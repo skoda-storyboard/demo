@@ -1,0 +1,81 @@
+# SKODA-104 — query-index skeleton (per-locale index definitions).
+#
+# In-repo source-of-truth copy ONLY. The platform does NOT read this file:
+# on the config service the index config is submitted via
+#   PUT https://admin.hlx.page/config/skoda-storyboard/sites/demo/content/query.yaml
+# (Content-Type: text/yaml). Push it with ./push-query-config.sh.
+# helix-query.yaml / fstab.yaml / paths.json are retired for this project.
+#
+# Skeleton columns only: path, title, description, image, template, date,
+# category, model, tags (path + lastModified are emitted automatically).
+# The full 15-facet selector schema and the importer normalization layer
+# (category-from-URL, 4-way date fallback) are SKODA-401, not this ticket.
+
+version: 1
+
+indices:
+  en: &default
+    include:
+      - /en/**
+    exclude:
+      - /en/drafts/**
+      - /en/fragments/**
+      - /en/**/modals/**
+      - /en/nav
+      - /en/footer
+    target: /en/query-index.json
+    properties:
+      title:
+        select: head > meta[property="og:title"]
+        value: attribute(el, "content")
+      description:
+        select: head > meta[name="description"]
+        value: attribute(el, "content")
+      image:
+        select: head > meta[property="og:image"]
+        value: attribute(el, "content")
+      template:
+        select: head > meta[name="template"]
+        value: attribute(el, "content")
+      date:
+        select: head > meta[name="publisheddate"]
+        value: attribute(el, "content")
+      category:
+        select: head > meta[name="category"]
+        value: attribute(el, "content")
+      model:
+        select: head > meta[name="model"]
+        value: attribute(el, "content")
+      # comma-joined multi-value facet; placeholder for the 15 facets (SKODA-401)
+      tags:
+        select: head > meta[name="tags"]
+        value: attribute(el, "content")
+
+  # --- Stubbed locales (E10 rollout, SKODA-1001). Inherit properties + exclude
+  #     from &default via merge; override include + target. Produce empty
+  #     indices until /<locale>/ content is published. ---
+  de:
+    <<: *default
+    include:
+      - /de/**
+    target: /de/query-index.json
+  cs:
+    <<: *default
+    include:
+      - /cs/**
+    target: /cs/query-index.json
+  sk:
+    <<: *default
+    include:
+      - /sk/**
+    target: /sk/query-index.json
+  sr:
+    <<: *default
+    include:
+      - /sr/**
+    target: /sr/query-index.json
+  sl:
+    <<: *default
+    include:
+      - /sl/**
+    target: /sl/query-index.json
