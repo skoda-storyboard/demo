@@ -1,7 +1,7 @@
 # Design Tokens — Global CSS Foundation (SKODA-106)
 
 The shared design-system contract every block consumes. Tokens are **re-derived** from the
-source design (measured in [`ui-specs/_FOUNDATIONS.md`](./ui-specs/_FOUNDATIONS.md)), **not ported**
+source design (measured in [`ui-specs/_FOUNDATIONS.md`](../ui-specs/_FOUNDATIONS.md)), **not ported**
 from the legacy jQuery/Owl/Isotope theme. Downstream block CSS must use `var(--…)` — no hardcoded
 colors or spacing.
 

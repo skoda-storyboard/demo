@@ -13,7 +13,7 @@
 /*
  * Global design tokens + global/section styles (SKODA-106).
  *
- * Two-file split (intentional — see docs/DESIGN-TOKENS.md):
+ * Two-file split (intentional — see docs/guardrails/DESIGN-TOKENS.md):
  *   - brand.css  = primitive layer. Raw hex color tokens + fallback @font-face. It is the ONLY
  *                  file exempt from Stylelint color-no-hex + declaration-strict-value, so raw hex
  *                  is allowed there and nowhere else. Loaded eagerly BEFORE this file in head.html.
