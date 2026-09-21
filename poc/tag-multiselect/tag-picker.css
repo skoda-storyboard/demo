@@ -1,0 +1,107 @@
+/*
+ * tag-picker.css — self-contained styling for the DA/EW library plugin palette.
+ * Not an EDS block, so it does not use repo design tokens; kept minimal and neutral
+ * so it sits comfortably inside the DA library iframe.
+ */
+
+:root {
+  --tp-ink: #1d1d1b;
+  --tp-line: #d8d8d8;
+  --tp-accent: #4ba82e; /* Škoda emerald, approximate */
+  --tp-bg: #fff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", roboto, sans-serif;
+  font-size: 14px;
+  color: var(--tp-ink);
+  background: var(--tp-bg);
+}
+
+#app { padding: 12px 14px; }
+
+.tp-help {
+  margin: 0 0 10px;
+  color: #555;
+  font-size: 12px;
+}
+
+.tp-list {
+  max-height: 320px;
+  overflow: auto;
+  padding: 4px 2px;
+  border: 1px solid var(--tp-line);
+  border-radius: 6px;
+}
+
+.tp-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 16px;
+  padding: 6px 4px;
+}
+
+.tp-group + .tp-group { border-top: 1px solid var(--tp-line); }
+
+.tp-group-label {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #777;
+}
+
+.tp-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tp-item:hover { background: #f4f4f4; }
+.tp-item input { accent-color: var(--tp-accent); }
+
+.tp-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.tp-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: #555;
+}
+
+.tp-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--tp-line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--tp-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.tp-btn:hover { border-color: #999; }
+
+.tp-btn-primary {
+  border-color: var(--tp-accent);
+  background: var(--tp-accent);
+  color: #fff;
+}
+
+.tp-btn-primary:disabled {
+  border-color: var(--tp-line);
+  background: #e6e6e6;
+  color: #999;
+  cursor: not-allowed;
+}

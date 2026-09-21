@@ -6,4 +6,5 @@ LICENSE
 package.json
 package-lock.json
 test/*
+poc/**/test.mjs
 sync-block-collection.sh
