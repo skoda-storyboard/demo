@@ -53,6 +53,7 @@ function parseArgs() {
     dryRun: false,
     force: false,
     daArchive: false,
+    fromManifest: false,
     limit: Infinity,
   };
   for (let i = 0; i < args.length; i += 1) {
@@ -60,6 +61,7 @@ function parseArgs() {
     if (a === '--dry-run') { out.dryRun = true; continue; }
     if (a === '--force') { out.force = true; continue; }
     if (a === '--da-archive') { out.daArchive = true; continue; }
+    if (a === '--from-manifest') { out.fromManifest = true; continue; }
     if (a === '--pages') {
       while (args[i + 1] && !args[i + 1].startsWith('--')) { out.pages.push(args[i + 1]); i += 1; }
       continue;
@@ -75,7 +77,9 @@ function parseArgs() {
     if (a === '--limit') { out.limit = Number(val); i += 1; continue; }
     throw new Error(`Unexpected argument: ${a}`);
   }
-  if (out.pages.length === 0) throw new Error('At least one --pages <file> is required');
+  if (out.pages.length === 0 && !out.fromManifest) {
+    throw new Error('Provide --pages <file> [...] or --from-manifest (re-ingest from the existing manifest\'s source_urls)');
+  }
   return out;
 }
 
@@ -131,43 +135,63 @@ async function main() {
   const damConfig = cfg.damBase ? { baseUrl: cfg.damBase, folder: cfg.damFolder } : null;
   const damToken = damConfig ? resolveDamToken({ tokenFile: cfg.tokenFile }) : null;
 
+  const manifest = loadManifest(cfg.manifest);
+  ensureDir(path.dirname(cfg.manifest));
+
   // 1. Collect + dedup image refs. First page that references a logical image
   //    OWNS its DAM folder (page-mirrored). Later pages reuse that path.
   const byLogical = new Map(); // id -> { sourceUrl, alt, caption, seenUrls:Set, ownerPage }
-  for (const page of cfg.pages) {
-    const abs = path.resolve(page);
-    if (!existsSync(abs)) { console.warn(`⚠️  page not found: ${page}`); continue; }
-    const pagePath = pagePathFromFile(abs);
-    const html = readFileSync(abs, 'utf8');
-    for (const ref of extractImageRefs(html)) {
-      if (!/^https?:\/\//i.test(ref.url)) continue; // skip already-ingested / relative
-      if (!isImageUrl(ref.url)) continue; // skip PDFs etc.
-      const id = logicalId(ref.url);
-      const existing = byLogical.get(id);
-      if (existing) {
-        existing.seenUrls.add(ref.url);
-        if (!existing.alt && ref.alt) existing.alt = ref.alt;
-        if (!existing.caption && ref.caption) existing.caption = ref.caption;
-      } else {
-        byLogical.set(id, {
-          sourceUrl: ref.url,
-          alt: ref.alt,
-          caption: ref.caption,
-          seenUrls: new Set([ref.url]),
-          ownerPage: pagePath,
-        });
+
+  if (cfg.fromManifest) {
+    // Re-ingest straight from the existing manifest's recorded source_urls — for
+    // when the imported .plain.html isn't in the checkout (content/ is a separate
+    // store). Reuses each row's own dam_page_path/alt so foldering is unchanged.
+    for (const row of Object.values(manifest.rows || {})) {
+      const src = row.source_url;
+      if (!src || !isImageUrl(src)) continue;
+      const id = row.logical_id || logicalId(src);
+      byLogical.set(id, {
+        sourceUrl: src,
+        alt: row.alt || '',
+        caption: row.caption || '',
+        seenUrls: new Set(row.seen_urls && row.seen_urls.length ? row.seen_urls : [src]),
+        ownerPage: row.dam_page_path || '',
+      });
+    }
+  } else {
+    for (const page of cfg.pages) {
+      const abs = path.resolve(page);
+      if (!existsSync(abs)) { console.warn(`⚠️  page not found: ${page}`); continue; }
+      const pagePath = pagePathFromFile(abs);
+      const html = readFileSync(abs, 'utf8');
+      for (const ref of extractImageRefs(html)) {
+        if (!/^https?:\/\//i.test(ref.url)) continue; // skip already-ingested / relative
+        if (!isImageUrl(ref.url)) continue; // skip PDFs etc.
+        const id = logicalId(ref.url);
+        const existing = byLogical.get(id);
+        if (existing) {
+          existing.seenUrls.add(ref.url);
+          if (!existing.alt && ref.alt) existing.alt = ref.alt;
+          if (!existing.caption && ref.caption) existing.caption = ref.caption;
+        } else {
+          byLogical.set(id, {
+            sourceUrl: ref.url,
+            alt: ref.alt,
+            caption: ref.caption,
+            seenUrls: new Set([ref.url]),
+            ownerPage: pagePath,
+          });
+        }
       }
     }
   }
 
   const logicalIds = [...byLogical.keys()].slice(0, cfg.limit);
-  console.log(`[media] ${logicalIds.length} distinct logical image(s) across ${cfg.pages.length} page(s)`);
+  const srcLabel = cfg.fromManifest ? 'from manifest' : `across ${cfg.pages.length} page(s)`;
+  console.log(`[media] ${logicalIds.length} distinct logical image(s) ${srcLabel}`);
   console.log(`[media] DAM: ${damConfig ? `${damConfig.baseUrl}${damConfig.folder} (token: ${damToken ? 'present' : 'MISSING → reference-in-place'})` : 'not configured'}`);
   console.log(`[media] DA archive: ${cfg.daArchive ? 'on' : 'off'}  ·  concurrency: ${cfg.concurrency}`);
   if (cfg.dryRun) console.log('[media] DRY RUN — no fetch/upload/write');
-
-  const manifest = loadManifest(cfg.manifest);
-  ensureDir(path.dirname(cfg.manifest));
 
   // Incremental persistence (B): flush after each row completes.
   let dirty = 0;

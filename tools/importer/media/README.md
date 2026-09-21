@@ -76,6 +76,23 @@ npm run test:media
 Without `--dam-base` the tool runs **delivery-only** (no DAM ingest) — useful for
 the media-bus rewrite alone.
 
+### `--from-manifest` (re-ingest without the page file)
+
+The imported `.plain.html` lives in the separate content store (`content/` is a
+symlink), so it is **not** in a code-repo checkout. To run the DAM ingest from a
+clean checkout, re-ingest straight from the source URLs already recorded in the
+committed `media-manifest.json` — no page file needed:
+
+```bash
+npm run media:build -- --from-manifest --force \
+  --dam-base https://author-p220607-e2281243.adobeaemcloud.com \
+  --dam-folder /content/dam/storyboard
+```
+
+Each row's own `dam_page_path`/`alt` are reused, so page-mirrored foldering is
+unchanged. `--force` re-processes rows already marked `done` (e.g. from a prior
+delivery-only build).
+
 ## Auth (per-host)
 
 - **DA / `admin.hlx.page` / `admin.da.live`** — the environment's injected
