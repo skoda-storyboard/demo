@@ -1,0 +1,272 @@
+{
+  "total_urls": 3499,
+  "scanned_ok": 3494,
+  "fetch_errors": 5,
+  "sides": {
+    "STO": 1634,
+    "MR": 1860
+  },
+  "template_counts": {
+    "press_release": 1651,
+    "story": 1318,
+    "custom_microsite": 201,
+    "skodapedia_archive": 190,
+    "page": 42,
+    "unknown": 38,
+    "tiles_dir": 35,
+    "faceted_listing": 6,
+    "press_kit": 4,
+    "company_page": 3,
+    "error404": 2,
+    "carousel_listing": 1,
+    "home": 1,
+    "model": 1,
+    "series_hub": 1
+  },
+  "template_by_side": {
+    "STO": {
+      "story": 1318,
+      "custom_microsite": 201,
+      "page": 42,
+      "tiles_dir": 35,
+      "unknown": 34,
+      "error404": 2,
+      "home": 1,
+      "series_hub": 1
+    },
+    "MR": {
+      "press_release": 1651,
+      "skodapedia_archive": 190,
+      "faceted_listing": 6,
+      "unknown": 4,
+      "press_kit": 4,
+      "company_page": 3,
+      "carousel_listing": 1,
+      "model": 1
+    }
+  },
+  "block_pages": {
+    "card_teaser": 3175,
+    "promo_banner": 2972,
+    "cover_box": 2952,
+    "tags": 2905,
+    "downloads": 2810,
+    "carousel_rails": 1995,
+    "gallery_lightbox": 1784,
+    "two_column": 1654,
+    "siteorigin_body": 1614,
+    "hero": 1405,
+    "skodapedia": 190,
+    "row_toggle": 33,
+    "faceted_listing": 6,
+    "press_kit_media": 4,
+    "media_cart_page": 2,
+    "model_nav": 1
+  },
+  "block_by_side": {
+    "card_teaser": {
+      "STO": 1509,
+      "MR": 1666
+    },
+    "carousel_rails": {
+      "STO": 1006,
+      "MR": 989
+    },
+    "cover_box": {
+      "STO": 1295,
+      "MR": 1657
+    },
+    "downloads": {
+      "STO": 1199,
+      "MR": 1611
+    },
+    "hero": {
+      "STO": 1399,
+      "MR": 6
+    },
+    "promo_banner": {
+      "STO": 1318,
+      "MR": 1654
+    },
+    "siteorigin_body": {
+      "STO": 1568,
+      "MR": 46
+    },
+    "tags": {
+      "STO": 1282,
+      "MR": 1623
+    },
+    "gallery_lightbox": {
+      "STO": 268,
+      "MR": 1516
+    },
+    "row_toggle": {
+      "STO": 17,
+      "MR": 16
+    },
+    "media_cart_page": {
+      "MR": 2
+    },
+    "faceted_listing": {
+      "MR": 6
+    },
+    "two_column": {
+      "MR": 1654
+    },
+    "skodapedia": {
+      "MR": 190
+    },
+    "press_kit_media": {
+      "MR": 4
+    },
+    "model_nav": {
+      "MR": 1
+    }
+  },
+  "block_by_template": {
+    "card_teaser": {
+      "press_release": 1651,
+      "story": 1299,
+      "custom_microsite": 153,
+      "tiles_dir": 33,
+      "page": 20,
+      "faceted_listing": 6,
+      "unknown": 4,
+      "press_kit": 4,
+      "carousel_listing": 1,
+      "home": 1,
+      "company_page": 1,
+      "model": 1,
+      "series_hub": 1
+    },
+    "carousel_rails": {
+      "story": 1005,
+      "press_release": 978,
+      "faceted_listing": 6,
+      "press_kit": 2,
+      "carousel_listing": 1,
+      "unknown": 1,
+      "home": 1,
+      "model": 1
+    },
+    "cover_box": {
+      "press_release": 1647,
+      "story": 1294,
+      "faceted_listing": 6,
+      "press_kit": 3,
+      "unknown": 1,
+      "home": 1
+    },
+    "downloads": {
+      "press_release": 1608,
+      "story": 1199,
+      "press_kit": 2,
+      "unknown": 1
+    },
+    "hero": {
+      "story": 1318,
+      "page": 42,
+      "tiles_dir": 35,
+      "unknown": 4,
+      "company_page": 3,
+      "carousel_listing": 1,
+      "press_kit": 1,
+      "series_hub": 1
+    },
+    "promo_banner": {
+      "press_release": 1651,
+      "story": 1318,
+      "press_kit": 3
+    },
+    "siteorigin_body": {
+      "story": 1268,
+      "custom_microsite": 201,
+      "press_release": 38,
+      "page": 34,
+      "tiles_dir": 32,
+      "unknown": 31,
+      "press_kit": 4,
+      "company_page": 3,
+      "error404": 2,
+      "model": 1
+    },
+    "tags": {
+      "press_release": 1620,
+      "story": 1282,
+      "press_kit": 3
+    },
+    "gallery_lightbox": {
+      "press_release": 1513,
+      "custom_microsite": 165,
+      "story": 81,
+      "page": 19,
+      "tiles_dir": 3,
+      "press_kit": 2,
+      "company_page": 1
+    },
+    "row_toggle": {
+      "custom_microsite": 17,
+      "press_release": 13,
+      "press_kit": 2,
+      "company_page": 1
+    },
+    "media_cart_page": {
+      "unknown": 2
+    },
+    "faceted_listing": {
+      "faceted_listing": 6
+    },
+    "two_column": {
+      "press_release": 1651,
+      "press_kit": 3
+    },
+    "skodapedia": {
+      "skodapedia_archive": 190
+    },
+    "press_kit_media": {
+      "press_kit": 4
+    },
+    "model_nav": {
+      "model": 1
+    }
+  },
+  "variant_pages": {
+    "teaser_overlay": 3494,
+    "teaser_media": 3142,
+    "teaser_toolbar": 3139,
+    "cover_box_dark": 2946,
+    "gallery_lightbox_viewer": 130
+  },
+  "embed_pages": {
+    "vimeo": 250,
+    "youtube": 200,
+    "buzzsprout": 197,
+    "spotify": 35
+  },
+  "specced_but_zero_appearances": [
+    "faq_accordion"
+  ],
+  "detected_outside_named_universe": [],
+  "error_samples": [
+    [
+      "https://www.skoda-storyboard.com/en/skoda-superb-combi-press-kit/",
+      "HTTP Error 404: Not Found"
+    ],
+    [
+      "https://www.skoda-storyboard.com/en/all-new-skoda-kodiaq-press-kit/",
+      "HTTP Error 404: Not Found"
+    ],
+    [
+      "https://www.skoda-storyboard.com/en/press-kits/privacy-statement/",
+      "HTTP Error 301: The HTTP server returned"
+    ],
+    [
+      "https://www.skoda-storyboard.com/en/press-releases/double-victory-skoda-best-cars-2018-awards/",
+      "HTTP Error 301: The HTTP server returned"
+    ],
+    [
+      "https://www.skoda-storyboard.com/en/press-releases/gift-ideas-santa-claus-skoda-turns-christmas-upside/",
+      "HTTP Error 301: The HTTP server returned"
+    ]
+  ]
+}

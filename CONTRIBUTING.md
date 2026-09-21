@@ -49,6 +49,38 @@ We enforce a coding styleguide using `eslint`. As part of your build, run `npm r
 
 You can fix some of the issues automatically by running `npx eslint . --fix`.
 
+# Frontend CSS Contribution Guidelines
+
+All frontend contributions involving CSS, responsive layout, or UI
+styling must follow:
+
+`docs/guardrails/css-guidelines.md`
+
+## Pull Request Expectations
+
+Before submitting frontend styling changes:
+
+-   Verify the implementation follows the three-layer architecture:
+    fluid, intrinsic/adaptive, then behavioral breakpoints.
+-   Confirm new breakpoints are driven by an actual layout transition
+    rather than a device category.
+-   Reuse existing design tokens and CSS variables before creating new
+    ones.
+-   Keep component-specific styles with the component.
+-   Keep global CSS limited to truly global concerns.
+-   Prefer Grid, Flexbox, intrinsic sizing, and container queries over
+    unnecessary viewport media queries.
+-   Avoid magic numbers, unnecessary fixed heights, excessive
+    specificity, `!important`, and JavaScript-based layout calculations.
+-   Test intermediate widths, not only named device sizes.
+-   Verify keyboard focus, text scaling, localization/text expansion,
+    RTL where applicable, and reduced-motion behavior.
+-   Confirm the change does not introduce unintended overflow or layout
+    shift.
+
+AI-generated code is held to the same engineering standards as manually
+authored code.
+
 ## Commit Message Format
 
 This project uses a structured commit changelog format that should be used for every commit. Use `npm run commit` instead of your usual `git commit` to generate commit messages using a wizard.

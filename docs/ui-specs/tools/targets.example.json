@@ -1,0 +1,22 @@
+[
+  {
+    "name": "media-cart-float",
+    "url": "https://www.skoda-storyboard.com/en/press-kits/skoda-superb-press-kit/models-history-one-million-mark-reached-in-third-generation/",
+    "selectors": [".sticky-buttons", "a.media-cart-icon"],
+    "attrs": ["data-count", "data-history", "rel"],
+    "viewports": [500, 768, 1024, 1280]
+  },
+  {
+    "name": "hero-story",
+    "url": "https://www.skoda-storyboard.com/en/",
+    "selectors": [".hero", ".hero h1"],
+    "viewports": [500, 768, 1024, 1280]
+  },
+  {
+    "name": "promo-box-carousel",
+    "url": "https://www.skoda-storyboard.com/en/",
+    "selectors": [".promo-box", ".promo-box .item:first-child"],
+    "attrs": ["data-flickity"],
+    "viewports": [500, 768, 1080, 1280]
+  }
+]

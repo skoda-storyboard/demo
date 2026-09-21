@@ -1,0 +1,99 @@
+ŠKODA STORYBOARD + MEDIA ROOM, CONTENT FOR THE 15 OCTOBER DEMO
+================================================================
+
+These are the live pages we plan to rebuild on the new Edge Delivery platform
+for the 15 October demo. They're a small, representative set: one real example
+of each page type the demo walks through, chosen so the demo shows the full
+breadth of the experience without migrating everything.
+
+What we'd like from your side:
+  1. Confirm these are the right representative pages (swap any you'd prefer).
+  2. Name one owner on your side for that sign-off, so nothing waits.
+
+The full content migration, all six languages, and the remaining page types
+come at go-live (see "Not in this demo set" at the bottom).
+
+
+STORYBOARD
+----------
+1. Homepage
+   https://www.skoda-storyboard.com/en/
+   The Storyboard front page: hero, featured promo, and the self-populating
+   topic rails that draw from your tags.
+
+2. Story page (one, in full richness)
+   https://www.skoda-storyboard.com/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/
+   A real article shown end to end, including an in-body gallery, video, and
+   media box, to prove the full story experience, not just plain text.
+
+3. Model page
+   https://www.skoda-storyboard.com/en/skoda-model/peaq/
+   A model page with its description and related-content rails.
+
+4. Series directory
+   https://www.skoda-storyboard.com/en/series-2/
+   The overview of all series.
+
+5. Series hub
+   https://www.skoda-storyboard.com/en/series/125-years-of-motorsport/
+   One series opened up: the curated two-level Series experience.
+
+
+MEDIA ROOM
+----------
+6. Media Room homepage
+   https://www.skoda-storyboard.com/en/media-room/
+   The pressroom front page, assembled from the same building blocks.
+
+7. Images listing
+   https://www.skoda-storyboard.com/en/images/
+   Filterable image listing with lightbox, downloads, and add-to-cart, over a
+   representative set.
+
+8. Videos listing
+   https://www.skoda-storyboard.com/en/videos/
+   Filterable video listing with playback, download, and add-to-cart.
+
+9. News / filtered listing
+   https://www.skoda-storyboard.com/en/news/
+   The shared filtering-and-sorting listing that powers the listing pages.
+
+10. Press release page
+    https://www.skoda-storyboard.com/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/
+    The press-release layout (about half of all pages), with its own structure.
+
+
+ONE PRESS KIT, END TO END
+-------------------------
+11. Press-kit hub
+    https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/
+    The chaptered kit landing page with its resources and downloads.
+
+12. Press-kit chapter
+    https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/
+    One chapter of the kit: article body, chapter navigation, and grouped media.
+
+13. Press-kit resource (infographics)
+    https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/infographics/
+    A resource page within the kit (infographics, with previews and downloads).
+
+
+ALSO SHOWN IN THE DEMO (no page to nominate)
+--------------------------------------------
+- English + Czech: the pages above in both languages, with the language
+  switcher showing only the languages a page actually exists in.
+- The media cart: collecting assets across the Images/Videos pages and
+  downloading them, no login needed.
+- An embargoed page: restricted to a group, previewed privately, then published
+  on schedule. This is a built-in platform feature, not a specific existing page.
+
+
+NOT IN THIS DEMO SET (planned for go-live)
+------------------------------------------
+- Company and utility pages (board of management, annual reports, company logo,
+  media-services app, contacts).
+- The newsletter sign-up.
+- Standalone category and tag archive pages (the demo already shows this
+  behaviour through the homepage and model-page rails).
+- Škodapedia: we'd like to confirm with you first whether it stays outside
+  Storyboard (as noted in your requirements) or moves onto the new platform.

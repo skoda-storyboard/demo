@@ -1,0 +1,35 @@
+# Škoda PoC minimal coverage URL set — 2026-09-15 (Škodapedia removed on demo-scope decision).
+# Full rationale + coverage matrix: SKODA-POC-URL-SET.md · machine-readable: skoda-poc-urls.json
+# Working set = 22 coverage URLs / 23 templates. The rail-feed corpus (extra tagged stories/
+# news/images/videos to prove rails + load-more) is maintained separately, see the demo plan.
+
+# --- Minimal set (22) ---
+https://www.skoda-storyboard.com/en/
+https://www.skoda-storyboard.com/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/
+https://www.skoda-storyboard.com/en/category/emobility/
+https://www.skoda-storyboard.com/en/tag/model/elroq/
+https://www.skoda-storyboard.com/en/series-2/
+https://www.skoda-storyboard.com/en/series/125-years-of-motorsport/
+https://www.skoda-storyboard.com/en/skoda-model/peaq/
+https://www.skoda-storyboard.com/en/category/podcast-en/
+https://www.skoda-storyboard.com/en/media-room/
+https://www.skoda-storyboard.com/en/news/
+https://www.skoda-storyboard.com/en/images/
+https://www.skoda-storyboard.com/en/videos/
+https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/
+https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/
+https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/infographics/
+https://www.skoda-storyboard.com/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/
+https://www.skoda-storyboard.com/en/board-of-management/
+https://www.skoda-storyboard.com/en/annual-reports/
+https://www.skoda-storyboard.com/en/company-logo/
+https://www.skoda-storyboard.com/en/skoda-media-services-application/
+https://www.skoda-storyboard.com/en/contacts/
+https://www.skoda-storyboard.com/en/newsletter/
+
+# --- Optional appendix (add only if a specific cell must be shown) ---
+# https://www.skoda-storyboard.com/en/brand-group-core-bgc/
+# https://www.skoda-storyboard.com/en/newsletter-settings/
+# https://www.skoda-storyboard.com/en/media-cart/
+# https://www.skoda-storyboard.com/en/copyright/
+# https://www.skoda-storyboard.com/en/?filter%5Bsearch%5D=octavia

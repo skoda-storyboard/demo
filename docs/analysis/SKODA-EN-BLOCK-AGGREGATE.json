@@ -1,0 +1,426 @@
+{
+  "total_pages": 3496,
+  "template_counts": {
+    "press_release": 1659,
+    "story": 1312,
+    "page": 334,
+    "skodapedia": 189,
+    "listing_index": 2
+  },
+  "block_pages": {
+    "ajax_loadmore": 3496,
+    "app_badges": 3496,
+    "downloads": 3496,
+    "social_feed": 3496,
+    "social_share": 3496,
+    "cards_teaser": 3191,
+    "newsletter": 3179,
+    "media_cart": 3178,
+    "tags": 2907,
+    "skodapedia_glossary": 1866,
+    "gallery": 1763,
+    "promo_banner": 1658,
+    "parallax": 1646,
+    "hero": 1587,
+    "carousel": 233,
+    "faceted_listing": 7
+  },
+  "block_templates": {
+    "ajax_loadmore": {
+      "press_release": 1659,
+      "story": 1312,
+      "page": 334,
+      "skodapedia": 189,
+      "listing_index": 2
+    },
+    "app_badges": {
+      "press_release": 1659,
+      "story": 1312,
+      "page": 334,
+      "skodapedia": 189,
+      "listing_index": 2
+    },
+    "cards_teaser": {
+      "press_release": 1659,
+      "story": 1311,
+      "page": 220,
+      "listing_index": 1
+    },
+    "carousel": {
+      "story": 231,
+      "press_release": 1,
+      "page": 1
+    },
+    "downloads": {
+      "press_release": 1659,
+      "story": 1312,
+      "page": 334,
+      "skodapedia": 189,
+      "listing_index": 2
+    },
+    "hero": {
+      "story": 1310,
+      "skodapedia": 189,
+      "page": 86,
+      "listing_index": 2
+    },
+    "media_cart": {
+      "press_release": 1659,
+      "story": 1294,
+      "page": 224,
+      "listing_index": 1
+    },
+    "newsletter": {
+      "press_release": 1659,
+      "story": 1312,
+      "skodapedia": 189,
+      "page": 17,
+      "listing_index": 2
+    },
+    "parallax": {
+      "story": 1312,
+      "page": 334
+    },
+    "social_feed": {
+      "press_release": 1659,
+      "story": 1312,
+      "page": 334,
+      "skodapedia": 189,
+      "listing_index": 2
+    },
+    "social_share": {
+      "press_release": 1659,
+      "story": 1312,
+      "page": 334,
+      "skodapedia": 189,
+      "listing_index": 2
+    },
+    "tags": {
+      "press_release": 1628,
+      "story": 1276,
+      "page": 3
+    },
+    "skodapedia_glossary": {
+      "press_release": 1659,
+      "skodapedia": 189,
+      "page": 14,
+      "story": 2,
+      "listing_index": 2
+    },
+    "gallery": {
+      "press_release": 1510,
+      "page": 176,
+      "story": 77
+    },
+    "promo_banner": {
+      "press_release": 1656,
+      "page": 2
+    },
+    "faceted_listing": {
+      "page": 6,
+      "listing_index": 1
+    }
+  },
+  "block_samples": {
+    "ajax_loadmore": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "app_badges": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "cards_teaser": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "carousel": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "downloads": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "hero": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "media_cart": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "newsletter": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "parallax": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "social_feed": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "social_share": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "tags": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "skodapedia_glossary": [
+      "https://www.skoda-storyboard.com/en/about/be-in-the-picture-subscribe-to-the-skoda-world/",
+      "https://www.skoda-storyboard.com/en/skoda-world/skoda-vision-7s-reveals-the-future/",
+      "https://www.skoda-storyboard.com/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management/"
+    ],
+    "gallery": [
+      "https://www.skoda-storyboard.com/en/lifestyle/chasing-the-best-drone-shot-ever/",
+      "https://www.skoda-storyboard.com/en/concepts/the-skoda-joyster-lemon-joy/",
+      "https://www.skoda-storyboard.com/en/skoda-world/design/number-of-the-month-373/"
+    ],
+    "promo_banner": [
+      "https://www.skoda-storyboard.com/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management/",
+      "https://www.skoda-storyboard.com/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/",
+      "https://www.skoda-storyboard.com/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon/"
+    ],
+    "faceted_listing": [
+      "https://www.skoda-storyboard.com/en/search/",
+      "https://www.skoda-storyboard.com/en/videos/",
+      "https://www.skoda-storyboard.com/en/images/"
+    ]
+  },
+  "variant_pages": {
+    "cards_teaser": {
+      "media": 3142,
+      "toolbar": 3139,
+      "overlay": 2637
+    },
+    "hero": {
+      "image": 1587
+    },
+    "media_cart": {
+      "item": 3158
+    },
+    "downloads": {
+      "badge": 3496,
+      "buttons": 3496
+    },
+    "social_share": {
+      "links": 3496
+    },
+    "skodapedia_glossary": {
+      "az-filter": 1866,
+      "term-detail": 190
+    },
+    "newsletter": {
+      "widget": 1864
+    },
+    "promo_banner": {
+      "box": 1658
+    },
+    "faceted_listing": {
+      "pagination": 7,
+      "taxonomy": 4
+    }
+  },
+  "variant_samples": {
+    "cards_teaser|media": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "cards_teaser|overlay": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "cards_teaser|toolbar": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "hero|image": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "media_cart|item": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "downloads|badge": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "downloads|buttons": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "social_share|links": [
+      "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+      "https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/"
+    ],
+    "skodapedia_glossary|az-filter": [
+      "https://www.skoda-storyboard.com/en/about/be-in-the-picture-subscribe-to-the-skoda-world/",
+      "https://www.skoda-storyboard.com/en/skoda-world/skoda-vision-7s-reveals-the-future/",
+      "https://www.skoda-storyboard.com/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management/"
+    ],
+    "newsletter|widget": [
+      "https://www.skoda-storyboard.com/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management/",
+      "https://www.skoda-storyboard.com/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/",
+      "https://www.skoda-storyboard.com/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon/"
+    ],
+    "promo_banner|box": [
+      "https://www.skoda-storyboard.com/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management/",
+      "https://www.skoda-storyboard.com/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/",
+      "https://www.skoda-storyboard.com/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon/"
+    ],
+    "faceted_listing|pagination": [
+      "https://www.skoda-storyboard.com/en/search/",
+      "https://www.skoda-storyboard.com/en/videos/",
+      "https://www.skoda-storyboard.com/en/images/"
+    ],
+    "faceted_listing|taxonomy": [
+      "https://www.skoda-storyboard.com/en/videos/",
+      "https://www.skoda-storyboard.com/en/images/",
+      "https://www.skoda-storyboard.com/en/press-kits/"
+    ],
+    "skodapedia_glossary|term-detail": [
+      "https://www.skoda-storyboard.com/en/skodapedia/trained-parking-2/",
+      "https://www.skoda-storyboard.com/en/skodapedia/recytitan/",
+      "https://www.skoda-storyboard.com/en/skodapedia/smart-dials/"
+    ]
+  },
+  "template_blocks": {
+    "story": {
+      "ajax_loadmore": 1312,
+      "app_badges": 1312,
+      "downloads": 1312,
+      "newsletter": 1312,
+      "parallax": 1312,
+      "social_feed": 1312,
+      "social_share": 1312,
+      "cards_teaser": 1311,
+      "hero": 1310,
+      "media_cart": 1294,
+      "tags": 1276,
+      "carousel": 231,
+      "gallery": 77,
+      "skodapedia_glossary": 2
+    },
+    "press_release": {
+      "ajax_loadmore": 1659,
+      "app_badges": 1659,
+      "cards_teaser": 1659,
+      "downloads": 1659,
+      "media_cart": 1659,
+      "newsletter": 1659,
+      "skodapedia_glossary": 1659,
+      "social_feed": 1659,
+      "social_share": 1659,
+      "promo_banner": 1656,
+      "tags": 1628,
+      "gallery": 1510,
+      "carousel": 1
+    },
+    "page": {
+      "ajax_loadmore": 334,
+      "app_badges": 334,
+      "downloads": 334,
+      "parallax": 334,
+      "social_feed": 334,
+      "social_share": 334,
+      "media_cart": 224,
+      "cards_teaser": 220,
+      "gallery": 176,
+      "hero": 86,
+      "newsletter": 17,
+      "skodapedia_glossary": 14,
+      "faceted_listing": 6,
+      "tags": 3,
+      "promo_banner": 2,
+      "carousel": 1
+    },
+    "skodapedia": {
+      "ajax_loadmore": 189,
+      "app_badges": 189,
+      "downloads": 189,
+      "hero": 189,
+      "newsletter": 189,
+      "skodapedia_glossary": 189,
+      "social_feed": 189,
+      "social_share": 189
+    },
+    "listing_index": {
+      "ajax_loadmore": 2,
+      "app_badges": 2,
+      "downloads": 2,
+      "hero": 2,
+      "newsletter": 2,
+      "skodapedia_glossary": 2,
+      "social_feed": 2,
+      "social_share": 2,
+      "cards_teaser": 1,
+      "faceted_listing": 1,
+      "media_cart": 1
+    }
+  },
+  "embed_pages": {
+    "vimeo": 246,
+    "youtube": 201,
+    "buzzsprout": 195,
+    "spotify": 36,
+    "skoda-internal": 23,
+    "other": 7
+  },
+  "embed_samples": {
+    "vimeo": [
+      "https://www.skoda-storyboard.com/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality/",
+      "https://www.skoda-storyboard.com/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia/",
+      "https://www.skoda-storyboard.com/en/emobility/meet-peaq-safe-and-comfortable/"
+    ],
+    "spotify": [
+      "https://www.skoda-storyboard.com/en/podcast-en/podcast-exploreskoda-designing-the-future-inside-skodas-vision-o/",
+      "https://www.skoda-storyboard.com/en/podcast-en/podcast-exploreskoda-ev-lounge-meet-up-real-life-experiences-with-skoda-evs/",
+      "https://www.skoda-storyboard.com/en/podcast-en/podcast-exploreskoda-steve-fowler-from-diesel-doubts-to-electric-confidence/"
+    ],
+    "youtube": [
+      "https://www.skoda-storyboard.com/en/skoda-world/2024-a-year-of-new-electric-cars-and-innovated-favourites/",
+      "https://www.skoda-storyboard.com/en/skoda-world/minutes-from-car-production-how-a-car-is-made-step-by-step/",
+      "https://www.skoda-storyboard.com/en/skoda-world/minutes-from-car-production-a-visual-inspection-and-the-first-test/"
+    ],
+    "skoda-internal": [
+      "https://www.skoda-storyboard.com/en/skoda-world/the-future-of-sustainable-materials-frying-oil-and-old-bumpers/",
+      "https://www.skoda-storyboard.com/en/skoda-world/innovation-and-technology/90-years-on-the-production-line/",
+      "https://www.skoda-storyboard.com/en/lifestyle/sports/slavia-versus-festka-scalatore-120-years-of-cycling-evolution/"
+    ],
+    "other": [
+      "https://www.skoda-storyboard.com/en/lifestyle/its-first-race-the-incredibly-fast-skoda-vision-gran-turismo/",
+      "https://www.skoda-storyboard.com/en/emobility/electrifying-the-bear-driving-the-skoda-kodiaq-iv/",
+      "https://www.skoda-storyboard.com/en/skoda-world/monte-carlo-in-monte-carlo/"
+    ],
+    "buzzsprout": [
+      "https://www.skoda-storyboard.com/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management/",
+      "https://www.skoda-storyboard.com/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/",
+      "https://www.skoda-storyboard.com/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon/"
+    ]
+  }
+}

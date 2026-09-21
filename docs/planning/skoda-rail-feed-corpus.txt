@@ -1,0 +1,133 @@
+# Škoda Demo — rail-feed corpus. Extra tagged source URLs (beyond the 22 coverage URLs)
+# to populate rails + prove load-more. All HTTP-verified 200 (no cross-path redirect)
+# by discovery fan-out 2026-09-17. Rationale + sizing: SKODA-RAIL-FEED-MAP.md.
+# Import per content-type family; each item carries category/model/tags/publisheddate/template.
+
+# ===== MODELS (11) — skoda_model CPT; feeds Models rails (STO + MR home) =====
+https://www.skoda-storyboard.com/en/skoda-model/elroq/
+https://www.skoda-storyboard.com/en/skoda-model/enyaq-iv-2/
+https://www.skoda-storyboard.com/en/skoda-model/epiq/
+https://www.skoda-storyboard.com/en/skoda-model/kamiq/
+https://www.skoda-storyboard.com/en/skoda-model/karoq-6/
+https://www.skoda-storyboard.com/en/skoda-model/new-fabia/
+https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/
+https://www.skoda-storyboard.com/en/skoda-model/new-superb/
+https://www.skoda-storyboard.com/en/skoda-model/octavia/
+https://www.skoda-storyboard.com/en/skoda-model/scala/
+# peaq is already in the coverage set (#7)
+
+# ===== SERIES (12) — skoda_series hubs; feeds Series rail + directory =====
+# (125-years-of-motorsport is already coverage #6)
+https://www.skoda-storyboard.com/en/series/road-trip/
+https://www.skoda-storyboard.com/en/series/winter-tips/
+https://www.skoda-storyboard.com/en/series/back-to-the-past/
+https://www.skoda-storyboard.com/en/series/unknown-parts/
+https://www.skoda-storyboard.com/en/series/hidden-helpers/
+https://www.skoda-storyboard.com/en/series/unexpected-jobs/
+https://www.skoda-storyboard.com/en/series/czech-footprint/
+https://www.skoda-storyboard.com/en/series/sustainable-mobility/
+https://www.skoda-storyboard.com/en/series/my-life-my-car/
+https://www.skoda-storyboard.com/en/series/roads-places/
+https://www.skoda-storyboard.com/en/series/evolution-of-parts/
+https://www.skoda-storyboard.com/en/series/60-seconds-walkaround/
+
+# ===== PRESS RELEASES (11) — feeds Latest News, MR News feed, /en/news/, model News rail =====
+# (skoda-superb-25-years... is coverage #16)
+https://www.skoda-storyboard.com/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car/
+https://www.skoda-storyboard.com/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france/
+https://www.skoda-storyboard.com/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions/
+https://www.skoda-storyboard.com/en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available/
+https://www.skoda-storyboard.com/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/
+https://www.skoda-storyboard.com/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon/
+https://www.skoda-storyboard.com/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026/
+https://www.skoda-storyboard.com/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich/
+
+# ===== PRESS KITS (12) — press_kit hubs; feeds MR Press Kits rail + model Press Kits rail =====
+# (skoda-epiq-press-kit-2 is coverage #13)
+https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/
+https://www.skoda-storyboard.com/en/press-kits/skoda-elroq-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-elroq-press-kit-2/
+https://www.skoda-storyboard.com/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/
+https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car/
+https://www.skoda-storyboard.com/en/press-kits/the-all-new-skoda-superb-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/the-all-new-skoda-kodiaq-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/new-skoda-enyaq-press-kit-2/
+https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/
+https://www.skoda-storyboard.com/en/press-kits/skoda-vision-o-press-kit/
+
+# ===== STORIES tagged PEAQ (13) — feeds model Stories rail, thin categories, Latest Stories =====
+https://www.skoda-storyboard.com/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france/
+https://www.skoda-storyboard.com/en/emobility/designers-on-the-peaq-its-modern-durable-and-practical/
+https://www.skoda-storyboard.com/en/emobility/even-opening-the-door-is-an-experience-says-the-designer-of-the-peaq-suv/
+https://www.skoda-storyboard.com/en/emobility/how-the-versatile-skoda-peaq-conquered-a-mountain-peak/
+https://www.skoda-storyboard.com/en/emobility/meet-the-peaq-comfort-just-like-at-home/
+https://www.skoda-storyboard.com/en/emobility/meet-the-peaq-spacious-inside-and-out/
+https://www.skoda-storyboard.com/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia/
+https://www.skoda-storyboard.com/en/emobility/skoda-peaq-unparalleled-space-and-comfort/
+https://www.skoda-storyboard.com/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq/
+https://www.skoda-storyboard.com/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving/
+https://www.skoda-storyboard.com/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute/
+# (peaq-sets-a-record... and spacious-comfortable... already imported in en-stories slice)
+
+# ===== STORIES tagged ELROQ (15) — feeds /en/tag/model/elroq/ listing + model Stories rail =====
+https://www.skoda-storyboard.com/en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca/
+https://www.skoda-storyboard.com/en/emobility/camouflage-to-get-you-hooked/
+https://www.skoda-storyboard.com/en/emobility/coffee-on-electric-wheels-elroq-and-enyaq-serving-coffee/
+https://www.skoda-storyboard.com/en/emobility/elroq-rs-in-a-robe-unveiling-the-secret-of-matte-paint/
+https://www.skoda-storyboard.com/en/emobility/how-was-the-elroq-made-not-in-the-usual-way/
+https://www.skoda-storyboard.com/en/emobility/make-use-of-the-frunk-unlock-with-your-phone-new-enhancements-for-elroq-and-enyaq/
+https://www.skoda-storyboard.com/en/emobility/skoda-elroq-premiere-light-cube-camera-action/
+https://www.skoda-storyboard.com/en/emobility/enyaq-and-elroq-now-double-as-gaming-consoles-and-thats-not-all/
+https://www.skoda-storyboard.com/en/emobility/skoda-elroq-and-a-happy-family/
+https://www.skoda-storyboard.com/en/lifestyle/la-dolce-vita-explore-the-surroundings-of-lake-como/
+https://www.skoda-storyboard.com/en/lifestyle/rs-four-ways-which-one-will-you-choose/
+https://www.skoda-storyboard.com/en/models/skoda-elroq-through-designers-eyes/
+https://www.skoda-storyboard.com/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car/
+https://www.skoda-storyboard.com/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details/
+https://www.skoda-storyboard.com/en/skoda-world/the-skoda-elroq-reveals-its-sustainable-interior/
+
+# ===== IMAGES (18) — attachment posts; per-item pages confirmed. Feeds Images listing + rails =====
+# NOTE: masters kept in place (no -WxH strip) per content-bus 409 gotcha.
+https://www.skoda-storyboard.com/?attachment_id=454117
+https://www.skoda-storyboard.com/?attachment_id=454116
+https://www.skoda-storyboard.com/?attachment_id=454115
+https://www.skoda-storyboard.com/?attachment_id=454113
+https://www.skoda-storyboard.com/?attachment_id=454114
+https://www.skoda-storyboard.com/?attachment_id=454112
+https://www.skoda-storyboard.com/?attachment_id=454844
+https://www.skoda-storyboard.com/?attachment_id=454845
+https://www.skoda-storyboard.com/?attachment_id=454843
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/092_skoda_epiq_3b448906_cb578496/
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/093_skoda_epiq_88fc035a_e098c289/
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/050_skoda_epiq_a13b0a2b_bf605016/
+https://www.skoda-storyboard.com/en/11-733/
+https://www.skoda-storyboard.com/en/10-724a/
+https://www.skoda-storyboard.com/en/09-728s-exponat/
+https://www.skoda-storyboard.com/en/07-s-37a-992-junior/
+https://www.skoda-storyboard.com/en/06a-115_1x/
+https://www.skoda-storyboard.com/en/22-781-sport/
+
+# ===== VIDEOS (18) — attachment posts, Vimeo-backed; per-item pages confirmed =====
+https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/videos/attachment/footage_innsbruck_epiq_uhd_d6cfe9d1/
+https://www.skoda-storyboard.com/?attachment_id=452721
+https://www.skoda-storyboard.com/?attachment_id=450950
+https://www.skoda-storyboard.com/?attachment_id=450428
+https://www.skoda-storyboard.com/?attachment_id=450349
+https://www.skoda-storyboard.com/?attachment_id=450350
+https://www.skoda-storyboard.com/en/skoda_peaq___simply_clever___part_1-1080p-1_a3e05a13/
+https://www.skoda-storyboard.com/?attachment_id=450055
+https://www.skoda-storyboard.com/en/skoda_peaq___simply_clever___part_2-1080p-1_583a6637/
+https://www.skoda-storyboard.com/en/skoda_peaq___simply_clever___part_2_with_subtitles-1080p-1_529affa6/
+https://www.skoda-storyboard.com/?attachment_id=449500
+https://www.skoda-storyboard.com/?attachment_id=449499
+https://www.skoda-storyboard.com/en/skoda_geneva_strube_interview_mp4/
+https://www.skoda-storyboard.com/en/tiger_on_ice_test/
+https://www.skoda-storyboard.com/en/wrc_rally_test/
+https://www.skoda-storyboard.com/en/feature_maxova_5/
+https://www.skoda-storyboard.com/en/skoda_octavia_combi_rs_4x4-2/
+https://www.skoda-storyboard.com/en/skoda_octavia_rs230_mpeg-4_1080p-2/

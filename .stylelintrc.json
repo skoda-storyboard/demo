@@ -1,3 +1,40 @@
 {
-  "extends": ["stylelint-config-standard"]
+  "extends": ["stylelint-config-standard"],
+  "plugins": ["stylelint-declaration-strict-value"],
+  "rules": {
+    "declaration-no-important": true,
+    "selector-max-id": 0,
+    "selector-max-universal": 0,
+    "max-nesting-depth": 4,
+    "font-family-name-quotes": "always-where-required",
+    "media-feature-name-value-allowed-list": {
+      "width": ["576px", "720px", "768px", "992px", "1080px", "/^calc\\(/"]
+    },
+    "media-feature-range-notation": "context",
+    "custom-property-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+    "selector-class-pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+    "color-no-hex": true,
+    "scale-unlimited/declaration-strict-value": [
+      ["color", "background-color", "border-color", "font-family"],
+      {
+        "ignoreValues": ["inherit", "transparent", "currentcolor", "unset", "none"],
+        "disableFix": true
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["styles/brand.css"],
+      "rules": {
+        "color-no-hex": null,
+        "scale-unlimited/declaration-strict-value": null
+      }
+    },
+    {
+      "files": ["styles/fonts.css"],
+      "rules": {
+        "scale-unlimited/declaration-strict-value": null
+      }
+    }
+  ]
 }

@@ -1,0 +1,17 @@
+{
+  "name": "skoda-ui-specs-tools",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Measurement + visual-diff harness for the Skoda UI spec library. Self-contained, kept out of the EDS project deps (docs/ is .hlxignore'd).",
+  "scripts": {
+    "postinstall": "playwright install chromium",
+    "measure": "node measure.mjs",
+    "diff": "node visual-diff.mjs"
+  },
+  "dependencies": {
+    "pixelmatch": "6.0.0",
+    "playwright": "1.63.0",
+    "pngjs": "7.0.0"
+  }
+}

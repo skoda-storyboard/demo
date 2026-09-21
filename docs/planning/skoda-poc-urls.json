@@ -1,0 +1,44 @@
+{
+  "generated": "2026-09-15",
+  "description": "Minimal PoC URL coverage set for Škoda Storyboard + Media Room. Smallest set of live, HTTP-verified source URLs exercising every template/variant/functionality. Feed to the scrape/import pipeline. Companion: SKODA-POC-URL-SET.md.",
+  "base": "https://www.skoda-storyboard.com",
+  "verified": "All URLs confirmed HTTP 200 (real render, not redirect/404) by research fan-out 2026-09-15.",
+  "scopeNote": "Škodapedia (archive + term-detail) removed from the working set on demo-scope decision (out of scope; re-aligns with client §9 'Škodapedia continues outside Storyboard'). Working set = 22 URLs / 23 templates. See docs/planning/SKODA-POC-URL-SET.md and the demo migration plan.",
+  "minimalSet": [
+    { "n": 1, "site": "SB", "template": "storyboard-home", "url": "/en/", "covers": ["featured-promo", "query-index-rails", "models-grid", "series-carousel", "load-more", "social-block", "language-selector"] },
+    { "n": 2, "site": "SB", "template": "story-detail", "url": "/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/", "covers": ["hero-image", "in-body-gallery", "youtube-embed", "media-box", "story-rail", "tags"], "note": "best full-fidelity story (gallery+embed+media-box in one)" },
+    { "n": 3, "site": "SB", "template": "category-listing", "url": "/en/category/emobility/", "covers": ["category-query-index-listing", "load-more"] },
+    { "n": 4, "site": "SB", "template": "tag-model-listing", "url": "/en/tag/model/elroq/", "covers": ["cta-hero", "model-tag-listing", "load-more"] },
+    { "n": 5, "site": "SB", "template": "series-directory", "url": "/en/series-2/", "covers": ["series-directory-grid"] },
+    { "n": 6, "site": "SB", "template": "series-hub", "url": "/en/series/125-years-of-motorsport/", "covers": ["curated-story-grid-no-loadmore"] },
+    { "n": 7, "site": "SB", "template": "storyboard-model", "url": "/en/skoda-model/peaq/", "covers": ["model-hero", "model-description", "tag-driven-rails-x5"] },
+    { "n": 8, "site": "SB", "template": "category-podcast", "url": "/en/category/podcast-en/", "covers": ["category-listing"], "note": "CORRECTED: not a 301 redirect — a live category page" },
+    { "n": 9, "site": "MR", "template": "media-room-home", "url": "/en/media-room/", "covers": ["7-rails", "media-cart-affordance", "mr-footer-variant"] },
+    { "n": 10, "site": "MR", "template": "faceted-listing", "url": "/en/news/", "covers": ["faceted-filter-bar", "6-per-load-more", "sort-newest-oldest"], "note": "shared listing engine baseline" },
+    { "n": 11, "site": "MR", "template": "images-listing", "url": "/en/images/", "covers": ["advanced-facets", "image-grid", "dual-rendition-download", "add-to-cart", "lightbox"] },
+    { "n": 12, "site": "MR", "template": "videos-listing", "url": "/en/videos/", "covers": ["vimeo-embed-grid", "mp4-download", "add-to-cart"] },
+    { "n": 13, "site": "MR", "template": "press-kit-hub", "url": "/en/press-kits/skoda-epiq-press-kit-2/", "covers": ["8-chapter-toc", "5-resource-tabs", "whole-kit-zip", "faq"] },
+    { "n": 14, "site": "MR", "template": "press-kit-chapter", "url": "/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/", "covers": ["article-body", "chapter-sub-nav", "in-body-gallery", "large-media-box"] },
+    { "n": 15, "site": "MR", "template": "press-kit-resource", "url": "/en/press-kits/skoda-epiq-press-kit-2/infographics/", "covers": ["infographics-preview-to-pdf-jpg-dual-format"] },
+    { "n": 16, "site": "MR", "template": "press-release-detail", "url": "/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/", "covers": ["ai-audio-buzzsprout-embed", "article-body", "media-box"], "note": "AI-audio iframe is JS-lazy-loaded; confirmed via Playwright" },
+    { "n": 17, "site": "shared", "template": "company-board-of-management", "url": "/en/board-of-management/", "covers": ["exec-bio-accordion", "expandable-gallery", "cv-photo-press-linkedin-links"] },
+    { "n": 18, "site": "shared", "template": "company-annual-reports", "url": "/en/annual-reports/", "covers": ["download-list", "pdf-cover-thumbs"] },
+    { "n": 19, "site": "shared", "template": "company-company-logo", "url": "/en/company-logo/", "covers": ["brand-asset-grid", "dual-pdf-png-download"] },
+    { "n": 20, "site": "shared", "template": "company-media-services-app", "url": "/en/skoda-media-services-application/", "covers": ["app-promo", "qr-code", "app-store-badges"] },
+    { "n": 21, "site": "shared", "template": "company-contacts", "url": "/en/contacts/", "covers": ["contact-directory"] },
+    { "n": 22, "site": "shared", "template": "newsletter-archive-signup", "url": "/en/newsletter/", "covers": ["newsletter-archive", "gdpr-consent-signup-form"], "note": "NEW 2026-09-15" }
+  ],
+  "appendix": [
+    { "site": "shared", "template": "page-info-landing", "url": "/en/brand-group-core-bgc/", "note": "NEW — corporate info landing; overlaps generic Page family" },
+    { "site": "shared", "template": "subscription-manage", "url": "/en/newsletter-settings/", "note": "NEW — manage/unsubscribe form; overlaps #24" },
+    { "site": "shared", "template": "media-cart-page", "url": "/en/media-cart/", "note": "NEW — the cart/downloads destination (COM14)" },
+    { "site": "shared", "template": "legal-text-page", "url": "/en/copyright/", "note": "plain content/legal page; /cs/copyright/ + de/impressum demo the language selector" },
+    { "site": "shared", "template": "documents-doc-page", "url": "/en/documents/", "note": "/en/documents/<slug>/ legal doc-page path" },
+    { "site": "shared", "template": "search-results", "url": "/en/?filter%5Bsearch%5D=octavia", "note": "search pattern is filter[search]=, not ?s= (index-only per D6)" }
+  ],
+  "knownGaps": [
+    "HTML technical-spec table: /technical-data/ ships specs as a PDF, not a rendered HTML table — NO live URL exercises a spec-table block. Net-new if required.",
+    "Media-cart real download / whole-kit ZIP: URLs exercise the UI only; the download backend is non-native to EDS (D2).",
+    "Legal URLs: /en/privacy-policy/, /en/data-protection/, /en/whistleblower/ 404; /en/privacy-statement redirect-loops; most legal lives off-site on skoda-auto.com."
+  ]
+}
