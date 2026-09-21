@@ -1,0 +1,213 @@
+{
+  "generatedAt": null,
+  "rows": {
+    "cdd4c961__Tech-Deck_c72ad67a.png": {
+      "logical_id": "cdd4c961__Tech-Deck_c72ad67a.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2024/10/Tech-Deck_c72ad67a.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2024/10/Tech-Deck_c72ad67a.png",
+      "dam_page_path": "en/skoda-model/elroq",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2024/10/Tech-Deck_c72ad67a.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2024/10/Tech-Deck_c72ad67a.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 968813,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cdd4c961__Elroq-interior_bc182cb0.png": {
+      "logical_id": "cdd4c961__Elroq-interior_bc182cb0.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-interior_bc182cb0.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-interior_bc182cb0.png",
+      "dam_page_path": "en/skoda-model/elroq",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-interior_bc182cb0.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2024/10/Elroq-interior_bc182cb0.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 1713221,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cdd4c961__elroq_header_fede6794.jpg": {
+      "logical_id": "cdd4c961__elroq_header_fede6794.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2024/10/elroq_header_fede6794.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2024/10/elroq_header_fede6794.jpg",
+      "dam_page_path": "en/skoda-model/elroq",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2024/10/elroq_header_fede6794.jpg",
+      "da_path": "",
+      "alt": "elroq_header_fede6794",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2024/10/elroq_header_fede6794.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 2681715,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cdd4c961__Elroq-boot_c23fb824.png": {
+      "logical_id": "cdd4c961__Elroq-boot_c23fb824.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-boot_c23fb824.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-boot_c23fb824.png",
+      "dam_page_path": "en/skoda-model/elroq",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-boot_c23fb824.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2024/10/Elroq-boot_c23fb824.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 2021060,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cdd4c961__Elroq-head-up_301f7568.png": {
+      "logical_id": "cdd4c961__Elroq-head-up_301f7568.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-head-up_301f7568.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-head-up_301f7568.png",
+      "dam_page_path": "en/skoda-model/elroq",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-head-up_301f7568.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2024/10/Elroq-head-up_301f7568.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 953243,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cdd4c961__Elroq-charging_ae487975.png": {
+      "logical_id": "cdd4c961__Elroq-charging_ae487975.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-charging_ae487975.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-charging_ae487975.png",
+      "dam_page_path": "en/skoda-model/elroq",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-charging_ae487975.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2024/10/Elroq-charging_ae487975.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 1009989,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cdd4c961__Elroq-MySkoda_09a17195.png": {
+      "logical_id": "cdd4c961__Elroq-MySkoda_09a17195.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-MySkoda_09a17195.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-MySkoda_09a17195.png",
+      "dam_page_path": "en/skoda-model/elroq",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2024/10/Elroq-MySkoda_09a17195.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2024/10/Elroq-MySkoda_09a17195.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 837545,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cdd4c961__hero_car_timiano_ext_front_1f67abb3.png": {
+      "logical_id": "cdd4c961__hero_car_timiano_ext_front_1f67abb3.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2024/10/hero_car_timiano_ext_front_1f67abb3.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2024/10/hero_car_timiano_ext_front_1f67abb3.png",
+      "dam_page_path": "en/skoda-model/elroq",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2024/10/hero_car_timiano_ext_front_1f67abb3.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2024/10/hero_car_timiano_ext_front_1f67abb3.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 847688,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    }
+  }
+}
