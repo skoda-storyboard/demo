@@ -36,8 +36,11 @@ client governs, so tags can be added or renamed with **no code change**:
 - **Fallback:** if the sheet can't be fetched (offline / restricted / not yet published), the
   picker uses the small built-in list in `fallback-tags.js` so it always works.
 
-The sheet is seeded with a representative starter set (a few models, bodywork, years, etc.).
-The client owns and extends it from there. To restrict the sheet (author-only), the picker
+The sheet is seeded with 29 tags harvested from the live source site
+(skoda-storyboard.com): the full model line-up plus real `years`, `environment`, `company`,
+`derivative`, and `view` tags. Note the harvest also picked up `crew` and `people`,
+taxonomies the live site carries beyond SKODA-401's 15 facets. The client owns and extends
+the list from there. To restrict the sheet (author-only), the picker
 sends the SDK `token` as a bearer header; a restricted sheet needs the render-after-connect
 variant (load the vocabulary after the DA handshake) instead of the current render-first path.
 
