@@ -11,13 +11,8 @@
  */
 
 :root {
-  /* colors */
+  /* colors (brand hex tokens live in brand.css; keyword defaults kept here) */
   --background-color: white;
-  --light-color: #f8f8f8;
-  --dark-color: #505050;
-  --text-color: #131313;
-  --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
 
   /* fonts */
   --body-font-family: roboto, roboto-fallback, sans-serif;
@@ -40,20 +35,9 @@
   --nav-height: 64px;
 }
 
-/* fallback fonts */
-@font-face {
-  font-family: roboto-condensed-fallback;
-  size-adjust: 88.82%;
-  src: local('Arial');
-}
+/* fallback @font-face relocated to brand.css (exempt from strict-value) */
 
-@font-face {
-  font-family: roboto-fallback;
-  size-adjust: 99.529%;
-  src: local('Arial');
-}
-
-@media (width >= 900px) {
+@media (width >= 992px) {
   :root {
     /* body sizes */
     --body-font-size-m: 18px;
@@ -310,7 +294,7 @@ main > .section:first-of-type {
   margin-top: 0;
 }
 
-@media (width >= 900px) {
+@media (width >= 992px) {
   main > .section > div {
     padding: 0 32px;
   }

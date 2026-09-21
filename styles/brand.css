@@ -1,0 +1,33 @@
+/*
+ * Brand tokens + fallback @font-face.
+ * This file is exempt from color-no-hex and declaration-strict-value in .stylelintrc.json:
+ * raw brand values (hex) and @font-face fallback descriptors live here; styles.css consumes
+ * them via var(). Loaded eagerly in head.html so the size-adjusted fallback fonts apply
+ * before the web fonts arrive (avoids CLS).
+ *
+ * NOTE: these are the stock aem-boilerplate values, relocated as-is to make lint pass on the
+ * scaffold. SKODA-106 re-derives the real Škoda design tokens here.
+ */
+
+:root {
+  /* colors */
+  --light-color: #f8f8f8;
+  --dark-color: #505050;
+  --text-color: #131313;
+  --link-color: #3b63fb;
+  --link-hover-color: #1d3ecf;
+  --border-color: #dadada;
+}
+
+/* fallback fonts */
+@font-face {
+  font-family: roboto-condensed-fallback;
+  size-adjust: 88.82%;
+  src: local('Arial');
+}
+
+@font-face {
+  font-family: roboto-fallback;
+  size-adjust: 99.529%;
+  src: local('Arial');
+}
