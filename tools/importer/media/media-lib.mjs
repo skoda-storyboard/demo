@@ -321,19 +321,23 @@ export async function pickIngestUrl(sourceUrl, { oversizeBytes = OVERSIZE_BYTES 
 
 /**
  * Resolve the AEM DAM bearer token WITHOUT ever taking it from chat/argv.
- * Order: AEM_DAM_TOKEN / AEM_DEV_TOKEN env → token file (default ~/.aem-dev-token
- * or .migration/secrets/aem-token) → null. Never logged.
+ * Order: AEM_DAM_TOKEN / AEM_DEV_TOKEN env → explicit tokenFile / AEM_TOKEN_FILE
+ * → default files (.migration/secrets/aem-token, ~/.aem-dev-token) → null.
+ * Never logged. Pass { searchDefaults:false } to consider ONLY env + the
+ * explicit tokenFile (used by tests so an ambient token file can't leak in).
  */
-export function resolveDamToken({ tokenFile } = {}) {
+export function resolveDamToken({ tokenFile, searchDefaults = true } = {}) {
   const env = process.env.AEM_DAM_TOKEN || process.env.AEM_DEV_TOKEN;
   if (env && env.trim()) return env.trim();
-  const candidates = [
-    tokenFile,
-    process.env.AEM_TOKEN_FILE,
-    path.join(process.env.WORKSPACE_PATH || process.cwd(), '.migration', 'secrets', 'aem-token'),
-    path.join(homedir(), '.aem-dev-token'),
-  ].filter(Boolean);
-  for (const f of candidates) {
+  const candidates = [tokenFile];
+  if (searchDefaults) {
+    candidates.push(
+      process.env.AEM_TOKEN_FILE,
+      path.join(process.env.WORKSPACE_PATH || process.cwd(), '.migration', 'secrets', 'aem-token'),
+      path.join(homedir(), '.aem-dev-token'),
+    );
+  }
+  for (const f of candidates.filter(Boolean)) {
     try {
       if (existsSync(f)) {
         const t = readFileSync(f, 'utf8').trim();

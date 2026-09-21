@@ -107,7 +107,9 @@ test('D: resolveDamToken reads AEM_DAM_TOKEN env, else returns null', () => {
   delete process.env.AEM_DAM_TOKEN;
   const prevDev = process.env.AEM_DEV_TOKEN;
   delete process.env.AEM_DEV_TOKEN;
-  assert.equal(resolveDamToken({ tokenFile: '/nonexistent-xyz' }), null);
+  // searchDefaults:false so a real ambient token file (.migration/secrets/aem-token,
+  // ~/.aem-dev-token) can't leak into this negative assertion.
+  assert.equal(resolveDamToken({ tokenFile: '/nonexistent-xyz', searchDefaults: false }), null);
   if (prev !== undefined) process.env.AEM_DAM_TOKEN = prev;
   if (prevDev !== undefined) process.env.AEM_DEV_TOKEN = prevDev;
 });
