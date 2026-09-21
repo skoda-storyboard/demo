@@ -17,6 +17,31 @@
   --link-color: #3b63fb;
   --link-hover-color: #1d3ecf;
   --border-color: #dadada;
+
+  /*
+   * Škoda brand tokens — MINIMAL subset added for SKODA-301 (header/mega-menu).
+   * SKODA-106 owns the full re-derivation of the design system; these are the
+   * values the header consumes today (measured in docs/ui-specs/_FOUNDATIONS.md
+   * §2 + header-megamenu.md). Keep in sync when SKODA-106 lands.
+   */
+  --skoda-ink: #161718;
+  --skoda-black: #000;
+  --skoda-white: #fff;
+  --skoda-grey-100: #f5f5f5;
+  --skoda-grey-200: #e6e6e6;
+  --skoda-grey-500: #7c7d7e;
+  --skoda-green: #0e3a2f;
+
+  /* header/nav-specific (candidate tokens, _FOUNDATIONS.md §8) */
+  --dropdown-shadow: 0 3px 8px rgb(0 0 0 / 15%);
+  --dropdown-hover-bg: #f1f1f1;
+  --divider-color: #e4e4e4;
+
+  /* weights */
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
 }
 
 /* fallback fonts */

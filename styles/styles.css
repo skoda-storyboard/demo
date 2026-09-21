@@ -31,8 +31,27 @@
   --heading-font-size-s: 24px;
   --heading-font-size-xs: 22px;
 
-  /* nav height */
-  --nav-height: 64px;
+  /* nav height (SKODA-301: topbar 44 + main 64 = 108) */
+  --nav-height: 108px;
+  --nav-topbar-height: 44px;
+  --nav-main-height: 64px;
+
+  /* header dropdown geometry (SKODA-301) */
+  --dropdown-radius: 4px;
+
+  /* layout */
+  --content-max-width: 1248px;
+
+  /* spacing (SKODA-301 minimal subset; SKODA-106/_FOUNDATIONS §4 owns full scale) */
+  --spacing-xs: 8px;
+  --spacing-s: 12px;
+  --spacing-m: 16px;
+  --spacing-l: 24px;
+  --spacing-xl: 40px;
+  --spacing-xxl: 64px;
+
+  /* small utility font size (topbar/lang, SKODA-301) */
+  --body-font-size-2xs: 12px;
 }
 
 /* fallback @font-face relocated to brand.css (exempt from strict-value) */

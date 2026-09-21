@@ -1,8 +1,8 @@
-import { getMetadata } from '../../scripts/aem.js';
+import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 
-// media query match that indicates mobile/tablet width
-const isDesktop = window.matchMedia('(min-width: 900px)');
+// desktop >= 1080px per source ladder (SKODA-301); below is the drawer band (SKODA-302)
+const isDesktop = window.matchMedia('(min-width: 1080px)');
 
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
@@ -124,23 +124,61 @@ export default async function decorate(block) {
   nav.id = 'nav';
   while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
 
-  const classes = ['brand', 'sections', 'tools'];
+  // 4-row fragment (topbar + brand + sections + tools) vs 3-row (brand + sections + tools)
+  const hasTopbar = nav.children.length >= 4;
+  const classes = hasTopbar
+    ? ['topbar', 'brand', 'sections', 'tools']
+    : ['brand', 'sections', 'tools'];
   classes.forEach((c, i) => {
     const section = nav.children[i];
     if (section) section.classList.add(`nav-${c}`);
   });
 
+  // topbar: section switcher (COM-04) + subscribe/locales group, lifted above <nav>
+  const navTopbar = nav.querySelector('.nav-topbar');
+  if (navTopbar) {
+    const switcher = navTopbar.querySelector(':scope .default-content-wrapper > ul, :scope > ul');
+    if (switcher) {
+      switcher.classList.add('nav-section-switcher');
+      // mark the active section tab (longest path prefix of the current URL; default first)
+      const { pathname } = window.location;
+      const items = [...switcher.querySelectorAll(':scope > li')];
+      let best;
+      let bestLen = -1;
+      items.forEach((li) => {
+        const a = li.querySelector('a');
+        if (!a) return;
+        const p = new URL(a.href).pathname;
+        if (pathname.startsWith(p) && p.length > bestLen) {
+          best = li;
+          bestLen = p.length;
+        }
+      });
+      if (!best) [best] = items;
+      if (best) best.classList.add('active');
+    }
+    // group Subscribe + locales so they can float right on desktop / drop into drawer on mobile
+    const utility = navTopbar.querySelectorAll(':scope .default-content-wrapper > p');
+    utility.forEach((p) => p.classList.add('nav-topbar-utility'));
+  }
+
   const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
-  if (brandLink) {
-    brandLink.className = '';
-    brandLink.closest('.button-container').className = '';
+  if (navBrand) {
+    const brandLink = navBrand.querySelector('.button');
+    if (brandLink) {
+      brandLink.className = '';
+      brandLink.closest('.button-container').className = '';
+    }
   }
 
   const navSections = nav.querySelector('.nav-sections');
   if (navSections) {
     navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
       if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
+      // Newsletter is drawer-only on desktop (server strips the authored class; re-tag by href)
+      if (navSection.querySelector('a[href*="#newsletter"]')) {
+        navSection.classList.add('nav-newsletter');
+      }
       navSection.addEventListener('click', () => {
         if (isDesktop.matches) {
           const expanded = navSection.getAttribute('aria-expanded') === 'true';
@@ -164,8 +202,12 @@ export default async function decorate(block) {
   toggleMenu(nav, navSections, isDesktop.matches);
   isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
 
+  decorateIcons(nav);
+
   const navWrapper = document.createElement('div');
   navWrapper.className = 'nav-wrapper';
+  // lift the topbar to full-width (grey utility bar), above the main nav row
+  if (navTopbar) navWrapper.append(navTopbar);
   navWrapper.append(nav);
   block.append(navWrapper);
 }

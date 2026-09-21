@@ -1,52 +1,51 @@
-/* header and nav layout */
+/* stylelint-disable no-descending-specificity --
+ * Rules are grouped by component region (topbar / nav / dropdown) and by state
+ * (base -> hover -> open) for readability. That grouping intentionally orders a
+ * few higher-specificity selectors before lower ones; the cascade is correct
+ * (e.g. the topbar is lifted OUT of <nav>, so `header nav ...` never matches its
+ * links). Reordering purely to satisfy this stylistic rule would fragment the
+ * component logic, so it is disabled for this file only. */
+
+/* ==========================================================================
+ * Header / mega-menu (SKODA-301)
+ * Spec: docs/ui-specs/header-megamenu.md · tokens: styles/brand.css + styles.css
+ * Two-row header: grey utility topbar (44px) + main nav row (64px) = 108px.
+ * NOT sticky (position: relative, scrolls away). Mobile-first: base = drawer
+ * band (<= 1079); desktop nav + hover dropdowns kick in at >= 1080.
+ * ========================================================================== */
+
 header .nav-wrapper {
-  background-color: var(--background-color);
+  position: relative;
   width: 100%;
-  z-index: 2;
-  position: fixed;
+  background-color: var(--background-color);
+  z-index: 20;
+
+  /*
+   * Header-scoped body type scale (Škoda _FOUNDATIONS §3: m16 / s14 / xs13).
+   * The GLOBAL tokens in styles.css still carry Adobe boilerplate sizes
+   * (18/16/14) — rescaling site typography is SKODA-106's job. Scope the
+   * correct values here so the header hits pixel parity now; REMOVE this
+   * override once SKODA-106 sets the global scale.
+   */
+  --body-font-size-m: 16px;
+  --body-font-size-s: 14px;
+  --body-font-size-xs: 13px;
 }
 
+/* --- Main nav row (generic element rules first, ascending specificity) ------ */
 header nav {
   box-sizing: border-box;
   display: grid;
   grid-template:
-    'hamburger brand tools' var(--nav-height)
+    'hamburger brand tools' var(--nav-main-height)
     'sections sections sections' 1fr / auto 1fr auto;
   align-items: center;
   gap: 0 24px;
+  max-width: var(--content-max-width);
+  height: var(--nav-main-height);
   margin: auto;
-  max-width: 1248px;
-  height: var(--nav-height);
-  padding: 0 24px;
+  padding: 0 var(--spacing-l);
   font-family: var(--body-font-family);
-}
-
-header nav[aria-expanded='true'] {
-  grid-template:
-    'hamburger brand' var(--nav-height)
-    'sections sections' 1fr
-    'tools tools' var(--nav-height) / auto 1fr;
-  overflow-y: auto;
-  min-height: 100dvh;
-}
-
-@media (width >= 992px) {
-  header .nav-wrapper {
-    position: relative;
-  }
-
-  header nav {
-    display: flex;
-    justify-content: space-between;
-    gap: 0 32px;
-    max-width: 1264px;
-    padding: 0 32px;
-  }
-
-  header nav[aria-expanded='true'] {
-    min-height: 0;
-    overflow: visible;
-  }
 }
 
 header nav p {
@@ -58,12 +57,97 @@ header nav a:any-link {
   color: currentcolor;
 }
 
-/* hamburger */
-header nav .nav-hamburger {
-  grid-area: hamburger;
-  height: 22px;
+header nav a:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+header nav[aria-expanded='true'] {
+  grid-template:
+    'hamburger brand' var(--nav-main-height)
+    'sections sections' 1fr
+    'tools tools' var(--nav-main-height) / auto 1fr;
+  min-height: calc(100dvh - var(--nav-topbar-height));
+  overflow-y: auto;
+}
+
+/* --- Utility topbar (grey, full width) — COM-01 / COM-04 --------------------- */
+header .nav-topbar {
+  background-color: var(--skoda-grey-200);
+}
+
+header .nav-topbar p {
+  margin: 0;
+  line-height: 1;
+}
+
+header .nav-topbar .default-content-wrapper {
   display: flex;
   align-items: center;
+  min-height: var(--nav-topbar-height);
+  margin: 0 auto;
+}
+
+/* Subscribe + locales — hidden on the mobile bar, folded into the drawer */
+header .nav-topbar-utility {
+  display: none;
+  font-size: var(--body-font-size-2xs);
+}
+
+header .nav-topbar .nav-topbar-utility a {
+  color: var(--skoda-grey-500);
+  text-decoration: none;
+}
+
+header .nav-topbar .nav-topbar-utility strong {
+  color: var(--skoda-ink);
+  font-weight: var(--weight-bold);
+}
+
+header nav[aria-expanded='true'] .nav-topbar-utility {
+  display: block;
+}
+
+/* section switcher (Stories | Media Room) — full-width 50/50 tab bar on mobile */
+header .nav-section-switcher {
+  display: flex;
+  width: 100%;
+  height: var(--nav-topbar-height);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--body-font-size-s);
+}
+
+header .nav-section-switcher li {
+  display: flex;
+  flex: 1 1 50%;
+}
+
+header .nav-section-switcher li a {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--spacing-l);
+  color: var(--skoda-grey-500);
+  font-size: var(--body-font-size-xs);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+header .nav-section-switcher li.active a {
+  background-color: var(--skoda-white);
+  color: var(--skoda-black);
+}
+
+/* --- Hamburger (drawer band only) ------------------------------------------ */
+header nav .nav-hamburger {
+  grid-area: hamburger;
+  display: flex;
+  align-items: center;
+  height: 22px;
 }
 
 header nav .nav-hamburger button {
@@ -119,11 +203,11 @@ header nav[aria-expanded='true'] .nav-hamburger-icon::before,
 header nav[aria-expanded='true'] .nav-hamburger-icon::after {
   top: 3px;
   left: 1px;
-  transform: rotate(45deg);
-  transform-origin: 2px 1px;
   width: 24px;
   height: 2px;
   border-radius: 2px;
+  transform: rotate(45deg);
+  transform-origin: 2px 1px;
 }
 
 header nav[aria-expanded='true'] .nav-hamburger-icon::after {
@@ -132,60 +216,119 @@ header nav[aria-expanded='true'] .nav-hamburger-icon::after {
   transform: rotate(-45deg);
 }
 
-@media (width >= 992px) {
-  header nav .nav-hamburger {
-    display: none;
-    visibility: hidden;
-  }
-}
-
-/* brand */
+/* --- Brand / logo ---------------------------------------------------------- */
 header .nav-brand {
   grid-area: brand;
-  flex-basis: 128px;
-  font-size: var(--heading-font-size-s);
-  font-weight: 700;
-  line-height: 1;
+  display: flex;
+  align-items: center;
 }
 
-header nav .nav-brand img {
-  width: 128px;
-  height: auto;
+header .nav-brand p {
+  margin: 0;
+  line-height: 0;
 }
 
-/* sections */
+header .nav-brand .icon-skoda-storyboard-logo,
+header .nav-brand .icon-skoda-storyboard-logo img {
+  width: 194px;
+  height: 18px;
+}
+
+/* --- Sections (main nav items + dropdown panels) --------------------------- */
 header nav .nav-sections {
   grid-area: sections;
-  flex: 1 1 auto;
   display: none;
+  flex: 1 1 auto;
   visibility: hidden;
+}
+
+header nav .nav-sections ul {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  font-size: var(--body-font-size-s);
+}
+
+header nav .nav-sections .default-content-wrapper > ul > li {
+  font-weight: var(--weight-regular);
+}
+
+header nav .nav-sections .default-content-wrapper > ul > li > ul {
+  margin-top: 0;
 }
 
 header nav[aria-expanded='true'] .nav-sections {
   display: block;
-  visibility: visible;
   align-self: start;
+  visibility: visible;
 }
 
-header nav .nav-sections ul {
-  list-style: none;
-  padding-left: 0;
-  font-size: var(--body-font-size-s);
+/* --- Tools (search) -------------------------------------------------------- */
+header nav .nav-tools {
+  grid-area: tools;
 }
 
-header nav .nav-sections ul > li {
-  font-weight: 500;
+header nav .nav-tools p {
+  margin: 0;
+  line-height: 0;
 }
 
-header nav .nav-sections ul > li > ul {
-  margin-top: 0;
+header nav .nav-tools .icon {
+  width: 24px;
+  height: 24px;
 }
 
-header nav .nav-sections ul > li > ul > li {
-  font-weight: 400;
-}
+/* ==========================================================================
+ * DESKTOP BAND (>= 1080): full topbar utility group + horizontal nav + hover
+ * dropdowns. The section switcher collapses to a left-aligned auto-width pair.
+ * ========================================================================== */
+@media (width >= 1080px) {
+  /* main nav becomes a single horizontal row: brand | menu | search */
+  header nav {
+    display: flex;
+    align-items: center;
+    gap: 0 var(--spacing-l);
+  }
 
-@media (width >= 992px) {
+  /* desktop nav is never the full-height drawer even when aria-expanded is set */
+  header nav[aria-expanded='true'] {
+    min-height: unset;
+    overflow: visible;
+  }
+
+  header .nav-topbar .default-content-wrapper {
+    gap: var(--spacing-m);
+    max-width: var(--content-max-width);
+    padding: 0 var(--spacing-l);
+  }
+
+  /* Subscribe + locales become visible, flush right */
+  header .nav-topbar-utility {
+    display: block;
+  }
+
+  header .nav-topbar-utility:last-of-type {
+    margin-left: auto;
+  }
+
+  /* switcher shrinks to an auto-width pair at the left of the grey bar */
+  header .nav-section-switcher {
+    width: auto;
+  }
+
+  header .nav-section-switcher li {
+    flex: 0 0 auto;
+  }
+
+  header .nav-section-switcher li a {
+    font-size: var(--body-font-size-s);
+  }
+
+  header nav .nav-hamburger {
+    display: none;
+    visibility: hidden;
+  }
+
   header nav .nav-sections {
     display: block;
     visibility: visible;
@@ -196,77 +339,119 @@ header nav .nav-sections ul > li > ul > li {
     align-self: unset;
   }
 
-  header nav .nav-sections .nav-drop {
-    position: relative;
-    padding-right: 16px;
-    cursor: pointer;
-  }
-
-  header nav .nav-sections .nav-drop::after {
-    content: '';
-    display: inline-block;
-    position: absolute;
-    top: 0.5em;
-    right: 2px;
-    transform: rotate(135deg);
-    width: 6px;
-    height: 6px;
-    border: 2px solid currentcolor;
-    border-radius: 0 1px 0 0;
-    border-width: 2px 2px 0 0;
-  }
-
-  header nav .nav-sections .nav-drop[aria-expanded='true']::after {
-    top: unset;
-    bottom: 0.5em;
-    transform: rotate(315deg);
-  }
-
-  header nav .nav-sections ul {
+  header nav .nav-sections .default-content-wrapper > ul {
     display: flex;
-    gap: 24px;
-    margin: 0;
+    gap: 0;
+    padding-right: 4rem; /* reserve the search-icon slot */
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li {
+    position: relative;
     flex: 0 1 auto;
-    position: relative;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li > ul {
+  /* Newsletter is drawer-only on desktop */
+  header nav .nav-sections .default-content-wrapper > ul > li.nav-newsletter {
     display: none;
-    position: relative;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] > ul {
-    display: block;
-    position: absolute;
-    left: -24px;
-    width: 200px;
-    top: 150%;
-    padding: 16px;
-    background-color: var(--light-color);
-    white-space: initial;
+  header nav .nav-sections .default-content-wrapper > ul > li > a,
+  header nav .nav-sections .default-content-wrapper > ul > li > p > a {
+    display: flex;
+    align-items: center;
+    height: var(--nav-main-height);
+    padding: 0 20px;
+    color: var(--skoda-ink);
+    font-size: var(--body-font-size-m);
+    line-height: 1.5;
+    text-decoration: none;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li > ul::before {
+  /* animated 2px ink underline on hover (source treatment, no color swap) */
+  header nav .nav-sections .default-content-wrapper > ul > li > a::before,
+  header nav .nav-sections .default-content-wrapper > ul > li > p > a::before {
     content: '';
     position: absolute;
-    top: -8px;
-    left: 16px;
+    bottom: 18px;
+    left: 20px;
     width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 8px solid var(--light-color);
+    height: 2px;
+    background: var(--skoda-ink);
+    transition: width 0.2s ease-in;
+  }
+
+  header nav .nav-sections .default-content-wrapper > ul > li:hover > a::before,
+  header nav .nav-sections .default-content-wrapper > ul > li:hover > p > a::before {
+    width: calc(100% - 40px);
+  }
+
+  /* dropdown panel — single-column list, opens on hover/focus/active */
+  header nav .nav-sections .default-content-wrapper > ul > li > ul {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 100%;
+    max-height: 0;
+    padding: 0;
+    background-color: var(--skoda-white);
+    border-radius: var(--dropdown-radius);
+    box-shadow: var(--dropdown-shadow);
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: opacity 0.1s ease-in-out;
+  }
+
+  header nav .nav-sections .default-content-wrapper > ul > li:hover > ul,
+  header nav .nav-sections .default-content-wrapper > ul > li:focus-within > ul,
+  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] > ul {
+    max-height: 999em;
+    opacity: 1;
+    pointer-events: auto;
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li > ul > li {
-    padding: 8px 0;
+    font-weight: var(--weight-regular);
   }
-}
 
-/* tools */
-header nav .nav-tools {
-  grid-area: tools;
+  header nav .nav-sections .default-content-wrapper > ul > li > ul > li > a {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: var(--spacing-s) var(--spacing-l);
+    color: var(--skoda-ink);
+    font-size: var(--body-font-size-m);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  header nav .nav-sections .default-content-wrapper > ul > li > ul > li > a:hover {
+    background-color: var(--dropdown-hover-bg);
+  }
+
+  /* caret on drop items (declared last to keep specificity ascending) */
+  header nav .nav-sections .default-content-wrapper > ul > li.nav-drop {
+    cursor: pointer;
+  }
+
+  header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > a,
+  header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > p > a {
+    padding-right: 32px;
+  }
+
+  header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > a::after,
+  header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > p > a::after {
+    content: '';
+    position: absolute;
+    top: calc(50% - 4px);
+    right: 16px;
+    width: 6px;
+    height: 6px;
+    border: 2px solid currentcolor;
+    border-width: 2px 2px 0 0;
+    border-radius: 0 1px 0 0;
+    transform: rotate(135deg);
+  }
 }
