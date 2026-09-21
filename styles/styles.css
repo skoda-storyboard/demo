@@ -12,10 +12,19 @@
 
 /*
  * Global design tokens + global/section styles (SKODA-106).
- * Tokens re-derived from docs/ui-specs/_FOUNDATIONS.md; primitive colors + fallback @font-face
- * live in brand.css (loaded eagerly before this file). Mobile-first: base rules target the
- * smallest viewport, min-width media queries enhance up. Downstream block CSS must consume these
- * tokens via var() — no hardcoded colors/spacing.
+ *
+ * Two-file split (intentional — see docs/DESIGN-TOKENS.md):
+ *   - brand.css  = primitive layer. Raw hex color tokens + fallback @font-face. It is the ONLY
+ *                  file exempt from Stylelint color-no-hex + declaration-strict-value, so raw hex
+ *                  is allowed there and nowhere else. Loaded eagerly BEFORE this file in head.html.
+ *   - styles.css = this file. Semantic tokens (typography/spacing/layout) + all global element
+ *                  styles. Fully lint-enforced: every color/bg/border/font must be a var() token.
+ * Merging the two would require weakening the lint guardrail, so they stay separate.
+ *
+ * Element defaults below are re-derived from measured computed styles on the live source
+ * (story detail, press release, home, category, EN + CZ) — not ported from the legacy theme.
+ * Mobile-first: base rules target the smallest viewport, min-width media queries enhance up.
+ * Downstream block CSS must consume these tokens via var() — no hardcoded colors/spacing.
  */
 
 :root {
@@ -25,10 +34,18 @@
   --heading-font-family: var(--body-font-family);
 
   /* font weights */
+  --weight-light: 300;
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
+
+  /* line heights (measured from source: body 24/16 = 1.5, headings ~1.25) */
+  --line-height-body: 1.5;
+  --line-height-heading: 1.25;
+
+  /* prose paragraph rhythm (measured ~20px bottom gap in article/press body) */
+  --paragraph-gap: 20px;
 
   /* body sizes (mobile-first base) */
   --body-font-size-m: 16px;
@@ -71,9 +88,15 @@
   --bp-desktop: 1080px;
 }
 
-/* Type scale is uniform across viewports per _FOUNDATIONS.md §3 (source uses one set of
-   sizes); no desktop :root override is needed. Blocks that scale type responsively do so in
-   their own CSS. The 992px small-desktop breakpoint is applied to layout (section padding). */
+/* The global element defaults below (body, headings, paragraphs, lists, strong/em, hr, line
+   heights, prose rhythm) are intentionally VIEWPORT-INVARIANT and carry no min-width overrides.
+   This is verified against the live source: computed styles for these elements are identical at
+   375px and 1200px (measured on story + press-release templates, EN + CZ). Do NOT add breakpoints
+   to these rules — the design does not scale them. What DOES scale responsively is heading sizes
+   on specific templates (e.g. story/hero title 40px→smaller on mobile); those are
+   template/component-specific and live in the owning block's CSS, not here (see _FOUNDATIONS.md
+   §3/§8). The one global rule that changes across breakpoints is section padding (see the
+   992px media query further down). */
 
 /* box-sizing baseline. A universal `*` reset is disallowed by Stylelint
    (selector-max-universal: 0), so document defaults set it on the root and inherit into
@@ -95,7 +118,9 @@ body {
   font-family: var(--body-font-family);
   font-size: var(--body-font-size-m);
   font-weight: var(--weight-regular);
-  line-height: 1.6;
+  line-height: var(--line-height-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizespeed;
 }
 
 body.appear {
@@ -116,6 +141,9 @@ footer .footer[data-block-status="loaded"] {
   visibility: visible;
 }
 
+/* headings — global fallback scale (canonical per _FOUNDATIONS.md §3). Source heading sizes are
+   template/component-specific (e.g. story title 40px, press-release title 26px, article h2 40px
+   at weight 300); those live in the owning block's CSS. These defaults keep unstyled prose sane. */
 h1,
 h2,
 h3,
@@ -126,8 +154,10 @@ h6 {
   margin-bottom: 0.25em;
   font-family: var(--heading-font-family);
   font-weight: var(--weight-semibold);
-  line-height: 1.25;
+  line-height: var(--line-height-heading);
+  color: var(--text-color);
   scroll-margin: var(--spacing-xl);
+  overflow-wrap: break-word;
 }
 
 h1 { font-size: var(--heading-font-size-xxl); }
@@ -137,16 +167,126 @@ h4 { font-size: var(--heading-font-size-m); }
 h5 { font-size: var(--heading-font-size-s); }
 h6 { font-size: var(--heading-font-size-xs); }
 
+/* prose text blocks — measured source rhythm: ~20px paragraph gap, body line-height 1.5 */
 p,
 dl,
 ol,
 ul,
 pre,
-blockquote {
-  margin-top: 0.8em;
-  margin-bottom: 0.25em;
+blockquote,
+figure,
+table {
+  margin-top: 0;
+  margin-bottom: var(--paragraph-gap);
 }
 
+/* remove the leading margin on the first flow element in a content column */
+main .default-content-wrapper > :first-child {
+  margin-top: 0;
+}
+
+/* inline emphasis (source: strong/b render at semibold, em/i italic) */
+strong,
+b {
+  font-weight: var(--weight-semibold);
+}
+
+em,
+i {
+  font-style: italic;
+}
+
+small {
+  font-size: var(--body-font-size-s);
+}
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub { bottom: -0.25em; }
+sup { top: -0.5em; }
+
+/* lists */
+ul,
+ol {
+  padding-left: var(--spacing-l);
+}
+
+li {
+  margin-bottom: var(--spacing-xs);
+}
+
+/* nested lists tighten up */
+li > ul,
+li > ol {
+  margin-top: var(--spacing-xs);
+  margin-bottom: 0;
+}
+
+dt {
+  font-weight: var(--weight-semibold);
+}
+
+dd {
+  margin-left: var(--spacing-l);
+}
+
+/* blockquote — leading-accent quotation block */
+blockquote {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: var(--spacing-l);
+  border-left: 2px solid var(--dark-color);
+  font-style: italic;
+  color: var(--text-color);
+}
+
+/* horizontal rule (measured: 2px solid, ~10px bottom gap) */
+hr {
+  margin-top: 0;
+  margin-bottom: var(--spacing-s);
+  border: 0;
+  border-top: 2px solid var(--text-color);
+}
+
+/* figures & captions */
+figure {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+figcaption {
+  margin-top: var(--spacing-xs);
+  font-size: var(--body-font-size-s);
+  line-height: var(--line-height-body);
+  color: var(--skoda-grey-500);
+}
+
+/* tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--body-font-size-s);
+}
+
+th,
+td {
+  padding: var(--spacing-xs) var(--spacing-s);
+  border-bottom: var(--card-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  font-weight: var(--weight-semibold);
+}
+
+/* code */
 code,
 pre {
   font-size: var(--body-font-size-s);
@@ -160,6 +300,17 @@ pre {
   white-space: pre;
 }
 
+code {
+  padding: 0.1em 0.3em;
+  border-radius: 4px;
+  background-color: var(--light-color);
+}
+
+pre code {
+  padding: 0;
+  background-color: transparent;
+}
+
 main > div {
   margin: var(--spacing-xl) var(--spacing-m);
 }
@@ -171,8 +322,9 @@ button {
   font: inherit;
 }
 
-/* links */
-a:any-link {
+/* links — plain `a` keeps global specificity low (0,0,1) so a block's `.block a` rule
+   overrides cleanly without escalating to `:any-link`. */
+a {
   color: var(--link-color);
   text-decoration: none;
   overflow-wrap: break-word;
@@ -193,7 +345,7 @@ p.button-wrapper {
   margin: var(--spacing-s) 0;
 }
 
-a.button:any-link,
+a.button,
 button.button {
   box-sizing: border-box;
   display: inline-flex;
@@ -356,6 +508,6 @@ main .section.dark {
   padding: var(--section-padding) 0;
 }
 
-main .section.dark a:any-link {
+main .section.dark a {
   color: var(--background-color);
 }

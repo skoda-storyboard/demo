@@ -26,10 +26,14 @@ Semantic map (use these downstream): `--background-color` → white, `--light-co
 ## Typography
 
 - Families: `--body-font-family` / `--heading-font-family` = `'SKODA Next', skoda-next-fallback, helvetica, arial, sans-serif`.
-- Weights: `--weight-regular 400`, `--weight-medium 500`, `--weight-semibold 600`, `--weight-bold 700`.
+- Weights: `--weight-light 300`, `--weight-regular 400`, `--weight-medium 500`, `--weight-semibold 600`, `--weight-bold 700`.
+- Line heights (measured from source): `--line-height-body 1.5` (24px on 16px body), `--line-height-heading 1.25`.
+- Prose rhythm: `--paragraph-gap 20px` (measured article/press body paragraph spacing).
 - Body: `--body-font-size-m 16px`, `-s 14px`, `-xs 13px`.
 - Headings: `--heading-font-size-xxl 44px` (h1), `-xl 34px` (h2), `-l 26px` (h3), `-m 22px` (h4),
-  `-s 18px` (h5), `-xs 16px` (h6). Uniform across viewports (source uses one type scale).
+  `-s 18px` (h5), `-xs 16px` (h6). These are **global fallback** sizes — actual source heading sizes
+  are template/component-specific (story title 40px/600, press-release title 26px/600, article h2
+  40px at weight 300) and live in each owning block's CSS, not globally.
 
 ## Spacing
 
