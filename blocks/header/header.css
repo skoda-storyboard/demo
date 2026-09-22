@@ -422,14 +422,16 @@ header nav .nav-search-input::placeholder {
     min-width: 0;
   }
 
-  /* locale switcher pinned to the bottom of the open drawer */
+  /* locale switcher pinned flush to the bottom edge of the open drawer, right-aligned */
   header nav[aria-expanded='true'] .nav-locales {
+    grid-column: 1 / -1;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: flex-end;
     gap: var(--spacing-m);
-    margin-top: auto;
-    padding: var(--spacing-l) 0;
+    margin: auto calc(-1 * var(--spacing-l)) 0;
+    padding: var(--spacing-l);
     border-top: 1px solid var(--divider-color);
     font-size: var(--body-font-size-s);
   }

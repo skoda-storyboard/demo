@@ -1,3 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 23.1" role="img" aria-label="Škoda Storyboard, home">
-  <text x="0" y="18" font-family="'SKODA Next', helvetica, arial, sans-serif" font-size="19" font-weight="700" letter-spacing="1.2" fill="#161718">ŠKODA STORYBOARD</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 24" role="img" aria-label="Škoda Storyboard, home">
+  <text x="0" y="18" font-family="'SKODA Next', helvetica, arial, sans-serif" font-size="20" letter-spacing="0.5">
+    <tspan font-weight="700" fill="#161718">ŠKODA</tspan><tspan dx="8" font-weight="400" fill="#4b4b4b">Storyboard</tspan>
+  </text>
 </svg>
