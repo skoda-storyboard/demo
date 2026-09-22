@@ -7,6 +7,10 @@ Prove the *static* media architecture for the pilot: ingest **masters only** (dr
 
 **Build-confirmed addition (2026-09-10): media pre-conditioning is required, not optional.** A shipped story page embedding 4 masters at **25–40 MB each 409'd the content bus on publish** ("error from content-bus"). The masters-only ingest (SKODA-501) must therefore **detect and strip/replace images over a size threshold (~10 MB) with a sized derivative before publish**, or bulk publishing fails at scale. Captured as **SKODA-506** and folded into SKODA-501's spec/AC. This is the concrete form of the abstract "~200k files / heavy masters" risk.
 
+**Implemented (2026-09-21): the media toolkit.** SKODA-501/504/506 (+ the SKODA-505 cart resolver seam) are built + tested in **[`tools/importer/media/`](../../../tools/importer/media/README.md)** — masters-only ingest into AEM Assets via the AEMaaCS 3-step direct-binary-upload, **page-mirrored** `/content/dam/storyboard/<page-path>/<file>`, delivery-image pre-conditioning, per-step resumable manifest, and `content/media-index.json` for the cart. See [`docs/media/SKODA-ASSET-MAPPING.md` §9](../../media/SKODA-ASSET-MAPPING.md).
+
+**Open decision (post-M1 demo): production media-cart original model.** The importer-authored DAM-path route is demo-only (migrated pages). Production authors picking **new** assets via the native AEM Assets picker need **Dynamic Media with OpenAPI** ("copy reference URL") — not enabled on the current standard instance — or a hash-reconciliation index. **Decide after the 15 Oct demo.**
+
 ## Phase
 **A — capability pilot (EN).** All tickets are pilot-scoped.
 

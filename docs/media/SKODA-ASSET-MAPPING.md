@@ -100,3 +100,49 @@ cdn.skoda-storyboard.com/2018/08/hero_V2.jpg       → /content/dam/skoda/…   
 - **M1:** ingest/match only the demo set into AEM Assets; hand-verify; reference-in-place for the rest. No blocker.
 - **M2:** confirm Scenario A/B, build the **manifest-driven pipeline** (match: filename→phash→manual; or ingest+manifest), wire it into the import rewrite, and budget the real cost against **rights + dedup + unmatched**, not the upload.
 - Track as **SKODA-504** (M1 demo-subset) with an M2 scale-out note; the full-scale rights/dedup work rides with SKODA-803 (bulk import) and the DAM decision (D5, now = AEM Assets).
+
+---
+
+## 9. Implemented (2026-09-21) — `tools/importer/media/`
+
+The manifest-driven pipeline described above is **built and tested**. Toolkit +
+runbook: [`../../tools/importer/media/README.md`](../../tools/importer/media/README.md).
+
+- **Scenario B (ingest):** `build-media-manifest.mjs` uploads the **original master**
+  of each in-use image into AEM Assets via the **AEMaaCS 3-step direct-binary-upload**
+  (`initiateUpload.json` → PUT parts → `completeUpload.json`), into a **page-mirrored
+  folder** `/content/dam/storyboard/<source-page-path>/<file>` (e.g. Elroq →
+  `/content/dam/storyboard/en/skoda-model/elroq/…`). First page to reference an image
+  owns its folder; shared images reuse it (logical-image dedup).
+- **Manifest** (`media-manifest.json`) = the `s3_url → { dam_asset_path, delivery_url,
+  original_download_url, alt, per-step status }` index. Re-runnable, incrementally
+  persisted (resumable), non-zero exit on residual failures.
+- **Two mechanisms:**
+  - **A) delivery** — `apply-media-manifest.mjs` rewrites content `<img src>`/`srcset`
+    to `delivery_url`; EDS ingests it into its media bus at publish (self-hosted webp).
+    Pre-conditioning (SKODA-506) applies to the **delivery** image only (>10 MB → sized
+    derivative); the **DAM keeps the full original**.
+  - **B) media-cart original** — `apply` emits `content/media-index.json`, the cart
+    resolver seam mapping `logical_id → dam_asset_path + original_download_url` that
+    the `media-cart` block (SKODA-505) reads for "download original".
+- **Auth (per-host):** injected **session** IMS for DA/`admin.hlx.page`; a **custom IMS
+  token** (from env/gitignored file, never chat) for the AEM DAM host only. Missing/
+  expired token → graceful reference-in-place fallback.
+
+### Findings that bound this
+
+- **The native AEM Assets sidekick picker cannot carry a DAM path** on a standard
+  instance: it pastes a **plain image → the EDS media bus** (no asset id/URN/custom
+  attribute). The native way to surface DAM identity for **any** picked asset (incl.
+  new production uploads) is **Dynamic Media with OpenAPI** ("copy reference URL"),
+  which is **not enabled** on this tenant.
+- ⇒ The importer-authored DAM-path route (Mechanism B) is **demo-only** — it covers
+  migrated pages, **not** future author-picked assets. **Production media-cart-original
+  model is a post-M1-demo decision** (DM/OpenAPI recommended; else content-hash
+  reconciliation or an author-recorded DAM-path field). The resolver is a single seam,
+  so swapping its source later is config, not a cart rebuild.
+- Author DAM paths are **IMS-gated** (not anonymously downloadable), so the M1 cart
+  "download original" is served from a **DA-published copy** (`--da-archive`), not the
+  author path.
+- EDS auto-ingests **absolute** image URLs into its media bus at publish; a
+  root-relative `/media-da/` path does **not** resolve on the `aem.live` host.
