@@ -99,6 +99,19 @@ header .nav-topbar .nav-topbar-utility a {
   text-decoration: none;
 }
 
+/* Subscribe CTA: mail icon inline before the label */
+header .nav-topbar .nav-subscribe {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+header .nav-topbar .nav-subscribe .icon-mail,
+header .nav-topbar .nav-subscribe .icon-mail img {
+  width: 16px;
+  height: 16px;
+}
+
 header .nav-topbar .nav-topbar-utility strong {
   color: var(--skoda-ink);
   font-weight: var(--weight-bold);

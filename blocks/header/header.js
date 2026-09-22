@@ -160,6 +160,14 @@ export default async function decorate(block) {
     // group Subscribe + locales so they can float right on desktop / drop into drawer on mobile
     const utility = navTopbar.querySelectorAll(':scope .default-content-wrapper > p');
     utility.forEach((p) => p.classList.add('nav-topbar-utility'));
+    // prefix the Subscribe CTA with a mail icon (injected here; DA strips authored tokens)
+    const subscribeLink = navTopbar.querySelector('a[href*="#subscribe"]');
+    if (subscribeLink && !subscribeLink.querySelector('.icon')) {
+      subscribeLink.classList.add('nav-subscribe');
+      const mail = document.createElement('span');
+      mail.className = 'icon icon-mail';
+      subscribeLink.prepend(mail);
+    }
   }
 
   const navBrand = nav.querySelector('.nav-brand');
