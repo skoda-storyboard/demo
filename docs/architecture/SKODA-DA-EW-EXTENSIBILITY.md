@@ -1,7 +1,7 @@
 # Škoda Storyboard, Custom Authoring UI in DA / Experience Workspace
 
 **Scope:** how to satisfy a *custom authoring requirement* (a control the author needs that isn't a plain block/table) on this DA/EW-authored site, without leaving the Document Authoring model and without Adobe App Builder. Written to answer the recurring client question "can the WYSIWYG editor do X" for X beyond typing text into a table.
-**Status:** the core route (DA library plugin + `DA_SDK`) is **build-confirmed in the client's own tenant** (`skoda-storyboard/demo`, 2026-09-16). Two working PoCs shipped: `poc/tag-multiselect/` and `poc/stories-tag/`.
+**Status:** the core route (DA library plugin + `DA_SDK`) is **build-confirmed in the client's own tenant** (`skoda-storyboard/demo`, 2026-09-16). This repo ships the productionized tag picker at `poc/tag-multiselect/` (SKODA-211 / #54); the sibling `poc/stories-tag/` PoC lives in the `skoda-storyboard` source repo and is not ported here.
 **Relates to:** `SKODA-EDS-DA-ARCHITECTURE.md` (§2 DA-specific callouts, §4 content model), decision **D13** (DA vs Universal Editor) in `SKODA-DELIVERY-PLAN.md`.
 
 ---
@@ -52,7 +52,7 @@ At `da.live/config#/{org}/{site}/` add a sheet named **`library`** with this hea
 
 | title | path | experience |
 |---|---|---|
-| Stories category | `https://main--demo--skoda-storyboard.aem.page/poc/stories-tag/index.html` | dialog |
+| Tag picker | `https://main--demo--skoda-storyboard.aem.page/poc/tag-multiselect/index.html` | dialog |
 
 - `path` = the HTTPS URL of the plugin's `index.html`.
 - `experience = dialog` makes it an **interactive plugin panel** (vs a block-sample library entry). Icon (a `.png`) is optional.
@@ -142,4 +142,4 @@ Adopting UE is decision **D13** and changes the content-source model (field-leve
 6. Push so it's served at the preview URL; register a `library` sheet row `title | path | experience=dialog` (mind the `path` header, §3.2).
 7. Verify in the DA editor Library and the EW canvas panel; test both write paths.
 
-Reference implementations: `poc/tag-multiselect/` (Tags block via `sendHTML`), `poc/stories-tag/` (category picker: `sendHTML` block **and** `sendText` value; consumes the new `category` include filter in `blocks/stories/stories.js`).
+Reference implementations: `poc/tag-multiselect/` (Tags block via `sendHTML`, ported into this repo for SKODA-211). `poc/stories-tag/` (category picker: `sendHTML` block **and** `sendText` value; consumes the `category` include filter in `blocks/stories/stories.js`) lives in the `skoda-storyboard` source repo.

@@ -8,6 +8,7 @@
     "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\"",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
+    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"poc/**/test.mjs\"",
     "media:build": "node tools/importer/media/build-media-manifest.mjs",
     "media:apply": "node tools/importer/media/apply-media-manifest.mjs",
     "test:media": "node --test tools/importer/media/media-lib.test.mjs",
