@@ -52,6 +52,11 @@ header nav .nav-mail {
   color: var(--skoda-ink);
 }
 
+/* mail shortcut only on the collapsed bar; hide it once the drawer is open */
+header nav[aria-expanded='true'] .nav-mail {
+  display: none;
+}
+
 header nav .nav-mail .icon,
 header nav .nav-mail .icon img {
   width: 24px;
