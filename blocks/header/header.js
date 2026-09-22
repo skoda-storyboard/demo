@@ -273,6 +273,15 @@ export default async function decorate(block) {
     }
   }
 
+  // mobile action cluster: mail shortcut + hamburger (mail sits before the
+  // hamburger, mobile-only). Mail is an anchor so it is not picked up by the
+  // nav's `querySelector('button')` focus/close logic.
+  const mail = document.createElement('a');
+  mail.className = 'nav-mail';
+  mail.href = '#subscribe';
+  mail.setAttribute('aria-label', 'Subscribe to our stories');
+  mail.innerHTML = '<span class="icon icon-mail"></span>';
+
   // hamburger for mobile
   const hamburger = document.createElement('div');
   hamburger.classList.add('nav-hamburger');
@@ -280,7 +289,11 @@ export default async function decorate(block) {
       <span class="nav-hamburger-icon"></span>
     </button>`;
   hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
-  nav.prepend(hamburger);
+
+  const mobileTools = document.createElement('div');
+  mobileTools.className = 'nav-mobile-tools';
+  mobileTools.append(mail, hamburger);
+  nav.prepend(mobileTools);
   nav.setAttribute('aria-expanded', 'false');
   // prevent mobile nav behavior on window resize
   toggleMenu(nav, navSections, isDesktop.matches);

@@ -26,7 +26,7 @@ header nav {
   box-sizing: border-box;
   display: grid;
   grid-template:
-    'brand hamburger' var(--nav-main-height)
+    'brand tools' var(--nav-main-height)
     'sections sections' 1fr / 1fr auto;
   align-items: center;
   gap: 0 24px;
@@ -35,6 +35,27 @@ header nav {
   margin: auto;
   padding: 0 var(--spacing-l);
   font-family: var(--body-font-family);
+}
+
+/* mobile action cluster (mail + hamburger), right-aligned */
+header nav .nav-mobile-tools {
+  grid-area: tools;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-m);
+  justify-content: flex-end;
+}
+
+header nav .nav-mail {
+  display: inline-flex;
+  align-items: center;
+  color: var(--skoda-ink);
+}
+
+header nav .nav-mail .icon,
+header nav .nav-mail .icon img {
+  width: 24px;
+  height: 24px;
 }
 
 header nav p {
@@ -53,8 +74,8 @@ header nav a:focus-visible {
 
 header nav[aria-expanded='true'] {
   grid-template:
-    'brand hamburger' var(--nav-main-height)
-    'tools tools' auto
+    'brand tools' var(--nav-main-height)
+    'search search' auto
     'sections sections' 1fr / 1fr auto;
   min-height: calc(100dvh - var(--nav-topbar-height));
   overflow-y: auto;
@@ -155,7 +176,6 @@ header .nav-section-switcher li.active a {
 
 /* --- Hamburger (drawer band only) ------------------------------------------ */
 header nav .nav-hamburger {
-  grid-area: hamburger;
   display: flex;
   align-items: center;
   height: 22px;
@@ -276,7 +296,7 @@ header nav[aria-expanded='true'] .nav-sections {
 
 /* --- Tools (search) -------------------------------------------------------- */
 header nav .nav-tools {
-  grid-area: tools;
+  grid-area: search;
 }
 
 header nav .nav-tools p {
@@ -380,6 +400,22 @@ header nav .nav-search-input::placeholder {
  * expanded to 80% width (no click-to-expand overlay here).
  * ========================================================================== */
 @media (width < 1080px) {
+  /* open drawer = left-anchored panel (not full width) */
+  header nav[aria-expanded='true'] {
+    max-width: 50%;
+    min-width: 375px;
+    margin-right: auto;
+    margin-left: 0;
+    background: var(--background-color);
+    box-shadow: var(--dropdown-shadow);
+  }
+
+  /* keep the collapsed bar full-width so brand + actions span the header */
+  header nav[aria-expanded='false'] {
+    max-width: none;
+    min-width: 0;
+  }
+
   /* tap-friendly accordion list */
   header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul {
     display: flex;
@@ -538,7 +574,7 @@ header nav .nav-search-input::placeholder {
     font-size: var(--body-font-size-s);
   }
 
-  header nav .nav-hamburger {
+  header nav .nav-mobile-tools {
     display: none;
     visibility: hidden;
   }
