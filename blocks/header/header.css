@@ -115,6 +115,7 @@ header .nav-topbar .nav-topbar-utility a + a {
 
 header nav[aria-expanded='true'] .nav-topbar-utility {
   display: block;
+  padding: var(--spacing-s) 0;
 }
 
 /* section switcher (Stories | Media Room) — full-width 50/50 tab bar on mobile */
@@ -270,6 +271,82 @@ header nav[aria-expanded='true'] .nav-sections {
   display: block;
   align-self: start;
   visibility: visible;
+}
+
+/* --- Drawer band (< 1080): tap-friendly accordion list --------------------- */
+header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--body-font-size-m);
+}
+
+header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul > li {
+  border-bottom: 1px solid var(--divider-color);
+}
+
+header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul > li > a,
+header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul > li > p > a {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: var(--spacing-s) 0;
+  color: var(--skoda-ink);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul > li > p {
+  margin: 0;
+}
+
+/* parent (accordion) rows: caret + collapsed sub-list by default */
+header nav[aria-expanded='true'] .nav-sections .nav-drop > a,
+header nav[aria-expanded='true'] .nav-sections .nav-drop > p > a {
+  position: relative;
+  justify-content: space-between;
+}
+
+header nav[aria-expanded='true'] .nav-sections .nav-drop > a::after,
+header nav[aria-expanded='true'] .nav-sections .nav-drop > p > a::after {
+  content: '';
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  border: 2px solid currentcolor;
+  border-width: 0 2px 2px 0;
+  border-radius: 0 0 1px;
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+header nav[aria-expanded='true'] .nav-sections .nav-drop[aria-expanded='true'] > a::after,
+header nav[aria-expanded='true'] .nav-sections .nav-drop[aria-expanded='true'] > p > a::after {
+  transform: rotate(-135deg);
+}
+
+/* collapsed sub-menu; expands when the parent li is aria-expanded */
+header nav[aria-expanded='true'] .nav-sections .nav-drop > ul {
+  max-height: 0;
+  padding-left: var(--spacing-m);
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+header nav[aria-expanded='true'] .nav-sections .nav-drop[aria-expanded='true'] > ul {
+  max-height: 999px;
+}
+
+header nav[aria-expanded='true'] .nav-sections .nav-drop > ul > li > a {
+  display: flex;
+  align-items: center;
+  min-height: 0;
+  padding: 10px 0;
+  color: var(--skoda-ink);
+  font-size: var(--body-font-size-s);
+  font-weight: var(--weight-regular);
+  line-height: 1.2;
+  text-decoration: none;
 }
 
 /* --- Tools (search) -------------------------------------------------------- */

@@ -198,11 +198,23 @@ export default async function decorate(block) {
       if (navSection.querySelector('a[href*="#newsletter"]')) {
         navSection.classList.add('nav-newsletter');
       }
-      navSection.addEventListener('click', () => {
+      const isDrop = navSection.classList.contains('nav-drop')
+        || navSection.querySelector('ul');
+      navSection.addEventListener('click', (e) => {
         if (isDesktop.matches) {
           const expanded = navSection.getAttribute('aria-expanded') === 'true';
           toggleAllNavSections(navSections);
           navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        } else if (isDrop) {
+          // drawer: tapping a parent row toggles its accordion instead of
+          // navigating; only intercept taps on the parent row itself, not on
+          // an already-revealed child link
+          const parentLink = navSection.querySelector(':scope > p > a, :scope > a');
+          if (e.target.closest('a') === parentLink) {
+            e.preventDefault();
+            const expanded = navSection.getAttribute('aria-expanded') === 'true';
+            navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+          }
         }
       });
     });
