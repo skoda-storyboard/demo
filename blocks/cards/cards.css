@@ -157,6 +157,12 @@ body.homepage .cards .cards-toolbar-button.media-cart-action {
   border-radius: var(--card-radius);
 }
 
+/* no hover tint/plus-icon affordance on overlay cards — the scrim + caption is the
+   visible state (matches the live source, whose overlay ::after carries no glyph) */
+.cards.overlay .cards-card-image::after {
+  content: none;
+}
+
 .cards.overlay .cards-card-body {
   position: absolute;
   inset: 0;
