@@ -1,8 +1,8 @@
-import { getMetadata } from '../../scripts/aem.js';
+import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 
-// media query match that indicates mobile/tablet width
-const isDesktop = window.matchMedia('(min-width: 900px)');
+// desktop >= 1080px per source ladder (SKODA-301); below is the drawer band (SKODA-302)
+const isDesktop = window.matchMedia('(min-width: 1080px)');
 
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
@@ -76,7 +76,9 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   const button = nav.querySelector('.nav-hamburger button');
   document.body.style.overflowY = (expanded || isDesktop.matches) ? '' : 'hidden';
   nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-  toggleAllNavSections(navSections, expanded || isDesktop.matches ? 'false' : 'true');
+  // always collapse the accordion sub-menus when opening/closing the drawer
+  // (mobile accordions start collapsed; user taps a parent to expand)
+  toggleAllNavSections(navSections, 'false');
   button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
   // enable nav dropdown keyboard accessibility
   if (navSections) {
@@ -124,32 +126,182 @@ export default async function decorate(block) {
   nav.id = 'nav';
   while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
 
-  const classes = ['brand', 'sections', 'tools'];
+  // 4-row fragment (topbar + brand + sections + tools) vs 3-row (brand + sections + tools)
+  const hasTopbar = nav.children.length >= 4;
+  const classes = hasTopbar
+    ? ['topbar', 'brand', 'sections', 'tools']
+    : ['brand', 'sections', 'tools'];
   classes.forEach((c, i) => {
     const section = nav.children[i];
     if (section) section.classList.add(`nav-${c}`);
   });
 
+  // topbar: section switcher (COM-04) + subscribe/locales group, lifted above <nav>
+  const navTopbar = nav.querySelector('.nav-topbar');
+  if (navTopbar) {
+    const switcher = navTopbar.querySelector(':scope .default-content-wrapper > ul, :scope > ul');
+    if (switcher) {
+      switcher.classList.add('nav-section-switcher');
+      // mark the active section tab (longest path-segment match of the current
+      // URL; default to the first tab). Decorate defensively: authors may omit
+      // the href, so guard against missing/invalid URLs.
+      const { pathname } = window.location;
+      const items = [...switcher.querySelectorAll(':scope > li')];
+      let best;
+      let bestLen = -1;
+      items.forEach((li) => {
+        const a = li.querySelector('a[href]');
+        if (!a || !a.getAttribute('href')) return;
+        let p;
+        try {
+          p = new URL(a.href, window.location).pathname;
+        } catch (e) {
+          return;
+        }
+        // match on segment boundaries so /news doesn't match /news-room/article
+        if ((pathname === p || pathname.startsWith(`${p.replace(/\/$/, '')}/`)) && p.length > bestLen) {
+          best = li;
+          bestLen = p.length;
+        }
+      });
+      if (!best) [best] = items;
+      if (best) best.classList.add('active');
+    }
+    // group Subscribe + locales so they can float right on desktop / drop into drawer on mobile
+    const utility = navTopbar.querySelectorAll(':scope .default-content-wrapper > p');
+    utility.forEach((p) => p.classList.add('nav-topbar-utility'));
+    // prefix the Subscribe CTA with a mail icon (injected here; DA strips authored tokens)
+    const subscribeLink = navTopbar.querySelector('a[href*="#subscribe"]');
+    if (subscribeLink && !subscribeLink.querySelector('.icon')) {
+      subscribeLink.classList.add('nav-subscribe');
+      const mail = document.createElement('span');
+      mail.className = 'icon icon-mail';
+      subscribeLink.prepend(mail);
+    }
+    // The topbar (incl. the locale switcher) is lifted OUT of <nav>, so it can't
+    // appear inside the mobile drawer. Clone the locale group into a drawer
+    // footer so the language list shows at the bottom on mobile (CSS shows it
+    // only in the open drawer; the original stays in the topbar for desktop).
+    const localeGroup = [...navTopbar.querySelectorAll(':scope .default-content-wrapper > p')]
+      .find((p) => p.querySelector('strong'));
+    if (localeGroup) {
+      const localeFooter = localeGroup.cloneNode(true);
+      localeFooter.className = 'nav-locales';
+      nav.append(localeFooter);
+    }
+  }
+
   const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
-  if (brandLink) {
-    brandLink.className = '';
-    brandLink.closest('.button-container').className = '';
+  if (navBrand) {
+    const brandLink = navBrand.querySelector('a');
+    if (brandLink) {
+      // strip any button decoration EDS may have added
+      brandLink.className = '';
+      const btnContainer = brandLink.closest('.button-container');
+      if (btnContainer) btnContainer.className = '';
+      // render the wordmark as the logo icon. Authoring the SVG via an icon
+      // token in the DA fragment is unreliable (DA sanitizes empty-anchor icon
+      // spans), so inject it here from the brand link's text.
+      brandLink.setAttribute('aria-label', brandLink.textContent.trim() || 'Škoda Storyboard, home');
+      brandLink.textContent = '';
+      brandLink.classList.add('nav-brand-logo');
+      const logo = document.createElement('span');
+      logo.className = 'icon icon-skoda-storyboard-logo';
+      brandLink.append(logo);
+    }
   }
 
   const navSections = nav.querySelector('.nav-sections');
   if (navSections) {
     navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
       if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
-      navSection.addEventListener('click', () => {
+      // Newsletter is drawer-only on desktop (server strips the authored class; re-tag by href)
+      if (navSection.querySelector('a[href*="#newsletter"]')) {
+        navSection.classList.add('nav-newsletter');
+      }
+      const isDrop = navSection.classList.contains('nav-drop')
+        || navSection.querySelector('ul');
+      navSection.addEventListener('click', (e) => {
         if (isDesktop.matches) {
           const expanded = navSection.getAttribute('aria-expanded') === 'true';
           toggleAllNavSections(navSections);
           navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        } else if (isDrop) {
+          // drawer: tapping a parent row toggles its accordion instead of
+          // navigating; only intercept taps on the parent row itself, not on
+          // an already-revealed child link
+          const parentLink = navSection.querySelector(':scope > p > a, :scope > a');
+          if (e.target.closest('a') === parentLink) {
+            e.preventDefault();
+            const expanded = navSection.getAttribute('aria-expanded') === 'true';
+            navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+          }
         }
       });
     });
   }
+
+  // tools row: render the search link as a click-to-expand search control.
+  // DA strips authored icon tokens, so build the icon + input here.
+  const navTools = nav.querySelector('.nav-tools');
+  if (navTools) {
+    const searchLink = navTools.querySelector('a[href*="#search"], a');
+    if (searchLink) {
+      const label = searchLink.textContent.trim() || 'Search';
+      // toggle button (the search icon)
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'nav-search-toggle';
+      toggle.setAttribute('aria-label', label);
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.innerHTML = '<span class="icon icon-search"></span>';
+      // search input (collapsed by default)
+      const input = document.createElement('input');
+      input.type = 'search';
+      input.className = 'nav-search-input';
+      input.placeholder = label;
+      input.setAttribute('aria-label', label);
+      input.tabIndex = -1;
+
+      // pill field holds the leading icon + input; icon sits before the
+      // placeholder when open, input fills the rest
+      const field = document.createElement('div');
+      field.className = 'nav-search-field';
+      field.append(toggle, input);
+
+      const searchBar = document.createElement('div');
+      searchBar.className = 'nav-search';
+      searchBar.append(field);
+
+      const setOpen = (open) => {
+        searchBar.classList.toggle('nav-search-open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        input.tabIndex = open ? 0 : -1;
+        if (open) input.focus();
+      };
+      toggle.addEventListener('click', () => {
+        setOpen(!searchBar.classList.contains('nav-search-open'));
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.code === 'Escape') { setOpen(false); toggle.focus(); }
+      });
+      // close when focus leaves the search control (if input is empty)
+      searchBar.addEventListener('focusout', (e) => {
+        if (!searchBar.contains(e.relatedTarget) && !input.value) setOpen(false);
+      });
+
+      searchLink.replaceWith(searchBar);
+    }
+  }
+
+  // mobile action cluster: mail shortcut + hamburger (mail sits before the
+  // hamburger, mobile-only). Mail is an anchor so it is not picked up by the
+  // nav's `querySelector('button')` focus/close logic.
+  const mail = document.createElement('a');
+  mail.className = 'nav-mail';
+  mail.href = '#subscribe';
+  mail.setAttribute('aria-label', 'Subscribe to our stories');
+  mail.innerHTML = '<span class="icon icon-mail"></span>';
 
   // hamburger for mobile
   const hamburger = document.createElement('div');
@@ -158,14 +310,22 @@ export default async function decorate(block) {
       <span class="nav-hamburger-icon"></span>
     </button>`;
   hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
-  nav.prepend(hamburger);
+
+  const mobileTools = document.createElement('div');
+  mobileTools.className = 'nav-mobile-tools';
+  mobileTools.append(mail, hamburger);
+  nav.prepend(mobileTools);
   nav.setAttribute('aria-expanded', 'false');
   // prevent mobile nav behavior on window resize
   toggleMenu(nav, navSections, isDesktop.matches);
   isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
 
+  decorateIcons(nav);
+
   const navWrapper = document.createElement('div');
   navWrapper.className = 'nav-wrapper';
+  // lift the topbar to full-width (grey utility bar), above the main nav row
+  if (navTopbar) navWrapper.append(navTopbar);
   navWrapper.append(nav);
   block.append(navWrapper);
 }

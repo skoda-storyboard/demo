@@ -81,6 +81,10 @@
   --nav-main-height: 64px;
   --nav-topbar-height: 44px;
 
+  /* header dropdown geometry + small utility font (SKODA-301) */
+  --dropdown-radius: 4px;
+  --body-font-size-2xs: 12px;
+
   /* breakpoint tokens — for JS / container-query reuse ONLY. CSS custom properties cannot be
      used inside @media conditions, so the literals 768/992/1080 below remain the source of
      truth for media queries (canonical ladder per _FOUNDATIONS.md §1). */
