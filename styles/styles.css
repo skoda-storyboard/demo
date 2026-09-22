@@ -10,48 +10,105 @@
  * governing permissions and limitations under the License.
  */
 
+/*
+ * Global design tokens + global/section styles (SKODA-106).
+ *
+ * Two-file split (intentional — see docs/guardrails/DESIGN-TOKENS.md):
+ *   - brand.css  = primitive layer. Raw hex color tokens + fallback @font-face. It is the ONLY
+ *                  file exempt from Stylelint color-no-hex + declaration-strict-value, so raw hex
+ *                  is allowed there and nowhere else. Loaded eagerly BEFORE this file in head.html.
+ *   - styles.css = this file. Semantic tokens (typography/spacing/layout) + all global element
+ *                  styles. Fully lint-enforced: every color/bg/border/font must be a var() token.
+ * Merging the two would require weakening the lint guardrail, so they stay separate.
+ *
+ * Element defaults below are re-derived from measured computed styles on the live source
+ * (story detail, press release, home, category, EN + CZ) — not ported from the legacy theme.
+ * Mobile-first: base rules target the smallest viewport, min-width media queries enhance up.
+ * Downstream block CSS must consume these tokens via var() — no hardcoded colors/spacing.
+ */
+
 :root {
-  /* colors (brand hex tokens live in brand.css; keyword defaults kept here) */
-  --background-color: white;
+  /* fonts — SKODA Next brand stack (self-hosted in fonts/, embedded via fonts.css which loads
+     lazily; brand.css supplies the size-adjusted fallback). The family name is unquoted and
+     lowercased ("skoda next") per Stylelint (font-family-name-quotes + value-keyword-case);
+     font-family matching is case-insensitive so this matches the @font-face descriptor. */
+  --body-font-family: skoda next, skoda-next-fallback, helvetica, arial, sans-serif;
+  --heading-font-family: var(--body-font-family);
 
-  /* fonts */
-  --body-font-family: roboto, roboto-fallback, sans-serif;
-  --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
+  /* font weights — source ships only 300/400/600/700 (no real 500 face). */
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
 
-  /* body sizes */
-  --body-font-size-m: 22px;
-  --body-font-size-s: 19px;
-  --body-font-size-xs: 17px;
+  /* line heights (measured from source: body 24/16 = 1.5, headings ~1.25) */
+  --line-height-body: 1.5;
+  --line-height-heading: 1.25;
 
-  /* heading sizes */
-  --heading-font-size-xxl: 55px;
-  --heading-font-size-xl: 44px;
-  --heading-font-size-l: 34px;
-  --heading-font-size-m: 27px;
-  --heading-font-size-s: 24px;
-  --heading-font-size-xs: 22px;
+  /* prose paragraph rhythm (measured ~20px bottom gap in article/press body) */
+  --paragraph-gap: 20px;
 
-  /* nav height */
-  --nav-height: 64px;
+  /* body sizes (mobile-first base) */
+  --body-font-size-m: 16px;
+  --body-font-size-s: 14px;
+  --body-font-size-xs: 13px;
+
+  /* heading sizes (mobile-first base) */
+  --heading-font-size-xxl: 44px;
+  --heading-font-size-xl: 34px;
+  --heading-font-size-l: 26px;
+  --heading-font-size-m: 22px;
+  --heading-font-size-s: 18px;
+  --heading-font-size-xs: 16px;
+
+  /* spacing scale */
+  --spacing-xs: 8px;
+  --spacing-s: 12px;
+  --spacing-m: 16px;
+  --spacing-l: 24px;
+  --spacing-xl: 40px;
+  --spacing-xxl: 64px;
+  --section-padding: 40px;
+
+  /* radii / shadow / border */
+  --card-radius: 8px;
+  --card-shadow: 0 1px 10px 0 rgb(0 0 0 / 7%), 0 2px 2px -2px rgb(0 0 0 / 10%);
+  --card-border: 1px solid var(--skoda-grey-border);
+
+  /* layout / nav */
+  --content-max-width: 1248px;
+  --nav-height: 108px;
+  --nav-main-height: 64px;
+  --nav-topbar-height: 44px;
+
+  /* breakpoint tokens — for JS / container-query reuse ONLY. CSS custom properties cannot be
+     used inside @media conditions, so the literals 768/992/1080 below remain the source of
+     truth for media queries (canonical ladder per _FOUNDATIONS.md §1). */
+  --bp-tablet: 768px;
+  --bp-desktop-s: 992px;
+  --bp-desktop: 1080px;
 }
 
-/* fallback @font-face relocated to brand.css (exempt from strict-value) */
+/* The global element defaults below (body, headings, paragraphs, lists, strong/em, hr, line
+   heights, prose rhythm) are intentionally VIEWPORT-INVARIANT and carry no min-width overrides.
+   This is verified against the live source: computed styles for these elements are identical at
+   375px and 1200px (measured on story + press-release templates, EN + CZ). Do NOT add breakpoints
+   to these rules — the design does not scale them. What DOES scale responsively is heading sizes
+   on specific templates (e.g. story/hero title 40px→smaller on mobile); those are
+   template/component-specific and live in the owning block's CSS, not here (see _FOUNDATIONS.md
+   §3/§8). The one global rule that changes across breakpoints is section padding (see the
+   992px media query further down). */
 
-@media (width >= 992px) {
-  :root {
-    /* body sizes */
-    --body-font-size-m: 18px;
-    --body-font-size-s: 16px;
-    --body-font-size-xs: 14px;
+/* box-sizing baseline. A universal `*` reset is disallowed by Stylelint
+   (selector-max-universal: 0), so document defaults set it on the root and inherit into
+   pseudo-elements; blocks set border-box on their own containers as needed. */
+html {
+  box-sizing: border-box;
+}
 
-    /* heading sizes */
-    --heading-font-size-xxl: 45px;
-    --heading-font-size-xl: 36px;
-    --heading-font-size-l: 28px;
-    --heading-font-size-m: 22px;
-    --heading-font-size-s: 20px;
-    --heading-font-size-xs: 18px;
-  }
+::before,
+::after {
+  box-sizing: inherit;
 }
 
 body {
@@ -61,7 +118,10 @@ body {
   color: var(--text-color);
   font-family: var(--body-font-family);
   font-size: var(--body-font-size-m);
-  line-height: 1.6;
+  font-weight: var(--weight-regular);
+  line-height: var(--line-height-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizespeed;
 }
 
 body.appear {
@@ -82,6 +142,9 @@ footer .footer[data-block-status="loaded"] {
   visibility: visible;
 }
 
+/* headings — global fallback scale (canonical per _FOUNDATIONS.md §3). Source heading sizes are
+   template/component-specific (e.g. story title 40px, press-release title 26px, article h2 40px
+   at weight 300); those live in the owning block's CSS. These defaults keep unstyled prose sane. */
 h1,
 h2,
 h3,
@@ -91,9 +154,11 @@ h6 {
   margin-top: 0.8em;
   margin-bottom: 0.25em;
   font-family: var(--heading-font-family);
-  font-weight: 600;
-  line-height: 1.25;
-  scroll-margin: 40px;
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-heading);
+  color: var(--text-color);
+  scroll-margin: var(--spacing-xl);
+  overflow-wrap: break-word;
 }
 
 h1 { font-size: var(--heading-font-size-xxl); }
@@ -103,31 +168,152 @@ h4 { font-size: var(--heading-font-size-m); }
 h5 { font-size: var(--heading-font-size-s); }
 h6 { font-size: var(--heading-font-size-xs); }
 
+/* prose text blocks — measured source rhythm: ~20px paragraph gap, body line-height 1.5 */
 p,
 dl,
 ol,
 ul,
 pre,
-blockquote {
-  margin-top: 0.8em;
-  margin-bottom: 0.25em;
+blockquote,
+figure,
+table {
+  margin-top: 0;
+  margin-bottom: var(--paragraph-gap);
 }
 
+/* remove the leading margin on the first flow element in a content column */
+main .default-content-wrapper > :first-child {
+  margin-top: 0;
+}
+
+/* inline emphasis (source: strong/b render at semibold, em/i italic) */
+strong,
+b {
+  font-weight: var(--weight-semibold);
+}
+
+em,
+i {
+  font-style: italic;
+}
+
+small {
+  font-size: var(--body-font-size-s);
+}
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub { bottom: -0.25em; }
+sup { top: -0.5em; }
+
+/* lists */
+ul,
+ol {
+  padding-left: var(--spacing-l);
+}
+
+li {
+  margin-bottom: var(--spacing-xs);
+}
+
+/* nested lists tighten up */
+li > ul,
+li > ol {
+  margin-top: var(--spacing-xs);
+  margin-bottom: 0;
+}
+
+dt {
+  font-weight: var(--weight-semibold);
+}
+
+dd {
+  margin-left: var(--spacing-l);
+}
+
+/* blockquote — leading-accent quotation block */
+blockquote {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: var(--spacing-l);
+  border-left: 2px solid var(--dark-color);
+  font-style: italic;
+  color: var(--text-color);
+}
+
+/* horizontal rule (measured: 2px solid, ~10px bottom gap) */
+hr {
+  margin-top: 0;
+  margin-bottom: var(--spacing-s);
+  border: 0;
+  border-top: 2px solid var(--text-color);
+}
+
+/* figures & captions */
+figure {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+figcaption {
+  margin-top: var(--spacing-xs);
+  font-size: var(--body-font-size-s);
+  line-height: var(--line-height-body);
+  color: var(--skoda-grey-500);
+}
+
+/* tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--body-font-size-s);
+}
+
+th,
+td {
+  padding: var(--spacing-xs) var(--spacing-s);
+  border-bottom: var(--card-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  font-weight: var(--weight-semibold);
+}
+
+/* code */
 code,
 pre {
   font-size: var(--body-font-size-s);
 }
 
 pre {
-  padding: 16px;
-  border-radius: 8px;
+  padding: var(--spacing-m);
+  border-radius: var(--card-radius);
   background-color: var(--light-color);
   overflow-x: auto;
   white-space: pre;
 }
 
+code {
+  padding: 0.1em 0.3em;
+  border-radius: 4px;
+  background-color: var(--light-color);
+}
+
+pre code {
+  padding: 0;
+  background-color: transparent;
+}
+
 main > div {
-  margin: 40px 16px;
+  margin: var(--spacing-xl) var(--spacing-m);
 }
 
 input,
@@ -137,8 +323,9 @@ button {
   font: inherit;
 }
 
-/* links */
-a:any-link {
+/* links — plain `a` keeps global specificity low (0,0,1) so a block's `.block a` rule
+   overrides cleanly without escalating to `:any-link`. */
+a {
   color: var(--link-color);
   text-decoration: none;
   overflow-wrap: break-word;
@@ -149,12 +336,17 @@ a:hover {
   text-decoration: underline;
 }
 
-/* buttons */
-p.button-wrapper {
-  margin: 12px 0;
+a:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
 }
 
-a.button:any-link,
+/* buttons */
+p.button-wrapper {
+  margin: var(--spacing-s) 0;
+}
+
+a.button,
 button.button {
   box-sizing: border-box;
   display: inline-flex;
@@ -166,7 +358,7 @@ button.button {
   border-radius: 2.4em;
   padding: 0.5em 1.2em;
   font: inherit;
-  font-weight: 500;
+  font-weight: var(--weight-semibold);
   line-height: 1.25;
   text-decoration: none;
   cursor: pointer;
@@ -262,6 +454,7 @@ button.button.accent:disabled:focus-visible {
   color: var(--dark-color);
 }
 
+/* media — reserve space to keep CLS low (source ships width/height) */
 main img {
   max-width: 100%;
   width: auto;
@@ -281,13 +474,13 @@ main img {
 
 /* sections */
 main > .section {
-  margin: 40px 0;
+  margin: var(--spacing-xl) 0;
 }
 
 main > .section > div {
-  max-width: 1200px;
+  max-width: var(--content-max-width);
   margin: auto;
-  padding: 0 24px;
+  padding: 0 var(--spacing-l);
 }
 
 main > .section:first-of-type {
@@ -296,7 +489,7 @@ main > .section:first-of-type {
 
 @media (width >= 992px) {
   main > .section > div {
-    padding: 0 32px;
+    padding: 0 var(--spacing-xl);
   }
 }
 
@@ -305,5 +498,17 @@ main .section.light,
 main .section.highlight {
   background-color: var(--light-color);
   margin: 0;
-  padding: 40px 0;
+  padding: var(--section-padding) 0;
+}
+
+/* dark band — green background, light text (per _FOUNDATIONS.md §7 conventions) */
+main .section.dark {
+  background-color: var(--dark-color);
+  color: var(--background-color);
+  margin: 0;
+  padding: var(--section-padding) 0;
+}
+
+main .section.dark a {
+  color: var(--background-color);
 }

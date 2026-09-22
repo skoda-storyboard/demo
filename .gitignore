@@ -3,10 +3,17 @@ coverage/*
 logs/*
 node_modules/*
 
+# Local secrets — AEM DAM dev/custom IMS token (never commit). See tools/importer/media/README.md.
+.migration/secrets/
+aem-token.rtf
+
 helix-importer-ui
 .DS_Store
 *.bak
 .idea
+
+# Personal Claude Code overrides (the shared team config is .claude/settings.json)
+.claude/settings.local.json
 
 # Ensure these files are tracked
 !CLAUDE.md

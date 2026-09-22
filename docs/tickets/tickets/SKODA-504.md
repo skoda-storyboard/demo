@@ -38,3 +38,6 @@ Assuming an instance: there is **no shared join key** between S3 images and AEM 
 - Perceptual-hash false-match rate → confidence threshold + manual review required.
 - No-CORS CDN → hashing must run server-side / in the import job, not the browser.
 - `[RUNTIME-UNCONFIRMED]`: rendered fidelity of Assets-delivered vs original renditions — verify in browser.
+
+## Implemented (2026-09-21)
+Manifest-driven ingest pipeline built + tested: **[`tools/importer/media/`](../../../tools/importer/media/README.md)** (Scenario B, masters-only, AEMaaCS 3-step direct-binary-upload, **page-mirrored** `/content/dam/storyboard/<page-path>/<file>`, per-step status, resumable). Details + findings in [`docs/media/SKODA-ASSET-MAPPING.md` §9](../../media/SKODA-ASSET-MAPPING.md). Demo-subset ACs met on the Elroq set (mock-DAM verified end-to-end; live run gated on the custom IMS token). Cart-original resolver (Mechanism B) emits `content/media-index.json` for SKODA-505.

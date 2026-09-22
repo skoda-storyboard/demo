@@ -53,13 +53,17 @@ Semantic maps: `--background-color`→white, `--light-color`→grey-100, `--dark
 
 ## 3. Typography (`styles/brand.css`)
 
-Family: `--body-font-family` / `--heading-font-family` = `'SKODA Next', helvetica, arial, sans-serif`
-(licensed font not rehosted; brand fallback stack; `fonts.css` loads lazily, never eager).
+Family: `--body-font-family` / `--heading-font-family` = `skoda next, skoda-next-fallback, helvetica, arial, sans-serif`
+(unquoted, lowercased per Stylelint; matching is case-insensitive. SKODA Next self-hosted in
+`fonts/` and embedded via `fonts.css`, which loads lazily, never eager; size-adjusted brand
+fallback covers the swap).
 
 Body: `--body-font-size-m: 16px`, `-s: 14px`, `-xs: 13px`.
 Headings: `--heading-font-size-xxl: 44px` (h1), `-xl: 34px` (h2), `-l: 26px` (h3), `-m: 22px` (h4),
 `-s: 18px` (h5), `-xs: 16px` (h6).
-Weights: `--weight-regular: 400`, `-medium: 500`, `-semibold: 600`, `-bold: 700`.
+Weights: `--weight-light: 300`, `--weight-regular: 400`, `-semibold: 600`, `-bold: 700`.
+(No `-medium: 500` — SKODA Next ships only 300/400/600/700; a 500 token would have no real face
+and browsers would synthesize it. Specs that referenced `--weight-medium` should map to 600.)
 
 ## 4. Spacing (`styles/brand.css`)
 
