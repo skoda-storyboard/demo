@@ -391,6 +391,54 @@ export function splitBuffer(buffer, uploadURIs, maxPartSize) {
 }
 
 /**
+ * Ensure the page-mirrored DAM folder chain for an asset exists before upload.
+ * `initiateUpload` 404s when the target folder node is absent and the Assets HTTP
+ * API does NOT auto-create parents, so we create every segment BELOW the (assumed
+ * pre-existing) configured base folder, top-down, via POST /api/assets/<path>.
+ * Idempotent + concurrency-safe: an already-present folder (200/201/409) is fine,
+ * and a single leaf existence GET short-circuits the common "folder already there"
+ * case so re-uploads into the same folder cost one GET, not N creates.
+ * Returns { ok, status, body }.
+ */
+export async function ensureDamFolder({
+  damConfig, folderPath, token, fetchImpl = fetchWithRetry,
+}) {
+  if (!damConfig || !damConfig.baseUrl || !token) {
+    return { ok: false, status: 0, body: 'DAM not configured' };
+  }
+  const base = damConfig.baseUrl.replace(/\/$/, '');
+  const root = (damConfig.folder || '/content/dam/storyboard').replace(/\/$/, '');
+  // Nothing to create at/above the base folder (assumed to exist).
+  if (folderPath === root || !folderPath.startsWith(`${root}/`)) {
+    return { ok: true, status: 200, body: '' };
+  }
+  const auth = { authorization: `Bearer ${token}` };
+  // Fast path: leaf already exists → all ancestors do too.
+  const leaf = await fetchImpl(`${base}${folderPath}.json`, { headers: auth });
+  if (leaf.ok) return { ok: true, status: leaf.status, body: '' };
+
+  const tail = folderPath.slice(root.length + 1).split('/').filter(Boolean);
+  let acc = root;
+  for (const seg of tail) {
+    acc = `${acc}/${seg}`;
+    const apiPath = acc.replace(/^\/content\/dam\//, ''); // e.g. storyboard/en/skoda-model
+    // eslint-disable-next-line no-await-in-loop
+    const res = await fetchImpl(`${base}/api/assets/${apiPath}`, {
+      method: 'POST',
+      headers: { ...auth, 'content-type': 'application/json' },
+      body: JSON.stringify({ class: 'assetFolder', properties: { 'jcr:title': seg } }),
+    });
+    // 200/201 created; 409 already exists (idempotent / concurrent create) — all OK.
+    if (!res.ok && res.status !== 409) {
+      // eslint-disable-next-line no-await-in-loop
+      const body = await res.text().catch(() => '');
+      return { ok: false, status: res.status, body: `mkdir ${apiPath} ${res.status}: ${body.slice(0, 120)}` };
+    }
+  }
+  return { ok: true, status: 200, body: '' };
+}
+
+/**
  * Upload one asset's ORIGINAL bytes into the AEM DAM via direct-binary-upload,
  * into the page-mirrored folder. Returns { ok, status, assetPath, body }.
  * Credentials: bearer token (custom IMS) — pass explicitly from resolveDamToken.
@@ -414,6 +462,15 @@ export async function uploadToDAM({
   const auth = { authorization: `Bearer ${token}` };
 
   try {
+    // 0) ensure the page-mirrored folder chain exists (initiateUpload 404s otherwise).
+    const mk = await ensureDamFolder({
+      damConfig, folderPath: folder, token, fetchImpl,
+    });
+    if (!mk.ok) {
+      return {
+        ok: false, status: mk.status, assetPath: damPath, body: `folder ${mk.body}`,
+      };
+    }
     // 1) initiateUpload
     const initForm = new URLSearchParams();
     initForm.set('fileName', fileName);

@@ -5,6 +5,7 @@ node_modules/*
 
 # Local secrets — AEM DAM dev/custom IMS token (never commit). See tools/importer/media/README.md.
 .migration/secrets/
+aem-token.rtf
 
 helix-importer-ui
 .DS_Store

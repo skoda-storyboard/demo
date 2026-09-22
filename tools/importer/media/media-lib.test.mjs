@@ -10,7 +10,7 @@ import { createServer } from 'node:http';
 import {
   logicalId, masterUrl, normalizeExtension, isAspectCrop, derivativeSuffix,
   damPathFor, pagePathFromFile, splitBuffer, imageSize, ratiosDiffer,
-  uploadToDAM, resolveDamToken,
+  uploadToDAM, ensureDamFolder, resolveDamToken,
 } from './media-lib.mjs';
 
 // ---- F3: path-qualified logical id -----------------------------------------
@@ -126,6 +126,14 @@ function startMockDam() {
         method: req.method, url: req.url, auth, len: body.length,
       });
       // Bearer required on the AEM endpoints (not the blob PUT).
+      if (req.method === 'GET' && req.url.endsWith('.json')) {
+        // folder existence check — report "missing" so ensureDamFolder creates it.
+        res.writeHead(404); res.end('not found'); return;
+      }
+      if (req.url.startsWith('/api/assets/')) {
+        if (!auth.startsWith('Bearer ')) { res.writeHead(401); res.end('no bearer'); return; }
+        res.writeHead(201); res.end('{}'); return; // folder created
+      }
       if (req.url.includes('.initiateUpload.json')) {
         if (!auth.startsWith('Bearer ')) { res.writeHead(401); res.end('no bearer'); return; }
         const { port } = server.address();
@@ -167,22 +175,113 @@ test('E/H: uploadToDAM drives initiate → PUT parts (ordered) → complete with
     });
     assert.equal(res.ok, true);
     assert.equal(res.status, 200);
-    // ordered: initiate, then 2 blob PUTs, then complete
+    // ordered: leaf existence check, create en/skoda-model/elroq, initiate, 2 PUTs, complete
     const label = (c) => {
+      if (c.method === 'GET' && c.url.endsWith('.json')) return 'check';
+      if (c.url.startsWith('/api/assets/')) return 'mkdir';
       if (c.url.includes('initiateUpload')) return 'init';
       if (c.url.startsWith('/blob/')) return 'put';
       if (c.url.includes('completeUpload')) return 'complete';
       return '?';
     };
-    assert.deepEqual(calls.map(label), ['init', 'put', 'put', 'complete']);
-    // bearer present on init + complete
-    assert.ok(calls[0].auth.startsWith('Bearer '));
-    assert.ok(calls[3].auth.startsWith('Bearer '));
+    assert.deepEqual(
+      calls.map(label),
+      ['check', 'mkdir', 'mkdir', 'mkdir', 'init', 'put', 'put', 'complete'],
+    );
+    // only the page-mirrored tail is created; the base folder is left untouched
+    assert.deepEqual(
+      calls.filter((c) => c.url.startsWith('/api/assets/')).map((c) => c.url),
+      ['/api/assets/storyboard/en', '/api/assets/storyboard/en/skoda-model', '/api/assets/storyboard/en/skoda-model/elroq'],
+    );
+    // bearer present on every AEM call (mkdir + init + complete)
+    assert.ok(calls.filter((c) => label(c) !== 'put').every((c) => c.auth.startsWith('Bearer ')));
     // parts covered all 10 bytes
-    assert.equal(calls[1].len + calls[2].len, 10);
+    const puts = calls.filter((c) => label(c) === 'put');
+    assert.equal(puts.reduce((n, c) => n + c.len, 0), 10);
   } finally {
     server.close();
   }
+});
+
+// ---- ensureDamFolder (page-mirrored folder auto-create) --------------------
+const damCfg = { baseUrl: 'http://dam', folder: '/content/dam/storyboard' };
+const okRes = (status = 201, body = '{}') => ({ ok: status < 400, status, text: async () => body });
+
+test('ensureDamFolder: creates only the tail below the base, top-down', async () => {
+  const calls = [];
+  const fetchImpl = async (url, opts = {}) => {
+    calls.push({ url, method: opts.method || 'GET' });
+    if ((opts.method || 'GET') === 'GET') return okRes(404, 'nf'); // leaf missing
+    return okRes(201);
+  };
+  const r = await ensureDamFolder({
+    damConfig: damCfg, folderPath: '/content/dam/storyboard/en/skoda-model/elroq', token: 't', fetchImpl,
+  });
+  assert.equal(r.ok, true);
+  assert.deepEqual(
+    calls.filter((c) => c.method === 'POST').map((c) => c.url),
+    ['http://dam/api/assets/storyboard/en', 'http://dam/api/assets/storyboard/en/skoda-model', 'http://dam/api/assets/storyboard/en/skoda-model/elroq'],
+  );
+});
+
+test('ensureDamFolder: leaf already exists → single GET, no creates', async () => {
+  const calls = [];
+  const fetchImpl = async (url, opts = {}) => {
+    calls.push({ method: opts.method || 'GET' });
+    return okRes(200, '{}'); // leaf present
+  };
+  const r = await ensureDamFolder({
+    damConfig: damCfg, folderPath: '/content/dam/storyboard/en/foo', token: 't', fetchImpl,
+  });
+  assert.equal(r.ok, true);
+  assert.deepEqual(calls, [{ method: 'GET' }]);
+});
+
+test('ensureDamFolder: base folder itself needs no creation', async () => {
+  let called = false;
+  const fetchImpl = async () => { called = true; return okRes(404); };
+  const r = await ensureDamFolder({
+    damConfig: damCfg, folderPath: '/content/dam/storyboard', token: 't', fetchImpl,
+  });
+  assert.equal(r.ok, true);
+  assert.equal(called, false);
+});
+
+test('ensureDamFolder: 409 on create is tolerated (idempotent / concurrent)', async () => {
+  const fetchImpl = async (url, opts = {}) => ((opts.method || 'GET') === 'GET' ? okRes(404) : okRes(409, 'exists'));
+  const r = await ensureDamFolder({
+    damConfig: damCfg, folderPath: '/content/dam/storyboard/en', token: 't', fetchImpl,
+  });
+  assert.equal(r.ok, true);
+});
+
+test('ensureDamFolder: a hard create failure (403) surfaces', async () => {
+  const fetchImpl = async (url, opts = {}) => ((opts.method || 'GET') === 'GET' ? okRes(404) : okRes(403, 'denied'));
+  const r = await ensureDamFolder({
+    damConfig: damCfg, folderPath: '/content/dam/storyboard/en', token: 't', fetchImpl,
+  });
+  assert.equal(r.ok, false);
+  assert.equal(r.status, 403);
+  assert.match(r.body, /mkdir storyboard\/en 403/);
+});
+
+test('E/H: uploadToDAM surfaces a folder-create failure before initiate', async () => {
+  const fetchImpl = async (url, opts = {}) => {
+    if ((opts.method || 'GET') === 'GET') return okRes(404);
+    if (url.includes('/api/assets/')) return okRes(403, 'denied');
+    throw new Error('should not reach initiate when folder creation fails');
+  };
+  const res = await uploadToDAM({
+    damConfig: damCfg,
+    damPath: '/content/dam/storyboard/en/skoda-model/elroq/hero.jpg',
+    buffer: Buffer.from('x'),
+    contentType: 'image/jpeg',
+    token: 't',
+    fetchImpl,
+  });
+  assert.equal(res.ok, false);
+  assert.equal(res.status, 403);
+  assert.match(res.body, /^folder mkdir/);
 });
 
 test('E/H: uploadToDAM without a token declines gracefully (reference-in-place)', async () => {
