@@ -302,13 +302,18 @@ header nav .nav-tools .icon {
     padding: 0 var(--spacing-l);
   }
 
-  /* Subscribe + locales become visible, flush right */
+  /* Subscribe + locales become visible, flush right (as one group) */
   header .nav-topbar-utility {
     display: block;
   }
 
-  header .nav-topbar-utility:last-of-type {
+  /* push the whole utility group (Subscribe first, then locales) to the right */
+  header .nav-topbar-utility:first-of-type {
     margin-left: auto;
+  }
+
+  header .nav-topbar-utility + .nav-topbar-utility {
+    margin-left: var(--spacing-l);
   }
 
   /* switcher shrinks to an auto-width pair at the left of the grey bar */
