@@ -1,0 +1,76 @@
+/* ==========================================================================
+ * Hero (image variant, story) — SKODA-202
+ * Spec: docs/ui-specs/hero.md (variant A, story-detail). Real <img>/<picture>,
+ * never a CSS background. Title ABOVE a 16:9 image on desktop; image moves above
+ * the title at <=1079px (flex order swap). Mobile-first.
+ * ========================================================================== */
+
+.hero-image.block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-m);
+}
+
+/* --- Title (heading + caption) -------------------------------------------- */
+.hero-image .hero-image-content {
+  order: 2; /* below the image on mobile/tablet */
+  width: 100%;
+  text-align: left;
+}
+
+.hero-image .hero-image-content h1,
+.hero-image .hero-image-content h2 {
+  margin: var(--spacing-m) 0 0;
+  color: var(--skoda-ink);
+  font-size: var(--heading-font-size-hero-story-mobile);
+  font-weight: var(--weight-semibold);
+  line-height: 1.1;
+}
+
+/* --- Media (image) -------------------------------------------------------- */
+.hero-image .hero-image-media {
+  order: 1; /* above the title on mobile/tablet */
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.hero-image .hero-image-media picture,
+.hero-image .hero-image-media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* dual-gradient scrim over the image (story variant) */
+.hero-image .hero-image-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--scrim-h), var(--scrim-v);
+  pointer-events: none;
+}
+
+/* ==========================================================================
+ * DESKTOP (>= 1080): title above image, centered; image width-capped ~970px.
+ * ========================================================================== */
+@media (width >= 1080px) {
+  .hero-image .hero-image-content {
+    order: 1; /* title first (above image) on desktop */
+    text-align: center;
+  }
+
+  .hero-image .hero-image-content h1,
+  .hero-image .hero-image-content h2 {
+    margin: var(--spacing-m) 0 var(--spacing-l);
+    font-size: var(--heading-font-size-hero-story);
+    line-height: 1.1;
+  }
+
+  .hero-image .hero-image-media {
+    order: 2;
+    max-width: 970px;
+  }
+}
