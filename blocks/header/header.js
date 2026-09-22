@@ -142,16 +142,24 @@ export default async function decorate(block) {
     const switcher = navTopbar.querySelector(':scope .default-content-wrapper > ul, :scope > ul');
     if (switcher) {
       switcher.classList.add('nav-section-switcher');
-      // mark the active section tab (longest path prefix of the current URL; default first)
+      // mark the active section tab (longest path-segment match of the current
+      // URL; default to the first tab). Decorate defensively: authors may omit
+      // the href, so guard against missing/invalid URLs.
       const { pathname } = window.location;
       const items = [...switcher.querySelectorAll(':scope > li')];
       let best;
       let bestLen = -1;
       items.forEach((li) => {
-        const a = li.querySelector('a');
-        if (!a) return;
-        const p = new URL(a.href).pathname;
-        if (pathname.startsWith(p) && p.length > bestLen) {
+        const a = li.querySelector('a[href]');
+        if (!a || !a.getAttribute('href')) return;
+        let p;
+        try {
+          p = new URL(a.href, window.location).pathname;
+        } catch (e) {
+          return;
+        }
+        // match on segment boundaries so /news doesn't match /news-room/article
+        if ((pathname === p || pathname.startsWith(`${p.replace(/\/$/, '')}/`)) && p.length > bestLen) {
           best = li;
           bestLen = p.length;
         }
