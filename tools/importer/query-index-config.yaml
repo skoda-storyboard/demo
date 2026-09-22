@@ -1,4 +1,4 @@
-# SKODA-104 — query-index skeleton (per-locale index definitions).
+# SKODA-401 — query-index schema + selectors (per-locale index definitions).
 #
 # In-repo source-of-truth copy ONLY. The platform does NOT read this file:
 # on the config service the index config is submitted via
@@ -6,10 +6,21 @@
 # (Content-Type: text/yaml). Push it with ./push-query-config.sh.
 # helix-query.yaml / fstab.yaml / paths.json are retired for this project.
 #
-# Skeleton columns only: path, title, description, image, template, date,
-# category, model, tags (path + lastModified are emitted automatically).
-# The full 15-facet selector schema and the importer normalization layer
-# (category-from-URL, 4-way date fallback) are SKODA-401, not this ticket.
+# Column schema (SKODA-401): base columns + the 15 taxonomy facets + tags.
+# (path + lastModified are emitted automatically by the indexer.)
+#
+# SELECTOR RULE (doc-confirmed 2026-09-22, aem.live /docs/special-metadata-properties):
+#   `tags` is a RESERVED special metadata property → rendered as
+#   <meta property="article:tag"> (one meta per tag, comma/bullet split), so it
+#   is selected via property="article:tag" and joined multi-value.
+#   The other 14 facets are NOT special metadata keys → the importer emits them
+#   as plain <meta name="<facet>">, so they are selected via name="<facet>".
+#   (Verified live on /en/skoda-model/elroq: name=model/template/publisheddate,
+#    property=article:tag.) Do NOT assume the non-tag facets map to property=.
+#
+# The importer-side normalization that POPULATES these fields where the source
+# markup lacks clean meta (category-from-URL, 4-way date fallback, per-facet
+# extraction) lives in tools/importer/transformers/skoda-metadata.js (SKODA-401).
 
 version: 1
 
@@ -25,6 +36,7 @@ indices:
       - /en/footer
     target: /en/query-index.json
     properties:
+      # --- base columns ---
       title:
         select: head > meta[property="og:title"]
         value: attribute(el, "content")
@@ -43,12 +55,62 @@ indices:
       category:
         select: head > meta[name="category"]
         value: attribute(el, "content")
+      # --- tags: reserved special prop → article:tag (multi-value, comma-joined) ---
+      tags:
+        select: head > meta[property="article:tag"]
+        values:
+          - attribute(el, "content")
+      # --- the 15 taxonomy facets (custom meta names emitted by the importer) ---
+      # NOTE the tags-vs-facets asymmetry (do NOT "fix" it to match):
+      #  - `tags` is a RESERVED prop → AEM SPLITS the comma-separated row into N
+      #    separate <meta property="article:tag"> tags, so it needs `values:` (array).
+      #  - the 14 facets below are PLAIN name= metas → AEM does NOT split them; the
+      #    importer emits ONE comma-joined <meta name="<facet>"> per facet, so a
+      #    single `value:` string is correct (already comma-joined for includes()).
       model:
         select: head > meta[name="model"]
         value: attribute(el, "content")
-      # comma-joined multi-value facet; placeholder for the 15 facets (SKODA-401)
-      tags:
-        select: head > meta[name="tags"]
+      bodywork:
+        select: head > meta[name="bodywork"]
+        value: attribute(el, "content")
+      derivative:
+        select: head > meta[name="derivative"]
+        value: attribute(el, "content")
+      motorsport:
+        select: head > meta[name="motorsport"]
+        value: attribute(el, "content")
+      equipment:
+        select: head > meta[name="equipment"]
+        value: attribute(el, "content")
+      technology:
+        select: head > meta[name="technology"]
+        value: attribute(el, "content")
+      years:
+        select: head > meta[name="years"]
+        value: attribute(el, "content")
+      view:
+        select: head > meta[name="view"]
+        value: attribute(el, "content")
+      company:
+        select: head > meta[name="company"]
+        value: attribute(el, "content")
+      concept:
+        select: head > meta[name="concept"]
+        value: attribute(el, "content")
+      environment:
+        select: head > meta[name="environment"]
+        value: attribute(el, "content")
+      happening:
+        select: head > meta[name="happening"]
+        value: attribute(el, "content")
+      history:
+        select: head > meta[name="history"]
+        value: attribute(el, "content")
+      sponsorship:
+        select: head > meta[name="sponsorship"]
+        value: attribute(el, "content")
+      vip:
+        select: head > meta[name="vip"]
         value: attribute(el, "content")
 
   # --- Stubbed locales (E10 rollout, SKODA-1001). Inherit properties + exclude
