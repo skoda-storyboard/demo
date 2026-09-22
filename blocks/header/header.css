@@ -549,7 +549,7 @@ header nav .nav-search-input::placeholder {
 
   header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > a,
   header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > p > a {
-    padding-right: 32px;
+    padding-right: 52px;
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > a::after,
