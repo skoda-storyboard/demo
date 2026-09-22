@@ -182,6 +182,22 @@ body.homepage .cards .cards-toolbar-button.media-cart-action {
   background-color: transparent;
 }
 
+/* ---- combined overlay + toolbar ---- */
+
+/* Pin the action row over the image bottom so the card stays a single 16:9 box
+   (a static toolbar would grow the card, and the inset:0 caption would then land
+   on top of it). The caption reserves bottom space so its text sits above the row. */
+.cards.overlay.toolbar .cards-card-toolbar {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 2;
+}
+
+.cards.overlay.toolbar .cards-card-body {
+  padding-bottom: calc(var(--spacing-xxl) + var(--spacing-m));
+}
+
 /* ---- interaction states (placed last for ascending specificity order) ---- */
 
 @media (hover: hover) {
