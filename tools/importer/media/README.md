@@ -113,6 +113,18 @@ content import** in this harness — no need to remember it:
   when new images were ingested).
 - **Never fails the import:** any hook error is logged to stderr and exits 0.
 
+**Team scope — two honest limits (why the manual step below still matters):**
+1. The hook is a **Claude Code** event — it fires only when the *agent* runs the
+   import in a session. A direct `node run-bulk-import.js` in a plain terminal or
+   CI will **not** trigger it; use the manual `media:build`/`media:apply` step there.
+2. Claude Code asks each team member to **review + approve project hooks once**
+   (a security gate on repo-supplied hooks). If someone declines, the hook won't
+   run for them — the documented pipeline step (`IMPORT-PIPELINE.md` §4) is the
+   fallback so the media step is never silently skipped.
+
+The shared team config is `.claude/settings.json` (committed); personal overrides
+go in `.claude/settings.local.json` (gitignored).
+
 ## Auth (per-host)
 
 - **DA / `admin.hlx.page` / `admin.da.live`** — the environment's injected

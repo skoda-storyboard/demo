@@ -12,6 +12,9 @@ helix-importer-ui
 *.bak
 .idea
 
+# Personal Claude Code overrides (the shared team config is .claude/settings.json)
+.claude/settings.local.json
+
 # Ensure these files are tracked
 !CLAUDE.md
 !AGENTS.md
