@@ -82,6 +82,7 @@ header .nav-topbar p {
 }
 
 header .nav-topbar .default-content-wrapper {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   min-height: var(--nav-topbar-height);
@@ -295,6 +296,63 @@ header nav .nav-tools p {
 header nav .nav-tools .icon {
   width: 24px;
   height: 24px;
+}
+
+/* search: icon toggle + collapsible input (input overlays left, no reflow) */
+header nav .nav-search {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: flex-end;
+  width: 24px;
+}
+
+header nav .nav-search-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+header nav .nav-search-toggle .icon,
+header nav .nav-search-toggle .icon img {
+  width: 24px;
+  height: 24px;
+}
+
+header nav .nav-search-input {
+  position: absolute;
+  top: 50%;
+  right: calc(24px + var(--spacing-s));
+  width: 0;
+  min-width: 0;
+  border: 0;
+  border-bottom: 1px solid var(--divider-color);
+  padding: 4px 0;
+  background: var(--background-color);
+  color: var(--skoda-ink);
+  font-size: var(--body-font-size-s);
+  opacity: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: width 0.3s ease, opacity 0.2s ease;
+}
+
+header nav .nav-search.nav-search-open .nav-search-input {
+  width: clamp(160px, 30vw, 320px);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+header nav .nav-search-input:focus-visible {
+  outline: none;
 }
 
 /* ==========================================================================

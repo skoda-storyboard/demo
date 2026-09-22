@@ -208,18 +208,50 @@ export default async function decorate(block) {
     });
   }
 
-  // tools row: render the search link as the search icon (DA strips authored
-  // icon tokens, so inject it here from the text link)
+  // tools row: render the search link as a click-to-expand search control.
+  // DA strips authored icon tokens, so build the icon + input here.
   const navTools = nav.querySelector('.nav-tools');
   if (navTools) {
     const searchLink = navTools.querySelector('a[href*="#search"], a');
     if (searchLink) {
-      searchLink.setAttribute('aria-label', searchLink.textContent.trim() || 'Search');
-      searchLink.textContent = '';
-      searchLink.classList.add('nav-search');
-      const searchIcon = document.createElement('span');
-      searchIcon.className = 'icon icon-search';
-      searchLink.append(searchIcon);
+      const label = searchLink.textContent.trim() || 'Search';
+      // toggle button (the search icon)
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'nav-search-toggle';
+      toggle.setAttribute('aria-label', label);
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.innerHTML = '<span class="icon icon-search"></span>';
+      // search input (collapsed by default)
+      const input = document.createElement('input');
+      input.type = 'search';
+      input.className = 'nav-search-input';
+      input.placeholder = label;
+      input.setAttribute('aria-label', label);
+      input.tabIndex = -1;
+
+      const searchBar = document.createElement('div');
+      searchBar.className = 'nav-search';
+      searchBar.append(input, toggle);
+
+      const setOpen = (open) => {
+        searchBar.classList.toggle('nav-search-open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        input.tabIndex = open ? 0 : -1;
+        if (open) input.focus();
+      };
+      toggle.addEventListener('click', () => {
+        setOpen(!searchBar.classList.contains('nav-search-open'));
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.code === 'Escape') { setOpen(false); toggle.focus(); }
+      });
+      // close when focus leaves the search control (if input is empty)
+      searchBar.addEventListener('focusout', (e) => {
+        if (!searchBar.contains(e.relatedTarget) && !input.value) setOpen(false);
+      });
+
+      searchLink.replaceWith(searchBar);
     }
   }
 
