@@ -113,6 +113,11 @@
 /* ---- toolbar variant ---- */
 
 .cards .cards-card-toolbar {
+  /* sit above the stretched .cards-card-link::after overlay (z-index:1) so the pill
+     buttons receive mouse hover (#a8ffcc) and clicks; the link still covers the rest
+     of the card */
+  position: relative;
+  z-index: 2;
   margin-top: auto;
   display: flex;
   justify-content: space-between;
