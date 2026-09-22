@@ -164,10 +164,21 @@ export default async function decorate(block) {
 
   const navBrand = nav.querySelector('.nav-brand');
   if (navBrand) {
-    const brandLink = navBrand.querySelector('.button');
+    const brandLink = navBrand.querySelector('a');
     if (brandLink) {
+      // strip any button decoration EDS may have added
       brandLink.className = '';
-      brandLink.closest('.button-container').className = '';
+      const btnContainer = brandLink.closest('.button-container');
+      if (btnContainer) btnContainer.className = '';
+      // render the wordmark as the logo icon. Authoring the SVG via an icon
+      // token in the DA fragment is unreliable (DA sanitizes empty-anchor icon
+      // spans), so inject it here from the brand link's text.
+      brandLink.setAttribute('aria-label', brandLink.textContent.trim() || 'Škoda Storyboard, home');
+      brandLink.textContent = '';
+      brandLink.classList.add('nav-brand-logo');
+      const logo = document.createElement('span');
+      logo.className = 'icon icon-skoda-storyboard-logo';
+      brandLink.append(logo);
     }
   }
 
@@ -187,6 +198,21 @@ export default async function decorate(block) {
         }
       });
     });
+  }
+
+  // tools row: render the search link as the search icon (DA strips authored
+  // icon tokens, so inject it here from the text link)
+  const navTools = nav.querySelector('.nav-tools');
+  if (navTools) {
+    const searchLink = navTools.querySelector('a[href*="#search"], a');
+    if (searchLink) {
+      searchLink.setAttribute('aria-label', searchLink.textContent.trim() || 'Search');
+      searchLink.textContent = '';
+      searchLink.classList.add('nav-search');
+      const searchIcon = document.createElement('span');
+      searchIcon.className = 'icon icon-search';
+      searchLink.append(searchIcon);
+    }
   }
 
   // hamburger for mobile
