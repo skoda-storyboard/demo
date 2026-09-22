@@ -373,15 +373,15 @@ header nav .nav-search-input:focus-visible {
   outline: none;
 }
 
-/* placeholder fades out while the field is focused */
+/*
+ * Placeholder stays visible when the pill expands and fades IN with the input
+ * (the input's opacity 0->1 transition carries the placeholder). It disappears
+ * on its own once the user types (native behaviour). Do NOT hide it on :focus —
+ * the toggle auto-focuses the input, which would erase the placeholder instantly.
+ */
 header nav .nav-search-input::placeholder {
   color: var(--skoda-grey-500);
   opacity: 1;
-  transition: opacity 0.2s ease;
-}
-
-header nav .nav-search-input:focus::placeholder {
-  opacity: 0;
 }
 
 /* ==========================================================================
