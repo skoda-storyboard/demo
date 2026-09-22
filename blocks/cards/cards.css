@@ -1,18 +1,26 @@
 /*
- * Base Cards block — fallback teaser (media-style: image above body). SKODA-201.
- * Scoped to .cards so it never bleeds into the cards-overlay / cards-toolbar variants.
+ * Cards / Teaser block (SKODA-201) — one block, three co-occurring variants.
+ *
+ * Base card styling is shared; variants are compound-class modifiers on the same block:
+ *   .cards            base / media (image above body)
+ *   .cards.overlay    text over image + dual-gradient scrim; hosts the promo showcase
+ *   .cards.toolbar    card + flex action row (pill buttons)
+ * Variants combine (e.g. .cards.overlay.toolbar). Everything is scoped under .cards so
+ * nothing leaks to other blocks.
  */
 
-.cards > ul {
+.cards ul {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
+
+  /* Layer 2 (intrinsic): reflow columns to available width, no breakpoints needed */
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 257px), 1fr));
   gap: var(--spacing-l);
 }
 
-.cards > ul > li {
+.cards ul > li {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -22,10 +30,12 @@
   overflow: hidden;
 }
 
+/* media layer — clipped 16:9 box; object-fit:cover (quality upgrade over source `fill`) */
 .cards .cards-card-image {
   position: relative;
   overflow: hidden;
   line-height: 0;
+  border-radius: var(--card-radius);
 }
 
 .cards .cards-card-image picture,
@@ -37,8 +47,27 @@
 .cards .cards-card-image img {
   aspect-ratio: 16 / 9;
   object-fit: cover;
+
+  /* .5s scale transition; ~2% net zoom composes on :hover/:focus of the card */
+  transition: scale 0.5s cubic-bezier(0.165, 0.85, 0.45, 1);
 }
 
+/* hover icon affordance — dark tint + centered expand glyph, fades in over .3s */
+.cards .cards-card-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgb(0 0 0 / 40%);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 48px;
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55), background-size 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  pointer-events: none;
+}
+
+/* body */
 .cards .cards-card-body {
   margin: var(--spacing-m);
   display: flex;
@@ -55,13 +84,16 @@
   font-size: var(--heading-font-size-s);
   line-height: 1.2;
   font-weight: var(--weight-regular);
+  color: var(--text-color);
 }
 
 .cards .cards-card-body p {
   margin: 0;
   font-size: var(--body-font-size-s);
+  color: var(--text-color);
 }
 
+/* stretched card link — one tab stop covering the whole card */
 .cards .cards-card-link {
   color: inherit;
   text-decoration: none;
@@ -74,11 +106,200 @@
   z-index: 1;
 }
 
-.cards > ul > li:focus-within {
+.cards .cards-card-link:focus {
+  outline: none;
+}
+
+/* ---- toolbar variant ---- */
+
+.cards .cards-card-toolbar {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-s) var(--spacing-m);
+  background-color: var(--background-color);
+}
+
+.cards .cards-toolbar-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  border-radius: var(--pill-radius);
+  padding: var(--spacing-xs) var(--spacing-s);
+  background-color: var(--background-color);
+  color: var(--skoda-ink);
+  font-size: var(--body-font-size-s);
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 0.25s ease;
+}
+
+.cards .cards-toolbar-button:focus-visible,
+.cards .cards-toolbar-button:active {
+  background-color: var(--skoda-green-emerald-hover);
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+  text-decoration: none;
+}
+
+/* homepage hides cart actions in the toolbar (source parity) */
+body.homepage .cards .cards-toolbar-button.media-cart-action {
+  display: none;
+}
+
+/* ---- overlay variant ---- */
+
+/* image fills the card; caption sits absolutely on top with a dual-gradient scrim */
+.cards.overlay .cards-card-image {
+  border-radius: var(--card-radius);
+}
+
+.cards.overlay .cards-card-body {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  justify-content: flex-end;
+  margin: 0;
+  padding: var(--spacing-m);
+  color: var(--skoda-white);
+  background-image: var(--scrim-h), var(--scrim-v);
+}
+
+.cards.overlay .cards-card-body h2,
+.cards.overlay .cards-card-body h3,
+.cards.overlay .cards-card-body h4,
+.cards.overlay .cards-card-body h5,
+.cards.overlay .cards-card-body h6,
+.cards.overlay .cards-card-body p {
+  color: var(--skoda-white);
+}
+
+/* toolbar sits transparent in the overlay context */
+.cards.overlay .cards-card-toolbar {
+  background-color: transparent;
+}
+
+/* ---- promo-box featured showcase (overlay only) ---- */
+
+/* base (<768): 1-up carousel; only the selected card shows once JS boots */
+.cards.cards-promo ul {
+  display: block;
+  position: relative;
+}
+
+.cards.cards-promo ul > li {
+  display: none;
+}
+
+.cards-dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-m);
+  margin-top: var(--spacing-m);
+}
+
+.cards-dot {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: var(--skoda-grey-border);
+  cursor: pointer;
+}
+
+.cards-dot.is-selected {
+  background-color: var(--skoda-grey-500);
+}
+
+.cards-dot:focus-visible {
   outline: 2px solid var(--link-color);
   outline-offset: 2px;
 }
 
-.cards .cards-card-link:focus {
-  outline: none;
+/* >=768: static mosaic — 1 big card + 2 small stacked, no carousel, no dots */
+@media (width >= 768px) {
+  .cards.cards-promo ul {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-auto-rows: 1fr;
+    gap: var(--spacing-l);
+  }
+
+  .cards.cards-promo ul > li {
+    display: block;
+    grid-column: 2;
+  }
+
+  .cards.cards-promo ul > li:first-child {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  /* the big first card promotes its title to the promo size */
+  .cards.cards-promo ul > li:first-child .cards-card-body h2,
+  .cards.cards-promo ul > li:first-child .cards-card-body h3,
+  .cards.cards-promo ul > li:first-child .cards-card-body h4,
+  .cards.cards-promo ul > li:first-child .cards-card-body h5,
+  .cards.cards-promo ul > li:first-child .cards-card-body h6 {
+    font-size: var(--heading-font-size-promo);
+    line-height: 1.2;
+  }
+
+  /* the big card is a hero; small cards stay 16:9 */
+  .cards.cards-promo ul > li:first-child .cards-card-image img {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+
+  .cards.cards-promo .cards-dots {
+    display: none;
+  }
+}
+
+/* ---- interaction states (placed last for ascending specificity order) ---- */
+
+@media (hover: hover) {
+  .cards ul > li:hover .cards-card-image::after,
+  .cards ul > li:focus-within .cards-card-image::after {
+    opacity: 1;
+    background-size: 36px;
+  }
+
+  .cards ul > li:hover .cards-card-image img,
+  .cards ul > li:focus-within .cards-card-image img {
+    scale: 1.02;
+  }
+
+  .cards .cards-toolbar-button:hover {
+    background-color: var(--skoda-green-emerald-hover);
+  }
+}
+
+.cards ul > li:focus-within {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+}
+
+.cards.overlay ul > li:focus-within {
+  outline-color: var(--skoda-white);
+  outline-offset: -2px;
+}
+
+/* promo 1-up carousel visibility: before JS boots show the first card;
+   after boot only the selected card shows */
+.cards.cards-promo ul:not(.is-booted) > li:first-child,
+.cards.cards-promo ul.is-booted > li.is-selected {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cards .cards-card-image img,
+  .cards .cards-card-image::after,
+  .cards .cards-toolbar-button {
+    transition: none;
+  }
 }
