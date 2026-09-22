@@ -61,7 +61,8 @@
   --heading-font-size-s: 18px;
   --heading-font-size-xs: 16px;
 
-  /* hero story title (hero.md §3/§4; SKODA-202): 40px desktop -> 28px <=768 */
+  /* hero titles (hero.md §3/§4; SKODA-202): story 40->28; overlay 48/300 white */
+  --heading-font-size-hero: 48px;
   --heading-font-size-hero-story: 40px;
   --heading-font-size-hero-story-mobile: 28px;
 

@@ -18,6 +18,7 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
  */
 export default function decorate(block) {
   const img = block.querySelector('img');
+  const authoredPicture = img?.closest('picture');
 
   // Build the media (image) layer.
   let media;
@@ -27,21 +28,38 @@ export default function decorate(block) {
     // asset has loaded, else the 16:9 master (1920×1080, hero.md §3).
     const width = img.getAttribute('width') || img.naturalWidth || 1920;
     const height = img.getAttribute('height') || img.naturalHeight || 1080;
-    const optimized = createOptimizedPicture(
-      img.src,
-      img.getAttribute('alt') || '',
-      true, // eager: this is the LCP image
-      [{ width: '1920' }],
-    );
-    const optImg = optimized.querySelector('img');
-    optImg.setAttribute('fetchpriority', 'high');
-    optImg.setAttribute('loading', 'eager');
-    optImg.setAttribute('width', width);
-    optImg.setAttribute('height', height);
+
+    // Only rebuild via createOptimizedPicture when the authored image has a
+    // usable http(s)/relative src. When EDS already emitted an optimized
+    // <picture>, reuse it (rebuilding from a hashed/optimized src is lossy);
+    // and never feed a broken src (e.g. "about:error") into new URL().
+    const rawSrc = img.getAttribute('src') || '';
+    const usableSrc = /^(https?:|\/)/.test(rawSrc);
+    let picture;
+    if (authoredPicture) {
+      picture = authoredPicture;
+    } else if (usableSrc) {
+      picture = createOptimizedPicture(
+        img.src,
+        img.getAttribute('alt') || '',
+        true, // eager: this is the LCP image
+        [{ width: '1920' }],
+      );
+    } else {
+      // Fallback: keep the authored <img> as-is inside a <picture> wrapper.
+      picture = document.createElement('picture');
+      picture.append(img.cloneNode(true));
+    }
+
+    const heroImg = picture.querySelector('img');
+    heroImg.setAttribute('fetchpriority', 'high'); // LCP element
+    heroImg.setAttribute('loading', 'eager');
+    heroImg.setAttribute('width', width);
+    heroImg.setAttribute('height', height);
 
     media = document.createElement('div');
     media.className = 'hero-image-media';
-    media.append(optimized);
+    media.append(picture);
   }
 
   // Everything that is not the image becomes the heading/caption content.
@@ -57,9 +75,10 @@ export default function decorate(block) {
     });
   });
 
-  // Rebuild the block: title (content) first in DOM (desktop order), image second.
-  // CSS reorders to image-above-title at <=1079px.
+  // Rebuild the block as an overlay hero: full-bleed image with the heading +
+  // caption overlaid (bottom-left, white) over a scrim. Media first, content
+  // layered on top via CSS (position: absolute).
   block.textContent = '';
-  if (content.childNodes.length) block.append(content);
   if (media) block.append(media);
+  if (content.childNodes.length) block.append(content);
 }
