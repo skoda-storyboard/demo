@@ -80,6 +80,21 @@
   color: var(--text-color);
 }
 
+/* content order for every variant matches the source teaser: date -> title -> summary,
+   each its own row, regardless of the authored sequence */
+.cards .cards-card-title { order: 2; }
+.cards .cards-card-summary { order: 3; }
+
+/* date: first, small, semibold, muted — like the source .entry-published.
+   Scoped under .cards-card-body so it beats the base `.cards .cards-card-body p` colour. */
+.cards .cards-card-body .cards-card-date {
+  order: 1;
+  font-size: var(--body-font-size-xs);
+  font-weight: var(--weight-semibold);
+  line-height: 1.2;
+  color: var(--skoda-grey-500);
+}
+
 /* stretched card link — one tab stop covering the whole card; the ::after overlay makes
    the whole card clickable, and cursor:pointer applies across it (set on the li so it
    covers the image, caption and any gaps, not just the anchor box) */
@@ -170,31 +185,17 @@ body.homepage .cards .cards-toolbar-button.media-cart-action {
   background-image: var(--scrim-text), var(--scrim-h), var(--scrim-v);
 }
 
-/* content order matches the source teaser: date -> title -> summary, each its own row,
-   regardless of the authored sequence. All caption text is white. */
-.cards.overlay .cards-card-title,
-.cards.overlay .cards-card-date,
-.cards.overlay .cards-card-summary {
+/* caption text is white over the image (order + date sizing come from the base rules;
+   here we only override colour — the base makes the date muted grey, which would be
+   illegible on the photo) */
+.cards.overlay .cards-card-body .cards-card-title,
+.cards.overlay .cards-card-body .cards-card-date,
+.cards.overlay .cards-card-body .cards-card-summary {
   color: var(--skoda-white);
 }
 
-/* date: small, semibold, like the source .entry-meta */
-.cards.overlay .cards-card-date {
-  order: 1;
-  font-size: var(--body-font-size-xs);
-  font-weight: var(--weight-semibold);
-  line-height: 1.2;
-}
-
-.cards.overlay .cards-card-title {
-  order: 2;
-}
-
-/* summary: body-size supporting text, clamped to keep the caption compact */
-.cards.overlay .cards-card-summary {
-  order: 3;
-  font-size: var(--body-font-size-s);
-  line-height: var(--line-height-body);
+/* summary: clamped to keep the caption compact */
+.cards.overlay .cards-card-body .cards-card-summary {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
