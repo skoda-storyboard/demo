@@ -328,15 +328,17 @@ header nav .nav-search-toggle .icon img {
 }
 
 header nav .nav-search-input {
+  box-sizing: border-box;
   position: absolute;
   top: 50%;
   right: calc(24px + var(--spacing-s));
   width: 0;
   min-width: 0;
+  height: 36px;
   border: 0;
-  border-bottom: 1px solid var(--divider-color);
-  padding: 4px 0;
-  background: var(--background-color);
+  border-radius: var(--dropdown-radius);
+  padding: 0;
+  background: var(--dropdown-hover-bg);
   color: var(--skoda-ink);
   font-size: var(--body-font-size-s);
   opacity: 0;
@@ -347,6 +349,7 @@ header nav .nav-search-input {
 
 header nav .nav-search.nav-search-open .nav-search-input {
   width: clamp(160px, 30vw, 320px);
+  padding: 0 var(--spacing-s);
   opacity: 1;
   pointer-events: auto;
 }
