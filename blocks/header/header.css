@@ -104,6 +104,12 @@ header .nav-topbar .nav-topbar-utility strong {
   font-weight: var(--weight-bold);
 }
 
+/* locale switcher: 1em gap between each locale (spec: .lang-links > * + *) */
+header .nav-topbar .nav-topbar-utility strong + a,
+header .nav-topbar .nav-topbar-utility a + a {
+  margin-left: 1em;
+}
+
 header nav[aria-expanded='true'] .nav-topbar-utility {
   display: block;
 }
