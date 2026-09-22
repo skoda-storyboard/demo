@@ -74,8 +74,16 @@ export function distinctFacetValues(rows, key) {
 }
 
 // --- deep-link URL state ---------------------------------------------------
-// Encoding: each facet with a selection → `?<facet>=v1,v2`; sort → `?sortby=oldest`
-// (omitted when 'newest'); revealed count → `?n=12` (omitted when === perpage).
+// URL scheme MATCHES THE SOURCE (verified live on /en/news/) so migrated deep
+// links keep working with no redirects:
+//   facets → `filter[<facet>][]=<value>` (repeated, array-style, one per value)
+//   sort   → `sortby=oldest` (omitted when 'newest')
+//   offset → `offset=<revealed>` (the load-more count the source pushState's;
+//            omitted when === perpage, i.e. first page)
+// Unrelated params (utm_*, analytics, a second listing's params) are PRESERVED.
+// `filter[search]` (source free-text) is intentionally not handled (no full-text).
+
+const facetParam = (key) => `filter[${key}][]`;
 
 /**
  * Decode listing state from a URLSearchParams (or query string).
@@ -87,28 +95,49 @@ export function decodeState(search, facetKeys, perpage = 6) {
   const params = typeof search === 'string' ? new URLSearchParams(search) : search;
   const active = {};
   facetKeys.forEach((key) => {
-    const raw = params.get(key);
-    const vals = raw ? raw.split(',').map((s) => s.trim()).filter(Boolean) : [];
-    if (vals.length) active[key] = vals;
+    // Array-style: filter[model][]=elroq&filter[model][]=octavia. Also accept a
+    // single comma-joined value for convenience (filter[model][]=a,b).
+    const vals = params.getAll(facetParam(key))
+      .flatMap((v) => v.split(','))
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (vals.length) active[key] = [...new Set(vals)];
   });
   const sort = params.get('sortby') === 'oldest' ? 'oldest' : 'newest';
-  const n = Number(params.get('n'));
-  const revealed = Number.isFinite(n) && n > 0 ? n : perpage;
+  const off = Number(params.get('offset'));
+  const revealed = Number.isFinite(off) && off > perpage ? off : perpage;
   return { active, sort, revealed };
 }
 
 /**
- * Encode listing state back to a query string (no leading '?').
- * Only non-default values are written, so a pristine listing has a clean URL.
+ * Encode listing state into a query string (no leading '?'), PRESERVING any
+ * params already present in `base` that aren't ours. Pass the current
+ * `window.location.search` as `base` so utm/tracking/other-block params
+ * survive a facet change. Only our keys are cleared + re-set.
+ * @param {{active?:object, sort?:string, revealed?:number}} state
+ * @param {number} perpage
+ * @param {URLSearchParams|string} [base] existing params to preserve
+ * @param {string[]} [facetKeys] our facet keys (needed to know what to clear)
  */
-export function encodeState({ active = {}, sort = 'newest', revealed } = {}, perpage = 6) {
-  const params = new URLSearchParams();
+export function encodeState({ active = {}, sort = 'newest', revealed } = {}, perpage = 6, base = '', facetKeys = null) {
+  const params = new URLSearchParams(typeof base === 'string' ? base : base.toString());
+  const keys = facetKeys || Object.keys(active);
+
+  // Clear OUR keys only (leave everything else untouched).
+  keys.forEach((key) => params.delete(facetParam(key)));
+  params.delete('sortby');
+  params.delete('offset');
+
+  // Re-write our state (array-style facet params, matching the source).
   Object.entries(active).forEach(([key, vals]) => {
-    if (vals && vals.length) params.set(key, vals.join(','));
+    (vals || []).forEach((v) => params.append(facetParam(key), v));
   });
   if (sort === 'oldest') params.set('sortby', 'oldest');
-  if (revealed && revealed !== perpage) params.set('n', String(revealed));
-  return params.toString();
+  if (revealed && revealed !== perpage) params.set('offset', String(revealed));
+
+  // URLSearchParams encodes `[` `]` as %5B/%5D; decode those back for readable,
+  // source-matching URLs (filter[model][] not filter%5Bmodel%5D%5B%5D).
+  return params.toString().replace(/%5B/gi, '[').replace(/%5D/gi, ']');
 }
 
 /** Count of selected values in a facet (for the pill count badge). */

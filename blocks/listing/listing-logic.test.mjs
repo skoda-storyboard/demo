@@ -12,10 +12,18 @@ import {
 } from './listing-logic.mjs';
 
 const rows = [
-  { path: '/en/press-releases/a', title: 'A', template: 'press_release', date: '2026-09-15', model: 'elroq, enyaq', years: '2026' },
-  { path: '/en/press-releases/b', title: 'B', template: 'press_release', date: '2026-01-02', model: 'octavia', years: '2026' },
-  { path: '/en/press-releases/c', title: 'C', template: 'press_release', date: '2025-06-01', model: 'elroq', years: '2025' },
-  { path: '/en/stories/d', title: 'D', template: 'story', date: '2026-03-03', model: 'elroq' },
+  {
+    path: '/en/press-releases/a', title: 'A', template: 'press_release', date: '2026-09-15', model: 'elroq, enyaq', years: '2026',
+  },
+  {
+    path: '/en/press-releases/b', title: 'B', template: 'press_release', date: '2026-01-02', model: 'octavia', years: '2026',
+  },
+  {
+    path: '/en/press-releases/c', title: 'C', template: 'press_release', date: '2025-06-01', model: 'elroq', years: '2025',
+  },
+  {
+    path: '/en/stories/d', title: 'D', template: 'story', date: '2026-03-03', model: 'elroq',
+  },
 ];
 
 test('facetTokens splits comma-joined cells', () => {
@@ -66,11 +74,16 @@ test('distinctFacetValues counts across comma tokens', () => {
   assert.equal(model.octavia, 1);
 });
 
-test('decodeState reads facets + sort + revealed from the URL', () => {
-  const s = decodeState('?model=elroq,octavia&sortby=oldest&n=12', ['model', 'years'], 6);
+test('decodeState reads the SOURCE scheme (filter[facet][] array + sortby + offset)', () => {
+  const s = decodeState('?filter[model][]=elroq&filter[model][]=octavia&sortby=oldest&offset=12', ['model', 'years'], 6);
   assert.deepEqual(s.active, { model: ['elroq', 'octavia'] });
   assert.equal(s.sort, 'oldest');
   assert.equal(s.revealed, 12);
+});
+
+test('decodeState also accepts a comma-joined single facet value', () => {
+  const s = decodeState('?filter[model][]=elroq,octavia', ['model'], 6);
+  assert.deepEqual(s.active, { model: ['elroq', 'octavia'] });
 });
 
 test('decodeState defaults: no params → newest, revealed=perpage', () => {
@@ -80,13 +93,37 @@ test('decodeState defaults: no params → newest, revealed=perpage', () => {
   assert.equal(s.revealed, 6);
 });
 
-test('encodeState omits defaults, round-trips with decodeState', () => {
+test('encodeState emits the source scheme + round-trips with decodeState', () => {
   assert.equal(encodeState({ active: {}, sort: 'newest', revealed: 6 }, 6), '');
-  const qs = encodeState({ active: { model: ['elroq'] }, sort: 'oldest', revealed: 12 }, 6);
+  const qs = encodeState({ active: { model: ['elroq', 'octavia'] }, sort: 'oldest', revealed: 12 }, 6, '', ['model']);
+  // readable, source-matching brackets (not %5B/%5D)
+  assert.match(qs, /filter\[model\]\[\]=elroq/);
+  assert.match(qs, /filter\[model\]\[\]=octavia/);
+  assert.match(qs, /sortby=oldest/);
+  assert.match(qs, /offset=12/);
   const back = decodeState(qs, ['model'], 6);
-  assert.deepEqual(back.active, { model: ['elroq'] });
+  assert.deepEqual(back.active, { model: ['elroq', 'octavia'] });
   assert.equal(back.sort, 'oldest');
   assert.equal(back.revealed, 12);
+});
+
+test('encodeState PRESERVES unrelated params (utm_*, other block) on facet change', () => {
+  const base = '?utm_source=newsletter&utm_medium=email&other[foo][]=x';
+  const qs = encodeState({ active: { model: ['octavia'] }, sort: 'newest', revealed: 6 }, 6, base, ['model', 'years']);
+  const p = new URLSearchParams(qs);
+  assert.equal(p.get('utm_source'), 'newsletter');
+  assert.equal(p.get('utm_medium'), 'email');
+  assert.equal(p.get('other[foo][]'), 'x'); // a different block's param survives
+  assert.equal(p.get('filter[model][]'), 'octavia');
+});
+
+test('encodeState clears a removed facet but keeps unrelated params', () => {
+  // was filtered by model=elroq + had utm; now model cleared → filter[model][] gone, utm stays
+  const base = 'filter[model][]=elroq&utm_source=x';
+  const qs = encodeState({ active: {}, sort: 'newest', revealed: 6 }, 6, base, ['model']);
+  const p = new URLSearchParams(qs);
+  assert.equal(p.has('filter[model][]'), false);
+  assert.equal(p.get('utm_source'), 'x');
 });
 
 test('selectedCount reports selections per facet', () => {

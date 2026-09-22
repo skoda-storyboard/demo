@@ -165,7 +165,9 @@ export default async function decorate(block) {
   // deep-linkable without a back-stack entry per toggle); only load-more pushes
   // a new entry, matching the source's offset paging.
   function updateUrl(push = false) {
-    const qs = encodeState(state, cfg.perpage);
+    // Preserve unrelated params (utm_*, analytics, a 2nd listing's params) by
+    // encoding on top of the CURRENT search; only our facet/sort/offset keys change.
+    const qs = encodeState(state, cfg.perpage, window.location.search, cfg.facets);
     const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
     if (push) window.history.pushState(state, '', url);
     else window.history.replaceState(state, '', url);

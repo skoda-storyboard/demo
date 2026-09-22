@@ -202,6 +202,25 @@ authored facet map. Paging = slice the filtered array in batches (default 6) beh
    drawer (mirrors source `#filter-btn-handler`).
 9. CSS scoped to `.listing`; tokens only; breakpoints `768 / 992 / 1080`.
 
+### URL scheme (deep-link) — matches the source, no redirects
+
+The block reads/writes the **source's own query-param scheme** (measured live on
+`/en/news/`, Search & Filter Pro) so migrated deep links keep working with **no
+redirect rules**:
+
+- Facets → `filter[<facet>][]=<value>` (repeated, array-style; e.g.
+  `?filter[model][]=elroq&filter[model][]=octavia`).
+- Sort → `sortby=oldest` (omitted for the `newest` default).
+- Load-more offset → `offset=<n>` (the count the source `pushState`s; omitted on
+  the first page).
+
+**Unrelated params are preserved.** On any facet/sort/load-more change the block
+re-encodes on top of the *current* querystring and only clears/sets its own keys,
+so `utm_*`, analytics, and a second listing block's params on the same page
+survive. The source's free-text `filter[search]` is **not** handled (index-only
+recall for M1). `encodeState(state, perpage, baseSearch, facetKeys)` does this
+(pure, unit-tested); the block passes `window.location.search` + its `facets`.
+
 ## 8. Open decisions + recommended default
 
 - **Facet data source:** derive facet values from the index at runtime (assumption to confirm) vs. an
