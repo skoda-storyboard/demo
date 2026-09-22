@@ -1,0 +1,197 @@
+/*
+ * Cards / Teaser — OVERLAY variant (text over image + dual-gradient scrim). SKODA-201.
+ * Also hosts the promo-box featured showcase: static mosaic >=768, 1-up auto-rotating
+ * carousel <768 (see cards-overlay.js). Scoped to .cards-overlay so it never bleeds into
+ * cards-media / cards-toolbar.
+ */
+
+.cards-overlay ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 257px), 1fr));
+  gap: var(--spacing-l);
+}
+
+.cards-overlay ul > li {
+  position: relative;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+/* image fills the card; overlay text sits on top */
+.cards-overlay .cards-card-image {
+  position: relative;
+  line-height: 0;
+}
+
+.cards-overlay .cards-card-image picture,
+.cards-overlay .cards-card-image img {
+  display: block;
+  width: 100%;
+}
+
+.cards-overlay .cards-card-image img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  transition: scale 0.5s cubic-bezier(0.165, 0.85, 0.45, 1);
+}
+
+/* caption layer: absolute over the image, dual-gradient scrim, white text */
+.cards-overlay .cards-card-body {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--spacing-xs);
+  margin: 0;
+  padding: var(--spacing-m);
+  color: var(--skoda-white);
+  background-image: var(--scrim-h), var(--scrim-v);
+}
+
+.cards-overlay .cards-card-body h2,
+.cards-overlay .cards-card-body h3,
+.cards-overlay .cards-card-body h4,
+.cards-overlay .cards-card-body h5,
+.cards-overlay .cards-card-body h6 {
+  margin: 0;
+  font-size: var(--heading-font-size-s);
+  line-height: 1.2;
+  font-weight: var(--weight-regular);
+  color: var(--skoda-white);
+}
+
+.cards-overlay .cards-card-body p {
+  margin: 0;
+  font-size: var(--body-font-size-s);
+  color: var(--skoda-white);
+}
+
+/* stretched card link → one tab stop */
+.cards-overlay .cards-card-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cards-overlay .cards-card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.cards-overlay .cards-card-link:focus {
+  outline: none;
+}
+
+/* ---- promo-box featured showcase ---- */
+
+/* base (<768): 1-up carousel; only the selected card shows once JS boots */
+.cards-overlay-promo ul {
+  display: block;
+  position: relative;
+}
+
+.cards-overlay-promo ul > li {
+  display: none;
+}
+
+/* dots */
+.cards-overlay-dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-m);
+  margin-top: var(--spacing-m);
+}
+
+.cards-overlay-dot {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: var(--skoda-grey-border);
+  cursor: pointer;
+}
+
+.cards-overlay-dot.is-selected {
+  background-color: var(--skoda-grey-500);
+}
+
+.cards-overlay-dot:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+}
+
+/* >=768: static mosaic — 1 big card + 2 small stacked, no carousel, no dots */
+@media (width >= 768px) {
+  .cards-overlay-promo ul {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-auto-rows: 1fr;
+    gap: var(--spacing-l);
+  }
+
+  /* first card spans both rows on the left (66.66% via the 2fr:1fr track ratio) */
+  .cards-overlay-promo ul > li {
+    display: block;
+    grid-column: 2;
+  }
+
+  .cards-overlay-promo ul > li:first-child {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  /* the big first card promotes its title to the promo size */
+  .cards-overlay-promo ul > li:first-child .cards-card-body h2,
+  .cards-overlay-promo ul > li:first-child .cards-card-body h3,
+  .cards-overlay-promo ul > li:first-child .cards-card-body h4,
+  .cards-overlay-promo ul > li:first-child .cards-card-body h5,
+  .cards-overlay-promo ul > li:first-child .cards-card-body h6 {
+    font-size: var(--heading-font-size-promo);
+    line-height: 1.2;
+  }
+
+  /* the big card is a portrait-ish hero; small cards stay 16:9 */
+  .cards-overlay-promo ul > li:first-child .cards-card-image img {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+
+  .cards-overlay-promo .cards-overlay-dots {
+    display: none;
+  }
+}
+
+/* card focus ring + hover zoom — placed after the promo rules so the more specific
+   :focus-within selector does not descend below the promo `ul > li` overrides */
+.cards-overlay ul > li:focus-within {
+  outline: 2px solid var(--skoda-white);
+  outline-offset: -2px;
+}
+
+/* promo 1-up carousel visibility (placed last for ascending specificity order):
+   before JS boots show the first card; after boot only the selected card shows */
+.cards-overlay-promo ul:not(.is-booted) > li:first-child,
+.cards-overlay-promo ul.is-booted > li.is-selected {
+  display: block;
+}
+
+@media (hover: hover) {
+  .cards-overlay ul > li:hover .cards-card-image img,
+  .cards-overlay ul > li:focus-within .cards-card-image img {
+    scale: 1.02;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cards-overlay .cards-card-image img {
+    transition: none;
+  }
+}

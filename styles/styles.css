@@ -74,6 +74,14 @@
   --card-radius: 8px;
   --card-shadow: 0 1px 10px 0 rgb(0 0 0 / 7%), 0 2px 2px -2px rgb(0 0 0 / 10%);
   --card-border: 1px solid var(--skoda-grey-border);
+  --pill-radius: 50px;
+
+  /* card/teaser (SKODA-201) — promo first-card title size (measured 29.6px = 1.85em @>=768) */
+  --heading-font-size-promo: 29.6px;
+
+  /* overlay scrim gradients (card-teaser overlay layer, measured from source) */
+  --scrim-h: linear-gradient(270deg, transparent, rgb(0 0 0 / 25%));
+  --scrim-v: linear-gradient(180deg, transparent, rgb(0 0 0 / 10%));
 
   /* layout / nav */
   --content-max-width: 1248px;

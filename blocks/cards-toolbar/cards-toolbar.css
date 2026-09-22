@@ -1,0 +1,124 @@
+/*
+ * Cards / Teaser — TOOLBAR variant (card + action row). SKODA-201.
+ * The toolbar is a flex row: space-between, center-aligned, pill buttons. Base bg white;
+ * in an overlay context the toolbar background is transparent. Scoped to .cards-toolbar.
+ */
+
+.cards-toolbar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 257px), 1fr));
+  gap: var(--spacing-l);
+}
+
+.cards-toolbar ul > li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--card-radius);
+  background-color: var(--background-color);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+.cards-toolbar .cards-card-image {
+  position: relative;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.cards-toolbar .cards-card-image picture,
+.cards-toolbar .cards-card-image img {
+  display: block;
+  width: 100%;
+}
+
+.cards-toolbar .cards-card-image img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  transition: scale 0.5s cubic-bezier(0.165, 0.85, 0.45, 1);
+}
+
+.cards-toolbar .cards-card-body {
+  margin: var(--spacing-m);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.cards-toolbar .cards-card-body h2,
+.cards-toolbar .cards-card-body h3,
+.cards-toolbar .cards-card-body h4,
+.cards-toolbar .cards-card-body h5,
+.cards-toolbar .cards-card-body h6 {
+  margin: 0;
+  font-size: var(--heading-font-size-s);
+  line-height: 1.2;
+  font-weight: var(--weight-regular);
+}
+
+.cards-toolbar .cards-card-body p {
+  margin: 0;
+  font-size: var(--body-font-size-s);
+}
+
+/* action row */
+.cards-toolbar .cards-card-toolbar {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-s) var(--spacing-m);
+  background-color: var(--background-color);
+}
+
+/* pill buttons */
+.cards-toolbar .cards-toolbar-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  border-radius: var(--pill-radius);
+  padding: var(--spacing-xs) var(--spacing-s);
+  background-color: var(--background-color);
+  color: var(--skoda-ink);
+  font-size: var(--body-font-size-s);
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 0.25s ease;
+}
+
+@media (hover: hover) {
+  .cards-toolbar .cards-toolbar-button:hover {
+    background-color: var(--skoda-green-emerald-hover);
+  }
+}
+
+.cards-toolbar .cards-toolbar-button:focus-visible,
+.cards-toolbar .cards-toolbar-button:active {
+  background-color: var(--skoda-green-emerald-hover);
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+  text-decoration: none;
+}
+
+/* toolbar sits transparent when the card is also an overlay context */
+.cards-overlay .cards-card-toolbar,
+.cards-toolbar.overlay .cards-card-toolbar {
+  background-color: transparent;
+}
+
+/* homepage hides cart actions in the toolbar (source parity) */
+body.homepage .cards-toolbar .cards-toolbar-button.media-cart-action {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cards-toolbar .cards-card-image img,
+  .cards-toolbar .cards-toolbar-button {
+    transition: none;
+  }
+}
