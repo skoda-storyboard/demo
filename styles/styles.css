@@ -28,15 +28,16 @@
  */
 
 :root {
-  /* fonts — SKODA Next brand stack (licensed font not rehosted; fonts.css loads it lazily,
-     brand.css supplies the size-adjusted fallback). Quotes required for the multi-word name. */
-  --body-font-family: 'SKODA Next', skoda-next-fallback, helvetica, arial, sans-serif;
+  /* fonts — SKODA Next brand stack (self-hosted in fonts/, embedded via fonts.css which loads
+     lazily; brand.css supplies the size-adjusted fallback). The family name is unquoted and
+     lowercased ("skoda next") per Stylelint (font-family-name-quotes + value-keyword-case);
+     font-family matching is case-insensitive so this matches the @font-face descriptor. */
+  --body-font-family: skoda next, skoda-next-fallback, helvetica, arial, sans-serif;
   --heading-font-family: var(--body-font-family);
 
-  /* font weights */
+  /* font weights — source ships only 300/400/600/700 (no real 500 face). */
   --weight-light: 300;
   --weight-regular: 400;
-  --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
 
@@ -357,7 +358,7 @@ button.button {
   border-radius: 2.4em;
   padding: 0.5em 1.2em;
   font: inherit;
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-semibold);
   line-height: 1.25;
   text-decoration: none;
   cursor: pointer;

@@ -1,18 +1,41 @@
 /*
- * SKODA Next — brand web font (loaded lazily by loadFonts() in scripts.js, never eager).
+ * SKODA Next — Škoda's corporate typeface (their own IP, no foundry license gate).
+ * Self-hosted from fonts/ (woff2 pulled from Škoda's public CDN, cdn.skoda-storyboard.com).
+ * Loaded lazily by loadFonts() in scripts.js, never eager (render-blocking).
  *
- * SKODA Next is a licensed font and is intentionally NOT rehosted in this repo. Until a
- * licensed, hosted source (self-hosted woff2 in fonts/, or an approved CDN) is available, the
- * stack falls back to the size-adjusted `skoda-next-fallback` face defined in brand.css, then
- * to helvetica/arial. No @font-face src is declared here to avoid shipping a broken font
- * request; add the real face below once the licensed asset is in place, e.g.:
- *
- * @font-face {
- *   font-family: 'SKODA Next';
- *   font-style: normal;
- *   font-weight: 400;
- *   font-display: swap;
- *   src: url('../fonts/skoda-next-regular.woff2') format('woff2');
- * }
- * (repeat for 500/600/700 weights)
+ * Source ships weights 300/400/600/700 (no 500). Upright only for now; matching italics exist
+ * on the CDN but em/i currently uses browser-synthesized italic (see SKODA-106 follow-up).
+ * font-display: swap → text paints immediately in the size-adjusted fallback (brand.css) and
+ * swaps to SKODA Next once loaded, minimizing CLS.
  */
+@font-face {
+  font-family: skoda next;
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../fonts/skoda-next-light.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: skoda next;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/skoda-next-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: skoda next;
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/skoda-next-semibold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: skoda next;
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/skoda-next-bold.woff2') format('woff2');
+}

@@ -11,7 +11,7 @@ colors or spacing.
 |---|---|---|
 | `styles/brand.css` | Primitive colors + semantic map + fallback `@font-face` | Only file allowed raw hex (Stylelint-exempt). Loaded eagerly in `head.html`. |
 | `styles/styles.css` `:root` | Typography, spacing, radii/shadow, layout/nav, breakpoint tokens | LCP-critical global styles. |
-| `styles/fonts.css` | SKODA Next `@font-face` | Loaded **lazily** by `loadFonts()`; licensed font not yet rehosted (fallback only). |
+| `styles/fonts.css` | SKODA Next `@font-face` (weights 300/400/600/700, upright) | Loaded **lazily** by `loadFonts()`; self-hosted in `fonts/` (woff2 from Škoda's public CDN), `font-display: swap`. |
 
 ## Colors
 
@@ -25,8 +25,8 @@ Semantic map (use these downstream): `--background-color` → white, `--light-co
 
 ## Typography
 
-- Families: `--body-font-family` / `--heading-font-family` = `'SKODA Next', skoda-next-fallback, helvetica, arial, sans-serif`.
-- Weights: `--weight-light 300`, `--weight-regular 400`, `--weight-medium 500`, `--weight-semibold 600`, `--weight-bold 700`.
+- Families: `--body-font-family` / `--heading-font-family` = `skoda next, skoda-next-fallback, helvetica, arial, sans-serif` (unquoted, lowercased per Stylelint; font matching is case-insensitive).
+- Weights: `--weight-light 300`, `--weight-regular 400`, `--weight-semibold 600`, `--weight-bold 700`. (No `--weight-medium`/500 — SKODA Next ships only 300/400/600/700, so a 500 token would have no real face.)
 - Line heights (measured from source): `--line-height-body 1.5` (24px on 16px body), `--line-height-heading 1.25`.
 - Prose rhythm: `--paragraph-gap 20px` (measured article/press body paragraph spacing).
 - Body: `--body-font-size-m 16px`, `-s 14px`, `-xs 13px`.

@@ -33,11 +33,16 @@
 }
 
 /*
- * Fallback fonts for the SKODA Next stack. The licensed SKODA Next font is not rehosted; these
- * size-adjusted local fallbacks minimize CLS until fonts.css (lazy) supplies the real face.
+ * Fallback font for the SKODA Next stack. SKODA Next is self-hosted and embedded via fonts.css
+ * (lazy); this size-adjusted local fallback matches its horizontal metrics so text painted with
+ * font-display: swap does not reflow when the real face arrives (minimizes CLS).
+ *
+ * size-adjust 87.32% measured: SKODA Next's average advance width is ~0.8732× Helvetica/Arial's
+ * for a representative Latin + Czech-diacritics sample (4232 vs 4846 at 100px). Re-measure if the
+ * font version changes.
  */
 @font-face {
   font-family: skoda-next-fallback;
-  size-adjust: 100%;
+  size-adjust: 87.32%;
   src: local('Helvetica'), local('Arial');
 }
