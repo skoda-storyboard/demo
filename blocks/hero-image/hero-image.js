@@ -1,22 +1,27 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
 
 /**
- * Hero (image variant, story) — SKODA-202.
+ * Hero (image variant) — SKODA-202.
  *
- * Authored as a two-cell block: an image cell + a heading/caption cell.
- *   | Hero-image        |
- *   | ![](hero.jpg)     |
- *   | # Heading         |
+ * One block, three rendering variants selected by the authored block class
+ * (hero.md §1/§3/§7):
+ *   - default / `story`  → title ABOVE a 16:9 image on desktop; image-above-title
+ *                          order swap at <=1079; ink title. Never overlaid.
+ *   - `overlay`          → full-bleed image (61.8vh); heading + caption overlaid
+ *                          bottom-left in white over a scrim (landing/series/
+ *                          press-kit form).
+ *   - `archive`          → image-only fixed-height band (160/200/240); no scrim,
+ *                          no heading (the page <h1> lives in the content column).
  *
- * Renders the title ABOVE a 16:9 image on desktop; the image moves above the
- * title at <=1079px (CSS order swap). The image is the eager-phase LCP element:
- * real <img> in an optimized <picture>, fetchpriority=high + loading=eager, and
- * width/height preserved for low CLS. Decorates defensively (authors omit/add
- * cells; the image may be authored inside a <p>).
+ * The image is the eager-phase LCP element: real <img> in a <picture>,
+ * fetchpriority=high + loading=eager, width/height preserved for low CLS.
+ * Decorates defensively (image may be authored inside a <p>; cells omitted).
  *
  * @param {Element} block the hero-image block element
  */
 export default function decorate(block) {
+  const isArchive = block.classList.contains('archive');
+
   const img = block.querySelector('img');
   const authoredPicture = img?.closest('picture');
 
@@ -66,19 +71,27 @@ export default function decorate(block) {
   const content = document.createElement('div');
   content.className = 'hero-image-content';
   [...block.children].forEach((row) => {
-    // a cell whose only meaningful content is the image is the media row — skip it
     const rowImg = row.querySelector('img');
-    if (rowImg && row.textContent.trim() === '') return;
+    if (rowImg && row.textContent.trim() === '') return; // media row
     [...row.children].forEach((cell) => {
       if (cell.querySelector('img') && cell.textContent.trim() === '') return;
       while (cell.firstChild) content.append(cell.firstChild);
     });
   });
 
-  // Rebuild the block as an overlay hero: full-bleed image with the heading +
-  // caption overlaid (bottom-left, white) over a scrim. Media first, content
-  // layered on top via CSS (position: absolute).
+  // Rebuild the block per variant.
   block.textContent = '';
-  if (media) block.append(media);
-  if (content.childNodes.length) block.append(content);
+  const hasContent = content.childNodes.length > 0;
+  if (isArchive) {
+    // image-only band: no heading/caption, no scrim (CSS drops ::after)
+    if (media) block.append(media);
+  } else if (block.classList.contains('overlay')) {
+    // overlay: media first, content layered on top (CSS position:absolute)
+    if (media) block.append(media);
+    if (hasContent) block.append(content);
+  } else {
+    // story: title first (above image) in DOM; CSS swaps order at <=1079
+    if (hasContent) block.append(content);
+    if (media) block.append(media);
+  }
 }

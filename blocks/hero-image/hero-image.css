@@ -1,18 +1,31 @@
+/* stylelint-disable no-descending-specificity --
+ * Rules are grouped by variant (shared base -> overlay -> archive -> desktop)
+ * for readability. The desktop story rules use :not(.overlay):not(.archive) to
+ * scope to the default variant, which raises their specificity above the plain
+ * .overlay rules declared earlier; the cascade is correct (variants are
+ * mutually exclusive on the same element). Reordering to satisfy this stylistic
+ * rule would fragment the per-variant grouping, so it is disabled for this file. */
+
 /* ==========================================================================
- * Hero (image variant, overlay) — SKODA-202
- * Spec: docs/ui-specs/hero.md (variant C, landing / press-kit overlay hero).
- * Full-bleed real <img>/<picture> with the heading + caption overlaid
- * bottom-left in white over a scrim. Never a CSS background. Mobile-first.
+ * Hero (image variant) — SKODA-202
+ * Spec: docs/ui-specs/hero.md. Real <img>/<picture>, never a CSS background.
+ * Three variants selected by block class:
+ *   default/story  → title above 16:9 image (order-swap <=1079); ink title
+ *   .overlay       → full-bleed 61.8vh image; white title + caption overlaid
+ *   .archive       → image-only fixed-height band (160/200/240); no scrim
+ * Mobile-first.
  * ========================================================================== */
 
 .hero-image.block {
   position: relative;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-m);
   width: 100%;
-  color: var(--skoda-white);
 }
 
-/* --- Media (full-bleed image) --------------------------------------------- */
+/* --- Media (image) — shared ------------------------------------------------- */
 .hero-image .hero-image-media {
   position: relative;
   width: 100%;
@@ -23,11 +36,11 @@
 .hero-image .hero-image-media img {
   display: block;
   width: 100%;
-  height: min(61.8vh, 640px);
+  aspect-ratio: 16 / 9;
   object-fit: cover;
 }
 
-/* dual-gradient scrim so the overlaid white text stays legible */
+/* dual-gradient scrim over the image (story + overlay; dropped on archive) */
 .hero-image .hero-image-media::after {
   content: '';
   position: absolute;
@@ -36,45 +49,118 @@
   pointer-events: none;
 }
 
-/* --- Overlaid content (heading + caption), bottom-left -------------------- */
+/* --- Content (heading + caption) — shared base ------------------------------ */
 .hero-image .hero-image-content {
-  position: absolute;
-  inset: auto 0 0;
-  z-index: 1;
-  box-sizing: border-box;
+  order: 2; /* below the image on mobile/tablet (story) */
   width: 100%;
-  max-width: var(--content-max-width);
-  margin: 0 auto;
-  padding: var(--spacing-l);
   text-align: left;
 }
 
 .hero-image .hero-image-content h1,
 .hero-image .hero-image-content h2 {
-  margin: 0 0 var(--spacing-s);
-  color: var(--skoda-white);
+  margin: var(--spacing-m) 0 0;
+  color: var(--skoda-ink);
   font-size: var(--heading-font-size-hero-story-mobile);
-  font-weight: var(--weight-light);
+  font-weight: var(--weight-semibold);
   line-height: 1.1;
 }
 
 .hero-image .hero-image-content p {
+  margin: var(--spacing-s) 0 0;
+}
+
+/* ==========================================================================
+ * OVERLAY VARIANT — full-bleed image, white title + caption overlaid.
+ * ========================================================================== */
+.hero-image.overlay {
+  gap: 0;
+}
+
+.hero-image.overlay .hero-image-media picture,
+.hero-image.overlay .hero-image-media img {
+  aspect-ratio: auto;
+  height: min(var(--hero-vh), 640px);
+}
+
+.hero-image.overlay .hero-image-content {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  box-sizing: border-box;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--spacing-l);
+}
+
+.hero-image.overlay .hero-image-content h1,
+.hero-image.overlay .hero-image-content h2 {
+  margin: 0 0 var(--spacing-s);
+  color: var(--skoda-white);
+  font-weight: var(--weight-light);
+}
+
+.hero-image.overlay .hero-image-content p {
   margin: 0;
   color: var(--skoda-white);
-  font-size: var(--body-font-size-m);
   font-weight: var(--weight-semibold);
 }
 
 /* ==========================================================================
- * DESKTOP (>= 1080): larger overlaid title; content padded to the content col.
+ * ARCHIVE VARIANT — image-only fixed-height band, no scrim, no title.
+ * ========================================================================== */
+.hero-image.archive .hero-image-media picture,
+.hero-image.archive .hero-image-media img {
+  aspect-ratio: auto;
+  height: var(--hero-archive-h-base);
+}
+
+.hero-image.archive .hero-image-media::after {
+  content: none; /* no scrim on the archive band */
+}
+
+/* ==========================================================================
+ * DESKTOP (>= 1080): story title above image (centered); overlay title 48px.
  * ========================================================================== */
 @media (width >= 1080px) {
-  .hero-image .hero-image-content {
+  /* story: title first (above image), centered; image width-capped ~970px */
+  .hero-image:not(.overlay, .archive) .hero-image-content {
+    order: 1;
+    text-align: center;
+  }
+
+  .hero-image:not(.overlay, .archive) .hero-image-content h1,
+  .hero-image:not(.overlay, .archive) .hero-image-content h2 {
+    margin: var(--spacing-m) 0 var(--spacing-l);
+    font-size: var(--heading-font-size-hero-story);
+  }
+
+  .hero-image:not(.overlay, .archive) .hero-image-media {
+    order: 2;
+    max-width: 970px;
+  }
+
+  /* overlay: larger overlaid title, content padded to the column */
+  .hero-image.overlay .hero-image-content {
     padding: var(--spacing-xl) var(--spacing-l);
   }
 
-  .hero-image .hero-image-content h1,
-  .hero-image .hero-image-content h2 {
+  .hero-image.overlay .hero-image-content h1,
+  .hero-image.overlay .hero-image-content h2 {
     font-size: var(--heading-font-size-hero);
+  }
+}
+
+/* archive band steps up at 576 / 768 (hero.md §3B) */
+@media (width >= 576px) {
+  .hero-image.archive .hero-image-media picture,
+  .hero-image.archive .hero-image-media img {
+    height: var(--hero-archive-h-sm);
+  }
+}
+
+@media (width >= 768px) {
+  .hero-image.archive .hero-image-media picture,
+  .hero-image.archive .hero-image-media img {
+    height: var(--hero-archive-h-md);
   }
 }
