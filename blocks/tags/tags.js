@@ -2,9 +2,11 @@
  * Tags block (SKODA-205).
  *
  * Renders a page's taxonomy tags as an accessible, semantic pill list. Authored as a small DA
- * table — each cell (or each <a> within a cell) becomes one tag. Links are preserved verbatim so
- * their hrefs (tag-archive `/en/tag/<taxonomy>/<slug>/` or listing facet `/en/news/?filter[…]`)
- * stay aligned with the SKODA-401 query-index facet taxonomy.
+ * table — each cell (or each <a> within a cell) becomes one tag. A plain-text cell may also hold
+ * several tags separated by commas or newlines (`Kamiq, Technology, Motorsport`), each of which
+ * becomes its own pill. Links are preserved verbatim so their hrefs (tag-archive
+ * `/en/tag/<taxonomy>/<slug>/` or listing facet `/en/news/?filter[…]`) stay aligned with the
+ * SKODA-401 query-index facet taxonomy.
  *
  * Variants (extra classes on the block, read defensively):
  *   - (default)        grey→ink per-article label pill.
@@ -19,43 +21,55 @@ export default function decorate(block) {
   const ul = document.createElement('ul');
   ul.className = 'tags-list';
 
+  // Build one <li><a|span class="tag-label"> per tag. `href`/`title` come from an authored anchor;
+  // `selected` marks the active chip (aria-current). Empty text is skipped upstream.
+  const addTag = (text, { href, title, selected } = {}) => {
+    const li = document.createElement('li');
+    let el;
+    if (href) {
+      el = document.createElement('a');
+      el.href = href;
+      // preserve title only when it adds information beyond the visible text
+      if (title && title.trim() && title.trim() !== text) el.title = title;
+    } else {
+      el = document.createElement('span');
+    }
+    el.className = 'tag-label';
+    el.textContent = text;
+    if (selected) {
+      el.classList.add('active');
+      el.setAttribute('aria-current', 'true');
+    }
+    li.append(el);
+    ul.append(li);
+  };
+
   [...block.children].forEach((row) => {
     [...row.children].forEach((cell) => {
       // A cell may hold one or more anchors, or plain text. Prefer explicit links.
       const anchors = [...cell.querySelectorAll('a')];
-      const items = anchors.length ? anchors : [cell];
 
-      items.forEach((node) => {
-        const text = node.textContent.trim();
-        if (!text) return; // skip empty / whitespace-only entries
+      if (anchors.length) {
+        anchors.forEach((a) => {
+          const text = a.textContent.trim();
+          if (!text) return; // skip empty / whitespace-only entries
+          addTag(text, {
+            href: a.getAttribute('href'),
+            title: a.getAttribute('title'),
+            // Selected marker: authored as **text** → <strong> (chips facet context).
+            selected: isChips && !!a.closest('strong'),
+          });
+        });
+        return;
+      }
 
-        const li = document.createElement('li');
-
-        // Selected marker: authored as **text** → <strong> (chips facet context).
-        const selected = isChips && !!node.closest('strong');
-
-        const href = node.tagName === 'A' ? node.getAttribute('href') : null;
-        let el;
-        if (href) {
-          el = document.createElement('a');
-          el.href = href;
-          // preserve title only when it adds information beyond the visible text
-          const title = node.getAttribute('title');
-          if (title && title.trim() && title.trim() !== text) el.title = title;
-        } else {
-          el = document.createElement('span');
-        }
-        el.className = 'tag-label';
-        el.textContent = text;
-
-        if (selected) {
-          el.classList.add('active');
-          el.setAttribute('aria-current', 'true');
-        }
-
-        li.append(el);
-        ul.append(li);
-      });
+      // Plain-text cell: one or more tags separated by commas or newlines.
+      const selected = isChips && !!cell.querySelector('strong');
+      cell.textContent
+        .split(/[,\n]/)
+        .map((t) => t.trim())
+        .filter(Boolean)
+        .forEach((text) => addTag(text, { selected }));
     });
   });
 
