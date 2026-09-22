@@ -114,7 +114,7 @@ header .nav-section-switcher {
   width: 100%;
   height: var(--nav-topbar-height);
   margin: 0;
-  padding: 0;
+  padding: 0 10px;
   list-style: none;
   font-size: var(--body-font-size-s);
 }
