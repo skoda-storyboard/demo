@@ -93,6 +93,26 @@ Each row's own `dam_page_path`/`alt` are reused, so page-mirrored foldering is
 unchanged. `--force` re-processes rows already marked `done` (e.g. from a prior
 delivery-only build).
 
+## Automatic wiring (PostToolUse hook)
+
+`.claude/settings.json` registers a **PostToolUse(Bash) hook**
+(`auto-media-hook.mjs`) so the media step runs **automatically after every
+content import** in this harness — no need to remember it:
+
+- Fires **only** when the Bash command invoked `run-bulk-import.js` (otherwise a
+  silent no-op).
+- Reads the runner's `✅ Saved content to <path>` lines to scope itself to the
+  **pages just imported**, then runs `build` + `apply`.
+- **Incremental — new images only:** the manifest skips images already `done`, so
+  when an import brings no new images the step fetches/rewrites nothing (a genuine
+  no-op). It reports the count of new images it ingested.
+- **Delivery-only by design:** the auto step does the safe, no-credential work
+  (manifest + media-bus rewrite + `media-index.json`). It never auto-uploads to
+  the AEM DAM — that needs the token and hits the external instance, so it stays
+  an explicit `npm run media:build -- --dam-base …` (the hook prints a reminder
+  when new images were ingested).
+- **Never fails the import:** any hook error is logged to stderr and exits 0.
+
 ## Auth (per-host)
 
 - **DA / `admin.hlx.page` / `admin.da.live`** — the environment's injected
