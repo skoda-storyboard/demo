@@ -29,6 +29,28 @@ body {
   font-size: 12px;
 }
 
+.tp-search {
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--tp-line);
+  border-radius: 6px;
+  font: inherit;
+  color: var(--tp-ink);
+}
+
+.tp-search:focus {
+  outline: 2px solid var(--tp-accent);
+  outline-offset: 1px;
+}
+
+/* Filtered-out items/groups. Needed because .tp-item (flex) and .tp-group (grid) set an
+   explicit display that would otherwise override the UA [hidden] { display: none }. */
+.tp-item[hidden],
+.tp-group[hidden] {
+  display: none;
+}
+
 .tp-list {
   max-height: 320px;
   overflow: auto;

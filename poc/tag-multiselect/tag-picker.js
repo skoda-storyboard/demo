@@ -119,6 +119,15 @@ function render(root, list, state) {
   help.className = 'tp-help';
   root.append(help);
 
+  // Typeahead filter: narrows the visible tags by label as the author types. Fixed above
+  // the scrolling list so it stays put; ticked tags keep their state while filtering.
+  const search = document.createElement('input');
+  search.type = 'search';
+  search.className = 'tp-search';
+  search.placeholder = 'Filter tags…';
+  search.setAttribute('aria-label', 'Filter tags');
+  root.append(search);
+
   const fieldset = document.createElement('div');
   fieldset.className = 'tp-list';
   groupByFacet(list).forEach((tags, taxonomy) => {
@@ -146,6 +155,23 @@ function render(root, list, state) {
   });
   root.append(fieldset);
 
+  // Hide any tag whose label doesn't contain the query; hide a whole facet group once
+  // all of its items are filtered out. Empty query shows everything.
+  const applyFilter = (q) => {
+    const query = q.trim().toLowerCase();
+    fieldset.querySelectorAll('.tp-group').forEach((group) => {
+      let anyVisible = false;
+      group.querySelectorAll('.tp-item').forEach((item) => {
+        const { label } = item.querySelector('input').dataset;
+        const match = !query || label.toLowerCase().includes(query);
+        item.hidden = !match;
+        if (match) anyVisible = true;
+      });
+      group.hidden = !anyVisible;
+    });
+  };
+  search.addEventListener('input', () => applyFilter(search.value));
+
   const bar = document.createElement('div');
   bar.className = 'tp-bar';
 
@@ -168,7 +194,8 @@ function render(root, list, state) {
   selectAll.className = 'tp-btn';
   selectAll.textContent = 'Select all';
   selectAll.addEventListener('click', () => {
-    fieldset.querySelectorAll('input').forEach((cb) => { cb.checked = true; });
+    // Act on what's currently visible, so it composes with the filter.
+    fieldset.querySelectorAll('.tp-item:not([hidden]) input').forEach((cb) => { cb.checked = true; });
     refresh();
   });
 
@@ -177,7 +204,7 @@ function render(root, list, state) {
   clear.className = 'tp-btn';
   clear.textContent = 'Clear';
   clear.addEventListener('click', () => {
-    fieldset.querySelectorAll('input').forEach((cb) => { cb.checked = false; });
+    fieldset.querySelectorAll('.tp-item:not([hidden]) input').forEach((cb) => { cb.checked = false; });
     refresh();
   });
 
