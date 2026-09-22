@@ -75,6 +75,15 @@
   --card-shadow: 0 1px 10px 0 rgb(0 0 0 / 7%), 0 2px 2px -2px rgb(0 0 0 / 10%);
   --card-border: 1px solid var(--skoda-grey-border);
 
+  /* tag pill (SKODA-205) — measured from source a.label; radius/padding/font/gap have no
+     existing token. --pill-radius (2em) is the rounded chip variant, distinct from --card-radius. */
+  --tag-radius: 2px;
+  --tag-padding: 5px 10px;
+  --tag-font-size: 11px;
+  --tag-letter-spacing: 0.1em;
+  --tag-gap: 5px;
+  --pill-radius: 2em;
+
   /* layout / nav */
   --content-max-width: 1248px;
   --nav-height: 108px;
