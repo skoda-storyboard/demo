@@ -15,6 +15,7 @@
 
 import { createOptimizedPicture, readBlockConfig } from '../../scripts/aem.js';
 import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
+import { fetchPlaceholders } from '../../scripts/placeholders.js';
 import {
   scopeRows, filterRows, sortRows, paginate, distinctFacetValues,
   decodeState, encodeState, selectedCount,
@@ -29,13 +30,23 @@ const FACET_LABELS = {
   years: 'Year', happening: 'Event', vip: 'People', view: 'Interior/Exterior',
 };
 
-const STRINGS = {
-  loadMore: 'Load more',
-  advancedFilter: 'Advanced filter',
-  noResults: 'No results — clear filters to see more.',
-  loading: 'Loading…',
-  removeFilter: 'Remove filter',
-};
+// UI strings resolve from the per-locale placeholders sheet (i18n architecture),
+// with English defaults so the block works before any sheet is authored.
+function buildStrings(ph) {
+  return {
+    loadMore: ph.loadMore || 'Load more',
+    advancedFilter: ph.advancedFilter || 'Advanced filter',
+    noResults: ph.listingNoResults || 'No results — clear filters to see more.',
+    loading: ph.loading || 'Loading…',
+    removeFilter: ph.removeFilter || 'Remove filter',
+    filters: ph.filters || 'Filters',
+    loadError: ph.listingLoadError || 'Could not load results.',
+    newest: ph.sortNewest || 'Newest',
+    oldest: ph.sortOldest || 'Oldest',
+  };
+}
+
+let instanceSeq = 0; // per-page counter → unique element ids when >1 listing on a page
 
 const titleCase = (s) => String(s).replace(/(^|[\s-])([a-z])/g, (m) => m.toUpperCase());
 const labelFor = (key, labels) => labels[key] || FACET_LABELS[key] || titleCase(key);
@@ -95,6 +106,9 @@ function cardCell(row, eager) {
 
 export default async function decorate(block) {
   const cfg = parseListConfig(block);
+  instanceSeq += 1;
+  const uid = `l${instanceSeq}`; // unique id prefix for this block instance
+  const STRINGS = buildStrings(await fetchPlaceholders());
 
   // State (restored from the deep-link URL).
   const initial = decodeState(window.location.search, cfg.facets, cfg.perpage);
@@ -105,7 +119,7 @@ export default async function decorate(block) {
   block.classList.add(`columns-${cfg.columns}`);
   const facetBar = document.createElement('form');
   facetBar.className = 'listing-facets';
-  facetBar.setAttribute('aria-label', 'Filters');
+  facetBar.setAttribute('aria-label', STRINGS.filters);
   const chipsRow = document.createElement('div');
   chipsRow.className = 'listing-chips';
   const sortRow = document.createElement('div');
@@ -127,8 +141,8 @@ export default async function decorate(block) {
   filterToggle.type = 'button';
   filterToggle.className = 'listing-filter-toggle';
   filterToggle.setAttribute('aria-expanded', 'false');
-  filterToggle.setAttribute('aria-controls', 'listing-facets');
-  facetBar.id = 'listing-facets';
+  filterToggle.setAttribute('aria-controls', `${uid}-facets`);
+  facetBar.id = `${uid}-facets`;
 
   block.append(facetBar, chipsRow, sortRow, countEl, status, grid, loadMoreWrap);
 
@@ -138,7 +152,7 @@ export default async function decorate(block) {
     const rows = await loadQueryIndex(cfg.index);
     scoped = scopeRows(rows, { template: cfg.template, path: cfg.path });
   } catch (e) {
-    status.textContent = 'Could not load results.';
+    status.textContent = STRINGS.loadError;
     // eslint-disable-next-line no-console
     console.error('listing: index load failed', e);
     return;
@@ -147,10 +161,14 @@ export default async function decorate(block) {
   // --- rendering ---------------------------------------------------------
   const filteredSorted = () => sortRows(filterRows(scoped, state.active), state.sort);
 
-  function updateUrl() {
+  // Filter/sort changes replace the current history entry (keeps the URL
+  // deep-linkable without a back-stack entry per toggle); only load-more pushes
+  // a new entry, matching the source's offset paging.
+  function updateUrl(push = false) {
     const qs = encodeState(state, cfg.perpage);
     const url = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
-    window.history.pushState(state, '', url);
+    if (push) window.history.pushState(state, '', url);
+    else window.history.replaceState(state, '', url);
   }
 
   function renderCount(shown, total) {
@@ -205,7 +223,7 @@ export default async function decorate(block) {
       btn.addEventListener('click', () => {
         const prev = grid.children.length;
         state.revealed += cfg.perpage;
-        updateUrl();
+        updateUrl(true); // load-more pushes a history entry (source offset paging)
         renderGrid();
         // move focus to the first newly-added cell (a11y)
         const firstNew = grid.children[prev];
@@ -249,7 +267,7 @@ export default async function decorate(block) {
     pill.type = 'button';
     pill.className = 'facet-pill';
     pill.setAttribute('aria-expanded', 'false');
-    const panelId = `facet-panel-${key}`;
+    const panelId = `${uid}-facet-panel-${key}`;
     pill.setAttribute('aria-controls', panelId);
     const labelSpan = document.createElement('span');
     labelSpan.className = 'facet-label';
@@ -268,7 +286,7 @@ export default async function decorate(block) {
     panel.append(legend);
 
     values.forEach(({ value, count }) => {
-      const optId = `facet-${key}-${value}`.replace(/[^a-z0-9-]/gi, '-');
+      const optId = `${uid}-facet-${key}-${value}`.replace(/[^a-z0-9-]/gi, '-');
       const wrap = document.createElement('label');
       wrap.className = 'facet-option';
       wrap.htmlFor = optId;
@@ -309,7 +327,7 @@ export default async function decorate(block) {
   sortRow.append(filterToggle);
   const sortList = document.createElement('div');
   sortList.className = 'listing-sort-options';
-  [['newest', 'Newest'], ['oldest', 'Oldest']].forEach(([val, lbl]) => {
+  [['newest', STRINGS.newest], ['oldest', STRINGS.oldest]].forEach(([val, lbl]) => {
     const s = document.createElement('button');
     s.type = 'button';
     s.className = 'listing-sort-btn';
@@ -326,19 +344,45 @@ export default async function decorate(block) {
   });
   sortRow.append(sortList);
 
-  // Mobile drawer: toggle exposes the facet bar; Esc closes; focus trap-lite.
+  // Mobile drawer: toggle exposes the facet bar; Esc closes; Tab is trapped
+  // between the toggle and the facet controls while open (focus restored to the
+  // trigger on close).
+  const drawerFocusables = () => [
+    filterToggle,
+    ...facetBar.querySelectorAll('button, input'),
+  ].filter((el) => !el.disabled && el.offsetParent !== null);
+
+  const closeDrawer = () => {
+    filterToggle.setAttribute('aria-expanded', 'false');
+    block.classList.remove('facets-open');
+    filterToggle.focus();
+  };
+
   filterToggle.addEventListener('click', () => {
     const open = filterToggle.getAttribute('aria-expanded') === 'true';
-    filterToggle.setAttribute('aria-expanded', String(!open));
-    block.classList.toggle('facets-open', !open);
-    if (!open) facetBar.querySelector('button, input')?.focus();
-    else filterToggle.focus();
+    if (open) { closeDrawer(); return; }
+    filterToggle.setAttribute('aria-expanded', 'true');
+    block.classList.add('facets-open');
+    facetBar.querySelector('button, input')?.focus();
   });
   block.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && block.classList.contains('facets-open')) {
-      filterToggle.setAttribute('aria-expanded', 'false');
-      block.classList.remove('facets-open');
-      filterToggle.focus();
+    if (!block.classList.contains('facets-open')) return;
+    if (e.key === 'Escape') {
+      closeDrawer();
+      return;
+    }
+    if (e.key === 'Tab') {
+      const f = drawerFocusables();
+      if (!f.length) return;
+      const first = f[0];
+      const last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
   });
 

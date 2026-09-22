@@ -217,7 +217,7 @@
 .listing .listing-count {
   padding-block: 0.5em;
   margin-block: 1em;
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-semibold); /* source measured 500; SKODA Next has no 500 face → 600 per _FOUNDATIONS §weights */
   color: var(--skoda-grey-500);
   border-block-end: 1px solid var(--pagination-border);
 }
@@ -312,8 +312,13 @@
 }
 
 @media (width >= 992px) {
+  /* default desktop column count (3); the `columns-N` class from config overrides */
   .listing .listing-items {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .listing.columns-2 .listing-items {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   /* image listings go 4-up at >=992 */
