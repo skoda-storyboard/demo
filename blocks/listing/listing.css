@@ -1,0 +1,349 @@
+/*
+ * Faceted Listing block (SKODA-402). Scoped to .listing; tokens only.
+ * Measured spec: docs/ui-specs/faceted-listing.md §3 (facet bar, pills, panel,
+ * chips, sort, count, grid, load-more, mobile drawer).
+ *
+ * Layer order (docs/guardrails/css-guidelines.md): fluid + intrinsic first;
+ * breakpoints (768/992/1080) only for the grid column-count transitions.
+ */
+
+.listing {
+  width: min(100%, var(--content-max-width));
+  margin-inline: auto;
+}
+
+/* sr-only utility (facet legends) */
+.listing .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- facet bar: top full-width pill bar (NOT a sidebar) --- */
+.listing .listing-facets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em 1em;
+  margin-block-end: var(--grid-gutter);
+}
+
+.listing .facet {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+}
+
+/* facet pill (default) */
+.listing .facet-pill {
+  display: inline-flex;
+  gap: 0.4em;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+  padding: 0 21px;
+  font-size: var(--body-font-size-s);
+  font-weight: var(--weight-semibold);
+  color: var(--text-color);
+  background: var(--facet-pill-bg);
+  border: 0;
+  border-radius: var(--facet-radius);
+  box-shadow: var(--facet-shadow);
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.listing .facet-pill:hover {
+  background: var(--facet-pill-hover);
+}
+
+.listing .facet-pill:focus-visible {
+  outline: 2px solid var(--facet-active);
+  outline-offset: 2px;
+}
+
+/* selected pill: green + white + ✓ glyph + count badge (dual-encoded) */
+.listing .facet-pill.active {
+  color: var(--skoda-white);
+  background: var(--facet-active);
+}
+
+.listing .facet-pill.active .facet-label::before {
+  content: "\2713 "; /* ✓ — not color-only */
+}
+
+.listing .facet-count:empty {
+  display: none;
+}
+
+.listing .facet-pill.active .facet-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: var(--body-font-size-2xs);
+  font-weight: var(--weight-bold);
+  color: var(--facet-active);
+  background: var(--skoda-white);
+  border-radius: 50%;
+}
+
+/* option panel: multi-column checkbox list, fade in */
+.listing .facet-panel {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: calc(35px + 6px);
+  inset-inline-start: 0;
+  min-width: 220px;
+  max-width: min(90vw, 520px);
+  padding: 12px 14px;
+  margin: 0;
+  column-width: 160px;
+  column-gap: 1em;
+  background: var(--skoda-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--facet-radius);
+  box-shadow: var(--dropdown-shadow);
+}
+
+.listing .facet-panel[hidden] {
+  display: none;
+}
+
+.listing .facet-option {
+  display: flex;
+  gap: 0.5em;
+  align-items: baseline;
+  padding: 4px 0;
+  font-size: var(--body-font-size-s);
+  break-inside: avoid;
+  cursor: pointer;
+}
+
+.listing .facet-option input {
+  accent-color: var(--facet-active);
+}
+
+/* --- applied-filter chips --- */
+.listing .listing-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+
+.listing .listing-chips:empty {
+  display: none;
+}
+
+.listing .listing-chip {
+  display: inline-flex;
+  gap: 0.4em;
+  align-items: center;
+  height: 35px;
+  padding: 0 1em;
+  font-size: var(--body-font-size-s);
+  font-weight: var(--weight-semibold);
+  color: var(--text-color);
+  background: var(--skoda-white);
+  border: 2px solid var(--chip-border);
+  border-radius: var(--facet-radius);
+  cursor: pointer;
+}
+
+.listing .listing-chip::before {
+  content: "\00d7"; /* × */
+  font-size: 1.1em;
+  color: var(--facet-active);
+}
+
+.listing .listing-chip:focus-visible {
+  outline: 2px solid var(--facet-active);
+  outline-offset: 2px;
+}
+
+/* --- sort row (right-aligned): mobile filter toggle + sort options --- */
+.listing .listing-sort {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1em;
+  margin-block: 1em 0;
+}
+
+.listing .listing-sort-options {
+  display: flex;
+  gap: 0.75em;
+}
+
+.listing .listing-sort-btn {
+  padding: 0;
+  font-size: var(--body-font-size-s);
+  font-weight: var(--weight-semibold);
+  color: var(--skoda-grey-500);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.listing .listing-sort-btn[aria-pressed="true"] {
+  color: var(--text-color);
+}
+
+.listing .listing-sort-btn:focus-visible {
+  outline: 2px solid var(--facet-active);
+  outline-offset: 2px;
+}
+
+/* the mobile "Advanced filter (N)" toggle — hidden on desktop */
+.listing .listing-filter-toggle {
+  display: none;
+  padding: 0;
+  font-size: var(--body-font-size-s);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  color: var(--text-color);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+/* --- result count "N / total" --- */
+.listing .listing-count {
+  padding-block: 0.5em;
+  margin-block: 1em;
+  font-weight: var(--weight-medium);
+  color: var(--skoda-grey-500);
+  border-block-end: 1px solid var(--pagination-border);
+}
+
+.listing .listing-count-total::before {
+  content: " / ";
+}
+
+/* --- status (loading / no-results) --- */
+.listing .listing-status[hidden] {
+  display: none;
+}
+
+.listing .listing-status {
+  padding: var(--grid-gutter) 0;
+  color: var(--skoda-grey-500);
+}
+
+/* --- result grid: fluid/intrinsic 1-up; column count via breakpoints --- */
+.listing .listing-items {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--grid-gutter);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.listing .listing-item {
+  margin: 0;
+}
+
+.listing .listing-item-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.listing .listing-item-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--facet-radius);
+}
+
+.listing .listing-item-body h3 {
+  margin-block: 0.5em 0.25em;
+  font-size: var(--body-font-size-m);
+}
+
+.listing .listing-item-body p {
+  margin: 0;
+  font-size: var(--body-font-size-s);
+  color: var(--dark-color);
+}
+
+.listing .listing-item-link:focus-visible {
+  outline: 2px solid var(--facet-active);
+  outline-offset: 2px;
+}
+
+/* --- load-more: shared ghost pill --- */
+.listing .listing-loadmore {
+  display: flex;
+  justify-content: center;
+  margin-block: var(--grid-gutter);
+}
+
+.listing .listing-loadmore-btn {
+  padding: 8px 48px;
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  color: var(--text-color);
+  background: var(--skoda-white);
+  border: 2px solid var(--skoda-ink);
+  border-radius: var(--pill-radius);
+  cursor: pointer;
+}
+
+.listing .listing-loadmore-btn:focus-visible {
+  outline: 2px solid var(--facet-active);
+  outline-offset: 2px;
+}
+
+/* ===== breakpoints: grid column-count transitions only (768 / 992 / 1080) ===== */
+@media (width >= 768px) {
+  .listing .listing-items {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (width >= 992px) {
+  .listing .listing-items {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* image listings go 4-up at >=992 */
+  .listing.columns-4 .listing-items {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ===== mobile drawer: hide the inline facet bar; reveal via toggle ===== */
+@media (width < 768px) {
+  .listing .listing-facets {
+    display: none;
+  }
+
+  .listing.facets-open .listing-facets {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .listing .listing-filter-toggle {
+    display: inline-flex;
+  }
+
+  .listing .facet {
+    width: 100%;
+  }
+
+  .listing .facet-panel {
+    position: static;
+    column-width: auto;
+    box-shadow: none;
+  }
+}

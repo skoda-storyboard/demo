@@ -1,0 +1,15 @@
+{
+  "total": 8,
+  "offset": 0,
+  "limit": 8,
+  "data": [
+    { "path": "/en/press-releases/elroq-rs", "title": "Škoda Elroq RS revealed", "description": "The sporty flagship of the all-electric Elroq line.", "image": "https://cdn.skoda-storyboard.com/2024/10/elroq_header_fede6794-1920x750.jpg", "template": "press_release", "date": "2026-09-15", "tags": "elroq, 2026", "model": "elroq", "years": "2026", "bodywork": "suv" },
+    { "path": "/en/press-releases/enyaq-update", "title": "Enyaq model-year update", "description": "More range and faster charging for the Enyaq.", "image": "https://cdn.skoda-storyboard.com/2024/10/Elroq-charging_ae487975.png", "template": "press_release", "date": "2026-08-01", "tags": "enyaq, 2026", "model": "enyaq", "years": "2026", "bodywork": "suv" },
+    { "path": "/en/press-releases/octavia-30", "title": "Octavia turns 30", "description": "Three decades of a brand icon.", "image": "https://cdn.skoda-storyboard.com/2024/10/Elroq-boot_c23fb824.png", "template": "press_release", "date": "2026-06-10", "tags": "octavia, 2026", "model": "octavia", "years": "2026", "bodywork": "estate" },
+    { "path": "/en/press-releases/kodiaq-million", "title": "One-millionth Kodiaq built", "description": "A production milestone for the large SUV.", "image": "https://cdn.skoda-storyboard.com/2024/10/Elroq-head-up_301f7568.png", "template": "press_release", "date": "2026-05-20", "tags": "kodiaq, 2026", "model": "kodiaq", "years": "2026", "bodywork": "suv" },
+    { "path": "/en/press-releases/superb-25", "title": "Superb: 25 years", "description": "A quarter century of comfort and space.", "image": "https://cdn.skoda-storyboard.com/2024/10/Elroq-interior_bc182cb0.png", "template": "press_release", "date": "2026-03-11", "tags": "superb, 2025", "model": "superb", "years": "2025", "bodywork": "liftback" },
+    { "path": "/en/press-releases/epiq-preview", "title": "Epiq city SUV preview", "description": "Škoda's most affordable all-electric car.", "image": "https://cdn.skoda-storyboard.com/2024/10/Tech-Deck_c72ad67a.png", "template": "press_release", "date": "2026-02-02", "tags": "epiq, 2025", "model": "epiq", "years": "2025", "bodywork": "suv" },
+    { "path": "/en/press-releases/kamiq-facelift", "title": "Kamiq facelift", "description": "Refreshed compact crossover.", "image": "https://cdn.skoda-storyboard.com/2024/10/Elroq-MySkoda_09a17195.png", "template": "press_release", "date": "2025-11-15", "tags": "kamiq, 2025", "model": "kamiq", "years": "2025", "bodywork": "suv" },
+    { "path": "/en/press-releases/scala-edition", "title": "Scala special edition", "description": "A new trim for the versatile hatchback.", "image": "https://cdn.skoda-storyboard.com/2024/10/hero_car_timiano_ext_front_1f67abb3.png", "template": "press_release", "date": "2025-09-01", "tags": "scala, 2025", "model": "scala", "years": "2025", "bodywork": "hatchback" }
+  ]
+}
