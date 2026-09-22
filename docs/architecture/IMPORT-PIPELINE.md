@@ -88,7 +88,19 @@ bash tools/importer/upload-en-stories.sh
    `npm run media:apply -- --pages content/<path>.plain.html` rewrites `<img src>` to each image's
    `delivery_url`. EDS auto-ingests those absolute URLs into its media bus at publish (self-hosted + webp),
    so the published page carries no legacy-CDN dependency and gets a masters-only responsive upgrade.
-7. **Run → preview → publish → validate** the index picked it up.
+7. **Validate metadata (gate, SKODA-401)** — run `node tools/importer/validate-metadata.mjs content/<path>.plain.html`
+   over the generated pages. It fails (non-zero) if any indexed page's Metadata block is missing `template`,
+   comma-separated `tags`, `category`, or an ISO `publisheddate` — the query-index contract. This catches a
+   mis-wired importer before publish, so the `tags`/facet columns and the tags-block fallback don't ship
+   silently empty. (`template=page` nav/utility pages are exempt from the rail-facet requirements.)
+8. **Run → preview → publish → validate** the index picked it up.
+
+**Metadata is generic, not per-page.** All importers should append the shared
+`tools/importer/transformers/skoda-metadata.js` transformer (content-type-agnostic: derives
+title/description/image/publisheddate/template/category/tags + the 15 facets from any source page), passing
+only CPT-fixed overrides via the template entry. Do not hand-roll per-page metadata literals. Contract:
+Metadata `tags` = comma-separated slugs → AEM emits `<meta property="article:tag">` → read by both the
+query-index (`query.yaml` selects `property="article:tag"`) and the tags block's `article:tag` fallback.
 
 This is exactly how the M1 backlog scopes Series (SKODA-207), the Media Room home/Model/Press-Kit pages, and the full Images/Videos listings — assembly of the existing pipeline, not new machinery.
 
