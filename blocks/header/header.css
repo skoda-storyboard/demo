@@ -26,8 +26,8 @@ header nav {
   box-sizing: border-box;
   display: grid;
   grid-template:
-    'hamburger brand tools' var(--nav-main-height)
-    'sections sections sections' 1fr / auto 1fr auto;
+    'brand hamburger' var(--nav-main-height)
+    'sections sections' 1fr / 1fr auto;
   align-items: center;
   gap: 0 24px;
   max-width: var(--content-max-width);
@@ -53,9 +53,9 @@ header nav a:focus-visible {
 
 header nav[aria-expanded='true'] {
   grid-template:
-    'hamburger brand' var(--nav-main-height)
-    'sections sections' 1fr
-    'tools tools' var(--nav-main-height) / auto 1fr;
+    'brand hamburger' var(--nav-main-height)
+    'tools tools' auto
+    'sections sections' 1fr / 1fr auto;
   min-height: calc(100dvh - var(--nav-topbar-height));
   overflow-y: auto;
 }
@@ -124,7 +124,7 @@ header .nav-section-switcher {
   width: 100%;
   height: var(--nav-topbar-height);
   margin: 0;
-  padding: 0 10px;
+  padding: 0;
   list-style: none;
   font-size: var(--body-font-size-s);
 }
@@ -132,6 +132,7 @@ header .nav-section-switcher {
 header .nav-section-switcher li {
   display: flex;
   flex: 1 1 50%;
+  margin: 0;
 }
 
 header .nav-section-switcher li a {
@@ -448,6 +449,42 @@ header nav .nav-search-input:focus-visible {
 header nav .nav-search-input::placeholder {
   color: var(--skoda-grey-500);
   opacity: 1;
+}
+
+/* ==========================================================================
+ * DRAWER BAND (< 1080): search lives inside the open menu as a static row,
+ * expanded to 80% width (no click-to-expand overlay here).
+ * ========================================================================== */
+@media (width < 1080px) {
+  /* hide the search entirely on the collapsed bar; show it in the open drawer */
+  header nav .nav-tools {
+    display: none;
+  }
+
+  header nav[aria-expanded='true'] .nav-tools {
+    display: block;
+    padding: var(--spacing-m) 0;
+  }
+
+  header nav[aria-expanded='true'] .nav-search {
+    position: static;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* static pill, always open, 80% wide */
+  header nav[aria-expanded='true'] .nav-search-field {
+    position: static;
+    width: 80%;
+    height: 3em;
+    background: var(--dropdown-hover-bg);
+    transform: none;
+  }
+
+  header nav[aria-expanded='true'] .nav-search-input {
+    width: auto;
+    opacity: 1;
+  }
 }
 
 /* ==========================================================================
