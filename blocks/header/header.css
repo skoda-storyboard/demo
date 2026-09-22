@@ -298,7 +298,7 @@ header nav .nav-tools .icon {
   height: 24px;
 }
 
-/* search: icon toggle + collapsible input (input overlays left, no reflow) */
+/* search: click-to-expand pill (leading icon + input; overlays left, no reflow) */
 header nav .nav-search {
   display: flex;
   position: relative;
@@ -307,12 +307,36 @@ header nav .nav-search {
   width: 24px;
 }
 
+/* the pill field: collapsed = just the round icon button; open = full pill */
+header nav .nav-search-field {
+  box-sizing: border-box;
+  display: flex;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  align-items: center;
+  width: 3em;
+  height: 3em;
+  border-radius: 200px;
+  background: transparent;
+  transform: translateY(-50%);
+  overflow: hidden;
+  transition: width 0.3s ease, background-color 0.2s ease;
+}
+
+header nav .nav-search.nav-search-open .nav-search-field {
+  width: clamp(200px, 32vw, 340px);
+  background: var(--dropdown-hover-bg);
+}
+
+/* leading search icon (also the toggle when collapsed) */
 header nav .nav-search-toggle {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 3em;
+  height: 3em;
   margin: 0;
   border: 0;
   padding: 0;
@@ -328,34 +352,36 @@ header nav .nav-search-toggle .icon img {
 }
 
 header nav .nav-search-input {
-  box-sizing: border-box;
-  position: absolute;
-  top: 50%;
-  right: calc(24px + var(--spacing-s));
+  flex: 1 1 auto;
   width: 0;
   min-width: 0;
-  height: 36px;
+  height: 100%;
   border: 0;
-  border-radius: var(--dropdown-radius);
-  padding: 0;
-  background: var(--dropdown-hover-bg);
+  padding: 0 var(--spacing-m) 0 0;
+  background: transparent;
   color: var(--skoda-ink);
   font-size: var(--body-font-size-s);
   opacity: 0;
-  transform: translateY(-50%);
-  pointer-events: none;
-  transition: width 0.3s ease, opacity 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 header nav .nav-search.nav-search-open .nav-search-input {
-  width: clamp(160px, 30vw, 320px);
-  padding: 0 var(--spacing-s);
   opacity: 1;
-  pointer-events: auto;
 }
 
 header nav .nav-search-input:focus-visible {
   outline: none;
+}
+
+/* placeholder fades out while the field is focused */
+header nav .nav-search-input::placeholder {
+  color: var(--skoda-grey-500);
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+header nav .nav-search-input:focus::placeholder {
+  opacity: 0;
 }
 
 /* ==========================================================================

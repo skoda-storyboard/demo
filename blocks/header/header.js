@@ -230,9 +230,15 @@ export default async function decorate(block) {
       input.setAttribute('aria-label', label);
       input.tabIndex = -1;
 
+      // pill field holds the leading icon + input; icon sits before the
+      // placeholder when open, input fills the rest
+      const field = document.createElement('div');
+      field.className = 'nav-search-field';
+      field.append(toggle, input);
+
       const searchBar = document.createElement('div');
       searchBar.className = 'nav-search';
-      searchBar.append(input, toggle);
+      searchBar.append(field);
 
       const setOpen = (open) => {
         searchBar.classList.toggle('nav-search-open', open);
