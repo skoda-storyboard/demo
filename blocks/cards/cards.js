@@ -91,6 +91,28 @@ function wireCardLink(li) {
   });
 }
 
+// A date paragraph like "15. 9. 2026", "1.9.2026", "12/09/2026" or "2026-09-15".
+const DATE_RE = /^\s*\d{1,4}[.\-/]\s?\d{1,2}[.\-/]\s?\d{2,4}\.?\s*$/;
+
+/**
+ * Classify the text pieces inside a card body so CSS can style + order them like the
+ * source teaser (date -> title -> summary), regardless of the authored sequence:
+ *   - a heading                    -> cards-card-title
+ *   - a <p> that is only a date     -> cards-card-date
+ *   - any other <p>                 -> cards-card-summary
+ */
+function classifyBody(body) {
+  [...body.children].forEach((el) => {
+    if (/^H[1-6]$/.test(el.tagName)) {
+      el.classList.add('cards-card-title');
+    } else if (el.tagName === 'P' && DATE_RE.test(el.textContent)) {
+      el.classList.add('cards-card-date');
+    } else if (el.tagName === 'P') {
+      el.classList.add('cards-card-summary');
+    }
+  });
+}
+
 export default function decorate(block) {
   const ul = document.createElement('ul');
   [...block.children].forEach((row) => {
@@ -99,7 +121,7 @@ export default function decorate(block) {
     [...li.children].forEach((cell) => {
       if (isImageCell(cell)) cell.className = 'cards-card-image';
       else if (isToolbarCell(cell)) decorateToolbar(cell);
-      else cell.className = 'cards-card-body';
+      else { cell.className = 'cards-card-body'; classifyBody(cell); }
     });
     // drop empty image cells so they don't leave a blank slot
     li.querySelectorAll('.cards-card-image:empty').forEach((c) => c.remove());

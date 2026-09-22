@@ -152,7 +152,7 @@ body.homepage .cards .cards-toolbar-button.media-cart-action {
 
 /* ---- overlay variant ---- */
 
-/* image fills the card; caption sits absolutely on top with a dual-gradient scrim */
+/* image fills the card; caption sits absolutely on top, anchored to the bottom */
 .cards.overlay .cards-card-image {
   border-radius: var(--card-radius);
 }
@@ -162,19 +162,45 @@ body.homepage .cards .cards-toolbar-button.media-cart-action {
   inset: 0;
   z-index: 1;
   justify-content: flex-end;
+  gap: var(--spacing-xs);
   margin: 0;
   padding: var(--spacing-m);
   color: var(--skoda-white);
-  background-image: var(--scrim-h), var(--scrim-v);
+
+  /* source dual scrim (decorative) + a stronger bottom legibility scrim so the white
+     caption stays legible on bright images (fixes text disappearing on light photos) */
+  background-image: var(--scrim-text), var(--scrim-h), var(--scrim-v);
 }
 
-.cards.overlay .cards-card-body h2,
-.cards.overlay .cards-card-body h3,
-.cards.overlay .cards-card-body h4,
-.cards.overlay .cards-card-body h5,
-.cards.overlay .cards-card-body h6,
-.cards.overlay .cards-card-body p {
+/* content order matches the source teaser: date -> title -> summary, each its own row,
+   regardless of the authored sequence. All caption text is white. */
+.cards.overlay .cards-card-title,
+.cards.overlay .cards-card-date,
+.cards.overlay .cards-card-summary {
   color: var(--skoda-white);
+}
+
+/* date: small, semibold, like the source .entry-meta */
+.cards.overlay .cards-card-date {
+  order: 1;
+  font-size: var(--body-font-size-xs);
+  font-weight: var(--weight-semibold);
+  line-height: 1.2;
+}
+
+.cards.overlay .cards-card-title {
+  order: 2;
+}
+
+/* summary: body-size supporting text, clamped to keep the caption compact */
+.cards.overlay .cards-card-summary {
+  order: 3;
+  font-size: var(--body-font-size-s);
+  line-height: var(--line-height-body);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 /* toolbar sits transparent in the overlay context */

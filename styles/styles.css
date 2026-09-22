@@ -80,6 +80,11 @@
   --scrim-h: linear-gradient(270deg, transparent, rgb(0 0 0 / 25%));
   --scrim-v: linear-gradient(180deg, transparent, rgb(0 0 0 / 10%));
 
+  /* bottom-anchored legibility scrim under the overlay caption text — guarantees the
+     white title/date/summary stay >= 4.5:1 even on bright images (the source dual scrim
+     alone is too weak on light photos). Ramps from opaque-ish at the base to clear ~55% up. */
+  --scrim-text: linear-gradient(0deg, rgb(0 0 0 / 70%), rgb(0 0 0 / 40%) 25%, transparent 55%);
+
   /* layout / nav */
   --content-max-width: 1248px;
   --nav-height: 108px;
