@@ -1,36 +1,41 @@
-/* stylelint-disable max-line-length */
+/*
+ * SKODA Next — Škoda's corporate typeface (their own IP, no foundry license gate).
+ * Self-hosted from fonts/ (woff2 pulled from Škoda's public CDN, cdn.skoda-storyboard.com).
+ * Loaded lazily by loadFonts() in scripts.js, never eager (render-blocking).
+ *
+ * Source ships weights 300/400/600/700 (no 500). Upright only for now; matching italics exist
+ * on the CDN but em/i currently uses browser-synthesized italic (see SKODA-106 follow-up).
+ * font-display: swap → text paints immediately in the size-adjusted fallback (brand.css) and
+ * swaps to SKODA Next once loaded, minimizing CLS.
+ */
 @font-face {
-  font-family: roboto-condensed;
+  font-family: skoda next;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 300;
   font-display: swap;
-  src: url('../fonts/roboto-condensed-bold.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('../fonts/skoda-next-light.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: roboto;
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/roboto-bold.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: roboto;
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('../fonts/roboto-medium.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: roboto;
+  font-family: skoda next;
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('../fonts/roboto-regular.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('../fonts/skoda-next-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: skoda next;
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/skoda-next-semibold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: skoda next;
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/skoda-next-bold.woff2') format('woff2');
 }

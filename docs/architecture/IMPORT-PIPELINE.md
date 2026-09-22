@@ -81,7 +81,13 @@ bash tools/importer/upload-en-stories.sh
 3. **Reuse or add parsers** — most new rails reuse `carousel` / `cards-*`; add a parser only for genuinely new block shapes.
 4. **Reuse or clone a transformer** — e.g. a press-release detail is ~`skoda-story-cleanup` with a different category/section; clone and adjust.
 5. **Assemble `import-<name>.js`**, bundle it, create `urls-<name>.txt` + `upload-<name>.sh`.
-6. **Pre-condition media** (image-heavy types) — strip/replace >~10 MB masters or the content bus 409s on publish.
+6. **Ingest + rewrite media** — after the content import, run the media toolkit
+   (`tools/importer/media/`, see its `README.md`): `npm run media:build -- --pages content/<path>.plain.html`
+   dedups to logical masters, **pre-conditions >~10 MB masters** (else the content bus 409s on publish),
+   optionally ingests to the AEM DAM / DA archive, and writes `media-manifest.json`; then
+   `npm run media:apply -- --pages content/<path>.plain.html` rewrites `<img src>` to each image's
+   `delivery_url`. EDS auto-ingests those absolute URLs into its media bus at publish (self-hosted + webp),
+   so the published page carries no legacy-CDN dependency and gets a masters-only responsive upgrade.
 7. **Run → preview → publish → validate** the index picked it up.
 
 This is exactly how the M1 backlog scopes Series (SKODA-207), the Media Room home/Model/Press-Kit pages, and the full Images/Videos listings — assembly of the existing pipeline, not new machinery.

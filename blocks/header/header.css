@@ -19,17 +19,6 @@ header .nav-wrapper {
   width: 100%;
   background-color: var(--background-color);
   z-index: 20;
-
-  /*
-   * Header-scoped body type scale (Škoda _FOUNDATIONS §3: m16 / s14 / xs13).
-   * The GLOBAL tokens in styles.css still carry Adobe boilerplate sizes
-   * (18/16/14) — rescaling site typography is SKODA-106's job. Scope the
-   * correct values here so the header hits pixel parity now; REMOVE this
-   * override once SKODA-106 sets the global scale.
-   */
-  --body-font-size-m: 16px;
-  --body-font-size-s: 14px;
-  --body-font-size-xs: 13px;
 }
 
 /* --- Main nav row (generic element rules first, ascending specificity) ------ */

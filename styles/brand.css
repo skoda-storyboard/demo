@@ -1,58 +1,54 @@
 /*
- * Brand tokens + fallback @font-face.
+ * Škoda brand primitives — raw palette + @font-face fallback descriptors.
+ *
  * This file is exempt from color-no-hex and declaration-strict-value in .stylelintrc.json:
  * raw brand values (hex) and @font-face fallback descriptors live here; styles.css consumes
  * them via var(). Loaded eagerly in head.html so the size-adjusted fallback fonts apply
- * before the web fonts arrive (avoids CLS).
+ * before the SKODA Next web font arrives (avoids CLS).
  *
- * NOTE: these are the stock aem-boilerplate values, relocated as-is to make lint pass on the
- * scaffold. SKODA-106 re-derives the real Škoda design tokens here.
+ * Tokens re-derived (not ported) from the source design system per SKODA-106 and the verified
+ * measurements in docs/ui-specs/_FOUNDATIONS.md (§2 colors, §3 typography). The primitive layer
+ * is the only place raw hex is allowed; everything downstream must consume the semantic var()s.
  */
 
 :root {
-  /* colors */
-  --light-color: #f8f8f8;
-  --dark-color: #505050;
-  --text-color: #131313;
-  --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
-  --border-color: #dadada;
-
-  /*
-   * Škoda brand tokens — MINIMAL subset added for SKODA-301 (header/mega-menu).
-   * SKODA-106 owns the full re-derivation of the design system; these are the
-   * values the header consumes today (measured in docs/ui-specs/_FOUNDATIONS.md
-   * §2 + header-megamenu.md). Keep in sync when SKODA-106 lands.
-   */
+  /* primitive colors (§2) */
+  --skoda-green: #0e3a2f;
+  --skoda-green-emerald: #78faae;
   --skoda-ink: #161718;
   --skoda-black: #000;
   --skoda-white: #fff;
   --skoda-grey-100: #f5f5f5;
   --skoda-grey-200: #e6e6e6;
   --skoda-grey-500: #7c7d7e;
-  --skoda-green: #0e3a2f;
+  --skoda-grey-border: #dadada;
 
-  /* header/nav-specific (candidate tokens, _FOUNDATIONS.md §8) */
+  /* semantic color map (consumed downstream via var()) */
+  --background-color: var(--skoda-white);
+  --light-color: var(--skoda-grey-100);
+  --dark-color: var(--skoda-green);
+  --text-color: var(--skoda-ink);
+  --link-color: var(--skoda-ink);
+  --link-hover-color: var(--skoda-green);
+  --border-color: var(--skoda-grey-border);
+
+  /* header/nav-specific (candidate tokens, _FOUNDATIONS.md §8; SKODA-301) */
   --dropdown-shadow: 0 3px 8px rgb(0 0 0 / 15%);
   --dropdown-hover-bg: #f1f1f1;
   --divider-color: #e4e4e4;
-
-  /* weights */
-  --weight-light: 300;
-  --weight-regular: 400;
-  --weight-semibold: 600;
-  --weight-bold: 700;
 }
 
-/* fallback fonts */
+/*
+ * Fallback font for the SKODA Next stack. SKODA Next is self-hosted and embedded via fonts.css
+ * (lazy); this size-adjusted local fallback matches its horizontal metrics so text painted with
+ * font-display: swap does not reflow when the real face arrives (minimizes CLS).
+ *
+ * size-adjust 87.32% measured: SKODA Next's average advance width is ~0.8732× Helvetica/Arial's
+ * for a representative Latin + Czech-diacritics sample (4232 vs 4846 at 100px). Re-measure if the
+ * font version changes.
+ */
 @font-face {
-  font-family: roboto-condensed-fallback;
-  size-adjust: 88.82%;
-  src: local('Arial');
-}
-
-@font-face {
-  font-family: roboto-fallback;
-  size-adjust: 99.529%;
-  src: local('Arial');
+  font-family: skoda-next-fallback;
+  size-adjust: 87.32%;
+  src: local('Helvetica'), local('Arial');
 }
