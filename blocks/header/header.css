@@ -139,6 +139,11 @@ header nav[aria-expanded='true'] .nav-topbar-utility {
   padding: var(--spacing-s) 0;
 }
 
+/* locale switcher cloned into the drawer footer — hidden except in open drawer */
+header nav .nav-locales {
+  display: none;
+}
+
 /* section switcher (Stories | Media Room) — full-width 50/50 tab bar on mobile */
 header .nav-section-switcher {
   display: flex;
@@ -415,6 +420,28 @@ header nav .nav-search-input::placeholder {
   header nav[aria-expanded='false'] {
     max-width: none;
     min-width: 0;
+  }
+
+  /* locale switcher pinned to the bottom of the open drawer */
+  header nav[aria-expanded='true'] .nav-locales {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-m);
+    margin-top: auto;
+    padding: var(--spacing-l) 0;
+    border-top: 1px solid var(--divider-color);
+    font-size: var(--body-font-size-s);
+  }
+
+  header nav[aria-expanded='true'] .nav-locales a {
+    color: var(--skoda-grey-500);
+    text-decoration: none;
+  }
+
+  header nav[aria-expanded='true'] .nav-locales strong {
+    color: var(--skoda-ink);
+    font-weight: var(--weight-bold);
   }
 
   /* blurred backdrop behind the open drawer (covers the whole viewport) */

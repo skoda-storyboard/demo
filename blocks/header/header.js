@@ -168,6 +168,17 @@ export default async function decorate(block) {
       mail.className = 'icon icon-mail';
       subscribeLink.prepend(mail);
     }
+    // The topbar (incl. the locale switcher) is lifted OUT of <nav>, so it can't
+    // appear inside the mobile drawer. Clone the locale group into a drawer
+    // footer so the language list shows at the bottom on mobile (CSS shows it
+    // only in the open drawer; the original stays in the topbar for desktop).
+    const localeGroup = [...navTopbar.querySelectorAll(':scope .default-content-wrapper > p')]
+      .find((p) => p.querySelector('strong'));
+    if (localeGroup) {
+      const localeFooter = localeGroup.cloneNode(true);
+      localeFooter.className = 'nav-locales';
+      nav.append(localeFooter);
+    }
   }
 
   const navBrand = nav.querySelector('.nav-brand');
