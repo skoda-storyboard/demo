@@ -43,8 +43,8 @@ site side:
 
 | WP template (body class) | Page type | Side | Composes | Spec | Ticket |
 |---|---|---|---|---|---|
-| `template-homepage` | Storyboard home | STO | `carousel-rails` (promo-box featured + category rails), `card-teaser`, `hero`, `newsletter`, `social-share` | `template-home.md` | SKODA-604/(home) |
-| `template-media-room` | Media Room home | MR | `carousel-rails` (promo-box + `cover-box`/`cover-box dark` rails), `card-teaser` | `template-home.md` | (MR home) |
+| `template-homepage` | Storyboard home | STO | `stories` (Latest Stories Load-more feed), `carousel-rails` (promo-box featured + category rails), `card-teaser`, `hero`, `newsletter`, `social-share` | `template-home.md` + `stories.md` | SKODA-604/(home), SKODA-211 (feed) |
+| `template-media-room` | Media Room home | MR | `carousel-rails` (promo-box + `cover-box`/`cover-box dark` rails incl. News press-release rail), `card-teaser` | `template-home.md` | (MR home) |
 | `post-template-template-layout-article` + `siteorigin-panels` (`single-post`) | Story detail | STO | `hero`, rich text, `embeds`, `gallery-lightbox`, sidebar widgets, `social-share`, `tags`, `newsletter`, `carousel-rails` (related) | `story-detail.md` | SKODA-604, 801 |
 | `press_release-template-default` (`single-press_release`) | Press release detail | MR | text title (no hero), lead teaser + bullet-points + rich text, secondary column (`downloads`/media-kit + `tags` + `newsletter` + ad), full-bleed dark related band | `template-press-release.md` | **SKODA-607** |
 | `skoda_model-template-default` (`single-skoda_model`) + siteorigin | Model page | MR | `hero`, "Model Description" rich text, **5 related rails** (`carousel-rails`/`story-rail`), `card-teaser` | `template-model-page.md` | **SKODA-208** |
