@@ -1,0 +1,53 @@
+/*
+ * Story rail (SKODA-212) — the index-driven rail wrapper.
+ *
+ * This block builds a `carousel` (all rail chrome + card visuals live there and
+ * in the shared card-teaser primitive). This file owns ONLY the rail header
+ * (heading + "view all") and the reserved height that prevents layout shift
+ * while the inner carousel is deferred-built. Tokens only; scoped to .story-rail.
+ */
+
+.story-rail {
+  width: min(100%, var(--content-max-width));
+  margin-inline: auto;
+}
+
+/* header: heading left, "view all" right (source: h2 + a.link-all) */
+.story-rail-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-m);
+  margin-block-end: var(--grid-gutter);
+}
+
+.story-rail-heading {
+  margin: 0;
+  font-size: var(--section-heading, var(--heading-font-size-l));
+  font-weight: var(--weight-semibold);
+  color: var(--text-color);
+}
+
+.story-rail-viewall {
+  flex: none;
+  color: var(--link-color);
+  font-size: var(--body-font-size-s);
+  text-decoration: none;
+}
+
+.story-rail-viewall:hover {
+  text-decoration: underline;
+}
+
+/*
+ * Reserve vertical space until the deferred carousel builds (CLS guard,
+ * carousel-rails.md §7). ~190px ≈ one row of 16:9 cards; released once the
+ * carousel is in the DOM (.is-built) so the real height takes over.
+ */
+.story-rail-mount {
+  min-height: 190px;
+}
+
+.story-rail-mount.is-built {
+  min-height: 0;
+}
