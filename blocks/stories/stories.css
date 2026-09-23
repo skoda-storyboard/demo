@@ -128,22 +128,35 @@
   border-color: var(--skoda-white);
 }
 
-/* ===== breakpoints: featured 2-up + 3-up split (source-measured) ===== */
+/*
+ * ===== breakpoints: exact source parity =====
+ * Extracted verbatim from the source bundle (media-room CSS, `.search-results-item`):
+ *   base            → flex 0 0 100%                  (1-up)
+ *   min-width:768px → item 50% · :first-child 100%   (lead full-width, then 2-up)
+ *   min-width:992px → item 33.33% · :nth-child(-n+2) 50%  (2 featured, then 3-up)
+ * The 768 band's first-child stays full width up to 991.98px, then the ≥992 rule
+ * resets it into the 2-featured split. Widths match the source to the pixel.
+ */
 
-/* tablet: 2-up (all cards half width) */
+/* tablet: lead card full-width, the rest 2-up */
 @media (width >= 768px) {
   .stories .stories-item {
     flex-basis: 50%;
   }
+
+  .stories .stories-item:first-child {
+    flex-basis: 100%;
+  }
 }
 
-/*
- * desktop: the featured split — first two cards stay large (2-up, 50%), the rest
- * go 3-up (33.33%). Matches the live /en/ Latest Stories feed.
- */
+/* desktop: 2 featured (50%) then 3-up (33.33%) */
 @media (width >= 992px) {
   .stories .stories-item {
     flex-basis: 33.333%;
+  }
+
+  .stories .stories-item:first-child {
+    flex-basis: 50%; /* reset the tablet full-width lead */
   }
 
   .stories .stories-item:nth-child(-n + 2) {
