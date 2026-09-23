@@ -116,6 +116,13 @@
   --dropdown-radius: 4px;
   --body-font-size-2xs: 12px;
 
+  /* footer (SKODA-304) — measured from source .footer-content / .social / app badges */
+  --footer-padding-y: 4rem;
+  --social-icon-size: 40px;
+  --social-icon-bg: var(--skoda-black);
+  --app-badge-w: 135px;
+  --app-badge-h: 40px;
+
   /* breakpoint tokens — for JS / container-query reuse ONLY. CSS custom properties cannot be
      used inside @media conditions, so the literals 768/992/1080 below remain the source of
      truth for media queries (canonical ladder per _FOUNDATIONS.md §1). */
