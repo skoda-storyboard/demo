@@ -41,6 +41,8 @@ const LABELS = {
 
 /**
  * Build an inline SVG icon (Trusted-Types safe: namespaced elements, no innerHTML).
+ * Filled house-style matching the project icon set (icons/mail.svg, search.svg):
+ * 24×24 viewBox, solid fill via currentColor.
  * @param {string[]} paths one or more SVG path `d` strings
  * @returns {SVGElement}
  */
@@ -48,13 +50,9 @@ function svgIcon(paths) {
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('width', '20');
-  svg.setAttribute('height', '20');
-  svg.setAttribute('fill', 'none');
-  svg.setAttribute('stroke', 'currentColor');
-  svg.setAttribute('stroke-width', '2');
-  svg.setAttribute('stroke-linecap', 'round');
-  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('width', '24');
+  svg.setAttribute('height', '24');
+  svg.setAttribute('fill', 'currentColor');
   svg.setAttribute('aria-hidden', 'true');
   paths.forEach((d) => {
     const p = document.createElementNS(NS, 'path');
@@ -64,11 +62,12 @@ function svgIcon(paths) {
   return svg;
 }
 
-// icon path sets (Feather-style): plus-in-square, download, link
+// filled icon path sets in the project house-style (24×24, solid fill):
+// add-to-box (plus in rounded square), download (tray + arrow), link (chain).
 const ICONS = {
-  addToBox: ['M3 3h18v18H3z', 'M12 8v8', 'M8 12h8'],
-  download: ['M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', 'M7 10l5 5 5-5', 'M12 15V3'],
-  copyLink: ['M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1', 'M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1'],
+  addToBox: ['M4,3h16c0.6,0,1,0.4,1,1v16c0,0.6-0.4,1-1,1H4c-0.6,0-1-0.4-1-1V4C3,3.4,3.4,3,4,3z M11,11H7v2h4v4h2v-4h4v-2h-4V7h-2V11z'],
+  download: ['M12,3c0.6,0,1,0.4,1,1v9.6l2.9-2.9c0.4-0.4,1-0.4,1.4,0c0.4,0.4,0.4,1,0,1.4l-4.6,4.6c-0.4,0.4-1,0.4-1.4,0l-4.6-4.6c-0.4-0.4-0.4-1,0-1.4c0.4-0.4,1-0.4,1.4,0l2.9,2.9V4C11,3.4,11.4,3,12,3z M4,15c0.6,0,1,0.4,1,1v3h14v-3c0-0.6,0.4-1,1-1s1,0.4,1,1v4c0,0.6-0.4,1-1,1H4c-0.6,0-1-0.4-1-1v-4C3,15.4,3.4,15,4,15z'],
+  copyLink: ['M10.6,13.4c-0.4-0.4-0.4-1,0-1.4l3.5-3.5c0.4-0.4,1-0.4,1.4,0s0.4,1,0,1.4l-3.5,3.5C11.6,13.8,11,13.8,10.6,13.4z M9.5,17.7l-1.4,1.4c-1,1-2.6,1-3.5,0s-1-2.6,0-3.5l1.4-1.4c0.4-0.4,0.4-1,0-1.4s-1-0.4-1.4,0l-1.4,1.4c-1.8,1.8-1.8,4.6,0,6.4s4.6,1.8,6.4,0l1.4-1.4c0.4-0.4,0.4-1,0-1.4S9.9,17.3,9.5,17.7z M20.4,3.6c-1.8-1.8-4.6-1.8-6.4,0l-1.4,1.4c-0.4,0.4-0.4,1,0,1.4s1,0.4,1.4,0l1.4-1.4c1-1,2.6-1,3.5,0s1,2.6,0,3.5l-1.4,1.4c-0.4,0.4-0.4,1,0,1.4s1,0.4,1.4,0l1.4-1.4C22.2,8.2,22.2,5.4,20.4,3.6z'],
 };
 
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

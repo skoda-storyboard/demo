@@ -390,6 +390,11 @@ body.gallery-lightbox-open {
   color: var(--gallery-accent);
 }
 
+.gallery .gallery-lightbox-action svg {
+  width: 20px;
+  height: 20px;
+}
+
 /* desktop: 2-column detail layout — image left, caption/detail panel right
    (matches the live MR image-detail lightbox) */
 @media (width >= 768px) {
