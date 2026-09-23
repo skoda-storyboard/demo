@@ -1,8 +1,9 @@
 /*
  * Stories feed block (SKODA-214). Scoped to .stories; tokens only.
- * Measured targets: template-home.md §5 (section heading 26px/32.5/600, content
- * cap 1248, dark band #0e3a2f) + card-teaser.md for the cell. Grid + load-more
- * mirror the faceted listing (SKODA-402) so the two feeds read identically.
+ * Measured spec: stories.md (grid ladder, heading, Load-more) + card-teaser.md
+ * (the overlay card: dual scrim, radius/shadow, white date+title over the image).
+ * Grid + Load-more mirror the faceted listing (SKODA-402) so the two feeds read
+ * identically; the card reuses SKODA-201's overlay design + shared tokens.
  *
  * Layer order (docs/guardrails/css-guidelines.md): fluid + intrinsic first;
  * breakpoints (768 / 992) only for the grid column-count transitions.
@@ -13,7 +14,7 @@
   margin-inline: auto;
 }
 
-/* --- section heading (h3-scale, per template-home.md §5) --- */
+/* --- section heading (h3-scale, stories.md §3) --- */
 .stories .stories-heading {
   margin-block: 0 var(--grid-gutter);
   font-size: var(--heading-font-size-l); /* 26px */
@@ -32,20 +33,15 @@
 }
 
 /*
- * Feed layout — the source "Latest Stories" is a FLEX-WRAP featured grid, not a
- * uniform grid (measured live on /en/ at 1440): the first two cards are large
- * (2-up, flex-basis 50%) and the rest are smaller (3-up, flex-basis 33.33%).
+ * Feed grid — flex-wrap featured grid (stories.md §3), not a uniform grid.
  * Inter-card gutter = 2×10px side padding (20px, --grid-gutter) + 20px row gap,
- * with box-sizing: border-box so the basis percentages stay exact. Fluid/
- * intrinsic 1-up first; the 2+3 featured split engages at the desktop breakpoint.
+ * box-sizing: border-box so the basis percentages stay exact. Negative inline
+ * margin cancels the outer cells' padding so rows span full width.
  */
 .stories .stories-items {
   display: flex;
   flex-wrap: wrap;
   padding: 0;
-
-  /* negative inline margin cancels the outer cards' side padding so the row
-     still spans full width; block margin 0 */
   margin: 0 calc(var(--grid-gutter) / -2);
   list-style: none;
 }
@@ -57,53 +53,108 @@
   margin-block-end: var(--grid-gutter);
 }
 
+/* --- overlay card-teaser (card-teaser.md): image + scrim + white caption --- */
 .stories .stories-item-link {
+  position: relative;
   display: block;
-  color: inherit;
+  color: var(--skoda-white);
   text-decoration: none;
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
 }
 
-.stories .stories-item-image img {
+.stories .stories-item-media {
+  position: relative;
+  overflow: hidden;
+  line-height: 0;
+  border-radius: var(--card-radius);
+}
+
+.stories .stories-item-media picture,
+.stories .stories-item-media img {
   display: block;
   width: 100%;
-  height: auto;
+}
+
+.stories .stories-item-media img {
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  border-radius: var(--facet-radius);
+  transition: scale 0.5s cubic-bezier(0.165, 0.85, 0.45, 1);
 }
 
-.stories .stories-item-body h3 {
-  margin-block: 0.5em 0.25em;
-  font-size: var(--body-font-size-m);
+/* caption: absolute over the image bottom-left, white on a dual scrim */
+.stories .stories-item-body {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-m);
+  background-image: var(--scrim-text), var(--scrim-h), var(--scrim-v);
 }
 
-.stories .stories-item-body p {
+.stories .stories-item-date {
+  font-size: var(--body-font-size-xs);
+  font-weight: var(--weight-semibold);
+  line-height: 1.2;
+  color: var(--skoda-white);
+}
+
+.stories .stories-item-title {
   margin: 0;
-  font-size: var(--body-font-size-s);
-  color: var(--dark-color);
+  font-size: var(--heading-font-size-s); /* 18px */
+  line-height: 1.2;
+  font-weight: var(--weight-regular);
+  color: var(--skoda-white);
+}
+
+/* --- interaction states --- */
+@media (hover: hover) {
+  .stories .stories-item-link:hover .stories-item-media img {
+    scale: 1.02;
+  }
 }
 
 .stories .stories-item-link:focus-visible {
-  outline: 2px solid var(--facet-active);
-  outline-offset: 2px;
+  outline: 2px solid var(--skoda-white);
+  outline-offset: -2px;
 }
 
-/* --- load-more: shared ghost pill (matches the listing) --- */
+@media (prefers-reduced-motion: reduce) {
+  .stories .stories-item-media img {
+    transition: none;
+  }
+}
+
+/* --- load-more: ghost pill (stories.md §3, measured) --- */
 .stories .stories-loadmore {
   display: flex;
   justify-content: center;
-  margin-block: var(--grid-gutter);
+  padding-block: var(--spacing-m); /* wrapper 16px 0 */
 }
 
 .stories .stories-loadmore-btn {
-  padding: 8px 48px;
-  font-size: var(--body-font-size-m);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: var(--spacing-xs) 48px; /* 8px 48px */
+  font-size: var(--body-font-size-m); /* 16px */
   font-weight: var(--weight-semibold);
-  color: var(--text-color);
+  color: var(--skoda-ink);
   background: var(--skoda-white);
   border: 2px solid var(--skoda-ink);
-  border-radius: var(--pill-radius);
+  border-radius: var(--pill-radius); /* 50px */
   cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+/* hover: subtle light-grey fill (source #f1f1f1 → --dropdown-hover-bg), not dark */
+.stories .stories-loadmore-btn:hover {
+  background: var(--dropdown-hover-bg);
 }
 
 .stories .stories-loadmore-btn:focus-visible {
@@ -112,54 +163,59 @@
 }
 
 /*
- * Dark band variant: a home section authored with Section Style "cover-box dark"
- * places the feed on the dark-green band (template-home.md §4). Text + ghost pill
- * invert for ≥ 4.5:1 contrast over #0e3a2f (§7).
- */
-.section.cover-box.dark .stories .stories-heading,
-.section.cover-box.dark .stories .stories-item-body h3,
-.section.cover-box.dark .stories .stories-item-body p {
-  color: var(--skoda-white);
-}
-
-.section.cover-box.dark .stories .stories-loadmore-btn {
-  color: var(--skoda-white);
-  background: transparent;
-  border-color: var(--skoda-white);
-}
-
-/*
- * ===== breakpoints: exact source parity =====
- * Extracted verbatim from the source bundle (media-room CSS, `.search-results-item`):
- *   base            → flex 0 0 100%                  (1-up)
- *   min-width:768px → item 50% · :first-child 100%   (lead full-width, then 2-up)
+ * ===== breakpoints: exact source parity (stories.md §3 + source CSS) =====
+ *   base            → flex 0 0 100%                       (1-up)
+ *   min-width:768px → item 50% · :first-child 100%        (lead full-width, then 2-up)
  *   min-width:992px → item 33.33% · :nth-child(-n+2) 50%  (2 featured, then 3-up)
- * The 768 band's first-child stays full width up to 991.98px, then the ≥992 rule
- * resets it into the 2-featured split. Widths match the source to the pixel.
+ * The featured split only applies to the .stories-featured variant; a plain
+ * .stories-cols-N variant keeps a uniform N-up grid.
  */
 
-/* tablet: lead card full-width, the rest 2-up */
+/* tablet: lead card full-width, the rest 2-up (source :first-child 100% <992) */
 @media (width >= 768px) {
-  .stories .stories-item {
+  .stories.stories-featured .stories-item {
     flex-basis: 50%;
   }
 
-  .stories .stories-item:first-child {
+  .stories.stories-featured .stories-item:first-child {
     flex-basis: 100%;
   }
 }
 
 /* desktop: 2 featured (50%) then 3-up (33.33%) */
 @media (width >= 992px) {
-  .stories .stories-item {
+  .stories.stories-featured .stories-item {
     flex-basis: 33.333%;
   }
 
-  .stories .stories-item:first-child {
+  .stories.stories-featured .stories-item:first-child {
     flex-basis: 50%; /* reset the tablet full-width lead */
   }
 
-  .stories .stories-item:nth-child(-n + 2) {
+  .stories.stories-featured .stories-item:nth-child(-n + 2) {
     flex-basis: 50%;
+  }
+}
+
+/* plain uniform-grid variant (columns: N) */
+@media (width >= 768px) {
+  .stories.stories-cols-2 .stories-item,
+  .stories.stories-cols-3 .stories-item,
+  .stories.stories-cols-4 .stories-item {
+    flex-basis: 50%;
+  }
+}
+
+@media (width >= 992px) {
+  .stories.stories-cols-2 .stories-item {
+    flex-basis: 50%;
+  }
+
+  .stories.stories-cols-3 .stories-item {
+    flex-basis: 33.333%;
+  }
+
+  .stories.stories-cols-4 .stories-item {
+    flex-basis: 25%;
   }
 }
