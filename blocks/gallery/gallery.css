@@ -188,7 +188,7 @@ body.gallery-lightbox-open {
   inset: 0;
   z-index: 99999;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: 1fr;
   width: 100%;
   height: 100%;
   background: var(--gallery-backdrop);
@@ -227,13 +227,17 @@ body.gallery-lightbox-open {
   animation: gallery-content-in 0.3s ease both;
 }
 
-/* top bar: just the close ✕, right-aligned (matches the source colorbox chrome) */
+/* close bar: floats at the top-right corner (over the detail-panel column),
+   so the stage gets full height — matches the source #cboxClose placement */
 .gallery .gallery-lightbox-top {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--spacing-m);
-  padding: 0 var(--spacing-l);
+  padding: var(--spacing-s) var(--spacing-m);
 }
 
 .gallery .gallery-lightbox-close {
@@ -260,7 +264,9 @@ body.gallery-lightbox-open {
   align-items: flex-start;
   justify-content: center;
   min-height: 0;
-  padding: var(--spacing-m) var(--spacing-m) calc(var(--spacing-xxl) + var(--spacing-m));
+
+  /* top padding clears the floating close ✕; bottom clears the fixed controls */
+  padding: var(--spacing-xxl) var(--spacing-m) calc(var(--spacing-xxl) + var(--spacing-m));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -364,8 +370,8 @@ body.gallery-lightbox-open {
   color: var(--gallery-accent);
 }
 
-/* detail-panel action buttons: white discs, dark ring + dark icon, right-aligned
-   (matches the live Media-Room chrome: 40×40, 2px #161718 border) */
+/* detail-panel action buttons: dark filled discs with white icons, right-aligned
+   (matches the live Media-Room chrome — 40×40 ink circles) */
 .gallery .gallery-lightbox-actions {
   display: flex;
   gap: var(--spacing-s);
@@ -379,20 +385,12 @@ body.gallery-lightbox-open {
   justify-content: center;
   width: 40px;
   height: 40px;
-  border: 2px solid var(--skoda-ink);
+  border: 0;
   border-radius: 50%;
   padding: 0;
-  background: var(--skoda-white);
-  color: var(--skoda-ink);
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-.gallery .gallery-lightbox-action:hover,
-.gallery .gallery-lightbox-action.is-copied {
-  border-color: var(--gallery-accent);
-  background: var(--gallery-accent);
+  background: var(--skoda-ink);
   color: var(--skoda-white);
+  cursor: pointer;
 }
 
 .gallery .gallery-lightbox-action svg {
@@ -424,10 +422,12 @@ body.gallery-lightbox-open {
 /* desktop: 2-column detail layout — image left, caption/detail panel right
    (matches the live MR image-detail lightbox) */
 @media (width >= 768px) {
-  /* desktop: the stage is a fixed height row again (no page scroll needed) */
+  /* desktop: fixed-height row with generous side margins so the image has clear
+     left/right breathing room (never edge-to-edge) — matches the live centred
+     content box */
   .gallery .gallery-lightbox-stage {
     align-items: center;
-    padding: var(--spacing-m);
+    padding: var(--spacing-l) clamp(var(--spacing-xl), 8vw, var(--spacing-xxl));
     overflow: hidden;
   }
 
@@ -441,21 +441,30 @@ body.gallery-lightbox-open {
   .gallery .gallery-lightbox-image-frame {
     flex: 1 1 auto;
     align-self: stretch;
+    align-items: flex-start;  /* image flush to the top (no top gap) */
+    justify-content: center;  /* centre horizontally → left/right space only */
     max-height: none; /* fill the row (mobile caps to 70vh) */
   }
 
-  /* fill the stage edge-to-edge on desktop (mobile keeps contain) */
+  /* live: the image is centred in a wider column with clear left/right space
+     (live is 984px in a 1213px column ≈ 81%). Cap the image width below the
+     column and centre it so a landscape photo gets equal side gaps, matching
+     .cboxPhoto { margin:auto }. */
   .gallery .gallery-lightbox-image {
-    width: 100%;
-    height: 100%;
-    max-height: none;
-    object-fit: cover;
+    width: auto;
+    height: auto;
+    max-width: 82%;
+    max-height: 100%;
+    object-fit: contain;
   }
 
   .gallery .gallery-lightbox-caption {
     flex: 0 0 clamp(280px, 28%, 380px);
     max-width: none;
     align-self: stretch;
+
+    /* start the panel content below the floating close-icon row */
+    padding-top: var(--spacing-xxl);
     text-align: left;
     overflow-y: auto;
   }
@@ -503,15 +512,17 @@ body.gallery-lightbox-open {
   padding: 18px;
   background: transparent;
   color: var(--skoda-white);
-  font-size: 24px;
   line-height: 1;
   cursor: pointer;
-  transition: color 0.2s ease;
 }
 
-.gallery .gallery-lightbox-prev:hover,
-.gallery .gallery-lightbox-next:hover {
-  color: var(--gallery-accent);
+/* larger, bolder chevrons so the arrows read at the live nav size (the thin
+   ‹ › punctuation glyphs render much smaller than their font-size) */
+.gallery .gallery-lightbox-prev::before,
+.gallery .gallery-lightbox-next::before {
+  font-size: 40px;
+  font-weight: 300;
+  line-height: 1;
 }
 
 .gallery .gallery-lightbox-prev::before {
