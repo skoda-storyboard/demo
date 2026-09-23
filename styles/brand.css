@@ -40,6 +40,12 @@
   /* hero scrim (dual gradient over the image; _FOUNDATIONS §8, hero.md §3; SKODA-202) */
   --scrim-h: linear-gradient(270deg, transparent, rgb(0 0 0 / 25%));
   --scrim-v: linear-gradient(180deg, transparent, rgb(0 0 0 / 10%));
+
+  /* gallery lightbox (gallery-lightbox.md §3; SKODA-203). Accent reuses the
+     brand emerald; divider is the source lightbox top-bar rule colour. */
+  --gallery-accent: var(--skoda-green-emerald);
+  --gallery-divider: #5a5b5c;
+  --gallery-backdrop: rgb(0 0 0 / 95%);
 }
 
 /*
