@@ -358,8 +358,17 @@ export default function decorate(block) {
     active = i;
     const base = items[i].src.split('?')[0];
     const mainImg = main.querySelector('img');
+    // show a placeholder while the new main rendition downloads, cleared on
+    // load or error so it never sticks (mirrors the lightbox loading graphic)
+    main.classList.add('is-loading');
+    const done = () => main.classList.remove('is-loading');
     mainImg.src = `${base}?width=2000&format=webply&optimize=medium`;
     mainImg.alt = items[i].alt;
+    if (mainImg.complete) done();
+    else {
+      mainImg.addEventListener('load', done, { once: true });
+      mainImg.addEventListener('error', done, { once: true });
+    }
     main.setAttribute('aria-label', `${LABELS.open} ${i + 1}`);
     items.forEach((it, j) => it.thumbButton.setAttribute('aria-current', j === i ? 'true' : 'false'));
   };
