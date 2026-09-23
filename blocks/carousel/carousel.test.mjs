@@ -34,7 +34,7 @@ globalThis.document = {
   addEventListener: () => {},
 };
 
-const { arrowState, railVariant } = await import('./carousel.js');
+const { arrowState, railVariant, dotState } = await import('./carousel.js');
 
 // --- arrowState: arrows enable/disable at the track ends -------------------
 
@@ -78,4 +78,38 @@ test('railVariant: a dated card gets the white overlay caption', () => {
 
 test('railVariant: a taxonomy card (no date) gets the below-image caption', () => {
   assert.deepEqual(railVariant(false), ['carousel-caption']);
+});
+
+// --- dotState: active dot from reachable scroll (SKODA-212 review P2) -------
+
+test('dotState: left edge selects the first dot', () => {
+  const s = dotState({ scrollLeft: 0, scrollWidth: 2000, clientWidth: 800 });
+  assert.equal(s.active, 0);
+});
+
+test('dotState: right edge selects the LAST dot on a partial final page', () => {
+  // The reported regression: 6-card desktop rail, scrollWidth 1374, viewport 944.
+  // max scroll = 430 (< a full page-width), so round(430/944)=0 would wrongly
+  // keep dot 0 active. dotState maps the right edge to pages-1.
+  const s = dotState({ scrollLeft: 430, scrollWidth: 1374, clientWidth: 944 });
+  assert.equal(s.pages, 2); // ceil(1374/944)
+  assert.equal(s.active, 1); // last dot, not 0
+});
+
+test('dotState: a rail that fits is a single page, dot 0', () => {
+  const s = dotState({ scrollLeft: 0, scrollWidth: 800, clientWidth: 800 });
+  assert.equal(s.pages, 1);
+  assert.equal(s.active, 0);
+});
+
+test('dotState: mid-scroll on a 3-page rail selects the middle dot', () => {
+  // pages = ceil(2400/800)=3, max=1600; halfway (800) → round(0.5*2)=1
+  const s = dotState({ scrollLeft: 800, scrollWidth: 2400, clientWidth: 800 });
+  assert.equal(s.pages, 3);
+  assert.equal(s.active, 1);
+});
+
+test('dotState: active never exceeds pages-1', () => {
+  const s = dotState({ scrollLeft: 99999, scrollWidth: 1374, clientWidth: 944 });
+  assert.equal(s.active, s.pages - 1);
 });

@@ -56,6 +56,22 @@ export function railVariant(hasDate) {
   return hasDate ? ['overlay', 'carousel-overlay'] : ['carousel-caption'];
 }
 
+/*
+ * Pure page-count + active-dot decision (exported for tests). The active dot is
+ * derived from the fraction of REACHABLE scroll, not scrollLeft/clientWidth:
+ * the browser clamps the last dot's scroll target to (scrollWidth - clientWidth),
+ * which on a partial final page is less than a full page-width — so a naive
+ * round(scrollLeft/clientWidth) never reaches the last dot (SKODA-212 review P2).
+ * Mapping scrollLeft/max onto [0, pages-1] makes the right edge select the last
+ * dot exactly and the left edge select the first.
+ */
+export function dotState({ scrollLeft = 0, scrollWidth = 0, clientWidth = 0 } = {}) {
+  const pages = clientWidth > 0 ? Math.max(1, Math.ceil(scrollWidth / clientWidth)) : 1;
+  const max = scrollWidth - clientWidth;
+  const active = max <= 0 ? 0 : Math.round((scrollLeft / max) * (pages - 1));
+  return { pages, active: Math.min(Math.max(active, 0), pages - 1) };
+}
+
 /* Turn each authored row into a shared card-teaser <li>, tagged overlay (dated)
  * or caption (taxonomy) from whether the primitive classified a date. */
 function buildCards(block) {
@@ -114,14 +130,16 @@ export default function decorate(block) {
   function syncControls() {
     rafId = 0;
     const x = track.scrollLeft;
-    const { scrollable, prevDisabled, nextDisabled } = arrowState({
+    const { prevDisabled, nextDisabled } = arrowState({
       scrollLeft: x, scrollWidth: track.scrollWidth, clientWidth: track.clientWidth,
     });
     prev.disabled = prevDisabled;
     next.disabled = nextDisabled;
 
     if (hasDots) {
-      const pages = scrollable ? Math.ceil(track.scrollWidth / track.clientWidth) : 1;
+      const { pages, active } = dotState({
+        scrollLeft: x, scrollWidth: track.scrollWidth, clientWidth: track.clientWidth,
+      });
       // rebuild dots only when the page count changes (resize)
       if (dotsNav.children.length !== pages) {
         dotsNav.replaceChildren();
@@ -130,14 +148,17 @@ export default function decorate(block) {
           dot.type = 'button';
           dot.className = 'carousel-dot';
           dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+          // last dot targets the reachable maximum so it can actually select;
+          // interior dots page by clientWidth.
           dot.addEventListener('click', () => track.scrollTo({
-            left: i * track.clientWidth,
+            left: i === pages - 1
+              ? track.scrollWidth - track.clientWidth
+              : i * track.clientWidth,
             behavior: prefersReducedMotion() ? 'auto' : 'smooth',
           }));
           dotsNav.append(dot);
         }
       }
-      const active = Math.round(x / track.clientWidth);
       [...dotsNav.children].forEach((dot, i) => {
         dot.classList.toggle('is-selected', i === active);
         if (i === active) dot.setAttribute('aria-current', 'true');

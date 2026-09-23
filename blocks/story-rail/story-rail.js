@@ -40,7 +40,10 @@ export function parseConfig(block) {
   return {
     index: cfg.index || defaultIndexUrl(),
     path: cfg.path || '',
-    template: cfg.template || '',
+    // default to the story template so a category-only rail stays scoped to
+    // stories (not press releases / other indexed content); an author widens
+    // scope by setting `template` explicitly (SKODA-212 review P1).
+    template: cfg.template || 'story',
     category: tokens(cfg.category),
     tag: tokens(cfg.tag || cfg.tags),
     heading: cfg.heading || '',
@@ -90,14 +93,7 @@ function isConfigTable(block) {
  * These rails are deferred (built near-viewport, below the fold), so images stay
  * lazy — no eager/fetchpriority (that belongs to the page's real LCP element).
  */
-function rowToCells(row) {
-  // image cell: a single <picture> child (carousel's image-cell contract)
-  const imageCell = row.image
-    ? createOptimizedPicture(row.image, row.title || '', false, [
-      { media: '(min-width: 768px)', width: '750' }, { width: '500' },
-    ])
-    : document.createElement('div');
-
+export function rowToCells(row) {
   // body cell: date paragraph (→ overlay) + title heading (link), as flat elems
   const elems = [];
   const iso = row.date || row.publisheddate || row.publishDate;
@@ -113,8 +109,21 @@ function rowToCells(row) {
   link.textContent = row.title || '';
   h.append(link);
   elems.push(h);
+  const body = { elems };
 
-  return [imageCell, { elems }];
+  // OMIT the image cell entirely when the row has no image (SKODA-212 review
+  // P2): an empty placeholder <div> would be sniffed as a second .card-teaser-
+  // body, giving an overlay card two bodies + doubled 16/9 fallback height.
+  // With only a body cell, decorateCardCells flags .card-teaser-no-image and the
+  // single body gets the correct intrinsic height (matches buildCardTeaser).
+  return row.image
+    ? [
+      createOptimizedPicture(row.image, row.title || '', false, [
+        { media: '(min-width: 768px)', width: '750' }, { width: '500' },
+      ]),
+      body,
+    ]
+    : [body];
 }
 
 export default async function decorate(block) {

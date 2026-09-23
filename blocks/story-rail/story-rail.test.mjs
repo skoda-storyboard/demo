@@ -19,18 +19,35 @@ globalThis.window = {
   hlx: { codeBasePath: '' },
   addEventListener: () => {},
 };
+// createElement returns a node that tracks tag/children/attributes so the
+// synthesized body cell (rowToCells) can be inspected.
+function el(tag) {
+  const node = {
+    tagName: String(tag).toUpperCase(),
+    className: '',
+    children: [],
+    attributes: {},
+    _text: '',
+    classList: { add() {}, contains() { return false; } },
+    setAttribute(k, v) { this.attributes[k] = String(v); },
+    getAttribute(k) { return this.attributes[k] ?? null; },
+    set href(v) { this.attributes.href = String(v); },
+    get href() { return this.attributes.href ?? ''; },
+    set textContent(v) { this._text = String(v); },
+    get textContent() { return this._text; },
+    append(...kids) { this.children.push(...kids); },
+    appendChild(kid) { this.children.push(kid); return kid; },
+  };
+  return node;
+}
 globalThis.document = {
   currentScript: { src: 'http://localhost/scripts/scripts.js' },
-  createElement: () => ({
-    className: '', children: [], attributes: {},
-    classList: { add() {}, contains() { return false; } },
-    setAttribute() {}, append() {},
-  }),
+  createElement: (tag) => el(tag),
   querySelector: () => null,
   addEventListener: () => {},
 };
 
-const { parseConfig, selectRows } = await import('./story-rail.js');
+const { parseConfig, selectRows, rowToCells } = await import('./story-rail.js');
 
 /*
  * A tiny block shim matching what readBlockConfig walks: block.querySelectorAll
@@ -128,4 +145,47 @@ test('selectRows scopes by template (drops non-matching rows)', () => {
   const cfg = parseConfig(cfgBlock([['template', 'model'], ['limit', '10']]));
   const out = selectRows(rows, cfg);
   assert.deepEqual(out.map((r) => r.title), ['Kodiaq']);
+});
+
+// --- P1: default template scopes to stories (no cross-type bleed) -----------
+
+const mixed = [
+  { path: '/en/stories/a', title: 'StoryA', template: 'story', category: 'emobility', date: '2026-03-01' },
+  { path: '/en/press-releases/b', title: 'PressB', template: 'press_release', category: 'emobility', date: '2026-04-01' },
+  { path: '/en/stories/c', title: 'StoryC', template: 'story', category: 'emobility', date: '2026-05-01' },
+];
+
+test('selectRows defaults template to story: a category-only rail excludes press releases (P1)', () => {
+  // no `template` key → parseConfig defaults to 'story'
+  const cfg = parseConfig(cfgBlock([['category', 'emobility'], ['limit', '10']]));
+  assert.equal(cfg.template, 'story');
+  const out = selectRows(mixed, cfg);
+  assert.deepEqual(out.map((r) => r.title), ['StoryC', 'StoryA']); // no PressB
+});
+
+test('selectRows: an author can still widen scope by setting template explicitly', () => {
+  const cfg = parseConfig(cfgBlock([['template', 'press_release'], ['category', 'emobility'], ['limit', '10']]));
+  const out = selectRows(mixed, cfg);
+  assert.deepEqual(out.map((r) => r.title), ['PressB']);
+});
+
+// --- P2: image-less row synthesizes ONE (body-only) cell --------------------
+
+test('rowToCells: a row with an image yields [imageCell, body] (2 cells)', () => {
+  const cells = rowToCells({
+    path: '/en/x', title: 'X', image: 'https://cdn.example/x.jpg', date: '2026-09-10',
+  });
+  assert.equal(cells.length, 2);
+  // second cell is the body object ({ elems: [...] })
+  assert.ok(Array.isArray(cells[1].elems));
+});
+
+test('rowToCells: an image-less row yields ONE body-only cell (no empty div → no double body) (P2)', () => {
+  const cells = rowToCells({ path: '/en/y', title: 'Y', date: '2026-08-01' });
+  assert.equal(cells.length, 1, 'only the body cell — no empty image placeholder');
+  const body = cells[0];
+  assert.ok(Array.isArray(body.elems), 'the single cell is the { elems } body');
+  // body carries date <p> + title <h3>
+  const tags = body.elems.map((e) => e.tagName);
+  assert.deepEqual(tags, ['P', 'H3']);
 });
