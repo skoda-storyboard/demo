@@ -199,6 +199,7 @@ function buildLightbox(block, items) {
   let current = 0;
   let lastFocused = null;
   let overviewBuilt = false;
+  let singleMode = false;
 
   const render = (index) => {
     current = (index + items.length) % items.length;
@@ -255,16 +256,16 @@ function buildLightbox(block, items) {
       e.preventDefault();
       // eslint-disable-next-line no-use-before-define
       close();
-    } else if (e.key === 'ArrowRight') {
+    } else if (e.key === 'ArrowRight' && !singleMode) {
       e.preventDefault();
       render(current + 1);
-    } else if (e.key === 'ArrowLeft') {
+    } else if (e.key === 'ArrowLeft' && !singleMode) {
       e.preventDefault();
       render(current - 1);
-    } else if (e.key === 'Home') {
+    } else if (e.key === 'Home' && !singleMode) {
       e.preventDefault();
       render(0);
-    } else if (e.key === 'End') {
+    } else if (e.key === 'End' && !singleMode) {
       e.preventDefault();
       render(items.length - 1);
     } else if (e.key === 'Tab') {
@@ -291,10 +292,18 @@ function buildLightbox(block, items) {
     if (lastFocused) lastFocused.focus();
   };
 
-  const open = (index, trigger) => {
+  // `single` = opened from the standalone main/lead image: show just that image,
+  // no prev/next, no counter, no overview (matches the live main-image viewer).
+  // Otherwise (opened from a thumbnail) it is a navigable gallery set.
+  const open = (index, trigger, single = false) => {
     lastFocused = trigger || document.activeElement;
+    singleMode = single;
     render(index);
     setOverview(false);
+    prevBtn.hidden = single;
+    nextBtn.hidden = single;
+    counter.hidden = single;
+    overviewBtn.hidden = single;
     overlay.hidden = false;
     document.body.classList.add('gallery-lightbox-open');
     document.addEventListener('keydown', onKeydown);
@@ -332,14 +341,16 @@ export default function decorate(block) {
   };
   setMain(0);
 
-  // main image: open the lightbox at the active image
-  main.addEventListener('click', () => lightbox.open(active, main));
+  // main/lead image: open a single-image viewer (no prev/next, no counter) —
+  // matches the live behaviour (screenshot 1).
+  main.addEventListener('click', () => lightbox.open(active, main, true));
 
-  // thumbnails: swap the main image AND open the lightbox at that image
+  // thumbnails: open the navigable gallery set (prev/next + "N / total") at
+  // that image — matches the live behaviour (screenshot 2).
   items.forEach((item, i) => {
     item.thumbButton.addEventListener('click', () => {
       setMain(i);
-      lightbox.open(i, item.thumbButton);
+      lightbox.open(i, item.thumbButton, false);
     });
   });
 }
