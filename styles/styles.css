@@ -96,6 +96,16 @@
      alone is too weak on light photos). Ramps from opaque-ish at the base to clear ~55% up. */
   --scrim-text: linear-gradient(0deg, rgb(0 0 0 / 70%), rgb(0 0 0 / 40%) 25%, transparent 55%);
 
+  /* tag pill (SKODA-205) — measured from source a.label; radius/padding/font/gap have no
+     existing token. The rounded chip variant reuses the shared --pill-radius (50px, defined
+     above) that cards/load-more also use — do not redefine it here (was 2em; dropped on the
+     SKODA-201/202 merge which established --pill-radius as the shared token). */
+  --tag-radius: 2px;
+  --tag-padding: 5px 10px;
+  --tag-font-size: 11px;
+  --tag-letter-spacing: 0.1em;
+  --tag-gap: 5px;
+
   /* layout / nav */
   --content-max-width: 1248px;
   --nav-height: 108px;

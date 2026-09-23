@@ -1,0 +1,83 @@
+/*
+ * Tags block (SKODA-205) — scoped to .tags.
+ * Layout uses flex-wrap + gap (replaces the source float:left + clearfix). Pills are fixed-size
+ * (px/rem) at every band per the measured spec; only the mobile text-align flips.
+ */
+
+.tags .tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tag-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags .tag-label {
+  display: inline-block;
+  padding: var(--tag-padding);
+  border-radius: var(--tag-radius);
+
+  /* Default matches the source per-article tag exactly: grey #7c7d7e on white. NOTE: this is a
+     known borderline AA contrast (~3.9:1 at 11px); pixel-parity with the source was chosen over
+     the contrast bump (SKODA-205 decision). --skoda-ink remains available as an accessible opt-in. */
+  background-color: var(--skoda-grey-500);
+  color: var(--skoda-white);
+  font-size: var(--tag-font-size);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  letter-spacing: var(--tag-letter-spacing);
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tags a.tag-label:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tags a.tag-label:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+/* chips variant — green emerald filter / media-cart pill (facet contexts) */
+.tags.chips .tag-label {
+  padding: 0.875rem 1.5rem;
+  border-radius: var(--pill-radius);
+  background-color: var(--skoda-green-emerald);
+  color: var(--skoda-ink);
+  font-size: var(--body-font-size-m);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.tags.chips a.tag-label:hover,
+.tags.chips .tag-label.active {
+  background-color: var(--skoda-green-emerald-hover);
+  text-decoration: none;
+}
+
+/* chips outline variant — transparent until hover / selected */
+.tags.chips.outline .tag-label {
+  border-radius: 0.2em;
+  background-color: transparent;
+  color: var(--skoda-ink);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 15%);
+}
+
+.tags.chips.outline a.tag-label:hover,
+.tags.chips.outline .tag-label.active {
+  background-color: var(--skoda-green-emerald);
+  color: var(--skoda-white);
+  box-shadow: none;
+}
+
+/* mobile: source centres the tag row below the tablet breakpoint */
+@media (width < 768px) {
+  .tags .tags-list {
+    justify-content: center;
+    text-align: center;
+  }
+}
