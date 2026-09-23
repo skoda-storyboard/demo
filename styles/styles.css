@@ -61,6 +61,17 @@
   --heading-font-size-s: 18px;
   --heading-font-size-xs: 16px;
 
+  /* hero titles (hero.md §3/§4; SKODA-202): story 40->28; overlay 48/300 white */
+  --heading-font-size-hero: 48px;
+  --heading-font-size-hero-story: 40px;
+  --heading-font-size-hero-story-mobile: 28px;
+
+  /* hero geometry (hero.md §8; SKODA-202) */
+  --hero-vh: 61.8vh;
+  --hero-archive-h-base: 160px;
+  --hero-archive-h-sm: 200px;
+  --hero-archive-h-md: 240px;
+
   /* spacing scale */
   --spacing-xs: 8px;
   --spacing-s: 12px;
