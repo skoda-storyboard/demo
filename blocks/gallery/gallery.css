@@ -252,27 +252,31 @@ body.gallery-lightbox-open {
   line-height: 1;
 }
 
-/* stage: contained image + caption */
+/* stage: contained image + caption. Mobile-first: scrollable and top-aligned so
+   dynamic (variable-length) detail panels are always reachable; extra bottom
+   padding clears the fixed bottom control cluster. */
 .gallery .gallery-lightbox-stage {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   min-height: 0;
-  padding: var(--spacing-m);
+  padding: var(--spacing-m) var(--spacing-m) calc(var(--spacing-xxl) + var(--spacing-m));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .gallery .gallery-lightbox-stage[hidden] {
   display: none;
 }
 
-/* mobile-first: image on top, caption/detail panel below (stacked) */
+/* mobile-first: image on top, caption/detail panel below (stacked). Height is
+   content-driven (not locked to the stage) so the panel can grow and scroll. */
 .gallery .gallery-lightbox-figure {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-s);
   width: 100%;
-  height: 100%;
   margin: 0;
 }
 
@@ -285,7 +289,10 @@ body.gallery-lightbox-open {
   min-width: 0;
   min-height: 0;
   max-width: 100%;
-  max-height: 100%;
+
+  /* mobile: cap the image height to most of the viewport so a tall/portrait
+     photo leaves room for the panel; desktop overrides this to fill the row */
+  max-height: 70vh;
 }
 
 /* loading placeholder: a spinner shown while the full-size rendition downloads
@@ -307,9 +314,12 @@ body.gallery-lightbox-open {
 
 .gallery .gallery-lightbox-image {
   min-height: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* fill the stage after expand — no letterboxing */
+
+  /* mobile: size by natural ratio, capped to the frame (no forced 100% height,
+     which would collapse when the frame is content-sized). Desktop fills. */
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
 
   /* fade + zoom in once the rendition has actually loaded (JS toggles .is-loaded);
      driving it off load — not the open animation — guarantees the image is
@@ -390,18 +400,56 @@ body.gallery-lightbox-open {
   height: 18px;
 }
 
+/* tag chips (live Media-Room pills): grey uppercase, 11px/600, 1.1px tracking */
+.gallery .gallery-lightbox-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  justify-content: center; /* mobile: centred with the rest of the panel */
+}
+
+.gallery .gallery-lightbox-tag {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 2px;
+  background: var(--skoda-grey-500);
+  color: var(--skoda-white);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+
 /* desktop: 2-column detail layout — image left, caption/detail panel right
    (matches the live MR image-detail lightbox) */
 @media (width >= 768px) {
+  /* desktop: the stage is a fixed height row again (no page scroll needed) */
+  .gallery .gallery-lightbox-stage {
+    align-items: center;
+    padding: var(--spacing-m);
+    overflow: hidden;
+  }
+
   .gallery .gallery-lightbox-figure {
     flex-direction: row;
     align-items: stretch;
     gap: var(--spacing-l);
+    height: 100%;
   }
 
   .gallery .gallery-lightbox-image-frame {
     flex: 1 1 auto;
     align-self: stretch;
+    max-height: none; /* fill the row (mobile caps to 70vh) */
+  }
+
+  /* fill the stage edge-to-edge on desktop (mobile keeps contain) */
+  .gallery .gallery-lightbox-image {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
   }
 
   .gallery .gallery-lightbox-caption {
@@ -410,6 +458,11 @@ body.gallery-lightbox-open {
     align-self: stretch;
     text-align: left;
     overflow-y: auto;
+  }
+
+  /* left-align the tag chips with the panel text on desktop */
+  .gallery .gallery-lightbox-tags {
+    justify-content: flex-start;
   }
 }
 

@@ -173,6 +173,33 @@ function overviewCols(count) {
 }
 
 /**
+ * Turn the authored tags paragraph (e.g. "2026 · Peaq") into individual chips
+ * (matches the live Media-Room tag pills). Idempotent: skips if already done.
+ * The tags line is the `·`-separated paragraph that is neither the file-metadata
+ * block nor the related-article line.
+ * @param {Element} caption the stage caption/detail panel
+ */
+function decorateTags(caption) {
+  const p = [...caption.querySelectorAll('p')].find((el) => (
+    el.textContent.includes('·')
+    && !/file type|file size|dimensions|published/i.test(el.textContent)
+    && !/related article/i.test(el.textContent)
+    && !el.querySelector('a')
+  ));
+  if (!p) return;
+  const tags = p.textContent.split('·').map((t) => t.trim()).filter(Boolean);
+  if (!tags.length) return;
+  p.classList.add('gallery-lightbox-tags');
+  p.textContent = '';
+  tags.forEach((tag) => {
+    const chip = document.createElement('span');
+    chip.className = 'gallery-lightbox-tag';
+    chip.textContent = tag;
+    p.append(chip);
+  });
+}
+
+/**
  * Build the single reusable accessible lightbox overlay.
  * @param {Element} block
  * @param {Array} items
@@ -301,10 +328,12 @@ function buildLightbox(block, items) {
       downloadBtn.href = `${base}?format=jpg`;
       // insert before the first "File type…"/metadata paragraph if present,
       // otherwise fall back to the end of the panel
-      const meta = [...stageCaption.querySelectorAll('p')]
-        .find((p) => /file type/i.test(p.textContent));
+      const paras = [...stageCaption.querySelectorAll('p')];
+      const meta = paras.find((p) => /file type/i.test(p.textContent));
       if (meta) stageCaption.insertBefore(actions, meta);
       else stageCaption.append(actions);
+      // render the tags paragraph ("2026 · Peaq") as individual chips
+      decorateTags(stageCaption); // eslint-disable-line no-use-before-define
       stageCaption.hidden = false;
     } else {
       stageCaption.hidden = true;
