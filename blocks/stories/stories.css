@@ -31,18 +31,30 @@
   color: var(--skoda-grey-500);
 }
 
-/* --- feed grid: fluid/intrinsic 1-up; column count via breakpoints --- */
+/*
+ * Feed layout — the source "Latest Stories" is a FLEX-WRAP featured grid, not a
+ * uniform grid (measured live on /en/ at 1440): the first two cards are large
+ * (2-up, flex-basis 50%) and the rest are smaller (3-up, flex-basis 33.33%).
+ * Inter-card gutter = 2×10px side padding (20px, --grid-gutter) + 20px row gap,
+ * with box-sizing: border-box so the basis percentages stay exact. Fluid/
+ * intrinsic 1-up first; the 2+3 featured split engages at the desktop breakpoint.
+ */
 .stories .stories-items {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--grid-gutter);
+  display: flex;
+  flex-wrap: wrap;
   padding: 0;
-  margin: 0;
+
+  /* negative inline margin cancels the outer cards' side padding so the row
+     still spans full width; block margin 0 */
+  margin: 0 calc(var(--grid-gutter) / -2);
   list-style: none;
 }
 
 .stories .stories-item {
-  margin: 0;
+  box-sizing: border-box;
+  flex: 0 0 100%; /* mobile: 1-up */
+  padding-inline: calc(var(--grid-gutter) / 2);
+  margin-block-end: var(--grid-gutter);
 }
 
 .stories .stories-item-link {
@@ -116,24 +128,25 @@
   border-color: var(--skoda-white);
 }
 
-/* ===== breakpoints: grid column-count transitions only (768 / 992) ===== */
+/* ===== breakpoints: featured 2-up + 3-up split (source-measured) ===== */
+
+/* tablet: 2-up (all cards half width) */
 @media (width >= 768px) {
-  .stories .stories-items {
-    grid-template-columns: repeat(2, 1fr);
+  .stories .stories-item {
+    flex-basis: 50%;
   }
 }
 
+/*
+ * desktop: the featured split — first two cards stay large (2-up, 50%), the rest
+ * go 3-up (33.33%). Matches the live /en/ Latest Stories feed.
+ */
 @media (width >= 992px) {
-  /* default desktop column count (3); the `columns-N` class from config overrides */
-  .stories .stories-items {
-    grid-template-columns: repeat(3, 1fr);
+  .stories .stories-item {
+    flex-basis: 33.333%;
   }
 
-  .stories.columns-2 .stories-items {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .stories.columns-4 .stories-items {
-    grid-template-columns: repeat(4, 1fr);
+  .stories .stories-item:nth-child(-n + 2) {
+    flex-basis: 50%;
   }
 }
