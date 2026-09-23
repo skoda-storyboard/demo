@@ -38,16 +38,21 @@
 
 /*
  * Feed grid — flex-wrap featured grid (stories.md §3), not a uniform grid.
- * The inter-card gutter (--grid-gutter, 20px) lives on the flex CONTAINER as
- * `gap`, never inside the card: the .stories-item IS the shared .card-teaser box
- * (background, radius, shadow, overflow-clip, absolute overlay), so any padding
- * on it would leak into the card visual and desync the scrim from the image.
- * Flex bases subtract their share of the gap so N-per-row still spans full width.
+ * Two-axis spacing, split so it's source-faithful (stories.md §43):
+ *   - horizontal gutter → column-gap on the container (between cards in a row);
+ *   - vertical gutter → margin-block-end on every cell, INCLUDING the last row,
+ *     so the source's 20px below the final row survives (row-gap would only
+ *     space BETWEEN lines and drop that trailing space, pulling load-more up).
+ * The gutter is never padding on the card: .stories-item IS the shared
+ * .card-teaser box (background, radius, shadow, overflow-clip, absolute
+ * overlay), so interior padding would desync the scrim from the image — margin
+ * is outside the box and safe. Flex bases subtract the column-gap share so
+ * N-per-row still spans full width.
  */
 .stories .stories-items {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--grid-gutter);
+  column-gap: var(--grid-gutter);
   padding: 0;
   margin: 0;
   list-style: none;
@@ -56,6 +61,7 @@
 .stories .stories-item {
   box-sizing: border-box;
   flex: 0 0 100%; /* mobile: 1-up */
+  margin-block-end: var(--grid-gutter); /* incl. final row — source parity */
 }
 
 /* --- load-more: ghost pill (stories.md §3, measured) --- */
