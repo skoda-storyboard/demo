@@ -309,12 +309,18 @@ function buildLightbox(block, items) {
       stageImg.addEventListener('error', reveal, { once: true });
     }
     // clone the authored caption content into the stage caption (plain or panel),
-    // then append the action buttons pointing at the current image
+    // then place the action buttons after the description, above the file
+    // metadata block (matches the live layout)
     stageCaption.textContent = '';
     if (item.caption) {
       [...item.caption.childNodes].forEach((n) => stageCaption.append(n.cloneNode(true)));
       downloadBtn.href = `${base}?format=jpg`;
-      stageCaption.append(actions);
+      // insert before the first "File type…"/metadata paragraph if present,
+      // otherwise fall back to the end of the panel
+      const meta = [...stageCaption.querySelectorAll('p')]
+        .find((p) => /file type/i.test(p.textContent));
+      if (meta) stageCaption.insertBefore(actions, meta);
+      else stageCaption.append(actions);
       stageCaption.hidden = false;
     } else {
       stageCaption.hidden = true;

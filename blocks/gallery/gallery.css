@@ -238,10 +238,6 @@ body.gallery-lightbox-open {
   padding: 0 var(--spacing-l);
 }
 
-.gallery .gallery-lightbox-count {
-  margin: 0;
-  font-size: var(--body-font-size-m);
-}
 
 .gallery .gallery-lightbox-overview-toggle {
   border: 0;
@@ -341,11 +337,13 @@ body.gallery-lightbox-open {
   transform: scale(1);
 }
 
-/* caption/detail panel starts hidden and fades in alongside the image */
+/* caption/detail panel starts hidden and fades in alongside the image.
+   Live spec: SKODA Next 16px / line-height 1.2, near-white #fefefe. */
 .gallery .gallery-lightbox-caption {
   max-width: min(90vw, var(--content-max-width));
-  color: var(--skoda-white);
-  font-size: var(--body-font-size-s);
+  color: rgb(254 254 254);
+  font-size: var(--body-font-size-m);
+  line-height: 1.2;
   text-align: center;
   user-select: text;
   opacity: 0;
@@ -356,16 +354,26 @@ body.gallery-lightbox-open {
   opacity: 1;
 }
 
+/* paragraph rhythm inside the panel: 20px gaps, none after the last block */
+.gallery .gallery-lightbox-caption p {
+  margin: 0 0 20px;
+}
+
+.gallery .gallery-lightbox-caption p:last-child {
+  margin-bottom: 0;
+}
+
 .gallery .gallery-lightbox-caption a:not(.gallery-lightbox-action) {
   color: var(--gallery-accent);
 }
 
-/* detail-panel action buttons: circular outlined discs (add / download / link) */
+/* detail-panel action buttons: white discs, dark ring + dark icon, right-aligned
+   (matches the live Media-Room chrome: 40×40, 2px #161718 border) */
 .gallery .gallery-lightbox-actions {
   display: flex;
   gap: var(--spacing-s);
-  justify-content: center;
-  margin: var(--spacing-s) 0;
+  justify-content: flex-end;
+  margin: 20px 0 var(--spacing-m);
 }
 
 .gallery .gallery-lightbox-action {
@@ -374,25 +382,25 @@ body.gallery-lightbox-open {
   justify-content: center;
   width: 40px;
   height: 40px;
-  border: 1px solid rgb(255 255 255 / 40%);
+  border: 2px solid var(--skoda-ink);
   border-radius: 50%;
   padding: 0;
-  background: transparent;
-  color: var(--skoda-white);
+  background: var(--skoda-white);
+  color: var(--skoda-ink);
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .gallery .gallery-lightbox-action:hover,
 .gallery .gallery-lightbox-action.is-copied {
   border-color: var(--gallery-accent);
-  background: rgb(255 255 255 / 10%);
-  color: var(--gallery-accent);
+  background: var(--gallery-accent);
+  color: var(--skoda-white);
 }
 
 .gallery .gallery-lightbox-action svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 /* desktop: 2-column detail layout — image left, caption/detail panel right
@@ -416,27 +424,32 @@ body.gallery-lightbox-open {
     text-align: left;
     overflow-y: auto;
   }
-
-  /* left-align the action discs with the panel text on desktop */
-  .gallery .gallery-lightbox-actions {
-    justify-content: flex-start;
-  }
 }
 
-/* bottom-right control cluster: prev ‹ · counter N / total · next › — matches
-   the live colorbox where the counter and arrows sit together bottom-right */
+/* bottom-right control cluster: counter "N / total" · ‹ · › in a row, separated
+   by thin vertical rules — matches the live colorbox nav (24px text, #606060
+   dividers, 18px padding, no button chrome) */
 .gallery .gallery-lightbox-controls {
   position: absolute;
   right: 0;
   bottom: 0;
   display: flex;
-  align-items: center;
-  gap: var(--spacing-s);
-  padding: var(--spacing-m) var(--spacing-l);
+  align-items: stretch;
 }
 
 .gallery .gallery-lightbox-controls[hidden] {
   display: none;
+}
+
+/* counter: 24px, near-white, generous padding to match the live cell */
+.gallery .gallery-lightbox-count {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 18px;
+  font-size: 24px;
+  line-height: 1;
+  color: rgb(254 254 254);
 }
 
 .gallery .gallery-lightbox-prev,
@@ -444,14 +457,21 @@ body.gallery-lightbox-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
   border: 0;
-  border-radius: 50%;
-  padding: 0;
-  background: var(--gallery-accent);
-  color: var(--skoda-ink);
+  border-left: 1px solid var(--gallery-nav-divider);
+  border-radius: 0;
+  padding: 18px;
+  background: transparent;
+  color: var(--skoda-white);
+  font-size: 24px;
+  line-height: 1;
   cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.gallery .gallery-lightbox-prev:hover,
+.gallery .gallery-lightbox-next:hover {
+  color: var(--gallery-accent);
 }
 
 .gallery .gallery-lightbox-prev::before {
@@ -460,12 +480,6 @@ body.gallery-lightbox-open {
 
 .gallery .gallery-lightbox-next::before {
   content: '›';
-}
-
-.gallery .gallery-lightbox-prev::before,
-.gallery .gallery-lightbox-next::before {
-  font-size: 1.75rem;
-  line-height: 1;
 }
 
 /* overview grid: 3/4/5 columns by item count (JS sets --overview-cols) */

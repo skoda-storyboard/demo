@@ -41,12 +41,14 @@
   --scrim-h: linear-gradient(270deg, transparent, rgb(0 0 0 / 25%));
   --scrim-v: linear-gradient(180deg, transparent, rgb(0 0 0 / 10%));
 
-  /* gallery lightbox (gallery-lightbox.md §3; SKODA-203). Accent reuses the
-     brand emerald; divider is the source lightbox top-bar rule colour. Backdrop
-     is the source colorbox overlay: solid skoda-ink (#161718), which fully
-     hides the page behind it (measured opaque on the live site). */
-  --gallery-accent: var(--skoda-green-emerald);
+  /* gallery lightbox (gallery-lightbox.md §3; SKODA-203). Accent is the source
+     lightbox green (#419468 — measured on the live related-article link + nav
+     discs); divider is the source lightbox top-bar rule colour. Backdrop is the
+     source colorbox overlay: solid skoda-ink (#161718), which fully hides the
+     page behind it (measured opaque on the live site). */
+  --gallery-accent: #419468;
   --gallery-divider: #5a5b5c;
+  --gallery-nav-divider: #606060; /* nav cluster vertical rules (measured live) */
   --gallery-backdrop: rgb(22 23 24);
 }
 
