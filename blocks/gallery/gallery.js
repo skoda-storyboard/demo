@@ -33,6 +33,42 @@ const LABELS = {
   counterLabel: (n, total) => `Image ${n} of ${total}`,
   // heading above the thumbnail rail
   imagesHeading: 'Images',
+  // detail-panel action buttons (Media-Room style)
+  addToBox: 'Add to media box',
+  download: 'Download image',
+  copyLink: 'Copy image link',
+};
+
+/**
+ * Build an inline SVG icon (Trusted-Types safe: namespaced elements, no innerHTML).
+ * @param {string[]} paths one or more SVG path `d` strings
+ * @returns {SVGElement}
+ */
+function svgIcon(paths) {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('width', '20');
+  svg.setAttribute('height', '20');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  paths.forEach((d) => {
+    const p = document.createElementNS(NS, 'path');
+    p.setAttribute('d', d);
+    svg.append(p);
+  });
+  return svg;
+}
+
+// icon path sets (Feather-style): plus-in-square, download, link
+const ICONS = {
+  addToBox: ['M3 3h18v18H3z', 'M12 8v8', 'M8 12h8'],
+  download: ['M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', 'M7 10l5 5 5-5', 'M12 15V3'],
+  copyLink: ['M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1', 'M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1'],
 };
 
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -201,6 +237,27 @@ function buildLightbox(block, items) {
   figure.append(imageFrame, stageCaption);
   stage.append(figure);
 
+  // detail-panel action buttons (add to media box / download / copy link),
+  // rendered inside the caption panel — matches the live Media-Room chrome
+  const actions = document.createElement('div');
+  actions.className = 'gallery-lightbox-actions';
+  const addBtn = document.createElement('button');
+  addBtn.type = 'button';
+  addBtn.className = 'gallery-lightbox-action';
+  addBtn.setAttribute('aria-label', LABELS.addToBox);
+  addBtn.append(svgIcon(ICONS.addToBox));
+  const downloadBtn = document.createElement('a');
+  downloadBtn.className = 'gallery-lightbox-action';
+  downloadBtn.setAttribute('aria-label', LABELS.download);
+  downloadBtn.setAttribute('download', '');
+  downloadBtn.append(svgIcon(ICONS.download));
+  const linkBtn = document.createElement('button');
+  linkBtn.type = 'button';
+  linkBtn.className = 'gallery-lightbox-action';
+  linkBtn.setAttribute('aria-label', LABELS.copyLink);
+  linkBtn.append(svgIcon(ICONS.copyLink));
+  actions.append(addBtn, downloadBtn, linkBtn);
+
   const prevBtn = document.createElement('button');
   prevBtn.type = 'button';
   prevBtn.className = 'gallery-lightbox-prev';
@@ -252,10 +309,13 @@ function buildLightbox(block, items) {
       // never stuck hidden) if the rendition fails to load
       stageImg.addEventListener('error', reveal, { once: true });
     }
-    // clone the authored caption content into the stage caption (plain or panel)
+    // clone the authored caption content into the stage caption (plain or panel),
+    // then append the action buttons pointing at the current image
     stageCaption.textContent = '';
     if (item.caption) {
       [...item.caption.childNodes].forEach((n) => stageCaption.append(n.cloneNode(true)));
+      downloadBtn.href = `${base}?format=jpg`;
+      stageCaption.append(actions);
       stageCaption.hidden = false;
     } else {
       stageCaption.hidden = true;
@@ -357,6 +417,17 @@ function buildLightbox(block, items) {
   nextBtn.addEventListener('click', () => render(current + 1));
   closeBtn.addEventListener('click', close);
   overviewBtn.addEventListener('click', () => setOverview(overview.hidden));
+  // copy the current image's absolute URL to the clipboard
+  linkBtn.addEventListener('click', async () => {
+    const url = new URL(items[current].src.split('?')[0], window.location.href).href;
+    try {
+      await navigator.clipboard.writeText(url);
+      linkBtn.classList.add('is-copied');
+      setTimeout(() => linkBtn.classList.remove('is-copied'), 1500);
+    } catch {
+      // clipboard unavailable (e.g. insecure context) — no-op
+    }
+  });
   // backdrop click closes (only when the overlay itself, not its children, is clicked)
   overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
 

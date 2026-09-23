@@ -356,7 +356,37 @@ body.gallery-lightbox-open {
   opacity: 1;
 }
 
-.gallery .gallery-lightbox-caption a {
+.gallery .gallery-lightbox-caption a:not(.gallery-lightbox-action) {
+  color: var(--gallery-accent);
+}
+
+/* detail-panel action buttons: circular outlined discs (add / download / link) */
+.gallery .gallery-lightbox-actions {
+  display: flex;
+  gap: var(--spacing-s);
+  justify-content: center;
+  margin: var(--spacing-s) 0;
+}
+
+.gallery .gallery-lightbox-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgb(255 255 255 / 40%);
+  border-radius: 50%;
+  padding: 0;
+  background: transparent;
+  color: var(--skoda-white);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.gallery .gallery-lightbox-action:hover,
+.gallery .gallery-lightbox-action.is-copied {
+  border-color: var(--gallery-accent);
+  background: rgb(255 255 255 / 10%);
   color: var(--gallery-accent);
 }
 
@@ -380,6 +410,11 @@ body.gallery-lightbox-open {
     align-self: stretch;
     text-align: left;
     overflow-y: auto;
+  }
+
+  /* left-align the action discs with the panel text on desktop */
+  .gallery .gallery-lightbox-actions {
+    justify-content: flex-start;
   }
 }
 
