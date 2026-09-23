@@ -249,9 +249,22 @@ export default async function decorate(block) {
     filterToggle.append(document.createTextNode(`${STRINGS.advancedFilter}${totalSel ? ` (${totalSel})` : ''}`));
   }
 
+  // Re-sync facet-panel checkboxes with the current selection. The checkboxes
+  // are built once, so any state change that doesn't originate from a checkbox
+  // (chip remove, back/forward) must refresh their checked state here.
+  function refreshFacetOptions() {
+    facetBar.querySelectorAll('.facet').forEach((f) => {
+      const sel = new Set(state.active[f.dataset.facet] || []);
+      f.querySelectorAll('.facet-option input').forEach((cb) => {
+        cb.checked = sel.has(cb.value);
+      });
+    });
+  }
+
   function rerender() {
     updateUrl();
     refreshPillStates();
+    refreshFacetOptions();
     renderChips();
     renderGrid();
   }
@@ -395,6 +408,7 @@ export default async function decorate(block) {
     state.sort = restored.sort;
     state.revealed = restored.revealed;
     refreshPillStates();
+    refreshFacetOptions();
     renderChips();
     renderGrid();
     sortList.querySelectorAll('.listing-sort-btn').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.sort === state.sort)));
