@@ -1,13 +1,17 @@
 /*
- * Stories feed block (SKODA-214). Scoped to .stories; tokens only.
- * Measured spec: stories.md (grid ladder, heading, Load-more) + card-teaser.md
- * (the overlay card: dual scrim, radius/shadow, white date+title over the image).
- * Grid + Load-more mirror the faceted listing (SKODA-402) so the two feeds read
- * identically; the card reuses SKODA-201's overlay design + shared tokens.
+ * Stories feed block (SKODA-214) — feed grid + heading + Load-more ONLY.
+ *
+ * The card box, media, overlay scrim, typography, hover/focus all come from the
+ * shared card-teaser primitive (styles/card-teaser.css, imported below); the feed
+ * renders cards via scripts/card-teaser.js buildCardTeaser(). Nothing card-visual
+ * is duplicated here — this file owns only the feed's grid ladder, section
+ * heading, status region and the Load-more control. Measured spec: stories.md.
  *
  * Layer order (docs/guardrails/css-guidelines.md): fluid + intrinsic first;
  * breakpoints (768 / 992) only for the grid column-count transitions.
  */
+
+@import url("../../styles/card-teaser.css");
 
 .stories {
   width: min(100%, var(--content-max-width));
@@ -53,82 +57,6 @@
   margin-block-end: var(--grid-gutter);
 }
 
-/* --- overlay card-teaser (card-teaser.md): image + scrim + white caption --- */
-.stories .stories-item-link {
-  position: relative;
-  display: block;
-  color: var(--skoda-white);
-  text-decoration: none;
-  border-radius: var(--card-radius);
-  box-shadow: var(--card-shadow);
-  overflow: hidden;
-}
-
-.stories .stories-item-media {
-  position: relative;
-  overflow: hidden;
-  line-height: 0;
-  border-radius: var(--card-radius);
-}
-
-.stories .stories-item-media picture,
-.stories .stories-item-media img {
-  display: block;
-  width: 100%;
-}
-
-.stories .stories-item-media img {
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  transition: scale 0.5s cubic-bezier(0.165, 0.85, 0.45, 1);
-}
-
-/* caption: absolute over the image bottom-left, white on a dual scrim */
-.stories .stories-item-body {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-m);
-  background-image: var(--scrim-text), var(--scrim-h), var(--scrim-v);
-}
-
-.stories .stories-item-date {
-  font-size: var(--body-font-size-xs);
-  font-weight: var(--weight-semibold);
-  line-height: 1.2;
-  color: var(--skoda-white);
-}
-
-.stories .stories-item-title {
-  margin: 0;
-  font-size: var(--heading-font-size-s); /* 18px */
-  line-height: 1.2;
-  font-weight: var(--weight-regular);
-  color: var(--skoda-white);
-}
-
-/* --- interaction states --- */
-@media (hover: hover) {
-  .stories .stories-item-link:hover .stories-item-media img {
-    scale: 1.02;
-  }
-}
-
-.stories .stories-item-link:focus-visible {
-  outline: 2px solid var(--skoda-white);
-  outline-offset: -2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .stories .stories-item-media img {
-    transition: none;
-  }
-}
-
 /* --- load-more: ghost pill (stories.md §3, measured) --- */
 .stories .stories-loadmore {
   display: flex;
@@ -163,22 +91,18 @@
 }
 
 /*
- * ===== breakpoints: exact source parity (stories.md §3 + source CSS) =====
- *   base            → flex 0 0 100%                       (1-up)
- *   min-width:768px → item 50% · :first-child 100%        (lead full-width, then 2-up)
- *   min-width:992px → item 33.33% · :nth-child(-n+2) 50%  (2 featured, then 3-up)
- * The featured split only applies to the .stories-featured variant; a plain
- * .stories-cols-N variant keeps a uniform N-up grid.
+ * ===== breakpoints: featured grid ladder (stories.md §3 + 768.png reference) =====
+ *   base            → 100%    (1-up)
+ *   768–991         → 50%     (uniform 2-col — the 768 reference shows equal cards)
+ *   ≥ 992           → 33.33%, with :nth-child(-n+2) at 50% (2 featured + 3-up)
+ * Note: NO full-width lead card in the 768 band — the measured 768.png is a
+ * uniform 2-col grid (2+2+1), so every card is 50% there.
  */
 
-/* tablet: lead card full-width, the rest 2-up (source :first-child 100% <992) */
+/* tablet: uniform 2-up */
 @media (width >= 768px) {
   .stories.stories-featured .stories-item {
     flex-basis: 50%;
-  }
-
-  .stories.stories-featured .stories-item:first-child {
-    flex-basis: 100%;
   }
 }
 
@@ -186,10 +110,6 @@
 @media (width >= 992px) {
   .stories.stories-featured .stories-item {
     flex-basis: 33.333%;
-  }
-
-  .stories.stories-featured .stories-item:first-child {
-    flex-basis: 50%; /* reset the tablet full-width lead */
   }
 
   .stories.stories-featured .stories-item:nth-child(-n + 2) {

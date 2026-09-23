@@ -13,6 +13,57 @@ import {
   scopeRows, filterRows, sortRows, paginate, decodeState, encodeState,
 } from '../listing/listing-logic.mjs';
 
+/*
+ * Minimal DOM/window shim so the production modules (which transitively import
+ * scripts/aem.js — it touches window/document at load) can be imported and
+ * exercised in plain node:test. Enough for card-teaser's element building +
+ * aem.js's RUM IIFE; NOT a full DOM. Installed before the dynamic imports below.
+ */
+function el() {
+  // className is the source of truth; classList reads/writes it (two-way), so
+  // both `.className = ...` (buildCardTeaser) and `.classList.add(...)` agree.
+  const node = {
+    tagName: '', className: '', children: [], attributes: {}, _text: '',
+    classList: {
+      add: (...c) => {
+        const s = new Set(node.className.split(/\s+/).filter(Boolean));
+        c.forEach((x) => s.add(x));
+        node.className = [...s].join(' ');
+      },
+      contains: (c) => node.className.split(/\s+/).includes(c),
+    },
+    setAttribute(k, v) { this.attributes[k] = String(v); },
+    getAttribute(k) { return this.attributes[k] ?? null; },
+    append(...kids) { this.children.push(...kids); },
+    querySelector() { return null; },
+    set textContent(v) { this._text = String(v); },
+    get textContent() { return this._text; },
+  };
+  return node;
+}
+globalThis.window = {
+  location: { search: '', pathname: '/', href: 'http://localhost/' },
+  origin: 'http://localhost',
+  performance: { now: () => 0 },
+  hlx: { codeBasePath: '' },
+  addEventListener: () => {},
+};
+globalThis.document = {
+  currentScript: { src: 'http://localhost/scripts/scripts.js' },
+  createElement: (tag) => { const n = el(); n.tagName = String(tag).toUpperCase(); return n; },
+  querySelector: () => null,
+  addEventListener: () => {},
+};
+// `navigator` is a read-only getter in modern node; aem.js only calls
+// navigator.sendBeacon inside a RUM handler (never at import), so we don't stub it.
+
+// Production modules under test (not copies): the feed's exported predicate and
+// the shared card-teaser primitive the block renders with. Dynamic import so the
+// shim above is in place first. createOptimizedPicture (aem.js) needs richer DOM,
+// so buildCardTeaser tests use image-less rows (the #3 regression path).
+const { isFeatured } = await import('./stories.js');
+const { buildCardTeaser, formatCardDate } = await import('../../scripts/card-teaser.js');
+
 const NO_FACETS = [];
 
 const rows = [
@@ -149,15 +200,19 @@ test('category AND tag combine across keys', () => {
 });
 
 // --- exclude promo/featured (stories.md §8 exclude_carousel_posts) ---------
-// Mirror of the block's isFeatured predicate: keep the feed free of the
-// promo-box hero posts so it never duplicates the featured items.
+// Exercises the PRODUCTION predicate imported from stories.js (not a copy), so
+// the suite fails if the block's exclusion logic breaks.
 
-const isFeatured = (row) => {
-  const v = row.featured ?? row.promo ?? row.carousel;
-  return v === true || v === 'true' || v === '1' || v === 1;
-};
+test('production isFeatured recognises featured/promo/carousel signals', () => {
+  assert.equal(isFeatured({ featured: 'true' }), true);
+  assert.equal(isFeatured({ promo: true }), true);
+  assert.equal(isFeatured({ carousel: '1' }), true);
+  assert.equal(isFeatured({ featured: 1 }), true);
+  assert.equal(isFeatured({}), false);
+  assert.equal(isFeatured({ featured: 'false' }), false);
+});
 
-test('featured/promo entries are excluded from the feed', () => {
+test('featured/promo entries are excluded from the feed (production predicate)', () => {
   const withPromo = [
     { path: '/en/hero', title: 'Hero', template: 'story', featured: 'true' },
     { path: '/en/x', title: 'X', template: 'story' },
@@ -165,4 +220,47 @@ test('featured/promo entries are excluded from the feed', () => {
   ];
   const kept = withPromo.filter((r) => !isFeatured(r));
   assert.deepEqual(kept.map((r) => r.title), ['X']);
+});
+
+// --- shared card-teaser primitive (scripts/card-teaser.js) -----------------
+
+test('formatCardDate renders the source D. M. YYYY form', () => {
+  assert.equal(formatCardDate('2026-09-10'), '10. 9. 2026');
+  assert.equal(formatCardDate('not-a-date'), '');
+  assert.equal(formatCardDate(''), '');
+});
+
+test('buildCardTeaser renders an overlay card with date + title', () => {
+  const li = buildCardTeaser(
+    { path: '/en/a', title: 'Story A', date: '2026-09-10' },
+    { eager: false, overlay: true },
+  );
+  assert.ok(li.classList.contains('card-teaser'));
+  assert.ok(li.classList.contains('overlay'));
+  const link = li.children[0];
+  assert.equal(link.className, 'card-teaser-link');
+  assert.equal(link.href, '/en/a'); // set as a property by buildCardTeaser
+  // body carries a classified date + title
+  const body = link.children.find((c) => c.className === 'card-teaser-body');
+  assert.ok(body, 'has a card-teaser-body');
+  const date = body.children.find((c) => c.className === 'card-teaser-date');
+  const title = body.children.find((c) => c.className === 'card-teaser-title');
+  assert.equal(date.textContent, '10. 9. 2026');
+  assert.equal(title.textContent, 'Story A');
+});
+
+test('buildCardTeaser: image-less row renders a full card, not a zero-height media element (#3)', () => {
+  const li = buildCardTeaser(
+    { path: '/en/b', title: 'No image story', date: '2026-08-01' },
+    { overlay: true },
+  );
+  // no empty media element created …
+  const link = li.children[0];
+  const media = link.children.find((c) => c.className === 'card-teaser-image');
+  assert.equal(media, undefined, 'no empty media layer when the row has no image');
+  // … and the card is marked so CSS gives the body intrinsic height
+  assert.ok(li.classList.contains('card-teaser-no-image'), 'flagged for in-flow height');
+  // the body (with title) is still present
+  const body = link.children.find((c) => c.className === 'card-teaser-body');
+  assert.ok(body && body.children.some((c) => c.className === 'card-teaser-title'));
 });

@@ -20,9 +20,10 @@
 // event handlers, so forward references between them are safe.
 /* eslint-disable no-use-before-define */
 
-import { createOptimizedPicture, readBlockConfig } from '../../scripts/aem.js';
+import { readBlockConfig } from '../../scripts/aem.js';
 import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
 import { fetchPlaceholders } from '../../scripts/placeholders.js';
+import { buildCardTeaser } from '../../scripts/card-teaser.js';
 import {
   scopeRows, filterRows, sortRows, paginate, decodeState, encodeState,
 } from '../listing/listing-logic.mjs';
@@ -71,60 +72,22 @@ function parseFeedConfig(block) {
 
 // A promo/featured entry the promo-box already shows (source `exclude_carousel_posts`).
 // Defensive: the index may signal this via a `featured`/`promo` flag (SKODA-401).
-const isFeatured = (row) => {
+// Exported so tests exercise the production predicate (not a copy).
+export const isFeatured = (row) => {
   const v = row.featured ?? row.promo ?? row.carousel;
   return v === true || v === 'true' || v === '1' || v === 1;
 };
 
-// Format an ISO/parseable date to the source's "D. M. YYYY" (e.g. 10. 9. 2026).
-function formatDate(value) {
-  const t = Date.parse(value);
-  if (Number.isNaN(t)) return '';
-  const d = new Date(t);
-  return `${d.getUTCDate()}. ${d.getUTCMonth() + 1}. ${d.getUTCFullYear()}`;
-}
-
 /*
- * Build one overlay card-teaser cell (card-teaser.md): image fills the card, a
- * dual scrim darkens the bottom, date + title sit in white over the image.
+ * One feed cell = the shared overlay card-teaser (scripts/card-teaser.js), which
+ * returns the <li> itself. The card structure/visual/missing-image handling all
+ * come from the primitive; the feed only adds `stories-item` so its flex grid can
+ * size the cell (the primitive owns everything inside the card).
  */
 function cardCell(row, eager) {
-  const li = document.createElement('li');
-  li.className = 'stories-item';
-
-  const a = document.createElement('a');
-  a.className = 'stories-item-link';
-  a.href = row.path || '#';
-
-  const media = document.createElement('div');
-  media.className = 'stories-item-media';
-  if (row.image) {
-    const pic = createOptimizedPicture(row.image, row.title || '', eager, [{ width: '750' }]);
-    if (eager) pic.querySelector('img')?.setAttribute('fetchpriority', 'high');
-    media.append(pic);
-  }
-  a.append(media);
-
-  const body = document.createElement('div');
-  body.className = 'stories-item-body';
-  const dateText = formatDate(row.date || row.publisheddate || row.publishDate);
-  if (dateText) {
-    const time = document.createElement('time');
-    time.className = 'stories-item-date';
-    const iso = row.date || row.publisheddate || row.publishDate;
-    if (iso) time.setAttribute('datetime', String(iso));
-    time.textContent = dateText;
-    body.append(time);
-  }
-  if (row.title) {
-    const h = document.createElement('h3');
-    h.className = 'stories-item-title';
-    h.textContent = row.title;
-    body.append(h);
-  }
-  a.append(body);
-  li.append(a);
-  return li;
+  const item = buildCardTeaser(row, { eager, overlay: true });
+  item.classList.add('stories-item');
+  return item;
 }
 
 export default async function decorate(block) {
