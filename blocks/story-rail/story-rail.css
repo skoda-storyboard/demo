@@ -41,13 +41,38 @@
 
 /*
  * Reserve vertical space until the deferred carousel builds (CLS guard,
- * carousel-rails.md §7). ~190px ≈ one row of 16:9 cards; released once the
- * carousel is in the DOM (.is-built) so the real height takes over.
+ * carousel-rails.md §7). An overlay card's height IS its 16:9 image, so the row
+ * height = cellWidth * 9/16, and cellWidth tracks the cells-per-view ladder
+ * (90% / 30% / 22.5%). A FIXED reserve (the old 190px) mismatched the real card
+ * at every width and shifted ~30px when released to 0.
+ *
+ * Reserve the SAME fluid geometry via aspect-ratio on the full-width mount: for
+ * a block of width W, `aspect-ratio: R` gives height W/R. We want the reserve to
+ * equal one card = frac * W * 9/16, so R = 16 / (9 * frac). Then the built
+ * carousel lands exactly on the reserved height → no release-shift, so we DON'T
+ * collapse to 0. Values: frac .90 → 1.975, .30 → 5.926, .225 → 7.901.
  */
 .story-rail-mount {
-  min-height: 190px;
+  aspect-ratio: 1.975; /* <768: 90% cell (1 + peek) */
 }
 
+@media (width >= 768px) {
+  .story-rail-mount {
+    aspect-ratio: 5.926; /* 30% cell (~3.3/view) */
+  }
+}
+
+@media (width >= 992px) {
+  .story-rail-mount {
+    aspect-ratio: 7.901; /* 22.5% cell (~4.4/view) */
+  }
+}
+
+/*
+ * Once built, the carousel provides its own (identical) height; drop the
+ * reserve so the mount never constrains taller content (e.g. caption cards).
+ * The built height matches the reserve, so this is shift-free.
+ */
 .story-rail-mount.is-built {
-  min-height: 0;
+  aspect-ratio: auto;
 }
