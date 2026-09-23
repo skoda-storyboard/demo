@@ -1,6 +1,6 @@
 # Škoda Storyboard → Edge Delivery (DA/Experience Workspace), Delivery Backlog Overview
 
-**What this is:** the master index for the migration backlog, 10 epics, 63 tickets, grounded in the `SKODA-*` analysis set. Pilot epics (E01–E07) are ticket-level; later phases (E08–E10) are epic + high-level tickets so the whole program is visible.
+**What this is:** the master index for the migration backlog, 10 epics, 72 tickets, grounded in the `SKODA-*` analysis set. Pilot epics (E01–E07) are ticket-level; later phases (E08–E10) are epic + high-level tickets so the whole program is visible.
 **Date:** 2026-09-05 (updated 2026-09-07: media-cart re-point, SKODA-505 added to M1, SKODA-902 re-scoped; updated 2026-09-10: build-confirmed, SKODA-506 added, SKODA-401 re-scoped to +3 SP for metadata-normalization, SKODA-801 trending low & browser-confirmed; updated 2026-09-11: Press Kit detail broken out of SKODA-802 into SKODA-805–808 per requirements doc §11; updated 2026-09-14: 22-URL analysis added SKODA-207 (Series→M1), SKODA-604 (full-fidelity story restore→M1), SKODA-810 (company/Page family→M2) per decision D18; updated 2026-09-14: traceability gaps closed, added SKODA-305 (MR footer→M1), SKODA-809 (roles), SKODA-811 (embargo), SKODA-812 (audit), SKODA-906 (QR access) → M2 governance layer, 51→56 tickets / 220→237 SP; updated 2026-09-15: ui-specs template-gap tickets added, SKODA-607 (press-release detail→M1), SKODA-208 (model page), SKODA-209 (category/tag archive), SKODA-706 (404), SKODA-813 (Page base shell)→M2, 56→61 tickets / 237→253 SP; updated 2026-09-15: block-recount cross-check added SKODA-210 (custom microsite, 201 pages) + SKODA-814 (SiteOrigin body flatten, 1,614 pages), 61→63 tickets / 253→261 SP, and reconciled SKODA-808 (no source variant selector, net-new pending MR-PK03); updated 2026-09-23: resolved a SKODA-211 ID collision, the **Stories feed block moved to SKODA-214** (GitHub issue #97 retitled) and **SKODA-211 registered as the completed DA tag-management plugin** (merged PR #60 / closed issue #54); E02 gains the tag-plugin row (net +1 vs the a73c810 stories/rails/promo scoping))
 **Target:** DA / Experience Workspace + EDS (no AEM Author / UE / JCR), per `SKODA-EDS-DA-ARCHITECTURE.md`.
 **Estimates:** story points (SP) + AI-assisted / manual day ranges, **planning estimates, not a quote**. "AI-assisted" reflects this environment's import/styling/QA tooling.
@@ -31,16 +31,16 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | Epic | Goal | Phase | Tickets | Effort (SP) | AI-days | Manual-days |
 |---|---|---|---|--:|--:|--:|
 | **E01 Foundation & Setup** | DA/EW site, repo, Code Sync, config, tokens | A | 6 | 15 | 5–9 | 12–20 |
-| **E02 Core Blocks** | teaser/cards, hero, gallery+lightbox, embeds, tags, Škodapedia glossary, Series template, **model-page (208)**, **category/tag archive (209)**, **custom microsite (210)** | A | 10 | 35 | 13.5–22 | 29–46 |
+| **E02 Core Blocks** | teaser/cards, hero, gallery+lightbox, embeds, tags, Škodapedia glossary, Series template, **model-page (208)**, **category/tag archive (209)**, **custom microsite (210)**, **DA tag plugin (211)**, **home blocks: stories feed / rails / promo-box (214/212/213)** | A | 14 | 35 | 13.5–22 | 29–46 |
 | **E03 Chrome Fragments** | header/mega-menu, mobile ARIA, lang switcher, footer, MR footer variant | A | 5 | 14 | 6–8 | 9–16 |
-| **E04 Listings & Search** | query-index (15 facets) + metadata-normalization, listing/load-more, search | A | 3 | 19 | 7–12 | 13–21 |
-| **E05 Media Pipeline** | masters-only ingest, downloads block, PDF/MP4, **AEM Assets mapping**, **demo cart + client-side zip**, **media pre-conditioning** | A | 6 | 21 | 7–13 | 14–23 |
+| **E04 Listings & Search** | query-index (15 facets) + metadata-normalization, listing/load-more, search, **RSS (405)** | A | 4 | 19 | 7–12 | 13–21 |
+| **E05 Media Pipeline** | masters-only ingest, downloads block, PDF/MP4, **AEM Assets mapping**, **demo cart + client-side zip (505/505a/505b)**, **media pre-conditioning**, **AEM Assets picker (507)** | A | 9 | 21 | 7–13 | 14–23 |
 | **E06 Import Pilot Content** | parsers/transformers, DA push, pilot pages, full-fidelity story restore | A | 4 | 13 | 4.5–8 | 9–14 |
-| **E07 QA / Perf / A11y / Launch** | lint, Lighthouse/RUM, a11y, visual QA, sign-off, **branded 404 (706)** | A | 5 | 12 | 4.5–7.5 | 7.5–13 |
+| **E07 QA / Perf / A11y / Launch** | lint, Lighthouse/RUM, a11y, visual QA, sign-off, **branded 404 (706)**, **demo assembly (707)** | A | 6 | 12 | 4.5–7.5 | 7.5–13 |
 | **E08 Editorial at Scale** | story flatten, remaining templates, **press-release detail (607)**, **press-kit (805–808)**, **company/Page family (810)**, **Page base shell (813)**, **SiteOrigin body flatten (814)**, **governance: roles/embargo/audit (809/811/812)**, bulk import | B | 15 | 71 | 26.5–46 | 53–91 |
 | **E09 Dynamic Services** | media-cart **prod hardening**, banners, newsletter, hosted search, analytics, **QR access (906)** | C | 6 | 45 | 17–28 | 34–62 |
 | **E10 Localization** | 6 locales, per-locale index, translation, routing | D | 3 | 16 | 6–10 | 10–15+ |
-| **Total** | | | **63** | **261** | **97–164** | **191–321** |
+| **Total** | | | **72** | **261** | **97–164** | **191–321** |
 
 *(SP roll-ups are indicative; day ranges are the sum of per-ticket planning ranges, treat as order-of-magnitude, not a commitment.)*
 
@@ -77,12 +77,16 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-401 | Query-index schema + selectors + metadata-normalization (15 facets) | E04 | 8 | 3–5 | 5–8 | 104 | 🟠 build-confirmed: admin-service `query.yaml` (not repo); fields need normalization layer, not clean selectors |
 | SKODA-402 | Faceted listing + load-more (deep-link) | E04 | 8 | 3–5 | 6–9 | 401,201 | 🟠 hardest pilot block |
 | SKODA-403 | Search block (index-only) | E04 | 3 | 1–2 | 2–4 | 401 | 🟡 body-search deferred |
+| SKODA-405 | RSS feed generation (query-index → RSS 2.0) | E04 | 2 | 0.5–1 | 1–2 | 401 | 🟢 M1 stretch; agent-fit |
 | SKODA-501 | Masters-only image ingest (img-out-of-`<p>`, alt/caption) | E05 | 3 | 1–2 | 2–3 | 102 | 🟢 |
 | SKODA-502 | Static Downloads block (mediabox) | E05 | 3 | 1–2 | 2–3 | 102 | 🟢 |
 | SKODA-503 | PDF/MP4 handling (link/DAM) | E05 | 2 | 0.5–1 | 1–2 | 501 | 🟡 MP4 signed-flow (cart now SKODA-505) |
 | SKODA-504 | Map S3 images → AEM Assets (manifest) | E05 | 3 | 1–2 | 2–3 | 501,601 | 🟠 A/B unconfirmed; M2 scale = rights+dedup |
 | SKODA-505 | Demo media-cart + client-side zip (device-ID, no login) | E05 | 8 | 3–5 | 6–10 | 502,501,504,601 | 🟠 mission-critical demo; CORS/AEM-Assets linchpin |
 | SKODA-506 | Media pre-conditioning: strip/replace oversized masters before publish | E05 | 2 | 0.5–1 | 1–2 | 501 | 🟠 build-confirmed: 25–40 MB masters 409 the content bus; gates publish |
+| SKODA-505a | Media-cart download logic (device-ID + originals + multi-select zip) | E05 | 5 | 2–3 | 4–6 | 501,504,502,601 | 🟠 split from 505 (logic half); agent-fit |
+| SKODA-505b | Media-cart presentation + live AEM DAM delivery wiring | E05 | 3 | 1–2 | 2–3 | 505a,501,504 | 🔴 split from 505 (presentation half); human-gate |
+| SKODA-507 | Native AEM Assets picker in DA/EW (Media Bus delivery) | E05 | 2 | 0.5–1 | 1–2 | 504,505b | 🔴 BLOCKED (client AEM env + DA site config, creds) |
 | SKODA-601 | Import infra: parsers + transformers | E06 | 5 | 2–3 | 4–6 | 102 | 🟡 content-driven only |
 | SKODA-602 | DA source-API push + bulk-op publish | E06 | 3 | 1–2 | 2–3 | 601 | 🟢 |
 | SKODA-603 | Pilot page set imported + validated | E06 | 3 | 1–2 | 2–3 | 601,602,201,202,203,204,205,501,502 | 🟡 fan-in |
