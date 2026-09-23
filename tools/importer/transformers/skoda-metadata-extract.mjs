@@ -68,15 +68,20 @@ export function categoryFromUrl(url) {
 }
 
 /**
- * Parse one tag href → { taxonomy, slug } or null. Handles both measured shapes:
- *   /en/tag/<taxonomy>/<slug>/                (archive links)
- *   ...?filter[<taxonomy>][]=<slug>           (listing facet links)
+ * Parse one tag href → { taxonomy, slug } or null. Handles both measured shapes,
+ * each in raw OR percent-encoded bracket form:
+ *   /en/tag/<taxonomy>/<slug>/                       (archive links)
+ *   ...?filter[<taxonomy>][]=<slug>                   (listing facet links, raw)
+ *   ...?filter%5B<taxonomy>%5D%5B%5D=<slug>           (listing facet links, encoded)
+ * Press-release tag links use the ENCODED form; the model page used /tag/ links —
+ * both must resolve, or a page's tags silently vanish from the query-index.
  */
 export function parseTagHref(href) {
   if (!href) return null;
   let m = href.match(/\/tag\/([a-z0-9-]+)\/([a-z0-9-]+)\/?/i);
   if (m) return { taxonomy: m[1].toLowerCase(), slug: m[2].toLowerCase() };
-  m = href.match(/filter\[([a-z0-9-]+)\]\[\]=([^&"]+)/i);
+  // Match filter[<tax>][]=<slug> with '[' / ']' either literal or %5B / %5D.
+  m = href.match(/filter(?:\[|%5B)([a-z0-9-]+)(?:\]|%5D)(?:\[\]|%5B%5D)=([^&"]+)/i);
   if (m) {
     const [, taxonomy, raw] = m;
     let slug;

@@ -135,7 +135,10 @@ function extractTagsAndFacets(document) {
       const href = a.getAttribute('href') || '';
       let m = href.match(/\/tag\/([a-z0-9-]+)\/([a-z0-9-]+)\/?/i);
       if (m) { add(m[1].toLowerCase(), m[2].toLowerCase()); return; }
-      m = href.match(/filter\[([a-z0-9-]+)\]\[\]=([^&"]+)/i);
+      // filter[<tax>][]=<slug> with brackets literal OR percent-encoded (%5B/%5D).
+      // Press-release tag links use the encoded form; keep this in sync with
+      // skoda-metadata-extract.mjs::parseTagHref (mirrored 1:1).
+      m = href.match(/filter(?:\[|%5B)([a-z0-9-]+)(?:\]|%5D)(?:\[\]|%5B%5D)=([^&"]+)/i);
       if (m) {
         let slug;
         try { slug = decodeURIComponent(m[2]); } catch (e) { slug = m[2]; }

@@ -1,0 +1,76 @@
+/* eslint-disable */
+/* global WebImporter */
+
+/**
+ * Transformer: shared Škoda "representative page" chrome cleanup.
+ *
+ * Reused across the low-complexity representative templates that share the same
+ * Media Room site chrome: editorial Page (SiteOrigin body → default content),
+ * category archive, and tag/model archive. Removes non-authorable header/footer/
+ * nav/newsletter/banner/social/consent chrome so the hero banner + body/archive
+ * content survive for the parsers.
+ *
+ * Selectors verified against .migration/work/samples/rep_brand-group-core-bgc.html,
+ * rep_category_emobility.html and rep_tag_model_elroq.html. OneTrust/side-banner
+ * patterns are defensive no-ops on samples that lack them but present on siblings.
+ *
+ * NOTE: SiteOrigin `.panel-grid` widget WRAPPERS are intentionally NOT removed —
+ * the editorial Page body is flattened to its plain default content (headings +
+ * rich text survive as-is); reconstructing the SiteOrigin widget tree is the hard
+ * Phase-B work explicitly deferred to SKODA-801 and out of scope here.
+ */
+
+const TransformHook = { beforeTransform: 'beforeTransform', afterTransform: 'afterTransform' };
+
+export default function transform(hookName, element, payload) {
+  if (hookName === TransformHook.beforeTransform) {
+    WebImporter.DOMUtils.remove(element, [
+      // Site header / nav / language switcher / search overlay chrome
+      'header.header',
+      '.site-header',
+      '.mega-menu',
+      '.megamenu',
+      '.menu-toggle',
+      '.language-switcher',
+      '.lang-switch',
+      '.search-form-wrap',
+      '.search-form',
+
+      // Footer chrome (also carries the .social strip)
+      'footer.footer',
+      '.site-footer',
+      '.footer-mediaroom',
+
+      // Secondary widgets / banners
+      '.newsletter-subscribe-widget',
+      '.side-banner',
+      '.sa-bnr',
+
+      // Cookie / consent (defensive)
+      '#onetrust-consent-sdk',
+      '#onetrust-banner-sdk',
+      '#onetrust-pc-sdk',
+      '.onetrust-pc-dark-filter',
+      '.ot-sdk-container',
+      '#ot-sdk-btn',
+      '.ot-sdk-show-settings',
+      '[id*="cookie" i]',
+      '[class*="cookie" i]',
+      '[class*="consent" i]',
+
+      // Floating affordances
+      '.scroll-top',
+      '.social-share',
+      '.media-cart-flyout',
+      '.share-bar',
+
+      // Chrome resource elements
+      'link[rel="stylesheet"]',
+      'link',
+    ]);
+  }
+
+  if (hookName === TransformHook.afterTransform) {
+    // intentionally empty
+  }
+}

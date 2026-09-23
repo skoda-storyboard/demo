@@ -1,0 +1,375 @@
+{
+  "templates": [
+    {
+      "name": "model-page",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/skoda-model/elroq/"
+      ],
+      "description": "Škoda model page (skoda_model CPT, Media Room side). Full-bleed hero (model image + 'Models' chip + model-name h1 overlay) -> 9-anchor in-page icon nav -> Model Description rich text -> Key Facts (Highlights) cards -> Technical Data spec table -> 6 index-driven rails (Bodywork/Derivatives + News/Press Kits/Stories/Images/Videos 'Based on tags: <model>'). Spec: docs/ui-specs/template-model-page.md; content model T3 (SKODA-TEMPLATE-CONTENT-MODELS.md); ticket SKODA-208.",
+      "blocks": [
+        {
+          "name": "hero",
+          "instances": [
+            "article.skoda_model > .carousel"
+          ]
+        },
+        {
+          "name": "in-page-nav",
+          "instances": [
+            "nav.model-nav, .model-nav"
+          ]
+        },
+        {
+          "name": "key-facts",
+          "instances": [
+            "#keyfacts .so-widget-ys-so-widget-highlights"
+          ]
+        },
+        {
+          "name": "spec-table",
+          "instances": [
+            "#techdata .so-widget-ys-so-widget-techdata"
+          ]
+        },
+        {
+          "name": "story-rail",
+          "instances": [
+            "#derivatives .search-results-container",
+            "#news .search-results-container",
+            "#press-kits .search-results-container",
+            "#stories .search-results-container",
+            "#images .search-results-container",
+            "#videos .search-results-container"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Hero",
+          "selector": [
+            "article.skoda_model > .carousel"
+          ],
+          "style": null,
+          "blocks": [
+            "hero"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-2",
+          "name": "In-page nav",
+          "selector": [
+            ".model-nav"
+          ],
+          "style": null,
+          "blocks": [
+            "in-page-nav"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-3",
+          "name": "Model Description",
+          "selector": [
+            "#intro"
+          ],
+          "style": null,
+          "blocks": [],
+          "defaultContent": [
+            "#intro h2",
+            "#intro p"
+          ]
+        },
+        {
+          "id": "section-4",
+          "name": "Key Facts",
+          "selector": [
+            "#keyfacts"
+          ],
+          "style": null,
+          "blocks": [
+            "key-facts"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-5",
+          "name": "Technical Data",
+          "selector": [
+            "#techdata"
+          ],
+          "style": null,
+          "blocks": [
+            "spec-table"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-6",
+          "name": "Bodywork / Derivatives",
+          "selector": [
+            "#derivatives"
+          ],
+          "style": null,
+          "blocks": [
+            "story-rail"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-7",
+          "name": "News",
+          "selector": [
+            "#news"
+          ],
+          "style": null,
+          "blocks": [
+            "story-rail"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-8",
+          "name": "Press Kits",
+          "selector": [
+            "#press-kits"
+          ],
+          "style": null,
+          "blocks": [
+            "story-rail"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-9",
+          "name": "Stories",
+          "selector": [
+            "#stories"
+          ],
+          "style": null,
+          "blocks": [
+            "story-rail"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-10",
+          "name": "Images",
+          "selector": [
+            "#images"
+          ],
+          "style": null,
+          "blocks": [
+            "story-rail"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-11",
+          "name": "Videos",
+          "selector": [
+            "#videos"
+          ],
+          "style": null,
+          "blocks": [
+            "story-rail"
+          ],
+          "defaultContent": []
+        }
+      ]
+    },
+    {
+      "name": "press-release",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/"
+      ],
+      "description": "Škoda press release detail (press_release CPT, Media Room side). No hero: header (span.entry-published date + h1.entry-title) -> primary column default content (article-teaser lead image, .bullet-points inline list, .entry-summary lead, .entry-content body) -> secondary Gallery (section.images.sa-media-kit-preview) -> Tags (ol.entry-tags) -> full-bleed dark related band (div.cover-box.dark div.search-results.media-box) parsed as Downloads. AI-audio (Buzzsprout) embed + newsletter/banner widgets are removed by skoda-press-release-cleanup (Embeds → SKODA-204). Spec: docs/ui-specs/template-press-release.md; content model T15; tickets SKODA-601/607. Detection is content-driven only.",
+      "blocks": [
+        {
+          "name": "gallery",
+          "instances": [
+            "section.images.sa-media-kit-preview"
+          ]
+        },
+        {
+          "name": "tags",
+          "instances": [
+            "section.tags"
+          ]
+        },
+        {
+          "name": "downloads",
+          "instances": [
+            ".cover-box.dark .search-results.media-box, .search-results.media-box"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Article",
+          "selector": [
+            "article.press_release > .container, article.press_release"
+          ],
+          "style": null,
+          "blocks": [
+            "gallery",
+            "tags"
+          ],
+          "defaultContent": [
+            "header .entry-published",
+            "header .entry-title",
+            ".column-primary .article-teaser",
+            ".column-primary .bullet-points",
+            ".column-primary .entry-summary",
+            ".column-primary .entry-content"
+          ]
+        },
+        {
+          "id": "section-2",
+          "name": "Related Media",
+          "selector": [
+            ".cover-box.dark"
+          ],
+          "style": "dark, full-width",
+          "blocks": [
+            "downloads"
+          ],
+          "defaultContent": []
+        }
+      ]
+    },
+    {
+      "name": "pr-listing",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/news/"
+      ],
+      "description": "Škoda faceted-listing page (template-search-results engine, e.g. /en/news/). INDEX-DRIVEN: emits a single `Listing` config block (index/path/template/facets/sort/perpage/columns) over the published query-index; the SSR result cards + Search-&-Filter-Pro/ElasticPress/Isotope stack are NOT ported. Page metadata is template=page (nav-only, not rail-indexed); listed items carry press_release metadata. Spec: docs/ui-specs/faceted-listing.md; content model T9; tickets SKODA-601/402. Detection is content-driven only.",
+      "blocks": [
+        {
+          "name": "listing",
+          "instances": [
+            "#search-filter-results"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Listing",
+          "selector": [
+            "#search-filter-results"
+          ],
+          "style": null,
+          "blocks": [
+            "listing"
+          ],
+          "defaultContent": [
+            "h1.entry-title, h1.page-title, main h1"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "page-base",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/brand-group-core-bgc/"
+      ],
+      "description": "Škoda editorial 'Page' base shell (page-template-default, e.g. /en/brand-group-core-bgc/). Hero banner (div.hero) -> single-column article.page body. The SiteOrigin panel-grid body is FLATTENED to plain default content (headings + rich text survive); the widget tree is NOT reconstructed (deferred to SKODA-801). Metadata template=page. Spec: docs/ui-specs/template-page-base.md; content model T-page; ticket SKODA-813/802. Content-driven detection only.",
+      "metadata": {
+        "template": "page"
+      },
+      "blocks": [
+        {
+          "name": "hero-banner",
+          "instances": [
+            "div.hero"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Hero",
+          "selector": [
+            "div.hero"
+          ],
+          "style": null,
+          "blocks": [
+            "hero-banner"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-2",
+          "name": "Body",
+          "selector": [
+            "article.page, article.post"
+          ],
+          "style": null,
+          "blocks": [],
+          "defaultContent": [
+            "article.page h1",
+            "article.page h2",
+            "article.page h3",
+            "article.page p",
+            "article.page ul",
+            "article.page ol"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "category-archive",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/category/emobility/"
+      ],
+      "description": "Škoda category/tag ARCHIVE listing (body.archive, e.g. /en/category/emobility/ and /en/tag/model/elroq/). Hero banner (div.hero, tag/model adds a CTA overlay) -> index-driven facet-less Listing over div.search-results.archive-results (scope derived from the page canonical URL). No facet engine (distinct from pr-listing). Metadata template=page. Spec: docs/ui-specs/template-category-archive.md; content models T7/T8; ticket SKODA-209. Content-driven detection only.",
+      "metadata": {
+        "template": "page"
+      },
+      "blocks": [
+        {
+          "name": "hero-banner",
+          "instances": [
+            "div.hero"
+          ]
+        },
+        {
+          "name": "archive-list",
+          "instances": [
+            "div.search-results.archive-results, .container .search-results-items"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Hero",
+          "selector": [
+            "div.hero"
+          ],
+          "style": null,
+          "blocks": [
+            "hero-banner"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-2",
+          "name": "Archive",
+          "selector": [
+            "div.search-results.archive-results",
+            ".container .search-results-items"
+          ],
+          "style": null,
+          "blocks": [
+            "archive-list"
+          ],
+          "defaultContent": []
+        }
+      ]
+    }
+  ]
+}

@@ -57,6 +57,23 @@ test('parseTagHref handles /tag/<taxonomy>/<slug>/ and ?filter[..][]=', () => {
   assert.equal(parseTagHref('/en/about/'), null);
 });
 
+test('parseTagHref handles percent-encoded filter brackets (press-release form)', () => {
+  // Real press-release tag hrefs encode the brackets: filter%5Byears%5D%5B%5D=
+  assert.deepEqual(
+    parseTagHref('https://www.skoda-storyboard.com/en/news/?filter%5Byears%5D%5B%5D=2026'),
+    { taxonomy: 'years', slug: '2026' },
+  );
+  assert.deepEqual(
+    parseTagHref('/en/news/?filter%5Btechnology%5D%5B%5D=plug-in-hybrid-en'),
+    { taxonomy: 'technology', slug: 'plug-in-hybrid-en' },
+  );
+  // Encoded value is percent-decoded too.
+  assert.deepEqual(
+    parseTagHref('/en/news/?filter%5Bvip%5D%5B%5D=jahn'),
+    { taxonomy: 'vip', slug: 'jahn' },
+  );
+});
+
 test('groupTags dedupes and groups by taxonomy (story: years+model)', () => {
   const { tags, byFacet } = groupTags([
     '/en/tag/years/2026/', '/en/tag/model/epiq/', '/en/tag/model/epiq/', // dup
