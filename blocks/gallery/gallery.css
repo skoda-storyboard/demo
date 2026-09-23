@@ -177,26 +177,19 @@ body.gallery-lightbox-open {
   animation: gallery-content-in 0.3s ease both;
 }
 
-/* top bar: counter + actions */
+/* top bar: overview toggle + close, right-aligned (no divider, matching the
+   source colorbox chrome where only the ✕ sits at the top-right) */
 .gallery .gallery-lightbox-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: var(--spacing-m);
   padding: var(--spacing-m) var(--spacing-l);
-  border-bottom: 1px solid var(--gallery-divider);
 }
 
 .gallery .gallery-lightbox-count {
   margin: 0;
   font-size: var(--body-font-size-m);
-}
-
-.gallery .gallery-lightbox-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-m);
-  margin-left: auto; /* keep close/actions right-aligned even when counter is hidden */
 }
 
 .gallery .gallery-lightbox-overview-toggle {
@@ -313,29 +306,35 @@ body.gallery-lightbox-open {
   }
 }
 
-/* prev / next discs (brand emerald) */
+/* bottom-right control cluster: prev ‹ · counter N / total · next › — matches
+   the live colorbox where the counter and arrows sit together bottom-right */
+.gallery .gallery-lightbox-controls {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
+  padding: var(--spacing-m) var(--spacing-l);
+}
+
+.gallery .gallery-lightbox-controls[hidden] {
+  display: none;
+}
+
 .gallery .gallery-lightbox-prev,
 .gallery .gallery-lightbox-next {
-  position: fixed;
-  top: 50%;
-  width: 48px;
-  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   border: 0;
   border-radius: 50%;
   padding: 0;
   background: var(--gallery-accent);
   color: var(--skoda-ink);
-  transform: translateY(-50%);
-  box-shadow: 1px 1px 6px 3px rgb(0 0 0 / 15%);
   cursor: pointer;
-}
-
-.gallery .gallery-lightbox-prev { left: 10px; }
-.gallery .gallery-lightbox-next { right: 10px; }
-
-.gallery .gallery-lightbox-prev[hidden],
-.gallery .gallery-lightbox-next[hidden] {
-  display: none;
 }
 
 .gallery .gallery-lightbox-prev::before {
@@ -348,7 +347,7 @@ body.gallery-lightbox-open {
 
 .gallery .gallery-lightbox-prev::before,
 .gallery .gallery-lightbox-next::before {
-  font-size: 2rem;
+  font-size: 1.75rem;
   line-height: 1;
 }
 

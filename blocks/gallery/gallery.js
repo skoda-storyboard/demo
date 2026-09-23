@@ -134,16 +134,10 @@ function buildLightbox(block, items) {
   overlay.hidden = true;
   if (REDUCED_MOTION) overlay.classList.add('reduced-motion');
 
-  // top bar: counter + overview toggle + close
+  // top bar: overview toggle + close, right-aligned (no divider — matches the
+  // source colorbox chrome where only the ✕ sits top-right)
   const topbar = document.createElement('div');
   topbar.className = 'gallery-lightbox-top';
-
-  const counter = document.createElement('p');
-  counter.className = 'gallery-lightbox-count';
-  counter.setAttribute('aria-live', 'polite');
-
-  const topActions = document.createElement('div');
-  topActions.className = 'gallery-lightbox-actions';
 
   const overviewBtn = document.createElement('button');
   overviewBtn.type = 'button';
@@ -157,8 +151,16 @@ function buildLightbox(block, items) {
   closeBtn.className = 'gallery-lightbox-close';
   closeBtn.setAttribute('aria-label', LABELS.close);
 
-  topActions.append(overviewBtn, closeBtn);
-  topbar.append(counter, topActions);
+  topbar.append(overviewBtn, closeBtn);
+
+  // bottom-right control cluster: prev + counter + next (matches the live
+  // colorbox where the counter and arrows sit together bottom-right)
+  const controls = document.createElement('div');
+  controls.className = 'gallery-lightbox-controls';
+
+  const counter = document.createElement('p');
+  counter.className = 'gallery-lightbox-count';
+  counter.setAttribute('aria-live', 'polite');
 
   // stage: image (contain-fit) + caption region
   const stage = document.createElement('div');
@@ -185,6 +187,8 @@ function buildLightbox(block, items) {
   nextBtn.className = 'gallery-lightbox-next';
   nextBtn.setAttribute('aria-label', LABELS.next);
 
+  controls.append(prevBtn, counter, nextBtn);
+
   stageImg.setAttribute('aria-describedby', stageCaption.id);
 
   // overview grid (thumbnails), built lazily on first toggle
@@ -193,7 +197,7 @@ function buildLightbox(block, items) {
   overview.hidden = true;
   overview.style.setProperty('--overview-cols', String(overviewCols(items.length)));
 
-  overlay.append(topbar, prevBtn, stage, nextBtn, overview);
+  overlay.append(topbar, stage, overview, controls);
   block.append(overlay);
 
   let current = 0;
@@ -213,7 +217,12 @@ function buildLightbox(block, items) {
     stageImg.alt = item.alt;
     const reveal = () => stageImg.classList.add('is-loaded');
     if (stageImg.complete) reveal();
-    else stageImg.addEventListener('load', reveal, { once: true });
+    else {
+      stageImg.addEventListener('load', reveal, { once: true });
+      // still reveal (so the caption/detail panel is never stuck hidden) if the
+      // rendition fails to load
+      stageImg.addEventListener('error', reveal, { once: true });
+    }
     // clone the authored caption content into the stage caption (plain or panel)
     stageCaption.textContent = '';
     if (item.caption) {
@@ -249,8 +258,8 @@ function buildLightbox(block, items) {
     if (on) buildOverview();
     overview.hidden = !on;
     stage.hidden = on;
-    prevBtn.hidden = on;
-    nextBtn.hidden = on;
+    // hide the whole bottom control cluster (prev + counter + next) in overview
+    controls.hidden = on;
     overviewBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
   };
 
@@ -306,9 +315,8 @@ function buildLightbox(block, items) {
     singleMode = single;
     render(index);
     setOverview(false);
-    prevBtn.hidden = single;
-    nextBtn.hidden = single;
-    counter.hidden = single;
+    // single-image view: no navigation cluster and no overview toggle
+    controls.hidden = single;
     overviewBtn.hidden = single;
     overlay.hidden = false;
     document.body.classList.add('gallery-lightbox-open');

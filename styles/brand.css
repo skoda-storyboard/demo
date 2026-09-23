@@ -43,10 +43,11 @@
 
   /* gallery lightbox (gallery-lightbox.md §3; SKODA-203). Accent reuses the
      brand emerald; divider is the source lightbox top-bar rule colour. Backdrop
-     is the source colorbox overlay: skoda-ink (#161718) at 0.9 opacity. */
+     is the source colorbox overlay: solid skoda-ink (#161718), which fully
+     hides the page behind it (measured opaque on the live site). */
   --gallery-accent: var(--skoda-green-emerald);
   --gallery-divider: #5a5b5c;
-  --gallery-backdrop: rgb(22 23 24 / 90%);
+  --gallery-backdrop: rgb(22 23 24);
 }
 
 /*
