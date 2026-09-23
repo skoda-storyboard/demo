@@ -28,8 +28,12 @@
   width: 100%;
   margin: 0;
   border: 0;
+  border-radius: var(--card-radius);
   padding: 0;
   background: none;
+
+  /* shadow on the button so it isn't clipped by the overflow used for hover-zoom */
+  box-shadow: var(--card-shadow);
   cursor: pointer;
   overflow: hidden;
 }
@@ -39,6 +43,7 @@
   display: block;
   width: 100%;
   aspect-ratio: 3 / 2;
+  border-radius: var(--card-radius);
   object-fit: cover;
 }
 
@@ -89,8 +94,10 @@
   width: 100%;
   margin: 0;
   border: 0;
+  border-radius: var(--card-radius);
   padding: 0;
   background: none;
+  box-shadow: var(--card-shadow);
   cursor: pointer;
   overflow: hidden;
 }
@@ -100,6 +107,7 @@
   display: block;
   width: 100%;
   aspect-ratio: 3 / 2;
+  border-radius: var(--card-radius);
   object-fit: cover;
 }
 
@@ -111,10 +119,10 @@
   transform: scale(1.02);
 }
 
-/* the thumbnail matching the current main image */
+/* the thumbnail matching the current main image — inset accent ring that
+   follows the rounded corners, layered over the card shadow */
 .gallery .gallery-thumb[aria-current='true'] {
-  outline: 2px solid var(--gallery-accent);
-  outline-offset: -2px;
+  box-shadow: inset 0 0 0 2px var(--gallery-accent), var(--card-shadow);
 }
 
 .gallery .gallery-main:focus-visible,
