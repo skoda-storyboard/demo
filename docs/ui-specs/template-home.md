@@ -35,7 +35,7 @@ div.cover-box       "Latest News"      news rail
 **Media Room home (`/en/media-room/`), 4 sections:**
 ```
 section.promo-box              featured (press kit / news)
-div.cover-box       "News"             main news feed
+div.cover-box       "News"             press-release rail (NOT a Load-more feed, measured 2026-09-23)
 div.cover-box.dark  "Models"           models section (dark green bg)
 div.cover-box       "Latest Stories"   stories rail
 ```
@@ -45,7 +45,9 @@ div.cover-box       "Latest Stories"   stories rail
 [`header-megamenu`](header-megamenu.md) (side variant) → [`carousel-rails`](carousel-rails.md)
 (`.promo-box` featured slider + each `.cover-box` rail) wrapping [`card-teaser`](card-teaser.md) →
 [`newsletter`](newsletter.md) + social strip → [`footer`](footer.md) / [`footer-mediaroom`](footer-mediaroom.md).
-The "Latest Stories"/"News" feed uses a **Load more** `<button>` (not a rail).
+The STO home "Latest Stories" feed uses a **Load more** `<button>` (not a rail), its own block
+[`stories`](stories.md) (SKODA-214, build-ready measured spec). The MR home "News" band, despite the shared
+"feed" wording, was measured 2026-09-23 as a **press-release rail with no Load-more button** (see §6/§9).
 
 ## 4. Template-specific structure
 
@@ -53,8 +55,9 @@ The "Latest Stories"/"News" feed uses a **Load more** `<button>` (not a rail).
   green) band. Dark bands are used for accent sections (Social media, Series on STO; Models on MR).
 - **Promo-box** leads both homes (featured showcase, per-breakpoint behavior + mobile auto-rotate, see
   `carousel-rails.md` §3/§5).
-- **Main feed vs rails:** the first `.cover-box` ("Latest Stories" / "News") is a paginated feed with a
-  Load more button; the rest are horizontal rails ("All" link + carousel).
+- **Main feed vs rails:** on the STO home the first `.cover-box` ("Latest Stories") is a paginated feed with
+  a Load more button (the [`stories`](stories.md) block); the rest are horizontal rails ("All" link +
+  carousel). On the MR home, "News" is itself a press-release rail, not a Load-more feed.
 
 ## 5. Measured template-level visual base
 
@@ -85,7 +88,8 @@ Values `getComputedStyle`, cited `(selector · viewport)`.
 ## 6. Interaction / behavior
 
 - Promo-box auto-rotation on mobile (10s, pause-on-hover), see `carousel-rails.md`.
-- "Latest Stories" / "News" **Load more** button appends the next page of cards (real `<button>`).
+- STO "Latest Stories" **Load more** button appends the next page of cards (real `<button>`); first 5 cards,
+  then +6 per click (source `offset:5` / `posts_per_page:6`). Detail in [`stories.md`](stories.md).
 - Category rails: "All" link + prev/next arrows, no autoplay (verify each rail's `data-flickity`).
 
 ## 7. Accessibility
@@ -99,14 +103,15 @@ Values `getComputedStyle`, cited `(selector · viewport)`.
 - DA `Metadata`: `template=landing` (STO) / `template=media-room-home` (MR); side selects chrome.
 - Section model: each home section = a DA section with `Style` = `cover-box` or `cover-box dark`
   (`--section-dark-bg`), containing a `carousel`/`story-rail` or the feed block. Promo-box = the featured
-  block. Reuse `story-rail`/`carousel` + `card-teaser`; the feed's Load more is a query-index pager.
+  block. Reuse `story-rail`/`carousel` + `card-teaser`; the STO feed's Load more is the [`stories`](stories.md)
+  query-index pager (reuses SKODA-402's loader/paginate).
 
 ## 9. Open decisions + recommended default
 
 - **Section order / which rails** per home (🟡): confirm the canonical section set + order with the client
   (captured set above is the current live order).
-- **Feed page size + Load more vs infinite scroll** (🟡): default Load more button (source-confirmed on
-  STO home).
+- **Feed page size + Load more vs infinite scroll** (🟢 RESOLVED 2026-09-23): Load more button, first **5**
+  cards then **+6** per click (source `offset:5` / `posts_per_page:6`); see [`stories.md`](stories.md) §2.
 
 ## 10. Pixel-perfect acceptance criteria
 

@@ -51,6 +51,7 @@ Status legend: `DRAFT` (skeleton, awaiting capture) · `CAPTURED` (measured, in 
 | `hero.md` | hero-image | 202 (reused 207) | `/en/<story>` hero | CAPTURED |
 | `tags.md` | tags (new) | 205 | story/PR tag-list | CAPTURED |
 | `carousel-rails.md` | carousel + story-rail | underpins 201/stories/story-rail; MR rails | `/en/` sliders | CAPTURED |
+| `stories.md` | stories (new) | 214 (reuses 402 loader/paginate) | `/en/` "Latest Stories" feed | CAPTURED |
 | `header-megamenu.md` | header | 301 | `/en/` nav | CAPTURED |
 | `mobile-nav.md` | header | 302 | `/en/` (<1080) | CAPTURED |
 | `language-switcher.md` | header | 303 | `/en/` topbar | CAPTURED |
@@ -108,7 +109,7 @@ component spec + ticket. Any ID with no UI build is marked with its reason.
 | ID | Client component | Component spec | Ticket |
 |---|---|---|---|
 | STO-H01 | Promotional/Featured Carousel | carousel-rails / stories(promo) | 201 / stories |
-| STO-H02 | Latest Stories | stories | 201 / 402 |
+| STO-H02 | Latest Stories | stories | 214 (402 reuse) |
 | STO-H03 | Models Slider | carousel-rails (cards-media models) | carousel |
 | STO-H04 | eMobility Slider | carousel-rails (story-rail) | story-rail |
 | STO-H05 | Lifestyle Slider | carousel-rails (story-rail) | story-rail |

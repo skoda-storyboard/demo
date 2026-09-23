@@ -15,6 +15,7 @@
   /* primitive colors (§2) */
   --skoda-green: #0e3a2f;
   --skoda-green-emerald: #78faae;
+  --skoda-green-emerald-hover: #a8ffcc;
   --skoda-ink: #161718;
   --skoda-black: #000;
   --skoda-white: #fff;
@@ -50,6 +51,17 @@
   --gallery-divider: #5a5b5c;
   --gallery-nav-divider: #606060; /* nav cluster vertical rules (measured live) */
   --gallery-backdrop: rgb(22 23 24);
+
+  /* faceted-listing (SKODA-402; measured in docs/ui-specs/faceted-listing.md §3) */
+  --facet-radius: 5px;
+  --facet-pill-bg: #f6f6f6;          /* distinct from --skoda-grey-100 #f5f5f5 */
+  --facet-pill-hover: #e4e4e4;       /* == --divider-color */
+  --facet-active: #419468;           /* selected pill / checked box / remove glyph */
+  --facet-shadow: 0 2px 1px -1px rgb(0 0 0 / 10%), 0 1px 1px 0 rgb(0 0 0 / 5%), 0 1px 3px 0 rgb(0 0 0 / 5%);
+  --chip-border: #d4d4d4;            /* applied-filter chip border */
+  --pagination-border: #c9cdd3;      /* result-count underline */
+  --grid-gutter: 20px;               /* listing cell margin-bottom / padding base */
+  --pill-radius: 50px;               /* shared ghost-pill (load-more) */
 }
 
 /*
