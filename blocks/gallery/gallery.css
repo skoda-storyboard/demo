@@ -8,26 +8,58 @@
 
 /* ==========================================================================
  * Gallery block + lightbox — SKODA-203
- * Spec: docs/ui-specs/gallery-lightbox.md. Fixed 4-across thumbnail grid + one
- * accessible full-screen lightbox at all viewports (retires the source
+ * Spec: docs/ui-specs/gallery-lightbox.md. On-page: a large MAIN image + a
+ * thumbnail list beside it (source sb-gallery form); clicking the main image or
+ * any thumbnail opens ONE accessible full-screen lightbox (retires the source
  * colorbox/sb-gallery split). Tokens-only; mobile-first.
  * ========================================================================== */
 
-/* --- Thumbnail grid (fixed 4-across per spec §3) --------------------------- */
-.gallery .gallery-grid {
+/* --- On-page layout: main image + thumbnail rail -------------------------- */
+.gallery .gallery-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+/* MAIN image (large, click to open the lightbox) */
+.gallery .gallery-main {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.gallery .gallery-main picture,
+.gallery .gallery-main img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.gallery .gallery-main img {
+  transition: transform 0.5s ease;
+}
+
+.gallery .gallery-main:hover img {
+  transform: scale(1.02);
+}
+
+/* THUMBNAIL rail — column count set by JS (--thumb-cols) from image count */
+.gallery .gallery-thumbs {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--spacing-xs); /* 8px ~ source 10px at <768 */
+  grid-template-columns: repeat(var(--thumb-cols, 4), 1fr);
+  gap: var(--spacing-xs);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.gallery .gallery-item {
-  margin: 0;
-}
-
-.gallery .gallery-figure {
+.gallery .gallery-thumb-item {
   margin: 0;
 }
 
@@ -36,7 +68,6 @@
   width: 100%;
   margin: 0;
   border: 0;
-  border-radius: var(--card-radius);
   padding: 0;
   background: none;
   cursor: pointer;
@@ -47,7 +78,7 @@
 .gallery .gallery-thumb img {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 2;
   object-fit: cover;
 }
 
@@ -59,20 +90,38 @@
   transform: scale(1.02);
 }
 
+/* the thumbnail matching the current main image */
+.gallery .gallery-thumb[aria-current='true'] {
+  outline: 2px solid var(--gallery-accent);
+  outline-offset: -2px;
+}
+
+.gallery .gallery-main:focus-visible,
 .gallery .gallery-thumb:focus-visible {
   outline: 2px solid var(--skoda-ink);
   outline-offset: 2px;
 }
 
-.gallery .gallery-caption {
-  margin: var(--spacing-xs) 0 0;
-  font-size: var(--body-font-size-s);
-  color: var(--text-color);
+/* authored caption content is held off-canvas and only shown in the lightbox */
+.gallery .gallery-caption-source {
+  display: none;
 }
 
+/* desktop: main image left, thumbnail rail beside it (matches live sb-gallery) */
 @media (width >= 768px) {
-  .gallery .gallery-grid {
-    gap: var(--spacing-m); /* 16px ~ source 20px */
+  .gallery .gallery-layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--spacing-m);
+  }
+
+  .gallery .gallery-main {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .gallery .gallery-thumbs {
+    flex: 0 0 clamp(180px, 30%, 320px);
   }
 }
 
@@ -160,6 +209,7 @@ body.gallery-lightbox-open {
   display: none;
 }
 
+/* mobile-first: image on top, caption/detail panel below (stacked) */
 .gallery .gallery-lightbox-figure {
   display: flex;
   flex-direction: column;
@@ -171,6 +221,7 @@ body.gallery-lightbox-open {
 }
 
 .gallery .gallery-lightbox-image {
+  min-height: 0;
   max-width: 100%;
   max-height: 100%;
   width: auto;
@@ -186,7 +237,32 @@ body.gallery-lightbox-open {
 }
 
 .gallery .gallery-lightbox-caption a {
-  color: var(--skoda-green-emerald);
+  color: var(--gallery-accent);
+}
+
+/* desktop: 2-column detail layout — image left, caption/detail panel right
+   (matches the live MR image-detail lightbox) */
+@media (width >= 768px) {
+  .gallery .gallery-lightbox-figure {
+    flex-direction: row;
+    align-items: stretch;
+    gap: var(--spacing-l);
+  }
+
+  .gallery .gallery-lightbox-image {
+    flex: 1 1 auto;
+    align-self: center;
+  }
+
+  .gallery .gallery-lightbox-caption {
+    flex: 0 0 clamp(280px, 28%, 380px);
+    max-width: none;
+    align-self: stretch;
+    padding-left: var(--spacing-l);
+    border-left: 1px solid var(--gallery-divider);
+    text-align: left;
+    overflow-y: auto;
+  }
 }
 
 /* prev / next discs (brand emerald) */

@@ -27,66 +27,85 @@ const LABELS = {
   next: 'Next image',
   close: 'Close gallery',
   overview: 'Show all images',
-  // counter: "Image {n} of {total}"
-  counter: (n, total) => `Image ${n} of ${total}`,
+  // visible counter, "N / total" (matches source); the aria-live label uses the
+  // longer form for screen readers.
+  counter: (n, total) => `${n} / ${total}`,
+  counterLabel: (n, total) => `Image ${n} of ${total}`,
 };
 
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
- * Build the grid: each row -> <li> with a <button> thumbnail + <figcaption>.
+ * Build the on-page gallery: a large MAIN image + a thumbnail list beside it
+ * (like the live sb-gallery). Clicking the main image or any thumbnail opens the
+ * full-screen lightbox at that index. Captions are held off-DOM and shown only
+ * in the lightbox (matching the source).
  * @param {Element} block
- * @returns {Array<{picture: Element, caption: Element|null, alt: string}>} items
+ * @returns {{items: Array, main: Element}}
  */
-function buildGrid(block) {
+function buildGallery(block) {
   const items = [];
-  const list = document.createElement('ul');
-  list.className = 'gallery-grid';
 
+  // read authored rows into items first
   [...block.children].forEach((row, i) => {
     const cells = [...row.children];
-    const imageCell = cells[0];
-    const captionCell = cells[1];
-    const img = imageCell?.querySelector('img');
+    const img = cells[0]?.querySelector('img');
     if (!img) return;
-
-    // optimized thumbnail picture
     const alt = img.getAttribute('alt') || '';
-    const picture = createOptimizedPicture(img.src, alt, false, [{ width: '750' }]);
+    const { src } = img;
 
-    const li = document.createElement('li');
-    li.className = 'gallery-item';
-
-    const figure = document.createElement('figure');
-    figure.className = 'gallery-figure';
-
-    // real button so the thumbnail is keyboard-openable
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'gallery-thumb';
-    button.setAttribute('aria-label', `${LABELS.open} ${i + 1}`);
-    button.dataset.index = String(i);
-    button.append(picture);
-    figure.append(button);
-
-    // caption: move authored caption content into a <figcaption> (plain text or
-    // the MR detail panel — links/metadata/related — all preserved)
     let caption = null;
+    const captionCell = cells[1];
     if (captionCell && captionCell.textContent.trim()) {
-      caption = document.createElement('figcaption');
-      caption.className = 'gallery-caption';
+      caption = document.createElement('div');
+      caption.className = 'gallery-caption-source';
       while (captionCell.firstChild) caption.append(captionCell.firstChild);
-      figure.append(caption);
     }
-
-    li.append(figure);
-    list.append(li);
-    items.push({ button, alt, caption });
+    items.push({
+      src, alt, caption, index: i,
+    });
   });
 
+  if (!items.length) return { items, main: null };
+
+  // set the column count on the thumbnail rail from item count (source: >19->5,
+  // >9->4, else 3) so the rail sizes to the number of images
+  const cols = overviewCols(items.length); // eslint-disable-line no-use-before-define
+
+  // MAIN image (large, click to open lightbox at the active index)
+  const main = document.createElement('button');
+  main.type = 'button';
+  main.className = 'gallery-main';
+  main.setAttribute('aria-label', `${LABELS.open} 1`);
+  const mainPic = createOptimizedPicture(items[0].src, items[0].alt, true, [{ width: '2000' }]);
+  main.append(mainPic);
+
+  // THUMBNAIL rail (one button per image, sized by count)
+  const thumbs = document.createElement('ul');
+  thumbs.className = 'gallery-thumbs';
+  thumbs.style.setProperty('--thumb-cols', String(cols));
+
+  items.forEach((item, i) => {
+    const li = document.createElement('li');
+    li.className = 'gallery-thumb-item';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'gallery-thumb';
+    btn.setAttribute('aria-label', `${LABELS.open} ${i + 1}`);
+    btn.dataset.index = String(i);
+    btn.append(createOptimizedPicture(item.src, item.alt, false, [{ width: '750' }]));
+    li.append(btn);
+    thumbs.append(li);
+    item.thumbButton = btn;
+  });
+
+  const layout = document.createElement('div');
+  layout.className = 'gallery-layout';
+  layout.append(main, thumbs);
+
   block.textContent = '';
-  block.append(list);
-  return items;
+  block.append(layout);
+  return { items, main };
 }
 
 /**
@@ -184,9 +203,8 @@ function buildLightbox(block, items) {
   const render = (index) => {
     current = (index + items.length) % items.length;
     const item = items[current];
-    const srcImg = item.button.querySelector('img');
-    // reuse the largest source; request a large lightbox rendition
-    const base = srcImg.src.split('?')[0];
+    // request a large lightbox rendition from the authored source
+    const base = item.src.split('?')[0];
     stageImg.src = `${base}?width=2000&format=webply&optimize=medium`;
     stageImg.alt = item.alt;
     // clone the authored caption content into the stage caption (plain or panel)
@@ -198,6 +216,7 @@ function buildLightbox(block, items) {
       stageCaption.hidden = true;
     }
     counter.textContent = LABELS.counter(current + 1, items.length);
+    counter.setAttribute('aria-label', LABELS.counterLabel(current + 1, items.length));
   };
 
   const buildOverview = () => {
@@ -207,7 +226,7 @@ function buildLightbox(block, items) {
       tile.type = 'button';
       tile.className = 'gallery-lightbox-overview-item';
       tile.setAttribute('aria-label', `${LABELS.open} ${i + 1}`);
-      const thumb = item.button.querySelector('picture')?.cloneNode(true);
+      const thumb = item.thumbButton.querySelector('picture')?.cloneNode(true);
       if (thumb) tile.append(thumb);
       tile.addEventListener('click', () => {
         render(i);
@@ -296,11 +315,31 @@ function buildLightbox(block, items) {
  * @param {Element} block the gallery block element
  */
 export default function decorate(block) {
-  const items = buildGrid(block);
+  const { items, main } = buildGallery(block);
   if (!items.length) return;
 
   const lightbox = buildLightbox(block, items);
+
+  let active = 0;
+  const setMain = (i) => {
+    active = i;
+    const base = items[i].src.split('?')[0];
+    const mainImg = main.querySelector('img');
+    mainImg.src = `${base}?width=2000&format=webply&optimize=medium`;
+    mainImg.alt = items[i].alt;
+    main.setAttribute('aria-label', `${LABELS.open} ${i + 1}`);
+    items.forEach((it, j) => it.thumbButton.setAttribute('aria-current', j === i ? 'true' : 'false'));
+  };
+  setMain(0);
+
+  // main image: open the lightbox at the active image
+  main.addEventListener('click', () => lightbox.open(active, main));
+
+  // thumbnails: swap the main image AND open the lightbox at that image
   items.forEach((item, i) => {
-    item.button.addEventListener('click', () => lightbox.open(i, item.button));
+    item.thumbButton.addEventListener('click', () => {
+      setMain(i);
+      lightbox.open(i, item.thumbButton);
+    });
   });
 }
