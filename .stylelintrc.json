@@ -1,4 +1,5 @@
 {
+  "_comment_breakpoints": "Width allowlist is the canonical ladder (768/992/1080) plus the two secondary steps (576/720). Adding a width here is cheap; the real risk is SPLITTING one layout transition across two of these breakpoints (e.g. reveal at 992 + grid at 1080), which leaves a broken in-between band. Stylelint cannot catch that — see docs/guardrails/css-guidelines.md §3 'one transition, one breakpoint'.",
   "extends": ["stylelint-config-standard"],
   "plugins": ["stylelint-declaration-strict-value"],
   "rules": {
