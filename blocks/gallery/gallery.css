@@ -235,7 +235,7 @@ body.gallery-lightbox-open {
   align-items: center;
   justify-content: flex-end;
   gap: var(--spacing-m);
-  padding: var(--spacing-m) var(--spacing-l);
+  padding: 0 var(--spacing-l);
 }
 
 .gallery .gallery-lightbox-count {
@@ -378,7 +378,6 @@ body.gallery-lightbox-open {
     flex: 0 0 clamp(280px, 28%, 380px);
     max-width: none;
     align-self: stretch;
-    border-left: 1px solid var(--gallery-divider);
     text-align: left;
     overflow-y: auto;
   }
