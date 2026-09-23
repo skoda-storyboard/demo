@@ -65,6 +65,16 @@
   line-height: 1.1;
 }
 
+/* Story title steps up to 40px from >768px (hero.md §4: 40px holds at 1024;
+   the drop to 28px is at <=768). Decoupled from the 1080 order/align swap so
+   the 768-1079 band renders 40px, left-aligned, image-above-title. */
+@media (width > 768px) {
+  .hero-image:not(.overlay, .archive) .hero-image-content h1,
+  .hero-image:not(.overlay, .archive) .hero-image-content h2 {
+    font-size: var(--heading-font-size-hero-story);
+  }
+}
+
 .hero-image .hero-image-content p {
   margin: var(--spacing-s) 0 0;
 }
@@ -128,10 +138,12 @@
     text-align: center;
   }
 
+  /* desktop story title: 16px top / 32px bottom (hero.md §3A: margin 16 0 32).
+     32px has no spacing token, so it is a documented literal. font-size is set
+     from the >768px rule above. */
   .hero-image:not(.overlay, .archive) .hero-image-content h1,
   .hero-image:not(.overlay, .archive) .hero-image-content h2 {
-    margin: var(--spacing-m) 0 var(--spacing-l);
-    font-size: var(--heading-font-size-hero-story);
+    margin: var(--spacing-m) 0 32px;
   }
 
   .hero-image:not(.overlay, .archive) .hero-image-media {
