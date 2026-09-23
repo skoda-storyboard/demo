@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stories feed block harness (SKODA-214)</title>
+  <link rel="stylesheet" href="/styles/brand.css">
+  <link rel="stylesheet" href="/styles/styles.css">
+  <link rel="stylesheet" href="/blocks/stories/stories.css">
+  <style>body { font-family: system-ui, sans-serif; margin: 24px; } main { max-width: 1248px; margin: auto; }</style>
+</head>
+<body>
+  <main>
+    <!-- A Stories feed authored as a DA config table: first cell = block name. -->
+    <div class="stories block" data-block-name="stories">
+      <div><div>index</div><div>/blocks/stories/test/query-index.json</div></div>
+      <div><div>heading</div><div>Latest Stories</div></div>
+      <div><div>perpage</div><div>3</div></div>
+      <div><div>columns</div><div>3</div></div>
+    </div>
+  </main>
+  <script type="module">
+    import decorate from '/blocks/stories/stories.js';
+    const block = document.querySelector('.stories');
+    await decorate(block);
+    window.__storiesReady = true;
+  </script>
+</body>
+</html>
