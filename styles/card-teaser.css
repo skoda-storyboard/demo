@@ -73,10 +73,12 @@
 /* date: first, small, semibold, muted — like the source .entry-published */
 .card-teaser-date {
   order: 1;
-  font-size: var(--body-font-size-xs);
+  font-size: var(--card-meta-font-size);
   font-weight: var(--weight-semibold);
-  line-height: 1.2;
+  line-height: var(--card-meta-line-height);
+  letter-spacing: var(--card-meta-letter-spacing);
   color: var(--skoda-grey-500);
+  white-space: nowrap;
 }
 
 /* stretched card link — one tab stop covering the whole card via ::after */
@@ -170,6 +172,12 @@ body.homepage .card-teaser-button.media-cart-action {
 .card-teaser.overlay .card-teaser-date,
 .card-teaser.overlay .card-teaser-summary {
   color: var(--skoda-white);
+}
+
+/* Source overlays give title + metadata a subtle shadow for legibility. */
+.card-teaser.overlay .card-teaser-title,
+.card-teaser.overlay .card-teaser-date {
+  text-shadow: var(--card-overlay-text-shadow);
 }
 
 /* summary: clamped to keep the caption compact */

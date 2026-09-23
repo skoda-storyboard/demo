@@ -121,6 +121,9 @@ Candidate tokens surfaced by capture (add when the relevant block lands):
   `2em` and the grey label radius `2px`; keep these separate, do not collapse into one token.
 - Tag chip: `--tag-radius: 2px`, `--tag-padding: 5px 10px`, `--tag-font-size: 11px`,
   `--tag-letter-spacing: 0.1em`, `--tag-gap: 5px`.
+- Card metadata: `--card-meta-font-size: 11px`, `--card-meta-line-height: 1`,
+  `--card-meta-letter-spacing: 0.1em`; overlay title/date shadow:
+  `--card-overlay-text-shadow: 0 1px 1px rgb(0 0 0 / 50%)`.
 - Hero: `--heading-font-size-hero: 48px`, `--heading-font-size-hero-story: 40px`,
   `--weight-light: 300`, `--hero-vh: 61.8vh`, archive-banner heights `160/200/240px`.
 - Scrim gradients (card-teaser overlay, hero landing/series): `--scrim-h`
