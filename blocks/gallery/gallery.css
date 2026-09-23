@@ -149,6 +149,34 @@ body.gallery-lightbox-open {
   display: none;
 }
 
+/* open effect: the dark backdrop fades in while the content expands up to full
+   screen (mirrors the source colorbox "elastic" resize, ~300ms). */
+@keyframes gallery-backdrop-in {
+  from { background: rgb(22 23 24 / 0%); }
+  to { background: var(--gallery-backdrop); }
+}
+
+@keyframes gallery-content-in {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.gallery .gallery-overlay:not([hidden]) {
+  animation: gallery-backdrop-in 0.3s ease both;
+}
+
+.gallery .gallery-overlay:not([hidden]) .gallery-lightbox-stage,
+.gallery .gallery-overlay:not([hidden]) .gallery-lightbox-overview {
+  animation: gallery-content-in 0.3s ease both;
+}
+
 /* top bar: counter + actions */
 .gallery .gallery-lightbox-top {
   display: flex;
@@ -342,8 +370,14 @@ body.gallery-lightbox-open {
   outline-offset: 2px;
 }
 
-/* respect reduced motion */
+/* respect reduced motion — no transitions and no open/expand animation */
 .gallery .gallery-overlay.reduced-motion .gallery-lightbox-image,
 .gallery .reduced-motion .gallery-thumb img {
   transition: none;
+}
+
+.gallery .gallery-overlay.reduced-motion,
+.gallery .gallery-overlay.reduced-motion .gallery-lightbox-stage,
+.gallery .gallery-overlay.reduced-motion .gallery-lightbox-overview {
+  animation: none;
 }
