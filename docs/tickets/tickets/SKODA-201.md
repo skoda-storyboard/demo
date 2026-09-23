@@ -52,7 +52,6 @@ Measurable gates live in [`card-teaser.md` §9](../../ui-specs/card-teaser.md); 
 - [ ] `cards-card-image`/`cards-card-body` classes present (content-sniffed, no positional `:not()` chains).
 - [ ] Uses tokens only; `npm run lint` clean.
 - [ ] A11y: one tab stop per card; visible `:focus-visible` ring; icon buttons have `aria-label`; non-empty `alt`.
-- [ ] Promo-box featured grid: `>=768` static mosaic (1×`66.66%` + 2×`33.33%`); `<768` 1-up carousel auto-rotating every `10s`, pausing on hover/touch, dots-only, `prefers-reduced-motion` honored.
 - [ ] Image hover: icon overlay fades in over `.3s`; base image `scale:1.02` overscan + `.5s` scale transition present; **no** `1.1` zoom on listing/rail/promo cards (that zoom is model-page-only).
 - [ ] Visual diff vs source at 1280/1024/768/mobile ≤ 2% per-pixel (excluding image content).
 
