@@ -168,13 +168,18 @@ function buildLightbox(block, items) {
 
   const figure = document.createElement('figure');
   figure.className = 'gallery-lightbox-figure';
+  // frame holds the image + a loading placeholder (spinner) shown while the
+  // full-size rendition downloads (mirrors the source colorbox loading graphic)
+  const imageFrame = document.createElement('div');
+  imageFrame.className = 'gallery-lightbox-image-frame';
   const stageImg = document.createElement('img');
   stageImg.className = 'gallery-lightbox-image';
   stageImg.id = 'gallery-lightbox-image';
+  imageFrame.append(stageImg);
   const stageCaption = document.createElement('figcaption');
   stageCaption.className = 'gallery-lightbox-caption';
   stageCaption.id = 'gallery-lightbox-caption';
-  figure.append(stageImg, stageCaption);
+  figure.append(imageFrame, stageCaption);
   stage.append(figure);
 
   const prevBtn = document.createElement('button');
@@ -210,17 +215,22 @@ function buildLightbox(block, items) {
     const item = items[current];
     // request a large lightbox rendition from the authored source
     const base = item.src.split('?')[0];
-    // reset the fade/zoom, then reveal once the rendition has decoded so the
-    // image animates in visible rather than popping in after the open effect
+    // show the loading placeholder + reset the fade/zoom, then reveal once the
+    // rendition has decoded so the image animates in visible rather than
+    // popping in after the open effect
     stageImg.classList.remove('is-loaded');
+    imageFrame.classList.add('is-loading');
     stageImg.src = `${base}?width=2000&format=webply&optimize=medium`;
     stageImg.alt = item.alt;
-    const reveal = () => stageImg.classList.add('is-loaded');
+    const reveal = () => {
+      stageImg.classList.add('is-loaded');
+      imageFrame.classList.remove('is-loading');
+    };
     if (stageImg.complete) reveal();
     else {
       stageImg.addEventListener('load', reveal, { once: true });
-      // still reveal (so the caption/detail panel is never stuck hidden) if the
-      // rendition fails to load
+      // still reveal (so the placeholder clears and the caption/detail panel is
+      // never stuck hidden) if the rendition fails to load
       stageImg.addEventListener('error', reveal, { once: true });
     }
     // clone the authored caption content into the stage caption (plain or panel)

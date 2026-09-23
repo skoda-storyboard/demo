@@ -242,6 +242,35 @@ body.gallery-lightbox-open {
   margin: 0;
 }
 
+/* image frame: holds the image + a centred loading spinner placeholder */
+.gallery .gallery-lightbox-image-frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* loading placeholder: a spinner shown while the full-size rendition downloads
+   (JS toggles .is-loading), mirroring the source colorbox loading graphic */
+.gallery .gallery-lightbox-image-frame.is-loading::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgb(255 255 255 / 30%);
+  border-top-color: var(--gallery-accent);
+  border-radius: 50%;
+  animation: gallery-spin 0.8s linear infinite;
+}
+
+@keyframes gallery-spin {
+  to { transform: rotate(360deg); }
+}
+
 .gallery .gallery-lightbox-image {
   min-height: 0;
   max-width: 100%;
@@ -273,7 +302,7 @@ body.gallery-lightbox-open {
   transition: opacity 0.3s ease;
 }
 
-.gallery .gallery-lightbox-image.is-loaded ~ .gallery-lightbox-caption {
+.gallery .gallery-lightbox-image-frame:not(.is-loading) ~ .gallery-lightbox-caption {
   opacity: 1;
 }
 
@@ -290,9 +319,9 @@ body.gallery-lightbox-open {
     gap: var(--spacing-l);
   }
 
-  .gallery .gallery-lightbox-image {
+  .gallery .gallery-lightbox-image-frame {
     flex: 1 1 auto;
-    align-self: center;
+    align-self: stretch;
   }
 
   .gallery .gallery-lightbox-caption {
@@ -398,6 +427,7 @@ body.gallery-lightbox-open {
 
 .gallery .gallery-overlay.reduced-motion,
 .gallery .gallery-overlay.reduced-motion .gallery-lightbox-stage,
-.gallery .gallery-overlay.reduced-motion .gallery-lightbox-overview {
+.gallery .gallery-overlay.reduced-motion .gallery-lightbox-overview,
+.gallery .gallery-overlay.reduced-motion .gallery-lightbox-image-frame.is-loading::after {
   animation: none;
 }
