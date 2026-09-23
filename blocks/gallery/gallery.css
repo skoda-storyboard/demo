@@ -1,5 +1,5 @@
 /* stylelint-disable no-descending-specificity --
- * Rules are grouped by component region (grid -> overlay -> stage -> overview)
+ * Rules are grouped by component region (grid -> overlay -> stage -> controls)
  * and by state. That grouping orders a couple of higher-specificity state
  * rules (e.g. .gallery-thumb:hover img) before lower-specificity plain img
  * rules in a different region; the cascade is correct (different elements).
@@ -223,30 +223,17 @@ body.gallery-lightbox-open {
   animation: gallery-backdrop-in 0.3s ease both;
 }
 
-.gallery .gallery-overlay:not([hidden]) .gallery-lightbox-stage,
-.gallery .gallery-overlay:not([hidden]) .gallery-lightbox-overview {
+.gallery .gallery-overlay:not([hidden]) .gallery-lightbox-stage {
   animation: gallery-content-in 0.3s ease both;
 }
 
-/* top bar: overview toggle + close, right-aligned (no divider, matching the
-   source colorbox chrome where only the ✕ sits at the top-right) */
+/* top bar: just the close ✕, right-aligned (matches the source colorbox chrome) */
 .gallery .gallery-lightbox-top {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: var(--spacing-m);
   padding: 0 var(--spacing-l);
-}
-
-
-.gallery .gallery-lightbox-overview-toggle {
-  border: 0;
-  border-radius: var(--card-radius);
-  padding: var(--spacing-xs) var(--spacing-s);
-  background: transparent;
-  color: var(--skoda-white);
-  font-size: var(--body-font-size-s);
-  cursor: pointer;
 }
 
 .gallery .gallery-lightbox-close {
@@ -482,38 +469,6 @@ body.gallery-lightbox-open {
   content: '›';
 }
 
-/* overview grid: 3/4/5 columns by item count (JS sets --overview-cols) */
-.gallery .gallery-lightbox-overview {
-  display: grid;
-  grid-template-columns: repeat(var(--overview-cols, 3), 1fr);
-  gap: var(--spacing-s);
-  align-content: start;
-  max-height: 100%;
-  padding: var(--spacing-m);
-  overflow-y: auto;
-}
-
-.gallery .gallery-lightbox-overview[hidden] {
-  display: none;
-}
-
-.gallery .gallery-lightbox-overview-item {
-  border: 0;
-  border-radius: var(--card-radius);
-  padding: 0;
-  background: none;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-.gallery .gallery-lightbox-overview-item picture,
-.gallery .gallery-lightbox-overview-item img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-}
-
 /* focus-visible on every control (source had outline:0 — a11y fix) */
 .gallery .gallery-overlay button:focus-visible {
   outline: 2px solid var(--skoda-white);
@@ -529,7 +484,6 @@ body.gallery-lightbox-open {
 
 .gallery .gallery-overlay.reduced-motion,
 .gallery .gallery-overlay.reduced-motion .gallery-lightbox-stage,
-.gallery .gallery-overlay.reduced-motion .gallery-lightbox-overview,
 .gallery .gallery-overlay.reduced-motion .gallery-lightbox-image-frame.is-loading::after {
   animation: none;
 }

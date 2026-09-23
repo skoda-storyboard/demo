@@ -26,7 +26,6 @@ const LABELS = {
   prev: 'Previous image',
   next: 'Next image',
   close: 'Close gallery',
-  overview: 'Show all images',
   // visible counter, "N / total" (matches source); the aria-live label uses the
   // longer form for screen readers.
   counter: (n, total) => `${n} / ${total}`,
@@ -163,7 +162,7 @@ function buildGallery(block) {
 }
 
 /**
- * Compute the overview grid column count from item count (source thresholds).
+ * Compute the thumbnail-rail column count from item count (source thresholds).
  * @param {number} count
  * @returns {number} 3 | 4 | 5
  */
@@ -188,24 +187,16 @@ function buildLightbox(block, items) {
   overlay.hidden = true;
   if (REDUCED_MOTION) overlay.classList.add('reduced-motion');
 
-  // top bar: overview toggle + close, right-aligned (no divider — matches the
-  // source colorbox chrome where only the ✕ sits top-right)
+  // top bar: just the close ✕, right-aligned (matches the source colorbox chrome)
   const topbar = document.createElement('div');
   topbar.className = 'gallery-lightbox-top';
-
-  const overviewBtn = document.createElement('button');
-  overviewBtn.type = 'button';
-  overviewBtn.className = 'gallery-lightbox-overview-toggle';
-  overviewBtn.setAttribute('aria-label', LABELS.overview);
-  overviewBtn.setAttribute('aria-pressed', 'false');
-  overviewBtn.textContent = LABELS.overview;
 
   const closeBtn = document.createElement('button');
   closeBtn.type = 'button';
   closeBtn.className = 'gallery-lightbox-close';
   closeBtn.setAttribute('aria-label', LABELS.close);
 
-  topbar.append(overviewBtn, closeBtn);
+  topbar.append(closeBtn);
 
   // bottom-right control cluster: prev + counter + next (matches the live
   // colorbox where the counter and arrows sit together bottom-right)
@@ -267,22 +258,15 @@ function buildLightbox(block, items) {
   nextBtn.className = 'gallery-lightbox-next';
   nextBtn.setAttribute('aria-label', LABELS.next);
 
-  controls.append(prevBtn, counter, nextBtn);
+  controls.append(counter, prevBtn, nextBtn);
 
   stageImg.setAttribute('aria-describedby', stageCaption.id);
 
-  // overview grid (thumbnails), built lazily on first toggle
-  const overview = document.createElement('div');
-  overview.className = 'gallery-lightbox-overview';
-  overview.hidden = true;
-  overview.style.setProperty('--overview-cols', String(overviewCols(items.length)));
-
-  overlay.append(topbar, stage, overview, controls);
+  overlay.append(topbar, stage, controls);
   block.append(overlay);
 
   let current = 0;
   let lastFocused = null;
-  let overviewBuilt = false;
   let singleMode = false;
 
   const render = (index) => {
@@ -329,34 +313,6 @@ function buildLightbox(block, items) {
     counter.setAttribute('aria-label', LABELS.counterLabel(current + 1, items.length));
   };
 
-  const buildOverview = () => {
-    if (overviewBuilt) return;
-    items.forEach((item, i) => {
-      const tile = document.createElement('button');
-      tile.type = 'button';
-      tile.className = 'gallery-lightbox-overview-item';
-      tile.setAttribute('aria-label', `${LABELS.open} ${i + 1}`);
-      const thumb = item.thumbButton.querySelector('picture')?.cloneNode(true);
-      if (thumb) tile.append(thumb);
-      tile.addEventListener('click', () => {
-        render(i);
-        // eslint-disable-next-line no-use-before-define
-        setOverview(false);
-      });
-      overview.append(tile);
-    });
-    overviewBuilt = true;
-  };
-
-  const setOverview = (on) => {
-    if (on) buildOverview();
-    overview.hidden = !on;
-    stage.hidden = on;
-    // hide the whole bottom control cluster (prev + counter + next) in overview
-    controls.hidden = on;
-    overviewBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-  };
-
   const focusable = () => [...overlay.querySelectorAll('button:not([hidden])')]
     .filter((el) => el.offsetParent !== null);
 
@@ -397,21 +353,18 @@ function buildLightbox(block, items) {
     overlay.hidden = true;
     document.body.classList.remove('gallery-lightbox-open');
     document.removeEventListener('keydown', onKeydown);
-    setOverview(false);
     if (lastFocused) lastFocused.focus();
   };
 
   // `single` = opened from the standalone main/lead image: show just that image,
-  // no prev/next, no counter, no overview (matches the live main-image viewer).
-  // Otherwise (opened from a thumbnail) it is a navigable gallery set.
+  // no prev/next, no counter (matches the live main-image viewer). Otherwise
+  // (opened from a thumbnail) it is a navigable gallery set.
   const open = (index, trigger, single = false) => {
     lastFocused = trigger || document.activeElement;
     singleMode = single;
     render(index);
-    setOverview(false);
-    // single-image view: no navigation cluster and no overview toggle
+    // single-image view: no navigation cluster
     controls.hidden = single;
-    overviewBtn.hidden = single;
     overlay.hidden = false;
     document.body.classList.add('gallery-lightbox-open');
     document.addEventListener('keydown', onKeydown);
@@ -421,7 +374,6 @@ function buildLightbox(block, items) {
   prevBtn.addEventListener('click', () => render(current - 1));
   nextBtn.addEventListener('click', () => render(current + 1));
   closeBtn.addEventListener('click', close);
-  overviewBtn.addEventListener('click', () => setOverview(overview.hidden));
   // copy the current image's absolute URL to the clipboard
   linkBtn.addEventListener('click', async () => {
     const url = new URL(items[current].src.split('?')[0], window.location.href).href;
