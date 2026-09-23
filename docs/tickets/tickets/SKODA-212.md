@@ -7,7 +7,7 @@
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/carousel-rails.md`](../../ui-specs/carousel-rails.md)** (Flickity rails: `cellAlign:left, groupCells:true, pageDots:false`, arrows, drag; watchCSS activation; per-breakpoint cells-per-view ladder at 500/768/1024/1280). Home-composition context: [`template-home.md`](../../ui-specs/template-home.md). Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).
 
-Gap that creates this ticket (2026-09-23): `carousel-rails.md` attributes the rails to *"SKODA-201 (rails part) + `stories`/`story-rail`"*, but **SKODA-201 shipped Cards/Teaser only** — `blocks/story-rail` and `blocks/carousel` do not exist on `main`. `template-home.md` line 56: "the rest are horizontal rails ('All' link + carousel)" — distinct from the feed (SKODA-211) and the promo-box (SKODA-213).
+Gap that creates this ticket (2026-09-23): `carousel-rails.md` attributes the rails to *"SKODA-201 (rails part) + `stories`/`story-rail`"*, but **SKODA-201 shipped Cards/Teaser only** — `blocks/story-rail` and `blocks/carousel` do not exist on `main`. `template-home.md` line 56: "the rest are horizontal rails ('All' link + carousel)" — distinct from the feed (SKODA-214) and the promo-box (SKODA-213).
 
 ## Summary
 Deliver the horizontal teaser rail: a scroll track wrapping `card-teaser` units with prev/next arrow controls, pointer drag, and `pageDots:false`. Implemented as `blocks/carousel` driven by `blocks/story-rail`, with Flickity-parity `watchCSS` activation — a carousel above a breakpoint, an intrinsic wrapped grid below. Rows are query-index-driven (tag/category/template filter) or author-curated cells. Reused by every home category/news rail and by the Series/Model/Press-release templates.

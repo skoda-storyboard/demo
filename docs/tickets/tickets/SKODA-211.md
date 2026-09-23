@@ -1,45 +1,31 @@
-# SKODA-211, Stories feed block (Load-more pager, query-index)
-- **Epic:** E02, Core Blocks
-- **Type:** block
-- **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (demo)
-- **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
-
-## UI Specification
-**Build-ready measured spec: [`docs/ui-specs/template-home.md`](../../ui-specs/template-home.md)** (the `/en/` "Latest Stories" / "News" feed sections) with cell/typography detail in [`carousel-rails.md`](../../ui-specs/carousel-rails.md) and [`card-teaser.md`](../../ui-specs/card-teaser.md). Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).
-
-Gap that creates this ticket (2026-09-23): `carousel-rails.md` attributes the home blocks to *"SKODA-201 (rails part) + `stories`/`story-rail`"*, but **SKODA-201 shipped the Cards/Teaser unit only** — `blocks/stories` does not exist on `main`. `template-home.md` is explicit (line 48): the "Latest Stories"/"News" feed **uses a Load more `<button>`, NOT a rail** — so the feed is a distinct block from the horizontal rails (SKODA-212) and the promo-box (SKODA-213).
+# SKODA-211, DA tag-management library plugin (DA_SDK multi-select, productionize PoC)
+- **Epic:** E02, Core Blocks (authoring)
+- **Type:** integration · **Phase:** A · **Pilot:** Yes · **Milestone:** M1 (15 Oct demo)
+- **Estimate:** ~3 SP
+- **Relates to:** decision D13 (DA vs Universal Editor), build-confirmed in this tenant 2026-09-16.
+- **GitHub status:** CLOSED (done).
 
 ## Summary
-Deliver the `stories` feed block: the vertical "Latest Stories" / "News" list that leads each home's `.cover-box` — first `pageSize` cards + an accessible **"Load more"** button that appends the next slice from the query-index and `history.pushState`es the offset. This is the **facet-less reuse of SKODA-402's `scripts/query-index.js` loader + `listing-logic` paginate** — it must not fork that engine.
-
-## Description
-Confirmed live on `https://www.skoda-storyboard.com/en/` ("Latest Stories" `.cover-box`) and `/en/media-room/` ("News"). Per `template-home.md` §Load-more: a real `<button>` appends the next page of cards (not infinite scroll, source-confirmed).
-
-This ticket delivers:
-- **`stories` (vertical feed):** first `pageSize` `card-teaser` cards + "Load more" appending the next slice; deep-link the offset via `pushState` (same pattern as SKODA-402, without facet params); newest-first ordering.
-- Query-index-driven (template/category/tag filter via block config) with a defensive empty state.
-
-Reuse-first: consumes `scripts/query-index.js` (chunk-aware memoized loader) + `listing-logic.mjs` `paginate`/`sortRows` + `card-teaser` markup. No new retrieval layer.
+Give authors a real tag-management control inside DA / Experience Workspace so they can pick taxonomy tags without App Builder or Universal Editor. Productionize the build-confirmed PoC (skoda-storyboard/poc/tag-multiselect/) into a demo DA library plugin: a hosted HTML/JS page that talks to the editor over the DA_SDK postMessage bridge and writes a Tags block via sendHTML. This is rung 4 of the extensibility ladder in docs/architecture/SKODA-DA-EW-EXTENSIBILITY.md.
 
 ## Requirements / Spec
-- **Reuse** `scripts/query-index.js` and `listing-logic.mjs` `paginate`/`sortRows` (SKODA-402). If a facet-less path needs a small extract, do it in `listing-logic` and depend on it — do not duplicate the fetch/paginate logic.
-- "Load more" over the query-index; new results announced (`aria-live`), focus managed to the first new card; offset deep-linked via `pushState`; `popstate` restores.
-- First image LCP-friendly (`fetchpriority=high`), rest lazy; `createOptimizedPicture`.
-- CSS scoped to `.stories`; tokens only; fluid → intrinsic → breakpoint per `docs/guardrails/css-guidelines.md`.
+- Host the plugin under the demo repo (e.g. poc/tag-multiselect/), served at the preview URL (localhost will not load inside the https canvas).
+- Register a library config sheet row: title | path | experience=dialog (mind the exact path header).
+- Vocabulary: the 15-facet taxonomy + 4 story categories, hardcoded initially, with the option to fetch a governed DA Sheet later (no redeploy to change the list).
+- Multi-select with select-all / clear / search; render-first, connect-in-background pattern so the panel never hangs.
+- On confirm, actions.sendHTML(Tags block table) aligned to the SKODA-205 Tags-block markup and the SKODA-401 facet taxonomy; then closeLibrary().
+- Must surface in BOTH the classic DA editor Library palette and the Experience Workspace canvas panel.
 
 ## Acceptance Criteria
-Measurable gates in [`template-home.md`](../../ui-specs/template-home.md); summary:
-- [ ] `blocks/stories` exists and decorates defensively (authors omit/add cells).
-- [ ] Renders first `pageSize`; "Load more" appends the next slice; offset deep-links via `pushState`; `popstate` restores.
-- [ ] New results announced (`aria-live`) + focus managed to first new card.
-- [ ] Reuses `scripts/query-index.js` (no second index fetcher) — verified by grep/import (single loader).
-- [ ] First image LCP-friendly; output passes `npm run lint` + unit tests; visual diff vs source at 1280/768/500 ≤ 2% per-pixel.
+- [ ] An author opens the plugin, multi-selects tags, and it inserts a Tags block that SKODA-205 renders and SKODA-401 facets recognise.
+- [ ] Emitted Tags-block HTML matches the expected markup for a given selection (unit/smoke test).
+- [ ] Works in the DA editor Library AND the EW canvas panel.
+- [ ] Vocabulary can be swapped to a DA Sheet without code change (documented, even if hardcoded for the demo).
+- [ ] npm run lint clean.
 
 ## Dependencies
-- Upstream: SKODA-201 (card-teaser), **SKODA-402 (query-index loader + paginate/sort — reuse target)**, SKODA-401 (index schema), SKODA-106 (tokens)
-- Downstream: SKODA-209 (archive feed reuses this pattern), SKODA-604 (home composition)
+- Upstream: SKODA-102 (repo + preview hosting), SKODA-205 (Tags block output contract), SKODA-401 (facet taxonomy).
+- Reference: skoda-storyboard/poc/tag-multiselect/, docs/architecture/SKODA-DA-EW-EXTENSIBILITY.md §3/§8.
 
-## Risks / Flags
-- **Engine reuse (🟢→🟡):** must consume SKODA-402's loader/paginate, not fork it; flag if a facet-less extract requires refactoring 402's `listing-logic`.
-- **Feed page size + Load more vs infinite scroll (🟡):** default Load more button (source-confirmed on `template-home.md` §108); confirm `pageSize` per source before locking.
-- **Home composition boundary:** this ticket builds the *block*; assembling it into `/en/` is SKODA-604.
+## Agent handoff
+hybrid: the vocabulary handling + DA_SDK sendHTML write logic is a self-contained agent slice (oracle: emitted Tags-block HTML matches expected for a given selection; openable standalone for a smoke test). The picker UI/UX and the in-editor verification are the human visual gate.

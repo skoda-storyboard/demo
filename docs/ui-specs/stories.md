@@ -9,7 +9,7 @@ Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 This is the vertical "Latest Stories" list that leads the Storyboard home: a fixed first slice of
 `card-teaser` cards plus an accessible **Load more** `<button>` that appends the next batch. It is a
 **distinct block from the horizontal rails** (`carousel-rails.md` / SKODA-212) and the promo-box
-(SKODA-213). Delivered by **SKODA-211** (GitHub issue #97), reusing SKODA-402's `scripts/query-index.js`
+(SKODA-213). Delivered by **SKODA-214** (GitHub issue #97), reusing SKODA-402's `scripts/query-index.js`
 loader + `listing-logic` `paginate`/`sortRows` without forking that engine.
 
 ## 1. Identity
@@ -18,7 +18,7 @@ loader + `listing-logic` `paginate`/`sortRows` without forking that engine.
 - **EDS block:** `stories` (new; index-driven, facet-less sibling of `faceted-listing`'s `listing`).
 - **Client component IDs:** STO-H02 "Latest Stories" (also underpins the `stories(promo)` featured usage
   noted in the README client map).
-- **Ticket:** SKODA-211 (issue #97). Depends on SKODA-201 (`card-teaser`), **SKODA-402**
+- **Ticket:** SKODA-214 (issue #97). Depends on SKODA-201 (`card-teaser`), **SKODA-402**
   (query-index loader + `paginate`/`sortRows`, the reuse target), SKODA-401 (index schema), SKODA-106 (tokens).
 - **Source URL + selector:** `https://www.skoda-storyboard.com/en/` ·
   `.cover-box .search-results.latest-articles` (heading "Latest Stories").

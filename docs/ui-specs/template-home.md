@@ -46,7 +46,7 @@ div.cover-box       "Latest Stories"   stories rail
 (`.promo-box` featured slider + each `.cover-box` rail) wrapping [`card-teaser`](card-teaser.md) →
 [`newsletter`](newsletter.md) + social strip → [`footer`](footer.md) / [`footer-mediaroom`](footer-mediaroom.md).
 The STO home "Latest Stories" feed uses a **Load more** `<button>` (not a rail), its own block
-[`stories`](stories.md) (SKODA-211, build-ready measured spec). The MR home "News" band, despite the shared
+[`stories`](stories.md) (SKODA-214, build-ready measured spec). The MR home "News" band, despite the shared
 "feed" wording, was measured 2026-09-23 as a **press-release rail with no Load-more button** (see §6/§9).
 
 ## 4. Template-specific structure
