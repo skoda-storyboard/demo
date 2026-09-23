@@ -38,23 +38,24 @@
 
 /*
  * Feed grid — flex-wrap featured grid (stories.md §3), not a uniform grid.
- * Inter-card gutter = 2×10px side padding (20px, --grid-gutter) + 20px row gap,
- * box-sizing: border-box so the basis percentages stay exact. Negative inline
- * margin cancels the outer cells' padding so rows span full width.
+ * The inter-card gutter (--grid-gutter, 20px) lives on the flex CONTAINER as
+ * `gap`, never inside the card: the .stories-item IS the shared .card-teaser box
+ * (background, radius, shadow, overflow-clip, absolute overlay), so any padding
+ * on it would leak into the card visual and desync the scrim from the image.
+ * Flex bases subtract their share of the gap so N-per-row still spans full width.
  */
 .stories .stories-items {
   display: flex;
   flex-wrap: wrap;
+  gap: var(--grid-gutter);
   padding: 0;
-  margin: 0 calc(var(--grid-gutter) / -2);
+  margin: 0;
   list-style: none;
 }
 
 .stories .stories-item {
   box-sizing: border-box;
   flex: 0 0 100%; /* mobile: 1-up */
-  padding-inline: calc(var(--grid-gutter) / 2);
-  margin-block-end: var(--grid-gutter);
 }
 
 /* --- load-more: ghost pill (stories.md §3, measured) --- */
@@ -99,21 +100,23 @@
  * uniform 2-col grid (2+2+1), so every card is 50% there.
  */
 
+/* Per-row basis = (100% − (cols−1)×gap) / cols, so the `gap` gutter is exact. */
+
 /* tablet: uniform 2-up */
 @media (width >= 768px) {
   .stories.stories-featured .stories-item {
-    flex-basis: 50%;
+    flex-basis: calc((100% - var(--grid-gutter)) / 2);
   }
 }
 
-/* desktop: 2 featured (50%) then 3-up (33.33%) */
+/* desktop: 2 featured (2-up) then 3-up */
 @media (width >= 992px) {
   .stories.stories-featured .stories-item {
-    flex-basis: 33.333%;
+    flex-basis: calc((100% - 2 * var(--grid-gutter)) / 3);
   }
 
   .stories.stories-featured .stories-item:nth-child(-n + 2) {
-    flex-basis: 50%;
+    flex-basis: calc((100% - var(--grid-gutter)) / 2);
   }
 }
 
@@ -122,20 +125,20 @@
   .stories.stories-cols-2 .stories-item,
   .stories.stories-cols-3 .stories-item,
   .stories.stories-cols-4 .stories-item {
-    flex-basis: 50%;
+    flex-basis: calc((100% - var(--grid-gutter)) / 2);
   }
 }
 
 @media (width >= 992px) {
   .stories.stories-cols-2 .stories-item {
-    flex-basis: 50%;
+    flex-basis: calc((100% - var(--grid-gutter)) / 2);
   }
 
   .stories.stories-cols-3 .stories-item {
-    flex-basis: 33.333%;
+    flex-basis: calc((100% - 2 * var(--grid-gutter)) / 3);
   }
 
   .stories.stories-cols-4 .stories-item {
-    flex-basis: 25%;
+    flex-basis: calc((100% - 3 * var(--grid-gutter)) / 4);
   }
 }

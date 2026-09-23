@@ -132,6 +132,10 @@ export function decorateCardCells(li) {
   });
   // drop empty image cells so they don't leave a blank slot
   li.querySelectorAll('.card-teaser-image:empty').forEach((c) => c.remove());
+  // no media left → same intrinsic-height fallback as the data-driven builder,
+  // so an authored .overlay card without an image can't collapse (its body is
+  // absolutely positioned over nothing). Mirrors buildCardTeaser's no-image flag.
+  if (!li.querySelector('.card-teaser-image')) li.classList.add('card-teaser-no-image');
 }
 
 // --- data-driven path (query-index rows) -----------------------------------

@@ -62,7 +62,9 @@ globalThis.document = {
 // shim above is in place first. createOptimizedPicture (aem.js) needs richer DOM,
 // so buildCardTeaser tests use image-less rows (the #3 regression path).
 const { isFeatured } = await import('./stories.js');
-const { buildCardTeaser, formatCardDate } = await import('../../scripts/card-teaser.js');
+const {
+  buildCardTeaser, formatCardDate, decorateCardCells,
+} = await import('../../scripts/card-teaser.js');
 
 const NO_FACETS = [];
 
@@ -263,4 +265,84 @@ test('buildCardTeaser: image-less row renders a full card, not a zero-height med
   // the body (with title) is still present
   const body = link.children.find((c) => c.className === 'card-teaser-body');
   assert.ok(body && body.children.some((c) => c.className === 'card-teaser-title'));
+});
+
+// --- authored adapter (decorateCardCells) — the `cards` block path ----------
+// A tiny purpose-built DOM node supporting exactly the selectors the adapter
+// uses (:scope > picture / :scope > p > picture, :scope > a, .card-teaser-image
+// [:empty]), so the authored-cell path is exercised, not only buildCardTeaser.
+function mk(tag, kids = []) {
+  const node = {
+    tagName: String(tag).toUpperCase(),
+    className: '',
+    children: [...kids],
+    _text: '',
+    classList: {
+      add(...c) {
+        const s = new Set(node.className.split(/\s+/).filter(Boolean));
+        c.forEach((x) => s.add(x));
+        node.className = [...s].join(' ');
+      },
+      contains(c) { return node.className.split(/\s+/).includes(c); },
+    },
+    set textContent(v) { this._text = String(v); this.children = []; },
+    get textContent() { return this._text; },
+    remove() { if (node.parent) node.parent.children = node.parent.children.filter((k) => k !== node); },
+    matchesSel(sel) {
+      if (sel === ':scope > picture') return node.children.some((k) => k.tagName === 'PICTURE');
+      if (sel === ':scope > p > picture') {
+        return node.children.some((k) => k.tagName === 'P' && k.children.some((g) => g.tagName === 'PICTURE'));
+      }
+      if (sel === ':scope > a') return node.children.some((k) => k.tagName === 'A');
+      return false;
+    },
+    querySelector(sel) {
+      // union selector used by isImageCell
+      if (sel.includes(',')) return sel.split(',').some((s) => node.matchesSel(s.trim())) ? {} : null;
+      if (sel.startsWith(':scope')) return node.matchesSel(sel) ? {} : null;
+      // class descendant lookup (.card-teaser-image[:empty])
+      return node.querySelectorAll(sel)[0] || null;
+    },
+    querySelectorAll(sel) {
+      const wantEmpty = sel.endsWith(':empty');
+      const cls = sel.replace(':empty', '').replace('.', '');
+      const out = [];
+      const walk = (n) => n.children.forEach((c) => {
+        if (c.classList.contains(cls) && (!wantEmpty || c.children.length === 0)) out.push(c);
+        walk(c);
+      });
+      walk(node);
+      return out;
+    },
+  };
+  node.children.forEach((c) => { c.parent = node; });
+  return node;
+}
+
+test('decorateCardCells: authored overlay row WITHOUT an image is flagged no-image (#2 authored path)', () => {
+  // <li> with one body cell only (no image cell) — an authored .cards.overlay row
+  const heading = mk('h3'); heading.textContent = 'Authored, no image';
+  const bodyCell = mk('div', [heading]);
+  const li = mk('li', [bodyCell]);
+  li.classList.add('card-teaser', 'overlay');
+
+  decorateCardCells(li);
+
+  assert.equal(bodyCell.className, 'card-teaser-body', 'text cell became the body');
+  assert.ok(heading.classList.contains('card-teaser-title'), 'heading classified as title');
+  assert.ok(li.classList.contains('card-teaser-no-image'), 'no media left → flagged for intrinsic height');
+});
+
+test('decorateCardCells: authored row WITH an image is not flagged no-image', () => {
+  const picture = mk('picture');
+  const imageCell = mk('div', [picture]);
+  const heading = mk('h3'); heading.textContent = 'Has image';
+  const bodyCell = mk('div', [heading]);
+  const li = mk('li', [imageCell, bodyCell]);
+  li.classList.add('card-teaser', 'overlay');
+
+  decorateCardCells(li);
+
+  assert.equal(imageCell.className, 'card-teaser-image', 'image cell classified');
+  assert.ok(!li.classList.contains('card-teaser-no-image'), 'image present → not flagged');
 });
