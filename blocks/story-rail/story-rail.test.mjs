@@ -47,7 +47,27 @@ globalThis.document = {
   addEventListener: () => {},
 };
 
-const { parseConfig, selectRows, rowToCells } = await import('./story-rail.js');
+const {
+  parseConfig, selectRows, rowToCells, isConfigTable,
+} = await import('./story-rail.js');
+
+/*
+ * A block whose `children` are rows, each row's `children` are cells. cells are
+ * { textContent, querySelector(sel) } — querySelector returns a truthy stub only
+ * when the cell was declared to hold an image. Drives isConfigTable (row shape +
+ * config-key detection) without a real DOM.
+ */
+function railBlock(rows) {
+  const cell = (text, hasImg = false) => ({
+    textContent: text,
+    querySelector: (sel) => ((hasImg && /picture|img/.test(sel)) ? {} : null),
+  });
+  return {
+    children: rows.map((cells) => ({
+      children: cells.map(([text, hasImg]) => cell(text, hasImg)),
+    })),
+  };
+}
 
 /*
  * A tiny block shim matching what readBlockConfig walks: block.querySelectorAll
@@ -188,4 +208,43 @@ test('rowToCells: an image-less row yields ONE body-only cell (no empty div → 
   // body carries date <p> + title <h3>
   const tags = body.elems.map((e) => e.tagName);
   assert.deepEqual(tags, ['P', 'H3']);
+});
+
+// --- isConfigTable: detect by row shape/keys, not image presence (P2) -------
+
+test('isConfigTable: a key/value config table is detected', () => {
+  const block = railBlock([
+    [['category'], ['emobility']],
+    [['limit'], ['10']],
+    [['heading'], ['Latest e-mobility']],
+  ]);
+  assert.equal(isConfigTable(block), true);
+});
+
+test('isConfigTable: an all-text curated rail (no images) is NOT a config table (P2)', () => {
+  // Reported bug: a curated rail whose authors omit images used to be sniffed as
+  // config (no <img> present) and replaced by an index rail. Its first cells are
+  // NOT config keys, so row-shape detection correctly keeps it curated.
+  const block = railBlock([
+    [['Škoda Elroq RS revealed'], ['15. 9. 2026']],
+    [['Enyaq model-year update'], ['1. 8. 2026']],
+  ]);
+  assert.equal(isConfigTable(block), false);
+});
+
+test('isConfigTable: a curated rail with images is not a config table', () => {
+  const block = railBlock([
+    [['', true], ['### Enyaq']], // first cell holds a picture
+    [['', true], ['### Elroq']],
+  ]);
+  assert.equal(isConfigTable(block), false);
+});
+
+test('isConfigTable: an empty block defaults to config', () => {
+  assert.equal(isConfigTable(railBlock([])), true);
+});
+
+test('isConfigTable: a 3-cell row is not a config table (curated shape)', () => {
+  const block = railBlock([[['category'], ['x'], ['extra']]]);
+  assert.equal(isConfigTable(block), false);
 });

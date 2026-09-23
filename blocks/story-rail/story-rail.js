@@ -25,6 +25,7 @@
 
 import {
   buildBlock, decorateBlock, loadBlock, readBlockConfig, createOptimizedPicture, getMetadata,
+  toClassName,
 } from '../../scripts/aem.js';
 import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
 import { formatCardDate } from '../../scripts/card-teaser.js';
@@ -76,11 +77,29 @@ export function selectRows(all, cfg) {
   return paginate(scoped, cfg.limit);
 }
 
-// Is this a key/value config table (first cell a known key), or curated cards?
-// A config row's first cell is a short single-word-ish key; a curated card row's
-// first cell contains a <picture>. Sniff by looking for any image in the block.
-function isConfigTable(block) {
-  return !block.querySelector('picture, img');
+// The config keys parseConfig understands (normalized via toClassName, so
+// "View all" → "view-all"). Used to tell a key/value config table apart from a
+// curated card rail by ROW SHAPE, not image presence (SKODA-212 review P2): a
+// curated rail whose authors omit images must still be treated as curated.
+const CONFIG_KEYS = new Set([
+  'index', 'path', 'template', 'category', 'tag', 'tags', 'heading',
+  'viewall', 'view-all', 'all', 'sort', 'limit', 'exclude', 'dots',
+]);
+
+// Is this a key/value config table, or curated cards? A config table is a set of
+// 2-cell rows whose first cell is a known config key. A curated card rail has
+// rows that don't match that shape (image + body, or body-only for image-less
+// curated cards). Empty blocks default to config (the common authored case).
+export function isConfigTable(block) {
+  const rows = [...block.children];
+  if (!rows.length) return true;
+  return rows.every((row) => {
+    const cells = [...row.children];
+    if (cells.length !== 2) return false; // curated rows are image+body (or 1 cell)
+    if (cells[0].querySelector('picture, img')) return false; // first cell is media → curated
+    const key = toClassName(cells[0].textContent.trim());
+    return CONFIG_KEYS.has(key);
+  });
 }
 
 /*
@@ -157,6 +176,15 @@ export default async function decorate(block) {
   if (header.children.length) block.append(header);
   block.append(mount);
 
+  // Terminal empty/error state: collapse the whole rail so no blank reserved
+  // slot lingers. The mount's min-height is a CLS guard for the pending build,
+  // not a placeholder for "no results" — on failure/zero-rows we remove the
+  // mount (and an empty header) entirely (SKODA-212 review P2).
+  function collapse() {
+    mount.remove();
+    if (!header.children.length) header.remove();
+  }
+
   // Build + decorate + load the inner carousel. Deferred so multiple home rails
   // don't all build on load.
   async function buildRail() {
@@ -166,13 +194,14 @@ export default async function decorate(block) {
         const all = await loadQueryIndex(cfg.index);
         rows = selectRows(all, cfg).map((r) => rowToCells(r));
       } catch (e) {
-        // degrade silently: leave the reserved space empty rather than error out
+        // index load failed: collapse rather than leave a blank reserved slot
         // eslint-disable-next-line no-console
         console.error('story-rail: index load failed', e);
+        collapse();
         return;
       }
     }
-    if (!rows || !rows.length) return;
+    if (!rows || !rows.length) { collapse(); return; }
 
     const carousel = buildBlock('carousel', rows);
     if (cfg.dots) carousel.classList.add('dots');

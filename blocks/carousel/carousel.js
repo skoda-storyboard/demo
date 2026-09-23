@@ -57,18 +57,25 @@ export function railVariant(hasDate) {
 }
 
 /*
- * Pure page-count + active-dot decision (exported for tests). The active dot is
- * derived from the fraction of REACHABLE scroll, not scrollLeft/clientWidth:
- * the browser clamps the last dot's scroll target to (scrollWidth - clientWidth),
- * which on a partial final page is less than a full page-width — so a naive
- * round(scrollLeft/clientWidth) never reaches the last dot (SKODA-212 review P2).
- * Mapping scrollLeft/max onto [0, pages-1] makes the right edge select the last
- * dot exactly and the left edge select the first.
+ * Pure page-count + active-dot decision (exported for tests). Active state must
+ * use the SAME coordinate system as the dot CLICK targets, or the two diverge:
+ * interior dot i scrolls to `i * clientWidth`, so active = round(scrollLeft /
+ * clientWidth) matches them exactly. The ONLY special case is the last dot: its
+ * target is the clamped reachable end (scrollWidth - clientWidth), which on a
+ * partial final page is less than a full page-width from the previous dot — so
+ * round() there would under-count. Mapping the right edge explicitly to
+ * pages-1 fixes the last dot without shifting the interior ones (SKODA-212 P2).
+ * (An even interpolation across `max` instead skews the interior dots — e.g.
+ * a 9-card rail where clicking dot 1 → scrollLeft 944 must read back as dot 1,
+ * not dot 2.)
  */
 export function dotState({ scrollLeft = 0, scrollWidth = 0, clientWidth = 0 } = {}) {
   const pages = clientWidth > 0 ? Math.max(1, Math.ceil(scrollWidth / clientWidth)) : 1;
   const max = scrollWidth - clientWidth;
-  const active = max <= 0 ? 0 : Math.round((scrollLeft / max) * (pages - 1));
+  // interior dots align to full page-widths…
+  let active = Math.round(scrollLeft / (clientWidth || 1));
+  // …and the right edge maps to the last dot (its target is the clamped `max`).
+  if (max > 0 && scrollLeft >= max - 1) active = pages - 1;
   return { pages, active: Math.min(Math.max(active, 0), pages - 1) };
 }
 

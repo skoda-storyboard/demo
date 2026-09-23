@@ -103,10 +103,25 @@ test('dotState: a rail that fits is a single page, dot 0', () => {
 });
 
 test('dotState: mid-scroll on a 3-page rail selects the middle dot', () => {
-  // pages = ceil(2400/800)=3, max=1600; halfway (800) → round(0.5*2)=1
+  // pages = ceil(2400/800)=3; clicking dot 1 targets 1*800=800 → round(800/800)=1
   const s = dotState({ scrollLeft: 800, scrollWidth: 2400, clientWidth: 800 });
   assert.equal(s.pages, 3);
   assert.equal(s.active, 1);
+});
+
+test('dotState: interior dot uses the SAME coordinate system as its click target (9-card rail)', () => {
+  // Reported P2 mismatch: 9-card desktop rail, scrollWidth 2072, viewport 944.
+  // Clicking middle dot 1 scrolls to 1*944=944. Active state must read that back
+  // as dot 1 — an even interpolation across max (1128) gives round(944/1128*2)=2.
+  const s = dotState({ scrollLeft: 944, scrollWidth: 2072, clientWidth: 944 });
+  assert.equal(s.pages, 3); // ceil(2072/944)
+  assert.equal(s.active, 1); // matches the click target, not 2
+});
+
+test('dotState: the 9-card rail right edge still selects the last dot', () => {
+  // max = 2072 - 944 = 1128 (the last dot's clamped target)
+  const s = dotState({ scrollLeft: 1128, scrollWidth: 2072, clientWidth: 944 });
+  assert.equal(s.active, 2);
 });
 
 test('dotState: active never exceeds pages-1', () => {
