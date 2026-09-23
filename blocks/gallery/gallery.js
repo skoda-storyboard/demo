@@ -206,8 +206,14 @@ function buildLightbox(block, items) {
     const item = items[current];
     // request a large lightbox rendition from the authored source
     const base = item.src.split('?')[0];
+    // reset the fade/zoom, then reveal once the rendition has decoded so the
+    // image animates in visible rather than popping in after the open effect
+    stageImg.classList.remove('is-loaded');
     stageImg.src = `${base}?width=2000&format=webply&optimize=medium`;
     stageImg.alt = item.alt;
+    const reveal = () => stageImg.classList.add('is-loaded');
+    if (stageImg.complete) reveal();
+    else stageImg.addEventListener('load', reveal, { once: true });
     // clone the authored caption content into the stage caption (plain or panel)
     stageCaption.textContent = '';
     if (item.caption) {

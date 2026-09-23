@@ -196,6 +196,7 @@ body.gallery-lightbox-open {
   display: flex;
   align-items: center;
   gap: var(--spacing-m);
+  margin-left: auto; /* keep close/actions right-aligned even when counter is hidden */
 }
 
 .gallery .gallery-lightbox-overview-toggle {
@@ -254,14 +255,33 @@ body.gallery-lightbox-open {
   max-height: 100%;
   width: auto;
   object-fit: contain; /* never crop */
+
+  /* fade + zoom in once the rendition has actually loaded (JS toggles .is-loaded);
+     driving it off load — not the open animation — guarantees the image is
+     visible while it animates, instead of popping in after. */
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+.gallery .gallery-lightbox-image.is-loaded {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* caption/detail panel starts hidden and fades in alongside the image */
 .gallery .gallery-lightbox-caption {
   max-width: min(90vw, var(--content-max-width));
   color: var(--skoda-white);
   font-size: var(--body-font-size-s);
   text-align: center;
   user-select: text;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gallery .gallery-lightbox-image.is-loaded ~ .gallery-lightbox-caption {
+  opacity: 1;
 }
 
 .gallery .gallery-lightbox-caption a {
@@ -372,6 +392,7 @@ body.gallery-lightbox-open {
 
 /* respect reduced motion — no transitions and no open/expand animation */
 .gallery .gallery-overlay.reduced-motion .gallery-lightbox-image,
+.gallery .gallery-overlay.reduced-motion .gallery-lightbox-caption,
 .gallery .reduced-motion .gallery-thumb img {
   transition: none;
 }
