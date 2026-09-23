@@ -31,6 +31,8 @@ const LABELS = {
   // longer form for screen readers.
   counter: (n, total) => `${n} / ${total}`,
   counterLabel: (n, total) => `Image ${n} of ${total}`,
+  // heading above the thumbnail rail
+  imagesHeading: 'Images',
 };
 
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -41,7 +43,7 @@ const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').mat
  * full-screen lightbox at that index. Captions are held off-DOM and shown only
  * in the lightbox (matching the source).
  * @param {Element} block
- * @returns {{items: Array, main: Element}}
+ * @returns {{items: Array, main: Element, mainHeading: Element}}
  */
 function buildGallery(block) {
   const items = [];
@@ -66,21 +68,36 @@ function buildGallery(block) {
     });
   });
 
-  if (!items.length) return { items, main: null };
+  if (!items.length) return { items, main: null, mainHeading: null };
 
   // set the column count on the thumbnail rail from item count (source: >19->5,
   // >9->4, else 3) so the rail sizes to the number of images
   const cols = overviewCols(items.length); // eslint-disable-line no-use-before-define
 
-  // MAIN image (large, click to open lightbox at the active index)
+  // MAIN image column: dynamic heading (the active image's title) + the image
+  const mainCol = document.createElement('div');
+  mainCol.className = 'gallery-main-col';
+
+  const mainHeading = document.createElement('h3');
+  mainHeading.className = 'gallery-main-heading';
+  mainHeading.textContent = items[0].alt;
+
   const main = document.createElement('button');
   main.type = 'button';
   main.className = 'gallery-main';
   main.setAttribute('aria-label', `${LABELS.open} 1`);
   const mainPic = createOptimizedPicture(items[0].src, items[0].alt, true, [{ width: '2000' }]);
   main.append(mainPic);
+  mainCol.append(mainHeading, main);
 
-  // THUMBNAIL rail (one button per image, sized by count)
+  // THUMBNAIL column: "Images" heading + the thumbnail rail
+  const thumbsCol = document.createElement('div');
+  thumbsCol.className = 'gallery-thumbs-col';
+
+  const thumbsHeading = document.createElement('h3');
+  thumbsHeading.className = 'gallery-thumbs-heading';
+  thumbsHeading.textContent = LABELS.imagesHeading;
+
   const thumbs = document.createElement('ul');
   thumbs.className = 'gallery-thumbs';
   thumbs.style.setProperty('--thumb-cols', String(cols));
@@ -99,13 +116,15 @@ function buildGallery(block) {
     item.thumbButton = btn;
   });
 
+  thumbsCol.append(thumbsHeading, thumbs);
+
   const layout = document.createElement('div');
   layout.className = 'gallery-layout';
-  layout.append(main, thumbs);
+  layout.append(mainCol, thumbsCol);
 
   block.textContent = '';
   block.append(layout);
-  return { items, main };
+  return { items, main, mainHeading };
 }
 
 /**
@@ -348,7 +367,7 @@ function buildLightbox(block, items) {
  * @param {Element} block the gallery block element
  */
 export default function decorate(block) {
-  const { items, main } = buildGallery(block);
+  const { items, main, mainHeading } = buildGallery(block);
   if (!items.length) return;
 
   const lightbox = buildLightbox(block, items);
@@ -370,6 +389,8 @@ export default function decorate(block) {
       mainImg.addEventListener('error', done, { once: true });
     }
     main.setAttribute('aria-label', `${LABELS.open} ${i + 1}`);
+    // update the heading above the main image to the active image's title
+    mainHeading.textContent = items[i].alt;
     items.forEach((it, j) => it.thumbButton.setAttribute('aria-current', j === i ? 'true' : 'false'));
   };
   setMain(0);

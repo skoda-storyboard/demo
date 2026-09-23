@@ -18,7 +18,30 @@
 .gallery .gallery-layout {
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-m);
+}
+
+/* each column stacks its heading above its content */
+.gallery .gallery-main-col,
+.gallery .gallery-thumbs-col {
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-s);
+  min-width: 0;
+}
+
+/* dynamic heading above the main image (the active image's title) */
+.gallery .gallery-main-heading {
+  margin: 0;
+  font-size: var(--heading-font-size-m);
+  line-height: 1.2;
+}
+
+/* "Images" heading above the thumbnail rail */
+.gallery .gallery-thumbs-heading {
+  margin: 0;
+  font-size: var(--heading-font-size-s);
+  line-height: 1.2;
 }
 
 /* MAIN image (large, click to open the lightbox) */
@@ -144,12 +167,11 @@
     gap: var(--spacing-m);
   }
 
-  .gallery .gallery-main {
+  .gallery .gallery-main-col {
     flex: 1 1 auto;
-    min-width: 0;
   }
 
-  .gallery .gallery-thumbs {
+  .gallery .gallery-thumbs-col {
     flex: 0 0 clamp(180px, 30%, 320px);
   }
 }
