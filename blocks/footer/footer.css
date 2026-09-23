@@ -233,15 +233,14 @@ footer .footer-social .social-icons a.social-instagram:hover {
   }
 }
 
-/* ≥ 992: reveal sub-links */
+/* ≥ 992: full desktop sitemap — reveal sub-links AND lay the 7 categories out as columns.
+   (Both switch at the same breakpoint so there is no in-between state where sub-links are
+   revealed but still stacked in one column between 992 and 1079px.) */
 @media (width >= 992px) {
   footer .footer-nav ul ul {
     display: block;
   }
-}
 
-/* ≥ 1080: 7-column sitemap grid */
-@media (width >= 1080px) {
   footer .footer-nav nav > ul {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
