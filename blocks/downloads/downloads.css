@@ -97,13 +97,14 @@
   background: var(--dropdown-hover-bg);
 }
 
-/* size menu: absolute dropdown of direct-download links (Original / 1920px) */
+/* size menu: absolute dropdown of direct-download links (Original / 1920px).
+   Sizes to its content (≈87px live), not a fixed min-width. */
 .downloads .downloads-sizes {
   position: absolute;
   top: 45px; /* measured live (downloads.md §3); not 40px + spacing-xs = 48px */
   left: 0;
   z-index: 15;
-  min-width: 120px;
+  width: max-content;
   margin: 0;
   padding: 0;
   background: var(--skoda-white);
@@ -113,6 +114,11 @@
 
 .downloads .downloads-sizes[hidden] {
   display: none;
+}
+
+/* reset the global li margin-bottom (styles.css) so rows don't add height */
+.downloads .downloads-sizes li {
+  margin: 0;
 }
 
 .downloads .downloads-size {

@@ -28,7 +28,7 @@ const LABELS = {
   download: (title, size) => `Download ${title}${size ? ` (${size})` : ''}`,
   // aria-label for the size-menu toggle
   sizes: (title) => `Download sizes for ${title}`,
-  open: 'Open image',
+  open: 'View image',
 };
 
 /**
@@ -254,10 +254,14 @@ function buildTile(asset) {
   const figure = document.createElement('figure');
   figure.className = 'downloads-figure';
 
-  // 16:9 thumbnail that opens the lightbox (button, so it is keyboard-operable)
-  const thumb = document.createElement('button');
-  thumb.type = 'button';
+  // 16:9 thumbnail linking to the full-size image. A real <a> gives a working,
+  // keyboard-operable affordance without a cross-block dependency; the live
+  // colorbox-style modal is deferred to the shared gallery-lightbox util
+  // (SKODA-203 ships it inside blocks/gallery; AGENTS.md forbids cross-block
+  // import, so reuse waits on a /scripts/ extraction — tracked separately).
+  const thumb = document.createElement('a');
   thumb.className = 'downloads-thumb';
+  [thumb.href] = asset.src.split('?');
   thumb.setAttribute('aria-label', `${LABELS.open} ${asset.title}`.trim());
   thumb.append(createOptimizedPicture(asset.src, asset.alt || asset.title, false, [
     { media: '(min-width: 768px)', width: '750' },
