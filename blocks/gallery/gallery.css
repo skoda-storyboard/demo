@@ -40,7 +40,8 @@
 /* "Images" heading above the thumbnail rail */
 .gallery .gallery-thumbs-heading {
   margin: 0;
-  font-size: var(--heading-font-size-s);
+  color: var(--gallery-heading-color);
+  font-size: var(--heading-font-size-xs); /* 16px */
   line-height: 1.2;
 }
 

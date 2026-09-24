@@ -51,6 +51,7 @@
   --gallery-divider: #5a5b5c;
   --gallery-nav-divider: #606060; /* nav cluster vertical rules (measured live) */
   --gallery-backdrop: rgb(22 23 24);
+  --gallery-heading-color: #353535; /* "Images" rail heading (measured live) */
 
   /* faceted-listing (SKODA-402; measured in docs/ui-specs/faceted-listing.md §3) */
   --facet-radius: 5px;
