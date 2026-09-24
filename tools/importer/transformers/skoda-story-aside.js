@@ -33,8 +33,13 @@ const TransformHook = { beforeTransform: 'beforeTransform', afterTransform: 'aft
 
 // Build a Cards block from the related "Explore more" teasers.
 function relatedCards(sidebar, document) {
-  const teasers = [...sidebar.querySelectorAll('.related .article-teaser, .related article')]
-    .filter((el, i, arr) => arr.indexOf(el) === i);
+  // The source nests `div.article-teaser > article`, so both selectors match the same
+  // teaser. Keep only the OUTERMOST match (SKODA-817): otherwise 3 teasers become 6 rows,
+  // and the shared <img> moves into the second row, which leaves the first image-less.
+  const matched = [...sidebar.querySelectorAll('.related .article-teaser, .related article')];
+  const teasers = matched
+    .filter((el, i, arr) => arr.indexOf(el) === i)
+    .filter((el) => !matched.some((other) => other !== el && other.contains(el)));
   if (!teasers.length) return null;
 
   const cells = [['Cards']];
@@ -112,7 +117,17 @@ export default function transform(hookName, element, payload) {
     aside.appendChild(h);
   }
   if (cards) aside.appendChild(WebImporter.DOMUtils.createTable(cards, document));
-  if (tags) aside.appendChild(WebImporter.DOMUtils.createTable(tags, document));
+  if (tags) {
+    // The source titles the tag row "Tags" (section.tags h3.sidebar-heading); keep it as
+    // authored text above the existing Tags block (SKODA-817).
+    const tagsHeading = sidebar.querySelector('section.tags .heading, section.tags h2, section.tags h3');
+    if (tagsHeading && (tagsHeading.textContent || '').trim()) {
+      const h = document.createElement('h2');
+      h.textContent = tagsHeading.textContent.trim();
+      aside.appendChild(h);
+    }
+    aside.appendChild(WebImporter.DOMUtils.createTable(tags, document));
+  }
   frag.appendChild(aside);
 
   // Section Metadata: Style = sidebar (consumed by the story-scoped runtime hook).

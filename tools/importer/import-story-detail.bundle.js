@@ -41,34 +41,71 @@ var CustomImportScript = (() => {
     default: () => import_story_detail_default
   });
 
-  // tools/importer/parsers/hero-banner.js
+  // tools/importer/parsers/tags.js
   function parse(element, { document: document2 }) {
-    const img = element.querySelector(".hero-image img, .image-wrapper img, img");
-    const heading = element.querySelector("h1, h2, .hero-title, .entry-title");
-    const perex = element.querySelector(".perex, .hero-caption p, .hero-content p");
-    const ctas = Array.from(element.querySelectorAll("a.btn, a.btn-secondary, .hero-content a, .cta a"));
+    const anchors = Array.from(element.querySelectorAll("a.label[href], li a[href], a[href]")).filter((el, i, arr) => arr.indexOf(el) === i);
+    if (anchors.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const cell = [];
+    anchors.forEach((a) => {
+      const href = a.getAttribute("href");
+      const text = (a.textContent || "").trim();
+      if (!href || !text) return;
+      const link = document2.createElement("a");
+      link.setAttribute("href", href);
+      link.textContent = text;
+      cell.push(link);
+    });
+    if (cell.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const table = WebImporter.DOMUtils.createTable([["Tags"], [cell]], document2);
+    element.replaceWith(table);
+  }
+
+  // tools/importer/parsers/story-hero.js
+  function parse2(element, { document: document2 }) {
+    const img = element.querySelector(".hero-image img, .hero-wrapper img, img");
+    const heading = element.querySelector(".hero-heading h1, h1, .heading, h2");
     if (!img && !heading) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const cells = [["Hero"]];
-    cells.push([img || ""]);
-    const contentCell = [];
-    if (heading) contentCell.push(heading);
-    if (perex && (perex.textContent || "").trim()) {
-      const p = document2.createElement("p");
-      p.textContent = (perex.textContent || "").trim();
-      contentCell.push(p);
+    const out = [];
+    const cells = [["Hero Image"]];
+    if (img) cells.push([img]);
+    if (heading) {
+      const h1 = document2.createElement("h1");
+      h1.textContent = (heading.textContent || "").trim();
+      cells.push([h1]);
     }
-    ctas.forEach((a) => {
-      const link = document2.createElement("a");
-      link.setAttribute("href", a.getAttribute("href") || "#");
-      link.textContent = (a.textContent || "").trim();
-      if (link.textContent) contentCell.push(link);
-    });
-    if (contentCell.length) cells.push([contentCell]);
-    const table = WebImporter.DOMUtils.createTable(cells, document2);
-    element.replaceWith(table);
+    out.push(WebImporter.DOMUtils.createTable(cells, document2));
+    const caption = element.querySelector(".hero-caption") || element;
+    const perex = caption.querySelector(".perex");
+    const perexText = perex && (perex.textContent || "").trim();
+    if (perexText) {
+      const p = document2.createElement("p");
+      p.textContent = perexText;
+      out.push(p);
+    }
+    const published = caption.querySelector(".published, time");
+    const dateText = published && (published.textContent || "").trim();
+    if (dateText) {
+      const p = document2.createElement("p");
+      p.textContent = dateText;
+      out.push(p);
+    }
+    const category = caption.querySelector(".category");
+    if (category && category.querySelector("a[href]")) {
+      const holder = document2.createElement("div");
+      holder.append(category);
+      parse(category, { document: document2 });
+      out.push(...holder.childNodes);
+    }
+    element.replaceWith(...out);
   }
 
   // tools/importer/parsers/story-flatten.js
@@ -314,7 +351,7 @@ var CustomImportScript = (() => {
       row[0].forEach((n) => out.push(n));
     }
   }
-  function parse2(element, { document: document2 }) {
+  function parse3(element, { document: document2 }) {
     const layout = element.querySelector(".panel-layout, .panel-grid");
     if (!layout) return;
     const grids = [...element.querySelectorAll(".panel-grid")].filter((g) => !g.parentElement.closest(".so-panel"));
@@ -437,21 +474,139 @@ var CustomImportScript = (() => {
 
   // tools/importer/transformers/skoda-story-cleanup.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  function videoUrl(el) {
+    const id = el.getAttribute("videoid");
+    if (el.tagName.toLowerCase() === "lite-youtube") {
+      return id ? `https://www.youtube.com/watch?v=${id}` : "";
+    }
+    const src = el.getAttribute("src") || el.getAttribute("data-src") || "";
+    const yt = src.match(/youtube(?:-nocookie)?\.com\/embed\/([\w-]{6,})/i);
+    if (yt) return `https://www.youtube.com/watch?v=${yt[1]}`;
+    const vimeo = src.match(/player\.vimeo\.com\/video\/(\d+)/i);
+    if (vimeo) return `https://vimeo.com/${vimeo[1]}`;
+    return "";
+  }
+  function videosToUrls(element, document2) {
+    element.querySelectorAll("lite-youtube, iframe[src], iframe[data-src]").forEach((el) => {
+      const url = videoUrl(el);
+      if (!url) return;
+      const p = document2.createElement("p");
+      const a = document2.createElement("a");
+      a.setAttribute("href", url);
+      a.textContent = url;
+      p.appendChild(a);
+      const target = el.closest(".embed-controller-wrapper, .video-container, .ratio-container") || el;
+      target.replaceWith(p);
+    });
+    WebImporter.DOMUtils.remove(element, [".page-embed.yt-embed-cookie"]);
+  }
+  function lastSegment(href) {
+    try {
+      const segs = new URL(href, "https://www.skoda-storyboard.com").pathname.split("/").filter(Boolean);
+      return segs[segs.length - 1] || "";
+    } catch (e) {
+      return "";
+    }
+  }
+  function curatedRows(band, document2) {
+    const matched = [...band.querySelectorAll("article.article-teaser, .search-results-item")];
+    const teasers = matched.filter((el) => !matched.some((o) => o !== el && o.contains(el)));
+    const rows = [];
+    teasers.forEach((t) => {
+      const titleLink = t.querySelector(".entry-title a[href], h3 a[href], a.link-more[href]");
+      if (!titleLink) return;
+      let title = (t.querySelector(".entry-title") || titleLink).textContent.trim();
+      if (!title) return;
+      const img = t.querySelector("img");
+      const alt = img ? (img.getAttribute("alt") || "").trim() : "";
+      const stem = title.replace(/\s*(…|\.\.\.)$/, "");
+      if (stem !== title && alt.startsWith(stem)) title = alt;
+      const body = [];
+      const date = t.querySelector(".entry-published, time");
+      if (date && date.textContent.trim()) {
+        const p = document2.createElement("p");
+        p.textContent = date.textContent.trim();
+        body.push(p);
+      }
+      const h3 = document2.createElement("h3");
+      const a = document2.createElement("a");
+      a.setAttribute("href", titleLink.getAttribute("href"));
+      a.textContent = title;
+      h3.appendChild(a);
+      body.push(h3);
+      rows.push([img || "", body]);
+    });
+    return rows;
+  }
+  function relatedBand(element, document2, payload) {
+    const band = element.querySelector(".cover-box .related-stories");
+    if (!band) return;
+    const cover = band.closest(".cover-box") || band;
+    const headingEl = band.querySelector(".search-results-heading, h2, h3");
+    const subEl = headingEl && headingEl.querySelector(".subheading");
+    const subText = subEl ? (subEl.textContent || "").trim() : "";
+    let headingText = "Related Stories";
+    if (headingEl) {
+      const clone = headingEl.cloneNode(true);
+      clone.querySelectorAll(".subheading").forEach((s) => s.remove());
+      headingText = (clone.textContent || "").trim() || headingText;
+    }
+    let rows = curatedRows(band, document2);
+    if (rows.length) {
+      rows = [["Story Rail"], ...rows];
+    } else {
+      const tagLinks = [...element.querySelectorAll("ol.entry-tags a[href], .sidebar .tags a[href]")].map((a) => a.getAttribute("href") || "");
+      const specific = tagLinks.filter((h) => !/\/tag\/years\//.test(h));
+      const slugs = (specific.length ? specific : tagLinks).map((h) => lastSegment(h).toLowerCase()).filter((s, i, arr) => s && arr.indexOf(s) === i);
+      if (!slugs.length && subText) {
+        subText.replace(/^[^:]*:/, "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean).forEach((s) => slugs.push(s));
+      }
+      if (!slugs.length) {
+        console.warn("[story-cleanup] related band has no teasers and no tags; dropped");
+        cover.remove();
+        return;
+      }
+      const originalURL = payload && payload.params && payload.params.originalURL || "";
+      const self = lastSegment(originalURL);
+      rows = [
+        ["Story Rail"],
+        ["template", "story"],
+        ["tags", slugs.join(", ")],
+        ["limit", "10"]
+      ];
+      if (self) rows.push(["exclude", self]);
+    }
+    const h2 = document2.createElement("h2");
+    h2.textContent = headingText;
+    const out = [document2.createElement("hr"), h2];
+    if (subText) {
+      const p = document2.createElement("p");
+      p.textContent = subText;
+      out.push(p);
+    }
+    out.push(WebImporter.DOMUtils.createTable(rows, document2));
+    out.push(WebImporter.Blocks.createBlock(document2, {
+      name: "Section Metadata",
+      cells: { Style: "dark" }
+    }));
+    cover.replaceWith(...out);
+  }
   function transform2(hookName, element, payload) {
     if (hookName === TransformHook2.beforeTransform) {
       WebImporter.DOMUtils.remove(element, [
         ".btn-group.social",
         ".social-container"
       ]);
+      videosToUrls(element, element.ownerDocument || document);
     }
     if (hookName === TransformHook2.afterTransform) {
+      relatedBand(element, element.ownerDocument || document, payload);
       const deferredSelectors = [
         ".search-results.media-box",
         ".sb-gallery",
         "a.colorbox",
         ".embed-controller-wrapper",
         ".page-embed",
-        ".cover-box .related-stories",
         ".cover-box.dark"
       ];
       const dropped = {};
@@ -471,7 +626,8 @@ var CustomImportScript = (() => {
   // tools/importer/transformers/skoda-story-aside.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function relatedCards(sidebar, document2) {
-    const teasers = [...sidebar.querySelectorAll(".related .article-teaser, .related article")].filter((el, i, arr) => arr.indexOf(el) === i);
+    const matched = [...sidebar.querySelectorAll(".related .article-teaser, .related article")];
+    const teasers = matched.filter((el, i, arr) => arr.indexOf(el) === i).filter((el) => !matched.some((other) => other !== el && other.contains(el)));
     if (!teasers.length) return null;
     const cells = [["Cards"]];
     let emitted = 0;
@@ -531,7 +687,15 @@ var CustomImportScript = (() => {
       aside.appendChild(h);
     }
     if (cards) aside.appendChild(WebImporter.DOMUtils.createTable(cards, document));
-    if (tags) aside.appendChild(WebImporter.DOMUtils.createTable(tags, document));
+    if (tags) {
+      const tagsHeading = sidebar.querySelector("section.tags .heading, section.tags h2, section.tags h3");
+      if (tagsHeading && (tagsHeading.textContent || "").trim()) {
+        const h = document.createElement("h2");
+        h.textContent = tagsHeading.textContent.trim();
+        aside.appendChild(h);
+      }
+      aside.appendChild(WebImporter.DOMUtils.createTable(tags, document));
+    }
     frag.appendChild(aside);
     const metadataBlock = WebImporter.Blocks.createBlock(document, {
       name: "Section Metadata",
@@ -784,15 +948,17 @@ var CustomImportScript = (() => {
 
   // tools/importer/import-story-detail.js
   var parsers = {
-    "hero-banner": parse,
-    "story-flatten": parse2
+    // SKODA-816: story hero → Hero Image (story variant) + caption + Tags, not the
+    // overlay Hero banner used by the page/archive templates.
+    "story-hero": parse2,
+    "story-flatten": parse3
   };
   var PAGE_TEMPLATE = {
     name: "story-detail",
     description: "\u0160koda story detail (single-post + SiteOrigin), full-fidelity SiteOrigin flatten (SKODA-801). Hero banner + primary .content SiteOrigin widget tree flattened to default content + block tables (17-widget map, census-driven). The secondary .sidebar column is rebuilt as a Style:sidebar section (Cards + Tags) beside the body via the grid-on-main story layout. In-body galleries/embeds/Media Box remain SKODA-604 full-restore work. Metadata template=story. Content-driven detection only.",
     urls: ["https://www.skoda-storyboard.com/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/"],
     blocks: [
-      { name: "hero-banner", instances: ["div.hero"] },
+      { name: "story-hero", instances: ["div.hero"] },
       // Flatten the SiteOrigin widget tree inside the primary reading column. The
       // parser self-detects the builder tree and no-ops (linear-story fallback) when
       // absent, so the 3.6% non-Page-Builder stories fall through to default content.
@@ -804,7 +970,7 @@ var CustomImportScript = (() => {
         name: "Hero",
         selector: ["div.hero"],
         style: null,
-        blocks: ["hero-banner"],
+        blocks: ["story-hero"],
         defaultContent: []
       },
       {

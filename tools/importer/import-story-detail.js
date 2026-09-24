@@ -16,7 +16,7 @@
  * skoda-page-cleanup.
  */
 
-import heroBannerParser from './parsers/hero-banner.js';
+import storyHeroParser from './parsers/story-hero.js';
 import storyFlattenParser from './parsers/story-flatten.js';
 import pageCleanupTransformer from './transformers/skoda-page-cleanup.js';
 import storyCleanupTransformer from './transformers/skoda-story-cleanup.js';
@@ -25,7 +25,9 @@ import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 
 const parsers = {
-  'hero-banner': heroBannerParser,
+  // SKODA-816: story hero → Hero Image (story variant) + caption + Tags, not the
+  // overlay Hero banner used by the page/archive templates.
+  'story-hero': storyHeroParser,
   'story-flatten': storyFlattenParser,
 };
 
@@ -35,7 +37,7 @@ const PAGE_TEMPLATE = {
     'Škoda story detail (single-post + SiteOrigin), full-fidelity SiteOrigin flatten (SKODA-801). Hero banner + primary .content SiteOrigin widget tree flattened to default content + block tables (17-widget map, census-driven). The secondary .sidebar column is rebuilt as a Style:sidebar section (Cards + Tags) beside the body via the grid-on-main story layout. In-body galleries/embeds/Media Box remain SKODA-604 full-restore work. Metadata template=story. Content-driven detection only.',
   urls: ['https://www.skoda-storyboard.com/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/'],
   blocks: [
-    { name: 'hero-banner', instances: ['div.hero'] },
+    { name: 'story-hero', instances: ['div.hero'] },
     // Flatten the SiteOrigin widget tree inside the primary reading column. The
     // parser self-detects the builder tree and no-ops (linear-story fallback) when
     // absent, so the 3.6% non-Page-Builder stories fall through to default content.
@@ -47,7 +49,7 @@ const PAGE_TEMPLATE = {
       name: 'Hero',
       selector: ['div.hero'],
       style: null,
-      blocks: ['hero-banner'],
+      blocks: ['story-hero'],
       defaultContent: [],
     },
     {
