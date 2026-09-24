@@ -442,19 +442,20 @@ body.gallery-lightbox-open {
   .gallery .gallery-lightbox-image-frame {
     flex: 1 1 auto;
     align-self: stretch;
-    align-items: stretch;     /* image fills full height, top to bottom */
+    align-items: center;      /* centre the contained image in the row */
     justify-content: center;
     max-height: none; /* fill the row (mobile caps to 70vh) */
   }
 
-  /* image fills the full row height top-to-bottom and is cropped on the sides
-     to fit the column (object-fit: cover) — no top/bottom gaps */
+  /* show the FULL image (contain, never cropped) per spec §9 / source
+     `img{max-height:100%; width:auto}`: size by the shorter axis and leave
+     side or vertical breathing room rather than filling the column. */
   .gallery .gallery-lightbox-image {
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    max-height: none;
-    object-fit: cover;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
   }
 
   .gallery .gallery-lightbox-caption {
