@@ -58,8 +58,13 @@ holds the iframe's URL in `data-src` and swaps it into `src` via an `Intersectio
 wrapper approaches the viewport. Confirmed: after scrolling the Buzzsprout wrapper into view,
 `data-src` became `null` and `src` populated with the Buzzsprout URL.
 
-**Privacy flags (verified live):** Vimeo carries `?dnt=1` (do-not-track) + `app_id`; YouTube embeds
-use the `youtube-nocookie.com` host. Keep both in the rebuild.
+**Privacy flags (verified live 2026-09-24 on the innovation-and-technology article):** Vimeo carries
+`?dnt=1` (do-not-track) + `app_id`. YouTube embeds use the **standard `www.youtube.com/embed/{id}`
+host with `?feature=oembed&enablejsapi=1`** (and a `si=` share token when present) — NOT the
+nocookie host (an earlier note here was wrong; corrected after measuring the live article embeds).
+Per-provider `allow` lists differ and are copied verbatim: YouTube =
+`accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share`;
+Vimeo = `autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share`.
 
 **Libraries to retire (do not port):** `ys-embed-controller` (custom Stimulus-style controller),
 jQuery, colorbox popups. Replace with native `loading="lazy"` iframes + a small consent gate.

@@ -144,25 +144,26 @@ test('Vimeo already-embed URL keeps app_id and forces dnt=1', () => {
   assert.equal(params.get('app_id'), '122963');
 });
 
-test('YouTube: normalised to nocookie host + /embed/{id}, video wrapper, direct src', () => {
+test('YouTube: matches live embed URL (youtube.com/embed + feature=oembed + enablejsapi)', () => {
   const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
   decorate(block);
   const iframe = block.querySelector('iframe');
-  assert.equal(iframe.getAttribute('src'), 'https://www.youtube-nocookie.com/embed/9LfK-A20pgw');
+  assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/9LfK-A20pgw?feature=oembed&enablejsapi=1');
   assert.equal(iframe.dataset.src, undefined, 'no consent gate — src set directly');
+  // allow list matches live YouTube verbatim (accelerometer/gyroscope, no fullscreen)
+  assert.equal(iframe.getAttribute('allow'), 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
   assert.ok(block.querySelector('.embed-video'));
-  // no facade / consent overlays remain
   assert.equal(block.querySelector('.embed-facade'), null);
   assert.equal(block.querySelector('.embed-consent'), null);
 });
 
-test('YouTube: /embed/ and youtu.be forms both yield nocookie host', () => {
-  const a = buildEmbed('https://www.youtube.com/embed/B4ZafpJKk0M?si=x');
+test('YouTube: /embed/ + si token and youtu.be forms both build the live URL', () => {
+  const a = buildEmbed('https://www.youtube.com/embed/B4ZafpJKk0M?si=v58s4T3awpvcBd7Y');
   decorate(a);
-  assert.equal(a.querySelector('iframe').getAttribute('src'), 'https://www.youtube-nocookie.com/embed/B4ZafpJKk0M');
+  assert.equal(a.querySelector('iframe').getAttribute('src'), 'https://www.youtube.com/embed/B4ZafpJKk0M?feature=oembed&si=v58s4T3awpvcBd7Y&enablejsapi=1');
   const b = buildEmbed('https://youtu.be/atipTWwYw5E');
   decorate(b);
-  assert.equal(b.querySelector('iframe').getAttribute('src'), 'https://www.youtube-nocookie.com/embed/atipTWwYw5E');
+  assert.equal(b.querySelector('iframe').getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?feature=oembed&enablejsapi=1');
 });
 
 test('Buzzsprout: audio wrapper (fixed height, not 16:9), iframe=true preserved', () => {
@@ -182,13 +183,11 @@ test('Spotify: audio wrapper + /embed/ path injection', () => {
   assert.equal(block.querySelector('iframe').getAttribute('src'), 'https://open.spotify.com/embed/episode/abc123');
 });
 
-test('iframe carries the live allow list (incl. web-share) and no data-src', () => {
+test('Vimeo carries the live Vimeo allow list (fullscreen, no gyroscope) and no data-src', () => {
   const block = buildEmbed('https://vimeo.com/1221703335');
   decorate(block);
   const iframe = block.querySelector('iframe');
-  const allow = iframe.getAttribute('allow');
-  ['autoplay', 'fullscreen', 'picture-in-picture', 'clipboard-write', 'encrypted-media', 'web-share']
-    .forEach((f) => assert.ok(allow.includes(f), `allow includes ${f}`));
+  assert.equal(iframe.getAttribute('allow'), 'autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share');
   assert.ok(iframe.getAttribute('src'), 'src is set');
   assert.equal(iframe.dataset.src, undefined, 'no data-src (no gate)');
 });

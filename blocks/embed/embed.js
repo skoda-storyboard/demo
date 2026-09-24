@@ -91,8 +91,14 @@ function buildEmbedUrl(provider, url) {
   }
   if (provider === 'youtube') {
     const id = youtubeId(url);
-    // Privacy-enhanced nocookie host (acceptance criteria; embeds.md §2).
-    return `https://www.youtube-nocookie.com/embed/${id}`;
+    // Match the live Škoda embed exactly: standard youtube.com host, /embed/{id}, with
+    // feature=oembed + enablejsapi=1 (and the si= share token when the author URL carries one).
+    const params = new URLSearchParams();
+    params.set('feature', 'oembed');
+    const si = url.searchParams.get('si');
+    if (si) params.set('si', si);
+    params.set('enablejsapi', '1');
+    return `https://www.youtube.com/embed/${id}?${params.toString()}`;
   }
   if (provider === 'buzzsprout') {
     // Keep the player query (?iframe=true etc.); ensure iframe mode.
@@ -108,27 +114,31 @@ function buildEmbedUrl(provider, url) {
   return url.href;
 }
 
+// Per-provider `allow` lists, copied verbatim from the live Škoda embeds so each player exposes
+// exactly the same controls as the source (YouTube lists accelerometer/gyroscope, no fullscreen;
+// Vimeo lists fullscreen). Measured on the reference innovation-and-technology article.
+const ALLOW = {
+  youtube: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
+  vimeo: 'autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share',
+};
+
 /**
  * Builds the lazy, title'd iframe. The src is set directly (no consent gate) so the provider
  * player renders exactly as on the live site — native controls, title, share, watch-on links.
- * Attributes mirror the measured live embeds (embeds.md §3): frameborder 0, the same `allow`
- * list, native loading="lazy". allowfullscreen is covered by `allow: fullscreen` (a separate
- * attr is redundant and warns).
+ * The `allow` list is provider-specific to match the live source verbatim (see ALLOW).
  * @param {string} src The normalised embed URL
  * @param {string} title Accessible iframe title
  * @param {boolean} isAudio Whether this is an audio player
+ * @param {string} provider Provider key (selects the matching `allow` list)
  * @returns {HTMLIFrameElement}
  */
-function buildIframe(src, title, isAudio) {
+function buildIframe(src, title, isAudio, provider) {
   const iframe = document.createElement('iframe');
   iframe.setAttribute('src', src);
   iframe.setAttribute('loading', 'lazy');
   iframe.setAttribute('title', title);
   iframe.setAttribute('frameborder', '0');
-  iframe.setAttribute(
-    'allow',
-    'autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share',
-  );
+  iframe.setAttribute('allow', ALLOW[provider] || ALLOW.vimeo);
   if (isAudio) iframe.setAttribute('scrolling', 'no');
   return iframe;
 }
@@ -173,7 +183,7 @@ export default function decorate(block) {
     wrapper.style.setProperty('--embed-ratio', ratio);
   }
 
-  wrapper.append(buildIframe(src, title, isAudio));
+  wrapper.append(buildIframe(src, title, isAudio, provider));
 
   block.classList.add(`embed-${provider}`);
   block.append(wrapper);
