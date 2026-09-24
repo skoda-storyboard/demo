@@ -10,6 +10,7 @@ import {
   loadSections,
   loadCSS,
   buildBlock,
+  toClassName,
 } from './aem.js';
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
@@ -143,6 +144,41 @@ function decorateButtons(main) {
 }
 
 /**
+ * Story-scoped: apply Section Metadata `Style` classes to sections.
+ *
+ * The vendored scripts/aem.js `decorateSections` does NOT process Section Metadata
+ * into a section class (the standard boilerplate step is absent, verified 2026-09-24).
+ * The story template (SKODA-801) emits a `Style: sidebar` section for the article
+ * aside, which the grid-on-main story layout (styles.css) places beside the body — so
+ * that class must be applied. Rather than change shared behaviour, this runs ONLY on
+ * `body.story` and consumes the section-metadata div (removing it before decorateBlocks
+ * would otherwise treat it as an unknown block and 404 on its missing block JS/CSS).
+ * @param {Element} main The main element
+ */
+function decorateStorySections(main) {
+  if (!document.body.classList.contains('story')) return;
+  // decorateSections wraps each block in its own div, so the section-metadata block
+  // sits at `.section > div > .section-metadata` (matched here regardless of depth).
+  main.querySelectorAll('.section .section-metadata').forEach((meta) => {
+    const section = meta.closest('.section');
+    if (!section) return;
+    meta.querySelectorAll(':scope > div').forEach((row) => {
+      const cols = [...row.children];
+      if (cols.length < 2) return;
+      const key = cols[0].textContent.trim().toLowerCase();
+      const val = cols[1].textContent.trim();
+      if (key === 'style' && val) {
+        val.split(',').forEach((c) => section.classList.add(toClassName(c.trim())));
+      }
+    });
+    // Remove the whole wrapper so decorateBlocks (div.section > div > div) never sees
+    // it as an unknown block (which would 404 on its missing block JS/CSS).
+    const wrapper = meta.closest('.section') === meta.parentElement ? meta : meta.parentElement;
+    (wrapper || meta).remove();
+  });
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -151,6 +187,7 @@ export function decorateMain(main) {
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
+  decorateStorySections(main);
   decorateBlocks(main);
   decorateButtons(main);
 }

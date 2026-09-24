@@ -6,29 +6,31 @@
  *
  * Layered ON TOP of skoda-page-cleanup (register both; this one handles what the
  * shared cleanup does not). The story is a two-column article shell
- * `.columns > .content (primary) + .sidebar (secondary)`. For the flatten-to-default
- * pass we keep the primary `.content` rich text and DROP:
- *   - `.sidebar` — the whole secondary column (subscribe + related "Explore more"
- *     cards + tags + promo); these become separate blocks under SKODA-604.
+ * `.columns > .content (primary) + .sidebar (secondary)`. This pass strips:
  *   - `.btn-group.social` / `.social-container` — the floating share cluster
  *     (skoda-page-cleanup only targets `.social-share`/`.share-bar`, not these).
+ *   - the in-body deferred-media shells inside `.content` (see below).
  *
- * ⚠️ FLATTEN-TO-DEFAULT, NOT RECONSTRUCTION. In-body galleries (`a.colorbox`,
- * `.sb-gallery`), embeds (`.embed-controller-wrapper`, `.page-embed`), and the
- * Media Box (`.search-results.media-box`) inside `.content` are the must-keep
- * content this pass intentionally drops → logged for SKODA-801/814/604. They are
- * NOT removed here (they fall out of the default-content selection in the template),
- * so this transformer only strips the sidebar + floating social chrome.
+ * ⚠️ THE SIDEBAR IS NO LONGER DROPPED HERE (SKODA-801). It is rebuilt into a
+ * `Style: sidebar` section (Cards + Tags) by skoda-story-aside.js so it renders
+ * beside the body via the grid-on-main story layout. This transformer must NOT
+ * remove `.sidebar` — storyAside owns it now.
+ *
+ * ⚠️ FLATTEN pass, in-body media deferred to SKODA-604. In-body galleries
+ * (`a.colorbox`, `.sb-gallery`), embeds (`.embed-controller-wrapper`, `.page-embed`),
+ * and the Media Box (`.search-results.media-box`) inside `.content` are the must-keep
+ * content SKODA-604 restores full-fidelity on the hero demo stories. They are removed
+ * here (with a LOG so the drop is never silent) so the common story flattens to clean
+ * body content; the SKODA-801 flatten parser handles the SiteOrigin WIDGET tree.
  *
  * Selectors verified against .migration/work/samples/story-live.html + story.html.
  *
  * ⚠️ ORDERING: `.sidebar` holds the story's `ol.entry-tags` (the tag links the
- * shared metadata transformer derives `tags`/facets from). If we dropped the sidebar
- * in `beforeTransform`, those tags would be gone before metadata runs and the page
- * would ship tag-less (gate failure). So the sidebar is removed in `afterTransform`,
- * and this transformer MUST be registered AFTER skoda-metadata.js so the Metadata
- * block is built (from the still-present tags) before the sidebar is stripped from
- * the output. The floating social cluster carries no metadata, so it goes early.
+ * shared metadata transformer derives `tags`/facets from). Both this transformer and
+ * skoda-story-aside act in `afterTransform` and MUST be registered AFTER
+ * skoda-metadata.js so the Metadata block is built (from the still-present tags)
+ * before the sidebar is restructured. The floating social cluster carries no
+ * metadata, so it goes early (beforeTransform).
  */
 
 const TransformHook = { beforeTransform: 'beforeTransform', afterTransform: 'afterTransform' };
@@ -42,16 +44,23 @@ export default function transform(hookName, element, payload) {
   }
 
   if (hookName === TransformHook.afterTransform) {
-    // Drop the secondary column AFTER metadata has read its entry-tags.
-    WebImporter.DOMUtils.remove(element, ['.sidebar']);
-
     // In-body galleries / embeds / Media Box are the must-keep content this
-    // flatten-to-default pass does NOT reconstruct (→ SKODA-801/814/604). Remove
-    // them from the flattened body so the story is clean linear default content,
-    // and LOG the counts so the drop is never silent.
+    // flatten pass does NOT reconstruct (→ SKODA-604 full restore). Remove them
+    // from the flattened body so the story is clean linear default content, and
+    // LOG the counts so the drop is never silent. The sidebar is intentionally
+    // left untouched here — skoda-story-aside rebuilds it.
+    //
+    // `div.cover-box.dark .related-stories` is the FULL-WIDTH bottom related band
+    // (a sibling of `.columns`, outside the two-column article body). The canonical
+    // related surface on the story is the sidebar `.related` (rebuilt by
+    // skoda-story-aside → Cards); this bottom band is index-derivable duplicate
+    // related content, so it is dropped for M1 (a dedicated related-rail block is
+    // SKODA-604/rail work). Without this it would fall through as raw default content
+    // and leak below the aside.
     const deferredSelectors = [
       '.search-results.media-box', '.sb-gallery', 'a.colorbox',
       '.embed-controller-wrapper', '.page-embed',
+      '.cover-box .related-stories', '.cover-box.dark',
     ];
     const dropped = {};
     deferredSelectors.forEach((sel) => {
