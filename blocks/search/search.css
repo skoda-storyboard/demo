@@ -1,44 +1,11 @@
 /* ==========================================================================
  * Search block — SKODA-403
- * Index-only site search: a labelled search input + an aria-live status + a
- * list of result links (thumbnail + title + summary). Vanilla, tokens-only,
- * mobile-first. Matches the source search page's shape, not its engine.
+ * Index-only search RESULTS: an aria-live status + a list of result links
+ * (title + summary). Results-only — the search INPUT lives in the header
+ * (SKODA-301) and submits the query here via ?filter[search]=. Vanilla,
+ * tokens-only, mobile-first. Matches the source search page's shape, not its
+ * engine.
  * ========================================================================== */
-
-/* sr-only utility (the visually-hidden input label) */
-.search .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* --- search input ------------------------------------------------------- */
-.search .search-box {
-  margin: 0 0 var(--spacing-l);
-}
-
-.search .search-input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: var(--spacing-s) var(--spacing-m);
-  border: 1px solid var(--border-color);
-  border-radius: var(--card-radius);
-  background: var(--background-color);
-  color: var(--text-color);
-  font: inherit;
-  font-size: var(--body-font-size-m);
-}
-
-.search .search-input:focus-visible {
-  outline: 2px solid var(--skoda-ink);
-  outline-offset: 2px;
-}
 
 /* --- status line (result count / prompt / error) ------------------------ */
 .search .search-status {
@@ -61,19 +28,20 @@
   margin: 0;
 }
 
+/* title link: matches the live search-result title scale (≈30px). No image —
+   link-only per the ticket / Block Collection Search pattern. */
 .search .search-result-link {
-  display: flex;
-  gap: var(--spacing-m);
-  align-items: flex-start;
-  padding: var(--spacing-s);
-  border-radius: var(--card-radius);
-  color: var(--text-color);
+  display: inline-block;
+  color: var(--link-color);
+  font-size: var(--heading-font-size-l);
+  font-weight: 400;
+  line-height: 1.2;
   text-decoration: none;
 }
 
 .search .search-result-link:hover,
 .search .search-result-link:focus-visible {
-  background: var(--dropdown-hover-bg);
+  color: var(--link-hover-color);
 }
 
 .search .search-result-link:focus-visible {
@@ -81,53 +49,10 @@
   outline-offset: 2px;
 }
 
-/* thumbnail: fixed-width 16:9, cover-fit, hidden if the row has no image */
-.search .search-result-image {
-  flex: 0 0 auto;
-  width: 96px;
-}
-
-.search .search-result-image img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: var(--card-radius);
-  object-fit: cover;
-}
-
-.search .search-result-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  min-width: 0;
-}
-
-.search .search-result-title {
-  color: var(--link-color);
-  font-size: var(--heading-font-size-xs);
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.search .search-result-link:hover .search-result-title,
-.search .search-result-link:focus-visible .search-result-title {
-  color: var(--link-hover-color);
-}
-
-/* summary: clamp to 2 lines so long descriptions don't dominate the row */
+/* summary: live excerpt scale (16px / ~20px line-height) */
 .search .search-result-desc {
-  display: -webkit-box;
-  overflow: hidden;
-  color: var(--skoda-grey-500);
-  font-size: var(--body-font-size-s);
-  line-height: 1.4;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-/* --- desktop: a touch more width for the thumbnail ---------------------- */
-@media (width >= 768px) {
-  .search .search-result-image {
-    width: 160px;
-  }
+  margin: var(--spacing-xs) 0 0;
+  color: var(--text-color);
+  font-size: var(--body-font-size-m);
+  line-height: 1.25;
 }
