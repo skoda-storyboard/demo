@@ -136,7 +136,7 @@ function extractCategory(url) {
  *   ...?filter[<taxonomy>][]=<slug>            (press-release facet links)
  * Returns { tags:[slug,…], byFacet:{ taxonomy:[slug,…] } }, de-duped.
  */
-function extractTagsAndFacets(document) {
+function extractTagsAndFacets(document, pageUrl = '') {
   const tags = [];
   const byFacet = {};
   const seen = new Set();
@@ -183,17 +183,22 @@ function extractTagsAndFacets(document) {
     }
   }
 
-  // Fallback: a series-hub (single-skoda_series) has no entry-tags in the body that
-  // survives grid removal. Its own series slug is the tag that feeds the Series rail
-  // — derive it from the canonical path (/en/series/<slug>/), mirroring how a model
-  // page carries its own model slug as a tag. Content-driven, not positional.
+  // Fallback: a self-describing CPT page (series hub, model page) has no entry-tags
+  // in the body — its OWN slug is the tag that feeds its rail. Derive it from the
+  // canonical path, keyed by CPT: /en/series/<slug>/ → series=<slug>;
+  // /en/skoda-model/<slug>/ → model=<slug>. Content-driven, not positional.
   if (tags.length === 0) {
     const cls = (document.body && document.body.getAttribute('class')) || '';
+    const canonical = document.querySelector('link[rel="canonical"]');
+    // Prefer the resolved page URL (always available at import); the canonical link
+    // may be absent in a pre-cleaned snapshot.
+    const href = pageUrl || (canonical && canonical.getAttribute('href')) || '';
     if (/\bsingle-skoda_series\b|\bskoda_series-template\b/.test(cls)) {
-      const canonical = document.querySelector('link[rel="canonical"]');
-      const href = (canonical && canonical.getAttribute('href')) || '';
       const m = href.match(/\/series\/([a-z0-9-]+)\/?/i);
       if (m) add('series', m[1].toLowerCase());
+    } else if (/\bsingle-skoda_model\b|\bskoda_model-template\b/.test(cls)) {
+      const m = href.match(/\/skoda-model\/([a-z0-9-]+)\/?/i);
+      if (m) add('model', m[1].toLowerCase());
     }
   }
   return { tags, byFacet };
@@ -231,7 +236,7 @@ export default function transform(hookName, element, payload) {
   const publisheddate = overrides.publisheddate || extractDate(document);
   const template = overrides.template || extractTemplate(document);
   const category = overrides.category || extractCategory(pageUrl);
-  const { tags: derivedTags, byFacet } = extractTagsAndFacets(document);
+  const { tags: derivedTags, byFacet } = extractTagsAndFacets(document, pageUrl);
 
   const meta = {};
   if (title) meta.Title = title;
