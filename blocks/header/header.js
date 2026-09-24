@@ -302,7 +302,9 @@ export default async function decorate(block) {
       // live suggestions (index-driven) + Enter → results page. The shared
       // helper owns the dropdown, arrow-key nav, and Enter; onSubmit fires when
       // Enter is pressed with no suggestion highlighted (submits the raw query).
-      attachSuggest(input, { onSubmit: submitSearch });
+      // Append the dropdown to .nav-search (positioned, not overflow:hidden) —
+      // the .nav-search-field pill clips its overflow for the collapse anim.
+      attachSuggest(input, { container: searchBar, onSubmit: submitSearch });
 
       toggle.addEventListener('click', () => {
         // when already open with a query, the icon acts as submit; else toggle

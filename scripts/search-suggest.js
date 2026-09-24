@@ -49,8 +49,11 @@ function metaLine(row) {
  * @param {HTMLInputElement} input the search field
  * @param {object} [opts]
  * @param {string} [opts.source] index URL (default: current locale's query-index)
+ * @param {Element} [opts.container] element to append the dropdown to (must be a
+ *   positioned, non-`overflow:hidden` ancestor so the absolute list isn't
+ *   clipped). Defaults to the input's parent.
  * @param {(query:string)=>void} [opts.onSubmit] called on Enter with the raw query
- * @returns {HTMLUListElement} the dropdown element (appended after the input)
+ * @returns {HTMLUListElement} the dropdown element
  */
 export default function attachSuggest(input, opts = {}) {
   const source = opts.source || defaultIndexUrl();
@@ -65,7 +68,11 @@ export default function attachSuggest(input, opts = {}) {
   input.setAttribute('aria-autocomplete', 'list');
   input.setAttribute('aria-controls', listId);
   input.setAttribute('aria-expanded', 'false');
-  input.after(list);
+  // append to the given container (a positioned, non-clipping ancestor) so the
+  // absolutely-positioned dropdown isn't clipped by an overflow:hidden wrapper
+  // (e.g. the header pill field). Falls back to inserting after the input.
+  if (opts.container) opts.container.append(list);
+  else input.after(list);
 
   let rows = null;
   let loadFailed = false;
