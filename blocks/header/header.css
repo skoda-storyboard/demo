@@ -405,6 +405,57 @@ header nav .nav-search-input::placeholder {
   opacity: 1;
 }
 
+/* live suggestion dropdown (SKODA-403; shared /scripts/search-suggest.js).
+   Matches the source: white panel, dropdown shadow, title + "date | section"
+   meta rows, no image. */
+header nav .nav-search .search-suggest {
+  position: absolute;
+  top: calc(100% + var(--spacing-xs));
+  right: 0;
+  z-index: 20;
+  width: max(280px, 100%);
+  max-height: 60vh;
+  margin: 0;
+  padding: var(--spacing-xs) 0;
+  overflow-y: auto;
+  background: var(--skoda-white);
+  box-shadow: var(--dropdown-shadow);
+  list-style: none;
+}
+
+header nav .nav-search .search-suggest[hidden] {
+  display: none;
+}
+
+header nav .nav-search .search-suggest-item {
+  margin: 0;
+}
+
+header nav .nav-search .search-suggest-link {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--spacing-xs) var(--spacing-m);
+  color: var(--skoda-ink);
+  text-decoration: none;
+}
+
+header nav .nav-search .search-suggest-link:hover,
+header nav .nav-search .search-suggest-link.is-active {
+  background: var(--dropdown-hover-bg);
+}
+
+header nav .nav-search .search-suggest-title {
+  font-size: var(--body-font-size-m);
+  line-height: 1.2;
+}
+
+header nav .nav-search .search-suggest-meta {
+  color: var(--skoda-grey-500);
+  font-size: 11px;
+  line-height: 1.2;
+}
+
 /* ==========================================================================
  * DRAWER BAND (< 1080): search lives inside the open menu as a static row,
  * expanded to 80% width (no click-to-expand overlay here).

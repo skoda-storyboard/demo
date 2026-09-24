@@ -1,5 +1,6 @@
 import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
+import attachSuggest from '../../scripts/search-suggest.js';
 
 // desktop >= 1080px per source ladder (SKODA-301); below is the drawer band (SKODA-302)
 const isDesktop = window.matchMedia('(min-width: 1080px)');
@@ -258,9 +259,11 @@ export default async function decorate(block) {
       // search input (collapsed by default)
       const input = document.createElement('input');
       input.type = 'search';
+      input.id = 'nav-search-input';
       input.className = 'nav-search-input';
       input.placeholder = label;
       input.setAttribute('aria-label', label);
+      input.setAttribute('autocomplete', 'off');
       input.tabIndex = -1;
 
       // pill field holds the leading icon + input; icon sits before the
@@ -279,9 +282,38 @@ export default async function decorate(block) {
         input.tabIndex = open ? 0 : -1;
         if (open) input.focus();
       };
+      // Submit the query to the search results page (the SKODA-403 block reads
+      // ?filter[search]= from the URL). Target: the authored search link's href
+      // if it points to a real page, else the locale's /search (mirrors the live
+      // header form → /{locale}/search/?filter[search]=…).
+      const authoredHref = searchLink.getAttribute('href') || '';
+      const localeMatch = window.location.pathname.match(/^\/([a-z]{2})(?:\/|$)/i);
+      const locale = localeMatch ? localeMatch[1] : 'en';
+      const searchPath = authoredHref && !authoredHref.startsWith('#')
+        ? authoredHref
+        : `/${locale}/search`;
+      const submitSearch = (value) => {
+        const q = String(value || '').trim();
+        if (!q) { input.focus(); return; }
+        const url = new URL(searchPath, window.location.origin);
+        url.searchParams.set('filter[search]', q);
+        window.location.assign(url.href);
+      };
+      // live suggestions (index-driven) + Enter → results page. The shared
+      // helper owns the dropdown, arrow-key nav, and Enter; onSubmit fires when
+      // Enter is pressed with no suggestion highlighted (submits the raw query).
+      attachSuggest(input, { onSubmit: submitSearch });
+
       toggle.addEventListener('click', () => {
-        setOpen(!searchBar.classList.contains('nav-search-open'));
+        // when already open with a query, the icon acts as submit; else toggle
+        if (searchBar.classList.contains('nav-search-open') && input.value.trim()) {
+          submitSearch(input.value);
+        } else {
+          setOpen(!searchBar.classList.contains('nav-search-open'));
+        }
       });
+      // Escape closes the whole search bar (the suggest helper also closes its
+      // own dropdown on Escape; this additionally collapses the field).
       input.addEventListener('keydown', (e) => {
         if (e.code === 'Escape') { setOpen(false); toggle.focus(); }
       });
