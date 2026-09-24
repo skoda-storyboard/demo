@@ -115,6 +115,19 @@ var CustomImportScript = (() => {
     const heading = headingEl ? (headingEl.textContent || "").trim() : "";
     const allLink = element.querySelector(".search-results-header-link[href]");
     const href = allLink ? allLink.getAttribute("href") : "";
+    const isFeed = /\blatest-articles\b/.test(element.className || "") || element.querySelector(".ajax-loader-button") && !element.querySelector("[data-flickity]");
+    if (isFeed) {
+      const q2 = queryFromHref(href) || (() => {
+        const t = templateFromTypeClass(element, heading);
+        return t ? { key: "template", value: t } : null;
+      })();
+      const feedCells = [["Stories"]];
+      if (heading) feedCells.push(["heading", heading]);
+      feedCells.push(q2 || ["template", "story"]);
+      const feedTable = WebImporter.DOMUtils.createTable(feedCells, document2);
+      element.replaceWith(feedTable);
+      return;
+    }
     const q = queryFromHref(href);
     const cells = [["Story Rail"]];
     if (heading) cells.push(["heading", heading]);
@@ -446,7 +459,13 @@ var CustomImportScript = (() => {
     metadata: { template: "page" },
     blocks: [
       { name: "promo-box", instances: ["section.promo-box"] },
-      { name: "home-rail", instances: ['.cover-box .search-results[class*="type-"]'] }
+      {
+        name: "home-rail",
+        instances: [
+          '.cover-box .search-results[class*="type-"]',
+          ".cover-box .search-results.latest-articles"
+        ]
+      }
     ],
     sections: []
   };

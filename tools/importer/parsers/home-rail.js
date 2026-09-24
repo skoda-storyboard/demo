@@ -66,6 +66,27 @@ export default function parse(element, { document }) {
   const allLink = element.querySelector('.search-results-header-link[href]');
   const href = allLink ? allLink.getAttribute('href') : '';
 
+  // FEED vs RAIL (content-driven): the Latest Stories/News feed is a `.latest-articles`
+  // container with a "Load more" `.ajax-loader-button` (vertical Load-more pager), NOT a
+  // flickity arrow carousel. It maps to the `Stories` block (SKODA-214), which is
+  // index-driven with a load-more pager — distinct from the `Story Rail` carousel
+  // (SKODA-212). Emit a Stories config table for it.
+  const isFeed = /\blatest-articles\b/.test(element.className || '')
+    || (element.querySelector('.ajax-loader-button') && !element.querySelector('[data-flickity]'));
+  if (isFeed) {
+    const q = queryFromHref(href) || (() => {
+      const t = templateFromTypeClass(element, heading);
+      return t ? { key: 'template', value: t } : null;
+    })();
+    const feedCells = [['Stories']];
+    if (heading) feedCells.push(['heading', heading]);
+    // Latest Stories = editorial posts; default to template=story when unclassified.
+    feedCells.push(q || ['template', 'story']);
+    const feedTable = WebImporter.DOMUtils.createTable(feedCells, document);
+    element.replaceWith(feedTable);
+    return;
+  }
+
   // Derive the query: prefer the explicit "All" link, else the type-<cpt> class.
   const q = queryFromHref(href);
   const cells = [['Story Rail']];

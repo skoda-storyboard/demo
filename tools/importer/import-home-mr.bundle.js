@@ -43,32 +43,36 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/promo-box.js
   function parse(element, { document: document2 }) {
-    const items = Array.from(element.querySelectorAll("article.promo-box-item, .item article, .items > .item")).filter((el, i, arr) => arr.indexOf(el) === i);
+    let items = Array.from(element.querySelectorAll("article.promo-box-item"));
+    if (items.length === 0) items = Array.from(element.querySelectorAll(".items > .item"));
     if (items.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const cells = [["Cards (promo)"]];
+    const cells = [["Promo box"]];
     let emitted = 0;
     items.forEach((item) => {
       const img = item.querySelector("img");
       const anchor = item.querySelector("a[href]");
-      const href = anchor ? anchor.getAttribute("href") : "";
-      const titleEl = item.querySelector(".article-teaser-title, h2, h3");
-      const title = titleEl && (titleEl.textContent || "").trim() || img && img.getAttribute("alt") || "";
-      if (!img && !title) return;
-      const titleCell = [];
-      if (href && title) {
-        const link = document2.createElement("a");
-        link.setAttribute("href", href);
-        link.textContent = title;
-        titleCell.push(link);
-      } else if (title) {
+      const href = anchor && anchor.getAttribute("href");
+      if (!href || href === "#") return;
+      const titleEl = item.querySelector(".article-teaser-title, .entry-title, h2, h3");
+      const title = titleEl && (titleEl.textContent || "").trim() || (anchor.textContent || "").trim() || img && img.getAttribute("alt") || "";
+      if (!title) return;
+      const heading = document2.createElement("h3");
+      const link = document2.createElement("a");
+      link.setAttribute("href", href);
+      link.textContent = title;
+      heading.append(link);
+      const bodyCell = [heading];
+      const summaryEl = item.querySelector(".article-teaser-excerpt, .entry-summary, .perex");
+      const summary = summaryEl && (summaryEl.textContent || "").trim();
+      if (summary) {
         const p = document2.createElement("p");
-        p.textContent = title;
-        titleCell.push(p);
+        p.textContent = summary;
+        bodyCell.push(p);
       }
-      cells.push([img || "", titleCell]);
+      cells.push([img || "", bodyCell]);
       emitted += 1;
     });
     if (emitted === 0) {
@@ -111,6 +115,19 @@ var CustomImportScript = (() => {
     const heading = headingEl ? (headingEl.textContent || "").trim() : "";
     const allLink = element.querySelector(".search-results-header-link[href]");
     const href = allLink ? allLink.getAttribute("href") : "";
+    const isFeed = /\blatest-articles\b/.test(element.className || "") || element.querySelector(".ajax-loader-button") && !element.querySelector("[data-flickity]");
+    if (isFeed) {
+      const q2 = queryFromHref(href) || (() => {
+        const t = templateFromTypeClass(element, heading);
+        return t ? { key: "template", value: t } : null;
+      })();
+      const feedCells = [["Stories"]];
+      if (heading) feedCells.push(["heading", heading]);
+      feedCells.push(q2 || ["template", "story"]);
+      const feedTable = WebImporter.DOMUtils.createTable(feedCells, document2);
+      element.replaceWith(feedTable);
+      return;
+    }
     const q = queryFromHref(href);
     const cells = [["Story Rail"]];
     if (heading) cells.push(["heading", heading]);
@@ -263,6 +280,10 @@ var CustomImportScript = (() => {
     [/\bsingle-press_release\b|\bpress_release-template\b/, "press_release"],
     [/\bsingle-press_kit\b|\bpress_kit-template\b/, "press_kit"],
     [/\bsingle-post\b|\bpost-template\b/, "story"],
+    // Škodapedia archive + branded 404 aren't rail CPTs and aren't in the template
+    // enum — map them to the valid `page` value (nav/direct only, not rail-indexed).
+    [/\bpost-type-archive-skodapedia\b/, "page"],
+    [/\berror404\b/, "page"],
     [/\bpage-template\b|\btemplate-media-room-page\b/, "page"]
   ];
   function metaContent(document2, selector) {
@@ -322,7 +343,7 @@ var CustomImportScript = (() => {
     }
     return "";
   }
-  function extractTagsAndFacets(document2) {
+  function extractTagsAndFacets(document2, pageUrl = "") {
     const tags = [];
     const byFacet = {};
     const seen = /* @__PURE__ */ new Set();
@@ -368,11 +389,14 @@ var CustomImportScript = (() => {
     }
     if (tags.length === 0) {
       const cls = document2.body && document2.body.getAttribute("class") || "";
+      const canonical = document2.querySelector('link[rel="canonical"]');
+      const href = pageUrl || canonical && canonical.getAttribute("href") || "";
       if (/\bsingle-skoda_series\b|\bskoda_series-template\b/.test(cls)) {
-        const canonical = document2.querySelector('link[rel="canonical"]');
-        const href = canonical && canonical.getAttribute("href") || "";
         const m = href.match(/\/series\/([a-z0-9-]+)\/?/i);
         if (m) add("series", m[1].toLowerCase());
+      } else if (/\bsingle-skoda_model\b|\bskoda_model-template\b/.test(cls)) {
+        const m = href.match(/\/skoda-model\/([a-z0-9-]+)\/?/i);
+        if (m) add("model", m[1].toLowerCase());
       }
     }
     return { tags, byFacet };
@@ -401,7 +425,7 @@ var CustomImportScript = (() => {
     const publisheddate = overrides.publisheddate || extractDate(document2);
     const template = overrides.template || extractTemplate(document2);
     const category = overrides.category || extractCategory(pageUrl);
-    const { tags: derivedTags, byFacet } = extractTagsAndFacets(document2);
+    const { tags: derivedTags, byFacet } = extractTagsAndFacets(document2, pageUrl);
     const meta = {};
     if (title) meta.Title = title;
     if (description) meta.Description = description;
@@ -435,7 +459,13 @@ var CustomImportScript = (() => {
     metadata: { template: "page" },
     blocks: [
       { name: "promo-box", instances: ["section.promo-box"] },
-      { name: "home-rail", instances: ['.cover-box .search-results[class*="type-"]'] }
+      {
+        name: "home-rail",
+        instances: [
+          '.cover-box .search-results[class*="type-"]',
+          ".cover-box .search-results.latest-articles"
+        ]
+      }
     ],
     sections: []
   };

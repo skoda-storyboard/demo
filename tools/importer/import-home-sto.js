@@ -30,7 +30,13 @@ const PAGE_TEMPLATE = {
   metadata: { template: 'page' },
   blocks: [
     { name: 'promo-box', instances: ['section.promo-box'] },
-    { name: 'home-rail', instances: ['.cover-box .search-results[class*="type-"]'] },
+    {
+      name: 'home-rail',
+      instances: [
+        '.cover-box .search-results[class*="type-"]',
+        '.cover-box .search-results.latest-articles',
+      ],
+    },
   ],
   sections: [],
 };
