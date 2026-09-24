@@ -12,6 +12,13 @@
   display: block;
 }
 
+/* Hide the raw config table (url / ratio cells) until decorate() runs. Without this, the
+   undecorated block briefly shows those cells — the long unbroken URL stretches the layout
+   ("stretched/hidden text"). aem.js sets data-block-status="loaded" once decorated. */
+.embed:not([data-block-status="loaded"]) {
+  visibility: hidden;
+}
+
 /* Video: fluid width, fixed ratio (default 16:9; author can override via --embed-ratio).
    aspect-ratio replaces the source padding-bottom:56.25% hack (no CLS, no letterbox). */
 .embed .embed-video {
