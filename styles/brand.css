@@ -52,12 +52,6 @@
   --pagination-border: #c9cdd3;      /* result-count underline */
   --grid-gutter: 20px;               /* listing cell margin-bottom / padding base */
   --pill-radius: 50px;               /* shared ghost-pill (load-more) */
-
-  /* embeds consent placeholder (SKODA-204; measured in docs/ui-specs/embeds.md §3) — the
-     source .page-embed_cookie greys have no existing token; inner bg #e4e4e4 == --divider-color
-     so it is reused downstream rather than redefined here. */
-  --embed-consent-bg: #c4c6c7;       /* placeholder box background */
-  --embed-consent-border: #9f9f9f;   /* placeholder box border */
 }
 
 /*

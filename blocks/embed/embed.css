@@ -1,17 +1,16 @@
 /*
- * Embeds block — SKODA-204 (docs/ui-specs/embeds.md §3–§6).
+ * Embeds block — SKODA-204 (docs/ui-specs/embeds.md §3–§4).
  *
- * Three-layer CSS: (1) fluid geometry (aspect-ratio video / fixed-height audio, fluid width);
- * (2) intrinsic consent placeholder; (3) two behavioural breakpoints (720/768) that only adjust
- * the consent control, matching the measured source. The media ratio is viewport-invariant, so
- * no breakpoint touches it. Scoped to .embed; --*-wrapper/-container are section classes.
+ * Fluid geometry only: video is a fixed-ratio box (default 16:9, author-overridable) with a
+ * fluid width; audio is a fixed-height box. The provider iframe fills the box and renders its
+ * own native player/controls (matching the live site) — there is no consent placeholder or
+ * thumbnail facade. The media ratio is viewport-invariant, so no breakpoint touches it.
+ * Scoped to .embed; -wrapper/-container are section classes.
  */
 
 .embed {
   display: block;
 }
-
-/* Layer 1 — fluid geometry -------------------------------------------------- */
 
 /* Video: fluid width, fixed ratio (default 16:9; author can override via --embed-ratio).
    aspect-ratio replaces the source padding-bottom:56.25% hack (no CLS, no letterbox). */
@@ -37,130 +36,4 @@
   width: 100%;
   height: 100%;
   border: 0;
-}
-
-/* Layer 2a — YouTube poster facade (thumbnail + play overlay) --------------- */
-
-.embed .embed-facade {
-  position: absolute;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  background: var(--skoda-ink);
-  cursor: pointer;
-}
-
-.embed .embed-facade img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* red YouTube-style play button (CSS triangle, no extra asset) */
-.embed .embed-facade-play {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 68px;
-  height: 48px;
-  border-radius: 14px;
-  background: rgb(0 0 0 / 65%);
-  transition: background-color 0.2s ease;
-}
-
-.embed .embed-facade-play::before {
-  content: "";
-  border-style: solid;
-  border-width: 11px 0 11px 19px;
-  border-color: transparent transparent transparent var(--skoda-white);
-}
-
-.embed .embed-facade:hover .embed-facade-play,
-.embed .embed-facade:focus-visible .embed-facade-play {
-  background: var(--social-youtube);
-}
-
-.embed .embed-facade:focus-visible {
-  outline: 2px solid var(--skoda-white);
-  outline-offset: -2px;
-}
-
-/* Layer 2 — consent placeholder (M1 stub; embeds.md §3) --------------------- */
-
-.embed .embed-consent {
-  position: absolute;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--embed-consent-bg);
-  border: 1px solid var(--embed-consent-border);
-}
-
-.embed .embed-consent-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 85%;
-  max-height: 80%;
-  padding: var(--spacing-m);
-  background-color: var(--embed-consent-inner-bg);
-  box-shadow: 0 0 10px 0 rgb(126 126 126 / 100%);
-  text-align: center;
-}
-
-.embed .embed-consent-text {
-  margin: 0 0 1.25rem;
-  color: var(--text-color);
-}
-
-.embed .embed-consent-button {
-  padding: 0.5rem;
-  border: 0;
-  border-radius: var(--embed-consent-radius);
-  background-color: var(--skoda-white);
-  box-shadow: inset 0 0 0 2px var(--skoda-ink);
-  color: var(--skoda-ink);
-  font: inherit;
-  cursor: pointer;
-  transition: background-color 0.25s ease;
-}
-
-.embed .embed-consent-button:hover,
-.embed .embed-consent-button:focus-visible,
-.embed .embed-consent-button:active {
-  background-color: var(--dropdown-hover-bg);
-}
-
-.embed .embed-consent-button:focus-visible {
-  outline: 2px solid var(--skoda-ink);
-  outline-offset: 2px;
-}
-
-/* Layer 3 — behavioural breakpoints (source-measured) ---------------------- */
-
-/* Consent button padding grows at the source's secondary step (embeds.md §4). */
-@media (width >= 720px) {
-  .embed .embed-consent-button {
-    padding: 0.875rem 1.5rem;
-  }
-}
-
-/* Consent text margin grows at the primary tablet step (embeds.md §4). */
-@media (width >= 768px) {
-  .embed .embed-consent-text {
-    margin-bottom: 2rem;
-  }
 }

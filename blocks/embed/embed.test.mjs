@@ -119,46 +119,50 @@ function buildEmbed(href, { title } = {}) {
 
 const { default: decorate } = await import('./embed.js');
 
-test('Vimeo: preserves dnt=1, uses player host, video wrapper, lazy + title, no eager src', () => {
+test('Vimeo: preserves dnt=1, uses player host, video wrapper, lazy + title, direct src', () => {
   const block = buildEmbed('https://vimeo.com/1221703335', { title: 'Octavia film' });
   decorate(block);
   const wrapper = block.querySelector('.embed-video');
   assert.ok(wrapper, 'video wrapper present');
   assert.equal(wrapper.style['--embed-ratio'], '16 / 9');
-  const iframe = wrapper.querySelector('iframe[data-src]');
-  const src = iframe.dataset.src;
+  const iframe = wrapper.querySelector('iframe');
+  const src = iframe.getAttribute('src');
   assert.ok(src.startsWith('https://player.vimeo.com/video/1221703335?'), src);
   assert.equal(new URL(src).searchParams.get('dnt'), '1');
   assert.equal(iframe.getAttribute('loading'), 'lazy');
   assert.equal(iframe.getAttribute('title'), 'Octavia film');
-  assert.equal(iframe.getAttribute('src'), null, 'no eager src (consent stub)');
+  assert.equal(iframe.dataset.src, undefined, 'src set directly (no consent gate)');
   assert.ok(block.classList.contains('embed-vimeo'));
 });
 
 test('Vimeo already-embed URL keeps app_id and forces dnt=1', () => {
   const block = buildEmbed('https://player.vimeo.com/video/1003242587?app_id=122963');
   decorate(block);
-  const src = block.querySelector('iframe[data-src]').dataset.src;
+  const src = block.querySelector('iframe').getAttribute('src');
   const params = new URL(src).searchParams;
   assert.equal(params.get('dnt'), '1');
   assert.equal(params.get('app_id'), '122963');
 });
 
-test('YouTube: normalised to nocookie host + /embed/{id}, video wrapper', () => {
+test('YouTube: normalised to nocookie host + /embed/{id}, video wrapper, direct src', () => {
   const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
   decorate(block);
-  const src = block.querySelector('iframe[data-src]').dataset.src;
-  assert.equal(src, 'https://www.youtube-nocookie.com/embed/9LfK-A20pgw');
+  const iframe = block.querySelector('iframe');
+  assert.equal(iframe.getAttribute('src'), 'https://www.youtube-nocookie.com/embed/9LfK-A20pgw');
+  assert.equal(iframe.dataset.src, undefined, 'no consent gate — src set directly');
   assert.ok(block.querySelector('.embed-video'));
+  // no facade / consent overlays remain
+  assert.equal(block.querySelector('.embed-facade'), null);
+  assert.equal(block.querySelector('.embed-consent'), null);
 });
 
 test('YouTube: /embed/ and youtu.be forms both yield nocookie host', () => {
   const a = buildEmbed('https://www.youtube.com/embed/B4ZafpJKk0M?si=x');
   decorate(a);
-  assert.equal(a.querySelector('iframe[data-src]').dataset.src, 'https://www.youtube-nocookie.com/embed/B4ZafpJKk0M');
+  assert.equal(a.querySelector('iframe').getAttribute('src'), 'https://www.youtube-nocookie.com/embed/B4ZafpJKk0M');
   const b = buildEmbed('https://youtu.be/atipTWwYw5E');
   decorate(b);
-  assert.equal(b.querySelector('iframe[data-src]').dataset.src, 'https://www.youtube-nocookie.com/embed/atipTWwYw5E');
+  assert.equal(b.querySelector('iframe').getAttribute('src'), 'https://www.youtube-nocookie.com/embed/atipTWwYw5E');
 });
 
 test('Buzzsprout: audio wrapper (fixed height, not 16:9), iframe=true preserved', () => {
@@ -166,7 +170,7 @@ test('Buzzsprout: audio wrapper (fixed height, not 16:9), iframe=true preserved'
   decorate(block);
   assert.ok(block.querySelector('.embed-audio'), 'audio wrapper');
   assert.equal(block.querySelector('.embed-video'), null, 'not a video wrapper');
-  const src = block.querySelector('iframe[data-src]').dataset.src;
+  const src = block.querySelector('iframe').getAttribute('src');
   assert.equal(new URL(src).searchParams.get('iframe'), 'true');
   assert.ok(block.classList.contains('embed-buzzsprout'));
 });
@@ -175,51 +179,28 @@ test('Spotify: audio wrapper + /embed/ path injection', () => {
   const block = buildEmbed('https://open.spotify.com/episode/abc123');
   decorate(block);
   assert.ok(block.querySelector('.embed-audio'));
-  assert.equal(block.querySelector('iframe[data-src]').dataset.src, 'https://open.spotify.com/embed/episode/abc123');
+  assert.equal(block.querySelector('iframe').getAttribute('src'), 'https://open.spotify.com/embed/episode/abc123');
 });
 
-test('consent stub: placeholder present; click swaps data-src -> src and removes placeholder', () => {
+test('iframe carries the live allow list (incl. web-share) and no data-src', () => {
   const block = buildEmbed('https://vimeo.com/1221703335');
   decorate(block);
-  const wrapper = block.querySelector('.embed-video');
-  const consent = wrapper.querySelector('.embed-consent');
-  assert.ok(consent, 'consent placeholder rendered');
-  const button = wrapper.querySelector('.embed-consent-button');
-  assert.equal(button.tagName, 'BUTTON');
-  assert.equal(button.getAttribute('type'), 'button');
-  const iframe = wrapper.querySelector('iframe[data-src]');
-  const held = iframe.dataset.src;
-  button.dispatch('click');
-  assert.equal(iframe.getAttribute('src'), held, 'src populated on consent');
-  assert.equal(iframe.dataset.src, undefined, 'data-src cleared');
-  assert.equal(wrapper.querySelector('.embed-consent'), null, 'placeholder removed');
-  assert.ok(wrapper.classList.contains('embed-loaded'));
+  const iframe = block.querySelector('iframe');
+  const allow = iframe.getAttribute('allow');
+  ['autoplay', 'fullscreen', 'picture-in-picture', 'clipboard-write', 'encrypted-media', 'web-share']
+    .forEach((f) => assert.ok(allow.includes(f), `allow includes ${f}`));
+  assert.ok(iframe.getAttribute('src'), 'src is set');
+  assert.equal(iframe.dataset.src, undefined, 'no data-src (no gate)');
 });
 
-test('YouTube: shows a poster facade (not the consent box); click autoplays + loads', () => {
-  const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
-  decorate(block);
-  const wrapper = block.querySelector('.embed-video');
-  const facade = wrapper.querySelector('.embed-facade');
-  assert.ok(facade, 'facade rendered for YouTube');
-  assert.equal(wrapper.querySelector('.embed-consent'), null, 'no consent box for YouTube');
-  const img = facade.querySelector('img');
-  assert.ok(img.getAttribute('src').includes('9LfK-A20pgw'), 'poster thumbnail uses the video id');
-  const iframe = wrapper.querySelector('iframe[data-src]');
-  facade.dispatch('click');
-  const src = iframe.getAttribute('src');
-  assert.ok(src.startsWith('https://www.youtube-nocookie.com/embed/9LfK-A20pgw'), src);
-  assert.equal(new URL(src).searchParams.get('autoplay'), '1', 'autoplay on click');
-  assert.equal(wrapper.querySelector('.embed-facade'), null, 'facade removed after load');
-  assert.ok(wrapper.classList.contains('embed-loaded'));
-});
-
-test('non-YouTube providers keep the consent box (no facade)', () => {
-  const block = buildEmbed('https://vimeo.com/1221703335');
-  decorate(block);
-  const wrapper = block.querySelector('.embed-video');
-  assert.ok(wrapper.querySelector('.embed-consent'), 'Vimeo keeps consent box');
-  assert.equal(wrapper.querySelector('.embed-facade'), null, 'no facade for Vimeo');
+test('no consent placeholder or facade is rendered for any provider', () => {
+  ['https://vimeo.com/1', 'https://www.youtube.com/watch?v=abc', 'https://open.spotify.com/episode/x']
+    .forEach((href) => {
+      const block = buildEmbed(href);
+      decorate(block);
+      assert.equal(block.querySelector('.embed-consent'), null, `${href}: no consent box`);
+      assert.equal(block.querySelector('.embed-facade'), null, `${href}: no facade`);
+    });
 });
 
 test('authored ratio override is applied', () => {

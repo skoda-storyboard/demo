@@ -10,10 +10,11 @@
  *   - Generic iframe provider: falls through as a video-ratio embed (the MR-PR03
  *     AI-audio JS *widget* is handled by the /widgets/ autoblock, not here).
  *
- * Consent (D10, OUT of Adobe scope for M1) is a stub: iframes are NOT given a live `src`
- * eagerly. The URL is held in `data-src` behind a click-to-load `.embed-consent`
- * placeholder; clicking it (the M1 gate hook) swaps data-src -> src. Downstream tickets
- * (SKODA-804/905) wire the real OneTrust category signal into loadEmbed().
+ * The iframe src is set directly so each provider's native player renders exactly as on the
+ * live site (YouTube title / share / watch-on-YouTube overlay, Vimeo controls, etc.). This
+ * matches the source, which loads its embeds directly; the site-wide OneTrust banner remains
+ * the consent mechanism (the per-embed .page-embed_cookie placeholder only appears when a
+ * category is actively blocked — out of Adobe M1 scope, D10 / SKODA-804/905).
  *
  * Authoring: a bare provider URL on its own line autoblocks into `embed`
  * (buildEmbedAutoBlocks, scripts.js). A table form is also supported for options
@@ -108,7 +109,11 @@ function buildEmbedUrl(provider, url) {
 }
 
 /**
- * Builds the lazy, title'd iframe (no live src until consent — see loadEmbed).
+ * Builds the lazy, title'd iframe. The src is set directly (no consent gate) so the provider
+ * player renders exactly as on the live site — native controls, title, share, watch-on links.
+ * Attributes mirror the measured live embeds (embeds.md §3): frameborder 0, the same `allow`
+ * list, native loading="lazy". allowfullscreen is covered by `allow: fullscreen` (a separate
+ * attr is redundant and warns).
  * @param {string} src The normalised embed URL
  * @param {string} title Accessible iframe title
  * @param {boolean} isAudio Whether this is an audio player
@@ -116,110 +121,16 @@ function buildEmbedUrl(provider, url) {
  */
 function buildIframe(src, title, isAudio) {
   const iframe = document.createElement('iframe');
-  // Consent gate (M1 stub): hold the URL in data-src, swap to src on load.
-  iframe.dataset.src = src;
+  iframe.setAttribute('src', src);
   iframe.setAttribute('loading', 'lazy');
   iframe.setAttribute('title', title);
   iframe.setAttribute('frameborder', '0');
-  // `allow` grants fullscreen; a separate allowfullscreen attr would be redundant (and warns).
   iframe.setAttribute(
     'allow',
-    'autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media',
+    'autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share',
   );
   if (isAudio) iframe.setAttribute('scrolling', 'no');
   return iframe;
-}
-
-/**
- * Swaps the held data-src into src to load the third-party iframe, and removes whichever
- * overlay (consent box or thumbnail facade) was covering it. This is the single
- * first-interaction hook that SKODA-804/905 will wire to OneTrust.
- * @param {Element} wrapper The .embed-video / .embed-audio wrapper
- */
-function loadEmbed(wrapper) {
-  const iframe = wrapper.querySelector('iframe[data-src]');
-  if (!iframe) return;
-  iframe.setAttribute('src', iframe.dataset.src);
-  delete iframe.dataset.src;
-  wrapper.querySelector('.embed-consent')?.remove();
-  wrapper.querySelector('.embed-facade')?.remove();
-  wrapper.classList.add('embed-loaded');
-}
-
-/**
- * YouTube poster thumbnail URL. hqdefault always exists (maxres 404s on some videos).
- * @param {string} id YouTube video id
- * @returns {string}
- */
-function youtubeThumb(id) {
-  return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-}
-
-/**
- * Builds a lightweight YouTube facade: the real poster thumbnail + a play overlay in place of
- * the grey consent box. Clicking loads the iframe with autoplay so it plays on the first click
- * (no second "press play"). Note: rendering the poster does contact Google (i.ytimg.com) — an
- * intentional tradeoff for the thumbnail-first UX (SKODA-204 follow-up).
- * @param {URL} url The authored YouTube URL
- * @param {Element} wrapper The embed wrapper (click-to-load target)
- * @returns {HTMLElement}
- */
-function buildFacade(url, wrapper) {
-  const facade = document.createElement('button');
-  facade.type = 'button';
-  facade.className = 'embed-facade';
-  facade.setAttribute('aria-label', 'Play video');
-
-  const img = document.createElement('img');
-  img.src = youtubeThumb(youtubeId(url));
-  img.alt = '';
-  img.loading = 'lazy';
-
-  const play = document.createElement('span');
-  play.className = 'embed-facade-play';
-  play.setAttribute('aria-hidden', 'true');
-
-  facade.append(img, play);
-  facade.addEventListener('click', () => {
-    const iframe = wrapper.querySelector('iframe[data-src]');
-    if (iframe) {
-      const u = new URL(iframe.dataset.src, window.location.href);
-      u.searchParams.set('autoplay', '1');
-      iframe.dataset.src = u.href;
-    }
-    loadEmbed(wrapper);
-  });
-  return facade;
-}
-
-/**
- * Builds the consent placeholder stub (embeds.md §3). Real OneTrust wiring is out of M1
- * scope (D10); clicking the button is the click-to-load hook.
- * @param {string} provider Provider name for the label
- * @param {Element} wrapper The embed wrapper (click-to-load target)
- * @returns {HTMLElement}
- */
-function buildConsent(provider, wrapper) {
-  const label = provider.charAt(0).toUpperCase() + provider.slice(1);
-  const consent = document.createElement('div');
-  consent.className = 'embed-consent';
-
-  const inner = document.createElement('div');
-  inner.className = 'embed-consent-inner';
-
-  const text = document.createElement('p');
-  text.className = 'embed-consent-text';
-  text.textContent = `To view this content from ${label}, a third party will be contacted. Load it now?`;
-
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'embed-consent-button';
-  button.textContent = `Load content from ${label}`;
-  button.addEventListener('click', () => loadEmbed(wrapper));
-
-  inner.append(text, button);
-  consent.append(inner);
-  return consent;
 }
 
 export default function decorate(block) {
@@ -263,13 +174,6 @@ export default function decorate(block) {
   }
 
   wrapper.append(buildIframe(src, title, isAudio));
-  // YouTube shows a poster-thumbnail facade (play overlay); other providers keep the M1
-  // consent stub. Facade only when we have a usable video id to build the thumbnail from.
-  if (provider === 'youtube' && youtubeId(url)) {
-    wrapper.append(buildFacade(url, wrapper));
-  } else {
-    wrapper.append(buildConsent(provider, wrapper));
-  }
 
   block.classList.add(`embed-${provider}`);
   block.append(wrapper);
