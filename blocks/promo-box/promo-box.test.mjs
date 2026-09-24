@@ -8,7 +8,7 @@ globalThis.window = {
 };
 
 const {
-  default: decorate, parseSource, selectPromoRows, validateCuratedRows,
+  default: decorate, parseSource, selectPromoRows, validateCuratedRows, enablePromoRotation,
 } = await import('./promo-box.js');
 
 function configBlock(settings) {
@@ -123,5 +123,107 @@ test('an index fetch failure reports an error without losing config rows', async
     globalThis.document = oldDocument;
     globalThis.fetch = oldFetch;
     console.error = oldError;
+  }
+});
+
+test('desktop mosaic cycles card nodes; pauses and mobile mode retain their behavior', () => {
+  const oldWindow = globalThis.window;
+  const oldDocument = globalThis.document;
+  const oldComputedStyle = globalThis.getComputedStyle;
+  const intervals = new Map();
+  let nextTimer = 0;
+
+  function element() {
+    const listeners = new Map();
+    return {
+      children: [],
+      attributes: new Map(),
+      scrollLeft: 0,
+      get firstElementChild() { return this.children[0]; },
+      append(child) {
+        if (child.parentElement) {
+          const siblings = child.parentElement.children;
+          siblings.splice(siblings.indexOf(child), 1);
+        }
+        this.children.push(child);
+        child.parentElement = this;
+      },
+      contains(child) { return this === child || this.children.some((el) => el.contains(child)); },
+      setAttribute(name, value) { this.attributes.set(name, value); },
+      removeAttribute(name) { this.attributes.delete(name); },
+      hasAttribute(name) { return this.attributes.has(name); },
+      addEventListener(name, listener) {
+        if (!listeners.has(name)) listeners.set(name, []);
+        listeners.get(name).push(listener);
+      },
+      dispatch(name) { (listeners.get(name) || []).forEach((listener) => listener()); },
+      getBoundingClientRect() { return { left: 0, right: 500 }; },
+      scrollTo({ left }) { this.scrollLeft = left; },
+    };
+  }
+
+  const desktop = { matches: false, addEventListener(name, listener) { this.change = listener; } };
+  const reduced = { matches: false, addEventListener(name, listener) { this.change = listener; } };
+  const track = element();
+  const cards = Array.from({ length: 3 }, () => element());
+  cards.forEach((card) => {
+    card.getBoundingClientRect = () => {
+      const left = track.children.indexOf(card) * 500 - track.scrollLeft;
+      return { left, right: left + 500 };
+    };
+    track.append(card);
+  });
+  const block = element();
+  block.append(track);
+  globalThis.window = {
+    ...oldWindow,
+    matchMedia: (query) => (query.includes('max-width') ? desktop : reduced),
+    setInterval: (callback, delay) => {
+      const id = ++nextTimer;
+      intervals.set(id, { callback, delay });
+      return id;
+    },
+    clearInterval: (id) => intervals.delete(id),
+    setTimeout: (callback) => callback(),
+  };
+  globalThis.document = {
+    activeElement: null, hidden: false, createElement: element, addEventListener() {},
+  };
+  globalThis.getComputedStyle = () => ({ direction: 'ltr' });
+  try {
+    enablePromoRotation(block, track);
+    assert.equal([...intervals.values()][0].delay, 10000);
+    [...intervals.values()][0].callback();
+    assert.deepEqual(track.children.map((card) => cards.indexOf(card)), [1, 2, 0]);
+
+    block.dispatch('mouseenter');
+    assert.equal(intervals.size, 0);
+    block.dispatch('mouseleave');
+    assert.equal(intervals.size, 1);
+    reduced.matches = true;
+    reduced.change();
+    assert.equal(intervals.size, 0);
+    reduced.matches = false;
+    reduced.change();
+
+    desktop.matches = true;
+    desktop.change();
+    assert.equal(block.attributes.get('aria-roledescription'), 'carousel');
+    [...intervals.values()][0].callback();
+    assert.equal(track.scrollLeft, 500);
+    assert.equal(block.children[1].children[1].attributes.get('aria-current'), 'true');
+    assert.deepEqual(track.children.map((card) => cards.indexOf(card)), [1, 2, 0]);
+
+    desktop.matches = false;
+    desktop.change();
+    assert.equal(track.scrollLeft, 0);
+    assert.equal(block.attributes.has('aria-roledescription'), false);
+    globalThis.document.activeElement = track.children[0];
+    block.dispatch('focusin');
+    assert.equal(intervals.size, 0);
+  } finally {
+    globalThis.window = oldWindow;
+    globalThis.document = oldDocument;
+    globalThis.getComputedStyle = oldComputedStyle;
   }
 });

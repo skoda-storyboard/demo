@@ -99,7 +99,7 @@ export function selectPromoRows(rows, config) {
   return paginate(sortRows(filtered, config.sort || 'newest'), config.limit);
 }
 
-function enablePromoRotation(block, track) {
+export function enablePromoRotation(block, track) {
   const dots = document.createElement('div');
   dots.className = 'promo-box-dots';
   dots.setAttribute('role', 'group');
