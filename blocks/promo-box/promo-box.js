@@ -64,8 +64,14 @@ async function getCards(source) {
   if (source.mode === 'curated') {
     validateCuratedRows(source.rows);
     const ul = document.createElement('ul');
-    source.rows.forEach((row) => ul.append(decorateCardCells(row)));
-    optimizeImages(ul.children[0], { eager: true });
+    source.rows.forEach((row) => {
+      const li = document.createElement('li');
+      li.className = 'card-teaser overlay';
+      while (row.firstElementChild) li.append(row.firstElementChild);
+      decorateCardCells(li);
+      ul.append(li);
+    });
+    optimizeImages(ul.children[0], { eager: true, desktopWidth: '1200', mobileWidth: '750' });
     [...ul.children].slice(1).forEach((li) => optimizeImages(li));
     [...ul.children].forEach((li) => wireCardLink(li));
     return ul;
@@ -76,7 +82,13 @@ async function getCards(source) {
   const chosen = selectPromoRows(rows, config);
   if (!chosen.length) throw new Error('No matching featured stories in the query index.');
   const ul = document.createElement('ul');
-  chosen.forEach((row, i) => ul.append(buildCardTeaser(row, { eager: i === 0, summary: i === 0 })));
+  chosen.forEach((row, i) => ul.append(buildCardTeaser(row, {
+    eager: i === 0,
+    overlay: true,
+    summary: i === 0,
+    desktopWidth: i === 0 ? '1200' : '750',
+    mobileWidth: i === 0 ? '750' : '500',
+  })));
   return ul;
 }
 

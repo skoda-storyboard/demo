@@ -1,15 +1,13 @@
-@import url('../../styles/card-teaser.css');
-
 /*
- * Cards / Teaser block (SKODA-201) — one block, three co-occurring variants.
+ * Cards / Teaser block (SKODA-201) — grid only.
  *
- * Base card styling is shared; variants are compound-class modifiers on the same block:
- *   .cards            base / media (image above body)
- *   .cards.overlay    text over image + dual-gradient scrim
- *   .cards.toolbar    card + flex action row (pill buttons)
- * Variants combine (e.g. .cards.overlay.toolbar). Everything is scoped under .cards so
- * nothing leaks to other blocks.
+ * The card box, media, overlay scrim, typography, toolbar and interaction states
+ * live in the shared primitive styles/card-teaser.css (imported below), reused by
+ * every card consumer. This file owns ONLY the cards grid + how the variants flow
+ * within it; nothing card-visual is duplicated here.
  */
+
+@import url("../../styles/card-teaser.css");
 
 .cards ul {
   list-style: none;
@@ -20,85 +18,4 @@
   /* Layer 2 (intrinsic): reflow columns to available width, no breakpoints needed */
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 257px), 1fr));
   gap: var(--spacing-l);
-}
-
-/* ---- toolbar variant ---- */
-
-.cards .cards-card-toolbar {
-  /* sit above the stretched .cards-card-link::after overlay (z-index:1) so the pill
-     buttons receive mouse hover (#a8ffcc) and clicks; the link still covers the rest
-     of the card */
-  position: relative;
-  z-index: 2;
-  margin-top: auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-s) var(--spacing-m);
-  background-color: var(--background-color);
-}
-
-.cards .cards-toolbar-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-xs);
-  border-radius: var(--pill-radius);
-  padding: var(--spacing-xs) var(--spacing-s);
-  background-color: var(--background-color);
-  color: var(--skoda-ink);
-  font-size: var(--body-font-size-s);
-  line-height: 1.2;
-  text-decoration: none;
-  transition: background-color 0.25s ease;
-}
-
-.cards .cards-toolbar-button:focus-visible,
-.cards .cards-toolbar-button:active {
-  background-color: var(--skoda-green-emerald-hover);
-  outline: 2px solid var(--link-color);
-  outline-offset: 2px;
-  text-decoration: none;
-}
-
-/* homepage hides cart actions in the toolbar (source parity) */
-body.homepage .cards .cards-toolbar-button.media-cart-action {
-  display: none;
-}
-
-/* toolbar sits transparent in the overlay context */
-.cards.overlay .cards-card-toolbar {
-  background-color: transparent;
-}
-
-/* ---- combined overlay + toolbar ---- */
-
-/* Pin the action row over the image bottom so the card stays a single 16:9 box
-   (a static toolbar would grow the card, and the inset:0 caption would then land
-   on top of it). The caption reserves bottom space so its text sits above the row. */
-.cards.overlay.toolbar .cards-card-toolbar {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  z-index: 2;
-}
-
-.cards.overlay.toolbar .cards-card-body {
-  padding-bottom: calc(var(--spacing-xxl) + var(--spacing-m));
-}
-
-/* ---- interaction states (placed last for ascending specificity order) ---- */
-
-@media (hover: hover) {
-  .cards .cards-toolbar-button:hover {
-    background-color: var(--skoda-green-emerald-hover);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cards .cards-card-image::after,
-  .cards .cards-toolbar-button {
-    transition: none;
-  }
 }

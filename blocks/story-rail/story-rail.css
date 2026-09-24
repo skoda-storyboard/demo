@@ -1,0 +1,78 @@
+/*
+ * Story rail (SKODA-212) — the index-driven rail wrapper.
+ *
+ * This block builds a `carousel` (all rail chrome + card visuals live there and
+ * in the shared card-teaser primitive). This file owns ONLY the rail header
+ * (heading + "view all") and the reserved height that prevents layout shift
+ * while the inner carousel is deferred-built. Tokens only; scoped to .story-rail.
+ */
+
+.story-rail {
+  width: min(100%, var(--content-max-width));
+  margin-inline: auto;
+}
+
+/* header: heading left, "view all" right (source: h2 + a.link-all) */
+.story-rail-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-m);
+  margin-block-end: var(--grid-gutter);
+}
+
+.story-rail-heading {
+  margin: 0;
+  font-size: var(--section-heading, var(--heading-font-size-l));
+  font-weight: var(--weight-semibold);
+  color: var(--text-color);
+}
+
+.story-rail-viewall {
+  flex: none;
+  color: var(--link-color);
+  font-size: var(--body-font-size-s);
+  text-decoration: none;
+}
+
+.story-rail-viewall:hover {
+  text-decoration: underline;
+}
+
+/*
+ * Reserve vertical space until the deferred carousel builds (CLS guard,
+ * carousel-rails.md §7). An overlay card's height IS its 16:9 image, so the row
+ * height = cellWidth * 9/16, and cellWidth tracks the cells-per-view ladder
+ * (90% / 30% / 22.5%). A FIXED reserve (the old 190px) mismatched the real card
+ * at every width and shifted ~30px when released to 0.
+ *
+ * Reserve the SAME fluid geometry via aspect-ratio on the full-width mount: for
+ * a block of width W, `aspect-ratio: R` gives height W/R. We want the reserve to
+ * equal one card = frac * W * 9/16, so R = 16 / (9 * frac). Then the built
+ * carousel lands exactly on the reserved height → no release-shift, so we DON'T
+ * collapse to 0. Values: frac .90 → 1.975, .30 → 5.926, .225 → 7.901.
+ */
+.story-rail-mount {
+  aspect-ratio: 1.975; /* <768: 90% cell (1 + peek) */
+}
+
+@media (width >= 768px) {
+  .story-rail-mount {
+    aspect-ratio: 5.926; /* 30% cell (~3.3/view) */
+  }
+}
+
+@media (width >= 992px) {
+  .story-rail-mount {
+    aspect-ratio: 7.901; /* 22.5% cell (~4.4/view) */
+  }
+}
+
+/*
+ * Once built, the carousel provides its own (identical) height; drop the
+ * reserve so the mount never constrains taller content (e.g. caption cards).
+ * The built height matches the reserve, so this is shift-free.
+ */
+.story-rail-mount.is-built {
+  aspect-ratio: auto;
+}

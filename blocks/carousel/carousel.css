@@ -1,0 +1,198 @@
+/*
+ * Carousel / horizontal rail (SKODA-212) — the rail chrome only.
+ *
+ * The card box, media, overlay scrim, typography and interaction states come
+ * from the shared card-teaser primitive (styles/card-teaser.css, imported
+ * below). This file owns ONLY the rail: viewport, scroll track, cells-per-view
+ * ladder, arrows and optional dots. Measured spec: docs/ui-specs/carousel-rails.md.
+ *
+ * The source's Flickity JS track is replaced with a native overflow-x +
+ * scroll-snap track (no JS animation loop); JS only gates the arrows/dots and
+ * adds pointer-drag. The track scrolls at every viewport — so it degrades to a
+ * plain swipe rail without JS. Cells-per-view ladder (§3/§4, source-parity):
+ *   <768   → 90%    (1 + peek)
+ *   768–991→ 30%    (~3.3/view)
+ *   ≥992   → 22.5%  (~4.4/view)
+ * 20px gap (--carousel-gap), 32px arrows (--carousel-arrow-size). Layer order
+ * (css-guidelines): fluid + intrinsic first; breakpoints (768/992) only for the
+ * cells-per-view transitions.
+ */
+
+@import url("../../styles/card-teaser.css");
+
+.carousel {
+  width: min(100%, var(--content-max-width));
+  margin-inline: auto;
+}
+
+/* viewport hosts the track between the two absolutely-positioned arrows */
+.carousel-viewport {
+  position: relative;
+}
+
+/* the scroll track — native horizontal scroll + snap, no library */
+.carousel-track {
+  display: flex;
+  gap: var(--carousel-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: auto hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+
+  /* vertical page scroll stays with the page; horizontal is the track's */
+  touch-action: pan-y;
+
+  /* hide the native scrollbar — arrows/drag/snap are the affordances */
+  scrollbar-width: none;
+}
+
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* dragging: grab cursor + suspend snap so manual scrollLeft doesn't fight it */
+.carousel-track.is-dragging {
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+  cursor: grabbing;
+  user-select: none;
+}
+
+.carousel-track .card-teaser {
+  flex: 0 0 90%; /* <768: 1 + peek */
+  scroll-snap-align: start;
+}
+
+/* --- taxonomy caption card (no date): wide letterbox, title below --------- */
+.carousel-caption .card-teaser-image img {
+  aspect-ratio: 383 / 150; /* light sections (Models); carousel-rails.md §3 */
+}
+
+.carousel-caption .card-teaser-title {
+  font-weight: var(--weight-semibold);
+}
+
+/* dark (Series) taxonomy rails use a 3:2 image (carousel-rails.md §3) */
+.section.dark .carousel-caption .card-teaser-image img {
+  aspect-ratio: 3 / 2;
+}
+
+/* --- arrows: 32px transparent button, ink icon-disc, white chevron -------- */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: var(--carousel-arrow-size);
+  height: var(--carousel-arrow-size);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.carousel-prev {
+  left: 10px;
+}
+
+.carousel-next {
+  right: 10px;
+}
+
+/* the ink disc (scale .95 like the source glyph disc) */
+.carousel-arrow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--skoda-ink);
+  transform: scale(0.95);
+}
+
+/* the white chevron (two borders of a rotated box) */
+.carousel-arrow::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.5em;
+  height: 0.5em;
+  border-top: 2px solid var(--skoda-white);
+  border-right: 2px solid var(--skoda-white);
+}
+
+.carousel-prev::after {
+  transform: translate(-30%, -50%) rotate(-135deg);
+}
+
+.carousel-next::after {
+  transform: translate(-70%, -50%) rotate(45deg);
+}
+
+/* disabled at a track end → fade out (source :disabled{opacity:0}) */
+.carousel-arrow:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.carousel-arrow:focus-visible {
+  outline: 2px solid var(--facet-active);
+  outline-offset: 2px;
+}
+
+/* --- dots (optional `carousel (dots)` variant; default off) --------------- */
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 16px; /* source .dot margin 0 8px */
+  margin-block-start: var(--spacing-m);
+}
+
+.carousel-dots[hidden] {
+  display: none;
+}
+
+.carousel-dot {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--carousel-dot);
+  cursor: pointer;
+}
+
+.carousel-dot.is-selected {
+  background: var(--carousel-dot-active);
+}
+
+.carousel-dot:focus-visible {
+  outline: 2px solid var(--facet-active);
+  outline-offset: 2px;
+}
+
+/* ===== breakpoints: cells-per-view ladder (carousel-rails.md §3/§4) ===== */
+
+/* tablet: ~3.3 per view */
+@media (width >= 768px) {
+  .carousel-track .card-teaser {
+    flex-basis: 30%;
+  }
+}
+
+/* desktop: ~4.4 per view */
+@media (width >= 992px) {
+  .carousel-track .card-teaser {
+    flex-basis: 22.5%;
+  }
+}
+
+/* reduced motion: keep the rail usable, drop smooth-scroll animation */
+@media (prefers-reduced-motion: reduce) {
+  .carousel-track {
+    scroll-behavior: auto;
+  }
+}

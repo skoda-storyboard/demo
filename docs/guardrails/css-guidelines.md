@@ -71,6 +71,18 @@ a multi-column composition changing information layout.
 - Default to mobile-first progressive enhancement unless the existing
   architecture justifies otherwise. Don't force desktop-first CSS onto
   mobile through large override chains.
+- **One transition, one breakpoint.** A single logical layout change must flip
+  at exactly one width. Do not split the parts of one transition across two
+  breakpoints — e.g. revealing a nav's sub-links at `992px` but switching the
+  columns to a grid only at `1080px` leaves a broken `992–1079px` band that is
+  neither the compact nor the wide layout. If two rules describe the same
+  state change ("become the desktop sitemap"), they share one `@media` block.
+  (Stylelint cannot detect this — it is a review-time check. Regression:
+  SKODA-304 footer, fixed by collapsing both rules onto `992px`.)
+- After adding/changing a breakpoint, sanity-check the viewport range *just
+  inside* each side of every breakpoint you touched (e.g. 991/992 and
+  1079/1080), not only the canonical device widths — the break usually hides
+  in the in-between range, not at the named sizes.
 
 ## 4. Container Queries
 
@@ -169,6 +181,8 @@ that component, not in global stylesheets.
 
 - Scope CSS to `.blockname`; `-wrapper`/`-container` are section classes.
 - Device-specific breakpoints, or breakpoint proliferation.
+- Splitting one layout transition across two breakpoints (see §3 "one
+  transition, one breakpoint") — leaves a broken in-between viewport band.
 - Fixed widths/heights for dynamic or translated content.
 - Component CSS in global stylesheets.
 - JavaScript-driven viewport layout.
