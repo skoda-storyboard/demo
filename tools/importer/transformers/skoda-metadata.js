@@ -44,6 +44,10 @@ const TEMPLATE_SIGNALS = [
   [/\bsingle-press_release\b|\bpress_release-template\b/, 'press_release'],
   [/\bsingle-press_kit\b|\bpress_kit-template\b/, 'press_kit'],
   [/\bsingle-post\b|\bpost-template\b/, 'story'],
+  // Škodapedia archive + branded 404 aren't rail CPTs and aren't in the template
+  // enum — map them to the valid `page` value (nav/direct only, not rail-indexed).
+  [/\bpost-type-archive-skodapedia\b/, 'page'],
+  [/\berror404\b/, 'page'],
   [/\bpage-template\b|\btemplate-media-room-page\b/, 'page'],
 ];
 
@@ -87,6 +91,13 @@ function extractDate(document) {
     const d = normalizeDate(span.getAttribute('datetime') || span.textContent);
     if (d) return d;
   }
+
+  // Last resort: article:modified_time (<head> meta, survives cleanup). Some CPT
+  // pages (series hub) expose no published_time that outlives grid removal; a valid
+  // ISO modified date beats an empty publisheddate. Mirror in skoda-metadata-extract.mjs.
+  const modified = metaContent(document, 'meta[property="article:modified_time"]');
+  if (normalizeDate(modified)) return normalizeDate(modified);
+
   return '';
 }
 
@@ -99,11 +110,21 @@ function extractTemplate(document) {
   return '';
 }
 
-/** Category = the content-family path segment after the locale. */
+/**
+ * Category = the content-family slug. Normally the segment after the locale, but
+ * archive URLs nest the real slug behind a routing prefix (returning segs[1] would
+ * emit the literal `category`/`tag` prefix — not a valid slug). Keep in sync with
+ * skoda-metadata-extract.mjs::categoryFromUrl.
+ *   /en/category/<slug>/          → <slug>            (segs[2])
+ *   /en/tag/<taxonomy>/<slug>/    → <slug> (the term) (last segment)
+ */
 function extractCategory(url) {
   try {
-    const segs = new URL(url).pathname.split('/').filter(Boolean);
-    if (segs.length >= 2) return segs[1]; // segs[0] = locale
+    const segs = new URL(url).pathname.split('/').filter(Boolean); // segs[0] = locale
+    if (segs.length < 2) return '';
+    if (segs[1] === 'category') return segs[2] || '';
+    if (segs[1] === 'tag') return segs[segs.length - 1] || '';
+    return segs[1];
   } catch (e) { /* bad url */ }
   return '';
 }
@@ -115,7 +136,7 @@ function extractCategory(url) {
  *   ...?filter[<taxonomy>][]=<slug>            (press-release facet links)
  * Returns { tags:[slug,…], byFacet:{ taxonomy:[slug,…] } }, de-duped.
  */
-function extractTagsAndFacets(document) {
+function extractTagsAndFacets(document, pageUrl = '') {
   const tags = [];
   const byFacet = {};
   const seen = new Set();
@@ -135,13 +156,50 @@ function extractTagsAndFacets(document) {
       const href = a.getAttribute('href') || '';
       let m = href.match(/\/tag\/([a-z0-9-]+)\/([a-z0-9-]+)\/?/i);
       if (m) { add(m[1].toLowerCase(), m[2].toLowerCase()); return; }
-      m = href.match(/filter\[([a-z0-9-]+)\]\[\]=([^&"]+)/i);
+      // filter[<tax>][]=<slug> with brackets literal OR percent-encoded (%5B/%5D).
+      // Press-release tag links use the encoded form; keep this in sync with
+      // skoda-metadata-extract.mjs::parseTagHref (mirrored 1:1).
+      m = href.match(/filter(?:\[|%5B)([a-z0-9-]+)(?:\]|%5D)(?:\[\]|%5B%5D)=([^&"]+)/i);
       if (m) {
         let slug;
         try { slug = decodeURIComponent(m[2]); } catch (e) { slug = m[2]; }
         add(m[1].toLowerCase(), slug.toLowerCase());
       }
     });
+  }
+
+  // Fallback: tag/model ARCHIVE pages carry their taxonomy ONLY in the <body>
+  // class (`tax-model term-elroq`), with no entry-tags anchors. Derive the facet
+  // from there so a model-tag listing self-classifies. Keep in sync with
+  // skoda-metadata-extract.mjs::facetFromBodyClass.
+  if (tags.length === 0) {
+    const cls = (document.body && document.body.getAttribute('class')) || '';
+    const tax = cls.match(/\btax-([a-z0-9_-]+)\b/i);
+    const term = cls.match(/\bterm-([a-z0-9-]+)\b/i);
+    if (tax && term) {
+      const taxonomy = tax[1].toLowerCase().replace(/_/g, '-');
+      const slug = term[1].toLowerCase();
+      if (FACETS.includes(taxonomy) && slug && !/^\d+$/.test(slug)) add(taxonomy, slug);
+    }
+  }
+
+  // Fallback: a self-describing CPT page (series hub, model page) has no entry-tags
+  // in the body — its OWN slug is the tag that feeds its rail. Derive it from the
+  // canonical path, keyed by CPT: /en/series/<slug>/ → series=<slug>;
+  // /en/skoda-model/<slug>/ → model=<slug>. Content-driven, not positional.
+  if (tags.length === 0) {
+    const cls = (document.body && document.body.getAttribute('class')) || '';
+    const canonical = document.querySelector('link[rel="canonical"]');
+    // Prefer the resolved page URL (always available at import); the canonical link
+    // may be absent in a pre-cleaned snapshot.
+    const href = pageUrl || (canonical && canonical.getAttribute('href')) || '';
+    if (/\bsingle-skoda_series\b|\bskoda_series-template\b/.test(cls)) {
+      const m = href.match(/\/series\/([a-z0-9-]+)\/?/i);
+      if (m) add('series', m[1].toLowerCase());
+    } else if (/\bsingle-skoda_model\b|\bskoda_model-template\b/.test(cls)) {
+      const m = href.match(/\/skoda-model\/([a-z0-9-]+)\/?/i);
+      if (m) add('model', m[1].toLowerCase());
+    }
   }
   return { tags, byFacet };
 }
@@ -178,7 +236,7 @@ export default function transform(hookName, element, payload) {
   const publisheddate = overrides.publisheddate || extractDate(document);
   const template = overrides.template || extractTemplate(document);
   const category = overrides.category || extractCategory(pageUrl);
-  const { tags: derivedTags, byFacet } = extractTagsAndFacets(document);
+  const { tags: derivedTags, byFacet } = extractTagsAndFacets(document, pageUrl);
 
   const meta = {};
   if (title) meta.Title = title;

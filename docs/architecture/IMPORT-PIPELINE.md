@@ -27,9 +27,32 @@ page-templates.json  ──►  import-<name>.js  ──►  import-<name>.bundl
                           query-index rebuilds → index-driven blocks populate
 ```
 
-Two pipelines exist today and are the templates to copy:
-- **`en-landing`** — the homepage (`import-en-landing.js` + `.bundle.js`): cards + carousel parsers, section transformers.
-- **`en-stories`** — 48 story detail pages (`import-en-stories.js` + `.bundle.js`): plain content, cleanup transformer only.
+Templates that exist today and are the ones to copy. All 17 public page types now
+have an importer (SKODA-601 pilot + the all-page-types extension); the complex
+**press-kit** N+1-document type is the one deferred type (SKODA-805–808).
+
+Detail/CPT + shells:
+- **`model-page`** — Škoda model page: hero + in-page-nav + key-facts + spec-table + 6 index-driven story-rails; Section Metadata.
+- **`press-release`** — header default content + `gallery` / `tags` / `downloads` parsers, `skoda-press-release-cleanup`. Media Box → `Downloads`; PDFs/MP4 as links (SKODA-503).
+- **`page-base`** — editorial "Page" shell: hero banner + SiteOrigin body flattened to plain default content.
+
+Faceted listings (one engine, `listing.js` variant map keyed on the body-class token):
+- **`pr-listing`** (news), **`images-listing`** (`template=image`, columns=4), **`videos-listing`** (`template=video`), **`search-listing`** (cross-type, `search=true`) — each emits a single index-driven `Listing` config block; SSR cards + source filter stack not ported.
+
+Archives + directories (index-driven grids emitted as config, not ported cards):
+- **`category-archive`** — category/tag archive (also covers podcast): hero + facet-less `Listing` scoped by canonical path.
+- **`series-directory`** / **`series-hub`** — `series-grid.js` self-detects level from card `data-content-type`; hub tag from canonical slug.
+- **`home-sto`** / **`home-mr`** — `promo-box` (curated cards) + `home-rail` (self-classifying index rails; social strip dropped).
+- **`skodapedia`** — glossary directory index block (term-detail prebake → SKODA-802).
+
+Flatten-to-default (SiteOrigin widget tree NOT reconstructed — deferred to SKODA-801/814/604/810/210):
+- **`company-page`** — hero + `.entry-content` flattened; sub-type blocks/galleries → SKODA-810.
+- **`story-detail`** — hero + primary `.content` flattened; `.sidebar` + floating social dropped (`skoda-story-cleanup`), in-body galleries/embeds/Media Box dropped-and-logged → SKODA-801/814/604.
+- **`error-404`** — `.error-message` dead-end copy + homepage link; site-root `404.html` shell.
+
+> Detection is **content-driven only** — blocks are located by the `page-templates.json` DOM selectors; parsers self-identify from the DOM (body-class token, `data-content-type`, `type-<cpt>` class), never from URL/template/section-order/position. Where a URL is read (series/archive scope) it derives the *rail filter*, never the *detection*. A page with a novel arrangement of known sections/blocks imports without parser changes.
+>
+> **Deliberately deferred:** the **custom microsite** (`template-custom-full-width`) is NOT run through flatten — its body is ~264 gallery tiles + a stub intro, so flatten yields a near-empty page; it needs the real gallery block (SKODA-210). **Newsletter** is a subscriber service surface (SKODA-904), not a content page. **Press-kit** (hub + chapters + resources + shared sub-nav) is SKODA-805–808.
 
 ---
 
@@ -39,13 +62,13 @@ Two pipelines exist today and are the templates to copy:
 The registry. Each template entry has a `name`, `description`, and a `blocks` array mapping **block variant → DOM selectors** in the source page. This tells the parser layer which source elements become which EDS block. Story pages carry `blocks: []` — they're plain content shaped entirely by a transformer.
 
 ### `tools/importer/parsers/*.js` — block parsers
-One per block variant. A parser recognizes a source DOM fragment (via the `page-templates.json` selectors) and emits the EDS block table for it. Current parsers: `cards-overlay`, `cards-media`, `cards-social`, `cards-toolbar`, `carousel`.
+One per block variant. A parser recognizes a source DOM fragment (via the `page-templates.json` selectors) and emits the EDS block table for it. Current parsers: `hero`, `in-page-nav`, `key-facts`, `spec-table`, `story-rail` (model-page); `gallery`, `tags`, `downloads` (press-release); `listing` (faceted listing); `hero-banner`, `archive-list` (page/archive templates). Every parser defensively unwraps-and-bails if its expected fragment is absent, and self-identifies from the DOM rather than assuming position.
 
 ### `tools/importer/transformers/*.js` — page transformers
 Whole-page shaping, run as `beforeTransform` / `afterTransform` hooks:
-- **`skoda-cleanup.js`** — general chrome/noise removal.
-- **`skoda-sections.js`** — section styling via the marker-`<hr>` + `Section Metadata` block pattern (this is what `decorateSectionMetadata` in `scripts.js` later reads).
-- **`skoda-story-cleanup.js`** — story-specific flatten/cleanup (hero + title + intro + body; drops in-body galleries/embeds/media-box for the demo slice).
+- **`skoda-model-cleanup.js` / `skoda-press-release-cleanup.js` / `skoda-listing-cleanup.js` / `skoda-page-cleanup.js`** — per-template chrome/noise removal (all selectors DOM-verified against the scraped sample). The press-release cleanup also strips per-request `#s_aid=` analytics fragments in `afterTransform` so output is deterministic (SKODA-602 idempotent re-push).
+- **`skoda-model-sections.js`** — section breaks via the marker-`<hr>` + `Section Metadata` block pattern (what `decorateSectionMetadata` in `scripts.js` later reads); reused by every multi-section template.
+- **`skoda-metadata.js`** — the shared, content-type-agnostic query-index Metadata block (SKODA-401); logic mirrored 1:1 by the unit-tested `skoda-metadata-extract.mjs`. All importers append it; do not hand-roll per-page metadata.
 
 ### `import-<name>.js` + `import-<name>.bundle.js`
 The `import-<name>.js` wires it together: embeds the `page-templates.json` entry, registers parsers + transformers, runs the two hooks around `WebImporter.rules`, and writes a sanitized output path. The **`.bundle.js` is the runnable artifact** — that's what the bulk runner executes.
