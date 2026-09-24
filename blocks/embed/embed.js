@@ -123,9 +123,11 @@ const ALLOW = {
 };
 
 /**
- * Builds the lazy, title'd iframe. The src is set directly (no consent gate) so the provider
- * player renders exactly as on the live site — native controls, title, share, watch-on links.
- * The `allow` list is provider-specific to match the live source verbatim (see ALLOW).
+ * Builds the title'd iframe. The real URL is held in `data-src` and only promoted to `src`
+ * when the embed nears the viewport (see observeLazyEmbed) — this is the source's own
+ * data-src → src swap, rebuilt with IntersectionObserver. It keeps the native player (no
+ * consent button) while deferring the third-party boot so N stacked embeds don't all execute
+ * up front (cuts TBT). The `allow` list is provider-specific, matching the live source (ALLOW).
  * @param {string} src The normalised embed URL
  * @param {string} title Accessible iframe title
  * @param {boolean} isAudio Whether this is an audio player
@@ -134,13 +136,42 @@ const ALLOW = {
  */
 function buildIframe(src, title, isAudio, provider) {
   const iframe = document.createElement('iframe');
-  iframe.setAttribute('src', src);
+  iframe.dataset.src = src;
   iframe.setAttribute('loading', 'lazy');
   iframe.setAttribute('title', title);
   iframe.setAttribute('frameborder', '0');
   iframe.setAttribute('allow', ALLOW[provider] || ALLOW.vimeo);
   if (isAudio) iframe.setAttribute('scrolling', 'no');
   return iframe;
+}
+
+/**
+ * Promotes an embed's held data-src to src when it approaches the viewport, so the third-party
+ * player only boots when needed. Loads eagerly (no observer) when IntersectionObserver is
+ * unavailable, keeping the embed functional.
+ * @param {Element} wrapper The .embed-video / .embed-audio wrapper
+ */
+function observeLazyEmbed(wrapper) {
+  const iframe = wrapper.querySelector('iframe[data-src]');
+  if (!iframe) return;
+  const load = () => {
+    if (!iframe.dataset.src) return;
+    iframe.setAttribute('src', iframe.dataset.src);
+    delete iframe.dataset.src;
+  };
+  if (!('IntersectionObserver' in window)) {
+    load();
+    return;
+  }
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        load();
+        obs.disconnect();
+      }
+    });
+  }, { rootMargin: '200px' });
+  observer.observe(wrapper);
 }
 
 export default function decorate(block) {
@@ -187,4 +218,7 @@ export default function decorate(block) {
 
   block.classList.add(`embed-${provider}`);
   block.append(wrapper);
+
+  // Defer the third-party player until the embed nears the viewport (source parity + perf).
+  observeLazyEmbed(wrapper);
 }
