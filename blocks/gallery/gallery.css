@@ -370,8 +370,8 @@ body.gallery-lightbox-open {
   color: var(--gallery-accent);
 }
 
-/* detail-panel action buttons: dark filled discs with white icons, right-aligned
-   (matches the live Media-Room chrome — 40×40 ink circles) */
+/* detail-panel action buttons: white filled discs with dark icons, right-aligned
+   (40×40 circles, no hover state) */
 .gallery .gallery-lightbox-actions {
   display: flex;
   gap: var(--spacing-s);
@@ -388,8 +388,8 @@ body.gallery-lightbox-open {
   border: 0;
   border-radius: 50%;
   padding: 0;
-  background: var(--skoda-ink);
-  color: var(--skoda-white);
+  background: var(--skoda-white);
+  color: var(--skoda-ink);
   cursor: pointer;
 }
 
@@ -422,44 +422,42 @@ body.gallery-lightbox-open {
 /* desktop: 2-column detail layout — image left, caption/detail panel right
    (matches the live MR image-detail lightbox) */
 @media (width >= 768px) {
-  /* desktop: fixed-height row with generous side margins so the image has clear
-     left/right breathing room (never edge-to-edge) — matches the live centred
-     content box */
+  /* desktop: fixed-height row. No top padding so the image sits flush to the
+     top; modest left gap before the image, small right gap so the panel sits
+     close to the right edge. */
   .gallery .gallery-lightbox-stage {
-    align-items: center;
-    padding: var(--spacing-l) clamp(var(--spacing-xl), 8vw, var(--spacing-xxl));
+    align-items: stretch;
+    padding: 0 var(--spacing-l) 0 clamp(var(--spacing-xl), 8.2vw, 118px);
     overflow: hidden;
   }
 
   .gallery .gallery-lightbox-figure {
     flex-direction: row;
     align-items: stretch;
-    gap: var(--spacing-l);
+    gap: clamp(var(--spacing-xxl), 8vw, 120px); /* space between image and panel */
     height: 100%;
   }
 
   .gallery .gallery-lightbox-image-frame {
     flex: 1 1 auto;
     align-self: stretch;
-    align-items: flex-start;  /* image flush to the top (no top gap) */
-    justify-content: center;  /* centre horizontally → left/right space only */
+    align-items: stretch;     /* image fills full height, top to bottom */
+    justify-content: center;
     max-height: none; /* fill the row (mobile caps to 70vh) */
   }
 
-  /* live: the image is centred in a wider column with clear left/right space
-     (live is 984px in a 1213px column ≈ 81%). Cap the image width below the
-     column and centre it so a landscape photo gets equal side gaps, matching
-     .cboxPhoto { margin:auto }. */
+  /* image fills the full row height top-to-bottom and is cropped on the sides
+     to fit the column (object-fit: cover) — no top/bottom gaps */
   .gallery .gallery-lightbox-image {
-    width: auto;
-    height: auto;
-    max-width: 82%;
-    max-height: 100%;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: cover;
   }
 
   .gallery .gallery-lightbox-caption {
-    flex: 0 0 clamp(280px, 28%, 380px);
+    flex: 0 0 clamp(240px, 20%, 300px);
     max-width: none;
     align-self: stretch;
 
