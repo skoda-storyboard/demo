@@ -26,7 +26,7 @@
 | COM12 | Media Preview, Actions (lightbox) | SKODA-203 | E02 | M1 | 🟦 | ✅ ticketed; a11y focus-trap to verify |
 | COM13 | Media Download (single/multi) | SKODA-501/502 | E05 | M1 | 🟦 | ✅ downloads block; masters-only ingest |
 | COM14 | Media Cart (retain across browsing) | SKODA-505 (demo) / 902 (prod) | E05/E09 | M1 (happy-path) / M2 (harden) | ⬜ | ✅ D2 = server-side reduction; PoC fallback = unpacked multi-download |
-| COM15 | Social Share | SKODA-304 | E03 | M1 | 🟦 | ✅ footer social built; channels identified |
+| COM15 | Social Share | SKODA-304 / 215 | E03/E02 | M1 | 🟦 | ⚠️ partial: footer follow-us icons built (304); gallery/lightbox "share this" links (Facebook/Pinterest/X share-intent) net-new (215, found in PR #103 review 2026-09-23) |
 | COM16 | Subscription / Newsletter | SKODA-904 | E09 | M1 (UI only) / M2 (ESP) | ⬜ | ✅ UI-only for PoC confirmed; provider TBD (D4) |
 | COM17 | Cookie / Consent | SKODA-804 | E08 | M1 (stub) | ⬜ | ✅ consent OUT of Adobe scope (D10); stub only |
 | COM18 | Footer | SKODA-304 / 305 | E03 | M1 | 🟩 | ✅ Storyboard built; MR footer variant now ticketed (SKODA-305, was G1) |
@@ -85,13 +85,13 @@
 | STO-D01 | Story Hero | SKODA-202/603 | E02/E06 | M1 | 🟩 | ✅ 48 imported |
 | STO-D02 | Rich Text | SKODA-801/604 | E08/E06 | M1 | 🟦 | ✅ flatten proven; 1–2 full-fidelity (604) |
 | STO-D03 | Embedded Video | SKODA-204/604 | E02/E06 | M1 | 🟦 | ✅ embed autoblock; restored on demo stories |
-| STO-D04 | Image Carousel / Gallery | SKODA-203/604 | E02/E06 | M1 | 🟦 | ✅ gallery+lightbox; auto-play a11y 🟡 |
+| STO-D04 | Image Carousel / Gallery | SKODA-203/216/604 | E02/E06 | M1 | 🟦 | ✅ shared gallery (203); story `.sb-gallery` presentation (216); story assembly (604) |
 | STO-D05 | Newsletter Widget | SKODA-904 | E09 | M1 (UI) / M2 | ⬜ | ✅ UI-only for PoC |
 | STO-D06 | Related Stories (tag+manual) | SKODA-402 | E04 | M1 | 🟩 | ✅ two mechanisms (auto strip + manual explore-more); the "not-OOTB" fn |
 | STO-D07 | Article Sidebar | SKODA-201 | E02 | M2 | 🟦 | ✅ responsive treatment needed |
 | STO-D08 | Side Banner | SKODA-903 | E09 | M2 | ⬜ | 🔴 deferred, bespoke ad server (D3) |
 | STO-D09 | Media Box / Gallery | SKODA-502/505/604 | E05/E06 | M1 | ⬜ | ✅ manual today; tag-autopopulate+delete = target improvement |
-| STO-D10 | Social Share | SKODA-304 | E03 | M1 | 🟦 | ✅ channels identified |
+| STO-D10 | Social Share | SKODA-304 / 215 | E03/E02 | M1 | 🟦 | ⚠️ partial: footer channels built (304); gallery/lightbox share-this links net-new (215) |
 
 ---
 
@@ -241,6 +241,8 @@ All MIG IDs map to the import infra (SKODA-601/602) for the demo sample and SKOD
 | SKODA-208 | M2 | STO-M (model page template, `skoda_model` CPT) |
 | SKODA-209 | M2 | STO-C (category/tag archive template) |
 | SKODA-210 | M2 | STO custom microsite (`template-custom-full-width`, event-gallery/campaign, 201 pages; block recount) |
+| SKODA-215 | M1 | COM15, STO-D10 (gallery/lightbox share-this links, split from SKODA-203 via PR #103 review, 2026-09-23) |
+| SKODA-216 | M1 | STO-D04 (Favorit-style story gallery presentation, shared lightbox from SKODA-203) |
 | SKODA-301/302 | M1 | COM01/02/03/04, 8.6 (mobile ARIA) |
 | SKODA-303 | M1 | COM05 |
 | SKODA-304 | M1 | COM15/18/19, STO-D10 |

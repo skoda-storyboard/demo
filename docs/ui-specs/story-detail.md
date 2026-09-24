@@ -145,7 +145,7 @@ All rows: `measured (source-url · selector · viewport) → token`. Source = th
 | STO-D01 | Story hero (title/perex/date) | `.hero` (single-post, ink) | `hero-image` Variant A, [`hero.md`](hero.md) |
 | STO-D02 | Rich-text body | `.content .textwidget` p/h2/h3/ul/blockquote | **default section content** (this spec §3); flatten SKODA-801 |
 | STO-D03 | In-body embed (video/podcast) | `.video-container` / `.embed-controller-wrapper` | `embed`/`widget`, [`embeds.md`](embeds.md) |
-| STO-D04 | In-body image gallery | `.sb-gallery` / `a.colorbox` | `gallery`, [`gallery-lightbox.md`](gallery-lightbox.md) |
+| STO-D04 | In-body image gallery | `.sb-gallery` / `a.colorbox` | `gallery (story)` variant, [SKODA-216](../tickets/tickets/SKODA-216.md) / [`gallery-lightbox.md`](gallery-lightbox.md) |
 | STO-D05 | In-body figure + caption | `figure` / `.wp-caption-text` | default content (this spec §3) |
 | STO-D06 | Related-stories cards | `.related .article-teaser` | `cards-overlay`, [`card-teaser.md`](card-teaser.md) |
 | STO-D07 | Sidebar (subscribe / related / promo) | `.sidebar` sections | `sidebar` section (this spec §3); subscribe = form, promo = banner |

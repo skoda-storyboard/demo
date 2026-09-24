@@ -13,12 +13,20 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 - **Client PDF IDs:** STO-D04 (Story image gallery); MR-H09 (Media Room gallery rail);
   MR-I03 (Image detail / download gallery).
 - **Ticket:** SKODA-203.
+- **Variant split (2026-09-24):** SKODA-203 / SKODA-607 use the Peaq press-release
+  `.images.sa-media-kit-preview` and desktop `#colorbox` as their presentation reference:
+  image previews on the right and bottom-right white counter/arrows. The Favorit story's
+  `.sb-gallery` is a *different in-body variant*, tracked by
+  [`SKODA-216`](../tickets/tickets/SKODA-216.md): a lead image with thumbnails below and
+  green side navigation. Do not apply this document's mixed visual measurements as a
+  single universal layout; SKODA-203's common accessibility contract applies to both.
 - **Source reference:** press-release galleries, e.g.
   `https://www.skoda-storyboard.com/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/`
   (24-image gallery); plus the custom `sb-gallery-lightbox` styles in the shared CSS bundle.
 - **Top-level selectors:** `article.gallery-item` (a thumbnail card), `a.colorbox` (thumbnail link,
-  `data-id`, `data-caption`), `#colorbox` (the live desktop lightbox), and the custom
-  `.sb-gallery` / `.sb-gallery-overlay` / `.sb-gallery-lightbox-*` (the mobile-gated lightbox).
+  `data-id`, `data-caption`), `#colorbox` (the live desktop press-release lightbox), and the custom
+  `.sb-gallery` / `.sb-gallery-overlay` / `.sb-gallery-lightbox-*` (the story lightbox, also
+  observed opening on desktop Favorit).
 
 ## 2. Source anatomy
 
@@ -194,32 +202,35 @@ managed). The rebuild MUST:
 | ![](./img2.jpg) | The Peaq covered 936 km without recharging.                   |
 | ![](./img3.jpg) | Average consumption of just 9.2 kWh/100 km.                   |
 
-Variants (authored `Gallery (variant)`): `gallery (grid)` default 4-across; `gallery (masonry)` if a
-justified layout is wanted later.
+Variants (authored `Gallery (variant)`): default press-release gallery (SKODA-203),
+`gallery (story)` for the in-body Favorit composition (SKODA-216). A masonry variant would
+require a separately justified use case.
 
 ### decorate() outline (repo conventions, `_FOUNDATIONS` §7)
 - Rows -> `<ul class="gallery-grid">/<li>`; per row: image cell -> `<button class="gallery-item">` (a
   real button, keyboard-openable) wrapping the thumbnail `<picture>`; caption cell -> `<figcaption>`.
 - `optimizeImageInPlace` on authored `<picture>>img`; request a small thumb rendition and a large
   lightbox rendition (`[{width:'2000'}]`).
-- Column count for the **overview grid**: compute from `items.length` (`>19 -> 5`, `>9 -> 4`,
-  `else 3`) and set a class / CSS custom prop; the on-page thumbnail grid stays a fixed responsive
-  `grid-template-columns` (2 / 3 / 4 across `768 / 992`).
+- The source's **overview grid** thresholds (`>19 -> 5`, `>9 -> 4`, `else 3`) describe a
+  stakeholder-removed mode, not either on-page variant. Do not implement it for this scope.
+  SKODA-216 retains the Favorit story's four-across on-page rail at all measured widths.
 - Build the lightbox lazily on first open (or `IntersectionObserver`): one overlay reused for all
   images; `role="dialog"`, focus-trap util, Escape + arrow handlers, `aria-live` counter, focus
   return. Any `innerHTML` must be Trusted-Types-safe (`_FOUNDATIONS` §7).
 - CSS scoped to `.gallery`; tokens for backdrop (`--skoda-ink`), accent (`--gallery-accent`), divider
   (`--gallery-divider`), radius (`--card-radius`).
 
-## 8. Open decisions + recommended default
+## 8. Variant decisions
 
-- **Column algorithm target:** keep the source thresholds (`>19 -> 5`, `>9 -> 4`, `else 3`) for the
-  **lightbox overview**; for the **on-page grid** recommend a plain responsive `2 / 3 / 4` across
-  `768 / 992` (assumption to confirm, source uses a fixed 4-across; 4 on a phone is cramped).
-- **Single lightbox at all viewports** (retire the mobile-only gate + colorbox split). Confirm.
-- **Backdrop:** `rgba(0,0,0,.95)` everywhere (drop the opaque-ink mobile variant) for consistency.
-- **Accent:** adopt `--gallery-accent: #419468` for prev/next, or switch to `--skoda-green-emerald`
-  for brand consistency (assumption to confirm; source uses the mid-green `#419468`).
+- The stakeholder removed the source's "Show all images" overview toggle. Its item-count
+  thresholds above remain source documentation, not acceptance criteria.
+- One accessible viewer at all widths; source presentation varies by authored variant:
+  Peaq press release uses an opaque ink backdrop with bottom-right white controls
+  (SKODA-203); Favorit story uses `rgba(0,0,0,.95)` desktop / opaque ink mobile, green
+  `--gallery-accent` side navigation, and a separate bottom-right counter (SKODA-216).
+- On-page Peaq press-release previews appear two across in a right media-kit column
+  (template assembly in SKODA-607). Favorit story has a large lead image and four
+  thumbnails below it, including mobile (SKODA-216).
 - **New tokens:** `--gallery-accent: #419468`, `--gallery-divider: #5a5b5c`, plus reuse `--skoda-ink`,
   `--skoda-white`, `--card-radius`.
 
@@ -227,8 +238,9 @@ justified layout is wanted later.
 
 WHAT / WHERE / viewport / expected / actual.
 
-- [ ] Grid columns: `.gallery-grid` / 1280 / 4 across (or agreed 4); / 768 / 3; / <768 / 2.
-- [ ] Grid gap: `.gallery-grid` / >=768 / `20px`; / <768 / `10px`.
+- [ ] Authored variant layout: press-release previews two across in Peaq's media-kit
+      sidebar; story lead image above four thumbnails across at 1280/1024/768/500px.
+- [ ] Story thumbnail spacing: ~20px effective desktop / ~10px mobile (SKODA-216).
 - [ ] Thumbnail hover: image scales to `1.02` over ~`.5s`; cursor `pointer`.
 - [ ] Open: click thumbnail -> overlay `position:fixed; z-index:99999`; body scroll-locked; clicked
       image shown; counter shows `"N / total"`.
@@ -237,13 +249,16 @@ WHAT / WHERE / viewport / expected / actual.
       `media-box-1` group on a shared page).
 - [ ] MR image lightbox: caption region shows the detail panel (Original + 1920px download links, file
       metadata, taxonomy, related-article links); STO story lightbox shows the plain caption.
-- [ ] Backdrop: `.gallery-overlay` / all / `rgba(0,0,0,.95)` (agreed).
+- [ ] Backdrop: opaque ink for press releases; `rgba(0,0,0,.95)` for desktop stories,
+      opaque ink for mobile stories.
 - [ ] Image fit: lightbox `<img>` / all / `max-height:100%; width:auto` (contain, never cropped);
       stage height `calc(100vh - topbar - infobar)`.
-- [ ] Controls: prev/next/close are labeled `<button>`; prev/next disc accent `#419468`; close top-right.
+- [ ] Controls: prev/next/close are labeled `<button>`; Peaq desktop groups white arrows
+      and counter bottom-right; Favorit story uses green `#419468` side discs and
+      a separate bottom-right counter.
 - [ ] Counter: updates on prev/next; `aria-live` announces "Image X of N".
 - [ ] Caption: `data-caption` shown as `<figcaption>` on grid AND in lightbox at every viewport.
-- [ ] Overview grid: `>19 -> 5`, `>9 -> 4`, `else 3` cols.
+- [ ] No "Show all images" overview toggle (stakeholder-approved removal).
 - [ ] **A11y GATE:** `role=dialog aria-modal`; focus trapped; Escape closes; Left/Right navigate;
       focus returns to the invoking thumbnail; visible `:focus-visible` on all controls; every image
       has `alt`. (Blocking, fails the ticket if any item fails.)
@@ -252,5 +267,5 @@ WHAT / WHERE / viewport / expected / actual.
 ## 10. Reference screenshots
 
 `assets/gallery-lightbox/`: `lightbox-open-colorbox-390.png` (live open state, counter "24",
-prev/next/close). Desktop grid + sb-lightbox overview captures pending (sb-lightbox is mobile-gated in
-source; overview requires triggering overview mode).
+prev/next/close). Press-release and story layouts require separate desktop comparisons;
+the Favorit custom story lightbox was also observed opening on desktop.
