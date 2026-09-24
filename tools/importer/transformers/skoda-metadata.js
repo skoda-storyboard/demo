@@ -44,6 +44,10 @@ const TEMPLATE_SIGNALS = [
   [/\bsingle-press_release\b|\bpress_release-template\b/, 'press_release'],
   [/\bsingle-press_kit\b|\bpress_kit-template\b/, 'press_kit'],
   [/\bsingle-post\b|\bpost-template\b/, 'story'],
+  // Škodapedia archive + branded 404 aren't rail CPTs and aren't in the template
+  // enum — map them to the valid `page` value (nav/direct only, not rail-indexed).
+  [/\bpost-type-archive-skodapedia\b/, 'page'],
+  [/\berror404\b/, 'page'],
   [/\bpage-template\b|\btemplate-media-room-page\b/, 'page'],
 ];
 

@@ -15,8 +15,9 @@ Volumes from `docs/analysis/SKODA-MASTER.md` §3. URL buckets from `.migration/p
 
 ## The shared shell
 
-Every page (except `error404`, which drops the chrome) renders one header + one footer, selected by
-site side:
+Every page renders one header + one footer, selected by site side (the `error404`
+page **keeps** the STO chrome — verified live 2026-09-24, header with 64 menu items +
+footer present; an earlier note here saying it drops the chrome was wrong):
 
 - **Header:** one block, `header-megamenu.md` (desktop) + `mobile-nav.md` (<1080) + `language-switcher.md`.
   The **section switcher** (Stories | Media Room) sets the side and reflows per breakpoint (see
@@ -93,6 +94,13 @@ plugin).
 - Wave T0 (this map): done.
 - Wave T1 (press-release, model-page, category-archive): **done** (measured, spec + screenshots).
 - Wave T2 (page-base, 404, home): **done** (measured, spec + screenshots).
+- **Import coverage (2026-09-24):** every public page type now has a `tools/importer/`
+  importer (per-template parser/transformer set + `page-templates.json` entry), all
+  passing the metadata gate. SiteOrigin-heavy types (story, company, generic page) are
+  imported via **flatten-to-default** (linear content only); full widget reconstruction
+  stays with SKODA-801/814/604. **Custom microsite** (flatten → near-empty) is deferred
+  to SKODA-210, **press-kit** to SKODA-805–808, **newsletter** is service-only (SKODA-904).
+  See [`../architecture/IMPORT-PIPELINE.md`](../architecture/IMPORT-PIPELINE.md).
 - Remaining: gap tickets (607/208/209/813/706) + wiring pointers into existing tickets + README/OVERVIEW.
 - **Added post block-recount (2026-09-15):** `custom_microsite` (`template-custom-full-width`, 201 STO
   pages, `custom-microsite.md` / SKODA-210) and the `siteorigin-body` region (1,614 pages,

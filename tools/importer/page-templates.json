@@ -619,6 +619,137 @@
         }
       ],
       "sections": []
+    },
+    {
+      "name": "company-page",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/contacts/",
+        "https://www.skoda-storyboard.com/en/board-of-management/",
+        "https://www.skoda-storyboard.com/en/annual-reports/"
+      ],
+      "description": "Škoda company/utility page (template-media-room-page). FLATTEN-TO-DEFAULT: hero banner + .entry-content flattened to plain default content. Named sub-type blocks + per-member galleries/download grids deferred to SKODA-810 (+604). Metadata template=page. Spec: docs/ui-specs/company-pages.md; SKODA-810.",
+      "metadata": {
+        "template": "page"
+      },
+      "blocks": [
+        {
+          "name": "hero-banner",
+          "instances": [
+            "div.hero"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Hero",
+          "selector": [
+            "div.hero"
+          ],
+          "style": null,
+          "blocks": [
+            "hero-banner"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-2",
+          "name": "Body",
+          "selector": [
+            "article .entry-content",
+            ".entry-content"
+          ],
+          "style": null,
+          "blocks": [],
+          "defaultContent": [
+            ".entry-content h1",
+            ".entry-content h2",
+            ".entry-content h3",
+            ".entry-content p",
+            ".entry-content ul",
+            ".entry-content ol"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "story-detail",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/"
+      ],
+      "description": "Škoda story detail (single-post + SiteOrigin), LINEAR FLATTEN. Hero banner + primary .content rich text flattened to default content; .sidebar + floating social dropped (skoda-story-cleanup). In-body galleries/embeds/Media Box deferred to SKODA-801/814/604. Metadata template=story. Spec: docs/ui-specs/story-detail.md; SKODA-604/801.",
+      "blocks": [
+        {
+          "name": "hero-banner",
+          "instances": [
+            "div.hero"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Hero",
+          "selector": [
+            "div.hero"
+          ],
+          "style": null,
+          "blocks": [
+            "hero-banner"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-2",
+          "name": "Body",
+          "selector": [
+            ".columns > .content",
+            "article .content",
+            ".entry-content"
+          ],
+          "style": null,
+          "blocks": [],
+          "defaultContent": [
+            ".content .entry-content h2",
+            ".content .entry-content h3",
+            ".content .entry-content p",
+            ".content .entry-content ul",
+            ".content .entry-content ol",
+            ".content .entry-content blockquote"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "skodapedia",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/skodapedia/"
+      ],
+      "description": "Škoda Škodapedia glossary directory (post-type-archive-skodapedia). One Skodapedia block (term index; A–Z/model/category filters re-applied client-side). Term-detail prebake → SKODA-802. Metadata template=page. Spec: docs/ui-specs/skodapedia.md; SKODA-206.",
+      "metadata": {
+        "template": "page"
+      },
+      "blocks": [
+        {
+          "name": "skodapedia",
+          "instances": [
+            ".sp__list-content"
+          ]
+        }
+      ],
+      "sections": []
+    },
+    {
+      "name": "error-404",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/this-page-does-not-exist-zzz/"
+      ],
+      "description": "Škoda branded 404 (error404). Keeps .error-message dead-end copy + homepage link; chrome dropped. Site-root 404.html shell. Metadata template=page. Spec: docs/ui-specs/template-404.md; SKODA-706.",
+      "metadata": {
+        "template": "page"
+      },
+      "blocks": [],
+      "sections": []
     }
   ]
 }

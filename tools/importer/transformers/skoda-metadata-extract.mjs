@@ -25,6 +25,9 @@ const TEMPLATE_SIGNALS = [
   [/\bsingle-press_release\b|\bpress_release-template\b/, 'press_release'],
   [/\bsingle-press_kit\b|\bpress_kit-template\b/, 'press_kit'],
   [/\bsingle-post\b|\bpost-template\b/, 'story'],
+  // Škodapedia archive + branded 404: not rail CPTs, not in the enum → `page`.
+  [/\bpost-type-archive-skodapedia\b/, 'page'],
+  [/\berror404\b/, 'page'],
   [/\bpage-template\b|\btemplate-media-room-page\b/, 'page'],
 ];
 

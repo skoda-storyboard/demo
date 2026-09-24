@@ -27,14 +27,32 @@ page-templates.json  ──►  import-<name>.js  ──►  import-<name>.bundl
                           query-index rebuilds → index-driven blocks populate
 ```
 
-Templates that exist today and are the ones to copy (SKODA-601, Phase-A pilot):
-- **`model-page`** — the Škoda model page (`import-model-page` set): hero + in-page-nav + key-facts + spec-table + 6 index-driven story-rails; section transformer with Section Metadata.
-- **`press-release`** — press-release detail (`import-press-release.js` + `.bundle.js`): header default content + `gallery` / `tags` / `downloads` parsers, `skoda-press-release-cleanup` + section + shared metadata transformers. Media Box → `Downloads`; PDFs/MP4 kept as links (SKODA-503).
-- **`pr-listing`** — the faceted listing (`import-pr-listing.js`): index-driven, emits a single `Listing` config block over the query-index; SSR cards + source filter stack not ported.
-- **`page-base`** — editorial "Page" shell (`import-page-base.js`): hero banner + SiteOrigin body flattened to plain default content (widget tree NOT reconstructed — deferred to SKODA-801).
-- **`category-archive`** — category/tag archive (`import-category-archive.js`): hero banner + a facet-less `Listing` scoped by the page's canonical path.
+Templates that exist today and are the ones to copy. All 17 public page types now
+have an importer (SKODA-601 pilot + the all-page-types extension); the complex
+**press-kit** N+1-document type is the one deferred type (SKODA-805–808).
 
-> Detection is **content-driven only** — blocks are located by the `page-templates.json` DOM selectors; parsers self-identify from the DOM (never URL/template/section-order/position). A page with a novel arrangement of known sections/blocks imports without parser changes.
+Detail/CPT + shells:
+- **`model-page`** — Škoda model page: hero + in-page-nav + key-facts + spec-table + 6 index-driven story-rails; Section Metadata.
+- **`press-release`** — header default content + `gallery` / `tags` / `downloads` parsers, `skoda-press-release-cleanup`. Media Box → `Downloads`; PDFs/MP4 as links (SKODA-503).
+- **`page-base`** — editorial "Page" shell: hero banner + SiteOrigin body flattened to plain default content.
+
+Faceted listings (one engine, `listing.js` variant map keyed on the body-class token):
+- **`pr-listing`** (news), **`images-listing`** (`template=image`, columns=4), **`videos-listing`** (`template=video`), **`search-listing`** (cross-type, `search=true`) — each emits a single index-driven `Listing` config block; SSR cards + source filter stack not ported.
+
+Archives + directories (index-driven grids emitted as config, not ported cards):
+- **`category-archive`** — category/tag archive (also covers podcast): hero + facet-less `Listing` scoped by canonical path.
+- **`series-directory`** / **`series-hub`** — `series-grid.js` self-detects level from card `data-content-type`; hub tag from canonical slug.
+- **`home-sto`** / **`home-mr`** — `promo-box` (curated cards) + `home-rail` (self-classifying index rails; social strip dropped).
+- **`skodapedia`** — glossary directory index block (term-detail prebake → SKODA-802).
+
+Flatten-to-default (SiteOrigin widget tree NOT reconstructed — deferred to SKODA-801/814/604/810/210):
+- **`company-page`** — hero + `.entry-content` flattened; sub-type blocks/galleries → SKODA-810.
+- **`story-detail`** — hero + primary `.content` flattened; `.sidebar` + floating social dropped (`skoda-story-cleanup`), in-body galleries/embeds/Media Box dropped-and-logged → SKODA-801/814/604.
+- **`error-404`** — `.error-message` dead-end copy + homepage link; site-root `404.html` shell.
+
+> Detection is **content-driven only** — blocks are located by the `page-templates.json` DOM selectors; parsers self-identify from the DOM (body-class token, `data-content-type`, `type-<cpt>` class), never from URL/template/section-order/position. Where a URL is read (series/archive scope) it derives the *rail filter*, never the *detection*. A page with a novel arrangement of known sections/blocks imports without parser changes.
+>
+> **Deliberately deferred:** the **custom microsite** (`template-custom-full-width`) is NOT run through flatten — its body is ~264 gallery tiles + a stub intro, so flatten yields a near-empty page; it needs the real gallery block (SKODA-210). **Newsletter** is a subscriber service surface (SKODA-904), not a content page. **Press-kit** (hub + chapters + resources + shared sub-nav) is SKODA-805–808.
 
 ---
 

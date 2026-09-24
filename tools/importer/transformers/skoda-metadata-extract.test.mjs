@@ -51,6 +51,12 @@ test('templateFromBodyClass maps CPT signals (model, story, press_release)', () 
   assert.equal(templateFromBodyClass('nothing-special'), '');
 });
 
+test('templateFromBodyClass maps skodapedia archive + error404 to page', () => {
+  // Neither is a rail CPT nor in the template enum → the valid `page` value.
+  assert.equal(templateFromBodyClass('archive post-type-archive post-type-archive-skodapedia media-room'), 'page');
+  assert.equal(templateFromBodyClass('error404 wp-theme-skoda-bnr-web lang-en'), 'page');
+});
+
 // ---- category from url path segment --------------------------------------
 test('categoryFromUrl takes the family segment after the locale', () => {
   assert.equal(categoryFromUrl('https://x/en/emobility/some-story/'), 'emobility');
