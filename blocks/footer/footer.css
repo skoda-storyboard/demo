@@ -15,10 +15,13 @@ footer {
   font-size: var(--body-font-size-xs);
 }
 
+/* Content box matches the source: 1248px max INCLUDING its 10px inline gutters
+   (box-sizing so max-width contains the padding). Source measured x=10/width=355 at 375px. */
 footer .footer > div {
+  box-sizing: border-box;
   margin: auto;
   max-width: var(--content-max-width);
-  padding: var(--footer-padding-y) var(--spacing-l);
+  padding: var(--footer-padding-y) 10px;
 }
 
 footer .footer p {
@@ -44,21 +47,22 @@ footer .footer-nav nav > ul {
   padding: 0;
 }
 
-/* top-level = column heading + its sub-list */
+/* top-level = column heading + its sub-list. Source item rhythm is 12px (--spacing-s),
+   not 16px — measured on the live footer nav (review #2). */
 footer .footer-nav nav > ul > li {
-  margin-bottom: var(--spacing-m);
+  margin-bottom: var(--spacing-s);
 }
 
 /* sub-links: hidden on mobile (only the 7 category headings show — source-exact) */
 footer .footer-nav ul ul {
   display: none;
   list-style: none;
-  margin: var(--spacing-xs) 0 0;
+  margin: var(--spacing-s) 0 0;
   padding: 0;
 }
 
 footer .footer-nav ul ul li {
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-s);
 }
 
 footer .footer-nav ul ul a {
@@ -145,9 +149,12 @@ footer .footer-legal hr {
   display: none;
 }
 
+/* footer-specific type, NOT the global body style: source renders the usage copy at
+   12px / 18px / weight 300 (review #3). */
 footer .footer-legal .copyright-text {
-  font-size: var(--body-font-size-m);
-  font-weight: var(--weight-regular);
+  font-size: var(--body-font-size-2xs);
+  font-weight: var(--weight-light);
+  line-height: 18px;
   margin-bottom: var(--spacing-l);
 }
 
