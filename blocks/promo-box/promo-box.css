@@ -48,9 +48,7 @@
 }
 
 .promo-box .card-teaser-title {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  max-height: 2.4em;
   overflow: hidden;
 }
 
@@ -137,7 +135,6 @@
   }
 
   .promo-box .card-teaser:first-child .card-teaser-title {
-    -webkit-line-clamp: 1;
     font-size: var(--heading-font-size-promo);
     line-height: 1.2;
     font-weight: var(--weight-regular);
