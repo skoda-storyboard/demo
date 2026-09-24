@@ -39,18 +39,18 @@ Measurable gates in [`carousel-rails.md`](../../ui-specs/carousel-rails.md) §3/
 - Downstream: SKODA-604 (home composition)
 
 ## Risks / Flags
-- **Auto-rotate + watchCSS a11y (🟡 `[RUNTIME-UNCONFIRMED]`):** the mosaic↔carousel mode switch and mobile auto-advance need browser verification (reduced-motion, focus, swipe); shared concern with SKODA-212/702/703.
+- **Auto-rotate + watchCSS a11y:** the mosaic↔carousel mode switch, mobile dots/swipe/auto-advance, and reduced-motion/focus behavior have browser coverage; shared concern with SKODA-212/702/703.
 - **Not promo-banner:** keep distinct from the ad-server `promo-banner` (E09) — this is the editorial featured showcase only.
-- **Curated vs indexed items:** confirm whether promo items are author-curated (featured) or query-index-driven before locking the block config.
+- **Curated vs indexed items:** both author-curated (featured) and optional query-index-driven sources are supported.
 - **Home composition boundary:** builds the *block*; assembly into `/en/` is SKODA-604.
 
 ## Authoring contract (issue #99)
 
-`Promo box` is editorial content, not an ad slot. Curated mode uses **exactly three rows** in author order, each with a story link (usually in a teaser title), an optional image and optional summary. Image cells may be omitted without breaking decoration. If the row count differs from three or a story link is missing, the block displays a visible error and retains the authored rows for correction.
+`Promo box` is editorial content, not an ad slot. Curated mode uses **exactly three rows** in author order, each with a story link (usually in a teaser title), an optional image and optional summary. For source fidelity, add the story's publication date as its own paragraph (for example `24. 9. 2026`) and use full-resolution images and migrated story URLs. Image cells may be omitted without breaking decoration. If the row count differs from three or a story link is missing, the block displays a visible error and retains the authored rows for correction.
 
 | Promo box | |
 | --- | --- |
-| ![Featured story](story-1.jpg) | ### [Featured story](/en/stories/story-1) <br> Summary |
+| ![Featured story](story-1.jpg) | 24. 9. 2026 <br> ### [Featured story](/en/stories/story-1) <br> Summary |
 | ![Second story](story-2.jpg) | ### [Second story](/en/stories/story-2) |
 | ![Third story](story-3.jpg) | ### [Third story](/en/stories/story-3) |
 
@@ -62,3 +62,9 @@ Optional index mode uses **only** key/value rows (do not combine with curated ro
 | category | emobility |
 | tags | elroq, enyaq |
 | limit | 3 |
+
+## Published-content QA (2026-09-24)
+
+The branch's published `/en` page renders the three curated rows; `/en/` requests an absent `/en/index.md` and returns 404. Against the source homepage, card geometry is within 1px at 1280px and 768px; the mobile first card and block heights match at 500px. Mobile dot selection, scroll/swipe position, arrow-key selection, and the 10-second advance work on the published page.
+
+Visual acceptance remains **pending**: the authored rows have no date paragraphs, so the source's dates are absent from every card. The second authored image only resolves to **272 × 182px** even when the browser requests a 750px rendition, making it visibly soft; replace that DA asset with a sufficiently large original. The current card links still target the WordPress source rather than migrated story paths. Those are content/import work for home assembly (SKODA-604), not data the block can recover from the authored rows. The 16px top-position difference at 500px comes from the surrounding header, not promo layout. Recheck comparable pixels once the content and header are corrected; do not mark the <=2% visual gate accepted yet.
