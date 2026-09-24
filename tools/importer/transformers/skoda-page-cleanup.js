@@ -71,13 +71,26 @@ export default function transform(hookName, element, payload) {
       '.media-cart-flyout',
       '.share-bar',
 
-      // Chrome resource elements
+      // Homepage live-Instagram social strip (not index-driven, external links).
+      '.socials-static',
+
+      // Chrome resource elements. Scripts carry per-request nonces / random
+      // container-id hashes (ys_ajax_loader) that would break byte-identical
+      // re-runs (SKODA-602 idempotency) if they survived into default content.
+      'script',
+      'noscript',
+      'style',
       'link[rel="stylesheet"]',
       'link',
     ]);
   }
 
   if (hookName === TransformHook.afterTransform) {
-    // intentionally empty
+    // Strip per-request Adobe-Analytics tracking fragments (#s_aid= / #s_cid=) the
+    // source injects onto asset/social hrefs — they rotate every fetch, so leaving
+    // them makes output non-deterministic (breaks SKODA-602 idempotent re-push).
+    element.querySelectorAll('a[href*="#s_aid="], a[href*="#s_cid="]').forEach((a) => {
+      a.setAttribute('href', a.getAttribute('href').split('#s_aid=')[0].split('#s_cid=')[0]);
+    });
   }
 }

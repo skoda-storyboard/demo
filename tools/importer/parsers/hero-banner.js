@@ -20,8 +20,9 @@
 export default function parse(element, { document }) {
   const img = element.querySelector('.hero-image img, .image-wrapper img, img');
 
-  // Overlay content: a heading (title) and any call-to-action links.
+  // Overlay content: a heading (title), an optional standfirst (perex), and CTAs.
   const heading = element.querySelector('h1, h2, .hero-title, .entry-title');
+  const perex = element.querySelector('.perex, .hero-caption p, .hero-content p');
   const ctas = Array.from(element.querySelectorAll('a.btn, a.btn-secondary, .hero-content a, .cta a'));
 
   // Defensive: nothing hero-shaped — unwrap and bail.
@@ -34,9 +35,14 @@ export default function parse(element, { document }) {
   // Row 2: background image (optional).
   cells.push([img || '']);
 
-  // Row 3: title + optional CTA link(s).
+  // Row 3: title + optional standfirst + optional CTA link(s).
   const contentCell = [];
   if (heading) contentCell.push(heading);
+  if (perex && (perex.textContent || '').trim()) {
+    const p = document.createElement('p');
+    p.textContent = (perex.textContent || '').trim();
+    contentCell.push(p);
+  }
   ctas.forEach((a) => {
     const link = document.createElement('a');
     link.setAttribute('href', a.getAttribute('href') || '#');

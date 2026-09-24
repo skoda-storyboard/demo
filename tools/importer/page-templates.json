@@ -370,6 +370,255 @@
           "defaultContent": []
         }
       ]
+    },
+    {
+      "name": "images-listing",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/images/"
+      ],
+      "description": "Škoda Images faceted listing (template-search-results engine, body.images). Same engine as pr-listing; listing.js emits the images variant (template=image, columns=4, perpage=12) selected content-driven from the body class token. Index-driven; SSR cards + filter stack not ported. Metadata template=page. Spec: docs/ui-specs/faceted-listing.md; SKODA-402/403.",
+      "metadata": {
+        "template": "page"
+      },
+      "blocks": [
+        {
+          "name": "listing",
+          "instances": [
+            "#search-filter-results"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Listing",
+          "selector": [
+            "#search-filter-results"
+          ],
+          "style": null,
+          "blocks": [
+            "listing"
+          ],
+          "defaultContent": [
+            "h1.entry-title, h1.page-title, main h1"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "videos-listing",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/videos/"
+      ],
+      "description": "Škoda Videos faceted listing (template-search-results engine, body.videos). listing.js emits the videos variant (template=video, columns=3, perpage=12) — content-driven from the body class. Index-driven; Vimeo thumbs + MP4 downloads are runtime-block concerns, not ported here. Metadata template=page. Spec: docs/ui-specs/faceted-listing.md; SKODA-402/403.",
+      "metadata": {
+        "template": "page"
+      },
+      "blocks": [
+        {
+          "name": "listing",
+          "instances": [
+            "#search-filter-results"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Listing",
+          "selector": [
+            "#search-filter-results"
+          ],
+          "style": null,
+          "blocks": [
+            "listing"
+          ],
+          "defaultContent": [
+            "h1.entry-title, h1.page-title, main h1"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "search-listing",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/search/"
+      ],
+      "description": "Škoda site-wide search results (template-search-results engine, body.search). listing.js emits the search variant (no path/template filter — cross-type; search=true free-text; columns=3). Index-driven over the whole query-index. Metadata template=page. Spec: docs/ui-specs/faceted-listing.md; SKODA-402.",
+      "metadata": {
+        "template": "page"
+      },
+      "blocks": [
+        {
+          "name": "listing",
+          "instances": [
+            "#search-filter-results"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Listing",
+          "selector": [
+            "#search-filter-results"
+          ],
+          "style": null,
+          "blocks": [
+            "listing"
+          ],
+          "defaultContent": [
+            "h1.entry-title, h1.page-title, main h1"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "series-directory",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/series-2/"
+      ],
+      "description": "Škoda Series directory (template-tiles, /en/series-2/). Hero banner + index-driven Listing over all skoda_series posts (series-grid.js detects the directory from data-content-type=Series). SSR cards not ported. Metadata template=page. Spec: docs/ui-specs/series.md; SKODA-207.",
+      "metadata": {
+        "template": "page"
+      },
+      "blocks": [
+        {
+          "name": "hero-banner",
+          "instances": [
+            "div.hero"
+          ]
+        },
+        {
+          "name": "series-grid",
+          "instances": [
+            ".panel-layout"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Hero",
+          "selector": [
+            "div.hero"
+          ],
+          "style": null,
+          "blocks": [
+            "hero-banner"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-2",
+          "name": "Series",
+          "selector": [
+            ".panel-layout"
+          ],
+          "style": null,
+          "blocks": [
+            "series-grid"
+          ],
+          "defaultContent": []
+        }
+      ]
+    },
+    {
+      "name": "series-hub",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/series/125-years-of-motorsport/"
+      ],
+      "description": "Škoda Series hub (single-skoda_series). Overlay hero (title + perex) + index-driven Listing of the series' stories (series-grid.js detects the hub from data-content-type=Story, tags=<slug> from canonical). SSR cards not ported. Metadata template=skoda_series (body-class signal). Spec: docs/ui-specs/series.md; SKODA-207.",
+      "blocks": [
+        {
+          "name": "hero-banner",
+          "instances": [
+            "div.hero"
+          ]
+        },
+        {
+          "name": "series-grid",
+          "instances": [
+            ".panel-layout"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Hero",
+          "selector": [
+            "div.hero"
+          ],
+          "style": null,
+          "blocks": [
+            "hero-banner"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "section-2",
+          "name": "Stories",
+          "selector": [
+            ".panel-layout"
+          ],
+          "style": null,
+          "blocks": [
+            "series-grid"
+          ],
+          "defaultContent": []
+        }
+      ]
+    },
+    {
+      "name": "home-sto",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/"
+      ],
+      "description": "Škoda Storyboard home (template-homepage). Curated promo-box cards + index-driven Story Rails (home-rail self-classifies each .search-results rail; social strip unwrapped). Metadata template=page. Spec: docs/ui-specs/template-home.md; SKODA-604/home.",
+      "metadata": {
+        "template": "page"
+      },
+      "blocks": [
+        {
+          "name": "promo-box",
+          "instances": [
+            "section.promo-box"
+          ]
+        },
+        {
+          "name": "home-rail",
+          "instances": [
+            ".cover-box .search-results[class*=\"type-\"]"
+          ]
+        }
+      ],
+      "sections": []
+    },
+    {
+      "name": "home-mr",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/media-room/"
+      ],
+      "description": "Škoda Media Room home (template-media-room). Curated promo-box cards + index-driven Story Rails (News/Images/Videos/Models/Press Kits/Latest Stories) via home-rail. Metadata template=page. Spec: docs/ui-specs/template-home.md.",
+      "metadata": {
+        "template": "page"
+      },
+      "blocks": [
+        {
+          "name": "promo-box",
+          "instances": [
+            "section.promo-box"
+          ]
+        },
+        {
+          "name": "home-rail",
+          "instances": [
+            ".cover-box .search-results[class*=\"type-\"]"
+          ]
+        }
+      ],
+      "sections": []
     }
   ]
 }

@@ -87,6 +87,13 @@ function extractDate(document) {
     const d = normalizeDate(span.getAttribute('datetime') || span.textContent);
     if (d) return d;
   }
+
+  // Last resort: article:modified_time (<head> meta, survives cleanup). Some CPT
+  // pages (series hub) expose no published_time that outlives grid removal; a valid
+  // ISO modified date beats an empty publisheddate. Mirror in skoda-metadata-extract.mjs.
+  const modified = metaContent(document, 'meta[property="article:modified_time"]');
+  if (normalizeDate(modified)) return normalizeDate(modified);
+
   return '';
 }
 
@@ -169,6 +176,20 @@ function extractTagsAndFacets(document) {
       const taxonomy = tax[1].toLowerCase().replace(/_/g, '-');
       const slug = term[1].toLowerCase();
       if (FACETS.includes(taxonomy) && slug && !/^\d+$/.test(slug)) add(taxonomy, slug);
+    }
+  }
+
+  // Fallback: a series-hub (single-skoda_series) has no entry-tags in the body that
+  // survives grid removal. Its own series slug is the tag that feeds the Series rail
+  // — derive it from the canonical path (/en/series/<slug>/), mirroring how a model
+  // page carries its own model slug as a tag. Content-driven, not positional.
+  if (tags.length === 0) {
+    const cls = (document.body && document.body.getAttribute('class')) || '';
+    if (/\bsingle-skoda_series\b|\bskoda_series-template\b/.test(cls)) {
+      const canonical = document.querySelector('link[rel="canonical"]');
+      const href = (canonical && canonical.getAttribute('href')) || '';
+      const m = href.match(/\/series\/([a-z0-9-]+)\/?/i);
+      if (m) add('series', m[1].toLowerCase());
     }
   }
   return { tags, byFacet };

@@ -26,6 +26,16 @@ test('pickDate falls through to JSON-LD then entry-published', () => {
   assert.equal(pickDate({}), '');
 });
 
+test('pickDate uses article:modified_time only as a last resort', () => {
+  // A CPT page (series hub) with no published_time surviving cleanup — modified beats empty.
+  assert.equal(pickDate({ articleModified: '2026-09-02T10:22:33+00:00' }), '2026-09-02');
+  // Published still wins over modified when both are present.
+  assert.equal(
+    pickDate({ articlePublishedTime: '2026-01-29T00:00:00+00:00', articleModified: '2026-09-02T00:00:00+00:00' }),
+    '2026-01-29',
+  );
+});
+
 test('normalizeDate ignores non-date text', () => {
   assert.equal(normalizeDate('not a date'), '');
   assert.equal(normalizeDate('2026-01-02T00:00:00Z'), '2026-01-02');

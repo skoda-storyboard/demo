@@ -36,16 +36,20 @@ export function normalizeDate(value) {
 }
 
 /**
- * 4-way publish-date fallback (SKODA-401), given already-extracted candidates
- * in priority order. Returns the first that normalizes to YYYY-MM-DD.
+ * Publish-date fallback (SKODA-401), given already-extracted candidates in
+ * priority order. Returns the first that normalizes to YYYY-MM-DD. `articleModified`
+ * is the last resort — some CPT pages (e.g. the series hub) expose no published_time
+ * in the body/head that survives cleanup, only `article:modified_time` in <head> —
+ * a stale-but-valid ISO date beats an empty publisheddate (which fails the gate).
  * @param {{ articlePublishedTime?: string, dataPublishDate?: string,
- *   jsonLdDatePublished?: string, entryPublished?: string }} c
+ *   jsonLdDatePublished?: string, entryPublished?: string, articleModified?: string }} c
  */
 export function pickDate(c = {}) {
   return normalizeDate(c.articlePublishedTime)
     || normalizeDate(c.dataPublishDate)
     || normalizeDate(c.jsonLdDatePublished)
     || normalizeDate(c.entryPublished)
+    || normalizeDate(c.articleModified)
     || '';
 }
 

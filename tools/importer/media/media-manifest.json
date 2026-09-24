@@ -211,7 +211,7 @@
     },
     "b5e98464__Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-1_2ed429f0.jpg": {
       "logical_id": "b5e98464__Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-1_2ed429f0.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-1_2ed429f0-1440x1018.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-1_2ed429f0.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-1_2ed429f0.jpg",
       "dam_page_path": "en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence",
       "dam_asset_path": "",
@@ -222,24 +222,22 @@
       "alt": "Škoda Superb: 25 years of comfort, space and technical excellence",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-1_2ed429f0-1440x1018.jpg",
-        "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-1_2ed429f0-768x543.jpg",
         "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-1_2ed429f0.jpg"
       ],
-      "aspect_crop_source": true,
+      "aspect_crop_source": false,
       "bytes": 1148101,
       "preconditioned": false,
       "steps": {
         "deliver": "done",
-        "dam": "n/a",
+        "dam": "skipped",
         "da": "n/a"
       },
       "status": "done",
-      "note": ""
+      "note": "DAM token missing → reference-in-place"
     },
     "b5e98464__Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-4_d57c86a6.jpg": {
       "logical_id": "b5e98464__Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-4_d57c86a6.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-4_d57c86a6-768x512.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-4_d57c86a6.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-4_d57c86a6.jpg",
       "dam_page_path": "en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence",
       "dam_asset_path": "",
@@ -250,22 +248,22 @@
       "alt": "Fourth-generation Škoda Superb Combi (2023)",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-4_d57c86a6-768x512.jpg"
+        "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-4_d57c86a6.jpg"
       ],
       "aspect_crop_source": false,
       "bytes": 2392061,
       "preconditioned": false,
       "steps": {
         "deliver": "done",
-        "dam": "n/a",
+        "dam": "skipped",
         "da": "n/a"
       },
       "status": "done",
-      "note": ""
+      "note": "DAM token missing → reference-in-place"
     },
     "b5e98464__Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-3_62f98c38.jpg": {
       "logical_id": "b5e98464__Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-3_62f98c38.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-3_62f98c38-768x516.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-3_62f98c38.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-3_62f98c38.jpg",
       "dam_page_path": "en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence",
       "dam_asset_path": "",
@@ -276,22 +274,22 @@
       "alt": "Third-generation Škoda Superb (2019)",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-3_62f98c38-768x516.jpg"
+        "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-3_62f98c38.jpg"
       ],
-      "aspect_crop_source": true,
+      "aspect_crop_source": false,
       "bytes": 5342839,
       "preconditioned": false,
       "steps": {
         "deliver": "done",
-        "dam": "n/a",
+        "dam": "skipped",
         "da": "n/a"
       },
       "status": "done",
-      "note": ""
+      "note": "DAM token missing → reference-in-place"
     },
     "b5e98464__Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-2_1c0e8243.jpg": {
       "logical_id": "b5e98464__Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-2_1c0e8243.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-2_1c0e8243-768x511.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-2_1c0e8243.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-2_1c0e8243.jpg",
       "dam_page_path": "en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence",
       "dam_asset_path": "",
@@ -302,22 +300,22 @@
       "alt": "Second-generation Škoda Superb Combi (2015)",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-2_1c0e8243-768x511.jpg"
+        "https://cdn.skoda-storyboard.com/2026/09/Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-2_1c0e8243.jpg"
       ],
-      "aspect_crop_source": true,
+      "aspect_crop_source": false,
       "bytes": 4616157,
       "preconditioned": false,
       "steps": {
         "deliver": "done",
-        "dam": "n/a",
+        "dam": "skipped",
         "da": "n/a"
       },
       "status": "done",
-      "note": ""
+      "note": "DAM token missing → reference-in-place"
     },
     "a818f128__Elroq_charging_2500_480_a042632e.jpg": {
       "logical_id": "a818f128__Elroq_charging_2500_480_a042632e.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2025/02/Elroq_charging_2500_480_a042632e-1920x369.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/02/Elroq_charging_2500_480_a042632e.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2025/02/Elroq_charging_2500_480_a042632e.jpg",
       "dam_page_path": "en/category/emobility",
       "dam_asset_path": "",
@@ -328,18 +326,18 @@
       "alt": "Škoda Elroq",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2025/02/Elroq_charging_2500_480_a042632e-1920x369.jpg"
+        "https://cdn.skoda-storyboard.com/2025/02/Elroq_charging_2500_480_a042632e.jpg"
       ],
-      "aspect_crop_source": true,
+      "aspect_crop_source": false,
       "bytes": 1052275,
       "preconditioned": false,
       "steps": {
         "deliver": "done",
-        "dam": "n/a",
+        "dam": "skipped",
         "da": "n/a"
       },
       "status": "done",
-      "note": ""
+      "note": "DAM token missing → reference-in-place"
     },
     "7354f7bb__brand_group_core_4dcc0280.png": {
       "logical_id": "7354f7bb__brand_group_core_4dcc0280.png",
@@ -361,15 +359,15 @@
       "preconditioned": false,
       "steps": {
         "deliver": "done",
-        "dam": "n/a",
+        "dam": "skipped",
         "da": "n/a"
       },
       "status": "done",
-      "note": ""
+      "note": "DAM token missing → reference-in-place"
     },
     "df14cfed__Elroq_banner_2500_480_38f49439.jpg": {
       "logical_id": "df14cfed__Elroq_banner_2500_480_38f49439.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2025/01/Elroq_banner_2500_480_38f49439-1920x369.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/01/Elroq_banner_2500_480_38f49439.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2025/01/Elroq_banner_2500_480_38f49439.jpg",
       "dam_page_path": "en/tag/model/elroq",
       "dam_asset_path": "",
@@ -380,18 +378,18 @@
       "alt": "Elroq_banner_2500_480_38f49439",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2025/01/Elroq_banner_2500_480_38f49439-1920x369.jpg"
+        "https://cdn.skoda-storyboard.com/2025/01/Elroq_banner_2500_480_38f49439.jpg"
       ],
-      "aspect_crop_source": true,
+      "aspect_crop_source": false,
       "bytes": 736166,
       "preconditioned": false,
       "steps": {
         "deliver": "done",
-        "dam": "n/a",
+        "dam": "skipped",
         "da": "n/a"
       },
       "status": "done",
-      "note": ""
+      "note": "DAM token missing → reference-in-place"
     },
     "cc9863f1__Storyboard_404_1125px_02.jpg": {
       "logical_id": "cc9863f1__Storyboard_404_1125px_02.jpg",
@@ -437,6 +435,347 @@
       "aspect_crop_source": false,
       "bytes": 987992,
       "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "4397252d__RS_Rally2_family_09ccf8a7.jpg": {
+      "logical_id": "4397252d__RS_Rally2_family_09ccf8a7.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/01/RS_Rally2_family_09ccf8a7-1920x1281.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/01/RS_Rally2_family_09ccf8a7.jpg",
+      "dam_page_path": "en/series/125-years-of-motorsport",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/01/RS_Rally2_family_09ccf8a7-2560x1707.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/01/RS_Rally2_family_09ccf8a7-1920x1281.jpg",
+        "https://cdn.skoda-storyboard.com/2026/01/RS_Rally2_family_09ccf8a7-1440x960.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 357647,
+      "preconditioned": true,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "90ef802f__04_skoda_explore_more-copy_cbdef8af.jpg": {
+      "logical_id": "90ef802f__04_skoda_explore_more-copy_cbdef8af.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2022/09/04_skoda_explore_more-copy_cbdef8af-1920x744.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2022/09/04_skoda_explore_more-copy_cbdef8af.jpg",
+      "dam_page_path": "en/series-2",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2022/09/04_skoda_explore_more-copy_cbdef8af.jpg",
+      "da_path": "",
+      "alt": "Series",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2022/09/04_skoda_explore_more-copy_cbdef8af-1920x744.jpg",
+        "https://cdn.skoda-storyboard.com/2022/09/04_skoda_explore_more-copy_cbdef8af-1440x558.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 2323659,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "b5e98464__Navrh-bez-nazvu-198_f752b9f5.png": {
+      "logical_id": "b5e98464__Navrh-bez-nazvu-198_f752b9f5.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/Navrh-bez-nazvu-198_f752b9f5-768x432.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/09/Navrh-bez-nazvu-198_f752b9f5.png",
+      "dam_page_path": "en",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/09/Navrh-bez-nazvu-198_f752b9f5.png",
+      "da_path": "",
+      "alt": "Škoda Epiq Will Win You Over in Just a Few Seconds",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/09/Navrh-bez-nazvu-198_f752b9f5-768x432.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 3270148,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "b5e98464__Navrh-bez-nazvu-195_06b8667a.png": {
+      "logical_id": "b5e98464__Navrh-bez-nazvu-195_06b8667a.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/Navrh-bez-nazvu-195_06b8667a-768x432.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/09/Navrh-bez-nazvu-195_06b8667a.png",
+      "dam_page_path": "en",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/09/Navrh-bez-nazvu-195_06b8667a.png",
+      "da_path": "",
+      "alt": "The Versatile Octavia. Do you know these ones, too?",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/09/Navrh-bez-nazvu-195_06b8667a-768x432.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 3921067,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "b5e98464__DSC_3500_a8b850af.jpg": {
+      "logical_id": "b5e98464__DSC_3500_a8b850af.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/DSC_3500_a8b850af-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/09/DSC_3500_a8b850af.jpg",
+      "dam_page_path": "en",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/09/DSC_3500_a8b850af.jpg",
+      "da_path": "",
+      "alt": "Škoda Classic Tour Through the Eyes of a Spectator",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/09/DSC_3500_a8b850af-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 1172804,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "f8ff4932__1_1979fd94.png": {
+      "logical_id": "f8ff4932__1_1979fd94.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/04/1_1979fd94-768x432.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/04/1_1979fd94.png",
+      "dam_page_path": "en",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/04/1_1979fd94.png",
+      "da_path": "",
+      "alt": "&quot;An electric car approaching,&quot; says the license plate. But only in some countries",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/04/1_1979fd94-768x432.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 1614655,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "b5e98464__DSC_5386_6ec0ab1b.jpg": {
+      "logical_id": "b5e98464__DSC_5386_6ec0ab1b.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/DSC_5386_6ec0ab1b-1440x960.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/09/DSC_5386_6ec0ab1b.jpg",
+      "dam_page_path": "en",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/09/DSC_5386_6ec0ab1b-2560x1707.jpg",
+      "da_path": "",
+      "alt": "What was racing like half a century ago? Škoda 120 S Rallye Delights a champion",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/09/DSC_5386_6ec0ab1b-1440x960.jpg",
+        "https://cdn.skoda-storyboard.com/2026/09/DSC_5386_6ec0ab1b.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 863639,
+      "preconditioned": true,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "3a8e9b07__02_SKODA_logo_wordmark.png": {
+      "logical_id": "3a8e9b07__02_SKODA_logo_wordmark.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2022/08/02_SKODA_logo_wordmark-1440x810.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2022/08/02_SKODA_logo_wordmark.png",
+      "dam_page_path": "en/media-room",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2022/08/02_SKODA_logo_wordmark.png",
+      "da_path": "",
+      "alt": "Škoda Auto: Klaus Zellmer to leave the company",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2022/08/02_SKODA_logo_wordmark-1440x810.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 211093,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__IMG_5081_72e6406c.jpg": {
+      "logical_id": "728314ef__IMG_5081_72e6406c.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/IMG_5081_72e6406c-1440x961.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/IMG_5081_72e6406c.jpg",
+      "dam_page_path": "en",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/IMG_5081_72e6406c.jpg",
+      "da_path": "",
+      "alt": "Even opening the door is an experience, says the designer of the Peaq SUV",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/IMG_5081_72e6406c-1440x961.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 5453730,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__PEAQ_Record_Run-00074_50dd3404.jpg": {
+      "logical_id": "728314ef__PEAQ_Record_Run-00074_50dd3404.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404.jpg",
+      "dam_page_path": "en",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404-768x512.jpg",
+      "da_path": "",
+      "alt": "Peaq Sets a Record: From the Heart of Europe to the Sea Without Recharging",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 76710,
+      "preconditioned": true,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__peaq-ml-header_b224ade9.jpg": {
+      "logical_id": "728314ef__peaq-ml-header_b224ade9.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/peaq-ml-header_b224ade9-1440x773.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/peaq-ml-header_b224ade9.jpg",
+      "dam_page_path": "en/media-room",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/peaq-ml-header_b224ade9.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq – Press Kit",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/peaq-ml-header_b224ade9-1440x773.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 4975394,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "b5e98464__1_da7abda1.jpg": {
+      "logical_id": "b5e98464__1_da7abda1.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/1_da7abda1-1440x979.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/09/1_da7abda1.jpg",
+      "dam_page_path": "en/media-room",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/09/1_da7abda1.jpg",
+      "da_path": "",
+      "alt": "Škoda Auto and National Theatre extend partnership until at least 2029",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/09/1_da7abda1-1440x979.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 4341286,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "b5e98464__Skoda-Peaq_116_4370c0a5.jpg": {
+      "logical_id": "b5e98464__Skoda-Peaq_116_4370c0a5.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Peaq_116_4370c0a5-1440x810.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Peaq_116_4370c0a5.jpg",
+      "dam_page_path": "en",
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Peaq_116_4370c0a5-272x182.jpg",
+      "da_path": "",
+      "alt": "The Škoda Peaq Will Win You Over Fast",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/09/Skoda-Peaq_116_4370c0a5-1440x810.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 36511,
+      "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "n/a",
