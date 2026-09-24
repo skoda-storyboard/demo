@@ -79,13 +79,16 @@ footer .footer-nav nav > ul > li > a {
 }
 
 /* ---- social + app-badge row (.footer-social) ----
-   Mobile: stacked and centered. A 1px white separator closes the social block (matches the
-   source <hr> that sits AFTER the widgets and BEFORE the menu). */
+   Mobile: stacked and centered. The 3rem row rhythm matches the source's widget spacing
+   (its .footer-widgets children carry margin-bottom:3em), so the stacked social region is the
+   same height as the live footer at ≤767px. A 1px white separator closes the block (matches the
+   source <hr> that sits AFTER the widgets and BEFORE the menu). The ≥768 rule overrides the gap
+   for the single-row desktop layout. */
 footer .footer-social {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-l);
+  gap: 3rem;
   border-bottom: 1px solid var(--skoda-white);
   padding-bottom: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
