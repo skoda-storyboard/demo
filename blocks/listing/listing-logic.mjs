@@ -10,6 +10,16 @@
  * its comma-split tokens.
  */
 
+/**
+ * The query-index facet columns (SKODA-401 contract), in the live listing's pill order
+ * (faceted-listing.md §3). Shared by the listing facet bar and the story-rail's
+ * facet-key config (SKODA-820), so both read the same taxonomy columns.
+ */
+export const INDEX_FACETS = [
+  'model', 'derivative', 'concept', 'bodywork', 'equipment', 'years', 'company',
+  'happening', 'history', 'motorsport', 'sponsorship', 'vip', 'view', 'technology', 'environment',
+];
+
 /** Split a comma-joined facet cell into trimmed lowercase tokens. */
 export function facetTokens(value) {
   return String(value || '')

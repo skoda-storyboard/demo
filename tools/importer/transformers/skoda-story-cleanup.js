@@ -35,6 +35,22 @@
 
 const TransformHook = { beforeTransform: 'beforeTransform', afterTransform: 'afterTransform' };
 
+// The 15 taxonomy facets (index columns). Transformers are self-contained (the validator
+// loads them standalone), so this mirrors skoda-metadata.js / skoda-metadata-extract.mjs
+// FACETS — keep the three in sync.
+const FACETS = [
+  'model', 'bodywork', 'derivative', 'motorsport', 'equipment', 'technology',
+  'years', 'view', 'company', 'concept', 'environment', 'happening', 'history',
+  'sponsorship', 'vip',
+];
+
+// /en/tag/<taxonomy>/<slug>/ → { taxonomy, slug } (mirrors skoda-metadata-extract.mjs
+// parseTagHref for the story tag-row link shape; story tag rows use /tag/ links only).
+function parseTagHref(href) {
+  const m = String(href || '').match(/\/tag\/([a-z0-9-]+)\/([a-z0-9-]+)\/?/i);
+  return m ? { taxonomy: m[1].toLowerCase(), slug: m[2].toLowerCase() } : null;
+}
+
 // Canonical watch URL for an in-body video (SKODA-818), or '' if not a video embed.
 // The SKODA-204 embed block (PR #109) autoblocks a bare YouTube/Vimeo URL on its own line.
 function videoUrl(el) {
@@ -81,48 +97,35 @@ function lastSegment(href) {
   }
 }
 
-// Curated Story Rail rows from the band's teasers: [image, date <p> + <h3><a>title</a></h3>].
-// The carousel's card-teaser detects the date paragraph and renders the dated overlay card.
-function curatedRows(band, document) {
-  const matched = [...band.querySelectorAll('article.article-teaser, .search-results-item')];
-  const teasers = matched.filter((el) => !matched.some((o) => o !== el && o.contains(el)));
-  const rows = [];
-  teasers.forEach((t) => {
-    const titleLink = t.querySelector('.entry-title a[href], h3 a[href], a.link-more[href]');
-    if (!titleLink) return;
-    let title = (t.querySelector('.entry-title') || titleLink).textContent.trim();
-    if (!title) return;
-    // The source clamps titles client-side (data-dotdotdot → "… reasons to…"); the image
-    // alt carries the full title, so restore it when the visible text is a truncation.
-    const img = t.querySelector('img');
-    const alt = img ? (img.getAttribute('alt') || '').trim() : '';
-    const stem = title.replace(/\s*(…|\.\.\.)$/, '');
-    if (stem !== title && alt.startsWith(stem)) title = alt;
-    const body = [];
-    const date = t.querySelector('.entry-published, time');
-    if (date && date.textContent.trim()) {
-      const p = document.createElement('p');
-      p.textContent = date.textContent.trim();
-      body.push(p);
+// Story Rail filter rows for the related band: one row per index facet column the story is
+// tagged with (/en/tag/<taxonomy>/<slug>/ → `<taxonomy>: <slug>`), e.g. `model: epiq` +
+// `years: 2026`. The rail ANDs across facet keys and ORs within one key, which is the
+// source's "Based on tags: 2026, Epiq" rule (every related story carries both tags).
+// Tag taxonomies that are not index facets fall back to the plain `tags` key.
+function facetRows(element) {
+  const byFacet = {};
+  const plain = [];
+  element.querySelectorAll('ol.entry-tags a[href], .sidebar .tags a[href]').forEach((a) => {
+    const t = parseTagHref(a.getAttribute('href') || '');
+    if (!t || !t.slug) return;
+    if (FACETS.includes(t.taxonomy)) {
+      byFacet[t.taxonomy] = byFacet[t.taxonomy] || [];
+      if (!byFacet[t.taxonomy].includes(t.slug)) byFacet[t.taxonomy].push(t.slug);
+    } else if (!plain.includes(t.slug)) {
+      plain.push(t.slug);
     }
-    const h3 = document.createElement('h3');
-    const a = document.createElement('a');
-    a.setAttribute('href', titleLink.getAttribute('href'));
-    a.textContent = title;
-    h3.appendChild(a);
-    body.push(h3);
-    rows.push([img || '', body]);
   });
+  const rows = FACETS.filter((f) => byFacet[f]).map((f) => [f, byFacet[f].join(', ')]);
+  if (plain.length) rows.push(['tags', plain.join(', ')]);
   return rows;
 }
 
 // Rebuild the full-width bottom "Related Stories" band (SKODA-820). It is NOT a duplicate
 // of the sidebar "Explore more" (3 hand-picked vs 10 tag-matched stories). Emit it as its
 // own `Style: dark` section: the heading + "Based on tags" subheading as default content,
-// then a Story Rail (SKODA-212). The rail is CURATED from the band's teasers: the source list
-// is ranked server-side by tag relevance, which the index rail's any-tag filter can't
-// reproduce, and the related stories may not be in the index yet. With no teasers, fall
-// back to an index-driven rail scoped to this story's tags, excluding the story itself.
+// then an INDEX-DRIVEN Story Rail (SKODA-212): stories matching ALL of this story's tags,
+// newest first, 10 items, the story itself excluded. Nothing is copied from the SSR
+// teasers; the list stays current as stories are published.
 function relatedBand(element, document, payload) {
   const band = element.querySelector('.cover-box .related-stories');
   if (!band) return;
@@ -138,40 +141,16 @@ function relatedBand(element, document, payload) {
     headingText = (clone.textContent || '').trim() || headingText;
   }
 
-  let rows = curatedRows(band, document);
-  if (rows.length) {
-    rows = [['Story Rail'], ...rows];
-  } else {
-    // Index fallback. Tag slugs from the sidebar tag row (/en/tag/<taxonomy>/<slug>/), the
-    // same anchors the metadata transformer turns into `tags`; else the subheading's list.
-    // Story Rail ORs the values within `tags` (listing-logic filterRows), so a year tag
-    // (/en/tag/years/2026/) would match every story of that year: drop year tags whenever
-    // a more specific tag (model, topic) exists.
-    const tagLinks = [...element.querySelectorAll('ol.entry-tags a[href], .sidebar .tags a[href]')]
-      .map((a) => a.getAttribute('href') || '');
-    const specific = tagLinks.filter((h) => !/\/tag\/years\//.test(h));
-    const slugs = (specific.length ? specific : tagLinks)
-      .map((h) => lastSegment(h).toLowerCase())
-      .filter((s, i, arr) => s && arr.indexOf(s) === i);
-    if (!slugs.length && subText) {
-      subText.replace(/^[^:]*:/, '').split(',').map((s) => s.trim().toLowerCase())
-        .filter(Boolean).forEach((s) => slugs.push(s));
-    }
-    if (!slugs.length) {
-      console.warn('[story-cleanup] related band has no teasers and no tags; dropped');
-      cover.remove();
-      return;
-    }
-    const originalURL = (payload && payload.params && payload.params.originalURL) || '';
-    const self = lastSegment(originalURL);
-    rows = [
-      ['Story Rail'],
-      ['template', 'story'],
-      ['tags', slugs.join(', ')],
-      ['limit', '10'],
-    ];
-    if (self) rows.push(['exclude', self]);
+  const filters = facetRows(element);
+  if (!filters.length) {
+    console.warn('[story-cleanup] related band: story has no tags to match; dropped');
+    cover.remove();
+    return;
   }
+  const originalURL = (payload && payload.params && payload.params.originalURL) || '';
+  const self = lastSegment(originalURL);
+  const rows = [['Story Rail'], ['template', 'story'], ...filters, ['limit', '10']];
+  if (self) rows.push(['exclude', self]);
 
   const h2 = document.createElement('h2');
   h2.textContent = headingText;
