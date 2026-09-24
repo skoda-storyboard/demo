@@ -116,7 +116,7 @@
   .promo-box .card-teaser:first-child {
     grid-row: span 2;
     aspect-ratio: auto;
-    margin-inline-end: var(--spacing-s);
+    margin-inline: 0 var(--spacing-s);
   }
 
   .promo-box .card-teaser:not(:first-child) {
