@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Story rail block harness (SKODA-212)</title>
+  <link rel="stylesheet" href="/styles/brand.css">
+  <link rel="stylesheet" href="/styles/styles.css">
+  <link rel="stylesheet" href="/blocks/story-rail/story-rail.css">
+  <link rel="stylesheet" href="/blocks/carousel/carousel.css">
+  <style>body { display: block; font-family: system-ui, sans-serif; margin: 24px; } main { max-width: 1248px; margin: auto; }</style>
+</head>
+<body class="appear">
+  <main>
+    <!-- Index-driven rail authored as a DA config table: builds a carousel. -->
+    <div class="story-rail block" data-block-name="story-rail">
+      <div><div>index</div><div>/blocks/story-rail/test/query-index.json</div></div>
+      <div><div>heading</div><div>Latest e-mobility</div></div>
+      <div><div>viewAll</div><div>/en/emobility</div></div>
+      <div><div>category</div><div>emobility</div></div>
+      <div><div>limit</div><div>10</div></div>
+    </div>
+  </main>
+  <script type="module">
+    import decorate from '/blocks/story-rail/story-rail.js';
+    const block = document.querySelector('.story-rail');
+    await decorate(block);
+    window.__storyRailReady = true;
+  </script>
+</body>
+</html>

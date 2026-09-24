@@ -1,0 +1,150 @@
+/*
+ * Stories feed block (SKODA-214) — feed grid + heading + Load-more ONLY.
+ *
+ * The card box, media, overlay scrim, typography, hover/focus all come from the
+ * shared card-teaser primitive (styles/card-teaser.css, imported below); the feed
+ * renders cards via scripts/card-teaser.js buildCardTeaser(). Nothing card-visual
+ * is duplicated here — this file owns only the feed's grid ladder, section
+ * heading, status region and the Load-more control. Measured spec: stories.md.
+ *
+ * Layer order (docs/guardrails/css-guidelines.md): fluid + intrinsic first;
+ * breakpoints (768 / 992) only for the grid column-count transitions.
+ */
+
+@import url("../../styles/card-teaser.css");
+
+.stories {
+  width: min(100%, var(--content-max-width));
+  margin-inline: auto;
+}
+
+/* --- section heading (h3-scale, stories.md §3) --- */
+.stories .stories-heading {
+  margin-block: 0 var(--grid-gutter);
+  font-size: var(--heading-font-size-l); /* 26px */
+  font-weight: var(--weight-semibold); /* 600 */
+  color: var(--text-color);
+}
+
+/* --- status (loading / no-results / load-more announce) --- */
+.stories .stories-status[hidden] {
+  display: none;
+}
+
+.stories .stories-status {
+  padding: var(--grid-gutter) 0;
+  color: var(--skoda-grey-500);
+}
+
+/*
+ * Feed grid — flex-wrap featured grid (stories.md §3), not a uniform grid.
+ * Two-axis spacing, split so it's source-faithful (stories.md §43):
+ *   - horizontal gutter → column-gap on the container (between cards in a row);
+ *   - vertical gutter → margin-block-end on every cell, INCLUDING the last row,
+ *     so the source's 20px below the final row survives (row-gap would only
+ *     space BETWEEN lines and drop that trailing space, pulling load-more up).
+ * The gutter is never padding on the card: .stories-item IS the shared
+ * .card-teaser box (background, radius, shadow, overflow-clip, absolute
+ * overlay), so interior padding would desync the scrim from the image — margin
+ * is outside the box and safe. Flex bases subtract the column-gap share so
+ * N-per-row still spans full width.
+ */
+.stories .stories-items {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--grid-gutter);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.stories .stories-item {
+  box-sizing: border-box;
+  flex: 0 0 100%; /* mobile: 1-up */
+  margin-block-end: var(--grid-gutter); /* incl. final row — source parity */
+}
+
+/* --- load-more: ghost pill (stories.md §3, measured) --- */
+.stories .stories-loadmore {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--spacing-m); /* wrapper 16px 0 */
+}
+
+.stories .stories-loadmore-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: var(--spacing-xs) 48px; /* 8px 48px */
+  font-size: var(--body-font-size-m); /* 16px */
+  font-weight: var(--weight-semibold);
+  color: var(--skoda-ink);
+  background: var(--skoda-white);
+  border: 2px solid var(--skoda-ink);
+  border-radius: var(--pill-radius); /* 50px */
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+/* hover: subtle light-grey fill (source #f1f1f1 → --dropdown-hover-bg), not dark */
+.stories .stories-loadmore-btn:hover {
+  background: var(--dropdown-hover-bg);
+}
+
+.stories .stories-loadmore-btn:focus-visible {
+  outline: 2px solid var(--facet-active);
+  outline-offset: 2px;
+}
+
+/*
+ * ===== breakpoints: featured grid ladder (stories.md §3 + 768.png reference) =====
+ *   base            → 100%    (1-up)
+ *   768–991         → 50%     (uniform 2-col — the 768 reference shows equal cards)
+ *   ≥ 992           → 33.33%, with :nth-child(-n+2) at 50% (2 featured + 3-up)
+ * Note: NO full-width lead card in the 768 band — the measured 768.png is a
+ * uniform 2-col grid (2+2+1), so every card is 50% there.
+ */
+
+/* Per-row basis = (100% − (cols−1)×gap) / cols, so the `gap` gutter is exact. */
+
+/* tablet: uniform 2-up */
+@media (width >= 768px) {
+  .stories.stories-featured .stories-item {
+    flex-basis: calc((100% - var(--grid-gutter)) / 2);
+  }
+}
+
+/* desktop: 2 featured (2-up) then 3-up */
+@media (width >= 992px) {
+  .stories.stories-featured .stories-item {
+    flex-basis: calc((100% - 2 * var(--grid-gutter)) / 3);
+  }
+
+  .stories.stories-featured .stories-item:nth-child(-n + 2) {
+    flex-basis: calc((100% - var(--grid-gutter)) / 2);
+  }
+}
+
+/* plain uniform-grid variant (columns: N) */
+@media (width >= 768px) {
+  .stories.stories-cols-2 .stories-item,
+  .stories.stories-cols-3 .stories-item,
+  .stories.stories-cols-4 .stories-item {
+    flex-basis: calc((100% - var(--grid-gutter)) / 2);
+  }
+}
+
+@media (width >= 992px) {
+  .stories.stories-cols-2 .stories-item {
+    flex-basis: calc((100% - var(--grid-gutter)) / 2);
+  }
+
+  .stories.stories-cols-3 .stories-item {
+    flex-basis: calc((100% - 2 * var(--grid-gutter)) / 3);
+  }
+
+  .stories.stories-cols-4 .stories-item {
+    flex-basis: calc((100% - 3 * var(--grid-gutter)) / 4);
+  }
+}

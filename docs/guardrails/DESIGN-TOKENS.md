@@ -30,6 +30,9 @@ Semantic map (use these downstream): `--background-color` → white, `--light-co
 - Line heights (measured from source): `--line-height-body 1.5` (24px on 16px body), `--line-height-heading 1.25`.
 - Prose rhythm: `--paragraph-gap 20px` (measured article/press body paragraph spacing).
 - Body: `--body-font-size-m 16px`, `-s 14px`, `-xs 13px`.
+- Card metadata: `--card-meta-font-size 11px`, `--card-meta-line-height 1`,
+  `--card-meta-letter-spacing 0.1em`; overlay title/date shadow:
+  `--card-overlay-text-shadow 0 1px 1px rgb(0 0 0 / 50%)`.
 - Headings: `--heading-font-size-xxl 44px` (h1), `-xl 34px` (h2), `-l 26px` (h3), `-m 22px` (h4),
   `-s 18px` (h5), `-xs 16px` (h6). These are **global fallback** sizes — actual source heading sizes
   are template/component-specific (story title 40px/600, press-release title 26px/600, article h2

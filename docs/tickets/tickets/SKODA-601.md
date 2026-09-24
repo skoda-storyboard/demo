@@ -20,12 +20,14 @@ The scripted DA-source-API import path relies on per-template parsers/transforme
 - Explicitly **exclude** story/SiteOrigin flattening (Phase B, SKODA-801).
 
 ## Acceptance Criteria
-- [ ] Parsers/transformers exist for press-release, PR-listing, and representative page templates.
-- [ ] Detection is content-driven only — a page with a novel arrangement of known sections/blocks imports without parser changes.
-- [ ] Generated DA HTML is clean: correct sections (`---`), block tables, and trailing Metadata table.
-- [ ] Media handling integrated (img-out-of-`<p>`, alt+data-caption, PDF/MP4 as links).
-- [ ] Story/SiteOrigin flattening is not attempted (deferred to SKODA-801).
-- [ ] `npm run lint` clean.
+- [x] Parsers/transformers exist for press-release, PR-listing, and representative page templates. *(press-release, pr-listing, page-base, category-archive — PR #105)*
+- [x] Detection is content-driven only — a page with a novel arrangement of known sections/blocks imports without parser changes. *(category-archive handles category + tag/model — distinct DOM, CTA-hero vs none — with zero per-URL logic; static audit: no positional/URL-coupled detection.)*
+- [x] Generated DA HTML is clean: correct sections (`---`), block tables, and trailing Metadata table. *(single canonical Metadata block; `dark, full-width` Section Metadata on the PR related band.)*
+- [x] Media handling integrated (img-out-of-`<p>`, alt+data-caption, PDF/MP4 as links). *(gallery/downloads read `data-caption`; PDFs emitted as links; per-asset cart hooks carried — SKODA-501/502/503/505.)*
+- [x] Story/SiteOrigin flattening is not attempted (deferred to SKODA-801). *(SiteOrigin bodies flattened to plain default content; no `panel-grid`/`so-widget` reconstruction.)*
+- [x] `npm run lint` clean. *(lint + 47 unit tests pass; metadata gate 5/5 pilot pages.)*
+
+**Status:** ✅ Delivered — PR #105 (`skoda-601-import-infra`). Ships importer tooling; DA push/publish is SKODA-602, source-vs-output validation SKODA-603.
 
 ## Dependencies
 - Upstream: SKODA-102 (boilerplate scaffold). / Downstream: SKODA-602 (DA push + bulk publish), SKODA-603 (pilot import + validation), SKODA-801 (Phase B story parser builds on this).

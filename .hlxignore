@@ -8,3 +8,5 @@ package-lock.json
 test/*
 poc/**/test.mjs
 sync-block-collection.sh
+drafts/
+content/en/press-releases/novel-arrangement-test.plain.html

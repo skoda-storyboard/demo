@@ -24,6 +24,14 @@
   --skoda-grey-500: #7c7d7e;
   --skoda-grey-border: #dadada;
 
+  /* social network brand colors (footer icon hover tints — raw brand hex) */
+  --social-hover: #419468;
+  --social-facebook: #3b5998;
+  --social-youtube: #f00;
+  --social-whatsapp: #43d854;
+  --social-instagram-gradient: radial-gradient(circle at 30% 107%,
+    #fdf497 0, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
+
   /* semantic color map (consumed downstream via var()) */
   --background-color: var(--skoda-white);
   --light-color: var(--skoda-grey-100);
@@ -42,6 +50,17 @@
   --scrim-h: linear-gradient(270deg, transparent, rgb(0 0 0 / 25%));
   --scrim-v: linear-gradient(180deg, transparent, rgb(0 0 0 / 10%));
 
+  /* gallery lightbox (gallery-lightbox.md §3; SKODA-203). Accent is the source
+     lightbox green (#419468 — measured on the live related-article link + nav
+     discs); divider is the source lightbox top-bar rule colour. Backdrop is the
+     source colorbox overlay: solid skoda-ink (#161718), which fully hides the
+     page behind it (measured opaque on the live site). */
+  --gallery-accent: #419468;
+  --gallery-divider: #5a5b5c;
+  --gallery-nav-divider: #606060; /* nav cluster vertical rules (measured live) */
+  --gallery-backdrop: rgb(22 23 24);
+  --gallery-heading-color: #353535; /* "Images" rail heading (measured live) */
+
   /* faceted-listing (SKODA-402; measured in docs/ui-specs/faceted-listing.md §3) */
   --facet-radius: 5px;
   --facet-pill-bg: #f6f6f6;          /* distinct from --skoda-grey-100 #f5f5f5 */
@@ -55,6 +74,12 @@
 
   /* downloads / media-box (SKODA-502; measured in docs/ui-specs/downloads.md §3) */
   --thumb-hairline: hsl(0deg 0% 85% / 13.3%); /* faint tile border on the download grid */
+
+  /* carousel / horizontal rails (SKODA-212; measured in docs/ui-specs/carousel-rails.md §3) */
+  --carousel-arrow-size: 32px;       /* source theme override 2em; base Flickity 44px */
+  --carousel-gap: 20px;              /* source .items margin 0 -10px + .item padding 0 10px */
+  --carousel-dot: #d8d8d8;           /* page dot (dots variant only) */
+  --carousel-dot-active: #686868;    /* selected page dot */
 }
 
 /*

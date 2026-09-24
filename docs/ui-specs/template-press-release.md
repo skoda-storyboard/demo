@@ -122,8 +122,11 @@ All values `getComputedStyle` on the Superb release, cited `(selector · viewpor
 
 ## 8. EDS target
 
-- DA `Metadata`: `template=press-release`, plus `model`, `bodywork`, `category`, `date`. `body.media-room`
-  → MR header/footer variant selection.
+- DA `Metadata`: `template=press_release` (underscore — the canonical enum value in
+  `SKODA-METADATA-SCHEMA.md` §template and the importer's `TEMPLATE_SIGNALS`; the earlier
+  `press-release` hyphen form here and in SKODA-607 is superseded — the import pipeline emits the
+  underscore form, matching the source `body.single-press_release` CPT class), plus `model`,
+  `bodywork`, `category`, `date`. `body.media-room` → MR header/footer variant selection.
 - Section model: one main section (title + primary rich content) + one `aside` section (secondary widgets)
   + one full-width related-media section (`Style: dark, full-width`).
 - Reuse: story rich-text decoration **minus the hero**, plus `downloads` + `tags` + `media-cart` +

@@ -96,6 +96,12 @@
      alone is too weak on light photos). Ramps from opaque-ish at the base to clear ~55% up. */
   --scrim-text: linear-gradient(0deg, rgb(0 0 0 / 70%), rgb(0 0 0 / 40%) 25%, transparent 55%);
 
+  /* card-teaser metadata + overlay typography (source .entry-published / overlay text) */
+  --card-meta-font-size: 11px;
+  --card-meta-line-height: 1;
+  --card-meta-letter-spacing: 0.1em;
+  --card-overlay-text-shadow: 0 1px 1px rgb(0 0 0 / 50%);
+
   /* tag pill (SKODA-205) — measured from source a.label; radius/padding/font/gap have no
      existing token. The rounded chip variant reuses the shared --pill-radius (50px, defined
      above) that cards/load-more also use — do not redefine it here (was 2em; dropped on the
@@ -115,6 +121,13 @@
   /* header dropdown geometry + small utility font (SKODA-301) */
   --dropdown-radius: 4px;
   --body-font-size-2xs: 12px;
+
+  /* footer (SKODA-304) — measured from source .footer-content / .social / app badges */
+  --footer-padding-y: 4rem;
+  --social-icon-size: 40px;
+  --social-icon-bg: var(--skoda-black);
+  --app-badge-w: 135px;
+  --app-badge-h: 40px;
 
   /* breakpoint tokens — for JS / container-query reuse ONLY. CSS custom properties cannot be
      used inside @media conditions, so the literals 768/992/1080 below remain the source of
