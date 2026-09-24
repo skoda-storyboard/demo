@@ -42,9 +42,10 @@
  *                                       → Gallery (in-body image set). Corpus uses both.
  *   sow-slider                 1.5%  → Gallery block (image slider)
  *   skoda-quote                1.1%  → <blockquote>
- *   skoda-captioned-image      0.7%  → <figure> + <figcaption>
+ *   skoda-captioned-image      0.7%  → <figure> + <figcaption> (lifts the native figure)
  *   sow-button                 0.3%  → EDS button (<p><strong><a>>)
- *   skoda-image-box            0.2%  → <figure> / image
+ *   skoda-image-box            0.2%  → infobox/definition callout: text (+ image) as
+ *                                       default content — NOT a plain image (D2)
  *   sow-image                  0.1%  → image (lifted to direct child)
  *   ys-milestones              0.1%  → dropped + logged (timeline; M2/omit)
  *   ys-embed-share             0.1%  → dropped (social share chrome, not body)
@@ -198,13 +199,19 @@ function quoteNodes(panel, document) {
 }
 
 function figureNodes(panel, document) {
+  // skoda-captioned-image: the widget usually contains a NATIVE <figure class="figure">
+  // (sometimes with a <figcaption>). Lift the existing figure and normalise it rather
+  // than building a fresh one, so a real caption is never lost (D2, 2026-09-24). The
+  // caption source order matches gallery.js: native figcaption → data-caption → alt.
   const img = panel.querySelector('img');
   if (!img) return [];
+  const srcFig = panel.querySelector('figure');
   const fig = document.createElement('figure');
   fig.appendChild(img);
-  const capEl = panel.querySelector('[data-caption]') || img;
-  const caption = (capEl.getAttribute && capEl.getAttribute('data-caption'))
-    || (panel.querySelector('figcaption') && panel.querySelector('figcaption').textContent)
+  const nativeCap = srcFig && srcFig.querySelector('figcaption');
+  const caption = (nativeCap && (nativeCap.textContent || '').trim())
+    || img.getAttribute('data-caption')
+    || (panel.querySelector('[data-caption]') && panel.querySelector('[data-caption]').getAttribute('data-caption'))
     || '';
   if ((caption || '').trim()) {
     const fc = document.createElement('figcaption');
@@ -212,6 +219,34 @@ function figureNodes(panel, document) {
     fig.appendChild(fc);
   }
   return [fig];
+}
+
+// skoda-image-box is an INFObox / definition callout (a label + explanatory text,
+// sometimes with an image), NOT a plain image (D2, 2026-09-24). Source shape:
+// `<abbr class="infobox"><abbr class="infobox-content">…rich text…</abbr></abbr>`,
+// occasionally alongside an <img>. Preserve BOTH the text and (if present) the image
+// as default content — keep the text as its own paragraph(s) so nothing is dropped.
+function infoboxNodes(panel, document) {
+  const out = [];
+  const img = panel.querySelector('img');
+  if (img) out.push(img);
+  // The definition body: the infobox-content, else the widget's own text.
+  const body = panel.querySelector('.infobox-content, [class*="infobox"]') || panel;
+  // Prefer real child elements (p/ul/etc.); fall back to a single paragraph of the text.
+  const rich = [...body.children].filter((n) => n.nodeType === 1
+    && !/^(abbr)$/i.test(n.tagName) // skip the wrapping <abbr>, recurse into its content instead
+    && (n.textContent || '').trim());
+  if (rich.length) {
+    rich.forEach((n) => out.push(n));
+  } else {
+    const text = (body.textContent || '').replace(/\s+/g, ' ').trim();
+    if (text) {
+      const p = document.createElement('p');
+      p.textContent = text;
+      out.push(p);
+    }
+  }
+  return out;
 }
 
 function imageNodes(panel, document) {
@@ -267,8 +302,8 @@ function emitWidget(panel, document, out, stats) {
     case 'carousel': cells = carouselCells(panel, document); break;
     case 'slider': cells = galleryCells(panel, document); break;
     case 'quote': nodes = quoteNodes(panel, document); break;
-    case 'captioned-image':
-    case 'image-box': nodes = figureNodes(panel, document); break;
+    case 'captioned-image': nodes = figureNodes(panel, document); break;
+    case 'image-box': nodes = infoboxNodes(panel, document); break;
     case 'image': nodes = imageNodes(panel, document); break;
     case 'button': nodes = buttonNodes(panel, document); break;
     default:

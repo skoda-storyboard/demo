@@ -167,16 +167,35 @@ var CustomImportScript = (() => {
   function figureNodes(panel, document2) {
     const img = panel.querySelector("img");
     if (!img) return [];
+    const srcFig = panel.querySelector("figure");
     const fig = document2.createElement("figure");
     fig.appendChild(img);
-    const capEl = panel.querySelector("[data-caption]") || img;
-    const caption = capEl.getAttribute && capEl.getAttribute("data-caption") || panel.querySelector("figcaption") && panel.querySelector("figcaption").textContent || "";
+    const nativeCap = srcFig && srcFig.querySelector("figcaption");
+    const caption = nativeCap && (nativeCap.textContent || "").trim() || img.getAttribute("data-caption") || panel.querySelector("[data-caption]") && panel.querySelector("[data-caption]").getAttribute("data-caption") || "";
     if ((caption || "").trim()) {
       const fc = document2.createElement("figcaption");
       fc.textContent = caption.trim();
       fig.appendChild(fc);
     }
     return [fig];
+  }
+  function infoboxNodes(panel, document2) {
+    const out = [];
+    const img = panel.querySelector("img");
+    if (img) out.push(img);
+    const body = panel.querySelector('.infobox-content, [class*="infobox"]') || panel;
+    const rich = [...body.children].filter((n) => n.nodeType === 1 && !/^(abbr)$/i.test(n.tagName) && (n.textContent || "").trim());
+    if (rich.length) {
+      rich.forEach((n) => out.push(n));
+    } else {
+      const text = (body.textContent || "").replace(/\s+/g, " ").trim();
+      if (text) {
+        const p = document2.createElement("p");
+        p.textContent = text;
+        out.push(p);
+      }
+    }
+    return out;
   }
   function imageNodes(panel, document2) {
     const img = panel.querySelector("img");
@@ -228,8 +247,10 @@ var CustomImportScript = (() => {
         nodes = quoteNodes(panel, document2);
         break;
       case "captioned-image":
-      case "image-box":
         nodes = figureNodes(panel, document2);
+        break;
+      case "image-box":
+        nodes = infoboxNodes(panel, document2);
         break;
       case "image":
         nodes = imageNodes(panel, document2);

@@ -50,7 +50,7 @@ panel-grid                         ← whole layout
 | `skoda-quote` | 1.1% | **pull-quote → `<blockquote>` / small quote block** |
 | `skoda-captioned-image` *(census, 45 stories)* | 0.7% | **image + caption → figure / image block** |
 | `sow-button` (+ `sow-button-wire` variants) *(census)* | 0.3% | **button / CTA** (EDS button-decoration: `<p><strong><a>`) |
-| `skoda-image-box` *(census, 16 stories)* | 0.2% | **image / small card block** |
+| `skoda-image-box` *(census, 16 stories)* | 0.2% | **infobox / definition callout → text (+ image) as default content** (CORRECTED 2026-09-24: it is an `<abbr class="infobox">` glossary box, NOT a plain image; see coverage review D2) |
 | `sow-image` *(census)* | 0.1% | **image** (lift out of `<p>`) |
 | `ys-milestones` *(census, 18 stories)* | 0.1% | **timeline → new block, or omit for demo** |
 | `ys-embed-share` *(census, 12 stories)* | 0.1% | **social-share widget → chrome/omit** (not body content) |

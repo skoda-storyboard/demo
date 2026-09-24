@@ -116,6 +116,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-810 | Company/Page family (board/annual-reports/logo/app/contacts) | E08 | B | 8 | 3–5 | 6–10 | 202,304,502,601,602,803,813 | 🟢 M2 (D18); 5 net-new blocks on the 813 shell |
 | SKODA-813 | Generic Page base shell (STO page + MR media-room-page) | E08 | B | 2 | 0.5–1 | 1–2 | 202,801 | 🟢 M2; shared shell under 810; spec `ui-specs/template-page-base.md` |
 | SKODA-814 | SiteOrigin body flatten contract (1,614 pages) | E08 | B | 5 | 2–3 | 4–6 | 601,203,204 | 🟢 M2; feeds 801/208/813; spec `ui-specs/siteorigin-body.md` (recount §3/§6) |
+| SKODA-815 | Story flatten: `ys-milestones` timeline (content-loss fix) | E08 | B | 3 | 1–2 | 3–5 | 801 | 🟠 M2; from 801 coverage review (D1) — timeline silently dropped in ~9 stories |
 | SKODA-809 | Roles & permissions (7 editorial groups) | E08 | B | 5 | 2–3 | 4–8 | 101,602 | 🟠 gap G2 (§6.4); blocked on D15 RACI |
 | SKODA-811 | Content embargo (staged-publish, group access) | E08 | B | 3 | 1–2 | 2–4 | 602,809 | 🟢 gap G3 (§6.5/D9) approach agreed; M1-Stretch only *ungated* (group-gate needs 809/M2/D15, F4) |
 | SKODA-812 | Auditability (author change-history) | E08 | B | 2 | 0.5–1 | 1–3 | 101,602,809 | 🟡 gap G5 (§6.7); validate DA/EW capability |

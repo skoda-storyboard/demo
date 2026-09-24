@@ -208,6 +208,63 @@ test('skoda-captioned-image → figure carrying data-caption + alt', { skip: dom
   assert.equal(fig.querySelector('figcaption').textContent, 'A caption');
 });
 
+// D2: captioned-image with a NATIVE <figure>/<figcaption> (the real source shape) —
+// the caption must be lifted from the native figcaption, not only from data-caption.
+test('skoda-captioned-image lifts a native figcaption', { skip: domSkip }, () => {
+  const d = domDoc(`
+    <div class="entry-content"><div class="panel-layout">
+      <div class="panel-grid"><div class="panel-grid-cell">
+        <div class="so-panel widget widget_skoda-captioned-image">
+          <div class="so-widget-skoda-captioned-image">
+            <figure class="figure"><img src="c.jpg" alt="Alt"><figcaption>Native caption text</figcaption></figure>
+          </div>
+        </div>
+      </div></div>
+    </div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  const fig = content.querySelector('figure');
+  assert.ok(fig, 'figure emitted');
+  assert.equal(fig.querySelector('figcaption').textContent, 'Native caption text');
+});
+
+// D2: skoda-image-box is an infobox/definition callout — its TEXT must survive (it was
+// dropped when routed through the image path, which requires an <img> that may be absent).
+test('skoda-image-box (infobox, no image) keeps its definition text', { skip: domSkip }, () => {
+  const d = domDoc(`
+    <div class="entry-content"><div class="panel-layout">
+      <div class="panel-grid"><div class="panel-grid-cell">
+        <div class="so-panel widget widget_skoda-image-box">
+          <div class="so-widget-skoda-image-box">
+            <abbr class="infobox"><abbr class="infobox-content"><p><strong>Up-cycling</strong> - transformation of waste into value.</p></abbr></abbr>
+          </div>
+        </div>
+      </div></div>
+    </div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  assert.match(content.textContent, /Up-cycling/, 'infobox definition text preserved');
+  assert.match(content.textContent, /transformation of waste/, 'infobox body preserved');
+});
+
+// D2: skoda-image-box WITH an image keeps both the image and the text.
+test('skoda-image-box with an image keeps both image and text', { skip: domSkip }, () => {
+  const d = domDoc(`
+    <div class="entry-content"><div class="panel-layout">
+      <div class="panel-grid"><div class="panel-grid-cell">
+        <div class="so-panel widget widget_skoda-image-box">
+          <div class="so-widget-skoda-image-box">
+            <abbr class="infobox"><abbr class="infobox-content"><img src="d.jpg" alt="D"><p>Recharging - four charging options.</p></abbr></abbr>
+          </div>
+        </div>
+      </div></div>
+    </div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  assert.ok(content.querySelector('img[src="d.jpg"]'), 'image kept');
+  assert.match(content.textContent, /Recharging/, 'text kept');
+});
+
 // ---- deferred widgets skipped + never crash -------------------------------
 test('deferred interactive widgets are skipped, no crash, no output', { skip: domSkip }, () => {
   const d = domDoc(`
