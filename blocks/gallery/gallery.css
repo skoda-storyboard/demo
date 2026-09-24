@@ -1,0 +1,554 @@
+/* stylelint-disable no-descending-specificity --
+ * Rules are grouped by component region (grid -> overlay -> stage -> controls)
+ * and by state. That grouping orders a couple of higher-specificity state
+ * rules (e.g. .gallery-thumb:hover img) before lower-specificity plain img
+ * rules in a different region; the cascade is correct (different elements).
+ * Reordering purely to satisfy this stylistic rule would fragment the
+ * component, so it is disabled for this file only. */
+
+/* ==========================================================================
+ * Gallery block + lightbox — SKODA-203
+ * Spec: docs/ui-specs/gallery-lightbox.md. On-page: a large MAIN image + a
+ * thumbnail list beside it (source sb-gallery form); clicking the main image or
+ * any thumbnail opens ONE accessible full-screen lightbox (retires the source
+ * colorbox/sb-gallery split). Tokens-only; mobile-first.
+ * ========================================================================== */
+
+/* --- On-page layout: main image + thumbnail rail -------------------------- */
+.gallery .gallery-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+}
+
+/* each column stacks its heading above its content */
+.gallery .gallery-main-col,
+.gallery .gallery-thumbs-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+  min-width: 0;
+}
+
+/* dynamic heading above the main image (the active image's title) */
+.gallery .gallery-main-heading {
+  margin: 0;
+  font-size: var(--heading-font-size-m);
+  line-height: 1.2;
+}
+
+/* "Images" heading above the thumbnail rail */
+.gallery .gallery-thumbs-heading {
+  margin: 0;
+  color: var(--gallery-heading-color);
+  font-size: var(--heading-font-size-xs); /* 16px */
+  line-height: 1.2;
+}
+
+/* MAIN image (large, click to open the lightbox) */
+.gallery .gallery-main {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: var(--card-radius);
+  padding: 0;
+  background: none;
+
+  /* shadow on the button so it isn't clipped by the overflow used for hover-zoom */
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.gallery .gallery-main picture,
+.gallery .gallery-main img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--card-radius);
+  object-fit: cover;
+}
+
+.gallery .gallery-main img {
+  transition: transform 0.5s ease;
+}
+
+.gallery .gallery-main:hover img {
+  transform: scale(1.02);
+}
+
+/* loading placeholder: neutral fill + centred spinner while the main rendition
+   downloads (JS toggles .is-loading); shares the lightbox spinner animation */
+.gallery .gallery-main.is-loading {
+  background: var(--skoda-grey-100);
+}
+
+.gallery .gallery-main.is-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgb(0 0 0 / 15%);
+  border-top-color: var(--gallery-accent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: gallery-spin 0.8s linear infinite;
+}
+
+/* THUMBNAIL rail — column count set by JS (--thumb-cols) from image count */
+.gallery .gallery-thumbs {
+  display: grid;
+  grid-template-columns: repeat(var(--thumb-cols, 4), 1fr);
+  gap: var(--spacing-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gallery .gallery-thumb-item {
+  margin: 0;
+}
+
+.gallery .gallery-thumb {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: var(--card-radius);
+  padding: 0;
+  background: none;
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.gallery .gallery-thumb picture,
+.gallery .gallery-thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--card-radius);
+  object-fit: cover;
+}
+
+.gallery .gallery-thumb img {
+  transition: transform 0.5s ease;
+}
+
+.gallery .gallery-thumb:hover img {
+  transform: scale(1.02);
+}
+
+/* the thumbnail matching the current main image — inset accent ring that
+   follows the rounded corners, layered over the card shadow */
+.gallery .gallery-thumb[aria-current='true'] {
+  box-shadow: inset 0 0 0 2px var(--gallery-accent), var(--card-shadow);
+}
+
+.gallery .gallery-main:focus-visible,
+.gallery .gallery-thumb:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+/* authored caption content is held off-canvas and only shown in the lightbox */
+.gallery .gallery-caption-source {
+  display: none;
+}
+
+/* desktop: main image left, thumbnail rail beside it (matches live sb-gallery) */
+@media (width >= 768px) {
+  .gallery .gallery-layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--spacing-m);
+  }
+
+  .gallery .gallery-main-col {
+    flex: 1 1 auto;
+  }
+
+  .gallery .gallery-thumbs-col {
+    flex: 0 0 clamp(180px, 30%, 320px);
+  }
+}
+
+/* ==========================================================================
+ * Lightbox overlay (one, all viewports) — spec §3/§4
+ * ========================================================================== */
+body.gallery-lightbox-open {
+  overflow: hidden; /* scroll-lock behind the modal */
+}
+
+.gallery .gallery-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: grid;
+  grid-template-rows: 1fr;
+  width: 100%;
+  height: 100%;
+  background: var(--gallery-backdrop);
+  color: var(--skoda-white);
+  user-select: none;
+}
+
+.gallery .gallery-overlay[hidden] {
+  display: none;
+}
+
+/* open effect: the dark backdrop fades in while the content expands up to full
+   screen (mirrors the source colorbox "elastic" resize, ~300ms). */
+@keyframes gallery-backdrop-in {
+  from { background: rgb(22 23 24 / 0%); }
+  to { background: var(--gallery-backdrop); }
+}
+
+@keyframes gallery-content-in {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.gallery .gallery-overlay:not([hidden]) {
+  animation: gallery-backdrop-in 0.3s ease both;
+}
+
+.gallery .gallery-overlay:not([hidden]) .gallery-lightbox-stage {
+  animation: gallery-content-in 0.3s ease both;
+}
+
+/* close bar: floats at the top-right corner (over the detail-panel column),
+   so the stage gets full height — matches the source #cboxClose placement */
+.gallery .gallery-lightbox-top {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--spacing-s) var(--spacing-m);
+}
+
+.gallery .gallery-lightbox-close {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--skoda-white);
+  cursor: pointer;
+}
+
+.gallery .gallery-lightbox-close::before {
+  content: '✕';
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* stage: contained image + caption. Mobile-first: scrollable and top-aligned so
+   dynamic (variable-length) detail panels are always reachable; extra bottom
+   padding clears the fixed bottom control cluster. */
+.gallery .gallery-lightbox-stage {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 0;
+
+  /* top padding clears the floating close ✕; bottom clears the fixed controls */
+  padding: var(--spacing-xxl) var(--spacing-m) calc(var(--spacing-xxl) + var(--spacing-m));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.gallery .gallery-lightbox-stage[hidden] {
+  display: none;
+}
+
+/* mobile-first: image on top, caption/detail panel below (stacked). Height is
+   content-driven (not locked to the stage) so the panel can grow and scroll. */
+.gallery .gallery-lightbox-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-s);
+  width: 100%;
+  margin: 0;
+}
+
+/* image frame: holds the image + a centred loading spinner placeholder */
+.gallery .gallery-lightbox-image-frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+
+  /* mobile: cap the image height to most of the viewport so a tall/portrait
+     photo leaves room for the panel; desktop overrides this to fill the row */
+  max-height: 70vh;
+}
+
+/* loading placeholder: a spinner shown while the full-size rendition downloads
+   (JS toggles .is-loading), mirroring the source colorbox loading graphic */
+.gallery .gallery-lightbox-image-frame.is-loading::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgb(255 255 255 / 30%);
+  border-top-color: var(--gallery-accent);
+  border-radius: 50%;
+  animation: gallery-spin 0.8s linear infinite;
+}
+
+@keyframes gallery-spin {
+  to { transform: rotate(360deg); }
+}
+
+.gallery .gallery-lightbox-image {
+  min-height: 0;
+
+  /* mobile: size by natural ratio, capped to the frame (no forced 100% height,
+     which would collapse when the frame is content-sized). Desktop fills. */
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+
+  /* fade + zoom in once the rendition has actually loaded (JS toggles .is-loaded);
+     driving it off load — not the open animation — guarantees the image is
+     visible while it animates, instead of popping in after. */
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.gallery .gallery-lightbox-image.is-loaded {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* caption/detail panel starts hidden and fades in alongside the image.
+   Live spec: SKODA Next 16px / line-height 1.2, near-white #fefefe. */
+.gallery .gallery-lightbox-caption {
+  max-width: min(90vw, var(--content-max-width));
+  color: rgb(254 254 254);
+  font-size: var(--body-font-size-m);
+  line-height: 1.2;
+  text-align: center;
+  user-select: text;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gallery .gallery-lightbox-image-frame:not(.is-loading) ~ .gallery-lightbox-caption {
+  opacity: 1;
+}
+
+/* paragraph rhythm inside the panel: 20px gaps, none after the last block */
+.gallery .gallery-lightbox-caption p {
+  margin: 0 0 20px;
+}
+
+.gallery .gallery-lightbox-caption p:last-child {
+  margin-bottom: 0;
+}
+
+.gallery .gallery-lightbox-caption a:not(.gallery-lightbox-action) {
+  color: var(--gallery-accent);
+}
+
+/* detail-panel action buttons: white filled discs with dark icons, right-aligned
+   (40×40 circles, no hover state) */
+.gallery .gallery-lightbox-actions {
+  display: flex;
+  gap: var(--spacing-s);
+  justify-content: flex-end;
+  margin: 20px 0 var(--spacing-m);
+}
+
+.gallery .gallery-lightbox-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background: var(--skoda-white);
+  color: var(--skoda-ink);
+  cursor: pointer;
+}
+
+.gallery .gallery-lightbox-action svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* tag chips (live Media-Room pills): grey uppercase, 11px/600, 1.1px tracking */
+.gallery .gallery-lightbox-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  justify-content: center; /* mobile: centred with the rest of the panel */
+}
+
+.gallery .gallery-lightbox-tag {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 2px;
+  background: var(--skoda-grey-500);
+  color: var(--skoda-white);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+
+/* desktop: 2-column detail layout — image left, caption/detail panel right
+   (matches the live MR image-detail lightbox) */
+@media (width >= 768px) {
+  /* desktop: fixed-height row. The image column runs flush to the left edge
+     (x=0); a ~32px right inset holds the detail panel off the right edge —
+     matches the live Peaq lightbox geometry (image 992 · gap 16 · panel 240 ·
+     inset 32 = 1280 at 1280w). */
+  .gallery .gallery-lightbox-stage {
+    align-items: stretch;
+    padding: 0 calc(var(--spacing-m) * 2) 0 0;
+    overflow: hidden;
+  }
+
+  .gallery .gallery-lightbox-figure {
+    flex-direction: row;
+    align-items: stretch;
+    gap: var(--spacing-m); /* ~16px between image and panel (live) */
+    height: 100%;
+  }
+
+  .gallery .gallery-lightbox-image-frame {
+    flex: 1 1 auto;
+    align-self: stretch;
+    align-items: center;      /* centre the contained image in the row */
+    justify-content: center;
+    max-height: none; /* fill the row (mobile caps to 70vh) */
+  }
+
+  /* show the FULL image (contain, never cropped) per spec §9 / source
+     `img{max-height:100%; width:auto}`: size by the shorter axis and leave
+     side or vertical breathing room rather than filling the column. */
+  .gallery .gallery-lightbox-image {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .gallery .gallery-lightbox-caption {
+    flex: 0 0 240px; /* live detail-panel width */
+    max-width: none;
+    align-self: stretch;
+
+    /* start the panel content below the floating close-icon row */
+    padding-top: var(--spacing-xxl);
+    text-align: left;
+    overflow-y: auto;
+  }
+
+  /* left-align the tag chips with the panel text on desktop */
+  .gallery .gallery-lightbox-tags {
+    justify-content: flex-start;
+  }
+}
+
+/* bottom-right control cluster: counter "N / total" · ‹ · › in a row, separated
+   by thin vertical rules — matches the live colorbox nav (24px text, #606060
+   dividers, 18px padding, no button chrome) */
+.gallery .gallery-lightbox-controls {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: stretch;
+}
+
+.gallery .gallery-lightbox-controls[hidden] {
+  display: none;
+}
+
+/* counter: 24px, near-white, generous padding to match the live cell */
+.gallery .gallery-lightbox-count {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 18px;
+  font-size: 24px;
+  line-height: 1;
+  color: rgb(254 254 254);
+}
+
+.gallery .gallery-lightbox-prev,
+.gallery .gallery-lightbox-next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-left: 1px solid var(--gallery-nav-divider);
+  border-radius: 0;
+  padding: 18px;
+  background: transparent;
+  color: var(--skoda-white);
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* larger, bolder chevrons so the arrows read at the live nav size (the thin
+   ‹ › punctuation glyphs render much smaller than their font-size) */
+.gallery .gallery-lightbox-prev::before,
+.gallery .gallery-lightbox-next::before {
+  font-size: 40px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.gallery .gallery-lightbox-prev::before {
+  content: '‹';
+}
+
+.gallery .gallery-lightbox-next::before {
+  content: '›';
+}
+
+/* focus-visible on every control (source had outline:0 — a11y fix) */
+.gallery .gallery-overlay button:focus-visible {
+  outline: 2px solid var(--skoda-white);
+  outline-offset: 2px;
+}
+
+/* respect reduced motion — no transitions and no open/expand animation */
+.gallery .gallery-overlay.reduced-motion .gallery-lightbox-image,
+.gallery .gallery-overlay.reduced-motion .gallery-lightbox-caption,
+.gallery .reduced-motion .gallery-thumb img {
+  transition: none;
+}
+
+.gallery .gallery-overlay.reduced-motion,
+.gallery .gallery-overlay.reduced-motion .gallery-lightbox-stage,
+.gallery .gallery-overlay.reduced-motion .gallery-lightbox-image-frame.is-loading::after {
+  animation: none;
+}
