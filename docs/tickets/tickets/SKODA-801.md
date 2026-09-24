@@ -52,7 +52,7 @@ panel-grid                         ← whole layout
 | `sow-button` (+ `sow-button-wire` variants) *(census)* | 0.3% | **button / CTA** (EDS button-decoration: `<p><strong><a>`) |
 | `skoda-image-box` *(census, 16 stories)* | 0.2% | **infobox / definition callout → text (+ image) as default content** (CORRECTED 2026-09-24: it is an `<abbr class="infobox">` glossary box, NOT a plain image; see coverage review D2) |
 | `sow-image` *(census)* | 0.1% | **image** (lift out of `<p>`) |
-| `ys-milestones` *(census, 18 stories)* | 0.1% | **timeline → new block, or omit for demo** |
+| `ys-milestones` *(census, 18 stories)* | 0.1% | **timeline flattened to content** (per entry `<h3>` "YEAR — Title" + image; SKODA-815/D1, shipped 2026-09-24). Optional dedicated timeline block = M2. |
 | `ys-embed-share` *(census, 12 stories)* | 0.1% | **social-share widget → chrome/omit** (not body content) |
 | `iframe-embed` *(census)* | 0.01% | **embed block** (preserve `dnt=1`) |
 | `highlights` / `ys-so-widget-highlights` *(census)* | 0.02% | small block / omit |

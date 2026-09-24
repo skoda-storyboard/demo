@@ -47,7 +47,8 @@
  *   skoda-image-box            0.2%  → infobox/definition callout: text (+ image) as
  *                                       default content — NOT a plain image (D2)
  *   sow-image                  0.1%  → image (lifted to direct child)
- *   ys-milestones              0.1%  → dropped + logged (timeline; M2/omit)
+ *   ys-milestones              0.1%  → timeline flattened to content: per entry an
+ *                                       <h3> "YEAR — Title" + its image (SKODA-815/D1)
  *   ys-embed-share             0.1%  → dropped (social share chrome, not body)
  *   iframe-embed              0.01%  → embed block (preserve dnt=1)
  *   highlights                0.02%  → dropped + logged
@@ -97,7 +98,7 @@ const WIDGET_KINDS = [
 ];
 
 const DEFERRED = new Set(['defer-charge-map', 'defer-calculator', 'defer-nested-builder']);
-const DROPPED = new Set(['offset', 'newsletter', 'share', 'milestones', 'highlights']);
+const DROPPED = new Set(['offset', 'newsletter', 'share', 'highlights']);
 
 function classifyWidget(panel) {
   const inner = panel.querySelector('[class*="so-widget-"]');
@@ -255,6 +256,40 @@ function imageNodes(panel, document) {
   return img ? [img] : [];
 }
 
+// ys-milestones = a dated timeline (SKODA-815 / D1). Source shape:
+// `section.milestones > ul > li` where each <li> holds `.year`, `.title` (rich text)
+// and an `<img>`. Reduced-fidelity flatten (M1): each milestone → an <h3> "YEAR — Title"
+// heading + its image lifted to a direct child (EDS wraps it in <picture>), in order.
+// No content is dropped; the source's timeline visual is not reproduced (see SKODA-815
+// for the optional dedicated timeline block). Falls back gracefully if the DOM differs.
+function milestonesNodes(panel, document) {
+  const items = [...panel.querySelectorAll('li')].filter((li) => li.querySelector('.year, .title, img'));
+  const out = [];
+  items.forEach((li) => {
+    const year = (li.querySelector('.year')?.textContent || '').replace(/\s+/g, ' ').trim();
+    const title = (li.querySelector('.title')?.textContent || '').replace(/\s+/g, ' ').trim();
+    if (year || title) {
+      const h = document.createElement('h3');
+      h.textContent = [year, title].filter(Boolean).join(' — ');
+      out.push(h);
+    }
+    const img = li.querySelector('img');
+    if (img) out.push(img);
+  });
+  // Defensive: unexpected DOM (no <li> entries) → salvage any images + text so nothing
+  // is silently lost, rather than emitting an empty block.
+  if (!out.length) {
+    panel.querySelectorAll('img').forEach((img) => out.push(img));
+    const text = (panel.textContent || '').replace(/\s+/g, ' ').trim();
+    if (text && !panel.querySelector('img')) {
+      const p = document.createElement('p');
+      p.textContent = text;
+      out.push(p);
+    }
+  }
+  return out;
+}
+
 function buttonNodes(panel, document) {
   const a = panel.querySelector('a[href]');
   if (!a) return [];
@@ -306,6 +341,7 @@ function emitWidget(panel, document, out, stats) {
     case 'image-box': nodes = infoboxNodes(panel, document); break;
     case 'image': nodes = imageNodes(panel, document); break;
     case 'button': nodes = buttonNodes(panel, document); break;
+    case 'milestones': nodes = milestonesNodes(panel, document); break;
     default:
       // unknown: try to salvage rich text, else skip + log.
       nodes = editorNodes(panel, document);

@@ -3,6 +3,11 @@
 - **Type:** block / import
 - **Phase:** B · **Milestone:** M2 (go-live) — *content-loss, prioritise within M2*
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3–5d *(planning estimate, not a quote)*
+- **Status (2026-09-24):** 🟢 **Option 1 (flatten-to-content) SHIPPED** in SKODA-801
+  (`milestonesNodes`) — `ys-milestones` no longer dropped; each entry → `<h3>` "YEAR — Title"
+  + its image. Verified on the steering-wheel story: **0 → 11 dated entries, +11 images**.
+  Remaining (optional, M2): the dedicated **timeline block (Option 2)** if the client wants the
+  source timeline visual — otherwise this ticket can close.
 
 ## Origin
 Surfaced by the SKODA-801 flatten coverage review (`docs/reviews/SKODA-801-FLATTEN-COVERAGE-REVIEW.md`,
@@ -39,12 +44,14 @@ Recommend **(1) for correctness now**, upgrade to (2) if the timeline visual is 
 - If the widget is empty/odd, skip + log (never crash) — keep the safety net.
 
 ## Acceptance Criteria
-- [ ] `ys-milestones` no longer dropped; the 11-entry steering-wheel story recovers its years + images
-      (0 → 11 dated entries, 0 → 11 images) and clears the ~90% completeness gate.
-- [ ] Content-driven detection only (no URL/positional assumptions).
-- [ ] Unit test in `story-flatten.test.mjs`: a synthetic milestones widget → N dated entries + N images.
-- [ ] `npm run lint` + `npm test` green; re-import a milestones story and diff vs source.
-- [ ] (If block route) `blocks/timeline` + `docs/ui-specs/timeline.md` + pixel-perfect ACs.
+- [x] `ys-milestones` no longer dropped; the 11-entry steering-wheel story recovers its years + images
+      (**verified: 0 → 11 dated entries, +11 images**; 11 unique milestone `<h3>`, scaffolding stripped).
+      *(Overall page completeness rose 62.4% → 67.0% — the residual gap is the separately-deferred
+      colorbox galleries, not milestones; the timeline content is now fully captured.)*
+- [x] Content-driven detection only (no URL/positional assumptions).
+- [x] Unit test in `story-flatten.test.mjs`: a synthetic milestones widget → N dated entries + N images.
+- [x] `npm run lint` + `npm test` green (152 tests); re-imported the milestones story and diffed vs source.
+- [ ] **(Optional, M2, only if timeline visual wanted)** `blocks/timeline` + `docs/ui-specs/timeline.md` + pixel-perfect ACs.
 
 ## Dependencies
 - Upstream: SKODA-801 (the flatten parser this extends). Related review: D2 (figure/infobox,

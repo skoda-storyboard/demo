@@ -34,7 +34,13 @@ dropped or de-semanticised without a warning.
 
 ## B. Things MISSED / defective (found by this review) ❌
 
-### D1 — `ys-milestones` timeline is silently dropped (real content loss)
+### D1 — `ys-milestones` timeline is silently dropped (real content loss) — **FIXED 2026-09-24 (SKODA-815)**
+> **Resolution:** removed `ys-milestones` from the `DROPPED` set; added `milestonesNodes` —
+> each `section.milestones > ul > li` entry flattens to an `<h3>` "YEAR — Title" + its image
+> (order preserved, scaffolding stripped). Verified on the steering-wheel story: **0 → 11 dated
+> entries, +11 images**, 11 unique milestone headings. Unit test added. Option-2 dedicated
+> timeline block remains optional M2 (SKODA-815).
+
 - **Where:** steering-wheel-decades-of-changes (`ys-milestones`).
 - **Source:** 11 dated milestone entries + **11 images** (1905, 1925, 1932, 1940, 1952…).
 - **Output:** **0 of those years, 0 of those 11 images.** Story scored 62.4% completeness.
@@ -112,7 +118,8 @@ The census's **208-widget outlier** URL
 293-grid unit test covers it). Need to re-pick a live large-tree story from the dataset for that AC.
 
 ## Recommended follow-ups (tickets)
-1. **D1 timeline** — new `ys-milestones` mapping (+ block or flatten-to-content). *Content loss; prioritise.* → **SKODA-815** (created 2026-09-24).
+1. ~~**D1 timeline**~~ — **FIXED in SKODA-801** (SKODA-815, 2026-09-24): `ys-milestones` flattens to
+   content (per entry `<h3>` "YEAR — Title" + image); 0 → 11 entries recovered. Optional M2: dedicated timeline block.
 2. ~~**D2 figure/infobox**~~ — **FIXED in SKODA-801** (2026-09-24): `figureNodes` lifts the native
    figure/figcaption; `skoda-image-box` → new `infoboxNodes` (text + optional image). 3 unit tests.
 3. **Re-select a live large-tree story** to satisfy the 208-widget AC (the census URL is dead).

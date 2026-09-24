@@ -265,6 +265,31 @@ test('skoda-image-box with an image keeps both image and text', { skip: domSkip 
   assert.match(content.textContent, /Recharging/, 'text kept');
 });
 
+// D1 (SKODA-815): ys-milestones is a dated timeline — its entries + images must
+// survive (previously it was in the DROPPED set → silent content loss).
+test('ys-milestones flattens each entry to an h3 + image (not dropped)', { skip: domSkip }, () => {
+  const d = domDoc(`
+    <div class="entry-content"><div class="panel-layout">
+      <div class="panel-grid"><div class="panel-grid-cell">
+        <div class="so-panel widget widget_ys-milestones">
+          <div class="so-widget-ys-milestones"><section class="milestones"><ul>
+            <li><div class="year">1905</div><div class="title">Voiturette A</div><img src="y1905.jpg"></li>
+            <li><div class="year">1925</div><div class="title">ŠKODA 110</div><img src="y1925.jpg"></li>
+            <li><div class="year">2017</div><div class="title">Octavia RS</div><img src="y2017.jpg"></li>
+          </ul></section></div>
+        </div>
+      </div></div>
+    </div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  const h3 = [...content.querySelectorAll('h3')].map((h) => h.textContent);
+  assert.equal(h3.length, 3, 'one h3 per milestone');
+  assert.match(h3[0], /1905/); assert.match(h3[0], /Voiturette A/);
+  assert.match(h3[2], /2017/);
+  assert.equal(content.querySelectorAll('img').length, 3, 'each milestone image kept');
+  assert.equal(content.querySelectorAll('.milestones, section').length, 0, 'timeline scaffolding stripped');
+});
+
 // ---- deferred widgets skipped + never crash -------------------------------
 test('deferred interactive widgets are skipped, no crash, no output', { skip: domSkip }, () => {
   const d = domDoc(`

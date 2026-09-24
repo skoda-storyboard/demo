@@ -92,7 +92,7 @@ var CustomImportScript = (() => {
     [/siteorigin-panels-builder/, "defer-nested-builder"]
   ];
   var DEFERRED = /* @__PURE__ */ new Set(["defer-charge-map", "defer-calculator", "defer-nested-builder"]);
-  var DROPPED = /* @__PURE__ */ new Set(["offset", "newsletter", "share", "milestones", "highlights"]);
+  var DROPPED = /* @__PURE__ */ new Set(["offset", "newsletter", "share", "highlights"]);
   function classifyWidget(panel) {
     const inner = panel.querySelector('[class*="so-widget-"]');
     const signal = `${panel.className || ""} ${inner && inner.className || ""}`;
@@ -201,6 +201,32 @@ var CustomImportScript = (() => {
     const img = panel.querySelector("img");
     return img ? [img] : [];
   }
+  function milestonesNodes(panel, document2) {
+    const items = [...panel.querySelectorAll("li")].filter((li) => li.querySelector(".year, .title, img"));
+    const out = [];
+    items.forEach((li) => {
+      var _a, _b;
+      const year = (((_a = li.querySelector(".year")) == null ? void 0 : _a.textContent) || "").replace(/\s+/g, " ").trim();
+      const title = (((_b = li.querySelector(".title")) == null ? void 0 : _b.textContent) || "").replace(/\s+/g, " ").trim();
+      if (year || title) {
+        const h = document2.createElement("h3");
+        h.textContent = [year, title].filter(Boolean).join(" \u2014 ");
+        out.push(h);
+      }
+      const img = li.querySelector("img");
+      if (img) out.push(img);
+    });
+    if (!out.length) {
+      panel.querySelectorAll("img").forEach((img) => out.push(img));
+      const text = (panel.textContent || "").replace(/\s+/g, " ").trim();
+      if (text && !panel.querySelector("img")) {
+        const p = document2.createElement("p");
+        p.textContent = text;
+        out.push(p);
+      }
+    }
+    return out;
+  }
   function buttonNodes(panel, document2) {
     const a = panel.querySelector("a[href]");
     if (!a) return [];
@@ -257,6 +283,9 @@ var CustomImportScript = (() => {
         break;
       case "button":
         nodes = buttonNodes(panel, document2);
+        break;
+      case "milestones":
+        nodes = milestonesNodes(panel, document2);
         break;
       default:
         nodes = editorNodes(panel, document2);
