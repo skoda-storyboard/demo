@@ -2,6 +2,7 @@
 - **Epic:** E08, Editorial at Scale
 - **Type:** block variant + import
 - **Phase:** A/B · **Milestone:** M1 (demo story fidelity)
+- **GitHub issue:** [#122](https://github.com/skoda-storyboard/demo/issues/122)
 - **Estimate:** 3 SP · AI-assisted 1d / manual 2–3d *(planning estimate, not a quote)*
 - **Status (2026-09-24):** 🔵 TODO · **Decision (2026-09-24, stakeholder):** render like the source
   (single-image slider), not as the lead-image + thumbnail gallery.

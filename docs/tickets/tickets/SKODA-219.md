@@ -1,7 +1,7 @@
 # SKODA-219, In-body story image carousel (`skoda-carousel-widget`)
 
 > **⛔ Superseded (2026-09-24) by [SKODA-819](SKODA-819.md).** The stakeholder decided to render this widget as a
-> Gallery `slider` variant, not as a `carousel` block variant. Do not create a GitHub issue for 219. The Must
+> Gallery `slider` variant, not as a `carousel` block variant. Its GitHub issue exists only for disk↔board parity and is closed as not planned (2026-09-25 sync). The Must
 > SP moves 1:1 to 819. See [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md) §15. The text below is
 > kept for its source census (21/21 in-set stories).
 
@@ -9,7 +9,7 @@
 - **Type:** block variant + importer mapping
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo)
 - **Estimate:** 3 SP · AI-assisted 1–1.5d / manual 2–3d *(planning estimate, not a quote)*
-- **GitHub issue:** *not yet created* (proposed in [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md))
+- **GitHub issue:** [#116](https://github.com/skoda-storyboard/demo/issues/116) (closed as not planned; superseded by SKODA-819 [#122](https://github.com/skoda-storyboard/demo/issues/122))
 - **Discovered in:** M1 gap review, 2026-09-24 (43-URL census)
 
 ## UI Specification

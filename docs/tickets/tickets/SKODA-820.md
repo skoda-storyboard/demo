@@ -2,6 +2,7 @@
 - **Epic:** E08, Editorial at Scale
 - **Type:** import (reuses existing blocks)
 - **Phase:** A/B · **Milestone:** M1 (demo story fidelity)
+- **GitHub issue:** [#123](https://github.com/skoda-storyboard/demo/issues/123)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
 - **Status (2026-09-24):** 🔵 TODO · **Update (late 2026-09-24):** 🟡 importer half merged in PR #113 (commit
   `e763378`: a `Style: dark` band with a curated Story Rail, plus an index-rail fallback). Open block work (≈ 1 SP):

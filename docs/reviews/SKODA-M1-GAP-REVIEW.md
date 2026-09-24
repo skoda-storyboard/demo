@@ -6,7 +6,9 @@
 everything the docs **require and don't rule out** for them.
 **Supersedes for M1 planning:** [`M1-BACKLOG-REVIEW.md`](./M1-BACKLOG-REVIEW.md) (21 Sep). That review is still valid for
 board hygiene, but it predates the 43-URL scope.
-**Status:** proposal. **No GitHub board or DA changes have been applied.** §11 lists them for review.
+**Status:** proposal. **No DA changes have been applied.** The GitHub side of §11 was applied **partially** in
+the 2026-09-25 sync (issue creation, milestone alignment for 206/405/815, body sync, Status/Priority/Estimate on
+the new items). Assignees, epic milestones and the other re-milestones (403, 216, 507) are still pending; see §11.
 
 ---
 
@@ -394,22 +396,36 @@ QA-loop fixes, then Should.
 
 ---
 
-## 11. Proposed GitHub board changes (NOT applied)
+## 11. Proposed GitHub board changes (partially applied 2026-09-25)
+
+> **Applied in the 2026-09-25 disk↔GitHub sync:**
+> - Item 1: all issues were created (numbers below). 219 was also created, for parity only, and closed as not
+>   planned (#116 → #122). 822 was created and closed as completed (#125, PR #113). 818 (#121) stays open until
+>   the #109 render check. SKODA-215 still has no ticket file on `main`, so it has no issue yet.
+> - Item 3: 405 → M2 (docs aligned). 206 docs aligned to its board milestone M2. #114 (815) had no milestone and
+>   is now M2.
+> - Item 5: the disk bodies of all 21 drifted issues were synced, which covers the listed files plus 212–214, 306,
+>   505/505a/505b, 507, 601, 707, 814 and others.
+> - Item 6: Status/Priority/Estimate are set on the new items. Existing items are unchanged.
+>
+> **Still pending (needs sign-off):** item 2 (assignees), the rest of item 3 (403, 216, 507 re-milestones, epic
+> milestones) and item 4.
 
 1. **Create issues** from the new ticket files, then add them to Project #1 with milestone M1:
-   - ~~SKODA-219~~: do **not** create; superseded by SKODA-819 (§15)
-   - [SKODA-801a](../tickets/tickets/SKODA-801a.md): P0, 1.5 SP (was 3, §15), vijay, parent #48
-   - [SKODA-608](../tickets/tickets/SKODA-608.md): P0, 3 SP, saran
-   - [SKODA-609](../tickets/tickets/SKODA-609.md): P0, 2 SP, saran (agent-executed)
-   - [SKODA-805a](../tickets/tickets/SKODA-805a.md): P0, 3 SP, extra, parent #66
-   - [SKODA-805b](../tickets/tickets/SKODA-805b.md): P2 Could, unowned
-   - [SKODA-805c](../tickets/tickets/SKODA-805c.md): P1 Should, vijay
+   - ~~SKODA-219~~ (#116, closed as not planned): superseded by SKODA-819 (§15)
+   - [SKODA-801a](../tickets/tickets/SKODA-801a.md) (#127): P0, 1.5 SP (was 3, §15), vijay, parent #48
+   - [SKODA-608](../tickets/tickets/SKODA-608.md) (#117): P0, 3 SP, saran
+   - [SKODA-609](../tickets/tickets/SKODA-609.md) (#118): P0, 2 SP, saran (agent-executed)
+   - [SKODA-805a](../tickets/tickets/SKODA-805a.md) (#128): P0, 3 SP, extra, parent #66
+   - [SKODA-805b](../tickets/tickets/SKODA-805b.md) (#129): P2 Could, unowned
+   - [SKODA-805c](../tickets/tickets/SKODA-805c.md) (#130): P1 Should, vijay
    - SKODA-215: P2 Could, unowned
-   - From §15: [SKODA-819](../tickets/tickets/SKODA-819.md) (P0, 3 SP), [816](../tickets/tickets/SKODA-816.md)
-     (P0, 0.5 SP remaining), [817](../tickets/tickets/SKODA-817.md) (P0, 1), [820](../tickets/tickets/SKODA-820.md)
-     (P0, 1), [821](../tickets/tickets/SKODA-821.md) (P0, 1), all vijay. [823](../tickets/tickets/SKODA-823.md): P2
-     Could, unowned. [818](../tickets/tickets/SKODA-818.md): create, then close when the #109 render check passes.
-     [822](../tickets/tickets/SKODA-822.md): no issue needed, done by PR #113
+   - From §15: [SKODA-819](../tickets/tickets/SKODA-819.md) (#122, P0, 3 SP), [816](../tickets/tickets/SKODA-816.md)
+     (#119, P0, 0.5 SP remaining), [817](../tickets/tickets/SKODA-817.md) (#120, P0, 1),
+     [820](../tickets/tickets/SKODA-820.md) (#123, P0, 1), [821](../tickets/tickets/SKODA-821.md) (#124, P0, 1), all
+     vijay. [823](../tickets/tickets/SKODA-823.md) (#126): P2 Could, unowned. [818](../tickets/tickets/SKODA-818.md)
+     (#121): close when the #109 render check passes. [822](../tickets/tickets/SKODA-822.md) (#125): closed, done by
+     PR #113
 2. **Assign:**
 
    | Owner | Must | Should |
@@ -561,7 +577,7 @@ The live source checks behind this section ran on 2026-09-24:
   (`/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`).
 - At 21:35, **PR #113** merged SKODA-801: the 17-widget flatten, the two-column body + aside, and the 815
   milestones flatten. The same PR carried commit `e763378`, which holds the importer halves of 816, 817, 818 and 820.
-- None of 816–823 has a GitHub issue yet.
+- GitHub issues were created in the 2026-09-25 sync: 816–823 → #119–#126 (822 closed, PR #113).
 - On `main`, all eight ticket files read 🔵 TODO. This change updates the status lines of 816, 817, 818, 820 and
   822; 819, 821 and 823 stay TODO. The state below was checked against `main` at `6af751e`.
 
@@ -580,8 +596,8 @@ The live source checks behind this section ran on 2026-09-24:
 
 ### 15.2 Dedupe and corrections
 
-- **219 → 819.** Same widget, same 3 SP. 819 already carries the source measurements. 219 is marked superseded and
-  gets no issue.
+- **219 → 819.** Same widget, same 3 SP. 819 already carries the source measurements. 219 is marked superseded; its
+  issue (#116) exists for parity only and is closed as not planned.
 - **801a shrinks from 3 to 1.5 SP.**
   - Carousel → 819.
   - Embeds → 818, already done.

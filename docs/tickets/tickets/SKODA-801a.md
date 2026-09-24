@@ -4,7 +4,7 @@
 - **Type:** import / transformer
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo)
 - **Estimate:** 1.5 SP (was 3 SP; re-scoped 2026-09-24, see below) · AI-assisted 0.5–1d / manual 1.5–2d *(planning estimate, not a quote)*
-- **Parent:** SKODA-801 (#48) · **GitHub issue:** *not yet created* (proposed in [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md))
+- **Parent:** SKODA-801 (#48) · **GitHub issue:** [#127](https://github.com/skoda-storyboard/demo/issues/127)
 - **Discovered in:** M1 gap review, 2026-09-24
 
 > **Re-scoped (2026-09-24, review §15): 3 → 1.5 SP.** PR #113 merged SKODA-801 and parts of 816–818/820, so:

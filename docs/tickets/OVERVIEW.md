@@ -34,6 +34,16 @@ New M1 tickets:
 - **Late 2026-09-24 (review §15):** SKODA-816–823 fold into M1. 819 supersedes 219 (−1 ticket, −3 SP), and 801a
   goes 3 → 1.5 SP. PR #113 shipped 822 and the importer halves of 816/817/818/820. 823 is Could. Net M1 Must is
   +2 SP. SKODA-216–218 and 306 are now mirrored on `main` (commit `55d8949`).
+- **2026-09-25, disk↔GitHub sync:**
+  - Created issues: 219 → #116 (closed as not planned, superseded by 819), 608 → #117, 609 → #118,
+    816 → #119, 817 → #120, 818 → #121, 819 → #122, 820 → #123, 821 → #124, 822 → #125 (closed as completed,
+    PR #113), 823 → #126, 801a → #127 (sub-issue of #48), 805a/b/c → #128/#129/#130 (sub-issues of #66).
+    All are milestone M1 and on Project #1 with Status/Priority/Estimate set, except 219.
+  - Milestones aligned: SKODA-206 and SKODA-405 are M2 on disk (matching the board), and #114 (SKODA-815) is set
+    to M2.
+  - Bodies: the disk ticket files were pushed to 21 issues whose bodies had drifted. The GitHub-only "Relations"
+    footers of #97/#98/#99 were pulled to disk first.
+  - Assignees are **not** set. The review §11 owner split is still a proposal.
 **Target:** DA / Experience Workspace + EDS (no AEM Author / UE / JCR), per `SKODA-EDS-DA-ARCHITECTURE.md`.
 **Estimates:** story points (SP) + AI-assisted / manual day ranges, **planning estimates, not a quote**. "AI-assisted" reflects this environment's import/styling/QA tooling.
 **Files:** `docs/tickets/epics/E##-*.md` · `docs/tickets/tickets/SKODA-<id>.md`.
@@ -95,7 +105,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-203 | Gallery + lightbox modal | E02 | 5 | 2–3 | 4–6 | 102,106 | 🟡 a11y modal `[RUNTIME-UNCONFIRMED]` |
 | SKODA-204 | Embeds (4 providers, dnt=1, lazy) | E02 | 3 | 1–2 | 2–4 | 102 | 🟢 |
 | SKODA-205 | Tags / metadata | E02 | 1 | 0.5 | 1 | 102 | 🟢 |
-| SKODA-206 | Škodapedia glossary block (directory + A–Z filter + modal) | E02 | 5 | 2–3 | 4–6 | 102,106 | 🟡 modal a11y `[RUNTIME-UNCONFIRMED]` |
+| SKODA-206 | Škodapedia glossary block (directory + A–Z filter + modal) | E02 | 5 | 2–3 | 4–6 | 102,106 | 🟡 modal a11y `[RUNTIME-UNCONFIRMED]`; **M2** on the board (aligned 2026-09-25) |
 | SKODA-207 | Series template (2-level: directory + hub) | E02 | 3 | 1–2 | 2–4 | 201,202,402,601 | 🟢 M1 (D18); reuses cards/hero/grid |
 | SKODA-211 | DA tag-management library plugin (DA_SDK multi-select) | E02 | 3 | 1–2 | 2–3 | 102,205,401 | 🟢 M1; CLOSED (done); build-confirmed 2026-09-16 (PR #60, issue #54) |
 | SKODA-212 | Horizontal rails block (story-rail + carousel) | E02 | 3 | 1–2 | 3–5 | 201,402,401,106 | 🟡 M1; `story-rail`/`carousel` unbuilt; watchCSS + a11y `[RUNTIME-UNCONFIRMED]`; spec `ui-specs/carousel-rails.md` |
@@ -114,7 +124,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-401 | Query-index schema + selectors + metadata-normalization (15 facets) | E04 | 8 | 3–5 | 5–8 | 104 | 🟠 build-confirmed: admin-service `query.yaml` (not repo); fields need normalization layer, not clean selectors |
 | SKODA-402 | Faceted listing + load-more (deep-link) | E04 | 8 | 3–5 | 6–9 | 401,201 | 🟠 hardest pilot block |
 | SKODA-403 | Search block (index-only) | E04 | 3 | 1–2 | 2–4 | 401 | 🟡 body-search deferred |
-| SKODA-405 | RSS feed generation (query-index → RSS 2.0) | E04 | 2 | 0.5–1 | 1–2 | 401 | 🟢 M1 stretch; agent-fit |
+| SKODA-405 | RSS feed generation (query-index → RSS 2.0) | E04 | 2 | 0.5–1 | 1–2 | 401 | 🟢 **M2** (aligned to board 2026-09-25; was M1 stretch); agent-fit |
 | SKODA-501 | Masters-only image ingest (img-out-of-`<p>`, alt/caption) | E05 | 3 | 1–2 | 2–3 | 102 | 🟢 |
 | SKODA-502 | Static Downloads block (mediabox) | E05 | 3 | 1–2 | 2–3 | 102 | 🟢 |
 | SKODA-503 | PDF/MP4 handling (link/DAM) | E05 | 2 | 0.5–1 | 1–2 | 501 | 🟡 MP4 signed-flow (cart now SKODA-505) |

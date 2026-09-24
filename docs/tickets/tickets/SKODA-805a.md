@@ -4,7 +4,7 @@
 - **Type:** template / import
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo), pulled forward from M2 by the 43-URL scope
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3–4d *(planning estimate, not a quote)*
-- **Parent:** SKODA-805 (#66) · **GitHub issue:** *not yet created* (proposed in [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md))
+- **Parent:** SKODA-805 (#66) · **GitHub issue:** [#128](https://github.com/skoda-storyboard/demo/issues/128)
 
 ## UI Specification
 [`press-kit-template.md`](../../ui-specs/press-kit-template.md) covers the landing: overlay hero plus the chapter-tile
