@@ -79,6 +79,13 @@ All values: `measured (source-url · selector · viewport) -> token`. Source URL
   `@media (min-width:768px)`; · confirmed in source CSS). Below 768 it falls back to the 18px base.
   `29.6px` has no token -> **candidate** `--heading-font-size-promo` (or compute `1.85em`).
 
+### Date / metadata (`.entry-published`)
+- font-size `11px` (`0.6875rem`), line-height `11px` (1), weight `600`, letter-spacing `0.1em`,
+  `white-space: nowrap` (· `.article-teaser .entry-published` · all viewports) ->
+  `--card-meta-font-size`, `--card-meta-line-height`, `--card-meta-letter-spacing`.
+- overlay title and date use `text-shadow: 0 1px 1px rgb(0 0 0 / 50%)` for legibility ->
+  `--card-overlay-text-shadow`.
+
 ### Toolbar (`.article-teaser-toolbar`)
 - display `flex`; justify-content `space-between`; align-items `center`.
 - base background `#fff` -> `--skoda-white`; in overlay + attachment/gallery contexts background
@@ -193,6 +200,8 @@ Compare EDS `/en` render to source at each viewport. Format: WHAT / WHERE / view
 - [ ] Overlay scrim: `.cards-overlay` / all / dual gradient present (270deg to `rgb(0 0 0 /.25)` +
       vertical to `.1`); title legible (contrast >= 4.5:1).
 - [ ] Standard title: `.entry-title equivalent` / all / `18px` / `21.6px` / weight `400` / white.
+- [ ] Date metadata: `.entry-published equivalent` / all / `11px` / `11px` / weight `600` /
+      letter-spacing `0.1em`; overlay title + date use the measured text shadow.
 - [ ] Promo title: promo first card / **>=768** / `29.6px` / `35.52px`; **<768** / `18px`.
 - [ ] Toolbar: `.cards-toolbar` / all / flex space-between, align center; base bg white; overlay
       context transparent; pill buttons radius `50px`.

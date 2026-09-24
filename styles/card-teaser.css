@@ -1,0 +1,249 @@
+/*
+ * card-teaser.css — the shared Card / Teaser visual primitive (SKODA-201).
+ *
+ * ONE source of truth for the card's look, consumed by every block that renders
+ * cards (imported by blocks/cards/cards.css, blocks/stories/stories.css, …). The
+ * markup contract + builders live in scripts/card-teaser.js. Blocks own only
+ * their grid/layout; the card box, media, overlay scrim, typography, toolbar and
+ * interaction states all live here so a fix reaches every consumer.
+ *
+ * Classes: .card-teaser (li) with .overlay / .toolbar / .no-image modifiers;
+ * inner .card-teaser-image / -body / -title / -date / -summary / -toolbar /
+ * -button / -link. Tokens only.
+ */
+
+.card-teaser {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--card-radius);
+  background-color: var(--background-color);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+/* media layer — clipped 16:9 box; object-fit:cover (quality upgrade over source `fill`) */
+.card-teaser-image {
+  position: relative;
+  overflow: hidden;
+  line-height: 0;
+  border-radius: var(--card-radius);
+}
+
+.card-teaser-image picture,
+.card-teaser-image img {
+  display: block;
+  width: 100%;
+}
+
+.card-teaser-image img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+
+  /* the only hover affordance is a subtle image zoom (matches the live source);
+     .5s transition; the ~2% zoom is applied on card :hover/:focus below. */
+  transition: scale 0.5s cubic-bezier(0.165, 0.85, 0.45, 1);
+}
+
+/* body */
+.card-teaser-body {
+  margin: var(--spacing-m);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+/* content order matches the source teaser: date (1) -> title (2) -> summary (3) */
+.card-teaser-title {
+  order: 2;
+  margin: 0;
+  font-size: var(--heading-font-size-s);
+  line-height: 1.2;
+  font-weight: var(--weight-regular);
+  color: var(--text-color);
+}
+
+.card-teaser-summary {
+  order: 3;
+  margin: 0;
+  font-size: var(--body-font-size-s);
+  color: var(--text-color);
+}
+
+/* date: first, small, semibold, muted — like the source .entry-published */
+.card-teaser-date {
+  order: 1;
+  font-size: var(--card-meta-font-size);
+  font-weight: var(--weight-semibold);
+  line-height: var(--card-meta-line-height);
+  letter-spacing: var(--card-meta-letter-spacing);
+  color: var(--skoda-grey-500);
+  white-space: nowrap;
+}
+
+/* stretched card link — one tab stop covering the whole card via ::after */
+.card-teaser-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.card-teaser:has(.card-teaser-link) {
+  cursor: pointer;
+}
+
+.card-teaser-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.card-teaser-link:focus {
+  outline: none;
+}
+
+/* ---- toolbar variant ---- */
+
+.card-teaser-toolbar {
+  /* sit above the stretched .card-teaser-link::after overlay (z-index:1) so the
+     pill buttons receive hover + clicks; the link still covers the rest */
+  position: relative;
+  z-index: 2;
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-s) var(--spacing-m);
+  background-color: var(--background-color);
+}
+
+.card-teaser-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  border-radius: var(--pill-radius);
+  padding: var(--spacing-xs) var(--spacing-s);
+  background-color: var(--background-color);
+  color: var(--skoda-ink);
+  font-size: var(--body-font-size-s);
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color 0.25s ease;
+}
+
+.card-teaser-button:focus-visible,
+.card-teaser-button:active {
+  background-color: var(--skoda-green-emerald-hover);
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+  text-decoration: none;
+}
+
+/* homepage hides cart actions in the toolbar (source parity) */
+body.homepage .card-teaser-button.media-cart-action {
+  display: none;
+}
+
+/* ---- overlay variant ---- */
+
+.card-teaser.overlay .card-teaser-image {
+  border-radius: var(--card-radius);
+}
+
+.card-teaser.overlay .card-teaser-body {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  justify-content: flex-end;
+  gap: var(--spacing-xs);
+  margin: 0;
+  padding: var(--spacing-m);
+  color: var(--skoda-white);
+
+  /* source dual scrim + a stronger bottom legibility scrim so the white caption
+     stays legible on bright images */
+  background-image: var(--scrim-text), var(--scrim-h), var(--scrim-v);
+}
+
+/* caption text is white over the image (order/date sizing from the base rules) */
+.card-teaser.overlay .card-teaser-title,
+.card-teaser.overlay .card-teaser-date,
+.card-teaser.overlay .card-teaser-summary {
+  color: var(--skoda-white);
+}
+
+/* Source overlays give title + metadata a subtle shadow for legibility. */
+.card-teaser.overlay .card-teaser-title,
+.card-teaser.overlay .card-teaser-date {
+  text-shadow: var(--card-overlay-text-shadow);
+}
+
+/* summary: clamped to keep the caption compact */
+.card-teaser.overlay .card-teaser-summary {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* toolbar sits transparent in the overlay context */
+.card-teaser.overlay .card-teaser-toolbar {
+  background-color: transparent;
+}
+
+/* image-less overlay card: no absolute-over-image layer would have height, so
+   let the body flow normally with an intrinsic min-height + a solid scrim base */
+.card-teaser.overlay.card-teaser-no-image .card-teaser-body {
+  position: static;
+  min-height: 0;
+  aspect-ratio: 16 / 9;
+  justify-content: flex-end;
+  color: var(--skoda-white);
+  background-color: var(--dark-color);
+  background-image: none;
+}
+
+/* ---- combined overlay + toolbar ---- */
+
+.card-teaser.overlay.toolbar .card-teaser-toolbar {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 2;
+}
+
+.card-teaser.overlay.toolbar .card-teaser-body {
+  padding-bottom: calc(var(--spacing-xxl) + var(--spacing-m));
+}
+
+/* ---- interaction states (last for ascending specificity) ---- */
+
+@media (hover: hover) {
+  .card-teaser:hover .card-teaser-image img,
+  .card-teaser:focus-within .card-teaser-image img {
+    scale: 1.02;
+  }
+
+  .card-teaser-button:hover {
+    background-color: var(--skoda-green-emerald-hover);
+  }
+}
+
+.card-teaser:focus-within {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+}
+
+.card-teaser.overlay:focus-within {
+  outline-color: var(--skoda-white);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-teaser-image img,
+  .card-teaser-button {
+    transition: none;
+  }
+}
