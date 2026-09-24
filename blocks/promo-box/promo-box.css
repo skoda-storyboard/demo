@@ -41,6 +41,10 @@
   height: 100%;
 }
 
+.promo-box .card-teaser.overlay .card-teaser-body {
+  background-image: var(--scrim-h), var(--scrim-v);
+}
+
 .promo-box .card-teaser-title {
   display: -webkit-box;
   -webkit-box-orient: vertical;

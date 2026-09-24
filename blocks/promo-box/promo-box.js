@@ -99,12 +99,12 @@ export function selectPromoRows(rows, config) {
   return paginate(sortRows(filtered, config.sort || 'newest'), config.limit);
 }
 
-function enableMobileCarousel(block, track) {
+function enablePromoRotation(block, track) {
   const dots = document.createElement('div');
   dots.className = 'promo-box-dots';
   dots.setAttribute('role', 'group');
   dots.setAttribute('aria-label', 'Featured story slides');
-  const slides = [...track.children];
+  let slides = [...track.children];
   if (slides.length > 1) {
     slides.forEach((slide, i) => {
       const dot = document.createElement('button');
@@ -148,22 +148,40 @@ function enableMobileCarousel(block, track) {
     if (manual) updateTimer();
   }
 
+  function rotateMosaic() {
+    track.append(track.firstElementChild);
+    slides = [...track.children];
+    active = 0;
+    updateDots();
+  }
+
   function updateTimer() {
     window.clearInterval(timer);
     timer = undefined;
-    if (!compact.matches || reduced.matches || document.hidden || hovered || touched
+    if (reduced.matches || document.hidden || hovered || touched
       || block.contains(document.activeElement) || slides.length < 2) return;
-    timer = window.setInterval(() => select((active + 1) % slides.length), ROTATION_MS);
+    timer = window.setInterval(() => {
+      if (compact.matches) select((active + 1) % slides.length);
+      else rotateMosaic();
+    }, ROTATION_MS);
   }
 
   function updateMode() {
     if (compact.matches) {
+      slides = [...track.children];
+      active = Math.max(0, slides.findIndex((slide) => slide.contains(document.activeElement)));
       block.setAttribute('aria-roledescription', 'carousel');
       track.tabIndex = 0;
+      select(active);
     } else {
+      if (dots.contains(document.activeElement)) {
+        slides[active]?.querySelector('.card-teaser-link')?.focus();
+      }
       block.removeAttribute('aria-roledescription');
       track.removeAttribute('tabindex');
       track.scrollTo({ left: 0, behavior: 'auto' });
+      active = 0;
+      updateDots();
     }
     updateTimer();
   }
@@ -199,7 +217,6 @@ function enableMobileCarousel(block, track) {
   compact.addEventListener('change', () => {
     window.clearInterval(timer);
     updateMode();
-    if (compact.matches) select(active);
   });
   updateDots();
   updateMode();
@@ -219,7 +236,7 @@ export default async function decorate(block) {
     block.replaceChildren(track);
     block.setAttribute('role', 'region');
     block.setAttribute('aria-label', 'Featured stories');
-    enableMobileCarousel(block, track);
+    enablePromoRotation(block, track);
   } catch (error) {
     showError(block, error);
   }
