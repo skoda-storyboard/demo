@@ -1,0 +1,141 @@
+/* ==========================================================================
+ * Downloads block — SKODA-502
+ * Spec: docs/ui-specs/downloads.md. The static "Media Box" download grid: a
+ * flex-wrap grid of 16:9 thumbnails, each with a round download control (single
+ * size = link; multiple = toggle + size menu). Tokens-only; mobile-first.
+ * No cart, no server state.
+ * ========================================================================== */
+
+/* --- grid: flex-wrap, column ladder 1 -> 2 (768) -> 4 (992) -------------- */
+.downloads .downloads-items {
+  --dl-cols: 1;
+
+  display: grid;
+  grid-template-columns: repeat(var(--dl-cols), 1fr);
+  gap: var(--spacing-m);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.downloads .downloads-item {
+  margin: 0;
+}
+
+/* each tile is a figure: thumbnail + title + download control */
+.downloads .downloads-figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin: 0;
+}
+
+/* --- thumbnail: 16:9 box, cover-fit, faint hairline, opens the lightbox --- */
+.downloads .downloads-thumb {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 1px solid var(--thumb-hairline);
+  border-radius: var(--card-radius);
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.downloads .downloads-thumb picture,
+.downloads .downloads-thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover; /* source uses fill (distorts); cover per spec §3/§8 */
+}
+
+.downloads .downloads-thumb img {
+  transition: transform 0.5s ease;
+}
+
+.downloads .downloads-thumb:hover img {
+  transform: scale(1.02);
+}
+
+.downloads .downloads-thumb:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+/* --- title -------------------------------------------------------------- */
+.downloads .downloads-title {
+  color: var(--text-color);
+  font-size: var(--body-font-size-s);
+  line-height: 1.3;
+}
+
+/* --- download control: round 40x40 disc (white / 2px ink), size menu ----- */
+.downloads .downloads-action {
+  position: relative;
+  display: flex;
+}
+
+.downloads .downloads-download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--skoda-ink);
+  border-radius: var(--pill-radius);
+  padding: 0;
+  background: var(--skoda-white);
+  color: var(--skoda-ink);
+  cursor: pointer;
+}
+
+.downloads .downloads-download:hover,
+.downloads .downloads-download:focus-visible {
+  background: var(--dropdown-hover-bg);
+}
+
+/* size menu: absolute dropdown of direct-download links (Original / 1920px) */
+.downloads .downloads-sizes {
+  position: absolute;
+  top: calc(40px + var(--spacing-xs));
+  left: 0;
+  z-index: 15;
+  min-width: 120px;
+  margin: 0;
+  padding: 0;
+  background: var(--skoda-white);
+  box-shadow: var(--dropdown-shadow);
+  list-style: none;
+}
+
+.downloads .downloads-sizes[hidden] {
+  display: none;
+}
+
+.downloads .downloads-size {
+  display: block;
+  padding: var(--spacing-xs) var(--spacing-s);
+  color: var(--text-color);
+  text-decoration: none;
+}
+
+.downloads .downloads-size:hover,
+.downloads .downloads-size:focus-visible {
+  background: var(--dropdown-hover-bg);
+}
+
+/* --- responsive column ladder (spec §4): 2 @768, 4 @992 ------------------ */
+@media (width >= 768px) {
+  .downloads .downloads-items {
+    --dl-cols: 2;
+  }
+}
+
+@media (width >= 992px) {
+  .downloads .downloads-items {
+    --dl-cols: var(--dl-cols-lg, 4);
+  }
+}

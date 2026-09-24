@@ -52,6 +52,9 @@
   --pagination-border: #c9cdd3;      /* result-count underline */
   --grid-gutter: 20px;               /* listing cell margin-bottom / padding base */
   --pill-radius: 50px;               /* shared ghost-pill (load-more) */
+
+  /* downloads / media-box (SKODA-502; measured in docs/ui-specs/downloads.md §3) */
+  --thumb-hairline: hsl(0deg 0% 85% / 13.3%); /* faint tile border on the download grid */
 }
 
 /*
