@@ -48,7 +48,7 @@ globalThis.document = {
 };
 
 const {
-  parseConfig, selectRows, rowToCells, isConfigTable,
+  parseConfig, selectRows, rowToCells, isConfigTable, curatedRows,
 } = await import('./story-rail.js');
 
 /*
@@ -247,4 +247,22 @@ test('isConfigTable: an empty block defaults to config', () => {
 test('isConfigTable: a 3-cell row is not a config table (curated shape)', () => {
   const block = railBlock([[['category'], ['x'], ['extra']]]);
   assert.equal(isConfigTable(block), false);
+});
+
+test('curatedRows passes the authored cell contents without nesting their wrappers', () => {
+  const picture = el('picture');
+  const date = el('p');
+  const title = el('h3');
+  const block = {
+    children: [{
+      children: [
+        { childNodes: [picture] },
+        { childNodes: [date, title] },
+      ],
+    }],
+  };
+  assert.deepEqual(curatedRows(block), [[
+    { elems: [picture] },
+    { elems: [date, title] },
+  ]]);
 });

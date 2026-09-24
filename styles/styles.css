@@ -645,6 +645,23 @@ body.story main > .section.sidebar aside {
     grid-column: 2;
   }
 
+  body.story main > .section.dark {
+    grid-column: 1 / -1;
+    position: relative;
+    isolation: isolate;
+  }
+
+  body.story main > .section.dark::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    background: var(--dark-color);
+    z-index: -1;
+  }
+
   /* At desktop the measured source h2 is 40/45 (wt300). */
   body.story main > .section.body-column .default-content-wrapper h2 {
     font-size: var(--heading-font-size-hero-story);

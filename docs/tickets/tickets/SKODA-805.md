@@ -1,8 +1,20 @@
 # SKODA-805, Press Kit template + structured narrative sections
 - **Epic:** E08, Editorial at Scale
 - **Type:** template / import
-- **Phase:** B  ·  **Pilot:** No · **Milestone:** M2 (go-live)
+- **Phase:** B  ·  **Pilot:** No · **Milestone:** M2 (go-live). The **M1 slices** are split out; see the update below.
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–6d *(planning estimate, not a quote)*
+
+> **Update (2026-09-24, M1 gap review, [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md)).**
+>
+> The 43-URL M1 set contains **4 press kits**, so M1 slices were split out:
+>
+> | Slice | Page(s) | Scope | Size |
+> |---|---|---|---|
+> | **SKODA-805a** | 3 tiles hubs: Peaq-2, Epiq-2, Motorsport | hub + importer | 3 SP |
+> | **SKODA-805b** | the hubs' 50 child pages | import, or link out: decision D-1 | Could tier |
+> | **SKODA-805c** | `skoda-peaq-first-glimpse-…` | `press_kit-template-default` article + accordion | 3 SP |
+>
+> The full structured-narrative template, SKODA-806/807/808, and bulk import (803) remain M2.
 
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/press-kit-template.md`](../../ui-specs/press-kit-template.md)** (captured via Chrome DevTools on the live Peaq kit `/en/press-kits/skoda-peaq-press-kit/`). Read it before implementing. Page-type context: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).

@@ -15,6 +15,20 @@ The 48 imported story pages are **flattened** to hero + title + body, the flatte
 ## Description
 Bucket A of `.migration/plans/url-analysis-comparison.md` verified that real story bodies contain galleries, YouTube embeds, and a 7–14-image Media Box. **Updated 2026-09-24:** the SKODA-801 flatten now **emits Gallery blocks** for the SiteOrigin image carousels/sliders (`sow-slider`, and link-free `skoda-carousel-widget`; a link-bearing carousel routes to Cards instead), so those are no longer dropped. What this ticket still restores is the content the flatten defers: the **colorbox/`.sb-gallery` lightbox galleries, YouTube/Vimeo embeds, and the bottom Media Box** (dropped + logged by `skoda-story-cleanup`). This ticket picks **1–2 visually rich hero stories** (e.g. the olive-oil lifestyle piece or `how-the-skoda-octavia-reached-365-km-h`) and re-imports them with those blocks in place.
 
+> **Update (2026-09-24, M1 gap review, [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md)).**
+>
+> **Hero stories.** Pick them only from the 43-URL set. The olive-oil story is **not** in the set. Recommended:
+> - `/en/skoda-world/how-the-skoda-octavia-reached-365-km-h/`: 5 in-body carousels + Media Box
+> - `/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia/`: carousel + Vimeo + Media Box
+>
+> **Split of work.** The baseline media reconstruction for all 21 stories now lives in **SKODA-801a**, which maps:
+> - carousel → SKODA-219
+> - Media Box → downloads
+> - Vimeo → embed
+>
+> This ticket is therefore limited to **full visual fidelity** (≤2% diff, lightbox, cart hook) on the 2 hero stories.
+> Estimate unchanged at 2 SP.
+
 This is a **bounded demo deliverable**, not the full-fidelity parser at scale (that remains M2 / SKODA-801 long tail). It exercises the E02 blocks (SKODA-203 gallery+lightbox, SKODA-204 embeds) and E05 media (SKODA-502 downloads / SKODA-505 cart) end-to-end on a real page.
 
 ## Requirements / Spec

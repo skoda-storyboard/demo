@@ -6,6 +6,17 @@
 
 > **Build-confirmed (2026-09-10).** The shipped EN homepage + story/rails slice exercised the reduced-fidelity path: for those stories the "flatten" was a **light cleanup transformer + one canonical Metadata block**, and the `sow-editor` + carousel model held, now **browser-verified**, not merely structural. This **retires the `[RUNTIME-UNCONFIRMED]` caveat for the common story/rails shape** and points the estimate to the low end. The **full-corpus long tail remains M2 work** (multi-column preservation, the 36 `has_rare=yes` specials, 208-widget outliers) and stays `[RUNTIME-UNCONFIRMED]` until run at scale. Effort freed here is re-allocated to the metadata-normalization + media-conditioning work surfaced in the build (see SKODA-401, E05, delivery plan §8/§9).
 
+> **Update (2026-09-24, M1 gap review, [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md)).**
+>
+> **Correction.** On all 21 in-scope stories, `skoda-carousel-widget` is an **in-body autoplay image gallery**, not
+> related-content teasers. The live markup is Flickity `autoPlay:3000`, `wrapAround`, `pageDots`, with captioned
+> `img.media-cart-image` slides. It is built as **SKODA-219** and must be migrated as content, not regenerated from
+> the index. The mapping-table row below is superseded for these pages.
+>
+> **Scope.** The origin/main importer still drops the Media Box, galleries and embeds. The M1 fidelity work for the
+> 21 stories (carousel → 219, Media Box → downloads, Vimeo → embed, tags kept) is split out as **SKODA-801a**. This
+> ticket keeps the reduced-fidelity parser (done) and the M2 long tail.
+
 ## Summary
 Build the import parser that flattens SiteOrigin Page Builder story layouts into clean DA sections + blocks. This is the hardest single parser in the migration and the highest-effort ticket in the whole program.
 
@@ -45,7 +56,7 @@ panel-grid                         ← whole layout
 |---|--:|---|
 | `sow-editor` / `tinymce` (rich text) | 83.5% | **default content** (h/p/ul; inline images + inline embeds pass through as-is) |
 | `skoda-offset` (spacer) | 8.2% | **dropped**, or a section break |
-| `skoda-carousel-widget` | 4.0% | **routed BY CONTENT — CORRECTED 2026-09-24 (build):** the corpus uses this widget **both ways**, so the parser routes on content, not name: **link-free** items (the article's own photo sets — images + captions, no links) → **Gallery** (SKODA-203 / STO-D04, same as `sow-slider`); **linked** items ("you might also like" teasers) → **Cards** (SKODA-201). *(Original census assumed teasers-only; build-inspected stories were image-only, the 5-story POC saw teasers — both real. The sidebar `.related` teaser rail is separately handled by `skoda-story-aside` → Cards.)* See census §7a. |
+| `skoda-carousel-widget` | 4.0% | **Routed by content:** link-free photo sets → Gallery (slider) per SKODA-219 (currently default Gallery until that variant lands); link-bearing teasers → Cards. Preserve the source image order and descriptions, not an index-generated list. See census §7a. |
 | `sow-slider` | 1.5% | **image slider → Carousel/Gallery block** |
 | `skoda-quote` | 1.1% | **pull-quote → `<blockquote>` / small quote block** |
 | `skoda-captioned-image` *(census, 45 stories)* | 0.7% | **image + caption → figure / image block** |
