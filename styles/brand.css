@@ -24,6 +24,14 @@
   --skoda-grey-500: #7c7d7e;
   --skoda-grey-border: #dadada;
 
+  /* social network brand colors (footer icon hover tints — raw brand hex) */
+  --social-hover: #419468;
+  --social-facebook: #3b5998;
+  --social-youtube: #f00;
+  --social-whatsapp: #43d854;
+  --social-instagram-gradient: radial-gradient(circle at 30% 107%,
+    #fdf497 0, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
+
   /* semantic color map (consumed downstream via var()) */
   --background-color: var(--skoda-white);
   --light-color: var(--skoda-grey-100);

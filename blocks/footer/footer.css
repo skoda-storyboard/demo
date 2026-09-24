@@ -1,20 +1,263 @@
+/*
+ * Storyboard footer (SKODA-304). Dark-green brand band that closes every page.
+ * Re-derived from measured source (docs/ui-specs/footer.md); tokens-only, no hardcoded hex.
+ * Mobile-first with the canonical 768/992/1080 ladder (source uses 768/968/1024; the current
+ * boilerplate 700/1000 is retired). Source responsive behavior is reproduced exactly:
+ *   < 992  → nav stacks, only the 7 category HEADINGS show (sub-links hidden), .social a column
+ *   ≥ 992  → sub-links revealed
+ *   ≥ 1080 → 7-column sitemap grid
+ * Rule order: base → structural → states (keeps stylelint no-descending-specificity happy).
+ */
+
 footer {
-  background-color: var(--light-color);
+  background-color: var(--skoda-green);
+  color: var(--skoda-white);
   font-size: var(--body-font-size-xs);
 }
 
+/* Content box matches the source: 1248px max INCLUDING its 10px inline gutters
+   (box-sizing so max-width contains the padding). Source measured x=10/width=355 at 375px. */
 footer .footer > div {
+  box-sizing: border-box;
   margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
+  max-width: var(--content-max-width);
+  padding: var(--footer-padding-y) 10px;
 }
 
 footer .footer p {
   margin: 0;
 }
 
+footer .footer a {
+  color: var(--skoda-white);
+}
+
+/* ---- nav sitemap (.footer-nav) ---- */
+footer .footer-nav {
+  margin-bottom: var(--spacing-xl);
+}
+
+footer .footer-nav nav {
+  margin: 0;
+}
+
+footer .footer-nav nav > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* top-level = column heading + its sub-list. Source item rhythm is 12px (--spacing-s),
+   not 16px — measured on the live footer nav (review #2). */
+footer .footer-nav nav > ul > li {
+  margin-bottom: var(--spacing-s);
+}
+
+/* sub-links: hidden on mobile (only the 7 category headings show — source-exact) */
+footer .footer-nav ul ul {
+  display: none;
+  list-style: none;
+  margin: var(--spacing-s) 0 0;
+  padding: 0;
+}
+
+footer .footer-nav ul ul li {
+  margin-bottom: var(--spacing-s);
+}
+
+footer .footer-nav ul ul a {
+  /* source is 12px/500; 500 has no real SKODA Next face (see SKODA-106), so map to 400 */
+  font-size: var(--body-font-size-2xs);
+  font-weight: var(--weight-regular);
+  letter-spacing: 1px;
+  line-height: 18px;
+}
+
+footer .footer-nav nav > ul > li > a {
+  font-weight: var(--weight-semibold);
+  letter-spacing: 1px;
+}
+
+/* ---- social + app-badge row (.footer-social) ----
+   Mobile: stacked and centered. The 3rem row rhythm matches the source's widget spacing
+   (its .footer-widgets children carry margin-bottom:3em), so the stacked social region is the
+   same height as the live footer at ≤767px. A 1px white separator closes the block (matches the
+   source <hr> that sits AFTER the widgets and BEFORE the menu). The ≥768 rule overrides the gap
+   for the single-row desktop layout. */
+footer .footer-social {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  border-bottom: 1px solid var(--skoda-white);
+  padding-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+footer .footer-social .app-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-m);
+  align-items: center;
+}
+
+footer .footer-social .app-badges a {
+  display: inline-block;
+  line-height: 0;
+}
+
+/* the app badge is a full-size store graphic, not a 24px UI glyph — override the global
+   .icon box so the anchor reserves the real 135x40 footprint (otherwise the 135px image
+   overflows a 24px .icon span and the two badges overlap). */
+footer .footer-social .app-badges .icon,
+footer .footer-social .app-badges img {
+  width: var(--app-badge-w);
+  height: var(--app-badge-h);
+}
+
+footer .footer-social .social-icons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-s);
+  align-items: center;
+}
+
+footer .footer-social .social-icons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--social-icon-size);
+  height: var(--social-icon-size);
+  border-radius: 50%;
+  background-color: var(--social-icon-bg);
+  transition: background-color 0.2s ease;
+}
+
+footer .footer-social .social-icons a .icon {
+  width: 20px;
+  height: 20px;
+}
+
+footer .footer-social .social-icons a .icon img {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- legal / attribution row (.footer-legal) ----
+   No separator here: the source's only rule sits after the social widgets (see .footer-social),
+   not after the menu. An authored <hr>, if present, is neutralised so it adds no line. */
+footer .footer-legal hr {
+  display: none;
+}
+
+/* footer-specific type, NOT the global body style: source renders the usage copy at
+   12px / 18px / weight 300 (review #3). */
+footer .footer-legal .copyright-text {
+  font-size: var(--body-font-size-2xs);
+  font-weight: var(--weight-light);
+  line-height: 18px;
+  margin-bottom: var(--spacing-l);
+}
+
+footer .footer-legal .copyright-text a {
+  font-weight: var(--weight-light);
+  color: var(--skoda-green-emerald);
+}
+
+footer .footer-legal .copyright-notice {
+  font-weight: var(--weight-semibold);
+  margin-bottom: var(--spacing-m);
+}
+
+footer .footer-legal .feed-links a {
+  font-size: var(--body-font-size-2xs);
+  color: var(--skoda-green-emerald);
+}
+
+footer .footer-legal .feed-links a + a::before {
+  content: "|";
+  margin: 0 var(--spacing-xs);
+  color: var(--skoda-white);
+}
+
+/* ---- states (declared last so specificity is non-descending) ---- */
+footer .footer a:focus-visible {
+  outline: 2px solid var(--skoda-white);
+  outline-offset: 2px;
+}
+
+footer .footer-social .social-icons a:hover {
+  background-color: var(--social-hover);
+}
+
+footer .footer-social .social-icons a.social-facebook:hover {
+  background-color: var(--social-facebook);
+}
+
+footer .footer-social .social-icons a.social-youtube:hover {
+  background-color: var(--social-youtube);
+}
+
+footer .footer-social .social-icons a.social-whatsapp:hover {
+  background-color: var(--social-whatsapp);
+}
+
+footer .footer-social .social-icons a.social-instagram:hover {
+  background-color: transparent;
+  background-image: var(--social-instagram-gradient);
+}
+
+/* ---- responsive (mobile-first enhancements) ---- */
+
+/* ≥ 768: the store badges + social icons sit together on ONE line, right-aligned and
+   vertically centered; the "Follow …" title stays full-width on its own line above.
+   (Mobile stays stacked + centered from the base rules.) Copyright text constrained;
+   notice + feeds share a row. */
+@media (width >= 768px) {
+  footer .footer-social {
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-m) var(--spacing-xl);
+  }
+
+  footer .footer-social > .default-content-wrapper {
+    flex-basis: 100%;
+  }
+
+  footer .footer-social .app-badges,
+  footer .footer-social .social-icons {
+    justify-content: flex-end;
+  }
+
+  footer .footer-legal .copyright-text {
+    max-width: 70%;
+  }
+
+  footer .footer-legal .legal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+}
+
+/* ≥ 992: full desktop sitemap — reveal sub-links AND lay the 7 categories out as columns.
+   (Both switch at the same breakpoint so there is no in-between state where sub-links are
+   revealed but still stacked in one column between 992 and 1079px.) */
 @media (width >= 992px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
+  footer .footer-nav ul ul {
+    display: block;
+  }
+
+  footer .footer-nav nav > ul {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--spacing-l);
+  }
+
+  footer .footer-nav nav > ul > li {
+    margin-bottom: 0;
   }
 }
