@@ -423,19 +423,20 @@ body.gallery-lightbox-open {
 /* desktop: 2-column detail layout — image left, caption/detail panel right
    (matches the live MR image-detail lightbox) */
 @media (width >= 768px) {
-  /* desktop: fixed-height row. No top padding so the image sits flush to the
-     top; modest left gap before the image, small right gap so the panel sits
-     close to the right edge. */
+  /* desktop: fixed-height row. The image column runs flush to the left edge
+     (x=0); a ~32px right inset holds the detail panel off the right edge —
+     matches the live Peaq lightbox geometry (image 992 · gap 16 · panel 240 ·
+     inset 32 = 1280 at 1280w). */
   .gallery .gallery-lightbox-stage {
     align-items: stretch;
-    padding: 0 var(--spacing-l) 0 clamp(var(--spacing-xl), 8.2vw, 118px);
+    padding: 0 calc(var(--spacing-m) * 2) 0 0;
     overflow: hidden;
   }
 
   .gallery .gallery-lightbox-figure {
     flex-direction: row;
     align-items: stretch;
-    gap: clamp(var(--spacing-xxl), 8vw, 120px); /* space between image and panel */
+    gap: var(--spacing-m); /* ~16px between image and panel (live) */
     height: 100%;
   }
 
@@ -459,7 +460,7 @@ body.gallery-lightbox-open {
   }
 
   .gallery .gallery-lightbox-caption {
-    flex: 0 0 clamp(240px, 20%, 300px);
+    flex: 0 0 240px; /* live detail-panel width */
     max-width: none;
     align-self: stretch;
 
