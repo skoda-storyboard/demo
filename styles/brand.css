@@ -23,6 +23,8 @@
   --skoda-grey-200: #e6e6e6;
   --skoda-grey-500: #7c7d7e;
   --skoda-grey-border: #dadada;
+  --promo-dot: #d8d8d8;
+  --promo-dot-active: #686868;
 
   /* semantic color map (consumed downstream via var()) */
   --background-color: var(--skoda-white);

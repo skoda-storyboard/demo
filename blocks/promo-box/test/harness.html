@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/styles/brand.css">
+  <link rel="stylesheet" href="/styles/styles.css">
+  <link rel="stylesheet" href="/blocks/promo-box/promo-box.css">
+  <title>Promo-box QA fixture</title>
+</head>
+<body class="appear">
+  <main>
+    <div class="promo-box">
+      <div><div><picture><img src="https://cdn.skoda-storyboard.com/2026/09/DSC_5386_6ec0ab1b-1440x960.jpg" alt="Featured rally story"></picture></div><div><h3><a href="/en/story-one">Featured story one</a></h3><p>Three authored teasers in the editorial showcase.</p></div></div>
+      <div><div><picture><img src="https://cdn.skoda-storyboard.com/2026/09/Skoda-Peaq_116_4370c0a5-1440x810.jpg" alt="Featured car story"></picture></div><div><h3><a href="/en/story-two">Featured story two</a></h3></div></div>
+      <div><div><picture><img src="https://cdn.skoda-storyboard.com/2026/08/IMG_5081_72e6406c-1440x961.jpg" alt="Featured design story"></picture></div><div><h3><a href="/en/story-three">Featured story three</a></h3></div></div>
+    </div>
+  </main>
+  <script type="module">
+    import decorate from '/blocks/promo-box/promo-box.js';
+
+    const block = document.querySelector('.promo-box');
+    if (new URLSearchParams(location.search).has('invalid')) block.lastElementChild.remove();
+    if (new URLSearchParams(location.search).has('indexed')) {
+      block.innerHTML = '<div><div>template</div><div>story</div></div><div><div>category</div><div>emobility</div></div><div><div>limit</div><div>3</div></div>';
+      const originalFetch = window.fetch.bind(window);
+      window.fetch = (url, opts) => String(url).includes('query-index.json')
+        && new URLSearchParams(location.search).has('error')
+        ? Promise.reject(new Error('Fixture index unavailable'))
+        : String(url).includes('query-index.json')
+        ? Promise.resolve(new Response(JSON.stringify({
+          data: [
+            { path: '/en/one', title: 'Indexed one', image: 'https://cdn.skoda-storyboard.com/2026/09/DSC_5386_6ec0ab1b-1440x960.jpg', template: 'story', category: 'emobility', publisheddate: '2026-09-24' },
+            { path: '/en/two', title: 'Indexed two', image: 'https://cdn.skoda-storyboard.com/2026/09/Skoda-Peaq_116_4370c0a5-1440x810.jpg', template: 'story', category: 'emobility', publisheddate: '2026-09-23' },
+            { path: '/en/three', title: 'Indexed three', image: 'https://cdn.skoda-storyboard.com/2026/08/IMG_5081_72e6406c-1440x961.jpg', template: 'story', category: 'emobility', publisheddate: '2026-09-22' },
+          ],
+        }), { status: 200 }))
+        : originalFetch(url, opts);
+    }
+    await decorate(block);
+    block.dataset.ready = 'true';
+  </script>
+</body>
+</html>

@@ -6,5 +6,7 @@ LICENSE
 package.json
 package-lock.json
 test/*
+blocks/promo-box/test/
+blocks/promo-box/promo-box.test.mjs
 poc/**/test.mjs
 sync-block-collection.sh

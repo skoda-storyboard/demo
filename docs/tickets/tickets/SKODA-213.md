@@ -43,3 +43,22 @@ Measurable gates in [`carousel-rails.md`](../../ui-specs/carousel-rails.md) §3/
 - **Not promo-banner:** keep distinct from the ad-server `promo-banner` (E09) — this is the editorial featured showcase only.
 - **Curated vs indexed items:** confirm whether promo items are author-curated (featured) or query-index-driven before locking the block config.
 - **Home composition boundary:** builds the *block*; assembly into `/en/` is SKODA-604.
+
+## Authoring contract (issue #99)
+
+`Promo box` is editorial content, not an ad slot. Curated mode uses **exactly three rows** in author order, each with a story link (usually in a teaser title), an optional image and optional summary. Image cells may be omitted without breaking decoration. If the row count differs from three or a story link is missing, the block displays a visible error and retains the authored rows for correction.
+
+| Promo box | |
+| --- | --- |
+| ![Featured story](story-1.jpg) | ### [Featured story](/en/stories/story-1) <br> Summary |
+| ![Second story](story-2.jpg) | ### [Second story](/en/stories/story-2) |
+| ![Third story](story-3.jpg) | ### [Third story](/en/stories/story-3) |
+
+Optional index mode uses **only** key/value rows (do not combine with curated rows). `template` defaults to `story`, `index` to `/{locale}/query-index.json`, `sort` to `newest`, and `limit` to 3. `category` and `tags` accept comma-separated slugs (OR within each field; AND across fields); optional `path` scopes to a prefix. Indexed rows use the shared query-index loader and listing selection functions. Missing results, invalid settings, and index failures show an error instead of a blank promo.
+
+| Promo box | |
+| --- | --- |
+| template | story |
+| category | emobility |
+| tags | elroq, enyaq |
+| limit | 3 |
