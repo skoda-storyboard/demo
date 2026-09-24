@@ -4,8 +4,10 @@
   --promo-dot-size: 10px;
   --promo-dot-target: 44px;
 
-  max-width: var(--content-max-width);
-  margin-inline: auto;
+  position: relative;
+  left: 50%;
+  width: min(100vw, var(--content-max-width));
+  transform: translateX(-50%);
 }
 
 .promo-box .promo-box-items {
@@ -39,8 +41,15 @@
   height: 100%;
 }
 
-.promo-box .card-teaser .card-teaser-body {
+.promo-box .card-teaser.overlay .card-teaser-body {
   padding-inline: 0;
+}
+
+.promo-box .card-teaser-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .promo-box .card-teaser:not(:has(.card-teaser-image)) {
