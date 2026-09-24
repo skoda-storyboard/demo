@@ -71,6 +71,12 @@
   --pagination-border: #c9cdd3;      /* result-count underline */
   --grid-gutter: 20px;               /* listing cell margin-bottom / padding base */
   --pill-radius: 50px;               /* shared ghost-pill (load-more) */
+
+  /* carousel / horizontal rails (SKODA-212; measured in docs/ui-specs/carousel-rails.md §3) */
+  --carousel-arrow-size: 32px;       /* source theme override 2em; base Flickity 44px */
+  --carousel-gap: 20px;              /* source .items margin 0 -10px + .item padding 0 10px */
+  --carousel-dot: #d8d8d8;           /* page dot (dots variant only) */
+  --carousel-dot-active: #686868;    /* selected page dot */
 }
 
 /*

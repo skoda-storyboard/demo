@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carousel rail block harness (SKODA-212)</title>
+  <link rel="stylesheet" href="/styles/brand.css">
+  <link rel="stylesheet" href="/styles/styles.css">
+  <link rel="stylesheet" href="/blocks/carousel/carousel.css">
+  <style>body { display: block; font-family: system-ui, sans-serif; margin: 24px; } main { max-width: 1248px; margin: auto; } h2 { font-size: 26px; }</style>
+</head>
+<body class="appear">
+  <main>
+    <h2>Dated posts (overlay caption)</h2>
+    <!-- Static authored carousel: one card per row, image cell + body cell. -->
+    <div class="carousel block" data-block-name="carousel" aria-label="Latest stories">
+      <div>
+        <div><picture><img src="https://cdn.skoda-storyboard.com/2024/10/elroq_header_fede6794-1920x750.jpg" alt="Elroq"></picture></div>
+        <div><p>15. 9. 2026</p><h3><a href="/en/a">Škoda Elroq RS revealed</a></h3></div>
+      </div>
+      <div>
+        <div><picture><img src="https://cdn.skoda-storyboard.com/2024/10/Elroq-charging_ae487975.png" alt="Enyaq"></picture></div>
+        <div><p>1. 8. 2026</p><h3><a href="/en/b">Enyaq model-year update</a></h3></div>
+      </div>
+      <div>
+        <div><picture><img src="https://cdn.skoda-storyboard.com/2024/10/Elroq-boot_c23fb824.png" alt="Octavia"></picture></div>
+        <div><p>10. 6. 2026</p><h3><a href="/en/c">Octavia turns 30</a></h3></div>
+      </div>
+      <div>
+        <div><picture><img src="https://cdn.skoda-storyboard.com/2024/10/Elroq-head-up_301f7568.png" alt="Kodiaq"></picture></div>
+        <div><p>20. 5. 2026</p><h3><a href="/en/d">One-millionth Kodiaq built</a></h3></div>
+      </div>
+      <div>
+        <div><picture><img src="https://cdn.skoda-storyboard.com/2024/10/Elroq-interior_bc182cb0.png" alt="Superb"></picture></div>
+        <div><p>11. 3. 2026</p><h3><a href="/en/e">Superb: 25 years</a></h3></div>
+      </div>
+      <div>
+        <div><picture><img src="https://cdn.skoda-storyboard.com/2024/10/Tech-Deck_c72ad67a.png" alt="Epiq"></picture></div>
+        <div><p>2. 2. 2026</p><h3><a href="/en/f">Epiq city SUV preview</a></h3></div>
+      </div>
+    </div>
+
+    <h2 style="margin-top:48px">Taxonomy (caption below wide image)</h2>
+    <div class="carousel block" data-block-name="carousel" aria-label="Models">
+      <div>
+        <div><picture><img src="https://cdn.skoda-storyboard.com/2024/10/hero_car_timiano_ext_front_1f67abb3.png" alt="Enyaq"></picture></div>
+        <div><h3><a href="/en/models/enyaq">Enyaq</a></h3></div>
+      </div>
+      <div>
+        <div><picture><img src="https://cdn.skoda-storyboard.com/2024/10/elroq_header_fede6794-1920x750.jpg" alt="Elroq"></picture></div>
+        <div><h3><a href="/en/models/elroq">Elroq</a></h3></div>
+      </div>
+      <div>
+        <div><picture><img src="https://cdn.skoda-storyboard.com/2024/10/Elroq-boot_c23fb824.png" alt="Kodiaq"></picture></div>
+        <div><h3><a href="/en/models/kodiaq">Kodiaq</a></h3></div>
+      </div>
+      <div>
+        <div><picture><img src="https://cdn.skoda-storyboard.com/2024/10/Elroq-interior_bc182cb0.png" alt="Octavia"></picture></div>
+        <div><h3><a href="/en/models/octavia">Octavia</a></h3></div>
+      </div>
+      <div>
+        <div><picture><img src="https://cdn.skoda-storyboard.com/2024/10/Tech-Deck_c72ad67a.png" alt="Superb"></picture></div>
+        <div><h3><a href="/en/models/superb">Superb</a></h3></div>
+      </div>
+    </div>
+  </main>
+  <script type="module">
+    import decorate from '/blocks/carousel/carousel.js';
+    document.querySelectorAll('.carousel').forEach((b) => decorate(b));
+    window.__carouselReady = true;
+  </script>
+</body>
+</html>
