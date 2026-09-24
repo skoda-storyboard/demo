@@ -3,10 +3,12 @@
 .promo-box {
   --promo-dot-size: 10px;
   --promo-dot-target: 44px;
+  --promo-following-gap: 2rem;
 
   position: relative;
   left: 50%;
   width: min(100vw, var(--content-max-width));
+  margin-block: var(--spacing-m) 0;
   transform: translateX(-50%);
 }
 
@@ -101,6 +103,10 @@
 }
 
 @media (width >= 768px) {
+  .promo-box {
+    margin-block-end: var(--promo-following-gap);
+  }
+
   .promo-box .promo-box-items {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
