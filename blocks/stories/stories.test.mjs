@@ -251,6 +251,16 @@ test('buildCardTeaser renders an overlay card with date + title', () => {
   assert.equal(title.textContent, 'Story A');
 });
 
+test('indexed story titles omit the site-wide SEO suffix, not the story title', () => {
+  const row = { path: '/en/a', title: 'The Škoda Peaq Will Win You Over Fast - Škoda Storyboard', date: '2026-09-22' };
+  const li = buildCardTeaser(row);
+  const body = li.children[0].children.find((c) => c.className === 'card-teaser-body');
+  const title = body.children.find((c) => c.className === 'card-teaser-title');
+  assert.equal(title.textContent, 'The Škoda Peaq Will Win You Over Fast');
+  assert.equal(row.title, 'The Škoda Peaq Will Win You Over Fast - Škoda Storyboard');
+  assert.equal(body.children[0].textContent, '22. 9. 2026');
+});
+
 test('buildCardTeaser: image-less row renders a full card, not a zero-height media element (#3)', () => {
   const li = buildCardTeaser(
     { path: '/en/b', title: 'No image story', date: '2026-08-01' },

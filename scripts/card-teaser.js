@@ -182,6 +182,7 @@ export function buildCardTeaser(row, {
 } = {}) {
   const li = document.createElement('li');
   li.className = overlay ? 'card-teaser overlay' : 'card-teaser';
+  const title = String(row.title || '').replace(/ - Škoda Storyboard$/, '');
 
   const a = document.createElement('a');
   a.className = 'card-teaser-link';
@@ -192,7 +193,7 @@ export function buildCardTeaser(row, {
   if (row.image) {
     const media = document.createElement('div');
     media.className = 'card-teaser-image';
-    const pic = createOptimizedPicture(row.image, row.title || '', eager, [
+    const pic = createOptimizedPicture(row.image, title, eager, [
       { media: '(min-width: 768px)', width: desktopWidth }, { width: mobileWidth },
     ]);
     if (eager) pic.querySelector('img')?.setAttribute('fetchpriority', 'high');
@@ -214,10 +215,10 @@ export function buildCardTeaser(row, {
     time.textContent = dateText;
     body.append(time);
   }
-  if (row.title) {
+  if (title) {
     const h = document.createElement('h3');
     h.className = 'card-teaser-title';
-    h.textContent = row.title;
+    h.textContent = title;
     body.append(h);
   }
   if (summary && row.description) {
