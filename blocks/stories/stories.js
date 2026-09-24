@@ -6,7 +6,8 @@
  * more" <button> that appends the next batch. Source pager (measured, stories.md
  * §2/§8): initial render = 5 cards, each Load more appends 6 — NOT infinite
  * scroll. The promo-box hero posts are excluded (source `exclude_carousel_posts`)
- * so the feed never repeats the featured items.
+ * so the feed never repeats the featured items. An authored offset can also skip
+ * the promo's top N stories when the index has no featured flag.
  *
  * FACET-LESS reuse of SKODA-402 (no fork): scripts/query-index.js (one memoized
  * fetch/cache) + listing-logic.mjs scopeRows/filterRows/sortRows/paginate + the
@@ -48,12 +49,17 @@ function buildStrings(ph) {
 // Split a comma-separated config value into trimmed tokens.
 const tokens = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
 
-function parseFeedConfig(block) {
+export function parseFeedConfig(block) {
   const cfg = readBlockConfig(block);
+  const offset = cfg.offset ? Number(cfg.offset) : 0;
+  if (!Number.isSafeInteger(offset) || offset < 0) {
+    throw new Error('stories: offset must be a non-negative integer');
+  }
   return {
     index: cfg.index || defaultIndexUrl(),
     path: cfg.path || '',
     template: cfg.template || '',
+    offset, // skip sorted, scoped rows before applying the load-more slice
     // category/tag: within-value OR, across-key AND (reuses listing-logic filterRows)
     category: tokens(cfg.category),
     tag: tokens(cfg.tag || cfg.tags),
@@ -65,8 +71,8 @@ function parseFeedConfig(block) {
     perpage: Math.max(1, Number(cfg.perpage) || 6),
     // 'featured' (default): 2 large + 3-up; a number → plain N-up grid
     columns: cfg.columns || 'featured',
-    // exclude promo-box hero posts so the feed doesn't duplicate them (default on)
-    excludeFeatured: String(cfg.excludefeatured ?? 'true') !== 'false',
+    // Use either the authored skip or flagged promo rows by default, not both.
+    excludeFeatured: String(cfg.excludefeatured ?? (offset ? 'false' : 'true')) !== 'false',
   };
 }
 
@@ -77,6 +83,8 @@ export const isFeatured = (row) => {
   const v = row.featured ?? row.promo ?? row.carousel;
   return v === true || v === 'true' || v === '1' || v === 1;
 };
+
+export const selectFeedRows = (rows, sort, offset) => sortRows(rows, sort).slice(offset);
 
 /*
  * One feed cell = the shared overlay card-teaser (scripts/card-teaser.js), which
@@ -139,7 +147,7 @@ export default async function decorate(block) {
     return;
   }
 
-  const sortedRows = () => sortRows(scoped, state.sort);
+  const sortedRows = () => selectFeedRows(scoped, state.sort, cfg.offset);
 
   // Load-more pushes a new history entry (offset paging, matching the source);
   // there is no filter/sort UI here, so no replaceState path is needed.
