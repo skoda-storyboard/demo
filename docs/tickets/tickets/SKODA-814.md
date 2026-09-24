@@ -13,7 +13,9 @@ Key facts from the block recount (2026-09-15) that create this ticket:
 - Heading levels are **author-chosen and often invalid** (sample uses `<h3>` with no `<h2>`), so the flatten must re-derive a correct hierarchy.
 
 ## Summary
-Define and build the parser contract that flattens the SiteOrigin Page-Builder body into clean EDS sections + default content, with a `columns` block only for genuine side-by-side columns. This is the reusable flatten SKODA-801 (story corpus) depends on; it also serves the model description and generic Pages.
+Define and build the parser contract that flattens the SiteOrigin Page-Builder body into clean EDS sections + default content, with a `columns` block only for genuine side-by-side columns.
+
+**Reconciled 2026-09-24:** SKODA-801 did NOT wait on this ticket — it shipped a working SiteOrigin flatten for the story corpus (`tools/importer/parsers/story-flatten.js`: 17-widget census map, genuine multi-column → `columns` block, large-tree robustness, linear-story fallback). So this ticket is no longer "the reusable flatten 801 depends on." It now owns **generalizing that flatten to the other SiteOrigin-bodied regions at M2** — the model-page description and generic Pages (1,614 pages total) — plus the measured `siteorigin-body.md` contract and the heading-hierarchy re-derivation for author-invalid levels. Where the story parser already solves a case, lift/share it rather than re-implement.
 
 ## Description
 The SiteOrigin panel tree carries no semantic value, its `panel-grid`/`cell`/`panel`/`so-widget` wrappers are pure layout. This ticket owns the **measured contract + flatten rules** for that region:
@@ -39,8 +41,8 @@ Measurable gates live in [`siteorigin-body.md` §9](../../ui-specs/siteorigin-bo
 - [ ] Visual diff vs source at 1280/768/mobile ≤ 2% per-pixel (excluding image content).
 
 ## Dependencies
-- Upstream: SKODA-601 (import infra), SKODA-203 (gallery), SKODA-204 (embeds)
-- Downstream: **SKODA-801** (story-corpus flatten consumes this contract), SKODA-208 (model description reuses it), SKODA-813 (generic Page base), SKODA-1001 (per-locale trees)
+- Upstream: SKODA-601 (import infra), SKODA-203 (gallery), SKODA-204 (embeds), **SKODA-801** (shipped the story-corpus flatten this ticket generalizes — reuse `story-flatten.js` rather than re-implement)
+- Downstream: SKODA-208 (model description reuses it), SKODA-813 (generic Page base), SKODA-1001 (per-locale trees)
 
 ## Risks / Flags
 - **Column heuristic (🟡):** deciding when a 2-col SiteOrigin row is a real `columns` block vs an authoring accident, verify against a sample of multi-col stories before locking.

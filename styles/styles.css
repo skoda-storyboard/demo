@@ -48,6 +48,16 @@
   /* prose paragraph rhythm (measured ~20px bottom gap in article/press body) */
   --paragraph-gap: 20px;
 
+  /* story-detail two-column shell (docs/ui-specs/story-detail.md §3): primary
+     .content 66.66% (~819px @1280) + secondary aside 33.33% (~409px). A 2fr/1fr
+     ratio holds the 66.66/33.33 proportion; the ~24px gap matches the source's
+     -10px column gutter so the tracks land on the measured 819/409 widths. */
+  --story-column-gap: var(--spacing-l);
+
+  /* reading-measure cap: source fills the full 819px column (~100ch); story-detail
+     §8 recommends capping ~72ch for readability. Applied to the prose column. */
+  --prose-measure: 72ch;
+
   /* body sizes (mobile-first base) */
   --body-font-size-m: 16px;
   --body-font-size-s: 14px;
@@ -559,4 +569,102 @@ main .section.dark {
 
 main .section.dark a {
   color: var(--background-color);
+}
+
+/* ==========================================================================
+   Story detail — two-column body + aside (SKODA-801)
+   Render target: docs/ui-specs/story-detail.md. Scoped to body.story so it never
+   affects other templates. Follows the three-layer order (css-guidelines.md):
+     L1 fluid prose measure · L2 intrinsic grid w/ minmax · L3 one ≥768 breakpoint.
+   ========================================================================== */
+
+/* Layer 1 — fluid. Mobile-first: sections stack in source order (body, then the
+   Style:sidebar aside below it), which matches the source <768 behaviour. Cap the
+   prose measure for readability rather than filling the whole column. Story prose
+   scale is measured (story-detail.md §3): body p 16/24; h2 40/45 wt300 (→28 mobile);
+   h3 24/27.6 wt300; prose lists use a custom bullet (list-style:none, padding 1.5em).
+   Scoped to the story body column so global heading sizes stay intact. */
+body.story main > .section.body-column .default-content-wrapper {
+  max-width: var(--prose-measure);
+  font-size: var(--body-font-size-m);
+  line-height: 1.5;
+}
+
+body.story main > .section.body-column .default-content-wrapper h2 {
+  font-size: var(--heading-font-size-hero-story-mobile); /* 28px mobile base */
+  font-weight: var(--weight-light);
+  line-height: 1.125;
+}
+
+body.story main > .section.body-column .default-content-wrapper h3 {
+  font-size: var(--heading-font-size-l);
+  font-weight: var(--weight-light);
+  line-height: 1.15;
+}
+
+body.story main > .section.body-column .default-content-wrapper ul {
+  list-style: none;
+  padding-left: 1.5em;
+}
+
+/* The aside: stacked full-width cards + tags below the body on small screens. */
+body.story main > .section.sidebar aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-l);
+}
+
+/* Layer 2 / Layer 3 — at ≥768 the article becomes a real two-column grid. This is a
+   genuine structural transition (single stack → side-by-side), so it earns the one
+   breakpoint. `main` is the grid; the body column spans the left track and the aside
+   the right, both capped by --content-max-width via the intrinsic minmax track. */
+@media (width >= 768px) {
+  body.story main {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    column-gap: var(--story-column-gap);
+    max-width: var(--content-max-width);
+    margin-inline: auto;
+    align-items: start;
+  }
+
+  /* Full-bleed sections (hero) opt out of the grid and span both tracks. */
+  body.story main > .section.hero,
+  body.story main > .section:first-of-type {
+    grid-column: 1 / -1;
+  }
+
+  /* Body column → left track; aside → right track, aligned to the body's top. */
+  body.story main > .section.body-column { grid-column: 1; }
+
+  /* Aside → right track. Enhancement hook (story-detail.md §8): to make the aside
+     follow long articles, add `position: sticky; top: var(--nav-height);` here —
+     grid-on-main makes it a one-line enable with no restructuring. Left off until
+     confirmed with the client (source aside is static). */
+  body.story main > .section.sidebar {
+    grid-column: 2;
+  }
+
+  body.story main > .section.dark {
+    grid-column: 1 / -1;
+    position: relative;
+    isolation: isolate;
+  }
+
+  body.story main > .section.dark::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    background: var(--dark-color);
+    z-index: -1;
+  }
+
+  /* At desktop the measured source h2 is 40/45 (wt300). */
+  body.story main > .section.body-column .default-content-wrapper h2 {
+    font-size: var(--heading-font-size-hero-story);
+    line-height: 1.125;
+  }
 }

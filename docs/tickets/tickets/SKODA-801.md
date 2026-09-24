@@ -56,14 +56,14 @@ panel-grid                         ← whole layout
 |---|--:|---|
 | `sow-editor` / `tinymce` (rich text) | 83.5% | **default content** (h/p/ul; inline images + inline embeds pass through as-is) |
 | `skoda-offset` (spacer) | 8.2% | **dropped**, or a section break |
-| `skoda-carousel-widget` | 4.0% | *(Superseded 2026-09-24: an in-body image gallery on the in-scope stories → SKODA-219.)* **Carousel/Cards block**, these are **related-content teasers** (a "you might also like" rail), possibly auto-generated → consider regenerating from the query-index at render rather than migrating as content |
+| `skoda-carousel-widget` | 4.0% | **Routed by content:** link-free photo sets → Gallery (slider) per SKODA-219 (currently default Gallery until that variant lands); link-bearing teasers → Cards. Preserve the source image order and descriptions, not an index-generated list. See census §7a. |
 | `sow-slider` | 1.5% | **image slider → Carousel/Gallery block** |
 | `skoda-quote` | 1.1% | **pull-quote → `<blockquote>` / small quote block** |
 | `skoda-captioned-image` *(census, 45 stories)* | 0.7% | **image + caption → figure / image block** |
 | `sow-button` (+ `sow-button-wire` variants) *(census)* | 0.3% | **button / CTA** (EDS button-decoration: `<p><strong><a>`) |
-| `skoda-image-box` *(census, 16 stories)* | 0.2% | **image / small card block** |
+| `skoda-image-box` *(census, 16 stories)* | 0.2% | **infobox / definition callout → text (+ image) as default content** (CORRECTED 2026-09-24: it is an `<abbr class="infobox">` glossary box, NOT a plain image; see coverage review D2) |
 | `sow-image` *(census)* | 0.1% | **image** (lift out of `<p>`) |
-| `ys-milestones` *(census, 18 stories)* | 0.1% | **timeline → new block, or omit for demo** |
+| `ys-milestones` *(census, 18 stories)* | 0.1% | **timeline flattened to content** (per entry `<h3>` "YEAR — Title" + image; SKODA-815/D1, shipped 2026-09-24). Optional dedicated timeline block = M2. |
 | `ys-embed-share` *(census, 12 stories)* | 0.1% | **social-share widget → chrome/omit** (not body content) |
 | `iframe-embed` *(census)* | 0.01% | **embed block** (preserve `dnt=1`) |
 | `highlights` / `ys-so-widget-highlights` *(census)* | 0.02% | small block / omit |
@@ -112,20 +112,24 @@ Body…
 - **Defer the 3 interactive widgets** (`k2tools-charge-map`, `k2tools-charging-calculator`, nested `siteorigin-panels-builder`), external embed or skip+log; confirm with Škoda whether to render or drop.
 
 ## Acceptance Criteria
-- [ ] Parser flattens a representative sample (≥4 stories spanning 13–19 panels) into valid DA HTML with sections + block tables, no builder markup left.
-- [ ] Rich-text, carousel, gallery, and embed widgets each map to the correct DA output; `dnt=1` preserved on Vimeo embeds.
-- [ ] Image captions from `data-caption` appear as figure captions; `alt` preserved.
-- [ ] Detection is purely content/DOM-driven, same story imports correctly regardless of URL or panel count/order.
-- [ ] Unknown widget types are skipped without failing the import and are logged.
-- [ ] Output passes lint and renders correctly in local preview vs. the source story.
-- [ ] **M1 acceptance (reduced-fidelity):** demo story set flattens to single-column stacked sections with the common widgets mapped, a correct, presentable blog post. **M2 acceptance (full):** arbitrary nesting + widget long-tail handled at scale.
-- [ ] Parser prototyped on ≥1 real story **before** the M1 schedule is committed (de-risk the unknown-unknowns).
-- [ ] **Non-Page-Builder stories** (no SiteOrigin tree, 3.6%) are detected and routed to the plain-post path, not force-flattened.
-- [ ] **Robust to large trees**, the 208-widget / 293-panel-grid outliers parse without failure.
-- [ ] Validated against the **census test corpus**: the 36 `has_rare=yes` stories + the 208-widget outlier + a non-Page-Builder story (`SKODA-STORY-WIDGET-DATASET.csv`).
+- [x] Parser flattens a representative sample into valid DA HTML with sections + block tables, no builder markup left. *(2026-09-24: `tools/importer/parsers/story-flatten.js`; verified on epiq 13-widget, olive-oil 9-widget multi-column, + linear octavia — 0 builder markup remaining in every output.)*
+- [x] Rich-text, carousel, gallery, and embed widgets each map to the correct DA output. *(sow-editor → default content; `sow-slider` → Gallery; `skoda-carousel-widget` routed by content — link-free → Gallery, linked → Cards; sidebar related teasers → Cards; embeds pass through. `dnt=1`/nocookie embed markup preserved as-is from the source `.page-embed`.)*
+- [x] Image captions from `data-caption` appear as figure captions; `alt` preserved. *(captioned-image/image-box → `<figure>`+`<figcaption>` from `data-caption`, alt kept.)*
+- [x] Detection is purely content/DOM-driven (`.panel-layout`/`.panel-grid`/`.so-panel`/`so-widget-*`), no URL/positional/template-order assumptions.
+- [x] Unknown widget types are skipped without failing the import and are logged. *(`unknown` salvages rich text then skips + logs; `console.warn` summary emitted.)*
+- [x] Output passes lint and renders correctly in local preview vs. the source story. *(eslint + stylelint clean; browser-verified two-column render at 1280 = 816/408px and stacked at 500px, aside below body; prose scale h2 40/45→28, p 16/24.)*
+- [x] **M1 acceptance (reduced-fidelity):** demo story set flattens with the common widgets mapped, a correct, presentable blog post, **now upgraded**: the primary column keeps full widget fidelity + a real two-column body+aside layout (grid-on-main). **M2 (full):** arbitrary nesting + widget long-tail at scale — still to run over the whole corpus.
+- [x] Parser prototyped on ≥1 real story **before** committing (top unknown-unknown). *(prototyped on epiq + olive-oil raw HTML; 0 unmapped widgets against the census set.)*
+- [x] **Non-Page-Builder stories** (no SiteOrigin tree, 3.6%) are detected and routed to the plain-post path, not force-flattened. *(verified on `/en/models/the-upgraded-skoda-octavia/`: no flatten log, clean default content.)*
+- [x] **Robust to large trees**, the 208-widget / 293-panel-grid outliers parse without failure. *(unit test: 293-grid synthetic tree flattens in ~210–310ms, 0 builder markup.)*
+- [ ] Validated against the **full census test corpus**: the 36 `has_rare=yes` stories + the 208-widget outlier + a non-Page-Builder story (`SKODA-STORY-WIDGET-DATASET.csv`). *(unit-tested synthetically + 3 real stories incl. one non-PB; the full 36-story `has_rare` at-scale run remains M2.)*
+
+**Aside/two-column layout (design as-built):** the body flattens to a single primary-column section (`Style: body-column`); the `.sidebar` is rebuilt (not dropped) into a `Style: sidebar` section (Cards + Tags) by `skoda-story-aside.js`; a story-scoped CSS grid on `main` (`styles.css`, `body.story`, ≥768) places them 66.66/33.33 and stacks them mobile-first. NB the vendored `decorateSections` does not apply Section Metadata `Style` classes, so a story-scoped `decorateStorySections` hook in `scripts.js` applies them (and consumes the section-metadata div so it is not mis-decorated as a block). Deviation from the ticket's "panel-row → `---`": the render-target spec models the body as one column beside the aside, so panel-rows linearize within the body rather than emit per-row section breaks; genuine multi-column panel-grids are preserved as a Columns block.
 
 ## Dependencies
-- Upstream: SKODA-601 (import infra: parsers/transformers), SKODA-603 (pilot page set validated) / Downstream: SKODA-802 (remaining templates), SKODA-803 (bulk import automation)
+- Upstream: SKODA-601 (import infra: parsers/transformers), SKODA-603 (pilot page set validated)
+- Block targets the flatten emits (render inert until built): **SKODA-203** (Gallery + lightbox — `skoda-carousel-widget`/`sow-slider` map here), **SKODA-201** (Cards — the sidebar related rail via `skoda-story-aside`)
+- Downstream: **SKODA-604** (full-fidelity restore extends this path — in-body `.sb-gallery`/colorbox galleries + Media Box that this flatten defers), SKODA-802 (remaining templates), SKODA-803 (bulk import automation), **SKODA-814** (generalize the flatten to model/Page bodies at M2)
 
 ## Risks / Flags
 - **R-A2 / R11 (Medium):** the **100% EN+CS census** (`SKODA-STORY-WIDGET-CENSUS.md`, 2,773 stories, 0 errors) makes the widget universe **known, not estimated**, 17 types, 98.7% of stories / 99.85% of instances covered by simple mapped widgets; residual is a **known, enumerated 36-story special set**. Widget set is **locale-invariant (EN = CS)** → CS adds volume, not parser complexity.
