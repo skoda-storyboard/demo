@@ -2,6 +2,35 @@
 
 **What this is:** the master index for the migration backlog, 10 epics, 72 tickets, grounded in the `SKODA-*` analysis set. Pilot epics (E01–E07) are ticket-level; later phases (E08–E10) are epic + high-level tickets so the whole program is visible.
 **Date:** 2026-09-05 (updated 2026-09-07: media-cart re-point, SKODA-505 added to M1, SKODA-902 re-scoped; updated 2026-09-10: build-confirmed, SKODA-506 added, SKODA-401 re-scoped to +3 SP for metadata-normalization, SKODA-801 trending low & browser-confirmed; updated 2026-09-11: Press Kit detail broken out of SKODA-802 into SKODA-805–808 per requirements doc §11; updated 2026-09-14: 22-URL analysis added SKODA-207 (Series→M1), SKODA-604 (full-fidelity story restore→M1), SKODA-810 (company/Page family→M2) per decision D18; updated 2026-09-14: traceability gaps closed, added SKODA-305 (MR footer→M1), SKODA-809 (roles), SKODA-811 (embargo), SKODA-812 (audit), SKODA-906 (QR access) → M2 governance layer, 51→56 tickets / 220→237 SP; updated 2026-09-15: ui-specs template-gap tickets added, SKODA-607 (press-release detail→M1), SKODA-208 (model page), SKODA-209 (category/tag archive), SKODA-706 (404), SKODA-813 (Page base shell)→M2, 56→61 tickets / 237→253 SP; updated 2026-09-15: block-recount cross-check added SKODA-210 (custom microsite, 201 pages) + SKODA-814 (SiteOrigin body flatten, 1,614 pages), 61→63 tickets / 253→261 SP, and reconciled SKODA-808 (no source variant selector, net-new pending MR-PK03); updated 2026-09-23: resolved a SKODA-211 ID collision, the **Stories feed block moved to SKODA-214** (GitHub issue #97 retitled) and **SKODA-211 registered as the completed DA tag-management plugin** (merged PR #60 / closed issue #54); E02 gains the tag-plugin row (net +1 vs the a73c810 stories/rails/promo scoping))
+**Update (2026-09-24, M1 gap review):** The [`SKODA-M1-GAP-REVIEW.md`](../reviews/SKODA-M1-GAP-REVIEW.md) revalidated M1 against the canonical 43-URL set in [`skoda-m1-url-set.txt`](../planning/skoda-m1-url-set.txt).
+
+New M1 tickets:
+
+| Ticket | Scope | SP | Tier |
+|---|---|--:|---|
+| **SKODA-219** | in-body story image carousel `skoda-carousel-widget`; on 21/21 story URLs | 3 | Must |
+| **SKODA-801a** | M1 story import fidelity: carousel, Media Box, Vimeo | 3 | Must |
+| **SKODA-608** | image/video item index rows | 3 | Must |
+| **SKODA-609** | link containment + alias redirect | 2 | Must |
+| **SKODA-805a** | press-kit tiles hub | 3 | Must |
+| **SKODA-805b** | press-kit child pages; sized as option B | 3 | Could |
+| **SKODA-805c** | `press_kit-template-default` | 3 | Should |
+
+- Ticket file created for the existing issue SKODA-306 (#102): 1 SP.
+- Re-scoped:
+  - SKODA-603: 3→5 SP (43 URLs + corpus + tracker)
+  - SKODA-207: hubs only
+  - SKODA-208: M2→**M1**
+  - SKODA-604: in-set stories
+  - SKODA-607: Buzzsprout, related rail
+  - SKODA-801: `skoda-carousel-widget` correction
+  - SKODA-805: M1 slices split out
+- Totals: **+8 tickets, +23 SP** relative to the running totals. Together with the SKODA-215–218 docs on
+  `docs/skoda-216-story-gallery`, that gives 76→84 tickets and 267→290 SP. The slice SP (801a, 805a–c) are added on
+  top of their parents as planning SP.
+- The headline count and the §2/§5 epic roll-ups are **not yet re-summed** for this update. They are re-summed once
+  both docs branches have merged.
+- The cut line and wave plan are in the review, §9–§10.
 **Target:** DA / Experience Workspace + EDS (no AEM Author / UE / JCR), per `SKODA-EDS-DA-ARCHITECTURE.md`.
 **Estimates:** story points (SP) + AI-assisted / manual day ranges, **planning estimates, not a quote**. "AI-assisted" reflects this environment's import/styling/QA tooling.
 **Files:** `docs/tickets/epics/E##-*.md` · `docs/tickets/tickets/SKODA-<id>.md`.
@@ -69,11 +98,13 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-212 | Horizontal rails block (story-rail + carousel) | E02 | 3 | 1–2 | 3–5 | 201,402,401,106 | 🟡 M1; `story-rail`/`carousel` unbuilt; watchCSS + a11y `[RUNTIME-UNCONFIRMED]`; spec `ui-specs/carousel-rails.md` |
 | SKODA-213 | Promo-box block (featured mosaic / auto-rotate slider) | E02 | 2 | 0.5–1 | 2–3 | 201,106,202 | 🟡 M1; `promo-box` unbuilt; mosaic≥768 / 1-up auto-rotate<768 a11y `[RUNTIME-UNCONFIRMED]`; spec `ui-specs/carousel-rails.md` §3/§5 |
 | SKODA-214 | Stories feed block (Load-more pager, query-index) | E02 | 2 | 0.5–1 | 1–2 | 201,402,401,106 | 🟢 M1; `blocks/stories` unbuilt; facet-less reuse of 402 loader/paginate; spec `ui-specs/stories.md` (was SKODA-211, renumbered 2026-09-23) |
+| [SKODA-219](tickets/SKODA-219.md) | In-body story image carousel (`skoda-carousel-widget`) | E02 | 3 | 1–1.5 | 2–3 | 212,501,106 | 🟠 M1 Must; 21/21 in-set stories; unspecced before 2026-09-24 (gap review G-02) |
 | SKODA-301 | Header + mega-menu (3 panels) | E03 | 5 | 2–3 | 4–6 | 102,106 | 🟡 |
 | SKODA-302 | Mobile nav toggle + ARIA (a11y fix) | E03 | 2 | 1 | 1–2 | 301 | 🟡 fixes source gap |
 | SKODA-303 | Language switcher (6 locales) | E03 | 2 | 1 | 1–2 | 301 | 🟢 |
 | SKODA-304 | Footer fragment | E03 | 3 | 1–2 | 2–4 | 102,106 | 🟢 |
 | SKODA-305 | Media Room footer variant | E03 | 2 | 1 | 1–2 | 304,301 | 🟢 M1; closes gap G1 (COM18); unify-vs-distinct 🟡 |
+| [SKODA-306](tickets/SKODA-306.md) | Footer outbound-link browsing-context parity (`target=_blank`) | E03 | 1 | 0.5 | 1 | 304 | 🟢 M1; issue #102; file added 2026-09-24 |
 | SKODA-401 | Query-index schema + selectors + metadata-normalization (15 facets) | E04 | 8 | 3–5 | 5–8 | 104 | 🟠 build-confirmed: admin-service `query.yaml` (not repo); fields need normalization layer, not clean selectors |
 | SKODA-402 | Faceted listing + load-more (deep-link) | E04 | 8 | 3–5 | 6–9 | 401,201 | 🟠 hardest pilot block |
 | SKODA-403 | Search block (index-only) | E04 | 3 | 1–2 | 2–4 | 401 | 🟡 body-search deferred |
@@ -89,9 +120,15 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-507 | Native AEM Assets picker in DA/EW (Media Bus delivery) | E05 | 2 | 0.5–1 | 1–2 | 504,505b | 🔴 BLOCKED (client AEM env + DA site config, creds) |
 | SKODA-601 | Import infra: parsers + transformers | E06 | 5 | 2–3 | 4–6 | 102 | 🟡 content-driven only |
 | SKODA-602 | DA source-API push + bulk-op publish | E06 | 3 | 1–2 | 2–3 | 601 | 🟢 |
-| SKODA-603 | Pilot page set imported + validated | E06 | 3 | 1–2 | 2–3 | 601,602,201,202,203,204,205,501,502 | 🟡 fan-in |
+| SKODA-603 | Pilot page set imported + validated, **re-scoped 2026-09-24 to the 43-URL set + rail corpus + tracker** | E06 | 5 | 2–3 | 3–5 | 601,602,201,202,203,204,205,501,502 | 🔴 M1 content critical path (index = 3 rows on 2026-09-24) |
 | SKODA-604 | Full-fidelity restore on 1–2 hero demo stories | E06 | 2 | 0.5–1 | 1–2 | 203,204,502,505,601,602,801 | 🟢 M1 (D18); bounded un-flatten |
 | SKODA-607 | Press Release detail template (split from story) | E08 | 5 | 2–3 | 4–6 | 601,602,502 | 🟢 M1; PR ≠ story (no hero, MR side, 47.5% of pages); spec `ui-specs/template-press-release.md` |
+| [SKODA-608](tickets/SKODA-608.md) | Image & video item index rows (listings + model media rails) | E06 | 3 | 1–1.5 | 2–3 | 601,602,401,501,503 | 🟠 M1 Must; `/en/images/`, `/en/videos/` empty without it |
+| [SKODA-609](tickets/SKODA-609.md) | M1 link containment + mixed-reality alias redirect | E06 | 2 | 1 | 1–2 | 605,103,603 | 🟠 M1 Must; decision D-3 |
+| [SKODA-801a](tickets/SKODA-801a.md) | M1 story import fidelity slice (carousel, Media Box, Vimeo) | E08 | 3 | 1–2 | 3–4 | 601,219,502,204 | 🟠 M1 Must; slice of 801 |
+| [SKODA-805a](tickets/SKODA-805a.md) | Press-kit tiles hub, M1 slice + importer (3 hubs) | E08 | 3 | 1–2 | 3–4 | 601,602,202,201,305,609 | 🟠 M1 Must; slice of 805 |
+| [SKODA-805b](tickets/SKODA-805b.md) | Press-kit child pages for M1 hubs (import vs link-out, D-1) | E08 | 3 | 1–2 | 3–5 | 805a,805c,502,609 | 🟡 M1 Could; 50 child pages outside the set |
+| [SKODA-805c](tickets/SKODA-805c.md) | `press_kit-template-default` article + accordion (first-glimpse) | E08 | 3 | 1–2 | 3 | 607,204,205,502,506 | 🟡 M1 Should; slice of 805/807 |
 | SKODA-701 | Lint + unit tests | E07 | 2 | 1 | 1–2 | E02,E03,E04 | 🟢 |
 | SKODA-702 | Performance (Lighthouse≈100/RUM) | E07 | 3 | 1–2 | 2–3 | 603 | 🟡 |
 | SKODA-703 | Accessibility audit | E07 | 3 | 1–2 | 2–4 | 603 | 🟠 several `[RUNTIME-UNCONFIRMED]` |
@@ -101,7 +138,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 
 | ID | Title | Epic | Phase | SP | AI-d | Man-d | Deps | Risk |
 |---|---|---|---|--:|--:|--:|---|---|
-| SKODA-208 | Model page template (skoda_model: hero + icon nav + 5 rails) | E02 | B | 5 | 2–3 | 4–6 | 202,402,201 | 🟢 M2; spec `ui-specs/template-model-page.md` |
+| SKODA-208 | Model page template (skoda_model: hero + icon nav + 5 rails) | E02 | B | 5 | 2–3 | 4–6 | 202,402,201 | 🟠 **M1** (re-milestoned 2026-09-24: 5 model URLs in the M1 set; 3 blocks missing); spec `ui-specs/template-model-page.md` |
 | SKODA-209 | Category / Tag archive template (hero + card grid, no facets) | E02 | B | 3 | 1–2 | 2–4 | 202,201,402 | 🟢 M2; spec `ui-specs/template-category-archive.md` |
 | SKODA-210 | Custom microsite (full-width event-gallery/campaign) scope + template | E02 | B | 3 | 1–2 | 2–4 | 203,813,814,601 | 🟡 M2; 201 pages, migrate/fold/drop decision; spec `ui-specs/custom-microsite.md` (recount §2/§8) |
 | SKODA-706 | Branded 404 (keeps chrome, real HTTP 404) | E07 | B | 1 | 0.5 | 0.5–1 | 301,304 | 🟢 M2; spec `ui-specs/template-404.md` |

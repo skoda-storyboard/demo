@@ -46,6 +46,12 @@ section
 as a dependency other legacy widgets pull in. No `skoda-carousel` / `.skoda-slider` nodes exist
 (count = 0 · `/en/`). jQuery underpins all of it.
 
+> **Scope note (2026-09-24, M1 gap review):** the "count = 0" above holds for the **home page** only. Story detail
+> pages have SiteOrigin `widget_skoda-carousel-widget` instances in the article body on **21/21** in-set story URLs,
+> for example 5 on `/en/skoda-world/how-the-skoda-octavia-reached-365-km-h/`. These are Flickity **image galleries**
+> (`autoPlay:3000`, `wrapAround`, `pageDots`, captioned `img.media-cart-image` slides), not teaser rails. They are
+> specified and built under **SKODA-219**, as an image variant of the same vanilla `carousel` block.
+
 **Libraries to retire (do not port):** Flickity, Owl Carousel, `skoda-carousel`, jQuery. Replace with
 the existing vanilla `carousel` block: native `overflow-x` scroll track + CSS `scroll-snap` +
 pointer-drag + rAF-gated arrow state (see `blocks/carousel/carousel.js`). No JS animation loop.
