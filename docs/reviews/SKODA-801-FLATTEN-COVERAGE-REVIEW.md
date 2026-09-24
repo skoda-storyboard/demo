@@ -9,9 +9,9 @@ non-Page-Builder linear story. Imported with the current shipped bundle (PR #113
 **Bottom line:** the common shape (rich text + image carousel + spacers + quote + button +
 related rail) flattens correctly and robustly. The review found **2 content-loss defects** (D1
 milestones dropped, D2 figure/infobox mis-handled in multi-column) plus **1 minor
-editor-hygiene issue** (D4 empty-text/over-encoded inline links). D3 (interactive defer) works
-as designed. None crash; the losses are **silent** — the widget is classified, but content is
-dropped or de-semanticised without a warning.
+editor-hygiene issue** (D4 over-encoded inline hrefs). D3 (interactive defer) works as designed.
+**All of D1, D2 and D4 are now FIXED (2026-09-24)**; see each section. The original losses were
+**silent** — the widget was classified, but content dropped or de-semanticised without a warning.
 
 ---
 
@@ -81,16 +81,22 @@ dropped or de-semanticised without a warning.
   first real page carrying **both** a charge-map and a calculator; confirms the defer path.
   Still needs the Škoda render-vs-drop decision.
 
-### D4 — editor-passthrough hygiene: empty-text links + over-encoded hrefs (minor)
+### D4 — editor-passthrough hygiene: over-encoded hrefs — **FIXED 2026-09-24**
 - **Where:** how-to-have-fun (inside `sow-editor` content, NOT the buttons).
 - **Finding:** `sow-button` itself is **correct** — the "DOWNLOAD GREY/WHITE MODEL HERE" CTAs
-  rendered with proper labels + clean PDF hrefs. ✅ But inline `<a>` inside the rich text passed
-  through with **empty link text** (image-wrapping anchors) and **mangled over-encoded hrefs**
-  (`https://apps.apple.com/us/app/%2525252525C5%2525252525A1koda-…` — quintuple-encoded from the
-  source WordPress). These are a11y ("link has no discernible text", story-detail §6) + link-rot
-  concerns, not a widget-mapping defect.
-- **Fix (low priority):** in `editorNodes`, drop/patch empty-text anchors and normalise
-  multiply-encoded hrefs (decode once). Editor cleanup, not a new block.
+  rendered with proper labels + clean PDF hrefs. ✅ The real defect was one image-wrapping anchor
+  with a **mangled over-encoded href** (`…/%2525252525C5%2525252525A1koda-magic-book/…` — `š`
+  percent-encoded ~6× by the source WordPress), which link-rots (404s).
+- **Correction to the original write-up:** there were **no truly empty-text anchors** in any story
+  body (the "empty" case was this image-link, which correctly keeps no text). So only the
+  href-normalisation was needed; an empty-anchor unwrap was considered and **dropped** (it fired on
+  0 real body anchors — unjustified risk).
+- **Resolution:** added href normalisation to the **shared** `skoda-page-cleanup.js` afterTransform
+  (next to the `#s_aid` stripping — same URL-hygiene home, so it fixes all templates): repeatedly
+  `decodeURIComponent` until stable, then `encodeURI` **once** → valid single-encoding (`%C5%A1`),
+  not the raw literal. Malformed encoding is caught and left as-is. 5 unit tests
+  (`skoda-page-cleanup.test.mjs`). Verified: the magic-book link is now
+  `…/%C5%A1koda-magic-book/…` (0 `%2525` remaining), decoding cleanly to `škoda-magic-book`.
 
 ## C. Blocks we still need to develop 🔨
 
@@ -122,6 +128,7 @@ The census's **208-widget outlier** URL
    content (per entry `<h3>` "YEAR — Title" + image); 0 → 11 entries recovered. Optional M2: dedicated timeline block.
 2. ~~**D2 figure/infobox**~~ — **FIXED in SKODA-801** (2026-09-24): `figureNodes` lifts the native
    figure/figcaption; `skoda-image-box` → new `infoboxNodes` (text + optional image). 3 unit tests.
-3. **Re-select a live large-tree story** to satisfy the 208-widget AC (the census URL is dead).
-4. Confirm `blocks/gallery` (SKODA-203) lands so emitted Gallery tables actually render.
-5. **D4 editor hygiene** (low) — drop empty-text inline anchors + normalise over-encoded hrefs in `editorNodes`.
+3. ~~**D4 editor hygiene**~~ — **FIXED** (2026-09-24): over-encoded hrefs normalised to single
+   encoding in the shared `skoda-page-cleanup.js` (+ 5 unit tests). No empty-anchor unwrap needed.
+4. **Re-select a live large-tree story** to satisfy the 208-widget AC (the census URL is dead). *(open)*
+5. Confirm `blocks/gallery` (SKODA-203) lands so emitted Gallery tables actually render. *(open, external)*

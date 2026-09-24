@@ -417,6 +417,21 @@ var CustomImportScript = (() => {
       element.querySelectorAll('a[href*="#s_aid="], a[href*="#s_cid="]').forEach((a) => {
         a.setAttribute("href", a.getAttribute("href").split("#s_aid=")[0].split("#s_cid=")[0]);
       });
+      element.querySelectorAll('a[href*="%25"]').forEach((a) => {
+        const href = a.getAttribute("href") || "";
+        let decoded = href;
+        for (let i = 0; i < 8; i += 1) {
+          let next;
+          try {
+            next = decodeURIComponent(decoded);
+          } catch (e) {
+            break;
+          }
+          if (next === decoded) break;
+          decoded = next;
+        }
+        if (decoded !== href) a.setAttribute("href", encodeURI(decoded));
+      });
     }
   }
 

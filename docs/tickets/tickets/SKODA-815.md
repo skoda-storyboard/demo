@@ -61,8 +61,9 @@ Recommend **(1) for correctness now**, upgrade to (2) if the timeline visual is 
 - **D2 (FIXED in SKODA-801, 2026-09-24):** `skoda-captioned-image` now lifts the native
   `<figure>`/`<figcaption>`; `skoda-image-box` remapped from the image path to an infobox/callout
   emitter (text + optional image preserved). Verified: the infobox story recovered 88.2% → 95.3%.
-- **D4 (low, editor hygiene):** inline `<a>` in `sow-editor` content pass through with empty text
-  + over-encoded hrefs (`%2525…`). Optional cleanup in `editorNodes` (a11y + link-rot). Not a block.
+- **D4 (FIXED 2026-09-24):** over-encoded hrefs (`%2525…`) normalised to single valid encoding in
+  the shared `skoda-page-cleanup.js` (fixes all templates; 5 unit tests). No empty-text anchors
+  existed in any story body, so no anchor-unwrap was added.
 - **Large-tree AC still unproven on real content:** the census's 208-widget outlier URL
   (`…/electricity-cng-or-perhaps-hydrogen-judge-for-yourselves/`) now **404s on the live site**.
   Re-pick a live large-tree story from the dataset to satisfy the "robust to 200+ widgets" AC
