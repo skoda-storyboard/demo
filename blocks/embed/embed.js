@@ -131,8 +131,9 @@ function buildIframe(src, title, isAudio) {
 }
 
 /**
- * Swaps the held data-src into src to load the third-party iframe. This is the single
- * consent/first-interaction hook that SKODA-804/905 will wire to OneTrust.
+ * Swaps the held data-src into src to load the third-party iframe, and removes whichever
+ * overlay (consent box or thumbnail facade) was covering it. This is the single
+ * first-interaction hook that SKODA-804/905 will wire to OneTrust.
  * @param {Element} wrapper The .embed-video / .embed-audio wrapper
  */
 function loadEmbed(wrapper) {
@@ -141,7 +142,54 @@ function loadEmbed(wrapper) {
   iframe.setAttribute('src', iframe.dataset.src);
   delete iframe.dataset.src;
   wrapper.querySelector('.embed-consent')?.remove();
+  wrapper.querySelector('.embed-facade')?.remove();
   wrapper.classList.add('embed-loaded');
+}
+
+/**
+ * YouTube poster thumbnail URL. hqdefault always exists (maxres 404s on some videos).
+ * @param {string} id YouTube video id
+ * @returns {string}
+ */
+function youtubeThumb(id) {
+  return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+}
+
+/**
+ * Builds a lightweight YouTube facade: the real poster thumbnail + a play overlay in place of
+ * the grey consent box. Clicking loads the iframe with autoplay so it plays on the first click
+ * (no second "press play"). Note: rendering the poster does contact Google (i.ytimg.com) — an
+ * intentional tradeoff for the thumbnail-first UX (SKODA-204 follow-up).
+ * @param {URL} url The authored YouTube URL
+ * @param {Element} wrapper The embed wrapper (click-to-load target)
+ * @returns {HTMLElement}
+ */
+function buildFacade(url, wrapper) {
+  const facade = document.createElement('button');
+  facade.type = 'button';
+  facade.className = 'embed-facade';
+  facade.setAttribute('aria-label', 'Play video');
+
+  const img = document.createElement('img');
+  img.src = youtubeThumb(youtubeId(url));
+  img.alt = '';
+  img.loading = 'lazy';
+
+  const play = document.createElement('span');
+  play.className = 'embed-facade-play';
+  play.setAttribute('aria-hidden', 'true');
+
+  facade.append(img, play);
+  facade.addEventListener('click', () => {
+    const iframe = wrapper.querySelector('iframe[data-src]');
+    if (iframe) {
+      const u = new URL(iframe.dataset.src, window.location.href);
+      u.searchParams.set('autoplay', '1');
+      iframe.dataset.src = u.href;
+    }
+    loadEmbed(wrapper);
+  });
+  return facade;
 }
 
 /**
@@ -215,7 +263,13 @@ export default function decorate(block) {
   }
 
   wrapper.append(buildIframe(src, title, isAudio));
-  wrapper.append(buildConsent(provider, wrapper));
+  // YouTube shows a poster-thumbnail facade (play overlay); other providers keep the M1
+  // consent stub. Facade only when we have a usable video id to build the thumbnail from.
+  if (provider === 'youtube' && youtubeId(url)) {
+    wrapper.append(buildFacade(url, wrapper));
+  } else {
+    wrapper.append(buildConsent(provider, wrapper));
+  }
 
   block.classList.add(`embed-${provider}`);
   block.append(wrapper);

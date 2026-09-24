@@ -48,6 +48,10 @@ class El {
 
   set type(v) { this.attributes.type = v; }
 
+  set src(v) { this.attributes.src = v; }
+
+  get src() { return this.attributes.src; }
+
   setAttribute(k, v) { this.attributes[k] = v; }
 
   getAttribute(k) { return this.attributes[k] ?? null; }
@@ -190,6 +194,32 @@ test('consent stub: placeholder present; click swaps data-src -> src and removes
   assert.equal(iframe.dataset.src, undefined, 'data-src cleared');
   assert.equal(wrapper.querySelector('.embed-consent'), null, 'placeholder removed');
   assert.ok(wrapper.classList.contains('embed-loaded'));
+});
+
+test('YouTube: shows a poster facade (not the consent box); click autoplays + loads', () => {
+  const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
+  decorate(block);
+  const wrapper = block.querySelector('.embed-video');
+  const facade = wrapper.querySelector('.embed-facade');
+  assert.ok(facade, 'facade rendered for YouTube');
+  assert.equal(wrapper.querySelector('.embed-consent'), null, 'no consent box for YouTube');
+  const img = facade.querySelector('img');
+  assert.ok(img.getAttribute('src').includes('9LfK-A20pgw'), 'poster thumbnail uses the video id');
+  const iframe = wrapper.querySelector('iframe[data-src]');
+  facade.dispatch('click');
+  const src = iframe.getAttribute('src');
+  assert.ok(src.startsWith('https://www.youtube-nocookie.com/embed/9LfK-A20pgw'), src);
+  assert.equal(new URL(src).searchParams.get('autoplay'), '1', 'autoplay on click');
+  assert.equal(wrapper.querySelector('.embed-facade'), null, 'facade removed after load');
+  assert.ok(wrapper.classList.contains('embed-loaded'));
+});
+
+test('non-YouTube providers keep the consent box (no facade)', () => {
+  const block = buildEmbed('https://vimeo.com/1221703335');
+  decorate(block);
+  const wrapper = block.querySelector('.embed-video');
+  assert.ok(wrapper.querySelector('.embed-consent'), 'Vimeo keeps consent box');
+  assert.equal(wrapper.querySelector('.embed-facade'), null, 'no facade for Vimeo');
 });
 
 test('authored ratio override is applied', () => {
