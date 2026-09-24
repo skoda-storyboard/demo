@@ -298,7 +298,8 @@ All MIG IDs map to the import infra (SKODA-601/602) for the demo sample and SKOD
 >
 > **Pulled into M1 by the set:**
 > - **208** (model page: STO-M / MR-M)
-> - **805a** (press-kit hub, MR-PK01/04/05) and **805c** (default press-kit article); **805b** children are Could
+> - **805a** (press-kit hub, MR-PK01/04/06) and **805c** (default press-kit article, MR-PK02); **805b** children
+>   are Could. §14 of the review proposes adding MR-PK07 (whole-kit ZIP link) to 805a
 > - **219** + **801a** (story in-body carousel, Media Box, embeds: STO-D)
 > - **608** (image/video item rows: MR-I/MR-V listings + model media rails)
 > - **609** (link containment + alias redirect: COM, MIG06)
@@ -369,10 +370,11 @@ G6–G8 are **spec/decision clarifications on existing tickets**, not missing ti
 | G-02 | `skoda-carousel-widget` (in-body image carousel) unspecced and dropped by import on 21/21 in-set stories | STO-D (body media), COM (gallery) | **SKODA-219**, **SKODA-801a** | M1 |
 | G-03 | Story Media Box and Vimeo dropped by the story importer | STO-D, COM14 | **SKODA-801a** | M1 |
 | G-04 | No image/video item index rows: empty listings and model media rails | MR-I01–05, MR-V01–04, MR-M rails | **SKODA-608** | M1 |
-| G-05/06/07 | Press-kit hub, children and default template have no M1 path | MR-PK01/04/05/07 | **SKODA-805a** (Must), **805c** (Should), **805b** (Could) | M1 |
+| G-05/06/07 | Press-kit hub, children and default template have no M1 path | MR-PK01/02/04/06 (PK07 per review §14) | **SKODA-805a** (Must), **805c** (Should), **805b** (Could) | M1 |
 | G-08 | Model page runtime blocks missing (in-page-nav, key-facts, spec-table) | STO-M, MR-M | SKODA-208 → **M1** | M1 |
 | G-10/11 | Out-of-set links → in-site 404s; mixed-reality alias | COM (nav), MIG06 | **SKODA-609** | M1 |
 | G-12 | PR importer drops Buzzsprout AI-audio (MR-PR03) and the related rail | MR-PR03, MR-PR01 | SKODA-607 (AC extended) | M1 |
+| C-1…C-9 | Client scope doc (16 Sep) promises vs the 43-URL set: MR home, series directory, CS pages, press kit end to end + ZIP, share, embargo, search sample, sidebar | MR-H01–10, STO-S01–03, COM05, MR-PK01/02/04/07, COM15, STO-D10, 6.5, COM06, STO-D07 | review **§14** (decisions D-7…D-9) | M1 |
 
 This review also records the 2026-09-21 media-cart correction: the M1 path is **AEM DAM originals + client-side
 `fflate` ZIP** (`SKODA-DEMO-FALLBACK-CONFIRM.md`). It supersedes the "server-side reduction (D2)" wording in the

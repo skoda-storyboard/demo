@@ -43,10 +43,16 @@ board hygiene, but it predates the 43-URL scope.
    - vijay: blocks, chrome, stories and models
    - extra resource: Media-Room importers (PR, press kit, series), packed into Mon 28 Sep – Fri 2 Oct
    - Lars: content ops and architect/QA gates, with agent-executed tickets
-6. **Six decisions and three human gates are needed this week** (§12):
+6. **Ten decisions and three human gates are needed this week** (§12):
    - **Decisions:** press-kit child pages, CS in the demo, link containment, series-hub cards, the cart fallback,
-     and confirming the 216 deferral.
+     confirming the 216 deferral, and (from §14) embargo, search sample, sidebar and the client-scope adds.
    - **Gates:** MR footer unify-vs-distinct by Fri 25 Sep; DA credentials by Mon 28 Sep; AEM Assets CORS by Thu 1 Oct.
+7. **The client scope doc (16 Sep) promises more than the 43-URL set covers** (§14):
+   - Pages missing from the set: the MR homepage, the series directory, and CS pages.
+   - Promises this review puts below Must: a press kit end to end (sub-page, whole-kit ZIP) and social share.
+   - Promises that contradict this review's rulings: embargo, search on a sample, and the article sidebar.
+   - Net Must would rise to ≈ 65.5 SP. The recommendation is to extend the extra resource by about 4–5 days and to
+     send the client a corrected scope doc before Thu 1 Oct.
 
 ---
 
@@ -424,6 +430,10 @@ QA-loop fixes, then Should.
 | D-4 | Series hub cards | index-driven + import linked stories · **static curated cards** | static cards for hubs whose stories are not in the corpus |
 | D-5 | Cart if AEM CORS is late (after Thu 1 Oct) | wait · **single-file direct download + client ZIP over the CDN mirror** · pre-zipped per story | the fallback in bold; record it in 505a |
 | D-6 | 216 `.sb-gallery` | keep M1 · **defer** (0/21 in-set stories use it) | defer |
+| D-7 | Embargo demo (client doc 6.5 vs 6.3; §14 C-7) | scripted native walk-through (≈ 1 SP) · **correct the client doc to "go-live"** | correct the doc |
+| D-8 | "Search on a sample" (COM06 note; §14 C-8) | resume 403 as Should · **correct the note** | correct the note |
+| D-9 | Article sidebar STO-D07 (§14 C-9) | build the sidebar · **related rail + promo, doc wording corrected** | related rail + promo |
+| D-10 | Client-scope adds C-1…C-6 (§14) | accept + **extend the extra resource about 4–5 days** · accept with the §14.3 trims · reject (tell the client) | accept + extend; decide by Mon 28 Sep |
 
 **Human gates:**
 
@@ -453,3 +463,73 @@ QA-loop fixes, then Should.
   6. series hub
 
   Run on `main--demo--skoda-storyboard.aem.page`, rehearsed Mon 12 Oct.
+
+---
+
+## 14. Client-scope reconciliation (added 2026-09-24 evening)
+
+**What was compared.** The 43-URL set and this review were checked against the client-facing scope walk-through,
+`SKODA-CLIENT-SCOPE-DISCUSSION.html`, dated 2026-09-16. It lives in the `larsauffarth/skoda-storyboard` repo at
+`docs/planning/`. Its §3 capability grid, §4 requirement table and §6 demo narrative are what Škoda saw as the
+15 Oct target.
+
+**Result.** The 43-URL set covers most of the promise and goes further in several places. However:
+- three promised pages are **not in the set**
+- five promised capabilities sit **below Must** in this review, or were ruled out
+
+The live source checks behind this section ran on 2026-09-24:
+- The Peaq-2 and Epiq-2 press kits each link a pre-built whole-kit ZIP on `cdn.skoda-storyboard.com`. The
+  Motorsport and first-glimpse kits have none.
+- CS counterparts exist for 5/5 models, 5/5 series hubs, 20/21 story URLs, and the images and videos listings.
+  Press releases and press kits have none.
+
+### 14.1 Promised, but missing or under-tiered
+
+| # | Client promise (doc §) | Status in the set / this review | Delta | Recommendation | SP |
+|---|---|---|---|---|--:|
+| C-1 | **Media Room homepage** (§3, §6, MR-H01–H10) | **Not in the 43 URLs.** `/en/media-room/` returns 404 on preview | page missing | Add `/en/media-room/` to the set. `import-home-mr.js` already exists on `main`. Its rails reuse `story-rail` and are fed by the 603/608 rows | 1.5 |
+| C-2 | **Series: directory → hub**, two-level (§3, STO-S01–S03) | `/en/series-2/` is not in the set, and this review moved it to M2 | directory missing | Add `/en/series-2/`. `import-series-directory.js` already exists. The index-driven grid shows the 5 imported hubs | 1 |
+| C-3 | **English + Czech**, with the switcher showing only languages that exist (§3, §6, COM05) | The set is **EN only**. 303/CS is a Should (D-2) | CS pages missing; tier too low | Promote **303 to Must**. Add 3 CS counterparts: Peaq model, the Peaq-production story, and one series hub. Add the CS header/footer fragments. Do **not** import `/cs/` home, because it needs a per-locale index (1001, M2) | 1.5 + 1 |
+| C-4 | **One press kit end to end**: chaptered hub, a sub-page, spec table, grouped media and downloads (§3, §6, MR-PK01/02/04/06) | Hub = 805a (Must). The default article 805c is a Should. Children (805b) are Could | sub-page and narrative below Must | Promote **805c to Must**. Import **one** Peaq-2 chapter sub-page with the 805c importer. Reuse the 208 `spec-table` block | 3 + 1 |
+| C-5 | **Whole-kit ZIP**, "a pre-built file, so easy" (MR-PK07, marked Demo) | Explicitly excluded from 805a (listed as 806, M2) | promise contradicted | Add a download link to the existing CDN ZIP on the Peaq-2 and Epiq-2 hubs. This is a 805a AC, not 806 | 0.5 |
+| C-6 | **Social share** on story detail, with configurable channels (COM15, STO-D10) | 215 is Could, unowned, and has no issue | tier too low | Create the 215 issue and make it **Must** (vijay) | 1 |
+| C-7 | **Embargoed content**: group-restricted page, previewed privately, published on schedule (§3, §6, 6.5) | Ruled out: 811 is M2, and only the ungated form is stretch | contradicted | **Decision D-7.** The client doc contradicts itself: its 6.3 says "scheduling, review and embargo at go-live". Either (a) script a native walk-through (restricted preview + scheduled publish; Lars, ≈ 1 SP, proven on one page), or (b) correct the doc to the 6.3 wording before the demo. Default: **(b)**, unless the client confirms 6.5 | 0–1 |
+| C-8 | **Search on a sample**: "the demo proves the search experience on a sample" (COM06 note, §3) | 403 paused → M2 | soft contradiction | **Decision D-8.** Default: correct the note, because the tier is already Go-live. Otherwise resume 403 as a Should (saran) | 0 |
+| C-9 | **Article sidebar**: related / promo / subscription (STO-D07, marked Demo) | M2 in traceability §2.E and in this review | contradicted | **Decision D-9.** Default: meet it with the related-stories rail (212) and in-body promo. Subscription is the newsletter, which is Go-live per COM16. Correct the doc wording | 0 |
+
+**Covered, but only by a fallback the client will notice:**
+- **6.9, "AEM Assets as the approved source in the demo".** The D-5 cart fallback (a CDN mirror) would break this.
+  Keep the Thu 1 Oct CORS gate strict. If the fallback ships, say so in the demo script.
+- **MR-PR06 / MR-V video "source download".** The 503 fallback (a plain MP4 link recorded by 608) meets this. 503
+  can stay a Should.
+
+### 14.2 Delivered beyond the client promise (levers if capacity is short)
+
+| Client promise | The set delivers | Lever |
+|---|---|---|
+| "A model page" (§3, §6) | 5 model pages | Keep the 208 template. QA Peaq in depth; the other 4 get smoke checks only (≈ −0.5 SP) |
+| "A press-release page" (§6) | 5 PRs | None needed: it's one importer (607) |
+| "1–2 hero stories in full richness" | 801a baseline richness on all 21 stories | Keep. Without it the other 19 stories render with no carousels. 604 stays a Should, because 801a on the 2 hero stories already meets the promise's wording |
+| COM18: "Storyboard footer in the demo; **Media Room variant at go-live**" | 305 MR footer is Must (2 SP) | **Defer 305 to M2 (−2 SP).** Škoda already accepted this wording. Keep 306 |
+
+### 14.3 Net effect on the cut line
+
+- **Adds to Must:** C-1 1.5, C-2 1, C-3 2.5, C-4 4, C-5 0.5, C-6 1 = **+10.5 SP**. Of that, 4.5 SP (805c, 303) was
+  already sized in Should, so **+6 SP is new**.
+- **Levers:** defer 305 (−2) and smoke-test the other model pages (−0.5) = **−2.5 SP**.
+- **Net Must ≈ 65.5 SP**, against a mid capacity of ≈ 57 (range 46–75). That is ≈ 4 dev-days over mid velocity. The
+  §9 slack (≈ 3 d) does not cover it.
+- **Recommendation**, in order:
+  1. **Extend the extra resource by about 4–5 days** (Mon 5 – Fri 9 Oct). Give them 805c, the C-4 sub-page, C-5, C-1
+     and C-2 (≈ 7 SP ≈ 3.4 d). These sit on their own importers and templates (press kit, MR home, series), so they
+     don't collide with other streams.
+  2. If that isn't possible, take the C-7/C-8/C-9 doc corrections **plus** a client agreement to show CS on 3 pages
+     only (C-3). Then move the C-4 sub-page to Should.
+  3. In both cases, send the corrected client doc (C-7/C-8/C-9, COM18, and the CS page list) before the Thu 1 Oct
+     checkpoint, so the demo matches what Škoda has in writing.
+- **§11 is unchanged until Lars accepts §14.** If he does:
+  - vijay takes 303 and 215 (+2.5 SP; 305 moves out, −2 SP, so net ≈ 16 SP).
+  - The extra resource takes 805c, the C-4 sub-page, C-5, C-1 and C-2.
+  - Lars adds the CS and extra URLs to the 603 tracker and to `skoda-m1-url-set.txt` (43 → 49 URLs: MR home, series
+    directory, 3 CS pages, 1 press-kit chapter).
+  - The 707 script gains: MR home → images, and EN ⇄ CS on a story.
