@@ -58,11 +58,21 @@ export function templateFromBodyClass(bodyClass) {
   return '';
 }
 
-/** Category = the content-family path segment after the locale. */
+/**
+ * Category = the content-family slug. Normally the path segment after the locale
+ * (`/en/press-releases/…` → `press-releases`), but archive URLs nest the real
+ * slug one level deeper behind a routing prefix, so returning segs[1] verbatim
+ * would emit the literal prefix (`category` / `tag`) — not a valid category slug:
+ *   /en/category/<slug>/          → <slug>            (segs[2])
+ *   /en/tag/<taxonomy>/<slug>/    → <slug> (the term) (last segment)
+ */
 export function categoryFromUrl(url) {
   try {
-    const segs = new URL(url).pathname.split('/').filter(Boolean);
-    if (segs.length >= 2) return segs[1]; // segs[0] = locale
+    const segs = new URL(url).pathname.split('/').filter(Boolean); // segs[0] = locale
+    if (segs.length < 2) return '';
+    if (segs[1] === 'category') return segs[2] || '';
+    if (segs[1] === 'tag') return segs[segs.length - 1] || '';
+    return segs[1];
   } catch (e) { /* bad url */ }
   return '';
 }
@@ -89,6 +99,27 @@ export function parseTagHref(href) {
     return { taxonomy: taxonomy.toLowerCase(), slug: slug.toLowerCase() };
   }
   return null;
+}
+
+/**
+ * Derive a taxonomy facet from a WordPress archive <body> class. Tag/model archive
+ * pages (e.g. /en/tag/model/elroq/) carry their taxonomy ONLY in the body class as
+ * `tax-<taxonomy> term-<slug>` (there are no entry-tags anchors to parse), so a
+ * model-tag listing would otherwise index with an empty `model` facet and never
+ * feed its model rail. Returns { taxonomy, slug } or null; only recognises the
+ * `tax-…`/`term-…` pair and maps it to a known facet name.
+ */
+export function facetFromBodyClass(bodyClass) {
+  const cls = bodyClass || '';
+  const tax = cls.match(/\btax-([a-z0-9_-]+)\b/i);
+  const term = cls.match(/\bterm-([a-z0-9-]+)\b/i); // first term-<slug>, not term-<numericId>
+  if (!tax || !term) return null;
+  // WP taxonomy slug → our facet key (only map ones in the 15-facet set).
+  const taxonomy = tax[1].toLowerCase().replace(/_/g, '-');
+  const facet = FACETS.includes(taxonomy) ? taxonomy : null;
+  const slug = term[1].toLowerCase();
+  if (!facet || !slug || /^\d+$/.test(slug)) return null;
+  return { taxonomy: facet, slug };
 }
 
 /**

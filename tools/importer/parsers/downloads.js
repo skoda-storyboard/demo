@@ -79,15 +79,18 @@ export default function parse(element, { document }) {
     const dataSize = (sizeAction && sizeAction.getAttribute('data-size')) || 'original';
     if (!isBinaryHref(href)) link.setAttribute('data-size', dataSize || 'original');
 
-    const linkCell = [link];
-    // Size / type label as a trailing note.
+    // Put the link and the size/type label in separate paragraphs so the label
+    // does not run onto the link text when the table is flattened to DA divs.
+    const linkPara = document.createElement('p');
+    linkPara.append(link);
+    const linkCell = [linkPara];
     const label = isBinaryHref(href)
       ? href.split('.').pop().split(/[?#]/)[0].toUpperCase()
       : 'Original';
     if (label) {
-      const span = document.createElement('span');
-      span.textContent = label;
-      linkCell.push(span);
+      const labelPara = document.createElement('p');
+      labelPara.textContent = label;
+      linkCell.push(labelPara);
     }
 
     cells.push([img || '', linkCell]);

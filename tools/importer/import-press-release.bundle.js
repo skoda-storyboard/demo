@@ -125,12 +125,14 @@ var CustomImportScript = (() => {
       const sizeAction = item.querySelector('a[title*="Original" i], a[data-size]');
       const dataSize = sizeAction && sizeAction.getAttribute("data-size") || "original";
       if (!isBinaryHref(href)) link.setAttribute("data-size", dataSize || "original");
-      const linkCell = [link];
+      const linkPara = document2.createElement("p");
+      linkPara.append(link);
+      const linkCell = [linkPara];
       const label = isBinaryHref(href) ? href.split(".").pop().split(/[?#]/)[0].toUpperCase() : "Original";
       if (label) {
-        const span = document2.createElement("span");
-        span.textContent = label;
-        linkCell.push(span);
+        const labelPara = document2.createElement("p");
+        labelPara.textContent = label;
+        linkCell.push(labelPara);
       }
       cells.push([img || "", linkCell]);
       emitted += 1;
@@ -322,7 +324,10 @@ var CustomImportScript = (() => {
   function extractCategory(url) {
     try {
       const segs = new URL(url).pathname.split("/").filter(Boolean);
-      if (segs.length >= 2) return segs[1];
+      if (segs.length < 2) return "";
+      if (segs[1] === "category") return segs[2] || "";
+      if (segs[1] === "tag") return segs[segs.length - 1] || "";
+      return segs[1];
     } catch (e) {
     }
     return "";
@@ -360,6 +365,16 @@ var CustomImportScript = (() => {
           add(m[1].toLowerCase(), slug.toLowerCase());
         }
       });
+    }
+    if (tags.length === 0) {
+      const cls = document2.body && document2.body.getAttribute("class") || "";
+      const tax = cls.match(/\btax-([a-z0-9_-]+)\b/i);
+      const term = cls.match(/\bterm-([a-z0-9-]+)\b/i);
+      if (tax && term) {
+        const taxonomy = tax[1].toLowerCase().replace(/_/g, "-");
+        const slug = term[1].toLowerCase();
+        if (FACETS.includes(taxonomy) && slug && !/^\d+$/.test(slug)) add(taxonomy, slug);
+      }
     }
     return { tags, byFacet };
   }

@@ -12,7 +12,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   pickDate, normalizeDate, templateFromBodyClass, categoryFromUrl,
-  parseTagHref, groupTags, splitList, buildMetaFields, FACETS,
+  parseTagHref, groupTags, splitList, buildMetaFields, facetFromBodyClass, FACETS,
 } from './skoda-metadata-extract.mjs';
 
 // ---- date: 4-way fallback + normalization --------------------------------
@@ -47,6 +47,31 @@ test('categoryFromUrl takes the family segment after the locale', () => {
   assert.equal(categoryFromUrl('https://x/en/press-releases/foo/'), 'press-releases');
   assert.equal(categoryFromUrl('https://x/en/skoda-model/elroq/'), 'skoda-model');
   assert.equal(categoryFromUrl('not a url'), '');
+});
+
+test('categoryFromUrl resolves archive slugs behind category/tag prefixes', () => {
+  // Regression: archive URLs nest the real slug — segs[1] would emit the prefix.
+  assert.equal(categoryFromUrl('https://x/en/category/emobility/'), 'emobility');
+  assert.equal(categoryFromUrl('https://x/en/tag/model/elroq/'), 'elroq');
+  assert.equal(categoryFromUrl('https://x/en/tag/years/2026/'), '2026');
+});
+
+test('facetFromBodyClass derives a facet from tax-…/term-… archive body class', () => {
+  // tag/model archive pages carry taxonomy only in the body class, no anchors.
+  assert.deepEqual(
+    facetFromBodyClass('archive tax-model term-elroq term-47482 lang-en'),
+    { taxonomy: 'model', slug: 'elroq' },
+  );
+  // Numeric term-<id> is ignored (first non-numeric term wins).
+  assert.deepEqual(
+    facetFromBodyClass('archive tax-bodywork term-suv term-99 lang-en'),
+    { taxonomy: 'bodywork', slug: 'suv' },
+  );
+  // Unknown taxonomy (not in the 15-facet set) → null.
+  assert.equal(facetFromBodyClass('archive tax-author term-jane lang-en'), null);
+  // Category archives use a different class shape (category category-emobility) → null.
+  assert.equal(facetFromBodyClass('archive category category-emobility lang-en'), null);
+  assert.equal(facetFromBodyClass(''), null);
 });
 
 // ---- tag href parsing (both measured shapes) -----------------------------

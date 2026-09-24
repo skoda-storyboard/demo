@@ -116,8 +116,15 @@ var CustomImportScript = (() => {
         "footer.footer",
         ".site-footer",
         ".footer-mediaroom",
-        // Secondary widgets / banners
+        // Secondary widgets / banners. The representative pages carry a standalone
+        // newsletter surface as <section id="newsletter-popups"> / .newsletter-popup
+        // (form.mailguide-subscribe) OUTSIDE header.header, so removing the header
+        // alone leaves it as leading default content — remove those too.
         ".newsletter-subscribe-widget",
+        "#newsletter-popups",
+        ".newsletter-popup",
+        ".mailguide-subscribe",
+        ".mailguide-form",
         ".side-banner",
         ".sa-bnr",
         // Cookie / consent (defensive)
@@ -264,7 +271,10 @@ var CustomImportScript = (() => {
   function extractCategory(url) {
     try {
       const segs = new URL(url).pathname.split("/").filter(Boolean);
-      if (segs.length >= 2) return segs[1];
+      if (segs.length < 2) return "";
+      if (segs[1] === "category") return segs[2] || "";
+      if (segs[1] === "tag") return segs[segs.length - 1] || "";
+      return segs[1];
     } catch (e) {
     }
     return "";
@@ -302,6 +312,16 @@ var CustomImportScript = (() => {
           add(m[1].toLowerCase(), slug.toLowerCase());
         }
       });
+    }
+    if (tags.length === 0) {
+      const cls = document2.body && document2.body.getAttribute("class") || "";
+      const tax = cls.match(/\btax-([a-z0-9_-]+)\b/i);
+      const term = cls.match(/\bterm-([a-z0-9-]+)\b/i);
+      if (tax && term) {
+        const taxonomy = tax[1].toLowerCase().replace(/_/g, "-");
+        const slug = term[1].toLowerCase();
+        if (FACETS.includes(taxonomy) && slug && !/^\d+$/.test(slug)) add(taxonomy, slug);
+      }
     }
     return { tags, byFacet };
   }

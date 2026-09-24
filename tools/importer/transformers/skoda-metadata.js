@@ -99,11 +99,21 @@ function extractTemplate(document) {
   return '';
 }
 
-/** Category = the content-family path segment after the locale. */
+/**
+ * Category = the content-family slug. Normally the segment after the locale, but
+ * archive URLs nest the real slug behind a routing prefix (returning segs[1] would
+ * emit the literal `category`/`tag` prefix — not a valid slug). Keep in sync with
+ * skoda-metadata-extract.mjs::categoryFromUrl.
+ *   /en/category/<slug>/          → <slug>            (segs[2])
+ *   /en/tag/<taxonomy>/<slug>/    → <slug> (the term) (last segment)
+ */
 function extractCategory(url) {
   try {
-    const segs = new URL(url).pathname.split('/').filter(Boolean);
-    if (segs.length >= 2) return segs[1]; // segs[0] = locale
+    const segs = new URL(url).pathname.split('/').filter(Boolean); // segs[0] = locale
+    if (segs.length < 2) return '';
+    if (segs[1] === 'category') return segs[2] || '';
+    if (segs[1] === 'tag') return segs[segs.length - 1] || '';
+    return segs[1];
   } catch (e) { /* bad url */ }
   return '';
 }
@@ -145,6 +155,21 @@ function extractTagsAndFacets(document) {
         add(m[1].toLowerCase(), slug.toLowerCase());
       }
     });
+  }
+
+  // Fallback: tag/model ARCHIVE pages carry their taxonomy ONLY in the <body>
+  // class (`tax-model term-elroq`), with no entry-tags anchors. Derive the facet
+  // from there so a model-tag listing self-classifies. Keep in sync with
+  // skoda-metadata-extract.mjs::facetFromBodyClass.
+  if (tags.length === 0) {
+    const cls = (document.body && document.body.getAttribute('class')) || '';
+    const tax = cls.match(/\btax-([a-z0-9_-]+)\b/i);
+    const term = cls.match(/\bterm-([a-z0-9-]+)\b/i);
+    if (tax && term) {
+      const taxonomy = tax[1].toLowerCase().replace(/_/g, '-');
+      const slug = term[1].toLowerCase();
+      if (FACETS.includes(taxonomy) && slug && !/^\d+$/.test(slug)) add(taxonomy, slug);
+    }
   }
   return { tags, byFacet };
 }

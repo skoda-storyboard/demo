@@ -41,8 +41,15 @@ export default function transform(hookName, element, payload) {
       '.site-footer',
       '.footer-mediaroom',
 
-      // Secondary widgets / banners
+      // Secondary widgets / banners. The representative pages carry a standalone
+      // newsletter surface as <section id="newsletter-popups"> / .newsletter-popup
+      // (form.mailguide-subscribe) OUTSIDE header.header, so removing the header
+      // alone leaves it as leading default content — remove those too.
       '.newsletter-subscribe-widget',
+      '#newsletter-popups',
+      '.newsletter-popup',
+      '.mailguide-subscribe',
+      '.mailguide-form',
       '.side-banner',
       '.sa-bnr',
 
