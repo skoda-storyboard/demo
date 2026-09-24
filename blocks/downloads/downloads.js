@@ -159,6 +159,10 @@ function readAsset(row) {
   };
 }
 
+// per-page counter → unique size-menu ids when >1 dropdown on a page (so the
+// toggle's aria-controls references its own menu). Mirrors listing.js.
+let menuSeq = 0;
+
 /**
  * Build the round download control for a tile. With one size it is a single
  * download <a>; with several it is a toggle button revealing a size menu, each
@@ -187,22 +191,29 @@ function buildDownload(asset) {
   }
 
   // multiple sizes → toggle button + menu of direct-download links
+  menuSeq += 1;
+  const menuId = `downloads-sizes-${menuSeq}`;
   const toggle = document.createElement('button');
   toggle.type = 'button';
   toggle.className = 'downloads-download';
   toggle.setAttribute('aria-label', LABELS.sizes(title));
   toggle.setAttribute('aria-expanded', 'false');
   toggle.setAttribute('aria-haspopup', 'true');
+  toggle.setAttribute('aria-controls', menuId);
   toggle.append(downloadIcon());
 
   const menu = document.createElement('ul');
   menu.className = 'downloads-sizes';
+  menu.id = menuId;
+  menu.setAttribute('role', 'menu');
   menu.hidden = true;
   sizes.forEach(({ label, href }) => {
     const li = document.createElement('li');
+    li.setAttribute('role', 'none');
     const a = document.createElement('a');
     a.className = 'downloads-size';
     a.href = href;
+    a.setAttribute('role', 'menuitem');
     a.setAttribute('download', '');
     a.setAttribute('aria-label', LABELS.download(title, label));
     a.textContent = label;

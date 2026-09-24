@@ -100,7 +100,7 @@
 /* size menu: absolute dropdown of direct-download links (Original / 1920px) */
 .downloads .downloads-sizes {
   position: absolute;
-  top: calc(40px + var(--spacing-xs));
+  top: 45px; /* measured live (downloads.md §3); not 40px + spacing-xs = 48px */
   left: 0;
   z-index: 15;
   min-width: 120px;
