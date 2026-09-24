@@ -87,6 +87,13 @@
   --card-border: 1px solid var(--skoda-grey-border);
   --pill-radius: 50px;
 
+  /* embeds (SKODA-204; docs/ui-specs/embeds.md §3/§8). Audio players are fixed-height, not
+     16:9. Consent-placeholder greys are primitives in brand.css; inner bg reuses --divider-color
+     (#e4e4e4). The consent pill radius stays 2em (source), distinct from the 50px card pill. */
+  --embed-audio-height: 200px;
+  --embed-consent-inner-bg: var(--divider-color);
+  --embed-consent-radius: 2em;
+
   /* overlay scrim gradients (card-teaser overlay layer, measured from source) */
   --scrim-h: linear-gradient(270deg, transparent, rgb(0 0 0 / 25%));
   --scrim-v: linear-gradient(180deg, transparent, rgb(0 0 0 / 10%));
