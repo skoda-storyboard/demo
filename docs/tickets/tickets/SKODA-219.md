@@ -1,5 +1,10 @@
 # SKODA-219, In-body story image carousel (`skoda-carousel-widget`)
 
+> **⛔ Superseded (2026-09-24) by [SKODA-819](SKODA-819.md).** The stakeholder decided to render this widget as a
+> Gallery `slider` variant, not as a `carousel` block variant. Do not create a GitHub issue for 219. The Must
+> SP moves 1:1 to 819. See [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md) §15. The text below is
+> kept for its source census (21/21 in-set stories).
+
 - **Epic:** E02, Core Blocks
 - **Type:** block variant + importer mapping
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo)

@@ -3,7 +3,9 @@
 - **Type:** import + block variant
 - **Phase:** A/B · **Milestone:** M1 (demo story fidelity, feeds SKODA-604)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
-- **Status (2026-09-24):** 🔵 TODO
+- **Status (2026-09-24):** 🔵 TODO · **Update (late 2026-09-24):** 🟡 importer half merged in PR #113 (commit
+  `e763378`: the new `story-hero` parser emits Hero Image story + perex + date + Tags). Open (≈ 0.5 SP): the hero
+  caption's 20px/600 styling and a render check.
 
 ## Origin
 Side-by-side QA of `/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`

@@ -5,6 +5,8 @@
 - **Estimate:** 3 SP · AI-assisted 1d / manual 2–3d *(planning estimate, not a quote)*
 - **Status (2026-09-24):** 🔵 TODO · **Decision (2026-09-24, stakeholder):** render like the source
   (single-image slider), not as the lead-image + thumbnail gallery.
+- **Supersedes:** [SKODA-219](SKODA-219.md), which is the same widget. It had been specced as a `carousel` block
+  variant in the M1 gap review. Its Must SP moves to this ticket (review §15).
 
 ## Origin
 Side-by-side QA of `/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/` (2026-09-24).

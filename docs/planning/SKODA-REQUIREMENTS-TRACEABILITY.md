@@ -82,15 +82,15 @@
 
 | Req | Requirement | Ticket(s) | Epic | M | Build | Status |
 |---|---|---|---|:--:|:--:|---|
-| STO-D01 | Story Hero | SKODA-202/603 | E02/E06 | M1 | 🟩 | ✅ 48 imported |
-| STO-D02 | Rich Text | SKODA-801/604 | E08/E06 | M1 | 🟦 | ✅ flatten proven; 1–2 full-fidelity (604) |
-| STO-D03 | Embedded Video | SKODA-204/604 | E02/E06 | M1 | 🟦 | ✅ embed autoblock; restored on demo stories |
-| STO-D04 | Image Carousel / Gallery | SKODA-203/604 | E02/E06 | M1 | 🟦 | ✅ gallery+lightbox; auto-play a11y 🟡 |
-| STO-D05 | Newsletter Widget | SKODA-904 | E09 | M1 (UI) / M2 | ⬜ | ✅ UI-only for PoC |
-| STO-D06 | Related Stories (tag+manual) | SKODA-402 | E04 | M1 | 🟩 | ✅ two mechanisms (auto strip + manual explore-more); the "not-OOTB" fn |
-| STO-D07 | Article Sidebar | SKODA-201 | E02 | M2 | 🟦 | ✅ responsive treatment needed |
+| STO-D01 | Story Hero | SKODA-202/603/816 | E02/E06/E08 | M1 | 🟩 | ✅ 48 imported; story hero (title above 16:9) importer in #113, caption styling via 816 |
+| STO-D02 | Rich Text | SKODA-801/604/821 | E08/E06 | M1 | 🟦 | ✅ flatten proven (801 merged, #113); 1–2 full-fidelity (604); body inset 821 |
+| STO-D03 | Embedded Video | SKODA-204/604/818 | E02/E06/E08 | M1 | 🟦 | ✅ embed autoblock; story importer → bare URL (818, #113) |
+| STO-D04 | Image Carousel / Gallery | SKODA-203/604/819 | E02/E06/E08 | M1 | 🟦 | ✅ gallery+lightbox; auto-play a11y 🟡; in-body carousel → Gallery `slider` (819, supersedes 219) |
+| STO-D05 | Newsletter Widget | SKODA-904/823 | E09/E08 | M1 (UI) / M2 | ⬜ | ✅ UI-only for PoC; sidebar UI stub 823 = M1 Could |
+| STO-D06 | Related Stories (tag+manual) | SKODA-402/212/820 | E04/E02/E08 | M1 | 🟩 | ✅ two mechanisms (auto strip + manual explore-more); the "not-OOTB" fn; bottom dark band 820 |
+| STO-D07 | Article Sidebar | SKODA-201/801/817 | E02/E08 | M1 | 🟦 | ✅ two-column aside built in 801 (#113); parity 817 (was M2; review §15) |
 | STO-D08 | Side Banner | SKODA-903 | E09 | M2 | ⬜ | 🔴 deferred, bespoke ad server (D3) |
-| STO-D09 | Media Box / Gallery | SKODA-502/505/604 | E05/E06 | M1 | ⬜ | ✅ manual today; tag-autopopulate+delete = target improvement |
+| STO-D09 | Media Box / Gallery | SKODA-502/505/604/801a | E05/E06/E08 | M1 | ⬜ | ✅ manual today; tag-autopopulate+delete = target improvement; 21 in-set stories mapped by 801a |
 | STO-D10 | Social Share | SKODA-304 | E03 | M1 | 🟦 | ✅ channels identified |
 
 ---
@@ -269,6 +269,14 @@ All MIG IDs map to the import infra (SKODA-601/602) for the demo sample and SKOD
 | SKODA-812 | M2 | 6.7 (auditability) |
 | SKODA-813 | M2 | generic Page base shell (`page-template-default`, copyright/legal/misc STO pages) |
 | SKODA-814 | M2 | SiteOrigin body flatten contract (1,614 pages, feeds 801/208/813; block recount) |
+| SKODA-816 | M1 | STO-D01 (story hero: title above 16:9 image, perex, date, Tags) |
+| SKODA-817 | M1 | STO-D07 (sidebar dedupe + parity), STO-D06 (explore-more teasers) |
+| SKODA-818 | M1 | STO-D03 (story embeds → 204 autoblock) |
+| SKODA-819 | M1 | STO-D04 (in-body carousel → Gallery `slider`; supersedes SKODA-219) |
+| SKODA-820 | M1 | STO-D06 (tag-based "Related Stories" dark band) |
+| SKODA-821 | M1 | STO-D02 (body-column text inset) |
+| SKODA-822 | M1 | release of 801 layout (done, PR #113) |
+| SKODA-823 | M1 Could | STO-D05 (newsletter UI stub, no ESP) |
 | SKODA-901 | M2 | COM06 (hosted search) |
 | SKODA-902 | M2 | COM14/MR-PK07 (prod cart + ZIP hardening) |
 | SKODA-903 | M2 | STO-D08 (banner) |
@@ -300,7 +308,7 @@ All MIG IDs map to the import infra (SKODA-601/602) for the demo sample and SKOD
 > - **208** (model page: STO-M / MR-M)
 > - **805a** (press-kit hub, MR-PK01/04/06) and **805c** (default press-kit article, MR-PK02); **805b** children
 >   are Could. §14 of the review proposes adding MR-PK07 (whole-kit ZIP link) to 805a
-> - **219** + **801a** (story in-body carousel, Media Box, embeds: STO-D)
+> - **819** (supersedes 219) + **801a** (story in-body carousel, Media Box, embeds: STO-D); story fidelity **816/817/818/820/821** (review §15)
 > - **608** (image/video item rows: MR-I/MR-V listings + model media rails)
 > - **609** (link containment + alias redirect: COM, MIG06)
 >
@@ -367,8 +375,8 @@ G6–G8 are **spec/decision clarifications on existing tickets**, not missing ti
 
 | # | Gap | Requirement IDs | Ticket | M |
 |---|---|---|---|:--:|
-| G-02 | `skoda-carousel-widget` (in-body image carousel) unspecced and dropped by import on 21/21 in-set stories | STO-D (body media), COM (gallery) | **SKODA-219**, **SKODA-801a** | M1 |
-| G-03 | Story Media Box and Vimeo dropped by the story importer | STO-D, COM14 | **SKODA-801a** | M1 |
+| G-02 | `skoda-carousel-widget` (in-body image carousel) unspecced and dropped by import on 21/21 in-set stories | STO-D (body media), COM (gallery) | ~~SKODA-219~~ **SKODA-819** (Gallery `slider`), **SKODA-801a** | M1 |
+| G-03 | Story Media Box and Vimeo dropped by the story importer | STO-D, COM14 | **SKODA-801a** (Media Box); Vimeo fixed by SKODA-818 (#113) | M1 |
 | G-04 | No image/video item index rows: empty listings and model media rails | MR-I01–05, MR-V01–04, MR-M rails | **SKODA-608** | M1 |
 | G-05/06/07 | Press-kit hub, children and default template have no M1 path | MR-PK01/02/04/06 (PK07 per review §14) | **SKODA-805a** (Must), **805c** (Should), **805b** (Could) | M1 |
 | G-08 | Model page runtime blocks missing (in-page-nav, key-facts, spec-table) | STO-M, MR-M | SKODA-208 → **M1** | M1 |

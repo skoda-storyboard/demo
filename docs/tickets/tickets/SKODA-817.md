@@ -3,7 +3,9 @@
 - **Type:** import + styling
 - **Phase:** A/B · **Milestone:** M1 (demo story fidelity)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
-- **Status (2026-09-24):** 🔵 TODO
+- **Status (2026-09-24):** 🔵 TODO · **Update (late 2026-09-24):** 🟡 importer half merged in PR #113 (commit
+  `e763378`: only the outermost teaser match is kept, and a "Tags" heading is added). Open (≈ 1 SP): the sidebar
+  visual-parity CSS in the `body.story` section of `styles/styles.css`.
 
 ## Origin
 Side-by-side QA of the Epiq story (1440px, 2026-09-24).

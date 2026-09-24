@@ -4,6 +4,7 @@
 - **Phase:** A · **Milestone:** M1
 - **Estimate:** 1 SP *(planning estimate, not a quote)*
 - **Status (2026-09-24):** 🔵 TODO. Needs the stakeholder go-ahead to open the PR and merge.
+  **Update (late 2026-09-24):** ✅ merged as PR #113 (21:35). Close after the post-merge render check.
 
 ## Problem
 The two-column story layout (body 816px + aside 408px, grid-on-main, `decorateStorySections`) and
