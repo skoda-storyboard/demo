@@ -2,7 +2,7 @@
   "comment": "SKODA-603 tracker inputs that can't be measured: family gates (waves, see SKODA-603.md), per-page QA results and notes. qa = pass | fail | pending. Edit here, then run `npm run import:status`; never edit docs/planning/skoda-m1-url-status.md by hand.",
   "families": {
     "home": { "label": "Home", "gate": "W1 (610) · W4 (609)", "note": "Live since the Epiq pilot. Re-import with 610 (clean titles) and the `Promo Box` header (contract promo-box); composition is SKODA-611." },
-    "listings": { "label": "Media listings", "gate": "W2b: SKODA-608", "note": "The shells are imported; without 608 item rows the listings stay empty. Hero → Hero Image (contract hero)." },
+    "listings": { "label": "Media listings", "gate": "W2b: SKODA-608", "note": "The shells are imported; without 608 item rows the listings stay empty." },
     "press-releases": { "label": "Press releases", "gate": "W1 (610, 506) · W4 re-push after SKODA-607", "note": "The 5 set PRs are live; the 11 corpus PRs can go in W1. Quote contract (220) applies." },
     "press-kits": { "label": "Press kits", "gate": "W3: SKODA-805a, 805c, 221", "note": "No importer yet." },
     "models": { "label": "Model pages", "gate": "W2c: SKODA-208", "note": "The current output fails the block check: `hero` (no block on main) and the story-rail `subheading` key." },
