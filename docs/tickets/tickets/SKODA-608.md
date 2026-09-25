@@ -4,7 +4,7 @@
 - **Type:** import / index
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo)
 - **Estimate:** 3 SP · AI-assisted 1–1.5d / manual 2–3d *(planning estimate, not a quote)*
-- **GitHub issue:** *not yet created* (proposed in [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md))
+- **GitHub issue:** [#117](https://github.com/skoda-storyboard/demo/issues/117)
 - **Discovered in:** M1 gap review, 2026-09-24
 
 ## Summary

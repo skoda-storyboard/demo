@@ -10,12 +10,13 @@
 >
 > **Correction.** On all 21 in-scope stories, `skoda-carousel-widget` is an **in-body autoplay image gallery**, not
 > related-content teasers. The live markup is Flickity `autoPlay:3000`, `wrapAround`, `pageDots`, with captioned
-> `img.media-cart-image` slides. It is built as **SKODA-219** and must be migrated as content, not regenerated from
+> `img.media-cart-image` slides. It is built as **SKODA-819** (Gallery `slider` variant; this supersedes SKODA-219) and must be migrated as content, not regenerated from
 > the index. The mapping-table row below is superseded for these pages.
 >
-> **Scope.** The origin/main importer still drops the Media Box, galleries and embeds. The M1 fidelity work for the
-> 21 stories (carousel → 219, Media Box → downloads, Vimeo → embed, tags kept) is split out as **SKODA-801a**. This
-> ticket keeps the reduced-fidelity parser (done) and the M2 long tail.
+> **Scope.** ~~The origin/main importer still drops the Media Box, galleries and embeds.~~ Since #113, galleries are
+> emitted and embeds become bare URLs (818); only the Media Box is still dropped. The M1 fidelity work for the
+> 21 stories is split: carousel → 819 (Gallery `slider`), embeds → 818, and Media Box → downloads plus the 21-story
+> run → **SKODA-801a**. This ticket keeps the reduced-fidelity parser (done) and the M2 long tail.
 
 ## Summary
 Build the import parser that flattens SiteOrigin Page Builder story layouts into clean DA sections + blocks. This is the hardest single parser in the migration and the highest-effort ticket in the whole program.
@@ -56,7 +57,7 @@ panel-grid                         ← whole layout
 |---|--:|---|
 | `sow-editor` / `tinymce` (rich text) | 83.5% | **default content** (h/p/ul; inline images + inline embeds pass through as-is) |
 | `skoda-offset` (spacer) | 8.2% | **dropped**, or a section break |
-| `skoda-carousel-widget` | 4.0% | **Routed by content:** link-free photo sets → Gallery (slider) per SKODA-219 (currently default Gallery until that variant lands); link-bearing teasers → Cards. Preserve the source image order and descriptions, not an index-generated list. See census §7a. |
+| `skoda-carousel-widget` | 4.0% | **Routed by content:** link-free photo sets → Gallery (slider) per SKODA-219 (now SKODA-819) (currently default Gallery until that variant lands); link-bearing teasers → Cards. Preserve the source image order and descriptions, not an index-generated list. See census §7a. |
 | `sow-slider` | 1.5% | **image slider → Carousel/Gallery block** |
 | `skoda-quote` | 1.1% | **pull-quote → `<blockquote>` / small quote block** |
 | `skoda-captioned-image` *(census, 45 stories)* | 0.7% | **image + caption → figure / image block** |

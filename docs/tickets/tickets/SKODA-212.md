@@ -44,3 +44,11 @@ Measurable gates in [`carousel-rails.md`](../../ui-specs/carousel-rails.md); sum
 - **Carousel a11y (🟡 `[RUNTIME-UNCONFIRMED]`):** native scroll-snap + JS controls parity with Flickity — verify keyboard/drag/reduced-motion in a browser (shared concern with SKODA-203/702/703).
 - **Curated vs indexed rows:** rails support both; confirm the authoring shape per source before locking the block config.
 - **Home composition boundary:** builds the *block*; assembly into `/en/` is SKODA-604.
+
+---
+### Relations
+**Depends on:** #15 (SKODA-201 card-teaser) · #28 (SKODA-402 query-index loader — reuse target) · #27 (SKODA-401 index schema) · #14 (SKODA-106 tokens)
+**Blocks:** #21 (SKODA-207 Series rails) · #57 (SKODA-208 model-page 5 rails) · #38 (SKODA-604 home composition) · #47 (SKODA-607 press-release related-media band)
+**Sibling home blocks:** #97 (SKODA-214 feed) · #99 (SKODA-213 promo-box)
+
+*Ticket source of truth on `main`: `docs/tickets/tickets/SKODA-212.md`.*
