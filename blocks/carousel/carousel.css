@@ -61,7 +61,7 @@
 }
 
 .carousel-track .card-teaser {
-  flex: 0 0 90%; /* <768: 1 + peek */
+  flex: 0 0 var(--carousel-cell-width, 90%); /* <768: 1 + peek */
   scroll-snap-align: start;
 }
 
@@ -179,14 +179,14 @@
 /* tablet: ~3.3 per view */
 @media (width >= 768px) {
   .carousel-track .card-teaser {
-    flex-basis: 30%;
+    flex-basis: var(--carousel-cell-width, 30%);
   }
 }
 
 /* desktop: ~4.4 per view */
 @media (width >= 992px) {
   .carousel-track .card-teaser {
-    flex-basis: 22.5%;
+    flex-basis: var(--carousel-cell-width, 22.5%);
   }
 }
 
