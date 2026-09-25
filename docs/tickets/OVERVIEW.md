@@ -148,7 +148,8 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-607 | Press Release detail template (split from story) | E08 | 5 | 2–3 | 4–6 | 601,602,502 | 🟢 M1; PR ≠ story (no hero, MR side, 47.5% of pages); spec `ui-specs/template-press-release.md` |
 | [SKODA-608](tickets/SKODA-608.md) | Image & video item index rows (listings + model media rails) | E06 | 3 | 1–1.5 | 2–3 | 601,602,401,501,503 | 🟠 M1 Must; `/en/images/`, `/en/videos/` empty without it |
 | [SKODA-609](tickets/SKODA-609.md) | M1 link containment + mixed-reality alias redirect | E06 | 2 | 1 | 1–2 | 605,103,603 | 🟠 M1 Must; decision D-3 |
-| [SKODA-610](tickets/SKODA-610.md) | Clean index titles (drop " - Škoda Storyboard") | E06 | 1 | 0.25–0.5 | 0.5–1 | 401,602,603 | 🟡 M1; Demo sweep 2026-09-25; every card/rail |
+| [SKODA-610](tickets/SKODA-610.md) | Clean index titles (drop " - Škoda Storyboard") | E06 | 1 | 0.25–0.5 | 0.5–1 | 401,602,603 | 🟡 M1; code done 2026-09-25 (importer + shared runtime trim); 7/28 re-pushed, 21 held (508/603/208/819) |
+| [SKODA-508](tickets/SKODA-508.md) | `skoda-images` turns card-image `data-caption` excerpts into body paragraphs | E05 | 1 | 0.25–0.5 | 0.5–1 | 501 | 🟠 M1; found in 610; blocks the PR re-import |
 | [SKODA-611](tickets/SKODA-611.md) | Storyboard home composition (/en cover-box stack, promo exclusion) | E06 | 3 | 1 | 2–3 | 212,213,214,217,218,603 | 🟡 M1; Demo sweep 2026-09-25; no owner since 604 re-point |
 | [SKODA-801a](tickets/SKODA-801a.md) | M1 story import fidelity slice (Media Box + 21-story run; carousel → 819, Vimeo → 818) | E08 | 1.5 | 0.5–1 | 1.5–2 | 601,801,819,818,502,204 | 🟠 M1 Must; slice of 801; re-scoped 3 → 1.5 SP (review §15) |
 | [SKODA-805a](tickets/SKODA-805a.md) | Press-kit tiles hub, M1 slice + importer (3 hubs) | E08 | 3 | 1–2 | 3–4 | 601,602,202,201,305,609 | 🟠 M1 Must; slice of 805 |

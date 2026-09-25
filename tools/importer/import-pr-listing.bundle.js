@@ -42,22 +42,60 @@ var CustomImportScript = (() => {
   });
 
   // tools/importer/parsers/listing.js
-  var LISTING_CONFIG = [
-    ["index", "/en/query-index.json"],
-    ["path", "/en/press-releases/"],
-    ["template", "press_release"],
-    ["facets", "model, derivative, year, company, event, technology"],
-    ["sort", "newest"],
-    ["perpage", "6"],
-    ["columns", "3"]
-  ];
+  var FACETS_DEFAULT = "model, derivative, year, company, event, technology";
+  var VARIANTS = {
+    // News (press releases) — the baseline.
+    news: [
+      ["index", "/en/query-index.json"],
+      ["path", "/en/press-releases/"],
+      ["template", "press_release"],
+      ["facets", FACETS_DEFAULT],
+      ["sort", "newest"],
+      ["perpage", "6"],
+      ["columns", "3"]
+    ],
+    images: [
+      ["index", "/en/query-index.json"],
+      ["path", "/en/images/"],
+      ["template", "image"],
+      ["facets", FACETS_DEFAULT],
+      ["sort", "newest"],
+      ["perpage", "12"],
+      ["columns", "4"]
+    ],
+    videos: [
+      ["index", "/en/query-index.json"],
+      ["path", "/en/videos/"],
+      ["template", "video"],
+      ["facets", FACETS_DEFAULT],
+      ["sort", "newest"],
+      ["perpage", "12"],
+      ["columns", "3"]
+    ],
+    // Site-wide free-text search: no path/template filter (cross-type), search box on.
+    search: [
+      ["index", "/en/query-index.json"],
+      ["facets", "model"],
+      ["search", "true"],
+      ["sort", "newest"],
+      ["perpage", "12"],
+      ["columns", "3"]
+    ]
+  };
+  function variantFromBody(document2) {
+    const tokens = (document2.body && document2.body.getAttribute("class") || "").split(/\s+/);
+    if (tokens.includes("images")) return "images";
+    if (tokens.includes("videos")) return "videos";
+    if (tokens.includes("search")) return "search";
+    return "news";
+  }
   function parse(element, { document: document2 }) {
     const isListing = element.matches("#search-filter-results, .search-filter, .search-results-items") || element.querySelector(".search-filter, .search-results-items, .ajax-loader-button");
     if (!isListing) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const cells = [["Listing"], ...LISTING_CONFIG];
+    const cells = [["Listing"], ...VARIANTS[variantFromBody(document2)]];
     const table = WebImporter.DOMUtils.createTable(cells, document2);
     element.replaceWith(table);
   }
@@ -180,8 +218,17 @@ var CustomImportScript = (() => {
     [/\bsingle-press_release\b|\bpress_release-template\b/, "press_release"],
     [/\bsingle-press_kit\b|\bpress_kit-template\b/, "press_kit"],
     [/\bsingle-post\b|\bpost-template\b/, "story"],
+    // Škodapedia archive + branded 404 aren't rail CPTs and aren't in the template
+    // enum — map them to the valid `page` value (nav/direct only, not rail-indexed).
+    [/\bpost-type-archive-skodapedia\b/, "page"],
+    [/\berror404\b/, "page"],
     [/\bpage-template\b|\btemplate-media-room-page\b/, "page"]
   ];
+  var SITE_SUFFIX = /\s+[-–|]\s+Škoda Storyboard\s*$/;
+  function cleanTitle(raw) {
+    const t = String(raw || "").replace(/\s+/g, " ").trim();
+    return t.replace(SITE_SUFFIX, "").trim() || t;
+  }
   function metaContent(document2, selector) {
     const el = document2.querySelector(selector);
     const val = el && el.getAttribute("content");
@@ -217,6 +264,8 @@ var CustomImportScript = (() => {
       const d = normalizeDate(span.getAttribute("datetime") || span.textContent);
       if (d) return d;
     }
+    const modified = metaContent(document2, 'meta[property="article:modified_time"]');
+    if (normalizeDate(modified)) return normalizeDate(modified);
     return "";
   }
   function extractTemplate(document2) {
@@ -229,12 +278,15 @@ var CustomImportScript = (() => {
   function extractCategory(url) {
     try {
       const segs = new URL(url).pathname.split("/").filter(Boolean);
-      if (segs.length >= 2) return segs[1];
+      if (segs.length < 2) return "";
+      if (segs[1] === "category") return segs[2] || "";
+      if (segs[1] === "tag") return segs[segs.length - 1] || "";
+      return segs[1];
     } catch (e) {
     }
     return "";
   }
-  function extractTagsAndFacets(document2) {
+  function extractTagsAndFacets(document2, pageUrl = "") {
     const tags = [];
     const byFacet = {};
     const seen = /* @__PURE__ */ new Set();
@@ -268,6 +320,28 @@ var CustomImportScript = (() => {
         }
       });
     }
+    if (tags.length === 0) {
+      const cls = document2.body && document2.body.getAttribute("class") || "";
+      const tax = cls.match(/\btax-([a-z0-9_-]+)\b/i);
+      const term = cls.match(/\bterm-([a-z0-9-]+)\b/i);
+      if (tax && term) {
+        const taxonomy = tax[1].toLowerCase().replace(/_/g, "-");
+        const slug = term[1].toLowerCase();
+        if (FACETS.includes(taxonomy) && slug && !/^\d+$/.test(slug)) add(taxonomy, slug);
+      }
+    }
+    if (tags.length === 0) {
+      const cls = document2.body && document2.body.getAttribute("class") || "";
+      const canonical = document2.querySelector('link[rel="canonical"]');
+      const href = pageUrl || canonical && canonical.getAttribute("href") || "";
+      if (/\bsingle-skoda_series\b|\bskoda_series-template\b/.test(cls)) {
+        const m = href.match(/\/series\/([a-z0-9-]+)\/?/i);
+        if (m) add("series", m[1].toLowerCase());
+      } else if (/\bsingle-skoda_model\b|\bskoda_model-template\b/.test(cls)) {
+        const m = href.match(/\/skoda-model\/([a-z0-9-]+)\/?/i);
+        if (m) add("model", m[1].toLowerCase());
+      }
+    }
     return { tags, byFacet };
   }
   function splitList(value) {
@@ -288,13 +362,14 @@ var CustomImportScript = (() => {
     const canonical = document2.querySelector('link[rel="canonical"]');
     const pageUrl = params && params.originalURL || url || canonical && canonical.href || "";
     const overrides = payload.template && payload.template.metadata || {};
-    const title = overrides.title || metaContent(document2, 'meta[property="og:title"]') || (document2.querySelector("title") ? document2.querySelector("title").textContent.trim() : "");
+    const h1 = document2.querySelector("h1");
+    const title = cleanTitle(overrides.title || metaContent(document2, 'meta[property="og:title"]') || (document2.querySelector("title") ? document2.querySelector("title").textContent.trim() : "") || (h1 ? h1.textContent.trim() : ""));
     const description = overrides.description || metaContent(document2, 'meta[property="og:description"]') || metaContent(document2, 'meta[name="description"]') || "";
     const imageSrc = overrides.image || metaContent(document2, 'meta[property="og:image"]') || "";
     const publisheddate = overrides.publisheddate || extractDate(document2);
     const template = overrides.template || extractTemplate(document2);
     const category = overrides.category || extractCategory(pageUrl);
-    const { tags: derivedTags, byFacet } = extractTagsAndFacets(document2);
+    const { tags: derivedTags, byFacet } = extractTagsAndFacets(document2, pageUrl);
     const meta = {};
     if (title) meta.Title = title;
     if (description) meta.Description = description;

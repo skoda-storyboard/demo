@@ -2,33 +2,48 @@
   "version": 1,
   "pages": {
     "/en/emobility/a-true-czech-from-spain": {
-      "hash": "c1f610ee799ba65605cf8f4f3f70887e4d2dda61284ee62b0a8d770fb5d56829",
-      "pushedAt": "2026-09-25T07:48:26.628Z",
+      "hash": "ebd7144ea2db0c187a76ca7ea215c84a7a3e5a59bf7c36ac5b2d5302b00572e2",
+      "pushedAt": "2026-09-25T13:35:22.605Z"
+    },
+    "/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries": {
+      "hash": "fc9b1fefaea3044d439fb90db63646a12d8d5659ddae5f0a8e49f1853132eefa",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
       "adopted": true
     },
     "/en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq": {
-      "hash": "7d727c562a5a2e9408c9f0b2d9d38904b119d01b78de656204bd4dea32b90961",
-      "pushedAt": "2026-09-25T07:48:26.628Z",
-      "adopted": true
+      "hash": "a67d068f7944c0b2b0681dafeedcb6c10cde5908e88641929e80ccb10afd4f05",
+      "pushedAt": "2026-09-25T13:35:22.605Z"
     },
     "/en/emobility/come-and-play-skoda-is-heading-to-milan": {
-      "hash": "39a558f3f1ce862248bcdbf858be71156f9ccb8aeef5fd416ac96d81b41a6825",
-      "pushedAt": "2026-09-25T07:48:26.628Z",
+      "hash": "4201960cf29e0ff60cb7f3182c24fe6ee9ef6f728404076ccedd1f782feb907b",
+      "pushedAt": "2026-09-25T13:35:22.605Z"
+    },
+    "/en/emobility/even-opening-the-door-is-an-experience-says-the-designer-of-the-peaq-suv": {
+      "hash": "6890da055f3f45f714af9ac18f5504dcf2378fc87e6fba2f3c27632ea5e76065",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
       "adopted": true
     },
     "/en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan": {
-      "hash": "39327bca0a90fb01e3f0c22a3485b6b596e56561c4d8f1717d088125f22b03ee",
-      "pushedAt": "2026-09-25T07:48:26.628Z",
+      "hash": "427d99eff1aad638ebe85802c8e0bb055823b5573eb74e95ce33667502d4a1c3",
+      "pushedAt": "2026-09-25T13:35:22.605Z"
+    },
+    "/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging": {
+      "hash": "0581fa9172f2f165f50f4abd734e9293148a51f7ad001ff2b8489d761f4c144c",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
       "adopted": true
     },
     "/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq": {
-      "hash": "a4e8acb114a91b2bfe539ddc5a1128c02dbb49322ffa12ec5b77771eff906d71",
-      "pushedAt": "2026-09-25T07:48:26.628Z",
-      "adopted": true
+      "hash": "13e2ef2ecb612aeb9ad80ab32c9e08e5ebf74235f380798464029c2696c06216",
+      "pushedAt": "2026-09-25T13:35:22.605Z"
     },
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds": {
       "hash": "39e669c994e858d08a3459e9f322ad6a2dc4a12e4635e19efb0f18a356024783",
       "pushedAt": "2026-09-25T07:48:26.628Z",
+      "adopted": true
+    },
+    "/en/emobility/the-skoda-peaq-will-win-you-over-fast": {
+      "hash": "644b556fa085b1d919daf2cb7000ac1f65755315b76f5fcb1f17f9fdf141c20c",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
       "adopted": true
     },
     "/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere": {
@@ -47,8 +62,27 @@
       "adopted": true
     },
     "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving": {
-      "hash": "e3966acf4a4c4a0be19f9b49222e63964c371c17a3c432ae9e3df2856027aa2e",
-      "pushedAt": "2026-09-25T07:48:26.628Z",
+      "hash": "cbb1f6835700e7384996afdabcf4026535d8c082f397b9ec713e011396cfc182",
+      "pushedAt": "2026-09-25T13:35:22.605Z"
+    },
+    "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs": {
+      "hash": "24789ed6f5909bd1e444de81b255cbd2c010d768668073f5dd550cdc77c0e573",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
+      "adopted": true
+    },
+    "/en/press-releases/simply-clever-for-summer-smart-skoda-features-that-make-every-trip-easier": {
+      "hash": "5c8212a9d6ce9d3037cfa9fd1962434e35a7e4733751da9903f9e57f3d93c395",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
+      "adopted": true
+    },
+    "/en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029": {
+      "hash": "35956ddf05d144072a712087afb39d3906b0419d3524b0e70ac76371f99a89e5",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
+      "adopted": true
+    },
+    "/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management": {
+      "hash": "19f7027a22b2b4d563e53ceb629ffd12b72cfba8e6dd8caaf02e9138c460b4a1",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
       "adopted": true
     },
     "/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company": {
@@ -56,9 +90,48 @@
       "pushedAt": "2026-09-25T07:51:40.789Z",
       "adopted": true
     },
+    "/en/press-releases/skoda-auto-supports-uci-mountain-bike-world-championshipsas-official-partner-for-second-year-running": {
+      "hash": "5f1378e342044ddcca7ef8a46f61d127422cc97edc2112fb918d2e4e2101327c",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
+      "adopted": true
+    },
+    "/en/press-releases/skoda-auto-unveils-updated-slavia-in-india": {
+      "hash": "a643cf9f9f2b8fbb9caacfa5b77db1f92d6e2ea1034f6183150ff58bb5b07013",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
+      "adopted": true
+    },
+    "/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon": {
+      "hash": "20397ef766ebebfefc8f31626c2e36d6882e236c3891392d41bd945d2d503d55",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
+      "adopted": true
+    },
+    "/en/press-releases/skoda-receives-red-dot-award-for-its-vision-app-concept": {
+      "hash": "f3da4015f372a63872d80674d49b526de9b82a1fcbec8dd356b7fea29d19ee5e",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
+      "adopted": true
+    },
+    "/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence": {
+      "hash": "124a57e2460c59b7756859a96bf8949c3a221cedd21979d5ea92609f6cbe8d32",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
+      "adopted": true
+    },
     "/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute": {
-      "hash": "f6f32b11539a805b78ab18f081bb4e00675cbcdc391aca60cac573b68f3aa43f",
-      "pushedAt": "2026-09-25T07:48:26.628Z",
+      "hash": "94402d3ad8aa6ced78e55c8f66c368591d6a6269ce7acfdee4cd26885366260c",
+      "pushedAt": "2026-09-25T13:35:22.605Z"
+    },
+    "/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator": {
+      "hash": "d1cdf204490611be7ba536a02402324056f4798c9a1f90e9d8e01404d3119436",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
+      "adopted": true
+    },
+    "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too": {
+      "hash": "e1ef015fa12730b7f21a4b1cda4bffdbe300259b6703a4f5bd2e332268f5c2c7",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
+      "adopted": true
+    },
+    "/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion": {
+      "hash": "1b47b6272249af85108b11ee5f8498f1f535a5df9335cc66ba7556b25343eb32",
+      "pushedAt": "2026-09-25T13:30:01.802Z",
       "adopted": true
     }
   }

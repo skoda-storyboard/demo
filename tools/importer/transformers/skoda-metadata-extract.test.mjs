@@ -10,9 +10,13 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   pickDate, normalizeDate, templateFromBodyClass, categoryFromUrl,
   parseTagHref, groupTags, splitList, buildMetaFields, facetFromBodyClass, FACETS,
+  SITE_SUFFIX, cleanTitle,
 } from './skoda-metadata-extract.mjs';
 
 // ---- date: 4-way fallback + normalization --------------------------------
@@ -163,4 +167,41 @@ test('FACETS is exactly the documented 15', () => {
 test('splitList trims and drops empties', () => {
   assert.deepEqual(splitList('a, b ,, c'), ['a', 'b', 'c']);
   assert.deepEqual(splitList(''), []);
+});
+
+// ---- title: strip the source SEO site suffix (SKODA-610) -----------------------
+
+test('cleanTitle strips one trailing " - Škoda Storyboard" (hyphen, en dash, pipe)', () => {
+  assert.equal(cleanTitle('Elroq - Škoda Storyboard'), 'Elroq');
+  assert.equal(cleanTitle('Elroq – Škoda Storyboard'), 'Elroq');
+  assert.equal(cleanTitle('Elroq | Škoda Storyboard'), 'Elroq');
+  assert.equal(cleanTitle('  The Škoda Peaq Will Win You Over Fast  -  Škoda Storyboard '), 'The Škoda Peaq Will Win You Over Fast');
+});
+
+test('cleanTitle keeps mid-title dashes, the bare site name and is idempotent', () => {
+  const zellmer = 'Škoda Auto: Klaus Zellmer to leave the company';
+  assert.equal(cleanTitle(`${zellmer} - Škoda Storyboard`), zellmer);
+  assert.equal(cleanTitle('Peaq - the new flagship - Škoda Storyboard'), 'Peaq - the new flagship');
+  assert.equal(cleanTitle('Škoda Storyboard'), 'Škoda Storyboard');
+  assert.equal(cleanTitle(cleanTitle('Elroq - Škoda Storyboard')), 'Elroq');
+  assert.equal(cleanTitle(''), '');
+  assert.equal(cleanTitle(null), '');
+});
+
+test('buildMetaFields writes the clean Title', () => {
+  const { meta } = buildMetaFields({ title: 'Elroq - Škoda Storyboard' });
+  assert.equal(meta.Title, 'Elroq');
+});
+
+test('the transformer + runtime mirrors use the same SITE_SUFFIX rule', () => {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const root = path.resolve(here, '..', '..', '..');
+  const mirrors = [
+    path.join(here, 'skoda-metadata.js'),
+    path.join(root, 'scripts', 'query-index.js'),
+  ];
+  mirrors.forEach((f) => {
+    const src = readFileSync(f, 'utf8');
+    assert.ok(src.includes(`SITE_SUFFIX = ${SITE_SUFFIX.toString()};`), `${path.basename(f)} must declare SITE_SUFFIX = ${SITE_SUFFIX}`);
+  });
 });

@@ -1,9 +1,26 @@
 /* eslint-disable */
 var CustomImportScript = (() => {
   var __defProp = Object.defineProperty;
+  var __defProps = Object.defineProperties;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __propIsEnum = Object.prototype.propertyIsEnumerable;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __spreadValues = (a, b) => {
+    for (var prop in b || (b = {}))
+      if (__hasOwnProp.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    if (__getOwnPropSymbols)
+      for (var prop of __getOwnPropSymbols(b)) {
+        if (__propIsEnum.call(b, prop))
+          __defNormalProp(a, prop, b[prop]);
+      }
+    return a;
+  };
+  var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
@@ -121,9 +138,10 @@ var CustomImportScript = (() => {
     }
     const cells = [["Spec Table"]];
     items.forEach((item) => {
-      const value = (item.querySelector(".item-value")?.textContent || "").trim();
-      const unit = (item.querySelector(".item-unit")?.textContent || "").trim();
-      const title = (item.querySelector(".item-title")?.textContent || "").trim();
+      var _a, _b, _c;
+      const value = (((_a = item.querySelector(".item-value")) == null ? void 0 : _a.textContent) || "").trim();
+      const unit = (((_b = item.querySelector(".item-unit")) == null ? void 0 : _b.textContent) || "").trim();
+      const title = (((_c = item.querySelector(".item-title")) == null ? void 0 : _c.textContent) || "").trim();
       const valueText = [value, unit].filter(Boolean).join(" ");
       cells.push([title, valueText]);
     });
@@ -317,6 +335,11 @@ var CustomImportScript = (() => {
     [/\berror404\b/, "page"],
     [/\bpage-template\b|\btemplate-media-room-page\b/, "page"]
   ];
+  var SITE_SUFFIX = /\s+[-–|]\s+Škoda Storyboard\s*$/;
+  function cleanTitle(raw) {
+    const t = String(raw || "").replace(/\s+/g, " ").trim();
+    return t.replace(SITE_SUFFIX, "").trim() || t;
+  }
   function metaContent(document2, selector) {
     const el = document2.querySelector(selector);
     const val = el && el.getAttribute("content");
@@ -450,7 +473,8 @@ var CustomImportScript = (() => {
     const canonical = document2.querySelector('link[rel="canonical"]');
     const pageUrl = params && params.originalURL || url || canonical && canonical.href || "";
     const overrides = payload.template && payload.template.metadata || {};
-    const title = overrides.title || metaContent(document2, 'meta[property="og:title"]') || (document2.querySelector("title") ? document2.querySelector("title").textContent.trim() : "");
+    const h1 = document2.querySelector("h1");
+    const title = cleanTitle(overrides.title || metaContent(document2, 'meta[property="og:title"]') || (document2.querySelector("title") ? document2.querySelector("title").textContent.trim() : "") || (h1 ? h1.textContent.trim() : ""));
     const description = overrides.description || metaContent(document2, 'meta[property="og:description"]') || metaContent(document2, 'meta[name="description"]') || "";
     const imageSrc = overrides.image || metaContent(document2, 'meta[property="og:image"]') || "";
     const publisheddate = overrides.publisheddate || extractDate(document2);
@@ -524,7 +548,7 @@ var CustomImportScript = (() => {
       if (img.closest("table, picture")) return;
       const figure = img.closest("figure");
       const wrapper = img.closest("[data-caption]");
-      const wrapperCaption = wrapper?.querySelectorAll("img").length === 1 ? wrapper.getAttribute("data-caption") : "";
+      const wrapperCaption = (wrapper == null ? void 0 : wrapper.querySelectorAll("img").length) === 1 ? wrapper.getAttribute("data-caption") : "";
       const caption = (img.getAttribute("data-caption") || wrapperCaption || "").trim();
       if (figure) {
         if (img.parentElement.tagName !== "DIV") {
@@ -618,7 +642,7 @@ var CustomImportScript = (() => {
     transform3
   ];
   function executeTransformers(hookName, element, payload) {
-    const enhancedPayload = { ...payload, template: PAGE_TEMPLATE };
+    const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE });
     transformers.forEach((transformerFn) => {
       try {
         transformerFn.call(null, hookName, element, enhancedPayload);
