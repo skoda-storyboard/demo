@@ -12,9 +12,9 @@
    spec and a ticket. That is 659 from the fleet plus 28 float-dock rows the Architect added from the fleet's own
    captures. The shared chrome is also recorded per URL (registry §4.7). Only three gaps needed a new ticket:
    - **SKODA-827** (first drafted as 824): page float dock (share + scroll-top). ⚠️ **Duplicate of SKODA-215**, which
-     the parallel sweep put on main first. 215 owns the build.
+     the parallel sweep put on main first. 215 owns the build; 827 was folded in and removed (§11.4).
    - **SKODA-825:** Media Room side resolution (MR nav + per-path nav/footer routing). ⚠️ **Duplicate of SKODA-309**,
-     which is on main first. 309 owns the build.
+     which is on main first. 309 owns the build; 825 was folded in and removed (§11.4).
    - **SKODA-826:** global page gutter
 
    Those three add **+3.5 SP**. After the dedupe (§11) the owners are 215, 309 and 826. Three unspecced source
@@ -135,8 +135,8 @@ re-measure on main.
 
 | New ticket | What | Evidence | Rows / URLs | SP | Tier |
 |---|---|---|---|--:|---|
-| [SKODA-827](../tickets/tickets/SKODA-827.md) → **[215](../tickets/tickets/SKODA-215.md)** | Page float dock: share expander (5 intent links) + scroll-to-top + cart slot | On all 42 pages, same fixed 322×70 dock, 8 anchors. No block or script in `blocks/` / `scripts.js`. STO-D10 was mapped to 304, whose ACs are footer follow links only | 84 / 42 | 1.5 (215: 2) | Should (Plan A) · **Must if §14 is accepted**: COM-15 share is client-promised. Duplicate of 215; fold in and close |
-| [SKODA-825](../tickets/tickets/SKODA-825.md) → **[309](../tickets/tickets/SKODA-309.md)** | MR side resolution: `/media-room/nav` fragment + bulk-metadata `nav`/`footer` rows + switcher active state | Main PR preview shows STO nav (Models, eMobility…) and the 7-col STO footer. No `nav`/`footer` meta. PR #134 lists routing as "not in this PR" | 5 chrome rows + every MR header/footer row / 16 | 1.5 (309: 2) | **Must** (blocks 704 sign-off on 16 URLs). Duplicate of 309; fold in and close |
+| SKODA-827 *(folded in, removed)* → **[215](../tickets/tickets/SKODA-215.md)** | Page float dock: share expander (5 intent links) + scroll-to-top + cart slot | On all 42 pages, same fixed 322×70 dock, 8 anchors. No block or script in `blocks/` / `scripts.js`. STO-D10 was mapped to 304, whose ACs are footer follow links only | 84 / 42 | 1.5 (215: 2) | Should (Plan A) · **Must if §14 is accepted**: COM-15 share is client-promised. Duplicate of 215; fold in and close |
+| SKODA-825 *(folded in, removed)* → **[309](../tickets/tickets/SKODA-309.md)** | MR side resolution: `/media-room/nav` fragment + bulk-metadata `nav`/`footer` rows + switcher active state | Main PR preview shows STO nav (Models, eMobility…) and the 7-col STO footer. No `nav`/`footer` meta. PR #134 lists routing as "not in this PR" | 5 chrome rows + every MR header/footer row / 16 | 1.5 (309: 2) | **Must** (blocks 704 sign-off on 16 URLs). Duplicate of 309; fold in and close |
 | [SKODA-826](../tickets/tickets/SKODA-826.md) | Global gutter 10px at every width (EDS 24 < 992, 40 ≥ 992) | Architect CDP re-measure, Epiq + Klaus: source `left 10 / 355` @375, `26 / 1228` @1280. EDS `24 / 327` and `40–56 / 1168`. SKODA-106 is closed | root cause of most 🟡 width deltas | 0.5 | **Must** (cheap; otherwise every 704 diff fails) |
 
 **Folded into existing ACs instead of new tickets:**
@@ -453,3 +453,35 @@ It was measured at 1440/390, which is why its pixel values differ from ours (375
    - 816/817/819/820/502/608: per their §5 and our §6
 4. Re-measure the 3 stale imports (plates, Peaq record, Octavia) after the re-import. Re-run both sweeps' rail probes
    with trusted input after the 212 fix.
+
+### 11.4 Post-merge re-check and GitHub sync (2026-09-25, after #110 / #134)
+
+Main moved after this reconciliation: **#110 (SKODA-213 promo-box)** and **#134 (SKODA-305 MR footer)** merged. A
+read-only CDP re-check on `main--demo--skoda-storyboard.aem.page` (1440) gave:
+
+| Check | Result | Effect |
+|---|---|---|
+| `/en` promo exclusion | 3 promo posts; Latest Stories starts at Epiq (15. 9. 2026); **0 overlap** (authored `offset`, 0304613) | **611a −0.5 SP → 1 SP**: section structure + social strip only |
+| `/en` section structure | Still **1 section** holding 13 blocks | 611a stays Must |
+| Title suffix | `buildCardTeaser()` trims it (`stories`, promo). **25** suffixed rail cards (`story-rail` → `carousel`) on `/en`; index **28 / 31** suffixed; search lists suffixed titles | **610 stays 1 SP** (agent lane) |
+| MR fragments | `/media-room/footer` → 200; `/media-room/nav` → **404**; the Klaus PR still has no `nav`/`footer` meta and renders STO chrome | 309 unblocked by #134; the MR nav doc is still open |
+
+**Cut-line delta vs §11.2:** Must (human) net **+2.5 SP** (was +3), because 611a is 1 SP. vijay drops to
+**≈ 19.5 SP (≈ 9.5 d)**, so the Plan A margin grows to **≈ 0.45 d**. The Plan A fallback (611a → promo exclusion
+only) no longer applies; if something slips, 611a's social strip moves to 611b.
+
+**Decisions applied (D1–D5, approved 2026-09-25):**
+- **D1:** 212 and 204 are not reopened. Follow-ups are **SKODA-212a** (desktop pointer fix, 1 SP, P0, linked to
+  #98) and **SKODA-204a** (consent click-to-load hook, 0.5 SP, P1, linked to #18).
+- **D2:** 611 is the parent; its slices are **611a** (Must) and **611b** (Should).
+- **D3:** SKODA-306 owns the 4 footer legal links; they were removed from 308's ACs.
+- **D4:** no assignees; the §11.2 owner split stays a proposal.
+- **D5:** the ticket-file edits land in this PR, then this PR merges, then the GitHub issues are created from the
+  files on `main`.
+
+**Folded + removed:** draft 827 → 215 (all templates, 8 anchors + cart slot, intent URLs, Esc/focus, reduced motion,
+no CLS). Draft 825 → 309 (16 MR URLs incl. `/en/skoda-model/`, 200-before-activation, 307 empty-no-throw, 0
+console errors). The registry generator was updated and the registry regenerated; the totals are unchanged.
+
+**AC amendments applied** (sweep §6 + §11.1): 208, 218, 306, 308, 607, 608, 801a (+ the closed 502 "Show more"
+route), 805a, 805c (+ "Show more"), 816, 817 (source cards have a radius), 819 and 820.

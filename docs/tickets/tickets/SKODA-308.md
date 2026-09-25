@@ -34,7 +34,9 @@ newsletter panel UI stub (shares markup/CSS with the SKODA-823 sidebar widget).
 ## Acceptance Criteria
 - [ ] Every value above matches at 1440 and 390 (±2px), verified on `.aem.page` **and** `.aem.live`.
 - [ ] Search opens the 624px bar with the scope select; Esc closes it; submit routes to the search page (SKODA-403).
-- [ ] Footer shows the 4 legal links; the newsletter panel opens/closes (aria-expanded, Esc) and posts nothing.
+- [ ] Footer spacing/typography values above match; the newsletter panel opens/closes (aria-expanded, Esc) and posts nothing.
+- **Note (2026-09-25, sweep reconciliation D3):** the 4 footer legal links are owned by **SKODA-306** (#102) and
+  are no longer in 308's scope. Priority: **Should** (§11.2 cut line), plan B extension.
 
 ## Dependencies
 SKODA-301/302/303/304 (built chrome), SKODA-307 (null guard), SKODA-403 (search), SKODA-823 / SKODA-904 (newsletter).

@@ -43,6 +43,9 @@ that block already renders "title above a 16:9 image" (`blocks/hero-image`).
 - [ ] ≤1079: image first, then title, then caption (hero.md §4); 28px title at ≤768.
 - [ ] Other templates' `hero-banner` output unchanged.
 - [ ] Lint + tests green; re-imported Epiq story verified in the browser.
+- [ ] **Amendment (2026-09-25, sweep reconciliation):** perex 20/600/30 **in the hero** (the Epiq perex is missing
+      today). Date 12/300 **inline with the category pill**, not a 16px `<p>` on its own row. 0 flex gap under the H1.
+      10px mobile gutter (via SKODA-826). Re-import the heroes that still use the older overlaid layout.
 
 ## Dependencies
 SKODA-202 (hero-image block), SKODA-801 (story import path).

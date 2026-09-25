@@ -67,7 +67,7 @@ Status legend: `DRAFT` (skeleton, awaiting capture) · `CAPTURED` (measured, in 
 | `story-detail.md` | composition | 604 / 801 | `/en/<story>` | CAPTURED |
 | `siteorigin-body.md` | default content (import flatten) | 814 (feeds 801/208/813) | `/en/<story>` SiteOrigin body | DRAFT+MEASURED |
 | `newsletter.md` | newsletter-stub | STO-D05 / COM-16 (prod E09) | `/en/` topbar + inline | CAPTURED |
-| `social-share.md` | share (chrome) | COM-15 / STO-D10 | **SKODA-215** page float dock (was unticketed; sweep 2026-09-25; draft 827 is a duplicate) · gallery share → 216 | CAPTURED |
+| `social-share.md` | share (chrome) | COM-15 / STO-D10 | **SKODA-215** page float dock (was unticketed; sweep 2026-09-25; draft 827 folded in) · gallery share → 216 | CAPTURED |
 | `promo-banner.md` | banner (E09/903) | COM-09 side / STO-D08 | flagged E09 | CAPTURED |
 | `press-kit-template.md` | press-kit (new) | 805 | `/en/press-kits/skoda-peaq-press-kit/` | CAPTURED |
 | `press-kit-media.md` | grouped media + ZIP (new) | 806 | press kit | CAPTURED |

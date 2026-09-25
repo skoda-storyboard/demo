@@ -247,9 +247,12 @@ All MIG IDs map to the import infra (SKODA-601/602) for the demo sample and SKOD
 | SKODA-305 | M1 | COM18 (MR footer variant) |
 | SKODA-215 | M1 | COM15, STO-D10 (page float dock: share + scroll-top; parallel sweep 88c1b48) |
 | SKODA-309 | M1 | COM02/03/18 (MR nav, active tab, per-path nav/footer metadata; parallel sweep 88c1b48) |
-| SKODA-827 | M1 (draft, duplicate of 215) | COM15, STO-D10 (float dock; first drafted as 824) |
-| SKODA-825 | M1 (draft, duplicate of 309) | COM02/03/18 (MR nav fragment + per-path nav/footer routing) |
+| SKODA-827 | — (draft folded into 215 and removed, 2026-09-25) | COM15, STO-D10 → see SKODA-215 |
+| SKODA-825 | — (draft folded into 309 and removed, 2026-09-25) | COM02/03/18 → see SKODA-309 |
 | SKODA-826 | M1 (draft) | no requirement ID; visual-parity fix feeding the 704 sign-off (global page gutter; follow-up to 106) |
+| SKODA-212a | M1 | rail interaction (desktop click/drag; follow-up to 212, sweep §11.1 V1) |
+| SKODA-204a | M1 | STO-D03, MR-PR03/PR06, MR-V03 (consent click-to-load hook; follow-up to 204) |
+| SKODA-611a / 611b | M1 (Must / Should) | STO home composition (`template-home.md` 9-section stack; slices of 611) |
 | SKODA-401 | M1 | COM07, MR-L03, MR-I02, MR-V02 |
 | SKODA-402 | M1 | COM07/11, STO-H02/04/05/06/08, STO-C02/04/05, STO-D06, MR-H02/06/07, MR-L02/04/06, MR-M03–07, MR-I01, MR-V01 |
 | SKODA-403 | M1 | COM06, MR-L01 |
