@@ -2,9 +2,9 @@
 - **Epic:** E01, Foundation & Setup (follow-up to SKODA-106, which is closed)
 - **Type:** global CSS token fix
 - **Phase:** A · **Milestone:** M1 (demo)
-- **GitHub issue:** — (drafted on disk 2026-09-25; create at sign-off)
+- **GitHub issue:** [#149](https://github.com/skoda-storyboard/demo/issues/149)
 - **Estimate:** 0.5 SP · AI-assisted 0.25d / manual 0.5d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🔵 TODO, **draft**
+- **Status (2026-09-25):** 🔵 TODO
 
 ## Origin
 In the 2026-09-25 DevTools URL→block sweep

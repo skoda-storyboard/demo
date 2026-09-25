@@ -2,6 +2,7 @@
 - **Epic:** E02, Core Blocks
 - **Type:** block variant + import
 - **Phase:** A/B · **Milestone:** M1 (cosmetic) / M2
+- **GitHub issue:** [#142](https://github.com/skoda-storyboard/demo/issues/142)
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1d *(planning estimate, not a quote)*
 - **Status (2026-09-25):** 🔵 TODO
 

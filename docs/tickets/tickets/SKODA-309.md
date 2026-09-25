@@ -2,6 +2,7 @@
 - **Epic:** E03, Chrome Fragments
 - **Type:** content + import + small header change
 - **Phase:** A · **Milestone:** M1 (demo-visible on **16** Media Room URLs)
+- **GitHub issue:** [#145](https://github.com/skoda-storyboard/demo/issues/145)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
 - **Status (2026-09-25):** 🔵 TODO. **Unblocked:** SKODA-305 / PR #134 merged (8b2a18a). The DevTools-sweep draft
   SKODA-825 (same scope) is **folded in here** and removed; the corrections are below.

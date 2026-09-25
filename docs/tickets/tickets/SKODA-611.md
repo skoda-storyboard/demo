@@ -2,6 +2,7 @@
 - **Epic:** E06, Import Pilot Content
 - **Type:** import + section styling
 - **Phase:** A · **Milestone:** M1 (demo-visible: the first page shown)
+- **GitHub issue:** [#147](https://github.com/skoda-storyboard/demo/issues/147)
 - **Estimate:** 3 SP → **2.5 SP** after re-verification (parent; the work is in the slices) *(planning estimate, not a quote)*
 - **Status (2026-09-25):** 🔵 TODO, **parent**. Split per sweep-reconciliation decision D2 (same pattern as 805 / 805a–c):
 

@@ -1,8 +1,9 @@
 # SKODA-611b, Storyboard home: band spacing (Should slice of SKODA-611)
 - **Epic:** E06, Import Pilot Content
-- **Parent:** [SKODA-611](SKODA-611.md) (home composition)
+- **Parent:** [SKODA-611](SKODA-611.md) (home composition, [#147](https://github.com/skoda-storyboard/demo/issues/147))
 - **Type:** section styling (CSS)
 - **Phase:** A · **Milestone:** M1 · **Tier:** Should (§11.2 cut line; builds on 611a)
+- **GitHub issue:** [#153](https://github.com/skoda-storyboard/demo/issues/153)
 - **Estimate:** 1.5 SP · AI-assisted 0.5d / manual 1–1.5d *(planning estimate, not a quote)*
 - **Status (2026-09-25):** 🔵 TODO
 

@@ -1,8 +1,9 @@
 # SKODA-611a, Storyboard home: section structure (Must slice of SKODA-611)
 - **Epic:** E06, Import Pilot Content
-- **Parent:** [SKODA-611](SKODA-611.md) (home composition)
+- **Parent:** [SKODA-611](SKODA-611.md) (home composition, [#147](https://github.com/skoda-storyboard/demo/issues/147))
 - **Type:** import + section metadata
 - **Phase:** A · **Milestone:** M1 (demo-visible: the first page shown) · **Tier:** Must (§11.2 cut line)
+- **GitHub issue:** [#151](https://github.com/skoda-storyboard/demo/issues/151)
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1d *(planning estimate, not a quote)*
 - **Status (2026-09-25):** 🔵 TODO
 

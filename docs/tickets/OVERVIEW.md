@@ -89,6 +89,7 @@ New M1 tickets:
   - AC amendments from sweep §6 + §11 were applied to 208, 218, 306, 308, 607, 608, 801a, 805a, 805c, 816, 817,
     819 and 820.
   - **Cut line:** Must (human) net is now **+2.5 SP** (611a is 1 SP), leaving ≈ 0.45 d of margin (sweep §11.4).
+  - **Issues created** (milestone M1, Project #1 with Status/Priority/Estimate, no assignees): 215 → #139, 220 → #140, 221 → #141, 225 → #142, 307 → #143, 308 → #144, 309 → #145, 610 → #146, 611 → #147, 824 → #148, 826 → #149, 212a → #150, 611a → #151, 204a → #152, 611b → #153. 611a/611b are sub-issues of #147. #98 / #18 / #31 got follow-up comments. Amended bodies were pushed to #57, #108, #102, #47, #117, #119, #120, #122, #123, #127, #128 and #130. Board fields: #57 P0 / 6 SP, #108 P1, #47 P0.
 **Target:** DA / Experience Workspace + EDS (no AEM Author / UE / JCR), per `SKODA-EDS-DA-ARCHITECTURE.md`.
 **Estimates:** story points (SP) + AI-assisted / manual day ranges, **planning estimates, not a quote**. "AI-assisted" reflects this environment's import/styling/QA tooling.
 **Files:** `docs/tickets/epics/E##-*.md` · `docs/tickets/tickets/SKODA-<id>.md`.
@@ -145,7 +146,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-104 | helix-query.yaml skeleton (per-locale) | E01 | 3 | 1–2 | 2–3 | 102 | 🟡 index critical path |
 | SKODA-105 | Sidekick v7 + preview/publish | E01 | 1 | 0.5 | 1 | 101 | 🟢 |
 | SKODA-106 | Design tokens + global CSS (re-derived) | E01 | 3 | 1–2 | 3–5 | 102 | 🟢 |
-| [SKODA-826](tickets/SKODA-826.md) | Global page gutter parity (10px at every width, not 24/40px) | E01 | 0.5 | 0.25 | 0.5 | 106 | 🟢 M1 Must; **draft** from the 2026-09-25 URL→block sweep |
+| [SKODA-826](tickets/SKODA-826.md) | Global page gutter parity (10px at every width, not 24/40px) | E01 | 0.5 | 0.25 | 0.5 | 106 | 🟢 M1 Must; from the 2026-09-25 URL→block sweep (#149) |
 | SKODA-201 | Cards/Teaser (overlay/media/toolbar) | E02 | 5 | 2–3 | 5–7 | 102,106 | 🟢 |
 | SKODA-202 | Hero (image, LCP) | E02 | 2 | 1 | 2–3 | 102,106 | 🟢 |
 | SKODA-203 | Gallery + lightbox modal | E02 | 5 | 2–3 | 4–6 | 102,106 | 🟡 a11y modal `[RUNTIME-UNCONFIRMED]` |
