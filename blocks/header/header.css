@@ -345,8 +345,11 @@ header nav .nav-search-field {
   transition: width 0.3s ease, background-color 0.2s ease;
 }
 
+/* open width = the source's search input: its bar is min(624px, 50vw) less
+   the 84px Stories/News type select we don't have → 540px from 1248px,
+   456px at 1080 */
 header nav .nav-search.nav-search-open .nav-search-field {
-  width: clamp(200px, 32vw, 340px);
+  width: min(540px, calc(50vw - 84px));
   background: var(--dropdown-hover-bg);
 }
 
@@ -381,7 +384,7 @@ header nav .nav-search-input {
   padding: 0 var(--spacing-m) 0 0;
   background: transparent;
   color: var(--skoda-ink);
-  font-size: var(--body-font-size-s);
+  font-size: var(--body-font-size-m); /* 16px, as the source input */
   opacity: 0;
   transition: opacity 0.2s ease;
 }
@@ -405,9 +408,109 @@ header nav .nav-search-input::placeholder {
   opacity: 1;
 }
 
+/* live suggestion dropdown (SKODA-403; shared /scripts/search-suggest.js).
+   Matches the source: white panel (4px radius), dropdown shadow, each row a
+   leading search glyph + stacked title + "date | section" meta, no image. */
+header nav .nav-search .search-suggest {
+  position: absolute;
+  top: calc(100% + var(--spacing-l)); /* 24px */
+  right: 0;
+  z-index: 20;
+  width: max(595px, 100%);
+  max-height: 60vh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  border-radius: var(--facet-radius); /* 4px — source dropdown radius */
+  background: var(--skoda-white);
+  box-shadow: var(--dropdown-shadow);
+  list-style: none;
+}
+
+header nav .nav-search .search-suggest[hidden] {
+  display: none;
+}
+
+header nav .nav-search .search-suggest-item {
+  margin: 0;
+}
+
+/* row: plain `8px 16px` padding. Only the row chosen with ↑/↓ shows the
+   search glyph and indents to 40px (the source's current-suggestion look). */
+header nav .nav-search .search-suggest-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-m);
+  color: var(--skoda-ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+header nav .nav-search .search-suggest-icon {
+  position: absolute;
+  top: 50%;
+  left: var(--spacing-s);
+  display: none;
+  color: var(--skoda-ink);
+  transform: translateY(-50%);
+}
+
+header nav .nav-search .search-suggest-icon svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+header nav .nav-search .search-suggest-text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: row;
+  gap: 2px;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* mouse-over (source: #f1f1f1) */
+header nav .nav-search .search-suggest-link:hover,
+header nav .nav-search .search-suggest-link:focus-visible {
+  background: var(--dropdown-hover-bg);
+}
+
+/* chosen row (source: #e4e4e4 + search glyph + 40px indent). Only a row the
+   user picked with ↑/↓ — never a default — so what is highlighted is what
+   Enter opens and what aria-activedescendant announces. */
+header nav .nav-search .search-suggest-link.is-active {
+  padding-left: 40px;
+  background: var(--divider-color);
+}
+
+header nav .nav-search .search-suggest-link.is-active .search-suggest-icon {
+  display: block;
+}
+
+header nav .nav-search .search-suggest-title {
+  font-size: var(--body-font-size-m);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+header nav .nav-search .search-suggest-meta {
+  color: var(--skoda-ink);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  opacity: 0.5;
+
+  /* "DD. MM. YYYY | Type" stays on one line; a long title wraps instead */
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 /* ==========================================================================
  * DRAWER BAND (< 1080): search lives inside the open menu as a static row,
- * expanded to 80% width (no click-to-expand overlay here).
+ * expanded to the full column width (no click-to-expand overlay here).
  * ========================================================================== */
 @media (width < 1080px) {
   /* open drawer = right-anchored panel with a gap on the left (page shows
@@ -550,16 +653,19 @@ header nav .nav-search-input::placeholder {
     padding: var(--spacing-m) 0;
   }
 
+  /* positioned so the suggestion overlay anchors to the field */
   header nav[aria-expanded='true'] .nav-search {
-    position: static;
+    position: relative;
+    flex-direction: column;
+    align-items: flex-start;
     width: 100%;
     justify-content: flex-start;
   }
 
-  /* static pill, always open, 80% wide */
+  /* static pill, always open, full column width (source: 335px @375) */
   header nav[aria-expanded='true'] .nav-search-field {
     position: static;
-    width: 80%;
+    width: 100%;
     height: 3em;
     background: var(--dropdown-hover-bg);
     transform: none;
@@ -568,6 +674,27 @@ header nav .nav-search-input::placeholder {
   header nav[aria-expanded='true'] .nav-search-input {
     width: auto;
     opacity: 1;
+  }
+
+  /* drawer: keep the pill full width (the desktop open width would shrink it) */
+  header nav[aria-expanded='true'] .nav-search.nav-search-open .nav-search-field {
+    width: 100%;
+  }
+
+  /* drawer: suggestions overlay the menu directly under the field, at the
+     field's width, instead of pushing the menu down (source behaviour) */
+  header nav[aria-expanded='true'] .nav-search .search-suggest {
+    top: 100%;
+    right: auto;
+    left: 0;
+    width: 100%;
+  }
+
+  /* narrow rows: title above meta rather than side by side */
+  header nav[aria-expanded='true'] .nav-search .search-suggest-text {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
   }
 }
 
