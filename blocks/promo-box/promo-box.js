@@ -196,9 +196,11 @@ export function enablePromoRotation(block, track, strings = buildStrings()) {
   function updateTimer() {
     window.clearInterval(timer);
     timer = undefined;
-    const pauseFocused = document.activeElement === controls.querySelector('.promo-box-pause');
+    const keyboardFocus = document.activeElement !== controls.querySelector('.promo-box-pause')
+      && block.contains(document.activeElement)
+      && document.activeElement?.matches(':focus-visible');
     if (paused || reduced.matches || document.hidden || hovered || touched
-      || (block.contains(document.activeElement) && !pauseFocused) || slides.length < 2) return;
+      || keyboardFocus || slides.length < 2) return;
     timer = window.setInterval(() => {
       if (compact.matches) select((active + 1) % slides.length);
       else rotateMosaic();

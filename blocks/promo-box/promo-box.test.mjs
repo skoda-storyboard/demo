@@ -256,6 +256,7 @@ test('desktop mosaic cycles card nodes; pauses and mobile mode retain their beha
         });
       },
       contains(child) { return this === child || this.children.some((el) => el.contains(child)); },
+      matches(selector) { return selector === ':focus-visible' && this.focusVisible !== false; },
       setAttribute(name, value) { this.attributes.set(name, value); },
       removeAttribute(name) { this.attributes.delete(name); },
       hasAttribute(name) { return this.attributes.has(name); },
@@ -320,6 +321,11 @@ test('desktop mosaic cycles card nodes; pauses and mobile mode retain their beha
 
     block.dispatch('pointerenter', { pointerType: 'touch' });
     assert.equal(intervals.size, 1, 'touch compatibility hover does not stop rotation');
+    globalThis.document.activeElement = cards[0];
+    cards[0].focusVisible = false;
+    block.dispatch('focusin');
+    assert.equal(intervals.size, 1, 'a tapped slide does not permanently stop rotation');
+    globalThis.document.activeElement = null;
     block.dispatch('pointerenter', { pointerType: 'mouse' });
     assert.equal(intervals.size, 0);
     block.dispatch('pointerleave', { pointerType: 'mouse' });
