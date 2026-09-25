@@ -99,6 +99,37 @@ test('splitBuffer: single URI → one part; N URIs → N ordered parts covering 
   const parts = splitBuffer(buf, ['u1', 'u2'], 5);
   assert.equal(parts.length, 2);
   assert.equal(Buffer.concat(parts).toString(), 'abcdefghij');
+  assert.throws(() => splitBuffer(buf, ['u1'], 5), /cannot hold/);
+  assert.throws(() => splitBuffer(buf, ['u1', 'u2'], 4), /cannot hold/);
+  assert.throws(() => splitBuffer(Buffer.from('ab'), ['u1', 'u2', 'u3'], 5), /URI count/);
+});
+
+test('uploadToDAM rejects insufficient part capacity before sending any bytes', async () => {
+  const calls = [];
+  const fetchImpl = async (url, options = {}) => {
+    calls.push(options.method || 'GET');
+    if (url.endsWith('.initiateUpload.json')) {
+      return {
+        ok: true,
+        json: async () => ({
+          files: [{ uploadToken: 'mock', uploadURIs: ['https://blob.example.test/part'], maxPartSize: 5 }],
+        }),
+      };
+    }
+    if (options.method === 'PUT') throw new Error('incomplete upload attempted');
+    return { ok: true, status: 200 };
+  };
+  const result = await uploadToDAM({
+    damConfig: { baseUrl: 'https://dam.example.test', folder: '/content/dam/storyboard' },
+    damPath: '/content/dam/storyboard/en/story/hero.jpg',
+    buffer: Buffer.from('abcdefghij'),
+    contentType: 'image/jpeg',
+    token: 'mock',
+    fetchImpl,
+  });
+  assert.equal(result.ok, false);
+  assert.match(result.body, /cannot hold the complete original/);
+  assert.deepEqual(calls, ['GET', 'POST']);
 });
 
 // ---- imageSize / ratiosDiffer ----------------------------------------------

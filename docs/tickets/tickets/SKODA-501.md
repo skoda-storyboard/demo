@@ -44,9 +44,20 @@ and removes the legacy derivative `srcset`. `npm run media:audit` reconciles the
 canonical M1 URL list with imported image references, delivery evidence, captions,
 alts and DAM-original status. See `tools/importer/media/README.md` for the run order.
 
-The isolated worktree has **zero of the 42 distinct M1 page files**, so the
-read-only audit reports 42 missing pages; it does **not** establish live image
-coverage. Rights clearance, access and content-ops approval are required before
-copying originals or publishing. SKODA-506 must separately gate every SKODA-602
-preview/publish. Rendered responsive pictures and source/preview fidelity still
-need independent QA before checking off this ticket's acceptance criteria.
+The requester confirmed rights and approved DAM ingest for the **357 originals
+already identified** in the tracked manifest, including six YouTube thumbnails.
+Of those, **349 originals were uploaded to page-mirrored DAM folders**; all 349
+Assets HEAD responses reported the same byte length and image MIME type as the
+source originals. All six YouTube thumbnails and the four oversized Peaq masters
+are among the successes.
+Eight source-CDN originals returned HTTP 403 and are marked `steps.dam=error`;
+no sized derivative was uploaded as their original. The four oversized Peaq
+rows remain `partial` only because they have no publish-safe inline delivery
+rendition (SKODA-506), despite successful original ingest.
+
+The isolated worktree still has **zero of the 42 distinct M1 page files**, so the
+read-only audit reports 42 missing pages; this historical manifest does **not**
+establish full M1 image coverage. No DA upload or preview/publish occurred.
+SKODA-506 must separately gate every SKODA-602 preview/publish. Rendered
+responsive pictures, source/preview fidelity, and recovery of the eight
+unavailable originals still need follow-up before ticket acceptance.

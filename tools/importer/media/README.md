@@ -55,6 +55,12 @@ block (SKODA-505) reads this to resolve "download original".
    resume just the DAM/DA steps when those are requested later (no blanket
    `--force` upload). Missing/empty alts are logged per imported occurrence.
 
+The original is uploaded even when a safe inline delivery rendition is unavailable;
+the row remains `partial` until SKODA-506 resolves that separate publish issue.
+Original fetches must return non-empty image bytes, and the direct-upload response
+must provide enough parts to cover every byte before any part is sent. A missing
+original is never replaced by a derivative under the original's DAM path.
+
 Then **`apply-media-manifest.mjs`** rewrites content `<img src>` →
 `delivery_url`, removes the old WordPress `srcset` ladder so EDS builds its own,
 and emits `content/media-index.json` (the cart resolver). A missing page or

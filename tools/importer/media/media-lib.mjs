@@ -389,13 +389,17 @@ export async function uploadToDA({
 /** Split a buffer into N parts to match the count of returned uploadURIs. */
 export function splitBuffer(buffer, uploadURIs, maxPartSize) {
   const n = uploadURIs.length;
-  if (n <= 1) return [buffer];
+  if (!n || !buffer.length || (maxPartSize && buffer.length > n * maxPartSize)) {
+    throw new Error('DAM upload URIs cannot hold the complete original');
+  }
+  if (n === 1) return [buffer];
   const part = Math.ceil(buffer.length / n);
   const size = maxPartSize ? Math.min(part, maxPartSize) : part;
   const parts = [];
   for (let off = 0; off < buffer.length; off += size) {
     parts.push(buffer.subarray(off, Math.min(off + size, buffer.length)));
   }
+  if (parts.length !== n) throw new Error('DAM upload URI count does not match original parts');
   return parts;
 }
 
@@ -508,7 +512,7 @@ export async function uploadToDAM({
     // 2) PUT parts
     const parts = splitBuffer(buffer, uploadURIs, file.maxPartSize);
     for (let i = 0; i < uploadURIs.length; i += 1) {
-      const partBuf = parts[i] || Buffer.alloc(0);
+      const partBuf = parts[i];
       const putRes = await fetchImpl(uploadURIs[i], {
         method: 'PUT',
         headers: { 'content-type': contentType || 'application/octet-stream' },

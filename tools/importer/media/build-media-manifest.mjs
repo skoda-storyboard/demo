@@ -323,6 +323,9 @@ async function main() {
           const master = await fetchBinary(row.master_url);
           masterBuffer = master.buffer; masterType = master.contentType;
         }
+        if (!masterBuffer.length || !/^image\//i.test(masterType)) {
+          throw new Error(`Original is not a non-empty image: ${row.master_url}`);
+        }
         if (damConfig && row.steps.dam !== 'done') {
           row.dam_original_url = row.master_url;
           if (masterBuffer) {
@@ -397,6 +400,8 @@ async function main() {
       console.log(`  ${allOk ? '✓' : '⚠'} ${id}  ${row.bytes ?? '?'} bytes${row.preconditioned ? ' [pre-conditioned]' : ''} → ${row.delivery_url || '(no delivery)'}${extras ? `  (${extras})` : ''}`);
     } catch (err) {
       row.status = 'partial';
+      if (damConfig && row.steps.dam !== 'done') row.steps.dam = 'error';
+      if (cfg.daArchive && row.steps.da !== 'done') row.steps.da = 'error';
       row.note = [row.note, String(err.message || err)].filter(Boolean).join('; ');
       counts.failed += 1;
       manifest.rows[id] = row;

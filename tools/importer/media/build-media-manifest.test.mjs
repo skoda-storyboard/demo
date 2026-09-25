@@ -156,6 +156,7 @@ test('an unavailable master cannot be replaced by the resized delivery file in D
     );
     const { rows } = JSON.parse(readFileSync(manifest, 'utf8'));
     assert.equal(rows[id].status, 'partial');
+    assert.equal(rows[id].steps.dam, 'error');
     assert.equal(rows[id].dam_asset_path, '');
     assert.deepEqual(dam.uploads, []);
   } finally {
