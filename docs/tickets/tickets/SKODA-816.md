@@ -39,7 +39,8 @@ place the perex and linked category beneath the image in the same caption.
   aside's independent Tags block remains unchanged.
 - Split story heading/caption DOM in `hero-image.js`: desktop title → image
   → caption; ≤1079 image → title → caption. Set the perex to 20px/30px/600;
-  align metadata inline and match the source's 10px narrow-width gutter.
+  align metadata inline. **SKODA-826** owns the shared page gutter; do not
+  add a story-only gutter override here.
 
 ## Acceptance Criteria
 - [ ] 1440: title centred above a 16:9 image of about 970×546; the caption (perex, then date + label) sits below the image, left-aligned.
@@ -50,6 +51,11 @@ place the perex and linked category beneath the image in the same caption.
 - [ ] Lint + importer/block tests green; re-imported Epiq story previewed,
       published and compared using Chrome computed CSS/DOM at 1440, 1024,
       768, 500 and breakpoint edges (no screenshots).
+- [ ] **Amendment (2026-09-25, sweep reconciliation):** perex 20/600/30 **in the hero** (the Epiq perex is missing
+      today). Date 12/300 **inline with the category pill**, not a 16px `<p>` on its own row. 0 flex gap under the H1.
+      10px page gutter is a separate SKODA-826 dependency. Re-import the heroes
+      that still use the older overlaid layout.
 
 ## Dependencies
-SKODA-202 (hero-image block), SKODA-801 (story import path).
+SKODA-202 (hero-image block), SKODA-801 (story import path); SKODA-826
+for site-wide gutter parity before visual sign-off.

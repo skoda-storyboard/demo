@@ -165,7 +165,9 @@ extraction (no screenshots) measured the Epiq source image as 970×545.6 at
 mobile gutters. The H1/image gap at 1440 is 32px (EDS pre-fix 48px), and
 the perex is 20px/30px/600. Date 12px/18px/300 and grey category link
 share one metadata row. Verify source versus branch EDS with computed CSS
-and bounding boxes at these widths and 1079/1080.
+and bounding boxes at these widths and 1079/1080. The 10px page gutter is a
+site-wide SKODA-826 change, not a story-specific hero override; check the
+full-width geometry again once that dependency lands.
 
 `Hero-image` (story / overlay, image + heading):
 | (image cell)              | (heading cell)                          |

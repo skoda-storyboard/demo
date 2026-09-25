@@ -45,6 +45,12 @@ attachment pages, HTTP-verified.
 - [ ] Peaq and Epiq model pages show populated Images and Videos rails. Rails with no rows are hidden and leave no
       empty heading.
 - [ ] Lightbox, download and add-to-cart affordances on items follow SKODA-203 and SKODA-505a, once they land.
+- [ ] **Amendment (2026-09-25, sweep reconciliation):**
+  - Rows: JPG Original + 1920, MP4, Vimeo ID/poster, date, and the 15 facets. Model-media rows keep the
+    model/bodywork facets. An empty listing shell is not acceptable.
+  - **Listing media-card cell:** date, filename, the add/download toolbar and the lightbox detail panel (parallel
+    sweep §5).
+  - Listing layout: columns 1/3/4/4, facets collapsed until "Advanced filter (0)" (the 402 listing QA fix).
 
 ## Dependencies
 - Upstream: SKODA-601, SKODA-602, SKODA-401/104 (index config), SKODA-501/503.

@@ -5,6 +5,12 @@ Superb-25-years release; a second release cross-checked for structure).
 Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Map: [`_TEMPLATES.md`](_TEMPLATES.md).
 Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 
+> **Sweep correction (2026-09-25).** The DevTools URL→block sweep ([registry](../analysis/SKODA-M1-URL-BLOCK-REGISTRY.md), [report](../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §7) disproved the points below on the live M1 pages. They override the sections they name until this spec is re-captured:
+>
+> - **Bullets are optional**: the Klaus Zellmer release has none.
+> - **No sidebar newsletter** on any of the 5 M1 releases. The secondary column is Additional info + Images + Tags; the side-banner is an empty 15px placeholder.
+> - **Two separate dark bands** (Media Box, then related press releases) on four releases. Superb has no related rail. The Peaq Media Box is 1 video + 3 images + 1 PDF, not a 24-image group.
+
 ## 1. Identity
 
 - **Template:** Press release detail page. **The single largest template, 47.5% of all EN pages.**

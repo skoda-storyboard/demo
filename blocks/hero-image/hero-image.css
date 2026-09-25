@@ -26,6 +26,11 @@
 }
 
 .hero-image:not(.overlay, .archive) {
+  --hero-story-media-max-width: 970px;
+  --hero-story-perex-size: 20px;
+  --hero-story-date-size: 12px;
+  --hero-story-title-gap: 32px;
+
   gap: 0;
 }
 
