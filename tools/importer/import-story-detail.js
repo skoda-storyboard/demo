@@ -23,6 +23,7 @@ import storyCleanupTransformer from './transformers/skoda-story-cleanup.js';
 import storyAsideTransformer from './transformers/skoda-story-aside.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
+import linksTransformer from './transformers/skoda-links.js';
 import normalizeImages from './transformers/skoda-images.js';
 
 const parsers = {
@@ -87,6 +88,7 @@ const transformers = [
   metadataTransformer,
   storyCleanupTransformer,
   storyAsideTransformer,
+  linksTransformer,
 ];
 
 function executeTransformers(hookName, element, payload) {
