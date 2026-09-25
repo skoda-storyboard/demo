@@ -611,6 +611,12 @@ var CustomImportScript = (() => {
     figure.append(node, figcaption);
     return figure;
   }
+  function editorialCaption(node) {
+    if (!node) return "";
+    const caption = (node.getAttribute("data-caption") || "").trim();
+    if (!caption || node.closest(".article-teaser, .media-cart-image")) return "";
+    return caption === (node.getAttribute("data-video_title") || "").trim() ? "" : caption;
+  }
   function imageContainer(img, document2, link = null) {
     const div = document2.createElement("div");
     div.append(img);
@@ -645,8 +651,8 @@ var CustomImportScript = (() => {
       if (img.closest("table, picture")) return;
       const figure = img.closest("figure");
       const wrapper = img.closest("[data-caption]");
-      const wrapperCaption = (wrapper == null ? void 0 : wrapper.querySelectorAll("img").length) === 1 ? wrapper.getAttribute("data-caption") : "";
-      const caption = (img.getAttribute("data-caption") || wrapperCaption || "").trim();
+      const wrapperCaption = (wrapper == null ? void 0 : wrapper.querySelectorAll("img").length) === 1 ? editorialCaption(wrapper) : "";
+      const caption = (img.hasAttribute("data-caption") ? editorialCaption(img) : "") || wrapperCaption;
       if (figure) {
         if (img.parentElement.tagName !== "DIV") {
           const div = document2.createElement("div");

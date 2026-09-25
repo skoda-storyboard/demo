@@ -65,6 +65,43 @@ test('merged story flatten and shared normalizer preserve inline editorial capti
   assert.match(content.textContent, /after/);
 });
 
+// SKODA-508: press-release teaser/card thumbnails carry the article excerpt, not a caption.
+const EXCERPT = 'Mladá Boleslav, 2. September 2026 – Škoda Auto today announced changes';
+
+test('does not caption the lead teaser image with the perex (div.article-teaser)', () => {
+  const root = normalize(`<div class="article-teaser promo-box-item"><div class="article-teaser-media">
+    <div class="entry-thumbnail media-cart-image"><a class="colorbox" href="https://cdn.example/logo.png">
+      <div class="image-holder"><img src="logo-1440x810.png" alt="Lead" class="media-cart-image"
+        data-caption="${EXCERPT}" data-video_title="${EXCERPT}"></div></a></div></div></div>`);
+  assert.equal(root.querySelectorAll('figure, figcaption').length, 0);
+  assert.doesNotMatch(root.textContent, /Mladá Boleslav/);
+  assert.equal(root.querySelector('a[href="https://cdn.example/logo.png"] img').getAttribute('alt'), 'Lead');
+});
+
+test('does not emit excerpt paragraphs for related cards and keeps the image-only link as is', () => {
+  const root = normalize(`<div class="search-results type-press_release"><article class="article-teaser press_release">
+    <div class="article-teaser-media"><div class="entry-thumbnail media-cart-image"><a class="colorbox" href="">
+      <div class="image-holder"><img src="card-768x493.jpg" alt="Card" class="media-cart-image"
+        data-caption="${EXCERPT}" data-video_title="${EXCERPT}"></div></a></div></div>
+    <h3 class="entry-title"><a href="/en/press-releases/card">Card title</a></h3></article></div>`);
+  assert.equal(root.querySelectorAll('figcaption').length, 0);
+  assert.doesNotMatch(root.textContent, /Mladá Boleslav/);
+  assert.equal(root.querySelector('a[href=""] img').getAttribute('alt'), 'Card');
+  assert.equal(root.querySelector('h3 a').textContent, 'Card title');
+});
+
+test('ignores a data-caption that only mirrors data-video_title outside a card', () => {
+  const root = normalize(`<p><img src="a.jpg" alt="A" data-caption="${EXCERPT}" data-video_title="${EXCERPT}"></p>`
+    + `<div data-caption="${EXCERPT}" data-video_title="${EXCERPT}"><img src="b.jpg" alt="B"></div>`);
+  assert.equal(root.querySelectorAll('figcaption').length, 0);
+  assert.doesNotMatch(root.textContent, /Mladá Boleslav/);
+});
+
+test('keeps an editorial caption that differs from data-video_title', () => {
+  const root = normalize('<p><img src="a.jpg" alt="A" data-caption="Head of Design at the premiere" data-video_title="Epiq premiere"></p>');
+  assert.equal(root.querySelector('figure figcaption').textContent, 'Head of Design at the premiere');
+});
+
 test('does not change gallery cells; the block parser supplies the caption cell', () => {
   const root = normalize('<table><tr><td><img src="a.jpg" alt="A" data-caption="Caption"></td><td>Caption</td></tr></table>');
   assert.equal(root.querySelectorAll('figure').length, 0);
