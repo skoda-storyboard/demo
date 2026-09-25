@@ -31,6 +31,15 @@ const IMAGE_EXT_RE = /\.(jpe?g|png|gif|webp|avif|svg)$/i;
 // a sized derivative. The DAM still stores the full ORIGINAL.
 export const OVERSIZE_BYTES = 10 * 1024 * 1024;
 
+export function needsMediaBuild(row, { dam = false, da = false, force = false } = {}) {
+  if (force || !row || row.status !== 'done') return true;
+  if (row.steps?.deliver !== 'done' || !row.delivery_url
+    || !Number.isFinite(row.bytes) || row.bytes > OVERSIZE_BYTES) return true;
+  if (dam && (row.steps?.dam !== 'done' || !row.dam_asset_path)) return true;
+  if (da && (row.steps?.da !== 'done' || !row.original_download_url)) return true;
+  return false;
+}
+
 // The named WordPress scaled-ladder sizes (SKODA-MEDIA-DEEP-DIVE §2), largest
 // first. Used both as the pre-condition fallback ladder (F4) and to distinguish
 // scaled derivatives from aspect crops (F7).
@@ -380,13 +389,17 @@ export async function uploadToDA({
 /** Split a buffer into N parts to match the count of returned uploadURIs. */
 export function splitBuffer(buffer, uploadURIs, maxPartSize) {
   const n = uploadURIs.length;
-  if (n <= 1) return [buffer];
+  if (!n || !buffer.length || (maxPartSize && buffer.length > n * maxPartSize)) {
+    throw new Error('DAM upload URIs cannot hold the complete original');
+  }
+  if (n === 1) return [buffer];
   const part = Math.ceil(buffer.length / n);
   const size = maxPartSize ? Math.min(part, maxPartSize) : part;
   const parts = [];
   for (let off = 0; off < buffer.length; off += size) {
     parts.push(buffer.subarray(off, Math.min(off + size, buffer.length)));
   }
+  if (parts.length !== n) throw new Error('DAM upload URI count does not match original parts');
   return parts;
 }
 
@@ -499,7 +512,7 @@ export async function uploadToDAM({
     // 2) PUT parts
     const parts = splitBuffer(buffer, uploadURIs, file.maxPartSize);
     for (let i = 0; i < uploadURIs.length; i += 1) {
-      const partBuf = parts[i] || Buffer.alloc(0);
+      const partBuf = parts[i];
       const putRes = await fetchImpl(uploadURIs[i], {
         method: 'PUT',
         headers: { 'content-type': contentType || 'application/octet-stream' },

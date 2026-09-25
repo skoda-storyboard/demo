@@ -46,7 +46,7 @@ Measurable gates in [`carousel-rails.md`](../../ui-specs/carousel-rails.md) §3/
 
 ## Authoring contract (issue #99)
 
-`Promo box` is editorial content, not an ad slot. Curated mode uses **exactly three rows** in author order, each with a story link (usually in a teaser title), an optional image and optional summary. For source fidelity, add the story's publication date as its own paragraph (for example `24. 9. 2026`) and use full-resolution images and migrated story URLs. Image cells may be omitted without breaking decoration. If the row count differs from three or a story link is missing, the block displays a visible error and retains the authored rows for correction.
+`Promo box` is editorial content, not an ad slot. Curated mode uses **exactly three rows** in author order, each with a story link (usually in a teaser title) and an optional image. Author a summary on each row because any card may become the lead. For source fidelity, add the story's publication date as its own paragraph (for example `24. 9. 2026`) and use full-resolution images and migrated story URLs. Image cells may be omitted without breaking decoration. If the row count differs from three or a story link is missing, local/preview shows an error and retains the authored rows for correction; published pages hide the block and log the error.
 
 | Promo box | |
 | --- | --- |
@@ -88,3 +88,11 @@ Branch preview `/en` renders the three indexed cards with source dates and inter
 Every indexed card now has a summary and 1200px desktop / 750px compact image sources, since desktop rotation moves every card through the lead slot. Curated cards need an authored summary on **each** row for the same reason; all curated images use lead-size sources without replacing their editable DA `<img>` elements. The first image remains eager/high priority; others remain lazy. An explicit pause/resume control is present in both layouts, alongside automatic hover/focus and reduced-motion suspension. Promo copy reads the locale placeholders keys `Promo Featured Stories`, `Promo Featured Story Slides`, `Promo Go To Story` (use `{number}`), `Promo Pause Rotation`, `Promo Resume Rotation`, and `Promo Unavailable`; English is the fallback until translated sheet entries exist.
 
 The index loader still reads all chunks before selecting globally newest stories. Rendering only the first chunk could change the selection when the index grows or chunks are not date-ordered; revisit LCP with measured full-index data and a dedicated feed or ordering contract if needed.
+
+---
+### Relations
+**Depends on:** #15 (SKODA-201 card-teaser promo variant) · #14 (SKODA-106 tokens) · #16 (SKODA-202 hero/LCP patterns)
+**Blocks:** #38 (SKODA-604 home composition)
+**Sibling home blocks:** #97 (SKODA-214 feed) · #98 (SKODA-212 rails)
+
+*Ticket source of truth on `main`: `docs/tickets/tickets/SKODA-213.md`.*

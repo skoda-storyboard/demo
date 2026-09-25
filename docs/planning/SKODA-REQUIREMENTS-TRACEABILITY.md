@@ -82,15 +82,15 @@
 
 | Req | Requirement | Ticket(s) | Epic | M | Build | Status |
 |---|---|---|---|:--:|:--:|---|
-| STO-D01 | Story Hero | SKODA-202/603 | E02/E06 | M1 | 🟩 | ✅ 48 imported |
-| STO-D02 | Rich Text | SKODA-801/604 | E08/E06 | M1 | 🟦 | ✅ flatten proven; 1–2 full-fidelity (604) |
-| STO-D03 | Embedded Video | SKODA-204/604 | E02/E06 | M1 | 🟦 | ✅ embed autoblock; restored on demo stories |
-| STO-D04 | Image Carousel / Gallery | SKODA-203/604 | E02/E06 | M1 | 🟦 | ✅ gallery+lightbox; auto-play a11y 🟡 |
-| STO-D05 | Newsletter Widget | SKODA-904 | E09 | M1 (UI) / M2 | ⬜ | ✅ UI-only for PoC |
-| STO-D06 | Related Stories (tag+manual) | SKODA-402 | E04 | M1 | 🟩 | ✅ two mechanisms (auto strip + manual explore-more); the "not-OOTB" fn |
-| STO-D07 | Article Sidebar | SKODA-201 | E02 | M2 | 🟦 | ✅ responsive treatment needed |
+| STO-D01 | Story Hero | SKODA-202/603/816 | E02/E06/E08 | M1 | 🟩 | ✅ 48 imported; story hero (title above 16:9) importer in #113, caption styling via 816 |
+| STO-D02 | Rich Text | SKODA-801/604/821 | E08/E06 | M1 | 🟦 | ✅ flatten proven (801 merged, #113); 1–2 full-fidelity (604); body inset 821 |
+| STO-D03 | Embedded Video | SKODA-204/604/818 | E02/E06/E08 | M1 | 🟦 | ✅ embed autoblock; story importer → bare URL (818, #113) |
+| STO-D04 | Image Carousel / Gallery | SKODA-203/604/819 | E02/E06/E08 | M1 | 🟦 | ✅ gallery+lightbox; auto-play a11y 🟡; in-body carousel → Gallery `slider` (819, supersedes 219) |
+| STO-D05 | Newsletter Widget | SKODA-904/823 | E09/E08 | M1 (UI) / M2 | ⬜ | ✅ UI-only for PoC; sidebar UI stub 823 = M1 Could |
+| STO-D06 | Related Stories (tag+manual) | SKODA-402/212/820 | E04/E02/E08 | M1 | 🟩 | ✅ two mechanisms (auto strip + manual explore-more); the "not-OOTB" fn; bottom dark band 820 |
+| STO-D07 | Article Sidebar | SKODA-201/801/817 | E02/E08 | M1 | 🟦 | ✅ two-column aside built in 801 (#113); parity 817 (was M2; review §15) |
 | STO-D08 | Side Banner | SKODA-903 | E09 | M2 | ⬜ | 🔴 deferred, bespoke ad server (D3) |
-| STO-D09 | Media Box / Gallery | SKODA-502/505/604 | E05/E06 | M1 | ⬜ | ✅ manual today; tag-autopopulate+delete = target improvement |
+| STO-D09 | Media Box / Gallery | SKODA-502/505/604/801a | E05/E06/E08 | M1 | ⬜ | ✅ manual today; tag-autopopulate+delete = target improvement; 21 in-set stories mapped by 801a |
 | STO-D10 | Social Share | SKODA-304 | E03 | M1 | 🟦 | ✅ channels identified |
 
 ---
@@ -269,6 +269,14 @@ All MIG IDs map to the import infra (SKODA-601/602) for the demo sample and SKOD
 | SKODA-812 | M2 | 6.7 (auditability) |
 | SKODA-813 | M2 | generic Page base shell (`page-template-default`, copyright/legal/misc STO pages) |
 | SKODA-814 | M2 | SiteOrigin body flatten contract (1,614 pages, feeds 801/208/813; block recount) |
+| SKODA-816 | M1 | STO-D01 (story hero: title above 16:9 image, perex, date, Tags) |
+| SKODA-817 | M1 | STO-D07 (sidebar dedupe + parity), STO-D06 (explore-more teasers) |
+| SKODA-818 | M1 | STO-D03 (story embeds → 204 autoblock) |
+| SKODA-819 | M1 | STO-D04 (in-body carousel → Gallery `slider`; supersedes SKODA-219) |
+| SKODA-820 | M1 | STO-D06 (tag-based "Related Stories" dark band) |
+| SKODA-821 | M1 | STO-D02 (body-column text inset) |
+| SKODA-822 | M1 | release of 801 layout (done, PR #113) |
+| SKODA-823 | M1 Could | STO-D05 (newsletter UI stub, no ESP) |
 | SKODA-901 | M2 | COM06 (hosted search) |
 | SKODA-902 | M2 | COM14/MR-PK07 (prod cart + ZIP hardening) |
 | SKODA-903 | M2 | STO-D08 (banner) |
@@ -291,9 +299,27 @@ All MIG IDs map to the import infra (SKODA-601/602) for the demo sample and SKOD
 **Integrate & QA →** 701, 702, 703, 704
 *Delivers: Storyboard home + stories (incl. 1–2 full-fidelity) + Model + Series; Media Room home + Images/Videos listings + cart; EN+CS; the not-OOTB trio.*
 
+> **Update (2026-09-24, M1 gap review, [`SKODA-M1-GAP-REVIEW.md`](../reviews/SKODA-M1-GAP-REVIEW.md)).**
+>
+> **Scope.** The M1 scope is now the canonical **43-URL set**, [`skoda-m1-url-set.txt`](./skoda-m1-url-set.txt), plus
+> the rail-feed corpus. The MR home and news listing are **not** in the set.
+>
+> **Pulled into M1 by the set:**
+> - **208** (model page: STO-M / MR-M)
+> - **805a** (press-kit hub, MR-PK01/04/06) and **805c** (default press-kit article, MR-PK02); **805b** children
+>   are Could. §14 of the review proposes adding MR-PK07 (whole-kit ZIP link) to 805a
+> - **819** (supersedes 219) + **801a** (story in-body carousel, Media Box, embeds: STO-D); story fidelity **816/817/818/820/821** (review §15)
+> - **608** (image/video item rows: MR-I/MR-V listings + model media rails)
+> - **609** (link containment + alias redirect: COM, MIG06)
+>
+> **Paused or moved to M2:** 403 (search), 207's directory half (`/en/series-2/`), 216, 405, 507.
+>
+> The review's §9 holds the Must/Should/Could cut line, and §10 the collision-safe waves (freeze 8 Oct, dry run
+> 9–14 Oct).
+
 ### M2, Go-live (02 Jan 2027)
 **Editorial at scale (E08) →** 802 (remaining templates), 803 (bulk import), 804 (consent+analytics), 805/806/807/808 (press-kit), 810 (company/Page family), **813 (generic Page base shell)**, **814 (SiteOrigin body flatten contract)**, **809 (roles), 811 (embargo), 812 (audit)**
-**Templates (E02) →** **208** (model page), **209** (category/tag archive), **210** (custom microsite family), measured template specs, deferred behind the M1 core
+**Templates (E02) →** ~~**208** (model page)~~ → M1 (2026-09-24 gap review), **209** (category/tag archive), **210** (custom microsite family), measured template specs, deferred behind the M1 core
 **Dynamic services (E09) →** 901 (hosted search), 902 (cart hardening), 903 (banners), 904 (newsletter), 905 (analytics rebuild), **906 (QR restricted access)**
 **Integration/QA (E07) →** **706** (branded 404)
 **Localization (E10) →** 1001 (per-locale index), 1002 (translation rollout), 1003 (routing)
@@ -344,6 +370,23 @@ G6–G8 are **spec/decision clarifications on existing tickets**, not missing ti
 | QA-F3 | **SKODA-705** (E07, M1) | "Load more" button = bordered pill vs source white-fill (cosmetic) | **Held, needs design/client confirm** (don't alter brand styling on assumption) |
 
 **Cycle-1 convergence note:** no ticket reached `DONE` this cycle. Every actionable homepage QA finding routes to either **content-regeneration** (605/606, codeable now, but end-to-end QA is blocked on DA publish credentials + reindex, which aren't available) or a **design decision** (705). This is the honest state: the built `/en` slice is demo-grade, the transformer fixes are written and lint-clean, but they cannot be QA-verified to `DONE` without a live re-import/publish cycle. Per the operating model, tickets stay open until QA verifies the rendered result, they are **not** marked done on an unverified change.
+
+**M1 gap review (2026-09-24, 43-URL set).** Full register: [`SKODA-M1-GAP-REVIEW.md`](../reviews/SKODA-M1-GAP-REVIEW.md) §8. The new ticketed gaps are:
+
+| # | Gap | Requirement IDs | Ticket | M |
+|---|---|---|---|:--:|
+| G-02 | `skoda-carousel-widget` (in-body image carousel) unspecced and dropped by import on 21/21 in-set stories | STO-D (body media), COM (gallery) | ~~SKODA-219~~ **SKODA-819** (Gallery `slider`), **SKODA-801a** | M1 |
+| G-03 | Story Media Box and Vimeo dropped by the story importer | STO-D, COM14 | **SKODA-801a** (Media Box); Vimeo fixed by SKODA-818 (#113) | M1 |
+| G-04 | No image/video item index rows: empty listings and model media rails | MR-I01–05, MR-V01–04, MR-M rails | **SKODA-608** | M1 |
+| G-05/06/07 | Press-kit hub, children and default template have no M1 path | MR-PK01/02/04/06 (PK07 per review §14) | **SKODA-805a** (Must), **805c** (Should), **805b** (Could) | M1 |
+| G-08 | Model page runtime blocks missing (in-page-nav, key-facts, spec-table) | STO-M, MR-M | SKODA-208 → **M1** | M1 |
+| G-10/11 | Out-of-set links → in-site 404s; mixed-reality alias | COM (nav), MIG06 | **SKODA-609** | M1 |
+| G-12 | PR importer drops Buzzsprout AI-audio (MR-PR03) and the related rail | MR-PR03, MR-PR01 | SKODA-607 (AC extended) | M1 |
+| C-1…C-9 | Client scope doc (16 Sep) promises vs the 43-URL set: MR home, series directory, CS pages, press kit end to end + ZIP, share, embargo, search sample, sidebar | MR-H01–10, STO-S01–03, COM05, MR-PK01/02/04/07, COM15, STO-D10, 6.5, COM06, STO-D07 | review **§14** (decisions D-7…D-9) | M1 |
+
+This review also records the 2026-09-21 media-cart correction: the M1 path is **AEM DAM originals + client-side
+`fflate` ZIP** (`SKODA-DEMO-FALLBACK-CONFIRM.md`). It supersedes the "server-side reduction (D2)" wording in the
+"Closed this pass" list above for M1.
 
 ---
 

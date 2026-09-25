@@ -18,14 +18,11 @@ import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
 import { fetchPlaceholders } from '../../scripts/placeholders.js';
 import {
   scopeRows, filterRows, sortRows, paginate, distinctFacetValues,
-  decodeState, encodeState, selectedCount,
+  decodeState, encodeState, selectedCount, INDEX_FACETS,
 } from './listing-logic.mjs';
 
 // Live facet order + label remaps (faceted-listing.md §3; supersedes backlog).
-const DEFAULT_FACETS = [
-  'model', 'derivative', 'concept', 'bodywork', 'equipment', 'years', 'company',
-  'happening', 'history', 'motorsport', 'sponsorship', 'vip', 'view', 'technology', 'environment',
-];
+const DEFAULT_FACETS = INDEX_FACETS;
 const FACET_LABELS = {
   years: 'Year', happening: 'Event', vip: 'People', view: 'Interior/Exterior',
 };

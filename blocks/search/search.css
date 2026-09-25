@@ -1,0 +1,58 @@
+/* ==========================================================================
+ * Search block — SKODA-403
+ * Index-only search RESULTS: an aria-live status + a list of result links
+ * (title + summary). Results-only — the search INPUT lives in the header
+ * (SKODA-301) and submits the query here via ?filter[search]=. Vanilla,
+ * tokens-only, mobile-first. Matches the source search page's shape, not its
+ * engine.
+ * ========================================================================== */
+
+/* --- status line (result count / prompt / error) ------------------------ */
+.search .search-status {
+  margin: 0 0 var(--spacing-m);
+  color: var(--skoda-grey-500);
+  font-size: var(--body-font-size-s);
+}
+
+/* --- results list ------------------------------------------------------- */
+.search .search-results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search .search-result {
+  margin: 0;
+}
+
+/* title link: matches the live search-result title scale (≈30px). No image —
+   link-only per the ticket / Block Collection Search pattern. */
+.search .search-result-link {
+  display: inline-block;
+  color: var(--link-color);
+  font-size: var(--heading-font-size-l);
+  font-weight: 400;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.search .search-result-link:hover,
+.search .search-result-link:focus-visible {
+  color: var(--link-hover-color);
+}
+
+.search .search-result-link:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+/* summary: live excerpt scale (16px / ~20px line-height) */
+.search .search-result-desc {
+  margin: var(--spacing-xs) 0 0;
+  color: var(--text-color);
+  font-size: var(--body-font-size-m);
+  line-height: 1.25;
+}

@@ -16,23 +16,33 @@
  * skoda-page-cleanup.
  */
 
-import heroBannerParser from './parsers/hero-banner.js';
+import storyHeroParser from './parsers/story-hero.js';
+import storyFlattenParser from './parsers/story-flatten.js';
 import pageCleanupTransformer from './transformers/skoda-page-cleanup.js';
 import storyCleanupTransformer from './transformers/skoda-story-cleanup.js';
+import storyAsideTransformer from './transformers/skoda-story-aside.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
+import normalizeImages from './transformers/skoda-images.js';
 
 const parsers = {
-  'hero-banner': heroBannerParser,
+  // SKODA-816: story hero → Hero Image (story variant) + caption + Tags, not the
+  // overlay Hero banner used by the page/archive templates.
+  'story-hero': storyHeroParser,
+  'story-flatten': storyFlattenParser,
 };
 
 const PAGE_TEMPLATE = {
   name: 'story-detail',
   description:
-    'Škoda story detail (single-post + SiteOrigin), linear flatten. Hero banner + primary .content flattened to default content. In-body galleries/embeds/Media Box deferred to SKODA-801/814/604. Metadata template=story. Content-driven detection only.',
+    'Škoda story detail (single-post + SiteOrigin), full-fidelity SiteOrigin flatten (SKODA-801). Hero banner + primary .content SiteOrigin widget tree flattened to default content + block tables (17-widget map, census-driven). The secondary .sidebar column is rebuilt as a Style:sidebar section (Cards + Tags) beside the body via the grid-on-main story layout. In-body galleries/embeds/Media Box remain SKODA-604 full-restore work. Metadata template=story. Content-driven detection only.',
   urls: ['https://www.skoda-storyboard.com/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/'],
   blocks: [
-    { name: 'hero-banner', instances: ['div.hero'] },
+    { name: 'story-hero', instances: ['div.hero'] },
+    // Flatten the SiteOrigin widget tree inside the primary reading column. The
+    // parser self-detects the builder tree and no-ops (linear-story fallback) when
+    // absent, so the 3.6% non-Page-Builder stories fall through to default content.
+    { name: 'story-flatten', instances: ['.columns > .content', 'article .content', '.entry-content'] },
   ],
   sections: [
     {
@@ -40,34 +50,43 @@ const PAGE_TEMPLATE = {
       name: 'Hero',
       selector: ['div.hero'],
       style: null,
-      blocks: ['hero-banner'],
+      blocks: ['story-hero'],
       defaultContent: [],
     },
     {
       id: 'section-2',
       name: 'Body',
       selector: ['.columns > .content', 'article .content', '.entry-content'],
-      style: null,
-      blocks: [],
+      // Style: body-column tags the primary reading column so the grid-on-main story
+      // layout (styles.css, body.story) places it in the left track and caps the prose
+      // measure. skoda-model-sections emits the Section Metadata; the story-scoped
+      // runtime hook (scripts.js decorateStorySections) turns it into a class.
+      style: 'body-column',
+      blocks: ['story-flatten'],
       defaultContent: [
         '.content .entry-content h2', '.content .entry-content h3',
         '.content .entry-content p', '.content .entry-content ul',
         '.content .entry-content ol', '.content .entry-content blockquote',
       ],
     },
+    // The aside section is emitted dynamically by skoda-story-aside (Style: sidebar);
+    // it inserts its own leading <hr> in afterTransform, so it is not listed here
+    // (skoda-model-sections only breaks statically-known section selectors).
   ],
 };
 
-// NOTE ordering: storyCleanupTransformer removes `.sidebar` in afterTransform, but
-// the sidebar holds the entry-tags the metadata transformer reads — so metadata MUST
-// run before it. Transformers execute in array order per hook, so storyCleanup is
-// registered LAST (its afterTransform sidebar-drop runs after metadata's). Its
-// beforeTransform (floating social) still runs early enough.
+// NOTE ordering (unchanged constraint): the `.sidebar` holds `ol.entry-tags`, the tag
+// links skoda-metadata.js derives `tags`/facets from. Both storyCleanup and storyAside
+// touch the sidebar in afterTransform, so metadata MUST run before them. Transformers
+// execute in array order per hook, so metadata is registered before storyCleanup and
+// storyAside. storyCleanup now only strips floating social + the in-body media shells
+// deferred to SKODA-604 (it no longer drops the sidebar — storyAside rebuilds it).
 const transformers = [
   pageCleanupTransformer,
   ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
   metadataTransformer,
   storyCleanupTransformer,
+  storyAsideTransformer,
 ];
 
 function executeTransformers(hookName, element, payload) {
@@ -123,6 +142,7 @@ export default {
     executeTransformers('afterTransform', main, payload);
 
     WebImporter.rules.transformBackgroundImages(main, document);
+    normalizeImages(main, document);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     const rawPath = new URL(params.originalURL).pathname

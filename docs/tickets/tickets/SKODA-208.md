@@ -1,8 +1,21 @@
 # SKODA-208, Model page template (skoda_model)
 - **Epic:** E02, Core Blocks
 - **Type:** template / import
-- **Phase:** B  ·  **Pilot:** No · **Milestone:** M2 (go-live)
+- **Phase:** B  ·  **Pilot:** No · **Milestone:** ~~M2 (go-live)~~ → **M1 (15 Oct demo)**. Re-milestoned 2026-09-24 to match the board: 5 model URLs are in the 43-URL M1 set (see update below).
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–6d *(planning estimate, not a quote)*
+
+> **Update (2026-09-24, M1 gap review, [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md)).**
+>
+> **In-scope pages.** Peaq, Epiq, Octavia, New Superb, New Fabia.
+>
+> **What is already on origin/main.** `import-model-page.js` and `page-templates.json` already emit `in-page-nav`,
+> `key-facts` and `spec-table`, **but none of the three blocks exists under `blocks/`**. Remaining M1 work:
+> 1. **Build the 3 blocks.** Defensive: Bodywork/Derivatives varies by model and is absent on Peaq.
+> 2. **Hide empty rails.** A rail with no index rows should render nothing, not an empty heading.
+> 3. **Populate the rails.** News, Press Kits and Stories need SKODA-603 (43 URLs + corpus). Images and Videos need
+>    **SKODA-608**. With the 43 URLs alone, Fabia has 0 rows and every model has 0 image/video rows.
+>
+> **Estimate.** About 4 SP remains.
 
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/template-model-page.md`](../../ui-specs/template-model-page.md)** (captured via Chrome DevTools on the live Peaq model page). Read it before implementing. Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).

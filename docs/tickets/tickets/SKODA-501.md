@@ -34,3 +34,33 @@ The source CDN serves each logical image as an 8-named-size derivative ladder pl
 - Rights/licensing not machine-readable (no embedded EXIF credit strings) — confirm redistribution terms with stakeholders before migrating originals. (`SKODA-MEDIA-DEEP-DIVE.md` §5/§10)
 - DAM target (AEM Assets vs direct-DA vs reference-in-place) unresolved; legacy CDN sends no CORS header (blocks cross-origin canvas use) — reference-in-place is demo-only.
 - Footprint/derivative-multiplier numbers are **order-of-magnitude** (medium-confidence sample extrapolation).
+
+## Implementation checkpoint (2026-09-25; not accepted)
+
+Shared image normalization is wired into the runnable home, images/videos, press-release,
+model, series-hub and story importers. The media builder resumes delivery-only rows
+when DAM originals are approved; apply fails on missing pages or unresolved images
+and removes the legacy derivative `srcset`. `npm run media:audit` reconciles the
+canonical M1 URL list with imported image references, delivery evidence, captions,
+alts and DAM-original status. See `tools/importer/media/README.md` for the run order.
+
+The requester confirmed rights and approved DAM ingest for the **357 originals
+already identified** in the tracked manifest, including six YouTube thumbnails.
+Of those, **349 originals were uploaded to page-mirrored DAM folders**; all 349
+Assets HEAD responses reported the same byte length and image MIME type as the
+source originals. All six YouTube thumbnails and the four oversized Peaq masters
+are among the successes.
+Eight source-CDN originals returned HTTP 403 and are marked `steps.dam=error`;
+no sized derivative was uploaded as their original. The four oversized Peaq
+rows remain `partial` only because they have no publish-safe inline delivery
+rendition (SKODA-506), despite successful original ingest.
+After this approved 357-image batch, `main` contributed another 125 manifest
+rows. They remain delivery-only and were not part of this upload; subsequent DAM
+runs must use an approved ID list instead of processing every manifest row.
+
+The isolated worktree still has **zero of the 42 distinct M1 page files**, so the
+read-only audit reports 42 missing pages; this historical manifest does **not**
+establish full M1 image coverage. No DA upload or preview/publish occurred.
+SKODA-506 must separately gate every SKODA-602 preview/publish. Rendered
+responsive pictures, source/preview fidelity, and recovery of the eight
+unavailable originals still need follow-up before ticket acceptance.

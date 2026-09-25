@@ -39,8 +39,8 @@ Canonicalized (button-wire instance variants folded into `sow-button`, charge-ma
 |---|--:|--:|--:|---|
 | `sow-editor` (rich text) | 29,359 | **83.5%** | 2,526 | default content |
 | `skoda-offset` (spacer) | 2,889 | 8.2% | 815 | drop |
-| `skoda-carousel-widget` | 1,420 | 4.0% | 416 | Carousel/Cards block |
-| `sow-slider` | 516 | 1.5% | 67 | slider → Carousel/Gallery |
+| `skoda-carousel-widget` | 1,420 | 4.0% | 416 | routed **by content** (build 2026-09-24): link-free items → **Gallery**; linked items → **Cards** (related teasers). See §7a. |
+| `sow-slider` | 516 | 1.5% | 67 | image slider → **Gallery** block |
 | `skoda-quote` | 402 | 1.1% | 164 | pull-quote → blockquote |
 | **`skoda-captioned-image`** *(new)* | 253 | 0.7% | 45 | image + caption → figure/image block |
 | `sow-button` (+ wire variants) | 89 | 0.3% | ~10 | button/CTA |
@@ -102,6 +102,14 @@ Canonicalized (button-wire instance variants folded into `sow-button`, charge-ma
 3. **Long tail is bigger than the sample showed (11 → 12 extra types):** but still tiny by volume (0.15% of instances). Adds a few **common-ish** mappings to SKODA-801: `skoda-captioned-image` (45 stories), `skoda-image-box` (16), `ys-milestones` (18 — timeline), `ys-embed-share` (12 — share), `sow-button` (CTAs). All simple except milestones (a timeline block — new-block or omit for demo).
 4. **3 interactive widgets confirmed defer/embed:** `charge-map`, `charging-calculator` (both `k2tools`, external Škoda apps — match the `sdrive`/charging CSP hosts), and the `siteorigin-panels-builder` nested edge case → skip+log.
 5. **SKODA-801 effort holds at 8 SP** — the census *confirms* rather than changes the re-point; the extra common widgets are simple, and the special ones are deferred, not built. The mapping table should be **expanded** with items 3–4 (flag for a separate edit).
+
+### 7a. `skoda-carousel-widget` semantics — variance resolved by content-driven routing (build, 2026-09-24)
+
+The prior findings disagreed on what `skoda-carousel-widget` *is*:
+- the **5-story POC** (`SKODA-FLATTENER-POC-FINDINGS.md` §4) observed **related-story teaser cards** inside `search-results-item` (links + h3 titles), and recommended a Cards/teaser mapping (or regenerating from the query-index);
+- the **SKODA-801 build inspection** (epiq + olive-oil, + the olive-oil bd-snapshot) found the opposite: **link-free image carousels** — the article's own photo sets, no teaser links.
+
+Both are real: the widget is used **both ways** across the corpus. The shipped parser therefore routes **by content, not by widget name** (repo rule): a carousel whose items are mostly linked → **Cards** (related teasers, `[img, linked-title]`); a link-free carousel → **Gallery** (image set, `[img, caption]`); `sow-slider` is always a Gallery. `[RUNTIME-UNCONFIRMED]` at scale: the *ratio* of image-vs-teaser carousels across the full 416-story set is not yet measured — verify during the M2 at-scale run, but the routing itself needs no per-story tuning.
 
 ---
 

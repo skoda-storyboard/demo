@@ -48,7 +48,7 @@ globalThis.document = {
 };
 
 const {
-  parseConfig, selectRows, rowToCells, isConfigTable,
+  parseConfig, selectRows, rowToCells, isConfigTable, curatedRows,
 } = await import('./story-rail.js');
 
 /*
@@ -167,6 +167,39 @@ test('selectRows scopes by template (drops non-matching rows)', () => {
   assert.deepEqual(out.map((r) => r.title), ['Kodiaq']);
 });
 
+// --- SKODA-820: index facet columns as config keys (AND across keys) ---------
+
+const tagged = [
+  { path: '/en/emobility/a', title: 'EpiqThisYear', template: 'story', model: 'epiq', years: '2026', date: '2026-08-13' },
+  { path: '/en/lifestyle/b', title: 'EpiqPeaqThisYear', template: 'story', model: 'epiq, peaq', years: '2026', date: '2026-07-07' },
+  { path: '/en/emobility/c', title: 'PeaqThisYear', template: 'story', model: 'peaq', years: '2026', date: '2026-09-22' },
+  { path: '/en/emobility/d', title: 'EpiqLastYear', template: 'story', model: 'epiq', years: '2025', date: '2025-11-01' },
+  { path: '/en/emobility/self', title: 'Self', template: 'story', model: 'epiq', years: '2026', date: '2026-09-15' },
+];
+
+test('parseConfig reads index facet columns (model, years) as facets', () => {
+  const cfg = parseConfig(cfgBlock([['model', 'epiq'], ['years', '2026'], ['tags', '']]));
+  assert.deepEqual(cfg.facets, { model: ['epiq'], years: ['2026'] });
+  assert.deepEqual(cfg.tag, []);
+});
+
+test('selectRows ANDs across facet keys: model=epiq AND years=2026, self excluded, newest first', () => {
+  const cfg = parseConfig(cfgBlock([['model', 'epiq'], ['years', '2026'], ['exclude', 'self'], ['limit', '10']]));
+  const out = selectRows(tagged, cfg);
+  assert.deepEqual(out.map((r) => r.title), ['EpiqThisYear', 'EpiqPeaqThisYear']);
+});
+
+test('selectRows still ORs values within one facet key', () => {
+  const cfg = parseConfig(cfgBlock([['model', 'epiq, peaq'], ['years', '2026'], ['exclude', 'self']]));
+  const out = selectRows(tagged, cfg);
+  assert.deepEqual(out.map((r) => r.title), ['PeaqThisYear', 'EpiqThisYear', 'EpiqPeaqThisYear']);
+});
+
+test('isConfigTable accepts facet-column keys (not mistaken for curated cards)', () => {
+  const block = railBlock([[['template'], ['story']], [['model'], ['epiq']], [['years'], ['2026']]]);
+  assert.equal(isConfigTable(block), true);
+});
+
 // --- P1: default template scopes to stories (no cross-type bleed) -----------
 
 const mixed = [
@@ -247,4 +280,22 @@ test('isConfigTable: an empty block defaults to config', () => {
 test('isConfigTable: a 3-cell row is not a config table (curated shape)', () => {
   const block = railBlock([[['category'], ['x'], ['extra']]]);
   assert.equal(isConfigTable(block), false);
+});
+
+test('curatedRows passes the authored cell contents without nesting their wrappers', () => {
+  const picture = el('picture');
+  const date = el('p');
+  const title = el('h3');
+  const block = {
+    children: [{
+      children: [
+        { childNodes: [picture] },
+        { childNodes: [date, title] },
+      ],
+    }],
+  };
+  assert.deepEqual(curatedRows(block), [[
+    { elems: [picture] },
+    { elems: [date, title] },
+  ]]);
 });

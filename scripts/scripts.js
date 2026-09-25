@@ -10,6 +10,7 @@ import {
   loadSections,
   loadCSS,
   buildBlock,
+  toClassName,
 } from './aem.js';
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
@@ -74,6 +75,52 @@ function buildWidgetAutoBlocks(main) {
 }
 
 /**
+ * Provider hosts that autoblock into the `embed` block (SKODA-204). A bare provider URL on
+ * its own line becomes an Embed. `/widgets/` links are handled by buildWidgetAutoBlocks and
+ * are excluded here so the widget path (e.g. the MR-PR03 AI-audio widget) still wins.
+ */
+const EMBED_HOSTS = /(?:^|\.)(?:vimeo\.com|youtube\.com|youtu\.be|youtube-nocookie\.com|buzzsprout\.com|spotify\.com)$/i;
+
+/**
+ * Tests whether an href points at a supported embed provider (and is not a widget link).
+ * @param {string} href The link href
+ * @returns {boolean}
+ */
+function isEmbedUrl(href) {
+  try {
+    const { hostname, pathname } = new URL(href, window.location.href);
+    if (pathname.includes('/widgets/')) return false;
+    return EMBED_HOSTS.test(hostname);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Turns a bare provider URL on its own line into an `embed` block (SKODA-204). Only acts on a
+ * paragraph whose sole content is the provider link (the autoblock "URL on its own line" case);
+ * inline provider links inside prose are left untouched.
+ * @param {Element} main The container element
+ */
+function buildEmbedAutoBlocks(main) {
+  const links = [...main.querySelectorAll('a[href]')];
+  links.forEach((link) => {
+    if (link.closest('.embed, .widget')) return;
+    if (!isEmbedUrl(link.href)) return;
+    const p = link.closest('p');
+    // Only autoblock when the provider URL is alone on its line (its own paragraph).
+    if (
+      !p
+      || p.querySelectorAll('a').length !== 1
+      || p.querySelector('a') !== link
+      || p.textContent.trim() !== link.textContent.trim()
+    ) return;
+    const embedBlock = buildBlock('embed', { elems: [link.cloneNode(true)] });
+    p.replaceWith(embedBlock);
+  });
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
@@ -97,6 +144,8 @@ function buildAutoBlocks(main) {
       });
     }
     buildWidgetAutoBlocks(main);
+    // After widgets so /widgets/ links (e.g. MR-PR03 AI-audio) keep priority (SKODA-204).
+    buildEmbedAutoBlocks(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
@@ -143,6 +192,41 @@ function decorateButtons(main) {
 }
 
 /**
+ * Story-scoped: apply Section Metadata `Style` classes to sections.
+ *
+ * The vendored scripts/aem.js `decorateSections` does NOT process Section Metadata
+ * into a section class (the standard boilerplate step is absent, verified 2026-09-24).
+ * The story template (SKODA-801) emits a `Style: sidebar` section for the article
+ * aside, which the grid-on-main story layout (styles.css) places beside the body — so
+ * that class must be applied. Rather than change shared behaviour, this runs ONLY on
+ * `body.story` and consumes the section-metadata div (removing it before decorateBlocks
+ * would otherwise treat it as an unknown block and 404 on its missing block JS/CSS).
+ * @param {Element} main The main element
+ */
+function decorateStorySections(main) {
+  if (!document.body.classList.contains('story')) return;
+  // decorateSections wraps each block in its own div, so the section-metadata block
+  // sits at `.section > div > .section-metadata` (matched here regardless of depth).
+  main.querySelectorAll('.section .section-metadata').forEach((meta) => {
+    const section = meta.closest('.section');
+    if (!section) return;
+    meta.querySelectorAll(':scope > div').forEach((row) => {
+      const cols = [...row.children];
+      if (cols.length < 2) return;
+      const key = cols[0].textContent.trim().toLowerCase();
+      const val = cols[1].textContent.trim();
+      if (key === 'style' && val) {
+        val.split(',').forEach((c) => section.classList.add(toClassName(c.trim())));
+      }
+    });
+    // Remove the whole wrapper so decorateBlocks (div.section > div > div) never sees
+    // it as an unknown block (which would 404 on its missing block JS/CSS).
+    const wrapper = meta.closest('.section') === meta.parentElement ? meta : meta.parentElement;
+    (wrapper || meta).remove();
+  });
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
@@ -151,6 +235,7 @@ export function decorateMain(main) {
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
+  decorateStorySections(main);
   decorateBlocks(main);
   decorateButtons(main);
 }

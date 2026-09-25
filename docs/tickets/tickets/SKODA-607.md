@@ -15,6 +15,23 @@ Key facts from capture (2026-09-15) that create this ticket:
 ## Summary
 Deliver the Press Release detail template as a first-class page type, distinct from the Story template. It reuses the two-column shell but on the Media Room side with a text title (no hero), a media-kit-oriented secondary column, and a dark related-media band. Includes the press-release parser feeding the bulk import (SKODA-803).
 
+> **Update (2026-09-24, M1 gap review, [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md)).**
+>
+> **In-scope pages.** The 5 press releases in the 43-URL set. As of 2026-09-24, all return 404 on preview.
+>
+> **Importer gaps.** The origin/main `import-press-release.js` + `skoda-press-release-cleanup.js` has three
+> problems:
+> - it **drops the Buzzsprout AI-audio embed**, although MR-PR03 is M1: map it to `embed` (SKODA-204)
+> - it **does not model the optional related-press-release dark rail**: 4 of the 5 PRs have one and Superb has none,
+>   so the importer must tolerate its absence
+> - its Media Box parser emits one link per asset rather than the Original/1920 dropdown required by SKODA-502
+>
+> The mediabox API returns 2–5 images per PR.
+>
+> **Out of scope.** The newsletter and side banner stay ruled out (904/903); strip them.
+>
+> **Estimate.** Unchanged at 5 SP. The 5 PRs are the reference set.
+
 ## Description
 Confirmed live (2026-09-15): `press_release` is its own CPT/template. This ticket delivers:
 - **Two-column article shell** (`.column-primary` 66.66% / `.column-secondary` 33.33%, stack <768) on the MR chrome (MR header nav + `footer-mediaroom`).

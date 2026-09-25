@@ -1,7 +1,7 @@
 # SKODA-206, Škodapedia glossary block (directory + A–Z/category filter + term modal)
 - **Epic:** E02, Core Blocks
 - **Type:** block
-- **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo)
+- **Phase:** A  ·  **Pilot:** Yes · **Milestone:** ~~M1 (15 Oct demo)~~ **M2 (go-live)**, aligned to the board (GitHub #20) on 2026-09-25; not in the 43-URL M1 set
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–6d *(planning estimate, not a quote)*
 
 > ⚠️ **Scope caveat (adversarial finding F6, 2026-09-14):** the client **§9** states Škodapedia *"continues **outside** Storyboard, so Storyboard should not be designed around its current inclusion."* This ticket is therefore scoped as **"prove the encyclopedia/glossary block pattern only"**, the actual Škodapedia *content* lives outside Storyboard and is not migrated here. **Candidate to drop from M1** if the pilot needs the 5 SP; keep only if the glossary pattern is wanted as a demo showcase. Confirm with the client before building.

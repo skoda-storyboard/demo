@@ -1,0 +1,56 @@
+# SKODA-609, M1 link containment (demo set) + alias redirect
+
+- **Epic:** E06, Import Pilot Content
+- **Type:** import transformer + config (redirects) + policy
+- **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo)
+- **Estimate:** 2 SP · AI-assisted 1d / manual 1–2d *(planning estimate, not a quote)*
+- **GitHub issue:** [#118](https://github.com/skoda-storyboard/demo/issues/118)
+- **Discovered in:** M1 gap review, 2026-09-24
+
+## Summary
+M1 imports the 43-URL set ([`skoda-m1-url-set.txt`](../../planning/skoda-m1-url-set.txt)) plus the rail-feed corpus.
+Most links on those pages point **outside** that set:
+- **chrome:** mega-menu categories, `/en/news/`, `/en/media-room/`, company pages, Škodapedia, `/en/media-cart/`,
+  search
+- **tags:** `/en/tag/...` archives, which are M2 (SKODA-209)
+- **series:** `/en/series-2/`
+- **home promo targets** that are not in the set
+- **press-kit chapter tiles:** 50 child pages
+- **related rails** in press releases and stories
+
+Once SKODA-605 rewrites these to site-relative paths, each of them becomes a **404 on the EDS demo** instead of a
+jump to the live site.
+
+The set also lists the mixed-reality story twice:
+- `/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality/` returns 200 with
+  canonical `/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality/`
+
+So it is an **alias, not a second page**.
+
+## Requirements / Spec
+Link policy is decision **D-3** in the gap review. Default until decided: **(b)**.
+
+| Link class | Policy options | Recommended default |
+|---|---|---|
+| Chrome to ruled-out pages (company, Škodapedia, category/tag archives, RSS) | (a) keep absolute to live source, (b) keep absolute with a `rel`/new tab, (c) remove | **(b)**, absolute to live with `target=_blank`, recorded in SKODA-306 |
+| Chrome to in-scope listings (`/en/`, `/en/images/`, `/en/videos/`) | site-relative | site-relative |
+| Press-kit chapter tiles | import (SKODA-805b), or absolute to live | per decision D-1 |
+| Tag links | absolute to live until SKODA-209 | absolute (b) |
+| Promo/related cards to out-of-set stories | import the target (add to corpus) or swap the card | add to corpus when it is a story; otherwise swap |
+| `/en/media-cart/`, `/en/series-2/` | point to the SKODA-505b cart UI / hide the "All series" link | hide/redirect |
+
+- Implement the policy in one shared transformer step that runs after SKODA-605 rewriting and is driven by an
+  allow-list (the URL set + corpus). Out-of-set targets follow the table.
+- Add a DA `redirects` sheet entry (SKODA-103) that sends the mixed-reality alias to its canonical. Import the page
+  once only.
+- Produce a **dead-link report**: crawl the demo preview and list any in-site 404 (see the gap review §13 verification).
+
+## Acceptance Criteria
+- [ ] A crawl of all imported demo pages finds **0 in-site 404s**. Every out-of-set link follows the agreed policy.
+- [ ] The mixed-reality alias 301s to the canonical, and the index holds exactly one row for it.
+- [ ] The policy table and allow-list are committed. `.hlxignore` covers `*.md` only, so a `.txt`/`.json`
+      allow-list is served publicly. That is acceptable for a list of public URLs; otherwise add it to `.hlxignore`.
+
+## Dependencies
+- Upstream: SKODA-605 (absolute → relative), SKODA-103 (redirects sheet), SKODA-603 (URL set + corpus).
+- Related: SKODA-306 (new-tab behaviour), SKODA-805b (press-kit children), SKODA-209 (tag archives, M2).
