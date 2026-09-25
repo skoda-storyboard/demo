@@ -1,8 +1,91 @@
 # Component Spec: Footer (Media Room) - delta from Storyboard footer
 
-Status: **CAPTURED** (measured 2026-09-15 via Chrome DevTools MCP; screenshots at 1280 + mobile).
+Status: **BUILT** (SKODA-305, re-measured live 2026-09-25 at 320–1440; captured 2026-09-15 via Chrome
+DevTools MCP). **§0 lists what changed since the first capture; it overrides the older rows below.**
 Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 **Read [`footer.md`](footer.md) first**, this spec records only where the Media Room footer *differs*.
+
+## 0. Re-capture 2026-09-25 (build source of truth)
+
+Re-measured against `https://www.skoda-storyboard.com/en/media-room/` while building SKODA-305. Where this
+section and the 2026-09-15 rows below disagree, **this section wins**.
+
+**Content drift since 2026-09-15**
+- **Company widget = heading + blurb only.** The "Annual Report 2025" PDF link is no longer on any Media Room
+  page (EN + CZ, checked in the server HTML). Built to match live (decision confirmed 2026-09-25).
+- **Copyright usage text** is wrapped in literal double quotes on the source (`"Without consent … a.s."`);
+  authored verbatim.
+- **Email input width is fluid, not `193px`** (see "Subscribe form" below).
+
+**Pages that render the Media Room footer (live, 2026-09-25):** `/en/media-room/`, `/en/news/`,
+`/en/press-releases/**`, `/en/press-kits/**`, `/en/images/`, `/en/videos/`, `/en/contacts/`,
+`/en/skodapedia/**`, `/en/search/`, `/en/newsletter/`, and the CZ equivalents (`/cs/media-room/`: headings
+"Kontakty / Odběr novinek / Společnost"). Storyboard footer: `/en/`, stories, `/en/category/**`,
+`/en/newsletter-settings/`, `/en/documents/**`.
+
+**Implementation note (corrects §7 "no block-code change needed"):** the Storyboard `footer.js` kept only the
+first `<ul>` of the middle section, which would have dropped the Company text and the Subscribe form. The
+footer now switches the middle section on content: **headings present → Media Room widget columns**
+(`.footer-widgets > .footer-columns > .footer-column`, one per heading), otherwise the Storyboard sitemap
+(`.footer-nav > nav`). Section decorators live in `blocks/footer/footer-sections.js` (unit-tested).
+The Subscribe form is the new **`newsletter-stub`** block (UI-only for M1; SKODA-904 wires the ESP).
+
+**Measured geometry (source = build, px, relative to the footer top)**
+
+| | 1280 | 1024 | 768 | 375 |
+|---|---|---|---|---|
+| Footer height | 706 (705.5) | 724 (723.5) | 796 (795.5) | 1260 (1259.5) |
+| Social row (badges + icons) | y64, right-aligned, ends 5px inside the content box | same | same | stacked + centred: badges y112, icons y200 |
+| Separator (`hr` 1px white) | y152 | y152 | y152 | y288 |
+| Columns | 3 × 416 at y201 | 3 × 341 | 3 × 256 | stacked 375: y337 / y508 / y847 |
+| Copyright text | 860 wide (70%) | 703 | 524 | 355 |
+| Notice / feeds | same row, left / right | same | same | stacked |
+
+Shell rhythm (shared with the Storyboard footer): container padding `64px 10px`; widget row `margin 0 -10px`
+with `15px` widget padding; widget `margin-bottom 3em` (48px); `hr` `margin-bottom 3rem`; at <768 an empty
+`.app-download` widget adds 48px above the badges; badges gap 12px, badges→icons `.65em`; legal copy
+`12px/18px/300`, wrapper `margin-bottom 2em` (32px); notice `12px/600`, `margin-bottom 15px`; feeds emerald
+with an emerald `|` (`margin 0 6px`).
+
+**Widgets:** heading `h3` 26px/600/32.5px, `margin-bottom 1em` (26px). Contacts links 16px/300/24px, white,
+no underline (also on hover), `li` gap 8px. Subscribe intro + Company blurb 12px/300/18px, `margin-bottom 15px`.
+
+**Subscribe form (source `.skoda-mailguide .mailguide-form`)**
+- Row: flex, `margin-bottom 10px`. **Email** `flex 0 1 auto` at its intrinsic width, `min-width 50%`,
+  padding 10px, `margin 10px 0`, bg `#f1f1f1`, ink 16px/24px, border-bottom `1px #5a5b5c`, radius `4px 4px 0 0`;
+  focus: border-bottom `2px #419468` (margin-bottom 9px). **Submit** `flex 1 1 auto` (takes the remaining
+  space), emerald pill (`2em` radius), `padding 0 2.5em`, `margin .5em 0 .5em 10px`, 16px ink, weight 500
+  (renders as the 400 face), `letter-spacing 1px`, nowrap; hover/focus `#a8ffcc`.
+  Measured widths (input / button): 320 → 145/137, 375 → 198/137, 500 → 273/187, 600 → 285/275,
+  767 → 369/359, 768 → 113/137 (the button overflows its 226px column; invisible, since the Company text
+  above it ends earlier), 992 → 154/137, 1280 → 239/137.
+- Consent: 18px custom checkbox at the label origin (2px outline rendered `#d0d0d0`, radius 3px; checked =
+  `#419468` fill + white tick); label `inline-block`, padding `0 5px 0 27px`, 14px/18px, `#a1a1a1`; link
+  emerald, no underline.
+- "Manage subscription" (`/en/newsletter-settings/`): `padding-top .5rem`, 16px/24px, `#419468`, underlined.
+- Response: white box (`padding .5rem .75rem`, 14px) laid over the consent row; hidden while empty.
+- Hidden fields: `language=en_GB`, `lang=en`, `list=339`; form code `NewsletterFormWidgetV2`.
+- **Below 320px (deliberate deviation):** the source page has a 320px minimum width and scrolls horizontally
+  below it. In our phone layout (<768), a form row narrower than 290px (screens under 320, e.g. Galaxy Fold 280)
+  stacks the Submit pill (49px) under a full-width field, so nothing overflows the screen. Source-exact at 320px and wider.
+
+**Build verification (2026-09-25):** every measured box above matches at 1280 / 1024 / 768, and at 375 apart
+from 1px sub-pixel centring on 3 icons. Footer heights match to the half-pixel at 375 / 767 / 768 / 992 /
+1024 / 1079 / 1280 / 1440. Pixel diff (element-scoped): 0.06–1.12% at all eight widths (gate 2%); what remains is the
+source rendering on a half-pixel row plus the `fi` ligature (the global `text-rendering: optimizespeed`).
+
+**Known deviations (deliberate / open):** weight 500 → 400 face (identical rendering); button radius
+`--pill-radius` (50px) vs `2em` (both fully round at 49px); the stub shows an "available soon" message instead
+of posting; a visible white `:focus-visible` ring is added on all controls (source has none).
+**A11y deviation (decided 2026-09-25):** the source "Manage subscription" link (`#419468` on `#0e3a2f`) is
+**3.40:1** and fails AA for 16px text, so the build uses the brand emerald (`#78faae`, 9.66:1), the colour of
+the source's own `.light` variant (`--newsletter-manage-color`). The browser-default placeholder stays
+source-exact (4.08:1 on `#f1f1f1`).
+
+**Routing (decided 2026-09-25):** activated **after merge**. The bulk metadata sheet gets
+`footer: /media-room/footer` rows for the MR sections listed above. The QA page `/drafts/mr-footer-qa`
+sets it per page. Activating before merge would feed the MR fragment to `main`'s old footer code
+(Contacts list only), because preview content is shared across branches.
 
 ## 1. Identity
 
@@ -107,7 +190,14 @@ copyright wording, a live form), model Media Room as its **own fragment** select
   (or page metadata) on Media Room templates so `getMetadata('footer')` resolves to it. No block-code
   change needed, `footer.js` already reads `getMetadata('footer')`.
 
-### DA fragment authoring model (`/media-room/footer`)
+### DA fragment authoring model (`/media-room/footer`), as built
+
+Middle section: `## Contacts` + a 2-item link list; `## Subscribe` + the intro paragraph + a
+`newsletter-stub` table (keys `label`, `placeholder`, `button`, `consent`, `manage`, `message`, `list`,
+`language`); `## Company` + the blurb. Any heading level h2–h6 starts a column. Every string is authored, so
+the CZ fragment (SKODA-1001) only needs translation.
+
+Original capture proposal (superseded where it differs):
 
 Sections separated by `---`:
 1. **Social** (-> `.footer-social`): same as Storyboard (heading + `:facebook: :instagram: :youtube:

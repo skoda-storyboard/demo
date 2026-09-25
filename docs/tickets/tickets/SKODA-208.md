@@ -49,6 +49,24 @@ Measurable gates live in [`template-model-page.md` §10](../../ui-specs/template
 - [ ] Content cap `1248`; a11y (nav landmark, heading order, hero contrast).
 - [ ] Visual diff vs source at 1280/1024/768/500 ≤ 2% per-pixel (hero + nav + one rail).
 
+## Amendments (2026-09-25, sweep reconciliation, [`SKODA-M1-URL-BLOCK-SWEEP.md`](../../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §6 + §11)
+These **supersede** the conflicting items above: 8 anchors / not sticky / ~510px hero.
+- [ ] Section-nav is a **sticky** icon nav on desktop with an accessible mobile equivalent. Match the source link
+      count per model: 9 / 8 / 6. Emit only links whose target section exists (no dangling anchors). Hero height is
+      about 480px.
+- [ ] Match the source rail count per model: 3 / 5 / 6. Rail tags and the subheading come per model from the source
+      (e.g. Fabia `model=fabia`, `bodywork=hatchback`), with an "All" deep link. A hardcoded `elroq` is rejected.
+      A two-cell subheading row is config, never a card. An empty rail removes its section. The Bodywork rail is
+      centred (`cellAlign: center`).
+- [ ] **Block names:** the importer emits only blocks that exist. Today the Elroq page references `in-page-nav` and
+      `spec-table`, and both 404 on preview and live. Map them to existing blocks/sections (e.g. `columns` + a 218
+      dark section + a download link), or to the section-nav this ticket builds. Check: 0 block JS 404s on the 5
+      model pages.
+- [ ] **Should, not Must** (§11.2 cut line): Key Facts (5–6 illustrated rows) and Technical Data (dark band, 6 rows +
+      PDF) on Superb / Octavia / Fabia.
+- Estimate: +1.5 (§9, including Key Facts / Tech Data) +0.5 (block names) −1 (Key Facts / Tech Data → Should) =
+  **+1 SP net Must**.
+
 ## Dependencies
 - Upstream: SKODA-202 (hero), SKODA-201 (cards/rails), SKODA-402 (query-index retrieval), SKODA-203 (gallery-lightbox), SKODA-505 (media-cart), SKODA-601 (import infra)
 - Downstream: SKODA-1001 (per-locale trees)

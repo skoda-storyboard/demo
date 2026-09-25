@@ -2,37 +2,145 @@
   "version": 1,
   "doc": "docs/planning/SKODA-PENDING-BLOCK-CONTRACTS.md",
   "comment": "SKODA-603 pending-block import contract. `main` = blocks whose code is in blocks/ (allowed variants + config keys the code reads). `pending` = blocks/variants the importers may emit before their code lands. Checked by tools/importer/validate-blocks.mjs. Edit together with the doc; a shape change bumps `shape` on the entry.",
-  "ignore": ["metadata", "section-metadata"],
+  "ignore": [
+    "metadata",
+    "section-metadata"
+  ],
   "main": {
-    "cards": { "variants": ["media", "overlay", "toolbar"] },
-    "carousel": { "variants": ["dots"] },
-    "columns": { "variants": [] },
-    "downloads": { "variants": [] },
-    "embed": { "variants": [] },
-    "footer": { "variants": [] },
-    "fragment": { "variants": [] },
-    "gallery": { "variants": [] },
-    "header": { "variants": [] },
-    "hero-image": { "variants": ["story", "overlay", "archive"] },
+    "cards": {
+      "variants": [
+        "media",
+        "overlay",
+        "toolbar"
+      ]
+    },
+    "carousel": {
+      "variants": [
+        "dots"
+      ]
+    },
+    "columns": {
+      "variants": []
+    },
+    "downloads": {
+      "variants": []
+    },
+    "embed": {
+      "variants": []
+    },
+    "footer": {
+      "variants": []
+    },
+    "fragment": {
+      "variants": []
+    },
+    "gallery": {
+      "variants": []
+    },
+    "header": {
+      "variants": []
+    },
+    "hero-image": {
+      "variants": [
+        "story",
+        "overlay",
+        "archive"
+      ]
+    },
     "listing": {
       "variants": [],
       "config": "only",
-      "configKeys": ["index", "path", "template", "facets", "facetlabels", "sort", "perpage", "columns"]
+      "configKeys": [
+        "index",
+        "path",
+        "template",
+        "facets",
+        "facetlabels",
+        "sort",
+        "perpage",
+        "columns"
+      ]
     },
-    "search": { "variants": [] },
+    "promo-box": {
+      "variants": [],
+      "config": "or-curated",
+      "configKeys": [
+        "index",
+        "template",
+        "path",
+        "category",
+        "tags",
+        "limit",
+        "sort"
+      ],
+      "replaces": [
+        "cards (promo)"
+      ]
+    },
+    "search": {
+      "variants": []
+    },
     "stories": {
       "variants": [],
       "config": "only",
-      "configKeys": ["index", "path", "template", "category", "tag", "tags", "heading", "sort", "initial", "perpage", "columns", "excludefeatured"]
+      "configKeys": [
+        "index",
+        "path",
+        "template",
+        "category",
+        "tag",
+        "tags",
+        "heading",
+        "sort",
+        "initial",
+        "perpage",
+        "columns",
+        "excludefeatured"
+      ]
     },
     "story-rail": {
       "variants": [],
       "config": "or-curated",
-      "configKeys": ["index", "path", "template", "category", "tag", "tags", "heading", "viewall", "view-all", "all", "sort", "limit", "exclude", "dots",
-        "model", "derivative", "concept", "bodywork", "equipment", "years", "company", "happening", "history", "motorsport", "sponsorship", "vip", "view", "technology", "environment"]
+      "configKeys": [
+        "index",
+        "path",
+        "template",
+        "category",
+        "tag",
+        "tags",
+        "heading",
+        "viewall",
+        "view-all",
+        "all",
+        "sort",
+        "limit",
+        "exclude",
+        "dots",
+        "model",
+        "derivative",
+        "concept",
+        "bodywork",
+        "equipment",
+        "years",
+        "company",
+        "happening",
+        "history",
+        "motorsport",
+        "sponsorship",
+        "vip",
+        "view",
+        "technology",
+        "environment"
+      ]
     },
-    "tags": { "variants": ["chips"] },
-    "widget": { "variants": [] }
+    "tags": {
+      "variants": [
+        "chips"
+      ]
+    },
+    "widget": {
+      "variants": []
+    }
   },
   "pending": [
     {
@@ -42,8 +150,11 @@
       "ticket": "SKODA-202",
       "fallback": "readable",
       "shape": 1,
-      "emittedBy": ["parsers/hero.js", "parsers/hero-banner.js"],
-      "resolveTo": "emit Hero Image (overlay) / Hero Image (archive)"
+      "emittedBy": [
+        "parsers/hero.js",
+        "parsers/hero-banner.js"
+      ],
+      "resolveTo": "emit Hero Image (overlay) / Hero Image (archive); blocks/hero is an empty boilerplate stub"
     },
     {
       "id": "in-page-nav",
@@ -52,63 +163,87 @@
       "ticket": "SKODA-208",
       "fallback": "readable",
       "shape": 1,
-      "emittedBy": ["parsers/in-page-nav.js"]
+      "emittedBy": [
+        "parsers/in-page-nav.js"
+      ]
     },
     {
       "id": "spec-table",
       "block": "spec-table",
-      "status": "pinned",
+      "status": "resolve",
       "ticket": "SKODA-208",
       "fallback": "readable",
       "shape": 1,
-      "emittedBy": ["parsers/spec-table.js"]
+      "emittedBy": [
+        "parsers/spec-table.js"
+      ],
+      "resolveTo": "map Technical Data to Columns + a dark section + a download link (SKODA-208 amendment: 0 block JS 404s; Key Facts / Tech Data are Should)"
     },
     {
       "id": "spec-table-versions",
       "block": "spec-table",
-      "variants": ["versions"],
-      "status": "proposed",
+      "variants": [
+        "versions"
+      ],
+      "status": "resolve",
       "ticket": "SKODA-801a",
       "fallback": "readable",
       "shape": 1,
       "emittedBy": [],
-      "replaces": ["version"]
+      "replaces": [
+        "version"
+      ],
+      "resolveTo": "flatten the version table to Columns rows or text (SKODA-801a: 0 block JS 404s)"
     },
     {
       "id": "cards-key-facts",
       "block": "cards",
-      "variants": ["key-facts"],
+      "variants": [
+        "key-facts"
+      ],
       "status": "pinned",
       "ticket": "SKODA-208",
       "fallback": "readable",
       "shape": 1,
-      "emittedBy": ["parsers/key-facts.js"]
+      "emittedBy": [
+        "parsers/key-facts.js"
+      ]
     },
     {
       "id": "tags-outline",
       "block": "tags",
-      "variants": ["outline"],
+      "variants": [
+        "outline"
+      ],
       "status": "pinned",
       "ticket": "SKODA-208",
       "fallback": "readable",
       "shape": 1,
-      "emittedBy": ["transformers/skoda-model-tags.js"]
+      "emittedBy": [
+        "transformers/skoda-model-tags.js"
+      ]
     },
     {
-      "id": "promo-box",
-      "block": "promo-box",
+      "id": "story-rail-subheading",
+      "block": "story-rail",
+      "addsConfigKeys": [
+        "subheading"
+      ],
       "status": "pinned",
-      "ticket": "SKODA-213",
+      "ticket": "SKODA-208",
       "fallback": "broken",
       "shape": 1,
-      "emittedBy": ["parsers/promo-box.js"],
-      "configKeys": ["index", "template", "path", "category", "tags", "limit", "sort"],
-      "replaces": ["cards (promo)"]
+      "emittedBy": [
+        "parsers/story-rail.js"
+      ]
     },
     {
       "id": "cards-tiles",
       "block": "cards",
-      "variants": ["overlay", "tiles"],
+      "variants": [
+        "overlay",
+        "tiles"
+      ],
       "status": "pinned",
       "ticket": "SKODA-221",
       "fallback": "readable",
@@ -118,7 +253,9 @@
     {
       "id": "gallery-slider",
       "block": "gallery",
-      "variants": ["slider"],
+      "variants": [
+        "slider"
+      ],
       "status": "pinned",
       "ticket": "SKODA-819",
       "fallback": "readable",
@@ -137,7 +274,9 @@
     {
       "id": "columns-split",
       "block": "columns",
-      "variantPatterns": ["^split-[1-9][0-9]$"],
+      "variantPatterns": [
+        "^split-[1-9][0-9]$"
+      ],
       "status": "pinned",
       "ticket": "SKODA-225",
       "fallback": "readable",
@@ -200,7 +339,9 @@
       "ticket": "SKODA-206",
       "fallback": "broken",
       "shape": 1,
-      "emittedBy": ["parsers/skodapedia.js"]
+      "emittedBy": [
+        "parsers/skodapedia.js"
+      ]
     }
   ]
 }

@@ -13,8 +13,8 @@
 | Req | Requirement | Ticket(s) | Epic | M | Build | Status / gap |
 |---|---|---|---|:--:|:--:|---|
 | COM01 | Site Header | SKODA-301/302 | E03 | M1 | 🟩 | ✅ built (Stories); MR nav variant assembly |
-| COM02 | Section Switcher (Stories ↔ MR) | SKODA-301 | E03 | M1 | 🟦 | ✅ links built; active-state + MR dest pending |
-| COM03 | Primary Navigation (per-section sets) | SKODA-301 | E03 | M1 | 🟦 | ✅ Stories nav built; MR nav set to add |
+| COM02 | Section Switcher (Stories ↔ MR) | SKODA-301/309 | E03 | M1 | 🟦 | ✅ links built; MR active-state → 309 (sweep 2026-09-25; draft 825 is a duplicate) |
+| COM03 | Primary Navigation (per-section sets) | SKODA-301/309 | E03 | M1 | 🟦 | ✅ Stories nav built; MR nav fragment + per-path routing → 309 (sweep 2026-09-25: 16 MR URLs render STO chrome; draft 825 is a duplicate) |
 | COM04 | Model / Secondary Navigation | SKODA-301 | E03 | M1 | 🟦 | 🔴 GAP, exact structure TBD (client) |
 | COM05 | Language / Country Selector | SKODA-303 / 1003 | E03/E10 | M1 (+M2 locales) | 🟦 | ⚠️ per-page dynamic rule client-confirmed; D1 locale scope open |
 | COM06 | Global Search | SKODA-403 / 901 | E04/E09 | M1 (index) / M2 (hosted) | 🟦 | 🔴 GAP, ranking + searchable types (§10 Q9, D6) |
@@ -26,10 +26,10 @@
 | COM12 | Media Preview, Actions (lightbox) | SKODA-203 | E02 | M1 | 🟦 | ✅ ticketed; a11y focus-trap to verify |
 | COM13 | Media Download (single/multi) | SKODA-501/502 | E05 | M1 | 🟦 | ✅ downloads block; masters-only ingest |
 | COM14 | Media Cart (retain across browsing) | SKODA-505 (demo) / 902 (prod) | E05/E09 | M1 (happy-path) / M2 (harden) | ⬜ | ✅ D2 = server-side reduction; PoC fallback = unpacked multi-download |
-| COM15 | Social Share | SKODA-304 | E03 | M1 | 🟦 | ✅ footer social built; channels identified |
+| COM15 | Social Share | SKODA-304/215 | E03/E02 | M1 | 🟦 | ✅ footer follow links built (304); page share float → 215 (sweep 2026-09-25; was unticketed; draft 827 is a duplicate) |
 | COM16 | Subscription / Newsletter | SKODA-904 | E09 | M1 (UI only) / M2 (ESP) | ⬜ | ✅ UI-only for PoC confirmed; provider TBD (D4) |
 | COM17 | Cookie / Consent | SKODA-804 | E08 | M1 (stub) | ⬜ | ✅ consent OUT of Adobe scope (D10); stub only |
-| COM18 | Footer | SKODA-304 / 305 | E03 | M1 | 🟩 | ✅ Storyboard built; MR footer variant now ticketed (SKODA-305, was G1) |
+| COM18 | Footer | SKODA-304 / 305 / 309 | E03 | M1 | 🟩 | ✅ Storyboard built; MR footer variant SKODA-305 (PR #134); per-path MR routing → 309 (draft 825 is a duplicate) |
 | COM19 | App download Badge | SKODA-304 | E03 | M1 | 🟩 | ✅ built |
 
 ---
@@ -91,7 +91,7 @@
 | STO-D07 | Article Sidebar | SKODA-201/801/817 | E02/E08 | M1 | 🟦 | ✅ two-column aside built in 801 (#113); parity 817 (was M2; review §15) |
 | STO-D08 | Side Banner | SKODA-903 | E09 | M2 | ⬜ | 🔴 deferred, bespoke ad server (D3) |
 | STO-D09 | Media Box / Gallery | SKODA-502/505/604/801a | E05/E06/E08 | M1 | ⬜ | ✅ manual today; tag-autopopulate+delete = target improvement; 21 in-set stories mapped by 801a |
-| STO-D10 | Social Share | SKODA-304 | E03 | M1 | 🟦 | ✅ channels identified |
+| STO-D10 | Social Share | SKODA-215 | E02 | M1 | 🟦 | ✅ channels identified; page float dock (share + scroll-top) → 215 (sweep 2026-09-25; 304 ACs cover footer follow links only; draft 827 is a duplicate) |
 
 ---
 
@@ -243,8 +243,16 @@ All MIG IDs map to the import infra (SKODA-601/602) for the demo sample and SKOD
 | SKODA-210 | M2 | STO custom microsite (`template-custom-full-width`, event-gallery/campaign, 201 pages; block recount) |
 | SKODA-301/302 | M1 | COM01/02/03/04, 8.6 (mobile ARIA) |
 | SKODA-303 | M1 | COM05 |
-| SKODA-304 | M1 | COM15/18/19, STO-D10 |
+| SKODA-304 | M1 | COM15/18/19 (footer follow links) |
 | SKODA-305 | M1 | COM18 (MR footer variant) |
+| SKODA-215 | M1 | COM15, STO-D10 (page float dock: share + scroll-top; parallel sweep 88c1b48) |
+| SKODA-309 | M1 | COM02/03/18 (MR nav, active tab, per-path nav/footer metadata; parallel sweep 88c1b48) |
+| SKODA-827 | — (draft folded into 215 and removed, 2026-09-25) | COM15, STO-D10 → see SKODA-215 |
+| SKODA-825 | — (draft folded into 309 and removed, 2026-09-25) | COM02/03/18 → see SKODA-309 |
+| SKODA-826 | M1 (draft) | no requirement ID; visual-parity fix feeding the 704 sign-off (global page gutter; follow-up to 106) |
+| SKODA-212a | M1 | rail interaction (desktop click/drag; follow-up to 212, sweep §11.1 V1) |
+| SKODA-204a | M1 | STO-D03, MR-PR03/PR06, MR-V03 (consent click-to-load hook; follow-up to 204) |
+| SKODA-611a / 611b | M1 (Must / Should) | STO home composition (`template-home.md` 9-section stack; slices of 611) |
 | SKODA-401 | M1 | COM07, MR-L03, MR-I02, MR-V02 |
 | SKODA-402 | M1 | COM07/11, STO-H02/04/05/06/08, STO-C02/04/05, STO-D06, MR-H02/06/07, MR-L02/04/06, MR-M03–07, MR-I01, MR-V01 |
 | SKODA-403 | M1 | COM06, MR-L01 |

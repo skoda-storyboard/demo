@@ -116,7 +116,7 @@ test('classifyBlock: unknown block / unknown variant are errors', () => {
 test('classifyBlock: superseded shapes point at their contract', () => {
   const promo = classifyBlock(one(block('cards promo', row('a', 'b'))), CONTRACTS, CODE);
   assert.equal(promo.status, 'error');
-  assert.match(promo.problems[0], /emit promo-box instead/);
+  assert.match(promo.problems[0], /emit promo-box instead \(on main\)/);
   const version = classifyBlock(one(block('version', row('Power', '85'))), CONTRACTS, CODE);
   assert.match(version.problems[0], /spec-table \(versions\)/);
 });
@@ -129,28 +129,49 @@ test('classifyBlock: resolve + out-of-scope contracts block the import', () => {
   assert.match(sp.problems[0], /out of M1 scope/);
 });
 
-test('classifyBlock: pending contract with its own config keys (promo-box index mode)', () => {
-  const code = new Set([...CODE]);
-  const ok = classifyBlock(one(block('promo-box', row('template', 'story'), row('limit', '3'))), CONTRACTS, code);
-  assert.equal(ok.status, 'pending');
-  const bad = classifyBlock(one(block('promo-box', row('template', 'story'), row('rotate', '10'))), CONTRACTS, code);
+test('classifyBlock: promo-box is on main (PR #110) with its own config keys', () => {
+  const ok = classifyBlock(one(block('promo-box', row('template', 'story'), row('limit', '3'))), CONTRACTS, CODE);
+  assert.equal(ok.status, 'main');
+  const bad = classifyBlock(one(block('promo-box', row('template', 'story'), row('rotate', '10'))), CONTRACTS, CODE);
+  assert.equal(bad.status, 'error');
+});
+
+test('classifyBlock: a pending config key (story-rail subheading, 208) is pending, not an error', () => {
+  const r = classifyBlock(one(block('story-rail', row('heading', 'News'), row('subheading', 'Based on tags'), row('template', 'press_release'))), CONTRACTS, CODE);
+  assert.equal(r.status, 'main');
+  assert.deepEqual(r.problems, []);
+  assert.equal(r.pendingKeys[0].id, 'story-rail-subheading');
+  const bad = classifyBlock(one(block('story-rail', row('heading', 'News'), row('wobble', 'x'), row('template', 'story'))), CONTRACTS, CODE);
   assert.equal(bad.status, 'error');
 });
 
 // ---- page -----------------------------------------------------------------------------
 
-test('checkPage: pending ids de-duplicated; broken fallback holds publish', () => {
+test('checkPage: pending ids de-duplicated; a pending BLOCK (no code) holds publish', () => {
   const html = page(
     block('quote', row('Q1', 'A1')),
     block('quote', row('Q2', 'A2')),
     block('metadata', row('template', 'press-release')),
   );
   const r = checkPage(html, CONTRACTS, CODE);
-  assert.deepEqual(r.pending, [{ id: 'quote', ticket: 'SKODA-220', fallback: 'readable' }]);
-  assert.equal(r.publishable, true);
+  assert.deepEqual(r.pending, [{
+    id: 'quote', ticket: 'SKODA-220', fallback: 'readable', missingCode: true,
+  }]);
+  assert.equal(r.errors.length, 0);
+  assert.equal(r.publishable, false); // quote.js would 404
+});
+
+test('checkPage: a readable pending VARIANT of a block on main may publish; broken holds', () => {
+  const tiles = checkPage(page(block('cards overlay tiles', row('sq', '<picture><img src="a.jpg"></picture>', '<a href="/en/a">A</a>'))), CONTRACTS, CODE);
+  assert.equal(tiles.errors.length, 0);
+  assert.equal(tiles.publishable, true);
+  const sub = checkPage(page(block('story-rail', row('heading', 'News'), row('subheading', 'x'), row('template', 'story'))), CONTRACTS, CODE);
+  assert.equal(sub.errors.length, 0);
+  assert.deepEqual(sub.pending.map((p) => p.id), ['story-rail-subheading']);
+  assert.equal(sub.publishable, false); // broken until 208: settings render as cards
   const promo = checkPage(page(block('promo-box', row('<a href="/en/a"><img src="a.jpg"></a>', '<a href="/en/a">A</a>'))), CONTRACTS, CODE);
   assert.equal(promo.errors.length, 0);
-  assert.equal(promo.publishable, false);
+  assert.equal(promo.publishable, true);
 });
 
 // ---- registry ---------------------------------------------------------------------------

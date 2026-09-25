@@ -148,10 +148,15 @@ export function classifyBlock(block, contracts, codeBlocks) {
   };
   const pending = contracts.pending || [];
 
-  const superseding = pending
-    .find((e) => (e.replaces || []).some((r) => r === label || r === block.name));
+  const replaces = (e) => (e.replaces || []).some((r) => r === label || r === block.name);
+  const superseding = pending.find(replaces);
   if (superseding) {
     res.problems.push(`superseded: emit ${blockLabel(superseding.block, superseding.variants || [])} instead (contract "${superseding.id}", ${superseding.ticket})`);
+    return res;
+  }
+  const mainTarget = Object.entries(contracts.main || {}).find(([, m]) => replaces(m));
+  if (mainTarget) {
+    res.problems.push(`superseded: emit ${mainTarget[0]} instead (on main)`);
     return res;
   }
 
@@ -168,7 +173,8 @@ export function classifyBlock(block, contracts, codeBlocks) {
     Object.assign(res, { status: 'main' });
     contract = main;
   } else {
-    const entry = pending.find((e) => e.block && entryMatches(e, block, baseVariants));
+    const entry = pending
+      .find((e) => e.block && !e.addsConfigKeys && entryMatches(e, block, baseVariants));
     if (!entry) {
       res.problems.push(hasCode
         ? `variant(s) ${unsupported.join(', ')} not supported by blocks/${block.name} and not in the pending registry`
@@ -176,7 +182,7 @@ export function classifyBlock(block, contracts, codeBlocks) {
       return res;
     }
     Object.assign(res, {
-      status: 'pending', id: entry.id, ticket: entry.ticket, fallback: entry.fallback,
+      status: 'pending', id: entry.id, ticket: entry.ticket, fallback: entry.fallback, missingCode: !hasCode,
     });
     if (entry.status === 'resolve') {
       res.status = 'error';
@@ -191,7 +197,19 @@ export function classifyBlock(block, contracts, codeBlocks) {
   }
 
   if (contract && contract.configKeys) {
-    const cp = configProblems(block, contract.configKeys, contract.config || 'or-curated');
+    // Keys a pending contract adds to this block (e.g. story-rail `subheading`, SKODA-208)
+    // are allowed at import but make the page pending on that contract.
+    const extras = pending.filter((e) => e.block === block.name && e.addsConfigKeys);
+    const cp = configProblems(block, contract.configKeys, contract.config || 'or-curated')
+      .filter((p) => {
+        const key = (p.match(/^unknown config key "([^"]+)"$/) || [])[1];
+        const adder = key && extras.find((e) => e.addsConfigKeys.includes(key));
+        if (!adder) return true;
+        if (!(res.pendingKeys || []).some((e) => e.id === adder.id)) {
+          res.pendingKeys = [...(res.pendingKeys || []), adder];
+        }
+        return false;
+      });
     if (cp.length) {
       res.problems.push(...cp);
       res.status = 'error';
@@ -204,7 +222,8 @@ export function classifyBlock(block, contracts, codeBlocks) {
  * Check one page's `.plain.html`.
  * @returns {{blocks: object[], pending: {id: string, ticket: string, fallback: string}[],
  *   errors: string[], warnings: string[], publishable: boolean}}
- *   publishable = no errors and every pending block has a readable fallback.
+ *   publishable = no errors, every pending entry has a readable fallback, and none is a block whose
+ *   code is missing (its JS would 404 on the page; 208/801a require 0 block JS 404s).
  */
 export function checkPage(html, contracts, codeBlocks) {
   const ignore = new Set(contracts.ignore || []);
@@ -212,10 +231,13 @@ export function checkPage(html, contracts, codeBlocks) {
     .filter((b) => !ignore.has(b.name))
     .map((b) => classifyBlock(b, contracts, codeBlocks));
   const pending = [];
-  blocks.filter((b) => b.status === 'pending').forEach((b) => {
-    if (pending.some((p) => p.id === b.id)) return;
-    pending.push({ id: b.id, ticket: b.ticket, fallback: b.fallback });
-  });
+  const add = (p) => { if (!pending.some((x) => x.id === p.id)) pending.push(p); };
+  blocks.filter((b) => b.status === 'pending').forEach((b) => add({
+    id: b.id, ticket: b.ticket, fallback: b.fallback, missingCode: b.missingCode,
+  }));
+  blocks.forEach((b) => (b.pendingKeys || []).forEach((e) => add({
+    id: e.id, ticket: e.ticket, fallback: e.fallback, missingCode: false,
+  })));
   const all = blocks.flatMap((b) => b.problems.map((p) => `${b.label}: ${p}`));
   const errors = [...new Set(all)].map((e) => {
     const n = all.filter((x) => x === e).length;
@@ -227,7 +249,8 @@ export function checkPage(html, contracts, codeBlocks) {
     pending,
     errors,
     warnings,
-    publishable: !errors.length && pending.every((p) => p.fallback === 'readable'),
+    // Only pending VARIANTS of a block on main may publish; a pending BLOCK 404s its JS.
+    publishable: !errors.length && pending.every((p) => p.fallback === 'readable' && !p.missingCode),
   };
 }
 

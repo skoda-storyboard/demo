@@ -9,7 +9,9 @@ Related: [`footer.md`](footer.md) (Newsletter is a hidden footer-nav category), 
 - **Component:** Newsletter subscribe (email capture + consent). Two live presentations: a **topbar
   dropdown** (site-wide, in the header) and an **inline sidebar widget** (story/press pages).
 - **EDS block:** `newsletter-stub` (`blocks/newsletter-stub/newsletter-stub.{js,css}`), **UI-only**
-  for the pilot, no ESP wiring (see §8).
+  for the pilot, no ESP wiring (see §8). **Built so far:** the Media Room footer "Subscribe" presentation
+  (SKODA-305, spec in [`footer-mediaroom.md` §0](footer-mediaroom.md)); the topbar and sidebar presentations
+  below are not built yet.
 - **Client PDF IDs:** COM-16 (Newsletter signup); COM-904 is the production subscriber service.
 - **Ticket:** SKODA-D05 / COM-16 (M1 UI-only stub); real service E09 / COM-904 (deferred).
 - **Source references:**

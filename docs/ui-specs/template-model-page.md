@@ -5,6 +5,13 @@ structure cross-read against the DOM).
 Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Map: [`_TEMPLATES.md`](_TEMPLATES.md).
 Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 
+> **Sweep correction (2026-09-25).** The DevTools URL→block sweep ([registry](../analysis/SKODA-M1-URL-BLOCK-REGISTRY.md), [report](../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §7) disproved the points below on the live M1 pages. They override the sections they name until this spec is re-captured:
+>
+> - Not always 8 anchors / 5 rails. Superb and Octavia have 9 anchors / 6 rails (with Bodywork/Derivatives). Fabia has 8 links but only 3 rails. Peaq/Epiq have 5 rails and no Key Facts or Technical Data.
+> - **Desktop `.model-nav` is sticky**: `.affix-top` (relative) becomes `.affix` (`position:fixed; top:0`) after scroll. It is hidden on mobile. The source nav has dangling anchors (Peaq/Epiq `#intro/#keyfacts/#techdata`, Fabia `#news/#stories`).
+> - Rail heading is `h3.search-results-heading` 26/32.5/600, not h2. The Bodywork rail centres its cells (`cellAlign:center`, `contain:false`).
+> - **Key Facts** (5–6 illustrated rows) and **Technical Data** (dark band, six spec rows + PDF) are unspecced. They are folded into the SKODA-208 ACs.
+
 ## 1. Identity
 
 - **Template:** Model page (one page per vehicle model).

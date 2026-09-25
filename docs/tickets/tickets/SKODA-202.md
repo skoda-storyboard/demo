@@ -59,4 +59,4 @@ Measurable gates in [`hero.md` §9](../../ui-specs/hero.md); summary:
 - Background-image heroes would defeat LCP optimization, enforce real `<img>` in review.
 
 ## Import contract (SKODA-603)
-Contract(s) `hero` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Status `resolve`: no `hero` block exists on `main`. `parsers/hero.js` and `hero-banner.js` must emit `Hero Image (overlay)` / `Hero Image (archive)` (the parser change sits with 207/208). The check fails pages that emit `Hero`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.
+Contract(s) `hero` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Status `resolve`: `blocks/hero` on `main` is only an empty boilerplate stub (0-byte `hero.js`); the project hero is `hero-image`. `parsers/hero.js` and `hero-banner.js` must emit `Hero Image (overlay)` / `Hero Image (archive)` (the parser change sits with 207/208). The check fails pages that emit `Hero`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

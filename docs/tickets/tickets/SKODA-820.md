@@ -32,6 +32,13 @@ band has 10 tag-matched ones.
 - [ ] Epiq story renders a full-width dark "Related Stories" band after the two-column body.
 - [ ] Rail visuals match `carousel-rails.md` (dated overlay cards).
 - [ ] No new block code; the Media Box is still dropped with a log line.
+- [ ] **Amendment (2026-09-25, sweep reconciliation):**
+  - Emit a rail only where the source has one. **7 of 21** story bands are **curated**, so emit hand-picked rails
+    for those. There is no "Based on tags" subtitle on curated rails; where it is shown, it is 16/32
+    `rgb(196,198,199)`.
+  - An empty index result removes the whole band.
+  - Heading contrast on the dark band is covered by SKODA-218.
+  - Re-verify after 5aed689.
 
 ## Dependencies
 SKODA-212 (rails), SKODA-218 (dark-section styling), SKODA-604 (Media Box), SKODA-801.

@@ -24,7 +24,10 @@ This contract pins **one DA table shape per pending block**. The importers emit 
    - a bare embed URL.
 
    Optional cells may be empty but are **never dropped**, so that cell positions stay stable (authors omit cells, and decoration stays defensive).
-8. **Publish rule.** A page whose pending blocks all have a **readable** fallback may publish; its QA reads `pending: <ticket>` rather than fail. When a block's JS is missing, aem.js logs the failed load and leaves the cells as undecorated divs. A page with a **broken** fallback stays preview-only until the block lands, unless the publish is explicitly approved at the wave gate. A broken fallback means visible config rows, or stacked raw images that hide the content.
+8. **Publish rule** (tightened 2026-09-25 after the M1 sweep and the 208/801a amendments, which require **0 block JS 404s**):
+   - A page with a **pending *block*** (no code in `blocks/` yet) **stays preview-only**, because its JS would 404. To publish such a page before the block lands, the importer emits the default-content fallback for that part, and the tracker flags `re-import on <ticket>`.
+   - A page whose only pending items are **variants of a block on `main`** (e.g. `Cards (overlay, tiles)`) may publish if every fallback is **readable**; its QA reads `pending: <ticket>` rather than fail.
+   - A **broken** fallback (visible config rows, or stacked raw images that hide the content) stays preview-only unless the publish is explicitly approved at the wave gate.
 9. **When a block lands,** re-QA the pages that use it (the tracker's "pending blocks" column lists them). A re-import is needed only if `shape` changed.
 
 ## Entry fields (JSON)
@@ -58,17 +61,20 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `stories` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured` (config only) |
 | `story-rail` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows |
 | `tags` | `chips` | – |
-| `search`, `fragment`, `header`, `footer`, `widget` | – | – |
+| `promo-box` | – | curated rows **or** config (`index`, `template`, `path`, `category`, `tags`, `limit`, `sort`); never mixed (PR #110, merged) |
+| `search`, `fragment`, `header`, `footer`, `widget`, `newsletter-stub` | – | – |
+
+`blocks/hero` exists only as an **empty boilerplate stub** (`hero.js` is 0 bytes). It isn't a baseline block: the project hero is `hero-image`, see `hero` below.
 
 Two findings from the first inventory (2026-09-25), both caught by the check:
 - `parsers/series-grid.js` emits `Listing` with a `tags` row, but `listing` doesn't read `tags`, so the hub would list every story. Series hubs move to `Cards (overlay, tiles)` anyway (see `cards-tiles`).
-- The model importer's rail rows use `subheading`, which `story-rail` doesn't read (SKODA-208).
+- The model importer's rail rows use `subheading`, which `story-rail` doesn't read yet. The SKODA-208 amendment makes it a config key ("a two-cell subheading row is config, never a card"), so it is pinned as the pending key `story-rail-subheading`.
 
 ## Contracts
 
 ### `hero`
 - **Status:** `resolve` · **Ticket:** SKODA-202 (the parser change sits with 207/208) · **Fallback:** readable
-- **Finding:** `parsers/hero.js` (model page) and `parsers/hero-banner.js` (page / category / tag / series / listing banners) emit `Hero`, but **there is no `hero` block on `main`**. Only `hero-image` exists.
+- **Finding:** `parsers/hero.js` (model page) and `parsers/hero-banner.js` (page / category / tag / series / listing banners) emit `Hero`, but the `hero` folder on `main` is only an **empty boilerplate stub** (`hero.js` is 0 bytes, `hero.css` is 504 bytes of boilerplate) left from #104. The project's hero is `hero-image`, so a `Hero` table renders undecorated, with boilerplate styling. *(Corrected 2026-09-25: the first inventory said there was no `hero` block at all.)*
 - **Contract:** emit the existing block, with no new `hero` block:
   - `Hero Image (overlay)` for full-bleed overlay heroes (model, series hub, press-kit hub, listings, pages);
   - `Hero Image (archive)` for the image-only category/tag band.
@@ -86,20 +92,26 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Example** (`/en/skoda-model/peaq/`): rows `Model Description` · `Key Facts` · `Technical Data` · `News` · `Press Kits` · `Stories` · `Images` · `Videos`. The spec wants 9/8/6 items depending on the model, and the sticky behaviour is the block's job.
 
 ### `spec-table`
-- **Status:** `pinned` · **Ticket:** SKODA-208 · **Fallback:** readable (label/value text pairs)
+- **Status:** `resolve` (2026-09-25: the SKODA-208 amendment requires **0 block JS 404s** and moves Key Facts / Technical Data to **Should**) · **Ticket:** SKODA-208 · **Fallback:** readable (label/value text pairs)
+- **Resolve to:** existing blocks, i.e. `Columns` rows (label | value + unit) in a dark section (218) plus a download link, unless 208 decides to build `spec-table`. The check fails `Spec Table` until then.
 - **Emitted by:** `parsers/spec-table.js`
 - **Shape:** the `Technical Data` heading stays as default content above the table. Header `Spec Table`, then rows `[label, value + unit]`. The last row is `[<a href="…pdf">Download PDF</a>]` when the source has one. The optional background image isn't imported.
 
 ### `spec-table-versions`
-- **Status:** `proposed` · **Ticket:** SKODA-801a (story importer) · **Fallback:** readable
+- **Status:** `resolve` (801a amendment: 0 block JS 404s; the `version` block is named explicitly) · **Ticket:** SKODA-801a (story importer) · **Fallback:** readable
 - **Finding:** a raw source spec table (`<table class="version">`) leaks through the story flattener as an unknown `version` block (published Epiq story; a 404 in the demo sweep). The contract `replaces: version`, so the check fails any page that still emits it.
 - **Shape:** header `Spec Table (versions)`. The first row is `[ "", version 1 name, version 2 name, … ]`, and each following row is `[label, value 1, value 2, …]` with units kept in the value text. It's the same block as `spec-table`, and the variant adds the multi-column layout.
-- **To confirm:** SKODA-208 reuses `spec-table` for this, or 801a flattens it to text.
+- **Resolve to:** `Columns` rows or text in the story importer (801a), since `spec-table` isn't built. The shape above applies only if 208 builds `spec-table`.
 
 ### `cards-key-facts`
 - **Status:** `pinned` · **Ticket:** SKODA-208 · **Fallback:** readable (`cards.js` renders them as plain cards)
 - **Emitted by:** `parsers/key-facts.js`
 - **Shape:** the `Highlights` heading stays as default content above the table. Header `Cards (key-facts)`, then rows `[square <picture>, <h3>title</h3><p>text</p>]` (the cards row shape). The variant only changes the styling.
+
+### `story-rail-subheading`
+- **Status:** `pinned` · **Ticket:** SKODA-208 · **Fallback:** **broken** (today `story-rail` treats a table with an unknown key as curated cards, so the settings render as cards)
+- **Form: a config key added to `story-rail`, not a block.** Row `[subheading, <text>]`, e.g. "Based on tags: Fabia". It's allowed at import, but pages that use it are held from publishing until `story-rail` reads the key (208).
+- **Emitted by:** `parsers/story-rail.js` (model page rails).
 
 ### `tags-outline`
 - **Status:** `pinned` · **Ticket:** SKODA-208 (with SKODA-205) · **Fallback:** readable (renders as chips)
@@ -107,14 +119,14 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Shape:** the same as `tags`, a single row of tag links. `outline` is a style modifier on `chips`.
 
 ### `promo-box`
-- **Status:** `pinned` · **Ticket:** SKODA-213 (PR #110, `blocks/promo-box`) · **Fallback:** **broken** (stacked full-size images at the top of `/en`)
+- **Status:** ✅ **on `main`** (PR #110 merged 2026-09-25). It moved to the baseline table above and is no longer a pending entry; this section stays as the shape reference. **Ticket:** SKODA-213
 - **Emitted by:** `parsers/promo-box.js`. **Finding:** it currently emits `Cards (promo)`, which PR #110 doesn't read. The contract `replaces: cards (promo)`, so the header must change to `Promo Box` before `/en` or the MR home is re-imported.
 - **Shape (curated, what the home importer emits):** header `Promo Box`, then one row per hand-picked item: `[<a href="/en/…"><picture/></a>, <a href="/en/…">Title</a>]`, in source order (usually 3).
 - **Shape (index mode, PR #110):** only 2-cell config rows with `index`, `template`, `path`, `category`, `tags`, `limit`, `sort`. PR #110 rejects a mix of curated and config rows, and so does the check.
-- **Publish:** `/en` is already live with the older shape. Re-publish it only after #110 merges, or with explicit approval.
+- **Still to do:** the importer header change (`Cards (promo)` → `Promo Box`). The check keeps failing `Cards (promo)` and points at `promo-box`.
 
 ### `cards-tiles`
-- **Status:** `pinned` · **Ticket:** SKODA-221 (importers: 207 series hub, 805a press-kit hub) · **Fallback:** readable (a uniform overlay-card grid)
+- **Status:** `pinned` · **Ticket:** SKODA-221, now **Could** (importers: 207 series hub, 805a press-kit hub) · **Fallback:** readable (a uniform overlay-card grid). Plain cards are the documented deviation until 221 lands (805a amendment), so the hubs don't wait for 221 and publish on the fallback.
 - **Shape:** header `Cards (overlay, tiles)`, then one row per tile: `[size token, <picture>, <a href="/en/…">Title</a>]`.
   - The size token is one of `sq`, `sq-small`, `wide`, `third`, `feature`.
   - Source `ratio-2x1` maps to `wide` (series) or `feature` (press kits).
@@ -125,7 +137,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 ### `gallery-slider`
 - **Status:** `pinned` · **Ticket:** SKODA-819 · **Fallback:** readable (the current Gallery lead + thumbnails)
 - **Emitted by:** `parsers/story-flatten.js` for link-free `skoda-carousel-widget`, once 801a/819 switch it over (today it emits `Gallery`).
-- **Shape:** header `Gallery (slider)`, then one row per slide: `[<picture>, caption paragraph or empty]`. Captions are visible on the source for some sliders (13.33/20 centred), so the caption cell is always present. Link-bearing carousels keep routing to `Cards`.
+- **Shape:** header `Gallery (slider)`, then one row per slide: `[<picture>, caption paragraph or empty]`. Captions are visible on the source for some sliders (13.33/20 centred; 6 of 16 lifestyle sliders, plus Octavia, Slavia and 365 km/h per the 819 amendment), so the caption cell is always present. Link-bearing carousels keep routing to `Cards`.
 - **Example** (`/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`): 3 sliders with 5, 8 and 4 rows.
 
 ### `quote`
@@ -159,17 +171,17 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Form: index row, not a block.** Image and video item pages carry the metadata the `listing` media card reads:
   - `template` = `image` | `video`;
   - `title`, `description`, `image` (masters-only thumbnail), `publisheddate`, `tags`, `model` and the facet fields in `query-index-config.yaml`;
-  - download fields (Original + 1920px, or the MP4 source).
+  - download fields (JPG Original + 1920, or the MP4 source), plus the Vimeo ID / poster for videos (608 amendment).
 
   The item body is a single `<picture>` or embed plus the caption. The listing media-card cell (date, filename, add/download toolbar, lightbox) is built inside `listing`, not as a new block.
 
 ### `floating-action-bar`
 - **Status:** `pinned` · **Ticket:** SKODA-215 · **Fallback:** readable (absent)
-- **Form: code-only.** It's template chrome (share toggle + scroll-to-top) added at runtime for stories, series and press kits, so the importers emit **nothing** for it.
+- **Form: code-only.** It's template chrome (share toggle + scroll-to-top) added at runtime on **every template** (215: all 43 captures), so the importers emit **nothing** for it.
 
 ### `media-room-chrome`
 - **Status:** `pinned` · **Ticket:** SKODA-309 (with 305) · **Fallback:** readable (Storyboard chrome)
-- **Form: page metadata.** Media Room pages (PRs, press kits, listings, media items) get `nav` and `footer` Metadata rows pointing at the MR fragments once those exist. The push tool's fragment check then requires those fragments to be live before publishing. Until 309 lands, nothing is emitted.
+- **Form: bulk metadata, not importer output** (309 amendment). The 16 MR-side URLs (5 press releases, **5 model pages**, 4 press kits, Images, Videos) get `nav` / `footer` from `metadata.json` rows for the MR path globs. Those rows are activated only once both MR fragments return 200 on preview and live. The importers emit nothing, and the push tool's fragment check requires the fragments to be live before publishing.
 
 ### `skodapedia`
 - **Status:** `out-of-scope` · **Ticket:** SKODA-206 · **Fallback:** broken
