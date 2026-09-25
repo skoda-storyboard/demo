@@ -97,6 +97,10 @@
   --card-border: 1px solid var(--skoda-grey-border);
   --pill-radius: 50px;
 
+  /* embeds (SKODA-204; docs/ui-specs/embeds.md §3/§4). Audio players are fixed-height, not
+     16:9; video uses a fluid aspect-ratio box. */
+  --embed-audio-height: 200px;
+
   /* overlay scrim gradients (card-teaser overlay layer, measured from source) */
   --scrim-h: linear-gradient(270deg, transparent, rgb(0 0 0 / 25%));
   --scrim-v: linear-gradient(180deg, transparent, rgb(0 0 0 / 10%));

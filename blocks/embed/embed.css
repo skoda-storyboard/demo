@@ -1,0 +1,46 @@
+/*
+ * Embeds block — SKODA-204 (docs/ui-specs/embeds.md §3–§4).
+ *
+ * Fluid geometry only: video is a fixed-ratio box (default 16:9, author-overridable) with a
+ * fluid width; audio is a fixed-height box. The provider iframe fills the box and renders its
+ * own native player/controls (matching the live site) — there is no consent placeholder or
+ * thumbnail facade. The media ratio is viewport-invariant, so no breakpoint touches it.
+ * Scoped to .embed; -wrapper/-container are section classes.
+ */
+
+.embed {
+  display: block;
+}
+
+/* Hide the raw config table (url / ratio cells) until decorate() runs. Without this, the
+   undecorated block briefly shows those cells — the long unbroken URL stretches the layout
+   ("stretched/hidden text"). aem.js sets data-block-status="loaded" once decorated. */
+.embed:not([data-block-status="loaded"]) {
+  visibility: hidden;
+}
+
+/* Video: fluid width, fixed ratio (default 16:9; author can override via --embed-ratio).
+   aspect-ratio replaces the source padding-bottom:56.25% hack (no CLS, no letterbox). */
+.embed .embed-video {
+  position: relative;
+  aspect-ratio: var(--embed-ratio, 16 / 9);
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Audio (Buzzsprout / Spotify): fixed height, fluid width — NOT 16:9. */
+.embed .embed-audio {
+  position: relative;
+  width: 100%;
+  height: var(--embed-audio-height);
+  overflow: hidden;
+}
+
+.embed .embed-video iframe,
+.embed .embed-audio iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
