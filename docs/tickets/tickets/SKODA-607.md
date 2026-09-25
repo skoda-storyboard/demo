@@ -56,6 +56,15 @@ Measurable gates live in [`template-press-release.md` §10](../../ui-specs/templ
 - [ ] Full-bleed dark related-media band (`#0e3a2f`) after the article, `margin-top 32px`.
 - [ ] Parser output for ≥2 releases matches source structure/order in local preview; Metadata passes lint.
 - [ ] Visual diff vs source at 1280/1024/768/500 ≤ 2% per-pixel.
+- [ ] **Amendment (2026-09-25, sweep reconciliation):**
+  - **The two-column shell is not built yet.** Verified live: EDS prose is 1248px with no sidebar, while the source
+    has 812px prose + a 342px sidebar inside 832 + 416 columns. It must render on all 5 M1 press releases.
+  - Sidebar images are 2-col 16:9 171×97 thumbs + a "+N" pill, not a 3:2 full-width stage. The Tags heading is
+    present.
+  - Bullets, newsletter and the related band are **optional**. The Media Box and Related are two separate
+    full-bleed bands.
+  - The importer emits the per-release Buzzsprout/Vimeo into Embeds (agent lane, +0.5).
+  - Quotes → SKODA-220. The grey info callout → SKODA-824 (grey variant).
 
 ## Dependencies
 - Upstream: SKODA-601 (import infra/parser conventions), SKODA-202 (hero, N/A here but shared type), SKODA-205 (tags), SKODA-502 (downloads), SKODA-505 (media-cart), SKODA-305 (MR footer)

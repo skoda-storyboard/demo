@@ -3,7 +3,14 @@
 - **Type:** import / metadata
 - **Phase:** A · **Milestone:** M1 (demo-visible on every card and rail)
 - **Estimate:** 1 SP · AI-assisted 0.25–0.5d / manual 0.5–1d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🟡 **Code done (branch `skoda-610-clean-titles`); 7 of 28 pages re-pushed and **published 2026-09-25** (approved); the live index has 22 suffixed rows left (29 → 22).** The other 21 pages are held (see below).
+- **Status (2026-09-25):** 🟡 **Code done (PR #138, branch `skoda-610-clean-titles`); 7 of 28 pages republished**
+  (live index 29 → 22 suffixed rows). The other 21 pages are held (see "Republish status").
+  - **On `main` before this PR** (re-verified after #110, CDP 1440): `scripts/card-teaser.js:186` trimmed only in
+    `buildCardTeaser()`, which covers the stories feed and the promo box. `/en` still had 25 suffixed rail titles
+    (and 25 suffixed `img alt`), the index 28 of 31, and search 4 hits.
+  - **On the PR branch preview** (2026-09-25, 1440): **0 suffixed card titles and 0 suffixed `img alt`** on `/en`
+    (34 cards), the Epiq story (23), search `?q=epiq` (12) and the listing demo (6). Every index consumer gets clean
+    rows from `loadQueryIndex()`, and `card-teaser.js` uses the same helper.
 
 ## Origin
 Demo URL/block sweep, 2026-09-25 (report §5; raised by 4 groups). It was noted before only under SKODA-602 "Follow-ups found".
@@ -18,12 +25,14 @@ Demo URL/block sweep, 2026-09-25 (report §5; raised by 4 groups). It was noted 
 - `skoda-metadata.js` (+ the mirrored `skoda-metadata-extract.mjs`): write the Metadata `Title` without the site-name
   suffix (source `og:title` / `h1`). Keep the page `<title>` suffix only via the site's head template, if wanted.
 - Re-import + republish the imported pages (`npm run import:push`) so the index rebuilds.
-- Optional defensive trim in `scripts/card-teaser.js` / `story-rail rowToCells`.
+- Defensive trim in `story-rail rowToCells` / `carousel` (the path #110 didn't cover), and in the `listing` / `search` result cards, reusing one helper from `scripts/`.
 
 ## Acceptance Criteria
 - [ ] No `query-index.json` title ends in " - Škoda Storyboard".
-- [ ] Related Stories / home rail titles fit the 1-line clamp as on the source.
-- [ ] Unit test in `skoda-metadata-extract.test.mjs`.
+- [ ] Related Stories / home rail titles fit the 1-line clamp as on the source; 0 suffixed card titles or `img alt`
+      on `/en`, the Epiq story, the listing pages and search.
+      *The "0 suffixed" half is met on the branch preview (see Status). The 1-line clamp is rail CSS and is tracked in SKODA-212a.*
+- [x] Unit test in `skoda-metadata-extract.test.mjs` (+ `scripts/query-index.test.mjs`).
 
 ## Dependencies
 SKODA-401 (metadata), SKODA-602 (push tool), SKODA-603 (re-import).
@@ -72,7 +81,7 @@ future re-pushes take the safe `update` path. `media:build` moved 4 already-inge
   because EDS has **no truncation**: the source cuts each rail title to **one line with "…"**
   (18px/21.6, 22px high, `overflow: hidden`, in 354px cards), and the EDS cells are narrower (the 4-up geometry,
   sweep V2). That's rail visual work in `carousel` / `card-teaser`, so it went to SKODA-212 as an AC
-  amendment to avoid colliding with its reopen.
+  amendment to avoid colliding with its reopen (now tracked on the rail follow-up **SKODA-212a**).
 - **Met:** the unit test.
 
 **Next:**

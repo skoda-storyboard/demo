@@ -47,6 +47,13 @@ accordions.
 - [ ] LCP and CLS are unaffected by the Media Box (lazy-loaded). The Lighthouse mobile score is ≥90 on the page.
 - [ ] Visual diff against the source is ≤2% at 1280/768, or deviations are documented. Lint and the accordion block
       test pass.
+- [ ] **Amendment (2026-09-25, sweep reconciliation):**
+  - 6 intro PDF/JPG downloads, 2 PDF/share banners, 2 contact cards, the 3-link sidebar menu and the Images +51
+    preview.
+  - The first glimpse is **Vimeo** (not Buzzsprout).
+  - The accordions are multi-open, with keyboard/ARIA support.
+  - The Media Box collapses behind "Show more" above 8 assets (708px collapsed, 139×44 pill; routed here from the
+    closed 502).
 
 ## Dependencies
 - Upstream: SKODA-607 (PR shell), SKODA-204, SKODA-205, SKODA-502, SKODA-506, SKODA-305 (MR footer).
