@@ -2,6 +2,7 @@
 - **Epic:** E02, Core Blocks
 - **Type:** site-wide component
 - **Phase:** A · **Milestone:** M1 (demo-visible; the gap review rates share C-6 as Must)
+- **GitHub issue:** [#139](https://github.com/skoda-storyboard/demo/issues/139)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
 - **Status (2026-09-25):** 🔵 TODO. The ID was referenced in the backlog and in 216/217/801a, but no ticket file existed until now.
   The M1 sweep's duplicate draft SKODA-827 was folded in on 2026-09-25 and removed.

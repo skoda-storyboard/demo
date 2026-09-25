@@ -2,6 +2,7 @@
 - **Epic:** E03, Chrome Fragments
 - **Type:** block hardening
 - **Phase:** A · **Milestone:** M1
+- **GitHub issue:** [#143](https://github.com/skoda-storyboard/demo/issues/143)
 - **Estimate:** 0.5 SP · AI-assisted 0.25d / manual 0.5d *(planning estimate, not a quote)*
 - **Status (2026-09-25):** 🔵 TODO
 

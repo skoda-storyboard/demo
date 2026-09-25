@@ -2,7 +2,7 @@
 - **Epic:** E02, Core Blocks
 - **Type:** block JS (small), AC gap on a closed ticket
 - **Phase:** A · **Milestone:** M1 (demo)
-- **GitHub issue:** follow-up to [#18](https://github.com/skoda-storyboard/demo/issues/18) (SKODA-204, Done)
+- **GitHub issue:** [#152](https://github.com/skoda-storyboard/demo/issues/152) · follow-up to [#18](https://github.com/skoda-storyboard/demo/issues/18) (SKODA-204, Done)
 - **Estimate:** 0.5 SP · AI-assisted 0.25d / manual 0.5d *(planning estimate, not a quote)*
 - **Priority:** P1
 - **Status (2026-09-25):** 🔵 TODO

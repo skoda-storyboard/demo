@@ -2,7 +2,7 @@
 - **Epic:** E02, Core Blocks
 - **Type:** bug fix (block JS)
 - **Phase:** A · **Milestone:** M1 (demo)
-- **GitHub issue:** follow-up to [#98](https://github.com/skoda-storyboard/demo/issues/98) (SKODA-212, Done)
+- **GitHub issue:** [#150](https://github.com/skoda-storyboard/demo/issues/150) · follow-up to [#98](https://github.com/skoda-storyboard/demo/issues/98) (SKODA-212, Done)
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1d *(planning estimate, not a quote)*
 - **Priority:** P0: every rail on every page.
 - **Status (2026-09-25):** 🔵 TODO

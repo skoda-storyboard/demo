@@ -2,6 +2,7 @@
 - **Epic:** E06, Import Pilot Content
 - **Type:** import / metadata
 - **Phase:** A · **Milestone:** M1 (demo-visible on every card and rail)
+- **GitHub issue:** [#146](https://github.com/skoda-storyboard/demo/issues/146)
 - **Estimate:** 1 SP · AI-assisted 0.25–0.5d / manual 0.5–1d *(planning estimate, not a quote)*
 - **Status (2026-09-25):** 🔵 TODO. **Re-verified on main after #110** (CDP, 1440): `scripts/card-teaser.js:186` now
   trims the suffix in `buildCardTeaser()`, so the `stories` feed and the promo box are clean. It is **not** fixed

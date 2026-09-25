@@ -2,6 +2,7 @@
 - **Epic:** E03, Chrome Fragments
 - **Type:** styling + small behaviour
 - **Phase:** A · **Milestone:** M1 (demo-visible on every page)
+- **GitHub issue:** [#144](https://github.com/skoda-storyboard/demo/issues/144)
 - **Estimate:** 3 SP · AI-assisted 1d / manual 2–3d *(planning estimate, not a quote)*
 - **Status (2026-09-25):** 🔵 TODO
 
