@@ -623,7 +623,7 @@ var CustomImportScript = (() => {
     const matched = [...sidebar.querySelectorAll(".related .article-teaser, .related article")];
     const teasers = matched.filter((el, i, arr) => arr.indexOf(el) === i).filter((el) => !matched.some((other) => other !== el && other.contains(el)));
     if (!teasers.length) return null;
-    const cells = [["Cards"]];
+    const cells = [["Cards (overlay)"]];
     let emitted = 0;
     teasers.forEach((t) => {
       const img = t.querySelector("img");
@@ -633,16 +633,16 @@ var CustomImportScript = (() => {
       if (!link && !img) return;
       const content = [];
       if (title) {
-        const p = document2.createElement("p");
+        const h = document2.createElement("h3");
         if (link) {
           const a = document2.createElement("a");
           a.setAttribute("href", link.getAttribute("href"));
           a.textContent = title;
-          p.appendChild(a);
+          h.appendChild(a);
         } else {
-          p.textContent = title;
+          h.textContent = title;
         }
-        content.push(p);
+        content.push(h);
       }
       cells.push([img || "", content]);
       emitted += 1;

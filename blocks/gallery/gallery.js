@@ -529,36 +529,39 @@ function buildSlider(block) {
 
   const count = items.length;
   const looped = count > 1;
-  block.setAttribute('role', 'region');
+  // WAI carousel pattern: a named group (not a region landmark — a story can hold
+  // several sliders sharing one title, which would give duplicate landmarks)
+  block.setAttribute('role', 'group');
   block.setAttribute('aria-roledescription', 'carousel');
   block.setAttribute('aria-label', items[0].alt || LABELS.slider);
 
   const viewport = document.createElement('div');
   viewport.className = 'gallery-slider-viewport';
-  const track = document.createElement('ul');
+  // a plain scroller of slide groups (not a <ul>: role=group children would
+  // break list semantics); named by the carousel group around it
+  const track = document.createElement('div');
   track.className = 'gallery-slider-track';
   track.tabIndex = 0; // keyboard-scrollable (← / →)
-  track.setAttribute('aria-label', block.getAttribute('aria-label'));
 
   const slides = items.map((item, i) => {
-    const li = document.createElement('li');
-    li.className = 'gallery-slide';
-    li.setAttribute('role', 'group');
-    li.setAttribute('aria-roledescription', 'slide');
-    li.setAttribute('aria-label', LABELS.slideOf(i + 1, count));
+    const slide = document.createElement('div');
+    slide.className = 'gallery-slide';
+    slide.setAttribute('role', 'group');
+    slide.setAttribute('aria-roledescription', 'slide');
+    slide.setAttribute('aria-label', LABELS.slideOf(i + 1, count));
     const pic = createOptimizedPicture(item.src, item.alt, false, [
       { media: '(min-width: 768px)', width: '1600' },
       { width: '1000' },
     ]);
     pic.querySelector('img').draggable = false;
-    li.append(pic);
-    return li;
+    slide.append(pic);
+    return slide;
   });
   track.append(...slides);
 
   if (looped) {
-    const clone = (li) => {
-      const c = li.cloneNode(true);
+    const clone = (slide) => {
+      const c = slide.cloneNode(true);
       c.classList.add('is-clone');
       c.removeAttribute('role');
       c.removeAttribute('aria-roledescription');
@@ -594,7 +597,11 @@ function buildSlider(block) {
   let current = 0;
   const setCurrent = (i) => {
     current = i;
-    dots.forEach((d, j) => d.toggleAttribute('aria-current', j === i));
+    // aria-current="true" (an empty value means false to assistive tech)
+    dots.forEach((d, j) => {
+      if (j === i) d.setAttribute('aria-current', 'true');
+      else d.removeAttribute('aria-current');
+    });
   };
   setCurrent(0);
 

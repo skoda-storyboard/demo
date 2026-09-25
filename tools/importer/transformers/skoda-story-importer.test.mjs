@@ -215,12 +215,13 @@ const ASIDE = `<div class="columns"><div class="content"></div><div class="sideb
 test('nested div.article-teaser > article yields ONE card per teaser, each with image + title', { skip }, () => {
   const doc = dom(ASIDE);
   storyAside('afterTransform', doc.body, {});
-  const cards = [...doc.querySelectorAll('table')].find((t) => blockName(t) === 'Cards');
+  const cards = [...doc.querySelectorAll('table')].find((t) => blockName(t) === 'Cards (overlay)');
   const rows = [...cards.querySelectorAll('tr')].slice(1);
   assert.equal(rows.length, 3);
   rows.forEach((tr, i) => {
     assert.ok(tr.querySelector('img'), `row ${i + 1} has its image`);
-    assert.equal(tr.querySelector('a').textContent, `Story ${i + 1}`);
+    // the linked title is a heading, so the card reads it as the title (not a toolbar)
+    assert.equal(tr.querySelector('h3 > a').textContent, `Story ${i + 1}`);
   });
 });
 

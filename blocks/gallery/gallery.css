@@ -588,7 +588,6 @@ body.gallery-lightbox-open {
   padding: 0;
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  list-style: none;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
@@ -705,7 +704,9 @@ body.gallery-lightbox-open {
 .gallery.slider .gallery-slider-prev:focus,
 .gallery.slider .gallery-slider-next:focus,
 .gallery.slider .gallery-slider-dot:focus {
-  outline: none;
+  /* transparent, not none: forced-colors mode drops box-shadow but paints this
+     outline in the system colour, so keyboard focus stays visible there */
+  outline: 2px solid transparent;
   box-shadow: 0 0 0 5px var(--slider-focus-ring);
 }
 

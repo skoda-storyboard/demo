@@ -38,6 +38,7 @@
   /* font weights — source ships only 300/400/600/700 (no real 500 face). */
   --weight-light: 300;
   --weight-regular: 400;
+  --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
 
@@ -84,6 +85,12 @@
   --heading-font-size-story-h3: 24px;
   --story-meta-gap: 11px; /* published date → category tag, same row (live) */
   --story-intro-gap: 48px; /* intro (date + tag) → article body at >=768 (live) */
+
+  /* story aside headings ("Explore more", "Tags"; live h3.sidebar-heading):
+     20px → 16px above 768, in a 45px line box sitting flush on what follows */
+  --sidebar-heading-font-size-mobile: 20px;
+  --sidebar-heading-font-size: 16px;
+  --sidebar-heading-line-height: 45px;
 
   /* hero geometry (hero.md §8; SKODA-202) */
   --hero-vh: 61.8vh;
@@ -665,6 +672,30 @@ body.story main > .section.body-column .default-content-wrapper ul {
   padding-left: 1.5em;
 }
 
+/* aside section headings, as the source h3.sidebar-heading (size steps down past
+   768 in the query at the end of this section). DA drops the imported <aside>
+   element, so the headings sit in the sidebar section's default content. */
+body.story main > .section.sidebar .default-content-wrapper h2 {
+  margin: 0;
+  color: var(--sidebar-heading-color);
+  font-size: var(--sidebar-heading-font-size-mobile);
+  font-weight: var(--weight-semibold);
+  line-height: var(--sidebar-heading-line-height);
+}
+
+/* aside "Explore more" teasers (Cards (overlay)): the source keeps the lighter
+   dual scrim and a 16/20 medium title without the rails' text shadow */
+body.story main > .section.sidebar .card-teaser.overlay .card-teaser-body {
+  background-image: var(--scrim-h), var(--scrim-v);
+}
+
+body.story main > .section.sidebar .card-teaser.overlay .card-teaser-title {
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-medium);
+  line-height: 1.25;
+  text-shadow: none;
+}
+
 /* The aside: stacked full-width cards + tags below the body on small screens. */
 body.story main > .section.sidebar aside {
   display: flex;
@@ -745,5 +776,9 @@ body.story main > .section.sidebar aside {
 
   body.story main > .section.body-column .default-content-wrapper h3 {
     font-size: var(--heading-font-size-story-h3);
+  }
+
+  body.story main > .section.sidebar .default-content-wrapper h2 {
+    font-size: var(--sidebar-heading-font-size);
   }
 }
