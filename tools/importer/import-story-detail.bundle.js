@@ -24,40 +24,14 @@ var CustomImportScript = (() => {
     default: () => import_story_detail_default
   });
 
-  // tools/importer/parsers/tags.js
-  function parse(element, { document: document2 }) {
-    const anchors = Array.from(element.querySelectorAll("a.label[href], li a[href], a[href]")).filter((el, i, arr) => arr.indexOf(el) === i);
-    if (anchors.length === 0) {
-      element.replaceWith(...element.childNodes);
-      return;
-    }
-    const cell = [];
-    anchors.forEach((a) => {
-      const href = a.getAttribute("href");
-      const text = (a.textContent || "").trim();
-      if (!href || !text) return;
-      const link = document2.createElement("a");
-      link.setAttribute("href", href);
-      link.textContent = text;
-      cell.push(link);
-    });
-    if (cell.length === 0) {
-      element.replaceWith(...element.childNodes);
-      return;
-    }
-    const table = WebImporter.DOMUtils.createTable([["Tags"], [cell]], document2);
-    element.replaceWith(table);
-  }
-
   // tools/importer/parsers/story-hero.js
-  function parse2(element, { document: document2 }) {
+  function parse(element, { document: document2 }) {
     const img = element.querySelector(".hero-image img, .hero-wrapper img, img");
     const heading = element.querySelector(".hero-heading h1, h1, .heading, h2");
     if (!img && !heading) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const out = [];
     const cells = [["Hero Image"]];
     if (img) cells.push([img]);
     if (heading) {
@@ -65,30 +39,44 @@ var CustomImportScript = (() => {
       h1.textContent = (heading.textContent || "").trim();
       cells.push([h1]);
     }
-    out.push(WebImporter.DOMUtils.createTable(cells, document2));
     const caption = element.querySelector(".hero-caption") || element;
     const perex = caption.querySelector(".perex");
     const perexText = perex && (perex.textContent || "").trim();
     if (perexText) {
       const p = document2.createElement("p");
       p.textContent = perexText;
-      out.push(p);
+      cells.push([p]);
     }
     const published = caption.querySelector(".published, time");
     const dateText = published && (published.textContent || "").trim();
+    const category = caption.querySelector(".category a[href]");
+    const categoryText = category && (category.textContent || "").trim();
+    const categoryHref = category && category.getAttribute("href");
+    const meta = document2.createElement("p");
+    meta.className = "hero-image-meta";
     if (dateText) {
-      const p = document2.createElement("p");
-      p.textContent = dateText;
-      out.push(p);
+      const match = dateText.match(/^(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})$/);
+      let datetime = published.getAttribute("datetime");
+      if (match) {
+        const [, day, month, year] = match;
+        const iso = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+        const d = /* @__PURE__ */ new Date(`${iso}T00:00:00Z`);
+        if (!Number.isNaN(d.getTime()) && d.toISOString().startsWith(iso)) datetime = iso;
+      }
+      const date = document2.createElement(datetime ? "time" : "span");
+      date.className = "hero-image-date";
+      if (datetime) date.setAttribute("datetime", datetime);
+      date.textContent = dateText;
+      meta.append(date);
     }
-    const category = caption.querySelector(".category");
-    if (category && category.querySelector("a[href]")) {
-      const holder = document2.createElement("div");
-      holder.append(category);
-      parse(category, { document: document2 });
-      out.push(...holder.childNodes);
+    if (categoryText && categoryHref) {
+      const link = document2.createElement("a");
+      link.setAttribute("href", categoryHref);
+      link.textContent = categoryText;
+      meta.append(link);
     }
-    element.replaceWith(...out);
+    if (meta.childNodes.length) cells.push([meta]);
+    element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
 
   // tools/importer/parsers/story-flatten.js
@@ -334,7 +322,7 @@ var CustomImportScript = (() => {
       row[0].forEach((n) => out.push(n));
     }
   }
-  function parse3(element, { document: document2 }) {
+  function parse2(element, { document: document2 }) {
     const layout = element.querySelector(".panel-layout, .panel-grid");
     if (!layout) return;
     const grids = [...element.querySelectorAll(".panel-grid")].filter((g) => !g.parentElement.closest(".so-panel"));
@@ -1017,8 +1005,8 @@ var CustomImportScript = (() => {
   var parsers = {
     // SKODA-816: story hero → Hero Image (story variant) + caption + Tags, not the
     // overlay Hero banner used by the page/archive templates.
-    "story-hero": parse2,
-    "story-flatten": parse3
+    "story-hero": parse,
+    "story-flatten": parse2
   };
   var PAGE_TEMPLATE = {
     name: "story-detail",

@@ -53,6 +53,11 @@
      ratio holds the 66.66/33.33 proportion; the ~24px gap matches the source's
      -10px column gutter so the tracks land on the measured 819/409 widths. */
   --story-column-gap: var(--spacing-l);
+  --hero-story-media-max-width: 970px;
+  --hero-story-perex-size: 20px;
+  --hero-story-date-size: 12px;
+  --hero-story-title-gap: 32px;
+  --hero-story-gutter: 10px;
 
   /* reading-measure cap: source fills the full 819px column (~100ch); story-detail
      §8 recommends capping ~72ch for readability. Applied to the prose column. */
@@ -640,6 +645,10 @@ body.story main > .section.body-column .default-content-wrapper {
   max-width: var(--prose-measure);
   font-size: var(--body-font-size-m);
   line-height: 1.5;
+}
+
+body.story main > .section.hero-image-container > .hero-image-wrapper {
+  padding-inline: var(--hero-story-gutter);
 }
 
 body.story main > .section.body-column .default-content-wrapper h2 {

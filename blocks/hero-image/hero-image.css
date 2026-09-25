@@ -25,11 +25,19 @@
   width: 100%;
 }
 
+.hero-image:not(.overlay, .archive) {
+  gap: 0;
+}
+
 /* --- Media (image) — shared ------------------------------------------------- */
 .hero-image .hero-image-media {
   position: relative;
   width: 100%;
   overflow: hidden;
+}
+
+.hero-image:not(.overlay, .archive) .hero-image-media {
+  max-width: var(--hero-story-media-max-width);
 }
 
 .hero-image .hero-image-media picture,
@@ -50,10 +58,18 @@
 }
 
 /* --- Content (heading + caption) — shared base ------------------------------ */
-.hero-image .hero-image-content {
+.hero-image .hero-image-content,
+.hero-image .hero-image-caption {
   order: 2; /* below the image on mobile/tablet (story) */
   width: 100%;
   text-align: left;
+}
+
+.hero-image:not(.overlay, .archive) .hero-image-caption {
+  order: 3;
+  display: flex;
+  flex-direction: column;
+  color: var(--skoda-ink);
 }
 
 .hero-image .hero-image-content h1,
@@ -77,6 +93,51 @@
 
 .hero-image .hero-image-content p {
   margin: var(--spacing-s) 0 0;
+}
+
+.hero-image .hero-image-caption .hero-image-perex {
+  margin: var(--spacing-m) 0 var(--spacing-xs);
+  font-size: var(--hero-story-perex-size);
+  line-height: 1.5;
+  font-weight: var(--weight-semibold);
+}
+
+.hero-image .hero-image-caption .hero-image-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-s);
+  margin: var(--spacing-xs) 0;
+}
+
+.hero-image .hero-image-meta .hero-image-date,
+.hero-image .hero-image-meta time {
+  font-size: var(--hero-story-date-size);
+  font-weight: var(--weight-light);
+  line-height: 1.5;
+}
+
+.hero-image .hero-image-meta a {
+  display: inline-block;
+  padding: var(--tag-padding);
+  border-radius: var(--tag-radius);
+  background-color: var(--skoda-grey-500);
+  color: var(--skoda-white);
+  font-size: var(--tag-font-size);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  letter-spacing: var(--tag-letter-spacing);
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.hero-image .hero-image-meta a:hover {
+  text-decoration: underline;
+}
+
+.hero-image .hero-image-meta a:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
 }
 
 /* ==========================================================================
@@ -138,17 +199,14 @@
     text-align: center;
   }
 
-  /* desktop story title: 16px top / 32px bottom (hero.md §3A: margin 16 0 32).
-     32px has no spacing token, so it is a documented literal. font-size is set
-     from the >768px rule above. */
+  /* Source title has 16px above / 32px below; the block has no extra flex gap. */
   .hero-image:not(.overlay, .archive) .hero-image-content h1,
   .hero-image:not(.overlay, .archive) .hero-image-content h2 {
-    margin: var(--spacing-m) 0 32px;
+    margin: var(--spacing-m) 0 var(--hero-story-title-gap);
   }
 
   .hero-image:not(.overlay, .archive) .hero-image-media {
     order: 2;
-    max-width: 970px;
   }
 
   /* overlay: larger overlaid title, content padded to the column */

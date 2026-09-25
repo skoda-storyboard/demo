@@ -154,6 +154,19 @@ optional `hero` text-only). Follow repo conventions (`_FOUNDATIONS` §7): author
 
 ### DA authoring table (worked examples)
 
+For `single-post` story heroes (SKODA-816), author **one** `Hero Image`
+table with four optional rows in order: image, H1, perex, then a paragraph
+containing a date and the linked category. Keep the caption *inside* that
+block: separate default paragraphs/Tags blocks become separate section
+wrappers and cannot be visually recomposed into the source caption. The
+aside's independent Tags block is unaffected. On 2026-09-25, Chrome CSS/DOM
+extraction (no screenshots) measured the Epiq source image as 970×545.6 at
+1440/1024, 748×420.8 at 768, and 480×270 at 500, with 10px caption and
+mobile gutters. The H1/image gap at 1440 is 32px (EDS pre-fix 48px), and
+the perex is 20px/30px/600. Date 12px/18px/300 and grey category link
+share one metadata row. Verify source versus branch EDS with computed CSS
+and bounding boxes at these widths and 1079/1080.
+
 `Hero-image` (story / overlay, image + heading):
 | (image cell)              | (heading cell)                          |
 |---------------------------|-----------------------------------------|

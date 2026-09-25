@@ -67,31 +67,63 @@ export default function decorate(block) {
     media.append(picture);
   }
 
-  // Everything that is not the image becomes the heading/caption content.
+  const isStory = !isArchive && !block.classList.contains('overlay');
   const content = document.createElement('div');
   content.className = 'hero-image-content';
+  const caption = document.createElement('div');
+  caption.className = 'hero-image-caption';
   [...block.children].forEach((row) => {
     const rowImg = row.querySelector('img');
     if (rowImg && row.textContent.trim() === '') return; // media row
     [...row.children].forEach((cell) => {
       if (cell.querySelector('img') && cell.textContent.trim() === '') return;
-      while (cell.firstChild) content.append(cell.firstChild);
+      while (cell.firstChild) {
+        const node = cell.firstChild;
+        if (isStory && node.nodeType === Node.ELEMENT_NODE && node.matches('h1, h2')) {
+          content.append(node);
+        } else if (isStory) {
+          if (node.nodeType === Node.ELEMENT_NODE && node.matches('p')) {
+            const isMeta = node.matches('.hero-image-meta')
+              || node.querySelector('time, .hero-image-date, a[href]')
+              || /^\d{1,2}\.\s*\d{1,2}\.\s*\d{4}/.test(node.textContent.trim());
+            node.classList.add(isMeta ? 'hero-image-meta' : 'hero-image-perex');
+            if (isMeta && !node.querySelector('time, .hero-image-date')) {
+              const dateElement = [...node.children].find((el) => !el.matches('a'));
+              if (dateElement) dateElement.classList.add('hero-image-date');
+              else {
+                const dateNodes = [...node.childNodes]
+                  .filter((child) => child.nodeType === Node.TEXT_NODE);
+                const dateText = dateNodes.map((child) => child.textContent).join('').trim();
+                if (dateText) {
+                  const date = document.createElement('span');
+                  date.className = 'hero-image-date';
+                  date.textContent = dateText;
+                  dateNodes.forEach((child) => child.remove());
+                  node.prepend(date);
+                }
+              }
+            }
+          }
+          caption.append(node);
+        } else {
+          content.append(node);
+        }
+      }
     });
   });
 
   // Rebuild the block per variant.
   block.textContent = '';
-  const hasContent = content.childNodes.length > 0;
   if (isArchive) {
     // image-only band: no heading/caption, no scrim (CSS drops ::after)
     if (media) block.append(media);
   } else if (block.classList.contains('overlay')) {
     // overlay: media first, content layered on top (CSS position:absolute)
     if (media) block.append(media);
-    if (hasContent) block.append(content);
+    if (content.childNodes.length) block.append(content);
   } else {
-    // story: title first (above image) in DOM; CSS swaps order at <=1079
-    if (hasContent) block.append(content);
+    if (content.childNodes.length) block.append(content);
     if (media) block.append(media);
+    if (caption.childNodes.length) block.append(caption);
   }
 }
