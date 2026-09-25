@@ -65,6 +65,9 @@ no underline (also on hover), `li` gap 8px. Subscribe intro + Company blurb 12px
 - "Manage subscription" (`/en/newsletter-settings/`): `padding-top .5rem`, 16px/24px, `#419468`, underlined.
 - Response: white box (`padding .5rem .75rem`, 14px) laid over the consent row; hidden while empty.
 - Hidden fields: `language=en_GB`, `lang=en`, `list=339`; form code `NewsletterFormWidgetV2`.
+- **Below 320px (deliberate deviation):** the source page has a 320px minimum width and scrolls horizontally
+  below it. In our phone layout (<768), a form row narrower than 290px (screens under 320, e.g. Galaxy Fold 280)
+  stacks the Submit pill (49px) under a full-width field, so nothing overflows the screen. Source-exact at 320px and wider.
 
 **Build verification (2026-09-25):** every measured box above matches at 1280 / 1024 / 768, and at 375 apart
 from 1px sub-pixel centring on 3 icons. Footer heights match to the half-pixel at 375 / 767 / 768 / 992 /

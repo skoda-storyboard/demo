@@ -10,6 +10,7 @@
  */
 
 .newsletter-stub {
+  container: newsletter-stub / inline-size;
   font-size: var(--body-font-size-m);
   line-height: var(--line-height-body);
 }
@@ -168,6 +169,33 @@
 
 .newsletter-stub .newsletter-stub-consent a:hover {
   color: var(--skoda-green-emerald);
+}
+
+/* Very narrow phones (form row < 290px, i.e. screens under 320px such as the Galaxy Fold at
+   280): the source rule (field >= 50% + a non-shrinking button) no longer fits and pushed the
+   button past the screen edge (horizontal scroll). Stack the button under the field instead.
+   Phone layout only (< 768): from 768 the footer is 3 columns and the source intentionally lets
+   the button overflow its 226px column (it never reaches the screen edge), so that stays
+   source-exact. At >= 320px screens the row is >= 290px, so nothing changes there either. */
+@media (width < 768px) {
+  @container newsletter-stub (width < 290px) {
+    .newsletter-stub .newsletter-stub-row {
+      flex-wrap: wrap;
+    }
+
+    .newsletter-stub .newsletter-stub-email {
+      flex-basis: 100%;
+      min-width: 0;
+    }
+
+    /* on its own line the pill no longer stretches to the field row, so keep the source's
+       49px pill height (45px field + 2 × 2px, the difference between their margins) */
+    .newsletter-stub .newsletter-stub-submit {
+      flex: 0 0 auto;
+      min-height: 49px;
+      margin: 0 0 0.5em;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

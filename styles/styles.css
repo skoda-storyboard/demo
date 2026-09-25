@@ -193,9 +193,15 @@
 
 /* box-sizing baseline. A universal `*` reset is disallowed by Stylelint
    (selector-max-universal: 0), so document defaults set it on the root and inherit into
-   pseudo-elements; blocks set border-box on their own containers as needed. */
+   pseudo-elements; blocks set border-box on their own containers as needed.
+   text-size-adjust stops mobile Safari inflating small text (e.g. the 12px footer copy) in
+   landscape; the source sets the same 100%. */
 html {
   box-sizing: border-box;
+
+  /* stylelint-disable-next-line property-no-vendor-prefix -- Safari has no unprefixed support */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 ::before,
