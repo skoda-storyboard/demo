@@ -3,6 +3,12 @@
 Status: **CAPTURED** (measured 2026-09-15 via Chrome DevTools MCP; source CSS `media-room-515d2d102b.css`).
 Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 
+> **Sweep correction (2026-09-25).** The DevTools URL→block sweep ([registry](../analysis/SKODA-M1-URL-BLOCK-REGISTRY.md), [report](../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §7) disproved the points below on the live M1 pages. They override the sections they name until this spec is re-captured:
+>
+> - Images / Videos: **initial page size 12, Load more +12** (not 6/+6).
+> - Grid is **1 / 3 / 4 / 4 columns at 375 / 768 / 992 / 1280** (not 1/2/3). The Videos DA document asks for 3 desktop columns, but the source shows 4.
+> - The facet form (15 groups) is **collapsed by default even at 1280** and revealed by "Advanced filter"; DA authored only six facets.
+
 ## 1. Identity
 
 - **Component:** Faceted Listing (the News / Images / Videos result index with taxonomy facets,
