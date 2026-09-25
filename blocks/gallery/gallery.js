@@ -639,23 +639,33 @@ function buildSlider(block) {
   let dragging = null;
   let raf = 0;
   let settleTimer = 0;
+  // the slide width the scroll offset was last valid for: while the column is
+  // resizing, the browser's own scroll adjustment reports the OLD offset against
+  // the NEW width, which would pick the wrong slide, so skip it until the
+  // ResizeObserver below has re-aligned the current slide
+  let knownWidth = slideWidth();
+  const resizing = () => slideWidth() !== knownWidth;
   track.addEventListener('scroll', () => {
     if (!raf) {
       raf = window.requestAnimationFrame(() => {
         raf = 0;
+        if (resizing()) return;
         setCurrent(slidePosition(track.scrollLeft, slideWidth(), count).index);
       });
     }
     window.clearTimeout(settleTimer);
     settleTimer = window.setTimeout(() => {
-      if (dragging) return;
+      if (dragging || resizing()) return;
       const at = slidePosition(track.scrollLeft, slideWidth(), count);
       if (at.onClone) jumpTo(at.index);
     }, SLIDER_SETTLE_MS);
   }, { passive: true });
 
   // keep the current slide aligned when the column width changes
-  new ResizeObserver(() => jumpTo(current)).observe(track);
+  new ResizeObserver(() => {
+    knownWidth = slideWidth();
+    jumpTo(current);
+  }).observe(track);
 
   // ---- user navigation (any of it stops autoplay, as on the source) -------
   prev.addEventListener('click', () => { stop(); goTo(current - 1); });

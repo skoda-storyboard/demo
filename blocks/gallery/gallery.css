@@ -577,6 +577,12 @@ body.gallery-lightbox-open {
   padding-block: var(--spacing-l) var(--spacing-m);
 }
 
+/* no images authored: decorate() leaves the block empty — take no space
+   (its vertical padding would otherwise leave a gap in the story) */
+.gallery.slider:empty {
+  display: none;
+}
+
 .gallery.slider .gallery-slider-viewport {
   position: relative;
 }
