@@ -54,6 +54,9 @@ Eight source-CDN originals returned HTTP 403 and are marked `steps.dam=error`;
 no sized derivative was uploaded as their original. The four oversized Peaq
 rows remain `partial` only because they have no publish-safe inline delivery
 rendition (SKODA-506), despite successful original ingest.
+After this approved 357-image batch, `main` contributed another 125 manifest
+rows. They remain delivery-only and were not part of this upload; subsequent DAM
+runs must use an approved ID list instead of processing every manifest row.
 
 The isolated worktree still has **zero of the 42 distinct M1 page files**, so the
 read-only audit reports 42 missing pages; this historical manifest does **not**

@@ -122,17 +122,25 @@ correctly reports 42 missing pages rather than claiming media QA passed.
 The imported `.plain.html` lives in the separate content store (`content/` is a
 symlink), so it is **not** in a code-repo checkout. To run the DAM ingest from a
 clean checkout, re-ingest straight from the source URLs already recorded in the
-committed `media-manifest.json` — no page file needed:
+committed `media-manifest.json` — no page file needed. For an approved batch,
+provide a plain-text file containing **one reviewed `logical_id` per line**:
 
 ```bash
 npm run media:build -- --from-manifest \
+  --ids-file /path/to/approved-original-ids.txt \
   --dam-base https://author-p220607-e2281243.adobeaemcloud.com \
-  --dam-folder /content/dam/storyboard
+  --dam-folder /content/dam/storyboard --dry-run
+# After approval and review, repeat without --dry-run.
 ```
 
 Each row's own `dam_page_path`/`alt` are reused, so page-mirrored foldering is
 unchanged. The builder resumes only missing steps on delivery-only rows;
-`--force` is reserved for deliberately rebuilding completed rows.
+`--force` is reserved for deliberately rebuilding completed rows. An unscoped
+`--from-manifest` run processes **every** row, including images another import
+may have added since a prior approval; use `--ids-file` to freeze the intended
+upload set. Unknown, repeated, or empty ID lists fail rather than expanding
+the scope. With `--dam-base`, `--dry-run` also HEAD-checks pending original
+masters and reports inaccessible ones without fetching bytes or uploading.
 
 ## Automatic wiring (PostToolUse hook)
 

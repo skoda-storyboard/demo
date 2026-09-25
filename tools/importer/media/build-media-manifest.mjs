@@ -32,7 +32,7 @@ import {
 import path from 'node:path';
 import {
   isImageUrl, masterUrl, logicalId, daPathFor, damPathFor, pagePathFromFile, isAspectCrop,
-  pickIngestUrl, fetchBinary, uploadToDA, uploadToDAM, setDamMetadata, resolveDamToken,
+  pickIngestUrl, headBytes, fetchBinary, uploadToDA, uploadToDAM, setDamMetadata, resolveDamToken,
   needsMediaBuild, OVERSIZE_BYTES,
 } from './media-lib.mjs';
 
@@ -55,6 +55,7 @@ function parseArgs() {
     force: false,
     daArchive: false,
     fromManifest: false,
+    idsFile: '',
     limit: Infinity,
   };
   for (let i = 0; i < args.length; i += 1) {
@@ -69,6 +70,10 @@ function parseArgs() {
     }
     const val = args[i + 1];
     if (a === '--manifest') { out.manifest = path.resolve(val); i += 1; continue; }
+    if (a === '--ids-file') {
+      if (!val || val.startsWith('--')) throw new Error('--ids-file requires a path');
+      out.idsFile = path.resolve(val); i += 1; continue;
+    }
     if (a === '--org') { out.org = val; i += 1; continue; }
     if (a === '--repo') { out.repo = val; i += 1; continue; }
     if (a === '--dam-base') { out.damBase = val; i += 1; continue; }
@@ -81,6 +86,7 @@ function parseArgs() {
   if (out.pages.length === 0 && !out.fromManifest) {
     throw new Error('Provide --pages <file> [...] or --from-manifest (re-ingest from the existing manifest\'s source_urls)');
   }
+  if (out.idsFile && !out.fromManifest) throw new Error('--ids-file requires --from-manifest');
   return out;
 }
 
@@ -195,7 +201,20 @@ async function main() {
     }
   }
 
-  const logicalIds = [...byLogical.keys()].slice(0, cfg.limit);
+  let logicalIds = [...byLogical.keys()];
+  if (cfg.idsFile) {
+    const ids = readFileSync(cfg.idsFile, 'utf8').split(/\r?\n/)
+      .map((id) => id.trim()).filter((id) => id && !id.startsWith('#'));
+    if (!ids.length) throw new Error(`Empty media ID list: ${cfg.idsFile}`);
+    const seen = new Set();
+    ids.forEach((id) => {
+      if (seen.has(id)) throw new Error(`Duplicate media ID in list: ${id}`);
+      if (!byLogical.has(id)) throw new Error(`Media ID not in manifest: ${id}`);
+      seen.add(id);
+    });
+    logicalIds = ids;
+  }
+  logicalIds = logicalIds.slice(0, cfg.limit);
   const srcLabel = cfg.fromManifest ? 'from manifest' : `across ${cfg.pages.length} page(s)`;
   console.log(`[media] ${logicalIds.length} distinct logical image(s) ${srcLabel}`);
   console.log(`[media] DAM: ${damConfig ? `${damConfig.baseUrl}${damConfig.folder} (token: ${damToken ? 'present' : 'dry-run only'})` : 'not configured'}`);
@@ -285,8 +304,12 @@ async function main() {
         const pick = row.steps.deliver === 'done'
           ? { ok: true, reason: 'already delivered', preconditioned: row.preconditioned }
           : await pickIngestUrl(info.sourceUrl);
-        if (!pick.ok) counts.failed += 1;
-        console.log(`  · ${id}  ${pick.reason}${pick.preconditioned ? ' [pre-conditioned]' : ''} → DAM ${damAssetPath || '(n/a)'}`);
+        const originalBytes = damConfig && row.steps.dam !== 'done'
+          ? await headBytes(row.master_url) : null;
+        const originalUnavailable = damConfig && row.steps.dam !== 'done'
+          && !(Number.isFinite(originalBytes) && originalBytes > 0);
+        if (!pick.ok || originalUnavailable) counts.failed += 1;
+        console.log(`  · ${id}  ${pick.reason}${pick.preconditioned ? ' [pre-conditioned]' : ''}${originalUnavailable ? ' [original unavailable]' : ''} → DAM ${damAssetPath || '(n/a)'}`);
       } catch (err) {
         counts.failed += 1;
         console.error(`  ✗ ${id}  ${err.message}`);

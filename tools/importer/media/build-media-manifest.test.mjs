@@ -146,6 +146,19 @@ test('an unavailable master cannot be replaced by the resized delivery file in D
         },
       },
     }));
+    const originalManifest = readFileSync(manifest, 'utf8');
+    await assert.rejects(
+      exec(
+        process.execPath,
+        [script, '--from-manifest', '--manifest', manifest, '--dam-base', dam.base, '--dry-run'],
+        { cwd: dir, env: { ...process.env, AEM_DAM_TOKEN: 'mock' } },
+      ),
+      (error) => {
+        assert.match(error.stdout, /original unavailable/);
+        return true;
+      },
+    );
+    assert.equal(readFileSync(manifest, 'utf8'), originalManifest);
     await assert.rejects(
       exec(
         process.execPath,
@@ -159,6 +172,47 @@ test('an unavailable master cannot be replaced by the resized delivery file in D
     assert.equal(rows[id].steps.dam, 'error');
     assert.equal(rows[id].dam_asset_path, '');
     assert.deepEqual(dam.uploads, []);
+  } finally {
+    await dam.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('an approved ID list scopes re-ingest and rejects unknown or repeated entries', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-media-scope-'));
+  const dam = await mockDam();
+  try {
+    const source = `${dam.base}/master-768x512.jpg`;
+    const other = `${dam.base}/other-768x512.jpg`;
+    const id = logicalId(source);
+    const otherId = logicalId(other);
+    const manifest = path.join(dir, 'manifest.json');
+    const idsFile = path.join(dir, 'approved.txt');
+    const row = (url) => ({
+      logical_id: logicalId(url),
+      source_url: url,
+      delivery_url: url,
+      bytes: 4,
+      status: 'done',
+      dam_page_path: 'en/story',
+      steps: { deliver: 'done', dam: 'n/a', da: 'n/a' },
+    });
+    writeFileSync(manifest, JSON.stringify({ rows: { [id]: row(source), [otherId]: row(other) } }));
+    writeFileSync(idsFile, `# approved originals\n${id}\n`);
+    const args = [script, '--from-manifest', '--manifest', manifest, '--ids-file', idsFile,
+      '--dam-base', dam.base];
+    const options = { cwd: dir, env: { ...process.env, AEM_DAM_TOKEN: 'mock' } };
+    await exec(process.execPath, args, options);
+    const result = JSON.parse(readFileSync(manifest, 'utf8')).rows;
+    assert.deepEqual(dam.uploads, ['ORIGINAL']);
+    assert.equal(result[id].steps.dam, 'done');
+    assert.equal(result[otherId].steps.dam, 'n/a');
+
+    writeFileSync(idsFile, `${id}\nunknown\n`);
+    await assert.rejects(exec(process.execPath, args, options), /Media ID not in manifest/);
+    writeFileSync(idsFile, `${id}\n${id}\n`);
+    await assert.rejects(exec(process.execPath, args, options), /Duplicate media ID/);
+    assert.equal(dam.uploads.length, 1);
   } finally {
     await dam.close();
     rmSync(dir, { recursive: true, force: true });
