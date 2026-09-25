@@ -12,6 +12,25 @@
 
 const cache = new Map();
 
+// The source SEO plugin appends the site name to titles ("Elroq - Škoda Storyboard");
+// index-driven cards/rails/search show the bare title (SKODA-610). The importer strips it
+// too (tools/importer/transformers/skoda-metadata-extract.mjs); this keeps rows that
+// haven't been re-imported clean. Keep the regex identical in both places.
+export const SITE_SUFFIX = /\s+[-–|]\s+Škoda Storyboard\s*$/;
+
+/** Row title without the site suffix; a title that is only the site name is kept. */
+export function cleanTitle(raw) {
+  const t = String(raw || '').replace(/\s+/g, ' ').trim();
+  return t.replace(SITE_SUFFIX, '').trim() || t;
+}
+
+/** Normalise one index row for display (currently: the title). */
+export function normalizeRow(row) {
+  if (!row || typeof row !== 'object' || typeof row.title !== 'string') return row;
+  const title = cleanTitle(row.title);
+  return title === row.title ? row : { ...row, title };
+}
+
 /** Derive the locale prefix (`/en`) from the current path, defaulting to /en. */
 export function currentLocale(pathname = window.location.pathname) {
   const m = pathname.match(/^\/([a-z]{2})(?:\/|$)/i);
@@ -46,9 +65,9 @@ export async function loadQueryIndex(url = defaultIndexUrl(), { force = false } 
     for (;;) {
       // eslint-disable-next-line no-await-in-loop
       const json = await fetchChunk(url, offset);
-      if (Array.isArray(json)) { rows.push(...json); break; }
+      if (Array.isArray(json)) { rows.push(...json.map(normalizeRow)); break; }
       const data = Array.isArray(json.data) ? json.data : [];
-      rows.push(...data);
+      rows.push(...data.map(normalizeRow));
       const total = Number(json.total);
       const limit = Number(json.limit) || data.length;
       offset += data.length;

@@ -27,6 +27,7 @@
  */
 
 import { createOptimizedPicture } from './aem.js';
+import { cleanTitle } from './query-index.js';
 
 // A date paragraph like "15. 9. 2026", "1.9.2026", "12/09/2026" or "2026-09-15".
 export const DATE_RE = /^\s*\d{1,4}[.\-/]\s?\d{1,2}[.\-/]\s?\d{2,4}\.?\s*$/;
@@ -183,7 +184,7 @@ export function buildCardTeaser(row, {
 } = {}) {
   const li = document.createElement('li');
   li.className = overlay ? 'card-teaser overlay' : 'card-teaser';
-  const title = String(row.title || '').replace(/ - Škoda Storyboard$/, '');
+  const title = cleanTitle(row.title); // rows built outside loadQueryIndex too (SKODA-610)
 
   const a = document.createElement('a');
   a.className = 'card-teaser-link';
