@@ -108,6 +108,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-304 | Footer fragment | E03 | 3 | 1–2 | 2–4 | 102,106 | 🟢 |
 | SKODA-305 | Media Room footer variant | E03 | 2 | 1 | 1–2 | 304,301 | 🟢 M1; closes gap G1 (COM18); unify-vs-distinct 🟡 |
 | [SKODA-306](tickets/SKODA-306.md) | Footer outbound-link browsing-context parity (`target=_blank`) | E03 | 1 | 0.5 | 1 | 304 | 🟢 M1; issue #102; file added 2026-09-24 |
+| [SKODA-307](tickets/SKODA-307.md) | Header/footer survive a missing nav/footer fragment (null guard) | E03 | 0.5 | 0.25 | 0.5 | 301,304 | 🟢 M1; from the 2026-09-25 live-footer incident |
 | SKODA-401 | Query-index schema + selectors + metadata-normalization (15 facets) | E04 | 8 | 3–5 | 5–8 | 104 | 🟠 build-confirmed: admin-service `query.yaml` (not repo); fields need normalization layer, not clean selectors |
 | SKODA-402 | Faceted listing + load-more (deep-link) | E04 | 8 | 3–5 | 6–9 | 401,201 | 🟠 hardest pilot block |
 | SKODA-403 | Search block (index-only) | E04 | 3 | 1–2 | 2–4 | 401 | 🟡 body-search deferred |
@@ -122,7 +123,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-505b | Media-cart presentation + live AEM DAM delivery wiring | E05 | 3 | 1–2 | 2–3 | 505a,501,504 | 🔴 split from 505 (presentation half); human-gate |
 | SKODA-507 | Native AEM Assets picker in DA/EW (Media Bus delivery) | E05 | 2 | 0.5–1 | 1–2 | 504,505b | 🔴 BLOCKED (client AEM env + DA site config, creds) |
 | SKODA-601 | Import infra: parsers + transformers | E06 | 5 | 2–3 | 4–6 | 102 | 🟡 content-driven only |
-| SKODA-602 | DA source-API push + bulk-op publish | E06 | 3 | 1–2 | 2–3 | 601 | 🟢 |
+| [SKODA-602](tickets/SKODA-602.md) | DA source-API push + bulk-op publish | E06 | 3 | 1–2 | 2–3 | 601 | 🟢 **built + piloted 2026-09-25** (`push-to-da.mjs`, branch `skoda-602-da-push`); credential gate resolved |
 | SKODA-603 | Pilot page set imported + validated, **re-scoped 2026-09-24 to the 43-URL set + rail corpus + tracker** | E06 | 5 | 2–3 | 3–5 | 601,602,201,202,203,204,205,501,502 | 🔴 M1 content critical path (index = 3 rows on 2026-09-24) |
 | SKODA-604 | Full-fidelity restore on 1–2 hero demo stories | E06 | 2 | 0.5–1 | 1–2 | 203,204,502,505,601,602,801 | 🟢 M1 (D18); bounded un-flatten |
 | SKODA-607 | Press Release detail template (split from story) | E08 | 5 | 2–3 | 4–6 | 601,602,502 | 🟢 M1; PR ≠ story (no hero, MR side, 47.5% of pages); spec `ui-specs/template-press-release.md` |
