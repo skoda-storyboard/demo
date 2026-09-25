@@ -4,7 +4,9 @@
  * A live typeahead dropdown for a search <input>, index-driven from the
  * per-locale query-index (SKODA-401), matching the live header behaviour:
  * as-you-type suggestions (from 1 char), capped list, each row a page link
- * with a "date | section" meta line, no image. Index-only — title/summary/tags
+ * with a "date | type" meta line, no image. Enter submits the typed query
+ * unless a row was chosen with ↑/↓ (then it opens that row); the chosen row is
+ * announced via aria-activedescendant. Index-only — title/summary/tags
  * matching, no body/relevance (that is Phase C, SKODA-901).
  *
  * Lives in /scripts/ (not a block) so the header (SKODA-301) and the search
@@ -28,19 +30,35 @@ function matchRows(rows, query) {
   });
 }
 
-/** Derive the "section" label from a page path (e.g. /en/emobility/x → eMobility). */
-function sectionOf(path) {
-  const seg = String(path || '').split('/').filter(Boolean)[1] || '';
-  if (!seg) return '';
-  return seg.replace(/-/g, ' ').replace(/(^|\s)\S/g, (m) => m.toUpperCase());
+// Public content-type label per index `template` — the source's search-type
+// names (its Stories / News / Press Kits filter), not the URL section.
+const TYPE_LABELS = {
+  story: 'Stories',
+  press_release: 'News',
+  press_kit: 'Press Kits',
+};
+
+// SEO site suffix on indexed titles; the source rows show the clean title
+const SITE_SUFFIX = /\s+[-–|]\s+Škoda Storyboard$/;
+
+/** Display title: the indexed title without the SEO site suffix. */
+function displayTitle(row) {
+  return String(row.title || '').replace(SITE_SUFFIX, '').trim() || row.path;
 }
 
-/** Build the "date | section" meta line for a row (either part optional). */
+/** Index ISO date (YYYY-MM-DD) → the source's "DD. MM. YYYY"; other values pass through. */
+function displayDate(value) {
+  const m = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[3]}. ${m[2]}. ${m[1]}` : String(value || '');
+}
+
+/** Build the "date | type" meta line for a row (either part optional). */
 function metaLine(row) {
   const parts = [];
-  if (row.date) parts.push(row.date);
-  const sec = sectionOf(row.path);
-  if (sec) parts.push(sec);
+  const date = displayDate(row.date);
+  if (date) parts.push(date);
+  const type = TYPE_LABELS[String(row.template || '').toLowerCase().replace(/-/g, '_')];
+  if (type) parts.push(type);
   return parts.join(' | ');
 }
 
@@ -103,7 +121,7 @@ export default function attachSuggest(input, opts = {}) {
 
   let rows = null;
   let loadFailed = false;
-  let active = -1; // keyboard-highlighted item index
+  let active = -1; // row chosen with ↑/↓; -1 = none (Enter submits the query)
 
   const ensureIndex = async () => {
     if (rows || loadFailed) return;
@@ -121,16 +139,20 @@ export default function attachSuggest(input, opts = {}) {
     list.textContent = '';
     active = -1;
     input.setAttribute('aria-expanded', 'false');
+    input.removeAttribute('aria-activedescendant');
   };
 
   const render = (matches) => {
     list.textContent = '';
     active = -1;
+    input.removeAttribute('aria-activedescendant');
     if (!matches.length) { close(); return; }
-    matches.forEach((row) => {
+    matches.forEach((row, i) => {
       const li = document.createElement('li');
       li.className = 'search-suggest-item';
+      li.id = `${listId}-option-${i}`;
       li.setAttribute('role', 'option');
+      li.setAttribute('aria-selected', 'false');
       const a = document.createElement('a');
       a.className = 'search-suggest-link';
       a.href = row.path;
@@ -146,7 +168,7 @@ export default function attachSuggest(input, opts = {}) {
       text.className = 'search-suggest-text';
       const title = document.createElement('span');
       title.className = 'search-suggest-title';
-      title.textContent = row.title || row.path;
+      title.textContent = displayTitle(row);
       text.append(title);
       const meta = metaLine(row);
       if (meta) {
@@ -181,11 +203,18 @@ export default function attachSuggest(input, opts = {}) {
   input.addEventListener('focus', ensureIndex, { once: true });
 
   const links = () => [...list.querySelectorAll('.search-suggest-link')];
+  // one source of truth for the chosen row: highlight (.is-active), the
+  // option's aria-selected, and the input's aria-activedescendant
   const setActive = (i) => {
     const items = links();
+    if (!items.length) return;
     active = (i + items.length) % items.length;
-    items.forEach((el, j) => el.classList.toggle('is-active', j === active));
-    items[active]?.scrollIntoView({ block: 'nearest' });
+    items.forEach((el, j) => {
+      el.classList.toggle('is-active', j === active);
+      el.parentElement.setAttribute('aria-selected', j === active ? 'true' : 'false');
+    });
+    input.setAttribute('aria-activedescendant', items[active].parentElement.id);
+    items[active].scrollIntoView({ block: 'nearest' });
   };
 
   input.addEventListener('keydown', (e) => {
@@ -194,7 +223,8 @@ export default function attachSuggest(input, opts = {}) {
       setActive(active + 1);
     } else if (e.key === 'ArrowUp' && !list.hidden) {
       e.preventDefault();
-      setActive(active - 1);
+      // from "none chosen", ↑ goes to the last row
+      setActive(active < 0 ? links().length - 1 : active - 1);
     } else if (e.key === 'Enter') {
       const chosen = links()[active];
       if (chosen) {

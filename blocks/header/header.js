@@ -67,6 +67,20 @@ function toggleAllNavSections(sections, expanded = false) {
 }
 
 /**
+ * Keep the header search input in the tab order only while it is visible:
+ * the desktop pill when expanded, or always inside the open mobile drawer
+ * (where CSS shows the field open regardless of the pill's state).
+ * @param {Element} nav The container element
+ */
+function syncSearchTabbable(nav) {
+  const bar = nav.querySelector('.nav-search');
+  const input = bar?.querySelector('.nav-search-input');
+  if (!input) return;
+  const drawerOpen = !isDesktop.matches && nav.getAttribute('aria-expanded') === 'true';
+  input.tabIndex = (drawerOpen || bar.classList.contains('nav-search-open')) ? 0 : -1;
+}
+
+/**
  * Toggles the entire nav
  * @param {Element} nav The container element
  * @param {Element} navSections The nav sections within the container element
@@ -81,6 +95,8 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   // (mobile accordions start collapsed; user taps a parent to expand)
   toggleAllNavSections(navSections, 'false');
   button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
+  // the drawer shows the search field, so it must be tabbable while open
+  syncSearchTabbable(nav);
   // enable nav dropdown keyboard accessibility
   if (navSections) {
     const navDrops = navSections.querySelectorAll('.nav-drop');
@@ -279,7 +295,7 @@ export default async function decorate(block) {
       const setOpen = (open) => {
         searchBar.classList.toggle('nav-search-open', open);
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-        input.tabIndex = open ? 0 : -1;
+        syncSearchTabbable(nav);
         if (open) input.focus();
       };
       // Submit the query to the search results page (the SKODA-403 block reads
