@@ -84,6 +84,27 @@ Standard rails (`.images / .models / .videos .items.flickity-enabled .item`, and
 Content-heavy rails (`.attachments / .news .items.flickity-enabled .item`): `90%` (<768) / `45%`
 (>=768, ~2.2/view) / `30%` (>=992, ~3.3/view) (· MR source CSS).
 
+**Story-detail bottom Related Stories (SKODA-820)** follows the content-heavy ladder,
+not the homepage category ladder. Chrome DevTools CSS/DOM extraction on
+`/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/` (2026-09-25):
+
+| Viewport | Source `.search-results-item` / `.article-teaser` | EDS `.carousel-track` / `.card-teaser` target |
+|---|---|---|
+| 1280 | ~374px / ~354px | 1248px track / ~354px card |
+| 768 | ~346px / ~326px | 768px track / ~326px card |
+| 500 | 450px / 430px | 500px track / 430px card |
+
+The source has 10px cell-side gutters (20px between cards) and a full-width
+dark-green band. The EDS story-band variant scopes its larger 90/45/30% cells to
+the story's dark Story Rail; generic rails keep their 90/30/22.5% ladder. Its
+pre-build mount reserves the exact 16:9 card geometry to prevent a jump when
+the index-fed carousel is deferred-built. The companion heading and subtitle
+measurements are in [`SKODA-820.md`](../tickets/tickets/SKODA-820.md).
+Unlike the 18px/21.6px desktop card title, the related card title is
+20px/24px below 992px; its date-to-title offset is 25px rather than the
+shared paragraph's larger default gap. Indexed rail titles omit the source
+page's " - Škoda Storyboard" SEO suffix, matching authored teaser cards.
+
 Featured hero slider = the **`.promo-box`** at the top of `/en/` and `/en/media-room/` (impression
 context "Media Room - Promo box"), plus `.cover-box .flickity-enabled`. **This is NOT the ad-server
 banner** (`.side-banner` / `promo-banner.md`); it is a featured-story showcase built from
@@ -149,7 +170,9 @@ Source ladder (matches `_FOUNDATIONS` §1: `768 / 992`):
 
 - **Drag / swipe:** `.flickity-enabled.is-draggable .flickity-viewport{cursor:grab}` ->
   `.is-pointer-down{cursor:grabbing}` (· base CSS 11–15). EDS reproduces with pointer-capture drag +
-  `cursor:grab/grabbing` and suppresses the post-drag click (`carousel.js` `enableDrag`).
+  `cursor:grab/grabbing` and suppresses the post-drag click (`carousel.js` `enableDrag`). The
+  desktop click/drag conflict (pointer capture + native `dragstart`) is separately owned by
+  SKODA-212a and remains a functional acceptance gate across all rails.
 - **Touch:** `touch-action: pan-y` on the viewport (vertical page scroll preserved, horizontal owned
   by the track). EDS matches (`.carousel-track{touch-action:pan-y}`).
 - **Arrows:** fade `opacity .3s` (source) / `.2s` (EDS); `disabled` -> `opacity:0` at ends.

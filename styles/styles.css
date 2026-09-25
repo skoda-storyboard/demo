@@ -71,6 +71,10 @@
   --heading-font-size-s: 18px;
   --heading-font-size-xs: 16px;
   --heading-font-size-promo: 29.6px;
+  --related-band-heading-compact: 20px;
+  --related-band-heading-inset: 10px;
+  --related-band-card-title-compact: 20px;
+  --related-band-date-gap: 6px;
 
   /* hero titles (hero.md §3/§4; SKODA-202): story 40->28; overlay 48/300 white */
   --heading-font-size-hero: 48px;
@@ -718,5 +722,41 @@ body.story main > .section.sidebar aside {
   body.story main > .section.body-column .default-content-wrapper h2 {
     font-size: var(--heading-font-size-hero-story);
     line-height: 1.125;
+  }
+}
+
+/* The story's related rail has its own full-bleed rhythm; other dark sections
+   retain the shared section padding and typography. */
+body.story main > .section.dark.story-rail-container {
+  padding-block: var(--spacing-xxl) calc(var(--spacing-xl) + var(--paragraph-gap));
+}
+
+body.story main > .section.dark.story-rail-container > div {
+  padding-inline: 0;
+}
+
+body.story main > .section.dark.story-rail-container .default-content-wrapper {
+  padding-inline: var(--related-band-heading-inset);
+}
+
+body.story main > .section.dark.story-rail-container .default-content-wrapper h2 {
+  margin: 0;
+  color: var(--skoda-white);
+  font-size: var(--related-band-heading-compact);
+  font-weight: var(--weight-semibold);
+  line-height: 1.25;
+}
+
+body.story main > .section.dark.story-rail-container .default-content-wrapper p {
+  margin-block: 0 var(--paragraph-gap);
+  color: var(--related-band-subtitle-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 2;
+}
+
+@media (width > 768px) {
+  body.story main > .section.dark.story-rail-container .default-content-wrapper h2 {
+    font-size: var(--heading-font-size-l);
   }
 }
