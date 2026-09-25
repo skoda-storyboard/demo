@@ -373,7 +373,7 @@ G6–G8 are **spec/decision clarifications on existing tickets**, not missing ti
 
 | # | Ticket | Finding | Status |
 |---|--------|---------|--------|
-| QA-F1 | **SKODA-605** (E06, M1) | Models/Series rail + "All" links are absolute `skoda-storyboard.com` URLs (leave the demo) → transformer link-rewrite | **Implemented (transformer); QA-blocked** on a clean re-import + publish |
+| QA-F1 | **SKODA-605** (E06, M1) | Models/Series rail + "All" links are absolute `skoda-storyboard.com` URLs (leave the demo) → transformer link-rewrite | **Code done 2026-09-25** (`skoda-links.js`, all 16 importers; demo-page allow-list, the rest stay absolute per D-3 (b), amended AC): 0 absolute demo links on 30 re-imported pages (was 45). 1 page republished; the rest are held by 508/603/607/801a/208 (see ticket). Rails are index-driven now, so F1 no longer reproduces there |
 | QA-F2 | **SKODA-606** (E06, M1) | Stray "Manage Cookies" consent text node in Latest News → transformer strip | **Implemented (transformer); QA-blocked** on re-import |
 | QA-F3 | **SKODA-705** (E07, M1) | "Load more" button = bordered pill vs source white-fill (cosmetic) | **Held, needs design/client confirm** (don't alter brand styling on assumption) |
 

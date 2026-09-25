@@ -25,6 +25,7 @@ import downloadsParser from './parsers/downloads.js';
 import cleanupTransformer from './transformers/skoda-press-release-cleanup.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
+import linksTransformer from './transformers/skoda-links.js';
 import normalizeImages from './transformers/skoda-images.js';
 
 // PARSER REGISTRY
@@ -82,6 +83,7 @@ const transformers = [
   cleanupTransformer,
   ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
   metadataTransformer,
+  linksTransformer,
 ];
 
 /**
