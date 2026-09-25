@@ -4,7 +4,7 @@
 - **Type:** import transformer + config (redirects) + policy
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo)
 - **Estimate:** 2 SP · AI-assisted 1d / manual 1–2d *(planning estimate, not a quote)*
-- **GitHub issue:** *not yet created* (proposed in [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md))
+- **GitHub issue:** [#118](https://github.com/skoda-storyboard/demo/issues/118)
 - **Discovered in:** M1 gap review, 2026-09-24
 
 ## Summary

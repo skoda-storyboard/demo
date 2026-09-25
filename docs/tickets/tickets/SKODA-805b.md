@@ -4,7 +4,7 @@
 - **Type:** import
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 **Could** tier (depends on decision D-1)
 - **Estimate:** 3 SP planned (option B) · option A (full import) = 5–8 SP · option C (link-out) ≈ 1 SP, done inside SKODA-609 *(planning estimate, not a quote)*
-- **Parent:** SKODA-805 (#66) · **GitHub issue:** *not yet created* (proposed in [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md))
+- **Parent:** SKODA-805 (#66) · **GitHub issue:** [#129](https://github.com/skoda-storyboard/demo/issues/129)
 
 ## Summary
 The 3 in-scope tiles hubs link to **50 child pages** outside the 43-URL set: Peaq 13, Epiq 13, Motorsport 24. The

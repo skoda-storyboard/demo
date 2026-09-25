@@ -19,10 +19,10 @@ page-templates.json  ──►  import-<name>.js  ──►  import-<name>.bundl
                                      │  run via run-bulk-import.js
                                      ▼
                                content/<path>.plain.html   (local, bare <div> markup)
-                                     │  upload-<name>.sh: wrap <body><main>, POST to DA
+                                     │  push-to-da.mjs: wrap <body><main>, POST to DA
                                      ▼
                      admin.da.live/source/{org}/{repo}/{path}.html
-                                     │  preview → publish
+                                     │  bulk preview → validate → bulk publish (+ /nav, /footer live)
                                      ▼
                           query-index rebuilds → index-driven blocks populate
 ```
@@ -73,8 +73,14 @@ Whole-page shaping, run as `beforeTransform` / `afterTransform` hooks:
 ### `import-<name>.js` + `import-<name>.bundle.js`
 The `import-<name>.js` wires it together: embeds the `page-templates.json` entry, registers parsers + transformers, runs the two hooks around `WebImporter.rules`, and writes a sanitized output path. The **`.bundle.js` is the runnable artifact** — that's what the bulk runner executes.
 
-### `upload-<name>.sh`
-Pushes results to DA: wraps each bare `.plain.html` in `<body><main>…</main></body>`, `POST`s to `https://admin.da.live/source/{org}/{repo}/{path}.html`, then previews and publishes. **Credentials are injected by the environment — never a token in the script or chat.**
+### `push-to-da.mjs` (SKODA-602) — DA push + bulk preview/publish
+One tool for every template (the per-template `upload-<name>.sh` scripts described in earlier drafts were never built). It reads `content/<path>.plain.html` for a URL list, wraps each page in `<body><header></header><main>…</main><footer></footer></body>`, `POST`s it to `https://admin.da.live/source/{org}/{repo}/{path}.html`, then runs **admin.hlx.page bulk jobs** (the API behind EW Bulk Operations) to preview and — only when asked — publish. **Credentials are injected by the environment — never a token in the script, a flag, or the chat.**
+- **Drafts first:** the default stage is `push,preview`. The previewed-but-unpublished page on `.aem.page` *is* the draft; publish is a separate, explicit `--stage publish` that only publishes pages that passed validation.
+- **Overwrite protection:** `tools/importer/push/push-manifest.json` (committed) records the hash of each page's `<main>` content at our last push. Per page the tool decides `new` / `unchanged` / `update` / **`conflict`** — a conflict means DA changed since our last push (an author edited it) or holds a document we have no record of, and it is **never overwritten without `--force`**. Wrapper whitespace differences are ignored.
+- **Validation after preview:** `.plain.html` must be 200 and every `<img>` must have moved to the media bus (a leftover `cdn.skoda-storyboard.com` URL means the ingest failed — usually an oversized master, SKODA-506). Publish 409s are reported per URL.
+- **Shared fragments:** before publishing it checks that `/nav`, `/footer` (and any `nav`/`footer` metadata overrides) are **live**. A previewed-but-unpublished `/footer` empties the footer on every `.aem.live` page while `.aem.page` looks fine (2026-09-25). `--publish-fragments` publishes them if they are previewed.
+- **After publish:** polls the query index until every published path has a row, and smoke-tests `/nav` + `/footer` on `.aem.live`.
+- **Output:** `tools/importer/reports/push/<stamp>.json` (per-URL `action`, DA/preview/live status, image check, indexed, errors) and `<stamp>-urls.txt` (validated preview URLs, the SKODA-603 validation input). Exit code 1 on any conflict, error or failed validation.
 
 ### `urls-<name>.txt`
 The input URL list for the run.
@@ -89,11 +95,17 @@ The input URL list for the run.
 # 2) Preview locally
 npx -y @adobe/aem-cli up          # inspect content/... at localhost:3000
 
-# 3) Upload → preview → publish to DA (credentials injected)
-bash tools/importer/upload-en-stories.sh
+# 3) Plan the push (reads DA, decides new/unchanged/update/conflict — writes nothing)
+npm run import:push -- --urls tools/importer/urls-<name>.txt --dry-run
+
+# 4) Push → bulk preview → validate on .aem.page (the draft state)
+npm run import:push -- --urls tools/importer/urls-<name>.txt
+
+# 5) After review: validate again → publish → wait for the index (+ shared fragments live)
+npm run import:push -- --urls tools/importer/urls-<name>.txt --stage publish --publish-fragments
 ```
 
-**Order matters:** upload → preview → **publish** → reindex. The query-index only sees *published* pages, so index-driven blocks (`stories`, `story-rail`) stay empty until publish completes and the index rebuilds.
+**Order matters:** push → preview → validate → **publish** → reindex. The query-index only sees *published* pages, so index-driven blocks (`stories`, `story-rail`) stay empty until publish completes and the index rebuilds — check rails in a second pass, after publish. **Check both hosts:** `.aem.page` renders previewed fragments, `.aem.live` only published ones.
 
 ---
 
@@ -103,7 +115,7 @@ bash tools/importer/upload-en-stories.sh
 2. **Add a template entry** to `page-templates.json` (name + block→selector map).
 3. **Reuse or add parsers** — most new rails reuse `carousel` / `cards-*`; add a parser only for genuinely new block shapes.
 4. **Reuse or clone a transformer** — e.g. a press-release detail is ~`skoda-story-cleanup` with a different category/section; clone and adjust.
-5. **Assemble `import-<name>.js`**, bundle it, create `urls-<name>.txt` + `upload-<name>.sh`.
+5. **Assemble `import-<name>.js`**, bundle it, create `urls-<name>.txt` (pushed with the shared `push-to-da.mjs`, §2 — no per-template upload script).
 6. **Ingest + rewrite media** — after the content import, run the media toolkit
    (`tools/importer/media/`, see its `README.md`): `npm run media:build -- --pages content/<path>.plain.html`
    dedups to logical masters, **pre-conditions >~10 MB masters** (else the content bus 409s on publish),

@@ -148,44 +148,9 @@ const RELATED = `<div class="container"><div class="columns"><div class="content
 const PAYLOAD = { params: { originalURL: 'https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/' } };
 
 const bandTeaser = (n) => `<div class="search-results-item"><article class="article-teaser">
-  <div class="article-teaser-media"><a class="colorbox" href=""><img src="r${n}.jpg" alt="R${n}"></a>
-  <div class="article-teaser-overlay"><div class="entry-meta"><span class="entry-published">${n}. 8. 2026</span></div>
-  <h3 class="entry-title"><a href="https://www.skoda-storyboard.com/en/emobility/r${n}/">Related ${n}</a></h3></div></div>
-  <a class="link-more" href="https://www.skoda-storyboard.com/en/emobility/r${n}/"></a></article></div>`;
+  <img src="r${n}.jpg" alt="R${n}"><h3 class="entry-title"><a href="/en/emobility/r${n}/">Related ${n}</a></h3></article></div>`;
 
-test('related band with SSR teasers → curated Story Rail (image + date + linked title per row, source order)', { skip }, () => {
-  const doc = dom(RELATED.replace(
-    /<div class="search-results-items">[\s\S]*?<\/div><\/div><\/div>$/,
-    `<div class="search-results-items">${bandTeaser(1)}${bandTeaser(2)}${bandTeaser(3)}</div></div></div>`,
-  ));
-  storyCleanup('afterTransform', doc.body, PAYLOAD);
-  const rail = [...doc.querySelectorAll('table')].find((t) => blockName(t) === 'Story Rail');
-  const rows = [...rail.querySelectorAll('tr')].slice(1);
-  assert.equal(rows.length, 3, 'one row per teaser (outermost match only)');
-  rows.forEach((tr, i) => {
-    const [media, body] = tr.children;
-    assert.equal(media.querySelector('img').getAttribute('src'), `r${i + 1}.jpg`);
-    assert.equal(body.querySelector('p').textContent, `${i + 1}. 8. 2026`);
-    const a = body.querySelector('h3 > a');
-    assert.equal(a.textContent, `Related ${i + 1}`);
-    assert.equal(a.getAttribute('href'), `https://www.skoda-storyboard.com/en/emobility/r${i + 1}/`);
-  });
-  assert.equal(doc.querySelector('h2').textContent, 'Related Stories');
-});
-
-test('related band restores a client-truncated teaser title from the image alt', { skip }, () => {
-  const t = bandTeaser(1)
-    .replace('alt="R1"', 'alt="Practical, fun, stylish. 5 reasons to choose the Epiq"')
-    .replace('>Related 1<', '>Practical, fun, stylish. 5 reasons to…<');
-  const doc = dom(RELATED.replace(
-    /<div class="search-results-items">[\s\S]*?<\/div><\/div><\/div>$/,
-    `<div class="search-results-items">${t}</div></div></div>`,
-  ));
-  storyCleanup('afterTransform', doc.body, PAYLOAD);
-  assert.equal(doc.querySelector('table h3 a').textContent, 'Practical, fun, stylish. 5 reasons to choose the Epiq');
-});
-
-test('related band without teasers → index-driven Story Rail (specific tags, self excluded) + Style dark', { skip }, () => {
+test('related band → hr + h2 + subheading + index Story Rail (model AND years, self excluded) + Style dark', { skip }, () => {
   const doc = dom(RELATED);
   storyCleanup('afterTransform', doc.body, PAYLOAD);
   const h2 = doc.querySelector('h2');
@@ -196,21 +161,45 @@ test('related band without teasers → index-driven Story Rail (specific tags, s
   const rail = tables.find((t) => blockName(t) === 'Story Rail');
   assert.deepEqual(rowsOf(rail), [
     ['template', 'story'],
-    ['tags', 'epiq'], // year tag dropped: the rail ORs tag values
+    ['model', 'epiq'], // one row per facet column: the rail ANDs across keys
+    ['years', '2026'],
     ['limit', '10'],
     ['exclude', 'skoda-epiq-will-win-you-over-in-just-a-few-seconds'],
   ]);
   const meta = tables.find((t) => blockName(t) === 'Section Metadata');
   assert.deepEqual(rowsOf(meta), [['Style', 'dark']]);
   assert.ok(!doc.querySelector('.media-box'), 'Media Box band still dropped (SKODA-604)');
-  assert.ok(!doc.querySelector('.related-stories, .cover-box'), 'SSR teasers not copied');
+  assert.ok(!doc.querySelector('.related-stories, .cover-box'), 'band removed');
 });
 
-test('related band keeps year tags when they are the only tags', { skip }, () => {
-  const doc = dom(RELATED.replace(/<li><a class="label" href="[^"]*model\/epiq\/">Epiq<\/a><\/li>/, ''));
+test('related band never copies the SSR teasers (index-driven only)', { skip }, () => {
+  const doc = dom(RELATED.replace(
+    '<article><a class="colorbox" href=""><img src="t.jpg"></a></article>',
+    bandTeaser(1) + bandTeaser(2),
+  ));
   storyCleanup('afterTransform', doc.body, PAYLOAD);
   const rail = [...doc.querySelectorAll('table')].find((t) => blockName(t) === 'Story Rail');
-  assert.deepEqual(rowsOf(rail)[1], ['tags', '2026']);
+  assert.ok(!rail.querySelector('img, h3'), 'no curated card rows');
+  assert.deepEqual(rowsOf(rail).map((r) => r[0]), ['template', 'model', 'years', 'limit', 'exclude']);
+});
+
+test('related band: values of one taxonomy share a key; non-facet tags use `tags`', { skip }, () => {
+  const doc = dom(RELATED.replace(
+    '</ol>',
+    '<li><a href="/en/tag/model/peaq/">Peaq</a></li><li><a href="/en/tag/cycling/tour/">Tour</a></li></ol>',
+  ));
+  storyCleanup('afterTransform', doc.body, PAYLOAD);
+  const rail = [...doc.querySelectorAll('table')].find((t) => blockName(t) === 'Story Rail');
+  const rows = rowsOf(rail);
+  assert.deepEqual(rows.find((r) => r[0] === 'model'), ['model', 'epiq, peaq']);
+  assert.deepEqual(rows.find((r) => r[0] === 'tags'), ['tags', 'tour']);
+});
+
+test('related band is dropped when the story has no tags', { skip }, () => {
+  const doc = dom(RELATED.replace(/<li>.*?<\/li>/gs, ''));
+  storyCleanup('afterTransform', doc.body, PAYLOAD);
+  assert.ok(![...doc.querySelectorAll('table')].some((t) => blockName(t) === 'Story Rail'));
+  assert.ok(!doc.querySelector('.cover-box'));
 });
 
 // ---- SKODA-817 aside teaser de-dup + Tags heading ----------------------------

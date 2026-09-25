@@ -1,6 +1,6 @@
 # SKODA-405, RSS feed generation (query-index → RSS 2.0)
 - **Epic:** E04, Listings & Search
-- **Type:** integration · **Phase:** A · **Pilot:** stretch · **Milestone:** M1
+- **Type:** integration · **Phase:** A · **Pilot:** stretch · **Milestone:** ~~M1~~ **M2**, aligned to the board (GitHub #52) on 2026-09-25, per the M1 gap review §7/§11
 - **Estimate:** ~2 SP
 
 ## Summary

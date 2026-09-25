@@ -2,8 +2,11 @@
 - **Epic:** E08, Editorial at Scale
 - **Type:** import (importer only; the block is SKODA-204 / PR #109)
 - **Phase:** A/B · **Milestone:** M1 (demo story fidelity)
+- **GitHub issue:** [#121](https://github.com/skoda-storyboard/demo/issues/121)
 - **Estimate:** 1 SP · AI-assisted 0.25–0.5d / manual 0.5–1d *(planning estimate, not a quote)*
 - **Status (2026-09-24):** 🔵 TODO (blocked on PR #109 merge for rendering; importer can land first)
+  **Update (late 2026-09-24):** 🟢 importer merged in PR #113 (commit `e763378`). What remains is the render check
+  once #109 merges.
 
 ## Origin
 Side-by-side QA of `/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/` (1440, 2026-09-24).

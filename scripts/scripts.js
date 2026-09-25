@@ -75,6 +75,52 @@ function buildWidgetAutoBlocks(main) {
 }
 
 /**
+ * Provider hosts that autoblock into the `embed` block (SKODA-204). A bare provider URL on
+ * its own line becomes an Embed. `/widgets/` links are handled by buildWidgetAutoBlocks and
+ * are excluded here so the widget path (e.g. the MR-PR03 AI-audio widget) still wins.
+ */
+const EMBED_HOSTS = /(?:^|\.)(?:vimeo\.com|youtube\.com|youtu\.be|youtube-nocookie\.com|buzzsprout\.com|spotify\.com)$/i;
+
+/**
+ * Tests whether an href points at a supported embed provider (and is not a widget link).
+ * @param {string} href The link href
+ * @returns {boolean}
+ */
+function isEmbedUrl(href) {
+  try {
+    const { hostname, pathname } = new URL(href, window.location.href);
+    if (pathname.includes('/widgets/')) return false;
+    return EMBED_HOSTS.test(hostname);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Turns a bare provider URL on its own line into an `embed` block (SKODA-204). Only acts on a
+ * paragraph whose sole content is the provider link (the autoblock "URL on its own line" case);
+ * inline provider links inside prose are left untouched.
+ * @param {Element} main The container element
+ */
+function buildEmbedAutoBlocks(main) {
+  const links = [...main.querySelectorAll('a[href]')];
+  links.forEach((link) => {
+    if (link.closest('.embed, .widget')) return;
+    if (!isEmbedUrl(link.href)) return;
+    const p = link.closest('p');
+    // Only autoblock when the provider URL is alone on its line (its own paragraph).
+    if (
+      !p
+      || p.querySelectorAll('a').length !== 1
+      || p.querySelector('a') !== link
+      || p.textContent.trim() !== link.textContent.trim()
+    ) return;
+    const embedBlock = buildBlock('embed', { elems: [link.cloneNode(true)] });
+    p.replaceWith(embedBlock);
+  });
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
@@ -98,6 +144,8 @@ function buildAutoBlocks(main) {
       });
     }
     buildWidgetAutoBlocks(main);
+    // After widgets so /widgets/ links (e.g. MR-PR03 AI-audio) keep priority (SKODA-204).
+    buildEmbedAutoBlocks(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);

@@ -43,3 +43,11 @@ Measurable gates in [`carousel-rails.md`](../../ui-specs/carousel-rails.md) §3/
 - **Not promo-banner:** keep distinct from the ad-server `promo-banner` (E09) — this is the editorial featured showcase only.
 - **Curated vs indexed items:** confirm whether promo items are author-curated (featured) or query-index-driven before locking the block config.
 - **Home composition boundary:** builds the *block*; assembly into `/en/` is SKODA-604.
+
+---
+### Relations
+**Depends on:** #15 (SKODA-201 card-teaser promo variant) · #14 (SKODA-106 tokens) · #16 (SKODA-202 hero/LCP patterns)
+**Blocks:** #38 (SKODA-604 home composition)
+**Sibling home blocks:** #97 (SKODA-214 feed) · #98 (SKODA-212 rails)
+
+*Ticket source of truth on `main`: `docs/tickets/tickets/SKODA-213.md`.*
