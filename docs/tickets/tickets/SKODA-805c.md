@@ -58,3 +58,6 @@ accordions.
 ## Dependencies
 - Upstream: SKODA-607 (PR shell), SKODA-204, SKODA-205, SKODA-502, SKODA-506, SKODA-305 (MR footer).
 - Downstream: SKODA-805b (children), SKODA-807 (full FAQ, M2).
+
+## Import contract (SKODA-603)
+Contract(s) `accordion`, `quote` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Pinned shape: `Accordion`, one row per toggle `[summary, body]`, all closed by default. Quotes use the `quote` contract. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

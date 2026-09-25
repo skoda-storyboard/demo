@@ -31,3 +31,6 @@ Demo URL/block sweep, 2026-09-25 (report §5). The series and press-kit groups r
 
 ## Dependencies
 SKODA-201 (cards), SKODA-207 (series hub importer: static curated rows), SKODA-805a (press-kit hub importer).
+
+## Import contract (SKODA-603)
+Contract(s) `cards-tiles` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Pinned shape: `Cards (overlay, tiles)`, one row per tile `[size token, picture, title link]`, with tokens `sq`/`sq-small`/`wide`/`third`/`feature`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

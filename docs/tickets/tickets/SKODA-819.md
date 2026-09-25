@@ -59,3 +59,6 @@ at a time with arrows and dots.
 ## Dependencies
 SKODA-203 (gallery), SKODA-212 (rail mechanics), SKODA-216 (story `sb-gallery`, a different
 widget), SKODA-801 (flatten routing).
+
+## Import contract (SKODA-603)
+Contract(s) `gallery-slider` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Pinned shape: `Gallery (slider)`, one row per slide `[picture, caption or empty]`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

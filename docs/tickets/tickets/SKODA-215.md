@@ -57,3 +57,6 @@ Plan B (§14 accepted): **Must**, since it delivers C-6 social share.
 ## Dependencies
 docs/ui-specs/social-share.md, SKODA-505a/b (cart slot), SKODA-704 (stacking against the consent banner), SKODA-216
 (gallery share, separate; reuses the `/scripts/` helper).
+
+## Import contract (SKODA-603)
+Contract `floating-action-bar` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Code-only on every template: the importers emit nothing. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

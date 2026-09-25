@@ -53,3 +53,6 @@ SKODA-301 (header), SKODA-305 (MR footer, PR #134 ✅ merged), **SKODA-307 (null
 SKODA-602 (fragment check), SKODA-603 (page set previewed). DA write access for the nav doc + metadata rows (Lars).
 **Blocks** the SKODA-704 visual sign-off of every MR template (607, 208, 805a/c, 608 listings).
 Owners (§11.2 proposal): Lars DA nav doc + rows 0.5; vijay header active state + QA 1.5.
+
+## Import contract (SKODA-603)
+Contract `media-room-chrome` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). **The importers emit nothing**: the MR `nav`/`footer` come from the bulk metadata (`metadata.json`) rows for the 16 MR path globs (including `/en/skoda-model/`), and those rows are activated only once both fragments return 200. The push tool's fragment check then requires them to be live before any publish.

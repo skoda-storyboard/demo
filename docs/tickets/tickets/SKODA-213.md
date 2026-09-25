@@ -96,3 +96,6 @@ The index loader still reads all chunks before selecting globally newest stories
 **Sibling home blocks:** #97 (SKODA-214 feed) · #98 (SKODA-212 rails)
 
 *Ticket source of truth on `main`: `docs/tickets/tickets/SKODA-213.md`.*
+
+## Import contract (SKODA-603)
+Contract(s) `promo-box` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). The home importer emits `Cards (promo)`, which this block doesn't read. The contract pins the `Promo Box` header with curated rows `[linked picture, title link]`, or config rows (the PR #110 keys). The fallback is broken, so `/en` is re-published only after this merges or with explicit approval. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.
