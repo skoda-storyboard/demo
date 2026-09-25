@@ -71,9 +71,16 @@ QA rule: a 605 re-import may change **only links**. The DA copy is compared with
 
 | Result | Pages |
 |---|---|
-| ✅ **Pushed + previewed, links only (1)** | modelling-clay-yoga-simply-epiq-skoda-returns-to-milan: 2 cards → `/en/emobility/even-opening-the-door…`, `/en/emobility/skoda-epiq-will-win-you-over…` (both live). Publish awaits approval |
+| ✅ **Published, links only (2)** | modelling-clay-yoga-simply-epiq-skoda-returns-to-milan: 2 cards → `/en/emobility/even-opening-the-door…`, `/en/emobility/skoda-epiq-will-win-you-over…` (both live) · an-epic-start-to-the-tour-de-france…: 2 cards → `a-custom-made-sunroof…`, `how-the-versatile-skoda-peaq…`. These two targets **aren't published yet** (603); publishing anyway, with 2 temporary in-site 404s, was approved on 2026-09-25 |
 | ➖ **No link change needed (5)** | a-true-czech-from-spain · big-possibilities-in-a-small-package… · come-and-play-skoda-is-heading-to-milan · practical-fun-stylish-5-reasons… · a-record-year-for-skoda… |
-| ⏸ **Links only, but targets unpublished (1)** | an-epic-start-to-the-tour-de-france…: links to `a-custom-made-sunroof…` and `how-the-versatile-skoda-peaq…`, which 603 hasn't published; pushing now would add 2 in-site 404s |
 | ⏸ **Other diffs held (23)** | the same blockers as SKODA-610: 508 caption/paragraph diffs (5 PRs: zellmer, national-theatre, superb-25-years, board-of-management, uci; 3 stories: this-is-epiq, whats-behind-epiq-design, watch-the-world-premiere) · stale pre-816 story output, `hero` in DA vs `hero-image` (7; even-opening-the-door is also media-blocked) · media apply blocked by Vimeo posters, 607 (5 PRs: 936-km, simply-clever, updated-slavia, octavia-turns-30, red-dot) · 819 slider conflict (Epiq story) · 208 (Elroq) · `/en` promo-box header (603 W1) |
+
+**Publish (2026-09-25, approved):** a bulk publish of the 2 pages returned live 200 and indexed for both. Live QA on `.aem.live`:
+- 0 absolute demo links; 4 site-relative links; 0 relative `/direct-download/`; 0 `#s_aid`;
+- the footer (3,045 characters) and the nav (42 links) render;
+- the index has 31 rows (both pages were already indexed);
+- `import:status` is unchanged at 16/136, because neither page is in the set or the corpus.
+
+**Open on the live site:** `/en/emobility/a-custom-made-sunroof…` and `/en/emobility/how-the-versatile-skoda-peaq…` 404 until SKODA-603 publishes them.
 
 Of the 23 rewrite targets, 13 aren't published yet (603). The held pages pick up 605 automatically when their blocker clears and they're re-imported with the new bundles.
