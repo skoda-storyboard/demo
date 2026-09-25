@@ -90,6 +90,11 @@
   --carousel-gap: 20px;              /* source .items margin 0 -10px + .item padding 0 10px */
   --carousel-dot: #d8d8d8;           /* page dot (dots variant only) */
   --carousel-dot-active: #686868;    /* selected page dot */
+
+  /* homepage social profile cards (SKODA-217; live .socials-static overlay):
+     a 60% black tile under the dual scrim, so the white icon + handle read on
+     the dark band (SKODA-218) or on a light section alike */
+  --social-card-tile: rgb(0 0 0 / 60%);
 }
 
 /*

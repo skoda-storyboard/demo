@@ -6,13 +6,15 @@
  *
  * Featured promo-box (curated cards) + a stack of index-driven Story Rails
  * (home-rail self-classifies each .search-results rail from its heading + "All"
- * link / type-<cpt> class). The live-Instagram social strip is not index-driven —
- * home-rail unwraps it. Metadata template=page (nav/direct only; body class carries
- * `page`). Content-driven detection only.
+ * link / type-<cpt> class). The "Social media" band (.socials-static) is not
+ * index-driven: social-cards turns it into a heading + Cards (social) section of
+ * the three follow-profile links (SKODA-217). Metadata template=page (nav/direct
+ * only; body class carries `page`). Content-driven detection only.
  */
 
 import promoBoxParser from './parsers/promo-box.js';
 import homeRailParser from './parsers/home-rail.js';
+import socialCardsParser from './parsers/social-cards.js';
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
@@ -26,7 +28,7 @@ const parsers = {
 const PAGE_TEMPLATE = {
   name: 'home-sto',
   description:
-    'Škoda Storyboard home (template-homepage). Curated promo-box cards + index-driven Story Rails (home-rail). Social strip unwrapped (not index-driven). Metadata template=page. Content-driven detection only.',
+    'Škoda Storyboard home (template-homepage). Curated promo-box cards + index-driven Story Rails (home-rail) + the Social media band as Cards (social) (social-cards). Metadata template=page. Content-driven detection only.',
   urls: ['https://www.skoda-storyboard.com/en/'],
   metadata: { template: 'page' },
   blocks: [
@@ -74,6 +76,17 @@ export default {
   transform: (payload) => {
     const { document, url, params } = payload;
     const main = document.body;
+
+    // Social media band (SKODA-217) → heading + Cards (social) in its own section.
+    // Runs BEFORE the transformers: the shared page cleanup strips .socials-static
+    // on every template, so it must be converted first (home importer only).
+    document.querySelectorAll('.socials-static').forEach((el) => {
+      try {
+        socialCardsParser(el, { document, url, params });
+      } catch (e) {
+        console.error('Failed to parse social-cards (.socials-static):', e);
+      }
+    });
 
     executeTransformers('beforeTransform', main, payload);
 

@@ -19,3 +19,30 @@
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 257px), 1fr));
   gap: var(--spacing-l);
 }
+
+/* ---- social variant (SKODA-217): homepage follow-profile tiles ----------
+   Layer 1: a centred grid capped at the source's card area (700px of 220px
+   cards). Layer 2: the source goes straight from one column to three (no
+   two-column state) at a 640px viewport; as a container query on the block's
+   own width that is 592px (640 less the 24px section padding either side), so
+   the switch lands on the same viewport and follows the block into any column. */
+.cards.social {
+  container: social-cards / inline-size;
+}
+
+.cards.social ul {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--social-card-gap);
+  max-width: var(--social-card-grid-max);
+  margin-inline: auto;
+}
+
+.cards.social li {
+  margin: 0;
+}
+
+@container social-cards (width >= 592px) {
+  .cards.social ul {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

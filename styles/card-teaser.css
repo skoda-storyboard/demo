@@ -247,3 +247,57 @@ body.homepage .card-teaser-button.media-cart-action {
     transition: none;
   }
 }
+
+/* ---- social variant (SKODA-217): homepage follow-profile tile ----------------
+   Measured on the live /en/ .socials-static: a 1 / 0.8 tile (the card box keeps
+   the shared radius + shadow), 60% black under the dual scrim, one link filling
+   it with a 76px white icon and a 16/19.2 light handle, 20px apart, centred
+   between 32px top / 8px bottom padding. No dark background is set on the
+   block itself; the band is the section's (SKODA-218). */
+.card-teaser.social {
+  aspect-ratio: 1 / 0.8;
+  background-color: var(--social-card-tile);
+  background-image: var(--scrim-h), var(--scrim-v);
+}
+
+.card-teaser-social-link {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--social-card-gap);
+  padding: var(--social-card-padding);
+  border-radius: var(--card-radius);
+  color: var(--skoda-white);
+  text-decoration: none;
+}
+
+.card-teaser-social-icon {
+  flex: none;
+  width: var(--social-card-icon-size);
+  height: var(--social-card-icon-size);
+  fill: currentcolor;
+}
+
+.card-teaser-social-handle {
+  max-width: 100%;
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-light);
+  line-height: 1.2;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* the source shows no focus ring; keep ONE visible one on the link (keyboard
+   only), inset so the tile's rounded clip doesn't cut it, white to read on the
+   dark tile. The shared card-level focus-within ring is dropped here: it would
+   double up and, in ink, all but vanish on the dark band */
+.card-teaser.social:focus-within {
+  outline: none;
+}
+
+.card-teaser-social-link:focus-visible {
+  outline: 2px solid var(--skoda-white);
+  outline-offset: calc(-1 * var(--spacing-xs));
+}

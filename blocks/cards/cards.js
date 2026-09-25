@@ -5,6 +5,8 @@
  * `Cards (media)` / `Cards (overlay)` / `Cards (toolbar)` in DA (EDS maps the parenthetical
  * to modifier classes: `Cards (overlay)` -> `.cards.overlay`). A single card may combine
  * variants, e.g. `Cards (overlay, toolbar)` -> `.cards.overlay.toolbar`.
+ * `Cards (social)` (SKODA-217) is a separate, link-only shape — the homepage
+ * follow-profile tiles — decorated by ./cards-social.js.
  *
  * The card structure, content-sniffing, and visual all live in the shared primitive
  * (scripts/card-teaser.js + styles/card-teaser.css, SKODA-201), reused by every card
@@ -14,7 +16,15 @@
 
 import { decorateCardCells, optimizeImages, wireCardLink } from '../../scripts/card-teaser.js';
 
-export default function decorate(block) {
+export default async function decorate(block) {
+  // `Cards (social)` (SKODA-217): link-only follow-profile tiles, a different
+  // authored shape from teaser cards — loaded on demand (icon data)
+  if (block.classList.contains('social')) {
+    const { default: decorateSocialCards } = await import('./cards-social.js');
+    decorateSocialCards(block);
+    return;
+  }
+
   const ul = document.createElement('ul');
   [...block.children].forEach((row) => {
     const li = document.createElement('li');

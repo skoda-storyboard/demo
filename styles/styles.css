@@ -144,6 +144,15 @@
   --app-badge-w: 135px;
   --app-badge-h: 40px;
 
+  /* homepage social profile cards (SKODA-217; measured on the live /en/
+     .socials-static): 76px icon, 20px icon → handle and card gaps, content
+     padding 32/16/8. The live grid is 720px of 240px slots with 10px insets,
+     i.e. 700px of 220px cards, so the card grid caps at 700px. */
+  --social-card-icon-size: 76px;
+  --social-card-gap: 20px;
+  --social-card-padding: 32px 16px 8px;
+  --social-card-grid-max: 700px;
+
   /* footer shell rhythm (SKODA-305, shared by the Storyboard + Media Room footers). Source:
      .footer-widgets > * margin-bottom 3em, hr margin-bottom 3rem, .container padding 10px with a
      -10px widget row and 15px widget padding, .copyright-text margin-bottom 2em (of 16px),
@@ -601,6 +610,20 @@ main > .section:first-of-type {
   main > .section > div {
     padding: 0 var(--spacing-xl);
   }
+}
+
+/* homepage "Social media" heading (SKODA-217; live .socials-static h3): the
+   default-content heading of the section that holds the social profile cards
+   (Cards (social)), centred at the section-heading size with the source's 20px
+   gap to the cards. Colour follows the section (the global heading colour is
+   the fixed text colour), so the SKODA-218 dark band turns it white. */
+main > .section.cards-container:has(.cards.social) > .default-content-wrapper :is(h2, h3) {
+  margin: 0 0 var(--social-card-gap);
+  color: inherit;
+  font-size: var(--heading-font-size-l);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-heading);
+  text-align: center;
 }
 
 /* section metadata */
