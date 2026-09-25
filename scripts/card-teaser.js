@@ -48,7 +48,8 @@ export function isToolbarCell(cell) {
 
 /**
  * Optimize authored images without replacing their <img> node, preserving DA
- * Layout-mode editability. Existing EDS <source> elements are retained.
+ * Layout-mode editability. Replace EDS's default 2000px sources with card-sized
+ * ones as well as optimizing images that have no <source> elements yet.
  */
 export function optimizeImages(scope, { eager = false, desktopWidth = '750', mobileWidth = '500' } = {}) {
   scope.querySelectorAll('.card-teaser-image img').forEach((img) => {
@@ -60,11 +61,11 @@ export function optimizeImages(scope, { eager = false, desktopWidth = '750', mob
     }
     const p = picture.parentElement;
     if (p?.tagName === 'P' && p.children.length === 1) p.replaceWith(picture);
-    const src = img.getAttribute('src') || '';
-    if (!picture.querySelector('source') && src && /^https?:/.test(img.src)) {
+    if (/^https?:/.test(img.src)) {
       const optimized = createOptimizedPicture(img.src, img.alt, eager, [
         { media: '(min-width: 768px)', width: desktopWidth }, { width: mobileWidth },
       ]);
+      picture.querySelectorAll(':scope > source').forEach((source) => source.remove());
       optimized.querySelectorAll('source').forEach((source) => picture.insertBefore(source, img));
       img.src = optimized.querySelector('img').src;
     }

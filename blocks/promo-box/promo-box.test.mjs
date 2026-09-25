@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 globalThis.window = {
-  location: { href: 'https://example.com/en/', pathname: '/en/', search: '' },
+  location: { href: 'https://example.com/en/', hostname: 'example.com', pathname: '/en/', search: '' },
   origin: 'https://example.com',
   hlx: { codeBasePath: '' },
 };
@@ -10,6 +10,7 @@ globalThis.window = {
 const {
   default: decorate, parseSource, selectPromoRows, validateCuratedRows, enablePromoRotation,
 } = await import('./promo-box.js');
+const { optimizeImages } = await import('../../scripts/card-teaser.js');
 
 function configBlock(settings) {
   return {
@@ -35,6 +36,7 @@ test('index mode parses facet lists and defaults to three items', () => {
   assert.equal(config.limit, 3);
   assert.deepEqual(config.category, ['emobility', 'skoda-world']);
   assert.deepEqual(config.tags, ['elroq', 'enyaq']);
+  assert.equal(parseSource(configBlock({ sort: 'Newest' })).config.sort, 'newest');
 });
 
 test('mixed modes, duplicate settings and invalid values are explicit errors', () => {
@@ -75,9 +77,11 @@ test('index selection scopes, OR-filters facets, sorts and limits without mutati
   assert.equal(rows[0].title, 'B');
 });
 
-test('a malformed curated block shows a visible error and preserves authored rows', async () => {
+test('a malformed curated block shows an error only in preview and preserves authored rows', async () => {
   const oldDocument = globalThis.document;
   const oldError = console.error;
+  const oldFetch = globalThis.fetch;
+  const oldLocation = globalThis.window.location;
   const logged = [];
   const rows = [{ children: [] }, { children: [] }];
   const block = {
@@ -89,23 +93,28 @@ test('a malformed curated block shows a visible error and preserves authored row
       setAttribute(name, value) { this[name] = value; },
     }),
   };
+  globalThis.window.location = { ...oldLocation, hostname: 'branch--repo.aem.page' };
+  globalThis.fetch = async () => ({ ok: true, json: async () => ({ data: [] }) });
   console.error = (...args) => logged.push(args);
   try {
     await decorate(block);
     assert.match(block.status.textContent, /exactly three authored cards/);
-    assert.equal(block.status.role, 'alert');
+    assert.equal(block.status.role, undefined);
     assert.deepEqual(block.children, rows);
     assert.equal(logged.length, 1);
   } finally {
     globalThis.document = oldDocument;
     console.error = oldError;
+    globalThis.fetch = oldFetch;
+    globalThis.window.location = oldLocation;
   }
 });
 
-test('an index fetch failure reports an error without losing config rows', async () => {
+test('an index fetch failure reports an error in preview without losing config rows', async () => {
   const oldDocument = globalThis.document;
   const oldFetch = globalThis.fetch;
   const oldError = console.error;
+  const oldLocation = globalThis.window.location;
   const block = configBlock({ template: 'story' });
   block.prepend = (status) => { block.status = status; };
   globalThis.document = {
@@ -113,7 +122,11 @@ test('an index fetch failure reports an error without losing config rows', async
       setAttribute(name, value) { this[name] = value; },
     }),
   };
-  globalThis.fetch = async () => { throw new Error('Index failed'); };
+  globalThis.window.location = { ...oldLocation, hostname: 'branch--repo.aem.page' };
+  globalThis.fetch = async (url) => {
+    if (String(url).includes('placeholders.json')) return { ok: true, json: async () => ({ data: [] }) };
+    throw new Error('Index failed');
+  };
   console.error = () => {};
   try {
     await decorate(block);
@@ -123,6 +136,98 @@ test('an index fetch failure reports an error without losing config rows', async
     globalThis.document = oldDocument;
     globalThis.fetch = oldFetch;
     console.error = oldError;
+    globalThis.window.location = oldLocation;
+  }
+});
+
+test('published errors hide raw config and log diagnostics without exposing technical messages', async () => {
+  const oldError = console.error;
+  const oldFetch = globalThis.fetch;
+  const oldLocation = globalThis.window.location;
+  const block = configBlock({ limit: 'bad' });
+  block.replaceChildren = () => { block.children = []; };
+  const errors = [];
+  console.error = (...args) => errors.push(args);
+  globalThis.window.location = { ...oldLocation, hostname: 'branch--repo.aem.live' };
+  globalThis.fetch = async () => ({ ok: true, json: async () => ({ data: [] }) });
+  try {
+    await decorate(block);
+    assert.equal(block.hidden, true);
+    assert.deepEqual(block.children, []);
+    assert.equal(errors.length, 1);
+  } finally {
+    console.error = oldError;
+    globalThis.fetch = oldFetch;
+    globalThis.window.location = oldLocation;
+  }
+});
+
+test('authored DA image keeps its img while replacing default 2000px sources', () => {
+  const oldDocument = globalThis.document;
+  function node(tag) {
+    const el = {
+      tagName: tag.toUpperCase(), children: [], attributes: {}, parentElement: null,
+      setAttribute(key, value) { this.attributes[key] = String(value); },
+      getAttribute(key) { return this.attributes[key] ?? null; },
+      appendChild(child) { this.insertBefore(child, null); },
+      insertBefore(child, before) {
+        if (child.parentElement) child.remove();
+        const index = before ? this.children.indexOf(before) : this.children.length;
+        this.children.splice(index, 0, child);
+        child.parentElement = this;
+      },
+      remove() {
+        if (this.parentElement) {
+          this.parentElement.children.splice(this.parentElement.children.indexOf(this), 1);
+          this.parentElement = null;
+        }
+      },
+      closest(selector) {
+        let current = this.parentElement;
+        while (current && current.tagName !== selector.toUpperCase()) current = current.parentElement;
+        return current;
+      },
+      querySelectorAll(selector) {
+        if (selector === ':scope > source') return this.children.filter((child) => child.tagName === 'SOURCE');
+        if (selector === 'source') return this.children.filter((child) => child.tagName === 'SOURCE');
+        return [];
+      },
+      querySelector(selector) { return this.children.find((child) => child.tagName === selector.toUpperCase()); },
+    };
+    Object.defineProperty(el, 'src', {
+      get() { return new URL(this.getAttribute('src'), globalThis.window.location.href).href; },
+      set(value) { this.setAttribute('src', value); },
+    });
+    return el;
+  }
+  const picture = node('picture');
+  const source = node('source');
+  source.setAttribute('srcset', 'https://example.com/image.jpg?width=2000');
+  const img = node('img');
+  img.src = 'https://example.com/image.jpg?width=2000';
+  img.alt = 'Story image';
+  picture.appendChild(source);
+  picture.appendChild(img);
+  const scope = { querySelectorAll: () => [img] };
+  globalThis.document = { createElement: node };
+  try {
+    optimizeImages(scope);
+    assert.equal(picture.children.at(-1), img);
+    assert.equal(img.getAttribute('src').includes('width=500'), true);
+    assert.equal(picture.querySelectorAll('source').length, 3);
+    assert.deepEqual(
+      picture.querySelectorAll('source').map((el) => new URL(el.getAttribute('srcset')).searchParams.get('width')),
+      ['750', '500', '750'],
+    );
+    assert.equal(img.getAttribute('loading'), 'lazy');
+    optimizeImages(scope, { eager: true, desktopWidth: '1200', mobileWidth: '750' });
+    assert.equal(picture.children.at(-1), img);
+    assert.equal(picture.querySelectorAll('source').length, 3, 're-optimization does not accumulate sources');
+    assert.equal(picture.querySelectorAll('source')[0].getAttribute('srcset').includes('width=1200'), true);
+    assert.equal(img.getAttribute('src').includes('width=750'), true);
+    assert.equal(img.getAttribute('fetchpriority'), 'high');
+  } finally {
+    globalThis.document = oldDocument;
   }
 });
 
@@ -140,23 +245,31 @@ test('desktop mosaic cycles card nodes; pauses and mobile mode retain their beha
       attributes: new Map(),
       scrollLeft: 0,
       get firstElementChild() { return this.children[0]; },
-      append(child) {
-        if (child.parentElement) {
-          const siblings = child.parentElement.children;
-          siblings.splice(siblings.indexOf(child), 1);
-        }
-        this.children.push(child);
-        child.parentElement = this;
+      append(...children) {
+        children.forEach((child) => {
+          if (child.parentElement) {
+            const siblings = child.parentElement.children;
+            siblings.splice(siblings.indexOf(child), 1);
+          }
+          this.children.push(child);
+          child.parentElement = this;
+        });
       },
       contains(child) { return this === child || this.children.some((el) => el.contains(child)); },
       setAttribute(name, value) { this.attributes.set(name, value); },
       removeAttribute(name) { this.attributes.delete(name); },
       hasAttribute(name) { return this.attributes.has(name); },
+      querySelector(selector) {
+        if (selector === '.promo-box-pause') {
+          return this.children.find((child) => child.className === 'promo-box-pause') || null;
+        }
+        return null;
+      },
       addEventListener(name, listener) {
         if (!listeners.has(name)) listeners.set(name, []);
         listeners.get(name).push(listener);
       },
-      dispatch(name) { (listeners.get(name) || []).forEach((listener) => listener()); },
+      dispatch(name, event = {}) { (listeners.get(name) || []).forEach((listener) => listener(event)); },
       getBoundingClientRect() { return { left: 0, right: 500 }; },
       scrollTo({ left }) { this.scrollLeft = left; },
     };
@@ -193,25 +306,38 @@ test('desktop mosaic cycles card nodes; pauses and mobile mode retain their beha
   try {
     enablePromoRotation(block, track);
     assert.equal([...intervals.values()][0].delay, 10000);
+    const pause = block.children[1].children[1];
+    assert.equal(pause.textContent, 'Pause rotation');
+    pause.dispatch('click');
+    assert.equal(pause.textContent, 'Resume rotation');
+    assert.equal(intervals.size, 0);
+    globalThis.document.activeElement = pause;
+    pause.dispatch('click');
+    assert.equal(intervals.size, 1, 'explicit resume works even while the button retains focus');
+    globalThis.document.activeElement = null;
     [...intervals.values()][0].callback();
     assert.deepEqual(track.children.map((card) => cards.indexOf(card)), [1, 2, 0]);
 
-    block.dispatch('mouseenter');
+    block.dispatch('pointerenter', { pointerType: 'touch' });
+    assert.equal(intervals.size, 1, 'touch compatibility hover does not stop rotation');
+    block.dispatch('pointerenter', { pointerType: 'mouse' });
     assert.equal(intervals.size, 0);
-    block.dispatch('mouseleave');
+    block.dispatch('pointerleave', { pointerType: 'mouse' });
     assert.equal(intervals.size, 1);
     reduced.matches = true;
     reduced.change();
     assert.equal(intervals.size, 0);
+    assert.equal(pause.hidden, true);
     reduced.matches = false;
     reduced.change();
+    assert.equal(pause.hidden, false);
 
     desktop.matches = true;
     desktop.change();
     assert.equal(block.attributes.get('aria-roledescription'), 'carousel');
     [...intervals.values()][0].callback();
     assert.equal(track.scrollLeft, 500);
-    assert.equal(block.children[1].children[1].attributes.get('aria-current'), 'true');
+    assert.equal(block.children[1].children[0].children[1].attributes.get('aria-current'), 'true');
     assert.deepEqual(track.children.map((card) => cards.indexOf(card)), [1, 2, 0]);
 
     desktop.matches = false;

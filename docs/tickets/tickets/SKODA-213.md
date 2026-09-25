@@ -23,7 +23,7 @@ Reuse-first: wraps `card-teaser` (SKODA-201, promo variant); may source items fr
 ## Requirements / Spec
 - Responsive mode switch: **CSS mosaic ≥768** (Flickity un-booted, cards rotate between positions every 10s) / **JS 1-up carousel <768** (autoPlay 10s, pause-on-hover, no arrows).
 - First item LCP-friendly (`fetchpriority=high`) — it is the home LCP candidate; rest lazy.
-- Auto-rotation respects `prefers-reduced-motion` (no auto-advance when set); mobile carousel is swipe-operable + focus-safe.
+- Auto-rotation respects `prefers-reduced-motion` (no auto-advance when set); mobile carousel is swipe-operable + focus-safe. Both layouts offer an explicit pause/resume control.
 - CSS scoped to `.promo-box`; tokens only; fluid → intrinsic → breakpoint per `docs/guardrails/css-guidelines.md`.
 
 ## Acceptance Criteria
@@ -51,10 +51,10 @@ Measurable gates in [`carousel-rails.md`](../../ui-specs/carousel-rails.md) §3/
 | Promo box | |
 | --- | --- |
 | ![Featured story](story-1.jpg) | 24. 9. 2026 <br> ### [Featured story](/en/stories/story-1) <br> Summary |
-| ![Second story](story-2.jpg) | ### [Second story](/en/stories/story-2) |
-| ![Third story](story-3.jpg) | ### [Third story](/en/stories/story-3) |
+| ![Second story](story-2.jpg) | ### [Second story](/en/stories/story-2) <br> Summary |
+| ![Third story](story-3.jpg) | ### [Third story](/en/stories/story-3) <br> Summary |
 
-Optional index mode uses **only** key/value rows (do not combine with curated rows). `template` defaults to `story`, `index` to `/{locale}/query-index.json`, `sort` to `newest`, and `limit` to 3. `category` and `tags` accept comma-separated slugs (OR within each field; AND across fields); optional `path` scopes to a prefix. Indexed rows use the shared query-index loader and listing selection functions. Missing results, invalid settings, and index failures show an error instead of a blank promo.
+Optional index mode uses **only** key/value rows (do not combine with curated rows). `template` defaults to `story`, `index` to `/{locale}/query-index.json`, `sort` to `newest`, and `limit` to 3. `category` and `tags` accept comma-separated slugs (OR within each field; AND across fields); optional `path` scopes to a prefix. Indexed rows use the shared query-index loader and listing selection functions. Missing results, invalid settings, and index failures show an error with technical detail on local/preview hosts; published hosts hide the block and log the error without exposing raw settings or diagnostics to visitors.
 
 | Promo box | |
 | --- | --- |
@@ -82,3 +82,9 @@ DA `/en` now authors the promo as three key/value rows: `template | story`, `sor
 The DA sample document `tools/sidekick/blocks/promo-box` contains two heading-based content variants, **Curated stories** (three authored teasers with dates and internal links) and **Latest three stories** (the same indexed configuration as `/en`). The `tools/sidekick/blocks.json` Blocks sheet references this document and the pre-existing Cards example. Library registration still requires an admin to add a `library` tab in `https://da.live/config#/skoda-storyboard/demo/` with `title | path | format | ref | icon | experience` columns and a `Blocks` row pointing to `https://content.da.live/skoda-storyboard/demo/tools/sidekick/blocks.json`. Confirm that both headings appear as distinct block variants in the editor palette. The config UI requires Adobe sign-in; DA source editing alone cannot register it.
 
 Branch preview `/en` renders the three indexed cards with source dates and internal links at 1280px and 500px, without a promo error or horizontal overflow. The first indexed image is eager/high-priority and remains the browser's LCP element on fresh loads at both widths. The Peaq image from the index **still resolves to 272 × 182px** when requested at 750px; its source media needs replacement before visual QA can accept the page. Re-evaluate the visual gate with the indexed data, including possible title/summary differences from the source.
+
+## Review follow-up (2026-09-25)
+
+Every indexed card now has a summary and 1200px desktop / 750px compact image sources, since desktop rotation moves every card through the lead slot. Curated cards need an authored summary on **each** row for the same reason; all curated images use lead-size sources without replacing their editable DA `<img>` elements. The first image remains eager/high priority; others remain lazy. An explicit pause/resume control is present in both layouts, alongside automatic hover/focus and reduced-motion suspension. Promo copy reads the locale placeholders keys `Promo Featured Stories`, `Promo Featured Story Slides`, `Promo Go To Story` (use `{number}`), `Promo Pause Rotation`, `Promo Resume Rotation`, and `Promo Unavailable`; English is the fallback until translated sheet entries exist.
+
+The index loader still reads all chunks before selecting globally newest stories. Rendering only the first chunk could change the selection when the index grows or chunks are not date-ordered; revisit LCP with measured full-index data and a dedicated feed or ordering contract if needed.

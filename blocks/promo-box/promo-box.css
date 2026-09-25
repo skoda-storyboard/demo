@@ -4,10 +4,11 @@
   --promo-dot-size: 10px;
   --promo-dot-target: 44px;
   --promo-following-gap: 2rem;
+  --promo-gutter: var(--spacing-l);
 
   position: relative;
   left: 50%;
-  width: min(100vw, var(--content-max-width));
+  width: min(calc(100% + 2 * var(--promo-gutter)), var(--content-max-width));
   margin-block: var(--spacing-m) 0;
   transform: translateX(-50%);
 }
@@ -60,19 +61,29 @@
   display: none;
 }
 
+.promo-box .promo-box-controls,
 .promo-box .promo-box-dots {
   display: flex;
+  align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+}
+
+.promo-box .promo-box-dots {
   padding-block: calc(var(--spacing-xs) / 4);
+}
+
+.promo-box .promo-box-dots button,
+.promo-box .promo-box-pause {
+  min-height: var(--promo-dot-target);
+  border: 0;
+  cursor: pointer;
 }
 
 .promo-box .promo-box-dots button {
   width: var(--promo-dot-target);
-  height: var(--promo-dot-target);
-  border: 0;
   padding: 0;
   background-color: transparent;
-  cursor: pointer;
 }
 
 .promo-box .promo-box-dots button::before {
@@ -89,7 +100,19 @@
   background-color: var(--carousel-dot-active);
 }
 
-.promo-box .promo-box-dots button:focus-visible {
+.promo-box .promo-box-pause {
+  padding-inline: var(--spacing-s);
+  background-color: transparent;
+  color: var(--text-color);
+  font-size: var(--body-font-size-s);
+}
+
+.promo-box .promo-box-pause[hidden] {
+  display: none;
+}
+
+.promo-box .promo-box-dots button:focus-visible,
+.promo-box .promo-box-pause:focus-visible {
   outline: 2px solid var(--link-color);
   outline-offset: var(--spacing-xs);
 }
@@ -140,6 +163,18 @@
     font-weight: var(--weight-regular);
   }
 
+  .promo-box .promo-box-controls {
+    position: absolute;
+    z-index: 1;
+    inset-block-start: var(--spacing-xs);
+    inset-inline-end: var(--spacing-xs);
+  }
+
+  .promo-box .promo-box-pause {
+    background-color: var(--dark-color);
+    color: var(--background-color);
+  }
+
   .promo-box .promo-box-dots {
     display: none;
   }
@@ -147,5 +182,11 @@
   .promo-box .promo-box-items:has(.card-teaser:only-child) .card-teaser {
     grid-row: auto;
     aspect-ratio: 16 / 9;
+  }
+}
+
+@media (width >= 992px) {
+  .promo-box {
+    --promo-gutter: var(--spacing-xl);
   }
 }

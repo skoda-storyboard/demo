@@ -105,15 +105,26 @@ test('sortRows defaults to newest-first', () => {
   assert.deepEqual(sorted.map((r) => r.title), ['D', 'E', 'B', 'A']);
 });
 
-test('authored offset defaults to zero and accepts a non-negative integer', () => {
-  assert.equal(parseFeedConfig(configBlock({})).offset, 0);
-  assert.equal(parseFeedConfig(configBlock({})).excludeFeatured, true);
-  assert.equal(parseFeedConfig(configBlock({ offset: '3' })).offset, 3);
-  assert.equal(parseFeedConfig(configBlock({ offset: '3' })).excludeFeatured, false);
-  assert.equal(parseFeedConfig(configBlock({ offset: '3', excludefeatured: 'true' })).excludeFeatured, true);
-  ['-1', '1.5', 'not-a-number', 'Infinity'].forEach((offset) => {
-    assert.throws(() => parseFeedConfig(configBlock({ offset })), /offset must be a non-negative integer/);
-  });
+test('authored offset falls back to zero with a warning when invalid', () => {
+  const oldWarn = console.warn;
+  const warnings = [];
+  console.warn = (...args) => warnings.push(args);
+  try {
+    assert.equal(parseFeedConfig(configBlock({})).offset, 0);
+    assert.equal(parseFeedConfig(configBlock({})).excludeFeatured, true);
+    assert.equal(parseFeedConfig(configBlock({ offset: '3' })).offset, 3);
+    assert.equal(parseFeedConfig(configBlock({ offset: '3' })).excludeFeatured, false);
+    assert.equal(parseFeedConfig(configBlock({ offset: '3', excludefeatured: 'true' })).excludeFeatured, true);
+    ['-1', '1.5', 'three', 'Infinity'].forEach((offset) => {
+      const cfg = parseFeedConfig(configBlock({ offset }));
+      assert.equal(cfg.offset, 0);
+      assert.equal(cfg.excludeFeatured, true);
+    });
+    assert.equal(warnings.length, 4);
+    assert.match(warnings[0][0], /offset must be a non-negative integer/);
+  } finally {
+    console.warn = oldWarn;
+  }
 });
 
 test('feed offset skips three filtered, newest-first rows before paging', () => {

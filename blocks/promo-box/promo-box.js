@@ -5,11 +5,23 @@ import {
 import {
   decorateCardCells, optimizeImages, wireCardLink, buildCardTeaser,
 } from '../../scripts/card-teaser.js';
+import { fetchPlaceholders } from '../../scripts/placeholders.js';
 
 /* eslint-disable no-use-before-define */
 
 const CONFIG_KEYS = new Set(['index', 'template', 'path', 'category', 'tags', 'limit', 'sort']);
 const ROTATION_MS = 10000;
+
+function buildStrings(ph = {}) {
+  return {
+    featured: ph.promoFeaturedStories || 'Featured stories',
+    slides: ph.promoFeaturedStorySlides || 'Featured story slides',
+    goToStory: ph.promoGoToStory || 'Go to featured story {number}',
+    pause: ph.promoPauseRotation || 'Pause rotation',
+    resume: ph.promoResumeRotation || 'Resume rotation',
+    unavailable: ph.promoUnavailable || 'Featured stories unavailable',
+  };
+}
 
 export function parseSource(block) {
   const rows = [...block.children];
@@ -31,6 +43,7 @@ export function parseSource(block) {
   if (!Number.isSafeInteger(limit) || limit < 1 || !/^[1-9]\d*$/.test(String(config.limit ?? 3))) {
     throw new Error('Promo-box limit must be a positive whole number.');
   }
+  if (config.sort) config.sort = config.sort.toLowerCase();
   if (config.sort && !['newest', 'oldest'].includes(config.sort)) {
     throw new Error('Promo-box sort must be newest or oldest.');
   }
@@ -43,12 +56,17 @@ export function parseSource(block) {
   };
 }
 
-function showError(block, error) {
-  const status = document.createElement('p');
-  status.className = 'promo-box-error';
-  status.setAttribute('role', 'alert');
-  status.textContent = `Featured stories unavailable: ${error.message}`;
-  block.prepend(status);
+function showError(block, error, strings) {
+  const { hostname } = window.location;
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.aem.page')) {
+    const status = document.createElement('p');
+    status.className = 'promo-box-error';
+    status.textContent = `${strings.unavailable}: ${error.message}`;
+    block.prepend(status);
+  } else {
+    block.replaceChildren();
+    block.hidden = true;
+  }
   // eslint-disable-next-line no-console
   console.error('promo-box:', error);
 }
@@ -71,8 +89,9 @@ async function getCards(source) {
       decorateCardCells(li);
       ul.append(li);
     });
-    optimizeImages(ul.children[0], { eager: true, desktopWidth: '1200', mobileWidth: '750' });
-    [...ul.children].slice(1).forEach((li) => optimizeImages(li));
+    [...ul.children].forEach((li, i) => optimizeImages(li, {
+      eager: i === 0, desktopWidth: '1200', mobileWidth: '750',
+    }));
     [...ul.children].forEach((li) => wireCardLink(li));
     return ul;
   }
@@ -85,9 +104,9 @@ async function getCards(source) {
   chosen.forEach((row, i) => ul.append(buildCardTeaser(row, {
     eager: i === 0,
     overlay: true,
-    summary: i === 0,
-    desktopWidth: i === 0 ? '1200' : '750',
-    mobileWidth: i === 0 ? '750' : '500',
+    summary: true,
+    desktopWidth: '1200',
+    mobileWidth: '750',
   })));
   return ul;
 }
@@ -99,24 +118,34 @@ export function selectPromoRows(rows, config) {
   return paginate(sortRows(filtered, config.sort || 'newest'), config.limit);
 }
 
-export function enablePromoRotation(block, track) {
+export function enablePromoRotation(block, track, strings = buildStrings()) {
   const dots = document.createElement('div');
   dots.className = 'promo-box-dots';
   dots.setAttribute('role', 'group');
-  dots.setAttribute('aria-label', 'Featured story slides');
+  dots.setAttribute('aria-label', strings.slides);
   let slides = [...track.children];
+  const controls = document.createElement('div');
+  controls.className = 'promo-box-controls';
   if (slides.length > 1) {
     slides.forEach((slide, i) => {
       const dot = document.createElement('button');
       dot.type = 'button';
-      dot.setAttribute('aria-label', `Go to featured story ${i + 1}`);
+      dot.setAttribute('aria-label', strings.goToStory.replace('{number}', String(i + 1)));
       dot.addEventListener('click', () => {
         select(i, true);
-        dot.focus();
       });
       dots.append(dot);
     });
-    block.append(dots);
+    const pauseButton = document.createElement('button');
+    pauseButton.type = 'button';
+    pauseButton.className = 'promo-box-pause';
+    controls.append(dots, pauseButton);
+    block.append(controls);
+    pauseButton.addEventListener('click', () => {
+      paused = !paused;
+      updatePauseButton();
+      updateTimer();
+    });
   }
 
   const compact = window.matchMedia('(max-width: 767px)');
@@ -125,6 +154,15 @@ export function enablePromoRotation(block, track) {
   let timer;
   let hovered = false;
   let touched = false;
+  let paused = false;
+
+  function updatePauseButton() {
+    const button = controls.querySelector('.promo-box-pause');
+    if (!button) return;
+    button.textContent = paused ? strings.resume : strings.pause;
+    button.setAttribute('aria-label', button.textContent);
+    button.hidden = reduced.matches;
+  }
 
   function updateDots() {
     [...dots.children].forEach((dot, i) => {
@@ -158,8 +196,9 @@ export function enablePromoRotation(block, track) {
   function updateTimer() {
     window.clearInterval(timer);
     timer = undefined;
-    if (reduced.matches || document.hidden || hovered || touched
-      || block.contains(document.activeElement) || slides.length < 2) return;
+    const pauseFocused = document.activeElement === controls.querySelector('.promo-box-pause');
+    if (paused || reduced.matches || document.hidden || hovered || touched
+      || (block.contains(document.activeElement) && !pauseFocused) || slides.length < 2) return;
     timer = window.setInterval(() => {
       if (compact.matches) select((active + 1) % slides.length);
       else rotateMosaic();
@@ -205,39 +244,46 @@ export function enablePromoRotation(block, track) {
     ), 0);
     updateDots();
   }, { passive: true });
-  block.addEventListener('mouseenter', () => { hovered = true; updateTimer(); });
-  block.addEventListener('mouseleave', () => { hovered = false; updateTimer(); });
+  block.addEventListener('pointerenter', (event) => {
+    if (event.pointerType === 'mouse') { hovered = true; updateTimer(); }
+  });
+  block.addEventListener('pointerleave', (event) => {
+    if (event.pointerType === 'mouse') { hovered = false; updateTimer(); }
+  });
   block.addEventListener('focusin', updateTimer);
   block.addEventListener('focusout', () => window.setTimeout(updateTimer, 0));
   track.addEventListener('pointerdown', () => { touched = true; updateTimer(); });
   track.addEventListener('pointerup', () => { touched = false; updateTimer(); });
   track.addEventListener('pointercancel', () => { touched = false; updateTimer(); });
   document.addEventListener('visibilitychange', updateTimer);
-  reduced.addEventListener('change', updateTimer);
+  reduced.addEventListener('change', () => { updatePauseButton(); updateTimer(); });
   compact.addEventListener('change', () => {
     window.clearInterval(timer);
     updateMode();
   });
   updateDots();
+  updatePauseButton();
   updateMode();
 }
 
 export default async function decorate(block) {
+  const stringsPromise = fetchPlaceholders();
   let source;
   try {
     source = parseSource(block);
   } catch (error) {
-    showError(block, error);
+    showError(block, error, buildStrings(await stringsPromise));
     return;
   }
   try {
-    const track = await getCards(source);
+    const [track, placeholders] = await Promise.all([getCards(source), stringsPromise]);
+    const strings = buildStrings(placeholders);
     track.className = 'promo-box-items';
     block.replaceChildren(track);
     block.setAttribute('role', 'region');
-    block.setAttribute('aria-label', 'Featured stories');
-    enablePromoRotation(block, track);
+    block.setAttribute('aria-label', strings.featured);
+    enablePromoRotation(block, track, strings);
   } catch (error) {
-    showError(block, error);
+    showError(block, error, buildStrings(await stringsPromise));
   }
 }

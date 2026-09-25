@@ -51,9 +51,11 @@ const tokens = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boo
 
 export function parseFeedConfig(block) {
   const cfg = readBlockConfig(block);
-  const offset = cfg.offset ? Number(cfg.offset) : 0;
+  let offset = cfg.offset ? Number(cfg.offset) : 0;
   if (!Number.isSafeInteger(offset) || offset < 0) {
-    throw new Error('stories: offset must be a non-negative integer');
+    // eslint-disable-next-line no-console
+    console.warn('stories: offset must be a non-negative integer; using 0');
+    offset = 0;
   }
   return {
     index: cfg.index || defaultIndexUrl(),
