@@ -77,6 +77,13 @@
   --carousel-gap: 20px;              /* source .items margin 0 -10px + .item padding 0 10px */
   --carousel-dot: #d8d8d8;           /* page dot (dots variant only) */
   --carousel-dot-active: #686868;    /* selected page dot */
+
+  /* gallery slider (SKODA-819; measured on the live Epiq story .carousel-widget):
+     selected dot #333, idle dots the same at 25% alpha; the arrow is a 90%
+     white disc over an ink disc, with the ink arrow showing through. */
+  --slider-control: #333;
+  --slider-dot: rgb(51 51 51 / 25%);
+  --slider-arrow-disc: rgb(255 255 255 / 90%);
 }
 
 /*

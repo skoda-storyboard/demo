@@ -158,21 +158,22 @@ var CustomImportScript = (() => {
     const capSource = img.getAttribute("data-caption") && img || ((_a = item.querySelector) == null ? void 0 : _a.call(item, "[data-caption]")) || item;
     return capSource.getAttribute && capSource.getAttribute("data-caption") || ((_b = item.querySelector) == null ? void 0 : _b.call(item, "a[title]")) && item.querySelector("a[title]").getAttribute("title") || img.getAttribute("alt") || "";
   }
-  function galleryCells(panel, document2) {
+  function galleryCells(panel, document2, blockName = "Gallery") {
     const imgs = [...panel.querySelectorAll("img")];
     if (!imgs.length) return null;
-    const cells = [["Gallery"]];
+    const cells = [[blockName]];
     imgs.forEach((img) => {
       const item = img.closest(".search-results-item, .item, figure") || img;
       cells.push([img, itemCaption(img, item)]);
     });
     return cells.length > 1 ? cells : null;
   }
+  var CAROUSEL_GALLERY = "Gallery (slider)";
   function carouselCells(panel, document2) {
     const items = [...panel.querySelectorAll(".search-results-item")];
-    if (!items.length) return galleryCells(panel, document2);
+    if (!items.length) return galleryCells(panel, document2, CAROUSEL_GALLERY);
     const linked = items.filter((it) => it.querySelector("a[href]")).length;
-    if (linked < Math.ceil(items.length / 2)) return galleryCells(panel, document2);
+    if (linked < Math.ceil(items.length / 2)) return galleryCells(panel, document2, CAROUSEL_GALLERY);
     const cells = [["Cards"]];
     items.forEach((it) => {
       const img = it.querySelector("img");

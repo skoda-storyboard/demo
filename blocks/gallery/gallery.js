@@ -36,6 +36,10 @@ const LABELS = {
   addToBox: 'Add to media box',
   download: 'Download image',
   copyLink: 'Copy image link',
+  // slider variant (SKODA-819): region name fallback, per-slide + per-dot names
+  slider: 'Image slider',
+  slideOf: (n, total) => `${n} of ${total}`,
+  goTo: (n) => `Go to image ${n}`,
 };
 
 /**
@@ -72,17 +76,14 @@ const ICONS = {
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
- * Build the on-page gallery: a large MAIN image + a thumbnail list beside it
- * (like the live sb-gallery). Clicking the main image or any thumbnail opens the
- * full-screen lightbox at that index. Captions are held off-DOM and shown only
- * in the lightbox (matching the source).
+ * Read the authored rows (cell 1 = image, cell 2 = optional caption) into items.
+ * Shared by the default gallery and the slider variant. Rows without an image
+ * are skipped (decorate defensively: authors omit and add cells).
  * @param {Element} block
- * @returns {{items: Array, main: Element, mainHeading: Element}}
+ * @returns {Array<{src: string, alt: string, caption: Element|null, index: number}>}
  */
-function buildGallery(block) {
+function readItems(block) {
   const items = [];
-
-  // read authored rows into items first
   [...block.children].forEach((row, i) => {
     const cells = [...row.children];
     const img = cells[0]?.querySelector('img');
@@ -101,6 +102,20 @@ function buildGallery(block) {
       src, alt, caption, index: i,
     });
   });
+  return items;
+}
+
+/**
+ * Build the on-page gallery: a large MAIN image + a thumbnail list beside it
+ * (like the live sb-gallery). Clicking the main image or any thumbnail opens the
+ * full-screen lightbox at that index. Captions are held off-DOM and shown only
+ * in the lightbox (matching the source).
+ * @param {Element} block
+ * @returns {{items: Array, main: Element, mainHeading: Element}}
+ */
+function buildGallery(block) {
+  // read authored rows into items first
+  const items = readItems(block);
 
   if (!items.length) return { items, main: null, mainHeading: null };
 
@@ -420,10 +435,267 @@ function buildLightbox(block, items) {
   return { open };
 }
 
+/* ==========================================================================
+ * Slider variant — `Gallery (slider)` (SKODA-819)
+ *
+ * The story in-body image carousel (source: link-free `skoda-carousel-widget`,
+ * Flickity `{cellAlign:left, groupCells, pageDots, autoPlay:3000, wrapAround}`).
+ * One full-width 16:9 image per view with prev/next arrows and page dots; no
+ * thumbnail strip, no "Images" heading, no caption, no lightbox (the source
+ * slides are not links). Measured spec: docs/tickets/tickets/SKODA-819.md.
+ *
+ * Native scroll-snap track (swipe/trackpad for free) + a small controller:
+ * - wrap-around: the track is [clone of last, 1..N, clone of first], so going
+ *   past either end scrolls forward/back seamlessly; once the scroll settles on
+ *   a clone it is swapped instantly for the real slide.
+ * - autoplay every 3s (source), paused while hovered or focused, off-screen or
+ *   in a hidden tab; stopped for good once the user navigates (as Flickity does);
+ *   never started under prefers-reduced-motion.
+ * - mouse drag (native scrolling covers touch and trackpads).
+ * The SKODA-212 rail's page maths (many cards per page, partial last page, no
+ * wrap) doesn't fit a one-per-view looping slider, and blocks can't import each
+ * other (AGENTS.md), so this is a purpose-built, smaller controller.
+ * ========================================================================== */
+
+const SLIDER_AUTOPLAY_MS = 3000; // source Flickity autoPlay
+const SLIDER_SETTLE_MS = 120; // scroll idle time that counts as "settled"
+const SLIDER_DRAG_THRESHOLD = 40; // px a mouse drag must travel to change slide
+// The source's icon-font arrow (skoda-bnr-icons U+E00B, Flickity's own SVG is
+// hidden), traced into a 32×32 box: a left arrow with 45° arms, drawn in ink on
+// a light disc. The next button mirrors it in CSS.
+const SLIDER_ARROW_PATH = 'M8.55 16 16.5 8.05l1.66 1.66-4.94 4.94H23.4v2.7H13.22l4.94 4.94-1.66 1.66z';
+
+/**
+ * Map a track scroll offset to a slide. With `looped`, physical position 0 is
+ * the clone of the last slide and `count + 1` the clone of the first.
+ * @param {number} scrollLeft track scroll offset
+ * @param {number} width one slide's width (the track's client width)
+ * @param {number} count number of real slides
+ * @param {boolean} looped whether the track carries the two wrap clones
+ * @returns {{pos: number, index: number, onClone: boolean}}
+ */
+export function slidePosition(scrollLeft, width, count, looped = true) {
+  const last = looped ? count + 1 : count - 1;
+  if (!width || count < 1) return { pos: looped ? 1 : 0, index: 0, onClone: false };
+  const pos = Math.max(0, Math.min(last, Math.round(scrollLeft / width)));
+  if (!looped) return { pos, index: pos, onClone: false };
+  if (pos === 0) return { pos, index: count - 1, onClone: true };
+  if (pos === count + 1) return { pos, index: 0, onClone: true };
+  return { pos, index: pos - 1, onClone: false };
+}
+
+/**
+ * The slide a mouse drag lands on: one step per drag past the threshold,
+ * otherwise back to where it started.
+ * @param {number} start slide index when the drag began
+ * @param {number} dx horizontal drag distance (negative = towards the next slide)
+ * @returns {number}
+ */
+export function dragTarget(start, dx) {
+  if (dx <= -SLIDER_DRAG_THRESHOLD) return start + 1;
+  if (dx >= SLIDER_DRAG_THRESHOLD) return start - 1;
+  return start;
+}
+
+function sliderArrow(dir) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = `gallery-slider-${dir}`;
+  btn.setAttribute('aria-label', dir === 'prev' ? LABELS.prev : LABELS.next);
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 32 32');
+  svg.setAttribute('aria-hidden', 'true');
+  // ink under-disc (source ::before, scaled 0.95) → translucent white disc → ink arrow
+  [['gallery-slider-arrow-under', 15.2], ['gallery-slider-arrow-disc', 16]].forEach(([cls, r]) => {
+    const circle = document.createElementNS(NS, 'circle');
+    circle.setAttribute('class', cls);
+    circle.setAttribute('cx', '16');
+    circle.setAttribute('cy', '16');
+    circle.setAttribute('r', String(r));
+    svg.append(circle);
+  });
+  const path = document.createElementNS(NS, 'path');
+  path.setAttribute('d', SLIDER_ARROW_PATH);
+  svg.append(path);
+  btn.append(svg);
+  return btn;
+}
+
+function buildSlider(block) {
+  const items = readItems(block);
+  block.textContent = '';
+  if (!items.length) return;
+
+  const count = items.length;
+  const looped = count > 1;
+  block.setAttribute('role', 'region');
+  block.setAttribute('aria-roledescription', 'carousel');
+  block.setAttribute('aria-label', items[0].alt || LABELS.slider);
+
+  const viewport = document.createElement('div');
+  viewport.className = 'gallery-slider-viewport';
+  const track = document.createElement('ul');
+  track.className = 'gallery-slider-track';
+  track.tabIndex = 0; // keyboard-scrollable (← / →)
+  track.setAttribute('aria-label', block.getAttribute('aria-label'));
+
+  const slides = items.map((item, i) => {
+    const li = document.createElement('li');
+    li.className = 'gallery-slide';
+    li.setAttribute('role', 'group');
+    li.setAttribute('aria-roledescription', 'slide');
+    li.setAttribute('aria-label', LABELS.slideOf(i + 1, count));
+    const pic = createOptimizedPicture(item.src, item.alt, false, [
+      { media: '(min-width: 768px)', width: '1600' },
+      { width: '1000' },
+    ]);
+    pic.querySelector('img').draggable = false;
+    li.append(pic);
+    return li;
+  });
+  track.append(...slides);
+
+  if (looped) {
+    const clone = (li) => {
+      const c = li.cloneNode(true);
+      c.classList.add('is-clone');
+      c.removeAttribute('role');
+      c.removeAttribute('aria-roledescription');
+      c.removeAttribute('aria-label');
+      c.setAttribute('aria-hidden', 'true');
+      c.inert = true;
+      return c;
+    };
+    track.prepend(clone(slides[count - 1]));
+    track.append(clone(slides[0]));
+  }
+
+  viewport.append(track);
+  block.append(viewport);
+  if (!looped) return; // a single image: no controls, no autoplay
+
+  const prev = sliderArrow('prev');
+  const next = sliderArrow('next');
+  viewport.append(prev, next);
+
+  const dotsNav = document.createElement('div');
+  dotsNav.className = 'gallery-slider-dots';
+  const dots = items.map((_, i) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'gallery-slider-dot';
+    dot.setAttribute('aria-label', LABELS.goTo(i + 1));
+    dotsNav.append(dot);
+    return dot;
+  });
+  block.append(dotsNav);
+
+  let current = 0;
+  const setCurrent = (i) => {
+    current = i;
+    dots.forEach((d, j) => d.toggleAttribute('aria-current', j === i));
+  };
+  setCurrent(0);
+
+  const slideWidth = () => track.clientWidth;
+  const jumpTo = (index) => track.scrollTo({ left: (index + 1) * slideWidth(), behavior: 'auto' });
+  // index may be -1 or `count`: those land on a clone and are swapped on settle
+  const goTo = (index) => {
+    const target = Math.max(-1, Math.min(count, index));
+    track.scrollTo({ left: (target + 1) * slideWidth(), behavior: REDUCED_MOTION ? 'auto' : 'smooth' });
+  };
+
+  // ---- autoplay -----------------------------------------------------------
+  let timer = 0;
+  let stopped = REDUCED_MOTION;
+  const paused = {
+    hover: false, focus: false, hidden: document.hidden, offscreen: true,
+  };
+  const schedule = () => {
+    window.clearTimeout(timer);
+    if (stopped || Object.values(paused).some(Boolean)) return;
+    timer = window.setTimeout(() => { goTo(current + 1); schedule(); }, SLIDER_AUTOPLAY_MS);
+  };
+  const setPaused = (key, value) => { paused[key] = value; schedule(); };
+  const stop = () => { stopped = true; window.clearTimeout(timer); };
+
+  block.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') setPaused('hover', true); });
+  block.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') setPaused('hover', false); });
+  block.addEventListener('focusin', () => setPaused('focus', true));
+  block.addEventListener('focusout', (e) => { if (!block.contains(e.relatedTarget)) setPaused('focus', false); });
+  document.addEventListener('visibilitychange', () => setPaused('hidden', document.hidden));
+  new IntersectionObserver(([entry]) => setPaused('offscreen', !entry.isIntersecting), { threshold: 0.5 })
+    .observe(viewport);
+
+  // ---- scroll tracking + wrap swap ---------------------------------------
+  let dragging = null;
+  let raf = 0;
+  let settleTimer = 0;
+  track.addEventListener('scroll', () => {
+    if (!raf) {
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        setCurrent(slidePosition(track.scrollLeft, slideWidth(), count).index);
+      });
+    }
+    window.clearTimeout(settleTimer);
+    settleTimer = window.setTimeout(() => {
+      if (dragging) return;
+      const at = slidePosition(track.scrollLeft, slideWidth(), count);
+      if (at.onClone) jumpTo(at.index);
+    }, SLIDER_SETTLE_MS);
+  }, { passive: true });
+
+  // keep the current slide aligned when the column width changes
+  new ResizeObserver(() => jumpTo(current)).observe(track);
+
+  // ---- user navigation (any of it stops autoplay, as on the source) -------
+  prev.addEventListener('click', () => { stop(); goTo(current - 1); });
+  next.addEventListener('click', () => { stop(); goTo(current + 1); });
+  dots.forEach((dot, i) => dot.addEventListener('click', () => { stop(); goTo(i); }));
+  track.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    stop();
+    goTo(current + (e.key === 'ArrowRight' ? 1 : -1));
+  });
+
+  track.addEventListener('pointerdown', (e) => {
+    stop();
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    dragging = {
+      x: e.clientX, lastX: e.clientX, left: track.scrollLeft, start: current,
+    };
+    track.setPointerCapture(e.pointerId);
+    track.classList.add('is-dragging');
+  });
+  track.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    dragging.lastX = e.clientX;
+    track.scrollLeft = dragging.left - (e.clientX - dragging.x);
+  });
+  // use the last move position: a cancelled pointer can report clientX 0
+  const endDrag = () => {
+    if (!dragging) return;
+    const target = dragTarget(dragging.start, dragging.lastX - dragging.x);
+    dragging = null;
+    track.classList.remove('is-dragging');
+    goTo(target);
+  };
+  track.addEventListener('pointerup', endDrag);
+  track.addEventListener('pointercancel', endDrag);
+}
+
 /**
  * @param {Element} block the gallery block element
  */
 export default function decorate(block) {
+  if (block.classList.contains('slider')) {
+    buildSlider(block);
+    return;
+  }
+
   const { items, main, mainHeading } = buildGallery(block);
   if (!items.length) return;
 

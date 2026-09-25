@@ -144,8 +144,8 @@ test('skoda-offset spacer is dropped', { skip: domSkip }, () => {
   assert.equal(content.textContent.trim(), '', 'offset produced no output');
 });
 
-// ---- carousel routed BY CONTENT: link-free images → Gallery -----------------
-test('link-free skoda-carousel-widget → Gallery block, one row per image + caption', { skip: domSkip }, () => {
+// ---- carousel routed BY CONTENT: link-free images → Gallery (slider) --------
+test('link-free skoda-carousel-widget → Gallery (slider) block, one row per image + caption', { skip: domSkip }, () => {
   const d = domDoc(`
     <div class="entry-content"><div class="panel-layout">
       <div class="panel-grid"><div class="panel-grid-cell">
@@ -159,13 +159,31 @@ test('link-free skoda-carousel-widget → Gallery block, one row per image + cap
     </div></div>`);
   const content = d.querySelector('.entry-content');
   parse(content, { document: d });
-  const table = content.querySelector('table[data-block="Gallery"]');
-  assert.ok(table, 'Gallery block emitted for a link-free image carousel');
+  // SKODA-819: rendered like the source — one image per view, not the lead+thumbnails gallery
+  const table = content.querySelector('table[data-block="Gallery (slider)"]');
+  assert.ok(table, 'Gallery (slider) block emitted for a link-free image carousel');
+  assert.equal(content.querySelector('table[data-block="Gallery"]'), null, 'not the default Gallery variant');
   assert.equal(content.querySelector('table[data-block="Cards"]'), null, 'no Cards block for an image carousel');
   assert.equal(table.querySelectorAll('tr').length, 2, 'two image rows');
   assert.ok(table.querySelector('img[src="a.jpg"]'));
   assert.match(table.textContent, /Cap A/, 'data-caption carried');
   assert.match(table.textContent, /Alt B/, 'alt fallback used when no data-caption');
+});
+
+// ---- sow-slider keeps the default Gallery (SKODA-819 scope: only the carousel) --
+test('sow-slider → default Gallery block (not the slider variant)', { skip: domSkip }, () => {
+  const d = domDoc(`
+    <div class="entry-content"><div class="panel-layout">
+      <div class="panel-grid"><div class="panel-grid-cell">
+        <div class="so-panel widget widget_sow-slider">
+          <div class="so-widget-sow-slider"><img src="s1.jpg" alt="S1"><img src="s2.jpg" alt="S2"></div>
+        </div>
+      </div></div>
+    </div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  assert.ok(content.querySelector('table[data-block="Gallery"]'), 'sow-slider → default Gallery');
+  assert.equal(content.querySelector('table[data-block="Gallery (slider)"]'), null, 'slider variant is only for the carousel widget');
 });
 
 // ---- carousel routed BY CONTENT: linked items → Cards (related teasers) ------
