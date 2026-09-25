@@ -346,7 +346,7 @@ header nav .nav-search-field {
 }
 
 header nav .nav-search.nav-search-open .nav-search-field {
-  width: clamp(200px, 32vw, 340px);
+  width: clamp(200px, 32vw, 430px);
   background: var(--dropdown-hover-bg);
 }
 
@@ -406,18 +406,19 @@ header nav .nav-search-input::placeholder {
 }
 
 /* live suggestion dropdown (SKODA-403; shared /scripts/search-suggest.js).
-   Matches the source: white panel, dropdown shadow, title + "date | section"
-   meta rows, no image. */
+   Matches the source: white panel (4px radius), dropdown shadow, each row a
+   leading search glyph + stacked title + "date | section" meta, no image. */
 header nav .nav-search .search-suggest {
   position: absolute;
-  top: calc(100% + var(--spacing-xs));
+  top: calc(100% + var(--spacing-l)); /* 24px */
   right: 0;
   z-index: 20;
-  width: max(280px, 100%);
+  width: max(595px, 100%);
   max-height: 60vh;
   margin: 0;
-  padding: var(--spacing-xs) 0;
+  padding: 0;
   overflow-y: auto;
+  border-radius: var(--facet-radius); /* 4px — source dropdown radius */
   background: var(--skoda-white);
   box-shadow: var(--dropdown-shadow);
   list-style: none;
@@ -431,29 +432,75 @@ header nav .nav-search .search-suggest-item {
   margin: 0;
 }
 
+/* row: plain `8px 16px` padding. Only the highlighted row (the first row by
+   default, or the ↑/↓ row) shows the search glyph and indents to 40px —
+   matching the source, where the glyph marks the current suggestion. */
 header nav .nav-search .search-suggest-link {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
   padding: var(--spacing-xs) var(--spacing-m);
   color: var(--skoda-ink);
   text-decoration: none;
+  cursor: pointer;
 }
 
+header nav .nav-search .search-suggest-icon {
+  position: absolute;
+  top: 50%;
+  left: var(--spacing-s);
+  display: none;
+  color: var(--skoda-ink);
+  transform: translateY(-50%);
+}
+
+header nav .nav-search .search-suggest-icon svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+header nav .nav-search .search-suggest-text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: row;
+  gap: 2px;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* mouse-over (source: #f1f1f1) */
 header nav .nav-search .search-suggest-link:hover,
-header nav .nav-search .search-suggest-link.is-active {
+header nav .nav-search .search-suggest-link:focus-visible {
   background: var(--dropdown-hover-bg);
+}
+
+/* highlighted row (source: #e4e4e4 + search glyph + 40px indent): the first
+   row by default, or the row chosen with ↑/↓ */
+header nav .nav-search .search-suggest:not(:has(.is-active)) .search-suggest-item:first-child .search-suggest-link,
+header nav .nav-search .search-suggest-link.is-active {
+  padding-left: 40px;
+  background: var(--divider-color);
+}
+
+header nav .nav-search .search-suggest:not(:has(.is-active)) .search-suggest-item:first-child .search-suggest-icon,
+header nav .nav-search .search-suggest-link.is-active .search-suggest-icon {
+  display: block;
 }
 
 header nav .nav-search .search-suggest-title {
   font-size: var(--body-font-size-m);
+  font-weight: 400;
   line-height: 1.2;
 }
 
 header nav .nav-search .search-suggest-meta {
-  color: var(--skoda-grey-500);
+  color: var(--skoda-ink);
   font-size: 11px;
+  font-weight: 600;
   line-height: 1.2;
+  opacity: 0.5;
 }
 
 /* ==========================================================================
@@ -603,6 +650,8 @@ header nav .nav-search .search-suggest-meta {
 
   header nav[aria-expanded='true'] .nav-search {
     position: static;
+    flex-direction: column;
+    align-items: flex-start;
     width: 100%;
     justify-content: flex-start;
   }
@@ -619,6 +668,29 @@ header nav .nav-search .search-suggest-meta {
   header nav[aria-expanded='true'] .nav-search-input {
     width: auto;
     opacity: 1;
+  }
+
+  /* drawer: keep the pill at 80% (the desktop open-width clamp would pin it
+     to 200px here) */
+  header nav[aria-expanded='true'] .nav-search.nav-search-open .nav-search-field {
+    width: 80%;
+  }
+
+  /* drawer: suggestions flow under the pill at the same 80% width instead of
+     a 595px absolute overlay (.nav-search is static in the drawer, so an
+     absolute list would anchor far down the page and overflow the screen) */
+  header nav[aria-expanded='true'] .nav-search .search-suggest {
+    position: static;
+    width: 80%;
+    max-height: none;
+    margin-top: var(--spacing-xs);
+  }
+
+  /* narrow rows: title above meta rather than side by side */
+  header nav[aria-expanded='true'] .nav-search .search-suggest-text {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
   }
 }
 

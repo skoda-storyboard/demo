@@ -45,6 +45,33 @@ function metaLine(row) {
 }
 
 /**
+ * Leading search-magnifier icon for a suggestion row (Trusted-Types safe:
+ * createElementNS, no innerHTML). Matches the source's per-row search glyph.
+ * @returns {SVGElement}
+ */
+function searchIcon() {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('aria-hidden', 'true');
+  const circle = document.createElementNS(NS, 'circle');
+  circle.setAttribute('cx', '11');
+  circle.setAttribute('cy', '11');
+  circle.setAttribute('r', '7');
+  const line = document.createElementNS(NS, 'line');
+  line.setAttribute('x1', '16.5');
+  line.setAttribute('y1', '16.5');
+  line.setAttribute('x2', '21');
+  line.setAttribute('y2', '21');
+  line.setAttribute('stroke-linecap', 'round');
+  svg.append(circle, line);
+  return svg;
+}
+
+/**
  * Attach a live suggestion dropdown to a search input.
  * @param {HTMLInputElement} input the search field
  * @param {object} [opts]
@@ -107,17 +134,29 @@ export default function attachSuggest(input, opts = {}) {
       const a = document.createElement('a');
       a.className = 'search-suggest-link';
       a.href = row.path;
+
+      // leading search glyph (matches the source per-row icon)
+      const icon = document.createElement('span');
+      icon.className = 'search-suggest-icon';
+      icon.append(searchIcon());
+      a.append(icon);
+
+      // stacked title + "date | section" meta
+      const text = document.createElement('span');
+      text.className = 'search-suggest-text';
       const title = document.createElement('span');
       title.className = 'search-suggest-title';
       title.textContent = row.title || row.path;
-      a.append(title);
+      text.append(title);
       const meta = metaLine(row);
       if (meta) {
         const m = document.createElement('span');
         m.className = 'search-suggest-meta';
         m.textContent = meta;
-        a.append(m);
+        text.append(m);
       }
+      a.append(text);
+
       li.append(a);
       list.append(li);
     });
