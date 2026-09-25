@@ -1,0 +1,177 @@
+/*
+ * Newsletter subscribe stub (SKODA-305). Footer "Subscribe" presentation, re-derived from the
+ * live Media Room footer (.skoda-mailguide .mailguide-form; docs/ui-specs/footer-mediaroom.md).
+ * Tokens-only. The source renders weight 500 as the 400 face (SKODA Next ships 300/400/600/700),
+ * so 500 maps to --weight-regular here.
+ * Geometry (source flex model, reproduced exactly): the email field keeps its intrinsic width
+ * (flex 0 1 auto, never narrower than 50% of the row) and the pill button takes the remaining
+ * space (flex 1 1 auto; nowrap keeps it >= its text width, and it may overflow a narrow row as
+ * the source does at 768). Row = 10px field margins + 45px field.
+ */
+
+.newsletter-stub {
+  font-size: var(--body-font-size-m);
+  line-height: var(--line-height-body);
+}
+
+.newsletter-stub .newsletter-stub-row {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+  margin-bottom: var(--form-gap);
+}
+
+/* visually hidden, still announced (the placeholder is not a label) */
+.newsletter-stub .newsletter-stub-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.newsletter-stub .newsletter-stub-email {
+  box-sizing: border-box;
+  display: block;
+  flex: 0 1 auto;
+  min-width: 50%;
+  margin: var(--form-gap) 0;
+  border: 0;
+  border-bottom: 1px solid var(--input-border-color);
+  border-radius: var(--input-radius) var(--input-radius) 0 0;
+  padding: var(--input-padding);
+  background-color: var(--input-bg);
+  color: var(--input-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-regular);
+  line-height: var(--line-height-body);
+}
+
+/* source focus: the underline thickens to 2px accent (margin trimmed 1px so nothing shifts) */
+.newsletter-stub .newsletter-stub-email:focus {
+  border-bottom-width: 2px;
+  border-bottom-color: var(--input-focus-color);
+  margin-bottom: calc(var(--form-gap) - 1px);
+  outline: none;
+}
+
+.newsletter-stub .newsletter-stub-submit {
+  flex: 1 1 auto;
+  margin: 0.5em 0 0.5em var(--form-gap);
+  border: 0;
+  border-radius: var(--pill-radius);
+  padding: 0 2.5em;
+  background-color: var(--skoda-green-emerald);
+  color: var(--skoda-ink);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-regular);
+  letter-spacing: 1px;
+  line-height: var(--line-height-body);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* status message: source .response, a white box laid over the consent row (no layout shift) */
+.newsletter-stub .newsletter-stub-response {
+  position: relative;
+}
+
+.newsletter-stub .newsletter-stub-status {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  z-index: 1;
+  color: var(--skoda-ink);
+  font-size: var(--body-font-size-s);
+  font-weight: var(--weight-regular);
+}
+
+.newsletter-stub .newsletter-stub-status:not(:empty) {
+  padding: var(--spacing-xs) var(--spacing-s);
+  background-color: var(--skoda-white);
+}
+
+/* consent: custom 18px checkbox on a real (accessible) input, label offset 27px */
+.newsletter-stub .newsletter-stub-consent {
+  position: relative;
+}
+
+.newsletter-stub .newsletter-stub-checkbox {
+  appearance: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  margin: 0;
+  border: 2px solid var(--checkbox-border-color);
+  border-radius: var(--checkbox-radius);
+  background: transparent center / 100% no-repeat;
+  cursor: pointer;
+}
+
+.newsletter-stub .newsletter-stub-consent label {
+  display: inline-block;
+
+  /* source label padding: 27px start (box + gap), 5px end — the end pad sets the wrap points */
+  padding-inline: calc(var(--checkbox-size) + var(--checkbox-label-gap)) 5px;
+  color: var(--consent-color);
+  font-size: var(--body-font-size-s);
+  font-weight: var(--weight-regular);
+  line-height: var(--footer-small-line-height);
+  cursor: pointer;
+}
+
+.newsletter-stub .newsletter-stub-consent a {
+  color: var(--skoda-green-emerald);
+  font-weight: var(--weight-regular);
+}
+
+.newsletter-stub .newsletter-stub-manage {
+  padding-top: var(--spacing-xs);
+}
+
+.newsletter-stub .newsletter-stub-manage a {
+  color: var(--newsletter-manage-color);
+  font-weight: var(--weight-regular);
+  text-decoration: underline;
+}
+
+/* ---- states ---- */
+.newsletter-stub .newsletter-stub-submit:hover,
+.newsletter-stub .newsletter-stub-submit:focus-visible {
+  background-color: var(--skoda-green-emerald-hover);
+}
+
+.newsletter-stub .newsletter-stub-checkbox:checked {
+  border-color: var(--checkbox-checked-color);
+  background-color: var(--checkbox-checked-color);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M3 8.5l4 4 8-8' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E");
+}
+
+.newsletter-stub .newsletter-stub-email:focus-visible,
+.newsletter-stub .newsletter-stub-submit:focus-visible,
+.newsletter-stub .newsletter-stub-checkbox:focus-visible,
+.newsletter-stub a:focus-visible {
+  outline: 2px solid var(--skoda-white);
+  outline-offset: 2px;
+}
+
+.newsletter-stub .newsletter-stub-manage a:hover {
+  color: var(--newsletter-manage-color);
+}
+
+.newsletter-stub .newsletter-stub-consent a:hover {
+  color: var(--skoda-green-emerald);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .newsletter-stub .newsletter-stub-submit {
+    transition: none;
+  }
+}
