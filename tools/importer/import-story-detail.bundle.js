@@ -474,6 +474,27 @@ var CustomImportScript = (() => {
 
   // tools/importer/transformers/skoda-story-cleanup.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  var FACETS = [
+    "model",
+    "bodywork",
+    "derivative",
+    "motorsport",
+    "equipment",
+    "technology",
+    "years",
+    "view",
+    "company",
+    "concept",
+    "environment",
+    "happening",
+    "history",
+    "sponsorship",
+    "vip"
+  ];
+  function parseTagHref(href) {
+    const m = String(href || "").match(/\/tag\/([a-z0-9-]+)\/([a-z0-9-]+)\/?/i);
+    return m ? { taxonomy: m[1].toLowerCase(), slug: m[2].toLowerCase() } : null;
+  }
   function videoUrl(el) {
     const id = el.getAttribute("videoid");
     if (el.tagName.toLowerCase() === "lite-youtube") {
@@ -508,34 +529,21 @@ var CustomImportScript = (() => {
       return "";
     }
   }
-  function curatedRows(band, document2) {
-    const matched = [...band.querySelectorAll("article.article-teaser, .search-results-item")];
-    const teasers = matched.filter((el) => !matched.some((o) => o !== el && o.contains(el)));
-    const rows = [];
-    teasers.forEach((t) => {
-      const titleLink = t.querySelector(".entry-title a[href], h3 a[href], a.link-more[href]");
-      if (!titleLink) return;
-      let title = (t.querySelector(".entry-title") || titleLink).textContent.trim();
-      if (!title) return;
-      const img = t.querySelector("img");
-      const alt = img ? (img.getAttribute("alt") || "").trim() : "";
-      const stem = title.replace(/\s*(…|\.\.\.)$/, "");
-      if (stem !== title && alt.startsWith(stem)) title = alt;
-      const body = [];
-      const date = t.querySelector(".entry-published, time");
-      if (date && date.textContent.trim()) {
-        const p = document2.createElement("p");
-        p.textContent = date.textContent.trim();
-        body.push(p);
+  function facetRows(element) {
+    const byFacet = {};
+    const plain = [];
+    element.querySelectorAll("ol.entry-tags a[href], .sidebar .tags a[href]").forEach((a) => {
+      const t = parseTagHref(a.getAttribute("href") || "");
+      if (!t || !t.slug) return;
+      if (FACETS.includes(t.taxonomy)) {
+        byFacet[t.taxonomy] = byFacet[t.taxonomy] || [];
+        if (!byFacet[t.taxonomy].includes(t.slug)) byFacet[t.taxonomy].push(t.slug);
+      } else if (!plain.includes(t.slug)) {
+        plain.push(t.slug);
       }
-      const h3 = document2.createElement("h3");
-      const a = document2.createElement("a");
-      a.setAttribute("href", titleLink.getAttribute("href"));
-      a.textContent = title;
-      h3.appendChild(a);
-      body.push(h3);
-      rows.push([img || "", body]);
     });
+    const rows = FACETS.filter((f) => byFacet[f]).map((f) => [f, byFacet[f].join(", ")]);
+    if (plain.length) rows.push(["tags", plain.join(", ")]);
     return rows;
   }
   function relatedBand(element, document2, payload) {
@@ -551,31 +559,16 @@ var CustomImportScript = (() => {
       clone.querySelectorAll(".subheading").forEach((s) => s.remove());
       headingText = (clone.textContent || "").trim() || headingText;
     }
-    let rows = curatedRows(band, document2);
-    if (rows.length) {
-      rows = [["Story Rail"], ...rows];
-    } else {
-      const tagLinks = [...element.querySelectorAll("ol.entry-tags a[href], .sidebar .tags a[href]")].map((a) => a.getAttribute("href") || "");
-      const specific = tagLinks.filter((h) => !/\/tag\/years\//.test(h));
-      const slugs = (specific.length ? specific : tagLinks).map((h) => lastSegment(h).toLowerCase()).filter((s, i, arr) => s && arr.indexOf(s) === i);
-      if (!slugs.length && subText) {
-        subText.replace(/^[^:]*:/, "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean).forEach((s) => slugs.push(s));
-      }
-      if (!slugs.length) {
-        console.warn("[story-cleanup] related band has no teasers and no tags; dropped");
-        cover.remove();
-        return;
-      }
-      const originalURL = payload && payload.params && payload.params.originalURL || "";
-      const self = lastSegment(originalURL);
-      rows = [
-        ["Story Rail"],
-        ["template", "story"],
-        ["tags", slugs.join(", ")],
-        ["limit", "10"]
-      ];
-      if (self) rows.push(["exclude", self]);
+    const filters = facetRows(element);
+    if (!filters.length) {
+      console.warn("[story-cleanup] related band: story has no tags to match; dropped");
+      cover.remove();
+      return;
     }
+    const originalURL = payload && payload.params && payload.params.originalURL || "";
+    const self = lastSegment(originalURL);
+    const rows = [["Story Rail"], ["template", "story"], ...filters, ["limit", "10"]];
+    if (self) rows.push(["exclude", self]);
     const h2 = document2.createElement("h2");
     h2.textContent = headingText;
     const out = [document2.createElement("hr"), h2];
@@ -756,7 +749,7 @@ var CustomImportScript = (() => {
 
   // tools/importer/transformers/skoda-metadata.js
   var TransformHook4 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
-  var FACETS = [
+  var FACETS2 = [
     "model",
     "bodywork",
     "derivative",
@@ -883,7 +876,7 @@ var CustomImportScript = (() => {
       if (tax && term) {
         const taxonomy = tax[1].toLowerCase().replace(/_/g, "-");
         const slug = term[1].toLowerCase();
-        if (FACETS.includes(taxonomy) && slug && !/^\d+$/.test(slug)) add(taxonomy, slug);
+        if (FACETS2.includes(taxonomy) && slug && !/^\d+$/.test(slug)) add(taxonomy, slug);
       }
     }
     if (tags.length === 0) {
@@ -938,7 +931,7 @@ var CustomImportScript = (() => {
     if (category) meta.category = category;
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
-    FACETS.forEach((f) => {
+    FACETS2.forEach((f) => {
       const merged = [.../* @__PURE__ */ new Set([...byFacet[f] || [], ...splitList(overrides[f])])];
       if (merged.length) meta[f] = merged.join(", ");
     });
