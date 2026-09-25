@@ -30,3 +30,6 @@ check confirmed that no ticket covers it (SKODA-801's `skoda-quote` row is a dif
 
 ## Dependencies
 SKODA-607 (press-release template), SKODA-805c (press-kit body), SKODA-801 (story quote widget).
+
+## Import contract (SKODA-603)
+Contract(s) `quote` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Pinned shape: `Quote` with a single row `[quote, attribution]`; the empty attribution cell is kept and no `hr` is emitted. The story-flatten `skoda-quote` switches from a default-content blockquote to this table in 603 W1. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

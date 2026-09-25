@@ -1,0 +1,206 @@
+{
+  "version": 1,
+  "doc": "docs/planning/SKODA-PENDING-BLOCK-CONTRACTS.md",
+  "comment": "SKODA-603 pending-block import contract. `main` = blocks whose code is in blocks/ (allowed variants + config keys the code reads). `pending` = blocks/variants the importers may emit before their code lands. Checked by tools/importer/validate-blocks.mjs. Edit together with the doc; a shape change bumps `shape` on the entry.",
+  "ignore": ["metadata", "section-metadata"],
+  "main": {
+    "cards": { "variants": ["media", "overlay", "toolbar"] },
+    "carousel": { "variants": ["dots"] },
+    "columns": { "variants": [] },
+    "downloads": { "variants": [] },
+    "embed": { "variants": [] },
+    "footer": { "variants": [] },
+    "fragment": { "variants": [] },
+    "gallery": { "variants": [] },
+    "header": { "variants": [] },
+    "hero-image": { "variants": ["story", "overlay", "archive"] },
+    "listing": {
+      "variants": [],
+      "config": "only",
+      "configKeys": ["index", "path", "template", "facets", "facetlabels", "sort", "perpage", "columns"]
+    },
+    "search": { "variants": [] },
+    "stories": {
+      "variants": [],
+      "config": "only",
+      "configKeys": ["index", "path", "template", "category", "tag", "tags", "heading", "sort", "initial", "perpage", "columns", "excludefeatured"]
+    },
+    "story-rail": {
+      "variants": [],
+      "config": "or-curated",
+      "configKeys": ["index", "path", "template", "category", "tag", "tags", "heading", "viewall", "view-all", "all", "sort", "limit", "exclude", "dots",
+        "model", "derivative", "concept", "bodywork", "equipment", "years", "company", "happening", "history", "motorsport", "sponsorship", "vip", "view", "technology", "environment"]
+    },
+    "tags": { "variants": ["chips"] },
+    "widget": { "variants": [] }
+  },
+  "pending": [
+    {
+      "id": "hero",
+      "block": "hero",
+      "status": "resolve",
+      "ticket": "SKODA-202",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": ["parsers/hero.js", "parsers/hero-banner.js"],
+      "resolveTo": "emit Hero Image (overlay) / Hero Image (archive)"
+    },
+    {
+      "id": "in-page-nav",
+      "block": "in-page-nav",
+      "status": "pinned",
+      "ticket": "SKODA-208",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": ["parsers/in-page-nav.js"]
+    },
+    {
+      "id": "spec-table",
+      "block": "spec-table",
+      "status": "pinned",
+      "ticket": "SKODA-208",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": ["parsers/spec-table.js"]
+    },
+    {
+      "id": "spec-table-versions",
+      "block": "spec-table",
+      "variants": ["versions"],
+      "status": "proposed",
+      "ticket": "SKODA-801a",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": [],
+      "replaces": ["version"]
+    },
+    {
+      "id": "cards-key-facts",
+      "block": "cards",
+      "variants": ["key-facts"],
+      "status": "pinned",
+      "ticket": "SKODA-208",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": ["parsers/key-facts.js"]
+    },
+    {
+      "id": "tags-outline",
+      "block": "tags",
+      "variants": ["outline"],
+      "status": "pinned",
+      "ticket": "SKODA-208",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": ["transformers/skoda-model-tags.js"]
+    },
+    {
+      "id": "promo-box",
+      "block": "promo-box",
+      "status": "pinned",
+      "ticket": "SKODA-213",
+      "fallback": "broken",
+      "shape": 1,
+      "emittedBy": ["parsers/promo-box.js"],
+      "configKeys": ["index", "template", "path", "category", "tags", "limit", "sort"],
+      "replaces": ["cards (promo)"]
+    },
+    {
+      "id": "cards-tiles",
+      "block": "cards",
+      "variants": ["overlay", "tiles"],
+      "status": "pinned",
+      "ticket": "SKODA-221",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": []
+    },
+    {
+      "id": "gallery-slider",
+      "block": "gallery",
+      "variants": ["slider"],
+      "status": "pinned",
+      "ticket": "SKODA-819",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": []
+    },
+    {
+      "id": "quote",
+      "block": "quote",
+      "status": "pinned",
+      "ticket": "SKODA-220",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": []
+    },
+    {
+      "id": "columns-split",
+      "block": "columns",
+      "variantPatterns": ["^split-[1-9][0-9]$"],
+      "status": "pinned",
+      "ticket": "SKODA-225",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": []
+    },
+    {
+      "id": "accordion",
+      "block": "accordion",
+      "status": "pinned",
+      "ticket": "SKODA-805c",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": []
+    },
+    {
+      "id": "highlight",
+      "block": null,
+      "form": "section-style",
+      "status": "proposed",
+      "ticket": "SKODA-824",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": []
+    },
+    {
+      "id": "media-item",
+      "block": null,
+      "form": "index-row",
+      "status": "pinned",
+      "ticket": "SKODA-608",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": []
+    },
+    {
+      "id": "floating-action-bar",
+      "block": null,
+      "form": "code-only",
+      "status": "pinned",
+      "ticket": "SKODA-215",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": []
+    },
+    {
+      "id": "media-room-chrome",
+      "block": null,
+      "form": "metadata",
+      "status": "pinned",
+      "ticket": "SKODA-309",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": []
+    },
+    {
+      "id": "skodapedia",
+      "block": "skodapedia",
+      "status": "out-of-scope",
+      "ticket": "SKODA-206",
+      "fallback": "broken",
+      "shape": 1,
+      "emittedBy": ["parsers/skodapedia.js"]
+    }
+  ]
+}

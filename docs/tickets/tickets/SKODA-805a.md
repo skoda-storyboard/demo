@@ -52,3 +52,6 @@ The chapter and resource children are SKODA-805b. The single default-template ki
 ## Dependencies
 - Upstream: SKODA-601/602, SKODA-202 (hero), SKODA-201 (cards), SKODA-305 (MR footer), SKODA-609.
 - Related: SKODA-805b (children), SKODA-805c (default template), SKODA-208 (model Press Kits rail).
+
+## Import contract (SKODA-603)
+Contract(s) `cards-tiles`, `hero` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). The press-kit hub emits `Hero Image (overlay)` + `Cards (overlay, tiles)` (`ratio-2x1` → `feature`). If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

@@ -49,3 +49,6 @@ attachment pages, HTTP-verified.
 ## Dependencies
 - Upstream: SKODA-601, SKODA-602, SKODA-401/104 (index config), SKODA-501/503.
 - Downstream: SKODA-208 (model rails), SKODA-402 QA on real content, SKODA-603 tracker, SKODA-707 dry run.
+
+## Import contract (SKODA-603)
+Contract(s) `media-item` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). An index-row contract, not a block (`template` = image/video + title, description, image, date, tags, model, facets, download fields). `?attachment_id=` corpus URLs need a path mapping (the tracker lists them as unmapped). If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

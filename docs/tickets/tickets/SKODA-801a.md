@@ -65,3 +65,6 @@ reconstruct the media that exists in all 21 stories, and keep the rest of SKODA-
 ## Dependencies
 - Upstream: SKODA-601 (importer), SKODA-801 (#113), SKODA-819 (was 219), SKODA-818, SKODA-502 (#111), SKODA-204 (#109), SKODA-501/506.
 - Downstream: SKODA-603 (43-URL import), SKODA-604 (full-fidelity hero stories), SKODA-704 visual sign-off.
+
+## Import contract (SKODA-603)
+Contract(s) `gallery-slider`, `quote`, `columns-split`, `spec-table-versions` (proposed) in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). The story importer emits these pinned shapes. The raw `version` spec table (Epiq) must become `Spec Table (versions)` or text; the check fails `version`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

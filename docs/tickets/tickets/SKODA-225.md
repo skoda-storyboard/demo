@@ -29,3 +29,6 @@ Demo URL/block sweep, 2026-09-25 (report §5; eMobility-B + Lifestyle groups).
 
 ## Dependencies
 SKODA-801 (flatten), SKODA-824 (rows inside the highlight panel).
+
+## Import contract (SKODA-603)
+Contract(s) `columns-split` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Pinned shape: `Columns (split-NN)`, where NN is the first cell's width share in % (518 | 320 → `split-62`). If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

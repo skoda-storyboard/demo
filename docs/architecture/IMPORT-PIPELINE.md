@@ -101,8 +101,9 @@ The input URL list for the run.
 # 2) Prepare delivery images; fail if any requested page/image cannot be resolved.
 npm run media:build -- --pages content/<path>.plain.html
 npm run media:apply -- --pages content/<path>.plain.html
-# 3) Validate metadata, then inspect locally against previewed DA content.
+# 3) Validate metadata + the pending-block contract, then inspect locally against previewed DA content.
 node tools/importer/validate-metadata.mjs content/<path>.plain.html
+npm run import:validate-blocks -- --urls tools/importer/urls-<name>.txt   # SKODA-603; fails on unknown/superseded blocks
 npx -y @adobe/aem-cli up          # inspect content/... at localhost:3000
 
 # 4) Plan the push (reads DA, decides new/unchanged/update/conflict — writes nothing)
@@ -113,9 +114,18 @@ npm run import:push -- --urls tools/importer/urls-<name>.txt
 
 # 6) After review and the SKODA-506 gate: publish → reindex (+ fragments live)
 npm run import:push -- --urls tools/importer/urls-<name>.txt --stage publish --publish-fragments
+
+# 7) M1 only: regenerate the per-URL tracker (read-only admin/index checks)
+npm run import:status
 ```
 
-**Order matters:** import → media build/apply → metadata validation → push →
+**Blocks that aren't on `main` yet.** Every block an importer emits must either be on `main` or
+have a pinned entry in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../planning/SKODA-PENDING-BLOCK-CONTRACTS.md)
+(machine side `tools/importer/push/block-contracts.json`). Step 3 enforces this. Emit the pinned table
+shape even when the block has no code yet; the block ticket builds against that shape, so its
+landing needs a re-QA, not a re-import.
+
+**Order matters:** import → media build/apply → metadata + block validation → push →
 SKODA-506 gate before preview → review → SKODA-506 gate before **publish** →
 reindex. SKODA-501's media builder selects publish-safe renditions, but does
 **not** enforce the publish-time gate. The query-index only sees *published*

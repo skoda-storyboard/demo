@@ -31,3 +31,6 @@ the gap review mean the *page-level floating share*. This ticket is the page-lev
 
 ## Dependencies
 docs/ui-specs/social-share.md, SKODA-505a (cart badge space), SKODA-216 (gallery share, separate).
+
+## Import contract (SKODA-603)
+Contract(s) `floating-action-bar` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Code-only: the importers emit nothing. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

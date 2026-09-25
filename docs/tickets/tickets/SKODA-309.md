@@ -31,3 +31,6 @@ Demo URL/block sweep, 2026-09-25 (report §5, chrome group).
 
 ## Dependencies
 SKODA-301 (header), SKODA-305 (MR footer, PR #134), SKODA-607, SKODA-805a, SKODA-602 (fragment check).
+
+## Import contract (SKODA-603)
+Contract(s) `media-room-chrome` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Page metadata only (`nav`/`footer` rows on MR pages once the fragments exist); the push tool's fragment check applies. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

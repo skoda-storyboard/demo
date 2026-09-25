@@ -143,7 +143,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-507 | Native AEM Assets picker in DA/EW (Media Bus delivery) | E05 | 2 | 0.5–1 | 1–2 | 504,505b | 🔴 BLOCKED (client AEM env + DA site config, creds) |
 | SKODA-601 | Import infra: parsers + transformers | E06 | 5 | 2–3 | 4–6 | 102 | 🟡 content-driven only |
 | [SKODA-602](tickets/SKODA-602.md) | DA source-API push + bulk-op publish | E06 | 3 | 1–2 | 2–3 | 601 | 🟢 **built + piloted 2026-09-25** (`push-to-da.mjs`, branch `skoda-602-da-push`); credential gate resolved |
-| SKODA-603 | Pilot page set imported + validated, **re-scoped 2026-09-24 to the 43-URL set + rail corpus + tracker** | E06 | 5 | 2–3 | 3–5 | 601,602,201,202,203,204,205,501,502 | 🔴 M1 content critical path (index = 3 rows on 2026-09-24) |
+| SKODA-603 | Pilot page set imported + validated, **re-scoped 2026-09-24 to the 43-URL set + rail corpus + tracker** | E06 | 5 | 2–3 | 3–5 | 601,602,201,202,203,204,205,501,502 | 🔴 M1 content critical path. **W0 done 2026-09-25:** tracker `planning/skoda-m1-url-status.md` (16/136 pages live + indexed) + pending-block contract `planning/SKODA-PENDING-BLOCK-CONTRACTS.md`; gated waves W1–W4 |
 | SKODA-604 | Full-fidelity restore on 1–2 hero demo stories | E06 | 2 | 0.5–1 | 1–2 | 203,204,502,505,601,602,801 | 🟢 M1 (D18); bounded un-flatten |
 | SKODA-607 | Press Release detail template (split from story) | E08 | 5 | 2–3 | 4–6 | 601,602,502 | 🟢 M1; PR ≠ story (no hero, MR side, 47.5% of pages); spec `ui-specs/template-press-release.md` |
 | [SKODA-608](tickets/SKODA-608.md) | Image & video item index rows (listings + model media rails) | E06 | 3 | 1–1.5 | 2–3 | 601,602,401,501,503 | 🟠 M1 Must; `/en/images/`, `/en/videos/` empty without it |

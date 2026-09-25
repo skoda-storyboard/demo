@@ -37,3 +37,6 @@ independently by 4 story groups and the press-release group; it was consolidated
 
 ## Dependencies
 SKODA-801 (flatten), SKODA-814 (M2 generic SiteOrigin rule, related), SKODA-218 (dark styling), SKODA-819 (nested slider), SKODA-225 (columns split).
+
+## Import contract (SKODA-603)
+Contract(s) `highlight` (**proposed**) in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Proposed form: a **section** with Section Metadata `Style` = `highlight, dark` / `highlight, grey` (it can contain nested sliders/columns, which a block can't), plus the `scripts.js` section hook. Needs the owner's confirmation. Until then, pages keep the default-content fallback and are flagged `re-import on SKODA-824`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

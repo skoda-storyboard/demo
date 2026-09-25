@@ -68,3 +68,6 @@ Measurable gates live in [`series.md` §9](../../ui-specs/series.md); summary:
 ## Risks / Flags
 - **Ordering/source of series** (🟡): same open question as the homepage Series slider (STO-H07), confirm sort + whether the directory is curated or index-driven.
 - Series hub membership signal (tag vs explicit list) to confirm against more than one live hub before locking the retrieval rule.
+
+## Import contract (SKODA-603)
+Contract(s) `cards-tiles`, `hero` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). The series hub imports as a curated `Cards (overlay, tiles)` mosaic (size token cell first), not the `series-grid` `Listing`, whose `tags` key the listing block doesn't read. The hero → `Hero Image (overlay)`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.
