@@ -3,7 +3,7 @@
 - **Type:** import / metadata
 - **Phase:** A · **Milestone:** M1 (demo-visible on every card and rail)
 - **Estimate:** 1 SP · AI-assisted 0.25–0.5d / manual 0.5–1d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🟡 **Code done (branch `skoda-610-clean-titles`); 7 of 28 pages re-pushed + previewed, publish awaiting approval.** The other 21 are held (see below).
+- **Status (2026-09-25):** 🟡 **Code done (branch `skoda-610-clean-titles`); 7 of 28 pages re-pushed and **published 2026-09-25** (approved); the live index has 22 suffixed rows left (29 → 22).** The other 21 pages are held (see below).
 
 ## Origin
 Demo URL/block sweep, 2026-09-25 (report §5; raised by 4 groups). It was noted before only under SKODA-602 "Follow-ups found".
@@ -53,7 +53,7 @@ QA rule: a 610 re-import may change **only the Title**. Any other difference mea
 
 | Result | Pages |
 |---|---|
-| ✅ **Pushed + previewed, clean `og:title` (7)** | practical-fun-stylish-5-reasons-to-choose-the-epiq · an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving · a-true-czech-from-spain · modelling-clay-yoga-simply-epiq-skoda-returns-to-milan · come-and-play-skoda-is-heading-to-milan · a-record-year-for-skoda-electrified-models-also-contribute · big-possibilities-in-a-small-package-the-new-skoda-epiq |
+| ✅ **Published, clean `<title>` / `og:title` / index row (7)** | practical-fun-stylish-5-reasons-to-choose-the-epiq · an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving · a-true-czech-from-spain · modelling-clay-yoga-simply-epiq-skoda-returns-to-milan · come-and-play-skoda-is-heading-to-milan · a-record-year-for-skoda-electrified-models-also-contribute · big-possibilities-in-a-small-package-the-new-skoda-epiq |
 | ⏸ **DA conflict (1)** | skoda-epiq-will-win-you-over-in-just-a-few-seconds: DA holds a newer `Gallery (slider)` version (SKODA-819) that isn't in any push record; a re-push would revert it. Not forced. |
 | ⏸ **Stale story output (6)** | what-was-racing-like…, the-skoda-peaq-will-win-you-over-fast, the-versatile-octavia…, skoda-classic-tour…, an-electric-car-approaching…, peaq-sets-a-record…: the live version predates 816 (`hero`). The re-import changes the whole page, so it belongs to SKODA-603 W1 / 801a, not a title fix |
 | ⏸ **SKODA-508 caption regression (7)** | 5 press releases (zellmer, national-theatre, superb-25-years, board-of-management, uci) and 2 stories (whats-behind-epiq-design, this-is-epiq…): `skoda-images` adds excerpt paragraphs |
@@ -79,3 +79,11 @@ future re-pushes take the safe `update` path. `media:build` moved 4 already-inge
 1. Your approval to publish the 7 pages.
 2. SKODA-508, then re-push the 7 caption pages.
 3. The remaining pages ride along with SKODA-603 W1 / 801a / 208.
+
+### Publish (2026-09-25, approved)
+- A bulk publish of the 7 pages returned live 200 and indexed for all of them.
+- The live index went from 29 suffixed rows (of 31) to **22**. `/en` is still "Škoda Storyboard".
+- On `.aem.live`, `a-true-czech-from-spain` has `<title>` and `og:title` "A True Czech from Spain", the footer
+  renders (908 chars), and the nav has 39 links. Its Related Stories rail still showed suffixed titles in the
+  browser: that's a cached index response, and `main`'s code doesn't have the runtime trim until this PR merges.
+
