@@ -4,8 +4,8 @@
 - **Phase:** A · **Milestone:** M1 (it blocks re-importing press releases: SKODA-610, SKODA-603 W1)
 - **GitHub issue:** [#158](https://github.com/skoda-storyboard/demo/issues/158)
 - **Estimate:** 1 SP · AI-assisted 0.25–0.5d / manual 0.5–1d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🟡 **Code done, QA passed on the importer output** (branch `skoda-508-card-captions`).
-  The republish of the 5 caption press releases is waiting for approval (see "Republish").
+- **Status (2026-09-25):** 🟡 **Code done, QA passed, 5 caption press releases republished** (PR #161, branch
+  `skoda-508-card-captions`). Code merge is pending review.
 
 ## Origin
 Found while re-importing for SKODA-610 on 2026-09-25. It isn't caused by 610: with the previous bundle, the
@@ -90,8 +90,19 @@ post-fix bundles. `compare.mjs` diffs the output against the current DA source `
 reshape: perex, date and category move into the hero, and the `tags` block goes. That's the same reason SKODA-610
 holds 6 other stories, so these 2 move to that group (SKODA-603 W1 / 801a) instead of being republished here.
 
-## Republish (needs approval)
-- **Ready:** the 5 caption press releases held in SKODA-610 (zellmer, national-theatre, superb-25-years,
-  board-of-management, uci). Flow: re-import → `media:apply` → `import:push` (push, preview) → publish after
-  approval. Their 5 Vimeo-poster siblings stay under "Media apply blocked" (610).
+## Republish (2026-09-25, approved)
+- **Published:** the 5 caption press releases held in SKODA-610 (zellmer, national-theatre, superb-25-years,
+  board-of-management, uci).
+  - Flow: post-fix import → `media:apply` (47 refs, 0 unresolved) → `import:push --stage push,preview,publish`.
+  - Result: `update` ×5, DA/preview/live 200, all images resolved (45/45), all indexed. Report:
+    `tools/importer/reports/push/2026-09-25T21-00-38-666Z.json`.
+  - The raw diff against the previous DA version (after `media:apply`) was the Title plus the intended **SKODA-605**
+    link rewrites: demo pages site-relative, `/direct-download/` absolute to the source host. No caption or structure
+    change.
+- **Live checks (`.aem.page` + `.aem.live`):**
+  - All 5 pages have a clean `<title>` and 0 excerpt links.
+  - Footer 3,039 chars, nav 42 links on both hosts.
+  - Live index: suffixed rows **21 → 16**, and all 5 rows are clean. The index took about 2 min to catch up after
+    the "indexed" report.
+- **Their 5 Vimeo-poster siblings** stay under "Media apply blocked" (610).
 - **Not here:** `whats-behind-epiq-design` and `this-is-epiq…` (816 hero diff, see above).
