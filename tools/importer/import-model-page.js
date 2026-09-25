@@ -25,6 +25,7 @@ import storyRailParser from './parsers/story-rail.js';
 import cleanupTransformer from './transformers/skoda-model-cleanup.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
+import normalizeImages from './transformers/skoda-images.js';
 
 const parsers = {
   hero: heroParser,
@@ -133,6 +134,7 @@ export default {
     // Shared skoda-metadata.js already emitted the canonical Metadata block; do NOT
     // call WebImporter.rules.createMetadata (it would append a thinner duplicate).
     WebImporter.rules.transformBackgroundImages(main, document);
+    normalizeImages(main, document);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     const rawPath = new URL(params.originalURL).pathname

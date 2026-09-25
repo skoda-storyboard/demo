@@ -23,6 +23,7 @@ import storyCleanupTransformer from './transformers/skoda-story-cleanup.js';
 import storyAsideTransformer from './transformers/skoda-story-aside.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
+import normalizeImages from './transformers/skoda-images.js';
 
 const parsers = {
   // SKODA-816: story hero → Hero Image (story variant) + caption + Tags, not the
@@ -141,6 +142,7 @@ export default {
     executeTransformers('afterTransform', main, payload);
 
     WebImporter.rules.transformBackgroundImages(main, document);
+    normalizeImages(main, document);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     const rawPath = new URL(params.originalURL).pathname

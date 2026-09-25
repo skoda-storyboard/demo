@@ -11,7 +11,22 @@ import {
   logicalId, masterUrl, normalizeExtension, isAspectCrop, derivativeSuffix,
   damPathFor, pagePathFromFile, splitBuffer, imageSize, ratiosDiffer,
   uploadToDAM, ensureDamFolder, resolveDamToken,
+  needsMediaBuild, OVERSIZE_BYTES,
 } from './media-lib.mjs';
+
+test('delivery-only rows resume when DAM ingest is requested, without a blanket force', () => {
+  const row = {
+    status: 'done',
+    bytes: 2048,
+    delivery_url: 'https://cdn.example.test/a.jpg',
+    steps: { deliver: 'done', dam: 'n/a', da: 'n/a' },
+  };
+  assert.equal(needsMediaBuild(row), false);
+  assert.equal(needsMediaBuild(row, { dam: true }), true);
+  assert.equal(needsMediaBuild(row, { da: true }), true);
+  assert.equal(needsMediaBuild({ ...row, bytes: OVERSIZE_BYTES + 1 }), true);
+  assert.equal(needsMediaBuild({ ...row, steps: { ...row.steps, dam: 'done' }, dam_asset_path: '/dam/a.jpg' }, { dam: true }), false);
+});
 
 // ---- F3: path-qualified logical id -----------------------------------------
 test('F3: same basename in different folders → distinct logical ids', () => {

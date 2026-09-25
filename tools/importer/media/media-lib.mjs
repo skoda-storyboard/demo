@@ -31,6 +31,15 @@ const IMAGE_EXT_RE = /\.(jpe?g|png|gif|webp|avif|svg)$/i;
 // a sized derivative. The DAM still stores the full ORIGINAL.
 export const OVERSIZE_BYTES = 10 * 1024 * 1024;
 
+export function needsMediaBuild(row, { dam = false, da = false, force = false } = {}) {
+  if (force || !row || row.status !== 'done') return true;
+  if (row.steps?.deliver !== 'done' || !row.delivery_url
+    || !Number.isFinite(row.bytes) || row.bytes > OVERSIZE_BYTES) return true;
+  if (dam && (row.steps?.dam !== 'done' || !row.dam_asset_path)) return true;
+  if (da && (row.steps?.da !== 'done' || !row.original_download_url)) return true;
+  return false;
+}
+
 // The named WordPress scaled-ladder sizes (SKODA-MEDIA-DEEP-DIVE §2), largest
 // first. Used both as the pre-condition fallback ladder (F4) and to distinguish
 // scaled derivatives from aspect crops (F7).

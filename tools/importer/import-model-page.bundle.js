@@ -1,26 +1,9 @@
 /* eslint-disable */
 var CustomImportScript = (() => {
   var __defProp = Object.defineProperty;
-  var __defProps = Object.defineProperties;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-  var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
   var __getOwnPropNames = Object.getOwnPropertyNames;
-  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
-  var __propIsEnum = Object.prototype.propertyIsEnumerable;
-  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-  var __spreadValues = (a, b) => {
-    for (var prop in b || (b = {}))
-      if (__hasOwnProp.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
-    if (__getOwnPropSymbols)
-      for (var prop of __getOwnPropSymbols(b)) {
-        if (__propIsEnum.call(b, prop))
-          __defNormalProp(a, prop, b[prop]);
-      }
-    return a;
-  };
-  var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
@@ -138,10 +121,9 @@ var CustomImportScript = (() => {
     }
     const cells = [["Spec Table"]];
     items.forEach((item) => {
-      var _a, _b, _c;
-      const value = (((_a = item.querySelector(".item-value")) == null ? void 0 : _a.textContent) || "").trim();
-      const unit = (((_b = item.querySelector(".item-unit")) == null ? void 0 : _b.textContent) || "").trim();
-      const title = (((_c = item.querySelector(".item-title")) == null ? void 0 : _c.textContent) || "").trim();
+      const value = (item.querySelector(".item-value")?.textContent || "").trim();
+      const unit = (item.querySelector(".item-unit")?.textContent || "").trim();
+      const title = (item.querySelector(".item-title")?.textContent || "").trim();
       const valueText = [value, unit].filter(Boolean).join(" ");
       cells.push([title, valueText]);
     });
@@ -496,6 +478,97 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
+  // tools/importer/transformers/skoda-images.js
+  function hasContent(node) {
+    return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
+  }
+  function withCaption(node, caption, document2) {
+    if (!caption) return node;
+    const figure = document2.createElement("figure");
+    const figcaption = document2.createElement("figcaption");
+    figcaption.textContent = caption;
+    figure.append(node, figcaption);
+    return figure;
+  }
+  function imageContainer(img, document2, link = null) {
+    const div = document2.createElement("div");
+    div.append(img);
+    if (!link) return div;
+    link.append(div);
+    return link;
+  }
+  function splitParagraph(img, paragraph, caption, document2) {
+    const link = img.closest("a");
+    const linkedImage = link && paragraph.contains(link) && link.querySelectorAll("img").length === 1 && !(link.textContent || "").trim();
+    const target = linkedImage ? link : img;
+    const afterRange = document2.createRange();
+    afterRange.setStartAfter(target);
+    afterRange.setEnd(paragraph, paragraph.childNodes.length);
+    const after = paragraph.cloneNode(false);
+    after.append(afterRange.extractContents());
+    const beforeRange = document2.createRange();
+    beforeRange.selectNodeContents(paragraph);
+    beforeRange.setEndBefore(target);
+    const before = paragraph.cloneNode(false);
+    before.append(beforeRange.extractContents());
+    const imageNode = imageContainer(img, document2, linkedImage ? link : null);
+    const image = withCaption(imageNode, caption, document2);
+    paragraph.replaceWith(...[before, image, after].filter(hasContent));
+  }
+  function normalizeImages(root, document2 = root.ownerDocument) {
+    root.querySelectorAll("img").forEach((img) => {
+      if (!img.hasAttribute("alt") || !img.getAttribute("alt").trim()) {
+        const type = img.hasAttribute("alt") ? "empty" : "missing";
+        console.warn(`[image-import] ${type} alt: ${img.getAttribute("src") || "(no src)"}`);
+      }
+      if (img.closest("table, picture")) return;
+      const figure = img.closest("figure");
+      const wrapper = img.closest("[data-caption]");
+      const wrapperCaption = wrapper?.querySelectorAll("img").length === 1 ? wrapper.getAttribute("data-caption") : "";
+      const caption = (img.getAttribute("data-caption") || wrapperCaption || "").trim();
+      if (figure) {
+        if (img.parentElement.tagName !== "DIV") {
+          const div = document2.createElement("div");
+          img.replaceWith(div);
+          div.append(img);
+        }
+        if (caption && !figure.querySelector("figcaption")) {
+          const figcaption = document2.createElement("figcaption");
+          figcaption.textContent = caption;
+          figure.append(figcaption);
+        }
+        return;
+      }
+      const paragraph = img.closest("p");
+      if (paragraph) {
+        splitParagraph(img, paragraph, caption, document2);
+        return;
+      }
+      if (img.parentElement.tagName === "DIV") {
+        if (caption) {
+          const div = img.parentElement;
+          if (div.childElementCount === 1 && !(div.textContent || "").trim()) {
+            const marker2 = document2.createComment("image");
+            div.replaceWith(marker2);
+            marker2.replaceWith(withCaption(div, caption, document2));
+          } else {
+            const marker2 = document2.createComment("image");
+            img.replaceWith(marker2);
+            marker2.replaceWith(withCaption(imageContainer(img, document2), caption, document2));
+          }
+        }
+        return;
+      }
+      const link = img.closest("a");
+      const linkedImage = link && link.querySelectorAll("img").length === 1 && !(link.textContent || "").trim();
+      const target = linkedImage ? link : img;
+      const marker = document2.createComment("image");
+      target.replaceWith(marker);
+      const imageNode = imageContainer(img, document2, linkedImage ? link : null);
+      marker.replaceWith(withCaption(imageNode, caption, document2));
+    });
+  }
+
   // tools/importer/import-model-page.js
   var parsers = {
     hero: parse,
@@ -545,7 +618,7 @@ var CustomImportScript = (() => {
     transform3
   ];
   function executeTransformers(hookName, element, payload) {
-    const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE });
+    const enhancedPayload = { ...payload, template: PAGE_TEMPLATE };
     transformers.forEach((transformerFn) => {
       try {
         transformerFn.call(null, hookName, element, enhancedPayload);
@@ -591,6 +664,7 @@ var CustomImportScript = (() => {
       });
       executeTransformers("afterTransform", main, payload);
       WebImporter.rules.transformBackgroundImages(main, document2);
+      normalizeImages(main, document2);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
       const path = WebImporter.FileUtils.sanitizePath(rawPath === "" ? "/index" : rawPath);

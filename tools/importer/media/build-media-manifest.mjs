@@ -33,6 +33,7 @@ import path from 'node:path';
 import {
   isImageUrl, masterUrl, logicalId, daPathFor, damPathFor, pagePathFromFile, isAspectCrop,
   pickIngestUrl, fetchBinary, uploadToDA, uploadToDAM, setDamMetadata, resolveDamToken,
+  needsMediaBuild, OVERSIZE_BYTES,
 } from './media-lib.mjs';
 
 const WORKSPACE = process.env.WORKSPACE_PATH || process.cwd();
@@ -88,8 +89,8 @@ function extractImageRefs(html) {
   const refs = [];
   const imgRe = /<img\b[^>]*>/gi;
   const attr = (tag, name) => {
-    const m = tag.match(new RegExp(`${name}="([^"]*)"`, 'i'));
-    return m ? m[1] : '';
+    const m = tag.match(new RegExp(`\\s${name}="([^"]*)"`, 'i'));
+    return m ? m[1] : null;
   };
   let m;
   // eslint-disable-next-line no-cond-assign
@@ -104,13 +105,9 @@ function extractImageRefs(html) {
 
 function loadManifest(file) {
   if (!existsSync(file)) return { generatedAt: null, rows: {} };
-  try {
-    const m = JSON.parse(readFileSync(file, 'utf8'));
-    m.rows = m.rows || {};
-    return m;
-  } catch {
-    return { generatedAt: null, rows: {} };
-  }
+  const m = JSON.parse(readFileSync(file, 'utf8'));
+  if (!m.rows || typeof m.rows !== 'object') throw new Error(`Invalid media manifest: ${file}`);
+  return m;
 }
 
 function ensureDir(dir) { if (!existsSync(dir)) mkdirSync(dir, { recursive: true }); }
@@ -134,6 +131,13 @@ async function main() {
   const cfg = parseArgs();
   const damConfig = cfg.damBase ? { baseUrl: cfg.damBase, folder: cfg.damFolder } : null;
   const damToken = damConfig ? resolveDamToken({ tokenFile: cfg.tokenFile }) : null;
+  if (damConfig && !damToken && !cfg.dryRun) {
+    throw new Error('DAM ingest requested but no DAM token is available; no images were processed');
+  }
+  if (!cfg.fromManifest) {
+    const missing = cfg.pages.filter((page) => !existsSync(path.resolve(page)));
+    if (missing.length) throw new Error(`Requested page(s) not found: ${missing.join(', ')}`);
+  }
 
   const manifest = loadManifest(cfg.manifest);
   ensureDir(path.dirname(cfg.manifest));
@@ -156,21 +160,25 @@ async function main() {
         caption: row.caption || '',
         seenUrls: new Set(row.seen_urls && row.seen_urls.length ? row.seen_urls : [src]),
         ownerPage: row.dam_page_path || '',
+        pageRefs: new Set(row.page_refs || [row.dam_page_path].filter(Boolean)),
       });
     }
   } else {
     for (const page of cfg.pages) {
       const abs = path.resolve(page);
-      if (!existsSync(abs)) { console.warn(`⚠️  page not found: ${page}`); continue; }
       const pagePath = pagePathFromFile(abs);
       const html = readFileSync(abs, 'utf8');
       for (const ref of extractImageRefs(html)) {
+        if (ref.alt === null || !ref.alt.trim()) {
+          console.warn(`[media] ${ref.alt === null ? 'missing' : 'empty'} alt: ${pagePath} ${ref.url}`);
+        }
         if (!/^https?:\/\//i.test(ref.url)) continue; // skip already-ingested / relative
         if (!isImageUrl(ref.url)) continue; // skip PDFs etc.
         const id = logicalId(ref.url);
         const existing = byLogical.get(id);
         if (existing) {
           existing.seenUrls.add(ref.url);
+          existing.pageRefs.add(pagePath);
           if (!existing.alt && ref.alt) existing.alt = ref.alt;
           if (!existing.caption && ref.caption) existing.caption = ref.caption;
         } else {
@@ -180,6 +188,7 @@ async function main() {
             caption: ref.caption,
             seenUrls: new Set([ref.url]),
             ownerPage: pagePath,
+            pageRefs: new Set([pagePath]),
           });
         }
       }
@@ -189,13 +198,14 @@ async function main() {
   const logicalIds = [...byLogical.keys()].slice(0, cfg.limit);
   const srcLabel = cfg.fromManifest ? 'from manifest' : `across ${cfg.pages.length} page(s)`;
   console.log(`[media] ${logicalIds.length} distinct logical image(s) ${srcLabel}`);
-  console.log(`[media] DAM: ${damConfig ? `${damConfig.baseUrl}${damConfig.folder} (token: ${damToken ? 'present' : 'MISSING → reference-in-place'})` : 'not configured'}`);
+  console.log(`[media] DAM: ${damConfig ? `${damConfig.baseUrl}${damConfig.folder} (token: ${damToken ? 'present' : 'dry-run only'})` : 'not configured'}`);
   console.log(`[media] DA archive: ${cfg.daArchive ? 'on' : 'off'}  ·  concurrency: ${cfg.concurrency}`);
   if (cfg.dryRun) console.log('[media] DRY RUN — no fetch/upload/write');
 
   // Incremental persistence (B): flush after each row completes.
   let dirty = 0;
   const flush = () => {
+    if (cfg.dryRun) return;
     writeFileSync(cfg.manifest, JSON.stringify(manifest, null, 2));
     dirty = 0;
   };
@@ -207,23 +217,50 @@ async function main() {
   async function processOne(id) {
     const info = byLogical.get(id);
     const prior = manifest.rows[id];
-    if (prior && prior.status === 'done' && !cfg.force) { counts.skipped += 1; return; }
+    if (!needsMediaBuild(prior, { dam: !!damConfig, da: cfg.daArchive, force: cfg.force })) {
+      const priorRefs = prior.page_refs || [prior.dam_page_path].filter(Boolean);
+      const pageRefs = [...new Set([...priorRefs, ...info.pageRefs])];
+      const seenUrls = [...new Set([...(prior.seen_urls || []), ...info.seenUrls])];
+      if (!cfg.dryRun && (pageRefs.length !== (prior.page_refs || []).length
+        || seenUrls.length !== (prior.seen_urls || []).length)) {
+        manifest.rows[id] = {
+          ...prior,
+          page_refs: pageRefs,
+          seen_urls: seenUrls,
+          alt: prior.alt || info.alt,
+          caption: prior.caption || info.caption,
+        };
+        flush();
+      }
+      counts.skipped += 1;
+      return;
+    }
 
     const pagePath = (prior && prior.dam_page_path) || info.ownerPage;
     const damAssetPath = damConfig ? damPathFor(info.sourceUrl, { damFolder: cfg.damFolder, pagePath }) : '';
+    const delivered = prior?.steps?.deliver === 'done' && !cfg.force
+      && Number.isFinite(prior.bytes) && prior.bytes <= OVERSIZE_BYTES;
+    const storedInDam = prior?.steps?.dam === 'done' && (!cfg.force || !damConfig);
+    const archivedInDa = prior?.steps?.da === 'done' && (!cfg.force || !cfg.daArchive);
+    let damStep = prior?.steps?.dam || 'n/a';
+    let daStep = prior?.steps?.da || 'n/a';
+    if (damConfig) damStep = storedInDam ? 'done' : 'pending';
+    if (cfg.daArchive) daStep = archivedInDa ? 'done' : 'pending';
 
     const row = {
+      ...prior,
       logical_id: id,
       source_url: info.sourceUrl,
       master_url: masterUrl(info.sourceUrl),
       dam_page_path: pagePath,
+      page_refs: [...new Set([...(prior?.page_refs || []), ...info.pageRefs])],
       // Mechanism B (media-cart original): the DAM asset path is the join key.
-      dam_asset_path: damAssetPath,
-      dam_original_url: '', // set to the fetched original url (provenance)
-      original_download_url: '', // deliverable original for the cart (M1: DA copy; prod: DM/OpenAPI)
+      dam_asset_path: storedInDam ? prior.dam_asset_path : '',
+      dam_original_url: storedInDam ? prior.dam_original_url : '',
+      original_download_url: archivedInDa ? prior.original_download_url : '',
       // Mechanism A (delivery): absolute url EDS ingests into its media bus at publish.
-      delivery_url: '',
-      da_path: '',
+      delivery_url: delivered ? prior.delivery_url : '',
+      da_path: archivedInDa ? prior.da_path : '',
       alt: info.alt || '',
       caption: info.caption || '',
       seen_urls: [...info.seenUrls],
@@ -231,80 +268,76 @@ async function main() {
       // still ingest the true master, but flag it so a reviewer can confirm the
       // page wanted a specific framing rather than the uncropped original.
       aspect_crop_source: [...info.seenUrls].some((u) => isAspectCrop(u)),
-      bytes: null,
-      preconditioned: false,
+      bytes: delivered ? prior.bytes : null,
+      preconditioned: delivered ? prior.preconditioned : false,
       // Per-step status (F5).
-      steps: { deliver: 'pending', dam: damConfig ? 'pending' : 'n/a', da: cfg.daArchive ? 'pending' : 'n/a' },
+      steps: {
+        deliver: delivered ? 'done' : 'pending',
+        dam: damStep,
+        da: daStep,
+      },
       status: 'pending',
       note: '',
     };
 
     if (cfg.dryRun) {
-      const pick = await pickIngestUrl(info.sourceUrl);
-      row.bytes = pick.bytes;
-      row.preconditioned = pick.preconditioned;
-      row.delivery_url = pick.ok ? pick.url : '';
-      row.steps.deliver = pick.ok ? 'planned' : 'skipped';
-      row.status = pick.ok ? 'planned' : 'skipped';
-      row.note = `dry-run: deliver ${pick.reason}; DAM original ${row.dam_asset_path || '(n/a)'}`;
-      manifest.rows[id] = row;
-      console.log(`  · ${id}  ${pick.reason}${pick.preconditioned ? ' [pre-conditioned]' : ''} → DAM ${row.dam_asset_path || '(n/a)'}`);
+      try {
+        const pick = row.steps.deliver === 'done'
+          ? { ok: true, reason: 'already delivered', preconditioned: row.preconditioned }
+          : await pickIngestUrl(info.sourceUrl);
+        if (!pick.ok) counts.failed += 1;
+        console.log(`  · ${id}  ${pick.reason}${pick.preconditioned ? ' [pre-conditioned]' : ''} → DAM ${damAssetPath || '(n/a)'}`);
+      } catch (err) {
+        counts.failed += 1;
+        console.error(`  ✗ ${id}  ${err.message}`);
+      }
       return;
     }
 
     try {
-      // 2. DELIVERY rendition (F4). If none is safe, skip delivery but still try DAM.
-      const pick = await pickIngestUrl(info.sourceUrl);
-      row.preconditioned = pick.preconditioned;
-      if (pick.preconditioned) counts.precond += 1;
-
-      let originalBuffer = null; let originalType = '';
-      if (pick.ok) {
-        const got = await fetchBinary(pick.url);
-        row.delivery_url = pick.url;
-        row.bytes = got.bytes;
-        row.steps.deliver = 'done';
-        originalBuffer = got.buffer; originalType = got.contentType;
-      } else {
-        row.steps.deliver = 'skipped';
-        row.note = `no safe delivery rendition: ${pick.reason}`;
-        console.warn(`  ⚠ ${id}  ${row.note}`);
+      // Delivery is reusable when a later run adds DAM ingest or DA archiving.
+      let deliveryBuffer = null; let deliveryType = '';
+      if (row.steps.deliver !== 'done') {
+        const pick = await pickIngestUrl(info.sourceUrl);
+        row.preconditioned = pick.preconditioned;
+        if (pick.preconditioned) counts.precond += 1;
+        if (pick.ok) {
+          const got = await fetchBinary(pick.url);
+          if (got.bytes > OVERSIZE_BYTES) throw new Error(`Delivery exceeds ${OVERSIZE_BYTES} bytes: ${pick.url}`);
+          row.delivery_url = pick.url;
+          row.bytes = got.bytes;
+          row.steps.deliver = 'done';
+          deliveryBuffer = got.buffer; deliveryType = got.contentType;
+        } else {
+          row.steps.deliver = 'skipped';
+          row.note = `no safe delivery rendition: ${pick.reason}`;
+          console.warn(`  ⚠ ${id}  ${row.note}`);
+        }
       }
 
-      // 3/4. DAM ingest — the ORIGINAL master (not the pre-conditioned copy).
-      if (damConfig) {
-        if (!damToken) {
-          row.steps.dam = 'skipped';
-          row.dam_asset_path = '';
-          row.note = [row.note, 'DAM token missing → reference-in-place'].filter(Boolean).join('; ');
-        } else {
-          // Fetch the ORIGINAL master (may be >10MB — that's fine for storage).
-          let masterBuf = originalBuffer; let masterType = originalType;
-          if (!pick.preconditioned && pick.ok && pick.url === row.master_url) {
-            // delivery WAS the master → reuse the buffer.
-          } else {
-            try {
-              const gotMaster = await fetchBinary(row.master_url);
-              masterBuf = gotMaster.buffer; masterType = gotMaster.contentType;
-              row.dam_original_url = row.master_url;
-            } catch {
-              // master unreachable → fall back to whatever delivery fetched
-              row.dam_original_url = pick.ok ? pick.url : '';
-            }
-          }
-          if (!row.dam_original_url) row.dam_original_url = pick.ok ? pick.url : row.master_url;
-          if (masterBuf) {
+      // Originals are fetched separately from delivery renditions. Never upload
+      // a resized or fallback source under the DAM-original identity.
+      if ((damConfig && row.steps.dam !== 'done') || (cfg.daArchive && row.steps.da !== 'done')) {
+        let masterBuffer = deliveryBuffer; let masterType = deliveryType;
+        if (!masterBuffer || row.delivery_url !== row.master_url) {
+          const master = await fetchBinary(row.master_url);
+          masterBuffer = master.buffer; masterType = master.contentType;
+        }
+        if (damConfig && row.steps.dam !== 'done') {
+          row.dam_original_url = row.master_url;
+          if (masterBuffer) {
             const dam = await uploadToDAM({
               damConfig,
               damPath: damAssetPath,
-              buffer: masterBuf,
+              buffer: masterBuffer,
               contentType: masterType,
               token: damToken,
             });
             row.dam_status = dam.status;
             if (dam.ok) {
               row.steps.dam = 'done';
-              await setDamMetadata({
+              row.dam_asset_path = damAssetPath;
+              const metadata = await setDamMetadata({
                 damConfig,
                 damPath: damAssetPath,
                 token: damToken,
@@ -312,6 +345,10 @@ async function main() {
                   originUrl: row.master_url, alt: row.alt, title: row.alt, sourcePage: pagePath,
                 },
               });
+              if (!metadata.ok) {
+                row.note = [row.note, `DAM provenance metadata ${metadata.status}`].filter(Boolean).join('; ');
+                console.warn(`  ⚠ ${id}  ${row.note}`);
+              }
             } else {
               row.steps.dam = 'error';
               row.dam_asset_path = '';
@@ -323,34 +360,31 @@ async function main() {
             row.note = [row.note, 'no master bytes to upload to DAM'].filter(Boolean).join('; ');
           }
         }
-      }
-
-      // 5. Optional DA archive (CDN-independence) + M1 deliverable original for cart.
-      if (cfg.daArchive && originalBuffer) {
-        ensureDir(MEDIA_DA_DIR);
-        writeFileSync(path.join(MEDIA_DA_DIR, id), originalBuffer);
-        const da = await uploadToDA({
-          org: cfg.org,
-          repo: cfg.repo,
-          daPath: daPathFor(id),
-          buffer: originalBuffer,
-          contentType: originalType,
-        });
-        row.da_status = da.status;
-        if (da.ok) {
-          row.da_path = daPathFor(id);
-          row.steps.da = 'done';
-          // M1 cart "download original" default = the DA-hosted copy (deliverable).
-          row.original_download_url = row.da_path;
-        } else {
-          row.steps.da = 'error';
-          row.note = [row.note, `DA archive ${da.status}`].filter(Boolean).join('; ');
+        if (cfg.daArchive && row.steps.da !== 'done') {
+          ensureDir(MEDIA_DA_DIR);
+          writeFileSync(path.join(MEDIA_DA_DIR, id), masterBuffer);
+          const da = await uploadToDA({
+            org: cfg.org,
+            repo: cfg.repo,
+            daPath: daPathFor(id),
+            buffer: masterBuffer,
+            contentType: masterType,
+          });
+          row.da_status = da.status;
+          if (da.ok) {
+            row.da_path = daPathFor(id);
+            row.steps.da = 'done';
+            row.original_download_url = row.da_path;
+          } else {
+            row.steps.da = 'error';
+            row.note = [row.note, `DA archive ${da.status}`].filter(Boolean).join('; ');
+          }
         }
       }
 
       // Per-step verdict (F5): done only when every REQUIRED step passed.
       const required = ['deliver'];
-      if (damConfig && damToken) required.push('dam');
+      if (damConfig) required.push('dam');
       if (cfg.daArchive) required.push('da');
       const allOk = required.every((s) => row.steps[s] === 'done');
       if (allOk) { row.status = 'done'; counts.done += 1; } else { row.status = 'partial'; counts.failed += 1; }
@@ -362,8 +396,8 @@ async function main() {
       ].filter(Boolean).join(' ');
       console.log(`  ${allOk ? '✓' : '⚠'} ${id}  ${row.bytes ?? '?'} bytes${row.preconditioned ? ' [pre-conditioned]' : ''} → ${row.delivery_url || '(no delivery)'}${extras ? `  (${extras})` : ''}`);
     } catch (err) {
-      row.status = 'error';
-      row.note = String(err.message || err);
+      row.status = 'partial';
+      row.note = [row.note, String(err.message || err)].filter(Boolean).join('; ');
       counts.failed += 1;
       manifest.rows[id] = row;
       console.error(`  ✗ ${id}  ${row.note}`);
@@ -378,7 +412,7 @@ async function main() {
   console.log(`\n[media] done=${counts.done} partial/failed=${counts.failed} skipped=${counts.skipped} pre-conditioned=${counts.precond}`);
   console.log(`[media] manifest → ${path.relative(WORKSPACE, cfg.manifest)}`);
   // F5: non-zero exit when failures remain (unless dry-run).
-  if (!cfg.dryRun && counts.failed > 0) process.exitCode = 1;
+  if (counts.failed > 0) process.exitCode = 1;
 }
 
 main().catch((err) => { console.error(err); process.exit(1); });

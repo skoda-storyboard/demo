@@ -34,3 +34,19 @@ The source CDN serves each logical image as an 8-named-size derivative ladder pl
 - Rights/licensing not machine-readable (no embedded EXIF credit strings) — confirm redistribution terms with stakeholders before migrating originals. (`SKODA-MEDIA-DEEP-DIVE.md` §5/§10)
 - DAM target (AEM Assets vs direct-DA vs reference-in-place) unresolved; legacy CDN sends no CORS header (blocks cross-origin canvas use) — reference-in-place is demo-only.
 - Footprint/derivative-multiplier numbers are **order-of-magnitude** (medium-confidence sample extrapolation).
+
+## Implementation checkpoint (2026-09-25; not accepted)
+
+Shared image normalization is wired into the runnable home, images/videos, press-release,
+model, series-hub and story importers. The media builder resumes delivery-only rows
+when DAM originals are approved; apply fails on missing pages or unresolved images
+and removes the legacy derivative `srcset`. `npm run media:audit` reconciles the
+canonical M1 URL list with imported image references, delivery evidence, captions,
+alts and DAM-original status. See `tools/importer/media/README.md` for the run order.
+
+The isolated worktree has **zero of the 42 distinct M1 page files**, so the
+read-only audit reports 42 missing pages; it does **not** establish live image
+coverage. Rights clearance, access and content-ops approval are required before
+copying originals or publishing. SKODA-506 must separately gate every SKODA-602
+preview/publish. Rendered responsive pictures and source/preview fidelity still
+need independent QA before checking off this ticket's acceptance criteria.
