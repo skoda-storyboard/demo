@@ -61,12 +61,23 @@ globalThis.document = {
 // the shared card-teaser primitive the block renders with. Dynamic import so the
 // shim above is in place first. createOptimizedPicture (aem.js) needs richer DOM,
 // so buildCardTeaser tests use image-less rows (the #3 regression path).
-const { isFeatured } = await import('./stories.js');
+const { isFeatured, parseFeedConfig, selectFeedRows } = await import('./stories.js');
 const {
   buildCardTeaser, formatCardDate, decorateCardCells,
 } = await import('../../scripts/card-teaser.js');
 
 const NO_FACETS = [];
+
+function configBlock(config) {
+  return {
+    querySelectorAll: () => Object.entries(config).map(([key, value]) => ({
+      children: [
+        { textContent: key },
+        { textContent: String(value), querySelector: () => null },
+      ],
+    })),
+  };
+}
 
 const rows = [
   { path: '/en/a', title: 'A', template: 'story', date: '2026-01-01' },
@@ -92,6 +103,37 @@ test('scopeRows filters by path prefix', () => {
 test('sortRows defaults to newest-first', () => {
   const sorted = sortRows(scopeRows(rows, { template: 'story' }), 'newest');
   assert.deepEqual(sorted.map((r) => r.title), ['D', 'E', 'B', 'A']);
+});
+
+test('authored offset falls back to zero with a warning when invalid', () => {
+  const oldWarn = console.warn;
+  const warnings = [];
+  console.warn = (...args) => warnings.push(args);
+  try {
+    assert.equal(parseFeedConfig(configBlock({})).offset, 0);
+    assert.equal(parseFeedConfig(configBlock({})).excludeFeatured, true);
+    assert.equal(parseFeedConfig(configBlock({ offset: '3' })).offset, 3);
+    assert.equal(parseFeedConfig(configBlock({ offset: '3' })).excludeFeatured, false);
+    assert.equal(parseFeedConfig(configBlock({ offset: '3', excludefeatured: 'true' })).excludeFeatured, true);
+    ['-1', '1.5', 'three', 'Infinity'].forEach((offset) => {
+      const cfg = parseFeedConfig(configBlock({ offset }));
+      assert.equal(cfg.offset, 0);
+      assert.equal(cfg.excludeFeatured, true);
+    });
+    assert.equal(warnings.length, 4);
+    assert.match(warnings[0][0], /offset must be a non-negative integer/);
+  } finally {
+    console.warn = oldWarn;
+  }
+});
+
+test('feed offset skips three filtered, newest-first rows before paging', () => {
+  const scoped = scopeRows(rows, { template: 'story' });
+  const selected = selectFeedRows(scoped, 'newest', 3);
+  assert.deepEqual(selected.map((r) => r.title), ['A']);
+  assert.deepEqual(paginate(selected, 5).map((r) => r.title), ['A']);
+  assert.deepEqual(selectFeedRows(scoped, 'oldest', 3).map((r) => r.title), ['D']);
+  assert.equal(scoped.length, 4, 'selection does not mutate the shared index rows');
 });
 
 test('paginate reveals the first perpage slice', () => {
@@ -176,6 +218,17 @@ test('pager: initial slice shows exactly `initial` cards, load-more appends `per
   assert.equal(paginate(sorted, 5 + 6 + 6).length, 17); // after two
 });
 
+test('feed offset keeps initial and load-more counts relative to the visible feed', () => {
+  const many = Array.from({ length: 20 }, (_, i) => ({
+    path: `/en/p${i}`, title: `P${i}`, date: `2026-01-${String(i + 1).padStart(2, '0')}`,
+  }));
+  const selected = selectFeedRows(many, 'newest', 3);
+  assert.equal(selected[0].title, 'P16');
+  assert.equal(paginate(selected, 5).length, 5);
+  assert.equal(paginate(selected, 11).length, 11);
+  assert.equal(decodeState('?offset=11', NO_FACETS, 5).revealed, 11);
+});
+
 // --- category / tag filtering (stories.md §8) ------------------------------
 // The block builds an `active` map { category:[...], tags:[...] } and reuses
 // listing-logic filterRows (within-value OR, across-key AND).
@@ -249,6 +302,16 @@ test('buildCardTeaser renders an overlay card with date + title', () => {
   const title = body.children.find((c) => c.className === 'card-teaser-title');
   assert.equal(date.textContent, '10. 9. 2026');
   assert.equal(title.textContent, 'Story A');
+});
+
+test('indexed story titles omit the site-wide SEO suffix, not the story title', () => {
+  const row = { path: '/en/a', title: 'The Škoda Peaq Will Win You Over Fast - Škoda Storyboard', date: '2026-09-22' };
+  const li = buildCardTeaser(row);
+  const body = li.children[0].children.find((c) => c.className === 'card-teaser-body');
+  const title = body.children.find((c) => c.className === 'card-teaser-title');
+  assert.equal(title.textContent, 'The Škoda Peaq Will Win You Over Fast');
+  assert.equal(row.title, 'The Škoda Peaq Will Win You Over Fast - Škoda Storyboard');
+  assert.equal(body.children[0].textContent, '22. 9. 2026');
 });
 
 test('buildCardTeaser: image-less row renders a full card, not a zero-height media element (#3)', () => {

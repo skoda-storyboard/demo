@@ -18,6 +18,8 @@ colors or spacing.
 Primitives (`brand.css`): `--skoda-green #0e3a2f`, `--skoda-green-emerald #78faae`,
 `--skoda-ink #161718`, `--skoda-white #fff`, `--skoda-grey-100 #f5f5f5`, `--skoda-grey-200 #e6e6e6`,
 `--skoda-grey-500 #7c7d7e`, `--skoda-grey-border #dadada`.
+Form primitives (SKODA-305): `--skoda-green-accent #419468`, `--skoda-grey-50 #f1f1f1`,
+`--skoda-grey-300 #d0d0d0`, `--skoda-grey-400 #a1a1a1`, `--skoda-grey-700 #5a5b5c`.
 
 Semantic map (use these downstream): `--background-color` → white, `--light-color` → grey-100,
 `--dark-color` → green, `--text-color` → ink, `--link-color` → ink, `--link-hover-color` → green,
@@ -50,6 +52,21 @@ Semantic map (use these downstream): `--background-color` → white, `--light-co
 ## Layout / nav
 
 `--content-max-width 1248px`; `--nav-height 108px`; `--nav-main-height 64px`; `--nav-topbar-height 44px`.
+
+## Footer shell (SKODA-304 / SKODA-305)
+
+`--footer-padding-y 4rem`; `--footer-row-gap 3rem` (widget margin + separator rhythm); `--footer-gutter 10px`
+(container inline padding / widget row offset); `--footer-column-padding 15px`; `--footer-legal-gap 2rem`;
+`--footer-text-gap 15px`; `--footer-social-gap 0.65rem` (badges → icons); `--footer-small-line-height 18px`;
+`--social-icon-size 40px`, `--social-icon-bg`, `--app-badge-w 135px`, `--app-badge-h 40px`.
+
+## Forms (SKODA-305 newsletter stub)
+
+`--input-bg` (grey-50), `--input-color` (ink), `--input-border-color` (grey-700), `--input-focus-color`
+(green-accent), `--input-radius 4px` (top corners), `--input-padding 10px`, `--form-gap 10px`;
+`--checkbox-size 18px`, `--checkbox-radius 3px`, `--checkbox-border-color` (grey-300),
+`--checkbox-checked-color` (green-accent), `--checkbox-label-gap 9px`; `--consent-color` (grey-400);
+`--newsletter-manage-color` (emerald; a deliberate a11y deviation from the source's 3.4:1 `#419468`, see footer-mediaroom.md §0).
 
 ## Breakpoints
 

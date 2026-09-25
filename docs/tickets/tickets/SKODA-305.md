@@ -12,6 +12,20 @@ Build the **Media Room footer** as a distinct `footer` fragment variant. The 202
 
 **Decision resolved by capture → (b) two section-resolved fragments.** The footers differ *materially*: Media Room has **5 widgets** (`app-download`, `social`, a Contacts nav with 2 links, a "Subscribe" mailguide form, and a "Company" text widget + Annual Report PDF) and **no 7-column sitemap**; content columns go `33.33%` at ≥768; copyright wording differs. The social/app/feed/notice shell is identical. Deltas are too large for one fragment, so ship `/footer` + `/media-room/footer` via the existing `getMetadata('footer')` (zero code change). Unification remains a possible later client simplification, but is not recommended given current fidelity.
 
+## Build notes (2026-09-25)
+Re-measured live while building; see [`footer-mediaroom.md` §0](../../ui-specs/footer-mediaroom.md#0-re-capture-2026-09-25-build-source-of-truth).
+- **Annual Report link dropped:** the live Company widget is heading + blurb only (EN + CZ); built to match live.
+- **Code change was needed** (the "zero code change" above is superseded): `footer.js` kept only the first
+  `<ul>` of the middle section. The footer now renders headed widget columns when the middle section has
+  headings, otherwise the Storyboard sitemap (`blocks/footer/footer-sections.js`, unit-tested).
+- **Subscribe** = new `newsletter-stub` block, UI-only for M1 (validates, announces an authored message,
+  sends nothing; fires `newsletter:subscribe` for SKODA-904).
+- **Shared shell corrected to source** (also improves the Storyboard footer): social row top/spacing, 48px
+  separator rhythm, 12px legal type, 32px copy gap, emerald feed divider.
+- **Pages using the MR footer (live):** `/en/media-room/`, `/en/news/`, `/en/press-releases/**`,
+  `/en/press-kits/**`, `/en/images/`, `/en/videos/`, `/en/contacts/`, `/en/skodapedia/**`, `/en/search/`,
+  `/en/newsletter/` (+ CZ equivalents, SKODA-1001).
+
 ## Description
 COM18 requires the footer to remain aligned with the standard Škoda footer pattern, but the client confirmed Storyboard and Media Room currently run **different footers**. SKODA-304 built the Storyboard footer; this ticket adds the Media Room variant as a second `footer` DA fragment loaded by the same Footer block, selected per section (decision above).
 
@@ -24,7 +38,7 @@ COM18 requires the footer to remain aligned with the standard Škoda footer patt
 ## Acceptance Criteria
 Measurable gates + the delta table live in [`footer-mediaroom.md`](../../ui-specs/footer-mediaroom.md); summary:
 - [ ] Media Room pages render the MR footer (`/media-room/footer` fragment); Storyboard pages render the Storyboard footer; resolved by `getMetadata('footer')`.
-- [ ] MR footer reflects the captured deltas: Contacts nav (2 links), Subscribe form, Company widget + Annual Report PDF, **no 7-column sitemap**; content columns `33.33%` at ≥768.
+- [ ] MR footer reflects the captured deltas: Contacts nav (2 links), Subscribe form, Company widget (blurb only; the Annual Report link is no longer on the live site, re-captured 2026-09-25), **no 7-column sitemap**; content columns `33.33%` at ≥768.
 - [ ] Shared shell (social 40×40 circles, app badges, feed links, copyright) reuses SKODA-304 patterns.
 - [ ] MR copyright wording matches source; `npm run lint` passes.
 
