@@ -40,6 +40,11 @@ In the #101 preview, the matching anchors have no target and replace the current
 - [ ] Internal sitemap links do not get `target="_blank"`.
 - [ ] New-tab links keep their accessible names and add no console or lint errors.
 - [ ] Chrome DevTools DOM inspection on the branch preview confirms the target/rel behaviour.
+- [ ] **Amendment (2026-09-25, sweep reconciliation D3: 306 owns the legal links, removed from SKODA-308):** the 4
+      legal links are **present** in the footer disclaimer on both footer variants (STO + MR), in `#78faae`. They are
+      Data Protection, Copyright, Cookies policies and Whistleblower system, and they exist in the source DOM
+      (parallel sweep V9). Add them to the `/footer` (and `/media-room/footer`) fragment content if they are missing.
+      The © line wording is correct per side.
 
 ## Scope boundary
 These QA findings stay under #25, because SKODA-304 already covers them:

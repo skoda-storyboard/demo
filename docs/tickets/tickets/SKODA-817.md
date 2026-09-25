@@ -37,7 +37,10 @@ second row, which leaves the first row image-less.
 
 ## Acceptance Criteria
 - [ ] Exactly 3 teaser rows, each with an image and a linked title.
-- [ ] 1440: "Explore more" and "Tags" headings are 16px/600; teasers show the title over the image, square corners.
+- [ ] 1440: "Explore more" and "Tags" headings are 16px/600/45 `rgb(53,53,53)` (20px at 390). Teasers show the title
+      over the image at 345×194, **with the source corner radius**. *Corrected 2026-09-25: the source cards do have
+      a radius, so "square corners" was wrong (parallel sweep V6).* No toolbar on the Explore-more cards. A 32px gap
+      above the Tags heading.
 - [ ] Unit/regression check on the transformer (nested teaser markup gives N rows, not 2N).
 
 ## Dependencies

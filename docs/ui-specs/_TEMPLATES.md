@@ -13,6 +13,13 @@ any full page/template; read the individual `template-*.md` for the measured vis
 Source census verified live via Chrome DevTools on 2026-09-15 (body-class = the WordPress template).
 Volumes from `docs/analysis/SKODA-MASTER.md` §3. URL buckets from `.migration/plans/url-analysis-comparison.md`.
 
+> **Sweep correction (2026-09-25).** The DevTools URL→block sweep ([registry](../analysis/SKODA-M1-URL-BLOCK-REGISTRY.md), [report](../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §7) disproved the points below on the live M1 pages. They override the sections they name until this spec is re-captured:
+>
+> - **Press-kit hub ≠ chapter page.** The three M1 hubs (Peaq/Epiq `-2`, Motorsport) have no chapter-nav, variant selector or accordion. Those live on the chapter child pages, which are outside M1. The hub is hero + tile grid (+ the WhatsApp/ZIP row on Peaq/Epiq).
+> - **Legal/copyright is inside the footer DOM** (`.copyright-text`, `.copyright-notice`, `.feed-links` under `footer`) on both STO and MR, not a separate strip outside it.
+> - **Series hub = curated editorial mosaic**: 8 / 14 / 10 / 5 / 12 tiles, 2/3-cell rows with 1:1 and ~2:1 tiles, editorial order (not newest-first) and mixed types (130-years includes a Press Kits tile). It is not a uniform grid.
+> - **MR side covers 16 M1 URLs** (press releases, model pages, press kits, Images, Videos). They need the MR nav + footer resolved per path (SKODA-309; the sweep draft 825 was folded in). Every source template also carries a floating share + scroll-top dock (SKODA-215; the sweep draft 827 is a duplicate).
+
 ## The shared shell
 
 Every page renders one header + one footer, selected by site side (the `error404`

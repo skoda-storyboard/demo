@@ -2,8 +2,19 @@
 - **Epic:** E06, Import Pilot Content
 - **Type:** import + section styling
 - **Phase:** A · **Milestone:** M1 (demo-visible: the first page shown)
-- **Estimate:** 3 SP · AI-assisted 1d / manual 2–3d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🔵 TODO
+- **Estimate:** 3 SP → **2.5 SP** after re-verification (parent; the work is in the slices) *(planning estimate, not a quote)*
+- **Status (2026-09-25):** 🔵 TODO, **parent**. Split per sweep-reconciliation decision D2 (same pattern as 805 / 805a–c):
+
+  | Slice | Scope | Tier | Size |
+  |---|---|---|---|
+  | [SKODA-611a](SKODA-611a.md) | 9-section structure, dark bands, social strip; keep the authored feed `offset` | **Must** | 1 SP |
+  | [SKODA-611b](SKODA-611b.md) | Band spacing to the measured pitch (67px gap, 320px rail pitch) | Should | 1.5 SP |
+
+  **Re-verified 2026-09-25 on main after #110** (CDP, 1440): the promo exclusion **already works**. `/en` shows 3
+  promo posts and Latest Stories starts at Epiq (15. 9. 2026) with **0 overlap**, via the authored `offset` in
+  `stories.js` (0304613, `excludeFeatured` off when an offset is set). That removes 0.5 SP from the original Must
+  scope. `/en` is **still one section** (`promo-box-container stories-container story-rail-container
+  carousel-container`, 13 blocks).
 
 ## Origin
 Demo URL/block sweep, 2026-09-25 (report §5). SKODA-212/213/214 name SKODA-604 as the owner of home composition, but 604 was

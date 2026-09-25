@@ -10,6 +10,12 @@ grouped media → [`press-kit-media.md`](press-kit-media.md); FAQ → [`faq-acco
 variant subsection → [`press-kit-variant.md`](press-kit-variant.md); rich text → [`story-detail.md`](story-detail.md);
 hero → [`hero.md`](hero.md); tiles → [`card-teaser.md`](card-teaser.md).
 
+> **Sweep correction (2026-09-25).** The DevTools URL→block sweep ([registry](../analysis/SKODA-M1-URL-BLOCK-REGISTRY.md), [report](../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §7) disproved the points below on the live M1 pages. They override the sections they name until this spec is re-captured:
+>
+> - At 375 the hub hero is a 211px image **above** a separate dark-text caption (no white overlay). The h1 stays 28px at 768 and becomes 48px at 992.
+> - The M1 hubs have **no chapter-nav, variant selector or accordion** (child pages only). Motorsport has 24 cards: 20 historical square, 1 cross-kit (Enyaq RS Race), 3 resource.
+> - First glimpse: a **Vimeo** iframe (not Buzzsprout). **Eight topical row toggles** (not a FAQPage section). The Media Box is 1 video + 55 images + 4 PDFs, plus a separate sidebar Images preview (+51).
+
 ## 1. Identity
 
 - **Component:** Press Kit detail template, the structured, more-controlled page type behind a model
