@@ -2,6 +2,7 @@
 - **Epic:** E08, Editorial at Scale (UI); production service stays E09 / SKODA-904
 - **Type:** block + import
 - **Phase:** A · **Milestone:** M1 (demo, UI only, no ESP wiring)
+- **GitHub issue:** [#126](https://github.com/skoda-storyboard/demo/issues/126)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
 - **Status (2026-09-24):** 🔵 TODO
 

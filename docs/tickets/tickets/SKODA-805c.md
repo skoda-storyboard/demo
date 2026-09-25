@@ -4,7 +4,7 @@
 - **Type:** template / import
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 **Should** tier (P1, 15 Oct demo) · fallback = the SKODA-607 PR shell without accordions
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3d *(planning estimate, not a quote)*
-- **Parent:** SKODA-805 (#66) · **GitHub issue:** *not yet created* (proposed in [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md))
+- **Parent:** SKODA-805 (#66) · **GitHub issue:** [#130](https://github.com/skoda-storyboard/demo/issues/130)
 
 ## UI Specification
 Two-column article per [`story-detail.md`](../../ui-specs/story-detail.md) / [`template-press-release.md`](../../ui-specs/template-press-release.md);

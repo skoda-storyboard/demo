@@ -47,3 +47,11 @@ Measurable gates in [`template-home.md`](../../ui-specs/template-home.md); summa
 - **Engine reuse (🟢→🟡):** must consume SKODA-402's loader/paginate, not fork it; flag if a facet-less extract requires refactoring 402's `listing-logic`.
 - **Feed page size + Load more vs infinite scroll (🟡):** default Load more button (source-confirmed on `template-home.md` §108); confirm `pageSize` per source before locking.
 - **Home composition boundary:** this ticket builds the *block*; assembling it into `/en/` is SKODA-604.
+
+---
+### Relations
+**Depends on:** #15 (SKODA-201 card-teaser) · #28 (SKODA-402 query-index loader/paginate — reuse target) · #27 (SKODA-401 index schema) · #14 (SKODA-106 tokens)
+**Blocks:** #58 (SKODA-209 archive feed reuse) · #38 (SKODA-604 home composition)
+**Sibling home blocks:** #98 (SKODA-212 rails) · #99 (SKODA-213 promo-box)
+
+*Ticket source of truth on `main`: `docs/tickets/tickets/SKODA-214.md`.*

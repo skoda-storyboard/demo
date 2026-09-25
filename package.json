@@ -14,6 +14,7 @@
     "media:audit": "node tools/importer/media/audit-m1-media.mjs",
     "test:media": "node --test tools/importer/media/*.test.mjs",
     "media:validate-metadata": "node tools/importer/validate-metadata.mjs",
+    "import:push": "node tools/importer/push-to-da.mjs",
     "prepare": "husky"
   },
   "repository": {

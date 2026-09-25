@@ -21,10 +21,10 @@ Bucket A of `.migration/plans/url-analysis-comparison.md` verified that real sto
 > - `/en/skoda-world/how-the-skoda-octavia-reached-365-km-h/`: 5 in-body carousels + Media Box
 > - `/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia/`: carousel + Vimeo + Media Box
 >
-> **Split of work.** The baseline media reconstruction for all 21 stories now lives in **SKODA-801a**, which maps:
-> - carousel → SKODA-219
-> - Media Box → downloads
-> - Vimeo → embed
+> **Split of work.** The baseline media reconstruction for all 21 stories is split (review §15):
+> - carousel → SKODA-819 (Gallery `slider`; supersedes SKODA-219)
+> - Media Box → downloads (**SKODA-801a**)
+> - Vimeo → embed (SKODA-818, done in #113)
 >
 > This ticket is therefore limited to **full visual fidelity** (≤2% diff, lightbox, cart hook) on the 2 hero stories.
 > Estimate unchanged at 2 SP.

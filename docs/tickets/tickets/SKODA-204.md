@@ -8,7 +8,7 @@
 **Build-ready measured spec: [`docs/ui-specs/embeds.md`](../../ui-specs/embeds.md)** (captured via Chrome DevTools). Read it before implementing.
 
 Key facts from capture that change this ticket:
-- Video: `.video-container` = **16:9** (`padding-bottom:56.25%`, measured); Vimeo `?dnt=1`; YouTube nocookie host.
+- Video: `.video-container` = **16:9** (`padding-bottom:56.25%`, measured); Vimeo `?dnt=1`; YouTube uses the standard `youtube.com/embed` host with `?feature=oembed&enablejsapi=1` (measured live — the source does **not** use the nocookie host).
 - **Audio (Buzzsprout) is fixed `200px` height, NOT 16:9**, use a separate audio aspect/height, not the video wrapper.
 - Lazy **confirmed live**: `.embed-controller-wrapper` (`ys-embed-controller`) swaps `data-src`→`src` on scroll-in → replace with native `loading="lazy"` + click-to-load.
 - Consent placeholder: `.page-embed_cookie` (`#c4c6c7` box, pill button) + OneTrust; M1 gate is a stub (consent OUT of Adobe scope, D10).
@@ -29,7 +29,7 @@ Embeds appear across story + press-release pages (Vimeo 246, YouTube 201, Buzzsp
 1. Detect provider from URL host (Vimeo / YouTube / Buzzsprout / Spotify).
 2. Build the correct iframe embed URL:
    - Vimeo: `player.vimeo.com/video/{id}?dnt=1&app_id=…`, **preserve `dnt=1`**.
-   - YouTube: privacy/nocookie embed URL.
+   - YouTube: `www.youtube.com/embed/{id}?feature=oembed&enablejsapi=1`, matching the live source.
    - Buzzsprout / Spotify: audio embed URL (audio variant of the same block).
 3. `loading="lazy"` (native), replaces IntersectionObserver `data-src` swap.
 4. Aspect-ratio CSS wrapper (no CLS); `<iframe title>` set.
@@ -40,7 +40,7 @@ Embeds appear across story + press-release pages (Vimeo 246, YouTube 201, Buzzsp
 ## Acceptance Criteria
 Measurable gates live in [`embeds.md` §9](../../ui-specs/embeds.md); summary:
 - [ ] All four providers render from a pasted URL (autoblock).
-- [ ] Vimeo embeds carry `dnt=1`; YouTube uses the nocookie host.
+- [ ] Vimeo embeds carry `dnt=1`; YouTube uses the live source's `youtube.com/embed` URL (`feature=oembed&enablejsapi=1`).
 - [ ] Video wrapper = **16:9** (`padding-bottom:56.25%` or `aspect-ratio:16/9`), no CLS.
 - [ ] Audio (Buzzsprout/Spotify) uses a **fixed `200px`** height, not the video aspect.
 - [ ] iframes use native `loading="lazy"` and have a `title`.

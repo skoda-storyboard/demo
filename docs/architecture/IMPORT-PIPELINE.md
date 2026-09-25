@@ -19,11 +19,11 @@ page-templates.json  ──►  import-<name>.js  ──►  import-<name>.bundl
                                      │  run via run-bulk-import.js
                                      ▼
                                content/<path>.plain.html   (local, bare <div> markup)
-                                     │  media:build → media:apply → SKODA-506 gate
-                                     │  SKODA-602: wrap <body><main>, POST to DA
+                                     │  media:build → media:apply
+                                     │  push-to-da.mjs: wrap page and POST to DA
                                      ▼
                      admin.da.live/source/{org}/{repo}/{path}.html
-                                     │  preview → publish
+                                     │  bulk preview → validate → bulk publish (+ /nav, /footer live)
                                      ▼
                           query-index rebuilds → index-driven blocks populate
 ```
@@ -75,8 +75,18 @@ Whole-page shaping, run as `beforeTransform` / `afterTransform` hooks:
 ### `import-<name>.js` + `import-<name>.bundle.js`
 The `import-<name>.js` wires it together: embeds the `page-templates.json` entry, registers parsers + transformers, runs the two hooks around `WebImporter.rules`, and writes a sanitized output path. The **`.bundle.js` is the runnable artifact** — that's what the bulk runner executes.
 
-### DA source push (SKODA-602)
-The source-API upload needs to wrap each bare `.plain.html` in `<body><main>…</main></body>`, POST to `https://admin.da.live/source/{org}/{repo}/{path}.html`, then preview and publish. The previously documented `upload-<name>.sh` scripts are **not in this checkout**; use the verified SKODA-602 content-ops route once available. Never paste credentials in a script or chat.
+### `push-to-da.mjs` (SKODA-602) — DA push + bulk preview/publish
+One tool for every template (the per-template `upload-<name>.sh` scripts described in earlier drafts were never built). It reads `content/<path>.plain.html` for a URL list, wraps each page in `<body><header></header><main>…</main><footer></footer></body>`, `POST`s it to `https://admin.da.live/source/{org}/{repo}/{path}.html`, then runs **admin.hlx.page bulk jobs** (the API behind EW Bulk Operations) to preview and — only when asked — publish. **Credentials are injected by the environment — never a token in the script, a flag, or the chat.**
+- **Drafts first:** the default stage is `push,preview`. The previewed-but-unpublished page on `.aem.page` *is* the draft; publish is a separate, explicit `--stage publish` that only publishes pages that passed validation.
+- **Overwrite protection:** `tools/importer/push/push-manifest.json` (committed) records the hash of each page's `<main>` content at our last push. Per page the tool decides `new` / `unchanged` / `update` / **`conflict`** — a conflict means DA changed since our last push (an author edited it) or holds a document we have no record of, and it is **never overwritten without `--force`**. Wrapper whitespace differences are ignored.
+- **Validation after preview:** `.plain.html` must be 200 and every `<img>` must have moved to the media bus (a leftover `cdn.skoda-storyboard.com` URL means the ingest failed — usually an oversized master, SKODA-506). Publish 409s are reported per URL.
+- **Shared fragments:** before publishing it checks that `/nav`, `/footer` (and any `nav`/`footer` metadata overrides) are **live**. A previewed-but-unpublished `/footer` empties the footer on every `.aem.live` page while `.aem.page` looks fine (2026-09-25). `--publish-fragments` publishes them if they are previewed.
+- **After publish:** polls the query index until every published path has a row, and smoke-tests `/nav` + `/footer` on `.aem.live`.
+- **Output:** `tools/importer/reports/push/<stamp>.json` (per-URL `action`, DA/preview/live status, image check, indexed, errors) and `<stamp>-urls.txt` (validated preview URLs, the SKODA-603 validation input). Exit code 1 on any conflict, error or failed validation.
+
+**SKODA-506 is still a separate prerequisite:** the push tool's image validation does
+not replace an enforced media check immediately before **every** preview/publish.
+Do not use those stages for M1 pages until that gate has been implemented.
 
 ### `urls-<name>.txt`
 The input URL list for the run.
@@ -94,11 +104,24 @@ npm run media:apply -- --pages content/<path>.plain.html
 # 3) Validate metadata, then inspect locally against previewed DA content.
 node tools/importer/validate-metadata.mjs content/<path>.plain.html
 npx -y @adobe/aem-cli up          # inspect content/... at localhost:3000
-# 4) Only after rights approval, optional DAM original ingest, and SKODA-506's
-#    separate enforced oversize gate: push → preview → publish via SKODA-602.
+
+# 4) Plan the push (reads DA, decides new/unchanged/update/conflict — writes nothing)
+npm run import:push -- --urls tools/importer/urls-<name>.txt --dry-run
+
+# 5) Only once SKODA-506 gates every preview/publish: push → bulk preview → validate
+npm run import:push -- --urls tools/importer/urls-<name>.txt
+
+# 6) After review and the SKODA-506 gate: publish → reindex (+ fragments live)
+npm run import:push -- --urls tools/importer/urls-<name>.txt --stage publish --publish-fragments
 ```
 
-**Order matters:** import → media build/apply → metadata validation → SKODA-506 pre-publish gate → DA push → preview → **publish** → reindex. SKODA-501's media builder selects publish-safe renditions, but does **not** enforce SKODA-506's gate on every preview/publish. The query-index only sees *published* pages, so index-driven blocks stay empty until publish and reindex.
+**Order matters:** import → media build/apply → metadata validation → push →
+SKODA-506 gate before preview → review → SKODA-506 gate before **publish** →
+reindex. SKODA-501's media builder selects publish-safe renditions, but does
+**not** enforce the publish-time gate. The query-index only sees *published*
+pages, so index-driven blocks stay empty until publish and reindex; check rails
+in a second pass. Check both hosts: `.aem.page` renders previewed fragments,
+`.aem.live` only published ones.
 
 ---
 
@@ -108,7 +131,7 @@ npx -y @adobe/aem-cli up          # inspect content/... at localhost:3000
 2. **Add a template entry** to `page-templates.json` (name + block→selector map).
 3. **Reuse or add parsers** — most new rails reuse `carousel` / `cards-*`; add a parser only for genuinely new block shapes.
 4. **Reuse or clone a transformer** — e.g. a press-release detail is ~`skoda-story-cleanup` with a different category/section; clone and adjust.
-5. **Assemble `import-<name>.js`**, bundle it, create `urls-<name>.txt`, and use the SKODA-602 DA push process.
+5. **Assemble `import-<name>.js`**, bundle it, create `urls-<name>.txt` (pushed with the shared `push-to-da.mjs`, §2 — no per-template upload script).
 6. **Ingest + rewrite media** — after the content import, run the media toolkit
    (`tools/importer/media/`, see its `README.md`): `npm run media:build -- --pages content/<path>.plain.html`
    dedups to logical masters, **pre-conditions >~10 MB masters** (else the content bus 409s on publish),

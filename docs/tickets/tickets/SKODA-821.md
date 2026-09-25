@@ -2,6 +2,7 @@
 - **Epic:** E08, Editorial at Scale
 - **Type:** styling
 - **Phase:** A/B · **Milestone:** M1 (demo story fidelity)
+- **GitHub issue:** [#124](https://github.com/skoda-storyboard/demo/issues/124)
 - **Estimate:** 1 SP · AI-assisted 0.25d / manual 0.5d *(planning estimate, not a quote)*
 - **Status (2026-09-24):** 🔵 TODO
 

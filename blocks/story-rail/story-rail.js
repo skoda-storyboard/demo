@@ -30,7 +30,7 @@ import {
 import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
 import { formatCardDate } from '../../scripts/card-teaser.js';
 import {
-  scopeRows, filterRows, sortRows, paginate,
+  scopeRows, filterRows, sortRows, paginate, INDEX_FACETS,
 } from '../listing/listing-logic.mjs';
 
 // Split a comma-separated config value into trimmed tokens.
@@ -47,6 +47,13 @@ export function parseConfig(block) {
     template: cfg.template || 'story',
     category: tokens(cfg.category),
     tag: tokens(cfg.tag || cfg.tags),
+    // index facet columns (model, years, …) as config keys (SKODA-820): each key is
+    // its own facet, so `model: epiq` + `years: 2026` must BOTH match (the story's
+    // "Related Stories · Based on tags: 2026, Epiq" rail), while values within one
+    // key still OR — the same filterRows semantics as the listing.
+    facets: Object.fromEntries(INDEX_FACETS
+      .map((key) => [key, tokens(cfg[key])])
+      .filter(([, vals]) => vals.length)),
     heading: cfg.heading || '',
     // header "view all" link (source a.link-all)
     viewAll: cfg.viewall || cfg.viewAll || cfg.all || '',
@@ -66,7 +73,7 @@ export function parseConfig(block) {
  */
 export function selectRows(all, cfg) {
   let scoped = scopeRows(all, { template: cfg.template, path: cfg.path });
-  const active = {};
+  const active = { ...(cfg.facets || {}) };
   if (cfg.category.length) active.category = cfg.category;
   if (cfg.tag.length) active.tags = cfg.tag;
   if (Object.keys(active).length) scoped = filterRows(scoped, active);
@@ -84,6 +91,7 @@ export function selectRows(all, cfg) {
 const CONFIG_KEYS = new Set([
   'index', 'path', 'template', 'category', 'tag', 'tags', 'heading',
   'viewall', 'view-all', 'all', 'sort', 'limit', 'exclude', 'dots',
+  ...INDEX_FACETS,
 ]);
 
 // Is this a key/value config table, or curated cards? A config table is a set of
