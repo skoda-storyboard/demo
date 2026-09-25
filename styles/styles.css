@@ -38,6 +38,7 @@
   /* font weights — source ships only 300/400/600/700 (no real 500 face). */
   --weight-light: 300;
   --weight-regular: 400;
+  --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
 
@@ -59,6 +60,7 @@
   --prose-measure: 72ch;
 
   /* body sizes (mobile-first base) */
+  --body-font-size-lead: 20px; /* story perex under the hero (live: 20/30 wt600) */
   --body-font-size-m: 16px;
   --body-font-size-s: 14px;
   --body-font-size-xs: 13px;
@@ -76,6 +78,20 @@
   --heading-font-size-hero: 48px;
   --heading-font-size-hero-story: 40px;
   --heading-font-size-hero-story-mobile: 28px;
+
+  /* story body prose headings (measured on the live Epiq story; switch at >768):
+     h2 24/27 → 40/45, h3 20/23 → 24/27.6, all wt300 with a 16px bottom margin */
+  --heading-font-size-story-h2-mobile: 24px;
+  --heading-font-size-story-h3-mobile: 20px;
+  --heading-font-size-story-h3: 24px;
+  --story-meta-gap: 11px; /* published date → category tag, same row (live) */
+  --story-intro-gap: 48px; /* intro (date + tag) → article body at >=768 (live) */
+
+  /* story aside headings ("Explore more", "Tags"; live h3.sidebar-heading):
+     20px → 16px above 768, in a 45px line box sitting flush on what follows */
+  --sidebar-heading-font-size-mobile: 20px;
+  --sidebar-heading-font-size: 16px;
+  --sidebar-heading-line-height: 45px;
 
   /* hero geometry (hero.md §8; SKODA-202) */
   --hero-vh: 61.8vh;
@@ -633,8 +649,9 @@ main .section.dark a {
 /* Layer 1 — fluid. Mobile-first: sections stack in source order (body, then the
    Style:sidebar aside below it), which matches the source <768 behaviour. Cap the
    prose measure for readability rather than filling the whole column. Story prose
-   scale is measured (story-detail.md §3): body p 16/24; h2 40/45 wt300 (→28 mobile);
-   h3 24/27.6 wt300; prose lists use a custom bullet (list-style:none, padding 1.5em).
+   scale is measured (story-detail.md §3, re-measured on the live Epiq story): body
+   p 16/24; h2 24/27 → 40/45 and h3 20/23 → 24/27.6 above 768px, all wt300 with a
+   16px gap below; prose lists use a custom bullet (list-style:none, padding 1.5em).
    Scoped to the story body column so global heading sizes stay intact. */
 body.story main > .section.body-column .default-content-wrapper {
   max-width: var(--prose-measure);
@@ -643,20 +660,88 @@ body.story main > .section.body-column .default-content-wrapper {
 }
 
 body.story main > .section.body-column .default-content-wrapper h2 {
-  font-size: var(--heading-font-size-hero-story-mobile); /* 28px mobile base */
+  margin-bottom: var(--spacing-m);
+  font-size: var(--heading-font-size-story-h2-mobile);
   font-weight: var(--weight-light);
   line-height: 1.125;
 }
 
 body.story main > .section.body-column .default-content-wrapper h3 {
-  font-size: var(--heading-font-size-l);
+  margin-bottom: var(--spacing-m);
+  font-size: var(--heading-font-size-story-h3-mobile);
   font-weight: var(--weight-light);
   line-height: 1.15;
+}
+
+/* Story intro under the hero (measured on the live Epiq story header): the perex
+   at 20/30 semibold, then the published date (12/18 light) and the category tag on
+   one row. decorateStoryIntro() (scripts.js) tags the section and moves the date
+   in front of the Tags block, so both share the tags wrapper's padding. */
+body.story main > .section.story-intro .default-content-wrapper p:not(.story-date) {
+  margin-bottom: var(--spacing-m);
+  font-size: var(--body-font-size-lead);
+  font-weight: var(--weight-semibold);
+  line-height: 1.5;
+}
+
+body.story main > .section.story-intro .tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs) var(--story-meta-gap);
+}
+
+body.story main > .section.story-intro .story-date {
+  margin: 0;
+  font-size: var(--body-font-size-2xs);
+  font-weight: var(--weight-light);
+  line-height: 1.5;
+}
+
+/* the row is as tall as the pill (no global li margin / 24px line box), so the
+   date centres on the tag as on the source */
+body.story main > .section.story-intro .tags-list li {
+  display: flex;
+  margin-bottom: 0;
+}
+
+/* intro → article body: 16px on the source below 768 (the block margins collapse
+   there, so the body's top margin sets the gap) */
+body.story main > .section.story-intro {
+  margin-bottom: 0;
+}
+
+body.story main > .section.story-intro + .section {
+  margin-top: var(--spacing-m);
 }
 
 body.story main > .section.body-column .default-content-wrapper ul {
   list-style: none;
   padding-left: 1.5em;
+}
+
+/* aside section headings, as the source h3.sidebar-heading (size steps down past
+   768 in the query at the end of this section). DA drops the imported <aside>
+   element, so the headings sit in the sidebar section's default content. */
+body.story main > .section.sidebar .default-content-wrapper h2 {
+  margin: 0;
+  color: var(--sidebar-heading-color);
+  font-size: var(--sidebar-heading-font-size-mobile);
+  font-weight: var(--weight-semibold);
+  line-height: var(--sidebar-heading-line-height);
+}
+
+/* aside "Explore more" teasers (Cards (overlay)): the source keeps the lighter
+   dual scrim and a 16/20 medium title without the rails' text shadow */
+body.story main > .section.sidebar .card-teaser.overlay .card-teaser-body {
+  background-image: var(--scrim-h), var(--scrim-v);
+}
+
+body.story main > .section.sidebar .card-teaser.overlay .card-teaser-title {
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-medium);
+  line-height: 1.25;
+  text-shadow: none;
 }
 
 /* The aside: stacked full-width cards + tags below the body on small screens. */
@@ -697,6 +782,13 @@ body.story main > .section.sidebar aside {
     grid-column: 2;
   }
 
+  /* intro → article body is 48px here on the source (grid items don't collapse
+     margins, so both first-row sections carry it and stay top-aligned) */
+  body.story main > .section.story-intro ~ .section.body-column,
+  body.story main > .section.story-intro ~ .section.sidebar {
+    margin-top: var(--story-intro-gap);
+  }
+
   body.story main > .section.dark {
     grid-column: 1 / -1;
     position: relative;
@@ -713,10 +805,28 @@ body.story main > .section.sidebar aside {
     background: var(--dark-color);
     z-index: -1;
   }
+}
 
-  /* At desktop the measured source h2 is 40/45 (wt300). */
+/* From 1080 the hero title moves above its image (hero-image block), so the intro
+   would sit flush under the image; the source keeps the perex's 16px top gap. */
+@media (width >= 1080px) {
+  body.story main > .section.story-intro .default-content-wrapper {
+    margin-top: var(--spacing-m);
+  }
+}
+
+/* The source steps the prose headings up just past 768px (24px h2 at 768, 40px at
+   769), one pixel after the grid breakpoint above, so it gets its own query. */
+@media (width > 768px) {
   body.story main > .section.body-column .default-content-wrapper h2 {
-    font-size: var(--heading-font-size-hero-story);
-    line-height: 1.125;
+    font-size: var(--heading-font-size-hero-story); /* 40px */
+  }
+
+  body.story main > .section.body-column .default-content-wrapper h3 {
+    font-size: var(--heading-font-size-story-h3);
+  }
+
+  body.story main > .section.sidebar .default-content-wrapper h2 {
+    font-size: var(--sidebar-heading-font-size);
   }
 }

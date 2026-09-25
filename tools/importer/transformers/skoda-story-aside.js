@@ -9,7 +9,7 @@
  * discarding the secondary column, we emit it as its OWN section carrying editorial
  * content, so the grid-on-main layout (styles.css, scoped to body.story) can place it
  * beside the body:
- *   .related  ("Explore more", 3 .article-teaser)  → Cards block
+ *   .related  ("Explore more", 3 .article-teaser)  → Cards (overlay) block
  *   section.tags (ol.entry-tags)                    → Tags block
  *   .newsletter-subscribe-widget / .side-banner     → DROPPED (JS-service / external
  *       widgets with no static content; not editorial body — chrome, per story-detail
@@ -42,7 +42,9 @@ function relatedCards(sidebar, document) {
     .filter((el) => !matched.some((other) => other !== el && other.contains(el)));
   if (!teasers.length) return null;
 
-  const cells = [['Cards']];
+  // The source renders these as image teasers with the title over the image
+  // (article-teaser overlay), so emit the overlay variant.
+  const cells = [['Cards (overlay)']];
   let emitted = 0;
   teasers.forEach((t) => {
     const img = t.querySelector('img');
@@ -53,21 +55,24 @@ function relatedCards(sidebar, document) {
       || (link && link.textContent.trim())
       || '';
     if (!link && !img) return;
-    // Cell 2 holds the title (linked when a href exists). createTable accepts a plain
-    // array of nodes as one cell (see tags.js) — NOT an { elems } object (that is the
-    // runtime buildBlock format and serialises to "[object Object]" here).
+    // Cell 2 holds the title as a heading (linked when a href exists): the card
+    // primitive reads a heading as the card title and its link as the whole-card
+    // link, whereas a cell of only link paragraphs is read as a toolbar of buttons.
+    // createTable accepts a plain array of nodes as one cell (see tags.js) — NOT an
+    // { elems } object (that is the runtime buildBlock format and serialises to
+    // "[object Object]" here).
     const content = [];
     if (title) {
-      const p = document.createElement('p');
+      const h = document.createElement('h3');
       if (link) {
         const a = document.createElement('a');
         a.setAttribute('href', link.getAttribute('href'));
         a.textContent = title;
-        p.appendChild(a);
+        h.appendChild(a);
       } else {
-        p.textContent = title;
+        h.textContent = title;
       }
-      content.push(p);
+      content.push(h);
     }
     cells.push([img || '', content]);
     emitted += 1;

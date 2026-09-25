@@ -44,3 +44,11 @@
   height: 100%;
   border: 0;
 }
+
+/* story body: share the text column's edges — the prose wrapper is capped at
+   --prose-measure and centred (styles.css), so the embed takes the same measure
+   (matches the Gallery slider; SKODA-819 alignment request) */
+body.story .section.body-column .embed {
+  max-width: var(--prose-measure);
+  margin-inline: auto;
+}
