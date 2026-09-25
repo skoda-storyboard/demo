@@ -95,8 +95,8 @@ flowchart LR
   TRF --> BUN
   BUN --> RUN["run-bulk-import.js"]
   RUN --> OUT["content/&lt;path&gt;.plain.html"]
-  OUT --> UP["upload-&lt;name&gt;.sh<br/>wrap &lt;body&gt;&lt;main&gt; → POST DA source-API"]
-  UP --> PUB["Preview → Publish → reindex"]
+  OUT --> UP["push-to-da.mjs (SKODA-602)<br/>wrap &lt;body&gt;&lt;main&gt; → POST DA source-API<br/>(overwrite protection via push-manifest)"]
+  UP --> PUB["Bulk preview → validate → bulk publish<br/>(+ /nav, /footer live) → reindex"]
   PUB --> LIVE["Live on /en + query-index"]
 
   MEDIA["Media pre-conditioning<br/>(strip >~10MB masters)"] -.-> UP

@@ -16,6 +16,7 @@ board hygiene, but it predates the 43-URL scope.
    - `main` has **3 rows** in `/en/query-index.json` (`/en`, `/en/skoda-model/elroq`, `/en/test/listing-demo`).
    - **42 of 43 demo URLs return 404** on preview.
    - The P0 content tickets **602/603** have not started, and 602 needs DA credentials (a human gate).
+     *Update 2026-09-25: the gate is resolved — the environment injects the DA/admin credentials, and SKODA-602 is built and piloted (`tools/importer/push-to-da.mjs`).*
    - Rendered QA shows the effect: the `/en` Latest Stories feed (SKODA-214, "Done") renders **0 cards**, only
      because there are no story rows.
 2. **The scope has outgrown the ticket set.** The 43 URLs pull in four things the M1 backlog did not plan:
@@ -150,7 +151,7 @@ index it once (SKODA-609).
 | | Sidebar (STO-D07), newsletter | ⚫ M2 / 904 | – | – |
 | | 2 full-fidelity hero stories | 🔵 | 604 (re-pointed to in-set stories) | demo-visible |
 | **Cross-cutting** | Media: masters-only, pre-conditioning gate | 🔵 | 501, 506 | demo-blocking (publish 409s) |
-| | DA push, bulk preview/publish, reindex | 🔵 | 602 (human gate) | demo-blocking |
+| | DA push, bulk preview/publish, reindex | 🟢 | 602 (built 2026-09-25; gate resolved) | demo-blocking |
 | | 43 + corpus import, per-URL tracker | 🔵 | 603 (re-scoped, 5 SP) | demo-blocking |
 | | Lint, Lighthouse ≥90, WCAG 2.1 AA, ≤2% visual diff, dry run | 🔵 | 701, 702, 703, 704, 707 | demo-blocking (gates) |
 | | CS locale proof | 🔵 | 303 / decision D-2 | cosmetic (Should) |
