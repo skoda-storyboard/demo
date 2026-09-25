@@ -146,11 +146,19 @@ params land on `dataset` (e.g. `data-src`).
 |-------|----------------------------------------------|
 | url   | https://vimeo.com/1221703335                 |
 | ratio | 16x9                                          |
+| title | Škoda Octavia turns 30 (optional iframe title) |
+
+The URL must be an absolute `http(s)` provider URL; missing, relative or non-http(s) values (and
+YouTube/Vimeo URLs without a media id) are rejected with a console warning and render nothing
+(block flagged `.embed-invalid`). The iframe `title` comes from the `title` row / link `title`
+attribute, else descriptive link text, else a readable provider label (e.g. "YouTube video") —
+never the raw URL.
 
 ### decorate() outline (repo conventions, `_FOUNDATIONS` §7)
 - Read the provider URL (cell/link/`data-src`); detect provider (vimeo / youtube / buzzsprout /
   spotify) and normalize the embed URL: Vimeo `player.vimeo.com/video/ID?dnt=1`, YouTube
-  `www.youtube-nocookie.com/embed/ID`, Buzzsprout / Spotify their iframe URLs.
+  `www.youtube.com/embed/ID?feature=oembed&enablejsapi=1` (measured live, §2), Buzzsprout / Spotify
+  their iframe URLs.
 - Build a ratio wrapper: `<div class="embed-video">` with CSS `aspect-ratio: 16 / 9` (modern
   replacement for the `padding-bottom:56.25%` hack) for video; a fixed-height wrapper for audio
   (`--embed-audio-height: 200px`).
@@ -167,7 +175,8 @@ params land on `dataset` (e.g. `data-src`).
   hack (no visual change; simpler). Support authored ratios (`16x9` default, `4x3`, `1x1`, `16x10`).
   Assumption to confirm: 16:9 is the default for video.
 - **Lazy + consent:** recommend native `loading="lazy"` for the iframe PLUS a click-to-load consent
-  gate for privacy (double win: perf + GDPR). Keep `?dnt=1` (Vimeo) and `youtube-nocookie` host.
+  gate for privacy (double win: perf + GDPR). Keep `?dnt=1` (Vimeo); YouTube uses the measured
+  live `youtube.com/embed` host (§2), not `youtube-nocookie`.
 - **Consent integration:** reuse the site's existing consent manager (OneTrust) category signal where
   available; otherwise the local `.embed-consent` placeholder gates the load. Confirm which is
   authoritative in EDS.
@@ -184,7 +193,8 @@ WHAT / WHERE / viewport / expected / actual.
       `aspect-ratio:16/9`); iframe fills it absolutely, no letterbox gaps.
 - [ ] Audio height: `.embed-audio` / all / fixed `200px`, fluid width.
 - [ ] Lazy: iframe `src` empty on load; populated only when scrolled near viewport (or on consent).
-- [ ] Privacy: Vimeo URL keeps `?dnt=1`; YouTube uses `youtube-nocookie.com`.
+- [ ] Privacy: Vimeo URL keeps `?dnt=1`; YouTube matches the live source,
+      `www.youtube.com/embed/{id}?feature=oembed&enablejsapi=1` (§2).
 - [ ] `loading="lazy"` present on the iframe; `title` non-empty.
 - [ ] Consent gate: unconsented -> `.embed-consent` placeholder (`#c4c6c7` box, `#e4e4e4` inner, pill
       button with ink outline); button hover/focus -> `#f1f1f1`; button padding `.5rem` (<720) /

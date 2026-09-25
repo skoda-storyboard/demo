@@ -5,8 +5,8 @@
  * Run: node --test blocks/embed/embed.test.mjs
  *
  * Focus: the acceptance-critical URL normalisation + provider/audio detection that a browser
- * preview cannot easily assert (Vimeo dnt=1, YouTube nocookie host, audio vs video, ratio,
- * lazy + title + data-src consent stub). Rendering geometry is verified separately in preview.
+ * preview cannot easily assert (Vimeo dnt=1, live youtube.com embed URL, audio vs video, ratio,
+ * lazy + title, invalid-URL rejection). Rendering geometry is verified separately in preview.
  */
 /* eslint-disable no-underscore-dangle, no-undef, max-classes-per-file */
 
@@ -85,6 +85,10 @@ class El {
   querySelector(sel) { return this.querySelectorAll(sel)[0] || null; }
 
   querySelectorAll(sel) {
+    // direct-child selectors used by the table-form config reader
+    const divKids = (n) => n.children.filter((c) => c.tagName === 'DIV');
+    if (sel === ':scope > div') return divKids(this);
+    if (sel === ':scope > div > div') return divKids(this).flatMap(divKids);
     const out = [];
     const match = (c) => {
       if (sel === 'a[href]') return c.tagName === 'A' && c.attributes.href != null;
@@ -209,11 +213,112 @@ test('authored ratio override is applied', () => {
   assert.equal(block.querySelector('.embed-video').style['--embed-ratio'], '4 / 3');
 });
 
-test('unusable URL: no throw, block left empty', () => {
+// --- invalid authoring (PR #109 review) --------------------------------------
+
+// Run fn with console.warn captured; returns the warn call count.
+function countWarnings(fn) {
+  const orig = console.warn;
+  let calls = 0;
+  console.warn = () => { calls += 1; };
+  try { fn(); } finally { console.warn = orig; }
+  return calls;
+}
+
+// Assert the block rendered nothing, was flagged, and the authoring error was reported.
+function assertRejected(block, label) {
+  const warnings = countWarnings(() => assert.doesNotThrow(() => decorate(block), label));
+  assert.equal(block.querySelector('iframe'), null, `${label}: no iframe`);
+  assert.equal(block.children.length, 0, `${label}: raw cells cleared`);
+  assert.ok(block.classList.contains('embed-invalid'), `${label}: flagged embed-invalid`);
+  assert.equal(warnings, 1, `${label}: authoring error reported once`);
+}
+
+// Table-form block: rows of [key, value]; a value may be an El (e.g. an auto-linked URL).
+function buildTable(rows) {
+  const block = new El('div');
+  block.classList.add('embed');
+  rows.forEach(([key, value]) => {
+    const row = new El('div');
+    const keyCell = new El('div');
+    keyCell.textContent = key;
+    const valueCell = new El('div');
+    if (value instanceof El) valueCell.append(value);
+    else valueCell.textContent = value;
+    row.append(keyCell, valueCell);
+    block.append(row);
+  });
+  return block;
+}
+
+test('missing URL: empty Embed is rejected, not resolved to /drafts/undefined', () => {
+  const block = new El('div');
+  block.classList.add('embed');
+  assertRejected(block, 'empty block');
+});
+
+test('malformed / relative / non-http(s) URLs are rejected (no same-site iframe)', () => {
+  ['not a url', 'vimeo.com/123', '/drafts/embed-qa', '', 'javascript:alert(1)', 'ftp://vimeo.com/1']
+    .forEach((href) => assertRejected(buildEmbed(href), JSON.stringify(href)));
+});
+
+test('provider URL without a media id is rejected (no empty /embed/ player)', () => {
+  ['https://www.youtube.com/@skoda', 'https://vimeo.com/skoda']
+    .forEach((href) => assertRejected(buildEmbed(href), href));
+});
+
+test('table form with a non-URL url cell is rejected', () => {
+  assertRejected(buildTable([['url', 'see the video below'], ['ratio', '4x3']]), 'table');
+});
+
+// --- iframe titles (PR #109 review) ------------------------------------------
+
+test('bare-URL autoblock: iframe title is a provider label, never the URL string', () => {
+  [
+    ['https://www.youtube.com/watch?v=9LfK-A20pgw', 'YouTube video'],
+    ['https://vimeo.com/1003242587', 'Vimeo video'],
+    ['https://www.buzzsprout.com/1730804/episodes/19710108-x?iframe=true', 'Buzzsprout podcast episode'],
+    ['https://open.spotify.com/show/4ywat2rxDqNidxx7FQxXGb', 'Spotify podcast'],
+    ['https://open.spotify.com/episode/abc123', 'Spotify podcast episode'],
+  ].forEach(([href, label]) => {
+    const block = buildEmbed(href); // link text === href (the autoblock case)
+    decorate(block);
+    assert.equal(block.querySelector('iframe').getAttribute('title'), label, href);
+  });
+});
+
+test('URL-valued title attribute (set by decorateButtons) is ignored in favour of the label', () => {
+  const href = 'https://vimeo.com/1003242587';
+  const block = buildEmbed(href);
+  block.querySelector('a').setAttribute('title', href); // scripts.js: a.title = a.textContent
+  decorate(block);
+  assert.equal(block.querySelector('iframe').getAttribute('title'), 'Vimeo video');
+});
+
+test('descriptive link text is used as the iframe title', () => {
   const block = new El('div');
   block.classList.add('embed');
   const a = new El('a');
-  a.setAttribute('href', 'not a url');
+  a.setAttribute('href', 'https://www.youtube.com/watch?v=9LfK-A20pgw');
+  a.textContent = 'The all-new Škoda Kodiaq RS';
   block.append(a);
-  assert.doesNotThrow(() => decorate(block));
+  decorate(block);
+  assert.equal(block.querySelector('iframe').getAttribute('title'), 'The all-new Škoda Kodiaq RS');
+});
+
+test('table form: auto-linked url cell still honours ratio + title rows', () => {
+  const link = new El('a');
+  link.setAttribute('href', 'https://vimeo.com/1003242587');
+  link.textContent = 'https://vimeo.com/1003242587';
+  const block = buildTable([['url', link], ['ratio', '4x3'], ['title', 'Škoda Superb Sportline']]);
+  decorate(block);
+  assert.equal(block.querySelector('.embed-video').style['--embed-ratio'], '4 / 3');
+  assert.equal(block.querySelector('iframe').getAttribute('title'), 'Škoda Superb Sportline');
+});
+
+test('table form: plain-text url cell works (no link)', () => {
+  const block = buildTable([['url', 'https://youtu.be/atipTWwYw5E']]);
+  decorate(block);
+  const iframe = block.querySelector('iframe');
+  assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?feature=oembed&enablejsapi=1');
+  assert.equal(iframe.getAttribute('title'), 'YouTube video');
 });
