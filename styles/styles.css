@@ -35,9 +35,10 @@
   --body-font-family: skoda next, skoda-next-fallback, helvetica, arial, sans-serif;
   --heading-font-family: var(--body-font-family);
 
-  /* font weights — source ships only 300/400/600/700 (no real 500 face). */
+  /* font weights — source uses 500 for story-aside titles, despite no dedicated 500 face. */
   --weight-light: 300;
   --weight-regular: 400;
+  --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
 
@@ -53,6 +54,9 @@
      ratio holds the 66.66/33.33 proportion; the ~24px gap matches the source's
      -10px column gutter so the tracks land on the measured 819/409 widths. */
   --story-column-gap: var(--spacing-l);
+  --story-sidebar-inset: 10px;
+  --story-sidebar-heading-size-compact: 20px;
+  --story-sidebar-heading-line-height: 45px;
 
   /* reading-measure cap: source fills the full 819px column (~100ch); story-detail
      §8 recommends capping ~72ch for readability. Applied to the prose column. */
@@ -666,6 +670,18 @@ body.story main > .section.sidebar aside {
   gap: var(--spacing-l);
 }
 
+body.story main > .section.sidebar > div {
+  padding-inline: var(--story-sidebar-inset);
+}
+
+body.story main > .section.sidebar .default-content-wrapper > h2 {
+  margin: 0;
+  color: var(--skoda-grey-800);
+  font-size: var(--story-sidebar-heading-size-compact);
+  font-weight: var(--weight-semibold);
+  line-height: var(--story-sidebar-heading-line-height);
+}
+
 /* Layer 2 / Layer 3 — at ≥768 the article becomes a real two-column grid. This is a
    genuine structural transition (single stack → side-by-side), so it earns the one
    breakpoint. `main` is the grid; the body column spans the left track and the aside
@@ -697,6 +713,10 @@ body.story main > .section.sidebar aside {
     grid-column: 2;
   }
 
+  body.story main > .section.sidebar > div {
+    padding-inline: var(--spacing-xxl) 0;
+  }
+
   body.story main > .section.dark {
     grid-column: 1 / -1;
     position: relative;
@@ -718,5 +738,12 @@ body.story main > .section.sidebar aside {
   body.story main > .section.body-column .default-content-wrapper h2 {
     font-size: var(--heading-font-size-hero-story);
     line-height: 1.125;
+  }
+}
+
+/* The source keeps the 20px sidebar headings at exactly 768px, then uses 16px. */
+@media (width > 768px) {
+  body.story main > .section.sidebar .default-content-wrapper > h2 {
+    font-size: var(--body-font-size-m);
   }
 }
