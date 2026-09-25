@@ -226,6 +226,32 @@ function decorateStorySections(main) {
   });
 }
 
+// A date paragraph like "15. 9. 2026" (same pattern as scripts/card-teaser.js
+// DATE_RE; kept local so the eager path doesn't load the card module).
+const STORY_DATE_RE = /^\s*\d{1,4}[.\-/]\s?\d{1,2}[.\-/]\s?\d{2,4}\.?\s*$/;
+
+/**
+ * Story-scoped: lay out the intro under the hero like the source header — the
+ * perex (lead) on its own line, then the published date and the category tag on
+ * one row. The story-hero importer emits both paragraphs optionally, so the date
+ * is found by content, not position, and moved in front of the Tags block inside
+ * its wrapper (a <p>, so decorateBlocks never mistakes it for a block).
+ * @param {Element} main The main element
+ */
+function decorateStoryIntro(main) {
+  if (!document.body.classList.contains('story')) return;
+  const section = main.querySelector('.section .hero-image')?.closest('.section');
+  const content = section?.querySelector(':scope > .default-content-wrapper');
+  if (!content) return;
+  section.classList.add('story-intro');
+  const date = [...content.querySelectorAll(':scope > p')].find((p) => STORY_DATE_RE.test(p.textContent));
+  if (!date) return;
+  date.classList.add('story-date');
+  // runs before decorateBlocks names the wrappers, so find it via the block itself
+  const tagsWrapper = section.querySelector(':scope > div > .tags')?.parentElement;
+  if (tagsWrapper) tagsWrapper.prepend(date);
+}
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -236,6 +262,7 @@ export function decorateMain(main) {
   buildAutoBlocks(main);
   decorateSections(main);
   decorateStorySections(main);
+  decorateStoryIntro(main);
   decorateBlocks(main);
   decorateButtons(main);
 }

@@ -84,6 +84,7 @@
   --slider-control: #333;
   --slider-dot: rgb(51 51 51 / 25%);
   --slider-arrow-disc: rgb(255 255 255 / 90%);
+  --slider-focus-ring: #19f; /* Flickity's focus ring, shown on arrows + dots */
 }
 
 /*

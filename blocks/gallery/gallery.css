@@ -557,8 +557,9 @@ body.gallery-lightbox-open {
  * Slider variant — `Gallery (slider)` (SKODA-819)
  * Story in-body image carousel, measured on the live Epiq story
  * (.carousel-widget): one 16:9 image per view, 32px light-disc ink arrows 10px
- * inside the edges, 10px dots 22px below the image. Box: 839×472 @1440,
- * 519×292 @768, 500×281 @500.
+ * inside the edges, 10px dots 22px below the image. Width follows the text
+ * column (left + right edges shared with the prose) rather than the source's
+ * 10px overhang, e.g. 728×409.5 @1440.
  * ========================================================================== */
 .gallery.slider {
   --slider-arrow-size: var(--carousel-arrow-size); /* 32px (source) */
@@ -566,8 +567,8 @@ body.gallery-lightbox-open {
   --slider-dot-size: 10px;
   --slider-dots-offset: 22px; /* image bottom → dot row (source bottom:-32px on a 10px row) */
 
-  /* fill the column: break out of the section's inline padding */
-  margin-inline: calc(-1 * var(--spacing-l));
+  /* no breakout: the slider keeps the wrapper's inline padding, so its edges line
+     up with the surrounding text (requested over the source's 10px overhang) */
 
   /* vertical rhythm measured on the source: paragraph text → image 44px
      (the paragraph's 20px margin + 24), dot row → next heading 48px (<768).
@@ -643,8 +644,9 @@ body.gallery-lightbox-open {
   padding: 0;
   background: transparent;
   color: var(--skoda-ink);
-  cursor: pointer;
+  cursor: default; /* source arrows keep the default cursor */
   transform: translateY(-50%);
+  transition: opacity 0.3s ease-in-out;
 }
 
 .gallery.slider .gallery-slider-next {
@@ -698,33 +700,32 @@ body.gallery-lightbox-open {
   background: var(--slider-control);
 }
 
-.gallery.slider .gallery-slider-prev:focus-visible,
-.gallery.slider .gallery-slider-next:focus-visible,
-.gallery.slider .gallery-slider-dot:focus-visible {
-  outline: 2px solid var(--skoda-ink);
-  outline-offset: 2px;
+/* focus, by mouse or keyboard alike (the source's Flickity :focus): a 5px blue
+   ring hugging the round arrow / dot, kept while the control has focus */
+.gallery.slider .gallery-slider-prev:focus,
+.gallery.slider .gallery-slider-next:focus,
+.gallery.slider .gallery-slider-dot:focus {
+  outline: none;
+  box-shadow: 0 0 0 5px var(--slider-focus-ring);
 }
 
-/* story two-column layout: the source slider bleeds past the text column into
-   the gutter, so run it into the column gap (stops at the aside's edge) */
+/* pressed arrows fade to 60% (source: opacity .3s ease-in-out) */
+.gallery.slider .gallery-slider-prev:active,
+.gallery.slider .gallery-slider-next:active {
+  opacity: 0.6;
+}
+
+/* story body: match the text column exactly — the prose wrapper is capped at
+   --prose-measure and centred (styles.css), so the slider takes the same measure
+   and centring and shares both text edges at every width */
+body.story .section.body-column .gallery.slider {
+  max-width: var(--prose-measure);
+  margin-inline: auto;
+}
+
 @media (width >= 768px) {
   /* two-column story: image → next heading is 72px on the source */
   .gallery.slider {
     padding-block-end: var(--spacing-xl);
-  }
-
-  body.story .section.body-column .gallery.slider {
-    margin-inline-end: calc(-1 * (var(--spacing-l) + var(--story-column-gap)));
-  }
-}
-
-/* the section padding steps up at 992 (styles.css), so the breakout follows */
-@media (width >= 992px) {
-  .gallery.slider {
-    margin-inline: calc(-1 * var(--spacing-xl));
-  }
-
-  body.story .section.body-column .gallery.slider {
-    margin-inline-end: calc(-1 * (var(--spacing-xl) + var(--story-column-gap)));
   }
 }
