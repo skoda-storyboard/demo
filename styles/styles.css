@@ -224,6 +224,13 @@ header {
   height: var(--nav-height);
 }
 
+/* Short pages: the content area fills at least the viewport below the header, so the footer
+   always starts at or below the fold and no blank band shows under it on tall desktop screens.
+   Matches the source, which keeps its footer just below the fold on short pages (SKODA-305). */
+main {
+  min-height: calc(100dvh - var(--nav-height));
+}
+
 header .header,
 footer .footer {
   visibility: hidden;
