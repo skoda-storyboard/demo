@@ -81,19 +81,22 @@ const HERO = `<div class="hero">
     <span class="category"><a href="https://www.skoda-storyboard.com/en/category/emobility/" class="label">eMobility</a></span>
   </div></div></div>`;
 
-test('story hero → Hero Image (image + h1), then perex, date, Tags(category)', { skip }, () => {
+test('story hero keeps image, h1, perex and same-row date/category inside Hero Image', { skip }, () => {
   const doc = dom(HERO);
   storyHero(doc.querySelector('.hero'), { document: doc });
   const kids = [...doc.body.children];
+  assert.equal(kids.length, 1);
   assert.equal(blockName(kids[0]), 'Hero Image');
-  assert.ok(kids[0].querySelector('img[src="https://cdn.x/h.png"]'), 'image row');
-  assert.equal(kids[0].querySelector('h1').textContent, 'Epiq title');
-  assert.equal(kids[1].tagName, 'P');
-  assert.equal(kids[1].textContent, 'The perex.');
-  assert.equal(kids[2].textContent, '15. 9. 2026');
-  assert.equal(blockName(kids[3]), 'Tags');
-  assert.equal(kids[3].querySelector('a').getAttribute('href'), 'https://www.skoda-storyboard.com/en/category/emobility/');
-  assert.equal(kids.length, 4);
+  const rows = [...kids[0].querySelectorAll('tr')].slice(1);
+  assert.equal(rows.length, 4);
+  assert.ok(rows[0].querySelector('img[src="https://cdn.x/h.png"]'), 'image row');
+  assert.equal(rows[1].querySelector('h1').textContent, 'Epiq title');
+  assert.equal(rows[2].textContent, 'The perex.');
+  const meta = rows[3].querySelector('p');
+  assert.equal(meta.querySelector('time[datetime="2026-09-15"]').textContent, '15. 9. 2026');
+  assert.equal(meta.querySelector('a').getAttribute('href'), 'https://www.skoda-storyboard.com/en/category/emobility/');
+  assert.equal(meta.querySelector('a').textContent, 'eMobility');
+  assert.equal(doc.querySelectorAll('table').length, 1, 'no separate hero Tags block');
 });
 
 test('story hero tolerates a missing caption (authors omit cells)', { skip }, () => {
@@ -108,6 +111,21 @@ test('story hero with no image and no heading unwraps', { skip }, () => {
   const doc = dom('<div class="hero"><p>stray</p></div>');
   storyHero(doc.querySelector('.hero'), { document: doc });
   assert.equal(doc.body.innerHTML, '<p>stray</p>');
+});
+
+test('story hero handles omitted perex, date or category without empty rows', { skip }, () => {
+  const noPerex = dom(HERO.replace('<p class="perex">The perex. </p>', ''));
+  storyHero(noPerex.querySelector('.hero'), { document: noPerex });
+  assert.equal(noPerex.querySelectorAll('tr').length, 4);
+  assert.equal(noPerex.querySelector('time').getAttribute('datetime'), '2026-09-15');
+  const noDate = dom(HERO.replace('<span class="published">15. 9. 2026</span>', ''));
+  storyHero(noDate.querySelector('.hero'), { document: noDate });
+  assert.equal(noDate.querySelectorAll('tr').length, 5);
+  assert.equal(noDate.querySelector('tr:last-child a').textContent, 'eMobility');
+  const noCategory = dom(HERO.replace(/<span class="category">.*?<\/span>/, ''));
+  storyHero(noCategory.querySelector('.hero'), { document: noCategory });
+  assert.equal(noCategory.querySelectorAll('tr').length, 5);
+  assert.equal(noCategory.querySelector('tr:last-child time').textContent, '15. 9. 2026');
 });
 
 // ---- SKODA-818 videos → bare URL --------------------------------------------

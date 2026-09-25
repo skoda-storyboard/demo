@@ -232,7 +232,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-813 | Generic Page base shell (STO page + MR media-room-page) | E08 | B | 2 | 0.5–1 | 1–2 | 202,801 | 🟢 M2; shared shell under 810; spec `ui-specs/template-page-base.md` |
 | SKODA-814 | SiteOrigin body flatten contract (1,614 pages) | E08 | B | 5 | 2–3 | 4–6 | 601,203,204 | 🟢 M2; feeds 801/208/813; spec `ui-specs/siteorigin-body.md` (recount §3/§6) |
 | SKODA-815 | Story flatten: `ys-milestones` timeline (content-loss fix) | E08 | B | 3 | 1–2 | 3–5 | 801 | 🟢 flatten-to-content SHIPPED in 801 (0→11 entries recovered); optional timeline block remains M2 |
-| SKODA-816 | Story hero: title above 16:9 image + caption (perex, date, category via Tags block) | E08 | A/B | 2 | 0.5–1 | 1–2 | 202,205,801 | 🟡 Epiq side-by-side QA 2026-09-24; importer half merged in #113 (`story-hero` → Hero Image story); caption styling open (≈ 0.5 SP) |
+| SKODA-816 | Story hero: title above 16:9 image + caption (perex, date, linked category) | E08 | A/B | 2 | 0.5–1 | 1–2 | 202,205,801,826 | 🟡 #113 importer half merged; single Hero Image caption + same-row metadata; page gutter owned by 826, published QA open |
 | SKODA-817 | Story aside: duplicated "Explore more" teasers + sidebar visual parity | E08 | A/B | 2 | 0.5–1 | 1–2 | 201,205,801 | 🟡 dedupe (6→3 cards) + Tags heading merged in #113; sidebar parity CSS open (≈ 1 SP) |
 | SKODA-818 | Story flatten: `lite-youtube` → bare YouTube URL (embed autoblock) | E08 | A/B | 1 | 0.25–0.5 | 0.5–1 | 204 (PR #109),801 | 🟢 importer merged in #113; render check once PR #109 merges |
 | SKODA-819 | Story in-body carousel → Gallery `slider` variant | E08 | A/B | 3 | 1 | 2–3 | 203,212,801 | 🟡 stakeholder decision: slider like source; **supersedes SKODA-219** |

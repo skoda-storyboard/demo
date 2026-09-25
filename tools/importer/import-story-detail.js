@@ -27,8 +27,8 @@ import linksTransformer from './transformers/skoda-links.js';
 import normalizeImages from './transformers/skoda-images.js';
 
 const parsers = {
-  // SKODA-816: story hero → Hero Image (story variant) + caption + Tags, not the
-  // overlay Hero banner used by the page/archive templates.
+  // SKODA-816: story hero → Hero Image with heading, caption and metadata
+  // inside one block, not the overlay Hero banner used by page/archive.
   'story-hero': storyHeroParser,
   'story-flatten': storyFlattenParser,
 };
