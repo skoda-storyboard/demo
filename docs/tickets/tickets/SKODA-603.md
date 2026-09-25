@@ -64,7 +64,7 @@ state.
 | Wave | Content | Gate |
 |---|---|---|
 | **W0** setup ✅ | tracker + generator, pending-block registry + check, baseline | – |
-| **W1** | 11 corpus PRs; re-push the 5 set PRs + `/en` with 610; re-import the 3 stale stories (plates, Peaq record, Octavia) | 610 (PR #138), 506, **508** (caption regression on PR re-imports; code done 2026-09-25, PR re-imports are Title-only vs DA); the `Promo Box` header in the home importer. `Quote` is a pending *block*: until 220 lands, W1 publishes with the default blockquote fallback + `re-import on SKODA-220` |
+| **W1** | 11 corpus PRs; re-push the 5 set PRs + `/en` with 610; re-import the 3 stale stories (plates, Peaq record, Octavia) ✅ 2026-09-25 with SKODA-816 (all 18 DA stories) | 610 (PR #138), 506, **508** (caption regression on PR re-imports; code done 2026-09-25, PR re-imports are Title-only vs DA); the `Promo Box` header in the home importer. `Quote` is a pending *block*: until 220 lands, W1 publishes with the default blockquote fallback + `re-import on SKODA-220` |
 | **W2a** | 16 set + 28 corpus + series-linked stories (not the alias) | 801a (it owns the story importer; 603 owns push/publish/tracker/QA) |
 | **W2b** | 2 listings + 36 image/video items | 608 |
 | **W2c** | 5 set + 11 corpus models | the 208 importer fix: `hero` → Hero Image; `in-page-nav` built (or mapped); `spec-table` mapped to Columns + a dark section (`resolve`); `subheading` read by story-rail. 208 requires 0 block JS 404s |

@@ -33,8 +33,8 @@
     },
     "stories": {
       "label": "Stories",
-      "gate": "W2a: SKODA-801a (W1: re-import the 3 stale stories)",
-      "note": "Local output from before 816 still emits `hero`; re-import with the current story importer (Hero Image)."
+      "gate": "W2a: SKODA-801a",
+      "note": "All 18 stories in DA were re-imported with the 816 Hero Image and published on 2026-09-25 (W1's 3 stale stories included). The `❌ hero` rows are stale local output from before 816 and not in DA yet: import them with the current story importer (W2a)."
     },
     "images": {
       "label": "Image items (corpus)",
@@ -48,14 +48,11 @@
     }
   },
   "pages": {
-    "/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries": {
-      "note": "stale import (pre-816/817/820): re-import in W1"
+    "/en/emobility/even-opening-the-door-is-an-experience-says-the-designer-of-the-peaq-suv": {
+      "note": "816 hero live; images still source renditions: 2 oversize masters (50/40 MB) have no delivery rendition (SKODA-506), so media:apply is held"
     },
-    "/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging": {
-      "note": "stale import (pre-816/817/820): re-import in W1"
-    },
-    "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too": {
-      "note": "stale import (pre-816/817/820): re-import in W1"
+    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds": {
+      "note": "816 hero swapped into the DA doc; DA keeps Gallery (slider) ×3 + Cards (overlay) edits until the importer emits them (SKODA-819)"
     }
   }
 }
