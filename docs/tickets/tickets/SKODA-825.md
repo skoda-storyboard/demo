@@ -4,7 +4,16 @@
 - **Phase:** A · **Milestone:** M1 (demo)
 - **GitHub issue:** — (drafted on disk 2026-09-25; create at sign-off)
 - **Estimate:** 1.5 SP · AI-assisted 0.5d / manual 1–1.5d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🔵 TODO, **draft**
+- **Status (2026-09-25):** 🔵 TODO, **draft**. ⚠️ **Dedupe candidate.** This is the same scope as
+  [SKODA-309](SKODA-309.md) (MR side chrome, from the parallel sweep 88c1b48 that landed on main first).
+  **Recommendation at sign-off:** keep 309 as the build ticket, fold in the corrections below, then close 825. The
+  capacity counts 309 only (2 SP).
+  1. **16 MR URLs, not 11.** This census places the 5 model pages (`/en/skoda-model/**`) on the MR side (their
+     topnav starts "News · Press Kits"). 309's active-tab path list misses `/en/skoda-model/`.
+  2. **Timing guards.** Activate the footer rows only after PR #134 merges. Activate the nav/footer rows only after
+     both fragments return 200 on preview and live.
+  3. **Safe failure.** A failed fragment load leaves the header/footer empty but does not throw (307's guard), and the
+     16 MR URLs show 0 console errors.
 
 ## Origin
 The 2026-09-25 DevTools URL→block sweep ([`SKODA-M1-URL-BLOCK-SWEEP.md`](../../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §4).

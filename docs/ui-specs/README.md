@@ -67,7 +67,7 @@ Status legend: `DRAFT` (skeleton, awaiting capture) · `CAPTURED` (measured, in 
 | `story-detail.md` | composition | 604 / 801 | `/en/<story>` | CAPTURED |
 | `siteorigin-body.md` | default content (import flatten) | 814 (feeds 801/208/813) | `/en/<story>` SiteOrigin body | DRAFT+MEASURED |
 | `newsletter.md` | newsletter-stub | STO-D05 / COM-16 (prod E09) | `/en/` topbar + inline | CAPTURED |
-| `social-share.md` | share (chrome) | COM-15 / STO-D10 | **SKODA-824** page float dock (was unticketed; sweep 2026-09-25) · gallery share → 215 | CAPTURED |
+| `social-share.md` | share (chrome) | COM-15 / STO-D10 | **SKODA-215** page float dock (was unticketed; sweep 2026-09-25; draft 827 is a duplicate) · gallery share → 216 | CAPTURED |
 | `promo-banner.md` | banner (E09/903) | COM-09 side / STO-D08 | flagged E09 | CAPTURED |
 | `press-kit-template.md` | press-kit (new) | 805 | `/en/press-kits/skoda-peaq-press-kit/` | CAPTURED |
 | `press-kit-media.md` | grouped media + ZIP (new) | 806 | press kit | CAPTURED |
@@ -98,7 +98,7 @@ component spec + ticket. Any ID with no UI build is marked with its reason.
 | COM-12 | Media Preview Actions | media-cart, gallery-lightbox | 505, 203 |
 | COM-13 | Media Download | downloads | 502 |
 | COM-14 | Media Cart | media-cart | 505 |
-| COM-15 | Social Share | social-share | **824** (304 = footer follow links only) |
+| COM-15 | Social Share | social-share | **215** (304 = footer follow links only) |
 | COM-16 | Subscription | newsletter | newsletter-stub (prod E09/904) |
 | COM-17 | Cookie/Consent | *(out of Adobe scope, D10)* | consent stub only |
 | COM-18 | Footer | footer, footer-mediaroom | 304, 305 |
@@ -139,7 +139,7 @@ component spec + ticket. Any ID with no UI build is marked with its reason.
 | STO-D07 | Article Sidebar | story-detail | 604 |
 | STO-D08 | Side Banner | promo-banner | E09/903 |
 | STO-D09 | Media Box/Gallery | media-cart / downloads | 505 / 502 |
-| STO-D10 | Social Share | social-share | **824** (304 = footer follow links only) |
+| STO-D10 | Social Share | social-share | **215** (304 = footer follow links only) |
 
 ### Media Room, Home (MR-H), Listing (MR-L), Press Release (MR-PR), Press Kit (MR-PK), Model (MR-M), Images (MR-I), Videos (MR-V)
 

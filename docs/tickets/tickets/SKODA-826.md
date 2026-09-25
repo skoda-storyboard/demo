@@ -46,3 +46,9 @@ per-block width delta in the sweep is really this one global cause: for example 
 ## Dependencies
 106 (closed; this is the token follow-up). It must land before 704 visual sign-off, because otherwise every 375 diff
 fails.
+
+**Related tickets from the parallel sweep (88c1b48): neighbours, not duplicates.**
+- [SKODA-308](SKODA-308.md) fixes the **header topbar** inline padding (10 vs 24). That is header CSS only.
+- [SKODA-821](SKODA-821.md) fixes the 34px extra inset of story **body text** inside `.body-column` at 1440.
+- 826 is the underlying **section** gutter token. Land it first; 308 and 821 then rebase their values onto it, so
+  none of the three double-counts the correction.

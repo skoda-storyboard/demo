@@ -16,7 +16,9 @@ This is the **source-of-truth UI inventory for the M1 demo URLs**: every visible
 - **Architect supplement (28 rows):** the fleet did not register the float dock on the model, series and press-kit pages, although their own captures contain it. The Architect re-read every capture: the same fixed `div.sticky-buttons` dock is on all 43 pages at 375 and 1280, so the missing rows were added (`origin: architect-supplement`, evidence path in `notes`).
 - **Shared chrome** (header, mobile nav, language switcher, footer, cookie banner) is one fragment per side on both systems, so its element rows are measured once per side on the G7 pages (`/en/` = STO, `/en/images/` and `/en/videos/` = MR, plus the MR press-release check). §4.7 records the chrome **per URL**: the side detected from each page's own capture (topnav + footer text), its locale count and the resulting status.
 
-**Status legend:** ✅ built + matches · 🟡 built, measured visual delta · 🔵 in an open PR · 📋 ticketed, not built or not imported · ⚠️ ticketed but the element/variant is missing from the ACs · ❌ no ticket, new ticket drafted · ⛔ ruled out for M1 (M2 ticket). Ticket numbers: `✓` = closed on the board, `(M2)` = M2 milestone.
+**Status legend:** ✅ built + matches · 🟡 built, measured visual delta · 🔵 in an open PR · 📋 ticketed, not built or not imported · ⚠️ ticketed but the element/variant is missing from the ACs · ❌ no ticket at sweep time, new ticket drafted · ⛔ ruled out for M1 (M2 ticket). Ticket numbers: `✓` = closed on the board, `(M2)` = M2 milestone.
+
+**Post-sweep ownership (reconciled with the parallel sweep on main `88c1b48`):** the ❌ float-dock rows are now owned by **SKODA-215**, and the ❌ MR-side rows by **SKODA-309**; both were created first on main. This sweep's drafts **827** (float dock, first drafted as 824) and **825** (MR side) are duplicates, kept only to carry the extra evidence and ACs into 215/309 at sign-off. **SKODA-824** now means the in-column highlight panel (main). Statuses stay as measured at sweep time.
 
 ## 2. Totals
 
@@ -27,7 +29,7 @@ This is the **source-of-truth UI inventory for the M1 demo URLs**: every visible
 | 🔵 in an open PR | 12 | | CONTENT-BLOCKED | 171 |
 | 📋 ticketed, not built / not imported | 327 | | IMPORT-GAP | 137 |
 | ⚠️ ticketed, element or variant missing from the ACs | 93 | | IN-PR | 12 |
-| ❌ no ticket → new ticket drafted | 84 | | MATCH | 6 |
+| ❌ no ticket at sweep time → new ticket drafted (float dock and MR side are now owned by main-first 215 / 309; drafts 827 / 825 are duplicates) | 84 | | MATCH | 6 |
 | ⛔ ruled out for M1 (M2 ticket) | 8 | |  |  |
 
 EDS status: **MATCH** measured within thresholds · **DELTA** built, out of threshold · **IN-PR** measured on a PR branch · **NOT-BUILT** no EDS block/code · **IMPORT-GAP** block exists but the importer/DA content drops or distorts the element · **CONTENT-BLOCKED** cannot be measured because the page or its data (index rows, press kits) does not exist on EDS yet.
@@ -38,14 +40,14 @@ Measured deltas: **1051 blocking**, **1136 visible**, **212 cosmetic** across 44
 
 | Component | What it covers | Spec | EDS block | Owner tickets | Pages | Rows | Status | Blocking / visible deltas |
 |---|---|---|---|---|--:|--:|---|--:|
-| **header-megamenu** | Topbar, section switcher, wordmark, desktop nav + mega-menu, search trigger | header-megamenu.md | header | 301, 403 (search), 825 (MR nav) | 3 | 12 | 🟡5 🔵3 ⚠️4 | 4 / 7 |
+| **header-megamenu** | Topbar, section switcher, wordmark, desktop nav + mega-menu, search trigger | header-megamenu.md | header | 301, 403 (search), 309 (MR nav; dup draft 825) | 3 | 12 | 🟡5 🔵3 ⚠️4 | 4 / 7 |
 | **mobile-nav** | Hamburger drawer <1080 | mobile-nav.md | header | 302 | 3 | 3 | 🟡3 | 3 / 0 |
 | **language-switcher** | Locale list in the topbar | language-switcher.md | header | 303 | 3 | 3 | ⚠️3 | 0 / 3 |
 | **footer** | STO footer: sitemap, badges, socials, legal/RSS strip | footer.md | footer | 304, 306, 307 | 1 | 3 | 🟡3 | 0 / 3 |
-| **footer-mediaroom** | MR footer: Contacts/Subscribe/Company, MR legal | footer-mediaroom.md | footer (+ newsletter-stub, PR #134) | 305, 825 (routing) | 2 | 8 | 🟡2 📋4 ⚠️2 | 3 / 1 |
-| **mr-side-chrome** | Media Room side resolution (nav/footer fragments per path) | _TEMPLATES.md (MR shell) | header + footer via metadata | 825 (new) | 5 | 5 | 🟡5 | 5 / 10 |
+| **footer-mediaroom** | MR footer: Contacts/Subscribe/Company, MR legal | footer-mediaroom.md | footer (+ newsletter-stub, PR #134) | 305, 309 (routing; dup draft 825) | 2 | 8 | 🟡2 📋4 ⚠️2 | 3 / 1 |
+| **mr-side-chrome** | Media Room side resolution (nav/footer fragments per path) | _TEMPLATES.md (MR shell) | header + footer via metadata | 309 (main 88c1b48; dup draft 825) | 5 | 5 | 🟡5 | 5 / 10 |
 | **cookie-consent** | OneTrust banner + Manage cookies button | — (SKODA-704 stub) | — | 704 (stub), 804 | 3 | 3 | 📋3 | 0 / 0 |
-| **page-float-dock** | Floating share expander + scroll-to-top (cart button → 505a) | social-share.md | — (not built) | 824 (new) | 42 | 84 | ❌84 | 84 / 0 |
+| **page-float-dock** | Floating share expander + scroll-to-top (cart button → 505a) | social-share.md | — (not built) | 215 (main 88c1b48; dup draft 827) | 42 | 84 | ❌84 | 84 / 0 |
 | **media-cart** | Floating cart count, add-to-cart toolbars, size menus | media-cart.md | — (not built) | 505a, 505b | 24 | 31 | 📋31 | 34 / 0 |
 | **hero** | Story/series/model/press-kit hero variants | hero.md | hero, hero-image | 202, 816 | 33 | 105 | 🟡32 📋58 ⚠️15 | 48 / 429 |
 | **story-detail** | Two-column story shell | story-detail.md | story template (sections) | 801, 821, 822 | 20 | 20 | 🟡7 📋13 | 8 / 11 |
@@ -262,9 +264,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 17 | Media Box cart/download controls | downloads | `.media-box .media-cart-action` | 3 | 📋 | CONTENT-BLOCKED | 502, 505✓, 604 | media box @375: present x1 → MISSING on EDS |
 | 18 | Media Box show-more | downloads | `.media-box .btn.open` | 1 | 📋 | NOT-BUILT | 502, 604 | media box @375: present x1 → MISSING on EDS |
 | 19 | Related Stories dark rail | carousel-rails | `.cover-box .related-stories` | 1 | 🟡 | DELTA | 820, 212✓, 218 | related rail width @375: 375px → 327px |
-| 20 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 824 | Sticky social-share menu @375: present on source → MISSING on EDS |
+| 20 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 215, 827 | Sticky social-share menu @375: present on source → MISSING on EDS |
 | 21 | Sticky cart shortcut | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505✓, 604 | Sticky cart shortcut @375: present on source → MISSING on EDS |
-| 22 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 824 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
+| 22 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 215, 827 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
 | 23 | SiteOrigin offset spacers | siteorigin-body | `.content .widget_skoda-offset` | 4 | 🟡 | DELTA | 801✓, 814(M2) | desktop 24px authored spacer @1280: 24px for each spacer → widget omitted; equivalent spacing not verified |
 
 </details>
@@ -291,9 +293,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 16 | Media Box cart/download controls | downloads | `.media-box .media-cart-action` | 5 | 📋 | CONTENT-BLOCKED | 502, 505✓, 604 | media box @375: present x1 → MISSING on EDS |
 | 17 | Media Box show-more | downloads | `.media-box .btn.open` | 1 | 📋 | NOT-BUILT | 502, 604 | media box @375: present x1 → MISSING on EDS |
 | 18 | Related Stories dark rail | carousel-rails | `.cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓, 218 | related rail @375: present x1 → MISSING on EDS |
-| 19 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 824 | Sticky social-share menu @375: present on source → MISSING on EDS |
+| 19 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 215, 827 | Sticky social-share menu @375: present on source → MISSING on EDS |
 | 20 | Sticky cart shortcut | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505✓, 604 | Sticky cart shortcut @375: present on source → MISSING on EDS |
-| 21 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 824 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
+| 21 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 215, 827 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
 | 22 | SiteOrigin offset spacers | siteorigin-body | `.content .widget_skoda-offset` | 5 | 🟡 | DELTA | 801✓, 814(M2) | desktop 24px authored spacer @1280: 24px for each spacer → widget omitted; equivalent spacing not verified |
 
 </details>
@@ -320,9 +322,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 16 | Media Box cart/download controls | downloads | `.media-box .media-cart-action` | 1 | 📋 | CONTENT-BLOCKED | 502, 505✓, 604 | media box @375: present x1 → MISSING on EDS |
 | 17 | Media Box show-more | downloads | `.media-box .btn.open` | 1 | 📋 | NOT-BUILT | 502, 604 | media box @375: present x1 → MISSING on EDS |
 | 18 | Related Stories dark rail | carousel-rails | `.cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓, 218 | related rail @375: present x1 → MISSING on EDS |
-| 19 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 824 | Sticky social-share menu @375: present on source → MISSING on EDS |
+| 19 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 215, 827 | Sticky social-share menu @375: present on source → MISSING on EDS |
 | 20 | Sticky cart shortcut | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505✓, 604 | Sticky cart shortcut @375: present on source → MISSING on EDS |
-| 21 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 824 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
+| 21 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 215, 827 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
 | 22 | SiteOrigin offset spacers | siteorigin-body | `.content .widget_skoda-offset` | 5 | 🟡 | DELTA | 801✓, 814(M2) | desktop 24px authored spacer @1280: 24px for each spacer → widget omitted; equivalent spacing not verified |
 
 </details>
@@ -348,9 +350,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 15 | Media Box cart/download controls | downloads | `.media-box .media-cart-action` | 3 | 📋 | CONTENT-BLOCKED | 502, 505✓, 604 | media box @375: present x1 → MISSING on EDS |
 | 16 | Media Box show-more | downloads | `.media-box .btn.open` | 1 | 📋 | NOT-BUILT | 502, 604 | media box @375: present x1 → MISSING on EDS |
 | 17 | Related Stories dark rail | carousel-rails | `.cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓, 218 | related rail @375: present x1 → MISSING on EDS |
-| 18 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 824 | Sticky social-share menu @375: present on source → MISSING on EDS |
+| 18 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 215, 827 | Sticky social-share menu @375: present on source → MISSING on EDS |
 | 19 | Sticky cart shortcut | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505✓, 604 | Sticky cart shortcut @375: present on source → MISSING on EDS |
-| 20 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 824 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
+| 20 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 215, 827 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
 | 21 | SiteOrigin offset spacers | siteorigin-body | `.content .widget_skoda-offset` | 5 | 📋 | IMPORT-GAP | 801✓, 814(M2) | authored offset widgets @375: author-controlled vertical spacing → widget structure MISSING; default content … |
 
 </details>
@@ -376,9 +378,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 15 | Media Box cart/download controls | downloads | `.media-box .media-cart-action` | 1 | 📋 | CONTENT-BLOCKED | 502, 505✓, 604 | media box @375: present x1 → MISSING on EDS |
 | 16 | Media Box show-more | downloads | `.media-box .btn.open` | 1 | 📋 | NOT-BUILT | 502, 604 | media box @375: present x1 → MISSING on EDS |
 | 17 | Related Stories dark rail | carousel-rails | `.cover-box .related-stories` | 1 | 🟡 | DELTA | 820, 212✓, 218 | related rail width @375: 375px → 327px |
-| 18 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 824 | Sticky social-share menu @375: present on source → MISSING on EDS |
+| 18 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 215, 827 | Sticky social-share menu @375: present on source → MISSING on EDS |
 | 19 | Sticky cart shortcut | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505✓, 604 | Sticky cart shortcut @375: present on source → MISSING on EDS |
-| 20 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 824 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
+| 20 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 215, 827 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
 | 21 | SiteOrigin offset spacers | siteorigin-body | `.content .widget_skoda-offset` | 5 | 🟡 | DELTA | 801✓, 814(M2) | desktop 24px authored spacer @1280: 24px for each spacer → widget omitted; equivalent spacing not verified |
 
 </details>
@@ -405,9 +407,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 16 | Media Box cart/download controls | downloads | `.media-box .media-cart-action` | 1 | 📋 | CONTENT-BLOCKED | 502, 505✓, 604 | Media Box cart/download controls @375: present on source → MISSING on EDS |
 | 17 | Media Box show-more | downloads | `.media-box .btn.open` | 1 | 📋 | NOT-BUILT | 502, 604 | Media Box show-more @375: present on source → MISSING on EDS |
 | 18 | Related Stories dark rail | carousel-rails | `.cover-box .related-stories` | 1 | 📋 | CONTENT-BLOCKED | 820, 212✓, 218 | Related Stories dark rail @375: present on source → MISSING on EDS |
-| 19 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 824 | Sticky social-share menu @375: present on source → MISSING on EDS |
+| 19 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 215, 827 | Sticky social-share menu @375: present on source → MISSING on EDS |
 | 20 | Sticky cart shortcut | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505✓, 604 | Sticky cart shortcut @375: present on source → MISSING on EDS |
-| 21 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 824 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
+| 21 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 215, 827 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
 | 22 | SiteOrigin offset spacers | siteorigin-body | `.content .widget_skoda-offset` | 4 | 📋 | CONTENT-BLOCKED | 801✓, 814(M2) | SiteOrigin offset spacers @768: present on source → MISSING on EDS |
 
 </details>
@@ -434,9 +436,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 16 | Media Box cart/download controls | downloads | `.media-box .media-cart-action` | 5 | 📋 | CONTENT-BLOCKED | 502, 505✓, 604 | media box @375: present x1 → MISSING on EDS |
 | 17 | Media Box show-more | downloads | `.media-box .btn.open` | 1 | 📋 | NOT-BUILT | 502, 604 | media box @375: present x1 → MISSING on EDS |
 | 18 | Related Stories dark rail | carousel-rails | `.cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓, 218 | related rail @375: present x1 → MISSING on EDS |
-| 19 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 824 | Sticky social-share menu @375: present on source → MISSING on EDS |
+| 19 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 215, 827 | Sticky social-share menu @375: present on source → MISSING on EDS |
 | 20 | Sticky cart shortcut | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505✓, 604 | Sticky cart shortcut @375: present on source → MISSING on EDS |
-| 21 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 824 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
+| 21 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 215, 827 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
 | 22 | SiteOrigin offset spacers | siteorigin-body | `.content .widget_skoda-offset` | 2 | 📋 | IMPORT-GAP | 801✓, 814(M2) | authored offset widgets @375: author-controlled vertical spacing → widget structure MISSING; default content … |
 
 </details>
@@ -463,9 +465,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 16 | Media Box cart/download controls | downloads | `.media-box .media-cart-action` | 1 | 📋 | CONTENT-BLOCKED | 502, 505✓, 604 | Media Box cart/download controls @375: present on source → MISSING on EDS |
 | 17 | Media Box show-more | downloads | `.media-box .btn.open` | 1 | 📋 | NOT-BUILT | 502, 604 | Media Box show-more @375: present on source → MISSING on EDS |
 | 18 | Related Stories dark rail | carousel-rails | `.cover-box .related-stories` | 1 | 📋 | CONTENT-BLOCKED | 820, 212✓, 218 | Related Stories dark rail @375: present on source → MISSING on EDS |
-| 19 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 824 | Sticky social-share menu @375: present on source → MISSING on EDS |
+| 19 | Sticky social-share menu | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | COM-15, STO-D10, 215, 827 | Sticky social-share menu @375: present on source → MISSING on EDS |
 | 20 | Sticky cart shortcut | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505✓, 604 | Sticky cart shortcut @375: present on source → MISSING on EDS |
-| 21 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 824 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
+| 21 | Sticky scroll-to-top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌ | NOT-BUILT | 604, 215, 827 | Sticky scroll-to-top @375: present on source → MISSING on EDS |
 | 22 | SiteOrigin offset spacers | siteorigin-body | `.content .widget_skoda-offset` | 3 | 📋 | CONTENT-BLOCKED | 801✓, 814(M2) | SiteOrigin offset spacers @768: present on source → MISSING on EDS |
 
 </details>
@@ -486,9 +488,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 10 | Explore more teasers | card-teaser | `article .sidebar section.related` | 3 | 📋 | IMPORT-GAP | 817 |  |
 | 11 | Sidebar tags | tags | `article .sidebar section.tags` | 1 | 📋 | IMPORT-GAP | 205✓ |  |
 | 12 | Media Box downloads | downloads | `article .cover-box .media-box` | 1 | ⚠️ | IMPORT-GAP | 502, 801a |  |
-| 13 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 13 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 | 14 | Sticky cart | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 15 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 15 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -508,9 +510,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 10 | Sidebar tags | tags | `article .sidebar section.tags` | 1 | 📋 | IMPORT-GAP | 205✓ |  |
 | 11 | Media Box downloads | downloads | `article .cover-box .media-box` | 1 | ⚠️ | IMPORT-GAP | 502, 801a |  |
 | 12 | Bottom Related Stories | carousel-rails | `article .cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓ |  |
-| 13 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 13 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 | 14 | Sticky cart | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 15 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 15 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -532,9 +534,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 12 | Sidebar tags | tags | `article .sidebar section.tags` | 1 | 📋 | IMPORT-GAP | 205✓ |  |
 | 13 | Media Box downloads | downloads | `article .cover-box .media-box` | 1 | ⚠️ | IMPORT-GAP | 502, 801a |  |
 | 14 | Bottom Related Stories | carousel-rails | `article .cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓ |  |
-| 15 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 15 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 | 16 | Sticky cart | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 17 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 17 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -554,9 +556,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 10 | Sidebar tags | tags | `article .sidebar section.tags` | 1 | 📋 | IMPORT-GAP | 205✓ |  |
 | 11 | Media Box downloads | downloads | `article .cover-box .media-box` | 1 | ⚠️ | IMPORT-GAP | 502, 801a |  |
 | 12 | Bottom Related Stories | carousel-rails | `article .cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓ |  |
-| 13 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 13 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 | 14 | Sticky cart | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 15 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 15 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -576,9 +578,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 10 | Sidebar tags | tags | `article .sidebar section.tags` | 1 | 📋 | IMPORT-GAP | 205✓ |  |
 | 11 | Media Box downloads | downloads | `article .cover-box .media-box` | 1 | ⚠️ | IMPORT-GAP | 502, 801a |  |
 | 12 | Bottom Related Stories | carousel-rails | `article .cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓ |  |
-| 13 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 13 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 | 14 | Sticky cart | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 15 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 15 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -600,9 +602,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 12 | Sidebar tags | tags | `article .sidebar section.tags` | 1 | 📋 | IMPORT-GAP | 205✓ |  |
 | 13 | Media Box downloads | downloads | `article .cover-box .media-box` | 1 | ⚠️ | IMPORT-GAP | 502, 801a |  |
 | 14 | Bottom Related Stories | carousel-rails | `article .cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓ |  |
-| 15 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 15 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 | 16 | Sticky cart | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 17 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 17 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -623,9 +625,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 11 | Sidebar tags | tags | `article .sidebar section.tags` | 1 | 📋 | IMPORT-GAP | 205✓ |  |
 | 12 | Media Box downloads | downloads | `article .cover-box .media-box` | 1 | ⚠️ | IMPORT-GAP | 502, 801a |  |
 | 13 | Bottom Related Stories | carousel-rails | `article .cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓ |  |
-| 14 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 14 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 | 15 | Sticky cart | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 16 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 16 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -647,9 +649,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 12 | Sidebar tags | tags | `article .sidebar section.tags` | 1 | 📋 | IMPORT-GAP | 205✓ |  |
 | 13 | Media Box downloads | downloads | `article .cover-box .media-box` | 1 | ⚠️ | IMPORT-GAP | 502, 801a |  |
 | 14 | Bottom Related Stories | carousel-rails | `article .cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓ |  |
-| 15 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 15 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 | 16 | Sticky cart | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 17 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 17 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -669,9 +671,9 @@ Ordered top to bottom as rendered on the source. `Top delta` is the first blocki
 | 10 | Sidebar tags | tags | `article .sidebar section.tags` | 1 | 📋 | IMPORT-GAP | 205✓ |  |
 | 11 | Media Box downloads | downloads | `article .cover-box .media-box` | 1 | ⚠️ | IMPORT-GAP | 502, 801a |  |
 | 12 | Bottom Related Stories | carousel-rails | `article .cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓ |  |
-| 13 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 13 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 | 14 | Sticky cart | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 15 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 15 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -698,9 +700,9 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 11 | Sidebar tags | tags | `article .sidebar section.tags` | 1 | 📋 | IMPORT-GAP | 205✓ |  |
 | 12 | Media Box downloads | downloads | `article .cover-box .media-box` | 1 | ⚠️ | IMPORT-GAP | 502, 801a |  |
 | 13 | Bottom Related Stories | carousel-rails | `article .cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓ |  |
-| 14 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 14 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 | 15 | Sticky cart | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 16 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 16 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -721,9 +723,9 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 11 | Sidebar tags | tags | `article .sidebar section.tags` | 1 | 📋 | IMPORT-GAP | 205✓ |  |
 | 12 | Media Box downloads | downloads | `article .cover-box .media-box` | 1 | ⚠️ | IMPORT-GAP | 502, 801a |  |
 | 13 | Bottom Related Stories | carousel-rails | `article .cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓ |  |
-| 14 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 14 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 | 15 | Sticky cart | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 16 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 16 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -744,9 +746,9 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 11 | Sidebar tags | tags | `article .sidebar section.tags` | 1 | 🟡 | DELTA | 205✓ | width @375: 355px → 327px |
 | 12 | Media Box downloads | downloads | `article .cover-box .media-box` | 1 | ⚠️ | IMPORT-GAP | 502, 801a | (element) @375: present x1 → MISSING on EDS |
 | 13 | Bottom Related Stories | carousel-rails | `article .cover-box .related-stories` | 1 | 📋 | IMPORT-GAP | 820, 212✓ | (element) @375: present x1 → MISSING on EDS |
-| 14 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 14 | Sticky share | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 | 15 | Sticky cart | media-cart | `.sticky-buttons .media-cart-icon` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 16 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 824 |  |
+| 16 | Scroll to top | page-float-dock | `.sticky-buttons .scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -754,7 +756,7 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 
 | # | Element | Component | Source selector | × | Status | EDS | Tickets | Top delta |
 |--:|---|---|---|--:|:-:|---|---|---|
-| 1 | Media Room chrome (header and footer) | mr-side-chrome | `header.header, footer.footer` | 1 | 🟡 | DELTA | 305, 607, 825 | nav/footer variant @1280: News/Press Kits/Models/Images/Videos/Company/Škodapedia + Contacts/Subscribe/Compan… |
+| 1 | Media Room chrome (header and footer) | mr-side-chrome | `header.header, footer.footer` | 1 | 🟡 | DELTA | 305, 607, 309, 825 | nav/footer variant @1280: News/Press Kits/Models/Images/Videos/Company/Škodapedia + Contacts/Subscribe/Compan… |
 | 2 | Published date | template-press-release | `article.press_release .entry-published` | 1 | 🟡 | DELTA | 607 | date fontSize @375: 11px → 16px |
 | 3 | Press release text title | template-press-release | `article.press_release h1.entry-title` | 1 | 🟡 | DELTA | 607 | width @375: 355px → 327px |
 | 4 | Two-column article shell | template-press-release | `article.press_release .columns` | 1 | 📋 | NOT-BUILT | 607, 821 | height @375: 2454px → 2935px |
@@ -769,8 +771,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 13 | Per-asset direct-download button | downloads | `article.press_release .search-results.media-box .…` | 1 | 🔵 | IN-PR | 502, 503, 607 | element absent @375: visible on source → missing on EDS main |
 | 14 | Per-asset cart add and Original/1920px menu | press-kit-media | `article.press_release .search-results.media-box .…` | 1 | 📋 | NOT-BUILT | 502, 505✓, 505a, 505b, 607 | element absent @375: visible on source → missing on EDS main |
 | 15 | Related press-release rail | carousel-rails | `article.press_release .cover-box.dark .search-res…` | 1 | 📋 | IMPORT-GAP | 201✓, 607, 803(M2) | height @375: 352px → 3905px |
-| 16 | Floating share / social-intent controls | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 607, 505✓, 824 | element absent @375: visible on source → missing on EDS main |
-| 17 | Floating media-cart badge / scroll-top | page-float-dock | `a.media-cart-icon.media-cart-count, a.round-icon.…` | 1 | ❌ | NOT-BUILT | 505✓, 505b, 607, 824 | element absent @375: visible on source → missing on EDS main |
+| 16 | Floating share / social-intent controls | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 607, 505✓, 215, 827 | element absent @375: visible on source → missing on EDS main |
+| 17 | Floating media-cart badge / scroll-top | page-float-dock | `a.media-cart-icon.media-cart-count, a.round-icon.…` | 1 | ❌ | NOT-BUILT | 505✓, 505b, 607, 215, 827 | element absent @375: visible on source → missing on EDS main |
 
 </details>
 
@@ -778,7 +780,7 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 
 | # | Element | Component | Source selector | × | Status | EDS | Tickets | Top delta |
 |--:|---|---|---|--:|:-:|---|---|---|
-| 1 | Media Room chrome (header and footer) | mr-side-chrome | `header.header, footer.footer` | 1 | 🟡 | DELTA | 305, 607, 825 | nav/footer variant @1280: News/Press Kits/Models/Images/Videos/Company/Škodapedia + Contacts/Subscribe/Compan… |
+| 1 | Media Room chrome (header and footer) | mr-side-chrome | `header.header, footer.footer` | 1 | 🟡 | DELTA | 305, 607, 309, 825 | nav/footer variant @1280: News/Press Kits/Models/Images/Videos/Company/Škodapedia + Contacts/Subscribe/Compan… |
 | 2 | Published date | template-press-release | `article.press_release .entry-published` | 1 | 🟡 | DELTA | 607 | date fontSize @375: 11px → 16px |
 | 3 | Press release text title | template-press-release | `article.press_release h1.entry-title` | 1 | 🟡 | DELTA | 607 | width @375: 355px → 327px |
 | 4 | Two-column article shell | template-press-release | `article.press_release .columns` | 1 | 📋 | NOT-BUILT | 607, 821 | height @375: 3124px → 3915px |
@@ -794,8 +796,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 14 | Per-asset direct-download button | downloads | `article.press_release .search-results.media-box .…` | 1 | 🔵 | IN-PR | 502, 503, 607 | element absent @375: visible on source → missing on EDS main |
 | 15 | Per-asset cart add and Original/1920px menu | press-kit-media | `article.press_release .search-results.media-box .…` | 1 | 📋 | NOT-BUILT | 502, 505✓, 505a, 505b, 607 | element absent @375: visible on source → missing on EDS main |
 | 16 | Related press-release rail | carousel-rails | `article.press_release .cover-box.dark .search-res…` | 1 | 📋 | IMPORT-GAP | 201✓, 607, 803(M2) | height @375: 320px → 1893px |
-| 17 | Floating share / social-intent controls | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 607, 505✓, 824 | element absent @375: visible on source → missing on EDS main |
-| 18 | Floating media-cart badge / scroll-top | page-float-dock | `a.media-cart-icon.media-cart-count, a.round-icon.…` | 1 | ❌ | NOT-BUILT | 505✓, 505b, 607, 824 | element absent @375: visible on source → missing on EDS main |
+| 17 | Floating share / social-intent controls | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 607, 505✓, 215, 827 | element absent @375: visible on source → missing on EDS main |
+| 18 | Floating media-cart badge / scroll-top | page-float-dock | `a.media-cart-icon.media-cart-count, a.round-icon.…` | 1 | ❌ | NOT-BUILT | 505✓, 505b, 607, 215, 827 | element absent @375: visible on source → missing on EDS main |
 
 </details>
 
@@ -803,7 +805,7 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 
 | # | Element | Component | Source selector | × | Status | EDS | Tickets | Top delta |
 |--:|---|---|---|--:|:-:|---|---|---|
-| 1 | Media Room chrome (header and footer) | mr-side-chrome | `header.header, footer.footer` | 1 | 🟡 | DELTA | 305, 607, 825 | nav/footer variant @1280: News/Press Kits/Models/Images/Videos/Company/Škodapedia + Contacts/Subscribe/Compan… |
+| 1 | Media Room chrome (header and footer) | mr-side-chrome | `header.header, footer.footer` | 1 | 🟡 | DELTA | 305, 607, 309, 825 | nav/footer variant @1280: News/Press Kits/Models/Images/Videos/Company/Škodapedia + Contacts/Subscribe/Compan… |
 | 2 | Published date | template-press-release | `article.press_release .entry-published` | 1 | 🟡 | DELTA | 607 | date fontSize @375: 11px → 16px |
 | 3 | Press release text title | template-press-release | `article.press_release h1.entry-title` | 1 | 🟡 | DELTA | 607 | width @375: 355px → 327px |
 | 4 | Two-column article shell | template-press-release | `article.press_release .columns` | 1 | 📋 | NOT-BUILT | 607, 821 | height @375: 2748px → 3568px |
@@ -818,8 +820,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 13 | Media Box asset cards | downloads | `article.press_release .cover-box.dark .search-res…` | 1 | 🟡 | DELTA | 502, 503, 505✓, 607, 803(M2) | width @375: 375px → 327px |
 | 14 | Per-asset direct-download button | downloads | `article.press_release .search-results.media-box .…` | 1 | 🔵 | IN-PR | 502, 503, 607 | element absent @375: visible on source → missing on EDS main |
 | 15 | Per-asset cart add and Original/1920px menu | press-kit-media | `article.press_release .search-results.media-box .…` | 1 | 📋 | NOT-BUILT | 502, 505✓, 505a, 505b, 607 | element absent @375: visible on source → missing on EDS main |
-| 16 | Floating share / social-intent controls | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 607, 505✓, 824 | element absent @375: visible on source → missing on EDS main |
-| 17 | Floating media-cart badge / scroll-top | page-float-dock | `a.media-cart-icon.media-cart-count, a.round-icon.…` | 1 | ❌ | NOT-BUILT | 505✓, 505b, 607, 824 | element absent @375: visible on source → missing on EDS main |
+| 16 | Floating share / social-intent controls | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 607, 505✓, 215, 827 | element absent @375: visible on source → missing on EDS main |
+| 17 | Floating media-cart badge / scroll-top | page-float-dock | `a.media-cart-icon.media-cart-count, a.round-icon.…` | 1 | ❌ | NOT-BUILT | 505✓, 505b, 607, 215, 827 | element absent @375: visible on source → missing on EDS main |
 
 </details>
 
@@ -827,7 +829,7 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 
 | # | Element | Component | Source selector | × | Status | EDS | Tickets | Top delta |
 |--:|---|---|---|--:|:-:|---|---|---|
-| 1 | Media Room chrome (header and footer) | mr-side-chrome | `header.header, footer.footer` | 1 | 🟡 | DELTA | 305, 607, 825 | nav/footer variant @1280: News/Press Kits/Models/Images/Videos/Company/Škodapedia + Contacts/Subscribe/Compan… |
+| 1 | Media Room chrome (header and footer) | mr-side-chrome | `header.header, footer.footer` | 1 | 🟡 | DELTA | 305, 607, 309, 825 | nav/footer variant @1280: News/Press Kits/Models/Images/Videos/Company/Škodapedia + Contacts/Subscribe/Compan… |
 | 2 | Published date | template-press-release | `article.press_release .entry-published` | 1 | 🟡 | DELTA | 607 | date fontSize @375: 11px → 16px |
 | 3 | Press release text title | template-press-release | `article.press_release h1.entry-title` | 1 | 🟡 | DELTA | 607 | width @375: 355px → 327px |
 | 4 | Two-column article shell | template-press-release | `article.press_release .columns` | 1 | 📋 | NOT-BUILT | 607, 821 | height @375: 2368px → 3092px |
@@ -843,8 +845,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 14 | Per-asset direct-download button | downloads | `article.press_release .search-results.media-box .…` | 1 | 🔵 | IN-PR | 502, 503, 607 | element absent @375: visible on source → missing on EDS main |
 | 15 | Per-asset cart add and Original/1920px menu | press-kit-media | `article.press_release .search-results.media-box .…` | 1 | 📋 | NOT-BUILT | 502, 505✓, 505a, 505b, 607 | element absent @375: visible on source → missing on EDS main |
 | 16 | Related press-release rail | carousel-rails | `article.press_release .cover-box.dark .search-res…` | 1 | 📋 | IMPORT-GAP | 201✓, 607, 803(M2) | height @1280: 308px → 1310px |
-| 17 | Floating share / social-intent controls | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 607, 505✓, 824 | element absent @375: visible on source → missing on EDS main |
-| 18 | Floating media-cart badge / scroll-top | page-float-dock | `a.media-cart-icon.media-cart-count, a.round-icon.…` | 1 | ❌ | NOT-BUILT | 505✓, 505b, 607, 824 | element absent @375: visible on source → missing on EDS main |
+| 17 | Floating share / social-intent controls | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 607, 505✓, 215, 827 | element absent @375: visible on source → missing on EDS main |
+| 18 | Floating media-cart badge / scroll-top | page-float-dock | `a.media-cart-icon.media-cart-count, a.round-icon.…` | 1 | ❌ | NOT-BUILT | 505✓, 505b, 607, 215, 827 | element absent @375: visible on source → missing on EDS main |
 
 </details>
 
@@ -852,7 +854,7 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 
 | # | Element | Component | Source selector | × | Status | EDS | Tickets | Top delta |
 |--:|---|---|---|--:|:-:|---|---|---|
-| 1 | Media Room chrome (header and footer) | mr-side-chrome | `header.header, footer.footer` | 1 | 🟡 | DELTA | 305, 607, 825 | nav/footer variant @1280: News/Press Kits/Models/Images/Videos/Company/Škodapedia + Contacts/Subscribe/Compan… |
+| 1 | Media Room chrome (header and footer) | mr-side-chrome | `header.header, footer.footer` | 1 | 🟡 | DELTA | 305, 607, 309, 825 | nav/footer variant @1280: News/Press Kits/Models/Images/Videos/Company/Škodapedia + Contacts/Subscribe/Compan… |
 | 2 | Published date | template-press-release | `article.press_release .entry-published` | 1 | 🟡 | DELTA | 607 | date fontSize @375: 11px → 16px |
 | 3 | Press release text title | template-press-release | `article.press_release h1.entry-title` | 1 | 🟡 | DELTA | 607 | width @375: 355px → 327px |
 | 4 | Two-column article shell | template-press-release | `article.press_release .columns` | 1 | 📋 | NOT-BUILT | 607, 821 | height @375: 2479px → 3194px |
@@ -869,8 +871,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 15 | Per-asset direct-download button | downloads | `article.press_release .search-results.media-box .…` | 1 | 🔵 | IN-PR | 502, 503, 607 | element absent @375: visible on source → missing on EDS main |
 | 16 | Per-asset cart add and Original/1920px menu | press-kit-media | `article.press_release .search-results.media-box .…` | 1 | 📋 | NOT-BUILT | 502, 505✓, 505a, 505b, 607 | element absent @375: visible on source → missing on EDS main |
 | 17 | Related press-release rail | carousel-rails | `article.press_release .cover-box.dark .search-res…` | 1 | 📋 | IMPORT-GAP | 201✓, 607, 803(M2) | height @375: 384px → 2264px |
-| 18 | Floating share / social-intent controls | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 607, 505✓, 824 | element absent @375: visible on source → missing on EDS main |
-| 19 | Floating media-cart badge / scroll-top | page-float-dock | `a.media-cart-icon.media-cart-count, a.round-icon.…` | 1 | ❌ | NOT-BUILT | 505✓, 505b, 607, 824 | element absent @375: visible on source → missing on EDS main |
+| 18 | Floating share / social-intent controls | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 607, 505✓, 215, 827 | element absent @375: visible on source → missing on EDS main |
+| 19 | Floating media-cart badge / scroll-top | page-float-dock | `a.media-cart-icon.media-cart-count, a.round-icon.…` | 1 | ❌ | NOT-BUILT | 505✓, 505b, 607, 215, 827 | element absent @375: visible on source → missing on EDS main |
 
 </details>
 
@@ -893,8 +895,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 13 | Image thumbnail lightbox and media-cart toolbar | gallery-lightbox | `#images .search-results-item a.file-type.colorbox` | 20 | 📋 | CONTENT-BLOCKED | 203✓, 201✓, 208, 505✓, 608 | images rail: height @375: 427px → 167px |
 | 14 | Videos related-content rail | carousel-rails | `#videos .search-results-container` | 1 | ⚠️ | IMPORT-GAP | 208, 212✓, 201✓, 603, 608 | videos rail: height @375: 427px → 167px |
 | 15 | Video thumbnail, Vimeo player and media toolbar | embeds | `#videos .search-results-item a.file-type.colorbox` | 20 | 📋 | CONTENT-BLOCKED | 204, 208, 505✓, 608 | videos rail: height @375: 427px → 167px |
-| 16 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 17 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 16 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 17 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -917,8 +919,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 13 | Image thumbnail lightbox and media-cart toolbar | gallery-lightbox | `#images .search-results-item a.file-type.colorbox` | 20 | 📋 | CONTENT-BLOCKED | 203✓, 201✓, 208, 505✓, 608 | images rail: height @375: 427px → 167px |
 | 14 | Videos related-content rail | carousel-rails | `#videos .search-results-container` | 1 | ⚠️ | IMPORT-GAP | 208, 212✓, 201✓, 603, 608 | videos rail: height @375: 427px → 167px |
 | 15 | Video thumbnail, Vimeo player and media toolbar | embeds | `#videos .search-results-item a.file-type.colorbox` | 20 | 📋 | CONTENT-BLOCKED | 204, 208, 505✓, 608 | videos rail: height @375: 427px → 167px |
-| 16 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 17 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 16 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 17 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -936,8 +938,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 8 | Image thumbnail lightbox and media-cart toolbar | gallery-lightbox | `#images .search-results-item a.file-type.colorbox` | 20 | 📋 | CONTENT-BLOCKED | 203✓, 201✓, 208, 505✓, 608 | images rail: height @375: 427px → 167px |
 | 9 | Videos related-content rail | carousel-rails | `#videos .search-results-container` | 1 | ⚠️ | IMPORT-GAP | 208, 212✓, 201✓, 603, 608 | videos rail: height @375: 427px → 167px |
 | 10 | Video thumbnail, Vimeo player and media toolbar | embeds | `#videos .search-results-item a.file-type.colorbox` | 9 | 📋 | CONTENT-BLOCKED | 204, 208, 505✓, 608 | videos rail: height @375: 427px → 167px |
-| 11 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 12 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 11 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 12 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -955,8 +957,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 8 | Image thumbnail lightbox and media-cart toolbar | gallery-lightbox | `#images .search-results-item a.file-type.colorbox` | 20 | 📋 | CONTENT-BLOCKED | 203✓, 201✓, 208, 505✓, 608 | images rail: height @375: 427px → 167px |
 | 9 | Videos related-content rail | carousel-rails | `#videos .search-results-container` | 1 | ⚠️ | IMPORT-GAP | 208, 212✓, 201✓, 603, 608 | videos rail: height @375: 427px → 167px |
 | 10 | Video thumbnail, Vimeo player and media toolbar | embeds | `#videos .search-results-item a.file-type.colorbox` | 13 | 📋 | CONTENT-BLOCKED | 204, 208, 505✓, 608 | videos rail: height @375: 427px → 167px |
-| 11 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 12 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 11 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 12 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -975,8 +977,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 9 | Image thumbnail lightbox and media-cart toolbar | gallery-lightbox | `#images .search-results-item a.file-type.colorbox` | 20 | 📋 | CONTENT-BLOCKED | 203✓, 201✓, 208, 505✓, 608 | images rail: height @375: 427px → 167px |
 | 10 | Videos related-content rail | carousel-rails | `#videos .search-results-container` | 1 | ⚠️ | IMPORT-GAP | 208, 212✓, 201✓, 603, 608 | videos rail: height @375: 427px → 167px |
 | 11 | Video thumbnail, Vimeo player and media toolbar | embeds | `#videos .search-results-item a.file-type.colorbox` | 20 | 📋 | CONTENT-BLOCKED | 204, 208, 505✓, 608 | videos rail: height @375: 427px → 167px |
-| 12 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 13 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 12 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 13 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -989,8 +991,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 3 | SERIES category badge | hero | `article.skoda_series > .hero .hero-caption .label` | 1 | ⚠️ | IMPORT-GAP | 207, 202✓ | SERIES badge: (element) @375: present x1 → MISSING on EDS |
 | 4 | Series standfirst / intro in hero caption | hero | `article.skoda_series > .hero .hero-caption p.perex` | 1 | 🟡 | DELTA | 202✓, 207 | hero standfirst: fontSize @375: 20px → 16px |
 | 5 | Curated story/press-kit mosaic tiles | series-mosaic | `article.skoda_series > .content .panel-grid > .pa…` | 8 | ⚠️ | IMPORT-GAP | 207, 201✓, 402✓, 603 | story tile: width @375: 355px → 327px |
-| 6 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 7 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 6 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 7 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -1003,8 +1005,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 3 | SERIES category badge | hero | `article.skoda_series > .hero .hero-caption .label` | 1 | ⚠️ | IMPORT-GAP | 207, 202✓ | SERIES badge: (element) @375: present x1 → MISSING on EDS |
 | 4 | Series standfirst / intro in hero caption | hero | `article.skoda_series > .hero .hero-caption p.perex` | 1 | 🟡 | DELTA | 202✓, 207 | hero standfirst: fontSize @375: 20px → 16px |
 | 5 | Curated story/press-kit mosaic tiles | series-mosaic | `article.skoda_series > .content .panel-grid > .pa…` | 14 | ⚠️ | IMPORT-GAP | 207, 201✓, 402✓, 603 | story tile: width @375: 355px → 327px |
-| 6 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 7 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 6 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 7 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -1017,8 +1019,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 3 | SERIES category badge | hero | `article.skoda_series > .hero .hero-caption .label` | 1 | ⚠️ | IMPORT-GAP | 207, 202✓ | SERIES badge: (element) @375: present x1 → MISSING on EDS |
 | 4 | Series standfirst / intro in hero caption | hero | `article.skoda_series > .hero .hero-caption p.perex` | 1 | 🟡 | DELTA | 202✓, 207 | hero standfirst: fontSize @375: 20px → 16px |
 | 5 | Curated story/press-kit mosaic tiles | series-mosaic | `article.skoda_series > .content .panel-grid > .pa…` | 10 | ⚠️ | IMPORT-GAP | 207, 201✓, 402✓, 603 | story tile: width @375: 355px → 327px |
-| 6 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 7 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 6 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 7 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -1031,8 +1033,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 3 | SERIES category badge | hero | `article.skoda_series > .hero .hero-caption .label` | 1 | ⚠️ | IMPORT-GAP | 207, 202✓ | SERIES badge: (element) @375: present x1 → MISSING on EDS |
 | 4 | Series standfirst / intro in hero caption | hero | `article.skoda_series > .hero .hero-caption p.perex` | 1 | 🟡 | DELTA | 202✓, 207 | hero standfirst: fontSize @375: 20px → 16px |
 | 5 | Curated story/press-kit mosaic tiles | series-mosaic | `article.skoda_series > .content .panel-grid > .pa…` | 5 | ⚠️ | IMPORT-GAP | 207, 201✓, 402✓, 603 | story tile: width @375: 355px → 327px |
-| 6 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 7 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 6 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 7 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -1045,8 +1047,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 3 | SERIES category badge | hero | `article.skoda_series > .hero .hero-caption .label` | 1 | ⚠️ | IMPORT-GAP | 207, 202✓ | SERIES badge: (element) @375: present x1 → MISSING on EDS |
 | 4 | Series standfirst / intro in hero caption | hero | `article.skoda_series > .hero .hero-caption p.perex` | 1 | 🟡 | DELTA | 202✓, 207 | hero standfirst: fontSize @375: 20px → 16px |
 | 5 | Curated story/press-kit mosaic tiles | series-mosaic | `article.skoda_series > .content .panel-grid > .pa…` | 12 | ⚠️ | IMPORT-GAP | 207, 201✓, 402✓, 603 | story tile: width @375: 355px → 327px |
-| 6 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 7 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 6 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 7 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -1063,8 +1065,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 7 | Media resource cards | card-teaser | `.content .panel-grid .so-widget-ys-so-widget-post…` | 5 | 📋 | CONTENT-BLOCKED | 805a, 805b, 806(M2), 201✓ | chapter tile 1 box.w @375: 355 → 327 |
 | 8 | WhatsApp linked image promo | press-kit-media | `.content .so-widget-sow-editor a[href*=whatsapp]` | 1 | ⚠️ | CONTENT-BLOCKED | 805a, 609 | source region width vs nearest EDS fixture (proxy only) @768: 748×374px → 348×360px |
 | 9 | Whole-kit direct ZIP image CTA | press-kit-media | `.content .so-widget-sow-editor a[href*=".zip"]` | 1 | ⚠️ | CONTENT-BLOCKED | 805a, 806(M2) | missing imported press-kit content @1280: source graphical CTA/files/sidebar list visible → press-kit EDS URL… |
-| 10 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 11 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 10 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 11 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -1081,8 +1083,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 7 | Media resource cards | card-teaser | `.content .panel-grid .so-widget-ys-so-widget-post…` | 5 | 📋 | CONTENT-BLOCKED | 805a, 805b, 806(M2), 201✓ | chapter tile 1 box.w @375: 355 → 327 |
 | 8 | WhatsApp linked image promo | press-kit-media | `.content .so-widget-sow-editor a[href*=whatsapp]` | 1 | ⚠️ | CONTENT-BLOCKED | 805a, 609 | source region width vs nearest EDS fixture (proxy only) @768: 748×374px → 348×360px |
 | 9 | Whole-kit direct ZIP image CTA | press-kit-media | `.content .so-widget-sow-editor a[href*=".zip"]` | 1 | ⚠️ | CONTENT-BLOCKED | 805a, 806(M2) | missing imported press-kit content @1280: source graphical CTA/files/sidebar list visible → press-kit EDS URL… |
-| 10 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 11 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 10 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 11 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -1095,8 +1097,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 3 | Historical chapter cards | card-teaser | `.content .panel-grid .so-widget-ys-so-widget-post…` | 20 | 📋 | CONTENT-BLOCKED | 805a, 805b, 201✓ | chapter tile 1 box.w @375: 355 → 327 |
 | 4 | Cross-kit card | card-teaser | `.content .panel-grid .so-widget-ys-so-widget-post…` | 1 | 📋 | CONTENT-BLOCKED | 805a, 609, 201✓ | chapter tile 1 box.w @375: 355 → 327 |
 | 5 | Media resource cards | card-teaser | `.content .panel-grid .so-widget-ys-so-widget-post…` | 3 | 📋 | CONTENT-BLOCKED | 805a, 805b, 806(M2), 201✓ | chapter tile 1 box.w @375: 355 → 327 |
-| 6 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 7 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 6 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 7 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -1124,8 +1126,8 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 18 | Media Box asset thumbnails and downloads | downloads | `.media-box .search-results-item` | 60 | 🔵 | IN-PR | 502, 506, 805c | media box vs PR downloads proxy box.w @375: 375 → 327 |
 | 19 | Media Box add-to-cart size menus | media-cart | `.media-box .search-results-item .media-cart-actio…` | 60 | 📋 | NOT-BUILT | 505a, 505b, 805c | missing feature @1280: 60 source instances → no equivalent rendered on main |
 | 20 | Media Box Show more / Show less | downloads | `.media-box .togglebox-opener` | 1 | 📋 | NOT-BUILT | 805c, 506 | missing feature @1280: 1 source instances → no equivalent rendered on main |
-| 21 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 824 |  |
-| 22 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 824 |  |
+| 21 | Floating share expander (architect census) | page-float-dock | `div.sticky-buttons > div.sticky-button` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
+| 22 | Floating scroll-to-top (architect census) | page-float-dock | `div.sticky-buttons > .round-icon` | 1 | ❌ | NOT-BUILT | 215, 827 |  |
 
 </details>
 
@@ -1154,9 +1156,9 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 19 | STO footer app badges and social profiles | footer | `footer.footer .footer-widgets` | 1 | 🟡 | DELTA | 304✓, 306 | footer height @1280: 830px → 842px |
 | 20 | STO footer navigation sitemap | footer | `footer.footer .footer-nav` | 1 | 🟡 | DELTA | 304✓, 306 |  |
 | 21 | STO copyright / legal / RSS strip | footer | `footer .copyright-text` | 1 | 🟡 | DELTA | 304✓, 306 | usage font-size @375: 16px → 12px |
-| 22 | Floating social-share expander | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 304✓, 824 |  |
+| 22 | Floating social-share expander | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 304✓, 215, 827 |  |
 | 23 | Floating media-cart badge/count | media-cart | `a.media-cart-icon.media-cart-count.round-icon` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 24 | Floating scroll-to-top button | page-float-dock | `a.round-icon.scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 304✓, 824 |  |
+| 24 | Floating scroll-to-top button | page-float-dock | `a.round-icon.scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 304✓, 215, 827 |  |
 | 25 | OneTrust banner and Manage cookies | cookie-consent | `#ot-sdk-btn` | 1 | 📋 | NOT-BUILT | 704, 804(M2) |  |
 
 </details>
@@ -1165,12 +1167,12 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 
 | # | Element | Component | Source selector | × | Status | EDS | Tickets | Top delta |
 |--:|---|---|---|--:|:-:|---|---|---|
-| 1 | MR topbar and section switcher | header-megamenu | `header.header > .topbar` | 1 | ⚠️ | DELTA | 301✓, 305, 825 | MR nav fragment @1280: News / Press Kits / Models / Images / Videos / Company / Škodapedia → STO nav fragment |
-| 2 | MR desktop navigation/Models and Company menus | header-megamenu | `nav.topnav` | 1 | ⚠️ | DELTA | 301✓, 305, 825 | menu content @1280: News, Press Kits, Models, Images, Videos, Company, Škodapedia → Models, eMobility, Lifest… |
-| 3 | MR wordmark | header-megamenu | `a.logo` | 1 | 🟡 | DELTA | 301✓, 825 | logo anchor width @1280: 256px → 194px |
-| 4 | MR mobile hamburger/drawer | mobile-nav | `button.menu-toggle` | 1 | 🟡 | DELTA | 302, 825 | button aria-expanded and scroll-lock @992: button reflects open state, lock html → aria-expanded absent; html… |
-| 5 | MR locale links | language-switcher | `.lang-links` | 2 | ⚠️ | DELTA | 303, 825 | translation-aware link availability @1280: six on Images but four on MR press release → six on every page |
-| 6 | MR header search/suggestions | header-megamenu | `.search-bar` | 1 | 🔵⚠️ | IN-PR | 403, 825 | trigger width @1280: 48px → 24px |
+| 1 | MR topbar and section switcher | header-megamenu | `header.header > .topbar` | 1 | ⚠️ | DELTA | 301✓, 305, 309, 825 | MR nav fragment @1280: News / Press Kits / Models / Images / Videos / Company / Škodapedia → STO nav fragment |
+| 2 | MR desktop navigation/Models and Company menus | header-megamenu | `nav.topnav` | 1 | ⚠️ | DELTA | 301✓, 305, 309, 825 | menu content @1280: News, Press Kits, Models, Images, Videos, Company, Škodapedia → Models, eMobility, Lifest… |
+| 3 | MR wordmark | header-megamenu | `a.logo` | 1 | 🟡 | DELTA | 301✓, 309, 825 | logo anchor width @1280: 256px → 194px |
+| 4 | MR mobile hamburger/drawer | mobile-nav | `button.menu-toggle` | 1 | 🟡 | DELTA | 302, 309, 825 | button aria-expanded and scroll-lock @992: button reflects open state, lock html → aria-expanded absent; html… |
+| 5 | MR locale links | language-switcher | `.lang-links` | 2 | ⚠️ | DELTA | 303, 309, 825 | translation-aware link availability @1280: six on Images but four on MR press release → six on every page |
+| 6 | MR header search/suggestions | header-megamenu | `.search-bar` | 1 | 🔵⚠️ | IN-PR | 403, 309, 825 | trigger width @1280: 48px → 24px |
 | 7 | Advanced filter facet groups | faceted-listing | `form.search-filter` | 1 | ⚠️ | CONTENT-BLOCKED | 401✓, 402✓, 608 | available facet options @1280: 15 pill groups (source source DOM, initially collapsed) → zero options with em… |
 | 8 | Advanced filter trigger and Newest/Oldest sort | faceted-listing | `ul.sort-options-list` | 1 | 🟡 | DELTA | 402✓ | sort row height @1280: 35px → 21px |
 | 9 | 80-photo package-limit notice | media-cart | `.media-cart-limit-banner` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
@@ -1181,14 +1183,14 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 14 | Image original / 1920px JPG download menu | media-cart | `.search-results-item .media-cart-action-multi.dow…` | 12 | 📋 | NOT-BUILT | 503, 505a, 505b |  |
 | 15 | Result count | faceted-listing | `.search-results-pagination` | 1 | 📋 | CONTENT-BLOCKED | 402✓, 608 | result count @1280: 12 / 33448 → 0 / 0 |
 | 16 | Load more image assets | faceted-listing | `button.ajax-loader-button` | 1 | ⚠️ | CONTENT-BLOCKED | 402✓, 608 | load-more control @1280: visible, 12 cards → missing, zero cards |
-| 17 | MR footer badges and social links | footer-mediaroom | `footer.footer .footer-widgets` | 2 | ⚠️ | DELTA | 305, 306, 825 | footer height/content @1280: 706px MR variant → 842px STO variant |
-| 18 | MR footer Contacts links | footer-mediaroom | `footer .widget_nav_menu` | 1 | 📋 | NOT-BUILT | 305, 825 |  |
+| 17 | MR footer badges and social links | footer-mediaroom | `footer.footer .footer-widgets` | 2 | ⚠️ | DELTA | 305, 306, 309, 825 | footer height/content @1280: 706px MR variant → 842px STO variant |
+| 18 | MR footer Contacts links | footer-mediaroom | `footer .widget_nav_menu` | 1 | 📋 | NOT-BUILT | 305, 309, 825 |  |
 | 19 | MR footer Subscribe/consent form | newsletter | `footer .skoda-mailguide` | 1 | 📋 | NOT-BUILT | 305, 704 |  |
-| 20 | MR footer Company/annual report | footer-mediaroom | `footer .widget_text` | 1 | 📋 | NOT-BUILT | 305, 503, 825 |  |
-| 21 | MR-specific copyright/legal/feed bar | footer-mediaroom | `footer .copyright-text` | 1 | 🟡 | DELTA | 305, 306, 825 | footer variant @1280: MR usage wording + RSS target=_blank → STO usage text; RSS target empty |
-| 22 | Floating share expander | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 304✓, 824 |  |
+| 20 | MR footer Company/annual report | footer-mediaroom | `footer .widget_text` | 1 | 📋 | NOT-BUILT | 305, 503, 309, 825 |  |
+| 21 | MR-specific copyright/legal/feed bar | footer-mediaroom | `footer .copyright-text` | 1 | 🟡 | DELTA | 305, 306, 309, 825 | footer variant @1280: MR usage wording + RSS target=_blank → STO usage text; RSS target empty |
+| 22 | Floating share expander | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 304✓, 215, 827 |  |
 | 23 | Floating media-cart count | media-cart | `a.media-cart-icon.media-cart-count` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 24 | Floating scroll-top | page-float-dock | `a.round-icon.scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 304✓, 824 |  |
+| 24 | Floating scroll-top | page-float-dock | `a.round-icon.scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 304✓, 215, 827 |  |
 | 25 | OneTrust consent and Manage cookies | cookie-consent | `#ot-sdk-btn` | 1 | 📋 | NOT-BUILT | 704, 804(M2) |  |
 
 </details>
@@ -1197,12 +1199,12 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 
 | # | Element | Component | Source selector | × | Status | EDS | Tickets | Top delta |
 |--:|---|---|---|--:|:-:|---|---|---|
-| 1 | MR topbar and section switcher | header-megamenu | `header.header > .topbar` | 1 | ⚠️ | DELTA | 301✓, 305, 825 | MR nav fragment @1280: News/Press Kits/Models/Images/Videos/Company/Škodapedia → STO navigation |
-| 2 | MR desktop navigation / dropdowns | header-megamenu | `nav.topnav` | 1 | ⚠️ | DELTA | 301✓, 305, 825 | menu labels @1280: News, Press Kits, Models, Images, Videos, Company, Škodapedia → STO navigation set |
-| 3 | MR wordmark | header-megamenu | `a.logo` | 1 | 🟡 | DELTA | 301✓, 825 | logo box @1280: 256×48 → 194×19 |
-| 4 | MR mobile hamburger/drawer | mobile-nav | `button.menu-toggle` | 1 | 🟡 | DELTA | 302, 825 | toggle ARIA / scroll-lock @375: expanded reflected on button; scroll locked → button aria-expanded absent; ov… |
-| 5 | MR language switcher | language-switcher | `.lang-links` | 2 | ⚠️ | DELTA | 303, 825 | locale existence rule @1280: six on Videos, four on MR press article → six static on both |
-| 6 | MR header search / suggestions | header-megamenu | `.search-bar` | 1 | 🔵⚠️ | IN-PR | 403, 825 | trigger width @1280: 48px → 24px |
+| 1 | MR topbar and section switcher | header-megamenu | `header.header > .topbar` | 1 | ⚠️ | DELTA | 301✓, 305, 309, 825 | MR nav fragment @1280: News/Press Kits/Models/Images/Videos/Company/Škodapedia → STO navigation |
+| 2 | MR desktop navigation / dropdowns | header-megamenu | `nav.topnav` | 1 | ⚠️ | DELTA | 301✓, 305, 309, 825 | menu labels @1280: News, Press Kits, Models, Images, Videos, Company, Škodapedia → STO navigation set |
+| 3 | MR wordmark | header-megamenu | `a.logo` | 1 | 🟡 | DELTA | 301✓, 309, 825 | logo box @1280: 256×48 → 194×19 |
+| 4 | MR mobile hamburger/drawer | mobile-nav | `button.menu-toggle` | 1 | 🟡 | DELTA | 302, 309, 825 | toggle ARIA / scroll-lock @375: expanded reflected on button; scroll locked → button aria-expanded absent; ov… |
+| 5 | MR language switcher | language-switcher | `.lang-links` | 2 | ⚠️ | DELTA | 303, 309, 825 | locale existence rule @1280: six on Videos, four on MR press article → six static on both |
+| 6 | MR header search / suggestions | header-megamenu | `.search-bar` | 1 | 🔵⚠️ | IN-PR | 403, 309, 825 | trigger width @1280: 48px → 24px |
 | 7 | Advanced filter facet groups | faceted-listing | `form.search-filter` | 1 | ⚠️ | CONTENT-BLOCKED | 401✓, 402✓, 608 | facet set @1280: 15 groups once expanded → zero option values |
 | 8 | Advanced filter and newest/oldest sort | faceted-listing | `ul.sort-options-list` | 1 | 🟡 | DELTA | 402✓ | sort row height @1280: 35px → 21px |
 | 9 | 80-photo package-limit notice | media-cart | `.media-cart-limit-banner` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
@@ -1214,14 +1216,14 @@ Alias URL, checked as a redirect only. Source: HTTP 200 with a canonical to the 
 | 15 | Original MP4 direct download | media-cart | `.search-results-item .media-cart-action.download` | 12 | 📋 | NOT-BUILT | 503, 505a, 505b |  |
 | 16 | Video result count | faceted-listing | `.search-results-pagination` | 1 | 📋 | CONTENT-BLOCKED | 402✓, 608 | count @1280: 12 / 904 → 0 / 0 |
 | 17 | Video Load more button | faceted-listing | `button.ajax-loader-button` | 1 | ⚠️ | CONTENT-BLOCKED | 402✓, 608 | button availability @1280: visible for 904 videos → missing; zero EDS items |
-| 18 | MR footer badges/social | footer-mediaroom | `footer.footer .footer-widgets` | 2 | ⚠️ | DELTA | 305, 306, 825 | MR footer variant/height @1280: 706px, three MR columns → 842px STO sitemap |
-| 19 | MR footer Contacts | footer-mediaroom | `footer .widget_nav_menu` | 1 | 📋 | NOT-BUILT | 305, 825 |  |
+| 18 | MR footer badges/social | footer-mediaroom | `footer.footer .footer-widgets` | 2 | ⚠️ | DELTA | 305, 306, 309, 825 | MR footer variant/height @1280: 706px, three MR columns → 842px STO sitemap |
+| 19 | MR footer Contacts | footer-mediaroom | `footer .widget_nav_menu` | 1 | 📋 | NOT-BUILT | 305, 309, 825 |  |
 | 20 | MR footer subscription/consent | newsletter | `footer .skoda-mailguide` | 1 | 📋 | NOT-BUILT | 305, 704 |  |
-| 21 | MR footer Company/annual report | footer-mediaroom | `footer .widget_text` | 1 | 📋 | NOT-BUILT | 305, 503, 825 |  |
-| 22 | MR copyright/legal/RSS | footer-mediaroom | `footer .copyright-text` | 1 | 🟡 | DELTA | 305, 306, 825 | legal text/RSS browsing context @1280: MR press/Internet/film rights + RSS target=_blank → STO Internet-news … |
-| 23 | Sticky share expander | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 304✓, 824 |  |
+| 21 | MR footer Company/annual report | footer-mediaroom | `footer .widget_text` | 1 | 📋 | NOT-BUILT | 305, 503, 309, 825 |  |
+| 22 | MR copyright/legal/RSS | footer-mediaroom | `footer .copyright-text` | 1 | 🟡 | DELTA | 305, 306, 309, 825 | legal text/RSS browsing context @1280: MR press/Internet/film rights + RSS target=_blank → STO Internet-news … |
+| 23 | Sticky share expander | page-float-dock | `.sticky-buttons .btn-group.social` | 1 | ❌ | NOT-BUILT | 304✓, 215, 827 |  |
 | 24 | Sticky media-cart count | media-cart | `a.media-cart-icon.media-cart-count` | 1 | 📋 | NOT-BUILT | 505a, 505b |  |
-| 25 | Floating scroll-top | page-float-dock | `a.round-icon.scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 304✓, 824 |  |
+| 25 | Floating scroll-top | page-float-dock | `a.round-icon.scroll-top` | 1 | ❌⚠️ | NOT-BUILT | 304✓, 215, 827 |  |
 | 26 | OneTrust and Manage cookies | cookie-consent | `#ot-sdk-btn` | 1 | 📋 | NOT-BUILT | 704, 804(M2) |  |
 
 </details>

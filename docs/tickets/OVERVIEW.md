@@ -48,11 +48,33 @@ New M1 tickets:
   registry [`SKODA-M1-URL-BLOCK-REGISTRY.md`](../analysis/SKODA-M1-URL-BLOCK-REGISTRY.md)):
   - 687 UI element rows on the 43 URLs are registered: 659 from the fleet plus 28 float-dock rows added by the
     Architect. The shared chrome is recorded per URL. Every row is ticketed or ruled out.
-  - Three **draft** tickets were added on disk only, with no GitHub issues yet: **SKODA-824** float dock (1.5,
-    Should/agent), **SKODA-825** MR side resolution (1.5, Must) and **SKODA-826** global gutter (0.5, Must).
+  - Three **draft** tickets were added on disk only, with no GitHub issues yet: **SKODA-827** float dock (1.5,
+    Should/agent; first drafted as 824), **SKODA-825** MR side resolution (1.5, Must) and **SKODA-826** global
+    gutter (0.5, Must).
   - AC amendments for 20+ tickets are listed in sweep §6 and are applied at sign-off.
-  - Net M1 Must change: +2 human SP, plus +2.5 SP in the agent lane (824, 607 importer, 216 listing-lightbox
+  - Net M1 Must change: +2 human SP, plus +2.5 SP in the agent lane (827, 607 importer, 216 listing-lightbox
     slice), per sweep §9.
+- **2026-09-25, parallel demo sweep reconciled** (main `88c1b48`,
+  [`SKODA-DEMO-SWEEP-REPORT.md`](../reviews/SKODA-DEMO-SWEEP-REPORT.md); validated in
+  [`SKODA-M1-URL-BLOCK-SWEEP.md`](../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §11):
+  - **Duplicates to merge at sign-off.** 827 duplicates 215 and 825 duplicates 309. The main-first IDs (215, 309)
+    are kept. 827 and 825 are closed once their extra evidence and ACs have been folded in. The capacity counts
+    only 215 and 309.
+  - **Number collision.** 824 now means the in-column highlight panel (main). The float-dock draft was renumbered
+    to 827, and no content was dropped.
+  - **826 is kept.** It is the section-gutter token; 308 (topbar padding) and 821 (story body inset) are
+    neighbours that rebase onto it.
+  - **Live re-check:** 9 of the parallel sweep's findings confirmed, 3 partial, 0 refuted.
+    - It found a missed **P1**: rail cards don't navigate on a desktop click and don't drag. **Reopen 212**
+      (proposal).
+    - 204 AC gap: the consent click-to-load hook is missing. The host is fine.
+    - Four referenced blocks don't exist (`in-page-nav`, `spec-table`, `version`, `promo-box`).
+  - **Combined cut line** (sweep §11.2):
+    - Must: +3 human SP net (212 fix, 309, 204 hook, 208 block names, 611a), with 208 Key Facts / Tech Data
+      demoted to Should. That leaves ≈ 0.2 d of margin.
+    - Agent lane: 610 + 215.
+    - Should: 308, 824, 611b, 220, 225.
+    - 221: D-4 fallback.
 **Target:** DA / Experience Workspace + EDS (no AEM Author / UE / JCR), per `SKODA-EDS-DA-ARCHITECTURE.md`.
 **Estimates:** story points (SP) + AI-assisted / manual day ranges, **planning estimates, not a quote**. "AI-assisted" reflects this environment's import/styling/QA tooling.
 **Files:** `docs/tickets/epics/E##-*.md` · `docs/tickets/tickets/SKODA-<id>.md`.
@@ -124,8 +146,12 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-216 | Story gallery variant (`sb-gallery`) + lightbox | E02 | 3 | 1–2 | 2–4 | 203,106 | 🟡 M1; story-variant of Gallery (lead image + 4-across strip, green lightbox); issue #106 (2026-09-24) |
 | SKODA-217 | Homepage social-media icon cards | E02 | 1 | 0.5 | 1–2 | 201,106 | 🟡 M1; block variant; issue #107 (2026-09-24) |
 | SKODA-218 | Metadata-driven dark section styling | E02 | 1 | 0.5 | 1–2 | 106 | 🟡 M1; Section Metadata Style→class; issue #108 (2026-09-24) |
-| [SKODA-824](tickets/SKODA-824.md) | Page-level floating action dock: share expander + scroll-to-top (cart slot → 505b) | E02 | 1.5 | 0.5–1 | 1–2 | 505b,704,215 | 🟡 M1 Should (Must if review §14 accepted); agent-fit; **draft** from the 2026-09-25 sweep (84 rows / all 42 URLs unticketed; replaces 215 as the C-6 share in plan B) |
+| [SKODA-827](tickets/SKODA-827.md) | Page-level floating action dock: share expander + scroll-to-top (cart slot → 505b) | E02 | 1.5 | 0.5–1 | 1–2 | 505b,704,215 | 🟡 M1 Should (Must if review §14 accepted); agent-fit; **draft** from the 2026-09-25 sweep (first drafted as 824; 84 rows / all 42 URLs). ⚠️ **Duplicate of 215**: fold in the all-templates coverage and the a11y/intent ACs, then close. Not counted in capacity. |
 | [SKODA-219](tickets/SKODA-219.md) | In-body story image carousel (`skoda-carousel-widget`) | E02 | 3 | 1–1.5 | 2–3 | 212,501,106 | 🟠 M1 Must; 21/21 in-set stories; unspecced before 2026-09-24 (gap review G-02). **⛔ Superseded by SKODA-819** (review §15) |
+| [SKODA-215](tickets/SKODA-215.md) | Floating action bar: share cluster + scroll-to-top | E02 | 2 | 0.5–1 | 1–2 | 106,505a | 🟡 M1; Demo sweep 2026-09-25; ID existed, file created. The DevTools census puts the dock on **all 42 URLs** (every template), not only stories/series/2 kits; see 827 |
+| [SKODA-220](tickets/SKODA-220.md) | Quote block (centred pull-quote + rule + attribution) | E02 | 2 | 0.5–1 | 1–2 | 607,805c,801 | 🟡 M1; Demo sweep 2026-09-25; 4 PRs + 1 PK |
+| [SKODA-221](tickets/SKODA-221.md) | Cards `tiles`/mosaic variant (series + press-kit hubs) | E02 | 3 | 1 | 2–3 | 201,207,805a | 🟡 M1; Demo sweep 2026-09-25; 5 series + 3 PK hubs |
+| [SKODA-225](tickets/SKODA-225.md) | Columns unequal split + intrinsic portrait (story 2-cell rows) | E02 | 1 | 0.5 | 1 | 801,824 | 🟢 cosmetic; Demo sweep 2026-09-25 |
 | SKODA-301 | Header + mega-menu (3 panels) | E03 | 5 | 2–3 | 4–6 | 102,106 | 🟡 |
 | SKODA-302 | Mobile nav toggle + ARIA (a11y fix) | E03 | 2 | 1 | 1–2 | 301 | 🟡 fixes source gap |
 | SKODA-303 | Language switcher (6 locales) | E03 | 2 | 1 | 1–2 | 301 | 🟢 |
@@ -133,7 +159,9 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-305 | Media Room footer variant | E03 | 2 | 1 | 1–2 | 304,301 | 🟢 M1; closes gap G1 (COM18); unify-vs-distinct 🟡 |
 | [SKODA-306](tickets/SKODA-306.md) | Footer outbound-link browsing-context parity (`target=_blank`) | E03 | 1 | 0.5 | 1 | 304 | 🟢 M1; issue #102; file added 2026-09-24 |
 | [SKODA-307](tickets/SKODA-307.md) | Header/footer survive a missing nav/footer fragment (null guard) | E03 | 0.5 | 0.25 | 0.5 | 301,304 | 🟢 M1; from the 2026-09-25 live-footer incident |
-| [SKODA-825](tickets/SKODA-825.md) | Media Room side resolution: MR nav fragment + per-path nav/footer metadata + switcher active state | E03 | 1.5 | 0.5 | 1–1.5 | 305,307,301,603 | 🟠 M1 Must; **draft** from the 2026-09-25 sweep (16 MR URLs render STO chrome; routing is a #134 follow-up) |
+| [SKODA-825](tickets/SKODA-825.md) | Media Room side resolution: MR nav fragment + per-path nav/footer metadata + switcher active state | E03 | 1.5 | 0.5 | 1–1.5 | 305,307,301,603 | 🟠 M1 Must; **draft** from the 2026-09-25 sweep (16 MR URLs render STO chrome; routing is a #134 follow-up). ⚠️ **Duplicate of 309**: fold in the 16-URL/model-page and activation-guard ACs, then close. Not counted in capacity. |
+| [SKODA-308](tickets/SKODA-308.md) | Chrome parity pass (header, search, mobile nav, footer legal links, topbar newsletter) | E03 | 3 | 1 | 2–3 | 301,302,303,304,307,403,823 | 🟡 M1; Demo sweep 2026-09-25; every page |
+| [SKODA-309](tickets/SKODA-309.md) | Media Room side chrome (MR nav, active tab, nav/footer metadata) | E03 | 2 | 0.5–1 | 1–2 | 301,305,607,805a,602 | 🟡 M1; Demo sweep 2026-09-25; 11 MR URLs (the DevTools census counts **16**, incl. 5 model pages; see 825) |
 | SKODA-401 | Query-index schema + selectors + metadata-normalization (15 facets) | E04 | 8 | 3–5 | 5–8 | 104 | 🟠 build-confirmed: admin-service `query.yaml` (not repo); fields need normalization layer, not clean selectors |
 | SKODA-402 | Faceted listing + load-more (deep-link) | E04 | 8 | 3–5 | 6–9 | 401,201 | 🟠 hardest pilot block |
 | SKODA-403 | Search block (index-only) | E04 | 3 | 1–2 | 2–4 | 401 | 🟡 body-search deferred |
@@ -154,6 +182,8 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-607 | Press Release detail template (split from story) | E08 | 5 | 2–3 | 4–6 | 601,602,502 | 🟢 M1; PR ≠ story (no hero, MR side, 47.5% of pages); spec `ui-specs/template-press-release.md` |
 | [SKODA-608](tickets/SKODA-608.md) | Image & video item index rows (listings + model media rails) | E06 | 3 | 1–1.5 | 2–3 | 601,602,401,501,503 | 🟠 M1 Must; `/en/images/`, `/en/videos/` empty without it |
 | [SKODA-609](tickets/SKODA-609.md) | M1 link containment + mixed-reality alias redirect | E06 | 2 | 1 | 1–2 | 605,103,603 | 🟠 M1 Must; decision D-3 |
+| [SKODA-610](tickets/SKODA-610.md) | Clean index titles (drop " - Škoda Storyboard") | E06 | 1 | 0.25–0.5 | 0.5–1 | 401,602,603 | 🟡 M1; Demo sweep 2026-09-25; every card/rail |
+| [SKODA-611](tickets/SKODA-611.md) | Storyboard home composition (/en cover-box stack, promo exclusion) | E06 | 3 | 1 | 2–3 | 212,213,214,217,218,603 | 🟡 M1; Demo sweep 2026-09-25; no owner since 604 re-point |
 | [SKODA-801a](tickets/SKODA-801a.md) | M1 story import fidelity slice (Media Box + 21-story run; carousel → 819, Vimeo → 818) | E08 | 1.5 | 0.5–1 | 1.5–2 | 601,801,819,818,502,204 | 🟠 M1 Must; slice of 801; re-scoped 3 → 1.5 SP (review §15) |
 | [SKODA-805a](tickets/SKODA-805a.md) | Press-kit tiles hub, M1 slice + importer (3 hubs) | E08 | 3 | 1–2 | 3–4 | 601,602,202,201,305,609 | 🟠 M1 Must; slice of 805 |
 | [SKODA-805b](tickets/SKODA-805b.md) | Press-kit child pages for M1 hubs (import vs link-out, D-1) | E08 | 3 | 1–2 | 3–5 | 805a,805c,502,609 | 🟡 M1 Could; 50 child pages outside the set |
@@ -191,6 +221,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-821 | Story body column text inset (34px extra per side) | E08 | A/B | 1 | 0.25 | 0.5 | 801 | 🟢 CSS only |
 | SKODA-822 | Ship SKODA-801 two-column story layout to `main` | E08 | A | 1 | — | — | 801 | ✅ merged as PR #113 (2026-09-24 21:35) |
 | SKODA-823 | Story sidebar newsletter sign-up widget (UI stub) | E08 | A | 2 | 0.5–1 | 1–2 | 904,801 | 🟡 `newsletter-stub` in spec but never built; side banner → 903; **M1 Could** (review §15) |
+| [SKODA-824](tickets/SKODA-824.md) | In-column highlight panel (story dark box + PR grey callout) | E08 | A | 3 | 1 | 2–3 | 801,814,218,819,225 | 🟡 M1; Demo sweep 2026-09-25; 12 stories + 1 PR |
 | SKODA-809 | Roles & permissions (7 editorial groups) | E08 | B | 5 | 2–3 | 4–8 | 101,602 | 🟠 gap G2 (§6.4); blocked on D15 RACI |
 | SKODA-811 | Content embargo (staged-publish, group access) | E08 | B | 3 | 1–2 | 2–4 | 602,809 | 🟢 gap G3 (§6.5/D9) approach agreed; M1-Stretch only *ungated* (group-gate needs 809/M2/D15, F4) |
 | SKODA-812 | Auditability (author change-history) | E08 | B | 2 | 0.5–1 | 1–3 | 101,602,809 | 🟡 gap G5 (§6.7); validate DA/EW capability |
