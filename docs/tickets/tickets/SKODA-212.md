@@ -52,3 +52,11 @@ Measurable gates in [`carousel-rails.md`](../../ui-specs/carousel-rails.md); sum
 **Sibling home blocks:** #97 (SKODA-214 feed) · #99 (SKODA-213 promo-box)
 
 *Ticket source of truth on `main`: `docs/tickets/tickets/SKODA-212.md`.*
+
+## Amendment (2026-09-25, from SKODA-610 QA): one-line rail titles
+- **Measured on the source (Epiq story Related Stories, 1440):** each card title is cut to **one line with "…"**:
+  18px / 21.6 line height, 22px high, `overflow: hidden`, in 354px cards (e.g. "An Epic Start to the Tour de France:…").
+- **EDS (branch `skoda-610-clean-titles`, titles already suffix-free):** 2–3 lines (43–65px), no clamp.
+- [ ] Rail card titles (`carousel` / `story-rail` overlay cards) are clamped to 1 line with an ellipsis, 22px high at 1440.
+  Other card-teaser consumers (stories feed, listing) are unchanged.
+

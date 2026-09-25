@@ -67,8 +67,12 @@ future re-pushes take the safe `update` path. `media:build` moved 4 already-inge
 **AC status:**
 - **Not met yet:** "no suffixed index row". It's met for 7 rows once they're published; the other 21 are held,
   as listed above.
-- **Met on the branch:** "rails fit the 1-line clamp", through the runtime trim (to be verified on the branch
-  preview).
+- **Suffix part met on the branch; the one-line clamp is handed to SKODA-212.** On the branch preview
+  (Epiq story, 1440), all 10 Related Stories titles are suffix-free. They still wrap to 2–3 lines (43–65px),
+  because EDS has **no truncation**: the source cuts each rail title to **one line with "…"**
+  (18px/21.6, 22px high, `overflow: hidden`, in 354px cards), and the EDS cells are narrower (the 4-up geometry,
+  sweep V2). That's rail visual work in `carousel` / `card-teaser`, so it went to SKODA-212 as an AC
+  amendment to avoid colliding with its reopen.
 - **Met:** the unit test.
 
 **Next:**
