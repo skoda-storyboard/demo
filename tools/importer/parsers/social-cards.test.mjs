@@ -59,16 +59,18 @@ const run = (html) => {
   return document;
 };
 
-test('the social band becomes its own section: hr, heading, Cards (social), hr', { skip }, () => {
+test('the social band becomes its own dark section: hr, heading, Cards (social), Section Metadata, hr', { skip }, () => {
   const doc = run(BAND);
   const kids = [...doc.querySelector('main').children].map((el) => el.tagName.toLowerCase() + (el.dataset?.block ? `:${el.dataset.block}` : ''));
-  assert.deepEqual(kids, ['div', 'hr', 'h2', 'table:Cards (social)', 'hr', 'div']);
+  assert.deepEqual(kids, ['div', 'hr', 'h2', 'table:Cards (social)', 'table:Section Metadata', 'hr', 'div']);
   assert.equal(doc.querySelector('h2').textContent, 'Social media');
+  const meta = [...doc.querySelector('table[data-block="Section Metadata"] tr').children].map((td) => td.textContent);
+  assert.deepEqual(meta, ['Style', 'dark']);
   assert.ok(!doc.querySelector('.socials-static'), 'source band replaced');
 });
 
 test('one row per profile, in source order, each a link whose text is the handle', { skip }, () => {
-  const rows = [...run(BAND).querySelectorAll('table tr')].map((tr) => {
+  const rows = [...run(BAND).querySelectorAll('table[data-block="Cards (social)"] tr')].map((tr) => {
     const a = tr.querySelector('a');
     return [a.getAttribute('href'), a.textContent, tr.querySelectorAll('td').length];
   });

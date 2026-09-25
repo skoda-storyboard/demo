@@ -152,6 +152,9 @@
   --social-card-gap: 20px;
   --social-card-padding: 32px 16px 8px;
   --social-card-grid-max: 700px;
+  --social-band-padding-top: 64px;
+  --social-band-padding-bottom: 80px;
+  --social-band-margin: 2.25em auto 1.5em; /* live .cover-box margin (36px / 24px) */
 
   /* footer shell rhythm (SKODA-305, shared by the Storyboard + Media Room footers). Source:
      .footer-widgets > * margin-bottom 3em, hr margin-bottom 3rem, .container padding 10px with a
@@ -616,7 +619,7 @@ main > .section:first-of-type {
    default-content heading of the section that holds the social profile cards
    (Cards (social)), centred at the section-heading size with the source's 20px
    gap to the cards. Colour follows the section (the global heading colour is
-   the fixed text colour), so the SKODA-218 dark band turns it white. */
+   the fixed text colour), so the dark band (Style: dark) turns it white. */
 main > .section.cards-container:has(.cards.social) > .default-content-wrapper :is(h2, h3) {
   margin: 0 0 var(--social-card-gap);
   color: inherit;
@@ -644,6 +647,14 @@ main .section.dark {
 
 main .section.dark a {
   color: var(--background-color);
+}
+
+/* homepage Social media band (SKODA-217; live .cover-box.dark.socials-static,
+   same at 1280/768/375): the .cover-box margin 2.25em auto 1.5em, band top →
+   heading 64px, last card → band end 80px */
+main > .section.dark.cards-container:has(.cards.social) {
+  margin: var(--social-band-margin);
+  padding-block: var(--social-band-padding-top) var(--social-band-padding-bottom);
 }
 
 /* ==========================================================================

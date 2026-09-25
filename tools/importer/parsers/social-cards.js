@@ -11,11 +11,12 @@
  *           svg (tile icon) + h3.entry-title      "@skodaglobal"
  * (measured on https://www.skoda-storyboard.com/en/, 2026-09-25)
  *
- * Emits the band as its OWN section (a leading and trailing <hr>) so the section
- * can later carry the dark style (SKODA-218) without touching its neighbours:
+ * Emits the band as its OWN section (a leading and trailing <hr>) carrying the
+ * source's dark style as Section Metadata, without touching its neighbours:
  *   <h2>Social media</h2>
  *   ['Cards (social)']
  *   [<a href="profile URL">@handle</a>]   ← one row per profile, source order
+ *   ['Section Metadata'] / ['Style', 'dark']   ← the green band (.section.dark)
  * The icon is NOT imported: the block draws it from the link's host, so authors
  * only edit the link and the visible handle.
  *
@@ -55,6 +56,8 @@ export default function parse(element, { document }) {
     out.push(h2);
   }
   out.push(WebImporter.DOMUtils.createTable([['Cards (social)'], ...rows], document));
+  // the source band is .cover-box.dark: the section's own style, not the block's
+  out.push(WebImporter.DOMUtils.createTable([['Section Metadata'], ['Style', 'dark']], document));
   out.push(document.createElement('hr'));
   element.replaceWith(...out);
 }

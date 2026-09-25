@@ -158,6 +158,7 @@ var CustomImportScript = (() => {
       out.push(h2);
     }
     out.push(WebImporter.DOMUtils.createTable([["Cards (social)"], ...rows], document2));
+    out.push(WebImporter.DOMUtils.createTable([["Section Metadata"], ["Style", "dark"]], document2));
     out.push(document2.createElement("hr"));
     element.replaceWith(...out);
   }
