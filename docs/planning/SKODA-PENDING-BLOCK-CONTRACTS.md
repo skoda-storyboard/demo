@@ -12,7 +12,7 @@ This contract pins **one DA table shape per pending block**. The importers emit 
 
 1. **Pin the shape before importing.** No wave imports a family whose pages would emit a pending block that has no pinned entry here. The check fails on any block that is neither on `main` nor in the registry.
 2. **The block ticket builds against the pinned shape.** If it needs a different shape, the same PR bumps `shape` in the JSON and updates the section below. The tracker then flags the affected pages, which are re-imported through the push tool's `update` path.
-3. **If the parser is missing but the source is known,** the parser, or the story-flatten widget map, emits the contract table now. **If the shape can't be decided yet** (status `proposed`), the page falls back to default content. The tracker then notes `re-import on <ticket>`, and the page is named in the publish approval request.
+3. **If the parser is missing but the source is known,** the parser, or the story-flatten widget map, emits the contract table now. **If the shape can't be decided yet** (status `proposed`, e.g. `spec-table-versions`), the page falls back to default content. The tracker then notes `re-import on <ticket>`, and the page is named in the publish approval request.
 4. **One name per block.** The name is kebab-case. The DA table header is its Title Case form (`Spec Table` → `.spec-table`), and variants go in parentheses (`Cards (overlay, tiles)`). There are no aliases: a superseded name (`Cards (promo)`, `version`) fails the check and says what to emit instead.
 5. **Prefer a variant to a new block.** Use a variant of an existing block before creating a new one: "one engine per job" (block data model §3). A styled region that has to **contain** other blocks can't be a block, because DA tables don't nest. It's a **section** with a Section Metadata `Style`. The vendored `decorateSections` doesn't apply `Style`, so the section needs the `scripts.js` hook.
 6. **Config rows** are 2-cell key/value rows, and the keys are the lowercase keys the block code reads (normalised like `toClassName`). Unknown keys are never emitted. For `story-rail`, an unknown key makes the code treat the whole table as curated cards, which renders the settings as cards (the SKODA-208 `subheading` bug).
@@ -148,11 +148,11 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Example** (`/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/`): 8 rows.
 
 ### `highlight`
-- **Status:** `proposed` · **Ticket:** SKODA-824 · **Fallback:** readable (plain ink text, as today)
+- **Status:** `pinned` (decided 2026-09-25: section style) · **Ticket:** SKODA-824 · **Fallback:** readable (plain ink text, as today)
 - **Form: section style, not a block.** The dark box can contain a `Gallery (slider)` or a `Columns` row, and DA blocks can't nest (rule 5).
 - **Shape:** a section holding the panel's content (h3, text, images, and any nested blocks), closed by `Section Metadata` with `Style` = `highlight, dark` (story panel) or `highlight, grey` (PR FAQ/info callout). Consecutive highlighted rows each become their own section with the same style; the runtime joins them.
 - **Runtime:** a body-column-scoped treatment through the `scripts.js` section hook. It must not reuse the full-bleed `.section.dark` rule.
-- **To confirm with the 824 owner:** section style (recommended) versus a block variant. Until then, the check warns on it, and the importers keep the current unwrap (default content), marking pages `re-import on SKODA-824`.
+- **Until the importer emits it** (824 importer half), pages keep the current unwrap (default content) and are marked `re-import on SKODA-824`. The shape is fixed, so the 824 runtime and importer can be built in parallel.
 
 ### `media-item`
 - **Status:** `pinned` · **Ticket:** SKODA-608 · **Fallback:** readable

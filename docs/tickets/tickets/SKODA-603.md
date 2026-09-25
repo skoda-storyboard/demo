@@ -98,8 +98,8 @@ explicitly approved.
   - The series-hub `Listing` has a `tags` key the listing block doesn't read (207/221).
   - `promo-box.js` emits `Cards (promo)`, but PR #110's block is `promo-box`.
   - A raw `version` table leaks from an Epiq story (contract `spec-table-versions`).
-- **Open decisions:** SKODA-824 (section style vs block, proposed = section style); `spec-table-versions`
-  (208/801a).
+- **Decided:** SKODA-824 highlight = **section style** (Section Metadata `Style` `highlight, dark|grey`).
+  **Open:** `spec-table-versions` (208/801a).
 
 ## Risks / Flags
 - This ticket has the widest dependency fan-in (blocks + media + import infra) — a slip in any upstream item blocks it.

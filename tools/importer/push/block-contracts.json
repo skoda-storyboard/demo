@@ -157,7 +157,7 @@
       "id": "highlight",
       "block": null,
       "form": "section-style",
-      "status": "proposed",
+      "status": "pinned",
       "ticket": "SKODA-824",
       "fallback": "readable",
       "shape": 1,
