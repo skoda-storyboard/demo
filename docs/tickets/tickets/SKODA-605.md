@@ -35,7 +35,7 @@ About half of the source-host links point outside the demo: news filters, `/en/t
 - Blocked-by (to fully verify on the published site): re-import + publish per page. Most live pages are held by other tickets (see Republish status).
 
 ## Risks / Flags
-- 🟢 Low-risk transformer change; the collision scope is the import layer only (no block/CSS impact). It touches **all 16 importers and bundles**, so serialize with other importer tickets (open PRs #155 and #156 touch `import-story-detail`; rebuild that bundle after whichever merges second).
+- 🟢 Low-risk transformer change; the collision scope is the import layer only (no block/CSS impact). It touches **all 16 importers and bundles**, so serialize with other importer tickets. #155 (SKODA-816) is merged into this branch and `import-story-detail.bundle.js` was rebuilt from the merged source. #156 (SKODA-819) also touches `import-story-detail`; whichever of #156 and this PR merges second rebuilds that bundle.
 - A link to a demo page that isn't published yet 404s until SKODA-603 publishes it. Pages with such links are held (see Republish status).
 
 ## Status (2026-09-25): code done, 1 page republished

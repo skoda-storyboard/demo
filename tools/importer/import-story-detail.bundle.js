@@ -1186,8 +1186,8 @@ var CustomImportScript = (() => {
 
   // tools/importer/import-story-detail.js
   var parsers = {
-    // SKODA-816: story hero → Hero Image (story variant) + caption + Tags, not the
-    // overlay Hero banner used by the page/archive templates.
+    // SKODA-816: story hero → Hero Image with heading, caption and metadata
+    // inside one block, not the overlay Hero banner used by page/archive.
     "story-hero": parse,
     "story-flatten": parse2
   };
