@@ -31,9 +31,13 @@ import { createOptimizedPicture } from './aem.js';
 // A date paragraph like "15. 9. 2026", "1.9.2026", "12/09/2026" or "2026-09-15".
 export const DATE_RE = /^\s*\d{1,4}[.\-/]\s?\d{1,2}[.\-/]\s?\d{2,4}\.?\s*$/;
 
-/** A cell is an image cell when its only child wraps a <picture>. */
+/** A cell is an image cell when its only child wraps a picture or image. */
 export function isImageCell(cell) {
-  return cell.children.length === 1 && !!cell.querySelector(':scope > picture, :scope > p > picture');
+  return cell.children.length === 1
+    && !!cell.querySelector(
+      ':scope > picture, :scope > p > picture, :scope > a > picture, :scope > p > a > picture,'
+      + ' :scope > img, :scope > p > img',
+    );
 }
 
 /** A cell is a toolbar cell when it has children and every child is a <p> holding an <a>. */
@@ -43,22 +47,30 @@ export function isToolbarCell(cell) {
 }
 
 /**
- * Lift an authored <img> out of its wrapping <p> so <picture> is a direct child
- * of the cell (EDS import wraps images in <p>), then swap in an optimized
- * <picture>. Operates on authored markup (the `cards` path).
+ * Optimize authored images without replacing their <img> node, preserving DA
+ * Layout-mode editability. Replace EDS's default 2000px sources with card-sized
+ * ones as well as optimizing images that have no <source> elements yet.
  */
-export function optimizeImages(scope) {
-  scope.querySelectorAll('picture > img').forEach((img) => {
-    const picture = img.closest('picture');
-    const p = picture.closest('p');
-    if (p && p.children.length === 1) p.replaceWith(picture);
-    const optimized = createOptimizedPicture(
-      img.src,
-      img.alt,
-      false,
-      [{ media: '(min-width: 768px)', width: '750' }, { width: '500' }],
-    );
-    picture.replaceWith(optimized);
+export function optimizeImages(scope, { eager = false, desktopWidth = '750', mobileWidth = '500' } = {}) {
+  scope.querySelectorAll('.card-teaser-image img').forEach((img) => {
+    let picture = img.closest('picture');
+    if (!picture) {
+      picture = document.createElement('picture');
+      img.replaceWith(picture);
+      picture.append(img);
+    }
+    const p = picture.parentElement;
+    if (p?.tagName === 'P' && p.children.length === 1) p.replaceWith(picture);
+    if (/^https?:/.test(img.src)) {
+      const optimized = createOptimizedPicture(img.src, img.alt, eager, [
+        { media: '(min-width: 768px)', width: desktopWidth }, { width: mobileWidth },
+      ]);
+      picture.querySelectorAll(':scope > source').forEach((source) => source.remove());
+      optimized.querySelectorAll('source').forEach((source) => picture.insertBefore(source, img));
+      img.src = optimized.querySelector('img').src;
+    }
+    img.setAttribute('loading', eager ? 'eager' : 'lazy');
+    if (eager) img.setAttribute('fetchpriority', 'high');
   });
 }
 
@@ -162,11 +174,16 @@ export function formatCardDate(value) {
  * @param {boolean} [opts.eager]   first card: eager <img> + fetchpriority=high
  * @param {boolean} [opts.overlay] overlay variant (caption over the image)
  * @param {boolean} [opts.summary] include the description as a summary line
+ * @param {string} [opts.desktopWidth] width of the large optimized image
+ * @param {string} [opts.mobileWidth] width of the compact optimized image
  * @returns {HTMLLIElement}
  */
-export function buildCardTeaser(row, { eager = false, overlay = true, summary = false } = {}) {
+export function buildCardTeaser(row, {
+  eager = false, overlay = true, summary = false, desktopWidth = '750', mobileWidth = '500',
+} = {}) {
   const li = document.createElement('li');
   li.className = overlay ? 'card-teaser overlay' : 'card-teaser';
+  const title = String(row.title || '').replace(/ - Škoda Storyboard$/, '');
 
   const a = document.createElement('a');
   a.className = 'card-teaser-link';
@@ -177,8 +194,8 @@ export function buildCardTeaser(row, { eager = false, overlay = true, summary = 
   if (row.image) {
     const media = document.createElement('div');
     media.className = 'card-teaser-image';
-    const pic = createOptimizedPicture(row.image, row.title || '', eager, [
-      { media: '(min-width: 768px)', width: '750' }, { width: '500' },
+    const pic = createOptimizedPicture(row.image, title, eager, [
+      { media: '(min-width: 768px)', width: desktopWidth }, { width: mobileWidth },
     ]);
     if (eager) pic.querySelector('img')?.setAttribute('fetchpriority', 'high');
     media.append(pic);
@@ -199,10 +216,10 @@ export function buildCardTeaser(row, { eager = false, overlay = true, summary = 
     time.textContent = dateText;
     body.append(time);
   }
-  if (row.title) {
+  if (title) {
     const h = document.createElement('h3');
     h.className = 'card-teaser-title';
-    h.textContent = row.title;
+    h.textContent = title;
     body.append(h);
   }
   if (summary && row.description) {

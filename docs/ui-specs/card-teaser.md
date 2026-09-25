@@ -41,8 +41,9 @@ The EDS build **decomposes** this composite into three reusable blocks: `cards-o
 `cards-toolbar` (card + action row). A single source teaser therefore maps to a *combination* of EDS
 variants depending on context.
 
-**Libraries to retire (do not port):** Isotope (masonry), `dotdotdot` (JS line clamp; replace with
-CSS `line-clamp`), the icon-font `:after` (replace with an SVG icon), jQuery. Media-cart affordances
+**Libraries to retire (do not port):** Isotope (masonry), `dotdotdot` (JS line clamp; use CSS
+overflow with a two-line height for promo titles so no ellipsis is generated), the icon-font `:after`
+(replace with an SVG icon), jQuery. Media-cart affordances
 carry `data-action` / `data-id` / `data-size` (see `media-cart.md` / SKODA-505).
 
 ## 3. Measured visual spec
