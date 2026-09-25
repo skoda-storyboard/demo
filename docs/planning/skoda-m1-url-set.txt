@@ -1,0 +1,64 @@
+# Škoda Storyboard — canonical M1 (15 Oct 2026 demo) URL set.
+# Supplied by the Architect 2026-09-24. Supersedes the page list in skoda-demo-content-urls.txt
+# for M1 scope. Rails/listings are additionally fed by skoda-rail-feed-corpus.txt (SKODA-603/608).
+# 43 lines = 42 unique pages: the nested mixed-reality URL (marked ALIAS) returns 200 with canonical
+# /en/skoda-world/explore-the-new-skoda-models-in-mixed-reality/, import once + redirect (SKODA-609).
+# Gap analysis: docs/reviews/SKODA-M1-GAP-REVIEW.md. Per-URL status tracker: SKODA-603.
+
+# ===== HOME (1) =====
+https://www.skoda-storyboard.com/en/
+
+# ===== MEDIA LISTINGS (2), items via SKODA-608 =====
+https://www.skoda-storyboard.com/en/images/
+https://www.skoda-storyboard.com/en/videos/
+
+# ===== PRESS RELEASES (5), SKODA-607 =====
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029/
+https://www.skoda-storyboard.com/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management/
+https://www.skoda-storyboard.com/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/
+
+# ===== PRESS KITS (4), tiles hubs SKODA-805a; default template SKODA-805c =====
+https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/
+https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/
+https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/
+
+# ===== MODEL PAGES (5), SKODA-208 =====
+https://www.skoda-storyboard.com/en/skoda-model/new-superb/
+https://www.skoda-storyboard.com/en/skoda-model/octavia/
+https://www.skoda-storyboard.com/en/skoda-model/epiq/
+https://www.skoda-storyboard.com/en/skoda-model/peaq/
+https://www.skoda-storyboard.com/en/skoda-model/new-fabia/
+
+# ===== SERIES HUBS (5), SKODA-207 (hub level only) =====
+https://www.skoda-storyboard.com/en/series/125-years-of-motorsport/
+https://www.skoda-storyboard.com/en/series/130-years/
+https://www.skoda-storyboard.com/en/series/roads-places/
+https://www.skoda-storyboard.com/en/series/unexpected-jobs/
+https://www.skoda-storyboard.com/en/series/minutes-from-car-production/
+
+# ===== STORIES (21 URLs = 20 unique pages), SKODA-801/801a/219/604 =====
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
+https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/
+https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/
+https://www.skoda-storyboard.com/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq/
+https://www.skoda-storyboard.com/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq/
+https://www.skoda-storyboard.com/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia/
+https://www.skoda-storyboard.com/en/emobility/meet-the-peaq-comfort-just-like-at-home/
+https://www.skoda-storyboard.com/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france/
+https://www.skoda-storyboard.com/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour/
+https://www.skoda-storyboard.com/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too/
+# ALIAS of the next line (redirect, do not import twice):
+https://www.skoda-storyboard.com/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality/
+https://www.skoda-storyboard.com/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality/
+https://www.skoda-storyboard.com/en/skoda-world/how-the-skoda-octavia-reached-365-km-h/
+https://www.skoda-storyboard.com/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it/
+https://www.skoda-storyboard.com/en/skoda-world/legend-chris-froome-takes-you-behind-the-scenes-of-the-tour-de-france/
+https://www.skoda-storyboard.com/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/
+https://www.skoda-storyboard.com/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling/
+https://www.skoda-storyboard.com/en/lifestyle/la-dolce-vita-explore-the-surroundings-of-lake-como/
+https://www.skoda-storyboard.com/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague/
+https://www.skoda-storyboard.com/en/lifestyle/chainsaws-and-sparklers-discover-the-traditions-of-rally-fans/
+https://www.skoda-storyboard.com/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones/

@@ -16,6 +16,28 @@ Key facts from capture:
 ## Summary
 Assemble the **Series** page type, confirmed by the 22-URL analysis (2026-09-14) to be a real **two-level template**, not the 301-redirect the master doc previously assumed. Level 1 is a series **directory** (`/series-2/`, ~20 series cards); level 2 is a series **hub** (`/series/<slug>/`, e.g. `125-years-of-motorsport`, a curated grid of the stories in that series). Pulled into M1 (decision D18) because it reuses already-built primitives and adds visible demo breadth.
 
+> **Update (2026-09-24, M1 gap review, [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md)).**
+>
+> **M1 scope = the 5 hubs only.** The in-scope hubs are:
+> - 125-years-of-motorsport
+> - 130-years
+> - roads-places
+> - unexpected-jobs
+> - minutes-from-car-production
+>
+> The `/en/series-2/` directory is **not** in the 43-URL set and moves to M2. Its links are handled by SKODA-609 (hide
+> or link out).
+>
+> **Empty-hub risk.** `import-series-hub.js` turns the curated source cards into an index-driven `tags=<series>`
+> listing. With only the 43 URLs imported, 125-years drops from 8 source cards to about 2–3 and the other hubs are
+> about empty. For M1, pick one of:
+> - **(a)** import each hub's linked stories as corpus rows (SKODA-603), or
+> - **(b)** keep the curated source cards as static `cards` content
+>
+> Default is (b) for any hub whose linked stories aren't in the corpus.
+>
+> **Estimate.** About 2 SP remains.
+
 ## Description
 Verified live (`.migration/plans/url-analysis-comparison.md`, Bucket C):
 - **Series directory**, hero + a grid of ~20 series cards (image + series title + short description), each linking to its hub.

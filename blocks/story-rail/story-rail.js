@@ -102,6 +102,11 @@ export function isConfigTable(block) {
   });
 }
 
+export function curatedRows(block) {
+  return [...block.children].map((row) => [...row.children]
+    .map((cell) => ({ elems: [...cell.childNodes] })));
+}
+
 /*
  * Synthesize one carousel row (image cell + body cell) from an index row. The
  * body is returned as buildBlock's `{ elems }` form so the date <p> and title
@@ -171,7 +176,7 @@ export default async function decorate(block) {
   const mount = document.createElement('div');
   mount.className = 'story-rail-mount';
 
-  const authoredRows = curated ? [...block.children].map((r) => [...r.children]) : null;
+  const authoredRows = curated ? curatedRows(block) : null;
   block.replaceChildren();
   if (header.children.length) block.append(header);
   block.append(mount);

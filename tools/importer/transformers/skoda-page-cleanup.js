@@ -92,5 +92,24 @@ export default function transform(hookName, element, payload) {
     element.querySelectorAll('a[href*="#s_aid="], a[href*="#s_cid="]').forEach((a) => {
       a.setAttribute('href', a.getAttribute('href').split('#s_aid=')[0].split('#s_cid=')[0]);
     });
+
+    // Normalise multiply percent-encoded hrefs (SKODA-801 review D4). Some source
+    // WordPress links carry an over-encoded path (e.g. `%2525252525C5%2525252525A1koda`
+    // = `š` percent-encoded ~6 times), which link-rots (404s). Repeatedly decode until
+    // stable, then re-encode ONCE so the URL is valid single-encoding (`%C5%A1`) — not
+    // the raw literal `š` (which would itself be an invalid href). Only touches hrefs
+    // that actually shrink on decode, so normal links are left untouched.
+    element.querySelectorAll('a[href*="%25"]').forEach((a) => {
+      const href = a.getAttribute('href') || '';
+      let decoded = href;
+      // Decode down to the fully-decoded form (bounded loop; never infinite).
+      for (let i = 0; i < 8; i += 1) {
+        let next;
+        try { next = decodeURIComponent(decoded); } catch (e) { break; } // malformed → leave as-is
+        if (next === decoded) break;
+        decoded = next;
+      }
+      if (decoded !== href) a.setAttribute('href', encodeURI(decoded));
+    });
   }
 }

@@ -36,8 +36,10 @@ Across all 5 stories, **exactly 3 widget types — zero unmapped:**
 |---|--:|---|
 | `sow-editor` (rich text via `siteorigin-widget-tinymce`) | dominant | **default content** (keep inner HTML as-is) |
 | `skoda-offset` (`<div style="padding-top:1em">`) | frequent | **DROP** (pure spacer) |
-| `skoda-carousel-widget` (Flickity, `search-results-items`) | present in most | **Carousel block** (related-content teasers, not inline images) |
+| `skoda-carousel-widget` (Flickity, `search-results-items`) | present in most | **teaser cards → Cards** *(in THIS 5-story sample; see note below)* |
 | **UNMAPPED** | **0** | — |
+
+> **Reconciled 2026-09-24 (SKODA-801 build):** this sample's carousels were link-bearing *related-story teaser cards*, but the build-inspected stories (epiq, olive-oil) had **link-free image carousels** (the article's own photos). The widget is used **both ways**; the shipped parser routes **by content** — linked items → Cards (teasers), link-free → Gallery (images). See `SKODA-STORY-WIDGET-CENSUS.md` §7a. The §4 "false-alarm" observation below remains accurate *for this sample* (its carousel content was genuinely non-body teasers).
 
 **No gallery/embed *widgets*** — instead, **video/embeds are inline inside the `sow-editor` HTML** (story3 has an inline Vimeo `<iframe>`), so they come across for free when we preserve the editor content.
 
@@ -93,7 +95,7 @@ Ouninpohjantie is a solid gravel road in southern Finland…
 |---|---|
 | `sow-editor` → default content | ✅ Held — keep inner `.textwidget` HTML verbatim (headings/lists/inline img/iframe already clean) |
 | `skoda-offset` → drop/section | ✅ Held — pure spacer, drop |
-| `skoda-carousel` → block | ✅ Held — but it's **related-content teasers**, i.e. maps to a **Cards/Carousel of teasers**, not an image gallery. Refine the mapping note. |
+| `skoda-carousel` → block | ✅ Held — teasers in *this* sample → Cards; **but see the §3 reconcile note: the widget is also used as link-free image carousels → Gallery. Shipped parser routes by content.** |
 | gallery / embed **widgets** | ⚠️ **None found** — embeds are **inline in editor HTML**, not separate widgets. So the embed/gallery widget-mapping rows are likely unnecessary for stories (galleries live on press releases, not stories). |
 | arbitrary deep nesting, long tail | ✅ **Not observed** — 3 widget types, 0 unmapped, shallow effective structure |
 | img out of `<p>` | ✅ Handled (regex lifts `<p><img></p>`) |
@@ -108,7 +110,7 @@ For the Oct 15 demo, the flatten needs only:
 1. **Extract each `sow-editor` `.textwidget` inner HTML** → default content (verbatim; headings, paragraphs, lists, inline images, inline embeds all pass through).
 2. **Lift `<img>` out of `<p>`** (EDS `<picture>` requirement); carry `alt` + `data-caption`.
 3. **Drop `skoda-offset` spacers.**
-4. **Collapse `skoda-carousel-widget` → a Cards/Carousel block** referencing the related items (or omit for the demo if not needed).
+4. **Collapse `skoda-carousel-widget` → a block** — routed by content in the shipped parser: linked items → Cards (teasers), link-free → Gallery (images). *(This rec originally said Cards-only; see the §3 reconcile note.)*
 5. **Panel-row boundaries → section breaks** (optional for single-column demo).
 
 That is a **small, well-defined transform** — not a research project.
@@ -129,7 +131,7 @@ That is a **small, well-defined transform** — not a research project.
 - **Sample = 5 EN stories.** Confident on the common shape; the **long tail across ~1,300 EN / 5,282 all-lang stories** could still hold rare widgets (campaign/interactive/older layouts). Keep the "skip + log unknown widgets" safety net; run a **full widget census across all stories** before finalizing the production parser (cheap: grep `so-widget-*` classes over a bulk fetch).
 - **Structural only.** The POC never rendered anything — column layouts, carousel behavior, and visual fidelity are `[RUNTIME-UNCONFIRMED]`. The demo build must verify rendered output in a browser.
 - **Multi-column layouts.** The sample was largely single-column-effective; stories with genuine multi-column `panel-row`s (story3 had 3 rows / 8 grids) need a decision: preserve columns or linearize. **M1: linearize; M2: decide per design.**
-- **Carousel semantics.** `skoda-carousel-widget` = related-content teasers (a "you might also like" rail), which may be **auto-generated**, not authored — confirm whether it should even be migrated as content or regenerated from the query-index at render time. *(Possible further simplification.)*
+- **Carousel semantics.** `skoda-carousel-widget` is used **both** as related-content teaser rails ("you might also like", possibly auto-generated) **and** as link-free in-body image carousels (build finding 2026-09-24). The shipped parser distinguishes them by content (linked → Cards, link-free → Gallery). For the *teaser* variant, still confirm whether it should be migrated as content or regenerated from the query-index at render time. *(Possible further simplification for that variant only.)*
 - **POC counter pitfall** (documented §4) — measure fidelity on the editor body, not the whole panel region.
 
 ---
