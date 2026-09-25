@@ -144,6 +144,40 @@
   --app-badge-w: 135px;
   --app-badge-h: 40px;
 
+  /* footer shell rhythm (SKODA-305, shared by the Storyboard + Media Room footers). Source:
+     .footer-widgets > * margin-bottom 3em, hr margin-bottom 3rem, .container padding 10px with a
+     -10px widget row and 15px widget padding, .copyright-text margin-bottom 2em (of 16px),
+     widget paragraph / copyright-notice margin-bottom 15px, app-badges margin-right .65em. */
+  --footer-row-gap: 3rem;
+  --footer-gutter: 10px;
+  --footer-column-padding: 15px;
+  --footer-legal-gap: 2rem;
+  --footer-text-gap: 15px;
+  --footer-social-gap: 0.65rem;
+  --footer-small-line-height: 18px;
+
+  /* forms (SKODA-305 footer Subscribe; footer-mediaroom.md). Input: padding 10px, radius
+     4px 4px 0 0, 1px underline that thickens to 2px accent on focus; checkbox 18px, radius 3px,
+     label offset 27px (18 + 9). */
+  --input-bg: var(--skoda-grey-50);
+  --input-color: var(--skoda-ink);
+  --input-border-color: var(--skoda-grey-700);
+  --input-focus-color: var(--skoda-green-accent);
+  --input-radius: 4px;
+  --input-padding: 10px;
+  --form-gap: 10px;
+  --checkbox-size: 18px;
+  --checkbox-radius: 3px;
+  --checkbox-border-color: var(--skoda-grey-300);
+  --checkbox-checked-color: var(--skoda-green-accent);
+  --checkbox-label-gap: 9px;
+  --consent-color: var(--skoda-grey-400);
+
+  /* "Manage subscription" link: brand emerald (9.7:1 on the footer green). Deliberate a11y
+     deviation: the source uses #419468 here, which is only 3.4:1 (fails AA for 16px text); the
+     source's own .light variant of this link is emerald. */
+  --newsletter-manage-color: var(--skoda-green-emerald);
+
   /* breakpoint tokens — for JS / container-query reuse ONLY. CSS custom properties cannot be
      used inside @media conditions, so the literals 768/992/1080 below remain the source of
      truth for media queries (canonical ladder per _FOUNDATIONS.md §1). */
@@ -164,9 +198,15 @@
 
 /* box-sizing baseline. A universal `*` reset is disallowed by Stylelint
    (selector-max-universal: 0), so document defaults set it on the root and inherit into
-   pseudo-elements; blocks set border-box on their own containers as needed. */
+   pseudo-elements; blocks set border-box on their own containers as needed.
+   text-size-adjust stops mobile Safari inflating small text (e.g. the 12px footer copy) in
+   landscape; the source sets the same 100%. */
 html {
   box-sizing: border-box;
+
+  /* stylelint-disable-next-line property-no-vendor-prefix -- Safari has no unprefixed support */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 ::before,
@@ -193,6 +233,13 @@ body.appear {
 
 header {
   height: var(--nav-height);
+}
+
+/* Short pages: the content area fills at least the viewport below the header, so the footer
+   always starts at or below the fold and no blank band shows under it on tall desktop screens.
+   Matches the source, which keeps its footer just below the fold on short pages (SKODA-305). */
+main {
+  min-height: calc(100dvh - var(--nav-height));
 }
 
 header .header,
