@@ -31,6 +31,20 @@ const TEMPLATE_SIGNALS = [
   [/\bpage-template\b|\btemplate-media-room-page\b/, 'page'],
 ];
 
+// The source SEO plugin appends the site name to every og:title / <title>
+// ("Elroq - Škoda Storyboard"). Index rows + cards show the bare title (SKODA-610).
+// Mirrored inline in skoda-metadata.js and scripts/query-index.js — keep in sync.
+export const SITE_SUFFIX = /\s+[-–|]\s+Škoda Storyboard\s*$/;
+
+/**
+ * Clean a page title: collapse whitespace (incl. nbsp) and strip ONE trailing site
+ * suffix. A title that is only the site name (the home page) is kept as is.
+ */
+export function cleanTitle(raw) {
+  const t = String(raw || '').replace(/\s+/g, ' ').trim();
+  return t.replace(SITE_SUFFIX, '').trim() || t;
+}
+
 /** Normalize any date-ish string to YYYY-MM-DD (or '' if none found). */
 export function normalizeDate(value) {
   if (!value) return '';
@@ -164,7 +178,7 @@ export function buildMetaFields({
   derived = { tags: [], byFacet: {} }, overrides = {},
 } = {}) {
   const meta = {};
-  if (title) meta.Title = title;
+  if (cleanTitle(title)) meta.Title = cleanTitle(title);
   if (description) meta.Description = description;
   if (publisheddate) meta.publisheddate = publisheddate;
   if (template) meta.template = template;

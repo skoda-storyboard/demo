@@ -151,16 +151,22 @@ measured here.
   | stories | |
   |---|---|
   | index | `/en/query-index.json` |
-  | template | `post` |
+  | template | `story` |
+  | offset | `3` |
   | perpage | `6` |
   | initial | `5` |
   | sort | `-publishDate` |
   | columns | `featured` |
 
-  `initial` (5) seeds the first slice; `perpage` (6) sizes each Load more; `columns: featured` selects the
+  `offset` (3) skips the promo-box's three newest stories after the feed's filters and date sort,
+  before pagination; it defaults to 0 when omitted. This is separate from the `offset` URL
+  parameter, which records the number of **feed** cards revealed by Load more. With `offset`,
+  featured-flag exclusion defaults off to avoid skipping the promo twice (set
+  `excludefeatured: true` explicitly to combine them). `initial` (5)
+  seeds the first slice; `perpage` (6) sizes each Load more; `columns: featured` selects the
   2-large-then-3-up grid (vs a plain 3-up). Authors omit/add cells → decorate defensively (fall through to
   sensible defaults; never assume a cell exists).
-- **`decorate()` outline:** `readConfig(block)` → `{ index, template, initial, perpage, sort, columns }`;
+- **`decorate()` outline:** `readConfig(block)` → `{ index, template, offset, initial, perpage, sort, columns }`;
   load rows via `scripts/query-index.js`; `sortRows` (newest-first); render first `initial` `card-teaser`
   cards (first image `createOptimizedPicture` + `fetchpriority="high"`, rest lazy); append a centered
   `<button>` "Load more"; on click `paginate` the next `perpage`, append, move focus to the first new card,

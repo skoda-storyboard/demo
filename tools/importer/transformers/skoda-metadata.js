@@ -51,6 +51,16 @@ const TEMPLATE_SIGNALS = [
   [/\bpage-template\b|\btemplate-media-room-page\b/, 'page'],
 ];
 
+// SKODA-610: the source SEO plugin appends the site name to og:title / <title>;
+// index rows + cards show the bare title. Mirror of skoda-metadata-extract.mjs
+// SITE_SUFFIX / cleanTitle (a test asserts the regex source matches).
+const SITE_SUFFIX = /\s+[-–|]\s+Škoda Storyboard\s*$/;
+
+function cleanTitle(raw) {
+  const t = String(raw || '').replace(/\s+/g, ' ').trim();
+  return t.replace(SITE_SUFFIX, '').trim() || t;
+}
+
 function metaContent(document, selector) {
   const el = document.querySelector(selector);
   const val = el && el.getAttribute('content');
@@ -226,9 +236,11 @@ export default function transform(hookName, element, payload) {
   const pageUrl = (params && params.originalURL) || url || (canonical && canonical.href) || '';
   const overrides = (payload.template && payload.template.metadata) || {};
 
-  const title = overrides.title
+  const h1 = document.querySelector('h1');
+  const title = cleanTitle(overrides.title
     || metaContent(document, 'meta[property="og:title"]')
-    || (document.querySelector('title') ? document.querySelector('title').textContent.trim() : '');
+    || (document.querySelector('title') ? document.querySelector('title').textContent.trim() : '')
+    || (h1 ? h1.textContent.trim() : ''));
   const description = overrides.description
     || metaContent(document, 'meta[property="og:description"]')
     || metaContent(document, 'meta[name="description"]') || '';

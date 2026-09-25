@@ -1,0 +1,192 @@
+@import url('../../styles/card-teaser.css');
+
+.promo-box {
+  --promo-dot-size: 10px;
+  --promo-dot-target: 44px;
+  --promo-following-gap: 2rem;
+  --promo-gutter: var(--spacing-l);
+
+  position: relative;
+  left: 50%;
+  width: min(calc(100% + 2 * var(--promo-gutter)), var(--content-max-width));
+  margin-block: var(--spacing-m) 0;
+  transform: translateX(-50%);
+}
+
+.promo-box .promo-box-items {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.promo-box .promo-box-items::-webkit-scrollbar {
+  display: none;
+}
+
+.promo-box .card-teaser {
+  flex: 0 0 100%;
+  aspect-ratio: 16 / 9;
+  scroll-snap-align: start;
+  margin-bottom: 0;
+}
+
+.promo-box .card-teaser-image {
+  position: absolute;
+  inset: 0;
+}
+
+.promo-box .card-teaser-image picture,
+.promo-box .card-teaser-image img {
+  height: 100%;
+}
+
+.promo-box .card-teaser.overlay .card-teaser-body {
+  background-image: var(--scrim-h), var(--scrim-v);
+}
+
+.promo-box .card-teaser-title {
+  max-height: 2.4em;
+  overflow: hidden;
+}
+
+.promo-box .card-teaser:not(:has(.card-teaser-image)) {
+  background-color: var(--dark-color);
+}
+
+.promo-box .card-teaser .card-teaser-body .card-teaser-summary {
+  display: none;
+}
+
+.promo-box .promo-box-controls,
+.promo-box .promo-box-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.promo-box .promo-box-dots {
+  padding-block: calc(var(--spacing-xs) / 4);
+}
+
+.promo-box .promo-box-dots button,
+.promo-box .promo-box-pause {
+  min-height: var(--promo-dot-target);
+  border: 0;
+  cursor: pointer;
+}
+
+.promo-box .promo-box-dots button {
+  width: var(--promo-dot-target);
+  padding: 0;
+  background-color: transparent;
+}
+
+.promo-box .promo-box-dots button::before {
+  content: "";
+  display: block;
+  width: var(--promo-dot-size);
+  height: var(--promo-dot-size);
+  margin: auto;
+  border-radius: 50%;
+  background-color: var(--carousel-dot);
+}
+
+.promo-box .promo-box-dots button[aria-current="true"]::before {
+  background-color: var(--carousel-dot-active);
+}
+
+.promo-box .promo-box-pause {
+  padding-inline: var(--spacing-s);
+  background-color: transparent;
+  color: var(--text-color);
+  font-size: var(--body-font-size-s);
+}
+
+.promo-box .promo-box-pause[hidden] {
+  display: none;
+}
+
+.promo-box .promo-box-dots button:focus-visible,
+.promo-box .promo-box-pause:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: var(--spacing-xs);
+}
+
+.promo-box .promo-box-error {
+  padding: var(--spacing-m);
+  color: var(--text-color);
+  background-color: var(--light-color);
+}
+
+@media (width >= 768px) {
+  .promo-box {
+    margin-block-end: var(--promo-following-gap);
+  }
+
+  .promo-box .promo-box-items {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    row-gap: var(--spacing-m);
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .promo-box .card-teaser {
+    margin-inline: var(--spacing-xs);
+  }
+
+  .promo-box .card-teaser:first-child {
+    grid-row: span 2;
+    aspect-ratio: auto;
+    margin-inline: 0 var(--spacing-s);
+  }
+
+  .promo-box .card-teaser:not(:first-child) {
+    aspect-ratio: 16 / 9;
+  }
+
+  .promo-box .card-teaser:first-child .card-teaser-body .card-teaser-summary {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    font-size: var(--body-font-size-m);
+    line-height: 1.25;
+  }
+
+  .promo-box .card-teaser:first-child .card-teaser-title {
+    font-size: var(--heading-font-size-promo);
+    line-height: 1.2;
+    font-weight: var(--weight-regular);
+  }
+
+  .promo-box .promo-box-controls {
+    position: absolute;
+    z-index: 1;
+    inset-block-start: var(--spacing-xs);
+    inset-inline-end: var(--spacing-xs);
+  }
+
+  .promo-box .promo-box-pause {
+    background-color: var(--dark-color);
+    color: var(--background-color);
+  }
+
+  .promo-box .promo-box-dots {
+    display: none;
+  }
+
+  .promo-box .promo-box-items:has(.card-teaser:only-child) .card-teaser {
+    grid-row: auto;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media (width >= 992px) {
+  .promo-box {
+    --promo-gutter: var(--spacing-xl);
+  }
+}

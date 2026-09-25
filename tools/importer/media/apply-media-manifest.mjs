@@ -11,7 +11,8 @@
  *     [--media-index content/media-index.json] [--dry-run]
  *
  * Two outputs:
- *   1. Rewrite content <img src> (and srcset, F9) → row.delivery_url. EDS ingests
+ *   1. Rewrite content <img src> → row.delivery_url, removing the source's
+ *      derivative-ladder srcset. EDS ingests
  *      that absolute url into its media bus at publish (self-hosted + webp).
  *   2. Emit /media-index.json — the CART RESOLVER SEAM (mechanism B). Maps
  *      logical_id → { dam_asset_path, original_download_url, alt } so the
@@ -20,12 +21,14 @@
  *      source of these fields, not the cart (design-for-swap, post-M1 decision).
  *
  * Matching: exact source url → logical id (derivative-suffix + query stripped).
- * Rows without a delivery_url (delivery skipped) are left untouched (reference-in-place).
+ * Unresolved image references fail the requested run before any page is written.
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
-import { logicalId, isImageUrl, cleanUrl } from './media-lib.mjs';
+import {
+  logicalId, isImageUrl, cleanUrl, OVERSIZE_BYTES,
+} from './media-lib.mjs';
 
 const WORKSPACE = process.env.WORKSPACE_PATH || process.cwd();
 const DEFAULT_MANIFEST = path.join(WORKSPACE, 'tools', 'importer', 'media', 'media-manifest.json');
@@ -51,14 +54,16 @@ function parseArgs() {
   return out;
 }
 
-/** Exact-URL + logical-id lookups from rows that have a delivery_url. */
+/** Exact-URL + logical-id lookups from verified delivery rows. */
 function buildLookups(manifest) {
   const byExact = new Map();
   const byId = new Map();
   for (const row of Object.values(manifest.rows || {})) {
     const dest = row.delivery_url || '';
     if (!dest) continue;
-    if (row.status !== 'done' && row.status !== 'partial') continue;
+    if ((row.status !== 'done' && row.status !== 'partial')
+      || row.steps?.deliver !== 'done'
+      || !Number.isFinite(row.bytes) || row.bytes > OVERSIZE_BYTES) continue;
     byId.set(row.logical_id, dest);
     for (const u of row.seen_urls || []) byExact.set(u, dest);
     if (row.source_url) byExact.set(row.source_url, dest);
@@ -74,19 +79,6 @@ function resolve({ byExact, byId }, url) {
   return byId.get(logicalId(url)) || null;
 }
 
-/** F9 — rewrite one srcset value's URLs through resolve(), preserving descriptors. */
-function rewriteSrcset(value, lookups) {
-  return value.split(',').map((part) => {
-    const seg = part.trim();
-    if (!seg) return seg;
-    const sp = seg.search(/\s/);
-    const url = sp === -1 ? seg : seg.slice(0, sp);
-    const descriptor = sp === -1 ? '' : seg.slice(sp);
-    const dest = resolve(lookups, url);
-    return `${dest || url}${descriptor}`;
-  }).join(', ');
-}
-
 /**
  * Emit the cart resolver index (mechanism B). Delivery-safe subset of the
  * manifest keyed by logical_id, only for rows that carry a DAM asset path.
@@ -94,7 +86,7 @@ function rewriteSrcset(value, lookups) {
 function emitMediaIndex(manifest, file, dryRun) {
   const items = {};
   for (const row of Object.values(manifest.rows || {})) {
-    if (!row.dam_asset_path) continue;
+    if (row.steps?.dam !== 'done' || !row.dam_asset_path || !row.original_download_url) continue;
     items[row.logical_id] = {
       dam_asset_path: row.dam_asset_path,
       original_download_url: row.original_download_url || '',
@@ -113,33 +105,56 @@ function main() {
   const lookups = buildLookups(manifest);
 
   let totalRewrites = 0;
+  const prepared = [];
+  const failures = [];
   for (const page of cfg.pages) {
     const abs = path.resolve(page);
-    if (!existsSync(abs)) { console.warn(`⚠️  page not found: ${page}`); continue; }
+    if (!existsSync(abs)) {
+      failures.push(`${page}: requested page not found`);
+      continue;
+    }
     let html = readFileSync(abs, 'utf8');
     let rw = 0;
-
-    // src="..."
-    html = html.replace(/(\ssrc=")([^"]+)(")/gi, (whole, pre, url, post) => {
+    html = html.replace(/<img\b[^>]*>/gi, (tag) => {
+      const match = tag.match(/(\ssrc=")([^"]+)(")/i);
+      if (!match) {
+        failures.push(`${page}: image has no src`);
+        return tag;
+      }
+      const [, pre, url, post] = match;
+      if (url.startsWith('data:') || /^\.?\/media_[^/]+/.test(url)) return tag;
       const dest = resolve(lookups, url);
-      if (dest) { rw += 1; return `${pre}${dest}${post}`; }
-      return whole;
-    });
-    // srcset="..." (F9 — actually rewrite, not just claim to)
-    html = html.replace(/(\ssrcset=")([^"]+)(")/gi, (whole, pre, val, post) => {
-      const rewritten = rewriteSrcset(val, lookups);
-      if (rewritten !== val) { rw += 1; return `${pre}${rewritten}${post}`; }
-      return whole;
+      if (!dest) {
+        failures.push(`${page}: unresolved image ${url}`);
+        return tag;
+      }
+      // A repeated absolute URL under eight different width descriptors is not
+      // a responsive ladder; EDS generates the real srcset from the delivery URL.
+      const rewritten = tag.replace(match[0], `${pre}${dest}${post}`)
+        .replace(/\ssrcset="[^"]*"/gi, '');
+      if (rewritten !== tag) rw += 1;
+      return rewritten;
     });
 
-    if (rw > 0 && !cfg.dryRun) writeFileSync(abs, html);
+    prepared.push({ abs, html, rw });
     totalRewrites += rw;
     console.log(`${cfg.dryRun ? '[dry-run] ' : ''}${path.relative(WORKSPACE, abs)}: ${rw} media ref(s) rewritten → delivery url`);
   }
 
+  if (failures.length) { throw new Error(`Media apply blocked:\n${failures.join('\n')}`); }
+  if (!cfg.dryRun) {
+    prepared.forEach(({ abs, html, rw }) => {
+      if (rw) { writeFileSync(abs, html); }
+    });
+  }
   const indexed = emitMediaIndex(manifest, cfg.mediaIndex, cfg.dryRun);
   console.log(`\n[media] ${totalRewrites} total rewrite(s)${cfg.dryRun ? ' (dry-run, no files changed)' : ''}`);
   console.log(`[media] cart resolver index: ${indexed} asset(s) → ${path.relative(WORKSPACE, cfg.mediaIndex)}${cfg.dryRun ? ' (dry-run)' : ''}`);
 }
 
-main();
+try {
+  main();
+} catch (err) {
+  console.error(err.message);
+  process.exitCode = 1;
+}

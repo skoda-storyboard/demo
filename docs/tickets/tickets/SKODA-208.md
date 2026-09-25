@@ -2,7 +2,7 @@
 - **Epic:** E02, Core Blocks
 - **Type:** template / import
 - **Phase:** B  ·  **Pilot:** No · **Milestone:** ~~M2 (go-live)~~ → **M1 (15 Oct demo)**. Re-milestoned 2026-09-24 to match the board: 5 model URLs are in the 43-URL M1 set (see update below).
-- **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–6d *(planning estimate, not a quote)*
+- **Estimate:** 5 SP **+1 net Must = 6 SP** (2026-09-25 amendment, below) · AI-assisted 2–3d / manual 4–6d *(planning estimate, not a quote)*
 
 > **Update (2026-09-24, M1 gap review, [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md)).**
 >
@@ -49,6 +49,24 @@ Measurable gates live in [`template-model-page.md` §10](../../ui-specs/template
 - [ ] Content cap `1248`; a11y (nav landmark, heading order, hero contrast).
 - [ ] Visual diff vs source at 1280/1024/768/500 ≤ 2% per-pixel (hero + nav + one rail).
 
+## Amendments (2026-09-25, sweep reconciliation, [`SKODA-M1-URL-BLOCK-SWEEP.md`](../../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §6 + §11)
+These **supersede** the conflicting items above: 8 anchors / not sticky / ~510px hero.
+- [ ] Section-nav is a **sticky** icon nav on desktop with an accessible mobile equivalent. Match the source link
+      count per model: 9 / 8 / 6. Emit only links whose target section exists (no dangling anchors). Hero height is
+      about 480px.
+- [ ] Match the source rail count per model: 3 / 5 / 6. Rail tags and the subheading come per model from the source
+      (e.g. Fabia `model=fabia`, `bodywork=hatchback`), with an "All" deep link. A hardcoded `elroq` is rejected.
+      A two-cell subheading row is config, never a card. An empty rail removes its section. The Bodywork rail is
+      centred (`cellAlign: center`).
+- [ ] **Block names:** the importer emits only blocks that exist. Today the Elroq page references `in-page-nav` and
+      `spec-table`, and both 404 on preview and live. Map them to existing blocks/sections (e.g. `columns` + a 218
+      dark section + a download link), or to the section-nav this ticket builds. Check: 0 block JS 404s on the 5
+      model pages.
+- [ ] **Should, not Must** (§11.2 cut line): Key Facts (5–6 illustrated rows) and Technical Data (dark band, 6 rows +
+      PDF) on Superb / Octavia / Fabia.
+- Estimate: +1.5 (§9, including Key Facts / Tech Data) +0.5 (block names) −1 (Key Facts / Tech Data → Should) =
+  **+1 SP net Must**.
+
 ## Dependencies
 - Upstream: SKODA-202 (hero), SKODA-201 (cards/rails), SKODA-402 (query-index retrieval), SKODA-203 (gallery-lightbox), SKODA-505 (media-cart), SKODA-601 (import infra)
 - Downstream: SKODA-1001 (per-locale trees)
@@ -57,3 +75,6 @@ Measurable gates live in [`template-model-page.md` §10](../../ui-specs/template
 - **Rail retrieval rule (🟡):** "Based on tags: <model>" = model tag; confirm exact taxonomy + per-rail ordering across ≥2 models.
 - **Icon-nav on mobile (🟡):** source hides it; default = render as in-page skip links (a11y improvement, confirm).
 - Key Facts / Technical Data structured-data source to confirm for import.
+
+## Import contract (SKODA-603)
+Contract(s) `in-page-nav`, `spec-table`, `cards-key-facts`, `tags-outline`, `hero` (+ `spec-table-versions` to confirm) in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). The block check currently fails every model page: `Hero` (no block on `main`) and the story-rail `subheading` key (story-rail doesn't read it, so it renders the settings as cards). Build the blocks against the pinned shapes. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

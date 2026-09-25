@@ -11,9 +11,11 @@ Grounded in `docs/media/SKODA-MEDIA-DEEP-DIVE.md` + `docs/media/SKODA-ASSET-MAPP
 ## Two mechanisms
 
 **A) Delivery — content `<img>` → EDS media bus.** `apply` rewrites each image's
-`<img src>` (and `srcset`) to an absolute `delivery_url` that EDS auto-ingests
-into its media bus at publish (self-hosted `./media_<hash>`, webp, responsive).
-For migrated pages the `delivery_url` is the pre-conditioned master. In
+`<img src>` to an absolute `delivery_url` and removes its legacy `srcset`.
+EDS auto-ingests the delivery URL into its media bus at publish
+(self-hosted `./media_<hash>`, webp, responsive).
+For migrated pages the `delivery_url` is the master or a publish-safe sized
+rendition; DAM and the optional DA archive receive the **full original**. In
 production, authors add images with the **native AEM Assets sidekick picker**,
 which pastes a plain image that also lands in the media bus — same delivery path.
 
@@ -36,7 +38,7 @@ block (SKODA-505) reads this to resolve "download original".
 
 1. **Dedup — path-qualified logical id** (F3): `<pathhash8>__<master-basename>`,
    so same-basename images in different folders don't collide.
-2. **Pick the delivery rendition** (F4/SKODA-506): the master, or — if it is over
+2. **Pick the delivery rendition** (F4): the master, or — if it is over
    ~10 MB — the largest ladder derivative under threshold. If none is safe, the
    row is `partial`/`skipped` (never silently ships an oversized master; the DAM
    still gets the full original).
@@ -49,49 +51,96 @@ block (SKODA-505) reads this to resolve "download original".
    becomes the M1 cart `original_download_url`.
 6. **Record a manifest row** with per-step status (`deliver`/`dam`/`da`); a row is
    `done` only when every required step passed. Manifest is flushed per row
-   (resumable); non-zero exit if failures remain.
+   (resumable); non-zero exit if failures remain. Delivery-only `done` rows
+   resume just the DAM/DA steps when those are requested later (no blanket
+   `--force` upload). Missing/empty alts are logged per imported occurrence.
 
-Then **`apply-media-manifest.mjs`** rewrites content `<img src>`/`srcset` →
-`delivery_url` and emits `content/media-index.json` (the cart resolver).
+The original is uploaded even when a safe inline delivery rendition is unavailable;
+the row remains `partial` until SKODA-506 resolves that separate publish issue.
+Original fetches must return non-empty image bytes, and the direct-upload response
+must provide enough parts to cover every byte before any part is sent. A missing
+original is never replaced by a derivative under the original's DAM path.
+
+Then **`apply-media-manifest.mjs`** rewrites content `<img src>` →
+`delivery_url`, removes the old WordPress `srcset` ladder so EDS builds its own,
+and emits `content/media-index.json` (the cart resolver). A missing page or
+unresolved image fails the entire requested apply before changing any page;
+an asset appears in the cart index only when the DAM upload and deliverable
+original-download URL have both succeeded. `--dry-run` does not modify pages,
+the manifest, or the cart index.
+
+The M1 importers call the shared `skoda-images.js` normalizer after parsing:
+default-content images (including inline paragraphs and native figures) become
+direct children of `<div>`, and `data-caption` becomes a visible `<figcaption>`
+without replacing an existing native caption. Table-cell images remain in their
+authored block shape; DA serializes those cells as `<div>`. Original alt values
+are preserved and missing/empty values are logged for editorial backfill.
 
 ## Usage
 
 ```bash
-# 1. Ingest originals to the DAM + build the manifest (needs the DAM token, below)
+# 1. Prepare delivery-only media (no external DAM or DA upload).
+npm run media:build -- --pages content/en/skoda-model/elroq.plain.html
+
+# 2. After rights/access approval, ingest originals to the DAM (needs a DAM token).
 npm run media:build -- \
   --pages content/en/skoda-model/elroq.plain.html \
   --dam-base https://author-p220607-e2281243.adobeaemcloud.com \
   --dam-folder /content/dam/storyboard \
-  [--da-archive] [--concurrency 4] [--dry-run] [--force]
+  --concurrency 4 --dry-run
 
-# 2. Rewrite content <img> → delivery url + emit the cart resolver index
+# After reviewing the dry run, repeat without --dry-run. Add --da-archive
+# only when the separate original-download archive has been approved.
+
+# 3. Rewrite imported content; fails if required image mappings are missing.
 npm run media:apply -- --pages content/en/skoda-model/elroq.plain.html
 
-# 3. Re-upload + publish the page as usual; EDS ingests the delivery masters.
+# Reconcile the canonical 43 URLs / 42 unique pages once the generated
+# content store is available. Non-zero exit for missing pages or image defects.
+npm run media:audit -- --contentRoot content --out /path/to/m1-media-audit.json
+
+# 4. SKODA-506 must enforce its separate oversize gate before SKODA-602
+#    previews/publishes. These scripts do not implement the publish gate.
+#    After clearance, publish via the actual SKODA-602 content-ops workflow.
 
 # Tests (no live DAM needed — mock server + pure-fn unit tests):
 npm run test:media
+npm test
 ```
 
 Without `--dam-base` the tool runs **delivery-only** (no DAM ingest) — useful for
 the media-bus rewrite alone.
+The audit reports per-page image counts, missing/empty alt, missing captions,
+misplaced images, unverified delivery, and pending DAM originals; it exits
+nonzero while any in-scope original is missing from DAM. It skips the
+alias annotated in `skoda-m1-url-set.txt`; it does not publish content or
+replace SKODA-506's publish-time byte check. A checkout without `content/`
+correctly reports 42 missing pages rather than claiming media QA passed.
 
 ### `--from-manifest` (re-ingest without the page file)
 
 The imported `.plain.html` lives in the separate content store (`content/` is a
 symlink), so it is **not** in a code-repo checkout. To run the DAM ingest from a
 clean checkout, re-ingest straight from the source URLs already recorded in the
-committed `media-manifest.json` — no page file needed:
+committed `media-manifest.json` — no page file needed. For an approved batch,
+provide a plain-text file containing **one reviewed `logical_id` per line**:
 
 ```bash
-npm run media:build -- --from-manifest --force \
+npm run media:build -- --from-manifest \
+  --ids-file /path/to/approved-original-ids.txt \
   --dam-base https://author-p220607-e2281243.adobeaemcloud.com \
-  --dam-folder /content/dam/storyboard
+  --dam-folder /content/dam/storyboard --dry-run
+# After approval and review, repeat without --dry-run.
 ```
 
 Each row's own `dam_page_path`/`alt` are reused, so page-mirrored foldering is
-unchanged. `--force` re-processes rows already marked `done` (e.g. from a prior
-delivery-only build).
+unchanged. The builder resumes only missing steps on delivery-only rows;
+`--force` is reserved for deliberately rebuilding completed rows. An unscoped
+`--from-manifest` run processes **every** row, including images another import
+may have added since a prior approval; use `--ids-file` to freeze the intended
+upload set. Unknown, repeated, or empty ID lists fail rather than expanding
+the scope. With `--dam-base`, `--dry-run` also HEAD-checks pending original
+masters and reports inaccessible ones without fetching bytes or uploading.
 
 ## Automatic wiring (PostToolUse hook)
 
@@ -111,7 +160,9 @@ content import** in this harness — no need to remember it:
   the AEM DAM — that needs the token and hits the external instance, so it stays
   an explicit `npm run media:build -- --dam-base …` (the hook prints a reminder
   when new images were ingested).
-- **Never fails the import:** any hook error is logged to stderr and exits 0.
+- **Never fails the originating import:** any hook error is logged to stderr
+  and exits 0. This is **not** a publish gate; inspect its output, run build/apply
+  explicitly in terminal/CI, and require SKODA-506 before publishing.
 
 **Team scope — two honest limits (why the manual step below still matters):**
 1. The hook is a **Claude Code** event — it fires only when the *agent* runs the
@@ -137,8 +188,9 @@ go in `.claude/settings.local.json` (gitignored).
   4. `~/.aem-dev-token`.
 
   **Never pass a token on the command line or in chat.** A pasted secret is
-  compromised — rotate it. If the token is absent/expired, the DAM step is
-  skipped and the image falls back to reference-in-place (logged) — no crash.
+  compromised — rotate it. If `--dam-base` is requested without a token,
+  the builder fails before processing rather than reporting delivery-only
+  success as a completed DAM ingest.
 
 ## Wiring the real DAM (contract)
 

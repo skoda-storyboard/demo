@@ -21,7 +21,7 @@ Both are a **vertical stack of `.cover-box` sections** (alternating light / `.co
 
 **Storyboard home (`/en/`), 9 sections:**
 ```
-section.promo-box              featured grid + mobile auto-rotate (see carousel-rails.md)
+section.promo-box              featured rotating grid / mobile carousel (see carousel-rails.md)
 div.cover-box       "Latest Stories"   main story feed + [Load more] button
 div.cover-box.dark  "Social media"     social strip (dark green bg)
 div.cover-box       "Models"           category rail
@@ -82,12 +82,12 @@ Values `getComputedStyle`, cited `(selector · viewport)`.
   candidate `--section-dark-bg: #0e3a2f` (· `.cover-box.dark` · 1280).
 
 **Responsiveness**
-- Sections stack at all widths; rails reflow per `carousel-rails.md`; promo-box switches from static
+- Sections stack at all widths; rails reflow per `carousel-rails.md`; promo-box switches from a rotating
   mosaic (≥768) to a 1-up auto-rotating carousel (<768).
 
 ## 6. Interaction / behavior
 
-- Promo-box auto-rotation on mobile (10s, pause-on-hover), see `carousel-rails.md`.
+- Promo-box cycles cards on desktop and mobile (10s, pause-on-hover), see `carousel-rails.md`.
 - STO "Latest Stories" **Load more** button appends the next page of cards (real `<button>`); first 5 cards,
   then +6 per click (source `offset:5` / `posts_per_page:6`). Detail in [`stories.md`](stories.md).
 - Category rails: "All" link + prev/next arrows, no autoplay (verify each rail's `data-flickity`).
@@ -119,7 +119,7 @@ Values `getComputedStyle`, cited `(selector · viewport)`.
       Models/eMobility/Lifestyle/Škoda World rails → Series dark → Latest News); MR home the 4-section stack.
 - [ ] Sections are `.cover-box` / `.cover-box.dark` bands; dark bg `#0e3a2f`; padding `12px`; headings
       `26px/32.5/600`.
-- [ ] Promo-box leads both homes with the per-breakpoint behavior (static mosaic ≥768 / auto-rotate <768).
+- [ ] Promo-box leads both homes with the per-breakpoint behavior (rotating mosaic ≥768 / carousel <768).
 - [ ] First feed uses an accessible Load more button; rails reflow per `carousel-rails.md`.
 - [ ] Correct chrome per side (STO vs MR header nav + footer).
 - [ ] Visual diff vs source at 1280/768/500 ≤ 2% per-pixel (promo-box + one light rail + one dark band).

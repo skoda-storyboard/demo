@@ -24,6 +24,16 @@
   --skoda-grey-500: #7c7d7e;
   --skoda-grey-border: #dadada;
 
+  /* form primitives (SKODA-305 footer Subscribe form; measured on the live Media Room footer).
+     The source reuses one accent green for focus / checked / success states (#419468, the same
+     value as --gallery-accent and --facet-active). The checkbox outline renders #d0d0d0 even
+     though the label text is #a1a1a1 (sampled from source pixels, not computed style). */
+  --skoda-green-accent: #419468;
+  --skoda-grey-50: #f1f1f1;
+  --skoda-grey-300: #d0d0d0;
+  --skoda-grey-400: #a1a1a1;
+  --skoda-grey-700: #5a5b5c;
+
   /* social network brand colors (footer icon hover tints — raw brand hex) */
   --social-hover: #419468;
   --social-facebook: #3b5998;
@@ -72,6 +82,9 @@
   --pagination-border: #c9cdd3;      /* result-count underline */
   --grid-gutter: 20px;               /* listing cell margin-bottom / padding base */
   --pill-radius: 50px;               /* shared ghost-pill (load-more) */
+
+  /* downloads / media-box (SKODA-502; measured in docs/ui-specs/downloads.md §3) */
+  --thumb-hairline: hsl(0deg 0% 85% / 13.3%); /* faint tile border on the download grid */
 
   /* carousel / horizontal rails (SKODA-212; measured in docs/ui-specs/carousel-rails.md §3) */
   --carousel-arrow-size: 32px;       /* source theme override 2em; base Flickity 44px */

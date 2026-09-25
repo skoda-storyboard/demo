@@ -13,7 +13,7 @@ back-compatible; new fields (`tags`, `model`, plus new `template` values) are ad
 
 | Meta name | Type | Required | Purpose / consumed by |
 |---|---|---|---|
-| `title` | text | yes | card title (og:title) |
+| `title` | text | yes | card title (og:title **without** the source's " - Škoda Storyboard" SEO suffix; `cleanTitle`, SKODA-610) |
 | `description` | text | rec. | card summary (meta description) |
 | `image` | URL | rec. | card image (og:image) |
 | `publisheddate` | ISO `YYYY-MM-DD` | yes | sort key (newest-first) for all rails |

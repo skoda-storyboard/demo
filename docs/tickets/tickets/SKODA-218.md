@@ -44,6 +44,17 @@ as dark, and that their headings, links, cards, and controls are legible.
       comparison against source at 1280/768/500px checks color, geometry, and
       contrast. `npm run lint:css` and focused checks pass.
 
+## Amendments (2026-09-25, sweep reconciliation, [`SKODA-M1-URL-BLOCK-SWEEP.md`](../../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §6 + §11.1 V3)
+- [ ] **Heading contrast on every dark band** (Related Stories, the press-release bands, home bands). h1–h6 inside
+      `.section.dark` (and `cover-box dark`) are white, not `rgb(22,23,24)`. Today the global `h*` colour beats the
+      section style (`styles/styles.css:210–224`). Check with computed style plus a WCAG AA contrast check.
+- [ ] The dark SiteOrigin `panel-row-style` band (`#0e3a2f`) that stories import becomes a dark section with its
+      source padding.
+- Boundary with SKODA-824: 218 owns **section-level** dark bands. 824 owns the **in-column** highlight panel
+  (dark + grey variants) inside the story body column. Both share the colour tokens.
+- Not a defect: the Epiq Related band's 1248px box is fine, because its `::before` paints the green full-bleed to
+  1440 (verified live).
+
 ## Dependencies
 - Upstream: SKODA-106 (tokens/section CSS).
 - Integration: SKODA-212 (Series rail), SKODA-217 (social cards),

@@ -45,7 +45,16 @@ attachment pages, HTTP-verified.
 - [ ] Peaq and Epiq model pages show populated Images and Videos rails. Rails with no rows are hidden and leave no
       empty heading.
 - [ ] Lightbox, download and add-to-cart affordances on items follow SKODA-203 and SKODA-505a, once they land.
+- [ ] **Amendment (2026-09-25, sweep reconciliation):**
+  - Rows: JPG Original + 1920, MP4, Vimeo ID/poster, date, and the 15 facets. Model-media rows keep the
+    model/bodywork facets. An empty listing shell is not acceptable.
+  - **Listing media-card cell:** date, filename, the add/download toolbar and the lightbox detail panel (parallel
+    sweep §5).
+  - Listing layout: columns 1/3/4/4, facets collapsed until "Advanced filter (0)" (the 402 listing QA fix).
 
 ## Dependencies
 - Upstream: SKODA-601, SKODA-602, SKODA-401/104 (index config), SKODA-501/503.
 - Downstream: SKODA-208 (model rails), SKODA-402 QA on real content, SKODA-603 tracker, SKODA-707 dry run.
+
+## Import contract (SKODA-603)
+Contract(s) `media-item` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). An index-row contract, not a block (`template` = image/video + title, description, image, date, tags, model, facets, download fields). `?attachment_id=` corpus URLs need a path mapping (the tracker lists them as unmapped). If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

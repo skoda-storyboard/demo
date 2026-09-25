@@ -38,12 +38,9 @@ const TYPE_LABELS = {
   press_kit: 'Press Kits',
 };
 
-// SEO site suffix on indexed titles; the source rows show the clean title
-const SITE_SUFFIX = /\s+[-–|]\s+Škoda Storyboard$/;
-
-/** Display title: the indexed title without the SEO site suffix. */
+/** Display title (loadQueryIndex already strips the SEO site suffix, SKODA-610). */
 function displayTitle(row) {
-  return String(row.title || '').replace(SITE_SUFFIX, '').trim() || row.path;
+  return String(row.title || '').trim() || row.path;
 }
 
 /** Index ISO date (YYYY-MM-DD) → the source's "DD. MM. YYYY"; other values pass through. */

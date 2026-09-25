@@ -9,6 +9,12 @@ covers, the **content column geometry**, the **rich-text typography**, and the *
 sub-part (hero, tags, gallery, embeds, media box, related rail) is delegated to its own atomic spec via
 the §7 assembly map.
 
+> **Sweep correction (2026-09-25).** The DevTools URL→block sweep ([registry](../analysis/SKODA-M1-URL-BLOCK-REGISTRY.md), [report](../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §7) disproved the points below on the live M1 pages. They override the sections they name until this spec is re-captured:
+>
+> - The article anatomy must include the **in-body `widget_skoda-carousel-widget` 3:2 image sliders** (19 across the 8 emobility stories, → SKODA-819). These are distinct from card rails.
+> - Below the sidebar there are **two separate full-width dark bands**: Media Box, then Related Stories. There are also 24px `skoda-offset` spacer widgets on desktop.
+> - The hero published date and the "Based on tags" subtitle are optional per page. The category link is always present.
+
 ## 1. Identity
 
 - **Component:** Story-detail page, the full article: hero → header (title/perex/date/tags) → rich-text

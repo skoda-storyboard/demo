@@ -6,7 +6,10 @@ LICENSE
 package.json
 package-lock.json
 test/*
+blocks/promo-box/test/
+blocks/promo-box/promo-box.test.mjs
 poc/**/test.mjs
 sync-block-collection.sh
 drafts/
 content/en/press-releases/novel-arrangement-test.plain.html
+docs/analysis/SKODA-M1-URL-BLOCK-REGISTRY.json

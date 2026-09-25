@@ -3,9 +3,10 @@
 Status: **CAPTURED** (measured 2026-09-15 via Chrome DevTools MCP + source CSS
 `media-room-515d2d102b.css`; screenshots saved). **Re-verified live 2026-09-15 via Playwright** at
 500/768/1024/1280: cells-per-view ladders, both `data-flickity` configs (promo-box autoPlay 10000 /
-watchCSS + `cellAlign:left, groupCells:true, pageDots:false` rails), promo-box static-mosaic-vs-1up
+watchCSS + `cellAlign:left, groupCells:true, pageDots:false` rails), promo-box mosaic-vs-1up
 modes, cover-box `opacity:.3` fade, 32px transparent arrows, and the MR-home `pauseAutoPlayOnHover:false`
-variance all hold. No corrections.
+variance all hold. The desktop mosaic's separate card-order rotation was discovered via live DevTools
+on 2026-09-24; the original CSS-only conclusion that desktop never rotates was incorrect.
 Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 Card unit reused here: [`card-teaser.md`](card-teaser.md).
 
@@ -88,10 +89,12 @@ context "Media Room - Promo box"), plus `.cover-box .flickity-enabled`. **This i
 banner** (`.side-banner` / `promo-banner.md`); it is a featured-story showcase built from
 [card-teaser](card-teaser.md) `article-teaser` cards. **It behaves differently per breakpoint (this is
 the key, easily-missed behavior, verified live 2026-09-15):**
-- **`>= 768` (desktop/tablet): a STATIC mosaic grid, no carousel, no rotation.** `watchCSS:true` keeps
+- **`>= 768` (desktop/tablet): a mosaic grid, no Flickity carousel.** `watchCSS:true` keeps
   Flickity un-booted here (`@media (min-width:768px){ .promo-box .items:after{content:""} }`), so it lays
   out as a float grid: first item `66.66%` (measured promo cell `832px` at 1280, `entry-title 1.85em/400`,
-  summary shown), items 2 and 3 `33.33%` stacked on the right (`16:9`). No autoplay, no arrows, no dots.
+  summary shown), items 2 and 3 `33.33%` stacked on the right (`16:9`). Separate source behavior rotates
+  the cards between these positions every `10s` even though Flickity is un-booted (observed live in
+  DevTools 2026-09-24); no arrows or dots.
 - **`< 768` (mobile): Flickity boots into a 1-up auto-rotating carousel.** Default rule
   `.promo-box .items:after{content:"flickity"}` activates it; below 768 only the first item shows until
   boot (`.item+.item{display:none}` @ `max-width:767px`), then `.flickity-enabled .item+.item{display:block}`.
@@ -156,11 +159,11 @@ Source ladder (matches `_FOUNDATIONS` §1: `768 / 992`):
   (verified: their `data-flickity` has no `autoPlay`, they use arrows). **BUT the `.promo-box` featured
   slider DOES auto-rotate** on mobile: inline `data-flickity={autoPlay:10000, pauseAutoPlayOnHover:<varies>,
   prevNextButtons:false, watchCSS:true}` (+ `data-rotate="10000" data-pause="hover"`). It advances every
-  `10s`, has no arrows (dots only), and only runs `< 768` where `watchCSS` boots Flickity (at `>= 768` the
-  promo-box is a static mosaic, see §3). The earlier "none observed" was a CSS-only-capture miss (autoplay
-  lives in the inline attribute, not the stylesheet). EDS: the rebuilt `promo-box`/featured block needs a
-  `setInterval` rotation (`10s`) with pause-on-hover/focus and `prefers-reduced-motion` respected, active
-  only in the mobile 1-up mode.
+  `10s`, has no arrows (dots only), and only runs `< 768` where `watchCSS` boots Flickity. At `>= 768`,
+  the grid is not a Flickity carousel, but the source still rotates the card DOM order every `10s`.
+  The earlier "none observed" was a CSS-only-capture miss (autoplay lives in the inline attribute and
+  the separate desktop rotation is not controlled by Flickity). EDS: rotate the mobile slide or the
+  desktop mosaic cards every `10s`, with pause-on-hover/focus and `prefers-reduced-motion` respected.
   - **Per-home variance (verified live 2026-09-15):** the Storyboard-home promo-box sets
     `pauseAutoPlayOnHover:true`; the **Media-Room-home promo-box sets `pauseAutoPlayOnHover:false`** (does
     not pause on hover). The EDS build should still **pause on hover/focus** (a11y/reduced-motion), treat
@@ -248,8 +251,8 @@ Compare EDS `/en` render to source at each viewport. WHAT / WHERE / viewport / e
 - [ ] Taxonomy rail: `.carousel-caption` img aspect `383/150` in light sections; title below, bold.
 - [ ] story-rail: builds a `.carousel`, defers build until near viewport, no repeat of stories shown
       in the featured promo / `stories` grid; reserves height (no CLS).
-- [ ] Promo-box mode: `.promo-box` / `>=768` / **static mosaic** (1 big `66.66%` + 2 small `33.33%`,
-      no rotation, no arrows); / `<768` / **1-up auto-rotating carousel** advancing every `10s`, pausing
+- [ ] Promo-box mode: `.promo-box` / `>=768` / **rotating mosaic** (1 big `66.66%` + 2 small `33.33%`,
+      cards change positions every `10s`, no arrows); / `<768` / **1-up auto-rotating carousel** advancing every `10s`, pausing
       on hover/touch, dots only (no arrows), respecting `prefers-reduced-motion`.
 - [ ] A11y: arrows are labeled `<button>`; track keyboard-scrollable; dots (if any) `aria-current`;
       promo-box autoplay pausable and reduced-motion-safe.

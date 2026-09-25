@@ -4,6 +4,11 @@ Status: **CAPTURED** (measured 2026-09-15 via Chrome DevTools MCP on page id 1; 
 cross-checked against `media-room-515d2d102b.css`; reference screenshots saved).
 Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 
+> **Sweep correction (2026-09-25).** The DevTools URL→block sweep ([registry](../analysis/SKODA-M1-URL-BLOCK-REGISTRY.md), [report](../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §7) disproved the points below on the live M1 pages. They override the sections they name until this spec is re-captured:
+>
+> - Hubs are **curated editorial mosaics**: 2/3-cell rows, 1:1 and ~2:1 tiles at 992/1280, 16:9 stacked at 375. They are in editorial order (date inversions) and can contain non-story tiles (130-years: Press Kits). They are not a newest-first grid.
+> - Hero at 375: 16:9 image, then a **48px/300 dark H1 + standfirst below** (no overlay). At ≥768: a 61.8vh image with a 48px/300 white overlay. The grey SERIES badge is always visible.
+
 ## 1. Identity
 
 - **Component:** Series, two surfaces. (a) The **series directory**, a grid of series cards; (b) a

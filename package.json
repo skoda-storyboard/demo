@@ -8,12 +8,15 @@
     "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\"",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
-    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"poc/**/test.mjs\" \"blocks/**/*.test.mjs\" \"tools/importer/**/*.test.mjs\"",
+    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"poc/**/test.mjs\" \"blocks/**/*.test.mjs\" \"scripts/**/*.test.mjs\" \"tools/importer/**/*.test.mjs\"",
     "media:build": "node tools/importer/media/build-media-manifest.mjs",
     "media:apply": "node tools/importer/media/apply-media-manifest.mjs",
-    "test:media": "node --test tools/importer/media/media-lib.test.mjs",
+    "media:audit": "node tools/importer/media/audit-m1-media.mjs",
+    "test:media": "node --test tools/importer/media/*.test.mjs",
     "media:validate-metadata": "node tools/importer/validate-metadata.mjs",
     "import:push": "node tools/importer/push-to-da.mjs",
+    "import:validate-blocks": "node tools/importer/validate-blocks.mjs",
+    "import:status": "node tools/importer/m1-status.mjs",
     "prepare": "husky"
   },
   "repository": {
@@ -28,10 +31,12 @@
   "homepage": "https://github.com/adobe/aem-boilerplate#readme",
   "devDependencies": {
     "@babel/eslint-parser": "7.29.9",
+    "esbuild": "^0.28.2",
     "eslint": "8.57.1",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "2.32.0",
     "husky": "^9.1.7",
+    "jsdom": "^30.1.1",
     "stylelint": "17.15.0",
     "stylelint-config-standard": "40.0.0",
     "stylelint-declaration-strict-value": "^1.12.1"

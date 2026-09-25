@@ -335,6 +335,11 @@ var CustomImportScript = (() => {
     [/\berror404\b/, "page"],
     [/\bpage-template\b|\btemplate-media-room-page\b/, "page"]
   ];
+  var SITE_SUFFIX = /\s+[-–|]\s+Škoda Storyboard\s*$/;
+  function cleanTitle(raw) {
+    const t = String(raw || "").replace(/\s+/g, " ").trim();
+    return t.replace(SITE_SUFFIX, "").trim() || t;
+  }
   function metaContent(document2, selector) {
     const el = document2.querySelector(selector);
     const val = el && el.getAttribute("content");
@@ -468,7 +473,8 @@ var CustomImportScript = (() => {
     const canonical = document2.querySelector('link[rel="canonical"]');
     const pageUrl = params && params.originalURL || url || canonical && canonical.href || "";
     const overrides = payload.template && payload.template.metadata || {};
-    const title = overrides.title || metaContent(document2, 'meta[property="og:title"]') || (document2.querySelector("title") ? document2.querySelector("title").textContent.trim() : "");
+    const h1 = document2.querySelector("h1");
+    const title = cleanTitle(overrides.title || metaContent(document2, 'meta[property="og:title"]') || (document2.querySelector("title") ? document2.querySelector("title").textContent.trim() : "") || (h1 ? h1.textContent.trim() : ""));
     const description = overrides.description || metaContent(document2, 'meta[property="og:description"]') || metaContent(document2, 'meta[name="description"]') || "";
     const imageSrc = overrides.image || metaContent(document2, 'meta[property="og:image"]') || "";
     const publisheddate = overrides.publisheddate || extractDate(document2);
@@ -494,6 +500,97 @@ var CustomImportScript = (() => {
     });
     const block = WebImporter.Blocks.getMetadataBlock(document2, meta);
     element.append(block);
+  }
+
+  // tools/importer/transformers/skoda-images.js
+  function hasContent(node) {
+    return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
+  }
+  function withCaption(node, caption, document2) {
+    if (!caption) return node;
+    const figure = document2.createElement("figure");
+    const figcaption = document2.createElement("figcaption");
+    figcaption.textContent = caption;
+    figure.append(node, figcaption);
+    return figure;
+  }
+  function imageContainer(img, document2, link = null) {
+    const div = document2.createElement("div");
+    div.append(img);
+    if (!link) return div;
+    link.append(div);
+    return link;
+  }
+  function splitParagraph(img, paragraph, caption, document2) {
+    const link = img.closest("a");
+    const linkedImage = link && paragraph.contains(link) && link.querySelectorAll("img").length === 1 && !(link.textContent || "").trim();
+    const target = linkedImage ? link : img;
+    const afterRange = document2.createRange();
+    afterRange.setStartAfter(target);
+    afterRange.setEnd(paragraph, paragraph.childNodes.length);
+    const after = paragraph.cloneNode(false);
+    after.append(afterRange.extractContents());
+    const beforeRange = document2.createRange();
+    beforeRange.selectNodeContents(paragraph);
+    beforeRange.setEndBefore(target);
+    const before = paragraph.cloneNode(false);
+    before.append(beforeRange.extractContents());
+    const imageNode = imageContainer(img, document2, linkedImage ? link : null);
+    const image = withCaption(imageNode, caption, document2);
+    paragraph.replaceWith(...[before, image, after].filter(hasContent));
+  }
+  function normalizeImages(root, document2 = root.ownerDocument) {
+    root.querySelectorAll("img").forEach((img) => {
+      if (!img.hasAttribute("alt") || !img.getAttribute("alt").trim()) {
+        const type = img.hasAttribute("alt") ? "empty" : "missing";
+        console.warn(`[image-import] ${type} alt: ${img.getAttribute("src") || "(no src)"}`);
+      }
+      if (img.closest("table, picture")) return;
+      const figure = img.closest("figure");
+      const wrapper = img.closest("[data-caption]");
+      const wrapperCaption = (wrapper == null ? void 0 : wrapper.querySelectorAll("img").length) === 1 ? wrapper.getAttribute("data-caption") : "";
+      const caption = (img.getAttribute("data-caption") || wrapperCaption || "").trim();
+      if (figure) {
+        if (img.parentElement.tagName !== "DIV") {
+          const div = document2.createElement("div");
+          img.replaceWith(div);
+          div.append(img);
+        }
+        if (caption && !figure.querySelector("figcaption")) {
+          const figcaption = document2.createElement("figcaption");
+          figcaption.textContent = caption;
+          figure.append(figcaption);
+        }
+        return;
+      }
+      const paragraph = img.closest("p");
+      if (paragraph) {
+        splitParagraph(img, paragraph, caption, document2);
+        return;
+      }
+      if (img.parentElement.tagName === "DIV") {
+        if (caption) {
+          const div = img.parentElement;
+          if (div.childElementCount === 1 && !(div.textContent || "").trim()) {
+            const marker2 = document2.createComment("image");
+            div.replaceWith(marker2);
+            marker2.replaceWith(withCaption(div, caption, document2));
+          } else {
+            const marker2 = document2.createComment("image");
+            img.replaceWith(marker2);
+            marker2.replaceWith(withCaption(imageContainer(img, document2), caption, document2));
+          }
+        }
+        return;
+      }
+      const link = img.closest("a");
+      const linkedImage = link && link.querySelectorAll("img").length === 1 && !(link.textContent || "").trim();
+      const target = linkedImage ? link : img;
+      const marker = document2.createComment("image");
+      target.replaceWith(marker);
+      const imageNode = imageContainer(img, document2, linkedImage ? link : null);
+      marker.replaceWith(withCaption(imageNode, caption, document2));
+    });
   }
 
   // tools/importer/import-model-page.js
@@ -591,6 +688,7 @@ var CustomImportScript = (() => {
       });
       executeTransformers("afterTransform", main, payload);
       WebImporter.rules.transformBackgroundImages(main, document2);
+      normalizeImages(main, document2);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
       const path = WebImporter.FileUtils.sanitizePath(rawPath === "" ? "/index" : rawPath);

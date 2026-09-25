@@ -50,7 +50,15 @@ at a time with arrows and dots.
 - [ ] Autoplay advances every 3s and wraps; it pauses on hover/focus and is off under reduced motion.
 - [ ] Arrows and dots are labelled `<button>`s; the track is keyboard-scrollable.
 - [ ] Existing Gallery variants (default / story) unchanged; lint + tests green.
+- [ ] **Amendment (2026-09-25, sweep reconciliation):**
+  - Visible slide captions, 13.33/20 centred. They are present on 6 of 16 lifestyle sliders plus Octavia, Slavia
+    and 365 km/h (parallel sweep §5).
+  - Slider counts, order, caption/alt and the 3:2 crop per page across the 8 emobility stories (M1 sweep §6).
+  - The 3s autoplay stays distinct from the related rail.
 
 ## Dependencies
 SKODA-203 (gallery), SKODA-212 (rail mechanics), SKODA-216 (story `sb-gallery`, a different
 widget), SKODA-801 (flatten routing).
+
+## Import contract (SKODA-603)
+Contract(s) `gallery-slider` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Pinned shape: `Gallery (slider)`, one row per slide `[picture, caption or empty]`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

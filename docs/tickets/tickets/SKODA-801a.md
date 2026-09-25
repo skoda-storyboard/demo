@@ -61,7 +61,16 @@ reconstruct the media that exists in all 21 stories, and keep the rest of SKODA-
       text, download link counts.
 - [ ] No `skoda-storyboard.com` absolute links remain (SKODA-605) and no consent residue remains (SKODA-606).
 - [ ] Importer unit or fixture tests cover the Media Box mapping. `npm run lint` is clean.
+- [ ] **Amendment (2026-09-25, sweep reconciliation):**
+  - Re-import every stale DA story with the #113/#133 importer, first the 3 flagged ones (plates, Peaq record,
+    Octavia), and assert the slider count per page.
+  - **0 block JS 404s:** the older Epiq import references a `version` block that doesn't exist.
+  - The story Media Box collapses behind "Show more" above 8 assets (708px collapsed, 139×44 pill; routed here from
+    the closed 502).
 
 ## Dependencies
 - Upstream: SKODA-601 (importer), SKODA-801 (#113), SKODA-819 (was 219), SKODA-818, SKODA-502 (#111), SKODA-204 (#109), SKODA-501/506.
 - Downstream: SKODA-603 (43-URL import), SKODA-604 (full-fidelity hero stories), SKODA-704 visual sign-off.
+
+## Import contract (SKODA-603)
+Contract(s) `gallery-slider`, `quote`, `columns-split`, `spec-table-versions` (proposed) in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). The story importer emits these pinned shapes. The raw `version` spec table (Epiq) must become `Spec Table (versions)` or text; the check fails `version`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

@@ -1,11 +1,12 @@
 /*
- * Storyboard footer (SKODA-304). Dark-green brand band that closes every page.
- * Re-derived from measured source (docs/ui-specs/footer.md); tokens-only, no hardcoded hex.
- * Mobile-first with the canonical 768/992/1080 ladder (source uses 768/968/1024; the current
- * boilerplate 700/1000 is retired). Source responsive behavior is reproduced exactly:
- *   < 992  → nav stacks, only the 7 category HEADINGS show (sub-links hidden), .social a column
- *   ≥ 992  → sub-links revealed
- *   ≥ 1080 → 7-column sitemap grid
+ * Footer (SKODA-304 Storyboard + SKODA-305 Media Room). Dark-green brand band that closes every
+ * page. Re-derived from measured source (docs/ui-specs/footer.md, footer-mediaroom.md);
+ * tokens-only, no hardcoded hex. Both variants share the shell (social row → separator → middle →
+ * legal); only the middle section differs:
+ *   .footer-nav     (Storyboard) sitemap. < 992 only the 7 category headings show; ≥ 992 sub-links
+ *                   are revealed and laid out as a 7-column grid.
+ *   .footer-widgets (Media Room) Contacts / Subscribe / Company columns. Stacked < 768; three
+ *                   33.333% columns ≥ 768 (source .footer-widgets > * flex 0 0 33.333%).
  * Rule order: base → structural → states (keeps stylelint no-descending-specificity happy).
  */
 
@@ -21,7 +22,7 @@ footer .footer > div {
   box-sizing: border-box;
   margin: auto;
   max-width: var(--content-max-width);
-  padding: var(--footer-padding-y) 10px;
+  padding: var(--footer-padding-y) var(--footer-gutter);
 }
 
 footer .footer p {
@@ -30,6 +31,57 @@ footer .footer p {
 
 footer .footer a {
   color: var(--skoda-white);
+}
+
+/* ---- Media Room widget columns (.footer-widgets, SKODA-305) ----
+   Source geometry: a -10px row inside the 10px container gutter, 15px column padding (so column
+   content sits 5px inside the content box), 3em column bottom margin. Stacked < 768. */
+footer .footer-widgets .footer-columns {
+  display: flex;
+  flex-wrap: wrap;
+  margin-inline: calc(-1 * var(--footer-gutter));
+}
+
+footer .footer-widgets .footer-column {
+  box-sizing: border-box;
+  flex: 0 0 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-bottom: var(--footer-row-gap);
+  padding-inline: var(--footer-column-padding);
+}
+
+footer .footer-widgets :is(h2, h3, h4, h5, h6) {
+  margin: 0 0 1em;
+  color: var(--skoda-white);
+  font-size: var(--heading-font-size-l);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-heading);
+}
+
+footer .footer-widgets ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+footer .footer-widgets li {
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-light);
+  line-height: var(--line-height-body);
+}
+
+footer .footer-widgets li a {
+  font-weight: var(--weight-light);
+}
+
+/* widget copy (Subscribe intro, Company blurb): source 12px / 18px / 300, 15px apart */
+footer .footer-widgets .footer-column p {
+  margin-bottom: var(--footer-text-gap);
+  font-size: var(--body-font-size-2xs);
+  font-weight: var(--weight-light);
+  line-height: var(--line-height-body);
 }
 
 /* ---- nav sitemap (.footer-nav) ---- */
@@ -79,26 +131,25 @@ footer .footer-nav nav > ul > li > a {
 }
 
 /* ---- social + app-badge row (.footer-social) ----
-   Mobile: stacked and centered. The 3rem row rhythm matches the source's widget spacing
-   (its .footer-widgets children carry margin-bottom:3em), so the stacked social region is the
-   same height as the live footer at ≤767px. A 1px white separator closes the block (matches the
-   source <hr> that sits AFTER the widgets and BEFORE the menu). The ≥768 rule overrides the gap
-   for the single-row desktop layout. */
+   Mobile: stacked and centered. The 3rem rhythm is the source's widget spacing (.footer-widgets
+   children carry margin-bottom 3em, and an empty .app-download widget sits above the badges, hence
+   the top padding). A 1px white separator closes the row (the source <hr>, margin-bottom 3rem,
+   sits after the social widgets and before the middle section). */
 footer .footer-social {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3rem;
+  gap: var(--footer-row-gap);
   border-bottom: 1px solid var(--skoda-white);
-  padding-bottom: var(--spacing-xl);
-  margin-bottom: var(--spacing-xl);
+  padding-block: var(--footer-row-gap);
+  margin-bottom: var(--footer-row-gap);
 }
 
 footer .footer-social .app-badges {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--spacing-m);
+  gap: var(--spacing-s);
   align-items: center;
 }
 
@@ -152,13 +203,17 @@ footer .footer-legal hr {
   display: none;
 }
 
-/* footer-specific type, NOT the global body style: source renders the usage copy at
-   12px / 18px / weight 300 (review #3). */
-footer .footer-legal .copyright-text {
+/* footer-specific type, NOT the global body style: the source renders the whole legal area
+   (usage copy, notice, feeds) at 12px / 18px (review #3). */
+footer .footer-legal {
   font-size: var(--body-font-size-2xs);
+  line-height: var(--footer-small-line-height);
+}
+
+/* usage copy: weight 300; the source wraps it in a 16px div with margin-bottom 2em (= 32px) */
+footer .footer-legal .copyright-text {
   font-weight: var(--weight-light);
-  line-height: 18px;
-  margin-bottom: var(--spacing-l);
+  margin-bottom: var(--footer-legal-gap);
 }
 
 footer .footer-legal .copyright-text a {
@@ -168,24 +223,28 @@ footer .footer-legal .copyright-text a {
 
 footer .footer-legal .copyright-notice {
   font-weight: var(--weight-semibold);
-  margin-bottom: var(--spacing-m);
+  margin-bottom: var(--footer-text-gap);
 }
 
 footer .footer-legal .feed-links a {
-  font-size: var(--body-font-size-2xs);
   color: var(--skoda-green-emerald);
 }
 
+/* the "|" divider is part of the second link in the source, so it takes the link's emerald */
 footer .footer-legal .feed-links a + a::before {
   content: "|";
-  margin: 0 var(--spacing-xs);
-  color: var(--skoda-white);
+  margin: 0 0.5em;
 }
 
 /* ---- states (declared last so specificity is non-descending) ---- */
 footer .footer a:focus-visible {
   outline: 2px solid var(--skoda-white);
   outline-offset: 2px;
+}
+
+/* source Contacts links stay white and undecorated on hover */
+footer .footer-widgets li a:hover {
+  text-decoration: none;
 }
 
 footer .footer-social .social-icons a:hover {
@@ -212,15 +271,18 @@ footer .footer-social .social-icons a.social-instagram:hover {
 /* ---- responsive (mobile-first enhancements) ---- */
 
 /* ≥ 768: the store badges + social icons sit together on ONE line, right-aligned and
-   vertically centered; the "Follow …" title stays full-width on its own line above.
-   (Mobile stays stacked + centered from the base rules.) Copyright text constrained;
-   notice + feeds share a row. */
+   vertically centered; an optional authored title stays full-width on its own line above.
+   The row ends 5px inside the content box (source 15px widget padding in a -10px row) and the
+   badges keep .65em from the icons. (Mobile stays stacked + centered from the base rules.)
+   Copyright text constrained; notice + feeds share a row. Media Room widgets go 3-up. */
 @media (width >= 768px) {
   footer .footer-social {
     flex-flow: row wrap;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--spacing-m) var(--spacing-xl);
+    gap: var(--spacing-m) var(--footer-social-gap);
+    padding-top: 0;
+    padding-inline-end: calc(var(--footer-column-padding) - var(--footer-gutter));
   }
 
   footer .footer-social > .default-content-wrapper {
@@ -240,6 +302,11 @@ footer .footer-social .social-icons a.social-instagram:hover {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
+  }
+
+  footer .footer-widgets .footer-column {
+    flex-basis: calc(100% / 3);
+    max-width: calc(100% / 3);
   }
 }
 

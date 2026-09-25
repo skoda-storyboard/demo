@@ -307,6 +307,7 @@
 | Search feasibility, EN scope, template gaps | `analysis/SKODA-STORYBOARD-DRILLDOWN.md` |
 | Full block audit + variants + matrix + responsive | `analysis/SKODA-EN-BLOCK-INVENTORY.md` (+ `analysis/SKODA-EN-BLOCK-DATASET.csv`/`-AGGREGATE.json`) |
 | **Block universe recount** (2026-09-15) — appearance counts per block vs the ui-specs universe, **split STO/MR**, signatures Explore-validated; supersedes the inventory's counts | `analysis/SKODA-BLOCK-RECOUNT.md` (+ `analysis/SKODA-BLOCK-RECOUNT-DATASET.csv` 3,499 rows / `-AGGREGATE.json`) |
+| **M1 URL → block registry** (2026-09-25): every UI element on the 43 M1 URLs, DevTools-measured source vs EDS, mapped to spec, block, ticket and status. Plus the sweep report (coverage, deltas, new ticket 826 (drafts 825 / 827 folded into 309 / 215), AC amendments; reconciled with the parallel sweep `SKODA-DEMO-SWEEP-REPORT.md`, where 825/827 duplicate 309/215) | `analysis/SKODA-M1-URL-BLOCK-REGISTRY.md` (+ `.json`) · `reviews/SKODA-M1-URL-BLOCK-SWEEP.md` |
 | Per-block critical review + live contracts + debt | `reviews/SKODA-BLOCK-IMPLEMENTATION-REVIEW.md` |
 | Media integration strategy | `media/SKODA-MEDIA-INTEGRATION-REVIEW.md` |
 | Measured media (counts, footprint, CDN/CORS) | `media/SKODA-MEDIA-DEEP-DIVE.md` |
