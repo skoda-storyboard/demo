@@ -39,5 +39,12 @@ newsletter panel UI stub (shares markup/CSS with the SKODA-823 sidebar widget).
 - **Note (2026-09-25, sweep reconciliation D3):** the 4 footer legal links are owned by **SKODA-306** (#102) and
   are no longer in 308's scope. Priority: **Should** (§11.2 cut line), plan B extension.
 
+## Found in SKODA-816 QA (2026-09-25)
+- **Horizontal overflow at 1080–~1180px on every page.** The desktop nav row doesn't fit: at 1080, `.nav-sections`
+  (891px wide) ends at x=1133 and `.nav-tools` (search) at x=1181, so `scrollWidth` = 1181 against a 1080 viewport.
+  From 1200 up it fits. Measured on the live Epiq story (Chrome DOM, no screenshots). Expected: no horizontal
+  scroll at any width, either by compressing the nav gaps/labels or by keeping the hamburger layout up to the
+  width where the row fits.
+
 ## Dependencies
 SKODA-301/302/303/304 (built chrome), SKODA-307 (null guard), SKODA-403 (search), SKODA-823 / SKODA-904 (newsletter).
