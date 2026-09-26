@@ -153,6 +153,41 @@ test('YouTube/Vimeo iframes (src or data-src, in a wrapper) → bare URL', { ski
   assert.ok(doc.querySelector('iframe[data-src*="buzzsprout"]'), 'non-video embeds untouched (SKODA-604)');
 });
 
+// ---- SKODA-801a WordPress [video] (MediaElement.js) → Embed -----------------
+
+// The DOM the importer sees after MediaElement.js hydrated the shortcode (trimmed).
+const WP_VIDEO = `<p>Before</p><div style="width: 1920px;" class="wp-video"><span class="mejs-offscreen">Video Player</span>
+  <div class="mejs-container wp-video-shortcode mejs-video"><div class="mejs-inner">
+    <div class="mejs-mediaelement"><mediaelementwrapper><video class="wp-video-shortcode" poster="https://cdn.x/2026/02/poster.jpg" preload="metadata">
+      <source type="video/mp4" src="https://cdn.x/2026/02/clip_16-9.mp4?_=1"><a href="https://cdn.x/2026/02/clip_16-9.mp4">https://cdn.x/2026/02/clip_16-9.mp4</a></video></mediaelementwrapper></div>
+    <div class="mejs-layers"><div class="mejs-poster mejs-layer"><img src="https://cdn.x/2026/02/poster.jpg"></div></div>
+    <div class="mejs-controls"><div class="mejs-button mejs-playpause-button"><button type="button">Play</button></div>
+      <div class="mejs-time mejs-currenttime-container"><span class="mejs-currenttime">00:00</span></div>
+      <div class="mejs-time mejs-duration-container"><span class="mejs-duration">00:53</span></div>
+      <div class="mejs-volume-button"><a href="javascript:void(0);" class="mejs-volume-slider"><span class="mejs-offscreen">Use Up/Down Arrow keys to increase or decrease volume.</span></a></div>
+    </div></div></div></div><p>After</p>`;
+
+test('WordPress MediaElement video → one Embed table (url without ?_=, poster); no player chrome', { skip }, () => {
+  const doc = dom(WP_VIDEO);
+  storyCleanup('beforeTransform', doc.body, {});
+  const tables = [...doc.querySelectorAll('table')];
+  assert.equal(tables.length, 1);
+  assert.equal(blockName(tables[0]), 'Embed');
+  assert.deepEqual(rowsOf(tables[0])[0], ['url', 'https://cdn.x/2026/02/clip_16-9.mp4']);
+  assert.equal(tables[0].querySelector('tr:nth-child(3) img').getAttribute('src'), 'https://cdn.x/2026/02/poster.jpg');
+  assert.ok(!doc.querySelector('[class*="mejs"], a[href^="javascript:"], video'), 'player chrome gone');
+  assert.doesNotMatch(doc.body.textContent, /00:00|00:53|Arrow keys/);
+  assert.match(doc.body.textContent, /Before[\s\S]*After/);
+});
+
+test('WordPress video without a poster emits only the url row', { skip }, () => {
+  const doc = dom('<div class="wp-video"><video src="https://cdn.x/v.webm"></video></div>');
+  storyCleanup('beforeTransform', doc.body, {});
+  const table = doc.querySelector('table');
+  assert.equal(blockName(table), 'Embed');
+  assert.deepEqual(rowsOf(table), [['url', 'https://cdn.x/v.webm']]);
+});
+
 // ---- SKODA-820 related band → Story Rail ------------------------------------
 
 const RELATED = `<div class="container"><div class="columns"><div class="content"><p>Body</p></div>

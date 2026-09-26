@@ -509,6 +509,27 @@ var CustomImportScript = (() => {
     });
     WebImporter.DOMUtils.remove(element, [".page-embed.yt-embed-cookie"]);
   }
+  function wpVideosToEmbeds(element, document2) {
+    element.querySelectorAll(".wp-video").forEach((wrapper) => {
+      var _a, _b;
+      const video = wrapper.querySelector("video");
+      const src = video && (((_a = video.querySelector("source[src]")) == null ? void 0 : _a.getAttribute("src")) || video.getAttribute("src") || ((_b = wrapper.querySelector("a[href]")) == null ? void 0 : _b.getAttribute("href")) || "");
+      if (!src || !/\.(mp4|webm|mov|m4v)(\?|$)/i.test(src)) return;
+      const url = src.replace(/\?_=\d+$/, "");
+      const link = document2.createElement("a");
+      link.setAttribute("href", url);
+      link.textContent = url;
+      const rows = [["Embed"], ["url", link]];
+      const posterUrl = video.getAttribute("poster");
+      if (posterUrl) {
+        const poster = document2.createElement("img");
+        poster.setAttribute("src", posterUrl);
+        poster.setAttribute("alt", "");
+        rows.push(["poster", poster]);
+      }
+      wrapper.replaceWith(WebImporter.DOMUtils.createTable(rows, document2));
+    });
+  }
   function lastSegment(href) {
     try {
       const segs = new URL(href, "https://www.skoda-storyboard.com").pathname.split("/").filter(Boolean);
@@ -579,6 +600,7 @@ var CustomImportScript = (() => {
         ".social-container"
       ]);
       videosToUrls(element, element.ownerDocument || document);
+      wpVideosToEmbeds(element, element.ownerDocument || document);
     }
     if (hookName === TransformHook2.afterTransform) {
       relatedBand(element, element.ownerDocument || document, payload);
