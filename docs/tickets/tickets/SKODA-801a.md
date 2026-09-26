@@ -49,7 +49,8 @@ reconstruct the media that exists in all 21 stories, and keep the rest of SKODA-
   SKODA-818 in #113 (bare URL → 204 autoblock).
 - **Tags.** Keep the visible tags block. The tags must be derived before the sidebar is stripped, as today.
 - **Sidebar.** ~~For M1, drop the sidebar, share cluster and newsletter.~~ Superseded: 801 (#113) keeps the
-  two-column aside, and SKODA-817 handles its parity. Share is 215 and the newsletter stub is 823 (Could).
+  two-column aside, and SKODA-817 handles its parity. Share is 215 and the newsletter stub is 823 (Could). The
+  side banner (SKODA-903) and the production newsletter service (SKODA-904) remain deferred.
 - **Media prep.** Masters-only images and the pre-conditioning gate follow SKODA-501 and SKODA-506.
 - **Cleanup changes.** Update `skoda-story-cleanup.js` so the Media Box selectors are no longer in the drop list.
   Log only what stays deferred.

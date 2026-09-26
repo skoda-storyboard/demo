@@ -74,7 +74,8 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 
 ### `hero`
 - **Status:** `resolve` · **Ticket:** SKODA-202 (the parser change sits with 207/208) · **Fallback:** readable
-- **Finding:** `parsers/hero.js` (model page) and `parsers/hero-banner.js` (page / category / tag / series / listing banners) emit `Hero`, but the `hero` folder on `main` is only an **empty boilerplate stub** (`hero.js` is 0 bytes, `hero.css` is 504 bytes of boilerplate) left from #104. The project's hero is `hero-image`, so a `Hero` table renders undecorated, with boilerplate styling. *(Corrected 2026-09-25: the first inventory said there was no `hero` block at all.)*
+- **Model hero resolved (SKODA-208, 2026-09-26):** `parsers/hero.js` emits `Hero Image (overlay)`: row 1 the picture, row 2 the "Models" chip `<p>` then the H1 (source order; the truncated teaser is dropped).
+- **Finding:** `parsers/hero.js` (model page, now resolved) and `parsers/hero-banner.js` (page / category / tag / series / listing banners) emit `Hero`, but the `hero` folder on `main` is only an **empty boilerplate stub** (`hero.js` is 0 bytes, `hero.css` is 504 bytes of boilerplate) left from #104. The project's hero is `hero-image`, so a `Hero` table renders undecorated, with boilerplate styling. *(Corrected 2026-09-25: the first inventory said there was no `hero` block at all.)*
 - **Contract:** emit the existing block, with no new `hero` block:
   - `Hero Image (overlay)` for full-bleed overlay heroes (model, series hub, press-kit hub, listings, pages);
   - `Hero Image (archive)` for the image-only category/tag band.
@@ -86,16 +87,23 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Until resolved:** the check fails pages that contain `hero`. Affected families: models (W2c), series (W3), listings (W2b), and the press-kit hubs (W3).
 
 ### `in-page-nav`
-- **Status:** `pinned` · **Ticket:** SKODA-208 · **Fallback:** readable (a column of anchor links)
-- **Emitted by:** `parsers/in-page-nav.js`
-- **Shape:** header `In-Page Nav`, then one row per section anchor: `[<a href="#section-id">Label</a>]`. The source icon SVGs are dropped; the block supplies the icons by label.
-- **Example** (`/en/skoda-model/peaq/`): rows `Model Description` · `Key Facts` · `Technical Data` · `News` · `Press Kits` · `Stories` · `Images` · `Videos`. The spec wants 9/8/6 items depending on the model, and the sticky behaviour is the block's job.
+- **Status:** `resolve` (shape 2, 2026-09-26) · **Ticket:** SKODA-208 · **Fallback:** readable
+- **Resolved in the 208 importer slice:** there is no `in-page-nav` block. `parsers/in-page-nav.js` now emits **default
+  content**, a `<ul>` of `<a href="#<heading id>">Label</a>` links built last from the section headings the other
+  model parsers emitted. Links whose section is absent are dropped (Peaq/Epiq/Fabia/partial pages: 6–9 links). The
+  href is the pipeline heading id (github-slugger, verified on all 22 previewed pages: 0 dangling). The check now
+  fails any page that still emits `In-Page Nav`.
+- Icons, stickiness and the mobile form are the 208 UI half (a decorator on this list or a new block + contract).
 
 ### `spec-table`
-- **Status:** `resolve` (2026-09-25: the SKODA-208 amendment requires **0 block JS 404s** and moves Key Facts / Technical Data to **Should**) · **Ticket:** SKODA-208 · **Fallback:** readable (label/value text pairs)
-- **Resolve to:** existing blocks, i.e. `Columns` rows (label | value + unit) in a dark section (218) plus a download link, unless 208 decides to build `spec-table`. The check fails `Spec Table` until then.
-- **Emitted by:** `parsers/spec-table.js`
-- **Shape:** the `Technical Data` heading stays as default content above the table. Header `Spec Table`, then rows `[label, value + unit]`. The last row is `[<a href="…pdf">Download PDF</a>]` when the source has one. The optional background image isn't imported.
+- **Status:** `resolve` (shape 2, 2026-09-26) · **Ticket:** SKODA-208 · **Fallback:** readable
+- **Resolved in the 208 importer slice** to existing blocks. `parsers/spec-table.js` emits, as default content, the
+  optional band image, the `Technical Data` h2, then `Columns` (the source's 3-column stat grid: rows of 3 cells, the
+  last row padded, each cell `<p><strong>value unit</strong></p><p>label</p>`), then `<p><a href="…pdf">Download
+  PDF</a></p>`. The PDF is tracked in the media manifest as a `document` row for the DAM ingest.
+- **Not emitted:** the dark band (SKODA-218 `Section Metadata Style: dark`). `decorateStorySections` only consumes
+  Section Metadata on `body.story`; on a model page it would 404 as a block. The band needs that hook widened (UI half).
+- The check fails any page that still emits `Spec Table`.
 
 ### `spec-table-versions`
 - **Status:** `resolve` (801a amendment: 0 block JS 404s; the `version` block is named explicitly) · **Ticket:** SKODA-801a (story importer) · **Fallback:** readable
@@ -125,7 +133,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 ### `story-rail-subheading`
 - **Status:** `pinned` · **Ticket:** SKODA-208 · **Fallback:** **broken** (today `story-rail` treats a table with an unknown key as curated cards, so the settings render as cards)
 - **Form: a config key added to `story-rail`, not a block.** Row `[subheading, <text>]`, e.g. "Based on tags: Fabia". It's allowed at import, but pages that use it are held from publishing until `story-rail` reads the key (208).
-- **Emitted by:** `parsers/story-rail.js` (model page rails).
+- **Emitted by:** nothing since the 208 importer slice (2026-09-26). The model rails emit the heading + "Based on tags: …" line as default content before a config-only `Story Rail` (the story related-band pattern), so no page is held. The key stays pinned for the UI half if the rail should own its header.
 
 ### `tags-outline`
 - **Status:** `pinned` · **Ticket:** SKODA-208 (with SKODA-205) · **Fallback:** readable (renders as chips)

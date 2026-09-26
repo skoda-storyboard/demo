@@ -24,7 +24,7 @@
     "models": {
       "label": "Model pages",
       "gate": "W2c: SKODA-208",
-      "note": "The current output fails the block check: `hero` (only the empty boilerplate stub on main) and `Spec Table` (resolve → Columns + dark section, 208 amendment). `subheading` is a pending story-rail key (208), which holds publish."
+      "note": "208 importer slice (2026-09-26): all 22 EN model pages (11 models + 11 derivatives) imported, published and indexed with main blocks only (Hero Image (overlay), Cards (key-facts), Columns, Story Rail; the section nav is a link list). `cards-key-facts` renders as plain cards until the 208 UI half. Tag rails fill as 603/608 content lands."
     },
     "series": {
       "label": "Series hubs",

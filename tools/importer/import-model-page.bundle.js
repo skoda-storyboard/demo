@@ -21,9 +21,9 @@ var CustomImportScript = (() => {
     return a;
   };
   var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-  var __export = (target, all) => {
+  var __export = (target2, all) => {
     for (var name in all)
-      __defProp(target, name, { get: all[name], enumerable: true });
+      __defProp(target2, name, { get: all[name], enumerable: true });
   };
   var __copyProps = (to, from, except, desc) => {
     if (from && typeof from === "object" || typeof from === "function") {
@@ -43,139 +43,231 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/hero.js
   function parse(element, { document: document2 }) {
-    const img = element.querySelector(".image-wrapper img, img.media-cart-image, img");
-    const chip = element.querySelector(".entry-meta .label, span.label-secondary, .label");
+    const img = element.querySelector(".item.active .image-wrapper img, .image-wrapper img, img");
     const heading = element.querySelector("h1.entry-title, h1");
-    const teaser = element.querySelector(".entry-summary p, .entry-summary");
     if (!img && !heading) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const contentCell = [];
-    if (chip) {
-      const chipText = (chip.textContent || "").trim();
-      if (chipText) {
-        const p = document2.createElement("p");
-        p.textContent = chipText;
-        contentCell.push(p);
-      }
+    const content = [];
+    const chip = element.querySelector(".entry-meta .label, span.label-secondary, .label");
+    const chipText = chip ? (chip.textContent || "").replace(/\s+/g, " ").trim() : "";
+    if (chipText) {
+      const p = document2.createElement("p");
+      p.textContent = chipText;
+      content.push(p);
     }
-    if (heading) contentCell.push(heading);
-    if (teaser) contentCell.push(teaser);
-    const cells = [
-      ["Hero"],
-      [img || ""],
-      [contentCell]
-    ];
-    const table = WebImporter.DOMUtils.createTable(cells, document2);
-    element.replaceWith(table);
+    if (heading) {
+      const h1 = document2.createElement("h1");
+      h1.textContent = (heading.textContent || "").replace(/\s+/g, " ").trim();
+      content.push(h1);
+    }
+    const cells = [["Hero Image (overlay)"]];
+    if (img) cells.push([img]);
+    if (content.length) cells.push([content]);
+    element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
 
   // tools/importer/parsers/in-page-nav.js
-  function parse2(element, { document: document2 }) {
-    const anchors = Array.from(
-      element.querySelectorAll('ul.nav > li > a[href], .model-nav-content a[href], a[href^="#"]')
-    );
-    const seen = /* @__PURE__ */ new Set();
-    const cleanAnchors = [];
-    anchors.forEach((a) => {
-      const href = a.getAttribute("href") || "";
-      const label = (a.textContent || "").trim();
-      if (!href || !label) return;
-      const key = `${href}::${label}`;
-      if (seen.has(key)) return;
-      seen.add(key);
-      const link = document2.createElement("a");
-      link.setAttribute("href", href);
-      link.textContent = label;
-      cleanAnchors.push(link);
+  var clean = (text) => String(text || "").replace(/\s+/g, " ").trim();
+  var STRIP = /[^\p{L}\p{M}\p{N}\p{Pc} -]/gu;
+  function headingIds(document2) {
+    const ids = /* @__PURE__ */ new Map();
+    const seen = /* @__PURE__ */ new Map();
+    document2.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((h) => {
+      const base = (h.textContent || "").toLowerCase().replace(STRIP, "").replace(/ /g, "-");
+      let id = base;
+      let n = seen.get(base) || 0;
+      while (seen.has(id)) {
+        n += 1;
+        id = `${base}-${n}`;
+      }
+      seen.set(base, n);
+      seen.set(id, 0);
+      ids.set(h, id);
     });
-    if (cleanAnchors.length === 0) {
-      element.replaceWith(...element.childNodes);
+    return ids;
+  }
+  function target(document2, key) {
+    const tagged = document2.querySelector(`[data-model-key="${key}"]`);
+    if (tagged) return tagged;
+    if (key === "intro") {
+      return document2.querySelector(".so-widget-sow-editor h2, .widget_sow-editor h2");
+    }
+    return null;
+  }
+  function parse2(element, { document: document2 }) {
+    const links = Array.from(element.querySelectorAll('ul.nav > li > a[href^="#"], a[href^="#"]'));
+    const ids = headingIds(document2);
+    const ul = document2.createElement("ul");
+    const used = /* @__PURE__ */ new Set();
+    links.forEach((a) => {
+      const key = (a.getAttribute("href") || "").slice(1);
+      const label = clean(a.textContent);
+      if (!key || !label || used.has(key)) return;
+      const heading = target(document2, key);
+      const id = heading && ids.get(heading);
+      if (!id) return;
+      used.add(key);
+      const li = document2.createElement("li");
+      const link = document2.createElement("a");
+      link.setAttribute("href", `#${id}`);
+      link.textContent = label;
+      li.append(link);
+      ul.append(li);
+    });
+    if (!ul.children.length) {
+      element.remove();
       return;
     }
-    const cells = [["In-Page Nav"]];
-    cleanAnchors.forEach((a) => cells.push([a]));
-    const table = WebImporter.DOMUtils.createTable(cells, document2);
-    element.replaceWith(table);
+    element.replaceWith(ul);
   }
 
   // tools/importer/parsers/key-facts.js
   function parse3(element, { document: document2 }) {
-    const heading = element.querySelector("h2");
-    const items = Array.from(element.querySelectorAll(":scope > .items > .item, .items > .item"));
+    const items = Array.from(element.querySelectorAll(".items > .item"));
     if (items.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
     }
     const cells = [["Cards (key-facts)"]];
     items.forEach((item) => {
-      const img = item.querySelector("img");
+      const img = item.querySelector(".item-image img, img");
       const title = item.querySelector(".item-text .item-title, .item-text h3, .item-title, h3");
-      const paras = Array.from(item.querySelectorAll(".item-text p, p"));
-      const bodyCell = [];
-      if (title) {
-        bodyCell.push(title.cloneNode(true));
+      const body = [];
+      const titleText = title ? (title.textContent || "").replace(/\s+/g, " ").trim() : "";
+      if (titleText) {
+        const h3 = document2.createElement("h3");
+        h3.textContent = titleText;
+        body.push(h3);
       }
-      paras.forEach((p) => bodyCell.push(p));
-      cells.push([img || "", bodyCell]);
+      const textRoot = item.querySelector(".item-text") || item;
+      textRoot.querySelectorAll("p").forEach((p) => {
+        if ((p.textContent || "").trim()) body.push(p);
+      });
+      if (!img && body.length === 0) return;
+      cells.push([img || "", body]);
     });
-    const table = WebImporter.DOMUtils.createTable(cells, document2);
-    if (heading) {
-      element.replaceWith(heading, table);
-    } else {
-      element.replaceWith(table);
+    const out = [];
+    const heading = element.querySelector("h2");
+    const headingText = heading ? (heading.textContent || "").replace(/\s+/g, " ").trim() : "";
+    if (headingText) {
+      const h2 = document2.createElement("h2");
+      h2.textContent = headingText;
+      h2.setAttribute("data-model-key", "keyfacts");
+      out.push(h2);
     }
+    out.push(WebImporter.DOMUtils.createTable(cells, document2));
+    element.replaceWith(...out);
   }
 
   // tools/importer/parsers/spec-table.js
+  var PER_ROW = 3;
   function parse4(element, { document: document2 }) {
-    const heading = element.querySelector("h2");
-    const items = Array.from(element.querySelectorAll(":scope > .items > .item, .items > .item"));
+    const items = Array.from(element.querySelectorAll(".items > .item"));
     if (items.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const cells = [["Spec Table"]];
-    items.forEach((item) => {
-      var _a, _b, _c;
-      const value = (((_a = item.querySelector(".item-value")) == null ? void 0 : _a.textContent) || "").trim();
-      const unit = (((_b = item.querySelector(".item-unit")) == null ? void 0 : _b.textContent) || "").trim();
-      const title = (((_c = item.querySelector(".item-title")) == null ? void 0 : _c.textContent) || "").trim();
-      const valueText = [value, unit].filter(Boolean).join(" ");
-      cells.push([title, valueText]);
-    });
-    const pdfLink = element.querySelector(".buttons a[href], a.btn[href]");
-    if (pdfLink) {
+    const clean3 = (node) => node ? (node.textContent || "").replace(/\s+/g, " ").trim() : "";
+    const stats = items.map((item) => {
+      const value = [clean3(item.querySelector(".item-value")), clean3(item.querySelector(".item-unit"))].filter(Boolean).join(" ");
+      const label = clean3(item.querySelector(".item-title"));
+      const cell = [];
+      if (value) {
+        const p = document2.createElement("p");
+        const strong = document2.createElement("strong");
+        strong.textContent = value;
+        p.append(strong);
+        cell.push(p);
+      }
+      if (label) {
+        const p = document2.createElement("p");
+        p.textContent = label;
+        cell.push(p);
+      }
+      return cell;
+    }).filter((cell) => cell.length);
+    const out = [];
+    const bgImg = element.querySelector(".bg-image img");
+    if (bgImg) {
+      const p = document2.createElement("p");
+      p.append(bgImg);
+      out.push(p);
+    }
+    const headingText = clean3(element.querySelector("h2"));
+    if (headingText) {
+      const h2 = document2.createElement("h2");
+      h2.textContent = headingText;
+      h2.setAttribute("data-model-key", "techdata");
+      out.push(h2);
+    }
+    if (stats.length) {
+      const cells = [["Columns"]];
+      for (let i = 0; i < stats.length; i += PER_ROW) {
+        const row = stats.slice(i, i + PER_ROW);
+        while (row.length < Math.min(PER_ROW, stats.length)) row.push("");
+        cells.push(row);
+      }
+      out.push(WebImporter.DOMUtils.createTable(cells, document2));
+    }
+    const pdf = element.querySelector(".buttons a[href], a.btn[href]");
+    if (pdf) {
+      const p = document2.createElement("p");
       const a = document2.createElement("a");
-      a.setAttribute("href", pdfLink.getAttribute("href"));
-      a.textContent = (pdfLink.textContent || "Download PDF").trim();
-      cells.push([a, ""]);
+      a.setAttribute("href", pdf.getAttribute("href"));
+      a.textContent = clean3(pdf) || "Download PDF";
+      p.append(a);
+      out.push(p);
     }
-    const table = WebImporter.DOMUtils.createTable(cells, document2);
-    if (heading) {
-      element.replaceWith(heading, table);
-    } else {
-      element.replaceWith(table);
-    }
+    element.replaceWith(...out);
   }
 
   // tools/importer/parsers/story-rail.js
-  var RAIL_CONFIG = {
-    derivatives: { template: "skoda_model", heading: "Bodywork / Derivatives", tagRail: false },
-    news: { template: "press_release", heading: "News", tagRail: true },
-    "press-kits": { template: "press_kit", heading: "Press Kits", tagRail: true },
-    stories: { template: "story", heading: "Stories", tagRail: true },
-    images: { template: "image", heading: "Images", tagRail: true },
-    videos: { template: "video", heading: "Videos", tagRail: true }
+  var RAILS = {
+    derivatives: { template: "skoda_model", heading: "Bodywork / Derivatives" },
+    news: { template: "press_release", heading: "News" },
+    "press-kits": { template: "press_kit", heading: "Press Kits" },
+    stories: { template: "story", heading: "Stories" },
+    images: { template: "image", heading: "Images", limit: "20" },
+    videos: { template: "video", heading: "Videos", limit: "20" }
   };
-  function parse5(element, { document: document2 }) {
+  var FACET_KEYS = ["model", "bodywork", "derivative"];
+  var clean2 = (text) => String(text || "").replace(/\s+/g, " ").trim();
+  function facetsFromHref(href) {
+    const out = {};
+    let query = "";
+    try {
+      query = new URL(href, "https://www.skoda-storyboard.com").search;
+    } catch (e) {
+      return out;
+    }
+    new URLSearchParams(query).forEach((value, key) => {
+      const m = key.match(/^filter\[([a-z0-9_-]+)\](?:\[\d*\])?$/i);
+      if (!m || !value) return;
+      const facet = m[1].toLowerCase();
+      if (!FACET_KEYS.includes(facet)) return;
+      out[facet] = out[facet] || [];
+      const slug = value.toLowerCase();
+      if (!out[facet].includes(slug)) out[facet].push(slug);
+    });
+    return out;
+  }
+  function allLink(root) {
+    return root.querySelector('a.search-results-header-link[href*="filter"]');
+  }
+  function modelSegments(document2, url) {
+    const canonical = document2.querySelector('link[rel="canonical"]');
+    const href = url || canonical && canonical.getAttribute("href") || "";
+    const m = String(href).match(/\/skoda-model\/([a-z0-9/-]+)/i);
+    return m ? m[1].toLowerCase().split("/").filter(Boolean) : [];
+  }
+  function parse5(element, { document: document2, url, params }) {
     let node = element;
     let railId = null;
     while (node && node !== document2.documentElement) {
-      const id = node.id;
-      if (id && Object.prototype.hasOwnProperty.call(RAIL_CONFIG, id)) {
-        railId = id;
+      if (node.id && Object.prototype.hasOwnProperty.call(RAILS, node.id)) {
+        railId = node.id;
         break;
       }
       node = node.parentElement;
@@ -184,26 +276,61 @@ var CustomImportScript = (() => {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const config = RAIL_CONFIG[railId];
+    const rail = RAILS[railId];
     const headingEl = element.querySelector(".search-results-heading, h2, h3");
-    let headingText = config.heading;
+    let headingText = rail.heading;
+    let subText = "";
     if (headingEl) {
+      const sub = headingEl.querySelector(".subheading");
+      subText = sub ? clean2(sub.textContent) : "";
       const clone = headingEl.cloneNode(true);
       clone.querySelectorAll(".subheading").forEach((s) => s.remove());
-      const t = (clone.textContent || "").trim();
-      if (t) headingText = t;
+      headingText = clean2(clone.textContent) || headingText;
     }
-    const cells = [
-      ["Story Rail"],
-      ["heading", headingText],
-      ["template", config.template],
-      ["tags", "elroq"]
-    ];
-    if (config.tagRail) {
-      cells.push(["subheading", "Based on tags: Elroq"]);
+    const rows = [["Story Rail"], ["template", rail.template]];
+    let viewAll = null;
+    if (railId === "derivatives") {
+      const segs = modelSegments(document2, params && params.originalURL || url);
+      if (!segs.length) {
+        console.warn("[story-rail] derivatives rail: no /skoda-model/<slug> in the page URL; dropped");
+        element.remove();
+        return;
+      }
+      rows.push(["path", segs.length > 1 ? `/en/skoda-model/${segs[0]}` : `/en/skoda-model/${segs[0]}/`]);
+    } else {
+      const own = allLink(element);
+      const link = own || allLink(document2);
+      const facets = link ? facetsFromHref(link.getAttribute("href")) : {};
+      FACET_KEYS.forEach((f) => {
+        if (facets[f]) rows.push([f, facets[f].join(", ")]);
+      });
+      if (rows.length === 2) {
+        console.warn(`[story-rail] ${railId}: no model filter on the page; dropped`);
+        element.remove();
+        return;
+      }
+      if (rail.limit) rows.push(["limit", rail.limit]);
+      if (own) {
+        const target2 = new URL(own.getAttribute("href"), "https://www.skoda-storyboard.com");
+        const qs = new URLSearchParams();
+        FACET_KEYS.forEach((f) => (facets[f] || []).forEach((v) => qs.append(`filter[${f}][]`, v)));
+        viewAll = document2.createElement("a");
+        viewAll.setAttribute("href", `${target2.origin}${target2.pathname}?${qs.toString().replace(/%5B/g, "[").replace(/%5D/g, "]")}`);
+        viewAll.textContent = clean2(own.textContent) || "All";
+        rows.push(["viewall", viewAll]);
+      }
     }
-    const table = WebImporter.DOMUtils.createTable(cells, document2);
-    element.replaceWith(table);
+    const h2 = document2.createElement("h2");
+    h2.textContent = headingText;
+    h2.setAttribute("data-model-key", railId);
+    const out = [h2];
+    if (subText) {
+      const p = document2.createElement("p");
+      p.textContent = subText;
+      out.push(p);
+    }
+    out.push(WebImporter.DOMUtils.createTable(rows, document2));
+    element.replaceWith(...out);
   }
 
   // tools/importer/transformers/skoda-model-cleanup.js
@@ -242,6 +369,8 @@ var CustomImportScript = (() => {
         // .social-share/.media-cart-flyout/.share-bar names do not exist here but
         // are kept as harmless defensive no-ops for reuse on sibling model pages.
         ".scroll-top",
+        // SiteOrigin spacer widget (Peaq/Epiq: an empty padding div before the description)
+        ".so-panel.widget_skoda-offset",
         ".social-share",
         ".media-cart-flyout",
         ".share-bar",
@@ -613,14 +742,25 @@ var CustomImportScript = (() => {
     "/en/series/winter-tips",
     "/en/skoda-geneva-strube-interview-mp4",
     "/en/skoda-model/elroq",
+    "/en/skoda-model/elroq/elroq-rs",
+    "/en/skoda-model/elroq/elroq-sportline",
     "/en/skoda-model/enyaq-iv-2",
+    "/en/skoda-model/enyaq-iv-2/enyaq-rs",
+    "/en/skoda-model/enyaq-iv-2/enyaq-sportline-iv",
     "/en/skoda-model/epiq",
     "/en/skoda-model/kamiq",
     "/en/skoda-model/karoq-6",
+    "/en/skoda-model/karoq-6/karoq-sportline",
     "/en/skoda-model/new-fabia",
     "/en/skoda-model/new-kodiaq",
+    "/en/skoda-model/new-kodiaq/kodiaq-rs",
+    "/en/skoda-model/new-kodiaq/new-kodiaq-iv",
+    "/en/skoda-model/new-kodiaq/new-kodiaq-sportline",
     "/en/skoda-model/new-superb",
+    "/en/skoda-model/new-superb/new-superb-iv",
     "/en/skoda-model/octavia",
+    "/en/skoda-model/octavia/octavia-rs",
+    "/en/skoda-model/octavia/octavia-sportline",
     "/en/skoda-model/peaq",
     "/en/skoda-model/scala",
     "/en/skoda-octavia-combi-rs-4x4-2",
@@ -688,9 +828,9 @@ var CustomImportScript = (() => {
     const rest = href.slice(m[0].length);
     const cut = rest.search(/[?#]/);
     const tail = cut === -1 ? "" : rest.slice(cut);
-    let target = edsPath(cut === -1 ? rest : rest.slice(0, cut));
-    target = DEMO_ALIASES[target] || target;
-    return ALLOWED.has(target) ? `${target}${tail}` : null;
+    let target2 = edsPath(cut === -1 ? rest : rest.slice(0, cut));
+    target2 = DEMO_ALIASES[target2] || target2;
+    return ALLOWED.has(target2) ? `${target2}${tail}` : null;
   }
   function transform4(hookName, element, payload) {
     if (hookName !== TransformHook3.afterTransform) return;
@@ -731,15 +871,15 @@ var CustomImportScript = (() => {
   function splitParagraph(img, paragraph, caption, document2) {
     const link = img.closest("a");
     const linkedImage = link && paragraph.contains(link) && link.querySelectorAll("img").length === 1 && !(link.textContent || "").trim();
-    const target = linkedImage ? link : img;
+    const target2 = linkedImage ? link : img;
     const afterRange = document2.createRange();
-    afterRange.setStartAfter(target);
+    afterRange.setStartAfter(target2);
     afterRange.setEnd(paragraph, paragraph.childNodes.length);
     const after = paragraph.cloneNode(false);
     after.append(afterRange.extractContents());
     const beforeRange = document2.createRange();
     beforeRange.selectNodeContents(paragraph);
-    beforeRange.setEndBefore(target);
+    beforeRange.setEndBefore(target2);
     const before = paragraph.cloneNode(false);
     before.append(beforeRange.extractContents());
     const imageNode = imageContainer(img, document2, linkedImage ? link : null);
@@ -792,9 +932,9 @@ var CustomImportScript = (() => {
       }
       const link = img.closest("a");
       const linkedImage = link && link.querySelectorAll("img").length === 1 && !(link.textContent || "").trim();
-      const target = linkedImage ? link : img;
+      const target2 = linkedImage ? link : img;
       const marker = document2.createComment("image");
-      target.replaceWith(marker);
+      target2.replaceWith(marker);
       const imageNode = imageContainer(img, document2, linkedImage ? link : null);
       marker.replaceWith(withCaption(imageNode, caption, document2));
     });
@@ -803,20 +943,19 @@ var CustomImportScript = (() => {
   // tools/importer/import-model-page.js
   var parsers = {
     hero: parse,
-    "in-page-nav": parse2,
     "key-facts": parse3,
     "spec-table": parse4,
-    "story-rail": parse5
+    "story-rail": parse5,
+    "in-page-nav": parse2
   };
   var PAGE_TEMPLATE = {
     name: "model-page",
-    description: "\u0160koda model page (skoda_model CPT). Hero + in-page nav + Model Description + Key Facts + Technical Data + 6 index-driven rails. Metadata template=skoda_model (body class), category from URL. Content-driven detection only.",
-    urls: ["https://www.skoda-storyboard.com/en/skoda-model/elroq/"],
+    description: "\u0160koda model page (skoda_model CPT, 22 EN pages incl. derivatives). Hero Image (overlay) + section-link list + Model Description + Cards (key-facts) + Technical Data (Columns + PDF) + up to 6 index-driven Story Rails. Widgets located by class (ids are missing on some pages).",
+    urls: ["https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/"],
     blocks: [
       { name: "hero", instances: ["article.skoda_model > .carousel"] },
-      { name: "in-page-nav", instances: ["nav.model-nav, .model-nav"] },
-      { name: "key-facts", instances: ["#keyfacts .so-widget-ys-so-widget-highlights"] },
-      { name: "spec-table", instances: ["#techdata .so-widget-ys-so-widget-techdata"] },
+      { name: "key-facts", instances: [".so-widget-ys-so-widget-highlights"] },
+      { name: "spec-table", instances: [".so-widget-ys-so-widget-techdata"] },
       {
         name: "story-rail",
         instances: [
@@ -827,14 +966,15 @@ var CustomImportScript = (() => {
           "#images .search-results-container",
           "#videos .search-results-container"
         ]
-      }
+      },
+      { name: "in-page-nav", instances: [".model-nav"] }
     ],
     sections: [
       { id: "section-1", name: "Hero", selector: ["article.skoda_model > .carousel"], style: null, blocks: ["hero"], defaultContent: [] },
-      { id: "section-2", name: "In-page nav", selector: [".model-nav"], style: null, blocks: ["in-page-nav"], defaultContent: [] },
-      { id: "section-3", name: "Model Description", selector: ["#intro"], style: null, blocks: [], defaultContent: ["#intro h2", "#intro p"] },
-      { id: "section-4", name: "Key Facts", selector: ["#keyfacts"], style: null, blocks: ["key-facts"], defaultContent: [] },
-      { id: "section-5", name: "Technical Data", selector: ["#techdata"], style: null, blocks: ["spec-table"], defaultContent: [] },
+      { id: "section-2", name: "Section nav", selector: [".model-nav"], style: null, blocks: ["in-page-nav"], defaultContent: [] },
+      { id: "section-3", name: "Model Description", selector: [".so-panel.widget_sow-editor"], style: null, blocks: [], defaultContent: [".so-widget-sow-editor"] },
+      { id: "section-4", name: "Key Facts", selector: [".so-panel.widget_ys-so-widget-highlights"], style: null, blocks: ["key-facts"], defaultContent: [] },
+      { id: "section-5", name: "Technical Data", selector: [".so-panel.widget_ys-so-widget-techdata"], style: null, blocks: ["spec-table"], defaultContent: [] },
       { id: "section-6", name: "Bodywork / Derivatives", selector: ["#derivatives"], style: null, blocks: ["story-rail"], defaultContent: [] },
       { id: "section-7", name: "News", selector: ["#news"], style: null, blocks: ["story-rail"], defaultContent: [] },
       { id: "section-8", name: "Press Kits", selector: ["#press-kits"], style: null, blocks: ["story-rail"], defaultContent: [] },
@@ -843,14 +983,38 @@ var CustomImportScript = (() => {
       { id: "section-11", name: "Videos", selector: ["#videos"], style: null, blocks: ["story-rail"], defaultContent: [] }
     ]
   };
-  var transformers = [
-    transform,
-    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform2] : [],
-    transform3,
-    transform4
-  ];
-  function executeTransformers(hookName, element, payload) {
-    const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE });
+  var FACET_KEYS2 = ["model", "bodywork", "derivative"];
+  function pageFacets(document2) {
+    const link = document2.querySelector('a.search-results-header-link[href*="filter"]');
+    const out = {};
+    if (!link) return out;
+    let query = "";
+    try {
+      query = new URL(link.getAttribute("href"), "https://www.skoda-storyboard.com").search;
+    } catch (e) {
+      return out;
+    }
+    new URLSearchParams(query).forEach((value, key) => {
+      const m = key.match(/^filter\[([a-z0-9_-]+)\](?:\[\d*\])?$/i);
+      const facet = m && m[1].toLowerCase();
+      if (!facet || !FACET_KEYS2.includes(facet) || !value) return;
+      out[facet] = [.../* @__PURE__ */ new Set([...out[facet] || [], value.toLowerCase()])];
+    });
+    return out;
+  }
+  function metadataOverrides(facets) {
+    const meta = { template: "skoda_model" };
+    const tags = [];
+    FACET_KEYS2.forEach((f) => {
+      if (!facets[f]) return;
+      meta[f] = facets[f].join(", ");
+      tags.push(...facets[f]);
+    });
+    if (tags.length) meta.tags = [...new Set(tags)].join(", ");
+    return meta;
+  }
+  function executeTransformers(transformers, hookName, element, payload, template) {
+    const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template });
     transformers.forEach((transformerFn) => {
       try {
         transformerFn.call(null, hookName, element, enhancedPayload);
@@ -879,8 +1043,10 @@ var CustomImportScript = (() => {
     transform: (payload) => {
       const { document: document2, url, params } = payload;
       const main = document2.body;
-      executeTransformers("beforeTransform", main, payload);
-      const pageBlocks = findBlocksOnPage(document2, PAGE_TEMPLATE);
+      const template = __spreadProps(__spreadValues({}, PAGE_TEMPLATE), { metadata: metadataOverrides(pageFacets(document2)) });
+      const transformers = [transform, transform2, transform3, transform4];
+      executeTransformers(transformers, "beforeTransform", main, payload, template);
+      const pageBlocks = findBlocksOnPage(document2, template);
       pageBlocks.forEach((block) => {
         if (!block.element.parentNode) return;
         const parser = parsers[block.name];
@@ -894,7 +1060,8 @@ var CustomImportScript = (() => {
           console.warn(`No parser found for block: ${block.name}`);
         }
       });
-      executeTransformers("afterTransform", main, payload);
+      main.querySelectorAll("[data-model-key]").forEach((el) => el.removeAttribute("data-model-key"));
+      executeTransformers(transformers, "afterTransform", main, payload, template);
       WebImporter.rules.transformBackgroundImages(main, document2);
       normalizeImages(main, document2);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);

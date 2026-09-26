@@ -3,9 +3,30 @@
     {
       "name": "model-page",
       "urls": [
-        "https://www.skoda-storyboard.com/en/skoda-model/elroq/"
+        "https://www.skoda-storyboard.com/en/skoda-model/elroq/",
+        "https://www.skoda-storyboard.com/en/skoda-model/enyaq-iv-2/",
+        "https://www.skoda-storyboard.com/en/skoda-model/epiq/",
+        "https://www.skoda-storyboard.com/en/skoda-model/kamiq/",
+        "https://www.skoda-storyboard.com/en/skoda-model/karoq-6/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-fabia/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-superb/",
+        "https://www.skoda-storyboard.com/en/skoda-model/octavia/",
+        "https://www.skoda-storyboard.com/en/skoda-model/peaq/",
+        "https://www.skoda-storyboard.com/en/skoda-model/scala/",
+        "https://www.skoda-storyboard.com/en/skoda-model/elroq/elroq-rs/",
+        "https://www.skoda-storyboard.com/en/skoda-model/elroq/elroq-sportline/",
+        "https://www.skoda-storyboard.com/en/skoda-model/enyaq-iv-2/enyaq-rs/",
+        "https://www.skoda-storyboard.com/en/skoda-model/enyaq-iv-2/enyaq-sportline-iv/",
+        "https://www.skoda-storyboard.com/en/skoda-model/karoq-6/karoq-sportline/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/kodiaq-rs/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/new-kodiaq-iv/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/new-kodiaq-sportline/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-superb/new-superb-iv/",
+        "https://www.skoda-storyboard.com/en/skoda-model/octavia/octavia-rs/",
+        "https://www.skoda-storyboard.com/en/skoda-model/octavia/octavia-sportline/"
       ],
-      "description": "Škoda model page (skoda_model CPT, Media Room side). Full-bleed hero (model image + 'Models' chip + model-name h1 overlay) -> 9-anchor in-page icon nav -> Model Description rich text -> Key Facts (Highlights) cards -> Technical Data spec table -> 6 index-driven rails (Bodywork/Derivatives + News/Press Kits/Stories/Images/Videos 'Based on tags: <model>'). Spec: docs/ui-specs/template-model-page.md; content model T3 (SKODA-TEMPLATE-CONTENT-MODELS.md); ticket SKODA-208.",
+      "description": "Škoda model page (skoda_model CPT, Media Room side): 22 EN pages, 11 models + 11 derivatives (source skoda_model-sitemap.xml). Hero Image (overlay) (image + 'Models' chip + model-name h1) -> section-link list (default content, links only to emitted headings) -> Model Description (editor widgets, default content) -> Cards (key-facts) -> Technical Data (band image + Columns stat grid + PDF link) -> up to 6 index-driven Story Rails (Bodywork/Derivatives by path; News/Press Kits/Stories/Images/Videos by the page's model/bodywork/derivative filter). Widgets located by class (their #intro/#keyfacts/#techdata ids are missing on some pages); in-page-nav parses last. Spec: docs/ui-specs/template-model-page.md; ticket SKODA-208.",
       "blocks": [
         {
           "name": "hero",
@@ -14,21 +35,15 @@
           ]
         },
         {
-          "name": "in-page-nav",
-          "instances": [
-            "nav.model-nav, .model-nav"
-          ]
-        },
-        {
           "name": "key-facts",
           "instances": [
-            "#keyfacts .so-widget-ys-so-widget-highlights"
+            ".so-widget-ys-so-widget-highlights"
           ]
         },
         {
           "name": "spec-table",
           "instances": [
-            "#techdata .so-widget-ys-so-widget-techdata"
+            ".so-widget-ys-so-widget-techdata"
           ]
         },
         {
@@ -40,6 +55,12 @@
             "#stories .search-results-container",
             "#images .search-results-container",
             "#videos .search-results-container"
+          ]
+        },
+        {
+          "name": "in-page-nav",
+          "instances": [
+            ".model-nav"
           ]
         }
       ],
@@ -58,7 +79,7 @@
         },
         {
           "id": "section-2",
-          "name": "In-page nav",
+          "name": "Section nav",
           "selector": [
             ".model-nav"
           ],
@@ -72,20 +93,19 @@
           "id": "section-3",
           "name": "Model Description",
           "selector": [
-            "#intro"
+            ".so-panel.widget_sow-editor"
           ],
           "style": null,
           "blocks": [],
           "defaultContent": [
-            "#intro h2",
-            "#intro p"
+            ".so-widget-sow-editor"
           ]
         },
         {
           "id": "section-4",
           "name": "Key Facts",
           "selector": [
-            "#keyfacts"
+            ".so-panel.widget_ys-so-widget-highlights"
           ],
           "style": null,
           "blocks": [
@@ -97,7 +117,7 @@
           "id": "section-5",
           "name": "Technical Data",
           "selector": [
-            "#techdata"
+            ".so-panel.widget_ys-so-widget-techdata"
           ],
           "style": null,
           "blocks": [

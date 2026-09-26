@@ -158,21 +158,19 @@
       "fallback": "readable",
       "shape": 1,
       "emittedBy": [
-        "parsers/hero.js",
         "parsers/hero-banner.js"
       ],
-      "resolveTo": "emit Hero Image (overlay) / Hero Image (archive); blocks/hero is an empty boilerplate stub"
+      "resolveTo": "emit Hero Image (overlay) / Hero Image (archive); blocks/hero is an empty boilerplate stub. parsers/hero.js (model) resolved in SKODA-208: Hero Image (overlay)"
     },
     {
       "id": "in-page-nav",
       "block": "in-page-nav",
-      "status": "pinned",
+      "status": "resolve",
       "ticket": "SKODA-208",
       "fallback": "readable",
-      "shape": 1,
-      "emittedBy": [
-        "parsers/in-page-nav.js"
-      ]
+      "shape": 2,
+      "emittedBy": [],
+      "resolveTo": "SKODA-208: the model nav is default content, a link list to the emitted section headings (parsers/in-page-nav.js); no in-page-nav block"
     },
     {
       "id": "spec-table",
@@ -180,11 +178,9 @@
       "status": "resolve",
       "ticket": "SKODA-208",
       "fallback": "readable",
-      "shape": 1,
-      "emittedBy": [
-        "parsers/spec-table.js"
-      ],
-      "resolveTo": "map Technical Data to Columns + a dark section + a download link (SKODA-208 amendment: 0 block JS 404s; Key Facts / Tech Data are Should)"
+      "shape": 2,
+      "emittedBy": [],
+      "resolveTo": "SKODA-208: Technical Data is default content + a Columns stat grid (3 cells a row) + the PDF link (parsers/spec-table.js); no spec-table block"
     },
     {
       "id": "spec-table-versions",
@@ -240,9 +236,7 @@
       "ticket": "SKODA-208",
       "fallback": "broken",
       "shape": 1,
-      "emittedBy": [
-        "parsers/story-rail.js"
-      ]
+      "emittedBy": []
     },
     {
       "id": "cards-tiles",
