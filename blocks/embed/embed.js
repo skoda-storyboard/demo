@@ -37,13 +37,14 @@ const RATIOS = {
   '1x1': '1 / 1',
 };
 
+// A self-hosted video file, detected by extension before any provider host check.
+const VIDEO_FILE_RE = /\.(mp4|webm|mov|m4v)$/i;
+
 /**
- * Detects the provider and whether it is audio from a URL host.
+ * Detects the provider and whether it is audio from a URL host (or a video-file extension).
  * @param {URL} url The source URL
  * @returns {{ provider: string, isAudio: boolean }}
  */
-const VIDEO_FILE_RE = /\.(mp4|webm|mov|m4v)$/i;
-
 function detectProvider(url) {
   if (VIDEO_FILE_RE.test(url.pathname)) return { provider: 'file', isAudio: false };
   const host = url.hostname.replace(/^www\./, '').toLowerCase();
