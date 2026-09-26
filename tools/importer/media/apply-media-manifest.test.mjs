@@ -92,3 +92,33 @@ test('apply dry-run reports rewrites without touching pages or writing the cart 
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('known oversized partial media is deferred to the mandatory push gate, unknown media still fails', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-media-deferred-'));
+  try {
+    const { manifest, index } = fixture(dir);
+    const page = path.join(dir, 'page.plain.html');
+    const oversized = 'https://cdn.example.test/2025/too-big.jpg';
+    const doc = `<figure><img src="${oversized}" alt="Large" data-caption="Keep"></figure>`;
+    const record = JSON.parse(readFileSync(manifest, 'utf8'));
+    record.rows[logicalId(oversized)] = {
+      logical_id: logicalId(oversized),
+      source_url: oversized,
+      status: 'partial',
+      steps: { deliver: 'skipped', dam: 'done' },
+      note: 'no safe delivery rendition: oversize-no-derivative-under-threshold',
+    };
+    writeFileSync(manifest, JSON.stringify(record));
+    writeFileSync(page, doc);
+    const result = await run(dir, manifest, index, [page]);
+    assert.match(result.stdout, /1 image\(s\) deferred to mandatory import:push gate/);
+    assert.equal(readFileSync(page, 'utf8'), doc);
+
+    const unknown = '<img src="https://cdn.example.test/unknown.jpg">';
+    writeFileSync(page, doc + unknown);
+    await assert.rejects(run(dir, manifest, index, [page]), /Media apply blocked/);
+    assert.equal(readFileSync(page, 'utf8'), doc + unknown);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

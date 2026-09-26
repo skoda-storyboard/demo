@@ -65,6 +65,9 @@ Then **`apply-media-manifest.mjs`** rewrites content `<img src>` →
 `delivery_url`, removes the old WordPress `srcset` ladder so EDS builds its own,
 and emits `content/media-index.json` (the cart resolver). A missing page or
 unresolved image fails the entire requested apply before changing any page;
+the sole exception is a manifest `partial` row explicitly marked
+`no safe delivery rendition`, whose original reference stays intact and is
+logged for the mandatory `import:push` strip-or-block gate;
 an asset appears in the cart index only when the DAM upload and deliverable
 original-download URL have both succeeded. `--dry-run` does not modify pages,
 the manifest, or the cart index.
@@ -99,9 +102,14 @@ npm run media:apply -- --pages content/en/skoda-model/elroq.plain.html
 # content store is available. Non-zero exit for missing pages or image defects.
 npm run media:audit -- --contentRoot content --out /path/to/m1-media-audit.json
 
-# 4. SKODA-506 must enforce its separate oversize gate before SKODA-602
-#    previews/publishes. These scripts do not implement the publish gate.
-#    After clearance, publish via the actual SKODA-602 content-ops workflow.
+# 4. import:push runs the mandatory SKODA-506 gate before DA push/preview,
+#    and rechecks before live publish. Dry-run reports changes without
+#    writing content or DA.
+npm run import:push -- --urls tools/importer/urls-<name>.txt --dry-run
+npm run import:push -- --urls tools/importer/urls-<name>.txt
+# Review preview, then run the separate publish stage; this re-previews
+# conditioned DA content and never implicitly overwrites an author edit.
+npm run import:push -- --urls tools/importer/urls-<name>.txt --stage publish
 
 # Tests (no live DAM needed — mock server + pure-fn unit tests):
 npm run test:media
@@ -114,8 +122,37 @@ The audit reports per-page image counts, missing/empty alt, missing captions,
 misplaced images, unverified delivery, and pending DAM originals; it exits
 nonzero while any in-scope original is missing from DAM. It skips the
 alias annotated in `skoda-m1-url-set.txt`; it does not publish content or
-replace SKODA-506's publish-time byte check. A checkout without `content/`
+replace SKODA-506's gate in `import:push`. A checkout without `content/`
 correctly reports 42 missing pages rather than claiming media QA passed.
+
+### Mandatory inline-image gate (`import:push`, SKODA-506)
+
+`import:push` probes every inline `<img>` and `<picture>` reference against a
+default **10 MiB** limit; `--max-image-bytes <positive integer>` overrides it.
+The media builder's stored byte count is not proof of current safety. An
+oversized image is replaced with a verified `delivery_url` from the manifest
+or a verified source-CDN `-WxH` rendition. Obsolete oversized `srcset` and
+`<source>` candidates are removed; `alt`, `data-caption`, and surrounding
+content are retained. If no safe rendition exists, only noncritical body
+imagery is removed, retaining/promoting its caption. Unclassified, hero,
+card, or art-directed imagery instead blocks the page; unreachable or
+unmeasurable media never passes as safe. Stripped alt/caption values remain
+in the per-image report. DAM originals, the cart index, and Metadata
+`image`/`og:image` references are not changed.
+
+The gate runs before DA writes/preview and rechecks before publish.
+Publish-only requires DA to match the conditioned local document and a
+successful explicit preview of that exact content hash (`previewedHash` in
+the push manifest); it refreshes that preview before live publish.
+With `--publish-fragments`, a non-live fragment's DA source must also pass
+the byte gate unchanged; an oversized fragment blocks its publish rather
+than being rewritten behind the author's back.
+For mismatches, run the explicit push + preview stage first (a DA author-edit
+conflict still requires separate review, never an implicit overwrite).
+Changes and errors appear in console output and the per-page `media`/`error`
+fields of `tools/importer/reports/push/<stamp>.json`; the report also includes
+`args.maxImageBytes`. `--dry-run` writes only its report, never the imported
+page, DA source, or a bulk preview/live job.
 
 ### `--from-manifest` (re-ingest without the page file)
 
