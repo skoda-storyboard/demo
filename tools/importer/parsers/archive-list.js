@@ -27,12 +27,53 @@
  *   ['template', 'story']
  *   ['tag', 'peaq']
  *   ['columns', '3'] ['initial', '6'] ['perpage', '6'] ['excludefeatured', 'false']
+ *   ['feature', <picture> + <h3>Explore the Peaq</h3> + CTA links]   // model tag archives only (pending, SKODA-222)
  */
 // Locale-relative index path for a given page path ('/en/…' → '/en/query-index.json').
 function indexForPath(pathname) {
   const segs = pathname.split('/').filter(Boolean);
   const locale = segs[0] || 'en';
   return `/${locale}/query-index.json`;
+}
+
+// The source's featured model card (`.featured-model`, model tag archives only) as a `feature`
+// row. Contract `stories-feature` (pending, SKODA-222): the Stories block ignores the row until
+// 222 renders it, so the page reads as today. Placement is 222's: the source puts the card in
+// the right column spanning ~2 rows at desktop and first, full-width + collapsible, below 1024.
+function featureRows(element, document) {
+  const card = element.querySelector('.featured-model');
+  if (!card) return [];
+  const cell = document.createElement('div');
+  const img = card.querySelector('img');
+  if (img) {
+    img.removeAttribute('srcset');
+    img.removeAttribute('sizes');
+    const p = document.createElement('p');
+    p.append(img);
+    cell.append(p);
+  }
+  const title = (card.querySelector('h2, h3')?.textContent || '').trim();
+  if (title) {
+    const h = document.createElement('h3');
+    h.textContent = title;
+    cell.append(h);
+  }
+  card.querySelectorAll('a[href]').forEach((a) => {
+    const p = document.createElement('p');
+    const link = document.createElement('a');
+    link.setAttribute('href', a.getAttribute('href'));
+    link.textContent = (a.textContent || '').trim();
+    // primary CTA (.btn) vs secondary (.btn-secondary): <strong> marks the primary one
+    if (a.classList.contains('btn') && !a.classList.contains('btn-secondary')) {
+      const strong = document.createElement('strong');
+      strong.append(link);
+      p.append(strong);
+    } else {
+      p.append(link);
+    }
+    cell.append(p);
+  });
+  return [['feature', cell]];
 }
 
 // Archive scope row from the archive URL, or null when the URL isn't an archive.
@@ -84,6 +125,7 @@ export default function parse(element, { document }) {
     ['initial', '6'],
     ['perpage', '6'],
     ['excludefeatured', 'false'],
+    ...featureRows(element, document),
   ];
   element.replaceWith(WebImporter.DOMUtils.createTable(cells, document));
 }

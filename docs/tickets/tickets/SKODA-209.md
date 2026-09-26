@@ -60,28 +60,10 @@
 - Nav/footer Series + Podcast targets: a series hub (SKODA-207) or removal.
 - Kushaq tag: only the held quiz story links it (no archive page).
 - New archives get added to `skoda-archive-url-set.txt` as their stories arrive.
-- **Featured model card (spec'd, not built; stakeholder decision 2026-09-26: note it for now).**
-  **Source:** 11 of the 13 model tag archives render `.search-results-item > .featured-model` as grid item **#2**:
-  Elroq, Enyaq, Epiq, Fabia, Kamiq, Karoq, Kodiaq, Octavia, Peaq, Scala, Superb. Kylaq and Slavia have none, and
-  non-model tags (years, crew, …) have none. The card has:
-  - an `h2` "Explore the <Model>";
-  - a model-specific 1440px image (not the model page hero);
-  - a `ul` of CTAs: `a.btn` "Discover the highlights" → the model page, whose slug is not derivable from the tag
-    (`new-fabia`, `karoq-6`, `enyaq-iv-2`, `new-kodiaq`, `new-superb`); `a.btn-secondary` "Images" / "Videos" → the
-    media listings pre-filtered by model (some also by bodywork).
-
-  **Proposed build (option A):**
-  - `archive-list` captures the card into a `feature` row of the Stories table: value cell = picture + h2 + the
-    CTA links.
-  - The Stories block renders it as a special card at position 2, overridable with a `featureposition` row.
-  - Contract: add `feature` and `featureposition` to `stories.configKeys`.
-  - Editable/removable per page in DA. Re-import the 11 pages.
-  - The rejected alternative (B) built the card from the model page's index row; only Elroq is imported, and the
-    image and CTAs would differ from the source.
-
-  **CTA decision:** link site-relative (the allow-list rewrite) even before the targets exist. The model pages
-  (SKODA-208, W2c; only Elroq is live) and the Images/Videos listings (SKODA-608, W2b) 404 until they publish.
-  Measure the card's visual spec with DevTools when building.
+- **Featured model card** ("Explore the Epiq", 11 model tag archives): the **import is done here**. `archive-list`
+  emits a `feature` row (contract `stories-feature`, pinned, readable), and the 11 pages carry it in DA. The
+  **UI representation** (rendering, responsive placement, collapsible mobile title) is
+  **[SKODA-222](SKODA-222.md)**. It was split out because it spans two areas (stakeholder decision 2026-09-26).
 
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/template-category-archive.md`](../../ui-specs/template-category-archive.md)** (captured via Chrome DevTools on the live eMobility category + Octavia tag). Read it before implementing. Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).

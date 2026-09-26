@@ -222,9 +222,10 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2024/10/hero_car_timiano_ext_front_1f67abb3.png",
       "da_path": "",
       "alt": "",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2024/10/hero_car_timiano_ext_front_1f67abb3.png"
+        "https://cdn.skoda-storyboard.com/2024/10/hero_car_timiano_ext_front_1f67abb3.png",
+        "https://cdn.skoda-storyboard.com/2024/10/hero_car_timiano_ext_front_1f67abb3-1440x810.png"
       ],
       "aspect_crop_source": false,
       "bytes": 847688,
@@ -237,7 +238,8 @@
       "status": "done",
       "note": "",
       "page_refs": [
-        "en/skoda-model/elroq"
+        "en/skoda-model/elroq",
+        "en/tag/model/elroq"
       ],
       "dam_status": 200
     },
@@ -24823,6 +24825,296 @@
       "aspect_crop_source": true,
       "bytes": 2587750,
       "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "aac5f28c__Models_New_FABIA.png": {
+      "logical_id": "aac5f28c__Models_New_FABIA.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/05/Models_New_FABIA-1440x810.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/05/Models_New_FABIA.png",
+      "dam_page_path": "en/tag/model/fabia",
+      "page_refs": [
+        "en/tag/model/fabia"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/05/Models_New_FABIA.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/05/Models_New_FABIA-1440x810.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 906557,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "455af128__skoda-kamiq-fl-m67-introduction_f5576a3a.png": {
+      "logical_id": "455af128__skoda-kamiq-fl-m67-introduction_f5576a3a.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2023/09/skoda-kamiq-fl-m67-introduction_f5576a3a.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2023/09/skoda-kamiq-fl-m67-introduction_f5576a3a.png",
+      "dam_page_path": "en/tag/model/kamiq",
+      "page_refs": [
+        "en/tag/model/kamiq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2023/09/skoda-kamiq-fl-m67-introduction_f5576a3a.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2023/09/skoda-kamiq-fl-m67-introduction_f5576a3a.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 588519,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "3f0b542e__Hero-Front.png": {
+      "logical_id": "3f0b542e__Hero-Front.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2017/07/Hero-Front-1440x810.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2017/07/Hero-Front.png",
+      "dam_page_path": "en/tag/model/karoq",
+      "page_refs": [
+        "en/tag/model/karoq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2017/07/Hero-Front.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2017/07/Hero-Front-1440x810.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 1199058,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "7354f7bb__limo_hero_front_a21e4ecc.png": {
+      "logical_id": "7354f7bb__limo_hero_front_a21e4ecc.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2024/03/limo_hero_front_a21e4ecc-1440x810.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2024/03/limo_hero_front_a21e4ecc.png",
+      "dam_page_path": "en/tag/model/octavia",
+      "page_refs": [
+        "en/tag/model/octavia"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2024/03/limo_hero_front_a21e4ecc.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2024/03/limo_hero_front_a21e4ecc-1440x810.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 701962,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "94490c59__Navrh-bez-nazvu-21_ec34da00.png": {
+      "logical_id": "94490c59__Navrh-bez-nazvu-21_ec34da00.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/06/Navrh-bez-nazvu-21_ec34da00-1440x810.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/06/Navrh-bez-nazvu-21_ec34da00.png",
+      "dam_page_path": "en/tag/model/peaq",
+      "page_refs": [
+        "en/tag/model/peaq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/06/Navrh-bez-nazvu-21_ec34da00.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/06/Navrh-bez-nazvu-21_ec34da00-1440x810.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 2770032,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "455af128__skoda-scala-fl-m67-introduction_943461be.png": {
+      "logical_id": "455af128__skoda-scala-fl-m67-introduction_943461be.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2023/09/skoda-scala-fl-m67-introduction_943461be.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2023/09/skoda-scala-fl-m67-introduction_943461be.png",
+      "dam_page_path": "en/tag/model/scala",
+      "page_refs": [
+        "en/tag/model/scala"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2023/09/skoda-scala-fl-m67-introduction_943461be.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2023/09/skoda-scala-fl-m67-introduction_943461be.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 575924,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "3311ece9__limo_hero_e_front_54a5ed01.png": {
+      "logical_id": "3311ece9__limo_hero_e_front_54a5ed01.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2023/12/limo_hero_e_front_54a5ed01-1440x810.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2023/12/limo_hero_e_front_54a5ed01.png",
+      "dam_page_path": "en/tag/model/superb",
+      "page_refs": [
+        "en/tag/model/superb"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2023/12/limo_hero_e_front_54a5ed01.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2023/12/limo_hero_e_front_54a5ed01-1440x810.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 808709,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "9dbc14fb__kodiaq-front_b4e60be8.png": {
+      "logical_id": "9dbc14fb__kodiaq-front_b4e60be8.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2023/11/kodiaq-front_b4e60be8-1440x810.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2023/11/kodiaq-front_b4e60be8.png",
+      "dam_page_path": "en/tag/model/kodiaq",
+      "page_refs": [
+        "en/tag/model/kodiaq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2023/11/kodiaq-front_b4e60be8.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2023/11/kodiaq-front_b4e60be8-1440x810.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 988345,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "94490c59__skoda-epiq-m62-exterior-02_6d0dfc3f_f08a3a3d.jpg": {
+      "logical_id": "94490c59__skoda-epiq-m62-exterior-02_6d0dfc3f_f08a3a3d.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/06/skoda-epiq-m62-exterior-02_6d0dfc3f_f08a3a3d-1440x720.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/06/skoda-epiq-m62-exterior-02_6d0dfc3f_f08a3a3d.jpg",
+      "dam_page_path": "en/tag/model/epiq",
+      "page_refs": [
+        "en/tag/model/epiq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/06/skoda-epiq-m62-exterior-02_6d0dfc3f_f08a3a3d.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/06/skoda-epiq-m62-exterior-02_6d0dfc3f_f08a3a3d-1440x720.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 8494700,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "df14cfed__enyaq-front_9c8651b6.png": {
+      "logical_id": "df14cfed__enyaq-front_9c8651b6.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/01/enyaq-front_9c8651b6-1440x810.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/01/enyaq-front_9c8651b6.png",
+      "dam_page_path": "en/tag/model/enyaq",
+      "page_refs": [
+        "en/tag/model/enyaq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/01/enyaq-front_9c8651b6-272x182.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/01/enyaq-front_9c8651b6-1440x810.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 31689,
+      "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "n/a",

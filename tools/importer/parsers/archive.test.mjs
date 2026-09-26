@@ -57,6 +57,43 @@ test('tag archive → Stories scoped by the term slug; source pager removed', { 
   assert.doesNotMatch(doc.body.textContent, /Load more|Card/);
 });
 
+const FEATURED = `<div class="container"><div class="search-results"><div class="search-results-items">
+  <div class="search-results-item"><article class="article-teaser">Story 1</article></div>
+  <div class="search-results-item"><div class="featured-model"><h2 class="toggle">Explore the Epiq</h2>
+    <img src="https://cdn.x/epiq-1440x720.jpg" srcset="a 1x" sizes="100vw" alt="">
+    <ul><li><a class="btn" href="https://www.skoda-storyboard.com/en/skoda-model/epiq/">Discover the highlights</a></li>
+      <li class="images"><a class="btn-secondary" href="https://www.skoda-storyboard.com/en/images/?filter[model]%5B0%5D=epiq">Images</a></li>
+      <li class="videos"><a class="btn-secondary" href="https://www.skoda-storyboard.com/en/videos/?filter[model]%5B0%5D=epiq">Videos</a></li></ul></div></div>
+  <div class="search-results-item"><article class="article-teaser">Story 2</article></div>
+</div></div></div>`;
+
+test('model tag archive: featured model card → a feature row (SKODA-222 pending key)', { skip }, () => {
+  const doc = page('https://www.skoda-storyboard.com/en/tag/model/epiq/', FEATURED);
+  archiveList(doc.querySelector('.search-results-items'), { document: doc });
+  const table = doc.querySelector('table');
+  const trs = [...table.querySelectorAll('tr')];
+  const feature = trs.find((tr) => tr.firstElementChild.textContent.trim() === 'feature');
+  assert.ok(feature, 'feature row');
+  const cell = feature.children[1];
+  assert.equal(cell.querySelector('img').getAttribute('src'), 'https://cdn.x/epiq-1440x720.jpg');
+  assert.equal(cell.querySelector('img').hasAttribute('srcset'), false);
+  assert.equal(cell.querySelector('h3').textContent, 'Explore the Epiq');
+  const links = [...cell.querySelectorAll('a')].map((a) => [a.textContent, a.getAttribute('href'), !!a.closest('strong')]);
+  assert.deepEqual(links, [
+    ['Discover the highlights', 'https://www.skoda-storyboard.com/en/skoda-model/epiq/', true],
+    ['Images', 'https://www.skoda-storyboard.com/en/images/?filter[model]%5B0%5D=epiq', false],
+    ['Videos', 'https://www.skoda-storyboard.com/en/videos/?filter[model]%5B0%5D=epiq', false],
+  ]);
+  assert.ok(!rows(table).some(([k]) => k === 'featureposition'), 'placement is SKODA-222 layout, not imported');
+  assert.doesNotMatch(doc.body.textContent, /Story 1|Story 2/);
+});
+
+test('archives without a featured card emit no feature rows', { skip }, () => {
+  const doc = page('https://www.skoda-storyboard.com/en/tag/years/2026/', GRID);
+  archiveList(doc.querySelector('.search-results-items'), { document: doc });
+  assert.ok(!rows(doc.querySelector('table')).some(([k]) => k === 'feature'));
+});
+
 test('category and sub-category archives → Stories scoped by the story path prefix', { skip }, () => {
   [['https://www.skoda-storyboard.com/en/category/emobility/', '/en/emobility/'],
     ['https://www.skoda-storyboard.com/en/category/lifestyle/people/', '/en/lifestyle/people/']].forEach(([url, path]) => {

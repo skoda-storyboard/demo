@@ -108,6 +108,20 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Emitted by:** `parsers/key-facts.js`
 - **Shape:** the `Highlights` heading stays as default content above the table. Header `Cards (key-facts)`, then rows `[square <picture>, <h3>title</h3><p>text</p>]` (the cards row shape). The variant only changes the styling.
 
+### `stories-feature`
+- **Status:** `pinned` · **Ticket:** SKODA-222 · **Fallback:** **readable**. `stories` clears its authored rows
+  before rendering, so until 222 lands the card is simply absent and the page reads as it does without it.
+- **Form:** a config key added to `stories`, not a block. Row `[feature, <cell>]`. The cell holds a `<picture>`,
+  then an `<h3>` title ("Explore the Epiq"), then one `<p>` per CTA link. The primary CTA is wrapped in `<strong>`
+  (source `a.btn`); secondary CTAs are plain links (source `a.btn-secondary`).
+- **Placement is not imported.** It's responsive layout (SKODA-222). The source puts the card in the right column,
+  ~2 rows tall, at 1440, and first, full-width and collapsible (`h2.toggle`) at 768/390. In the DOM it's item 1.
+- **Emitted by:** `parsers/archive-list.js` from the source `.featured-model` card. That's on 11 model tag
+  archives: Elroq, Enyaq, Epiq, Fabia, Kamiq, Karoq, Kodiaq, Octavia, Peaq, Scala, Superb.
+- **CTA links** go through the SKODA-605 rewrite. The model pages (SKODA-208) and the Images/Videos listings
+  (SKODA-608) are on the allow-list, so the links are site-relative even before those pages are published
+  (stakeholder decision 2026-09-26).
+
 ### `story-rail-subheading`
 - **Status:** `pinned` · **Ticket:** SKODA-208 · **Fallback:** **broken** (today `story-rail` treats a table with an unknown key as curated cards, so the settings render as cards)
 - **Form: a config key added to `story-rail`, not a block.** Row `[subheading, <text>]`, e.g. "Based on tags: Fabia". It's allowed at import, but pages that use it are held from publishing until `story-rail` reads the key (208).

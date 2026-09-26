@@ -74,6 +74,41 @@ var CustomImportScript = (() => {
     const locale = segs[0] || "en";
     return `/${locale}/query-index.json`;
   }
+  function featureRows(element, document2) {
+    var _a;
+    const card = element.querySelector(".featured-model");
+    if (!card) return [];
+    const cell = document2.createElement("div");
+    const img = card.querySelector("img");
+    if (img) {
+      img.removeAttribute("srcset");
+      img.removeAttribute("sizes");
+      const p = document2.createElement("p");
+      p.append(img);
+      cell.append(p);
+    }
+    const title = (((_a = card.querySelector("h2, h3")) == null ? void 0 : _a.textContent) || "").trim();
+    if (title) {
+      const h = document2.createElement("h3");
+      h.textContent = title;
+      cell.append(h);
+    }
+    card.querySelectorAll("a[href]").forEach((a) => {
+      const p = document2.createElement("p");
+      const link = document2.createElement("a");
+      link.setAttribute("href", a.getAttribute("href"));
+      link.textContent = (a.textContent || "").trim();
+      if (a.classList.contains("btn") && !a.classList.contains("btn-secondary")) {
+        const strong = document2.createElement("strong");
+        strong.append(link);
+        p.append(strong);
+      } else {
+        p.append(link);
+      }
+      cell.append(p);
+    });
+    return [["feature", cell]];
+  }
   function scopeFor(pathname) {
     const segs = pathname.split("/").filter(Boolean);
     const [locale, kind, ...rest] = segs;
@@ -113,7 +148,8 @@ var CustomImportScript = (() => {
       ["columns", "3"],
       ["initial", "6"],
       ["perpage", "6"],
-      ["excludefeatured", "false"]
+      ["excludefeatured", "false"],
+      ...featureRows(element, document2)
     ];
     element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
