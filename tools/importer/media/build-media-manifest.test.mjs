@@ -25,6 +25,9 @@ async function mockDam() {
         if (!originalAvailable) { res.writeHead(404); res.end(); return; }
         res.writeHead(200, { 'content-type': 'image/jpeg', 'content-length': '8' });
         res.end(req.method === 'HEAD' ? undefined : 'ORIGINAL');
+      } else if (req.url === '/TD-Kodiaq-en.pdf') {
+        res.writeHead(200, { 'content-type': 'application/pdf', 'content-length': '9' });
+        res.end(req.method === 'HEAD' ? undefined : '%PDF-TECH');
       } else if (req.method === 'GET' && req.url.endsWith('.json')) {
         res.writeHead(200); res.end('{}');
       } else if (req.url.endsWith('.initiateUpload.json')) {
@@ -213,6 +216,45 @@ test('an approved ID list scopes re-ingest and rejects unknown or repeated entri
     writeFileSync(idsFile, `${id}\n${id}\n`);
     await assert.rejects(exec(process.execPath, args, options), /Duplicate media ID/);
     assert.equal(dam.uploads.length, 1);
+  } finally {
+    await dam.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a linked PDF is tracked as a document row, then ingested to the DAM as the original (SKODA-208)', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-media-doc-'));
+  const dam = await mockDam();
+  try {
+    const pdf = `${dam.base}/TD-Kodiaq-en.pdf`;
+    const id = logicalId(pdf);
+    const manifest = path.join(dir, 'manifest.json');
+    const content = path.join(dir, 'content', 'en', 'skoda-model');
+    mkdirSync(content, { recursive: true });
+    const page = path.join(content, 'new-kodiaq.plain.html');
+    writeFileSync(page, `<div><h2>Technical Data</h2><p><a href="${pdf}">Download PDF</a></p></div>`);
+    const options = { cwd: dir, env: { ...process.env, AEM_DAM_TOKEN: 'mock' } };
+
+    await exec(process.execPath, [script, '--pages', page, '--manifest', manifest], options);
+    let row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(row.kind, 'document');
+    assert.equal(row.title, 'Download PDF');
+    assert.deepEqual(row.steps, { deliver: 'n/a', dam: 'n/a', da: 'n/a' });
+    assert.equal(row.status, 'done');
+    assert.equal(row.delivery_url, '', 'the page keeps its source link');
+    assert.deepEqual(row.page_refs, ['en/skoda-model/new-kodiaq']);
+    assert.equal(dam.uploads.length, 0, 'delivery-only never uploads');
+
+    const damArgs = [script, '--from-manifest', '--manifest', manifest, '--dam-base', dam.base];
+    await exec(process.execPath, damArgs, options);
+    row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.deepEqual(dam.uploads, ['%PDF-TECH']);
+    assert.equal(row.steps.dam, 'done');
+    assert.match(row.dam_asset_path, /\/content\/dam\/storyboard\/en\/skoda-model\/new-kodiaq\/TD-Kodiaq-en\.pdf$/);
+    assert.equal(row.dam_original_url, pdf);
+
+    await exec(process.execPath, damArgs, options);
+    assert.equal(dam.uploads.length, 1, 're-run does not upload twice');
   } finally {
     await dam.close();
     rmSync(dir, { recursive: true, force: true });
