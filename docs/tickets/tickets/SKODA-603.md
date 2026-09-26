@@ -3,8 +3,8 @@
 - **Type:** import
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo)
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–3d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🟡 **W0 done** (tracker, pending-block contract + check, baseline). W1 is waiting on
-  610 and 506. See "Execution plan" below.
+- **Status (2026-09-26):** 🟡 **W0 done; W1 partly done** (5 set PRs re-pushed with 508/610, the 3 stale stories with 816);
+  **W2a stories: 31 published, 3 held.** 47 of 136 pages are live and indexed. See "Execution plan" below.
 
 ## Summary
 Run the import pipeline end-to-end on the pilot page set — a press-release article, the PR listing, and a couple of representative pages — and validate the result against the source.
@@ -65,7 +65,7 @@ state.
 |---|---|---|
 | **W0** setup ✅ | tracker + generator, pending-block registry + check, baseline | – |
 | **W1** | 11 corpus PRs; re-push the 5 set PRs + `/en` with 610; re-import the 3 stale stories (plates, Peaq record, Octavia) ✅ 2026-09-25 with SKODA-816 (all 18 DA stories) | 610 (PR #138), 506, **508** (caption regression on PR re-imports; code done 2026-09-25, PR re-imports are Title-only vs DA); the `Promo Box` header in the home importer. `Quote` is a pending *block*: until 220 lands, W1 publishes with the default blockquote fallback + `re-import on SKODA-220` |
-| **W2a** | 16 set + 28 corpus + series-linked stories (not the alias) | 801a (it owns the story importer; 603 owns push/publish/tracker/QA) |
+| **W2a** | 16 set + 28 corpus + series-linked stories (not the alias). ✅ 2026-09-26: 31 published, 3 held (see W2a results); series-linked stories still to do with 207 | 801a (it owns the story importer; 603 owns push/publish/tracker/QA) |
 | **W2b** | 2 listings + 36 image/video items | 608 |
 | **W2c** | 5 set + 11 corpus models | the 208 importer fix: `hero` → Hero Image; `in-page-nav` built (or mapped); `spec-table` mapped to Columns + a dark section (`resolve`); `subheading` read by story-rail. 208 requires 0 block JS 404s |
 | **W3** | 5 + 12 series hubs (`Cards (overlay, tiles)`); 4 + 12 press kits | 207, 805a, 805c. **Not 221**: it's Could, and plain cards are the documented fallback (805a amendment) |
@@ -108,6 +108,39 @@ explicitly approved.
   - A raw `version` table leaks from an Epiq story (contract `spec-table-versions`).
 - **Decided:** SKODA-824 highlight = **section style** (Section Metadata `Style` `highlight, dark|grey`).
   **Open:** `spec-table-versions` (208/801a).
+
+### W2a results (2026-09-26): stories
+- **Scope:** 34 open stories. The set and corpus rows had no push record; the mixed-reality alias is excluded (609
+  redirect).
+- **Pipeline:**
+  - Import with the current story-detail bundle, into scratch `.migration/wt-w2a/`.
+  - `import:validate-blocks`: 34 checked, **0 errors, 0 held**.
+  - Junk scan for source-chrome leaks.
+  - `media:build` in **delivery-only** mode: 412 images; 337 new delivery rows, 89 of them pre-conditioned
+    oversize masters; 74 already known. There is no DAM token in the environment, so the **DAM originals for the
+    media cart are pending** for these images. Re-run `media:build --dam-base …` once a token is available; page
+    content doesn't change.
+  - `media:apply`: exit 0, 381 rewrites. All image `src`s are manifest delivery URLs.
+  - `import:push` push + preview. Rendered preview QA at 1440 + 767, then approval, then publish.
+- **DA:** 15 of the pages already had DA documents without a push record. Each was byte-identical to the stale
+  pre-816 local output and had never been previewed or published (404 on both hosts), so they were untouched
+  machine drafts. They were replaced with `--force`. 17 were new.
+- **Published (31):** live 200 and indexed. Live QA at 1440: all 31 have the Hero Image with image, perex and
+  category row, visible images all load, 0 block/script 404s, clean `<title>`, and the footer. The live index went
+  from 31 to **62 rows**.
+- **Held (3):**
+  - `quiz-can-you-recognise-skoda-models-by-their-details` (preview only): the quiz widget imports as static text.
+    The config JSON is rendered as a paragraph, plus 42 `[ ]` answers and 16 quiz-UI lines. Needs an importer
+    mapping (SKODA-801a).
+  - `enyaq-and-elroq-now-double-as-gaming-consoles…` (preview only): the WordPress MediaElement video player leaks:
+    2 `mejs-controls.svg` images, timecodes, and a `javascript:void(0)` "Use Up/Down Arrow keys…" link. The `.mp4`
+    link itself survives (SKODA-801a).
+  - `the-skoda-elroq-reveals-its-sustainable-interior`: the **source URL returns 404**, so the importer received the
+    404 page. Not pushed. Fix `skoda-rail-feed-corpus.txt`.
+- **Also noted:** 144 source images have an empty `alt`. By SKODA-501 policy the importer doesn't invent alt text
+  (the build logs each one).
+- **Tracker:** the local `content/` story output was regenerated (`--force`), so the Imported/Blocks columns match
+  what's in DA. Stories: 42 imported, 39 published, **0 block errors**.
 
 ## Risks / Flags
 - This ticket has the widest dependency fan-in (blocks + media + import infra) — a slip in any upstream item blocks it.
