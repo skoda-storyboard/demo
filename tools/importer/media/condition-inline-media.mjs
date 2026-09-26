@@ -6,6 +6,11 @@ import {
 } from './media-lib.mjs';
 
 const TIMEOUT_MS = 20000;
+// The source CDN is S3-backed: a missing object answers 403, not 404.
+const MISSING = new Set([403, 404]);
+// Narrower substitutes (e.g. a -272x182 thumbnail) would render as a blown-up
+// thumbnail in a full-width body slot; strip or block instead.
+export const MIN_SUBSTITUTE_WIDTH = 768;
 
 export function imageLimit(value = OVERSIZE_BYTES) {
   const bytes = Number(value);
@@ -13,6 +18,29 @@ export function imageLimit(value = OVERSIZE_BYTES) {
     throw new Error('Maximum inline image size must be a positive integer number of bytes');
   }
   return bytes;
+}
+
+export function imageWidth(value = MIN_SUBSTITUTE_WIDTH) {
+  const px = Number(value);
+  if (!Number.isSafeInteger(px) || px < 1) {
+    throw new Error('Minimum substitute image width must be a positive integer number of pixels');
+  }
+  return px;
+}
+
+function tooNarrow(url, minWidth) {
+  const suffix = derivativeSuffix(url);
+  return !!suffix && Number(suffix.split('x')[0]) < minWidth;
+}
+
+// Extension-less URLs (e.g. Vimeo thumbnails) pass only on an image/* content-type.
+function checkType(url, type, typed) {
+  if (type && !/^image\//i.test(type) && !/^application\/octet-stream/i.test(type)) {
+    throw new Error(`Not an image response: ${url} (${type})`);
+  }
+  if (!typed && !/^image\//i.test(type || '')) {
+    throw new Error(`Not an image response: ${url} (${type || 'no content-type'})`);
+  }
 }
 
 function imageReferences(img) {
@@ -46,31 +74,24 @@ async function imageBytes(url, { fetchImpl, maxBytes, verify = false }) {
     if (!match) throw new Error('Unsupported inline data image');
     return Buffer.from(match[2], match[1] ? 'base64' : 'utf8').length;
   }
-  if (!isImageUrl(url)) throw new Error(`Not an image URL: ${url}`);
+  const typed = isImageUrl(url);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
     const head = await fetchImpl(url, { method: 'HEAD', signal: controller.signal });
-    if (head.status === 404) return null;
+    if (MISSING.has(head.status)) return null;
     if (!head.ok && head.status !== 405 && head.status !== 501) {
       throw new Error(`Image HEAD ${head.status}: ${url}`);
     }
-    const headType = head.headers.get('content-type');
-    if (head.ok && headType && !/^image\//i.test(headType)
-      && !/^application\/octet-stream/i.test(headType)) {
-      throw new Error(`Not an image response: ${url} (${headType})`);
-    }
+    if (head.ok) checkType(url, head.headers.get('content-type'), typed);
     const size = head.ok ? Number(head.headers.get('content-length')) : NaN;
     if (head.ok && Number.isSafeInteger(size) && size > maxBytes) return size;
     if (!verify && head.ok && Number.isSafeInteger(size) && size > 0) return size;
 
     const response = await fetchImpl(url, { signal: controller.signal });
-    if (response.status === 404) return null;
+    if (MISSING.has(response.status)) return null;
     if (!response.ok || !response.body) throw new Error(`Image GET ${response.status}: ${url}`);
-    const getType = response.headers.get('content-type');
-    if (getType && !/^image\//i.test(getType) && !/^application\/octet-stream/i.test(getType)) {
-      throw new Error(`Not an image response: ${url} (${getType})`);
-    }
+    checkType(url, response.headers.get('content-type'), typed);
     const reader = response.body.getReader();
     let count = 0;
     try {
@@ -129,9 +150,11 @@ function removeBodyImage(img) {
 }
 
 export async function conditionInlineMedia(html, {
-  base, manifest = { rows: {} }, maxBytes = OVERSIZE_BYTES, fetchImpl = fetch, cache = new Map(),
+  base, manifest = { rows: {} }, maxBytes = OVERSIZE_BYTES, minWidth = MIN_SUBSTITUTE_WIDTH,
+  fetchImpl = fetch, cache = new Map(),
 } = {}) {
   imageLimit(maxBytes);
+  imageWidth(minWidth);
   if (!base) throw new Error('A page URL is required to resolve inline image references');
   const { document } = new JSDOM(`<body>${html}</body>`).window;
   const changes = [];
@@ -168,12 +191,25 @@ export async function conditionInlineMedia(html, {
           ? sizedRenditions(urls[0]) : []),
       ].filter((url, i, all) => url && all.indexOf(url) === i);
       let safe = null;
+      const tooSmall = [];
       for (const candidate of candidates) {
         if (!sameFraming(urls[0], candidate)) continue;
+        if (candidate !== urls[0] && tooNarrow(candidate, minWidth)) {
+          tooSmall.push(candidate);
+          continue;
+        }
         const bytes = candidate === urls[0] ? lengths[0] : await measure(candidate, true);
         if (bytes !== null && bytes > 0 && bytes <= maxBytes) {
           safe = { url: candidate, bytes };
           break;
+        }
+      }
+      // Only report narrow renditions that exist, so the log explains the strip/block.
+      const narrow = [];
+      if (!safe) {
+        for (const candidate of tooSmall) {
+          const bytes = await measure(candidate, true);
+          if (bytes !== null && bytes > 0 && bytes <= maxBytes) narrow.push(candidate);
         }
       }
       if (safe) {
@@ -190,10 +226,12 @@ export async function conditionInlineMedia(html, {
           from: src,
           alt: img.getAttribute('alt'),
           caption: img.getAttribute('data-caption') || img.closest('figure')?.querySelector('figcaption')?.textContent || '',
+          ...(narrow.length ? { narrowerThanMinWidth: narrow } : {}),
         });
         removeBodyImage(img);
       } else {
-        throw new Error(`No safe rendition; hero/card or unclassified image cannot be stripped: ${src}`);
+        const why = narrow.length ? ` (renditions under ${minWidth}px ignored: ${narrow.join(', ')})` : '';
+        throw new Error(`No safe rendition; hero/card or unclassified image cannot be stripped: ${src}${why}`);
       }
     } catch (error) {
       errors.push(`${src}: ${error.message}`);

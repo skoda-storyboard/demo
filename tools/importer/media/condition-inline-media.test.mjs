@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { conditionInlineMedia, imageLimit } from './condition-inline-media.mjs';
+import { conditionInlineMedia, imageLimit, imageWidth } from './condition-inline-media.mjs';
+import { logicalId } from './media-lib.mjs';
 
 async function fixture(run, overrides = {}) {
   const requests = [];
@@ -10,9 +11,10 @@ async function fixture(run, overrides = {}) {
     const entry = overrides[req.url] || (req.url === '/big.jpg' ? 24 : null);
     if (entry === null) { res.writeHead(404); res.end(); return; }
     if (entry === 'error') { res.writeHead(503); res.end(); return; }
+    if (entry.status) { res.writeHead(entry.status, { 'content-type': 'application/xml' }); res.end(); return; }
     const bytes = typeof entry === 'number' ? entry : entry.bytes;
     const headers = {
-      'content-type': 'image/jpeg',
+      'content-type': entry.type || 'image/jpeg',
       ...(entry.noHeadLength && req.method === 'HEAD' ? {} : {
         'content-length': String(entry.headLength && req.method === 'HEAD' ? entry.headLength : bytes),
       }),
@@ -34,6 +36,8 @@ const opts = (base) => ({ base, maxBytes: 10 });
 test('configured byte limit rejects invalid values', () => {
   for (const value of [0, -1, 1.5, '', 'bogus']) assert.throws(() => imageLimit(value));
   assert.equal(imageLimit(10), 10);
+  for (const value of [0, -1, 1.5, 'bogus']) assert.throws(() => imageWidth(value));
+  assert.equal(imageWidth(1440), 1440);
 });
 
 test('inline image exactly at the threshold stays byte-for-byte unchanged', async () => {
@@ -146,4 +150,50 @@ test('a derivative with a falsely small HEAD is rejected after GET verification'
     assert.deepEqual(result.errors, []);
     assert.equal(result.changes[0].action, 'strip');
   }, { '/big-2560x1707.jpg': { bytes: 24, headLength: 8 } });
+});
+
+test('extension-less thumbnails pass on an image content-type, other types block', async () => {
+  // Real case: Vimeo thumbnails (i.vimeocdn.com/video/<id>-d_295x166?region=us).
+  await fixture(async (base) => {
+    const html = '<p><picture><img src="/video/2196437413-d_295x166?region=us" alt="Video"></picture></p>';
+    const result = await conditionInlineMedia(html, opts(base));
+    assert.deepEqual(result.errors, []);
+    assert.equal(result.html, html);
+    const page = await conditionInlineMedia('<p><img src="/video/page"></p>', opts(base));
+    assert.match(page.errors[0], /Not an image response: .*text\/html/);
+  }, {
+    '/video/2196437413-d_295x166?region=us': 8,
+    '/video/page': { bytes: 8, type: 'text/html' },
+  });
+});
+
+test('a CDN 403 means a missing derivative, so body imagery is stripped, not blocked', async () => {
+  // Real case: the S3-backed source CDN answers 403 for every absent -WxH rendition.
+  await fixture(async (base) => {
+    const result = await conditionInlineMedia('<p><picture><img src="/big.jpg" alt="Body"></picture></p>', opts(base));
+    assert.deepEqual(result.errors, []);
+    assert.equal(result.changes[0].action, 'strip');
+    const gone = await conditionInlineMedia('<p><img src="/gone.jpg"></p>', opts(base));
+    assert.match(gone.errors[0], /missing or empty/);
+  }, Object.fromEntries(['/gone.jpg', '/big-2560x1707.jpg', '/big-2048x1365.jpg', '/big-1920x1280.jpg',
+    '/big-1536x1024.jpg', '/big-1440x960.jpg', '/big-768x512.jpg', '/big-384x256.jpg', '/big-272x182.jpg']
+    .map((url) => [url, { status: 403 }])));
+});
+
+test('a thumbnail-width rendition is never substituted for a body image', async () => {
+  // Real case: the manifest delivery_url for a 18 MB master was its -272x182 thumbnail.
+  await fixture(async (base) => {
+    const src = `${new URL(base).origin}/big.jpg`;
+    const manifest = { rows: { [logicalId(src)]: { delivery_url: `${new URL(base).origin}/big-272x182.jpg` } } };
+    const html = '<p><picture><img src="/big.jpg" alt="Family"></picture></p>';
+    const result = await conditionInlineMedia(html, { ...opts(base), manifest });
+    assert.deepEqual(result.errors, []);
+    assert.equal(result.changes[0].action, 'strip');
+    assert.match(result.changes[0].narrowerThanMinWidth.join(), /big-272x182\.jpg/);
+    const hero = await conditionInlineMedia('<div class="hero-image"><div><img src="/big.jpg"></div></div>', { ...opts(base), manifest });
+    assert.match(hero.errors[0], /renditions under 768px ignored/);
+    const lowered = await conditionInlineMedia(html, { ...opts(base), manifest, minWidth: 200 });
+    assert.equal(lowered.changes[0].action, 'substitute');
+    assert.match(lowered.changes[0].to, /big-272x182\.jpg$/);
+  }, { '/big-272x182.jpg': 8 });
 });

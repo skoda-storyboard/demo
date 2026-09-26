@@ -87,9 +87,10 @@ One tool for every template (the per-template `upload-<name>.sh` scripts describ
 
 **SKODA-506's media gate is enforced by `import:push`:** it probes inline image
 bytes before DA push/preview and again before the live job. Oversized images
-receive a verified <=10 MiB rendition where available; otherwise only
-noncritical body imagery may be removed (caption retained). Unclassified,
-hero/card, or unmeasurable imagery blocks the page. See the
+receive a verified <=10 MiB rendition at least 768 px wide where available;
+otherwise only noncritical body imagery may be removed (caption retained).
+Unclassified, hero/card, or unmeasurable imagery blocks that page only; the
+rest of the batch continues. See the
 [`media/README.md`](../../tools/importer/media/README.md) for the threshold
 option and per-image report. Publish-only refuses DA/local mismatches and
 refreshes the preview before live publish.

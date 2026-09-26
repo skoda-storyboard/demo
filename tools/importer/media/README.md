@@ -131,19 +131,28 @@ correctly reports 42 missing pages rather than claiming media QA passed.
 default **10 MiB** limit; `--max-image-bytes <positive integer>` overrides it.
 The media builder's stored byte count is not proof of current safety. An
 oversized image is replaced with a verified `delivery_url` from the manifest
-or a verified source-CDN `-WxH` rendition. Obsolete oversized `srcset` and
+or a verified source-CDN `-WxH` rendition at least **768 px** wide
+(`--min-image-width <px>` overrides it; a `-272x182` thumbnail in a body slot
+is worse than a logged strip). The source CDN answers **403** for a missing
+rendition, so 403 and 404 both mean "absent". Extension-less URLs (e.g. Vimeo
+thumbnails) pass on an `image/*` content-type. Obsolete oversized `srcset` and
 `<source>` candidates are removed; `alt`, `data-caption`, and surrounding
 content are retained. If no safe rendition exists, only noncritical body
 imagery is removed, retaining/promoting its caption. Unclassified, hero,
 card, or art-directed imagery instead blocks the page; unreachable or
 unmeasurable media never passes as safe. Stripped alt/caption values remain
-in the per-image report. DAM originals, the cart index, and Metadata
-`image`/`og:image` references are not changed.
+in the per-image report, with `narrowerThanMinWidth` listing any existing
+rendition rejected for width. DAM originals, the cart index, and Metadata
+`image`/`og:image` references are not changed. A blocked page is skipped on its
+own (`blocked-media`, exit code 1); the rest of the batch still pushes.
 
 The gate runs before DA writes/preview and rechecks before publish.
 Publish-only requires DA to match the conditioned local document and a
 successful explicit preview of that exact content hash (`previewedHash` in
-the push manifest); it refreshes that preview before live publish.
+the push manifest); it refreshes that preview before live publish. Pages
+previewed before the gate existed have no `previewedHash`, so run one
+`--stage push,preview` before their first publish-only run. Each image is
+probed once per run; the preview/publish rechecks reuse that measurement.
 With `--publish-fragments`, a non-live fragment's DA source must also pass
 the byte gate unchanged; an oversized fragment blocks its publish rather
 than being rewritten behind the author's back.
@@ -151,7 +160,7 @@ For mismatches, run the explicit push + preview stage first (a DA author-edit
 conflict still requires separate review, never an implicit overwrite).
 Changes and errors appear in console output and the per-page `media`/`error`
 fields of `tools/importer/reports/push/<stamp>.json`; the report also includes
-`args.maxImageBytes`. `--dry-run` writes only its report, never the imported
+`args.maxImageBytes` and `args.minImageWidth`. `--dry-run` writes only its report, never the imported
 page, DA source, or a bulk preview/live job.
 
 ### `--from-manifest` (re-ingest without the page file)

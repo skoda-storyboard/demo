@@ -28,6 +28,7 @@
  *   --index <path>                 query index to poll after publish (default /en/query-index.json)
  *   --timeout <s>                  job + index polling timeout (default 300)
  *   --max-image-bytes <n>          maximum inline image size (default 10485760)
+ *   --min-image-width <px>         narrowest -WxH substitute the media gate may use (default 768)
  *
  * Per page: new | unchanged | update | conflict | overwrite (see push/push-lib.mjs
  * decideAction). A conflict is never overwritten without --force.
@@ -44,7 +45,9 @@ import {
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { uploadToDA, fetchWithRetry, OVERSIZE_BYTES } from './media/media-lib.mjs';
-import { conditionInlineMedia, imageLimit } from './media/condition-inline-media.mjs';
+import {
+  conditionInlineMedia, imageLimit, imageWidth, MIN_SUBSTITUTE_WIDTH,
+} from './media/condition-inline-media.mjs';
 import {
   parseList, wrapPage, contentHash, decideAction, PUSHING, chunk, parseJobDetails,
   fragmentPaths, imageCheck, summarize,
@@ -76,6 +79,7 @@ function parseArgs(argv) {
     force: false,
     publishFragments: false,
     maxImageBytes: OVERSIZE_BYTES,
+    minImageWidth: MIN_SUBSTITUTE_WIDTH,
   };
   for (let i = 0; i < argv.length; i += 1) {
     const k = argv[i];
@@ -90,6 +94,7 @@ function parseArgs(argv) {
     else if (k === '--index') a.index = v();
     else if (k === '--timeout') a.timeout = Number(v());
     else if (k === '--max-image-bytes') a.maxImageBytes = imageLimit(v());
+    else if (k === '--min-image-width') a.minImageWidth = imageWidth(v());
     else if (k === '--dry-run') a.dryRun = true;
     else if (k === '--force') a.force = true;
     else if (k === '--publish-fragments') a.publishFragments = true;
@@ -194,6 +199,15 @@ export default async function main(argv = process.argv.slice(2), {
   const h = hosts(a);
   const manifest = loadManifest(manifestFile);
   const mediaManifest = JSON.parse(readFileSync(mediaManifestFile, 'utf8'));
+  // One byte probe per image per run: the preview/publish/fragment rechecks reuse it.
+  const mediaCache = new Map();
+  const mediaGate = (html, p) => conditionInlineMedia(html, {
+    base: `${h.page}${p}.html`,
+    manifest: mediaManifest,
+    maxBytes: a.maxImageBytes,
+    minWidth: a.minImageWidth,
+    cache: mediaCache,
+  });
   let paths = parseList(readFileSync(a.list, 'utf8'));
   if (a.limit) paths = paths.slice(0, a.limit);
   log(`[push] ${paths.length} paths · stages=${[...a.stages].join(',')}${a.dryRun ? ' · DRY RUN' : ''}${a.force ? ' · FORCE' : ''}`);
@@ -211,9 +225,7 @@ export default async function main(argv = process.argv.slice(2), {
       continue;
     }
     const original = readFileSync(file, 'utf8');
-    const conditioned = await conditionInlineMedia(original, {
-      base: `${h.page}${p}.html`, manifest: mediaManifest, maxBytes: a.maxImageBytes,
-    });
+    const conditioned = await mediaGate(original, p);
     page.media = conditioned.changes;
     conditioned.changes.forEach((change) => log(`[media] ${p}: ${change.action} ${change.from}${change.to ? ` -> ${change.to}` : ''}`));
     if (conditioned.errors.length) {
@@ -246,12 +258,6 @@ export default async function main(argv = process.argv.slice(2), {
       && (a.stages.has('preview') || a.stages.has('publish'))) {
       page.error = 'DA differs from conditioned local content; run --stage push,preview first';
     }
-  }
-  const mediaBatchBlocked = pages.some((pg) => pg.action === 'blocked-media');
-  if (mediaBatchBlocked) {
-    pages.filter((pg) => pg.doc && !pg.error).forEach((pg) => {
-      pg.error = 'Batch media gate failed; no pages will be pushed or previewed';
-    });
   }
 
   // 2) push ------------------------------------------------------------------------------
@@ -294,9 +300,7 @@ export default async function main(argv = process.argv.slice(2), {
   if ((a.stages.has('preview') || wantPublish) && !a.dryRun) {
     const ready = pages.filter(inDA);
     for (const pg of ready) {
-      const gate = await conditionInlineMedia(pg.plain, {
-        base: `${h.page}${pg.path}.html`, manifest: mediaManifest, maxBytes: a.maxImageBytes,
-      });
+      const gate = await mediaGate(pg.plain, pg.path);
       if (gate.errors.length || gate.changes.length) {
         pg.error = `Media changed before preview: ${gate.errors.join('; ') || JSON.stringify(gate.changes)}`;
       }
@@ -346,14 +350,11 @@ export default async function main(argv = process.argv.slice(2), {
   for (const f of fragmentPaths(plains)) {
     const st = await adminStatus(a, f);
     const frag = { path: f, preview: st.preview, live: st.live };
-    if (st.live !== 200 && a.publishFragments && st.preview === 200
-      && !a.dryRun && !mediaBatchBlocked) {
+    if (st.live !== 200 && a.publishFragments && st.preview === 200 && !a.dryRun) {
       const source = await readDA(a, f);
       if (source.text == null) frag.error = 'Fragment has no DA source to condition';
       else {
-        const gate = await conditionInlineMedia(source.text, {
-          base: `${h.page}${f}.html`, manifest: mediaManifest, maxBytes: a.maxImageBytes,
-        });
+        const gate = await mediaGate(source.text, f);
         if (gate.errors.length || gate.changes.length) {
           frag.error = `Fragment media gate: ${gate.errors.join('; ') || JSON.stringify(gate.changes)}`;
         }
@@ -363,7 +364,7 @@ export default async function main(argv = process.argv.slice(2), {
   }
   if (!fragments.some((f) => f.error)) {
     for (const frag of fragments.filter((f) => f.live !== 200 && a.publishFragments
-      && f.preview === 200 && !a.dryRun && !mediaBatchBlocked)) {
+      && f.preview === 200 && !a.dryRun)) {
       const r = await adminFetch(`${ADMIN}/live/${a.org}/${a.repo}/${a.ref}${frag.path}`, { method: 'POST' });
       frag.published = r.status;
       if (r.ok) frag.live = 200;
@@ -387,9 +388,7 @@ export default async function main(argv = process.argv.slice(2), {
         pg.error = 'DA changed since preview; run --stage push,preview again';
         continue;
       }
-      const gate = await conditionInlineMedia(pg.plain, {
-        base: `${h.page}${pg.path}.html`, manifest: mediaManifest, maxBytes: a.maxImageBytes,
-      });
+      const gate = await mediaGate(pg.plain, pg.path);
       if (gate.errors.length || gate.changes.length) {
         pg.error = `Media changed before publish: ${gate.errors.join('; ') || JSON.stringify(gate.changes)}`;
         continue;
@@ -427,7 +426,7 @@ export default async function main(argv = process.argv.slice(2), {
   }
 
   // 6) report ------------------------------------------------------------------------------
-  if (!a.dryRun && !mediaBatchBlocked) saveManifest(manifest, manifestFile);
+  if (!a.dryRun) saveManifest(manifest, manifestFile);
   mkdirSync(reportDir, { recursive: true });
   const stamp = now.replace(/[:.]/g, '-');
   const report = {
@@ -439,6 +438,7 @@ export default async function main(argv = process.argv.slice(2), {
       force: a.force,
       publishFragments: a.publishFragments,
       maxImageBytes: a.maxImageBytes,
+      minImageWidth: a.minImageWidth,
       ref: a.ref,
     },
     summary: summarize(pages),

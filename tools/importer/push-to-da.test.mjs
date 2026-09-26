@@ -10,6 +10,7 @@ import { contentHash, wrapPage } from './push/push-lib.mjs';
 
 async function scenario(stage, remoteMatches, {
   previewed = false, image = 'small', extra = [], edited = false, fragmentBlocked = false,
+  blockedSibling = false,
 } = {}) {
   const dir = mkdtempSync(path.join(tmpdir(), 'skoda-506-push-'));
   const previousFetch = global.fetch;
@@ -25,7 +26,10 @@ async function scenario(stage, remoteMatches, {
   const requests = [];
   mkdirSync(path.join(contentDir, 'en'), { recursive: true });
   writeFileSync(path.join(contentDir, 'en', 'story.plain.html'), plain);
-  writeFileSync(list, '/en/story\n');
+  writeFileSync(list, `/en/story\n${blockedSibling ? '/en/blocked\n' : ''}`);
+  if (blockedSibling) {
+    writeFileSync(path.join(contentDir, 'en', 'blocked.plain.html'), '<div><img src="https://cdn.example.test/huge.jpg" alt="No rendition"></div>');
+  }
   writeFileSync(mediaManifestFile, '{"rows":{}}\n');
   const hash = contentHash(wrapPage(da));
   writeFileSync(manifestFile, JSON.stringify({
@@ -48,7 +52,7 @@ async function scenario(stage, remoteMatches, {
         status: 200, headers: { 'content-length': '8', 'content-type': 'image/jpeg' },
       });
     }
-    if (address.includes('cdn.example.test/big.jpg')) {
+    if (address.includes('cdn.example.test/big.jpg') || address.includes('cdn.example.test/huge.jpg')) {
       return new Response(null, {
         status: 200, headers: { 'content-length': '24', 'content-type': 'image/jpeg' },
       });
@@ -170,4 +174,18 @@ test('an unconditioned shared fragment cannot bypass the gate via --publish-frag
   assert.match(result.report.fragments[0].error, /Fragment media gate/);
   assert.ok(!result.requests.some((req) => req.includes('POST https://admin.hlx.page/live/')));
   assert.equal(result.report.pages[0].liveStatus, undefined);
+});
+
+test('a media-blocked page does not stop the rest of the batch', async () => {
+  const result = await scenario('push,preview', true, {
+    image: 'big', blockedSibling: true, extra: ['--max-image-bytes', '10'],
+  });
+  const [story, blocked] = result.report.pages;
+  assert.equal(blocked.action, 'blocked-media');
+  assert.match(blocked.error, /cannot be stripped/);
+  assert.equal(story.error, undefined);
+  assert.equal(story.valid, true);
+  assert.equal(result.state.pages['/en/story'].previewedHash, result.state.pages['/en/story'].hash);
+  assert.ok(!result.requests.some((req) => req.includes('/en/blocked') && req.startsWith('POST ')));
+  assert.equal(result.requests.filter((req) => req === 'HEAD https://cdn.example.test/big.jpg').length, 1);
 });
