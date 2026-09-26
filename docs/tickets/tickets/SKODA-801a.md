@@ -80,7 +80,9 @@ Two story-importer leaks hold 2 pages at preview. See SKODA-603 "W2a results".
   source as one video link (or an Embed row).
   **✅ Fixed 2026-09-26 (PR #164).** `.wp-video` now imports as an Embed table (`url` + `poster`), and the embed
   block plays `.mp4` / `.webm` / `.mov` / `.m4v` natively (`<video controls preload=metadata>`). The page is
-  re-imported and on preview, and goes live once #164 is merged.
+  re-imported and **published 2026-09-26** after #163/#164 merged. Live check at 1440/767: native video (53s,
+  1920×1080) with the poster, 0 player-chrome leaks, hero OK, footer OK, no overflow. Indexed. Embed regression
+  check: 54/54 real-page renders + 13/13 fixture cases identical to the previous code (see #164).
 - **Quiz widget** (`quiz-can-you-recognise-skoda-models-by-their-details`): the quiz's config JSON is rendered as a
   paragraph, answers become `[ ]` list items, and quiz controls ("Go to next question", "Finish quiz",
   "correct answers: 0") become text. Needs a decision: static Q&A content (drop the JSON and controls), or a
