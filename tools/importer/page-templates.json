@@ -331,7 +331,7 @@
       },
       "blocks": [
         {
-          "name": "hero-banner",
+          "name": "archive-hero",
           "instances": [
             "div.hero"
           ]
@@ -352,7 +352,7 @@
           ],
           "style": null,
           "blocks": [
-            "hero-banner"
+            "archive-hero"
           ],
           "defaultContent": []
         },

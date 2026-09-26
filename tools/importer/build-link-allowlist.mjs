@@ -4,7 +4,8 @@
  * transformers/skoda-links.js (SKODA-605).
  *
  * The import rewrites an absolute source-host link to site-relative only when its target
- * is a demo page: docs/planning/skoda-m1-url-set.txt + skoda-rail-feed-corpus.txt.
+ * is a demo page: docs/planning/skoda-m1-url-set.txt + skoda-rail-feed-corpus.txt
+ * + skoda-archive-url-set.txt (category / tag archives).
  * Transformers are self-contained scripts (no imports: the bundles and the transformer
  * validator load them standalone), so the list is written between the
  * `BEGIN/END GENERATED ALLOWLIST` markers. Paths use the importer's EDS form (edsPath:
@@ -24,13 +25,16 @@ import { parseSectionedList, mergeLists } from './push/m1-status-lib.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 export const SET = 'docs/planning/skoda-m1-url-set.txt';
 export const CORPUS = 'docs/planning/skoda-rail-feed-corpus.txt';
+export const ARCHIVES = 'docs/planning/skoda-archive-url-set.txt';
 export const TARGET = 'tools/importer/transformers/skoda-links.js';
 const BLOCK = /(\/\/ BEGIN GENERATED ALLOWLIST[^\n]*\n)[\s\S]*?(\/\/ END GENERATED ALLOWLIST)/;
 
-/** Build { paths, aliases } from the two list texts (pure; used by the test too). */
-export function buildAllowlist(setText, corpusText) {
-  const rows = mergeLists(parseSectionedList(setText), parseSectionedList(corpusText))
-    .filter((r) => !r.unmapped);
+/** Build { paths, aliases } from the list texts (pure; used by the test too). */
+export function buildAllowlist(setText, corpusText, archiveText = '') {
+  const rows = mergeLists(
+    mergeLists(parseSectionedList(setText), parseSectionedList(corpusText)),
+    parseSectionedList(archiveText),
+  ).filter((r) => !r.unmapped);
   const aliases = {};
   rows.filter((r) => r.alias).forEach((r) => { aliases[r.path] = r.alias; });
   const paths = rows.filter((r) => !r.alias).map((r) => (r.path === '/index' ? '/' : r.path));
@@ -49,6 +53,7 @@ export function readLists(root = ROOT) {
   return buildAllowlist(
     readFileSync(path.join(root, SET), 'utf8'),
     readFileSync(path.join(root, CORPUS), 'utf8'),
+    readFileSync(path.join(root, ARCHIVES), 'utf8'),
   );
 }
 

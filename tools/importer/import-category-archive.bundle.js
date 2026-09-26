@@ -41,34 +41,31 @@ var CustomImportScript = (() => {
     default: () => import_category_archive_default
   });
 
-  // tools/importer/parsers/hero-banner.js
+  // tools/importer/parsers/archive-hero.js
   function parse(element, { document: document2 }) {
-    const img = element.querySelector(".hero-image img, .image-wrapper img, img");
-    const heading = element.querySelector("h1, h2, .hero-title, .entry-title");
-    const perex = element.querySelector(".perex, .hero-caption p, .hero-content p");
-    const ctas = Array.from(element.querySelectorAll("a.btn, a.btn-secondary, .hero-content a, .cta a"));
-    if (!img && !heading) {
+    const img = element.querySelector(".hero-image img, img");
+    const labels = [...element.querySelectorAll(".hero-caption .label, .hero-caption .category > *")].map((l) => (l.textContent || "").replace(/\s+/g, " ").trim()).filter(Boolean);
+    const unique = labels.filter((l, i) => labels.indexOf(l) === i);
+    const docTitle = (document2.title || "").replace(/\s+[-–|]\s+Škoda Storyboard\s*$/, "").trim();
+    const title = unique.length ? unique.join(" ") : docTitle;
+    if (!img && !title) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const cells = [["Hero"]];
-    cells.push([img || ""]);
-    const contentCell = [];
-    if (heading) contentCell.push(heading);
-    if (perex && (perex.textContent || "").trim()) {
+    const out = [];
+    if (img) {
       const p = document2.createElement("p");
-      p.textContent = (perex.textContent || "").trim();
-      contentCell.push(p);
+      img.removeAttribute("srcset");
+      img.removeAttribute("sizes");
+      p.append(img);
+      out.push(p);
     }
-    ctas.forEach((a) => {
-      const link = document2.createElement("a");
-      link.setAttribute("href", a.getAttribute("href") || "#");
-      link.textContent = (a.textContent || "").trim();
-      if (link.textContent) contentCell.push(link);
-    });
-    if (contentCell.length) cells.push([contentCell]);
-    const table = WebImporter.DOMUtils.createTable(cells, document2);
-    element.replaceWith(table);
+    if (title) {
+      const h1 = document2.createElement("h1");
+      h1.textContent = title;
+      out.push(h1);
+    }
+    element.replaceWith(...out);
   }
 
   // tools/importer/parsers/archive-list.js
@@ -77,30 +74,48 @@ var CustomImportScript = (() => {
     const locale = segs[0] || "en";
     return `/${locale}/query-index.json`;
   }
+  function scopeFor(pathname) {
+    const segs = pathname.split("/").filter(Boolean);
+    const [locale, kind, ...rest] = segs;
+    if (kind === "tag" && rest.length) return ["tag", rest[rest.length - 1]];
+    if (kind === "category" && rest.length) return ["path", `/${locale}/${rest.join("/")}/`];
+    return null;
+  }
   function parse2(element, { document: document2 }) {
     const isArchive = element.matches(".archive-results, .search-results-items") || element.querySelector(".archive-results, .search-results-items");
     if (!isArchive) {
       element.replaceWith(...element.childNodes);
       return;
     }
+    const container = element.closest(".search-results") || element.parentElement;
+    if (container) {
+      container.querySelectorAll(".search-results-pagination, .ajax-loader-button-wrapper").forEach((n) => n.remove());
+    }
     const canonical = document2.querySelector('link[rel="canonical"]');
     const ogUrl = document2.querySelector('meta[property="og:url"]');
     const rawUrl = canonical && canonical.getAttribute("href") || ogUrl && ogUrl.getAttribute("content") || "";
-    let pathname = "/en/";
+    let pathname = "";
     try {
       pathname = new URL(rawUrl).pathname;
     } catch (e) {
     }
+    const scope = scopeFor(pathname);
+    if (!scope) {
+      console.warn(`[archive-list] no archive scope for canonical "${rawUrl}"; grid dropped`);
+      element.remove();
+      return;
+    }
     const cells = [
-      ["Listing"],
+      ["Stories"],
       ["index", indexForPath(pathname)],
-      ["path", pathname],
-      ["sort", "newest"],
+      ["template", "story"],
+      scope,
+      ["columns", "3"],
+      ["initial", "6"],
       ["perpage", "6"],
-      ["columns", "3"]
+      ["excludefeatured", "false"]
     ];
-    const table = WebImporter.DOMUtils.createTable(cells, document2);
-    element.replaceWith(table);
+    element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
 
   // tools/importer/transformers/skoda-page-cleanup.js
@@ -438,6 +453,21 @@ var CustomImportScript = (() => {
     "/en/10-724a",
     "/en/11-733",
     "/en/22-781-sport",
+    "/en/category/classic-cars",
+    "/en/category/concepts",
+    "/en/category/corporate-life",
+    "/en/category/design-eng",
+    "/en/category/emobility",
+    "/en/category/lifestyle",
+    "/en/category/lifestyle/adventures",
+    "/en/category/lifestyle/people",
+    "/en/category/lifestyle/sports",
+    "/en/category/models",
+    "/en/category/skoda-world",
+    "/en/category/skoda-world/design",
+    "/en/category/skoda-world/heritage",
+    "/en/category/skoda-world/innovation-and-technology",
+    "/en/category/skoda-world/responsibility",
     "/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france",
     "/en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca",
     "/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries",
@@ -547,6 +577,32 @@ var CustomImportScript = (() => {
     "/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour",
     "/en/skoda-world/the-skoda-elroq-reveals-its-sustainable-interior",
     "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too",
+    "/en/tag/company/design",
+    "/en/tag/company/production",
+    "/en/tag/crew/electro-vehicle",
+    "/en/tag/crew/electromobility",
+    "/en/tag/crew/emobility",
+    "/en/tag/crew/technology",
+    "/en/tag/derivative/sportline",
+    "/en/tag/environment/greenfuture",
+    "/en/tag/environment/sustainability",
+    "/en/tag/model/elroq",
+    "/en/tag/model/enyaq",
+    "/en/tag/model/epiq",
+    "/en/tag/model/fabia",
+    "/en/tag/model/kamiq",
+    "/en/tag/model/karoq",
+    "/en/tag/model/kodiaq",
+    "/en/tag/model/kylaq",
+    "/en/tag/model/octavia",
+    "/en/tag/model/peaq",
+    "/en/tag/model/scala",
+    "/en/tag/model/slavia",
+    "/en/tag/model/superb",
+    "/en/tag/people/stefani",
+    "/en/tag/years/2024",
+    "/en/tag/years/2025",
+    "/en/tag/years/2026",
     "/en/tiger-on-ice-test",
     "/en/videos",
     "/en/wrc-rally-test"
@@ -588,19 +644,19 @@ var CustomImportScript = (() => {
 
   // tools/importer/import-category-archive.js
   var parsers = {
-    "hero-banner": parse,
+    "archive-hero": parse,
     "archive-list": parse2
   };
   var PAGE_TEMPLATE = {
     name: "category-archive",
-    description: "\u0160koda category/tag archive listing. Hero banner -> index-driven facet-less Listing over the archive grid (scope from canonical URL). Metadata template=page. Content-driven detection only.",
+    description: "\u0160koda category/tag archive listing. Term hero (banner + h1, default content) -> index-driven Stories grid (tag or path scope from the canonical URL). Metadata template=page. Content-driven detection only.",
     urls: [
       "https://www.skoda-storyboard.com/en/category/emobility/",
       "https://www.skoda-storyboard.com/en/tag/model/elroq/"
     ],
     metadata: { template: "page" },
     blocks: [
-      { name: "hero-banner", instances: ["div.hero"] },
+      { name: "archive-hero", instances: ["div.hero"] },
       {
         name: "archive-list",
         instances: ["div.search-results.archive-results, .container .search-results-items"]
@@ -612,7 +668,7 @@ var CustomImportScript = (() => {
         name: "Hero",
         selector: ["div.hero"],
         style: null,
-        blocks: ["hero-banner"],
+        blocks: ["archive-hero"],
         defaultContent: []
       },
       {
