@@ -8,8 +8,8 @@
 
 ## Origin
 Side-by-side QA of the Epiq story (2026-09-24). No existing ticket covers the **inline sidebar**
-presentation. SKODA-904 is the M2 subscriber backend, and `docs/ui-specs/newsletter.md` names a
-`newsletter-stub` block that was never built (not in `blocks/`).
+presentation. SKODA-904 is the M2 subscriber backend. The `newsletter-stub` block already
+renders the Media Room footer form (SKODA-305); its sidebar presentation is not built.
 
 ## Problem
 The source sidebar opens with `.sidebar .newsletter-subscribe-widget` (345×355 at 1440, top of the
@@ -18,11 +18,15 @@ stories", an e-mail field, and a mint "Subscribe now!" pill on dark green. `skod
 drops it, so the EDS aside starts directly with "Explore more".
 
 ## Scope
-- Build the UI-only stub per **`docs/ui-specs/newsletter.md`** (inline sidebar presentation; the
-  spec was measured on this exact Epiq page): image header + heading, e-mail input, consent,
-  honeypot, and the "Subscribe now!" button. Submit shows a stubbed "check your email" state and
-  posts nothing (ESP wiring is SKODA-904).
-- Share the component with the topbar "Subscribe to our stories" dropdown where possible (same spec).
+- Extend the existing `newsletter-stub` for the measured inline sidebar presentation in
+  **`docs/ui-specs/newsletter.md`**: image header + heading, e-mail input, consent, and
+  "Subscribe now!" button. Reuse its key/value authoring contract and accessible form;
+  keep the footer variant unchanged. The production honeypot belongs to SKODA-904.
+  In M1 the form posts nothing:
+  validate locally, then show an honest **"Newsletter signup is not available yet"**
+  status, not "check your email" or any other success/confirmation message.
+  Never imply a subscription or confirmation email was sent.
+- Reuse the footer block's form and design tokens; the topbar host remains a header concern.
 - Importer: `skoda-story-aside.js` emits the stub block at the top of the sidebar section instead
   of dropping the widget. Heading text + image come from the source widget, so it stays authorable.
 - Out of scope: the side banner (`.side-banner .sa-bnr`, 345×345) → **SKODA-903** banner platform.
@@ -30,7 +34,14 @@ drops it, so the EDS aside starts directly with "Explore more".
 ## Acceptance Criteria
 - [ ] 1440: widget at the top of the aside, 345px wide, matching newsletter.md (colours, button, input).
 - [ ] Accessible form: labelled input, real button, visible focus, and an error for an invalid e-mail.
-- [ ] No network submission in M1; the stub state is clearly non-functional to QA.
+- [ ] No network submission in M1; after valid local input, the user sees
+      "Newsletter signup is not available yet" in an accessible status region.
+      Neither a success message nor an email-confirmation promise appears.
+- [ ] Consent/management links use verified published destinations. The source
+      sidebar links to `/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing/`
+      and `/en/newsletter-settings/`; verify their migrated targets before
+      authoring. Until then, use client-approved plain text, not fake links.
 
 ## Dependencies
-SKODA-904 (production service), SKODA-801 (aside rebuild), SKODA-903 (side banner, separate).
+SKODA-801 (aside rebuild). SKODA-904 (M2 ESP) and SKODA-903 (banner
+platform) are explicitly out of scope, not upstream dependencies.

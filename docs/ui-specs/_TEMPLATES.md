@@ -106,7 +106,8 @@ plugin).
   passing the metadata gate. SiteOrigin-heavy types (story, company, generic page) are
   imported via **flatten-to-default** (linear content only); full widget reconstruction
   stays with SKODA-801/814/604. **Custom microsite** (flatten → near-empty) is deferred
-  to SKODA-210, **press-kit** to SKODA-805–808, **newsletter** is service-only (SKODA-904).
+  to SKODA-210, **press-kit** to SKODA-805–808, **newsletter** has a built footer
+  stub, a planned M1 sidebar variant (SKODA-823), and an M2 service (SKODA-904).
   See [`../architecture/IMPORT-PIPELINE.md`](../architecture/IMPORT-PIPELINE.md).
 - Remaining: gap tickets (607/208/209/813/706) + wiring pointers into existing tickets + README/OVERVIEW.
 - **Added post block-recount (2026-09-15):** `custom_microsite` (`template-custom-full-width`, 201 STO
