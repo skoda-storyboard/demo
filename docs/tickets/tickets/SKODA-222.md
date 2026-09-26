@@ -2,6 +2,7 @@
 - **Epic:** E02, Core Blocks
 - **Type:** block feature + visual
 - **Phase:** A · **Milestone:** M1 Should (demo-visible on 11 model tag pages)
+- **GitHub issue:** [#167](https://github.com/skoda-storyboard/demo/issues/167)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
 - **Status (2026-09-26):** 🔵 TODO. **Content is already imported** (contract `stories-feature`, pinned):
   11 archives carry the card in DA, and the block ignores it until this ticket lands.
