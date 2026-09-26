@@ -72,5 +72,16 @@ reconstruct the media that exists in all 21 stories, and keep the rest of SKODA-
 - Upstream: SKODA-601 (importer), SKODA-801 (#113), SKODA-819 (was 219), SKODA-818, SKODA-502 (#111), SKODA-204 (#109), SKODA-501/506.
 - Downstream: SKODA-603 (43-URL import), SKODA-604 (full-fidelity hero stories), SKODA-704 visual sign-off.
 
+## Found in SKODA-603 W2a (2026-09-26)
+Two story-importer leaks hold 2 pages at preview. See SKODA-603 "W2a results".
+- **WordPress MediaElement video** (`enyaq-and-elroq-now-double-as-gaming-consoles…`): the player chrome is
+  flattened into content: 2 `mejs-controls.svg` images, `00:00`/`00:53` timecode paragraphs, and a
+  `javascript:void(0)` "Use Up/Down Arrow keys…" link. Strip `.mejs-*` / `.wp-video` chrome and keep the `.mp4`
+  source as one video link (or an Embed row).
+- **Quiz widget** (`quiz-can-you-recognise-skoda-models-by-their-details`): the quiz's config JSON is rendered as a
+  paragraph, answers become `[ ]` list items, and quiz controls ("Go to next question", "Finish quiz",
+  "correct answers: 0") become text. Needs a decision: static Q&A content (drop the JSON and controls), or a
+  quiz block (new contract).
+
 ## Import contract (SKODA-603)
 Contract(s) `gallery-slider`, `quote`, `columns-split`, `spec-table-versions` (proposed) in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). The story importer emits these pinned shapes. The raw `version` spec table (Epiq) must become `Spec Table (versions)` or text; the check fails `version`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

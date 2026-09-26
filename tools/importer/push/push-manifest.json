@@ -1,6 +1,14 @@
 {
   "version": 1,
   "pages": {
+    "/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france": {
+      "hash": "90613808691e3cccf06bf590f21185457f850d317acb326d0ac8d5fe1c1f0487",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
+    },
+    "/en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca": {
+      "hash": "967cba31eaa4634a9b767e31157fc64d477fd8ba2ee896b9fac7432292205bc8",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
     "/en/emobility/a-true-czech-from-spain": {
       "hash": "1a3a19416c4b30006ef3926538f4d98907f1a53cc5825813bcca7234083d7627",
       "pushedAt": "2026-09-25T21:21:19.238Z"
@@ -13,17 +21,57 @@
       "hash": "4f276a7f27c82e9b69fcd5c10aba79c2c01d6cac94750a9d35a9b2e2c06f6e2b",
       "pushedAt": "2026-09-25T21:21:19.238Z"
     },
+    "/en/emobility/camouflage-to-get-you-hooked": {
+      "hash": "135631df938b5a699c701f383241c06d062d002a9b3cb7ae2fea9967628b5c47",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
+    "/en/emobility/coffee-on-electric-wheels-elroq-and-enyaq-serving-coffee": {
+      "hash": "40b8211d7083aa1298ee321c71e12d7279d45fee5d44daf18d6e76fa2c35fe37",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
     "/en/emobility/come-and-play-skoda-is-heading-to-milan": {
       "hash": "047af65928ea6299296322a060782f0f21f2ef8dcd088401432eae44281ccc2d",
       "pushedAt": "2026-09-25T21:21:19.238Z"
+    },
+    "/en/emobility/designers-on-the-peaq-its-modern-durable-and-practical": {
+      "hash": "6d09d0fbbd99e183aa9ed9b5857318b56b0e20bc36f974777811a19c9106b53e",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
+    "/en/emobility/elroq-rs-in-a-robe-unveiling-the-secret-of-matte-paint": {
+      "hash": "6ff9889c1eef1749451e0d0d0a50df644a23088af2b2a31812f9d996931be6bb",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
     },
     "/en/emobility/even-opening-the-door-is-an-experience-says-the-designer-of-the-peaq-suv": {
       "hash": "7ae5311804b448dbff4af468fce5fc93700e805d32f91b9958ecf41757d77d55",
       "pushedAt": "2026-09-25T21:19:19.450Z"
     },
+    "/en/emobility/how-the-versatile-skoda-peaq-conquered-a-mountain-peak": {
+      "hash": "3764c62d6499167d4354a7fefb782f15832f3e3ae2549b48322506e671199a58",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
+    "/en/emobility/how-was-the-elroq-made-not-in-the-usual-way": {
+      "hash": "b39a7de7e01188a3735db5f001c4c3827c2524a91e153dd8ecf0494f81f43b69",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
+    "/en/emobility/make-use-of-the-frunk-unlock-with-your-phone-new-enhancements-for-elroq-and-enyaq": {
+      "hash": "5d237152fb419decc41502e77d6460d4b45c76f70a1b6073c364c90b2122f0eb",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
+    "/en/emobility/meet-the-peaq-comfort-just-like-at-home": {
+      "hash": "f7fce81d3ef5a0e85c8a2772d65cc58838a04755c305b2dc8b364a0fe3035130",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
+    },
+    "/en/emobility/meet-the-peaq-spacious-inside-and-out": {
+      "hash": "36234575c51ba0d6836567027e0a4e1b92d7d4e9827d7141cf2e6a1a0461882e",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
     "/en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan": {
       "hash": "164e38d0580b67391dcaa15e116876d8d3dd5625a32ced64cfb6fbeb0f4195bc",
       "pushedAt": "2026-09-25T21:21:19.238Z"
+    },
+    "/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia": {
+      "hash": "ce62c04b0d897ab5106829c5f084a78eef2f215b20d3cd6e5ffc2457a1def555",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
     },
     "/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging": {
       "hash": "f3cbe28e6a901583ce8232827ad2c88f50e67edc8aabf221e822d9d151e6626a",
@@ -33,9 +81,29 @@
       "hash": "27942ad70674efbcd5ccd7f1320795f7af44056039c3b84b5171aa96a506be9d",
       "pushedAt": "2026-09-25T21:21:19.238Z"
     },
+    "/en/emobility/skoda-elroq-and-a-happy-family": {
+      "hash": "2e5446d5d9e4f823eebb778905418de0f269754a55734695d2386994a11b6233",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
+    "/en/emobility/skoda-elroq-premiere-light-cube-camera-action": {
+      "hash": "8e0b4da86fc71b5dc7ba2aa55e1716b5872f13c8ccba227333538ac4ffd1f8d9",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds": {
       "hash": "429341d9bbc19c6ff94956fb266a17cd54854a7a7047b88a17bd17a3f1058f07",
       "pushedAt": "2026-09-25T21:23:23.146Z"
+    },
+    "/en/emobility/skoda-peaq-unparalleled-space-and-comfort": {
+      "hash": "0cd58779d7bdf243284be87632ad0337c15a5bda2e30520d5209e0d0002b8d0e",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
+    "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq": {
+      "hash": "9c010ee7cd2790f74b8c71b38362f92d02b51f5c7ced2a400e7518f284e40c9f",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
+    },
+    "/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq": {
+      "hash": "0c817d1dfb4e8148f21fb0815ecf569eed6e7dbedf3d908d818e6956313be051",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
     },
     "/en/emobility/the-skoda-peaq-will-win-you-over-fast": {
       "hash": "62ea06b5b863c4fc041e7ff51f72eee86436c25ca27d21af3f50bc15805393df",
@@ -53,9 +121,41 @@
       "hash": "199cefe1297bee13fa73927e193a5cc041a3bfbf4f33d5e103549308cad2968a",
       "pushedAt": "2026-09-25T21:21:19.238Z"
     },
+    "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague": {
+      "hash": "deee7962bfe9cd558f2aba32381bf94c305aca0166faae9350c22d37ca9fb67a",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
+    },
     "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving": {
       "hash": "2abe4483bb31368d7eeaa5f9a25c7f32d41293cd65701f606db5f410df1ad846",
       "pushedAt": "2026-09-25T21:21:19.238Z"
+    },
+    "/en/lifestyle/chainsaws-and-sparklers-discover-the-traditions-of-rally-fans": {
+      "hash": "37767fcdfd7911f39d01f855da48a8edf670e787d93b98f6f3006b8b0788a010",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
+    },
+    "/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling": {
+      "hash": "4780eccdfb624ac6589458f935a9a95622665f2c67556d56d5a1ade2b2a67776",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
+    },
+    "/en/lifestyle/la-dolce-vita-explore-the-surroundings-of-lake-como": {
+      "hash": "1a211b04835c163c5a4c285f404b51ea7ca17e10260761bcbcd8ffa373dea1cc",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
+    },
+    "/en/lifestyle/ouninpohja-finlands-roller-coaster-stage": {
+      "hash": "fda7c4f69ae152643d40c992b12fa768364c77e82ef9218091f574cd0218acd5",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
+    },
+    "/en/lifestyle/rs-four-ways-which-one-will-you-choose": {
+      "hash": "05abdc66beb92d094d41bdbca0136b04afb19a3a7f52a23b883a21858fdadd46",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
+    "/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones": {
+      "hash": "54fdb925ac1c327e0e3dd05db1649105c91d325821baebe668fae39fa222eac8",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
+    },
+    "/en/models/skoda-elroq-through-designers-eyes": {
+      "hash": "2d136b1a8981a7e77a6274c808883f2f3acb662c8f336d61b6a576e9ebbf02a5",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
     },
     "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs": {
       "hash": "24789ed6f5909bd1e444de81b255cbd2c010d768668073f5dd550cdc77c0e573",
@@ -102,13 +202,41 @@
       "hash": "869982693d2e381b8b33f62592ab2cfd90ce6d7b40e4445f088449edd0217bb5",
       "pushedAt": "2026-09-25T21:00:38.666Z"
     },
+    "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it": {
+      "hash": "630fa9f127a86038ad8a6eaf7ad0626f242f16e14af1a930220fb80f8088d5d9",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
+    },
     "/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute": {
       "hash": "65cce3e30aaf210c5f466cf28650e5f841043303ad34e1aba4624fdc4d92f000",
       "pushedAt": "2026-09-25T21:21:19.238Z"
     },
+    "/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car": {
+      "hash": "367ea15ba69256c0b48c931dade4871f702ea7c9832f86ea7117ce98a533a1c3",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
+    "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality": {
+      "hash": "06ad9a839c3b28abd90b16952ffdd9176a2bef2476adcd7edfeeb2aecd19cef8",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
+    },
+    "/en/skoda-world/how-the-skoda-octavia-reached-365-km-h": {
+      "hash": "304f2b9dfde7a56b9c0e49d961ddbd084eec0d704294792638614f71601502a5",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
+    },
+    "/en/skoda-world/legend-chris-froome-takes-you-behind-the-scenes-of-the-tour-de-france": {
+      "hash": "0e11c3df6a2750ed1d865c53d958a83bd2c470ab704cb4e9fc931626a14b9a52",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
+    },
+    "/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details": {
+      "hash": "efb17ebd8aa3217fc9d0f9a84320c4973a61bc46429e8fd80557ef50cd2b51f7",
+      "pushedAt": "2026-09-25T21:57:44.796Z"
+    },
     "/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator": {
       "hash": "46a67c212feaa19cec002a258404b2d3ae9f17efde16e3111861ea1940b77d5e",
       "pushedAt": "2026-09-25T21:21:19.238Z"
+    },
+    "/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour": {
+      "hash": "953d922a540fc766798ed5b15e46cfb55140d038ff12781b06489b6f1384cc8d",
+      "pushedAt": "2026-09-25T21:58:25.807Z"
     },
     "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too": {
       "hash": "b351c643af3608292a4532b41029eff58745b89f8d70907efb786792cb07b46c",
