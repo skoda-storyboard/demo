@@ -26,6 +26,10 @@ const DERIVATIVE_SUFFIX_RE = /-\d{2,5}x\d{2,5}(?=\.[a-z0-9]+$)/i;
 
 const IMAGE_EXT_RE = /\.(jpe?g|png|gif|webp|avif|svg)$/i;
 
+// Linked documents tracked for the DAM (SKODA-208: the model Technical Data PDFs). They
+// have no media-bus delivery (the page keeps the source link until the DAM ingest).
+const DOCUMENT_EXT_RE = /\.pdf$/i;
+
 // Content-bus 409 threshold: masters over ~10 MB 409 the content bus on publish
 // (SKODA-506, build-confirmed). Pre-condition the DELIVERY image by substituting
 // a sized derivative. The DAM still stores the full ORIGINAL.
@@ -33,6 +37,8 @@ export const OVERSIZE_BYTES = 10 * 1024 * 1024;
 
 export function needsMediaBuild(row, { dam = false, da = false, force = false } = {}) {
   if (force || !row || row.status !== 'done') return true;
+  // A document row has no delivery step; only the DAM original can be outstanding.
+  if (row.kind === 'document') return dam && (row.steps?.dam !== 'done' || !row.dam_asset_path);
   if (row.steps?.deliver !== 'done' || !row.delivery_url
     || !Number.isFinite(row.bytes) || row.bytes > OVERSIZE_BYTES) return true;
   if (dam && (row.steps?.dam !== 'done' || !row.dam_asset_path)) return true;
@@ -60,6 +66,11 @@ export function urlBasename(url) {
 /** True if the URL points at a raster/vector image we should process. */
 export function isImageUrl(url) {
   return IMAGE_EXT_RE.test(cleanUrl(url));
+}
+
+/** True if the URL points at a linked document (PDF) tracked for the DAM. */
+export function isDocumentUrl(url) {
+  return DOCUMENT_EXT_RE.test(cleanUrl(url));
 }
 
 /** The `-WxH` suffix on a filename, or null. */

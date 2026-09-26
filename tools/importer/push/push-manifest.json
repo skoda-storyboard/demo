@@ -266,6 +266,94 @@
       "hash": "869982693d2e381b8b33f62592ab2cfd90ce6d7b40e4445f088449edd0217bb5",
       "pushedAt": "2026-09-25T21:00:38.666Z"
     },
+    "/en/skoda-model/elroq": {
+      "hash": "6404bdcfc1fc5c7bfe9ae9a91658f60ba1d15eb4141d7d9801e1e8306595602d",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/elroq/elroq-rs": {
+      "hash": "515851e4ac7d69d2db3e20f497cfcb0aae71496c899a1313f2b7cc719ac782b8",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/elroq/elroq-sportline": {
+      "hash": "c659cf0fed4965f1e95430f3f0305a07b94cfa35b5e166a1e7e4305c674255a9",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/enyaq-iv-2": {
+      "hash": "05f33f0252c4c241f2108a8a0dcf1df9c0c435012faa1f29904fe6f739565a00",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/enyaq-iv-2/enyaq-rs": {
+      "hash": "d06d356eb1396f11406f3453e34d43d52963d11b9c4ebeec38d0b9c3f625c892",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/enyaq-iv-2/enyaq-sportline-iv": {
+      "hash": "671c06e07bc15fa1ce1447fcd95ec3f3ce5c56519945b71eb44574ed68131b5d",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/epiq": {
+      "hash": "b2d912f587a031d668832578de70ea75b0ef335c1d753e541e2bdc9ca9ecc0d9",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/kamiq": {
+      "hash": "baf02a0bd0cbd2e2dd0596cd3a61a441ef6c9342bbbba625fab01501a1ba9cd1",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/karoq-6": {
+      "hash": "dd89fc29acce9af4034e3da06248bff8ec7ff0c65ed00ae497ce807bf69499c4",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/karoq-6/karoq-sportline": {
+      "hash": "5e039269c2e47e9fdd4b1235b5063804a8afba92897beaa4168217248eda9072",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/new-fabia": {
+      "hash": "e83cc37830ab09f50a73ae2fad8ed620c0021b17e2bde7f693532240a0563c2c",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/new-kodiaq": {
+      "hash": "809c02db81c6f8ee4723394cf8d99ac5da740f76a55b72e8b15657b8d2807f0d",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/new-kodiaq/kodiaq-rs": {
+      "hash": "58f3710a62fcd2f7d34fb11f19be99965128eeb10eac83d78119a1f4c388633b",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/new-kodiaq/new-kodiaq-iv": {
+      "hash": "ef36ca3f7be832485a2b201742b2000b66e40538ab56378b58219d609df65506",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/new-kodiaq/new-kodiaq-sportline": {
+      "hash": "74c89bd9f1ef08ac297ab55eea98d201d19ab6b63799da371c703ac3ad01ad5c",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/new-superb": {
+      "hash": "7f0a047bf474d798136cc33f4c744e2c49f8ada1f8e765067ca713558b94e41c",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/new-superb/new-superb-iv": {
+      "hash": "e81cd9ccb9a7a409080bcd77bd1e492798f04c786152d14f1d22153d3b0154c1",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/octavia": {
+      "hash": "f9f414cfcf469239e9e13b098e053ad77d876dd2e9c34f2359354aad5fb9e23c",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/octavia/octavia-rs": {
+      "hash": "a4805e08190e68ab99763c255f39c2d0ee3e8f36776f1ed044974e6c6003269f",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/octavia/octavia-sportline": {
+      "hash": "59b9d4aa39bd2ae78047da5d7a4069121276917583644d207d8e0d453c21ef26",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/peaq": {
+      "hash": "df3f46c3fd57be3861538f73fbb3d100ed619c0b675472a250572e21f7a8802e",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
+    "/en/skoda-model/scala": {
+      "hash": "841ff63209ca3d0b35268cfcc9d077e0a1021018edfb649dde2cd98c84c4a768",
+      "pushedAt": "2026-09-26T20:11:52.717Z"
+    },
     "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it": {
       "hash": "34db90554e535baa91e46902205f86d491fd49ba609b619719cc54d233b1ed4b",
       "pushedAt": "2026-09-26T06:46:02.390Z"
