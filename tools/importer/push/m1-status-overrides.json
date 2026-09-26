@@ -53,11 +53,10 @@
     },
     "/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details": {
       "qa": "fail",
-      "note": "held (preview only): the quiz widget imports as static text (config JSON paragraph, 42 '[ ]' answers, 16 quiz-UI lines); needs a quiz mapping in the story importer (SKODA-801a)"
+      "note": "held by stakeholder decision (2026-09-26): the quiz is graded server-side and has no answer key in the page; an interactive quiz needs the key from the client. Preview only."
     },
     "/en/emobility/enyaq-and-elroq-now-double-as-gaming-consoles-and-thats-not-all": {
-      "qa": "fail",
-      "note": "held (preview only): the WordPress MediaElement video player leaks (2 mejs sprite images, timecodes, a javascript:void link); strip the player chrome and keep the .mp4 (SKODA-801a)"
+      "note": "video leak fixed (PR #164: .wp-video → Embed, native <video>); on preview, publish after #164 merges (main's embed can't play .mp4)"
     },
     "/en/skoda-world/the-skoda-elroq-reveals-its-sustainable-interior": {
       "note": "source URL returns 404 (checked 2026-09-26); the importer gets the 404 page. Drop it from skoda-rail-feed-corpus.txt or find the moved URL"

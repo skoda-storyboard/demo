@@ -78,10 +78,16 @@ Two story-importer leaks hold 2 pages at preview. See SKODA-603 "W2a results".
   flattened into content: 2 `mejs-controls.svg` images, `00:00`/`00:53` timecode paragraphs, and a
   `javascript:void(0)` "Use Up/Down Arrow keys…" link. Strip `.mejs-*` / `.wp-video` chrome and keep the `.mp4`
   source as one video link (or an Embed row).
+  **✅ Fixed 2026-09-26 (PR #164).** `.wp-video` now imports as an Embed table (`url` + `poster`), and the embed
+  block plays `.mp4` / `.webm` / `.mov` / `.m4v` natively (`<video controls preload=metadata>`). The page is
+  re-imported and on preview, and goes live once #164 is merged.
 - **Quiz widget** (`quiz-can-you-recognise-skoda-models-by-their-details`): the quiz's config JSON is rendered as a
   paragraph, answers become `[ ]` list items, and quiz controls ("Go to next question", "Finish quiz",
   "correct answers: 0") become text. Needs a decision: static Q&A content (drop the JSON and controls), or a
   quiz block (new contract).
+  **Decision 2026-09-26 (stakeholder): keep the page held.** The quiz is graded server-side
+  (`/wp-json/skt/result`); the answer inputs have obfuscated classes and there's no answer key in the page. An
+  interactive rebuild needs the answer key from the client, so the page stays preview-only until that's scoped.
 
 ## Import contract (SKODA-603)
 Contract(s) `gallery-slider`, `quote`, `columns-split`, `spec-table-versions` (proposed) in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). The story importer emits these pinned shapes. The raw `version` spec table (Epiq) must become `Spec Table (versions)` or text; the check fails `version`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.
