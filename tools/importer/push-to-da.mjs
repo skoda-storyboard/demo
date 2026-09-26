@@ -27,6 +27,8 @@
  *   --limit <n>                    only the first n paths
  *   --index <path>                 query index to poll after publish (default /en/query-index.json)
  *   --timeout <s>                  job + index polling timeout (default 300)
+ *   --max-image-bytes <n>          maximum inline image size (default 10485760)
+ *   --min-image-width <px>         narrowest -WxH substitute the media gate may use (default 768)
  *
  * Per page: new | unchanged | update | conflict | overwrite (see push/push-lib.mjs
  * decideAction). A conflict is never overwritten without --force.
@@ -42,7 +44,10 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { uploadToDA, fetchWithRetry } from './media/media-lib.mjs';
+import { uploadToDA, fetchWithRetry, OVERSIZE_BYTES } from './media/media-lib.mjs';
+import {
+  conditionInlineMedia, imageLimit, imageWidth, MIN_SUBSTITUTE_WIDTH,
+} from './media/condition-inline-media.mjs';
 import {
   parseList, wrapPage, contentHash, decideAction, PUSHING, chunk, parseJobDetails,
   fragmentPaths, imageCheck, summarize,
@@ -51,6 +56,7 @@ import {
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const MANIFEST = path.join(HERE, 'push', 'push-manifest.json');
 const REPORT_DIR = path.join(HERE, 'reports', 'push');
+const MEDIA_MANIFEST = path.join(HERE, 'media', 'media-manifest.json');
 const ADMIN = 'https://admin.hlx.page';
 const DA = 'https://admin.da.live';
 const BATCH = 100; // paths per bulk job
@@ -72,6 +78,8 @@ function parseArgs(argv) {
     dryRun: false,
     force: false,
     publishFragments: false,
+    maxImageBytes: OVERSIZE_BYTES,
+    minImageWidth: MIN_SUBSTITUTE_WIDTH,
   };
   for (let i = 0; i < argv.length; i += 1) {
     const k = argv[i];
@@ -85,6 +93,8 @@ function parseArgs(argv) {
     else if (k === '--limit') a.limit = Number(v());
     else if (k === '--index') a.index = v();
     else if (k === '--timeout') a.timeout = Number(v());
+    else if (k === '--max-image-bytes') a.maxImageBytes = imageLimit(v());
+    else if (k === '--min-image-width') a.minImageWidth = imageWidth(v());
     else if (k === '--dry-run') a.dryRun = true;
     else if (k === '--force') a.force = true;
     else if (k === '--publish-fragments') a.publishFragments = true;
@@ -93,6 +103,9 @@ function parseArgs(argv) {
   if (!a.list) throw new Error('--urls <file> (or --paths <file>) is required');
   const stages = a.stage === 'all' ? ['push', 'preview', 'publish'] : a.stage.split(',').map((s) => s.trim());
   a.stages = new Set(stages);
+  if (stages.some((stage) => !['push', 'preview', 'publish'].includes(stage))) {
+    throw new Error(`Invalid stage: ${a.stage}`);
+  }
   return a;
 }
 
@@ -109,14 +122,14 @@ async function adminFetch(url, opts) {
   return fetchWithRetry(url, opts);
 }
 
-function loadManifest() {
-  if (!existsSync(MANIFEST)) return { version: 1, pages: {} };
-  return JSON.parse(readFileSync(MANIFEST, 'utf8'));
+function loadManifest(file) {
+  if (!existsSync(file)) return { version: 1, pages: {} };
+  return JSON.parse(readFileSync(file, 'utf8'));
 }
 
-function saveManifest(m) {
+function saveManifest(m, file) {
   const sorted = Object.fromEntries(Object.keys(m.pages).sort().map((k) => [k, m.pages[k]]));
-  writeFileSync(MANIFEST, `${JSON.stringify({ ...m, pages: sorted }, null, 2)}\n`);
+  writeFileSync(file, `${JSON.stringify({ ...m, pages: sorted }, null, 2)}\n`);
 }
 
 const hosts = ({ org, repo, ref }) => ({
@@ -178,11 +191,23 @@ async function adminStatus(a, p) {
 // main
 // ---------------------------------------------------------------------------
 
-async function main() {
-  const a = parseArgs(process.argv.slice(2));
+export default async function main(argv = process.argv.slice(2), {
+  manifestFile = MANIFEST, mediaManifestFile = MEDIA_MANIFEST, reportDir = REPORT_DIR,
+} = {}) {
+  const a = parseArgs(argv);
   const log = (...m) => console.log(...m);
   const h = hosts(a);
-  const manifest = loadManifest();
+  const manifest = loadManifest(manifestFile);
+  const mediaManifest = JSON.parse(readFileSync(mediaManifestFile, 'utf8'));
+  // One byte probe per image per run: the preview/publish/fragment rechecks reuse it.
+  const mediaCache = new Map();
+  const mediaGate = (html, p) => conditionInlineMedia(html, {
+    base: `${h.page}${p}.html`,
+    manifest: mediaManifest,
+    maxBytes: a.maxImageBytes,
+    minWidth: a.minImageWidth,
+    cache: mediaCache,
+  });
   let paths = parseList(readFileSync(a.list, 'utf8'));
   if (a.limit) paths = paths.slice(0, a.limit);
   log(`[push] ${paths.length} paths · stages=${[...a.stages].join(',')}${a.dryRun ? ' · DRY RUN' : ''}${a.force ? ' · FORCE' : ''}`);
@@ -199,7 +224,17 @@ async function main() {
       Object.assign(page, { action: 'missing-local', error: `no ${file} — run the importer first` });
       continue;
     }
-    const plain = readFileSync(file, 'utf8');
+    const original = readFileSync(file, 'utf8');
+    const conditioned = await mediaGate(original, p);
+    page.media = conditioned.changes;
+    conditioned.changes.forEach((change) => log(`[media] ${p}: ${change.action} ${change.from}${change.to ? ` -> ${change.to}` : ''}`));
+    if (conditioned.errors.length) {
+      Object.assign(page, {
+        action: 'blocked-media', error: `Media gate: ${conditioned.errors.join('; ')}`,
+      });
+      continue;
+    }
+    const plain = conditioned.html;
     plains.push(plain);
     const doc = wrapPage(plain);
     const localHash = contentHash(doc);
@@ -216,13 +251,23 @@ async function main() {
       record: manifest.pages[p],
       force: a.force,
     });
-    Object.assign(page, decision, { localHash, daLastModified: remote.lastModified || null, doc });
+    Object.assign(page, decision, {
+      localHash, daLastModified: remote.lastModified || null, doc, plain, file,
+    });
+    if (!a.stages.has('push') && !['unchanged', 'conflict'].includes(decision.action)
+      && (a.stages.has('preview') || a.stages.has('publish'))) {
+      page.error = 'DA differs from conditioned local content; run --stage push,preview first';
+    }
   }
 
   // 2) push ------------------------------------------------------------------------------
   const now = new Date().toISOString();
+  if (!a.dryRun) {
+    pages.filter((pg) => pg.doc && !pg.error && pg.action !== 'conflict' && pg.media.length)
+      .forEach((pg) => writeFileSync(pg.file, pg.plain));
+  }
   for (const page of pages) {
-    if (!page.doc) continue;
+    if (!page.doc || page.error) continue;
     if (page.action === 'unchanged' && !a.dryRun) {
       // DA already equals local: (re)record that state. Adopts pages pushed before the
       // manifest existed and keeps older records on the current hash scheme.
@@ -232,6 +277,7 @@ async function main() {
           hash: page.localHash,
           pushedAt: (rec && rec.pushedAt) || now,
           adopted: !rec || !!rec.adopted,
+          ...(rec?.previewedHash === page.localHash ? { previewedHash: rec.previewedHash } : {}),
         };
       }
     }
@@ -240,18 +286,35 @@ async function main() {
       org: a.org, repo: a.repo, daPath: `${page.path}.html`, buffer: Buffer.from(page.doc, 'utf8'), contentType: 'text/html',
     });
     page.daStatus = res.status;
+    page.daReady = res.ok;
     if (res.ok) manifest.pages[page.path] = { hash: page.localHash, pushedAt: now };
     else page.error = `DA push HTTP ${res.status} ${res.body.slice(0, 200)}`;
     await sleep(ADMIN_GAP_MS);
   }
 
-  const inDA = (pg) => pg.doc && pg.action !== 'conflict' && !pg.error;
+  const inDA = (pg) => pg.doc && pg.action !== 'conflict' && !pg.error
+    && (pg.action === 'unchanged' || pg.daReady);
 
   // 3) preview + validate ------------------------------------------------------------------
   const wantPublish = a.stages.has('publish');
   if ((a.stages.has('preview') || wantPublish) && !a.dryRun) {
-    const targets = pages.filter(inDA).map((pg) => pg.path);
-    if (a.stages.has('preview') && targets.length) {
+    const ready = pages.filter(inDA);
+    for (const pg of ready) {
+      const gate = await mediaGate(pg.plain, pg.path);
+      if (gate.errors.length || gate.changes.length) {
+        pg.error = `Media changed before preview: ${gate.errors.join('; ') || JSON.stringify(gate.changes)}`;
+      }
+      if (wantPublish && !a.stages.has('preview') && !pg.error) {
+        if (manifest.pages[pg.path]?.previewedHash !== pg.localHash) {
+          pg.error = 'Conditioned DA document has not passed an explicit preview; run --stage push,preview first';
+          continue;
+        }
+        const status = await adminStatus(a, pg.path);
+        if (status.preview !== 200) pg.error = 'Page has not been previewed; run --stage push,preview first';
+      }
+    }
+    const targets = ready.filter((pg) => !pg.error).map((pg) => pg.path);
+    if (targets.length) {
       const res = await runBulk(a, 'preview', targets, log);
       pages.forEach((pg) => {
         if (!res[pg.path]) return;
@@ -261,6 +324,10 @@ async function main() {
     }
     // validate on .aem.page (always before any publish)
     for (const pg of pages.filter((x) => inDA(x) && !x.error)) {
+      if (pg.previewStatus !== 200) {
+        pg.error = `Preview job failed: ${pg.previewStatus || 'no result'}`;
+        continue;
+      }
       const r = await fetchWithRetry(`${h.page}${pg.path}.plain.html?cb=${Date.now()}`);
       const body = r.ok ? await r.text() : '';
       const img = imageCheck(body);
@@ -272,6 +339,9 @@ async function main() {
       };
       pg.valid = r.ok && img.external.length === 0;
       if (!pg.valid) pg.error = r.ok ? `${img.external.length} image(s) not moved to the media bus (oversized master? SKODA-506)` : `preview .plain.html HTTP ${r.status}`;
+      else if (manifest.pages[pg.path]?.hash === pg.localHash) {
+        manifest.pages[pg.path].previewedHash = pg.localHash;
+      }
     }
   }
 
@@ -281,19 +351,50 @@ async function main() {
     const st = await adminStatus(a, f);
     const frag = { path: f, preview: st.preview, live: st.live };
     if (st.live !== 200 && a.publishFragments && st.preview === 200 && !a.dryRun) {
-      const r = await adminFetch(`${ADMIN}/live/${a.org}/${a.repo}/${a.ref}${f}`, { method: 'POST' });
+      const source = await readDA(a, f);
+      if (source.text == null) frag.error = 'Fragment has no DA source to condition';
+      else {
+        const gate = await mediaGate(source.text, f);
+        if (gate.errors.length || gate.changes.length) {
+          frag.error = `Fragment media gate: ${gate.errors.join('; ') || JSON.stringify(gate.changes)}`;
+        }
+      }
+    }
+    fragments.push(frag);
+  }
+  if (!fragments.some((f) => f.error)) {
+    for (const frag of fragments.filter((f) => f.live !== 200 && a.publishFragments
+      && f.preview === 200 && !a.dryRun)) {
+      const r = await adminFetch(`${ADMIN}/live/${a.org}/${a.repo}/${a.ref}${frag.path}`, { method: 'POST' });
       frag.published = r.status;
       if (r.ok) frag.live = 200;
     }
-    frag.ok = frag.live === 200;
-    fragments.push(frag);
   }
+  fragments.forEach((frag) => { frag.ok = frag.live === 200; });
   const fragmentsOk = fragments.every((f) => f.ok);
-  fragments.filter((f) => !f.ok).forEach((f) => log(`[push] ⚠ fragment ${f.path} is not live (preview ${f.preview}, live ${f.live}) — pages will render without it on .aem.live${a.publishFragments ? '' : '; re-run with --publish-fragments'}`));
+  fragments.filter((f) => !f.ok).forEach((f) => {
+    let detail = '';
+    if (f.error) detail = `; ${f.error}`;
+    else if (!a.publishFragments) detail = '; re-run with --publish-fragments';
+    log(`[push] ⚠ fragment ${f.path} is not live (preview ${f.preview}, live ${f.live}) — pages will render without it on .aem.live${detail}`);
+  });
 
   // 5) publish ------------------------------------------------------------------------------
   if (wantPublish && !a.dryRun) {
-    const ready = pages.filter((pg) => pg.valid).map((pg) => pg.path);
+    const ready = [];
+    for (const pg of pages.filter((page) => page.valid && !page.error)) {
+      const remote = await readDA(a, pg.path);
+      if (remote.text == null || contentHash(remote.text) !== pg.localHash) {
+        pg.error = 'DA changed since preview; run --stage push,preview again';
+        continue;
+      }
+      const gate = await mediaGate(pg.plain, pg.path);
+      if (gate.errors.length || gate.changes.length) {
+        pg.error = `Media changed before publish: ${gate.errors.join('; ') || JSON.stringify(gate.changes)}`;
+        continue;
+      }
+      ready.push(pg.path);
+    }
     if (!fragmentsOk) {
       log('[push] ✖ publish skipped: shared fragments are not live (see above)');
     } else if (ready.length) {
@@ -325,8 +426,8 @@ async function main() {
   }
 
   // 6) report ------------------------------------------------------------------------------
-  if (!a.dryRun) saveManifest(manifest);
-  mkdirSync(REPORT_DIR, { recursive: true });
+  if (!a.dryRun) saveManifest(manifest, manifestFile);
+  mkdirSync(reportDir, { recursive: true });
   const stamp = now.replace(/[:.]/g, '-');
   const report = {
     run: now,
@@ -336,16 +437,20 @@ async function main() {
       dryRun: a.dryRun,
       force: a.force,
       publishFragments: a.publishFragments,
+      maxImageBytes: a.maxImageBytes,
+      minImageWidth: a.minImageWidth,
       ref: a.ref,
     },
     summary: summarize(pages),
     fragments,
-    pages: pages.map(({ doc, localHash, ...rest }) => rest),
+    pages: pages.map(({
+      doc, localHash, plain, file, ...rest
+    }) => rest),
   };
-  const reportFile = path.join(REPORT_DIR, `${stamp}${a.dryRun ? '-dry' : ''}.json`);
+  const reportFile = path.join(reportDir, `${stamp}${a.dryRun ? '-dry' : ''}.json`);
   writeFileSync(reportFile, `${JSON.stringify(report, null, 2)}\n`);
   const urls = pages.filter((pg) => pg.valid).map((pg) => pg.preview);
-  if (urls.length) writeFileSync(path.join(REPORT_DIR, `${stamp}-urls.txt`), `${urls.join('\n')}\n`);
+  if (urls.length) writeFileSync(path.join(reportDir, `${stamp}-urls.txt`), `${urls.join('\n')}\n`);
 
   pages.forEach((pg) => {
     const bits = [pg.action];
@@ -363,9 +468,12 @@ async function main() {
   const failed = pages.some((pg) => pg.error || pg.action === 'conflict' || pg.action === 'missing-local')
     || (wantPublish && !a.dryRun && !fragmentsOk);
   process.exitCode = failed ? 1 : 0;
+  return report;
 }
 
-main().catch((e) => {
-  console.error(`[push] fatal: ${e.message}`);
-  process.exitCode = 1;
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((e) => {
+    console.error(`[push] fatal: ${e.message}`);
+    process.exitCode = 1;
+  });
+}

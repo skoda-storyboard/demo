@@ -85,9 +85,15 @@ One tool for every template (the per-template `upload-<name>.sh` scripts describ
 - **After publish:** polls the query index until every published path has a row, and smoke-tests `/nav` + `/footer` on `.aem.live`.
 - **Output:** `tools/importer/reports/push/<stamp>.json` (per-URL `action`, DA/preview/live status, image check, indexed, errors) and `<stamp>-urls.txt` (validated preview URLs, the SKODA-603 validation input). Exit code 1 on any conflict, error or failed validation.
 
-**SKODA-506 is still a separate prerequisite:** the push tool's image validation does
-not replace an enforced media check immediately before **every** preview/publish.
-Do not use those stages for M1 pages until that gate has been implemented.
+**SKODA-506's media gate is enforced by `import:push`:** it probes inline image
+bytes before DA push/preview and again before the live job. Oversized images
+receive a verified <=10 MiB rendition at least 768 px wide where available;
+otherwise only noncritical body imagery may be removed (caption retained).
+Unclassified, hero/card, or unmeasurable imagery blocks that page only; the
+rest of the batch continues. See the
+[`media/README.md`](../../tools/importer/media/README.md) for the threshold
+option and per-image report. Publish-only refuses DA/local mismatches and
+refreshes the preview before live publish.
 
 ### `urls-<name>.txt`
 The input URL list for the run.
@@ -110,10 +116,10 @@ npx -y @adobe/aem-cli up          # inspect content/... at localhost:3000
 # 4) Plan the push (reads DA, decides new/unchanged/update/conflict — writes nothing)
 npm run import:push -- --urls tools/importer/urls-<name>.txt --dry-run
 
-# 5) Only once SKODA-506 gates every preview/publish: push → bulk preview → validate
+# 5) The SKODA-506 gate runs before DA push/preview; review its image decisions.
 npm run import:push -- --urls tools/importer/urls-<name>.txt
 
-# 6) After review and the SKODA-506 gate: publish → reindex (+ fragments live)
+# 6) After preview review: gate again → fresh preview → publish → reindex (+ fragments live).
 npm run import:push -- --urls tools/importer/urls-<name>.txt --stage publish --publish-fragments
 
 # 7) M1 only: regenerate the per-URL tracker (read-only admin/index checks)
@@ -126,13 +132,16 @@ have a pinned entry in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../planning/SKODA-PE
 shape even when the block has no code yet; the block ticket builds against that shape, so its
 landing needs a re-QA, not a re-import.
 
-**Order matters:** import → media build/apply → metadata + block validation → push →
-SKODA-506 gate before preview → review → SKODA-506 gate before **publish** →
-reindex. SKODA-501's media builder selects publish-safe renditions, but does
-**not** enforce the publish-time gate. The query-index only sees *published*
+**Order matters:** import → media build/apply → metadata + block validation →
+SKODA-506 gate before DA push/preview → review → recheck and refreshed preview
+before **publish** → reindex. SKODA-501's media builder selects publish-safe
+renditions, but does **not** replace the publish-time gate. The query-index only sees *published*
 pages, so index-driven blocks stay empty until publish and reindex; check rails
 in a second pass. Check both hosts: `.aem.page` renders previewed fragments,
 `.aem.live` only published ones.
+If the builder marks a row `partial` solely because no safe inline delivery
+exists, `media:apply` leaves that image for the push gate to strip or block;
+unknown/unresolved images still stop `media:apply`.
 
 ---
 
@@ -155,7 +164,7 @@ in a second pass. Check both hosts: `.aem.page` renders previewed fragments,
    comma-separated `tags`, `category`, or an ISO `publisheddate` — the query-index contract. This catches a
    mis-wired importer before publish, so the `tags`/facet columns and the tags-block fallback don't ship
    silently empty. (`template=page` nav/utility pages are exempt from the rail-facet requirements.)
-8. **Require SKODA-506's enforced pre-publish media gate**, then push → preview → publish via SKODA-602 and validate that the index picked it up.
+8. **Run SKODA-506's enforced pre-publish gate through `import:push`**, then push → preview → publish via SKODA-602 and validate that the index picked it up. Review substitutions/strips in the push report; unresolved media or a DA/local mismatch blocks the page.
 
 **Metadata is generic, not per-page.** All importers should append the shared
 `tools/importer/transformers/skoda-metadata.js` transformer (content-type-agnostic: derives

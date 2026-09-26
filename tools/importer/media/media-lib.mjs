@@ -122,6 +122,14 @@ export function masterUrl(url) {
   return normalizeExtension(url).replace(DERIVATIVE_SUFFIX_RE, '');
 }
 
+export function sizedRenditions(url) {
+  const master = masterUrl(url);
+  const ext = path.extname(cleanUrl(master));
+  if (!ext) return [];
+  const base = master.slice(0, -ext.length);
+  return DERIVATIVE_LADDER.map((size) => `${base}-${size}${ext}`);
+}
+
 /**
  * F3 — logical id for a source image (the dedup key). Path-qualified so two
  * different images that happen to share a basename in different folders (e.g.
@@ -318,14 +326,11 @@ export async function pickIngestUrl(sourceUrl, { oversizeBytes = OVERSIZE_BYTES 
   }
 
   // Master oversized: step down the ladder to the first rendition under limit.
-  const ext = path.extname(cleanUrl(master));
-  const base = master.slice(0, master.length - ext.length);
-  for (const size of DERIVATIVE_LADDER) {
-    const candidate = `${base}-${size}${ext}`;
+  for (const candidate of sizedRenditions(master)) {
     const bytes = await headBytes(candidate);
     if (bytes !== null && bytes <= oversizeBytes) {
       return {
-        url: candidate, bytes, preconditioned: true, ok: true, reason: `oversize-master(${masterBytes})->${size}`,
+        url: candidate, bytes, preconditioned: true, ok: true, reason: `oversize-master(${masterBytes})->${derivativeSuffix(candidate)}`,
       };
     }
   }
