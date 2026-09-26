@@ -87,6 +87,33 @@ function videosToUrls(element, document) {
   WebImporter.DOMUtils.remove(element, ['.page-embed.yt-embed-cookie']);
 }
 
+// Replace self-hosted WordPress videos (`[video]` shortcode) with an Embed table (SKODA-801a).
+// By the time the importer sees the page, MediaElement.js has wrapped the <video> in `.mejs-*`
+// player chrome whose CSS sprites (mejs-controls.svg), timecodes and a javascript:void volume
+// link would otherwise flatten into the story body. The embed block plays the file natively.
+function wpVideosToEmbeds(element, document) {
+  element.querySelectorAll('.wp-video').forEach((wrapper) => {
+    const video = wrapper.querySelector('video');
+    const src = video && (video.querySelector('source[src]')?.getAttribute('src')
+      || video.getAttribute('src') || wrapper.querySelector('a[href]')?.getAttribute('href') || '');
+    if (!src || !/\.(mp4|webm|mov|m4v)(\?|$)/i.test(src)) return;
+    // WordPress appends a cache-buster (?_=1) to the source URL.
+    const url = src.replace(/\?_=\d+$/, '');
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.textContent = url;
+    const rows = [['Embed'], ['url', link]];
+    const posterUrl = video.getAttribute('poster');
+    if (posterUrl) {
+      const poster = document.createElement('img');
+      poster.setAttribute('src', posterUrl);
+      poster.setAttribute('alt', '');
+      rows.push(['poster', poster]);
+    }
+    wrapper.replaceWith(WebImporter.DOMUtils.createTable(rows, document));
+  });
+}
+
 // Last non-empty path segment of an href/URL ('' when unparsable).
 function lastSegment(href) {
   try {
@@ -175,6 +202,7 @@ export default function transform(hookName, element, payload) {
       '.social-container',
     ]);
     videosToUrls(element, element.ownerDocument || document);
+    wpVideosToEmbeds(element, element.ownerDocument || document);
   }
 
   if (hookName === TransformHook.afterTransform) {

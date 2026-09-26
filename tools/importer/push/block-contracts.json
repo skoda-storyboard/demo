@@ -26,7 +26,14 @@
       "variants": []
     },
     "embed": {
-      "variants": []
+      "variants": [],
+      "config": "or-curated",
+      "configKeys": [
+        "url",
+        "ratio",
+        "title",
+        "poster"
+      ]
     },
     "footer": {
       "variants": []

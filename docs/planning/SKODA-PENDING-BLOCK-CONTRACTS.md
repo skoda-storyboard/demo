@@ -54,7 +54,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `carousel` | `dots` | – |
 | `columns` | – | – |
 | `downloads` | – | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes` (SKODA-502) |
-| `embed` | – | – (a bare Vimeo / YouTube / Buzzsprout / Spotify URL on its own line autoblocks) |
+| `embed` | – | `url`, `ratio`, `title`, `poster` (`or-curated`: a bare Vimeo / YouTube / Buzzsprout / Spotify URL on its own line still autoblocks). A self-hosted `.mp4`/`.webm`/`.mov`/`.m4v` `url` renders a native `<video>` with the `poster` image (SKODA-801a, WordPress `[video]`) |
 | `gallery` | – | – |
 | `hero-image` | `story` (default), `overlay`, `archive` | – |
 | `listing` | – | `index`, `path`, `template`, `facets`, `facetlabels`, `sort`, `perpage`, `columns` (config only) |

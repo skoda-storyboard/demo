@@ -8,6 +8,8 @@
  *     with feature=oembed&enablejsapi=1, as measured on the live source (embeds.md §2).
  *   - Audio (Buzzsprout / Spotify): fixed-height wrapper (--embed-audio-height: 200px),
  *     NOT 16:9.
+ *   - Self-hosted video file (.mp4 / .webm / .mov / .m4v, e.g. a WordPress `[video]`): a native
+ *     <video controls> in the same 16:9 wrapper, with the optional `poster` row (SKODA-801a).
  *   - Generic iframe provider: falls through as a video-ratio embed (the MR-PR03
  *     AI-audio JS *widget* is handled by the /widgets/ autoblock, not here).
  *
@@ -40,7 +42,10 @@ const RATIOS = {
  * @param {URL} url The source URL
  * @returns {{ provider: string, isAudio: boolean }}
  */
+const VIDEO_FILE_RE = /\.(mp4|webm|mov|m4v)$/i;
+
 function detectProvider(url) {
+  if (VIDEO_FILE_RE.test(url.pathname)) return { provider: 'file', isAudio: false };
   const host = url.hostname.replace(/^www\./, '').toLowerCase();
   if (host.endsWith('vimeo.com')) return { provider: 'vimeo', isAudio: false };
   if (host.endsWith('youtube.com') || host === 'youtu.be' || host.endsWith('youtube-nocookie.com')) {
@@ -147,6 +152,34 @@ function buildIframe(src, title, isAudio, provider) {
   return iframe;
 }
 
+// Container MIME type per file extension, so the browser can skip formats it can't play.
+const VIDEO_TYPES = {
+  mp4: 'video/mp4', m4v: 'video/mp4', webm: 'video/webm', mov: 'video/quicktime',
+};
+
+/**
+ * Builds the native player for a self-hosted video file, like the source's WordPress
+ * `<video controls preload="metadata" poster>` (without its MediaElement.js chrome).
+ * @param {URL} url The video file URL
+ * @param {string} title Accessible name for the player
+ * @param {string} poster Poster image URL ('' for none)
+ * @returns {HTMLVideoElement}
+ */
+function buildVideo(url, title, poster) {
+  const video = document.createElement('video');
+  video.setAttribute('controls', '');
+  video.setAttribute('preload', 'metadata');
+  video.setAttribute('playsinline', '');
+  video.setAttribute('aria-label', title);
+  if (poster) video.setAttribute('poster', poster);
+  const source = document.createElement('source');
+  source.setAttribute('src', url.href);
+  const ext = url.pathname.split('.').pop().toLowerCase();
+  if (VIDEO_TYPES[ext]) source.setAttribute('type', VIDEO_TYPES[ext]);
+  video.append(source);
+  return video;
+}
+
 /**
  * Promotes an embed's held data-src to src when it approaches the viewport, so the third-party
  * player only boots when needed. Loads eagerly (no observer) when IntersectionObserver is
@@ -232,6 +265,7 @@ function providerLabel(provider, url) {
     const type = url.pathname.replace(/^\/embed/, '').split('/')[1];
     return SPOTIFY_LABELS[type] || 'Spotify player';
   }
+  if (provider === 'file') return 'Video';
   return `Embedded content from ${url.hostname.replace(/^www\./, '')}`;
 }
 
@@ -287,6 +321,10 @@ export default function decorate(block) {
   }
   const ratioKey = cfg.ratio?.textContent.trim() || block.dataset.ratio || '';
   const tableTitle = cfg.title?.textContent.trim() || '';
+  // Poster row: an image (DA turns it into a <picture>) or a plain image URL.
+  const posterImg = cfg.poster?.querySelector('img');
+  const poster = posterImg?.currentSrc || posterImg?.getAttribute('src')
+    || parseEmbedUrl(cfg.poster?.textContent)?.href || '';
 
   // Validate BEFORE clearing: only absolute http(s) URLs with a usable media id are embedded.
   const url = parseEmbedUrl(rawUrl);
@@ -312,6 +350,13 @@ export default function decorate(block) {
   if (!isAudio) {
     const ratio = RATIOS[ratioKey.toLowerCase()] || RATIOS['16x9'];
     wrapper.style.setProperty('--embed-ratio', ratio);
+  }
+
+  if (provider === 'file') {
+    wrapper.append(buildVideo(url, title, poster));
+    block.classList.add('embed-file');
+    block.append(wrapper);
+    return;
   }
 
   wrapper.append(buildIframe(src, title, isAudio, provider));
