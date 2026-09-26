@@ -11,11 +11,12 @@
  *     [--dam-base https://author-p220607-e2281243.adobeaemcloud.com] \
  *     [--dam-folder /content/dam/storyboard] \
  *     [--da-archive] [--org skoda-storyboard --repo demo] \
- *     [--concurrency 4] [--dry-run] [--force] [--limit N]
+ *     [--concurrency 4] [--dry-run] [--force] [--limit N] [--min-image-edge 768]
  *
  * Per distinct LOGICAL image (path-qualified id, F3) referenced by the pages:
  *   1. dedup to the logical master; first PAGE that references it owns the DAM folder
- *   2. pickIngestUrl → DELIVERY rendition (master, or a sized derivative if >10MB, F4)
+ *   2. pickIngestUrl → DELIVERY rendition (master, or a sized derivative if >10MB,
+ *      never under --min-image-edge px on the long edge, F4)
  *   3. fetch the ORIGINAL master bytes (server-side; no CORS)
  *   4. upload the ORIGINAL to the AEM DAM at /content/dam/storyboard/<page-path>/<file>
  *   5. (optional --da-archive) also self-host in DA for CDN-independence
@@ -33,7 +34,7 @@ import path from 'node:path';
 import {
   isImageUrl, masterUrl, logicalId, daPathFor, damPathFor, pagePathFromFile, isAspectCrop,
   pickIngestUrl, headBytes, fetchBinary, uploadToDA, uploadToDAM, setDamMetadata, resolveDamToken,
-  needsMediaBuild, OVERSIZE_BYTES,
+  needsMediaBuild, stepDownTooSmall, renditionEdge, OVERSIZE_BYTES, MIN_RENDITION_EDGE,
 } from './media-lib.mjs';
 
 const WORKSPACE = process.env.WORKSPACE_PATH || process.cwd();
@@ -57,6 +58,7 @@ function parseArgs() {
     fromManifest: false,
     idsFile: '',
     limit: Infinity,
+    minEdge: MIN_RENDITION_EDGE,
   };
   for (let i = 0; i < args.length; i += 1) {
     const a = args[i];
@@ -81,6 +83,7 @@ function parseArgs() {
     if (a === '--token-file') { out.tokenFile = val; i += 1; continue; }
     if (a === '--concurrency') { out.concurrency = Math.max(1, Number(val) || 1); i += 1; continue; }
     if (a === '--limit') { out.limit = Number(val); i += 1; continue; }
+    if (a === '--min-image-edge') { out.minEdge = renditionEdge(val); i += 1; continue; }
     throw new Error(`Unexpected argument: ${a}`);
   }
   if (out.pages.length === 0 && !out.fromManifest) {
@@ -236,7 +239,9 @@ async function main() {
   async function processOne(id) {
     const info = byLogical.get(id);
     const prior = manifest.rows[id];
-    if (!needsMediaBuild(prior, { dam: !!damConfig, da: cfg.daArchive, force: cfg.force })) {
+    if (!needsMediaBuild(prior, {
+      dam: !!damConfig, da: cfg.daArchive, force: cfg.force, minEdge: cfg.minEdge,
+    })) {
       const priorRefs = prior.page_refs || [prior.dam_page_path].filter(Boolean);
       const pageRefs = [...new Set([...priorRefs, ...info.pageRefs])];
       const seenUrls = [...new Set([...(prior.seen_urls || []), ...info.seenUrls])];
@@ -258,7 +263,8 @@ async function main() {
     const pagePath = (prior && prior.dam_page_path) || info.ownerPage;
     const damAssetPath = damConfig ? damPathFor(info.sourceUrl, { damFolder: cfg.damFolder, pagePath }) : '';
     const delivered = prior?.steps?.deliver === 'done' && !cfg.force
-      && Number.isFinite(prior.bytes) && prior.bytes <= OVERSIZE_BYTES;
+      && Number.isFinite(prior.bytes) && prior.bytes <= OVERSIZE_BYTES
+      && !stepDownTooSmall(prior, cfg.minEdge);
     const storedInDam = prior?.steps?.dam === 'done' && (!cfg.force || !damConfig);
     const archivedInDa = prior?.steps?.da === 'done' && (!cfg.force || !cfg.daArchive);
     let damStep = prior?.steps?.dam || 'n/a';
@@ -303,7 +309,7 @@ async function main() {
       try {
         const pick = row.steps.deliver === 'done'
           ? { ok: true, reason: 'already delivered', preconditioned: row.preconditioned }
-          : await pickIngestUrl(info.sourceUrl);
+          : await pickIngestUrl(info.sourceUrl, { minEdge: cfg.minEdge });
         const originalBytes = damConfig && row.steps.dam !== 'done'
           ? await headBytes(row.master_url) : null;
         const originalUnavailable = damConfig && row.steps.dam !== 'done'
@@ -321,7 +327,7 @@ async function main() {
       // Delivery is reusable when a later run adds DAM ingest or DA archiving.
       let deliveryBuffer = null; let deliveryType = '';
       if (row.steps.deliver !== 'done') {
-        const pick = await pickIngestUrl(info.sourceUrl);
+        const pick = await pickIngestUrl(info.sourceUrl, { minEdge: cfg.minEdge });
         row.preconditioned = pick.preconditioned;
         if (pick.preconditioned) counts.precond += 1;
         if (pick.ok) {

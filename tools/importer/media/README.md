@@ -55,8 +55,14 @@ block (SKODA-505) reads this to resolve "download original".
    resume just the DAM/DA steps when those are requested later (no blanket
    `--force` upload). Missing/empty alts are logged per imported occurrence.
 
-The original is uploaded even when a safe inline delivery rendition is unavailable;
-the row remains `partial` until SKODA-506 resolves that separate publish issue.
+The delivery rendition for an oversized master steps down the `-WxH` ladder but
+never below **768 px on the long edge** (`--min-image-edge <px>` overrides it):
+a `-272x182` thumbnail in a gallery or card slot is a silent downgrade. Rows that
+earlier delivered a stepped-down thumbnail are re-picked on the next build, no
+`--force` needed; a page's own small reference (e.g. a portrait `-631x768`) is
+kept. The original is uploaded even when a safe inline delivery rendition is
+unavailable; the row remains `partial` until SKODA-506 resolves that separate
+publish issue.
 Original fetches must return non-empty image bytes, and the direct-upload response
 must provide enough parts to cover every byte before any part is sent. A missing
 original is never replaced by a derivative under the original's DAM path.
@@ -131,9 +137,9 @@ correctly reports 42 missing pages rather than claiming media QA passed.
 default **10 MiB** limit; `--max-image-bytes <positive integer>` overrides it.
 The media builder's stored byte count is not proof of current safety. An
 oversized image is replaced with a verified `delivery_url` from the manifest
-or a verified source-CDN `-WxH` rendition at least **768 px** wide
-(`--min-image-width <px>` overrides it; a `-272x182` thumbnail in a body slot
-is worse than a logged strip). The source CDN answers **403** for a missing
+or a verified source-CDN `-WxH` rendition at least **768 px** on the long edge
+(`--min-image-edge <px>` overrides it, as in the media builder; a `-272x182`
+thumbnail in a body slot is worse than a logged strip). The source CDN answers **403** for a missing
 rendition, so 403 and 404 both mean "absent". Extension-less URLs (e.g. Vimeo
 thumbnails) pass on an `image/*` content-type. Obsolete oversized `srcset` and
 `<source>` candidates are removed; `alt`, `data-caption`, and surrounding
@@ -141,7 +147,7 @@ content are retained. If no safe rendition exists, only noncritical body
 imagery is removed, retaining/promoting its caption. Unclassified, hero,
 card, or art-directed imagery instead blocks the page; unreachable or
 unmeasurable media never passes as safe. Stripped alt/caption values remain
-in the per-image report, with `narrowerThanMinWidth` listing any existing
+in the per-image report, with `belowMinEdge` listing any existing
 rendition rejected for width. DAM originals, the cart index, and Metadata
 `image`/`og:image` references are not changed. A blocked page is skipped on its
 own (`blocked-media`, exit code 1); the rest of the batch still pushes.
@@ -160,7 +166,7 @@ For mismatches, run the explicit push + preview stage first (a DA author-edit
 conflict still requires separate review, never an implicit overwrite).
 Changes and errors appear in console output and the per-page `media`/`error`
 fields of `tools/importer/reports/push/<stamp>.json`; the report also includes
-`args.maxImageBytes` and `args.minImageWidth`. `--dry-run` writes only its report, never the imported
+`args.maxImageBytes` and `args.minImageEdge`. `--dry-run` writes only its report, never the imported
 page, DA source, or a bulk preview/live job.
 
 ### `--from-manifest` (re-ingest without the page file)

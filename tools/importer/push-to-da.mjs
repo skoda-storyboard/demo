@@ -28,7 +28,7 @@
  *   --index <path>                 query index to poll after publish (default /en/query-index.json)
  *   --timeout <s>                  job + index polling timeout (default 300)
  *   --max-image-bytes <n>          maximum inline image size (default 10485760)
- *   --min-image-width <px>         narrowest -WxH substitute the media gate may use (default 768)
+ *   --min-image-edge <px>          smallest substitute long edge the gate may use (default 768)
  *
  * Per page: new | unchanged | update | conflict | overwrite (see push/push-lib.mjs
  * decideAction). A conflict is never overwritten without --force.
@@ -44,10 +44,10 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { uploadToDA, fetchWithRetry, OVERSIZE_BYTES } from './media/media-lib.mjs';
 import {
-  conditionInlineMedia, imageLimit, imageWidth, MIN_SUBSTITUTE_WIDTH,
-} from './media/condition-inline-media.mjs';
+  uploadToDA, fetchWithRetry, OVERSIZE_BYTES, MIN_RENDITION_EDGE, renditionEdge,
+} from './media/media-lib.mjs';
+import { conditionInlineMedia, imageLimit } from './media/condition-inline-media.mjs';
 import {
   parseList, wrapPage, contentHash, decideAction, PUSHING, chunk, parseJobDetails,
   fragmentPaths, imageCheck, summarize,
@@ -79,7 +79,7 @@ function parseArgs(argv) {
     force: false,
     publishFragments: false,
     maxImageBytes: OVERSIZE_BYTES,
-    minImageWidth: MIN_SUBSTITUTE_WIDTH,
+    minImageEdge: MIN_RENDITION_EDGE,
   };
   for (let i = 0; i < argv.length; i += 1) {
     const k = argv[i];
@@ -94,7 +94,7 @@ function parseArgs(argv) {
     else if (k === '--index') a.index = v();
     else if (k === '--timeout') a.timeout = Number(v());
     else if (k === '--max-image-bytes') a.maxImageBytes = imageLimit(v());
-    else if (k === '--min-image-width') a.minImageWidth = imageWidth(v());
+    else if (k === '--min-image-edge') a.minImageEdge = renditionEdge(v());
     else if (k === '--dry-run') a.dryRun = true;
     else if (k === '--force') a.force = true;
     else if (k === '--publish-fragments') a.publishFragments = true;
@@ -205,7 +205,7 @@ export default async function main(argv = process.argv.slice(2), {
     base: `${h.page}${p}.html`,
     manifest: mediaManifest,
     maxBytes: a.maxImageBytes,
-    minWidth: a.minImageWidth,
+    minEdge: a.minImageEdge,
     cache: mediaCache,
   });
   let paths = parseList(readFileSync(a.list, 'utf8'));
@@ -438,7 +438,7 @@ export default async function main(argv = process.argv.slice(2), {
       force: a.force,
       publishFragments: a.publishFragments,
       maxImageBytes: a.maxImageBytes,
-      minImageWidth: a.minImageWidth,
+      minImageEdge: a.minImageEdge,
       ref: a.ref,
     },
     summary: summarize(pages),

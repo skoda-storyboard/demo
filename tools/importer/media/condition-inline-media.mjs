@@ -1,16 +1,13 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { JSDOM } from 'jsdom';
 import {
-  OVERSIZE_BYTES, logicalId, sizedRenditions, isAspectCrop,
-  derivativeSuffix, ratiosDiffer, isImageUrl,
+  OVERSIZE_BYTES, MIN_RENDITION_EDGE, logicalId, sizedRenditions, isAspectCrop,
+  derivativeSuffix, ratiosDiffer, isImageUrl, belowMinEdge, renditionEdge,
 } from './media-lib.mjs';
 
 const TIMEOUT_MS = 20000;
 // The source CDN is S3-backed: a missing object answers 403, not 404.
 const MISSING = new Set([403, 404]);
-// Narrower substitutes (e.g. a -272x182 thumbnail) would render as a blown-up
-// thumbnail in a full-width body slot; strip or block instead.
-export const MIN_SUBSTITUTE_WIDTH = 768;
 
 export function imageLimit(value = OVERSIZE_BYTES) {
   const bytes = Number(value);
@@ -18,19 +15,6 @@ export function imageLimit(value = OVERSIZE_BYTES) {
     throw new Error('Maximum inline image size must be a positive integer number of bytes');
   }
   return bytes;
-}
-
-export function imageWidth(value = MIN_SUBSTITUTE_WIDTH) {
-  const px = Number(value);
-  if (!Number.isSafeInteger(px) || px < 1) {
-    throw new Error('Minimum substitute image width must be a positive integer number of pixels');
-  }
-  return px;
-}
-
-function tooNarrow(url, minWidth) {
-  const suffix = derivativeSuffix(url);
-  return !!suffix && Number(suffix.split('x')[0]) < minWidth;
 }
 
 // Extension-less URLs (e.g. Vimeo thumbnails) pass only on an image/* content-type.
@@ -150,11 +134,11 @@ function removeBodyImage(img) {
 }
 
 export async function conditionInlineMedia(html, {
-  base, manifest = { rows: {} }, maxBytes = OVERSIZE_BYTES, minWidth = MIN_SUBSTITUTE_WIDTH,
+  base, manifest = { rows: {} }, maxBytes = OVERSIZE_BYTES, minEdge = MIN_RENDITION_EDGE,
   fetchImpl = fetch, cache = new Map(),
 } = {}) {
   imageLimit(maxBytes);
-  imageWidth(minWidth);
+  renditionEdge(minEdge);
   if (!base) throw new Error('A page URL is required to resolve inline image references');
   const { document } = new JSDOM(`<body>${html}</body>`).window;
   const changes = [];
@@ -194,7 +178,7 @@ export async function conditionInlineMedia(html, {
       const tooSmall = [];
       for (const candidate of candidates) {
         if (!sameFraming(urls[0], candidate)) continue;
-        if (candidate !== urls[0] && tooNarrow(candidate, minWidth)) {
+        if (candidate !== urls[0] && belowMinEdge(candidate, minEdge)) {
           tooSmall.push(candidate);
           continue;
         }
@@ -226,11 +210,11 @@ export async function conditionInlineMedia(html, {
           from: src,
           alt: img.getAttribute('alt'),
           caption: img.getAttribute('data-caption') || img.closest('figure')?.querySelector('figcaption')?.textContent || '',
-          ...(narrow.length ? { narrowerThanMinWidth: narrow } : {}),
+          ...(narrow.length ? { belowMinEdge: narrow } : {}),
         });
         removeBodyImage(img);
       } else {
-        const why = narrow.length ? ` (renditions under ${minWidth}px ignored: ${narrow.join(', ')})` : '';
+        const why = narrow.length ? ` (renditions under ${minEdge}px ignored: ${narrow.join(', ')})` : '';
         throw new Error(`No safe rendition; hero/card or unclassified image cannot be stripped: ${src}${why}`);
       }
     } catch (error) {

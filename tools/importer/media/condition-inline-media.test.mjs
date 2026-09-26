@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { conditionInlineMedia, imageLimit, imageWidth } from './condition-inline-media.mjs';
+import { conditionInlineMedia, imageLimit } from './condition-inline-media.mjs';
 import { logicalId } from './media-lib.mjs';
 
 async function fixture(run, overrides = {}) {
@@ -36,8 +36,6 @@ const opts = (base) => ({ base, maxBytes: 10 });
 test('configured byte limit rejects invalid values', () => {
   for (const value of [0, -1, 1.5, '', 'bogus']) assert.throws(() => imageLimit(value));
   assert.equal(imageLimit(10), 10);
-  for (const value of [0, -1, 1.5, 'bogus']) assert.throws(() => imageWidth(value));
-  assert.equal(imageWidth(1440), 1440);
 });
 
 test('inline image exactly at the threshold stays byte-for-byte unchanged', async () => {
@@ -189,10 +187,10 @@ test('a thumbnail-width rendition is never substituted for a body image', async 
     const result = await conditionInlineMedia(html, { ...opts(base), manifest });
     assert.deepEqual(result.errors, []);
     assert.equal(result.changes[0].action, 'strip');
-    assert.match(result.changes[0].narrowerThanMinWidth.join(), /big-272x182\.jpg/);
+    assert.match(result.changes[0].belowMinEdge.join(), /big-272x182\.jpg/);
     const hero = await conditionInlineMedia('<div class="hero-image"><div><img src="/big.jpg"></div></div>', { ...opts(base), manifest });
     assert.match(hero.errors[0], /renditions under 768px ignored/);
-    const lowered = await conditionInlineMedia(html, { ...opts(base), manifest, minWidth: 200 });
+    const lowered = await conditionInlineMedia(html, { ...opts(base), manifest, minEdge: 200 });
     assert.equal(lowered.changes[0].action, 'substitute');
     assert.match(lowered.changes[0].to, /big-272x182\.jpg$/);
   }, { '/big-272x182.jpg': 8 });
