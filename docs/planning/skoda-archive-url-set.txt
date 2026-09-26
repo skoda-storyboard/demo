@@ -1,0 +1,50 @@
+# Škoda Demo — category / tag archive pages (SKODA-209 slice, pulled into M1 on 2026-09-26).
+# Every /en/tag/<taxonomy>/<slug>/ and /en/category/<cat>[/<sub>]/ that a published page or the
+# nav/footer links to (tag inventory 2026-09-26). All HTTP-verified 200 on the source.
+# Imported with import-category-archive (term hero + Stories grid); on the SKODA-605 allow-list,
+# so imports rewrite links to them site-relative.
+
+# ===== TAG ARCHIVES (26) =====
+https://www.skoda-storyboard.com/en/tag/company/design/
+https://www.skoda-storyboard.com/en/tag/company/production/
+https://www.skoda-storyboard.com/en/tag/crew/electro-vehicle/
+https://www.skoda-storyboard.com/en/tag/crew/electromobility/
+https://www.skoda-storyboard.com/en/tag/crew/emobility/
+https://www.skoda-storyboard.com/en/tag/crew/technology/
+https://www.skoda-storyboard.com/en/tag/derivative/sportline/
+https://www.skoda-storyboard.com/en/tag/environment/greenfuture/
+https://www.skoda-storyboard.com/en/tag/environment/sustainability/
+https://www.skoda-storyboard.com/en/tag/model/elroq/
+https://www.skoda-storyboard.com/en/tag/model/enyaq/
+https://www.skoda-storyboard.com/en/tag/model/epiq/
+https://www.skoda-storyboard.com/en/tag/model/fabia/
+https://www.skoda-storyboard.com/en/tag/model/kamiq/
+https://www.skoda-storyboard.com/en/tag/model/karoq/
+https://www.skoda-storyboard.com/en/tag/model/kodiaq/
+https://www.skoda-storyboard.com/en/tag/model/kylaq/
+https://www.skoda-storyboard.com/en/tag/model/octavia/
+https://www.skoda-storyboard.com/en/tag/model/peaq/
+https://www.skoda-storyboard.com/en/tag/model/scala/
+https://www.skoda-storyboard.com/en/tag/model/slavia/
+https://www.skoda-storyboard.com/en/tag/model/superb/
+https://www.skoda-storyboard.com/en/tag/people/stefani/
+https://www.skoda-storyboard.com/en/tag/years/2024/
+https://www.skoda-storyboard.com/en/tag/years/2025/
+https://www.skoda-storyboard.com/en/tag/years/2026/
+
+# ===== CATEGORY ARCHIVES (15) =====
+https://www.skoda-storyboard.com/en/category/classic-cars/
+https://www.skoda-storyboard.com/en/category/concepts/
+https://www.skoda-storyboard.com/en/category/corporate-life/
+https://www.skoda-storyboard.com/en/category/design-eng/
+https://www.skoda-storyboard.com/en/category/emobility/
+https://www.skoda-storyboard.com/en/category/lifestyle/
+https://www.skoda-storyboard.com/en/category/lifestyle/adventures/
+https://www.skoda-storyboard.com/en/category/lifestyle/people/
+https://www.skoda-storyboard.com/en/category/lifestyle/sports/
+https://www.skoda-storyboard.com/en/category/models/
+https://www.skoda-storyboard.com/en/category/skoda-world/
+https://www.skoda-storyboard.com/en/category/skoda-world/design/
+https://www.skoda-storyboard.com/en/category/skoda-world/heritage/
+https://www.skoda-storyboard.com/en/category/skoda-world/innovation-and-technology/
+https://www.skoda-storyboard.com/en/category/skoda-world/responsibility/

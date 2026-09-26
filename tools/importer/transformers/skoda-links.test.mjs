@@ -76,9 +76,9 @@ test('the mixed-reality alias goes straight to its canonical', { skip }, () => {
 
 test('source-host links outside the demo stay absolute (D-3 (b))', { skip }, () => {
   [
-    `${SRC}/en/tag/model/epiq/`,
+    `${SRC}/en/tag/model/yeti/`, // a tag archive that isn't imported
     `${SRC}/en/news/?filter%5Byears%5D%5B%5D=2026`,
-    `${SRC}/en/category/emobility/`,
+    `${SRC}/en/category/podcast/`, // 404 on the source, not an archive page here
     `${SRC}/en/emobility/whats-behind-epiq-design/`,
     `${SRC}/?attachment_id=454117`,
     `${SRC}/`,
@@ -109,9 +109,15 @@ test('#s_aid / #s_cid fragments are stripped, then the link is rewritten', { ski
 });
 
 test('links inside block tables are rewritten too', { skip }, () => {
-  const el = run(`<table><tr><th>Tags</th></tr><tr><td><a href="${SRC}/en/tag/years/2026/">2026</a></td></tr>
+  const el = run(`<table><tr><th>Tags</th></tr><tr><td><a href="${SRC}/en/tag/model/yeti/">Yeti</a></td></tr>
     <tr><td><a href="${SRC}${STORY}/">Epiq</a></td></tr></table>`);
-  assert.deepEqual(hrefs(el), [`${SRC}/en/tag/years/2026/`, STORY]);
+  assert.deepEqual(hrefs(el), [`${SRC}/en/tag/model/yeti/`, STORY]);
+});
+
+test('archive pages (skoda-archive-url-set.txt) are rewritten site-relative, no trailing slash', { skip }, () => {
+  const el = run(`<a href="${SRC}/en/tag/model/epiq/">Epiq</a><a href="${SRC}/en/tag/years/2026/">2026</a>
+    <a href="${SRC}/en/category/emobility/">eMobility</a><a href="${SRC}/en/category/lifestyle/people/">People</a>`);
+  assert.deepEqual(hrefs(el), ['/en/tag/model/epiq', '/en/tag/years/2026', '/en/category/emobility', '/en/category/lifestyle/people']);
 });
 
 test('beforeTransform is a no-op', { skip }, () => {
@@ -132,9 +138,9 @@ test('idempotent: a second run changes nothing', { skip }, () => {
   assert.equal(first.innerHTML, once);
 });
 
-test('every URL-set page and corpus page (non-attachment) is on the allow-list', { skip }, () => {
+test('every URL-set, corpus and archive page (non-attachment) is on the allow-list', { skip }, () => {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-  const lines = ['skoda-m1-url-set.txt', 'skoda-rail-feed-corpus.txt']
+  const lines = ['skoda-m1-url-set.txt', 'skoda-rail-feed-corpus.txt', 'skoda-archive-url-set.txt']
     .flatMap((f) => readFileSync(path.join(root, 'docs/planning', f), 'utf8').split(/\r?\n/))
     .map((l) => l.trim())
     .filter((l) => l.startsWith('https://www.skoda-storyboard.com/') && !l.includes('attachment_id='));
@@ -142,7 +148,7 @@ test('every URL-set page and corpus page (non-attachment) is on the allow-list',
   lines.forEach((url) => assert.ok(one(url).startsWith('/'), `not rewritten: ${url}`));
 });
 
-test('the generated allow-list block matches the URL set + corpus (run npm run import:allowlist)', () => {
+test('the generated allow-list block matches the URL set + corpus + archives (run npm run import:allowlist)', () => {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
   const source = readFileSync(path.join(root, TARGET), 'utf8');
   assert.equal(renderInto(source, readLists(root)), source);
