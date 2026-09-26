@@ -35,7 +35,7 @@ Link policy is decision **D-3** in the gap review. Default until decided: **(b)*
 | Chrome to ruled-out pages (company, Škodapedia, category/tag archives, RSS) | (a) keep absolute to live source, (b) keep absolute with a `rel`/new tab, (c) remove | **(b)**, absolute to live with `target=_blank`, recorded in SKODA-306 |
 | Chrome to in-scope listings (`/en/`, `/en/images/`, `/en/videos/`) | site-relative | site-relative |
 | Press-kit chapter tiles | import (SKODA-805b), or absolute to live | per decision D-1 |
-| Tag links | absolute to live until SKODA-209 | absolute (b) |
+| Tag links | absolute to live until SKODA-209 | absolute (b). **Superseded 2026-09-26:** the 41 tag/category archives are demo pages (SKODA-209 M1 slice) and are on the SKODA-605 allow-list; all tag/category links on the site are site-relative |
 | Promo/related cards to out-of-set stories | import the target (add to corpus) or swap the card | add to corpus when it is a story; otherwise swap |
 | `/en/media-cart/`, `/en/series-2/` | point to the SKODA-505b cart UI / hide the "All series" link | hide/redirect |
 
