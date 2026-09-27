@@ -96,7 +96,10 @@ not the homepage category ladder. Chrome DevTools CSS/DOM extraction on
 | 500 | 450px / 430px | 500px track / 430px card |
 
 The source has 10px cell-side gutters (20px between cards) and a full-width
-dark-green band. The EDS story-band variant scopes its larger 90/45/30% cells to
+dark-green band. The band leaves a 24px uncolored gap before the green footer;
+its own background does not extend into that margin (DevTools, 500/1280/1440).
+The preceding Media Box is another dark band, separated by 36px of white.
+The EDS story-band variant scopes its larger 90/45/30% cells to
 the story's dark Story Rail; generic rails keep their 90/30/22.5% ladder. Its
 pre-build mount reserves the exact 16:9 card geometry to prevent a jump when
 the index-fed carousel is deferred-built. The companion heading and subtitle

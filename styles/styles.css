@@ -748,6 +748,7 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
 /* The story's related rail has its own full-bleed rhythm; other dark sections
    retain the shared section padding and typography. */
 body.story main > .section.dark.story-rail-container {
+  margin-block-end: var(--spacing-l);
   padding-block: var(--spacing-xxl) calc(var(--spacing-xl) + var(--paragraph-gap));
 }
 

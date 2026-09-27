@@ -59,6 +59,12 @@ Curated bands are separate from this tag-based Epiq configuration.
 
 The source subtitle is `rgb(196,198,199)`, 16px/32px, 600; the background
 is `rgb(14,58,47)`, with 20px effective card gap and 10px first-card inset.
+At 500/1280/1440px the source green `.cover-box.dark` spans the full viewport,
+but its 24px bottom margin is uncolored before the green footer; the previous
+Media Box band ends 36px above the Related Stories band. The EDS preview had
+the same full-bleed background but no bottom margin, joining band and footer
+into one uninterrupted green surface. Keep the bottom separator unpainted;
+the Media Box itself remains separately owned by SKODA-801a.
 The heading switches at **769px**, while card-title sizing changes at 992px
 (20px/24px below, 18px/21.6px above). Date-to-title offset is 25px.
 Use computed CSS/DOM measurements, not screenshots, for visual QA.
