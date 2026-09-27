@@ -72,16 +72,99 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/parsers/series-grid.js
-  function seriesSlugFromCanonical(document2) {
-    const canonical = document2.querySelector('link[rel="canonical"]');
-    const ogUrl = document2.querySelector('meta[property="og:url"]');
-    const raw = canonical && canonical.getAttribute("href") || ogUrl && ogUrl.getAttribute("content") || "";
-    try {
-      const segs = new URL(raw).pathname.split("/").filter(Boolean);
-      return segs[segs.length - 1] || "";
-    } catch (e) {
-      return "";
+  var TOKENS = {
+    "6:1x1": "sq",
+    "6:2x1": "wide",
+    "3:1x1": "sq-small",
+    "3:2x1": "quarter",
+    "4:2x1": "third",
+    "4:1x1": "third-sq",
+    "8:2x1": "two-thirds",
+    "12:4x1": "banner",
+    "12:3x1": "banner-tall"
+  };
+  var clean = (node) => node ? (node.textContent || "").replace(/\s+/g, " ").trim() : "";
+  function siteOriginWidths(document2) {
+    const widths = {};
+    document2.querySelectorAll("style").forEach((style) => {
+      const css = (style.textContent || "").replace(/@media[^{]*\{(?:[^{}]*\{[^}]*\})*\s*\}/g, "");
+      const re = /([^{}]+)\{([^}]*)\}/g;
+      let m;
+      while (m = re.exec(css)) {
+        const w = m[2].match(/(?:^|;)\s*width:\s*([\d.]+)%/);
+        if (!w) continue;
+        (m[1].match(/#pgc-[\w-]+/g) || []).forEach((sel) => {
+          widths[sel.slice(1)] = Number(w[1]);
+        });
+      }
+    });
+    return widths;
+  }
+  function ratioOf(article) {
+    const box = article.querySelector('[class*="ratio-"]');
+    const m = box && box.className.match(/\bratio-(\d+x\d+)\b/);
+    return m ? m[1] : "";
+  }
+  function rowSpans(row, cells, widths) {
+    const byCss = cells.map((cell) => widths[cell.id]);
+    if (byCss.every((w) => w > 0)) return byCss.map((w) => Math.round(w / 100 * 12));
+    const rowWidth = row.getBoundingClientRect ? row.getBoundingClientRect().width : 0;
+    if (rowWidth > 0) {
+      const byBox = cells.map((cell) => cell.getBoundingClientRect().width);
+      if (byBox.every((w) => w > 0)) return byBox.map((w) => Math.round(w / rowWidth * 12));
     }
+    return cells.map(() => null);
+  }
+  function spanFromComposition(tiles, i) {
+    const ratios = tiles.map((t) => t.ratio);
+    if (tiles.length === 1) return 12;
+    if (tiles.length === 4) return 3;
+    if (tiles.length === 2) return 6;
+    if (tiles.length === 3) return ratios[i] === "1x1" && ratios.includes("2x1") ? 3 : ratios[i] === "2x1" && ratios.includes("1x1") ? 6 : 4;
+    return null;
+  }
+  function hubRows(element, document2) {
+    const widths = siteOriginWidths(document2);
+    const out = [];
+    const grids = element.querySelectorAll(":scope > .panel-grid, .panel-layout > .panel-grid");
+    const rows = grids.length ? [...grids] : [element];
+    rows.forEach((row, r) => {
+      const cells = [...row.querySelectorAll(":scope > .panel-grid-cell, :scope > .panel-row-style > .panel-grid-cell")];
+      const spans = rowSpans(row, cells, widths);
+      const tiles = [];
+      let short = false;
+      cells.forEach((cell, c) => {
+        const article = cell.querySelector("article.article-teaser[data-content-type]");
+        if (!article) {
+          short = true;
+          return;
+        }
+        tiles.push({ article, ratio: ratioOf(article), span: spans[c] });
+      });
+      let sum = 0;
+      tiles.forEach((tile, i) => {
+        let { span } = tile;
+        if (!span) {
+          span = spanFromComposition(tiles, i);
+          console.warn(`[series-grid] row ${r + 1}: no source width for tile ${i + 1}, inferred ${span}/12`);
+        }
+        const token = TOKENS[`${span}:${tile.ratio}`];
+        if (!token) console.warn(`[series-grid] row ${r + 1} tile ${i + 1}: no cards-tiles token for ${span}/12 ${tile.ratio}`);
+        sum += span || 0;
+        out.push(__spreadProps(__spreadValues({}, tile), { token: token || "" }));
+      });
+      if (!tiles.length) return;
+      if (sum > 12) console.warn(`[series-grid] row ${r + 1} overfills: ${sum}/12`);
+      if (sum < 12 || short) out[out.length - 1].token += " end";
+    });
+    return out.map(({ article, token }) => {
+      const link = article.querySelector("a[href]");
+      const img = article.querySelector("img");
+      const a = document2.createElement("a");
+      a.setAttribute("href", link ? link.getAttribute("href") : "");
+      a.textContent = clean(article.querySelector("h2, h3, .heading")) || clean(link);
+      return [token.trim(), img || "", a];
+    });
   }
   function parse2(element, { document: document2 }) {
     const cards = Array.from(element.querySelectorAll("article[data-content-type]"));
@@ -90,9 +173,11 @@ var CustomImportScript = (() => {
       return;
     }
     const types = cards.map((c) => (c.getAttribute("data-content-type") || "").toLowerCase());
-    const isDirectory = types.filter((t) => t === "series").length >= types.filter((t) => t === "story").length;
+    const isHub = document2.body.classList.contains("single-skoda_series") || !types.includes("series");
     let cells;
-    if (isDirectory) {
+    if (isHub) {
+      cells = [["Cards (overlay, tiles)"], ...hubRows(element, document2)];
+    } else {
       cells = [
         ["Listing"],
         ["index", "/en/query-index.json"],
@@ -100,17 +185,6 @@ var CustomImportScript = (() => {
         ["sort", "editorial"],
         ["columns", "2"]
       ];
-    } else {
-      const slug = seriesSlugFromCanonical(document2);
-      cells = [
-        ["Listing"],
-        ["index", "/en/query-index.json"],
-        ["template", "story"],
-        ["sort", "newest"],
-        ["perpage", "8"],
-        ["columns", "2"]
-      ];
-      if (slug) cells.splice(3, 0, ["tags", slug]);
     }
     const table = WebImporter.DOMUtils.createTable(cells, document2);
     element.replaceWith(table);
@@ -445,12 +519,6 @@ var CustomImportScript = (() => {
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
   var DEMO_PATHS = [
     "/en",
-    "/en/06a-115-1x",
-    "/en/07-s-37a-992-junior",
-    "/en/09-728s-exponat",
-    "/en/10-724a",
-    "/en/11-733",
-    "/en/22-781-sport",
     "/en/category/classic-cars",
     "/en/category/concepts",
     "/en/category/corporate-life",
@@ -486,13 +554,9 @@ var CustomImportScript = (() => {
     "/en/emobility/skoda-elroq-and-a-happy-family",
     "/en/emobility/skoda-elroq-premiere-light-cube-camera-action",
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
-    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/050-skoda-epiq-a13b0a2b-bf605016",
-    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/092-skoda-epiq-3b448906-cb578496",
-    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/093-skoda-epiq-88fc035a-e098c289",
     "/en/emobility/skoda-peaq-unparalleled-space-and-comfort",
     "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
     "/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq",
-    "/en/feature-maxova-5",
     "/en/images",
     "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague",
     "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving",
@@ -509,7 +573,6 @@ var CustomImportScript = (() => {
     "/en/press-kits/skoda-elroq-press-kit-2",
     "/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
     "/en/press-kits/skoda-epiq-press-kit-2",
-    "/en/press-kits/skoda-epiq-press-kit-2/videos/attachment/footage-innsbruck-epiq-uhd-d6cfe9d1",
     "/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
     "/en/press-kits/skoda-peaq-press-kit",
@@ -548,7 +611,6 @@ var CustomImportScript = (() => {
     "/en/series/unexpected-jobs",
     "/en/series/unknown-parts",
     "/en/series/winter-tips",
-    "/en/skoda-geneva-strube-interview-mp4",
     "/en/skoda-model/elroq",
     "/en/skoda-model/elroq/elroq-rs",
     "/en/skoda-model/elroq/elroq-sportline",
@@ -571,11 +633,6 @@ var CustomImportScript = (() => {
     "/en/skoda-model/octavia/octavia-sportline",
     "/en/skoda-model/peaq",
     "/en/skoda-model/scala",
-    "/en/skoda-octavia-combi-rs-4x4-2",
-    "/en/skoda-octavia-rs230-mpeg-4-1080p-2",
-    "/en/skoda-peaq-simply-clever-part-1-1080p-1-a3e05a13",
-    "/en/skoda-peaq-simply-clever-part-2-1080p-1-583a6637",
-    "/en/skoda-peaq-simply-clever-part-2-with-subtitles-1080p-1-529affa6",
     "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it",
     "/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute",
     "/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car",
@@ -612,9 +669,7 @@ var CustomImportScript = (() => {
     "/en/tag/years/2024",
     "/en/tag/years/2025",
     "/en/tag/years/2026",
-    "/en/tiger-on-ice-test",
-    "/en/videos",
-    "/en/wrc-rally-test"
+    "/en/videos"
   ];
   var DEMO_ALIASES = {
     "/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality": "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality"
@@ -636,9 +691,20 @@ var CustomImportScript = (() => {
     const rest = href.slice(m[0].length);
     const cut = rest.search(/[?#]/);
     const tail = cut === -1 ? "" : rest.slice(cut);
+    if (/^\?(?:[^#]*&)?(?:p|page_id)=\d/.test(tail)) return null;
     let target = edsPath(cut === -1 ? rest : rest.slice(0, cut));
     target = DEMO_ALIASES[target] || target;
     return ALLOWED.has(target) ? `${target}${tail}` : null;
+  }
+  var TAG_FILTER = /^(?:(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com)?\/en\/news\/?\?filter(?:\[|%5B)([a-z0-9-]+)(?:\]|%5D)(?:\[\]|%5B%5D)=([^&#]+)$/i;
+  function tagPageHref(href) {
+    const m = href.match(TAG_FILTER);
+    if (!m) return null;
+    const slug = edsPath(`/${m[2]}`).slice(1);
+    const exact = `/en/tag/${m[1].toLowerCase()}/${slug}`;
+    if (ALLOWED.has(exact)) return exact;
+    const bySlug = DEMO_PATHS.filter((p) => p.startsWith("/en/tag/") && p.endsWith(`/${slug}`) && p.split("/").length === 5);
+    return bySlug.length === 1 ? bySlug[0] : null;
   }
   function transform4(hookName, element, payload) {
     if (hookName !== TransformHook3.afterTransform) return;
@@ -646,7 +712,7 @@ var CustomImportScript = (() => {
       let href = a.getAttribute("href");
       if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
       if (href.startsWith("/direct-download/")) href = `${SOURCE_ORIGIN}${href}`;
-      else href = rewriteHref(href) || href;
+      else href = tagPageHref(href) || rewriteHref(href) || href;
       if (href !== a.getAttribute("href")) a.setAttribute("href", href);
     });
   }

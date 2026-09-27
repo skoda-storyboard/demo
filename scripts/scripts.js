@@ -19,7 +19,7 @@ import {
  * the `template` metadata (`press_release` → `press-release`). Only listed templates load, so
  * an unknown value never requests a missing file.
  */
-const TEMPLATES = ['press-release'];
+const TEMPLATES = ['press-release', 'skoda-series'];
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
   const innerTT = window.trustedTypes.createPolicy('tt-inner', {

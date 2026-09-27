@@ -5,6 +5,18 @@
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–4d *(planning estimate, not a quote)*
 - **GitHub issue:** [#21](https://github.com/skoda-storyboard/demo/issues/21)
 - **Scope split:** five curated hubs in M1; the 25-card `/en/series-2/` directory in M2
+- **Status (2026-09-27):** 🟡 **Importer + hero template done, preview-only.** All 15 tracker hubs (5 M1 set + 10 rail corpus) are imported, pushed to DA and previewed. Publishing is held on SKODA-221.
+  - **Importer:** `parsers/series-hero.js` emits `Hero Image (overlay)` (badge, H1, standfirst). `parsers/series-grid.js` emits the authored `Cards (overlay, tiles)` mosaic: every source tile in DOM order, with Story and Press Kits tiles kept.
+  - **Contract `cards-tiles` shape 2:** the corpus hubs needed new tokens (`quarter`, `third-sq`, `two-thirds`, `banner`, `banner-tall`) and an `end` flag for short rows. The tile fallback is corrected to `broken`, because `cards.js` prints the token.
+  - **Tests:** `tools/importer/series-hub.test.mjs` replays all 15 hubs' rows. The directory output is frozen (M2) and checked byte-identical.
+  - **Template:** `templates/skoda-series/` scopes the hero. Below 768: image first, then a dark caption. From 768: a white overlay; the H1 stays 48/300 at every width.
+  - **Hero QA:** independent QA matched the source on 5 hubs × 7 viewports. The one exception is a source-only 16px offset at exactly 768 (overlapping source media rules).
+  - **Open:**
+    - SKODA-221 renderer, then re-QA the tile geometry and publish.
+    - White caption contrast is below 4.5:1 on 4 of 5 measured hubs. The scrim is identical to the source; the client must decide whether to deviate.
+    - 4 `/en/?p=<id>` tiles on sustainable-mobility are dead WordPress shortlinks (404 on the source too). They are kept, absolute, per SKODA-609.
+    - The 506 size ladder misses non-3:2 renditions (4 masters over 10 MB). Preview still ingested the source renditions.
+    - M2 directory contract and importer.
 
 ## UI Specification
 **Authoritative, DevTools-measured spec:** [`docs/ui-specs/series.md`](../../ui-specs/series.md).

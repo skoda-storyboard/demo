@@ -75,6 +75,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 ### `hero`
 - **Status:** `resolve` · **Ticket:** SKODA-202 (the parser change sits with 207/208) · **Fallback:** readable
 - **Model hero resolved (SKODA-208, 2026-09-26):** `parsers/hero.js` emits `Hero Image (overlay)`: row 1 the picture, row 2 the "Models" chip `<p>` then the H1 (source order; the truncated teaser is dropped).
+- **Series hub resolved (SKODA-207, 2026-09-27):** `parsers/series-hero.js` emits `Hero Image (overlay)`: row 1 the picture, row 2 the "Series" chip `<p>`, the H1, then the standfirst `<p>`. `templates/skoda-series/` shows them as H1 → badge → standfirst. `hero-banner.js` stays unchanged (page/company still to resolve).
 - **Finding:** `parsers/hero.js` (model page, now resolved) and `parsers/hero-banner.js` (page / category / tag / series / listing banners) emit `Hero`, but the `hero` folder on `main` is only an **empty boilerplate stub** (`hero.js` is 0 bytes, `hero.css` is 504 bytes of boilerplate) left from #104. The project's hero is `hero-image`, so a `Hero` table renders undecorated, with boilerplate styling. *(Corrected 2026-09-25: the first inventory said there was no `hero` block at all.)*
 - **Contract:** emit the existing block, with no new `hero` block:
   - `Hero Image (overlay)` for full-bleed overlay heroes (model, series hub, press-kit hub, listings, pages);
@@ -148,13 +149,33 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Still to do:** the importer header change (`Cards (promo)` → `Promo Box`). The check keeps failing `Cards (promo)` and points at `promo-box`.
 
 ### `cards-tiles`
-- **Status:** `pinned` · **Ticket:** SKODA-221, now **Could** (importers: 207 series hub, 805a press-kit hub) · **Fallback:** readable (a uniform overlay-card grid). Plain cards are the documented deviation until 221 lands (805a amendment), so the hubs don't wait for 221 and publish on the fallback.
+- **Status:** `pinned` (shape 2, 2026-09-27) · **Ticket:** SKODA-221, now **Could** (importers: 207 series hub, 805a press-kit hub) · **Fallback:** broken (corrected 2026-09-27, SKODA-207): `blocks/cards/cards.js` on `main` classifies the token cell as body text, so the size word would print on the tile. The hubs therefore stay **preview-only** until 221 consumes the token (rule 8), or until a measured fallback shows zero tokens.
+- **Emitted by:** `parsers/series-grid.js` (207). 805a still to write.
 - **Shape:** header `Cards (overlay, tiles)`, then one row per tile: `[size token, <picture>, <a href="/en/…">Title</a>]`.
-  - The size token is one of `sq`, `sq-small`, `wide`, `third`, `feature`.
-  - Source `ratio-2x1` maps to `wide` (series) or `feature` (press kits).
+  - The size token names the tile's share of its source row, in twelfths, and its image ratio:
+
+    | Token | Row share | Ratio | Token | Row share | Ratio |
+    |---|---|---|---|---|---|
+    | `sq` | 6/12 | 1:1 | `third` | 4/12 | 2:1 |
+    | `wide` | 6/12 | 2:1 | `third-sq` | 4/12 | 1:1 |
+    | `sq-small` | 3/12 | 1:1 | `two-thirds` | 8/12 | 2:1 |
+    | `quarter` | 3/12 | 2:1 | `banner` | 12/12 | 4:1 |
+    | `feature` | press kits (805a) | 2:1 | `banner-tall` | 12/12 | 3:1 |
+
+  - **Row breaks:** a row closes when its tiles fill 12/12. A row that stays short (a source `panel-grid-cell-empty` or empty widget) marks its last tile with a second word, `end` (`wide end`). So every source row break is authored and the renderer never guesses. A token that would overfill a row is a content error.
+  - The importer takes the share from the SiteOrigin layout CSS (`#pgc-<post>-<row>-<cell>{width:N%}`) and the ratio from the tile's `ratio-NxM` class.
   - An empty token cell means the default `sq-small`. The cell stays, per rule 7.
   - Tiles have no date and no excerpt.
-- **Example** (`/en/series/125-years-of-motorsport/`): the curated mosaic in source order. It's **not** index-driven (sweep report §5: series hubs are curated), so it replaces the `series-grid` `Listing`.
+- **Why shape 2:** v1 (`sq`, `sq-small`, `wide`, `third`, `feature`) covered the 5 M1 hubs, where every row fills 12/12. The 10 corpus hubs added:
+  - quarter-width 2:1 tiles (back-to-the-past);
+  - square thirds (evolution-of-parts, my-life-my-car);
+  - 1/3 + 2/3 rows (winter-tips);
+  - full-width 4:1 and 3:1 banners (czech-footprint, unknown-parts, evolution-of-parts, my-life-my-car, sustainable-mobility);
+  - short rows (road-trip row 2, sustainable-mobility row 22).
+
+  v1 tokens keep their meaning, so v1 rows are valid v2 rows.
+- **Proof** (all 15 hubs, `test/fixtures/series/`, `tools/importer/series-hub.test.mjs`): replaying the tokens with "close at 12/12 or on `end`" recovers every source row. Tiles per hub: 125-years 8, 130-years 14, roads-places 10, unexpected-jobs 5, minutes 12, road-trip 3, winter-tips 4, back-to-the-past 22, unknown-parts 3, hidden-helpers 19, czech-footprint 5, sustainable-mobility 93, my-life-my-car 11, evolution-of-parts 8, 60-seconds-walkaround 17.
+- **Example** (`/en/series/125-years-of-motorsport/`): `sq sq` / `sq-small wide sq-small` / `third third third`, the curated mosaic in source order. It's **not** index-driven (sweep report §5: series hubs are curated), so it replaces the `series-grid` `Listing`.
 
 ### `gallery-slider`
 - **Status:** `pinned` · **Ticket:** SKODA-819 · **Fallback:** readable (the current Gallery lead + thumbnails)

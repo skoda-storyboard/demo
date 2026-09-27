@@ -81,6 +81,8 @@ test('source-host links outside the demo stay absolute (D-3 (b))', { skip }, () 
     `${SRC}/en/category/podcast/`, // 404 on the source, not an archive page here
     `${SRC}/en/emobility/whats-behind-epiq-design/`,
     `${SRC}/?attachment_id=454117`,
+    `${SRC}/en/?p=312022`, // WordPress post-id shortlink, not the /en page (SKODA-207)
+    `${SRC}/en/?page_id=105035`,
     `${SRC}/`,
     `${SRC}/cs/`,
   ].forEach((href) => assert.equal(one(href), href));

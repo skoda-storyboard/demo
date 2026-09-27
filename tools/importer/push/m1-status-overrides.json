@@ -28,8 +28,8 @@
     },
     "series": {
       "label": "Series hubs",
-      "gate": "W3: SKODA-207 (221 is Could: plain-card fallback)",
-      "note": "The current output fails the block check: `hero` and a `Listing` `tags` key the listing block doesn't read. The target is the curated `Cards (overlay, tiles)` mosaic."
+      "gate": "W3: SKODA-207 (publish held on SKODA-221)",
+      "note": "207 importer slice (2026-09-27): all 15 hubs imported and previewed as `Hero Image (overlay)` + the authored `Cards (overlay, tiles)` mosaic (cards-tiles v2). Preview-only: `cards.js` prints the size token until SKODA-221, so the contract fallback is `broken` and the check holds publish."
     },
     "stories": {
       "label": "Stories",
