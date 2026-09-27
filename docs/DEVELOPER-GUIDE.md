@@ -44,9 +44,22 @@ styles/
   styles.css         global/layout styles
   fonts.css          @font-face (SKODA Next), loaded lazily
   lazy-styles.css    non-critical global styles
+templates/           page templates with their own layout code (see below)
+  press-release/     press-release.{js,css} (SKODA-607)
 tools/importer/      content-import pipeline (see architecture/IMPORT-PIPELINE.md)
 docs/                analysis + planning docs (see docs/README.md)
 ```
+
+### Page templates (`templates/<name>/`)
+A page type whose layout differs enough from the global one gets its own folder: `templates/<name>/<name>.js`
+(default export `decorate(main)`) and `<name>.css` (scoped to `body.<name>`). It is selected by the `template`
+metadata (`press_release` → `press-release`, the same `toClassName` as the body class) and must be listed in the
+`TEMPLATES` allow-list in `scripts/scripts.js`, so an unknown value never requests a missing file. Loading order:
+`decorateMain` applies the Section Metadata `Style` classes for template pages (`decorateTemplateSections`), then
+`loadEager` awaits the template CSS + JS and runs `decorate(main)` **before** the first section is shown, so the
+layout never shifts. Templates style page layout and default content only; block visuals stay in the blocks.
+`npm run lint:css` covers `templates/**/*.css`. Today: `press-release` (SKODA-607). The story layout still lives in
+`styles/styles.css` (candidate to move once 817/820/821 settle).
 
 > **Note:** there is **no `scripts/delayed.js` and no `scripts/utils.js`** in this repo. The delayed phase calls `loadDelayed()` in `scripts.js` but no separate delayed module is loaded today; consent/analytics is handled via `consent-check.js` + `consented.js`.
 

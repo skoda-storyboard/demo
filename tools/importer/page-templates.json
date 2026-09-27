@@ -204,7 +204,7 @@
       "urls": [
         "https://www.skoda-storyboard.com/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/"
       ],
-      "description": "Škoda press release detail (press_release CPT, Media Room side). No hero: header (span.entry-published date + h1.entry-title) -> primary column default content (article-teaser lead image, .bullet-points inline list, .entry-summary lead, .entry-content body) -> secondary Gallery (section.images.sa-media-kit-preview) -> Tags (ol.entry-tags) -> full-bleed dark related band (div.cover-box.dark div.search-results.media-box) parsed as Downloads. AI-audio (Buzzsprout) embed + newsletter/banner widgets are removed by skoda-press-release-cleanup (Embeds → SKODA-204). Spec: docs/ui-specs/template-press-release.md; content model T15; tickets SKODA-601/607. Detection is content-driven only.",
+      "description": "Škoda press release detail (press_release CPT, Media Room side), SKODA-607. No hero. skoda-press-release-layout rebuilds the article into 5 sections: header (date <p> + h1) -> body-column (lead image, .bullet-points as <ul>, .entry-summary perex as <p><strong>, Buzzsprout + inline Vimeo as bare URLs, .entry-content body) -> sidebar (Additional info list, Gallery (preview) from section.images.sa-media-kit-preview, Tags from section.tags, each with an h3) -> dark Media Box band (heading + stats + Downloads from .search-results.media-box) -> optional dark Related Press Releases band (heading + 'Based on tags' + All link + curated Story Rail (press)). Newsletter/banner widgets removed by skoda-press-release-cleanup. Spec: docs/ui-specs/template-press-release.md; contracts gallery-preview, story-rail-press, downloads-file-rows, press-release-sections. Detection is content-driven only.",
       "blocks": [
         {
           "name": "gallery",
@@ -221,42 +221,82 @@
         {
           "name": "downloads",
           "instances": [
-            ".cover-box.dark .search-results.media-box, .search-results.media-box"
+            ".search-results.media-box"
           ]
         }
       ],
       "sections": [
         {
-          "id": "section-1",
-          "name": "Article",
+          "id": "header",
+          "name": "Header",
           "selector": [
-            "article.press_release > .container, article.press_release"
+            "article.press_release > .container > header"
           ],
           "style": null,
-          "blocks": [
-            "gallery",
-            "tags"
-          ],
+          "blocks": [],
           "defaultContent": [
             "header .entry-published",
-            "header .entry-title",
-            ".column-primary .article-teaser",
+            "header .entry-title"
+          ]
+        },
+        {
+          "id": "body",
+          "name": "Body column",
+          "selector": [
+            "article.press_release .column-primary"
+          ],
+          "style": "body-column",
+          "blocks": [],
+          "defaultContent": [
+            ".column-primary .article-teaser img",
             ".column-primary .bullet-points",
             ".column-primary .entry-summary",
             ".column-primary .entry-content"
           ]
         },
         {
-          "id": "section-2",
-          "name": "Related Media",
+          "id": "sidebar",
+          "name": "Sidebar",
           "selector": [
-            ".cover-box.dark"
+            "article.press_release .column-secondary"
           ],
-          "style": "dark, full-width",
+          "style": "sidebar",
+          "blocks": [
+            "gallery",
+            "tags"
+          ],
+          "defaultContent": [
+            ".column-secondary section > .menu"
+          ]
+        },
+        {
+          "id": "media-box",
+          "name": "Media Box",
+          "selector": [
+            ".cover-box.dark .search-results.media-box"
+          ],
+          "style": "dark, full-width, media-box",
           "blocks": [
             "downloads"
           ],
-          "defaultContent": []
+          "defaultContent": [
+            ".search-results-heading",
+            ".search-results-stats .stats"
+          ]
+        },
+        {
+          "id": "related",
+          "name": "Related Press Releases",
+          "selector": [
+            ".cover-box.dark .search-results.type-press_release"
+          ],
+          "style": "dark, full-width, related",
+          "blocks": [
+            "story-rail"
+          ],
+          "defaultContent": [
+            ".search-results-header"
+          ]
         }
       ]
     },

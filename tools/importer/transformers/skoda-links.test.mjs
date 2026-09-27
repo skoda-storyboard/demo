@@ -77,7 +77,7 @@ test('the mixed-reality alias goes straight to its canonical', { skip }, () => {
 test('source-host links outside the demo stay absolute (D-3 (b))', { skip }, () => {
   [
     `${SRC}/en/tag/model/yeti/`, // a tag archive that isn't imported
-    `${SRC}/en/news/?filter%5Byears%5D%5B%5D=2026`,
+    `${SRC}/en/news/?filter%5Bvip%5D%5B%5D=jahn`, // no demo tag page for the term (607 rule 4)
     `${SRC}/en/category/podcast/`, // 404 on the source, not an archive page here
     `${SRC}/en/emobility/whats-behind-epiq-design/`,
     `${SRC}/?attachment_id=454117`,
@@ -152,4 +152,18 @@ test('the generated allow-list block matches the URL set + corpus + archives (ru
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
   const source = readFileSync(path.join(root, TARGET), 'utf8');
   assert.equal(renderInto(source, readLists(root)), source);
+});
+
+test('single-tag news filter becomes the demo tag page (SKODA-607)', { skip }, () => {
+  // exact taxonomy match
+  assert.equal(one(`${SRC}/en/news/?filter%5Byears%5D%5B%5D=2026`), '/en/tag/years/2026');
+  assert.equal(one(`${SRC}/en/news/?filter[model][]=peaq`), '/en/tag/model/peaq');
+  // the demo files the term under another taxonomy: unique slug match
+  assert.equal(one(`${SRC}/en/news/?filter%5Btechnology%5D%5B%5D=electromobility`), '/en/tag/crew/electromobility');
+  // no demo tag page → unchanged
+  const jahn = `${SRC}/en/news/?filter%5Bvip%5D%5B%5D=jahn`;
+  assert.equal(one(jahn), jahn);
+  // multi-filter "All" links are not tag links
+  const all = `${SRC}/en/news/?filter[years]%5B0%5D=61572&amp;filter[model]%5B0%5D=61611`;
+  assert.equal(one(all), `${SRC}/en/news/?filter[years]%5B0%5D=61572&filter[model]%5B0%5D=61611`);
 });

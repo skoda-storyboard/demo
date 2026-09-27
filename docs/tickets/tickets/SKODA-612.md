@@ -3,7 +3,8 @@
 - **Type:** import / content model
 - **Phase:** A · **Milestone:** M1 Should (visible on every press release)
 - **Estimate:** 1.5 SP · AI-assisted 0.5d / manual 1–1.5d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🔵 TODO
+- **Status (2026-09-27):** ⤵ Folded. The importer half ships in **SKODA-607** (curated `Story Rail (press)` rows in
+  a `dark, full-width, related` section, no `href=""`); the block half (press card styling) is **SKODA-224**.
 
 ## Origin
 SKODA-508 (2026-09-25). 508 kept the band as published (Title-only AC). This ticket carries the ticket's

@@ -11,6 +11,17 @@ Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 > - **No sidebar newsletter** on any of the 5 M1 releases. The secondary column is Additional info + Images + Tags; the side-banner is an empty 15px placeholder.
 > - **Two separate dark bands** (Media Box, then related press releases) on four releases. Superb has no related rail. The Peaq Media Box is 1 video + 3 images + 1 PDF, not a 24-image group.
 
+> **Re-measure (2026-09-27, SKODA-607 origin review of all 5 M1 releases, 1280/1200/1080/1024/768/500).** Overrides the sections it names:
+>
+> - **§2/§6 bands:** both are `.cover-box.dark` `#0e3a2f` (= `--dark-color`), full-bleed, padding 16/12, inner `.search-results` margin 32/48, header padding-top 24 → heading 72px below the band top. Media Box: margin-top 32, heading 26/32.5/600 white, stats line 16/32/600 `#c4c6c7`, a **static** 4-up grid (292×305 tiles at 1280, 3-up at 768, 1-up <768 behind Show more/less). Related: margin-top 0, `h3` + "Based on tags" subheading, an "All" ghost pill (white, 2px `#464748`, 36px, radius 50), Flickity `{"cellAlign":"left","groupCells":true,"pageDots":false}`, 374px cells / 354×199 cards.
+> - **§4 bullets:** one `<p>` of `›` lines split by `<br>`, 16/24/600, not a list. The importer emits a `<ul>`.
+> - **§2 podcast:** the Buzzsprout player is the **first** item in `.entry-content` (lazy `data-src`), not after the body.
+> - **§5 secondary column:** the 416px box has `padding: 0 10px 0 64px` from **1080** (content 342 at x=912 @1280), `0 10px` at 1024 and below (content 321 @1024, 236 @768). Headings 16/45/600 `#353535`; "Additional info" rows 62px (link padding 8 + line 45, 1px `#d2d2d2` bottom border); 15px between groups. Images: 2-up 171×97 at 1280, 1-up <768; no "+N" pill on the M1 set (max 4 images).
+> - **§5 header:** header padding-top 24; date 11/11/600 `#808080` (inline-block, lands at y=140), 16px below; h1 26/32.5/600 `#0a0a0a`. The h1's 26px margin collapses out of the header: the h1 → lead-image gap is **16px**.
+> - **§3/§10 newsletter:** hidden (`display:none`) on all 5; out of scope (904).
+>
+> **§8 EDS target, as built (SKODA-607 phase 1):** the press release has its **own template**, `templates/press-release/` (JS + CSS), loaded from `template: press_release` through the `scripts.js` `TEMPLATES` allow-list. It is not the story CSS. Sections follow the import contract `press-release-sections` (header · `body-column` · `sidebar` · `dark, full-width, media-box` · optional `dark, full-width, related`). Block visuals are separate tickets: SKODA-223 (Gallery `preview`), SKODA-224 (Story Rail `press`), SKODA-510 (Downloads file tiles).
+
 ## 1. Identity
 
 - **Template:** Press release detail page. **The single largest template, 47.5% of all EN pages.**
