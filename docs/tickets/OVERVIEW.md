@@ -173,8 +173,8 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-220](tickets/SKODA-220.md) | Quote block (centred pull-quote + rule + attribution) | E02 | 2 | 0.5–1 | 1–2 | 607,805c,801 | 🟡 M1; Demo sweep 2026-09-25; 4 PRs + 1 PK |
 | [SKODA-221](tickets/SKODA-221.md) | Cards `tiles`/mosaic variant (series + press-kit hubs) | E02 | 3 | 1 | 2–3 | 201,207,805a | 🟡 M1; Demo sweep 2026-09-25; 5 series + 3 PK hubs |
 | [SKODA-222](tickets/SKODA-222.md) | Stories: featured model card on model tag archives (UI) | E02 | 2 | 0.5–1 | 1–2 | 209,214 | 🔵 M1 Should; content imported (contract `stories-feature`) |
-| [SKODA-223](tickets/SKODA-223.md) | Gallery `preview` variant (press-release sidebar media-kit preview, "+N" pill) | E02 | 1.5 | 0.5 | 1–1.5 | 203,607,819 | 🔵 M1; from the 607 phase split (contract `gallery-preview`, readable fallback) |
-| [SKODA-224](tickets/SKODA-224.md) | Story Rail `press` variant (Related Press Releases band cards) | E02 | 1 | 0.5 | 1 | 212,212a,820,607 | 🔵 M1; from the 607 phase split + 612 block half (contract `story-rail-press`) |
+| [SKODA-223](tickets/SKODA-223.md) | Gallery `preview` variant (press-release sidebar media-kit preview, "+N" pill) (#171) | E02 | 1.5 | 0.5 | 1–1.5 | 203,607,819 | 🔵 M1; from the 607 phase split (contract `gallery-preview`, readable fallback) |
+| [SKODA-224](tickets/SKODA-224.md) | Story Rail `press` variant (Related Press Releases band cards) (#172) | E02 | 1 | 0.5 | 1 | 212,212a,820,607 | 🔵 M1; from the 607 phase split + 612 block half (contract `story-rail-press`) |
 | [SKODA-225](tickets/SKODA-225.md) | Columns unequal split + intrinsic portrait (story 2-cell rows) | E02 | 1 | 0.5 | 1 | 801,824 | 🟢 cosmetic; Demo sweep 2026-09-25 |
 | SKODA-301 | Header + mega-menu (3 panels) | E03 | 5 | 2–3 | 4–6 | 102,106 | 🟡 |
 | SKODA-302 | Mobile nav toggle + ARIA (a11y fix) | E03 | 2 | 1 | 1–2 | 301 | 🟡 fixes source gap |
@@ -209,7 +209,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-610](tickets/SKODA-610.md) | Clean index titles (drop " - Škoda Storyboard") | E06 | 1 | 0.25–0.5 | 0.5–1 | 401,602,603 | 🟡 M1; code done 2026-09-25 (importer + shared runtime trim); 7/28 republished (index 29→22 suffixed), 21 held (508/603/208/819); 0 suffixed card titles/alt on branch preview |
 | [SKODA-508](tickets/SKODA-508.md) | `skoda-images` turns card-image `data-caption` excerpts into body paragraphs | E05 | 1 | 0.25–0.5 | 0.5–1 | 501 | 🟡 M1; code done + QA 2026-09-25 (10/10 PR re-imports Title-only vs DA); 5 caption PRs republished (live index 21→16 suffixed); follow-ups 509, 612 |
 | [SKODA-509](tickets/SKODA-509.md) | `skoda-images.js` doesn't use the transformer hook signature (validator fails on every edit) | E05 | 0.5 | 0.25 | 0.25–0.5 | 508 | 🔵 M2; tooling, from 508 |
-| [SKODA-510](tickets/SKODA-510.md) | Downloads file tiles (PDF / no-image rows, video badge) + mobile Show more | E05 | 1 | 0.5 | 1 | 502,503,607 | 🔵 M1; from the 607 phase split (contract `downloads-file-rows`) |
+| [SKODA-510](tickets/SKODA-510.md) | Downloads file tiles (PDF / no-image rows, video badge) + mobile Show more (#173) | E05 | 1 | 0.5 | 1 | 502,503,607 | 🔵 M1; from the 607 phase split (contract `downloads-file-rows`) |
 | [SKODA-611](tickets/SKODA-611.md) | Storyboard home composition (/en cover-box stack, promo exclusion) | E06 | 2.5 | 1 | 2–2.5 | 212,213,214,217,218,603 | 🟡 M1; Demo sweep 2026-09-25; no owner since 604 re-point; **parent** of 611a/611b (D2); promo exclusion already fixed by #110 |
 | [SKODA-611a](tickets/SKODA-611a.md) | Home section structure: 9 cover-box sections, dark bands, social strip (Must slice) | E06 | 1 | 0.5 | 1 | 213,214,217,218,603 | 🟡 M1 Must |
 | [SKODA-611b](tickets/SKODA-611b.md) | Home band spacing: 67px gap, 320px rail pitch (Should slice) | E06 | 1.5 | 0.5 | 1–1.5 | 611a,218 | 🟡 M1 Should |

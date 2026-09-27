@@ -2,6 +2,7 @@
 - **Epic:** E05, Media Pipeline
 - **Type:** block extension
 - **Phase:** A · **Milestone:** M1 (demo-visible on every press release)
+- **GitHub issue:** [#173](https://github.com/skoda-storyboard/demo/issues/173) (sub-issue of #47; not yet on Project #1)
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1d *(planning estimate, not a quote)*
 - **Status (2026-09-27):** 🔵 TODO
 
