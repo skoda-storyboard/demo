@@ -23,13 +23,18 @@
  *   ['index', '/en/query-index.json']
  *   ['path', '/en/images/']
  *   ['template', 'image']
- *   ['facets', 'model, derivative, year, company, event, technology']
+ *   ['facets', 'model, bodywork, derivative, view, years, company, happening, technology']
  *   ['sort', 'newest']
  *   ['perpage', '12']
  *   ['columns', '4']
  */
 
-const FACETS_DEFAULT = 'model, derivative, year, company, event, technology';
+// Facet keys are the index COLUMN names (query-index-config.yaml), not the display labels:
+// `years` (label "Year"), `happening` ("Event"). SKODA-608 fixed `year`/`event`, which match
+// no column, so those pills never rendered.
+const FACETS_DEFAULT = 'model, derivative, years, company, happening, technology';
+// Media listings also facet by bodywork and Interior/Exterior (`view`), as the source does.
+const FACETS_MEDIA = 'model, bodywork, derivative, view, years, company, happening, technology';
 
 // Variant config keyed by the <body> class token the source page carries.
 // Each value is the authored Listing contract (faceted-listing.md §7). Order-preserving.
@@ -48,7 +53,7 @@ const VARIANTS = {
     ['index', '/en/query-index.json'],
     ['path', '/en/images/'],
     ['template', 'image'],
-    ['facets', FACETS_DEFAULT],
+    ['facets', FACETS_MEDIA],
     ['sort', 'newest'],
     ['perpage', '12'],
     ['columns', '4'],
@@ -57,10 +62,10 @@ const VARIANTS = {
     ['index', '/en/query-index.json'],
     ['path', '/en/videos/'],
     ['template', 'video'],
-    ['facets', FACETS_DEFAULT],
+    ['facets', FACETS_MEDIA],
     ['sort', 'newest'],
     ['perpage', '12'],
-    ['columns', '3'],
+    ['columns', '4'], // the source videos grid is 4-up at ≥992, like images
   ],
   // Site-wide free-text search: no path/template filter (cross-type), search box on.
   search: [

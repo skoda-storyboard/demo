@@ -42,7 +42,8 @@ paths and emit the new properties:
 
 - Add `include` globs: `/en/models/**` (or `/en/skoda-model/**`), `/en/series/**`, `/en/press-releases/**`,
   `/en/press-kits/**`, `/en/images/**`, `/en/videos/**` — mapped to the DA target paths the importer writes.
-- Add properties: `tags` (`head > meta[name="tags"]`), `model` (`head > meta[name="model"]`).
+- Add properties: `tags` (`head > meta[property="article:tag"]`, multi-value; DA `tags` metadata renders as `article:tag`), `model` (`head > meta[name="model"]`).
+- Media items (SKODA-608, `template` image|video): download columns `original`, `rendition-1920`, `mp4`, `vimeo-id`, `poster` (`head > meta[name="<field>"]`, stable CDN URLs). See the `media-item` contract.
 - Keep one shared `target: /en/query-index.json` so all blocks read one index (they already memoize the
   fetch via `scripts/query-index.js`).
 

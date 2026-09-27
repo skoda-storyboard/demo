@@ -56,14 +56,19 @@ test('the committed M1 set parses to 43 entries, 42 pages + 1 alias', () => {
   );
 });
 
-test('the committed corpus parses into its families, 18 image + 18 video items', () => {
+test('the committed corpus parses into its families, ≥18 image + ≥18 video item pages', () => {
   const corpus = parseSectionedList(readFileSync(path.join(PLANNING, 'skoda-rail-feed-corpus.txt'), 'utf8'));
   const fams = new Set(corpus.map((r) => r.family));
   ['models', 'series', 'press-releases', 'press-kits', 'stories', 'images', 'videos'].forEach((f) => assert.ok(fams.has(f), f));
   assert.ok(!fams.has('other'));
   assert.ok(!fams.has('home'));
-  assert.equal(corpus.filter((r) => r.family === 'images').length, 18);
-  assert.equal(corpus.filter((r) => r.family === 'videos').length, 18);
+  // SKODA-608: item pages at their EDS paths (generated block), no unmapped ?attachment_id= rows.
+  const images = corpus.filter((r) => r.family === 'images');
+  const videos = corpus.filter((r) => r.family === 'videos');
+  assert.ok(images.length >= 18, `images ${images.length}`);
+  assert.ok(videos.length >= 18, `videos ${videos.length}`);
+  assert.ok(images.every((r) => r.path.startsWith('/en/images/') && !r.unmapped));
+  assert.ok(videos.every((r) => r.path.startsWith('/en/videos/') && !r.unmapped));
   assert.ok(!corpus.some((r) => r.path === '/index'));
 });
 

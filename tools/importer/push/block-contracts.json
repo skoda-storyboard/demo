@@ -310,8 +310,10 @@
       "status": "pinned",
       "ticket": "SKODA-608",
       "fallback": "readable",
-      "shape": 1,
-      "emittedBy": []
+      "shape": 2,
+      "emittedBy": [
+        "media-items/build-media-items.mjs"
+      ]
     },
     {
       "id": "floating-action-bar",

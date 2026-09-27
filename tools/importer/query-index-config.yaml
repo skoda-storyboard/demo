@@ -112,6 +112,23 @@ indices:
       vip:
         select: head > meta[name="vip"]
         value: attribute(el, "content")
+      # --- media-item download fields (SKODA-608, contract media-item shape 2). Stable CDN
+      #     URLs; empty on every non-media row. Read by the listing media card (SKODA-406). ---
+      original:
+        select: head > meta[name="original"]
+        value: attribute(el, "content")
+      rendition-1920:
+        select: head > meta[name="rendition-1920"]
+        value: attribute(el, "content")
+      mp4:
+        select: head > meta[name="mp4"]
+        value: attribute(el, "content")
+      vimeo-id:
+        select: head > meta[name="vimeo-id"]
+        value: attribute(el, "content")
+      poster:
+        select: head > meta[name="poster"]
+        value: attribute(el, "content")
 
   # --- Stubbed locales (E10 rollout, SKODA-1001). Inherit properties + exclude
   #     from &default via merge; override include + target. Produce empty

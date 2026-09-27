@@ -20,6 +20,23 @@ result, both listings and 10 model rails render empty.
 [`skoda-rail-feed-corpus.txt`](../../planning/skoda-rail-feed-corpus.txt) already lists 18 image and 18 video
 attachment pages, HTTP-verified.
 
+> **Update (2026-09-27, phase 1: import + index).**
+>
+> - **Scope:** import, index and content only; block work is ticketed: **SKODA-402a** (listing 1/3/4/4 + collapsed
+>   facets), **SKODA-406** (listing media card), **SKODA-208** amendment (hide the whole empty rail section).
+> - **Item pages** live at `/en/images/<slug>` / `/en/videos/<slug>` (the listing's path scope), built by
+>   `tools/importer/media-items/build-media-items.mjs` from the **source listing cards** (the only source covering
+>   items whose attachment page 404s; `ajax_search_results_<type>=N` renders N cards). Contract `media-item` shape 2.
+> - **Corpus expanded** from the 18+18 attachment list (which couldn't meet the ACs: images carried no model tags)
+>   to Peaq/Epiq-tagged items: **74 images** (Peaq 41, Epiq 30, 12 interior) and **27 videos** (Peaq 8, Epiq 6).
+> - **Rail AC amended:** Peaq and Epiq Images ≥12; Videos show **every playable** source video for the model:
+>   Peaq 8, Epiq 6. Five source videos (451655/57/58, 452405, 436546) are Vimeo domain-restricted to
+>   skoda-storyboard.com (oEmbed `domain_status_code 403`): they can't play on the demo and have no poster, so
+>   they are not imported. The source rails show 13 / 9 including them.
+> - **Download fields** are stable CDN URLs (`/direct-download/` redirects to an expiring presigned S3 URL).
+> - **Facets:** the listing parser now uses the index column keys (`years`, `happening`; was `year`, `event`) and
+>   adds `bodywork` + `view` on the media listings; Videos is 4 columns like the source.
+
 ## Requirements / Spec
 - **Approach.** Recommended: **one lightweight EDS page per attachment item** at the source path, with template
   `image` / `video`. This lets the existing `listing` and `story-rail` blocks and the query-index work unchanged.

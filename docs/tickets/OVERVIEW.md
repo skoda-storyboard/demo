@@ -95,6 +95,11 @@ New M1 tickets:
   as **SKODA-223** (Gallery `preview`, 1.5), **SKODA-224** (Story Rail `press`, 1) and **SKODA-510** (Downloads
   file tiles, 1): +3.5 SP. **SKODA-612** is folded (importer → 607, block → 224). New contracts `gallery-preview`,
   `story-rail-press`, `downloads-file-rows`, `press-release-sections`.
+- **2026-09-27, SKODA-608 phase 1 (import + index):** 74 image + 27 video item pages (`/en/images/<slug>`,
+  `/en/videos/<slug>`, contract `media-item` shape 2) generated from the source listing cards by
+  `tools/importer/media-items/build-media-items.mjs`; the index config gains `original`, `rendition-1920`, `mp4`,
+  `vimeo-id`, `poster`. `/en/images` and `/en/videos` are live. Block work split out: **SKODA-402a** (listing layout,
+  1 SP), **SKODA-406** (listing media card, 2 SP); **SKODA-208** amended (hide the whole empty rail section).
 **Target:** DA / Experience Workspace + EDS (no AEM Author / UE / JCR), per `SKODA-EDS-DA-ARCHITECTURE.md`.
 **Estimates:** story points (SP) + AI-assisted / manual day ranges, **planning estimates, not a quote**. "AI-assisted" reflects this environment's import/styling/QA tooling.
 **Files:** `docs/tickets/epics/E##-*.md` · `docs/tickets/tickets/SKODA-<id>.md`.
@@ -187,8 +192,10 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-309](tickets/SKODA-309.md) | Media Room side chrome (MR nav, active tab, nav/footer metadata) | E03 | 2 | 0.5–1 | 1–2 | 301,305,307,607,805a,602 | 🟡 M1; Demo sweep 2026-09-25; **16** MR URLs incl. 5 model pages; draft 825 folded in; unblocked (#134 merged); MR nav fragment still 404 |
 | SKODA-401 | Query-index schema + selectors + metadata-normalization (15 facets) | E04 | 8 | 3–5 | 5–8 | 104 | 🟠 build-confirmed: admin-service `query.yaml` (not repo); fields need normalization layer, not clean selectors |
 | SKODA-402 | Faceted listing + load-more (deep-link) | E04 | 8 | 3–5 | 6–9 | 401,201 | 🟠 hardest pilot block |
+| [SKODA-402a](tickets/SKODA-402a.md) | Listing layout QA fix: 1/3/4/4 grid + facets collapsed behind "Advanced filter (n)" (follow-up to 402) (#175) | E04 | 1 | 0.5 | 1 | 402,608 | 🔵 M1; from the 608 phase split (sweep V10) |
 | SKODA-403 | Search block (index-only) | E04 | 3 | 1–2 | 2–4 | 401 | 🟡 body-search deferred |
 | SKODA-405 | RSS feed generation (query-index → RSS 2.0) | E04 | 2 | 0.5–1 | 1–2 | 401 | 🟢 **M2** (aligned to board 2026-09-25; was M1 stretch); agent-fit |
+| [SKODA-406](tickets/SKODA-406.md) | Listing media-card cell (image/video: date, filename, download toolbar, video badge, lightbox) (#176) | E04 | 2 | 1 | 1.5–2 | 402,608,203,216,502,505a | 🔵 M1; from the 608 phase split (reads the media-item download columns) |
 | SKODA-501 | Masters-only image ingest (img-out-of-`<p>`, alt/caption) | E05 | 3 | 1–2 | 2–3 | 102 | 🟢 |
 | SKODA-502 | Static Downloads block (mediabox) | E05 | 3 | 1–2 | 2–3 | 102 | 🟢 |
 | SKODA-503 | PDF/MP4 handling (link/DAM) | E05 | 2 | 0.5–1 | 1–2 | 501 | 🟡 MP4 signed-flow (cart now SKODA-505) |
@@ -204,7 +211,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-604 | Full-fidelity restore on 1–2 hero demo stories | E06 | 2 | 0.5–1 | 1–2 | 203,204,502,505,601,602,801 | 🟢 M1 (D18); bounded un-flatten |
 | [SKODA-605](tickets/SKODA-605.md) | Rewrite absolute source URLs to site-relative in import (#39) | E06 | 2 | 0.5–1 | 1–2 | 601,602 | 🟡 M1; code done 2026-09-25 (`skoda-links.js` in all 16 importers, demo-page allow-list, D-3 (b) for the rest); 2 pages published, the rest ride with 508/603/607/801a/208 |
 | SKODA-607 | Press Release detail template (split from story) | E08 | 5 | 2–3 | 4–6 | 601,602,502 | 🟡 M1; phase 1 (import + own template `templates/press-release/`) on branch `skoda-607-press-release` 2026-09-27; closes after 223/224/510 + final visual diff; spec `ui-specs/template-press-release.md` |
-| [SKODA-608](tickets/SKODA-608.md) | Image & video item index rows (listings + model media rails) | E06 | 3 | 1–1.5 | 2–3 | 601,602,401,501,503 | 🟠 M1 Must; `/en/images/`, `/en/videos/` empty without it |
+| [SKODA-608](tickets/SKODA-608.md) | Image & video item index rows (listings + model media rails) | E06 | 3 | 1–1.5 | 2–3 | 601,602,401,501,503 | 🟡 M1; phase 1 (import + index) 2026-09-27: 74 image + 27 video item pages at /en/images\|videos/<slug>, index download columns, both listings live; UI → 402a / 406, rail hide-empty → 208 |
 | [SKODA-609](tickets/SKODA-609.md) | M1 link containment + mixed-reality alias redirect | E06 | 2 | 1 | 1–2 | 605,103,603 | 🟠 M1 Must; decision D-3 |
 | [SKODA-610](tickets/SKODA-610.md) | Clean index titles (drop " - Škoda Storyboard") | E06 | 1 | 0.25–0.5 | 0.5–1 | 401,602,603 | 🟡 M1; code done 2026-09-25 (importer + shared runtime trim); 7/28 republished (index 29→22 suffixed), 21 held (508/603/208/819); 0 suffixed card titles/alt on branch preview |
 | [SKODA-508](tickets/SKODA-508.md) | `skoda-images` turns card-image `data-caption` excerpts into body paragraphs | E05 | 1 | 0.25–0.5 | 0.5–1 | 501 | 🟡 M1; code done + QA 2026-09-25 (10/10 PR re-imports Title-only vs DA); 5 caption PRs republished (live index 21→16 suffixed); follow-ups 509, 612 |

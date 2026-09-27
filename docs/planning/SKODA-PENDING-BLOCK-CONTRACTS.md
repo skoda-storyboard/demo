@@ -217,14 +217,15 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Until the importer emits it** (824 importer half), pages keep the current unwrap (default content) and are marked `re-import on SKODA-824`. The shape is fixed, so the 824 runtime and importer can be built in parallel.
 
 ### `media-item`
-- **Status:** `pinned` · **Ticket:** SKODA-608 · **Fallback:** readable
-- **Form: index row, not a block.** Image and video item pages carry the metadata the `listing` media card reads:
-  - `template` = `image` | `video`;
-  - `title`, `description`, `image` (masters-only thumbnail), `publisheddate`, `tags`, `model` and the facet fields in `query-index-config.yaml`;
-  - download fields (JPG Original + 1920, or the MP4 source), plus the Vimeo ID / poster for videos (608 amendment).
-
-  The item body is a single `<picture>` or embed plus the caption. The listing media-card cell (date, filename, add/download toolbar, lightbox) is built inside `listing`, not as a new block.
-
+- **Status:** `pinned` (shape 2, 2026-09-27) · **Ticket:** SKODA-608 · **Fallback:** readable (story-style listing/rail cards until SKODA-406)
+- **Emitted by:** `tools/importer/media-items/build-media-items.mjs` (source listing cards → one page per item; record in `tools/importer/media-items/items.json`).
+- **Form: an item page per image/video, at `/en/images/<slug>` or `/en/videos/<slug>`** (the listing's `path` scope). Its Metadata block is the index row:
+  - `template` = `image` | `video`; `category` = `images` | `videos`;
+  - `title`, `description` (the caption, else the title), `image` (thumbnail: the master for images, the Vimeo poster `…-d_1280x720.jpg` for videos), `publisheddate` (the date the source card shows), `tags` (every facet value) and the 15 facets, mapped by term **name** from the source filter form (English terms only);
+  - download fields, stable CDN URLs (never `/direct-download/`, which redirects to an expiring presigned S3 URL): `original` + `rendition-1920` (images), `mp4` + `vimeo-id` + `poster` (videos); plus `source` (the source attachment URL).
+- **Body (shape 2):** `h1` title, the date, the `<picture>` (images) or the bare `https://vimeo.com/<id>` URL (videos, `embed` autoblock), the caption, a one-row `Downloads` table in the `downloads-file-rows` shape (Original + 1920px, or MP4), an `h3` "Tags" + `Tags` block whose links deep-link the filtered demo listing (`/en/images?filter[model][]=peaq`). Only blocks on main.
+- The listing media-card cell (date, filename, add/download toolbar, lightbox) is SKODA-406, inside `listing`; it reads the download columns.
+- Vimeo videos that are domain-restricted to skoda-storyboard.com (oEmbed `domain_status_code: 403`) can't play on the demo and have no public poster; they are not imported.
 ### `floating-action-bar`
 - **Status:** `pinned` · **Ticket:** SKODA-215 · **Fallback:** readable (absent)
 - **Form: code-only.** It's template chrome (share toggle + scroll-to-top) added at runtime on **every template** (215: all 43 captures), so the importers emit **nothing** for it.
