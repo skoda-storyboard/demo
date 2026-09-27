@@ -306,11 +306,11 @@
     {
       "id": "media-item",
       "block": null,
-      "form": "index-row",
+      "form": "feed-row",
       "status": "pinned",
       "ticket": "SKODA-608",
       "fallback": "readable",
-      "shape": 2,
+      "shape": 3,
       "emittedBy": [
         "media-items/build-media-items.mjs"
       ]

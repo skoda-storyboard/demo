@@ -13,7 +13,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   slugify, isoDate, cdnUrl, vimeoPoster, facetOptions, cardTerms, parseCards, mergeItems,
-  itemPageHtml, itemSlug, FACETS,
+  feedRow, feedSheet, itemSlug, FACETS,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 
@@ -109,37 +109,41 @@ test('merge: dedupe by source id, union terms, resolve slug collisions', () => {
   assert.equal(out[1].path, '/en/images/x-2');
 });
 
-test('item page: h1, picture, Downloads row, Tags links, Metadata index row', { skip }, () => {
+test('image feed row: listing/rail columns, facets, download fields, thumbnail', { skip }, () => {
   const d = doc('images-peaq');
-  const opts = facetOptions(d);
-  const [item] = parseCards(d, { options: opts, yearsById: YEARS });
-  const page = new JSDOM(`<body>${itemPageHtml(item, opts)}</body>`).window.document;
-  assert.equal(page.querySelectorAll('h1').length, 1);
-  const dl = page.querySelector('.downloads > div');
-  assert.equal(dl.children.length, 3, 'downloads row is 3 cells');
-  assert.deepEqual([...dl.children[2].querySelectorAll('a')].map((x) => x.textContent), item['rendition-1920'] ? ['Original', '1920px'] : ['Original']);
-  const tagHrefs = [...page.querySelectorAll('.tags a')].map((x) => x.getAttribute('href'));
-  assert.ok(tagHrefs.includes('/en/images?filter%5Bmodel%5D%5B%5D=peaq'));
-  const meta = Object.fromEntries([...page.querySelectorAll('.metadata > div')].map((r) => [r.children[0].textContent, r.children[1].textContent]));
-  assert.equal(meta.template, 'image');
-  assert.equal(meta.category, 'images');
-  assert.equal(meta.original, item.original);
-  assert.match(meta.publisheddate, /^\d{4}-\d{2}-\d{2}$/);
-  assert.ok(meta.model.includes('peaq'));
-  FACETS.forEach((f) => { if (meta[f]) assert.ok(meta.tags.includes(meta[f].split(', ')[0])); });
-  assert.ok(page.querySelector('.metadata img[src]'), 'Image row carries the thumbnail');
+  const [item] = parseCards(d, { yearsById: YEARS });
+  const row = feedRow(item);
+  assert.equal(row.template, 'image');
+  assert.equal(row.category, 'images');
+  assert.equal(row.path, item.original, 'card links to the image until the SKODA-406 lightbox');
+  assert.match(row.image, /^https:\/\/cdn\.skoda-storyboard\.com\/.+-\d+x\d+\.[a-z]+$/i, 'small source rendition as the thumbnail');
+  assert.match(row.date, /^\d{4}-\d{2}-\d{2}$/);
+  assert.ok(row.model.split(', ').includes('peaq'));
+  assert.equal(row.original, item.original);
+  assert.equal(row.mp4, '');
+  FACETS.forEach((f) => { assert.equal(typeof row[f], 'string'); if (row[f]) assert.ok(row.tags.includes(row[f].split(', ')[0])); });
+  Object.values(row).forEach((v) => assert.equal(typeof v, 'string', 'every cell is a string'));
 });
 
-test('video item page: bare Vimeo URL (embed autoblock) + MP4 download + download fields', { skip }, () => {
-  const d = doc('videos-peaq');
-  const item = parseCards(d, { yearsById: YEARS }).find((i) => i.poster);
-  const page = new JSDOM(`<body>${itemPageHtml(item)}</body>`).window.document;
-  const vimeo = page.querySelector(`a[href="https://vimeo.com/${item['vimeo-id']}"]`);
-  assert.ok(vimeo && vimeo.closest('p').textContent.trim() === vimeo.getAttribute('href'));
-  assert.deepEqual([...page.querySelectorAll('.downloads a')].map((x) => x.textContent), ['MP4']);
-  const meta = Object.fromEntries([...page.querySelectorAll('.metadata > div')].map((r) => [r.children[0].textContent, r.children[1].textContent]));
-  assert.equal(meta.template, 'video');
-  assert.equal(meta['vimeo-id'], item['vimeo-id']);
-  assert.equal(meta.mp4, item.mp4);
-  assert.equal(meta.poster, item.poster);
+test('video feed row: Vimeo link, MP4 + poster fields', { skip }, () => {
+  const item = parseCards(doc('videos-peaq'), { yearsById: YEARS }).find((i) => i.poster);
+  const row = feedRow(item);
+  assert.equal(row.template, 'video');
+  assert.equal(row.path, `https://vimeo.com/${item['vimeo-id']}`);
+  assert.equal(row.image, item.poster);
+  assert.equal(row['vimeo-id'], item['vimeo-id']);
+  assert.equal(row.mp4, item.mp4);
+});
+
+test('feed sheet: DA sheet shape, newest first, query-index compatible', { skip }, () => {
+  const items = mergeItems([parseCards(doc('images-peaq'), { yearsById: YEARS }), parseCards(doc('videos-peaq'), { yearsById: YEARS })]);
+  const sheet = feedSheet(items);
+  assert.equal(sheet[':type'], 'sheet');
+  assert.equal(sheet.total, sheet.data.length);
+  assert.equal(sheet.limit, sheet.data.length);
+  assert.equal(sheet.offset, 0);
+  assert.equal(sheet.data.length, 24);
+  const dates = sheet.data.map((r) => r.date);
+  assert.deepEqual(dates, [...dates].sort().reverse());
+  assert.deepEqual(new Set(sheet.data.map((r) => r.template)), new Set(['image', 'video']));
 });

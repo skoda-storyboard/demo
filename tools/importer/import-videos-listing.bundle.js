@@ -56,8 +56,7 @@ var CustomImportScript = (() => {
       ["columns", "3"]
     ],
     images: [
-      ["index", "/en/query-index.json"],
-      ["path", "/en/images/"],
+      ["index", "/en/media-feed.json"],
       ["template", "image"],
       ["facets", FACETS_MEDIA],
       ["sort", "newest"],
@@ -65,8 +64,7 @@ var CustomImportScript = (() => {
       ["columns", "4"]
     ],
     videos: [
-      ["index", "/en/query-index.json"],
-      ["path", "/en/videos/"],
+      ["index", "/en/media-feed.json"],
       ["template", "video"],
       ["facets", FACETS_MEDIA],
       ["sort", "newest"],

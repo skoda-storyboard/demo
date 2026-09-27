@@ -1,7 +1,7 @@
 # Media items (images / videos): architecture options
 
-*Decision note for SKODA-608, 2026-09-27. Status: **direction agreed (option B)**, see the decision log at the end.
-PR #177 (phase 1: one page per item) is on hold; the demo pivot waits for a go-ahead.*
+*Decision note for SKODA-608, 2026-09-27. Status: **decided (option B) and implemented for the M1 demo**, see the
+decision log at the end.*
 
 ## The question
 
@@ -107,3 +107,9 @@ renditions: they aren't resized by the Media Bus params, but they are small enou
 - **M2:** Media taxonomy in AEM Assets: the 15 facet namespaces and the source-term mapping, applied at ingest
   (with SKODA-504).
 - **SKODA-406:** verify card images against AEM delivery URLs (the `createOptimizedPicture` params).
+
+**Implemented for M1 (2026-09-27):** `/en/media-feed.json` published (101 rows); `/en/images`, `/en/videos` and 20
+model pages read it via `index`; the 101 item pages are unpublished and deleted; the 5 query-index columns are
+reverted. Verified on `.aem.live`: listings 12 + load-more, facet narrowing, Peaq/Epiq rails 20/8 and 20/6.
+Follow-ups: **SKODA-511** (sync job), **SKODA-512** (taxonomy). Kamiq/Scala model pages still lack the `index` row
+(SKODA-506 hero gate; their media rails are empty either way).

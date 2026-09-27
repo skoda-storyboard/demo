@@ -6,11 +6,12 @@
  * `article.media-cart-item` cards are the only source that covers every item: many
  * attachment pages 404 (unpublished parent press kits) while the card is listed.
  *
- * One EDS page per item at /en/images/<slug> or /en/videos/<slug> (contract `media-item`
- * shape 2, docs/planning/SKODA-PENDING-BLOCK-CONTRACTS.md). The page body uses blocks on
- * main only (embed autoblock, downloads, tags); the Metadata block carries the index row:
- * template, title, description, image, publisheddate, category, tags, the 15 facets and
- * the download fields (original, rendition-1920, mp4, vimeo-id, poster).
+ * No page per item (docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md, option B: AEM Assets is
+ * the source of truth). Each item becomes one ROW of the generated media feed
+ * (/en/media-feed.json, a DA sheet in the query-index shape; contract `media-item` shape 3),
+ * which the listing and story-rail blocks read through their `index` config row. For the M1
+ * demo the rows come from the source listing; the M2 sync job writes the same rows from
+ * published AEM Assets.
  *
  * Every function here is DOM-in / data-out and has no network access, so it is unit-tested
  * on saved fixtures (tools/importer/media-items/media-items.test.mjs).
@@ -146,6 +147,7 @@ export function parseCards(doc, { options, yearsById } = {}) {
       date: isoDate(text(article.querySelector('.entry-published'))),
       caption: ((img && img.getAttribute('data-caption')) || '').replace(/\s+/g, ' ').trim(),
       alt: ((img && img.getAttribute('alt')) || '').trim(),
+      thumbnail: cdnUrl(img && img.getAttribute('src')),
       terms: cardTerms(article, opts, yearsById),
     };
 
@@ -191,71 +193,41 @@ export function mergeItems(lists) {
   });
 }
 
-const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;');
-const row = (key, valueHtml) => `<div><div>${esc(key)}</div><div>${valueHtml}</div></div>`;
-const picture = (src, alt) => `<picture><img src="${esc(src)}" alt="${esc(alt)}"></picture>`;
-const listingOf = (item) => (item.type === 'image' ? '/en/images' : '/en/videos');
-
-/** Display date "21. 9. 2026" (the source card format) from ISO. */
-function displayDate(iso) {
-  const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  return m ? `${Number(m[3])}. ${Number(m[2])}. ${m[1]}` : '';
+/** Link target of a feed row until the listing lightbox lands (SKODA-406). */
+function rowPath(item) {
+  if (item.type === 'image') return item.original;
+  return item['vimeo-id'] ? `https://vimeo.com/${item['vimeo-id']}` : item.mp4;
 }
 
 /**
- * Item page (.plain.html, the importer output format push-to-da wraps for DA).
- * @param {object} item a parseCards() descriptor
- * @param {Map<string,string>} labels `${tax}:${value}` → label (facetOptions)
+ * One media feed row (contract media-item shape 3): the columns the listing and story-rail
+ * read (path, title, description, image, template, date, category, tags, the 15 facets) plus
+ * the download fields. Every value is a string (a sheet cell); lists are comma-joined.
  */
-export function itemPageHtml(item, labels = new Map()) {
-  const body = [`<h1>${esc(item.title)}</h1>`];
-  if (item.date) body.push(`<p>${esc(displayDate(item.date))}</p>`);
-  if (item.type === 'image') {
-    body.push(`<p>${picture(item.original, item.alt || item.title)}</p>`);
-  } else if (item['vimeo-id']) {
-    const url = `https://vimeo.com/${item['vimeo-id']}`;
-    body.push(`<p><a href="${esc(url)}">${esc(url)}</a></p>`);
-  }
-  if (item.caption) body.push(`<p>${esc(item.caption)}</p>`);
+export function feedRow(item) {
+  const row = {
+    path: rowPath(item),
+    title: item.title,
+    description: item.caption,
+    // Card thumbnail: the source's 768px rendition for images, the Vimeo poster for videos.
+    image: (item.type === 'image' ? item.thumbnail : item.poster) || item.image,
+    template: item.type,
+    date: item.date,
+    category: item.type === 'image' ? 'images' : 'videos',
+    tags: [...new Set(FACETS.flatMap((tax) => item.terms[tax] || []))].join(', '),
+  };
+  FACETS.forEach((tax) => { row[tax] = (item.terms[tax] || []).join(', '); });
+  DOWNLOAD_FIELDS.forEach((field) => { row[field] = item[field] || ''; });
+  row.id = item.id;
+  row.source = item.source;
+  return row;
+}
 
-  // Downloads: one row in the block's 3-cell shape (contract downloads-file-rows).
-  const links = item.type === 'image'
-    ? [['Original', item.original], ['1920px', item['rendition-1920']]]
-    : [['MP4', item.mp4]];
-  const linkCell = links.filter(([, href]) => href)
-    .map(([label, href]) => `<p><a href="${esc(href)}">${esc(label)}</a></p>`).join('');
-  if (linkCell) {
-    body.push(`<div class="downloads"><div><div>${item.image ? picture(item.image, item.alt || item.title) : ''}</div><div>${esc(item.title)}</div><div>${linkCell}</div></div></div>`);
-  }
-
-  // Tags: every facet value, linked to the filtered demo listing (deep-links the facet).
-  const tagLinks = FACETS.flatMap((tax) => (item.terms[tax] || []).map((value) => {
-    const href = `${listingOf(item)}?filter%5B${tax}%5D%5B%5D=${encodeURIComponent(value)}`;
-    return `<a href="${esc(href)}">${esc(labels.get(`${tax}:${value}`) || value)}</a>`;
-  }));
-  if (tagLinks.length) {
-    body.push('<h3>Tags</h3>');
-    body.push(`<div class="tags"><div><div>${tagLinks.join('')}</div></div></div>`);
-  }
-
-  // Metadata = the index row (contract media-item shape 2).
-  const allTags = [...new Set(FACETS.flatMap((tax) => item.terms[tax] || []))];
-  const meta = [
-    row('Title', esc(item.title)),
-    row('Description', esc(item.caption || item.title)),
-  ];
-  if (item.image) meta.push(row('Image', picture(item.image, item.alt || item.title)));
-  if (item.date) meta.push(row('publisheddate', esc(item.date)));
-  meta.push(row('template', item.type));
-  meta.push(row('category', item.type === 'image' ? 'images' : 'videos'));
-  if (allTags.length) meta.push(row('tags', esc(allTags.join(', '))));
-  FACETS.forEach((tax) => {
-    if ((item.terms[tax] || []).length) meta.push(row(tax, esc(item.terms[tax].join(', '))));
-  });
-  DOWNLOAD_FIELDS.forEach((field) => { if (item[field]) meta.push(row(field, esc(item[field]))); });
-  meta.push(row('source', esc(item.source)));
-  body.push(`<div class="metadata">${meta.join('')}</div>`);
-
-  return `<div>${body.join('')}</div>\n`;
+/** The DA sheet JSON (`:type: sheet`, the shape DA stores and Edge Delivery serves). */
+export function feedSheet(items) {
+  const data = items.map(feedRow)
+    .sort((a, b) => (b.date || '').localeCompare(a.date || '') || a.path.localeCompare(b.path));
+  return {
+    total: data.length, offset: 0, limit: data.length, data, ':type': 'sheet',
+  };
 }

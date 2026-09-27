@@ -217,15 +217,23 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Until the importer emits it** (824 importer half), pages keep the current unwrap (default content) and are marked `re-import on SKODA-824`. The shape is fixed, so the 824 runtime and importer can be built in parallel.
 
 ### `media-item`
-- **Status:** `pinned` (shape 2, 2026-09-27) · **Ticket:** SKODA-608 · **Fallback:** readable (story-style listing/rail cards until SKODA-406)
-- **Emitted by:** `tools/importer/media-items/build-media-items.mjs` (source listing cards → one page per item; record in `tools/importer/media-items/items.json`).
-- **Form: an item page per image/video, at `/en/images/<slug>` or `/en/videos/<slug>`** (the listing's `path` scope). Its Metadata block is the index row:
-  - `template` = `image` | `video`; `category` = `images` | `videos`;
-  - `title`, `description` (the caption, else the title), `image` (thumbnail: the master for images, the Vimeo poster `…-d_1280x720.jpg` for videos), `publisheddate` (the date the source card shows), `tags` (every facet value) and the 15 facets, mapped by term **name** from the source filter form (English terms only);
-  - download fields, stable CDN URLs (never `/direct-download/`, which redirects to an expiring presigned S3 URL): `original` + `rendition-1920` (images), `mp4` + `vimeo-id` + `poster` (videos); plus `source` (the source attachment URL).
-- **Body (shape 2):** `h1` title, the date, the `<picture>` (images) or the bare `https://vimeo.com/<id>` URL (videos, `embed` autoblock), the caption, a one-row `Downloads` table in the `downloads-file-rows` shape (Original + 1920px, or MP4), an `h3` "Tags" + `Tags` block whose links deep-link the filtered demo listing (`/en/images?filter[model][]=peaq`). Only blocks on main.
-- The listing media-card cell (date, filename, add/download toolbar, lightbox) is SKODA-406, inside `listing`; it reads the download columns.
-- Vimeo videos that are domain-restricted to skoda-storyboard.com (oEmbed `domain_status_code: 403`) can't play on the demo and have no public poster; they are not imported.
+- **Status:** `pinned` (shape 3, 2026-09-27) · **Ticket:** SKODA-608 · **Fallback:** readable (story-style listing/rail cards until SKODA-406)
+- **Form: a row of the generated media feed, not a page** (docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md, option B:
+  AEM Assets is the source of truth; pages per item are retired). The feed is a DA sheet at `/en/media-feed.json`
+  (`{total, offset, limit, data, ":type": "sheet"}`), read by `listing` and `story-rail` via `index: /en/media-feed.json`.
+- **Emitted by:** `tools/importer/media-items/build-media-items.mjs` (M1: from the source listing cards;
+  `--push` uploads, previews and publishes it). **M2:** the AEM Assets sync job (SKODA-511) writes the same rows from
+  published assets.
+- **Row (every value a string, lists comma-joined):** `path` (the card link: the image's CDN original or
+  `https://vimeo.com/<id>`, until the SKODA-406 lightbox), `title`, `description` (caption), `image` (thumbnail: the
+  768px source rendition / Vimeo poster; in M2 the asset's published delivery URL), `template` image|video, `date`,
+  `category` images|videos, `tags` + the 15 facets (mapped by term name; in M2 from AEM tags, SKODA-512),
+  `original`, `rendition-1920`, `mp4`, `vimeo-id`, `poster` (stable CDN URLs, never `/direct-download/`), `id`
+  (source attachment id / M2 asset id, the cart key), `source`.
+- **Sharding:** a sheet holds 500k cells (~20k rows at ~30 columns); split by type/year before that (the loader
+  pages with `offset`).
+- Domain-restricted Vimeo videos (oEmbed `domain_status_code: 403`) can't play on the demo and are not emitted.
+
 ### `floating-action-bar`
 - **Status:** `pinned` · **Ticket:** SKODA-215 · **Fallback:** readable (absent)
 - **Form: code-only.** It's template chrome (share toggle + scroll-to-top) added at runtime on **every template** (215: all 43 captures), so the importers emit **nothing** for it.

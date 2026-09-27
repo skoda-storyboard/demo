@@ -16,8 +16,10 @@ card that shows them is block work (608 amendment 2026-09-25: "listing media-car
   menus; **videos** one add + one MP4 download and a play badge. Click opens a lightbox (image, title, caption,
   counter, prev/next).
 - `blocks/listing` renders story cards only: picture, h3 title, description (`listing.js:70-102`); no date,
-  toolbar, badge or lightbox. The index now carries `original`, `rendition-1920`, `mp4`, `vimeo-id`, `poster`
-  (contract `media-item` shape 2).
+  toolbar, badge or lightbox. The rows come from the media feed `/en/media-feed.json` (contract `media-item`
+  shape 3), which carries `original`, `rendition-1920`, `mp4`, `vimeo-id`, `poster` and `id`. There are no item
+  pages: the card's `path` is the image / Vimeo URL until this ticket opens the lightbox instead. Verify thumbnails
+  against AEM delivery URLs (M2): `createOptimizedPicture` replaces the query with Media Bus params.
 
 ## Scope
 - `blocks/listing`: when the scoped template is `image` or `video`, render the media card: 16:9 thumbnail, date

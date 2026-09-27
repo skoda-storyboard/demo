@@ -38,13 +38,13 @@
     },
     "images": {
       "label": "Image items (corpus)",
-      "gate": "W2b: SKODA-608 phase 1 live 2026-09-27; card UI → 402a / 406",
-      "note": "SKODA-608 (2026-09-27): item pages at /en/images/<slug> generated from the source listing cards (tools/importer/media-items); index rows with the download columns; the listing and model rails fill. Story-style cards until SKODA-406; layout per SKODA-402a. Domain-restricted Vimeo videos are not imported."
+      "gate": "SKODA-608: media feed (not pages); card UI → 402a / 406",
+      "note": "No item pages (option B, docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md): images rows live in /en/media-feed.json (tools/importer/media-items). M2: AEM Assets sync (SKODA-511)."
     },
     "videos": {
       "label": "Video items (corpus)",
-      "gate": "W2b: SKODA-608 phase 1 live 2026-09-27; card UI → 402a / 406",
-      "note": "SKODA-608 (2026-09-27): item pages at /en/videos/<slug> generated from the source listing cards (tools/importer/media-items); index rows with the download columns; the listing and model rails fill. Story-style cards until SKODA-406; layout per SKODA-402a. Domain-restricted Vimeo videos are not imported."
+      "gate": "SKODA-608: media feed (not pages); card UI → 402a / 406",
+      "note": "No item pages (option B, docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md): videos rows live in /en/media-feed.json (tools/importer/media-items). M2: AEM Assets sync (SKODA-511)."
     }
   },
   "pages": {

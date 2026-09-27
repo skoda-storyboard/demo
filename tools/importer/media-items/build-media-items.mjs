@@ -1,21 +1,20 @@
 #!/usr/bin/env node
 /*
- * build-media-items.mjs — SKODA-608: generate one EDS page per source image/video item.
+ * build-media-items.mjs - SKODA-608: generate the media feed (en/media-feed.json).
  *
- *   npm run media-items:build -- [--out <content dir>] [--cache <dir>] [--offline] [--dry-run]
+ *   npm run media-items:build -- [--out <dir>] [--cache <dir>] [--offline] [--dry-run] [--push]
  *
- * Reads tools/importer/media-items/sources.json (source listing queries), fetches the
- * server-rendered source listings (`ajax_search_results_<type>=N` renders N cards), parses
- * the cards (media-items-lib.mjs), resolves `years-<termId>` classes to year names by
- * probing each year filter, and fills missing Vimeo posters from Vimeo oEmbed. Writes:
- *   <out>/en/images/<slug>.plain.html, <out>/en/videos/<slug>.plain.html
- *   tools/importer/media-items/items.json           (committed record: id, source, path, fields)
- *   tools/importer/media-items/paths-media-items.txt (push list: import:push -- --paths …)
- *   docs/planning/skoda-rail-feed-corpus.txt          IMAGES / VIDEOS sections (generated block)
- *
- * Why not the bulk runner: one source listing page yields many item pages, and the runner
- * writes one page per URL. Items whose attachment page 404s exist only as listing cards.
- * Store CDN URLs only (/direct-download/ answers with a presigned, expiring S3 redirect).
+ * AEM Assets is the source of truth for images/videos (docs/architecture/
+ * SKODA-MEDIA-ITEMS-OPTIONS.md, option B): no page per item. This M1 generator builds the
+ * feed from the server-rendered source listings (`ajax_search_results_<type>=N` renders N
+ * cards; many attachment pages 404, the cards don't), resolves `years-<termId>` classes by
+ * probing each year filter, takes Vimeo posters from oEmbed and skips domain-restricted
+ * videos. The M2 sync job writes the same rows from published AEM Assets. Writes:
+ *   <out>/en/media-feed.json                 the DA sheet (query-index shape, `:type: sheet`)
+ *   tools/importer/media-items/items.json    committed record (id, template, title, date, source)
+ * `--push` uploads the sheet to DA and previews + publishes it. The listing and story-rail
+ * blocks read it via their `index: /en/media-feed.json` config row.
+ * Download URLs are stable CDN URLs (/direct-download/ redirects to a presigned S3 URL).
  */
 
 import {
@@ -25,15 +24,16 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import {
-  SOURCE_ORIGIN, facetOptions, parseCards, mergeItems, itemPageHtml, yearIds, vimeoPoster,
+  SOURCE_ORIGIN, facetOptions, parseCards, mergeItems, feedSheet, yearIds, vimeoPoster,
 } from './media-items-lib.mjs';
+import { uploadToDA } from '../media/media-lib.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '../../..');
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128 Safari/537.36';
-const CORPUS = path.join(ROOT, 'docs/planning/skoda-rail-feed-corpus.txt');
-const BEGIN = '# BEGIN GENERATED MEDIA ITEMS (npm run media-items:build; do not edit by hand)';
-const END = '# END GENERATED MEDIA ITEMS';
+const ORG = 'skoda-storyboard';
+const REPO = 'demo';
+const FEED_PATH = 'en/media-feed.json';
 
 export function loadJSDOM() {
   const tries = ['/home/node/.excat-marketplaces/excat-marketplace/excat/hooks/import-validator/', import.meta.url];
@@ -48,7 +48,7 @@ export function loadJSDOM() {
 
 function parseArgs(argv) {
   const a = {
-    out: path.join(ROOT, 'content'), cache: path.join(ROOT, '.migration/work/608/cache'), offline: false, dryRun: false,
+    out: path.join(ROOT, 'content'), cache: path.join(ROOT, '.migration/work/608/cache'), offline: false, dryRun: false, push: false,
   };
   for (let i = 0; i < argv.length; i += 1) {
     const k = argv[i];
@@ -57,6 +57,7 @@ function parseArgs(argv) {
     else if (k === '--cache') a.cache = path.resolve(v());
     else if (k === '--offline') a.offline = true;
     else if (k === '--dry-run') a.dryRun = true;
+    else if (k === '--push') a.push = true;
     else throw new Error(`unknown flag ${k}`);
   }
   return a;
@@ -123,23 +124,19 @@ async function oembed(vimeoId, cacheDir, offline) {
   }
 }
 
-function writeCorpus(items) {
-  const block = (type, title) => {
-    const list = items.filter((i) => i.type === type).map((i) => i.path).sort();
-    return [`# ===== ${title} (${list.length}) — SKODA-608 item pages at their EDS paths; feed the listing + model rails =====`, ...list];
-  };
-  const generated = [BEGIN, ...block('image', 'IMAGES'), '', ...block('video', 'VIDEOS'), END].join('\n');
-  let corpus = readFileSync(CORPUS, 'utf8');
-  if (corpus.includes(BEGIN)) {
-    corpus = corpus.replace(new RegExp(`${BEGIN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*?${END}`), generated);
-  } else {
-    // First run: replace the hand-written IMAGES/VIDEOS sections (attachment URLs) with the block.
-    const start = corpus.search(/^# ===== IMAGES/m);
-    const after = corpus.slice(start).search(/^# ===== (?!IMAGES|VIDEOS)/m);
-    const end = after === -1 ? corpus.length : start + after;
-    corpus = `${corpus.slice(0, start)}${generated}\n\n${corpus.slice(end).replace(/^\n+/, '')}`;
+/** Upload the sheet to DA, then preview + publish it (credentials are injected for DA/admin). */
+async function pushFeed(file) {
+  const res = await uploadToDA({
+    org: ORG, repo: REPO, daPath: `/${FEED_PATH}`, buffer: readFileSync(file), contentType: 'application/json',
+  });
+  if (!res.ok) throw new Error(`DA upload ${res.status}: ${res.body.slice(0, 200)}`);
+  for (const stage of ['preview', 'live']) {
+    // eslint-disable-next-line no-await-in-loop
+    const r = await fetch(`https://admin.hlx.page/${stage}/${ORG}/${REPO}/main/${FEED_PATH}`, { method: 'POST' });
+    // eslint-disable-next-line no-await-in-loop
+    if (!r.ok) throw new Error(`${stage} ${r.status} ${await r.text()}`);
   }
-  writeFileSync(CORPUS, corpus.endsWith('\n') ? corpus : `${corpus}\n`);
+  console.log(`[media-items] pushed, previewed and published /${FEED_PATH}`);
 }
 
 export async function main(argv = process.argv.slice(2)) {
@@ -147,7 +144,6 @@ export async function main(argv = process.argv.slice(2)) {
   const JSDOM = loadJSDOM();
   const { queries } = JSON.parse(readFileSync(path.join(HERE, 'sources.json'), 'utf8'));
   const lists = [];
-  const labels = new Map();
   const yearsById = {};
 
   for (const type of ['image', 'video']) {
@@ -156,7 +152,6 @@ export async function main(argv = process.argv.slice(2)) {
     const baseHtml = await fetchText(listingUrl({ type, n: 1 }), a.cache, a.offline);
     const base = new JSDOM(baseHtml).window.document;
     const options = facetOptions(base);
-    options.forEach((label, key) => labels.set(key, label));
     // eslint-disable-next-line no-await-in-loop
     Object.assign(yearsById, await probeYears(JSDOM, options, type, a.cache, a.offline));
     for (const q of queries.filter((x) => x.type === type)) {
@@ -201,20 +196,17 @@ export async function main(argv = process.argv.slice(2)) {
   console.log(JSON.stringify(summary, null, 1));
   if (a.dryRun) return summary;
 
-  items.forEach((item) => {
-    const file = path.join(a.out, `${item.path}.plain.html`);
-    mkdirSync(path.dirname(file), { recursive: true });
-    writeFileSync(file, itemPageHtml(item, labels));
-  });
-  const record = items.map(({
-    id, type, path: p, source, title, date, terms, ...rest
-  }) => ({
-    id, type, path: p, source, title, date, terms, fields: Object.fromEntries(['original', 'rendition-1920', 'mp4', 'vimeo-id', 'poster'].filter((f) => rest[f]).map((f) => [f, rest[f]])),
-  })).sort((x, y) => x.path.localeCompare(y.path));
-  writeFileSync(path.join(HERE, 'items.json'), `${JSON.stringify({ generated: new Date().toISOString().slice(0, 10), items: record }, null, 2)}\n`);
-  writeFileSync(path.join(HERE, 'paths-media-items.txt'), `# SKODA-608 item pages (generated by build-media-items.mjs)\n${record.map((r) => r.path).join('\n')}\n`);
-  writeCorpus(items);
-  console.log(`[media-items] wrote ${items.length} pages → ${a.out}`);
+  const sheet = feedSheet(items);
+  const feedFile = path.join(a.out, FEED_PATH);
+  mkdirSync(path.dirname(feedFile), { recursive: true });
+  writeFileSync(feedFile, `${JSON.stringify(sheet, null, 2)}\n`);
+  const record = sheet.data.map((r) => ({
+    id: r.id, template: r.template, title: r.title, date: r.date, source: r.source,
+  }));
+  const generated = new Date().toISOString().slice(0, 10);
+  writeFileSync(path.join(HERE, 'items.json'), `${JSON.stringify({ generated, feed: `/${FEED_PATH}`, items: record }, null, 2)}\n`);
+  console.log(`[media-items] wrote ${sheet.total} rows -> ${feedFile}`);
+  if (a.push) await pushFeed(feedFile);
   return summary;
 }
 
