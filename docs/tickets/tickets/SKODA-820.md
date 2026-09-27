@@ -65,8 +65,8 @@ but at 3440px it is centered and capped at 1440px (x=1000–2440). The EDS
 background initially painted 100vw at every size. Its 24px bottom margin is
 uncolored before the green footer; the previous Media Box band ends 36px
 above Related Stories. Keep the bottom separator unpainted and cap only the
-story-related background at 1440px; the Media Box itself remains separately
-owned by SKODA-801a.
+story-related background at 1440px; the source footer itself spans the full
+viewport. The Media Box remains separately owned by SKODA-801a.
 The heading switches at **769px**, while card-title sizing changes at 992px
 (20px/24px below, 18px/21.6px above). Date-to-title offset is 25px.
 Use computed CSS/DOM measurements, not screenshots, for visual QA.
@@ -79,7 +79,10 @@ Use computed CSS/DOM measurements, not screenshots, for visual QA.
 - [x] The Epiq visual slice matched source CSS geometry at 500/768/1280 and
       edges 767/768/769/991/992 in independent local DevTools QA; on 2026-09-27
       its slashless deployed preview also matched 500/768/1280 CSS/DOM sizes,
-      with 10 clean titles/links and no horizontal overflow.
+      with 10 clean titles/links and no horizontal overflow. Wide-screen
+      source and deployed preview match at 1441 (x=0.5)/1920 (x=240)/3440
+      (x=1000), each with a centered 1440px green band, unchanged card geometry
+      and the 24px uncolored footer gap.
 - [ ] **Sweep amendment:** import the 7 curated story bands, omit "Based on
       tags" where absent, and emit a band only where the source has one.
       This requires importer/content validation beyond the Epiq visual PR.
