@@ -1,0 +1,224 @@
+/* ==========================================================================
+   Press release detail (SKODA-607)
+   Render target: docs/ui-specs/template-press-release.md, measured on the 5 M1 releases
+   (2026-09-27). Loaded only on `template: press_release` pages (scripts.js TEMPLATES).
+   Sections come from the import contract `press-release-sections`: header, body-column,
+   sidebar, media-box band, related band (optional). Block visuals (gallery preview, story
+   rail press cards, downloads tiles) belong to their blocks (SKODA-223 / 224 / 510).
+   Three-layer order (css-guidelines.md): L1 fluid · L2 intrinsic grid · L3 the 768
+   two-column transition and the 1080 sidebar inset.
+   ========================================================================== */
+
+body.press-release {
+  --pr-gutter: 10px;
+  --pr-header-offset: 32px;
+  --pr-sidebar-inset: var(--spacing-xxl);
+  --pr-date-size: 11px;
+  --pr-band-gap: 32px;
+  --pr-band-padding-top: 72px;
+  --pr-band-padding-bottom: 60px;
+}
+
+/* Layer 1 — fluid. Mobile first: every section stacks in source order with the
+   constant 10px source gutter; the sidebar follows the body column. */
+body.press-release main > .section {
+  margin: 0;
+}
+
+body.press-release main > .section > div,
+body.press-release main > .section > aside {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--pr-gutter);
+}
+
+/* Header: date above the single text h1, no hero. The source h1 has margin-bottom 26px,
+   but it collapses out of the header: the measured h1 → lead-image gap is 16px. */
+body.press-release main > .section.press-release-header {
+  padding-top: var(--pr-header-offset);
+}
+
+body.press-release .press-release-header .press-release-date {
+  margin: 0 0 var(--spacing-m);
+  color: var(--pr-date-color);
+  font-size: var(--pr-date-size);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+}
+
+body.press-release .press-release-header h1 {
+  margin: 0 0 var(--spacing-m);
+  color: var(--pr-title-color);
+  font-size: var(--heading-font-size-l);
+  font-weight: var(--weight-semibold);
+  line-height: 1.25;
+}
+
+/* Body column: lead image (16:9 crop), › bullets, bold perex, body 16/24. */
+body.press-release .section.body-column .default-content-wrapper {
+  font-size: var(--body-font-size-m);
+  line-height: var(--line-height-body);
+}
+
+body.press-release .section.body-column .default-content-wrapper > p,
+body.press-release .section.body-column .default-content-wrapper > ul {
+  margin: 0 0 var(--paragraph-gap);
+}
+
+body.press-release .section.body-column .default-content-wrapper:first-child > p:first-child img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+body.press-release .section.body-column .press-release-bullets {
+  padding: 0;
+  list-style: none;
+  font-weight: var(--weight-semibold);
+}
+
+body.press-release .section.body-column .press-release-bullets > li {
+  margin: 0;
+}
+
+body.press-release .section.body-column .press-release-bullets > li::before {
+  content: '› ';
+}
+
+body.press-release .section.body-column .press-release-perex strong {
+  font-weight: var(--weight-semibold);
+}
+
+/* Sidebar: Additional info list, Images, Tags; 16/45 headings, 15px between groups. */
+body.press-release .section.sidebar aside > div {
+  margin-bottom: 15px;
+}
+
+/* Blocks in the body column (embeds) keep the paragraph rhythm. */
+body.press-release .section.body-column > div:not(.default-content-wrapper) {
+  margin-bottom: var(--paragraph-gap);
+}
+
+body.press-release .section.sidebar h3 {
+  margin: 0;
+  color: var(--skoda-grey-800);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 45px;
+}
+
+body.press-release .section.sidebar .default-content-wrapper > ul {
+  margin: 0 0 15px;
+  padding: 0;
+  list-style: none;
+}
+
+body.press-release .section.sidebar .default-content-wrapper > ul > li {
+  margin: 0;
+  border-bottom: 1px solid var(--pr-menu-border-color);
+}
+
+body.press-release .section.sidebar .default-content-wrapper > ul a {
+  display: block;
+  padding: var(--spacing-xs) 0;
+  color: var(--skoda-grey-800);
+  line-height: 45px;
+  text-decoration: none;
+}
+
+/* Dark bands: Media Box (32px below the article), then Related directly after it. */
+body.press-release main > .section.dark {
+  padding: var(--pr-band-padding-top) 0 var(--pr-band-padding-bottom);
+}
+
+body.press-release main > .section.media-box {
+  margin-top: var(--pr-band-gap);
+}
+
+body.press-release .section.dark .default-content-wrapper > h2 {
+  margin: 0;
+  color: var(--background-color);
+  font-size: var(--heading-font-size-l);
+  font-weight: var(--weight-semibold);
+  line-height: 1.25;
+}
+
+body.press-release .section.dark .default-content-wrapper > p {
+  margin: 0;
+  color: var(--pr-band-meta-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 2;
+}
+
+body.press-release .section.media-box .default-content-wrapper {
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Related header: heading + "Based on tags" left, the "All" ghost pill right. */
+body.press-release .section.related .default-content-wrapper {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--spacing-m);
+  margin-bottom: var(--paragraph-gap);
+}
+
+body.press-release .section.related .default-content-wrapper > :not(.button-container) {
+  grid-column: 1;
+}
+
+body.press-release .section.related .default-content-wrapper > .button-container {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+body.press-release .section.related .button-container a.button {
+  margin: 0;
+  padding: var(--spacing-xs) var(--spacing-xl);
+  border: 2px solid var(--pr-ghost-color);
+  border-radius: var(--pill-radius);
+  background: var(--background-color);
+  color: var(--pr-ghost-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+}
+
+/* Layer 2 / Layer 3 — at ≥768 the article becomes a real two-column grid (the source's
+   single structural transition). `main` is the grid, capped by --content-max-width;
+   the header and both bands span it, and the bands bleed to the viewport edges. */
+@media (width >= 768px) {
+  body.press-release main {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    align-items: start;
+    max-width: var(--content-max-width);
+    margin-inline: auto;
+  }
+
+  body.press-release main > .section {
+    grid-column: 1 / -1;
+  }
+
+  body.press-release main > .section.body-column {
+    grid-column: 1;
+  }
+
+  body.press-release main > .section.sidebar {
+    grid-column: 2;
+  }
+
+  body.press-release main > .section.dark {
+    box-shadow: 0 0 0 100vmax var(--dark-color);
+    clip-path: inset(0 -100vmax);
+  }
+}
+
+/* The source adds the 64px sidebar inset from 1080 (10px at 1024, 64px at 1080). */
+@media (width >= 1080px) {
+  body.press-release main > .section.sidebar > aside {
+    padding-left: var(--pr-sidebar-inset);
+  }
+}

@@ -162,6 +162,34 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Shape:** header `Gallery (slider)`, then one row per slide: `[<picture>, caption paragraph or empty]`. Captions are visible on the source for some sliders (13.33/20 centred; 6 of 16 lifestyle sliders, plus Octavia, Slavia and 365 km/h per the 819 amendment), so the caption cell is always present. Link-bearing carousels keep routing to `Cards`.
 - **Example** (`/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`): 3 sliders with 5, 8 and 4 rows.
 
+### `gallery-preview`
+- **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-223 · **Fallback:** readable (the normal Gallery: main image + thumbnails, in the sidebar column)
+- **Emitted by:** `transformers/skoda-press-release-layout.js` (renames the `parsers/gallery.js` table in the press-release sidebar).
+- **Shape:** header `Gallery (preview)`, then one row per image `[<picture>, caption paragraph or empty]`, the same rows as `Gallery`. Preceded by an `h3` "Images" as default content.
+- **Example** (`/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/`): 4 rows. The 5 M1 releases carry 1, 3, 4, 2 and 3.
+
+### `story-rail-press`
+- **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-224 · **Fallback:** readable (the default carousel cards)
+- **Emitted by:** `transformers/skoda-press-release-layout.js` (the "Related Press Releases" band; replaces the default-content cards of SKODA-612).
+- **Shape:** header `Story Rail (press)`, then one **curated** row per card `[<picture>, <p>date</p><h3><a href>Title</a></h3>]`. No config rows (they can't mix with curated rows). The band heading (`h2`), the "Based on tags: …" paragraph and the "All" link paragraph are default content before the table, in a `dark, full-width, related` section. Title links go through `skoda-links`; a card without a title link is dropped, so no `href=""` is ever emitted.
+- **Example** (`/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/`): 6 rows. Zellmer 10, National Theatre 5, Board 1; Superb has no band.
+
+### `downloads-file-rows`
+- **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-510 · **Fallback:** readable (image tiles only; rows without an image are skipped by the block, as live today)
+- **Emitted by:** `parsers/downloads.js` (press-release Media Box). A row shape of the `downloads` block on `main`, so the check classifies these pages as `main`, not pending.
+- **Shape:** header `Downloads`, then 3 cells per row: `[<picture> or empty, title text, links]`. The links cell holds one `<a>` per size, its text the size label: `Original` + `1920px` (image, `/direct-download/…` and `…-1920xH.jpg`), `MP4` (video, Vimeo poster as the picture), `PDF` (document, empty picture cell).
+- **Example** (Peaq): 5 rows, `MP4`, 3 × `Original`+`1920px`, `PDF`.
+
+### `press-release-sections`
+- **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-607 · **Fallback:** readable (sections stack in source order; the dark bands use the global `.section.dark` rule)
+- **Emitted by:** `transformers/skoda-press-release-layout.js`. Laid out by `templates/press-release/` (selected by `template: press_release` → `body.press-release`).
+- **Shape:** five sections, split by `---`:
+  1. header: date `<p>` + `h1` (no Section Metadata);
+  2. `Style: body-column`: lead image, bullets `<ul>` (optional), perex `<p><strong>`, the Buzzsprout URL, body, an inline Vimeo URL (optional);
+  3. `Style: sidebar`: `h3` Additional info + `<ul>` (Media contacts, "Download Media Box" → `#media-box`), `h3` Images + `Gallery (preview)`, `h3` Tags + `Tags`;
+  4. `Style: dark, full-width, media-box`: `h2` Media Box, the stats paragraph, `Downloads`;
+  5. `Style: dark, full-width, related` (optional): see `story-rail-press`.
+
 ### `quote`
 - **Status:** `pinned` · **Ticket:** SKODA-220 · **Fallback:** readable (two text cells)
 - **Shape:** header `Quote`, then a single row `[<p>quote text</p>, <p><strong>Attribution</strong>, role</p>]`. An empty attribution cell is kept. The source's decorative `hr` is **never** emitted, because a bare `hr` in DA splits sections.

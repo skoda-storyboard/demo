@@ -16,6 +16,11 @@
  *    live source; they 404 on EDS.
  * 3. `#s_aid=` / `#s_cid=` analytics fragments are stripped (SKODA-602 idempotency), for
  *    the importers that do not run skoda-page-cleanup.
+ * 4. A single-tag news filter (`/en/news/?filter[<tax>][]=<slug>`, the press-release tag
+ *    chips, SKODA-607) becomes the demo tag page for that term: `/en/tag/<tax>/<slug>`, or
+ *    the one demo tag page with that slug (the source files some terms under another
+ *    taxonomy, e.g. technology `electromobility` → `/en/tag/crew/electromobility`). No
+ *    unique demo page → the link stays as it is (rule 1).
  *
  * `cdn.skoda-storyboard.com` assets, external hosts, mailto/tel, `#…` and relative links
  * are untouched. Idempotent: a second run changes nothing.
@@ -228,6 +233,20 @@ function rewriteHref(href) {
   return ALLOWED.has(target) ? `${target}${tail}` : null;
 }
 
+const TAG_FILTER = /^(?:(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com)?\/en\/news\/?\?filter(?:\[|%5B)([a-z0-9-]+)(?:\]|%5D)(?:\[\]|%5B%5D)=([^&#]+)$/i;
+
+/** Demo tag page for a single-tag news filter link, or null (rule 4). */
+function tagPageHref(href) {
+  const m = href.match(TAG_FILTER);
+  if (!m) return null;
+  const slug = edsPath(`/${m[2]}`).slice(1);
+  const exact = `/en/tag/${m[1].toLowerCase()}/${slug}`;
+  if (ALLOWED.has(exact)) return exact;
+  const bySlug = DEMO_PATHS.filter((p) => p.startsWith('/en/tag/') && p.endsWith(`/${slug}`)
+    && p.split('/').length === 5);
+  return bySlug.length === 1 ? bySlug[0] : null;
+}
+
 export default function transform(hookName, element, payload) {
   if (hookName !== TransformHook.afterTransform) return;
 
@@ -235,7 +254,7 @@ export default function transform(hookName, element, payload) {
     let href = a.getAttribute('href');
     if (/#s_[ac]id=/.test(href)) href = href.split('#s_aid=')[0].split('#s_cid=')[0];
     if (href.startsWith('/direct-download/')) href = `${SOURCE_ORIGIN}${href}`;
-    else href = rewriteHref(href) || href;
+    else href = tagPageHref(href) || rewriteHref(href) || href;
     if (href !== a.getAttribute('href')) a.setAttribute('href', href);
   });
 }

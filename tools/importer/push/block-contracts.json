@@ -357,6 +357,58 @@
       "emittedBy": [
         "parsers/archive-list.js"
       ]
+    },
+    {
+      "id": "gallery-preview",
+      "block": "gallery",
+      "variants": [
+        "preview"
+      ],
+      "status": "pinned",
+      "ticket": "SKODA-223",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": [
+        "transformers/skoda-press-release-layout.js"
+      ]
+    },
+    {
+      "id": "story-rail-press",
+      "block": "story-rail",
+      "variants": [
+        "press"
+      ],
+      "status": "pinned",
+      "ticket": "SKODA-224",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": [
+        "transformers/skoda-press-release-layout.js"
+      ]
+    },
+    {
+      "id": "downloads-file-rows",
+      "block": "downloads",
+      "form": "row-shape",
+      "status": "pinned",
+      "ticket": "SKODA-510",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": [
+        "parsers/downloads.js"
+      ]
+    },
+    {
+      "id": "press-release-sections",
+      "block": null,
+      "form": "section-style",
+      "status": "pinned",
+      "ticket": "SKODA-607",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": [
+        "transformers/skoda-press-release-layout.js"
+      ]
     }
   ]
 }

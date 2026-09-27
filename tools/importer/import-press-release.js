@@ -10,10 +10,12 @@
  * template's DOM selectors, never by URL/position.
  *
  * Pipeline per page:
- *   beforeTransform (cleanup + section <hr> breaks)
+ *   beforeTransform (cleanup, then skoda-press-release-layout rebuilds the article
+ *   into the five sections of the press-release template, SKODA-607)
  *     → block parsers (gallery / tags / downloads) replace matched fragments
- *       → afterTransform (Section Metadata anchored to markers + shared Metadata)
- *         → WebImporter built-in rules (metadata / background images / image URLs)
+ *       → afterTransform (Section Metadata + Gallery (preview) anchored to the layout
+ *         markers, then the shared Metadata and link rewriting)
+ *         → WebImporter built-in rules (background images / image URLs)
  */
 
 // PARSER IMPORTS
@@ -23,7 +25,7 @@ import downloadsParser from './parsers/downloads.js';
 
 // TRANSFORMER IMPORTS
 import cleanupTransformer from './transformers/skoda-press-release-cleanup.js';
-import sectionsTransformer from './transformers/skoda-model-sections.js';
+import layoutTransformer from './transformers/skoda-press-release-layout.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 import linksTransformer from './transformers/skoda-links.js';
 import normalizeImages from './transformers/skoda-images.js';
@@ -39,49 +41,34 @@ const parsers = {
 const PAGE_TEMPLATE = {
   name: 'press-release',
   description:
-    'Škoda press release detail (press_release CPT). No hero: header (date + title) -> primary column default content -> Gallery -> Tags -> full-bleed dark Media Box parsed as Downloads. AI-audio embed + widgets removed by cleanup. Content-driven detection only.',
+    'Škoda press release detail (press_release CPT), SKODA-607. No hero: header (date + title) -> body-column (lead image, bullets, perex, Buzzsprout, body, Vimeo) -> sidebar (Additional info, Gallery (preview), Tags) -> dark Media Box band (Downloads) -> optional dark Related Press Releases band (Story Rail (press)). Sections are built by skoda-press-release-layout. Content-driven detection only.',
   urls: [
     'https://www.skoda-storyboard.com/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/',
   ],
   blocks: [
     { name: 'gallery', instances: ['section.images.sa-media-kit-preview'] },
     { name: 'tags', instances: ['section.tags'] },
-    {
-      name: 'downloads',
-      instances: ['.cover-box.dark .search-results.media-box, .search-results.media-box'],
-    },
+    { name: 'downloads', instances: ['.search-results.media-box'] },
   ],
+  // Documentation of the emitted section model; skoda-press-release-layout builds it.
   sections: [
+    { id: 'header', name: 'Header', style: null, defaultContent: ['header .entry-published', 'header .entry-title'] },
     {
-      id: 'section-1',
-      name: 'Article',
-      selector: ['article.press_release > .container, article.press_release'],
-      style: null,
-      blocks: ['gallery', 'tags'],
-      defaultContent: [
-        'header .entry-published',
-        'header .entry-title',
-        '.column-primary .article-teaser',
-        '.column-primary .bullet-points',
-        '.column-primary .entry-summary',
-        '.column-primary .entry-content',
-      ],
+      id: 'body',
+      name: 'Body column',
+      style: 'body-column',
+      defaultContent: ['.column-primary .article-teaser img', '.column-primary .bullet-points', '.column-primary .entry-summary', '.column-primary .entry-content'],
     },
-    {
-      id: 'section-2',
-      name: 'Related Media',
-      selector: ['.cover-box.dark'],
-      style: 'dark, full-width',
-      blocks: ['downloads'],
-      defaultContent: [],
-    },
+    { id: 'sidebar', name: 'Sidebar', style: 'sidebar', blocks: ['gallery', 'tags'], defaultContent: ['.column-secondary section > .menu'] },
+    { id: 'media-box', name: 'Media Box', style: 'dark, full-width, media-box', blocks: ['downloads'], defaultContent: ['.search-results-heading', '.search-results-stats .stats'] },
+    { id: 'related', name: 'Related Press Releases', style: 'dark, full-width, related', blocks: ['story-rail'], defaultContent: ['.search-results.type-press_release .search-results-header'] },
   ],
 };
 
-// TRANSFORMER REGISTRY — cleanup + (sections if 2+) + shared metadata (afterTransform).
+// TRANSFORMER REGISTRY — cleanup + layout (sections) + shared metadata + links (last).
 const transformers = [
   cleanupTransformer,
-  ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
+  layoutTransformer,
   metadataTransformer,
   linksTransformer,
 ];
@@ -120,6 +107,18 @@ function findBlocksOnPage(document, template) {
 }
 
 export default {
+  /**
+   * Runs on the untouched DOM, before helix-importer's preProcess drops every empty
+   * inline element. The Media Box's single download links (video MP4, PDF) are icon-only
+   * `<a><i class="icon"></i></a>`, so they'd vanish before the downloads parser runs;
+   * give them a text label so they survive (the parser labels them by file type).
+   */
+  preprocess: ({ document }) => {
+    document.querySelectorAll('.search-results.media-box a.media-cart-action.download[href]').forEach((a) => {
+      if (!(a.textContent || '').trim()) a.textContent = 'Download';
+    });
+  },
+
   transform: (payload) => {
     const { document, url, params } = payload;
     const main = document.body;
