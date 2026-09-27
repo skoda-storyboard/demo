@@ -6,6 +6,14 @@ Edge Delivery Services. Read a block first. Omissions are in the repo or known.
 
 **Operating model (durable, reread on every execution cycle + after any context compaction/reset):** the migration runs as an Architect → Developer → QA team loop defined in [`AGENTS-TEAM.md`](AGENTS-TEAM.md). Do not rely on conversation history for the team structure, parallelism/collision rules, QA/visual-fidelity requirements, or the convergence/termination conditions, reread `AGENTS-TEAM.md` before continuing work. It defines *how the team operates*; project knowledge stays under `docs/*` and the ticket backlog under `docs/tickets/`.
 
+## Chrome DevTools MCP isolation
+
+- Before browser work in parallel, give each agent its **own Chrome DevTools MCP server process** configured with `--isolated` (for example, MCP args `["-y", "chrome-devtools-mcp@latest", "--isolated"]`). This gives each process a temporary Chrome profile; the default profile is shared and can be locked by another browser.
+- A new tab, `select_page`, or page-ID routing in a **shared** server is not browser isolation. Do not use `--autoConnect`, a shared `--browser-url`, or the same `--userDataDir` across agents. If a persistent login is required, assign a distinct `--userDataDir` and server process per agent instead of `--isolated`.
+- If the client cannot provide separate MCP processes, do not claim isolated concurrent access: serialize use of the shared server or use independently provisioned browser automation. Never close, reset, or reconfigure another agent's server, browser, profile, or tabs; clean up only your own session.
+
+See the [Chrome DevTools MCP advanced usage guide](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/main/docs/advanced-usage.md) and [configuration reference](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/main/docs/configuration.md).
+
 ## Avoid
 - `scripts/aem.js` is vendored. Never edit.
 - Markup comes from the backend. `curl localhost:3000/x.plain.html` first.
