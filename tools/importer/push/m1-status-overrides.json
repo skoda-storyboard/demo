@@ -8,8 +8,8 @@
     },
     "listings": {
       "label": "Media listings",
-      "gate": "W2b: SKODA-608",
-      "note": "The shells are imported; without 608 item rows the listings stay empty."
+      "gate": "W2b: SKODA-608 live 2026-09-27 (PR #177); card UI → 402a / 406",
+      "note": "Both listings are live and read the media feed /en/media-feed.json (74 images + 27 videos; no item pages, option B, docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md). Media items are feed rows, so the tracker lists no image/video pages. Story-style cards until SKODA-406; layout per SKODA-402a. M2: AEM Assets sync (SKODA-511)."
     },
     "press-releases": {
       "label": "Press releases",
