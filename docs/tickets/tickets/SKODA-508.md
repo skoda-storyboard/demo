@@ -4,8 +4,8 @@
 - **Phase:** A · **Milestone:** M1 (it blocks re-importing press releases: SKODA-610, SKODA-603 W1)
 - **GitHub issue:** [#158](https://github.com/skoda-storyboard/demo/issues/158)
 - **Estimate:** 1 SP · AI-assisted 0.25–0.5d / manual 0.5–1d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🟡 **Code done, QA passed, 5 caption press releases republished** (PR #161, branch
-  `skoda-508-card-captions`). Code merge is pending review.
+- **Status (2026-09-25):** ✅ **Done.** [PR #161](https://github.com/skoda-storyboard/demo/pull/161) merged (branch
+  `skoda-508-card-captions`); QA passed, 5 caption press releases republished; #158 closed.
 
 ## Origin
 Found while re-importing for SKODA-610 on 2026-09-25. It isn't caused by 610: with the previous bundle, the
