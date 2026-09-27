@@ -165,11 +165,11 @@ body.press-release .section.media-box .press-release-files {
   list-style: none;
 }
 
-body.press-release .section.media-box .press-release-files li {
+body.press-release .section.media-box ul.press-release-files > li {
   margin: 0;
 }
 
-body.press-release .section.media-box .press-release-files a {
+body.press-release .section.media-box ul.press-release-files > li > a {
   color: var(--background-color);
   font-size: var(--body-font-size-m);
   font-weight: var(--weight-semibold);
