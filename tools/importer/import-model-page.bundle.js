@@ -229,8 +229,20 @@ var CustomImportScript = (() => {
     news: { template: "press_release", heading: "News" },
     "press-kits": { template: "press_kit", heading: "Press Kits" },
     stories: { template: "story", heading: "Stories" },
-    images: { template: "image", heading: "Images", limit: "20" },
-    videos: { template: "video", heading: "Videos", limit: "20" }
+    // Image/video rows live in the generated media feed, not the page index (SKODA-608,
+    // docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md: AEM Assets is the source of truth).
+    images: {
+      template: "image",
+      heading: "Images",
+      limit: "20",
+      index: "/en/media-feed.json"
+    },
+    videos: {
+      template: "video",
+      heading: "Videos",
+      limit: "20",
+      index: "/en/media-feed.json"
+    }
   };
   var FACET_KEYS = ["model", "bodywork", "derivative"];
   var clean2 = (text) => String(text || "").replace(/\s+/g, " ").trim();
@@ -309,6 +321,7 @@ var CustomImportScript = (() => {
         element.remove();
         return;
       }
+      if (rail.index) rows.splice(1, 0, ["index", rail.index]);
       if (rail.limit) rows.push(["limit", rail.limit]);
       if (own) {
         const target2 = new URL(own.getAttribute("href"), "https://www.skoda-storyboard.com");
@@ -637,12 +650,6 @@ var CustomImportScript = (() => {
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
   var DEMO_PATHS = [
     "/en",
-    "/en/06a-115-1x",
-    "/en/07-s-37a-992-junior",
-    "/en/09-728s-exponat",
-    "/en/10-724a",
-    "/en/11-733",
-    "/en/22-781-sport",
     "/en/category/classic-cars",
     "/en/category/concepts",
     "/en/category/corporate-life",
@@ -678,14 +685,84 @@ var CustomImportScript = (() => {
     "/en/emobility/skoda-elroq-and-a-happy-family",
     "/en/emobility/skoda-elroq-premiere-light-cube-camera-action",
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
-    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/050-skoda-epiq-a13b0a2b-bf605016",
-    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/092-skoda-epiq-3b448906-cb578496",
-    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/093-skoda-epiq-88fc035a-e098c289",
     "/en/emobility/skoda-peaq-unparalleled-space-and-comfort",
     "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
     "/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq",
-    "/en/feature-maxova-5",
     "/en/images",
+    "/en/images/001-skoda-peaq-skoda-epiq-ce71e572",
+    "/en/images/002-skoda-peaq-skoda-epiq-afbf699f",
+    "/en/images/003-skoda-peaq-skoda-epiq-e9288512",
+    "/en/images/004-skoda-peaq-skoda-epiq-978a59bd",
+    "/en/images/005-skoda-peaq-skoda-epiq-7be8bc24",
+    "/en/images/006-skoda-peaq-skoda-epiq-first-edition-35505792",
+    "/en/images/007-skoda-peaq-skoda-epiq-first-edition-a52c80dc",
+    "/en/images/008-skoda-peaq-skoda-epiq-first-edition-2b99ea44",
+    "/en/images/009-skoda-epiq-54d53d81",
+    "/en/images/009-skoda-peaq-skoda-epiq-first-edition-bceca70d",
+    "/en/images/010-skoda-epiq-3f4514fe",
+    "/en/images/010-skoda-peaq-sportline-skoda-epiq-126b736b",
+    "/en/images/011-skoda-epiq-fe1b889d",
+    "/en/images/011-skoda-peaq-sportline-skoda-epiq-188de9ce",
+    "/en/images/012-skoda-epiq-ac7d025b",
+    "/en/images/012-skoda-peaq-sportline-skoda-epiq-5e4f4341",
+    "/en/images/013-skoda-epiq-947acd5a",
+    "/en/images/013-skoda-peaq-sportline-skoda-epiq-d0017674",
+    "/en/images/014-skoda-epiq-eaf7f0a3",
+    "/en/images/014-skoda-peaq-sportline-skoda-epiq-5d903068",
+    "/en/images/015-skoda-epiq-8737c4e2",
+    "/en/images/015-skoda-peaq-sportline-skoda-epiq-74c1c602",
+    "/en/images/016-skoda-epiq-7633ce16",
+    "/en/images/016-skoda-peaq-sportline-skoda-epiq-9d349256",
+    "/en/images/017-skoda-peaq-sportline-skoda-epiq-f48d5103",
+    "/en/images/018-skoda-peaq-0a8b4ba5-1920x1280-ab2c1175-e1789983218794",
+    "/en/images/018-skoda-peaq-sportline-skoda-epiq-b67d25e1",
+    "/en/images/019-skoda-epiq-first-edition-skoda-epiq-skoda-peaq-sportline-skoda-peaq-929c1920",
+    "/en/images/020-skoda-peaq-skoda-epiq-skoda-epiq-skoda-peaq-sportline-69456c39",
+    "/en/images/021-skoda-epiq-skoda-epiq-first-edition-cb1d88fe",
+    "/en/images/022-skoda-epiq-skoda-epiq-first-edition-b7a9f642",
+    "/en/images/025-skoda-peaq-bc771dee-1920x1310-0fc2860d",
+    "/en/images/028-skoda-peaq-0b0266a9",
+    "/en/images/028-skoda-peaq-0b0266a9-f097b359",
+    "/en/images/029-skoda-peaq-768fdd85",
+    "/en/images/029-skoda-peaq-768fdd85-1920x1280-3e2c55ee",
+    "/en/images/030-skoda-peaq-71710073",
+    "/en/images/060-skoda-peaq-b07bf0f8",
+    "/en/images/061-skoda-peaq-9262e91b",
+    "/en/images/062-skoda-peaq-4814bbc4",
+    "/en/images/063-skoda-peaq-1d2bf3e5",
+    "/en/images/064-skoda-peaq-0ba0dc78",
+    "/en/images/065-skoda-peaq-e35f34fe",
+    "/en/images/066-skoda-peaq-333f018f",
+    "/en/images/067-skoda-peaq-95ca7025",
+    "/en/images/068-skoda-peaq-620906c5",
+    "/en/images/069-skoda-peaq-1a211cc9",
+    "/en/images/070-skoda-peaq-f16771ae",
+    "/en/images/071-skoda-peaq-e55b535b",
+    "/en/images/072-skoda-peaq-d74c3b12",
+    "/en/images/073-skoda-peaq-e85fbace",
+    "/en/images/074-skoda-peaq-57ae7dd5",
+    "/en/images/075-skoda-peaq-46708799",
+    "/en/images/076-skoda-peaq-3307cb16",
+    "/en/images/103-skoda-peaq-81f5a394-e69b6c98",
+    "/en/images/200227-skod-kamiq-interior-1-2",
+    "/en/images/dsc-5386-6ec0ab1b",
+    "/en/images/dsc-5419-d3320dc0",
+    "/en/images/dsc-5425-0546d440",
+    "/en/images/dsc-5432-a3ec66da",
+    "/en/images/dsc-5437-7af55c3f",
+    "/en/images/dsc-5441-557e0d6f",
+    "/en/images/dsc-5457-00d5c8eb",
+    "/en/images/dsc-5469-c9a23152",
+    "/en/images/dsc-5496-e9a0ab0a",
+    "/en/images/dsc-5642-f6fb00c0",
+    "/en/images/dsc-5712-076cf78b",
+    "/en/images/hudebni-leto-ee2dfc93",
+    "/en/images/novym-vedoucim-zavodu-skoda-auto-ve-vrchlabi-bude-lars-burger-1-b294f830",
+    "/en/images/skoda-peaq-150-3bdddd54",
+    "/en/images/skoda-peaq-18-7fc256ec",
+    "/en/images/skoda-peaq-5b339691",
+    "/en/images/sosnova-classic-355-6869f94a",
+    "/en/images/sosnova-classic-380-2ea9f2db",
     "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague",
     "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving",
     "/en/lifestyle/chainsaws-and-sparklers-discover-the-traditions-of-rally-fans",
@@ -701,7 +778,6 @@ var CustomImportScript = (() => {
     "/en/press-kits/skoda-elroq-press-kit-2",
     "/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
     "/en/press-kits/skoda-epiq-press-kit-2",
-    "/en/press-kits/skoda-epiq-press-kit-2/videos/attachment/footage-innsbruck-epiq-uhd-d6cfe9d1",
     "/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
     "/en/press-kits/skoda-peaq-press-kit",
@@ -740,7 +816,6 @@ var CustomImportScript = (() => {
     "/en/series/unexpected-jobs",
     "/en/series/unknown-parts",
     "/en/series/winter-tips",
-    "/en/skoda-geneva-strube-interview-mp4",
     "/en/skoda-model/elroq",
     "/en/skoda-model/elroq/elroq-rs",
     "/en/skoda-model/elroq/elroq-sportline",
@@ -763,11 +838,6 @@ var CustomImportScript = (() => {
     "/en/skoda-model/octavia/octavia-sportline",
     "/en/skoda-model/peaq",
     "/en/skoda-model/scala",
-    "/en/skoda-octavia-combi-rs-4x4-2",
-    "/en/skoda-octavia-rs230-mpeg-4-1080p-2",
-    "/en/skoda-peaq-simply-clever-part-1-1080p-1-a3e05a13",
-    "/en/skoda-peaq-simply-clever-part-2-1080p-1-583a6637",
-    "/en/skoda-peaq-simply-clever-part-2-with-subtitles-1080p-1-529affa6",
     "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it",
     "/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute",
     "/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car",
@@ -804,9 +874,34 @@ var CustomImportScript = (() => {
     "/en/tag/years/2024",
     "/en/tag/years/2025",
     "/en/tag/years/2026",
-    "/en/tiger-on-ice-test",
     "/en/videos",
-    "/en/wrc-rally-test"
+    "/en/videos/936-km-without-recharging-skoda-peaq-sets-range-record-for-electric-seven-seater-suv-1080p-b9fcbb59",
+    "/en/videos/epiq-colours-en-1d57bbaa",
+    "/en/videos/epiq-reveal-hero-60s-16x9-clean-noepiq-h264-25mbit-331d5d10",
+    "/en/videos/naming-story-hd-16x9-809a9c3f",
+    "/en/videos/peaq-colours-en-ea6229cc",
+    "/en/videos/skoda-appoints-world-renowned-cyclist-chris-froome-as-brand-cycling-ambassador-1080p-7f20f61e",
+    "/en/videos/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav-1080p-1-9a67240d",
+    "/en/videos/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav-1080p-d8e78f93",
+    "/en/videos/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav-540p-ed39b17d",
+    "/en/videos/skoda-epiq-footage-01-hd-68aa554d",
+    "/en/videos/skoda-epiq-footage-02-hd-bcda4348",
+    "/en/videos/skoda-epiq-footage-first-edition-01-hd-830e36e5",
+    "/en/videos/skoda-epiq-footage-first-edition-02-uhd-58aec896",
+    "/en/videos/skoda-octavia-turns-30-three-decades-of-a-brand-icon-1080p-b0e9968c",
+    "/en/videos/skoda-peaq-footage-i-uhd-aa09ad60",
+    "/en/videos/skoda-peaq-footage-ii-uhd-569780b0",
+    "/en/videos/skoda-peaq-simply-clever-part-1-1080p-1-a3e05a13",
+    "/en/videos/skoda-peaq-simply-clever-part-1-with-subtitles-1080p-1-526eb599",
+    "/en/videos/skoda-peaq-simply-clever-part-2-1080p-1-583a6637",
+    "/en/videos/skoda-peaq-simply-clever-part-2-with-subtitles-1080p-1-529affa6",
+    "/en/videos/skoda-peaq-sportline-footage-i-uhd-166b2150",
+    "/en/videos/skoda-receives-red-dot-award-for-its-vision-app-concept-720p-cd084254",
+    "/en/videos/skoda-slavia-monte-carlo-mov-125225b2",
+    "/en/videos/skoda-slavia-prestige-69ae887f",
+    "/en/videos/tdffaz26-2-12956adf",
+    "/en/videos/tdffaz26-mobile-e1b62f9c",
+    "/en/videos/world-premiere-of-the-all-new-skoda-peaq-1080p-6cacbdd4"
   ];
   var DEMO_ALIASES = {
     "/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality": "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality"
@@ -832,13 +927,23 @@ var CustomImportScript = (() => {
     target2 = DEMO_ALIASES[target2] || target2;
     return ALLOWED.has(target2) ? `${target2}${tail}` : null;
   }
+  var TAG_FILTER = /^(?:(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com)?\/en\/news\/?\?filter(?:\[|%5B)([a-z0-9-]+)(?:\]|%5D)(?:\[\]|%5B%5D)=([^&#]+)$/i;
+  function tagPageHref(href) {
+    const m = href.match(TAG_FILTER);
+    if (!m) return null;
+    const slug = edsPath(`/${m[2]}`).slice(1);
+    const exact = `/en/tag/${m[1].toLowerCase()}/${slug}`;
+    if (ALLOWED.has(exact)) return exact;
+    const bySlug = DEMO_PATHS.filter((p) => p.startsWith("/en/tag/") && p.endsWith(`/${slug}`) && p.split("/").length === 5);
+    return bySlug.length === 1 ? bySlug[0] : null;
+  }
   function transform4(hookName, element, payload) {
     if (hookName !== TransformHook3.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
       let href = a.getAttribute("href");
       if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
       if (href.startsWith("/direct-download/")) href = `${SOURCE_ORIGIN}${href}`;
-      else href = rewriteHref(href) || href;
+      else href = tagPageHref(href) || rewriteHref(href) || href;
       if (href !== a.getAttribute("href")) a.setAttribute("href", href);
     });
   }

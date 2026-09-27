@@ -38,13 +38,13 @@
     },
     "images": {
       "label": "Image items (corpus)",
-      "gate": "W2b: SKODA-608",
-      "note": "The media-item index-row contract; no importer yet."
+      "gate": "SKODA-608: media feed (not pages); card UI → 402a / 406",
+      "note": "No item pages (option B, docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md): images rows live in /en/media-feed.json (tools/importer/media-items). M2: AEM Assets sync (SKODA-511)."
     },
     "videos": {
       "label": "Video items (corpus)",
-      "gate": "W2b: SKODA-608",
-      "note": "The media-item index-row contract; no importer yet."
+      "gate": "SKODA-608: media feed (not pages); card UI → 402a / 406",
+      "note": "No item pages (option B, docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md): videos rows live in /en/media-feed.json (tools/importer/media-items). M2: AEM Assets sync (SKODA-511)."
     }
   },
   "pages": {

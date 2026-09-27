@@ -102,6 +102,10 @@ image, holding the master (`-WxH` stripped), `dam_page_path` and `steps.dam`.
 - Key-facts card styling.
 - Dark Tech Data band: needs a Section Metadata hook outside `body.story` in `scripts.js`.
 - `story-rail` collapsing its section when empty, and reading `subheading`.
+  - **Amendment (2026-09-27, SKODA-608):** "collapsing" means the whole rail section: the default-content `h2`,
+    the "Based on tags" line and the "View all" link go too, not only the block's mount. Measured on the Peaq/Epiq
+    pages before 608: an empty rail left a ~116px heading + dead "View all". After 608, Octavia, Superb and Fabia
+    Images/Videos rails are still empty and still show the leftover heading until this lands.
 
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/template-model-page.md`](../../ui-specs/template-model-page.md)** (captured via Chrome DevTools on the live Peaq model page). Read it before implementing. Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).
