@@ -4,7 +4,8 @@
 - **Phase:** A/B · **Milestone:** M1 (demo story fidelity)
 - **GitHub issue:** [#120](https://github.com/skoda-storyboard/demo/issues/120)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🟡 importer merged in PR #113; sidebar CSS implemented, independent QA pending.
+- **Status (2026-09-25):** ✅ **Done.** Importer merged in PR #113; sidebar CSS merged in
+  [PR #160](https://github.com/skoda-storyboard/demo/pull/160); #120 closed.
 
 ## Origin
 Side-by-side QA of the Epiq story (1440px, 2026-09-24).

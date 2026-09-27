@@ -2,7 +2,7 @@
 - **Epic:** E02, Core Blocks
 - **Type:** block variant
 - **Phase:** A · **Milestone:** M1 (demo-visible on 4 of 5 M1 press releases)
-- **GitHub issue:** [#172](https://github.com/skoda-storyboard/demo/issues/172) (sub-issue of #47; not yet on Project #1)
+- **GitHub issue:** [#172](https://github.com/skoda-storyboard/demo/issues/172) (sub-issue of #47)
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1d *(planning estimate, not a quote)*
 - **Status (2026-09-27):** 🔵 TODO
 
