@@ -40,9 +40,14 @@ Detail/CPT + shells:
 Faceted listings (one engine, `listing.js` variant map keyed on the body-class token):
 - **`pr-listing`** (news), **`images-listing`** (`template=image`, columns=4), **`videos-listing`** (`template=video`), **`search-listing`** (cross-type, `search=true`) — each emits a single index-driven `Listing` config block; SSR cards + source filter stack not ported.
 
-Archives + directories (index-driven grids emitted as config, not ported cards):
+Archives + directories:
 - **`category-archive`** — category/tag archive (also covers podcast): hero + facet-less `Listing` scoped by canonical path.
-- **`series-directory`** / **`series-hub`** — `series-grid.js` self-detects level from card `data-content-type`; hub tag from canonical slug.
+- **`series-directory`** / **`series-hub`** — current `series-grid.js` self-detects level but emits
+  an invalid index-driven `Listing` (the hub `tags` key is not read). **SKODA-207 must
+  replace this** with source-order authored Cards: 25 directory cards (M2) and five
+  M1 hub mosaics (8/14/10/5/12 tiles, mixed Story/Press Kits). `hero-banner.js`
+  must emit `Hero Image (overlay)`, not the boilerplate `Hero`; the shared mosaic
+  variant is SKODA-221. See [`series.md`](../ui-specs/series.md) §7.
 - **`home-sto`** / **`home-mr`** — `promo-box` (curated cards) + `home-rail` (self-classifying index rails; social strip dropped).
 - **`skodapedia`** — glossary directory index block (term-detail prebake → SKODA-802).
 
@@ -51,7 +56,7 @@ Flatten-to-default (SiteOrigin widget tree NOT reconstructed — deferred to SKO
 - **`story-detail`** — hero + primary `.content` flattened by SKODA-801; `.sidebar` rebuilt as a separate section; in-body Media Box deferred to SKODA-801a/604.
 - **`error-404`** — `.error-message` dead-end copy + homepage link; site-root `404.html` shell.
 
-> Detection is **content-driven only** — blocks are located by the `page-templates.json` DOM selectors; parsers self-identify from the DOM (body-class token, `data-content-type`, `type-<cpt>` class), never from URL/template/section-order/position. Where a URL is read (series/archive scope) it derives the *rail filter*, never the *detection*. A page with a novel arrangement of known sections/blocks imports without parser changes.
+> Detection is **content-driven only** — blocks are located by the `page-templates.json` DOM selectors; parsers self-identify from the DOM (body-class token, `data-content-type`, `type-<cpt>` class), never from URL/template/section-order/position. Where a URL is read for archives, it derives the rail filter, never detection. **Series is an exception to index-driven grid output, not to DOM-based detection:** preserve the authored SiteOrigin row/order/size signals and use its canonical URL only for Metadata/links. Mixed Story/Press Kits tiles must not make a hub look like a directory.
 >
 > **Deliberately deferred:** the **custom microsite** (`template-custom-full-width`) is NOT run through flatten — its body is ~264 gallery tiles + a stub intro, so flatten yields a near-empty page; it needs the real gallery block (SKODA-210). **Newsletter** is a subscriber service surface (SKODA-904), not a content page. **Press-kit** (hub + chapters + resources + shared sub-nav) is SKODA-805–808.
 
@@ -173,7 +178,10 @@ only CPT-fixed overrides via the template entry. Do not hand-roll per-page metad
 Metadata `tags` = comma-separated slugs → AEM emits `<meta property="article:tag">` → read by both the
 query-index (`query.yaml` selects `property="article:tag"`) and the tags block's `article:tag` fallback.
 
-This is exactly how the M1 backlog scopes Series (SKODA-207), the Media Room home/Model/Press-Kit pages, and the full Images/Videos listings — assembly of the existing pipeline, not new machinery.
+Series (SKODA-207) reuses the pipeline but needs a **curated-card parser**, not an
+index-driven page grid; `skoda_series` Metadata still feeds the homepage Series
+rail. The Media Room home/Model/Press-Kit pages and Images/Videos listings
+continue to use the shared indexing machinery where specified.
 
 ---
 
