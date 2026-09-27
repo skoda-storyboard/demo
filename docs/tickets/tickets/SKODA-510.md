@@ -37,6 +37,9 @@ SKODA-607 phase split (2026-09-27). The 607 importer now emits every Media Box i
 - [ ] Every download link resolves (no 404/403); `aria-label` per control.
 - [ ] Story Media Box (SKODA-801a) unchanged apart from gaining its PDF tiles.
 - [ ] lint + tests green; no re-import needed (contract shape 1).
+- [ ] Remove the interim `decorateMediaBoxFiles` fallback in `templates/press-release/press-release.js` (+ its
+      `.press-release-files` CSS). It already renders nothing once the block outputs a link for every file row, so
+      this is cleanup, not a behaviour change (added on PR #170 review, 2026-09-27).
 
 ## Dependencies
 SKODA-502 (downloads block), SKODA-503 (PDF/MP4 routing), SKODA-607 (emits the rows), SKODA-505a (cart hook, later).
