@@ -1,7 +1,7 @@
 # Media items (images / videos): architecture options
 
-*Decision note for SKODA-608, 2026-09-27. Status: **open**, to decide with the client. PR #177 (phase 1: one page
-per item) is on hold until this is decided.*
+*Decision note for SKODA-608, 2026-09-27. Status: **direction agreed (option B)**, see the decision log at the end.
+PR #177 (phase 1: one page per item) is on hold; the demo pivot waits for a go-ahead.*
 
 ## The question
 
@@ -82,3 +82,28 @@ asset id / DAM path) and the lightbox (SKODA-406) already want to work.
 - **SKODA-406 / SKODA-402a:** unchanged (they read rows, wherever the rows come from). SKODA-406's card links to the
   lightbox, not an item page.
 - **SKODA-505a:** the cart keys off the feed's asset id / DAM path.
+
+## Decision log (2026-09-27)
+
+Answers to the open questions (project lead):
+
+| # | Question | Answer | Consequence |
+|---|---|---|---|
+| 1 | Which assets are public? | The **publish status** of the asset in AEM Assets | The sync reads published assets only; unpublishing an asset removes its row on the next sync. |
+| 2 | Are the 15 facets AEM tags today? | **No**, not on AEM yet | A taxonomy workstream: create the facet tag namespaces in AEM and tag assets during the DAM ingest (SKODA-504), mapped from the source terms (the M1 generator already maps them by name). Until then the feed carries source taxonomy. |
+| 3 | Delivery URL outside pages | The **AEM native CDN**; published AEM assets are also on the EDS Media Bus, so thumbnails work natively | Feed `image` = the asset's published delivery URL. **Verify** the URL pattern accepts resizing: the cards' `createOptimizedPicture` keeps the origin and replaces the query with Media Bus params (`?width=…&format=webply&optimize=medium`). That's correct for Media Bus URLs; any other host must accept those params or the shared card-image helper needs a small adapter. |
+| 4 | Sync trigger and owner | **After the demo** | The M2 sync ticket stays open on trigger (AEM events vs schedule) and ownership. |
+| 5 | Per-item SEO pages | **No** | No item pages. The detail view is the lightbox (SKODA-406); the source attachment pages are thin (broken `og:image`, canonical to the file, many 404). |
+
+**Decided: option B.** AEM Assets (published assets) is the source of truth, and a generated media feed carries the
+rows to Edge Delivery. Pages per item are retired.
+
+**Demo (M1) specifics:** AEM Assets isn't populated or tagged yet, so the demo feed is generated from the source
+listing (the #177 generator, writing one sheet instead of 101 pages). Its thumbnails are the source CDN `-768x512`
+renditions: they aren't resized by the Media Bus params, but they are small enough for cards.
+
+**Follow-up tickets:**
+- **M2:** AEM Assets → media feed sync job (published assets, sharded feed, trigger/owner TBD).
+- **M2:** Media taxonomy in AEM Assets: the 15 facet namespaces and the source-term mapping, applied at ingest
+  (with SKODA-504).
+- **SKODA-406:** verify card images against AEM delivery URLs (the `createOptimizedPicture` params).
