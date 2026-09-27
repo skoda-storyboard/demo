@@ -1,6 +1,11 @@
 {
   "version": 1,
   "pages": {
+    "/en": {
+      "hash": "a0e395350882547bb7a99f16e2c451bf1e96c04740c3b2ebc521f75dc8e8cabc",
+      "pushedAt": "2026-09-27T07:59:33.392Z",
+      "previewedHash": "a0e395350882547bb7a99f16e2c451bf1e96c04740c3b2ebc521f75dc8e8cabc"
+    },
     "/en/category/classic-cars": {
       "hash": "db83278b4a434d6d339fb50aa2c5ce93c081a3f0f64cde8f9e9ffe81f557d0b6",
       "pushedAt": "2026-09-26T06:32:21.552Z"
@@ -159,8 +164,9 @@
       "pushedAt": "2026-09-26T06:46:02.390Z"
     },
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds": {
-      "hash": "e8efe2579ee8919a1bc53c79762968ff54071fbfda05f4b87c9070a33bb58bea",
-      "pushedAt": "2026-09-26T06:47:09.820Z"
+      "hash": "7e8f22dea93b09e7ec4cc5c6e8c05988e788bad4c0a32dcc0ad5648448c99547",
+      "pushedAt": "2026-09-27T07:59:33.392Z",
+      "previewedHash": "7e8f22dea93b09e7ec4cc5c6e8c05988e788bad4c0a32dcc0ad5648448c99547"
     },
     "/en/emobility/skoda-peaq-unparalleled-space-and-comfort": {
       "hash": "c76bcff4932a9130ff0ea02b54f7ffb2ec905e04a5ce621086e76d666b1b4f58",
