@@ -3,6 +3,71 @@
 Reusable, re-runnable tooling to ingest source-site images into the project's
 media layer and re-point imported content at them. Not Elroq-specific.
 
+## PDF/MP4 links (SKODA-503)
+
+PDFs and self-hosted MP4s are **not images**: they are recorded as `document`
+and `video` rows in the same manifest, uploaded as originals to AEM Assets,
+and rewritten only in `<a href>` attributes. Embedded Vimeo/YouTube/audio
+URLs are not binaries. A private author DAM path is never used as an anonymous
+page link. The public AEM Assets delivery contract for this tenant is **not yet
+established**; upload **only one rights-approved original** against a reviewed
+candidate public URL to prove anonymous access, original MIME type and byte
+count. Do not expand the batch or rewrite page links until that proof succeeds.
+A redirect to an expiring signed URL is not a suitable link.
+An anonymous HEAD on an **existing image** under
+`publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/` returned
+200 on 2026-09-27. This suggests a candidate publish host, **not proof that
+new PDF/MP4 originals are automatically published or anonymously accessible**.
+
+Before the first approved sample upload, create a **reviewed, local JSON map**
+whose keys are intended DAM paths and whose values are candidate public Assets
+URLs; the builder verifies actual public delivery **after** uploading:
+
+```json
+{
+  "/content/dam/storyboard/en/press-releases/example/release.pdf": "https://PUBLIC-ASSETS-HOST/content/dam/storyboard/en/press-releases/example/release.pdf"
+}
+```
+
+The hostname above is a **placeholder, not a known working endpoint**. Keep
+the mapping out of commits until the tenant-specific delivery contract has
+been established. Restrict the first upload to one rights-approved original
+using an ID list and review the dry run first:
+
+```bash
+npm run media:build -- --pages content/en/press-releases/example.plain.html
+npm run media:build -- --from-manifest --ids-file /path/to/approved-binary-ids.txt \
+  --dam-base https://author-p220607-e2281243.adobeaemcloud.com \
+  --public-urls /path/to/public-urls.json --dry-run
+# With credentials, upload the approved single sample without --dry-run.
+# The builder fails closed if the sample does not deliver publicly; investigate
+# activation/publication requirements before adding any more IDs.
+npm run media:apply -- --pages content/en/press-releases/example.plain.html
+npm run media:validate-binaries -- --pages content/en/press-releases/example.plain.html
+npm run import:push -- --paths /path/to/approved-page-paths.txt --dry-run
+# Only with separate DA approval: default import:push stage is push + preview, NOT publish.
+```
+
+The Assets builder requires a public URL mapping **before** uploading any
+selected binary. It verifies anonymous `HEAD` access, exact PDF/MP4 MIME,
+original byte length, and no redirect after upload. A source
+`/direct-download/…mp4` redirect is followed only to fetch the bytes; neither
+that redirect nor its signed S3 target becomes the destination link. The source
+link must be a stable URL without a query string; query-bearing binaries block
+ingest rather than guessing whether dropping parameters changes the file.
+Analytics hash fragments may be stripped by the existing link transformer. The source
+may return `application/octet-stream` for MP4s, so verified MP4 signatures
+are uploaded with `video/mp4` MIME. Binary uploads are serial to bound memory
+usage (a measured M1 MP4 is about 101 MB). A signed MP4 route may reject HEAD
+but accept a one-byte ranged GET; the dry-run preflight handles that. Failures
+remain `partial` in the manifest and block rewriting. The standalone
+`media:validate-binaries` check is **offline** and emits per-page JSON results
+with a nonzero exit for missing, unrehosted or misclassified links. `import:push`
+applies the same gate per page before DA writes and again before preview/live;
+an invalid page is reported as `blocked-binary` while other pages can proceed.
+The gate checks the stored public proof but does not crawl preview/live URLs.
+No automatic publish or `--force` overwrite is part of this procedure.
+
 Implements the media half of **SKODA-501** (masters-only ingest), **SKODA-504**
 (mapping manifest, page-mirrored DAM foldering), **SKODA-505** (media-cart
 resolver seam), **SKODA-506** (pre-condition oversized masters before publish).
@@ -69,6 +134,7 @@ original is never replaced by a derivative under the original's DAM path.
 
 Then **`apply-media-manifest.mjs`** rewrites content `<img src>` →
 `delivery_url`, removes the old WordPress `srcset` ladder so EDS builds its own,
+and rewrites verified PDF/MP4 anchors to their public Assets URLs,
 and emits `content/media-index.json` (the cart resolver). A missing page or
 unresolved image fails the entire requested apply before changing any page;
 the sole exception is a manifest `partial` row explicitly marked
@@ -128,7 +194,9 @@ The audit reports per-page image counts, missing/empty alt, missing captions,
 misplaced images, unverified delivery, and pending DAM originals; it exits
 nonzero while any in-scope original is missing from DAM. It skips the
 alias annotated in `skoda-m1-url-set.txt`; it does not publish content or
-replace SKODA-506's gate in `import:push`. A checkout without `content/`
+replace SKODA-506's gate in `import:push`. It also reports PDF/MP4 count and
+unverified binary links; a private DAM-only PDF does not count as delivered.
+A checkout without `content/`
 correctly reports 42 missing pages rather than claiming media QA passed.
 
 ### Mandatory inline-image gate (`import:push`, SKODA-506)
@@ -191,8 +259,9 @@ unchanged. The builder resumes only missing steps on delivery-only rows;
 `--from-manifest` run processes **every** row, including images another import
 may have added since a prior approval; use `--ids-file` to freeze the intended
 upload set. Unknown, repeated, or empty ID lists fail rather than expanding
-the scope. With `--dam-base`, `--dry-run` also HEAD-checks pending original
-masters and reports inaccessible ones without fetching bytes or uploading.
+the scope. With `--dam-base`, `--dry-run` HEAD-checks pending image originals and
+HEAD/range-probes pending PDF/MP4 originals (requesting one byte, then
+canceling the response body), reporting inaccessible sources without uploading.
 
 ## Automatic wiring (PostToolUse hook)
 

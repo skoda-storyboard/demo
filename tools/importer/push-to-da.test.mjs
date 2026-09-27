@@ -7,10 +7,15 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import main from './push-to-da.mjs';
 import { contentHash, wrapPage } from './push/push-lib.mjs';
+import { logicalId } from './media/media-lib.mjs';
+
+const binarySource = 'https://www.skoda-storyboard.com/direct-download/report.pdf';
+const binaryPublic = 'https://publish-p123.adobeaemcloud.com/content/dam/report.pdf';
 
 async function scenario(stage, remoteMatches, {
   previewed = false, image = 'small', extra = [], edited = false, fragmentBlocked = false,
   blockedSibling = false,
+  binary = '', binarySibling = false,
 } = {}) {
   const dir = mkdtempSync(path.join(tmpdir(), 'skoda-506-push-'));
   const previousFetch = global.fetch;
@@ -21,16 +26,37 @@ async function scenario(stage, remoteMatches, {
   const mediaManifestFile = path.join(dir, 'media-manifest.json');
   const list = path.join(dir, 'paths.txt');
   const plain = `<figure><img src="https://cdn.example.test/${image}.jpg" alt="Kept"></figure>`
-    + '<div class="metadata"><div><div>Image</div><div>https://cdn.example.test/card.jpg</div></div></div>';
+    + `<div class="metadata"><div><div>Image</div><div>https://cdn.example.test/card.jpg</div></div></div>${
+      binary ? `<p><a href="${binary === 'hosted' ? binaryPublic : binarySource}">Report PDF</a></p>` : ''}`;
   let da = remoteMatches ? plain : '<div>Edited in DA</div>';
   const requests = [];
   mkdirSync(path.join(contentDir, 'en'), { recursive: true });
   writeFileSync(path.join(contentDir, 'en', 'story.plain.html'), plain);
-  writeFileSync(list, `/en/story\n${blockedSibling ? '/en/blocked\n' : ''}`);
+  writeFileSync(list, `/en/story\n${blockedSibling ? '/en/blocked\n' : ''}${binarySibling ? '/en/binary\n' : ''}`);
   if (blockedSibling) {
     writeFileSync(path.join(contentDir, 'en', 'blocked.plain.html'), '<div><img src="https://cdn.example.test/huge.jpg" alt="No rendition"></div>');
   }
-  writeFileSync(mediaManifestFile, '{"rows":{}}\n');
+  if (binarySibling) {
+    writeFileSync(
+      path.join(contentDir, 'en', 'binary.plain.html'),
+      `<p><a href="${binarySource}">Report PDF</a></p>`,
+    );
+  }
+  const binaryRow = {
+    logical_id: logicalId(binarySource),
+    kind: 'document',
+    source_url: binarySource,
+    page_refs: binary === 'hosted' ? ['en/story'] : [],
+    dam_asset_path: '/content/dam/storyboard/report.pdf',
+    public_url: binaryPublic,
+    bytes: 42,
+    public_verified: { url: binaryPublic, mime: 'application/pdf', bytes: 42 },
+    status: 'done',
+    steps: { dam: 'done' },
+  };
+  writeFileSync(mediaManifestFile, JSON.stringify({
+    rows: binary === 'hosted' ? { [logicalId(binarySource)]: binaryRow } : {},
+  }));
   const hash = contentHash(wrapPage(da));
   writeFileSync(manifestFile, JSON.stringify({
     pages: {
@@ -188,4 +214,26 @@ test('a media-blocked page does not stop the rest of the batch', async () => {
   assert.equal(result.state.pages['/en/story'].previewedHash, result.state.pages['/en/story'].hash);
   assert.ok(!result.requests.some((req) => req.includes('/en/blocked') && req.startsWith('POST ')));
   assert.equal(result.requests.filter((req) => req === 'HEAD https://cdn.example.test/big.jpg').length, 1);
+});
+
+test('the binary gate blocks unmapped source links before a DA write', async () => {
+  const result = await scenario('push,preview', true, { binary: 'source' });
+  assert.equal(result.report.pages[0].action, 'blocked-binary');
+  assert.match(result.report.pages[0].error, /unverified document link/);
+  assert.ok(!result.requests.some((request) => request.startsWith('POST ')));
+});
+
+test('a binary-blocked page does not block another page from preview', async () => {
+  const result = await scenario('push,preview', true, { binarySibling: true });
+  assert.equal(result.report.pages[0].valid, true);
+  assert.equal(result.report.pages[1].action, 'blocked-binary');
+  assert.ok(result.requests.some((request) => request.includes('POST https://admin.hlx.page/preview/')));
+  assert.ok(!result.requests.some((request) => request.startsWith('POST ') && request.includes('/en/binary')));
+});
+
+test('verified Assets links pass the offline binary gate without binary network probes', async () => {
+  const result = await scenario('push,preview', true, { binary: 'hosted' });
+  assert.equal(result.report.pages[0].valid, true);
+  assert.deepEqual(result.report.pages[0].binaries, { count: 1, errors: [] });
+  assert.ok(!result.requests.some((request) => request.includes('publish-p123.adobeaemcloud.com')));
 });

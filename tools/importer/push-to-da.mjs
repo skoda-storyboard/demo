@@ -48,6 +48,7 @@ import {
   uploadToDA, fetchWithRetry, OVERSIZE_BYTES, MIN_RENDITION_EDGE, renditionEdge,
 } from './media/media-lib.mjs';
 import { conditionInlineMedia, imageLimit } from './media/condition-inline-media.mjs';
+import { binaryAnchors, binaryErrors } from './media/binary-media.mjs';
 import {
   parseList, wrapPage, contentHash, decideAction, PUSHING, chunk, parseJobDetails,
   fragmentPaths, imageCheck, summarize,
@@ -225,6 +226,16 @@ export default async function main(argv = process.argv.slice(2), {
       continue;
     }
     const original = readFileSync(file, 'utf8');
+    page.binaries = {
+      count: binaryAnchors(original).length,
+      errors: binaryErrors(original, mediaManifest, p.slice(1)),
+    };
+    if (page.binaries.errors.length) {
+      Object.assign(page, {
+        action: 'blocked-binary', error: `Binary gate: ${page.binaries.errors.join('; ')}`,
+      });
+      continue;
+    }
     const conditioned = await mediaGate(original, p);
     page.media = conditioned.changes;
     conditioned.changes.forEach((change) => log(`[media] ${p}: ${change.action} ${change.from}${change.to ? ` -> ${change.to}` : ''}`));
@@ -300,6 +311,11 @@ export default async function main(argv = process.argv.slice(2), {
   if ((a.stages.has('preview') || wantPublish) && !a.dryRun) {
     const ready = pages.filter(inDA);
     for (const pg of ready) {
+      const binaryFailures = binaryErrors(pg.plain, mediaManifest, pg.path.slice(1));
+      if (binaryFailures.length) {
+        pg.error = `Binary changed before preview: ${binaryFailures.join('; ')}`;
+        continue;
+      }
       const gate = await mediaGate(pg.plain, pg.path);
       if (gate.errors.length || gate.changes.length) {
         pg.error = `Media changed before preview: ${gate.errors.join('; ') || JSON.stringify(gate.changes)}`;
@@ -354,9 +370,10 @@ export default async function main(argv = process.argv.slice(2), {
       const source = await readDA(a, f);
       if (source.text == null) frag.error = 'Fragment has no DA source to condition';
       else {
+        const binaryFailures = binaryErrors(source.text, mediaManifest, f.slice(1));
         const gate = await mediaGate(source.text, f);
-        if (gate.errors.length || gate.changes.length) {
-          frag.error = `Fragment media gate: ${gate.errors.join('; ') || JSON.stringify(gate.changes)}`;
+        if (binaryFailures.length || gate.errors.length || gate.changes.length) {
+          frag.error = `Fragment media gate: ${binaryFailures.join('; ') || gate.errors.join('; ') || JSON.stringify(gate.changes)}`;
         }
       }
     }
@@ -389,8 +406,9 @@ export default async function main(argv = process.argv.slice(2), {
         continue;
       }
       const gate = await mediaGate(pg.plain, pg.path);
-      if (gate.errors.length || gate.changes.length) {
-        pg.error = `Media changed before publish: ${gate.errors.join('; ') || JSON.stringify(gate.changes)}`;
+      const binaryFailures = binaryErrors(pg.plain, mediaManifest, pg.path.slice(1));
+      if (binaryFailures.length || gate.errors.length || gate.changes.length) {
+        pg.error = `Media changed before publish: ${binaryFailures.join('; ') || gate.errors.join('; ') || JSON.stringify(gate.changes)}`;
         continue;
       }
       ready.push(pg.path);

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync,
+  mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync, existsSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -118,6 +118,55 @@ test('known oversized partial media is deferred to the mandatory push gate, unkn
     writeFileSync(page, doc + unknown);
     await assert.rejects(run(dir, manifest, index, [page]), /Media apply blocked/);
     assert.equal(readFileSync(page, 'utf8'), doc + unknown);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('apply rewrites public PDF/MP4 links by page-relative source path, atomically', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-binary-apply-'));
+  try {
+    const { manifest, index } = fixture(dir);
+    const content = path.join(dir, 'content', 'en', 'press-releases');
+    mkdirSync(content, { recursive: true });
+    const page = path.join(content, 'example.plain.html');
+    const pdf = 'https://www.skoda-storyboard.com/en/press-releases/assets/release.pdf';
+    const mp4 = 'https://www.skoda-storyboard.com/direct-download/clip.mp4';
+    const publicPdf = 'https://publish-p123.adobeaemcloud.com/content/dam/release.pdf';
+    const publicMp4 = 'https://publish-p123.adobeaemcloud.com/content/dam/clip.mp4';
+    const record = JSON.parse(readFileSync(manifest, 'utf8'));
+    [
+      [pdf, publicPdf, 'document', 'application/pdf'],
+      [mp4, publicMp4, 'video', 'video/mp4'],
+    ].forEach(([sourceUrl, publicUrl, kind, mime]) => {
+      const id = logicalId(sourceUrl);
+      record.rows[id] = {
+        logical_id: id,
+        kind,
+        source_url: sourceUrl,
+        public_url: publicUrl,
+        bytes: 42,
+        status: 'done',
+        steps: { dam: 'done' },
+        dam_asset_path: `/content/dam/storyboard/${kind}`,
+        public_verified: { url: publicUrl, mime, bytes: 42 },
+        page_refs: ['en/press-releases/example'],
+      };
+    });
+    writeFileSync(manifest, JSON.stringify(record));
+    const original = '<p><a href="../assets/release.pdf" title="Release">Read PDF</a></p>'
+      + '<p><a href="/direct-download/clip.mp4">Watch MP4</a></p>';
+    writeFileSync(page, original);
+    await run(dir, manifest, index, [page]);
+    const result = readFileSync(page, 'utf8');
+    assert.match(result, new RegExp(`href="${publicPdf}" title="Release">Read PDF`));
+    assert.match(result, new RegExp(`href="${publicMp4}">Watch MP4`));
+    await run(dir, manifest, index, [page]);
+    assert.equal(readFileSync(page, 'utf8'), result);
+
+    writeFileSync(page, `${original}<a href="/direct-download/missing.mp4">Missing</a>`);
+    await assert.rejects(run(dir, manifest, index, [page]), /Media apply blocked/);
+    assert.equal(readFileSync(page, 'utf8'), `${original}<a href="/direct-download/missing.mp4">Missing</a>`);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

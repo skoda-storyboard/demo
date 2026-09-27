@@ -108,11 +108,15 @@ export function stepDownTooSmall(row, minEdge = MIN_RENDITION_EDGE) {
 }
 
 export function needsMediaBuild(row, {
-  dam = false, da = false, force = false, minEdge = MIN_RENDITION_EDGE,
+  dam = false, da = false, force = false, minEdge = MIN_RENDITION_EDGE, publicUrl = '',
 } = {}) {
   if (force || !row || row.status !== 'done') return true;
-  // A document row has no delivery step; only the DAM original can be outstanding.
-  if (row.kind === 'document') return dam && (row.steps?.dam !== 'done' || !row.dam_asset_path);
+  // A binary must have a verified public destination, not merely a private DAM upload.
+  if (row.kind === 'document' || row.kind === 'video') {
+    return row.steps?.dam !== 'done' || !row.dam_asset_path
+      || !row.public_url || (publicUrl && row.public_url !== publicUrl)
+      || row.public_verified?.url !== row.public_url;
+  }
   if (row.steps?.deliver !== 'done' || !row.delivery_url
     || !Number.isFinite(row.bytes) || row.bytes > OVERSIZE_BYTES) return true;
   if (stepDownTooSmall(row, minEdge)) return true;

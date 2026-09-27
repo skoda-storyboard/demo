@@ -32,3 +32,20 @@ Non-image binaries must never go through EDS's image optimization pipeline. PDFs
 - **Note (2026-09-07):** the media **cart + bulk zip-download** is **no longer blanket-deferred** — per client scope it is a mission-critical M1 demo deliverable, now built in **SKODA-505** (device-ID, client-side zip). This ticket still handles MP4/PDF as plain links for the pilot; only the *signed MP4 download service* remains a Phase C item (SKODA-902). See `SKODA-MEDIA-CART-DOWNLOAD.md`.
 - MP4 rendition/resolution count and total video footprint are unquantified `[PARTIAL]` (no video sitemap).
 - No-CORS legacy CDN complicates reference-in-place for production.
+
+## Implementation checkpoint (2026-09-27; awaiting live delivery proof and QA)
+
+On `skoda-503-binary-links` the manifest builder can inventory PDF/MP4 anchors,
+upload approved originals to Assets, and verify a reviewed anonymous public
+URL before marking a row ready. Apply rewrites verified anchors; an offline
+validator and the DA push path block unmapped/private/source links per page
+before external writes. Tests use a mock Assets server. **No actual PDF/MP4
+upload or DA push has occurred:** the tenant's public AEM Assets binary URL
+is unknown and no token was supplied. The ticket remains open until that
+contract, sample preview and independent QA have been demonstrated. SKODA-510
+owns the Downloads file-tile rendering.
+
+Read-only probe: the candidate AEM publish hostname serves one already-uploaded
+image anonymously (HEAD 200). The source Peaq MP4 is approximately 101 MB;
+its signed redirect rejects HEAD (403) but a one-byte ranged GET succeeds (206).
+Neither observation proves the tenant will publish newly uploaded PDF/MP4 assets.

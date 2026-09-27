@@ -27,8 +27,9 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import {
-  logicalId, isImageUrl, cleanUrl, OVERSIZE_BYTES,
+  logicalId, isImageUrl, cleanUrl, OVERSIZE_BYTES, pagePathFromFile,
 } from './media-lib.mjs';
+import { rewriteBinaryLinks } from './binary-media.mjs';
 
 const WORKSPACE = process.env.WORKSPACE_PATH || process.cwd();
 const DEFAULT_MANIFEST = path.join(WORKSPACE, 'tools', 'importer', 'media', 'media-manifest.json');
@@ -121,7 +122,8 @@ function main() {
       failures.push(`${page}: requested page not found`);
       continue;
     }
-    let html = readFileSync(abs, 'utf8');
+    const original = readFileSync(abs, 'utf8');
+    let html = original;
     let rw = 0;
     let deferred = 0;
     html = html.replace(/<img\b[^>]*>/gi, (tag) => {
@@ -150,16 +152,19 @@ function main() {
       return rewritten;
     });
 
-    prepared.push({ abs, html, rw });
+    const binaries = rewriteBinaryLinks(html, manifest, pagePathFromFile(abs));
+    failures.push(...binaries.errors.map((error) => `${page}: ${error}`));
+    html = binaries.html;
+    prepared.push({ abs, html, changed: html !== original });
     totalRewrites += rw;
     totalDeferred += deferred;
-    console.log(`${cfg.dryRun ? '[dry-run] ' : ''}${path.relative(WORKSPACE, abs)}: ${rw} media ref(s) rewritten → delivery url`);
+    console.log(`${cfg.dryRun ? '[dry-run] ' : ''}${path.relative(WORKSPACE, abs)}: ${rw} image(s), ${binaries.rewrites} binary link(s) rewritten`);
   }
 
   if (failures.length) { throw new Error(`Media apply blocked:\n${failures.join('\n')}`); }
   if (!cfg.dryRun) {
-    prepared.forEach(({ abs, html, rw }) => {
-      if (rw) { writeFileSync(abs, html); }
+    prepared.forEach(({ abs, html, changed }) => {
+      if (changed) writeFileSync(abs, html);
     });
   }
   const indexed = emitMediaIndex(manifest, cfg.mediaIndex, cfg.dryRun);
