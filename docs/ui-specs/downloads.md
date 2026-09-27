@@ -3,6 +3,18 @@
 Status: **CAPTURED** (measured 2026-09-15 via Chrome DevTools MCP; source CSS `media-room-515d2d102b.css`).
 Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 
+> **SKODA-510 update (2026-09-27, measured without screenshots):** Press-release Media Boxes include
+> image rows, MP4 poster rows and a PDF row with an empty image cell. The source Peaq box has five tiles
+> (one video, three images, one PDF); the old EDS block dropped the PDF. At 1280/1024/768/500 the source
+> thumbnail widths are **292/236/236/480px**, with **4/4/3/1** columns and 20px visual gaps. The source
+> switches from one to two columns at **520px**, from two to three at 768px, and to four at 992px.
+> The source's **Show more** is count-triggered, not mobile-only: Peaq (5 tiles) has no control even
+> at 500px; the Epiq story (19 tiles) collapses after two rows at both 500 and 1280px, with Show less
+> after expansion. SKODA-510 applies this disclosure to large press-release boxes; story disclosure
+> remains with SKODA-801a. This overrides the older two-column-at-768 suggestion in §4/§7/§9 for
+> press-release boxes. The block shows file-only rows as PDF icon tiles and a decorative play badge on
+> MP4 posters; the MP4 action remains a direct download, not a video player.
+
 ## 1. Identity
 
 - **Component:** Downloads, the **static** per-image download gallery ("Media Box" / "Images" section)
@@ -100,9 +112,13 @@ press release above.
 
 - Thumbnail grid is `flex-wrap` and tile-width-driven, so it reflows fluidly (more tiles per row as
   width grows); no explicit per-breakpoint tile restyle in the inline press-release box.
+- **Measured press-release Media Box override:** 1 column below 520px, 2 from 520px, 3 from 768px,
+  4 from 992px. Each tile has a 10px inner gutter on either side in the source; the EDS visual
+  thumbnail grid matches its 20px gap. The 1280px image tile measures 292 × 305px. Larger boxes
+  (>8 assets) disclose the first two rows; five-asset boxes show all tiles.
 - The dedicated image listing (`/images/`) applies the listing grid ladder: `1` col (<768) ->
   `2` (`>=768`) -> `4` (`>=992`) (· `.images .items .item` @media · source CSS). For a press-release
-  Downloads block, recommend the same ladder capped by a `columns` option.
+  Downloads block, use the measured Media Box ladder above, not the listing ladder.
 - Aspect ratio stays **16:9** (`padding-bottom:56.25%`) at every band.
 
 ## 5. Interaction states
@@ -130,9 +146,9 @@ press release above.
 
 ## 7. EDS target
 
-Block `downloads` (new). Two authoring modes: (a) **API/index-driven**, one config cell with the
+Block `downloads`. Two authoring modes: (a) **API/index-driven**, one config cell with the
 post id + lang, fetch `mediabox/post/{id}/{lang}`, render tiles from `images[]`; (b) **authored**, a
-row per image (picture + title + file link). Reuse `createOptimizedPicture` for synthesized tiles /
+row per asset (picture or empty cell + title + download links). Reuse `createOptimizedPicture` for synthesized tiles /
 `optimizeImageInPlace` for authored ones. Reuse the card-teaser markup for each tile and the
 `gallery-lightbox` block for the enlarged view.
 
@@ -184,7 +200,8 @@ actual.
 - [ ] Layout: `.downloads-items` / all / **grid of thumbnails** (flex-wrap), not a text list.
 - [ ] Thumbnail: `.downloads-items img` / all / **16:9** box (`padding-bottom:56.25%`),
       `object-fit:cover`, faint `1px` hairline border.
-- [ ] Columns: image mode / mobile `1` / 768 `2` / 992+ `4` (configurable).
+- [ ] Columns: press-release box `1` below 520 / `2` from 520 / `3` from 768 / `4` from 992
+      (the older `2` at 768 describes listings, not press-release boxes).
 - [ ] Download button: `a.download` / all / round `40x40`, radius `50px`, bg `#fff`, border
       `2px #161718`, download icon (SVG).
 - [ ] Download hover: `a.download:hover` / all / bg `#f1f1f1`.

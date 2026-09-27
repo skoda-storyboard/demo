@@ -29,6 +29,8 @@ const LABELS = {
   // aria-label for the size-menu toggle
   sizes: (title) => `Download sizes for ${title}`,
   open: 'View image',
+  more: 'Show more',
+  less: 'Show less',
 };
 
 /**
@@ -56,6 +58,32 @@ function downloadIcon() {
   const base = document.createElementNS(NS, 'path');
   base.setAttribute('d', 'M4 20 H20');
   svg.append(arrow, base);
+  return svg;
+}
+
+function fileIcon() {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 48 48');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('aria-hidden', 'true');
+  const page = document.createElementNS(NS, 'path');
+  page.setAttribute('d', 'M10 3h19l9 9v33H10z M29 3v10h9 M16 25h16 M16 31h16 M16 37h11');
+  svg.append(page);
+  return svg;
+}
+
+function playIcon() {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('aria-hidden', 'true');
+  const triangle = document.createElementNS(NS, 'path');
+  triangle.setAttribute('d', 'M8 5v14l11-7z');
+  triangle.setAttribute('fill', 'currentColor');
+  svg.append(triangle);
   return svg;
 }
 
@@ -162,6 +190,7 @@ function readAsset(row) {
 // per-page counter → unique size-menu ids when >1 dropdown on a page (so the
 // toggle's aria-controls references its own menu). Mirrors listing.js.
 let menuSeq = 0;
+let disclosureSeq = 0;
 
 /**
  * Build the round download control for a tile. With one size it is a single
@@ -243,10 +272,10 @@ function buildDownload(asset) {
  * Build one download tile (<li>) from a normalized asset descriptor. Shared by
  * both the authored and mediabox-API paths.
  * @param {{src: string, alt?: string, title: string, sizes: Array<{label,href}>}} asset
- * @returns {HTMLLIElement|null} null if the asset has no image
+ * @returns {HTMLLIElement|null} null if the asset has neither image nor download
  */
 function buildTile(asset) {
-  if (!asset.src) return null;
+  if (!asset.src && !asset.sizes.length) return null;
 
   const li = document.createElement('li');
   li.className = 'downloads-item';
@@ -254,25 +283,39 @@ function buildTile(asset) {
   const figure = document.createElement('figure');
   figure.className = 'downloads-figure';
 
-  // 16:9 thumbnail linking to the full-size image. A real <a> gives a working,
-  // keyboard-operable affordance without a cross-block dependency; the live
-  // colorbox-style modal is deferred to the shared gallery-lightbox util
-  // (SKODA-203 ships it inside blocks/gallery; AGENTS.md forbids cross-block
-  // import, so reuse waits on a /scripts/ extraction — tracked separately).
-  const thumb = document.createElement('a');
-  thumb.className = 'downloads-thumb';
-  [thumb.href] = asset.src.split('?');
-  thumb.setAttribute('aria-label', `${LABELS.open} ${asset.title}`.trim());
-  thumb.append(createOptimizedPicture(asset.src, asset.alt || asset.title, false, [
-    { media: '(min-width: 768px)', width: '750' },
-    { width: '500' },
-  ]));
-  figure.append(thumb);
+  if (asset.src) {
+    // Keep the existing image link and size-menu behavior for image and video rows.
+    const thumb = document.createElement('a');
+    thumb.className = 'downloads-thumb';
+    [thumb.href] = asset.src.split('?');
+    thumb.setAttribute('aria-label', `${LABELS.open} ${asset.title}`.trim());
+    thumb.append(createOptimizedPicture(asset.src, asset.alt || asset.title, false, [
+      { media: '(min-width: 768px)', width: '750' },
+      { width: '500' },
+    ]));
+    if (asset.sizes.length === 1 && /\.mp4(?:[?#]|$)/i.test(asset.sizes[0].href)) {
+      const badge = document.createElement('span');
+      badge.className = 'downloads-play';
+      badge.setAttribute('aria-hidden', 'true');
+      badge.append(playIcon());
+      thumb.append(badge);
+    }
+    figure.append(thumb);
+  } else {
+    const file = document.createElement('div');
+    file.className = 'downloads-file';
+    file.append(fileIcon());
+    const type = document.createElement('span');
+    type.className = 'downloads-file-type';
+    type.textContent = asset.sizes[0].label || 'File';
+    file.append(type);
+    figure.append(file);
+  }
 
-  if (asset.title) {
+  if (asset.title || asset.sizes[0]?.label) {
     const cap = document.createElement('figcaption');
     cap.className = 'downloads-title';
-    cap.textContent = asset.title;
+    cap.textContent = asset.title || asset.sizes[0].label;
     figure.append(cap);
   }
 
@@ -312,4 +355,21 @@ export default async function decorate(block) {
   });
 
   block.replaceChildren(list);
+  if (block.closest('body.press-release') && list.children.length > 8) {
+    disclosureSeq += 1;
+    list.id = `downloads-items-${disclosureSeq}`;
+    block.classList.add('downloads-collapsible');
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'downloads-more';
+    toggle.setAttribute('aria-controls', list.id);
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.textContent = LABELS.more;
+    toggle.addEventListener('click', () => {
+      const expanded = block.classList.toggle('downloads-expanded');
+      toggle.setAttribute('aria-expanded', String(expanded));
+      toggle.textContent = expanded ? LABELS.less : LABELS.more;
+    });
+    block.append(toggle);
+  }
 }

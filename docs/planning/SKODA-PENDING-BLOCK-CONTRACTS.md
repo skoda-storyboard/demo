@@ -176,6 +176,9 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 
 ### `downloads-file-rows`
 - **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-510 · **Fallback:** readable (image tiles; rows without an image are skipped by the block, so on press releases `templates/press-release` lists each skipped file, e.g. the release PDF, as a plain download link under the grid until SKODA-510 lands; PR #170 review)
+- **Landing:** `skoda-510-downloads-tiles` implements this shape without re-import; each empty-image
+  row now renders as a file tile and the template fallback is removed. Keep the contract pinned
+  until that branch merges and QA verifies the rendered pages.
 - **Emitted by:** `parsers/downloads.js` (press-release Media Box). A row shape of the `downloads` block on `main`, so the check classifies these pages as `main`, not pending.
 - **Shape:** header `Downloads`, then 3 cells per row: `[<picture> or empty, title text, links]`. The links cell holds one `<a>` per size, its text the size label: `Original` + `1920px` (image, `/direct-download/…` and `…-1920xH.jpg`), `MP4` (video, Vimeo poster as the picture), `PDF` (document, empty picture cell).
 - **Example** (Peaq): 5 rows, `MP4`, 3 × `Original`+`1920px`, `PDF`.

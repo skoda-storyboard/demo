@@ -6,7 +6,18 @@
  * No cart, no server state.
  * ========================================================================== */
 
-/* --- grid: flex-wrap, column ladder 1 -> 2 (768) -> 4 (992) -------------- */
+.downloads {
+  --dl-tile-gap: 20px;
+  --dl-play-size: 32px;
+  --dl-file-icon-size: 48px;
+  --dl-meta-space: 44px;
+  --dl-title-row: 46px;
+  --dl-title-size: 15px;
+  --dl-toolbar-row: 50px;
+  --dl-toggle-height: 44px;
+}
+
+/* --- grid: default image ladder 1 -> 2 (768) -> 4 (992) ------------------ */
 .downloads .downloads-items {
   --dl-cols: 1;
 
@@ -65,6 +76,48 @@
   outline-offset: 2px;
 }
 
+.downloads .downloads-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: var(--dl-play-size);
+  height: var(--dl-play-size);
+  color: var(--skoda-white);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.downloads .downloads-play svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.downloads .downloads-file {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--thumb-hairline);
+  background: var(--skoda-grey-100);
+  color: var(--skoda-ink);
+}
+
+.downloads .downloads-file svg {
+  width: var(--dl-file-icon-size);
+  height: var(--dl-file-icon-size);
+}
+
+.downloads .downloads-file-type {
+  margin-top: var(--spacing-xs);
+  font-size: var(--body-font-size-s);
+}
+
 /* --- title -------------------------------------------------------------- */
 .downloads .downloads-title {
   color: var(--text-color);
@@ -82,6 +135,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   width: 40px;
   height: 40px;
   border: 2px solid var(--skoda-ink);
@@ -133,15 +187,110 @@
   background: var(--dropdown-hover-bg);
 }
 
+.downloads .downloads-more {
+  display: block;
+  min-height: var(--dl-toggle-height);
+  margin: var(--spacing-m) auto 0;
+  border: 2px solid var(--skoda-ink);
+  border-radius: var(--pill-radius);
+  padding: var(--spacing-xs) var(--spacing-l);
+  background: var(--skoda-white);
+  color: var(--skoda-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.downloads .downloads-more:hover,
+.downloads .downloads-more:focus-visible {
+  background: var(--dropdown-hover-bg);
+}
+
+/* Press-release Media Boxes use the source's 20px visual gap and tile rhythm.
+   Other Downloads consumers retain their existing image layout. */
+body.press-release .downloads .downloads-items {
+  gap: var(--dl-tile-gap);
+}
+
+body.press-release .downloads .downloads-figure {
+  gap: 0;
+}
+
+body.press-release .downloads .downloads-thumb {
+  box-sizing: border-box;
+  border-radius: 0;
+}
+
+body.press-release .downloads .downloads-title {
+  box-sizing: border-box;
+  height: calc(var(--dl-meta-space) + var(--dl-title-row));
+  margin: 0;
+  padding-top: var(--dl-meta-space);
+  color: var(--skoda-white);
+  font-size: var(--dl-title-size);
+  line-height: 1.2;
+  overflow: hidden; /* the source clamps card titles to two lines */
+}
+
+body.press-release .downloads .downloads-action {
+  min-height: var(--dl-toolbar-row);
+}
+
+body.press-release .downloads .downloads-file {
+  background: var(--dark-color);
+  color: var(--skoda-white);
+}
+
+body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+3) {
+  display: none;
+}
+
 /* --- responsive column ladder (spec §4): 2 @768, 4 @992 ------------------ */
+@media (width >= 520px) {
+  body.press-release .downloads .downloads-items {
+    --dl-cols: 2;
+  }
+
+  body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+3) {
+    display: block;
+  }
+
+  body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+5) {
+    display: none;
+  }
+}
+
 @media (width >= 768px) {
   .downloads .downloads-items {
     --dl-cols: 2;
+  }
+
+  body.press-release .downloads .downloads-items {
+    --dl-cols: 3;
+  }
+
+  body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+5) {
+    display: block;
+  }
+
+  body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+7) {
+    display: none;
   }
 }
 
 @media (width >= 992px) {
   .downloads .downloads-items {
     --dl-cols: var(--dl-cols-lg, 4);
+  }
+
+  body.press-release .downloads .downloads-items {
+    --dl-cols: var(--dl-cols-lg, 4);
+  }
+
+  body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+7) {
+    display: block;
+  }
+
+  body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+9) {
+    display: none;
   }
 }
