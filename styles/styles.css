@@ -57,6 +57,7 @@
   --story-sidebar-inset: 10px;
   --story-sidebar-heading-size-compact: 20px;
   --story-sidebar-heading-line-height: 45px;
+  --story-related-band-max-width: 1440px;
 
   /* reading-measure cap: source fills the full 819px column (~100ch); story-detail
      §8 recommends capping ~72ch for readability. Applied to the prose column. */
@@ -738,6 +739,10 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
     z-index: -1;
   }
 
+  body.story main > .section.dark.story-rail-container::before {
+    max-width: var(--story-related-band-max-width);
+  }
+
   /* At desktop the measured source h2 is 40/45 (wt300). */
   body.story main > .section.body-column .default-content-wrapper h2 {
     font-size: var(--heading-font-size-hero-story);
@@ -745,7 +750,7 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
   }
 }
 
-/* The story's related rail has its own full-bleed rhythm; other dark sections
+/* The story's related rail has its own band rhythm; other dark sections
    retain the shared section padding and typography. */
 body.story main > .section.dark.story-rail-container {
   margin-block-end: var(--spacing-l);

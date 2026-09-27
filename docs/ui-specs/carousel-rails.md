@@ -95,8 +95,10 @@ not the homepage category ladder. Chrome DevTools CSS/DOM extraction on
 | 768 | ~346px / ~326px | 768px track / ~326px card |
 | 500 | 450px / 430px | 500px track / 430px card |
 
-The source has 10px cell-side gutters (20px between cards) and a full-width
-dark-green band. The band leaves a 24px uncolored gap before the green footer;
+The source has 10px cell-side gutters (20px between cards) and a dark-green
+band that fills the viewport through 1440px, then remains 1440px wide and
+centered (x=1000 at a 3440px viewport). The 1248px card track stays centered
+within it. The band leaves a 24px uncolored gap before the green footer;
 its own background does not extend into that margin (DevTools, 500/1280/1440).
 The preceding Media Box is another dark band, separated by 36px of white.
 The EDS story-band variant scopes its larger 90/45/30% cells to
