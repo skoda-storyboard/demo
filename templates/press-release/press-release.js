@@ -66,6 +66,56 @@ function decorateSidebar(section) {
 }
 
 /**
+ * Media Box file links (fallback until SKODA-510). The Downloads block drops rows without
+ * an image, so the release PDF (and any other file-only row) would be unreachable. Read those
+ * rows from the authored table before the block decorates it, then, once the block has
+ * loaded, list every file it didn't render as a plain download link under the grid. When the
+ * block renders file tiles itself (SKODA-510), nothing is added.
+ * @param {Element} section The media-box section
+ */
+function decorateMediaBoxFiles(section) {
+  const block = section?.querySelector('.downloads');
+  if (!block) return;
+  const files = [...block.querySelectorAll(':scope > div')]
+    .filter((row) => !row.querySelector('img'))
+    .map((row) => {
+      const link = row.querySelector('a[href]');
+      const title = [...row.children].find((cell) => !cell.querySelector('a') && cell.textContent.trim());
+      return link && {
+        href: link.getAttribute('href'),
+        label: link.textContent.trim(),
+        title: title ? title.textContent.trim() : link.textContent.trim(),
+      };
+    })
+    .filter(Boolean);
+  if (!files.length) return;
+
+  const render = () => {
+    const missing = files.filter(({ href }) => !block.querySelector(`a[href="${CSS.escape(href)}"]`));
+    if (!missing.length) return;
+    const list = document.createElement('ul');
+    list.className = 'press-release-files';
+    missing.forEach(({ href, label, title }) => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = href;
+      a.setAttribute('download', '');
+      a.textContent = `${title} (${label})`;
+      li.append(a);
+      list.append(li);
+    });
+    block.closest('.downloads-wrapper')?.after(list);
+  };
+
+  const observer = new MutationObserver(() => {
+    if (block.dataset.blockStatus !== 'loaded') return;
+    observer.disconnect();
+    render();
+  });
+  observer.observe(block, { attributes: true, attributeFilter: ['data-block-status'] });
+}
+
+/**
  * Lays out a press release (SKODA-607): header, body column + sidebar, Media Box and
  * related bands. Sections come from the import contract `press-release-sections`.
  * @param {Element} main The main element
@@ -77,4 +127,5 @@ export default function decorate(main) {
   decorateSidebar(main.querySelector(':scope > .section.sidebar'));
   const mediaBox = main.querySelector(':scope > .section.media-box');
   if (mediaBox && !document.getElementById('media-box')) mediaBox.id = 'media-box';
+  decorateMediaBoxFiles(mediaBox);
 }

@@ -156,6 +156,27 @@ body.press-release .section.media-box .default-content-wrapper {
   margin-bottom: var(--spacing-xl);
 }
 
+/* Media Box file links (release PDF): readable fallback until the Downloads block renders
+   file tiles (SKODA-510); press-release.js adds it only for files the block didn't render. */
+body.press-release .section.media-box .press-release-files {
+  max-width: var(--content-max-width);
+  margin: var(--paragraph-gap) auto 0;
+  padding: 0 var(--pr-gutter);
+  list-style: none;
+}
+
+body.press-release .section.media-box .press-release-files li {
+  margin: 0;
+}
+
+body.press-release .section.media-box .press-release-files a {
+  color: var(--background-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-body);
+  text-decoration: underline;
+}
+
 /* Related header: heading + "Based on tags" left, the "All" ghost pill right. */
 body.press-release .section.related .default-content-wrapper {
   display: grid;
