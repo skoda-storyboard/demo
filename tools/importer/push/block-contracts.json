@@ -247,9 +247,11 @@
       ],
       "status": "pinned",
       "ticket": "SKODA-221",
-      "fallback": "readable",
-      "shape": 1,
-      "emittedBy": []
+      "fallback": "broken",
+      "shape": 2,
+      "emittedBy": [
+        "parsers/series-grid.js"
+      ]
     },
     {
       "id": "gallery-slider",

@@ -587,12 +587,26 @@
     {
       "name": "series-hub",
       "urls": [
-        "https://www.skoda-storyboard.com/en/series/125-years-of-motorsport/"
+        "https://www.skoda-storyboard.com/en/series/125-years-of-motorsport/",
+        "https://www.skoda-storyboard.com/en/series/130-years/",
+        "https://www.skoda-storyboard.com/en/series/roads-places/",
+        "https://www.skoda-storyboard.com/en/series/unexpected-jobs/",
+        "https://www.skoda-storyboard.com/en/series/minutes-from-car-production/",
+        "https://www.skoda-storyboard.com/en/series/road-trip/",
+        "https://www.skoda-storyboard.com/en/series/winter-tips/",
+        "https://www.skoda-storyboard.com/en/series/back-to-the-past/",
+        "https://www.skoda-storyboard.com/en/series/unknown-parts/",
+        "https://www.skoda-storyboard.com/en/series/hidden-helpers/",
+        "https://www.skoda-storyboard.com/en/series/czech-footprint/",
+        "https://www.skoda-storyboard.com/en/series/sustainable-mobility/",
+        "https://www.skoda-storyboard.com/en/series/my-life-my-car/",
+        "https://www.skoda-storyboard.com/en/series/evolution-of-parts/",
+        "https://www.skoda-storyboard.com/en/series/60-seconds-walkaround/"
       ],
-      "description": "Škoda Series hub (single-skoda_series). Overlay hero (title + perex) + index-driven Listing of the series' stories (series-grid.js detects the hub from data-content-type=Story, tags=<slug> from canonical). SSR cards not ported. Metadata template=skoda_series (body-class signal). Spec: docs/ui-specs/series.md; SKODA-207.",
+      "description": "Škoda Series hub (single-skoda_series). Hero Image (overlay): SERIES badge, H1, standfirst (series-hero.js). The authored tile mosaic as Cards (overlay, tiles), contract cards-tiles v2 (series-grid.js): one row per source tile in DOM order, Story and Press Kits kept, size token from the SiteOrigin row share + ratio class, `end` on a short row. No index, tags or sort. Metadata template=skoda_series (body-class signal). Spec: docs/ui-specs/series.md; SKODA-207.",
       "blocks": [
         {
-          "name": "hero-banner",
+          "name": "series-hero",
           "instances": [
             "div.hero"
           ]
@@ -613,7 +627,7 @@
           ],
           "style": null,
           "blocks": [
-            "hero-banner"
+            "series-hero"
           ],
           "defaultContent": []
         },

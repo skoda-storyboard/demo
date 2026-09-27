@@ -290,6 +290,81 @@
       "pushedAt": "2026-09-27T09:43:15.315Z",
       "previewedHash": "820789901b45371ccc21a0682187272102b36058f8611ee83c79bb8ef9468688"
     },
+    "/en/series/125-years-of-motorsport": {
+      "hash": "796e695e591dbb878670f4b1384ad275e1dcb7113866b53e4d950f6ffc46c968",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "796e695e591dbb878670f4b1384ad275e1dcb7113866b53e4d950f6ffc46c968"
+    },
+    "/en/series/130-years": {
+      "hash": "fca016b1bd2122decb6ff42d7b442d18194922c78e95e373ed645495ed6adb01",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "fca016b1bd2122decb6ff42d7b442d18194922c78e95e373ed645495ed6adb01"
+    },
+    "/en/series/60-seconds-walkaround": {
+      "hash": "0bfb510806187a54eadf598df7400979110e18d169c779613ef4612ca1e828ed",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "0bfb510806187a54eadf598df7400979110e18d169c779613ef4612ca1e828ed"
+    },
+    "/en/series/back-to-the-past": {
+      "hash": "97c98427b35b40f56b8405b10853ff4d9ab3bba5157df9fe2e76b9fac26c595f",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "97c98427b35b40f56b8405b10853ff4d9ab3bba5157df9fe2e76b9fac26c595f"
+    },
+    "/en/series/czech-footprint": {
+      "hash": "6d4a80b44f6520d41fbc7ae20f9c48945d0657119b189e05a96b570ed4cb6c7a",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "6d4a80b44f6520d41fbc7ae20f9c48945d0657119b189e05a96b570ed4cb6c7a"
+    },
+    "/en/series/evolution-of-parts": {
+      "hash": "d610ee7f5c6c783aaac2dc395d45bb4136ece040b029b222b3903162950bae4f",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "d610ee7f5c6c783aaac2dc395d45bb4136ece040b029b222b3903162950bae4f"
+    },
+    "/en/series/hidden-helpers": {
+      "hash": "e53b71406515662839ddf9673eba117fa17f2f73c76adffff8dd28aa0b2ec225",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "e53b71406515662839ddf9673eba117fa17f2f73c76adffff8dd28aa0b2ec225"
+    },
+    "/en/series/minutes-from-car-production": {
+      "hash": "71862d69e263c87d7ac863213d6cd7470f31d28d4178c5987e6ee5bacc09d604",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "71862d69e263c87d7ac863213d6cd7470f31d28d4178c5987e6ee5bacc09d604"
+    },
+    "/en/series/my-life-my-car": {
+      "hash": "1dc55cf3adb64a3fd1b6f19da811d36c2efa6a2d33852bdf319c4255f59914d8",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "1dc55cf3adb64a3fd1b6f19da811d36c2efa6a2d33852bdf319c4255f59914d8"
+    },
+    "/en/series/road-trip": {
+      "hash": "df486f3caeec50385529f08f7c90a09b87e870981679559a3b6031c9b278720e",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "df486f3caeec50385529f08f7c90a09b87e870981679559a3b6031c9b278720e"
+    },
+    "/en/series/roads-places": {
+      "hash": "a2f164b288f2ca2c496a8e63d5a1caa43aeb7473f52a3b5131b09fa68dd4ef47",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "a2f164b288f2ca2c496a8e63d5a1caa43aeb7473f52a3b5131b09fa68dd4ef47"
+    },
+    "/en/series/sustainable-mobility": {
+      "hash": "ba21c33dca11c419b4b8b1a277ff5702061cbfdd6977c3fefe5bb7b0f8b50b37",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "ba21c33dca11c419b4b8b1a277ff5702061cbfdd6977c3fefe5bb7b0f8b50b37"
+    },
+    "/en/series/unexpected-jobs": {
+      "hash": "188f754e84f88873b73ed04f14b7a1c308361ec1be569d5d78cc81a8071a3192",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "188f754e84f88873b73ed04f14b7a1c308361ec1be569d5d78cc81a8071a3192"
+    },
+    "/en/series/unknown-parts": {
+      "hash": "7fab53c24f5fe4ccd6b379aea6952159adda64933dd20c2fcf9c0c31890dd4e6",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "7fab53c24f5fe4ccd6b379aea6952159adda64933dd20c2fcf9c0c31890dd4e6"
+    },
+    "/en/series/winter-tips": {
+      "hash": "2fd951c05b22e787f444af9055cf6c579ca719c0798c5850ef396e2a6160adbe",
+      "pushedAt": "2026-09-27T21:14:15.709Z",
+      "previewedHash": "2fd951c05b22e787f444af9055cf6c579ca719c0798c5850ef396e2a6160adbe"
+    },
     "/en/skoda-model/elroq": {
       "hash": "7a9316fc2a87a4c4399619437dad6d7dab8dde615913e05977616139a1d23bf8",
       "pushedAt": "2026-09-27T19:49:07.302Z",
