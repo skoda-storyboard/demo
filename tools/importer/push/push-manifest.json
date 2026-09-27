@@ -1,6 +1,11 @@
 {
   "version": 1,
   "pages": {
+    "/en": {
+      "hash": "a0e395350882547bb7a99f16e2c451bf1e96c04740c3b2ebc521f75dc8e8cabc",
+      "pushedAt": "2026-09-27T07:59:33.392Z",
+      "previewedHash": "a0e395350882547bb7a99f16e2c451bf1e96c04740c3b2ebc521f75dc8e8cabc"
+    },
     "/en/category/classic-cars": {
       "hash": "db83278b4a434d6d339fb50aa2c5ce93c081a3f0f64cde8f9e9ffe81f557d0b6",
       "pushedAt": "2026-09-26T06:32:21.552Z"
@@ -70,12 +75,14 @@
       "pushedAt": "2026-09-26T06:46:02.390Z"
     },
     "/en/emobility/a-true-czech-from-spain": {
-      "hash": "967990fe475134cfb369460defbd77fcee9c1782cc8e6202ede86a28758a4738",
-      "pushedAt": "2026-09-26T06:46:02.390Z"
+      "hash": "227f3ce939f629f784abbed61e62a3cf9dddaa20d71d2b7e31a1879f4adef803",
+      "pushedAt": "2026-09-26T22:04:31.303Z",
+      "previewedHash": "227f3ce939f629f784abbed61e62a3cf9dddaa20d71d2b7e31a1879f4adef803"
     },
     "/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries": {
-      "hash": "d43f4598dbffba01f49f87d4374ee6e6b2c2df7283a6b4da37b9649ed496f918",
-      "pushedAt": "2026-09-26T06:46:02.390Z"
+      "hash": "4d3b8f94501db9528d69d821fb961b8a5e5487365299758bcac8e46adbc7935f",
+      "pushedAt": "2026-09-26T22:04:31.303Z",
+      "previewedHash": "4d3b8f94501db9528d69d821fb961b8a5e5487365299758bcac8e46adbc7935f"
     },
     "/en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq": {
       "hash": "791d75e72ab6b17948e66c69a4bd3a287c2b0567bc2bdcae85cc341ee5e83287",
@@ -130,16 +137,19 @@
       "pushedAt": "2026-09-26T06:46:02.390Z"
     },
     "/en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan": {
-      "hash": "4db265dbefc83db3364fdaf0ab2405ef1281c75e92585130b26edd8b98d3318c",
-      "pushedAt": "2026-09-26T06:46:02.390Z"
+      "hash": "7f10b23518d9aeec61c4979acc20dd7532bbe7b7e37e92fb992f088fd076cc8b",
+      "pushedAt": "2026-09-26T22:04:31.303Z",
+      "previewedHash": "7f10b23518d9aeec61c4979acc20dd7532bbe7b7e37e92fb992f088fd076cc8b"
     },
     "/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia": {
-      "hash": "d3647b7fe513fac5868ae3a526864a353be586ffccdbb84c2de068cf7a80f69e",
-      "pushedAt": "2026-09-26T06:46:02.390Z"
+      "hash": "274d39ef9cd23f316e100838458511234e27ce99134b68d0f365d8b747b908b0",
+      "pushedAt": "2026-09-26T22:04:31.303Z",
+      "previewedHash": "274d39ef9cd23f316e100838458511234e27ce99134b68d0f365d8b747b908b0"
     },
     "/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging": {
-      "hash": "2136c3992b114dd80c2c6daaa54eb3395ddbf834672e0fa6cf1b5a1316f3e719",
-      "pushedAt": "2026-09-26T06:46:02.390Z"
+      "hash": "cd8ecb9ed66448c28e5ae29f3b80f586fe8ba5ccd026573cb7839c4e67694cad",
+      "pushedAt": "2026-09-26T22:04:31.303Z",
+      "previewedHash": "cd8ecb9ed66448c28e5ae29f3b80f586fe8ba5ccd026573cb7839c4e67694cad"
     },
     "/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq": {
       "hash": "97c4db69846b504d6955792686d85ea111ea05b39e016715ed3461ca948fa016",
@@ -154,8 +164,9 @@
       "pushedAt": "2026-09-26T06:46:02.390Z"
     },
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds": {
-      "hash": "e8efe2579ee8919a1bc53c79762968ff54071fbfda05f4b87c9070a33bb58bea",
-      "pushedAt": "2026-09-26T06:47:09.820Z"
+      "hash": "7e8f22dea93b09e7ec4cc5c6e8c05988e788bad4c0a32dcc0ad5648448c99547",
+      "pushedAt": "2026-09-27T07:59:33.392Z",
+      "previewedHash": "7e8f22dea93b09e7ec4cc5c6e8c05988e788bad4c0a32dcc0ad5648448c99547"
     },
     "/en/emobility/skoda-peaq-unparalleled-space-and-comfort": {
       "hash": "c76bcff4932a9130ff0ea02b54f7ffb2ec905e04a5ce621086e76d666b1b4f58",
@@ -166,12 +177,14 @@
       "pushedAt": "2026-09-26T06:46:02.390Z"
     },
     "/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq": {
-      "hash": "543b1308accc681dacfc18e7c6c7d3075593ff5f6821ef81d8299e9a3682781d",
-      "pushedAt": "2026-09-26T06:46:02.390Z"
+      "hash": "725c95690f61f55120e6096bcf80adb1e4d6f994f686e84df181bd450ee98dfd",
+      "pushedAt": "2026-09-26T22:04:31.303Z",
+      "previewedHash": "725c95690f61f55120e6096bcf80adb1e4d6f994f686e84df181bd450ee98dfd"
     },
     "/en/emobility/the-skoda-peaq-will-win-you-over-fast": {
-      "hash": "221b3283fa718edb14abe3f74e7124b79feb1136f2aa1e105aecce56e35a2a15",
-      "pushedAt": "2026-09-26T06:46:02.390Z"
+      "hash": "e6fe8d18ff6523ca5db1f74e1e491f718b65e80c561d4bccc87fe28970752d84",
+      "pushedAt": "2026-09-26T22:04:31.303Z",
+      "previewedHash": "e6fe8d18ff6523ca5db1f74e1e491f718b65e80c561d4bccc87fe28970752d84"
     },
     "/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere": {
       "hash": "f2a896b28111f39544d796c52dce72413b75c77af8b3a783e52539d6ed9364fa",
@@ -194,12 +207,14 @@
       "pushedAt": "2026-09-26T06:46:02.390Z"
     },
     "/en/lifestyle/chainsaws-and-sparklers-discover-the-traditions-of-rally-fans": {
-      "hash": "9bcafef41e0f5b12d2ed6126feb1864b8ff810032be75d7ad04e2c4f4b8c7595",
-      "pushedAt": "2026-09-26T06:46:02.390Z"
+      "hash": "3de0779b5847070e54ea1f820497e399b6bf83a56e48274c217241b0186aff36",
+      "pushedAt": "2026-09-26T22:04:31.303Z",
+      "previewedHash": "3de0779b5847070e54ea1f820497e399b6bf83a56e48274c217241b0186aff36"
     },
     "/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling": {
-      "hash": "f0d28aeba671fa6ae5ab26ffb48f3b1a741d45141aad02aac9d72ff31a461a98",
-      "pushedAt": "2026-09-26T06:46:02.390Z"
+      "hash": "5313ebaebf81a5ad62b834df05169b84976049e8956ce93a03d5637213ed7704",
+      "pushedAt": "2026-09-26T22:04:31.303Z",
+      "previewedHash": "5313ebaebf81a5ad62b834df05169b84976049e8956ce93a03d5637213ed7704"
     },
     "/en/lifestyle/la-dolce-vita-explore-the-surroundings-of-lake-como": {
       "hash": "52b293e53a604e78896d69e171493c125a04e2b7014495415f54c514c213261d",
@@ -279,16 +294,18 @@
       "pushedAt": "2026-09-26T20:11:52.717Z"
     },
     "/en/skoda-model/enyaq-iv-2": {
-      "hash": "05f33f0252c4c241f2108a8a0dcf1df9c0c435012faa1f29904fe6f739565a00",
-      "pushedAt": "2026-09-26T20:11:52.717Z"
+      "hash": "18bd0e995aee8ad34df9aba6599b959ac64bfe1f328306b829899cc1d6c9047e",
+      "pushedAt": "2026-09-26T22:04:31.303Z",
+      "previewedHash": "18bd0e995aee8ad34df9aba6599b959ac64bfe1f328306b829899cc1d6c9047e"
     },
     "/en/skoda-model/enyaq-iv-2/enyaq-rs": {
       "hash": "d06d356eb1396f11406f3453e34d43d52963d11b9c4ebeec38d0b9c3f625c892",
       "pushedAt": "2026-09-26T20:11:52.717Z"
     },
     "/en/skoda-model/enyaq-iv-2/enyaq-sportline-iv": {
-      "hash": "671c06e07bc15fa1ce1447fcd95ec3f3ce5c56519945b71eb44574ed68131b5d",
-      "pushedAt": "2026-09-26T20:11:52.717Z"
+      "hash": "9fda5aba146a8212470de3f0efa8077c54c3cbad790a7cc1a55950618820306a",
+      "pushedAt": "2026-09-26T22:04:31.303Z",
+      "previewedHash": "9fda5aba146a8212470de3f0efa8077c54c3cbad790a7cc1a55950618820306a"
     },
     "/en/skoda-model/epiq": {
       "hash": "b2d912f587a031d668832578de70ea75b0ef335c1d753e541e2bdc9ca9ecc0d9",
@@ -383,8 +400,9 @@
       "pushedAt": "2026-09-26T06:46:02.390Z"
     },
     "/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator": {
-      "hash": "2d981257c8fba5df012de51e7d560c93cf8cdd30d0af186e5479f42dba5636cd",
-      "pushedAt": "2026-09-26T06:46:02.390Z"
+      "hash": "2af22699238228749ce8ed08287b015f02de2adbac8ed8c7f6cadbdb784cbf89",
+      "pushedAt": "2026-09-26T22:04:31.303Z",
+      "previewedHash": "2af22699238228749ce8ed08287b015f02de2adbac8ed8c7f6cadbdb784cbf89"
     },
     "/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour": {
       "hash": "c18871dfb81a00bc37657905deafcad4354e4f47fa1d04d50c4ab199869fb976",
@@ -439,8 +457,9 @@
       "pushedAt": "2026-09-26T07:26:43.181Z"
     },
     "/en/tag/model/enyaq": {
-      "hash": "a0df44fbb301f58b72a0b27ab5d89a35f2a626da98a18b53b38e13fb013671eb",
-      "pushedAt": "2026-09-26T07:26:43.181Z"
+      "hash": "b5099f4eb82246051856d9a17bdb910a3870fde302247f14bbba1413ddc4af84",
+      "pushedAt": "2026-09-26T22:04:31.303Z",
+      "previewedHash": "b5099f4eb82246051856d9a17bdb910a3870fde302247f14bbba1413ddc4af84"
     },
     "/en/tag/model/epiq": {
       "hash": "5c317811ba847aa5cf57f997fcc1f4d7a893d5e8ca9ecb641d819e5185edb6df",

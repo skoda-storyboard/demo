@@ -35,15 +35,18 @@ const DOCUMENT_EXT_RE = /\.pdf$/i;
 // a sized derivative. The DAM still stores the full ORIGINAL.
 export const OVERSIZE_BYTES = 10 * 1024 * 1024;
 
-export function needsMediaBuild(row, { dam = false, da = false, force = false } = {}) {
-  if (force || !row || row.status !== 'done') return true;
-  // A document row has no delivery step; only the DAM original can be outstanding.
-  if (row.kind === 'document') return dam && (row.steps?.dam !== 'done' || !row.dam_asset_path);
-  if (row.steps?.deliver !== 'done' || !row.delivery_url
-    || !Number.isFinite(row.bytes) || row.bytes > OVERSIZE_BYTES) return true;
-  if (dam && (row.steps?.dam !== 'done' || !row.dam_asset_path)) return true;
-  if (da && (row.steps?.da !== 'done' || !row.original_download_url)) return true;
-  return false;
+// Smallest long edge (px) of a rendition the pipeline may pick in place of an
+// oversized master. Below it (e.g. a -272x182 thumbnail in a full-width slot) a
+// logged strip/block is better than a silent downgrade (SKODA-506).
+export const MIN_RENDITION_EDGE = 768;
+
+/** Validate a --min-image-edge value (positive integer px). */
+export function renditionEdge(value = MIN_RENDITION_EDGE) {
+  const px = Number(value);
+  if (!Number.isSafeInteger(px) || px < 1) {
+    throw new Error('Minimum rendition edge must be a positive integer number of pixels');
+  }
+  return px;
 }
 
 // The named WordPress scaled-ladder sizes (SKODA-MEDIA-DEEP-DIVE §2), largest
@@ -92,6 +95,32 @@ export function isAspectCrop(url) {
   return !!suffix && !LADDER_SET.has(suffix);
 }
 
+/** True when the url's `-WxH` suffix is under `minEdge` on its long edge; unsuffixed → false. */
+export function belowMinEdge(url, minEdge = MIN_RENDITION_EDGE) {
+  const suffix = derivativeSuffix(url);
+  return !!suffix && Math.max(...suffix.split('x').map(Number)) < minEdge;
+}
+
+/** A delivery rendition we stepped down to (not the page's own reference) that is too small. */
+export function stepDownTooSmall(row, minEdge = MIN_RENDITION_EDGE) {
+  return !!row.preconditioned && row.delivery_url !== row.source_url
+    && belowMinEdge(row.delivery_url, minEdge);
+}
+
+export function needsMediaBuild(row, {
+  dam = false, da = false, force = false, minEdge = MIN_RENDITION_EDGE,
+} = {}) {
+  if (force || !row || row.status !== 'done') return true;
+  // A document row has no delivery step; only the DAM original can be outstanding.
+  if (row.kind === 'document') return dam && (row.steps?.dam !== 'done' || !row.dam_asset_path);
+  if (row.steps?.deliver !== 'done' || !row.delivery_url
+    || !Number.isFinite(row.bytes) || row.bytes > OVERSIZE_BYTES) return true;
+  if (stepDownTooSmall(row, minEdge)) return true;
+  if (dam && (row.steps?.dam !== 'done' || !row.dam_asset_path)) return true;
+  if (da && (row.steps?.da !== 'done' || !row.original_download_url)) return true;
+  return false;
+}
+
 /**
  * F8 — normalise a URL for logical-id/master derivation:
  *  - lowercase the extension,
@@ -120,6 +149,14 @@ export function normalizeExtension(url) {
  */
 export function masterUrl(url) {
   return normalizeExtension(url).replace(DERIVATIVE_SUFFIX_RE, '');
+}
+
+export function sizedRenditions(url) {
+  const master = masterUrl(url);
+  const ext = path.extname(cleanUrl(master));
+  if (!ext) return [];
+  const base = master.slice(0, -ext.length);
+  return DERIVATIVE_LADDER.map((size) => `${base}-${size}${ext}`);
 }
 
 /**
@@ -286,14 +323,18 @@ export async function headBytes(url, { timeoutMs = 20000 } = {}) {
 /**
  * F4 — choose the DELIVERY url for a logical image (what content <img> points at
  * for EDS media-bus ingest). The master unless it is over OVERSIZE_BYTES, then
- * step down the ladder to the largest rendition under threshold (SKODA-506).
+ * step down the ladder to the largest rendition under threshold, never below
+ * `minEdge` px on the long edge (SKODA-506).
  *
  * Returns { url, bytes, preconditioned, ok, reason }.
- *  - ok=false → NO safe delivery rendition (all oversized / master unreachable
- *    with an oversized fallback). Caller marks the row skipped/error, NOT done,
- *    and does not set delivery_url. The DAM still gets the original separately.
+ *  - ok=false → NO safe delivery rendition (all oversized or too small / master
+ *    unreachable with an oversized fallback). Caller marks the row skipped/error,
+ *    NOT done, and does not set delivery_url; the import:push gate then strips or
+ *    blocks the image. The DAM still gets the original separately.
  */
-export async function pickIngestUrl(sourceUrl, { oversizeBytes = OVERSIZE_BYTES } = {}) {
+export async function pickIngestUrl(sourceUrl, {
+  oversizeBytes = OVERSIZE_BYTES, minEdge = MIN_RENDITION_EDGE,
+} = {}) {
   const master = masterUrl(sourceUrl);
   const masterBytes = await headBytes(master);
 
@@ -318,20 +359,18 @@ export async function pickIngestUrl(sourceUrl, { oversizeBytes = OVERSIZE_BYTES 
   }
 
   // Master oversized: step down the ladder to the first rendition under limit.
-  const ext = path.extname(cleanUrl(master));
-  const base = master.slice(0, master.length - ext.length);
-  for (const size of DERIVATIVE_LADDER) {
-    const candidate = `${base}-${size}${ext}`;
+  for (const candidate of sizedRenditions(master)) {
+    if (belowMinEdge(candidate, minEdge)) continue;
     const bytes = await headBytes(candidate);
     if (bytes !== null && bytes <= oversizeBytes) {
       return {
-        url: candidate, bytes, preconditioned: true, ok: true, reason: `oversize-master(${masterBytes})->${size}`,
+        url: candidate, bytes, preconditioned: true, ok: true, reason: `oversize-master(${masterBytes})->${derivativeSuffix(candidate)}`,
       };
     }
   }
   // No rendition under threshold — decline (F4: never ship an oversized master).
   return {
-    url: master, bytes: masterBytes, preconditioned: false, ok: false, reason: `oversize-no-derivative-under-threshold(${masterBytes})`,
+    url: master, bytes: masterBytes, preconditioned: false, ok: false, reason: `oversize-no-derivative-under-threshold(${masterBytes}, min ${minEdge}px)`,
   };
 }
 

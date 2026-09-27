@@ -11,7 +11,7 @@ import {
   logicalId, masterUrl, normalizeExtension, isAspectCrop, derivativeSuffix,
   damPathFor, pagePathFromFile, splitBuffer, imageSize, ratiosDiffer,
   uploadToDAM, ensureDamFolder, resolveDamToken,
-  needsMediaBuild, OVERSIZE_BYTES,
+  needsMediaBuild, OVERSIZE_BYTES, belowMinEdge, stepDownTooSmall, pickIngestUrl, renditionEdge,
 } from './media-lib.mjs';
 
 test('delivery-only rows resume when DAM ingest is requested, without a blanket force', () => {
@@ -26,6 +26,67 @@ test('delivery-only rows resume when DAM ingest is requested, without a blanket 
   assert.equal(needsMediaBuild(row, { da: true }), true);
   assert.equal(needsMediaBuild({ ...row, bytes: OVERSIZE_BYTES + 1 }), true);
   assert.equal(needsMediaBuild({ ...row, steps: { ...row.steps, dam: 'done' }, dam_asset_path: '/dam/a.jpg' }, { dam: true }), false);
+});
+
+// ---- SKODA-506: minimum rendition edge ---------------------------------------
+test('min edge measures the long side, so portrait renditions are not "narrow"', () => {
+  assert.equal(belowMinEdge('https://cdn.x.com/a-272x182.jpg'), true);
+  assert.equal(belowMinEdge('https://cdn.x.com/a-384x256.jpg'), true);
+  assert.equal(belowMinEdge('https://cdn.x.com/a-768x512.jpg'), false);
+  assert.equal(belowMinEdge('https://cdn.x.com/a.JPG-631x768.jpg'), false);
+  assert.equal(belowMinEdge('https://cdn.x.com/a.jpg'), false);
+  assert.equal(belowMinEdge('https://cdn.x.com/a-272x182.jpg', 200), false);
+  for (const value of [0, -1, 1.5, 'bogus']) assert.throws(() => renditionEdge(value));
+  assert.equal(renditionEdge('1440'), 1440);
+});
+
+test('a stepped-down thumbnail delivery is rebuilt; a page-authored small src is not', () => {
+  // Real row: 6b386aae__skoda_all-electric_family… delivered its -272x182 thumbnail.
+  const row = {
+    status: 'done',
+    bytes: 681412,
+    preconditioned: true,
+    source_url: 'https://cdn.x.com/2026/03/family.jpg',
+    delivery_url: 'https://cdn.x.com/2026/03/family-272x182.jpg',
+    steps: { deliver: 'done', dam: 'n/a', da: 'n/a' },
+  };
+  assert.equal(stepDownTooSmall(row), true);
+  assert.equal(needsMediaBuild(row), true);
+  assert.equal(needsMediaBuild(row, { minEdge: 272 }), false);
+  assert.equal(needsMediaBuild({ ...row, source_url: row.delivery_url }), false);
+});
+
+test('pickIngestUrl never steps an oversized master down to a thumbnail', async () => {
+  const sizes = {
+    'https://cdn.x.com/big.jpg': 19129112,
+    'https://cdn.x.com/big-384x256.jpg': 90000,
+    'https://cdn.x.com/big-272x182.jpg': 681412,
+    'https://cdn.x.com/ok.jpg': 19129112,
+    'https://cdn.x.com/ok-768x512.jpg': 150000,
+  };
+  const heads = [];
+  const previous = global.fetch;
+  // The source CDN answers 403 for a rendition that does not exist.
+  global.fetch = async (url) => {
+    heads.push(String(url));
+    const bytes = sizes[String(url)];
+    return bytes
+      ? new Response(null, { status: 200, headers: { 'content-length': String(bytes) } })
+      : new Response(null, { status: 403 });
+  };
+  try {
+    const declined = await pickIngestUrl('https://cdn.x.com/big.jpg');
+    assert.equal(declined.ok, false);
+    assert.match(declined.reason, /min 768px/);
+    assert.ok(!heads.includes('https://cdn.x.com/big-384x256.jpg'));
+    assert.ok(!heads.includes('https://cdn.x.com/big-272x182.jpg'));
+    const lowered = await pickIngestUrl('https://cdn.x.com/big.jpg', { minEdge: 200 });
+    assert.equal(lowered.url, 'https://cdn.x.com/big-384x256.jpg');
+    const kept = await pickIngestUrl('https://cdn.x.com/ok.jpg');
+    assert.equal(kept.url, 'https://cdn.x.com/ok-768x512.jpg');
+  } finally {
+    global.fetch = previous;
+  }
 });
 
 // ---- F3: path-qualified logical id -----------------------------------------

@@ -932,24 +932,24 @@
       "dam_asset_path": "/content/dam/storyboard/en/Skoda-Peaq_116_4370c0a5.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Peaq_116_4370c0a5.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda-Peaq_116_4370c0a5-272x182.jpg",
+      "delivery_url": "",
       "da_path": "",
       "alt": "The Škoda Peaq Will Win You Over Fast",
-      "caption": null,
+      "caption": "",
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda-Peaq_116_4370c0a5-1440x810.jpg",
         "https://cdn.skoda-storyboard.com/2026/09/Skoda-Peaq_116_4370c0a5-1920x1080.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 36511,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "done",
         "da": "n/a"
       },
-      "status": "done",
-      "note": "",
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(13227821, min 768px)",
       "page_refs": [
         "en",
         "en/emobility/the-skoda-peaq-will-win-you-over-fast",
@@ -2053,7 +2053,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/skoda_oil-38-copy_2e79b1ca_73b9f992.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2025/02/skoda_oil-38-copy_2e79b1ca_73b9f992.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2025/02/skoda_oil-38-copy_2e79b1ca_73b9f992-272x182.jpg",
+      "delivery_url": "",
       "da_path": "",
       "alt": "Organic leather made with olive leaves.",
       "caption": "",
@@ -2061,15 +2061,15 @@
         "https://cdn.skoda-storyboard.com/2025/02/skoda_oil-38-copy_2e79b1ca_73b9f992-768x432.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 36268,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "done",
         "da": "n/a"
       },
-      "status": "done",
-      "note": "",
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(15379388, min 768px)",
       "page_refs": [
         "en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic"
       ],
@@ -2083,7 +2083,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/H2_PS_2422_KMQ_MOON_WHITEKRQ_PHOENIX_ORANGEKDQ_GRAPHITE_GREY_V2_16x9-kopie_3d3c59cf.webp",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2024/11/H2_PS_2422_KMQ_MOON_WHITEKRQ_PHOENIX_ORANGEKDQ_GRAPHITE_GREY_V2_16x9-kopie_3d3c59cf.webp",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2024/11/H2_PS_2422_KMQ_MOON_WHITEKRQ_PHOENIX_ORANGEKDQ_GRAPHITE_GREY_V2_16x9-kopie_3d3c59cf-272x182.webp",
+      "delivery_url": "",
       "da_path": "",
       "alt": "Kamiq, Karoq, Kodiaq? Great choices for the city and countryside",
       "caption": "",
@@ -2091,15 +2091,15 @@
         "https://cdn.skoda-storyboard.com/2024/11/H2_PS_2422_KMQ_MOON_WHITEKRQ_PHOENIX_ORANGEKDQ_GRAPHITE_GREY_V2_16x9-kopie_3d3c59cf-768x432.webp"
       ],
       "aspect_crop_source": true,
-      "bytes": 7298,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "done",
         "da": "n/a"
       },
-      "status": "done",
-      "note": "",
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(18363656, min 768px)",
       "page_refs": [
         "en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic"
       ],
@@ -2696,24 +2696,24 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/EPIQ_Praha-00007_3fe6e8ae.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/EPIQ_Praha-00007_3fe6e8ae.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/09/EPIQ_Praha-00007_3fe6e8ae-384x256.jpg",
+      "delivery_url": "",
       "da_path": "",
       "alt": "Škoda Epiq Will Win You Over in 60 Seconds",
-      "caption": null,
+      "caption": "",
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/EPIQ_Praha-00007_3fe6e8ae-768x513.jpg",
         "https://cdn.skoda-storyboard.com/2026/09/EPIQ_Praha-00007_3fe6e8ae-384x256.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 59240,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "done",
         "da": "n/a"
       },
-      "status": "done",
-      "note": "",
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(16726561, min 768px)",
       "page_refs": [
         "en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
       ],
@@ -4415,7 +4415,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00013_05d54f32.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00013_05d54f32.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00013_05d54f32-384x256.jpg",
+      "delivery_url": "",
       "da_path": "",
       "alt": "Board member Johannes Neft was also present at the start.",
       "caption": "",
@@ -4423,15 +4423,15 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00013_05d54f32-768x513.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 54568,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "done",
         "da": "n/a"
       },
-      "status": "done",
-      "note": "",
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(25075730, min 768px)",
       "page_refs": [
         "en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging"
       ],
@@ -4535,7 +4535,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00047_bc0b2e81.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00047_bc0b2e81.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00047_bc0b2e81-384x256.jpg",
+      "delivery_url": "",
       "da_path": "",
       "alt": "Peaq Sets a Record: From the Heart of Europe to the Sea Without Recharging",
       "caption": "",
@@ -4543,15 +4543,15 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00047_bc0b2e81-768x513.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 72111,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "done",
         "da": "n/a"
       },
-      "status": "done",
-      "note": "",
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(16549961, min 768px)",
       "page_refs": [
         "en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging"
       ],
@@ -4655,7 +4655,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00053_bc50ad11.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00053_bc50ad11.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00053_bc50ad11-384x256.jpg",
+      "delivery_url": "",
       "da_path": "",
       "alt": "Peaq Sets a Record: From the Heart of Europe to the Sea Without Recharging",
       "caption": "",
@@ -4663,15 +4663,15 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00053_bc50ad11-768x513.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 44837,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "done",
         "da": "n/a"
       },
-      "status": "done",
-      "note": "",
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(15549630, min 768px)",
       "page_refs": [
         "en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging"
       ],
@@ -6743,7 +6743,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia/DSC2329ret_7407416f.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/DSC2329ret_7407416f.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/DSC2329ret_7407416f-272x182.jpg",
+      "delivery_url": "",
       "da_path": "",
       "alt": "Peaq enters production, sharing the line with the Octavia",
       "caption": "",
@@ -6751,15 +6751,15 @@
         "https://cdn.skoda-storyboard.com/2026/08/DSC2329ret_7407416f-768x528.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 37483,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "done",
         "da": "n/a"
       },
-      "status": "done",
-      "note": "",
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(12394447, min 768px)",
       "page_refs": [
         "en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia"
       ],
@@ -11452,23 +11452,23 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/06/DST2020_661e2d5e-272x182.jpg",
+      "delivery_url": "",
       "da_path": "",
       "alt": "A True Czech from Spain",
-      "caption": null,
+      "caption": "",
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/06/DST2020_661e2d5e-768x496.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 41159,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "n/a",
         "da": "n/a"
       },
-      "status": "done",
-      "note": "",
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(11079538, min 768px)",
       "page_refs": [
         "en/emobility/a-true-czech-from-spain"
       ]
@@ -11655,23 +11655,23 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/06/DST2613_5b54cd26-272x182.jpg",
+      "delivery_url": "",
       "da_path": "",
       "alt": "A True Czech from Spain",
-      "caption": null,
+      "caption": "",
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/06/DST2613_5b54cd26-768x521.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 48417,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "n/a",
         "da": "n/a"
       },
-      "status": "done",
-      "note": "",
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(13015148, min 768px)",
       "page_refs": [
         "en/emobility/a-true-czech-from-spain"
       ]
@@ -16413,7 +16413,7 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/07/TDFF_Stills_5_8a366ddb-272x182.jpg",
+      "delivery_url": "",
       "da_path": "",
       "alt": "From unwanted graffiti to bold support for women’s cycling",
       "caption": "",
@@ -16422,15 +16422,15 @@
         "https://cdn.skoda-storyboard.com/2026/07/TDFF_Stills_5_8a366ddb-1440x810.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 57522,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "n/a",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(11887315, min 768px)"
     },
     "f8ff4932__Meredith_kulaty-vyrez_beaa7857.png": {
       "logical_id": "f8ff4932__Meredith_kulaty-vyrez_beaa7857.png",
@@ -16589,7 +16589,7 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/07/TDFF_Stills_7_c992de2d-272x182.jpg",
+      "delivery_url": "",
       "da_path": "",
       "alt": "From unwanted graffiti to bold support for women’s cycling",
       "caption": "",
@@ -16597,15 +16597,15 @@
         "https://cdn.skoda-storyboard.com/2026/07/TDFF_Stills_7_c992de2d-768x432.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 57644,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "n/a",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(12784377, min 768px)"
     },
     "94490c59__DSC_6391_1a20d08d.jpg": {
       "logical_id": "94490c59__DSC_6391_1a20d08d.jpg",
@@ -18329,7 +18329,7 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/07/Solberg_223d4987-272x182.jpg",
+      "delivery_url": "",
       "da_path": "",
       "alt": "Chainsaws and sparklers. Discover the traditions of rally fans",
       "caption": "",
@@ -18337,15 +18337,15 @@
         "https://cdn.skoda-storyboard.com/2026/07/Solberg_223d4987-768x523.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 27813,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "n/a",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(11504713, min 768px)"
     },
     "9dd7d96c__IMG_0286_16db6bc0-e1783069335444.jpg": {
       "logical_id": "9dd7d96c__IMG_0286_16db6bc0-e1783069335444.jpg",
@@ -20309,7 +20309,7 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/skoda_all-electric_family_80fcb8d2-2_bb98c6d2-272x182.jpg",
+      "delivery_url": "",
       "da_path": "",
       "alt": "skoda_all-electric_family_80fcb8d2-2_bb98c6d2",
       "caption": "",
@@ -20317,15 +20317,15 @@
         "https://cdn.skoda-storyboard.com/2026/03/skoda_all-electric_family_80fcb8d2-2_bb98c6d2.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 681412,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "n/a",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(18595550, min 768px)"
     },
     "2afbc684__DSC_8793_9c00824d.jpg": {
       "logical_id": "2afbc684__DSC_8793_9c00824d.jpg",
@@ -25130,23 +25130,23 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2025/01/enyaq-front_9c8651b6-272x182.png",
+      "delivery_url": "",
       "da_path": "",
       "alt": "",
-      "caption": null,
+      "caption": "",
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2025/01/enyaq-front_9c8651b6-1440x810.png"
       ],
       "aspect_crop_source": true,
-      "bytes": 31689,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "n/a",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(10605519, min 768px)"
     },
     "cdd4c961__TD-Elroq-en_new_7a3c9a44.pdf": {
       "kind": "document",
@@ -25833,7 +25833,7 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2023/09/kamiq-matrixLED_5f39cad8-272x182.png",
+      "delivery_url": "",
       "da_path": "",
       "alt": "",
       "caption": "",
@@ -25841,15 +25841,15 @@
         "https://cdn.skoda-storyboard.com/2023/09/kamiq-matrixLED_5f39cad8.png"
       ],
       "aspect_crop_source": false,
-      "bytes": 81345,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "n/a",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(10865725, min 768px)"
     },
     "551ee036__TD-KAROQ-en.pdf": {
       "kind": "document",
@@ -27294,7 +27294,7 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2023/09/scala-virtualni-pedal_7ea05c8e-272x182.png",
+      "delivery_url": "",
       "da_path": "",
       "alt": "",
       "caption": "",
@@ -27302,15 +27302,15 @@
         "https://cdn.skoda-storyboard.com/2023/09/scala-virtualni-pedal_7ea05c8e.png"
       ],
       "aspect_crop_source": false,
-      "bytes": 99361,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "n/a",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(10708158, min 768px)"
     },
     "df14cfed__23_Skoda_Elroq_0fb76d53_14fe325a.jpg": {
       "logical_id": "df14cfed__23_Skoda_Elroq_0fb76d53_14fe325a.jpg",
@@ -27410,7 +27410,7 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2023/09/scala-MC_6e616ae0-272x182.png",
+      "delivery_url": "",
       "da_path": "",
       "alt": "",
       "caption": "",
@@ -27418,15 +27418,15 @@
         "https://cdn.skoda-storyboard.com/2023/09/scala-MC_6e616ae0.png"
       ],
       "aspect_crop_source": false,
-      "bytes": 109134,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "n/a",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(11431800, min 768px)"
     },
     "2afbc684__3_Skoda_Elroq_RS_feed_de5adf7d.jpg": {
       "logical_id": "2afbc684__3_Skoda_Elroq_RS_feed_de5adf7d.jpg",
@@ -28512,7 +28512,7 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2025/01/enyaq-sportline-front_90486bd1-272x182.png",
+      "delivery_url": "",
       "da_path": "",
       "alt": "",
       "caption": "",
@@ -28520,15 +28520,15 @@
         "https://cdn.skoda-storyboard.com/2025/01/enyaq-sportline-front_90486bd1-1440x810.png"
       ],
       "aspect_crop_source": true,
-      "bytes": 33173,
-      "preconditioned": true,
+      "bytes": null,
+      "preconditioned": false,
       "steps": {
-        "deliver": "done",
+        "deliver": "skipped",
         "dam": "n/a",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(11716357, min 768px)"
     },
     "1ef83eb0__KodiaqRS-smartdials_7ea5c500.png": {
       "logical_id": "1ef83eb0__KodiaqRS-smartdials_7ea5c500.png",

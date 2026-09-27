@@ -343,7 +343,8 @@
     {
       "name": "category-archive",
       "urls": [
-        "https://www.skoda-storyboard.com/en/category/emobility/"
+        "https://www.skoda-storyboard.com/en/category/emobility/",
+        "https://www.skoda-storyboard.com/en/tag/model/enyaq/"
       ],
       "description": "Škoda category/tag ARCHIVE listing (body.archive, e.g. /en/category/emobility/ and /en/tag/model/elroq/). Hero banner (div.hero, tag/model adds a CTA overlay) -> index-driven facet-less Listing over div.search-results.archive-results (scope derived from the page canonical URL). No facet engine (distinct from pr-listing). Metadata template=page. Spec: docs/ui-specs/template-category-archive.md; content models T7/T8; ticket SKODA-209. Content-driven detection only.",
       "metadata": {
@@ -695,7 +696,19 @@
     {
       "name": "story-detail",
       "urls": [
-        "https://www.skoda-storyboard.com/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/"
+        "https://www.skoda-storyboard.com/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/",
+        "https://www.skoda-storyboard.com/en/emobility/a-true-czech-from-spain/",
+        "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+        "https://www.skoda-storyboard.com/en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan/",
+        "https://www.skoda-storyboard.com/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia/",
+        "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+        "https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/",
+        "https://www.skoda-storyboard.com/en/emobility/skoda-peaq-unparalleled-space-and-comfort/",
+        "https://www.skoda-storyboard.com/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq/",
+        "https://www.skoda-storyboard.com/en/emobility/the-skoda-peaq-will-win-you-over-fast/",
+        "https://www.skoda-storyboard.com/en/lifestyle/chainsaws-and-sparklers-discover-the-traditions-of-rally-fans/",
+        "https://www.skoda-storyboard.com/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling/",
+        "https://www.skoda-storyboard.com/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator/"
       ],
       "description": "Škoda story detail (single-post + SiteOrigin), LINEAR FLATTEN. Hero banner + primary .content rich text flattened to default content; .sidebar + floating social dropped (skoda-story-cleanup). In-body galleries/embeds/Media Box deferred to SKODA-801/814/604. Metadata template=story. Spec: docs/ui-specs/story-detail.md; SKODA-604/801.",
       "blocks": [
