@@ -2,6 +2,7 @@
 - **Epic:** E05, Media Pipeline
 - **Type:** import tooling
 - **Phase:** A · **Milestone:** M2 (no content impact; friction on every edit)
+- **GitHub issue:** [#182](https://github.com/skoda-storyboard/demo/issues/182)
 - **Estimate:** 0.5 SP · AI-assisted 0.25d / manual 0.25–0.5d *(planning estimate, not a quote)*
 - **Status (2026-09-25):** 🔵 TODO
 
