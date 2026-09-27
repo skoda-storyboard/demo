@@ -7,6 +7,7 @@
 - **Status (2026-09-24):** 🔵 TODO (blocked on PR #109 merge for rendering; importer can land first)
   **Update (late 2026-09-24):** 🟢 importer merged in PR #113 (commit `e763378`). What remains is the render check
   once #109 merges.
+  **Update (2026-09-25):** ✅ QA accepted. Embed block merged in PR #109; the Epiq player is verified (#121 closed).
 
 ## Origin
 Side-by-side QA of `/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/` (1440, 2026-09-24).

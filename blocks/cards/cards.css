@@ -19,3 +19,13 @@
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 257px), 1fr));
   gap: var(--spacing-l);
 }
+
+body.story .section.sidebar .cards ul {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body.story .section.sidebar .cards.overlay .card-teaser-title {
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-medium);
+  line-height: 1.25;
+}

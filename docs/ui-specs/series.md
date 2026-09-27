@@ -1,194 +1,234 @@
 # Component Spec: Series (directory + hub)
 
-Status: **CAPTURED** (measured 2026-09-15 via Chrome DevTools MCP on page id 1; source CSS
-cross-checked against `media-room-515d2d102b.css`; reference screenshots saved).
-Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
+Status: **RE-MEASURED** against live source DOM and computed styles via Chrome DevTools (no
+screenshots used as measurement evidence). Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md).
+Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md). Ticket: [SKODA-207](../tickets/tickets/SKODA-207.md).
 
-> **Sweep correction (2026-09-25).** The DevTools URL→block sweep ([registry](../analysis/SKODA-M1-URL-BLOCK-REGISTRY.md), [report](../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §7) disproved the points below on the live M1 pages. They override the sections they name until this spec is re-captured:
->
-> - Hubs are **curated editorial mosaics**: 2/3-cell rows, 1:1 and ~2:1 tiles at 992/1280, 16:9 stacked at 375. They are in editorial order (date inversions) and can contain non-story tiles (130-years: Press Kits). They are not a newest-first grid.
-> - Hero at 375: 16:9 image, then a **48px/300 dark H1 + standfirst below** (no overlay). At ≥768: a 61.8vh image with a 48px/300 white overlay. The grey SERIES badge is always visible.
+**Delivery split:** the five hubs listed in §2 are M1; `/en/series-2/` is M2. This specifies both
+levels now, not 25 new hub imports in M1. Older two-column/newest-first/index-driven hub descriptions
+are superseded by the live URL-to-block [sweep](../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) and the
+direct measurements below. The existing importer and EDS blocks do **not** implement this spec yet.
 
 ## 1. Identity
 
-- **Component:** Series, two surfaces. (a) The **series directory**, a grid of series cards; (b) a
-  **series hub**, an overlay hero + a grid of the stories in that series. Both are almost entirely
-  **reuse**: [`card-teaser.md`](card-teaser.md) (the card unit) + [`hero.md`](hero.md) (the hub hero).
-  This spec captures only the series-specific deltas (grid columns, card fields, image ratio, ordering).
-- **EDS block(s):** reuse `cards-overlay` (overlaid title + excerpt) inside a listing grid; hub hero =
-  `hero-image` (overlay variant). A thin `series` listing wrapper (index-driven, like `stories`) drives
-  both grids. No series-only block is needed.
+- **Component:** Series, two surfaces: M2 directory of series cards with excerpts, and M1
+  editorial hubs of linked Story/Press Kits tiles. Reuse the existing `cards` block and shared
+  [`card-teaser.md`](card-teaser.md) primitive, plus `hero-image` ([`hero.md`](hero.md)).
+  The mosaic size-token variant is owned by [SKODA-221](../tickets/tickets/SKODA-221.md);
+  the series directory needs its own excerpt-below-image treatment. No index-driven `series`
+  block or faceted `listing` is needed for the authored grids.
 - **Client PDF IDs:** STO-S01 (Series hero), STO-S03 (Series card), STO-H07 (homepage series rail);
   MR references via the cards family.
 - **Ticket:** SKODA-207.
-- **Source references + selectors:**
-  - Directory: `https://www.skoda-storyboard.com/en/series-2/` · `body.page-template-template-tiles`;
-    grid `.panel-grid > .panel-grid-cell`; card `article.article-teaser.has-excerpt`.
-  - Hub: `https://www.skoda-storyboard.com/en/series/125-years-of-motorsport/` ·
-    `body.single-skoda_series`; hub hero `.hero-image`; story grid `.panel-grid > .panel-grid-cell`.
+- **Source references + selectors:** directory
+  `https://www.skoda-storyboard.com/en/series-2/` (`body.page-template-template-tiles`);
+  hubs `https://www.skoda-storyboard.com/en/series/125-years-of-motorsport/`,
+  `https://www.skoda-storyboard.com/en/series/130-years/`,
+  `https://www.skoda-storyboard.com/en/series/roads-places/`,
+  `https://www.skoda-storyboard.com/en/series/unexpected-jobs/` and
+  `https://www.skoda-storyboard.com/en/series/minutes-from-car-production/`
+  (`body.single-skoda_series`). In both: `div.hero` contains `.hero-image` and
+  `.hero-caption`; `.panel-layout > .panel-grid > .panel-grid-cell` contains
+  `article.article-teaser` with `data-content-type` and a linked image/title.
 
 ## 2. Source anatomy
 
 ```
-DIRECTORY  body.page-template-template-tiles  (SiteOrigin panels)
-.panel-grid  (flex row, 1248 wide)
-└── .panel-grid-cell   (2 per row = 2 columns; 624px each @1280)
-    └── .so-widget-ys-so-widget-post-teaser
-        └── article.article-teaser.has-excerpt[data-content-type="Series"][data-publish-date=…]
-            ├── a[href="/en/series/{slug}/"]
-            │   ├── .image-stretch.ratio-container.round.cover-width.ratio-2x1 > img   (2:1, radius 8px)
-            │   ├── .article-teaser-overlay
-            │   └── h2.heading                       overlaid white title
-            └── .article-teaser-excerpt-wrapper > .article-teaser-excerpt.ddd-truncated   excerpt below
+DIRECTORY body.page-template-template-tiles
+├── div.hero > .hero-image + .hero-caption h1
+└── .panel-layout > .panel-grid (13 authored rows)
+    └── .panel-grid-cell (2 per row, except last)
+        └── article.article-teaser.has-excerpt[data-content-type="Series"]
+            ├── a > .ratio-container.ratio-2x1 img + h2.heading (overlay)
+            └── .article-teaser-excerpt-wrapper > .article-teaser-excerpt (below image)
 
-HUB  body.single-skoda_series
-├── .hero-image (overlay hero, 61.8vh, white 48px/300 title + .perex)   → see hero.md Variant C
-└── .panel-grid > .panel-grid-cell (2 per row) 
-    └── article.article-teaser[data-content-type="Story"]   story cards (square 1:1 image, no date)
+HUB body.single-skoda_series
+├── div.hero > .hero-image + .hero-caption (h1, SERIES badge, p.perex)
+└── .panel-layout > .panel-grid (authored 2/3-cell rows)
+    └── .panel-grid-cell > article.article-teaser[data-content-type]
+        └── a > .ratio-container.ratio-1x1|ratio-2x1 img + h2.heading (overlay)
 ```
 
-**Two deltas from `card-teaser.md`:** (1) the series **directory card carries a visible excerpt**
-(`.article-teaser-excerpt`, absent from the homepage overlay cards); (2) the image ratio is **2:1**
-(directory) / **1:1** (hub story cards), not the 16:9 of the standard teaser.
+**Authoring is the ordering signal.** The directory contains 25 series cards in 13 rows, in source
+order; the five M1 hubs have 8 / 14 / 10 / 5 / 12 tiles, respectively (live
+`.panel-layout article.article-teaser` at 1280). On `/130-years/`, the first three `data-publish-date` values
+are 2025-12-17, 2025-11-21, **2025-12-09**: sorting would move tile 3 before tile 2.
+It also contains a `data-content-type="Press Kits"` tile (the other 13 are Stories).
+Never infer membership from `tags`, sort by date, or filter to Stories; keep the explicit
+DOM order and destination of **every** tile. No tile has a visible date. Retire SiteOrigin
+panels and dotdotdot without losing the authored rows.
 
-**Re-verified 2026-09-15:** directory container `ratio-2x1` (box `2.07`), hub container `ratio-1x1`
-(box `1.00`), 25 series in the directory, 8 stories on the motorsport hub. Read the ratio at the
-**`.ratio-container`**, the raw `<img>` reports `~1.5` because it overflows via `object-fit:cover`. This
-`page-template-template-tiles` shell is **shared with the press-kit hub** (see `_TEMPLATES.md`).
+Source row shapes at 1280×900 (live `.panel-layout > .panel-grid >
+.panel-grid-cell` for each URL in §1), expressed with the pinned `cards-tiles`
+size tokens: `sq` = 604×604 card, `sq-small` = 292×292, `wide` = 604×292,
+`third` = 396×188. These are card sizes after the 10px inset on each cell;
+row boundaries must survive import.
 
-**Ordering signal (confirmed):** the hub story grid is sorted **newest-first by publish date**
-(measured `data-publish-date` descending: `2026-08-27`, `07-21`, `06-18`, `06-11`, `04-23`, `04-10` ·
-hub · 1280). The directory order is editorial (SiteOrigin-authored tiles).
-
-**No date on cards (STO-H07 confirmed):** neither the directory card nor the hub story card renders a
-visible date. `data-publish-date` exists as an attribute only (`hasDate:false` measured on both).
-
-**Libraries / patterns to retire:** SiteOrigin Panels (`panel-grid` / `panel-grid-cell` / `so-widget-*`)
-→ a real CSS grid listing; `dotdotdot` (`.ddd-truncated` JS clamp) → CSS `line-clamp`; `object-fit:fill`
-→ `cover`; the `ratio-container` padding-bottom hack → `aspect-ratio`; jQuery.
+| Hub slug | Authored row shape, top to bottom |
+|---|---|
+| `125-years-of-motorsport` | `sq sq` / `sq-small wide sq-small` / `third third third` |
+| `130-years` | `third third third` / `sq-small wide sq-small` / `sq sq` / `third third third` / `sq-small wide sq-small` |
+| `roads-places` | `sq-small wide sq-small` / `sq sq` / `third third third` / `wide wide` |
+| `unexpected-jobs` | `wide wide` / `third third third` |
+| `minutes-from-car-production` | `wide wide` / `sq-small sq-small wide` / `wide wide` / `wide sq-small sq-small` / `wide wide` |
 
 ## 3. Measured visual spec
 
-All rows: `measured (source-url · selector · viewport) → token`. `DIR` = `…/series-2/`,
-`HUB` = `…/series/125-years-of-motorsport/`.
+Measurements below use `getBoundingClientRect()` and `getComputedStyle()` on the named live selector.
+`DIR` is the directory URL in §1; `HUB` is the motorsport URL unless otherwise named. Boxes include
+their x-position and size, not just a guessed image ratio. Map design values to the existing tokens
+`--content-max-width`, `--card-radius`, `--body-font-size-m`, `--weight-medium`, `--skoda-white`,
+`--skoda-ink`, `--skoda-grey-500`, `--tag-padding`, `--tag-font-size`,
+`--spacing-xxl`, `--grid-gutter` (20px),
+`--hero-vh` and `--heading-font-size-hero`.
 
-### Directory grid (`.panel-grid` / `.panel-grid-cell`)
-- `.panel-grid`: `display:flex; width:1248px` (`--content-max-width`) (· DIR · 1280).
-- `.panel-grid-cell`: **2 columns** at `≥781` (`624px` each; SiteOrigin's mobile breakpoint is `781px`,
-  confirmed by `@media (min-width:781px)` in source CSS) → **1 column** (full width) below `781`
-  (measured: cells stack, `768×768` at 768) (· `.panel-grid-cell` · 1280 vs 768).
-- 13 rows / 25 series cards; card margin-bottom `64px` → `--spacing-xxl` (· `.article-teaser` · 1280).
-
-### Directory card (`article.article-teaser.has-excerpt`)
-- image `.ratio-container.round.ratio-2x1`: **2:1** box, `border-radius:8px` → `--card-radius`,
-  `object-fit:fill` (**fix to `cover`**), rendered `604×292` (· DIR · 1280).
-- title `h2.heading` (overlaid, in `.article-teaser-overlay`): `font-size:16px; line-height:18px;
-  font-weight:500; color:#fff` (· DIR · 1280) → `16px` = `--body-font-size-m` (note: smaller than the
-  homepage overlay title `18px`), weight → `--weight-medium`, color → `--skoda-white`.
-- excerpt `.article-teaser-excerpt`: `font-size:16px; line-height:24px; font-weight:400; color:#161718`
-  (→ `--skoda-ink`), `padding:.5rem; max-height:4rem; overflow:hidden` (2-line clamp via dotdotdot)
-  (· `.article-teaser-excerpt` · 1280). Positioned **below** the image (`.article-teaser-excerpt-wrapper`).
-- **No date, no toolbar/cart** on the series card (· DIR · 1280).
-
-### Hub hero (`.hero-image`)
-- Overlay hero, height **`~633px`** at 1024 viewport-height (= `61.8vh`; matches
-  [`hero.md`](hero.md) Variant C) (· HUB · 1280). Real `<img 1920×1281>`, `object-fit:fill`.
-- title `.heading`: `font-size:48px; font-weight:300; color:#fff; text-align:start` (· HUB · 1280) →
-  reuse `--heading-font-size-hero: 48px`, `--weight-light: 300`, `--skoda-white` (all from `hero.md`).
-- `.perex` present (series standfirst).
-
-### Hub story grid (`.panel-grid-cell`)
-- Same SiteOrigin **2-col** grid (`≥781`) / 1-col (`<781`) as the directory (· HUB · 1280).
-- story card image `.ratio-container.round.cover-height.ratio-1x1`: **1:1** (square), `radius 8px` (· HUB).
-- `data-content-type="Story"`; no visible date; ordered newest-first (see §2).
+| Source · selector · viewport | Measured behavior |
+|---|---|
+| DIR · `.hero .hero-image`, `.hero h1` · 1280×900 | Image 1280×556.2 (`61.8vh`), white H1 48/52.8/300; grid begins y=688.2 after hero and 24px margin. |
+| DIR · `.panel-layout`, first `.panel-grid-cell`, `.ratio-container` · 1280×900 | Track x=16/w=1248, two 624px cells; inset card x=26/w=604, image 604×292 (~2:1) with 8px radius; next card x=650 (20px card gap). |
+| DIR · first `.heading`, `.article-teaser-excerpt` · 1280×900 | White over-image title 16px/18px/500, 16px inset; excerpt starts below image at y=990.2, 16px/24px/400 ink, 8px padding, 2-line clamp; card margin-bottom 64px. No visible date. |
+| DIR · first `.panel-grid-cell`, `.ratio-container` · 992×900 | Two 496px cells with 476×228 image boxes. |
+| DIR · first `.panel-grid-cell` · 780×900 / 781×900 | 780: two stacked 780px cells; 781: two side-by-side ~391px cells. |
+| DIR · `.hero .hero-image`, first `.ratio-container` · 375×812 | Image 375×210.9; dark 48/52.8/300 H1 below at x=10/w=355. Card x=10/w=355 with 355×199.7 16:9 media, excerpt below; rows stack. |
+| HUB · `.hero .hero-image`, `h1`, `.perex` · 1280×900 | Image 1280×556.2 (`61.8vh`); white H1 x=26/w=1228, 48/52.8/300; white perex 20/30/600; SERIES label present. |
+| HUB · `.panel-layout > .panel-grid` · 1280×900 | Track x=16/w=1248. Motorsport rows: `624×624 + 624×624`; `312×312 + 624×312 + 312×312`; `416×208 × 3`. Corresponding inset tile boxes: 604×604, 292×292, 604×292, 396×188 (20px between cards). |
+| HUB · first card `.ratio-container`, `.heading` · 1280×900 | Square 604×604, 8px radius; over-image title 16/18/500 white, 16px inset; no excerpt/date. Wide and third tiles are ~2:1. |
+| HUB · `.hero`, first `.ratio-container` · 375×812 | Image 375×210.9 (16:9), then dark H1 x=10/w=355 at 48/52.8/300, grey SERIES badge and dark perex 20/30/600. First tile x=10/w=355/h=199.7 (16:9); all tiles 1-up with 20px vertical separation. |
+| HUB · `.hero .category .label` · 375×812 | SERIES badge x=18/y=459.5, 63.6×21; white 11px/11px/600 uppercase on `#7c7d7e`, padding 5px 10px (`--tag-font-size`, `--tag-padding`, `--skoda-grey-500`). |
+| HUB · `.hero .hero-image`, first `.ratio-container` · 767×900 / 768×900 | At 767 the image and dark caption are stacked, and tiles use 16:9. At 768 the image is 61.8vh with white overlay; tiles stack but retain square/wide ratios (first tile 748×748). |
 
 ## 4. Responsive behavior
 
-- **Columns:** directory + hub grids are **2-up at `≥781px`**, **1-up below `781px`** (SiteOrigin's
-  built-in mobile breakpoint). This is off the canonical ladder (`768 / 992 / 1080`); the rebuild should
-  standardize to the source ladder (recommend `1 / 2 / 3` across `768 / 1080`, see §8).
-- **Card fields** are fixed size (title `16px`, excerpt `16px`) at every band; the excerpt keeps its
-  2-line clamp.
-- **Hub hero** follows `hero.md` Variant C responsive rules (61.8vh; title `48px` → smaller on mobile;
-  overlaid white).
+- **Source has two distinct transitions.** At **768px** the hero changes from 16:9 image followed by
+  dark caption to 61.8vh image with white overlay; mosaic tile ratios switch from all 16:9 to each
+  authored square/wide/third shape. At **781px** SiteOrigin grid cells switch from stacked to
+  side-by-side; preserve the row's 2/3-cell composition. Test 767/768 and 780/781, as well as
+  375/992/1280. A full-width stacked square at 768 is source behavior, not a measurement mistake.
+- Hero title stays **48px/300 even at 375**; standfirst is 20px/30px/600. Directory cards have
+  16px/18px/500 titles, 16px/24px excerpts under images, and no dates.
 
 ## 5. Interaction states
 
-- **Card:** whole card is a link to `/en/series/{slug}/` (directory) or the story (hub). Reuse
-  `card-teaser.md` §5 states (media hover icon, `:focus-visible` upgrade). No cart/toolbar on series cards.
-- **Hero:** non-interactive (no CTA), per `hero.md` §5.
+- **Card:** one usable link per card to the authored hub or Story/Press Kits destination. Preserve
+  the href and source order; use the existing `card-teaser` keyboard/focus contract, with no cart,
+  load-more, facets, or sort UI. Out-of-scope URLs must follow SKODA-609 rather than become EDS 404s.
+- **Hero:** non-interactive (no CTA), per `hero.md` §5. Do not turn the SERIES label into a
+  broken archive link.
 
 ## 6. Accessibility
 
-- One tab stop per card (the card is a single link) with the title as the accessible name; add
-  `:focus-visible` (reuse `card-teaser.md` §6).
-- Overlaid white title over the image must keep contrast ≥ 4.5:1 (scrim/overlay); confirm on light
-  series imagery.
-- Grid is a real list (`<ul>/<li>`); the hub `<h1>` is the hero title (one `<h1>` per page, per `hero.md`).
-- Excerpt text must not be the only accessible name; keep the title as the link text.
+- One tab stop per card, title as accessible link name and visible `:focus-visible` ring; retain
+  sensible image alt text without inventing it for decorative source images.
+- White over-image title contrast ≥4.5:1 with scrim; dark-on-light mobile H1/perex also clear.
+- Real list (`<ul>/<li>`); one H1 in the hero per page; excerpt must not replace the link title.
 
 ## 7. EDS target
 
-Reuse, don't build new. Directory = a `cards-overlay` listing with the excerpt sub-field; hub = a
-`hero-image` (overlay variant) + a `cards-overlay` story grid. A thin index-driven `series` wrapper
-(like `stories`, `_FOUNDATIONS` §7) supplies rows: directory reads a `series` index (editorial order);
-hub reads the `stories` index filtered by `series == {slug}`, sorted `publisheddate` desc.
+**Reuse authored blocks, not an index lookup for page tiles.** Both pages have a `Hero Image
+(overlay)` with image, H1 and optional caption; hubs additionally have the SERIES label and
+standfirst. The source's hub mosaic is `Cards (overlay, tiles)` (pinned SKODA-603 contract, UI
+variant SKODA-221). The M2 directory needs `Cards (overlay, series-directory)` or an equivalent
+explicit variant for an excerpt **below** a title-over-image card, not a standard overlay summary.
+Choose/pin that new shape in the future implementation PR in **both** the Markdown and
+`tools/importer/push/block-contracts.json` (bump `shape` if changing an existing contract). The
+query index continues to supply the homepage Series rail from page metadata, not these grids.
 
 ### DA authoring model
 
-Directory (`Cards (overlay)` listing, one row per series, excerpt in the body cell):
-| (image cell)              | (body cell)                                    |
-|---------------------------|------------------------------------------------|
-| ![](./motorsport.jpg)     | ## 125 years of Motorsport \n Škoda Motorsport… |
+Hub, **pinned** `cards-tiles` v1 (`SKODA-PENDING-BLOCK-CONTRACTS.md`), one row per source tile in
+DOM order, including non-Story tiles:
 
-Hub page: a `Hero-image` block (image + `# {series title}` + perex) followed by a `Series` (or
-`Story rail`/`Cards`) block:
-| Series |             |
-|--------|-------------|
-| slug   | 125-years-of-motorsport |
-| order  | newest      |
+| Header | First cell | Second cell | Third cell |
+|---|---|---|---|
+| `Cards (overlay, tiles)` | `sq` / `sq-small` / `wide` / `third` / `feature` | `<picture>` with source alt | `<a href="/en/…">Title</a>` |
 
-### decorate() outline
+E.g. motorsport row 1 = `sq, sq`; row 2 = `sq-small, wide, sq-small`; row 3 =
+`third, third, third`. **Order/row boundaries matter**: the variant must reproduce each
+source row, including partial final rows; a token-only row sequence must be checked against
+all five mosaics to ensure it can encode those boundaries without relying on auto-flow guesses.
+Card width tokens are **not** rendered card text. Today `blocks/cards/cards.js` only classifies
+image/toolbar/body cells; it would classify a leading token as text. The contract's claimed
+"readable" fallback must be verified in rendered preview, or publishing must wait for
+SKODA-221/its safe fallback.
 
-- **Card:** reuse `cards-overlay.js` (overlay title). Add an **excerpt** pass: a trailing paragraph in
-  the body cell → `.cards-overlay-excerpt` below the image with a CSS `line-clamp: 2` (retire dotdotdot).
-- **Image ratio:** apply `aspect-ratio: 2 / 1` (directory) / `1 / 1` (hub cards) + `object-fit: cover`
-  (fixes the source `fill`); `optimizeImageInPlace` on authored `<picture>`.
-- **Grid:** `series` wrapper renders `<ul>` with `grid-template-columns` stepping `1 / 2 / 3` at
-  `768 / 1080`; **no visible date** (drop any date paragraph, STO-H07).
-- **Hub:** `hero-image` overlay variant (61.8vh, white `48px/300` title) + the story grid sorted newest-first.
-- CSS scoped to `.cards-overlay` / `.series`; tokens only.
+Directory, **proposed, not pinned**: `Cards (overlay, series-directory)`, one row per series
+`[<picture>, <a href="/en/series/…">Title</a> + <p>excerpt</p>]` (two cells, same base
+cards shape). The variant must place only the title on the image, with the excerpt *outside*
+the clipped image area; this likely needs variant-specific decoration/layout using
+`scripts/card-teaser.js`, not just a summary in today's absolute overlay body. Preserve all
+25 authored rows, their order, image/alt, excerpt, and links. Retain `template=page` on the
+directory, `template=skoda_series` on hubs via `skoda-metadata.js`; Metadata also needs
+title, description and image, and hub metadata must stay indexable for the homepage rail.
+
+### Importer + runtime handoff (not implemented yet)
+
+1. `page-templates.json`, `import-series-hub.js`/`import-series-directory.js` and their bundles:
+   expand the five-hub URL list; locate `.hero` and `.panel-layout` by source DOM, recognize
+   directory vs hub from `data-content-type="Series"` vs a hub with mixed `Story`/`Press Kits`,
+   never from a presumed first-card type or location alone. Preserve rows/tokens/links before
+   SiteOrigin wrappers are discarded. Keep the shared cleanup, sections, metadata, links, and
+   image normalization stages. Do **not** emit a `Listing` with `tags`: `listing.js` does not
+   read that key and always sorts; `series-grid.js` currently emits exactly this invalid shape.
+2. `hero-banner.js` currently emits `Hero` (boilerplate stub). Series pages need `Hero Image
+   (overlay)` and the source SERIES badge + standfirst in the content cell. Avoid changing the
+   shape of other banners without testing their consumers. The existing `hero-image.overlay`
+   CSS overlays white text on mobile, so it needs a scoped series/tiles mobile treatment to
+   position dark title/badge/perex below the image without regressing unrelated heroes.
+3. SKODA-221 owns `Cards (overlay, tiles)` rendering in `blocks/cards/` and the shared
+   `scripts/card-teaser.js`/CSS. SKODA-207 owns the series importer and directory-specific
+   variant, coordinating shared edits rather than concurrently changing the same files.
+   Style component CSS per [`css-guidelines.md`](../guardrails/css-guidelines.md): reuse tokens,
+   intrinsic sizing first, breakpoints only for measured behavior, retain focus and image
+   editability. Keep mobile media `object-fit: cover` and 16:9 while matching measured boxes.
+4. Import → regenerate bundles → media build/apply → metadata and pending-block validation →
+   SKODA-506 media gate → SKODA-602 push/preview → QA → explicit publish approval/reindex via
+   SKODA-603. SKODA-605 rewrites only allow-listed demo destinations; SKODA-609 governs other
+   story, press-kit and M2 directory links. Do not point the directory's other 20 hubs to EDS
+   404 pages if they remain unimported. Never hand-author `content/` pages.
 
 ## 8. Open decisions + recommended default
 
-- **Grid columns:** source is a rigid SiteOrigin `2 / 1` (break at `781`). Recommend a real responsive
-  `1 / 2 / 3` across `768 / 1080` for the directory (more use of desktop width) and `1 / 2` for the hub,
-  or match source `2 / 1` exactly for pixel parity, assumption to confirm with design.
-- **Excerpt:** keep the directory card excerpt (2-line CSS clamp); hub story cards have **no** excerpt
-  and **no** date (STO-H07), confirm.
-- **Ordering:** hub stories newest-first (measured); directory editorial order (authored), confirm the
-  directory isn't meant to be alphabetical.
-- **Image ratio:** `2:1` directory, `1:1` hub cards, `object-fit:cover`, assumption to confirm (source
-  uses `fill`, which distorts non-native ratios).
-- **Tokens:** all reused (`--card-radius`, `--body-font-size-m`, `--weight-medium`, `--skoda-ink`,
-  `--skoda-white`, `--spacing-xxl`, `--heading-font-size-hero`, `--weight-light`). No new tokens.
+- **Decided:** source fidelity, editorial ordering and curated membership at both levels;
+  directory M2, five hubs M1; no redesign to 1/2/3 columns or newest-first ordering.
+- **Implementation decisions to verify against real imported output:** can the pinned size
+  tokens alone retain every row boundary (including mixed `sq`/`wide` rows), or does the
+  `cards-tiles` shape need an explicit row signal? If so, change and version both contract
+  representations together before import; do not invent silent runtime heuristics. Validate
+  the directory excerpt placement and all missing hub destinations under SKODA-609.
+- **Tokens:** reuse the current hero/card/spacing tokens; introduce a semantic token only
+  when an unmatched reusable dimension truly requires it. No source CSS copied wholesale.
 
 ## 9. Pixel-perfect acceptance criteria
 
-Compare EDS render to source at each viewport. Format: WHAT / WHERE / viewport / expected / actual.
-
-- [ ] Directory columns: `.series` grid / **≥781 → 2 cols**, / **<781 → 1 col** (or agreed `1/2/3`).
-- [ ] Directory card: image `2:1`, `radius 8px`, `object-fit:cover`; overlaid title `16px / 500 / #fff`;
-      excerpt below `16px / 24px / #161718`, 2-line clamp; **no date**.
-- [ ] Card margin: `.article-teaser` bottom margin `64px` (`--spacing-xxl`).
-- [ ] Hub hero: `.hero-image` overlay `61.8vh`; title white `48px / 300`; perex present (per `hero.md`).
-- [ ] Hub story grid: same 2-col grid; story image `1:1`; **no date**; ordered newest-first
-      (`publisheddate` desc).
-- [ ] Card link: one tab stop per card, title = accessible name; `:focus-visible` ring.
-- [ ] A11y: grid is `<ul>/<li>`; single `<h1>` (hub hero title); overlay title contrast ≥ 4.5:1.
-- [ ] Visual diff vs source at 1280/1024/768/mobile ≤ 2% per-pixel (excluding image content).
+- [ ] Importer fixtures for `/en/series-2/` and **each of the five** hubs emit
+      `Hero Image (overlay)` + exactly one curated Cards table, Metadata and correct
+      section breaks; no `Hero`/`Listing tags`, no dropped mixed-type tile, no visible
+      size token. `import:validate-blocks` and metadata validation pass.
+- [ ] Source-card census vs EDS: directory 25 links, hubs **8/14/10/5/12** in
+      exact authored order, with matching title, destination, media, alt and card
+      type; 130-years contains its Press Kits tile. No sort/load-more/facets or
+      visible date. Dead-link crawl finds 0 in-site 404s.
+- [ ] Layout measured with DevTools at **375, 767, 768, 780, 781, 992 and 1280**
+      (900px high except the 375×812 mobile sample): compare source and EDS
+      `getBoundingClientRect()` positions/sizes within **±2px or ±2%**, and
+      exact column state, font size/weight/line-height and color. Investigate
+      every discrepancy in the shared 221/826 layers before a local workaround.
+- [ ] Directory: 2-up from 781, 1-up below; desktop 2:1 card media
+      604×292 at 1280, mobile 355×199.7 at 375, white 16/18/500
+      title over image, excerpt **below** at 16/24/400 and two-line clamp,
+      8px radius, 20px card gap; no date.
+- [ ] Hubs: at 1280 the hero image is **556.2px at 900px viewport height**
+      (61.8vh), white 48/52.8/300 H1, SERIES badge, 20/30/600 perex.
+      At 375 image 16:9 with same-size dark H1/standfirst below and badge
+      visible. The per-hub square/wide/third mosaics match row shapes in §2/§3
+      (20px gap), stacked 16:9 at 375. No 221 token text or broken fallback.
+- [ ] Each tile exposes one accessible link and visible keyboard focus;
+      single H1, readable overlay contrast ≥4.5:1, no missing media or block
+      script. QA compares **rendered** EDS to live source after publish/reindex;
+      Architect reopens discrepancies and Developer fixes before QA accepts.
 
 ## 10. Reference screenshots
 
-`assets/series/`: `directory-1280.png` (2-col series grid, overlaid titles + excerpts, no dates),
-`hub-1280.png` (overlay hero + 2-col story grid). 768/mobile 1-col captures pending.
+Prior captures under `assets/series/` are visual aids only. The acceptance oracle above is
+the live DOM, computed styles, authored card census and rendered EDS measurements; do not
+infer box dimensions or a per-pixel percentage from screenshots.

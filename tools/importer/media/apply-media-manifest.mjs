@@ -33,6 +33,7 @@ import {
 const WORKSPACE = process.env.WORKSPACE_PATH || process.cwd();
 const DEFAULT_MANIFEST = path.join(WORKSPACE, 'tools', 'importer', 'media', 'media-manifest.json');
 const DEFAULT_MEDIA_INDEX = path.join(WORKSPACE, 'content', 'media-index.json');
+const DEFERRED = Symbol('oversized image deferred to import:push media gate');
 
 function parseArgs() {
   const args = process.argv.slice(2);
@@ -58,8 +59,13 @@ function parseArgs() {
 function buildLookups(manifest) {
   const byExact = new Map();
   const byId = new Map();
+  const deferred = new Set();
   for (const row of Object.values(manifest.rows || {})) {
     const dest = row.delivery_url || '';
+    if (!dest && row.status === 'partial' && row.steps?.deliver === 'skipped'
+      && row.note?.startsWith('no safe delivery rendition:')) {
+      deferred.add(row.logical_id);
+    }
     if (!dest) continue;
     if ((row.status !== 'done' && row.status !== 'partial')
       || row.steps?.deliver !== 'done'
@@ -69,14 +75,15 @@ function buildLookups(manifest) {
     if (row.source_url) byExact.set(row.source_url, dest);
     if (row.master_url) byExact.set(row.master_url, dest);
   }
-  return { byExact, byId };
+  return { byExact, byId, deferred };
 }
 
-function resolve({ byExact, byId }, url) {
+function resolve({ byExact, byId, deferred }, url) {
   if (byExact.has(url)) return byExact.get(url);
   if (byExact.has(cleanUrl(url))) return byExact.get(cleanUrl(url));
   if (!isImageUrl(url)) return null;
-  return byId.get(logicalId(url)) || null;
+  const id = logicalId(url);
+  return byId.get(id) || (deferred.has(id) ? DEFERRED : null);
 }
 
 /**
@@ -105,6 +112,7 @@ function main() {
   const lookups = buildLookups(manifest);
 
   let totalRewrites = 0;
+  let totalDeferred = 0;
   const prepared = [];
   const failures = [];
   for (const page of cfg.pages) {
@@ -115,6 +123,7 @@ function main() {
     }
     let html = readFileSync(abs, 'utf8');
     let rw = 0;
+    let deferred = 0;
     html = html.replace(/<img\b[^>]*>/gi, (tag) => {
       const match = tag.match(/(\ssrc=")([^"]+)(")/i);
       if (!match) {
@@ -128,6 +137,11 @@ function main() {
         failures.push(`${page}: unresolved image ${url}`);
         return tag;
       }
+      if (dest === DEFERRED) {
+        deferred += 1;
+        console.warn(`[media] ${page}: ${url} has no safe delivery rendition; import:push must strip or block it before DA preview`);
+        return tag;
+      }
       // A repeated absolute URL under eight different width descriptors is not
       // a responsive ladder; EDS generates the real srcset from the delivery URL.
       const rewritten = tag.replace(match[0], `${pre}${dest}${post}`)
@@ -138,6 +152,7 @@ function main() {
 
     prepared.push({ abs, html, rw });
     totalRewrites += rw;
+    totalDeferred += deferred;
     console.log(`${cfg.dryRun ? '[dry-run] ' : ''}${path.relative(WORKSPACE, abs)}: ${rw} media ref(s) rewritten → delivery url`);
   }
 
@@ -149,6 +164,7 @@ function main() {
   }
   const indexed = emitMediaIndex(manifest, cfg.mediaIndex, cfg.dryRun);
   console.log(`\n[media] ${totalRewrites} total rewrite(s)${cfg.dryRun ? ' (dry-run, no files changed)' : ''}`);
+  if (totalDeferred) console.log(`[media] ${totalDeferred} image(s) deferred to mandatory import:push gate`);
   console.log(`[media] cart resolver index: ${indexed} asset(s) → ${path.relative(WORKSPACE, cfg.mediaIndex)}${cfg.dryRun ? ' (dry-run)' : ''}`);
 }
 

@@ -3,7 +3,7 @@
 # by discovery fan-out 2026-09-17. Rationale + sizing: SKODA-RAIL-FEED-MAP.md.
 # Import per content-type family; each item carries category/model/tags/publisheddate/template.
 
-# ===== MODELS (11) — skoda_model CPT; feeds Models rails (STO + MR home) =====
+# ===== MODELS (21) — skoda_model CPT (10 models + 11 derivatives); feeds Models rails (STO + MR home) =====
 https://www.skoda-storyboard.com/en/skoda-model/elroq/
 https://www.skoda-storyboard.com/en/skoda-model/enyaq-iv-2/
 https://www.skoda-storyboard.com/en/skoda-model/epiq/
@@ -15,6 +15,19 @@ https://www.skoda-storyboard.com/en/skoda-model/new-superb/
 https://www.skoda-storyboard.com/en/skoda-model/octavia/
 https://www.skoda-storyboard.com/en/skoda-model/scala/
 # peaq is already in the coverage set (#7)
+# Model derivatives (11), SKODA-208: child skoda_model pages from the source
+# skoda_model-sitemap.xml (2026-09-26); they feed each model's Bodywork / Derivatives rail.
+https://www.skoda-storyboard.com/en/skoda-model/elroq/elroq-rs/
+https://www.skoda-storyboard.com/en/skoda-model/elroq/elroq-sportline/
+https://www.skoda-storyboard.com/en/skoda-model/enyaq-iv-2/enyaq-rs/
+https://www.skoda-storyboard.com/en/skoda-model/enyaq-iv-2/enyaq-sportline-iv/
+https://www.skoda-storyboard.com/en/skoda-model/karoq-6/karoq-sportline/
+https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/kodiaq-rs/
+https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/new-kodiaq-iv/
+https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/new-kodiaq-sportline/
+https://www.skoda-storyboard.com/en/skoda-model/new-superb/new-superb-iv/
+https://www.skoda-storyboard.com/en/skoda-model/octavia/octavia-rs/
+https://www.skoda-storyboard.com/en/skoda-model/octavia/octavia-sportline/
 
 # ===== SERIES (12) — skoda_series hubs; feeds Series rail + directory =====
 # (125-years-of-motorsport is already coverage #6)

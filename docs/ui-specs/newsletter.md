@@ -13,7 +13,7 @@ Related: [`footer.md`](footer.md) (Newsletter is a hidden footer-nav category), 
   (SKODA-305, spec in [`footer-mediaroom.md` §0](footer-mediaroom.md)); the topbar and sidebar presentations
   below are not built yet.
 - **Client PDF IDs:** COM-16 (Newsletter signup); COM-904 is the production subscriber service.
-- **Ticket:** SKODA-D05 / COM-16 (M1 UI-only stub); real service E09 / COM-904 (deferred).
+- **Ticket:** SKODA-823 (M1 inline UI-only stub); real service SKODA-904 (M2).
 - **Source references:**
   - Topbar dropdown: `https://www.skoda-storyboard.com/en/`, trigger `.topbar__newsletter`,
     panel `.topbar__dropdown__newsletter` (form `data-form-code="NewsletterFormHeader"`).
@@ -137,11 +137,13 @@ the curled `media-room-*.css`.
   (· source CSS `.mailguide-form .response .error/.success`). Loading: button `:before` spinner
   (`animation:a 7s infinite`, `border-radius:50%`).
 
-### Existing EDS stub (`blocks/newsletter-stub`)
-- block padding `40px 24px`, centered, background `--light-color` (`#f2f2f2`); `h2/h3` margin
-  `0 0 8px`; `p` max-width `48ch`; CTA `<a>`: inline-block, padding `12px 28px`, radius `4px`,
-  background `--dark-color` (`#0e3a2f`), color `#fff`, weight `700`, `aria-disabled` on click.
-  (Current stub is a single CTA button, **not** the measured form, see §8.)
+### EDS status
+`blocks/newsletter-stub` already renders the Media Room footer form (SKODA-305):
+labelled email input, optional consent and management link, submit button and
+authored message in a live region. It prevents network submission and emits a
+`newsletter:subscribe` hand-off event for the future service. The measured
+sidebar card and topbar dropdown are **not** implemented; SKODA-823 owns the
+sidebar presentation, SKODA-904 the production submit path (M2).
 
 ## 4. Responsive behavior
 
@@ -180,49 +182,47 @@ the curled `media-room-*.css`.
   label; the terms link must be keyboard reachable. Do not ship consent as a `1×1` unlabeled control.
 - Announce `.response` as an `aria-live="polite"` region for success/error.
 - Close ✕ is icon-only → `aria-label="Close"`; convert icon-font glyph to inline SVG.
-- Keep the honeypot `input.title-name` `aria-hidden="true"` + `tabindex="-1"` (already visually hidden).
+- For the M2 production form, keep the source honeypot `input.title-name` out of the
+  tab order. Do not copy its `required` constraint into the UI-only stub.
 - Contrast: white / emerald on `#0e3a2f` pass AA; verify `#d8d8d8` label on green ≥ 4.5:1.
 
 ## 7. EDS target
 
-Block: `newsletter-stub` (exists, UI-only). For M1 keep it non-submitting; author the **form layout**
-(email + consent + button) rather than only a CTA link, so the demo shows the real signup shape.
-Follow repo conventions (`_FOUNDATIONS` §7): `decorate(block)`, CSS scoped to `.newsletter-stub`,
-`:name:` icon tokens → `decorateIcons`, button decoration (link in `<strong>` → `.button.primary`).
+Reuse the existing `newsletter-stub` block (UI-only, non-submitting). Its footer
+implementation already builds the labelled email input, consent checkbox, button
+and accessible status from a key/value table. SKODA-823 extends it with a
+story-sidebar presentation: source image/heading, dark card and sidebar form
+geometry, without changing the footer. The topbar dropdown is a separate header
+host; reuse the form contract rather than importing between blocks.
 
 ### DA authoring table (worked example)
 
-`Newsletter (stub)`:
-| (heading + copy cell)                                   | (form cell)                                   |
-|---------------------------------------------------------|-----------------------------------------------|
-| ### Be the first to get the latest stories \n Subscribe so you don't miss out. | Email: (placeholder "Enter your email address") \n [ ] I agree to the [terms](/en/terms/) \n **Subscribe** |
+The existing `Newsletter Stub` block accepts these authored rows (see
+[`footer-mediaroom.md`](footer-mediaroom.md) and `blocks/newsletter-stub/newsletter-stub.js`):
 
-Variants: author `Newsletter (stub)` (dark card, sidebar) vs `Newsletter (stub) inline` (topbar/full).
-Add a `dark` section style → green band, white text (matches source).
+| Key | Value |
+|---|---|
+| `label` | Email address |
+| `placeholder` | Enter your email address |
+| `button` | Subscribe now! |
+| `consent` | Client-approved consent text (link only after its migrated destination is verified) |
+| `manage` | Optional verified subscription-management link |
+| `message` | Newsletter signup is not available yet |
 
-### decorate() outline
-
-```
-export default function decorate(block) {
-  // classify cells: heading/copy cell vs form cell (content-sniff: cell containing an email hint + a checkbox line)
-  // build a real <form> (novalidate off): email <input type=email required autocomplete=email>,
-  //   consent <input type=checkbox id=nl-terms> + <label for=nl-terms>, submit <button>
-  // M1 stub: form.addEventListener('submit', e => e.preventDefault()); show a static "thanks" affordance
-  // convert :close:/:mail: icon tokens; decorateIcons(block)
-  // NO network call — real ESP (mailguide/COM-904) is E09, deferred
-}
-```
-
-Reuse notes: the existing stub already strips `action` and disables submit; extend it to render the
-labelled email + consent controls and a mocked success message. Wire the emerald button + green card
-from tokens.
+The footer also authors `list` and `language` for the future ESP. The image
+header and heading need an additional authorable sidebar variant under
+SKODA-823; they are **not** supported by the footer renderer today. Keep
+`decorate(block)` and scope the new styling to the sidebar variant, preserving
+the footer CSS. Native email/consent validation and the status live region can
+be reused. Do not send network requests or show success when nothing was
+submitted; the existing hand-off event must not be wired to an ESP in M1.
 
 ## 8. Open decisions + recommended default
 
 - **Scope (confirmed):** M1 ships **UI only**, no ESP, no POST, no double-opt-in. The real service
-  (mailguide, list `389`, `NewsletterForm*` codes, `newsletter/v1`) is **E09 / COM-904, deferred**.
-  Recommend the stub renders a real form shape with a client-side "Thanks, we'll be in touch" mock so
-  the demo is representative; flag clearly in the block comment that it does not subscribe anyone.
+  (mailguide, list `389`, `NewsletterForm*` codes, `newsletter/v1`) is **SKODA-904, deferred**.
+  After valid local input, announce "Newsletter signup is not available yet."
+  Never promise a confirmation email or subscription when no request is sent.
 - **Which presentation for M1?** Recommend the **inline dark card** (matches
   `.newsletter-subscribe-widget`: green, radius `8px`, emerald button) as the authorable block, plus a
   note that the topbar dropdown is a header concern (build with `header-megamenu`, not this block).
@@ -232,8 +232,13 @@ from tokens.
   `--gallery-divider` (`#5a5b5c` input underline). Add `--skoda-green-emerald-hover:#a8ffcc`,
   `--error-color:#e82b37`, `--pill-radius-2em:2em`, `--body-font-size-2xs:12px`, and a placeholder
   grey `#b2b2b2` / `#7a7a7a` only if the `.newsletter-mailguide` input-group variant is built.
-- **Consent copy + terms URL:** pull the exact GDPR consent wording + link target from the client
-  (source label text was truncated in capture). Do not synthesize legal copy.
+- **Consent reference (Chrome DevTools, Epiq sidebar, 2026-09-24):** the source
+  checkbox is named `terms`; its label links "consent to the processing" to
+  `/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing/`
+  and "Manage subscription" to `/en/newsletter-settings/`. These are source-site
+  URLs, not yet verified as published EDS destinations. Use client-approved
+  legal copy and valid migrated destinations before activating a real signup;
+  do not synthesize legal text or silently ship broken links in the stub.
 
 ## 9. Pixel-perfect acceptance criteria
 
@@ -245,15 +250,15 @@ Compare EDS render to source at each viewport. Format: WHAT / WHERE / viewport /
       placeholder "Enter your email address"; `type=email` + `required` + `autocomplete=email`.
 - [ ] Submit button: `.newsletter-stub button` / all / background `#78faae`
       (`--skoda-green-emerald`), color `#161718`, pill radius `2em`; hover background `#a8ffcc`.
-- [ ] Consent: real `<input type=checkbox>` + clickable `<label>`; terms link emerald `#78faae`,
-      keyboard reachable.
+- [ ] Consent: real `<input type=checkbox>` + clickable `<label>`; when a verified
+      legal destination is available its link is emerald `#78faae` and keyboard reachable.
 - [ ] Topbar dropdown (if built): panel bg `#0e3a2f`, flat (radius `0`, no shadow), email+button in a
       flex row ≥768 / stacked <768; close ✕ top-right `2em`.
 - [ ] Responsive: sidebar widget 33.33% col ≥768, full-width stacked <768; button width `60%`.
-- [ ] States: submit disabled/mocked in M1 (no network); success + error message slot present,
-      `aria-live`; loading spinner optional.
-- [ ] A11y: `label[for]`↔`input[id]` paired; consent labelled; honeypot `aria-hidden`+`tabindex=-1`;
-      `Esc` closes dropdown; contrast ≥ 4.5:1. Keyboard: tab reaches email → consent → submit.
+- [ ] States: no network submission in M1; invalid input shows an error, valid
+      input shows an unavailable notice (not a success); message region has `aria-live`.
+- [ ] A11y: `label[for]`↔`input[id]` paired; consent labelled; `Esc` closes the topbar dropdown
+      if built; contrast ≥ 4.5:1. Keyboard: tab reaches email → consent → submit.
 - [ ] Visual diff vs source (inline widget) at 1280/1024/768/mobile ≤ 2% per-pixel (excluding the
       header background image).
 

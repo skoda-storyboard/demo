@@ -30,13 +30,20 @@ Sections: `hero` (overlay carousel) → icon section-nav → "Model Description"
 Stories `template=story tags=<model>`, Images `template=image tags=<model>`, Videos `template=video
 tags=<model>`). Meta: `title, image, template=skoda_model, model=<slug>, tags=<slug>`.
 
-### T4 · Series directory (`/en/series-2/`) — Shell B tiles, `series variant=directory`
-Sections: `hero` (overlay) → `cards-overlay` grid of series cards.
-Meta: `template=page`.
+### T4 · Series directory (`/en/series-2/`) — M2, 25 authored cards
+Sections: `Hero Image (overlay)` → proposed `Cards (overlay, series-directory)`:
+25 source-order `[picture, linked title + excerpt]` rows, 2 cols from 781px,
+one below; title over image, excerpt below. The variant/shape must be pinned
+in the pending-block Markdown and JSON in the implementation PR.
+Meta: `template=page`; do not require all 25 linked hubs to be in the M1 index.
 
-### T5 · Series hub (`/en/series/<slug>/`) — `series variant=hub`
-Sections: `hero` (overlay) → curated `cards-overlay` story grid (FIXED, no load-more).
-Meta: `title, image, template=skoda_series`.
+### T5 · Series hub (`/en/series/<slug>/`) — M1, five curated mosaics
+Sections: `Hero Image (overlay)` (image + H1 + SERIES label + perex) →
+`Cards (overlay, tiles)` (pinned `cards-tiles` v1 `[size token, picture, linked
+title]` rows). Tile counts are 8/14/10/5/12 in the five-hub M1 URL set;
+preserve source order and square/wide/third row mix, including the Press Kits
+tile on 130-years. No sort, tag-filtered Listing, facets or load-more.
+Meta: `title, description, image, template=skoda_series` for the homepage rail.
 
 ### T6 · Media Room home (`/en/media-room/`)
 Sections: featured promo → News feed (`stories template=press_release`, load-more) → Models (dark,
@@ -108,6 +115,9 @@ Meta: `template=page`.
 `footer` (STO) / `footer-mediaroom` (MR). Legal/copyright bar = separate strip.
 
 ## Parser implication
-Net-new parsers needed only for structural blocks (series, card-teaser, listing, gallery-lightbox,
+Net-new parsers needed only for structural blocks (card-teaser, listing, gallery-lightbox,
 embeds, media-cart, press-kit-*, company sub-types, newsletter). Rails reuse `story-rail`/`stories`.
 Transformers emit the per-family metadata above so the index-driven rails/listings populate.
+For Series, replace `series-grid.js`'s invalid `Listing tags` with authored Cards;
+convert `hero-banner.js`'s `Hero` to `Hero Image (overlay)`. See
+[`series.md`](../ui-specs/series.md) §7 for the exact import/DA handoff.

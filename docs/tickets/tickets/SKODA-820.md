@@ -4,8 +4,8 @@
 - **Phase:** A/B · **Milestone:** M1 (demo story fidelity)
 - **GitHub issue:** [#123](https://github.com/skoda-storyboard/demo/issues/123)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🟡 Epiq index-backed rail merged in PR #133; Epiq-specific
-  CSS and empty-band behavior prepared on `skoda-820-epiq-visual`. Seven curated
+- **Status (2026-09-27):** 🟡 Epiq index-backed rail merged in PR #133; Epiq-specific
+  CSS and empty-band behavior on `skoda-820-epiq-visual` (PR #157). Seven curated
   story bands from the sweep amendment remain. Issue #123 stays open.
 
 ## Origin
@@ -36,16 +36,20 @@ and must not be replaced with this index filter.
   not merely its reserved rail mount. Generic rails keep their own collapse
   behavior. No new block.
 - SKODA-801a owns the in-set Media Box → downloads mapping; SKODA-604 owns
-  longer-tail assembly. Leave the Media Box drop logging alone.
+  longer-tail assembly. Leave Media Box ownership to those tickets.
 
 ## Published-content gate
 
-At local QA on 2026-09-25 the preview and live `/en/query-index.json` each had
-31 rows, including 11 Epiq+2026 stories: the Epiq page plus 10 distinct
-related cards linking to EDS. If fewer are published later, show only those
-actually indexed, not fabricated or source-site cards.
+The source has 10 distinct story links (`.entry-title a`, not the image lightbox).
+On 2026-09-24 the EDS index held only one Epiq-tagged story; SKODA-603 later
+published the rail-feed stories. On 2026-09-27, the slashless branch preview
+`/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds`
+rendered 10 distinct Epiq+2026 EDS links. DA pages do **not** have a trailing
+slash: the slash-appended URL returns 404. If fewer matching stories are
+published later, show only those indexed, not fabricated or source-site cards.
+Curated bands are separate from this tag-based Epiq configuration.
 
-## CSS-extraction targets (Epiq source, Chrome DevTools, 2026-09-25)
+## CSS-extraction targets (Epiq source, Chrome DevTools, 2026-09-27)
 
 | Viewport | Band height | Heading | Card box | Track |
 |---|---:|---|---:|---:|
@@ -65,9 +69,9 @@ Use computed CSS/DOM measurements, not screenshots, for visual QA.
 - [x] Epiq index configuration matches both tags, excludes self, and displays
       10 distinct dated EDS links when those stories are published (PR #133).
 - [x] The Epiq visual slice matched source CSS geometry at 500/768/1280 and
-      edges 767/768/769/991/992 in independent local DevTools QA; the
-      992px pre-build reserve, cleaned titles, arrows/focus and unaffected
-      home rail were also checked. Recheck on the PR branch preview.
+      edges 767/768/769/991/992 in independent local DevTools QA; on 2026-09-27
+      its slashless deployed preview also matched 500/768/1280 CSS/DOM sizes,
+      with 10 clean titles/links and no horizontal overflow.
 - [ ] **Sweep amendment:** import the 7 curated story bands, omit "Based on
       tags" where absent, and emit a band only where the source has one.
       This requires importer/content validation beyond the Epiq visual PR.

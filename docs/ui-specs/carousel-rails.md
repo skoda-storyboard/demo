@@ -53,6 +53,7 @@ as a dependency other legacy widgets pull in. No `skoda-carousel` / `.skoda-slid
 > (`autoPlay:3000`, `wrapAround`, `pageDots`, captioned `img.media-cart-image` slides), not teaser rails. They are
 > specified and built under **SKODA-819** as a `slider` variant of the **Gallery** block (stakeholder decision
 > 2026-09-24). This supersedes SKODA-219, which had planned an image variant of the vanilla `carousel` block.
+> Measured spec: [`story-image-carousel.md`](story-image-carousel.md).
 
 **Libraries to retire (do not port):** Flickity, Owl Carousel, `skoda-carousel`, jQuery. Replace with
 the existing vanilla `carousel` block: native `overflow-x` scroll track + CSS `scroll-snap` +

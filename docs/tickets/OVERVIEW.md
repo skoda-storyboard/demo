@@ -90,6 +90,11 @@ New M1 tickets:
     819 and 820.
   - **Cut line:** Must (human) net is now **+2.5 SP** (611a is 1 SP), leaving ≈ 0.45 d of margin (sweep §11.4).
   - **Issues created** (milestone M1, Project #1 with Status/Priority/Estimate, no assignees): 215 → #139, 220 → #140, 221 → #141, 225 → #142, 307 → #143, 308 → #144, 309 → #145, 610 → #146, 611 → #147, 824 → #148, 826 → #149, 212a → #150, 611a → #151, 204a → #152, 611b → #153. 611a/611b are sub-issues of #147. #98 / #18 / #31 got follow-up comments. Amended bodies were pushed to #57, #108, #102, #47, #117, #119, #120, #122, #123, #127, #128 and #130. Board fields: #57 P0 / 6 SP, #108 P1, #47 P0.
+- **2026-09-27, SKODA-607 phase 1 (import + template):** the press release gets its own template
+  (`templates/press-release/`, loaded via the `scripts.js` `TEMPLATES` allow-list). Block extensions are split out
+  as **SKODA-223** (Gallery `preview`, 1.5), **SKODA-224** (Story Rail `press`, 1) and **SKODA-510** (Downloads
+  file tiles, 1): +3.5 SP. **SKODA-612** is folded (importer → 607, block → 224). New contracts `gallery-preview`,
+  `story-rail-press`, `downloads-file-rows`, `press-release-sections`.
 **Target:** DA / Experience Workspace + EDS (no AEM Author / UE / JCR), per `SKODA-EDS-DA-ARCHITECTURE.md`.
 **Estimates:** story points (SP) + AI-assisted / manual day ranges, **planning estimates, not a quote**. "AI-assisted" reflects this environment's import/styling/QA tooling.
 **Files:** `docs/tickets/epics/E##-*.md` · `docs/tickets/tickets/SKODA-<id>.md`.
@@ -167,6 +172,9 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-215](tickets/SKODA-215.md) | Floating action bar: share cluster + scroll-to-top | E02 | 2 | 0.5–1 | 1–2 | 106,505a | 🟡 M1; Demo sweep 2026-09-25; ID existed, file created. The DevTools census puts the dock on **all 42 URLs** (every template), not only stories/series/2 kits; draft 827 folded in (8 anchors, cart slot, intent URLs, a11y) |
 | [SKODA-220](tickets/SKODA-220.md) | Quote block (centred pull-quote + rule + attribution) | E02 | 2 | 0.5–1 | 1–2 | 607,805c,801 | 🟡 M1; Demo sweep 2026-09-25; 4 PRs + 1 PK |
 | [SKODA-221](tickets/SKODA-221.md) | Cards `tiles`/mosaic variant (series + press-kit hubs) | E02 | 3 | 1 | 2–3 | 201,207,805a | 🟡 M1; Demo sweep 2026-09-25; 5 series + 3 PK hubs |
+| [SKODA-222](tickets/SKODA-222.md) | Stories: featured model card on model tag archives (UI) | E02 | 2 | 0.5–1 | 1–2 | 209,214 | 🔵 M1 Should; content imported (contract `stories-feature`) |
+| [SKODA-223](tickets/SKODA-223.md) | Gallery `preview` variant (press-release sidebar media-kit preview, "+N" pill) (#171) | E02 | 1.5 | 0.5 | 1–1.5 | 203,607,819 | 🔵 M1; from the 607 phase split (contract `gallery-preview`, readable fallback) |
+| [SKODA-224](tickets/SKODA-224.md) | Story Rail `press` variant (Related Press Releases band cards) (#172) | E02 | 1 | 0.5 | 1 | 212,212a,820,607 | 🔵 M1; from the 607 phase split + 612 block half (contract `story-rail-press`) |
 | [SKODA-225](tickets/SKODA-225.md) | Columns unequal split + intrinsic portrait (story 2-cell rows) | E02 | 1 | 0.5 | 1 | 801,824 | 🟢 cosmetic; Demo sweep 2026-09-25 |
 | SKODA-301 | Header + mega-menu (3 panels) | E03 | 5 | 2–3 | 4–6 | 102,106 | 🟡 |
 | SKODA-302 | Mobile nav toggle + ARIA (a11y fix) | E03 | 2 | 1 | 1–2 | 301 | 🟡 fixes source gap |
@@ -194,14 +202,18 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-602](tickets/SKODA-602.md) | DA source-API push + bulk-op publish | E06 | 3 | 1–2 | 2–3 | 601 | 🟢 **built + piloted 2026-09-25** (`push-to-da.mjs`, branch `skoda-602-da-push`); credential gate resolved |
 | SKODA-603 | Pilot page set imported + validated, **re-scoped 2026-09-24 to the 43-URL set + rail corpus + tracker** | E06 | 5 | 2–3 | 3–5 | 601,602,201,202,203,204,205,501,502 | 🔴 M1 content critical path. **W0 done 2026-09-25:** tracker `planning/skoda-m1-url-status.md` (16/136 pages live + indexed) + pending-block contract `planning/SKODA-PENDING-BLOCK-CONTRACTS.md`; gated waves W1–W4 |
 | SKODA-604 | Full-fidelity restore on 1–2 hero demo stories | E06 | 2 | 0.5–1 | 1–2 | 203,204,502,505,601,602,801 | 🟢 M1 (D18); bounded un-flatten |
-| SKODA-607 | Press Release detail template (split from story) | E08 | 5 | 2–3 | 4–6 | 601,602,502 | 🟢 M1; PR ≠ story (no hero, MR side, 47.5% of pages); spec `ui-specs/template-press-release.md` |
+| [SKODA-605](tickets/SKODA-605.md) | Rewrite absolute source URLs to site-relative in import (#39) | E06 | 2 | 0.5–1 | 1–2 | 601,602 | 🟡 M1; code done 2026-09-25 (`skoda-links.js` in all 16 importers, demo-page allow-list, D-3 (b) for the rest); 2 pages published, the rest ride with 508/603/607/801a/208 |
+| SKODA-607 | Press Release detail template (split from story) | E08 | 5 | 2–3 | 4–6 | 601,602,502 | 🟡 M1; phase 1 (import + own template `templates/press-release/`) on branch `skoda-607-press-release` 2026-09-27; closes after 223/224/510 + final visual diff; spec `ui-specs/template-press-release.md` |
 | [SKODA-608](tickets/SKODA-608.md) | Image & video item index rows (listings + model media rails) | E06 | 3 | 1–1.5 | 2–3 | 601,602,401,501,503 | 🟠 M1 Must; `/en/images/`, `/en/videos/` empty without it |
 | [SKODA-609](tickets/SKODA-609.md) | M1 link containment + mixed-reality alias redirect | E06 | 2 | 1 | 1–2 | 605,103,603 | 🟠 M1 Must; decision D-3 |
 | [SKODA-610](tickets/SKODA-610.md) | Clean index titles (drop " - Škoda Storyboard") | E06 | 1 | 0.25–0.5 | 0.5–1 | 401,602,603 | 🟡 M1; code done 2026-09-25 (importer + shared runtime trim); 7/28 republished (index 29→22 suffixed), 21 held (508/603/208/819); 0 suffixed card titles/alt on branch preview |
-| [SKODA-508](tickets/SKODA-508.md) | `skoda-images` turns card-image `data-caption` excerpts into body paragraphs | E05 | 1 | 0.25–0.5 | 0.5–1 | 501 | 🟠 M1; found in 610; blocks the PR re-import |
+| [SKODA-508](tickets/SKODA-508.md) | `skoda-images` turns card-image `data-caption` excerpts into body paragraphs | E05 | 1 | 0.25–0.5 | 0.5–1 | 501 | 🟡 M1; code done + QA 2026-09-25 (10/10 PR re-imports Title-only vs DA); 5 caption PRs republished (live index 21→16 suffixed); follow-ups 509, 612 |
+| [SKODA-509](tickets/SKODA-509.md) | `skoda-images.js` doesn't use the transformer hook signature (validator fails on every edit) | E05 | 0.5 | 0.25 | 0.25–0.5 | 508 | 🔵 M2; tooling, from 508 |
+| [SKODA-510](tickets/SKODA-510.md) | Downloads file tiles (PDF / no-image rows, video badge) + mobile Show more (#173) | E05 | 1 | 0.5 | 1 | 502,503,607 | 🔵 M1; from the 607 phase split (contract `downloads-file-rows`) |
 | [SKODA-611](tickets/SKODA-611.md) | Storyboard home composition (/en cover-box stack, promo exclusion) | E06 | 2.5 | 1 | 2–2.5 | 212,213,214,217,218,603 | 🟡 M1; Demo sweep 2026-09-25; no owner since 604 re-point; **parent** of 611a/611b (D2); promo exclusion already fixed by #110 |
 | [SKODA-611a](tickets/SKODA-611a.md) | Home section structure: 9 cover-box sections, dark bands, social strip (Must slice) | E06 | 1 | 0.5 | 1 | 213,214,217,218,603 | 🟡 M1 Must |
 | [SKODA-611b](tickets/SKODA-611b.md) | Home band spacing: 67px gap, 320px rail pitch (Should slice) | E06 | 1.5 | 0.5 | 1–1.5 | 611a,218 | 🟡 M1 Should |
+| [SKODA-612](tickets/SKODA-612.md) | Press-release Related Press Releases band imported as default content (empty-`href` card images) | E06 | 1.5 | 0.5 | 1–1.5 | 508,212,603 | ⤵ folded 2026-09-27: importer half → 607, block half → 224 |
 | [SKODA-801a](tickets/SKODA-801a.md) | M1 story import fidelity slice (Media Box + 21-story run; carousel → 819, Vimeo → 818) | E08 | 1.5 | 0.5–1 | 1.5–2 | 601,801,819,818,502,204 | 🟠 M1 Must; slice of 801; re-scoped 3 → 1.5 SP (review §15) |
 | [SKODA-805a](tickets/SKODA-805a.md) | Press-kit tiles hub, M1 slice + importer (3 hubs) | E08 | 3 | 1–2 | 3–4 | 601,602,202,201,305,609 | 🟠 M1 Must; slice of 805 |
 | [SKODA-805b](tickets/SKODA-805b.md) | Press-kit child pages for M1 hubs (import vs link-out, D-1) | E08 | 3 | 1–2 | 3–5 | 805a,805c,502,609 | 🟡 M1 Could; 50 child pages outside the set |
@@ -231,14 +243,14 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-813 | Generic Page base shell (STO page + MR media-room-page) | E08 | B | 2 | 0.5–1 | 1–2 | 202,801 | 🟢 M2; shared shell under 810; spec `ui-specs/template-page-base.md` |
 | SKODA-814 | SiteOrigin body flatten contract (1,614 pages) | E08 | B | 5 | 2–3 | 4–6 | 601,203,204 | 🟢 M2; feeds 801/208/813; spec `ui-specs/siteorigin-body.md` (recount §3/§6) |
 | SKODA-815 | Story flatten: `ys-milestones` timeline (content-loss fix) | E08 | B | 3 | 1–2 | 3–5 | 801 | 🟢 flatten-to-content SHIPPED in 801 (0→11 entries recovered); optional timeline block remains M2 |
-| SKODA-816 | Story hero: title above 16:9 image + caption (perex, date, category via Tags block) | E08 | A/B | 2 | 0.5–1 | 1–2 | 202,205,801 | 🟡 Epiq side-by-side QA 2026-09-24; importer half merged in #113 (`story-hero` → Hero Image story); caption styling open (≈ 0.5 SP) |
-| SKODA-817 | Story aside: duplicated "Explore more" teasers + sidebar visual parity | E08 | A/B | 2 | 0.5–1 | 1–2 | 201,205,801 | 🟡 dedupe (6→3 cards) + Tags heading merged in #113; sidebar parity CSS open (≈ 1 SP) |
-| SKODA-818 | Story flatten: `lite-youtube` → bare YouTube URL (embed autoblock) | E08 | A/B | 1 | 0.25–0.5 | 0.5–1 | 204 (PR #109),801 | 🟢 importer merged in #113; render check once PR #109 merges |
-| SKODA-819 | Story in-body carousel → Gallery `slider` variant | E08 | A/B | 3 | 1 | 2–3 | 203,212,801 | 🟡 stakeholder decision: slider like source; **supersedes SKODA-219** |
-| SKODA-820 | Story bottom "Related Stories" band restored (tag-based rail) | E08 | A/B | 2 | 0.5–1 | 1–2 | 212,801,603 | 🟡 #133 Epiq index rail live (10 cards); scoped CSS parity on `skoda-820-epiq-visual` for review. Curated bands remain (sweep amendment); desktop pointer → 212a; Media Box → 801a |
-| SKODA-821 | Story body column text inset (34px extra per side) | E08 | A/B | 1 | 0.25 | 0.5 | 801 | 🟢 CSS only |
+| SKODA-816 | Story hero: title above 16:9 image + caption (perex, date, linked category) | E08 | A/B | 2 | 0.5–1 | 1–2 | 202,205,801,826 | ✅ Done 2026-09-25: #113 + #155 code; all 18 DA stories re-imported with the Hero Image and published; live QA 1440–500 (width delta → 826) |
+| SKODA-817 | Story aside: duplicated "Explore more" teasers + sidebar visual parity | E08 | A/B | 2 | 0.5–1 | 1–2 | 201,205,801 | ✅ #120 closed; dedupe + Tags heading in #113, sidebar parity CSS in #160 |
+| SKODA-818 | Story flatten: `lite-youtube` → bare YouTube URL (embed autoblock) | E08 | A/B | 1 | 0.25–0.5 | 0.5–1 | 204 (PR #109),801 | ✅ #121 closed; importer #113 + block #109, Epiq player verified |
+| SKODA-819 | Story in-body carousel → Gallery `slider` variant | E08 | A/B | 3 | 1 | 2–3 | 203,212,801 | 🟡 stakeholder decision: slider like source; **supersedes SKODA-219**; spec `ui-specs/story-image-carousel.md` |
+| SKODA-820 | Story bottom "Related Stories" band restored (tag-based rail) | E08 | A/B | 2 | 0.5–1 | 1–2 | 212,218,801,603 | 🟡 #133 Epiq index rail live (10 cards); scoped CSS parity in PR #157. Curated bands remain (sweep amendment); desktop pointer → 212a; Media Box → 801a |
+| SKODA-821 | Story body text inset vs intentionally bleeding image slider | E08 | A/B | 1 | 0.25 | 0.5 | 801 | 🟢 story CSS only; 10px media bleed retained |
 | SKODA-822 | Ship SKODA-801 two-column story layout to `main` | E08 | A | 1 | — | — | 801 | ✅ merged as PR #113 (2026-09-24 21:35) |
-| SKODA-823 | Story sidebar newsletter sign-up widget (UI stub) | E08 | A | 2 | 0.5–1 | 1–2 | 904,801 | 🟡 `newsletter-stub` in spec but never built; side banner → 903; **M1 Could** (review §15) |
+| SKODA-823 | Story sidebar newsletter sign-up widget (UI stub) | E08 | A | 2 | 0.5–1 | 1–2 | 904,801 | 🟡 extend footer `newsletter-stub` for the sidebar; no ESP, no false success; side banner → 903; **M1 Could** (review §15) |
 | [SKODA-824](tickets/SKODA-824.md) | In-column highlight panel (story dark box + PR grey callout) | E08 | A | 3 | 1 | 2–3 | 801,814,218,819,225 | 🟡 M1; Demo sweep 2026-09-25; 12 stories + 1 PR |
 | SKODA-809 | Roles & permissions (7 editorial groups) | E08 | B | 5 | 2–3 | 4–8 | 101,602 | 🟠 gap G2 (§6.4); blocked on D15 RACI |
 | SKODA-811 | Content embargo (staged-publish, group access) | E08 | B | 3 | 1–2 | 2–4 | 602,809 | 🟢 gap G3 (§6.5/D9) approach agreed; M1-Stretch only *ungated* (group-gate needs 809/M2/D15, F4) |

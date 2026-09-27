@@ -5,7 +5,7 @@
   "description": "Starter project for Adobe Helix",
   "scripts": {
     "lint:js": "eslint .",
-    "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\"",
+    "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\" \"templates/**/*.css\"",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"poc/**/test.mjs\" \"blocks/**/*.test.mjs\" \"scripts/**/*.test.mjs\" \"tools/importer/**/*.test.mjs\"",
@@ -17,6 +17,7 @@
     "import:push": "node tools/importer/push-to-da.mjs",
     "import:validate-blocks": "node tools/importer/validate-blocks.mjs",
     "import:status": "node tools/importer/m1-status.mjs",
+    "import:allowlist": "node tools/importer/build-link-allowlist.mjs",
     "prepare": "husky"
   },
   "repository": {

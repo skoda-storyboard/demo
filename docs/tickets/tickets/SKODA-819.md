@@ -8,6 +8,8 @@
   (single-image slider), not as the lead-image + thumbnail gallery.
 - **Supersedes:** [SKODA-219](SKODA-219.md), which is the same widget. It had been specced as a `carousel` block
   variant in the M1 gap review. Its Must SP moves to this ticket (review §15).
+- **UI spec:** [`story-image-carousel.md`](../../ui-specs/story-image-carousel.md), measured on Epiq + Octavia
+  at 1440/768/500.
 
 ## Origin
 Side-by-side QA of `/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/` (2026-09-24).
@@ -41,13 +43,23 @@ at a time with arrows and dots.
 - **Importer:** `story-flatten.js` emits `Gallery (slider)` for link-free `skoda-carousel-widget`.
   Link-bearing carousels keep routing to Cards. Leave `sow-slider` and `.sb-gallery` (SKODA-216)
   as they are unless measured otherwise.
+- **Measured refinements (Octavia, 2026-09-24):** the frame stays **16:9** even when the natural image is 3:2. A
+  visible `.search-results-item-description` sits below the image on Octavia (64px on its first slide) and is
+  absent on Epiq; `img[data-caption]` is empty on both. Emit the description only when non-empty and **never
+  generate a caption from alt text**. Keep the 10px lateral bleed beyond the text column (SKODA-821 owns the
+  text inset, not this bleed).
+- **Autoplay a11y (WCAG 2.2.2):** include a visible pause/resume control; without one, disable autoplay.
+- Defensive authoring: 1 to n slides; a single slide renders a static figure with no controls.
 - Evaluate reusing the SKODA-212 `carousel` rail mechanics (arrow state, dots, drag) instead of
   forking them. The rail is card-teaser-based, so reuse is at the logic level, not the markup.
 
 ## Acceptance Criteria
 - [ ] 1440/768/500: slider box matches the table above (±2px), 16:9, one image per view.
 - [ ] Arrows + dots positioned and coloured as measured; the selected dot tracks the current slide.
-- [ ] Autoplay advances every 3s and wraps; it pauses on hover/focus and is off under reduced motion.
+- [ ] Autoplay advances every 3s and wraps; it pauses on hover/focus, is off under reduced motion, and has a
+      visible pause/resume control.
+- [ ] Descriptions add height below the frame only when present (Octavia), with no empty caption gap (Epiq); no
+      alt-as-caption.
 - [ ] Arrows and dots are labelled `<button>`s; the track is keyboard-scrollable.
 - [ ] Existing Gallery variants (default / story) unchanged; lint + tests green.
 - [ ] **Amendment (2026-09-25, sweep reconciliation):**

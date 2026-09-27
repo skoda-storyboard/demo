@@ -1,0 +1,261 @@
+/* global globalThis */
+/*
+ * SKODA-607: the press-release importer (import-press-release.js) on the 5 M1 releases.
+ * Fixtures: test/fixtures/press-release/<slug>.html (source pages, trimmed of scripts and
+ * site chrome; test/* is .hlxignore'd). The whole pipeline runs on jsdom with a minimal
+ * WebImporter stub, then the output is read the way DA reads it: <hr> = section break,
+ * a table = a block (first cell = name), Section Metadata `style` = the section classes.
+ * Run: node --test tools/importer/press-release.test.mjs
+ */
+
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+let JSDOM = null;
+try {
+  const req = createRequire('/home/node/.excat-marketplaces/excat-marketplace/excat/hooks/import-validator/');
+  // eslint-disable-next-line import/no-unresolved
+  ({ JSDOM } = req('jsdom'));
+} catch {
+  try {
+    const req = createRequire(import.meta.url);
+    // eslint-disable-next-line import/no-unresolved
+    ({ JSDOM } = req('jsdom'));
+  } catch { /* jsdom unavailable — skip */ }
+}
+const skip = JSDOM ? false : 'jsdom not installed — DOM tests skip';
+
+const FIXTURES = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../test/fixtures/press-release');
+const SRC = 'https://www.skoda-storyboard.com/en/press-releases';
+const PAGES = {
+  zellmer: 'skoda-auto-klaus-zellmer-to-leave-the-company',
+  theatre: 'skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029',
+  superb: 'skoda-superb-25-years-of-comfort-space-and-technical-excellence',
+  board: 'skoda-auto-announces-changes-to-its-board-of-management',
+  peaq: '936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs',
+};
+
+function createTable(rows, doc) {
+  const table = doc.createElement('table');
+  rows.forEach((cells) => {
+    const tr = doc.createElement('tr');
+    cells.forEach((c) => {
+      const td = doc.createElement('td');
+      (Array.isArray(c) ? c : [c]).forEach((n) => {
+        if (n === '' || n == null) return;
+        td.append(typeof n === 'string' ? doc.createTextNode(n) : n);
+      });
+      tr.append(td);
+    });
+    table.append(tr);
+  });
+  return table;
+}
+const toRows = (cells) => Object.entries(cells).map(([k, v]) => [k, v]);
+globalThis.WebImporter = {
+  DOMUtils: {
+    remove(el, sels) { sels.forEach((s) => el.querySelectorAll(s).forEach((n) => n.remove())); },
+    createTable,
+  },
+  Blocks: {
+    createBlock(doc, { name, cells }) { return createTable([[name], ...toRows(cells)], doc); },
+    getMetadataBlock(doc, meta) { return createTable([['Metadata'], ...toRows(meta)], doc); },
+  },
+  rules: { transformBackgroundImages() {}, adjustImageUrls() {} },
+  FileUtils: { sanitizePath: (p) => p },
+};
+
+const importer = JSDOM ? (await import('./import-press-release.js')).default : null;
+
+// What @adobe/helix-importer PageImporter.preProcess does before `transform` runs: drop
+// every <hr> and every empty inline element (unless it holds an img/video/iframe/div/
+// picture). Icon-only links vanish here, which is why the importer has a `preprocess`.
+const KEEP = 'img, video, iframe, div, picture';
+function helixPreProcess(doc) {
+  doc.querySelectorAll('hr').forEach((n) => n.remove());
+  ['b', 'a', 'em', 'i', 'strong', 'small', 'u'].forEach((tag) => {
+    [...doc.querySelectorAll(tag)].reverse().forEach((n) => {
+      if (n.textContent === '' && !n.querySelector(KEEP)) n.remove();
+    });
+  });
+}
+
+const txt = (n) => (n.textContent || '').replace(/\s+/g, ' ').trim();
+const blockName = (table) => txt(table.querySelector('tr td'));
+
+/** Split the output at <hr> into sections: [{ nodes, blocks, style }]. */
+function sectionsOf(element) {
+  const article = element.querySelector('article');
+  const out = [{ nodes: [] }];
+  [...article.children].forEach((n) => {
+    if (n.tagName === 'HR') out.push({ nodes: [] });
+    else out[out.length - 1].nodes.push(n);
+  });
+  return out.map((s) => {
+    const blocks = s.nodes.filter((n) => n.tagName === 'TABLE');
+    const meta = blocks.find((t) => blockName(t) === 'Section Metadata');
+    const style = meta ? txt(meta.querySelectorAll('tr')[1].children[1]) : null;
+    return {
+      ...s,
+      style,
+      blocks: blocks.filter((t) => t !== meta).map(blockName),
+      content: s.nodes.filter((n) => n.tagName !== 'TABLE'),
+    };
+  });
+}
+const cache = {};
+function importPage(key) {
+  if (cache[key]) return cache[key];
+  const slug = PAGES[key];
+  const dom = new JSDOM(readFileSync(path.join(FIXTURES, `${slug}.html`), 'utf8'), { url: `${SRC}/${slug}/` });
+  globalThis.document = dom.window.document;
+  globalThis.window = dom.window;
+  importer.preprocess({ document: dom.window.document });
+  helixPreProcess(dom.window.document);
+  const [{ element }] = importer.transform({
+    document: dom.window.document,
+    url: `${SRC}/${slug}/`,
+    params: { originalURL: `${SRC}/${slug}/` },
+  });
+  cache[key] = { element, sections: sectionsOf(element) };
+  return cache[key];
+}
+
+const rowsOf = (table) => [...table.querySelectorAll('tr')].slice(1);
+const find = (sections, name) => sections.flatMap((s) => s.nodes).find((n) => n.tagName === 'TABLE' && blockName(n) === name);
+
+test('section model: header, body-column, sidebar, media-box, related (only when present)', { skip }, () => {
+  const expect = ['body-column', 'sidebar', 'dark, full-width, media-box', 'dark, full-width, related'];
+  ['zellmer', 'theatre', 'board', 'peaq'].forEach((k) => {
+    assert.deepEqual(importPage(k).sections.map((s) => s.style), [null, ...expect], k);
+  });
+  // Superb has no Related Press Releases band
+  assert.deepEqual(importPage('superb').sections.map((s) => s.style), [null, ...expect.slice(0, 3)]);
+});
+
+test('header: date paragraph + a single h1, <br> in the title becomes a space', { skip }, () => {
+  const [head] = importPage('peaq').sections;
+  assert.deepEqual(head.content.map((n) => n.tagName), ['P', 'H1']);
+  assert.equal(txt(head.content[0]), '2. 9. 2026');
+  assert.equal(txt(head.content[1]), '936 km without recharging: Škoda Peaq sets range record for seven-seater electric SUVs');
+  Object.keys(PAGES).forEach((k) => assert.equal(importPage(k).element.querySelectorAll('h1').length, 1, k));
+});
+
+test('body: lead image, bullets list (optional), bold perex, Buzzsprout first in the body', { skip }, () => {
+  const body = importPage('superb').sections[1].content;
+  assert.ok(body[0].querySelector('img'), 'lead image first');
+  assert.equal(body[1].tagName, 'UL');
+  assert.equal(body[1].children.length, 4);
+  assert.ok(!/›/.test(txt(body[1])), 'bullet marker stripped');
+  assert.equal(body[2].children[0].tagName, 'STRONG');
+  assert.match(txt(body[2]), /^Mladá Boleslav/);
+  assert.match(body[3].querySelector('a').getAttribute('href'), /^https:\/\/www\.buzzsprout\.com\/1730804\/episodes\//);
+
+  // Zellmer has no bullets: the perex follows the lead image
+  const z = importPage('zellmer').sections[1].content;
+  assert.equal(z[1].children[0].tagName, 'STRONG');
+  assert.equal(importPage('zellmer').sections[1].nodes.filter((n) => n.tagName === 'UL').length, 0);
+});
+
+test('body: every release keeps its Buzzsprout player; Peaq keeps the inline Vimeo', { skip }, () => {
+  Object.keys(PAGES).forEach((k) => {
+    const links = [...importPage(k).sections[1].nodes.flatMap((n) => [...n.querySelectorAll('a')])];
+    assert.equal(links.filter((a) => /buzzsprout\.com/.test(a.href)).length, 1, k);
+  });
+  const peaq = importPage('peaq').sections[1].nodes.flatMap((n) => [...n.querySelectorAll('a')]);
+  const vimeo = peaq.filter((a) => /player\.vimeo\.com\/video\/1223262231/.test(a.href));
+  assert.equal(vimeo.length, 1);
+  assert.equal(txt(vimeo[0].closest('p')), vimeo[0].getAttribute('href'), 'bare URL on its own line');
+  assert.ok(!peaq.some((a) => /direct-download|attachment_id/.test(a.href)), 'video cart/download toolbar dropped');
+});
+
+test('body: no decorative <hr>, no empty paragraphs, FAQ panel kept as separate paragraphs', { skip }, () => {
+  const z = importPage('zellmer').sections[1].content;
+  assert.ok(!z.some((n) => n.tagName === 'P' && !txt(n) && !n.querySelector('img, a')), 'no empty <p>');
+  const faq = z.filter((n) => /^(Frequently Asked Questions|When did Klaus Zellmer|What has Klaus Zellmer)/.test(txt(n)));
+  assert.equal(faq.length, 3);
+});
+
+test('sidebar: Additional info list, Images + Gallery (preview), Tags heading + Tags', { skip }, () => {
+  const side = importPage('peaq').sections[2];
+  assert.deepEqual(side.content.filter((n) => n.tagName === 'H3').map(txt), ['Additional info', 'Images', 'Tags']);
+  assert.deepEqual(side.blocks, ['Gallery (preview)', 'Tags']);
+  const info = side.content.find((n) => n.tagName === 'UL');
+  assert.deepEqual([...info.querySelectorAll('a')].map((a) => [txt(a), a.getAttribute('href')]), [
+    ['Media contacts', 'https://www.skoda-storyboard.com/en/contacts/'],
+    ['Download Media Box', '#media-box'],
+  ]);
+  const counts = {
+    zellmer: 1, theatre: 3, superb: 4, board: 2, peaq: 3,
+  };
+  Object.entries(counts).forEach(([k, n]) => {
+    assert.equal(rowsOf(find(importPage(k).sections, 'Gallery (preview)')).length, n, k);
+  });
+});
+
+test('tags: chips link to demo tag pages when one exists, else stay on the source', { skip }, () => {
+  const hrefs = [...find(importPage('peaq').sections, 'Tags').querySelectorAll('a')].map((a) => a.getAttribute('href'));
+  assert.ok(hrefs.includes('/en/tag/years/2026'));
+  assert.ok(hrefs.includes('/en/tag/model/peaq'));
+  assert.ok(hrefs.includes('/en/tag/crew/electromobility'));
+});
+
+test('media box: heading + stats, image rows carry Original + 1920px, PDF and video rows', { skip }, () => {
+  const band = importPage('peaq').sections[3];
+  assert.equal(txt(band.content[0]), 'Media Box');
+  assert.equal(txt(band.content[1]), '1 video, 3 images, 1 PDF');
+  const rows = rowsOf(find(importPage('peaq').sections, 'Downloads'));
+  assert.equal(rows.length, 5);
+  const labels = rows.map((r) => [...r.children[2].querySelectorAll('a')].map(txt).join('+'));
+  assert.deepEqual(labels, ['MP4', 'Original+1920px', 'Original+1920px', 'Original+1920px', 'PDF']);
+  rows.forEach((r) => assert.equal(r.children.length, 3, 'three cells per row'));
+  assert.ok(!rows[4].querySelector('img'), 'PDF row has no image');
+  // the Vimeo poster in its ingestible .jpg form (the source src has no extension)
+  assert.match(rows[0].querySelector('img').getAttribute('src'), /^https:\/\/i\.vimeocdn\.com\/video\/.+-d_1280x720\.jpg$/);
+  assert.ok(rows[0].querySelector('img').getAttribute('alt'), 'poster alt from its title');
+  rows.flatMap((r) => [...r.querySelectorAll('a')]).forEach((a) => {
+    assert.match(a.getAttribute('href'), /^https:\/\/www\.skoda-storyboard\.com\/direct-download\//);
+  });
+  const sizes = {
+    zellmer: 2, theatre: 4, superb: 5, board: 3,
+  };
+  Object.entries(sizes).forEach(([k, n]) => assert.equal(rowsOf(find(importPage(k).sections, 'Downloads')).length, n, k));
+});
+
+test('related band: curated Story Rail (press) rows, heading, subheading, All link', { skip }, () => {
+  const band = importPage('peaq').sections[4];
+  assert.equal(txt(band.content[0]), 'Related Press Releases');
+  assert.match(txt(band.content[1]), /^Based on tags:/);
+  assert.equal(txt(band.content[2]), 'All');
+  assert.deepEqual(band.blocks, ['Story Rail (press)']);
+  const rows = rowsOf(find(importPage('peaq').sections, 'Story Rail (press)'));
+  assert.equal(rows.length, 6);
+  rows.forEach((r) => {
+    assert.ok(r.children[0].querySelector('img'));
+    assert.ok(r.children[1].querySelector('p'), 'date');
+    assert.ok(r.children[1].querySelector('h3 a[href]'), 'title link');
+  });
+  const cards = { zellmer: 10, theatre: 5, board: 1 };
+  Object.entries(cards).forEach(([k, n]) => assert.equal(rowsOf(find(importPage(k).sections, 'Story Rail (press)')).length, n, k));
+});
+
+test('no empty href and no leftover source widgets anywhere', { skip }, () => {
+  Object.keys(PAGES).forEach((k) => {
+    const { element } = importPage(k);
+    assert.equal(element.querySelectorAll('a[href=""], a:not([href])').length, 0, k);
+    assert.equal(element.querySelectorAll('iframe, .newsletter-subscribe-widget, .side-banner, .sa-bnr, form').length, 0, k);
+  });
+});
+
+test('metadata: template press_release, publish date and tags survive the rebuild', { skip }, () => {
+  const meta = find([{ nodes: [...importPage('superb').element.children] }], 'Metadata');
+  const rows = Object.fromEntries(rowsOf(meta)
+    .map((r) => [txt(r.children[0]), txt(r.children[1])]));
+  assert.equal(rows.template, 'press_release');
+  assert.equal(rows.publisheddate, '2026-09-11');
+  assert.match(rows.tags, /superb/);
+});

@@ -60,6 +60,9 @@ test('M1 audit excludes the annotated alias, reports missing pages and checks im
       missingFromPage: 0,
       unresolvedDelivery: 0,
       pendingDamOriginal: 0,
+      documents: 0,
+      untrackedDocuments: 0,
+      pendingDamDocument: 0,
     });
 
     assert.deepEqual(report.pages.map(({ path: p }) => p), ['en/story', 'en/other-story']);
@@ -141,6 +144,47 @@ test('M1 audit fails when an image-bearing page loses all its images', async () 
     const report = JSON.parse(readFileSync(output, 'utf8'));
     assert.equal(report.summary.missingFromPage, 1);
     assert.deepEqual(report.pages[0].missingImages, [logicalId(image)]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('M1 audit tracks linked PDFs: untracked, then pending, then in the DAM (SKODA-208)', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-media-audit-'));
+  try {
+    const urls = path.join(dir, 'urls.txt');
+    const manifest = path.join(dir, 'manifest.json');
+    const content = path.join(dir, 'content');
+    const output = path.join(dir, 'audit.json');
+    const pdf = 'https://cdn.example.test/2024/04/TD-Kodiaq-en.pdf';
+    mkdirSync(path.join(content, 'en/skoda-model'), { recursive: true });
+    writeFileSync(urls, 'https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/\n');
+    writeFileSync(path.join(content, 'en/skoda-model/new-kodiaq.plain.html'), `<p><a href="${pdf}">Download PDF</a></p>`);
+    const command = [script, '--urls', urls, '--contentRoot', content, '--manifest', manifest, '--out', output];
+
+    writeFileSync(manifest, JSON.stringify({ rows: {} }));
+    await assert.rejects(exec(process.execPath, command, { cwd: dir }), /Command failed/);
+    let { summary } = JSON.parse(readFileSync(output, 'utf8'));
+    const counts = (keys) => keys.map((k) => summary[k]);
+    assert.deepEqual(counts(['documents', 'untrackedDocuments', 'missingFromPage']), [1, 1, 0]);
+
+    const row = {
+      kind: 'document',
+      logical_id: logicalId(pdf),
+      page_refs: ['en/skoda-model/new-kodiaq'],
+      steps: { deliver: 'n/a', dam: 'n/a' },
+    };
+    writeFileSync(manifest, JSON.stringify({ rows: { [row.logical_id]: row } }));
+    await assert.rejects(exec(process.execPath, command, { cwd: dir }), /Command failed/);
+    ({ summary } = JSON.parse(readFileSync(output, 'utf8')));
+    assert.deepEqual(counts(['untrackedDocuments', 'pendingDamDocument', 'missingFromPage']), [0, 1, 0]);
+
+    row.steps.dam = 'done';
+    row.dam_asset_path = '/content/dam/storyboard/en/skoda-model/new-kodiaq/TD-Kodiaq-en.pdf';
+    writeFileSync(manifest, JSON.stringify({ rows: { [row.logical_id]: row } }));
+    await exec(process.execPath, command, { cwd: dir });
+    ({ summary } = JSON.parse(readFileSync(output, 'utf8')));
+    assert.equal(summary.pendingDamDocument, 0);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

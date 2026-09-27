@@ -59,6 +59,8 @@ export default function transform(hookName, element, payload) {
       // .social-share/.media-cart-flyout/.share-bar names do not exist here but
       // are kept as harmless defensive no-ops for reuse on sibling model pages.
       '.scroll-top',
+      // SiteOrigin spacer widget (Peaq/Epiq: an empty padding div before the description)
+      '.so-panel.widget_skoda-offset',
       '.social-share',
       '.media-cart-flyout',
       '.share-bar',

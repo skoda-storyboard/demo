@@ -13,8 +13,8 @@
     },
     "press-releases": {
       "label": "Press releases",
-      "gate": "W1 (610 PR #138, 506, 508) · W4 re-push after SKODA-607",
-      "note": "The 5 set PRs are live; the 11 corpus PRs can go in W1. Quote contract (220) applies."
+      "gate": "W1 (610 PR #138, 506, 508) · W4: SKODA-607 phase 1 live 2026-09-27 (PR #170); final QA after 223/224/510",
+      "note": "SKODA-607 phase 1 (2026-09-27): the 5 set PRs + Octavia re-imported with the press-release layout (own template `templates/press-release/`), pushed and published (PR #170). Pending variants with readable fallbacks: Gallery (preview) → 223, Story Rail (press) → 224, Downloads file rows → 510 (PDF shown via the template fallback). Media Room chrome → 309. The 9 remaining corpus PRs can re-import with the new importer (803). Quote contract (220) applies."
     },
     "press-kits": {
       "label": "Press kits",
@@ -24,7 +24,7 @@
     "models": {
       "label": "Model pages",
       "gate": "W2c: SKODA-208",
-      "note": "The current output fails the block check: `hero` (only the empty boilerplate stub on main) and `Spec Table` (resolve → Columns + dark section, 208 amendment). `subheading` is a pending story-rail key (208), which holds publish."
+      "note": "208 importer slice (2026-09-26): all 22 EN model pages (11 models + 11 derivatives) imported, published and indexed with main blocks only (Hero Image (overlay), Cards (key-facts), Columns, Story Rail; the section nav is a link list). `cards-key-facts` renders as plain cards until the 208 UI half. Tag rails fill as 603/608 content lands."
     },
     "series": {
       "label": "Series hubs",
@@ -33,8 +33,8 @@
     },
     "stories": {
       "label": "Stories",
-      "gate": "W2a: SKODA-801a (W1: re-import the 3 stale stories)",
-      "note": "Local output from before 816 still emits `hero`; re-import with the current story importer (Hero Image)."
+      "gate": "W2a: SKODA-801a",
+      "note": "W2a (2026-09-26): 31 of 34 open stories imported with the current story importer and published (media delivery-only: DAM originals pending a DAM token). 3 held: quiz and gaming-consoles (importer leaks, preview only) and one dead source URL (404). With the 18 re-imported for 816, 49 stories are live. Local `content/` still holds stale pre-816 output; the published versions come from the W2a scratch run."
     },
     "images": {
       "label": "Image items (corpus)",
@@ -48,14 +48,42 @@
     }
   },
   "pages": {
-    "/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries": {
-      "note": "stale import (pre-816/817/820): re-import in W1"
+    "/en/emobility/even-opening-the-door-is-an-experience-says-the-designer-of-the-peaq-suv": {
+      "note": "816 hero live; images still source renditions: 2 oversize masters (50/40 MB) have no delivery rendition (SKODA-506), so media:apply is held"
     },
-    "/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging": {
-      "note": "stale import (pre-816/817/820): re-import in W1"
+    "/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details": {
+      "qa": "fail",
+      "note": "held by stakeholder decision (2026-09-26): the quiz is graded server-side and has no answer key in the page; an interactive quiz needs the key from the client. Preview only."
     },
-    "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too": {
-      "note": "stale import (pre-816/817/820): re-import in W1"
+    "/en/skoda-world/the-skoda-elroq-reveals-its-sustainable-interior": {
+      "note": "source URL returns 404 (checked 2026-09-26); the importer gets the 404 page. Drop it from skoda-rail-feed-corpus.txt or find the moved URL"
+    },
+    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds": {
+      "note": "816 hero swapped into the DA doc; DA keeps Gallery (slider) ×3 + Cards (overlay) edits until the importer emits them (SKODA-819)"
+    },
+    "/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company": {
+      "qa": "pending",
+      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+    },
+    "/en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029": {
+      "qa": "pending",
+      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+    },
+    "/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence": {
+      "qa": "pending",
+      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+    },
+    "/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management": {
+      "qa": "pending",
+      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+    },
+    "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs": {
+      "qa": "pending",
+      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+    },
+    "/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon": {
+      "qa": "pending",
+      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
     }
   }
 }
