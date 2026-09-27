@@ -2,6 +2,7 @@
 - **Epic:** E05, Media Pipeline
 - **Type:** integration / backend job
 - **Phase:** B · **Milestone:** M2 (go-live)
+- **GitHub issue:** [#178](https://github.com/skoda-storyboard/demo/issues/178) (sub-issue of #117)
 - **Estimate:** 4 SP · AI-assisted 1.5–2.5d / manual 3–5d *(planning estimate, not a quote)*
 - **Status (2026-09-27):** 🔵 TODO
 

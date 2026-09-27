@@ -2,6 +2,7 @@
 - **Epic:** E05, Media Pipeline
 - **Type:** taxonomy / migration
 - **Phase:** B · **Milestone:** M2 (go-live)
+- **GitHub issue:** [#179](https://github.com/skoda-storyboard/demo/issues/179) (sub-issue of #117)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1.5–2d *(planning estimate, not a quote)*
 - **Status (2026-09-27):** 🔵 TODO
 
