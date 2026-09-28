@@ -12,7 +12,7 @@ Social media and Series bands, and the Media Room Models band. Source:
 `styles/styles.css`; this ticket completes their use and visual parity.
 
 ## Summary
-Use EDS **Section Metadata** (`Style: cover-box dark`) for full-width dark-green
+Use EDS **Section Metadata** (`Style: cover-box, dark`: two classes, `cover-box` + `dark`) for dark-green
 content bands instead of a Series-specific carousel style or a new block.
 Ensure the authored/imported homepage marks the Social media and Series sections
 as dark, and that their headings, links, cards, and controls are legible.
@@ -23,7 +23,8 @@ as dark, and that their headings, links, cards, and controls are legible.
   foreground. Use the existing `.section.dark` and `--dark-color` (`#0e3a2f`)
   primitive, extending section-level styles only where parity is missing. Do not
   put page-specific rules on all carousels/cards.
-- The dark background spans the viewport; the inner content remains capped at
+- The dark background spans the viewport **up to 1440px, then is capped and centred** (live: x240 w1440 at 1920,
+  x1000 at 3440; every home section is capped the same way); the inner content remains capped at
   1248px. Match the home spec's section spacing (12px vertical at the source),
   headings (26px / 32.5px / weight 600), and readable white foreground/links.
   Light sections remain white. Ensure no selector leakage to other page sections;
@@ -35,7 +36,7 @@ as dark, and that their headings, links, cards, and controls are legible.
   fluid and intrinsic layout first, and no new breakpoint without a behavior change.
 
 ## Acceptance Criteria
-- [ ] Section Metadata `Style: cover-box dark` produces a full-width green band
+- [ ] Section Metadata `Style: cover-box, dark` produces a green band (full width up to 1440px, centred above)
       with a 1248px-capped inner region at 1280/768/500px; no new block is required.
 - [ ] Storyboard `/en/` has dark Social media and Series bands in the correct
       positions; their headings/links/rail controls and social cards remain readable
@@ -54,6 +55,18 @@ as dark, and that their headings, links, cards, and controls are legible.
   (dark + grey variants) inside the story body column. Both share the colour tokens.
 - Not a defect: the Epiq Related band's 1248px box is fine, because its `::before` paints the green full-bleed to
   1440 (verified live).
+
+## Follow-ups from the SKODA-217 review ([PR #188](https://github.com/skoda-storyboard/demo/pull/188), 2026-09-28)
+- **Style name.** `Style: cover-box, dark` (comma) for every home dark band. Written without the comma, EDS makes one
+  class, `cover-box-dark`, which nothing styles. The 217 Social media band emits `cover-box, dark` since `4446cd9`.
+- **Shared rules, not per-band CSS.** 217 styles its own section (`:has(.cards.social)` in `styles/styles.css`).
+  Move to the shared dark / home-band rules here:
+  - the heading colour (h1–h6 in a dark band = white; the amendment above);
+  - the home section heading (centred 26/32.5/600, 20px gap to the content; template-home §7);
+  - the 1440px cap and the band spacing (the social band's own 64/80 inner spacing stays a social value).
+  Keep only social-specific values with the Cards (social) variant.
+- **Every home section is capped at 1440px on live, light ones too** (e.g. "Models" at x240 w1440 at 1920). Ours
+  are full width. Cap them with the same shared rule (or record the light sections on SKODA-611b).
 
 ## Dependencies
 - Upstream: SKODA-106 (tokens/section CSS).

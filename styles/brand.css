@@ -93,6 +93,11 @@
   --carousel-dot: #d8d8d8;           /* page dot (dots variant only) */
   --carousel-dot-active: #686868;    /* selected page dot */
 
+  /* homepage social profile cards (SKODA-217; live .socials-static overlay):
+     a 60% black tile under the dual scrim, so the white icon + handle read on
+     the section's dark band (Style: cover-box, dark) or on a light section alike */
+  --social-card-tile: rgb(0 0 0 / 60%);
+
   /* gallery slider (SKODA-819; measured on the live Epiq story .carousel-widget):
      selected dot #333, idle dots the same at 25% alpha; the arrow is a 90%
      white disc over an ink disc, with the ink arrow showing through. */
