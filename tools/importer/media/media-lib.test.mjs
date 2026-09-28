@@ -727,6 +727,154 @@ test('file-backed PUT retries when its deadline expires and never completes on f
   }
 });
 
+test('author folder lookup and create have hard deadlines even if fetch ignores abort', async () => {
+  const damConfig = { baseUrl: 'http://dam', folder: '/content/dam/storyboard' };
+  await assert.rejects(ensureDamFolder({
+    damConfig,
+    folderPath: '/content/dam/storyboard/en',
+    token: 'mock',
+    requestTimeoutMs: 10,
+    fetchImpl: async () => new Promise(() => {}),
+  }), /DAM folder lookup timed out/);
+
+  let creates = 0;
+  await assert.rejects(ensureDamFolder({
+    damConfig,
+    folderPath: '/content/dam/storyboard/en',
+    token: 'mock',
+    requestTimeoutMs: 10,
+    fetchImpl: async (url, options = {}) => {
+      if (!options.method) return { ok: false, status: 404 };
+      creates += 1;
+      return new Promise(() => {});
+    },
+  }), /DAM folder create storyboard\/en timed out/);
+  assert.equal(creates, 2, 'folder creation may be retried because 409 is idempotent');
+});
+
+test('author initiate retries a stalled JSON body, then fails before uploading any part', async () => {
+  let initiates = 0;
+  let puts = 0;
+  const result = await uploadToDAM({
+    damConfig: { baseUrl: 'http://dam', folder: '/content/dam/storyboard' },
+    damPath: '/content/dam/storyboard/clip.mp4',
+    buffer: Buffer.from('ftyp'),
+    token: 'mock',
+    requestTimeoutMs: 10,
+    fetchImpl: async (url, options = {}) => {
+      if (url.endsWith('.initiateUpload.json')) {
+        initiates += 1;
+        return { ok: true, status: 200, json: async () => new Promise(() => {}) };
+      }
+      if (options.method === 'PUT') puts += 1;
+      return { ok: true, status: 200 };
+    },
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.uncertain, false);
+  assert.match(result.body, /initiate.*timed out/);
+  assert.equal(initiates, 3);
+  assert.equal(puts, 0);
+});
+
+test('author initiate retries an eventual-consistency 404 before any part is sent', async () => {
+  let initiates = 0;
+  let puts = 0;
+  const result = await uploadToDAM({
+    damConfig: { baseUrl: 'http://dam', folder: '/content/dam/storyboard' },
+    damPath: '/content/dam/storyboard/clip.mp4',
+    buffer: Buffer.from('ftyp'),
+    token: 'mock',
+    fetchImpl: async (url, options = {}) => {
+      if (url.endsWith('.initiateUpload.json')) {
+        initiates += 1;
+        if (initiates === 1) return { ok: false, status: 404 };
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            completeURI: '/completeUpload.json',
+            files: [{ uploadToken: 'mock', uploadURIs: ['http://blob/part'] }],
+          }),
+        };
+      }
+      if (options.method === 'PUT') puts += 1;
+      return { ok: true, status: 200, text: async () => '' };
+    },
+  });
+  assert.equal(result.ok, true);
+  assert.equal(initiates, 2);
+  assert.equal(puts, 1);
+});
+
+test('author complete timeout is uncertain and is never automatically retried', async () => {
+  const stages = [];
+  let completes = 0;
+  const result = await uploadToDAM({
+    damConfig: { baseUrl: 'http://dam', folder: '/content/dam/storyboard' },
+    damPath: '/content/dam/storyboard/clip.mp4',
+    buffer: Buffer.from('ftyp'),
+    token: 'mock',
+    requestTimeoutMs: 10,
+    onStage: (stage) => stages.push(stage),
+    fetchImpl: async (url, options = {}) => {
+      if (url.endsWith('.initiateUpload.json')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            completeURI: '/completeUpload.json',
+            files: [{ uploadToken: 'private', uploadURIs: ['http://blob/part'] }],
+          }),
+        };
+      }
+      if (url.endsWith('/completeUpload.json')) {
+        completes += 1;
+        return new Promise(() => {});
+      }
+      if (options.method === 'PUT') return { ok: true, status: 201 };
+      return { ok: true, status: 200 };
+    },
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.uncertain, true);
+  assert.match(result.body, /complete.*timed out/);
+  assert.doesNotMatch(result.body, /private|blob/);
+  assert.equal(completes, 1);
+  assert.deepEqual(stages, ['folder', 'initiate', 'part 1/1', 'complete']);
+});
+
+test('author complete HTTP failure is uncertain and does not retry or publish a duplicate', async () => {
+  let completes = 0;
+  const result = await uploadToDAM({
+    damConfig: { baseUrl: 'http://dam', folder: '/content/dam/storyboard' },
+    damPath: '/content/dam/storyboard/clip.mp4',
+    buffer: Buffer.from('ftyp'),
+    token: 'mock',
+    fetchImpl: async (url) => {
+      if (url.endsWith('.initiateUpload.json')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            completeURI: '/completeUpload.json',
+            files: [{ uploadToken: 'mock', uploadURIs: ['http://blob/part'] }],
+          }),
+        };
+      }
+      if (url.endsWith('/completeUpload.json')) {
+        completes += 1;
+        return { ok: false, status: 503 };
+      }
+      return { ok: true, status: 201 };
+    },
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.uncertain, true);
+  assert.equal(result.status, 503);
+  assert.equal(completes, 1);
+});
+
 // ---- ensureDamFolder (page-mirrored folder auto-create) --------------------
 const damCfg = { baseUrl: 'http://dam', folder: '/content/dam/storyboard' };
 const okRes = (status = 201, body = '{}') => ({ ok: status < 400, status, text: async () => body });

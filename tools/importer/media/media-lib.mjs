@@ -555,6 +555,57 @@ export function splitBuffer(buffer, uploadURIs, maxPartSize, minPartSize) {
     .map(({ start, end }) => buffer.subarray(start, end + 1));
 }
 
+async function withAuthorDeadline(label, timeoutMs, action) {
+  const controller = new AbortController();
+  let timer;
+  const deadline = new Promise((resolve, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new Error(`${label} timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+  });
+  try {
+    return await Promise.race([action(controller.signal), deadline]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function authorRequest(url, options, {
+  fetchImpl, timeoutMs, label, retries = 0, retry404 = false, json = false,
+}) {
+  const request = fetchImpl === fetchWithRetry ? fetch : fetchImpl;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const result = await withAuthorDeadline(label, timeoutMs, async (signal) => {
+        const response = await request(url, { ...options, signal });
+        return { response, data: json && response.ok ? await response.json() : null };
+      });
+      const { status } = result.response;
+      if (!json || !result.response.ok) {
+        const cancel = result.response.body?.cancel?.();
+        if (cancel) cancel.catch(() => {});
+      }
+      if (attempt < retries
+        && (status === 429 || status >= 500 || (retry404 && status === 404))) {
+        // eslint-disable-next-line no-await-in-loop
+        await sleep(500 * 2 ** attempt);
+      } else {
+        return result;
+      }
+    } catch (err) {
+      if (attempt === retries) {
+        throw new Error(err.message.startsWith(`${label} timed out`)
+          ? err.message : `${label} failed (${err.name || 'network'})`);
+      }
+      // eslint-disable-next-line no-await-in-loop
+      await sleep(500 * 2 ** attempt);
+    }
+  }
+  throw new Error(`${label} failed`);
+}
+
 /**
  * Ensure the page-mirrored DAM folder chain for an asset exists before upload.
  * `initiateUpload` 404s when the target folder node is absent and the Assets HTTP
@@ -566,7 +617,7 @@ export function splitBuffer(buffer, uploadURIs, maxPartSize, minPartSize) {
  * Returns { ok, status, body }.
  */
 export async function ensureDamFolder({
-  damConfig, folderPath, token, fetchImpl = fetchWithRetry,
+  damConfig, folderPath, token, fetchImpl = fetchWithRetry, requestTimeoutMs = 60000,
 }) {
   if (!damConfig || !damConfig.baseUrl || !token) {
     return { ok: false, status: 0, body: 'DAM not configured' };
@@ -579,10 +630,15 @@ export async function ensureDamFolder({
   }
   const auth = { authorization: `Bearer ${token}` };
   // Fast path: leaf already exists → all ancestors do too.
-  const leaf = await fetchImpl(`${base}${folderPath}.json`, {
-    headers: auth, signal: AbortSignal.timeout(60000),
+  const { response: leaf } = await authorRequest(`${base}${folderPath}.json`, {
+    headers: auth,
+  }, {
+    fetchImpl, timeoutMs: requestTimeoutMs, label: 'DAM folder lookup', retries: 1,
   });
   if (leaf.ok) return { ok: true, status: leaf.status, body: '' };
+  if (leaf.status !== 404) {
+    return { ok: false, status: leaf.status, body: `DAM folder lookup ${leaf.status}` };
+  }
 
   const tail = folderPath.slice(root.length + 1).split('/').filter(Boolean);
   let acc = root;
@@ -590,17 +646,20 @@ export async function ensureDamFolder({
     acc = `${acc}/${seg}`;
     const apiPath = acc.replace(/^\/content\/dam\//, ''); // e.g. storyboard/en/skoda-model
     // eslint-disable-next-line no-await-in-loop
-    const res = await fetchImpl(`${base}/api/assets/${apiPath}`, {
+    const { response: res } = await authorRequest(`${base}/api/assets/${apiPath}`, {
       method: 'POST',
       headers: { ...auth, 'content-type': 'application/json' },
       body: JSON.stringify({ class: 'assetFolder', properties: { 'jcr:title': seg } }),
-      signal: AbortSignal.timeout(60000),
+    }, {
+      fetchImpl,
+      timeoutMs: requestTimeoutMs,
+      label: `DAM folder create ${apiPath}`,
+      retries: 1,
+      retry404: true,
     });
     // 200/201 created; 409 already exists (idempotent / concurrent create) — all OK.
     if (!res.ok && res.status !== 409) {
-      // eslint-disable-next-line no-await-in-loop
-      const body = await res.text().catch(() => '');
-      return { ok: false, status: res.status, body: `mkdir ${apiPath} ${res.status}: ${body.slice(0, 120)}` };
+      return { ok: false, status: res.status, body: `mkdir ${apiPath} ${res.status}` };
     }
   }
   return { ok: true, status: 200, body: '' };
@@ -614,6 +673,7 @@ export async function ensureDamFolder({
 export async function uploadToDAM({
   damConfig, damPath, buffer, filePath, contentType, token, fetchImpl = fetchWithRetry,
   partTimeoutMs = 3600000, partIdleTimeoutMs = 120000, requestTimeoutMs = 60000, partRetries = 2,
+  onStage,
 }) {
   if (!damConfig || !damConfig.baseUrl) {
     return {
@@ -630,6 +690,7 @@ export async function uploadToDAM({
   const fileName = damPath.slice(damPath.lastIndexOf('/') + 1);
   const auth = { authorization: `Bearer ${token}` };
 
+  let stage = 'folder';
   try {
     if ((buffer === undefined) === (filePath === undefined)) {
       throw new Error('Provide exactly one of buffer or filePath');
@@ -637,8 +698,9 @@ export async function uploadToDAM({
     const size = filePath ? (await stat(filePath)).size : buffer.length;
     if (!Number.isSafeInteger(size) || size < 1) throw new Error('Original has invalid size');
     // 0) ensure the page-mirrored folder chain exists (initiateUpload 404s otherwise).
+    onStage?.(stage);
     const mk = await ensureDamFolder({
-      damConfig, folderPath: folder, token, fetchImpl,
+      damConfig, folderPath: folder, token, fetchImpl, requestTimeoutMs,
     });
     if (!mk.ok) {
       return {
@@ -649,19 +711,25 @@ export async function uploadToDAM({
     const initForm = new URLSearchParams();
     initForm.set('fileName', fileName);
     initForm.set('fileSize', String(size));
-    const initRes = await fetchImpl(`${base}${folder}.initiateUpload.json`, {
+    stage = 'initiate';
+    onStage?.(stage);
+    const { response: initRes, data: init } = await authorRequest(`${base}${folder}.initiateUpload.json`, {
       method: 'POST',
       headers: { ...auth, 'content-type': 'application/x-www-form-urlencoded' },
       body: initForm.toString(),
-      signal: AbortSignal.timeout(requestTimeoutMs),
+    }, {
+      fetchImpl,
+      timeoutMs: requestTimeoutMs,
+      label: 'DAM initiate',
+      retries: 2,
+      retry404: true,
+      json: true,
     });
     if (!initRes.ok) {
-      const body = await initRes.text().catch(() => '');
       return {
-        ok: false, status: initRes.status, assetPath: damPath, body: `initiate ${initRes.status}: ${body.slice(0, 160)}`,
+        ok: false, status: initRes.status, assetPath: damPath, body: `initiate ${initRes.status}`,
       };
     }
-    const init = await initRes.json();
     const file = (init.files && init.files[0]) || {};
     const uploadURIs = file.uploadURIs || [];
     const completeURI = init.completeURI || `${folder}.completeUpload.json`;
@@ -676,6 +744,8 @@ export async function uploadToDAM({
       ? partRanges(size, uploadURIs, file.minPartSize, file.maxPartSize)
       : splitBuffer(buffer, uploadURIs, file.maxPartSize, file.minPartSize);
     for (let i = 0; i < ranges.length; i += 1) {
+      stage = `part ${i + 1}/${ranges.length}`;
+      onStage?.(stage);
       let putRes;
       let failure = '';
       for (let attempt = 0; attempt <= (filePath ? partRetries : 0); attempt += 1) {
@@ -741,21 +811,55 @@ export async function uploadToDAM({
     compForm.set('mimeType', contentType || 'application/octet-stream');
     compForm.set('uploadToken', file.uploadToken || '');
     const compUrl = completeURI.startsWith('http') ? completeURI : `${base}${completeURI}`;
-    const compRes = await fetchImpl(compUrl, {
+    stage = 'complete';
+    onStage?.(stage);
+    const { response: compRes } = await authorRequest(compUrl, {
       method: 'POST',
       headers: { ...auth, 'content-type': 'application/x-www-form-urlencoded' },
       body: compForm.toString(),
-      signal: AbortSignal.timeout(requestTimeoutMs),
+    }, {
+      fetchImpl, timeoutMs: requestTimeoutMs, label: 'DAM complete',
     });
-    const body = await compRes.text().catch(() => '');
     return {
-      ok: compRes.ok, status: compRes.status, assetPath: damPath, body: body.slice(0, 160),
+      ok: compRes.ok,
+      status: compRes.status,
+      assetPath: damPath,
+      body: compRes.ok ? '' : `complete ${compRes.status}; outcome requires confirmation`,
+      uncertain: !compRes.ok,
     };
   } catch (err) {
     return {
-      ok: false, status: 0, assetPath: damPath, body: String(err.message || err),
+      ok: false,
+      status: 0,
+      assetPath: damPath,
+      body: `${stage}: ${String(err.message || err)}`,
+      uncertain: stage === 'complete',
     };
   }
+}
+
+/** Confirm an uncertain completion from authenticated author metadata without uploading again. */
+export async function verifyDamOriginal({
+  damConfig, damPath, token, bytes, contentType, fetchImpl = fetchWithRetry,
+  requestTimeoutMs = 60000,
+}) {
+  if (!damConfig?.baseUrl || !token || !Number.isSafeInteger(bytes) || bytes < 1) {
+    throw new Error('Cannot verify DAM original without its expected size and authorization');
+  }
+  const { response } = await authorRequest(`${damConfig.baseUrl.replace(/\/$/, '')}${damPath}`, {
+    method: 'HEAD',
+    headers: new Headers({ Authorization: ['Bearer', token].join(' ') }),
+    redirect: 'error',
+  }, {
+    fetchImpl, timeoutMs: requestTimeoutMs, label: 'DAM original HEAD', retries: 1,
+  });
+  const mime = (response.headers?.get('content-type') || '').split(';')[0].trim().toLowerCase();
+  const length = Number(response.headers?.get('content-length'));
+  return {
+    ok: response.ok && mime === contentType && length === bytes,
+    status: response.status,
+    body: `author HEAD ${response.status}, ${mime || 'no MIME'}, ${length} bytes; expected ${contentType}, ${bytes}`,
+  };
 }
 
 /** Activate a single original on the AEM publish tier after its DAM upload. */

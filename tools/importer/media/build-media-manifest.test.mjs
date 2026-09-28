@@ -19,7 +19,10 @@ async function mockDam() {
   const uploads = [];
   const activations = [];
   let originalAvailable = true;
+  let originalHeadStatus = 404;
+  let originalHeadBytes = 12;
   let activationStatus = 200;
+  let completeStatus = 200;
   const server = createServer((req, res) => {
     const chunks = [];
     req.on('data', (chunk) => chunks.push(chunk));
@@ -51,6 +54,11 @@ async function mockDam() {
       } else if (req.url === '/invalid.mp4') {
         res.writeHead(200, { 'content-type': 'video/mp4', 'content-length': '11' });
         res.end(req.method === 'HEAD' ? undefined : 'not-a-video');
+      } else if (req.method === 'HEAD' && req.url.startsWith('/content/dam/')
+        && req.url.endsWith('.mp4')) {
+        res.writeHead(originalHeadStatus, originalHeadStatus === 200
+          ? { 'content-type': 'video/mp4', 'content-length': String(originalHeadBytes) } : {});
+        res.end();
       } else if (req.url === '/bin/replicate.json' && req.method === 'POST') {
         const form = new URLSearchParams(Buffer.concat(chunks).toString());
         if (req.headers.authorization !== 'Bearer mock' || form.get('cmd') !== 'Activate') {
@@ -71,7 +79,9 @@ async function mockDam() {
       } else if (req.url === '/blob') {
         uploads.push(Buffer.concat(chunks).toString());
         res.writeHead(201); res.end();
-      } else if (req.url === '/completeUpload.json' || req.url.startsWith('/api/assets/')) {
+      } else if (req.url === '/completeUpload.json') {
+        res.writeHead(completeStatus); res.end('{}');
+      } else if (req.url.startsWith('/api/assets/')) {
         res.writeHead(200); res.end('{}');
       } else {
         res.writeHead(404); res.end();
@@ -85,6 +95,9 @@ async function mockDam() {
     activations,
     setActivationStatus(value) { activationStatus = value; },
     setOriginalAvailable(value) { originalAvailable = value; },
+    setOriginalHeadStatus(value) { originalHeadStatus = value; },
+    setOriginalHeadBytes(value) { originalHeadBytes = value; },
+    setCompleteStatus(value) { completeStatus = value; },
     async close() { await new Promise((resolve) => { server.close(resolve); }); },
   };
 }
@@ -573,6 +586,139 @@ test('legacy DAM-only PDF resumes activation without downloading or uploading ag
     assert.equal(row.public_url, publicUrl);
     assert.deepEqual(dam.uploads, []);
     assert.deepEqual(dam.activations, [damPath]);
+  } finally {
+    global.fetch = previousFetch;
+    process.exitCode = previousExitCode;
+    if (previousToken === undefined) delete process.env.AEM_DAM_TOKEN;
+    else process.env.AEM_DAM_TOKEN = previousToken;
+    await dam.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('uncertain completion waits for matching author original before publish, never re-uploads', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-binary-uncertain-'));
+  const dam = await mockDam();
+  const previousFetch = global.fetch;
+  const previousExitCode = process.exitCode;
+  const previousToken = process.env.AEM_DAM_TOKEN;
+  try {
+    const source = `${dam.base}/unavailable.mp4`;
+    const id = logicalId(source);
+    const damPath = '/content/dam/storyboard/en/story/unavailable.mp4';
+    const publicUrl = `https://assets.example.test${damPath}`;
+    const manifest = path.join(dir, 'manifest.json');
+    const urls = path.join(dir, 'public-urls.json');
+    const ids = path.join(dir, 'approved.txt');
+    writeFileSync(manifest, JSON.stringify({
+      rows: {
+        [id]: {
+          logical_id: id,
+          kind: 'video',
+          source_url: source,
+          master_url: source,
+          dam_page_path: 'en/story',
+          dam_original_url: source,
+          bytes: 12,
+          status: 'partial',
+          steps: { dam: 'uncertain', publish: 'pending' },
+        },
+      },
+    }));
+    writeFileSync(urls, JSON.stringify({ [damPath]: publicUrl }));
+    writeFileSync(ids, `${id}\n`);
+    process.env.AEM_DAM_TOKEN = 'mock';
+    global.fetch = (url, options) => (String(url) === publicUrl
+      ? Promise.resolve(new Response(null, {
+        status: 200,
+        headers: { 'content-type': 'video/mp4', 'content-length': '12' },
+      }))
+      : previousFetch(url, options));
+    const args = ['--from-manifest', '--ids-file', ids, '--manifest', manifest,
+      '--dam-base', dam.base, '--public-urls', urls];
+    await build(args);
+    let row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(row.steps.dam, 'uncertain');
+    assert.equal(row.status, 'partial');
+    assert.match(row.note, /author HEAD 404.*no re-upload/);
+    assert.deepEqual(dam.uploads, []);
+    assert.deepEqual(dam.activations, []);
+
+    dam.setOriginalHeadStatus(200);
+    dam.setOriginalHeadBytes(11);
+    process.exitCode = 0;
+    await build(args);
+    row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(row.steps.dam, 'uncertain');
+    assert.match(row.note, /11 bytes; expected video\/mp4, 12/);
+    assert.deepEqual(dam.uploads, []);
+    assert.deepEqual(dam.activations, []);
+
+    dam.setOriginalHeadBytes(12);
+    process.exitCode = 0;
+    await build(args);
+    row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(row.status, 'done');
+    assert.equal(row.steps.dam, 'done');
+    assert.equal(row.dam_asset_path, damPath);
+    assert.deepEqual(dam.uploads, []);
+    assert.deepEqual(dam.activations, [damPath]);
+  } finally {
+    global.fetch = previousFetch;
+    process.exitCode = previousExitCode;
+    if (previousToken === undefined) delete process.env.AEM_DAM_TOKEN;
+    else process.env.AEM_DAM_TOKEN = previousToken;
+    await dam.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('failed complete marks manifest uncertain before any subsequent automatic retry', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-binary-complete-'));
+  const dam = await mockDam();
+  const previousFetch = global.fetch;
+  const previousExitCode = process.exitCode;
+  const previousToken = process.env.AEM_DAM_TOKEN;
+  try {
+    const source = `${dam.base}/clip.mp4`;
+    const id = logicalId(source);
+    const assetPath = '/content/dam/storyboard/en/story/clip.mp4';
+    const publicUrl = `https://assets.example.test${assetPath}`;
+    const manifest = path.join(dir, 'manifest.json');
+    const urls = path.join(dir, 'public-urls.json');
+    const page = path.join(dir, 'content', 'en', 'story.plain.html');
+    mkdirSync(path.dirname(page), { recursive: true });
+    writeFileSync(page, `<a href="${source}">Video</a>`);
+    writeFileSync(urls, JSON.stringify({ [assetPath]: publicUrl }));
+    process.env.AEM_DAM_TOKEN = 'mock';
+    global.fetch = (url, options) => (String(url) === publicUrl
+      ? Promise.resolve(new Response(null, {
+        status: 200,
+        headers: { 'content-type': 'video/mp4', 'content-length': '12' },
+      }))
+      : previousFetch(url, options));
+    dam.setCompleteStatus(503);
+    const args = ['--pages', page, '--manifest', manifest, '--dam-base', dam.base, '--public-urls', urls];
+    await build(args);
+    let row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(row.steps.dam, 'uncertain');
+    assert.equal(row.status, 'partial');
+    assert.equal(dam.uploads.length, 1);
+    assert.deepEqual(dam.activations, []);
+
+    process.exitCode = 0;
+    await build(args);
+    row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(row.steps.dam, 'uncertain');
+    assert.equal(dam.uploads.length, 1, 'author 404 cannot trigger another source download or upload');
+
+    dam.setOriginalHeadStatus(200);
+    process.exitCode = 0;
+    await build(args);
+    row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(row.status, 'done');
+    assert.equal(dam.uploads.length, 1);
+    assert.deepEqual(dam.activations, [assetPath]);
   } finally {
     global.fetch = previousFetch;
     process.exitCode = previousExitCode;

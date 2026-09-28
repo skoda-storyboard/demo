@@ -115,7 +115,12 @@ Buffer, subject to available disk space and DAM part limits. AEM may offer more
 upload URLs than needed: use the first `ceil(bytes / maxPartSize)` in order,
 with a shorter final part; reject an offer with too few URLs. A signed MP4 route
 may reject HEAD but accept a one-byte ranged GET; the dry-run preflight handles
-that. Failures remain `partial` in the manifest and block rewriting. The standalone
+that. Author folder/initiate calls have bounded deadlines and retries; the
+completion POST is never automatically retried. Its pending state is saved
+before the request. An uncertain completion remains `partial`: a rerun checks
+the authenticated author original's exact MIME and byte count, and does not
+download or re-upload while the author asset is absent or mismatched.
+Failures block rewriting. The standalone
 `media:validate-binaries` check is **offline** and emits per-page JSON results
 with a nonzero exit for missing, unrehosted or misclassified links. `import:push`
 rewrites verified source PDF/MP4 anchors from the manifest in memory before

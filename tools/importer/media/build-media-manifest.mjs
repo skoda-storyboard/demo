@@ -41,7 +41,7 @@ import {
   isImageUrl, cleanUrl, masterUrl, logicalId, daPathFor, damPathFor,
   pagePathFromFile, isAspectCrop,
   pickIngestUrl, headBytes, fetchBinary, fetchBinaryToFile,
-  uploadToDA, uploadToDAM, publishDamBinary,
+  uploadToDA, uploadToDAM, verifyDamOriginal, publishDamBinary,
   setDamMetadata, resolveDamToken,
   needsMediaBuild, stepDownTooSmall, renditionEdge, OVERSIZE_BYTES, MIN_RENDITION_EDGE,
 } from './media-lib.mjs';
@@ -333,8 +333,10 @@ export default async function main(args = process.argv.slice(2)) {
     }) : '';
     const publicUrl = damConfig ? destination(id) : prior?.public_url || '';
     const storedInDam = prior?.steps?.dam === 'done' && (!cfg.force || !damConfig);
+    const pendingConfirmation = prior?.steps?.dam === 'uncertain';
     let damStep = prior?.steps?.dam || 'n/a';
-    if (damConfig) damStep = storedInDam ? 'done' : 'pending';
+    if (damConfig) damStep = pendingConfirmation ? 'uncertain' : 'pending';
+    if (storedInDam) damStep = 'done';
     const publishStep = damConfig && !storedInDam ? 'pending' : prior?.steps?.publish || 'pending';
     const row = {
       ...prior,
@@ -345,7 +347,7 @@ export default async function main(args = process.argv.slice(2)) {
       dam_page_path: pagePath,
       page_refs: [...new Set([...(prior?.page_refs || []), ...info.pageRefs])],
       dam_asset_path: storedInDam ? prior.dam_asset_path : '',
-      dam_original_url: storedInDam ? prior.dam_original_url : '',
+      dam_original_url: storedInDam || pendingConfirmation ? prior.dam_original_url : '',
       original_download_url: '',
       delivery_url: '',
       public_url: storedInDam ? prior?.public_url || '' : '',
@@ -365,14 +367,16 @@ export default async function main(args = process.argv.slice(2)) {
 
     if (cfg.dryRun) {
       try {
-        const bytes = damConfig && damStep !== 'done' ? await probeBinaryBytes(row.master_url) : null;
-        const unavailable = damConfig && damStep !== 'done' && !(Number.isFinite(bytes) && bytes > 0);
+        const bytes = damConfig && damStep !== 'done' && !pendingConfirmation
+          ? await probeBinaryBytes(row.master_url) : null;
+        const unavailable = damConfig && damStep !== 'done' && !pendingConfirmation
+          && !(Number.isFinite(bytes) && bytes > 0);
         const activationPending = damConfig && damStep === 'done' && publishStep !== 'done';
         if (damConfig && damStep === 'done' && publishStep === 'done') {
           await verifyPublicBinary(publicUrl, info.kind, row.bytes);
         }
-        if (unavailable || !damConfig) counts.failed += 1;
-        console.log(`  · ${id}  ${info.kind}${unavailable ? ' [original unavailable]' : ''}${activationPending ? ' [activation pending]' : ''} → DAM ${damAssetPath || '(not configured)'}`);
+        if (unavailable || !damConfig || pendingConfirmation) counts.failed += 1;
+        console.log(`  · ${id}  ${info.kind}${unavailable ? ' [original unavailable]' : ''}${pendingConfirmation ? ' [completion uncertain; author HEAD required]' : ''}${activationPending ? ' [activation pending]' : ''} → DAM ${damAssetPath || '(not configured)'}`);
       } catch (err) {
         counts.failed += 1;
         console.error(`  ✗ ${id}  ${err.message}`);
@@ -381,6 +385,28 @@ export default async function main(args = process.argv.slice(2)) {
     }
 
     try {
+      let recovered = false;
+      if (damConfig && row.steps.dam === 'uncertain') {
+        const check = await verifyDamOriginal({
+          damConfig,
+          damPath: damAssetPath,
+          token: damToken,
+          bytes: row.bytes,
+          contentType: info.kind === 'document' ? 'application/pdf' : 'video/mp4',
+        });
+        if (!check.ok) {
+          row.note = `DAM completion uncertain: ${check.body}; no re-upload`;
+          row.status = 'partial';
+          counts.failed += 1;
+          manifest.rows[id] = row;
+          flush();
+          console.error(`  ✗ ${id}  ${row.note}`);
+          return;
+        }
+        row.steps.dam = 'done';
+        row.dam_asset_path = damAssetPath;
+        recovered = true;
+      }
       if (damConfig && row.steps.dam !== 'done') {
         const tempDir = mkdtempSync(path.join(tmpdir(), 'skoda-media-original-'));
         let dam;
@@ -405,6 +431,15 @@ export default async function main(args = process.argv.slice(2)) {
             filePath: got.filePath,
             contentType: mime,
             token: damToken,
+            onStage: (stage) => {
+              console.log(`  · ${id}  DAM ${stage}`);
+              if (stage === 'complete') {
+                row.steps.dam = 'uncertain';
+                row.note = 'DAM completion pending confirmation';
+                manifest.rows[id] = row;
+                flush();
+              }
+            },
           });
         } finally {
           rmSync(tempDir, { recursive: true, force: true });
@@ -413,19 +448,21 @@ export default async function main(args = process.argv.slice(2)) {
         if (dam.ok) {
           row.steps.dam = 'done';
           row.dam_asset_path = damAssetPath;
-          const metadata = await setDamMetadata({
-            damConfig,
-            damPath: damAssetPath,
-            token: damToken,
-            metadata: {
-              originUrl: row.master_url, alt: '', title: row.title, sourcePage: pagePath,
-            },
-          });
-          if (!metadata.ok) row.note = `DAM provenance metadata ${metadata.status}`;
         } else {
-          row.steps.dam = 'error';
+          row.steps.dam = dam.uncertain ? 'uncertain' : 'error';
           row.note = `DAM ${dam.status}: ${(dam.body || '').slice(0, 100)}`;
         }
+      }
+      if (damConfig && row.steps.dam === 'done' && (recovered || !storedInDam)) {
+        const metadata = await setDamMetadata({
+          damConfig,
+          damPath: damAssetPath,
+          token: damToken,
+          metadata: {
+            originUrl: row.master_url, alt: '', title: row.title, sourcePage: pagePath,
+          },
+        });
+        if (!metadata.ok) row.note = `DAM provenance metadata ${metadata.status}`;
       }
       let activatedNow = false;
       if (damConfig && row.steps.dam === 'done' && row.steps.publish !== 'done') {
@@ -454,7 +491,9 @@ export default async function main(args = process.argv.slice(2)) {
       console.log(`  ${allOk ? '✓' : '⚠'} ${id}  ${info.kind} → ${row.dam_asset_path ? `DAM:${row.dam_asset_path}` : 'DAM pending'}`);
     } catch (err) {
       row.status = 'partial';
-      if (damConfig && row.steps.dam !== 'done') row.steps.dam = 'error';
+      if (damConfig && row.steps.dam !== 'done' && row.steps.dam !== 'uncertain') {
+        row.steps.dam = 'error';
+      }
       row.note = String(err.message || err);
       counts.failed += 1;
       console.error(`  ✗ ${id}  ${row.note}`);
