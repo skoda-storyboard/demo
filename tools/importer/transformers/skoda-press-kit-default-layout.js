@@ -31,7 +31,9 @@ function chapters(document) {
   links.forEach((sourceLink) => {
     const link = document.createElement('a');
     link.href = sourceLink.getAttribute('href');
-    link.textContent = text(sourceLink);
+    // The source labels the hub link "Introduction", like the first chapter; use its title.
+    link.textContent = (sourceLink.matches('.link-intro') && sourceLink.getAttribute('title')?.trim())
+      || text(sourceLink);
     const li = document.createElement('li');
     li.append(link);
     list.append(li);
@@ -50,7 +52,7 @@ function sidebar(document, secondary, mediaBox) {
       if (heading) heading.remove();
       nodes.push(make(document, 'h3', label || 'Images'), section);
       const more = section.querySelector('a.more');
-      if (more && text(more)) {
+      if (mediaBox && more && text(more)) {
         const link = document.createElement('a');
         link.href = '#media-box';
         link.textContent = text(more);
@@ -90,8 +92,9 @@ function rebuild(element, document) {
   const h1 = article.querySelector('.container > header h1');
   const content = article.querySelector('.column-primary .entry-content');
   const media = article.querySelector('.search-results.media-box');
-  if (!h1 || !text(h1) || !content?.querySelector(':scope > .panel-layout') || !media) {
-    throw new Error('Default press-kit article requires title, body and Media Box');
+  // Chapter resource pages (FAQ, Texts, Images, Videos…) have no Media Box (SKODA-805b).
+  if (!h1 || !text(h1) || !content?.querySelector(':scope > .panel-layout')) {
+    throw new Error('Default press-kit article requires title and body');
   }
   const out = [];
   const date = text(article.querySelector('.container > header .entry-published'));
@@ -117,17 +120,19 @@ function rebuild(element, document) {
   out.push(content);
   const side = sidebar(document, article.querySelector('.column-secondary'), !!media);
   if (side.length) out.push(marker(document, 'sidebar'), ...side);
-  const heading = text(media.querySelector('.search-results-heading')) || 'Media Box';
-  const stats = text(media.querySelector('.search-results-stats .stats'));
-  const totals = [...stats.matchAll(/\b(\d+)\s+(?:images?|videos?|PDFs?)\b/gi)];
-  if (totals.length) {
-    media.dataset.expectedAssets = totals.reduce((sum, match) => sum + Number(match[1]), 0);
+  if (media) {
+    const heading = text(media.querySelector('.search-results-heading')) || 'Media Box';
+    const stats = text(media.querySelector('.search-results-stats .stats'));
+    const totals = [...stats.matchAll(/\b(\d+)\s+(?:images?|videos?|PDFs?)\b/gi)];
+    if (totals.length) {
+      media.dataset.expectedAssets = totals.reduce((sum, match) => sum + Number(match[1]), 0);
+    }
+    out.push(marker(document, 'media-box, dark, full-width'), make(document, 'h2', heading));
+    if (stats) out.push(make(document, 'p', stats));
+    media.querySelectorAll('.search-results-header, .search-results-stats, .togglebox-opener')
+      .forEach((node) => node.remove());
+    out.push(media);
   }
-  out.push(marker(document, 'media-box, dark, full-width'), make(document, 'h2', heading));
-  if (stats) out.push(make(document, 'p', stats));
-  media.querySelectorAll('.search-results-header, .search-results-stats, .togglebox-opener')
-    .forEach((node) => node.remove());
-  out.push(media);
   article.replaceChildren(...out);
   // No source site chrome or orphaned gallery/media cards outside the article.
   element.replaceChildren(article);
@@ -148,16 +153,19 @@ function labelImageLinks(article) {
     const img = a.querySelector('img');
     if (!img || text(a) || a.title) return;
     const alt = (img.getAttribute('alt') || '').trim();
-    if (alt && !PLACEHOLDER_ALT.test(alt)) return;
+    const placeholder = !alt || PLACEHOLDER_ALT.test(alt);
     const href = a.getAttribute('href');
+    const binary = /\.(?:pdf|mp4)(?:$|[?#])/i.test(href);
+    // A real alt names the image, not the download; the binary gate reads the link title only.
+    if (!placeholder && !binary) return;
     const label = bannerLabel(href);
     if (!label) {
-      if (/\.(?:pdf|mp4)(?:$|[?#])/i.test(href)) {
+      if (binary) {
         throw new Error(`Press-kit PDF/MP4 link has no accessible name: ${href}`);
       }
       return;
     }
-    img.alt = label;
+    if (placeholder) img.alt = label;
     a.title = label;
   });
 }

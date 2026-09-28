@@ -262,6 +262,8 @@ export default function transform(hookName, element, payload) {
   if (template) meta.template = template;
   // page layout for a template=page page (e.g. the series directory, SKODA-207)
   if (overrides.theme) meta.theme = overrides.theme;
+  // press-kit chapter/resource child → its hub path (SKODA-805b); not a rail template
+  if (overrides.presskit) meta.presskit = overrides.presskit;
   if (category) meta.category = category;
 
   // tags = derived ∪ override (comma-joined → AEM splits into article:tag metas).

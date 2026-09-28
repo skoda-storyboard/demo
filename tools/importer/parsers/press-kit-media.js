@@ -60,5 +60,8 @@ export default function parse(element, { document }) {
       .forEach((attr) => img.removeAttribute(attr));
     rows.push([img, title, paragraphs]);
   });
-  element.replaceWith(WebImporter.DOMUtils.createTable([['Downloads'], ...rows], document));
+  // A gallery group sits in the article column, where the Downloads block would show every tile;
+  // the source's togglebox shows two rows first, which is the block's `collapse auto` (SKODA-510).
+  const config = element.matches('.search-results-gallery') ? [['collapse', 'auto']] : [];
+  element.replaceWith(WebImporter.DOMUtils.createTable([['Downloads'], ...config, ...rows], document));
 }

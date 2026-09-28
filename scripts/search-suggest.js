@@ -36,6 +36,7 @@ const TYPE_LABELS = {
   story: 'Stories',
   press_release: 'News',
   press_kit: 'Press Kits',
+  press_kit_chapter: 'Press Kits',
 };
 
 /** Display title (loadQueryIndex already strips the SEO site suffix, SKODA-610). */

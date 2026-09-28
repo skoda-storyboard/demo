@@ -69,9 +69,9 @@ size token off each `.tiles` row by content and keeps it as `data-tile-size`
 (also fixes the printed token on the series hubs). The Peaq/Epiq image-link
 pairs and source-derived metadata are included. The slice also brings one Peaq
 Introduction child and first-glimpse through the default-article importer; the
-other chapter links stay on the live site. The Introduction child is a proposed
-one-page subset of D-1 option B and **needs Architect sign-off** (D-1 is
-recorded as C). Live-source importer tests cover 13/13/24 ordered tiles. **Keep the
+other chapter links stay on the live site. **Superseded (2026-09-28):** D-1 = A
+imports all 49 children in SKODA-805b (#129), stacked on this branch; the
+Introduction child moves to `template=press_kit_chapter` there. Live-source importer tests cover 13/13/24 ordered tiles. **Keep the
 acceptance boxes open** pending actual DA preview, source-vs-EDS visual QA,
 SKODA-309 chrome, SKODA-221 mosaic and a separate publish/reindex approval.
 

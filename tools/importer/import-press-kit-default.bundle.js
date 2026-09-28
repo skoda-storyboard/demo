@@ -108,12 +108,87 @@ var CustomImportScript = (() => {
       const attachment = frame.closest(".media-cart-item.attachment");
       const video = frame.closest(".video-container");
       if (attachment && root.contains(attachment) && !text(attachment) && attachment.querySelectorAll("iframe").length === 1 && !attachment.querySelector("img, video")) {
-        attachment.replaceWith(p);
+        const master = attachment.querySelector('a.media-cart-action.download[href], a[data-action="download"][href]');
+        const href = master == null ? void 0 : master.getAttribute("href");
+        if (href && href !== "#") {
+          const ext = href.split(/[?#]/)[0].split(".").pop().toUpperCase();
+          const download = document.createElement("p");
+          const link = document.createElement("a");
+          link.href = href;
+          link.textContent = /^(MP4|MOV|PDF|ZIP)$/.test(ext) ? `Download ${ext}` : "Download";
+          download.append(link);
+          attachment.replaceWith(p, download);
+        } else {
+          attachment.replaceWith(p);
+        }
       } else if (video && root.contains(video) && !text(video) && video.querySelectorAll("iframe").length === 1) {
         video.replaceWith(p);
       } else {
         frame.replaceWith(p);
       }
+    });
+  }
+  function dataTable(table, document) {
+    const rows = [...table.querySelectorAll("tr")].map((row) => [...row.children]);
+    const width = rows[0].length;
+    if (width < 2 || rows.some((cells) => cells.length !== width || cells.some((cell) => cell.hasAttribute("colspan") || cell.hasAttribute("rowspan")))) {
+      throw new Error(`Unsupported press-kit data table: ${text(table).slice(0, 60)}`);
+    }
+    const [header, ...body] = rows;
+    return header.slice(1).flatMap((column, index) => {
+      const title = document.createElement("p");
+      title.append(Object.assign(document.createElement("strong"), { textContent: text(column) }));
+      const list = document.createElement("ul");
+      body.forEach((cells) => {
+        const value = cells[index + 1];
+        if (!text(value)) return;
+        const item = document.createElement("li");
+        item.append(`${text(cells[0])}: `, ...value.childNodes);
+        list.append(item);
+      });
+      return [title, list];
+    });
+  }
+  function unwrapTables(root, document) {
+    root.querySelectorAll("table").forEach((layout) => {
+      const labelled = [...layout.querySelectorAll("tr")].filter((row) => [...row.children].filter((cell) => text(cell)).length >= 2);
+      if (labelled.length >= 2) {
+        layout.replaceWith(...dataTable(layout, document));
+        return;
+      }
+      layout.querySelectorAll('img[src*="whatsapp"]').forEach((img) => {
+        const link = img.closest("a");
+        (link && !text(link) ? link : img).remove();
+      });
+      const nodes = [...layout.querySelectorAll("td, th")].flatMap((cell) => {
+        if (!text(cell) && !cell.querySelector("img, a[href]")) return [];
+        if (cell.querySelector("p, ul, ol, h1, h2, h3, h4, h5, h6, div")) return [...cell.childNodes];
+        const p = document.createElement("p");
+        p.append(...cell.childNodes);
+        return [p];
+      });
+      layout.replaceWith(...nodes);
+    });
+  }
+  function inlineGalleries(root, document) {
+    root.querySelectorAll(".sb-gallery").forEach((gallery) => {
+      var _a;
+      const img = gallery.querySelector(".sb-gallery-image-main img") || gallery.querySelector("img");
+      if (!img) throw new Error("Press-kit in-body gallery has no image");
+      const nodes = [];
+      const figure = document.createElement("p");
+      const caption = (_a = img.getAttribute("data-caption")) == null ? void 0 : _a.trim();
+      ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop"].forEach((attr) => img.removeAttribute(attr));
+      figure.append(img);
+      nodes.push(figure);
+      if (caption) nodes.push(Object.assign(document.createElement("p"), { textContent: caption }));
+      const more = text(gallery.querySelector(".sb-gallery-show-more"));
+      if (more && document.querySelector(".search-results.media-box")) {
+        const p = document.createElement("p");
+        p.append(Object.assign(document.createElement("a"), { href: "#media-box", textContent: `+${more}` }));
+        nodes.push(p);
+      }
+      gallery.replaceWith(...nodes);
     });
   }
   function contents(panel, document) {
@@ -122,9 +197,15 @@ var CustomImportScript = (() => {
     const widgets = panel.querySelectorAll(".textwidget");
     if (widgets.length) {
       return [...widgets].flatMap((widget) => {
+        var _a;
+        const title = text((_a = widget.parentElement) == null ? void 0 : _a.querySelector(":scope > .widget-title"));
+        const heading = title ? [Object.assign(document.createElement("h2"), { textContent: title })] : [];
         embedUrls(widget, document);
+        inlineGalleries(widget, document);
+        unwrapTables(widget, document);
         widget.querySelectorAll("hr").forEach((rule) => rule.remove());
-        return [...widget.childNodes].filter((node) => node.nodeType === 1 || text(node));
+        const items = widget.childNodes;
+        return [...heading, ...[...items].filter((node) => node.nodeType === 1 || text(node))];
       });
     }
     if (!text(panel) && !panel.querySelector("img, a[href]")) return [];
@@ -241,7 +322,8 @@ var CustomImportScript = (() => {
       ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop", "title"].forEach((attr) => img.removeAttribute(attr));
       rows.push([img, title, paragraphs]);
     });
-    element.replaceWith(WebImporter.DOMUtils.createTable([["Downloads"], ...rows], document));
+    const config = element.matches(".search-results-gallery") ? [["collapse", "auto"]] : [];
+    element.replaceWith(WebImporter.DOMUtils.createTable([["Downloads"], ...config, ...rows], document));
   }
 
   // tools/importer/transformers/skoda-press-kit-default-layout.js
@@ -273,9 +355,10 @@ var CustomImportScript = (() => {
     chaptersItem.append(chaptersLink);
     list.append(chaptersItem);
     links.forEach((sourceLink) => {
+      var _a;
       const link = document.createElement("a");
       link.href = sourceLink.getAttribute("href");
-      link.textContent = text3(sourceLink);
+      link.textContent = sourceLink.matches(".link-intro") && ((_a = sourceLink.getAttribute("title")) == null ? void 0 : _a.trim()) || text3(sourceLink);
       const li = document.createElement("li");
       li.append(link);
       list.append(li);
@@ -293,7 +376,7 @@ var CustomImportScript = (() => {
         if (heading) heading.remove();
         nodes.push(make(document, "h3", label || "Images"), section);
         const more = section.querySelector("a.more");
-        if (more && text3(more)) {
+        if (mediaBox && more && text3(more)) {
           const link = document.createElement("a");
           link.href = "#media-box";
           link.textContent = text3(more);
@@ -331,8 +414,8 @@ var CustomImportScript = (() => {
     const h1 = article.querySelector(".container > header h1");
     const content = article.querySelector(".column-primary .entry-content");
     const media = article.querySelector(".search-results.media-box");
-    if (!h1 || !text3(h1) || !(content == null ? void 0 : content.querySelector(":scope > .panel-layout")) || !media) {
-      throw new Error("Default press-kit article requires title, body and Media Box");
+    if (!h1 || !text3(h1) || !(content == null ? void 0 : content.querySelector(":scope > .panel-layout"))) {
+      throw new Error("Default press-kit article requires title and body");
     }
     const out = [];
     const date = text3(article.querySelector(".container > header .entry-published"));
@@ -355,16 +438,18 @@ var CustomImportScript = (() => {
     out.push(content);
     const side = sidebar(document, article.querySelector(".column-secondary"), !!media);
     if (side.length) out.push(marker(document, "sidebar"), ...side);
-    const heading = text3(media.querySelector(".search-results-heading")) || "Media Box";
-    const stats = text3(media.querySelector(".search-results-stats .stats"));
-    const totals = [...stats.matchAll(/\b(\d+)\s+(?:images?|videos?|PDFs?)\b/gi)];
-    if (totals.length) {
-      media.dataset.expectedAssets = totals.reduce((sum, match) => sum + Number(match[1]), 0);
+    if (media) {
+      const heading = text3(media.querySelector(".search-results-heading")) || "Media Box";
+      const stats = text3(media.querySelector(".search-results-stats .stats"));
+      const totals = [...stats.matchAll(/\b(\d+)\s+(?:images?|videos?|PDFs?)\b/gi)];
+      if (totals.length) {
+        media.dataset.expectedAssets = totals.reduce((sum, match) => sum + Number(match[1]), 0);
+      }
+      out.push(marker(document, "media-box, dark, full-width"), make(document, "h2", heading));
+      if (stats) out.push(make(document, "p", stats));
+      media.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((node) => node.remove());
+      out.push(media);
     }
-    out.push(marker(document, "media-box, dark, full-width"), make(document, "h2", heading));
-    if (stats) out.push(make(document, "p", stats));
-    media.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((node) => node.remove());
-    out.push(media);
     article.replaceChildren(...out);
     element.replaceChildren(article);
   }
@@ -380,16 +465,18 @@ var CustomImportScript = (() => {
       const img = a.querySelector("img");
       if (!img || text3(a) || a.title) return;
       const alt = (img.getAttribute("alt") || "").trim();
-      if (alt && !PLACEHOLDER_ALT.test(alt)) return;
+      const placeholder = !alt || PLACEHOLDER_ALT.test(alt);
       const href = a.getAttribute("href");
+      const binary = /\.(?:pdf|mp4)(?:$|[?#])/i.test(href);
+      if (!placeholder && !binary) return;
       const label = bannerLabel(href);
       if (!label) {
-        if (/\.(?:pdf|mp4)(?:$|[?#])/i.test(href)) {
+        if (binary) {
           throw new Error(`Press-kit PDF/MP4 link has no accessible name: ${href}`);
         }
         return;
       }
-      img.alt = label;
+      if (placeholder) img.alt = label;
       a.title = label;
     });
   }
@@ -614,6 +701,7 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
@@ -777,16 +865,64 @@ var CustomImportScript = (() => {
     "/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones",
     "/en/models/skoda-elroq-through-designers-eyes",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/images",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/motorsport-versions-of-the-skoda-favorit-1989-all-different-and-yet-familiar",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1000-mb-1964-and-1100-mb-b5-1966-a-family-saloon-in-rally",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1100-ohc-1957-the-beautiful-dream-of-le-mans",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-lr-1984-last-motorsport-model-from-mlada-boleslav-with-rear-mounted-engine",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-180-rs-and-200-rs-1974-rally-cars-from-another-league",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-f3-type-992-1964-european-class-formula-racing-car",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-r5-rally2-rally2-evo-successful-in-the-hands-of-factory-drivers-and-privateers-alike",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-super-2000-2008-successful-motorsport-comeback-for-the-works-team",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-wrc-2003-paving-the-way-for-future-success",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-felicia-kit-car-1995-the-next-chapter-in-an-international-success-story",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-touring-sport-1960-successful-return-to-international-rally-courses",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-wrc-1999-entering-the-highest-class-of-international-rallying",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-spider-b5-1972-and-skoda-spider-ii-1975-prototypes-for-the-racetrack",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos",
     "/en/press-kits/new-skoda-enyaq-press-kit-2",
     "/en/press-kits/skoda-elroq-press-kit",
     "/en/press-kits/skoda-elroq-press-kit-2",
     "/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
     "/en/press-kits/skoda-epiq-press-kit-2",
+    "/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance",
+    "/en/press-kits/skoda-epiq-press-kit-2/connectivity-intuitive-digital-services-and-seamless-vehicle-access",
+    "/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language",
+    "/en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details",
+    "/en/press-kits/skoda-epiq-press-kit-2/frequently-asked-questions",
+    "/en/press-kits/skoda-epiq-press-kit-2/images",
+    "/en/press-kits/skoda-epiq-press-kit-2/infographics",
+    "/en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience",
+    "/en/press-kits/skoda-epiq-press-kit-2/safety-and-assistance-systems-comprehensive-predictiveand-reassuring-driver-support",
+    "/en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality",
+    "/en/press-kits/skoda-epiq-press-kit-2/technical-data",
+    "/en/press-kits/skoda-epiq-press-kit-2/texts",
+    "/en/press-kits/skoda-epiq-press-kit-2/videos",
     "/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
     "/en/press-kits/skoda-peaq-press-kit",
     "/en/press-kits/skoda-peaq-press-kit-2",
+    "/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model",
+    "/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart",
+    "/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design",
+    "/en/press-kits/skoda-peaq-press-kit-2/frequently-asked-questions",
+    "/en/press-kits/skoda-peaq-press-kit-2/images",
+    "/en/press-kits/skoda-peaq-press-kit-2/infographics",
+    "/en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot",
+    "/en/press-kits/skoda-peaq-press-kit-2/safety-a-comprehensive-suite-of-active-and-passive-safety-systems",
+    "/en/press-kits/skoda-peaq-press-kit-2/technical-data",
+    "/en/press-kits/skoda-peaq-press-kit-2/texts",
+    "/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out",
     "/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+    "/en/press-kits/skoda-peaq-press-kit-2/videos",
     "/en/press-kits/skoda-vision-o-press-kit",
     "/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design",
     "/en/press-kits/the-all-new-skoda-kodiaq-press-kit",
@@ -929,6 +1065,16 @@ var CustomImportScript = (() => {
 
   // tools/importer/import-press-kit-default.js
   var TEMPLATE = { name: "press-kit-default", metadata: { template: "press_kit" } };
+  function templateFor(document, pageUrl) {
+    const hub = document.querySelector(".chapter-nav .link-intro[href]");
+    if (!hub) return TEMPLATE;
+    const hubUrl = new URL(hub.getAttribute("href"), pageUrl);
+    const path = (value) => value.pathname.replace(/\/$/, "");
+    if (path(hubUrl) === path(new URL(pageUrl))) return TEMPLATE;
+    return __spreadProps(__spreadValues({}, TEMPLATE), {
+      metadata: { template: "press_kit_chapter", theme: "press-kit", presskit: path(hubUrl) }
+    });
+  }
   var import_press_kit_default_default = {
     preprocess: ({ document }) => {
       document.querySelectorAll(".search-results.media-box a.media-cart-action.download[href]").forEach((a) => {
@@ -938,16 +1084,18 @@ var CustomImportScript = (() => {
     transform: (payload) => {
       const { document, url, params } = payload;
       const main = document.body;
+      const template = templateFor(document, params.originalURL);
       transform("beforeTransform", main, payload);
       const article = main.querySelector("article.press_kit");
       const body = article.querySelector(".entry-content");
       parse3(body, { document });
       article.querySelectorAll("section.images.sa-media-kit-preview").forEach((section) => parse(section, payload));
       article.querySelectorAll("section.tags").forEach((section) => parse2(section, payload));
+      body.querySelectorAll(".search-results.search-results-gallery").forEach((group) => parse4(group, payload));
       const mediaBox = article.querySelector(".search-results.media-box");
-      parse4(mediaBox, payload);
+      if (mediaBox) parse4(mediaBox, payload);
       transform("afterTransform", main, payload);
-      transform2("afterTransform", main, __spreadProps(__spreadValues({}, payload), { template: TEMPLATE }));
+      transform2("afterTransform", main, __spreadProps(__spreadValues({}, payload), { template }));
       WebImporter.rules.transformBackgroundImages(main, document);
       normalizeImages(main, document);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);

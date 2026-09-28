@@ -458,7 +458,7 @@ QA-loop fixes, then Should.
 
 | # | Decision | Options | Default if undecided |
 |---|---|---|---|
-| D-1 | Press-kit child pages (50) | A: import all (5–8 SP) · **B: Peaq children only (3 SP, Could)** · C: link out to live (inside 609) | **C** for M1; upgrade to B if Could capacity opens |
+| D-1 | Press-kit child pages (49; the ticket's 50 counted the cross-kit Enyaq RS Race tile) | **A: import all (5–8 SP)** · B: Peaq children only (3 SP, Could) · C: link out to live (inside 609) | **Decided A** (Lars, 2026-09-28): SKODA-805b, #129 |
 | D-2 | CS in the demo | none · **switcher filtered to existing locales + 1 CS story counterpart** · full CS | switcher shows only locales that exist; CS page is Should |
 | D-3 | Link policy for out-of-set targets | see the [SKODA-609](../tickets/tickets/SKODA-609.md) table | absolute to live + new tab for ruled-out pages; import or swap for stories |
 | D-4 | Series hub cards | index-driven + import linked stories · **static curated cards** | static cards for hubs whose stories are not in the corpus |
@@ -469,15 +469,15 @@ QA-loop fixes, then Should.
 | D-9 | Article sidebar STO-D07 (§14 C-9) | build the sidebar · **related rail + promo, doc wording corrected** | **Resolved by §15:** the sidebar is built (801 in #113, parity in 817). Subscription = 823 (Could) or doc wording "go-live" |
 | D-10 | Client-scope adds C-1…C-6 (§14) | accept + **extend the extra resource about 4–5 days** · accept with the §14.3 trims · reject (tell the client) | accept + extend; decide by Mon 28 Sep |
 
-**D-1 selected-child implementation (SKODA-805a branch, 2026-09-28), pending Architect
-sign-off.** The recorded D-1 decision above is still **C**; this is a one-page subset of B
-proposed by #189 and must be accepted (or reverted) by the Architect before merge. The Peaq-2
-Introduction URL was added as one end-to-end chapter alongside the existing first-glimpse
-article. The other chapter/resource tiles remain absolute live-source links, opened in a
-new tab. This is not approval to import the remaining children. Introduction does not
-contain a technical-spec table, so the broader spec-table chapter proposal remains open.
-Neither these pages nor the hubs can feed the published index before a separately approved
-publish/reindex wave.
+**D-1 = A (Lars, 2026-09-28).** All **49** children of the three M1 hubs are imported: Peaq-2 13,
+Epiq-2 13, Motorsport 23 (SKODA-805b, #129). This supersedes the one-page selected-child subset
+that #189 proposed. The ticket's count of 50 included Motorsport's "The new Enyaq RS Race – Press
+Kit" tile. That tile is a separate kit, not a chapter, so it stays an absolute live link opened in
+a new tab. The children carry `template=press_kit_chapter` (not `press_kit`), so they never enter
+the press-kit rails. No child has a Technical-data spec table: Technical data is a single PDF on
+the source (see C-4). The Peaq FAQ has one variant-spec table, which is imported as a labelled list
+per variant. Neither these pages nor the hubs can feed the published index before a
+separately approved publish/reindex wave.
 
 **Human gates:**
 
@@ -534,7 +534,7 @@ The live source checks behind this section ran on 2026-09-24:
 | C-1 | **Media Room homepage** (§3, §6, MR-H01–H10) | **Not in the 43 URLs.** `/en/media-room/` returns 404 on preview | page missing | Add `/en/media-room/` to the set. `import-home-mr.js` already exists on `main`. Its rails reuse `story-rail` and are fed by the 603/608 rows | 1.5 |
 | C-2 | **Series: directory → hub**, two-level (§3, STO-S01–S03) | `/en/series-2/` is not in the set, and this review moved it to M2 | directory missing | Add `/en/series-2/`. `import-series-directory.js` already exists. The index-driven grid shows the 5 imported hubs | 1 |
 | C-3 | **English + Czech**, with the switcher showing only languages that exist (§3, §6, COM05) | The set is **EN only**. 303/CS is a Should (D-2) | CS pages missing; tier too low | Promote **303 to Must**. Add 3 CS counterparts: Peaq model, the Peaq-production story, and one series hub. Add the CS header/footer fragments. Do **not** import `/cs/` home, because it needs a per-locale index (1001, M2) | 1.5 + 1 |
-| C-4 | **One press kit end to end**: chaptered hub, a sub-page, spec table, grouped media and downloads (§3, §6, MR-PK01/02/04/06) | Hub = 805a (Must). The default article 805c is a Should. Children (805b) are Could | sub-page and narrative below Must | Promote **805c to Must**. Import **one** Peaq-2 chapter sub-page with the 805c importer. Reuse the 208 `spec-table` block | 3 + 1 |
+| C-4 | **One press kit end to end**: chaptered hub, a sub-page, spec table, grouped media and downloads (§3, §6, MR-PK01/02/04/06) | Hub = 805a (Must). The default article 805c is a Should. Children (805b) are Could | sub-page and narrative below Must | Promote **805c to Must**. Import **one** Peaq-2 chapter sub-page with the 805c importer. Reuse the 208 `spec-table` block. **Update (2026-09-28):** D-1 = A imports all 49 sub-pages (805b). The source's Technical data chapters have no spec table: both are a single PDF download. The only spec table is a 3-variant table in an answer on the Peaq FAQ, imported as one labelled list per variant (no block). So a `spec-table` chapter cannot be sourced from these kits | 3 + 1 |
 | C-5 | **Whole-kit ZIP**, "a pre-built file, so easy" (MR-PK07, marked Demo) | Explicitly excluded from 805a (listed as 806, M2) | promise contradicted | Add a download link to the existing CDN ZIP on the Peaq-2 and Epiq-2 hubs. This is a 805a AC, not 806 | 0.5 |
 | C-6 | **Social share** on story detail, with configurable channels (COM15, STO-D10) | 215 is Could, unowned, and has no issue | tier too low | Create the 215 issue and make it **Must** (vijay) | 1 |
 | C-7 | **Embargoed content**: group-restricted page, previewed privately, published on schedule (§3, §6, 6.5) | Ruled out: 811 is M2, and only the ungated form is stretch | contradicted | **Decision D-7.** The client doc contradicts itself: its 6.3 says "scheduling, review and embargo at go-live". Either (a) script a native walk-through (restricted preview + scheduled publish; Lars, ≈ 1 SP, proven on one page), or (b) correct the doc to the 6.3 wording before the demo. Default: **(b)**, unless the client confirms 6.5 | 0–1 |
