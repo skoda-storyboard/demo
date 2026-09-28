@@ -826,13 +826,19 @@ body.story .section.body-column .gallery.slider {
 }
 
 /* hover zoom stacks a further 2% on the resting one (source `scale`, not
-   `transform`); only for real hover pointers and without reduced motion */
+   `transform`); only for real hover pointers and without reduced motion. The
+   source's hover scale also scales its translate(-50%, -50%) centring, so the
+   image centre drifts 1% of the box up-left (x 911.3 → 907.9 @1280, bottom and
+   right edges fixed): the translate reproduces that drift. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .gallery.preview .gallery-preview-thumb img {
-    transition: scale var(--gallery-preview-zoom-transition);
+    transition:
+      scale var(--gallery-preview-zoom-transition),
+      translate var(--gallery-preview-zoom-transition);
   }
 
   .gallery.preview .gallery-preview-thumb:hover img {
+    translate: -1% -1%;
     scale: var(--gallery-preview-zoom);
   }
 }

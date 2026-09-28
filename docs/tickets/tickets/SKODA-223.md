@@ -24,6 +24,9 @@
   and ring stay. The source's dim `::after` stays at `opacity:0`, so there is no overlay.
 - QA round 1 (PR #201, 2026-09-28): added the resting 2% crop, the thumb hover zoom and the pill hover. My first
   hover probe drove a synthetic mouse and saw no change, so the hover states were wrongly recorded as absent.
+  Re-measured with DevTools-forced `:hover`: the source zoom also scales its `translate(-50%,-50%)`, so the image
+  drifts up-left. Adding `translate: -1% -1%` puts the hovered image at x 907.9 / 175.8 wide @1280 and x 519.5 /
+  120.7 @768, the same as the source. The pill hover measures `#f1f1f1` and 51.9×40 on both.
 - `templates/press-release/press-release.css`: when a sidebar `h3` ends its default content, it labels the next
   block, so the 15px group gap now comes after the block instead of between them. Source: 0px Images → thumbs and
   Tags → chips. EDS was 15px, which pushed Images and Tags 15px low.
