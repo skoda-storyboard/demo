@@ -25228,8 +25228,8 @@
         "en/skoda-model/elroq/elroq-rs",
         "en/skoda-model/elroq/elroq-sportline"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/skoda-model/elroq/TD-Elroq-en_new_7a3c9a44.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2024/10/TD-Elroq-en_new_7a3c9a44.pdf",
       "original_download_url": "",
       "delivery_url": "",
       "da_path": "",
@@ -25239,14 +25239,23 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2024/10/TD-Elroq-en_new_7a3c9a44.pdf"
       ],
-      "bytes": null,
+      "bytes": 537385,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
       "status": "done",
-      "note": ""
+      "note": "",
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/elroq/TD-Elroq-en_new_7a3c9a44.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/elroq/TD-Elroq-en_new_7a3c9a44.pdf",
+        "mime": "application/pdf",
+        "bytes": 537385
+      },
+      "source_content_type": "application/pdf",
+      "dam_status": 200
     },
     "df14cfed__enyaq_aerodynamics_25f1d1fd.png": {
       "logical_id": "df14cfed__enyaq_aerodynamics_25f1d1fd.png",

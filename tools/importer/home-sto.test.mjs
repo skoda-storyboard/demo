@@ -59,6 +59,14 @@ test('Storyboard home imports index promo settings, a complementary feed, and se
         <h3 class="search-results-heading">Latest Stories</h3>
         <article>Old server-rendered story</article>
       </div></div>
+      <div class="cover-box dark socials-static">
+        <h3 class="search-results-heading">Social media</h3>
+        <div class="search-results-items"><div class="search-results-item">
+          <a href="https://www.instagram.com/skodagram/">
+            <h3 class="entry-title">@skodagram</h3>
+          </a>
+        </div></div>
+      </div>
       <div class="cover-box"><div class="search-results type-press_release">
         <h3 class="search-results-heading">Latest News</h3>
         <div class="search-results-items"><article>Old server-rendered release</article></div>
@@ -89,11 +97,17 @@ test('Storyboard home imports index promo settings, a complementary feed, and se
     path: '/en/',
     offset: '3',
   });
-  assert.equal(name(tables[3]), 'Story Rail');
-  assert.equal(config(tables[3]).template, 'press_release');
-  assert.equal(config(tables[3]).heading, 'Latest News');
+  assert.equal(name(tables[3]), 'Cards (social)');
+  assert.equal(tables[3].querySelector('a').getAttribute('href'), 'https://www.instagram.com/skodagram/');
+  assert.equal(name(tables[5]), 'Story Rail');
+  assert.equal(config(tables[5]).template, 'press_release');
+  assert.equal(config(tables[5]).heading, 'Latest News');
   assert.deepEqual(tables.filter((block) => name(block) === 'Section Metadata')
-    .map((block) => config(block).style), ['cover-box', 'cover-box']);
-  assert.equal(element.querySelectorAll('hr').length, 2);
+    .map((block) => [...block.querySelectorAll('tr')].find(
+      (row) => row.querySelector('td')?.textContent.trim().toLowerCase() === 'style',
+    )?.querySelector('td:nth-child(2)')?.textContent.trim()), [
+    'cover-box', 'cover-box, dark', 'cover-box',
+  ]);
+  assert.equal(element.querySelectorAll('hr').length, 4);
   assert.equal(element.textContent.includes('Old server-rendered story'), false);
 });

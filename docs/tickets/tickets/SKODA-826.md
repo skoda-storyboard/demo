@@ -43,6 +43,15 @@ per-block width delta in the sweep is really this one global cause: for example 
 - [ ] `npm run lint:css` is clean, and the guardrail self-check is noted in the PR.
 - [ ] Preview link: `https://skoda-826-gutter--demo--skoda-storyboard.aem.page/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds`
 
+## Recheck after the gutter change (from the SKODA-217 review, [PR #188](https://github.com/skoda-storyboard/demo/pull/188))
+- **Social media cards at 500px:** EDS 452×361.6 at x24 (band 1321px) vs live 460×368 at x20 (band 1340.5px): the
+  section's 24px side padding against live's narrower inset. Don't count SKODA-217's 500px check as passed until this
+  lands; re-measure the cards and band then.
+- **The 1 → 3 column switch** of `Cards (social)` is a 592px container query: 640px viewport − 2 × 24px section
+  padding (`blocks/cards/cards.css`). When the gutter changes, retune it to 640 − 2 × the new gutter and recheck
+  639 (1 column) / 640 (3 columns). Measured 2026-09-28: 1 column at 639, 3 at 640 on live and EDS; cards 184 vs
+  186.7px wide at 640.
+
 ## Dependencies
 106 (closed; this is the token follow-up). It must land before 704 visual sign-off, because otherwise every 375 diff
 fails.

@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import {
   pagePath, parseList, wrapPage, hashOf, mainContent, contentHash, decideAction, PUSHING, chunk,
   parseJobDetails,
-  fragmentPaths, imageCheck, summarize,
+  fragmentPaths, bulkPatternMatches, imageCheck, summarize,
 } from './push-lib.mjs';
 
 // ---- paths + lists ----------------------------------------------------------
@@ -140,6 +140,34 @@ test('fragmentPaths: defaults /nav + /footer, plus metadata overrides, de-duplic
     + '<div><div>footer</div><div>/en/footer-mr</div></div><div><div>nav</div><div>/nav</div></div></div></div>';
   assert.deepEqual(fragmentPaths([plain, '<div><p>no metadata</p></div>']), ['/nav', '/footer', '/en/footer-mr']);
   assert.deepEqual(fragmentPaths([]), ['/nav', '/footer']);
+});
+
+test('fragmentPaths: bulk metadata rows add the fragments of matching batch pages only', () => {
+  const bulk = [
+    {
+      URL: '/en/press-releases/**', nav: '/media-room/nav', footer: '/media-room/footer', section: 'media-room',
+    },
+    { URL: '/en/images', nav: '/media-room/nav', footer: '/media-room/footer' },
+    { URL: '/en/**', title: 'no fragment keys' },
+    { URL: '/en/news/**', nav: '""', footer: '' },
+  ];
+  assert.deepEqual(fragmentPaths([], { paths: ['/en/press-releases/x'], bulk }), ['/nav', '/footer', '/media-room/nav', '/media-room/footer']);
+  assert.deepEqual(fragmentPaths([], { paths: ['/en/images'], bulk }), ['/nav', '/footer', '/media-room/nav', '/media-room/footer']);
+  assert.deepEqual(fragmentPaths([], { paths: ['/en/lifestyle/story', '/en/news/a'], bulk }), ['/nav', '/footer']);
+  assert.deepEqual(fragmentPaths([], { paths: ['/en/press-releases/x'] }), ['/nav', '/footer']);
+});
+
+test('bulkPatternMatches: aem.live bulk metadata wildcards', () => {
+  assert.equal(bulkPatternMatches('/en/press-releases/**', '/en/press-releases/a'), true);
+  assert.equal(bulkPatternMatches('/en/press-releases/**', '/en/press-releases/a/b'), true);
+  assert.equal(bulkPatternMatches('/en/press-releases/**', '/en/press-releases-archive/a'), false);
+  assert.equal(bulkPatternMatches('/en/images', '/en/images'), true);
+  assert.equal(bulkPatternMatches('/en/images/', '/en/images'), true);
+  assert.equal(bulkPatternMatches('/en/images', '/en/images/x'), false);
+  assert.equal(bulkPatternMatches('/en/*/new-superb', '/en/skoda-model/new-superb'), true);
+  assert.equal(bulkPatternMatches('/en/*', '/en/a/b'), false);
+  assert.equal(bulkPatternMatches('**/press-kits/**', '/en/press-kits/k'), true);
+  assert.equal(bulkPatternMatches('', '/en'), false);
 });
 
 // ---- post-preview content check --------------------------------------------------------

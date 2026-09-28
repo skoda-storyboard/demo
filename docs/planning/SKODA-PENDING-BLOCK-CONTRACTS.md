@@ -50,7 +50,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 
 | Block | Variants | Config keys |
 |---|---|---|
-| `cards` | `media`, `overlay`, `toolbar`, `series-directory` | – |
+| `cards` | `media`, `overlay`, `toolbar`, `series-directory`, `social` (SKODA-217: one row per profile, one cell with a link whose text is the handle; its section carries `Style: cover-box, dark`, the SKODA-218 home band) | – |
 | `carousel` | `dots` | – |
 | `columns` | – | – |
 | `downloads` | `media-box` (SKODA-510) | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes`, `collapse` (SKODA-502/510) |
@@ -271,6 +271,10 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 ### `media-room-chrome`
 - **Status:** `pinned` · **Ticket:** SKODA-309 (with 305) · **Fallback:** readable (Storyboard chrome)
 - **Form: bulk metadata, not importer output** (309 amendment). The 16 MR-side URLs (5 press releases, **5 model pages**, 4 press kits, Images, Videos) get `nav` / `footer` from `metadata.json` rows for the MR path globs. Those rows are activated only once both MR fragments return 200 on preview and live. The importers emit nothing, and the push tool's fragment check requires the fragments to be live before publishing.
+- **Rows** (SKODA-309, 2026-09-28): every row sets `nav: /media-room/nav`, `footer: /media-room/footer` and `section: media-room`. `header-switcher.js` uses `section` to activate the Media Room tab; the Media Room header also gets a lighter topbar.
+  - Patterns: `/en/press-releases/**`, `/en/press-kits/**`, `/en/skoda-model/**`, `/en/skodapedia/**`, plus an exact row and a `/**` row each for `/en/news`, `/en/images`, `/en/videos`, `/en/media-room`, `/en/contacts`, `/en/search` and `/en/newsletter` (the SKODA-305 footer list).
+  - The rows don't overlap each other and none matches a Storyboard page. Page-level metadata still wins over the bulk rows (aem.live bulk metadata).
+- **Fragment check:** `fragmentPaths()` reads the preview and live `/metadata.json` rows whose pattern matches a pushed page (`bulkPatternMatches`). So an MR batch requires `/media-room/nav` and `/media-room/footer` to be live, and Storyboard batches don't.
 
 ### `skodapedia`
 - **Status:** `out-of-scope` · **Ticket:** SKODA-206 · **Fallback:** broken

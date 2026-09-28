@@ -135,6 +135,41 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable(rows, document2));
   }
 
+  // tools/importer/parsers/social-cards.js
+  function parse4(element, { document: document2 }) {
+    const seen = /* @__PURE__ */ new Set();
+    const links = [...element.querySelectorAll(
+      ".search-results-item a[href], .search-results-items a[href]"
+    )].filter((a) => {
+      const href = a.getAttribute("href") || "";
+      if (!/^https?:/i.test(href) || seen.has(href)) return false;
+      seen.add(href);
+      return true;
+    });
+    const rows = links.map((a) => {
+      const handleEl = a.querySelector(".entry-title, h2, h3, h4");
+      const handle = (handleEl && handleEl.textContent || a.textContent || "").trim();
+      if (!handle) return null;
+      const link = document2.createElement("a");
+      link.setAttribute("href", a.getAttribute("href"));
+      link.textContent = handle;
+      return [link];
+    }).filter(Boolean);
+    if (!rows.length) return;
+    const out = [document2.createElement("hr")];
+    const headingEl = element.querySelector(".search-results-heading, .search-results-header h2, .search-results-header h3");
+    const headingText = headingEl && headingEl.textContent.trim();
+    if (headingText) {
+      const h2 = document2.createElement("h2");
+      h2.textContent = headingText;
+      out.push(h2);
+    }
+    out.push(WebImporter.DOMUtils.createTable([["Cards (social)"], ...rows], document2));
+    out.push(WebImporter.DOMUtils.createTable([["Section Metadata"], ["Style", "cover-box, dark"]], document2));
+    out.push(document2.createElement("hr"));
+    element.replaceWith(...out);
+  }
+
   // tools/importer/transformers/skoda-page-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
@@ -740,7 +775,7 @@ var CustomImportScript = (() => {
   };
   var PAGE_TEMPLATE = {
     name: "home-sto",
-    description: "\u0160koda Storyboard home (template-homepage). Indexed promo, Stories feed and Story Rails in cover-box bands. Social strip unwrapped. Metadata template=page.",
+    description: "\u0160koda Storyboard home (template-homepage). Indexed Promo Box, Stories feed and Story Rails in cover-box bands; Social media as Cards (social). Metadata template=page.",
     urls: ["https://www.skoda-storyboard.com/en/"],
     metadata: { template: "page" },
     blocks: [
@@ -786,6 +821,13 @@ var CustomImportScript = (() => {
     transform: (payload) => {
       const { document: document2, url, params } = payload;
       const main = document2.body;
+      document2.querySelectorAll(".socials-static").forEach((el) => {
+        try {
+          parse4(el, { document: document2, url, params });
+        } catch (e) {
+          console.error("Failed to parse social-cards (.socials-static):", e);
+        }
+      });
       executeTransformers("beforeTransform", main, payload);
       const pageBlocks = findBlocksOnPage(document2, PAGE_TEMPLATE);
       pageBlocks.forEach((block) => {
