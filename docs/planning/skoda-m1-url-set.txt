@@ -1,7 +1,7 @@
 # Škoda Storyboard — canonical M1 (15 Oct 2026 demo) URL set.
 # Supplied by the Architect 2026-09-24. Supersedes the page list in skoda-demo-content-urls.txt
 # for M1 scope. Rails/listings are additionally fed by skoda-rail-feed-corpus.txt (SKODA-603/608).
-# 43 lines = 42 unique pages: the nested mixed-reality URL (marked ALIAS) returns 200 with canonical
+# 44 lines = 43 unique pages: the nested mixed-reality URL (marked ALIAS) returns 200 with canonical
 # /en/skoda-world/explore-the-new-skoda-models-in-mixed-reality/, import once + redirect (SKODA-609).
 # Gap analysis: docs/reviews/SKODA-M1-GAP-REVIEW.md. Per-URL status tracker: SKODA-603.
 
@@ -24,6 +24,9 @@ https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/
 https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/
+
+# D-1 selected child (SKODA-805a/805b); remaining chapter tiles open the live source.
+https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio/
 
 # ===== MODEL PAGES (5), SKODA-208 =====
 https://www.skoda-storyboard.com/en/skoda-model/new-superb/

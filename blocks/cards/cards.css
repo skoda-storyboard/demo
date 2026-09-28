@@ -20,6 +20,28 @@
   gap: var(--spacing-l);
 }
 
+/* Pinned tiles keep their authored size cell for SKODA-221; hide it in the readable fallback. */
+.cards.tiles .card-teaser-body:first-child {
+  display: none;
+}
+
+.cards.tiles .card-teaser-body a {
+  font-size: var(--heading-font-size-xs);
+  font-weight: var(--weight-medium);
+  line-height: 1.125;
+}
+
+.cards.tiles .card-teaser-image img {
+  transition: none;
+}
+
+@media (hover: hover) {
+  .cards.tiles .card-teaser:hover .card-teaser-image img,
+  .cards.tiles .card-teaser:focus-within .card-teaser-image img {
+    scale: 1;
+  }
+}
+
 body.story .section.sidebar .cards ul {
   grid-template-columns: minmax(0, 1fr);
 }

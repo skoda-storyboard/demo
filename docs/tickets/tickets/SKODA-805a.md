@@ -60,3 +60,21 @@ The chapter and resource children are SKODA-805b. The single default-template ki
 
 ## Import contract (SKODA-603)
 Contract(s) `cards-tiles`, `hero` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). The press-kit hub emits `Hero Image (overlay)` + `Cards (overlay, tiles)` (`ratio-2x1` → `feature`). If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.
+
+## Branch implementation (2026-09-28, not QA accepted)
+
+`skoda-805a-press-kit-hubs` adds the three-hub importer, pinned tiles and a
+uniform overlay-card fallback that hides the authored size cell until SKODA-221
+ships. The Peaq/Epiq image-link pairs and source-derived metadata are included.
+The approved slice also brings one Peaq Introduction child and first-glimpse
+through the default-article importer; the other chapter links stay on the live
+site (D-1). Live-source importer tests cover 13/13/24 ordered tiles. **Keep the
+acceptance boxes open** pending actual DA preview, source-vs-EDS visual QA,
+SKODA-309 chrome, SKODA-221 mosaic and a separate publish/reindex approval.
+
+**Known visual deviation (SKODA-221):** the source model hubs use 3/5/5
+mixed-width rows at 1280 (two 2:1 feature tiles followed by squares); the
+fallback is a uniform responsive overlay-card grid. This is intentionally
+readable but cannot meet the mosaic diff target. Exact rendered pixel diff
+and mobile accessibility still require branch-preview browser QA. SKODA-309
+owns the separate Media Room header/footer and active-tab difference.

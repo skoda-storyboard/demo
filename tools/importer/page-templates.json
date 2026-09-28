@@ -200,6 +200,100 @@
       ]
     },
     {
+      "name": "press-kit-hub",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/",
+        "https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/",
+        "https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/"
+      ],
+      "description": "Press-kit tiles hub: Hero Image (overlay), source-order Cards (overlay, tiles), optional introduction and linked WhatsApp/ZIP banners. Metadata template=press_kit; SKODA-805a.",
+      "blocks": [
+        {
+          "name": "hero",
+          "instances": ["article.press_kit > .hero"]
+        },
+        {
+          "name": "tiles",
+          "instances": ["article.press_kit > .content .panel-grid article.article-teaser"]
+        }
+      ],
+      "sections": [
+        {
+          "id": "hero",
+          "name": "Overlay hero",
+          "selector": ["article.press_kit > .hero"],
+          "blocks": ["hero"],
+          "defaultContent": []
+        },
+        {
+          "id": "tiles",
+          "name": "Ordered chapter tiles",
+          "selector": ["article.press_kit > .content"],
+          "blocks": ["tiles"],
+          "defaultContent": []
+        }
+      ]
+    },
+    {
+      "name": "press-kit-default",
+      "urls": [
+        "https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio/",
+        "https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/"
+      ],
+      "description": "Default press-kit article: source title, optional Chapters, primary content with eight optional row toggles as Accordion, sidebar Gallery (preview) and Tags, then a full Media Box with Downloads and reachable file rows. Metadata template=press_kit; SKODA-805b/c.",
+      "blocks": [
+        {
+          "name": "gallery",
+          "instances": ["section.images.sa-media-kit-preview"]
+        },
+        {
+          "name": "tags",
+          "instances": ["section.tags"]
+        },
+        {
+          "name": "downloads",
+          "instances": [".search-results.media-box"]
+        },
+        {
+          "name": "accordion",
+          "instances": [".widget_ys-row-toggle"]
+        }
+      ],
+      "sections": [
+        {
+          "id": "header",
+          "name": "Article header",
+          "defaultContent": ["article.press_kit .container > header"]
+        },
+        {
+          "id": "chapters",
+          "name": "Introduction Chapters",
+          "style": "press-kit-chapters",
+          "defaultContent": [".chapter-nav"]
+        },
+        {
+          "id": "body",
+          "name": "Article body",
+          "style": "body-column",
+          "blocks": ["accordion"],
+          "defaultContent": [".column-primary"]
+        },
+        {
+          "id": "sidebar",
+          "name": "Article sidebar",
+          "style": "sidebar",
+          "blocks": ["gallery", "tags"],
+          "defaultContent": [".column-secondary"]
+        },
+        {
+          "id": "media-box",
+          "name": "Media Box",
+          "style": "media-box, dark, full-width",
+          "blocks": ["downloads"]
+        }
+      ]
+    },
+    {
       "name": "press-release",
       "urls": [
         "https://www.skoda-storyboard.com/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/"

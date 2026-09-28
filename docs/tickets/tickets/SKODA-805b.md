@@ -37,3 +37,14 @@ children are the substance of a press kit: chapter narrative, resources and medi
 
 ## Dependencies
 - Upstream: SKODA-805a, SKODA-805c, SKODA-502, SKODA-609, SKODA-602.
+
+## Selected-child slice (2026-09-28, in progress)
+
+The SKODA-805a branch implements only the Peaq-2 Introduction child, not
+options A or B in full. Its URL is in the M1 addendum; all other chapter
+and resource links stay absolute to the source and open in a new tab.
+The importer retains the article, chapter list, six interactive row toggles
+and 26 Media Box assets
+in the live-source tests. DA preview, browser QA and no-404 verification
+are still required before accepting this slice; the rest of this ticket
+remains open.
