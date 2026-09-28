@@ -33,28 +33,36 @@ Non-image binaries must never go through EDS's image optimization pipeline. PDFs
 - MP4 rendition/resolution count and total video footprint are unquantified `[PARTIAL]` (no video sitemap).
 - No-CORS legacy CDN complicates reference-in-place for production.
 
-## Implementation checkpoint (2026-09-28; awaiting public delivery and QA)
+## Implementation checkpoint (2026-09-28; awaiting manifest update and QA)
 
 On `skoda-503-binary-links` the manifest builder can inventory PDF/MP4 anchors,
 upload approved originals to Assets, and verify a reviewed anonymous public
 URL before marking a row ready. Apply rewrites verified anchors; an offline
 validator and the DA push path block unmapped/private/source links per page
 before external writes. Tests use a mock Assets server. **One PDF was uploaded
-to the author DAM; it is not publicly delivered.** The rights-approved Elroq
+to the author DAM and is now publicly delivered.** The rights-approved Elroq
 technical-data PDF (`TD-Elroq-en_new_7a3c9a44.pdf`) is present and processed
 at `/content/dam/storyboard/en/skoda-model/elroq/` on author (authenticated
-HEAD 200, `application/pdf`, 537,385 bytes). The corresponding anonymous
-publish URL returns 404, so the isolated sample manifest records `dam: done`,
-`status: partial`, with no `public_url` or `public_verified` proof. The
-committed manifest and page links were not changed. No MP4 upload, DA push,
-preview, asset activation or publication occurred. The ticket remains open
-until public delivery, sample preview and independent QA pass. SKODA-510 owns
-the Downloads file-tile rendering.
+HEAD 200, `application/pdf`, 537,385 bytes). Immediately after upload the
+matching anonymous publish URL returned 404. The user manually published
+the asset, after which anonymous HEAD returned 200 with matching MIME/size.
+With explicit approval, a single `POST /bin/replicate.json` on author with
+form fields `cmd=Activate` and `path=<exact PDF DAM path>` returned 200 using
+the same DAM token. Author `jcr:content` recorded a fresh
+`cq:lastReplicationAction_publish: Activate`, and anonymous verification
+still passes. This proves activation for **this asset on this tenant**, not
+bulk publish rights or automatic publication of future uploads.
+
+The isolated sample manifest still records `dam: done`, `status: partial`,
+without a `public_url` or `public_verified` proof: updating it was separately
+denied pending explicit one-row authorization. The committed manifest and
+page links remain unchanged. No MP4 upload, DA push or page preview/publish
+occurred. The ticket remains open until the manifest proof, sample preview
+and independent QA pass. SKODA-510 owns the Downloads file-tile rendering.
 
 Read-only probe: the candidate AEM publish hostname serves one already-uploaded
 image anonymously (HEAD 200). The source Peaq MP4 is approximately 101 MB;
 its signed redirect rejects HEAD (403) but a one-byte ranged GET succeeds (206).
-Neither observation proves the tenant will publish newly uploaded PDF/MP4 assets.
-Investigate and separately authorize the required Assets activation or another
-permanent anonymous delivery endpoint before rewriting this sample or expanding
-the upload batch.
+Neither observation proves future PDF/MP4 assets will be published automatically.
+Keep activation a separately approved step per asset or approved batch; verify
+each public original before rewriting links or expanding the upload batch.

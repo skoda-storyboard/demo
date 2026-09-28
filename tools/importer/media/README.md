@@ -21,12 +21,21 @@ new PDF/MP4 originals are automatically published or anonymously accessible**.
 On 2026-09-28, a single approved Elroq PDF was uploaded and processed on the
 author DAM (`/content/dam/storyboard/en/skoda-model/elroq/TD-Elroq-en_new_7a3c9a44.pdf`):
 authenticated HEAD returned `application/pdf`, 537,385 bytes. Anonymous HEAD
-at the matching publish path returned **404** after the upload. The isolated
-manifest under `.migration/secrets/skoda-503-sample-manifest.json` retains the
-successful DAM upload as `partial`, without a verified public URL. Do not
-repeat the upload, expand the batch, rewrite links, or mark the ticket done.
-Determine the tenant's Assets activation/public delivery contract first;
-activation or site publication needs separate approval.
+at the matching publish path initially returned **404**. After the user
+published the asset manually, its anonymous HEAD returned **200** with the
+original MIME/byte count. With separate approval, an authenticated
+`POST /bin/replicate.json` to this tenant's author host, form fields
+`cmd=Activate` and `path=<exact PDF DAM path>`, returned 200 for this
+already-published PDF. Author `jcr:content` recorded a fresh publish
+replication action, and anonymous original delivery still passed. This
+demonstrates that the token can trigger activation **for this asset**, not
+that new uploads are auto-published or that a bulk publish policy exists.
+Do not activate other assets without explicit approval. The isolated manifest
+under `.migration/secrets/skoda-503-sample-manifest.json` still retains the
+successful DAM upload as `partial` without a recorded public proof: a
+manifest-mutating resume was separately declined. Do not repeat the upload,
+expand the batch, rewrite links or mark the ticket done until the proof is
+authorized and recorded in the manifest and the page has passed QA.
 
 Before the first approved sample upload, create a **reviewed, local JSON map**
 whose keys are intended DAM paths and whose values are candidate public Assets
