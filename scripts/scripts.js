@@ -16,10 +16,11 @@ import {
 
 /**
  * Page templates with their own layout code: `templates/<name>/<name>.{js,css}`, selected by
- * the `template` metadata (`press_release` → `press-release`). Only listed templates load, so
- * an unknown value never requests a missing file.
+ * the `template` metadata (`press_release` → `press-release`), else by the `theme` metadata
+ * (a `template: page` page that shares a layout, e.g. the series directory → `skoda-series`).
+ * Only listed templates load, so an unknown value never requests a missing file.
  */
-const TEMPLATES = ['press-release', 'press-kit'];
+const TEMPLATES = ['press-release', 'skoda-series', 'press-kit'];
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
   const innerTT = window.trustedTypes.createPolicy('tt-inner', {
@@ -226,6 +227,32 @@ function applySectionStyles(main) {
   });
 }
 
+// A date paragraph like "15. 9. 2026" (same pattern as scripts/card-teaser.js
+// DATE_RE; kept local so the eager path doesn't load the card module).
+const STORY_DATE_RE = /^\s*\d{1,4}[.\-/]\s?\d{1,2}[.\-/]\s?\d{2,4}\.?\s*$/;
+
+/**
+ * Story-scoped: lay out the intro under the hero like the source header — the
+ * perex (lead) on its own line, then the published date and the category tag on
+ * one row. The story-hero importer emits both paragraphs optionally, so the date
+ * is found by content, not position, and moved in front of the Tags block inside
+ * its wrapper (a <p>, so decorateBlocks never mistakes it for a block).
+ * @param {Element} main The main element
+ */
+function decorateStoryIntro(main) {
+  if (!document.body.classList.contains('story')) return;
+  const section = main.querySelector('.section .hero-image')?.closest('.section');
+  const content = section?.querySelector(':scope > .default-content-wrapper');
+  if (!content) return;
+  section.classList.add('story-intro');
+  const date = [...content.querySelectorAll(':scope > p')].find((p) => STORY_DATE_RE.test(p.textContent));
+  if (!date) return;
+  date.classList.add('story-date');
+  // runs before decorateBlocks names the wrappers, so find it via the block itself
+  const tagsWrapper = section.querySelector(':scope > div > .tags')?.parentElement;
+  if (tagsWrapper) tagsWrapper.prepend(date);
+}
+
 /**
  * Story-scoped: apply Section Metadata `Style` classes to sections.
  *
@@ -243,10 +270,11 @@ function decorateStorySections(main) {
   applySectionStyles(main);
 }
 
-/** The page's template, if it has its own layout code (see TEMPLATES). */
+/** The page's template (or theme), if it has its own layout code (see TEMPLATES). */
 function pageTemplate() {
-  const name = toClassName(getMetadata('template'));
-  return TEMPLATES.includes(name) ? name : null;
+  return [getMetadata('template'), getMetadata('theme')]
+    .map((value) => toClassName(value))
+    .find((name) => TEMPLATES.includes(name)) || null;
 }
 
 /**
@@ -286,6 +314,7 @@ export function decorateMain(main) {
   buildAutoBlocks(main);
   decorateSections(main);
   decorateStorySections(main);
+  decorateStoryIntro(main);
   decorateTemplateSections(main);
   decorateBlocks(main);
   decorateButtons(main);

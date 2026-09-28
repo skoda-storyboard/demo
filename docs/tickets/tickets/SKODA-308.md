@@ -46,5 +46,14 @@ newsletter panel UI stub (shares markup/CSS with the SKODA-823 sidebar widget).
   scroll at any width, either by compressing the nav gaps/labels or by keeping the hamburger layout up to the
   width where the row fits.
 
+## Found in SKODA-309 QA (2026-09-28)
+Measured with DevTools on both sides, Storyboard (`/en/lifestyle/ouninpohja-finlands-roller-coaster-stage`) and Media Room (`/drafts/mr-chrome-qa`) against the source. All four issues are on `main` too, and they apply to both navs.
+- **Nav row inset:** top-level items sit **24px left** of the source at 1440 and 1280 (News x338 vs 362; Storyboard Models x338 vs 362). The brand link is 194×19 at x120; the source logo is 256×48 at x106. Match the brand box and the header's inner padding.
+- **Dropdown triggers ~8px too wide:** `li.nav-drop > p > a` has `padding: 0 52px 0 20px`; the source is `0 44px 0 20px` (Models 123.9 vs 116.1, Company 139.1 vs 131.4, Škoda World 163.2 vs 155.6). The extra width adds up item by item across the row. Move the chevron to match.
+- **Section tabs at ≥1080:** the tabs start 14px right of the source. Tab link padding is `0 24px`; the source is about 21px (MR active tab 128×44 at x213.6 vs 124.8×44 at x195.6; Storyboard 93.6×44 at x120 vs 89.6×44 at x106). At 992 and 375 they match.
+- **Keyboard:**
+  - Escape resets `aria-expanded` on a desktop dropdown, but `li:focus-within > ul` (header.css ~837) keeps the panel visible.
+  - Space on a focused dropdown trigger scrolls the page (its default isn't prevented).
+
 ## Dependencies
 SKODA-301/302/303/304 (built chrome), SKODA-307 (null guard), SKODA-403 (search), SKODA-823 / SKODA-904 (newsletter).

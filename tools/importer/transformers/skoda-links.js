@@ -210,6 +210,9 @@ function rewriteHref(href) {
   const rest = href.slice(m[0].length);
   const cut = rest.search(/[?#]/);
   const tail = cut === -1 ? '' : rest.slice(cut);
+  // WordPress post-id shortlinks (`/en/?p=<id>`) address a post, not the path (SKODA-207):
+  // rewriting them would point at the demo home page.
+  if (/^\?(?:[^#]*&)?(?:p|page_id)=\d/.test(tail)) return null;
   let target = edsPath(cut === -1 ? rest : rest.slice(0, cut));
   target = DEMO_ALIASES[target] || target;
   return ALLOWED.has(target) ? `${target}${tail}` : null;

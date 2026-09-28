@@ -27,7 +27,7 @@ import {
   buildBlock, decorateBlock, loadBlock, readBlockConfig, createOptimizedPicture, getMetadata,
   toClassName,
 } from '../../scripts/aem.js';
-import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
+import { loadQueryIndex, defaultIndexUrl, cleanTitle } from '../../scripts/query-index.js';
 import { formatCardDate } from '../../scripts/card-teaser.js';
 import {
   scopeRows, filterRows, sortRows, paginate, INDEX_FACETS,
@@ -128,6 +128,7 @@ export function curatedRows(block) {
 export function rowToCells(row) {
   // body cell: date paragraph (→ overlay) + title heading (link), as flat elems
   const elems = [];
+  const title = cleanTitle(row.title);
   const iso = row.date || row.publisheddate || row.publishDate;
   const dateText = formatCardDate(iso);
   if (dateText) {
@@ -138,7 +139,7 @@ export function rowToCells(row) {
   const h = document.createElement('h3');
   const link = document.createElement('a');
   link.href = row.path || '#';
-  link.textContent = row.title || '';
+  link.textContent = title;
   h.append(link);
   elems.push(h);
   const body = { elems };
@@ -150,12 +151,22 @@ export function rowToCells(row) {
   // single body gets the correct intrinsic height (matches buildCardTeaser).
   return row.image
     ? [
-      createOptimizedPicture(row.image, row.title || '', false, [
+      createOptimizedPicture(row.image, title, false, [
         { media: '(min-width: 768px)', width: '750' }, { width: '500' },
       ]),
       body,
     ]
     : [body];
+}
+
+export function collapseRail(block, mount, header) {
+  const relatedSection = block.closest('body.story .section.dark.story-rail-container');
+  if (relatedSection) {
+    relatedSection.remove();
+    return;
+  }
+  mount.remove();
+  if (!header.children.length) header.remove();
 }
 
 export default async function decorate(block) {
@@ -189,15 +200,6 @@ export default async function decorate(block) {
   if (header.children.length) block.append(header);
   block.append(mount);
 
-  // Terminal empty/error state: collapse the whole rail so no blank reserved
-  // slot lingers. The mount's min-height is a CLS guard for the pending build,
-  // not a placeholder for "no results" — on failure/zero-rows we remove the
-  // mount (and an empty header) entirely (SKODA-212 review P2).
-  function collapse() {
-    mount.remove();
-    if (!header.children.length) header.remove();
-  }
-
   // Build + decorate + load the inner carousel. Deferred so multiple home rails
   // don't all build on load.
   async function buildRail() {
@@ -207,14 +209,14 @@ export default async function decorate(block) {
         const all = await loadQueryIndex(cfg.index);
         rows = selectRows(all, cfg).map((r) => rowToCells(r));
       } catch (e) {
-        // index load failed: collapse rather than leave a blank reserved slot
+        // index load failed: remove the empty story band or generic rail
         // eslint-disable-next-line no-console
         console.error('story-rail: index load failed', e);
-        collapse();
+        collapseRail(block, mount, header);
         return;
       }
     }
-    if (!rows || !rows.length) { collapse(); return; }
+    if (!rows || !rows.length) { collapseRail(block, mount, header); return; }
 
     const carousel = buildBlock('carousel', rows);
     if (cfg.dots) carousel.classList.add('dots');
@@ -222,7 +224,7 @@ export default async function decorate(block) {
     mount.append(carousel);
     decorateBlock(carousel);
     await loadBlock(carousel);
-    mount.classList.add('is-built'); // release the reserved min-height
+    mount.classList.add('is-built'); // release the reserved card geometry
   }
 
   if (window.IntersectionObserver) {

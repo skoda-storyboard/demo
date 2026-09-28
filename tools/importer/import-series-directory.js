@@ -4,32 +4,35 @@
 /**
  * Import orchestrator: Škoda Series directory (template-tiles, /en/series-2/).
  *
- * Hero banner + an index-driven Listing over all skoda_series posts (series-grid.js
- * detects the directory from the cards' data-content-type="Series" and emits a
- * template=skoda_series config — SSR cards not ported). Metadata template=page.
+ * SKODA-207: `Hero Image (overlay)` (series-hero.js) + the authored series cards as
+ * `Cards (series-directory)` (series-grid.js detects the directory from the cards'
+ * data-content-type="Series"): every source card in order, title + full excerpt.
+ * Metadata template=page (the directory is not a series in the index) with
+ * theme=skoda-series, so it shares the Series hub layout (templates/skoda-series).
  * Content-driven detection only.
  */
 
-import heroBannerParser from './parsers/hero-banner.js';
+import seriesHeroParser from './parsers/series-hero.js';
 import seriesGridParser from './parsers/series-grid.js';
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 import linksTransformer from './transformers/skoda-links.js';
+import normalizeImages from './transformers/skoda-images.js';
 
 const parsers = {
-  'hero-banner': heroBannerParser,
+  'series-hero': seriesHeroParser,
   'series-grid': seriesGridParser,
 };
 
 const PAGE_TEMPLATE = {
   name: 'series-directory',
   description:
-    'Škoda Series directory (template-tiles). Hero banner + index-driven Listing (template=skoda_series, editorial order). Metadata template=page. Content-driven detection only.',
+    'Škoda Series directory (template-tiles). Hero Image (overlay) + the authored series cards as Cards (series-directory): every source card in order, linked title over the image, full excerpt below. Metadata template=page, theme=skoda-series. Content-driven detection only.',
   urls: ['https://www.skoda-storyboard.com/en/series-2/'],
-  metadata: { template: 'page' },
+  metadata: { template: 'page', theme: 'skoda-series' },
   blocks: [
-    { name: 'hero-banner', instances: ['div.hero'] },
+    { name: 'series-hero', instances: ['div.hero'] },
     { name: 'series-grid', instances: ['.panel-layout'] },
   ],
   sections: [
@@ -38,7 +41,7 @@ const PAGE_TEMPLATE = {
       name: 'Hero',
       selector: ['div.hero'],
       style: null,
-      blocks: ['hero-banner'],
+      blocks: ['series-hero'],
       defaultContent: [],
     },
     {
@@ -112,6 +115,7 @@ export default {
     executeTransformers('afterTransform', main, payload);
 
     WebImporter.rules.transformBackgroundImages(main, document);
+    normalizeImages(main, document);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     const rawPath = new URL(params.originalURL).pathname

@@ -4,14 +4,14 @@
 /**
  * Import orchestrator: Škoda Series hub (single-skoda_series, /en/series/<slug>/).
  *
- * Overlay hero (title + perex) + an index-driven Listing of the series' stories
- * (series-grid.js detects the hub from data-content-type="Story" and emits a
- * template=story + tags=<series-slug> config — SSR cards not ported). Metadata
- * template=skoda_series (derived from the single-skoda_series body class).
- * Content-driven detection only.
+ * SKODA-207: `Hero Image (overlay)` (SERIES badge, H1, standfirst; series-hero.js) +
+ * the authored tile mosaic as `Cards (overlay, tiles)`, contract cards-tiles v2
+ * (series-grid.js: every source tile in DOM order, size token per tile, mixed
+ * Story / Press Kits kept; no index, tags or sort). Metadata template=skoda_series
+ * (derived from the single-skoda_series body class). Content-driven detection only.
  */
 
-import heroBannerParser from './parsers/hero-banner.js';
+import seriesHeroParser from './parsers/series-hero.js';
 import seriesGridParser from './parsers/series-grid.js';
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
@@ -20,17 +20,33 @@ import linksTransformer from './transformers/skoda-links.js';
 import normalizeImages from './transformers/skoda-images.js';
 
 const parsers = {
-  'hero-banner': heroBannerParser,
+  'series-hero': seriesHeroParser,
   'series-grid': seriesGridParser,
 };
 
 const PAGE_TEMPLATE = {
   name: 'series-hub',
   description:
-    'Škoda Series hub (single-skoda_series). Overlay hero (title + perex) + index-driven Listing (template=story, tags=<series-slug>, newest). Metadata template=skoda_series (from body class). Content-driven detection only.',
-  urls: ['https://www.skoda-storyboard.com/en/series/125-years-of-motorsport/'],
+    'Škoda Series hub (single-skoda_series). Hero Image (overlay) with SERIES badge, H1 and standfirst + the authored tile mosaic as Cards (overlay, tiles), cards-tiles v2: one row per source tile in DOM order, size token from the SiteOrigin row share + ratio, `end` on short rows. Metadata template=skoda_series (from body class). Content-driven detection only.',
+  urls: [
+    'https://www.skoda-storyboard.com/en/series/125-years-of-motorsport/',
+    'https://www.skoda-storyboard.com/en/series/130-years/',
+    'https://www.skoda-storyboard.com/en/series/roads-places/',
+    'https://www.skoda-storyboard.com/en/series/unexpected-jobs/',
+    'https://www.skoda-storyboard.com/en/series/minutes-from-car-production/',
+    'https://www.skoda-storyboard.com/en/series/road-trip/',
+    'https://www.skoda-storyboard.com/en/series/winter-tips/',
+    'https://www.skoda-storyboard.com/en/series/back-to-the-past/',
+    'https://www.skoda-storyboard.com/en/series/unknown-parts/',
+    'https://www.skoda-storyboard.com/en/series/hidden-helpers/',
+    'https://www.skoda-storyboard.com/en/series/czech-footprint/',
+    'https://www.skoda-storyboard.com/en/series/sustainable-mobility/',
+    'https://www.skoda-storyboard.com/en/series/my-life-my-car/',
+    'https://www.skoda-storyboard.com/en/series/evolution-of-parts/',
+    'https://www.skoda-storyboard.com/en/series/60-seconds-walkaround/',
+  ],
   blocks: [
-    { name: 'hero-banner', instances: ['div.hero'] },
+    { name: 'series-hero', instances: ['div.hero'] },
     { name: 'series-grid', instances: ['.panel-layout'] },
   ],
   sections: [
@@ -39,7 +55,7 @@ const PAGE_TEMPLATE = {
       name: 'Hero',
       selector: ['div.hero'],
       style: null,
-      blocks: ['hero-banner'],
+      blocks: ['series-hero'],
       defaultContent: [],
     },
     {

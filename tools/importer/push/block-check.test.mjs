@@ -86,6 +86,9 @@ test('classifyBlock: main block with supported variant', () => {
   const r = classifyBlock(one(block('cards overlay', row('a', 'b'))), CONTRACTS, CODE);
   assert.equal(r.status, 'main');
   assert.deepEqual(r.problems, []);
+  const downloads = classifyBlock(one(block('downloads media-box', row('', 'PDF', '<a href="/file.pdf">PDF</a>'))), CONTRACTS, CODE);
+  assert.equal(downloads.status, 'main');
+  assert.deepEqual(downloads.problems, []);
 });
 
 test('classifyBlock: pending variant of a main block (cards tiles, gallery slider, columns split)', () => {
@@ -164,7 +167,7 @@ test('checkPage: pending ids de-duplicated; a pending BLOCK (no code) holds publ
 test('checkPage: a readable pending VARIANT of a block on main may publish; broken holds', () => {
   const tiles = checkPage(page(block('cards overlay tiles', row('sq', '<picture><img src="a.jpg"></picture>', '<a href="/en/a">A</a>'))), CONTRACTS, CODE);
   assert.equal(tiles.errors.length, 0);
-  assert.equal(tiles.publishable, true);
+  assert.equal(tiles.publishable, false); // broken until 221: cards.js prints the size token
   const sub = checkPage(page(block('story-rail', row('heading', 'News'), row('subheading', 'x'), row('template', 'story'))), CONTRACTS, CODE);
   assert.equal(sub.errors.length, 0);
   assert.deepEqual(sub.pending.map((p) => p.id), ['story-rail-subheading']);

@@ -49,20 +49,20 @@
   /* prose paragraph rhythm (measured ~20px bottom gap in article/press body) */
   --paragraph-gap: 20px;
 
-  /* story-detail two-column shell (docs/ui-specs/story-detail.md §3): primary
-     .content 66.66% (~819px @1280) + secondary aside 33.33% (~409px). A 2fr/1fr
-     ratio holds the 66.66/33.33 proportion; the ~24px gap matches the source's
-     -10px column gutter so the tracks land on the measured 819/409 widths. */
-  --story-column-gap: var(--spacing-l);
-  --story-sidebar-inset: 10px;
+  /* story-detail two-column shell (docs/ui-specs/story-detail.md §3; re-measured
+     on the live Epiq story at 1440/1280/1080/992/768/500/375). The source insets
+     its content 10px from the container edge; the article text then takes 2/3 of
+     what is left (819px of 1248), the aside the rest, starting 64px after the text
+     and ending 10px from the edge. No reading-measure cap: the source prose fills
+     its column. Full-width body media (the Gallery slider) bleed the 10px inset. */
+  --story-inset: 10px;
+  --story-sidebar-inset: var(--story-inset);
   --story-sidebar-heading-size-compact: 20px;
   --story-sidebar-heading-line-height: 45px;
-
-  /* reading-measure cap: source fills the full 819px column (~100ch); story-detail
-     §8 recommends capping ~72ch for readability. Applied to the prose column. */
-  --prose-measure: 72ch;
+  --story-related-band-max-width: 1440px;
 
   /* body sizes (mobile-first base) */
+  --body-font-size-lead: 20px; /* story perex under the hero (live: 20/30 wt600) */
   --body-font-size-m: 16px;
   --body-font-size-s: 14px;
   --body-font-size-xs: 13px;
@@ -75,11 +75,23 @@
   --heading-font-size-s: 18px;
   --heading-font-size-xs: 16px;
   --heading-font-size-promo: 29.6px;
+  --related-band-heading-compact: 20px;
+  --related-band-heading-inset: 10px;
+  --related-band-card-title-compact: 20px;
+  --related-band-date-gap: 6px;
 
   /* hero titles (hero.md §3/§4; SKODA-202): story 40->28; overlay 48/300 white */
   --heading-font-size-hero: 48px;
   --heading-font-size-hero-story: 40px;
   --heading-font-size-hero-story-mobile: 28px;
+
+  /* story body prose headings (measured on the live Epiq story; switch at >768):
+     h2 24/27 → 40/45, h3 20/23 → 24/27.6, all wt300 with a 16px bottom margin */
+  --heading-font-size-story-h2-mobile: 24px;
+  --heading-font-size-story-h3-mobile: 20px;
+  --heading-font-size-story-h3: 24px;
+  --story-meta-gap: 11px; /* published date → category tag, same row (live) */
+  --story-intro-gap: 48px; /* intro (date + tag) → article body at >=768 (live) */
 
   /* hero geometry (hero.md §8; SKODA-202) */
   --hero-vh: 61.8vh;
@@ -147,6 +159,15 @@
   --social-icon-bg: var(--skoda-black);
   --app-badge-w: 135px;
   --app-badge-h: 40px;
+
+  /* homepage Social media band (SKODA-217; measured on the live /en/
+     .socials-static). The card values live with the Cards (social) variant
+     (blocks/cards/cards.css); the shared home-band box is SKODA-218's. */
+  --social-band-padding-top: 64px;
+  --social-band-padding-bottom: 80px;
+  --social-band-max-width: 1440px; /* live .cover-box: capped + centred above 1440 */
+  --social-band-margin-top: 64px; /* visible gap Load more → band on live */
+  --social-band-margin-bottom: 60px; /* visible gap band → next rail heading on live */
 
   /* footer shell rhythm (SKODA-305, shared by the Storyboard + Media Room footers). Source:
      .footer-widgets > * margin-bottom 3em, hr margin-bottom 3rem, .container padding 10px with a
@@ -607,6 +628,20 @@ main > .section:first-of-type {
   }
 }
 
+/* homepage "Social media" heading (SKODA-217; live .socials-static h3): the
+   default-content heading of the section that holds the social profile cards
+   (Cards (social)), centred at the section-heading size with the source's 20px
+   gap to the cards. Colour follows the section (the global heading colour is
+   the fixed text colour), so the dark band (Style: cover-box, dark) turns it white. */
+main > .section.cards-container:has(.cards.social) > .default-content-wrapper :is(h2, h3) {
+  margin: 0 0 var(--grid-gutter); /* 20px, the home section heading → content gap */
+  color: inherit;
+  font-size: var(--heading-font-size-l);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-heading);
+  text-align: center;
+}
+
 /* section metadata */
 main .section.light,
 main .section.highlight {
@@ -627,6 +662,22 @@ main .section.dark a {
   color: var(--background-color);
 }
 
+/* homepage Social media band (SKODA-217; live .cover-box.dark.socials-static,
+   measured 375–3440): band top → heading 64px, last card → band end 80px, and
+   max-width 1440px centred (x240 @1920, x1000 @3440). Live's own margin is
+   2.25em auto 1.5em (36/24), which adds to its neighbours' inner spacing (28px
+   under Load more, the next band's 36px top margin). Our sections collapse
+   margins with their 40px neighbours instead, so the band carries live's
+   visible totals: 64px above, 60px below. Its section is `Style: cover-box, dark`
+   like every home dark band (SKODA-218); this rule keys on `.dark` + the social
+   cards, so it also covers older `Style: dark` content, and it outranks the
+   generic `.cover-box` band with the social band's own measured spacing. */
+main > .section.dark.cards-container:has(.cards.social) {
+  max-width: var(--social-band-max-width);
+  margin: var(--social-band-margin-top) auto var(--social-band-margin-bottom);
+  padding-block: var(--social-band-padding-top) var(--social-band-padding-bottom);
+}
+
 /* ==========================================================================
    Story detail — two-column body + aside (SKODA-801)
    Render target: docs/ui-specs/story-detail.md. Scoped to body.story so it never
@@ -635,32 +686,91 @@ main .section.dark a {
    ========================================================================== */
 
 /* Layer 1 — fluid. Mobile-first: sections stack in source order (body, then the
-   Style:sidebar aside below it), which matches the source <768 behaviour. Cap the
-   prose measure for readability rather than filling the whole column. Story prose
-   scale is measured (story-detail.md §3): body p 16/24; h2 40/45 wt300 (→28 mobile);
-   h3 24/27.6 wt300; prose lists use a custom bullet (list-style:none, padding 1.5em).
-   Scoped to the story body column so global heading sizes stay intact. */
+   Style:sidebar aside below it), which matches the source <768 behaviour. The body
+   content sits the source's 10px in from the edge and fills the column (no measure
+   cap, as on the source). Story prose scale is measured (story-detail.md §3,
+   re-measured on the live Epiq story): body p 16/24; h2 24/27 → 40/45 and h3
+   20/23 → 24/27.6 above 768px, all wt300 with a 16px gap below; prose lists use a
+   custom bullet (list-style:none, padding 1.5em). Scoped to the story body column
+   so global heading sizes stay intact. */
+body.story main > .section.body-column > div {
+  padding-inline: var(--story-inset);
+}
+
 body.story main > .section.body-column .default-content-wrapper {
-  max-width: var(--prose-measure);
   font-size: var(--body-font-size-m);
   line-height: 1.5;
 }
 
 body.story main > .section.body-column .default-content-wrapper h2 {
-  font-size: var(--heading-font-size-hero-story-mobile); /* 28px mobile base */
+  margin-bottom: var(--spacing-m);
+  font-size: var(--heading-font-size-story-h2-mobile);
   font-weight: var(--weight-light);
   line-height: 1.125;
 }
 
 body.story main > .section.body-column .default-content-wrapper h3 {
-  font-size: var(--heading-font-size-l);
+  margin-bottom: var(--spacing-m);
+  font-size: var(--heading-font-size-story-h3-mobile);
   font-weight: var(--weight-light);
   line-height: 1.15;
+}
+
+/* Story intro under the hero (measured on the live Epiq story header): the perex
+   at 20/30 semibold, then the published date (12/18 light) and the category tag on
+   one row. decorateStoryIntro() (scripts.js) tags the section and moves the date
+   in front of the Tags block, so both share the tags wrapper's padding. */
+body.story main > .section.story-intro .default-content-wrapper p:not(.story-date) {
+  margin-bottom: var(--spacing-m);
+  font-size: var(--body-font-size-lead);
+  font-weight: var(--weight-semibold);
+  line-height: 1.5;
+}
+
+body.story main > .section.story-intro .tags-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs) var(--story-meta-gap);
+}
+
+body.story main > .section.story-intro .story-date {
+  margin: 0;
+  font-size: var(--body-font-size-2xs);
+  font-weight: var(--weight-light);
+  line-height: 1.5;
+}
+
+/* the row is as tall as the pill (no global li margin / 24px line box), so the
+   date centres on the tag as on the source */
+body.story main > .section.story-intro .tags-list li {
+  display: flex;
+  margin-bottom: 0;
+}
+
+/* intro → article body: 16px on the source below 768 (the block margins collapse
+   there, so the body's top margin sets the gap) */
+body.story main > .section.story-intro {
+  margin-bottom: 0;
+}
+
+body.story main > .section.story-intro + .section {
+  margin-top: var(--spacing-m);
 }
 
 body.story main > .section.body-column .default-content-wrapper ul {
   list-style: none;
   padding-left: 1.5em;
+}
+
+/* aside "Explore more" teasers (Cards (overlay)): the source keeps the lighter
+   dual scrim and no text shadow (the 16/20 title itself is SKODA-817, cards.css) */
+body.story main > .section.sidebar .card-teaser.overlay .card-teaser-body {
+  background-image: var(--scrim-h), var(--scrim-v);
+}
+
+body.story main > .section.sidebar .card-teaser.overlay .card-teaser-title {
+  text-shadow: none;
 }
 
 /* The aside: stacked full-width cards + tags below the body on small screens. */
@@ -685,15 +795,23 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
 /* Layer 2 / Layer 3 — at ≥768 the article becomes a real two-column grid. This is a
    genuine structural transition (single stack → side-by-side), so it earns the one
    breakpoint. `main` is the grid; the body column spans the left track and the aside
-   the right, both capped by --content-max-width via the intrinsic minmax track. */
+   the right, both capped by --content-max-width via the intrinsic minmax track. The
+   body track is the 10px inset + 2/3 of the inset content box, so the text lands on
+   the source's 819px at 1248 (707 at 1080, 499 at 768); the aside takes the rest. */
 @media (width >= 768px) {
   body.story main {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-    column-gap: var(--story-column-gap);
+    grid-template-columns:
+      minmax(0, calc(var(--story-inset) + (100% - 2 * var(--story-inset)) * 2 / 3))
+      minmax(0, 1fr);
     max-width: var(--content-max-width);
     margin-inline: auto;
     align-items: start;
+  }
+
+  /* the text ends where the aside track starts (the aside owns the 64px gap) */
+  body.story main > .section.body-column > div {
+    padding-inline: var(--story-inset) 0;
   }
 
   /* Full-bleed sections (hero) opt out of the grid and span both tracks. */
@@ -713,8 +831,16 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
     grid-column: 2;
   }
 
+  /* 64px after the text, ending the source's 10px from the container edge */
   body.story main > .section.sidebar > div {
-    padding-inline: var(--spacing-xxl) 0;
+    padding-inline: var(--spacing-xxl) var(--story-inset);
+  }
+
+  /* intro → article body is 48px here on the source (grid items don't collapse
+     margins, so both first-row sections carry it and stay top-aligned) */
+  body.story main > .section.story-intro ~ .section.body-column,
+  body.story main > .section.story-intro ~ .section.sidebar {
+    margin-top: var(--story-intro-gap);
   }
 
   body.story main > .section.dark {
@@ -734,16 +860,69 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
     z-index: -1;
   }
 
-  /* At desktop the measured source h2 is 40/45 (wt300). */
-  body.story main > .section.body-column .default-content-wrapper h2 {
-    font-size: var(--heading-font-size-hero-story);
-    line-height: 1.125;
+  body.story main > .section.dark.story-rail-container::before {
+    max-width: var(--story-related-band-max-width);
   }
+}
+
+/* From 1080 the hero title moves above its image (hero-image block), so the intro
+   would sit flush under the image; the source keeps the perex's 16px top gap. */
+@media (width >= 1080px) {
+  body.story main > .section.story-intro .default-content-wrapper {
+    margin-top: var(--spacing-m);
+  }
+}
+
+/* The source steps the prose headings up just past 768px (24px h2 at 768, 40px at
+   769), one pixel after the grid breakpoint above, so it gets its own query. */
+@media (width > 768px) {
+  body.story main > .section.body-column .default-content-wrapper h2 {
+    font-size: var(--heading-font-size-hero-story); /* 40px */
+  }
+
+  body.story main > .section.body-column .default-content-wrapper h3 {
+    font-size: var(--heading-font-size-story-h3);
+  }
+}
+
+/* The story's related rail has its own band rhythm; other dark sections
+   retain the shared section padding and typography. */
+body.story main > .section.dark.story-rail-container {
+  margin-block-end: var(--spacing-l);
+  padding-block: var(--spacing-xxl) calc(var(--spacing-xl) + var(--paragraph-gap));
+}
+
+body.story main > .section.dark.story-rail-container > div {
+  padding-inline: 0;
+}
+
+body.story main > .section.dark.story-rail-container .default-content-wrapper {
+  padding-inline: var(--related-band-heading-inset);
+}
+
+body.story main > .section.dark.story-rail-container .default-content-wrapper h2 {
+  margin: 0;
+  color: var(--skoda-white);
+  font-size: var(--related-band-heading-compact);
+  font-weight: var(--weight-semibold);
+  line-height: 1.25;
+}
+
+body.story main > .section.dark.story-rail-container .default-content-wrapper p {
+  margin-block: 0 var(--paragraph-gap);
+  color: var(--related-band-subtitle-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 2;
 }
 
 /* The source keeps the 20px sidebar headings at exactly 768px, then uses 16px. */
 @media (width > 768px) {
   body.story main > .section.sidebar .default-content-wrapper > h2 {
     font-size: var(--body-font-size-m);
+  }
+
+  body.story main > .section.dark.story-rail-container .default-content-wrapper h2 {
+    font-size: var(--heading-font-size-l);
   }
 }

@@ -552,3 +552,207 @@ body.gallery-lightbox-open {
 .gallery .gallery-overlay.reduced-motion .gallery-lightbox-image-frame.is-loading::after {
   animation: none;
 }
+
+/* ==========================================================================
+ * Slider variant — `Gallery (slider)` (SKODA-819)
+ * Story in-body image carousel, measured on the live Epiq story
+ * (.carousel-widget): one 16:9 image per view, 32px light-disc ink arrows 10px
+ * inside the edges, 10px dots 22px below the slide, an optional centred item
+ * description under the image (Octavia). As on the source it overhangs the text
+ * column by 10px each side: 839×472 @1440, 519 @768, full width on mobile.
+ * ========================================================================== */
+.gallery.slider {
+  --slider-arrow-size: var(--carousel-arrow-size); /* 32px (source) */
+  --slider-arrow-inset: 10px; /* Flickity arrows sit 10px inside the viewport */
+  --slider-dot-size: 10px;
+  --slider-dots-offset: 22px; /* slide bottom → dot row (source bottom:-32px on a 10px row) */
+  --slider-caption-padding: 10px; /* source .search-results-item-description */
+  --slider-caption-font-size: 10pt; /* 13.33px, the source description span */
+  --slider-caption-line-height: 24px;
+
+  /* vertical rhythm measured on the source: paragraph text → image 44px
+     (the paragraph's 20px margin + 24), dot row → next heading 48px (<768).
+     Padding, not margin, so it adds to the paragraph margin instead of
+     collapsing into it. */
+  padding-block: var(--spacing-l) var(--spacing-m);
+}
+
+/* no images authored: decorate() leaves the block empty — take no space
+   (its vertical padding would otherwise leave a gap in the story) */
+.gallery.slider:empty {
+  display: none;
+}
+
+.gallery.slider .gallery-slider-viewport {
+  position: relative;
+
+  /* whole pixels: the source-width column is fractional (838.67px @1440), and a
+     scroll offset can't rest on a fraction, so a ⅓px sliver of the next slide
+     would show. Where round() is unsupported the width simply stays fluid. */
+  width: round(down, 100%, 1px);
+}
+
+.gallery.slider .gallery-slider-track {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.gallery.slider .gallery-slider-track::-webkit-scrollbar {
+  display: none;
+}
+
+.gallery.slider .gallery-slider-track.is-dragging {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+}
+
+.gallery.slider .gallery-slider-track:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+.gallery.slider .gallery-slide {
+  flex: 0 0 100%;
+  margin: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* the 16:9 image frame (clips the 102% image); a caption, when authored, follows */
+.gallery.slider .gallery-slide picture {
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+/* cover the 16:9 box; the source also scales the image to 102% */
+.gallery.slider .gallery-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+}
+
+/* optional description under the image, as the source item description: 10px
+   above/below, centred 10pt text on a 24px line, 20px after each paragraph
+   (one line = 64px, so the dots land 86px under the image as on the Octavia
+   story). The slide and its arrows grow with it, as on the source. */
+.gallery.slider .gallery-slide-caption {
+  padding-block: var(--slider-caption-padding);
+  color: var(--text-color);
+  font-size: var(--slider-caption-font-size);
+  line-height: var(--slider-caption-line-height);
+  text-align: center;
+}
+
+.gallery.slider .gallery-slide-caption p {
+  margin: 0 0 var(--paragraph-gap);
+}
+
+/* --- arrows: 32px light disc with an ink arrow (source icon-font glyph) --- */
+.gallery.slider .gallery-slider-prev,
+.gallery.slider .gallery-slider-next {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: var(--slider-arrow-inset);
+  display: block;
+  width: var(--slider-arrow-size);
+  height: var(--slider-arrow-size);
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background: transparent;
+  color: var(--skoda-ink);
+  cursor: default; /* source arrows keep the default cursor */
+  transform: translateY(-50%);
+  transition: opacity 0.3s ease-in-out;
+}
+
+.gallery.slider .gallery-slider-next {
+  inset-inline: auto var(--slider-arrow-inset);
+}
+
+.gallery.slider .gallery-slider-prev svg,
+.gallery.slider .gallery-slider-next svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: currentcolor;
+}
+
+.gallery.slider .gallery-slider-arrow-disc {
+  fill: var(--slider-arrow-disc);
+}
+
+.gallery.slider .gallery-slider-next svg {
+  transform: scaleX(-1);
+}
+
+/* --- page dots: 10px, 16px apart, selected dot solid ------------------- */
+.gallery.slider .gallery-slider-dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-m);
+  margin-block-start: var(--slider-dots-offset);
+}
+
+.gallery.slider .gallery-slider-dot {
+  position: relative;
+  width: var(--slider-dot-size);
+  height: var(--slider-dot-size);
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background: var(--slider-dot);
+  cursor: pointer;
+}
+
+/* larger invisible hit area for touch, without moving the dots */
+.gallery.slider .gallery-slider-dot::after {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--spacing-xs));
+}
+
+.gallery.slider .gallery-slider-dot[aria-current] {
+  background: var(--slider-control);
+}
+
+/* focus, by mouse or keyboard alike (the source's Flickity :focus): a 5px blue
+   ring hugging the round arrow / dot, kept while the control has focus */
+.gallery.slider .gallery-slider-prev:focus,
+.gallery.slider .gallery-slider-next:focus,
+.gallery.slider .gallery-slider-dot:focus {
+  /* transparent, not none: forced-colors mode drops box-shadow but paints this
+     outline in the system colour, so keyboard focus stays visible there */
+  outline: 2px solid transparent;
+  box-shadow: 0 0 0 5px var(--slider-focus-ring);
+}
+
+/* pressed arrows fade to 60% (source: opacity .3s ease-in-out) */
+.gallery.slider .gallery-slider-prev:active,
+.gallery.slider .gallery-slider-next:active {
+  opacity: 0.6;
+}
+
+/* story body: as on the source, the slider bleeds the column's 10px inset past
+   both text edges (839px against 819px of text at 1248; full width on mobile) */
+body.story .section.body-column .gallery.slider {
+  margin-inline: calc(-1 * var(--story-inset));
+}
+
+@media (width >= 768px) {
+  /* two-column story: image → next heading is 72px on the source */
+  .gallery.slider {
+    padding-block-end: var(--spacing-xl);
+  }
+}

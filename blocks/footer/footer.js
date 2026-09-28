@@ -14,6 +14,12 @@ export default async function decorate(block) {
 
   // decorate footer DOM
   block.textContent = '';
+  if (!fragment) {
+    // a missing/unpublished footer fragment leaves an empty footer, never a broken page (SKODA-307)
+    // eslint-disable-next-line no-console
+    console.warn(`footer: footer fragment ${footerPath} could not be loaded`);
+    return;
+  }
   const footer = document.createElement('div');
   while (fragment.firstElementChild) footer.append(fragment.firstElementChild);
 
