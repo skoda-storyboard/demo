@@ -50,7 +50,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 
 | Block | Variants | Config keys |
 |---|---|---|
-| `cards` | `media`, `overlay`, `toolbar` | – |
+| `cards` | `media`, `overlay`, `toolbar`, `series-directory` | – |
 | `carousel` | `dots` | – |
 | `columns` | – | – |
 | `downloads` | – | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes` (SKODA-502) |
@@ -63,6 +63,8 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `tags` | `chips` | – |
 | `promo-box` | – | curated rows **or** config (`index`, `template`, `path`, `category`, `tags`, `limit`, `sort`); never mixed (PR #110, merged) |
 | `search`, `fragment`, `header`, `footer`, `widget`, `newsletter-stub` | – | – |
+
+**`Cards (series-directory)`** (SKODA-207, 2026-09-27; the M2 series directory `/en/series-2`). One row per source card, in source order: `[<picture>, <h2><a href="/en/series/…">Title</a></h2><p>excerpt</p>]`. The title sits over the image and the excerpt below it (`cards.css`). Emitted by `parsers/series-grid.js`. Replaces the index `Listing` proposal (`Cards (overlay, series-directory)` in `series.md` §7): the variant has its own layout, so it doesn't combine with `overlay`.
 
 `blocks/hero` exists only as an **empty boilerplate stub** (`hero.js` is 0 bytes). It isn't a baseline block: the project hero is `hero-image`, see `hero` below.
 

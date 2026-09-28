@@ -260,6 +260,8 @@ export default function transform(hookName, element, payload) {
   }
   if (publisheddate) meta.publisheddate = publisheddate;
   if (template) meta.template = template;
+  // page layout for a template=page page (e.g. the series directory, SKODA-207)
+  if (overrides.theme) meta.theme = overrides.theme;
   if (category) meta.category = category;
 
   // tags = derived ∪ override (comma-joined → AEM splits into article:tag metas).

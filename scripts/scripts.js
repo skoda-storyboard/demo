@@ -16,8 +16,9 @@ import {
 
 /**
  * Page templates with their own layout code: `templates/<name>/<name>.{js,css}`, selected by
- * the `template` metadata (`press_release` → `press-release`). Only listed templates load, so
- * an unknown value never requests a missing file.
+ * the `template` metadata (`press_release` → `press-release`), else by the `theme` metadata
+ * (a `template: page` page that shares a layout, e.g. the series directory → `skoda-series`).
+ * Only listed templates load, so an unknown value never requests a missing file.
  */
 const TEMPLATES = ['press-release', 'skoda-series'];
 
@@ -269,10 +270,11 @@ function decorateStorySections(main) {
   applySectionStyles(main);
 }
 
-/** The page's template, if it has its own layout code (see TEMPLATES). */
+/** The page's template (or theme), if it has its own layout code (see TEMPLATES). */
 function pageTemplate() {
-  const name = toClassName(getMetadata('template'));
-  return TEMPLATES.includes(name) ? name : null;
+  return [getMetadata('template'), getMetadata('theme')]
+    .map((value) => toClassName(value))
+    .find((name) => TEMPLATES.includes(name)) || null;
 }
 
 /**

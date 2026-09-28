@@ -41,34 +41,38 @@ var CustomImportScript = (() => {
     default: () => import_series_directory_default
   });
 
-  // tools/importer/parsers/hero-banner.js
+  // tools/importer/parsers/series-hero.js
+  var clean = (node) => node ? (node.textContent || "").replace(/\s+/g, " ").trim() : "";
   function parse(element, { document: document2 }) {
-    const img = element.querySelector(".hero-image img, .image-wrapper img, img");
-    const heading = element.querySelector("h1, h2, .hero-title, .entry-title");
-    const perex = element.querySelector(".perex, .hero-caption p, .hero-content p");
-    const ctas = Array.from(element.querySelectorAll("a.btn, a.btn-secondary, .hero-content a, .cta a"));
-    if (!img && !heading) {
+    const img = element.querySelector(".hero-image img, img");
+    const caption = element.querySelector(".hero-caption") || element;
+    const title = clean(caption.querySelector("h1, h2, .heading"));
+    if (!img && !title) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const cells = [["Hero"]];
-    cells.push([img || ""]);
-    const contentCell = [];
-    if (heading) contentCell.push(heading);
-    if (perex && (perex.textContent || "").trim()) {
+    const content = [];
+    const label = clean(caption.querySelector(".category .label, .category"));
+    if (label) {
       const p = document2.createElement("p");
-      p.textContent = (perex.textContent || "").trim();
-      contentCell.push(p);
+      p.textContent = label;
+      content.push(p);
     }
-    ctas.forEach((a) => {
-      const link = document2.createElement("a");
-      link.setAttribute("href", a.getAttribute("href") || "#");
-      link.textContent = (a.textContent || "").trim();
-      if (link.textContent) contentCell.push(link);
-    });
-    if (contentCell.length) cells.push([contentCell]);
-    const table = WebImporter.DOMUtils.createTable(cells, document2);
-    element.replaceWith(table);
+    if (title) {
+      const h1 = document2.createElement("h1");
+      h1.textContent = title;
+      content.push(h1);
+    }
+    const perex = clean(caption.querySelector(".perex"));
+    if (perex) {
+      const p = document2.createElement("p");
+      p.textContent = perex;
+      content.push(p);
+    }
+    const cells = [["Hero Image (overlay)"]];
+    if (img) cells.push([img]);
+    if (content.length) cells.push([content]);
+    element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
 
   // tools/importer/parsers/series-grid.js
@@ -83,7 +87,7 @@ var CustomImportScript = (() => {
     "12:4x1": "banner",
     "12:3x1": "banner-tall"
   };
-  var clean = (node) => node ? (node.textContent || "").replace(/\s+/g, " ").trim() : "";
+  var clean2 = (node) => node ? (node.textContent || "").replace(/\s+/g, " ").trim() : "";
   function siteOriginWidths(document2) {
     const widths = {};
     document2.querySelectorAll("style").forEach((style) => {
@@ -122,6 +126,24 @@ var CustomImportScript = (() => {
     if (tiles.length === 2) return 6;
     if (tiles.length === 3) return ratios[i] === "1x1" && ratios.includes("2x1") ? 3 : ratios[i] === "2x1" && ratios.includes("1x1") ? 6 : 4;
     return null;
+  }
+  function directoryRows(element, document2) {
+    return [...element.querySelectorAll("article.article-teaser[data-content-type]")].map((article) => {
+      const link = article.querySelector("a[href]");
+      const h2 = document2.createElement("h2");
+      const a = document2.createElement("a");
+      a.setAttribute("href", link ? link.getAttribute("href") : "");
+      a.textContent = clean2(article.querySelector("h2, h3, .heading")) || clean2(link);
+      h2.append(a);
+      const body = [h2];
+      const excerpt = clean2(article.querySelector(".article-teaser-excerpt"));
+      if (excerpt) {
+        const p = document2.createElement("p");
+        p.textContent = excerpt;
+        body.push(p);
+      }
+      return [article.querySelector("img") || "", body];
+    });
   }
   function hubRows(element, document2) {
     const widths = siteOriginWidths(document2);
@@ -162,7 +184,7 @@ var CustomImportScript = (() => {
       const img = article.querySelector("img");
       const a = document2.createElement("a");
       a.setAttribute("href", link ? link.getAttribute("href") : "");
-      a.textContent = clean(article.querySelector("h2, h3, .heading")) || clean(link);
+      a.textContent = clean2(article.querySelector("h2, h3, .heading")) || clean2(link);
       return [token.trim(), img || "", a];
     });
   }
@@ -178,13 +200,7 @@ var CustomImportScript = (() => {
     if (isHub) {
       cells = [["Cards (overlay, tiles)"], ...hubRows(element, document2)];
     } else {
-      cells = [
-        ["Listing"],
-        ["index", "/en/query-index.json"],
-        ["template", "skoda_series"],
-        ["sort", "editorial"],
-        ["columns", "2"]
-      ];
+      cells = [["Cards (series-directory)"], ...directoryRows(element, document2)];
     }
     const table = WebImporter.DOMUtils.createTable(cells, document2);
     element.replaceWith(table);
@@ -502,6 +518,7 @@ var CustomImportScript = (() => {
     }
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
+    if (overrides.theme) meta.theme = overrides.theme;
     if (category) meta.category = category;
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
@@ -717,18 +734,115 @@ var CustomImportScript = (() => {
     });
   }
 
+  // tools/importer/transformers/skoda-images.js
+  function hasContent(node) {
+    return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
+  }
+  function withCaption(node, caption, document2) {
+    if (!caption) return node;
+    const figure = document2.createElement("figure");
+    const figcaption = document2.createElement("figcaption");
+    figcaption.textContent = caption;
+    figure.append(node, figcaption);
+    return figure;
+  }
+  function editorialCaption(node) {
+    if (!node) return "";
+    const caption = (node.getAttribute("data-caption") || "").trim();
+    if (!caption || node.closest(".article-teaser, .media-cart-image")) return "";
+    return caption === (node.getAttribute("data-video_title") || "").trim() ? "" : caption;
+  }
+  function imageContainer(img, document2, link = null) {
+    const div = document2.createElement("div");
+    div.append(img);
+    if (!link) return div;
+    link.append(div);
+    return link;
+  }
+  function splitParagraph(img, paragraph, caption, document2) {
+    const link = img.closest("a");
+    const linkedImage = link && paragraph.contains(link) && link.querySelectorAll("img").length === 1 && !(link.textContent || "").trim();
+    const target = linkedImage ? link : img;
+    const afterRange = document2.createRange();
+    afterRange.setStartAfter(target);
+    afterRange.setEnd(paragraph, paragraph.childNodes.length);
+    const after = paragraph.cloneNode(false);
+    after.append(afterRange.extractContents());
+    const beforeRange = document2.createRange();
+    beforeRange.selectNodeContents(paragraph);
+    beforeRange.setEndBefore(target);
+    const before = paragraph.cloneNode(false);
+    before.append(beforeRange.extractContents());
+    const imageNode = imageContainer(img, document2, linkedImage ? link : null);
+    const image = withCaption(imageNode, caption, document2);
+    paragraph.replaceWith(...[before, image, after].filter(hasContent));
+  }
+  function normalizeImages(root, document2 = root.ownerDocument) {
+    root.querySelectorAll("img").forEach((img) => {
+      if (!img.hasAttribute("alt") || !img.getAttribute("alt").trim()) {
+        const type = img.hasAttribute("alt") ? "empty" : "missing";
+        console.warn(`[image-import] ${type} alt: ${img.getAttribute("src") || "(no src)"}`);
+      }
+      if (img.closest("table, picture")) return;
+      const figure = img.closest("figure");
+      const wrapper = img.closest("[data-caption]");
+      const wrapperCaption = (wrapper == null ? void 0 : wrapper.querySelectorAll("img").length) === 1 ? editorialCaption(wrapper) : "";
+      const caption = (img.hasAttribute("data-caption") ? editorialCaption(img) : "") || wrapperCaption;
+      if (figure) {
+        if (img.parentElement.tagName !== "DIV") {
+          const div = document2.createElement("div");
+          img.replaceWith(div);
+          div.append(img);
+        }
+        if (caption && !figure.querySelector("figcaption")) {
+          const figcaption = document2.createElement("figcaption");
+          figcaption.textContent = caption;
+          figure.append(figcaption);
+        }
+        return;
+      }
+      const paragraph = img.closest("p");
+      if (paragraph) {
+        splitParagraph(img, paragraph, caption, document2);
+        return;
+      }
+      if (img.parentElement.tagName === "DIV") {
+        if (caption) {
+          const div = img.parentElement;
+          if (div.childElementCount === 1 && !(div.textContent || "").trim()) {
+            const marker2 = document2.createComment("image");
+            div.replaceWith(marker2);
+            marker2.replaceWith(withCaption(div, caption, document2));
+          } else {
+            const marker2 = document2.createComment("image");
+            img.replaceWith(marker2);
+            marker2.replaceWith(withCaption(imageContainer(img, document2), caption, document2));
+          }
+        }
+        return;
+      }
+      const link = img.closest("a");
+      const linkedImage = link && link.querySelectorAll("img").length === 1 && !(link.textContent || "").trim();
+      const target = linkedImage ? link : img;
+      const marker = document2.createComment("image");
+      target.replaceWith(marker);
+      const imageNode = imageContainer(img, document2, linkedImage ? link : null);
+      marker.replaceWith(withCaption(imageNode, caption, document2));
+    });
+  }
+
   // tools/importer/import-series-directory.js
   var parsers = {
-    "hero-banner": parse,
+    "series-hero": parse,
     "series-grid": parse2
   };
   var PAGE_TEMPLATE = {
     name: "series-directory",
-    description: "\u0160koda Series directory (template-tiles). Hero banner + index-driven Listing (template=skoda_series, editorial order). Metadata template=page. Content-driven detection only.",
+    description: "\u0160koda Series directory (template-tiles). Hero Image (overlay) + the authored series cards as Cards (series-directory): every source card in order, linked title over the image, full excerpt below. Metadata template=page, theme=skoda-series. Content-driven detection only.",
     urls: ["https://www.skoda-storyboard.com/en/series-2/"],
-    metadata: { template: "page" },
+    metadata: { template: "page", theme: "skoda-series" },
     blocks: [
-      { name: "hero-banner", instances: ["div.hero"] },
+      { name: "series-hero", instances: ["div.hero"] },
       { name: "series-grid", instances: [".panel-layout"] }
     ],
     sections: [
@@ -737,7 +851,7 @@ var CustomImportScript = (() => {
         name: "Hero",
         selector: ["div.hero"],
         style: null,
-        blocks: ["hero-banner"],
+        blocks: ["series-hero"],
         defaultContent: []
       },
       {
@@ -803,6 +917,7 @@ var CustomImportScript = (() => {
       });
       executeTransformers("afterTransform", main, payload);
       WebImporter.rules.transformBackgroundImages(main, document2);
+      normalizeImages(main, document2);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
       const path = WebImporter.FileUtils.sanitizePath(rawPath === "" ? "/index" : rawPath);

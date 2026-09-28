@@ -566,10 +566,11 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2022/09/04_skoda_explore_more-copy_cbdef8af.jpg",
       "da_path": "",
       "alt": "Series",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2022/09/04_skoda_explore_more-copy_cbdef8af-1920x744.jpg",
-        "https://cdn.skoda-storyboard.com/2022/09/04_skoda_explore_more-copy_cbdef8af-1440x558.jpg"
+        "https://cdn.skoda-storyboard.com/2022/09/04_skoda_explore_more-copy_cbdef8af-1440x558.jpg",
+        "https://cdn.skoda-storyboard.com/2022/09/04_skoda_explore_more-copy_cbdef8af.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 2323659,
@@ -2148,10 +2149,11 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2024/06/necekane_profese_3082x1194_4571eff0.jpg",
       "da_path": "",
       "alt": "",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2024/06/necekane_profese_3082x1194_4571eff0-1920x744.jpg",
-        "https://cdn.skoda-storyboard.com/2024/06/necekane_profese_3082x1194_4571eff0.jpg"
+        "https://cdn.skoda-storyboard.com/2024/06/necekane_profese_3082x1194_4571eff0.jpg",
+        "https://cdn.skoda-storyboard.com/2024/06/necekane_profese_3082x1194_4571eff0-1440x558.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 2034481,
@@ -2164,7 +2166,8 @@
       "status": "done",
       "note": "",
       "page_refs": [
-        "en/series/unexpected-jobs"
+        "en/series/unexpected-jobs",
+        "en/series-2"
       ],
       "dam_status": 200
     },
@@ -2179,10 +2182,11 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2024/03/Skoda_Storyboard_Header_3082x1194_Minutes-from-car-production-V7_9104b254.jpg",
       "da_path": "",
       "alt": "",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2024/03/Skoda_Storyboard_Header_3082x1194_Minutes-from-car-production-V7_9104b254-1920x744.jpg",
-        "https://cdn.skoda-storyboard.com/2024/03/Skoda_Storyboard_Header_3082x1194_Minutes-from-car-production-V7_9104b254-1440x558.jpg"
+        "https://cdn.skoda-storyboard.com/2024/03/Skoda_Storyboard_Header_3082x1194_Minutes-from-car-production-V7_9104b254-1440x558.jpg",
+        "https://cdn.skoda-storyboard.com/2024/03/Skoda_Storyboard_Header_3082x1194_Minutes-from-car-production-V7_9104b254.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 3624915,
@@ -2195,7 +2199,8 @@
       "status": "done",
       "note": "",
       "page_refs": [
-        "en/series/minutes-from-car-production"
+        "en/series/minutes-from-car-production",
+        "en/series-2"
       ],
       "dam_status": 200
     },
@@ -32345,7 +32350,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2018/12/Czech-Footprint.jpg",
       "dam_page_path": "en/series/czech-footprint",
       "page_refs": [
-        "en/series/czech-footprint"
+        "en/series/czech-footprint",
+        "en/series-2"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -32353,10 +32359,11 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2018/12/Czech-Footprint.jpg",
       "da_path": "",
       "alt": "",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2018/12/Czech-Footprint-1920x730.jpg",
-        "https://cdn.skoda-storyboard.com/2018/12/Czech-Footprint.jpg"
+        "https://cdn.skoda-storyboard.com/2018/12/Czech-Footprint.jpg",
+        "https://cdn.skoda-storyboard.com/2018/12/Czech-Footprint-1440x547.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 1244679,
@@ -32555,7 +32562,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2021/01/02_skoda_explore_more-copy_c717bf21.jpg",
       "dam_page_path": "en/series/sustainable-mobility",
       "page_refs": [
-        "en/series/sustainable-mobility"
+        "en/series/sustainable-mobility",
+        "en/series-2"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -35194,7 +35202,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2018/11/best-of-header-V4.jpg",
       "dam_page_path": "en/series/my-life-my-car",
       "page_refs": [
-        "en/series/my-life-my-car"
+        "en/series/my-life-my-car",
+        "en/series-2"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -35202,10 +35211,11 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2018/11/best-of-header-V4.jpg",
       "da_path": "",
       "alt": "",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2018/11/best-of-header-V4-1920x730.jpg",
-        "https://cdn.skoda-storyboard.com/2018/11/best-of-header-V4.jpg"
+        "https://cdn.skoda-storyboard.com/2018/11/best-of-header-V4.jpg",
+        "https://cdn.skoda-storyboard.com/2018/11/best-of-header-V4-1440x547.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 1224187,
@@ -35674,7 +35684,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2018/12/Evolution-of-parts.jpg",
       "dam_page_path": "en/series/evolution-of-parts",
       "page_refs": [
-        "en/series/evolution-of-parts"
+        "en/series/evolution-of-parts",
+        "en/series-2"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -35682,10 +35693,11 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2018/12/Evolution-of-parts.jpg",
       "da_path": "",
       "alt": "",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2018/12/Evolution-of-parts-1920x730.jpg",
-        "https://cdn.skoda-storyboard.com/2018/12/Evolution-of-parts.jpg"
+        "https://cdn.skoda-storyboard.com/2018/12/Evolution-of-parts.jpg",
+        "https://cdn.skoda-storyboard.com/2018/12/Evolution-of-parts-1440x547.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 780840,
@@ -35914,7 +35926,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2022/11/Elroq_banner_stories_60_sec_7b5270a8.jpg",
       "dam_page_path": "en/series/60-seconds-walkaround",
       "page_refs": [
-        "en/series/60-seconds-walkaround"
+        "en/series/60-seconds-walkaround",
+        "en/series-2"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -37291,7 +37304,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2021/09/skoda_roadtrip1_16x9_86-jpg-copy_2630b8bb.jpg",
       "dam_page_path": "en/series/road-trip",
       "page_refs": [
-        "en/series/road-trip"
+        "en/series/road-trip",
+        "en/series-2"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -37299,10 +37313,11 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2021/09/skoda_roadtrip1_16x9_86-jpg-copy_2630b8bb.jpg",
       "da_path": "",
       "alt": "",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2021/09/skoda_roadtrip1_16x9_86-jpg-copy_2630b8bb-1920x744.jpg",
-        "https://cdn.skoda-storyboard.com/2021/09/skoda_roadtrip1_16x9_86-jpg-copy_2630b8bb-1440x558.jpg"
+        "https://cdn.skoda-storyboard.com/2021/09/skoda_roadtrip1_16x9_86-jpg-copy_2630b8bb-1440x558.jpg",
+        "https://cdn.skoda-storyboard.com/2021/09/skoda_roadtrip1_16x9_86-jpg-copy_2630b8bb.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 2873112,
@@ -37321,7 +37336,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2018/12/Winter-tips.jpg",
       "dam_page_path": "en/series/winter-tips",
       "page_refs": [
-        "en/series/winter-tips"
+        "en/series/winter-tips",
+        "en/series-2"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -37329,10 +37345,11 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2018/12/Winter-tips.jpg",
       "da_path": "",
       "alt": "",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2018/12/Winter-tips-1920x730.jpg",
-        "https://cdn.skoda-storyboard.com/2018/12/Winter-tips.jpg"
+        "https://cdn.skoda-storyboard.com/2018/12/Winter-tips.jpg",
+        "https://cdn.skoda-storyboard.com/2018/12/Winter-tips-1440x547.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 726853,
@@ -37554,7 +37571,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2021/01/1906_18_leden_var01-copy_7b4d8212.jpg",
       "dam_page_path": "en/series/back-to-the-past",
       "page_refs": [
-        "en/series/back-to-the-past"
+        "en/series/back-to-the-past",
+        "en/series-2"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -37562,10 +37580,11 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2021/01/1906_18_leden_var01-copy_7b4d8212.jpg",
       "da_path": "",
       "alt": "",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2021/01/1906_18_leden_var01-copy_7b4d8212-1920x744.jpg",
-        "https://cdn.skoda-storyboard.com/2021/01/1906_18_leden_var01-copy_7b4d8212-1440x558.jpg"
+        "https://cdn.skoda-storyboard.com/2021/01/1906_18_leden_var01-copy_7b4d8212-1440x558.jpg",
+        "https://cdn.skoda-storyboard.com/2021/01/1906_18_leden_var01-copy_7b4d8212.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 2458325,
@@ -38367,7 +38386,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2018/08/hero_V2.jpg",
       "dam_page_path": "en/series/unknown-parts",
       "page_refs": [
-        "en/series/unknown-parts"
+        "en/series/unknown-parts",
+        "en/series-2"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -38375,7 +38395,7 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2018/08/hero_V2.jpg",
       "da_path": "",
       "alt": "",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2018/08/hero_V2-1920x730.jpg",
         "https://cdn.skoda-storyboard.com/2018/08/hero_V2-1440x547.jpg",
@@ -38514,7 +38534,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2021/01/foto-virtualni-pedal-copy_8d99d15a.jpg",
       "dam_page_path": "en/series/hidden-helpers",
       "page_refs": [
-        "en/series/hidden-helpers"
+        "en/series/hidden-helpers",
+        "en/series-2"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -38522,10 +38543,11 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2021/01/foto-virtualni-pedal-copy_8d99d15a.jpg",
       "da_path": "",
       "alt": "",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2021/01/foto-virtualni-pedal-copy_8d99d15a-1920x744.jpg",
-        "https://cdn.skoda-storyboard.com/2021/01/foto-virtualni-pedal-copy_8d99d15a-1440x558.jpg"
+        "https://cdn.skoda-storyboard.com/2021/01/foto-virtualni-pedal-copy_8d99d15a-1440x558.jpg",
+        "https://cdn.skoda-storyboard.com/2021/01/foto-virtualni-pedal-copy_8d99d15a.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 4546064,
@@ -38769,6 +38791,366 @@
       },
       "status": "partial",
       "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(33781544, min 768px)"
+    },
+    "551ee036__RS200_Side_Dan-Petr-copy_a2f64255.jpg": {
+      "logical_id": "551ee036__RS200_Side_Dan-Petr-copy_a2f64255.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2020/11/RS200_Side_Dan-Petr-copy_a2f64255-1440x558.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2020/11/RS200_Side_Dan-Petr-copy_a2f64255.jpg",
+      "dam_page_path": "en/series-2",
+      "page_refs": [
+        "en/series-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2020/11/RS200_Side_Dan-Petr-copy_a2f64255.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": null,
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2020/11/RS200_Side_Dan-Petr-copy_a2f64255-1440x558.jpg",
+        "https://cdn.skoda-storyboard.com/2020/11/RS200_Side_Dan-Petr-copy_a2f64255.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 819947,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "4397252d__DSF8938_1a06cdc7-2560x1707_c8a875e8_fa0cd1cf.jpg": {
+      "logical_id": "4397252d__DSF8938_1a06cdc7-2560x1707_c8a875e8_fa0cd1cf.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/01/DSF8938_1a06cdc7-2560x1707_c8a875e8_fa0cd1cf-1440x960.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/01/DSF8938_1a06cdc7-2560x1707_c8a875e8_fa0cd1cf.jpg",
+      "dam_page_path": "en/series-2",
+      "page_refs": [
+        "en/series-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/01/DSF8938_1a06cdc7-2560x1707_c8a875e8_fa0cd1cf.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": null,
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/01/DSF8938_1a06cdc7-2560x1707_c8a875e8_fa0cd1cf-1440x960.jpg",
+        "https://cdn.skoda-storyboard.com/2026/01/DSF8938_1a06cdc7-2560x1707_c8a875e8_fa0cd1cf.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 1475268,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "4397252d__RS_Rally2_family_c7bc54be.jpg": {
+      "logical_id": "4397252d__RS_Rally2_family_c7bc54be.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/01/RS_Rally2_family_c7bc54be-1440x960.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/01/RS_Rally2_family_c7bc54be.jpg",
+      "dam_page_path": "en/series-2",
+      "page_refs": [
+        "en/series-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/01/RS_Rally2_family_c7bc54be-2560x1707.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": null,
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/01/RS_Rally2_family_c7bc54be-1440x960.jpg",
+        "https://cdn.skoda-storyboard.com/2026/01/RS_Rally2_family_c7bc54be-2560x1707.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 357647,
+      "preconditioned": true,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "bd8c395e__DSC_8964_1f7fbca0_721f63ea.jpg": {
+      "logical_id": "bd8c395e__DSC_8964_1f7fbca0_721f63ea.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/07/DSC_8964_1f7fbca0_721f63ea-1440x960.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/07/DSC_8964_1f7fbca0_721f63ea.jpg",
+      "dam_page_path": "en/series-2",
+      "page_refs": [
+        "en/series-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/07/DSC_8964_1f7fbca0_721f63ea-2560x1707.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": null,
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/07/DSC_8964_1f7fbca0_721f63ea-1440x960.jpg",
+        "https://cdn.skoda-storyboard.com/2025/07/DSC_8964_1f7fbca0_721f63ea-2560x1707.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 1020037,
+      "preconditioned": true,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "67d4c803__Header_125_let_EN-2.png": {
+      "logical_id": "67d4c803__Header_125_let_EN-2.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2020/01/Header_125_let_EN-2-1440x454.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2020/01/Header_125_let_EN-2.png",
+      "dam_page_path": "en/series-2",
+      "page_refs": [
+        "en/series-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2020/01/Header_125_let_EN-2.png",
+      "da_path": "",
+      "alt": "",
+      "caption": null,
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2020/01/Header_125_let_EN-2-1440x454.png",
+        "https://cdn.skoda-storyboard.com/2020/01/Header_125_let_EN-2.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 100889,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "e00eee37__752_20_Header_120_let_2.png": {
+      "logical_id": "e00eee37__752_20_Header_120_let_2.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/01/752_20_Header_120_let_2-1440x454.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/01/752_20_Header_120_let_2.png",
+      "dam_page_path": "en/series-2",
+      "page_refs": [
+        "en/series-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/01/752_20_Header_120_let_2.png",
+      "da_path": "",
+      "alt": "",
+      "caption": null,
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/01/752_20_Header_120_let_2-1440x454.png",
+        "https://cdn.skoda-storyboard.com/2021/01/752_20_Header_120_let_2.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 99770,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "0afb65f4__Header_sekce_O.jpg": {
+      "logical_id": "0afb65f4__Header_sekce_O.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2019/12/Header_sekce_O-1440x547.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2019/12/Header_sekce_O.jpg",
+      "dam_page_path": "en/series-2",
+      "page_refs": [
+        "en/series-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2019/12/Header_sekce_O.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": null,
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2019/12/Header_sekce_O-1440x547.jpg",
+        "https://cdn.skoda-storyboard.com/2019/12/Header_sekce_O.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 446236,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "0a44313c__spz-header-serial-V2.jpg": {
+      "logical_id": "0a44313c__spz-header-serial-V2.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2019/01/spz-header-serial-V2-1440x547.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2019/01/spz-header-serial-V2.jpg",
+      "dam_page_path": "en/series-2",
+      "page_refs": [
+        "en/series-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2019/01/spz-header-serial-V2.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": null,
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2019/01/spz-header-serial-V2-1440x547.jpg",
+        "https://cdn.skoda-storyboard.com/2019/01/spz-header-serial-V2.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 1015115,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "8a8e8b11__751_22_SKODA_enyaq_serial_3082x1194_III_edb6333b.jpg": {
+      "logical_id": "8a8e8b11__751_22_SKODA_enyaq_serial_3082x1194_III_edb6333b.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/10/751_22_SKODA_enyaq_serial_3082x1194_III_edb6333b-1440x558.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/10/751_22_SKODA_enyaq_serial_3082x1194_III_edb6333b.jpg",
+      "dam_page_path": "en/series-2",
+      "page_refs": [
+        "en/series-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/10/751_22_SKODA_enyaq_serial_3082x1194_III_edb6333b.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": null,
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/10/751_22_SKODA_enyaq_serial_3082x1194_III_edb6333b-1440x558.jpg",
+        "https://cdn.skoda-storyboard.com/2021/10/751_22_SKODA_enyaq_serial_3082x1194_III_edb6333b.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 905467,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "8a8e8b11__DRC5117ab-copy_1017aabc.jpg": {
+      "logical_id": "8a8e8b11__DRC5117ab-copy_1017aabc.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/10/DRC5117ab-copy_1017aabc-1440x558.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/10/DRC5117ab-copy_1017aabc.jpg",
+      "dam_page_path": "en/series-2",
+      "page_refs": [
+        "en/series-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/10/DRC5117ab-copy_1017aabc.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": null,
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/10/DRC5117ab-copy_1017aabc-1440x558.jpg",
+        "https://cdn.skoda-storyboard.com/2021/10/DRC5117ab-copy_1017aabc.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 1989890,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "0a44313c__Assistance-systems-1.jpg": {
+      "logical_id": "0a44313c__Assistance-systems-1.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2019/01/Assistance-systems-1-1440x547.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2019/01/Assistance-systems-1.jpg",
+      "dam_page_path": "en/series-2",
+      "page_refs": [
+        "en/series-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2019/01/Assistance-systems-1.jpg",
+      "da_path": "",
+      "alt": "",
+      "caption": null,
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2019/01/Assistance-systems-1-1440x547.jpg",
+        "https://cdn.skoda-storyboard.com/2019/01/Assistance-systems-1.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 967790,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "e1291945__1C_ac63c3be.png": {
+      "logical_id": "e1291945__1C_ac63c3be.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2023/10/1C_ac63c3be-1440x558.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2023/10/1C_ac63c3be.png",
+      "dam_page_path": "en/series-2",
+      "page_refs": [
+        "en/series-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2023/10/1C_ac63c3be.png",
+      "da_path": "",
+      "alt": "",
+      "caption": null,
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2023/10/1C_ac63c3be-1440x558.png",
+        "https://cdn.skoda-storyboard.com/2023/10/1C_ac63c3be.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 6991042,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
     }
   }
 }

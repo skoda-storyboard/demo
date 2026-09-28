@@ -182,6 +182,7 @@ export function buildMetaFields({
   if (description) meta.Description = description;
   if (publisheddate) meta.publisheddate = publisheddate;
   if (template) meta.template = template;
+  if (overrides.theme) meta.theme = overrides.theme;
   if (category) meta.category = category;
 
   const facetValues = {};
