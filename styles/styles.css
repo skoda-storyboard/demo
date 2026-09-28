@@ -59,6 +59,7 @@
   --story-sidebar-inset: var(--story-inset);
   --story-sidebar-heading-size-compact: 20px;
   --story-sidebar-heading-line-height: 45px;
+  --story-related-band-max-width: 1440px;
 
   /* body sizes (mobile-first base) */
   --body-font-size-lead: 20px; /* story perex under the hero (live: 20/30 wt600) */
@@ -74,6 +75,10 @@
   --heading-font-size-s: 18px;
   --heading-font-size-xs: 16px;
   --heading-font-size-promo: 29.6px;
+  --related-band-heading-compact: 20px;
+  --related-band-heading-inset: 10px;
+  --related-band-card-title-compact: 20px;
+  --related-band-date-gap: 6px;
 
   /* hero titles (hero.md §3/§4; SKODA-202): story 40->28; overlay 48/300 white */
   --heading-font-size-hero: 48px;
@@ -815,6 +820,10 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
     background: var(--dark-color);
     z-index: -1;
   }
+
+  body.story main > .section.dark.story-rail-container::before {
+    max-width: var(--story-related-band-max-width);
+  }
 }
 
 /* From 1080 the hero title moves above its image (hero-image block), so the intro
@@ -837,9 +846,44 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
   }
 }
 
+/* The story's related rail has its own band rhythm; other dark sections
+   retain the shared section padding and typography. */
+body.story main > .section.dark.story-rail-container {
+  margin-block-end: var(--spacing-l);
+  padding-block: var(--spacing-xxl) calc(var(--spacing-xl) + var(--paragraph-gap));
+}
+
+body.story main > .section.dark.story-rail-container > div {
+  padding-inline: 0;
+}
+
+body.story main > .section.dark.story-rail-container .default-content-wrapper {
+  padding-inline: var(--related-band-heading-inset);
+}
+
+body.story main > .section.dark.story-rail-container .default-content-wrapper h2 {
+  margin: 0;
+  color: var(--skoda-white);
+  font-size: var(--related-band-heading-compact);
+  font-weight: var(--weight-semibold);
+  line-height: 1.25;
+}
+
+body.story main > .section.dark.story-rail-container .default-content-wrapper p {
+  margin-block: 0 var(--paragraph-gap);
+  color: var(--related-band-subtitle-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 2;
+}
+
 /* The source keeps the 20px sidebar headings at exactly 768px, then uses 16px. */
 @media (width > 768px) {
   body.story main > .section.sidebar .default-content-wrapper > h2 {
     font-size: var(--body-font-size-m);
+  }
+
+  body.story main > .section.dark.story-rail-container .default-content-wrapper h2 {
+    font-size: var(--heading-font-size-l);
   }
 }

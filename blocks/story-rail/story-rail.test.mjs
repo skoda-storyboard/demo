@@ -48,7 +48,7 @@ globalThis.document = {
 };
 
 const {
-  parseConfig, selectRows, rowToCells, isConfigTable, curatedRows,
+  parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail,
 } = await import('./story-rail.js');
 
 /*
@@ -189,6 +189,49 @@ test('selectRows ANDs across facet keys: model=epiq AND years=2026, self exclude
   assert.deepEqual(out.map((r) => r.title), ['EpiqThisYear', 'EpiqPeaqThisYear']);
 });
 
+test('related rail shows ten distinct indexed stories, or only available matches', () => {
+  const cfg = parseConfig(cfgBlock([
+    ['template', 'story'], ['model', 'epiq'], ['years', '2026'],
+    ['exclude', 'epiq-self'], ['limit', '10'],
+  ]));
+  const matching = Array.from({ length: 10 }, (_, i) => ({
+    path: `/en/emobility/related-${i}`,
+    title: `Related ${i}`,
+    template: 'story',
+    model: 'epiq',
+    years: '2026',
+    date: `2026-08-${String(i + 1).padStart(2, '0')}`,
+  }));
+  const excluded = { ...matching[0], path: '/en/emobility/epiq-self' };
+  const otherYear = { ...matching[0], path: '/en/emobility/epiq-2025', years: '2025' };
+  const otherTemplate = { ...matching[0], path: '/en/press-releases/epiq', template: 'press_release' };
+  const all = [excluded, otherYear, otherTemplate, ...matching];
+  const paths = selectRows(all, cfg).map((row) => row.path);
+  assert.equal(paths.length, 10);
+  assert.equal(new Set(paths).size, 10);
+  assert.ok(paths.every((path) => path.startsWith('/en/emobility/related-')));
+  assert.equal(selectRows(all.slice(0, 5), cfg).length, 2);
+});
+
+test('empty related rail removes its dark section; other rails keep their section', () => {
+  let removedSection = false;
+  const section = { remove: () => { removedSection = true; } };
+  const mount = { remove: () => { throw new Error('related mount should not be removed alone'); } };
+  const header = { children: [] };
+  collapseRail({ closest: () => section }, mount, header);
+  assert.equal(removedSection, true);
+
+  let removedMount = false;
+  let removedHeader = false;
+  collapseRail(
+    { closest: () => null },
+    { remove: () => { removedMount = true; } },
+    { children: [], remove: () => { removedHeader = true; } },
+  );
+  assert.equal(removedMount, true);
+  assert.equal(removedHeader, true);
+});
+
 test('selectRows still ORs values within one facet key', () => {
   const cfg = parseConfig(cfgBlock([['model', 'epiq, peaq'], ['years', '2026'], ['exclude', 'self']]));
   const out = selectRows(tagged, cfg);
@@ -241,6 +284,15 @@ test('rowToCells: an image-less row yields ONE body-only cell (no empty div → 
   // body carries date <p> + title <h3>
   const tags = body.elems.map((e) => e.tagName);
   assert.deepEqual(tags, ['P', 'H3']);
+});
+
+test('rowToCells removes the legacy site suffix from indexed teaser titles', () => {
+  const [body] = rowToCells({
+    path: '/en/epiq',
+    title: 'What’s behind Epiq design? - Škoda Storyboard',
+    date: '2026-05-27',
+  });
+  assert.equal(body.elems[1].children[0].textContent, 'What’s behind Epiq design?');
 });
 
 // --- isConfigTable: detect by row shape/keys, not image presence (P2) -------
