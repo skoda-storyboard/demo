@@ -136,6 +136,21 @@ test('feed offset skips three filtered, newest-first rows before paging', () => 
   assert.equal(scoped.length, 4, 'selection does not mutate the shared index rows');
 });
 
+test('exact promo paths are excluded before sorting or paging, even when they are not newest', () => {
+  const cfg = parseFeedConfig(configBlock({ exclude: '/en/b/, /en/d' }));
+  assert.deepEqual(cfg.exclude, ['/en/b', '/en/d']);
+  assert.equal(cfg.excludeFeatured, false);
+  const chosen = selectFeedRows(scopeRows(rows, { template: 'story' }), 'newest', 0, cfg.exclude);
+  assert.deepEqual(chosen.map((row) => row.title), ['E', 'A']);
+  assert.deepEqual(selectFeedRows(rows, 'newest', 1, ['/en/b']).map((row) => row.title), [
+    'E', 'C', 'A',
+  ]);
+  assert.throws(
+    () => parseFeedConfig(configBlock({ exclude: 'https://example.com/en/b' })),
+    /site-relative paths/,
+  );
+});
+
 test('paginate reveals the first perpage slice', () => {
   const sorted = sortRows(scopeRows(rows, { template: 'story' }), 'newest');
   assert.deepEqual(paginate(sorted, 2).map((r) => r.title), ['D', 'E']);

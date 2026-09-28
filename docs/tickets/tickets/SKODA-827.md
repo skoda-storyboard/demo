@@ -20,6 +20,9 @@ at 1280px EDS renders 270px cards in a 1200px rail, whereas the source uses
 - Import exactly three linked Promo Box cards, a Stories feed, and separate
   `cover-box` bands with the news rail in its own band; regenerate the runnable
   `import-home-sto.bundle.js`.
+- Exclude the exact three authored promo story paths from Latest Stories, even
+  when index ordering changes; do not assume the promo is always the newest
+  three stories.
 - Only landing-page `press_release` rails use the 90% / 45% / 30% news-cell
   ladder across the <768 / 768–991 / >=992 layout states. Model, story, and
   press-detail related rails keep their existing geometry.

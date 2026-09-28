@@ -166,6 +166,10 @@ measured here.
   seeds the first slice; `perpage` (6) sizes each Load more; `columns: featured` selects the
   2-large-then-3-up grid (vs a plain 3-up). Authors omit/add cells → decorate defensively (fall through to
   sensible defaults; never assume a cell exists).
+  The Storyboard home importer instead authors `exclude` as a comma-separated
+  list of the promo's exact site-relative paths. This keeps the feed from
+  repeating curated promo stories even if their index positions change; do not
+  combine `exclude` with an `offset` that also skips those stories.
 - **`decorate()` outline:** `readConfig(block)` → `{ index, template, offset, initial, perpage, sort, columns }`;
   load rows via `scripts/query-index.js`; `sortRows` (newest-first); render first `initial` `card-teaser`
   cards (first image `createOptimizedPicture` + `fetchpriority="high"`, rest lazy); append a centered

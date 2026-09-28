@@ -78,7 +78,11 @@ test('Storyboard home imports three promo cards, a feed, and separate home news 
   assert.equal(name(tables[0]), 'Promo Box');
   assert.equal(tables[0].querySelectorAll('tr').length, 4);
   assert.equal(name(tables[1]), 'Stories');
-  assert.deepEqual(config(tables[1]), { heading: 'Latest Stories', template: 'story' });
+  assert.deepEqual(config(tables[1]), {
+    heading: 'Latest Stories',
+    template: 'story',
+    exclude: '/en/story-1, /en/story-2, /en/story-3',
+  });
   assert.equal(name(tables[3]), 'Story Rail');
   assert.equal(config(tables[3]).template, 'press_release');
   assert.equal(config(tables[3]).heading, 'Latest News');

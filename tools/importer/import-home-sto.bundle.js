@@ -113,14 +113,16 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/parsers/home-stories.js
-  function parse3(element, { document: document2 }) {
+  function parse3(element, { document: document2, featuredPaths = [] }) {
     const heading = element.querySelector(".search-results-heading")?.textContent.trim();
     if (!heading) throw new Error("Homepage stories feed needs a heading.");
-    element.replaceWith(WebImporter.DOMUtils.createTable([
+    const rows = [
       ["Stories"],
       ["heading", heading],
       ["template", "story"]
-    ], document2));
+    ];
+    if (featuredPaths.length) rows.push(["exclude", featuredPaths.join(", ")]);
+    element.replaceWith(WebImporter.DOMUtils.createTable(rows, document2));
   }
 
   // tools/importer/transformers/skoda-page-cleanup.js
@@ -775,13 +777,14 @@ var CustomImportScript = (() => {
       const { document: document2, url, params } = payload;
       const main = document2.body;
       executeTransformers("beforeTransform", main, payload);
+      const featuredPaths = [...new Set([...main.querySelectorAll("section.promo-box article.promo-box-item")].map((article) => article.querySelector("a[href]")?.getAttribute("href")).filter(Boolean).map((href) => new URL(href, url)).filter((link) => link.hostname === new URL(url).hostname).map((link) => link.pathname.replace(/\/+$/, "")))];
       const pageBlocks = findBlocksOnPage(document2, PAGE_TEMPLATE);
       pageBlocks.forEach((block) => {
         if (!block.element.parentNode) return;
         const parser = parsers[block.name];
         if (parser) {
           try {
-            parser(block.element, { document: document2, url, params });
+            parser(block.element, { document: document2, url, params, featuredPaths });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
           }

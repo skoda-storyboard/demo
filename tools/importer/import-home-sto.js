@@ -82,13 +82,19 @@ export default {
 
     executeTransformers('beforeTransform', main, payload);
 
+    const featuredPaths = [...new Set([...main.querySelectorAll('section.promo-box article.promo-box-item')]
+      .map((article) => article.querySelector('a[href]')?.getAttribute('href'))
+      .filter(Boolean)
+      .map((href) => new URL(href, url))
+      .filter((link) => link.hostname === new URL(url).hostname)
+      .map((link) => link.pathname.replace(/\/+$/, '')))];
     const pageBlocks = findBlocksOnPage(document, PAGE_TEMPLATE);
     pageBlocks.forEach((block) => {
       if (!block.element.parentNode) return;
       const parser = parsers[block.name];
       if (parser) {
         try {
-          parser(block.element, { document, url, params });
+          parser(block.element, { document, url, params, featuredPaths });
         } catch (e) {
           console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
         }
