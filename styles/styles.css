@@ -637,7 +637,7 @@ main > .section:first-of-type {
    default-content heading of the section that holds the social profile cards
    (Cards (social)), centred at the section-heading size with the source's 20px
    gap to the cards. Colour follows the section (the global heading colour is
-   the fixed text colour), so the dark band (Style: dark) turns it white. */
+   the fixed text colour), so the dark band (Style: cover-box, dark) turns it white. */
 main > .section.cards-container:has(.cards.social) > .default-content-wrapper :is(h2, h3) {
   margin: 0 0 var(--social-card-gap);
   color: inherit;
@@ -673,7 +673,10 @@ main .section.dark a {
    2.25em auto 1.5em (36/24), which adds to its neighbours' inner spacing (28px
    under Load more, the next band's 36px top margin). Our sections collapse
    margins with their 40px neighbours instead, so the band carries live's
-   visible totals: 64px above, 60px below. */
+   visible totals: 64px above, 60px below. Its section is `Style: cover-box, dark`
+   like every home dark band (SKODA-218); this rule keys on `.dark` + the social
+   cards, so it also covers older `Style: dark` content, and it outranks the
+   generic `.cover-box` band with the social band's own measured spacing. */
 main > .section.dark.cards-container:has(.cards.social) {
   max-width: var(--social-band-max-width);
   margin: var(--social-band-margin-top) auto var(--social-band-margin-bottom);

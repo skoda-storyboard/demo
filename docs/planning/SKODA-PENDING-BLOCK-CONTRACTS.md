@@ -50,7 +50,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 
 | Block | Variants | Config keys |
 |---|---|---|
-| `cards` | `media`, `overlay`, `toolbar`, `series-directory`, `social` (SKODA-217: one row per profile, one cell with a link whose text is the handle; its section carries `Style: dark`) | – |
+| `cards` | `media`, `overlay`, `toolbar`, `series-directory`, `social` (SKODA-217: one row per profile, one cell with a link whose text is the handle; its section carries `Style: cover-box, dark`, the SKODA-218 home band) | – |
 | `carousel` | `dots` | – |
 | `columns` | – | – |
 | `downloads` | `media-box` (SKODA-510) | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes`, `collapse` (SKODA-502/510) |

@@ -65,7 +65,7 @@ test('the social band becomes its own dark section: hr, heading, Cards (social),
   assert.deepEqual(kids, ['div', 'hr', 'h2', 'table:Cards (social)', 'table:Section Metadata', 'hr', 'div']);
   assert.equal(doc.querySelector('h2').textContent, 'Social media');
   const meta = [...doc.querySelector('table[data-block="Section Metadata"] tr').children].map((td) => td.textContent);
-  assert.deepEqual(meta, ['Style', 'dark']);
+  assert.deepEqual(meta, ['Style', 'cover-box, dark']);
   assert.ok(!doc.querySelector('.socials-static'), 'source band replaced');
 });
 

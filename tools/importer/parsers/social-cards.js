@@ -16,7 +16,7 @@
  *   <h2>Social media</h2>
  *   ['Cards (social)']
  *   [<a href="profile URL">@handle</a>]   ← one row per profile, source order
- *   ['Section Metadata'] / ['Style', 'dark']   ← the green band (.section.dark)
+ *   ['Section Metadata'] / ['Style', 'cover-box, dark']   ← the green home band
  * The icon is NOT imported: the block draws it from the link's host, so authors
  * only edit the link and the visible handle.
  *
@@ -56,8 +56,9 @@ export default function parse(element, { document }) {
     out.push(h2);
   }
   out.push(WebImporter.DOMUtils.createTable([['Cards (social)'], ...rows], document));
-  // the source band is .cover-box.dark: the section's own style, not the block's
-  out.push(WebImporter.DOMUtils.createTable([['Section Metadata'], ['Style', 'dark']], document));
+  // the source band is .cover-box.dark: the section's own style, not the block's,
+  // named like every home dark band (SKODA-218 `cover-box` section style)
+  out.push(WebImporter.DOMUtils.createTable([['Section Metadata'], ['Style', 'cover-box, dark']], document));
   out.push(document.createElement('hr'));
   element.replaceWith(...out);
 }

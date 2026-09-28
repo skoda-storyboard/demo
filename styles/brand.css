@@ -95,7 +95,7 @@
 
   /* homepage social profile cards (SKODA-217; live .socials-static overlay):
      a 60% black tile under the dual scrim, so the white icon + handle read on
-     the section's dark band (Style: dark) or on a light section alike */
+     the section's dark band (Style: cover-box, dark) or on a light section alike */
   --social-card-tile: rgb(0 0 0 / 60%);
 
   /* gallery slider (SKODA-819; measured on the live Epiq story .carousel-widget):
