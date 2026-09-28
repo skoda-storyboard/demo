@@ -756,3 +756,100 @@ body.story .section.body-column .gallery.slider {
     padding-block-end: var(--spacing-xl);
   }
 }
+
+/* ==========================================================================
+ * Preview variant — `Gallery (preview)` (SKODA-223)
+ * Press-release sidebar "Images" preview, measured on the source
+ * (section.sa-media-kit-preview, Superb, 2026-09-28): no stage, 16:9 thumbs in
+ * a 2-up grid filling the sidebar column, 1-up below 768. Each cell is half the
+ * column with a 1px white ring, so thumbs sit 2px apart:
+ * cell 171×97.1 / thumb 169×95.1 @1280, 160.7×91.3 @1024, 118×67.3 @768,
+ * 480×270.9 @500. 8px radius, no shadow, no hover effect, no captions.
+ * ========================================================================== */
+.gallery.preview {
+  --gallery-preview-inset: 1px; /* source .item 1px white border */
+
+  /* "+N" ghost pill (source a.more.btn-ghost-icon, press-kit "+51"): 51.9×40 for
+     "+51", 16/16/700 +1px tracking, 2px ink ring on white, 5px off the corner */
+  --gallery-preview-more-offset: 5px;
+  --gallery-preview-more-padding: 10px;
+  --gallery-preview-more-border: 2px;
+  --gallery-preview-more-tracking: 1px;
+}
+
+.gallery.preview:empty {
+  display: none;
+}
+
+.gallery.preview .gallery-preview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gallery.preview .gallery-preview-item {
+  position: relative;
+  margin: 0;
+  padding: var(--gallery-preview-inset);
+}
+
+.gallery.preview .gallery-preview-thumb {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: var(--card-radius);
+  padding: 0;
+  background: var(--skoda-grey-100);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.gallery.preview .gallery-preview-thumb picture,
+.gallery.preview .gallery-preview-thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* "+N": more images than the preview shows; opens the lightbox at the first
+   hidden one. Sits on the last thumb's bottom corner, the thumb stays clickable. */
+.gallery.preview .gallery-preview-more {
+  position: absolute;
+  inset-block-end: calc(var(--gallery-preview-inset) + var(--gallery-preview-more-offset));
+  inset-inline-end: calc(var(--gallery-preview-inset) + var(--gallery-preview-more-offset));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: var(--gallery-preview-more-border) solid var(--skoda-ink);
+  border-radius: var(--pill-radius);
+  padding: var(--gallery-preview-more-padding);
+  background: var(--skoda-white);
+  color: var(--skoda-ink);
+  font-family: inherit;
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  letter-spacing: var(--gallery-preview-more-tracking);
+  cursor: pointer;
+}
+
+.gallery.preview .gallery-preview-thumb:focus-visible,
+.gallery.preview .gallery-preview-more:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+/* the page's single two-column transition (template-press-release.md §5): the
+   sidebar becomes a narrow column, and the preview goes 2-up in it. Tied to the
+   viewport, not the container: the 1-up column is wider (480 @500) than the
+   2-up one (236 @768), so no width threshold on the block can express it. */
+@media (width >= 768px) {
+  .gallery.preview .gallery-preview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
