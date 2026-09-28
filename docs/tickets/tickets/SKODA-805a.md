@@ -43,16 +43,18 @@ The chapter and resource children are SKODA-805b. The single default-template ki
 
 ## Acceptance Criteria
 - [ ] All 3 hubs import through SKODA-602 and render the hero plus the full tile grid in source order at
-      1280/768/375.
+      1280/768/375. *(Hero presence and order here; hero geometry and type: SKODA-828 F1.)*
 - [ ] Every tile link resolves (imported child, or policy-compliant external). The SKODA-609 crawl shows no in-site
       404.
 - [ ] Hubs appear in the index with `template=press_kit`, so they can feed the Peaq/Epiq model "Press Kits" rails.
-- [ ] Visual diff against the source is ≤2% at 1280/768, or deviations are documented. Lint is clean.
+- [ ] Visual diff against the source is ≤2% at 1280/768 (tiles; the hero diff is SKODA-828), or deviations are
+      documented. Lint is clean.
 - [ ] **Amendment (2026-09-25, sweep reconciliation):**
   - The tile grid uses the SKODA-221 `tiles` variant: 1:1 + 2:1 tiles, 20px gap, 16/500 title, no date, no hover
     zoom. Until 221 lands, plain cards are the documented deviation (221 is Could).
   - The 2-up WhatsApp / direct-ZIP banner pair on Peaq and Epiq. The whole-kit ZIP is a static `<a>`, not scripted.
-  - At 375 a dark caption sits below the image. The h1 is 28px at 768.
+  - ~~At 375 a dark caption sits below the image. The h1 is 28px at 768.~~ Moved to [SKODA-828](SKODA-828.md) ([#196](https://github.com/skoda-storyboard/demo/issues/196)) F1
+    (2026-09-28), which owns the press-kit hero UI at every width, including ultrawide.
 
 ## Dependencies
 - Upstream: SKODA-601/602, SKODA-202 (hero), SKODA-201 (cards), SKODA-305 (MR footer), SKODA-609.
