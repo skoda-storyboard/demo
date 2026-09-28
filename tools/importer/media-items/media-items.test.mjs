@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import {
   slugify, isoDate, cdnUrl, vimeoPoster, facetOptions, cardTerms, parseCards, mergeItems,
   feedRow, feedSheet, itemSlug, sourceOrder, FACETS, DETAIL_FIELDS, parseDetailPanel, ajaxNonce,
-  detailRequest,
+  detailRequest, parseAssetLinks, assetItem,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 
@@ -189,4 +189,27 @@ test('detail request: the source ajax loader call with the page nonce', () => {
   assert.equal(q.get('template'), 'templates/image-overlay-meta-data');
   assert.equal(q.get('query_vars[p]'), '450812');
   assert.equal(q.get('nonce'), 'abc');
+});
+
+test('assets (shape 5): images the page copy links to, not listing cards; titled from the panel', { skip }, () => {
+  const page = new JSDOM(`<article class="skoda_model media-cart-item"><div class="textwidget">
+    <p><a href="https://cdn.skoda-storyboard.com/2024/03/OCT_FL_149_limo_7299ddc7.jpg"><img class="aligncenter wp-image-361053 size-full" alt="Technical drawings limo"></a></p>
+    <p><a href="https://cdn.skoda-storyboard.com/2024/03/OCT_FL_149_limo_7299ddc7.jpg"><img class="wp-image-361053" alt="again"></a></p>
+    <p><a href="https://www.skoda-storyboard.com/en/x/"><img class="wp-image-9" alt="not an image link"></a></p>
+  </div></article>
+  <article class="article-teaser media-cart-item image"><a href="https://cdn.skoda-storyboard.com/2026/08/card.jpg"><img class="wp-image-1" alt="card"></a></article>`).window.document;
+  const links = parseAssetLinks(page);
+  assert.deepEqual(links, [{ id: '361053', original: 'https://cdn.skoda-storyboard.com/2024/03/OCT_FL_149_limo_7299ddc7.jpg', alt: 'Technical drawings limo' }]);
+  const panel = new JSDOM(`<p>Technical drawings limo</p><div class="media-meta"><div class="meta-filetype">File type: <strong>JPG</strong></div>
+    <div class="meta-filesize">File size: <strong>599 KB</strong></div><div class="meta-dimensions">Dimensions: <strong>3151&nbsp;×&nbsp;1847 px</strong></div>
+    <div class="meta-published">Published: <strong>22. 3. 2024</strong></div></div>`).window.document;
+  const row = feedRow(assetItem(links[0], panel));
+  assert.equal(row.template, 'asset');
+  assert.equal(row.category, 'assets');
+  assert.equal(row.title, 'Technical drawings limo');
+  assert.equal(row.date, '2024-03-22');
+  assert.equal(row.path, links[0].original);
+  assert.equal(row.filesize, '599 KB');
+  assert.equal(row.dimensions, '3151 × 1847 px');
+  assert.equal(row.tags, '', 'no facets: never in a listing or rail');
 });

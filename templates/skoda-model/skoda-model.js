@@ -5,13 +5,16 @@
  *   - hero:       `Hero Image (overlay)`; the "Models" line becomes the chip (as skoda-series)
  *   - icon nav:   the importer's same-page link list becomes a sticky <nav> with icons and
  *                 scrollspy; links to sections that are missing or collapse are dropped
- *   - Highlights: `Cards (key-facts)` (CSS variant, cards.css)
+ *   - Highlights: `Cards (key-facts)` (CSS variant, cards.css); the drawings open the shared
+ *                 lightbox (scripts/media-lightbox.js)
  *   - Tech Data:  `Columns` + `stats` variant (CSS, columns.css) on a dark band
  *   - rails:      `Story Rail`; Derivatives → `center caption`, Images/Videos → `media caption`
  * Sections are recognised by their heading id (the importer's section headings), so the
  * already-published pages need no re-import. Runs before the blocks decorate.
  * @param {Element} main The main element
  */
+
+import { wireImageLinks } from '../../scripts/media-lightbox.js';
 
 // heading id (importer slug) → section role, nav icon (icons/model-*.svg) and the source's
 // anchor (so old deep links such as /en/skoda-model/octavia/#keyfacts still land)
@@ -72,10 +75,11 @@ function decorateSections(main) {
     }
 
     if (match.role === 'model-highlights') {
-      // technical drawings (Liftback / Combi): an h3 + a linked full-size image
-      section.querySelectorAll('.default-content-wrapper > p > a > picture').forEach((pic) => {
-        pic.closest('p').classList.add('model-drawing');
-      });
+      // technical drawings (Liftback / Combi): an h3 + a linked full-size image, opened in
+      // the source's single-image lightbox (title + file details, close ✕)
+      const drawings = [...section.querySelectorAll('.default-content-wrapper > p > a > picture')];
+      drawings.forEach((pic) => pic.closest('p').classList.add('model-drawing'));
+      wireImageLinks(drawings.map((pic) => pic.parentElement));
     }
 
     if (match.role === 'model-rail') {

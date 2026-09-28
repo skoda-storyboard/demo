@@ -243,6 +243,17 @@ body.gallery-lightbox-open {
   --lightbox-action-icon: var(--lightbox-icon);
 }
 
+/* no buttons (content images such as the model drawings): the source's empty actions row
+   still spaces the metadata 40px under the title */
+.gallery-lightbox-actions.is-empty {
+  margin: 0;
+  padding-bottom: 20px;
+}
+
+.gallery-lightbox-actions.is-empty .gallery-lightbox-action {
+  display: none;
+}
+
 /* 16px to the related line + the chip row's 5px (source); beats the panel p rhythm */
 .gallery-lightbox-caption p.gallery-lightbox-tags {
   margin-bottom: 21px;

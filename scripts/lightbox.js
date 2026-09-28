@@ -14,6 +14,7 @@
  *   download the download link (default: `src` as JPEG)
  *   link     the URL "copy link" copies (default: `src`)
  *   cartId   the media-cart key on the add button (SKODA-505 binds it)
+ *   actions  false: no action buttons (the source's content images), spacing kept
  *
  * i18n: all control text lives in LABELS (the single translation point, SKODA-1003).
  */
@@ -189,6 +190,8 @@ export function buildLightbox(host, items) {
     if (item.caption) {
       [...item.caption.childNodes].forEach((n) => stageCaption.append(n.cloneNode(true)));
       downloadBtn.href = item.download || `${base}?format=jpg`;
+      // `actions: false` (content images): the source panel keeps an empty actions row
+      actions.classList.toggle('is-empty', item.actions === false);
       if (item.cartId) addBtn.dataset.id = item.cartId;
       else delete addBtn.dataset.id;
       // insert before the first "File type…"/metadata paragraph if present,

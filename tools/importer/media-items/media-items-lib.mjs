@@ -169,6 +169,55 @@ export function itemSlug(sourceUrl, fileUrl) {
 }
 
 /**
+ * Images a source page links from its own copy (`<a href="…jpg"><img class="wp-image-N">`,
+ * e.g. the model pages' Liftback / Combi drawings): the source opens them in the same
+ * colorbox, with the attachment's detail panel. Listing and rail cards (`.article-teaser`) are not
+ * matched. Returns [{ id, original, alt }] in page order, de-duplicated by id.
+ * @param {Document} doc the source page
+ */
+export function parseAssetLinks(doc) {
+  const seen = new Set();
+  return [...doc.querySelectorAll('a[href]')].flatMap((a) => {
+    const img = a.querySelector(':scope > img[class*="wp-image-"]');
+    const href = cdnUrl(a.getAttribute('href'));
+    if (!img || !/\.(jpe?g|png|webp)$/i.test(href) || a.closest('.article-teaser')) return [];
+    const id = (img.getAttribute('class').match(/wp-image-(\d+)/) || [])[1];
+    if (!id || seen.has(id)) return [];
+    seen.add(id);
+    return [{ id, original: href, alt: (img.getAttribute('alt') || '').trim() }];
+  });
+}
+
+/**
+ * A content-linked image as a feed item (template `asset`, contract media-item shape 5): no
+ * listing, rail or cart; it only carries what the lightbox shows. Title and published date
+ * come from the source detail panel (its first line and "Published"), else the alt text.
+ * @param {{id: string, original: string, alt: string}} link from parseAssetLinks
+ * @param {Document} panelDoc the parsed source detail panel
+ */
+export function assetItem(link, panelDoc) {
+  const panel = parseDetailPanel(panelDoc);
+  const title = text(panelDoc.querySelector('p')) || link.alt;
+  const slug = slugify(link.original.split('/').pop().replace(/\.[a-z0-9]+$/i, ''));
+  return {
+    id: link.id,
+    type: 'asset',
+    title,
+    source: `${SOURCE_ORIGIN}/?attachment_id=${link.id}`,
+    date: isoDate(text(panelDoc.querySelector('.meta-published strong'))),
+    caption: '',
+    alt: link.alt,
+    original: link.original,
+    thumbnail: link.original,
+    image: link.original,
+    terms: {},
+    slug,
+    path: `/en/assets/${slug}`,
+    ...panel,
+  };
+}
+
+/**
  * Parse the media cards of a source listing page into item descriptors.
  * @param {Document} doc
  * @param {{options?: Map, yearsById?: object}} ctx
@@ -282,7 +331,7 @@ export function mergeItems(lists) {
 
 /** Link target of a feed row until the listing lightbox lands (SKODA-406). */
 function rowPath(item) {
-  if (item.type === 'image') return item.original;
+  if (item.type === 'image' || item.type === 'asset') return item.original;
   return item['vimeo-id'] ? `https://vimeo.com/${item['vimeo-id']}` : item.mp4;
 }
 
@@ -300,7 +349,7 @@ export function feedRow(item) {
     image: (item.type === 'image' ? item.thumbnail : item.poster) || item.image,
     template: item.type,
     date: item.date,
-    category: item.type === 'image' ? 'images' : 'videos',
+    category: { image: 'images', video: 'videos', asset: 'assets' }[item.type] || '',
     tags: [...new Set(FACETS.flatMap((tax) => item.terms[tax] || []))].join(', '),
   };
   FACETS.forEach((tax) => { row[tax] = (item.terms[tax] || []).join(', '); });

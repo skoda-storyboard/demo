@@ -30,6 +30,7 @@ import {
 import { loadQueryIndex, defaultIndexUrl, cleanTitle } from '../../scripts/query-index.js';
 import { formatCardDate } from '../../scripts/card-teaser.js';
 import { buildLightbox } from '../../scripts/lightbox.js';
+import { feedLightboxItem } from '../../scripts/media-lightbox.js';
 import {
   scopeRows, filterRows, sortRows, paginate, INDEX_FACETS,
 } from '../listing/listing-logic.mjs';
@@ -168,53 +169,6 @@ export function mediaToolbar(row) {
 }
 
 /*
- * One shared-lightbox item from an image feed row (contract media-item shape 4): the stage
- * shows the 1920px rendition, and the detail panel follows the source colorbox: title,
- * caption, (the lightbox's action buttons), file metadata, tag chips, related article.
- */
-export function mediaLightboxItem(row) {
-  const title = cleanTitle(row.title);
-  const caption = document.createElement('div');
-  const para = (...nodes) => {
-    const p = document.createElement('p');
-    p.append(...nodes);
-    caption.append(p);
-    return p;
-  };
-  if (title) para(title);
-  if (row.description) para(row.description);
-  const meta = [['File type', row.filetype], ['File size', row.filesize],
-    ['Dimensions', row.dimensions], ['Published', formatCardDate(row.date)]].filter(([, v]) => v);
-  if (meta.length) {
-    const p = para();
-    meta.forEach(([label, value], i) => {
-      if (i) p.append(document.createElement('br'));
-      const strong = document.createElement('strong');
-      strong.textContent = value;
-      p.append(`${label}: `, strong);
-    });
-  }
-  const labels = String(row.labels || '').split(',').map((s) => s.trim()).filter(Boolean);
-  if (labels.length) para(labels.join(' · '));
-  if (row.related) {
-    const a = document.createElement('a');
-    a.href = row.related;
-    a.textContent = row['related-title'] || row.related;
-    para('Related article: ', a);
-  }
-  const src = row['rendition-1920'] || row.original || row.image;
-  return {
-    src,
-    full: src,
-    alt: title,
-    caption,
-    download: row.original || src,
-    link: row.original || src,
-    cartId: row.id || '',
-  };
-}
-
-/*
  * Synthesize one carousel row (image cell + body cell) from an index row. The
  * body is returned as buildBlock's `{ elems }` form so the date <p> and title
  * <h3> land DIRECTLY in the cell (not wrapped in an extra <div>) — the carousel
@@ -284,7 +238,7 @@ export function viewAllLabel(block) {
 function wireMediaLightbox(carousel, rows) {
   const cards = [...carousel.querySelectorAll('.carousel-track > *')];
   if (!cards.length) return;
-  const lightbox = buildLightbox(document.body, rows.slice(0, cards.length).map(mediaLightboxItem));
+  const lightbox = buildLightbox(document.body, rows.slice(0, cards.length).map(feedLightboxItem));
   carousel.addEventListener('click', (e) => {
     const modified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
     if (e.defaultPrevented || e.button !== 0 || modified) return;

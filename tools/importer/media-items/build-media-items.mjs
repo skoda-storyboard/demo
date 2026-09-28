@@ -25,7 +25,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import {
   SOURCE_ORIGIN, facetOptions, parseCards, mergeItems, feedSheet, yearIds, vimeoPoster,
-  detailRequest, ajaxNonce, parseDetailPanel,
+  detailRequest, ajaxNonce, parseDetailPanel, parseAssetLinks, assetItem,
 } from './media-items-lib.mjs';
 import { uploadToDA } from '../media/media-lib.mjs';
 import { readLists } from '../build-link-allowlist.mjs';
@@ -137,6 +137,37 @@ async function addDetails(JSDOM, items, nonce, cacheDir, offline) {
   if (missing) console.warn(`[media-items] no detail panel for ${missing} item(s)`);
 }
 
+/**
+ * Images the source pages link from their copy (model-page Liftback / Combi drawings), as
+ * `asset` rows (media-item shape 5): the lightbox detail panel only, no listing or rail.
+ * Pages come from the URL lists in sources.json `assetPages`.
+ */
+async function collectAssets(JSDOM, lists, nonce, cacheDir, offline, known) {
+  const pages = lists.flatMap((file) => readFileSync(path.join(ROOT, file), 'utf8').split(/\r?\n/))
+    .map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));
+  const out = [];
+  for (const url of pages) {
+    let links = [];
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      links = parseAssetLinks(new JSDOM(await fetchText(url, cacheDir, offline)).window.document);
+    } catch (e) {
+      console.warn(`[media-items] asset page skipped: ${url} (${e.message})`);
+    }
+    for (const link of links.filter((l) => !known.has(l.id))) {
+      known.add(link.id);
+      const { url: ajax, body } = detailRequest(link.id, nonce);
+      let panel = '';
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        panel = JSON.parse(await fetchPost(ajax, body, `detail_${link.id}`, cacheDir, offline)).html || '';
+      } catch (e) { /* the alt text still titles the lightbox */ }
+      out.push(assetItem(link, new JSDOM(panel).window.document));
+    }
+  }
+  return out;
+}
+
 /** Map `years-<termId>` → year name: filter by each offered year and intersect card classes. */
 async function probeYears(JSDOM, options, type, cacheDir, offline) {
   const byId = {};
@@ -186,7 +217,7 @@ async function pushFeed(file) {
 export async function main(argv = process.argv.slice(2)) {
   const a = parseArgs(argv);
   const JSDOM = loadJSDOM();
-  const { queries } = JSON.parse(readFileSync(path.join(HERE, 'sources.json'), 'utf8'));
+  const { queries, assetPages = [] } = JSON.parse(readFileSync(path.join(HERE, 'sources.json'), 'utf8'));
   const lists = [];
   const yearsById = {};
   let nonce = '';
@@ -225,10 +256,14 @@ export async function main(argv = process.argv.slice(2)) {
   const dropped = items.filter((i) => reason(i));
   items = items.filter((i) => !reason(i));
   await addDetails(JSDOM, items, nonce, a.cache, a.offline);
+  const known = new Set(items.map((i) => i.id));
+  const assets = await collectAssets(JSDOM, assetPages, nonce, a.cache, a.offline, known);
+  items = [...items, ...assets];
 
   const summary = {
     images: items.filter((i) => i.type === 'image').length,
     videos: items.filter((i) => i.type === 'video').length,
+    assets: items.filter((i) => i.type === 'asset').length,
     dropped: dropped.map((i) => `${i.type} ${i.id} ${i.title} (${reason(i)})`),
     yearsById,
   };

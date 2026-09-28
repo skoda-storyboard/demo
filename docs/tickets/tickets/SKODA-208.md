@@ -164,6 +164,17 @@ plus variants of existing blocks, built against the already-published pages (no 
 - Still open: videos open vimeo.com (the source plays them in the lightbox); the press-release gallery panel only
   has the authored caption (no title / file metadata / tags / related yet); the cart button is inert (SKODA-505).
 
+**Drawing lightbox (Liftback / Combi, 2026-09-28):** the Highlights drawings open the source's single-image colorbox
+(close ✕, title, file type / size / dimensions / published; no counter, arrows or buttons) instead of the bare file.
+- Data migrated: the feed builder scans the pages in `sources.json` `assetPages` (the 22 model pages) for images
+  their copy links to and writes them as `asset` rows (contract `media-item` shape 5) with the source panel's
+  details: 4 rows today (Octavia limo / combi, Superb, Superb Combi).
+- Runtime: `scripts/media-lightbox.js` (`feedLightboxItem`, moved from story-rail, and `wireImageLinks`); the
+  template wires the drawings. The stage shows the page's own media-bus image; an image without a feed row still
+  opens, titled by its alt.
+- QA vs live at 1024/1280/1440: title, metadata lines, close and the missing counter / arrows match; image within
+  1px (rounding). Esc closes and returns focus to the drawing.
+
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/template-model-page.md`](../../ui-specs/template-model-page.md)** (captured via Chrome DevTools on the live Peaq model page). Read it before implementing. Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).
 

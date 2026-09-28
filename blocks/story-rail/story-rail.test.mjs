@@ -49,8 +49,9 @@ globalThis.document = {
 };
 
 const {
-  parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail, mediaLightboxItem,
+  parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail,
 } = await import('./story-rail.js');
+const { feedLightboxItem } = await import('../../scripts/media-lightbox.js');
 
 /*
  * A block whose `children` are rows, each row's `children` are cells. cells are
@@ -378,8 +379,9 @@ test('curatedRows passes the authored cell contents without nesting their wrappe
   ]]);
 });
 
-test('mediaLightboxItem: the source colorbox panel from a media feed row (shape 4)', () => {
-  const item = mediaLightboxItem({
+test('feedLightboxItem: the source colorbox panel from a media feed row (shape 5)', () => {
+  const item = feedLightboxItem({
+    template: 'image',
     title: 'Škoda Octavia turns 30', description: 'Caption', date: '2026-08-27', id: '450812',
     original: 'https://cdn.example/a.jpg', 'rendition-1920': 'https://cdn.example/a-1920x1280.jpg',
     filetype: 'JPG', filesize: '10 MB', dimensions: '8256 × 5504 px', labels: '2026, Octavia',
@@ -395,7 +397,14 @@ test('mediaLightboxItem: the source colorbox panel from a media feed row (shape 
     'File type: JPGFile size: 10 MBDimensions: 8256 × 5504 pxPublished: 27. 8. 2026',
     '2026 · Octavia', 'Related article: Octavia turns 30',
   ]);
-  const bare = mediaLightboxItem({ title: 'T', original: 'https://cdn.example/b.jpg', date: '' });
+  assert.equal(item.actions, true, 'image rows keep the cart / download / link buttons');
+  const bare = feedLightboxItem({ title: 'T', original: 'https://cdn.example/b.jpg', date: '' });
   assert.equal(bare.caption.children.length, 1, 'no empty metadata, tags or related lines');
   assert.equal(bare.full, 'https://cdn.example/b.jpg');
+  const drawing = feedLightboxItem({
+    template: 'asset', title: 'Technical drawings limo', date: '2024-03-22', original: 'https://cdn.example/limo.jpg',
+    filetype: 'JPG', filesize: '599 KB', dimensions: '3151 × 1847 px',
+  });
+  assert.equal(drawing.actions, false, 'content images have no action buttons (source)');
+  assert.equal(drawing.caption.children.length, 2, 'title + file details');
 });
