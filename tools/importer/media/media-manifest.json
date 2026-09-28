@@ -875,9 +875,10 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/peaq-ml-header_b224ade9.jpg",
       "da_path": "",
       "alt": "Škoda Peaq – Press Kit",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/peaq-ml-header_b224ade9-1440x773.jpg"
+        "https://cdn.skoda-storyboard.com/2026/08/peaq-ml-header_b224ade9-1440x773.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/peaq-ml-header_b224ade9-1920x1030.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 4975394,
@@ -890,7 +891,8 @@
       "status": "done",
       "note": "",
       "page_refs": [
-        "en/media-room"
+        "en/media-room",
+        "en/press-kits/skoda-peaq-press-kit-2"
       ],
       "dam_status": 200
     },
@@ -30981,7 +30983,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2026/08/060_Skoda_Peaq_b07bf0f8.jpg",
       "dam_page_path": "en/images/060-skoda-peaq-b07bf0f8",
       "page_refs": [
-        "en/images/060-skoda-peaq-b07bf0f8"
+        "en/images/060-skoda-peaq-b07bf0f8",
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -30989,9 +30992,10 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/060_Skoda_Peaq_b07bf0f8.jpg",
       "da_path": "",
       "alt": "Škoda Peaq",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/060_Skoda_Peaq_b07bf0f8.jpg"
+        "https://cdn.skoda-storyboard.com/2026/08/060_Skoda_Peaq_b07bf0f8.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/060_Skoda_Peaq_b07bf0f8-768x512.jpg"
       ],
       "aspect_crop_source": false,
       "bytes": 4973388,
@@ -31126,7 +31130,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2026/08/065_Skoda_Peaq_e35f34fe.jpg",
       "dam_page_path": "en/images/065-skoda-peaq-e35f34fe",
       "page_refs": [
-        "en/images/065-skoda-peaq-e35f34fe"
+        "en/images/065-skoda-peaq-e35f34fe",
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -31134,9 +31139,10 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/065_Skoda_Peaq_e35f34fe.jpg",
       "da_path": "",
       "alt": "Škoda Peaq",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/065_Skoda_Peaq_e35f34fe.jpg"
+        "https://cdn.skoda-storyboard.com/2026/08/065_Skoda_Peaq_e35f34fe.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/065_Skoda_Peaq_e35f34fe-768x512.jpg"
       ],
       "aspect_crop_source": false,
       "bytes": 2134341,
@@ -31358,7 +31364,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2026/08/073_Skoda_Peaq_e85fbace.jpg",
       "dam_page_path": "en/images/073-skoda-peaq-e85fbace",
       "page_refs": [
-        "en/images/073-skoda-peaq-e85fbace"
+        "en/images/073-skoda-peaq-e85fbace",
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -31366,9 +31373,10 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/073_Skoda_Peaq_e85fbace.jpg",
       "da_path": "",
       "alt": "Škoda Peaq",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/073_Skoda_Peaq_e85fbace.jpg"
+        "https://cdn.skoda-storyboard.com/2026/08/073_Skoda_Peaq_e85fbace.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/073_Skoda_Peaq_e85fbace-768x512.jpg"
       ],
       "aspect_crop_source": false,
       "bytes": 3263995,
@@ -31503,7 +31511,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2026/08/074_Skoda_Peaq_57ae7dd5.jpg",
       "dam_page_path": "en/images/074-skoda-peaq-57ae7dd5",
       "page_refs": [
-        "en/images/074-skoda-peaq-57ae7dd5"
+        "en/images/074-skoda-peaq-57ae7dd5",
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -31511,9 +31520,10 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/074_Skoda_Peaq_57ae7dd5.jpg",
       "da_path": "",
       "alt": "Škoda Peaq",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/074_Skoda_Peaq_57ae7dd5.jpg"
+        "https://cdn.skoda-storyboard.com/2026/08/074_Skoda_Peaq_57ae7dd5.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/074_Skoda_Peaq_57ae7dd5-768x512.jpg"
       ],
       "aspect_crop_source": false,
       "bytes": 3220794,
@@ -31532,7 +31542,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/2026/08/075_Skoda_Peaq_46708799.jpg",
       "dam_page_path": "en/images/075-skoda-peaq-46708799",
       "page_refs": [
-        "en/images/075-skoda-peaq-46708799"
+        "en/images/075-skoda-peaq-46708799",
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -31540,9 +31551,10 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/075_Skoda_Peaq_46708799.jpg",
       "da_path": "",
       "alt": "Škoda Peaq",
-      "caption": "",
+      "caption": null,
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/075_Skoda_Peaq_46708799.jpg"
+        "https://cdn.skoda-storyboard.com/2026/08/075_Skoda_Peaq_46708799.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/075_Skoda_Peaq_46708799-768x514.jpg"
       ],
       "aspect_crop_source": false,
       "bytes": 3563225,
@@ -40539,6 +40551,3777 @@
       "caption": "",
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2018/07/animace_NVH-KODIAQ..mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "728314ef__Peaq-ML-Button-800x800-075_0302746a.jpg": {
+      "logical_id": "728314ef__Peaq-ML-Button-800x800-075_0302746a.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-075_0302746a.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-075_0302746a.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-075_0302746a.jpg",
+      "da_path": "",
+      "alt": "Interior",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-075_0302746a.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 250341,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__Peaq-ML-Button-800x800-004_c91499de.jpg": {
+      "logical_id": "728314ef__Peaq-ML-Button-800x800-004_c91499de.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-004_c91499de.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-004_c91499de.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-004_c91499de.jpg",
+      "da_path": "",
+      "alt": "Battery and powertrain variants",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-004_c91499de.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 255637,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__Peaq-ML-Button-800x800-008_5ae942af.jpg": {
+      "logical_id": "728314ef__Peaq-ML-Button-800x800-008_5ae942af.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-008_5ae942af.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-008_5ae942af.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-008_5ae942af.jpg",
+      "da_path": "",
+      "alt": "Safety and assistance systems",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-008_5ae942af.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 242510,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__Peaq-ML-Button-800x800-149_50a663f4.jpg": {
+      "logical_id": "728314ef__Peaq-ML-Button-800x800-149_50a663f4.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-149_50a663f4.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-149_50a663f4.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-149_50a663f4.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq Sportline",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-149_50a663f4.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 304658,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__Peaq-ML-Button-800x800-071_4077e548.jpg": {
+      "logical_id": "728314ef__Peaq-ML-Button-800x800-071_4077e548.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-071_4077e548.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-071_4077e548.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-071_4077e548.jpg",
+      "da_path": "",
+      "alt": "Connectivity",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-800x800-071_4077e548.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 259037,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "8b558dfa__Button_FAQ_EDIT_26118dc7.jpg": {
+      "logical_id": "8b558dfa__Button_FAQ_EDIT_26118dc7.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/Button_FAQ_EDIT_26118dc7.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/Button_FAQ_EDIT_26118dc7.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2",
+        "en/press-kits/skoda-epiq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/Button_FAQ_EDIT_26118dc7.jpg",
+      "da_path": "",
+      "alt": "Frequently Asked Questions",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/Button_FAQ_EDIT_26118dc7.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 17821,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "e1291945__ikony_sb_txt_ec46d0c2.png": {
+      "logical_id": "e1291945__ikony_sb_txt_ec46d0c2.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_txt_ec46d0c2.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_txt_ec46d0c2.png",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2",
+        "en/press-kits/skoda-epiq-press-kit-2",
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_txt_ec46d0c2.png",
+      "da_path": "",
+      "alt": "Texts",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_txt_ec46d0c2.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5543,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "e1291945__ikony_sb_infogr_339c5269.png": {
+      "logical_id": "e1291945__ikony_sb_infogr_339c5269.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_infogr_339c5269.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_infogr_339c5269.png",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2",
+        "en/press-kits/skoda-epiq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_infogr_339c5269.png",
+      "da_path": "",
+      "alt": "Infographics",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_infogr_339c5269.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 9059,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "2f1622cb__ikony_sb_techdata_EN_928201d9.png": {
+      "logical_id": "2f1622cb__ikony_sb_techdata_EN_928201d9.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2024/01/ikony_sb_techdata_EN_928201d9.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2024/01/ikony_sb_techdata_EN_928201d9.png",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2",
+        "en/press-kits/skoda-epiq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2024/01/ikony_sb_techdata_EN_928201d9.png",
+      "da_path": "",
+      "alt": "Technical data",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2024/01/ikony_sb_techdata_EN_928201d9.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 14874,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "e1291945__ikony_sb_img_8087f8a9.png": {
+      "logical_id": "e1291945__ikony_sb_img_8087f8a9.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_img_8087f8a9.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_img_8087f8a9.png",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2",
+        "en/press-kits/skoda-epiq-press-kit-2",
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_img_8087f8a9.png",
+      "da_path": "",
+      "alt": "Images",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_img_8087f8a9.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 9103,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__Peaq-ML-Button-1600x800-099_7bbf9e63.jpg": {
+      "logical_id": "728314ef__Peaq-ML-Button-1600x800-099_7bbf9e63.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-1600x800-099_7bbf9e63-1440x720.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-1600x800-099_7bbf9e63.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-1600x800-099_7bbf9e63.jpg",
+      "da_path": "",
+      "alt": "Introduction",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-1600x800-099_7bbf9e63-1440x720.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 355996,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__Peaq-ML-Button-1600x800-090_cc6ced1b.jpg": {
+      "logical_id": "728314ef__Peaq-ML-Button-1600x800-090_cc6ced1b.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-1600x800-090_cc6ced1b-1440x720.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-1600x800-090_cc6ced1b.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-1600x800-090_cc6ced1b.jpg",
+      "da_path": "",
+      "alt": "Exterior",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-1600x800-090_cc6ced1b-1440x720.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 268692,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "e1291945__ikony_sb_landscape_down_EN_E_dca67e28.png": {
+      "logical_id": "e1291945__ikony_sb_landscape_down_EN_E_dca67e28.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_landscape_down_EN_E_dca67e28.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_landscape_down_EN_E_dca67e28.png",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2",
+        "en/press-kits/skoda-epiq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_landscape_down_EN_E_dca67e28.png",
+      "da_path": "",
+      "alt": "Download the press kit ZIP",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_landscape_down_EN_E_dca67e28.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 95091,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "e1291945__ikony_sb_video_dea792b7.png": {
+      "logical_id": "e1291945__ikony_sb_video_dea792b7.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_video_dea792b7.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_video_dea792b7.png",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2",
+        "en/press-kits/skoda-epiq-press-kit-2",
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_video_dea792b7.png",
+      "da_path": "",
+      "alt": "Videos",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2023/10/ikony_sb_video_dea792b7.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 7545,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "d60cda40__ikony_sb_landscape_WA_EN_f66c79bf.png": {
+      "logical_id": "d60cda40__ikony_sb_landscape_WA_EN_f66c79bf.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2024/09/ikony_sb_landscape_WA_EN_f66c79bf.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2024/09/ikony_sb_landscape_WA_EN_f66c79bf.png",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2",
+        "en/press-kits/skoda-epiq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2024/09/ikony_sb_landscape_WA_EN_f66c79bf.png",
+      "da_path": "",
+      "alt": "Follow Škoda Storyboard on WhatsApp",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2024/09/ikony_sb_landscape_WA_EN_f66c79bf.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 111186,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__Button_ML_1600x800px_0001_Intro_031_Skoda_Epiq_f1171184.jpg": {
+      "logical_id": "728314ef__Button_ML_1600x800px_0001_Intro_031_Skoda_Epiq_f1171184.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_1600x800px_0001_Intro_031_Skoda_Epiq_f1171184-1440x720.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_1600x800px_0001_Intro_031_Skoda_Epiq_f1171184.jpg",
+      "dam_page_path": "en/press-kits/skoda-epiq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-epiq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_1600x800px_0001_Intro_031_Skoda_Epiq_f1171184.jpg",
+      "da_path": "",
+      "alt": "Introduction",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Button_ML_1600x800px_0001_Intro_031_Skoda_Epiq_f1171184-1440x720.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 390699,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__Button_ML_1600x800px_0000_Exterior_065_Skoda_Epiq_787d02bb.jpg": {
+      "logical_id": "728314ef__Button_ML_1600x800px_0000_Exterior_065_Skoda_Epiq_787d02bb.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_1600x800px_0000_Exterior_065_Skoda_Epiq_787d02bb-1440x720.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_1600x800px_0000_Exterior_065_Skoda_Epiq_787d02bb.jpg",
+      "dam_page_path": "en/press-kits/skoda-epiq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-epiq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_1600x800px_0000_Exterior_065_Skoda_Epiq_787d02bb.jpg",
+      "da_path": "",
+      "alt": "Exterior",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Button_ML_1600x800px_0000_Exterior_065_Skoda_Epiq_787d02bb-1440x720.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 276231,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__Button_ML_800x800px_023_Skoda_Epiq_94397b1d.jpg": {
+      "logical_id": "728314ef__Button_ML_800x800px_023_Skoda_Epiq_94397b1d.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_023_Skoda_Epiq_94397b1d.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_023_Skoda_Epiq_94397b1d.jpg",
+      "dam_page_path": "en/press-kits/skoda-epiq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-epiq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_023_Skoda_Epiq_94397b1d.jpg",
+      "da_path": "",
+      "alt": "Safety and assistance systems",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_023_Skoda_Epiq_94397b1d.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 618143,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__Button_ML_800x800px_0004_Interior_068_Skoda_Epiq_51630908.jpg": {
+      "logical_id": "728314ef__Button_ML_800x800px_0004_Interior_068_Skoda_Epiq_51630908.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_0004_Interior_068_Skoda_Epiq_51630908.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_0004_Interior_068_Skoda_Epiq_51630908.jpg",
+      "dam_page_path": "en/press-kits/skoda-epiq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-epiq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_0004_Interior_068_Skoda_Epiq_51630908.jpg",
+      "da_path": "",
+      "alt": "Interior",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_0004_Interior_068_Skoda_Epiq_51630908.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 280815,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__Button_ML_800x800px_049_Skoda_Epiq_31a71dd3.jpg": {
+      "logical_id": "728314ef__Button_ML_800x800px_049_Skoda_Epiq_31a71dd3.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_049_Skoda_Epiq_31a71dd3.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_049_Skoda_Epiq_31a71dd3.jpg",
+      "dam_page_path": "en/press-kits/skoda-epiq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-epiq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_049_Skoda_Epiq_31a71dd3.jpg",
+      "da_path": "",
+      "alt": "Battery and powertrain variants",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_049_Skoda_Epiq_31a71dd3.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 641225,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__Button_ML_800x800px_095_Skoda_Epiq_First_Edition_7df1e0c7.jpg": {
+      "logical_id": "728314ef__Button_ML_800x800px_095_Skoda_Epiq_First_Edition_7df1e0c7.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_095_Skoda_Epiq_First_Edition_7df1e0c7.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_095_Skoda_Epiq_First_Edition_7df1e0c7.jpg",
+      "dam_page_path": "en/press-kits/skoda-epiq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-epiq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_095_Skoda_Epiq_First_Edition_7df1e0c7.jpg",
+      "da_path": "",
+      "alt": "Škoda Epiq First Edition",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_095_Skoda_Epiq_First_Edition_7df1e0c7.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 368383,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "8b558dfa__3840x1400_A_FI_5b535b12.jpg": {
+      "logical_id": "8b558dfa__3840x1400_A_FI_5b535b12.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/3840x1400_A_FI_5b535b12-1920x700.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/3840x1400_A_FI_5b535b12.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/3840x1400_A_FI_5b535b12.jpg",
+      "da_path": "",
+      "alt": "125 Years of Škoda Motorsport – Press Kit",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/3840x1400_A_FI_5b535b12-1920x700.jpg",
+        "https://cdn.skoda-storyboard.com/2026/05/3840x1400_A_FI_5b535b12.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 1095970,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__Button_ML_800x800px_0001_Connectivity_119_Skoda_Epiq_d866f95c.jpg": {
+      "logical_id": "728314ef__Button_ML_800x800px_0001_Connectivity_119_Skoda_Epiq_d866f95c.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_0001_Connectivity_119_Skoda_Epiq_d866f95c.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_0001_Connectivity_119_Skoda_Epiq_d866f95c.jpg",
+      "dam_page_path": "en/press-kits/skoda-epiq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-epiq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_0001_Connectivity_119_Skoda_Epiq_d866f95c.jpg",
+      "da_path": "",
+      "alt": "Connectivity",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Button_ML_800x800px_0001_Connectivity_119_Skoda_Epiq_d866f95c.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 193311,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cc3f5752__Skoda-Motorsport-Laurin-Klement-FC.jpg": {
+      "logical_id": "cc3f5752__Skoda-Motorsport-Laurin-Klement-FC.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Laurin-Klement-FC.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Laurin-Klement-FC.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Laurin-Klement-FC.jpg",
+      "da_path": "",
+      "alt": "Laurin &amp; Klement FC",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Laurin-Klement-FC.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 141964,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cc3f5752__Skoda-Motorsport-Sport.jpg": {
+      "logical_id": "cc3f5752__Skoda-Motorsport-Sport.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Sport.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Sport.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Sport.jpg",
+      "da_path": "",
+      "alt": "Škoda Sport",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Sport.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 115238,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cc3f5752__Skoda-Motorsport-Popular-Monte-Carlo.jpg": {
+      "logical_id": "cc3f5752__Skoda-Motorsport-Popular-Monte-Carlo.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Popular-Monte-Carlo.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Popular-Monte-Carlo.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Popular-Monte-Carlo.jpg",
+      "da_path": "",
+      "alt": "Škoda Popular Sport",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Popular-Monte-Carlo.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 131598,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cc3f5752__Skoda-Motorsport-Laurin-Klement-RKM.jpg": {
+      "logical_id": "cc3f5752__Skoda-Motorsport-Laurin-Klement-RKM.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Laurin-Klement-RKM.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Laurin-Klement-RKM.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Laurin-Klement-RKM.jpg",
+      "da_path": "",
+      "alt": "Laurin &amp; Klement RK/M",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Laurin-Klement-RKM.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 144931,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "7ad55d82__Skoda-Motorsport-1100-OHC.jpg": {
+      "logical_id": "7ad55d82__Skoda-Motorsport-1100-OHC.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/12/Skoda-Motorsport-1100-OHC.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/12/Skoda-Motorsport-1100-OHC.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/12/Skoda-Motorsport-1100-OHC.jpg",
+      "da_path": "",
+      "alt": "Škoda 1100 OHC",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/12/Skoda-Motorsport-1100-OHC.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 128959,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cc3f5752__Skoda-Motorsport-F3-Type-992.jpg": {
+      "logical_id": "cc3f5752__Skoda-Motorsport-F3-Type-992.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-F3-Type-992.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-F3-Type-992.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-F3-Type-992.jpg",
+      "da_path": "",
+      "alt": "Škoda F3, Type 992",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-F3-Type-992.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 109076,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__epiq-ml-header_f040a137.jpg": {
+      "logical_id": "728314ef__epiq-ml-header_f040a137.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/epiq-ml-header_f040a137-1920x1030.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/epiq-ml-header_f040a137.jpg",
+      "dam_page_path": "en/press-kits/skoda-epiq-press-kit-2",
+      "page_refs": [
+        "en/press-kits/skoda-epiq-press-kit-2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/epiq-ml-header_f040a137.jpg",
+      "da_path": "",
+      "alt": "Škoda Epiq – Press Kit",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/epiq-ml-header_f040a137-1920x1030.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/epiq-ml-header_f040a137-1440x773.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 5563745,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cc3f5752__Skoda-Motorsport-Spider-B5.jpg": {
+      "logical_id": "cc3f5752__Skoda-Motorsport-Spider-B5.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Spider-B5.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Spider-B5.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Spider-B5.jpg",
+      "da_path": "",
+      "alt": "Škoda Spider B5 &amp; Škoda Spider II",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Spider-B5.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 107021,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "8b558dfa__Skoda-1000-MB-B5_button_91ef4825.jpg": {
+      "logical_id": "8b558dfa__Skoda-1000-MB-B5_button_91ef4825.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-1000-MB-B5_button_91ef4825.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-1000-MB-B5_button_91ef4825.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-1000-MB-B5_button_91ef4825.jpg",
+      "da_path": "",
+      "alt": "Škoda 1000 MB &amp; 1100 MB B5",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/Skoda-1000-MB-B5_button_91ef4825.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 122364,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cc3f5752__Skoda-Motorsport-200-RS.jpg": {
+      "logical_id": "cc3f5752__Skoda-Motorsport-200-RS.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-200-RS.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-200-RS.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-200-RS.jpg",
+      "da_path": "",
+      "alt": "Škoda 180 RS &amp; 200 RS",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-200-RS.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 133570,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cc3f5752__Skoda-Motorsport-Octavia-Touring.jpg": {
+      "logical_id": "cc3f5752__Skoda-Motorsport-Octavia-Touring.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Octavia-Touring.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Octavia-Touring.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Octavia-Touring.jpg",
+      "da_path": "",
+      "alt": "Škoda Octavia Touring Sport",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Octavia-Touring.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 198497,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cc3f5752__Skoda-Motorsport-Favorit.jpg": {
+      "logical_id": "cc3f5752__Skoda-Motorsport-Favorit.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Favorit.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Favorit.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Favorit.jpg",
+      "da_path": "",
+      "alt": "Škoda Favorit",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-Favorit.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 138573,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cc3f5752__Skoda-Motorsport-130-RS-1975.jpg": {
+      "logical_id": "cc3f5752__Skoda-Motorsport-130-RS-1975.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-130-RS-1975.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-130-RS-1975.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-130-RS-1975.jpg",
+      "da_path": "",
+      "alt": "Škoda 130 RS",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-130-RS-1975.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 127563,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "7ad55d82__Skoda-Motorsport-Octavia-WRC.jpg": {
+      "logical_id": "7ad55d82__Skoda-Motorsport-Octavia-WRC.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/12/Skoda-Motorsport-Octavia-WRC.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/12/Skoda-Motorsport-Octavia-WRC.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/12/Skoda-Motorsport-Octavia-WRC.jpg",
+      "da_path": "",
+      "alt": "Škoda Octavia WRC",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/12/Skoda-Motorsport-Octavia-WRC.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 166996,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cc3f5752__Skoda-Motorsport-130-LR.jpg": {
+      "logical_id": "cc3f5752__Skoda-Motorsport-130-LR.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-130-LR.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-130-LR.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-130-LR.jpg",
+      "da_path": "",
+      "alt": "Škoda 130 LR",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/11/Skoda-Motorsport-130-LR.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 151499,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "cc3f5752__SKODA_FELICIA_Kit_car-RET_button.jpg": {
+      "logical_id": "cc3f5752__SKODA_FELICIA_Kit_car-RET_button.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/11/SKODA_FELICIA_Kit_car-RET_button.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/11/SKODA_FELICIA_Kit_car-RET_button.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/11/SKODA_FELICIA_Kit_car-RET_button.jpg",
+      "da_path": "",
+      "alt": "Škoda Felicia Kit Car",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/11/SKODA_FELICIA_Kit_car-RET_button.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 334686,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "7ad55d82__button_SKODA-Fabia-S2000.jpg": {
+      "logical_id": "7ad55d82__button_SKODA-Fabia-S2000.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/12/button_SKODA-Fabia-S2000.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/12/button_SKODA-Fabia-S2000.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/12/button_SKODA-Fabia-S2000.jpg",
+      "da_path": "",
+      "alt": "Škoda Fabia Super 2000",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/12/button_SKODA-Fabia-S2000.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 467905,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "7ad55d82__Skoda-Motorsport-Fabia-R5-1.jpg": {
+      "logical_id": "7ad55d82__Skoda-Motorsport-Fabia-R5-1.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/12/Skoda-Motorsport-Fabia-R5-1.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/12/Skoda-Motorsport-Fabia-R5-1.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/12/Skoda-Motorsport-Fabia-R5-1.jpg",
+      "da_path": "",
+      "alt": "Škoda Fabia R5/ Rally2/ Rally2 evo",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/12/Skoda-Motorsport-Fabia-R5-1.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 212155,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "7ad55d82__SKODA-Fabia-WRC-2003.jpg": {
+      "logical_id": "7ad55d82__SKODA-Fabia-WRC-2003.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2021/12/SKODA-Fabia-WRC-2003-1440x1018.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2021/12/SKODA-Fabia-WRC-2003.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/12/SKODA-Fabia-WRC-2003.jpg",
+      "da_path": "",
+      "alt": "Škoda Fabia WRC",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2021/12/SKODA-Fabia-WRC-2003-1440x1018.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 3931372,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "8b558dfa__Skoda_Fabia_Motorsport_Edition_13_305cdc03.jpg": {
+      "logical_id": "8b558dfa__Skoda_Fabia_Motorsport_Edition_13_305cdc03.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda_Fabia_Motorsport_Edition_13_305cdc03-1440x960.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda_Fabia_Motorsport_Edition_13_305cdc03.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda_Fabia_Motorsport_Edition_13_305cdc03.jpg",
+      "da_path": "",
+      "alt": "Škoda Fabia Motorsport Edition",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/Skoda_Fabia_Motorsport_Edition_13_305cdc03-1440x960.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4357764,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "db5847c5__02_New_Enyaq_RS_Race_74bf46ae.jpg": {
+      "logical_id": "db5847c5__02_New_Enyaq_RS_Race_74bf46ae.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/06/02_New_Enyaq_RS_Race_74bf46ae-1440x960.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/06/02_New_Enyaq_RS_Race_74bf46ae.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/06/02_New_Enyaq_RS_Race_74bf46ae.jpg",
+      "da_path": "",
+      "alt": "The new Enyaq RS Race – Press Kit",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/06/02_New_Enyaq_RS_Race_74bf46ae-1440x960.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 2335266,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "8b558dfa__FabiaRS_Rally2_125_34front_125right_button_new_d8d1a013.jpg": {
+      "logical_id": "8b558dfa__FabiaRS_Rally2_125_34front_125right_button_new_d8d1a013.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/FabiaRS_Rally2_125_34front_125right_button_new_d8d1a013-1440x1440.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/FabiaRS_Rally2_125_34front_125right_button_new_d8d1a013.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/FabiaRS_Rally2_125_34front_125right_button_new_d8d1a013.jpg",
+      "da_path": "",
+      "alt": "Škoda Fabia RS Rally2",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/FabiaRS_Rally2_125_34front_125right_button_new_d8d1a013-1440x1440.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 3646787,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__100_Skoda_Peaq_5185b2cd.jpg": {
+      "logical_id": "728314ef__100_Skoda_Peaq_5185b2cd.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/100_Skoda_Peaq_5185b2cd.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/100_Skoda_Peaq_5185b2cd.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/100_Skoda_Peaq_5185b2cd.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/100_Skoda_Peaq_5185b2cd.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/100_Skoda_Peaq_5185b2cd-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3038326,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__043_Skoda_Peaq_de2fa200.jpg": {
+      "logical_id": "728314ef__043_Skoda_Peaq_de2fa200.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/043_Skoda_Peaq_de2fa200.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/043_Skoda_Peaq_de2fa200.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/043_Skoda_Peaq_de2fa200.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/043_Skoda_Peaq_de2fa200.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/043_Skoda_Peaq_de2fa200-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3784194,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__099_Skoda_Peaq_5545f557.jpg": {
+      "logical_id": "728314ef__099_Skoda_Peaq_5545f557.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/099_Skoda_Peaq_5545f557.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/099_Skoda_Peaq_5545f557.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/099_Skoda_Peaq_5545f557.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/099_Skoda_Peaq_5545f557.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/099_Skoda_Peaq_5545f557-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 2846258,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__025_Skoda_Peaq_094549b6.jpg": {
+      "logical_id": "728314ef__025_Skoda_Peaq_094549b6.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/025_Skoda_Peaq_094549b6.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/025_Skoda_Peaq_094549b6.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/025_Skoda_Peaq_094549b6.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/025_Skoda_Peaq_094549b6.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/025_Skoda_Peaq_094549b6-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4488302,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__027_Skoda_Peaq_1727eab4.jpg": {
+      "logical_id": "728314ef__027_Skoda_Peaq_1727eab4.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/027_Skoda_Peaq_1727eab4.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/027_Skoda_Peaq_1727eab4.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/027_Skoda_Peaq_1727eab4.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/027_Skoda_Peaq_1727eab4.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/027_Skoda_Peaq_1727eab4-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5549201,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__039_Skoda_Peaq_4552cf63.jpg": {
+      "logical_id": "728314ef__039_Skoda_Peaq_4552cf63.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/039_Skoda_Peaq_4552cf63.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/039_Skoda_Peaq_4552cf63.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/039_Skoda_Peaq_4552cf63.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/039_Skoda_Peaq_4552cf63.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/039_Skoda_Peaq_4552cf63-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3618658,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__156_Skoda_Peaq_Sportline_41b2c754.jpg": {
+      "logical_id": "728314ef__156_Skoda_Peaq_Sportline_41b2c754.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/156_Skoda_Peaq_Sportline_41b2c754.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/156_Skoda_Peaq_Sportline_41b2c754.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/156_Skoda_Peaq_Sportline_41b2c754.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq Sportline",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/156_Skoda_Peaq_Sportline_41b2c754.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/156_Skoda_Peaq_Sportline_41b2c754-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5308103,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "06f9a534__share-en.png": {
+      "logical_id": "06f9a534__share-en.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2019/02/share-en.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2019/02/share-en.png",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2019/02/share-en.png",
+      "da_path": "",
+      "alt": "share-de",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2019/02/share-en.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 18429,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__154_Skoda_Peaq_Sportline_137d06af.jpg": {
+      "logical_id": "728314ef__154_Skoda_Peaq_Sportline_137d06af.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/154_Skoda_Peaq_Sportline_137d06af.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/154_Skoda_Peaq_Sportline_137d06af.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/154_Skoda_Peaq_Sportline_137d06af.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq Sportline",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/154_Skoda_Peaq_Sportline_137d06af.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/154_Skoda_Peaq_Sportline_137d06af-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4827378,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "06f9a534__download-en.png": {
+      "logical_id": "06f9a534__download-en.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2019/02/download-en.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2019/02/download-en.png",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2019/02/download-en.png",
+      "da_path": "",
+      "alt": "download-de",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2019/02/download-en.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 9921,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__005_Skoda_Peaq_5f1f18cc.jpg": {
+      "logical_id": "728314ef__005_Skoda_Peaq_5f1f18cc.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/005_Skoda_Peaq_5f1f18cc-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/005_Skoda_Peaq_5f1f18cc.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/005_Skoda_Peaq_5f1f18cc.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/005_Skoda_Peaq_5f1f18cc-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5349461,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__020_Skoda_Peaq_3b600b4f.jpg": {
+      "logical_id": "728314ef__020_Skoda_Peaq_3b600b4f.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/020_Skoda_Peaq_3b600b4f-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/020_Skoda_Peaq_3b600b4f.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/020_Skoda_Peaq_3b600b4f.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/020_Skoda_Peaq_3b600b4f-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3691360,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__007_Skoda_Peaq_65bf0951.jpg": {
+      "logical_id": "728314ef__007_Skoda_Peaq_65bf0951.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/007_Skoda_Peaq_65bf0951-1440x960.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/007_Skoda_Peaq_65bf0951.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/007_Skoda_Peaq_65bf0951.jpg",
+      "da_path": "",
+      "alt": "The Škoda Peaq: Škoda’s new flagship expands the brand’s electric portfolio",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/007_Skoda_Peaq_65bf0951-1440x960.jpg",
+        "https://cdn.skoda-storyboard.com/2026/08/007_Skoda_Peaq_65bf0951-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3334240,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__023_Skoda_Peaq_4070085e.jpg": {
+      "logical_id": "728314ef__023_Skoda_Peaq_4070085e.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/023_Skoda_Peaq_4070085e-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/023_Skoda_Peaq_4070085e.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/023_Skoda_Peaq_4070085e.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/023_Skoda_Peaq_4070085e-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4356049,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__058_Skoda_Peaq_a9605b68.jpg": {
+      "logical_id": "728314ef__058_Skoda_Peaq_a9605b68.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/058_Skoda_Peaq_a9605b68-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/058_Skoda_Peaq_a9605b68.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/058_Skoda_Peaq_a9605b68.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/058_Skoda_Peaq_a9605b68-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 2025325,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__077_Skoda_Peaq_0d22df25.jpg": {
+      "logical_id": "728314ef__077_Skoda_Peaq_0d22df25.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/077_Skoda_Peaq_0d22df25-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/077_Skoda_Peaq_0d22df25.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/077_Skoda_Peaq_0d22df25.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/077_Skoda_Peaq_0d22df25-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 2403758,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__090_Skoda_Peaq_40fc6229.jpg": {
+      "logical_id": "728314ef__090_Skoda_Peaq_40fc6229.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/090_Skoda_Peaq_40fc6229-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/090_Skoda_Peaq_40fc6229.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/090_Skoda_Peaq_40fc6229.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/090_Skoda_Peaq_40fc6229-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 2625864,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__022_Skoda_Peaq_20429d65.jpg": {
+      "logical_id": "728314ef__022_Skoda_Peaq_20429d65.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/022_Skoda_Peaq_20429d65-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/022_Skoda_Peaq_20429d65.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/022_Skoda_Peaq_20429d65.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/022_Skoda_Peaq_20429d65-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 2597389,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__149_Skoda_Peaq_Sportline_627b2930.jpg": {
+      "logical_id": "728314ef__149_Skoda_Peaq_Sportline_627b2930.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/149_Skoda_Peaq_Sportline_627b2930-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/149_Skoda_Peaq_Sportline_627b2930.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/149_Skoda_Peaq_Sportline_627b2930.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq Sportline",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/149_Skoda_Peaq_Sportline_627b2930-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4047380,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__059_Skoda_Peaq_1020c6fd.jpg": {
+      "logical_id": "728314ef__059_Skoda_Peaq_1020c6fd.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/059_Skoda_Peaq_1020c6fd-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/059_Skoda_Peaq_1020c6fd.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/059_Skoda_Peaq_1020c6fd.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/059_Skoda_Peaq_1020c6fd-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3697679,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__02_Skoda_Peaq_Covered_Drive_c49f1dc4.jpg": {
+      "logical_id": "6b386aae__02_Skoda_Peaq_Covered_Drive_c49f1dc4.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/02_Skoda_Peaq_Covered_Drive_c49f1dc4.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/02_Skoda_Peaq_Covered_Drive_c49f1dc4.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/02_Skoda_Peaq_Covered_Drive_c49f1dc4.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/02_Skoda_Peaq_Covered_Drive_c49f1dc4.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/02_Skoda_Peaq_Covered_Drive_c49f1dc4-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3054762,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__41_Skoda_Peaq_Covered_Drive_56d314fe.jpg": {
+      "logical_id": "6b386aae__41_Skoda_Peaq_Covered_Drive_56d314fe.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/41_Skoda_Peaq_Covered_Drive_56d314fe.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/41_Skoda_Peaq_Covered_Drive_56d314fe.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/41_Skoda_Peaq_Covered_Drive_56d314fe.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/41_Skoda_Peaq_Covered_Drive_56d314fe.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/41_Skoda_Peaq_Covered_Drive_56d314fe-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5208633,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__142_Skoda_Peaq_Sportline_28131436.jpg": {
+      "logical_id": "728314ef__142_Skoda_Peaq_Sportline_28131436.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/142_Skoda_Peaq_Sportline_28131436-768x513.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/142_Skoda_Peaq_Sportline_28131436.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/142_Skoda_Peaq_Sportline_28131436.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq Sportline",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/142_Skoda_Peaq_Sportline_28131436-768x513.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 2121076,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "728314ef__144_Skoda_Peaq_Sportline_528f5580.jpg": {
+      "logical_id": "728314ef__144_Skoda_Peaq_Sportline_528f5580.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/144_Skoda_Peaq_Sportline_528f5580-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/144_Skoda_Peaq_Sportline_528f5580.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/144_Skoda_Peaq_Sportline_528f5580.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq Sportline",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/144_Skoda_Peaq_Sportline_528f5580-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3227905,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__07_Skoda_Peaq_Covered_Drive_ee9cac76.jpg": {
+      "logical_id": "6b386aae__07_Skoda_Peaq_Covered_Drive_ee9cac76.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/07_Skoda_Peaq_Covered_Drive_ee9cac76.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/07_Skoda_Peaq_Covered_Drive_ee9cac76.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/07_Skoda_Peaq_Covered_Drive_ee9cac76.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/07_Skoda_Peaq_Covered_Drive_ee9cac76.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/07_Skoda_Peaq_Covered_Drive_ee9cac76-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4562677,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__38_Skoda_Peaq_Covered_Drive_531b435a.jpg": {
+      "logical_id": "6b386aae__38_Skoda_Peaq_Covered_Drive_531b435a.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/38_Skoda_Peaq_Covered_Drive_531b435a.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/38_Skoda_Peaq_Covered_Drive_531b435a.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/38_Skoda_Peaq_Covered_Drive_531b435a.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/38_Skoda_Peaq_Covered_Drive_531b435a.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/38_Skoda_Peaq_Covered_Drive_531b435a-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5903092,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__29_Skoda_Peaq_Covered_Drive_08b5d442.jpg": {
+      "logical_id": "6b386aae__29_Skoda_Peaq_Covered_Drive_08b5d442.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/29_Skoda_Peaq_Covered_Drive_08b5d442.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/29_Skoda_Peaq_Covered_Drive_08b5d442.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/29_Skoda_Peaq_Covered_Drive_08b5d442.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/29_Skoda_Peaq_Covered_Drive_08b5d442.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/29_Skoda_Peaq_Covered_Drive_08b5d442-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3877168,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__35_Skoda_Peaq_Covered_Drive_a9890028.jpg": {
+      "logical_id": "6b386aae__35_Skoda_Peaq_Covered_Drive_a9890028.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/35_Skoda_Peaq_Covered_Drive_a9890028.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/35_Skoda_Peaq_Covered_Drive_a9890028.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/35_Skoda_Peaq_Covered_Drive_a9890028.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/35_Skoda_Peaq_Covered_Drive_a9890028.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/35_Skoda_Peaq_Covered_Drive_a9890028-768x521.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 6126159,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__27_Skoda_Peaq_Covered_Drive_81244d49.jpg": {
+      "logical_id": "6b386aae__27_Skoda_Peaq_Covered_Drive_81244d49.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/27_Skoda_Peaq_Covered_Drive_81244d49-1440x960.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/27_Skoda_Peaq_Covered_Drive_81244d49.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/27_Skoda_Peaq_Covered_Drive_81244d49.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq: first glimpse of Škoda’s new electric flagship",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/27_Skoda_Peaq_Covered_Drive_81244d49-1440x960.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/27_Skoda_Peaq_Covered_Drive_81244d49-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3699036,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__Skoda_Peaq_battery_powertrain_a8933919.jpg": {
+      "logical_id": "6b386aae__Skoda_Peaq_battery_powertrain_a8933919.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/Skoda_Peaq_battery_powertrain_a8933919.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/Skoda_Peaq_battery_powertrain_a8933919.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/Skoda_Peaq_battery_powertrain_a8933919.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq | Battery Powertrain",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/Skoda_Peaq_battery_powertrain_a8933919.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/Skoda_Peaq_battery_powertrain_a8933919-768x432.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 7332377,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__26_Skoda_Peaq_Covered_Drive_a54c6b13.jpg": {
+      "logical_id": "6b386aae__26_Skoda_Peaq_Covered_Drive_a54c6b13.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/26_Skoda_Peaq_Covered_Drive_a54c6b13.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/26_Skoda_Peaq_Covered_Drive_a54c6b13.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/26_Skoda_Peaq_Covered_Drive_a54c6b13.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/26_Skoda_Peaq_Covered_Drive_a54c6b13.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/26_Skoda_Peaq_Covered_Drive_a54c6b13-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4257832,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__Skoda_Peaq_v_Skoda_Kodiaq_a33f7283.jpg": {
+      "logical_id": "6b386aae__Skoda_Peaq_v_Skoda_Kodiaq_a33f7283.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/Skoda_Peaq_v_Skoda_Kodiaq_a33f7283.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/Skoda_Peaq_v_Skoda_Kodiaq_a33f7283.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/Skoda_Peaq_v_Skoda_Kodiaq_a33f7283.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq v. Škoda Kodiaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/Skoda_Peaq_v_Skoda_Kodiaq_a33f7283.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/Skoda_Peaq_v_Skoda_Kodiaq_a33f7283-768x432.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 6845087,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__37_Skoda_Peaq_Covered_Drive_1791f0cd.jpg": {
+      "logical_id": "6b386aae__37_Skoda_Peaq_Covered_Drive_1791f0cd.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/37_Skoda_Peaq_Covered_Drive_1791f0cd.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/37_Skoda_Peaq_Covered_Drive_1791f0cd.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/37_Skoda_Peaq_Covered_Drive_1791f0cd.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/37_Skoda_Peaq_Covered_Drive_1791f0cd.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/37_Skoda_Peaq_Covered_Drive_1791f0cd-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5693732,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__Skoda_all-electric_family_80fcb8d2.jpg": {
+      "logical_id": "6b386aae__Skoda_all-electric_family_80fcb8d2.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/Skoda_all-electric_family_80fcb8d2.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/Skoda_all-electric_family_80fcb8d2.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "da_path": "",
+      "alt": "Škoda All-electric Family",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/Skoda_all-electric_family_80fcb8d2.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/Skoda_all-electric_family_80fcb8d2-768x432.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": null,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "skipped",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(18595550, min 768px)"
+    },
+    "6b386aae__11_Skoda_Peaq_Covered_Drive_e32321ff.jpg": {
+      "logical_id": "6b386aae__11_Skoda_Peaq_Covered_Drive_e32321ff.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/11_Skoda_Peaq_Covered_Drive_e32321ff.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/11_Skoda_Peaq_Covered_Drive_e32321ff.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/11_Skoda_Peaq_Covered_Drive_e32321ff.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/11_Skoda_Peaq_Covered_Drive_e32321ff.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/11_Skoda_Peaq_Covered_Drive_e32321ff-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4585279,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__40_Skoda_Peaq_Covered_Drive_3cccb50e.jpg": {
+      "logical_id": "6b386aae__40_Skoda_Peaq_Covered_Drive_3cccb50e.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/40_Skoda_Peaq_Covered_Drive_3cccb50e.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/40_Skoda_Peaq_Covered_Drive_3cccb50e.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/40_Skoda_Peaq_Covered_Drive_3cccb50e.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/40_Skoda_Peaq_Covered_Drive_3cccb50e.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/40_Skoda_Peaq_Covered_Drive_3cccb50e-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4861631,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__09_Skoda_Peaq_Covered_Drive_b58e98fb.jpg": {
+      "logical_id": "6b386aae__09_Skoda_Peaq_Covered_Drive_b58e98fb.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/09_Skoda_Peaq_Covered_Drive_b58e98fb.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/09_Skoda_Peaq_Covered_Drive_b58e98fb.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/09_Skoda_Peaq_Covered_Drive_b58e98fb.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/09_Skoda_Peaq_Covered_Drive_b58e98fb.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/09_Skoda_Peaq_Covered_Drive_b58e98fb-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4475763,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__28_Skoda_Peaq_Covered_Drive_1ba11a9f.jpg": {
+      "logical_id": "6b386aae__28_Skoda_Peaq_Covered_Drive_1ba11a9f.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/28_Skoda_Peaq_Covered_Drive_1ba11a9f-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/28_Skoda_Peaq_Covered_Drive_1ba11a9f.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/28_Skoda_Peaq_Covered_Drive_1ba11a9f.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/28_Skoda_Peaq_Covered_Drive_1ba11a9f-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4231266,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__18_Skoda_Peaq_Covered_Drive_936a7603.jpg": {
+      "logical_id": "6b386aae__18_Skoda_Peaq_Covered_Drive_936a7603.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/18_Skoda_Peaq_Covered_Drive_936a7603.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/18_Skoda_Peaq_Covered_Drive_936a7603.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/18_Skoda_Peaq_Covered_Drive_936a7603.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/18_Skoda_Peaq_Covered_Drive_936a7603.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/18_Skoda_Peaq_Covered_Drive_936a7603-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4356255,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__46_Skoda_Peaq_Covered_Drive_96171723.jpg": {
+      "logical_id": "6b386aae__46_Skoda_Peaq_Covered_Drive_96171723.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/46_Skoda_Peaq_Covered_Drive_96171723.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/46_Skoda_Peaq_Covered_Drive_96171723.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/46_Skoda_Peaq_Covered_Drive_96171723-1440x960.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/46_Skoda_Peaq_Covered_Drive_96171723.jpg",
+        "https://cdn.skoda-storyboard.com/2026/03/46_Skoda_Peaq_Covered_Drive_96171723-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 513086,
+      "preconditioned": true,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__25_Skoda_Peaq_Covered_Drive_0c79fadb.jpg": {
+      "logical_id": "6b386aae__25_Skoda_Peaq_Covered_Drive_0c79fadb.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/25_Skoda_Peaq_Covered_Drive_0c79fadb-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/25_Skoda_Peaq_Covered_Drive_0c79fadb.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/25_Skoda_Peaq_Covered_Drive_0c79fadb.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/25_Skoda_Peaq_Covered_Drive_0c79fadb-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4523963,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__01_Skoda_Peaq_Covered_Drive_e754572f.jpg": {
+      "logical_id": "6b386aae__01_Skoda_Peaq_Covered_Drive_e754572f.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/01_Skoda_Peaq_Covered_Drive_e754572f-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/01_Skoda_Peaq_Covered_Drive_e754572f.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/01_Skoda_Peaq_Covered_Drive_e754572f.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/01_Skoda_Peaq_Covered_Drive_e754572f-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4085955,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__04_Skoda_Peaq_Covered_Drive_5573ca78.jpg": {
+      "logical_id": "6b386aae__04_Skoda_Peaq_Covered_Drive_5573ca78.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/04_Skoda_Peaq_Covered_Drive_5573ca78-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/04_Skoda_Peaq_Covered_Drive_5573ca78.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/04_Skoda_Peaq_Covered_Drive_5573ca78.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/04_Skoda_Peaq_Covered_Drive_5573ca78-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3987816,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__10_Skoda_Peaq_Covered_Drive_2d9a6bf0.jpg": {
+      "logical_id": "6b386aae__10_Skoda_Peaq_Covered_Drive_2d9a6bf0.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/10_Skoda_Peaq_Covered_Drive_2d9a6bf0-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/10_Skoda_Peaq_Covered_Drive_2d9a6bf0.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/10_Skoda_Peaq_Covered_Drive_2d9a6bf0.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/10_Skoda_Peaq_Covered_Drive_2d9a6bf0-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5144222,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__39_Skoda_Peaq_Covered_Drive_b03f6b72.jpg": {
+      "logical_id": "6b386aae__39_Skoda_Peaq_Covered_Drive_b03f6b72.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/39_Skoda_Peaq_Covered_Drive_b03f6b72-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/39_Skoda_Peaq_Covered_Drive_b03f6b72.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/39_Skoda_Peaq_Covered_Drive_b03f6b72.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/39_Skoda_Peaq_Covered_Drive_b03f6b72-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4783627,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__45_Skoda_Peaq_Covered_Drive_d47351fe.jpg": {
+      "logical_id": "6b386aae__45_Skoda_Peaq_Covered_Drive_d47351fe.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/45_Skoda_Peaq_Covered_Drive_d47351fe-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/45_Skoda_Peaq_Covered_Drive_d47351fe.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/45_Skoda_Peaq_Covered_Drive_d47351fe.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/45_Skoda_Peaq_Covered_Drive_d47351fe-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 6149032,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__05_Skoda_Peaq_Covered_Drive_39d982a3.jpg": {
+      "logical_id": "6b386aae__05_Skoda_Peaq_Covered_Drive_39d982a3.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/05_Skoda_Peaq_Covered_Drive_39d982a3-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/05_Skoda_Peaq_Covered_Drive_39d982a3.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/05_Skoda_Peaq_Covered_Drive_39d982a3.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/05_Skoda_Peaq_Covered_Drive_39d982a3-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4418182,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__33_Skoda_Peaq_Covered_Drive_228b32c0.jpg": {
+      "logical_id": "6b386aae__33_Skoda_Peaq_Covered_Drive_228b32c0.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/33_Skoda_Peaq_Covered_Drive_228b32c0-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/33_Skoda_Peaq_Covered_Drive_228b32c0.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/33_Skoda_Peaq_Covered_Drive_228b32c0.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/33_Skoda_Peaq_Covered_Drive_228b32c0-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5631076,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__08_Skoda_Peaq_Covered_Drive_e9f600d6.jpg": {
+      "logical_id": "6b386aae__08_Skoda_Peaq_Covered_Drive_e9f600d6.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/08_Skoda_Peaq_Covered_Drive_e9f600d6-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/08_Skoda_Peaq_Covered_Drive_e9f600d6.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/08_Skoda_Peaq_Covered_Drive_e9f600d6.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/08_Skoda_Peaq_Covered_Drive_e9f600d6-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4313040,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__03_Skoda_Peaq_Covered_Drive_48416ade.jpg": {
+      "logical_id": "6b386aae__03_Skoda_Peaq_Covered_Drive_48416ade.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/03_Skoda_Peaq_Covered_Drive_48416ade-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/03_Skoda_Peaq_Covered_Drive_48416ade.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/03_Skoda_Peaq_Covered_Drive_48416ade.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/03_Skoda_Peaq_Covered_Drive_48416ade-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5417396,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__42_Skoda_Peaq_Covered_Drive_590d8052.jpg": {
+      "logical_id": "6b386aae__42_Skoda_Peaq_Covered_Drive_590d8052.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/42_Skoda_Peaq_Covered_Drive_590d8052-768x497.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/42_Skoda_Peaq_Covered_Drive_590d8052.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/42_Skoda_Peaq_Covered_Drive_590d8052.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/42_Skoda_Peaq_Covered_Drive_590d8052-768x497.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 5001194,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__06_Skoda_Peaq_Covered_Drive_841cf00a.jpg": {
+      "logical_id": "6b386aae__06_Skoda_Peaq_Covered_Drive_841cf00a.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/06_Skoda_Peaq_Covered_Drive_841cf00a-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/06_Skoda_Peaq_Covered_Drive_841cf00a.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/06_Skoda_Peaq_Covered_Drive_841cf00a.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/06_Skoda_Peaq_Covered_Drive_841cf00a-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4640649,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__44_Skoda_Peaq_Covered_Drive_8a86e2ed.jpg": {
+      "logical_id": "6b386aae__44_Skoda_Peaq_Covered_Drive_8a86e2ed.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/44_Skoda_Peaq_Covered_Drive_8a86e2ed-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/44_Skoda_Peaq_Covered_Drive_8a86e2ed.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/44_Skoda_Peaq_Covered_Drive_8a86e2ed.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/44_Skoda_Peaq_Covered_Drive_8a86e2ed-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4990646,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__43_Skoda_Peaq_Covered_Drive_afe8958b.jpg": {
+      "logical_id": "6b386aae__43_Skoda_Peaq_Covered_Drive_afe8958b.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/43_Skoda_Peaq_Covered_Drive_afe8958b-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/43_Skoda_Peaq_Covered_Drive_afe8958b.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/43_Skoda_Peaq_Covered_Drive_afe8958b.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/43_Skoda_Peaq_Covered_Drive_afe8958b-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5187245,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__32_Skoda_Peaq_Covered_Drive_3cbfbf29.jpg": {
+      "logical_id": "6b386aae__32_Skoda_Peaq_Covered_Drive_3cbfbf29.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/32_Skoda_Peaq_Covered_Drive_3cbfbf29-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/32_Skoda_Peaq_Covered_Drive_3cbfbf29.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/32_Skoda_Peaq_Covered_Drive_3cbfbf29.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/32_Skoda_Peaq_Covered_Drive_3cbfbf29-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5543612,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__36_Skoda_Peaq_Covered_Drive_1902a216.jpg": {
+      "logical_id": "6b386aae__36_Skoda_Peaq_Covered_Drive_1902a216.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/36_Skoda_Peaq_Covered_Drive_1902a216-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/36_Skoda_Peaq_Covered_Drive_1902a216.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/36_Skoda_Peaq_Covered_Drive_1902a216.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/36_Skoda_Peaq_Covered_Drive_1902a216-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4744403,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__31_Skoda_Peaq_Covered_Drive_24d42317.jpg": {
+      "logical_id": "6b386aae__31_Skoda_Peaq_Covered_Drive_24d42317.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/31_Skoda_Peaq_Covered_Drive_24d42317-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/31_Skoda_Peaq_Covered_Drive_24d42317.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/31_Skoda_Peaq_Covered_Drive_24d42317.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/31_Skoda_Peaq_Covered_Drive_24d42317-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 6184708,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__34_Skoda_Peaq_Covered_Drive_ffc9445b.jpg": {
+      "logical_id": "6b386aae__34_Skoda_Peaq_Covered_Drive_ffc9445b.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/34_Skoda_Peaq_Covered_Drive_ffc9445b-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/34_Skoda_Peaq_Covered_Drive_ffc9445b.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/34_Skoda_Peaq_Covered_Drive_ffc9445b.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/34_Skoda_Peaq_Covered_Drive_ffc9445b-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5880220,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__23_Skoda_Peaq_Covered_Drive_c44c5b2d.jpg": {
+      "logical_id": "6b386aae__23_Skoda_Peaq_Covered_Drive_c44c5b2d.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/23_Skoda_Peaq_Covered_Drive_c44c5b2d-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/23_Skoda_Peaq_Covered_Drive_c44c5b2d.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/23_Skoda_Peaq_Covered_Drive_c44c5b2d.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/23_Skoda_Peaq_Covered_Drive_c44c5b2d-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3726912,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__30_Skoda_Peaq_Covered_Drive_deda6f73.jpg": {
+      "logical_id": "6b386aae__30_Skoda_Peaq_Covered_Drive_deda6f73.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/30_Skoda_Peaq_Covered_Drive_deda6f73-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/30_Skoda_Peaq_Covered_Drive_deda6f73.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/30_Skoda_Peaq_Covered_Drive_deda6f73.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/30_Skoda_Peaq_Covered_Drive_deda6f73-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3185117,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__24_Skoda_Peaq_Covered_Drive_750aaab9.jpg": {
+      "logical_id": "6b386aae__24_Skoda_Peaq_Covered_Drive_750aaab9.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/24_Skoda_Peaq_Covered_Drive_750aaab9-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/24_Skoda_Peaq_Covered_Drive_750aaab9.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/24_Skoda_Peaq_Covered_Drive_750aaab9.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/24_Skoda_Peaq_Covered_Drive_750aaab9-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4762050,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__22_Skoda_Peaq_Covered_Drive_ee5e0ba9.jpg": {
+      "logical_id": "6b386aae__22_Skoda_Peaq_Covered_Drive_ee5e0ba9.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/22_Skoda_Peaq_Covered_Drive_ee5e0ba9-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/22_Skoda_Peaq_Covered_Drive_ee5e0ba9.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/22_Skoda_Peaq_Covered_Drive_ee5e0ba9.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/22_Skoda_Peaq_Covered_Drive_ee5e0ba9-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3682980,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__17_Skoda_Peaq_Covered_Drive_b0169565.jpg": {
+      "logical_id": "6b386aae__17_Skoda_Peaq_Covered_Drive_b0169565.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/17_Skoda_Peaq_Covered_Drive_b0169565-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/17_Skoda_Peaq_Covered_Drive_b0169565.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/17_Skoda_Peaq_Covered_Drive_b0169565.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/17_Skoda_Peaq_Covered_Drive_b0169565-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4347918,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__16_Skoda_Peaq_Covered_Drive_830b4cef.jpg": {
+      "logical_id": "6b386aae__16_Skoda_Peaq_Covered_Drive_830b4cef.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/16_Skoda_Peaq_Covered_Drive_830b4cef-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/16_Skoda_Peaq_Covered_Drive_830b4cef.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/16_Skoda_Peaq_Covered_Drive_830b4cef.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/16_Skoda_Peaq_Covered_Drive_830b4cef-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4192250,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__15_Skoda_Peaq_Covered_Drive_745511b0.jpg": {
+      "logical_id": "6b386aae__15_Skoda_Peaq_Covered_Drive_745511b0.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/15_Skoda_Peaq_Covered_Drive_745511b0-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/15_Skoda_Peaq_Covered_Drive_745511b0.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/15_Skoda_Peaq_Covered_Drive_745511b0.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/15_Skoda_Peaq_Covered_Drive_745511b0-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4770945,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__20_Skoda_Peaq_Covered_Drive_318da091.jpg": {
+      "logical_id": "6b386aae__20_Skoda_Peaq_Covered_Drive_318da091.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/20_Skoda_Peaq_Covered_Drive_318da091-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/20_Skoda_Peaq_Covered_Drive_318da091.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/20_Skoda_Peaq_Covered_Drive_318da091.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/20_Skoda_Peaq_Covered_Drive_318da091-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3206851,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__21_Skoda_Peaq_Covered_Drive_3d212500.jpg": {
+      "logical_id": "6b386aae__21_Skoda_Peaq_Covered_Drive_3d212500.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/21_Skoda_Peaq_Covered_Drive_3d212500-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/21_Skoda_Peaq_Covered_Drive_3d212500.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/21_Skoda_Peaq_Covered_Drive_3d212500.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/21_Skoda_Peaq_Covered_Drive_3d212500-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4048035,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__19_Skoda_Peaq_Covered_Drive_bd709526.jpg": {
+      "logical_id": "6b386aae__19_Skoda_Peaq_Covered_Drive_bd709526.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/19_Skoda_Peaq_Covered_Drive_bd709526-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/19_Skoda_Peaq_Covered_Drive_bd709526.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/19_Skoda_Peaq_Covered_Drive_bd709526.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/19_Skoda_Peaq_Covered_Drive_bd709526-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4951832,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__13_Skoda_Peaq_Covered_Drive_b44ed5aa.jpg": {
+      "logical_id": "6b386aae__13_Skoda_Peaq_Covered_Drive_b44ed5aa.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/13_Skoda_Peaq_Covered_Drive_b44ed5aa-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/13_Skoda_Peaq_Covered_Drive_b44ed5aa.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/13_Skoda_Peaq_Covered_Drive_b44ed5aa.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/13_Skoda_Peaq_Covered_Drive_b44ed5aa-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 5213715,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__12_Skoda_Peaq_Covered_Drive_f0393388.jpg": {
+      "logical_id": "6b386aae__12_Skoda_Peaq_Covered_Drive_f0393388.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/12_Skoda_Peaq_Covered_Drive_f0393388-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/12_Skoda_Peaq_Covered_Drive_f0393388.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/12_Skoda_Peaq_Covered_Drive_f0393388.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/12_Skoda_Peaq_Covered_Drive_f0393388-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4701429,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__14_Skoda_Peaq_Covered_Drive_01d645f2.jpg": {
+      "logical_id": "6b386aae__14_Skoda_Peaq_Covered_Drive_01d645f2.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/14_Skoda_Peaq_Covered_Drive_01d645f2-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/14_Skoda_Peaq_Covered_Drive_01d645f2.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/14_Skoda_Peaq_Covered_Drive_01d645f2.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/14_Skoda_Peaq_Covered_Drive_01d645f2-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 4096386,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__52_Skoda_Peaq_Covered_Drive_53590f83.jpg": {
+      "logical_id": "6b386aae__52_Skoda_Peaq_Covered_Drive_53590f83.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/52_Skoda_Peaq_Covered_Drive_53590f83-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/52_Skoda_Peaq_Covered_Drive_53590f83.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/52_Skoda_Peaq_Covered_Drive_53590f83.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/52_Skoda_Peaq_Covered_Drive_53590f83-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 6452757,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__49_Skoda_Peaq_Covered_Drive_512f0f2f.jpg": {
+      "logical_id": "6b386aae__49_Skoda_Peaq_Covered_Drive_512f0f2f.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/49_Skoda_Peaq_Covered_Drive_512f0f2f-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/49_Skoda_Peaq_Covered_Drive_512f0f2f.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/49_Skoda_Peaq_Covered_Drive_512f0f2f.jpg",
+      "da_path": "",
+      "alt": "Škoda Peaq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/49_Skoda_Peaq_Covered_Drive_512f0f2f-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 9029712,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__50_Skoda_Peaq_Covered_Drive_b6f842ac.jpg": {
+      "logical_id": "6b386aae__50_Skoda_Peaq_Covered_Drive_b6f842ac.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/50_Skoda_Peaq_Covered_Drive_b6f842ac-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/50_Skoda_Peaq_Covered_Drive_b6f842ac.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/50_Skoda_Peaq_Covered_Drive_b6f842ac-1440x960.jpg",
+      "da_path": "",
+      "alt": "Škoda Elroq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/50_Skoda_Peaq_Covered_Drive_b6f842ac-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 478673,
+      "preconditioned": true,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__48_Skoda_Peaq_Covered_Drive_4f1a4f76.jpg": {
+      "logical_id": "6b386aae__48_Skoda_Peaq_Covered_Drive_4f1a4f76.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/48_Skoda_Peaq_Covered_Drive_4f1a4f76-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/48_Skoda_Peaq_Covered_Drive_4f1a4f76.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/48_Skoda_Peaq_Covered_Drive_4f1a4f76.jpg",
+      "da_path": "",
+      "alt": "Škoda Elroq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/48_Skoda_Peaq_Covered_Drive_4f1a4f76-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3479248,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__47_Skoda_Peaq_Covered_Drive_36588771.jpg": {
+      "logical_id": "6b386aae__47_Skoda_Peaq_Covered_Drive_36588771.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/47_Skoda_Peaq_Covered_Drive_36588771-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/47_Skoda_Peaq_Covered_Drive_36588771.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/47_Skoda_Peaq_Covered_Drive_36588771.jpg",
+      "da_path": "",
+      "alt": "Škoda Elroq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/47_Skoda_Peaq_Covered_Drive_36588771-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 9392023,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "6b386aae__51_Skoda_Peaq_Covered_Drive_04427cae.jpg": {
+      "logical_id": "6b386aae__51_Skoda_Peaq_Covered_Drive_04427cae.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/03/51_Skoda_Peaq_Covered_Drive_04427cae-768x512.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/03/51_Skoda_Peaq_Covered_Drive_04427cae.jpg",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/51_Skoda_Peaq_Covered_Drive_04427cae.jpg",
+      "da_path": "",
+      "alt": "Škoda Elroq",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/03/51_Skoda_Peaq_Covered_Drive_04427cae-768x512.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 6020971,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "9f34d7bf__Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf": {
+      "kind": "document",
+      "logical_id": "9f34d7bf__Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "Download PDF",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "87472c4b__Skoda_all-electric_family_d82d4b7a.pdf": {
+      "kind": "document",
+      "logical_id": "87472c4b__Skoda_all-electric_family_d82d4b7a.pdf",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_all-electric_family_d82d4b7a.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_all-electric_family_d82d4b7a.pdf",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "PDF download",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_all-electric_family_d82d4b7a.pdf"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "87472c4b__Skoda_Peaq_v_Skoda_Kodiaq_91fd0302.pdf": {
+      "kind": "document",
+      "logical_id": "87472c4b__Skoda_Peaq_v_Skoda_Kodiaq_91fd0302.pdf",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_Peaq_v_Skoda_Kodiaq_91fd0302.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_Peaq_v_Skoda_Kodiaq_91fd0302.pdf",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "PDF download",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_Peaq_v_Skoda_Kodiaq_91fd0302.pdf"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "87472c4b__Skoda_Peaq_battery_powertrain_52694888.pdf": {
+      "kind": "document",
+      "logical_id": "87472c4b__Skoda_Peaq_battery_powertrain_52694888.pdf",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_Peaq_battery_powertrain_52694888.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_Peaq_battery_powertrain_52694888.pdf",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "PDF download",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_Peaq_battery_powertrain_52694888.pdf"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "87472c4b__Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf": {
+      "kind": "document",
+      "logical_id": "87472c4b__Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "Download PDF",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/03/Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "87472c4b__Skoda-Peaq-Covered-Drive_4a806aa2.mp4": {
+      "kind": "video",
+      "logical_id": "87472c4b__Skoda-Peaq-Covered-Drive_4a806aa2.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda-Peaq-Covered-Drive_4a806aa2.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda-Peaq-Covered-Drive_4a806aa2.mp4",
+      "dam_page_path": "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda-Peaq-Covered-Drive_4a806aa2.mp4"
       ],
       "bytes": null,
       "steps": {
