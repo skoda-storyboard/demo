@@ -2,7 +2,7 @@
 
 - **Epic:** E08, Editorial at Scale (M1 slice of SKODA-805/806)
 - **Type:** import
-- **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 **Could** tier (depends on decision D-1)
+- **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (D-1 = A, Architect 2026-09-28; was Could)
 - **Estimate:** 3 SP planned (option B) · option A (full import) = 5–8 SP · option C (link-out) ≈ 1 SP, done inside SKODA-609 *(planning estimate, not a quote)*
 - **Parent:** SKODA-805 (#66) · **GitHub issue:** [#129](https://github.com/skoda-storyboard/demo/issues/129)
 
@@ -38,13 +38,19 @@ children are the substance of a press kit: chapter narrative, resources and medi
 ## Dependencies
 - Upstream: SKODA-805a, SKODA-805c, SKODA-502, SKODA-609, SKODA-602.
 
-## Selected-child slice (2026-09-28, in progress)
+## Decision: D-1 = A, import all 50 (Architect sign-off 2026-09-28)
 
-The SKODA-805a branch implements only the Peaq-2 Introduction child, not
-options A or B in full. Its URL is in the M1 addendum; all other chapter
-and resource links stay absolute to the source and open in a new tab.
-The importer retains the article, chapter list, six interactive row toggles
-and 26 Media Box assets
-in the live-source tests. DA preview, browser QA and no-404 verification
-are still required before accepting this slice; the rest of this ticket
-remains open.
+Milestone moves from Could to **M1 scope**. The 50 tile targets (Peaq-2 13, Epiq-2 13,
+Motorsport 23 + its cross-kit Enyaq RS Race tile) are listed under `PRESS KITS: CHILDREN (50)`
+in `skoda-m1-url-set.txt` and in the link allow-list.
+
+**Source census (2026-09-28, trial import in a scratch workspace):**
+- All 50 are `press_kit-template-default`, imported by `import-press-kit-default`.
+- **36 chapter pages import as-is.**
+- **14 resource pages fail**: Texts, FAQ, Infographics, Technical data, Images, Videos (Peaq and
+  Epiq), plus Motorsport Texts and Images. They have an article body but **no Media Box**, which the
+  importer requires. Content: inline image grids (246 / 196 / 82 items), video grids (11), FAQ row
+  toggles (28 / 5), Texts tables with 8–20 PDFs. Mapping (Architect): reuse existing blocks,
+  grids → Downloads, toggles → Accordion, PDFs → Downloads file rows.
+- **40 of 50 link PDFs/MP4s (≈102)**: their DA push is held by the SKODA-503 binary gate until the
+  developer-machine DAM ingest.

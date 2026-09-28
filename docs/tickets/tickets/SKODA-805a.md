@@ -67,11 +67,12 @@ Contract(s) `cards-tiles`, `hero` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../
 uniform overlay-card fallback until SKODA-221 ships: `cards.js` takes a known
 size token off each `.tiles` row by content and keeps it as `data-tile-size`
 (also fixes the printed token on the series hubs). The Peaq/Epiq image-link
-pairs and source-derived metadata are included. The slice also brings one Peaq
-Introduction child and first-glimpse through the default-article importer; the
-other chapter links stay on the live site. The Introduction child is a proposed
-one-page subset of D-1 option B and **needs Architect sign-off** (D-1 is
-recorded as C). Live-source importer tests cover 13/13/24 ordered tiles. **Keep the
+pairs and source-derived metadata are included, and first-glimpse comes through
+the default-article importer. **D-1 = A (Architect sign-off 2026-09-28):** all 50
+tile targets are in the M1 set and the link allow-list, so every tile links
+site-relative to an imported child. The children themselves are SKODA-805b; this
+ticket's "every tile link resolves" criterion therefore waits for 805b. The hubs
+publish with the plain-card fallback only once their children are live. Live-source importer tests cover 13/13/24 ordered tiles. **Keep the
 acceptance boxes open** pending actual DA preview, source-vs-EDS visual QA,
 SKODA-309 chrome, SKODA-221 mosaic and a separate publish/reindex approval.
 

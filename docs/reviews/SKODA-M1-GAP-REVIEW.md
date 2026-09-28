@@ -4,6 +4,8 @@
 **Milestone:** M1 demo **Thu 15 Oct 2026** · **Build freeze:** Thu 8 Oct EOD · **Dry run + fixes:** Fri 9 – Wed 14 Oct
 **Scope:** [`docs/planning/skoda-m1-url-set.txt`](../planning/skoda-m1-url-set.txt): 43 URLs (42 unique pages) plus
 everything the docs **require and don't rule out** for them.
+**Scope update (2026-09-28):** D-1 = A adds the 49 press-kit child pages, so the set is now 93 lines /
+92 unique pages (§12 D-1). Counts in this review describe the original 43-URL snapshot.
 **Supersedes for M1 planning:** [`M1-BACKLOG-REVIEW.md`](./M1-BACKLOG-REVIEW.md) (21 Sep). That review is still valid for
 board hygiene, but it predates the 43-URL scope.
 **Status:** proposal. **No DA changes have been applied.** The GitHub side of §11 was applied **partially** in
@@ -458,7 +460,7 @@ QA-loop fixes, then Should.
 
 | # | Decision | Options | Default if undecided |
 |---|---|---|---|
-| D-1 | Press-kit child pages (50) | A: import all (5–8 SP) · **B: Peaq children only (3 SP, Could)** · C: link out to live (inside 609) | **C** for M1; upgrade to B if Could capacity opens |
+| D-1 | Press-kit child pages (50) | A: import all (5–8 SP) · **B: Peaq children only (3 SP, Could)** · C: link out to live (inside 609) | **Decided 2026-09-28 (Architect): A, import all 50** (supersedes the default C) |
 | D-2 | CS in the demo | none · **switcher filtered to existing locales + 1 CS story counterpart** · full CS | switcher shows only locales that exist; CS page is Should |
 | D-3 | Link policy for out-of-set targets | see the [SKODA-609](../tickets/tickets/SKODA-609.md) table | absolute to live + new tab for ruled-out pages; import or swap for stories |
 | D-4 | Series hub cards | index-driven + import linked stories · **static curated cards** | static cards for hubs whose stories are not in the corpus |
@@ -469,15 +471,18 @@ QA-loop fixes, then Should.
 | D-9 | Article sidebar STO-D07 (§14 C-9) | build the sidebar · **related rail + promo, doc wording corrected** | **Resolved by §15:** the sidebar is built (801 in #113, parity in 817). Subscription = 823 (Could) or doc wording "go-live" |
 | D-10 | Client-scope adds C-1…C-6 (§14) | accept + **extend the extra resource about 4–5 days** · accept with the §14.3 trims · reject (tell the client) | accept + extend; decide by Mon 28 Sep |
 
-**D-1 selected-child implementation (SKODA-805a branch, 2026-09-28), pending Architect
-sign-off.** The recorded D-1 decision above is still **C**; this is a one-page subset of B
-proposed by #189 and must be accepted (or reverted) by the Architect before merge. The Peaq-2
-Introduction URL was added as one end-to-end chapter alongside the existing first-glimpse
-article. The other chapter/resource tiles remain absolute live-source links, opened in a
-new tab. This is not approval to import the remaining children. Introduction does not
-contain a technical-spec table, so the broader spec-table chapter proposal remains open.
-Neither these pages nor the hubs can feed the published index before a separately approved
-publish/reindex wave.
+**D-1 decided 2026-09-28: option A, import all children (Architect sign-off).** This
+supersedes the one-page Introduction subset first proposed in #189. All 50 tile targets of
+the 3 hubs join the M1 set under `PRESS KITS: CHILDREN (50)` in `skoda-m1-url-set.txt`:
+Peaq-2 13, Epiq-2 13, Motorsport 24 (23 children plus its cross-kit tile, the Enyaq RS Race
+kit, so no hub tile links out). 49 are new (the Introduction was already listed), so the set
+is 92 unique pages. All 50 use `press_kit-template-default` and are imported by
+`import-press-kit-default` (SKODA-805b). A source census on 2026-09-28 found 36 chapter
+pages import as-is and 14 resource pages (Texts, FAQ, Infographics, Technical data, Images,
+Videos) with no Media Box, which need the importer extended; 40 of the 50 link PDFs/MP4s
+(about 102), so their DA push waits for the developer-machine DAM ingest. The hubs publish
+with the documented plain-card fallback (SKODA-221 mosaic follows), once their children are
+live so no tile 404s. Publish and reindex remain a separately approved wave.
 
 **Human gates:**
 

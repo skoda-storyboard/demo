@@ -309,14 +309,14 @@ All MIG IDs map to the import infra (SKODA-601/602) for the demo sample and SKOD
 
 > **Update (2026-09-24, M1 gap review, [`SKODA-M1-GAP-REVIEW.md`](../reviews/SKODA-M1-GAP-REVIEW.md)).**
 >
-> **Scope.** The M1 scope is now the canonical **43-URL set**, [`skoda-m1-url-set.txt`](./skoda-m1-url-set.txt) (44 lines / 43 pages
-> if the D-1 selected Peaq-2 Introduction child is accepted, pending Architect sign-off; SKODA-805a, #189), plus
-> the rail-feed corpus. The MR home and news listing are **not** in the set.
+> **Scope.** The M1 scope is the canonical URL set, [`skoda-m1-url-set.txt`](./skoda-m1-url-set.txt): originally 43 URLs;
+> since D-1 = A (Architect, 2026-09-28) **93 lines / 92 unique pages**, adding all 49 press-kit children (SKODA-805b),
+> plus the rail-feed corpus. The MR home and news listing are **not** in the set.
 >
 > **Pulled into M1 by the set:**
 > - **208** (model page: STO-M / MR-M)
 > - **805a** (press-kit hub, MR-PK01/04/06) and **805c** (default press-kit article, MR-PK02); **805b** children
->   are Could. §14 of the review proposes adding MR-PK07 (whole-kit ZIP link) to 805a
+>   are M1 scope since D-1 = A (2026-09-28). §14 of the review proposes adding MR-PK07 (whole-kit ZIP link) to 805a
 > - **819** (supersedes 219) + **801a** (story in-body carousel, Media Box, embeds: STO-D); story fidelity **816/817/818/820/821** (review §15)
 > - **608** (image/video item rows: MR-I/MR-V listings + model media rails)
 > - **609** (link containment + alias redirect: COM, MIG06)
