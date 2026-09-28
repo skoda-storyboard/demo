@@ -15,6 +15,7 @@
  *   link     the URL "copy link" copies (default: `src`)
  *   cartId   the media-cart key on the add button (SKODA-505 binds it)
  *   actions  false: no action buttons (the source's content images), spacing kept
+ *   video    an embed URL (Vimeo player): the stage plays it instead of the image
  *
  * i18n: all control text lives in LABELS (the single translation point, SKODA-1003).
  */
@@ -26,6 +27,7 @@ const LABELS = {
   prev: 'Previous image',
   next: 'Next image',
   close: 'Close gallery',
+  video: 'Video player',
   // the visible counter is "N / total" (the "/" is CSS); the aria-live label is the long form
   counterLabel: (n, total) => `Image ${n} of ${total}`,
   // detail-panel action buttons (Media-Room style)
@@ -160,6 +162,26 @@ export function buildLightbox(host, items) {
   let lastFocused = null;
   let singleMode = false;
 
+  // one player iframe per overlay, created on the first video item
+  let player = null;
+  const videoPlayer = () => {
+    if (!player) {
+      player = document.createElement('iframe');
+      player.className = 'gallery-lightbox-video';
+      player.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+      player.setAttribute('allowfullscreen', '');
+      player.hidden = true;
+      imageFrame.append(player);
+    }
+    return player;
+  };
+  // leaving a video (close, prev / next) must stop it: drop the player's document
+  const stopVideo = () => {
+    if (!player || player.hidden) return;
+    player.removeAttribute('src');
+    player.hidden = true;
+  };
+
   const render = (index) => {
     current = (index + items.length) % items.length;
     const item = items[current];
@@ -168,15 +190,28 @@ export function buildLightbox(host, items) {
     // show the loading placeholder + reset the fade/zoom, then reveal once the
     // rendition has decoded so the image animates in visible rather than
     // popping in after the open effect
+    stopVideo();
+    if (item.video) {
+      // videos play in the stage (the source colorbox iframe): the player letterboxes
+      stageImg.hidden = true;
+      imageFrame.classList.remove('is-loading');
+      const frame = videoPlayer();
+      frame.title = item.alt || LABELS.video;
+      frame.src = item.video;
+      frame.hidden = false;
+    } else {
+      stageImg.hidden = false;
+    }
     stageImg.classList.remove('is-loaded');
-    imageFrame.classList.add('is-loading');
-    stageImg.src = item.full || `${base}?width=2000&format=webply&optimize=medium`;
+    if (!item.video) imageFrame.classList.add('is-loading');
+    if (item.video) stageImg.removeAttribute('src');
+    else stageImg.src = item.full || `${base}?width=2000&format=webply&optimize=medium`;
     stageImg.alt = item.alt;
     const reveal = () => {
       stageImg.classList.add('is-loaded');
       imageFrame.classList.remove('is-loading');
     };
-    if (stageImg.complete) reveal();
+    if (item.video || stageImg.complete) reveal();
     else {
       stageImg.addEventListener('load', reveal, { once: true });
       // still reveal (so the placeholder clears and the caption/detail panel is
@@ -251,6 +286,7 @@ export function buildLightbox(host, items) {
   };
 
   const close = () => {
+    stopVideo();
     overlay.hidden = true;
     document.body.classList.remove('gallery-lightbox-open');
     document.removeEventListener('keydown', onKeydown);

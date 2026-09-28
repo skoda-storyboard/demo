@@ -30,9 +30,11 @@ export const FACETS = [
 // Download fields, in the order they are written to the Metadata block + index.
 export const DOWNLOAD_FIELDS = ['original', 'rendition-1920', 'mp4', 'vimeo-id', 'poster'];
 
-// The lightbox detail-panel fields (media-item shape 4): file metadata as the source prints
-// it, the tag chip labels in source order, and the related article.
-export const DETAIL_FIELDS = ['filetype', 'filesize', 'dimensions', 'labels', 'related', 'related-title'];
+// The lightbox detail-panel fields (media-item shapes 4 + 6): file metadata as the source
+// prints it (videos add length, bitrate and audio format), the tag chip labels in source
+// order, and the related article.
+export const DETAIL_FIELDS = ['filetype', 'filesize', 'length', 'bitrate', 'audioformat', 'dimensions',
+  'labels', 'related', 'related-title'];
 
 const text = (el) => (el ? (el.textContent || '').replace(/\s+/g, ' ').trim() : '');
 
@@ -68,6 +70,9 @@ export function parseDetailPanel(doc) {
   return {
     filetype: strong('.meta-filetype'),
     filesize: strong('.meta-filesize'),
+    length: strong('.meta-length'),
+    bitrate: strong('.meta-bitrate'),
+    audioformat: strong('.meta-dataformat'),
     dimensions: strong('.meta-dimensions'),
     labels: [...doc.querySelectorAll('.entry-tags a.label')].map(text).filter(Boolean).join(', '),
     related: related ? related.getAttribute('href') : '',

@@ -247,7 +247,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Until the importer emits it** (824 importer half), pages keep the current unwrap (default content) and are marked `re-import on SKODA-824`. The shape is fixed, so the 824 runtime and importer can be built in parallel.
 
 ### `media-item`
-- **Status:** `pinned` (shape 5, 2026-09-28) · **Ticket:** SKODA-608 · **Fallback:** readable (story-style listing/rail cards until SKODA-406)
+- **Status:** `pinned` (shape 6, 2026-09-28) · **Ticket:** SKODA-608 · **Fallback:** readable (story-style listing/rail cards until SKODA-406)
 - **Form: a row of the generated media feed, not a page** (docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md, option B:
   AEM Assets is the source of truth; pages per item are retired). The feed is a DA sheet at `/en/media-feed.json`
   (`{total, offset, limit, data, ":type": "sheet"}`), read by `listing` and `story-rail` via `index: /en/media-feed.json`.
@@ -270,6 +270,8 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   pages in `sources.json` `assetPages`. Title (the source panel's first line), `date` (its Published), `original` and
   the shape-4 detail fields; no facets, cart or download fields. Only the lightbox reads them (matched by file name);
   listings and rails never show them (they scope `template=image|video`).
+- **Shape 6 (2026-09-28, SKODA-208):** + the video lines of the source panel: `length` (14:05), `bitrate`
+  (29994kb/s), `audioformat` (the source's "Audio format", `.meta-dataformat`: quicktime). Empty for images.
 - **Sharding:** a sheet holds 500k cells (~20k rows at ~30 columns); split by type/year before that (the loader
   pages with `offset`).
 - Domain-restricted Vimeo videos (oEmbed `domain_status_code: 403`) can't play on the demo and are not emitted.

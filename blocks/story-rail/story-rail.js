@@ -230,8 +230,9 @@ export function viewAllLabel(block) {
 }
 
 /*
- * Image rails open the shared lightbox (the source colorbox) instead of the bare file: a
- * click anywhere on a card except its toolbar opens it at that card. Modifier clicks keep
+ * Image and video rails open the shared lightbox (the source colorbox; videos play in it)
+ * instead of the bare file / vimeo.com: a click anywhere on a card except its toolbar opens
+ * it at that card. Modifier clicks keep
  * the link (new tab). The overlay lives on <body>: a fixed layer inside the carousel
  * would be clipped by its transforms.
  */
@@ -358,7 +359,7 @@ export default async function decorate(block) {
     decorateBlock(carousel);
     await loadBlock(carousel);
     mount.classList.add('is-built'); // release the reserved card geometry
-    if (cfg.template === 'image' && indexRows.length) wireMediaLightbox(carousel, indexRows);
+    if (['image', 'video'].includes(cfg.template) && indexRows.length) wireMediaLightbox(carousel, indexRows);
   }
 
   if (window.IntersectionObserver) {

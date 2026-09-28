@@ -315,7 +315,7 @@
       "status": "pinned",
       "ticket": "SKODA-608",
       "fallback": "readable",
-      "shape": 5,
+      "shape": 6,
       "emittedBy": [
         "media-items/build-media-items.mjs"
       ]

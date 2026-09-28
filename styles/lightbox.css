@@ -150,6 +150,20 @@ body.gallery-lightbox-open {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+/* video items: the source colorbox plays the Vimeo player in the image column. Phones: full
+   width at 16:9, centred like an image; from 768 it fills the column (the player letterboxes) */
+.gallery-lightbox-video {
+  display: block;
+  width: 100vw;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+}
+
+.gallery-lightbox-video[hidden] {
+  display: none;
+}
+
 .gallery-lightbox-image.is-loaded {
   opacity: 1;
   transform: scale(1);
@@ -193,7 +207,7 @@ body.gallery-lightbox-open {
   display: flex;
   gap: var(--spacing-s);
   justify-content: flex-end;
-  margin: 21px 0 20px; /* source: 21px under the caption, 20px over the metadata */
+  margin: 20px 0; /* source: 20px under the last line, 20px over the metadata */
 }
 
 /* the file metadata block right under the actions (source .media-meta: 20px padding over
@@ -259,12 +273,13 @@ body.gallery-lightbox-open {
 .gallery-lightbox-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-xs);
+  gap: 5px; /* source: 5px between chips; rows 27px apart (22px items) */
   justify-content: center; /* mobile: centred with the rest of the panel */
 }
 
 .gallery-lightbox-tag {
   display: inline-block;
+  margin-top: 1px; /* the source chip sits 1px down in its 22px list item */
   padding: 5px 10px;
   border-radius: 2px;
   background: var(--skoda-grey-500);
@@ -312,6 +327,12 @@ body.gallery-lightbox-open {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+  }
+
+  .gallery-lightbox-video {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
   }
 
   .gallery-lightbox-caption {

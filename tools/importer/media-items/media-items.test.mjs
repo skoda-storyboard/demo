@@ -167,6 +167,9 @@ test('detail panel (shape 4): file metadata, tag labels and the related article'
   assert.deepEqual(panel, {
     filetype: 'JPG',
     filesize: '10 MB',
+    length: '',
+    bitrate: '',
+    audioformat: '',
     dimensions: '8256 × 5504 px',
     labels: '2026, Octavia',
     related: 'https://www.skoda-storyboard.com/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon/',
@@ -212,4 +215,14 @@ test('assets (shape 5): images the page copy links to, not listing cards; titled
   assert.equal(row.filesize, '599 KB');
   assert.equal(row.dimensions, '3151 × 1847 px');
   assert.equal(row.tags, '', 'no facets: never in a listing or rail');
+});
+
+test('video detail panel (shape 6): length, bitrate and audio format', { skip }, () => {
+  const d = new JSDOM(`<div class="media-meta"><div class="meta-filetype">File type: <strong>MP4</strong></div>
+    <div class="meta-length">Length: <strong>14:05</strong></div><div class="meta-bitrate">Bitrate: <strong>29994kb/s</strong></div>
+    <div class="meta-dataformat">Audio format: <strong>quicktime</strong></div></div>`).window.document;
+  const panel = parseDetailPanel(d);
+  assert.equal(panel.length, '14:05');
+  assert.equal(panel.bitrate, '29994kb/s');
+  assert.equal(panel.audioformat, 'quicktime');
 });

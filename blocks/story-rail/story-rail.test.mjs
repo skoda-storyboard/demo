@@ -408,3 +408,20 @@ test('feedLightboxItem: the source colorbox panel from a media feed row (shape 5
   assert.equal(drawing.actions, false, 'content images have no action buttons (source)');
   assert.equal(drawing.caption.children.length, 2, 'title + file details');
 });
+
+test('feedLightboxItem: a video row plays the Vimeo player; its panel adds length / bitrate / audio', () => {
+  const item = feedLightboxItem({
+    template: 'video', title: "Let's Explore Albania | Footage", date: '2025-06-23', id: '410179',
+    'vimeo-id': '1095073143', mp4: 'https://cdn.example/f.mp4', poster: 'https://i.vimeocdn.com/p.jpg',
+    filetype: 'MP4', filesize: '3 GB', length: '14:05', bitrate: '29994kb/s', audioformat: 'quicktime',
+    dimensions: '3840 × 2160 px',
+  });
+  assert.equal(item.video, 'https://player.vimeo.com/video/1095073143?dnt=1&autoplay=1&muted=1');
+  assert.equal(item.src, 'https://i.vimeocdn.com/p.jpg', 'the poster stands in for the image');
+  assert.equal(item.download, 'https://cdn.example/f.mp4');
+  assert.equal(item.actions, true);
+  const text = (node) => (node.children.length ? node.children.map((c) => (typeof c === 'string' ? c : text(c))).join('') : node.textContent);
+  assert.equal(text(item.caption.children[1]), 'File type: MP4File size: 3 GBLength: 14:05Bitrate: 29994kb/sAudio format: quicktimeDimensions: 3840 × 2160 pxPublished: 23. 6. 2025');
+  const fileOnly = feedLightboxItem({ template: 'video', title: 'V', mp4: 'https://cdn.example/v.mp4' });
+  assert.equal(fileOnly.video, 'https://cdn.example/v.mp4', 'no Vimeo id: the MP4 plays');
+});

@@ -161,7 +161,7 @@ plus variants of existing blocks, built against the already-published pages (no 
 - Carousel fix (all rails): the drag code captured the pointer on every press, which retargeted the click to the
   track, so a plain mouse click never followed a card link. It now captures only once a drag passes the threshold.
 - QA vs live at 1024/1280/1440: image, panel blocks, close, counter and arrows match to the pixel.
-- Still open: videos open vimeo.com (the source plays them in the lightbox); the press-release gallery panel only
+- Still open: ~~videos open vimeo.com~~ (done below); the press-release gallery panel only
   has the authored caption (no title / file metadata / tags / related yet); the cart button is inert (SKODA-505).
 
 **Drawing lightbox (Liftback / Combi, 2026-09-28):** the Highlights drawings open the source's single-image colorbox
@@ -177,6 +177,13 @@ plus variants of existing blocks, built against the already-published pages (no 
 - Tablet / mobile (2026-09-28): 768 matches live (desktop layout, 480 image column + 256 panel). Below 768 the
   shared lightbox shows the image alone, full width and vertically centred, no description, close ✕ in the 60px
   top-right cell (as the source on phones); applies to the image rails, the drawings and press-release galleries.
+
+**Video lightbox (2026-09-28):** a Videos card opens the lightbox and plays the Vimeo player there (autoplay, muted,
+fullscreen allowed), as the source colorbox: the player fills the image column (992×900 at 1280, 480 at 768; phones
+full width 16:9, centred, no panel). Panel: title, cart / download (MP4) / link buttons, File type, File size,
+Length, Bitrate, Audio format, Dimensions, Published (feed shape 6), tag chips, related article. Prev / next switch
+videos; closing or moving on unloads the player. QA vs live at 768/1024/1280/1440: all measured points equal
+(player, title, buttons, metadata, chips, related, close, counter).
 
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/template-model-page.md`](../../ui-specs/template-model-page.md)** (captured via Chrome DevTools on the live Peaq model page). Read it before implementing. Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).

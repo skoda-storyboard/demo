@@ -25,8 +25,10 @@ export function feedLightboxItem(row) {
   };
   if (title) para(title);
   if (row.description) para(row.description);
-  const meta = [['File type', row.filetype], ['File size', row.filesize],
-    ['Dimensions', row.dimensions], ['Published', formatCardDate(row.date)]].filter(([, v]) => v);
+  // the source panel order; videos add length, bitrate and audio format
+  const meta = [['File type', row.filetype], ['File size', row.filesize], ['Length', row.length],
+    ['Bitrate', row.bitrate], ['Audio format', row.audioformat], ['Dimensions', row.dimensions],
+    ['Published', formatCardDate(row.date)]].filter(([, v]) => v);
   if (meta.length) {
     const p = para();
     meta.forEach(([label, value], i) => {
@@ -43,6 +45,20 @@ export function feedLightboxItem(row) {
     a.href = row.related;
     a.textContent = row['related-title'] || row.related;
     para('Related article: ', a);
+  }
+  if (row.template === 'video') {
+    const vimeo = row['vimeo-id'];
+    return {
+      src: row.poster || row.image,
+      alt: title,
+      caption,
+      // the source colorbox player: autoplay, muted (the browser allows muted autoplay)
+      video: vimeo ? `https://player.vimeo.com/video/${vimeo}?dnt=1&autoplay=1&muted=1` : row.mp4,
+      download: row.mp4 || '',
+      link: vimeo ? `https://vimeo.com/${vimeo}` : row.mp4,
+      cartId: row.id || '',
+      actions: true,
+    };
   }
   const src = row['rendition-1920'] || row.original || row.image;
   return {
