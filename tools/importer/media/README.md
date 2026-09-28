@@ -65,7 +65,8 @@ npm run media:build -- --from-manifest --ids-file /path/to/approved-binary-ids.t
 npm run media:apply -- --pages content/en/press-releases/example.plain.html
 npm run media:validate-binaries -- --pages content/en/press-releases/example.plain.html
 npm run import:push -- --paths /path/to/approved-page-paths.txt --dry-run
-# Only with separate DA approval: default import:push stage is push + preview, NOT publish.
+# With separate DA approval, push + preview (NOT page publish). The push also
+# rewrites verified binary links if media:apply has not already done so.
 ```
 
 The Assets builder requires a public URL mapping **before** uploading any
@@ -90,8 +91,17 @@ but accept a one-byte ranged GET; the dry-run preflight handles that. Failures
 remain `partial` in the manifest and block rewriting. The standalone
 `media:validate-binaries` check is **offline** and emits per-page JSON results
 with a nonzero exit for missing, unrehosted or misclassified links. `import:push`
-applies the same gate per page before DA writes and again before preview/live;
-an invalid page is reported as `blocked-binary` while other pages can proceed.
+rewrites verified source PDF/MP4 anchors from the manifest in memory before
+its per-page offline gate and DA decision, then stores the rewritten page
+locally when an allowed push occurs. `media:apply` remains the explicit
+rewrite path when validating generated pages before a push. Both paths
+require a completed DAM upload, publish activation and recorded anonymous
+original MIME/byte-count proof; neither uploads or activates an asset during
+DA push. An invalid or partly verified page is reported as `blocked-binary`
+without a local or DA write, while other pages can proceed. Preview-only
+cannot introduce a new rewrite into DA; use `--stage push,preview` after
+reviewing `--dry-run`. Conflicts still require explicit review, not an
+automatic overwrite.
 The gate checks the stored public proof but does not crawl preview/live URLs.
 Never use `--force` to recover a publish or delivery failure, and never run
 an unreviewed `--from-manifest` batch: the binary publisher acts on every
@@ -209,9 +219,9 @@ npm run media:apply -- --pages content/en/skoda-model/elroq.plain.html
 # content store is available. Non-zero exit for missing pages or image defects.
 npm run media:audit -- --contentRoot content --out /path/to/m1-media-audit.json
 
-# 4. import:push runs the mandatory SKODA-506 gate before DA push/preview,
-#    and rechecks before live publish. Dry-run reports changes without
-#    writing content or DA.
+# 4. import:push rewrites verified binary anchors if needed and runs the
+#    mandatory SKODA-506 gate before DA push/preview; it rechecks before live
+#    publish. Dry-run reports changes without writing content or DA.
 npm run import:push -- --urls tools/importer/urls-<name>.txt --dry-run
 npm run import:push -- --urls tools/importer/urls-<name>.txt
 # Review preview, then run the separate publish stage; this re-previews

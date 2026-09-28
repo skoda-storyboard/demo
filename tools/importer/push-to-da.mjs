@@ -48,7 +48,7 @@ import {
   uploadToDA, fetchWithRetry, OVERSIZE_BYTES, MIN_RENDITION_EDGE, renditionEdge,
 } from './media/media-lib.mjs';
 import { conditionInlineMedia, imageLimit } from './media/condition-inline-media.mjs';
-import { binaryAnchors, binaryErrors } from './media/binary-media.mjs';
+import { binaryAnchors, binaryErrors, rewriteBinaryLinks } from './media/binary-media.mjs';
 import {
   parseList, wrapPage, contentHash, decideAction, PUSHING, chunk, parseJobDetails,
   fragmentPaths, imageCheck, summarize,
@@ -226,9 +226,11 @@ export default async function main(argv = process.argv.slice(2), {
       continue;
     }
     const original = readFileSync(file, 'utf8');
+    const rewritten = rewriteBinaryLinks(original, mediaManifest, p.slice(1));
     page.binaries = {
       count: binaryAnchors(original).length,
-      errors: binaryErrors(original, mediaManifest, p.slice(1)),
+      rewrites: rewritten.rewrites,
+      errors: rewritten.errors,
     };
     if (page.binaries.errors.length) {
       Object.assign(page, {
@@ -236,7 +238,7 @@ export default async function main(argv = process.argv.slice(2), {
       });
       continue;
     }
-    const conditioned = await mediaGate(original, p);
+    const conditioned = await mediaGate(rewritten.html, p);
     page.media = conditioned.changes;
     conditioned.changes.forEach((change) => log(`[media] ${p}: ${change.action} ${change.from}${change.to ? ` -> ${change.to}` : ''}`));
     if (conditioned.errors.length) {
@@ -274,7 +276,8 @@ export default async function main(argv = process.argv.slice(2), {
   // 2) push ------------------------------------------------------------------------------
   const now = new Date().toISOString();
   if (!a.dryRun) {
-    pages.filter((pg) => pg.doc && !pg.error && pg.action !== 'conflict' && pg.media.length)
+    pages.filter((pg) => pg.doc && !pg.error && pg.action !== 'conflict'
+      && (pg.media.length || (a.stages.has('push') && pg.binaries.rewrites)))
       .forEach((pg) => writeFileSync(pg.file, pg.plain));
   }
   for (const page of pages) {

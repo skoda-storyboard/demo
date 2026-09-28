@@ -61,7 +61,12 @@ failure leaves the row partial and blocks DA push. Scoping via reviewed
 pages/IDs still limits which binaries can be published; DA page publication
 is a separate workflow and is not implied by asset activation. Mock PDF/MP4
 tests cover scoped activation, fail-closed errors, propagation and resume
-without re-upload. An isolated one-ID dry run for the Elroq PDF reported
+without re-upload. `import:push` now also rewrites verified PDF/MP4 source
+anchors into the DA document and local page on an allowed push, even when
+`media:apply` was not run first. Dry-run reports prospective rewrites without
+writing; unverified links, author edits and preview-only mismatches block
+the DA handoff. This does not ingest or activate Assets during DA push.
+An isolated one-ID dry run for the Elroq PDF reported
 `activation pending` and performed no write. The subsequent live resume was
 declined because activation needs explicit approval; it did not run.
 
