@@ -37,6 +37,9 @@ const LAYOUT_ATTR = 'data-pr-layout';
 
 const SECTION_STYLES = {
   body: 'body-column',
+  // Background panels in the body (Zellmer grey FAQ, SKODA-824, contract highlight v2).
+  'highlight-grey': 'body-column, highlight-grey',
+  'highlight-dark': 'body-column, highlight-dark',
   sidebar: 'sidebar',
   'media-box': 'dark, full-width, media-box',
   related: 'dark, full-width, related',
@@ -126,6 +129,22 @@ function perex(document, primary) {
   return out;
 }
 
+/** `dark` / `grey` for an inline `background(-color)`; null for none or white. */
+function panelVariant(style) {
+  const value = ((style || '').match(/background(?:-color)?\s*:\s*([^;]+)/i) || [])[1];
+  const hex = (value || '').trim().toLowerCase().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+  const rgb = (value || '').match(/rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/);
+  let channels = null;
+  if (hex) {
+    const h = hex[1].length === 3 ? hex[1].replace(/./g, '$&$&') : hex[1];
+    channels = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+  } else if (rgb) channels = rgb.slice(1, 4).map(Number);
+  if (!channels) return null;
+  const luminance = (0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]) / 255;
+  if (luminance > 0.98) return null;
+  return luminance < 0.5 ? 'dark' : 'grey';
+}
+
 /** `.entry-content` → flat default content with bare embed URLs. */
 function bodyContent(document, primary) {
   const content = primary.querySelector('.entry-content');
@@ -161,11 +180,23 @@ function bodyContent(document, primary) {
   // Decorative quote rules: a bare <hr> would split the DA section (quote → SKODA-220).
   content.querySelectorAll('hr').forEach((hr) => hr.remove());
 
-  // Inline-styled panels (Zellmer grey FAQ → SKODA-824): keep their paragraphs separate.
+  // Background panels (Zellmer grey FAQ, SKODA-824) get their own highlight section and
+  // the body resumes after them; other inline-styled divs just keep their paragraphs.
+  content.querySelectorAll(':scope > div[style]').forEach((div) => {
+    const variant = panelVariant(div.getAttribute('style'));
+    if (variant && text(div)) {
+      div.replaceWith(marker(document, `highlight-${variant}`), ...div.childNodes, marker(document, 'body'));
+    }
+  });
   content.querySelectorAll('div[style]').forEach((div) => div.replaceWith(...div.childNodes));
 
   content.querySelectorAll('p').forEach((p) => { if (isEmptyParagraph(p)) p.remove(); });
-  return [...content.childNodes].filter((n) => n.nodeType === 1 || text(n));
+  const nodes = [...content.childNodes].filter((n) => n.nodeType === 1 || text(n));
+  // No empty resumed body: drop a body marker that is last or directly before another marker.
+  const isMarker = (n) => n && n.nodeType === 1 && n.hasAttribute(MARKER);
+  const nextElement = (i) => nodes.slice(i + 1).find((n) => n.nodeType === 1);
+  return nodes.filter((n, i) => !(isMarker(n) && n.getAttribute(MARKER) === 'body'
+    && (!nextElement(i) || isMarker(nextElement(i)))));
 }
 
 /** Secondary column → sidebar parts (the parser-owned sections are kept in place). */

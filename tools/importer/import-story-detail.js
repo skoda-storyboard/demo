@@ -17,7 +17,7 @@
  */
 
 import storyHeroParser from './parsers/story-hero.js';
-import storyFlattenParser from './parsers/story-flatten.js';
+import storyFlattenParser, { markHighlights } from './parsers/story-flatten.js';
 import pageCleanupTransformer from './transformers/skoda-page-cleanup.js';
 import storyCleanupTransformer from './transformers/skoda-story-cleanup.js';
 import storyAsideTransformer from './transformers/skoda-story-aside.js';
@@ -120,6 +120,15 @@ function findBlocksOnPage(document, template) {
 }
 
 export default {
+  /**
+   * Runs on the untouched DOM, before helix-importer's preProcess and the cleanup
+   * transformers. The highlight rows' background colour (SKODA-824) is only in the
+   * SiteOrigin head CSS, so the rows are marked here for story-flatten.
+   */
+  preprocess: ({ document }) => {
+    markHighlights(document);
+  },
+
   transform: (payload) => {
     const { document, url, params } = payload;
     const main = document.body;

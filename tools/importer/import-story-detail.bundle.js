@@ -278,6 +278,58 @@ var CustomImportScript = (() => {
     p.appendChild(strong);
     return [p];
   }
+  var BODY_STYLE = "body-column";
+  var HIGHLIGHT_ATTR = "data-highlight";
+  function highlightVariant(color) {
+    const value = (color || "").trim().toLowerCase();
+    let rgb = null;
+    const hex = value.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+    if (hex) {
+      const h = hex[1].length === 3 ? hex[1].replace(/./g, "$&$&") : hex[1];
+      rgb = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+    } else {
+      const fn = value.match(/^rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)(?:[\s,/]+([\d.]+%?))?\s*\)$/);
+      if (fn && !(fn[4] !== void 0 && parseFloat(fn[4]) === 0)) rgb = fn.slice(1, 4).map(Number);
+    }
+    if (!rgb) return null;
+    const luminance = (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
+    if (luminance > 0.98) return null;
+    return luminance < 0.5 ? "dark" : "grey";
+  }
+  function markHighlights(document2) {
+    const css = [...document2.querySelectorAll("style")].map((s) => s.textContent || "").join("\n");
+    const byId = /* @__PURE__ */ new Map();
+    for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+      const color = (body.match(/background(?:-color)?\s*:\s*([^;]+)/i) || [])[1];
+      const variant = highlightVariant(color && color.replace(/!important/i, ""));
+      if (!variant) continue;
+      selectors.split(",").forEach((sel) => {
+        const m = sel.trim().match(/^#(pg-[\w-]+)\s*>\s*\.panel-row-style$/);
+        if (m) byId.set(m[1], variant);
+      });
+    }
+    let count = 0;
+    document2.querySelectorAll(".panel-grid").forEach((grid) => {
+      const row = grid.querySelector(":scope > .panel-row-style");
+      const inline = row && (row.getAttribute("style") || "").match(/background(?:-color)?\s*:\s*([^;]+)/i);
+      const variant = byId.get(grid.id) || inline && highlightVariant(inline[1]);
+      if (!variant) return;
+      grid.setAttribute(HIGHLIGHT_ATTR, variant);
+      count += 1;
+    });
+    return count;
+  }
+  function hasContentAfter(node, root) {
+    for (let n = node; n && n !== root; n = n.parentNode) {
+      for (let s = n.nextSibling; s; s = s.nextSibling) {
+        if ((s.textContent || "").trim() || s.querySelector && s.querySelector("img, picture, iframe, table")) return true;
+      }
+    }
+    return false;
+  }
+  function sectionMetadata(style, document2) {
+    return WebImporter.DOMUtils.createTable([["Section Metadata"], ["style", style]], document2);
+  }
   function cellsOf(grid) {
     const direct = [...grid.children].flatMap((c) => {
       if (c.classList && c.classList.contains("panel-grid-cell")) return [c];
@@ -286,7 +338,12 @@ var CustomImportScript = (() => {
     return direct;
   }
   function panelsOf(cell) {
-    return [...cell.querySelectorAll(':scope > .so-panel, :scope > [class*="widget_"]')];
+    return [...cell.querySelectorAll([
+      ":scope > .so-panel",
+      ':scope > [class*="widget_"]',
+      ":scope > .panel-cell-style > .so-panel",
+      ':scope > .panel-cell-style > [class*="widget_"]'
+    ].join(", "))];
   }
   function emitWidget(panel, document2, out, stats) {
     const kind = classifyWidget(panel);
@@ -363,17 +420,34 @@ var CustomImportScript = (() => {
       byKind: {},
       deferred: [],
       unknown: [],
-      multiColumn: 0
+      multiColumn: 0,
+      highlights: 0
     };
+    let resume = false;
     grids.forEach((grid) => {
+      const variant = grid.getAttribute(HIGHLIGHT_ATTR);
+      const row = [];
       const cells = cellsOf(grid);
       const nonEmpty = cells.filter((c) => panelsOf(c).length > 0);
       if (nonEmpty.length > 1) {
-        emitMultiColumn(nonEmpty, document2, out, stats);
+        emitMultiColumn(nonEmpty, document2, row, stats);
       } else {
-        cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document2, out, stats)));
+        cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document2, row, stats)));
       }
+      if (!row.length) return;
+      if (variant) {
+        out.push(document2.createElement("hr"), ...row, sectionMetadata(`${BODY_STYLE}, highlight-${variant}`, document2));
+        stats.highlights += 1;
+        resume = true;
+        return;
+      }
+      if (resume) out.push(document2.createElement("hr"), sectionMetadata(BODY_STYLE, document2));
+      resume = false;
+      out.push(...row);
     });
+    if (resume && hasContentAfter(layout, element)) {
+      out.push(document2.createElement("hr"), sectionMetadata(BODY_STYLE, document2));
+    }
     const container = layout.closest(".entry-content") || layout.parentElement;
     const holder = document2.createElement("div");
     out.forEach((n) => holder.appendChild(n));
@@ -384,6 +458,7 @@ var CustomImportScript = (() => {
       widgets: Object.values(stats.byKind).reduce((a, b) => a + b, 0),
       byKind: stats.byKind,
       multiColumn: stats.multiColumn,
+      highlights: stats.highlights,
       deferred: stats.deferred,
       unknown: stats.unknown
     };
@@ -1357,6 +1432,14 @@ var CustomImportScript = (() => {
     return pageBlocks;
   }
   var import_story_detail_default = {
+    /**
+     * Runs on the untouched DOM, before helix-importer's preProcess and the cleanup
+     * transformers. The highlight rows' background colour (SKODA-824) is only in the
+     * SiteOrigin head CSS, so the rows are marked here for story-flatten.
+     */
+    preprocess: ({ document: document2 }) => {
+      markHighlights(document2);
+    },
     transform: (payload) => {
       const { document: document2, url, params } = payload;
       const main = document2.body;

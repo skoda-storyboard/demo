@@ -4,7 +4,7 @@
 - **Phase:** A/B · **Milestone:** M1 (demo-visible)
 - **GitHub issue:** [#148](https://github.com/skoda-storyboard/demo/issues/148)
 - **Estimate:** 3 SP · AI-assisted 1d / manual 2–3d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🔵 TODO
+- **Status (2026-09-28):** 🟡 IN PROGRESS: importer done (contract `highlight` shape 2, branch `skoda-824-highlight-panel-importer`); runtime TODO. Pages carrying a highlight section hold publish until the runtime spans the sidebar across the split body (not enforced: `import:validate-blocks` doesn't track section styles). Also fixed in the importer: story-flatten dropped widgets wrapped in `.panel-cell-style` (the charging portrait); that row is now `Columns`.
 
 ## Origin
 Demo URL/block sweep, 2026-09-25 ([`SKODA-DEMO-SWEEP-REPORT.md`](../../reviews/SKODA-DEMO-SWEEP-REPORT.md) §5). The same root cause was raised
@@ -34,10 +34,10 @@ independently by 4 story groups and the press-release group; it was consolidated
 - [ ] 390: full-bleed box, 15px inner margin, h3 20/23.
 - [ ] Grey callout: bg `rgb(243,243,243)`, padding 25px, 812 wide at 1440 on the Zellmer PR.
 - [ ] Nested slider/columns render inside the box; consecutive rows join as on the source.
-- [ ] Verified on Epiq, Octavia, charging and the Zellmer PR; lint + tests green.
+- [ ] Verified on Epiq, Octavia, charging and the Zellmer PR; lint + tests green. *(Importer: local import emits 16 dark sections on 11 of the 19 M1 stories + the Zellmer grey section; unit tests in `story-flatten.test.mjs` / `press-release.test.mjs`. Not pushed to DA.)*
 
 ## Dependencies
 SKODA-801 (flatten), SKODA-814 (M2 generic SiteOrigin rule, related), SKODA-218 (dark styling), SKODA-819 (nested slider), SKODA-225 (columns split).
 
 ## Import contract (SKODA-603)
-Contract(s) `highlight` (**pinned 2026-09-25: section style**) in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Form: a **section** with Section Metadata `Style` = `highlight, dark` / `highlight, grey` (it can contain nested sliders/columns, which a block can't), plus the `scripts.js` section hook. Until the importer emits it, pages keep the default-content fallback and are flagged `re-import on SKODA-824`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.
+Contract(s) `highlight` (**pinned 2026-09-25: section style; shape 2 on 2026-09-28: `Style` = `body-column, highlight-dark` / `body-column, highlight-grey`**) in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Form (v1, superseded): a **section** with Section Metadata `Style` = `highlight, dark` / `highlight, grey` (it can contain nested sliders/columns, which a block can't), plus the `scripts.js` section hook. Until the importer emits it, pages keep the default-content fallback and are flagged `re-import on SKODA-824`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

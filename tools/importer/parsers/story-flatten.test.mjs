@@ -402,3 +402,129 @@ test('large tree (293 grids) flattens without failure', { skip: domSkip }, () =>
     assert.equal(content.querySelectorAll('.panel-grid, .so-panel, [class*="so-widget"], .panel-layout').length, 0);
   });
 });
+
+// ---- highlight rows (SKODA-824, contract highlight v2) --------------------------
+// Live shape (Epiq, Kylaq, charging … 2026-09-28): the row colour is only in the
+// SiteOrigin head CSS, keyed by the grid id; the row itself carries no inline style.
+const { markHighlights } = await import('./story-flatten.js');
+
+const editorRow = (id, html, rowStyle = '') => `<div id="${id}" class="panel-grid panel-has-style">
+  <div class="panel-row-style panel-row-style-for-${id.slice(3)}"${rowStyle ? ` style="${rowStyle}"` : ''}>
+    <div class="panel-grid-cell"><div class="so-panel widget widget_sow-editor">
+      <div class="so-widget-sow-editor"><div class="siteorigin-widget-tinymce textwidget">${html}</div></div>
+    </div></div>
+  </div></div>`;
+const storyDoc = (css, rows, after = '') => domDoc(`<html><head><style id="siteorigin-panels-layouts-head">${css}</style></head>
+  <body><div class="columns"><div class="content"><div class="panel-layout">${rows.join('')}</div>${after}</div></div></body></html>`);
+/** The flattened body as [kind, text] pairs: hr, a Section Metadata style, or element text. */
+function flow(d) {
+  const content = d.querySelector('.content');
+  parse(content, { document: d });
+  return [...content.children].map((n) => {
+    if (n.tagName === 'HR') return ['hr'];
+    if (n.dataset.block === 'Section Metadata') return ['meta', n.querySelector('tr > td:last-child').textContent];
+    if (n.tagName === 'TABLE') return ['block', n.dataset.block];
+    return [n.tagName.toLowerCase(), n.textContent.trim()];
+  });
+}
+
+test('markHighlights: head-CSS row colours (incl. grouped selectors) and inline styles', { skip: domSkip }, () => {
+  const d = storyDoc(
+    '#pl-1 .so-panel { margin-bottom:0px } #pg-1-1> .panel-row-style { background-color:#0e3a2f }'
+      + ' #pg-1-2> .panel-row-style, #pg-1-4 > .panel-row-style { background-color: rgb(243, 243, 243) }'
+      + ' #pg-1-3> .panel-row-style { background-color:#ffffff }',
+    ['pg-1-0', 'pg-1-1', 'pg-1-2', 'pg-1-3', 'pg-1-4'].map((id) => editorRow(id, `<p>${id}</p>`))
+      .concat(editorRow('pg-1-5', '<p>inline</p>', 'background-color: #0e3a2f; padding: 0 15px')),
+  );
+  assert.equal(markHighlights(d), 4);
+  assert.deepEqual(
+    [...d.querySelectorAll('.panel-grid')].map((g) => g.getAttribute('data-highlight')),
+    [null, 'dark', 'grey', null, 'grey', 'dark'],
+    'white is not a panel',
+  );
+});
+
+test('a highlight row becomes its own body-column, highlight-dark section; the body resumes after it', { skip: domSkip }, () => {
+  const d = storyDoc('#pg-2-1> .panel-row-style { background-color:#0e3a2f }', [
+    editorRow('pg-2-0', '<p>Intro</p>'),
+    editorRow('pg-2-1', '<h3>What Else Will Epiq Win You Over With?</h3><p>Panel</p>'),
+    editorRow('pg-2-2', '<p>Outro</p>'),
+  ]);
+  markHighlights(d);
+  assert.deepEqual(flow(d), [
+    ['p', 'Intro'],
+    ['hr'], ['h3', 'What Else Will Epiq Win You Over With?'], ['p', 'Panel'], ['meta', 'body-column, highlight-dark'],
+    ['hr'], ['meta', 'body-column'], ['p', 'Outro'],
+  ]);
+});
+
+test('consecutive highlight rows are one section each; a trailing row leaves no empty body', { skip: domSkip }, () => {
+  const d = storyDoc('#pg-3-1> .panel-row-style, #pg-3-2> .panel-row-style { background-color:#0e3a2f }', [
+    editorRow('pg-3-0', '<p>Intro</p>'), editorRow('pg-3-1', '<p>One</p>'), editorRow('pg-3-2', '<p>Two</p>'),
+  ]);
+  markHighlights(d);
+  assert.deepEqual(flow(d), [
+    ['p', 'Intro'],
+    ['hr'], ['p', 'One'], ['meta', 'body-column, highlight-dark'],
+    ['hr'], ['p', 'Two'], ['meta', 'body-column, highlight-dark'],
+  ]);
+  // …but content after the builder tree still gets its body section back
+  const tail = storyDoc('#pg-4-1> .panel-row-style { background-color:#0e3a2f }', [
+    editorRow('pg-4-0', '<p>Intro</p>'), editorRow('pg-4-1', '<p>Panel</p>'),
+  ], '<p>After the builder</p>');
+  markHighlights(tail);
+  assert.deepEqual(flow(tail).slice(-4), [['meta', 'body-column, highlight-dark'], ['hr'], ['meta', 'body-column'], ['p', 'After the builder']]);
+});
+
+test('nested blocks stay inside the highlight section (2-cell row → Columns, carousel → Gallery (slider))', { skip: domSkip }, () => {
+  const twoCells = `<div id="pg-5-1" class="panel-grid panel-has-style"><div class="panel-row-style">
+    <div class="panel-grid-cell"><div class="so-panel widget widget_sow-editor"><div class="so-widget-sow-editor">
+      <div class="siteorigin-widget-tinymce textwidget"><h3>Five questions for Michal Zajíc</h3></div></div></div></div>
+    <div class="panel-grid-cell"><div class="so-panel widget widget_sow-image"><div class="so-widget-sow-image"><img src="zajic.jpg" alt="Michal Zajíc"></div></div></div>
+  </div></div>`;
+  const carousel = `<div id="pg-5-2" class="panel-grid panel-has-style"><div class="panel-row-style"><div class="panel-grid-cell">
+    <div class="so-panel widget widget_skoda-carousel-widget"><div class="so-widget-skoda-carousel-widget">
+      ${carouselItem('a.jpg', 'A')}${carouselItem('b.jpg', 'B')}</div></div></div></div></div>`;
+  const d = storyDoc('#pg-5-1> .panel-row-style, #pg-5-2> .panel-row-style { background-color:#0e3a2f }', [
+    editorRow('pg-5-0', '<p>Intro</p>'), twoCells, carousel,
+  ]);
+  markHighlights(d);
+  assert.deepEqual(flow(d), [
+    ['p', 'Intro'],
+    ['hr'], ['block', 'Columns'], ['meta', 'body-column, highlight-dark'],
+    ['hr'], ['block', 'Gallery (slider)'], ['meta', 'body-column, highlight-dark'],
+  ]);
+});
+
+test('without markHighlights (no preprocess) rows still linearize into the one body section', { skip: domSkip }, () => {
+  const d = storyDoc('#pg-6-1> .panel-row-style { background-color:#0e3a2f }', [
+    editorRow('pg-6-0', '<p>Intro</p>'), editorRow('pg-6-1', '<p>Panel</p>'),
+  ]);
+  assert.deepEqual(flow(d), [['p', 'Intro'], ['p', 'Panel']]);
+});
+
+test('a spacer-only row after the last highlight does not resume an empty body (Kylaq)', { skip: domSkip }, () => {
+  const spacer = `<div id="pg-7-2" class="panel-grid panel-no-style"><div class="panel-grid-cell">
+    <div class="so-panel widget widget_skoda-offset"><div class="so-widget-skoda-offset"><div style="padding-top:1em"></div></div></div>
+  </div></div>`;
+  const d = storyDoc('#pg-7-1> .panel-row-style { background-color:#0e3a2f }', [
+    editorRow('pg-7-0', '<p>Intro</p>'), editorRow('pg-7-1', '<p>Škoda Kylaq</p>'), spacer,
+  ]);
+  markHighlights(d);
+  assert.deepEqual(flow(d), [['p', 'Intro'], ['hr'], ['p', 'Škoda Kylaq'], ['meta', 'body-column, highlight-dark']]);
+});
+
+test('a widget inside a .panel-cell-style wrapper is not dropped (charging portrait cell)', { skip: domSkip }, () => {
+  const d = domDoc(`<div class="entry-content"><div class="panel-layout"><div class="panel-grid"><div class="panel-row-style">
+    <div class="panel-grid-cell"><div class="so-panel widget widget_sow-editor"><div class="so-widget-sow-editor">
+      <div class="siteorigin-widget-tinymce textwidget"><h3>Five questions for Michal Zajíc</h3></div></div></div></div>
+    <div class="panel-grid-cell"><div class="panel-cell-style panel-cell-style-for-447920-1-1">
+      <div class="so-panel widget widget_sow-image"><div class="so-widget-sow-image"><img src="portrait.png" alt=""></div></div>
+    </div></div>
+  </div></div></div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  const columns = content.querySelector('table[data-block="Columns"]');
+  assert.ok(columns, 'two non-empty cells → Columns');
+  assert.ok(columns.querySelector('img[src="portrait.png"]'), 'portrait kept');
+});
