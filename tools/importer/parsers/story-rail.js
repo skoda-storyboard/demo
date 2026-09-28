@@ -31,8 +31,14 @@ const RAILS = {
   news: { template: 'press_release', heading: 'News' },
   'press-kits': { template: 'press_kit', heading: 'Press Kits' },
   stories: { template: 'story', heading: 'Stories' },
-  images: { template: 'image', heading: 'Images', limit: '20' },
-  videos: { template: 'video', heading: 'Videos', limit: '20' },
+  // Image/video rows live in the generated media feed, not the page index (SKODA-608,
+  // docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md: AEM Assets is the source of truth).
+  images: {
+    template: 'image', heading: 'Images', limit: '20', index: '/en/media-feed.json',
+  },
+  videos: {
+    template: 'video', heading: 'Videos', limit: '20', index: '/en/media-feed.json',
+  },
 };
 const FACET_KEYS = ['model', 'bodywork', 'derivative'];
 
@@ -112,6 +118,7 @@ export default function parse(element, { document, url, params }) {
       element.remove();
       return;
     }
+    if (rail.index) rows.splice(1, 0, ['index', rail.index]);
     if (rail.limit) rows.push(['limit', rail.limit]);
     if (own) {
       const target = new URL(own.getAttribute('href'), 'https://www.skoda-storyboard.com');

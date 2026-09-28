@@ -104,43 +104,8 @@ https://www.skoda-storyboard.com/en/skoda-world/come-cheer-and-sing-along-meet-t
 https://www.skoda-storyboard.com/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details/
 https://www.skoda-storyboard.com/en/skoda-world/the-skoda-elroq-reveals-its-sustainable-interior/
 
-# ===== IMAGES (18) — attachment posts; per-item pages confirmed. Feeds Images listing + rails =====
-# NOTE: masters kept in place (no -WxH strip) per content-bus 409 gotcha.
-https://www.skoda-storyboard.com/?attachment_id=454117
-https://www.skoda-storyboard.com/?attachment_id=454116
-https://www.skoda-storyboard.com/?attachment_id=454115
-https://www.skoda-storyboard.com/?attachment_id=454113
-https://www.skoda-storyboard.com/?attachment_id=454114
-https://www.skoda-storyboard.com/?attachment_id=454112
-https://www.skoda-storyboard.com/?attachment_id=454844
-https://www.skoda-storyboard.com/?attachment_id=454845
-https://www.skoda-storyboard.com/?attachment_id=454843
-https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/092_skoda_epiq_3b448906_cb578496/
-https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/093_skoda_epiq_88fc035a_e098c289/
-https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/050_skoda_epiq_a13b0a2b_bf605016/
-https://www.skoda-storyboard.com/en/11-733/
-https://www.skoda-storyboard.com/en/10-724a/
-https://www.skoda-storyboard.com/en/09-728s-exponat/
-https://www.skoda-storyboard.com/en/07-s-37a-992-junior/
-https://www.skoda-storyboard.com/en/06a-115_1x/
-https://www.skoda-storyboard.com/en/22-781-sport/
+# IMAGES / VIDEOS: no pages (SKODA-608, docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md, option B).
+# The image/video rows live in the generated media feed /en/media-feed.json (74 images + 27 videos,
+# npm run media-items:build; record in tools/importer/media-items/items.json), read by the listings
+# and the model-page Images/Videos rails via their `index` config row.
 
-# ===== VIDEOS (18) — attachment posts, Vimeo-backed; per-item pages confirmed =====
-https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/videos/attachment/footage_innsbruck_epiq_uhd_d6cfe9d1/
-https://www.skoda-storyboard.com/?attachment_id=452721
-https://www.skoda-storyboard.com/?attachment_id=450950
-https://www.skoda-storyboard.com/?attachment_id=450428
-https://www.skoda-storyboard.com/?attachment_id=450349
-https://www.skoda-storyboard.com/?attachment_id=450350
-https://www.skoda-storyboard.com/en/skoda_peaq___simply_clever___part_1-1080p-1_a3e05a13/
-https://www.skoda-storyboard.com/?attachment_id=450055
-https://www.skoda-storyboard.com/en/skoda_peaq___simply_clever___part_2-1080p-1_583a6637/
-https://www.skoda-storyboard.com/en/skoda_peaq___simply_clever___part_2_with_subtitles-1080p-1_529affa6/
-https://www.skoda-storyboard.com/?attachment_id=449500
-https://www.skoda-storyboard.com/?attachment_id=449499
-https://www.skoda-storyboard.com/en/skoda_geneva_strube_interview_mp4/
-https://www.skoda-storyboard.com/en/tiger_on_ice_test/
-https://www.skoda-storyboard.com/en/wrc_rally_test/
-https://www.skoda-storyboard.com/en/feature_maxova_5/
-https://www.skoda-storyboard.com/en/skoda_octavia_combi_rs_4x4-2/
-https://www.skoda-storyboard.com/en/skoda_octavia_rs230_mpeg-4_1080p-2/

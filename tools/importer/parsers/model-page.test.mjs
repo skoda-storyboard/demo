@@ -145,12 +145,13 @@ test('tag rail → h2 + subheading as default content, facets + viewall from its
   assert.doesNotMatch(doc.body.textContent, /SSR card/);
 });
 
-test('Stories rail (no All link) borrows the page facets; images get limit 20', { skip }, () => {
+test('Stories rail (no All link) borrows the page facets; images read the media feed, limit 20', { skip }, () => {
   const doc = page(rail('stories', 'post', { all: false }) + rail('images', 'attachment'));
   storyRail(doc.querySelector('#stories .search-results-container'), { document: doc });
   assert.deepEqual(rows(doc.querySelector('table')), [['template', 'story'], ['model', 'kodiaq'], ['bodywork', 'suv']]);
   storyRail(doc.querySelector('#images .search-results-container'), { document: doc });
-  assert.deepEqual(rows(doc.querySelectorAll('table')[1]).slice(0, 4), [['template', 'image'], ['model', 'kodiaq'], ['bodywork', 'suv'], ['limit', '20']]);
+  // SKODA-608: image/video rows come from the generated media feed, not the page index.
+  assert.deepEqual(rows(doc.querySelectorAll('table')[1]).slice(0, 5), [['index', '/en/media-feed.json'], ['template', 'image'], ['model', 'kodiaq'], ['bodywork', 'suv'], ['limit', '20']]);
 });
 
 test('a tag rail with no filter anywhere on the page is dropped, not emitted unscoped', { skip }, () => {

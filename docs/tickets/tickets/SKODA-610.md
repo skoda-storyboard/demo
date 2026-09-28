@@ -4,8 +4,12 @@
 - **Phase:** A · **Milestone:** M1 (demo-visible on every card and rail)
 - **GitHub issue:** [#146](https://github.com/skoda-storyboard/demo/issues/146)
 - **Estimate:** 1 SP · AI-assisted 0.25–0.5d / manual 0.5–1d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🟡 **Code done (PR #138, branch `skoda-610-clean-titles`); 7 of 28 pages republished**
-  (live index 29 → 22 suffixed rows). The other 21 pages are held (see "Republish status").
+- **Status (2026-09-26):** ✅ **Done (code ticket).** The importer and shared runtime title fix merged in
+  [PR #138](https://github.com/skoda-storyboard/demo/pull/138); rendered-title QA passed on the PR preview; #146 closed.
+  **Remaining original ACs, reassigned (not yet met):** SKODA-603 W4 re-pushes the 5 media-gated press releases
+  and verifies 0 suffixed rows in the full `/en/query-index.json` (5 of 125 rows still suffixed on 2026-09-27);
+  SKODA-212a (#150) owns the one-line rail-title clamp.
+  History (2026-09-25): 7 of 28 pages republished (live index 29 → 22 suffixed rows); the rest were held (see "Republish status").
   - **On `main` before this PR** (re-verified after #110, CDP 1440): `scripts/card-teaser.js:186` trimmed only in
     `buildCardTeaser()`, which covers the stories feed and the promo box. `/en` still had 25 suffixed rail titles
     (and 25 suffixed `img alt`), the index 28 of 31, and search 4 hits.

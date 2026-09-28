@@ -654,6 +654,7 @@ var CustomImportScript = (() => {
     }
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
+    if (overrides.theme) meta.theme = overrides.theme;
     if (category) meta.category = category;
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
@@ -671,12 +672,6 @@ var CustomImportScript = (() => {
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
   var DEMO_PATHS = [
     "/en",
-    "/en/06a-115-1x",
-    "/en/07-s-37a-992-junior",
-    "/en/09-728s-exponat",
-    "/en/10-724a",
-    "/en/11-733",
-    "/en/22-781-sport",
     "/en/category/classic-cars",
     "/en/category/concepts",
     "/en/category/corporate-life",
@@ -712,13 +707,9 @@ var CustomImportScript = (() => {
     "/en/emobility/skoda-elroq-and-a-happy-family",
     "/en/emobility/skoda-elroq-premiere-light-cube-camera-action",
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
-    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/050-skoda-epiq-a13b0a2b-bf605016",
-    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/092-skoda-epiq-3b448906-cb578496",
-    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/093-skoda-epiq-88fc035a-e098c289",
     "/en/emobility/skoda-peaq-unparalleled-space-and-comfort",
     "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
     "/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq",
-    "/en/feature-maxova-5",
     "/en/images",
     "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague",
     "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving",
@@ -735,7 +726,6 @@ var CustomImportScript = (() => {
     "/en/press-kits/skoda-elroq-press-kit-2",
     "/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
     "/en/press-kits/skoda-epiq-press-kit-2",
-    "/en/press-kits/skoda-epiq-press-kit-2/videos/attachment/footage-innsbruck-epiq-uhd-d6cfe9d1",
     "/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
     "/en/press-kits/skoda-peaq-press-kit",
@@ -774,7 +764,6 @@ var CustomImportScript = (() => {
     "/en/series/unexpected-jobs",
     "/en/series/unknown-parts",
     "/en/series/winter-tips",
-    "/en/skoda-geneva-strube-interview-mp4",
     "/en/skoda-model/elroq",
     "/en/skoda-model/elroq/elroq-rs",
     "/en/skoda-model/elroq/elroq-sportline",
@@ -797,11 +786,6 @@ var CustomImportScript = (() => {
     "/en/skoda-model/octavia/octavia-sportline",
     "/en/skoda-model/peaq",
     "/en/skoda-model/scala",
-    "/en/skoda-octavia-combi-rs-4x4-2",
-    "/en/skoda-octavia-rs230-mpeg-4-1080p-2",
-    "/en/skoda-peaq-simply-clever-part-1-1080p-1-a3e05a13",
-    "/en/skoda-peaq-simply-clever-part-2-1080p-1-583a6637",
-    "/en/skoda-peaq-simply-clever-part-2-with-subtitles-1080p-1-529affa6",
     "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it",
     "/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute",
     "/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car",
@@ -838,9 +822,7 @@ var CustomImportScript = (() => {
     "/en/tag/years/2024",
     "/en/tag/years/2025",
     "/en/tag/years/2026",
-    "/en/tiger-on-ice-test",
-    "/en/videos",
-    "/en/wrc-rally-test"
+    "/en/videos"
   ];
   var DEMO_ALIASES = {
     "/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality": "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality"
@@ -862,6 +844,7 @@ var CustomImportScript = (() => {
     const rest = href.slice(m[0].length);
     const cut = rest.search(/[?#]/);
     const tail = cut === -1 ? "" : rest.slice(cut);
+    if (/^\?(?:[^#]*&)?(?:p|page_id)=\d/.test(tail)) return null;
     let target = edsPath(cut === -1 ? rest : rest.slice(0, cut));
     target = DEMO_ALIASES[target] || target;
     return ALLOWED.has(target) ? `${target}${tail}` : null;

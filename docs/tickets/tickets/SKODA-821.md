@@ -4,7 +4,10 @@
 - **Phase:** A/B · **Milestone:** M1 (demo story fidelity)
 - **GitHub issue:** [#124](https://github.com/skoda-storyboard/demo/issues/124)
 - **Estimate:** 1 SP · AI-assisted 0.25d / manual 0.5d *(planning estimate, not a quote)*
-- **Status (2026-09-24):** 🔵 TODO
+- **Status (2026-09-28):** 🟡 In review, done with SKODA-819 in [PR #156](https://github.com/skoda-storyboard/demo/pull/156)
+  (review asked for the prose cap + wrapper padding, not only the slider). Story-scoped: 10px inset, no 72ch
+  cap, body track `10px + 2/3` of the inset box, aside 64px after the text. Measured x106/w819 @1440,
+  x10/w707 @1080, x10/w499 @768, x10/w480 @500, x10/w355 @375; aside x989/w345 @1440 (source 989/345).
 
 ## Problem (measured, 1440, branch preview)
 Source body text starts at x=106 and is 819px wide at 1440. On the

@@ -41,47 +41,152 @@ var CustomImportScript = (() => {
     default: () => import_series_directory_default
   });
 
-  // tools/importer/parsers/hero-banner.js
+  // tools/importer/parsers/series-hero.js
+  var clean = (node) => node ? (node.textContent || "").replace(/\s+/g, " ").trim() : "";
   function parse(element, { document: document2 }) {
-    const img = element.querySelector(".hero-image img, .image-wrapper img, img");
-    const heading = element.querySelector("h1, h2, .hero-title, .entry-title");
-    const perex = element.querySelector(".perex, .hero-caption p, .hero-content p");
-    const ctas = Array.from(element.querySelectorAll("a.btn, a.btn-secondary, .hero-content a, .cta a"));
-    if (!img && !heading) {
+    const img = element.querySelector(".hero-image img, img");
+    const caption = element.querySelector(".hero-caption") || element;
+    const title = clean(caption.querySelector("h1, h2, .heading"));
+    if (!img && !title) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const cells = [["Hero"]];
-    cells.push([img || ""]);
-    const contentCell = [];
-    if (heading) contentCell.push(heading);
-    if (perex && (perex.textContent || "").trim()) {
+    const content = [];
+    const label = clean(caption.querySelector(".category .label, .category"));
+    if (label) {
       const p = document2.createElement("p");
-      p.textContent = (perex.textContent || "").trim();
-      contentCell.push(p);
+      p.textContent = label;
+      content.push(p);
     }
-    ctas.forEach((a) => {
-      const link = document2.createElement("a");
-      link.setAttribute("href", a.getAttribute("href") || "#");
-      link.textContent = (a.textContent || "").trim();
-      if (link.textContent) contentCell.push(link);
-    });
-    if (contentCell.length) cells.push([contentCell]);
-    const table = WebImporter.DOMUtils.createTable(cells, document2);
-    element.replaceWith(table);
+    if (title) {
+      const h1 = document2.createElement("h1");
+      h1.textContent = title;
+      content.push(h1);
+    }
+    const perex = clean(caption.querySelector(".perex"));
+    if (perex) {
+      const p = document2.createElement("p");
+      p.textContent = perex;
+      content.push(p);
+    }
+    const cells = [["Hero Image (overlay)"]];
+    if (img) cells.push([img]);
+    if (content.length) cells.push([content]);
+    element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
 
   // tools/importer/parsers/series-grid.js
-  function seriesSlugFromCanonical(document2) {
-    const canonical = document2.querySelector('link[rel="canonical"]');
-    const ogUrl = document2.querySelector('meta[property="og:url"]');
-    const raw = canonical && canonical.getAttribute("href") || ogUrl && ogUrl.getAttribute("content") || "";
-    try {
-      const segs = new URL(raw).pathname.split("/").filter(Boolean);
-      return segs[segs.length - 1] || "";
-    } catch (e) {
-      return "";
+  var TOKENS = {
+    "6:1x1": "sq",
+    "6:2x1": "wide",
+    "3:1x1": "sq-small",
+    "3:2x1": "quarter",
+    "4:2x1": "third",
+    "4:1x1": "third-sq",
+    "8:2x1": "two-thirds",
+    "12:4x1": "banner",
+    "12:3x1": "banner-tall"
+  };
+  var clean2 = (node) => node ? (node.textContent || "").replace(/\s+/g, " ").trim() : "";
+  function siteOriginWidths(document2) {
+    const widths = {};
+    document2.querySelectorAll("style").forEach((style) => {
+      const css = (style.textContent || "").replace(/@media[^{]*\{(?:[^{}]*\{[^}]*\})*\s*\}/g, "");
+      const re = /([^{}]+)\{([^}]*)\}/g;
+      let m;
+      while (m = re.exec(css)) {
+        const w = m[2].match(/(?:^|;)\s*width:\s*([\d.]+)%/);
+        if (!w) continue;
+        (m[1].match(/#pgc-[\w-]+/g) || []).forEach((sel) => {
+          widths[sel.slice(1)] = Number(w[1]);
+        });
+      }
+    });
+    return widths;
+  }
+  function ratioOf(article) {
+    const box = article.querySelector('[class*="ratio-"]');
+    const m = box && box.className.match(/\bratio-(\d+x\d+)\b/);
+    return m ? m[1] : "";
+  }
+  function rowSpans(row, cells, widths) {
+    const byCss = cells.map((cell) => widths[cell.id]);
+    if (byCss.every((w) => w > 0)) return byCss.map((w) => Math.round(w / 100 * 12));
+    const rowWidth = row.getBoundingClientRect ? row.getBoundingClientRect().width : 0;
+    if (rowWidth > 0) {
+      const byBox = cells.map((cell) => cell.getBoundingClientRect().width);
+      if (byBox.every((w) => w > 0)) return byBox.map((w) => Math.round(w / rowWidth * 12));
     }
+    return cells.map(() => null);
+  }
+  function spanFromComposition(tiles, i) {
+    const ratios = tiles.map((t) => t.ratio);
+    if (tiles.length === 1) return 12;
+    if (tiles.length === 4) return 3;
+    if (tiles.length === 2) return 6;
+    if (tiles.length === 3) return ratios[i] === "1x1" && ratios.includes("2x1") ? 3 : ratios[i] === "2x1" && ratios.includes("1x1") ? 6 : 4;
+    return null;
+  }
+  function directoryRows(element, document2) {
+    return [...element.querySelectorAll("article.article-teaser[data-content-type]")].map((article) => {
+      const link = article.querySelector("a[href]");
+      const h2 = document2.createElement("h2");
+      const a = document2.createElement("a");
+      a.setAttribute("href", link ? link.getAttribute("href") : "");
+      a.textContent = clean2(article.querySelector("h2, h3, .heading")) || clean2(link);
+      h2.append(a);
+      const body = [h2];
+      const excerpt = clean2(article.querySelector(".article-teaser-excerpt"));
+      if (excerpt) {
+        const p = document2.createElement("p");
+        p.textContent = excerpt;
+        body.push(p);
+      }
+      return [article.querySelector("img") || "", body];
+    });
+  }
+  function hubRows(element, document2) {
+    const widths = siteOriginWidths(document2);
+    const out = [];
+    const grids = element.querySelectorAll(":scope > .panel-grid, .panel-layout > .panel-grid");
+    const rows = grids.length ? [...grids] : [element];
+    rows.forEach((row, r) => {
+      const cells = [...row.querySelectorAll(":scope > .panel-grid-cell, :scope > .panel-row-style > .panel-grid-cell")];
+      const spans = rowSpans(row, cells, widths);
+      const tiles = [];
+      let short = false;
+      cells.forEach((cell, c) => {
+        const article = cell.querySelector("article.article-teaser[data-content-type]");
+        if (!article) {
+          short = true;
+          return;
+        }
+        tiles.push({ article, ratio: ratioOf(article), span: spans[c] });
+      });
+      let sum = 0;
+      tiles.forEach((tile, i) => {
+        let { span } = tile;
+        if (!span) {
+          span = spanFromComposition(tiles, i);
+          console.warn(`[series-grid] row ${r + 1}: no source width for tile ${i + 1}, inferred ${span}/12`);
+        }
+        const token = TOKENS[`${span}:${tile.ratio}`];
+        if (!token) console.warn(`[series-grid] row ${r + 1} tile ${i + 1}: no cards-tiles token for ${span}/12 ${tile.ratio}`);
+        sum += span || 0;
+        out.push(__spreadProps(__spreadValues({}, tile), { token: token || "" }));
+      });
+      if (!tiles.length) return;
+      if (sum > 12) console.warn(`[series-grid] row ${r + 1} overfills: ${sum}/12`);
+      if (sum < 12 || short) out[out.length - 1].token += " end";
+    });
+    return out.map(({ article, token }) => {
+      const link = article.querySelector("a[href]");
+      const img = article.querySelector("img");
+      const a = document2.createElement("a");
+      a.setAttribute("href", link ? link.getAttribute("href") : "");
+      a.textContent = clean2(article.querySelector("h2, h3, .heading")) || clean2(link);
+      return [token.trim(), img || "", a];
+    });
   }
   function parse2(element, { document: document2 }) {
     const cards = Array.from(element.querySelectorAll("article[data-content-type]"));
@@ -90,27 +195,12 @@ var CustomImportScript = (() => {
       return;
     }
     const types = cards.map((c) => (c.getAttribute("data-content-type") || "").toLowerCase());
-    const isDirectory = types.filter((t) => t === "series").length >= types.filter((t) => t === "story").length;
+    const isHub = document2.body.classList.contains("single-skoda_series") || !types.includes("series");
     let cells;
-    if (isDirectory) {
-      cells = [
-        ["Listing"],
-        ["index", "/en/query-index.json"],
-        ["template", "skoda_series"],
-        ["sort", "editorial"],
-        ["columns", "2"]
-      ];
+    if (isHub) {
+      cells = [["Cards (overlay, tiles)"], ...hubRows(element, document2)];
     } else {
-      const slug = seriesSlugFromCanonical(document2);
-      cells = [
-        ["Listing"],
-        ["index", "/en/query-index.json"],
-        ["template", "story"],
-        ["sort", "newest"],
-        ["perpage", "8"],
-        ["columns", "2"]
-      ];
-      if (slug) cells.splice(3, 0, ["tags", slug]);
+      cells = [["Cards (series-directory)"], ...directoryRows(element, document2)];
     }
     const table = WebImporter.DOMUtils.createTable(cells, document2);
     element.replaceWith(table);
@@ -428,6 +518,7 @@ var CustomImportScript = (() => {
     }
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
+    if (overrides.theme) meta.theme = overrides.theme;
     if (category) meta.category = category;
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
@@ -445,12 +536,6 @@ var CustomImportScript = (() => {
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
   var DEMO_PATHS = [
     "/en",
-    "/en/06a-115-1x",
-    "/en/07-s-37a-992-junior",
-    "/en/09-728s-exponat",
-    "/en/10-724a",
-    "/en/11-733",
-    "/en/22-781-sport",
     "/en/category/classic-cars",
     "/en/category/concepts",
     "/en/category/corporate-life",
@@ -486,13 +571,9 @@ var CustomImportScript = (() => {
     "/en/emobility/skoda-elroq-and-a-happy-family",
     "/en/emobility/skoda-elroq-premiere-light-cube-camera-action",
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
-    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/050-skoda-epiq-a13b0a2b-bf605016",
-    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/092-skoda-epiq-3b448906-cb578496",
-    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/attachment/093-skoda-epiq-88fc035a-e098c289",
     "/en/emobility/skoda-peaq-unparalleled-space-and-comfort",
     "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
     "/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq",
-    "/en/feature-maxova-5",
     "/en/images",
     "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague",
     "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving",
@@ -509,7 +590,6 @@ var CustomImportScript = (() => {
     "/en/press-kits/skoda-elroq-press-kit-2",
     "/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
     "/en/press-kits/skoda-epiq-press-kit-2",
-    "/en/press-kits/skoda-epiq-press-kit-2/videos/attachment/footage-innsbruck-epiq-uhd-d6cfe9d1",
     "/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
     "/en/press-kits/skoda-peaq-press-kit",
@@ -548,7 +628,6 @@ var CustomImportScript = (() => {
     "/en/series/unexpected-jobs",
     "/en/series/unknown-parts",
     "/en/series/winter-tips",
-    "/en/skoda-geneva-strube-interview-mp4",
     "/en/skoda-model/elroq",
     "/en/skoda-model/elroq/elroq-rs",
     "/en/skoda-model/elroq/elroq-sportline",
@@ -571,11 +650,6 @@ var CustomImportScript = (() => {
     "/en/skoda-model/octavia/octavia-sportline",
     "/en/skoda-model/peaq",
     "/en/skoda-model/scala",
-    "/en/skoda-octavia-combi-rs-4x4-2",
-    "/en/skoda-octavia-rs230-mpeg-4-1080p-2",
-    "/en/skoda-peaq-simply-clever-part-1-1080p-1-a3e05a13",
-    "/en/skoda-peaq-simply-clever-part-2-1080p-1-583a6637",
-    "/en/skoda-peaq-simply-clever-part-2-with-subtitles-1080p-1-529affa6",
     "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it",
     "/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute",
     "/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car",
@@ -612,9 +686,7 @@ var CustomImportScript = (() => {
     "/en/tag/years/2024",
     "/en/tag/years/2025",
     "/en/tag/years/2026",
-    "/en/tiger-on-ice-test",
-    "/en/videos",
-    "/en/wrc-rally-test"
+    "/en/videos"
   ];
   var DEMO_ALIASES = {
     "/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality": "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality"
@@ -636,9 +708,20 @@ var CustomImportScript = (() => {
     const rest = href.slice(m[0].length);
     const cut = rest.search(/[?#]/);
     const tail = cut === -1 ? "" : rest.slice(cut);
+    if (/^\?(?:[^#]*&)?(?:p|page_id)=\d/.test(tail)) return null;
     let target = edsPath(cut === -1 ? rest : rest.slice(0, cut));
     target = DEMO_ALIASES[target] || target;
     return ALLOWED.has(target) ? `${target}${tail}` : null;
+  }
+  var TAG_FILTER = /^(?:(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com)?\/en\/news\/?\?filter(?:\[|%5B)([a-z0-9-]+)(?:\]|%5D)(?:\[\]|%5B%5D)=([^&#]+)$/i;
+  function tagPageHref(href) {
+    const m = href.match(TAG_FILTER);
+    if (!m) return null;
+    const slug = edsPath(`/${m[2]}`).slice(1);
+    const exact = `/en/tag/${m[1].toLowerCase()}/${slug}`;
+    if (ALLOWED.has(exact)) return exact;
+    const bySlug = DEMO_PATHS.filter((p) => p.startsWith("/en/tag/") && p.endsWith(`/${slug}`) && p.split("/").length === 5);
+    return bySlug.length === 1 ? bySlug[0] : null;
   }
   function transform4(hookName, element, payload) {
     if (hookName !== TransformHook3.afterTransform) return;
@@ -646,23 +729,120 @@ var CustomImportScript = (() => {
       let href = a.getAttribute("href");
       if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
       if (href.startsWith("/direct-download/")) href = `${SOURCE_ORIGIN}${href}`;
-      else href = rewriteHref(href) || href;
+      else href = tagPageHref(href) || rewriteHref(href) || href;
       if (href !== a.getAttribute("href")) a.setAttribute("href", href);
+    });
+  }
+
+  // tools/importer/transformers/skoda-images.js
+  function hasContent(node) {
+    return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
+  }
+  function withCaption(node, caption, document2) {
+    if (!caption) return node;
+    const figure = document2.createElement("figure");
+    const figcaption = document2.createElement("figcaption");
+    figcaption.textContent = caption;
+    figure.append(node, figcaption);
+    return figure;
+  }
+  function editorialCaption(node) {
+    if (!node) return "";
+    const caption = (node.getAttribute("data-caption") || "").trim();
+    if (!caption || node.closest(".article-teaser, .media-cart-image")) return "";
+    return caption === (node.getAttribute("data-video_title") || "").trim() ? "" : caption;
+  }
+  function imageContainer(img, document2, link = null) {
+    const div = document2.createElement("div");
+    div.append(img);
+    if (!link) return div;
+    link.append(div);
+    return link;
+  }
+  function splitParagraph(img, paragraph, caption, document2) {
+    const link = img.closest("a");
+    const linkedImage = link && paragraph.contains(link) && link.querySelectorAll("img").length === 1 && !(link.textContent || "").trim();
+    const target = linkedImage ? link : img;
+    const afterRange = document2.createRange();
+    afterRange.setStartAfter(target);
+    afterRange.setEnd(paragraph, paragraph.childNodes.length);
+    const after = paragraph.cloneNode(false);
+    after.append(afterRange.extractContents());
+    const beforeRange = document2.createRange();
+    beforeRange.selectNodeContents(paragraph);
+    beforeRange.setEndBefore(target);
+    const before = paragraph.cloneNode(false);
+    before.append(beforeRange.extractContents());
+    const imageNode = imageContainer(img, document2, linkedImage ? link : null);
+    const image = withCaption(imageNode, caption, document2);
+    paragraph.replaceWith(...[before, image, after].filter(hasContent));
+  }
+  function normalizeImages(root, document2 = root.ownerDocument) {
+    root.querySelectorAll("img").forEach((img) => {
+      if (!img.hasAttribute("alt") || !img.getAttribute("alt").trim()) {
+        const type = img.hasAttribute("alt") ? "empty" : "missing";
+        console.warn(`[image-import] ${type} alt: ${img.getAttribute("src") || "(no src)"}`);
+      }
+      if (img.closest("table, picture")) return;
+      const figure = img.closest("figure");
+      const wrapper = img.closest("[data-caption]");
+      const wrapperCaption = (wrapper == null ? void 0 : wrapper.querySelectorAll("img").length) === 1 ? editorialCaption(wrapper) : "";
+      const caption = (img.hasAttribute("data-caption") ? editorialCaption(img) : "") || wrapperCaption;
+      if (figure) {
+        if (img.parentElement.tagName !== "DIV") {
+          const div = document2.createElement("div");
+          img.replaceWith(div);
+          div.append(img);
+        }
+        if (caption && !figure.querySelector("figcaption")) {
+          const figcaption = document2.createElement("figcaption");
+          figcaption.textContent = caption;
+          figure.append(figcaption);
+        }
+        return;
+      }
+      const paragraph = img.closest("p");
+      if (paragraph) {
+        splitParagraph(img, paragraph, caption, document2);
+        return;
+      }
+      if (img.parentElement.tagName === "DIV") {
+        if (caption) {
+          const div = img.parentElement;
+          if (div.childElementCount === 1 && !(div.textContent || "").trim()) {
+            const marker2 = document2.createComment("image");
+            div.replaceWith(marker2);
+            marker2.replaceWith(withCaption(div, caption, document2));
+          } else {
+            const marker2 = document2.createComment("image");
+            img.replaceWith(marker2);
+            marker2.replaceWith(withCaption(imageContainer(img, document2), caption, document2));
+          }
+        }
+        return;
+      }
+      const link = img.closest("a");
+      const linkedImage = link && link.querySelectorAll("img").length === 1 && !(link.textContent || "").trim();
+      const target = linkedImage ? link : img;
+      const marker = document2.createComment("image");
+      target.replaceWith(marker);
+      const imageNode = imageContainer(img, document2, linkedImage ? link : null);
+      marker.replaceWith(withCaption(imageNode, caption, document2));
     });
   }
 
   // tools/importer/import-series-directory.js
   var parsers = {
-    "hero-banner": parse,
+    "series-hero": parse,
     "series-grid": parse2
   };
   var PAGE_TEMPLATE = {
     name: "series-directory",
-    description: "\u0160koda Series directory (template-tiles). Hero banner + index-driven Listing (template=skoda_series, editorial order). Metadata template=page. Content-driven detection only.",
+    description: "\u0160koda Series directory (template-tiles). Hero Image (overlay) + the authored series cards as Cards (series-directory): every source card in order, linked title over the image, full excerpt below. Metadata template=page, theme=skoda-series. Content-driven detection only.",
     urls: ["https://www.skoda-storyboard.com/en/series-2/"],
-    metadata: { template: "page" },
+    metadata: { template: "page", theme: "skoda-series" },
     blocks: [
-      { name: "hero-banner", instances: ["div.hero"] },
+      { name: "series-hero", instances: ["div.hero"] },
       { name: "series-grid", instances: [".panel-layout"] }
     ],
     sections: [
@@ -671,7 +851,7 @@ var CustomImportScript = (() => {
         name: "Hero",
         selector: ["div.hero"],
         style: null,
-        blocks: ["hero-banner"],
+        blocks: ["series-hero"],
         defaultContent: []
       },
       {
@@ -737,6 +917,7 @@ var CustomImportScript = (() => {
       });
       executeTransformers("afterTransform", main, payload);
       WebImporter.rules.transformBackgroundImages(main, document2);
+      normalizeImages(main, document2);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
       const path = WebImporter.FileUtils.sanitizePath(rawPath === "" ? "/index" : rawPath);

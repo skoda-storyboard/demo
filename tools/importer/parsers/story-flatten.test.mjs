@@ -144,28 +144,78 @@ test('skoda-offset spacer is dropped', { skip: domSkip }, () => {
   assert.equal(content.textContent.trim(), '', 'offset produced no output');
 });
 
-// ---- carousel routed BY CONTENT: link-free images → Gallery -----------------
-test('link-free skoda-carousel-widget → Gallery block, one row per image + caption', { skip: domSkip }, () => {
+// ---- carousel routed BY CONTENT: link-free images → Gallery (slider) --------
+// source item shape (live Octavia / Epiq carousels, measured 2026-09-28): an
+// image holder, then an optional description div with inline presentation styles
+const carouselItem = (src, alt, desc) => `<div class="search-results-item">
+  <div class="image-holder ratio-16x9"><img src="${src}" alt="${alt}" data-caption=""></div>
+  ${desc == null ? '' : `<div class="search-results-item-description" style="color: #161718">
+    <p style="text-align: center;"><span style="font-size: 10pt;">${desc}</span></p></div>`}
+</div>`;
+const carouselDoc = (items) => domDoc(`
+  <div class="entry-content"><div class="panel-layout">
+    <div class="panel-grid"><div class="panel-grid-cell">
+      <div class="so-panel widget widget_skoda-carousel-widget">
+        <div class="so-widget-skoda-carousel-widget">${items.join('')}</div>
+      </div>
+    </div></div>
+  </div></div>`);
+const sliderRows = (d) => {
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  const table = content.querySelector('table[data-block="Gallery (slider)"]');
+  return { content, table, rows: table ? [...table.querySelectorAll('tr')] : [] };
+};
+
+test('link-free skoda-carousel-widget → Gallery (slider) block, one row per image', { skip: domSkip }, () => {
+  const { content, table, rows } = sliderRows(carouselDoc([
+    carouselItem('a.jpg', 'Alt A'), carouselItem('b.jpg', 'Alt B'),
+  ]));
+  // SKODA-819: rendered like the source — one image per view, not the lead+thumbnails gallery
+  assert.ok(table, 'Gallery (slider) block emitted for a link-free image carousel');
+  assert.equal(content.querySelector('table[data-block="Gallery"]'), null, 'not the default Gallery variant');
+  assert.equal(content.querySelector('table[data-block="Cards"]'), null, 'no Cards block for an image carousel');
+  assert.equal(rows.length, 2, 'two image rows');
+  assert.ok(table.querySelector('img[src="a.jpg"]'));
+});
+
+test('slider caption = the item description (Octavia), text only, source order', { skip: domSkip }, () => {
+  const { rows } = sliderRows(carouselDoc([
+    carouselItem('a.jpg', 'Alt A', 'Škoda Octavia Combi Laurin &amp; Klement'),
+    carouselItem('b.jpg', 'Alt B', 'Škoda Octavia Long'),
+  ]));
+  const captions = rows.map((tr) => tr.children[1]);
+  assert.deepEqual(captions.map((td) => td.textContent.trim()), ['Škoda Octavia Combi Laurin & Klement', 'Škoda Octavia Long']);
+  captions.forEach((td) => {
+    assert.equal(td.querySelectorAll('p').length, 1, 'one paragraph per description paragraph');
+    assert.equal(td.querySelector('[style], span'), null, 'inline presentation styles dropped');
+  });
+});
+
+test('no description (Epiq) → empty caption cell: alt / data-caption never become a caption', { skip: domSkip }, () => {
+  const d = carouselDoc([
+    carouselItem('a.jpg', 'Škoda Epiq Will Win You Over in 60 Seconds'),
+    carouselItem('b.jpg', 'Alt B', '   '),
+  ]);
+  d.querySelector('img').setAttribute('data-caption', 'Colorbox caption');
+  const { rows } = sliderRows(d);
+  rows.forEach((tr) => assert.equal((tr.children[1]?.textContent || '').trim(), '', 'empty caption cell'));
+});
+
+// ---- sow-slider keeps the default Gallery (SKODA-819 scope: only the carousel) --
+test('sow-slider → default Gallery block (not the slider variant)', { skip: domSkip }, () => {
   const d = domDoc(`
     <div class="entry-content"><div class="panel-layout">
       <div class="panel-grid"><div class="panel-grid-cell">
-        <div class="so-panel widget widget_skoda-carousel-widget">
-          <div class="so-widget-skoda-carousel-widget">
-            <div class="search-results-item"><img src="a.jpg" alt="Alt A" data-caption="Cap A"></div>
-            <div class="search-results-item"><img src="b.jpg" alt="Alt B"></div>
-          </div>
+        <div class="so-panel widget widget_sow-slider">
+          <div class="so-widget-sow-slider"><img src="s1.jpg" alt="S1"><img src="s2.jpg" alt="S2"></div>
         </div>
       </div></div>
     </div></div>`);
   const content = d.querySelector('.entry-content');
   parse(content, { document: d });
-  const table = content.querySelector('table[data-block="Gallery"]');
-  assert.ok(table, 'Gallery block emitted for a link-free image carousel');
-  assert.equal(content.querySelector('table[data-block="Cards"]'), null, 'no Cards block for an image carousel');
-  assert.equal(table.querySelectorAll('tr').length, 2, 'two image rows');
-  assert.ok(table.querySelector('img[src="a.jpg"]'));
-  assert.match(table.textContent, /Cap A/, 'data-caption carried');
-  assert.match(table.textContent, /Alt B/, 'alt fallback used when no data-caption');
+  assert.ok(content.querySelector('table[data-block="Gallery"]'), 'sow-slider → default Gallery');
+  assert.equal(content.querySelector('table[data-block="Gallery (slider)"]'), null, 'slider variant is only for the carousel widget');
 });
 
 // ---- carousel routed BY CONTENT: linked items → Cards (related teasers) ------
