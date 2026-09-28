@@ -403,13 +403,24 @@ body.skoda-model .model-rail .story-rail-viewall:hover {
 }
 
 /* cell ladder through the carousel's --carousel-cell-width hook (source flickity cells,
-   card = cell − the 20px gutter); the global li bottom margin must not add 8px under the rail */
+   card = cell − the 20px gutter); the global li bottom margin must not add 8px under the rail.
+   The source flickity viewport spans the section gutter and its cells carry the 10px
+   inset: cards scroll to the gutter edge and the arrows sit 10px inside it (26 / 1222 at
+   1280). The track keeps the same content box, so the ladder is unchanged. */
 body.skoda-model .model-rail .carousel {
   --carousel-cell-width: calc((100% + var(--carousel-gap)) * var(--model-rail-cell) - var(--carousel-gap));
+
+  width: auto; /* the section caps it; auto lets the negative margins widen it */
+  margin-inline: calc(var(--model-gutter) * -1);
 }
 
 body.skoda-model .model-rail .carousel.media {
   --carousel-cell-width: calc((100% + var(--carousel-gap)) * var(--model-media-cell) - var(--carousel-gap));
+}
+
+body.skoda-model .model-rail .carousel-track {
+  padding-inline: var(--model-gutter);
+  scroll-padding-inline: var(--model-gutter);
 }
 
 body.skoda-model .model-rail .carousel-track .card-teaser {

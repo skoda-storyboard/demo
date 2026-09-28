@@ -27,6 +27,7 @@ function el(tag) {
     className: '',
     children: [],
     attributes: {},
+    dataset: {},
     _text: '',
     classList: { add() {}, contains() { return false; } },
     setAttribute(k, v) { this.attributes[k] = String(v); },
@@ -284,6 +285,31 @@ test('rowToCells: an image-less row yields ONE body-only cell (no empty div → 
   // body carries date <p> + title <h3>
   const tags = body.elems.map((e) => e.tagName);
   assert.deepEqual(tags, ['P', 'H3']);
+});
+
+test('rowToCells: a media feed row gets the cart + download toolbar cell (media-item contract)', () => {
+  const image = rowToCells({
+    path: 'https://cdn.example/a.jpg', title: 'A', image: 'https://cdn.example/a-768x512.jpg', date: '2026-08-27',
+    template: 'image', id: '450812', original: 'https://cdn.example/a.jpg', mp4: '',
+  });
+  assert.equal(image.length, 3, 'image, body, toolbar');
+  const [cart, download] = image[2].elems.map((p) => p.children[0]);
+  assert.equal(image[2].elems.every((p) => p.tagName === 'P'), true, 'p > a, the card-teaser toolbar shape');
+  assert.equal(cart.className, 'media-cart-action add');
+  assert.equal(cart.dataset.id, '450812', 'carries the cart key for SKODA-505');
+  assert.equal(cart.getAttribute('aria-disabled'), 'true');
+  assert.equal(cart.getAttribute('aria-label'), 'Add to media cart');
+  assert.equal(download.className, 'media-cart-action download');
+  assert.equal(download.href, 'https://cdn.example/a.jpg', 'downloads the original');
+
+  const video = rowToCells({
+    path: 'https://vimeo.com/1', title: 'V', image: 'https://i.vimeocdn.com/v.jpg', date: '2025-06-23',
+    template: 'video', id: '410179', mp4: 'https://cdn.example/v.mp4',
+  });
+  assert.equal(video[2].elems[1].children[0].href, 'https://cdn.example/v.mp4', 'a video downloads its MP4');
+  const noFile = rowToCells({ title: 'N', image: 'https://x/n.jpg', template: 'video', id: '9' });
+  assert.equal(noFile[2].elems.length, 1, 'no download button without a file');
+  assert.equal(rowToCells({ path: '/en/s', title: 'S', image: 'https://x/s.jpg', template: 'story' }).length, 2, 'stories get no toolbar');
 });
 
 test('rowToCells removes the legacy site suffix from indexed teaser titles', () => {

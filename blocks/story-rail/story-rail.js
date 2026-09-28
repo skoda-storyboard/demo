@@ -110,9 +110,60 @@ export function isConfigTable(block) {
   });
 }
 
+// Rail-chrome settings a curated (hand-picked) rail may keep next to its cards, e.g. the
+// "All" link and the `template` that picks the card style (SKODA-208 model rails).
+const CURATED_SETTINGS = new Set(['template', 'heading', 'viewall', 'view-all', 'all', 'dots']);
+
+/* A two-cell text row whose first cell is one of the curated rail settings (a card's
+   body cell carries a title heading, a setting's value never does). */
+function isSettingsRow(row) {
+  const cells = [...row.children];
+  if (cells.length !== 2) return false;
+  if (!CURATED_SETTINGS.has(toClassName(cells[0].textContent?.trim() || ''))) return false;
+  return !cells[0].querySelector?.('picture, img') && !cells[1].querySelector?.('h1, h2, h3, h4, h5, h6');
+}
+
 export function curatedRows(block) {
-  return [...block.children].map((row) => [...row.children]
+  return [...block.children].filter((row) => !isSettingsRow(row)).map((row) => [...row.children]
     .map((cell) => ({ elems: [...cell.childNodes] })));
+}
+
+/*
+ * The media card's action row (media feed rows, contract media-item): "add to media cart"
+ * and "download", as the shared card-teaser toolbar cell (`<p><a>` per button). The cart
+ * button carries the cart key (`data-id`) and stays inert until the media cart (SKODA-505)
+ * binds it; download links the original (image) or the MP4 (video). Icon-only buttons, so
+ * each gets its label from the source titles. Returns null for non-media rows.
+ */
+export function mediaToolbar(row) {
+  if (row.template !== 'image' && row.template !== 'video') return null;
+  const button = (action, label, href) => {
+    const p = document.createElement('p');
+    const a = document.createElement('a');
+    a.className = `media-cart-action ${action}`;
+    a.href = href;
+    a.title = label;
+    a.setAttribute('aria-label', label);
+    a.dataset.action = action;
+    p.append(a);
+    return { p, a };
+  };
+  const elems = [];
+  if (row.id) {
+    const { p, a } = button('add', 'Add to media cart', '#');
+    a.dataset.id = row.id;
+    a.setAttribute('role', 'button');
+    a.setAttribute('aria-disabled', 'true');
+    elems.push(p);
+  }
+  const file = row.template === 'image' ? row.original : row.mp4;
+  if (file) {
+    const { p, a } = button('download', row.template === 'image' ? 'Download original' : 'Download video', file);
+    a.setAttribute('download', '');
+    a.target = '_blank';
+    elems.push(p);
+  }
+  return elems.length ? { elems } : null;
 }
 
 /*
@@ -143,13 +194,14 @@ export function rowToCells(row) {
   h.append(link);
   elems.push(h);
   const body = { elems };
+  const toolbar = mediaToolbar(row);
 
   // OMIT the image cell entirely when the row has no image (SKODA-212 review
   // P2): an empty placeholder <div> would be sniffed as a second .card-teaser-
   // body, giving an overlay card two bodies + doubled 16/9 fallback height.
   // With only a body cell, decorateCardCells flags .card-teaser-no-image and the
   // single body gets the correct intrinsic height (matches buildCardTeaser).
-  return row.image
+  const cells = row.image
     ? [
       createOptimizedPicture(row.image, title, false, [
         { media: '(min-width: 768px)', width: '750' }, { width: '500' },
@@ -157,6 +209,8 @@ export function rowToCells(row) {
       body,
     ]
     : [body];
+  if (toolbar) cells.push(toolbar);
+  return cells;
 }
 
 /*
@@ -271,6 +325,10 @@ export default async function decorate(block) {
     if (cfg.dots) carousel.classList.add('dots');
     if (heading) carousel.setAttribute('aria-label', heading);
     mount.append(carousel);
+    // the media cart (SKODA-505) isn't bound yet: its "#" button must not jump to the top
+    carousel.addEventListener('click', (e) => {
+      if (e.target.closest('.media-cart-action[aria-disabled="true"]')) e.preventDefault();
+    });
     decorateBlock(carousel);
     await loadBlock(carousel);
     mount.classList.add('is-built'); // release the reserved card geometry

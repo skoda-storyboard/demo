@@ -129,6 +129,26 @@ plus variants of existing blocks, built against the already-published pages (no 
   `gallery` + SKODA-505a/b), inline Vimeo previews, the floating share / scroll-top group (SKODA-215), MR footer
   routing (SKODA-305 follow-up).
 
+**Octavia rail data migrated (2026-09-28), all through the import pipeline, no authored cards:**
+- News: 9 press releases (`urls-press-release-octavia.txt`); Stories: 8 stories (`urls-story-detail-octavia.txt`);
+  Press Kits: the 10 hubs through the page-base importer (`urls-page-base-octavia-press-kits.txt`) as an interim
+  until SKODA-805 rebuilds the hub. All imported, pushed, previewed and published; corpus section "OCTAVIA".
+  Images/Videos: `model=octavia` queries in the media feed (`media-items/sources.json`), feed republished.
+- Importer fixes found on the way (all importers re-bundled): page-base uses `templateDefault` so a flattened CPT page
+  keeps its type (`press_kit`); `skoda-metadata` reads a single post's own `<facet>-<slug>` article classes when it
+  has no tag row (press-kit hubs); `hero-banner` emits `Hero Image (overlay)` (contract `hero`); page cleanup
+  rewrites extension-less Vimeo posters to `.jpg`; the media feed keeps the source listing order for same-day items;
+  **`skoda-nbsp`** keeps the source's glued non-breaking spaces (helix html2md turned them into spaces, so copy
+  wrapped a line differently on mobile; restored by `push-lib` `wrapPage`).
+- Media cards carry the source toolbar (40px ringed cart + download buttons, `mediaToolbar` in story-rail): download
+  links the original / MP4; the cart button holds `data-id` and stays inert until SKODA-505. Model rails now span the
+  section gutter like the source flickity viewport (arrows at 26 / 1222 at 1280).
+- QA vs live Octavia at 1280/1024/768/375: every rail box, card, arrow, toolbar button, "All" pill and the footer
+  match to the pixel (375: a 0.17px sub-pixel offset). Press Kits, Stories, Images and Videos list the same items in
+  the same order. **News differs by one card:** the source search index misses the Octavia tag on "Simply Clever
+  for summer" (17 Aug 2026; the page itself is tagged Octavia, and it is absent from every model-filtered live
+  listing), so our rail shows it and drops the oldest item. Not overridden: the index follows the page's tags.
+
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/template-model-page.md`](../../ui-specs/template-model-page.md)** (captured via Chrome DevTools on the live Peaq model page). Read it before implementing. Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).
 

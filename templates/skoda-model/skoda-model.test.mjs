@@ -67,7 +67,9 @@ function setup(html = PAGE) {
 
 setup();
 const { default: decorate } = await import('./skoda-model.js');
-const { viewAllLabel, isRailOnlySection } = await import('../../blocks/story-rail/story-rail.js');
+const {
+  viewAllLabel, isRailOnlySection, isConfigTable, curatedRows, parseConfig,
+} = await import('../../blocks/story-rail/story-rail.js');
 const { decorateStats } = await import('../../blocks/columns/columns.js');
 
 test('sections get their roles and the source anchors as aliases', () => {
@@ -142,6 +144,23 @@ test('story-rail: a rail alone with a heading lead-in owns its section; one next
   assert.equal(isRailOnlySection(news, news.querySelector('.story-rail')), true);
   news.querySelector('.default-content-wrapper').insertAdjacentHTML('beforeend', '<p>More prose</p>');
   assert.equal(isRailOnlySection(news, news.querySelector('.story-rail')), false);
+});
+
+test('story-rail: a hand-picked rail keeps its template and "All" rows out of the cards', () => {
+  const main = setup();
+  const news = main.querySelector('h2#news').closest('.section').querySelector('.story-rail');
+  news.insertAdjacentHTML('beforeend', `
+    <div><div><picture><img src="/n1.jpg" alt=""></picture></div><div><p>27. 8. 2026</p><h3><a href="/n1">One</a></h3></div></div>`);
+  assert.equal(isConfigTable(news), false, 'card rows make the rail curated');
+  const rows = curatedRows(news);
+  assert.equal(rows.length, 1, 'template + viewall rows are settings, not cards');
+  assert.equal(rows[0].length, 2);
+  const cfg = parseConfig(news);
+  assert.equal(new URL(cfg.viewAll).pathname, '/en/tag/model/octavia', 'the "All" link still renders');
+  assert.equal(cfg.template, 'press_release');
+  // a titled body-only card whose first cell happens to read like a key stays a card
+  news.insertAdjacentHTML('beforeend', '<div><div>Template</div><div><h3><a href="/n2">Two</a></h3></div></div>');
+  assert.equal(curatedRows(news).length, 2);
 });
 
 test('columns (stats): value and unit are split; other cells are left alone', () => {
