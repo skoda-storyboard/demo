@@ -165,7 +165,9 @@
   --social-card-grid-max: 700px;
   --social-band-padding-top: 64px;
   --social-band-padding-bottom: 80px;
-  --social-band-margin: 2.25em auto 1.5em; /* live .cover-box margin (36px / 24px) */
+  --social-band-max-width: 1440px; /* live .cover-box: capped + centred above 1440 */
+  --social-band-margin-top: 64px; /* visible gap Load more → band on live */
+  --social-band-margin-bottom: 60px; /* visible gap band → next rail heading on live */
 
   /* footer shell rhythm (SKODA-305, shared by the Storyboard + Media Room footers). Source:
      .footer-widgets > * margin-bottom 3em, hr margin-bottom 3rem, .container padding 10px with a
@@ -661,10 +663,15 @@ main .section.dark a {
 }
 
 /* homepage Social media band (SKODA-217; live .cover-box.dark.socials-static,
-   same at 1280/768/375): the .cover-box margin 2.25em auto 1.5em, band top →
-   heading 64px, last card → band end 80px */
+   measured 375–3440): band top → heading 64px, last card → band end 80px, and
+   max-width 1440px centred (x240 @1920, x1000 @3440). Live's own margin is
+   2.25em auto 1.5em (36/24), which adds to its neighbours' inner spacing (28px
+   under Load more, the next band's 36px top margin). Our sections collapse
+   margins with their 40px neighbours instead, so the band carries live's
+   visible totals: 64px above, 60px below. */
 main > .section.dark.cards-container:has(.cards.social) {
-  margin: var(--social-band-margin);
+  max-width: var(--social-band-max-width);
+  margin: var(--social-band-margin-top) auto var(--social-band-margin-bottom);
   padding-block: var(--social-band-padding-top) var(--social-band-padding-bottom);
 }
 
