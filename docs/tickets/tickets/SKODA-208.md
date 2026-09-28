@@ -174,6 +174,9 @@ plus variants of existing blocks, built against the already-published pages (no 
   opens, titled by its alt.
 - QA vs live at 1024/1280/1440: title, metadata lines, close and the missing counter / arrows match; image within
   1px (rounding). Esc closes and returns focus to the drawing.
+- Tablet / mobile (2026-09-28): 768 matches live (desktop layout, 480 image column + 256 panel). Below 768 the
+  shared lightbox shows the image alone, full width and vertically centred, no description, close ✕ in the 60px
+  top-right cell (as the source on phones); applies to the image rails, the drawings and press-release galleries.
 
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/template-model-page.md`](../../ui-specs/template-model-page.md)** (captured via Chrome DevTools on the live Peaq model page). Read it before implementing. Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).

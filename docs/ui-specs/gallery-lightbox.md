@@ -117,6 +117,10 @@ one accessible vanilla lightbox.
   lines), tags (16px above), related article (16px above).
 - `#cboxClose` 60×60 in the corner (24px glyph, 18px padding); `#cboxCurrent` 108×60 "1" + grey (#808080) total
   with a `/` 12px each side; `#cboxPrevious` / `#cboxNext` 61×60, 1px #606060 left rule, cells 60px apart.
+- Tablet (768–991) keeps the desktop layout: image column = viewport − 288 (480 at 768), panel 256 at x=496.
+- Phones (<768, 2026-09-28, as the source colorbox): the image alone, full width, centred in the space between the
+  60px close band and the 60px counter band; **no detail panel** (supersedes the earlier "always show the caption"
+  rebuild decision); the close ✕ stays the 60×60 top-right cell.
 
 ### Live colorbox chrome (measured · PR · 500-wide)
 - `#cboxOverlay`: `position:fixed`, background `#161718` (rgb 22,23,24), full-screen.
