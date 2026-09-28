@@ -24,7 +24,9 @@
       "variants": []
     },
     "downloads": {
-      "variants": []
+      "variants": [
+        "media-box"
+      ]
     },
     "embed": {
       "variants": [],

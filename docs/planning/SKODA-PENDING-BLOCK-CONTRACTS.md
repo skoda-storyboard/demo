@@ -53,7 +53,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `cards` | `media`, `overlay`, `toolbar`, `series-directory` | – |
 | `carousel` | `dots` | – |
 | `columns` | – | – |
-| `downloads` | – | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes` (SKODA-502) |
+| `downloads` | `media-box` (SKODA-510) | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes`, `collapse` (SKODA-502/510) |
 | `embed` | – | `url`, `ratio`, `title`, `poster` (`or-curated`: a bare Vimeo / YouTube / Buzzsprout / Spotify URL on its own line still autoblocks). A self-hosted `.mp4`/`.webm`/`.mov`/`.m4v` `url` renders a native `<video>` with the `poster` image (SKODA-801a, WordPress `[video]`) |
 | `gallery` | – | – |
 | `hero-image` | `story` (default), `overlay`, `archive` | – |
@@ -198,7 +198,14 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Example** (`/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/`): 6 rows. Zellmer 10, National Theatre 5, Board 1; Superb has no band.
 
 ### `downloads-file-rows`
-- **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-510 · **Fallback:** readable (image tiles; rows without an image are skipped by the block, so on press releases `templates/press-release` lists each skipped file, e.g. the release PDF, as a plain download link under the grid until SKODA-510 lands; PR #170 review)
+- **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-510 · **Fallback:** readable on `main`
+  until PR #186 merges (image tiles and a plain PDF link from `templates/press-release`).
+- **Landing:** PR #186 implements this shape without re-import; each empty-image row renders as
+  a file tile and the template fallback is removed. The block gets its Media Box appearance from
+  a `media-box` section or a `Downloads (media-box)` variant. Authored `collapse=auto|none` optionally
+  controls the two-row disclosure (default `auto` in a Media Box, `none` elsewhere); authored
+  `columns` controls desktop columns and the number disclosed. Neither option changes the three-cell
+  asset row shape. Keep the contract pinned until the branch merges and QA verifies it.
 - **Emitted by:** `parsers/downloads.js` (press-release Media Box). A row shape of the `downloads` block on `main`, so the check classifies these pages as `main`, not pending.
 - **Shape:** header `Downloads`, then 3 cells per row: `[<picture> or empty, title text, links]`. The links cell holds one `<a>` per size, its text the size label: `Original` + `1920px` (image, `/direct-download/…` and `…-1920xH.jpg`), `MP4` (video, Vimeo poster as the picture), `PDF` (document, empty picture cell).
 - **Example** (Peaq): 5 rows, `MP4`, 3 × `Original`+`1920px`, `PDF`.

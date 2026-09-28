@@ -86,6 +86,9 @@ test('classifyBlock: main block with supported variant', () => {
   const r = classifyBlock(one(block('cards overlay', row('a', 'b'))), CONTRACTS, CODE);
   assert.equal(r.status, 'main');
   assert.deepEqual(r.problems, []);
+  const downloads = classifyBlock(one(block('downloads media-box', row('', 'PDF', '<a href="/file.pdf">PDF</a>'))), CONTRACTS, CODE);
+  assert.equal(downloads.status, 'main');
+  assert.deepEqual(downloads.problems, []);
 });
 
 test('classifyBlock: pending variant of a main block (cards tiles, gallery slider, columns split)', () => {
