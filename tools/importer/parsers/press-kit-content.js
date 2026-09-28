@@ -15,10 +15,26 @@ function embedUrls(root, document) {
     p.append(a);
     const attachment = frame.closest('.media-cart-item.attachment');
     const video = frame.closest('.video-container');
-    if (attachment && root.contains(attachment) && !text(attachment)
+    // The cart toolbar's only text is the "Download" preprocess gives its icon link.
+    const bare = attachment?.cloneNode(true);
+    bare?.querySelectorAll('.media-cart-actions').forEach((actions) => actions.remove());
+    if (attachment && root.contains(attachment) && !text(bare)
       && attachment.querySelectorAll('iframe').length === 1
       && !attachment.querySelector('img, video')) {
-      attachment.replaceWith(p);
+      // The cart toolbar's download icon is the only way to the video file (resource "Videos"
+      // pages have no Media Box, SKODA-805b): keep it as a labelled link after the embed.
+      const file = [...attachment.querySelectorAll('a.media-cart-action.download[href], a[data-action="download"][href]')]
+        .map((link) => link.getAttribute('href')).find((href) => /\.mp4(?:[?#]|$)/i.test(href || ''));
+      const out = [p];
+      if (file) {
+        const dp = document.createElement('p');
+        const link = document.createElement('a');
+        link.href = file;
+        link.textContent = 'Download video';
+        dp.append(link);
+        out.push(dp);
+      }
+      attachment.replaceWith(...out);
     } else if (video && root.contains(video) && !text(video)
       && video.querySelectorAll('iframe').length === 1) {
       video.replaceWith(p);

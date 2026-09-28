@@ -107,8 +107,20 @@ var CustomImportScript = (() => {
       p.append(a);
       const attachment = frame.closest(".media-cart-item.attachment");
       const video = frame.closest(".video-container");
-      if (attachment && root.contains(attachment) && !text(attachment) && attachment.querySelectorAll("iframe").length === 1 && !attachment.querySelector("img, video")) {
-        attachment.replaceWith(p);
+      const bare = attachment == null ? void 0 : attachment.cloneNode(true);
+      bare == null ? void 0 : bare.querySelectorAll(".media-cart-actions").forEach((actions) => actions.remove());
+      if (attachment && root.contains(attachment) && !text(bare) && attachment.querySelectorAll("iframe").length === 1 && !attachment.querySelector("img, video")) {
+        const file = [...attachment.querySelectorAll('a.media-cart-action.download[href], a[data-action="download"][href]')].map((link) => link.getAttribute("href")).find((href) => /\.mp4(?:[?#]|$)/i.test(href || ""));
+        const out = [p];
+        if (file) {
+          const dp = document.createElement("p");
+          const link = document.createElement("a");
+          link.href = file;
+          link.textContent = "Download video";
+          dp.append(link);
+          out.push(dp);
+        }
+        attachment.replaceWith(...out);
       } else if (video && root.contains(video) && !text(video) && video.querySelectorAll("iframe").length === 1) {
         video.replaceWith(p);
       } else {
@@ -322,6 +334,44 @@ var CustomImportScript = (() => {
     });
     return nodes;
   }
+  function sourceTables(content, document) {
+    content.querySelectorAll("table").forEach((table) => {
+      const rows = [...table.rows].filter((row) => text3(row) || row.querySelector("a[href], img"));
+      if (!rows.length) {
+        table.remove();
+        return;
+      }
+      const cols = Math.max(...rows.map((row) => row.cells.length));
+      const out = [];
+      if (cols === 1) {
+        const [first, ...rest] = rows;
+        const headed = !first.querySelector("a[href], img") && rest.length;
+        if (headed) out.push(make(document, "h3", text3(first)));
+        const list = document.createElement("ul");
+        (headed ? rest : rows).forEach((row) => {
+          const li = document.createElement("li");
+          li.append(...row.cells[0].childNodes);
+          list.append(li);
+        });
+        out.push(list);
+      } else {
+        const [head, ...body] = rows;
+        const labels = [...head.cells].map((cell) => text3(cell));
+        const list = document.createElement("ul");
+        body.forEach((row) => {
+          const cells = [...row.cells];
+          const li = document.createElement("li");
+          const strong = make(document, "strong", text3(cells[0]));
+          const values = cells.slice(1).map((cell, i) => [labels[i + 1], text3(cell)].filter(Boolean).join(": "));
+          li.append(strong, `: ${values.join(" \xB7 ")}`);
+          list.append(li);
+        });
+        if (labels[0]) out.push(make(document, "p", labels[0]));
+        out.push(list);
+      }
+      table.replaceWith(...out);
+    });
+  }
   function rebuild(element, document) {
     if (!/\bpress_kit-template-default\b/.test(document.body.className)) {
       throw new Error("Not a default press-kit article (body class missing)");
@@ -331,9 +381,10 @@ var CustomImportScript = (() => {
     const h1 = article.querySelector(".container > header h1");
     const content = article.querySelector(".column-primary .entry-content");
     const media = article.querySelector(".search-results.media-box");
-    if (!h1 || !text3(h1) || !(content == null ? void 0 : content.querySelector(":scope > .panel-layout")) || !media) {
-      throw new Error("Default press-kit article requires title, body and Media Box");
+    if (!h1 || !text3(h1) || !(content == null ? void 0 : content.querySelector(":scope > .panel-layout"))) {
+      throw new Error("Default press-kit article requires a title and body");
     }
+    sourceTables(content, document);
     const out = [];
     const date = text3(article.querySelector(".container > header .entry-published"));
     if (date) out.push(make(document, "p", date));
@@ -355,16 +406,18 @@ var CustomImportScript = (() => {
     out.push(content);
     const side = sidebar(document, article.querySelector(".column-secondary"), !!media);
     if (side.length) out.push(marker(document, "sidebar"), ...side);
-    const heading = text3(media.querySelector(".search-results-heading")) || "Media Box";
-    const stats = text3(media.querySelector(".search-results-stats .stats"));
-    const totals = [...stats.matchAll(/\b(\d+)\s+(?:images?|videos?|PDFs?)\b/gi)];
-    if (totals.length) {
-      media.dataset.expectedAssets = totals.reduce((sum, match) => sum + Number(match[1]), 0);
+    if (media) {
+      const heading = text3(media.querySelector(".search-results-heading")) || "Media Box";
+      const stats = text3(media.querySelector(".search-results-stats .stats"));
+      const totals = [...stats.matchAll(/\b(\d+)\s+(?:images?|videos?|PDFs?)\b/gi)];
+      if (totals.length) {
+        media.dataset.expectedAssets = totals.reduce((sum, match) => sum + Number(match[1]), 0);
+      }
+      out.push(marker(document, "media-box, dark, full-width"), make(document, "h2", heading));
+      if (stats) out.push(make(document, "p", stats));
+      media.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((node) => node.remove());
+      out.push(media);
     }
-    out.push(marker(document, "media-box, dark, full-width"), make(document, "h2", heading));
-    if (stats) out.push(make(document, "p", stats));
-    media.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((node) => node.remove());
-    out.push(media);
     article.replaceChildren(...out);
     element.replaceChildren(article);
   }
@@ -380,7 +433,10 @@ var CustomImportScript = (() => {
       const img = a.querySelector("img");
       if (!img || text3(a) || a.title) return;
       const alt = (img.getAttribute("alt") || "").trim();
-      if (alt && !PLACEHOLDER_ALT.test(alt)) return;
+      if (alt && !PLACEHOLDER_ALT.test(alt)) {
+        a.title = alt;
+        return;
+      }
       const href = a.getAttribute("href");
       const label = bannerLabel(href);
       if (!label) {
@@ -980,7 +1036,7 @@ var CustomImportScript = (() => {
   var TEMPLATE = { name: "press-kit-default", metadata: { template: "press_kit" } };
   var import_press_kit_default_default = {
     preprocess: ({ document }) => {
-      document.querySelectorAll(".search-results.media-box a.media-cart-action.download[href]").forEach((a) => {
+      document.querySelectorAll('article.press_kit a.media-cart-action.download[href], article.press_kit a[data-action="download"][href]').forEach((a) => {
         if (!a.textContent.trim()) a.textContent = "Download";
       });
     },
@@ -990,11 +1046,12 @@ var CustomImportScript = (() => {
       transform("beforeTransform", main, payload);
       const article = main.querySelector("article.press_kit");
       const body = article.querySelector(".entry-content");
+      body.querySelectorAll(".search-results-items").forEach((grid) => parse4(grid, payload));
       parse3(body, { document });
       article.querySelectorAll("section.images.sa-media-kit-preview").forEach((section) => parse(section, payload));
       article.querySelectorAll("section.tags").forEach((section) => parse2(section, payload));
       const mediaBox = article.querySelector(".search-results.media-box");
-      parse4(mediaBox, payload);
+      if (mediaBox) parse4(mediaBox, payload);
       transform("afterTransform", main, payload);
       transform2("afterTransform", main, __spreadProps(__spreadValues({}, payload), { template: TEMPLATE }));
       WebImporter.rules.transformBackgroundImages(main, document);

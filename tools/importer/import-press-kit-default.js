@@ -13,7 +13,10 @@ const TEMPLATE = { name: 'press-kit-default', metadata: { template: 'press_kit' 
 
 export default {
   preprocess: ({ document }) => {
-    document.querySelectorAll('.search-results.media-box a.media-cart-action.download[href]')
+    // Icon-only cart download links would be stripped as empty inline elements before
+    // transform. Give every one text: Media Box and inline grid assets, and the video
+    // attachments of resource "Videos" children (SKODA-805b).
+    document.querySelectorAll('article.press_kit a.media-cart-action.download[href], article.press_kit a[data-action="download"][href]')
       .forEach((a) => { if (!a.textContent.trim()) a.textContent = 'Download'; });
   },
   transform: (payload) => {
@@ -22,6 +25,10 @@ export default {
     layout('beforeTransform', main, payload);
     const article = main.querySelector('article.press_kit');
     const body = article.querySelector('.entry-content');
+    // Resource "Images" children (SKODA-805b) carry their assets as inline grids with the
+    // Media Box item markup: one Downloads table per grid, before content() strips the cart
+    // toolbars that hold each image's download sizes.
+    body.querySelectorAll('.search-results-items').forEach((grid) => media(grid, payload));
     content(body, { document });
 
     article.querySelectorAll('section.images.sa-media-kit-preview')
@@ -29,7 +36,7 @@ export default {
     article.querySelectorAll('section.tags')
       .forEach((section) => tags(section, payload));
     const mediaBox = article.querySelector('.search-results.media-box');
-    media(mediaBox, payload);
+    if (mediaBox) media(mediaBox, payload); // resource children have none (SKODA-805b)
     layout('afterTransform', main, payload);
     metadata('afterTransform', main, { ...payload, template: TEMPLATE });
 

@@ -31,8 +31,9 @@ export default function parse(element, { document }) {
     throw new Error(`Press-kit Media Box expected ${expected} assets, found ${items.length}`);
   }
   // One Downloads table in source order (contract `downloads`: [<picture> or empty, title,
-  // links]). File-only assets (PDF, MP4 without a poster) keep an empty picture cell; the
-  // press-kit template lists them as plain links until the block renders file tiles (SKODA-510).
+  // links]). File-only assets (PDF, MP4 without a poster) keep an empty picture cell, which the
+  // Downloads block renders as a file tile (SKODA-510). Used for the Media Box and for the
+  // inline asset grids of resource "Images" children (SKODA-805b).
   const rows = [];
   items.forEach((wrapper) => {
     const item = wrapper.querySelector('article.media-cart-item');
