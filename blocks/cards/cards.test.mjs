@@ -62,12 +62,36 @@ test('all shape-2 series sizes fit authored rows', async () => {
   assert.equal(block.querySelectorAll('.tile-row-start').length, 4);
 });
 
+test('tile images retain authored img nodes and use size-aware responsive sources', async () => {
+  const block = makeBlock(['sq', 'sq-small', 'sq-small', 'third', 'third', 'third', 'banner']);
+  const images = [...block.querySelectorAll('img')];
+  images.forEach((img) => { img.src = 'https://example.com/media.jpg?width=750'; });
+  await decorate(block);
+  const cards = [...block.querySelectorAll('li')];
+  const widthAt = (li, media) => {
+    const source = [...li.querySelectorAll('source[type="image/webp"]')]
+      .find((el) => el.getAttribute('media') === media);
+    return new URL(source.getAttribute('srcset')).searchParams.get('width');
+  };
+  cards.forEach((li, i) => assert.equal(li.querySelector('img'), images[i]));
+  assert.equal(widthAt(cards[0], '(min-width: 781px)'), '1250');
+  assert.equal(widthAt(cards[1], '(min-width: 781px)'), '750');
+  assert.equal(widthAt(cards[3], '(min-width: 781px)'), '850');
+  assert.equal(widthAt(cards[6], '(min-width: 781px)'), '2500');
+  assert.equal(widthAt(cards[0], '(min-width: 500px)'), '1600');
+  assert.equal(widthAt(cards[0], '(min-width: 395px)'), '1000');
+  assert.equal(widthAt(cards[0], null), '750');
+});
+
 test('press kits use a distinct 20-column track for features, fifths and quarters', async () => {
   const block = makeBlock([
     'feature', 'feature', 'press-square',
     'press-square', 'press-square', 'press-square', 'press-square', 'press-square',
     'press-quarter', 'press-quarter', 'press-quarter', 'press-quarter',
   ]);
+  [...block.querySelectorAll('img')].forEach((img) => {
+    img.src = 'https://example.com/media.jpg?width=750';
+  });
   assert.equal(parseTileRows(block).mode, 'press');
   await decorate(block);
   assert.equal(block.querySelector('ul').classList.contains('tiles-press'), true);
@@ -75,6 +99,11 @@ test('press kits use a distinct 20-column track for features, fifths and quarter
     [...block.querySelectorAll('.tile-row-start')].map((li) => li.textContent.trim()),
     ['Tile 1', 'Tile 4', 'Tile 9'],
   );
+  [1000, 500, 750].forEach((width, i) => {
+    const card = block.querySelectorAll('li')[[0, 2, 8][i]];
+    const source = card.querySelector('source[media="(min-width: 781px)"]');
+    assert.equal(new URL(source.srcset).searchParams.get('width'), String(width));
+  });
 });
 
 test('empty or omitted series token uses the documented small-square default', async () => {
@@ -104,6 +133,12 @@ test('invalid rows fail explicitly before modifying the authored DOM', async () 
   const missingTitle = makeBlock(['sq', 'sq']);
   missingTitle.querySelector('a').textContent = '';
   await assert.rejects(decorate(missingTitle), /linked title/);
+  const extraTitle = makeBlock(['sq', 'sq']);
+  extraTitle.firstElementChild.lastElementChild.append('Extra');
+  await assert.rejects(decorate(extraTitle), /linked title/);
+  const twoLinks = makeBlock(['sq', 'sq']);
+  twoLinks.firstElementChild.lastElementChild.append(twoLinks.querySelector('a').cloneNode(true));
+  await assert.rejects(decorate(twoLinks), /linked title/);
   const missingCells = makeBlock(['sq', 'sq']);
   missingCells.firstElementChild.replaceChildren();
   await assert.rejects(decorate(missingCells), /missing cells/);
@@ -120,7 +155,10 @@ test('invalid rows fail explicitly before modifying the authored DOM', async () 
 
 test('ordinary overlay cards still use the shared card-teaser decorator', async () => {
   const block = makeBlock(['sq'], { tiles: false });
+  block.querySelector('img').src = 'https://example.com/media.jpg?width=750';
   await decorate(block);
   assert.equal(block.querySelector('li').classList.contains('tile-sq'), false);
   assert.equal(block.querySelector('.card-teaser-body').textContent.trim(), 'sq');
+  const sources = [...block.querySelectorAll('source[type="image/webp"]')];
+  assert.deepEqual(sources.map((source) => new URL(source.srcset).searchParams.get('width')), ['750', '500']);
 });

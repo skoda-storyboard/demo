@@ -20,6 +20,21 @@ import {
 } from '../../scripts/card-teaser.js';
 import { layoutTileRows } from '../../scripts/cards-tiles.js';
 
+const TILE_IMAGE_WIDTHS = {
+  sq: '1250',
+  wide: '1250',
+  'sq-small': '750',
+  quarter: '750',
+  third: '850',
+  'third-sq': '850',
+  'two-thirds': '1800',
+  banner: '2500',
+  'banner-tall': '2500',
+  feature: '1000',
+  'press-square': '500',
+  'press-quarter': '750',
+};
+
 export function parseTileRows(block) {
   if (!block.classList.contains('overlay')) {
     throw new Error('Cards tiles: the overlay variant is required');
@@ -85,7 +100,18 @@ export default async function decorate(block) {
     ul.append(li);
   });
 
-  optimizeImages(ul);
+  if (isTiles) {
+    [...ul.children].forEach((li, index) => optimizeImages(li, {
+      breakpoints: [
+        { media: '(min-width: 781px)', width: TILE_IMAGE_WIDTHS[parsed.tiles[index].token] },
+        { media: '(min-width: 500px)', width: '1600' },
+        { media: '(min-width: 395px)', width: '1000' },
+        { width: '750' },
+      ],
+    }));
+  } else {
+    optimizeImages(ul);
+  }
   [...ul.children].forEach((li) => wireCardLink(li));
 
   block.replaceChildren(ul);

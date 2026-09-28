@@ -24,6 +24,22 @@ export function textOf(html) {
     .trim();
 }
 
+function validTileTitle(cell) {
+  if (!cell) return false;
+  const links = [...cell.html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a\s*>/gi)];
+  if (links.length !== 1 || (cell.html.match(/<a\b/gi) || []).length !== 1) return false;
+  const href = links[0][1].match(/(?:^|\s)href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i);
+  const linkText = textOf(links[0][2]);
+  const hrefValue = (href?.[1] ?? href?.[2] ?? href?.[3] ?? '')
+    .replace(/&#(?:x([0-9a-f]+)|([0-9]+));?/gi, (entity, hex, decimal) => {
+      const code = Number.parseInt(hex || decimal, hex ? 16 : 10);
+      return code <= 0x10ffff ? String.fromCodePoint(code) : entity;
+    })
+    .replace(/&(?:nbsp|ensp|emsp|thinsp|Tab|NewLine);/gi, ' ');
+  return !!(hrefValue.trim()
+    && linkText && cell.text === linkText);
+}
+
 /** Config-key normalisation, mirroring aem.js toClassName ("View all" → "view-all"). */
 export function normKey(text) {
   return String(text || '').toLowerCase().replace(/[^0-9a-z]/gi, '-').replace(/-+/g, '-')
@@ -240,7 +256,7 @@ export function checkPage(html, contracts, codeBlocks, path = '') {
           const [size, image, title] = omitted
             ? [{ text: '' }, ...row.cells] : row.cells;
           if (row.cells.length !== (omitted ? 2 : 3) || !image?.media
-            || !title?.link) {
+            || !validTileTitle(title)) {
             result.problems.push(`row ${index + 1}: expected [size, picture, linked title]`);
           }
           return size?.text || '';

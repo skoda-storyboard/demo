@@ -233,6 +233,38 @@ test('checkPage: tiles reject unknown sizes, overfilled rows and missing overlay
   assert.match(checkPage(missingImage, CONTRACTS, CODE).errors.join(' '), /expected \[size, picture, linked title\]/);
 });
 
+test('checkPage: tiles reject titles that the renderer cannot decorate', () => {
+  const invalidTitles = [
+    '<a href="/en/a"></a>',
+    '<a href="">A</a>',
+    '<a href="  ">A</a>',
+    '<a href="&#32;">A</a>',
+    '<a href="&#x20;">A</a>',
+    '<a href="&nbsp;">A</a>',
+    '<a>A</a>',
+    '<a data-href="/en/a">A</a>',
+    '<a href="/en/a">&nbsp;</a>',
+    '<a href="/en/a">A</a><a href="/en/b">B</a>',
+    '<p>Extra <a href="/en/a">A</a></p>',
+  ];
+  invalidTitles.forEach((title) => {
+    const html = page(block(
+      'cards overlay tiles',
+      row('sq', '<picture><img src="a.jpg"></picture>', title),
+      row('sq', '<picture><img src="b.jpg"></picture>', '<a href="/en/b">B</a>'),
+    ));
+    const result = checkPage(html, CONTRACTS, CODE);
+    assert.equal(result.publishable, false, title);
+    assert.match(result.errors.join(' '), /expected \[size, picture, linked title\]/, title);
+  });
+  const valid = page(block(
+    'cards overlay tiles',
+    row('sq', '<picture><img src="a.jpg"></picture>', '<p><a href="/en/a"><span>A &amp; B</span></a></p>'),
+    row('sq', '<picture><img src="b.jpg"></picture>', '<a href="/en/b">B</a>'),
+  ));
+  assert.equal(checkPage(valid, CONTRACTS, CODE).publishable, true);
+});
+
 // ---- registry ---------------------------------------------------------------------------
 
 test('committed registry is self-consistent and fully documented', () => {

@@ -26,6 +26,9 @@ Demo URL/block sweep, 2026-09-25 (report §5). The series and press-kit groups r
   a 12-column series track and a 20-column press-kit track, 20px gap, 16/18/500 overlaid
   title with no shadow/hover zoom, the source's two-gradient scrim rather than the
   stronger generic-card text scrim, and the measured 781-column/768-ratio transitions.
+- Tile-only responsive image sources account for the measured 604px desktop square,
+  1228px banners and one-up 370–760px tiles at DPR 2; preserve each authored `<img>`
+  for DA editability and retain the shared defaults for non-tile cards.
 - **Accessibility-driven deviation:** the measured source scrim alone leaves 634/2,280
   title-area background samples under 4.5:1 at 1440 and 698/2,271 at 390
   (worst ~1.39:1). A tiles-only 56% black backdrop directly under each linked
@@ -43,6 +46,9 @@ Demo URL/block sweep, 2026-09-25 (report §5). The series and press-kit groups r
 - [ ] 1440 tile rects match the source per hub (±2px), 20px gap.
 - [ ] 390: 1-up 370×208, 20px gap, x=10.
 - [ ] Title 16/18/500, no text-shadow, no hover zoom; other cards variants unchanged.
+- [ ] Tiles request image sources at least 2× their measured CSS width at 390/780/1440;
+      authored `<img>` elements stay in place. The original EDS media can cap
+      natural resolution (e.g. a 2500px banner request yields a 2000px image).
 - [ ] Tile scrim has only the source's 25% horizontal and 10% vertical gradients;
       non-tiles retain their original three-layer scrim.
 - [ ] The linked title's scoped backdrop keeps white text contrast ≥4.5:1;
