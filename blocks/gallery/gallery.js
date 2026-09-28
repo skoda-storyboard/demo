@@ -555,6 +555,14 @@ function buildSlider(block) {
     ]);
     pic.querySelector('img').draggable = false;
     slide.append(pic);
+    // the optional authored description, under the 16:9 frame (source
+    // .search-results-item-description); none → nothing added, so no gap
+    if (item.caption) {
+      const caption = document.createElement('div');
+      caption.className = 'gallery-slide-caption';
+      caption.append(...[...item.caption.childNodes].map((n) => n.cloneNode(true)));
+      slide.append(caption);
+    }
     return slide;
   });
   track.append(...slides);

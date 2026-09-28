@@ -49,18 +49,16 @@
   /* prose paragraph rhythm (measured ~20px bottom gap in article/press body) */
   --paragraph-gap: 20px;
 
-  /* story-detail two-column shell (docs/ui-specs/story-detail.md §3): primary
-     .content 66.66% (~819px @1280) + secondary aside 33.33% (~409px). A 2fr/1fr
-     ratio holds the 66.66/33.33 proportion; the ~24px gap matches the source's
-     -10px column gutter so the tracks land on the measured 819/409 widths. */
-  --story-column-gap: var(--spacing-l);
-  --story-sidebar-inset: 10px;
+  /* story-detail two-column shell (docs/ui-specs/story-detail.md §3; re-measured
+     on the live Epiq story at 1440/1280/1080/992/768/500/375). The source insets
+     its content 10px from the container edge; the article text then takes 2/3 of
+     what is left (819px of 1248), the aside the rest, starting 64px after the text
+     and ending 10px from the edge. No reading-measure cap: the source prose fills
+     its column. Full-width body media (the Gallery slider) bleed the 10px inset. */
+  --story-inset: 10px;
+  --story-sidebar-inset: var(--story-inset);
   --story-sidebar-heading-size-compact: 20px;
   --story-sidebar-heading-line-height: 45px;
-
-  /* reading-measure cap: source fills the full 819px column (~100ch); story-detail
-     §8 recommends capping ~72ch for readability. Applied to the prose column. */
-  --prose-measure: 72ch;
 
   /* body sizes (mobile-first base) */
   --body-font-size-lead: 20px; /* story perex under the hero (live: 20/30 wt600) */
@@ -644,14 +642,18 @@ main .section.dark a {
    ========================================================================== */
 
 /* Layer 1 — fluid. Mobile-first: sections stack in source order (body, then the
-   Style:sidebar aside below it), which matches the source <768 behaviour. Cap the
-   prose measure for readability rather than filling the whole column. Story prose
-   scale is measured (story-detail.md §3, re-measured on the live Epiq story): body
-   p 16/24; h2 24/27 → 40/45 and h3 20/23 → 24/27.6 above 768px, all wt300 with a
-   16px gap below; prose lists use a custom bullet (list-style:none, padding 1.5em).
-   Scoped to the story body column so global heading sizes stay intact. */
+   Style:sidebar aside below it), which matches the source <768 behaviour. The body
+   content sits the source's 10px in from the edge and fills the column (no measure
+   cap, as on the source). Story prose scale is measured (story-detail.md §3,
+   re-measured on the live Epiq story): body p 16/24; h2 24/27 → 40/45 and h3
+   20/23 → 24/27.6 above 768px, all wt300 with a 16px gap below; prose lists use a
+   custom bullet (list-style:none, padding 1.5em). Scoped to the story body column
+   so global heading sizes stay intact. */
+body.story main > .section.body-column > div {
+  padding-inline: var(--story-inset);
+}
+
 body.story main > .section.body-column .default-content-wrapper {
-  max-width: var(--prose-measure);
   font-size: var(--body-font-size-m);
   line-height: 1.5;
 }
@@ -749,15 +751,23 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
 /* Layer 2 / Layer 3 — at ≥768 the article becomes a real two-column grid. This is a
    genuine structural transition (single stack → side-by-side), so it earns the one
    breakpoint. `main` is the grid; the body column spans the left track and the aside
-   the right, both capped by --content-max-width via the intrinsic minmax track. */
+   the right, both capped by --content-max-width via the intrinsic minmax track. The
+   body track is the 10px inset + 2/3 of the inset content box, so the text lands on
+   the source's 819px at 1248 (707 at 1080, 499 at 768); the aside takes the rest. */
 @media (width >= 768px) {
   body.story main {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-    column-gap: var(--story-column-gap);
+    grid-template-columns:
+      minmax(0, calc(var(--story-inset) + (100% - 2 * var(--story-inset)) * 2 / 3))
+      minmax(0, 1fr);
     max-width: var(--content-max-width);
     margin-inline: auto;
     align-items: start;
+  }
+
+  /* the text ends where the aside track starts (the aside owns the 64px gap) */
+  body.story main > .section.body-column > div {
+    padding-inline: var(--story-inset) 0;
   }
 
   /* Full-bleed sections (hero) opt out of the grid and span both tracks. */
@@ -777,8 +787,9 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
     grid-column: 2;
   }
 
+  /* 64px after the text, ending the source's 10px from the container edge */
   body.story main > .section.sidebar > div {
-    padding-inline: var(--spacing-xxl) 0;
+    padding-inline: var(--spacing-xxl) var(--story-inset);
   }
 
   /* intro → article body is 48px here on the source (grid items don't collapse

@@ -557,18 +557,18 @@ body.gallery-lightbox-open {
  * Slider variant — `Gallery (slider)` (SKODA-819)
  * Story in-body image carousel, measured on the live Epiq story
  * (.carousel-widget): one 16:9 image per view, 32px light-disc ink arrows 10px
- * inside the edges, 10px dots 22px below the image. Width follows the text
- * column (left + right edges shared with the prose) rather than the source's
- * 10px overhang, e.g. 728×409.5 @1440.
+ * inside the edges, 10px dots 22px below the slide, an optional centred item
+ * description under the image (Octavia). As on the source it overhangs the text
+ * column by 10px each side: 839×472 @1440, 519 @768, full width on mobile.
  * ========================================================================== */
 .gallery.slider {
   --slider-arrow-size: var(--carousel-arrow-size); /* 32px (source) */
   --slider-arrow-inset: 10px; /* Flickity arrows sit 10px inside the viewport */
   --slider-dot-size: 10px;
-  --slider-dots-offset: 22px; /* image bottom → dot row (source bottom:-32px on a 10px row) */
-
-  /* no breakout: the slider keeps the wrapper's inline padding, so its edges line
-     up with the surrounding text (requested over the source's 10px overhang) */
+  --slider-dots-offset: 22px; /* slide bottom → dot row (source bottom:-32px on a 10px row) */
+  --slider-caption-padding: 10px; /* source .search-results-item-description */
+  --slider-caption-font-size: 10pt; /* 13.33px, the source description span */
+  --slider-caption-line-height: 24px;
 
   /* vertical rhythm measured on the source: paragraph text → image 44px
      (the paragraph's 20px margin + 24), dot row → next heading 48px (<768).
@@ -585,11 +585,15 @@ body.gallery-lightbox-open {
 
 .gallery.slider .gallery-slider-viewport {
   position: relative;
+
+  /* whole pixels: the source-width column is fractional (838.67px @1440), and a
+     scroll offset can't rest on a fraction, so a ⅓px sliver of the next slide
+     would show. Where round() is unsupported the width simply stays fluid. */
+  width: round(down, 100%, 1px);
 }
 
 .gallery.slider .gallery-slider-track {
   display: flex;
-  aspect-ratio: 16 / 9;
   margin: 0;
   padding: 0;
   overflow-x: auto;
@@ -616,22 +620,40 @@ body.gallery-lightbox-open {
 .gallery.slider .gallery-slide {
   flex: 0 0 100%;
   margin: 0;
-  overflow: hidden;
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 
-.gallery.slider .gallery-slide picture,
-.gallery.slider .gallery-slide img {
+/* the 16:9 image frame (clips the 102% image); a caption, when authored, follows */
+.gallery.slider .gallery-slide picture {
   display: block;
-  width: 100%;
-  height: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
 }
 
 /* cover the 16:9 box; the source also scales the image to 102% */
 .gallery.slider .gallery-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   transform: scale(1.02);
+}
+
+/* optional description under the image, as the source item description: 10px
+   above/below, centred 10pt text on a 24px line, 20px after each paragraph
+   (one line = 64px, so the dots land 86px under the image as on the Octavia
+   story). The slide and its arrows grow with it, as on the source. */
+.gallery.slider .gallery-slide-caption {
+  padding-block: var(--slider-caption-padding);
+  color: var(--text-color);
+  font-size: var(--slider-caption-font-size);
+  line-height: var(--slider-caption-line-height);
+  text-align: center;
+}
+
+.gallery.slider .gallery-slide-caption p {
+  margin: 0 0 var(--paragraph-gap);
 }
 
 /* --- arrows: 32px light disc with an ink arrow (source icon-font glyph) --- */
@@ -722,12 +744,10 @@ body.gallery-lightbox-open {
   opacity: 0.6;
 }
 
-/* story body: match the text column exactly — the prose wrapper is capped at
-   --prose-measure and centred (styles.css), so the slider takes the same measure
-   and centring and shares both text edges at every width */
+/* story body: as on the source, the slider bleeds the column's 10px inset past
+   both text edges (839px against 819px of text at 1248; full width on mobile) */
 body.story .section.body-column .gallery.slider {
-  max-width: var(--prose-measure);
-  margin-inline: auto;
+  margin-inline: calc(-1 * var(--story-inset));
 }
 
 @media (width >= 768px) {

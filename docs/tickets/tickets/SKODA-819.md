@@ -4,8 +4,13 @@
 - **Phase:** A/B · **Milestone:** M1 (demo story fidelity)
 - **GitHub issue:** [#122](https://github.com/skoda-storyboard/demo/issues/122)
 - **Estimate:** 3 SP · AI-assisted 1d / manual 2–3d *(planning estimate, not a quote)*
-- **Status (2026-09-24):** 🔵 TODO · **Decision (2026-09-24, stakeholder):** render like the source
-  (single-image slider), not as the lead-image + thumbnail gallery.
+- **Status (2026-09-28):** 🟡 In review, [PR #156](https://github.com/skoda-storyboard/demo/pull/156) ·
+  **Decision (2026-09-24, stakeholder):** render like the source (single-image slider), not as the lead-image +
+  thumbnail gallery.
+- **Review round 1 (2026-09-28):** captions come only from `.search-results-item-description` (never alt /
+  `data-caption`) and render under the 16:9 frame (10pt on a 24px line, 10px padding, 20px paragraph gap: the
+  Octavia dots land 86px under the image, Epiq stays at 22px). The slider now uses the source geometry (839×472 @1440,
+  519 @768, 500 @500, 10px bleed past the text), with the story text inset done together (SKODA-821 AC).
 - **Supersedes:** [SKODA-219](SKODA-219.md), which is the same widget. It had been specced as a `carousel` block
   variant in the M1 gap review. Its Must SP moves to this ticket (review §15).
 - **UI spec:** [`story-image-carousel.md`](../../ui-specs/story-image-carousel.md), measured on Epiq + Octavia
