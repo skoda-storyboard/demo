@@ -146,21 +146,35 @@ var CustomImportScript = (() => {
     const capSource = img.getAttribute("data-caption") && img || ((_a = item.querySelector) == null ? void 0 : _a.call(item, "[data-caption]")) || item;
     return capSource.getAttribute && capSource.getAttribute("data-caption") || ((_b = item.querySelector) == null ? void 0 : _b.call(item, "a[title]")) && item.querySelector("a[title]").getAttribute("title") || img.getAttribute("alt") || "";
   }
-  function galleryCells(panel, document2) {
+  function itemDescription(item, document2) {
+    var _a;
+    const desc = (_a = item.querySelector) == null ? void 0 : _a.call(item, ".search-results-item-description");
+    if (!desc || !(desc.textContent || "").trim()) return "";
+    const paras = [...desc.querySelectorAll("p")].map((p) => (p.textContent || "").replace(/\s+/g, " ").trim()).filter(Boolean);
+    const texts = paras.length ? paras : [desc.textContent.replace(/\s+/g, " ").trim()];
+    return texts.map((t) => {
+      const p = document2.createElement("p");
+      p.textContent = t;
+      return p;
+    });
+  }
+  function galleryCells(panel, document2, blockName = "Gallery") {
     const imgs = [...panel.querySelectorAll("img")];
     if (!imgs.length) return null;
-    const cells = [["Gallery"]];
+    const slider = blockName === CAROUSEL_GALLERY;
+    const cells = [[blockName]];
     imgs.forEach((img) => {
       const item = img.closest(".search-results-item, .item, figure") || img;
-      cells.push([img, itemCaption(img, item)]);
+      cells.push([img, slider ? itemDescription(item, document2) : itemCaption(img, item)]);
     });
     return cells.length > 1 ? cells : null;
   }
+  var CAROUSEL_GALLERY = "Gallery (slider)";
   function carouselCells(panel, document2) {
     const items = [...panel.querySelectorAll(".search-results-item")];
-    if (!items.length) return galleryCells(panel, document2);
+    if (!items.length) return galleryCells(panel, document2, CAROUSEL_GALLERY);
     const linked = items.filter((it) => it.querySelector("a[href]")).length;
-    if (linked < Math.ceil(items.length / 2)) return galleryCells(panel, document2);
+    if (linked < Math.ceil(items.length / 2)) return galleryCells(panel, document2, CAROUSEL_GALLERY);
     const cells = [["Cards"]];
     items.forEach((it) => {
       const img = it.querySelector("img");
@@ -632,7 +646,7 @@ var CustomImportScript = (() => {
     const matched = [...sidebar.querySelectorAll(".related .article-teaser, .related article")];
     const teasers = matched.filter((el, i, arr) => arr.indexOf(el) === i).filter((el) => !matched.some((other) => other !== el && other.contains(el)));
     if (!teasers.length) return null;
-    const cells = [["Cards"]];
+    const cells = [["Cards (overlay)"]];
     let emitted = 0;
     teasers.forEach((t) => {
       const img = t.querySelector("img");
@@ -642,16 +656,16 @@ var CustomImportScript = (() => {
       if (!link && !img) return;
       const content = [];
       if (title) {
-        const p = document2.createElement("p");
+        const h = document2.createElement("h3");
         if (link) {
           const a = document2.createElement("a");
           a.setAttribute("href", link.getAttribute("href"));
           a.textContent = title;
-          p.appendChild(a);
+          h.appendChild(a);
         } else {
-          p.textContent = title;
+          h.textContent = title;
         }
-        content.push(p);
+        content.push(h);
       }
       cells.push([img || "", content]);
       emitted += 1;
