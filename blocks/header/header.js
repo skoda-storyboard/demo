@@ -129,6 +129,24 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
 }
 
 /**
+ * A dropdown parent authored as plain text (`<p>Models</p>`, the Media Room nav) gets the
+ * same trigger link as a linked parent (`#`, as on the source), so it takes focus (the
+ * drawer then stays open on tap) and picks up the nav-item styles. The click never
+ * navigates; the li's handler toggles the dropdown.
+ * @param {Element} navSection A top-level nav li with a sub-list
+ */
+export function linkDropLabel(navSection) {
+  const label = navSection.querySelector(':scope > p');
+  if (!label || label.querySelector('a') || !label.textContent.trim()) return;
+  const trigger = document.createElement('a');
+  trigger.href = '#';
+  trigger.setAttribute('role', 'button');
+  trigger.textContent = label.textContent.trim();
+  trigger.addEventListener('click', (e) => e.preventDefault());
+  label.replaceChildren(trigger);
+}
+
+/**
  * loads and decorates the header, mainly the nav
  * @param {Element} block The header block element
  */
@@ -224,7 +242,10 @@ export default async function decorate(block) {
   const navSections = nav.querySelector('.nav-sections');
   if (navSections) {
     navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
-      if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
+      if (navSection.querySelector('ul')) {
+        navSection.classList.add('nav-drop');
+        linkDropLabel(navSection);
+      }
       // Newsletter is drawer-only on desktop (server strips the authored class; re-tag by href)
       if (navSection.querySelector('a[href*="#newsletter"]')) {
         navSection.classList.add('nav-newsletter');

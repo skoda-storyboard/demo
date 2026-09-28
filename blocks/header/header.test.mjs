@@ -65,6 +65,25 @@ console.warn = (...args) => warnings.push(args.join(' '));
 const { default: decorateHeader } = await import('./header.js');
 const { default: decorateFooter } = await import('../footer/footer.js');
 
+test('a text-only dropdown parent gets a focusable trigger link that never navigates', async () => {
+  const { linkDropLabel } = await import('./header.js');
+  const li = document.createElement('li');
+  li.innerHTML = '<p>Models</p><ul><li><a href="/en/skoda-model/peaq">Peaq</a></li></ul>';
+  linkDropLabel(li);
+  const trigger = li.querySelector(':scope > p > a');
+  assert.equal(trigger.textContent, 'Models');
+  assert.equal(trigger.getAttribute('href'), '#');
+  assert.equal(trigger.getAttribute('role'), 'button');
+  const click = new window.MouseEvent('click', { bubbles: true, cancelable: true });
+  trigger.dispatchEvent(click);
+  assert.equal(click.defaultPrevented, true);
+  // an authored parent link is left alone
+  const linked = document.createElement('li');
+  linked.innerHTML = '<p><a href="/en/category/models">Models</a></p><ul><li>x</li></ul>';
+  linkDropLabel(linked);
+  assert.equal(linked.querySelector('a').getAttribute('href'), '/en/category/models');
+});
+
 test('a 404 nav fragment leaves an empty header without throwing', async () => {
   const block = document.querySelector('.header');
   block.innerHTML = '<p>stale</p>';
