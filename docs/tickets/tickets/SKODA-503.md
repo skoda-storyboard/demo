@@ -33,7 +33,7 @@ Non-image binaries must never go through EDS's image optimization pipeline. PDFs
 - MP4 rendition/resolution count and total video footprint are unquantified `[PARTIAL]` (no video sitemap).
 - No-CORS legacy CDN complicates reference-in-place for production.
 
-## Implementation checkpoint (2026-09-28; awaiting manifest update and QA)
+## Implementation checkpoint (2026-09-28; awaiting generated page and QA)
 
 On `skoda-503-binary-links` the manifest builder can inventory PDF/MP4 anchors,
 upload approved originals to Assets, and verify a reviewed anonymous public
@@ -70,12 +70,21 @@ An isolated one-ID dry run for the Elroq PDF reported
 `activation pending` and performed no write. The subsequent live resume was
 declined because activation needs explicit approval; it did not run.
 
-The isolated sample manifest still records `dam: done`, `status: partial`,
-without a `public_url` or `public_verified` proof: updating it was separately
-denied pending explicit one-row authorization. The committed manifest and
-page links remain unchanged. No MP4 upload, DA push or page preview/publish
-occurred. The ticket remains open until the manifest proof, sample preview
-and independent QA pass. SKODA-510 owns the Downloads file-tile rendering.
+**One-page execution attempt (2026-09-28):** on the user's request to run one
+sample page end to end, a scoped one-ID resume of the already uploaded Elroq
+PDF activated the asset and recorded `dam: done`, `publish: done` and an
+anonymous public proof (`application/pdf`, 537,385 bytes). Only that proved
+PDF row was transferred from the ignored sample manifest to the tracked media
+manifest. An in-memory check against the existing rendered Elroq page found
+one PDF anchor, rewrote it to the proved Assets URL and returned no binary
+gate errors. The existing DA source still has the source-host PDF link.
+The external bulk-import runner was denied by the execution environment,
+the branch worktree has no generated `content/` page, and terminal DA source
+access returned 401. No local page or DA document was overwritten; no page
+preview or page publish occurred. Resume at a generated importer page and a
+credentialed, conflict-safe `import:push --dry-run`, then push + preview and
+hand off to independent QA. No MP4 has been uploaded or live-proven. The
+ticket remains open; SKODA-510 owns Downloads file-tile rendering.
 
 Read-only probe: the candidate AEM publish hostname serves one already-uploaded
 image anonymously (HEAD 200). The source Peaq MP4 is approximately 101 MB;

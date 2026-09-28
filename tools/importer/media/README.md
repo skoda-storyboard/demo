@@ -33,11 +33,14 @@ demonstrates that the token can trigger activation **for this asset**; direct
 binary upload alone does not publish. The migration now automatically
 activates each selected PDF/MP4 after DAM upload; restrict the batch with
 reviewed pages or `--ids-file`. The isolated manifest
-under `.migration/secrets/skoda-503-sample-manifest.json` still retains the
-successful DAM upload as `partial` without a recorded public proof: a
-manifest-mutating resume was separately declined. Do not repeat the upload,
-expand the batch, rewrite links or mark the ticket done until the proof is
-authorized and recorded in the manifest and the page has passed QA.
+under `.migration/secrets/skoda-503-sample-manifest.json` was resumed with
+the user's one-page execution request: its one Elroq PDF row now records
+activation and anonymous MIME/byte-count proof, which was copied to the
+tracked media manifest. Do not repeat the upload or expand the batch. The
+Elroq DA page still has its source PDF link; the bulk-import runner was denied
+in the execution environment and no generated page was available in this
+branch for the gated DA push/preview. Do not mark the ticket done until a
+generated page, credentialed push/preview, and independent QA have passed.
 
 Before the first approved sample upload, create a **reviewed, local JSON map**
 whose keys are intended DAM paths and whose values are candidate public Assets
@@ -108,10 +111,10 @@ an unreviewed `--from-manifest` batch: the binary publisher acts on every
 selected PDF/MP4. When `--from-manifest` also specifies `--dam-base` and
 binary rows exist, the builder requires `--ids-file` before any upload or
 activation; page-based runs are scoped by their explicit `--pages` list.
-`--dry-run` never activates an asset. A live resume of the Elroq sample
-through the new automation was not authorized and did not run; the isolated
-sample row remains partial. Obtain explicit activation approval for each
-batch before running the non-dry command, even for already uploaded originals.
+`--dry-run` never activates an asset. The user authorized a scoped live
+resume of the already uploaded Elroq PDF; it completed without re-upload.
+Obtain explicit activation approval for each new batch before running the
+non-dry command, even for already uploaded originals.
 
 Implements the media half of **SKODA-501** (masters-only ingest), **SKODA-504**
 (mapping manifest, page-mirrored DAM foldering), **SKODA-505** (media-cart
