@@ -68274,12 +68274,16 @@
         "en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model",
         "en/press-kits/skoda-peaq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model/Skoda_Peaq_Motor_and_battery_architecture_efe7eeff.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Peaq_Motor_and_battery_architecture_efe7eeff.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model/Skoda_Peaq_Motor_and_battery_architecture_efe7eeff.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model/Skoda_Peaq_Motor_and_battery_architecture_efe7eeff.pdf",
+        "mime": "application/pdf",
+        "bytes": 990533
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -68287,15 +68291,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Peaq_Motor_and_battery_architecture_efe7eeff.pdf"
       ],
-      "bytes": null,
+      "bytes": 990533,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:19.009Z"
     },
     "c0387e27__Skoda_Peaq_Infographic_Battery_powertrains_478855e5.pdf": {
       "kind": "document",
@@ -68307,12 +68315,16 @@
         "en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model",
         "en/press-kits/skoda-peaq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model/Skoda_Peaq_Infographic_Battery_powertrains_478855e5.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Infographic_Battery_powertrains_478855e5.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model/Skoda_Peaq_Infographic_Battery_powertrains_478855e5.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model/Skoda_Peaq_Infographic_Battery_powertrains_478855e5.pdf",
+        "mime": "application/pdf",
+        "bytes": 937459
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -68320,15 +68332,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Infographic_Battery_powertrains_478855e5.pdf"
       ],
-      "bytes": null,
+      "bytes": 937459,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:23.655Z"
     },
     "9f34d7bf__Skoda_Peaq_Heat_pump_624ca5f5.pdf": {
       "kind": "document",
@@ -68340,12 +68356,16 @@
         "en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model",
         "en/press-kits/skoda-peaq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model/Skoda_Peaq_Heat_pump_624ca5f5.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Peaq_Heat_pump_624ca5f5.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model/Skoda_Peaq_Heat_pump_624ca5f5.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model/Skoda_Peaq_Heat_pump_624ca5f5.pdf",
+        "mime": "application/pdf",
+        "bytes": 1016070
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -68353,15 +68373,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Peaq_Heat_pump_624ca5f5.pdf"
       ],
-      "bytes": null,
+      "bytes": 1016070,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:25.590Z"
     },
     "9f34d7bf__Press_kit_Skoda_Peaq_Media_Launch_Powertrains_and_batteries_33668044.pdf": {
       "kind": "document",
@@ -68372,12 +68396,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model/Press_kit_Skoda_Peaq_Media_Launch_Powertrains_and_batteries_33668044.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Powertrains_and_batteries_33668044.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model/Press_kit_Skoda_Peaq_Media_Launch_Powertrains_and_batteries_33668044.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model/Press_kit_Skoda_Peaq_Media_Launch_Powertrains_and_batteries_33668044.pdf",
+        "mime": "application/pdf",
+        "bytes": 178692
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -68385,15 +68413,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Powertrains_and_batteries_33668044.pdf"
       ],
-      "bytes": null,
+      "bytes": 178692,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:27.416Z"
     },
     "c0387e27__Skoda_Peaq_Infographic_Sonos_premium_sound_system_44d2d6cb.pdf": {
       "kind": "document",
@@ -68405,12 +68437,16 @@
         "en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart",
         "en/press-kits/skoda-peaq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart/Skoda_Peaq_Infographic_Sonos_premium_sound_system_44d2d6cb.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Infographic_Sonos_premium_sound_system_44d2d6cb.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart/Skoda_Peaq_Infographic_Sonos_premium_sound_system_44d2d6cb.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart/Skoda_Peaq_Infographic_Sonos_premium_sound_system_44d2d6cb.pdf",
+        "mime": "application/pdf",
+        "bytes": 918590
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -68418,15 +68454,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Infographic_Sonos_premium_sound_system_44d2d6cb.pdf"
       ],
-      "bytes": null,
+      "bytes": 918590,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:30.625Z"
     },
     "9f34d7bf__Press_kit_Skoda_Peaq_Media_Launch_Connectivity_92f92c3a.pdf": {
       "kind": "document",
@@ -68437,12 +68477,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart/Press_kit_Skoda_Peaq_Media_Launch_Connectivity_92f92c3a.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Connectivity_92f92c3a.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart/Press_kit_Skoda_Peaq_Media_Launch_Connectivity_92f92c3a.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart/Press_kit_Skoda_Peaq_Media_Launch_Connectivity_92f92c3a.pdf",
+        "mime": "application/pdf",
+        "bytes": 187744
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -68450,15 +68494,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Connectivity_92f92c3a.pdf"
       ],
-      "bytes": null,
+      "bytes": 187744,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:32.512Z"
     },
     "c0387e27__Skoda_Peaq_Infographic_Exterior_4ea891f1.pdf": {
       "kind": "document",
@@ -68470,12 +68518,16 @@
         "en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design",
         "en/press-kits/skoda-peaq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Skoda_Peaq_Infographic_Exterior_4ea891f1.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Infographic_Exterior_4ea891f1.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Skoda_Peaq_Infographic_Exterior_4ea891f1.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Skoda_Peaq_Infographic_Exterior_4ea891f1.pdf",
+        "mime": "application/pdf",
+        "bytes": 655258
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -68483,15 +68535,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Infographic_Exterior_4ea891f1.pdf"
       ],
-      "bytes": null,
+      "bytes": 655258,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:34.642Z"
     },
     "9f34d7bf__Skoda_Peaq_Seven_seat_configuration_a5e24f86.pdf": {
       "kind": "document",
@@ -68503,12 +68559,16 @@
         "en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design",
         "en/press-kits/skoda-peaq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Skoda_Peaq_Seven_seat_configuration_a5e24f86.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Peaq_Seven_seat_configuration_a5e24f86.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Skoda_Peaq_Seven_seat_configuration_a5e24f86.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Skoda_Peaq_Seven_seat_configuration_a5e24f86.pdf",
+        "mime": "application/pdf",
+        "bytes": 976931
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -68516,15 +68576,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Peaq_Seven_seat_configuration_a5e24f86.pdf"
       ],
-      "bytes": null,
+      "bytes": 976931,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:36.410Z"
     },
     "c0387e27__Peaq_colours_EN_ea6229cc.mp4": {
       "kind": "video",
@@ -68569,12 +68633,16 @@
         "en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design",
         "en/press-kits/skoda-peaq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Skoda_Peaq_Infographic_Aerodynamics_299d3aa4.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Infographic_Aerodynamics_299d3aa4.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Skoda_Peaq_Infographic_Aerodynamics_299d3aa4.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Skoda_Peaq_Infographic_Aerodynamics_299d3aa4.pdf",
+        "mime": "application/pdf",
+        "bytes": 2405970
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -68582,15 +68650,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Infographic_Aerodynamics_299d3aa4.pdf"
       ],
-      "bytes": null,
+      "bytes": 2405970,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:41.083Z"
     },
     "9f34d7bf__Press_kit_Skoda_Peaq_Media_Launch_Exterior_7fecd07c.pdf": {
       "kind": "document",
@@ -68601,12 +68673,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Press_kit_Skoda_Peaq_Media_Launch_Exterior_7fecd07c.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Exterior_7fecd07c.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Press_kit_Skoda_Peaq_Media_Launch_Exterior_7fecd07c.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Press_kit_Skoda_Peaq_Media_Launch_Exterior_7fecd07c.pdf",
+        "mime": "application/pdf",
+        "bytes": 173209
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -68614,15 +68690,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Exterior_7fecd07c.pdf"
       ],
-      "bytes": null,
+      "bytes": 173209,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:42.750Z"
     },
     "9f34d7bf__Skoda_Peaq_Five_seat_configuration_1f9de5f3.pdf": {
       "kind": "document",
@@ -68633,12 +68713,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Skoda_Peaq_Five_seat_configuration_1f9de5f3.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Peaq_Five_seat_configuration_1f9de5f3.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Skoda_Peaq_Five_seat_configuration_1f9de5f3.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/Skoda_Peaq_Five_seat_configuration_1f9de5f3.pdf",
+        "mime": "application/pdf",
+        "bytes": 967296
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -68646,15 +68730,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Peaq_Five_seat_configuration_1f9de5f3.pdf"
       ],
-      "bytes": null,
+      "bytes": 967296,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:47.050Z"
     },
     "c0387e27__Skoda_Peaq_Infographic_-Interior_Suite_Ceramique_39192b4e.pdf": {
       "kind": "document",
@@ -68666,12 +68754,16 @@
         "en/press-kits/skoda-peaq-press-kit-2/infographics",
         "en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Infographic_-Interior_Suite_Ceramique_39192b4e.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Infographic_-Interior_Suite_Ceramique_39192b4e.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Infographic_-Interior_Suite_Ceramique_39192b4e.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Infographic_-Interior_Suite_Ceramique_39192b4e.pdf",
+        "mime": "application/pdf",
+        "bytes": 685738
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -68679,15 +68771,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Infographic_-Interior_Suite_Ceramique_39192b4e.pdf"
       ],
-      "bytes": null,
+      "bytes": 685738,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:49.476Z"
     },
     "c0387e27__Skoda_Peaq_Infographic_Relax_Package_0987cefb.pdf": {
       "kind": "document",
@@ -68699,12 +68795,16 @@
         "en/press-kits/skoda-peaq-press-kit-2/infographics",
         "en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Infographic_Relax_Package_0987cefb.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Infographic_Relax_Package_0987cefb.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Infographic_Relax_Package_0987cefb.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Infographic_Relax_Package_0987cefb.pdf",
+        "mime": "application/pdf",
+        "bytes": 679119
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -68712,15 +68812,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Infographic_Relax_Package_0987cefb.pdf"
       ],
-      "bytes": null,
+      "bytes": 679119,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:51.388Z"
     },
     "9f34d7bf__Skoda_Peaq_Six_equipment_packages_dea2a5f9.pdf": {
       "kind": "document",
@@ -68732,12 +68836,16 @@
         "en/press-kits/skoda-peaq-press-kit-2/infographics",
         "en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Six_equipment_packages_dea2a5f9.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Peaq_Six_equipment_packages_dea2a5f9.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Six_equipment_packages_dea2a5f9.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Six_equipment_packages_dea2a5f9.pdf",
+        "mime": "application/pdf",
+        "bytes": 786292
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -68745,15 +68853,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Peaq_Six_equipment_packages_dea2a5f9.pdf"
       ],
-      "bytes": null,
+      "bytes": 786292,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:54.007Z"
     },
     "9f34d7bf__Skoda_Peaq_Simply_Clever_and_practical_innovations_cf69b02a.pdf": {
       "kind": "document",
@@ -68765,12 +68877,16 @@
         "en/press-kits/skoda-peaq-press-kit-2/infographics",
         "en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Simply_Clever_and_practical_innovations_cf69b02a.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Peaq_Simply_Clever_and_practical_innovations_cf69b02a.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Simply_Clever_and_practical_innovations_cf69b02a.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Simply_Clever_and_practical_innovations_cf69b02a.pdf",
+        "mime": "application/pdf",
+        "bytes": 2625356
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -68778,15 +68894,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Peaq_Simply_Clever_and_practical_innovations_cf69b02a.pdf"
       ],
-      "bytes": null,
+      "bytes": 2625356,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:15:56.259Z"
     },
     "c0387e27__Skoda_Peaq_Sportline_Infographic_Exterior_22a35fec.pdf": {
       "kind": "document",
@@ -68798,12 +68918,16 @@
         "en/press-kits/skoda-peaq-press-kit-2/infographics",
         "en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Sportline_Infographic_Exterior_22a35fec.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Sportline_Infographic_Exterior_22a35fec.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Sportline_Infographic_Exterior_22a35fec.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/infographics/Skoda_Peaq_Sportline_Infographic_Exterior_22a35fec.pdf",
+        "mime": "application/pdf",
+        "bytes": 666929
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -68811,15 +68935,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Sportline_Infographic_Exterior_22a35fec.pdf"
       ],
-      "bytes": null,
+      "bytes": 666929,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:00.472Z"
     },
     "9f34d7bf__Press_kit_Skoda_Peaq_Media_Launch_Interior_1a08eb4e.pdf": {
       "kind": "document",
@@ -68830,12 +68958,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot/Press_kit_Skoda_Peaq_Media_Launch_Interior_1a08eb4e.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Interior_1a08eb4e.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot/Press_kit_Skoda_Peaq_Media_Launch_Interior_1a08eb4e.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot/Press_kit_Skoda_Peaq_Media_Launch_Interior_1a08eb4e.pdf",
+        "mime": "application/pdf",
+        "bytes": 187126
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -68843,15 +68975,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Interior_1a08eb4e.pdf"
       ],
-      "bytes": null,
+      "bytes": 187126,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:02.539Z"
     },
     "9f34d7bf__Press_kit_Skoda_Peaq_Media_Launch_Safety_296db219.pdf": {
       "kind": "document",
@@ -68862,12 +68998,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/safety-a-comprehensive-suite-of-active-and-passive-safety-systems"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/safety-a-comprehensive-suite-of-active-and-passive-safety-systems/Press_kit_Skoda_Peaq_Media_Launch_Safety_296db219.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Safety_296db219.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/safety-a-comprehensive-suite-of-active-and-passive-safety-systems/Press_kit_Skoda_Peaq_Media_Launch_Safety_296db219.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/safety-a-comprehensive-suite-of-active-and-passive-safety-systems/Press_kit_Skoda_Peaq_Media_Launch_Safety_296db219.pdf",
+        "mime": "application/pdf",
+        "bytes": 157221
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -68875,47 +69015,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Safety_296db219.pdf"
       ],
-      "bytes": null,
+      "bytes": 157221,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
-    },
-    "728314ef__TD_Skoda_Peaq_en_70dd3efd.pdf": {
-      "kind": "document",
-      "logical_id": "728314ef__TD_Skoda_Peaq_en_70dd3efd.pdf",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/08/TD_Skoda_Peaq_en_70dd3efd.pdf",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/08/TD_Skoda_Peaq_en_70dd3efd.pdf",
-      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/technical-data",
-      "page_refs": [
-        "en/press-kits/skoda-peaq-press-kit-2/technical-data"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
-      "da_path": "",
-      "title": "Škoda Peaq",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/TD_Skoda_Peaq_en_70dd3efd.pdf"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
-        "da": "n/a"
-      },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:04.493Z"
     },
     "9f34d7bf__TD_Skoda_Peaq_en_70dd3efd.pdf": {
       "kind": "document",
@@ -68926,28 +69038,37 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/technical-data"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/technical-data/TD_Skoda_Peaq_en_70dd3efd.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/TD_Skoda_Peaq_en_70dd3efd.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/technical-data/TD_Skoda_Peaq_en_70dd3efd.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/technical-data/TD_Skoda_Peaq_en_70dd3efd.pdf",
+        "mime": "application/pdf",
+        "bytes": 164420
+      },
       "da_path": "",
       "title": "Technical data PDF download",
       "alt": "",
       "caption": "",
       "seen_urls": [
-        "https://www.skoda-storyboard.com/direct-download/2026/08/TD_Skoda_Peaq_en_70dd3efd.pdf"
+        "https://www.skoda-storyboard.com/direct-download/2026/08/TD_Skoda_Peaq_en_70dd3efd.pdf",
+        "https://cdn.skoda-storyboard.com/2026/08/TD_Skoda_Peaq_en_70dd3efd.pdf"
       ],
-      "bytes": null,
+      "bytes": 164420,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:06.349Z"
     },
     "728314ef__Press_kit_Skoda_Peaq_Media_Launch_a47652fe.pdf": {
       "kind": "document",
@@ -68958,12 +69079,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_a47652fe.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_a47652fe.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_a47652fe.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_a47652fe.pdf",
+        "mime": "application/pdf",
+        "bytes": 311053
+      },
       "da_path": "",
       "title": "Škoda Peaq – Press Kit",
       "alt": "",
@@ -68971,15 +69096,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_a47652fe.pdf"
       ],
-      "bytes": null,
+      "bytes": 311053,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:10.008Z"
     },
     "728314ef__Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf": {
       "kind": "document",
@@ -68990,12 +69119,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf",
+        "mime": "application/pdf",
+        "bytes": 172734
+      },
       "da_path": "",
       "title": "01 Introduction",
       "alt": "",
@@ -69003,15 +69136,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf"
       ],
-      "bytes": null,
+      "bytes": 172734,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:10.925Z"
     },
     "728314ef__Press_kit_Skoda_Peaq_Media_Launch_Exterior_7fecd07c.pdf": {
       "kind": "document",
@@ -69022,12 +69159,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Exterior_7fecd07c.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Exterior_7fecd07c.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Exterior_7fecd07c.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Exterior_7fecd07c.pdf",
+        "mime": "application/pdf",
+        "bytes": 173209
+      },
       "da_path": "",
       "title": "02 Exterior",
       "alt": "",
@@ -69035,15 +69176,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Exterior_7fecd07c.pdf"
       ],
-      "bytes": null,
+      "bytes": 173209,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:14.082Z"
     },
     "728314ef__Press_kit_Skoda_Peaq_Media_Launch_Interior_1a08eb4e.pdf": {
       "kind": "document",
@@ -69054,12 +69199,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Interior_1a08eb4e.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Interior_1a08eb4e.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Interior_1a08eb4e.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Interior_1a08eb4e.pdf",
+        "mime": "application/pdf",
+        "bytes": 187126
+      },
       "da_path": "",
       "title": "03 Interior",
       "alt": "",
@@ -69067,15 +69216,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Interior_1a08eb4e.pdf"
       ],
-      "bytes": null,
+      "bytes": 187126,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:15.123Z"
     },
     "728314ef__Press_kit_Skoda_Peaq_Media_Launch_Powertrains_and_batteries_33668044.pdf": {
       "kind": "document",
@@ -69086,12 +69239,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Powertrains_and_batteries_33668044.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Powertrains_and_batteries_33668044.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Powertrains_and_batteries_33668044.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Powertrains_and_batteries_33668044.pdf",
+        "mime": "application/pdf",
+        "bytes": 178692
+      },
       "da_path": "",
       "title": "04 Battery and powertrain variants",
       "alt": "",
@@ -69099,15 +69256,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Powertrains_and_batteries_33668044.pdf"
       ],
-      "bytes": null,
+      "bytes": 178692,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:16.376Z"
     },
     "728314ef__Press_kit_Skoda_Peaq_Media_Launch_Safety_296db219.pdf": {
       "kind": "document",
@@ -69118,12 +69279,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Safety_296db219.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Safety_296db219.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Safety_296db219.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Safety_296db219.pdf",
+        "mime": "application/pdf",
+        "bytes": 157221
+      },
       "da_path": "",
       "title": "05 Safety and assistance systems",
       "alt": "",
@@ -69131,15 +69296,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Safety_296db219.pdf"
       ],
-      "bytes": null,
+      "bytes": 157221,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:17.464Z"
     },
     "728314ef__Press_kit_Skoda_Peaq_Media_Launch_Connectivity_92f92c3a.pdf": {
       "kind": "document",
@@ -69150,12 +69319,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Connectivity_92f92c3a.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Connectivity_92f92c3a.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Connectivity_92f92c3a.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Connectivity_92f92c3a.pdf",
+        "mime": "application/pdf",
+        "bytes": 187744
+      },
       "da_path": "",
       "title": "06 Connectivity",
       "alt": "",
@@ -69163,15 +69336,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Connectivity_92f92c3a.pdf"
       ],
-      "bytes": null,
+      "bytes": 187744,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:20.747Z"
     },
     "728314ef__Press_kit_Skoda_Peaq_Media_Launch_Sportline_71f55ba5.pdf": {
       "kind": "document",
@@ -69182,12 +69359,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Sportline_71f55ba5.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Sportline_71f55ba5.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Sportline_71f55ba5.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/texts/Press_kit_Skoda_Peaq_Media_Launch_Sportline_71f55ba5.pdf",
+        "mime": "application/pdf",
+        "bytes": 151625
+      },
       "da_path": "",
       "title": "07 Škoda Peaq Sportline",
       "alt": "",
@@ -69195,15 +69376,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Sportline_71f55ba5.pdf"
       ],
-      "bytes": null,
+      "bytes": 151625,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:21.795Z"
     },
     "9f34d7bf__Press_kit_Skoda_Peaq_Media_Launch_Sportline_71f55ba5.pdf": {
       "kind": "document",
@@ -69214,12 +69399,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out/Press_kit_Skoda_Peaq_Media_Launch_Sportline_71f55ba5.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Sportline_71f55ba5.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out/Press_kit_Skoda_Peaq_Media_Launch_Sportline_71f55ba5.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out/Press_kit_Skoda_Peaq_Media_Launch_Sportline_71f55ba5.pdf",
+        "mime": "application/pdf",
+        "bytes": 151625
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -69227,15 +69416,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Sportline_71f55ba5.pdf"
       ],
-      "bytes": null,
+      "bytes": 151625,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:24.056Z"
     },
     "9f34d7bf__Skoda_peaq_footage_innsbruck_v1-1440p_23903b04.mp4": {
       "kind": "video",
@@ -69502,12 +69695,16 @@
       "page_refs": [
         "en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_Exterior_highlights_Front_view_edb999d5.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2025/06/New_Enyaq_RS_Race_Exterior_highlights_Front_view_edb999d5.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_Exterior_highlights_Front_view_edb999d5.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_Exterior_highlights_Front_view_edb999d5.pdf",
+        "mime": "application/pdf",
+        "bytes": 1144559
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -69515,15 +69712,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2025/06/New_Enyaq_RS_Race_Exterior_highlights_Front_view_edb999d5.pdf"
       ],
-      "bytes": null,
+      "bytes": 1144559,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:26.234Z"
     },
     "9a41cde2__New_Enyaq_RS_Race_Exterior_highlights_Rear_view_7419b1a1.pdf": {
       "kind": "document",
@@ -69534,12 +69735,16 @@
       "page_refs": [
         "en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_Exterior_highlights_Rear_view_7419b1a1.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2025/06/New_Enyaq_RS_Race_Exterior_highlights_Rear_view_7419b1a1.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_Exterior_highlights_Rear_view_7419b1a1.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_Exterior_highlights_Rear_view_7419b1a1.pdf",
+        "mime": "application/pdf",
+        "bytes": 1145809
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -69547,15 +69752,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2025/06/New_Enyaq_RS_Race_Exterior_highlights_Rear_view_7419b1a1.pdf"
       ],
-      "bytes": null,
+      "bytes": 1145809,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:30.420Z"
     },
     "9a41cde2__New_Enyaq_RS_Race_x_New_Enyaq_Coupe_RS_9a12374e.pdf": {
       "kind": "document",
@@ -69566,12 +69775,16 @@
       "page_refs": [
         "en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_x_New_Enyaq_Coupe_RS_9a12374e.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2025/06/New_Enyaq_RS_Race_x_New_Enyaq_Coupe_RS_9a12374e.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_x_New_Enyaq_Coupe_RS_9a12374e.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_x_New_Enyaq_Coupe_RS_9a12374e.pdf",
+        "mime": "application/pdf",
+        "bytes": 1246688
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -69579,15 +69792,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2025/06/New_Enyaq_RS_Race_x_New_Enyaq_Coupe_RS_9a12374e.pdf"
       ],
-      "bytes": null,
+      "bytes": 1246688,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:34.742Z"
     },
     "9a41cde2__New_Enyaq_RS_Race_Sustainable_biocomposite_parts_28a6e66c.pdf": {
       "kind": "document",
@@ -69598,12 +69815,16 @@
       "page_refs": [
         "en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_Sustainable_biocomposite_parts_28a6e66c.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2025/06/New_Enyaq_RS_Race_Sustainable_biocomposite_parts_28a6e66c.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_Sustainable_biocomposite_parts_28a6e66c.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_Sustainable_biocomposite_parts_28a6e66c.pdf",
+        "mime": "application/pdf",
+        "bytes": 2345179
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -69611,15 +69832,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2025/06/New_Enyaq_RS_Race_Sustainable_biocomposite_parts_28a6e66c.pdf"
       ],
-      "bytes": null,
+      "bytes": 2345179,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:37.705Z"
     },
     "9a41cde2__New_Enyaq_RS_Race_Interior_4ca79bc0.pdf": {
       "kind": "document",
@@ -69630,12 +69855,16 @@
       "page_refs": [
         "en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_Interior_4ca79bc0.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2025/06/New_Enyaq_RS_Race_Interior_4ca79bc0.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_Interior_4ca79bc0.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_Interior_4ca79bc0.pdf",
+        "mime": "application/pdf",
+        "bytes": 1729706
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -69643,15 +69872,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2025/06/New_Enyaq_RS_Race_Interior_4ca79bc0.pdf"
       ],
-      "bytes": null,
+      "bytes": 1729706,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:40.563Z"
     },
     "9a41cde2__Press_Kit_New_Enyaq_RS_Race_7cc9cee5.pdf": {
       "kind": "document",
@@ -69662,12 +69895,16 @@
       "page_refs": [
         "en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/Press_Kit_New_Enyaq_RS_Race_7cc9cee5.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2025/06/Press_Kit_New_Enyaq_RS_Race_7cc9cee5.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/Press_Kit_New_Enyaq_RS_Race_7cc9cee5.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/Press_Kit_New_Enyaq_RS_Race_7cc9cee5.pdf",
+        "mime": "application/pdf",
+        "bytes": 187849
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -69675,15 +69912,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2025/06/Press_Kit_New_Enyaq_RS_Race_7cc9cee5.pdf"
       ],
-      "bytes": null,
+      "bytes": 187849,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:16:42.597Z"
     },
     "68eff613__Enyaq_RS_Race_Footage_aba539fd.mp4": {
       "kind": "video",
