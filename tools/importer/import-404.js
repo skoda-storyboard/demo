@@ -14,6 +14,7 @@
 
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
+import linksTransformer from './transformers/skoda-links.js';
 
 const parsers = {};
 
@@ -30,6 +31,7 @@ const PAGE_TEMPLATE = {
 const transformers = [
   cleanupTransformer,
   metadataTransformer,
+  linksTransformer,
 ];
 
 function executeTransformers(hookName, element, payload) {

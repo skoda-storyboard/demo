@@ -37,12 +37,19 @@
 }
 
 .embed .embed-video iframe,
+.embed .embed-video video,
 .embed .embed-audio iframe {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   border: 0;
+}
+
+/* Self-hosted file: letterbox a non-16:9 file inside the box rather than cropping it. */
+.embed .embed-video video {
+  object-fit: contain;
+  background: var(--skoda-black);
 }
 
 /* story body: share the text column's edges — the prose wrapper is capped at

@@ -322,3 +322,46 @@ test('table form: plain-text url cell works (no link)', () => {
   assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?feature=oembed&enablejsapi=1');
   assert.equal(iframe.getAttribute('title'), 'YouTube video');
 });
+
+// --- self-hosted video file (SKODA-801a: WordPress [video] shortcode) ---------
+
+test('self-hosted .mp4 renders a native <video> with the poster row, no iframe', () => {
+  const link = new El('a');
+  link.setAttribute('href', 'https://cdn.skoda-storyboard.com/2026/02/hero_16-9.mp4');
+  link.textContent = 'https://cdn.skoda-storyboard.com/2026/02/hero_16-9.mp4';
+  const img = new El('img');
+  img.setAttribute('src', './media_1234.jpg?width=750');
+  const block = buildTable([['url', link], ['poster', img]]);
+  decorate(block);
+  assert.equal(block.querySelector('iframe'), null);
+  const video = block.querySelector('video');
+  assert.ok(video, 'video element');
+  assert.equal(video.getAttribute('controls'), '');
+  assert.equal(video.getAttribute('preload'), 'metadata');
+  assert.equal(video.getAttribute('poster'), './media_1234.jpg?width=750');
+  assert.equal(video.getAttribute('aria-label'), 'Video');
+  const source = block.querySelector('source');
+  assert.equal(source.getAttribute('src'), 'https://cdn.skoda-storyboard.com/2026/02/hero_16-9.mp4');
+  assert.equal(source.getAttribute('type'), 'video/mp4');
+  assert.ok(block.classList.contains('embed-file'));
+  assert.equal(block.querySelector('.embed-video').style['--embed-ratio'], '16 / 9');
+});
+
+test('self-hosted .webm: poster as a plain URL cell, title row as the accessible name', () => {
+  const block = buildTable([
+    ['url', 'https://cdn.example.com/v/clip.webm'],
+    ['poster', 'https://cdn.example.com/v/clip.jpg'],
+    ['title', 'Škoda x AirConsole'],
+  ]);
+  decorate(block);
+  const video = block.querySelector('video');
+  assert.equal(video.getAttribute('poster'), 'https://cdn.example.com/v/clip.jpg');
+  assert.equal(video.getAttribute('aria-label'), 'Škoda x AirConsole');
+  assert.equal(block.querySelector('source').getAttribute('type'), 'video/webm');
+});
+
+test('self-hosted video without a poster row has no poster attribute', () => {
+  const block = buildEmbed('https://cdn.example.com/v/clip.mp4');
+  decorate(block);
+  assert.equal(block.querySelector('video').getAttribute('poster'), null);
+});

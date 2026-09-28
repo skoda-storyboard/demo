@@ -17,6 +17,15 @@ function withCaption(node, caption, document) {
   return figure;
 }
 
+// Teaser and card thumbnails carry the linked article's excerpt in data-caption
+// (mirrored in data-video_title). That is card copy, not an editorial caption.
+function editorialCaption(node) {
+  if (!node) return '';
+  const caption = (node.getAttribute('data-caption') || '').trim();
+  if (!caption || node.closest('.article-teaser, .media-cart-image')) return '';
+  return caption === (node.getAttribute('data-video_title') || '').trim() ? '' : caption;
+}
+
 function imageContainer(img, document, link = null) {
   const div = document.createElement('div');
   div.append(img);
@@ -63,8 +72,9 @@ export default function normalizeImages(root, document = root.ownerDocument) {
     const figure = img.closest('figure');
     const wrapper = img.closest('[data-caption]');
     const wrapperCaption = wrapper?.querySelectorAll('img').length === 1
-      ? wrapper.getAttribute('data-caption') : '';
-    const caption = (img.getAttribute('data-caption') || wrapperCaption || '').trim();
+      ? editorialCaption(wrapper) : '';
+    const caption = (img.hasAttribute('data-caption')
+      ? editorialCaption(img) : '') || wrapperCaption;
     if (figure) {
       if (img.parentElement.tagName !== 'DIV') {
         const div = document.createElement('div');

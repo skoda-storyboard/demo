@@ -3,9 +3,30 @@
     {
       "name": "model-page",
       "urls": [
-        "https://www.skoda-storyboard.com/en/skoda-model/elroq/"
+        "https://www.skoda-storyboard.com/en/skoda-model/elroq/",
+        "https://www.skoda-storyboard.com/en/skoda-model/enyaq-iv-2/",
+        "https://www.skoda-storyboard.com/en/skoda-model/epiq/",
+        "https://www.skoda-storyboard.com/en/skoda-model/kamiq/",
+        "https://www.skoda-storyboard.com/en/skoda-model/karoq-6/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-fabia/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-superb/",
+        "https://www.skoda-storyboard.com/en/skoda-model/octavia/",
+        "https://www.skoda-storyboard.com/en/skoda-model/peaq/",
+        "https://www.skoda-storyboard.com/en/skoda-model/scala/",
+        "https://www.skoda-storyboard.com/en/skoda-model/elroq/elroq-rs/",
+        "https://www.skoda-storyboard.com/en/skoda-model/elroq/elroq-sportline/",
+        "https://www.skoda-storyboard.com/en/skoda-model/enyaq-iv-2/enyaq-rs/",
+        "https://www.skoda-storyboard.com/en/skoda-model/enyaq-iv-2/enyaq-sportline-iv/",
+        "https://www.skoda-storyboard.com/en/skoda-model/karoq-6/karoq-sportline/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/kodiaq-rs/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/new-kodiaq-iv/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/new-kodiaq-sportline/",
+        "https://www.skoda-storyboard.com/en/skoda-model/new-superb/new-superb-iv/",
+        "https://www.skoda-storyboard.com/en/skoda-model/octavia/octavia-rs/",
+        "https://www.skoda-storyboard.com/en/skoda-model/octavia/octavia-sportline/"
       ],
-      "description": "Škoda model page (skoda_model CPT, Media Room side). Full-bleed hero (model image + 'Models' chip + model-name h1 overlay) -> 9-anchor in-page icon nav -> Model Description rich text -> Key Facts (Highlights) cards -> Technical Data spec table -> 6 index-driven rails (Bodywork/Derivatives + News/Press Kits/Stories/Images/Videos 'Based on tags: <model>'). Spec: docs/ui-specs/template-model-page.md; content model T3 (SKODA-TEMPLATE-CONTENT-MODELS.md); ticket SKODA-208.",
+      "description": "Škoda model page (skoda_model CPT, Media Room side): 22 EN pages, 11 models + 11 derivatives (source skoda_model-sitemap.xml). Hero Image (overlay) (image + 'Models' chip + model-name h1) -> section-link list (default content, links only to emitted headings) -> Model Description (editor widgets, default content) -> Cards (key-facts) -> Technical Data (band image + Columns stat grid + PDF link) -> up to 6 index-driven Story Rails (Bodywork/Derivatives by path; News/Press Kits/Stories/Images/Videos by the page's model/bodywork/derivative filter). Widgets located by class (their #intro/#keyfacts/#techdata ids are missing on some pages); in-page-nav parses last. Spec: docs/ui-specs/template-model-page.md; ticket SKODA-208.",
       "blocks": [
         {
           "name": "hero",
@@ -14,21 +35,15 @@
           ]
         },
         {
-          "name": "in-page-nav",
-          "instances": [
-            "nav.model-nav, .model-nav"
-          ]
-        },
-        {
           "name": "key-facts",
           "instances": [
-            "#keyfacts .so-widget-ys-so-widget-highlights"
+            ".so-widget-ys-so-widget-highlights"
           ]
         },
         {
           "name": "spec-table",
           "instances": [
-            "#techdata .so-widget-ys-so-widget-techdata"
+            ".so-widget-ys-so-widget-techdata"
           ]
         },
         {
@@ -40,6 +55,12 @@
             "#stories .search-results-container",
             "#images .search-results-container",
             "#videos .search-results-container"
+          ]
+        },
+        {
+          "name": "in-page-nav",
+          "instances": [
+            ".model-nav"
           ]
         }
       ],
@@ -58,7 +79,7 @@
         },
         {
           "id": "section-2",
-          "name": "In-page nav",
+          "name": "Section nav",
           "selector": [
             ".model-nav"
           ],
@@ -72,20 +93,19 @@
           "id": "section-3",
           "name": "Model Description",
           "selector": [
-            "#intro"
+            ".so-panel.widget_sow-editor"
           ],
           "style": null,
           "blocks": [],
           "defaultContent": [
-            "#intro h2",
-            "#intro p"
+            ".so-widget-sow-editor"
           ]
         },
         {
           "id": "section-4",
           "name": "Key Facts",
           "selector": [
-            "#keyfacts"
+            ".so-panel.widget_ys-so-widget-highlights"
           ],
           "style": null,
           "blocks": [
@@ -97,7 +117,7 @@
           "id": "section-5",
           "name": "Technical Data",
           "selector": [
-            "#techdata"
+            ".so-panel.widget_ys-so-widget-techdata"
           ],
           "style": null,
           "blocks": [
@@ -184,7 +204,7 @@
       "urls": [
         "https://www.skoda-storyboard.com/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/"
       ],
-      "description": "Škoda press release detail (press_release CPT, Media Room side). No hero: header (span.entry-published date + h1.entry-title) -> primary column default content (article-teaser lead image, .bullet-points inline list, .entry-summary lead, .entry-content body) -> secondary Gallery (section.images.sa-media-kit-preview) -> Tags (ol.entry-tags) -> full-bleed dark related band (div.cover-box.dark div.search-results.media-box) parsed as Downloads. AI-audio (Buzzsprout) embed + newsletter/banner widgets are removed by skoda-press-release-cleanup (Embeds → SKODA-204). Spec: docs/ui-specs/template-press-release.md; content model T15; tickets SKODA-601/607. Detection is content-driven only.",
+      "description": "Škoda press release detail (press_release CPT, Media Room side), SKODA-607. No hero. skoda-press-release-layout rebuilds the article into 5 sections: header (date <p> + h1) -> body-column (lead image, .bullet-points as <ul>, .entry-summary perex as <p><strong>, Buzzsprout + inline Vimeo as bare URLs, .entry-content body) -> sidebar (Additional info list, Gallery (preview) from section.images.sa-media-kit-preview, Tags from section.tags, each with an h3) -> dark Media Box band (heading + stats + Downloads from .search-results.media-box) -> optional dark Related Press Releases band (heading + 'Based on tags' + All link + curated Story Rail (press)). Newsletter/banner widgets removed by skoda-press-release-cleanup. Spec: docs/ui-specs/template-press-release.md; contracts gallery-preview, story-rail-press, downloads-file-rows, press-release-sections. Detection is content-driven only.",
       "blocks": [
         {
           "name": "gallery",
@@ -201,42 +221,82 @@
         {
           "name": "downloads",
           "instances": [
-            ".cover-box.dark .search-results.media-box, .search-results.media-box"
+            ".search-results.media-box"
           ]
         }
       ],
       "sections": [
         {
-          "id": "section-1",
-          "name": "Article",
+          "id": "header",
+          "name": "Header",
           "selector": [
-            "article.press_release > .container, article.press_release"
+            "article.press_release > .container > header"
           ],
           "style": null,
-          "blocks": [
-            "gallery",
-            "tags"
-          ],
+          "blocks": [],
           "defaultContent": [
             "header .entry-published",
-            "header .entry-title",
-            ".column-primary .article-teaser",
+            "header .entry-title"
+          ]
+        },
+        {
+          "id": "body",
+          "name": "Body column",
+          "selector": [
+            "article.press_release .column-primary"
+          ],
+          "style": "body-column",
+          "blocks": [],
+          "defaultContent": [
+            ".column-primary .article-teaser img",
             ".column-primary .bullet-points",
             ".column-primary .entry-summary",
             ".column-primary .entry-content"
           ]
         },
         {
-          "id": "section-2",
-          "name": "Related Media",
+          "id": "sidebar",
+          "name": "Sidebar",
           "selector": [
-            ".cover-box.dark"
+            "article.press_release .column-secondary"
           ],
-          "style": "dark, full-width",
+          "style": "sidebar",
+          "blocks": [
+            "gallery",
+            "tags"
+          ],
+          "defaultContent": [
+            ".column-secondary section > .menu"
+          ]
+        },
+        {
+          "id": "media-box",
+          "name": "Media Box",
+          "selector": [
+            ".cover-box.dark .search-results.media-box"
+          ],
+          "style": "dark, full-width, media-box",
           "blocks": [
             "downloads"
           ],
-          "defaultContent": []
+          "defaultContent": [
+            ".search-results-heading",
+            ".search-results-stats .stats"
+          ]
+        },
+        {
+          "id": "related",
+          "name": "Related Press Releases",
+          "selector": [
+            ".cover-box.dark .search-results.type-press_release"
+          ],
+          "style": "dark, full-width, related",
+          "blocks": [
+            "story-rail"
+          ],
+          "defaultContent": [
+            ".search-results-header"
+          ]
         }
       ]
     },
@@ -323,7 +383,8 @@
     {
       "name": "category-archive",
       "urls": [
-        "https://www.skoda-storyboard.com/en/category/emobility/"
+        "https://www.skoda-storyboard.com/en/category/emobility/",
+        "https://www.skoda-storyboard.com/en/tag/model/enyaq/"
       ],
       "description": "Škoda category/tag ARCHIVE listing (body.archive, e.g. /en/category/emobility/ and /en/tag/model/elroq/). Hero banner (div.hero, tag/model adds a CTA overlay) -> index-driven facet-less Listing over div.search-results.archive-results (scope derived from the page canonical URL). No facet engine (distinct from pr-listing). Metadata template=page. Spec: docs/ui-specs/template-category-archive.md; content models T7/T8; ticket SKODA-209. Content-driven detection only.",
       "metadata": {
@@ -331,7 +392,7 @@
       },
       "blocks": [
         {
-          "name": "hero-banner",
+          "name": "archive-hero",
           "instances": [
             "div.hero"
           ]
@@ -352,7 +413,7 @@
           ],
           "style": null,
           "blocks": [
-            "hero-banner"
+            "archive-hero"
           ],
           "defaultContent": []
         },
@@ -526,12 +587,26 @@
     {
       "name": "series-hub",
       "urls": [
-        "https://www.skoda-storyboard.com/en/series/125-years-of-motorsport/"
+        "https://www.skoda-storyboard.com/en/series/125-years-of-motorsport/",
+        "https://www.skoda-storyboard.com/en/series/130-years/",
+        "https://www.skoda-storyboard.com/en/series/roads-places/",
+        "https://www.skoda-storyboard.com/en/series/unexpected-jobs/",
+        "https://www.skoda-storyboard.com/en/series/minutes-from-car-production/",
+        "https://www.skoda-storyboard.com/en/series/road-trip/",
+        "https://www.skoda-storyboard.com/en/series/winter-tips/",
+        "https://www.skoda-storyboard.com/en/series/back-to-the-past/",
+        "https://www.skoda-storyboard.com/en/series/unknown-parts/",
+        "https://www.skoda-storyboard.com/en/series/hidden-helpers/",
+        "https://www.skoda-storyboard.com/en/series/czech-footprint/",
+        "https://www.skoda-storyboard.com/en/series/sustainable-mobility/",
+        "https://www.skoda-storyboard.com/en/series/my-life-my-car/",
+        "https://www.skoda-storyboard.com/en/series/evolution-of-parts/",
+        "https://www.skoda-storyboard.com/en/series/60-seconds-walkaround/"
       ],
-      "description": "Škoda Series hub (single-skoda_series). Overlay hero (title + perex) + index-driven Listing of the series' stories (series-grid.js detects the hub from data-content-type=Story, tags=<slug> from canonical). SSR cards not ported. Metadata template=skoda_series (body-class signal). Spec: docs/ui-specs/series.md; SKODA-207.",
+      "description": "Škoda Series hub (single-skoda_series). Hero Image (overlay): SERIES badge, H1, standfirst (series-hero.js). The authored tile mosaic as Cards (overlay, tiles), contract cards-tiles v2 (series-grid.js): one row per source tile in DOM order, Story and Press Kits kept, size token from the SiteOrigin row share + ratio class, `end` on a short row. No index, tags or sort. Metadata template=skoda_series (body-class signal). Spec: docs/ui-specs/series.md; SKODA-207.",
       "blocks": [
         {
-          "name": "hero-banner",
+          "name": "series-hero",
           "instances": [
             "div.hero"
           ]
@@ -552,7 +627,7 @@
           ],
           "style": null,
           "blocks": [
-            "hero-banner"
+            "series-hero"
           ],
           "defaultContent": []
         },
@@ -675,7 +750,19 @@
     {
       "name": "story-detail",
       "urls": [
-        "https://www.skoda-storyboard.com/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/"
+        "https://www.skoda-storyboard.com/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/",
+        "https://www.skoda-storyboard.com/en/emobility/a-true-czech-from-spain/",
+        "https://www.skoda-storyboard.com/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries/",
+        "https://www.skoda-storyboard.com/en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan/",
+        "https://www.skoda-storyboard.com/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia/",
+        "https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/",
+        "https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/",
+        "https://www.skoda-storyboard.com/en/emobility/skoda-peaq-unparalleled-space-and-comfort/",
+        "https://www.skoda-storyboard.com/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq/",
+        "https://www.skoda-storyboard.com/en/emobility/the-skoda-peaq-will-win-you-over-fast/",
+        "https://www.skoda-storyboard.com/en/lifestyle/chainsaws-and-sparklers-discover-the-traditions-of-rally-fans/",
+        "https://www.skoda-storyboard.com/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling/",
+        "https://www.skoda-storyboard.com/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator/"
       ],
       "description": "Škoda story detail (single-post + SiteOrigin), LINEAR FLATTEN. Hero banner + primary .content rich text flattened to default content; .sidebar + floating social dropped (skoda-story-cleanup). In-body galleries/embeds/Media Box deferred to SKODA-801/814/604. Metadata template=story. Spec: docs/ui-specs/story-detail.md; SKODA-604/801.",
       "blocks": [

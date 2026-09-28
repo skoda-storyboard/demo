@@ -11,11 +11,12 @@
  *     [--dam-base https://author-p220607-e2281243.adobeaemcloud.com] \
  *     [--dam-folder /content/dam/storyboard] \
  *     [--da-archive] [--org skoda-storyboard --repo demo] \
- *     [--concurrency 4] [--dry-run] [--force] [--limit N]
+ *     [--concurrency 4] [--dry-run] [--force] [--limit N] [--min-image-edge 768]
  *
  * Per distinct LOGICAL image (path-qualified id, F3) referenced by the pages:
  *   1. dedup to the logical master; first PAGE that references it owns the DAM folder
- *   2. pickIngestUrl → DELIVERY rendition (master, or a sized derivative if >10MB, F4)
+ *   2. pickIngestUrl → DELIVERY rendition (master, or a sized derivative if >10MB,
+ *      never under --min-image-edge px on the long edge, F4)
  *   3. fetch the ORIGINAL master bytes (server-side; no CORS)
  *   4. upload the ORIGINAL to the AEM DAM at /content/dam/storyboard/<page-path>/<file>
  *   5. (optional --da-archive) also self-host in DA for CDN-independence
@@ -31,9 +32,10 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 import {
-  isImageUrl, masterUrl, logicalId, daPathFor, damPathFor, pagePathFromFile, isAspectCrop,
+  isImageUrl, isDocumentUrl, cleanUrl, masterUrl, logicalId, daPathFor, damPathFor,
+  pagePathFromFile, isAspectCrop,
   pickIngestUrl, headBytes, fetchBinary, uploadToDA, uploadToDAM, setDamMetadata, resolveDamToken,
-  needsMediaBuild, OVERSIZE_BYTES,
+  needsMediaBuild, stepDownTooSmall, renditionEdge, OVERSIZE_BYTES, MIN_RENDITION_EDGE,
 } from './media-lib.mjs';
 
 const WORKSPACE = process.env.WORKSPACE_PATH || process.cwd();
@@ -57,6 +59,7 @@ function parseArgs() {
     fromManifest: false,
     idsFile: '',
     limit: Infinity,
+    minEdge: MIN_RENDITION_EDGE,
   };
   for (let i = 0; i < args.length; i += 1) {
     const a = args[i];
@@ -81,6 +84,7 @@ function parseArgs() {
     if (a === '--token-file') { out.tokenFile = val; i += 1; continue; }
     if (a === '--concurrency') { out.concurrency = Math.max(1, Number(val) || 1); i += 1; continue; }
     if (a === '--limit') { out.limit = Number(val); i += 1; continue; }
+    if (a === '--min-image-edge') { out.minEdge = renditionEdge(val); i += 1; continue; }
     throw new Error(`Unexpected argument: ${a}`);
   }
   if (out.pages.length === 0 && !out.fromManifest) {
@@ -105,6 +109,20 @@ function extractImageRefs(html) {
     const src = attr(tag, 'src');
     if (!src) continue;
     refs.push({ url: src, alt: attr(tag, 'alt'), caption: attr(tag, 'data-caption') });
+  }
+  return refs;
+}
+
+/** Extract linked-document refs (<a href="….pdf">title</a>) from imported .plain.html. */
+function extractDocumentRefs(html) {
+  const refs = [];
+  const linkRe = /<a\b[^>]*\shref="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+  let m;
+  // eslint-disable-next-line no-cond-assign
+  while ((m = linkRe.exec(html)) !== null) {
+    const url = m[1].replace(/&amp;/g, '&');
+    if (!isDocumentUrl(url)) continue;
+    refs.push({ url, title: m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() });
   }
   return refs;
 }
@@ -158,9 +176,12 @@ async function main() {
     // store). Reuses each row's own dam_page_path/alt so foldering is unchanged.
     for (const row of Object.values(manifest.rows || {})) {
       const src = row.source_url;
-      if (!src || !isImageUrl(src)) continue;
+      const isDocument = row.kind === 'document';
+      if (!src || !(isDocument ? isDocumentUrl(src) : isImageUrl(src))) continue;
       const id = row.logical_id || logicalId(src);
       byLogical.set(id, {
+        kind: isDocument ? 'document' : 'image',
+        title: row.title || '',
         sourceUrl: src,
         alt: row.alt || '',
         caption: row.caption || '',
@@ -189,9 +210,31 @@ async function main() {
           if (!existing.caption && ref.caption) existing.caption = ref.caption;
         } else {
           byLogical.set(id, {
+            kind: 'image',
             sourceUrl: ref.url,
             alt: ref.alt,
             caption: ref.caption,
+            seenUrls: new Set([ref.url]),
+            ownerPage: pagePath,
+            pageRefs: new Set([pagePath]),
+          });
+        }
+      }
+      for (const ref of extractDocumentRefs(html)) {
+        if (!/^https?:\/\//i.test(ref.url)) continue;
+        const id = logicalId(ref.url);
+        const existing = byLogical.get(id);
+        if (existing) {
+          existing.seenUrls.add(ref.url);
+          existing.pageRefs.add(pagePath);
+          if (!existing.title && ref.title) existing.title = ref.title;
+        } else {
+          byLogical.set(id, {
+            kind: 'document',
+            title: ref.title,
+            sourceUrl: ref.url,
+            alt: '',
+            caption: '',
             seenUrls: new Set([ref.url]),
             ownerPage: pagePath,
             pageRefs: new Set([pagePath]),
@@ -233,10 +276,100 @@ async function main() {
     done: 0, skipped: 0, failed: 0, precond: 0,
   };
 
+  // A linked document (PDF, SKODA-208) is tracked for the DAM only: no delivery rendition
+  // (the page keeps its source link), no DA archive. Delivery-only runs record the row
+  // (dam: n/a); a --dam-base run uploads the original PDF under the page-mirrored path.
+  async function processDocument(id, info, prior) {
+    const pagePath = (prior && prior.dam_page_path) || info.ownerPage;
+    const damAssetPath = damConfig ? damPathFor(info.sourceUrl, { damFolder: cfg.damFolder, pagePath }) : '';
+    const storedInDam = prior?.steps?.dam === 'done' && (!cfg.force || !damConfig);
+    let damStep = prior?.steps?.dam || 'n/a';
+    if (damConfig) damStep = storedInDam ? 'done' : 'pending';
+    const row = {
+      ...prior,
+      kind: 'document',
+      logical_id: id,
+      source_url: info.sourceUrl,
+      master_url: cleanUrl(info.sourceUrl),
+      dam_page_path: pagePath,
+      page_refs: [...new Set([...(prior?.page_refs || []), ...info.pageRefs])],
+      dam_asset_path: storedInDam ? prior.dam_asset_path : '',
+      dam_original_url: storedInDam ? prior.dam_original_url : '',
+      original_download_url: '',
+      delivery_url: '',
+      da_path: '',
+      title: info.title || prior?.title || '',
+      alt: '',
+      caption: '',
+      seen_urls: [...new Set([...(prior?.seen_urls || []), ...info.seenUrls])],
+      bytes: prior?.bytes ?? null,
+      steps: { deliver: 'n/a', dam: damStep, da: 'n/a' },
+      status: 'pending',
+      note: '',
+    };
+
+    if (cfg.dryRun) {
+      const bytes = damConfig && damStep !== 'done' ? await headBytes(row.master_url) : null;
+      const unavailable = damConfig && damStep !== 'done' && !(Number.isFinite(bytes) && bytes > 0);
+      if (unavailable) counts.failed += 1;
+      console.log(`  · ${id}  document${unavailable ? ' [original unavailable]' : ''} → DAM ${damAssetPath || '(n/a)'}`);
+      return;
+    }
+
+    try {
+      if (damConfig && row.steps.dam !== 'done') {
+        const got = await fetchBinary(row.master_url);
+        if (!got.bytes || !/^application\/pdf/i.test(got.contentType)) {
+          throw new Error(`Original is not a non-empty PDF: ${row.master_url}`);
+        }
+        row.bytes = got.bytes;
+        row.dam_original_url = row.master_url;
+        const dam = await uploadToDAM({
+          damConfig,
+          damPath: damAssetPath,
+          buffer: got.buffer,
+          contentType: got.contentType,
+          token: damToken,
+        });
+        row.dam_status = dam.status;
+        if (dam.ok) {
+          row.steps.dam = 'done';
+          row.dam_asset_path = damAssetPath;
+          const metadata = await setDamMetadata({
+            damConfig,
+            damPath: damAssetPath,
+            token: damToken,
+            metadata: {
+              originUrl: row.master_url, alt: '', title: row.title, sourcePage: pagePath,
+            },
+          });
+          if (!metadata.ok) row.note = `DAM provenance metadata ${metadata.status}`;
+        } else {
+          row.steps.dam = 'error';
+          row.note = `DAM ${dam.status}: ${(dam.body || '').slice(0, 100)}`;
+        }
+      }
+      const allOk = !damConfig || row.steps.dam === 'done';
+      row.status = allOk ? 'done' : 'partial';
+      if (allOk) counts.done += 1; else counts.failed += 1;
+      console.log(`  ${allOk ? '✓' : '⚠'} ${id}  document → ${row.dam_asset_path ? `DAM:${row.dam_asset_path}` : 'tracked (DAM pending)'}`);
+    } catch (err) {
+      row.status = 'partial';
+      if (damConfig) row.steps.dam = 'error';
+      row.note = String(err.message || err);
+      counts.failed += 1;
+      console.error(`  ✗ ${id}  ${row.note}`);
+    }
+    manifest.rows[id] = row;
+    flush();
+  }
+
   async function processOne(id) {
     const info = byLogical.get(id);
     const prior = manifest.rows[id];
-    if (!needsMediaBuild(prior, { dam: !!damConfig, da: cfg.daArchive, force: cfg.force })) {
+    if (!needsMediaBuild(prior, {
+      dam: !!damConfig, da: cfg.daArchive, force: cfg.force, minEdge: cfg.minEdge,
+    })) {
       const priorRefs = prior.page_refs || [prior.dam_page_path].filter(Boolean);
       const pageRefs = [...new Set([...priorRefs, ...info.pageRefs])];
       const seenUrls = [...new Set([...(prior.seen_urls || []), ...info.seenUrls])];
@@ -254,11 +387,16 @@ async function main() {
       counts.skipped += 1;
       return;
     }
+    if (info.kind === 'document') {
+      await processDocument(id, info, prior);
+      return;
+    }
 
     const pagePath = (prior && prior.dam_page_path) || info.ownerPage;
     const damAssetPath = damConfig ? damPathFor(info.sourceUrl, { damFolder: cfg.damFolder, pagePath }) : '';
     const delivered = prior?.steps?.deliver === 'done' && !cfg.force
-      && Number.isFinite(prior.bytes) && prior.bytes <= OVERSIZE_BYTES;
+      && Number.isFinite(prior.bytes) && prior.bytes <= OVERSIZE_BYTES
+      && !stepDownTooSmall(prior, cfg.minEdge);
     const storedInDam = prior?.steps?.dam === 'done' && (!cfg.force || !damConfig);
     const archivedInDa = prior?.steps?.da === 'done' && (!cfg.force || !cfg.daArchive);
     let damStep = prior?.steps?.dam || 'n/a';
@@ -303,7 +441,7 @@ async function main() {
       try {
         const pick = row.steps.deliver === 'done'
           ? { ok: true, reason: 'already delivered', preconditioned: row.preconditioned }
-          : await pickIngestUrl(info.sourceUrl);
+          : await pickIngestUrl(info.sourceUrl, { minEdge: cfg.minEdge });
         const originalBytes = damConfig && row.steps.dam !== 'done'
           ? await headBytes(row.master_url) : null;
         const originalUnavailable = damConfig && row.steps.dam !== 'done'
@@ -321,7 +459,7 @@ async function main() {
       // Delivery is reusable when a later run adds DAM ingest or DA archiving.
       let deliveryBuffer = null; let deliveryType = '';
       if (row.steps.deliver !== 'done') {
-        const pick = await pickIngestUrl(info.sourceUrl);
+        const pick = await pickIngestUrl(info.sourceUrl, { minEdge: cfg.minEdge });
         row.preconditioned = pick.preconditioned;
         if (pick.preconditioned) counts.precond += 1;
         if (pick.ok) {

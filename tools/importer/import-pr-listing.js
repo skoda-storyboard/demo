@@ -17,6 +17,7 @@ import listingParser from './parsers/listing.js';
 import cleanupTransformer from './transformers/skoda-listing-cleanup.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
+import linksTransformer from './transformers/skoda-links.js';
 
 // PARSER REGISTRY
 const parsers = {
@@ -49,6 +50,7 @@ const transformers = [
   cleanupTransformer,
   ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
   metadataTransformer,
+  linksTransformer,
 ];
 
 function executeTransformers(hookName, element, payload) {

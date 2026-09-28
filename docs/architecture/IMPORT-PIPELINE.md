@@ -40,9 +40,14 @@ Detail/CPT + shells:
 Faceted listings (one engine, `listing.js` variant map keyed on the body-class token):
 - **`pr-listing`** (news), **`images-listing`** (`template=image`, columns=4), **`videos-listing`** (`template=video`), **`search-listing`** (cross-type, `search=true`) — each emits a single index-driven `Listing` config block; SSR cards + source filter stack not ported.
 
-Archives + directories (index-driven grids emitted as config, not ported cards):
+Archives + directories:
 - **`category-archive`** — category/tag archive (also covers podcast): hero + facet-less `Listing` scoped by canonical path.
-- **`series-directory`** / **`series-hub`** — `series-grid.js` self-detects level from card `data-content-type`; hub tag from canonical slug.
+- **`series-directory`** / **`series-hub`** — current `series-grid.js` self-detects level but emits
+  an invalid index-driven `Listing` (the hub `tags` key is not read). **SKODA-207 must
+  replace this** with source-order authored Cards: 25 directory cards (M2) and five
+  M1 hub mosaics (8/14/10/5/12 tiles, mixed Story/Press Kits). `hero-banner.js`
+  must emit `Hero Image (overlay)`, not the boilerplate `Hero`; the shared mosaic
+  variant is SKODA-221. See [`series.md`](../ui-specs/series.md) §7.
 - **`home-sto`** / **`home-mr`** — `promo-box` (curated cards) + `home-rail` (self-classifying index rails; social strip dropped).
 - **`skodapedia`** — glossary directory index block (term-detail prebake → SKODA-802).
 
@@ -51,7 +56,7 @@ Flatten-to-default (SiteOrigin widget tree NOT reconstructed — deferred to SKO
 - **`story-detail`** — hero + primary `.content` flattened by SKODA-801; `.sidebar` rebuilt as a separate section; in-body Media Box deferred to SKODA-801a/604.
 - **`error-404`** — `.error-message` dead-end copy + homepage link; site-root `404.html` shell.
 
-> Detection is **content-driven only** — blocks are located by the `page-templates.json` DOM selectors; parsers self-identify from the DOM (body-class token, `data-content-type`, `type-<cpt>` class), never from URL/template/section-order/position. Where a URL is read (series/archive scope) it derives the *rail filter*, never the *detection*. A page with a novel arrangement of known sections/blocks imports without parser changes.
+> Detection is **content-driven only** — blocks are located by the `page-templates.json` DOM selectors; parsers self-identify from the DOM (body-class token, `data-content-type`, `type-<cpt>` class), never from URL/template/section-order/position. Where a URL is read for archives, it derives the rail filter, never detection. **Series is an exception to index-driven grid output, not to DOM-based detection:** preserve the authored SiteOrigin row/order/size signals and use its canonical URL only for Metadata/links. Mixed Story/Press Kits tiles must not make a hub look like a directory.
 >
 > **Deliberately deferred:** the **custom microsite** (`template-custom-full-width`) is NOT run through flatten — its body is ~264 gallery tiles + a stub intro, so flatten yields a near-empty page; it needs the real gallery block (SKODA-210). **Newsletter** is a subscriber service surface (SKODA-904), not a content page. **Press-kit** (hub + chapters + resources + shared sub-nav) is SKODA-805–808.
 
@@ -71,6 +76,7 @@ Whole-page shaping, run as `beforeTransform` / `afterTransform` hooks:
 - **`skoda-model-sections.js`** — section breaks via the marker-`<hr>` + `Section Metadata` block pattern (what `decorateSectionMetadata` in `scripts.js` later reads); reused by every multi-section template.
 - **`skoda-metadata.js`** — the shared, content-type-agnostic query-index Metadata block (SKODA-401); logic mirrored 1:1 by the unit-tested `skoda-metadata-extract.mjs`. All importers append it; do not hand-roll per-page metadata.
 - **`skoda-images.js`** — after block parsing, normalize default-content images to direct `<div>` children, preserve alt, and render `data-caption` without duplicating native figure captions. Wired into the M1 home, story, press-release, model, series-hub, and images/videos importers; future importers should reuse it.
+- **`skoda-links.js`** (SKODA-605): source-host link rewriting, registered **last** in `afterTransform` in all 16 importers, so it also sees links built by parsers and later transformers. A `[www.]skoda-storyboard.com` href becomes a site-relative EDS path (lowercase, no trailing slash, `/en/` → `/en`, query + hash kept) **only when the target is a demo page**: the M1 URL set + rail-feed corpus, generated between the `BEGIN/END GENERATED ALLOWLIST` markers by `npm run import:allowlist`. Every other source-host link stays absolute (D-3 default (b); SKODA-609). It also points root-relative `/direct-download/…` at the live source and strips `#s_aid`/`#s_cid`. After editing either URL list, run `npm run import:allowlist` and re-bundle; `skoda-links.test.mjs` fails on drift. Transformers must stay self-contained (no `import`, no named exports): the transformer validator and the bundles load them standalone.
 
 ### `import-<name>.js` + `import-<name>.bundle.js`
 The `import-<name>.js` wires it together: embeds the `page-templates.json` entry, registers parsers + transformers, runs the two hooks around `WebImporter.rules`, and writes a sanitized output path. The **`.bundle.js` is the runnable artifact** — that's what the bulk runner executes.
@@ -84,9 +90,15 @@ One tool for every template (the per-template `upload-<name>.sh` scripts describ
 - **After publish:** polls the query index until every published path has a row, and smoke-tests `/nav` + `/footer` on `.aem.live`.
 - **Output:** `tools/importer/reports/push/<stamp>.json` (per-URL `action`, DA/preview/live status, image check, indexed, errors) and `<stamp>-urls.txt` (validated preview URLs, the SKODA-603 validation input). Exit code 1 on any conflict, error or failed validation.
 
-**SKODA-506 is still a separate prerequisite:** the push tool's image validation does
-not replace an enforced media check immediately before **every** preview/publish.
-Do not use those stages for M1 pages until that gate has been implemented.
+**SKODA-506's media gate is enforced by `import:push`:** it probes inline image
+bytes before DA push/preview and again before the live job. Oversized images
+receive a verified <=10 MiB rendition at least 768 px on the long edge where available;
+otherwise only noncritical body imagery may be removed (caption retained).
+Unclassified, hero/card, or unmeasurable imagery blocks that page only; the
+rest of the batch continues. See the
+[`media/README.md`](../../tools/importer/media/README.md) for the threshold
+option and per-image report. Publish-only refuses DA/local mismatches and
+refreshes the preview before live publish.
 
 ### `urls-<name>.txt`
 The input URL list for the run.
@@ -109,10 +121,10 @@ npx -y @adobe/aem-cli up          # inspect content/... at localhost:3000
 # 4) Plan the push (reads DA, decides new/unchanged/update/conflict — writes nothing)
 npm run import:push -- --urls tools/importer/urls-<name>.txt --dry-run
 
-# 5) Only once SKODA-506 gates every preview/publish: push → bulk preview → validate
+# 5) The SKODA-506 gate runs before DA push/preview; review its image decisions.
 npm run import:push -- --urls tools/importer/urls-<name>.txt
 
-# 6) After review and the SKODA-506 gate: publish → reindex (+ fragments live)
+# 6) After preview review: gate again → fresh preview → publish → reindex (+ fragments live).
 npm run import:push -- --urls tools/importer/urls-<name>.txt --stage publish --publish-fragments
 
 # 7) M1 only: regenerate the per-URL tracker (read-only admin/index checks)
@@ -125,13 +137,16 @@ have a pinned entry in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../planning/SKODA-PE
 shape even when the block has no code yet; the block ticket builds against that shape, so its
 landing needs a re-QA, not a re-import.
 
-**Order matters:** import → media build/apply → metadata + block validation → push →
-SKODA-506 gate before preview → review → SKODA-506 gate before **publish** →
-reindex. SKODA-501's media builder selects publish-safe renditions, but does
-**not** enforce the publish-time gate. The query-index only sees *published*
+**Order matters:** import → media build/apply → metadata + block validation →
+SKODA-506 gate before DA push/preview → review → recheck and refreshed preview
+before **publish** → reindex. SKODA-501's media builder selects publish-safe
+renditions, but does **not** replace the publish-time gate. The query-index only sees *published*
 pages, so index-driven blocks stay empty until publish and reindex; check rails
 in a second pass. Check both hosts: `.aem.page` renders previewed fragments,
 `.aem.live` only published ones.
+If the builder marks a row `partial` solely because no safe inline delivery
+exists, `media:apply` leaves that image for the push gate to strip or block;
+unknown/unresolved images still stop `media:apply`.
 
 ---
 
@@ -154,7 +169,7 @@ in a second pass. Check both hosts: `.aem.page` renders previewed fragments,
    comma-separated `tags`, `category`, or an ISO `publisheddate` — the query-index contract. This catches a
    mis-wired importer before publish, so the `tags`/facet columns and the tags-block fallback don't ship
    silently empty. (`template=page` nav/utility pages are exempt from the rail-facet requirements.)
-8. **Require SKODA-506's enforced pre-publish media gate**, then push → preview → publish via SKODA-602 and validate that the index picked it up.
+8. **Run SKODA-506's enforced pre-publish gate through `import:push`**, then push → preview → publish via SKODA-602 and validate that the index picked it up. Review substitutions/strips in the push report; unresolved media or a DA/local mismatch blocks the page.
 
 **Metadata is generic, not per-page.** All importers should append the shared
 `tools/importer/transformers/skoda-metadata.js` transformer (content-type-agnostic: derives
@@ -163,7 +178,10 @@ only CPT-fixed overrides via the template entry. Do not hand-roll per-page metad
 Metadata `tags` = comma-separated slugs → AEM emits `<meta property="article:tag">` → read by both the
 query-index (`query.yaml` selects `property="article:tag"`) and the tags block's `article:tag` fallback.
 
-This is exactly how the M1 backlog scopes Series (SKODA-207), the Media Room home/Model/Press-Kit pages, and the full Images/Videos listings — assembly of the existing pipeline, not new machinery.
+Series (SKODA-207) reuses the pipeline but needs a **curated-card parser**, not an
+index-driven page grid; `skoda_series` Metadata still feeds the homepage Series
+rail. The Media Room home/Model/Press-Kit pages and Images/Videos listings
+continue to use the shared indexing machinery where specified.
 
 ---
 

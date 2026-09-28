@@ -32,6 +32,36 @@ Deliver the Press Release detail template as a first-class page type, distinct f
 >
 > **Estimate.** Unchanged at 5 SP. The 5 PRs are the reference set.
 
+> **Update (2026-09-27, phase 1: import + template).**
+>
+> **Separate template.** The press release gets its own template, `templates/press-release/` (JS + CSS), loaded
+> by the `scripts.js` `TEMPLATES` allow-list from `template: press_release`. This replaces the "share the story
+> two-column CSS, don't fork" requirement below: almost every value differs from the story (832/416 columns, no
+> reading-width cap, 64px inset from 1080, 26px text title, two bands), the story CSS is still moving (817/820/821/
+> 826), and 805c can reuse the template. Only the Section Metadata `Style` helper is shared (`applySectionStyles`).
+>
+> **Phase split.** Phase 1 = importer + content + template, **no block code**. Block extensions are ticketed:
+> **SKODA-223** Gallery `preview` (sidebar thumbs + "+N"), **SKODA-224** Story Rail `press` (related cards),
+> **SKODA-510** Downloads file tiles (PDF, video badge, mobile Show more). The importer already emits their shapes
+> (contracts `gallery-preview`, `story-rail-press`, `downloads-file-rows`, `press-release-sections`), so they
+> need a re-check, not a re-import. **This ticket closes only after those land and the final ≤2% visual diff passes.**
+> The importer half of **SKODA-612** (related band) is folded in here; its block half is SKODA-224.
+>
+> **Origin review (5 M1 releases, 2026-09-27)**, corrections to the capture below and to the spec:
+> - Two separate full-width bands in `#0e3a2f`: Media Box (margin-top 32, a static 4-up grid, Show more <768), then
+>   Related (Flickity `groupCells`, no dots, no autoplay; absent on Superb, 1 card on Board, 10 + "All" on Zellmer).
+> - Bullets are one `<p>` of `›` lines split by `<br>` (absent on Zellmer). Buzzsprout is the **first** item in
+>   the body (`data-src`, lazy). Newsletter is hidden on all 5; side banner is an empty 15px slot.
+> - Secondary column: 416px box, **342px content** (64px left padding from 1080; 10px at 1024 and below).
+> - The h1 → lead-image gap is 16px (the 26px h1 margin collapses out of the header).
+> - helix-importer's preProcess drops icon-only links before the transform: the importer's `preprocess` hook labels
+>   the Media Box's single download links so the MP4/PDF rows survive.
+>
+> **Delivered (branch `skoda-607-press-release`):** layout transformer `skoda-press-release-layout.js` (5 sections),
+> cleanup keeps Additional info + Buzzsprout, downloads parser emits Original + 1920px / MP4 / PDF rows, tag chips
+> link to demo tag pages (`skoda-links` rule 4), `templates/press-release/`, fixture tests
+> (`tools/importer/press-release.test.mjs`). 6 releases (5 set + Octavia) re-imported and pushed to DA + preview.
+
 ## Description
 Confirmed live (2026-09-15): `press_release` is its own CPT/template. This ticket delivers:
 - **Two-column article shell** (`.column-primary` 66.66% / `.column-secondary` 33.33%, stack <768) on the MR chrome (MR header nav + `footer-mediaroom`).

@@ -104,7 +104,7 @@ Body…
 ## Requirements / Spec
 - Detect the SiteOrigin layout system from DOM structure (`so-panel`, `panel-grid`, `so-widget-*`), not from URL or page type.
 - Map builder nesting → DA sections (`---`) and section metadata; map each widget type → default content or a block table.
-- Widget mapping table covering at least: `sow-editor`/`tinymce` (rich text → default content), `skoda-carousel-widget` (→ carousel/cards block), `skoda-offset` (→ layout/section), gallery widgets (→ gallery block), embed widgets (→ embed block, preserve `dnt=1`).
+- Widget mapping table covering at least: `sow-editor`/`tinymce` (rich text → default content), link-free `skoda-carousel-widget` (→ `Gallery (slider)` per SKODA-819; link-bearing → Cards), `skoda-offset` (→ layout/section), gallery widgets (→ gallery block), embed widgets (→ embed block, preserve `dnt=1`).
 - Preserve heading hierarchy, links/buttons, and image handling (`<img>` lifted to direct child of `<div>`; `alt` + `data-caption` carried).
 - Graceful handling of unknown/empty widgets (skip cleanly, log for review; never crash).
 - Descendant filtering so nested widgets inside an already-matched block are not double-parsed.

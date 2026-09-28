@@ -5,18 +5,20 @@
   "description": "Starter project for Adobe Helix",
   "scripts": {
     "lint:js": "eslint .",
-    "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\"",
+    "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\" \"templates/**/*.css\"",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"poc/**/test.mjs\" \"blocks/**/*.test.mjs\" \"scripts/**/*.test.mjs\" \"tools/importer/**/*.test.mjs\"",
     "media:build": "node tools/importer/media/build-media-manifest.mjs",
     "media:apply": "node tools/importer/media/apply-media-manifest.mjs",
     "media:audit": "node tools/importer/media/audit-m1-media.mjs",
+    "media-items:build": "node tools/importer/media-items/build-media-items.mjs",
     "test:media": "node --test tools/importer/media/*.test.mjs",
     "media:validate-metadata": "node tools/importer/validate-metadata.mjs",
     "import:push": "node tools/importer/push-to-da.mjs",
     "import:validate-blocks": "node tools/importer/validate-blocks.mjs",
     "import:status": "node tools/importer/m1-status.mjs",
+    "import:allowlist": "node tools/importer/build-link-allowlist.mjs",
     "prepare": "husky"
   },
   "repository": {

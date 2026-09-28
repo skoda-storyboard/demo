@@ -25,10 +25,14 @@ shell; vary the secondary-column content + the site side.
 
 ### Shell B — `template-tiles` (overlay hero + tile grid)
 Used by: **series directory** and **press-kit hub**. Source: `page-template-template-tiles` = overlay
-hero (`61.8vh`, title `48px/300`) + a grid of tiles.
+hero (`61.8vh`, title `48px/300`) + authored tiles. The series-specific mobile hero
+puts a dark caption below the 16:9 image; verify other consumers independently.
 
-- Reuse `hero` (overlay variant) + `cards-overlay` (tile grid). Series tiles = series cards; press-kit
-  hub tiles = chapter cards.
+- Reuse `hero-image` (overlay variant) + `cards`/shared `card-teaser`. The 25-card Series
+  directory has a 2-col series-card grid with excerpts below the image (M2); the five
+  Series hubs are curated 2/3-cell Story/Press Kits mosaics (M1), using the shared
+  `Cards (overlay, tiles)` variant owned by SKODA-221. Neither grid is an index-driven
+  `series` wrapper. See [`series.md`](../ui-specs/series.md) for source measurements.
 
 ### Shell C — faceted-listing engine (`listing` block)
 Used by: **News**, **Images**, **Videos**, **Search** (one engine, different default query). Per
@@ -58,12 +62,12 @@ rows; `columns` option (3 default, 4 for images).
 |---|---|---|
 | `story-rail` | add optional `template` row (default `story`) + optional `tags` OR-match row | model-tag rails, Models/Series/News/PressKits rails — one block, many rails |
 | `stories` | add optional `template` + `tags` rows | MR News feed, paginated listings by type |
+| `cards` | `overlay, tiles` mosaic size tokens (SKODA-221), plus a directory-only excerpt-below-image variant (SKODA-207 M2) | authored Series hubs and directory, not index listings |
 
 ### Net-new blocks to build (Tier-ordered)
 **Tier 1 (irreducible core — build first):**
 | Block | Spec | Serves |
 |---|---|---|
-| `series` (directory + hub) | `series.md` | #5, #6 — reuses Shell B + cards |
 | `card-teaser` (grid + pagination) | `template-category-archive.md` | category/tag listings #3,#4,#8 |
 | `tags` | `tags.md` | story/PR secondary column |
 | `social-share` | `social-share.md` | story/PR |
@@ -89,13 +93,17 @@ rows; `columns` option (3 default, 4 for images).
   (`template`/`category`/`tags`). Name them in DA by their section heading only.
 - `listing` is the single faceted engine; the News/Images/Videos pages differ only by the `template`,
   `facets`, and `columns` config rows — not three blocks.
-- `series` directory vs hub = one block, `variant` row (`directory`|`hub`).
+- Series directory vs hub = distinct **authored Cards variants**, not a `series`
+  config row or a tag-filtered `listing`; homepage Series rail still reads indexed
+  hub Metadata (`template=skoda_series`).
 - Dark sections use the existing section metadata (`Style = cover-box dark`), not a new block
   (as `en-landing` already does with `section-social-dark`/`section-series-dark`).
 
 ## 4. Consequence for parsers (Phase 3)
 
 Because rails/listings reuse `story-rail`/`stories`/`listing`, the importer only needs parsers for the
-**net-new structural blocks** (series, card-teaser, listing, gallery-lightbox, embeds, media-cart,
+**net-new structural blocks** (card-teaser, listing, gallery-lightbox, embeds, media-cart,
 press-kit set, company sub-types, newsletter) — plus transformers that emit the correct `template`/
 `category`/`tags`/`model`/`publisheddate` metadata per content family so the index-driven rails populate.
+The Series importer must preserve SiteOrigin tile order, row geometry and the mixed content type
+when emitting authored Cards; the current `series-grid.js` `Listing tags` output is invalid.

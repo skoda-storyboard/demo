@@ -42,7 +42,7 @@ var CustomImportScript = (() => {
   });
 
   // tools/importer/parsers/gallery.js
-  function parse(element, { document: document2 }) {
+  function parse(element, { document }) {
     let items = Array.from(element.querySelectorAll("article.gallery-item"));
     if (items.length === 0) items = Array.from(element.querySelectorAll(".items > .item"));
     if (items.length === 0) {
@@ -63,12 +63,12 @@ var CustomImportScript = (() => {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const table = WebImporter.DOMUtils.createTable(cells, document2);
+    const table = WebImporter.DOMUtils.createTable(cells, document);
     element.replaceWith(table);
   }
 
   // tools/importer/parsers/tags.js
-  function parse2(element, { document: document2 }) {
+  function parse2(element, { document }) {
     const anchors = Array.from(element.querySelectorAll("a.label[href], li a[href], a[href]")).filter((el, i, arr) => arr.indexOf(el) === i);
     if (anchors.length === 0) {
       element.replaceWith(...element.childNodes);
@@ -77,26 +77,47 @@ var CustomImportScript = (() => {
     const cell = [];
     anchors.forEach((a) => {
       const href = a.getAttribute("href");
-      const text = (a.textContent || "").trim();
-      if (!href || !text) return;
-      const link = document2.createElement("a");
-      link.setAttribute("href", href);
-      link.textContent = text;
-      cell.push(link);
+      const text3 = (a.textContent || "").trim();
+      if (!href || !text3) return;
+      const link2 = document.createElement("a");
+      link2.setAttribute("href", href);
+      link2.textContent = text3;
+      cell.push(link2);
     });
     if (cell.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const table = WebImporter.DOMUtils.createTable([["Tags"], [cell]], document2);
+    const table = WebImporter.DOMUtils.createTable([["Tags"], [cell]], document);
     element.replaceWith(table);
   }
 
   // tools/importer/parsers/downloads.js
-  function isBinaryHref(href) {
-    return /\.(pdf|mp4|zip|docx?|pptx?|xlsx?)(\?|#|$)/i.test(href || "");
+  var text = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
+  function fileLabel(href) {
+    const ext = ((href || "").split(/[?#]/)[0].split(".").pop() || "").toLowerCase();
+    if (/^(jpe?g|png|webp|gif|tiff?)$/.test(ext)) return "Original";
+    return ext ? ext.toUpperCase() : "Download";
   }
-  function parse3(element, { document: document2 }) {
+  function sizeLinks(item, document) {
+    const links = [];
+    const add = (href, label) => {
+      if (!href || href === "#" || links.some((l) => l.getAttribute("href") === href)) return;
+      const a = document.createElement("a");
+      a.setAttribute("href", href);
+      a.textContent = label;
+      links.push(a);
+    };
+    item.querySelectorAll(".media-cart-action-multi.download a[href]").forEach((a) => {
+      const href = a.getAttribute("href");
+      add(href, text(a) || fileLabel(href));
+    });
+    if (links.length) return links;
+    const single = item.querySelector('a.media-cart-action.download[href], a[data-action="download"][href]') || item.querySelector('a[href*="direct-download"]');
+    if (single) add(single.getAttribute("href"), fileLabel(single.getAttribute("href")));
+    return links;
+  }
+  function parse3(element, { document }) {
     let items = Array.from(element.querySelectorAll("article.media-cart-item"));
     if (items.length === 0) {
       items = Array.from(element.querySelectorAll(".search-results-item, .items > .item"));
@@ -106,43 +127,34 @@ var CustomImportScript = (() => {
       return;
     }
     const cells = [["Downloads"]];
-    let emitted = 0;
     items.forEach((item) => {
-      const dlAnchor = item.querySelector('a[data-action="download"]') || item.querySelector('a[href*="direct-download"]') || item.querySelector("a.colorbox[href], a.file-type[href]");
-      const href = dlAnchor && dlAnchor.getAttribute("href");
-      if (!href || href === "#") return;
-      const img = item.querySelector("img");
-      const captionEl = item.querySelector("[data-caption]");
-      const filename = href.split("/").pop().split(/[?#]/)[0];
-      const title = captionEl && captionEl.getAttribute("data-caption") || (dlAnchor.getAttribute("title") || "").replace(/^Download\s+/i, "").trim() || img && img.getAttribute("alt") || filename;
-      const link = document2.createElement("a");
-      link.setAttribute("href", href);
-      link.textContent = title;
-      const addAction = item.querySelector('a[data-action="add"][data-id]');
-      const dataId = addAction && addAction.getAttribute("data-id") || dlAnchor.getAttribute("data-id") || "";
-      if (dataId) link.setAttribute("data-id", dataId);
-      link.setAttribute("data-action", isBinaryHref(href) ? "link" : "download");
-      const sizeAction = item.querySelector('a[title*="Original" i], a[data-size]');
-      const dataSize = sizeAction && sizeAction.getAttribute("data-size") || "original";
-      if (!isBinaryHref(href)) link.setAttribute("data-size", dataSize || "original");
-      const linkPara = document2.createElement("p");
-      linkPara.append(link);
-      const linkCell = [linkPara];
-      const label = isBinaryHref(href) ? href.split(".").pop().split(/[?#]/)[0].toUpperCase() : "Original";
-      if (label) {
-        const labelPara = document2.createElement("p");
-        labelPara.textContent = label;
-        linkCell.push(labelPara);
+      const links = sizeLinks(item, document);
+      if (!links.length) return;
+      const img = item.querySelector(".article-teaser-media img, .entry-thumbnail img, img");
+      if (img) {
+        if (!(img.getAttribute("alt") || "").trim() && img.getAttribute("title")) {
+          img.setAttribute("alt", img.getAttribute("title").replace(/^Video\s*\|\s*/i, "").trim());
+        }
+        const src = img.getAttribute("src") || "";
+        if (/^https:\/\/i\.vimeocdn\.com\//.test(src)) {
+          img.setAttribute("src", src.replace(/-d_\d+x\d+(\.[a-z]+)?(\?.*)?$/i, "-d_1280x720.jpg"));
+        }
+        ["data-caption", "data-video_title", "data-video_src", "data-media-url", "srcset", "sizes", "itemprop", "title"].forEach((a) => img.removeAttribute(a));
       }
-      cells.push([img || "", linkCell]);
-      emitted += 1;
+      const filename = links[0].getAttribute("href").split("/").pop().split(/[?#]/)[0];
+      const title = text(item.querySelector(".entry-title")) || img && img.getAttribute("alt") || filename;
+      const linkCell = links.map((a) => {
+        const p = document.createElement("p");
+        p.append(a);
+        return p;
+      });
+      cells.push([img || "", title, linkCell]);
     });
-    if (emitted === 0) {
+    if (cells.length === 1) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const table = WebImporter.DOMUtils.createTable(cells, document2);
-    element.replaceWith(table);
+    element.replaceWith(WebImporter.DOMUtils.createTable(cells, document));
   }
 
   // tools/importer/transformers/skoda-press-release-cleanup.js
@@ -171,8 +183,6 @@ var CustomImportScript = (() => {
         // verified: SiteOrigin banner slot
         ".sa-bnr",
         // verified: banner injection (also inline in body)
-        ".embed-controller-wrapper",
-        // verified: Buzzsprout AI-audio embed (→ SKODA-204)
         // Cookie / consent (defensive — no OneTrust SDK on this sample)
         "#onetrust-consent-sdk",
         "#onetrust-banner-sdk",
@@ -186,6 +196,10 @@ var CustomImportScript = (() => {
         '[class*="consent" i]',
         // Floating affordances — verified: .scroll-top. Others are defensive no-ops.
         ".scroll-top",
+        ".sticky-buttons",
+        // verified: share + cart floating dock (→ SKODA-215)
+        ".skoda-anniversary-background",
+        // verified: decorative page background
         ".social-share",
         ".media-cart-flyout",
         ".share-bar",
@@ -193,10 +207,6 @@ var CustomImportScript = (() => {
         'link[rel="stylesheet"]',
         "link"
       ]);
-      element.querySelectorAll("section > ul.menu, section > .menu").forEach((menu) => {
-        const section = menu.closest("section");
-        if (section) section.remove();
-      });
     }
     if (hookName === TransformHook.afterTransform) {
       element.querySelectorAll('a[href*="#s_aid="], a[href*="#s_cid="]').forEach((a) => {
@@ -205,53 +215,260 @@ var CustomImportScript = (() => {
     }
   }
 
-  // tools/importer/transformers/skoda-model-sections.js
-  var SECTION_MARKER_ATTR = "data-excat-section-id";
-  function querySection(root, selectors) {
-    const list = Array.isArray(selectors) ? selectors : [selectors];
-    for (const sel of list) {
-      if (!sel) continue;
-      const el = root.querySelector(sel);
-      if (el) return el;
+  // tools/importer/transformers/skoda-press-release-layout.js
+  var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  var MARKER = "data-pr-section";
+  var LAYOUT_ATTR = "data-pr-layout";
+  var SECTION_STYLES = {
+    body: "body-column",
+    sidebar: "sidebar",
+    "media-box": "dark, full-width, media-box",
+    related: "dark, full-width, related"
+  };
+  var text2 = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
+  function make(document, tag, content) {
+    const el = document.createElement(tag);
+    if (typeof content === "string") el.textContent = content;
+    else if (content) el.append(...[].concat(content));
+    return el;
+  }
+  function marker(document, id) {
+    const hr = document.createElement("hr");
+    hr.setAttribute(MARKER, id);
+    return hr;
+  }
+  function link(document, href, label) {
+    const a = document.createElement("a");
+    a.setAttribute("href", href);
+    a.textContent = label;
+    return a;
+  }
+  function urlParagraph(document, url) {
+    return make(document, "p", link(document, url, url));
+  }
+  function titleText(h1) {
+    const clone = h1.cloneNode(true);
+    clone.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
+    return text2(clone);
+  }
+  function isEmptyParagraph(p) {
+    return !text2(p) && !p.querySelector("img, picture, a[href], iframe");
+  }
+  function leadImage(document, primary) {
+    const img = primary.querySelector(".article-teaser img");
+    if (!img) return null;
+    ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop"].forEach((a) => img.removeAttribute(a));
+    const alt = (img.getAttribute("alt") || "").replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim();
+    img.setAttribute("alt", alt);
+    return make(document, "p", img);
+  }
+  function bulletList(document, primary) {
+    const box = primary.querySelector(".bullet-points");
+    if (!box) return null;
+    const lines = [];
+    const lis = box.querySelectorAll("li");
+    if (lis.length) {
+      lis.forEach((li) => lines.push(li.innerHTML));
+    } else {
+      box.querySelectorAll("p").forEach((p) => {
+        p.innerHTML.split(/<br\s*\/?>/i).forEach((line) => lines.push(line));
+      });
     }
-    return null;
+    const ul = document.createElement("ul");
+    lines.forEach((html) => {
+      const li = document.createElement("li");
+      li.innerHTML = html.replace(/^\s*(?:›|&rsaquo;)\s*/, "").trim();
+      if (text2(li)) ul.append(li);
+    });
+    return ul.children.length ? ul : null;
+  }
+  function perex(document, primary) {
+    const out = [];
+    const summary = primary.querySelector(".entry-summary");
+    if (!summary) return out;
+    summary.querySelectorAll("p").forEach((p) => {
+      if (isEmptyParagraph(p)) return;
+      const strong = document.createElement("strong");
+      strong.append(...p.childNodes);
+      out.push(make(document, "p", strong));
+    });
+    return out;
+  }
+  function bodyContent(document, primary) {
+    const content = primary.querySelector(".entry-content");
+    if (!content) return [];
+    content.querySelectorAll(".sa-bnr").forEach((n) => n.remove());
+    content.querySelectorAll(".embed-controller-wrapper").forEach((wrap) => {
+      const iframe = wrap.querySelector("iframe");
+      const url = iframe && (iframe.getAttribute("data-src") || iframe.getAttribute("src"));
+      wrap.replaceWith(...url ? [urlParagraph(document, url)] : []);
+    });
+    content.querySelectorAll(".media-cart-item.attachment, .video-container").forEach((wrap) => {
+      if (!wrap.parentNode) return;
+      const iframe = wrap.querySelector("iframe[src], iframe[data-src]");
+      const url = iframe && (iframe.getAttribute("src") || iframe.getAttribute("data-src"));
+      wrap.replaceWith(...url ? [urlParagraph(document, url)] : []);
+    });
+    content.querySelectorAll(".media-cart-actions").forEach((n) => n.remove());
+    content.querySelectorAll("iframe").forEach((iframe) => {
+      const url = iframe.getAttribute("src") || iframe.getAttribute("data-src");
+      const p = iframe.closest("p");
+      const replacement = url && /^https?:/.test(url) ? urlParagraph(document, url) : null;
+      if (p && text2(p) === "") p.replaceWith(...replacement ? [replacement] : []);
+      else iframe.replaceWith(...replacement ? [replacement] : []);
+    });
+    content.querySelectorAll("hr").forEach((hr) => hr.remove());
+    content.querySelectorAll("div[style]").forEach((div) => div.replaceWith(...div.childNodes));
+    content.querySelectorAll("p").forEach((p) => {
+      if (isEmptyParagraph(p)) p.remove();
+    });
+    return [...content.childNodes].filter((n) => n.nodeType === 1 || text2(n));
+  }
+  function sidebarContent(document, secondary, hasMediaBox) {
+    const out = [];
+    if (!secondary) return out;
+    secondary.querySelectorAll(":scope > section").forEach((section) => {
+      const heading = section.querySelector("h2, h3, .heading");
+      const headingText = text2(heading);
+      if (section.matches(".images, .sa-media-kit-preview")) {
+        if (heading) heading.remove();
+        out.push(make(document, "h3", headingText || "Images"), section);
+        return;
+      }
+      if (section.matches(".tags") || section.querySelector(".entry-tags")) {
+        if (heading) heading.remove();
+        out.push(make(document, "h3", headingText || "Tags"), section);
+        return;
+      }
+      const menu = section.querySelector("ul.menu, .menu");
+      if (!menu) return;
+      const ul = document.createElement("ul");
+      menu.querySelectorAll(":scope > li").forEach((li) => {
+        const a = li.querySelector('a[href]:not([href="#"])');
+        if (a && text2(a)) {
+          ul.append(make(document, "li", link(document, a.getAttribute("href"), text2(a))));
+          return;
+        }
+        const label = text2(li.querySelector("span")) || text2(li);
+        if (label && hasMediaBox) ul.append(make(document, "li", link(document, "#media-box", label)));
+      });
+      if (!ul.children.length) return;
+      out.push(make(document, "h3", headingText || "Additional info"), ul);
+    });
+    return out;
+  }
+  function mediaBoxContent(document, band) {
+    const box = band.querySelector(".search-results.media-box");
+    if (!box) return [];
+    const heading = text2(box.querySelector(".search-results-heading")) || "Media Box";
+    const stats = text2(box.querySelector(".search-results-stats .stats, .stats"));
+    box.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((n) => n.remove());
+    const out = [make(document, "h2", heading)];
+    if (stats) out.push(make(document, "p", stats));
+    out.push(box);
+    return out;
+  }
+  function relatedContent(document, band) {
+    const results = band.querySelector(".search-results");
+    if (!results) return [];
+    const rows = [["Story Rail (press)"]];
+    results.querySelectorAll("article.article-teaser").forEach((card) => {
+      const titleLink = card.querySelector(".entry-title a[href]");
+      const href = titleLink && titleLink.getAttribute("href");
+      if (!href || !text2(titleLink)) return;
+      const img = card.querySelector(".article-teaser-media img");
+      if (img) ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop"].forEach((a) => img.removeAttribute(a));
+      const body = [];
+      const date = text2(card.querySelector(".entry-published"));
+      if (date) body.push(make(document, "p", date));
+      body.push(make(document, "h3", link(document, href, text2(titleLink))));
+      rows.push([img || "", body]);
+    });
+    if (rows.length === 1) return [];
+    const headingEl = results.querySelector(".search-results-heading");
+    const sub = text2(headingEl && headingEl.querySelector(".subheading"));
+    let heading = "Related Press Releases";
+    if (headingEl) {
+      const clone = headingEl.cloneNode(true);
+      clone.querySelectorAll(".subheading").forEach((s) => s.remove());
+      heading = text2(clone) || heading;
+    }
+    const out = [make(document, "h2", heading)];
+    if (sub) out.push(make(document, "p", sub));
+    const all = results.querySelector("a.search-results-header-link[href], .search-results-header a[href]");
+    if (all && all.getAttribute("href")) out.push(make(document, "p", link(document, all.getAttribute("href"), text2(all) || "All")));
+    out.push(WebImporter.DOMUtils.createTable(rows, document));
+    return out;
+  }
+  function rebuild(element, document) {
+    const article = [...element.querySelectorAll("article.press_release, article.type-press_release")].find((a) => a.querySelector(".column-primary"));
+    if (!article) return;
+    const container = article.querySelector(":scope > .container") || article;
+    const primary = container.querySelector(".column-primary");
+    const header = container.querySelector(":scope > header") || container;
+    const date = text2(header.querySelector(".entry-published"));
+    const h1 = header.querySelector("h1");
+    const secondary = container.querySelector(".column-secondary");
+    const bands = [...article.querySelectorAll(".cover-box.dark")];
+    const mediaBand = bands.find((b) => b.querySelector(".search-results.media-box"));
+    const relatedBand = bands.find((b) => b !== mediaBand && b.querySelector("article.article-teaser"));
+    const out = [];
+    if (date) out.push(make(document, "p", date));
+    if (h1) out.push(make(document, "h1", titleText(h1)));
+    out.push(marker(document, "body"));
+    [
+      leadImage(document, primary),
+      bulletList(document, primary),
+      ...perex(document, primary),
+      ...bodyContent(document, primary)
+    ].forEach((n) => {
+      if (n) out.push(n);
+    });
+    const media = mediaBand ? mediaBoxContent(document, mediaBand) : [];
+    const side = sidebarContent(document, secondary, media.length > 0);
+    if (side.length) out.push(marker(document, "sidebar"), ...side);
+    if (media.length) out.push(marker(document, "media-box"), ...media);
+    const related = relatedBand ? relatedContent(document, relatedBand) : [];
+    if (related.length) out.push(marker(document, "related"), ...related);
+    article.replaceChildren(...out);
+    article.setAttribute(LAYOUT_ATTR, "");
+  }
+  function finish(element, document) {
+    const article = element.querySelector(`[${LAYOUT_ATTR}]`);
+    if (!article) return;
+    article.removeAttribute(LAYOUT_ATTR);
+    const sidebar = element.querySelector(`hr[${MARKER}="sidebar"]`);
+    if (sidebar) {
+      let n = sidebar.nextElementSibling;
+      while (n && !n.hasAttribute(MARKER)) {
+        const cell = n.matches("table") && n.querySelector("tr > th, tr > td");
+        if (cell && text2(cell).toLowerCase() === "gallery") cell.textContent = "Gallery (preview)";
+        n = n.nextElementSibling;
+      }
+    }
+    element.querySelectorAll(`hr[${MARKER}]`).forEach((hr) => {
+      const style = SECTION_STYLES[hr.getAttribute(MARKER)];
+      let end = hr.nextElementSibling;
+      let last = hr;
+      while (end && !end.hasAttribute(MARKER)) {
+        last = end;
+        end = end.nextElementSibling;
+      }
+      if (style) {
+        last.after(WebImporter.Blocks.createBlock(document, { name: "Section Metadata", cells: { style } }));
+      }
+      hr.removeAttribute(MARKER);
+    });
+    article.querySelectorAll('a[href=""], a:not([href])').forEach((a) => a.replaceWith(...a.childNodes));
   }
   function transform2(hookName, element, payload) {
-    const sections = payload && payload.template && payload.template.sections || [];
-    if (sections.length < 2) return;
-    if (hookName === "beforeTransform") {
-      for (let i = sections.length - 1; i >= 0; i -= 1) {
-        const section = sections[i];
-        if (i === 0 && !section.style) continue;
-        const sectionEl = querySection(element, section.selector);
-        if (!sectionEl) continue;
-        const hr = document.createElement("hr");
-        if (section.style) hr.setAttribute(SECTION_MARKER_ATTR, section.id);
-        sectionEl.before(hr);
-      }
-    }
-    if (hookName === "afterTransform") {
-      for (let i = sections.length - 1; i >= 0; i -= 1) {
-        const section = sections[i];
-        if (!section.style) continue;
-        const marker = element.querySelector(`[${SECTION_MARKER_ATTR}="${section.id}"]`);
-        const anchor = marker || querySection(element, section.selector);
-        if (!anchor) continue;
-        const metadataBlock = WebImporter.Blocks.createBlock(document, {
-          name: "Section Metadata",
-          cells: { style: section.style }
-        });
-        anchor.after(metadataBlock);
-        if (marker) {
-          marker.removeAttribute(SECTION_MARKER_ATTR);
-          if (i === 0) marker.remove();
-        }
-      }
-    }
+    const document = element.ownerDocument || typeof window !== "undefined" && window.document;
+    if (hookName === TransformHook2.beforeTransform) rebuild(element, document);
+    if (hookName === TransformHook2.afterTransform) finish(element, document);
   }
 
   // tools/importer/transformers/skoda-metadata.js
-  var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
     "bodywork",
@@ -286,8 +503,8 @@ var CustomImportScript = (() => {
     const t = String(raw || "").replace(/\s+/g, " ").trim();
     return t.replace(SITE_SUFFIX, "").trim() || t;
   }
-  function metaContent(document2, selector) {
-    const el = document2.querySelector(selector);
+  function metaContent(document, selector) {
+    const el = document.querySelector(selector);
     const val = el && el.getAttribute("content");
     return val && val.trim() ? val.trim() : null;
   }
@@ -296,13 +513,13 @@ var CustomImportScript = (() => {
     const m = String(value).match(/\d{4}-\d{2}-\d{2}/);
     return m ? m[0] : "";
   }
-  function extractDate(document2) {
-    const meta = metaContent(document2, 'meta[property="article:published_time"]');
+  function extractDate(document) {
+    const meta = metaContent(document, 'meta[property="article:published_time"]');
     if (normalizeDate(meta)) return normalizeDate(meta);
-    const attrEl = document2.querySelector("[data-publish-date]");
+    const attrEl = document.querySelector("[data-publish-date]");
     const attr = attrEl && attrEl.getAttribute("data-publish-date");
     if (normalizeDate(attr)) return normalizeDate(attr);
-    const scripts = document2.querySelectorAll('script[type="application/ld+json"]');
+    const scripts = document.querySelectorAll('script[type="application/ld+json"]');
     for (const s of scripts) {
       try {
         const data = JSON.parse(s.textContent);
@@ -316,17 +533,17 @@ var CustomImportScript = (() => {
       } catch (e) {
       }
     }
-    const span = document2.querySelector(".entry-published, time[datetime]");
+    const span = document.querySelector(".entry-published, time[datetime]");
     if (span) {
       const d = normalizeDate(span.getAttribute("datetime") || span.textContent);
       if (d) return d;
     }
-    const modified = metaContent(document2, 'meta[property="article:modified_time"]');
+    const modified = metaContent(document, 'meta[property="article:modified_time"]');
     if (normalizeDate(modified)) return normalizeDate(modified);
     return "";
   }
-  function extractTemplate(document2) {
-    const cls = document2.body && document2.body.getAttribute("class") || "";
+  function extractTemplate(document) {
+    const cls = document.body && document.body.getAttribute("class") || "";
     for (const [re, value] of TEMPLATE_SIGNALS) {
       if (re.test(cls)) return value;
     }
@@ -343,7 +560,7 @@ var CustomImportScript = (() => {
     }
     return "";
   }
-  function extractTagsAndFacets(document2, pageUrl = "") {
+  function extractTagsAndFacets(document, pageUrl = "") {
     const tags = [];
     const byFacet = {};
     const seen = /* @__PURE__ */ new Set();
@@ -355,8 +572,8 @@ var CustomImportScript = (() => {
       (byFacet[taxonomy] = byFacet[taxonomy] || []).push(slug);
       tags.push(slug);
     };
-    const scopes = document2.querySelectorAll("ol.entry-tags, ul.entry-tags, .entry-tags, .tag-list");
-    const roots = scopes.length ? scopes : [document2];
+    const scopes = document.querySelectorAll("ol.entry-tags, ul.entry-tags, .entry-tags, .tag-list");
+    const roots = scopes.length ? scopes : [document];
     for (const root of roots) {
       root.querySelectorAll("a[href]").forEach((a) => {
         const href = a.getAttribute("href") || "";
@@ -378,7 +595,7 @@ var CustomImportScript = (() => {
       });
     }
     if (tags.length === 0) {
-      const cls = document2.body && document2.body.getAttribute("class") || "";
+      const cls = document.body && document.body.getAttribute("class") || "";
       const tax = cls.match(/\btax-([a-z0-9_-]+)\b/i);
       const term = cls.match(/\bterm-([a-z0-9-]+)\b/i);
       if (tax && term) {
@@ -388,8 +605,8 @@ var CustomImportScript = (() => {
       }
     }
     if (tags.length === 0) {
-      const cls = document2.body && document2.body.getAttribute("class") || "";
-      const canonical = document2.querySelector('link[rel="canonical"]');
+      const cls = document.body && document.body.getAttribute("class") || "";
+      const canonical = document.querySelector('link[rel="canonical"]');
       const href = pageUrl || canonical && canonical.getAttribute("href") || "";
       if (/\bsingle-skoda_series\b|\bskoda_series-template\b/.test(cls)) {
         const m = href.match(/\/series\/([a-z0-9-]+)\/?/i);
@@ -413,25 +630,25 @@ var CustomImportScript = (() => {
     return false;
   }
   function transform3(hookName, element, payload) {
-    if (hookName !== TransformHook2.afterTransform) return;
+    if (hookName !== TransformHook3.afterTransform) return;
     if (hasMetadataBlock(element)) return;
-    const { document: document2, url, params } = payload;
-    const canonical = document2.querySelector('link[rel="canonical"]');
+    const { document, url, params } = payload;
+    const canonical = document.querySelector('link[rel="canonical"]');
     const pageUrl = params && params.originalURL || url || canonical && canonical.href || "";
     const overrides = payload.template && payload.template.metadata || {};
-    const h1 = document2.querySelector("h1");
-    const title = cleanTitle(overrides.title || metaContent(document2, 'meta[property="og:title"]') || (document2.querySelector("title") ? document2.querySelector("title").textContent.trim() : "") || (h1 ? h1.textContent.trim() : ""));
-    const description = overrides.description || metaContent(document2, 'meta[property="og:description"]') || metaContent(document2, 'meta[name="description"]') || "";
-    const imageSrc = overrides.image || metaContent(document2, 'meta[property="og:image"]') || "";
-    const publisheddate = overrides.publisheddate || extractDate(document2);
-    const template = overrides.template || extractTemplate(document2);
+    const h1 = document.querySelector("h1");
+    const title = cleanTitle(overrides.title || metaContent(document, 'meta[property="og:title"]') || (document.querySelector("title") ? document.querySelector("title").textContent.trim() : "") || (h1 ? h1.textContent.trim() : ""));
+    const description = overrides.description || metaContent(document, 'meta[property="og:description"]') || metaContent(document, 'meta[name="description"]') || "";
+    const imageSrc = overrides.image || metaContent(document, 'meta[property="og:image"]') || "";
+    const publisheddate = overrides.publisheddate || extractDate(document);
+    const template = overrides.template || extractTemplate(document);
     const category = overrides.category || extractCategory(pageUrl);
-    const { tags: derivedTags, byFacet } = extractTagsAndFacets(document2, pageUrl);
+    const { tags: derivedTags, byFacet } = extractTagsAndFacets(document, pageUrl);
     const meta = {};
     if (title) meta.Title = title;
     if (description) meta.Description = description;
     if (imageSrc) {
-      const img = document2.createElement("img");
+      const img = document.createElement("img");
       img.src = imageSrc;
       meta.Image = img;
     }
@@ -444,48 +661,258 @@ var CustomImportScript = (() => {
       const merged = [.../* @__PURE__ */ new Set([...byFacet[f] || [], ...splitList(overrides[f])])];
       if (merged.length) meta[f] = merged.join(", ");
     });
-    const block = WebImporter.Blocks.getMetadataBlock(document2, meta);
+    const block = WebImporter.Blocks.getMetadataBlock(document, meta);
     element.append(block);
+  }
+
+  // tools/importer/transformers/skoda-links.js
+  var TransformHook4 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
+  var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
+  var DEMO_PATHS = [
+    "/en",
+    "/en/category/classic-cars",
+    "/en/category/concepts",
+    "/en/category/corporate-life",
+    "/en/category/design-eng",
+    "/en/category/emobility",
+    "/en/category/lifestyle",
+    "/en/category/lifestyle/adventures",
+    "/en/category/lifestyle/people",
+    "/en/category/lifestyle/sports",
+    "/en/category/models",
+    "/en/category/skoda-world",
+    "/en/category/skoda-world/design",
+    "/en/category/skoda-world/heritage",
+    "/en/category/skoda-world/innovation-and-technology",
+    "/en/category/skoda-world/responsibility",
+    "/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france",
+    "/en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca",
+    "/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries",
+    "/en/emobility/camouflage-to-get-you-hooked",
+    "/en/emobility/coffee-on-electric-wheels-elroq-and-enyaq-serving-coffee",
+    "/en/emobility/designers-on-the-peaq-its-modern-durable-and-practical",
+    "/en/emobility/elroq-rs-in-a-robe-unveiling-the-secret-of-matte-paint",
+    "/en/emobility/enyaq-and-elroq-now-double-as-gaming-consoles-and-thats-not-all",
+    "/en/emobility/even-opening-the-door-is-an-experience-says-the-designer-of-the-peaq-suv",
+    "/en/emobility/how-the-versatile-skoda-peaq-conquered-a-mountain-peak",
+    "/en/emobility/how-was-the-elroq-made-not-in-the-usual-way",
+    "/en/emobility/make-use-of-the-frunk-unlock-with-your-phone-new-enhancements-for-elroq-and-enyaq",
+    "/en/emobility/meet-the-peaq-comfort-just-like-at-home",
+    "/en/emobility/meet-the-peaq-spacious-inside-and-out",
+    "/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia",
+    "/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging",
+    "/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq",
+    "/en/emobility/skoda-elroq-and-a-happy-family",
+    "/en/emobility/skoda-elroq-premiere-light-cube-camera-action",
+    "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+    "/en/emobility/skoda-peaq-unparalleled-space-and-comfort",
+    "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
+    "/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq",
+    "/en/images",
+    "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague",
+    "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving",
+    "/en/lifestyle/chainsaws-and-sparklers-discover-the-traditions-of-rally-fans",
+    "/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling",
+    "/en/lifestyle/la-dolce-vita-explore-the-surroundings-of-lake-como",
+    "/en/lifestyle/ouninpohja-finlands-roller-coaster-stage",
+    "/en/lifestyle/rs-four-ways-which-one-will-you-choose",
+    "/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones",
+    "/en/models/skoda-elroq-through-designers-eyes",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
+    "/en/press-kits/new-skoda-enyaq-press-kit-2",
+    "/en/press-kits/skoda-elroq-press-kit",
+    "/en/press-kits/skoda-elroq-press-kit-2",
+    "/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
+    "/en/press-kits/skoda-epiq-press-kit-2",
+    "/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
+    "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+    "/en/press-kits/skoda-peaq-press-kit",
+    "/en/press-kits/skoda-peaq-press-kit-2",
+    "/en/press-kits/skoda-vision-o-press-kit",
+    "/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design",
+    "/en/press-kits/the-all-new-skoda-kodiaq-press-kit",
+    "/en/press-kits/the-all-new-skoda-superb-press-kit",
+    "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
+    "/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq",
+    "/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026",
+    "/en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029",
+    "/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management",
+    "/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company",
+    "/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav",
+    "/en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car",
+    "/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
+    "/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions",
+    "/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence",
+    "/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates",
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available",
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich",
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france",
+    "/en/series/125-years-of-motorsport",
+    "/en/series/130-years",
+    "/en/series/60-seconds-walkaround",
+    "/en/series/back-to-the-past",
+    "/en/series/czech-footprint",
+    "/en/series/evolution-of-parts",
+    "/en/series/hidden-helpers",
+    "/en/series/minutes-from-car-production",
+    "/en/series/my-life-my-car",
+    "/en/series/road-trip",
+    "/en/series/roads-places",
+    "/en/series/sustainable-mobility",
+    "/en/series/unexpected-jobs",
+    "/en/series/unknown-parts",
+    "/en/series/winter-tips",
+    "/en/skoda-model/elroq",
+    "/en/skoda-model/elroq/elroq-rs",
+    "/en/skoda-model/elroq/elroq-sportline",
+    "/en/skoda-model/enyaq-iv-2",
+    "/en/skoda-model/enyaq-iv-2/enyaq-rs",
+    "/en/skoda-model/enyaq-iv-2/enyaq-sportline-iv",
+    "/en/skoda-model/epiq",
+    "/en/skoda-model/kamiq",
+    "/en/skoda-model/karoq-6",
+    "/en/skoda-model/karoq-6/karoq-sportline",
+    "/en/skoda-model/new-fabia",
+    "/en/skoda-model/new-kodiaq",
+    "/en/skoda-model/new-kodiaq/kodiaq-rs",
+    "/en/skoda-model/new-kodiaq/new-kodiaq-iv",
+    "/en/skoda-model/new-kodiaq/new-kodiaq-sportline",
+    "/en/skoda-model/new-superb",
+    "/en/skoda-model/new-superb/new-superb-iv",
+    "/en/skoda-model/octavia",
+    "/en/skoda-model/octavia/octavia-rs",
+    "/en/skoda-model/octavia/octavia-sportline",
+    "/en/skoda-model/peaq",
+    "/en/skoda-model/scala",
+    "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it",
+    "/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute",
+    "/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car",
+    "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality",
+    "/en/skoda-world/how-the-skoda-octavia-reached-365-km-h",
+    "/en/skoda-world/legend-chris-froome-takes-you-behind-the-scenes-of-the-tour-de-france",
+    "/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details",
+    "/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour",
+    "/en/skoda-world/the-skoda-elroq-reveals-its-sustainable-interior",
+    "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too",
+    "/en/tag/company/design",
+    "/en/tag/company/production",
+    "/en/tag/crew/electro-vehicle",
+    "/en/tag/crew/electromobility",
+    "/en/tag/crew/emobility",
+    "/en/tag/crew/technology",
+    "/en/tag/derivative/sportline",
+    "/en/tag/environment/greenfuture",
+    "/en/tag/environment/sustainability",
+    "/en/tag/model/elroq",
+    "/en/tag/model/enyaq",
+    "/en/tag/model/epiq",
+    "/en/tag/model/fabia",
+    "/en/tag/model/kamiq",
+    "/en/tag/model/karoq",
+    "/en/tag/model/kodiaq",
+    "/en/tag/model/kylaq",
+    "/en/tag/model/octavia",
+    "/en/tag/model/peaq",
+    "/en/tag/model/scala",
+    "/en/tag/model/slavia",
+    "/en/tag/model/superb",
+    "/en/tag/people/stefani",
+    "/en/tag/years/2024",
+    "/en/tag/years/2025",
+    "/en/tag/years/2026",
+    "/en/videos"
+  ];
+  var DEMO_ALIASES = {
+    "/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality": "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality"
+  };
+  var ALLOWED = new Set(DEMO_PATHS);
+  function edsPath(sourcePath) {
+    let p = sourcePath || "/";
+    try {
+      p = decodeURIComponent(p);
+    } catch (e) {
+    }
+    p = p.replace(/\.html?$/i, "").replace(/\/+$/, "");
+    if (!p) return "/";
+    return p.split("/").map((seg) => seg.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/-+/g, "-")).join("/");
+  }
+  function rewriteHref(href) {
+    const m = href.match(SOURCE_HOST);
+    if (!m) return null;
+    const rest = href.slice(m[0].length);
+    const cut = rest.search(/[?#]/);
+    const tail = cut === -1 ? "" : rest.slice(cut);
+    if (/^\?(?:[^#]*&)?(?:p|page_id)=\d/.test(tail)) return null;
+    let target = edsPath(cut === -1 ? rest : rest.slice(0, cut));
+    target = DEMO_ALIASES[target] || target;
+    return ALLOWED.has(target) ? `${target}${tail}` : null;
+  }
+  var TAG_FILTER = /^(?:(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com)?\/en\/news\/?\?filter(?:\[|%5B)([a-z0-9-]+)(?:\]|%5D)(?:\[\]|%5B%5D)=([^&#]+)$/i;
+  function tagPageHref(href) {
+    const m = href.match(TAG_FILTER);
+    if (!m) return null;
+    const slug = edsPath(`/${m[2]}`).slice(1);
+    const exact = `/en/tag/${m[1].toLowerCase()}/${slug}`;
+    if (ALLOWED.has(exact)) return exact;
+    const bySlug = DEMO_PATHS.filter((p) => p.startsWith("/en/tag/") && p.endsWith(`/${slug}`) && p.split("/").length === 5);
+    return bySlug.length === 1 ? bySlug[0] : null;
+  }
+  function transform4(hookName, element, payload) {
+    if (hookName !== TransformHook4.afterTransform) return;
+    element.querySelectorAll("a[href]").forEach((a) => {
+      let href = a.getAttribute("href");
+      if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
+      if (href.startsWith("/direct-download/")) href = `${SOURCE_ORIGIN}${href}`;
+      else href = tagPageHref(href) || rewriteHref(href) || href;
+      if (href !== a.getAttribute("href")) a.setAttribute("href", href);
+    });
   }
 
   // tools/importer/transformers/skoda-images.js
   function hasContent(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
-  function withCaption(node, caption, document2) {
+  function withCaption(node, caption, document) {
     if (!caption) return node;
-    const figure = document2.createElement("figure");
-    const figcaption = document2.createElement("figcaption");
+    const figure = document.createElement("figure");
+    const figcaption = document.createElement("figcaption");
     figcaption.textContent = caption;
     figure.append(node, figcaption);
     return figure;
   }
-  function imageContainer(img, document2, link = null) {
-    const div = document2.createElement("div");
-    div.append(img);
-    if (!link) return div;
-    link.append(div);
-    return link;
+  function editorialCaption(node) {
+    if (!node) return "";
+    const caption = (node.getAttribute("data-caption") || "").trim();
+    if (!caption || node.closest(".article-teaser, .media-cart-image")) return "";
+    return caption === (node.getAttribute("data-video_title") || "").trim() ? "" : caption;
   }
-  function splitParagraph(img, paragraph, caption, document2) {
-    const link = img.closest("a");
-    const linkedImage = link && paragraph.contains(link) && link.querySelectorAll("img").length === 1 && !(link.textContent || "").trim();
-    const target = linkedImage ? link : img;
-    const afterRange = document2.createRange();
+  function imageContainer(img, document, link2 = null) {
+    const div = document.createElement("div");
+    div.append(img);
+    if (!link2) return div;
+    link2.append(div);
+    return link2;
+  }
+  function splitParagraph(img, paragraph, caption, document) {
+    const link2 = img.closest("a");
+    const linkedImage = link2 && paragraph.contains(link2) && link2.querySelectorAll("img").length === 1 && !(link2.textContent || "").trim();
+    const target = linkedImage ? link2 : img;
+    const afterRange = document.createRange();
     afterRange.setStartAfter(target);
     afterRange.setEnd(paragraph, paragraph.childNodes.length);
     const after = paragraph.cloneNode(false);
     after.append(afterRange.extractContents());
-    const beforeRange = document2.createRange();
+    const beforeRange = document.createRange();
     beforeRange.selectNodeContents(paragraph);
     beforeRange.setEndBefore(target);
     const before = paragraph.cloneNode(false);
     before.append(beforeRange.extractContents());
-    const imageNode = imageContainer(img, document2, linkedImage ? link : null);
-    const image = withCaption(imageNode, caption, document2);
+    const imageNode = imageContainer(img, document, linkedImage ? link2 : null);
+    const image = withCaption(imageNode, caption, document);
     paragraph.replaceWith(...[before, image, after].filter(hasContent));
   }
-  function normalizeImages(root, document2 = root.ownerDocument) {
+  function normalizeImages(root, document = root.ownerDocument) {
     root.querySelectorAll("img").forEach((img) => {
       if (!img.hasAttribute("alt") || !img.getAttribute("alt").trim()) {
         const type = img.hasAttribute("alt") ? "empty" : "missing";
@@ -494,16 +921,16 @@ var CustomImportScript = (() => {
       if (img.closest("table, picture")) return;
       const figure = img.closest("figure");
       const wrapper = img.closest("[data-caption]");
-      const wrapperCaption = (wrapper == null ? void 0 : wrapper.querySelectorAll("img").length) === 1 ? wrapper.getAttribute("data-caption") : "";
-      const caption = (img.getAttribute("data-caption") || wrapperCaption || "").trim();
+      const wrapperCaption = (wrapper == null ? void 0 : wrapper.querySelectorAll("img").length) === 1 ? editorialCaption(wrapper) : "";
+      const caption = (img.hasAttribute("data-caption") ? editorialCaption(img) : "") || wrapperCaption;
       if (figure) {
         if (img.parentElement.tagName !== "DIV") {
-          const div = document2.createElement("div");
+          const div = document.createElement("div");
           img.replaceWith(div);
           div.append(img);
         }
         if (caption && !figure.querySelector("figcaption")) {
-          const figcaption = document2.createElement("figcaption");
+          const figcaption = document.createElement("figcaption");
           figcaption.textContent = caption;
           figure.append(figcaption);
         }
@@ -511,31 +938,31 @@ var CustomImportScript = (() => {
       }
       const paragraph = img.closest("p");
       if (paragraph) {
-        splitParagraph(img, paragraph, caption, document2);
+        splitParagraph(img, paragraph, caption, document);
         return;
       }
       if (img.parentElement.tagName === "DIV") {
         if (caption) {
           const div = img.parentElement;
           if (div.childElementCount === 1 && !(div.textContent || "").trim()) {
-            const marker2 = document2.createComment("image");
-            div.replaceWith(marker2);
-            marker2.replaceWith(withCaption(div, caption, document2));
+            const marker3 = document.createComment("image");
+            div.replaceWith(marker3);
+            marker3.replaceWith(withCaption(div, caption, document));
           } else {
-            const marker2 = document2.createComment("image");
-            img.replaceWith(marker2);
-            marker2.replaceWith(withCaption(imageContainer(img, document2), caption, document2));
+            const marker3 = document.createComment("image");
+            img.replaceWith(marker3);
+            marker3.replaceWith(withCaption(imageContainer(img, document), caption, document));
           }
         }
         return;
       }
-      const link = img.closest("a");
-      const linkedImage = link && link.querySelectorAll("img").length === 1 && !(link.textContent || "").trim();
-      const target = linkedImage ? link : img;
-      const marker = document2.createComment("image");
-      target.replaceWith(marker);
-      const imageNode = imageContainer(img, document2, linkedImage ? link : null);
-      marker.replaceWith(withCaption(imageNode, caption, document2));
+      const link2 = img.closest("a");
+      const linkedImage = link2 && link2.querySelectorAll("img").length === 1 && !(link2.textContent || "").trim();
+      const target = linkedImage ? link2 : img;
+      const marker2 = document.createComment("image");
+      target.replaceWith(marker2);
+      const imageNode = imageContainer(img, document, linkedImage ? link2 : null);
+      marker2.replaceWith(withCaption(imageNode, caption, document));
     });
   }
 
@@ -547,48 +974,34 @@ var CustomImportScript = (() => {
   };
   var PAGE_TEMPLATE = {
     name: "press-release",
-    description: "\u0160koda press release detail (press_release CPT). No hero: header (date + title) -> primary column default content -> Gallery -> Tags -> full-bleed dark Media Box parsed as Downloads. AI-audio embed + widgets removed by cleanup. Content-driven detection only.",
+    description: "\u0160koda press release detail (press_release CPT), SKODA-607. No hero: header (date + title) -> body-column (lead image, bullets, perex, Buzzsprout, body, Vimeo) -> sidebar (Additional info, Gallery (preview), Tags) -> dark Media Box band (Downloads) -> optional dark Related Press Releases band (Story Rail (press)). Sections are built by skoda-press-release-layout. Content-driven detection only.",
     urls: [
       "https://www.skoda-storyboard.com/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/"
     ],
     blocks: [
       { name: "gallery", instances: ["section.images.sa-media-kit-preview"] },
       { name: "tags", instances: ["section.tags"] },
-      {
-        name: "downloads",
-        instances: [".cover-box.dark .search-results.media-box, .search-results.media-box"]
-      }
+      { name: "downloads", instances: [".search-results.media-box"] }
     ],
+    // Documentation of the emitted section model; skoda-press-release-layout builds it.
     sections: [
+      { id: "header", name: "Header", style: null, defaultContent: ["header .entry-published", "header .entry-title"] },
       {
-        id: "section-1",
-        name: "Article",
-        selector: ["article.press_release > .container, article.press_release"],
-        style: null,
-        blocks: ["gallery", "tags"],
-        defaultContent: [
-          "header .entry-published",
-          "header .entry-title",
-          ".column-primary .article-teaser",
-          ".column-primary .bullet-points",
-          ".column-primary .entry-summary",
-          ".column-primary .entry-content"
-        ]
+        id: "body",
+        name: "Body column",
+        style: "body-column",
+        defaultContent: [".column-primary .article-teaser img", ".column-primary .bullet-points", ".column-primary .entry-summary", ".column-primary .entry-content"]
       },
-      {
-        id: "section-2",
-        name: "Related Media",
-        selector: [".cover-box.dark"],
-        style: "dark, full-width",
-        blocks: ["downloads"],
-        defaultContent: []
-      }
+      { id: "sidebar", name: "Sidebar", style: "sidebar", blocks: ["gallery", "tags"], defaultContent: [".column-secondary section > .menu"] },
+      { id: "media-box", name: "Media Box", style: "dark, full-width, media-box", blocks: ["downloads"], defaultContent: [".search-results-heading", ".search-results-stats .stats"] },
+      { id: "related", name: "Related Press Releases", style: "dark, full-width, related", blocks: ["story-rail"], defaultContent: [".search-results.type-press_release .search-results-header"] }
     ]
   };
   var transformers = [
     transform,
-    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform2] : [],
-    transform3
+    transform2,
+    transform3,
+    transform4
   ];
   function executeTransformers(hookName, element, payload) {
     const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE });
@@ -600,11 +1013,11 @@ var CustomImportScript = (() => {
       }
     });
   }
-  function findBlocksOnPage(document2, template) {
+  function findBlocksOnPage(document, template) {
     const pageBlocks = [];
     template.blocks.forEach((blockDef) => {
       blockDef.instances.forEach((selector) => {
-        const elements = document2.querySelectorAll(selector);
+        const elements = document.querySelectorAll(selector);
         if (elements.length === 0) {
           console.warn(`Block "${blockDef.name}" selector not found: ${selector}`);
         }
@@ -617,17 +1030,28 @@ var CustomImportScript = (() => {
     return pageBlocks;
   }
   var import_press_release_default = {
+    /**
+     * Runs on the untouched DOM, before helix-importer's preProcess drops every empty
+     * inline element. The Media Box's single download links (video MP4, PDF) are icon-only
+     * `<a><i class="icon"></i></a>`, so they'd vanish before the downloads parser runs;
+     * give them a text label so they survive (the parser labels them by file type).
+     */
+    preprocess: ({ document }) => {
+      document.querySelectorAll(".search-results.media-box a.media-cart-action.download[href]").forEach((a) => {
+        if (!(a.textContent || "").trim()) a.textContent = "Download";
+      });
+    },
     transform: (payload) => {
-      const { document: document2, url, params } = payload;
-      const main = document2.body;
+      const { document, url, params } = payload;
+      const main = document.body;
       executeTransformers("beforeTransform", main, payload);
-      const pageBlocks = findBlocksOnPage(document2, PAGE_TEMPLATE);
+      const pageBlocks = findBlocksOnPage(document, PAGE_TEMPLATE);
       pageBlocks.forEach((block) => {
         if (!block.element.parentNode) return;
         const parser = parsers[block.name];
         if (parser) {
           try {
-            parser(block.element, { document: document2, url, params });
+            parser(block.element, { document, url, params });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
           }
@@ -636,8 +1060,8 @@ var CustomImportScript = (() => {
         }
       });
       executeTransformers("afterTransform", main, payload);
-      WebImporter.rules.transformBackgroundImages(main, document2);
-      normalizeImages(main, document2);
+      WebImporter.rules.transformBackgroundImages(main, document);
+      normalizeImages(main, document);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
       const path = WebImporter.FileUtils.sanitizePath(rawPath === "" ? "/index" : rawPath);
@@ -645,7 +1069,7 @@ var CustomImportScript = (() => {
         element: main,
         path,
         report: {
-          title: document2.title,
+          title: document.title,
           template: PAGE_TEMPLATE.name,
           blocks: pageBlocks.map((b) => b.name)
         }

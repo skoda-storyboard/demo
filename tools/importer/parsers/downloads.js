@@ -3,35 +3,62 @@
 /**
  * Parser: downloads (block name: "Downloads")
  * Source: the press-release Media Box —
- *   div.cover-box.dark div.search-results.media-box (…-container) with a grid of
- *   article.media-cart-item entries, each carrying a preview <img>, a download
- *   anchor (a.media-cart-action[data-action="download"] or a[href*="direct-download"]),
- *   add-to-cart actions with data-size (Original / 1920px), and a caption.
- * (measured against .migration/work/samples/press.html; ties to docs/ui-specs/downloads.md, SKODA-502.)
+ *   .search-results.media-box with a grid of `.search-results-item > article.media-cart-item`
+ *   entries (classes `image` / `video` / `pdf`). Each has a 16:9 preview <img> (none for a PDF),
+ *   a title (`h3.entry-title a`) and a toolbar with either a download size menu
+ *   (`.media-cart-action-multi.download a` → "Original" / "1920px") or a single
+ *   `a.media-cart-action.download` (MP4 / PDF).
+ * (measured on the 5 M1 releases 2026-09-27; ties to docs/ui-specs/downloads.md, SKODA-502.)
  *
  * ⚠️ CONTENT-DRIVEN, NOT POSITIONAL. Everything is derived from the DOM inside the
  * element the Media-Box selector matched. If no download-shaped items are found it
  * unwraps and bails rather than emit an empty block.
  *
- * Media rules:
- *  - SKODA-502: one row per asset = preview image + title + a download link.
- *  - SKODA-503: PDF/MP4 references are emitted as plain links (never the image pipeline);
- *    detection is by href/type, not by page.
- *  - SKODA-505: per-asset cart hooks are carried onto the download link as
- *    data-action / data-id / data-size so the demo media-cart can wire them later.
- *
- * DA table shape (one row per asset):
+ * DA table shape — contract `downloads-file-rows` v1 (SKODA-510), 3 cells per row, the
+ * shape blocks/downloads `readAsset` reads (image cell / title text / links cell):
  *   ['Downloads']
- *   [previewImgOrEmpty, linkCell]     // linkCell = <a href> (title text) + optional size label
+ *   [<img> or '', 'Title', [<a>Original</a>, <a>1920px</a>]]   // image
+ *   [<img>,       'Title', [<a>MP4</a>]]                          // video (Vimeo poster)
+ *   ['',          'Title', [<a>PDF</a>]]                          // document — dropped by the
+ *                                                                 // block until SKODA-510 lands
+ * Every link is the source `/direct-download/…` URL (skoda-links makes it absolute).
+ * The cart hooks (data-id / data-size, SKODA-505) don't survive DA, so none are emitted.
  */
 
-// Is this href a document/binary that must stay a link, not an <img>? (SKODA-503)
-function isBinaryHref(href) {
-  return /\.(pdf|mp4|zip|docx?|pptx?|xlsx?)(\?|#|$)/i.test(href || '');
+const text = (el) => (el ? (el.textContent || '').replace(/\s+/g, ' ').trim() : '');
+
+// Size label for a single-download item: its file type (SKODA-503 keeps binaries as links).
+function fileLabel(href) {
+  const ext = ((href || '').split(/[?#]/)[0].split('.').pop() || '').toLowerCase();
+  if (/^(jpe?g|png|webp|gif|tiff?)$/.test(ext)) return 'Original';
+  return ext ? ext.toUpperCase() : 'Download';
+}
+
+function sizeLinks(item, document) {
+  const links = [];
+  const add = (href, label) => {
+    if (!href || href === '#' || links.some((l) => l.getAttribute('href') === href)) return;
+    const a = document.createElement('a');
+    a.setAttribute('href', href);
+    a.textContent = label;
+    links.push(a);
+  };
+
+  // Image: the download size menu ("Original" / "1920px").
+  item.querySelectorAll('.media-cart-action-multi.download a[href]').forEach((a) => {
+    const href = a.getAttribute('href');
+    add(href, text(a) || fileLabel(href));
+  });
+  if (links.length) return links;
+
+  // Video / PDF / legacy markup: one download anchor.
+  const single = item.querySelector('a.media-cart-action.download[href], a[data-action="download"][href]')
+    || item.querySelector('a[href*="direct-download"]');
+  if (single) add(single.getAttribute('href'), fileLabel(single.getAttribute('href')));
+  return links;
 }
 
 export default function parse(element, { document }) {
-  // Media-box entries: prefer the per-asset <article>; fall back to result items.
   let items = Array.from(element.querySelectorAll('article.media-cart-item'));
   if (items.length === 0) {
     items = Array.from(element.querySelectorAll('.search-results-item, .items > .item'));
@@ -44,64 +71,45 @@ export default function parse(element, { document }) {
   }
 
   const cells = [['Downloads']];
-  let emitted = 0;
 
   items.forEach((item) => {
-    // Download URL: explicit download action first, then any direct-download href,
-    // then the colorbox/original-file anchor.
-    const dlAnchor = item.querySelector('a[data-action="download"]')
-      || item.querySelector('a[href*="direct-download"]')
-      || item.querySelector('a.colorbox[href], a.file-type[href]');
-    const href = dlAnchor && dlAnchor.getAttribute('href');
-    if (!href || href === '#') return; // no resolvable asset — skip, never guess
+    const links = sizeLinks(item, document);
+    if (!links.length) return; // no resolvable asset — skip, never guess
 
-    const img = item.querySelector('img');
+    // Preview: the teaser image (a PDF has none, only a file-type icon).
+    const img = item.querySelector('.article-teaser-media img, .entry-thumbnail img, img');
+    if (img) {
+      // The Vimeo poster only carries a `title` ("Video | …"); keep it as the alt text.
+      if (!(img.getAttribute('alt') || '').trim() && img.getAttribute('title')) {
+        img.setAttribute('alt', img.getAttribute('title').replace(/^Video\s*\|\s*/i, '').trim());
+      }
+      // Vimeo posters come extension-less (`…-d_295x166?region=us`), which the media
+      // pipeline can't ingest; the CDN serves the same frame as `…-d_1280x720.jpg`.
+      const src = img.getAttribute('src') || '';
+      if (/^https:\/\/i\.vimeocdn\.com\//.test(src)) {
+        img.setAttribute('src', src.replace(/-d_\d+x\d+(\.[a-z]+)?(\?.*)?$/i, '-d_1280x720.jpg'));
+      }
+      ['data-caption', 'data-video_title', 'data-video_src', 'data-media-url', 'srcset', 'sizes', 'itemprop', 'title']
+        .forEach((a) => img.removeAttribute(a));
+    }
 
-    // Title: caption → colorbox title → alt → clean filename (no query/fragment).
-    const captionEl = item.querySelector('[data-caption]');
-    const filename = href.split('/').pop().split(/[?#]/)[0];
-    const title = (captionEl && captionEl.getAttribute('data-caption'))
-      || (dlAnchor.getAttribute('title') || '').replace(/^Download\s+/i, '').trim()
+    const filename = links[0].getAttribute('href').split('/').pop().split(/[?#]/)[0];
+    const title = text(item.querySelector('.entry-title'))
       || (img && img.getAttribute('alt'))
       || filename;
 
-    // Per-asset cart hooks (SKODA-505). Carry the source data-* onto our link.
-    const link = document.createElement('a');
-    link.setAttribute('href', href);
-    link.textContent = title;
-    const addAction = item.querySelector('a[data-action="add"][data-id]');
-    const dataId = (addAction && addAction.getAttribute('data-id'))
-      || (dlAnchor.getAttribute('data-id')) || '';
-    if (dataId) link.setAttribute('data-id', dataId);
-    // PDFs/MP4s are pure links; images get a media-cart "add" affordance seam.
-    link.setAttribute('data-action', isBinaryHref(href) ? 'link' : 'download');
-    const sizeAction = item.querySelector('a[title*="Original" i], a[data-size]');
-    const dataSize = (sizeAction && sizeAction.getAttribute('data-size')) || 'original';
-    if (!isBinaryHref(href)) link.setAttribute('data-size', dataSize || 'original');
-
-    // Put the link and the size/type label in separate paragraphs so the label
-    // does not run onto the link text when the table is flattened to DA divs.
-    const linkPara = document.createElement('p');
-    linkPara.append(link);
-    const linkCell = [linkPara];
-    const label = isBinaryHref(href)
-      ? href.split('.').pop().split(/[?#]/)[0].toUpperCase()
-      : 'Original';
-    if (label) {
-      const labelPara = document.createElement('p');
-      labelPara.textContent = label;
-      linkCell.push(labelPara);
-    }
-
-    cells.push([img || '', linkCell]);
-    emitted += 1;
+    const linkCell = links.map((a) => {
+      const p = document.createElement('p');
+      p.append(a);
+      return p;
+    });
+    cells.push([img || '', title, linkCell]);
   });
 
-  if (emitted === 0) {
+  if (cells.length === 1) {
     element.replaceWith(...element.childNodes);
     return;
   }
 
-  const table = WebImporter.DOMUtils.createTable(cells, document);
-  element.replaceWith(table);
+  element.replaceWith(WebImporter.DOMUtils.createTable(cells, document));
 }

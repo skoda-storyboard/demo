@@ -81,19 +81,22 @@ const HERO = `<div class="hero">
     <span class="category"><a href="https://www.skoda-storyboard.com/en/category/emobility/" class="label">eMobility</a></span>
   </div></div></div>`;
 
-test('story hero → Hero Image (image + h1), then perex, date, Tags(category)', { skip }, () => {
+test('story hero keeps image, h1, perex and same-row date/category inside Hero Image', { skip }, () => {
   const doc = dom(HERO);
   storyHero(doc.querySelector('.hero'), { document: doc });
   const kids = [...doc.body.children];
+  assert.equal(kids.length, 1);
   assert.equal(blockName(kids[0]), 'Hero Image');
-  assert.ok(kids[0].querySelector('img[src="https://cdn.x/h.png"]'), 'image row');
-  assert.equal(kids[0].querySelector('h1').textContent, 'Epiq title');
-  assert.equal(kids[1].tagName, 'P');
-  assert.equal(kids[1].textContent, 'The perex.');
-  assert.equal(kids[2].textContent, '15. 9. 2026');
-  assert.equal(blockName(kids[3]), 'Tags');
-  assert.equal(kids[3].querySelector('a').getAttribute('href'), 'https://www.skoda-storyboard.com/en/category/emobility/');
-  assert.equal(kids.length, 4);
+  const rows = [...kids[0].querySelectorAll('tr')].slice(1);
+  assert.equal(rows.length, 4);
+  assert.ok(rows[0].querySelector('img[src="https://cdn.x/h.png"]'), 'image row');
+  assert.equal(rows[1].querySelector('h1').textContent, 'Epiq title');
+  assert.equal(rows[2].textContent, 'The perex.');
+  const meta = rows[3].querySelector('p');
+  assert.equal(meta.querySelector('time[datetime="2026-09-15"]').textContent, '15. 9. 2026');
+  assert.equal(meta.querySelector('a').getAttribute('href'), 'https://www.skoda-storyboard.com/en/category/emobility/');
+  assert.equal(meta.querySelector('a').textContent, 'eMobility');
+  assert.equal(doc.querySelectorAll('table').length, 1, 'no separate hero Tags block');
 });
 
 test('story hero tolerates a missing caption (authors omit cells)', { skip }, () => {
@@ -108,6 +111,21 @@ test('story hero with no image and no heading unwraps', { skip }, () => {
   const doc = dom('<div class="hero"><p>stray</p></div>');
   storyHero(doc.querySelector('.hero'), { document: doc });
   assert.equal(doc.body.innerHTML, '<p>stray</p>');
+});
+
+test('story hero handles omitted perex, date or category without empty rows', { skip }, () => {
+  const noPerex = dom(HERO.replace('<p class="perex">The perex. </p>', ''));
+  storyHero(noPerex.querySelector('.hero'), { document: noPerex });
+  assert.equal(noPerex.querySelectorAll('tr').length, 4);
+  assert.equal(noPerex.querySelector('time').getAttribute('datetime'), '2026-09-15');
+  const noDate = dom(HERO.replace('<span class="published">15. 9. 2026</span>', ''));
+  storyHero(noDate.querySelector('.hero'), { document: noDate });
+  assert.equal(noDate.querySelectorAll('tr').length, 5);
+  assert.equal(noDate.querySelector('tr:last-child a').textContent, 'eMobility');
+  const noCategory = dom(HERO.replace(/<span class="category">.*?<\/span>/, ''));
+  storyHero(noCategory.querySelector('.hero'), { document: noCategory });
+  assert.equal(noCategory.querySelectorAll('tr').length, 5);
+  assert.equal(noCategory.querySelector('tr:last-child time').textContent, '15. 9. 2026');
 });
 
 // ---- SKODA-818 videos → bare URL --------------------------------------------
@@ -133,6 +151,41 @@ test('YouTube/Vimeo iframes (src or data-src, in a wrapper) → bare URL', { ski
   const hrefs = [...doc.querySelectorAll('p > a')].map((a) => a.getAttribute('href'));
   assert.deepEqual(hrefs, ['https://www.youtube.com/watch?v=abcDEF123', 'https://vimeo.com/1221703335']);
   assert.ok(doc.querySelector('iframe[data-src*="buzzsprout"]'), 'non-video embeds untouched (SKODA-604)');
+});
+
+// ---- SKODA-801a WordPress [video] (MediaElement.js) → Embed -----------------
+
+// The DOM the importer sees after MediaElement.js hydrated the shortcode (trimmed).
+const WP_VIDEO = `<p>Before</p><div style="width: 1920px;" class="wp-video"><span class="mejs-offscreen">Video Player</span>
+  <div class="mejs-container wp-video-shortcode mejs-video"><div class="mejs-inner">
+    <div class="mejs-mediaelement"><mediaelementwrapper><video class="wp-video-shortcode" poster="https://cdn.x/2026/02/poster.jpg" preload="metadata">
+      <source type="video/mp4" src="https://cdn.x/2026/02/clip_16-9.mp4?_=1"><a href="https://cdn.x/2026/02/clip_16-9.mp4">https://cdn.x/2026/02/clip_16-9.mp4</a></video></mediaelementwrapper></div>
+    <div class="mejs-layers"><div class="mejs-poster mejs-layer"><img src="https://cdn.x/2026/02/poster.jpg"></div></div>
+    <div class="mejs-controls"><div class="mejs-button mejs-playpause-button"><button type="button">Play</button></div>
+      <div class="mejs-time mejs-currenttime-container"><span class="mejs-currenttime">00:00</span></div>
+      <div class="mejs-time mejs-duration-container"><span class="mejs-duration">00:53</span></div>
+      <div class="mejs-volume-button"><a href="javascript:void(0);" class="mejs-volume-slider"><span class="mejs-offscreen">Use Up/Down Arrow keys to increase or decrease volume.</span></a></div>
+    </div></div></div></div><p>After</p>`;
+
+test('WordPress MediaElement video → one Embed table (url without ?_=, poster); no player chrome', { skip }, () => {
+  const doc = dom(WP_VIDEO);
+  storyCleanup('beforeTransform', doc.body, {});
+  const tables = [...doc.querySelectorAll('table')];
+  assert.equal(tables.length, 1);
+  assert.equal(blockName(tables[0]), 'Embed');
+  assert.deepEqual(rowsOf(tables[0])[0], ['url', 'https://cdn.x/2026/02/clip_16-9.mp4']);
+  assert.equal(tables[0].querySelector('tr:nth-child(3) img').getAttribute('src'), 'https://cdn.x/2026/02/poster.jpg');
+  assert.ok(!doc.querySelector('[class*="mejs"], a[href^="javascript:"], video'), 'player chrome gone');
+  assert.doesNotMatch(doc.body.textContent, /00:00|00:53|Arrow keys/);
+  assert.match(doc.body.textContent, /Before[\s\S]*After/);
+});
+
+test('WordPress video without a poster emits only the url row', { skip }, () => {
+  const doc = dom('<div class="wp-video"><video src="https://cdn.x/v.webm"></video></div>');
+  storyCleanup('beforeTransform', doc.body, {});
+  const table = doc.querySelector('table');
+  assert.equal(blockName(table), 'Embed');
+  assert.deepEqual(rowsOf(table), [['url', 'https://cdn.x/v.webm']]);
 });
 
 // ---- SKODA-820 related band → Story Rail ------------------------------------
