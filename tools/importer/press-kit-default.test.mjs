@@ -84,10 +84,11 @@ function fixture({
     <div class="chapter-nav-body"><ul>${Array.from({ length: 13 }, (_, i) => `<a href="${base}chapter-${i}/"><li>Chapter ${i}</li></a>`).join('')}</ul></div>
   </div>` : '';
   const bannersAndContacts = chapters ? '' : `${grid(widget(
-    '<p><a href="/direct-download/2026/03/Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf"><img src="https://cdn.skoda-storyboard.com/2019/02/download-en.png" alt="Download press kit"></a></p>',
+    // Source alts are placeholders (`download-de` / `share-de`, even on English pages).
+    '<p><a href="/direct-download/2026/03/Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf"><img src="https://cdn.skoda-storyboard.com/2019/02/download-en.png" alt="download-de"></a></p>',
   ))}
     ${grid(widget(
-    '<p><a href="mailto:?body=https://www.skoda-storyboard.com/r/skoda-peaq-covered-drive"><img src="https://cdn.skoda-storyboard.com/2019/02/share-en.png" alt="Share press kit"></a></p>',
+    '<p><a href="mailto:?body=https://www.skoda-storyboard.com/r/skoda-peaq-covered-drive"><img src="https://cdn.skoda-storyboard.com/2019/02/share-en.png" alt="share-de"></a></p>',
   ))}
     ${grid(widget(
     '<p><strong>Vítězslav Kodym</strong><br>Head of Product Communications<br>+420 604 292 131<br><a href="mailto:vitezslav.kodym@skoda-auto.cz">vitezslav.kodym@skoda-auto.cz</a></p>',
@@ -194,6 +195,11 @@ test('first glimpse preserves six inline downloads, two linked banners and both 
       'mailto:?body=https://www.skoda-storyboard.com/r/skoda-peaq-covered-drive',
       'https://cdn.skoda-storyboard.com/2019/02/share-en.png',
     ],
+  ]);
+  // The placeholder alts are replaced; the link carries the name the binary gate reads.
+  assert.deepEqual(banners.map((a) => [a.title, a.querySelector('img').alt]), [
+    ['Download PDF', 'Download PDF'],
+    ['Share by email', 'Share by email'],
   ]);
   for (const [name, role, phone, email] of [
     ['Vítězslav Kodym', 'Head of Product Communications', '+420 604 292 131', 'vitezslav.kodym@skoda-auto.cz'],

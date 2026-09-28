@@ -133,8 +133,38 @@ function rebuild(element, document) {
   element.replaceChildren(article);
 }
 
+// The source's "download"/"share" button images carry placeholder alts (`download-de`,
+// `share-de`, even on English pages) and the links have no text. Name the link (`title`, which
+// survives DA; the SKODA-503 binary gate reads it) and the image by what the link does.
+const PLACEHOLDER_ALT = /^(?:download|share)-[a-z]{2}$/i;
+function bannerLabel(href) {
+  if (/\.pdf(?:$|[?#])/i.test(href)) return 'Download PDF';
+  if (/\.mp4(?:$|[?#])/i.test(href)) return 'Download video';
+  if (/^mailto:\?/i.test(href)) return 'Share by email';
+  return '';
+}
+function labelImageLinks(article) {
+  article.querySelectorAll('a[href]').forEach((a) => {
+    const img = a.querySelector('img');
+    if (!img || text(a) || a.title) return;
+    const alt = (img.getAttribute('alt') || '').trim();
+    if (alt && !PLACEHOLDER_ALT.test(alt)) return;
+    const href = a.getAttribute('href');
+    const label = bannerLabel(href);
+    if (!label) {
+      if (/\.(?:pdf|mp4)(?:$|[?#])/i.test(href)) {
+        throw new Error(`Press-kit PDF/MP4 link has no accessible name: ${href}`);
+      }
+      return;
+    }
+    img.alt = label;
+    a.title = label;
+  });
+}
+
 function finish(element, document) {
   const article = element.querySelector('article.press_kit');
+  if (article) labelImageLinks(article);
   const sidebarStart = article?.querySelector('hr[data-press-kit-section="sidebar"]');
   if (sidebarStart) {
     let node = sidebarStart.nextElementSibling;

@@ -43,55 +43,45 @@ function imageRow(i) {
 function fileRow(title, href, label) {
   return `<div><div></div><div>${title}</div><div><p><a href="${href}">${label}</a></p></div></div>`;
 }
-// What the Downloads block does: one tile per image row, file-only rows dropped.
-function loadDownloads(block) {
-  const list = block.ownerDocument.createElement('ul');
-  list.className = 'downloads-items';
-  [...block.children].filter((row) => row.querySelector('img')).forEach(() => {
-    list.append(block.ownerDocument.createElement('li'));
+// A desktop window for the REAL Downloads block (it reads matchMedia for its Media Box
+// disclosure), mirroring blocks/downloads/downloads.test.mjs.
+function setupWindow(markup, width = 1280) {
+  const dom = new JSDOM(`<main>${markup}</main>`, { url: 'https://demo.example/en/press-kits/kit' });
+  dom.window.matchMedia = (media) => ({
+    matches: width >= Number(media.match(/\d+/)[0]),
+    addEventListener() {},
   });
-  block.replaceChildren(list);
-  block.dataset.blockStatus = 'loaded';
+  globalThis.window = dom.window;
+  globalThis.document = dom.window.document;
+  return dom.window.document.querySelector('main');
 }
 
-test('60-asset Media Box collapses to 8 tiles and lists file-only rows after Show more', async () => {
+test('Media Box: the Downloads block alone owns the disclosure and renders file rows as tiles', async () => {
+  // As imported: one Downloads table, image rows plus file-only PDF/MP4 rows (SKODA-510).
   const rows = [
     ...Array.from({ length: 30 }, (_, i) => imageRow(i)),
     fileRow('Press kit PDF', 'https://example.com/press.pdf', 'PDF'),
-    ...Array.from({ length: 25 }, (_, i) => imageRow(30 + i)),
+    ...Array.from({ length: 28 }, (_, i) => imageRow(30 + i)),
     fileRow('Launch film', 'https://example.com/film.mp4', 'MP4'),
   ];
-  const main = setup(`<div class="section body-column"></div>
+  const main = setupWindow(`<div class="section body-column"></div>
     <div class="section media-box"><div class="downloads-wrapper"><div class="downloads">${rows.join('')}</div></div></div>`);
   decorate(main);
+  const { default: decorateDownloads } = await import('../../blocks/downloads/downloads.js');
   const block = main.querySelector('.downloads');
-  loadDownloads(block);
+  await decorateDownloads(block);
+  // What loadBlock does after decorating: page code may wait on this (MutationObserver).
+  block.dataset.blockStatus = 'loaded';
   await new Promise((resolve) => { setTimeout(resolve, 0); });
-  const list = block.querySelector('.downloads-items');
-  const toggle = main.querySelector('.press-kit-show-more');
-  assert.equal(list.querySelectorAll('li:not([hidden])').length, 8);
-  const files = main.querySelector('ul.press-kit-files');
-  assert.deepEqual([...files.querySelectorAll('a[download]')].map((a) => [a.getAttribute('href'), a.textContent]), [
-    ['https://example.com/press.pdf', 'Press kit PDF (PDF)'],
-    ['https://example.com/film.mp4', 'Launch film (MP4)'],
-  ]);
-  assert.ok(toggle.compareDocumentPosition(files) & 4, 'file links follow the Show more control');
-  toggle.click();
-  assert.equal(list.querySelectorAll('li:not([hidden])').length, 55);
-  assert.equal(toggle.getAttribute('aria-expanded'), 'true');
-});
 
-test('Media Box collapse counts image tiles across multiple Downloads blocks', async () => {
-  const main = setup(`<div class="section body-column"></div>
-    <div class="section media-box"><div class="downloads">${Array.from({ length: 53 }, (_, i) => imageRow(i)).join('')}</div>
-    <div class="downloads">${[imageRow(53), imageRow(54)].join('')}</div></div>`);
-  decorate(main);
-  main.querySelectorAll('.downloads').forEach(loadDownloads);
-  await new Promise((resolve) => { setTimeout(resolve, 0); });
-  assert.equal(main.querySelectorAll('.downloads-items > li:not([hidden])').length, 8);
-  assert.equal(main.querySelectorAll('.press-kit-files').length, 0, 'no file rows, no file list');
-  main.querySelector('.press-kit-show-more').click();
-  assert.equal(main.querySelectorAll('.downloads-items > li:not([hidden])').length, 55);
+  const section = main.querySelector('.section.media-box');
+  assert.equal(section.id, 'media-box', 'anchor for the sidebar "+N" link');
+  const toggles = [...section.querySelectorAll('button')]
+    .filter((button) => /show (more|less)/i.test(button.textContent));
+  assert.equal(toggles.length, 1, 'exactly one disclosure control');
+  assert.ok(toggles[0].classList.contains('downloads-more'), 'and it is the Downloads block\'s');
+  assert.equal(section.querySelectorAll('.press-kit-show-more, .press-kit-files').length, 0);
+  assert.equal(section.querySelectorAll('.downloads-file').length, 2, 'PDF + MP4 render as file tiles');
 });
 
 test('a hub keeps links and has no article-only controls', () => {

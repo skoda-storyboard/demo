@@ -368,8 +368,34 @@ var CustomImportScript = (() => {
     article.replaceChildren(...out);
     element.replaceChildren(article);
   }
+  var PLACEHOLDER_ALT = /^(?:download|share)-[a-z]{2}$/i;
+  function bannerLabel(href) {
+    if (/\.pdf(?:$|[?#])/i.test(href)) return "Download PDF";
+    if (/\.mp4(?:$|[?#])/i.test(href)) return "Download video";
+    if (/^mailto:\?/i.test(href)) return "Share by email";
+    return "";
+  }
+  function labelImageLinks(article) {
+    article.querySelectorAll("a[href]").forEach((a) => {
+      const img = a.querySelector("img");
+      if (!img || text3(a) || a.title) return;
+      const alt = (img.getAttribute("alt") || "").trim();
+      if (alt && !PLACEHOLDER_ALT.test(alt)) return;
+      const href = a.getAttribute("href");
+      const label = bannerLabel(href);
+      if (!label) {
+        if (/\.(?:pdf|mp4)(?:$|[?#])/i.test(href)) {
+          throw new Error(`Press-kit PDF/MP4 link has no accessible name: ${href}`);
+        }
+        return;
+      }
+      img.alt = label;
+      a.title = label;
+    });
+  }
   function finish(element, document) {
     const article = element.querySelector("article.press_kit");
+    if (article) labelImageLinks(article);
     const sidebarStart = article == null ? void 0 : article.querySelector('hr[data-press-kit-section="sidebar"]');
     if (sidebarStart) {
       let node = sidebarStart.nextElementSibling;

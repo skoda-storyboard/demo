@@ -5,7 +5,6 @@ body.press-kit {
   --pk-chapters-layer: 5;
   --pk-media-gap: var(--spacing-xl);
   --pk-sidebar-inset: var(--spacing-xxl);
-  --pk-show-more-min-width: 139px;
   --pk-article-top: var(--spacing-xl);
   --pk-date-size: 11px;
 }
@@ -102,31 +101,6 @@ body.press-kit main > .section:first-child:not(:has(.hero-image)) p {
 
 body.press-kit .section.media-box {
   margin-top: var(--pk-media-gap);
-}
-
-body.press-kit .press-kit-files {
-  max-width: var(--content-max-width);
-  margin: var(--spacing-l) auto 0;
-  padding-inline: var(--pk-gutter);
-  list-style: none;
-}
-
-body.press-kit .section.media-box .press-kit-files a {
-  color: var(--background-color);
-}
-
-body.press-kit .press-kit-show-more {
-  display: block;
-  min-width: var(--pk-show-more-min-width);
-  min-height: var(--pk-chapters-height);
-  margin: var(--spacing-l) auto;
-  padding: var(--spacing-s) var(--spacing-xl);
-  cursor: pointer;
-}
-
-body.press-kit .press-kit-show-more:focus-visible {
-  outline: 2px solid var(--link-color);
-  outline-offset: 2px;
 }
 
 /* Hub hero (press-kit-template.md sweep correction): below 768 the caption leaves the image
