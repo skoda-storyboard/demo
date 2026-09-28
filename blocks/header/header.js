@@ -183,6 +183,7 @@ export default async function decorate(block) {
 
   // topbar: section switcher (COM-04) + subscribe/locales group, lifted above <nav>
   const navTopbar = nav.querySelector('.nav-topbar');
+  let hasSubscribe = false;
   if (navTopbar) {
     const switcher = navTopbar.querySelector(':scope .default-content-wrapper > ul, :scope > ul');
     if (switcher) {
@@ -200,6 +201,7 @@ export default async function decorate(block) {
     utility.forEach((p) => p.classList.add('nav-topbar-utility'));
     // prefix the Subscribe CTA with a mail icon (injected here; DA strips authored tokens)
     const subscribeLink = navTopbar.querySelector('a[href*="#subscribe"]');
+    hasSubscribe = !!subscribeLink;
     if (subscribeLink && !subscribeLink.querySelector('.icon')) {
       subscribeLink.classList.add('nav-subscribe');
       const mail = document.createElement('span');
@@ -360,12 +362,16 @@ export default async function decorate(block) {
 
   // mobile action cluster: mail shortcut + hamburger (mail sits before the
   // hamburger, mobile-only). Mail is an anchor so it is not picked up by the
-  // nav's `querySelector('button')` focus/close logic.
-  const mail = document.createElement('a');
-  mail.className = 'nav-mail';
-  mail.href = '#subscribe';
-  mail.setAttribute('aria-label', 'Subscribe to our stories');
-  mail.innerHTML = '<span class="icon icon-mail"></span>';
+  // nav's `querySelector('button')` focus/close logic. Only a nav that authors
+  // the Subscribe CTA gets it: the Media Room nav has none (SKODA-309).
+  let mail;
+  if (hasSubscribe) {
+    mail = document.createElement('a');
+    mail.className = 'nav-mail';
+    mail.href = '#subscribe';
+    mail.setAttribute('aria-label', 'Subscribe to our stories');
+    mail.innerHTML = '<span class="icon icon-mail"></span>';
+  }
 
   // hamburger for mobile
   const hamburger = document.createElement('div');
@@ -377,7 +383,8 @@ export default async function decorate(block) {
 
   const mobileTools = document.createElement('div');
   mobileTools.className = 'nav-mobile-tools';
-  mobileTools.append(mail, hamburger);
+  if (mail) mobileTools.append(mail);
+  mobileTools.append(hamburger);
   nav.prepend(mobileTools);
   nav.setAttribute('aria-expanded', 'false');
   // prevent mobile nav behavior on window resize
