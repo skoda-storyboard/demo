@@ -80,11 +80,22 @@ one PDF anchor, rewrote it to the proved Assets URL and returned no binary
 gate errors. The existing DA source still has the source-host PDF link.
 The external bulk-import runner was denied by the execution environment,
 the branch worktree has no generated `content/` page, and terminal DA source
-access returned 401. No local page or DA document was overwritten; no page
-preview or page publish occurred. Resume at a generated importer page and a
-credentialed, conflict-safe `import:push --dry-run`, then push + preview and
-hand off to independent QA. No MP4 has been uploaded or live-proven. The
-ticket remains open; SKODA-510 owns Downloads file-tile rendering.
+access returned 401. No generated local page was available.
+
+**DA MCP handoff:** the user directed use of DA MCP for the existing imported
+Elroq document. A named pre-change version was saved, then its single PDF
+anchor was changed to the proven public Assets URL and the page previewed.
+The DA source and anonymous `.aem.page` output show the same accessible
+`Download PDF` link. Offline binary verification of the preview found one
+PDF anchor, no external inline images and no binary errors; the browser
+shows a visible link and the existing headings and model-filter links.
+Both `main` and the PR branch `.aem.page` serve the verified link; `.aem.live`
+still serves the original source URL. **No page publication occurred.**
+The repo's push manifest still represents the prior content hash and was
+intentionally not updated without a generated local page; future
+`import:push` runs must resolve its author-edit conflict explicitly.
+Independent QA and a reproducible importer run remain outstanding. No MP4
+has been uploaded or live-proven. SKODA-510 owns Downloads file-tile rendering.
 
 Read-only probe: the candidate AEM publish hostname serves one already-uploaded
 image anonymously (HEAD 200). The source Peaq MP4 is approximately 101 MB;

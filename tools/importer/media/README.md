@@ -37,10 +37,14 @@ under `.migration/secrets/skoda-503-sample-manifest.json` was resumed with
 the user's one-page execution request: its one Elroq PDF row now records
 activation and anonymous MIME/byte-count proof, which was copied to the
 tracked media manifest. Do not repeat the upload or expand the batch. The
-Elroq DA page still has its source PDF link; the bulk-import runner was denied
-in the execution environment and no generated page was available in this
-branch for the gated DA push/preview. Do not mark the ticket done until a
-generated page, credentialed push/preview, and independent QA have passed.
+bulk-import runner was denied in the execution environment and no generated
+page was available in this branch for `import:push`. At the user's request,
+the existing DA Elroq page was versioned, its verified PDF link updated via
+DA MCP, and previewed. `main` and PR branch `.aem.page` now show the public
+Assets link; `.aem.live` still shows the source URL. The push manifest was
+not modified to pretend this was an importer push. Do not mark the ticket
+done until a reproducible generated page and independent QA have passed;
+page publication remains a separate decision.
 
 Before the first approved sample upload, create a **reviewed, local JSON map**
 whose keys are intended DAM paths and whose values are candidate public Assets
