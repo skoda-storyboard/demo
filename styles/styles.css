@@ -160,14 +160,9 @@
   --app-badge-w: 135px;
   --app-badge-h: 40px;
 
-  /* homepage social profile cards (SKODA-217; measured on the live /en/
-     .socials-static): 76px icon, 20px icon → handle and card gaps, content
-     padding 32/16/8. The live grid is 720px of 240px slots with 10px insets,
-     i.e. 700px of 220px cards, so the card grid caps at 700px. */
-  --social-card-icon-size: 76px;
-  --social-card-gap: 20px;
-  --social-card-padding: 32px 16px 8px;
-  --social-card-grid-max: 700px;
+  /* homepage Social media band (SKODA-217; measured on the live /en/
+     .socials-static). The card values live with the Cards (social) variant
+     (blocks/cards/cards.css); the shared home-band box is SKODA-218's. */
   --social-band-padding-top: 64px;
   --social-band-padding-bottom: 80px;
   --social-band-max-width: 1440px; /* live .cover-box: capped + centred above 1440 */
@@ -639,7 +634,7 @@ main > .section:first-of-type {
    gap to the cards. Colour follows the section (the global heading colour is
    the fixed text colour), so the dark band (Style: cover-box, dark) turns it white. */
 main > .section.cards-container:has(.cards.social) > .default-content-wrapper :is(h2, h3) {
-  margin: 0 0 var(--social-card-gap);
+  margin: 0 0 var(--grid-gutter); /* 20px, the home section heading → content gap */
   color: inherit;
   font-size: var(--heading-font-size-l);
   font-weight: var(--weight-semibold);

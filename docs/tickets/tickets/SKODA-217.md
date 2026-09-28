@@ -4,6 +4,10 @@
 - **Type:** block variant
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo)
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1–2d *(planning estimate, not a quote)*
+- **Status (2026-09-28):** 🟡 In review, [PR #188](https://github.com/skoda-storyboard/demo/pull/188) (QA: matches
+  live at 1280/768/640/1920). Open against other tickets: 500px is 8px narrower and the 592px column switch depends
+  on the section padding (SKODA-826); the shared dark-band heading colour, 1440px cap and band spacing move to
+  SKODA-218's shared rules. The section style is `cover-box, dark`, as on every home dark band (SKODA-218).
 
 ## UI Specification
 Source: `https://www.skoda-storyboard.com/en/`, the `.socials-static .type-social` section.

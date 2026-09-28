@@ -25,8 +25,18 @@
    cards). Layer 2: the source goes straight from one column to three (no
    two-column state) at a 640px viewport; as a container query on the block's
    own width that is 592px (640 less the 24px section padding either side), so
-   the switch lands on the same viewport and follows the block into any column. */
+   the switch lands on the same viewport and follows the block into any column
+   (recheck 639/640 when SKODA-826 changes the section padding).
+   Variant tokens (measured on the live /en/ .socials-static), read by the
+   .card-teaser.social tiles inside (styles/card-teaser.css): 76px icon, 20px
+   icon → handle and card gaps, content padding 32/16/8; the live grid is 720px
+   of 240px slots with 10px insets, i.e. 700px of 220px cards. */
 .cards.social {
+  --social-card-icon-size: 76px;
+  --social-card-gap: 20px;
+  --social-card-padding: 32px 16px 8px;
+  --social-card-grid-max: 700px;
+
   container: social-cards / inline-size;
 }
 
