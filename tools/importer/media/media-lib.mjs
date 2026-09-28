@@ -1,10 +1,10 @@
 /*
- * media-lib.mjs — reusable helpers for the Škoda image-import mechanism.
+ * media-lib.mjs — reusable helpers for the Škoda media-import mechanism.
  *
  * Pure/dependency-free (Node 24 built-ins only: fetch, fs, crypto, path).
  * Shared by build-media-manifest.mjs and apply-media-manifest.mjs so any page
- * set in this project can ingest its images into the AEM DAM (system of record,
- * ORIGINALS) and rewrite content to media-bus-deliverable URLs.
+ * set in this project can ingest originals into the AEM DAM (system of record)
+ * and rewrite images to media-bus-deliverable URLs.
  *
  * Grounded in docs/media/SKODA-MEDIA-DEEP-DIVE.md + SKODA-ASSET-MAPPING.md and
  * tickets SKODA-501 (masters-only), SKODA-504 (manifest), SKODA-506 (pre-condition).
@@ -26,15 +26,9 @@ const DERIVATIVE_SUFFIX_RE = /-\d{2,5}x\d{2,5}(?=\.[a-z0-9]+$)/i;
 
 const IMAGE_EXT_RE = /\.(jpe?g|png|gif|webp|avif|svg)$/i;
 
-// Linked (non-image) binaries tracked for the DAM (SKODA-503; SKODA-208 for the model
-// Technical Data PDFs). They have no media-bus delivery: the page keeps its source link
-// and the manifest row records the original for a later explicit `--dam-base` run.
-// kind → file extension + the MIME type the fetched original must have.
-const LINKED_ASSET_TYPES = {
-  document: { ext: /\.pdf$/i, mime: /^application\/pdf/i, label: 'PDF' },
-  video: { ext: /\.mp4$/i, mime: /^video\/mp4/i, label: 'MP4' },
-};
-const DOCUMENT_EXT_RE = LINKED_ASSET_TYPES.document.ext;
+// Linked documents tracked for the DAM (SKODA-208: the model Technical Data PDFs). They
+// have no media-bus delivery (the page keeps the source link until the DAM ingest).
+const DOCUMENT_EXT_RE = /\.pdf$/i;
 
 // Content-bus 409 threshold: masters over ~10 MB 409 the content bus on publish
 // (SKODA-506, build-confirmed). Pre-condition the DELIVERY image by substituting
@@ -82,35 +76,6 @@ export function isDocumentUrl(url) {
   return DOCUMENT_EXT_RE.test(cleanUrl(url));
 }
 
-/** The linked-asset kind ('document' | 'video') of a URL, or null for anything else. */
-export function linkedAssetKind(url) {
-  const clean = cleanUrl(url);
-  return Object.keys(LINKED_ASSET_TYPES).find((kind) => LINKED_ASSET_TYPES[kind].ext.test(clean))
-    || null;
-}
-
-/** True for a manifest row kind that is tracked for the DAM only (no delivery step). */
-export function isLinkedAssetKind(kind) {
-  return Object.hasOwn(LINKED_ASSET_TYPES, kind);
-}
-
-/** Expected MIME pattern + display label for a linked-asset kind. */
-export function linkedAssetType(kind) {
-  return LINKED_ASSET_TYPES[kind];
-}
-
-// The source site's gated `/direct-download/<yyyy>/<mm>/<file>` route (SKODA-503)
-// redirects to a signed, expiring S3 URL served as application/octet-stream. The same
-// object is on the plain CDN at `/<yyyy>/<mm>/<file>` with its real type and size.
-const DIRECT_DOWNLOAD_RE = /^https?:\/\/(?:www\.)?skoda-storyboard\.com\/direct-download\/(.+)$/i;
-
-/** The fetchable original for a linked asset: the plain CDN object, never the gated route. */
-export function linkedAssetOriginalUrl(url) {
-  const clean = cleanUrl(url);
-  const m = clean.match(DIRECT_DOWNLOAD_RE);
-  return m ? `https://cdn.skoda-storyboard.com/${m[1]}` : clean;
-}
-
 /** The `-WxH` suffix on a filename, or null. */
 export function derivativeSuffix(url) {
   const m = urlBasename(url).match(/-(\d{2,5}x\d{2,5})(?=\.[a-z0-9]+$)/i);
@@ -143,11 +108,16 @@ export function stepDownTooSmall(row, minEdge = MIN_RENDITION_EDGE) {
 }
 
 export function needsMediaBuild(row, {
-  dam = false, da = false, force = false, minEdge = MIN_RENDITION_EDGE,
+  dam = false, da = false, force = false, minEdge = MIN_RENDITION_EDGE, publicUrl = '',
 } = {}) {
   if (force || !row || row.status !== 'done') return true;
-  // A linked-asset row (PDF/MP4) has no delivery step; only the DAM original can be outstanding.
-  if (isLinkedAssetKind(row.kind)) return dam && (row.steps?.dam !== 'done' || !row.dam_asset_path);
+  // A binary must have a verified public destination, not merely a private DAM upload.
+  if (row.kind === 'document' || row.kind === 'video') {
+    return row.steps?.dam !== 'done' || !row.dam_asset_path
+      || (dam && row.steps?.publish !== 'done')
+      || !row.public_url || (publicUrl && row.public_url !== publicUrl)
+      || row.public_verified?.url !== row.public_url;
+  }
   if (row.steps?.deliver !== 'done' || !row.delivery_url
     || !Number.isFinite(row.bytes) || row.bytes > OVERSIZE_BYTES) return true;
   if (stepDownTooSmall(row, minEdge)) return true;
@@ -344,11 +314,7 @@ export async function headBytes(url, { timeoutMs = 20000 } = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    // identity: the CDN gzips compressible originals (PDFs) and then omits
-    // content-length, which read as "unavailable"; we want the original's byte size.
-    const res = await fetch(url, {
-      method: 'HEAD', headers: { 'accept-encoding': 'identity' }, signal: controller.signal,
-    });
+    const res = await fetch(url, { method: 'HEAD', signal: controller.signal });
     if (!res.ok) return null;
     const len = res.headers.get('content-length');
     return len ? Number(len) : null;
@@ -635,6 +601,35 @@ export async function uploadToDAM({
       ok: false, status: 0, assetPath: damPath, body: String(err.message || err),
     };
   }
+}
+
+/** Activate a single original on the AEM publish tier after its DAM upload. */
+export async function publishDamBinary({
+  damConfig, damPath, token, fetchImpl = fetch,
+}) {
+  const folder = (damConfig?.folder || '/content/dam/storyboard').replace(/\/$/, '');
+  if (!damConfig?.baseUrl || !token || !damPath?.startsWith(`${folder}/`)
+    || path.posix.normalize(damPath) !== damPath || !/\.(pdf|mp4)$/i.test(damPath)) {
+    throw new Error(`Cannot activate an unconfigured or out-of-scope DAM binary: ${damPath}`);
+  }
+  const response = await fetchImpl(`${damConfig.baseUrl.replace(/\/$/, '')}/bin/replicate.json`, {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${token}`,
+      'content-type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({ cmd: 'Activate', path: damPath }).toString(),
+    redirect: 'error',
+    signal: AbortSignal.timeout(60000),
+  });
+  if (!response.ok) throw new Error(`DAM activation returned ${response.status} for ${damPath}`);
+  if ((response.headers.get('content-type') || '').includes('application/json')) {
+    const result = await response.json();
+    if (result.success === false || result.error || result.status === 'error') {
+      throw new Error(`DAM activation reported failure for ${damPath}`);
+    }
+  }
+  return response.status;
 }
 
 /**

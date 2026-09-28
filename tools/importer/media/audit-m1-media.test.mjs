@@ -64,8 +64,7 @@ test('M1 audit excludes the annotated alias, reports missing pages and checks im
       untrackedDocuments: 0,
       pendingDamDocument: 0,
       videos: 0,
-      untrackedVideos: 0,
-      pendingDamVideo: 0,
+      unverifiedBinaries: 0,
     });
 
     assert.deepEqual(report.pages.map(({ path: p }) => p), ['en/story', 'en/other-story']);
@@ -183,45 +182,22 @@ test('M1 audit tracks linked PDFs: untracked, then pending, then in the DAM (SKO
     assert.deepEqual(counts(['untrackedDocuments', 'pendingDamDocument', 'missingFromPage']), [0, 1, 0]);
 
     row.steps.dam = 'done';
+    row.steps.publish = 'done';
     row.dam_asset_path = '/content/dam/storyboard/en/skoda-model/new-kodiaq/TD-Kodiaq-en.pdf';
+    row.status = 'done';
+    row.source_url = pdf;
+    row.public_url = 'https://publish-p123.adobeaemcloud.com/content/dam/TD-Kodiaq-en.pdf';
+    row.bytes = 42;
+    row.public_verified = { url: row.public_url, mime: 'application/pdf', bytes: 42 };
     writeFileSync(manifest, JSON.stringify({ rows: { [row.logical_id]: row } }));
+    await assert.rejects(exec(process.execPath, command, { cwd: dir }), /Command failed/);
+    writeFileSync(
+      path.join(content, 'en/skoda-model/new-kodiaq.plain.html'),
+      `<p><a href="${row.public_url}">Download PDF</a></p>`,
+    );
     await exec(process.execPath, command, { cwd: dir });
     ({ summary } = JSON.parse(readFileSync(output, 'utf8')));
     assert.equal(summary.pendingDamDocument, 0);
-  } finally {
-    rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('M1 audit tracks linked MP4s separately from PDFs: untracked, then pending (SKODA-503)', async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-media-audit-video-'));
-  try {
-    const urls = path.join(dir, 'urls.txt');
-    const manifest = path.join(dir, 'manifest.json');
-    const content = path.join(dir, 'content');
-    const output = path.join(dir, 'audit.json');
-    const mp4 = 'https://cdn.example.test/2026/05/Epiq_colours_EN_1d57bbaa.mp4';
-    mkdirSync(path.join(content, 'en/videos'), { recursive: true });
-    writeFileSync(urls, 'https://www.skoda-storyboard.com/en/videos/epiq-colours-en/\n');
-    writeFileSync(path.join(content, 'en/videos/epiq-colours-en.plain.html'), `<p><a href="${mp4}">Download video</a></p>`);
-    const command = [script, '--urls', urls, '--contentRoot', content, '--manifest', manifest, '--out', output];
-
-    writeFileSync(manifest, JSON.stringify({ rows: {} }));
-    await assert.rejects(exec(process.execPath, command, { cwd: dir }), /Command failed/);
-    let { summary } = JSON.parse(readFileSync(output, 'utf8'));
-    const counts = (keys) => keys.map((k) => summary[k]);
-    assert.deepEqual(counts(['videos', 'untrackedVideos', 'documents']), [1, 1, 0]);
-
-    const row = {
-      kind: 'video',
-      logical_id: logicalId(mp4),
-      page_refs: ['en/videos/epiq-colours-en'],
-      steps: { deliver: 'n/a', dam: 'n/a' },
-    };
-    writeFileSync(manifest, JSON.stringify({ rows: { [row.logical_id]: row } }));
-    await assert.rejects(exec(process.execPath, command, { cwd: dir }), /Command failed/);
-    ({ summary } = JSON.parse(readFileSync(output, 'utf8')));
-    assert.deepEqual(counts(['untrackedVideos', 'pendingDamVideo', 'missingFromPage']), [0, 1, 0]);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

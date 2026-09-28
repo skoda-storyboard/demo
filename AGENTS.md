@@ -51,5 +51,5 @@ For any frontend CSS, styling, responsive-layout, or UI-component work:
 - Merging `main` ships code; content publishes separately.
 - A PR without a `{branch}--demo--skoda-storyboard.aem.page/{path}` link is rejected.
 - All committed files are served. Use `.hlxignore`.
-- Migrated PDFs/MP4s get rows in `tools/importer/media/media-manifest.json` (`kind: document|video`), like images; commit it with the import. The DAM ingest runs on a developer machine, not here (`tools/importer/media/README.md`, "Linked assets").
+- Migrated PDFs/MP4s get rows in `tools/importer/media/media-manifest.json` (`kind: document|video`), like images; commit it with the import. The DAM ingest runs on a developer machine, not here (`tools/importer/media/README.md`, "PDF/MP4 links").
 - Skills: `/plugin marketplace add adobe/skills`, then `aem-edge-delivery-services` (24 skills, incl. `docs-search`).

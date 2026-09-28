@@ -207,6 +207,37 @@ Four content rows (the `header.js` `hasTopbar` path, `children.length >= 4`):
    ```
 4. **Tools row:** search + (optional) locale mirror. -> `.nav-tools`.
 
+### Media Room variant (`/media-room/nav`, SKODA-309)
+
+Measured 2026-09-28 in Chrome DevTools (DOM + computed styles, no screenshots). MR source: `/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/`. STO comparison: `/en/lifestyle/ouninpohja-finlands-roller-coaster-stage/`.
+
+- **The same header block** loads a second nav document, selected by bulk metadata on the MR paths: `nav: /media-room/nav`, `footer: /media-room/footer`, `section: media-room`.
+- **Shell:** unchanged. The logo SVG is byte-identical, 256×48 at x106 (1440). The header is 108px tall: a 44px topbar plus a 64px nav row. Nav items are 16/24/400 `#161718`.
+- **Topbar grey:** `#f1f1f1` on MR (`--skoda-grey-50`) vs `#e6e6e6` on STO (`--skoda-grey-200`). Applied via `.header[data-section='media-room']`.
+- **Active tab:** Media Room, white, 14/21/400 black, 124.8×44 at x195.6 (1440) and x115.6 (1280). The inactive Stories tab is 14/600 `#7c7d7e`. Below 1080 each tab takes half the width; Media Room is the right half (496px at 992, 187.5px at 375). `header-switcher.js` picks the tab named by `section`, so MR pages outside `/en/media-room` activate it.
+- **Topbar content:** switcher plus locales. **There is no "Subscribe to our stories" link on the MR side.** The source locales are per-page translations (CZ/sk/sr); the demo keeps the static six (locales are SKODA-303).
+- **Brand:** links to the MR home (`/en/media-room/`, live site; not in the demo).
+- **Sections at 1440** (x positions: News 362 · Press Kits 442.3 · Models 552.1 · Images 668.2 · Videos 759.2 · Company 847.2 · Škodapedia 978.6; hamburger below 1080, as STO):
+
+  ```
+  - [News](https://www.skoda-storyboard.com/en/news/)
+  - [Press Kits](https://www.skoda-storyboard.com/en/press-kits/)
+  - Models (no link on the source: `#`)
+    - Fabia /en/skoda-model/new-fabia · Scala …/scala · Octavia …/octavia · Superb …/new-superb
+      Kamiq …/kamiq · Karoq …/karoq-6 · Kodiaq …/new-kodiaq · Epiq …/epiq · Peaq …/peaq
+      Elroq …/elroq · Enyaq …/enyaq-iv-2
+  - [Images](/en/images) · [Videos](/en/videos)
+  - Company (no link: `#`)
+    - Management …/board-of-management/ · Brand Group CORE (BGC) …/brand-group-core-bgc/
+      #ExploreSkoda podcast (simplycleverpodcast2.buzzsprout.com) · Škoda Motorsport (skoda-motorsport.com)
+      Newsletter …/newsletter/ · Company Logo …/company-logo/ · Mobile App …/skoda-media-services-application/
+      Contacts …/contacts/
+  - [Škodapedia](https://www.skoda-storyboard.com/en/skodapedia/)
+  ```
+
+- **Links:** the demo pages (`/en`, Images, Videos, the 11 model pages) are site-relative with no trailing slash. Every other target stays absolute to the live site (SKODA-605/609).
+- **Dropdown parents without a link:** authored as `<p>Models</p>` / `<p>Company</p>` and toggled by the existing `.nav-drop` logic.
+
 ### `decorate()` outline (consistent with `blocks/header/header.js`)
 
 - `loadFragment(getMetadata('nav') || '/nav')`; move fragment children into a new `<nav id="nav">`.

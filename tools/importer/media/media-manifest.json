@@ -25228,8 +25228,8 @@
         "en/skoda-model/elroq/elroq-rs",
         "en/skoda-model/elroq/elroq-sportline"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/skoda-model/elroq/TD-Elroq-en_new_7a3c9a44.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2024/10/TD-Elroq-en_new_7a3c9a44.pdf",
       "original_download_url": "",
       "delivery_url": "",
       "da_path": "",
@@ -25239,14 +25239,23 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2024/10/TD-Elroq-en_new_7a3c9a44.pdf"
       ],
-      "bytes": null,
+      "bytes": 537385,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
       "status": "done",
-      "note": ""
+      "note": "",
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/elroq/TD-Elroq-en_new_7a3c9a44.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-model/elroq/TD-Elroq-en_new_7a3c9a44.pdf",
+        "mime": "application/pdf",
+        "bytes": 537385
+      },
+      "source_content_type": "application/pdf",
+      "dam_status": 200
     },
     "df14cfed__enyaq_aerodynamics_25f1d1fd.png": {
       "logical_id": "df14cfed__enyaq_aerodynamics_25f1d1fd.png",
@@ -25450,10 +25459,13 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "41927b7c__NEW_ENQ_111_Tech_Drawings_Basis_ee7f8f97.jpg": {
       "logical_id": "41927b7c__NEW_ENQ_111_Tech_Drawings_Basis_ee7f8f97.jpg",
@@ -25712,10 +25724,13 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "455af128__kamiq-virtualni-pedal_66aa4de2.png": {
       "logical_id": "455af128__kamiq-virtualni-pedal_66aa4de2.png",
@@ -25945,10 +25960,13 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "168ad7ed__karoq_2_79ca8dc0.jpg": {
       "logical_id": "168ad7ed__karoq_2_79ca8dc0.jpg",
@@ -26178,10 +26196,13 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "aac5f28c__Header_New_FABIA.jpg": {
       "logical_id": "aac5f28c__Header_New_FABIA.jpg",
@@ -26442,10 +26463,13 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "9dbc14fb__Skoda_Kodiaq_header_04479753.png": {
       "logical_id": "9dbc14fb__Skoda_Kodiaq_header_04479753.png",
@@ -26734,10 +26758,13 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "3311ece9__adaptivni_podvozek_af3f5368.png": {
       "logical_id": "3311ece9__adaptivni_podvozek_af3f5368.png",
@@ -26997,10 +27024,13 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "7354f7bb__octaviaFL-safety_2fb903a1.png": {
       "logical_id": "7354f7bb__octaviaFL-safety_2fb903a1.png",
@@ -27260,10 +27290,13 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "455af128__scala-infotainment_acd08583.png": {
       "logical_id": "455af128__scala-infotainment_acd08583.png",
@@ -28565,10 +28598,13 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "df14cfed__enyaq-sportline-front_90486bd1.png": {
       "logical_id": "df14cfed__enyaq-sportline-front_90486bd1.png",
@@ -29821,7 +29857,7 @@
       "kind": "document",
       "logical_id": "2ba8cd9d__260902_936-km-without-recharging-Skoda-Peaq-sets-range-record-for-seven-seater-electric-SUVs_26857905.pdf",
       "source_url": "https://www.skoda-storyboard.com/direct-download/2026/09/260902_936-km-without-recharging-Skoda-Peaq-sets-range-record-for-seven-seater-electric-SUVs_26857905.pdf",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/09/260902_936-km-without-recharging-Skoda-Peaq-sets-range-record-for-seven-seater-electric-SUVs_26857905.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/09/260902_936-km-without-recharging-Skoda-Peaq-sets-range-record-for-seven-seater-electric-SUVs_26857905.pdf",
       "dam_page_path": "en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
       "page_refs": [
         "en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs"
@@ -29841,16 +29877,19 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "2ba8cd9d__260916_Skoda-Auto-and-National-Theatre-extend-partnership-until-at-least-2029_bfc24cdb.pdf": {
       "kind": "document",
       "logical_id": "2ba8cd9d__260916_Skoda-Auto-and-National-Theatre-extend-partnership-until-at-least-2029_bfc24cdb.pdf",
       "source_url": "https://www.skoda-storyboard.com/direct-download/2026/09/260916_Skoda-Auto-and-National-Theatre-extend-partnership-until-at-least-2029_bfc24cdb.pdf",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/09/260916_Skoda-Auto-and-National-Theatre-extend-partnership-until-at-least-2029_bfc24cdb.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/09/260916_Skoda-Auto-and-National-Theatre-extend-partnership-until-at-least-2029_bfc24cdb.pdf",
       "dam_page_path": "en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029",
       "page_refs": [
         "en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029"
@@ -29870,16 +29909,19 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "2ba8cd9d__260902_Skoda-Auto-announces-changes-to-its-Board-of-Management_8feffddc.pdf": {
       "kind": "document",
       "logical_id": "2ba8cd9d__260902_Skoda-Auto-announces-changes-to-its-Board-of-Management_8feffddc.pdf",
       "source_url": "https://www.skoda-storyboard.com/direct-download/2026/09/260902_Skoda-Auto-announces-changes-to-its-Board-of-Management_8feffddc.pdf",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/09/260902_Skoda-Auto-announces-changes-to-its-Board-of-Management_8feffddc.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/09/260902_Skoda-Auto-announces-changes-to-its-Board-of-Management_8feffddc.pdf",
       "dam_page_path": "en/press-releases/skoda-auto-announces-changes-to-its-board-of-management",
       "page_refs": [
         "en/press-releases/skoda-auto-announces-changes-to-its-board-of-management"
@@ -29899,16 +29941,19 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "2ba8cd9d__260921_Skoda-Auto-Klaus-Zellmer-to-leave-the-company_cbd56c45.pdf": {
       "kind": "document",
       "logical_id": "2ba8cd9d__260921_Skoda-Auto-Klaus-Zellmer-to-leave-the-company_cbd56c45.pdf",
       "source_url": "https://www.skoda-storyboard.com/direct-download/2026/09/260921_Skoda-Auto-Klaus-Zellmer-to-leave-the-company_cbd56c45.pdf",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/09/260921_Skoda-Auto-Klaus-Zellmer-to-leave-the-company_cbd56c45.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/09/260921_Skoda-Auto-Klaus-Zellmer-to-leave-the-company_cbd56c45.pdf",
       "dam_page_path": "en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company",
       "page_refs": [
         "en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company"
@@ -29928,16 +29973,19 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "9f34d7bf__260827_Skoda-Octavia-turns-30-Three-decades-of-a-brand-icon_8b603fd6.pdf": {
       "kind": "document",
       "logical_id": "9f34d7bf__260827_Skoda-Octavia-turns-30-Three-decades-of-a-brand-icon_8b603fd6.pdf",
       "source_url": "https://www.skoda-storyboard.com/direct-download/2026/08/260827_Skoda-Octavia-turns-30-Three-decades-of-a-brand-icon_8b603fd6.pdf",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/08/260827_Skoda-Octavia-turns-30-Three-decades-of-a-brand-icon_8b603fd6.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/08/260827_Skoda-Octavia-turns-30-Three-decades-of-a-brand-icon_8b603fd6.pdf",
       "dam_page_path": "en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
       "page_refs": [
         "en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon"
@@ -29957,16 +30005,19 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "2ba8cd9d__260911_Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-_0b7cd9dc.pdf": {
       "kind": "document",
       "logical_id": "2ba8cd9d__260911_Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-_0b7cd9dc.pdf",
       "source_url": "https://www.skoda-storyboard.com/direct-download/2026/09/260911_Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-_0b7cd9dc.pdf",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/09/260911_Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-_0b7cd9dc.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/09/260911_Skoda-Superb-25-years-of-comfort-space-and-technical-excellence-_0b7cd9dc.pdf",
       "dam_page_path": "en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence",
       "page_refs": [
         "en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence"
@@ -29986,10 +30037,13 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
+      "status": "partial",
+      "note": "",
+      "public_url": "",
+      "public_verified": null
     },
     "4e5a58fb__2196437413-81d87b7411e7fe848a3bb9da2a47c3520e562ce3cbf638de1a4ea0a68086149b-d_1280x720.jpg": {
       "logical_id": "4e5a58fb__2196437413-81d87b7411e7fe848a3bb9da2a47c3520e562ce3cbf638de1a4ea0a68086149b-d_1280x720.jpg",
@@ -39165,6 +39219,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39176,9 +39232,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "728314ef__Skoda_receives_red_dot_award_for_its_vision_app_concept-720p_cd084254.mp4": {
@@ -39194,6 +39251,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39205,183 +39264,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
-    },
-    "94490c59__Skoda_Peaq_Footage_II_UHD_569780b0.mp4": {
-      "kind": "video",
-      "logical_id": "94490c59__Skoda_Peaq_Footage_II_UHD_569780b0.mp4",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Footage_II_UHD_569780b0.mp4",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Footage_II_UHD_569780b0.mp4",
-      "dam_page_path": "en/videos/skoda-peaq-footage-ii-uhd-569780b0",
-      "page_refs": [
-        "en/videos/skoda-peaq-footage-ii-uhd-569780b0"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "MP4",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Footage_II_UHD_569780b0.mp4"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
-      "note": ""
-    },
-    "8b558dfa__Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4": {
-      "kind": "video",
-      "logical_id": "8b558dfa__Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/05/Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/05/Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4",
-      "dam_page_path": "en/videos/epiq-reveal-hero-60s-16x9-clean-noepiq-h264-25mbit-331d5d10",
-      "page_refs": [
-        "en/videos/epiq-reveal-hero-60s-16x9-clean-noepiq-h264-25mbit-331d5d10"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "MP4",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/05/Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
-      "note": ""
-    },
-    "94490c59__Peaq_colours_EN_ea6229cc.mp4": {
-      "kind": "video",
-      "logical_id": "94490c59__Peaq_colours_EN_ea6229cc.mp4",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/06/Peaq_colours_EN_ea6229cc.mp4",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/06/Peaq_colours_EN_ea6229cc.mp4",
-      "dam_page_path": "en/videos/peaq-colours-en-ea6229cc",
-      "page_refs": [
-        "en/videos/peaq-colours-en-ea6229cc"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "MP4",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/06/Peaq_colours_EN_ea6229cc.mp4"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
-      "note": ""
-    },
-    "94490c59__Skoda_Peaq_Sportline_Footage_I_UHD_166b2150.mp4": {
-      "kind": "video",
-      "logical_id": "94490c59__Skoda_Peaq_Sportline_Footage_I_UHD_166b2150.mp4",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Sportline_Footage_I_UHD_166b2150.mp4",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Sportline_Footage_I_UHD_166b2150.mp4",
-      "dam_page_path": "en/videos/skoda-peaq-sportline-footage-i-uhd-166b2150",
-      "page_refs": [
-        "en/videos/skoda-peaq-sportline-footage-i-uhd-166b2150"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "MP4",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Sportline_Footage_I_UHD_166b2150.mp4"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
-      "note": ""
-    },
-    "94490c59__Skoda_appoints_world-renowned_cyclist_chris_froome_as_brand_cycling_ambassador-1080p_7f20f61e.mp4": {
-      "kind": "video",
-      "logical_id": "94490c59__Skoda_appoints_world-renowned_cyclist_chris_froome_as_brand_cycling_ambassador-1080p_7f20f61e.mp4",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_appoints_world-renowned_cyclist_chris_froome_as_brand_cycling_ambassador-1080p_7f20f61e.mp4",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_appoints_world-renowned_cyclist_chris_froome_as_brand_cycling_ambassador-1080p_7f20f61e.mp4",
-      "dam_page_path": "en/videos/skoda-appoints-world-renowned-cyclist-chris-froome-as-brand-cycling-ambassador-1080p-7f20f61e",
-      "page_refs": [
-        "en/videos/skoda-appoints-world-renowned-cyclist-chris-froome-as-brand-cycling-ambassador-1080p-7f20f61e"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "MP4",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/06/Skoda_appoints_world-renowned_cyclist_chris_froome_as_brand_cycling_ambassador-1080p_7f20f61e.mp4"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
-      "note": ""
-    },
-    "94490c59__Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4": {
-      "kind": "video",
-      "logical_id": "94490c59__Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4",
-      "dam_page_path": "en/videos/skoda-peaq-footage-i-uhd-aa09ad60",
-      "page_refs": [
-        "en/videos/skoda-peaq-footage-i-uhd-aa09ad60"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "MP4",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "b5e98464__936_km_without_recharging__Skoda_peaq_sets_range_record_for_electric_seven_seater_suv-1080p_b9fcbb59.mp4": {
@@ -39397,6 +39283,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39408,9 +39296,106 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
+      "note": ""
+    },
+    "94490c59__Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4": {
+      "kind": "video",
+      "logical_id": "94490c59__Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4",
+      "dam_page_path": "en/videos/skoda-peaq-footage-i-uhd-aa09ad60",
+      "page_refs": [
+        "en/videos/skoda-peaq-footage-i-uhd-aa09ad60"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "94490c59__Peaq_colours_EN_ea6229cc.mp4": {
+      "kind": "video",
+      "logical_id": "94490c59__Peaq_colours_EN_ea6229cc.mp4",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/06/Peaq_colours_EN_ea6229cc.mp4",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/06/Peaq_colours_EN_ea6229cc.mp4",
+      "dam_page_path": "en/videos/peaq-colours-en-ea6229cc",
+      "page_refs": [
+        "en/videos/peaq-colours-en-ea6229cc"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/06/Peaq_colours_EN_ea6229cc.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "94490c59__Skoda_Peaq_Footage_II_UHD_569780b0.mp4": {
+      "kind": "video",
+      "logical_id": "94490c59__Skoda_Peaq_Footage_II_UHD_569780b0.mp4",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Footage_II_UHD_569780b0.mp4",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Footage_II_UHD_569780b0.mp4",
+      "dam_page_path": "en/videos/skoda-peaq-footage-ii-uhd-569780b0",
+      "page_refs": [
+        "en/videos/skoda-peaq-footage-ii-uhd-569780b0"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Footage_II_UHD_569780b0.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
       "note": ""
     },
     "8b558dfa__Epiq_colours_EN_1d57bbaa.mp4": {
@@ -39426,6 +39411,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39437,9 +39424,106 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
+      "note": ""
+    },
+    "94490c59__Skoda_Peaq_Sportline_Footage_I_UHD_166b2150.mp4": {
+      "kind": "video",
+      "logical_id": "94490c59__Skoda_Peaq_Sportline_Footage_I_UHD_166b2150.mp4",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Sportline_Footage_I_UHD_166b2150.mp4",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Sportline_Footage_I_UHD_166b2150.mp4",
+      "dam_page_path": "en/videos/skoda-peaq-sportline-footage-i-uhd-166b2150",
+      "page_refs": [
+        "en/videos/skoda-peaq-sportline-footage-i-uhd-166b2150"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/06/Skoda_Peaq_Sportline_Footage_I_UHD_166b2150.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "94490c59__Skoda_appoints_world-renowned_cyclist_chris_froome_as_brand_cycling_ambassador-1080p_7f20f61e.mp4": {
+      "kind": "video",
+      "logical_id": "94490c59__Skoda_appoints_world-renowned_cyclist_chris_froome_as_brand_cycling_ambassador-1080p_7f20f61e.mp4",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_appoints_world-renowned_cyclist_chris_froome_as_brand_cycling_ambassador-1080p_7f20f61e.mp4",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/06/Skoda_appoints_world-renowned_cyclist_chris_froome_as_brand_cycling_ambassador-1080p_7f20f61e.mp4",
+      "dam_page_path": "en/videos/skoda-appoints-world-renowned-cyclist-chris-froome-as-brand-cycling-ambassador-1080p-7f20f61e",
+      "page_refs": [
+        "en/videos/skoda-appoints-world-renowned-cyclist-chris-froome-as-brand-cycling-ambassador-1080p-7f20f61e"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/06/Skoda_appoints_world-renowned_cyclist_chris_froome_as_brand_cycling_ambassador-1080p_7f20f61e.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "8b558dfa__Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4": {
+      "kind": "video",
+      "logical_id": "8b558dfa__Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4",
+      "dam_page_path": "en/videos/epiq-reveal-hero-60s-16x9-clean-noepiq-h264-25mbit-331d5d10",
+      "page_refs": [
+        "en/videos/epiq-reveal-hero-60s-16x9-clean-noepiq-h264-25mbit-331d5d10"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
       "note": ""
     },
     "8b558dfa__Skoda_Epiq_Footage_First-Edition_02_UHD_58aec896.mp4": {
@@ -39455,6 +39539,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39466,9 +39552,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "8b558dfa__Skoda_Epiq_Footage_First-Edition_01_HD_830e36e5.mp4": {
@@ -39484,6 +39571,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39495,9 +39584,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "728314ef__Skoda_peaq___simply_clever___part_1-1080p-1_a3e05a13.mp4": {
@@ -39513,6 +39603,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39524,9 +39616,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "9dd7d96c__TDFFAZ26_2_12956adf.mp4": {
@@ -39542,6 +39635,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39553,154 +39648,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
-    },
-    "94490c59__world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4": {
-      "kind": "video",
-      "logical_id": "94490c59__world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/06/world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/06/world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4",
-      "dam_page_path": "en/videos/world-premiere-of-the-all-new-skoda-peaq-1080p-6cacbdd4",
-      "page_refs": [
-        "en/videos/world-premiere-of-the-all-new-skoda-peaq-1080p-6cacbdd4"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "MP4",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/06/world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
-      "note": ""
-    },
-    "8b558dfa__Skoda_Epiq_Footage_01_HD_68aa554d.mp4": {
-      "kind": "video",
-      "logical_id": "8b558dfa__Skoda_Epiq_Footage_01_HD_68aa554d.mp4",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda_Epiq_Footage_01_HD_68aa554d.mp4",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda_Epiq_Footage_01_HD_68aa554d.mp4",
-      "dam_page_path": "en/videos/skoda-epiq-footage-01-hd-68aa554d",
-      "page_refs": [
-        "en/videos/skoda-epiq-footage-01-hd-68aa554d"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "MP4",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/05/Skoda_Epiq_Footage_01_HD_68aa554d.mp4"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
-      "note": ""
-    },
-    "728314ef__Skoda_peaq___simply_clever___part_2_with_subtitles-1080p-1_529affa6.mp4": {
-      "kind": "video",
-      "logical_id": "728314ef__Skoda_peaq___simply_clever___part_2_with_subtitles-1080p-1_529affa6.mp4",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Skoda_peaq___simply_clever___part_2_with_subtitles-1080p-1_529affa6.mp4",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Skoda_peaq___simply_clever___part_2_with_subtitles-1080p-1_529affa6.mp4",
-      "dam_page_path": "en/videos/skoda-peaq-simply-clever-part-2-with-subtitles-1080p-1-529affa6",
-      "page_refs": [
-        "en/videos/skoda-peaq-simply-clever-part-2-with-subtitles-1080p-1-529affa6"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "MP4",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/Skoda_peaq___simply_clever___part_2_with_subtitles-1080p-1_529affa6.mp4"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
-      "note": ""
-    },
-    "728314ef__Skoda_Slavia_Prestige_69ae887f.mp4": {
-      "kind": "video",
-      "logical_id": "728314ef__Skoda_Slavia_Prestige_69ae887f.mp4",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Skoda_Slavia_Prestige_69ae887f.mp4",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Skoda_Slavia_Prestige_69ae887f.mp4",
-      "dam_page_path": "en/videos/skoda-slavia-prestige-69ae887f",
-      "page_refs": [
-        "en/videos/skoda-slavia-prestige-69ae887f"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "MP4",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/Skoda_Slavia_Prestige_69ae887f.mp4"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
-      "note": ""
-    },
-    "728314ef__Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4": {
-      "kind": "video",
-      "logical_id": "728314ef__Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4",
-      "dam_page_path": "en/videos/skoda-slavia-monte-carlo-mov-125225b2",
-      "page_refs": [
-        "en/videos/skoda-slavia-monte-carlo-mov-125225b2"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "MP4",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "728314ef__Skoda_octavia_turns_30__three_decades_of_a_brand_icon-1080p_b0e9968c.mp4": {
@@ -39716,6 +39667,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39727,9 +39680,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "728314ef__Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p_d8e78f93.mp4": {
@@ -39745,6 +39699,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39756,9 +39712,74 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
+      "note": ""
+    },
+    "728314ef__Skoda_peaq___simply_clever___part_2_with_subtitles-1080p-1_529affa6.mp4": {
+      "kind": "video",
+      "logical_id": "728314ef__Skoda_peaq___simply_clever___part_2_with_subtitles-1080p-1_529affa6.mp4",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Skoda_peaq___simply_clever___part_2_with_subtitles-1080p-1_529affa6.mp4",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Skoda_peaq___simply_clever___part_2_with_subtitles-1080p-1_529affa6.mp4",
+      "dam_page_path": "en/videos/skoda-peaq-simply-clever-part-2-with-subtitles-1080p-1-529affa6",
+      "page_refs": [
+        "en/videos/skoda-peaq-simply-clever-part-2-with-subtitles-1080p-1-529affa6"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Skoda_peaq___simply_clever___part_2_with_subtitles-1080p-1_529affa6.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "94490c59__world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4": {
+      "kind": "video",
+      "logical_id": "94490c59__world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/06/world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/06/world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4",
+      "dam_page_path": "en/videos/world-premiere-of-the-all-new-skoda-peaq-1080p-6cacbdd4",
+      "page_refs": [
+        "en/videos/world-premiere-of-the-all-new-skoda-peaq-1080p-6cacbdd4"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/06/world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
       "note": ""
     },
     "728314ef__Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p-1_9a67240d.mp4": {
@@ -39774,6 +39795,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39785,9 +39808,106 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
+      "note": ""
+    },
+    "728314ef__Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4": {
+      "kind": "video",
+      "logical_id": "728314ef__Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4",
+      "dam_page_path": "en/videos/skoda-slavia-monte-carlo-mov-125225b2",
+      "page_refs": [
+        "en/videos/skoda-slavia-monte-carlo-mov-125225b2"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "728314ef__Skoda_Slavia_Prestige_69ae887f.mp4": {
+      "kind": "video",
+      "logical_id": "728314ef__Skoda_Slavia_Prestige_69ae887f.mp4",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Skoda_Slavia_Prestige_69ae887f.mp4",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Skoda_Slavia_Prestige_69ae887f.mp4",
+      "dam_page_path": "en/videos/skoda-slavia-prestige-69ae887f",
+      "page_refs": [
+        "en/videos/skoda-slavia-prestige-69ae887f"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/Skoda_Slavia_Prestige_69ae887f.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "8b558dfa__Skoda_Epiq_Footage_01_HD_68aa554d.mp4": {
+      "kind": "video",
+      "logical_id": "8b558dfa__Skoda_Epiq_Footage_01_HD_68aa554d.mp4",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda_Epiq_Footage_01_HD_68aa554d.mp4",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda_Epiq_Footage_01_HD_68aa554d.mp4",
+      "dam_page_path": "en/videos/skoda-epiq-footage-01-hd-68aa554d",
+      "page_refs": [
+        "en/videos/skoda-epiq-footage-01-hd-68aa554d"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/05/Skoda_Epiq_Footage_01_HD_68aa554d.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
       "note": ""
     },
     "728314ef__Skoda_peaq___simply_clever___part_1_with_subtitles-1080p-1_526eb599.mp4": {
@@ -39803,6 +39923,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39814,9 +39936,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "8b558dfa__Skoda_Epiq_Footage_02_HD_bcda4348.mp4": {
@@ -39832,6 +39955,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39843,9 +39968,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "728314ef__Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-540p_ed39b17d.mp4": {
@@ -39861,6 +39987,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39872,9 +40000,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "728314ef__Skoda_peaq___simply_clever___part_2-1080p-1_583a6637.mp4": {
@@ -39890,6 +40019,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39901,9 +40032,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "4397252d__Naming-Story_HD_16x9_809a9c3f.mp4": {
@@ -39919,6 +40051,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -39930,125 +40064,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
-      "note": ""
-    },
-    "2ba8cd9d__936_km_without_recharging__Skoda_peaq_sets_range_record_for_electric_seven_seater_suv-1080p_b9fcbb59.mp4": {
-      "kind": "video",
-      "logical_id": "2ba8cd9d__936_km_without_recharging__Skoda_peaq_sets_range_record_for_electric_seven_seater_suv-1080p_b9fcbb59.mp4",
-      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/09/936_km_without_recharging__Skoda_peaq_sets_range_record_for_electric_seven_seater_suv-1080p_b9fcbb59.mp4",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/09/936_km_without_recharging__Skoda_peaq_sets_range_record_for_electric_seven_seater_suv-1080p_b9fcbb59.mp4",
-      "dam_page_path": "en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
-      "page_refs": [
-        "en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "MP4",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://www.skoda-storyboard.com/direct-download/2026/09/936_km_without_recharging__Skoda_peaq_sets_range_record_for_electric_seven_seater_suv-1080p_b9fcbb59.mp4"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
-      "note": ""
-    },
-    "9f34d7bf__Skoda_octavia_turns_30__three_decades_of_a_brand_icon-1080p_b0e9968c.mp4": {
-      "kind": "video",
-      "logical_id": "9f34d7bf__Skoda_octavia_turns_30__three_decades_of_a_brand_icon-1080p_b0e9968c.mp4",
-      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_octavia_turns_30__three_decades_of_a_brand_icon-1080p_b0e9968c.mp4",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Skoda_octavia_turns_30__three_decades_of_a_brand_icon-1080p_b0e9968c.mp4",
-      "dam_page_path": "en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
-      "page_refs": [
-        "en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "MP4",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_octavia_turns_30__three_decades_of_a_brand_icon-1080p_b0e9968c.mp4"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
-      "note": ""
-    },
-    "728314ef__260817_Simply-Clever-for-summer-smart-Skoda-features-that-make-every-trip-easier_4020084d.pdf": {
-      "kind": "document",
-      "logical_id": "728314ef__260817_Simply-Clever-for-summer-smart-Skoda-features-that-make-every-trip-easier_4020084d.pdf",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/08/260817_Simply-Clever-for-summer-smart-Skoda-features-that-make-every-trip-easier_4020084d.pdf",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/08/260817_Simply-Clever-for-summer-smart-Skoda-features-that-make-every-trip-easier_4020084d.pdf",
-      "dam_page_path": "en/press-releases/simply-clever-for-summer-smart-skoda-features-that-make-every-trip-easier",
-      "page_refs": [
-        "en/press-releases/simply-clever-for-summer-smart-skoda-features-that-make-every-trip-easier"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "260817_Simply-Clever-for-summer-smart-Skoda-features-that-make-every-trip-easier_4020084d.pdf",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/260817_Simply-Clever-for-summer-smart-Skoda-features-that-make-every-trip-easier_4020084d.pdf"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
-      "note": ""
-    },
-    "728314ef__260820_Skoda-receives-Red-Dot-Award-for-its-Vision-App-concept_094b7c12.pdf": {
-      "kind": "document",
-      "logical_id": "728314ef__260820_Skoda-receives-Red-Dot-Award-for-its-Vision-App-concept_094b7c12.pdf",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/08/260820_Skoda-receives-Red-Dot-Award-for-its-Vision-App-concept_094b7c12.pdf",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/08/260820_Skoda-receives-Red-Dot-Award-for-its-Vision-App-concept_094b7c12.pdf",
-      "dam_page_path": "en/press-releases/skoda-receives-red-dot-award-for-its-vision-app-concept",
-      "page_refs": [
-        "en/press-releases/skoda-receives-red-dot-award-for-its-vision-app-concept"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "da_path": "",
-      "title": "260820_Skoda-receives-Red-Dot-Award-for-its-Vision-App-concept_094b7c12.pdf",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/260820_Skoda-receives-Red-Dot-Award-for-its-Vision-App-concept_094b7c12.pdf"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "da": "n/a"
-      },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "728314ef__260825_Skoda-Auto-supports-UCI-Mountain-Bike-World-Championships-as-official-partner-for-second-year-running_54e4195a.pdf": {
@@ -40064,6 +40083,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "260825_Skoda-Auto-supports-UCI-Mountain-Bike-World-Championships-as-official-partner-for-second-year-running_54e4195a.pdf",
       "alt": "",
@@ -40075,9 +40096,106 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
+      "note": ""
+    },
+    "2ba8cd9d__936_km_without_recharging__Skoda_peaq_sets_range_record_for_electric_seven_seater_suv-1080p_b9fcbb59.mp4": {
+      "kind": "video",
+      "logical_id": "2ba8cd9d__936_km_without_recharging__Skoda_peaq_sets_range_record_for_electric_seven_seater_suv-1080p_b9fcbb59.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/09/936_km_without_recharging__Skoda_peaq_sets_range_record_for_electric_seven_seater_suv-1080p_b9fcbb59.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/09/936_km_without_recharging__Skoda_peaq_sets_range_record_for_electric_seven_seater_suv-1080p_b9fcbb59.mp4",
+      "dam_page_path": "en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
+      "page_refs": [
+        "en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/09/936_km_without_recharging__Skoda_peaq_sets_range_record_for_electric_seven_seater_suv-1080p_b9fcbb59.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "9f34d7bf__Skoda_octavia_turns_30__three_decades_of_a_brand_icon-1080p_b0e9968c.mp4": {
+      "kind": "video",
+      "logical_id": "9f34d7bf__Skoda_octavia_turns_30__three_decades_of_a_brand_icon-1080p_b0e9968c.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_octavia_turns_30__three_decades_of_a_brand_icon-1080p_b0e9968c.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_octavia_turns_30__three_decades_of_a_brand_icon-1080p_b0e9968c.mp4",
+      "dam_page_path": "en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
+      "page_refs": [
+        "en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_octavia_turns_30__three_decades_of_a_brand_icon-1080p_b0e9968c.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "728314ef__260817_Simply-Clever-for-summer-smart-Skoda-features-that-make-every-trip-easier_4020084d.pdf": {
+      "kind": "document",
+      "logical_id": "728314ef__260817_Simply-Clever-for-summer-smart-Skoda-features-that-make-every-trip-easier_4020084d.pdf",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/260817_Simply-Clever-for-summer-smart-Skoda-features-that-make-every-trip-easier_4020084d.pdf",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/260817_Simply-Clever-for-summer-smart-Skoda-features-that-make-every-trip-easier_4020084d.pdf",
+      "dam_page_path": "en/press-releases/simply-clever-for-summer-smart-skoda-features-that-make-every-trip-easier",
+      "page_refs": [
+        "en/press-releases/simply-clever-for-summer-smart-skoda-features-that-make-every-trip-easier"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "260817_Simply-Clever-for-summer-smart-Skoda-features-that-make-every-trip-easier_4020084d.pdf",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/260817_Simply-Clever-for-summer-smart-Skoda-features-that-make-every-trip-easier_4020084d.pdf"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
       "note": ""
     },
     "728314ef__260818_Skoda-Auto-unveils-updated-Slavia-in-India_fd432da8.pdf": {
@@ -40093,6 +40211,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "260818_Skoda-Auto-unveils-updated-Slavia-in-India_fd432da8.pdf",
       "alt": "",
@@ -40104,9 +40224,42 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
+      "note": ""
+    },
+    "728314ef__260820_Skoda-receives-Red-Dot-Award-for-its-Vision-App-concept_094b7c12.pdf": {
+      "kind": "document",
+      "logical_id": "728314ef__260820_Skoda-receives-Red-Dot-Award-for-its-Vision-App-concept_094b7c12.pdf",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/260820_Skoda-receives-Red-Dot-Award-for-its-Vision-App-concept_094b7c12.pdf",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/08/260820_Skoda-receives-Red-Dot-Award-for-its-Vision-App-concept_094b7c12.pdf",
+      "dam_page_path": "en/press-releases/skoda-receives-red-dot-award-for-its-vision-app-concept",
+      "page_refs": [
+        "en/press-releases/skoda-receives-red-dot-award-for-its-vision-app-concept"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "260820_Skoda-receives-Red-Dot-Award-for-its-Vision-App-concept_094b7c12.pdf",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/260820_Skoda-receives-Red-Dot-Award-for-its-Vision-App-concept_094b7c12.pdf"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
       "note": ""
     },
     "86741f96__7_skoda-x-airconsole_hero_16-9_v08_056c7d9e.mp4": {
@@ -40122,6 +40275,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "https://cdn.skoda-storyboard.com/2026/02/7_skoda-x-airconsole_hero_16-9_v08_056c7d9e.mp4",
       "alt": "",
@@ -40133,9 +40288,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "5992a822__karoq_model_storyboard_grey_english-version.pdf": {
@@ -40151,6 +40307,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "DOWNLOAD GREY MODEL HERE",
       "alt": "",
@@ -40162,9 +40320,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "5992a822__karoq_model_storyboard_white_english-version.pdf": {
@@ -40180,6 +40339,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "DOWNLOAD WHITE MODEL HERE",
       "alt": "",
@@ -40191,9 +40352,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "e6d32439__ext-aero-uplav.mp4": {
@@ -40209,6 +40371,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "https://cdn.skoda-storyboard.com/2018/03/ext-aero-uplav.mp4",
       "alt": "",
@@ -40220,9 +40384,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "e7285b87__ext-aero-uplav.mp4": {
@@ -40238,6 +40403,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "Download",
       "alt": "",
@@ -40249,9 +40416,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "e6d32439__ext-aero-mot..mp4": {
@@ -40267,6 +40435,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "https://cdn.skoda-storyboard.com/2018/03/ext-aero-mot..mp4",
       "alt": "",
@@ -40278,9 +40448,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "e7285b87__ext-aero-mot..mp4": {
@@ -40296,6 +40467,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "Download",
       "alt": "",
@@ -40307,9 +40480,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "e6d32439__animace_NVH-KODIAQ..mp4": {
@@ -40325,6 +40499,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "https://cdn.skoda-storyboard.com/2018/03/animace_NVH-KODIAQ..mp4",
       "alt": "",
@@ -40336,9 +40512,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     },
     "e7285b87__animace_NVH-KODIAQ..mp4": {
@@ -40354,6 +40531,8 @@
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
       "da_path": "",
       "title": "Download",
       "alt": "",
@@ -40365,9 +40544,10 @@
       "steps": {
         "deliver": "n/a",
         "dam": "n/a",
+        "publish": "pending",
         "da": "n/a"
       },
-      "status": "done",
+      "status": "partial",
       "note": ""
     }
   }
