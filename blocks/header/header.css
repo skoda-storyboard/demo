@@ -91,6 +91,11 @@ header .nav-topbar {
   background-color: var(--skoda-grey-200);
 }
 
+/* the Media Room side's topbar is a lighter grey (#f1f1f1 vs #e6e6e6, measured SKODA-309) */
+header .header[data-section='media-room'] .nav-topbar {
+  background-color: var(--skoda-grey-50);
+}
+
 header .nav-topbar p {
   margin: 0;
   line-height: 1;

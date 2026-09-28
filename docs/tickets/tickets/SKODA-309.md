@@ -4,6 +4,13 @@
 - **Phase:** A · **Milestone:** M1 (demo-visible on **16** Media Room URLs)
 - **GitHub issue:** [#145](https://github.com/skoda-storyboard/demo/issues/145)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
+- **Status (2026-09-28):** 🟡 code, MR nav document and QA drafts done; the bulk metadata rows go live after the PR
+  merges and `/media-room/nav` is published.
+  - `header-switcher.js` activates the tab named by `section` metadata; the MR topbar is `#f1f1f1`.
+  - The SKODA-307 null guard is folded in.
+  - The push tool's fragment check now reads the bulk rows.
+  - `/media-room/nav` is authored from the source capture (`header-megamenu.md`, "Media Room variant").
+  - 12 of the 16 MR URLs exist. The 4 press kits inherit the MR chrome through `/en/press-kits/**` and get QA under 805a/c.
 - **Status (2026-09-25):** 🔵 TODO. **Unblocked:** SKODA-305 / PR #134 merged (8b2a18a). The DevTools-sweep draft
   SKODA-825 (same scope) is **folded in here** and removed; the corrections are below.
 
@@ -28,8 +35,8 @@ Demo URL/block sweep, 2026-09-25 (report §5, chrome group).
 
 ## Scope
 - Author and **publish** `/media-room/nav` (and the `/media-room/footer` from 305).
-- MR importers (607 press release, 805a/c press kits, image/video listings, news) emit `nav: /media-room/nav` and
-  `footer: /media-room/footer` Metadata.
+- ~~MR importers emit `nav`/`footer` Metadata~~ (superseded by the contract below: the importers emit nothing; the
+  bulk `metadata.json` rows set `nav`, `footer` and `section`).
 - Header active-tab logic: activate the Media Room tab for MR pages (from a metadata `section` key or an authored path
   list: `/en/press-releases/`, `/en/press-kits/`, **`/en/skoda-model/`**, `/en/news/`, `/en/images/`, `/en/videos/`,
   `/en/skodapedia/`), not by tab-href prefix. Keep longest-match as the default; add a unit test next to the header

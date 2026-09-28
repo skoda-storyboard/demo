@@ -1,6 +1,7 @@
 import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 import attachSuggest from '../../scripts/search-suggest.js';
+import { hrefPath, pickActiveTab } from './header-switcher.js';
 
 // desktop >= 1080px per source ladder (SKODA-301); below is the drawer band (SKODA-302)
 const isDesktop = window.matchMedia('(min-width: 1080px)');
@@ -139,6 +140,15 @@ export default async function decorate(block) {
 
   // decorate nav DOM
   block.textContent = '';
+  if (!fragment) {
+    // a missing/unpublished nav fragment leaves an empty header, never a broken page (SKODA-307)
+    // eslint-disable-next-line no-console
+    console.warn(`header: nav fragment ${navPath} could not be loaded`);
+    return;
+  }
+  // Media Room pages set `section: media-room` (bulk metadata, SKODA-309): active tab + topbar
+  const siteSection = getMetadata('section');
+  if (siteSection) block.dataset.section = siteSection;
   const nav = document.createElement('nav');
   nav.id = 'nav';
   while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
@@ -159,30 +169,13 @@ export default async function decorate(block) {
     const switcher = navTopbar.querySelector(':scope .default-content-wrapper > ul, :scope > ul');
     if (switcher) {
       switcher.classList.add('nav-section-switcher');
-      // mark the active section tab (longest path-segment match of the current
-      // URL; default to the first tab). Decorate defensively: authors may omit
-      // the href, so guard against missing/invalid URLs.
-      const { pathname } = window.location;
+      // mark the active section tab: the `section` metadata tab, else the longest
+      // path-segment match of the current URL, else the first tab. Decorate
+      // defensively: authors may omit the href (header-switcher.js).
       const items = [...switcher.querySelectorAll(':scope > li')];
-      let best;
-      let bestLen = -1;
-      items.forEach((li) => {
-        const a = li.querySelector('a[href]');
-        if (!a || !a.getAttribute('href')) return;
-        let p;
-        try {
-          p = new URL(a.href, window.location).pathname;
-        } catch (e) {
-          return;
-        }
-        // match on segment boundaries so /news doesn't match /news-room/article
-        if ((pathname === p || pathname.startsWith(`${p.replace(/\/$/, '')}/`)) && p.length > bestLen) {
-          best = li;
-          bestLen = p.length;
-        }
-      });
-      if (!best) [best] = items;
-      if (best) best.classList.add('active');
+      const paths = items.map((li) => hrefPath(li.querySelector('a')?.getAttribute('href'), window.location.href));
+      const active = items[pickActiveTab(paths, window.location.pathname, siteSection)];
+      if (active) active.classList.add('active');
     }
     // group Subscribe + locales so they can float right on desktop / drop into drawer on mobile
     const utility = navTopbar.querySelectorAll(':scope .default-content-wrapper > p');
