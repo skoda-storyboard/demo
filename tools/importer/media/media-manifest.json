@@ -44418,12 +44418,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio/Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio/Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio/Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf",
+        "mime": "application/pdf",
+        "bytes": 172734
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -44431,15 +44435,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_kit_Skoda_Peaq_Media_Launch_Introduction_7e6dc768.pdf"
       ],
-      "bytes": null,
+      "bytes": 172734,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:36:40.910Z"
     },
     "87472c4b__Skoda_all-electric_family_d82d4b7a.pdf": {
       "kind": "document",
@@ -44450,12 +44458,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Skoda_all-electric_family_d82d4b7a.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_all-electric_family_d82d4b7a.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Skoda_all-electric_family_d82d4b7a.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Skoda_all-electric_family_d82d4b7a.pdf",
+        "mime": "application/pdf",
+        "bytes": 4440265
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -44463,15 +44475,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_all-electric_family_d82d4b7a.pdf"
       ],
-      "bytes": null,
+      "bytes": 4440265,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:36:44.719Z"
     },
     "87472c4b__Skoda_Peaq_v_Skoda_Kodiaq_91fd0302.pdf": {
       "kind": "document",
@@ -44482,12 +44498,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Skoda_Peaq_v_Skoda_Kodiaq_91fd0302.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_Peaq_v_Skoda_Kodiaq_91fd0302.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Skoda_Peaq_v_Skoda_Kodiaq_91fd0302.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Skoda_Peaq_v_Skoda_Kodiaq_91fd0302.pdf",
+        "mime": "application/pdf",
+        "bytes": 1334576
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -44495,15 +44515,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_Peaq_v_Skoda_Kodiaq_91fd0302.pdf"
       ],
-      "bytes": null,
+      "bytes": 1334576,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:36:46.831Z"
     },
     "87472c4b__Skoda_Peaq_battery_powertrain_52694888.pdf": {
       "kind": "document",
@@ -44514,12 +44538,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Skoda_Peaq_battery_powertrain_52694888.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_Peaq_battery_powertrain_52694888.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Skoda_Peaq_battery_powertrain_52694888.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Skoda_Peaq_battery_powertrain_52694888.pdf",
+        "mime": "application/pdf",
+        "bytes": 1333921
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -44527,15 +44555,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda_Peaq_battery_powertrain_52694888.pdf"
       ],
-      "bytes": null,
+      "bytes": 1333921,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:36:49.823Z"
     },
     "87472c4b__Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf": {
       "kind": "document",
@@ -44546,12 +44578,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf",
+        "mime": "application/pdf",
+        "bytes": 396817
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -44559,15 +44595,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/03/Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf"
       ],
-      "bytes": null,
+      "bytes": 396817,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:36:51.920Z"
     },
     "87472c4b__Skoda-Peaq-Covered-Drive_4a806aa2.mp4": {
       "kind": "video",
@@ -44578,12 +44618,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Skoda-Peaq-Covered-Drive_4a806aa2.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda-Peaq-Covered-Drive_4a806aa2.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Skoda-Peaq-Covered-Drive_4a806aa2.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/Skoda-Peaq-Covered-Drive_4a806aa2.mp4",
+        "mime": "video/mp4",
+        "bytes": 947235376
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -44591,15 +44635,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/03/Skoda-Peaq-Covered-Drive_4a806aa2.mp4"
       ],
-      "bytes": null,
+      "bytes": 947235376,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:05.840Z"
     },
     "a1ca90ce__LaK-RKM-11.jpg": {
       "logical_id": "a1ca90ce__LaK-RKM-11.jpg",
@@ -64572,12 +64620,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav/Laurin-Klement-FC_3a63d762.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Laurin-Klement-FC_3a63d762.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav/Laurin-Klement-FC_3a63d762.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav/Laurin-Klement-FC_3a63d762.pdf",
+        "mime": "application/pdf",
+        "bytes": 338541
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -64585,15 +64637,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Laurin-Klement-FC_3a63d762.pdf"
       ],
-      "bytes": null,
+      "bytes": 338541,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:11.810Z"
     },
     "c6d86b52__Laurin-Klement-RK-M_83863b25.pdf": {
       "kind": "document",
@@ -64604,12 +64660,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model/Laurin-Klement-RK-M_83863b25.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Laurin-Klement-RK-M_83863b25.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model/Laurin-Klement-RK-M_83863b25.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model/Laurin-Klement-RK-M_83863b25.pdf",
+        "mime": "application/pdf",
+        "bytes": 288483
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -64617,15 +64677,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Laurin-Klement-RK-M_83863b25.pdf"
       ],
-      "bytes": null,
+      "bytes": 288483,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:14.242Z"
     },
     "c6d86b52__Skoda-Favorit_563d4a16.pdf": {
       "kind": "document",
@@ -64636,12 +64700,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/motorsport-versions-of-the-skoda-favorit-1989-all-different-and-yet-familiar"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/motorsport-versions-of-the-skoda-favorit-1989-all-different-and-yet-familiar/Skoda-Favorit_563d4a16.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Favorit_563d4a16.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/motorsport-versions-of-the-skoda-favorit-1989-all-different-and-yet-familiar/Skoda-Favorit_563d4a16.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/motorsport-versions-of-the-skoda-favorit-1989-all-different-and-yet-familiar/Skoda-Favorit_563d4a16.pdf",
+        "mime": "application/pdf",
+        "bytes": 446180
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -64649,15 +64717,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Favorit_563d4a16.pdf"
       ],
-      "bytes": null,
+      "bytes": 446180,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:16.583Z"
     },
     "c6d86b52__Skoda-1000-MB-and-1100-MB-B5_63ebed20.pdf": {
       "kind": "document",
@@ -64668,12 +64740,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1000-mb-1964-and-1100-mb-b5-1966-a-family-saloon-in-rally"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1000-mb-1964-and-1100-mb-b5-1966-a-family-saloon-in-rally/Skoda-1000-MB-and-1100-MB-B5_63ebed20.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-1000-MB-and-1100-MB-B5_63ebed20.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1000-mb-1964-and-1100-mb-b5-1966-a-family-saloon-in-rally/Skoda-1000-MB-and-1100-MB-B5_63ebed20.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1000-mb-1964-and-1100-mb-b5-1966-a-family-saloon-in-rally/Skoda-1000-MB-and-1100-MB-B5_63ebed20.pdf",
+        "mime": "application/pdf",
+        "bytes": 198717
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -64681,15 +64757,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-1000-MB-and-1100-MB-B5_63ebed20.pdf"
       ],
-      "bytes": null,
+      "bytes": 198717,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:21.764Z"
     },
     "c6d86b52__Skoda-1100-OHC_61d79357.pdf": {
       "kind": "document",
@@ -64700,12 +64780,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1100-ohc-1957-the-beautiful-dream-of-le-mans"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1100-ohc-1957-the-beautiful-dream-of-le-mans/Skoda-1100-OHC_61d79357.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-1100-OHC_61d79357.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1100-ohc-1957-the-beautiful-dream-of-le-mans/Skoda-1100-OHC_61d79357.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1100-ohc-1957-the-beautiful-dream-of-le-mans/Skoda-1100-OHC_61d79357.pdf",
+        "mime": "application/pdf",
+        "bytes": 216075
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -64713,15 +64797,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-1100-OHC_61d79357.pdf"
       ],
-      "bytes": null,
+      "bytes": 216075,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:24.605Z"
     },
     "c6d86b52__Skoda-130-LR_8e853661.pdf": {
       "kind": "document",
@@ -64732,12 +64820,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-lr-1984-last-motorsport-model-from-mlada-boleslav-with-rear-mounted-engine"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-lr-1984-last-motorsport-model-from-mlada-boleslav-with-rear-mounted-engine/Skoda-130-LR_8e853661.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-130-LR_8e853661.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-lr-1984-last-motorsport-model-from-mlada-boleslav-with-rear-mounted-engine/Skoda-130-LR_8e853661.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-lr-1984-last-motorsport-model-from-mlada-boleslav-with-rear-mounted-engine/Skoda-130-LR_8e853661.pdf",
+        "mime": "application/pdf",
+        "bytes": 610000
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -64745,15 +64837,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-130-LR_8e853661.pdf"
       ],
-      "bytes": null,
+      "bytes": 610000,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:27.005Z"
     },
     "c6d86b52__Skoda-130-RS_efa795d5.pdf": {
       "kind": "document",
@@ -64764,12 +64860,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain/Skoda-130-RS_efa795d5.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-130-RS_efa795d5.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain/Skoda-130-RS_efa795d5.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain/Skoda-130-RS_efa795d5.pdf",
+        "mime": "application/pdf",
+        "bytes": 359755
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -64777,15 +64877,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-130-RS_efa795d5.pdf"
       ],
-      "bytes": null,
+      "bytes": 359755,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:29.628Z"
     },
     "c6d86b52__Skoda-180-RS-200-RS_1f2a566e.pdf": {
       "kind": "document",
@@ -64796,12 +64900,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-180-rs-and-200-rs-1974-rally-cars-from-another-league"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-180-rs-and-200-rs-1974-rally-cars-from-another-league/Skoda-180-RS-200-RS_1f2a566e.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-180-RS-200-RS_1f2a566e.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-180-rs-and-200-rs-1974-rally-cars-from-another-league/Skoda-180-RS-200-RS_1f2a566e.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-180-rs-and-200-rs-1974-rally-cars-from-another-league/Skoda-180-RS-200-RS_1f2a566e.pdf",
+        "mime": "application/pdf",
+        "bytes": 408320
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -64809,15 +64917,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-180-RS-200-RS_1f2a566e.pdf"
       ],
-      "bytes": null,
+      "bytes": 408320,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:32.248Z"
     },
     "c6d86b52__Skoda-F3-Type-992_bbd08183.pdf": {
       "kind": "document",
@@ -64828,12 +64940,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-f3-type-992-1964-european-class-formula-racing-car"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-f3-type-992-1964-european-class-formula-racing-car/Skoda-F3-Type-992_bbd08183.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-F3-Type-992_bbd08183.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-f3-type-992-1964-european-class-formula-racing-car/Skoda-F3-Type-992_bbd08183.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-f3-type-992-1964-european-class-formula-racing-car/Skoda-F3-Type-992_bbd08183.pdf",
+        "mime": "application/pdf",
+        "bytes": 226885
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -64841,15 +64957,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-F3-Type-992_bbd08183.pdf"
       ],
-      "bytes": null,
+      "bytes": 226885,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:35.744Z"
     },
     "c6d86b52__Skoda-Fabia-Motorsport-Edition_65e965e3.pdf": {
       "kind": "document",
@@ -64860,12 +64980,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport/Skoda-Fabia-Motorsport-Edition_65e965e3.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Fabia-Motorsport-Edition_65e965e3.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport/Skoda-Fabia-Motorsport-Edition_65e965e3.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport/Skoda-Fabia-Motorsport-Edition_65e965e3.pdf",
+        "mime": "application/pdf",
+        "bytes": 572075
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -64873,15 +64997,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Fabia-Motorsport-Edition_65e965e3.pdf"
       ],
-      "bytes": null,
+      "bytes": 572075,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:38.538Z"
     },
     "c6d86b52__Skoda-Fabia-R5-Rally2-Rally2-evo_56666812.pdf": {
       "kind": "document",
@@ -64892,12 +65020,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-r5-rally2-rally2-evo-successful-in-the-hands-of-factory-drivers-and-privateers-alike"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-r5-rally2-rally2-evo-successful-in-the-hands-of-factory-drivers-and-privateers-alike/Skoda-Fabia-R5-Rally2-Rally2-evo_56666812.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Fabia-R5-Rally2-Rally2-evo_56666812.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-r5-rally2-rally2-evo-successful-in-the-hands-of-factory-drivers-and-privateers-alike/Skoda-Fabia-R5-Rally2-Rally2-evo_56666812.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-r5-rally2-rally2-evo-successful-in-the-hands-of-factory-drivers-and-privateers-alike/Skoda-Fabia-R5-Rally2-Rally2-evo_56666812.pdf",
+        "mime": "application/pdf",
+        "bytes": 477568
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -64905,15 +65037,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Fabia-R5-Rally2-Rally2-evo_56666812.pdf"
       ],
-      "bytes": null,
+      "bytes": 477568,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:42.410Z"
     },
     "c6d86b52__Skoda-Fabia-RS-Rally2_ff02b216.pdf": {
       "kind": "document",
@@ -64924,12 +65060,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success/Skoda-Fabia-RS-Rally2_ff02b216.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Fabia-RS-Rally2_ff02b216.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success/Skoda-Fabia-RS-Rally2_ff02b216.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success/Skoda-Fabia-RS-Rally2_ff02b216.pdf",
+        "mime": "application/pdf",
+        "bytes": 341395
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -64937,15 +65077,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Fabia-RS-Rally2_ff02b216.pdf"
       ],
-      "bytes": null,
+      "bytes": 341395,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:45.113Z"
     },
     "c6d86b52__Skoda-Fabia-Super-2000_29df7a2e.pdf": {
       "kind": "document",
@@ -64956,12 +65100,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-super-2000-2008-successful-motorsport-comeback-for-the-works-team"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-super-2000-2008-successful-motorsport-comeback-for-the-works-team/Skoda-Fabia-Super-2000_29df7a2e.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Fabia-Super-2000_29df7a2e.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-super-2000-2008-successful-motorsport-comeback-for-the-works-team/Skoda-Fabia-Super-2000_29df7a2e.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-super-2000-2008-successful-motorsport-comeback-for-the-works-team/Skoda-Fabia-Super-2000_29df7a2e.pdf",
+        "mime": "application/pdf",
+        "bytes": 269157
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -64969,15 +65117,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Fabia-Super-2000_29df7a2e.pdf"
       ],
-      "bytes": null,
+      "bytes": 269157,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:47.623Z"
     },
     "c6d86b52__Skoda-Fabia-WRC_c9b54ab7.pdf": {
       "kind": "document",
@@ -64988,12 +65140,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-wrc-2003-paving-the-way-for-future-success"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-wrc-2003-paving-the-way-for-future-success/Skoda-Fabia-WRC_c9b54ab7.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Fabia-WRC_c9b54ab7.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-wrc-2003-paving-the-way-for-future-success/Skoda-Fabia-WRC_c9b54ab7.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-wrc-2003-paving-the-way-for-future-success/Skoda-Fabia-WRC_c9b54ab7.pdf",
+        "mime": "application/pdf",
+        "bytes": 274027
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -65001,15 +65157,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Fabia-WRC_c9b54ab7.pdf"
       ],
-      "bytes": null,
+      "bytes": 274027,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:50.599Z"
     },
     "c6d86b52__Skoda-Felicia-Kit-Car_c630c02c.pdf": {
       "kind": "document",
@@ -65020,12 +65180,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-felicia-kit-car-1995-the-next-chapter-in-an-international-success-story"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-felicia-kit-car-1995-the-next-chapter-in-an-international-success-story/Skoda-Felicia-Kit-Car_c630c02c.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Felicia-Kit-Car_c630c02c.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-felicia-kit-car-1995-the-next-chapter-in-an-international-success-story/Skoda-Felicia-Kit-Car_c630c02c.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-felicia-kit-car-1995-the-next-chapter-in-an-international-success-story/Skoda-Felicia-Kit-Car_c630c02c.pdf",
+        "mime": "application/pdf",
+        "bytes": 373272
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -65033,15 +65197,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Felicia-Kit-Car_c630c02c.pdf"
       ],
-      "bytes": null,
+      "bytes": 373272,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:53.342Z"
     },
     "c6d86b52__Skoda-Octavia-Touring-Sport_ddeb9a7c.pdf": {
       "kind": "document",
@@ -65052,12 +65220,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-touring-sport-1960-successful-return-to-international-rally-courses"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-touring-sport-1960-successful-return-to-international-rally-courses/Skoda-Octavia-Touring-Sport_ddeb9a7c.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Octavia-Touring-Sport_ddeb9a7c.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-touring-sport-1960-successful-return-to-international-rally-courses/Skoda-Octavia-Touring-Sport_ddeb9a7c.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-touring-sport-1960-successful-return-to-international-rally-courses/Skoda-Octavia-Touring-Sport_ddeb9a7c.pdf",
+        "mime": "application/pdf",
+        "bytes": 499045
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -65065,15 +65237,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Octavia-Touring-Sport_ddeb9a7c.pdf"
       ],
-      "bytes": null,
+      "bytes": 499045,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:56.045Z"
     },
     "c6d86b52__Skoda-Octavia-WRC_ce5f7c9d.pdf": {
       "kind": "document",
@@ -65084,12 +65260,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-wrc-1999-entering-the-highest-class-of-international-rallying"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-wrc-1999-entering-the-highest-class-of-international-rallying/Skoda-Octavia-WRC_ce5f7c9d.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Octavia-WRC_ce5f7c9d.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-wrc-1999-entering-the-highest-class-of-international-rallying/Skoda-Octavia-WRC_ce5f7c9d.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-wrc-1999-entering-the-highest-class-of-international-rallying/Skoda-Octavia-WRC_ce5f7c9d.pdf",
+        "mime": "application/pdf",
+        "bytes": 330010
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -65097,15 +65277,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Octavia-WRC_ce5f7c9d.pdf"
       ],
-      "bytes": null,
+      "bytes": 330010,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:44:59.512Z"
     },
     "c6d86b52__Skoda-Popular-Sport_31f774d8.pdf": {
       "kind": "document",
@@ -65116,12 +65300,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally/Skoda-Popular-Sport_31f774d8.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Popular-Sport_31f774d8.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally/Skoda-Popular-Sport_31f774d8.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally/Skoda-Popular-Sport_31f774d8.pdf",
+        "mime": "application/pdf",
+        "bytes": 369825
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -65129,15 +65317,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Popular-Sport_31f774d8.pdf"
       ],
-      "bytes": null,
+      "bytes": 369825,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:45:02.314Z"
     },
     "a95563c7__1936_Skoda-Popular.mp4": {
       "kind": "video",
@@ -65148,12 +65340,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally/1936_Skoda-Popular.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/05/1936_Skoda-Popular.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally/1936_Skoda-Popular.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally/1936_Skoda-Popular.mp4",
+        "mime": "video/mp4",
+        "bytes": 160747169
+      },
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -65161,15 +65357,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/05/1936_Skoda-Popular.mp4"
       ],
-      "bytes": null,
+      "bytes": 160747169,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:46:40.700Z"
     },
     "c6d86b52__Skoda-Spider-B5-Skoda-Spider-II_98fc20c7.pdf": {
       "kind": "document",
@@ -65180,12 +65380,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-spider-b5-1972-and-skoda-spider-ii-1975-prototypes-for-the-racetrack"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-spider-b5-1972-and-skoda-spider-ii-1975-prototypes-for-the-racetrack/Skoda-Spider-B5-Skoda-Spider-II_98fc20c7.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Spider-B5-Skoda-Spider-II_98fc20c7.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-spider-b5-1972-and-skoda-spider-ii-1975-prototypes-for-the-racetrack/Skoda-Spider-B5-Skoda-Spider-II_98fc20c7.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-spider-b5-1972-and-skoda-spider-ii-1975-prototypes-for-the-racetrack/Skoda-Spider-B5-Skoda-Spider-II_98fc20c7.pdf",
+        "mime": "application/pdf",
+        "bytes": 254547
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -65193,15 +65397,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Spider-B5-Skoda-Spider-II_98fc20c7.pdf"
       ],
-      "bytes": null,
+      "bytes": 254547,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:46:43.693Z"
     },
     "c6d86b52__Skoda-Sport_bd8b4ea3.pdf": {
       "kind": "document",
@@ -65212,12 +65420,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain/Skoda-Sport_bd8b4ea3.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Sport_bd8b4ea3.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain/Skoda-Sport_bd8b4ea3.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain/Skoda-Sport_bd8b4ea3.pdf",
+        "mime": "application/pdf",
+        "bytes": 325153
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -65225,15 +65437,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda-Sport_bd8b4ea3.pdf"
       ],
-      "bytes": null,
+      "bytes": 325153,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:46:46.205Z"
     },
     "8b558dfa__Laurin-Klement-FC_3a63d762.pdf": {
       "kind": "document",
@@ -65244,12 +65460,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Laurin-Klement-FC_3a63d762.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Laurin-Klement-FC_3a63d762.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Laurin-Klement-FC_3a63d762.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Laurin-Klement-FC_3a63d762.pdf",
+        "mime": "application/pdf",
+        "bytes": 338541
+      },
       "da_path": "",
       "title": "01 Laurin & Klement FC",
       "alt": "",
@@ -65257,15 +65477,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Laurin-Klement-FC_3a63d762.pdf"
       ],
-      "bytes": null,
+      "bytes": 338541,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:36:07.201Z"
     },
     "8b558dfa__Laurin-Klement-RK-M_83863b25.pdf": {
       "kind": "document",
@@ -65276,12 +65500,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Laurin-Klement-RK-M_83863b25.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Laurin-Klement-RK-M_83863b25.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Laurin-Klement-RK-M_83863b25.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Laurin-Klement-RK-M_83863b25.pdf",
+        "mime": "application/pdf",
+        "bytes": 288483
+      },
       "da_path": "",
       "title": "02 Laurin & Klement RK/M",
       "alt": "",
@@ -65289,15 +65517,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Laurin-Klement-RK-M_83863b25.pdf"
       ],
-      "bytes": null,
+      "bytes": 288483,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:46:47.777Z"
     },
     "8b558dfa__Skoda-Popular-Sport_31f774d8.pdf": {
       "kind": "document",
@@ -65308,12 +65540,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Popular-Sport_31f774d8.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-Popular-Sport_31f774d8.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Popular-Sport_31f774d8.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Popular-Sport_31f774d8.pdf",
+        "mime": "application/pdf",
+        "bytes": 369825
+      },
       "da_path": "",
       "title": "03 Škoda Popular Sport",
       "alt": "",
@@ -65321,15 +65557,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-Popular-Sport_31f774d8.pdf"
       ],
-      "bytes": null,
+      "bytes": 369825,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:46:49.310Z"
     },
     "8b558dfa__Skoda-Sport_bd8b4ea3.pdf": {
       "kind": "document",
@@ -65340,12 +65580,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Sport_bd8b4ea3.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-Sport_bd8b4ea3.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Sport_bd8b4ea3.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Sport_bd8b4ea3.pdf",
+        "mime": "application/pdf",
+        "bytes": 325153
+      },
       "da_path": "",
       "title": "04 Škoda Sport",
       "alt": "",
@@ -65353,15 +65597,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-Sport_bd8b4ea3.pdf"
       ],
-      "bytes": null,
+      "bytes": 325153,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:46:50.920Z"
     },
     "8b558dfa__Skoda-1100-OHC_61d79357.pdf": {
       "kind": "document",
@@ -65372,12 +65620,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-1100-OHC_61d79357.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-1100-OHC_61d79357.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-1100-OHC_61d79357.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-1100-OHC_61d79357.pdf",
+        "mime": "application/pdf",
+        "bytes": 216075
+      },
       "da_path": "",
       "title": "05 Škoda 1100 OHC",
       "alt": "",
@@ -65385,15 +65637,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-1100-OHC_61d79357.pdf"
       ],
-      "bytes": null,
+      "bytes": 216075,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:46:52.276Z"
     },
     "8b558dfa__Skoda-Octavia-Touring-Sport_ddeb9a7c.pdf": {
       "kind": "document",
@@ -65404,12 +65660,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Octavia-Touring-Sport_ddeb9a7c.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-Octavia-Touring-Sport_ddeb9a7c.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Octavia-Touring-Sport_ddeb9a7c.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Octavia-Touring-Sport_ddeb9a7c.pdf",
+        "mime": "application/pdf",
+        "bytes": 499045
+      },
       "da_path": "",
       "title": "06 Škoda Octavia Touring Sport",
       "alt": "",
@@ -65417,15 +65677,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-Octavia-Touring-Sport_ddeb9a7c.pdf"
       ],
-      "bytes": null,
+      "bytes": 499045,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:46:54.021Z"
     },
     "8b558dfa__Skoda-F3-Type-992_bbd08183.pdf": {
       "kind": "document",
@@ -65436,12 +65700,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-F3-Type-992_bbd08183.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-F3-Type-992_bbd08183.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-F3-Type-992_bbd08183.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-F3-Type-992_bbd08183.pdf",
+        "mime": "application/pdf",
+        "bytes": 226885
+      },
       "da_path": "",
       "title": "07 Škoda F3, Type 992",
       "alt": "",
@@ -65449,15 +65717,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-F3-Type-992_bbd08183.pdf"
       ],
-      "bytes": null,
+      "bytes": 226885,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:46:55.671Z"
     },
     "8b558dfa__Skoda-1000-MB-and-1100-MB-B5_63ebed20.pdf": {
       "kind": "document",
@@ -65468,12 +65740,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-1000-MB-and-1100-MB-B5_63ebed20.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-1000-MB-and-1100-MB-B5_63ebed20.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-1000-MB-and-1100-MB-B5_63ebed20.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-1000-MB-and-1100-MB-B5_63ebed20.pdf",
+        "mime": "application/pdf",
+        "bytes": 198717
+      },
       "da_path": "",
       "title": "08 Škoda 1000 MB and 1100 MB B5",
       "alt": "",
@@ -65481,15 +65757,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-1000-MB-and-1100-MB-B5_63ebed20.pdf"
       ],
-      "bytes": null,
+      "bytes": 198717,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:46:56.953Z"
     },
     "8b558dfa__Skoda-Spider-B5-Skoda-Spider-II_98fc20c7.pdf": {
       "kind": "document",
@@ -65500,12 +65780,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Spider-B5-Skoda-Spider-II_98fc20c7.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-Spider-B5-Skoda-Spider-II_98fc20c7.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Spider-B5-Skoda-Spider-II_98fc20c7.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Spider-B5-Skoda-Spider-II_98fc20c7.pdf",
+        "mime": "application/pdf",
+        "bytes": 254547
+      },
       "da_path": "",
       "title": "09 Škoda Spider B5 & Škoda Spider II",
       "alt": "",
@@ -65513,15 +65797,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-Spider-B5-Skoda-Spider-II_98fc20c7.pdf"
       ],
-      "bytes": null,
+      "bytes": 254547,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:46:58.431Z"
     },
     "8b558dfa__Skoda-180-RS-200-RS_1f2a566e.pdf": {
       "kind": "document",
@@ -65532,12 +65820,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-180-RS-200-RS_1f2a566e.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-180-RS-200-RS_1f2a566e.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-180-RS-200-RS_1f2a566e.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-180-RS-200-RS_1f2a566e.pdf",
+        "mime": "application/pdf",
+        "bytes": 408320
+      },
       "da_path": "",
       "title": "10 Škoda 180 RS & 200 RS",
       "alt": "",
@@ -65545,15 +65837,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-180-RS-200-RS_1f2a566e.pdf"
       ],
-      "bytes": null,
+      "bytes": 408320,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:46:59.979Z"
     },
     "8b558dfa__Skoda-130-RS_efa795d5.pdf": {
       "kind": "document",
@@ -65564,12 +65860,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-130-RS_efa795d5.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-130-RS_efa795d5.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-130-RS_efa795d5.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-130-RS_efa795d5.pdf",
+        "mime": "application/pdf",
+        "bytes": 359755
+      },
       "da_path": "",
       "title": "11 Škoda 130 RS",
       "alt": "",
@@ -65577,15 +65877,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-130-RS_efa795d5.pdf"
       ],
-      "bytes": null,
+      "bytes": 359755,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:47:01.688Z"
     },
     "8b558dfa__Skoda-130-LR_8e853661.pdf": {
       "kind": "document",
@@ -65596,12 +65900,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-130-LR_8e853661.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-130-LR_8e853661.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-130-LR_8e853661.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-130-LR_8e853661.pdf",
+        "mime": "application/pdf",
+        "bytes": 610000
+      },
       "da_path": "",
       "title": "12 Škoda 130 LR",
       "alt": "",
@@ -65609,15 +65917,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-130-LR_8e853661.pdf"
       ],
-      "bytes": null,
+      "bytes": 610000,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:47:03.013Z"
     },
     "8b558dfa__Skoda-Favorit_563d4a16.pdf": {
       "kind": "document",
@@ -65628,12 +65940,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Favorit_563d4a16.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-Favorit_563d4a16.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Favorit_563d4a16.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Favorit_563d4a16.pdf",
+        "mime": "application/pdf",
+        "bytes": 446180
+      },
       "da_path": "",
       "title": "13 Škoda Favorit",
       "alt": "",
@@ -65641,15 +65957,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-Favorit_563d4a16.pdf"
       ],
-      "bytes": null,
+      "bytes": 446180,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:47:04.567Z"
     },
     "8b558dfa__Skoda-Felicia-Kit-Car_c630c02c.pdf": {
       "kind": "document",
@@ -65660,12 +65980,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Felicia-Kit-Car_c630c02c.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-Felicia-Kit-Car_c630c02c.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Felicia-Kit-Car_c630c02c.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Felicia-Kit-Car_c630c02c.pdf",
+        "mime": "application/pdf",
+        "bytes": 373272
+      },
       "da_path": "",
       "title": "14 Škoda Felicia Kit Car",
       "alt": "",
@@ -65673,15 +65997,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-Felicia-Kit-Car_c630c02c.pdf"
       ],
-      "bytes": null,
+      "bytes": 373272,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:47:05.866Z"
     },
     "8b558dfa__Skoda-Octavia-WRC_ce5f7c9d.pdf": {
       "kind": "document",
@@ -65692,12 +66020,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Octavia-WRC_ce5f7c9d.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-Octavia-WRC_ce5f7c9d.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Octavia-WRC_ce5f7c9d.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Octavia-WRC_ce5f7c9d.pdf",
+        "mime": "application/pdf",
+        "bytes": 330010
+      },
       "da_path": "",
       "title": "15 Škoda Octavia WRC",
       "alt": "",
@@ -65705,15 +66037,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-Octavia-WRC_ce5f7c9d.pdf"
       ],
-      "bytes": null,
+      "bytes": 330010,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:47:07.992Z"
     },
     "8b558dfa__Skoda-Fabia-WRC_c9b54ab7.pdf": {
       "kind": "document",
@@ -65724,12 +66060,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-WRC_c9b54ab7.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-Fabia-WRC_c9b54ab7.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-WRC_c9b54ab7.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-WRC_c9b54ab7.pdf",
+        "mime": "application/pdf",
+        "bytes": 274027
+      },
       "da_path": "",
       "title": "16 Škoda Fabia WRC",
       "alt": "",
@@ -65737,15 +66077,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-Fabia-WRC_c9b54ab7.pdf"
       ],
-      "bytes": null,
+      "bytes": 274027,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:47:09.331Z"
     },
     "8b558dfa__Skoda-Fabia-Super-2000_29df7a2e.pdf": {
       "kind": "document",
@@ -65756,12 +66100,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-Super-2000_29df7a2e.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-Fabia-Super-2000_29df7a2e.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-Super-2000_29df7a2e.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-Super-2000_29df7a2e.pdf",
+        "mime": "application/pdf",
+        "bytes": 269157
+      },
       "da_path": "",
       "title": "17 Škoda Fabia Super 2000",
       "alt": "",
@@ -65769,15 +66117,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-Fabia-Super-2000_29df7a2e.pdf"
       ],
-      "bytes": null,
+      "bytes": 269157,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:47:10.967Z"
     },
     "8b558dfa__Skoda-Fabia-R5-Rally2-Rally2-evo_56666812.pdf": {
       "kind": "document",
@@ -65788,12 +66140,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-R5-Rally2-Rally2-evo_56666812.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-Fabia-R5-Rally2-Rally2-evo_56666812.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-R5-Rally2-Rally2-evo_56666812.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-R5-Rally2-Rally2-evo_56666812.pdf",
+        "mime": "application/pdf",
+        "bytes": 477568
+      },
       "da_path": "",
       "title": "18 Škoda Fabia R5/ Rally2/ Rally2 evo",
       "alt": "",
@@ -65801,15 +66157,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-Fabia-R5-Rally2-Rally2-evo_56666812.pdf"
       ],
-      "bytes": null,
+      "bytes": 477568,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:47:12.374Z"
     },
     "8b558dfa__Skoda-Fabia-RS-Rally2_ff02b216.pdf": {
       "kind": "document",
@@ -65820,12 +66180,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-RS-Rally2_ff02b216.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-Fabia-RS-Rally2_ff02b216.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-RS-Rally2_ff02b216.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-RS-Rally2_ff02b216.pdf",
+        "mime": "application/pdf",
+        "bytes": 341395
+      },
       "da_path": "",
       "title": "19 Škoda Fabia RS Rally2",
       "alt": "",
@@ -65833,15 +66197,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-Fabia-RS-Rally2_ff02b216.pdf"
       ],
-      "bytes": null,
+      "bytes": 341395,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:47:13.937Z"
     },
     "8b558dfa__Skoda-Fabia-Motorsport-Edition_65e965e3.pdf": {
       "kind": "document",
@@ -65852,12 +66220,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-Motorsport-Edition_65e965e3.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Skoda-Fabia-Motorsport-Edition_65e965e3.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-Motorsport-Edition_65e965e3.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/Skoda-Fabia-Motorsport-Edition_65e965e3.pdf",
+        "mime": "application/pdf",
+        "bytes": 572075
+      },
       "da_path": "",
       "title": "20 Škoda Fabia Motorsport Edition",
       "alt": "",
@@ -65865,15 +66237,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Skoda-Fabia-Motorsport-Edition_65e965e3.pdf"
       ],
-      "bytes": null,
+      "bytes": 572075,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:47:16.189Z"
     },
     "c6d86b52__Anniversary_125_years_2026_4K_1.13_clean_cf3be498.mp4": {
       "kind": "video",
@@ -65884,12 +66260,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/Anniversary_125_years_2026_4K_1.13_clean_cf3be498.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Anniversary_125_years_2026_4K_1.13_clean_cf3be498.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/Anniversary_125_years_2026_4K_1.13_clean_cf3be498.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/Anniversary_125_years_2026_4K_1.13_clean_cf3be498.mp4",
+        "mime": "video/mp4",
+        "bytes": 441553064
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -65897,15 +66277,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Anniversary_125_years_2026_4K_1.13_clean_cf3be498.mp4"
       ],
-      "bytes": null,
+      "bytes": 441553064,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:51:57.023Z"
     },
     "aa4fe1bd__SKODA-1100_OHC-START.mp4": {
       "kind": "video",
@@ -65916,12 +66300,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-1100_OHC-START.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/11/SKODA-1100_OHC-START.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-1100_OHC-START.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-1100_OHC-START.mp4",
+        "mime": "video/mp4",
+        "bytes": 62325425
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -65929,15 +66317,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/11/SKODA-1100_OHC-START.mp4"
       ],
-      "bytes": null,
+      "bytes": 62325425,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:52:28.619Z"
     },
     "bdda8abc__SKODA-1100-OHC-HD-h264.mp4": {
       "kind": "video",
@@ -65948,12 +66340,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-1100-OHC-HD-h264.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/09/SKODA-1100-OHC-HD-h264.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-1100-OHC-HD-h264.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-1100-OHC-HD-h264.mp4",
+        "mime": "video/mp4",
+        "bytes": 348019603
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -65961,15 +66357,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/09/SKODA-1100-OHC-HD-h264.mp4"
       ],
-      "bytes": null,
+      "bytes": 348019603,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:56:02.284Z"
     },
     "aa4fe1bd__SKODA-200RS-START.mp4": {
       "kind": "video",
@@ -65980,12 +66380,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-200RS-START.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/11/SKODA-200RS-START.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-200RS-START.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-200RS-START.mp4",
+        "mime": "video/mp4",
+        "bytes": 44795208
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -65993,15 +66397,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/11/SKODA-200RS-START.mp4"
       ],
-      "bytes": null,
+      "bytes": 44795208,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:56:29.264Z"
     },
     "bdda8abc__SKODA-200RS-FOOTAGE-HD-h264.mp4": {
       "kind": "video",
@@ -66012,12 +66420,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-200RS-FOOTAGE-HD-h264.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/09/SKODA-200RS-FOOTAGE-HD-h264.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-200RS-FOOTAGE-HD-h264.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-200RS-FOOTAGE-HD-h264.mp4",
+        "mime": "video/mp4",
+        "bytes": 355878349
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66025,15 +66437,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/09/SKODA-200RS-FOOTAGE-HD-h264.mp4"
       ],
-      "bytes": null,
+      "bytes": 355878349,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T18:59:42.391Z"
     },
     "aa4fe1bd__SKODA-130LR-START.mp4": {
       "kind": "video",
@@ -66044,12 +66460,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-130LR-START.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/11/SKODA-130LR-START.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-130LR-START.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-130LR-START.mp4",
+        "mime": "video/mp4",
+        "bytes": 63894158
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66057,15 +66477,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/11/SKODA-130LR-START.mp4"
       ],
-      "bytes": null,
+      "bytes": 63894158,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:00:17.739Z"
     },
     "bdda8abc__SKODA-130LR-FOOTAGE-HD-H264.mp4": {
       "kind": "video",
@@ -66076,12 +66500,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-130LR-FOOTAGE-HD-H264.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/09/SKODA-130LR-FOOTAGE-HD-H264.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-130LR-FOOTAGE-HD-H264.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-130LR-FOOTAGE-HD-H264.mp4",
+        "mime": "video/mp4",
+        "bytes": 348415440
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66089,15 +66517,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/09/SKODA-130LR-FOOTAGE-HD-H264.mp4"
       ],
-      "bytes": null,
+      "bytes": 348415440,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:03:30.379Z"
     },
     "aa4fe1bd__SKODA-FAVORIT-136L-START.mp4": {
       "kind": "video",
@@ -66108,12 +66540,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-FAVORIT-136L-START.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/11/SKODA-FAVORIT-136L-START.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-FAVORIT-136L-START.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-FAVORIT-136L-START.mp4",
+        "mime": "video/mp4",
+        "bytes": 54394528
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66121,15 +66557,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/11/SKODA-FAVORIT-136L-START.mp4"
       ],
-      "bytes": null,
+      "bytes": 54394528,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:03:59.118Z"
     },
     "bdda8abc__SKODA-FAVORIT-136L-FOOTAGE-HD-h264.mp4": {
       "kind": "video",
@@ -66140,12 +66580,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-FAVORIT-136L-FOOTAGE-HD-h264.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/09/SKODA-FAVORIT-136L-FOOTAGE-HD-h264.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-FAVORIT-136L-FOOTAGE-HD-h264.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-FAVORIT-136L-FOOTAGE-HD-h264.mp4",
+        "mime": "video/mp4",
+        "bytes": 318645397
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66153,15 +66597,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/09/SKODA-FAVORIT-136L-FOOTAGE-HD-h264.mp4"
       ],
-      "bytes": null,
+      "bytes": 318645397,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:06:53.581Z"
     },
     "aa4fe1bd__SKODA-FABIA-RALLY-2-EVO-START.mp4": {
       "kind": "video",
@@ -66172,12 +66620,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-FABIA-RALLY-2-EVO-START.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/11/SKODA-FABIA-RALLY-2-EVO-START.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-FABIA-RALLY-2-EVO-START.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-FABIA-RALLY-2-EVO-START.mp4",
+        "mime": "video/mp4",
+        "bytes": 67947853
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66185,15 +66637,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/11/SKODA-FABIA-RALLY-2-EVO-START.mp4"
       ],
-      "bytes": null,
+      "bytes": 67947853,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:07:27.804Z"
     },
     "bdda8abc__SKODA-FABIA-RALLY-2-EVO-FOOTAGE-HD-h264.mp4": {
       "kind": "video",
@@ -66204,12 +66660,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-FABIA-RALLY-2-EVO-FOOTAGE-HD-h264.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/09/SKODA-FABIA-RALLY-2-EVO-FOOTAGE-HD-h264.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-FABIA-RALLY-2-EVO-FOOTAGE-HD-h264.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-FABIA-RALLY-2-EVO-FOOTAGE-HD-h264.mp4",
+        "mime": "video/mp4",
+        "bytes": 431610345
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66217,15 +66677,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/09/SKODA-FABIA-RALLY-2-EVO-FOOTAGE-HD-h264.mp4"
       ],
-      "bytes": null,
+      "bytes": 431610345,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:12:15.020Z"
     },
     "aa4fe1bd__SKODA-RE-X1-KREISEL-START.mp4": {
       "kind": "video",
@@ -66236,12 +66700,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-RE-X1-KREISEL-START.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/11/SKODA-RE-X1-KREISEL-START.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-RE-X1-KREISEL-START.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-RE-X1-KREISEL-START.mp4",
+        "mime": "video/mp4",
+        "bytes": 57081346
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66249,15 +66717,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/11/SKODA-RE-X1-KREISEL-START.mp4"
       ],
-      "bytes": null,
+      "bytes": 57081346,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:13:01.973Z"
     },
     "bdda8abc__SKODA-RE-X1-KREISEL-FOOTAGE-HD-h264.mp4": {
       "kind": "video",
@@ -66268,12 +66740,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-RE-X1-KREISEL-FOOTAGE-HD-h264.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/09/SKODA-RE-X1-KREISEL-FOOTAGE-HD-h264.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-RE-X1-KREISEL-FOOTAGE-HD-h264.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/SKODA-RE-X1-KREISEL-FOOTAGE-HD-h264.mp4",
+        "mime": "video/mp4",
+        "bytes": 369682591
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66281,15 +66757,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/09/SKODA-RE-X1-KREISEL-FOOTAGE-HD-h264.mp4"
       ],
-      "bytes": null,
+      "bytes": 369682591,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:17:26.015Z"
     },
     "b85b1ca2__Kreisel-RE-X1.mp4": {
       "kind": "video",
@@ -66300,12 +66780,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/Kreisel-RE-X1.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/07/Kreisel-RE-X1.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/Kreisel-RE-X1.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/Kreisel-RE-X1.mp4",
+        "mime": "video/mp4",
+        "bytes": 73952447
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66313,15 +66797,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/07/Kreisel-RE-X1.mp4"
       ],
-      "bytes": null,
+      "bytes": 73952447,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:18:16.760Z"
     },
     "c6d86b52__rally-weiz-2021-hero-1_00743a9b.mp4": {
       "kind": "video",
@@ -66332,12 +66820,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/rally-weiz-2021-hero-1_00743a9b.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/rally-weiz-2021-hero-1_00743a9b.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/rally-weiz-2021-hero-1_00743a9b.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/rally-weiz-2021-hero-1_00743a9b.mp4",
+        "mime": "video/mp4",
+        "bytes": 566470485
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66345,15 +66837,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/rally-weiz-2021-hero-1_00743a9b.mp4"
       ],
-      "bytes": null,
+      "bytes": 566470485,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:24:04.997Z"
     },
     "edb24d58__Rally_Monza_2020.mp4": {
       "kind": "video",
@@ -66364,12 +66860,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/Rally_Monza_2020.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2020/12/Rally_Monza_2020.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/Rally_Monza_2020.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/Rally_Monza_2020.mp4",
+        "mime": "video/mp4",
+        "bytes": 186863897
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66377,15 +66877,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2020/12/Rally_Monza_2020.mp4"
       ],
-      "bytes": null,
+      "bytes": 186863897,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:25:59.815Z"
     },
     "62066ec4__Monte_2021_H264_20Mb.mp4": {
       "kind": "video",
@@ -66396,12 +66900,16 @@
       "page_refs": [
         "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/Monte_2021_H264_20Mb.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2021/01/Monte_2021_H264_20Mb.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/Monte_2021_H264_20Mb.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/Monte_2021_H264_20Mb.mp4",
+        "mime": "video/mp4",
+        "bytes": 151784036
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66409,15 +66917,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2021/01/Monte_2021_H264_20Mb.mp4"
       ],
-      "bytes": null,
+      "bytes": 151784036,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:27:04.705Z"
     },
     "9f34d7bf__Skoda_Epiq_Battery_versions_36b08a56.pdf": {
       "kind": "document",
@@ -66429,12 +66941,16 @@
         "en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance",
         "en/press-kits/skoda-epiq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance/Skoda_Epiq_Battery_versions_36b08a56.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Epiq_Battery_versions_36b08a56.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance/Skoda_Epiq_Battery_versions_36b08a56.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance/Skoda_Epiq_Battery_versions_36b08a56.pdf",
+        "mime": "application/pdf",
+        "bytes": 9797853
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -66442,15 +66958,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Epiq_Battery_versions_36b08a56.pdf"
       ],
-      "bytes": null,
+      "bytes": 9797853,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:27:12.384Z"
     },
     "9f34d7bf__Press_Kit_Skoda_Epiq_Media_Launch_Battery_and_powertrain_variants_c6b6747b.pdf": {
       "kind": "document",
@@ -66461,12 +66981,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance/Press_Kit_Skoda_Epiq_Media_Launch_Battery_and_powertrain_variants_c6b6747b.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Battery_and_powertrain_variants_c6b6747b.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance/Press_Kit_Skoda_Epiq_Media_Launch_Battery_and_powertrain_variants_c6b6747b.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance/Press_Kit_Skoda_Epiq_Media_Launch_Battery_and_powertrain_variants_c6b6747b.pdf",
+        "mime": "application/pdf",
+        "bytes": 174954
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -66474,15 +66998,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Battery_and_powertrain_variants_c6b6747b.pdf"
       ],
-      "bytes": null,
+      "bytes": 174954,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:27:16.793Z"
     },
     "9f34d7bf__Press_Kit_Skoda_Epiq_Media_Launch_Connectivity_cb570274.pdf": {
       "kind": "document",
@@ -66493,12 +67021,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/connectivity-intuitive-digital-services-and-seamless-vehicle-access"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/connectivity-intuitive-digital-services-and-seamless-vehicle-access/Press_Kit_Skoda_Epiq_Media_Launch_Connectivity_cb570274.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Connectivity_cb570274.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/connectivity-intuitive-digital-services-and-seamless-vehicle-access/Press_Kit_Skoda_Epiq_Media_Launch_Connectivity_cb570274.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/connectivity-intuitive-digital-services-and-seamless-vehicle-access/Press_Kit_Skoda_Epiq_Media_Launch_Connectivity_cb570274.pdf",
+        "mime": "application/pdf",
+        "bytes": 169809
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -66506,15 +67038,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Connectivity_cb570274.pdf"
       ],
-      "bytes": null,
+      "bytes": 169809,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:27:19.197Z"
     },
     "c6d86b52__Skoda_Epiq_Exterior_front_ddf69cc6.pdf": {
       "kind": "document",
@@ -66526,12 +67062,16 @@
         "en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language",
         "en/press-kits/skoda-epiq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Exterior_front_ddf69cc6.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Exterior_front_ddf69cc6.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Exterior_front_ddf69cc6.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Exterior_front_ddf69cc6.pdf",
+        "mime": "application/pdf",
+        "bytes": 4685680
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -66539,15 +67079,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Exterior_front_ddf69cc6.pdf"
       ],
-      "bytes": null,
+      "bytes": 4685680,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:27:24.087Z"
     },
     "c6d86b52__Skoda_Epiq_Exterior_rear_d3a446f8.pdf": {
       "kind": "document",
@@ -66559,12 +67103,16 @@
         "en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language",
         "en/press-kits/skoda-epiq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Exterior_rear_d3a446f8.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Exterior_rear_d3a446f8.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Exterior_rear_d3a446f8.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Exterior_rear_d3a446f8.pdf",
+        "mime": "application/pdf",
+        "bytes": 4871466
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -66572,15 +67120,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Exterior_rear_d3a446f8.pdf"
       ],
-      "bytes": null,
+      "bytes": 4871466,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:27:28.781Z"
     },
     "c6d86b52__Skoda_Epiq_Aerodynamics_4b2b97c6.pdf": {
       "kind": "document",
@@ -66592,12 +67144,16 @@
         "en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language",
         "en/press-kits/skoda-epiq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Aerodynamics_4b2b97c6.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Aerodynamics_4b2b97c6.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Aerodynamics_4b2b97c6.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Aerodynamics_4b2b97c6.pdf",
+        "mime": "application/pdf",
+        "bytes": 3323853
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -66605,15 +67161,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Aerodynamics_4b2b97c6.pdf"
       ],
-      "bytes": null,
+      "bytes": 3323853,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:27:32.755Z"
     },
     "c6d86b52__Skoda_Epiq_Dimensions_edd15eb1.pdf": {
       "kind": "document",
@@ -66625,12 +67185,16 @@
         "en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language",
         "en/press-kits/skoda-epiq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Dimensions_edd15eb1.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Dimensions_edd15eb1.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Dimensions_edd15eb1.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Dimensions_edd15eb1.pdf",
+        "mime": "application/pdf",
+        "bytes": 3291249
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -66638,15 +67202,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Dimensions_edd15eb1.pdf"
       ],
-      "bytes": null,
+      "bytes": 3291249,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:27:37.331Z"
     },
     "c6d86b52__Skoda_Epiq_Wheels_b3996b33.pdf": {
       "kind": "document",
@@ -66658,12 +67226,16 @@
         "en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language",
         "en/press-kits/skoda-epiq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Wheels_b3996b33.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Wheels_b3996b33.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Wheels_b3996b33.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Skoda_Epiq_Wheels_b3996b33.pdf",
+        "mime": "application/pdf",
+        "bytes": 3751448
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -66671,15 +67243,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Wheels_b3996b33.pdf"
       ],
-      "bytes": null,
+      "bytes": 3751448,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:27:41.432Z"
     },
     "c6d86b52__Epiq_colours_EN_1d57bbaa.mp4": {
       "kind": "video",
@@ -66691,12 +67267,16 @@
         "en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language",
         "en/press-kits/skoda-epiq-press-kit-2/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Epiq_colours_EN_1d57bbaa.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Epiq_colours_EN_1d57bbaa.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Epiq_colours_EN_1d57bbaa.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Epiq_colours_EN_1d57bbaa.mp4",
+        "mime": "video/mp4",
+        "bytes": 35124773
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -66704,15 +67284,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Epiq_colours_EN_1d57bbaa.mp4"
       ],
-      "bytes": null,
+      "bytes": 35124773,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:04.848Z"
     },
     "9f34d7bf__Press_Kit_Skoda_Epiq_Media_Launch_Exterior_b1e1a11f.pdf": {
       "kind": "document",
@@ -66723,12 +67307,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Press_Kit_Skoda_Epiq_Media_Launch_Exterior_b1e1a11f.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Exterior_b1e1a11f.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Press_Kit_Skoda_Epiq_Media_Launch_Exterior_b1e1a11f.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/Press_Kit_Skoda_Epiq_Media_Launch_Exterior_b1e1a11f.pdf",
+        "mime": "application/pdf",
+        "bytes": 157101
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -66736,15 +67324,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Exterior_b1e1a11f.pdf"
       ],
-      "bytes": null,
+      "bytes": 157101,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:09.049Z"
     },
     "c6d86b52__Skoda_Epiq_First_Edition_eb74b996.pdf": {
       "kind": "document",
@@ -66756,12 +67348,16 @@
         "en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details",
         "en/press-kits/skoda-epiq-press-kit-2/infographics"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details/Skoda_Epiq_First_Edition_eb74b996.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_First_Edition_eb74b996.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details/Skoda_Epiq_First_Edition_eb74b996.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details/Skoda_Epiq_First_Edition_eb74b996.pdf",
+        "mime": "application/pdf",
+        "bytes": 3278497
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -66769,15 +67365,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_First_Edition_eb74b996.pdf"
       ],
-      "bytes": null,
+      "bytes": 3278497,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:12.243Z"
     },
     "9f34d7bf__Press_Kit_Skoda_Epiq_Media_Launch_First_Edition_ac2c4098.pdf": {
       "kind": "document",
@@ -66788,12 +67388,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details/Press_Kit_Skoda_Epiq_Media_Launch_First_Edition_ac2c4098.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_First_Edition_ac2c4098.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details/Press_Kit_Skoda_Epiq_Media_Launch_First_Edition_ac2c4098.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details/Press_Kit_Skoda_Epiq_Media_Launch_First_Edition_ac2c4098.pdf",
+        "mime": "application/pdf",
+        "bytes": 163760
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -66801,15 +67405,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_First_Edition_ac2c4098.pdf"
       ],
-      "bytes": null,
+      "bytes": 163760,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:14.187Z"
     },
     "c6d86b52__Skoda_Epiq_Interior_Loft_Mint_38d0d693.pdf": {
       "kind": "document",
@@ -66821,12 +67429,16 @@
         "en/press-kits/skoda-epiq-press-kit-2/infographics",
         "en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/infographics/Skoda_Epiq_Interior_Loft_Mint_38d0d693.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Interior_Loft_Mint_38d0d693.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/infographics/Skoda_Epiq_Interior_Loft_Mint_38d0d693.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/infographics/Skoda_Epiq_Interior_Loft_Mint_38d0d693.pdf",
+        "mime": "application/pdf",
+        "bytes": 2358283
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -66834,15 +67446,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Interior_Loft_Mint_38d0d693.pdf"
       ],
-      "bytes": null,
+      "bytes": 2358283,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:17.182Z"
     },
     "9f34d7bf__Skoda_Epiq_Five_equipment_packages_dad644ef.pdf": {
       "kind": "document",
@@ -66854,12 +67470,16 @@
         "en/press-kits/skoda-epiq-press-kit-2/infographics",
         "en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/infographics/Skoda_Epiq_Five_equipment_packages_dad644ef.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Epiq_Five_equipment_packages_dad644ef.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/infographics/Skoda_Epiq_Five_equipment_packages_dad644ef.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/infographics/Skoda_Epiq_Five_equipment_packages_dad644ef.pdf",
+        "mime": "application/pdf",
+        "bytes": 1657056
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -66867,15 +67487,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Epiq_Five_equipment_packages_dad644ef.pdf"
       ],
-      "bytes": null,
+      "bytes": 1657056,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:22.427Z"
     },
     "9f34d7bf__Press_Kit_Skoda_Epiq_Media_Launch_Interior_58d7b9e2.pdf": {
       "kind": "document",
@@ -66886,12 +67510,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience/Press_Kit_Skoda_Epiq_Media_Launch_Interior_58d7b9e2.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Interior_58d7b9e2.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience/Press_Kit_Skoda_Epiq_Media_Launch_Interior_58d7b9e2.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience/Press_Kit_Skoda_Epiq_Media_Launch_Interior_58d7b9e2.pdf",
+        "mime": "application/pdf",
+        "bytes": 165489
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -66899,15 +67527,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Interior_58d7b9e2.pdf"
       ],
-      "bytes": null,
+      "bytes": 165489,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:24.824Z"
     },
     "9f34d7bf__Press_Kit_Skoda_Epiq_Media_Launch_Safety_and_assistance_systems_5772208c.pdf": {
       "kind": "document",
@@ -66918,12 +67550,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/safety-and-assistance-systems-comprehensive-predictiveand-reassuring-driver-support"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/safety-and-assistance-systems-comprehensive-predictiveand-reassuring-driver-support/Press_Kit_Skoda_Epiq_Media_Launch_Safety_and_assistance_systems_5772208c.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Safety_and_assistance_systems_5772208c.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/safety-and-assistance-systems-comprehensive-predictiveand-reassuring-driver-support/Press_Kit_Skoda_Epiq_Media_Launch_Safety_and_assistance_systems_5772208c.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/safety-and-assistance-systems-comprehensive-predictiveand-reassuring-driver-support/Press_Kit_Skoda_Epiq_Media_Launch_Safety_and_assistance_systems_5772208c.pdf",
+        "mime": "application/pdf",
+        "bytes": 156724
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -66931,15 +67567,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Safety_and_assistance_systems_5772208c.pdf"
       ],
-      "bytes": null,
+      "bytes": 156724,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:26.812Z"
     },
     "9f34d7bf__Press_Kit_Skoda_Epiq_Media_Launch_Introduction_f69f32f3.pdf": {
       "kind": "document",
@@ -66950,12 +67590,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality/Press_Kit_Skoda_Epiq_Media_Launch_Introduction_f69f32f3.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Introduction_f69f32f3.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality/Press_Kit_Skoda_Epiq_Media_Launch_Introduction_f69f32f3.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality/Press_Kit_Skoda_Epiq_Media_Launch_Introduction_f69f32f3.pdf",
+        "mime": "application/pdf",
+        "bytes": 167782
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -66963,47 +67607,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Introduction_f69f32f3.pdf"
       ],
-      "bytes": null,
+      "bytes": 167782,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
-    },
-    "728314ef__TD_Skoda_Epiq_en_69592937.pdf": {
-      "kind": "document",
-      "logical_id": "728314ef__TD_Skoda_Epiq_en_69592937.pdf",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/08/TD_Skoda_Epiq_en_69592937.pdf",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/08/TD_Skoda_Epiq_en_69592937.pdf",
-      "dam_page_path": "en/press-kits/skoda-epiq-press-kit-2/technical-data",
-      "page_refs": [
-        "en/press-kits/skoda-epiq-press-kit-2/technical-data"
-      ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
-      "original_download_url": "",
-      "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
-      "da_path": "",
-      "title": "Download PDF",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/TD_Skoda_Epiq_en_69592937.pdf"
-      ],
-      "bytes": null,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
-        "da": "n/a"
-      },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:29.493Z"
     },
     "9f34d7bf__TD_Skoda_Epiq_en_69592937.pdf": {
       "kind": "document",
@@ -67014,28 +67630,37 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/technical-data"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/technical-data/TD_Skoda_Epiq_en_69592937.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/TD_Skoda_Epiq_en_69592937.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/technical-data/TD_Skoda_Epiq_en_69592937.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/technical-data/TD_Skoda_Epiq_en_69592937.pdf",
+        "mime": "application/pdf",
+        "bytes": 134975
+      },
       "da_path": "",
       "title": "Technical data PDF download",
       "alt": "",
       "caption": "",
       "seen_urls": [
-        "https://www.skoda-storyboard.com/direct-download/2026/08/TD_Skoda_Epiq_en_69592937.pdf"
+        "https://www.skoda-storyboard.com/direct-download/2026/08/TD_Skoda_Epiq_en_69592937.pdf",
+        "https://cdn.skoda-storyboard.com/2026/08/TD_Skoda_Epiq_en_69592937.pdf"
       ],
-      "bytes": null,
+      "bytes": 134975,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:32.593Z"
     },
     "728314ef__Press_Kit_Skoda_Epiq_Media_Launch_1a15a93e.pdf": {
       "kind": "document",
@@ -67046,12 +67671,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_1a15a93e.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_1a15a93e.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_1a15a93e.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_1a15a93e.pdf",
+        "mime": "application/pdf",
+        "bytes": 281225
+      },
       "da_path": "",
       "title": "Škoda Epiq – Press Kit",
       "alt": "",
@@ -67059,15 +67688,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_1a15a93e.pdf"
       ],
-      "bytes": null,
+      "bytes": 281225,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:34.487Z"
     },
     "728314ef__Press_Kit_Skoda_Epiq_Media_Launch_Introduction_f69f32f3.pdf": {
       "kind": "document",
@@ -67078,12 +67711,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Introduction_f69f32f3.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Introduction_f69f32f3.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Introduction_f69f32f3.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Introduction_f69f32f3.pdf",
+        "mime": "application/pdf",
+        "bytes": 167782
+      },
       "da_path": "",
       "title": "01 Introduction",
       "alt": "",
@@ -67091,15 +67728,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Introduction_f69f32f3.pdf"
       ],
-      "bytes": null,
+      "bytes": 167782,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:35.751Z"
     },
     "728314ef__Press_Kit_Skoda_Epiq_Media_Launch_Exterior_b1e1a11f.pdf": {
       "kind": "document",
@@ -67110,12 +67751,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Exterior_b1e1a11f.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Exterior_b1e1a11f.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Exterior_b1e1a11f.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Exterior_b1e1a11f.pdf",
+        "mime": "application/pdf",
+        "bytes": 157101
+      },
       "da_path": "",
       "title": "02 Exterior",
       "alt": "",
@@ -67123,15 +67768,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Exterior_b1e1a11f.pdf"
       ],
-      "bytes": null,
+      "bytes": 157101,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:37.308Z"
     },
     "728314ef__Press_Kit_Skoda_Epiq_Media_Launch_Interior_58d7b9e2.pdf": {
       "kind": "document",
@@ -67142,12 +67791,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Interior_58d7b9e2.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Interior_58d7b9e2.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Interior_58d7b9e2.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Interior_58d7b9e2.pdf",
+        "mime": "application/pdf",
+        "bytes": 165489
+      },
       "da_path": "",
       "title": "03 Interior",
       "alt": "",
@@ -67155,15 +67808,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Interior_58d7b9e2.pdf"
       ],
-      "bytes": null,
+      "bytes": 165489,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:38.871Z"
     },
     "728314ef__Press_Kit_Skoda_Epiq_Media_Launch_Battery_and_powertrain_variants_c6b6747b.pdf": {
       "kind": "document",
@@ -67174,12 +67831,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Battery_and_powertrain_variants_c6b6747b.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Battery_and_powertrain_variants_c6b6747b.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Battery_and_powertrain_variants_c6b6747b.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Battery_and_powertrain_variants_c6b6747b.pdf",
+        "mime": "application/pdf",
+        "bytes": 174954
+      },
       "da_path": "",
       "title": "04 Battery and powertrain variants",
       "alt": "",
@@ -67187,15 +67848,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Battery_and_powertrain_variants_c6b6747b.pdf"
       ],
-      "bytes": null,
+      "bytes": 174954,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:43.655Z"
     },
     "728314ef__Press_Kit_Skoda_Epiq_Media_Launch_Safety_and_assistance_systems_5772208c.pdf": {
       "kind": "document",
@@ -67206,12 +67871,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Safety_and_assistance_systems_5772208c.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Safety_and_assistance_systems_5772208c.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Safety_and_assistance_systems_5772208c.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Safety_and_assistance_systems_5772208c.pdf",
+        "mime": "application/pdf",
+        "bytes": 156724
+      },
       "da_path": "",
       "title": "05 Safety and assistance systems",
       "alt": "",
@@ -67219,15 +67888,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Safety_and_assistance_systems_5772208c.pdf"
       ],
-      "bytes": null,
+      "bytes": 156724,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:44.850Z"
     },
     "728314ef__Press_Kit_Skoda_Epiq_Media_Launch_Connectivity_cb570274.pdf": {
       "kind": "document",
@@ -67238,12 +67911,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Connectivity_cb570274.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Connectivity_cb570274.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Connectivity_cb570274.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_Connectivity_cb570274.pdf",
+        "mime": "application/pdf",
+        "bytes": 169809
+      },
       "da_path": "",
       "title": "06 Connectivity",
       "alt": "",
@@ -67251,15 +67928,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_Connectivity_cb570274.pdf"
       ],
-      "bytes": null,
+      "bytes": 169809,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:46.952Z"
     },
     "728314ef__Press_Kit_Skoda_Epiq_Media_Launch_First_Edition_ac2c4098.pdf": {
       "kind": "document",
@@ -67270,12 +67951,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_First_Edition_ac2c4098.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_First_Edition_ac2c4098.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_First_Edition_ac2c4098.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/texts/Press_Kit_Skoda_Epiq_Media_Launch_First_Edition_ac2c4098.pdf",
+        "mime": "application/pdf",
+        "bytes": 163760
+      },
       "da_path": "",
       "title": "07 Škoda Epiq First Edition",
       "alt": "",
@@ -67283,15 +67968,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Press_Kit_Skoda_Epiq_Media_Launch_First_Edition_ac2c4098.pdf"
       ],
-      "bytes": null,
+      "bytes": 163760,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:28:48.383Z"
     },
     "9f34d7bf__FOOTAGE_INNSBRUCK_EPIQ_UHD_d6cfe9d1.mp4": {
       "kind": "video",
@@ -67335,12 +68024,16 @@
         "en/press-kits/skoda-epiq-press-kit-2/videos",
         "en/press-kits/skoda-peaq-press-kit-2/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/zdravice-neft-EPIQ_PEAQ_UHD_0b964d21.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/zdravice-neft-EPIQ_PEAQ_UHD_0b964d21.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/zdravice-neft-EPIQ_PEAQ_UHD_0b964d21.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/zdravice-neft-EPIQ_PEAQ_UHD_0b964d21.mp4",
+        "mime": "video/mp4",
+        "bytes": 325668643
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -67348,15 +68041,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/zdravice-neft-EPIQ_PEAQ_UHD_0b964d21.mp4"
       ],
-      "bytes": null,
+      "bytes": 325668643,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:35:18.583Z"
     },
     "9f34d7bf__klip_EPIQ_PEAQ_UHD_201c18c6.mp4": {
       "kind": "video",
@@ -67368,12 +68065,16 @@
         "en/press-kits/skoda-epiq-press-kit-2/videos",
         "en/press-kits/skoda-peaq-press-kit-2/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/klip_EPIQ_PEAQ_UHD_201c18c6.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/klip_EPIQ_PEAQ_UHD_201c18c6.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/klip_EPIQ_PEAQ_UHD_201c18c6.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/klip_EPIQ_PEAQ_UHD_201c18c6.mp4",
+        "mime": "video/mp4",
+        "bytes": 98060399
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -67381,15 +68082,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/klip_EPIQ_PEAQ_UHD_201c18c6.mp4"
       ],
-      "bytes": null,
+      "bytes": 98060399,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:36:19.209Z"
     },
     "c6d86b52__Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4": {
       "kind": "video",
@@ -67400,12 +68105,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4",
+        "mime": "video/mp4",
+        "bytes": 186106427
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -67413,15 +68122,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Epiq_Reveal_Hero_60s_16x9_Clean_NoEpiQ_H264_25mbit_331d5d10.mp4"
       ],
-      "bytes": null,
+      "bytes": 186106427,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T19:37:57.331Z"
     },
     "c6d86b52__Skoda_Epiq_Footage_01_HD_68aa554d.mp4": {
       "kind": "video",
