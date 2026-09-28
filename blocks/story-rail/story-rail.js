@@ -59,6 +59,7 @@ export function parseConfig(block) {
     viewAll: cfg.viewall || cfg.viewAll || cfg.all || '',
     // 'oldest'/'publishdate' → ascending; else newest-first
     sort: (cfg.sort === 'oldest' || cfg.sort === 'publishdate') ? 'oldest' : 'newest',
+    layout: cfg.template === 'press_release' ? 'news' : 'standard',
     limit: Math.max(1, Number(cfg.limit) || 10),
     // comma list of path-slug fragments to exclude (already shown above)
     exclude: tokens(cfg.exclude),
@@ -172,6 +173,9 @@ export function collapseRail(block, mount, header) {
 export default async function decorate(block) {
   const cfg = parseConfig(block);
   const curated = !isConfigTable(block);
+  if (!curated && cfg.layout === 'news' && document.body.classList.contains('page')) {
+    block.classList.add('story-rail-news');
+  }
 
   // --- header (heading + optional "view all") --------------------------------
   const heading = cfg.heading || getMetadata('story-rail-heading') || '';

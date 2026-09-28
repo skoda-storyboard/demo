@@ -4,17 +4,18 @@
 /**
  * Import orchestrator: Škoda Storyboard home (template-homepage, /en/).
  *
- * Featured promo-box (curated cards) + a stack of index-driven Story Rails
+ * Featured promo-box (curated cards), a Stories feed, and index-driven Story Rails
  * (home-rail self-classifies each .search-results rail from its heading + "All"
  * link / type-<cpt> class). The live-Instagram social strip is not index-driven —
- * home-rail unwraps it. Metadata template=page (nav/direct only; body class carries
- * `page`). Content-driven detection only.
+ * home-rail unwraps it. Preserve each cover-box section and its Style metadata.
+ * Metadata template=page (nav/direct only; body class carries `page`).
  */
 
 import promoBoxParser from './parsers/promo-box.js';
 import homeRailParser from './parsers/home-rail.js';
+import homeStoriesParser from './parsers/home-stories.js';
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
-import sectionsTransformer from './transformers/skoda-model-sections.js';
+import sectionsTransformer from './transformers/skoda-home-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 import linksTransformer from './transformers/skoda-links.js';
 import normalizeImages from './transformers/skoda-images.js';
@@ -22,16 +23,18 @@ import normalizeImages from './transformers/skoda-images.js';
 const parsers = {
   'promo-box': promoBoxParser,
   'home-rail': homeRailParser,
+  'home-stories': homeStoriesParser,
 };
 
 const PAGE_TEMPLATE = {
   name: 'home-sto',
   description:
-    'Škoda Storyboard home (template-homepage). Curated promo-box cards + index-driven Story Rails (home-rail). Social strip unwrapped (not index-driven). Metadata template=page. Content-driven detection only.',
+    'Škoda Storyboard home (template-homepage). Curated promo, Stories feed and index-driven Story Rails in cover-box bands. Social strip unwrapped. Metadata template=page.',
   urls: ['https://www.skoda-storyboard.com/en/'],
   metadata: { template: 'page' },
   blocks: [
     { name: 'promo-box', instances: ['section.promo-box'] },
+    { name: 'home-stories', instances: ['.cover-box .search-results.latest-articles'] },
     { name: 'home-rail', instances: ['.cover-box .search-results[class*="type-"]'] },
   ],
   sections: [],
@@ -39,7 +42,7 @@ const PAGE_TEMPLATE = {
 
 const transformers = [
   cleanupTransformer,
-  ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
+  sectionsTransformer,
   metadataTransformer,
   linksTransformer,
 ];

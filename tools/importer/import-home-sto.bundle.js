@@ -1,26 +1,9 @@
 /* eslint-disable */
 var CustomImportScript = (() => {
   var __defProp = Object.defineProperty;
-  var __defProps = Object.defineProperties;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-  var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
   var __getOwnPropNames = Object.getOwnPropertyNames;
-  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
-  var __propIsEnum = Object.prototype.propertyIsEnumerable;
-  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-  var __spreadValues = (a, b) => {
-    for (var prop in b || (b = {}))
-      if (__hasOwnProp.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
-    if (__getOwnPropSymbols)
-      for (var prop of __getOwnPropSymbols(b)) {
-        if (__propIsEnum.call(b, prop))
-          __defNormalProp(a, prop, b[prop]);
-      }
-    return a;
-  };
-  var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
@@ -43,12 +26,13 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/promo-box.js
   function parse(element, { document: document2 }) {
-    const items = Array.from(element.querySelectorAll("article.promo-box-item, .item article, .items > .item")).filter((el, i, arr) => arr.indexOf(el) === i);
+    const articles = [...element.querySelectorAll("article.promo-box-item, .item article")];
+    const items = (articles.length ? articles : [...element.querySelectorAll(".items > .item")]).filter((el, i, arr) => arr.indexOf(el) === i);
     if (items.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const cells = [["Cards (promo)"]];
+    const cells = [["Promo Box"]];
     let emitted = 0;
     items.forEach((item) => {
       const img = item.querySelector("img");
@@ -126,6 +110,17 @@ var CustomImportScript = (() => {
     }
     const table = WebImporter.DOMUtils.createTable(cells, document2);
     element.replaceWith(table);
+  }
+
+  // tools/importer/parsers/home-stories.js
+  function parse3(element, { document: document2 }) {
+    const heading = element.querySelector(".search-results-heading")?.textContent.trim();
+    if (!heading) throw new Error("Homepage stories feed needs a heading.");
+    element.replaceWith(WebImporter.DOMUtils.createTable([
+      ["Stories"],
+      ["heading", heading],
+      ["template", "story"]
+    ], document2));
   }
 
   // tools/importer/transformers/skoda-page-cleanup.js
@@ -208,48 +203,20 @@ var CustomImportScript = (() => {
     }
   }
 
-  // tools/importer/transformers/skoda-model-sections.js
-  var SECTION_MARKER_ATTR = "data-excat-section-id";
-  function querySection(root, selectors) {
-    const list = Array.isArray(selectors) ? selectors : [selectors];
-    for (const sel of list) {
-      if (!sel) continue;
-      const el = root.querySelector(sel);
-      if (el) return el;
-    }
-    return null;
-  }
-  function transform2(hookName, element, payload) {
-    const sections = payload && payload.template && payload.template.sections || [];
-    if (sections.length < 2) return;
+  // tools/importer/transformers/skoda-home-sections.js
+  function transform2(hookName, element) {
     if (hookName === "beforeTransform") {
-      for (let i = sections.length - 1; i >= 0; i -= 1) {
-        const section = sections[i];
-        if (i === 0 && !section.style) continue;
-        const sectionEl = querySection(element, section.selector);
-        if (!sectionEl) continue;
-        const hr = document.createElement("hr");
-        if (section.style) hr.setAttribute(SECTION_MARKER_ATTR, section.id);
-        sectionEl.before(hr);
-      }
+      element.querySelectorAll(".cover-box").forEach((band) => {
+        band.before(document.createElement("hr"));
+      });
     }
     if (hookName === "afterTransform") {
-      for (let i = sections.length - 1; i >= 0; i -= 1) {
-        const section = sections[i];
-        if (!section.style) continue;
-        const marker = element.querySelector(`[${SECTION_MARKER_ATTR}="${section.id}"]`);
-        const anchor = marker || querySection(element, section.selector);
-        if (!anchor) continue;
-        const metadataBlock = WebImporter.Blocks.createBlock(document, {
+      element.querySelectorAll(".cover-box").forEach((band) => {
+        band.after(WebImporter.Blocks.createBlock(document, {
           name: "Section Metadata",
-          cells: { style: section.style }
-        });
-        anchor.after(metadataBlock);
-        if (marker) {
-          marker.removeAttribute(SECTION_MARKER_ATTR);
-          if (i === 0) marker.remove();
-        }
-      }
+          cells: { style: band.classList.contains("dark") ? "cover-box, dark" : "cover-box" }
+        }));
+      });
     }
   }
 
@@ -708,7 +675,7 @@ var CustomImportScript = (() => {
       if (img.closest("table, picture")) return;
       const figure = img.closest("figure");
       const wrapper = img.closest("[data-caption]");
-      const wrapperCaption = (wrapper == null ? void 0 : wrapper.querySelectorAll("img").length) === 1 ? editorialCaption(wrapper) : "";
+      const wrapperCaption = wrapper?.querySelectorAll("img").length === 1 ? editorialCaption(wrapper) : "";
       const caption = (img.hasAttribute("data-caption") ? editorialCaption(img) : "") || wrapperCaption;
       if (figure) {
         if (img.parentElement.tagName !== "DIV") {
@@ -756,27 +723,29 @@ var CustomImportScript = (() => {
   // tools/importer/import-home-sto.js
   var parsers = {
     "promo-box": parse,
-    "home-rail": parse2
+    "home-rail": parse2,
+    "home-stories": parse3
   };
   var PAGE_TEMPLATE = {
     name: "home-sto",
-    description: "\u0160koda Storyboard home (template-homepage). Curated promo-box cards + index-driven Story Rails (home-rail). Social strip unwrapped (not index-driven). Metadata template=page. Content-driven detection only.",
+    description: "\u0160koda Storyboard home (template-homepage). Curated promo, Stories feed and index-driven Story Rails in cover-box bands. Social strip unwrapped. Metadata template=page.",
     urls: ["https://www.skoda-storyboard.com/en/"],
     metadata: { template: "page" },
     blocks: [
       { name: "promo-box", instances: ["section.promo-box"] },
+      { name: "home-stories", instances: [".cover-box .search-results.latest-articles"] },
       { name: "home-rail", instances: ['.cover-box .search-results[class*="type-"]'] }
     ],
     sections: []
   };
   var transformers = [
     transform,
-    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform2] : [],
+    transform2,
     transform3,
     transform4
   ];
   function executeTransformers(hookName, element, payload) {
-    const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE });
+    const enhancedPayload = { ...payload, template: PAGE_TEMPLATE };
     transformers.forEach((transformerFn) => {
       try {
         transformerFn.call(null, hookName, element, enhancedPayload);

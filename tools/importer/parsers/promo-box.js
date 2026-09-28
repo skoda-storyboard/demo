@@ -1,7 +1,7 @@
 /* eslint-disable */
 /* global WebImporter */
 /**
- * Parser: promo-box (block name: "Cards (promo)")
+ * Parser: promo-box (block name: "Promo Box")
  * Source: the homepage featured slider — section.promo-box > .items[data-flickity]
  *   > .item > article.promo-box-item (typically 3 hand-picked posts).
  * (measured against .migration/work/samples/sto-home.html + mr-home.html;
@@ -22,7 +22,8 @@
  *   [img(wrapped in its link), <a href>title</a>]
  */
 export default function parse(element, { document }) {
-  const items = Array.from(element.querySelectorAll('article.promo-box-item, .item article, .items > .item'))
+  const articles = [...element.querySelectorAll('article.promo-box-item, .item article')];
+  const items = (articles.length ? articles : [...element.querySelectorAll('.items > .item')])
     .filter((el, i, arr) => arr.indexOf(el) === i);
 
   if (items.length === 0) {
@@ -30,7 +31,7 @@ export default function parse(element, { document }) {
     return;
   }
 
-  const cells = [['Cards (promo)']];
+  const cells = [['Promo Box']];
   let emitted = 0;
 
   items.forEach((item) => {

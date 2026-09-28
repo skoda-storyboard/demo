@@ -116,6 +116,12 @@ test('parseConfig reads keys and applies defaults', () => {
   assert.equal(cfg.dots, false);
 });
 
+test('press releases select the wider news layout without changing standard rails', () => {
+  assert.equal(parseConfig(cfgBlock([['template', 'press_release']])).layout, 'news');
+  assert.equal(parseConfig(cfgBlock([['template', 'skoda_model']])).layout, 'standard');
+  assert.equal(parseConfig(cfgBlock([['template', 'story']])).layout, 'standard');
+});
+
 test('parseConfig tokenizes comma lists and floors limit to >=1', () => {
   const cfg = parseConfig(cfgBlock([['tag', 'enyaq, 2026'], ['limit', '-5'], ['exclude', 'teaser, promo']]));
   assert.deepEqual(cfg.tag, ['enyaq', '2026']);

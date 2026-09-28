@@ -77,6 +77,53 @@
   aspect-ratio: auto;
 }
 
+/* Press-release rails use the source's wider news cells; category and model
+   rails retain the standard carousel ladder. Bleed only this rail through the
+   generic section padding to the source's full-width (capped) home container. */
+.story-rail.story-rail-news {
+  --news-rail-gutter: var(--spacing-l);
+  --news-cell-width: calc(90cqw - var(--carousel-gap));
+
+  position: relative;
+  left: 50%;
+  width: min(calc(100% + 2 * var(--news-rail-gutter)), var(--content-max-width));
+  transform: translateX(-50%);
+  container-type: inline-size;
+}
+
+.story-rail.story-rail-news .story-rail-mount {
+  aspect-ratio: auto;
+}
+
+.story-rail.story-rail-news .story-rail-mount:not(.is-built)::before {
+  content: "";
+  display: block;
+  width: var(--news-cell-width);
+  aspect-ratio: 16 / 9;
+}
+
+.story-rail.story-rail-news .carousel-track {
+  padding-inline: calc(var(--carousel-gap) / 2);
+  scroll-padding-inline: calc(var(--carousel-gap) / 2);
+}
+
+.story-rail.story-rail-news .carousel-track .card-teaser {
+  flex-basis: var(--news-cell-width);
+}
+
+@media (width >= 768px) {
+  .story-rail.story-rail-news {
+    --news-cell-width: calc(45cqw - var(--carousel-gap));
+  }
+}
+
+@media (width >= 992px) {
+  .story-rail.story-rail-news {
+    --news-rail-gutter: var(--spacing-xl);
+    --news-cell-width: calc(30cqw - var(--carousel-gap));
+  }
+}
+
 /* Related-story teasers use the source's larger content-rail cells. The query
    container keeps the reserved image width equal to the decorated card width,
    including the track's two 10px insets. */
