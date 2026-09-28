@@ -4,7 +4,7 @@
 - **Phase:** A · **Milestone:** M1 (demo-visible on every press release)
 - **GitHub issue:** [#171](https://github.com/skoda-storyboard/demo/issues/171) (sub-issue of #47)
 - **Estimate:** 1.5 SP · AI-assisted 0.5d / manual 1–1.5d *(planning estimate, not a quote)*
-- **Status (2026-09-28):** 🟡 In review (Developer → QA), branch `skoda-223-gallery-preview`
+- **Status (2026-09-28):** 🟡 In review (Developer → QA), [PR #201](https://github.com/skoda-storyboard/demo/pull/201)
 
 ## Implementation (2026-09-28)
 - `blocks/gallery/gallery.js`: `Gallery (preview)` → `buildPreview()`. A `<ul>` of up to 4 `<button>` thumbs
