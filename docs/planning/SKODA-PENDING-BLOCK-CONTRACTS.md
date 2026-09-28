@@ -50,10 +50,10 @@ These blocks have code on `main`, with the variants and config keys that code re
 
 | Block | Variants | Config keys |
 |---|---|---|
-| `cards` | `media`, `overlay`, `toolbar`, `series-directory` | – |
+| `cards` | `media`, `overlay`, `toolbar`, `series-directory`, `social` (SKODA-217: one row per profile, one cell with a link whose text is the handle; its section carries `Style: cover-box, dark`, the SKODA-218 home band) | – |
 | `carousel` | `dots` | – |
 | `columns` | – | – |
-| `downloads` | – | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes` (SKODA-502) |
+| `downloads` | `media-box` (SKODA-510) | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes`, `collapse` (SKODA-502/510) |
 | `embed` | – | `url`, `ratio`, `title`, `poster` (`or-curated`: a bare Vimeo / YouTube / Buzzsprout / Spotify URL on its own line still autoblocks). A self-hosted `.mp4`/`.webm`/`.mov`/`.m4v` `url` renders a native `<video>` with the `poster` image (SKODA-801a, WordPress `[video]`) |
 | `gallery` | – | – |
 | `hero-image` | `story` (default), `overlay`, `archive` | – |
@@ -198,7 +198,14 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Example** (`/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/`): 6 rows. Zellmer 10, National Theatre 5, Board 1; Superb has no band.
 
 ### `downloads-file-rows`
-- **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-510 · **Fallback:** readable (image tiles; rows without an image are skipped by the block, so on press releases `templates/press-release` lists each skipped file, e.g. the release PDF, as a plain download link under the grid until SKODA-510 lands; PR #170 review)
+- **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-510 · **Fallback:** readable on `main`
+  until PR #186 merges (image tiles and a plain PDF link from `templates/press-release`).
+- **Landing:** PR #186 implements this shape without re-import; each empty-image row renders as
+  a file tile and the template fallback is removed. The block gets its Media Box appearance from
+  a `media-box` section or a `Downloads (media-box)` variant. Authored `collapse=auto|none` optionally
+  controls the two-row disclosure (default `auto` in a Media Box, `none` elsewhere); authored
+  `columns` controls desktop columns and the number disclosed. Neither option changes the three-cell
+  asset row shape. Keep the contract pinned until the branch merges and QA verifies it.
 - **Emitted by:** `parsers/downloads.js` (press-release Media Box). A row shape of the `downloads` block on `main`, so the check classifies these pages as `main`, not pending.
 - **Shape:** header `Downloads`, then 3 cells per row: `[<picture> or empty, title text, links]`. The links cell holds one `<a>` per size, its text the size label: `Original` + `1920px` (image, `/direct-download/…` and `…-1920xH.jpg`), `MP4` (video, Vimeo poster as the picture), `PDF` (document, empty picture cell).
 - **Example** (Peaq): 5 rows, `MP4`, 3 × `Original`+`1920px`, `PDF`.
@@ -242,7 +249,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 ### `cover-box`
 - **Status:** `pinned` (2026-09-28) · **Ticket:** SKODA-218 · **Fallback:** readable (a light rail, as before)
 - **Form: section style, not a block.** A homepage band holds one or more rails (Media Room "Models" + "Press Kits"), and DA blocks can't nest (rule 5).
-- **Shape:** each source `.cover-box.dark` band (except the Social media band, which is `Cards (social)`) becomes its own section closed by `Section Metadata` with `Style` = `cover-box, dark`. The Media Room home adds `compact` (`cover-box, dark, compact`: its bands sit 16px tighter at the top). Detected by the source class, never by heading or URL; emitted by `transformers/skoda-dark-bands.js` (both home importers).
+- **Shape:** each source `.cover-box.dark` band becomes its own section closed by `Section Metadata` with `Style` = `cover-box, dark`. The Media Room home adds `compact` (`cover-box, dark, compact`: its bands sit 16px tighter at the top). Detected by the source class, never by heading or URL. Emitted by `transformers/skoda-dark-bands.js` (both home importers) and, for the Social media band (a heading + `Cards (social)`), by `parsers/social-cards.js` (SKODA-217); the transformer skips `.socials-static` so the band is styled once.
 - **Runtime:** `styles.css`. `cover-box` = the band box (1440px cap, centred; live inner spacing 66/60, compact 48; 48px between rails); `dark` = the existing green/white primitive, with headings in the band following its white text.
 
 ### `media-item`
@@ -270,6 +277,10 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 ### `media-room-chrome`
 - **Status:** `pinned` · **Ticket:** SKODA-309 (with 305) · **Fallback:** readable (Storyboard chrome)
 - **Form: bulk metadata, not importer output** (309 amendment). The 16 MR-side URLs (5 press releases, **5 model pages**, 4 press kits, Images, Videos) get `nav` / `footer` from `metadata.json` rows for the MR path globs. Those rows are activated only once both MR fragments return 200 on preview and live. The importers emit nothing, and the push tool's fragment check requires the fragments to be live before publishing.
+- **Rows** (SKODA-309, 2026-09-28): every row sets `nav: /media-room/nav`, `footer: /media-room/footer` and `section: media-room`. `header-switcher.js` uses `section` to activate the Media Room tab; the Media Room header also gets a lighter topbar.
+  - Patterns: `/en/press-releases/**`, `/en/press-kits/**`, `/en/skoda-model/**`, `/en/skodapedia/**`, plus an exact row and a `/**` row each for `/en/news`, `/en/images`, `/en/videos`, `/en/media-room`, `/en/contacts`, `/en/search` and `/en/newsletter` (the SKODA-305 footer list).
+  - The rows don't overlap each other and none matches a Storyboard page. Page-level metadata still wins over the bulk rows (aem.live bulk metadata).
+- **Fragment check:** `fragmentPaths()` reads the preview and live `/metadata.json` rows whose pattern matches a pushed page (`bulkPatternMatches`). So an MR batch requires `/media-room/nav` and `/media-room/footer` to be live, and Storyboard batches don't.
 
 ### `skodapedia`
 - **Status:** `out-of-scope` · **Ticket:** SKODA-206 · **Fallback:** broken

@@ -86,6 +86,9 @@ async function scenario(stage, remoteMatches, {
     if (address.includes('.aem.page/en/story.plain.html')) {
       return new Response('<img src="./media_abc123.jpg" alt="Kept">', { status: 200 });
     }
+    if (/\.aem\.(page|live)\/metadata\.json/.test(address)) {
+      return new Response(null, { status: 404 }); // no bulk metadata sheet published
+    }
     if (address.includes('query-index.json')) {
       return Response.json({ data: [{ path: '/en/story' }] });
     }

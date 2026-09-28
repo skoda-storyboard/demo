@@ -346,8 +346,14 @@ export default async function main(argv = process.argv.slice(2), {
   }
 
   // 4) shared fragments ------------------------------------------------------------------
+  // bulk metadata rows (preview + live sheet) can set nav/footer too (Media Room, SKODA-309)
+  const bulk = [];
+  for (const host of [h.page, h.live]) {
+    const r = await fetchWithRetry(`${host}/metadata.json?cb=${Date.now()}`);
+    if (r.ok) bulk.push(...((await r.json()).data || []));
+  }
   const fragments = [];
-  for (const f of fragmentPaths(plains)) {
+  for (const f of fragmentPaths(plains, { paths: pages.map((pg) => pg.path), bulk })) {
     const st = await adminStatus(a, f);
     const frag = { path: f, preview: st.preview, live: st.live };
     if (st.live !== 200 && a.publishFragments && st.preview === 200 && !a.dryRun) {
@@ -417,10 +423,9 @@ export default async function main(argv = process.argv.slice(2), {
         if (missing.size) await sleep(10000);
       }
       pages.forEach((pg) => { if (pg.liveStatus === 200) pg.indexed = !missing.has(pg.path); });
-      for (const f of ['/nav', '/footer']) {
-        const r = await fetchWithRetry(`${h.live}${f}.plain.html?cb=${Date.now()}`);
-        const frag = fragments.find((x) => x.path === f);
-        if (frag) frag.liveSmoke = r.status;
+      for (const frag of fragments) {
+        const r = await fetchWithRetry(`${h.live}${frag.path}.plain.html?cb=${Date.now()}`);
+        frag.liveSmoke = r.status;
       }
     }
   }

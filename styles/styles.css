@@ -169,6 +169,14 @@
   --app-badge-w: 135px;
   --app-badge-h: 40px;
 
+  /* homepage Social media band (SKODA-217; measured on the live /en/
+     .socials-static). The card values live with the Cards (social) variant
+     (blocks/cards/cards.css); the shared home-band box is SKODA-218's. */
+  --social-band-padding-top: 64px;
+  --social-band-padding-bottom: 80px;
+  --social-band-margin-top: 64px; /* visible gap Load more → band on live */
+  --social-band-margin-bottom: 60px; /* visible gap band → next rail heading on live */
+
   /* footer shell rhythm (SKODA-305, shared by the Storyboard + Media Room footers). Source:
      .footer-widgets > * margin-bottom 3em, hr margin-bottom 3rem, .container padding 10px with a
      -10px widget row and 15px widget padding, .copyright-text margin-bottom 2em (of 16px),
@@ -628,6 +636,19 @@ main > .section:first-of-type {
   }
 }
 
+/* homepage "Social media" heading (SKODA-217; live .socials-static h3): the
+   default-content heading of the section that holds the social profile cards
+   (Cards (social)), centred at the section-heading size with the source's 20px
+   gap to the cards. Its white on the dark band comes from the shared dark-band
+   heading rule below (SKODA-218). */
+main > .section.cards-container:has(.cards.social) > .default-content-wrapper :is(h2, h3) {
+  margin: 0 0 var(--grid-gutter); /* 20px, the home section heading → content gap */
+  font-size: var(--heading-font-size-l);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-heading);
+  text-align: center;
+}
+
 /* section metadata */
 main .section.light,
 main .section.highlight {
@@ -693,6 +714,22 @@ main > .section.cover-box .carousel-track .card-teaser {
 
 main > .section.cover-box .story-rail-wrapper + .story-rail-wrapper {
   margin-block-start: var(--cover-box-rail-gap);
+}
+
+/* homepage Social media band (SKODA-217; live .cover-box.dark.socials-static,
+   measured 375–3440): band top → heading 64px, last card → band end 80px, and
+   max-width 1440px centred (x240 @1920, x1000 @3440). Live's own margin is
+   2.25em auto 1.5em (36/24), which adds to its neighbours' inner spacing (28px
+   under Load more, the next band's 36px top margin). Our sections collapse
+   margins with their 40px neighbours instead, so the band carries live's
+   visible totals: 64px above, 60px below. Its section is `Style: cover-box, dark`
+   like every home dark band (SKODA-218); this rule keys on `.dark` + the social
+   cards, so it also covers older `Style: dark` content, and it outranks the
+   generic `.cover-box` band with the social band's own measured spacing. */
+main > .section.dark.cards-container:has(.cards.social) {
+  max-width: var(--cover-box-max-width);
+  margin: var(--social-band-margin-top) auto var(--social-band-margin-bottom);
+  padding-block: var(--social-band-padding-top) var(--social-band-padding-bottom);
 }
 
 /* ==========================================================================

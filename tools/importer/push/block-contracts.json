@@ -12,7 +12,8 @@
         "media",
         "overlay",
         "toolbar",
-        "series-directory"
+        "series-directory",
+        "social"
       ]
     },
     "carousel": {
@@ -24,7 +25,9 @@
       "variants": []
     },
     "downloads": {
-      "variants": []
+      "variants": [
+        "media-box"
+      ]
     },
     "embed": {
       "variants": [],
@@ -315,7 +318,8 @@
       "fallback": "readable",
       "shape": 1,
       "emittedBy": [
-        "transformers/skoda-dark-bands.js"
+        "transformers/skoda-dark-bands.js",
+        "parsers/social-cards.js"
       ]
     },
     {
