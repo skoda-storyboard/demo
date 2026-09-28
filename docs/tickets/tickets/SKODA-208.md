@@ -149,6 +149,21 @@ plus variants of existing blocks, built against the already-published pages (no 
   for summer" (17 Aug 2026; the page itself is tagged Octavia, and it is absent from every model-filtered live
   listing), so our rail shows it and drops the oldest item. Not overridden: the index follows the page's tags.
 
+**Image lightbox (2026-09-28):** an Images card now opens the source colorbox view instead of the bare file.
+- The gallery block's lightbox moved, unchanged in behaviour, to the shared `scripts/lightbox.js` +
+  `styles/lightbox.css` (used by `gallery` and the rails); items may carry `full` / `download` / `link` / `cartId`.
+- Re-measured the live colorbox (model page + press release, 1024/1280/1440): panel 256 wide, 16 from the right
+  edge, text from y=96; close, counter and arrow cells 60px with the source close / caret glyphs; the counter total
+  in grey with a CSS "/". Press-release galleries get the same chrome.
+- The detail panel data is migrated, not authored: the media feed builder fetches each item's source panel
+  (`image-overlay-meta-data`) into contract `media-item` **shape 4** (`filetype`, `filesize`, `dimensions`,
+  `labels`, `related`, `related-title`); related articles that are demo pages link locally.
+- Carousel fix (all rails): the drag code captured the pointer on every press, which retargeted the click to the
+  track, so a plain mouse click never followed a card link. It now captures only once a drag passes the threshold.
+- QA vs live at 1024/1280/1440: image, panel blocks, close, counter and arrows match to the pixel.
+- Still open: videos open vimeo.com (the source plays them in the lightbox); the press-release gallery panel only
+  has the authored caption (no title / file metadata / tags / related yet); the cart button is inert (SKODA-505).
+
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/template-model-page.md`](../../ui-specs/template-model-page.md)** (captured via Chrome DevTools on the live Peaq model page). Read it before implementing. Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).
 

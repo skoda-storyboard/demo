@@ -211,15 +211,19 @@ export default function decorate(block) {
     moved = false;
     startX = e.clientX;
     startLeft = track.scrollLeft;
-    track.setPointerCapture(e.pointerId);
-    track.classList.add('is-dragging');
   });
 
+  // Capture the pointer only once it really drags: capturing on pointerdown retargets the
+  // click to the track, so a plain click never reached the card link (or its lightbox).
   track.addEventListener('pointermove', (e) => {
     if (!dragging) return;
     const dx = e.clientX - startX;
-    if (Math.abs(dx) > DRAG_THRESHOLD) moved = true;
-    track.scrollLeft = startLeft - dx;
+    if (!moved && Math.abs(dx) > DRAG_THRESHOLD) {
+      moved = true;
+      track.setPointerCapture?.(e.pointerId);
+      track.classList.add('is-dragging');
+    }
+    if (moved) track.scrollLeft = startLeft - dx;
   });
 
   function endDrag(e) {

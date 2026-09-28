@@ -49,7 +49,7 @@ globalThis.document = {
 };
 
 const {
-  parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail,
+  parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail, mediaLightboxItem,
 } = await import('./story-rail.js');
 
 /*
@@ -376,4 +376,26 @@ test('curatedRows passes the authored cell contents without nesting their wrappe
     { elems: [picture] },
     { elems: [date, title] },
   ]]);
+});
+
+test('mediaLightboxItem: the source colorbox panel from a media feed row (shape 4)', () => {
+  const item = mediaLightboxItem({
+    title: 'Škoda Octavia turns 30', description: 'Caption', date: '2026-08-27', id: '450812',
+    original: 'https://cdn.example/a.jpg', 'rendition-1920': 'https://cdn.example/a-1920x1280.jpg',
+    filetype: 'JPG', filesize: '10 MB', dimensions: '8256 × 5504 px', labels: '2026, Octavia',
+    related: '/en/press-releases/octavia-30', 'related-title': 'Octavia turns 30',
+  });
+  assert.equal(item.full, 'https://cdn.example/a-1920x1280.jpg', 'the stage shows the 1920 rendition');
+  assert.equal(item.download, 'https://cdn.example/a.jpg', 'download is the original');
+  assert.equal(item.cartId, '450812');
+  const paras = item.caption.children;
+  const text = (node) => (node.children.length ? node.children.map((c) => (typeof c === 'string' ? c : text(c))).join('') : node.textContent);
+  assert.deepEqual(paras.map(text), [
+    'Škoda Octavia turns 30', 'Caption',
+    'File type: JPGFile size: 10 MBDimensions: 8256 × 5504 pxPublished: 27. 8. 2026',
+    '2026 · Octavia', 'Related article: Octavia turns 30',
+  ]);
+  const bare = mediaLightboxItem({ title: 'T', original: 'https://cdn.example/b.jpg', date: '' });
+  assert.equal(bare.caption.children.length, 1, 'no empty metadata, tags or related lines');
+  assert.equal(bare.full, 'https://cdn.example/b.jpg');
 });

@@ -30,7 +30,50 @@ export const FACETS = [
 // Download fields, in the order they are written to the Metadata block + index.
 export const DOWNLOAD_FIELDS = ['original', 'rendition-1920', 'mp4', 'vimeo-id', 'poster'];
 
+// The lightbox detail-panel fields (media-item shape 4): file metadata as the source prints
+// it, the tag chip labels in source order, and the related article.
+export const DETAIL_FIELDS = ['filetype', 'filesize', 'dimensions', 'labels', 'related', 'related-title'];
+
 const text = (el) => (el ? (el.textContent || '').replace(/\s+/g, ' ').trim() : '');
+
+/** The source's per-item detail request (the colorbox panel, `image-overlay-meta-data`). */
+export function detailRequest(id, nonce) {
+  const body = new URLSearchParams({
+    action: 'skoda_ajax_loader',
+    nonce,
+    template: 'templates/image-overlay-meta-data',
+    loop: 'false',
+    'query_vars[post_type]': 'attachment',
+    'query_vars[offset]': '0',
+    'query_vars[p]': String(id),
+    'query_vars[include_hidden]': 'true',
+  });
+  return { url: `${SOURCE_ORIGIN}/wp/wp-admin/admin-ajax.php`, body: body.toString() };
+}
+
+/** The ajax loader nonce a source listing page embeds (`var skoda_ajax_loader = {…}`). */
+export function ajaxNonce(html) {
+  return (String(html || '').match(/skoda_ajax_loader\s*=\s*\{[^}]*"nonce":"([a-z0-9]+)"/i) || [])[1] || '';
+}
+
+/**
+ * The detail-panel fields from the source panel markup: `File type: JPG`, `File size: 10 MB`,
+ * `Dimensions: 8256 × 5504 px` (the source's non-breaking spaces become plain ones), the
+ * tag chip labels ("2026, Octavia") and the first related article (absolute source URL).
+ * @param {Document} doc the parsed panel HTML
+ */
+export function parseDetailPanel(doc) {
+  const strong = (sel) => text(doc.querySelector(`${sel} strong`));
+  const related = doc.querySelector('.related-links a.related-link[href]');
+  return {
+    filetype: strong('.meta-filetype'),
+    filesize: strong('.meta-filesize'),
+    dimensions: strong('.meta-dimensions'),
+    labels: [...doc.querySelectorAll('.entry-tags a.label')].map(text).filter(Boolean).join(', '),
+    related: related ? related.getAttribute('href') : '',
+    'related-title': text(related),
+  };
+}
 
 /** Lowercase, anything outside [a-z0-9-] becomes `-` (the EDS path rule, push/m1-status-lib). */
 export function slugify(value) {
@@ -262,6 +305,7 @@ export function feedRow(item) {
   };
   FACETS.forEach((tax) => { row[tax] = (item.terms[tax] || []).join(', '); });
   DOWNLOAD_FIELDS.forEach((field) => { row[field] = item[field] || ''; });
+  DETAIL_FIELDS.forEach((field) => { row[field] = item[field] || ''; });
   row.id = item.id;
   row.source = item.source;
   return row;

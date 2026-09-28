@@ -29,6 +29,7 @@ import {
 } from '../../scripts/aem.js';
 import { loadQueryIndex, defaultIndexUrl, cleanTitle } from '../../scripts/query-index.js';
 import { formatCardDate } from '../../scripts/card-teaser.js';
+import { buildLightbox } from '../../scripts/lightbox.js';
 import {
   scopeRows, filterRows, sortRows, paginate, INDEX_FACETS,
 } from '../listing/listing-logic.mjs';
@@ -167,6 +168,53 @@ export function mediaToolbar(row) {
 }
 
 /*
+ * One shared-lightbox item from an image feed row (contract media-item shape 4): the stage
+ * shows the 1920px rendition, and the detail panel follows the source colorbox: title,
+ * caption, (the lightbox's action buttons), file metadata, tag chips, related article.
+ */
+export function mediaLightboxItem(row) {
+  const title = cleanTitle(row.title);
+  const caption = document.createElement('div');
+  const para = (...nodes) => {
+    const p = document.createElement('p');
+    p.append(...nodes);
+    caption.append(p);
+    return p;
+  };
+  if (title) para(title);
+  if (row.description) para(row.description);
+  const meta = [['File type', row.filetype], ['File size', row.filesize],
+    ['Dimensions', row.dimensions], ['Published', formatCardDate(row.date)]].filter(([, v]) => v);
+  if (meta.length) {
+    const p = para();
+    meta.forEach(([label, value], i) => {
+      if (i) p.append(document.createElement('br'));
+      const strong = document.createElement('strong');
+      strong.textContent = value;
+      p.append(`${label}: `, strong);
+    });
+  }
+  const labels = String(row.labels || '').split(',').map((s) => s.trim()).filter(Boolean);
+  if (labels.length) para(labels.join(' · '));
+  if (row.related) {
+    const a = document.createElement('a');
+    a.href = row.related;
+    a.textContent = row['related-title'] || row.related;
+    para('Related article: ', a);
+  }
+  const src = row['rendition-1920'] || row.original || row.image;
+  return {
+    src,
+    full: src,
+    alt: title,
+    caption,
+    download: row.original || src,
+    link: row.original || src,
+    cartId: row.id || '',
+  };
+}
+
+/*
  * Synthesize one carousel row (image cell + body cell) from an index row. The
  * body is returned as buildBlock's `{ elems }` form so the date <p> and title
  * <h3> land DIRECTLY in the cell (not wrapped in an extra <div>) — the carousel
@@ -225,6 +273,28 @@ export function viewAllLabel(block) {
   const text = row?.children[1]?.querySelector('a')?.textContent.trim() || '';
   // a bare URL as link text (the common DA paste) is not a label
   return text && !/^(https?:\/\/|\/)/i.test(text) ? text : 'View all';
+}
+
+/*
+ * Image rails open the shared lightbox (the source colorbox) instead of the bare file: a
+ * click anywhere on a card except its toolbar opens it at that card. Modifier clicks keep
+ * the link (new tab). The overlay lives on <body>: a fixed layer inside the carousel
+ * would be clipped by its transforms.
+ */
+function wireMediaLightbox(carousel, rows) {
+  const cards = [...carousel.querySelectorAll('.carousel-track > *')];
+  if (!cards.length) return;
+  const lightbox = buildLightbox(document.body, rows.slice(0, cards.length).map(mediaLightboxItem));
+  carousel.addEventListener('click', (e) => {
+    const modified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
+    if (e.defaultPrevented || e.button !== 0 || modified) return;
+    const card = e.target.closest('.carousel-track > *');
+    if (!card || e.target.closest('.card-teaser-toolbar')) return;
+    const index = cards.indexOf(card);
+    if (index < 0) return;
+    e.preventDefault();
+    lightbox.open(index, card.querySelector('.card-teaser-link') || card);
+  });
 }
 
 // Classes that belong to the rail itself and are never passed to the inner carousel.
@@ -305,10 +375,12 @@ export default async function decorate(block) {
   // don't all build on load.
   async function buildRail() {
     let rows = authoredRows;
+    let indexRows = [];
     if (!curated) {
       try {
         const all = await loadQueryIndex(cfg.index);
-        rows = selectRows(all, cfg).map((r) => rowToCells(r));
+        indexRows = selectRows(all, cfg);
+        rows = indexRows.map((r) => rowToCells(r));
       } catch (e) {
         // index load failed: remove the empty story band or generic rail
         // eslint-disable-next-line no-console
@@ -332,6 +404,7 @@ export default async function decorate(block) {
     decorateBlock(carousel);
     await loadBlock(carousel);
     mount.classList.add('is-built'); // release the reserved card geometry
+    if (cfg.template === 'image' && indexRows.length) wireMediaLightbox(carousel, indexRows);
   }
 
   if (window.IntersectionObserver) {

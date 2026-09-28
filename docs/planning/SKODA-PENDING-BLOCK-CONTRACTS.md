@@ -247,7 +247,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Until the importer emits it** (824 importer half), pages keep the current unwrap (default content) and are marked `re-import on SKODA-824`. The shape is fixed, so the 824 runtime and importer can be built in parallel.
 
 ### `media-item`
-- **Status:** `pinned` (shape 3, 2026-09-27) · **Ticket:** SKODA-608 · **Fallback:** readable (story-style listing/rail cards until SKODA-406)
+- **Status:** `pinned` (shape 4, 2026-09-28) · **Ticket:** SKODA-608 · **Fallback:** readable (story-style listing/rail cards until SKODA-406)
 - **Form: a row of the generated media feed, not a page** (docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md, option B:
   AEM Assets is the source of truth; pages per item are retired). The feed is a DA sheet at `/en/media-feed.json`
   (`{total, offset, limit, data, ":type": "sheet"}`), read by `listing` and `story-rail` via `index: /en/media-feed.json`.
@@ -260,6 +260,11 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   `category` images|videos, `tags` + the 15 facets (mapped by term name; in M2 from AEM tags, SKODA-512),
   `original`, `rendition-1920`, `mp4`, `vimeo-id`, `poster` (stable CDN URLs, never `/direct-download/`), `id`
   (source attachment id / M2 asset id, the cart key), `source`.
+- **Shape 4 (2026-09-28, SKODA-208):** + the lightbox detail panel, as the source colorbox shows it (fetched per
+  item from the source `image-overlay-meta-data` panel): `filetype` (JPG), `filesize` (10 MB), `dimensions`
+  (8256 × 5504 px), `labels` (tag chip names in source order, comma-joined), `related` (the parent article: a
+  site path when it is a demo page, else the absolute source URL) and `related-title`. Empty when the source panel
+  is empty. In M2 the AEM Assets sync writes them from the asset metadata.
 - **Sharding:** a sheet holds 500k cells (~20k rows at ~30 columns); split by type/year before that (the loader
   pages with `offset`).
 - Domain-restricted Vimeo videos (oEmbed `domain_status_code: 403`) can't play on the demo and are not emitted.

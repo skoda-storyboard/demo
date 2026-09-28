@@ -25,8 +25,10 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import {
   SOURCE_ORIGIN, facetOptions, parseCards, mergeItems, feedSheet, yearIds, vimeoPoster,
+  detailRequest, ajaxNonce, parseDetailPanel,
 } from './media-items-lib.mjs';
 import { uploadToDA } from '../media/media-lib.mjs';
+import { readLists } from '../build-link-allowlist.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '../../..');
@@ -93,6 +95,48 @@ async function fetchText(url, cacheDir, offline) {
   throw new Error(`failed ${url}`);
 }
 
+/** POST with the same file cache as fetchText (keyed by `key`, not the URL). */
+async function fetchPost(url, body, key, cacheDir, offline) {
+  const file = path.join(cacheDir, `${key}.json`);
+  if (existsSync(file)) return readFileSync(file, 'utf8');
+  if (offline) throw new Error(`offline and not cached: ${key}`);
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'user-agent': UA, 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+    body,
+  });
+  if (!res.ok) throw new Error(`${res.status} ${url} (${key})`);
+  const out = await res.text();
+  mkdirSync(cacheDir, { recursive: true });
+  writeFileSync(file, out);
+  return out;
+}
+
+/**
+ * The lightbox detail panel of every item (media-item shape 4): the source colorbox loads it
+ * per item (`image-overlay-meta-data`). A related article that is a demo page links there.
+ */
+async function addDetails(JSDOM, items, nonce, cacheDir, offline) {
+  const demo = new Set(readLists().paths);
+  let missing = 0;
+  for (const item of items) {
+    const { url, body } = detailRequest(item.id, nonce);
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      const json = JSON.parse(await fetchPost(url, body, `detail_${item.id}`, cacheDir, offline));
+      Object.assign(item, parseDetailPanel(new JSDOM(json.html || '').window.document));
+      if (item.related) {
+        const rel = new URL(item.related, SOURCE_ORIGIN);
+        const local = rel.pathname.toLowerCase().replace(/\/+$/, '');
+        if (demo.has(local)) item.related = local;
+      }
+    } catch (e) {
+      missing += 1;
+    }
+  }
+  if (missing) console.warn(`[media-items] no detail panel for ${missing} item(s)`);
+}
+
 /** Map `years-<termId>` → year name: filter by each offered year and intersect card classes. */
 async function probeYears(JSDOM, options, type, cacheDir, offline) {
   const byId = {};
@@ -145,12 +189,14 @@ export async function main(argv = process.argv.slice(2)) {
   const { queries } = JSON.parse(readFileSync(path.join(HERE, 'sources.json'), 'utf8'));
   const lists = [];
   const yearsById = {};
+  let nonce = '';
 
   for (const type of ['image', 'video']) {
     // The unfiltered listing's form offers every facet value (and all year names).
     // eslint-disable-next-line no-await-in-loop
     const baseHtml = await fetchText(listingUrl({ type, n: 1 }), a.cache, a.offline);
     const base = new JSDOM(baseHtml).window.document;
+    nonce = nonce || ajaxNonce(baseHtml);
     const options = facetOptions(base);
     // eslint-disable-next-line no-await-in-loop
     Object.assign(yearsById, await probeYears(JSDOM, options, type, a.cache, a.offline));
@@ -178,6 +224,7 @@ export async function main(argv = process.argv.slice(2)) {
   };
   const dropped = items.filter((i) => reason(i));
   items = items.filter((i) => !reason(i));
+  await addDetails(JSDOM, items, nonce, a.cache, a.offline);
 
   const summary = {
     images: items.filter((i) => i.type === 'image').length,

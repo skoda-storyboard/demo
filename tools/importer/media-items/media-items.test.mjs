@@ -13,7 +13,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   slugify, isoDate, cdnUrl, vimeoPoster, facetOptions, cardTerms, parseCards, mergeItems,
-  feedRow, feedSheet, itemSlug, sourceOrder, FACETS,
+  feedRow, feedSheet, itemSlug, sourceOrder, FACETS, DETAIL_FIELDS, parseDetailPanel, ajaxNonce,
+  detailRequest,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 
@@ -159,4 +160,33 @@ test('feed sheet: DA sheet shape, newest first, query-index compatible', { skip 
   const dates = sheet.data.map((r) => r.date);
   assert.deepEqual(dates, [...dates].sort().reverse());
   assert.deepEqual(new Set(sheet.data.map((r) => r.template)), new Set(['image', 'video']));
+});
+
+test('detail panel (shape 4): file metadata, tag labels and the related article', { skip }, () => {
+  const panel = parseDetailPanel(doc('detail-450812'));
+  assert.deepEqual(panel, {
+    filetype: 'JPG',
+    filesize: '10 MB',
+    dimensions: '8256 × 5504 px',
+    labels: '2026, Octavia',
+    related: 'https://www.skoda-storyboard.com/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon/',
+    'related-title': 'Škoda Octavia turns 30: Three decades of a brand icon',
+  });
+  const empty = parseDetailPanel(new JSDOM('<div><ol class="entry-tags tag-list"></ol></div>').window.document);
+  assert.ok(DETAIL_FIELDS.every((f) => empty[f] === ''), 'an empty source panel gives empty fields');
+  const row = feedRow({
+    id: '1', type: 'image', title: 'T', date: '2026-08-27', terms: {}, original: '/o.jpg', ...panel,
+  });
+  DETAIL_FIELDS.forEach((f) => assert.equal(row[f], panel[f]));
+});
+
+test('detail request: the source ajax loader call with the page nonce', () => {
+  assert.equal(ajaxNonce('<script>var skoda_ajax_loader = {"ajax_url":"https:\\/\\/x","nonce":"8d4ff79608"};</script>'), '8d4ff79608');
+  assert.equal(ajaxNonce('<p>none</p>'), '');
+  const { url, body } = detailRequest(450812, 'abc');
+  assert.equal(url, 'https://www.skoda-storyboard.com/wp/wp-admin/admin-ajax.php');
+  const q = new URLSearchParams(body);
+  assert.equal(q.get('template'), 'templates/image-overlay-meta-data');
+  assert.equal(q.get('query_vars[p]'), '450812');
+  assert.equal(q.get('nonce'), 'abc');
 });

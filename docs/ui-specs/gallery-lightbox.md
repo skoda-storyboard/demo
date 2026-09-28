@@ -109,6 +109,15 @@ one accessible vanilla lightbox.
   locked `position:fixed; height:100vh; width:100vw` (scroll-lock) and its scrollbar hidden.
 - Text color `#fff` -> `--skoda-white`; `user-select:none` on chrome, `user-select:text` on caption.
 
+### Live colorbox chrome, desktop (re-measured 2026-09-28 · model page + PR · 1024/1280/1440)
+- Implementation: shared `scripts/lightbox.js` + `styles/lightbox.css` (gallery block and media rails).
+- Image column flush left (992×661 at 1280), detail panel **256px**, 16px gap, **16px** from the right edge,
+  text from **y=96** (`#cboxTitle`); blocks: title, caption (20px), actions (21 above, 20 below; 40px discs, 12px
+  apart, right-aligned; add / download 16px glyphs, link 24px), metadata (20px padding over a 1px rule, 20px
+  lines), tags (16px above), related article (16px above).
+- `#cboxClose` 60×60 in the corner (24px glyph, 18px padding); `#cboxCurrent` 108×60 "1" + grey (#808080) total
+  with a `/` 12px each side; `#cboxPrevious` / `#cboxNext` 61×60, 1px #606060 left rule, cells 60px apart.
+
 ### Live colorbox chrome (measured · PR · 500-wide)
 - `#cboxOverlay`: `position:fixed`, background `#161718` (rgb 22,23,24), full-screen.
 - `#cboxCurrent` (counter): `24px`, color `#fefefe`, box `97×60`, text e.g. `"24"` (total count).
