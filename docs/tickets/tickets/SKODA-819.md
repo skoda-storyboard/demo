@@ -4,10 +4,17 @@
 - **Phase:** A/B · **Milestone:** M1 (demo story fidelity)
 - **GitHub issue:** [#122](https://github.com/skoda-storyboard/demo/issues/122)
 - **Estimate:** 3 SP · AI-assisted 1d / manual 2–3d *(planning estimate, not a quote)*
-- **Status (2026-09-24):** 🔵 TODO · **Decision (2026-09-24, stakeholder):** render like the source
-  (single-image slider), not as the lead-image + thumbnail gallery.
+- **Status (2026-09-28):** 🟡 In review, [PR #156](https://github.com/skoda-storyboard/demo/pull/156) ·
+  **Decision (2026-09-24, stakeholder):** render like the source (single-image slider), not as the lead-image +
+  thumbnail gallery.
+- **Review round 1 (2026-09-28):** captions come only from `.search-results-item-description` (never alt /
+  `data-caption`) and render under the 16:9 frame (10pt on a 24px line, 10px padding, 20px paragraph gap: the
+  Octavia dots land 86px under the image, Epiq stays at 22px). The slider now uses the source geometry (839×472 @1440,
+  519 @768, 500 @500, 10px bleed past the text), with the story text inset done together (SKODA-821 AC).
 - **Supersedes:** [SKODA-219](SKODA-219.md), which is the same widget. It had been specced as a `carousel` block
   variant in the M1 gap review. Its Must SP moves to this ticket (review §15).
+- **UI spec:** [`story-image-carousel.md`](../../ui-specs/story-image-carousel.md), measured on Epiq + Octavia
+  at 1440/768/500.
 
 ## Origin
 Side-by-side QA of `/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/` (2026-09-24).
@@ -41,13 +48,23 @@ at a time with arrows and dots.
 - **Importer:** `story-flatten.js` emits `Gallery (slider)` for link-free `skoda-carousel-widget`.
   Link-bearing carousels keep routing to Cards. Leave `sow-slider` and `.sb-gallery` (SKODA-216)
   as they are unless measured otherwise.
+- **Measured refinements (Octavia, 2026-09-24):** the frame stays **16:9** even when the natural image is 3:2. A
+  visible `.search-results-item-description` sits below the image on Octavia (64px on its first slide) and is
+  absent on Epiq; `img[data-caption]` is empty on both. Emit the description only when non-empty and **never
+  generate a caption from alt text**. Keep the 10px lateral bleed beyond the text column (SKODA-821 owns the
+  text inset, not this bleed).
+- **Autoplay a11y (WCAG 2.2.2):** include a visible pause/resume control; without one, disable autoplay.
+- Defensive authoring: 1 to n slides; a single slide renders a static figure with no controls.
 - Evaluate reusing the SKODA-212 `carousel` rail mechanics (arrow state, dots, drag) instead of
   forking them. The rail is card-teaser-based, so reuse is at the logic level, not the markup.
 
 ## Acceptance Criteria
 - [ ] 1440/768/500: slider box matches the table above (±2px), 16:9, one image per view.
 - [ ] Arrows + dots positioned and coloured as measured; the selected dot tracks the current slide.
-- [ ] Autoplay advances every 3s and wraps; it pauses on hover/focus and is off under reduced motion.
+- [ ] Autoplay advances every 3s and wraps; it pauses on hover/focus, is off under reduced motion, and has a
+      visible pause/resume control.
+- [ ] Descriptions add height below the frame only when present (Octavia), with no empty caption gap (Epiq); no
+      alt-as-caption.
 - [ ] Arrows and dots are labelled `<button>`s; the track is keyboard-scrollable.
 - [ ] Existing Gallery variants (default / story) unchanged; lint + tests green.
 - [ ] **Amendment (2026-09-25, sweep reconciliation):**

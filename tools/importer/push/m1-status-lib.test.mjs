@@ -56,14 +56,15 @@ test('the committed M1 set parses to 43 entries, 42 pages + 1 alias', () => {
   );
 });
 
-test('the committed corpus parses into its families, 18 image + 18 video items', () => {
+test('the committed corpus parses into its families; media items are feed rows, not pages', () => {
   const corpus = parseSectionedList(readFileSync(path.join(PLANNING, 'skoda-rail-feed-corpus.txt'), 'utf8'));
   const fams = new Set(corpus.map((r) => r.family));
-  ['models', 'series', 'press-releases', 'press-kits', 'stories', 'images', 'videos'].forEach((f) => assert.ok(fams.has(f), f));
+  ['models', 'series', 'press-releases', 'press-kits', 'stories'].forEach((f) => assert.ok(fams.has(f), f));
   assert.ok(!fams.has('other'));
   assert.ok(!fams.has('home'));
-  assert.equal(corpus.filter((r) => r.family === 'images').length, 18);
-  assert.equal(corpus.filter((r) => r.family === 'videos').length, 18);
+  // SKODA-608 (option B): images/videos live in /en/media-feed.json, so the page corpus has none.
+  assert.ok(!fams.has('images') && !fams.has('videos'));
+  assert.ok(!corpus.some((r) => r.unmapped), 'no unmapped ?attachment_id= rows');
   assert.ok(!corpus.some((r) => r.path === '/index'));
 });
 

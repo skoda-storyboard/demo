@@ -11,7 +11,15 @@ import {
   loadCSS,
   buildBlock,
   toClassName,
+  getMetadata,
 } from './aem.js';
+
+/**
+ * Page templates with their own layout code: `templates/<name>/<name>.{js,css}`, selected by
+ * the `template` metadata (`press_release` → `press-release`). Only listed templates load, so
+ * an unknown value never requests a missing file.
+ */
+const TEMPLATES = ['press-release', 'skoda-series'];
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
   const innerTT = window.trustedTypes.createPolicy('tt-inner', {
@@ -192,19 +200,11 @@ function decorateButtons(main) {
 }
 
 /**
- * Story-scoped: apply Section Metadata `Style` classes to sections.
- *
- * The vendored scripts/aem.js `decorateSections` does NOT process Section Metadata
- * into a section class (the standard boilerplate step is absent, verified 2026-09-24).
- * The story template (SKODA-801) emits a `Style: sidebar` section for the article
- * aside, which the grid-on-main story layout (styles.css) places beside the body — so
- * that class must be applied. Rather than change shared behaviour, this runs ONLY on
- * `body.story` and consumes the section-metadata div (removing it before decorateBlocks
- * would otherwise treat it as an unknown block and 404 on its missing block JS/CSS).
+ * Applies Section Metadata `Style` values as section classes and removes the
+ * section-metadata div. Shared by the story sections and the page templates below.
  * @param {Element} main The main element
  */
-function decorateStorySections(main) {
-  if (!document.body.classList.contains('story')) return;
+function applySectionStyles(main) {
   // decorateSections wraps each block in its own div, so the section-metadata block
   // sits at `.section > div > .section-metadata` (matched here regardless of depth).
   main.querySelectorAll('.section .section-metadata').forEach((meta) => {
@@ -226,6 +226,82 @@ function decorateStorySections(main) {
   });
 }
 
+// A date paragraph like "15. 9. 2026" (same pattern as scripts/card-teaser.js
+// DATE_RE; kept local so the eager path doesn't load the card module).
+const STORY_DATE_RE = /^\s*\d{1,4}[.\-/]\s?\d{1,2}[.\-/]\s?\d{2,4}\.?\s*$/;
+
+/**
+ * Story-scoped: lay out the intro under the hero like the source header — the
+ * perex (lead) on its own line, then the published date and the category tag on
+ * one row. The story-hero importer emits both paragraphs optionally, so the date
+ * is found by content, not position, and moved in front of the Tags block inside
+ * its wrapper (a <p>, so decorateBlocks never mistakes it for a block).
+ * @param {Element} main The main element
+ */
+function decorateStoryIntro(main) {
+  if (!document.body.classList.contains('story')) return;
+  const section = main.querySelector('.section .hero-image')?.closest('.section');
+  const content = section?.querySelector(':scope > .default-content-wrapper');
+  if (!content) return;
+  section.classList.add('story-intro');
+  const date = [...content.querySelectorAll(':scope > p')].find((p) => STORY_DATE_RE.test(p.textContent));
+  if (!date) return;
+  date.classList.add('story-date');
+  // runs before decorateBlocks names the wrappers, so find it via the block itself
+  const tagsWrapper = section.querySelector(':scope > div > .tags')?.parentElement;
+  if (tagsWrapper) tagsWrapper.prepend(date);
+}
+
+/**
+ * Story-scoped: apply Section Metadata `Style` classes to sections.
+ *
+ * The vendored scripts/aem.js `decorateSections` does NOT process Section Metadata
+ * into a section class (the standard boilerplate step is absent, verified 2026-09-24).
+ * The story template (SKODA-801) emits a `Style: sidebar` section for the article
+ * aside, which the grid-on-main story layout (styles.css) places beside the body — so
+ * that class must be applied. Rather than change shared behaviour, this runs ONLY on
+ * `body.story` and consumes the section-metadata div (removing it before decorateBlocks
+ * would otherwise treat it as an unknown block and 404 on its missing block JS/CSS).
+ * @param {Element} main The main element
+ */
+function decorateStorySections(main) {
+  if (!document.body.classList.contains('story')) return;
+  applySectionStyles(main);
+}
+
+/** The page's template, if it has its own layout code (see TEMPLATES). */
+function pageTemplate() {
+  const name = toClassName(getMetadata('template'));
+  return TEMPLATES.includes(name) ? name : null;
+}
+
+/**
+ * Template-scoped Section Metadata `Style` (e.g. press-release `body-column`, `sidebar`,
+ * `media-box`), applied before decorateBlocks for the same reason as the story sections.
+ * @param {Element} main The main element
+ */
+function decorateTemplateSections(main) {
+  if (pageTemplate()) applySectionStyles(main);
+}
+
+/**
+ * Loads a page template's CSS and JS and runs its `decorate(main)`. Awaited before the
+ * first section shows, so the template layout never shifts the page.
+ * @param {Element} main The main element
+ */
+async function loadTemplate(main) {
+  const name = pageTemplate();
+  if (!name) return;
+  const base = `${window.hlx.codeBasePath}/templates/${name}/${name}`;
+  try {
+    const [mod] = await Promise.all([import(`${base}.js`), loadCSS(`${base}.css`)]);
+    if (mod.default) await mod.default(main);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`failed to load template ${name}`, error);
+  }
+}
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -236,6 +312,8 @@ export function decorateMain(main) {
   buildAutoBlocks(main);
   decorateSections(main);
   decorateStorySections(main);
+  decorateStoryIntro(main);
+  decorateTemplateSections(main);
   decorateBlocks(main);
   decorateButtons(main);
 }
@@ -250,6 +328,7 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
+    await loadTemplate(main);
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
   }

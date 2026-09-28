@@ -45,7 +45,11 @@ footer present; an earlier note here saying it drops the chrome was wrong):
   (class names vary: `.content`/`.sidebar` on the story, `.column-primary`/`.column-secondary` on PR +
   press-kit). Build one shared shell; vary content + side.
 - **Shared `template-tiles` shell:** the **series directory** and the **press-kit hub** both use
-  `page-template-template-tiles` = overlay hero (`61.8vh`, title `48px/300`) + a grid of tiles.
+  `page-template-template-tiles` = hero + authored tiles. For **Series**, the hero
+  has a 61.8vh/white 48px title from 768px; below 768px it is a 16:9 image
+  followed by a dark 48px caption. Series **hubs** use `single-skoda_series`
+  with the same responsive hero but a curated 2/3-cell
+  mosaic, not an index-driven, sorted two-column listing; see `series.md`.
 
 ## Template census (public CPTs: `post`, `page`, `press_release`, `skodapedia`, `skoda_model`, `skoda_series`)
 
@@ -61,8 +65,8 @@ footer present; an earlier note here saying it drops the chrome was wrong):
 | `template-media-room-page` + siteorigin | Company/utility pages (contacts, board, annual-reports, ...) | MR | `hero`, base page shell + the 5 company sub-type blocks | `company-pages.md` (+ `template-page-base.md` shell) | SKODA-810 |
 | `page-template-default` + siteorigin | Generic Page (copyright, legal, misc) | STO | `hero`, rich text (SiteOrigin) | `template-page-base.md` | **SKODA-813** |
 | `page-template-template-custom-full-width` + siteorigin | Custom microsite (event-gallery / campaign) | STO | `siteorigin-body`, `gallery-lightbox` (big colorbox grid), `card-teaser` | `custom-microsite.md` | **SKODA-210** |
-| `template-tiles` | Series directory | STO | `hero`, `card-teaser` (series cards) grid | `series.md` | SKODA-207 |
-| `single-skoda_series` | Series hub | STO | `hero` (overlay), `card-teaser` (story) grid | `series.md` | SKODA-207 |
+| `template-tiles` | Series directory (M2) | STO | `hero-image` (overlay/mobile below), authored `cards` series cards with excerpts (25) | `series.md` | SKODA-207 |
+| `single-skoda_series` | Series hub (5 in M1) | STO | `hero-image` (SERIES label + perex), `cards` (overlay, tiles) curated mosaic including a Press Kits tile | `series.md` | SKODA-207, 221 |
 | Škodapedia directory + term | Škodapedia (`post-type-archive`) | MR | `skodapedia` (A-Z nav `.sp__list-nav` 26 letters + term modal `.sp__term-detail`) | `skodapedia.md` | SKODA-206, 802 |
 | `press_kit-template-default` + sub-pages | Press kit (hub + chapter + gallery) | MR | `hero`, chapter-nav, `press-kit-media`, `press-kit-variant`, `faq-accordion`, `downloads` | `press-kit-template.md` | SKODA-805–808 |
 | `error404` | Branded 404 | global | minimal shell + "dead end" copy + homepage link | `template-404.md` | **SKODA-706** |
@@ -106,7 +110,8 @@ plugin).
   passing the metadata gate. SiteOrigin-heavy types (story, company, generic page) are
   imported via **flatten-to-default** (linear content only); full widget reconstruction
   stays with SKODA-801/814/604. **Custom microsite** (flatten → near-empty) is deferred
-  to SKODA-210, **press-kit** to SKODA-805–808, **newsletter** is service-only (SKODA-904).
+  to SKODA-210, **press-kit** to SKODA-805–808, **newsletter** has a built footer
+  stub, a planned M1 sidebar variant (SKODA-823), and an M2 service (SKODA-904).
   See [`../architecture/IMPORT-PIPELINE.md`](../architecture/IMPORT-PIPELINE.md).
 - Remaining: gap tickets (607/208/209/813/706) + wiring pointers into existing tickets + README/OVERVIEW.
 - **Added post block-recount (2026-09-15):** `custom_microsite` (`template-custom-full-width`, 201 STO

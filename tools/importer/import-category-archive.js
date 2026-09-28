@@ -4,25 +4,26 @@
 /**
  * Import orchestrator: Škoda category/tag ARCHIVE listing (body.archive).
  *
- * Hero banner (tag/model adds a CTA overlay) + an index-driven, facet-less Listing
- * over the archive grid (scope derived from the page canonical URL). Distinct from
+ * Term hero (banner + h1 from the source labels, default content) + an index-driven
+ * Stories grid (tag / path scope derived from the page canonical URL). Distinct from
  * pr-listing (which has the facet engine). Serves both /en/category/<x>/ and
  * /en/tag/model/<x>/ — same DOM shape. One template = one import script.
  * Content-driven detection only.
  */
 
 // PARSER IMPORTS
-import heroBannerParser from './parsers/hero-banner.js';
+import archiveHeroParser from './parsers/archive-hero.js';
 import archiveListParser from './parsers/archive-list.js';
 
 // TRANSFORMER IMPORTS
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
+import linksTransformer from './transformers/skoda-links.js';
 
 // PARSER REGISTRY
 const parsers = {
-  'hero-banner': heroBannerParser,
+  'archive-hero': archiveHeroParser,
   'archive-list': archiveListParser,
 };
 
@@ -30,14 +31,14 @@ const parsers = {
 const PAGE_TEMPLATE = {
   name: 'category-archive',
   description:
-    'Škoda category/tag archive listing. Hero banner -> index-driven facet-less Listing over the archive grid (scope from canonical URL). Metadata template=page. Content-driven detection only.',
+    'Škoda category/tag archive listing. Term hero (banner + h1, default content) -> index-driven Stories grid (tag or path scope from the canonical URL). Metadata template=page. Content-driven detection only.',
   urls: [
     'https://www.skoda-storyboard.com/en/category/emobility/',
     'https://www.skoda-storyboard.com/en/tag/model/elroq/',
   ],
   metadata: { template: 'page' },
   blocks: [
-    { name: 'hero-banner', instances: ['div.hero'] },
+    { name: 'archive-hero', instances: ['div.hero'] },
     {
       name: 'archive-list',
       instances: ['div.search-results.archive-results, .container .search-results-items'],
@@ -49,7 +50,7 @@ const PAGE_TEMPLATE = {
       name: 'Hero',
       selector: ['div.hero'],
       style: null,
-      blocks: ['hero-banner'],
+      blocks: ['archive-hero'],
       defaultContent: [],
     },
     {
@@ -71,6 +72,7 @@ const transformers = [
   cleanupTransformer,
   ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
   metadataTransformer,
+  linksTransformer,
 ];
 
 function executeTransformers(hookName, element, payload) {

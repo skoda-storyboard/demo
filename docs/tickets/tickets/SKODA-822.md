@@ -4,8 +4,7 @@
 - **Phase:** A · **Milestone:** M1
 - **GitHub issue:** [#125](https://github.com/skoda-storyboard/demo/issues/125) (closed, completed via PR #113)
 - **Estimate:** 1 SP *(planning estimate, not a quote)*
-- **Status (2026-09-24):** 🔵 TODO. Needs the stakeholder go-ahead to open the PR and merge.
-  **Update (late 2026-09-24):** ✅ merged as PR #113 (21:35). Close after the post-merge render check.
+- **Status (2026-09-24):** ✅ **Done.** Merged as PR #113 (21:35); #125 closed after the post-merge render check.
 
 ## Problem
 The two-column story layout (body 816px + aside 408px, grid-on-main, `decorateStorySections`) and

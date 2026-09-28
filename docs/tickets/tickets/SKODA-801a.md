@@ -49,7 +49,8 @@ reconstruct the media that exists in all 21 stories, and keep the rest of SKODA-
   SKODA-818 in #113 (bare URL → 204 autoblock).
 - **Tags.** Keep the visible tags block. The tags must be derived before the sidebar is stripped, as today.
 - **Sidebar.** ~~For M1, drop the sidebar, share cluster and newsletter.~~ Superseded: 801 (#113) keeps the
-  two-column aside, and SKODA-817 handles its parity. Share is 215 and the newsletter stub is 823 (Could).
+  two-column aside, and SKODA-817 handles its parity. Share is 215 and the newsletter stub is 823 (Could). The
+  side banner (SKODA-903) and the production newsletter service (SKODA-904) remain deferred.
 - **Media prep.** Masters-only images and the pre-conditioning gate follow SKODA-501 and SKODA-506.
 - **Cleanup changes.** Update `skoda-story-cleanup.js` so the Media Box selectors are no longer in the drop list.
   Log only what stays deferred.
@@ -71,6 +72,25 @@ reconstruct the media that exists in all 21 stories, and keep the rest of SKODA-
 ## Dependencies
 - Upstream: SKODA-601 (importer), SKODA-801 (#113), SKODA-819 (was 219), SKODA-818, SKODA-502 (#111), SKODA-204 (#109), SKODA-501/506.
 - Downstream: SKODA-603 (43-URL import), SKODA-604 (full-fidelity hero stories), SKODA-704 visual sign-off.
+
+## Found in SKODA-603 W2a (2026-09-26)
+Two story-importer leaks hold 2 pages at preview. See SKODA-603 "W2a results".
+- **WordPress MediaElement video** (`enyaq-and-elroq-now-double-as-gaming-consoles…`): the player chrome is
+  flattened into content: 2 `mejs-controls.svg` images, `00:00`/`00:53` timecode paragraphs, and a
+  `javascript:void(0)` "Use Up/Down Arrow keys…" link. Strip `.mejs-*` / `.wp-video` chrome and keep the `.mp4`
+  source as one video link (or an Embed row).
+  **✅ Fixed 2026-09-26 (PR #164).** `.wp-video` now imports as an Embed table (`url` + `poster`), and the embed
+  block plays `.mp4` / `.webm` / `.mov` / `.m4v` natively (`<video controls preload=metadata>`). The page is
+  re-imported and **published 2026-09-26** after #163/#164 merged. Live check at 1440/767: native video (53s,
+  1920×1080) with the poster, 0 player-chrome leaks, hero OK, footer OK, no overflow. Indexed. Embed regression
+  check: 54/54 real-page renders + 13/13 fixture cases identical to the previous code (see #164).
+- **Quiz widget** (`quiz-can-you-recognise-skoda-models-by-their-details`): the quiz's config JSON is rendered as a
+  paragraph, answers become `[ ]` list items, and quiz controls ("Go to next question", "Finish quiz",
+  "correct answers: 0") become text. Needs a decision: static Q&A content (drop the JSON and controls), or a
+  quiz block (new contract).
+  **Decision 2026-09-26 (stakeholder): keep the page held.** The quiz is graded server-side
+  (`/wp-json/skt/result`); the answer inputs have obfuscated classes and there's no answer key in the page. An
+  interactive rebuild needs the answer key from the client, so the page stays preview-only until that's scoped.
 
 ## Import contract (SKODA-603)
 Contract(s) `gallery-slider`, `quote`, `columns-split`, `spec-table-versions` (proposed) in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). The story importer emits these pinned shapes. The raw `version` spec table (Epiq) must become `Spec Table (versions)` or text; the check fails `version`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.

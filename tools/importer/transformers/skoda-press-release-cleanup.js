@@ -13,13 +13,13 @@
  * — none are guessed. Notable, page-specific decisions:
  *  - `header.header` (top nav + inline `sk`/`en` language links) + `footer.footer`
  *    (which also carries the `.social` strip) are the site chrome and are removed.
- *  - `.newsletter-subscribe-widget` and the "Additional info" `<section>` (a `.menu`
- *    of contact/legal links) are secondary-column WIDGETS, not article content, and
- *    are dropped for the pilot (newsletter is its own block ticket; the menu is chrome).
- *  - `.side-banner` / `.sa-bnr` are ad/banner slots (SiteOrigin banner injection) —
- *    removed. `.entry-content > .sa-bnr` (an inline banner slot) is included here.
- *  - `.embed-controller-wrapper` is the Buzzsprout AI-audio embed — Embeds-block
- *    (SKODA-204) territory, NOT 601's media path — so it is removed for this slice.
+ *  - `.newsletter-subscribe-widget` (hidden on every M1 release) and `.side-banner`
+ *    are ruled out (SKODA-904 / 903) and dropped. `.sa-bnr` banner slots (also inline
+ *    in the body) are removed.
+ *  - SKODA-607: the "Additional info" `<section>` (Media contacts + Download Media Box)
+ *    and the Buzzsprout `.embed-controller-wrapper` are KEPT — skoda-press-release-layout
+ *    turns them into sidebar content and a bare embed URL.
+ *  - `.sticky-buttons` (share / cart floating dock → SKODA-215) is chrome.
  *  - Cookie/consent: this sample has no OneTrust SDK ids, but `[*cookie*]`/`[*consent*]`
  *    defensive patterns are kept as harmless no-ops for sibling press pages that do.
  *  - The Media Box (`.search-results.media-box`), gallery (`.sa-media-kit-preview`)
@@ -51,7 +51,6 @@ export default function transform(hookName, element, payload) {
       '.newsletter-subscribe-widget',   // verified: mailguide subscribe form widget
       '.side-banner',                   // verified: SiteOrigin banner slot
       '.sa-bnr',                        // verified: banner injection (also inline in body)
-      '.embed-controller-wrapper',      // verified: Buzzsprout AI-audio embed (→ SKODA-204)
 
       // Cookie / consent (defensive — no OneTrust SDK on this sample)
       '#onetrust-consent-sdk',
@@ -67,6 +66,8 @@ export default function transform(hookName, element, payload) {
 
       // Floating affordances — verified: .scroll-top. Others are defensive no-ops.
       '.scroll-top',
+      '.sticky-buttons',                // verified: share + cart floating dock (→ SKODA-215)
+      '.skoda-anniversary-background',  // verified: decorative page background
       '.social-share',
       '.media-cart-flyout',
       '.share-bar',
@@ -75,13 +76,6 @@ export default function transform(hookName, element, payload) {
       'link[rel="stylesheet"]',
       'link',
     ]);
-
-    // The "Additional info" section is a bare <section> holding a <ul.menu> of
-    // contact/legal links — remove it by targeting that menu's owning section.
-    element.querySelectorAll('section > ul.menu, section > .menu').forEach((menu) => {
-      const section = menu.closest('section');
-      if (section) section.remove();
-    });
   }
 
   if (hookName === TransformHook.afterTransform) {

@@ -39,7 +39,8 @@
  *   skoda-offset (spacer)      8.2%  → dropped
  *   skoda-carousel-widget      4.0%  → routed BY CONTENT (not widget name): items with
  *                                       links → Cards (related-story teasers); link-free
- *                                       → Gallery (in-body image set). Corpus uses both.
+ *                                       → Gallery (slider) (in-body image set, one image
+ *                                       per view like the source; SKODA-819). Corpus uses both.
  *   sow-slider                 1.5%  → Gallery block (image slider)
  *   skoda-quote                1.1%  → <blockquote>
  *   skoda-captioned-image      0.7%  → <figure> + <figcaption> (lifts the native figure)
@@ -142,15 +143,39 @@ function itemCaption(img, item) {
     || img.getAttribute('alt') || '';
 }
 
+// The slider's visible caption is the carousel item's optional description
+// (`.search-results-item-description`, shown under the image on the source, e.g.
+// the Octavia story), never data-caption or alt: those are not shown there, and
+// an alt fallback would put a caption under every Epiq image. Absent → empty cell.
+// Only the paragraphs' text is kept (the source's inline font-size/centring styles
+// are presentation, owned by the block).
+function itemDescription(item, document) {
+  const desc = item.querySelector?.('.search-results-item-description');
+  if (!desc || !(desc.textContent || '').trim()) return '';
+  const paras = [...desc.querySelectorAll('p')]
+    .map((p) => (p.textContent || '').replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+  const texts = paras.length ? paras : [desc.textContent.replace(/\s+/g, ' ').trim()];
+  return texts.map((t) => {
+    const p = document.createElement('p');
+    p.textContent = t;
+    return p;
+  });
+}
+
 // Build a Gallery block (SKODA-203 / story-detail.md STO-D04): one row per image,
 // [img, caption]. Used for link-free image sets (sow-slider and image carousels).
-function galleryCells(panel, document) {
+// `blockName` picks the variant: link-free carousels render as the one-image
+// slider (`Gallery (slider)`, SKODA-819) captioned by the item description;
+// sow-slider keeps the default Gallery and its data-caption → title → alt caption.
+function galleryCells(panel, document, blockName = 'Gallery') {
   const imgs = [...panel.querySelectorAll('img')];
   if (!imgs.length) return null;
-  const cells = [['Gallery']];
+  const slider = blockName === CAROUSEL_GALLERY;
+  const cells = [[blockName]];
   imgs.forEach((img) => {
     const item = img.closest('.search-results-item, .item, figure') || img;
-    cells.push([img, itemCaption(img, item)]);
+    cells.push([img, slider ? itemDescription(item, document) : itemCaption(img, item)]);
   });
   return cells.length > 1 ? cells : null;
 }
@@ -160,14 +185,17 @@ function galleryCells(panel, document) {
 // link-bearing related-story TEASER cards). So route by CONTENT, not by widget name
 // (repo rule: content-driven detection):
 //   items carry links → related-story teasers → Cards block ([img, linked-title])
-//   items are link-free → the article's own photo set → Gallery block ([img, caption])
+//   items are link-free → the article's own photo set → Gallery (slider) block
+//   ([img, caption]), rendered like the source: one image per view (SKODA-819)
+const CAROUSEL_GALLERY = 'Gallery (slider)';
 function carouselCells(panel, document) {
   const items = [...panel.querySelectorAll('.search-results-item')];
-  if (!items.length) return galleryCells(panel, document); // odd shape → treat as images
+  // odd shape → treat as images
+  if (!items.length) return galleryCells(panel, document, CAROUSEL_GALLERY);
   const linked = items.filter((it) => it.querySelector('a[href]')).length;
   // Teaser only when a clear majority of items link out (a stray caption link in an
   // image set must not flip the whole widget to Cards).
-  if (linked < Math.ceil(items.length / 2)) return galleryCells(panel, document);
+  if (linked < Math.ceil(items.length / 2)) return galleryCells(panel, document, CAROUSEL_GALLERY);
 
   const cells = [['Cards']];
   items.forEach((it) => {
@@ -332,7 +360,7 @@ function emitWidget(panel, document, out, stats) {
   let nodes = null;
   switch (kind) {
     case 'editor': nodes = editorNodes(panel, document); break;
-    // carousel-widget routes by content (Cards if teasers-with-links, else Gallery);
+    // carousel-widget routes by content (Cards if teasers-with-links, else Gallery (slider));
     // sow-slider is always an image slider → Gallery.
     case 'carousel': cells = carouselCells(panel, document); break;
     case 'slider': cells = galleryCells(panel, document); break;

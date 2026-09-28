@@ -253,7 +253,7 @@ body.homepage .card-teaser-button.media-cart-action {
    the shared radius + shadow), 60% black under the dual scrim, one link filling
    it with a 76px white icon and a 16/19.2 light handle, 20px apart, centred
    between 32px top / 8px bottom padding. No dark background is set on the
-   block itself; the band is the section's (SKODA-218). */
+   block itself; the green band is its section's (Section Metadata Style: dark). */
 .card-teaser.social {
   aspect-ratio: 1 / 0.8;
   background-color: var(--social-card-tile);
