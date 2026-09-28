@@ -539,13 +539,14 @@
       "urls": [
         "https://www.skoda-storyboard.com/en/series-2/"
       ],
-      "description": "Škoda Series directory (template-tiles, /en/series-2/). Hero banner + index-driven Listing over all skoda_series posts (series-grid.js detects the directory from data-content-type=Series). SSR cards not ported. Metadata template=page. Spec: docs/ui-specs/series.md; SKODA-207.",
+      "description": "Škoda Series directory (template-tiles, /en/series-2/). Hero Image (overlay) with the H1 (series-hero.js) + the authored series cards as Cards (series-directory) (series-grid.js detects the directory from data-content-type=Series): every source card in order, linked title over the image, full excerpt below. Metadata template=page, theme=skoda-series (shares templates/skoda-series). Spec: docs/ui-specs/series.md; SKODA-207.",
       "metadata": {
-        "template": "page"
+        "template": "page",
+        "theme": "skoda-series"
       },
       "blocks": [
         {
-          "name": "hero-banner",
+          "name": "series-hero",
           "instances": [
             "div.hero"
           ]
@@ -566,7 +567,7 @@
           ],
           "style": null,
           "blocks": [
-            "hero-banner"
+            "series-hero"
           ],
           "defaultContent": []
         },

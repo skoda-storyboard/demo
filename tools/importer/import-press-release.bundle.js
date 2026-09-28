@@ -654,6 +654,7 @@ var CustomImportScript = (() => {
     }
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
+    if (overrides.theme) meta.theme = overrides.theme;
     if (category) meta.category = category;
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");

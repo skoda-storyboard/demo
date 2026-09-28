@@ -11,7 +11,8 @@
       "variants": [
         "media",
         "overlay",
-        "toolbar"
+        "toolbar",
+        "series-directory"
       ]
     },
     "carousel": {

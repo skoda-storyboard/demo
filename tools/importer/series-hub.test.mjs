@@ -1,7 +1,7 @@
 /* global globalThis */
 /*
- * SKODA-207: the Series hub importer (import-series-hub.js) on all 15 hubs, and the frozen
- * M2 directory output of the shared series-grid parser (import-series-directory.js).
+ * SKODA-207: the Series hub importer (import-series-hub.js) on all 15 hubs, and the
+ * series directory (import-series-directory.js) that shares the series-grid parser.
  * Fixtures: test/fixtures/series/<slug>.html (source pages, trimmed of scripts and site
  * chrome; the SiteOrigin layout <style> is kept, it carries the tile widths; test/* is
  * .hlxignore'd). The pipeline runs on jsdom with a minimal WebImporter stub; the output is
@@ -222,10 +222,46 @@ test('hub metadata: template skoda_series, title without the site suffix, descri
   });
 });
 
-test('directory (M2) output stays frozen: Hero + Listing editorial config', { skip }, () => {
-  const { tables, find } = load(directory, 'series-2', `${SRC}/series-2/`);
-  assert.deepEqual(tables.map(blockName), ['Hero', 'Listing', 'Metadata']);
-  assert.deepEqual(rowsOf(find('Listing')).map((r) => [...r.children].map(txt)), [
-    ['index', '/en/query-index.json'], ['template', 'skoda_series'], ['sort', 'editorial'], ['columns', '2'],
-  ]);
+test('directory: Hero Image (overlay) with the H1, Cards (series-directory), Metadata', { skip }, () => {
+  const {
+    element, tables, find, pagePath,
+  } = load(directory, 'series-2', `${SRC}/series-2/`);
+  assert.equal(pagePath, '/en/series-2');
+  assert.deepEqual(tables.map(blockName), ['Hero Image (overlay)', 'Cards (series-directory)', 'Metadata']);
+  assert.equal(element.querySelectorAll('hr').length, 1, 'hero | cards sections');
+  assert.equal(element.querySelectorAll('h1').length, 1);
+  const [media, content] = rowsOf(find('Hero Image (overlay)'));
+  assert.equal(media.querySelector('img').getAttribute('alt'), 'Series');
+  assert.deepEqual([...content.querySelector('td').children].map((n) => `${n.tagName}:${txt(n)}`), ['H1:Series']);
+});
+
+test('directory cards: all 25 source cards in order with title, href, alt and full excerpt', { skip }, () => {
+  const { find, source } = load(directory, 'series-2', `${SRC}/series-2/`);
+  const articles = [...source.querySelectorAll('.panel-layout article.article-teaser[data-content-type="Series"]')];
+  const rows = rowsOf(find('Cards (series-directory)'));
+  assert.equal(articles.length, 25);
+  assert.equal(rows.length, 25);
+  rows.forEach((row, i) => {
+    const src = articles[i];
+    const [media, body] = row.children;
+    assert.equal(row.children.length, 2, `#${i + 1}: 2 cells`);
+    assert.equal(media.querySelector('img').getAttribute('alt') ?? '', src.querySelector('img').getAttribute('alt') ?? '');
+    const [h2, p] = body.children;
+    assert.equal(h2.tagName, 'H2');
+    const a = h2.querySelector('a');
+    assert.equal(txt(a), txt(src.querySelector('h2')), `#${i + 1}: title`);
+    assert.equal(normHref(a.getAttribute('href')), normHref(src.querySelector('a[href]').getAttribute('href')));
+    assert.equal(p.tagName, 'P');
+    assert.equal(txt(p), txt(src.querySelector('.article-teaser-excerpt')), `#${i + 1}: excerpt`);
+  });
+  // the source lists minutes-from-car-production twice; both cards are kept
+  assert.equal(rows.filter((r) => /minutes-from-car-production/.test(r.querySelector('a').getAttribute('href'))).length, 2);
+});
+
+test('directory metadata: template page (not a series in the index), theme skoda-series', { skip }, () => {
+  const { find } = load(directory, 'series-2', `${SRC}/series-2/`);
+  const meta = Object.fromEntries(rowsOf(find('Metadata')).map((r) => [txt(r.children[0]).toLowerCase(), txt(r.children[1])]));
+  assert.equal(meta.template, 'page');
+  assert.equal(meta.theme, 'skoda-series');
+  assert.equal(meta.title, 'Series');
 });
