@@ -62,6 +62,9 @@ each render their PDF. All 32 authored direct-download links return 206 to range
 visibility/`aria-expanded`. Branch-preview QA on PR #186 confirmed the Peaq, Zellmer, Superb and
 35-tile Slavia Media Boxes, responsive geometry and keyboard interaction. Review follow-up adds
 authored `columns`/`collapse` coverage, focus rings and a precise video-poster link label.
+On dark Media Box sections, the global `main .section.dark a` rule overrode the round download
+link's ink color, leaving PDF/MP4 icons white on white. The block now gives its download control
+enough specificity to keep the link icon dark, as the image-menu button already was.
 
 ## Dependencies
 SKODA-502 (downloads block), SKODA-503 (PDF/MP4 routing), SKODA-607 (emits the rows), SKODA-505a (cart hook, later).
