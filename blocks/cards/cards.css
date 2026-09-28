@@ -172,7 +172,7 @@
 
 /* no zoom: the facts are not links */
 .cards.key-facts .card-teaser:hover .card-teaser-image img,
-.cards.key-facts .card-teaser:focus-within .card-teaser-image img {
+.cards.key-facts .card-teaser:has(:focus-visible) .card-teaser-image img {
   scale: none;
 }
 
