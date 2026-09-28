@@ -310,6 +310,19 @@
       "emittedBy": []
     },
     {
+      "id": "cover-box",
+      "block": null,
+      "form": "section-style",
+      "status": "pinned",
+      "ticket": "SKODA-218",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": [
+        "transformers/skoda-dark-bands.js",
+        "parsers/social-cards.js"
+      ]
+    },
+    {
       "id": "media-item",
       "block": null,
       "form": "feed-row",
