@@ -1,10 +1,10 @@
 /*
- * Cards / Teaser block (SKODA-201) — grid only.
+ * Cards / Teaser block (SKODA-201 / SKODA-221) — grid + scoped tiles variant.
  *
  * The card box, media, overlay scrim, typography, toolbar and interaction states
  * live in the shared primitive styles/card-teaser.css (imported below), reused by
- * every card consumer. This file owns ONLY the cards grid + how the variants flow
- * within it; nothing card-visual is duplicated here.
+ * every card consumer. Tiles override card visuals only within `.cards.tiles`
+ * to match the authored series and press-kit mosaics.
  */
 
 @import url("../../styles/card-teaser.css");
@@ -18,6 +18,149 @@
   /* Layer 2 (intrinsic): reflow columns to available width, no breakpoints needed */
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 257px), 1fr));
   gap: var(--spacing-l);
+}
+
+.cards.tiles ul {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--grid-gutter);
+}
+
+.cards.tiles {
+  --tile-title-backdrop: rgb(0 0 0 / 56%);
+}
+
+.cards.tiles li {
+  margin-block-end: 0;
+}
+
+.cards.tiles .card-teaser-image {
+  aspect-ratio: 16 / 9;
+}
+
+.cards.tiles .card-teaser-image picture,
+.cards.tiles .card-teaser-image img {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+}
+
+.cards.tiles .card-teaser-image img {
+  aspect-ratio: auto;
+}
+
+.cards.tiles .card-teaser-body {
+  background-image: var(--scrim-h), var(--scrim-v);
+}
+
+.cards.tiles .card-teaser-title,
+.cards.tiles .card-teaser-title a {
+  color: var(--skoda-white);
+  font-size: var(--heading-font-size-xs);
+  font-weight: var(--weight-medium);
+  line-height: 1.125;
+  text-shadow: none;
+  text-decoration: none;
+}
+
+.cards.tiles .card-teaser-title a {
+  background-color: var(--tile-title-backdrop);
+  box-decoration-break: clone;
+}
+
+.cards.tiles .card-teaser-image img,
+.cards.tiles .card-teaser:hover .card-teaser-image img,
+.cards.tiles .card-teaser:focus-within .card-teaser-image img {
+  scale: none;
+  transition: none;
+}
+
+@media (width >= 768px) {
+  .cards.tiles .tile-sq .card-teaser-image,
+  .cards.tiles .tile-sq-small .card-teaser-image,
+  .cards.tiles .tile-third-sq .card-teaser-image,
+  .cards.tiles .tile-press-square .card-teaser-image,
+  .cards.tiles .tile-press-quarter .card-teaser-image {
+    aspect-ratio: 1;
+  }
+
+  .cards.tiles .tile-wide .card-teaser-image,
+  .cards.tiles .tile-quarter .card-teaser-image,
+  .cards.tiles .tile-third .card-teaser-image,
+  .cards.tiles .tile-two-thirds .card-teaser-image,
+  .cards.tiles .tile-feature .card-teaser-image {
+    aspect-ratio: auto;
+  }
+
+  .cards.tiles .tile-wide .card-teaser-image::before,
+  .cards.tiles .tile-quarter .card-teaser-image::before,
+  .cards.tiles .tile-third .card-teaser-image::before,
+  .cards.tiles .tile-two-thirds .card-teaser-image::before,
+  .cards.tiles .tile-feature .card-teaser-image::before {
+    content: "";
+    display: block;
+    padding-block-end: calc((100% - var(--grid-gutter)) / 2);
+  }
+
+  .cards.tiles .tile-banner .card-teaser-image,
+  .cards.tiles .tile-banner-tall .card-teaser-image {
+    aspect-ratio: auto;
+  }
+
+  .cards.tiles .tile-banner .card-teaser-image::before {
+    content: "";
+    display: block;
+    padding-block-end: calc((100% - 3 * var(--grid-gutter)) / 4);
+  }
+
+  .cards.tiles .tile-banner-tall .card-teaser-image::before {
+    content: "";
+    display: block;
+    padding-block-end: calc((100% - 2 * var(--grid-gutter)) / 3);
+  }
+}
+
+@media (width >= 781px) {
+  .cards.tiles ul {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .cards.tiles ul.tiles-press {
+    grid-template-columns: repeat(20, minmax(0, 1fr));
+  }
+
+  .cards.tiles .tile-sq,
+  .cards.tiles .tile-wide {
+    grid-column-end: span 6;
+  }
+
+  .cards.tiles .tile-sq-small,
+  .cards.tiles .tile-quarter {
+    grid-column-end: span 3;
+  }
+
+  .cards.tiles .tile-third,
+  .cards.tiles .tile-third-sq,
+  .cards.tiles .tile-press-square {
+    grid-column-end: span 4;
+  }
+
+  .cards.tiles .tile-two-thirds,
+  .cards.tiles .tile-feature {
+    grid-column-end: span 8;
+  }
+
+  .cards.tiles .tile-press-quarter {
+    grid-column-end: span 5;
+  }
+
+  .cards.tiles .tile-banner,
+  .cards.tiles .tile-banner-tall {
+    grid-column-end: span 12;
+  }
+
+  .cards.tiles .tile-row-start {
+    grid-column-start: 1;
+  }
 }
 
 /* ---- social variant (SKODA-217): homepage follow-profile tiles ----------
@@ -154,4 +297,3 @@ body.story .section.sidebar .cards.overlay .card-teaser-title {
   font-weight: var(--weight-medium);
   line-height: 1.25;
 }
-

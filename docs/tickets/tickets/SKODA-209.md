@@ -4,7 +4,8 @@
 - **Phase:** B  ·  **Pilot:** No · **Milestone:** M2 (go-live)
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–4d *(planning estimate, not a quote)*
 - **Status (2026-09-26):** 🟡 **M1 slice done** (pulled forward from M2 by stakeholder request): 41 archive pages live,
-  and every tag / category link on the site points at them. The styled term hero (240px banner) is still open here.
+  and every tag / category link on the site points at them. The styled term hero (240px banner) **moved to
+  [SKODA-828](SKODA-828.md) ([#196](https://github.com/skoda-storyboard/demo/issues/196)) F3** on 2026-09-28, including the `archive-hero` → `Hero Image (archive)` re-import.
 
 ## M1 slice (2026-09-26): archive pages so the site doesn't link to the source
 **Why:** story sidebars, hero category pills and the nav/footer linked the live source for every tag/category.
@@ -56,7 +57,7 @@
 - Click-through: the story sidebar tag, the nav model tag and the nav sub-category all land on the archive.
 
 **Open:**
-- The styled 240px term hero and the label chips (this ticket).
+- ~~The styled 240px term hero and the label chips (this ticket).~~ Moved to SKODA-828 F3 (2026-09-28).
 - Nav/footer Series + Podcast targets: a series hub (SKODA-207) or removal.
 - Kushaq tag: only the held quiz story links it (no archive page).
 - New archives get added to `skoda-archive-url-set.txt` as their stories arrive.
@@ -78,7 +79,8 @@ Assemble the Storyboard category/tag archive: a term hero + a responsive card gr
 
 ## Description
 Confirmed live. This ticket delivers:
-- **Term hero:** short banner titled by the taxonomy term (category term; tag = parent + term).
+- **Term hero:** short banner titled by the taxonomy term (category term; tag = parent + term). *(UI and the
+  `Hero Image (archive)` re-import: SKODA-828.)*
 - **Card grid:** `.search-results-items` reusing `card-teaser`; responsive 3/2/1 columns; newest-first (confirm).
 - **Pagination:** accessible "Load more" over the query-index (default; confirm vs source mechanism).
 - **Parser/retrieval:** query-index filtered by the term; Metadata carries template=category|tag + term.
@@ -91,15 +93,16 @@ Confirmed live. This ticket delivers:
 ## Acceptance Criteria
 Measurable gates live in [`template-category-archive.md` §10](../../ui-specs/template-category-archive.md); summary:
 - [ ] STO shell; single `h1` = term name (category term; tag = parent + term).
-- [ ] Hero banner ~`240px` desktop / `184px` mobile; term title from `hero.md` scale.
+- *(Hero banner criterion moved to SKODA-828 F3, 2026-09-28. The source measured 160px at 375, not 184px.)*
 - [ ] Card grid flex-wrap **3-up 1280 / 2-up 768 / 1-up 500**; cards `16:9`; **no facet panel**.
 - [ ] Pagination via accessible "Load more" (or confirmed source mechanism); new results announced, focus managed.
 - [ ] Content cap `1248`, gutter `~16px`.
-- [ ] Visual diff vs source at 1280/768/500 ≤ 2% per-pixel (hero + grid).
+- [ ] Visual diff vs source at 1280/768/500 ≤ 2% per-pixel (grid; the hero diff is SKODA-828).
 
 ## Dependencies
 - Upstream: SKODA-201 (cards), SKODA-202 (hero), SKODA-402 (query-index retrieval), SKODA-601 (import infra)
 - Downstream: SKODA-1001 (per-locale trees)
+- Related: SKODA-828 (term banner UI and the archive-hero re-import, moved out 2026-09-28)
 
 ## Risks / Flags
 - **Pagination mechanism (🟡):** no static control; verify Load more vs infinite scroll live before locking.

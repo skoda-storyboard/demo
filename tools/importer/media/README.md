@@ -8,7 +8,21 @@ media layer and re-point imported content at them. Not Elroq-specific.
 PDFs and self-hosted MP4s are **not images**: they are recorded as `document`
 and `video` rows in the same manifest, uploaded as originals to AEM Assets,
 and rewritten only in `<a href>` attributes. Embedded Vimeo/YouTube/audio
-URLs are not binaries. A private author DAM path is never used as an anonymous
+URLs are not binaries.
+
+**Tracking convention: record at import, ingest on a developer machine.**
+Every PDF/MP4 link on a migrated page must have a row in the committed
+`media-manifest.json`, like its images. The import-time build (no
+`--dam-base`, as the post-import hook runs it) records each one as a
+`partial` row with `steps.dam: "n/a"` and `steps.publish: "pending"`.
+It fetches and uploads nothing. **Commit the manifest with the import.**
+`content/` is not in a code checkout, so the manifest is the handoff. The DAM
+upload, activation and public verification below run later **on a developer
+machine** (DAM token in `AEM_DAM_TOKEN` or a gitignored token file), not in the
+agent environment, using a reviewed `--ids-file` and public-URL map. For pages
+migrated before a link was tracked, run the same delivery-only build over them.
+An untracked link shows up in `npm run media:validate-binaries` and in the
+audit's `untrackedDocuments` / `unverifiedBinaries`. A private author DAM path is never used as an anonymous
 page link. The public AEM Assets delivery contract for **one PDF** is proven; every new
 PDF/MP4 still requires its own published-original proof. Scope real ingest to
 reviewed page/ID batches and a candidate public URL for each original. The

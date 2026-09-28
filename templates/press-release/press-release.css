@@ -186,6 +186,13 @@ body.press-release .section.related .button-container a.button {
   line-height: 1;
 }
 
+/* A sidebar heading closing its default content is the label of the block after it
+   ("Images" → Gallery preview, "Tags" → Tags): the source puts no gap between them,
+   the 15px group gap follows the block (SKODA-223). */
+body.press-release .section.sidebar aside > .default-content-wrapper:has(> h3:last-child) {
+  margin-bottom: 0;
+}
+
 /* Layer 2 / Layer 3 — at ≥768 the article becomes a real two-column grid (the source's
    single structural transition). `main` is the grid, capped by --content-max-width;
    the header and both bands span it, and the bands bleed to the viewport edges. */

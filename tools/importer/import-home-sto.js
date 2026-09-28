@@ -8,8 +8,9 @@
  * (home-rail self-classifies each .search-results rail from its heading + "All"
  * link / type-<cpt> class). The "Social media" band (.socials-static) is not
  * index-driven: social-cards turns it into a heading + Cards (social) section of
- * the three follow-profile links (SKODA-217). Preserve cover-box bands and
- * their Style metadata. Metadata template=page (nav/direct only).
+ * the three follow-profile links (SKODA-217). The home sections transformer
+ * gives each cover-box band its own section and Style metadata, including the
+ * dark Series band (SKODA-218). Metadata template=page (nav/direct only).
  */
 
 import promoBoxParser from './parsers/promo-box.js';

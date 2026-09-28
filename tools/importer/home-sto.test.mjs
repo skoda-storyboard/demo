@@ -71,6 +71,10 @@ test('Storyboard home imports index promo settings, a complementary feed, and se
         <h3 class="search-results-heading">Latest News</h3>
         <div class="search-results-items"><article>Old server-rendered release</article></div>
       </div></div>
+      <div class="cover-box dark"><div class="search-results type-skoda_series">
+        <h3 class="search-results-heading">Series</h3>
+        <div class="search-results-items"><article>Old server-rendered series</article></div>
+      </div></div>
     </body></html>`, { url: source }).window;
   globalThis.document = document;
 
@@ -106,8 +110,9 @@ test('Storyboard home imports index promo settings, a complementary feed, and se
     .map((block) => [...block.querySelectorAll('tr')].find(
       (row) => row.querySelector('td')?.textContent.trim().toLowerCase() === 'style',
     )?.querySelector('td:nth-child(2)')?.textContent.trim()), [
-    'cover-box', 'cover-box, dark', 'cover-box',
+    'cover-box', 'cover-box, dark', 'cover-box', 'cover-box, dark',
   ]);
-  assert.equal(element.querySelectorAll('hr').length, 4);
+  assert.equal(element.querySelectorAll('hr').length, 5);
   assert.equal(element.textContent.includes('Old server-rendered story'), false);
+  assert.equal(element.textContent.includes('Old server-rendered series'), false);
 });
