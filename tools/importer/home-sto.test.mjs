@@ -45,7 +45,7 @@ globalThis.WebImporter = {
 
 const { default: importer } = await import('./import-home-sto.js');
 
-test('Storyboard home imports three promo cards, a feed, and separate home news band', () => {
+test('Storyboard home imports index promo settings, a complementary feed, and separate news band', () => {
   const source = 'https://www.skoda-storyboard.com/en/';
   const { document } = new JSDOM(`<html><head><title>Storyboard</title>
     <link rel="canonical" href="${source}"></head>
@@ -76,12 +76,18 @@ test('Storyboard home imports three promo cards, a feed, and separate home news 
 
   assert.equal(path, '/en');
   assert.equal(name(tables[0]), 'Promo Box');
-  assert.equal(tables[0].querySelectorAll('tr').length, 4);
+  assert.deepEqual(config(tables[0]), {
+    template: 'story',
+    path: '/en/',
+    limit: '3',
+  });
+  assert.equal(tables[0].querySelectorAll('img, a').length, 0);
   assert.equal(name(tables[1]), 'Stories');
   assert.deepEqual(config(tables[1]), {
     heading: 'Latest Stories',
     template: 'story',
-    exclude: '/en/story-1, /en/story-2, /en/story-3',
+    path: '/en/',
+    offset: '3',
   });
   assert.equal(name(tables[3]), 'Story Rail');
   assert.equal(config(tables[3]).template, 'press_release');

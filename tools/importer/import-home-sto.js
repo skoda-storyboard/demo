@@ -4,7 +4,7 @@
 /**
  * Import orchestrator: Škoda Storyboard home (template-homepage, /en/).
  *
- * Featured promo-box (curated cards), a Stories feed, and index-driven Story Rails
+ * Indexed featured promo-box, a Stories feed, and index-driven Story Rails
  * (home-rail self-classifies each .search-results rail from its heading + "All"
  * link / type-<cpt> class). The live-Instagram social strip is not index-driven —
  * home-rail unwraps it. Preserve each cover-box section and its Style metadata.
@@ -29,7 +29,7 @@ const parsers = {
 const PAGE_TEMPLATE = {
   name: 'home-sto',
   description:
-    'Škoda Storyboard home (template-homepage). Curated promo, Stories feed and index-driven Story Rails in cover-box bands. Social strip unwrapped. Metadata template=page.',
+    'Škoda Storyboard home (template-homepage). Indexed promo, Stories feed and Story Rails in cover-box bands. Social strip unwrapped. Metadata template=page.',
   urls: ['https://www.skoda-storyboard.com/en/'],
   metadata: { template: 'page' },
   blocks: [
@@ -82,19 +82,15 @@ export default {
 
     executeTransformers('beforeTransform', main, payload);
 
-    const featuredPaths = [...new Set([...main.querySelectorAll('section.promo-box article.promo-box-item')]
-      .map((article) => article.querySelector('a[href]')?.getAttribute('href'))
-      .filter(Boolean)
-      .map((href) => new URL(href, url))
-      .filter((link) => link.hostname === new URL(url).hostname)
-      .map((link) => link.pathname.replace(/\/+$/, '')))];
     const pageBlocks = findBlocksOnPage(document, PAGE_TEMPLATE);
     pageBlocks.forEach((block) => {
       if (!block.element.parentNode) return;
       const parser = parsers[block.name];
       if (parser) {
         try {
-          parser(block.element, { document, url, params, featuredPaths });
+          parser(block.element, {
+            document, url, params, indexDriven: block.name === 'promo-box',
+          });
         } catch (e) {
           console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
         }

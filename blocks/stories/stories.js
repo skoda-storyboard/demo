@@ -92,7 +92,8 @@ export const isFeatured = (row) => {
 };
 
 export const selectFeedRows = (rows, sort, offset, exclude = []) => sortRows(
-  rows.filter((row) => !exclude.includes(String(row.path || '').replace(/\/+$/, ''))),
+  rows.filter((row) => typeof row.path === 'string' && /^\/(?!\/)/.test(row.path)
+    && row.title && !exclude.includes(row.path.replace(/\/+$/, ''))),
   sort,
 ).slice(offset);
 

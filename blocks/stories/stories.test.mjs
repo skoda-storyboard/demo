@@ -136,6 +136,33 @@ test('feed offset skips three filtered, newest-first rows before paging', () => 
   assert.equal(scoped.length, 4, 'selection does not mutate the shared index rows');
 });
 
+test('indexed promo and home feed remain complementary as new stories arrive', async () => {
+  const { selectPromoRows } = await import('../promo-box/promo-box.js');
+  const home = [
+    ...rows,
+    {
+      path: '/en/new', title: 'New', template: 'story', date: '2026-06-01',
+    },
+    {
+      path: '/de/newer', title: 'German', template: 'story', date: '2026-07-01',
+    },
+  ];
+  [home, [
+    ...home,
+    {
+      path: '/en/newest', title: 'Newest', template: 'story', date: '2026-08-01',
+    },
+  ]].forEach((indexed) => {
+    const scoped = scopeRows(indexed, { template: 'story', path: '/en/' });
+    const promo = selectPromoRows(indexed, { template: 'story', path: '/en/', limit: 3 });
+    const feed = selectFeedRows(scoped, 'newest', 3);
+    assert.deepEqual(feed.map((row) => row.path), sortRows(scoped, 'newest').slice(3).map((row) => row.path));
+    assert.equal(promo.length, 3);
+    assert.deepEqual(promo.map((row) => row.path), sortRows(scoped, 'newest').slice(0, 3).map((row) => row.path));
+    assert.equal(promo.some((row) => feed.includes(row)), false);
+  });
+});
+
 test('exact promo paths are excluded before sorting or paging, even when they are not newest', () => {
   const cfg = parseFeedConfig(configBlock({ exclude: '/en/b/, /en/d' }));
   assert.deepEqual(cfg.exclude, ['/en/b', '/en/d']);

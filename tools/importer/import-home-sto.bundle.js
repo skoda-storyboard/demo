@@ -25,7 +25,16 @@ var CustomImportScript = (() => {
   });
 
   // tools/importer/parsers/promo-box.js
-  function parse(element, { document: document2 }) {
+  function parse(element, { document: document2, indexDriven = false }) {
+    if (indexDriven) {
+      element.replaceWith(WebImporter.DOMUtils.createTable([
+        ["Promo Box"],
+        ["template", "story"],
+        ["path", "/en/"],
+        ["limit", "3"]
+      ], document2));
+      return;
+    }
     const articles = [...element.querySelectorAll("article.promo-box-item, .item article")];
     const items = (articles.length ? articles : [...element.querySelectorAll(".items > .item")]).filter((el, i, arr) => arr.indexOf(el) === i);
     if (items.length === 0) {
@@ -113,15 +122,16 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/parsers/home-stories.js
-  function parse3(element, { document: document2, featuredPaths = [] }) {
+  function parse3(element, { document: document2 }) {
     const heading = element.querySelector(".search-results-heading")?.textContent.trim();
     if (!heading) throw new Error("Homepage stories feed needs a heading.");
     const rows = [
       ["Stories"],
       ["heading", heading],
-      ["template", "story"]
+      ["template", "story"],
+      ["path", "/en/"],
+      ["offset", "3"]
     ];
-    if (featuredPaths.length) rows.push(["exclude", featuredPaths.join(", ")]);
     element.replaceWith(WebImporter.DOMUtils.createTable(rows, document2));
   }
 
@@ -730,7 +740,7 @@ var CustomImportScript = (() => {
   };
   var PAGE_TEMPLATE = {
     name: "home-sto",
-    description: "\u0160koda Storyboard home (template-homepage). Curated promo, Stories feed and index-driven Story Rails in cover-box bands. Social strip unwrapped. Metadata template=page.",
+    description: "\u0160koda Storyboard home (template-homepage). Indexed promo, Stories feed and Story Rails in cover-box bands. Social strip unwrapped. Metadata template=page.",
     urls: ["https://www.skoda-storyboard.com/en/"],
     metadata: { template: "page" },
     blocks: [
@@ -777,14 +787,18 @@ var CustomImportScript = (() => {
       const { document: document2, url, params } = payload;
       const main = document2.body;
       executeTransformers("beforeTransform", main, payload);
-      const featuredPaths = [...new Set([...main.querySelectorAll("section.promo-box article.promo-box-item")].map((article) => article.querySelector("a[href]")?.getAttribute("href")).filter(Boolean).map((href) => new URL(href, url)).filter((link) => link.hostname === new URL(url).hostname).map((link) => link.pathname.replace(/\/+$/, "")))];
       const pageBlocks = findBlocksOnPage(document2, PAGE_TEMPLATE);
       pageBlocks.forEach((block) => {
         if (!block.element.parentNode) return;
         const parser = parsers[block.name];
         if (parser) {
           try {
-            parser(block.element, { document: document2, url, params, featuredPaths });
+            parser(block.element, {
+              document: document2,
+              url,
+              params,
+              indexDriven: block.name === "promo-box"
+            });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
           }

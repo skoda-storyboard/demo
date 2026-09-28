@@ -53,3 +53,17 @@ test('promo without nested articles still imports each item once', () => {
   parse(document.querySelector('.promo-box'), { document });
   assert.equal(document.querySelectorAll('table tr').length, 4);
 });
+
+test('Storyboard home emits only index settings, never imported teaser content', () => {
+  const { document } = new JSDOM(`<section class="promo-box">
+    <div class="item"><article class="promo-box-item">
+      <img src="/peaq.jpg" alt="Peaq"><a href="/en/peaq">Peaq</a>
+    </article></div></section>`).window;
+  parse(document.querySelector('.promo-box'), { document, indexDriven: true });
+  const rows = [...document.querySelectorAll('table tr')];
+  assert.deepEqual(rows.map((row) => [...row.querySelectorAll('td')]
+    .map((cell) => cell.textContent.trim())), [
+    ['Promo Box'], ['template', 'story'], ['path', '/en/'], ['limit', '3'],
+  ]);
+  assert.equal(document.querySelectorAll('table img, table a').length, 0);
+});

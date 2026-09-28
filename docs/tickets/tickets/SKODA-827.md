@@ -17,16 +17,15 @@ at 1280px EDS renders 270px cards in a 1200px rail, whereas the source uses
 
 ## Acceptance
 
-- Import exactly three linked Promo Box cards, a Stories feed, and separate
+- Import an indexed Promo Box configuration (newest three `/en/` stories), a Stories feed, and separate
   `cover-box` bands with the news rail in its own band; regenerate the runnable
   `import-home-sto.bundle.js`.
-- Exclude the exact three authored promo story paths from Latest Stories, even
-  when index ordering changes; do not assume the promo is always the newest
-  three stories.
+- Scope both blocks to `/en/` stories and skip the same first three eligible,
+  newest-first index rows in Latest Stories, even as index ordering changes.
 - Match the source Stories card inset (10px at mobile, 26px at 1280px)
   without changing the global section spacing or other blocks.
-- Restore all three source promo images, links, titles, and full summaries in
-  the DA draft rather than shortened placeholder copy.
+- Render promo images, published dates, links, titles, and full summaries from
+  query-index rows, without importing duplicate teaser content.
 - Only landing-page `press_release` rails use the 90% / 45% / 30% news-cell
   ladder across the <768 / 768–991 / >=992 layout states. Model, story, and
   press-detail related rails keep their existing geometry.
