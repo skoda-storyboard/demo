@@ -9,15 +9,16 @@ PDFs and self-hosted MP4s are **not images**: they are recorded as `document`
 and `video` rows in the same manifest, uploaded as originals to AEM Assets,
 and rewritten only in `<a href>` attributes. Embedded Vimeo/YouTube/audio
 URLs are not binaries. A private author DAM path is never used as an anonymous
-page link. The public AEM Assets delivery contract for this tenant is **not yet
-established**; upload **only one rights-approved original** against a reviewed
-candidate public URL to prove anonymous access, original MIME type and byte
-count. Do not expand the batch or rewrite page links until that proof succeeds.
+page link. The public AEM Assets delivery contract for **one PDF** is proven; every new
+PDF/MP4 still requires its own published-original proof. Scope real ingest to
+reviewed page/ID batches and a candidate public URL for each original. The
+builder uploads, activates on AEM publish, then verifies anonymous MIME type
+and original byte count before rewriting any page link.
 A redirect to an expiring signed URL is not a suitable link.
 An anonymous HEAD on an **existing image** under
 `publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/` returned
-200 on 2026-09-27. This suggests a candidate publish host, **not proof that
-new PDF/MP4 originals are automatically published or anonymously accessible**.
+200 on 2026-09-27. This suggested a candidate publish host, not automatic
+publication of newly uploaded originals.
 On 2026-09-28, a single approved Elroq PDF was uploaded and processed on the
 author DAM (`/content/dam/storyboard/en/skoda-model/elroq/TD-Elroq-en_new_7a3c9a44.pdf`):
 authenticated HEAD returned `application/pdf`, 537,385 bytes. Anonymous HEAD
@@ -28,9 +29,10 @@ original MIME/byte count. With separate approval, an authenticated
 `cmd=Activate` and `path=<exact PDF DAM path>`, returned 200 for this
 already-published PDF. Author `jcr:content` recorded a fresh publish
 replication action, and anonymous original delivery still passed. This
-demonstrates that the token can trigger activation **for this asset**, not
-that new uploads are auto-published or that a bulk publish policy exists.
-Do not activate other assets without explicit approval. The isolated manifest
+demonstrates that the token can trigger activation **for this asset**; direct
+binary upload alone does not publish. The migration now automatically
+activates each selected PDF/MP4 after DAM upload; restrict the batch with
+reviewed pages or `--ids-file`. The isolated manifest
 under `.migration/secrets/skoda-503-sample-manifest.json` still retains the
 successful DAM upload as `partial` without a recorded public proof: a
 manifest-mutating resume was separately declined. Do not repeat the upload,
@@ -57,9 +59,9 @@ npm run media:build -- --pages content/en/press-releases/example.plain.html
 npm run media:build -- --from-manifest --ids-file /path/to/approved-binary-ids.txt \
   --dam-base https://author-p220607-e2281243.adobeaemcloud.com \
   --public-urls /path/to/public-urls.json --dry-run
-# With credentials, upload the approved single sample without --dry-run.
-# The builder fails closed if the sample does not deliver publicly; investigate
-# activation/publication requirements before adding any more IDs.
+# With credentials, repeat without --dry-run: DAM upload -> publish activation
+# -> anonymous original verification. The first approved sample may be reused
+# from the private manifest; no --force or second upload is needed.
 npm run media:apply -- --pages content/en/press-releases/example.plain.html
 npm run media:validate-binaries -- --pages content/en/press-releases/example.plain.html
 npm run import:push -- --paths /path/to/approved-page-paths.txt --dry-run
@@ -67,8 +69,15 @@ npm run import:push -- --paths /path/to/approved-page-paths.txt --dry-run
 ```
 
 The Assets builder requires a public URL mapping **before** uploading any
-selected binary. It verifies anonymous `HEAD` access, exact PDF/MP4 MIME,
-original byte length, and no redirect after upload. A source
+selected binary. After DAM upload (and metadata), it sends one
+`POST /bin/replicate.json` on author with `cmd=Activate` and the selected
+binary's exact DAM path, using the DAM token. It waits briefly for anonymous
+`HEAD` access, exact PDF/MP4 MIME, original byte length and no redirect.
+`steps.publish` records activation separately from `steps.dam`; failure keeps
+the row `partial` and blocks link rewriting/DA push. Retry resumes activation
+or delivery verification without re-uploading the original. **This publishes
+Assets binaries, not DA pages**; `import:push --stage publish` remains separate
+and requires its own approval. A source
 `/direct-download/…mp4` redirect is followed only to fetch the bytes; neither
 that redirect nor its signed S3 target becomes the destination link. The source
 link must be a stable URL without a query string; query-bearing binaries block
@@ -84,7 +93,15 @@ with a nonzero exit for missing, unrehosted or misclassified links. `import:push
 applies the same gate per page before DA writes and again before preview/live;
 an invalid page is reported as `blocked-binary` while other pages can proceed.
 The gate checks the stored public proof but does not crawl preview/live URLs.
-No automatic publish or `--force` overwrite is part of this procedure.
+Never use `--force` to recover a publish or delivery failure, and never run
+an unreviewed `--from-manifest` batch: the binary publisher acts on every
+selected PDF/MP4. When `--from-manifest` also specifies `--dam-base` and
+binary rows exist, the builder requires `--ids-file` before any upload or
+activation; page-based runs are scoped by their explicit `--pages` list.
+`--dry-run` never activates an asset. A live resume of the Elroq sample
+through the new automation was not authorized and did not run; the isolated
+sample row remains partial. Obtain explicit activation approval for each
+batch before running the non-dry command, even for already uploaded originals.
 
 Implements the media half of **SKODA-501** (masters-only ingest), **SKODA-504**
 (mapping manifest, page-mirrored DAM foldering), **SKODA-505** (media-cart

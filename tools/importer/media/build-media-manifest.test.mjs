@@ -17,7 +17,9 @@ const script = fileURLToPath(new URL('./build-media-manifest.mjs', import.meta.u
 
 async function mockDam() {
   const uploads = [];
+  const activations = [];
   let originalAvailable = true;
+  let activationStatus = 200;
   const server = createServer((req, res) => {
     const chunks = [];
     req.on('data', (chunk) => chunks.push(chunk));
@@ -46,6 +48,14 @@ async function mockDam() {
         }
         res.writeHead(200, { 'content-type': 'application/octet-stream', 'content-length': '12' });
         res.end(req.method === 'HEAD' ? undefined : '\0\0\0\0ftypmock');
+      } else if (req.url === '/bin/replicate.json' && req.method === 'POST') {
+        const form = new URLSearchParams(Buffer.concat(chunks).toString());
+        if (req.headers.authorization !== 'Bearer mock' || form.get('cmd') !== 'Activate') {
+          res.writeHead(400); res.end(); return;
+        }
+        if (activationStatus === 200) activations.push(form.get('path'));
+        res.writeHead(activationStatus, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ success: activationStatus === 200 }));
       } else if (req.method === 'GET' && req.url.endsWith('.json')) {
         res.writeHead(200); res.end('{}');
       } else if (req.url.endsWith('.initiateUpload.json')) {
@@ -69,6 +79,8 @@ async function mockDam() {
   return {
     base: `http://127.0.0.1:${server.address().port}`,
     uploads,
+    activations,
+    setActivationStatus(value) { activationStatus = value; },
     setOriginalAvailable(value) { originalAvailable = value; },
     async close() { await new Promise((resolve) => { server.close(resolve); }); },
   };
@@ -257,14 +269,19 @@ test('PDF and MP4 links require proven public Assets delivery before DAM ingesti
     const row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
     assert.equal(row.kind, 'document');
     assert.equal(row.title, 'Download PDF');
-    assert.deepEqual(row.steps, { deliver: 'n/a', dam: 'n/a', da: 'n/a' });
+    assert.deepEqual(row.steps, {
+      deliver: 'n/a', dam: 'n/a', publish: 'pending', da: 'n/a',
+    });
     assert.equal(row.status, 'partial');
     assert.equal(row.delivery_url, '', 'the page keeps its source link');
     assert.deepEqual(row.page_refs, ['en/skoda-model/new-kodiaq']);
     assert.equal(dam.uploads.length, 0, 'delivery-only never uploads');
 
+    const ids = path.join(dir, 'approved.txt');
+    writeFileSync(ids, `${id}\n`);
     const damArgs = [script, '--from-manifest', '--manifest', manifest, '--dam-base', dam.base];
-    await assert.rejects(exec(process.execPath, damArgs, options), /missing or invalid public Assets URL/);
+    await assert.rejects(exec(process.execPath, damArgs, options), /requires --ids-file/);
+    await assert.rejects(exec(process.execPath, [...damArgs, '--ids-file', ids], options), /missing or invalid public Assets URL/);
     assert.deepEqual(dam.uploads, []);
   } finally {
     await dam.close();
@@ -324,6 +341,9 @@ test('approved PDF and redirecting MP4 originals upload once and verify public d
     global.fetch = (url, options) => {
       if (String(url).startsWith('https://assets.example.test/')) {
         if (!publicAccessible) return Promise.resolve(new Response(null, { status: 403 }));
+        if (!dam.activations.includes(new URL(url).pathname)) {
+          return Promise.resolve(new Response(null, { status: 404 }));
+        }
         const pdfAsset = String(url) === publicPdf || String(url) === publicAnnual;
         return Promise.resolve(new Response(null, {
           status: 200,
@@ -338,22 +358,29 @@ test('approved PDF and redirecting MP4 originals upload once and verify public d
     const args = ['--pages', page, '--manifest', manifest, '--dam-base', dam.base, '--public-urls', urls];
     await build([...args, '--dry-run']);
     assert.deepEqual(dam.uploads, [], 'binary dry-run does not upload');
+    assert.deepEqual(dam.activations, [], 'binary dry-run does not publish');
     await build(args);
     const row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
     assert.deepEqual(dam.uploads, ['%PDF-TECH', '%PDF-YEAR', '\0\0\0\0ftypmock']);
     assert.equal(row.steps.dam, 'done');
+    assert.equal(row.steps.publish, 'done');
+    assert.equal(row.publish_status, 200);
     assert.equal(row.dam_asset_path, `${assetPath}TD-Kodiaq-en.pdf`);
     assert.equal(row.dam_original_url, pdf);
     assert.equal(row.public_url, publicPdf);
     assert.equal(row.public_verified.mime, 'application/pdf');
     assert.equal(row.status, 'done');
     assert.equal(JSON.parse(readFileSync(manifest, 'utf8')).rows[videoId].public_url, publicMp4);
+    assert.deepEqual(dam.activations, [
+      `${assetPath}TD-Kodiaq-en.pdf`, `${assetPath}annual.pdf`, `${assetPath}clip.mp4`,
+    ]);
     assert.equal(
       JSON.parse(readFileSync(manifest, 'utf8')).rows[videoId].source_content_type,
       'application/octet-stream',
     );
     await build(args);
     assert.equal(dam.uploads.length, 3, 're-run does not upload twice');
+    assert.equal(dam.activations.length, 3, 're-run does not republish');
 
     const pending = JSON.parse(readFileSync(manifest, 'utf8'));
     pending.rows[id].status = 'partial';
@@ -364,13 +391,145 @@ test('approved PDF and redirecting MP4 originals upload once and verify public d
     const blocked = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
     assert.equal(blocked.status, 'partial');
     assert.equal(blocked.steps.dam, 'done', 'public failure does not invalidate the DAM original');
+    assert.equal(blocked.steps.publish, 'done', 'public failure does not republish the original');
     assert.equal(dam.uploads.length, 3, 'public failure does not re-upload the original');
+    assert.equal(dam.activations.length, 3);
     assert.equal(process.exitCode, 1);
     publicAccessible = true;
     process.exitCode = 0;
     await build(args);
     assert.equal(JSON.parse(readFileSync(manifest, 'utf8')).rows[id].status, 'done');
     assert.equal(dam.uploads.length, 3, 'public retry only verifies delivery');
+  } finally {
+    global.fetch = previousFetch;
+    process.exitCode = previousExitCode;
+    if (previousToken === undefined) delete process.env.AEM_DAM_TOKEN;
+    else process.env.AEM_DAM_TOKEN = previousToken;
+    await dam.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('activation failure blocks delivery; retry publishes the existing DAM original only', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-binary-activation-'));
+  const dam = await mockDam();
+  const previousFetch = global.fetch;
+  const previousExitCode = process.exitCode;
+  const previousToken = process.env.AEM_DAM_TOKEN;
+  try {
+    const source = `${dam.base}/TD-Kodiaq-en.pdf`;
+    const id = logicalId(source);
+    const manifest = path.join(dir, 'manifest.json');
+    const urls = path.join(dir, 'public-urls.json');
+    const ids = path.join(dir, 'approved.txt');
+    const damPath = '/content/dam/storyboard/en/press-releases/test/TD-Kodiaq-en.pdf';
+    const publicUrl = `https://assets.example.test${damPath}`;
+    writeFileSync(manifest, JSON.stringify({
+      rows: {
+        [id]: {
+          logical_id: id,
+          kind: 'document',
+          source_url: source,
+          dam_page_path: 'en/press-releases/test',
+          page_refs: ['en/press-releases/test'],
+          status: 'partial',
+          steps: { dam: 'n/a' },
+        },
+      },
+    }));
+    writeFileSync(urls, JSON.stringify({ [damPath]: publicUrl }));
+    writeFileSync(ids, `${id}\n`);
+    process.env.AEM_DAM_TOKEN = 'mock';
+    global.fetch = (url, options) => (String(url) === publicUrl
+      ? Promise.resolve(new Response(null, {
+        status: 200,
+        headers: {
+          'content-type': 'application/pdf', 'content-length': '9',
+        },
+      }))
+      : previousFetch(url, options));
+    const args = ['--from-manifest', '--ids-file', ids, '--manifest', manifest,
+      '--dam-base', dam.base, '--public-urls', urls];
+    dam.setActivationStatus(403);
+    await build(args);
+    let row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(process.exitCode, 1);
+    assert.equal(row.steps.dam, 'done');
+    assert.equal(row.steps.publish, 'error');
+    assert.equal(row.status, 'partial');
+    assert.equal(row.public_url, '');
+    assert.deepEqual(dam.uploads, ['%PDF-TECH']);
+    assert.deepEqual(dam.activations, []);
+    const beforeDryRun = readFileSync(manifest, 'utf8');
+    await build([...args, '--dry-run']);
+    assert.equal(readFileSync(manifest, 'utf8'), beforeDryRun);
+    assert.deepEqual(dam.activations, [], 'dry run never retries activation');
+
+    dam.setActivationStatus(200);
+    process.exitCode = 0;
+    await build(args);
+    row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(row.steps.publish, 'done');
+    assert.equal(row.public_url, publicUrl);
+    assert.equal(row.status, 'done');
+    assert.deepEqual(dam.uploads, ['%PDF-TECH'], 'activation retry does not re-upload');
+    assert.deepEqual(dam.activations, [damPath]);
+  } finally {
+    global.fetch = previousFetch;
+    process.exitCode = previousExitCode;
+    if (previousToken === undefined) delete process.env.AEM_DAM_TOKEN;
+    else process.env.AEM_DAM_TOKEN = previousToken;
+    await dam.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('legacy DAM-only PDF resumes activation without downloading or uploading again', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-binary-resume-'));
+  const dam = await mockDam();
+  const previousFetch = global.fetch;
+  const previousExitCode = process.exitCode;
+  const previousToken = process.env.AEM_DAM_TOKEN;
+  try {
+    const source = `${dam.base}/TD-Kodiaq-en.pdf`;
+    const id = logicalId(source);
+    const damPath = '/content/dam/storyboard/en/press-releases/test/TD-Kodiaq-en.pdf';
+    const publicUrl = `https://assets.example.test${damPath}`;
+    const manifest = path.join(dir, 'manifest.json');
+    const urls = path.join(dir, 'public-urls.json');
+    const ids = path.join(dir, 'approved.txt');
+    writeFileSync(manifest, JSON.stringify({
+      rows: {
+        [id]: {
+          logical_id: id,
+          kind: 'document',
+          source_url: source,
+          dam_page_path: 'en/press-releases/test',
+          dam_asset_path: damPath,
+          bytes: 9,
+          status: 'partial',
+          steps: { dam: 'done' },
+        },
+      },
+    }));
+    writeFileSync(urls, JSON.stringify({ [damPath]: publicUrl }));
+    writeFileSync(ids, `${id}\n`);
+    process.env.AEM_DAM_TOKEN = 'mock';
+    global.fetch = (url, options) => (String(url) === publicUrl
+      ? Promise.resolve(new Response(null, {
+        status: 200,
+        headers: { 'content-type': 'application/pdf', 'content-length': '9' },
+      }))
+      : previousFetch(url, options));
+    dam.setOriginalAvailable(false);
+    await build(['--from-manifest', '--ids-file', ids, '--manifest', manifest,
+      '--dam-base', dam.base, '--public-urls', urls]);
+    const row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(row.status, 'done');
+    assert.equal(row.steps.publish, 'done');
+    assert.equal(row.public_url, publicUrl);
+    assert.deepEqual(dam.uploads, []);
+    assert.deepEqual(dam.activations, [damPath]);
   } finally {
     global.fetch = previousFetch;
     process.exitCode = previousExitCode;

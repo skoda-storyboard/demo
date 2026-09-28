@@ -53,6 +53,18 @@ the same DAM token. Author `jcr:content` recorded a fresh
 still passes. This proves activation for **this asset on this tenant**, not
 bulk publish rights or automatic publication of future uploads.
 
+**Revised 1:1 migration requirement:** approved PDF/MP4 ingest must now
+automatically activate each selected original on publish, then prove
+anonymous MIME/size before any page link is rewritten. The importer records
+DAM upload and publish activation as separate resumable steps; activation
+failure leaves the row partial and blocks DA push. Scoping via reviewed
+pages/IDs still limits which binaries can be published; DA page publication
+is a separate workflow and is not implied by asset activation. Mock PDF/MP4
+tests cover scoped activation, fail-closed errors, propagation and resume
+without re-upload. An isolated one-ID dry run for the Elroq PDF reported
+`activation pending` and performed no write. The subsequent live resume was
+declined because activation needs explicit approval; it did not run.
+
 The isolated sample manifest still records `dam: done`, `status: partial`,
 without a `public_url` or `public_verified` proof: updating it was separately
 denied pending explicit one-row authorization. The committed manifest and
@@ -64,5 +76,5 @@ Read-only probe: the candidate AEM publish hostname serves one already-uploaded
 image anonymously (HEAD 200). The source Peaq MP4 is approximately 101 MB;
 its signed redirect rejects HEAD (403) but a one-byte ranged GET succeeds (206).
 Neither observation proves future PDF/MP4 assets will be published automatically.
-Keep activation a separately approved step per asset or approved batch; verify
-each public original before rewriting links or expanding the upload batch.
+Use the approved page/ID batch as the activation scope, and verify each public
+original before rewriting links or expanding the upload batch.

@@ -31,7 +31,9 @@ const row = (url, hosted, kind) => ({
   page_refs: ['en/press-releases/example'],
   bytes: 42,
   status: 'done',
-  steps: { deliver: 'n/a', dam: 'done', da: 'n/a' },
+  steps: {
+    deliver: 'n/a', dam: 'done', publish: 'done', da: 'n/a',
+  },
   kind,
 });
 const manifest = {
@@ -122,6 +124,12 @@ test('offline gate fails closed for missing refs, wrong tags and unverified dest
     binaryErrors(`<a href="${hostedPdf}">PDF</a>`, wrong).join(' '),
     /unverified document link/,
   );
+  wrong.rows[logicalId(pdf)].public_verified.bytes = 42;
+  wrong.rows[logicalId(pdf)].steps.publish = 'error';
+  assert.match(
+    binaryErrors(`<a href="${hostedPdf}">PDF</a>`, wrong).join(' '),
+    /unverified document link/,
+  );
 });
 
 test('public proof refuses redirects and mismatched MIME/size', async () => {
@@ -142,6 +150,35 @@ test('public proof refuses redirects and mismatched MIME/size', async () => {
     await assert.rejects(verifyPublicBinary(hostedMp4, 'video', 42), /HEAD returned 302/);
     global.fetch = async () => new Response(null, { status: 403 });
     await assert.rejects(verifyPublicBinary(hostedMp4, 'video', 42), /HEAD returned 403/);
+  } finally {
+    global.fetch = previousFetch;
+  }
+});
+
+test('public proof waits for a newly activated original but does not retry forbidden access', async () => {
+  const previousFetch = global.fetch;
+  let calls = 0;
+  try {
+    global.fetch = async () => {
+      calls += 1;
+      return calls < 3 ? new Response(null, { status: 404 }) : new Response(null, {
+        status: 200,
+        headers: { 'content-type': 'application/pdf', 'content-length': '42' },
+      });
+    };
+    assert.deepEqual(await verifyPublicBinary(hostedPdf, 'document', 42, {
+      attempts: 3, intervalMs: 0,
+    }), { url: hostedPdf, mime: 'application/pdf', bytes: 42 });
+    assert.equal(calls, 3);
+    calls = 0;
+    global.fetch = async () => {
+      calls += 1;
+      return new Response(null, { status: 403 });
+    };
+    await assert.rejects(verifyPublicBinary(hostedPdf, 'document', 42, {
+      attempts: 3, intervalMs: 0,
+    }), /returned 403/);
+    assert.equal(calls, 1);
   } finally {
     global.fetch = previousFetch;
   }

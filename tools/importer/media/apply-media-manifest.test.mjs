@@ -147,7 +147,7 @@ test('apply rewrites public PDF/MP4 links by page-relative source path, atomical
         public_url: publicUrl,
         bytes: 42,
         status: 'done',
-        steps: { dam: 'done' },
+        steps: { dam: 'done', publish: 'done' },
         dam_asset_path: `/content/dam/storyboard/${kind}`,
         public_verified: { url: publicUrl, mime, bytes: 42 },
         page_refs: ['en/press-releases/example'],

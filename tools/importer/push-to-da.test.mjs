@@ -52,7 +52,7 @@ async function scenario(stage, remoteMatches, {
     bytes: 42,
     public_verified: { url: binaryPublic, mime: 'application/pdf', bytes: 42 },
     status: 'done',
-    steps: { dam: 'done' },
+    steps: { dam: 'done', publish: 'done' },
   };
   writeFileSync(mediaManifestFile, JSON.stringify({
     rows: binary === 'hosted' ? { [logicalId(binarySource)]: binaryRow } : {},

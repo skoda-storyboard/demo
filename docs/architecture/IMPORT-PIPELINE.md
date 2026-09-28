@@ -113,8 +113,8 @@ The input URL list for the run.
 # 2) Prepare delivery images; fail if any requested page/image cannot be resolved.
 npm run media:build -- --pages content/<path>.plain.html
 npm run media:apply -- --pages content/<path>.plain.html
-# PDFs/MP4s additionally need approved AEM Assets ingest + a verified public
-# URL mapping before media:apply can rewrite their anchors (media/README.md).
+# PDFs/MP4s additionally need approved AEM Assets ingest + activation + a
+# verified public URL mapping before media:apply (see media/README.md).
 npm run media:validate-binaries -- --pages content/<path>.plain.html
 # 3) Validate metadata + the pending-block contract, then inspect locally against previewed DA content.
 node tools/importer/validate-metadata.mjs content/<path>.plain.html
@@ -140,8 +140,9 @@ have a pinned entry in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../planning/SKODA-PE
 shape even when the block has no code yet; the block ticket builds against that shape, so its
 landing needs a re-QA, not a re-import.
 
-**Order matters:** import → media build/apply (PDF/MP4 Assets originals must
-have an anonymously accessible public URL; private author DAM paths do not
+**Order matters:** import → media build/apply (for selected PDFs/MP4s the builder
+uploads originals to Assets, activates them on publish and proves anonymous
+public delivery before rewriting links; private author DAM paths do not
 qualify) → offline binary + metadata + block validation →
 SKODA-506 gate before DA push/preview → review → recheck and refreshed preview
 before **publish** → reindex. SKODA-501's media builder selects publish-safe

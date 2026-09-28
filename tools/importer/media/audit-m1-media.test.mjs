@@ -182,6 +182,7 @@ test('M1 audit tracks linked PDFs: untracked, then pending, then in the DAM (SKO
     assert.deepEqual(counts(['untrackedDocuments', 'pendingDamDocument', 'missingFromPage']), [0, 1, 0]);
 
     row.steps.dam = 'done';
+    row.steps.publish = 'done';
     row.dam_asset_path = '/content/dam/storyboard/en/skoda-model/new-kodiaq/TD-Kodiaq-en.pdf';
     row.status = 'done';
     row.source_url = pdf;

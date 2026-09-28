@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /*
- * build-media-manifest.mjs — ingest source images into the AEM DAM (originals),
- * pick a media-bus-deliverable rendition, and emit a re-runnable mapping manifest
- * (SKODA-501 masters-only / SKODA-504 manifest / SKODA-506 pre-condition).
+ * build-media-manifest.mjs — ingest source images and PDF/MP4 originals into
+ * AEM DAM, pick media-bus-safe image renditions, activate approved binaries
+ * on publish, and emit a resumable mapping manifest.
  *
  * Usage:
  *   node tools/importer/media/build-media-manifest.mjs \
@@ -11,6 +11,8 @@
  *     [--dam-base https://author-p220607-e2281243.adobeaemcloud.com] \
  *     [--dam-folder /content/dam/storyboard] \
  *     [--da-archive] [--org skoda-storyboard --repo demo] \
+ *     [--public-urls reviewed-assets-map.json] \
+ *     [--from-manifest --ids-file approved-binary-ids.txt] \
  *     [--concurrency 4] [--dry-run] [--force] [--limit N] [--min-image-edge 768]
  *
  * Per distinct LOGICAL image (path-qualified id, F3) referenced by the pages:
@@ -22,6 +24,8 @@
  *   5. (optional --da-archive) also self-host in DA for CDN-independence
  *   6. record a manifest row: delivery_url (A) + dam_asset_path (B) + provenance
  *
+ * Binary rows require DAM upload, publish activation and anonymous public
+ * MIME/byte verification; images retain their separate delivery behavior.
  * Per-step status (F5): a row is `done` only when every REQUIRED step passed.
  * Manifest is persisted incrementally (B) so a crash/expiry resumes. Non-zero
  * exit when failures remain. Credentials never come from chat/argv (see media-lib).
@@ -35,7 +39,8 @@ import { fileURLToPath } from 'node:url';
 import {
   isImageUrl, cleanUrl, masterUrl, logicalId, daPathFor, damPathFor,
   pagePathFromFile, isAspectCrop,
-  pickIngestUrl, headBytes, fetchBinary, uploadToDA, uploadToDAM, setDamMetadata, resolveDamToken,
+  pickIngestUrl, headBytes, fetchBinary, uploadToDA, uploadToDAM, publishDamBinary,
+  setDamMetadata, resolveDamToken,
   needsMediaBuild, stepDownTooSmall, renditionEdge, OVERSIZE_BYTES, MIN_RENDITION_EDGE,
 } from './media-lib.mjs';
 import {
@@ -281,6 +286,10 @@ export default async function main(args = process.argv.slice(2)) {
     });
     logicalIds = ids;
   }
+  if (cfg.fromManifest && cfg.damBase && !cfg.idsFile
+    && logicalIds.some((id) => byLogical.get(id).kind !== 'image')) {
+    throw new Error('Binary DAM activation from a manifest requires --ids-file with the approved asset IDs');
+  }
   logicalIds = logicalIds.slice(0, cfg.limit);
   const destination = (id) => {
     const info = byLogical.get(id);
@@ -300,7 +309,7 @@ export default async function main(args = process.argv.slice(2)) {
   console.log(`[media] ${logicalIds.length} distinct logical asset(s) ${srcLabel}`);
   console.log(`[media] DAM: ${damConfig ? `${damConfig.baseUrl}${damConfig.folder} (token: ${damToken ? 'present' : 'dry-run only'})` : 'not configured'}`);
   console.log(`[media] DA archive: ${cfg.daArchive ? 'on' : 'off'}  ·  concurrency: ${cfg.concurrency}`);
-  if (cfg.dryRun) console.log('[media] DRY RUN — headers/range probes only; no upload/write');
+  if (cfg.dryRun) console.log('[media] DRY RUN — headers/range probes only; no upload/activation/write');
 
   // Incremental persistence (B): flush after each row completes.
   let dirty = 0;
@@ -324,6 +333,7 @@ export default async function main(args = process.argv.slice(2)) {
     const storedInDam = prior?.steps?.dam === 'done' && (!cfg.force || !damConfig);
     let damStep = prior?.steps?.dam || 'n/a';
     if (damConfig) damStep = storedInDam ? 'done' : 'pending';
+    const publishStep = damConfig && !storedInDam ? 'pending' : prior?.steps?.publish || 'pending';
     const row = {
       ...prior,
       kind: info.kind,
@@ -336,15 +346,17 @@ export default async function main(args = process.argv.slice(2)) {
       dam_original_url: storedInDam ? prior.dam_original_url : '',
       original_download_url: '',
       delivery_url: '',
-      public_url: prior?.public_url || '',
-      public_verified: prior?.public_verified || null,
+      public_url: storedInDam ? prior?.public_url || '' : '',
+      public_verified: storedInDam ? prior?.public_verified || null : null,
       da_path: '',
       title: info.title || prior?.title || '',
       alt: '',
       caption: '',
       seen_urls: [...new Set([...(prior?.seen_urls || []), ...info.seenUrls])],
       bytes: prior?.bytes ?? null,
-      steps: { deliver: 'n/a', dam: damStep, da: 'n/a' },
+      steps: {
+        deliver: 'n/a', dam: damStep, publish: publishStep, da: 'n/a',
+      },
       status: 'pending',
       note: '',
     };
@@ -353,11 +365,12 @@ export default async function main(args = process.argv.slice(2)) {
       try {
         const bytes = damConfig && damStep !== 'done' ? await probeBinaryBytes(row.master_url) : null;
         const unavailable = damConfig && damStep !== 'done' && !(Number.isFinite(bytes) && bytes > 0);
-        if (damConfig && damStep === 'done') {
+        const activationPending = damConfig && damStep === 'done' && publishStep !== 'done';
+        if (damConfig && damStep === 'done' && publishStep === 'done') {
           await verifyPublicBinary(publicUrl, info.kind, row.bytes);
         }
         if (unavailable || !damConfig) counts.failed += 1;
-        console.log(`  · ${id}  ${info.kind}${unavailable ? ' [original unavailable]' : ''} → DAM ${damAssetPath || '(not configured)'}`);
+        console.log(`  · ${id}  ${info.kind}${unavailable ? ' [original unavailable]' : ''}${activationPending ? ' [activation pending]' : ''} → DAM ${damAssetPath || '(not configured)'}`);
       } catch (err) {
         counts.failed += 1;
         console.error(`  ✗ ${id}  ${err.message}`);
@@ -404,12 +417,28 @@ export default async function main(args = process.argv.slice(2)) {
           row.note = `DAM ${dam.status}: ${(dam.body || '').slice(0, 100)}`;
         }
       }
-      if (damConfig && row.steps.dam === 'done') {
-        row.public_verified = await verifyPublicBinary(publicUrl, info.kind, row.bytes);
+      let activatedNow = false;
+      if (damConfig && row.steps.dam === 'done' && row.steps.publish !== 'done') {
+        try {
+          row.publish_status = await publishDamBinary({
+            damConfig, damPath: row.dam_asset_path, token: damToken,
+          });
+          row.steps.publish = 'done';
+          row.published_at = new Date().toISOString();
+          activatedNow = true;
+        } catch (error) {
+          row.steps.publish = 'error';
+          throw error;
+        }
+      }
+      if (damConfig && row.steps.publish === 'done') {
+        row.public_verified = await verifyPublicBinary(publicUrl, info.kind, row.bytes, {
+          attempts: activatedNow ? 11 : 1,
+        });
         row.public_url = publicUrl;
       }
-      const allOk = row.steps.dam === 'done' && row.public_verified?.url === publicUrl
-        && !!publicUrl;
+      const allOk = row.steps.dam === 'done' && row.steps.publish === 'done'
+        && row.public_verified?.url === publicUrl && !!publicUrl;
       row.status = allOk ? 'done' : 'partial';
       if (allOk) counts.done += 1; else counts.failed += 1;
       console.log(`  ${allOk ? '✓' : '⚠'} ${id}  ${info.kind} → ${row.dam_asset_path ? `DAM:${row.dam_asset_path}` : 'DAM pending'}`);

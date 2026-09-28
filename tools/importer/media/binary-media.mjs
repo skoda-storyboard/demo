@@ -91,7 +91,8 @@ export function binaryErrors(html, manifest, pagePath = '') {
   } of binaryAnchors(html)) {
     const row = lookup.get(binarySource(href, pagePath));
     if (row) seen.add(row.logical_id);
-    if (!row || row.kind !== kind || row.status !== 'done' || row.steps?.dam !== 'done'
+    if (!row || row.kind !== kind || row.status !== 'done'
+      || row.steps?.dam !== 'done' || row.steps?.publish !== 'done'
       || !row.dam_asset_path || !row.public_url || !publicBinaryUrl(row.public_url)
       || row.public_verified?.url !== row.public_url
       || row.public_verified?.mime !== MIME[kind]
@@ -127,7 +128,8 @@ export function rewriteBinaryLinks(html, manifest, pagePath = '') {
     const kind = binaryKind(href, type);
     if (!kind) return tag;
     const row = lookup.get(binarySource(href, pagePath));
-    if (!row || row.kind !== kind || row.status !== 'done' || row.steps?.dam !== 'done'
+    if (!row || row.kind !== kind || row.status !== 'done'
+      || row.steps?.dam !== 'done' || row.steps?.publish !== 'done'
       || !publicBinaryUrl(row.public_url)
       || row.public_verified?.url !== row.public_url
       || row.public_verified?.mime !== MIME[kind]
@@ -150,16 +152,29 @@ export function rewriteBinaryLinks(html, manifest, pagePath = '') {
   };
 }
 
-export async function verifyPublicBinary(url, kind, bytes) {
+export async function verifyPublicBinary(url, kind, bytes, {
+  attempts = 1, intervalMs = 2000,
+} = {}) {
   if (!publicBinaryUrl(url)) throw new Error(`Not a public Assets binary URL: ${url}`);
-  const response = await fetch(url, { method: 'HEAD', redirect: 'error' });
-  if (!response.ok) throw new Error(`Public binary HEAD returned ${response.status}: ${url}`);
-  const mime = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
-  const size = Number(response.headers.get('content-length'));
-  if (mime !== MIME[kind] || !Number.isSafeInteger(size) || size < 1 || size !== bytes) {
-    throw new Error(`Public binary type/size mismatch: ${url} (${mime}, ${size} bytes; expected ${MIME[kind]}, ${bytes})`);
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    const response = await fetch(url, {
+      method: 'HEAD', redirect: 'error', signal: AbortSignal.timeout(20000),
+    });
+    if (response.status === 404 && attempt < attempts - 1) {
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve) => { setTimeout(resolve, intervalMs); });
+      continue;
+    }
+    if (!response.ok) throw new Error(`Public binary HEAD returned ${response.status}: ${url}`);
+    const mime = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+    const size = Number(response.headers.get('content-length'));
+    if (mime !== MIME[kind] || !Number.isSafeInteger(size) || size < 1 || size !== bytes) {
+      throw new Error(`Public binary type/size mismatch: ${url} (${mime}, ${size} bytes; expected ${MIME[kind]}, ${bytes})`);
+    }
+    return { url, mime, bytes: size };
   }
-  return { url, mime, bytes: size };
+  throw new Error(`No public binary HEAD attempts were made: ${url}`);
 }
 
 export async function probeBinaryBytes(url) {

@@ -1,10 +1,10 @@
 /*
- * media-lib.mjs — reusable helpers for the Škoda image-import mechanism.
+ * media-lib.mjs — reusable helpers for the Škoda media-import mechanism.
  *
  * Pure/dependency-free (Node 24 built-ins only: fetch, fs, crypto, path).
  * Shared by build-media-manifest.mjs and apply-media-manifest.mjs so any page
- * set in this project can ingest its images into the AEM DAM (system of record,
- * ORIGINALS) and rewrite content to media-bus-deliverable URLs.
+ * set in this project can ingest originals into the AEM DAM (system of record)
+ * and rewrite images to media-bus-deliverable URLs.
  *
  * Grounded in docs/media/SKODA-MEDIA-DEEP-DIVE.md + SKODA-ASSET-MAPPING.md and
  * tickets SKODA-501 (masters-only), SKODA-504 (manifest), SKODA-506 (pre-condition).
@@ -114,6 +114,7 @@ export function needsMediaBuild(row, {
   // A binary must have a verified public destination, not merely a private DAM upload.
   if (row.kind === 'document' || row.kind === 'video') {
     return row.steps?.dam !== 'done' || !row.dam_asset_path
+      || (dam && row.steps?.publish !== 'done')
       || !row.public_url || (publicUrl && row.public_url !== publicUrl)
       || row.public_verified?.url !== row.public_url;
   }
@@ -600,6 +601,35 @@ export async function uploadToDAM({
       ok: false, status: 0, assetPath: damPath, body: String(err.message || err),
     };
   }
+}
+
+/** Activate a single original on the AEM publish tier after its DAM upload. */
+export async function publishDamBinary({
+  damConfig, damPath, token, fetchImpl = fetch,
+}) {
+  const folder = (damConfig?.folder || '/content/dam/storyboard').replace(/\/$/, '');
+  if (!damConfig?.baseUrl || !token || !damPath?.startsWith(`${folder}/`)
+    || path.posix.normalize(damPath) !== damPath || !/\.(pdf|mp4)$/i.test(damPath)) {
+    throw new Error(`Cannot activate an unconfigured or out-of-scope DAM binary: ${damPath}`);
+  }
+  const response = await fetchImpl(`${damConfig.baseUrl.replace(/\/$/, '')}/bin/replicate.json`, {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${token}`,
+      'content-type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({ cmd: 'Activate', path: damPath }).toString(),
+    redirect: 'error',
+    signal: AbortSignal.timeout(60000),
+  });
+  if (!response.ok) throw new Error(`DAM activation returned ${response.status} for ${damPath}`);
+  if ((response.headers.get('content-type') || '').includes('application/json')) {
+    const result = await response.json();
+    if (result.success === false || result.error || result.status === 'error') {
+      throw new Error(`DAM activation reported failure for ${damPath}`);
+    }
+  }
+  return response.status;
 }
 
 /**
