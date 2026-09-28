@@ -92,12 +92,14 @@ body.skoda-series .hero-image.overlay .hero-image-content .hero-image-perex {
 }
 
 /* Layer 3 — from 768 the image is 61.8vh and the caption overlays it in white,
-   inside the centred content column (source `.hero-caption .container`). */
+   inside the centred content column (source `.hero-caption .container`). The
+   source never caps the height (667px at 1080 tall, 890px at 1440), unlike the
+   block's 640px cap for the model hero. */
 @media (width >= 768px) {
   body.skoda-series .hero-image.overlay .hero-image-media picture,
   body.skoda-series .hero-image.overlay .hero-image-media img {
     aspect-ratio: auto;
-    height: min(var(--hero-vh), 640px);
+    height: var(--hero-vh);
   }
 
   body.skoda-series .hero-image.overlay .hero-image-content {
