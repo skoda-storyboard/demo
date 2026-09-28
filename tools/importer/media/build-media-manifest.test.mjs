@@ -16,12 +16,17 @@ const script = fileURLToPath(new URL('./build-media-manifest.mjs', import.meta.u
 
 async function mockDam() {
   const uploads = [];
+  const requests = [];
   let originalAvailable = true;
   const server = createServer((req, res) => {
     const chunks = [];
+    requests.push(`${req.method} ${req.url}`);
     req.on('data', (chunk) => chunks.push(chunk));
     req.on('end', () => {
-      if (req.url === '/master.jpg') {
+      if (req.url === '/Epiq-colours-EN.mp4') {
+        res.writeHead(200, { 'content-type': 'video/mp4', 'content-length': '8' });
+        res.end(req.method === 'HEAD' ? undefined : 'MP4-CLIP');
+      } else if (req.url === '/master.jpg') {
         if (!originalAvailable) { res.writeHead(404); res.end(); return; }
         res.writeHead(200, { 'content-type': 'image/jpeg', 'content-length': '8' });
         res.end(req.method === 'HEAD' ? undefined : 'ORIGINAL');
@@ -51,6 +56,7 @@ async function mockDam() {
   return {
     base: `http://127.0.0.1:${server.address().port}`,
     uploads,
+    requests,
     setOriginalAvailable(value) { originalAvailable = value; },
     async close() { await new Promise((resolve) => { server.close(resolve); }); },
   };
@@ -255,6 +261,93 @@ test('a linked PDF is tracked as a document row, then ingested to the DAM as the
 
     await exec(process.execPath, damArgs, options);
     assert.equal(dam.uploads.length, 1, 're-run does not upload twice');
+  } finally {
+    await dam.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('a linked MP4 is tracked as a video row (nothing fetched), then ingested to the DAM from the manifest (SKODA-503)', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-media-video-'));
+  const dam = await mockDam();
+  try {
+    const mp4 = `${dam.base}/Epiq-colours-EN.mp4`;
+    const id = logicalId(mp4);
+    const manifest = path.join(dir, 'manifest.json');
+    const content = path.join(dir, 'content', 'en', 'videos');
+    mkdirSync(content, { recursive: true });
+    const page = path.join(content, 'epiq-colours-en.plain.html');
+    writeFileSync(page, `<div><h1>Epiq colours</h1><p><a href="${mp4}">Download video</a></p></div>`);
+    const options = { cwd: dir, env: { ...process.env, AEM_DAM_TOKEN: 'mock' } };
+
+    // 1. The import-time (delivery-only) run just RECORDS the row — no fetch, no upload.
+    await exec(process.execPath, [script, '--pages', page, '--manifest', manifest], options);
+    let row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(row.kind, 'video');
+    assert.equal(row.title, 'Download video');
+    assert.deepEqual(row.steps, { deliver: 'n/a', dam: 'n/a', da: 'n/a' });
+    assert.equal(row.status, 'done');
+    assert.equal(row.delivery_url, '', 'the page keeps its source link');
+    assert.deepEqual(row.page_refs, ['en/videos/epiq-colours-en']);
+    assert.equal(dam.requests.length, 0, 'recording a video row makes no network request');
+
+    // 2. On a developer machine: DAM ingest straight from the committed manifest
+    //    (content/ is not in the checkout), uploading the ORIGINAL mp4.
+    const damArgs = [script, '--from-manifest', '--manifest', manifest, '--dam-base', dam.base];
+    await exec(process.execPath, damArgs, options);
+    row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.deepEqual(dam.uploads, ['MP4-CLIP']);
+    assert.equal(row.steps.dam, 'done');
+    assert.match(row.dam_asset_path, /\/content\/dam\/storyboard\/en\/videos\/epiq-colours-en\/Epiq-colours-EN\.mp4$/);
+    assert.equal(row.dam_original_url, mp4);
+
+    await exec(process.execPath, damArgs, options);
+    assert.equal(dam.uploads.length, 1, 're-run does not upload twice');
+  } finally {
+    await dam.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('an MP4 in <video>/<source> markup is tracked too, not only <a href> links', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-media-video-tag-'));
+  try {
+    const mp4 = 'https://cdn.example.test/2026/05/Hero-loop.mp4';
+    const manifest = path.join(dir, 'manifest.json');
+    const content = path.join(dir, 'content', 'en');
+    mkdirSync(content, { recursive: true });
+    const page = path.join(content, 'story.plain.html');
+    writeFileSync(page, `<div><video controls title="Hero loop"><source src="${mp4}" type="video/mp4"></video></div>`);
+
+    await exec(process.execPath, [script, '--pages', page, '--manifest', manifest], { cwd: dir });
+    const row = JSON.parse(readFileSync(manifest, 'utf8')).rows[logicalId(mp4)];
+    assert.equal(row.kind, 'video');
+    assert.equal(row.source_url, mp4);
+    assert.deepEqual(row.page_refs, ['en/story']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('--linked-only backfills PDF + MP4 rows without touching images or the network', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-media-linked-only-'));
+  const dam = await mockDam();
+  try {
+    const img = `${dam.base}/master.jpg`;
+    const pdf = `${dam.base}/TD-Kodiaq-en.pdf`;
+    const mp4 = `${dam.base}/Epiq-colours-EN.mp4`;
+    const manifest = path.join(dir, 'manifest.json');
+    const content = path.join(dir, 'content', 'en');
+    mkdirSync(content, { recursive: true });
+    const page = path.join(content, 'mixed.plain.html');
+    writeFileSync(page, `<div><p><img src="${img}" alt="Car"></p>`
+      + `<p><a href="${pdf}">Technical data</a></p><p><a href="${mp4}">Video</a></p></div>`);
+
+    await exec(process.execPath, [script, '--pages', page, '--manifest', manifest, '--linked-only'], { cwd: dir });
+    const { rows } = JSON.parse(readFileSync(manifest, 'utf8'));
+    assert.deepEqual(Object.values(rows).map((r) => r.kind).sort(), ['document', 'video']);
+    assert.equal(rows[logicalId(img)], undefined, 'images are left to the normal build');
+    assert.equal(dam.requests.length, 0, 'backfill is zero-network');
   } finally {
     await dam.close();
     rmSync(dir, { recursive: true, force: true });

@@ -12,6 +12,14 @@
  *     [--dam-folder /content/dam/storyboard] \
  *     [--da-archive] [--org skoda-storyboard --repo demo] \
  *     [--concurrency 4] [--dry-run] [--force] [--limit N] [--min-image-edge 768]
+ *     [--linked-only]
+ *
+ * Linked assets (SKODA-503): PDFs (`document`) and MP4s (`video`) referenced by the
+ * pages (<a href>, <video src>, <source src>) get DAM-only rows — no delivery step,
+ * the page keeps its source link. A delivery-only run just RECORDS them (nothing is
+ * fetched), so the committed manifest is the handoff for a later `--from-manifest
+ * --dam-base …` run on a developer machine. `--linked-only` records only these rows
+ * (skips images entirely, zero network) — for backfilling already-migrated pages.
  *
  * Per distinct LOGICAL image (path-qualified id, F3) referenced by the pages:
  *   1. dedup to the logical master; first PAGE that references it owns the DAM folder
@@ -32,8 +40,8 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 import {
-  isImageUrl, isDocumentUrl, cleanUrl, masterUrl, logicalId, daPathFor, damPathFor,
-  pagePathFromFile, isAspectCrop,
+  isImageUrl, linkedAssetKind, isLinkedAssetKind, linkedAssetType, linkedAssetOriginalUrl,
+  masterUrl, logicalId, daPathFor, damPathFor, pagePathFromFile, isAspectCrop,
   pickIngestUrl, headBytes, fetchBinary, uploadToDA, uploadToDAM, setDamMetadata, resolveDamToken,
   needsMediaBuild, stepDownTooSmall, renditionEdge, OVERSIZE_BYTES, MIN_RENDITION_EDGE,
 } from './media-lib.mjs';
@@ -57,6 +65,7 @@ function parseArgs() {
     force: false,
     daArchive: false,
     fromManifest: false,
+    linkedOnly: false,
     idsFile: '',
     limit: Infinity,
     minEdge: MIN_RENDITION_EDGE,
@@ -67,6 +76,7 @@ function parseArgs() {
     if (a === '--force') { out.force = true; continue; }
     if (a === '--da-archive') { out.daArchive = true; continue; }
     if (a === '--from-manifest') { out.fromManifest = true; continue; }
+    if (a === '--linked-only') { out.linkedOnly = true; continue; }
     if (a === '--pages') {
       while (args[i + 1] && !args[i + 1].startsWith('--')) { out.pages.push(args[i + 1]); i += 1; }
       continue;
@@ -113,17 +123,26 @@ function extractImageRefs(html) {
   return refs;
 }
 
-/** Extract linked-document refs (<a href="….pdf">title</a>) from imported .plain.html. */
-function extractDocumentRefs(html) {
+/**
+ * Extract linked-asset refs (PDF/MP4) from imported .plain.html: `<a href>` links
+ * (title = link text) plus `<video src>` / `<source src>` (title = title attr), so the
+ * convention holds whichever markup a template emits. Each ref carries its kind.
+ */
+function extractLinkedAssetRefs(html) {
   const refs = [];
+  const text = (s) => s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const add = (rawUrl, title) => {
+    const url = rawUrl.replace(/&amp;/g, '&');
+    const kind = linkedAssetKind(url);
+    if (kind) refs.push({ url, title, kind });
+  };
   const linkRe = /<a\b[^>]*\shref="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+  const mediaRe = /<(?:video|source)\b[^>]*\ssrc="([^"]+)"[^>]*>/gi;
   let m;
   // eslint-disable-next-line no-cond-assign
-  while ((m = linkRe.exec(html)) !== null) {
-    const url = m[1].replace(/&amp;/g, '&');
-    if (!isDocumentUrl(url)) continue;
-    refs.push({ url, title: m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() });
-  }
+  while ((m = linkRe.exec(html)) !== null) add(m[1], text(m[2]));
+  // eslint-disable-next-line no-cond-assign
+  while ((m = mediaRe.exec(html)) !== null) add(m[1], (m[0].match(/\stitle="([^"]*)"/i) || [])[1] || '');
   return refs;
 }
 
@@ -176,11 +195,12 @@ async function main() {
     // store). Reuses each row's own dam_page_path/alt so foldering is unchanged.
     for (const row of Object.values(manifest.rows || {})) {
       const src = row.source_url;
-      const isDocument = row.kind === 'document';
-      if (!src || !(isDocument ? isDocumentUrl(src) : isImageUrl(src))) continue;
+      const linked = isLinkedAssetKind(row.kind);
+      if (!src || !(linked ? linkedAssetKind(src) === row.kind : isImageUrl(src))) continue;
+      if (cfg.linkedOnly && !linked) continue;
       const id = row.logical_id || logicalId(src);
       byLogical.set(id, {
-        kind: isDocument ? 'document' : 'image',
+        kind: linked ? row.kind : 'image',
         title: row.title || '',
         sourceUrl: src,
         alt: row.alt || '',
@@ -195,7 +215,7 @@ async function main() {
       const abs = path.resolve(page);
       const pagePath = pagePathFromFile(abs);
       const html = readFileSync(abs, 'utf8');
-      for (const ref of extractImageRefs(html)) {
+      for (const ref of cfg.linkedOnly ? [] : extractImageRefs(html)) {
         if (ref.alt === null || !ref.alt.trim()) {
           console.warn(`[media] ${ref.alt === null ? 'missing' : 'empty'} alt: ${pagePath} ${ref.url}`);
         }
@@ -220,7 +240,7 @@ async function main() {
           });
         }
       }
-      for (const ref of extractDocumentRefs(html)) {
+      for (const ref of extractLinkedAssetRefs(html)) {
         if (!/^https?:\/\//i.test(ref.url)) continue;
         const id = logicalId(ref.url);
         const existing = byLogical.get(id);
@@ -230,7 +250,7 @@ async function main() {
           if (!existing.title && ref.title) existing.title = ref.title;
         } else {
           byLogical.set(id, {
-            kind: 'document',
+            kind: ref.kind,
             title: ref.title,
             sourceUrl: ref.url,
             alt: '',
@@ -259,7 +279,7 @@ async function main() {
   }
   logicalIds = logicalIds.slice(0, cfg.limit);
   const srcLabel = cfg.fromManifest ? 'from manifest' : `across ${cfg.pages.length} page(s)`;
-  console.log(`[media] ${logicalIds.length} distinct logical image(s) ${srcLabel}`);
+  console.log(`[media] ${logicalIds.length} distinct logical ${cfg.linkedOnly ? 'PDF/MP4 asset' : 'media item'}(s) ${srcLabel}`);
   console.log(`[media] DAM: ${damConfig ? `${damConfig.baseUrl}${damConfig.folder} (token: ${damToken ? 'present' : 'dry-run only'})` : 'not configured'}`);
   console.log(`[media] DA archive: ${cfg.daArchive ? 'on' : 'off'}  ·  concurrency: ${cfg.concurrency}`);
   if (cfg.dryRun) console.log('[media] DRY RUN — no fetch/upload/write');
@@ -276,10 +296,12 @@ async function main() {
     done: 0, skipped: 0, failed: 0, precond: 0,
   };
 
-  // A linked document (PDF, SKODA-208) is tracked for the DAM only: no delivery rendition
-  // (the page keeps its source link), no DA archive. Delivery-only runs record the row
-  // (dam: n/a); a --dam-base run uploads the original PDF under the page-mirrored path.
-  async function processDocument(id, info, prior) {
+  // A linked asset (PDF `document` / MP4 `video`, SKODA-503/208) is tracked for the DAM
+  // only: no delivery rendition (the page keeps its source link), no DA archive.
+  // Delivery-only runs just record the row (dam: n/a, nothing fetched); a --dam-base run
+  // uploads the original under the page-mirrored path.
+  async function processLinkedAsset(id, info, prior) {
+    const type = linkedAssetType(info.kind);
     const pagePath = (prior && prior.dam_page_path) || info.ownerPage;
     const damAssetPath = damConfig ? damPathFor(info.sourceUrl, { damFolder: cfg.damFolder, pagePath }) : '';
     const storedInDam = prior?.steps?.dam === 'done' && (!cfg.force || !damConfig);
@@ -287,10 +309,10 @@ async function main() {
     if (damConfig) damStep = storedInDam ? 'done' : 'pending';
     const row = {
       ...prior,
-      kind: 'document',
+      kind: info.kind,
       logical_id: id,
       source_url: info.sourceUrl,
-      master_url: cleanUrl(info.sourceUrl),
+      master_url: linkedAssetOriginalUrl(info.sourceUrl), // plain CDN object, not /direct-download/
       dam_page_path: pagePath,
       page_refs: [...new Set([...(prior?.page_refs || []), ...info.pageRefs])],
       dam_asset_path: storedInDam ? prior.dam_asset_path : '',
@@ -312,15 +334,15 @@ async function main() {
       const bytes = damConfig && damStep !== 'done' ? await headBytes(row.master_url) : null;
       const unavailable = damConfig && damStep !== 'done' && !(Number.isFinite(bytes) && bytes > 0);
       if (unavailable) counts.failed += 1;
-      console.log(`  · ${id}  document${unavailable ? ' [original unavailable]' : ''} → DAM ${damAssetPath || '(n/a)'}`);
+      console.log(`  · ${id}  ${info.kind}${unavailable ? ' [original unavailable]' : ''} → DAM ${damAssetPath || '(n/a)'}`);
       return;
     }
 
     try {
       if (damConfig && row.steps.dam !== 'done') {
         const got = await fetchBinary(row.master_url);
-        if (!got.bytes || !/^application\/pdf/i.test(got.contentType)) {
-          throw new Error(`Original is not a non-empty PDF: ${row.master_url}`);
+        if (!got.bytes || !type.mime.test(got.contentType)) {
+          throw new Error(`Original is not a non-empty ${type.label}: ${row.master_url}`);
         }
         row.bytes = got.bytes;
         row.dam_original_url = row.master_url;
@@ -352,7 +374,7 @@ async function main() {
       const allOk = !damConfig || row.steps.dam === 'done';
       row.status = allOk ? 'done' : 'partial';
       if (allOk) counts.done += 1; else counts.failed += 1;
-      console.log(`  ${allOk ? '✓' : '⚠'} ${id}  document → ${row.dam_asset_path ? `DAM:${row.dam_asset_path}` : 'tracked (DAM pending)'}`);
+      console.log(`  ${allOk ? '✓' : '⚠'} ${id}  ${info.kind} → ${row.dam_asset_path ? `DAM:${row.dam_asset_path}` : 'tracked (DAM pending)'}`);
     } catch (err) {
       row.status = 'partial';
       if (damConfig) row.steps.dam = 'error';
@@ -387,8 +409,8 @@ async function main() {
       counts.skipped += 1;
       return;
     }
-    if (info.kind === 'document') {
-      await processDocument(id, info, prior);
+    if (isLinkedAssetKind(info.kind)) {
+      await processLinkedAsset(id, info, prior);
       return;
     }
 

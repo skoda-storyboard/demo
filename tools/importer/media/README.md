@@ -34,6 +34,47 @@ block (SKODA-505) reads this to resolve "download original".
 > a **post-M1-demo decision**. The resolver is a single seam, so switching its
 > source to DM/OpenAPI later is a config change, not a cart rebuild.
 
+## Linked assets (PDF, MP4): tracked here, ingested on a developer machine
+
+**Convention (SKODA-503):** every PDF and MP4 that a migrated page references gets
+a row in the committed `media-manifest.json`, just like its images, so the DAM
+migration can run later on a developer machine rather than in the agent environment.
+
+- **What's tracked:** `<a href>` links plus `<video src>` / `<source src>`. PDFs
+  become `kind: "document"` rows and MP4s become `kind: "video"` rows. Each row
+  records the source URL, link title, owning page (`dam_page_path`) and every
+  referencing page (`page_refs`).
+- **No delivery step, nothing fetched at import time.** The page keeps its source
+  link (MP4s stay plain links for the pilot; the signed-download flow is SKODA-902).
+  A delivery-only run only *records* the row (`steps.dam: "n/a"`), so tracking is
+  free and needs no credentials.
+- **Commit the manifest with the import.** `content/` isn't in a code checkout,
+  so the manifest is the only handoff to the developer who runs the DAM ingest.
+- **Recording is automatic** after every agent-run bulk import (see the hook
+  below). For a terminal/CI import, run `npm run media:build -- --pages …` yourself.
+- **Backfill already-migrated pages** without touching images or the network:
+  `npm run media:build -- --linked-only --pages content/en/**/*.plain.html`.
+- **Check coverage:** `npm run media:audit` reports `untrackedDocuments` /
+  `untrackedVideos` (not in the manifest) and `pendingDamDocument` /
+  `pendingDamVideo` (tracked, original not yet in the DAM).
+
+**On the developer machine** (DAM token in `AEM_DAM_TOKEN` or a gitignored
+token file; see *Auth* below), ingest from the manifest with no page files needed:
+
+```bash
+npm run media:build -- --from-manifest --linked-only \
+  --dam-base https://author-p220607-e2281243.adobeaemcloud.com \
+  --dam-folder /content/dam/storyboard --dry-run
+# Review (the dry run HEAD-checks each original), then repeat without --dry-run.
+# Use --ids-file to freeze an approved set; commit the updated manifest afterwards.
+```
+
+The original is fetched, checked against its expected MIME type (`application/pdf`
+or `video/mp4`), and uploaded under the page-mirrored path
+`/content/dam/storyboard/<page-path>/<file>`. Re-runs are idempotent. MP4s are
+large (tens of MB each), so run the ingest on a machine with good bandwidth.
+Embedded Vimeo/YouTube/podcast media isn't a file and is out of scope (SKODA-204).
+
 ## What `build-media-manifest.mjs` does (per distinct logical image)
 
 1. **Dedup — path-qualified logical id** (F3): `<pathhash8>__<master-basename>`,
@@ -204,9 +245,10 @@ content import** in this harness — no need to remember it:
   silent no-op).
 - Reads the runner's `✅ Saved content to <path>` lines to scope itself to the
   **pages just imported**, then runs `build` + `apply`.
-- **Incremental — new images only:** the manifest skips images already `done`, so
+- **Incremental — new media only:** the manifest skips images already `done`, so
   when an import brings no new images the step fetches/rewrites nothing (a genuine
-  no-op). It reports the count of new images it ingested.
+  no-op). New PDF/MP4 references are recorded as DAM-only rows (no fetch). It
+  reports the count of new rows it added.
 - **Delivery-only by design:** the auto step does the safe, no-credential work
   (manifest + media-bus rewrite + `media-index.json`). It never auto-uploads to
   the AEM DAM — that needs the token and hits the external instance, so it stays

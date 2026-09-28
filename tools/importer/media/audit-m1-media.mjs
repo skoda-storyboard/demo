@@ -8,7 +8,7 @@ import path from 'node:path';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { JSDOM } from 'jsdom';
 import {
-  logicalId, isImageUrl, isDocumentUrl, OVERSIZE_BYTES,
+  logicalId, isImageUrl, linkedAssetKind, isLinkedAssetKind, OVERSIZE_BYTES,
 } from './media-lib.mjs';
 
 function args() {
@@ -76,27 +76,34 @@ function auditPage(pagePath, contentRoot, rows) {
       logicalId: row?.logical_id || (isImageUrl(src) && !alreadyDelivered ? logicalId(src) : null),
     };
   });
-  // Linked documents (the model Technical Data PDFs, SKODA-208): tracked for the DAM only.
-  const documents = [...doc.querySelectorAll('a[href]')]
-    .map((a) => a.getAttribute('href'))
-    .filter((href) => /^https?:/i.test(href) && isDocumentUrl(href))
+  // Linked assets tracked for the DAM only (SKODA-503): PDFs (`document`, incl. the
+  // SKODA-208 Technical Data PDFs) and MP4s (`video`), from links and <video>/<source>.
+  const linked = [
+    ...[...doc.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')),
+    ...[...doc.querySelectorAll('video[src], source[src]')].map((el) => el.getAttribute('src')),
+  ]
+    .filter((href) => /^https?:/i.test(href) && linkedAssetKind(href))
     .map((href) => {
+      const kind = linkedAssetKind(href);
       const row = rows[logicalId(href)];
       return {
         href,
-        tracked: row?.kind === 'document',
+        kind,
+        tracked: row?.kind === kind,
         original: row?.steps?.dam === 'done' && row.dam_asset_path ? 'dam' : 'pending',
       };
     });
+  const documents = linked.filter((asset) => asset.kind === 'document');
+  const videos = linked.filter((asset) => asset.kind === 'video');
   const actual = new Set(images.map((img) => img.logicalId).filter(Boolean));
   const expected = Object.values(rows).filter((row) => {
     const refs = row.page_refs || [row.dam_page_path];
-    return refs.includes(pagePath) && row.logical_id && row.kind !== 'document';
+    return refs.includes(pagePath) && row.logical_id && !isLinkedAssetKind(row.kind);
   });
   const missingImages = expected.filter((row) => !actual.has(row.logical_id))
     .map((row) => row.logical_id);
   return {
-    path: pagePath, status: 'present', images, documents, missingImages,
+    path: pagePath, status: 'present', images, documents, videos, missingImages,
   };
 }
 
@@ -107,6 +114,7 @@ function main() {
   const pages = urls.map((url) => auditPage(url.slice(1), cfg.contentRoot, rows));
   const all = pages.flatMap((page) => page.images);
   const docs = pages.flatMap((page) => page.documents);
+  const videos = pages.flatMap((page) => page.videos || []);
   const summary = {
     expectedPages: urls.length,
     presentPages: pages.filter((page) => page.status === 'present').length,
@@ -122,13 +130,17 @@ function main() {
     documents: docs.length,
     untrackedDocuments: docs.filter((d) => !d.tracked).length,
     pendingDamDocument: docs.filter((d) => d.original === 'pending').length,
+    videos: videos.length,
+    untrackedVideos: videos.filter((v) => !v.tracked).length,
+    pendingDamVideo: videos.filter((v) => v.original === 'pending').length,
   };
   const report = { summary, pages };
   if (cfg.out) writeFileSync(cfg.out, JSON.stringify(report, null, 2));
   console.log(JSON.stringify(summary));
   if (summary.missingPages || summary.missingFromPage || summary.misplaced
     || summary.missingCaption || summary.unresolvedDelivery || summary.pendingDamOriginal
-    || summary.untrackedDocuments || summary.pendingDamDocument) {
+    || summary.untrackedDocuments || summary.pendingDamDocument
+    || summary.untrackedVideos || summary.pendingDamVideo) {
     process.exitCode = 1;
   }
 }

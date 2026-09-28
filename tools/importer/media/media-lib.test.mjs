@@ -12,7 +12,57 @@ import {
   damPathFor, pagePathFromFile, splitBuffer, imageSize, ratiosDiffer,
   uploadToDAM, ensureDamFolder, resolveDamToken,
   needsMediaBuild, OVERSIZE_BYTES, belowMinEdge, stepDownTooSmall, pickIngestUrl, renditionEdge,
+  linkedAssetKind, isLinkedAssetKind, headBytes, linkedAssetOriginalUrl,
 } from './media-lib.mjs';
+
+test('a gated /direct-download/ link resolves to its plain CDN original; other URLs pass through', () => {
+  assert.equal(
+    linkedAssetOriginalUrl('https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_octavia_turns_30-1080p_b0e9968c.mp4'),
+    'https://cdn.skoda-storyboard.com/2026/08/Skoda_octavia_turns_30-1080p_b0e9968c.mp4',
+  );
+  assert.equal(
+    linkedAssetOriginalUrl('https://cdn.skoda-storyboard.com/2020/11/TD-KAROQ-en.pdf?x=1'),
+    'https://cdn.skoda-storyboard.com/2020/11/TD-KAROQ-en.pdf',
+  );
+});
+
+test('headBytes asks for identity encoding, so a gzipping CDN still reports the original size', async () => {
+  // Mimics the source CDN: with gzip allowed it compresses and drops content-length.
+  const server = createServer((req, res) => {
+    if (/gzip|br/.test(req.headers['accept-encoding'] || '')) {
+      res.writeHead(200, { 'content-type': 'application/pdf', 'content-encoding': 'gzip' });
+    } else {
+      res.writeHead(200, { 'content-type': 'application/pdf', 'content-length': '416478' });
+    }
+    res.end();
+  });
+  await new Promise((resolve) => { server.listen(0, '127.0.0.1', resolve); });
+  try {
+    assert.equal(await headBytes(`http://127.0.0.1:${server.address().port}/TD-KAROQ-en.pdf`), 416478);
+  } finally {
+    await new Promise((resolve) => { server.close(resolve); });
+  }
+});
+
+test('linked assets: PDF → document, MP4 → video, images and pages → null (SKODA-503)', () => {
+  assert.equal(linkedAssetKind('https://cdn.example.test/2024/04/TD-Kodiaq-en.pdf'), 'document');
+  assert.equal(linkedAssetKind('https://cdn.example.test/2026/05/Epiq_colours_EN_1d57bbaa.mp4'), 'video');
+  assert.equal(linkedAssetKind('https://cdn.example.test/2018/03/ext-aero-mot..mp4?dl=1#t=5'), 'video');
+  assert.equal(linkedAssetKind('https://cdn.example.test/a.jpg'), null);
+  assert.equal(linkedAssetKind('https://www.example.test/en/videos/clip'), null);
+  assert.equal(isLinkedAssetKind('video'), true);
+  assert.equal(isLinkedAssetKind('document'), true);
+  assert.equal(isLinkedAssetKind('image'), false);
+});
+
+test('a video row, like a document row, only needs work when a DAM ingest is requested', () => {
+  const row = { kind: 'video', status: 'done', steps: { deliver: 'n/a', dam: 'n/a', da: 'n/a' } };
+  assert.equal(needsMediaBuild(row), false, 'delivery-only: nothing to do (no delivery step)');
+  assert.equal(needsMediaBuild(row, { dam: true }), true);
+  assert.equal(needsMediaBuild({
+    ...row, steps: { ...row.steps, dam: 'done' }, dam_asset_path: '/content/dam/storyboard/en/x.mp4',
+  }, { dam: true }), false);
+});
 
 test('delivery-only rows resume when DAM ingest is requested, without a blanket force', () => {
   const row = {

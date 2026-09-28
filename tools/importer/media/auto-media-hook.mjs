@@ -94,12 +94,12 @@ async function main() {
   // Surface a short note to the agent (stderr; never fail the tool).
   const lines = [
     '[auto-media] wired media step ran after content import',
-    `  pages: ${pages.length} · new images this run: ${newImages >= 0 ? newImages : 'n/a'}`,
+    `  pages: ${pages.length} · new manifest rows this run (images + PDF/MP4): ${newImages >= 0 ? newImages : 'n/a'}`,
     build.status === 0 ? '  build: ok (delivery-only; DAM ingest stays explicit)' : `  build: exit ${build.status}`,
     apply.status === 0 ? '  apply: ok (media-bus rewrite + media-index.json)' : `  apply: exit ${apply.status}`,
     newImages > 0
-      ? '  → NEW images ingested to media bus. To also store originals in the AEM DAM, run: npm run media:build -- --dam-base <host> --dam-folder /content/dam/storyboard'
-      : '  → no new images; delivery rewrite is a no-op.',
+      ? '  → NEW rows recorded (PDF/MP4 are DAM-only rows). Commit media-manifest.json; the DAM ingest runs on a developer machine: npm run media:build -- --from-manifest --dam-base <host> --dam-folder /content/dam/storyboard'
+      : '  → no new media; delivery rewrite is a no-op.',
   ];
   process.stderr.write(`${lines.join('\n')}\n`);
 }

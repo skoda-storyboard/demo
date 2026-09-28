@@ -26,9 +26,15 @@ const DERIVATIVE_SUFFIX_RE = /-\d{2,5}x\d{2,5}(?=\.[a-z0-9]+$)/i;
 
 const IMAGE_EXT_RE = /\.(jpe?g|png|gif|webp|avif|svg)$/i;
 
-// Linked documents tracked for the DAM (SKODA-208: the model Technical Data PDFs). They
-// have no media-bus delivery (the page keeps the source link until the DAM ingest).
-const DOCUMENT_EXT_RE = /\.pdf$/i;
+// Linked (non-image) binaries tracked for the DAM (SKODA-503; SKODA-208 for the model
+// Technical Data PDFs). They have no media-bus delivery: the page keeps its source link
+// and the manifest row records the original for a later explicit `--dam-base` run.
+// kind → file extension + the MIME type the fetched original must have.
+const LINKED_ASSET_TYPES = {
+  document: { ext: /\.pdf$/i, mime: /^application\/pdf/i, label: 'PDF' },
+  video: { ext: /\.mp4$/i, mime: /^video\/mp4/i, label: 'MP4' },
+};
+const DOCUMENT_EXT_RE = LINKED_ASSET_TYPES.document.ext;
 
 // Content-bus 409 threshold: masters over ~10 MB 409 the content bus on publish
 // (SKODA-506, build-confirmed). Pre-condition the DELIVERY image by substituting
@@ -76,6 +82,35 @@ export function isDocumentUrl(url) {
   return DOCUMENT_EXT_RE.test(cleanUrl(url));
 }
 
+/** The linked-asset kind ('document' | 'video') of a URL, or null for anything else. */
+export function linkedAssetKind(url) {
+  const clean = cleanUrl(url);
+  return Object.keys(LINKED_ASSET_TYPES).find((kind) => LINKED_ASSET_TYPES[kind].ext.test(clean))
+    || null;
+}
+
+/** True for a manifest row kind that is tracked for the DAM only (no delivery step). */
+export function isLinkedAssetKind(kind) {
+  return Object.hasOwn(LINKED_ASSET_TYPES, kind);
+}
+
+/** Expected MIME pattern + display label for a linked-asset kind. */
+export function linkedAssetType(kind) {
+  return LINKED_ASSET_TYPES[kind];
+}
+
+// The source site's gated `/direct-download/<yyyy>/<mm>/<file>` route (SKODA-503)
+// redirects to a signed, expiring S3 URL served as application/octet-stream. The same
+// object is on the plain CDN at `/<yyyy>/<mm>/<file>` with its real type and size.
+const DIRECT_DOWNLOAD_RE = /^https?:\/\/(?:www\.)?skoda-storyboard\.com\/direct-download\/(.+)$/i;
+
+/** The fetchable original for a linked asset: the plain CDN object, never the gated route. */
+export function linkedAssetOriginalUrl(url) {
+  const clean = cleanUrl(url);
+  const m = clean.match(DIRECT_DOWNLOAD_RE);
+  return m ? `https://cdn.skoda-storyboard.com/${m[1]}` : clean;
+}
+
 /** The `-WxH` suffix on a filename, or null. */
 export function derivativeSuffix(url) {
   const m = urlBasename(url).match(/-(\d{2,5}x\d{2,5})(?=\.[a-z0-9]+$)/i);
@@ -111,8 +146,8 @@ export function needsMediaBuild(row, {
   dam = false, da = false, force = false, minEdge = MIN_RENDITION_EDGE,
 } = {}) {
   if (force || !row || row.status !== 'done') return true;
-  // A document row has no delivery step; only the DAM original can be outstanding.
-  if (row.kind === 'document') return dam && (row.steps?.dam !== 'done' || !row.dam_asset_path);
+  // A linked-asset row (PDF/MP4) has no delivery step; only the DAM original can be outstanding.
+  if (isLinkedAssetKind(row.kind)) return dam && (row.steps?.dam !== 'done' || !row.dam_asset_path);
   if (row.steps?.deliver !== 'done' || !row.delivery_url
     || !Number.isFinite(row.bytes) || row.bytes > OVERSIZE_BYTES) return true;
   if (stepDownTooSmall(row, minEdge)) return true;
@@ -309,7 +344,11 @@ export async function headBytes(url, { timeoutMs = 20000 } = {}) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(url, { method: 'HEAD', signal: controller.signal });
+    // identity: the CDN gzips compressible originals (PDFs) and then omits
+    // content-length, which read as "unavailable"; we want the original's byte size.
+    const res = await fetch(url, {
+      method: 'HEAD', headers: { 'accept-encoding': 'identity' }, signal: controller.signal,
+    });
     if (!res.ok) return null;
     const len = res.headers.get('content-length');
     return len ? Number(len) : null;

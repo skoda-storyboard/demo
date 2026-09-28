@@ -111,6 +111,9 @@ The input URL list for the run.
 # 1) Run the bundled importer over its URL list (run-bulk-import.js from the
 #    content-import skill drives the *.bundle.js). Output lands in content/<path>.plain.html
 # 2) Prepare delivery images; fail if any requested page/image cannot be resolved.
+#    The same build records every linked PDF/MP4 as a DAM-only manifest row (no fetch).
+#    Commit tools/importer/media/media-manifest.json with the import: it is the handoff
+#    for the DAM ingest, which runs on a developer machine (media README, "Linked assets").
 npm run media:build -- --pages content/<path>.plain.html
 npm run media:apply -- --pages content/<path>.plain.html
 # 3) Validate metadata + the pending-block contract, then inspect locally against previewed DA content.
