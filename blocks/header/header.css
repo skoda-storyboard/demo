@@ -885,3 +885,8 @@ header nav .nav-search .search-suggest-meta {
     transform: rotate(135deg);
   }
 }
+
+/* Media Room side: the active section tab text is ink #161718, not the Storyboard black (measured SKODA-309) */
+header .header[data-section='media-room'] .nav-section-switcher li.active a {
+  color: var(--skoda-ink);
+}
