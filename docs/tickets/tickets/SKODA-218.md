@@ -73,6 +73,8 @@ as dark, and that their headings, links, cards, and controls are legible.
   Keep only social-specific values with the Cards (social) variant.
 - **Every home section is capped at 1440px on live, light ones too** (e.g. "Models" at x240 w1440 at 1920). Ours
   are full width. Cap them with the same shared rule (or record the light sections on SKODA-611b).
+  → Done in SKODA-611a: light home bands are `Style: cover-box` sections, and `.section.cover-box` is the shared
+  1440px cap. The dark-band padding and margins are keyed on `.cover-box.dark`.
 
 ## Dependencies
 - Upstream: SKODA-106 (tokens/section CSS).

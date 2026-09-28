@@ -128,8 +128,18 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // tools/importer/parsers/social-cards.js
+  // tools/importer/parsers/home-stories.js
   function parse3(element, { document: document2 }) {
+    const headingEl = element.querySelector(".search-results-heading, .search-results-header h2, .search-results-header h3");
+    const heading = headingEl ? headingEl.textContent.trim() : "";
+    const rows = [["Stories"]];
+    if (heading) rows.push(["heading", heading]);
+    rows.push(["template", "story"], ["path", "/en/"], ["offset", "3"]);
+    element.replaceWith(WebImporter.DOMUtils.createTable(rows, document2));
+  }
+
+  // tools/importer/parsers/social-cards.js
+  function parse4(element, { document: document2 }) {
     const seen = /* @__PURE__ */ new Set();
     const links = [...element.querySelectorAll(
       ".search-results-item a[href], .search-results-items a[href]"
@@ -244,7 +254,6 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/transformers/skoda-dark-bands.js
-  var DARK_BAND_SELECTOR = ".cover-box.dark:not(.socials-static)";
   var DARK_BAND_STYLE = "cover-box, dark";
   function hasContent(el) {
     return !!el && ((el.textContent || "").trim() !== "" || !!el.querySelector("img, picture, iframe, table"));
@@ -255,18 +264,26 @@ var CustomImportScript = (() => {
     }
     return false;
   }
+  var isBreak = (el) => !!el && el.tagName === "HR";
   function transform2(hookName, element, payload) {
     if (hookName !== "beforeTransform") return;
     const doc = element.ownerDocument;
-    const style = payload && payload.template && payload.template.darkBandStyle || DARK_BAND_STYLE;
-    [...element.querySelectorAll(DARK_BAND_SELECTOR)].forEach((band) => {
+    const template = payload && payload.template || {};
+    const darkStyle = template.darkBandStyle || DARK_BAND_STYLE;
+    const lightStyle = template.lightBandStyle || "";
+    const selector = lightStyle ? ".cover-box:not(.socials-static)" : ".cover-box.dark:not(.socials-static)";
+    [...element.querySelectorAll(selector)].forEach((band) => {
       if (!hasContent(band)) return;
-      if (hasContentBeside(band, element, "previousElementSibling")) band.before(doc.createElement("hr"));
+      if (!isBreak(band.previousElementSibling) && hasContentBeside(band, element, "previousElementSibling")) {
+        band.before(doc.createElement("hr"));
+      }
       band.append(WebImporter.Blocks.createBlock(doc, {
         name: "Section Metadata",
-        cells: { style }
+        cells: { style: band.classList.contains("dark") ? darkStyle : lightStyle }
       }));
-      if (hasContentBeside(band, element, "nextElementSibling")) band.after(doc.createElement("hr"));
+      if (!isBreak(band.nextElementSibling) && hasContentBeside(band, element, "nextElementSibling")) {
+        band.after(doc.createElement("hr"));
+      }
     });
   }
 
@@ -818,15 +835,19 @@ var CustomImportScript = (() => {
   // tools/importer/import-home-sto.js
   var parsers = {
     "promo-box": parse,
-    "home-rail": parse2
+    "home-rail": parse2,
+    "home-stories": parse3
   };
   var PAGE_TEMPLATE = {
     name: "home-sto",
-    description: "\u0160koda Storyboard home (template-homepage). Curated promo-box cards + index-driven Story Rails (home-rail) + the Social media band as Cards (social) (social-cards). Metadata template=page. Content-driven detection only.",
+    description: "\u0160koda Storyboard home (template-homepage). Curated promo-box cards + the Latest Stories feed (home-stories) + index-driven Story Rails (home-rail) + the Social media band as Cards (social) (social-cards), one section per source cover-box band. Metadata template=page. Content-driven detection only.",
     urls: ["https://www.skoda-storyboard.com/en/"],
     metadata: { template: "page" },
+    // every light .cover-box is its own section too (skoda-dark-bands, SKODA-611a)
+    lightBandStyle: "cover-box",
     blocks: [
       { name: "promo-box", instances: ["section.promo-box"] },
+      { name: "home-stories", instances: [".cover-box .search-results.latest-articles"] },
       { name: "home-rail", instances: ['.cover-box .search-results[class*="type-"]'] }
     ],
     sections: []
@@ -870,7 +891,7 @@ var CustomImportScript = (() => {
       const main = document2.body;
       document2.querySelectorAll(".socials-static").forEach((el) => {
         try {
-          parse3(el, { document: document2, url, params });
+          parse4(el, { document: document2, url, params });
         } catch (e) {
           console.error("Failed to parse social-cards (.socials-static):", e);
         }
