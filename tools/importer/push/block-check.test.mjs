@@ -91,10 +91,9 @@ test('classifyBlock: main block with supported variant', () => {
   assert.deepEqual(downloads.problems, []);
 });
 
-test('classifyBlock: pending variant of a main block (cards tiles, gallery slider, columns split)', () => {
+test('classifyBlock: tiles are on main; gallery slider and columns split remain pending', () => {
   const tiles = classifyBlock(one(block('cards overlay tiles', row('sq', 'x'))), CONTRACTS, CODE);
-  assert.equal(tiles.status, 'pending');
-  assert.equal(tiles.id, 'cards-tiles');
+  assert.equal(tiles.status, 'main');
   assert.equal(classifyBlock(one(block('gallery slider', row('x'))), CONTRACTS, CODE).id, 'gallery-slider');
   assert.equal(classifyBlock(one(block('columns split-62', row('a', 'b'))), CONTRACTS, CODE).id, 'columns-split');
 });
@@ -164,10 +163,14 @@ test('checkPage: pending ids de-duplicated; a pending BLOCK (no code) holds publ
   assert.equal(r.publishable, false); // quote.js would 404
 });
 
-test('checkPage: a readable pending VARIANT of a block on main may publish; broken holds', () => {
-  const tiles = checkPage(page(block('cards overlay tiles', row('sq', '<picture><img src="a.jpg"></picture>', '<a href="/en/a">A</a>'))), CONTRACTS, CODE);
+test('checkPage: implemented tiles may publish; broken pending config still holds', () => {
+  const tiles = checkPage(page(block(
+    'cards overlay tiles',
+    row('sq', '<picture><img src="a.jpg"></picture>', '<a href="/en/a">A</a>'),
+    row('sq', '<picture><img src="b.jpg"></picture>', '<a href="/en/b">B</a>'),
+  )), CONTRACTS, CODE);
   assert.equal(tiles.errors.length, 0);
-  assert.equal(tiles.publishable, false); // broken until 221: cards.js prints the size token
+  assert.equal(tiles.publishable, true);
   const sub = checkPage(page(block('story-rail', row('heading', 'News'), row('subheading', 'x'), row('template', 'story'))), CONTRACTS, CODE);
   assert.equal(sub.errors.length, 0);
   assert.deepEqual(sub.pending.map((p) => p.id), ['story-rail-subheading']);
@@ -175,6 +178,59 @@ test('checkPage: a readable pending VARIANT of a block on main may publish; brok
   const promo = checkPage(page(block('promo-box', row('<a href="/en/a"><img src="a.jpg"></a>', '<a href="/en/a">A</a>'))), CONTRACTS, CODE);
   assert.equal(promo.errors.length, 0);
   assert.equal(promo.publishable, true);
+});
+
+test('checkPage: press-kit legacy tokens block publication until shape-3 re-import', () => {
+  const legacy = page(block(
+    'cards overlay tiles',
+    row('feature', '<picture><img src="a.jpg"></picture>', '<a href="/en/a">A</a>'),
+    row('sq', '<picture><img src="b.jpg"></picture>', '<a href="/en/b">B</a>'),
+  ));
+  const result = checkPage(legacy, CONTRACTS, CODE, '/en/press-kits/epiq');
+  assert.equal(result.publishable, false);
+  assert.match(result.errors.join(' '), /re-import press-kit tiles with shape-3 size tokens/);
+
+  const motorsport = page(block(
+    'cards overlay tiles',
+    ...Array.from({ length: 24 }, (_, i) => row('sq', '<picture><img src="a.jpg"></picture>', `<a href="/en/${i}">${i}</a>`)),
+  ));
+  assert.equal(checkPage(motorsport, CONTRACTS, CODE, '/en/press-kits/motorsport').publishable, false);
+
+  const updated = page(block(
+    'cards overlay tiles',
+    row('feature', '<picture><img src="a.jpg"></picture>', '<a href="/en/a">A</a>'),
+    row('feature', '<picture><img src="b.jpg"></picture>', '<a href="/en/b">B</a>'),
+    row('press-square', '<picture><img src="c.jpg"></picture>', '<a href="/en/c">C</a>'),
+  ));
+  assert.equal(checkPage(updated, CONTRACTS, CODE, '/en/press-kits/epiq').publishable, true);
+});
+
+test('checkPage: tiles reject unknown sizes, overfilled rows and missing overlay', () => {
+  const invalid = page(block(
+    'cards overlay tiles',
+    row('sq', '<picture><img src="a.jpg"></picture>', '<a href="/en/a">A</a>'),
+    row('mystery', '<picture><img src="b.jpg"></picture>', '<a href="/en/b">B</a>'),
+  ));
+  assert.match(checkPage(invalid, CONTRACTS, CODE).errors.join(' '), /invalid size token/);
+  const overfill = page(block(
+    'cards overlay tiles',
+    row('sq', '<picture><img src="a.jpg"></picture>', '<a href="/en/a">A</a>'),
+    row('third', '<picture><img src="b.jpg"></picture>', '<a href="/en/b">B</a>'),
+    row('third', '<picture><img src="c.jpg"></picture>', '<a href="/en/c">C</a>'),
+  ));
+  assert.match(checkPage(overfill, CONTRACTS, CODE).errors.join(' '), /overfills/);
+  const noOverlay = page(block(
+    'cards tiles',
+    row('sq', '<picture><img src="a.jpg"></picture>', '<a href="/en/a">A</a>'),
+    row('sq', '<picture><img src="b.jpg"></picture>', '<a href="/en/b">B</a>'),
+  ));
+  assert.match(checkPage(noOverlay, CONTRACTS, CODE).errors.join(' '), /requires the overlay/);
+  const missingImage = page(block(
+    'cards overlay tiles',
+    row('sq', '', '<a href="/en/a">A</a>'),
+    row('sq', '<picture><img src="b.jpg"></picture>', '<a href="/en/b">B</a>'),
+  ));
+  assert.match(checkPage(missingImage, CONTRACTS, CODE).errors.join(' '), /expected \[size, picture, linked title\]/);
 });
 
 // ---- registry ---------------------------------------------------------------------------

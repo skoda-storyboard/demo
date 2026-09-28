@@ -10,6 +10,8 @@
  * and config tables may only use the keys the block (or its contract) reads.
  */
 
+import { layoutTileRows, TileLayoutError } from '../../../scripts/cards-tiles.js';
+
 const TAG = /<(\/?)div\b([^>]*)>/gi;
 
 /** Strip tags + collapse whitespace (enough for key cells and messages). */
@@ -225,11 +227,34 @@ export function classifyBlock(block, contracts, codeBlocks) {
  *   publishable = no errors, every pending entry has a readable fallback, and none is a block whose
  *   code is missing (its JS would 404 on the page; 208/801a require 0 block JS 404s).
  */
-export function checkPage(html, contracts, codeBlocks) {
+export function checkPage(html, contracts, codeBlocks, path = '') {
   const ignore = new Set(contracts.ignore || []);
   const blocks = parseBlocks(html)
     .filter((b) => !ignore.has(b.name))
-    .map((b) => classifyBlock(b, contracts, codeBlocks));
+    .map((b) => {
+      const result = classifyBlock(b, contracts, codeBlocks);
+      if (b.name === 'cards' && b.variants.includes('tiles')) {
+        if (!b.variants.includes('overlay')) result.problems.push('tiles requires the overlay variant');
+        const tokens = b.rows.map((row, index) => {
+          const omitted = row.cells.length === 2 && row.cells[0].media;
+          const [size, image, title] = omitted
+            ? [{ text: '' }, ...row.cells] : row.cells;
+          if (row.cells.length !== (omitted ? 2 : 3) || !image?.media
+            || !title?.link) {
+            result.problems.push(`row ${index + 1}: expected [size, picture, linked title]`);
+          }
+          return size?.text || '';
+        });
+        try {
+          layoutTileRows(tokens, { pressPage: path.includes('/press-kits/') });
+        } catch (e) {
+          if (!(e instanceof TileLayoutError)) throw e;
+          result.problems.push(e.message);
+        }
+        if (result.problems.length) result.status = 'error';
+      }
+      return result;
+    });
   const pending = [];
   const add = (p) => { if (!pending.some((x) => x.id === p.id)) pending.push(p); };
   blocks.filter((b) => b.status === 'pending').forEach((b) => add({
