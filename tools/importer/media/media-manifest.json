@@ -68145,12 +68145,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/Skoda_Epiq_Footage_01_HD_68aa554d.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Footage_01_HD_68aa554d.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/Skoda_Epiq_Footage_01_HD_68aa554d.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/Skoda_Epiq_Footage_01_HD_68aa554d.mp4",
+        "mime": "video/mp4",
+        "bytes": 897569483
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -68158,15 +68162,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Footage_01_HD_68aa554d.mp4"
       ],
-      "bytes": null,
+      "bytes": 897569483,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T21:07:44.388Z"
     },
     "c6d86b52__Skoda_Epiq_Footage_02_HD_bcda4348.mp4": {
       "kind": "video",
@@ -68209,12 +68217,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/Skoda_Epiq_Footage_First-Edition_01_HD_830e36e5.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Footage_First-Edition_01_HD_830e36e5.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/Skoda_Epiq_Footage_First-Edition_01_HD_830e36e5.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/Skoda_Epiq_Footage_First-Edition_01_HD_830e36e5.mp4",
+        "mime": "video/mp4",
+        "bytes": 706818321
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -68222,15 +68234,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Footage_First-Edition_01_HD_830e36e5.mp4"
       ],
-      "bytes": null,
+      "bytes": 706818321,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:47:24.274Z"
     },
     "c6d86b52__Skoda_Epiq_Footage_First-Edition_02_UHD_58aec896.mp4": {
       "kind": "video",
@@ -69479,12 +69495,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/videos/Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/videos/Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/videos/Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4",
+        "mime": "video/mp4",
+        "bytes": 1218248943
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -69492,15 +69512,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Footage_I_UHD_aa09ad60.mp4"
       ],
-      "bytes": null,
+      "bytes": 1218248943,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T21:36:07.058Z"
     },
     "c0387e27__Skoda_Peaq_Sportline_Footage_I_UHD_166b2150.mp4": {
       "kind": "video",
@@ -69543,12 +69567,16 @@
       "page_refs": [
         "en/press-kits/skoda-peaq-press-kit-2/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/videos/Skoda_Peaq_Footage_II_UHD_569780b0.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Footage_II_UHD_569780b0.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/videos/Skoda_Peaq_Footage_II_UHD_569780b0.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-peaq-press-kit-2/videos/Skoda_Peaq_Footage_II_UHD_569780b0.mp4",
+        "mime": "video/mp4",
+        "bytes": 801765926
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -69556,15 +69584,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_Peaq_Footage_II_UHD_569780b0.mp4"
       ],
-      "bytes": null,
+      "bytes": 801765926,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T20:55:54.455Z"
     },
     "9f34d7bf__Skoda_peaq___simply_clever___part_1-1080p-1_a3e05a13.mp4": {
       "kind": "video",
@@ -69975,12 +70007,16 @@
       "page_refs": [
         "en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/Enyaq_RS_Race_Footage_aba539fd.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2024/10/Enyaq_RS_Race_Footage_aba539fd.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/Enyaq_RS_Race_Footage_aba539fd.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/Enyaq_RS_Race_Footage_aba539fd.mp4",
+        "mime": "video/mp4",
+        "bytes": 1120949559
+      },
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -69988,15 +70024,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2024/10/Enyaq_RS_Race_Footage_aba539fd.mp4"
       ],
-      "bytes": null,
+      "bytes": 1120949559,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-28T21:19:18.839Z"
     },
     "68eff613__Enyaq_RS_Race_Idea_and_design_en_288844f3.mp4": {
       "kind": "video",
