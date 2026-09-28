@@ -13,7 +13,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   slugify, isoDate, cdnUrl, vimeoPoster, facetOptions, cardTerms, parseCards, mergeItems,
-  feedRow, feedSheet, itemSlug, FACETS,
+  feedRow, feedSheet, itemSlug, sourceOrder, FACETS,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 
@@ -107,6 +107,19 @@ test('merge: dedupe by source id, union terms, resolve slug collisions', () => {
   assert.equal(out.length, 2);
   assert.deepEqual(out[0].terms.model, ['peaq', 'epiq']);
   assert.equal(out[1].path, '/en/images/x-2');
+});
+
+test('merge keeps the source listing order across listings; same-day feed rows keep it', () => {
+  const item = (id, date) => ({
+    id, date, type: 'image', title: id, path: `/en/images/${id}`, slug: id, original: `/${id}.jpg`, terms: {},
+  });
+  // two filtered slices of one source order: 4 3 1 2 5 (4, 3, 1, 2 share a day)
+  const octavia = [item('4', '2025-06-23'), item('1', '2025-06-23'), item('5', '2025-06-01')];
+  const peaq = [item('3', '2025-06-23'), item('1', '2025-06-23'), item('2', '2025-06-23')];
+  const all = [item('4', '2025-06-23'), item('3', '2025-06-23')];
+  assert.deepEqual(sourceOrder([octavia, peaq, all]), ['4', '3', '1', '2', '5']);
+  const sheet = feedSheet(mergeItems([octavia, peaq, all]));
+  assert.deepEqual(sheet.data.map((r) => r.id), ['4', '3', '1', '2', '5'], 'not re-sorted by path');
 });
 
 test('image feed row: listing/rail columns, facets, download fields, thumbnail', { skip }, () => {

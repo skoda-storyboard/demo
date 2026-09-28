@@ -1,12 +1,14 @@
 {
-  "comment": "SKODA-608 source listing queries. Each renders `n` cards server-side (ajax_search_results_<type>=n). Items are merged by source id. Sized so the Peaq/Epiq rails fill (≥12 images each, all Peaq videos, all 9 Epiq videos) and a facet filter still leaves a load-more (>12) on both listings.",
+  "comment": "SKODA-608 source listing queries. Each renders `n` cards server-side (ajax_search_results_<type>=n). Items are merged by source id. Sized so the Peaq/Epiq rails fill (≥12 images each, all Peaq videos, all 9 Epiq videos) and a facet filter still leaves a load-more (>12) on both listings. Octavia (SKODA-208): the model page's Images/Videos rails show the 20 newest of each; 24 covers domain-restricted videos that are dropped.",
   "queries": [
     { "type": "image", "filter": { "model": "peaq" }, "n": 30 },
     { "type": "image", "filter": { "model": "epiq" }, "n": 30 },
     { "type": "image", "filter": { "model": "peaq", "view": "interior" }, "n": 12 },
+    { "type": "image", "filter": { "model": "octavia" }, "n": 24 },
     { "type": "image", "n": 24 },
     { "type": "video", "filter": { "model": "peaq" }, "n": 24 },
     { "type": "video", "filter": { "model": "epiq" }, "n": 24 },
+    { "type": "video", "filter": { "model": "octavia" }, "n": 24 },
     { "type": "video", "n": 24 }
   ]
 }

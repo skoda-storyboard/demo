@@ -342,6 +342,15 @@ var CustomImportScript = (() => {
         if (m) add("model", m[1].toLowerCase());
       }
     }
+    if (tags.length === 0) {
+      const cls = document2.body && document2.body.getAttribute("class") || "";
+      const id = cls.match(/\bpostid-(\d+)\b/);
+      const post = id && document2.querySelector(`article[data-post-id="${id[1]}"]`);
+      String(post && post.getAttribute("class") || "").split(/\s+/).forEach((token) => {
+        const m = token.toLowerCase().match(/^([a-z]+)-([a-z0-9-]+)$/);
+        if (m && FACETS.includes(m[1]) && !/^\d+$/.test(m[2])) add(m[1], m[2]);
+      });
+    }
     return { tags, byFacet };
   }
   function splitList(value) {
@@ -367,7 +376,7 @@ var CustomImportScript = (() => {
     const description = overrides.description || metaContent(document2, 'meta[property="og:description"]') || metaContent(document2, 'meta[name="description"]') || "";
     const imageSrc = overrides.image || metaContent(document2, 'meta[property="og:image"]') || "";
     const publisheddate = overrides.publisheddate || extractDate(document2);
-    const template = overrides.template || extractTemplate(document2);
+    const template = overrides.template || extractTemplate(document2) || overrides.templateDefault || "";
     const category = overrides.category || extractCategory(pageUrl);
     const { tags: derivedTags, byFacet } = extractTagsAndFacets(document2, pageUrl);
     const meta = {};
@@ -445,33 +454,53 @@ var CustomImportScript = (() => {
     "/en/lifestyle/ouninpohja-finlands-roller-coaster-stage",
     "/en/lifestyle/rs-four-ways-which-one-will-you-choose",
     "/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones",
+    "/en/lifestyle/what-you-learn-on-the-circuit-can-save-you-on-the-road",
     "/en/models/skoda-elroq-through-designers-eyes",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
+    "/en/press-kits/4x4-winter-experience-press-kit",
+    "/en/press-kits/lets-explore-albania-press-kit",
     "/en/press-kits/new-skoda-enyaq-press-kit-2",
+    "/en/press-kits/press-kit-skoda-at-the-iaa-2019",
     "/en/press-kits/skoda-elroq-press-kit",
     "/en/press-kits/skoda-elroq-press-kit-2",
     "/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
     "/en/press-kits/skoda-epiq-press-kit-2",
     "/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
+    "/en/press-kits/skoda-octavia-media-launch-press-kit",
+    "/en/press-kits/skoda-octavia-press-kit",
+    "/en/press-kits/skoda-octavia-press-kit-2",
+    "/en/press-kits/skoda-octavia-rs-245-sporty-spacious-practical-family-sportster-delivers-245-ps",
+    "/en/press-kits/skoda-octavia-rs-and-octavia-scout-press-kit",
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
     "/en/press-kits/skoda-peaq-press-kit",
     "/en/press-kits/skoda-peaq-press-kit-2",
+    "/en/press-kits/skoda-rs-driving-experience-press-kit",
+    "/en/press-kits/skoda-rs-experience-press-kit",
     "/en/press-kits/skoda-vision-o-press-kit",
     "/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design",
     "/en/press-kits/the-all-new-skoda-kodiaq-press-kit",
     "/en/press-kits/the-all-new-skoda-superb-press-kit",
+    "/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production",
     "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
     "/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq",
     "/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026",
     "/en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029",
     "/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management",
+    "/en/press-releases/skoda-auto-enters-saudi-arabian-market-strengthening-its-presence-in-the-middle-east",
     "/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company",
     "/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav",
     "/en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car",
+    "/en/press-releases/skoda-auto-produces-first-units-of-updated-octavia-in-kvasiny",
+    "/en/press-releases/skoda-octavia-combi-rs-wins-prestigious-2024-golden-steering-wheel-award-in-the-mid-sized-car-category",
     "/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
     "/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions",
     "/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence",
     "/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates",
+    "/en/press-releases/skodas-voice-assistant-laura-now-enhanced-with-chatgpt-capabilities",
+    "/en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+    "/en/press-releases/the-skoda-elroq-earns-5-star-euro-ncap-safety-rating-with-the-enyaq-and-octavia-retaining-their-top-scores",
+    "/en/press-releases/the-updated-octavia-now-with-all-wheel-drive",
+    "/en/press-releases/when-driving-fun-meets-comfort-rally-ace-oliver-solberg-tests-the-skoda-octavia-rs",
     "/en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available",
     "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich",
     "/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france",
@@ -490,6 +519,7 @@ var CustomImportScript = (() => {
     "/en/series/unexpected-jobs",
     "/en/series/unknown-parts",
     "/en/series/winter-tips",
+    "/en/simply-clever/park-your-skoda-using-your-mobile-phone-well-show-you-how-how",
     "/en/skoda-model/elroq",
     "/en/skoda-model/elroq/elroq-rs",
     "/en/skoda-model/elroq/elroq-sportline",
@@ -512,13 +542,18 @@ var CustomImportScript = (() => {
     "/en/skoda-model/octavia/octavia-sportline",
     "/en/skoda-model/peaq",
     "/en/skoda-model/scala",
+    "/en/skoda-world/2024-a-year-of-new-electric-cars-and-innovated-favourites",
     "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it",
     "/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute",
     "/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car",
     "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality",
     "/en/skoda-world/how-the-skoda-octavia-reached-365-km-h",
     "/en/skoda-world/legend-chris-froome-takes-you-behind-the-scenes-of-the-tour-de-france",
+    "/en/skoda-world/making-driving-easier-how-cruise-control-works",
+    "/en/skoda-world/oliver-solberg-behind-the-wheel-of-the-new-octavia-rs",
     "/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details",
+    "/en/skoda-world/sportline-models-dynamic-elegance-for-every-day",
+    "/en/skoda-world/the-immortal-octavia-see-what-it-looks-like-after-one-million-kilometres",
     "/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour",
     "/en/skoda-world/the-skoda-elroq-reveals-its-sustainable-interior",
     "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too",
@@ -596,6 +631,24 @@ var CustomImportScript = (() => {
     });
   }
 
+  // tools/importer/transformers/skoda-nbsp.js
+  var NBSP_PLACEHOLDER = "\u{F00A0}";
+  var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
+  function transform5(hookName, element, payload) {
+    if (hookName !== "preprocess") return;
+    const doc = element.ownerDocument || payload && payload.document;
+    const walker = doc.createTreeWalker(
+      element,
+      4
+      /* NodeFilter.SHOW_TEXT */
+    );
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.nodeValue.includes("\xA0")) {
+        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER.repeat(run.length));
+      }
+    }
+  }
+
   // tools/importer/import-pr-listing.js
   var parsers = {
     listing: parse
@@ -651,6 +704,8 @@ var CustomImportScript = (() => {
     return pageBlocks;
   }
   var import_pr_listing_default = {
+    // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
+    preprocess: ({ document: document2 }) => transform5("preprocess", document2.body, { document: document2 }),
     transform: (payload) => {
       const { document: document2, url, params } = payload;
       const main = document2.body;

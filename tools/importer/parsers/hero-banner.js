@@ -1,7 +1,7 @@
 /* eslint-disable */
 /* global WebImporter */
 /**
- * Parser: hero-banner (block name: "Hero")
+ * Parser: hero-banner (block name: "Hero Image (overlay)")
  * Source: the short full-bleed banner used by editorial "Page", category and
  *   tag/model archive templates — div.hero > .hero-image (img) [+ optional
  *   heading/CTA overlay].
@@ -31,7 +31,10 @@ export default function parse(element, { document }) {
     return;
   }
 
-  const cells = [['Hero']];
+  // Project contract `hero` (SKODA-202, tools/importer/push/block-contracts.json): this
+  // repo's hero is the Hero Image block (blocks/hero is an empty boilerplate stub the block
+  // gate rejects). Same 1-column shape as the library Hero: image row, then title/CTA row.
+  const cells = [['Hero Image (overlay)']];
   // Row 2: background image (optional).
   cells.push([img || '']);
 

@@ -173,7 +173,51 @@ export function parseCards(doc, { options, yearsById } = {}) {
   });
 }
 
-/** Merge item lists by source id (first wins; terms are unioned). Resolves slug collisions. */
+/**
+ * Source ids in the source's own listing order. Every listing is a slice of one global
+ * order (newest first, then the source's gallery order, which neither the id nor the publish
+ * time reproduces), so consecutive cards give "a before b" edges; a topological merge of
+ * them rebuilds the order across listings. Unordered pairs go newest first, then (like any
+ * inconsistent pair) first-seen.
+ */
+export function sourceOrder(lists) {
+  const firstSeen = new Map();
+  const dates = new Map();
+  const next = new Map();
+  const indegree = new Map();
+  lists.forEach((list) => list.forEach((item, i) => {
+    if (!firstSeen.has(item.id)) {
+      firstSeen.set(item.id, firstSeen.size);
+      dates.set(item.id, item.date || '');
+      next.set(item.id, new Set());
+      indegree.set(item.id, 0);
+    }
+    const prev = list[i - 1];
+    if (prev && prev.id !== item.id && !next.get(prev.id).has(item.id)) {
+      next.get(prev.id).add(item.id);
+      indegree.set(item.id, indegree.get(item.id) + 1);
+    }
+  }));
+  const order = [];
+  const done = new Set();
+  const byDateThenSeen = (a, b) => dates.get(b).localeCompare(dates.get(a))
+    || firstSeen.get(a) - firstSeen.get(b);
+  while (order.length < firstSeen.size) {
+    const ready = [...firstSeen.keys()].filter((id) => !done.has(id) && indegree.get(id) === 0);
+    // a cycle (listings disagree): release the earliest-seen remaining id
+    const id = (ready.length ? ready : [...firstSeen.keys()].filter((x) => !done.has(x)))
+      .sort(byDateThenSeen)[0];
+    done.add(id);
+    order.push(id);
+    next.get(id).forEach((n) => indegree.set(n, indegree.get(n) - 1));
+  }
+  return order;
+}
+
+/**
+ * Merge item lists by source id (first wins; terms are unioned), in source listing order.
+ * Resolves slug collisions.
+ */
 export function mergeItems(lists) {
   const byId = new Map();
   lists.flat().forEach((item) => {
@@ -184,7 +228,7 @@ export function mergeItems(lists) {
     });
   });
   const seen = new Map();
-  return [...byId.values()].map((item) => {
+  return sourceOrder(lists).map((id) => byId.get(id)).map((item) => {
     const n = (seen.get(item.path) || 0) + 1;
     seen.set(item.path, n);
     if (n === 1) return item;
@@ -223,10 +267,14 @@ export function feedRow(item) {
   return row;
 }
 
-/** The DA sheet JSON (`:type: sheet`, the shape DA stores and Edge Delivery serves). */
+/**
+ * The DA sheet JSON (`:type: sheet`, the shape DA stores and Edge Delivery serves). Newest
+ * first; same-day rows keep the source listing order (mergeItems), which the rails' stable
+ * date sort then preserves, so a rail lists them as the source does.
+ */
 export function feedSheet(items) {
   const data = items.map(feedRow)
-    .sort((a, b) => (b.date || '').localeCompare(a.date || '') || a.path.localeCompare(b.path));
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   return {
     total: data.length, offset: 0, limit: data.length, data, ':type': 'sheet',
   };
