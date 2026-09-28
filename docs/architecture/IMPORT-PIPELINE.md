@@ -128,6 +128,8 @@ npm run media:build -- --pages content/<path>.plain.html
 npm run media:apply -- --pages content/<path>.plain.html
 # PDFs/MP4s additionally need approved AEM Assets ingest + activation + a
 # verified public URL mapping before media:apply (see media/README.md).
+# media:build above already records them as pending manifest rows: commit
+# media-manifest.json with the import; the ingest runs on a developer machine.
 npm run media:validate-binaries -- --pages content/<path>.plain.html
 # 3) Validate metadata + the pending-block contract, then inspect locally against previewed DA content.
 node tools/importer/validate-metadata.mjs content/<path>.plain.html
