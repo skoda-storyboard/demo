@@ -65,6 +65,15 @@
   scroll-snap-align: start;
 }
 
+/* dated rail titles end in an ellipsis after 2 lines (source dotdotdot,
+   max-height 43.2px); a band can set --carousel-title-lines (SKODA-212a) */
+.carousel-overlay .card-teaser-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--carousel-title-lines, 2);
+  overflow: hidden;
+}
+
 /* --- taxonomy caption card (no date): wide letterbox, title below --------- */
 .carousel-caption .card-teaser-image img {
   aspect-ratio: 383 / 150; /* light sections (Models); carousel-rails.md §3 */

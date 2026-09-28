@@ -66,6 +66,13 @@
   .story-rail-mount {
     aspect-ratio: 7.901; /* 22.5% cell (~4.4/view) */
   }
+
+  /* related bands (story + press release) show one title line from 992px
+     (source: 22px at 1440); two below, the carousel default (SKODA-212a) */
+  .section.related.story-rail-container .story-rail,
+  body.story .section.dark.story-rail-container .story-rail {
+    --carousel-title-lines: 1;
+  }
 }
 
 /*

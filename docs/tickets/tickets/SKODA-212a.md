@@ -5,7 +5,7 @@
 - **GitHub issue:** [#150](https://github.com/skoda-storyboard/demo/issues/150) · follow-up to [#98](https://github.com/skoda-storyboard/demo/issues/98) (SKODA-212, Done)
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1d *(planning estimate, not a quote)*
 - **Priority:** P0: every rail on every page.
-- **Status (2026-09-25):** 🔵 TODO
+- **Status (2026-09-28):** 🟡 In progress (branch `skoda-212a-rail-pointer`)
 
 ## Origin
 - Parallel demo sweep [`SKODA-DEMO-SWEEP-REPORT.md`](../../reviews/SKODA-DEMO-SWEEP-REPORT.md) V1.
@@ -48,3 +48,41 @@ Builds on 212 (#98). It does not block other tickets. Re-run both sweeps' rail p
 - **EDS (branch `skoda-610-clean-titles`, titles already suffix-free):** 2–3 lines (43–65px), no clamp.
 - [ ] Rail card titles (`carousel` / `story-rail` overlay cards) are clamped to 1 line with an ellipsis, 22px high at 1440.
   Other card-teaser consumers (stories feed, listing) are unchanged.
+
+## Implementation notes (2026-09-28)
+- **Pointer:** `dragStep()` in `blocks/carousel/carousel.js` is a pure gesture step (exported for the tests).
+  `pointerdown` only records the start. The pointer is captured, and `is-dragging` set, on the first move past
+  `DRAG_THRESHOLD` (6px). `dragstart` is prevented on the track. The click after a real drag is swallowed; a new press
+  resets it. `story-rail.js` needed no change (it builds a `carousel`).
+- **Edge cases:**
+  - A press released outside the track before capture is dropped on the next move with no button held (checked:
+    no stray scroll).
+  - A `pointercancel` (native touch pan) clears the swallow flag, so a later keyboard Enter still navigates.
+  - Keyboard-activated clicks (`detail` 0) are never swallowed.
+- **Mobile / tablet (touch context):**
+  - At 320, 390 and 768, a tap navigates and a swipe scrolls (265 / 328 / 236px, snapped) without navigating.
+  - Enter right after a swipe navigates. A vertical pan over a rail scrolls the page (768: 140px, track unmoved).
+- **Keyboard (1440):** the Next button works with Enter and Space, and Tab walks the cards with `:focus-visible`.
+- **Geometry unchanged:** built rail heights are the same as main (home 166 / 174px at 1440 / 375, Epiq 199 / 179px).
+  The home rails' reserve is 8px short of the built height on main (158 → 166 at 1440). That shift predates this
+  ticket and belongs to the SKODA-212 CLS reserve.
+- **Checked with trusted input on the main preview, new code routed in:**
+
+  | Check | Result |
+  |---|---|
+  | 1440 click: home eMobility, Latest News, Epiq Related Stories | navigates on all three |
+  | 1440 300px drag: same three rails | `scrollLeft` 301 / 301 / 374 (Epiq snaps to the next card), no navigation |
+  | 390 touch | tap navigates; swipe 0 → 328px, no navigation |
+  | 390 keyboard | link has `:focus-visible`; Enter navigates |
+- **Title clamp: matches the source per band, not 1 line everywhere.** Live measurements:
+  - home and Media Room rails: 2 lines, `max-height` 43.2px;
+  - Related Stories / Related Press Releases: 1 line (22px) at 1440, 2 lines at 375 (20/24px, 48px);
+  - Models / Series caption rails: no clamp.
+
+  How it's built:
+  - `.carousel-overlay .card-teaser-title` clamps to `var(--carousel-title-lines, 2)`; caption cards are not
+    clamped.
+  - `story-rail.css` sets `--carousel-title-lines: 1` from 992px for the story related band and `.section.related`
+    (press release).
+
+  Result: home 43px; related 22px at 1440, 2 lines at 768/375.

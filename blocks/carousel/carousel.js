@@ -27,7 +27,45 @@ import {
 
 // A pointer must travel this far (px) before we treat the gesture as a drag and
 // suppress the post-drag click (so a small wobble on a tap still navigates).
-const DRAG_THRESHOLD = 6;
+export const DRAG_THRESHOLD = 6;
+
+/*
+ * Pure pointer-gesture step (exported so tests exercise the production logic).
+ * A press only becomes a drag once it travels past `threshold` horizontally;
+ * until then nothing is captured, so a plain mouse click still reaches the card
+ * link (SKODA-212a: capturing on pointerdown retargeted the click to the track).
+ * `ev` is { type: 'down' | 'move' | 'up' | 'cancel', x, scrollLeft }.
+ * Returns the next state; `startDrag` is true on the step that crosses the
+ * threshold (capture the pointer then), `scrollLeft` is where to scroll while
+ * dragging, and `moved` stays true after a drag so the next click is swallowed.
+ */
+export function dragStep(state, ev, threshold = DRAG_THRESHOLD) {
+  const s = state || { pressed: false, dragging: false, moved: false };
+  switch (ev.type) {
+    case 'down':
+      return {
+        pressed: true, dragging: false, moved: false, startX: ev.x, startLeft: ev.scrollLeft,
+      };
+    case 'move': {
+      if (!s.pressed) return { ...s, startDrag: false };
+      const dx = ev.x - s.startX;
+      if (!s.dragging && Math.abs(dx) <= threshold) return { ...s, startDrag: false };
+      return {
+        ...s, startDrag: !s.dragging, dragging: true, moved: true, scrollLeft: s.startLeft - dx,
+      };
+    }
+    case 'up':
+      return {
+        ...s, pressed: false, dragging: false, startDrag: false,
+      };
+    case 'cancel': // no click follows a cancel, so there is nothing to swallow
+      return {
+        ...s, pressed: false, dragging: false, startDrag: false, moved: false,
+      };
+    default:
+      return s;
+  }
+}
 
 const prefersReducedMotion = () => window.matchMedia
   && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -195,44 +233,49 @@ export default function decorate(block) {
     window.addEventListener('resize', scheduleSync);
   }
 
-  // ---- pointer-capture drag with post-drag click suppression -----------------
-  let dragging = false;
-  let moved = false;
-  let startX = 0;
-  let startLeft = 0;
+  // ---- threshold drag with post-drag click suppression (SKODA-212a) ----------
+  // The pointer is captured only once the press becomes a drag (dragStep), so a
+  // click below the threshold reaches the card link and navigates.
+  let gesture = null;
 
   track.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return; // primary button / touch / pen only
-    dragging = true;
-    moved = false;
-    startX = e.clientX;
-    startLeft = track.scrollLeft;
-    track.setPointerCapture(e.pointerId);
-    track.classList.add('is-dragging');
+    gesture = dragStep(gesture, { type: 'down', x: e.clientX, scrollLeft: track.scrollLeft });
   });
 
   track.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
-    const dx = e.clientX - startX;
-    if (Math.abs(dx) > DRAG_THRESHOLD) moved = true;
-    track.scrollLeft = startLeft - dx;
+    if (!gesture?.pressed) return;
+    // released outside the track before capture: we never saw the pointerup
+    if (!e.buttons) { gesture = dragStep(gesture, { type: 'cancel' }); return; }
+    gesture = dragStep(gesture, { type: 'move', x: e.clientX });
+    if (!gesture.dragging) return;
+    if (gesture.startDrag) {
+      track.setPointerCapture?.(e.pointerId);
+      track.classList.add('is-dragging');
+    }
+    track.scrollLeft = gesture.scrollLeft;
   });
 
   function endDrag(e) {
-    if (!dragging) return;
-    dragging = false;
+    if (!gesture?.pressed) return;
+    gesture = dragStep(gesture, { type: e.type === 'pointercancel' ? 'cancel' : 'up' });
     track.classList.remove('is-dragging');
     if (track.hasPointerCapture?.(e.pointerId)) track.releasePointerCapture(e.pointerId);
   }
   track.addEventListener('pointerup', endDrag);
   track.addEventListener('pointercancel', endDrag);
 
+  // The browser's own link/image drag would fire pointercancel and end our drag
+  // before it scrolls, so it never starts inside the track.
+  track.addEventListener('dragstart', (e) => e.preventDefault());
+
   // Suppress the click that ends a drag so it can't navigate the dragged card.
+  // Keyboard activation (detail 0) is never a drag's click, so it always passes.
   track.addEventListener('click', (e) => {
-    if (moved) {
+    if (gesture?.moved && e.detail !== 0) {
       e.preventDefault();
       e.stopPropagation();
-      moved = false;
+      gesture.moved = false;
     }
   }, true);
 

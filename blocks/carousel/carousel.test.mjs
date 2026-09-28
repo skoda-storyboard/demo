@@ -128,3 +128,58 @@ test('dotState: active never exceeds pages-1', () => {
   const s = dotState({ scrollLeft: 99999, scrollWidth: 1374, clientWidth: 944 });
   assert.equal(s.active, s.pages - 1);
 });
+
+// ---- SKODA-212a: threshold drag (capture only once the press is a real drag) ----
+const { dragStep, DRAG_THRESHOLD } = await import('./carousel.js');
+
+function run(steps) {
+  return steps.reduce((acc, ev) => {
+    const next = dragStep(acc.state, ev);
+    acc.log.push(next);
+    return { state: next, log: acc.log };
+  }, { state: null, log: [] });
+}
+
+test('dragStep: a click below the threshold never starts a drag (the link navigates)', () => {
+  const { state, log } = run([
+    { type: 'down', x: 100, scrollLeft: 0 },
+    { type: 'move', x: 100 + DRAG_THRESHOLD },
+    { type: 'move', x: 100 - DRAG_THRESHOLD },
+    { type: 'up' },
+  ]);
+  assert.ok(log.every((s) => !s.startDrag && !s.dragging), 'no capture, no scroll');
+  assert.equal(state.moved, false, 'the click is not swallowed');
+});
+
+test('dragStep: drag-then-release scrolls 1:1, captures once and swallows the click', () => {
+  const { state, log } = run([
+    { type: 'down', x: 600, scrollLeft: 40 },
+    { type: 'move', x: 590 },
+    { type: 'move', x: 450 },
+    { type: 'move', x: 300 },
+    { type: 'up' },
+  ]);
+  assert.equal(log.filter((s) => s.startDrag).length, 1, 'capture on the threshold-crossing move only');
+  assert.equal(log[1].startDrag, true);
+  assert.equal(log[3].scrollLeft, 340, 'a 300px drag scrolls 300px');
+  assert.equal(state.dragging, false);
+  assert.equal(state.moved, true, 'the post-drag click is suppressed');
+});
+
+test('dragStep: a new press resets moved, so the next plain click navigates', () => {
+  const dragged = run([
+    { type: 'down', x: 0, scrollLeft: 0 }, { type: 'move', x: -50 }, { type: 'up' },
+  ]).state;
+  const next = dragStep(dragged, { type: 'down', x: 10, scrollLeft: 50 });
+  assert.equal(next.moved, false);
+});
+
+test('dragStep: moves without a press, and pointercancel, never drag', () => {
+  assert.equal(dragStep(null, { type: 'move', x: 500 }).dragging, false);
+  const s = run([
+    { type: 'down', x: 0, scrollLeft: 0 }, { type: 'move', x: -40 }, { type: 'cancel' },
+  ]).state;
+  assert.equal(s.pressed, false);
+  assert.equal(s.dragging, false);
+  assert.equal(s.moved, false, 'a cancelled swipe leaves no click to swallow (keyboard Enter still works)');
+});
