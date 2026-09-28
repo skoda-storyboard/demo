@@ -12,6 +12,7 @@
         "media",
         "overlay",
         "toolbar",
+        "series-directory",
         "social"
       ]
     },
@@ -24,7 +25,9 @@
       "variants": []
     },
     "downloads": {
-      "variants": []
+      "variants": [
+        "media-box"
+      ]
     },
     "embed": {
       "variants": [],

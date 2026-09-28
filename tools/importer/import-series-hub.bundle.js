@@ -127,6 +127,24 @@ var CustomImportScript = (() => {
     if (tiles.length === 3) return ratios[i] === "1x1" && ratios.includes("2x1") ? 3 : ratios[i] === "2x1" && ratios.includes("1x1") ? 6 : 4;
     return null;
   }
+  function directoryRows(element, document2) {
+    return [...element.querySelectorAll("article.article-teaser[data-content-type]")].map((article) => {
+      const link = article.querySelector("a[href]");
+      const h2 = document2.createElement("h2");
+      const a = document2.createElement("a");
+      a.setAttribute("href", link ? link.getAttribute("href") : "");
+      a.textContent = clean2(article.querySelector("h2, h3, .heading")) || clean2(link);
+      h2.append(a);
+      const body = [h2];
+      const excerpt = clean2(article.querySelector(".article-teaser-excerpt"));
+      if (excerpt) {
+        const p = document2.createElement("p");
+        p.textContent = excerpt;
+        body.push(p);
+      }
+      return [article.querySelector("img") || "", body];
+    });
+  }
   function hubRows(element, document2) {
     const widths = siteOriginWidths(document2);
     const out = [];
@@ -182,13 +200,7 @@ var CustomImportScript = (() => {
     if (isHub) {
       cells = [["Cards (overlay, tiles)"], ...hubRows(element, document2)];
     } else {
-      cells = [
-        ["Listing"],
-        ["index", "/en/query-index.json"],
-        ["template", "skoda_series"],
-        ["sort", "editorial"],
-        ["columns", "2"]
-      ];
+      cells = [["Cards (series-directory)"], ...directoryRows(element, document2)];
     }
     const table = WebImporter.DOMUtils.createTable(cells, document2);
     element.replaceWith(table);
@@ -506,6 +518,7 @@ var CustomImportScript = (() => {
     }
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
+    if (overrides.theme) meta.theme = overrides.theme;
     if (category) meta.category = category;
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");

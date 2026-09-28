@@ -47,6 +47,94 @@
   }
 }
 
+/* ---- series-directory (SKODA-207, /en/series-2): linked title over the image, excerpt
+   below it. Measured on the source (series.md §3): 20px gaps, 2 columns from a 761px
+   card column (the source SiteOrigin 781px stack width), 16:9 media below 768 and a 2:1 cell box minus
+   the 10px cell inset from 768, white 16/18/500 title with a 16px inset, 16/24/400
+   excerpt with 8px padding clamped to two lines. One stretched link per card. ---- */
+.cards.series-directory {
+  --series-directory-inset: calc(var(--grid-gutter) / 2);
+  --series-directory-title-line-height: 1.125;
+
+  container-type: inline-size;
+}
+
+.cards.series-directory ul {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--grid-gutter);
+}
+
+.cards.series-directory .card-teaser {
+  display: grid;
+  grid-template-areas: "media" "excerpt";
+  grid-template-rows: auto auto;
+  margin: 0;
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.cards.series-directory .card-teaser-image {
+  grid-area: media;
+  container-type: inline-size;
+}
+
+/* the source's light dual scrim over the image (no text shadow) */
+.cards.series-directory .card-teaser-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--scrim-h), var(--scrim-v);
+  pointer-events: none;
+}
+
+/* title and excerpt become grid items: the title sits in the media cell */
+.cards.series-directory .card-teaser-body {
+  display: contents;
+}
+
+.cards.series-directory .card-teaser-title {
+  grid-area: media;
+  align-self: end;
+  z-index: 1;
+  margin: 0;
+  padding: var(--spacing-m);
+  color: var(--skoda-white);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-medium);
+  line-height: var(--series-directory-title-line-height);
+}
+
+.cards.series-directory .card-teaser-summary {
+  grid-area: excerpt;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: 0;
+  padding: var(--spacing-xs);
+  color: var(--skoda-ink);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-regular);
+  line-height: var(--line-height-body);
+}
+
+@media (width >= 768px) {
+  .cards.series-directory .card-teaser-image img {
+    aspect-ratio: auto;
+    height: calc(50cqi - var(--series-directory-inset));
+  }
+}
+
+/* two columns once the card column is 761px (the source's 781px viewport minus the
+   two 10px cell insets) */
+@container (width >= 761px) {
+  .cards.series-directory ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 body.story .section.sidebar .cards ul {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -56,3 +144,4 @@ body.story .section.sidebar .cards.overlay .card-teaser-title {
   font-weight: var(--weight-medium);
   line-height: 1.25;
 }
+

@@ -19,10 +19,12 @@
  * Membership, order and size are the source's: no index, tags, sort, date or excerpt.
  * (measured on the 15 hubs in test/fixtures/series/; docs/ui-specs/series.md §2.)
  *
- * DIRECTORY (/en/series-2/, all cards data-content-type="Series"): M2, output FROZEN
- * until the series-directory contract is pinned. Still the index Listing below.
- *   ['Listing'] ['index','/en/query-index.json'] ['template','skoda_series']
- *   ['sort','editorial'] ['columns','2']
+ * DIRECTORY (/en/series-2/, all cards data-content-type="Series"): the authored card
+ * list as `Cards (series-directory)` (a `cards` variant on main), every source card in
+ * DOM order, duplicates kept:
+ *   ['Cards (series-directory)']
+ *   [<img>, [<h2><a href>Title</a></h2>, <p>excerpt</p>]]
+ * The excerpt is the full source text (the source truncates it client-side).
  *
  * CONTENT-DRIVEN, NOT POSITIONAL: hub vs directory comes from the body class and the
  * cards' own data-content-type, never the URL, the slug or the first card. Bails
@@ -91,6 +93,25 @@ function spanFromComposition(tiles, i) {
   return null;
 }
 
+function directoryRows(element, document) {
+  return [...element.querySelectorAll('article.article-teaser[data-content-type]')].map((article) => {
+    const link = article.querySelector('a[href]');
+    const h2 = document.createElement('h2');
+    const a = document.createElement('a');
+    a.setAttribute('href', link ? link.getAttribute('href') : '');
+    a.textContent = clean(article.querySelector('h2, h3, .heading')) || clean(link);
+    h2.append(a);
+    const body = [h2];
+    const excerpt = clean(article.querySelector('.article-teaser-excerpt'));
+    if (excerpt) {
+      const p = document.createElement('p');
+      p.textContent = excerpt;
+      body.push(p);
+    }
+    return [article.querySelector('img') || '', body];
+  });
+}
+
 function hubRows(element, document) {
   const widths = siteOriginWidths(document);
   const out = [];
@@ -148,13 +169,7 @@ export default function parse(element, { document }) {
   if (isHub) {
     cells = [['Cards (overlay, tiles)'], ...hubRows(element, document)];
   } else {
-    cells = [
-      ['Listing'],
-      ['index', '/en/query-index.json'],
-      ['template', 'skoda_series'],
-      ['sort', 'editorial'],
-      ['columns', '2'],
-    ];
+    cells = [['Cards (series-directory)'], ...directoryRows(element, document)];
   }
 
   const table = WebImporter.DOMUtils.createTable(cells, document);

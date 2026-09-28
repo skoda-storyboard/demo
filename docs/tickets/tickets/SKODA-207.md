@@ -16,7 +16,13 @@
     - White caption contrast is below 4.5:1 on 4 of 5 measured hubs. The scrim is identical to the source; the client must decide whether to deviate.
     - 4 `/en/?p=<id>` tiles on sustainable-mobility are dead WordPress shortlinks (404 on the source too). They are kept, absolute, per SKODA-609.
     - The 506 size ladder misses non-3:2 renditions (4 masters over 10 MB). Preview still ingested the source renditions.
-    - M2 directory contract and importer.
+    - ~~M2 directory contract and importer.~~ Done 2026-09-28 (see below).
+- **Directory (2026-09-28):** `/en/series-2` is imported, pushed and published.
+  - Hero: `Hero Image (overlay)` with the H1.
+  - Cards: `Cards (series-directory)`, a new `cards` variant on main. The 25 source cards keep their order (minutes-from-car-production appears twice). The linked title sits over the image and the full excerpt below it.
+  - Metadata: `template=page` (the directory stays out of the Series rail) plus `theme=skoda-series`. `scripts.js` now also selects layout code by `theme`, so the directory shares `templates/skoda-series`.
+  - Local render matches the source boxes at 375/767/781/1280.
+  - Links: 16 cards link to the 15 hubs, which are preview-only until SKODA-221. The other 9 link to the live site (SKODA-609).
 
 ## UI Specification
 **Authoritative, DevTools-measured spec:** [`docs/ui-specs/series.md`](../../ui-specs/series.md).

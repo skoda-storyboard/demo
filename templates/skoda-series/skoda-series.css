@@ -1,9 +1,11 @@
 /* ==========================================================================
-   Series hub (SKODA-207)
-   Render target: docs/ui-specs/series.md §3, measured on the source hubs at
-   375/767/768/1280 (2026-09-27). Loaded only on `template: skoda_series` pages
-   (scripts.js TEMPLATES). Scope: the `Hero Image (overlay)` of the hub. The model
-   page's overlay hero is untouched. The tile mosaic belongs to SKODA-221.
+   Series hub + series directory (SKODA-207)
+   Render target: docs/ui-specs/series.md §3, measured on the source hubs and
+   /en/series-2 at 375/767/768/780/781/992/1280 (2026-09-27). Loaded on
+   `template: skoda_series` hubs and on the directory (`template: page`,
+   `theme: skoda-series`; scripts.js TEMPLATES). Scope: the `Hero Image (overlay)`
+   and the page gutter. The model page's overlay hero is untouched. The hub tile
+   mosaic belongs to SKODA-221; the directory cards to cards.css (series-directory).
    Three-layer order (css-guidelines.md): L1 fluid type/spacing · L2 intrinsic
    column · L3 the single 768 transition, image-first → full-bleed overlay.
    ========================================================================== */
@@ -14,14 +16,25 @@ body.skoda-series {
   --series-perex-size: 20px;
 }
 
-/* The hero is full-bleed, not capped to the content column. */
+/* The hero is full-bleed, not capped to the content column. The source grid starts
+   24px below it, and its first cards sit one 10px cell inset lower. */
 body.skoda-series main > .hero-image-container {
-  margin-bottom: var(--spacing-l);
+  margin-bottom: calc(var(--spacing-l) + var(--series-gutter));
+}
+
+body.skoda-series main > .hero-image-container + .section {
+  margin-top: 0;
 }
 
 body.skoda-series main > .hero-image-container > .hero-image-wrapper {
   max-width: none;
   padding: 0;
+}
+
+/* Cards keep the source's 10px cell inset inside the 1248px content column. */
+body.skoda-series main > .cards-container > .cards-wrapper {
+  box-sizing: border-box;
+  padding: 0 var(--series-gutter);
 }
 
 /* Layer 1 — fluid. Mobile first: 16:9 image, then the dark caption below it.
@@ -39,6 +52,11 @@ body.skoda-series .hero-image.overlay .hero-image-content {
   max-width: var(--content-max-width);
   margin-top: var(--spacing-m);
   padding: 0 var(--series-gutter);
+}
+
+/* The directory's (template-tiles) caption follows the image directly. */
+body.page.skoda-series .hero-image.overlay .hero-image-content {
+  margin-top: 0;
 }
 
 body.skoda-series .hero-image.overlay .hero-image-content h1 {
@@ -74,12 +92,14 @@ body.skoda-series .hero-image.overlay .hero-image-content .hero-image-perex {
 }
 
 /* Layer 3 — from 768 the image is 61.8vh and the caption overlays it in white,
-   inside the centred content column (source `.hero-caption .container`). */
+   inside the centred content column (source `.hero-caption .container`). The
+   source never caps the height (667px at 1080 tall, 890px at 1440), unlike the
+   block's 640px cap for the model hero. */
 @media (width >= 768px) {
   body.skoda-series .hero-image.overlay .hero-image-media picture,
   body.skoda-series .hero-image.overlay .hero-image-media img {
     aspect-ratio: auto;
-    height: min(var(--hero-vh), 640px);
+    height: var(--hero-vh);
   }
 
   body.skoda-series .hero-image.overlay .hero-image-content {

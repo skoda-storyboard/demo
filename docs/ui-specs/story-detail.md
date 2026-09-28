@@ -14,6 +14,7 @@ the §7 assembly map.
 > - The article anatomy must include the **in-body `widget_skoda-carousel-widget` 3:2 image sliders** (19 across the 8 emobility stories, → SKODA-819). These are distinct from card rails.
 > - Below the sidebar there are **two separate full-width dark bands**: Media Box, then Related Stories. There are also 24px `skoda-offset` spacer widgets on desktop.
 > - The hero published date and the "Based on tags" subtitle are optional per page. The category link is always present.
+> - Related Stories may use a curated rail without a "Based on tags" subtitle; do not synthesize one. The Epiq index-fed variant has measured band/card geometry in [`carousel-rails.md`](carousel-rails.md) and [SKODA-820](../tickets/tickets/SKODA-820.md).
 
 ## 1. Identity
 
@@ -159,7 +160,7 @@ All rows: `measured (source-url · selector · viewport) → token`. Source = th
 | STO-D09 | Add-to-cart on media | `a.media-cart-action` | `media-cart` affordance, [`media-cart.md`](media-cart.md) |
 | STO-D10 | Social share | `.btn-group.social` | share control (this spec §3, §6); round-icon sizing per `media-cart.md` |
 |, | Tags row | `ol.entry-tags.label` | `tags`, [`tags.md`](tags.md) |
-|, | Related rail (rail variant) | `.related .flickity-enabled` (other templates) | `carousel`/`story-rail`, [`carousel-rails.md`](carousel-rails.md) |
+|, | Bottom Related Stories band (distinct from STO-D06 sidebar) | `.cover-box.dark .related-stories` | `story-rail` → dated `carousel` in a dark section, [`carousel-rails.md`](carousel-rails.md) / [SKODA-820](../tickets/tickets/SKODA-820.md) |
 
 ## 8. Open decisions + recommended default
 
