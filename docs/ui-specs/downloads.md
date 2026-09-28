@@ -10,7 +10,7 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 > switches from one to two columns at **520px**, from two to three at 768px, and to four at 992px.
 > The source's **Show more** is count-triggered, not mobile-only: Peaq (5 tiles) has no control even
 > at 500px; the Epiq story (19 tiles) collapses after two rows at both 500 and 1280px, with Show less
-> after expansion. SKODA-510 applies this disclosure to large press-release boxes; story disclosure
+> after expansion. SKODA-510 applies this disclosure to large Media Boxes; story rendering QA
 > remains with SKODA-801a. This overrides the older two-column-at-768 suggestion in §4/§7/§9 for
 > press-release boxes. The block shows file-only rows as PDF icon tiles and a decorative play badge on
 > MP4 posters; the MP4 action remains a direct download, not a video player.
@@ -162,6 +162,13 @@ row per asset (picture or empty cell + title + download links). Reuse `createOpt
 | `lang` | `en` | language (API mode) |
 | `columns` | `4` | grid columns at `>=992` (default 4 for images) |
 | `sizes` | `Original, 1920px` | offered download sizes (labels + query) |
+| `collapse` | `auto` / `none` | optional: two visible rows for >8 items or show all; defaults to `auto` in a `media-box` section or `Downloads (media-box)` variant, `none` elsewhere. An authored `columns` count changes how many tiles fit in two rows. |
+
+Media Box visuals are implemented in the block-scoped `.downloads-media-box` variant; an existing
+`Style: media-box` section or an explicit `Downloads (media-box)` header selects it. This keeps
+the block reusable outside the press-release template and requires no change to published tables.
+The MP4 thumbnail opens its poster JPEG, not a player; its accessible link name identifies it as
+a **video poster**, and the separate labelled round action downloads the MP4.
 
 Authored mode (one image per row):
 
@@ -171,7 +178,7 @@ Authored mode (one image per row):
 
 ### `decorate()` outline
 
-1. `readConfig(block)` -> `{ source, postid, lang, columns, sizes[] }`.
+1. `readConfig(block)` -> `{ source, postid, lang, columns, sizes[], collapse }`.
 2. If `source=mediabox`: `fetch('/mediakit/v1/mediabox/post/'+postid+'/'+lang)`; for each `images[]`
    entry build a tile (`createOptimizedPicture(imageUrl, title)`, a `<a download href=link>` per size).
    Degrade gracefully to nothing on fetch failure (per `stories`).

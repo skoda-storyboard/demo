@@ -25,10 +25,11 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
 
 const LABELS = {
   // aria-label for a download link, e.g. "Download Škoda Octavia front (Original)"
-  download: (title, size) => `Download ${title}${size ? ` (${size})` : ''}`,
+  download: (title, size) => `Download ${title || size || 'file'}${title && size ? ` (${size})` : ''}`,
   // aria-label for the size-menu toggle
   sizes: (title) => `Download sizes for ${title}`,
   open: 'View image',
+  videoPoster: 'View video poster',
   more: 'Show more',
   less: 'Show less',
 };
@@ -90,17 +91,18 @@ function playIcon() {
 /**
  * Read an optional leading config block into settings. The config block is a
  * set of single-row key/value pairs (spec §7 table): `source`, `postid`,
- * `lang`, `columns`, `sizes`. A key/value row has exactly two cells; anything
+ * `lang`, `columns`, `sizes`, `collapse`. A key/value row has exactly two cells; anything
  * else (an image/title/link asset row) is left untouched. Returns the parsed
  * config and removes only the rows it consumed.
  * @param {Element} block
- * @returns {{source: string, postid: string, lang: string, columns: string|null, sizes: string[]}}
+ * @returns {{source: string, postid: string, lang: string, columns: string|null,
+ *   sizes: string[], collapse: string|null}}
  */
 function readConfig(block) {
   const cfg = {
-    source: 'authored', postid: '', lang: 'en', columns: null, sizes: [],
+    source: 'authored', postid: '', lang: 'en', columns: null, sizes: [], collapse: null,
   };
-  const keys = new Set(['source', 'postid', 'lang', 'columns', 'sizes']);
+  const keys = new Set(['source', 'postid', 'lang', 'columns', 'sizes', 'collapse']);
   [...block.children].forEach((row) => {
     const cells = [...row.children];
     if (cells.length !== 2 || cells[0].querySelector('img, a')) return;
@@ -288,12 +290,13 @@ function buildTile(asset) {
     const thumb = document.createElement('a');
     thumb.className = 'downloads-thumb';
     [thumb.href] = asset.src.split('?');
-    thumb.setAttribute('aria-label', `${LABELS.open} ${asset.title}`.trim());
+    const isVideo = asset.sizes.length === 1 && /\.mp4(?:[?#]|$)/i.test(asset.sizes[0].href);
+    thumb.setAttribute('aria-label', `${isVideo ? LABELS.videoPoster : LABELS.open} ${asset.title}`.trim());
     thumb.append(createOptimizedPicture(asset.src, asset.alt || asset.title, false, [
       { media: '(min-width: 768px)', width: '750' },
       { width: '500' },
     ]));
-    if (asset.sizes.length === 1 && /\.mp4(?:[?#]|$)/i.test(asset.sizes[0].href)) {
+    if (isVideo) {
       const badge = document.createElement('span');
       badge.className = 'downloads-play';
       badge.setAttribute('aria-hidden', 'true');
@@ -312,10 +315,10 @@ function buildTile(asset) {
     figure.append(file);
   }
 
-  if (asset.title || asset.sizes[0]?.label) {
+  if (asset.title) {
     const cap = document.createElement('figcaption');
     cap.className = 'downloads-title';
-    cap.textContent = asset.title || asset.sizes[0].label;
+    cap.textContent = asset.title;
     figure.append(cap);
   }
 
@@ -330,14 +333,23 @@ function buildTile(asset) {
  * @param {Element} block the downloads block element
  */
 export default async function decorate(block) {
-  // read + consume any leading config rows (source / postid / lang / columns / sizes)
+  // read + consume any leading config rows
   const cfg = readConfig(block);
+  const mediaBox = block.classList.contains('media-box') || !!block.closest('.section.media-box');
+  if (mediaBox) block.classList.add('downloads-media-box');
+  if (cfg.collapse !== null && !['auto', 'none'].includes(cfg.collapse)) {
+    throw new Error('downloads: collapse must be auto or none');
+  }
+  if (cfg.columns !== null && (!/^[1-9]\d*$/.test(cfg.columns)
+    || !Number.isSafeInteger(Number(cfg.columns)))) {
+    throw new Error('downloads: columns must be a positive whole number');
+  }
 
   const list = document.createElement('ul');
   list.className = 'downloads-items';
   // set the desktop (>=992) column count only, so the mobile→tablet ladder
-  // (1 → 2) still applies; CSS defaults --dl-cols-lg to 4
-  if (cfg.columns && /^\d+$/.test(cfg.columns)) {
+  // still applies; CSS defaults --dl-cols-lg to 4
+  if (cfg.columns) {
     list.style.setProperty('--dl-cols-lg', cfg.columns);
   }
 
@@ -355,21 +367,37 @@ export default async function decorate(block) {
   });
 
   block.replaceChildren(list);
-  if (block.closest('body.press-release') && list.children.length > 8) {
+  if ((cfg.collapse === 'auto' || (cfg.collapse === null && mediaBox)) && list.children.length > 8) {
     disclosureSeq += 1;
     list.id = `downloads-items-${disclosureSeq}`;
-    block.classList.add('downloads-collapsible');
     const toggle = document.createElement('button');
     toggle.type = 'button';
     toggle.className = 'downloads-more';
     toggle.setAttribute('aria-controls', list.id);
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.textContent = LABELS.more;
-    toggle.addEventListener('click', () => {
-      const expanded = block.classList.toggle('downloads-expanded');
+    const compact = window.matchMedia('(min-width: 520px)');
+    const medium = window.matchMedia('(min-width: 768px)');
+    const wide = window.matchMedia('(min-width: 992px)');
+    const syncVisibility = () => {
+      let columns = 1;
+      if (compact.matches && mediaBox) columns = 2;
+      if (medium.matches) columns = mediaBox ? 3 : 2;
+      if (wide.matches) columns = Number(cfg.columns) || 4;
+      const overflow = list.children.length > 2 * columns;
+      if (!overflow) block.classList.remove('downloads-expanded');
+      const expanded = block.classList.contains('downloads-expanded');
+      [...list.children].forEach((tile, index) => {
+        tile.hidden = overflow && !expanded && index >= 2 * columns;
+      });
+      toggle.hidden = !overflow;
       toggle.setAttribute('aria-expanded', String(expanded));
       toggle.textContent = expanded ? LABELS.less : LABELS.more;
+    };
+    toggle.addEventListener('click', () => {
+      block.classList.toggle('downloads-expanded');
+      syncVisibility();
     });
     block.append(toggle);
+    [compact, medium, wide].forEach((query) => query.addEventListener('change', syncVisibility));
+    syncVisibility();
   }
 }

@@ -151,6 +151,11 @@
   background: var(--dropdown-hover-bg);
 }
 
+.downloads .downloads-download:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
 /* size menu: absolute dropdown of direct-download links (Original / 1920px).
    Sizes to its content (≈87px live), not a fixed min-width. */
 .downloads .downloads-sizes {
@@ -205,22 +210,31 @@
   background: var(--dropdown-hover-bg);
 }
 
-/* Press-release Media Boxes use the source's 20px visual gap and tile rhythm.
-   Other Downloads consumers retain their existing image layout. */
-body.press-release .downloads .downloads-items {
+.downloads .downloads-more:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+.downloads .downloads-more[hidden],
+.downloads .downloads-item[hidden] {
+  display: none;
+}
+
+/* The media-box variant uses the source's 20px gap and tile rhythm. */
+.downloads.downloads-media-box .downloads-items {
   gap: var(--dl-tile-gap);
 }
 
-body.press-release .downloads .downloads-figure {
+.downloads.downloads-media-box .downloads-figure {
   gap: 0;
 }
 
-body.press-release .downloads .downloads-thumb {
+.downloads.downloads-media-box .downloads-thumb {
   box-sizing: border-box;
   border-radius: 0;
 }
 
-body.press-release .downloads .downloads-title {
+.downloads.downloads-media-box .downloads-title {
   box-sizing: border-box;
   height: calc(var(--dl-meta-space) + var(--dl-title-row));
   margin: 0;
@@ -231,31 +245,19 @@ body.press-release .downloads .downloads-title {
   overflow: hidden; /* the source clamps card titles to two lines */
 }
 
-body.press-release .downloads .downloads-action {
+.downloads.downloads-media-box .downloads-action {
   min-height: var(--dl-toolbar-row);
 }
 
-body.press-release .downloads .downloads-file {
+.downloads.downloads-media-box .downloads-file {
   background: var(--dark-color);
   color: var(--skoda-white);
 }
 
-body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+3) {
-  display: none;
-}
-
-/* --- responsive column ladder (spec §4): 2 @768, 4 @992 ------------------ */
+/* --- responsive column ladder: media-box 1 / 2 / 3 / 4, default 1 / 2 / 4 --- */
 @media (width >= 520px) {
-  body.press-release .downloads .downloads-items {
+  .downloads.downloads-media-box .downloads-items {
     --dl-cols: 2;
-  }
-
-  body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+3) {
-    display: block;
-  }
-
-  body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+5) {
-    display: none;
   }
 }
 
@@ -264,16 +266,8 @@ body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .do
     --dl-cols: 2;
   }
 
-  body.press-release .downloads .downloads-items {
+  .downloads.downloads-media-box .downloads-items {
     --dl-cols: 3;
-  }
-
-  body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+5) {
-    display: block;
-  }
-
-  body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+7) {
-    display: none;
   }
 }
 
@@ -282,15 +276,7 @@ body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .do
     --dl-cols: var(--dl-cols-lg, 4);
   }
 
-  body.press-release .downloads .downloads-items {
+  .downloads.downloads-media-box .downloads-items {
     --dl-cols: var(--dl-cols-lg, 4);
-  }
-
-  body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+7) {
-    display: block;
-  }
-
-  body.press-release .downloads.downloads-collapsible:not(.downloads-expanded) .downloads-item:nth-child(n+9) {
-    display: none;
   }
 }
