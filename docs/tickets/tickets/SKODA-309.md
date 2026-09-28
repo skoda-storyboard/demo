@@ -4,6 +4,11 @@
 - **Phase:** A · **Milestone:** M1 (demo-visible on **16** Media Room URLs)
 - **GitHub issue:** [#145](https://github.com/skoda-storyboard/demo/issues/145)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
+- **Content live (2026-09-28, published ahead of the code merge at the user's request):**
+  - `/media-room/nav` and `/media-room/footer` are published (the footer was previewed-only until now).
+  - DA `/metadata.json` now holds 22 MR rows (an exact row and a `/**` row per MR folder). The never-previewed placeholder rows are archived at `/drafts/metadata-placeholders.json`. The sheet is previewed and published.
+  - Live check: all 12 existing MR URLs render the MR nav and footer at 1440 and 390; Storyboard pages are unchanged; 0 console errors.
+  - **Until #190 merges,** live MR pages still show the Stories tab, the `#e6e6e6` topbar, and the mobile Models/Company drawer bug (QA F1).
 - **Status (2026-09-28):** 🟡 code, MR nav document and QA drafts done; the bulk metadata rows go live after the PR
   merges and `/media-room/nav` is published.
   - `header-switcher.js` activates the tab named by `section` metadata; the MR topbar is `#f1f1f1`.
