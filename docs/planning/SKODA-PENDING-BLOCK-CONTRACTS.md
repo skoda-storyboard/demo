@@ -224,10 +224,10 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 ### `quote`
 - **Status:** `pinned` · **Ticket:** SKODA-220 · **Fallback:** readable (two text cells)
 - **Shape:** header `Quote`, then a single row `[<p>quote text</p>, <p><strong>Attribution</strong>, role</p>]`. An empty attribution cell is kept. The source's decorative `hr` is **never** emitted, because a bare `hr` in DA splits sections.
-- **Importers:**
-  - the press-release cleanup (detects `p[style*=center] > em`, the following `hr`, and the centred `strong`);
-  - the press-kit importer (805c);
-  - `story-flatten.js` `skoda-quote`. It currently emits a default-content `<blockquote>` and loses the attribution; W1 switches it to this table.
+- **Importers:** `parsers/quote.js` (SKODA-220). It detects a centred `p` with only `em` content, the `hr` right after it, and an optional centred `p > strong`. helix-importer's preProcess drops every `hr` before `transform`, so each importer's `preprocess` marks the runs (`markQuotes`) and the parser builds the table after the layouts have run.
+  - `import-press-release.js`: 6 quotes on the 4 M1 releases (Zellmer 2, National Theatre 2, Superb 1, Board 1; Peaq none). They stay in the `body-column` section.
+  - `import-press-kit-default.js`: the 2 first-glimpse quotes (Zellmer, Stefani). They are built after `press-kit-content` flattening, so the layout's source-table pass never sees them.
+  - `story-flatten.js` `skoda-quote`: not switched yet. It still emits a default-content `<blockquote>` and loses the attribution, and W1 switches it to this table.
 - **Example:** the Zellmer press release (`/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/`).
 
 ### `columns-split`

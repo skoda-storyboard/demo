@@ -53,6 +53,7 @@ function contents(panel, document) {
   if (widgets.length) {
     return [...widgets].flatMap((widget) => {
       embedUrls(widget, document);
+      // Stray rules would split the DA section; pull-quote rules are consumed in `preprocess`.
       widget.querySelectorAll('hr').forEach((rule) => rule.remove());
       return [...widget.childNodes].filter((node) => node.nodeType === 1 || text(node));
     });

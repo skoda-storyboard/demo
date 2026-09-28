@@ -77,11 +77,11 @@ var CustomImportScript = (() => {
     const cell = [];
     anchors.forEach((a) => {
       const href = a.getAttribute("href");
-      const text3 = (a.textContent || "").trim();
-      if (!href || !text3) return;
+      const text4 = (a.textContent || "").trim();
+      if (!href || !text4) return;
       const link2 = document.createElement("a");
       link2.setAttribute("href", href);
-      link2.textContent = text3;
+      link2.textContent = text4;
       cell.push(link2);
     });
     if (cell.length === 0) {
@@ -157,6 +157,64 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable(cells, document));
   }
 
+  // tools/importer/parsers/quote.js
+  var QUOTE = "data-skoda-quote";
+  var BY = "data-skoda-quote-by";
+  var text2 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
+  var centred = (p) => /text-align:\s*center/i.test(p.getAttribute("style") || "") || p.classList.contains("has-text-align-center");
+  function isQuote(p) {
+    if (!(p == null ? void 0 : p.matches("p")) || !centred(p)) return false;
+    const nodes = [...p.childNodes].filter((n) => n.nodeType === 1 || text2(n));
+    return nodes.some((n) => {
+      var _a;
+      return ((_a = n.matches) == null ? void 0 : _a.call(n, "em, i")) && text2(n);
+    }) && nodes.every((n) => n.nodeType === 1 && n.matches("em, i, br"));
+  }
+  function isAttribution(p) {
+    return !!(p == null ? void 0 : p.matches("p")) && centred(p) && !!p.querySelector("strong, b") && !isQuote(p);
+  }
+  function markRun(hr) {
+    const quote = hr.previousElementSibling;
+    if (!isQuote(quote)) return false;
+    quote.setAttribute(QUOTE, "");
+    const by = hr.nextElementSibling;
+    if (isAttribution(by)) by.setAttribute(BY, "");
+    hr.remove();
+    return true;
+  }
+  function markQuotes(root) {
+    return [...root.querySelectorAll("hr")].filter(markRun).length;
+  }
+  function quoteParagraph(quote, document) {
+    const p = document.createElement("p");
+    [...quote.childNodes].forEach((node) => {
+      if (node.nodeType === 1 && node.matches("em, i")) p.append(...node.childNodes);
+    });
+    const edge = (n) => n && (n.nodeType === 1 && n.matches("br") || n.nodeType === 3 && !text2(n));
+    while (edge(p.lastChild)) p.lastChild.remove();
+    while (edge(p.firstChild)) p.firstChild.remove();
+    return p;
+  }
+  function attributionParagraph(by, document) {
+    var _a;
+    const p = document.createElement("p");
+    p.append(...by.childNodes);
+    const first = (_a = p.querySelector("strong, b")) == null ? void 0 : _a.firstChild;
+    if ((first == null ? void 0 : first.nodeType) === 3) first.textContent = first.textContent.replace(/^\s+/, "");
+    return p;
+  }
+  function parse4(element, { document }) {
+    var _a;
+    if (!element.hasAttribute(QUOTE)) {
+      const hr = element.nextElementSibling;
+      if (!(hr == null ? void 0 : hr.matches("hr")) || !markRun(hr)) return;
+    }
+    const by = ((_a = element.nextElementSibling) == null ? void 0 : _a.hasAttribute(BY)) ? element.nextElementSibling : null;
+    const cells = [quoteParagraph(element, document), by ? attributionParagraph(by, document) : ""];
+    by == null ? void 0 : by.remove();
+    element.replaceWith(WebImporter.DOMUtils.createTable([["Quote"], cells], document));
+  }
+
   // tools/importer/transformers/skoda-press-release-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
@@ -225,7 +283,7 @@ var CustomImportScript = (() => {
     "media-box": "dark, full-width, media-box",
     related: "dark, full-width, related"
   };
-  var text2 = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
+  var text3 = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
   function make(document, tag, content) {
     const el = document.createElement(tag);
     if (typeof content === "string") el.textContent = content;
@@ -249,10 +307,10 @@ var CustomImportScript = (() => {
   function titleText(h1) {
     const clone = h1.cloneNode(true);
     clone.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
-    return text2(clone);
+    return text3(clone);
   }
   function isEmptyParagraph(p) {
-    return !text2(p) && !p.querySelector("img, picture, a[href], iframe");
+    return !text3(p) && !p.querySelector("img, picture, a[href], iframe");
   }
   function leadImage(document, primary) {
     const img = primary.querySelector(".article-teaser img");
@@ -278,7 +336,7 @@ var CustomImportScript = (() => {
     lines.forEach((html) => {
       const li = document.createElement("li");
       li.innerHTML = html.replace(/^\s*(?:›|&rsaquo;)\s*/, "").trim();
-      if (text2(li)) ul.append(li);
+      if (text3(li)) ul.append(li);
     });
     return ul.children.length ? ul : null;
   }
@@ -314,7 +372,7 @@ var CustomImportScript = (() => {
       const url = iframe.getAttribute("src") || iframe.getAttribute("data-src");
       const p = iframe.closest("p");
       const replacement = url && /^https?:/.test(url) ? urlParagraph(document, url) : null;
-      if (p && text2(p) === "") p.replaceWith(...replacement ? [replacement] : []);
+      if (p && text3(p) === "") p.replaceWith(...replacement ? [replacement] : []);
       else iframe.replaceWith(...replacement ? [replacement] : []);
     });
     content.querySelectorAll("hr").forEach((hr) => hr.remove());
@@ -322,14 +380,14 @@ var CustomImportScript = (() => {
     content.querySelectorAll("p").forEach((p) => {
       if (isEmptyParagraph(p)) p.remove();
     });
-    return [...content.childNodes].filter((n) => n.nodeType === 1 || text2(n));
+    return [...content.childNodes].filter((n) => n.nodeType === 1 || text3(n));
   }
   function sidebarContent(document, secondary, hasMediaBox) {
     const out = [];
     if (!secondary) return out;
     secondary.querySelectorAll(":scope > section").forEach((section) => {
       const heading = section.querySelector("h2, h3, .heading");
-      const headingText = text2(heading);
+      const headingText = text3(heading);
       if (section.matches(".images, .sa-media-kit-preview")) {
         if (heading) heading.remove();
         out.push(make(document, "h3", headingText || "Images"), section);
@@ -345,11 +403,11 @@ var CustomImportScript = (() => {
       const ul = document.createElement("ul");
       menu.querySelectorAll(":scope > li").forEach((li) => {
         const a = li.querySelector('a[href]:not([href="#"])');
-        if (a && text2(a)) {
-          ul.append(make(document, "li", link(document, a.getAttribute("href"), text2(a))));
+        if (a && text3(a)) {
+          ul.append(make(document, "li", link(document, a.getAttribute("href"), text3(a))));
           return;
         }
-        const label = text2(li.querySelector("span")) || text2(li);
+        const label = text3(li.querySelector("span")) || text3(li);
         if (label && hasMediaBox) ul.append(make(document, "li", link(document, "#media-box", label)));
       });
       if (!ul.children.length) return;
@@ -360,8 +418,8 @@ var CustomImportScript = (() => {
   function mediaBoxContent(document, band) {
     const box = band.querySelector(".search-results.media-box");
     if (!box) return [];
-    const heading = text2(box.querySelector(".search-results-heading")) || "Media Box";
-    const stats = text2(box.querySelector(".search-results-stats .stats, .stats"));
+    const heading = text3(box.querySelector(".search-results-heading")) || "Media Box";
+    const stats = text3(box.querySelector(".search-results-stats .stats, .stats"));
     box.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((n) => n.remove());
     const out = [make(document, "h2", heading)];
     if (stats) out.push(make(document, "p", stats));
@@ -375,28 +433,28 @@ var CustomImportScript = (() => {
     results.querySelectorAll("article.article-teaser").forEach((card) => {
       const titleLink = card.querySelector(".entry-title a[href]");
       const href = titleLink && titleLink.getAttribute("href");
-      if (!href || !text2(titleLink)) return;
+      if (!href || !text3(titleLink)) return;
       const img = card.querySelector(".article-teaser-media img");
       if (img) ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop"].forEach((a) => img.removeAttribute(a));
       const body = [];
-      const date = text2(card.querySelector(".entry-published"));
+      const date = text3(card.querySelector(".entry-published"));
       if (date) body.push(make(document, "p", date));
-      body.push(make(document, "h3", link(document, href, text2(titleLink))));
+      body.push(make(document, "h3", link(document, href, text3(titleLink))));
       rows.push([img || "", body]);
     });
     if (rows.length === 1) return [];
     const headingEl = results.querySelector(".search-results-heading");
-    const sub = text2(headingEl && headingEl.querySelector(".subheading"));
+    const sub = text3(headingEl && headingEl.querySelector(".subheading"));
     let heading = "Related Press Releases";
     if (headingEl) {
       const clone = headingEl.cloneNode(true);
       clone.querySelectorAll(".subheading").forEach((s) => s.remove());
-      heading = text2(clone) || heading;
+      heading = text3(clone) || heading;
     }
     const out = [make(document, "h2", heading)];
     if (sub) out.push(make(document, "p", sub));
     const all = results.querySelector("a.search-results-header-link[href], .search-results-header a[href]");
-    if (all && all.getAttribute("href")) out.push(make(document, "p", link(document, all.getAttribute("href"), text2(all) || "All")));
+    if (all && all.getAttribute("href")) out.push(make(document, "p", link(document, all.getAttribute("href"), text3(all) || "All")));
     out.push(WebImporter.DOMUtils.createTable(rows, document));
     return out;
   }
@@ -406,7 +464,7 @@ var CustomImportScript = (() => {
     const container = article.querySelector(":scope > .container") || article;
     const primary = container.querySelector(".column-primary");
     const header = container.querySelector(":scope > header") || container;
-    const date = text2(header.querySelector(".entry-published"));
+    const date = text3(header.querySelector(".entry-published"));
     const h1 = header.querySelector("h1");
     const secondary = container.querySelector(".column-secondary");
     const bands = [...article.querySelectorAll(".cover-box.dark")];
@@ -442,7 +500,7 @@ var CustomImportScript = (() => {
       let n = sidebar.nextElementSibling;
       while (n && !n.hasAttribute(MARKER)) {
         const cell = n.matches("table") && n.querySelector("tr > th, tr > td");
-        if (cell && text2(cell).toLowerCase() === "gallery") cell.textContent = "Gallery (preview)";
+        if (cell && text3(cell).toLowerCase() === "gallery") cell.textContent = "Gallery (preview)";
         n = n.nextElementSibling;
       }
     }
@@ -1021,7 +1079,8 @@ var CustomImportScript = (() => {
   var parsers = {
     gallery: parse,
     tags: parse2,
-    downloads: parse3
+    downloads: parse3,
+    quote: parse4
   };
   var PAGE_TEMPLATE = {
     name: "press-release",
@@ -1032,7 +1091,9 @@ var CustomImportScript = (() => {
     blocks: [
       { name: "gallery", instances: ["section.images.sa-media-kit-preview"] },
       { name: "tags", instances: ["section.tags"] },
-      { name: "downloads", instances: [".search-results.media-box"] }
+      { name: "downloads", instances: [".search-results.media-box"] },
+      // Pull-quotes (SKODA-220): marked in `preprocess`, while their decorative <hr> exists.
+      { name: "quote", instances: ["article p[data-skoda-quote]"] }
     ],
     // Documentation of the emitted section model; skoda-press-release-layout builds it.
     sections: [
@@ -1086,11 +1147,13 @@ var CustomImportScript = (() => {
      * inline element. The Media Box's single download links (video MP4, PDF) are icon-only
      * `<a><i class="icon"></i></a>`, so they'd vanish before the downloads parser runs;
      * give them a text label so they survive (the parser labels them by file type).
+     * preProcess also drops every <hr>, so the pull-quotes are marked by their rule here.
      */
     preprocess: ({ document }) => {
       document.querySelectorAll(".search-results.media-box a.media-cart-action.download[href]").forEach((a) => {
         if (!(a.textContent || "").trim()) a.textContent = "Download";
       });
+      document.querySelectorAll("article.press_release .entry-content").forEach(markQuotes);
     },
     transform: (payload) => {
       const { document, url, params } = payload;

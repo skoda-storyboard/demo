@@ -48,6 +48,13 @@ const inBodyDownloads = [
   ['JPG download', '/direct-download/2026/03/Skoda_Peaq_battery_powertrain_a8933919.jpg'],
 ];
 
+// The two first-glimpse pull-quotes (SKODA-220): one sow-editor widget, live markup 2026-09-28.
+const RULE = '<hr style="width: 10%; height: 2px; display: block; margin: 0 auto; border: none; background-color: #000000; margin-bottom: 10px;">';
+const QUOTES = [['“The confident presence of the Škoda&nbsp;Peaq.”', 'Klaus Zellmer, Škoda Auto CEO'],
+  ['“Modern Solid design.”', 'Oliver Stefani, Head of Škoda Design']]
+  .map(([q, by]) => `<p style="text-align: center;"><em>${q}</em></p>${RULE}<p style="text-align: center;"><strong>${by}</strong></p>`)
+  .join('');
+
 function widget(html, klass = 'widget_sow-editor') {
   return `<div class="so-panel ${klass}"><div class="textwidget">${html}</div></div>`;
 }
@@ -106,7 +113,7 @@ function fixture({
     <div class="columns"><div class="column-primary">
       <div class="article-teaser-media"><img src="https://cdn.skoda-storyboard.com/lead.jpg" alt="Lead"></div>
       <div class="entry-content"><div class="panel-layout">
-      ${grid(widget('<p><strong>Intro copy</strong></p><hr><p>Quote attribution</p>'))}${images}${toggles(togglesCount, !chapters)}
+      ${grid(widget('<p><strong>Intro copy</strong></p><hr><p>Quote attribution</p>'))}${chapters ? '' : grid(widget(QUOTES))}${images}${toggles(togglesCount, !chapters)}
       ${grid(widget('<div class="media-cart-item attachment"><div class="video-container"><iframe src="https://player.vimeo.com/video/1234?dnt=1"></iframe></div><div class="media-cart-actions"><a href="#"><i class="icon"></i></a></div></div><p><a href="mailto:press@skoda-auto.cz">Press contact</a></p>'))}
       ${bannersAndContacts}
       </div></div></div><div class="column-secondary">
@@ -154,6 +161,13 @@ test('first glimpse: eight paired rich accordions, 60 unique media assets and ac
   assert.equal(page.querySelectorAll('iframe, header.header, footer').length, 0);
   assert.equal(page.querySelectorAll('.entry-content hr').length, 0);
   assert.match(page.textContent, /Quote attribution/);
+  const quotes = blocks(page, 'Quote');
+  assert.deepEqual(quotes.map((q) => [...q.querySelectorAll('tr')[1].children].map(txt)), [
+    ['“The confident presence of the Škoda Peaq.”', 'Klaus Zellmer, Škoda Auto CEO'],
+    ['“Modern Solid design.”', 'Oliver Stefani, Head of Škoda Design'],
+  ], 'Quote [quote, attribution] (SKODA-220)');
+  assert.ok(quotes.every((q) => q.parentElement.matches('.entry-content')), 'body default content, not in an accordion');
+  assert.equal(page.querySelectorAll('.entry-content p[style], [data-skoda-quote]').length, 0);
   assert.equal(page.querySelectorAll('.entry-content .media-cart-item, .entry-content .video-container').length, 0);
   assert.match(page.textContent, /Answer 8/);
   assert.equal(page.querySelectorAll('.entry-content > p > a[href^="https://player.vimeo.com/video/"]').length, 1);
