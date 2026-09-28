@@ -239,6 +239,12 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Runtime:** a body-column-scoped treatment through the `scripts.js` section hook. It must not reuse the full-bleed `.section.dark` rule.
 - **Until the importer emits it** (824 importer half), pages keep the current unwrap (default content) and are marked `re-import on SKODA-824`. The shape is fixed, so the 824 runtime and importer can be built in parallel.
 
+### `cover-box`
+- **Status:** `pinned` (2026-09-28) · **Ticket:** SKODA-218 · **Fallback:** readable (a light rail, as before)
+- **Form: section style, not a block.** A homepage band holds one or more rails (Media Room "Models" + "Press Kits"), and DA blocks can't nest (rule 5).
+- **Shape:** each source `.cover-box.dark` band (except the Social media band, which is `Cards (social)`) becomes its own section closed by `Section Metadata` with `Style` = `cover-box, dark`. The Media Room home adds `compact` (`cover-box, dark, compact`: its bands sit 16px tighter at the top). Detected by the source class, never by heading or URL; emitted by `transformers/skoda-dark-bands.js` (both home importers).
+- **Runtime:** `styles.css`. `cover-box` = the band box (1440px cap, centred; live inner spacing 66/60, compact 48; 48px between rails); `dark` = the existing green/white primitive, with headings in the band following its white text.
+
 ### `media-item`
 - **Status:** `pinned` (shape 3, 2026-09-27) · **Ticket:** SKODA-608 · **Fallback:** readable (story-style listing/rail cards until SKODA-406)
 - **Form: a row of the generated media feed, not a page** (docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md, option B:

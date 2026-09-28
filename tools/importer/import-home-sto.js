@@ -7,13 +7,16 @@
  * Featured promo-box (curated cards) + a stack of index-driven Story Rails
  * (home-rail self-classifies each .search-results rail from its heading + "All"
  * link / type-<cpt> class). The live-Instagram social strip is not index-driven —
- * home-rail unwraps it. Metadata template=page (nav/direct only; body class carries
- * `page`). Content-driven detection only.
+ * home-rail unwraps it. Dark `.cover-box.dark` bands (Series) become their own
+ * `Style: cover-box, dark` sections (skoda-dark-bands, SKODA-218). Metadata
+ * template=page (nav/direct only; body class carries `page`). Content-driven
+ * detection only.
  */
 
 import promoBoxParser from './parsers/promo-box.js';
 import homeRailParser from './parsers/home-rail.js';
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
+import darkBandsTransformer from './transformers/skoda-dark-bands.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 import linksTransformer from './transformers/skoda-links.js';
@@ -39,6 +42,7 @@ const PAGE_TEMPLATE = {
 
 const transformers = [
   cleanupTransformer,
+  darkBandsTransformer,
   ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
   metadataTransformer,
   linksTransformer,

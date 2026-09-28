@@ -59,7 +59,7 @@
   --story-sidebar-inset: var(--story-inset);
   --story-sidebar-heading-size-compact: 20px;
   --story-sidebar-heading-line-height: 45px;
-  --story-related-band-max-width: 1440px;
+  --story-related-band-max-width: var(--cover-box-max-width); /* the same live .cover-box cap */
 
   /* body sizes (mobile-first base) */
   --body-font-size-lead: 20px; /* story perex under the hero (live: 20/30 wt600) */
@@ -145,6 +145,15 @@
 
   /* layout / nav */
   --content-max-width: 1248px;
+  --cover-box-max-width: 1440px; /* live home .cover-box band cap (SKODA-218) */
+  --cover-box-padding-top: 66px; /* band top → first heading (Storyboard home) */
+  --cover-box-padding-bottom: 60px; /* last rail cards → band end */
+  --cover-box-rail-gap: 48px; /* rail cards → next rail heading inside a band */
+  --cover-box-margin-top: 56px; /* + the rail's 8px card margin = live's 64px */
+  --cover-box-margin-bottom: 62px;
+  --cover-box-compact-padding-top: 48px; /* Media Room home band */
+  --cover-box-compact-margin-top: 52px; /* + 8px = live's 60px */
+  --cover-box-compact-margin-bottom: 52px;
   --nav-height: 108px;
   --nav-main-height: 64px;
   --nav-topbar-height: 44px;
@@ -637,6 +646,53 @@ main .section.dark {
 
 main .section.dark a {
   color: var(--background-color);
+}
+
+/* headings in a dark band's default content follow its white text: the global
+   h1–h6 colour otherwise wins and paints ink on green (SKODA-218; e.g. the story
+   "Related Stories" heading). Block-owned headings stay with their block, so
+   white-bodied cards keep their ink titles. */
+main .section.dark > .default-content-wrapper :is(h1, h2, h3, h4, h5, h6) {
+  color: inherit;
+}
+
+/* cover-box: the homepage band box (Section Metadata `Style: cover-box, dark`,
+   the Storyboard "Series" and Media Room "Models" bands; SKODA-218), measured on
+   the live homes at 1280/768/500. Live caps it at 1440px and centres it on wider
+   screens (x240 @1920); the inner content stays capped at 1248px by the section
+   wrappers. Inside: band top → first heading 66px (Media Room: 48px, `compact`),
+   rail cards → the next rail's heading 48px, last cards → band end 60px. Around
+   it, live shows 64px from the rail cards above and 62px to the next heading
+   (Media Room 60 / 52): its 36/24 margin plus the neighbours' own inner spacing.
+   The band owns both gaps here: the neighbouring sections drop their 40px
+   section margin on the band's side (no collapsing into it), and the band's
+   margin adds to what the neighbour ends with (a rail's 8px card margin). */
+main > .section.cover-box {
+  max-width: var(--cover-box-max-width);
+  margin: var(--cover-box-margin-top) auto var(--cover-box-margin-bottom);
+  padding-block: var(--cover-box-padding-top) var(--cover-box-padding-bottom);
+}
+
+main > .section:has(+ .section.cover-box) {
+  margin-block-end: 0;
+}
+
+main > .section.cover-box + .section {
+  margin-block-start: 0;
+}
+
+main > .section.cover-box.compact {
+  margin-block: var(--cover-box-compact-margin-top) var(--cover-box-compact-margin-bottom);
+  padding-block-start: var(--cover-box-compact-padding-top);
+}
+
+/* the band sets its own rhythm: no stray list margin under the rail cards */
+main > .section.cover-box .carousel-track .card-teaser {
+  margin-block-end: 0;
+}
+
+main > .section.cover-box .story-rail-wrapper + .story-rail-wrapper {
+  margin-block-start: var(--cover-box-rail-gap);
 }
 
 /* ==========================================================================
