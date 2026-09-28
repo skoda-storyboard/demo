@@ -277,7 +277,9 @@
       "ticket": "SKODA-220",
       "fallback": "readable",
       "shape": 1,
-      "emittedBy": []
+      "emittedBy": [
+        "parsers/quote.js"
+      ]
     },
     {
       "id": "columns-split",

@@ -4,6 +4,7 @@ import gallery from './parsers/gallery.js';
 import tags from './parsers/tags.js';
 import content from './parsers/press-kit-content.js';
 import media from './parsers/press-kit-media.js';
+import quote, { markQuotes } from './parsers/quote.js';
 import layout from './transformers/skoda-press-kit-default-layout.js';
 import metadata from './transformers/skoda-metadata.js';
 import normalizeImages from './transformers/skoda-images.js';
@@ -18,6 +19,8 @@ export default {
     // attachments of resource "Videos" children (SKODA-805b).
     document.querySelectorAll('article.press_kit a.media-cart-action.download[href], article.press_kit a[data-action="download"][href]')
       .forEach((a) => { if (!a.textContent.trim()) a.textContent = 'Download'; });
+    // preProcess also drops every <hr>: mark the pull-quotes by their rule first (SKODA-220).
+    document.querySelectorAll('article.press_kit .entry-content').forEach(markQuotes);
   },
   transform: (payload) => {
     const { document, url, params } = payload;
@@ -30,6 +33,8 @@ export default {
     // toolbars that hold each image's download sizes.
     body.querySelectorAll('.search-results-items').forEach((grid) => media(grid, payload));
     content(body, { document });
+    // After the layout, whose source-table pass would flatten a Quote table.
+    body.querySelectorAll('p[data-skoda-quote]').forEach((p) => quote(p, payload));
 
     article.querySelectorAll('section.images.sa-media-kit-preview')
       .forEach((section) => gallery(section, payload));
