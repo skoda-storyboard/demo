@@ -107,6 +107,28 @@ image, holding the master (`-WxH` stripped), `dam_page_path` and `steps.dam`.
     pages before 608: an empty rail left a ~116px heading + dead "View all". After 608, Octavia, Superb and Fabia
     Images/Videos rails are still empty and still show the leftover heading until this lands.
 
+**UI half built (2026-09-28, branch `skoda-208-model-template`): no new block.** Everything is a page template
+plus variants of existing blocks, built against the already-published pages (no re-import):
+- `templates/skoda-model/` (`TEMPLATES` += `skoda-model`): section roles from the importer's heading ids, source
+  anchors kept as aliases (`#intro`, `#keyfacts`, `#techdata`, `#derivatives`), the hero chip, the short-page flag.
+- **Icon nav (template, option A):** the importer's link list becomes `<nav aria-label="On this page">`, sticky from
+  768, 9 source icons (`icons/model-*.svg`, CSS mask so they recolour), scrollspy (`aria-current`), anchors land under
+  the nav. Links to missing or collapsed sections are dropped. Below 768 (source: hidden) it is a skip-link strip,
+  hidden until focused.
+- **Hero:** `hero-image (overlay)` restyled (9:5 → 3:1 → 5:2 at 1080 → 3:1 at 1440, measured).
+- **Highlights:** `cards (key-facts)` CSS variant. **Technical Data:** `columns (stats)` variant (value/unit split)
+  on a 1248 dark band, mint PDF pill, Fabia banner.
+- **Rails:** `story-rail` passes its variants to `carousel`, labels "View all" from the authored link ("All"), and an
+  empty rail removes its whole section (heading, "Based on tags", link) and fires `story-rail:empty` (the nav drops
+  its link). `carousel (caption)` forces title-below cards, `(center)` centres them; Derivatives =
+  `center caption`, Images/Videos = `media caption` (+ `video` play glyph). Card widths follow the source cells.
+- Measured against live at 1280/1024/768/375: Octavia/Superb/Fabia/Peaq/Epiq layout matches; remaining offsets
+  come from content (fewer rails/nav links until SKODA-603/608 fill the index). Hero pixel diff 0.24–1.38% at
+  1024/768/500; 2.92% at 1280 is photo encoding (WebP 2000 vs source JPEG 1440), layout identical.
+- **Not in this slice:** lightbox, add-to-cart and size menus on Images/Videos cards (needs a shared lightbox from
+  `gallery` + SKODA-505a/b), inline Vimeo previews, the floating share / scroll-top group (SKODA-215), MR footer
+  routing (SKODA-305 follow-up).
+
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/template-model-page.md`](../../ui-specs/template-model-page.md)** (captured via Chrome DevTools on the live Peaq model page). Read it before implementing. Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).
 

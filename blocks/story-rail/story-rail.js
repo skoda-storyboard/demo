@@ -159,19 +159,66 @@ export function rowToCells(row) {
     : [body];
 }
 
+/*
+ * The authored text of the "view all" link, when the cell holds a link (the model page's
+ * rails say "All"). readBlockConfig keeps only the href, so read the anchor directly.
+ */
+export function viewAllLabel(block) {
+  const row = [...block.children].find((r) => {
+    const key = toClassName(r.children[0]?.textContent.trim() || '');
+    return key === 'viewall' || key === 'view-all' || key === 'all';
+  });
+  const text = row?.children[1]?.querySelector('a')?.textContent.trim() || '';
+  // a bare URL as link text (the common DA paste) is not a label
+  return text && !/^(https?:\/\/|\/)/i.test(text) ? text : 'View all';
+}
+
+// Classes that belong to the rail itself and are never passed to the inner carousel.
+const OWN_CLASSES = new Set(['story-rail', 'block']);
+
+/*
+ * Is this rail the only thing in its section apart from a short lead-in (a heading and at
+ * most one line such as "Based on tags: Octavia")? Then an empty rail takes the section
+ * with it (SKODA-208 / SKODA-608: an empty rail leaves no heading behind).
+ */
+export function isRailOnlySection(section, block) {
+  const wrappers = [...section.children];
+  const blocks = wrappers.filter((w) => !w.classList.contains('default-content-wrapper'));
+  if (blocks.length !== 1 || !blocks[0].contains(block)) return false;
+  const lead = wrappers.filter((w) => w.classList.contains('default-content-wrapper'))
+    .flatMap((w) => [...w.children]);
+  const paragraphs = lead.filter((el) => el.tagName === 'P');
+  return lead.every((el) => /^(H[1-6]|P)$/.test(el.tagName)) && paragraphs.length <= 1;
+}
+
+/*
+ * Terminal empty/error state: remove the rail so no blank reserved slot or dead
+ * "View all" lingers (SKODA-212 review P2, SKODA-608).
+ *   - the story page's related band (SKODA-820) goes as a whole section;
+ *   - so does any rail alone in its section with just a heading lead-in (the model
+ *     page's rails: heading + "Based on tags"), SKODA-208;
+ *   - otherwise the rail drops its own chrome (mount + header, "View all" included).
+ * `story-rail:empty` (bubbling) is dispatched first so a page template can drop in-page
+ * links to the removed section.
+ */
 export function collapseRail(block, mount, header) {
   const relatedSection = block.closest('body.story .section.dark.story-rail-container');
-  if (relatedSection) {
-    relatedSection.remove();
+  const section = relatedSection || block.closest('.section');
+  if (section && (relatedSection || isRailOnlySection(section, block))) {
+    section.dispatchEvent?.(new CustomEvent('story-rail:empty', { bubbles: true }));
+    section.remove();
     return;
   }
+  block.dispatchEvent?.(new CustomEvent('story-rail:empty', { bubbles: true }));
   mount.remove();
-  if (!header.children.length) header.remove();
+  header.remove();
 }
 
 export default async function decorate(block) {
   const cfg = parseConfig(block);
   const curated = !isConfigTable(block);
+  const allLabel = viewAllLabel(block);
+  const variants = [...block.classList].filter((c) => !OWN_CLASSES.has(c));
 
   // --- header (heading + optional "view all") --------------------------------
   const heading = cfg.heading || getMetadata('story-rail-heading') || '';
@@ -187,7 +234,7 @@ export default async function decorate(block) {
     const a = document.createElement('a');
     a.className = 'story-rail-viewall';
     a.href = cfg.viewAll;
-    a.textContent = 'View all';
+    a.textContent = allLabel;
     header.append(a);
   }
 
@@ -219,6 +266,8 @@ export default async function decorate(block) {
     if (!rows || !rows.length) { collapseRail(block, mount, header); return; }
 
     const carousel = buildBlock('carousel', rows);
+    // the rail's own variants (e.g. `center`, `caption`, `media`) style the inner carousel
+    carousel.classList.add(...variants);
     if (cfg.dots) carousel.classList.add('dots');
     if (heading) carousel.setAttribute('aria-label', heading);
     mount.append(carousel);

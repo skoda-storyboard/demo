@@ -79,6 +79,76 @@
   aspect-ratio: 3 / 2;
 }
 
+/* --- `center` variant: cells centred while they fit (source cellAlign:center,
+   e.g. the model page's Bodywork / Derivatives rail). `safe` falls back to start
+   alignment once the track overflows, so no card is ever pushed out of reach. */
+.carousel.center .carousel-track {
+  justify-content: safe center;
+}
+
+.carousel.center .carousel-track .card-teaser {
+  scroll-snap-align: center;
+}
+
+/* --- `media` variant: image / video asset cards (model page Images / Videos rails,
+   source .type-attachment): a 16:9 image with rounded corners and the date + title
+   below it, no card box or shadow. `video` adds a centred play glyph. */
+.carousel.media {
+  --media-card-pad: 10px;
+  --media-card-date-row: 24px;
+  --media-card-title-size: 15px;
+  --media-card-title-line: 18px;
+}
+
+.carousel.media .carousel-track .card-teaser {
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.carousel.media .carousel-caption .card-teaser-image img {
+  aspect-ratio: 16 / 9;
+}
+
+.carousel.media .card-teaser-body {
+  gap: 0;
+  margin: 0;
+}
+
+/* source: a 44px date row (10px padding), then a two-line 15/18 title with 10px below */
+.carousel.media .card-teaser-date {
+  margin: 0;
+  padding: var(--media-card-pad) 0;
+  color: var(--skoda-grey-350);
+  line-height: var(--media-card-date-row);
+}
+
+.carousel.media .carousel-caption .card-teaser-title {
+  display: -webkit-box;
+  min-height: calc(var(--media-card-title-line) * 2);
+  margin: 0;
+  padding-bottom: var(--media-card-pad);
+  overflow: hidden;
+  font-size: var(--media-card-title-size);
+  font-weight: var(--weight-regular);
+  line-height: var(--media-card-title-line);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.carousel.video .card-teaser-image::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--carousel-arrow-size);
+  height: var(--carousel-arrow-size);
+  background: var(--skoda-white);
+  clip-path: polygon(25% 15%, 85% 50%, 25% 85%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
 /* --- arrows: 32px transparent button, ink icon-disc, white chevron -------- */
 .carousel-arrow {
   position: absolute;

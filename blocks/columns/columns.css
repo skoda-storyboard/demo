@@ -31,3 +31,73 @@
     order: unset;
   }
 }
+
+/* ==========================================================================
+   `stats` variant (SKODA-208 Technical Data): a centred grid of key figures, each a
+   value + unit and a label below. All cells flow as one wrapping row (the rows are
+   only authoring structure), 1 / 2 / 3 per line at <768 / 768–991 / ≥992 like the
+   source (.item: 90% / 45% / 30%, inline-block with a 4px whitespace gap). Colour is
+   inherited, so the variant works on light or dark sections. Component tokens are
+   measured: .item-value 32/40, .item-unit 24/30, .item margin-bottom 50.
+   ========================================================================== */
+.columns.stats {
+  --stats-cell: 90%;
+  --stats-gap: 4px;
+  --stats-row-gap: 50px;
+  --stats-value-size: 32px;
+  --stats-unit-size: 24px;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: var(--stats-gap);
+  text-align: center;
+}
+
+.columns.stats > div {
+  display: contents;
+}
+
+.columns.stats > div > .columns-stat {
+  flex: 0 0 var(--stats-cell);
+  margin-bottom: var(--stats-row-gap);
+}
+
+.columns.stats .columns-stat p {
+  margin: 0;
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-light);
+  line-height: var(--line-height-body);
+}
+
+.columns.stats .columns-stat strong {
+  display: block;
+  font-weight: var(--weight-regular);
+}
+
+.columns.stats .columns-stat-value {
+  font-size: var(--stats-value-size);
+  line-height: 1.25;
+}
+
+.columns.stats .columns-stat-unit {
+  font-size: var(--stats-unit-size);
+  line-height: 1.25;
+}
+
+@media (width >= 768px) {
+  .columns.stats {
+    --stats-cell: 45%;
+  }
+}
+
+@media (width >= 992px) {
+  .columns.stats {
+    --stats-cell: 30%;
+  }
+
+  /* the base ≥992 row rules don't apply to the flat stats grid */
+  .columns.stats > div > .columns-stat {
+    flex: 0 0 var(--stats-cell);
+  }
+}

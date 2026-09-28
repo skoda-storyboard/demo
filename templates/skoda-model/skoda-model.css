@@ -1,0 +1,574 @@
+/* stylelint-disable no-descending-specificity --
+ * Rules are grouped per page component (hero → nav → text panels → band → rails) for
+ * readability; the flagged pairs (e.g. hero media img vs drawing img, nav links vs the
+ * PDF button) never match the same elements, so source order carries no meaning there. */
+
+/* ==========================================================================
+   Model page (SKODA-208)
+   Render target: docs/ui-specs/template-model-page.md + the SKODA-208 re-captures,
+   measured on the live Octavia / Superb / Fabia / Peaq / Epiq pages at 1440–375
+   (2026-09-28). Loaded only on `template: skoda_model` pages (scripts.js TEMPLATES).
+   Section roles come from templates/skoda-model/skoda-model.js. Block variants used:
+   hero-image (overlay), cards (key-facts), columns (stats), story-rail / carousel
+   (center, caption, media, video).
+   Layout base: the source container (1248 incl. a 10px gutter), content panels with
+   50px top padding, and an 8/12 centred text column (Model Description, Highlights,
+   drawings) from 992.
+   ========================================================================== */
+
+body.skoda-model {
+  --model-gutter: 10px;
+  --model-panel-gap: 50px;
+  --model-offset: 50px; /* short pages: the source's extra spacer before the description */
+  --model-heading-gap: 40px;
+  --model-nav-height: 99px;
+  --model-scroll-offset: 0px; /* the nav only sticks from 768 */
+  --model-nav-shadow: 0 1px 10px 3px rgb(0 0 0 / 5%);
+  --model-hero-shadow: 10px 1px 30px rgb(0 0 0 / 30%);
+  --model-hero-title-size: 36px;
+  --model-hero-title-size-compact: 24px;
+  --model-heading-size: 40px;
+  --model-drawing-title-size: 24px;
+  --model-band-padding: 80px;
+  --model-rail-gap: 48px;
+  --model-rail-header-gap: 24px;
+  --model-rail-head-height: 64.5px; /* h3 32.5 + "Based on tags" 32 */
+  --model-ghost-padding: 8px 32px;
+  --model-button-padding: 16px 24px;
+  --model-button-radius: 32px;
+
+  /* cells per view: overlay/derivative rails 90 / 45 / 30 %, media rails 90 / 30 / 22.5 %
+     of the source track (the content box + one gutter); card = cell − gutter */
+  --model-rail-cell: 0.9;
+  --model-media-cell: 0.9;
+}
+
+/* anchors land below the sticky nav (source offsets by the nav height) */
+body.skoda-model main [id] {
+  scroll-margin-top: var(--model-scroll-offset);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* sections own their spacing (no collapsing into the global 40px section margins) */
+body.skoda-model main > .section {
+  display: flow-root;
+  margin: 0;
+}
+
+body.skoda-model main > .section > div {
+  box-sizing: border-box;
+  max-width: var(--content-max-width);
+  padding: 0 var(--model-gutter);
+}
+
+/* ---- hero: `Hero Image (overlay)` restyled ---------------------------------
+   <768: 16:9 image, then the chip (overlapping the image edge) and a 24/700 ink title.
+   768–1079: 3:1 image, 24/700 ink title over its top-left corner (chip clipped, as live).
+   ≥1080: 5:2 image (512px at 1280), chip + 36/700 white title at the container's 5% inset.
+   ≥1440: 3:1 again (480 at 1440, 640 at 1920). */
+body.skoda-model main > .hero-image-container > .hero-image-wrapper {
+  max-width: none;
+  padding: 0;
+}
+
+body.skoda-model .hero-image.overlay .hero-image-media picture,
+body.skoda-model .hero-image.overlay .hero-image-media img {
+  height: auto;
+  aspect-ratio: 9 / 5;
+}
+
+body.skoda-model .hero-image.overlay .hero-image-media::after {
+  background-image: var(--scrim-h);
+}
+
+body.skoda-model .hero-image.overlay .hero-image-content {
+  position: relative;
+  inset: auto;
+  max-width: none;
+  margin: -21px 0 0;
+  padding: 0 calc(var(--model-gutter) * 3) var(--model-gutter);
+}
+
+body.skoda-model .hero-image.overlay .hero-image-content h1 {
+  margin: 0 0 6px;
+  color: var(--text-color);
+  font-size: var(--model-hero-title-size-compact);
+  font-weight: var(--weight-bold);
+  line-height: 1.25;
+  text-shadow: var(--model-hero-shadow);
+}
+
+body.skoda-model .hero-image.overlay .hero-image-content .hero-image-badge {
+  display: inline-block;
+  margin: 0 0 15px;
+  padding: var(--tag-padding);
+  border-radius: var(--tag-radius);
+  background-color: var(--skoda-grey-500);
+  color: var(--skoda-white);
+  font-size: var(--tag-font-size);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  letter-spacing: var(--tag-letter-spacing);
+  text-transform: uppercase;
+}
+
+/* ---- sticky icon nav --------------------------------------------------------
+   Source .model-nav: a 99px white bar, centred icon + label links, grey → ink with a
+   green icon and a 3px green bar on hover / current section; sticks to the top from
+   768. Below 768 the source hides it. Here it stays in the page as a skip-link style
+   landmark: visually hidden until a keyboard user tabs into it, then shown as a
+   scrollable strip (SKODA-208 AC: accessible mobile equivalent, no layout change). */
+body.skoda-model main > .section.model-nav-section {
+  position: relative;
+  z-index: 10;
+  background-color: var(--background-color);
+}
+
+body.skoda-model main > .section.model-nav-section:not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+body.skoda-model main > .section.model-nav-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: var(--model-nav-shadow);
+  pointer-events: none;
+}
+
+body.skoda-model .model-nav-list {
+  display: flex;
+  justify-content: flex-start;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+body.skoda-model .model-nav-list > li {
+  position: relative;
+  flex: none;
+  margin: 0;
+}
+
+body.skoda-model .model-nav-list > li::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background-color: var(--skoda-green-accent);
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+body.skoda-model .model-nav-list a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 20px 15px;
+  color: var(--skoda-grey-500);
+  font-size: var(--body-font-size-s);
+  font-weight: var(--weight-semibold);
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
+}
+
+body.skoda-model .model-nav-icon {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 5px;
+  background-color: currentcolor;
+  mask: var(--model-nav-icon) center / contain no-repeat;
+}
+
+body.skoda-model .icon-model-description { --model-nav-icon: url("/icons/model-description.svg"); }
+body.skoda-model .icon-model-key-facts { --model-nav-icon: url("/icons/model-key-facts.svg"); }
+body.skoda-model .icon-model-technical-data { --model-nav-icon: url("/icons/model-technical-data.svg"); }
+body.skoda-model .icon-model-derivatives { --model-nav-icon: url("/icons/model-derivatives.svg"); }
+body.skoda-model .icon-model-news { --model-nav-icon: url("/icons/model-news.svg"); }
+body.skoda-model .icon-model-press-kits { --model-nav-icon: url("/icons/model-press-kits.svg"); }
+body.skoda-model .icon-model-stories { --model-nav-icon: url("/icons/model-stories.svg"); }
+body.skoda-model .icon-model-images { --model-nav-icon: url("/icons/model-images.svg"); }
+body.skoda-model .icon-model-videos { --model-nav-icon: url("/icons/model-videos.svg"); }
+
+body.skoda-model .model-nav-list a:hover,
+body.skoda-model .model-nav-list a[aria-current] {
+  color: var(--text-color);
+}
+
+body.skoda-model .model-nav-list a:hover .model-nav-icon,
+body.skoda-model .model-nav-list a[aria-current] .model-nav-icon {
+  background-color: var(--skoda-green-accent);
+}
+
+body.skoda-model .model-nav-list > li:hover::after,
+body.skoda-model .model-nav-list > li:has(a[aria-current])::after {
+  opacity: 1;
+}
+
+body.skoda-model .model-nav-list a:focus-visible {
+  outline: 2px solid var(--skoda-green-accent);
+  outline-offset: -2px;
+}
+
+/* ---- text panels: Model Description, Highlights, technical drawings ---------- */
+body.skoda-model .section.model-intro,
+body.skoda-model .section.model-highlights {
+  padding-top: var(--model-panel-gap);
+}
+
+body.skoda-model.model-short .section.model-intro {
+  padding-top: calc(var(--model-panel-gap) + var(--model-offset));
+}
+
+body.skoda-model .model-intro h2,
+body.skoda-model .model-highlights h2 {
+  margin: 0 0 var(--model-heading-gap);
+  font-size: var(--model-heading-size);
+  font-weight: var(--weight-light);
+  line-height: 1.125;
+}
+
+body.skoda-model .model-intro p {
+  margin: 0 0 var(--paragraph-gap);
+}
+
+/* technical drawings (Liftback / Combi): a 24/300 heading over a full-column image */
+body.skoda-model .model-highlights .cards-wrapper + .default-content-wrapper {
+  padding-top: var(--model-panel-gap);
+}
+
+body.skoda-model .model-highlights .default-content-wrapper > h3 {
+  margin: 0 0 var(--spacing-m);
+  font-size: var(--model-drawing-title-size);
+  font-weight: var(--weight-light);
+  line-height: 1.15;
+}
+
+/* each drawing is its own 50px-padded panel on the source (no margin collapsing) */
+body.skoda-model .model-highlights .model-drawing + h3 {
+  padding-top: var(--model-panel-gap);
+}
+
+body.skoda-model .model-drawing {
+  margin: 0 0 var(--paragraph-gap);
+}
+
+body.skoda-model .model-drawing img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ---- Technical Data: a dark band (the content width, not full-bleed) ------------ */
+body.skoda-model main > .section.model-techdata {
+  max-width: var(--content-max-width);
+  margin: var(--model-heading-gap) auto 0;
+  padding: var(--model-band-padding) 0;
+  background-color: var(--dark-color);
+  color: var(--skoda-white);
+}
+
+body.skoda-model main > .section.model-techdata > div {
+  padding: 0;
+}
+
+body.skoda-model .model-techdata h2 {
+  margin: 0 0 var(--model-heading-gap);
+  color: var(--skoda-white);
+  font-size: var(--model-heading-size);
+  font-weight: var(--weight-bold);
+  line-height: 1.125;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+/* Fabia: a banner image flush with the top of the band */
+body.skoda-model .model-techdata-banner {
+  margin: calc(var(--model-band-padding) * -1) 0 var(--model-band-padding);
+}
+
+body.skoda-model .model-techdata-banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+body.skoda-model .model-techdata-download {
+  margin: 0;
+  text-align: center;
+}
+
+body.skoda-model .model-techdata-download a {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--model-button-padding);
+  border-radius: var(--model-button-radius);
+  background-color: var(--skoda-green-emerald);
+  color: var(--text-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  letter-spacing: 1px;
+  text-decoration: none;
+}
+
+body.skoda-model .model-techdata-download a::before {
+  content: "";
+  width: 25px;
+  height: 16px;
+  background-color: currentcolor;
+  mask: url("/icons/model-download.svg") left center / contain no-repeat;
+}
+
+body.skoda-model .model-techdata-download a:hover,
+body.skoda-model .model-techdata-download a:focus-visible {
+  background-color: var(--skoda-green-emerald-hover);
+}
+
+body.skoda-model .model-techdata-download a:focus-visible {
+  outline: 2px solid var(--skoda-white);
+  outline-offset: 2px;
+}
+
+/* ---- rails: heading + "Based on tags" left, the "All" ghost pill right ---------- */
+
+/* source .search-results: margin 24px 0 48px (collapsing between rails) + a 24px header pad */
+body.skoda-model main > .section.model-rail {
+  margin: var(--model-rail-header-gap) 0 var(--model-rail-gap);
+  padding-top: var(--model-rail-header-gap);
+}
+
+body.skoda-model .model-rail .default-content-wrapper {
+  margin-bottom: var(--grid-gutter);
+}
+
+body.skoda-model .model-rail .default-content-wrapper > h2 {
+  margin: 0;
+  font-size: var(--heading-font-size-l);
+  font-weight: var(--weight-semibold);
+  line-height: 1.25;
+}
+
+body.skoda-model .model-rail-subheading {
+  margin: 0;
+  color: var(--skoda-grey-350);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 2;
+}
+
+/* the rail's own header only holds the "All" link: lift it beside the heading block */
+body.skoda-model .model-rail .story-rail {
+  position: relative;
+  width: 100%;
+}
+
+body.skoda-model .model-rail .story-rail-header {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--grid-gutter));
+  height: var(--model-rail-head-height);
+  margin: 0;
+  align-items: center;
+}
+
+body.skoda-model .model-rail .story-rail-viewall {
+  padding: var(--model-ghost-padding);
+  border: 2px solid var(--skoda-grey-750);
+  border-radius: var(--pill-radius);
+  background-color: var(--background-color);
+  color: var(--skoda-grey-750);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  letter-spacing: 1px;
+  text-decoration: none;
+}
+
+body.skoda-model .model-rail .story-rail-viewall:hover {
+  background-color: var(--skoda-grey-50);
+  text-decoration: none;
+}
+
+/* cell ladder through the carousel's --carousel-cell-width hook (source flickity cells,
+   card = cell − the 20px gutter); the global li bottom margin must not add 8px under the rail */
+body.skoda-model .model-rail .carousel {
+  --carousel-cell-width: calc((100% + var(--carousel-gap)) * var(--model-rail-cell) - var(--carousel-gap));
+}
+
+body.skoda-model .model-rail .carousel.media {
+  --carousel-cell-width: calc((100% + var(--carousel-gap)) * var(--model-media-cell) - var(--carousel-gap));
+}
+
+body.skoda-model .model-rail .carousel-track .card-teaser {
+  margin-block: 0;
+}
+
+/* Bodywork / Derivatives: 16:9 image over a 45px white title strip, no date */
+body.skoda-model .carousel.center .carousel-track .card-teaser {
+  box-shadow: none;
+}
+
+body.skoda-model .carousel.center .card-teaser-image {
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
+}
+
+body.skoda-model .carousel.center .carousel-caption .card-teaser-image img {
+  aspect-ratio: 16 / 9;
+}
+
+body.skoda-model .carousel.center .card-teaser-body {
+  margin: 0;
+}
+
+/* <768 only one card fits: the source centres it (cellAlign:center) */
+body.skoda-model .model-rail .carousel.center .card-teaser:first-child {
+  margin-inline-start: calc((100% + var(--carousel-gap)) * (1 - var(--model-rail-cell)) / 2);
+}
+
+body.skoda-model .model-rail .carousel.center .card-teaser:last-child {
+  margin-inline-end: calc((100% + var(--carousel-gap)) * (1 - var(--model-rail-cell)) / 2);
+}
+
+body.skoda-model .carousel.center .card-teaser-date {
+  display: none;
+}
+
+body.skoda-model .carousel.center .card-teaser-title {
+  color: var(--skoda-black);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 45px;
+  text-align: center;
+}
+
+/* ---- breakpoints ------------------------------------------------------------ */
+@media (width >= 768px) {
+  body.skoda-model {
+    --model-rail-cell: 0.45;
+    --model-media-cell: 0.3;
+    --model-scroll-offset: var(--model-nav-height);
+    --model-offset: 74px;
+  }
+
+  body.skoda-model .model-rail .carousel.center .card-teaser:first-child,
+  body.skoda-model .model-rail .carousel.center .card-teaser:last-child {
+    margin-inline: 0;
+  }
+
+  body.skoda-model .hero-image.overlay .hero-image-media picture,
+  body.skoda-model .hero-image.overlay .hero-image-media img {
+    aspect-ratio: 3 / 1;
+  }
+
+  body.skoda-model .hero-image.overlay .hero-image-content {
+    position: absolute;
+    inset: 18px auto auto 0;
+    margin: 0;
+    padding: 0 calc(var(--model-gutter) * 2);
+  }
+
+  /* 768–1079 the source clips the chip above the image edge */
+  body.skoda-model .hero-image.overlay .hero-image-content .hero-image-badge {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  body.skoda-model main > .section.model-nav-section,
+  body.skoda-model main > .section.model-nav-section:not(:focus-within) {
+    position: sticky;
+    top: 0;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  /* the facts row runs one gutter wider than the text column on each side */
+  body.skoda-model .model-highlights .cards.key-facts {
+    margin-inline: calc(var(--model-gutter) * -1);
+  }
+
+  body.skoda-model .model-nav-list {
+    justify-content: center;
+    overflow: visible;
+  }
+
+  body.skoda-model .model-nav-list > li {
+    flex: 0 1 auto;
+  }
+}
+
+@media (width >= 992px) {
+  body.skoda-model {
+    --model-rail-cell: 0.3;
+    --model-media-cell: 0.225;
+  }
+
+  /* the 8/12 centred text column */
+  body.skoda-model .model-intro .default-content-wrapper > :is(h2, h3, p),
+  body.skoda-model .model-highlights .default-content-wrapper > :is(h2, h3, p) {
+    max-width: calc(100% * 2 / 3 - var(--model-gutter) * 2);
+    margin-inline: auto;
+  }
+
+  body.skoda-model .model-highlights .cards.key-facts {
+    max-width: calc(100% * 2 / 3);
+    margin-inline: auto;
+  }
+
+  body.skoda-model .hero-image.overlay .hero-image-content > :is(h1, p) {
+    max-width: 50%;
+  }
+}
+
+@media (width >= 1080px) {
+  body.skoda-model .hero-image.overlay .hero-image-media picture,
+  body.skoda-model .hero-image.overlay .hero-image-media img {
+    aspect-ratio: 5 / 2;
+  }
+
+  body.skoda-model .hero-image.overlay .hero-image-content {
+    inset: 0 0 auto;
+    box-sizing: border-box;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: 12px min(5%, 62px) 0;
+  }
+
+  body.skoda-model .hero-image.overlay .hero-image-content h1 {
+    margin-bottom: 9px;
+    color: var(--skoda-white);
+    font-size: var(--model-hero-title-size);
+  }
+
+  body.skoda-model .hero-image.overlay .hero-image-content .hero-image-badge {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+}
+
+@media (width >= 1440px) {
+  body.skoda-model .hero-image.overlay .hero-image-media picture,
+  body.skoda-model .hero-image.overlay .hero-image-media img {
+    aspect-ratio: 3 / 1;
+  }
+}
