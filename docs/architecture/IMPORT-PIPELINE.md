@@ -20,7 +20,7 @@ page-templates.json  ──►  import-<name>.js  ──►  import-<name>.bundl
                                      ▼
                                content/<path>.plain.html   (local, bare <div> markup)
                                      │  media:build → media:apply
-                                     │  push-to-da.mjs: wrap page and POST to DA
+                                     │  push-to-da.mjs: verify/rewrite binaries, wrap and POST to DA
                                      ▼
                      admin.da.live/source/{org}/{repo}/{path}.html
                                      │  bulk preview → validate → bulk publish (+ /nav, /footer live)
@@ -113,6 +113,19 @@ rest of the batch continues. See the
 option and per-image report. Publish-only refuses DA/local mismatches and
 refreshes the preview before live publish.
 
+**SKODA-503's binary gate is enforced by `import:push`:** once a PDF/MP4
+manifest row has completed DAM upload and publish activation and records
+anonymous original MIME/byte-count proof, the push rewrites matching source
+anchors in memory **before** validation, conflict detection and DA upload.
+An allowed push saves the same rewritten content locally; `--dry-run` reports
+the prospective rewrite count but does not write either copy. Missing or
+unverified mappings block that page; an author-edited DA page is never
+overwritten without explicit conflict review. `media:apply` remains the
+explicit pre-push rewrite path, and `media:validate-binaries` checks that
+output offline. Preview-only and publish-only cannot smuggle a newly rewritten
+page into DA; run `--stage push,preview` first. Neither DA push nor the
+offline gate uploads or activates Assets originals.
+
 ### `urls-<name>.txt`
 The input URL list for the run.
 
@@ -126,6 +139,11 @@ The input URL list for the run.
 # 2) Prepare delivery images; fail if any requested page/image cannot be resolved.
 npm run media:build -- --pages content/<path>.plain.html
 npm run media:apply -- --pages content/<path>.plain.html
+# PDFs/MP4s additionally need approved AEM Assets ingest + activation + a
+# verified public URL mapping before media:apply (see media/README.md).
+# media:build above already records them as pending manifest rows: commit
+# media-manifest.json with the import; the ingest runs on a developer machine.
+npm run media:validate-binaries -- --pages content/<path>.plain.html
 # 3) Validate metadata + the pending-block contract, then inspect locally against previewed DA content.
 node tools/importer/validate-metadata.mjs content/<path>.plain.html
 npm run import:validate-blocks -- --urls tools/importer/urls-<name>.txt   # SKODA-603; fails on unknown/superseded blocks
@@ -134,7 +152,8 @@ npx -y @adobe/aem-cli up          # inspect content/... at localhost:3000
 # 4) Plan the push (reads DA, decides new/unchanged/update/conflict — writes nothing)
 npm run import:push -- --urls tools/importer/urls-<name>.txt --dry-run
 
-# 5) The SKODA-506 gate runs before DA push/preview; review its image decisions.
+# 5) The binary rewrite/gate and SKODA-506 gate run before DA push/preview;
+#    review link rewrites, image decisions, and author-edit conflicts.
 npm run import:push -- --urls tools/importer/urls-<name>.txt
 
 # 6) After preview review: gate again → fresh preview → publish → reindex (+ fragments live).
@@ -150,7 +169,11 @@ have a pinned entry in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../planning/SKODA-PE
 shape even when the block has no code yet; the block ticket builds against that shape, so its
 landing needs a re-QA, not a re-import.
 
-**Order matters:** import → media build/apply → metadata + block validation →
+**Order matters:** import → media build/apply (for selected PDFs/MP4s the builder
+uploads originals to Assets, activates them on publish and proves anonymous
+public delivery before rewriting links; private author DAM paths do not
+qualify; `import:push` also rewrites verified links if apply was not run) →
+offline binary + metadata + block validation →
 SKODA-506 gate before DA push/preview → review → recheck and refreshed preview
 before **publish** → reindex. SKODA-501's media builder selects publish-safe
 renditions, but does **not** replace the publish-time gate. The query-index only sees *published*

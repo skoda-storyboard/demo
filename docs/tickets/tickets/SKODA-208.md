@@ -2,7 +2,11 @@
 - **Epic:** E02, Core Blocks
 - **Type:** template / import
 - **Phase:** B  ·  **Pilot:** No · **Milestone:** ~~M2 (go-live)~~ → **M1 (15 Oct demo)**. Re-milestoned 2026-09-24 to match the board: 5 model URLs are in the 43-URL M1 set (see update below).
-- **Estimate:** 5 SP **+1 net Must = 6 SP** (2026-09-25 amendment, below) · AI-assisted 2–3d / manual 4–6d *(planning estimate, not a quote)*
+- **Estimate:** 5 SP **+1 net Must = 6 SP** (2026-09-25 amendment, below) · AI-assisted 2–3d / manual 4–6d *(planning estimate, not a quote)*. The hero UI moved to SKODA-828 on 2026-09-28; re-estimate at the next grooming.
+
+> **Hero UI moved to [SKODA-828](SKODA-828.md) ([#196](https://github.com/skoda-storyboard/demo/issues/196)) (2026-09-28).** The hero sweep measured the source model hero (full-bleed, about
+> vw/3 tall, top-left 36/700 title) up to 3840px. Its acceptance criteria now live in SKODA-828 F2. This ticket keeps
+> the importer contract (`Hero Image (overlay)`: picture, "Models" chip, H1) and the single-`h1` rule.
 
 > **Update (2026-09-24, M1 gap review, [`SKODA-M1-GAP-REVIEW.md`](../../reviews/SKODA-M1-GAP-REVIEW.md)).**
 >
@@ -197,7 +201,7 @@ Deliver the vehicle Model page template: a model hero + an in-page icon section-
 
 ## Description
 Confirmed live on `/en/skoda-model/peaq/`. This ticket delivers:
-- **Model hero:** full-bleed image (carousel) with a category chip + model name overlay.
+- **Model hero:** full-bleed image (carousel) with a category chip + model name overlay. *(Import here; UI in SKODA-828.)*
 - **Icon section-nav:** a centered row of 8 icon+label in-page anchors; desktop-only in source, provide an accessible mobile equivalent (in-page skip links).
 - **Content sections:** Model Description (rich text), Key Facts, Technical Data (spec table).
 - **5 related rails:** News, Press Kits, Stories, Images, Videos, each a query-index rail filtered by the model tag (reuse `carousel-rails`/`story-rail` + `card-teaser`; Images/Videos add lightbox + cart).
@@ -210,18 +214,18 @@ Confirmed live on `/en/skoda-model/peaq/`. This ticket delivers:
 
 ## Acceptance Criteria
 Measurable gates live in [`template-model-page.md` §10](../../ui-specs/template-model-page.md); summary:
-- [ ] MR shell; single `h1` = model name; hero full-bleed (~510px) with chip + name `36px/700` white (→24px @500).
+- [ ] MR shell; single `h1` = model name. *(Hero UI criteria moved to SKODA-828 F2.)*
 - [ ] Icon section-nav: 8 in-page anchors (Model Description…Videos), centered, not sticky, desktop-only + accessible mobile equivalent.
 - [ ] Sections in order: intro / key-facts / tech-data, then 5 tag rails (News, Press Kits, Stories, Images, Videos), headings `26px/32.5/600 #161718`, ~`356px` rhythm.
 - [ ] Rails query the model tag; each respects its own carousel config; Images/Videos wire lightbox + cart.
-- [ ] Content cap `1248`; a11y (nav landmark, heading order, hero contrast).
-- [ ] Visual diff vs source at 1280/1024/768/500 ≤ 2% per-pixel (hero + nav + one rail).
+- [ ] Content cap `1248`; a11y (nav landmark, heading order). Hero contrast is in SKODA-828.
+- [ ] Visual diff vs source at 1280/1024/768/500 ≤ 2% per-pixel (nav + one rail; the hero diff is SKODA-828).
 
 ## Amendments (2026-09-25, sweep reconciliation, [`SKODA-M1-URL-BLOCK-SWEEP.md`](../../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §6 + §11)
-These **supersede** the conflicting items above: 8 anchors / not sticky / ~510px hero.
+These **supersede** the conflicting items above: 8 anchors / not sticky.
 - [ ] Section-nav is a **sticky** icon nav on desktop with an accessible mobile equivalent. Match the source link
-      count per model: 9 / 8 / 6. Emit only links whose target section exists (no dangling anchors). Hero height is
-      about 480px.
+      count per model: 9 / 8 / 6. Emit only links whose target section exists (no dangling anchors). *(The "hero about
+      480px" item moved to SKODA-828 F2, superseded by measured values.)*
 - [ ] Match the source rail count per model: 3 / 5 / 6. Rail tags and the subheading come per model from the source
       (e.g. Fabia `model=fabia`, `bodywork=hatchback`), with an "All" deep link. A hardcoded `elroq` is rejected.
       A two-cell subheading row is config, never a card. An empty rail removes its section. The Bodywork rail is
@@ -238,6 +242,7 @@ These **supersede** the conflicting items above: 8 anchors / not sticky / ~510px
 ## Dependencies
 - Upstream: SKODA-202 (hero), SKODA-201 (cards/rails), SKODA-402 (query-index retrieval), SKODA-203 (gallery-lightbox), SKODA-505 (media-cart), SKODA-601 (import infra)
 - Downstream: SKODA-1001 (per-locale trees)
+- Related: SKODA-828 (hero UI, moved out 2026-09-28; it builds on this ticket's importer output)
 
 ## Risks / Flags
 - **Rail retrieval rule (🟡):** "Based on tags: <model>" = model tag; confirm exact taxonomy + per-rail ordering across ≥2 models.

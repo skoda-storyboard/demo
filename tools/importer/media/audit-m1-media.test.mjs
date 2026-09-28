@@ -63,6 +63,8 @@ test('M1 audit excludes the annotated alias, reports missing pages and checks im
       documents: 0,
       untrackedDocuments: 0,
       pendingDamDocument: 0,
+      videos: 0,
+      unverifiedBinaries: 0,
     });
 
     assert.deepEqual(report.pages.map(({ path: p }) => p), ['en/story', 'en/other-story']);
@@ -180,8 +182,19 @@ test('M1 audit tracks linked PDFs: untracked, then pending, then in the DAM (SKO
     assert.deepEqual(counts(['untrackedDocuments', 'pendingDamDocument', 'missingFromPage']), [0, 1, 0]);
 
     row.steps.dam = 'done';
+    row.steps.publish = 'done';
     row.dam_asset_path = '/content/dam/storyboard/en/skoda-model/new-kodiaq/TD-Kodiaq-en.pdf';
+    row.status = 'done';
+    row.source_url = pdf;
+    row.public_url = 'https://publish-p123.adobeaemcloud.com/content/dam/TD-Kodiaq-en.pdf';
+    row.bytes = 42;
+    row.public_verified = { url: row.public_url, mime: 'application/pdf', bytes: 42 };
     writeFileSync(manifest, JSON.stringify({ rows: { [row.logical_id]: row } }));
+    await assert.rejects(exec(process.execPath, command, { cwd: dir }), /Command failed/);
+    writeFileSync(
+      path.join(content, 'en/skoda-model/new-kodiaq.plain.html'),
+      `<p><a href="${row.public_url}">Download PDF</a></p>`,
+    );
     await exec(process.execPath, command, { cwd: dir });
     ({ summary } = JSON.parse(readFileSync(output, 'utf8')));
     assert.equal(summary.pendingDamDocument, 0);

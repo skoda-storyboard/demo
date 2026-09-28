@@ -7,10 +7,17 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import main from './push-to-da.mjs';
 import { contentHash, wrapPage } from './push/push-lib.mjs';
+import { logicalId } from './media/media-lib.mjs';
+
+const binarySource = 'https://www.skoda-storyboard.com/direct-download/report.pdf';
+const binaryPublic = 'https://publish-p123.adobeaemcloud.com/content/dam/report.pdf';
+const videoSource = 'https://www.skoda-storyboard.com/direct-download/clip.mp4';
+const videoPublic = 'https://publish-p123.adobeaemcloud.com/content/dam/clip.mp4';
 
 async function scenario(stage, remoteMatches, {
   previewed = false, image = 'small', extra = [], edited = false, fragmentBlocked = false,
   blockedSibling = false,
+  binary = '', binarySibling = false, video = false,
 } = {}) {
   const dir = mkdtempSync(path.join(tmpdir(), 'skoda-506-push-'));
   const previousFetch = global.fetch;
@@ -21,16 +28,50 @@ async function scenario(stage, remoteMatches, {
   const mediaManifestFile = path.join(dir, 'media-manifest.json');
   const list = path.join(dir, 'paths.txt');
   const plain = `<figure><img src="https://cdn.example.test/${image}.jpg" alt="Kept"></figure>`
-    + '<div class="metadata"><div><div>Image</div><div>https://cdn.example.test/card.jpg</div></div></div>';
+    + `<div class="metadata"><div><div>Image</div><div>https://cdn.example.test/card.jpg</div></div></div>${
+      binary ? `<p><a href="${binary === 'hosted' ? binaryPublic : binarySource}">Report PDF</a></p>` : ''}${
+      video ? `<p><a href="${videoSource}">Download video</a></p>` : ''}`;
   let da = remoteMatches ? plain : '<div>Edited in DA</div>';
   const requests = [];
   mkdirSync(path.join(contentDir, 'en'), { recursive: true });
   writeFileSync(path.join(contentDir, 'en', 'story.plain.html'), plain);
-  writeFileSync(list, `/en/story\n${blockedSibling ? '/en/blocked\n' : ''}`);
+  writeFileSync(list, `/en/story\n${blockedSibling ? '/en/blocked\n' : ''}${binarySibling ? '/en/binary\n' : ''}`);
   if (blockedSibling) {
     writeFileSync(path.join(contentDir, 'en', 'blocked.plain.html'), '<div><img src="https://cdn.example.test/huge.jpg" alt="No rendition"></div>');
   }
-  writeFileSync(mediaManifestFile, '{"rows":{}}\n');
+  if (binarySibling) {
+    writeFileSync(
+      path.join(contentDir, 'en', 'binary.plain.html'),
+      `<p><a href="${binarySource}">Report PDF</a></p>`,
+    );
+  }
+  const binaryRow = {
+    logical_id: logicalId(binarySource),
+    kind: 'document',
+    source_url: binarySource,
+    page_refs: ['ready', 'hosted'].includes(binary) ? ['en/story'] : [],
+    dam_asset_path: '/content/dam/storyboard/report.pdf',
+    public_url: binaryPublic,
+    bytes: 42,
+    public_verified: { url: binaryPublic, mime: 'application/pdf', bytes: 42 },
+    status: 'done',
+    steps: { dam: 'done', publish: 'done' },
+  };
+  const videoRow = {
+    ...binaryRow,
+    logical_id: logicalId(videoSource),
+    kind: 'video',
+    source_url: videoSource,
+    dam_asset_path: '/content/dam/storyboard/clip.mp4',
+    public_url: videoPublic,
+    public_verified: { url: videoPublic, mime: 'video/mp4', bytes: 42 },
+  };
+  writeFileSync(mediaManifestFile, JSON.stringify({
+    rows: {
+      ...(['ready', 'hosted'].includes(binary) ? { [binaryRow.logical_id]: binaryRow } : {}),
+      ...(video === true ? { [videoRow.logical_id]: videoRow } : {}),
+    },
+  }));
   const hash = contentHash(wrapPage(da));
   writeFileSync(manifestFile, JSON.stringify({
     pages: {
@@ -86,6 +127,9 @@ async function scenario(stage, remoteMatches, {
     if (address.includes('.aem.page/en/story.plain.html')) {
       return new Response('<img src="./media_abc123.jpg" alt="Kept">', { status: 200 });
     }
+    if (/\.aem\.(page|live)\/metadata\.json/.test(address)) {
+      return new Response(null, { status: 404 }); // no bulk metadata sheet published
+    }
     if (address.includes('query-index.json')) {
       return Response.json({ data: [{ path: '/en/story' }] });
     }
@@ -101,6 +145,7 @@ async function scenario(stage, remoteMatches, {
     return {
       report,
       requests,
+      da,
       plain: readFileSync(path.join(contentDir, 'en', 'story.plain.html'), 'utf8'),
       state: JSON.parse(readFileSync(manifestFile, 'utf8')),
     };
@@ -188,4 +233,76 @@ test('a media-blocked page does not stop the rest of the batch', async () => {
   assert.equal(result.state.pages['/en/story'].previewedHash, result.state.pages['/en/story'].hash);
   assert.ok(!result.requests.some((req) => req.includes('/en/blocked') && req.startsWith('POST ')));
   assert.equal(result.requests.filter((req) => req === 'HEAD https://cdn.example.test/big.jpg').length, 1);
+});
+
+test('the binary gate blocks unmapped source links before a DA write', async () => {
+  const result = await scenario('push,preview', true, { binary: 'source' });
+  assert.equal(result.report.pages[0].action, 'blocked-binary');
+  assert.match(result.report.pages[0].error, /unverified document link/);
+  assert.ok(!result.requests.some((request) => request.startsWith('POST ')));
+});
+
+test('a binary-blocked page does not block another page from preview', async () => {
+  const result = await scenario('push,preview', true, { binarySibling: true });
+  assert.equal(result.report.pages[0].valid, true);
+  assert.equal(result.report.pages[1].action, 'blocked-binary');
+  assert.ok(result.requests.some((request) => request.includes('POST https://admin.hlx.page/preview/')));
+  assert.ok(!result.requests.some((request) => request.startsWith('POST ') && request.includes('/en/binary')));
+});
+
+test('verified Assets links pass the offline binary gate without binary network probes', async () => {
+  const result = await scenario('push,preview', true, { binary: 'hosted' });
+  assert.equal(result.report.pages[0].valid, true);
+  assert.deepEqual(result.report.pages[0].binaries, { count: 1, rewrites: 0, errors: [] });
+  assert.ok(!result.requests.some((request) => request.includes('publish-p123.adobeaemcloud.com')));
+});
+
+test('DA push rewrites verified PDF and MP4 source links and persists the same local content', async () => {
+  const result = await scenario('push,preview', true, { binary: 'ready', video: true });
+  assert.equal(result.report.pages[0].valid, true);
+  assert.deepEqual(result.report.pages[0].binaries, { count: 2, rewrites: 2, errors: [] });
+  for (const text of [result.da, result.plain]) {
+    assert.match(text, new RegExp(`href="${binaryPublic}"`));
+    assert.match(text, new RegExp(`href="${videoPublic}"`));
+    assert.doesNotMatch(text, /href="https:\/\/www\.skoda-storyboard\.com\/direct-download/);
+    assert.match(text, /Report PDF/);
+    assert.match(text, /Download video/);
+  }
+  assert.ok(result.requests.some((request) => request.includes('POST https://admin.da.live/source/')));
+  assert.ok(!result.requests.some((request) => request.includes('publish-p123.adobeaemcloud.com')));
+});
+
+test('DA dry-run reports binary rewrites but never changes local or DA content', async () => {
+  const result = await scenario('push,preview', true, {
+    binary: 'ready', video: true, extra: ['--dry-run'],
+  });
+  assert.deepEqual(result.report.pages[0].binaries, { count: 2, rewrites: 2, errors: [] });
+  assert.match(result.plain, new RegExp(`href="${binarySource}"`));
+  assert.match(result.da, new RegExp(`href="${videoSource}"`));
+  assert.ok(!result.requests.some((request) => request.startsWith('POST ')));
+});
+
+test('an unmapped MP4 blocks the entire page even when its PDF is verified', async () => {
+  const result = await scenario('push,preview', true, { binary: 'ready', video: 'unverified' });
+  assert.equal(result.report.pages[0].action, 'blocked-binary');
+  assert.match(result.report.pages[0].error, /unverified video link/);
+  assert.match(result.plain, new RegExp(`href="${binarySource}"`));
+  assert.match(result.da, new RegExp(`href="${binarySource}"`));
+  assert.ok(!result.requests.some((request) => request.startsWith('POST ')));
+});
+
+test('author edits block a verified binary rewrite without changing DA or local content', async () => {
+  const result = await scenario('push,preview', true, { binary: 'ready', video: true, edited: true });
+  assert.equal(result.report.pages[0].action, 'conflict');
+  assert.match(result.plain, new RegExp(`href="${binarySource}"`));
+  assert.match(result.da, new RegExp(`href="${videoSource}"`));
+  assert.ok(!result.requests.some((request) => request.startsWith('POST ')));
+});
+
+test('preview-only cannot push a verified binary rewrite into an older DA document', async () => {
+  const result = await scenario('preview', true, { binary: 'ready', video: true });
+  assert.match(result.report.pages[0].error, /run --stage push,preview first/);
+  assert.match(result.plain, new RegExp(`href="${binarySource}"`));
+  assert.match(result.da, new RegExp(`href="${videoSource}"`));
+  assert.ok(!result.requests.some((request) => request.startsWith('POST ')));
 });

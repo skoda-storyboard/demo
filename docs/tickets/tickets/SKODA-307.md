@@ -4,6 +4,9 @@
 - **Phase:** A · **Milestone:** M1
 - **GitHub issue:** [#143](https://github.com/skoda-storyboard/demo/issues/143)
 - **Estimate:** 0.5 SP · AI-assisted 0.25d / manual 0.5d *(planning estimate, not a quote)*
+- **Status (2026-09-28):** 🟡 implemented in the SKODA-309 PR: `header.js` and `footer.js` warn and leave the block
+  empty when `loadFragment()` returns null. Covered by `blocks/header/header.test.mjs`, which runs the real decorate()
+  against 404 fragments.
 - **Status (2026-09-25):** 🔵 TODO
 
 ## Origin

@@ -150,14 +150,49 @@ export function parseJobDetails(details) {
 }
 
 /**
+ * Whether a bulk metadata `URL` pattern matches a page path (aem.live bulk metadata:
+ * `*` wildcards, `**` across folders, e.g. `/en/press-releases/**`). Trailing slashes are
+ * ignored on both sides, like EDS page paths.
+ * @param {string} pattern the sheet's URL cell
+ * @param {string} page the page path
+ * @returns {boolean}
+ */
+export function bulkPatternMatches(pattern, page) {
+  const trim = (s) => String(s || '').trim().replace(/(.)\/+$/, '$1');
+  const pat = trim(pattern);
+  if (!pat) return false;
+  const re = pat.split(/(\*\*|\*)/).map((part) => {
+    if (part === '**') return '.*';
+    if (part === '*') return '[^/]*';
+    return part.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+  }).join('');
+  return new RegExp(`^${re}$`).test(trim(page));
+}
+
+/**
  * Shared fragments a page depends on: the header/footer blocks load `/nav` and `/footer`
  * unless page metadata overrides them (blocks/header/header.js, blocks/footer/footer.js).
- * Reads a `nav` / `footer` row from the importer's Metadata block.
+ * Reads a `nav` / `footer` row from the importer's Metadata block, and from the bulk
+ * metadata sheet (`/metadata.json`) rows whose `URL` pattern matches a page of the batch
+ * (the Media Room chrome comes from bulk rows, SKODA-309).
  * @param {string[]} plains the `.plain.html` bodies of the batch
+ * @param {{paths?: string[], bulk?: object[]}} [opts] the batch page paths and the bulk rows
  * @returns {string[]} unique fragment paths, defaults first
  */
-export function fragmentPaths(plains) {
+export function fragmentPaths(plains, { paths = [], bulk = [] } = {}) {
   const out = ['/nav', '/footer'];
+  const add = (value) => {
+    const p = pagePath(value);
+    if (p && p !== '/index' && !out.includes(p)) out.push(p);
+  };
+  (bulk || []).forEach((row) => {
+    const pattern = row.URL || row.url || '';
+    if (!(paths || []).some((p) => bulkPatternMatches(pattern, p))) return;
+    ['nav', 'footer'].forEach((key) => {
+      const value = String(row[key] || '').trim();
+      if (value && value !== '""') add(value);
+    });
+  });
   (plains || []).forEach((plain) => {
     // key/value rows `<div><div>nav</div><div>/path</div></div>` (Metadata block shape)
     const text = String(plain || '');

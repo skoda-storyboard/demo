@@ -10,6 +10,7 @@ import { JSDOM } from 'jsdom';
 import {
   logicalId, isImageUrl, isDocumentUrl, OVERSIZE_BYTES,
 } from './media-lib.mjs';
+import { binaryAnchors, binaryErrors } from './binary-media.mjs';
 
 function args() {
   const parsed = {
@@ -45,14 +46,18 @@ function auditPage(pagePath, contentRoot, rows) {
   const found = existsSync(file) ? file : indexFile;
   if (!existsSync(found)) {
     return {
-      path: pagePath, status: 'missing', images: [], documents: [],
+      path: pagePath, status: 'missing', images: [], documents: [], videos: [],
     };
   }
 
-  const doc = new JSDOM(readFileSync(found, 'utf8')).window.document;
+  const html = readFileSync(found, 'utf8');
+  const doc = new JSDOM(html).window.document;
   const byDelivery = new Map(Object.values(rows)
     .filter((row) => row.delivery_url)
     .map((row) => [row.delivery_url, row]));
+  const byPublic = new Map(Object.values(rows)
+    .filter((row) => row.kind === 'document' && row.public_url)
+    .map((row) => [row.public_url, row]));
   const images = [...doc.querySelectorAll('img')].map((img) => {
     const src = img.getAttribute('src') || '';
     const alreadyDelivered = /^\.?\/media_[^/]+/.test(src);
@@ -81,7 +86,7 @@ function auditPage(pagePath, contentRoot, rows) {
     .map((a) => a.getAttribute('href'))
     .filter((href) => /^https?:/i.test(href) && isDocumentUrl(href))
     .map((href) => {
-      const row = rows[logicalId(href)];
+      const row = byPublic.get(href) || rows[logicalId(href)];
       return {
         href,
         tracked: row?.kind === 'document',
@@ -91,12 +96,19 @@ function auditPage(pagePath, contentRoot, rows) {
   const actual = new Set(images.map((img) => img.logicalId).filter(Boolean));
   const expected = Object.values(rows).filter((row) => {
     const refs = row.page_refs || [row.dam_page_path];
-    return refs.includes(pagePath) && row.logical_id && row.kind !== 'document';
+    return refs.includes(pagePath) && row.logical_id
+      && row.kind !== 'document' && row.kind !== 'video';
   });
   const missingImages = expected.filter((row) => !actual.has(row.logical_id))
     .map((row) => row.logical_id);
   return {
-    path: pagePath, status: 'present', images, documents, missingImages,
+    path: pagePath,
+    status: 'present',
+    images,
+    documents,
+    missingImages,
+    videos: binaryAnchors(html).filter((anchor) => anchor.kind === 'video'),
+    binaryErrors: binaryErrors(html, { rows }, pagePath),
   };
 }
 
@@ -122,13 +134,15 @@ function main() {
     documents: docs.length,
     untrackedDocuments: docs.filter((d) => !d.tracked).length,
     pendingDamDocument: docs.filter((d) => d.original === 'pending').length,
+    videos: pages.reduce((count, page) => count + page.videos.length, 0),
+    unverifiedBinaries: pages.reduce((count, page) => count + (page.binaryErrors?.length || 0), 0),
   };
   const report = { summary, pages };
   if (cfg.out) writeFileSync(cfg.out, JSON.stringify(report, null, 2));
   console.log(JSON.stringify(summary));
   if (summary.missingPages || summary.missingFromPage || summary.misplaced
     || summary.missingCaption || summary.unresolvedDelivery || summary.pendingDamOriginal
-    || summary.untrackedDocuments || summary.pendingDamDocument) {
+    || summary.untrackedDocuments || summary.pendingDamDocument || summary.unverifiedBinaries) {
     process.exitCode = 1;
   }
 }
