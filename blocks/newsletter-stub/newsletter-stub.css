@@ -198,6 +198,166 @@
   }
 }
 
+/* ---- card variant (SKODA-823): story-sidebar widget ----
+   Measured on the live Epiq story .newsletter-subscribe-widget (docs/ui-specs/newsletter.md §3):
+   345x355 at 1440 (492 once consent opens), 185 at 768, full width stacked below 768.
+   Everything is relative to the sidebar column, so no breakpoints: the header keeps its 55%
+   image ratio, the button its 60% width. Placed after the footer rules so it wins the ties. */
+.newsletter-stub.card {
+  margin-bottom: var(--spacing-m);
+  border: 1px solid var(--newsletter-card-border);
+  border-radius: var(--card-radius);
+  background-color: var(--skoda-green);
+  color: var(--skoda-white);
+}
+
+/* image box with the source's angled bottom edge */
+.newsletter-stub.card .newsletter-stub-header {
+  position: relative;
+  aspect-ratio: 100 / 55;
+  margin-bottom: var(--spacing-l);
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
+  overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 75%);
+}
+
+.newsletter-stub.card .newsletter-stub-header img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* source h3: 24/24 regular, 15% down the image, 20px inset */
+.newsletter-stub.card .newsletter-stub-heading {
+  position: absolute;
+  top: 15%;
+  left: 0;
+  margin: 0;
+  padding: 0 20px;
+  color: var(--skoda-white);
+  font-size: var(--heading-font-size-story-h3);
+  font-weight: var(--weight-regular);
+  line-height: 1;
+}
+
+/* stacked form; the response box sits above the field as on the source (order only, so the
+   tab order stays email → submit → consent) */
+.newsletter-stub.card .newsletter-stub-form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--spacing-m);
+  padding: 0 var(--spacing-l);
+}
+
+.newsletter-stub.card .newsletter-stub-row {
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.newsletter-stub.card .newsletter-stub-email {
+  flex: none;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 var(--spacing-m);
+  padding: 14px;
+  background-color: var(--skoda-white);
+  font-size: var(--body-font-size-s);
+  line-height: 1.5;
+}
+
+.newsletter-stub.card .newsletter-stub-email:focus {
+  margin-bottom: calc(var(--spacing-m) - 1px);
+}
+
+/* source pill: 60% of the form, 44px tall (16/16 + 14px padding), centred. Deliberate
+   deviation: the source keeps 60% even when the label no longer fits (768-1200, label spills
+   out of the pill), so the pill grows to its label instead (fit-content, capped by the row). */
+.newsletter-stub.card .newsletter-stub-submit {
+  display: flex;
+  flex: none;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  width: 60%;
+  min-width: fit-content;
+  min-height: 0;
+  margin: 0 0 14px;
+  padding: 14px var(--spacing-l);
+  line-height: 1;
+}
+
+.newsletter-stub.card .newsletter-stub-response {
+  order: -1;
+}
+
+.newsletter-stub.card .newsletter-stub-status {
+  position: static;
+}
+
+/* error: same white box as the status, source .response .error red; hidden while empty */
+.newsletter-stub.card .newsletter-stub-error {
+  margin: 0;
+  color: var(--error-color);
+  font-weight: var(--weight-regular);
+}
+
+.newsletter-stub.card .newsletter-stub-error:empty {
+  display: none;
+}
+
+.newsletter-stub.card .newsletter-stub-status:not(:empty),
+.newsletter-stub.card .newsletter-stub-error:not(:empty) {
+  margin: 0 0 var(--spacing-m);
+  padding: var(--spacing-xs) var(--spacing-s);
+  background-color: var(--skoda-white);
+  font-size: var(--body-font-size-s);
+  line-height: var(--line-height-body);
+}
+
+/* consent: hidden until the form is first used (source .hidden-content), 80% wide, centred;
+   the manage link lines up with the label text (checkbox + gap) */
+.newsletter-stub.card .newsletter-stub-consent,
+.newsletter-stub.card .newsletter-stub-manage {
+  display: none;
+  align-self: center;
+  width: 80%;
+}
+
+.newsletter-stub.card .newsletter-stub-consent label {
+  color: var(--newsletter-consent-color);
+}
+
+.newsletter-stub.card .newsletter-stub-manage {
+  padding: 0 0 0 calc(var(--checkbox-size) + var(--checkbox-label-gap));
+  font-size: var(--body-font-size-s);
+  line-height: var(--footer-small-line-height);
+}
+
+.newsletter-stub.card .newsletter-stub-manage a {
+  text-decoration: none;
+}
+
+.newsletter-stub.card .newsletter-stub-form.is-expanded .newsletter-stub-consent,
+.newsletter-stub.card .newsletter-stub-form.is-expanded .newsletter-stub-manage {
+  display: block;
+}
+
+/* Narrow sidebar column (the 185px card at 768): the source lets the e-mail field overflow the
+   card by its intrinsic width (~11px) and the label spill out of the pill. Tighten the insets so
+   the field and the one-line label stay inside the card instead (component-local, so a
+   container query rather than a breakpoint). */
+@container newsletter-stub (width < 240px) {
+  .newsletter-stub.card .newsletter-stub-form {
+    padding-inline: var(--spacing-s);
+  }
+
+  .newsletter-stub.card .newsletter-stub-submit {
+    padding-inline: var(--spacing-s);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .newsletter-stub .newsletter-stub-submit {
     transition: none;

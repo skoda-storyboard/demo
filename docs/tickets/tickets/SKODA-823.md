@@ -4,7 +4,11 @@
 - **Phase:** A · **Milestone:** M1 (demo, UI only, no ESP wiring)
 - **GitHub issue:** [#126](https://github.com/skoda-storyboard/demo/issues/126)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
-- **Status (2026-09-24):** 🔵 TODO
+- **Status (2026-09-28):** 🟡 IN REVIEW, block slice. The `Newsletter Stub (card)` variant is built
+  and QA'd on the draft `/drafts/skoda-823-newsletter-sidebar`; footer output is unchanged. **Still
+  open:** the importer slice (`skoda-story-aside.js` emits the card, `block-contracts.json`
+  registers `newsletter-stub` / `card`, story re-import), kept to a follow-up PR so this PR only
+  touches the block.
 
 ## Origin
 Side-by-side QA of the Epiq story (2026-09-24). No existing ticket covers the **inline sidebar**
@@ -41,6 +45,22 @@ drops it, so the EDS aside starts directly with "Explore more".
       sidebar links to `/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing/`
       and `/en/newsletter-settings/`; verify their migrated targets before
       authoring. Until then, use client-approved plain text, not fake links.
+
+## Build notes (block slice, 2026-09-28)
+- Authoring: `Newsletter Stub (card)`, with the footer keys plus `image`, `heading`, `error` and
+  `consent-error` (see `docs/ui-specs/newsletter.md` §7). The draft uses plain-text consent and
+  no `manage` row, because the consent and newsletter-settings pages are not migrated yet.
+- Measured against the live Epiq story at 1440: card 345×355, header 343×189, field 295×50 and
+  pill 177×44 all match; the gap to "Explore more" is 16px. At 390 the card is 370, the header 202,
+  the field 320 and the pill 192, also matching.
+- **Deliberate deviation, 768–1200:** the source lets the field overflow the narrow card
+  (about 11px at 768) and the pill label spill out of its 60% pill. The card keeps the field
+  inside and lets the pill grow to its label (`fit-content`). Below 240px of card width a
+  container query tightens the insets.
+- Consent opens on first focus and stays open; the source's opened card also carries the
+  manage link, so ours is shorter until that link is authored.
+- Found in passing, not this ticket: the header nav overflows the viewport at 1080 (about 101px)
+  and at 280 (`.nav-mobile-tools`, about 22px). It affects every page.
 
 ## Dependencies
 SKODA-801 (aside rebuild). SKODA-904 (M2 ESP) and SKODA-903 (banner

@@ -141,9 +141,15 @@ the curled `media-room-*.css`.
 `blocks/newsletter-stub` already renders the Media Room footer form (SKODA-305):
 labelled email input, optional consent and management link, submit button and
 authored message in a live region. It prevents network submission and emits a
-`newsletter:subscribe` hand-off event for the future service. The measured
-sidebar card and topbar dropdown are **not** implemented; SKODA-823 owns the
-sidebar presentation, SKODA-904 the production submit path (M2).
+`newsletter:subscribe` hand-off event for the future service. **Sidebar card built
+(SKODA-823, 2026-09-28)** as the `card` variant (`Newsletter Stub (card)`). It adds
+an image header, validates in the block (a described error with `aria-invalid`,
+and focus moves to the failing control), and opens consent on first focus. After
+valid input it announces "Newsletter signup is not available yet". Draft:
+`/drafts/skoda-823-newsletter-sidebar`. The topbar dropdown is still not built;
+SKODA-904 owns the production submit path (M2). Deliberate deviation at 768–1200:
+the field stays inside the card and the pill grows to fit its label, where the
+source overflows both.
 
 ## 4. Responsive behavior
 
@@ -209,9 +215,18 @@ The existing `Newsletter Stub` block accepts these authored rows (see
 | `manage` | Optional verified subscription-management link |
 | `message` | Newsletter signup is not available yet |
 
-The footer also authors `list` and `language` for the future ESP. The image
-header and heading need an additional authorable sidebar variant under
-SKODA-823; they are **not** supported by the footer renderer today. Keep
+The footer also authors `list` and `language` for the future ESP. The sidebar
+card is the `Newsletter Stub (card)` variant (SKODA-823). It accepts the keys
+above plus:
+
+| Key | Value |
+|---|---|
+| `image` | header picture (source `newsletter_subscribe.webp`) |
+| `heading` | Be the first⏎to get the latest stories (line break kept) |
+| `error` | invalid e-mail message (default "Please enter a valid e-mail address.") |
+| `consent-error` | unchecked consent message (default "Please accept the terms before continuing.") |
+
+The footer ignores these keys. Keep
 `decorate(block)` and scope the new styling to the sidebar variant, preserving
 the footer CSS. Native email/consent validation and the status live region can
 be reused. Do not send network requests or show success when nothing was
