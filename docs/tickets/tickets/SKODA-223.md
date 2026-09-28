@@ -15,11 +15,15 @@
 - `blocks/gallery/gallery.css`: `.gallery.preview` grid, 1-up, then 2-up at the page's 768 two-column transition
   (a viewport query on purpose: the 1-up column is wider than the 2-up one, so a container width can't express it).
   Each cell has a 1px inset (the source's 1px white `.item` border). The thumb is 16:9 `cover`, 8px radius, no
-  shadow and no hover change (neither exists on the source).
+  shadow. The image rests at `scale(1.02)`, centred and clipped (172.4 wide in the 169 thumb @1280). On hover it
+  adds `scale: 1.02` over `0.5s cubic-bezier(0.165, 0.85, 0.45, 1)` (175.8 wide). The zoom only applies under
+  `(hover: hover) and (prefers-reduced-motion: no-preference)`.
 - `+N` pill, measured on the source press kit that has one (`/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/`,
   `a.more.btn-ghost-icon` "+51"): white, 2px ink ring, 50px radius, 10px padding, 16/16/700 with 1px tracking,
-  5px off the thumb's bottom-right corner, 51.9×40 for "+51". The source's dim `::after` stays at `opacity:0`, so
-  there is no overlay.
+  5px off the thumb's bottom-right corner, 51.9×40 for "+51". On hover it turns `--skoda-grey-50` (#f1f1f1); ink
+  and ring stay. The source's dim `::after` stays at `opacity:0`, so there is no overlay.
+- QA round 1 (PR #201, 2026-09-28): added the resting 2% crop, the thumb hover zoom and the pill hover. My first
+  hover probe drove a synthetic mouse and saw no change, so the hover states were wrongly recorded as absent.
 - `templates/press-release/press-release.css`: when a sidebar `h3` ends its default content, it labels the next
   block, so the 15px group gap now comes after the block instead of between them. Source: 0px Images → thumbs and
   Tags → chips. EDS was 15px, which pushed Images and Tags 15px low.
