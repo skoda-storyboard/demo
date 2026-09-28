@@ -13,6 +13,13 @@
 
 @import url("../../styles/card-teaser.css");
 
+/* The generic section wrapper pads by 24/40px; the source feed uses a
+   1248px outer measure with a 10px inset at every viewport. */
+.stories-container > .stories-wrapper {
+  max-width: calc(var(--content-max-width) - var(--grid-gutter));
+  padding-inline: calc(var(--grid-gutter) / 2);
+}
+
 .stories {
   width: min(100%, var(--content-max-width));
   margin-inline: auto;

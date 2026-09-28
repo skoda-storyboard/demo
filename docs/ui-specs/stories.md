@@ -73,6 +73,9 @@ measured here.
 **Feed container / grid**
 - `.search-results-container` `max-width 1248px` → `--content-max-width`; `padding 0 10px`
   (· 1280/1024/768/500).
+- Override only the Stories section's generic 24/40px wrapper inset with
+  `--grid-gutter / 2` (10px); cap its outer width at 1248px so the first card
+  aligns at x=26 (1280px) and x=10 (500px), as on the source.
 - `.search-results-items` `display:flex; flex-wrap:wrap; margin:0 -10px` (negative gutter).
 - `.search-results-item` `padding:0 10px`, `margin:0 0 20px` → effective **20px column gutter + 20px row
   gap** → candidate `--grid-gutter: 20px` (shared with `faceted-listing.md`). `box-sizing:border-box`.

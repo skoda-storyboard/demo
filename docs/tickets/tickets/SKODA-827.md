@@ -23,6 +23,10 @@ at 1280px EDS renders 270px cards in a 1200px rail, whereas the source uses
 - Exclude the exact three authored promo story paths from Latest Stories, even
   when index ordering changes; do not assume the promo is always the newest
   three stories.
+- Match the source Stories card inset (10px at mobile, 26px at 1280px)
+  without changing the global section spacing or other blocks.
+- Restore all three source promo images, links, titles, and full summaries in
+  the DA draft rather than shortened placeholder copy.
 - Only landing-page `press_release` rails use the 90% / 45% / 30% news-cell
   ladder across the <768 / 768–991 / >=992 layout states. Model, story, and
   press-detail related rails keep their existing geometry.
