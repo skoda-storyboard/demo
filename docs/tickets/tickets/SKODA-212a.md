@@ -46,19 +46,31 @@ Builds on 212 (#98). It does not block other tickets. Re-run both sweeps' rail p
 - **Measured on the source (Epiq story Related Stories, 1440):** each card title is cut to **one line with "…"**:
   18px / 21.6 line height, 22px high, `overflow: hidden`, in 354px cards (e.g. "An Epic Start to the Tour de France:…").
 - **EDS (branch `skoda-610-clean-titles`, titles already suffix-free):** 2–3 lines (43–65px), no clamp.
-- [ ] Rail card titles (`carousel` / `story-rail` overlay cards) are clamped to 1 line with an ellipsis, 22px high at 1440.
+- [ ] Rail card titles (`carousel` / `story-rail` overlay cards) end in an ellipsis, **per band as on the source**
+  (re-measured 2026-09-28; the user chose "match live" over "1 line everywhere"):
+  - home and Media Room rails: 2 lines, 43px high;
+  - Related Stories / Related Press Releases: 1 line, 22px high, from 992px; 2 lines below;
+  - Models / Series caption cards: unclamped.
+
   Other card-teaser consumers (stories feed, listing) are unchanged.
 
 ## Implementation notes (2026-09-28)
-- **Pointer:** `dragStep()` in `blocks/carousel/carousel.js` is a pure gesture step (exported for the tests).
+- **Pointer:** `dragStep()` in `blocks/carousel/carousel.js` is a pure gesture step and `swallowClick()` the
+  click rule. `bindDrag(track)` wires them to the track, with one cleanup path. All three are exported for the tests.
   `pointerdown` only records the start. The pointer is captured, and `is-dragging` set, on the first move past
   `DRAG_THRESHOLD` (6px). `dragstart` is prevented on the track. The click after a real drag is swallowed; a new press
   resets it. `story-rail.js` needed no change (it builds a `carousel`).
-- **Edge cases:**
-  - A press released outside the track before capture is dropped on the next move with no button held (checked:
-    no stray scroll).
+- **Edge cases (tightened after the 2026-09-28 code review):**
+  - A press is dropped when the pointer leaves the track before capture, or on a move with no button held.
+    Coming back with a button held (e.g. a text selection) can't make the rail jump; checked in the browser, no
+    stray scroll.
+  - Only the pointer that pressed first drives the gesture, so a second finger is ignored.
+  - `lostpointercapture` ends a drag only when the track itself lost capture. The bubbled event from a card losing
+    touch's implicit capture is ignored.
   - A `pointercancel` (native touch pan) clears the swallow flag, so a later keyboard Enter still navigates.
   - Keyboard-activated clicks (`detail` 0) are never swallowed.
+  - Tests: 28 carousel tests. `bindDrag` is driven on a fake `EventTarget` track. Each of the 7 fixes was
+    removed in turn, and every removal fails a test.
 - **Mobile / tablet (touch context):**
   - At 320, 390 and 768, a tap navigates and a swipe scrolls (265 / 328 / 236px, snapped) without navigating.
   - Enter right after a swipe navigates. A vertical pan over a rail scrolls the page (768: 140px, track unmoved).
@@ -82,7 +94,7 @@ Builds on 212 (#98). It does not block other tickets. Re-run both sweeps' rail p
   How it's built:
   - `.carousel-overlay .card-teaser-title` clamps to `var(--carousel-title-lines, 2)`; caption cards are not
     clamped.
-  - `story-rail.css` sets `--carousel-title-lines: 1` from 992px for the story related band and `.section.related`
-    (press release).
+  - `story-rail.css` sets `--carousel-title-lines: 1` from 992px for the story related band and for
+    `body.press-release .section.related` (press release).
 
   Result: home 43px; related 22px at 1440, 2 lines at 768/375.

@@ -4,8 +4,10 @@
  * The decorate() path is scroll/pointer-coupled (real layout), so these tests
  * pin the PURE decision logic the block exports — arrow enable/disable at the
  * track ends (arrowState) and the dated-vs-taxonomy cell tagging (railVariant) —
- * plus the shared card-teaser classification the rail relies on. Runtime drag /
- * keyboard / reduced-motion is confirmed in-browser (the ticket's RUNTIME flag).
+ * plus the shared card-teaser classification the rail relies on. The SKODA-212a
+ * pointer gesture (dragStep / swallowClick) and its event wiring (bindDrag, on a
+ * fake EventTarget track) are covered too. Real scrolling, snap and navigation
+ * are confirmed in-browser with trusted input (the ticket's notes).
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -34,7 +36,9 @@ globalThis.document = {
   addEventListener: () => {},
 };
 
-const { arrowState, railVariant, dotState } = await import('./carousel.js');
+const {
+  arrowState, railVariant, dotState, dragStep, swallowClick, bindDrag, DRAG_THRESHOLD,
+} = await import('./carousel.js');
 
 // --- arrowState: arrows enable/disable at the track ends -------------------
 
@@ -130,8 +134,6 @@ test('dotState: active never exceeds pages-1', () => {
 });
 
 // ---- SKODA-212a: threshold drag (capture only once the press is a real drag) ----
-const { dragStep, DRAG_THRESHOLD } = await import('./carousel.js');
-
 function run(steps) {
   return steps.reduce((acc, ev) => {
     const next = dragStep(acc.state, ev);
@@ -182,4 +184,140 @@ test('dragStep: moves without a press, and pointercancel, never drag', () => {
   assert.equal(s.pressed, false);
   assert.equal(s.dragging, false);
   assert.equal(s.moved, false, 'a cancelled swipe leaves no click to swallow (keyboard Enter still works)');
+});
+
+test('dragStep: a second pointer (another finger) neither restarts nor moves the drag', () => {
+  let s = dragStep(null, {
+    type: 'down', id: 1, x: 300, scrollLeft: 0,
+  });
+  s = dragStep(s, { type: 'move', id: 1, x: 250 });
+  s = dragStep(s, {
+    type: 'down', id: 2, x: 900, scrollLeft: 50,
+  });
+  assert.equal(s.startX, 300, 'the first finger keeps the gesture');
+  s = dragStep(s, { type: 'move', id: 2, x: 100 });
+  assert.equal(s.scrollLeft, 50, 'moves from the second finger are ignored');
+  s = dragStep(s, { type: 'up', id: 2 });
+  assert.equal(s.dragging, true, 'lifting the second finger does not end the drag');
+  s = dragStep(s, { type: 'up', id: 1 });
+  assert.equal(s.dragging, false);
+});
+
+test('dragStep: leaving the track before the threshold drops the press (no stale jump later)', () => {
+  let s = dragStep(null, { type: 'down', x: 300, scrollLeft: 0 });
+  s = dragStep(s, { type: 'move', x: 302, buttons: 1 });
+  s = dragStep(s, { type: 'leave' });
+  assert.equal(s.pressed, false);
+  // coming back with the button held (text selection from elsewhere) must not scroll
+  s = dragStep(s, { type: 'move', x: 100, buttons: 1 });
+  assert.equal(s.dragging, false);
+  assert.equal(s.scrollLeft, undefined);
+});
+
+test('dragStep: leave during a captured drag is ignored; lost capture ends it like up', () => {
+  let s = dragStep(null, { type: 'down', x: 300, scrollLeft: 0 });
+  s = dragStep(s, { type: 'move', x: 200, buttons: 1 });
+  s = dragStep(s, { type: 'leave' });
+  assert.equal(s.dragging, true);
+  s = dragStep(s, { type: 'lost' });
+  assert.equal(s.dragging, false);
+  assert.equal(s.moved, true, 'the click that follows is still swallowed');
+});
+
+test('dragStep: a move with no button held drops a press released outside the track', () => {
+  let s = dragStep(null, { type: 'down', x: 300, scrollLeft: 0 });
+  s = dragStep(s, { type: 'move', x: 100, buttons: 0 });
+  assert.equal(s.pressed, false);
+  assert.equal(s.dragging, false);
+});
+
+test('swallowClick: only the pointer click after a real drag, never a keyboard click', () => {
+  assert.equal(swallowClick({ moved: true }, 1), true);
+  assert.equal(swallowClick({ moved: true }, 0), false, 'Enter / Space (detail 0)');
+  assert.equal(swallowClick({ moved: false }, 1), false);
+  assert.equal(swallowClick(null, 1), false);
+});
+
+// ---- bindDrag: the real event wiring on a fake track ----------------------
+function fakeTrack() {
+  const track = new EventTarget();
+  const classes = new Set();
+  const captured = new Set();
+  Object.assign(track, {
+    scrollLeft: 0,
+    classList: { add: (c) => classes.add(c), remove: (c) => classes.delete(c), contains: (c) => classes.has(c) },
+    captureCalls: 0,
+    setPointerCapture: (id) => { track.captureCalls += 1; captured.add(id); },
+    hasPointerCapture: (id) => captured.has(id),
+    releasePointerCapture: (id) => captured.delete(id),
+    captured,
+  });
+  bindDrag(track);
+  return track;
+}
+
+function fire(target, type, props = {}) {
+  const e = new Event(type, { bubbles: true, cancelable: true });
+  Object.assign(e, {
+    button: 0, buttons: 1, pointerId: 1, clientX: 0, detail: 1,
+  }, props);
+  target.dispatchEvent(e);
+  return e;
+}
+
+test('bindDrag: a plain click is not captured and is not prevented', () => {
+  const track = fakeTrack();
+  fire(track, 'pointerdown', { clientX: 100 });
+  fire(track, 'pointermove', { clientX: 103 });
+  assert.equal(track.captureCalls, 0, 'no capture below the threshold');
+  fire(track, 'pointerup', { clientX: 103, buttons: 0 });
+  assert.equal(fire(track, 'click').defaultPrevented, false);
+});
+
+test('bindDrag: a drag captures once past the threshold, scrolls, and swallows only its click', () => {
+  const track = fakeTrack();
+  fire(track, 'pointerdown', { clientX: 600 });
+  fire(track, 'pointermove', { clientX: 590 });
+  assert.ok(track.captured.has(1));
+  fire(track, 'pointermove', { clientX: 500 });
+  assert.equal(track.captureCalls, 1, 'captured once, on the threshold-crossing move');
+  assert.ok(track.classList.contains('is-dragging'));
+  fire(track, 'pointermove', { clientX: 300 });
+  assert.equal(track.scrollLeft, 300);
+  fire(track, 'pointerup', { clientX: 300, buttons: 0 });
+  assert.equal(track.captured.size, 0, 'capture released');
+  assert.equal(track.classList.contains('is-dragging'), false);
+  assert.equal(fire(track, 'click').defaultPrevented, true, 'the drag click is swallowed');
+  assert.equal(fire(track, 'click').defaultPrevented, false, 'the next click passes');
+});
+
+test('bindDrag: a card losing touch implicit capture does not end the drag', () => {
+  const track = fakeTrack();
+  fire(track, 'pointerdown', { clientX: 600 });
+  fire(track, 'pointermove', { clientX: 580 });
+  // bubbled up from the card: its target is the card, not the track
+  const e = new Event('lostpointercapture');
+  Object.assign(e, { pointerId: 1 });
+  Object.defineProperty(e, 'target', { value: new EventTarget() });
+  track.dispatchEvent(e);
+  assert.ok(track.classList.contains('is-dragging'), 'still dragging');
+  fire(track, 'pointermove', { clientX: 400 });
+  assert.equal(track.scrollLeft, 200);
+});
+
+test('bindDrag: keyboard click after a touch swipe is never swallowed; dragstart is prevented', () => {
+  const track = fakeTrack();
+  fire(track, 'pointerdown', { clientX: 600 });
+  fire(track, 'pointermove', { clientX: 400 });
+  fire(track, 'pointerup', { clientX: 400, buttons: 0 }); // touch: no click follows
+  assert.equal(fire(track, 'click', { detail: 0 }).defaultPrevented, false);
+  assert.equal(fire(track, 'dragstart').defaultPrevented, true);
+});
+
+test('bindDrag: right-click never starts a gesture', () => {
+  const track = fakeTrack();
+  fire(track, 'pointerdown', { clientX: 600, button: 2 });
+  fire(track, 'pointermove', { clientX: 300, buttons: 2 });
+  assert.equal(track.scrollLeft, 0);
+  assert.equal(track.captured.size, 0);
 });
