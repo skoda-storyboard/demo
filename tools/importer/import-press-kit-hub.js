@@ -24,6 +24,15 @@ function sourceFacets(article) {
   return result;
 }
 
+// The source banner images carry no useful alt; name them by what the link does.
+function bannerAlt(href, img) {
+  if (/\.zip(?:$|[?#])/i.test(href)) return 'Download the press kit ZIP';
+  if (/whatsapp/i.test(href)) return 'Follow Škoda Storyboard on WhatsApp';
+  const alt = (img.getAttribute('alt') || img.getAttribute('title') || '').trim();
+  if (alt) return alt;
+  throw new Error(`Press-kit hub banner has no accessible name: ${href}`);
+}
+
 function bannerLinks(content, document) {
   return [...content.querySelectorAll('.widget_sow-editor .textwidget a[href]')]
     .filter((a) => a.querySelector('img[src]'))
@@ -33,7 +42,7 @@ function bannerLinks(content, document) {
       const img = source.querySelector('img').cloneNode(true);
       img.removeAttribute('srcset');
       img.removeAttribute('sizes');
-      img.alt = /\.zip(?:$|\?)/i.test(link.href) ? 'Download the press kit ZIP' : 'Follow Škoda Storyboard on WhatsApp';
+      img.alt = bannerAlt(link.href, source.querySelector('img'));
       link.append(img);
       const p = document.createElement('p');
       p.append(link);

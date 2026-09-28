@@ -30,20 +30,10 @@ export default function parse(element, { document }) {
   if (expected && items.length !== expected) {
     throw new Error(`Press-kit Media Box expected ${expected} assets, found ${items.length}`);
   }
-  const output = [];
-  let rows = [];
-  let files = [];
-  const flush = () => {
-    if (rows.length) output.push(WebImporter.DOMUtils.createTable([['Downloads'], ...rows], document));
-    if (files.length) {
-      const list = document.createElement('ul');
-      list.className = 'press-kit-files';
-      list.append(...files);
-      output.push(list);
-    }
-    rows = [];
-    files = [];
-  };
+  // One Downloads table in source order (contract `downloads`: [<picture> or empty, title,
+  // links]). File-only assets (PDF, MP4 without a poster) keep an empty picture cell; the
+  // press-kit template lists them as plain links until the block renders file tiles (SKODA-510).
+  const rows = [];
   items.forEach((wrapper) => {
     const item = wrapper.querySelector('article.media-cart-item');
     if (!item) throw new Error('Malformed press-kit Media Box asset');
@@ -52,20 +42,15 @@ export default function parse(element, { document }) {
     const img = item.querySelector('.article-teaser-media img');
     const title = text(item.querySelector('.entry-title')) || img?.getAttribute('alt') || '';
     if (!title) throw new Error('Press-kit Media Box asset has no title');
+    const paragraphs = links.map((link) => {
+      const p = document.createElement('p');
+      p.append(link);
+      return p;
+    });
     if (!img) {
-      if (rows.length) flush();
-      const li = document.createElement('li');
-      const strong = document.createElement('strong');
-      strong.textContent = title;
-      li.append(strong, ' — ');
-      links.forEach((link, index) => {
-        if (index) li.append(' · ');
-        li.append(link);
-      });
-      files.push(li);
+      rows.push(['', title, paragraphs]);
       return;
     }
-    if (files.length) flush();
     if (!img.getAttribute('alt')?.trim()) img.alt = img.getAttribute('title')?.replace(/^Video\s*\|\s*/i, '') || title;
     const src = img.getAttribute('src') || '';
     if (/^https:\/\/i\.vimeocdn\.com\//.test(src)) {
@@ -73,13 +58,7 @@ export default function parse(element, { document }) {
     }
     ['data-caption', 'data-video_title', 'data-video_src', 'srcset', 'sizes', 'itemprop', 'title']
       .forEach((attr) => img.removeAttribute(attr));
-    const paragraphs = links.map((link) => {
-      const p = document.createElement('p');
-      p.append(link);
-      return p;
-    });
     rows.push([img, title, paragraphs]);
   });
-  flush();
-  element.replaceWith(...output);
+  element.replaceWith(WebImporter.DOMUtils.createTable([['Downloads'], ...rows], document));
 }

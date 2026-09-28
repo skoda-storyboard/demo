@@ -101,6 +101,22 @@ test('an optional introduction is retained before the tile table', () => {
   assert.equal(article.querySelectorAll('.panel-grid').length, 0);
 });
 
+test('banner alt text follows the link: ZIP, WhatsApp, else the source alt', () => {
+  const { element } = output(page(13, { banners: true }));
+  assert.deepEqual([...element.querySelectorAll('img')]
+    .filter((img) => /wa\.png|zip\.png/.test(img.getAttribute('src')))
+    .map((img) => img.alt), ['Follow Škoda Storyboard on WhatsApp', 'Download the press kit ZIP']);
+
+  const other = page(13);
+  other.querySelector('.content').insertAdjacentHTML('beforeend', '<div class="widget_sow-editor"><div class="textwidget"><p><a href="https://example.com/configurator"><img src="https://cdn.skoda-storyboard.com/cfg.png" alt="Open the configurator"></a></p></div></div>');
+  const { element: labelled } = output(other);
+  assert.equal(labelled.querySelector('img[src$="cfg.png"]').alt, 'Open the configurator');
+
+  const unlabelled = page(13);
+  unlabelled.querySelector('.content').insertAdjacentHTML('beforeend', '<div class="widget_sow-editor"><div class="textwidget"><p><a href="https://example.com/unknown"><img src="https://cdn.skoda-storyboard.com/x.png"></a></p></div></div>');
+  assert.throws(() => output(unlabelled), /banner has no accessible name/);
+});
+
 test('live SSR hubs retain exact chapter titles, dates, facets and banner assets', {
   skip: !process.env.SKODA_PRESS_KIT_LIVE,
 }, async () => {

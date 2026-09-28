@@ -19,10 +19,6 @@ body.press-kit main > .section:first-child:has(.hero-image.overlay) > div {
   padding: 0;
 }
 
-body.press-kit .hero-image.overlay .hero-image-content {
-  padding-inline: var(--pk-gutter);
-}
-
 body.press-kit .section.press-kit-banners .default-content-wrapper {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 25rem), 1fr));
@@ -133,6 +129,8 @@ body.press-kit .press-kit-show-more:focus-visible {
   outline-offset: 2px;
 }
 
+/* Hub hero (press-kit-template.md sweep correction): below 768 the caption leaves the image
+   and sits under it in ink, as on the series hubs (templates/skoda-series); 48px from 992. */
 @media (width < 768px) {
   body.press-kit .hero-image.overlay .hero-image-media img {
     height: auto;
@@ -179,10 +177,6 @@ body.press-kit .press-kit-show-more:focus-visible {
   body.press-kit main > .section.media-box {
     box-shadow: 0 0 0 100vmax var(--dark-color);
     clip-path: inset(0 -100vmax);
-  }
-
-  body.press-kit .hero-image.overlay .hero-image-content h1 {
-    font-size: var(--heading-font-size-hero-story-mobile);
   }
 }
 

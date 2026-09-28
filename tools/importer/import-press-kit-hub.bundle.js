@@ -28,7 +28,7 @@ var CustomImportScript = (() => {
   function parseHero(hero, document) {
     const image = hero.querySelector(".hero-image img");
     const title = hero.querySelector(".hero-caption h1");
-    if (!image?.getAttribute("src") || !title?.textContent.trim()) {
+    if (!(image == null ? void 0 : image.getAttribute("src")) || !(title == null ? void 0 : title.textContent.trim())) {
       throw new Error("Press-kit hub requires a hero image and title");
     }
     const caption = document.createElement("div");
@@ -36,7 +36,7 @@ var CustomImportScript = (() => {
     h1.textContent = title.textContent.trim();
     caption.append(h1);
     const perex = hero.querySelector(".hero-caption .perex");
-    if (perex?.textContent.trim()) {
+    if (perex == null ? void 0 : perex.textContent.trim()) {
       const p = document.createElement("p");
       p.textContent = perex.textContent.trim();
       caption.append(p);
@@ -61,7 +61,7 @@ var CustomImportScript = (() => {
       const sourceLink = tile.querySelector(":scope > a[href]");
       const sourceImage = tile.querySelector(".ratio-container img[src]");
       const heading = tile.querySelector(".heading");
-      if (!sourceLink || !sourceImage || !heading?.textContent.trim()) {
+      if (!sourceLink || !sourceImage || !(heading == null ? void 0 : heading.textContent.trim())) {
         throw new Error(`Press-kit tile ${index + 1} needs a link, image and title`);
       }
       const title = heading.textContent.replace(/\s+/g, " ").trim();
@@ -264,6 +264,7 @@ var CustomImportScript = (() => {
     }
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
+    if (overrides.theme) meta.theme = overrides.theme;
     if (category) meta.category = category;
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
@@ -454,6 +455,7 @@ var CustomImportScript = (() => {
     const rest = href.slice(m[0].length);
     const cut = rest.search(/[?#]/);
     const tail = cut === -1 ? "" : rest.slice(cut);
+    if (/^\?(?:[^#]*&)?(?:p|page_id)=\d/.test(tail)) return null;
     let target = edsPath(cut === -1 ? rest : rest.slice(0, cut));
     target = DEMO_ALIASES[target] || target;
     return ALLOWED.has(target) ? `${target}${tail}` : null;
@@ -531,7 +533,7 @@ var CustomImportScript = (() => {
       if (img.closest("table, picture")) return;
       const figure = img.closest("figure");
       const wrapper = img.closest("[data-caption]");
-      const wrapperCaption = wrapper?.querySelectorAll("img").length === 1 ? editorialCaption(wrapper) : "";
+      const wrapperCaption = (wrapper == null ? void 0 : wrapper.querySelectorAll("img").length) === 1 ? editorialCaption(wrapper) : "";
       const caption = (img.hasAttribute("data-caption") ? editorialCaption(img) : "") || wrapperCaption;
       if (figure) {
         if (img.parentElement.tagName !== "DIV") {
@@ -591,6 +593,13 @@ var CustomImportScript = (() => {
     if (tags.length) result.tags = [...new Set(tags)].join(", ");
     return result;
   }
+  function bannerAlt(href, img) {
+    if (/\.zip(?:$|[?#])/i.test(href)) return "Download the press kit ZIP";
+    if (/whatsapp/i.test(href)) return "Follow \u0160koda Storyboard on WhatsApp";
+    const alt = (img.getAttribute("alt") || img.getAttribute("title") || "").trim();
+    if (alt) return alt;
+    throw new Error(`Press-kit hub banner has no accessible name: ${href}`);
+  }
   function bannerLinks(content, document) {
     return [...content.querySelectorAll(".widget_sow-editor .textwidget a[href]")].filter((a) => a.querySelector("img[src]")).map((source) => {
       const link = document.createElement("a");
@@ -598,7 +607,7 @@ var CustomImportScript = (() => {
       const img = source.querySelector("img").cloneNode(true);
       img.removeAttribute("srcset");
       img.removeAttribute("sizes");
-      img.alt = /\.zip(?:$|\?)/i.test(link.href) ? "Download the press kit ZIP" : "Follow \u0160koda Storyboard on WhatsApp";
+      img.alt = bannerAlt(link.href, source.querySelector("img"));
       link.append(img);
       const p = document.createElement("p");
       p.append(link);
@@ -608,8 +617,8 @@ var CustomImportScript = (() => {
   var import_press_kit_hub_default = {
     transform: ({ document, url, params }) => {
       const article = document.querySelector("article.press_kit");
-      const hero = article?.querySelector(":scope > .hero");
-      const content = article?.querySelector(":scope > .content");
+      const hero = article == null ? void 0 : article.querySelector(":scope > .hero");
+      const content = article == null ? void 0 : article.querySelector(":scope > .content");
       if (!article || !hero || !content) throw new Error("Expected a press-kit tiles hub with hero and content");
       const facets = sourceFacets(article);
       const heroBlock = parseHero(hero, document);

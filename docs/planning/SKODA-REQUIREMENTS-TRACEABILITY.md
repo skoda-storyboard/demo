@@ -309,7 +309,8 @@ All MIG IDs map to the import infra (SKODA-601/602) for the demo sample and SKOD
 
 > **Update (2026-09-24, M1 gap review, [`SKODA-M1-GAP-REVIEW.md`](../reviews/SKODA-M1-GAP-REVIEW.md)).**
 >
-> **Scope.** The M1 scope is now the canonical **43-URL set**, [`skoda-m1-url-set.txt`](./skoda-m1-url-set.txt), plus
+> **Scope.** The M1 scope is now the canonical **43-URL set**, [`skoda-m1-url-set.txt`](./skoda-m1-url-set.txt) (44 lines / 43 pages
+> if the D-1 selected Peaq-2 Introduction child is accepted, pending Architect sign-off; SKODA-805a, #189), plus
 > the rail-feed corpus. The MR home and news listing are **not** in the set.
 >
 > **Pulled into M1 by the set:**

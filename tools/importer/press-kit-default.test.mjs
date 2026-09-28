@@ -132,18 +132,23 @@ function blocks(root, name) {
 function rows(root, name) {
   return blocks(root, name).flatMap((t) => [...t.querySelectorAll('tr')].slice(1));
 }
+const fileRows = (root) => rows(root, 'Downloads').filter((row) => !row.querySelector('img, picture'));
 
 test('first glimpse: eight paired rich accordions, 60 unique media assets and accessible fallbacks', { skip: !JSDOM }, () => {
   const page = run(fixture({}), target);
   assert.equal(rows(page, 'Accordion').length, 8);
   assert.equal(blocks(page, 'Accordion').length, 1);
-  assert.equal(rows(page, 'Downloads').length, 56);
-  assert.equal(page.querySelectorAll('.press-kit-files li').length, 4);
-  assert.equal(rows(page, 'Downloads').length + page.querySelectorAll('.press-kit-files li').length, 60);
-  assert.equal(new Set([
-    ...page.querySelectorAll('.press-kit-files a'),
-    ...blocks(page, 'Downloads').flatMap((block) => [...block.querySelectorAll('a[href]')]),
-  ]
+  assert.equal(blocks(page, 'Downloads').length, 1, 'one Downloads table in source order');
+  assert.equal(rows(page, 'Downloads').length, 60);
+  assert.equal(fileRows(page).length, 4);
+  fileRows(page).forEach((row) => {
+    assert.equal(row.children.length, 3, 'contract downloads: [empty picture, title, links]');
+    assert.equal(txt(row.children[0]), '');
+    assert.match(txt(row.children[1]), /^Asset \d+$/);
+    assert.ok(row.children[2].querySelector('p > a[href$=".pdf"]'));
+  });
+  assert.equal(page.querySelectorAll('.press-kit-files').length, 0, 'no class-dependent default content');
+  assert.equal(new Set(blocks(page, 'Downloads').flatMap((block) => [...block.querySelectorAll('a[href]')])
     .map((a) => a.href)).size, 116, '56 image pairs + 4 PDFs, no duplicate links');
   assert.equal(page.querySelectorAll('iframe, header.header, footer').length, 0);
   assert.equal(page.querySelectorAll('.entry-content hr').length, 0);
@@ -230,8 +235,8 @@ test('chapter introduction: 15 Chapters links coexist with six independent rich 
   assert.equal(page.querySelectorAll('ul#chapters-links > li > a[href]').length, 15);
   assert.equal(page.querySelectorAll('nav').length, 0);
   assert.equal(page.querySelectorAll('.entry-content img').length, 11);
-  assert.equal(rows(page, 'Downloads').length, 25);
-  assert.equal(page.querySelectorAll('.press-kit-files li').length, 1);
+  assert.equal(rows(page, 'Downloads').length, 26);
+  assert.equal(fileRows(page).length, 1);
   assert.match(page.textContent, /Answer 6/);
   assert.equal(page.querySelectorAll('h1').length, 1);
   assert.deepEqual(
@@ -304,8 +309,8 @@ test('public SSR samples keep all real article and Media Box assets', {
     assert.equal(response.status, 200, url);
     const html = await response.text();
     const page = run(html, url);
-    const count = rows(page, 'Downloads').length + page.querySelectorAll('.press-kit-files li').length;
-    assert.equal(count, expected, url);
+    assert.equal(blocks(page, 'Downloads').length, 1, url);
+    assert.equal(rows(page, 'Downloads').length, expected, url);
     assert.equal(rows(page, 'Accordion').length, accordions, url);
     const source = new JSDOM(html, { url }).window.document;
     const sourceToggles = [...source.querySelectorAll('article.press_kit .entry-content .widget_ys-row-toggle')];
@@ -317,15 +322,11 @@ test('public SSR samples keep all real article and Media Box assets', {
     assert.equal(page.querySelectorAll('.entry-content img').length, inline, url);
     assert.equal(page.querySelectorAll('ul#chapters-links > li > a[href]').length, chapters, url);
     assert.ok(page.querySelector('article.press_kit[data-publish-date]'), url);
-    assert.equal(page.querySelectorAll('.press-kit-files li a[href]').length, expected === 26 ? 1 : 5);
-    assert.equal(page.querySelectorAll('.press-kit-files li').length, expected === 26 ? 1 : 5);
-    assert.equal(rows(page, 'Downloads').length, expected === 26 ? 25 : 55);
-    assert.ok(rows(page, 'Downloads')
-      .every((r) => r.querySelector('img, picture') && r.querySelector('a[href]')));
-    const mediaLinks = [
-      ...blocks(page, 'Downloads').flatMap((block) => [...block.querySelectorAll('a[href]')]),
-      ...page.querySelectorAll('.press-kit-files a[href]'),
-    ].map((a) => a.getAttribute('href'));
+    assert.equal(fileRows(page).length, expected === 26 ? 1 : 5);
+    assert.ok(fileRows(page).every((r) => r.children.length === 3 && r.querySelector('a[href]')));
+    assert.ok(rows(page, 'Downloads').every((r) => r.querySelector('a[href]')));
+    const mediaLinks = blocks(page, 'Downloads').flatMap((block) => [...block.querySelectorAll('a[href]')])
+      .map((a) => a.getAttribute('href'));
     assert.equal(mediaLinks.length, expected === 26 ? 51 : 115, url);
     assert.equal(new Set(mediaLinks).size, mediaLinks.length, 'no repeated Media Box URLs');
     assert.equal(page.querySelectorAll('iframe, .panel-grid, .so-panel, .sa-bnr').length, 0, url);

@@ -151,8 +151,8 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Still to do:** the importer header change (`Cards (promo)` → `Promo Box`). The check keeps failing `Cards (promo)` and points at `promo-box`.
 
 ### `cards-tiles`
-- **Status:** `pinned` (shape 2, 2026-09-27) · **Ticket:** SKODA-221, now **Could** (importers: 207 series hub, 805a press-kit hub) · **Fallback:** broken (corrected 2026-09-27, SKODA-207): `blocks/cards/cards.js` on `main` classifies the token cell as body text, so the size word would print on the tile. The hubs therefore stay **preview-only** until 221 consumes the token (rule 8), or until a measured fallback shows zero tokens.
-- **Emitted by:** `parsers/series-grid.js` (207). 805a still to write.
+- **Status:** `pinned` (shape 2, 2026-09-27) · **Ticket:** SKODA-221, now **Could** (importers: 207 series hub, 805a press-kit hub) · **Fallback:** broken (corrected 2026-09-27, SKODA-207): `blocks/cards/cards.js` on `main` classifies the token cell as body text, so the size word would print on the tile. The hubs therefore stay **preview-only** until 221 consumes the token (rule 8), or until a measured fallback shows zero tokens. **Update 2026-09-28 (#189):** `cards.js` now takes a known token (or an empty first cell) off every `.tiles` row and keeps it as `data-tile-size` for 221, so no token prints (unit-tested in `blocks/cards/cards.test.mjs`). Reclassify to `readable` once a branch preview confirms zero printed tokens.
+- **Emitted by:** `parsers/series-grid.js` (207), `parsers/press-kit-hub-tiles.js` (805a, v1 tokens `feature`/`sq`).
 - **Shape:** header `Cards (overlay, tiles)`, then one row per tile: `[size token, <picture>, <a href="/en/…">Title</a>]`.
   - The size token names the tile's share of its source row, in twelfths, and its image ratio:
 
@@ -199,7 +199,8 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 
 ### `downloads-file-rows`
 - **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-510 · **Fallback:** readable on `main`
-  until PR #186 merges (image tiles and a plain PDF link from `templates/press-release`).
+  until PR #186 merges (image tiles and a plain PDF link from `templates/press-release`, and from
+  `templates/press-kit` for the press-kit Media Box, which emits the same empty-image rows, #189).
 - **Landing:** PR #186 implements this shape without re-import; each empty-image row renders as
   a file tile and the template fallback is removed. The block gets its Media Box appearance from
   a `media-box` section or a `Downloads (media-box)` variant. Authored `collapse=auto|none` optionally

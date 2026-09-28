@@ -25,7 +25,9 @@ https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/
 
+# PROPOSED, pending Architect sign-off: D-1 is recorded as C (link out) in SKODA-M1-GAP-REVIEW §D-1.
 # D-1 selected child (SKODA-805a/805b); remaining chapter tiles open the live source.
+# If D-1 stays C, drop this line and run `npm run import:allowlist` + re-bundle.
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio/
 
 # ===== MODEL PAGES (5), SKODA-208 =====

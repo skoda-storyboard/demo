@@ -254,7 +254,8 @@
       "fallback": "broken",
       "shape": 2,
       "emittedBy": [
-        "parsers/series-grid.js"
+        "parsers/series-grid.js",
+        "parsers/press-kit-hub-tiles.js"
       ]
     },
     {
@@ -297,7 +298,9 @@
       "ticket": "SKODA-805c",
       "fallback": "readable",
       "shape": 1,
-      "emittedBy": []
+      "emittedBy": [
+        "parsers/press-kit-content.js"
+      ]
     },
     {
       "id": "highlight",

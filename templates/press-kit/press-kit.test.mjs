@@ -34,21 +34,48 @@ test('the Introduction alone gets a keyboard-accessible Chapters menu', () => {
   assert.equal(nav.querySelector('ul').hidden, true);
 });
 
-test('60-item Media Box collapses after the Downloads block has loaded', async () => {
+// Authored Downloads rows as they come from DA (contract `downloads`): image rows and
+// file-only rows with an empty picture cell.
+function imageRow(i) {
+  return `<div><div><picture><img src="https://example.com/${i}.jpg" alt="Asset ${i}"></picture></div><div>Asset ${i}</div>
+    <div><p><a href="https://example.com/${i}.jpg">Original</a></p><p><a href="https://example.com/${i}-1920.jpg">1920px</a></p></div></div>`;
+}
+function fileRow(title, href, label) {
+  return `<div><div></div><div>${title}</div><div><p><a href="${href}">${label}</a></p></div></div>`;
+}
+// What the Downloads block does: one tile per image row, file-only rows dropped.
+function loadDownloads(block) {
+  const list = block.ownerDocument.createElement('ul');
+  list.className = 'downloads-items';
+  [...block.children].filter((row) => row.querySelector('img')).forEach(() => {
+    list.append(block.ownerDocument.createElement('li'));
+  });
+  block.replaceChildren(list);
+  block.dataset.blockStatus = 'loaded';
+}
+
+test('60-asset Media Box collapses to 8 tiles and lists file-only rows after Show more', async () => {
+  const rows = [
+    ...Array.from({ length: 30 }, (_, i) => imageRow(i)),
+    fileRow('Press kit PDF', 'https://example.com/press.pdf', 'PDF'),
+    ...Array.from({ length: 25 }, (_, i) => imageRow(30 + i)),
+    fileRow('Launch film', 'https://example.com/film.mp4', 'MP4'),
+  ];
   const main = setup(`<div class="section body-column"></div>
-    <div class="section media-box"><div class="downloads"><div>authored row</div></div>
-    <ul class="press-kit-files"><li><a href="https://example.com/press.pdf">Press PDF</a></li></ul></div>`);
+    <div class="section media-box"><div class="downloads-wrapper"><div class="downloads">${rows.join('')}</div></div></div>`);
   decorate(main);
   const block = main.querySelector('.downloads');
-  block.replaceChildren(main.ownerDocument.createElement('ul'));
-  const list = block.querySelector('ul');
-  list.className = 'downloads-items';
-  for (let i = 0; i < 55; i += 1) list.append(main.ownerDocument.createElement('li'));
-  block.dataset.blockStatus = 'loaded';
+  loadDownloads(block);
   await new Promise((resolve) => { setTimeout(resolve, 0); });
+  const list = block.querySelector('.downloads-items');
   const toggle = main.querySelector('.press-kit-show-more');
   assert.equal(list.querySelectorAll('li:not([hidden])').length, 8);
-  assert.equal(main.querySelector('.press-kit-files a').getAttribute('href'), 'https://example.com/press.pdf');
+  const files = main.querySelector('ul.press-kit-files');
+  assert.deepEqual([...files.querySelectorAll('a[download]')].map((a) => [a.getAttribute('href'), a.textContent]), [
+    ['https://example.com/press.pdf', 'Press kit PDF (PDF)'],
+    ['https://example.com/film.mp4', 'Launch film (MP4)'],
+  ]);
+  assert.ok(toggle.compareDocumentPosition(files) & 4, 'file links follow the Show more control');
   toggle.click();
   assert.equal(list.querySelectorAll('li:not([hidden])').length, 55);
   assert.equal(toggle.getAttribute('aria-expanded'), 'true');
@@ -56,21 +83,13 @@ test('60-item Media Box collapses after the Downloads block has loaded', async (
 
 test('Media Box collapse counts image tiles across multiple Downloads blocks', async () => {
   const main = setup(`<div class="section body-column"></div>
-    <div class="section media-box"><div class="downloads"></div>
-    <ul class="press-kit-files"><li><a href="https://example.com/a.pdf">PDF</a></li></ul>
-    <div class="downloads"></div></div>`);
+    <div class="section media-box"><div class="downloads">${Array.from({ length: 53 }, (_, i) => imageRow(i)).join('')}</div>
+    <div class="downloads">${[imageRow(53), imageRow(54)].join('')}</div></div>`);
   decorate(main);
-  const blocks = [...main.querySelectorAll('.downloads')];
-  for (const [index, block] of blocks.entries()) {
-    const list = main.ownerDocument.createElement('ul');
-    list.className = 'downloads-items';
-    const count = index ? 2 : 53;
-    for (let i = 0; i < count; i += 1) list.append(main.ownerDocument.createElement('li'));
-    block.append(list);
-    block.dataset.blockStatus = 'loaded';
-  }
+  main.querySelectorAll('.downloads').forEach(loadDownloads);
   await new Promise((resolve) => { setTimeout(resolve, 0); });
   assert.equal(main.querySelectorAll('.downloads-items > li:not([hidden])').length, 8);
+  assert.equal(main.querySelectorAll('.press-kit-files').length, 0, 'no file rows, no file list');
   main.querySelector('.press-kit-show-more').click();
   assert.equal(main.querySelectorAll('.downloads-items > li:not([hidden])').length, 55);
 });

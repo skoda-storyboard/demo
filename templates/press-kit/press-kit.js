@@ -45,13 +45,19 @@ function mediaBox(main) {
   const blocks = [...(section?.querySelectorAll('.downloads') || [])];
   if (!blocks.length) return;
   section.id = 'media-box';
-  const fileRows = blocks.flatMap((block) => [...block.children]
-    .filter((row) => !row.querySelector('img')));
-  const files = fileRows.map((row) => {
-    const link = row.querySelector('a[href]');
-    const title = [...row.children].find((cell) => !cell.querySelector('a') && cell.textContent.trim());
-    return link && { href: link.getAttribute('href'), label: link.textContent.trim(), title: title?.textContent.trim() || link.textContent.trim() };
-  }).filter(Boolean);
+  // The Downloads block drops rows without an image (file-only PDF/MP4 rows, contract
+  // `downloads`), so read them from the authored table before it decorates (SKODA-510).
+  const files = blocks.flatMap((block) => [...block.children]
+    .filter((row) => !row.querySelector('img'))
+    .flatMap((row) => {
+      const title = [...row.children]
+        .find((cell) => !cell.querySelector('a') && cell.textContent.trim())?.textContent.trim();
+      return [...row.querySelectorAll('a[href]')].map((link) => ({
+        href: link.getAttribute('href'),
+        label: link.textContent.trim(),
+        title: title || link.textContent.trim(),
+      }));
+    }));
 
   const render = () => {
     const items = blocks.flatMap((block) => [...block.querySelectorAll('.downloads-items > li')]);

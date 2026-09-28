@@ -42,3 +42,21 @@ test('preserves rich content and heading level, is multi-open, closed and keyboa
   assert.equal(block.querySelectorAll('button').length, 2);
   assert.match(block.textContent, /Incomplete summary/, 'malformed authored row remains readable');
 });
+
+test('an h1 summary becomes h2, and non-heading summaries keep only phrasing content in the button', { skip: !JSDOM }, () => {
+  const dom = new JSDOM(`<div class="accordion">
+    <div><div><h1 class="row-title"><span>Top level</span></h1><p>Teaser line</p></div><div><p>Answer one</p></div></div>
+    <div><div><p>Plain <strong>summary</strong></p></div><div><p>Answer two</p></div></div>
+  </div>`, { url: 'https://example.com/' });
+  globalThis.document = dom.window.document;
+  const block = document.querySelector('.accordion');
+  decorate(block);
+  const [first, second] = [...block.querySelectorAll('.accordion-item')];
+  assert.equal(first.querySelector('.accordion-heading').tagName, 'H2');
+  assert.equal(block.querySelectorAll('h1').length, 0);
+  assert.equal(first.querySelector('button').textContent.trim(), 'Top level');
+  assert.match(first.querySelector('.accordion-panel').textContent, /Teaser line[\s\S]*Answer one/, 'extra summary content is kept');
+  assert.equal(second.querySelector('.accordion-heading').tagName, 'H3');
+  assert.equal(block.querySelectorAll('button p, button div, button h1, button h2, button h3').length, 0);
+  assert.equal(second.querySelector('button strong').textContent, 'summary');
+});

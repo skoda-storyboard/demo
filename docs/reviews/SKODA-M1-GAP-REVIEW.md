@@ -469,7 +469,9 @@ QA-loop fixes, then Should.
 | D-9 | Article sidebar STO-D07 (§14 C-9) | build the sidebar · **related rail + promo, doc wording corrected** | **Resolved by §15:** the sidebar is built (801 in #113, parity in 817). Subscription = 823 (Could) or doc wording "go-live" |
 | D-10 | Client-scope adds C-1…C-6 (§14) | accept + **extend the extra resource about 4–5 days** · accept with the §14.3 trims · reject (tell the client) | accept + extend; decide by Mon 28 Sep |
 
-**D-1 selected-child implementation (SKODA-805a branch, 2026-09-28):** the Peaq-2
+**D-1 selected-child implementation (SKODA-805a branch, 2026-09-28), pending Architect
+sign-off.** The recorded D-1 decision above is still **C**; this is a one-page subset of B
+proposed by #189 and must be accepted (or reverted) by the Architect before merge. The Peaq-2
 Introduction URL was added as one end-to-end chapter alongside the existing first-glimpse
 article. The other chapter/resource tiles remain absolute live-source links, opened in a
 new tab. This is not approval to import the remaining children. Introduction does not
