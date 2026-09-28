@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync,
+  existsSync, mkdtempSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -48,6 +48,9 @@ async function mockDam() {
         }
         res.writeHead(200, { 'content-type': 'application/octet-stream', 'content-length': '12' });
         res.end(req.method === 'HEAD' ? undefined : '\0\0\0\0ftypmock');
+      } else if (req.url === '/invalid.mp4') {
+        res.writeHead(200, { 'content-type': 'video/mp4', 'content-length': '11' });
+        res.end(req.method === 'HEAD' ? undefined : 'not-a-video');
       } else if (req.url === '/bin/replicate.json' && req.method === 'POST') {
         const form = new URLSearchParams(Buffer.concat(chunks).toString());
         if (req.headers.authorization !== 'Bearer mock' || form.get('cmd') !== 'Activate') {
@@ -361,6 +364,11 @@ test('approved PDF and redirecting MP4 originals upload once and verify public d
     assert.deepEqual(dam.activations, [], 'binary dry-run does not publish');
     await build(args);
     const row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(
+      readdirSync(dir).filter((name) => name.startsWith('.media-original-')).length,
+      0,
+      'local originals are removed after DAM upload',
+    );
     assert.deepEqual(dam.uploads, ['%PDF-TECH', '%PDF-YEAR', '\0\0\0\0ftypmock']);
     assert.equal(row.steps.dam, 'done');
     assert.equal(row.steps.publish, 'done');
@@ -403,6 +411,41 @@ test('approved PDF and redirecting MP4 originals upload once and verify public d
   } finally {
     global.fetch = previousFetch;
     process.exitCode = previousExitCode;
+    if (previousToken === undefined) delete process.env.AEM_DAM_TOKEN;
+    else process.env.AEM_DAM_TOKEN = previousToken;
+    await dam.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('invalid MP4 signature blocks upload and removes the local original', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-binary-invalid-'));
+  const dam = await mockDam();
+  const previousToken = process.env.AEM_DAM_TOKEN;
+  try {
+    const source = `${dam.base}/invalid.mp4`;
+    const page = path.join(dir, 'content', 'en', 'story.plain.html');
+    const manifest = path.join(dir, 'manifest.json');
+    const urls = path.join(dir, 'public-urls.json');
+    mkdirSync(path.dirname(page), { recursive: true });
+    writeFileSync(page, `<a href="${source}">Video</a>`);
+    writeFileSync(urls, JSON.stringify({
+      '/content/dam/storyboard/en/story/invalid.mp4':
+        'https://assets.example.test/content/dam/storyboard/en/story/invalid.mp4',
+    }));
+    process.env.AEM_DAM_TOKEN = 'mock';
+    const previousExitCode = process.exitCode;
+    try {
+      await build(['--pages', page, '--manifest', manifest, '--dam-base', dam.base, '--public-urls', urls]);
+    } finally {
+      process.exitCode = previousExitCode;
+    }
+    const row = JSON.parse(readFileSync(manifest, 'utf8')).rows[logicalId(source)];
+    assert.equal(row.steps.dam, 'error');
+    assert.match(row.note, /not a non-empty video\/mp4/);
+    assert.deepEqual(dam.uploads, []);
+    assert.equal(readdirSync(dir).filter((name) => name.startsWith('.media-original-')).length, 0);
+  } finally {
     if (previousToken === undefined) delete process.env.AEM_DAM_TOKEN;
     else process.env.AEM_DAM_TOKEN = previousToken;
     await dam.close();

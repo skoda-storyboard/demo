@@ -32,14 +32,16 @@
  */
 
 import {
-  readFileSync, writeFileSync, existsSync, mkdirSync,
+  readFileSync, writeFileSync, existsSync, mkdirSync, mkdtempSync, rmSync,
 } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   isImageUrl, cleanUrl, masterUrl, logicalId, daPathFor, damPathFor,
   pagePathFromFile, isAspectCrop,
-  pickIngestUrl, headBytes, fetchBinary, uploadToDA, uploadToDAM, publishDamBinary,
+  pickIngestUrl, headBytes, fetchBinary, fetchBinaryToFile,
+  uploadToDA, uploadToDAM, publishDamBinary,
   setDamMetadata, resolveDamToken,
   needsMediaBuild, stepDownTooSmall, renditionEdge, OVERSIZE_BYTES, MIN_RENDITION_EDGE,
 } from './media-lib.mjs';
@@ -380,25 +382,33 @@ export default async function main(args = process.argv.slice(2)) {
 
     try {
       if (damConfig && row.steps.dam !== 'done') {
-        const got = await fetchBinary(row.master_url, { timeoutMs: 180000 });
-        const mime = info.kind === 'document' ? 'application/pdf' : 'video/mp4';
-        const type = got.contentType.split(';')[0].trim().toLowerCase();
-        const signature = info.kind === 'document'
-          ? got.buffer.subarray(0, 5).toString() === '%PDF-'
-          : got.buffer.subarray(4, 8).toString() === 'ftyp';
-        if (!signature || ![mime, 'application/octet-stream'].includes(type)) {
-          throw new Error(`Original is not a non-empty ${mime}: ${row.master_url}`);
+        const tempDir = mkdtempSync(path.join(tmpdir(), 'skoda-media-original-'));
+        let dam;
+        try {
+          const got = await fetchBinaryToFile(row.master_url, {
+            filePath: path.join(tempDir, 'original'),
+          });
+          const mime = info.kind === 'document' ? 'application/pdf' : 'video/mp4';
+          const type = got.contentType.split(';')[0].trim().toLowerCase();
+          const signature = info.kind === 'document'
+            ? got.header.subarray(0, 5).toString() === '%PDF-'
+            : got.header.subarray(4, 8).toString() === 'ftyp';
+          if (!signature || ![mime, 'application/octet-stream'].includes(type)) {
+            throw new Error(`Original is not a non-empty ${mime}: ${row.master_url}`);
+          }
+          row.bytes = got.bytes;
+          row.source_content_type = type;
+          row.dam_original_url = row.master_url;
+          dam = await uploadToDAM({
+            damConfig,
+            damPath: damAssetPath,
+            filePath: got.filePath,
+            contentType: mime,
+            token: damToken,
+          });
+        } finally {
+          rmSync(tempDir, { recursive: true, force: true });
         }
-        row.bytes = got.bytes;
-        row.source_content_type = type;
-        row.dam_original_url = row.master_url;
-        const dam = await uploadToDAM({
-          damConfig,
-          damPath: damAssetPath,
-          buffer: got.buffer,
-          contentType: mime,
-          token: damToken,
-        });
         row.dam_status = dam.status;
         if (dam.ok) {
           row.steps.dam = 'done';

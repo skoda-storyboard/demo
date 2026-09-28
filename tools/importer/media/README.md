@@ -106,10 +106,16 @@ link must be a stable URL without a query string; query-bearing binaries block
 ingest rather than guessing whether dropping parameters changes the file.
 Analytics hash fragments may be stripped by the existing link transformer. The source
 may return `application/octet-stream` for MP4s, so verified MP4 signatures
-are uploaded with `video/mp4` MIME. Binary uploads are serial to bound memory
-usage (a measured M1 MP4 is about 101 MB). A signed MP4 route may reject HEAD
-but accept a one-byte ranged GET; the dry-run preflight handles that. Failures
-remain `partial` in the manifest and block rewriting. The standalone
+are uploaded with `video/mp4` MIME. PDF/MP4 originals download into a
+system temporary directory outside the served checkout, then upload as bounded
+file streams through the DAM's multipart URLs; the temporary file is removed
+on success or failure.
+Binary uploads are serial and support multi-GB originals without a whole-file
+Buffer, subject to available disk space and DAM part limits. AEM may offer more
+upload URLs than needed: use the first `ceil(bytes / maxPartSize)` in order,
+with a shorter final part; reject an offer with too few URLs. A signed MP4 route
+may reject HEAD but accept a one-byte ranged GET; the dry-run preflight handles
+that. Failures remain `partial` in the manifest and block rewriting. The standalone
 `media:validate-binaries` check is **offline** and emits per-page JSON results
 with a nonzero exit for missing, unrehosted or misclassified links. `import:push`
 rewrites verified source PDF/MP4 anchors from the manifest in memory before

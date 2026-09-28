@@ -15,9 +15,14 @@
  */
 
 import { createHash } from 'node:crypto';
-import { readFileSync, existsSync } from 'node:fs';
+import {
+  readFileSync, existsSync, createReadStream, createWriteStream,
+} from 'node:fs';
+import { open, stat } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import path from 'node:path';
+import { Readable, Transform } from 'node:stream';
+import { finished, pipeline } from 'node:stream/promises';
 
 // WordPress pre-bakes an 8-size derivative ladder as `-WxH` filename suffixes.
 // Strip a *scaled* suffix to recover the logical (master) image. Aspect CROPS
@@ -309,6 +314,85 @@ export async function fetchBinary(url, { timeoutMs = 45000 } = {}) {
   }
 }
 
+/**
+ * Download an original to a caller-owned local file, never buffering the body.
+ * Retry transient failures from byte zero (truncate the file each attempt);
+ * both a stalled connection and the entire transfer have finite deadlines.
+ */
+export async function fetchBinaryToFile(url, {
+  filePath, timeoutMs = 2 * 60 * 60 * 1000, idleTimeoutMs = 120000,
+  retries = 2, fetchImpl = fetch,
+} = {}) {
+  if (!filePath) throw new Error('A local binary file path is required');
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    const controller = new AbortController();
+    const totalTimer = setTimeout(() => controller.abort(new Error('Source download deadline exceeded')), timeoutMs);
+    let idleTimer;
+    const resetIdle = () => {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => controller.abort(new Error('Source download stalled')), idleTimeoutMs);
+    };
+    let retry = true;
+    try {
+      resetIdle();
+      // eslint-disable-next-line no-await-in-loop
+      const res = await fetchImpl(url, {
+        signal: controller.signal,
+        headers: { 'user-agent': 'skoda-media-import/1.0 (+migration)' },
+      });
+      if (!res.ok) {
+        retry = res.status === 429 || res.status >= 500;
+        // eslint-disable-next-line no-await-in-loop
+        await res.body?.cancel();
+        throw new Error(`HTTP ${res.status} for ${url}`);
+      }
+      if (!res.body) throw new Error(`Empty response for ${url}`);
+      const length = res.headers.get('content-length');
+      const expected = length === null ? null : Number(length);
+      if (expected !== null && (!Number.isSafeInteger(expected) || expected < 1)) {
+        throw new Error(`Invalid source Content-Length for ${url}`);
+      }
+      let bytes = 0;
+      const counter = new Transform({
+        transform(chunk, encoding, callback) {
+          bytes += chunk.length;
+          resetIdle();
+          callback(null, chunk);
+        },
+      });
+      // eslint-disable-next-line no-await-in-loop
+      await pipeline(Readable.fromWeb(res.body), counter, createWriteStream(filePath, { flags: 'w' }));
+      // eslint-disable-next-line no-await-in-loop
+      const diskBytes = (await stat(filePath)).size;
+      if (!Number.isSafeInteger(bytes) || !bytes || diskBytes !== bytes
+        || (expected !== null && bytes !== expected)) {
+        throw new Error(`Source byte count mismatch for ${url}: ${bytes} / ${expected} (disk ${diskBytes})`);
+      }
+      // eslint-disable-next-line no-await-in-loop
+      const handle = await open(filePath, 'r');
+      const header = Buffer.alloc(8);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await handle.read(header, 0, header.length, 0);
+      } finally {
+        // eslint-disable-next-line no-await-in-loop
+        await handle.close();
+      }
+      return {
+        filePath, header, bytes, contentType: res.headers.get('content-type') || '',
+      };
+    } catch (err) {
+      if (!retry || attempt === retries) throw err;
+      // eslint-disable-next-line no-await-in-loop
+      await sleep(500 * 2 ** attempt);
+    } finally {
+      clearTimeout(totalTimer);
+      clearTimeout(idleTimer);
+    }
+  }
+  throw new Error(`Source download failed: ${url}`);
+}
+
 /** HEAD a URL for Content-Length (bytes) without the body. Null if unreachable. */
 export async function headBytes(url, { timeoutMs = 20000 } = {}) {
   const controller = new AbortController();
@@ -441,21 +525,34 @@ export async function uploadToDA({
 // Auth = custom IMS bearer (DAM host only). No per-part S3 ETags (AEM abstracts).
 // ---------------------------------------------------------------------------
 
-/** Split a buffer into N parts to match the count of returned uploadURIs. */
-export function splitBuffer(buffer, uploadURIs, maxPartSize) {
+function partRanges(size, uploadURIs, minPartSize, maxPartSize) {
   const n = uploadURIs.length;
-  if (!n || !buffer.length || (maxPartSize && buffer.length > n * maxPartSize)) {
-    throw new Error('DAM upload URIs cannot hold the complete original');
+  const max = maxPartSize == null && n === 1 ? size : Number(maxPartSize);
+  const min = minPartSize == null ? 1 : Number(minPartSize);
+  const needed = Number.isSafeInteger(max) && max > 0 ? Math.ceil(size / max) : NaN;
+  if (!Number.isSafeInteger(size) || size < 1 || !n
+    || !Number.isSafeInteger(max) || max < 1
+    || !Number.isSafeInteger(min) || min < 1
+    || (n > 1 && min > max) || needed > n) {
+    throw new Error(`DAM upload URIs cannot hold the complete original: ${size}B, ${n} URIs, ${min}-${max}B/part`);
   }
-  if (n === 1) return [buffer];
-  const part = Math.ceil(buffer.length / n);
-  const size = maxPartSize ? Math.min(part, maxPartSize) : part;
-  const parts = [];
-  for (let off = 0; off < buffer.length; off += size) {
-    parts.push(buffer.subarray(off, Math.min(off + size, buffer.length)));
+  const ranges = [];
+  let offset = 0;
+  while (offset < size) {
+    const length = Math.min(max, size - offset);
+    if (offset + length < size && length < min) {
+      throw new Error('DAM upload part is below the server minimum');
+    }
+    ranges.push({ start: offset, end: offset + length - 1 });
+    offset += length;
   }
-  if (parts.length !== n) throw new Error('DAM upload URI count does not match original parts');
-  return parts;
+  return ranges;
+}
+
+/** Use only as many ordered upload URIs as the original needs at maxPartSize. */
+export function splitBuffer(buffer, uploadURIs, maxPartSize, minPartSize) {
+  return partRanges(buffer.length, uploadURIs, minPartSize, maxPartSize)
+    .map(({ start, end }) => buffer.subarray(start, end + 1));
 }
 
 /**
@@ -482,7 +579,9 @@ export async function ensureDamFolder({
   }
   const auth = { authorization: `Bearer ${token}` };
   // Fast path: leaf already exists → all ancestors do too.
-  const leaf = await fetchImpl(`${base}${folderPath}.json`, { headers: auth });
+  const leaf = await fetchImpl(`${base}${folderPath}.json`, {
+    headers: auth, signal: AbortSignal.timeout(60000),
+  });
   if (leaf.ok) return { ok: true, status: leaf.status, body: '' };
 
   const tail = folderPath.slice(root.length + 1).split('/').filter(Boolean);
@@ -495,6 +594,7 @@ export async function ensureDamFolder({
       method: 'POST',
       headers: { ...auth, 'content-type': 'application/json' },
       body: JSON.stringify({ class: 'assetFolder', properties: { 'jcr:title': seg } }),
+      signal: AbortSignal.timeout(60000),
     });
     // 200/201 created; 409 already exists (idempotent / concurrent create) — all OK.
     if (!res.ok && res.status !== 409) {
@@ -512,7 +612,8 @@ export async function ensureDamFolder({
  * Credentials: bearer token (custom IMS) — pass explicitly from resolveDamToken.
  */
 export async function uploadToDAM({
-  damConfig, damPath, buffer, contentType, token, fetchImpl = fetchWithRetry,
+  damConfig, damPath, buffer, filePath, contentType, token, fetchImpl = fetchWithRetry,
+  partTimeoutMs = 3600000, partIdleTimeoutMs = 120000, requestTimeoutMs = 60000, partRetries = 2,
 }) {
   if (!damConfig || !damConfig.baseUrl) {
     return {
@@ -530,6 +631,11 @@ export async function uploadToDAM({
   const auth = { authorization: `Bearer ${token}` };
 
   try {
+    if ((buffer === undefined) === (filePath === undefined)) {
+      throw new Error('Provide exactly one of buffer or filePath');
+    }
+    const size = filePath ? (await stat(filePath)).size : buffer.length;
+    if (!Number.isSafeInteger(size) || size < 1) throw new Error('Original has invalid size');
     // 0) ensure the page-mirrored folder chain exists (initiateUpload 404s otherwise).
     const mk = await ensureDamFolder({
       damConfig, folderPath: folder, token, fetchImpl,
@@ -542,11 +648,12 @@ export async function uploadToDAM({
     // 1) initiateUpload
     const initForm = new URLSearchParams();
     initForm.set('fileName', fileName);
-    initForm.set('fileSize', String(buffer.length));
+    initForm.set('fileSize', String(size));
     const initRes = await fetchImpl(`${base}${folder}.initiateUpload.json`, {
       method: 'POST',
       headers: { ...auth, 'content-type': 'application/x-www-form-urlencoded' },
       body: initForm.toString(),
+      signal: AbortSignal.timeout(requestTimeoutMs),
     });
     if (!initRes.ok) {
       const body = await initRes.text().catch(() => '');
@@ -565,18 +672,65 @@ export async function uploadToDAM({
     }
 
     // 2) PUT parts
-    const parts = splitBuffer(buffer, uploadURIs, file.maxPartSize);
-    for (let i = 0; i < uploadURIs.length; i += 1) {
-      const partBuf = parts[i];
-      const putRes = await fetchImpl(uploadURIs[i], {
-        method: 'PUT',
-        headers: { 'content-type': contentType || 'application/octet-stream' },
-        body: partBuf,
-      });
-      if (!putRes.ok) {
-        const body = await putRes.text().catch(() => '');
+    const ranges = filePath
+      ? partRanges(size, uploadURIs, file.minPartSize, file.maxPartSize)
+      : splitBuffer(buffer, uploadURIs, file.maxPartSize, file.minPartSize);
+    for (let i = 0; i < ranges.length; i += 1) {
+      let putRes;
+      let failure = '';
+      for (let attempt = 0; attempt <= (filePath ? partRetries : 0); attempt += 1) {
+        const body = filePath
+          ? createReadStream(filePath, { ...ranges[i], highWaterMark: 1024 * 1024 })
+          : ranges[i];
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(new Error('DAM upload part deadline exceeded')), partTimeoutMs);
+        let idleTimer;
+        if (filePath) {
+          const resetIdle = () => {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => controller.abort(new Error('DAM upload part stalled')), partIdleTimeoutMs);
+          };
+          body.on('data', resetIdle);
+          body.pause();
+          resetIdle();
+        }
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          const putFetch = filePath && fetchImpl === fetchWithRetry ? fetch : fetchImpl;
+          putRes = await putFetch(uploadURIs[i], {
+            method: 'PUT',
+            headers: {
+              'content-type': contentType || 'application/octet-stream',
+              'content-length': String(filePath ? ranges[i].end - ranges[i].start + 1 : body.length),
+            },
+            body,
+            ...(filePath ? { duplex: 'half' } : {}),
+            signal: controller.signal,
+          });
+          if (putRes.ok) break;
+          // eslint-disable-next-line no-await-in-loop
+          failure = (await putRes.text().catch(() => '')).slice(0, 120);
+          if (putRes.status !== 429 && putRes.status < 500) break;
+        } catch (err) {
+          failure = String(err.message || err).slice(0, 120);
+        } finally {
+          clearTimeout(timer);
+          clearTimeout(idleTimer);
+          if (filePath) {
+            const closed = finished(body);
+            body.destroy();
+            // eslint-disable-next-line no-await-in-loop
+            await closed.catch(() => {});
+          }
+        }
+        if (attempt < partRetries && filePath) {
+          // eslint-disable-next-line no-await-in-loop
+          await sleep(500 * 2 ** attempt);
+        }
+      }
+      if (!putRes?.ok) {
         return {
-          ok: false, status: putRes.status, assetPath: damPath, body: `part ${i} ${putRes.status}: ${body.slice(0, 120)}`,
+          ok: false, status: putRes?.status || 0, assetPath: damPath, body: `part ${i} ${putRes?.status || 0}: ${failure}`,
         };
       }
     }
@@ -591,6 +745,7 @@ export async function uploadToDAM({
       method: 'POST',
       headers: { ...auth, 'content-type': 'application/x-www-form-urlencoded' },
       body: compForm.toString(),
+      signal: AbortSignal.timeout(requestTimeoutMs),
     });
     const body = await compRes.text().catch(() => '');
     return {
@@ -652,6 +807,7 @@ export async function setDamMetadata({
       method: 'PUT',
       headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
       body: JSON.stringify({ class: 'asset', properties: props }),
+      signal: AbortSignal.timeout(60000),
     });
     return { ok: res.ok, status: res.status };
   } catch {

@@ -8,9 +8,13 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import {
+  closeSync, mkdtempSync, openSync, readFileSync, readSync, rmSync, truncateSync, writeFileSync,
+} from 'node:fs';
+import nodePath from 'node:path';
+import {
   logicalId, masterUrl, normalizeExtension, isAspectCrop, derivativeSuffix,
   damPathFor, pagePathFromFile, splitBuffer, imageSize, ratiosDiffer,
-  uploadToDAM, publishDamBinary, ensureDamFolder, resolveDamToken,
+  uploadToDAM, publishDamBinary, ensureDamFolder, resolveDamToken, fetchBinaryToFile,
   needsMediaBuild, OVERSIZE_BYTES, belowMinEdge, stepDownTooSmall, pickIngestUrl, renditionEdge,
 } from './media-lib.mjs';
 
@@ -169,15 +173,15 @@ test('C: damPathFor mirrors the page path under the base folder', () => {
 });
 
 // ---- splitBuffer (multi-part upload) ---------------------------------------
-test('splitBuffer: single URI → one part; N URIs → N ordered parts covering all bytes', () => {
+test('splitBuffer: uses the required ordered URIs, not every offered URI', () => {
   const buf = Buffer.from('abcdefghij'); // 10 bytes
-  assert.equal(splitBuffer(buf, ['u1'], 0).length, 1);
-  const parts = splitBuffer(buf, ['u1', 'u2'], 5);
+  assert.equal(splitBuffer(buf, ['u1']).length, 1);
+  const parts = splitBuffer(buf, ['u1', 'u2', 'u3', 'u4'], 5, 4);
   assert.equal(parts.length, 2);
   assert.equal(Buffer.concat(parts).toString(), 'abcdefghij');
   assert.throws(() => splitBuffer(buf, ['u1'], 5), /cannot hold/);
   assert.throws(() => splitBuffer(buf, ['u1', 'u2'], 4), /cannot hold/);
-  assert.throws(() => splitBuffer(Buffer.from('ab'), ['u1', 'u2', 'u3'], 5), /URI count/);
+  assert.equal(splitBuffer(Buffer.from('ab'), ['u1', 'u2', 'u3'], 5, 4).length, 1);
 });
 
 test('uploadToDAM rejects insufficient part capacity before sending any bytes', async () => {
@@ -206,6 +210,345 @@ test('uploadToDAM rejects insufficient part capacity before sending any bytes', 
   assert.equal(result.ok, false);
   assert.match(result.body, /cannot hold the complete original/);
   assert.deepEqual(calls, ['GET', 'POST']);
+});
+
+test('file download retries a stalled transfer from byte zero and checks the final size', async () => {
+  const dir = mkdtempSync(nodePath.join(process.cwd(), '.media-stream-test-'));
+  const filePath = nodePath.join(dir, 'original');
+  let requests = 0;
+  const server = createServer((req, res) => {
+    requests += 1;
+    res.writeHead(200, { 'content-type': 'video/mp4', 'content-length': '12' });
+    if (requests === 1) res.write('bad');
+    else res.end('\0\0\0\0ftypmock');
+  });
+  await new Promise((resolve) => { server.listen(0, '127.0.0.1', resolve); });
+  try {
+    const got = await fetchBinaryToFile(`http://127.0.0.1:${server.address().port}/clip.mp4`, {
+      filePath, idleTimeoutMs: 50, timeoutMs: 2000, retries: 1,
+    });
+    assert.equal(requests, 2);
+    assert.equal(got.bytes, 12);
+    assert.equal(got.header.subarray(4, 8).toString(), 'ftyp');
+    assert.equal(readFileSync(filePath).toString(), '\0\0\0\0ftypmock');
+  } finally {
+    await new Promise((resolve) => { server.close(resolve); });
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('file download rejects truncated bodies rather than uploading incomplete originals', async () => {
+  const dir = mkdtempSync(nodePath.join(process.cwd(), '.media-stream-test-'));
+  const server = createServer((req, res) => {
+    res.writeHead(200, { 'content-length': '30' });
+    res.end('%PDF-short');
+  });
+  await new Promise((resolve) => { server.listen(0, '127.0.0.1', resolve); });
+  try {
+    await assert.rejects(fetchBinaryToFile(`http://127.0.0.1:${server.address().port}/a.pdf`, {
+      filePath: nodePath.join(dir, 'original'), retries: 0, idleTimeoutMs: 100,
+    }));
+  } finally {
+    await new Promise((resolve) => { server.close(resolve); });
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('file-backed upload streams bounded parts, retries one transient PUT, and completes', async () => {
+  const dir = mkdtempSync(nodePath.join(process.cwd(), '.media-stream-test-'));
+  const filePath = nodePath.join(dir, 'original');
+  writeFileSync(filePath, 'abcdefghij');
+  const calls = [];
+  let firstPut = true;
+  const fetchImpl = async (url, options = {}) => {
+    if (url.endsWith('.initiateUpload.json')) {
+      assert.equal(new URLSearchParams(options.body).get('fileSize'), '10');
+      return {
+        ok: true,
+        json: async () => ({
+          completeURI: '/completeUpload.json',
+          files: [{
+            uploadToken: 'token',
+            minPartSize: 4,
+            maxPartSize: 6,
+            uploadURIs: [
+              'http://blob/part0', 'http://blob/part1', 'http://blob/unused2',
+              'http://blob/unused3', 'http://blob/unused4',
+            ],
+          }],
+        }),
+      };
+    }
+    if (options.method === 'PUT') {
+      assert.equal(options.duplex, 'half');
+      assert.equal(options.headers.authorization, undefined);
+      const chunks = [];
+      for await (const chunk of options.body) chunks.push(chunk);
+      calls.push([url, Buffer.concat(chunks).toString(), options.headers['content-length']]);
+      if (firstPut) { firstPut = false; return { ok: false, status: 503, text: async () => 'transient' }; }
+      return { ok: true, status: 201 };
+    }
+    if (url.endsWith('completeUpload.json')) {
+      assert.equal(new URLSearchParams(options.body).get('mimeType'), 'video/mp4');
+      return { ok: true, status: 200, text: async () => 'ok' };
+    }
+    return { ok: true, status: 200 };
+  };
+  try {
+    const result = await uploadToDAM({
+      damConfig: { baseUrl: 'http://dam', folder: '/content/dam/storyboard' },
+      damPath: '/content/dam/storyboard/clip.mp4',
+      filePath,
+      token: 'mock',
+      contentType: 'video/mp4',
+      fetchImpl,
+    });
+    assert.equal(result.ok, true);
+    assert.deepEqual(calls, [
+      ['http://blob/part0', 'abcdef', '6'],
+      ['http://blob/part0', 'abcdef', '6'],
+      ['http://blob/part1', 'ghij', '4'],
+    ]);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('3.4GB sparse original advertises its exact size and rejects insufficient URI capacity', async () => {
+  const dir = mkdtempSync(nodePath.join(process.cwd(), '.media-stream-test-'));
+  const filePath = nodePath.join(dir, 'original');
+  try {
+    writeFileSync(filePath, '');
+    truncateSync(filePath, 3_445_520_486);
+    let puts = 0;
+    const result = await uploadToDAM({
+      damConfig: { baseUrl: 'http://dam', folder: '/content/dam/storyboard' },
+      damPath: '/content/dam/storyboard/clip.mp4',
+      filePath,
+      contentType: 'video/mp4',
+      token: 'mock',
+      fetchImpl: async (url, options = {}) => {
+        if (url.endsWith('.initiateUpload.json')) {
+          assert.equal(new URLSearchParams(options.body).get('fileSize'), '3445520486');
+          return {
+            ok: true,
+            json: async () => ({
+              files: [{ uploadURIs: ['http://blob/only'], maxPartSize: 2_000_000_000 }],
+            }),
+          };
+        }
+        if (options.method === 'PUT') puts += 1;
+        return { ok: true, status: 200 };
+      },
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.body, /cannot hold/);
+    assert.equal(puts, 0);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+for (const [size, offeredURIs] of [[23_667_215, 3], [58_000_000, 6]]) {
+  test(`AEM ${size}-byte original uses one of ${offeredURIs} offered URIs`, async () => {
+    const dir = mkdtempSync(nodePath.join(process.cwd(), '.media-stream-test-'));
+    const filePath = nodePath.join(dir, 'original');
+    try {
+      writeFileSync(filePath, '');
+      truncateSync(filePath, size);
+      const puts = [];
+      let completed = 0;
+      const result = await uploadToDAM({
+        damConfig: { baseUrl: 'http://dam', folder: '/content/dam/storyboard' },
+        damPath: '/content/dam/storyboard/clip.mp4',
+        filePath,
+        contentType: 'video/mp4',
+        token: 'mock',
+        fetchImpl: async (url, options = {}) => {
+          if (url.endsWith('.initiateUpload.json')) {
+            assert.equal(new URLSearchParams(options.body).get('fileSize'), String(size));
+            return {
+              ok: true,
+              json: async () => ({
+                completeURI: '/completeUpload.json',
+                files: [{
+                  uploadToken: 'token-for-whole-original',
+                  minPartSize: 10_485_760,
+                  maxPartSize: 104_857_600,
+                  uploadURIs: Array.from({ length: offeredURIs }, (_, i) => `http://blob/part${i}`),
+                }],
+              }),
+            };
+          }
+          if (options.method === 'PUT') {
+            puts.push([url, options.body.start, options.body.end,
+              Number(options.headers['content-length'])]);
+            return { ok: true, status: 201 };
+          }
+          if (url.endsWith('/completeUpload.json')) {
+            const form = new URLSearchParams(options.body);
+            assert.deepEqual([...form.keys()], ['fileName', 'mimeType', 'uploadToken']);
+            assert.equal(form.get('fileName'), 'clip.mp4');
+            assert.equal(form.get('mimeType'), 'video/mp4');
+            assert.equal(form.get('uploadToken'), 'token-for-whole-original');
+            completed += 1;
+            return { ok: true, status: 200, text: async () => 'ok' };
+          }
+          return { ok: true, status: 200 };
+        },
+      });
+      assert.equal(result.ok, true);
+      assert.deepEqual(puts, [['http://blob/part0', 0, size - 1, size]]);
+      assert.equal(completed, 1);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+}
+
+test('4.94GB MP4 uses safe offsets and bounded streams across every signed DAM part', async () => {
+  const dir = mkdtempSync(nodePath.join(process.cwd(), '.media-stream-test-'));
+  const filePath = nodePath.join(dir, 'original');
+  const size = 4_941_784_081;
+  try {
+    writeFileSync(filePath, Buffer.from('\0\0\0\0ftyp'));
+    truncateSync(filePath, size);
+    const header = Buffer.alloc(8);
+    const fd = openSync(filePath, 'r');
+    try {
+      assert.equal(readSync(fd, header, 0, 8, 0), 8);
+    } finally {
+      closeSync(fd);
+    }
+    assert.equal(header.subarray(4, 8).toString(), 'ftyp');
+    const parts = [];
+    let complete = 0;
+    const result = await uploadToDAM({
+      damConfig: { baseUrl: 'http://dam', folder: '/content/dam/storyboard' },
+      damPath: '/content/dam/storyboard/footage.mp4',
+      filePath,
+      contentType: 'video/mp4',
+      token: 'mock',
+      fetchImpl: async (url, options = {}) => {
+        if (url.endsWith('.initiateUpload.json')) {
+          assert.equal(new URLSearchParams(options.body).get('fileSize'), String(size));
+          return {
+            ok: true,
+            json: async () => ({
+              completeURI: '/completeUpload.json',
+              files: [{
+                uploadToken: 'signed',
+                minPartSize: 1_000_000_000,
+                maxPartSize: 2_000_000_000,
+                uploadURIs: [
+                  'http://blob/part0', 'http://blob/part1', 'http://blob/part2',
+                  'http://blob/unused3', 'http://blob/unused4',
+                ],
+              }],
+            }),
+          };
+        }
+        if (options.method === 'PUT') {
+          assert.equal(options.headers.authorization, undefined);
+          assert.equal(options.headers['content-type'], 'video/mp4');
+          assert.equal(options.body.readableHighWaterMark, 1024 * 1024);
+          assert.equal(options.duplex, 'half');
+          const length = Number(options.headers['content-length']);
+          assert.equal(options.body.end - options.body.start + 1, length);
+          parts.push([options.body.start, options.body.end, length]);
+          return { ok: true, status: 201 };
+        }
+        if (url.endsWith('/completeUpload.json')) {
+          complete += 1;
+          assert.equal(new URLSearchParams(options.body).get('mimeType'), 'video/mp4');
+          assert.equal(new URLSearchParams(options.body).get('uploadToken'), 'signed');
+          return { ok: true, status: 200, text: async () => 'ok' };
+        }
+        return { ok: true, status: 200 };
+      },
+    });
+    assert.equal(result.ok, true);
+    assert.deepEqual(parts, [
+      [0, 1_999_999_999, 2_000_000_000],
+      [2_000_000_000, 3_999_999_999, 2_000_000_000],
+      [4_000_000_000, 4_941_784_080, 941_784_081],
+    ]);
+    assert.equal(parts.reduce((sum, part) => sum + part[2], 0), size);
+    assert.equal(complete, 1);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('real Peaq initiation shape uses 48 of 472 offered URLs with exact byte coverage', async () => {
+  const dir = mkdtempSync(nodePath.join(process.cwd(), '.media-stream-test-'));
+  const filePath = nodePath.join(dir, 'original');
+  const size = 4_941_784_081;
+  const minPartSize = 10_485_760;
+  const maxPartSize = 104_857_600;
+  try {
+    writeFileSync(filePath, '');
+    truncateSync(filePath, size);
+    const parts = [];
+    let complete = 0;
+    const result = await uploadToDAM({
+      damConfig: { baseUrl: 'http://dam', folder: '/content/dam/storyboard' },
+      damPath: '/content/dam/storyboard/peaq.mp4',
+      filePath,
+      contentType: 'video/mp4',
+      token: 'mock',
+      fetchImpl: async (url, options = {}) => {
+        if (url.endsWith('.initiateUpload.json')) {
+          assert.equal(new URLSearchParams(options.body).get('fileSize'), String(size));
+          return {
+            ok: true,
+            json: async () => ({
+              completeURI: '/completeUpload.json',
+              files: [{
+                uploadToken: 'token',
+                minPartSize,
+                maxPartSize,
+                uploadURIs: Array.from({ length: 472 }, (_, i) => `http://blob/part${i}`),
+              }],
+            }),
+          };
+        }
+        if (options.method === 'PUT') {
+          assert.equal(options.body.readableHighWaterMark, 1024 * 1024);
+          parts.push({
+            url,
+            start: options.body.start,
+            end: options.body.end,
+            bytes: Number(options.headers['content-length']),
+          });
+          return { ok: true, status: 201 };
+        }
+        if (url.endsWith('/completeUpload.json')) {
+          const form = new URLSearchParams(options.body);
+          assert.equal(form.get('uploadToken'), 'token');
+          assert.equal(form.get('mimeType'), 'video/mp4');
+          assert.deepEqual([...form.keys()], ['fileName', 'mimeType', 'uploadToken']);
+          complete += 1;
+          return { ok: true, status: 200, text: async () => 'ok' };
+        }
+        return { ok: true, status: 200 };
+      },
+    });
+    assert.equal(result.ok, true);
+    assert.equal(parts.length, 48);
+    parts.forEach((part, i) => {
+      assert.equal(part.url, `http://blob/part${i}`);
+      assert.equal(part.start, i * maxPartSize);
+      assert.equal(part.end, part.start + part.bytes - 1);
+      assert.equal(part.bytes, i === 47 ? 13_476_881 : maxPartSize);
+      assert.ok(i === 47 || part.bytes >= minPartSize);
+    });
+    assert.equal(parts.reduce((total, part) => total + part.bytes, 0), size);
+    assert.equal(parts.at(-1).end, size - 1);
+    assert.equal(complete, 1);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 // ---- imageSize / ratiosDiffer ----------------------------------------------
@@ -322,6 +665,65 @@ test('E/H: uploadToDAM drives initiate → PUT parts (ordered) → complete with
     assert.equal(puts.reduce((n, c) => n + c.len, 0), 10);
   } finally {
     server.close();
+  }
+});
+
+test('file-backed multipart PUT works over real HTTP with the exact bytes and no blob bearer', async () => {
+  const dir = mkdtempSync(nodePath.join(process.cwd(), '.media-stream-test-'));
+  const filePath = nodePath.join(dir, 'original');
+  writeFileSync(filePath, 'abcdefghij');
+  const { server, calls, port } = await startMockDam();
+  try {
+    const result = await uploadToDAM({
+      damConfig: { baseUrl: `http://127.0.0.1:${port}`, folder: '/content/dam/storyboard' },
+      damPath: '/content/dam/storyboard/en/skoda-model/elroq/clip.mp4',
+      filePath,
+      contentType: 'video/mp4',
+      token: 'mock',
+    });
+    assert.equal(result.ok, true);
+    const puts = calls.filter((call) => call.url.startsWith('/blob/'));
+    assert.deepEqual(puts.map((call) => call.len), [5, 5]);
+    assert.ok(puts.every((call) => !call.auth));
+  } finally {
+    await new Promise((resolve) => { server.close(resolve); });
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('file-backed PUT retries when its deadline expires and never completes on failure', async () => {
+  const dir = mkdtempSync(nodePath.join(process.cwd(), '.media-stream-test-'));
+  const filePath = nodePath.join(dir, 'original');
+  writeFileSync(filePath, 'abcdefghij');
+  let puts = 0;
+  let completes = 0;
+  try {
+    const result = await uploadToDAM({
+      damConfig: { baseUrl: 'http://dam', folder: '/content/dam/storyboard' },
+      damPath: '/content/dam/storyboard/clip.mp4',
+      filePath,
+      token: 'mock',
+      partRetries: 1,
+      partTimeoutMs: 20,
+      fetchImpl: async (url, options = {}) => {
+        if (url.endsWith('.initiateUpload.json')) {
+          return { ok: true, json: async () => ({ files: [{ uploadURIs: ['http://blob/part'] }] }) };
+        }
+        if (options.method === 'PUT') {
+          puts += 1;
+          return new Promise((resolve, reject) => {
+            options.signal.addEventListener('abort', () => reject(options.signal.reason), { once: true });
+          });
+        }
+        if (url.includes('completeUpload')) completes += 1;
+        return { ok: true, status: 200 };
+      },
+    });
+    assert.equal(result.ok, false);
+    assert.equal(puts, 2);
+    assert.equal(completes, 0);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
 });
 
