@@ -18,7 +18,7 @@
  * `card` variant (SKODA-823): the story-sidebar widget (.newsletter-subscribe-widget,
  * docs/ui-specs/newsletter.md §3). Adds an image header and validates in the block, so an
  * invalid e-mail or unchecked consent shows a visible, described error. Consent stays hidden
- * until the form is first focused (as on the source). Extra keys:
+ * until the form is first focused, then slides open (as on the source). Extra keys:
  *   image          header picture
  *   heading        header heading (an authored line break is kept)
  *   error          invalid e-mail message
@@ -92,6 +92,22 @@ function buildHeader(cfg) {
     header.append(heading);
   }
   return header;
+}
+
+/**
+ * Source reveal (jQuery slideDown, measured live): height 0 → full over 400ms with the
+ * "swing" easing (0.5 - cos(πp)/2, i.e. easeInOutSine), clipped while it runs, no fade.
+ * Skipped without the Web Animations API or under reduced motion (the block just appears).
+ * @param {Element} target
+ */
+function slideDown(target) {
+  if (!target?.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const { height } = target.getBoundingClientRect();
+  target.style.overflow = 'hidden';
+  target.animate({ height: ['0px', `${height}px`] }, {
+    duration: 400,
+    easing: 'cubic-bezier(0.37, 0, 0.63, 1)',
+  }).addEventListener('finish', () => target.style.removeProperty('overflow'));
 }
 
 /**
@@ -200,8 +216,12 @@ export default function decorate(block) {
 
   const validate = isCard ? cardValidation(cfg, form, input, id) : () => true;
   if (isCard) {
-    // source reveals the consent block once the form is first used, then keeps it open
-    form.addEventListener('focusin', () => form.classList.add('is-expanded'));
+    // source slides the consent block open once the form is first used, then keeps it open
+    form.addEventListener('focusin', () => {
+      if (form.classList.contains('is-expanded')) return;
+      form.classList.add('is-expanded');
+      slideDown(form.querySelector('.newsletter-stub-consent'));
+    });
   }
 
   const message = text(cfg.message, DEFAULTS.message);

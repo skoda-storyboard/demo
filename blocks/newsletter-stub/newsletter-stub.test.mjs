@@ -143,6 +143,35 @@ test('card: consent opens on first focus and stays open', () => {
   assert.equal(form.classList.contains('is-expanded'), true);
 });
 
+test('card: consent slides open like the source (400ms swing), once, and not under reduced motion', () => {
+  const run = (reduce) => {
+    globalThis.window = { matchMedia: () => ({ matches: reduce }) };
+    const form = build(CARD).querySelector('form');
+    const consent = form.querySelector('.newsletter-stub-consent');
+    const calls = [];
+    consent.style = { removeProperty: (p) => { delete consent.style[p]; } };
+    consent.getBoundingClientRect = () => ({ height: 137 });
+    consent.animate = (keyframes, options) => {
+      calls.push({ keyframes, options });
+      return { addEventListener: (type, fn) => type === 'finish' && fn() };
+    };
+    form.dispatchEvent(new Event('focusin', { bubbles: true }));
+    form.dispatchEvent(new Event('focusin', { bubbles: true }));
+    return { calls, consent };
+  };
+  try {
+    const { calls, consent } = run(false);
+    assert.equal(calls.length, 1, 'opens once, a second focus does not replay it');
+    assert.deepEqual(calls[0].keyframes, { height: ['0px', '137px'] });
+    assert.equal(calls[0].options.duration, 400);
+    assert.equal(calls[0].options.easing, 'cubic-bezier(0.37, 0, 0.63, 1)');
+    assert.equal(consent.style.overflow, undefined, 'clip is removed when the slide finishes');
+    assert.equal(run(true).calls.length, 0, 'reduced motion: consent just appears');
+  } finally {
+    delete globalThis.window;
+  }
+});
+
 test('card: invalid e-mail shows a described error, no status and no hand-off', () => {
   const block = build(CARD);
   const form = block.querySelector('form');
