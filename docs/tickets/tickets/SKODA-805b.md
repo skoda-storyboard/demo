@@ -57,9 +57,10 @@ shape from the content, never from the URL:
   They get no `#media-box` section and no sidebar "+N" link. A page missing its title, body or
   Chapters list still fails.
 - **Images pages.** Each `widget-title` gallery group becomes `## <group>` plus its own `Downloads`
-  block, in source order (Peaq 246, Epiq 194, Motorsport 80 assets). The template collapses each
-  group to 8 tiles behind Show more, as the source's togglebox does. The "related press releases"
-  cover-box is dropped, as on every press-kit page.
+  block, in source order (Peaq 246, Epiq 194, Motorsport 80 assets). Each block carries the
+  Downloads `collapse | auto` config, so the block shows two rows and its own Show more, as the
+  source's togglebox does. The "related press releases" cover-box is dropped, as on every
+  press-kit page.
 - **Videos.** Each clip keeps its Vimeo embed plus a `Download MP4` link for the icon-only master
   download.
 - **Layout tables.** SiteOrigin layout `<table>`s ("Find out more", the WhatsApp banner, the Texts
@@ -68,14 +69,15 @@ shape from the content, never from the URL:
   then "Range: Over 450 km", …), because a block can't nest inside an Accordion cell. An irregular
   data table (colspan or ragged rows) fails the import instead of being flattened.
 - **In-body `.sb-gallery`** (2 Motorsport pages): lead image, caption, and a `+N` link to the Media Box.
-- **Image-only binary banners** are named `Download PDF` / `Download MP4` for the SKODA-503 gate.
+- **Image-only binary links.** #189's banner labelling now also titles a PDF/MP4 thumbnail link
+  whose image has a real alt, such as Peaq Technical data. The SKODA-503 gate reads only the link
+  text or title.
 - **Metadata.** A child is identified by its Chapters `link-intro` pointing at another page (the
   hub). It gets `template=press_kit_chapter`, `theme=press-kit` (to load the template),
   `presskit=<hub path>` and the hub's `model`/`tags`. Because the template is `press_kit_chapter`,
   children stay out of the model and MR Press Kits rails.
 - **Template.** The Chapters menu marks the current page with `aria-current="page"`. Fixed in #189:
-  the `body-column`/`sidebar` grid columns never applied (specificity), and the Media Box got a
-  second Show more on top of the Downloads block's own (SKODA-510) disclosure.
+  the `body-column`/`sidebar` grid columns never applied (specificity).
 
 **Verification (local).**
 - The importer runs on the cached source for 49/49 pages, with 0 errors.
