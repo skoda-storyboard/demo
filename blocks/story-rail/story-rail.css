@@ -66,13 +66,14 @@
   .story-rail-mount {
     aspect-ratio: 7.901; /* 22.5% cell (~4.4/view) */
   }
+}
 
-  /* related bands (story + press release) show one title line from 992px
-     (source: 22px at 1440); two below, the carousel default (SKODA-212a) */
-  body.press-release .section.related.story-rail-container .story-rail,
-  body.story .section.dark.story-rail-container .story-rail {
-    --carousel-title-lines: 1;
-  }
+/* Related-band title clamp (SKODA-212a; measured on the live site, fresh load per width:
+   its dotdotdot re-trims on resize). The press-release band is one 18px line at every
+   width (375–1440); the story band is two 20px lines up to 768 and one 18px line from
+   769 (see the story band rules below). */
+body.press-release .section.related.story-rail-container .story-rail {
+  --carousel-title-lines: 1;
 }
 
 /*
@@ -127,12 +128,20 @@ body.story .section.dark.story-rail-container .story-rail .card-teaser-title {
   }
 }
 
-@media (width >= 992px) {
+/* One title transition, one breakpoint: live's story band leaves its max-width:768px
+   state (two 20px lines) at 769 for one 18px line, so size and clamp switch together. */
+@media (width > 768px) {
   body.story .section.dark.story-rail-container .story-rail {
-    --carousel-cell-width: calc(30cqw - var(--carousel-gap));
+    --carousel-title-lines: 1;
   }
 
   body.story .section.dark.story-rail-container .story-rail .card-teaser-title {
     font-size: var(--heading-font-size-s);
+  }
+}
+
+@media (width >= 992px) {
+  body.story .section.dark.story-rail-container .story-rail {
+    --carousel-cell-width: calc(30cqw - var(--carousel-gap));
   }
 }
