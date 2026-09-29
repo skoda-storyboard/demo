@@ -27,7 +27,8 @@
     },
     "columns": {
       "variants": [
-        "banners"
+        "banners",
+        "callout"
       ]
     },
     "downloads": {

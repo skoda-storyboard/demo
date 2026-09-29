@@ -41016,7 +41016,8 @@
       "dam_page_path": "en/images/060-skoda-peaq-b07bf0f8",
       "page_refs": [
         "en/images/060-skoda-peaq-b07bf0f8",
-        "en/media-feed"
+        "en/media-feed",
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
       ],
       "dam_asset_path": "/content/dam/storyboard/en/images/060-skoda-peaq-b07bf0f8/060_Skoda_Peaq_b07bf0f8.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/060_Skoda_Peaq_b07bf0f8.jpg",
@@ -41231,7 +41232,8 @@
       "dam_page_path": "en/images/065-skoda-peaq-e35f34fe",
       "page_refs": [
         "en/images/065-skoda-peaq-e35f34fe",
-        "en/media-feed"
+        "en/media-feed",
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
       ],
       "dam_asset_path": "/content/dam/storyboard/en/images/065-skoda-peaq-e35f34fe/065_Skoda_Peaq_e35f34fe.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/065_Skoda_Peaq_e35f34fe.jpg",
@@ -41575,7 +41577,8 @@
       "dam_page_path": "en/images/073-skoda-peaq-e85fbace",
       "page_refs": [
         "en/images/073-skoda-peaq-e85fbace",
-        "en/media-feed"
+        "en/media-feed",
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
       ],
       "dam_asset_path": "/content/dam/storyboard/en/images/073-skoda-peaq-e85fbace/073_Skoda_Peaq_e85fbace.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/073_Skoda_Peaq_e85fbace.jpg",
@@ -41792,7 +41795,8 @@
       "dam_page_path": "en/images/074-skoda-peaq-57ae7dd5",
       "page_refs": [
         "en/images/074-skoda-peaq-57ae7dd5",
-        "en/media-feed"
+        "en/media-feed",
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
       ],
       "dam_asset_path": "/content/dam/storyboard/en/images/074-skoda-peaq-57ae7dd5/074_Skoda_Peaq_57ae7dd5.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/074_Skoda_Peaq_57ae7dd5.jpg",
@@ -41835,7 +41839,8 @@
       "dam_page_path": "en/images/075-skoda-peaq-46708799",
       "page_refs": [
         "en/images/075-skoda-peaq-46708799",
-        "en/media-feed"
+        "en/media-feed",
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
       ],
       "dam_asset_path": "/content/dam/storyboard/en/images/075-skoda-peaq-46708799/075_Skoda_Peaq_46708799.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/075_Skoda_Peaq_46708799.jpg",
@@ -103575,6 +103580,35 @@
         "bytes": 8969
       },
       "publish_note": ""
+    },
+    "1ef83eb0__whatsapp_66fb5aee.png": {
+      "logical_id": "1ef83eb0__whatsapp_66fb5aee.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2024/11/whatsapp_66fb5aee.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2024/11/whatsapp_66fb5aee.png",
+      "dam_page_path": "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+      "page_refs": [
+        "en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2024/11/whatsapp_66fb5aee.png",
+      "da_path": "",
+      "alt": "DSC01282_RET-1",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2024/11/whatsapp_66fb5aee.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 18262,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
     }
   }
 }

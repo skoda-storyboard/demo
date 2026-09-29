@@ -444,7 +444,7 @@ var CustomImportScript = (() => {
         const ul = document.createElement("ul");
         section.querySelectorAll("ul.menu > li").forEach((li) => {
           const a = li.querySelector('a[href]:not([href="#"])');
-          const title = text4(a) || text4(li.querySelector("span"));
+          const title = text4(a) || text4(li);
           if (!title || !a && !mediaBox) return;
           const link = document.createElement("a");
           link.href = (a == null ? void 0 : a.getAttribute("href")) || "#media-box";
@@ -458,7 +458,24 @@ var CustomImportScript = (() => {
     });
     return nodes;
   }
+  var ICON_MAX_WIDTH = 60;
+  function iconCallout(table, document) {
+    var _a;
+    const rows = [...table.rows];
+    const cells = rows.length === 1 ? [...rows[0].cells] : [];
+    if (cells.length !== 2 || text4(cells[0])) return null;
+    const imgs = cells[0].querySelectorAll("img");
+    const width = Number((_a = imgs[0]) == null ? void 0 : _a.getAttribute("width"));
+    if (imgs.length !== 1 || !(width > 0 && width <= ICON_MAX_WIDTH) || !text4(cells[1])) return null;
+    const icon = make(document, "p", "");
+    icon.append(cells[0].querySelector("a:has(img)") || imgs[0]);
+    const body = make(document, "p", "");
+    body.append(...cells[1].childNodes);
+    return WebImporter.DOMUtils.createTable([["Columns (callout)"], [[icon], [body]]], document);
+  }
   function layoutTable(table, document) {
+    const callout = iconCallout(table, document);
+    if (callout) return [callout];
     table.querySelectorAll('img[src*="whatsapp"]').forEach((img) => {
       const link = img.closest("a");
       (link && !text4(link) ? link : img).remove();

@@ -67,7 +67,9 @@ function sidebar(document, secondary, mediaBox) {
       const ul = document.createElement('ul');
       section.querySelectorAll('ul.menu > li').forEach((li) => {
         const a = li.querySelector('a[href]:not([href="#"])');
-        const title = text(a) || text(li.querySelector('span'));
+        // helix-importer unwraps classless spans before transform: "Download Media Box" is then
+        // the item's own text beside its icon-only cart action.
+        const title = text(a) || text(li);
         if (!title || (!a && !mediaBox)) return;
         const link = document.createElement('a');
         link.href = a?.getAttribute('href') || '#media-box';
@@ -88,12 +90,36 @@ function sidebar(document, secondary, mediaBox) {
  * tables: a one-column layout table (the resource "Texts" chapter-PDF list) becomes its
  * header as a heading plus a list; a data table (e.g. the FAQ model table, which sits inside
  * an accordion answer, where no block may nest) becomes one text line per row.
- * Any other multi-column table is layout (the chapters' "What's up, Škoda?" WhatsApp callout,
- * the Enyaq RS Race "130 years" banner): its cells become content, keeping their links and
- * images. The WhatsApp icon is a decorative 512px PNG sized by a width attribute DA drops; the
- * channel link beside it carries the message (SKODA-805b, PR #202).
+ * Any other multi-column table is layout (the Enyaq RS Race "130 years" banner): its cells
+ * become content, keeping their links and images.
  */
+
+// The widest authored image that still reads as an icon (the WhatsApp callout's is 50).
+const ICON_MAX_WIDTH = 60;
+
+// A one-row [small image | text] layout table is an icon callout (the chapters' "What's up,
+// Škoda?" WhatsApp row: a 512px PNG shown at 50px beside the channel link). DA drops the width
+// attribute, so it becomes `Columns (callout)`, which keeps the icon at its authored size
+// (SKODA-805c review; SKODA-805b dropped the icon, which cost the row its 50px height).
+function iconCallout(table, document) {
+  const rows = [...table.rows];
+  const cells = rows.length === 1 ? [...rows[0].cells] : [];
+  if (cells.length !== 2 || text(cells[0])) return null;
+  const imgs = cells[0].querySelectorAll('img');
+  const width = Number(imgs[0]?.getAttribute('width'));
+  if (imgs.length !== 1 || !(width > 0 && width <= ICON_MAX_WIDTH) || !text(cells[1])) return null;
+  const icon = make(document, 'p', '');
+  icon.append(cells[0].querySelector('a:has(img)') || imgs[0]);
+  const body = make(document, 'p', '');
+  body.append(...cells[1].childNodes);
+  return WebImporter.DOMUtils.createTable([['Columns (callout)'], [[icon], [body]]], document);
+}
+
 function layoutTable(table, document) {
+  const callout = iconCallout(table, document);
+  if (callout) return [callout];
+  // Outside that callout a WhatsApp image is a 512px PNG sized only by an attribute DA drops,
+  // and the channel link beside it carries the message (SKODA-805b, PR #202).
   table.querySelectorAll('img[src*="whatsapp"]').forEach((img) => {
     const link = img.closest('a');
     (link && !text(link) ? link : img).remove();

@@ -505,6 +505,25 @@ test('SiteOrigin layout tables flatten to default content, never an unnamed bloc
   assert.equal([...body.querySelectorAll('p')].filter((p) => !txt(p) && !p.querySelector('img, a')).length, 0);
 });
 
+test('the WhatsApp callout keeps its 50px icon as Columns (callout); the menu keeps Download Media Box', { skip: !JSDOM }, () => {
+  // Live shape: a one-row [icon | text] layout table, then an empty spacer paragraph.
+  const callout = `<table><tbody><tr>
+    <td style="padding: 0; width: 60px;"><img src="https://cdn.skoda-storyboard.com/2024/11/whatsapp_66fb5aee.png" alt="DSC01282_RET-1" width="50"></td>
+    <td style="padding-left: 15px;">Explore the ‘What’s up, Škoda?’ channel: <a href="http://go.skoda.eu/whatsapp">go.skoda.eu/whatsapp</a></td>
+  </tr></tbody></table><p>&nbsp;</p>`;
+  const html = fixture({ extra: grid(widget(callout)) })
+    // helix-importer unwraps classless spans before transform: the menu item is bare text.
+    .replace('<li><span>Download Media Box</span></li>', '<li>Download Media Box <a class="media-cart-action add" href="#"></a></li>');
+  const page = run(html, target);
+  const [callBlock] = blocks(page, 'Columns (callout)');
+  assert.ok(callBlock, 'Columns (callout)');
+  const [icon, body] = [...callBlock.querySelectorAll('tr')[1].children];
+  assert.match(icon.querySelector('img').getAttribute('src'), /whatsapp_66fb5aee\.png$/);
+  assert.match(txt(body), /^Explore the ‘What’s up, Škoda\?’ channel: go\.skoda\.eu\/whatsapp$/);
+  assert.equal(body.querySelector('a').getAttribute('href'), 'http://go.skoda.eu/whatsapp');
+  assert.equal(page.querySelector('a[href="#media-box"]')?.textContent, 'Download Media Box');
+});
+
 test('a data table (2+ labelled rows) becomes one text line per row, every value kept', { skip: !JSDOM }, () => {
   // #189's table engine (skoda-press-kit-default-layout sourceTables) wins over PR #202's
   // per-column lists: the published FAQ pages already use this shape (SKODA-805b merge).
