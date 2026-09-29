@@ -139,3 +139,15 @@ test('a hub keeps links and has no article-only controls', () => {
   assert.equal(main.querySelector('a[href^="/en"]').target, '');
   assert.equal(main.querySelectorAll('.press-kit-chapters-nav, .press-kit-show-more').length, 0);
 });
+
+test('the sidebar "+N" link becomes the Gallery (preview) pill data, pointing at the Media Box', () => {
+  const main = setup(`<div class="section sidebar"><div class="default-content-wrapper"><h3>Images</h3></div>
+    <div class="gallery-wrapper"><div class="gallery preview"><div><div>img</div></div></div></div>
+    <div class="default-content-wrapper"><p><a href="#media-box">+51</a></p><h3>Tags</h3></div></div>`);
+  decorate(main);
+  const gallery = main.querySelector('.gallery.preview');
+  assert.equal(gallery.dataset.moreCount, '51');
+  assert.equal(gallery.dataset.moreHref, '#media-box');
+  assert.equal(main.querySelector('a[href="#media-box"]'), null, 'the separate link is gone');
+  assert.ok(main.querySelector('.sidebar h3:last-child'), 'the Tags heading stays');
+});

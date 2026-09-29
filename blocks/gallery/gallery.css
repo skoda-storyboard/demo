@@ -516,3 +516,8 @@ body.story .section.body-column .gallery.slider {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* the "+N" pill as a link (the press-kit preview points at its Media Box, SKODA-805c) */
+.gallery.preview a.gallery-preview-more {
+  text-decoration: none;
+}

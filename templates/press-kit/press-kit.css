@@ -3,11 +3,28 @@ body.press-kit {
   --pk-gutter: var(--spacing-l);
   --pk-chapters-height: 44px;
   --pk-chapters-layer: 5;
-  --pk-media-gap: var(--spacing-xl);
   --pk-sidebar-inset: var(--spacing-xxl);
   --pk-article-top: 32px;
   --pk-date-size: 11px;
   --pk-title-size-compact: 28px;
+
+  /* below the body (SKODA-805c review), measured on the source's first-glimpse:
+     the primary column's 60px margin, its -10px row inset and the band's 32px margin */
+  --pk-column-end: 60px;
+  --pk-band-gap: calc(32px - var(--page-gutter));
+  --pk-band-padding-top: 72px;
+  --pk-band-padding-bottom: 60px;
+  --pk-band-title-size-compact: 20px;
+  --pk-band-stats-gap: calc(var(--paragraph-gap) + var(--spacing-xs));
+  --pk-side-group-gap: 15px;
+  --pk-side-heading-compact: 20px;
+  --pk-side-line: 45px;
+
+  /* the sidebar ends in an empty 15px ad slot and its 15px gap, then the 24px column margin */
+  --pk-side-end: calc(3 * var(--pk-side-group-gap) + var(--spacing-l) + var(--pk-band-gap));
+
+  /* the source's 40px cart toolbar under a video, less the 4px its row gap overlaps */
+  --pk-video-toolbar: 36px;
   --pk-columns-gap: var(--grid-gutter);
   --pk-columns-stack-gap: var(--spacing-xl);
 }
@@ -25,7 +42,7 @@ body.press-kit .section.body-column .columns {
   margin-block: var(--pk-columns-stack-gap);
 }
 
-body.press-kit .section.body-column .columns > div {
+body.press-kit .section.body-column .columns:not(.callout) > div {
   gap: var(--pk-columns-stack-gap);
 }
 
@@ -34,13 +51,13 @@ body.press-kit .section.body-column .columns > div > div > :last-child {
 }
 
 @media (width >= 781px) {
-  body.press-kit .section.body-column .columns > div {
+  body.press-kit .section.body-column .columns:not(.callout) > div {
     flex-direction: row;
     align-items: start;
     gap: var(--pk-columns-gap);
   }
 
-  body.press-kit .section.body-column .columns > div > div {
+  body.press-kit .section.body-column .columns:not(.callout) > div > div {
     flex: 1 1 0;
     min-width: 0;
   }
@@ -138,6 +155,107 @@ body.press-kit .press-kit-chapters-nav a:focus-visible {
   outline-offset: 2px;
 }
 
+/* The body column ends with the source's 60px column margin (also its gap to the stacked
+   sidebar); the sidebar with its ad slot and column margin (--pk-side-end). */
+body.press-kit main > .section.body-column {
+  display: flow-root;
+  margin-block-end: var(--pk-column-end);
+  padding-block-end: var(--page-gutter);
+}
+
+/* ...after its last paragraph's 20px and the source row's 10px inset (the padding above),
+   whichever block ends it: 90px to the stacked sidebar, 112px to the band. */
+body.press-kit .section.body-column > .default-content-wrapper:last-child > :last-child,
+body.press-kit .section.body-column > div:last-child > .columns {
+  margin-block-end: var(--paragraph-gap);
+}
+
+body.press-kit main > .section.sidebar {
+  margin-block-end: var(--pk-side-end);
+}
+
+/* Sidebar, as press-release.css measures the same source shell: groups 15px apart; headings
+   45px lines, 600 #353535, 20px up to 768 and 16px above; the Additional-info rows 45px
+   lines between 8px insets over a 1px rule; tag rows touch, 5px between chips. */
+body.press-kit .section.sidebar h3 {
+  margin: 0;
+  color: var(--skoda-grey-800);
+  font-size: var(--pk-side-heading-compact);
+  font-weight: var(--weight-semibold);
+  line-height: var(--pk-side-line);
+}
+
+body.press-kit .section.sidebar .tags-list {
+  row-gap: 0;
+}
+
+body.press-kit .section.sidebar .tags-list > li {
+  margin: 0;
+}
+
+body.press-kit .section.sidebar .default-content-wrapper > ul {
+  margin: 0 0 var(--pk-side-group-gap);
+  padding: 0;
+  list-style: none;
+}
+
+body.press-kit .section.sidebar .default-content-wrapper > ul > li {
+  margin: 0;
+  border-bottom: 1px solid var(--pr-menu-border-color);
+}
+
+body.press-kit .section.sidebar .default-content-wrapper > ul a {
+  display: block;
+  padding: var(--spacing-xs) 0;
+  color: var(--skoda-grey-800);
+  line-height: var(--pk-side-line);
+  text-decoration: none;
+}
+
+body.press-kit .section.sidebar .gallery-wrapper,
+body.press-kit .section.sidebar .tags-wrapper {
+  margin-block-end: var(--pk-side-group-gap);
+}
+
+/* Media Box band: the source's band padding plus the Media Box margin and header inset
+   (16 + 32 + 24 above the title, 48 + 12 below the grid), 32px after the article and 16px
+   before the footer. The title is 20/25 up to 768, 26/32.5 above; the stats line 16/32. */
+body.press-kit main > .section.media-box {
+  margin-block: var(--pk-band-gap) var(--spacing-m);
+  padding-block: var(--pk-band-padding-top) var(--pk-band-padding-bottom);
+}
+
+body.press-kit .section.media-box .default-content-wrapper {
+  margin-block-end: var(--pk-band-stats-gap);
+}
+
+body.press-kit .section.media-box .default-content-wrapper > h2 {
+  margin: 0;
+  color: var(--background-color);
+  font-size: var(--pk-band-title-size-compact);
+  font-weight: var(--weight-semibold);
+  line-height: 1.25;
+}
+
+body.press-kit .section.media-box .default-content-wrapper > p {
+  margin: 0;
+  padding-block-start: calc(var(--spacing-xs) / 2);
+  color: var(--pr-band-meta-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 2;
+}
+
+@media (width > 768px) {
+  body.press-kit .section.sidebar h3 {
+    font-size: var(--body-font-size-m);
+  }
+
+  body.press-kit .section.media-box .default-content-wrapper > h2 {
+    font-size: var(--heading-font-size-l);
+  }
+}
+
 body.press-kit .section.body-column .default-content-wrapper {
   font-size: var(--body-font-size-m);
   line-height: var(--line-height-body);
@@ -167,8 +285,33 @@ body.press-kit .section.body-column .default-content-wrapper:first-child > p:fir
   margin-block-end: calc(var(--paragraph-gap) + var(--page-gutter));
 }
 
-body.press-kit .section.media-box {
-  margin-top: var(--pk-media-gap);
+/* Row toggles are the source's 20px rows apart (the block's own gap is 24), and the text after
+   them keeps its 20px; a clip starts 56px after the text before it: the row gap plus the
+   attachment's 16px margin (SKODA-805c review). */
+body.press-kit .section.body-column .accordion .accordion-item + .accordion-item {
+  margin-block-start: var(--paragraph-gap);
+}
+
+body.press-kit .section.body-column .accordion {
+  margin-block-end: var(--paragraph-gap);
+}
+
+body.press-kit .section.body-column .embed {
+  margin-block-start: calc(var(--pk-columns-stack-gap) + var(--spacing-m));
+}
+
+/* A clip's "Download video" link sits where the source's cart toolbar is: 8px under the
+   player, in a 40px row (SKODA-805c review). */
+body.press-kit .section.body-column .embed-wrapper + .default-content-wrapper > p:first-child:has(> a[href*=".mp4"]) {
+  display: flex;
+  align-items: center;
+  min-height: var(--pk-video-toolbar);
+  margin-block-start: var(--spacing-xs);
+}
+
+/* The WhatsApp callout (`Columns (callout)`): the source's empty paragraph after it adds 24px. */
+body.press-kit .section.body-column .columns.callout {
+  margin-block-end: calc(var(--pk-columns-stack-gap) + var(--spacing-l));
 }
 
 /* Hub hero (press-kit-template.md sweep correction): below 768 the caption leaves the image
