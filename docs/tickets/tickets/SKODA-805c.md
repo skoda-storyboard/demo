@@ -138,8 +138,8 @@ and finishes it.
 - **Lead crop:** the source also scales its lead image 1.02 inside the crop, a 2% tighter framing;
   not reproduced.
 - **Chapter quotes:** on chapter pages the `blockquote > em` quotes aren't `Quote` rows yet
-  (SKODA-220 follow-up). The Peaq Exterior chapter ends 49px short of the source because of this.
-- **WhatsApp icon:** the 50px decorative icon is dropped (SKODA-805b), so the WhatsApp line → banners
-  gap is 40 vs 64.
+  (SKODA-220 follow-up). Because of this, from the quote down the Peaq Exterior chapter sits 29px
+  above the source at 1280 and 4px above at 768/375 (the sidebar is unaffected). Its footer is 28px
+  higher at 1280, 768 and 375.
 - **Peaq Images child:** its preview still fails in html2md (200-image page, unchanged in DA; 805a
   follow-up).
