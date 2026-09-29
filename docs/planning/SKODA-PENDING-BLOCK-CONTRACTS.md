@@ -50,7 +50,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 
 | Block | Variants | Config keys |
 |---|---|---|
-| `cards` | `media`, `overlay`, `toolbar`, `series-directory`, `social` (SKODA-217: one row per profile, one cell with a link whose text is the handle; its section carries `Style: cover-box, dark`, the SKODA-218 home band) | – |
+| `cards` | `media`, `overlay`, `toolbar`, `tiles`, `series-directory`, `social` (SKODA-217: one row per profile, one cell with a link whose text is the handle; its section carries `Style: cover-box, dark`, the SKODA-218 home band) | – |
 | `carousel` | `dots` | – |
 | `columns` | – | – |
 | `downloads` | `media-box` (SKODA-510) | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes`, `collapse` (SKODA-502/510) |
@@ -151,10 +151,13 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Still to do:** the importer header change (`Cards (promo)` → `Promo Box`). The check keeps failing `Cards (promo)` and points at `promo-box`.
 
 ### `cards-tiles`
-- **Status:** `pinned` (shape 2, 2026-09-27) · **Ticket:** SKODA-221, now **Could** (importers: 207 series hub, 805a press-kit hub) · **Fallback:** broken (corrected 2026-09-27, SKODA-207): `blocks/cards/cards.js` on `main` classifies the token cell as body text, so the size word would print on the tile. The hubs therefore stay **preview-only** until 221 consumes the token (rule 8), or until a measured fallback shows zero tokens.
-- **Emitted by:** `parsers/series-grid.js` (207). 805a still to write.
+- **Status:** implemented by SKODA-221 (shape 3; historical pending entry retained for version tracking) · **Ticket:** SKODA-221 (importers: 207 series hub, 805a press-kit hub). Series pages using shape 2 need rendered QA; press-kit pages need the shape 3 import before QA and publication.
+- **Emitted by:** `parsers/series-grid.js` (207). The 805a importer is still to write.
+  Existing press-kit DA previews have the ambiguous old `feature`/`sq` rows, including
+  Motorsport's all-`sq` grid; the runtime and `import:validate-blocks` both reject
+  these on `/en/press-kits/`. They must be re-imported with shape 3 before tile QA/publish.
 - **Shape:** header `Cards (overlay, tiles)`, then one row per tile: `[size token, <picture>, <a href="/en/…">Title</a>]`.
-  - The size token names the tile's share of its source row, in twelfths, and its image ratio:
+  - The size token names the tile's share of its source row and its image ratio. Series uses twelfths; press kits use twentieths:
 
     | Token | Row share | Ratio | Token | Row share | Ratio |
     |---|---|---|---|---|---|
@@ -162,11 +165,12 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
     | `wide` | 6/12 | 2:1 | `third-sq` | 4/12 | 1:1 |
     | `sq-small` | 3/12 | 1:1 | `two-thirds` | 8/12 | 2:1 |
     | `quarter` | 3/12 | 2:1 | `banner` | 12/12 | 4:1 |
-    | `feature` | press kits (805a) | 2:1 | `banner-tall` | 12/12 | 3:1 |
+    | `feature` | 8/20 | 2:1 | `banner-tall` | 12/12 | 3:1 |
+    | `press-square` | 4/20 | 1:1 | `press-quarter` | 5/20 | 1:1 |
 
-  - **Row breaks:** a row closes when its tiles fill 12/12. A row that stays short (a source `panel-grid-cell-empty` or empty widget) marks its last tile with a second word, `end` (`wide end`). So every source row break is authored and the renderer never guesses. A token that would overfill a row is a content error.
+  - **Row breaks:** a row closes at 12/12 (series) or 20/20 (press kits). A short row marks its last tile `end` (`wide end`). The renderer never guesses; unknown tokens, mixed track types and overfilled/unterminated rows are errors.
   - The importer takes the share from the SiteOrigin layout CSS (`#pgc-<post>-<row>-<cell>{width:N%}`) and the ratio from the tile's `ratio-NxM` class.
-  - An empty token cell means the default `sq-small`. The cell stays, per rule 7.
+  - An empty token cell means the default series `sq-small`. The cell stays, per rule 7; press-kit rows must carry explicit press tokens.
   - Tiles have no date and no excerpt.
 - **Why shape 2:** v1 (`sq`, `sq-small`, `wide`, `third`, `feature`) covered the 5 M1 hubs, where every row fills 12/12. The 10 corpus hubs added:
   - quarter-width 2:1 tiles (back-to-the-past);
@@ -175,7 +179,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - full-width 4:1 and 3:1 banners (czech-footprint, unknown-parts, evolution-of-parts, my-life-my-car, sustainable-mobility);
   - short rows (road-trip row 2, sustainable-mobility row 22).
 
-  v1 tokens keep their meaning, so v1 rows are valid v2 rows.
+  v1 tokens keep their meaning, so v1 rows are valid v2 and v3 rows. **Shape 3** adds the 20-column press-kit track: `feature` = 8/20, `press-square` = 4/20, `press-quarter` = 5/20. Peaq/Epiq open with `feature feature press-square` and then five `press-square` tiles per row; Motorsport has four `press-quarter` tiles in its last row. This addition does not change any series token or require a series re-import.
 - **Proof** (all 15 hubs, `test/fixtures/series/`, `tools/importer/series-hub.test.mjs`): replaying the tokens with "close at 12/12 or on `end`" recovers every source row. Tiles per hub: 125-years 8, 130-years 14, roads-places 10, unexpected-jobs 5, minutes 12, road-trip 3, winter-tips 4, back-to-the-past 22, unknown-parts 3, hidden-helpers 19, czech-footprint 5, sustainable-mobility 93, my-life-my-car 11, evolution-of-parts 8, 60-seconds-walkaround 17.
 - **Example** (`/en/series/125-years-of-motorsport/`): `sq sq` / `sq-small wide sq-small` / `third third third`, the curated mosaic in source order. It's **not** index-driven (sweep report §5: series hubs are curated), so it replaces the `series-grid` `Listing`.
 
@@ -190,6 +194,9 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Emitted by:** `transformers/skoda-press-release-layout.js` (renames the `parsers/gallery.js` table in the press-release sidebar).
 - **Shape:** header `Gallery (preview)`, then one row per image `[<picture>, caption paragraph or empty]`, the same rows as `Gallery`. Preceded by an `h3` "Images" as default content.
 - **Example** (`/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/`): 4 rows. The 5 M1 releases carry 1, 3, 4, 2 and 3.
+- **Landing:** branch `skoda-223-gallery-preview` renders this shape as-is: no re-import, and the fallback goes away
+  once it merges. Rows beyond 4 stay in the lightbox behind a "+N" pill. Keep the contract pinned until the branch
+  merges and QA verifies it.
 
 ### `story-rail-press`
 - **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-224 · **Fallback:** readable (the default carousel cards)
@@ -245,6 +252,12 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Shape:** a section holding the panel's content (h3, text, images, and any nested blocks), closed by `Section Metadata` with `Style` = `highlight, dark` (story panel) or `highlight, grey` (PR FAQ/info callout). Consecutive highlighted rows each become their own section with the same style; the runtime joins them.
 - **Runtime:** a body-column-scoped treatment through the `scripts.js` section hook. It must not reuse the full-bleed `.section.dark` rule.
 - **Until the importer emits it** (824 importer half), pages keep the current unwrap (default content) and are marked `re-import on SKODA-824`. The shape is fixed, so the 824 runtime and importer can be built in parallel.
+
+### `cover-box`
+- **Status:** `pinned` (2026-09-28) · **Ticket:** SKODA-218 · **Fallback:** readable (a light rail, as before)
+- **Form: section style, not a block.** A homepage band holds one or more rails (Media Room "Models" + "Press Kits"), and DA blocks can't nest (rule 5).
+- **Shape:** each source `.cover-box.dark` band becomes its own section closed by `Section Metadata` with `Style` = `cover-box, dark`. The Media Room home adds `compact` (`cover-box, dark, compact`: its bands sit 16px tighter at the top). Detected by the source class, never by heading or URL. Emitted by `transformers/skoda-dark-bands.js` (both home importers) and, for the Social media band (a heading + `Cards (social)`), by `parsers/social-cards.js` (SKODA-217); the transformer skips `.socials-static` so the band is styled once.
+- **Runtime:** `styles.css`. `cover-box` = the band box (1440px cap, centred; live inner spacing 66/60, compact 48; 48px between rails); `dark` = the existing green/white primitive, with headings in the band following its white text.
 
 ### `media-item`
 - **Status:** `pinned` (shape 6, 2026-09-28) · **Ticket:** SKODA-608 · **Fallback:** readable (story-style listing/rail cards until SKODA-406)

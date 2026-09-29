@@ -6,13 +6,16 @@
  *
  * Featured promo-box (curated cards) + index-driven Story Rails (News / Images /
  * Videos / Models / Press Kits / Latest Stories), each self-classified by home-rail
- * from its heading + "All" link / type-<cpt> class. Metadata template=page (body
- * class carries `page`; MR side selects chrome at runtime). Content-driven detection.
+ * from its heading + "All" link / type-<cpt> class. The dark `.cover-box.dark`
+ * Models band becomes its own `Style: cover-box, dark` section (skoda-dark-bands,
+ * SKODA-218). Metadata template=page (body class carries `page`; MR side selects
+ * chrome at runtime). Content-driven detection.
  */
 
 import promoBoxParser from './parsers/promo-box.js';
 import homeRailParser from './parsers/home-rail.js';
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
+import darkBandsTransformer from './transformers/skoda-dark-bands.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 import linksTransformer from './transformers/skoda-links.js';
@@ -29,6 +32,8 @@ const PAGE_TEMPLATE = {
     'Škoda Media Room home (template-media-room). Curated promo-box cards + index-driven Story Rails (News/Images/Videos/Models/Press Kits/Latest Stories) via home-rail. Metadata template=page. Content-driven detection only.',
   urls: ['https://www.skoda-storyboard.com/en/media-room/'],
   metadata: { template: 'page' },
+  // skoda-dark-bands: the MR home's bands sit 16px tighter at the top (live, SKODA-218)
+  darkBandStyle: 'cover-box, dark, compact',
   blocks: [
     { name: 'promo-box', instances: ['section.promo-box'] },
     { name: 'home-rail', instances: ['.cover-box .search-results[class*="type-"]'] },
@@ -38,6 +43,7 @@ const PAGE_TEMPLATE = {
 
 const transformers = [
   cleanupTransformer,
+  darkBandsTransformer,
   ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
   metadataTransformer,
   linksTransformer,

@@ -32,6 +32,10 @@ const LABELS = {
   slider: 'Image slider',
   slideOf: (n, total) => `${n} of ${total}`,
   goTo: (n) => `Go to image ${n}`,
+  // preview variant (SKODA-223): per-thumb name + the "+N" pill
+  openNamed: (n, alt) => (alt ? `${LABELS.open} ${n}: ${alt}` : `${LABELS.open} ${n}`),
+  more: (n) => `+${n}`,
+  moreLabel: (n) => `Show ${n} more ${n === 1 ? 'image' : 'images'}`,
 };
 
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -425,12 +429,82 @@ function buildSlider(block) {
   track.addEventListener('pointercancel', endDrag);
 }
 
+/* ==========================================================================
+ * Preview variant — `Gallery (preview)` (SKODA-223)
+ *
+ * The press-release sidebar "Images" preview (source section.sa-media-kit-preview):
+ * no main stage, just a 2-up grid of 16:9 thumbnails (1-up below 768), at most
+ * PREVIEW_MAX shown. With more images the last shown thumb carries a "+N" pill that
+ * opens the lightbox at the first hidden image. Every thumb opens the shared
+ * lightbox over ALL images; captions stay off-page for the lightbox. The "Images"
+ * heading is authored default content before the block, so none is added here.
+ * ========================================================================== */
+
+const PREVIEW_MAX = 4;
+
+/**
+ * What the preview shows for a given image count.
+ * @param {number} count number of images
+ * @param {number} max most thumbs shown
+ * @returns {{shown: number, more: number, moreIndex: number}} `more` = hidden images
+ *   (0 = no pill); `moreIndex` = the image the pill opens (-1 without a pill)
+ */
+export function previewPlan(count, max = PREVIEW_MAX) {
+  const total = Math.max(0, count);
+  const shown = Math.min(total, max);
+  const more = total - shown;
+  return { shown, more, moreIndex: more ? shown : -1 };
+}
+
+function buildPreview(block) {
+  const items = readItems(block);
+  block.textContent = '';
+  if (!items.length) return;
+
+  const { shown, more, moreIndex } = previewPlan(items.length);
+  const grid = document.createElement('ul');
+  grid.className = 'gallery-preview-grid';
+  const triggers = items.slice(0, shown).map((item, i) => {
+    const li = document.createElement('li');
+    li.className = 'gallery-preview-item';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'gallery-preview-thumb';
+    btn.setAttribute('aria-label', LABELS.openNamed(i + 1, item.alt));
+    btn.append(createOptimizedPicture(item.src, item.alt, false, [{ width: '750' }]));
+    li.append(btn);
+    grid.append(li);
+    return [btn, i];
+  });
+
+  if (more) {
+    const pill = document.createElement('button');
+    pill.type = 'button';
+    pill.className = 'gallery-preview-more';
+    pill.setAttribute('aria-label', LABELS.moreLabel(more));
+    pill.textContent = LABELS.more(more);
+    grid.lastElementChild.append(pill);
+    triggers.push([pill, moreIndex]);
+  }
+  block.append(grid);
+
+  const lightbox = buildLightbox(block, items);
+  const single = items.length === 1;
+  triggers.forEach(([btn, index]) => {
+    btn.addEventListener('click', () => lightbox.open(index, btn, single));
+  });
+}
+
 /**
  * @param {Element} block the gallery block element
  */
 export default function decorate(block) {
   if (block.classList.contains('slider')) {
     buildSlider(block);
+    return;
+  }
+  if (block.classList.contains('preview')) {
+    buildPreview(block);
     return;
   }
 

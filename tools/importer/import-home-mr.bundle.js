@@ -212,6 +212,33 @@ var CustomImportScript = (() => {
     }
   }
 
+  // tools/importer/transformers/skoda-dark-bands.js
+  var DARK_BAND_SELECTOR = ".cover-box.dark:not(.socials-static)";
+  var DARK_BAND_STYLE = "cover-box, dark";
+  function hasContent(el) {
+    return !!el && ((el.textContent || "").trim() !== "" || !!el.querySelector("img, picture, iframe, table"));
+  }
+  function hasContentBeside(band, root, step) {
+    for (let el = band; el && el !== root; el = el.parentElement) {
+      for (let n = el[step]; n; n = n[step]) if (hasContent(n)) return true;
+    }
+    return false;
+  }
+  function transform2(hookName, element, payload) {
+    if (hookName !== "beforeTransform") return;
+    const doc = element.ownerDocument;
+    const style = payload && payload.template && payload.template.darkBandStyle || DARK_BAND_STYLE;
+    [...element.querySelectorAll(DARK_BAND_SELECTOR)].forEach((band) => {
+      if (!hasContent(band)) return;
+      if (hasContentBeside(band, element, "previousElementSibling")) band.before(doc.createElement("hr"));
+      band.append(WebImporter.Blocks.createBlock(doc, {
+        name: "Section Metadata",
+        cells: { style }
+      }));
+      if (hasContentBeside(band, element, "nextElementSibling")) band.after(doc.createElement("hr"));
+    });
+  }
+
   // tools/importer/transformers/skoda-model-sections.js
   var SECTION_MARKER_ATTR = "data-excat-section-id";
   function querySection(root, selectors) {
@@ -223,7 +250,7 @@ var CustomImportScript = (() => {
     }
     return null;
   }
-  function transform2(hookName, element, payload) {
+  function transform3(hookName, element, payload) {
     const sections = payload && payload.template && payload.template.sections || [];
     if (sections.length < 2) return;
     if (hookName === "beforeTransform") {
@@ -428,7 +455,7 @@ var CustomImportScript = (() => {
     }
     return false;
   }
-  function transform3(hookName, element, payload) {
+  function transform4(hookName, element, payload) {
     if (hookName !== TransformHook2.afterTransform) return;
     if (hasMetadataBlock(element)) return;
     const { document: document2, url, params } = payload;
@@ -684,7 +711,7 @@ var CustomImportScript = (() => {
     const bySlug = DEMO_PATHS.filter((p) => p.startsWith("/en/tag/") && p.endsWith(`/${slug}`) && p.split("/").length === 5);
     return bySlug.length === 1 ? bySlug[0] : null;
   }
-  function transform4(hookName, element, payload) {
+  function transform5(hookName, element, payload) {
     if (hookName !== TransformHook3.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
       let href = a.getAttribute("href");
@@ -723,6 +750,8 @@ var CustomImportScript = (() => {
     description: "\u0160koda Media Room home (template-media-room). Curated promo-box cards + index-driven Story Rails (News/Images/Videos/Models/Press Kits/Latest Stories) via home-rail. Metadata template=page. Content-driven detection only.",
     urls: ["https://www.skoda-storyboard.com/en/media-room/"],
     metadata: { template: "page" },
+    // skoda-dark-bands: the MR home's bands sit 16px tighter at the top (live, SKODA-218)
+    darkBandStyle: "cover-box, dark, compact",
     blocks: [
       { name: "promo-box", instances: ["section.promo-box"] },
       { name: "home-rail", instances: ['.cover-box .search-results[class*="type-"]'] }
@@ -731,9 +760,10 @@ var CustomImportScript = (() => {
   };
   var transformers = [
     transform,
-    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform2] : [],
-    transform3,
-    transform4
+    transform2,
+    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform3] : [],
+    transform4,
+    transform5
   ];
   function executeTransformers(hookName, element, payload) {
     const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE });
