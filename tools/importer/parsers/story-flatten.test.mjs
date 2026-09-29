@@ -34,29 +34,39 @@ try {
 }
 const domSkip = JSDOM ? false : 'jsdom not installed (repo has no DOM lib) — DOM tests skip';
 
-// Minimal createTable stub — plain-array cells only (the helix-importer contract).
+// Minimal createTable stub — plain-array cells only (the helix-importer contract): a
+// header row (<th> block name), then one <tr> per row.
+function createTable(cells, document) {
+  const table = document.createElement('table');
+  const [[blockName]] = cells;
+  table.dataset.block = blockName;
+  const head = document.createElement('tr');
+  head.appendChild(document.createElement('th')).textContent = blockName;
+  table.appendChild(head);
+  cells.slice(1).forEach((row) => {
+    const tr = document.createElement('tr');
+    row.forEach((col) => {
+      const td = document.createElement('td');
+      (Array.isArray(col) ? col : [col]).forEach((v) => {
+        if (v == null) return;
+        if (typeof v === 'string') td.append(document.createTextNode(v));
+        else td.appendChild(v);
+      });
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+  return table;
+}
 globalThis.WebImporter = {
   DOMUtils: {
-    createTable(cells, document) {
-      const table = document.createElement('table');
-      const [[blockName]] = cells;
-      table.dataset.block = blockName;
-      cells.slice(1).forEach((row) => {
-        const tr = document.createElement('tr');
-        row.forEach((col) => {
-          const td = document.createElement('td');
-          (Array.isArray(col) ? col : [col]).forEach((v) => {
-            if (v == null) return;
-            if (typeof v === 'string') td.append(document.createTextNode(v));
-            else td.appendChild(v);
-          });
-          tr.appendChild(td);
-        });
-        table.appendChild(tr);
-      });
-      return table;
-    },
+    createTable,
     remove(el, sels) { sels.forEach((s) => el.querySelectorAll(s).forEach((n) => n.remove())); },
+  },
+  Blocks: {
+    createBlock(document, { name, cells }) {
+      return createTable([[name], ...Object.entries(cells)], document);
+    },
   },
 };
 
@@ -164,7 +174,7 @@ const sliderRows = (d) => {
   const content = d.querySelector('.entry-content');
   parse(content, { document: d });
   const table = content.querySelector('table[data-block="Gallery (slider)"]');
-  return { content, table, rows: table ? [...table.querySelectorAll('tr')] : [] };
+  return { content, table, rows: table ? [...table.querySelectorAll('tr')].filter((tr) => tr.querySelector('td')) : [] };
 };
 
 test('link-free skoda-carousel-widget → Gallery (slider) block, one row per image', { skip: domSkip }, () => {
@@ -512,6 +522,74 @@ test('a spacer-only row after the last highlight does not resume an empty body (
   ]);
   markHighlights(d);
   assert.deepEqual(flow(d), [['p', 'Intro'], ['hr'], ['p', 'Škoda Kylaq'], ['meta', 'body-column, highlight-dark']]);
+});
+
+// The full story pipeline around the parser: skoda-model-sections opens the body section
+// (break + `body-column` Section Metadata), then import-story-detail runs dropEmptySections.
+const { dropEmptySections } = await import('./story-flatten.js');
+const { default: sectionsTransformer } = await import('../transformers/skoda-model-sections.js');
+const SECTIONS = {
+  template: {
+    sections: [
+      { id: 'section-1', selector: ['div.hero'], style: null },
+      { id: 'section-2', selector: ['.columns > .content'], style: 'body-column' },
+    ],
+  },
+};
+function pipeline(css, rows, before = '') {
+  const d = domDoc(`<html><head><style>${css}</style></head><body><div class="hero"><h1>Hero</h1></div>
+    <div class="columns"><div class="content">${before}<div class="panel-layout">${rows.join('')}</div></div></div></body></html>`);
+  markHighlights(d);
+  globalThis.document = d; // skoda-model-sections creates its breaks on the global document
+  try {
+    sectionsTransformer('beforeTransform', d.body, SECTIONS);
+    parse(d.querySelector('.content'), { document: d });
+    sectionsTransformer('afterTransform', d.body, SECTIONS);
+  } finally {
+    delete globalThis.document;
+  }
+  const dropped = dropEmptySections(d.body);
+  const items = [...d.body.querySelectorAll('hr, table, h1, h3, p')].filter((n) => !n.parentElement.closest('table'));
+  return {
+    dropped,
+    flow: items.map((n) => {
+      if (n.tagName === 'HR') return ['hr'];
+      if (n.dataset.block === 'Section Metadata') return ['meta', n.querySelector('tr > td:last-child').textContent];
+      return [n.tagName.toLowerCase(), n.textContent.trim()];
+    }),
+  };
+}
+
+test('a leading highlight row leaves no empty body section before the panel', { skip: domSkip }, () => {
+  const { dropped, flow: out } = pipeline('#pg-8-0> .panel-row-style { background-color:#0e3a2f }', [
+    editorRow('pg-8-0', '<p>Panel</p>'), editorRow('pg-8-1', '<p>Outro</p>'),
+  ]);
+  assert.equal(dropped, 1);
+  assert.deepEqual(out, [
+    ['h1', 'Hero'],
+    ['hr'], ['p', 'Panel'], ['meta', 'body-column, highlight-dark'],
+    ['hr'], ['meta', 'body-column'], ['p', 'Outro'],
+  ]);
+});
+
+test('a leading highlight row keeps the body section when body content precedes it', { skip: domSkip }, () => {
+  const { dropped, flow: out } = pipeline('#pg-9-0> .panel-row-style { background-color:#0e3a2f }', [
+    editorRow('pg-9-0', '<p>Panel</p>'),
+  ], '<p>Lead</p>');
+  assert.equal(dropped, 0);
+  assert.deepEqual(out, [
+    ['h1', 'Hero'],
+    ['hr'], ['meta', 'body-column'], ['p', 'Lead'],
+    ['hr'], ['p', 'Panel'], ['meta', 'body-column, highlight-dark'],
+  ]);
+});
+
+test('a leading highlight row after a body row keeps the body section intact', { skip: domSkip }, () => {
+  const { dropped, flow: out } = pipeline('#pg-10-1> .panel-row-style { background-color:#0e3a2f }', [
+    editorRow('pg-10-0', '<p>Intro</p>'), editorRow('pg-10-1', '<p>Panel</p>'),
+  ]);
+  assert.equal(dropped, 0);
+  assert.deepEqual(out.slice(1, 4), [['hr'], ['meta', 'body-column'], ['p', 'Intro']]);
 });
 
 test('a widget inside a .panel-cell-style wrapper is not dropped (charging portrait cell)', { skip: domSkip }, () => {

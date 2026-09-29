@@ -192,8 +192,11 @@ function bodyContent(document, primary) {
   content.querySelectorAll('div[style]').forEach((div) => div.replaceWith(...div.childNodes));
 
   content.querySelectorAll('p').forEach((p) => { if (isEmptyParagraph(p)) p.remove(); });
-  const nodes = [...content.childNodes].filter((n) => n.nodeType === 1 || text(n));
-  // No empty resumed body: drop a body marker that is last or directly before another marker.
+  return [...content.childNodes].filter((n) => n.nodeType === 1 || text(n));
+}
+
+/** No empty body section: drop a body marker that is last or directly before another marker. */
+function dropEmptyBodies(nodes) {
   const isMarker = (n) => n && n.nodeType === 1 && n.hasAttribute(MARKER);
   const nextElement = (i) => nodes.slice(i + 1).find((n) => n.nodeType === 1);
   return nodes.filter((n, i) => !(isMarker(n) && n.getAttribute(MARKER) === 'body'
@@ -321,7 +324,7 @@ function rebuild(element, document) {
   const related = relatedBand ? relatedContent(document, relatedBand) : [];
   if (related.length) out.push(marker(document, 'related'), ...related);
 
-  article.replaceChildren(...out);
+  article.replaceChildren(...dropEmptyBodies(out));
   article.setAttribute(LAYOUT_ATTR, '');
 }
 

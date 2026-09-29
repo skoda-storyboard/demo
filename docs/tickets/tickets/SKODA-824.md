@@ -4,7 +4,7 @@
 - **Phase:** A/B · **Milestone:** M1 (demo-visible)
 - **GitHub issue:** [#148](https://github.com/skoda-storyboard/demo/issues/148)
 - **Estimate:** 3 SP · AI-assisted 1d / manual 2–3d *(planning estimate, not a quote)*
-- **Status (2026-09-28):** 🟡 IN PROGRESS: importer done (contract `highlight` shape 2, branch `skoda-824-highlight-panel-importer`); runtime TODO. Pages carrying a highlight section hold publish until the runtime spans the sidebar across the split body (not enforced: `import:validate-blocks` doesn't track section styles). Also fixed in the importer: story-flatten dropped widgets wrapped in `.panel-cell-style` (the charging portrait); that row is now `Columns`.
+- **Status (2026-09-28):** 🟡 IN PROGRESS: importer done (contract `highlight` shape 2, branch `skoda-824-highlight-panel-importer`); runtime TODO. Pages carrying a highlight section hold publish until the runtime spans the sidebar across the split body: the contract's fallback is `broken` and lists its section `styles`, so `import:validate-blocks` flags them `[hold publish]` and `import:push --stage publish` refuses them (PR #209 review). The runtime PR sets the fallback back to `readable`. Also fixed in the importer: story-flatten dropped widgets wrapped in `.panel-cell-style` (the charging portrait); that row is now `Columns`.
 
 ## Origin
 Demo URL/block sweep, 2026-09-25 ([`SKODA-DEMO-SWEEP-REPORT.md`](../../reviews/SKODA-DEMO-SWEEP-REPORT.md) §5). The same root cause was raised

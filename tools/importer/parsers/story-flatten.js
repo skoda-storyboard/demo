@@ -401,6 +401,34 @@ function sectionMetadata(style, document) {
   return WebImporter.DOMUtils.createTable([['Section Metadata'], ['style', style]], document);
 }
 
+const isSectionMetadata = (el) => el.tagName === 'TABLE'
+  && /^section metadata$/i.test(((el.querySelector('tr > th, tr > td') || {}).textContent || '').trim());
+
+/**
+ * Drop every section that holds nothing but Section Metadata, e.g. the `body-column`
+ * section skoda-model-sections opens when the first builder row is a highlight panel.
+ * Call after afterTransform, once every break and Section Metadata is in place. Returns
+ * the number of sections dropped.
+ */
+export function dropEmptySections(root) {
+  const doc = root.ownerDocument;
+  const breaks = [...root.querySelectorAll('hr')].filter((hr) => !hr.closest('table'));
+  const between = (hr, i, el) => (hr.compareDocumentPosition(el) & hr.DOCUMENT_POSITION_FOLLOWING)
+    && (!breaks[i + 1] || (breaks[i + 1].compareDocumentPosition(el) & hr.DOCUMENT_POSITION_PRECEDING));
+  const empty = breaks.map((hr, i) => {
+    const range = doc.createRange();
+    range.setStartAfter(hr);
+    if (breaks[i + 1]) range.setEndBefore(breaks[i + 1]);
+    else range.setEnd(root, root.childNodes.length);
+    const rest = range.cloneContents();
+    rest.querySelectorAll('table').forEach((t) => { if (isSectionMetadata(t)) t.remove(); });
+    const isEmpty = !(rest.textContent || '').trim() && !rest.querySelector('img, picture, video, iframe, table');
+    return isEmpty && [hr, ...[...root.querySelectorAll('table')].filter((t) => isSectionMetadata(t) && between(hr, i, t))];
+  }).filter(Boolean);
+  empty.forEach((nodes) => nodes.forEach((n) => n.remove()));
+  return empty.length;
+}
+
 // ---- tree walk ------------------------------------------------------------
 
 // Direct panel-grid-cell children of a grid (SiteOrigin sometimes wraps cells in a
@@ -494,8 +522,9 @@ export default function parse(element, { document }) {
   // body resumes in a fresh `body-column` section. Consecutive rows are one section each
   // (the runtime joins them). The body resumes only once a later row emits something
   // (spacer-only rows don't), or when content follows the builder tree, so no empty
-  // section is emitted. A leading row always breaks: the body section already carries
-  // its own `body-column` Section Metadata (skoda-model-sections).
+  // section is emitted. A leading row still breaks here, keeping any body content before
+  // it (the body section's own `body-column` metadata comes from skoda-model-sections);
+  // if nothing precedes it, the importer's dropEmptySections() removes that empty section.
   let resume = false; // a highlight section was closed and the body hasn't resumed yet
   grids.forEach((grid) => {
     const variant = grid.getAttribute(HIGHLIGHT_ATTR);

@@ -108,10 +108,11 @@ function sectionsOf(element) {
   });
 }
 const cache = {};
-function importPage(key) {
-  if (cache[key]) return cache[key];
+function importPage(key, edit) {
+  if (cache[key] && !edit) return cache[key];
   const slug = PAGES[key];
   const dom = new JSDOM(readFileSync(path.join(FIXTURES, `${slug}.html`), 'utf8'), { url: `${SRC}/${slug}/` });
+  if (edit) edit(dom.window.document);
   globalThis.document = dom.window.document;
   globalThis.window = dom.window;
   importer.preprocess({ document: dom.window.document });
@@ -121,8 +122,9 @@ function importPage(key) {
     url: `${SRC}/${slug}/`,
     params: { originalURL: `${SRC}/${slug}/` },
   });
-  cache[key] = { element, sections: sectionsOf(element) };
-  return cache[key];
+  const result = { element, sections: sectionsOf(element) };
+  if (!edit) cache[key] = result;
+  return result;
 }
 
 const rowsOf = (table) => [...table.querySelectorAll('tr')].slice(1);
@@ -196,6 +198,18 @@ test('highlight (SKODA-824): the grey FAQ panel is its own body-column section, 
   ['theatre', 'superb', 'board', 'peaq'].forEach((k) => {
     assert.ok(!importPage(k).sections.some((s) => /highlight/.test(s.style || '')), `${k}: no panel`);
   });
+});
+
+test('highlight (SKODA-824): a panel that opens the body leaves no empty body section', { skip }, () => {
+  const { sections } = importPage('zellmer', (doc) => {
+    // Only the grey FAQ panel is left in the body: no lead image, bullets, perex or text.
+    doc.querySelectorAll('.column-primary .article-teaser img, .entry-summary, .bullet-points').forEach((n) => n.remove());
+    const content = doc.querySelector('.entry-content');
+    [...content.children].filter((n) => !/background/i.test(n.getAttribute('style') || '')).forEach((n) => n.remove());
+  });
+  const styles = sections.map((s) => s.style);
+  assert.equal(styles[1], 'body-column, highlight-grey', 'the panel follows the header directly');
+  assert.ok(!styles.includes('body-column'), 'no metadata-only body section');
 });
 
 test('quotes (SKODA-220): centred pull-quotes become Quote [quote, attribution] in the body column', { skip }, () => {
