@@ -21,11 +21,13 @@
   margin-block-end: var(--grid-gutter);
 }
 
+/* colour follows the section: ink on light sections, white on a dark band
+   (SKODA-218; the source Series / Models headings are white 26/600) */
 .story-rail-heading {
   margin: 0;
   font-size: var(--section-heading, var(--heading-font-size-l));
   font-weight: var(--weight-semibold);
-  color: var(--text-color);
+  color: inherit;
 }
 
 .story-rail-viewall {

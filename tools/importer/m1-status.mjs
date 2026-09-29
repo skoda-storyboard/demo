@@ -104,7 +104,7 @@ async function main() {
       preview: st.preview,
       live: st.live,
       indexed: index ? indexSet.has(row.path) : undefined,
-      check: local ? checkPage(readFileSync(file, 'utf8'), contracts, codeBlocks) : null,
+      check: local ? checkPage(readFileSync(file, 'utf8'), contracts, codeBlocks, row.path) : null,
       qa: o.qa,
       note: o.note,
     }));

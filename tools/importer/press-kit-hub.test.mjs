@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { JSDOM } from 'jsdom';
+import { layoutTileRows } from '../../scripts/cards-tiles.js';
 
 function table(rows, document) {
   const t = document.createElement('table');
@@ -35,13 +36,21 @@ const root = 'https://www.skoda-storyboard.com/en/press-kits/';
 const child = `${root}skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio/`;
 
 function page(count, { banners = false, intro = false, missingImage = -1 } = {}) {
-  const items = Array.from({ length: count }, (_, index) => `
-    <div class="panel-grid"><article class="article-teaser">
-      <a href="${index === 0 ? child : `${root}unimported-${index}/`}">
-        <div class="ratio-container ${index < 2 && count === 13 ? 'ratio-2x1' : 'ratio-1x1'}">
-          ${index === missingImage ? '' : `<img src="https://cdn.skoda-storyboard.com/${index}.jpg" alt="">`}
-        </div><h2 class="heading">Chapter ${index + 1}</h2>
-      </a></article></div>`).join('');
+  const rowCounts = count === 24 ? [5, 5, 5, 5, 4] : [3, 5, 5];
+  let index = 0;
+  const items = rowCounts.map((rowCount) => `<div class="panel-grid">${Array.from(
+    { length: rowCount },
+    () => {
+      const tileIndex = index;
+      index += 1;
+      return `<article class="article-teaser">
+      <a href="${tileIndex === 0 ? child : `${root}unimported-${tileIndex}/`}">
+        <div class="ratio-container ${tileIndex < 2 && count === 13 ? 'ratio-2x1' : 'ratio-1x1'}">
+          ${tileIndex === missingImage ? '' : `<img src="https://cdn.skoda-storyboard.com/${tileIndex}.jpg" alt="">`}
+        </div><h2 class="heading">Chapter ${tileIndex + 1}</h2>
+      </a></article>`;
+    },
+  ).join('')}</div>`).join('');
   const widgets = `${intro ? '<div class="widget_sow-editor"><div class="textwidget"><p>Kit introduction</p></div></div>' : ''}
   ${banners ? '<div class="widget_sow-editor"><div class="textwidget"><p><a href="http://go.skoda.eu/whatsapp"><img src="https://cdn.skoda-storyboard.com/wa.png"></a></p></div></div><div class="widget_sow-editor"><div class="textwidget"><p><a href="https://cdn.skoda-storyboard.com/kit.zip"><img src="https://cdn.skoda-storyboard.com/zip.png"></a></p></div></div>' : ''}`;
   const doc = new JSDOM(`<!doctype html><title>Press Kit</title><body class="single-press_kit">
@@ -70,7 +79,12 @@ test('all three hub counts retain ordered pinned tiles and source metadata', () 
     const metadata = [...element.querySelectorAll('table')].find((t) => t.rows[0].textContent.trim() === 'Metadata');
     assert.equal(path, '/en/press-kits/skoda-peaq-press-kit-2');
     assert.equal(cards.rows.length, count + 1);
-    assert.equal(cards.rows[1].cells[0].textContent, count === 24 ? 'sq' : 'feature');
+    const tokens = [...cards.rows].slice(1).map((row) => row.cells[0].textContent);
+    assert.equal(tokens[0], count === 24 ? 'press-square' : 'feature');
+    assert.equal(tokens[count - 1], count === 24 ? 'press-quarter' : 'press-square');
+    const { mode, tiles } = layoutTileRows(tokens, { pressPage: true });
+    assert.equal(mode, 'press');
+    assert.equal(tiles.filter((tile) => tile.rowStart).length, count === 24 ? 5 : 3);
     assert.equal(cards.rows[1].cells[2].textContent, 'Chapter 1');
     assert.equal(cards.rows[count].cells[2].textContent, `Chapter ${count}`);
     assert.match(metadata.textContent, /2026-09-21/);
@@ -90,6 +104,12 @@ test('the imported child becomes an internal link; other children stay on the so
 
 test('a missing chapter image fails explicitly', () => {
   assert.throws(() => output(page(13, { missingImage: 2 })), /tile 3 needs a link, image and title/);
+});
+
+test('an unsupported source tile row fails before emitting a malformed mosaic', () => {
+  const document = page(13);
+  document.querySelector('.panel-grid article.article-teaser').remove();
+  assert.throws(() => output(document), /tile row 1 has an unsupported layout/);
 });
 
 test('an optional introduction is retained before the tile table', () => {
@@ -152,5 +172,9 @@ test('live SSR hubs retain exact chapter titles, dates, facets and banner assets
     assert.equal(element.querySelectorAll('h1').length, 1);
     assert.equal(element.querySelectorAll('.panel-grid, .so-panel').length, 0);
     assert.equal([...cards.rows].slice(1).filter((row) => row.cells[0].textContent === 'feature').length, model ? 2 : 0);
+    const tokens = [...cards.rows].slice(1).map((row) => row.cells[0].textContent);
+    const starts = layoutTileRows(tokens, { pressPage: true }).tiles
+      .filter((tile) => tile.rowStart);
+    assert.equal(starts.length, model ? 3 : 5);
   }
 });

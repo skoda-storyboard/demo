@@ -8,17 +8,21 @@
  * (home-rail self-classifies each .search-results rail from its heading + "All"
  * link / type-<cpt> class). The "Social media" band (.socials-static) is not
  * index-driven: social-cards turns it into a heading + Cards (social) section of
- * the three follow-profile links (SKODA-217). Metadata template=page (nav/direct
- * only; body class carries `page`). Content-driven detection only.
+ * the three follow-profile links (SKODA-217). The other dark `.cover-box.dark`
+ * bands (Series) become their own sections (skoda-dark-bands, SKODA-218); every
+ * home dark band carries `Style: cover-box, dark`. Metadata template=page
+ * (nav/direct only; body class carries `page`). Content-driven detection only.
  */
 
 import promoBoxParser from './parsers/promo-box.js';
 import homeRailParser from './parsers/home-rail.js';
 import socialCardsParser from './parsers/social-cards.js';
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
+import darkBandsTransformer from './transformers/skoda-dark-bands.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 import linksTransformer from './transformers/skoda-links.js';
+import nbspTransformer from './transformers/skoda-nbsp.js';
 import normalizeImages from './transformers/skoda-images.js';
 
 const parsers = {
@@ -41,6 +45,7 @@ const PAGE_TEMPLATE = {
 
 const transformers = [
   cleanupTransformer,
+  darkBandsTransformer,
   ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
   metadataTransformer,
   linksTransformer,
@@ -75,6 +80,9 @@ function findBlocksOnPage(document, template) {
 }
 
 export default {
+  // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
+  preprocess: ({ document }) => nbspTransformer('preprocess', document.body, { document }),
+
   transform: (payload) => {
     const { document, url, params } = payload;
     const main = document.body;

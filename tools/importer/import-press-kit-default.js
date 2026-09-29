@@ -4,6 +4,7 @@ import gallery from './parsers/gallery.js';
 import tags from './parsers/tags.js';
 import content from './parsers/press-kit-content.js';
 import media from './parsers/press-kit-media.js';
+import quote, { markQuotes } from './parsers/quote.js';
 import layout from './transformers/skoda-press-kit-default-layout.js';
 import metadata from './transformers/skoda-metadata.js';
 import normalizeImages from './transformers/skoda-images.js';
@@ -28,8 +29,13 @@ function templateFor(document, pageUrl) {
 
 export default {
   preprocess: ({ document }) => {
-    document.querySelectorAll('.search-results.media-box a.media-cart-action.download[href]')
+    // Icon-only cart download links would be stripped as empty inline elements before
+    // transform. Give every one text: Media Box and inline grid assets, and the video
+    // attachments of resource "Videos" children (SKODA-805b).
+    document.querySelectorAll('article.press_kit a.media-cart-action.download[href], article.press_kit a[data-action="download"][href]')
       .forEach((a) => { if (!a.textContent.trim()) a.textContent = 'Download'; });
+    // preProcess also drops every <hr>: mark the pull-quotes by their rule first (SKODA-220).
+    document.querySelectorAll('article.press_kit .entry-content').forEach(markQuotes);
   },
   transform: (payload) => {
     const { document, url, params } = payload;
@@ -38,17 +44,22 @@ export default {
     layout('beforeTransform', main, payload);
     const article = main.querySelector('article.press_kit');
     const body = article.querySelector('.entry-content');
+    // Resource "Images" children (SKODA-805b) carry their assets as inline grids with the
+    // Media Box item markup: one Downloads table per grid, before content() strips the cart
+    // toolbars that hold each image's download sizes. A per-heading gallery is converted whole
+    // (`collapse auto`), so its select-all toolbar and Show more/less toggle go with it (PR #202).
+    body.querySelectorAll('.search-results.search-results-gallery').forEach((group) => media(group, payload));
+    body.querySelectorAll('.search-results-items').forEach((grid) => media(grid, payload));
     content(body, { document });
+    // After the layout, whose source-table pass would flatten a Quote table.
+    body.querySelectorAll('p[data-skoda-quote]').forEach((p) => quote(p, payload));
 
     article.querySelectorAll('section.images.sa-media-kit-preview')
       .forEach((section) => gallery(section, payload));
     article.querySelectorAll('section.tags')
       .forEach((section) => tags(section, payload));
-    // Images resource pages group their assets in per-heading galleries (SKODA-805b).
-    body.querySelectorAll('.search-results.search-results-gallery')
-      .forEach((group) => media(group, payload));
     const mediaBox = article.querySelector('.search-results.media-box');
-    if (mediaBox) media(mediaBox, payload);
+    if (mediaBox) media(mediaBox, payload); // resource children have none (SKODA-805b)
     layout('afterTransform', main, payload);
     metadata('afterTransform', main, { ...payload, template });
 

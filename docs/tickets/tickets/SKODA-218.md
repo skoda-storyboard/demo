@@ -4,6 +4,12 @@
 - **Type:** section styling
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo)
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1–2d *(planning estimate, not a quote)*
+- **Status (2026-09-28):** 🟡 In review, branch `skoda-218-dark-sections`. The Storyboard Series and Social media
+  bands and the Media Room Models band are `Style: cover-box, dark` (importer: `transformers/skoda-dark-bands.js` +
+  `parsers/social-cards.js`); the dark bands take live's own margin, 2.25em auto 1.5em (Media Room 0 auto 1em), with
+  the measured inner spacing. The story dark panel amendment moves to SKODA-824 (in-column). Open elsewhere: Series has
+  no cards until the index carries Series rows (SKODA-603/608); the visible gaps around the bands (44/24 vs live 64/62)
+  need the light home sections as cover-boxes too (SKODA-611a/611b); the page gutter (SKODA-826).
 
 ## UI Specification
 [`template-home.md`](../../ui-specs/template-home.md) measures the Storyboard

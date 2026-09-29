@@ -15,82 +15,32 @@ function embedUrls(root, document) {
     p.append(a);
     const attachment = frame.closest('.media-cart-item.attachment');
     const video = frame.closest('.video-container');
-    if (attachment && root.contains(attachment) && !text(attachment)
+    // The cart toolbar's only text is the "Download" preprocess gives its icon link.
+    const bare = attachment?.cloneNode(true);
+    bare?.querySelectorAll('.media-cart-actions').forEach((actions) => actions.remove());
+    if (attachment && root.contains(attachment) && !text(bare)
       && attachment.querySelectorAll('iframe').length === 1
       && !attachment.querySelector('img, video')) {
-      // Videos chapters offer each clip's master file through an icon-only action.
-      const master = attachment.querySelector('a.media-cart-action.download[href], a[data-action="download"][href]');
-      const href = master?.getAttribute('href');
-      if (href && href !== '#') {
-        const ext = href.split(/[?#]/)[0].split('.').pop().toUpperCase();
-        const download = document.createElement('p');
+      // The cart toolbar's download icon is the only way to the video file (resource "Videos"
+      // pages have no Media Box, SKODA-805b): keep it as a labelled link after the embed.
+      const file = [...attachment.querySelectorAll('a.media-cart-action.download[href], a[data-action="download"][href]')]
+        .map((link) => link.getAttribute('href')).find((href) => /\.mp4(?:[?#]|$)/i.test(href || ''));
+      const out = [p];
+      if (file) {
+        const dp = document.createElement('p');
         const link = document.createElement('a');
-        link.href = href;
-        link.textContent = /^(MP4|MOV|PDF|ZIP)$/.test(ext) ? `Download ${ext}` : 'Download';
-        download.append(link);
-        attachment.replaceWith(p, download);
-      } else {
-        attachment.replaceWith(p);
+        link.href = file;
+        link.textContent = 'Download video';
+        dp.append(link);
+        out.push(dp);
       }
+      attachment.replaceWith(...out);
     } else if (video && root.contains(video) && !text(video)
       && video.querySelectorAll('iframe').length === 1) {
       video.replaceWith(p);
     } else {
       frame.replaceWith(p);
     }
-  });
-}
-
-// A data table (a header row plus label/value rows, e.g. the Peaq FAQ's variant specs) cannot
-// sit in an Accordion cell as a nested block, so each value column becomes a labelled list:
-// "**Peaq 60**" then "Range: Over 450 km", keeping every value tied to its row and column.
-function dataTable(table, document) {
-  const rows = [...table.querySelectorAll('tr')].map((row) => [...row.children]);
-  const width = rows[0].length;
-  if (width < 2 || rows.some((cells) => cells.length !== width
-    || cells.some((cell) => cell.hasAttribute('colspan') || cell.hasAttribute('rowspan')))) {
-    throw new Error(`Unsupported press-kit data table: ${text(table).slice(0, 60)}`);
-  }
-  const [header, ...body] = rows;
-  return header.slice(1).flatMap((column, index) => {
-    const title = document.createElement('p');
-    title.append(Object.assign(document.createElement('strong'), { textContent: text(column) }));
-    const list = document.createElement('ul');
-    body.forEach((cells) => {
-      const value = cells[index + 1];
-      if (!text(value)) return;
-      const item = document.createElement('li');
-      item.append(`${text(cells[0])}: `, ...value.childNodes);
-      list.append(item);
-    });
-    return [title, list];
-  });
-}
-
-// SiteOrigin editors mostly use <table> for layout (WhatsApp banner, "Find out more", the Texts
-// chapter list). DA would read a table as a block, so each non-empty cell becomes content.
-// The WhatsApp icon is a decorative 512px PNG sized by a width attribute DA drops; the channel
-// link text beside it carries the message.
-function unwrapTables(root, document) {
-  root.querySelectorAll('table').forEach((layout) => {
-    const labelled = [...layout.querySelectorAll('tr')]
-      .filter((row) => [...row.children].filter((cell) => text(cell)).length >= 2);
-    if (labelled.length >= 2) {
-      layout.replaceWith(...dataTable(layout, document));
-      return;
-    }
-    layout.querySelectorAll('img[src*="whatsapp"]').forEach((img) => {
-      const link = img.closest('a');
-      (link && !text(link) ? link : img).remove();
-    });
-    const nodes = [...layout.querySelectorAll('td, th')].flatMap((cell) => {
-      if (!text(cell) && !cell.querySelector('img, a[href]')) return [];
-      if (cell.querySelector('p, ul, ol, h1, h2, h3, h4, h5, h6, div')) return [...cell.childNodes];
-      const p = document.createElement('p');
-      p.append(...cell.childNodes);
-      return [p];
-    });
-    layout.replaceWith(...nodes);
   });
 }
 
@@ -131,7 +81,7 @@ function contents(panel, document) {
       const heading = title ? [Object.assign(document.createElement('h2'), { textContent: title })] : [];
       embedUrls(widget, document);
       inlineGalleries(widget, document);
-      unwrapTables(widget, document);
+      // Stray rules would split the DA section; pull-quote rules are consumed in `preprocess`.
       widget.querySelectorAll('hr').forEach((rule) => rule.remove());
       const items = widget.childNodes;
       return [...heading, ...[...items].filter((node) => node.nodeType === 1 || text(node))];

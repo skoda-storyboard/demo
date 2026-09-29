@@ -1,7 +1,8 @@
 # Škoda Storyboard — canonical M1 (15 Oct 2026 demo) URL set.
 # Supplied by the Architect 2026-09-24. Supersedes the page list in skoda-demo-content-urls.txt
 # for M1 scope. Rails/listings are additionally fed by skoda-rail-feed-corpus.txt (SKODA-603/608).
-# 92 lines = 91 unique pages (43 set + the 49-page SKODA-805b addendum, minus the alias): the nested mixed-reality URL (marked ALIAS) returns 200 with canonical
+# 93 lines = 92 unique pages (43 original + 49 press-kit children added 2026-09-28, D-1 = A).
+# The nested mixed-reality URL (marked ALIAS) returns 200 with canonical
 # /en/skoda-world/explore-the-new-skoda-models-in-mixed-reality/, import once + redirect (SKODA-609).
 # Gap analysis: docs/reviews/SKODA-M1-GAP-REVIEW.md. Per-URL status tracker: SKODA-603.
 
@@ -25,11 +26,11 @@ https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/
 
-# ===== PRESS KITS ADDENDUM (49 children), SKODA-805b, D-1 = A (Lars, 2026-09-28) =====
-# Every chapter/resource child of the three hubs, in hub tile order: Peaq-2 13, Epiq-2 13, Motorsport 23.
-# Imported with import-press-kit-default.js as template=press_kit_chapter (not rail-indexed).
-# Motorsport's 24th tile (the Enyaq RS Race kit) is a separate kit, not a child: it stays live/new tab.
-# Peaq-2 (13)
+# ===== PRESS KITS: CHILDREN (50), SKODA-805b: D-1 = A, Architect sign-off 2026-09-28 =====
+# Every tile target of the 3 hubs above, in source tile order (import all children;
+# SKODA-M1-GAP-REVIEW D-1). All use press_kit-template-default (import-press-kit-default).
+# The Motorsport hub's cross-kit tile (Enyaq RS Race) is included so no hub tile links out.
+# --- Peaq-2 kit (13) ---
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot/
@@ -43,7 +44,7 @@ https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/infographi
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/technical-data/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/images/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/videos/
-# Epiq-2 (13)
+# --- Epiq-2 kit (13) ---
 https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality/
 https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/
 https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience/
@@ -57,7 +58,7 @@ https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/infographi
 https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/technical-data/
 https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/images/
 https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/videos/
-# Motorsport (23)
+# --- 125 years of Motorsport kit (24) ---
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav/
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model/
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally/
@@ -78,6 +79,7 @@ https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-pre
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-r5-rally2-rally2-evo-successful-in-the-hands-of-factory-drivers-and-privateers-alike/
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success/
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport/
+https://www.skoda-storyboard.com/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/images/
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/

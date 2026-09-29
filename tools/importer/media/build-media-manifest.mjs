@@ -13,6 +13,7 @@
  *     [--da-archive] [--org skoda-storyboard --repo demo] \
  *     [--public-urls reviewed-assets-map.json] \
  *     [--from-manifest --ids-file approved-binary-ids.txt] \
+ *     [--feed .migration/…/en/media-feed.json] \
  *     [--concurrency 4] [--dry-run] [--force] [--limit N] [--min-image-edge 768]
  *
  * Per distinct LOGICAL image (path-qualified id, F3) referenced by the pages:
@@ -32,20 +33,23 @@
  */
 
 import {
-  readFileSync, writeFileSync, existsSync, mkdirSync,
+  readFileSync, writeFileSync, existsSync, mkdirSync, mkdtempSync, rmSync,
 } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   isImageUrl, cleanUrl, masterUrl, logicalId, daPathFor, damPathFor,
   pagePathFromFile, isAspectCrop,
-  pickIngestUrl, headBytes, fetchBinary, uploadToDA, uploadToDAM, publishDamBinary,
+  pickIngestUrl, headBytes, fetchBinary, fetchBinaryToFile,
+  uploadToDA, uploadToDAM, verifyDamOriginal, publishDamBinary,
   setDamMetadata, resolveDamToken,
   needsMediaBuild, stepDownTooSmall, renditionEdge, OVERSIZE_BYTES, MIN_RENDITION_EDGE,
 } from './media-lib.mjs';
 import {
   binaryAnchors, binaryKind, binarySource, publicBinaryUrl, verifyPublicBinary, probeBinaryBytes,
 } from './binary-media.mjs';
+import { feedMediaRefs } from '../media-items/media-items-lib.mjs';
 
 const WORKSPACE = process.env.WORKSPACE_PATH || process.cwd();
 const DEFAULT_MANIFEST = path.join(WORKSPACE, 'tools', 'importer', 'media', 'media-manifest.json');
@@ -54,6 +58,7 @@ const MEDIA_DA_DIR = path.join(WORKSPACE, 'content', 'media-da');
 function parseArgs(args = process.argv.slice(2)) {
   const out = {
     pages: [],
+    feeds: [],
     manifest: DEFAULT_MANIFEST,
     org: 'skoda-storyboard',
     repo: 'demo',
@@ -76,6 +81,10 @@ function parseArgs(args = process.argv.slice(2)) {
     if (a === '--force') { out.force = true; continue; }
     if (a === '--da-archive') { out.daArchive = true; continue; }
     if (a === '--from-manifest') { out.fromManifest = true; continue; }
+    if (a === '--feed') {
+      if (!args[i + 1] || args[i + 1].startsWith('--')) throw new Error('--feed requires a media-feed.json path');
+      out.feeds.push(path.resolve(args[i + 1])); i += 1; continue;
+    }
     if (a === '--pages') {
       while (args[i + 1] && !args[i + 1].startsWith('--')) { out.pages.push(args[i + 1]); i += 1; }
       continue;
@@ -100,8 +109,8 @@ function parseArgs(args = process.argv.slice(2)) {
     if (a === '--min-image-edge') { out.minEdge = renditionEdge(val); i += 1; continue; }
     throw new Error(`Unexpected argument: ${a}`);
   }
-  if (out.pages.length === 0 && !out.fromManifest) {
-    throw new Error('Provide --pages <file> [...] or --from-manifest (re-ingest from the existing manifest\'s source_urls)');
+  if (out.pages.length === 0 && out.feeds.length === 0 && !out.fromManifest) {
+    throw new Error('Provide --pages <file> [...], --feed <media-feed.json> or --from-manifest (re-ingest from the existing manifest\'s source_urls)');
   }
   if (out.idsFile && !out.fromManifest) throw new Error('--ids-file requires --from-manifest');
   return out;
@@ -183,7 +192,7 @@ export default async function main(args = process.argv.slice(2)) {
     throw new Error('DAM ingest requested but no DAM token is available; no images were processed');
   }
   if (!cfg.fromManifest) {
-    const missing = cfg.pages.filter((page) => !existsSync(path.resolve(page)));
+    const missing = [...cfg.pages, ...cfg.feeds].filter((page) => !existsSync(path.resolve(page)));
     if (missing.length) throw new Error(`Requested page(s) not found: ${missing.join(', ')}`);
   }
 
@@ -271,6 +280,36 @@ export default async function main(args = process.argv.slice(2)) {
         }
       }
     }
+    // The media feed (SKODA-608) serves thumbnails, originals, posters and MP4s from a DA sheet,
+    // which EDS does not ingest into the media bus: each still gets a manifest row (source,
+    // delivery mapping, DAM path / status), deduplicated with the page assets by logical id.
+    // The item's listing home (en/images|videos|assets) owns the DAM folder unless a page
+    // already does; the feed document is recorded as the referencing page.
+    for (const feedFile of cfg.feeds) {
+      const feedPath = (feedFile.replace(/\\/g, '/').match(/([a-z]{2}\/media-feed)\.json$/) || [])[1] || 'en/media-feed';
+      for (const ref of feedMediaRefs(JSON.parse(readFileSync(feedFile, 'utf8')))) {
+        if (ref.kind === 'image' && !isImageUrl(ref.url)) continue;
+        const id = logicalId(ref.url);
+        const existing = byLogical.get(id);
+        if (existing) {
+          existing.seenUrls.add(ref.url);
+          existing.pageRefs.add(feedPath);
+          if (!existing.alt && ref.alt) existing.alt = ref.alt;
+          if (!existing.title && ref.title) existing.title = ref.title;
+        } else {
+          byLogical.set(id, {
+            kind: ref.kind,
+            title: ref.kind === 'image' ? '' : ref.title,
+            sourceUrl: ref.url,
+            alt: ref.kind === 'image' ? ref.alt : '',
+            caption: ref.kind === 'image' ? ref.caption : '',
+            seenUrls: new Set([ref.url]),
+            ownerPage: ref.home,
+            pageRefs: new Set([feedPath]),
+          });
+        }
+      }
+    }
   }
 
   let logicalIds = [...byLogical.keys()];
@@ -305,7 +344,8 @@ export default async function main(args = process.argv.slice(2)) {
     return url;
   };
   if (cfg.damBase) logicalIds.forEach(destination);
-  const srcLabel = cfg.fromManifest ? 'from manifest' : `across ${cfg.pages.length} page(s)`;
+  const srcLabel = cfg.fromManifest ? 'from manifest'
+    : `across ${cfg.pages.length} page(s)${cfg.feeds.length ? ` + ${cfg.feeds.length} media feed(s)` : ''}`;
   console.log(`[media] ${logicalIds.length} distinct logical asset(s) ${srcLabel}`);
   console.log(`[media] DAM: ${damConfig ? `${damConfig.baseUrl}${damConfig.folder} (token: ${damToken ? 'present' : 'dry-run only'})` : 'not configured'}`);
   console.log(`[media] DA archive: ${cfg.daArchive ? 'on' : 'off'}  ·  concurrency: ${cfg.concurrency}`);
@@ -331,8 +371,10 @@ export default async function main(args = process.argv.slice(2)) {
     }) : '';
     const publicUrl = damConfig ? destination(id) : prior?.public_url || '';
     const storedInDam = prior?.steps?.dam === 'done' && (!cfg.force || !damConfig);
+    const pendingConfirmation = prior?.steps?.dam === 'uncertain';
     let damStep = prior?.steps?.dam || 'n/a';
-    if (damConfig) damStep = storedInDam ? 'done' : 'pending';
+    if (damConfig) damStep = pendingConfirmation ? 'uncertain' : 'pending';
+    if (storedInDam) damStep = 'done';
     const publishStep = damConfig && !storedInDam ? 'pending' : prior?.steps?.publish || 'pending';
     const row = {
       ...prior,
@@ -343,7 +385,7 @@ export default async function main(args = process.argv.slice(2)) {
       dam_page_path: pagePath,
       page_refs: [...new Set([...(prior?.page_refs || []), ...info.pageRefs])],
       dam_asset_path: storedInDam ? prior.dam_asset_path : '',
-      dam_original_url: storedInDam ? prior.dam_original_url : '',
+      dam_original_url: storedInDam || pendingConfirmation ? prior.dam_original_url : '',
       original_download_url: '',
       delivery_url: '',
       public_url: storedInDam ? prior?.public_url || '' : '',
@@ -363,14 +405,16 @@ export default async function main(args = process.argv.slice(2)) {
 
     if (cfg.dryRun) {
       try {
-        const bytes = damConfig && damStep !== 'done' ? await probeBinaryBytes(row.master_url) : null;
-        const unavailable = damConfig && damStep !== 'done' && !(Number.isFinite(bytes) && bytes > 0);
+        const bytes = damConfig && damStep !== 'done' && !pendingConfirmation
+          ? await probeBinaryBytes(row.master_url) : null;
+        const unavailable = damConfig && damStep !== 'done' && !pendingConfirmation
+          && !(Number.isFinite(bytes) && bytes > 0);
         const activationPending = damConfig && damStep === 'done' && publishStep !== 'done';
         if (damConfig && damStep === 'done' && publishStep === 'done') {
           await verifyPublicBinary(publicUrl, info.kind, row.bytes);
         }
-        if (unavailable || !damConfig) counts.failed += 1;
-        console.log(`  · ${id}  ${info.kind}${unavailable ? ' [original unavailable]' : ''}${activationPending ? ' [activation pending]' : ''} → DAM ${damAssetPath || '(not configured)'}`);
+        if (unavailable || !damConfig || pendingConfirmation) counts.failed += 1;
+        console.log(`  · ${id}  ${info.kind}${unavailable ? ' [original unavailable]' : ''}${pendingConfirmation ? ' [completion uncertain; author HEAD required]' : ''}${activationPending ? ' [activation pending]' : ''} → DAM ${damAssetPath || '(not configured)'}`);
       } catch (err) {
         counts.failed += 1;
         console.error(`  ✗ ${id}  ${err.message}`);
@@ -379,43 +423,84 @@ export default async function main(args = process.argv.slice(2)) {
     }
 
     try {
-      if (damConfig && row.steps.dam !== 'done') {
-        const got = await fetchBinary(row.master_url, { timeoutMs: 180000 });
-        const mime = info.kind === 'document' ? 'application/pdf' : 'video/mp4';
-        const type = got.contentType.split(';')[0].trim().toLowerCase();
-        const signature = info.kind === 'document'
-          ? got.buffer.subarray(0, 5).toString() === '%PDF-'
-          : got.buffer.subarray(4, 8).toString() === 'ftyp';
-        if (!signature || ![mime, 'application/octet-stream'].includes(type)) {
-          throw new Error(`Original is not a non-empty ${mime}: ${row.master_url}`);
-        }
-        row.bytes = got.bytes;
-        row.source_content_type = type;
-        row.dam_original_url = row.master_url;
-        const dam = await uploadToDAM({
+      let recovered = false;
+      if (damConfig && row.steps.dam === 'uncertain') {
+        const check = await verifyDamOriginal({
           damConfig,
           damPath: damAssetPath,
-          buffer: got.buffer,
-          contentType: mime,
           token: damToken,
+          bytes: row.bytes,
+          contentType: info.kind === 'document' ? 'application/pdf' : 'video/mp4',
         });
+        if (!check.ok) {
+          row.note = `DAM completion uncertain: ${check.body}; no re-upload`;
+          row.status = 'partial';
+          counts.failed += 1;
+          manifest.rows[id] = row;
+          flush();
+          console.error(`  ✗ ${id}  ${row.note}`);
+          return;
+        }
+        row.steps.dam = 'done';
+        row.dam_asset_path = damAssetPath;
+        recovered = true;
+      }
+      if (damConfig && row.steps.dam !== 'done') {
+        const tempDir = mkdtempSync(path.join(tmpdir(), 'skoda-media-original-'));
+        let dam;
+        try {
+          const got = await fetchBinaryToFile(row.master_url, {
+            filePath: path.join(tempDir, 'original'),
+          });
+          const mime = info.kind === 'document' ? 'application/pdf' : 'video/mp4';
+          const type = got.contentType.split(';')[0].trim().toLowerCase();
+          const signature = info.kind === 'document'
+            ? got.header.subarray(0, 5).toString() === '%PDF-'
+            : got.header.subarray(4, 8).toString() === 'ftyp';
+          if (!signature || ![mime, 'application/octet-stream'].includes(type)) {
+            throw new Error(`Original is not a non-empty ${mime}: ${row.master_url}`);
+          }
+          row.bytes = got.bytes;
+          row.source_content_type = type;
+          row.dam_original_url = row.master_url;
+          dam = await uploadToDAM({
+            damConfig,
+            damPath: damAssetPath,
+            filePath: got.filePath,
+            contentType: mime,
+            token: damToken,
+            onStage: (stage) => {
+              console.log(`  · ${id}  DAM ${stage}`);
+              if (stage === 'complete') {
+                row.steps.dam = 'uncertain';
+                row.note = 'DAM completion pending confirmation';
+                manifest.rows[id] = row;
+                flush();
+              }
+            },
+          });
+        } finally {
+          rmSync(tempDir, { recursive: true, force: true });
+        }
         row.dam_status = dam.status;
         if (dam.ok) {
           row.steps.dam = 'done';
           row.dam_asset_path = damAssetPath;
-          const metadata = await setDamMetadata({
-            damConfig,
-            damPath: damAssetPath,
-            token: damToken,
-            metadata: {
-              originUrl: row.master_url, alt: '', title: row.title, sourcePage: pagePath,
-            },
-          });
-          if (!metadata.ok) row.note = `DAM provenance metadata ${metadata.status}`;
         } else {
-          row.steps.dam = 'error';
+          row.steps.dam = dam.uncertain ? 'uncertain' : 'error';
           row.note = `DAM ${dam.status}: ${(dam.body || '').slice(0, 100)}`;
         }
+      }
+      if (damConfig && row.steps.dam === 'done' && (recovered || !storedInDam)) {
+        const metadata = await setDamMetadata({
+          damConfig,
+          damPath: damAssetPath,
+          token: damToken,
+          metadata: {
+            originUrl: row.master_url, alt: '', title: row.title, sourcePage: pagePath,
+          },
+        });
+        if (!metadata.ok) row.note = `DAM provenance metadata ${metadata.status}`;
       }
       let activatedNow = false;
       if (damConfig && row.steps.dam === 'done' && row.steps.publish !== 'done') {
@@ -440,11 +525,14 @@ export default async function main(args = process.argv.slice(2)) {
       const allOk = row.steps.dam === 'done' && row.steps.publish === 'done'
         && row.public_verified?.url === publicUrl && !!publicUrl;
       row.status = allOk ? 'done' : 'partial';
+      if (allOk && !row.note?.startsWith('DAM provenance metadata ')) row.note = '';
       if (allOk) counts.done += 1; else counts.failed += 1;
       console.log(`  ${allOk ? '✓' : '⚠'} ${id}  ${info.kind} → ${row.dam_asset_path ? `DAM:${row.dam_asset_path}` : 'DAM pending'}`);
     } catch (err) {
       row.status = 'partial';
-      if (damConfig && row.steps.dam !== 'done') row.steps.dam = 'error';
+      if (damConfig && row.steps.dam !== 'done' && row.steps.dam !== 'uncertain') {
+        row.steps.dam = 'error';
+      }
       row.note = String(err.message || err);
       counts.failed += 1;
       console.error(`  ✗ ${id}  ${row.note}`);
