@@ -2,23 +2,21 @@
 
 const text = (node) => (node?.textContent || '').replace(/\s+/g, ' ').trim();
 
-// The clip's name: the Media Box item for the same master ("Footage | Škoda Peaq Covered
-// Drive"), else what titles it on resource "Videos" pages: the heading before it (Peaq, Epiq)
-// or the all-bold paragraph right before it (Motorsport: `<p><strong>Škoda 1100 OHC –
-// Footage</strong></p>`).
+// The clip's name: what titles it on the page, the all-bold paragraph right before it
+// (Motorsport Videos: `<p><strong>Škoda 1100 OHC – Footage</strong></p>`) or the heading
+// before it (Peaq/Epiq Videos); else its Media Box item ("Footage | Škoda Peaq Covered
+// Drive"), whose title is sometimes just the file name.
 const boldCaption = (node) => node?.matches('p') && !!text(node)
   && text(node) === [...node.querySelectorAll('strong, b')].map(text).join(' ').trim();
 function clipTitle(document, file, attachment) {
-  const item = [...document.querySelectorAll('.search-results-item')]
-    .find((node) => [...node.querySelectorAll('a[href]')]
-      .some((a) => a.getAttribute('href') === file));
-  const own = text(item?.querySelector('.entry-title'));
-  if (own) return own;
   const before = attachment.previousElementSibling;
   if (boldCaption(before)) return text(before);
   let node = before;
   while (node && !node.matches('h1, h2, h3, h4, h5, h6, .media-cart-item')) node = node.previousElementSibling;
-  return node?.matches('.media-cart-item') ? '' : text(node);
+  if (node && !node.matches('.media-cart-item') && text(node)) return text(node);
+  const item = [...document.querySelectorAll('.search-results-item')]
+    .find((el) => [...el.querySelectorAll('a[href]')].some((a) => a.getAttribute('href') === file));
+  return text(item?.querySelector('.entry-title'));
 }
 
 // The source's Vimeo account is domain-locked, so its player errors on the demo (SKODA-805c

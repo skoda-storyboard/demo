@@ -96,14 +96,13 @@ var CustomImportScript = (() => {
   var text = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
   var boldCaption = (node) => (node == null ? void 0 : node.matches("p")) && !!text(node) && text(node) === [...node.querySelectorAll("strong, b")].map(text).join(" ").trim();
   function clipTitle(document, file, attachment) {
-    const item = [...document.querySelectorAll(".search-results-item")].find((node2) => [...node2.querySelectorAll("a[href]")].some((a) => a.getAttribute("href") === file));
-    const own = text(item == null ? void 0 : item.querySelector(".entry-title"));
-    if (own) return own;
     const before = attachment.previousElementSibling;
     if (boldCaption(before)) return text(before);
     let node = before;
     while (node && !node.matches("h1, h2, h3, h4, h5, h6, .media-cart-item")) node = node.previousElementSibling;
-    return (node == null ? void 0 : node.matches(".media-cart-item")) ? "" : text(node);
+    if (node && !node.matches(".media-cart-item") && text(node)) return text(node);
+    const item = [...document.querySelectorAll(".search-results-item")].find((el) => [...el.querySelectorAll("a[href]")].some((a) => a.getAttribute("href") === file));
+    return text(item == null ? void 0 : item.querySelector(".entry-title"));
   }
   function videoEmbed(document, file, attachment) {
     const title = clipTitle(document, file, attachment);
