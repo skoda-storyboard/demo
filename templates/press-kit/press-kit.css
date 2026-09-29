@@ -126,6 +126,13 @@ body.press-kit .section.body-column .default-content-wrapper img {
   height: auto;
 }
 
+/* The lead image (the layout puts it first) fills the column, so its width/height attributes
+   reserve its box before it loads: under global `width: auto` it was 0×0 until then, a 0.18
+   layout shift on every press-kit page (SKODA-805c; press-release.css does the same). */
+body.press-kit .section.body-column .default-content-wrapper:first-child > p:first-child img {
+  width: 100%;
+}
+
 body.press-kit .section.body-column .default-content-wrapper > p {
   margin-block: 0 var(--paragraph-gap);
 }
