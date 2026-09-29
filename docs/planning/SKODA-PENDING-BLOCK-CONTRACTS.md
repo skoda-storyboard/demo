@@ -264,7 +264,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Runtime:** `styles.css`. `cover-box` = the band box (1440px cap, centred; live inner spacing 66/60, compact 48; 48px between rails); `dark` = the existing green/white primitive, with headings in the band following its white text.
 
 ### `media-item`
-- **Status:** `pinned` (shape 3, 2026-09-27) · **Ticket:** SKODA-608 · **Fallback:** readable (story-style listing/rail cards until SKODA-406)
+- **Status:** `pinned` (shape 6, 2026-09-28) · **Ticket:** SKODA-608 · **Fallback:** readable (story-style listing/rail cards until SKODA-406)
 - **Form: a row of the generated media feed, not a page** (docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md, option B:
   AEM Assets is the source of truth; pages per item are retired). The feed is a DA sheet at `/en/media-feed.json`
   (`{total, offset, limit, data, ":type": "sheet"}`), read by `listing` and `story-rail` via `index: /en/media-feed.json`.
@@ -277,6 +277,26 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   `category` images|videos, `tags` + the 15 facets (mapped by term name; in M2 from AEM tags, SKODA-512),
   `original`, `rendition-1920`, `mp4`, `vimeo-id`, `poster` (stable CDN URLs, never `/direct-download/`), `id`
   (source attachment id / M2 asset id, the cart key), `source`.
+- **Shape 4 (2026-09-28, SKODA-208):** + the lightbox detail panel, as the source colorbox shows it (fetched per
+  item from the source `image-overlay-meta-data` panel): `filetype` (JPG), `filesize` (10 MB), `dimensions`
+  (8256 × 5504 px), `labels` (tag chip names in source order, comma-joined), `related` (the parent article: a
+  site path when it is a demo page, else the absolute source URL) and `related-title`. Empty when the source panel
+  is empty. In M2 the AEM Assets sync writes them from the asset metadata.
+- **Shape 5 (2026-09-28, SKODA-208):** + `template` **`asset`** (`category` `assets`): an image that page copy links
+  to (the model pages' Liftback / Combi drawings, `<a href="…jpg"><img class="wp-image-N">`), found by scanning the
+  pages in `sources.json` `assetPages`. Title (the source panel's first line), `date` (its Published), `original` and
+  the shape-4 detail fields; no facets, cart or download fields. Only the lightbox reads them (matched by file name);
+  listings and rails never show them (they scope `template=image|video`).
+- **Shape 6 (2026-09-28, SKODA-208):** + the video lines of the source panel: `length` (14:05), `bitrate`
+  (29994kb/s), `audioformat` (the source's "Audio format", `.meta-dataformat`: quicktime). Empty for images.
+- **Detail gate (2026-09-29, #200 review):** every row the lightbox offers as a file (images, `asset` rows, videos
+  with an MP4) must carry `filetype`, `filesize` and `dimensions`. The builder re-fetches incomplete or missing
+  panels (3 attempts, fresh nonce), caches only complete ones, writes `detail-gaps.json`, and **fails the build**
+  on any gap not recorded as a verified source gap in `sources.json` `knownDetailGaps` (6 today: 5 Peaq / Epiq
+  videos with an empty source panel, 1 video without a dimensions line).
+- **Manifest gate (2026-09-29, #200 review):** every binary a row serves (thumbnail, `rendition-1920`, `original`,
+  `poster`, `mp4`) has a row in `tools/importer/media/media-manifest.json` (`npm run media:build -- --feed …`);
+  `media-items:build --push` refuses to publish while one is missing. DAM upload stays deferred (import-time rows).
 - **Sharding:** a sheet holds 500k cells (~20k rows at ~30 columns); split by type/year before that (the loader
   pages with `offset`).
 - Domain-restricted Vimeo videos (oEmbed `domain_status_code: 403`) can't play on the demo and are not emitted.

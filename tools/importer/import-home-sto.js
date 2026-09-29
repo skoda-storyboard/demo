@@ -22,6 +22,7 @@ import darkBandsTransformer from './transformers/skoda-dark-bands.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 import linksTransformer from './transformers/skoda-links.js';
+import nbspTransformer from './transformers/skoda-nbsp.js';
 import normalizeImages from './transformers/skoda-images.js';
 
 const parsers = {
@@ -79,6 +80,9 @@ function findBlocksOnPage(document, template) {
 }
 
 export default {
+  // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
+  preprocess: ({ document }) => nbspTransformer('preprocess', document.body, { document }),
+
   transform: (payload) => {
     const { document, url, params } = payload;
     const main = document.body;

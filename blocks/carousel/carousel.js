@@ -27,7 +27,121 @@ import {
 
 // A pointer must travel this far (px) before we treat the gesture as a drag and
 // suppress the post-drag click (so a small wobble on a tap still navigates).
-const DRAG_THRESHOLD = 6;
+export const DRAG_THRESHOLD = 6;
+
+/*
+ * Pure pointer-gesture step (exported so tests exercise the production logic).
+ * A press only becomes a drag once it travels past `threshold` horizontally;
+ * until then nothing is captured, so a plain mouse click still reaches the card
+ * link (SKODA-212a: capturing on pointerdown retargeted the click to the track).
+ * `ev` is { type, id, x, buttons, scrollLeft }; type is 'down' | 'move' | 'up' |
+ * 'lost' (capture lost) | 'leave' (left the track) | 'cancel'. Only the pointer
+ * that pressed first drives the gesture, so a second finger is ignored.
+ * Returns the next state; `startDrag` is true on the step that crosses the
+ * threshold (capture the pointer then), `scrollLeft` is where to scroll while
+ * dragging, and `moved` stays true after a drag so the next click is swallowed.
+ */
+export function dragStep(state, ev, threshold = DRAG_THRESHOLD) {
+  const s = state || { pressed: false, dragging: false, moved: false };
+  const same = { ...s, startDrag: false };
+  // released without a click to follow: nothing left to swallow
+  const dropped = {
+    ...same, pressed: false, dragging: false, moved: false,
+  };
+  if (ev.type === 'down') {
+    if (s.pressed && ev.id !== s.id) return same;
+    return {
+      pressed: true,
+      dragging: false,
+      moved: false,
+      startDrag: false,
+      id: ev.id,
+      startX: ev.x,
+      startLeft: ev.scrollLeft,
+    };
+  }
+  if (!s.pressed || ev.id !== s.id) return same;
+  switch (ev.type) {
+    case 'move': {
+      // released outside the track before capture: we never saw the pointerup
+      if (ev.buttons === 0) return dropped;
+      const dx = ev.x - s.startX;
+      if (!s.dragging && Math.abs(dx) <= threshold) return same;
+      return {
+        ...s, startDrag: !s.dragging, dragging: true, moved: true, scrollLeft: s.startLeft - dx,
+      };
+    }
+    case 'up':
+    case 'lost': // the click that ends a drag follows these
+      return { ...same, pressed: false, dragging: false };
+    case 'leave': // a captured drag keeps going; an uncaptured press is dropped
+      return s.dragging ? same : dropped;
+    case 'cancel':
+      return dropped;
+    default:
+      return same;
+  }
+}
+
+// The click that ends a real drag is swallowed; keyboard activation (detail 0)
+// never is, so Enter on a card always navigates.
+export const swallowClick = (state, detail) => !!state?.moved && detail !== 0;
+
+/*
+ * Threshold drag with post-drag click suppression (SKODA-212a). The pointer is
+ * captured only once the press becomes a drag (dragStep), so a click below the
+ * threshold reaches the card link and navigates. Exported for the tests.
+ */
+export function bindDrag(track) {
+  let gesture = null;
+
+  // One path for every pointer event: step the gesture, then capture on the
+  // threshold-crossing move, scroll while dragging, and otherwise clean up
+  // (grab cursor, suspended snap, capture) however the gesture ended.
+  function onPointer(type, e) {
+    if (type !== 'down' && !gesture?.pressed) return;
+    gesture = dragStep(gesture, {
+      type, id: e.pointerId, x: e.clientX, buttons: e.buttons, scrollLeft: track.scrollLeft,
+    });
+    if (gesture.startDrag) {
+      track.setPointerCapture?.(e.pointerId);
+      track.classList.add('is-dragging');
+    }
+    if (gesture.dragging) {
+      track.scrollLeft = gesture.scrollLeft;
+      return;
+    }
+    track.classList.remove('is-dragging');
+    if (track.hasPointerCapture?.(e.pointerId)) track.releasePointerCapture(e.pointerId);
+  }
+
+  track.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return; // primary button / touch / pen only
+    onPointer('down', e);
+  });
+  track.addEventListener('pointermove', (e) => onPointer('move', e));
+  track.addEventListener('pointerup', (e) => onPointer('up', e));
+  track.addEventListener('pointercancel', (e) => onPointer('cancel', e));
+  // lostpointercapture bubbles: a card losing touch's implicit capture to the
+  // track (on startDrag) must not end the drag, only the track's own loss does
+  track.addEventListener('lostpointercapture', (e) => {
+    if (e.target === track) onPointer('lost', e);
+  });
+  track.addEventListener('pointerleave', (e) => onPointer('leave', e));
+
+  // The browser's own link/image drag would fire pointercancel and end our drag
+  // before it scrolls, so it never starts inside the track.
+  track.addEventListener('dragstart', (e) => e.preventDefault());
+
+  // Suppress the click that ends a drag so it can't navigate the dragged card.
+  track.addEventListener('click', (e) => {
+    if (swallowClick(gesture, e.detail)) {
+      e.preventDefault();
+      e.stopPropagation();
+      gesture.moved = false;
+    }
+  }, true);
+}
 
 const prefersReducedMotion = () => window.matchMedia
   && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -80,16 +194,20 @@ export function dotState({ scrollLeft = 0, scrollWidth = 0, clientWidth = 0 } = 
 }
 
 /* Turn each authored row into a shared card-teaser <li>, tagged overlay (dated)
- * or caption (taxonomy) from whether the primitive classified a date. */
+ * or caption (taxonomy) from whether the primitive classified a date. The
+ * `caption` variant forces the title-below card even for dated rows (model-page
+ * media and derivative rails show the date/title under the image). */
 function buildCards(block) {
   const track = document.createElement('ul');
   track.className = 'carousel-track';
+  const captionOnly = block.classList.contains('caption');
   [...block.children].forEach((row) => {
     const li = document.createElement('li');
     li.className = 'card-teaser';
     while (row.firstElementChild) li.append(row.firstElementChild);
     decorateCardCells(li); // shared content-sniff (image/body/date/title)
-    railVariant(!!li.querySelector('.card-teaser-date')).forEach((c) => li.classList.add(c));
+    const dated = !captionOnly && !!li.querySelector('.card-teaser-date');
+    railVariant(dated).forEach((c) => li.classList.add(c));
     track.append(li);
   });
   optimizeImages(track); // authored <picture> → optimized (shared with cards)
@@ -195,46 +313,7 @@ export default function decorate(block) {
     window.addEventListener('resize', scheduleSync);
   }
 
-  // ---- pointer-capture drag with post-drag click suppression -----------------
-  let dragging = false;
-  let moved = false;
-  let startX = 0;
-  let startLeft = 0;
-
-  track.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0) return; // primary button / touch / pen only
-    dragging = true;
-    moved = false;
-    startX = e.clientX;
-    startLeft = track.scrollLeft;
-    track.setPointerCapture(e.pointerId);
-    track.classList.add('is-dragging');
-  });
-
-  track.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
-    const dx = e.clientX - startX;
-    if (Math.abs(dx) > DRAG_THRESHOLD) moved = true;
-    track.scrollLeft = startLeft - dx;
-  });
-
-  function endDrag(e) {
-    if (!dragging) return;
-    dragging = false;
-    track.classList.remove('is-dragging');
-    if (track.hasPointerCapture?.(e.pointerId)) track.releasePointerCapture(e.pointerId);
-  }
-  track.addEventListener('pointerup', endDrag);
-  track.addEventListener('pointercancel', endDrag);
-
-  // Suppress the click that ends a drag so it can't navigate the dragged card.
-  track.addEventListener('click', (e) => {
-    if (moved) {
-      e.preventDefault();
-      e.stopPropagation();
-      moved = false;
-    }
-  }, true);
+  bindDrag(track);
 
   // Initial paint of arrow/dot state (after layout).
   scheduleSync();

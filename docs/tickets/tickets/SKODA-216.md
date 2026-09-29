@@ -5,7 +5,8 @@
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo capability; story assembly via SKODA-604)
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–4d *(planning estimate, not a quote)*
 - **Status (2026-09-29):** 🟡 IN REVIEW. `Gallery (story)` is built in `blocks/gallery` (story branch
-  only; the default, `preview` and `slider` paths are unchanged). It is QA'd on
+  only) plus an opt-in `story` option on the shared `scripts/lightbox.js`; the default, `preview`,
+  `slider` and media-rail paths are unchanged. It is QA'd on
   `/drafts/skoda-216-story-gallery` against the live Favorit gallery.
 
 ## UI Specification
@@ -108,10 +109,12 @@ press-release template or a new modal implementation.
   - Image box 1280×751 from y=93, contain-fit, leaving the 56px bottom band.
   - Squares at x=10 / right 10, y=461.4 (source `top: calc(50% + 46.5px)`, `translateY(-50%)`, a
     1.6px lift).
-- **Story-only lightbox behaviour:**
+- **Story-only lightbox behaviour** (an opt-in `{ story, title }` option on the shared
+  `scripts/lightbox.js`, which SKODA-208 moved the gallery lightbox into; without the option
+  the gallery, `preview` and media-rail lightboxes are unchanged):
   - No media-cart actions or tag chips.
   - The dialog is labelled by the title.
-  - Ids are numbered per story gallery, so two galleries never share one.
+  - Ids stay unique per overlay (the shared lightbox numbers them), so two galleries never share one.
   - The focus trap includes authored caption links (close → link → prev → next → close).
   - An authored caption shows on one line in the bottom band, left of the counter.
 - **Tokens (brand.css):** `--gallery-story-backdrop`, `--gallery-story-badge`,
@@ -124,9 +127,9 @@ press-release template or a new modal implementation.
     breakpoint allowlist; EDS keeps 10px.
   - **Bottom bar:** "View 5 photos" is the removed overview entry and "Share gallery" is SKODA-215,
     so neither is rendered.
-  - **Shared fixes not applied:** the default/`preview` lightbox still uses fixed ids and a
-    buttons-only focus trap. This ticket only touches the story path; fixing the others would
-    change SKODA-203/223 behaviour.
+  - **Focus trap outside the story:** the default, `preview` and media-rail lightboxes keep a
+    buttons-only trap. This ticket only changes the story path; widening it for the others would
+    change SKODA-203/208/223 behaviour.
 - **Import:** the pending contract `gallery-story` is registered. Nothing emits it yet:
   `skoda-story-cleanup.js` still drops `.sb-gallery` (SKODA-604/801).
 

@@ -13,7 +13,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   slugify, isoDate, cdnUrl, vimeoPoster, facetOptions, cardTerms, parseCards, mergeItems,
-  feedRow, feedSheet, itemSlug, FACETS,
+  feedRow, feedSheet, itemSlug, sourceOrder, FACETS, DETAIL_FIELDS, parseDetailPanel, ajaxNonce,
+  detailRequest, parseAssetLinks, assetItem, requiredDetails, detailGaps, unknownGaps,
+  feedMediaRefs, feedCoverageGaps,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 
@@ -109,6 +111,19 @@ test('merge: dedupe by source id, union terms, resolve slug collisions', () => {
   assert.equal(out[1].path, '/en/images/x-2');
 });
 
+test('merge keeps the source listing order across listings; same-day feed rows keep it', () => {
+  const item = (id, date) => ({
+    id, date, type: 'image', title: id, path: `/en/images/${id}`, slug: id, original: `/${id}.jpg`, terms: {},
+  });
+  // two filtered slices of one source order: 4 3 1 2 5 (4, 3, 1, 2 share a day)
+  const octavia = [item('4', '2025-06-23'), item('1', '2025-06-23'), item('5', '2025-06-01')];
+  const peaq = [item('3', '2025-06-23'), item('1', '2025-06-23'), item('2', '2025-06-23')];
+  const all = [item('4', '2025-06-23'), item('3', '2025-06-23')];
+  assert.deepEqual(sourceOrder([octavia, peaq, all]), ['4', '3', '1', '2', '5']);
+  const sheet = feedSheet(mergeItems([octavia, peaq, all]));
+  assert.deepEqual(sheet.data.map((r) => r.id), ['4', '3', '1', '2', '5'], 'not re-sorted by path');
+});
+
 test('image feed row: listing/rail columns, facets, download fields, thumbnail', { skip }, () => {
   const d = doc('images-peaq');
   const [item] = parseCards(d, { yearsById: YEARS });
@@ -146,4 +161,139 @@ test('feed sheet: DA sheet shape, newest first, query-index compatible', { skip 
   const dates = sheet.data.map((r) => r.date);
   assert.deepEqual(dates, [...dates].sort().reverse());
   assert.deepEqual(new Set(sheet.data.map((r) => r.template)), new Set(['image', 'video']));
+});
+
+test('detail panel (shape 4): file metadata, tag labels and the related article', { skip }, () => {
+  const panel = parseDetailPanel(doc('detail-450812'));
+  assert.deepEqual(panel, {
+    filetype: 'JPG',
+    filesize: '10 MB',
+    length: '',
+    bitrate: '',
+    audioformat: '',
+    dimensions: '8256 × 5504 px',
+    labels: '2026, Octavia',
+    related: 'https://www.skoda-storyboard.com/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon/',
+    'related-title': 'Škoda Octavia turns 30: Three decades of a brand icon',
+  });
+  const empty = parseDetailPanel(new JSDOM('<div><ol class="entry-tags tag-list"></ol></div>').window.document);
+  assert.ok(DETAIL_FIELDS.every((f) => empty[f] === ''), 'an empty source panel gives empty fields');
+  const row = feedRow({
+    id: '1', type: 'image', title: 'T', date: '2026-08-27', terms: {}, original: '/o.jpg', ...panel,
+  });
+  DETAIL_FIELDS.forEach((f) => assert.equal(row[f], panel[f]));
+});
+
+test('detail request: the source ajax loader call with the page nonce', () => {
+  assert.equal(ajaxNonce('<script>var skoda_ajax_loader = {"ajax_url":"https:\\/\\/x","nonce":"8d4ff79608"};</script>'), '8d4ff79608');
+  assert.equal(ajaxNonce('<p>none</p>'), '');
+  const { url, body } = detailRequest(450812, 'abc');
+  assert.equal(url, 'https://www.skoda-storyboard.com/wp/wp-admin/admin-ajax.php');
+  const q = new URLSearchParams(body);
+  assert.equal(q.get('template'), 'templates/image-overlay-meta-data');
+  assert.equal(q.get('query_vars[p]'), '450812');
+  assert.equal(q.get('nonce'), 'abc');
+});
+
+test('assets (shape 5): images the page copy links to, not listing cards; titled from the panel', { skip }, () => {
+  const page = new JSDOM(`<article class="skoda_model media-cart-item"><div class="textwidget">
+    <p><a href="https://cdn.skoda-storyboard.com/2024/03/OCT_FL_149_limo_7299ddc7.jpg"><img class="aligncenter wp-image-361053 size-full" alt="Technical drawings limo"></a></p>
+    <p><a href="https://cdn.skoda-storyboard.com/2024/03/OCT_FL_149_limo_7299ddc7.jpg"><img class="wp-image-361053" alt="again"></a></p>
+    <p><a href="https://www.skoda-storyboard.com/en/x/"><img class="wp-image-9" alt="not an image link"></a></p>
+  </div></article>
+  <article class="article-teaser media-cart-item image"><a href="https://cdn.skoda-storyboard.com/2026/08/card.jpg"><img class="wp-image-1" alt="card"></a></article>`).window.document;
+  const links = parseAssetLinks(page);
+  assert.deepEqual(links, [{ id: '361053', original: 'https://cdn.skoda-storyboard.com/2024/03/OCT_FL_149_limo_7299ddc7.jpg', alt: 'Technical drawings limo' }]);
+  const panel = new JSDOM(`<p>Technical drawings limo</p><div class="media-meta"><div class="meta-filetype">File type: <strong>JPG</strong></div>
+    <div class="meta-filesize">File size: <strong>599 KB</strong></div><div class="meta-dimensions">Dimensions: <strong>3151&nbsp;×&nbsp;1847 px</strong></div>
+    <div class="meta-published">Published: <strong>22. 3. 2024</strong></div></div>`).window.document;
+  const row = feedRow(assetItem(links[0], panel));
+  assert.equal(row.template, 'asset');
+  assert.equal(row.category, 'assets');
+  assert.equal(row.title, 'Technical drawings limo');
+  assert.equal(row.date, '2024-03-22');
+  assert.equal(row.path, links[0].original);
+  assert.equal(row.filesize, '599 KB');
+  assert.equal(row.dimensions, '3151 × 1847 px');
+  assert.equal(row.tags, '', 'no facets: never in a listing or rail');
+});
+
+test('video detail panel (shape 6): length, bitrate and audio format', { skip }, () => {
+  const d = new JSDOM(`<div class="media-meta"><div class="meta-filetype">File type: <strong>MP4</strong></div>
+    <div class="meta-length">Length: <strong>14:05</strong></div><div class="meta-bitrate">Bitrate: <strong>29994kb/s</strong></div>
+    <div class="meta-dataformat">Audio format: <strong>quicktime</strong></div></div>`).window.document;
+  const panel = parseDetailPanel(d);
+  assert.equal(panel.length, '14:05');
+  assert.equal(panel.bitrate, '29994kb/s');
+  assert.equal(panel.audioformat, 'quicktime');
+});
+
+test('detail gate: files need type, size and dimensions; Vimeo-only videos need none', () => {
+  assert.deepEqual(requiredDetails({ type: 'image' }), ['filetype', 'filesize', 'dimensions']);
+  assert.deepEqual(requiredDetails({ type: 'asset' }), ['filetype', 'filesize', 'dimensions']);
+  assert.deepEqual(requiredDetails({ type: 'video', mp4: 'https://cdn.example/v.mp4' }), ['filetype', 'filesize', 'dimensions']);
+  assert.deepEqual(requiredDetails({ type: 'video', mp4: '' }), []);
+  const gaps = detailGaps([
+    { id: '451237', type: 'image', title: 'Empty panel' },
+    {
+      id: '1', type: 'image', title: 'OK', filetype: 'JPG', filesize: '6 MB', dimensions: '5000 × 7496 px',
+    },
+    { id: '2', type: 'video', title: 'Vimeo only' },
+  ]);
+  assert.deepEqual(gaps, [{
+    id: '451237', type: 'image', title: 'Empty panel', missing: ['filetype', 'filesize', 'dimensions'],
+  }]);
+});
+
+test('detail gate: only a recorded source gap, for the fields it lists, lets a row through', () => {
+  const gaps = [
+    { id: '445970', missing: ['filetype', 'filesize', 'dimensions'] },
+    { id: '396289', missing: ['dimensions'] },
+    { id: '396289b', missing: ['filesize'] },
+    { id: '451237', missing: ['filetype'] },
+  ];
+  const known = {
+    445970: { missing: ['filetype', 'filesize', 'dimensions'] },
+    396289: { missing: ['dimensions'] },
+    '396289b': { missing: ['dimensions'] },
+  };
+  assert.deepEqual(unknownGaps(gaps, known).map((g) => g.id), ['396289b', '451237']);
+});
+
+test('feed media refs: every binary a row serves, with its home folder (manifest traceability)', () => {
+  const sheet = {
+    data: [
+      {
+        id: '409837',
+        template: 'image',
+        title: 'Infographic',
+        image: 'https://cdn.skoda-storyboard.com/2025/06/i-768x432.jpg',
+        'rendition-1920': 'https://cdn.skoda-storyboard.com/2025/06/i-1920x1080.jpg',
+        original: 'https://cdn.skoda-storyboard.com/2025/06/i.jpg',
+      },
+      {
+        id: '410179',
+        template: 'video',
+        title: 'Footage',
+        poster: 'https://i.vimeocdn.com/video/1-d_1280x720.jpg',
+        image: 'https://i.vimeocdn.com/video/1-d_1280x720.jpg',
+        mp4: 'https://cdn.skoda-storyboard.com/2025/06/f.mp4',
+      },
+      {
+        id: '361053', template: 'asset', title: 'Drawing', original: 'https://cdn.skoda-storyboard.com/2024/03/d.jpg', image: 'https://cdn.skoda-storyboard.com/2024/03/d.jpg',
+      },
+      { id: 'x', template: 'story', image: 'https://cdn.skoda-storyboard.com/s.jpg' },
+    ],
+  };
+  const refs = feedMediaRefs(sheet);
+  assert.deepEqual(refs.map((r) => `${r.id} ${r.field} ${r.kind} ${r.home}`), [
+    '409837 image image en/images', '409837 rendition-1920 image en/images', '409837 original image en/images',
+    '410179 poster image en/videos', '410179 mp4 video en/videos',
+    '361053 image image en/assets', '361053 original image en/assets',
+  ]);
+  // a manifest row by logical id (the master) covers every rendition of that image
+  const rows = { 'x__i.jpg': {} };
+  const covered = { 'row-a': { seen_urls: ['https://i.vimeocdn.com/video/1-d_1280x720.jpg'] } };
+  assert.equal(feedCoverageGaps(sheet, { ...covered }).length, 6, 'only the poster is recorded');
+  assert.ok(feedCoverageGaps(sheet, rows).length > 0);
 });
