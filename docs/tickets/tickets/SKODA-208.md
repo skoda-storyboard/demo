@@ -126,8 +126,9 @@ plus variants of existing blocks, built against the already-published pages (no 
   empty rail removes its whole section (heading, "Based on tags", link) and fires `story-rail:empty` (the nav drops
   its link). `carousel (caption)` forces title-below cards, `(center)` centres them; Derivatives =
   `center caption`, Images/Videos = `media caption` (+ `video` play glyph). Card widths follow the source cells.
-- Measured against live at 1280/1024/768/375: Octavia/Superb/Fabia/Peaq/Epiq layout matches; remaining offsets
-  come from content (fewer rails/nav links until SKODA-603/608 fill the index). Hero pixel diff 0.24–1.38% at
+- Measured against live at 1280/1024/768/375: the page layout matches on Octavia/Superb/Fabia/Peaq/Epiq. **Rail
+  parity is QA-complete for Octavia only**; the other four lack rail content (see "Rail content dependency" below)
+  and are not counted as QA-complete for the rails. Hero pixel diff 0.24–1.38% at
   1024/768/500; 2.92% at 1280 is photo encoding (WebP 2000 vs source JPEG 1440), layout identical.
 - **Not in this slice:** lightbox, add-to-cart and size menus on Images/Videos cards (needs a shared lightbox from
   `gallery` + SKODA-505a/b), inline Vimeo previews, the floating share / scroll-top group (SKODA-215), MR footer
@@ -241,10 +242,14 @@ These **supersede** the conflicting items above: 8 anchors / not sticky.
 - [ ] Section-nav is a **sticky** icon nav on desktop with an accessible mobile equivalent. Match the source link
       count per model: 9 / 8 / 6. Emit only links whose target section exists (no dangling anchors). *(The "hero about
       480px" item moved to SKODA-828 F2, superseded by measured values.)*
-- [ ] Match the source rail count per model: 3 / 5 / 6. Rail tags and the subheading come per model from the source
-      (e.g. Fabia `model=fabia`, `bodywork=hatchback`), with an "All" deep link. A hardcoded `elroq` is rejected.
-      A two-cell subheading row is config, never a card. An empty rail removes its section. The Bodywork rail is
-      centred (`cellAlign: center`).
+- [x] **Rail configuration (code, this ticket):** rail tags and the subheading come per model from the source (e.g.
+      Fabia `model=fabia`, `bodywork=hatchback`), with an "All" deep link; no hardcoded `elroq`. A two-cell subheading
+      row is config, never a card. An empty rail removes its section (and its nav link). The Bodywork rail is centred
+      (`cellAlign: center`). *Verified on the five M1 model pages (2026-09-29).*
+- [ ] **Source rail parity (content, owned by SKODA-603 / SKODA-608):** each model shows the source's rails and
+      counts (3 / 5 / 6). Reconciled 2026-09-29 (PR 200 review): this is a content/import dependency, not a code
+      criterion of this ticket. **Octavia: done (6/6 rails, every count equal).** Superb, Fabia, Peaq and Epiq stay
+      open until their content is migrated; see "Rail content dependency" below.
 - [ ] **Block names:** the importer emits only blocks that exist. Today the Elroq page references `in-page-nav` and
       `spec-table`, and both 404 on preview and live. Map them to existing blocks/sections (e.g. `columns` + a 218
       dark section + a download link), or to the section-nav this ticket builds. Check: 0 block JS 404s on the 5
@@ -253,6 +258,26 @@ These **supersede** the conflicting items above: 8 anchors / not sticky.
       PDF) on Superb / Octavia / Fabia.
 - Estimate: +1.5 (§9, including Key Facts / Tech Data) +0.5 (block names) −1 (Key Facts / Tech Data → Should) =
   **+1 SP net Must**.
+
+## Rail content dependency (2026-09-29, PR 200 review)
+
+Measured on the branch preview after the deferred rails load (source → preview cards; "–" = no rail, section removed).
+The rails render whatever the index / media feed holds; the gap is content that has not been migrated yet.
+
+| Model | Rails | Bodywork | News | Press Kits | Stories | Images | Videos | Owner of the gap |
+|---|---|---|---|---|---|---|---|---|
+| Octavia | 6 → 6 | 2 → 2 | 10 → 10 | 10 → 10 | 10 → 10 | 20 → 20 | 20 → 20 | done (this ticket) |
+| Superb | 6 → 5 | 1 → 1 | 10 → 5 | 10 → 2 | 10 → 3 | 20 → – | 20 → 12 | 603 (news, kits, stories), 608 (images, videos) |
+| Fabia | 3 → 0 | – | – | 6 → – | – | 20 → – | 20 → – | 603 (kits), 608 (images, videos) |
+| Peaq | 5 → 4 | – | 10 → 2 | 3 → – | 10 → 10 | 20 → 20 | 13 → 8 | 603 (news, kits), 608 (videos) |
+| Epiq | 5 → 3 | – | 10 → – | 3 → – | 10 → 10 | 20 → 20 | 9 → 6 | 603 (news, kits), 608 (videos) |
+
+- **How to close a row** (the Octavia recipe, 2026-09-28): add the model's News / Press Kits / Stories source URLs to
+  the rail-feed corpus and import them with the press-release / story / page-base importers (SKODA-603); add a
+  `model=<slug>` image and video query to `tools/importer/media-items/sources.json` and rebuild the feed (SKODA-608);
+  record the feed binaries (`media:build --feed`). Some videos are domain-restricted on Vimeo and are dropped, so a
+  video count can stay below the source.
+- Person owners are not assigned in this repo yet (docs/tickets/OVERVIEW.md); the owning tickets above carry the work.
 
 ## Dependencies
 - Upstream: SKODA-202 (hero), SKODA-201 (cards/rails), SKODA-402 (query-index retrieval), SKODA-203 (gallery-lightbox), SKODA-505 (media-cart), SKODA-601 (import infra)
