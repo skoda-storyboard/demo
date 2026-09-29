@@ -12,7 +12,7 @@
  * Pipeline per page:
  *   beforeTransform (cleanup, then skoda-press-release-layout rebuilds the article
  *   into the five sections of the press-release template, SKODA-607)
- *     → block parsers (gallery / tags / downloads) replace matched fragments
+ *     → block parsers (gallery / tags / downloads / quote) replace matched fragments
  *       → afterTransform (Section Metadata + Gallery (preview) anchored to the layout
  *         markers, then the shared Metadata and link rewriting)
  *         → WebImporter built-in rules (background images / image URLs)
@@ -22,6 +22,7 @@
 import galleryParser from './parsers/gallery.js';
 import tagsParser from './parsers/tags.js';
 import downloadsParser from './parsers/downloads.js';
+import quoteParser, { markQuotes } from './parsers/quote.js';
 
 // TRANSFORMER IMPORTS
 import cleanupTransformer from './transformers/skoda-press-release-cleanup.js';
@@ -36,6 +37,7 @@ const parsers = {
   gallery: galleryParser,
   tags: tagsParser,
   downloads: downloadsParser,
+  quote: quoteParser,
 };
 
 // PAGE TEMPLATE CONFIGURATION — embedded from page-templates.json (press-release)
@@ -50,6 +52,8 @@ const PAGE_TEMPLATE = {
     { name: 'gallery', instances: ['section.images.sa-media-kit-preview'] },
     { name: 'tags', instances: ['section.tags'] },
     { name: 'downloads', instances: ['.search-results.media-box'] },
+    // Pull-quotes (SKODA-220): marked in `preprocess`, while their decorative <hr> exists.
+    { name: 'quote', instances: ['article p[data-skoda-quote]'] },
   ],
   // Documentation of the emitted section model; skoda-press-release-layout builds it.
   sections: [
@@ -113,6 +117,7 @@ export default {
    * inline element. The Media Box's single download links (video MP4, PDF) are icon-only
    * `<a><i class="icon"></i></a>`, so they'd vanish before the downloads parser runs;
    * give them a text label so they survive (the parser labels them by file type).
+   * preProcess also drops every <hr>, so the pull-quotes are marked by their rule here.
    */
   preprocess: ({ document }) => {
     // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
@@ -120,6 +125,7 @@ export default {
     document.querySelectorAll('.search-results.media-box a.media-cart-action.download[href]').forEach((a) => {
       if (!(a.textContent || '').trim()) a.textContent = 'Download';
     });
+    document.querySelectorAll('article.press_release .entry-content').forEach(markQuotes);
   },
 
   transform: (payload) => {
