@@ -68265,12 +68265,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-press-kit-2/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/Skoda_Epiq_Footage_First-Edition_02_UHD_58aec896.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Footage_First-Edition_02_UHD_58aec896.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/Skoda_Epiq_Footage_First-Edition_02_UHD_58aec896.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-press-kit-2/videos/Skoda_Epiq_Footage_First-Edition_02_UHD_58aec896.mp4",
+        "mime": "video/mp4",
+        "bytes": 2063945946
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -68278,15 +68282,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/Skoda_Epiq_Footage_First-Edition_02_UHD_58aec896.mp4"
       ],
-      "bytes": null,
+      "bytes": 2063945946,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "DAM completion pending confirmation",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-29T06:22:27.218Z"
     },
     "9f34d7bf__Skoda_Peaq_Motor_and_battery_architecture_efe7eeff.pdf": {
       "kind": "document",
