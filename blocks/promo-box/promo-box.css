@@ -4,7 +4,7 @@
   --promo-dot-size: 10px;
   --promo-dot-target: 44px;
   --promo-following-gap: 2rem;
-  --promo-gutter: var(--spacing-l);
+  --promo-gutter: var(--page-gutter); /* bleeds back over the section gutter */
 
   position: relative;
   left: 50%;
@@ -182,11 +182,5 @@
   .promo-box .promo-box-items:has(.card-teaser:only-child) .card-teaser {
     grid-row: auto;
     aspect-ratio: 16 / 9;
-  }
-}
-
-@media (width >= 992px) {
-  .promo-box {
-    --promo-gutter: var(--spacing-xl);
   }
 }
