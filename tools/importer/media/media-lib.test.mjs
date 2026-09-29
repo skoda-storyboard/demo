@@ -17,7 +17,52 @@ import {
   uploadToDAM, publishDamBinary, publishDamImage, ensureDamFolder, resolveDamToken,
   fetchBinaryToFile,
   needsMediaBuild, OVERSIZE_BYTES, belowMinEdge, stepDownTooSmall, pickIngestUrl, renditionEdge,
+  renditionCandidates, remoteImageSize,
 } from './media-lib.mjs';
+
+// SOI + one APP2 segment of `padding` bytes (≤ 65533) + SOF0 for w×h.
+const jpegHead = (w, h, padding) => {
+  const app2 = Buffer.alloc(padding + 4);
+  app2.set([0xff, 0xe2]);
+  app2.writeUInt16BE(padding + 2, 2);
+  const sof = Buffer.from([0xff, 0xc0, 0, 17, 8, 0, 0, 0, 0,
+    3, 1, 0x22, 0, 2, 0x11, 1, 3, 0x11, 1]);
+  sof.writeUInt16BE(h, 5);
+  sof.writeUInt16BE(w, 7);
+  return Buffer.concat([Buffer.from([0xff, 0xd8]), app2, sof]);
+};
+
+test('renditionCandidates keeps a non-3:2 master at its own ratio', () => {
+  const url = 'https://cdn.x.com/2026/03/wide.jpg';
+  assert.deepEqual(renditionCandidates(url, { w: 8000, h: 4500 }).map((u) => u.split('-').pop()), [
+    '2560x1440.jpg', '2048x1152.jpg', '1920x1080.jpg', '1536x864.jpg', '1440x810.jpg', '768x432.jpg',
+  ]);
+  // Near-3:2 masters round like WordPress (the source's -1920x1281);
+  // exact 3:2 keeps the named ladder.
+  assert.ok(renditionCandidates(url, { w: 6000, h: 4003 }).some((u) => u.endsWith('-1920x1281.jpg')));
+  assert.equal(renditionCandidates(url, { w: 6000, h: 4000 }).filter((u) => u.endsWith('-1920x1280.jpg')).length, 1);
+  // Portrait: the long edge is the height. Never upscale.
+  assert.ok(renditionCandidates(url, { w: 3000, h: 4000 }).some((u) => u.endsWith('-1440x1920.jpg')));
+  assert.ok(!renditionCandidates(url, { w: 2000, h: 1125 }).some((u) => /-(2560|2048)x/.test(u)));
+  // Unknown size: the 3:2 ladder, unchanged.
+  assert.ok(renditionCandidates(url).some((u) => u.endsWith('-272x182.jpg')));
+});
+
+test('remoteImageSize streams past a large ICC profile and never throws', async () => {
+  const head = jpegHead(8000, 4500, 60000);
+  const body = Buffer.concat([head, Buffer.alloc(50000)]);
+  const serve = (bytes) => async () => new Response(new ReadableStream({
+    start(controller) {
+      for (let i = 0; i < bytes.length; i += 4096) controller.enqueue(bytes.subarray(i, i + 4096));
+      controller.close();
+    },
+  }), { status: 206 });
+  assert.deepEqual(await remoteImageSize('https://cdn.x.com/a.jpg', { fetchImpl: serve(body) }), { w: 8000, h: 4500 });
+  assert.equal(await remoteImageSize('https://cdn.x.com/a.jpg', { fetchImpl: serve(body), maxBytes: 30000 }), null);
+  assert.equal(await remoteImageSize('https://cdn.x.com/a.jpg', { fetchImpl: serve(Buffer.alloc(9000, 1)) }), null);
+  assert.equal(await remoteImageSize('https://cdn.x.com/a.jpg', { fetchImpl: async () => new Response(null, { status: 403 }) }), null);
+  assert.equal(await remoteImageSize('https://cdn.x.com/a.jpg', { fetchImpl: async () => { throw new Error('offline'); } }), null);
+});
 
 test('delivery-only rows resume when DAM ingest is requested, without a blanket force', () => {
   const row = {
@@ -104,6 +149,31 @@ test('pickIngestUrl never steps an oversized master down to a thumbnail', async 
     assert.equal(lowered.url, 'https://cdn.x.com/big-384x256.jpg');
     const kept = await pickIngestUrl('https://cdn.x.com/ok.jpg');
     assert.equal(kept.url, 'https://cdn.x.com/ok-768x512.jpg');
+  } finally {
+    global.fetch = previous;
+  }
+});
+
+test('pickIngestUrl steps a 16:9 master down to its own -WxH copy', async () => {
+  // Real case: Skoda_Epiq_Battery_versions (17.5 MB, 8000x4500) only has 16:9 copies.
+  const sizes = {
+    'https://cdn.x.com/wide.jpg': 17541381,
+    'https://cdn.x.com/wide-2560x1440.jpg': 557944,
+  };
+  const previous = global.fetch;
+  global.fetch = async (url, init = {}) => {
+    if (init.method !== 'HEAD' && String(url) === 'https://cdn.x.com/wide.jpg') {
+      return new Response(jpegHead(8000, 4500, 1000), { status: 206 });
+    }
+    const bytes = sizes[String(url)];
+    return bytes
+      ? new Response(null, { status: 200, headers: { 'content-length': String(bytes) } })
+      : new Response(null, { status: 403 });
+  };
+  try {
+    const pick = await pickIngestUrl('https://cdn.x.com/wide.jpg');
+    assert.equal(pick.ok, true);
+    assert.equal(pick.url, 'https://cdn.x.com/wide-2560x1440.jpg');
   } finally {
     global.fetch = previous;
   }
