@@ -121,6 +121,27 @@ All rows: `measured (source-url · selector · viewport) -> token`. Source URL f
   (`.images .items .item:nth-child(4n+1){clear:left}`).
 - Each cell holds an `.article-teaser`, see [`card-teaser.md`](card-teaser.md).
 
+### Media card: `/en/images`, `/en/videos` (`article.media-cart-item.image|video`, SKODA-406)
+Measured on the live listings 2026-09-29 (Playwright, computed boxes); EDS `blocks/listing` `mediaCell` +
+`scripts/media-card.js`, `.listing.listing-media`.
+
+| Part | Source (all widths) | EDS token / rule |
+|---|---|---|
+| Thumbnail | `.image-holder.ratio-16x9`, cover crop, radius 8, bg `rgba(0,0,0,.05)`; the link opens the colorbox | `--media-card-radius: 8px`, 16:9, lightbox on click |
+| Date row | `.entry-meta` padding 10px 0, 44px tall; `span.entry-published` 11px / 600 / `#c4c6c7` | `--media-card-pad`, `--media-card-date-row: 24px`, `--card-meta-font-size`, `--skoda-grey-350` |
+| Title / filename | `h3.entry-title` 15/18, 400, `#161718`, 2 lines, padding-bottom 10 → **46px even for one line** | `--media-card-title-size/-line`, `min-height: 2 lines`, clamp 2 |
+| Toolbar | `.article-teaser-toolbar` padding-bottom 10 → 50px; two 40px round buttons, 2px ink ring, white, 8px apart | `--media-card-button: 40px`, `--media-card-button-gap: 8px` |
+| Image buttons | both open a **size menu on click** (`.is-active`): **Add** (`Add/remove Original / 1920px version`, `data-size` `''` / `giant`) and **Download** (`Download Original / 1920px version`, `/direct-download/…`, `_blank`) | `button[aria-expanded]` + `ul[role=menu]`; an image with one size gets a direct link |
+| Size menu | 89×80 at (−24.5, +47) from the button: centred, 7px below; white, `0 3px 8px rgba(0,0,0,.15)`, z 15; rows 40px: padding 12, 16/16, 500, letter-spacing 1px | `--media-card-menu-gap: 7px`, `--media-card-menu-pad: 12px`, `--dropdown-shadow` |
+| Video buttons | no menus: `a.add` (`Add/remove this`, `data-original-only`) + `a.download` (`Download this`, MP4, `_blank`) | single links |
+| Play badge | `.has-play-button::after`, 32px white glyph, centred | `--media-card-play: 32px` (the rails' glyph) |
+| Card height | thumbnail + **140** (44 + 46 + 50): 304.3 @1280 (292 wide), 272.8 @1024/768 (236), 410 @500 (480) | same formula: EDS 300.3 @285, 264.3 @221, 394.3 @452 |
+
+Grid: source 4 / 4 / 3 / 1 columns at 1280 / 1024 / 768 / 500, gap 20 (`--grid-gutter`). The column
+ladder (EDS 4 / 4 / 2 / 1) is SKODA-402a; the card widths also follow the page gutter (SKODA-826).
+The source thumbnail on videos is a live Vimeo iframe; EDS shows the feed `poster` / `image` plus the
+badge and plays the video in the lightbox (no iframe per card).
+
 ### Load-more (`button.ajax-loader-button`)
 - text "Load more"; display flex; border-radius `50px` -> `--pill-radius`; background `#fff`
   -> `--skoda-white`; color `#161718` -> `--skoda-ink`; border `2px solid #161718`; padding
