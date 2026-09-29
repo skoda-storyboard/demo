@@ -55,7 +55,7 @@
      what is left (819px of 1248), the aside the rest, starting 64px after the text
      and ending 10px from the edge. No reading-measure cap: the source prose fills
      its column. Full-width body media (the Gallery slider) bleed the 10px inset. */
-  --story-inset: 10px;
+  --story-inset: var(--page-gutter);
   --story-sidebar-inset: var(--story-inset);
   --story-sidebar-heading-size-compact: 20px;
   --story-sidebar-heading-line-height: 45px;
@@ -91,7 +91,13 @@
   --heading-font-size-story-h3-mobile: 20px;
   --heading-font-size-story-h3: 24px;
   --story-meta-gap: 11px; /* published date → category tag, same row (live) */
-  --story-intro-gap: 48px; /* intro (date + tag) → article body at >=768 (live) */
+
+  /* intro (hero caption: perex, date, tag) → article, measured on the live Epiq story from
+     the caption's bottom edge: the source .content column has margin-top 0 (<768) / 32px
+     (>=768) and its text sits 10px in (panel cell padding, = --story-inset); the aside box
+     starts at the edge with a 32px top padding (>=768) */
+  --story-body-gap: 0px;
+  --story-aside-inset-top: 32px;
 
   /* hero geometry (hero.md §8; SKODA-202) */
   --hero-vh: 61.8vh;
@@ -145,6 +151,10 @@
 
   /* layout / nav */
   --content-max-width: 1248px;
+
+  /* page gutter (SKODA-826): the source's constant Bootstrap 10px gutter at every width,
+     inside the 1248px container (content edge 10 at 375/768/992, 26 at 1280, inner 1228) */
+  --page-gutter: 10px;
   --cover-box-max-width: 1440px; /* live home .cover-box band cap (SKODA-218) */
   --cover-box-padding-top: 66px; /* band top → first heading (Storyboard home) */
   --cover-box-padding-bottom: 60px; /* last rail cards → band end */
@@ -213,6 +223,13 @@
   --bp-tablet: 768px;
   --bp-desktop-s: 992px;
   --bp-desktop: 1080px;
+
+  /* stacking order for page-level fixed UI (SKODA-215), lowest → highest:
+     in-page layers (carousel/cards ≤ 2, downloads size menu 15) < floating action bar 18
+     < header + open mobile nav drawer and its backdrop (header .nav-wrapper, 20)
+     < gallery lightbox (99999) < consent banner (OneTrust ships its own ~2147483645, SKODA-704).
+     The bar stays under the drawer, lightbox and consent banner so they always cover it. */
+  --z-float-dock: 18;
 }
 
 /* The global element defaults below (body, headings, paragraphs, lists, strong/em, hr, line
@@ -222,8 +239,8 @@
    to these rules — the design does not scale them. What DOES scale responsively is heading sizes
    on specific templates (e.g. story/hero title 40px→smaller on mobile); those are
    template/component-specific and live in the owning block's CSS, not here (see _FOUNDATIONS.md
-   §3/§8). The one global rule that changes across breakpoints is section padding (see the
-   992px media query further down). */
+   §3/§8). The section gutter does not change either: it is the constant --page-gutter (10px) at
+   every width (SKODA-826). */
 
 /* box-sizing baseline. A universal `*` reset is disallowed by Stylelint
    (selector-max-universal: 0), so document defaults set it on the root and inherit into
@@ -480,6 +497,12 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
+/* <main> receives programmatic focus (tabindex=-1, e.g. the SKODA-215 scroll-to-top) only to
+   move the reading position; it is not a control, so it gets no page-sized focus ring */
+main[tabindex='-1']:focus {
+  outline: none;
+}
+
 /* buttons */
 p.button-wrapper {
   margin: var(--spacing-s) 0;
@@ -616,20 +639,17 @@ main > .section {
   margin: var(--spacing-xl) 0;
 }
 
+/* the 1248px cap includes the gutter, as the source .container does (border-box), so wide
+   screens get a 1228px content column 10px inside the centred container */
 main > .section > div {
+  box-sizing: border-box;
   max-width: var(--content-max-width);
   margin: auto;
-  padding: 0 var(--spacing-l);
+  padding: 0 var(--page-gutter);
 }
 
 main > .section:first-of-type {
   margin-top: 0;
-}
-
-@media (width >= 992px) {
-  main > .section > div {
-    padding: 0 var(--spacing-xl);
-  }
 }
 
 /* homepage "Social media" heading (SKODA-217; live .socials-static h3): the
@@ -799,14 +819,16 @@ body.story main > .section.story-intro .tags-list li {
   margin-bottom: 0;
 }
 
-/* intro → article body: 16px on the source below 768 (the block margins collapse
-   there, so the body's top margin sets the gap) */
-body.story main > .section.story-intro {
+/* intro → article body. The intro ends the first (hero) section on every story: in the
+   Hero Image caption, or in the hero section's own default content (.story-intro). Its
+   bottom margin is dropped so the gap is set once, on the section that follows. */
+body.story main > .section:first-of-type {
   margin-bottom: 0;
 }
 
-body.story main > .section.story-intro + .section {
-  margin-top: var(--spacing-m);
+body.story main > .section:first-of-type + .section.body-column {
+  margin-top: var(--story-body-gap);
+  padding-top: var(--story-inset);
 }
 
 body.story main > .section.body-column .default-content-wrapper ul {
@@ -850,6 +872,10 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
    body track is the 10px inset + 2/3 of the inset content box, so the text lands on
    the source's 819px at 1248 (707 at 1080, 499 at 768); the aside takes the rest. */
 @media (width >= 768px) {
+  body.story {
+    --story-body-gap: 32px;
+  }
+
   body.story main {
     display: grid;
     grid-template-columns:
@@ -887,11 +913,11 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
     padding-inline: var(--spacing-xxl) var(--story-inset);
   }
 
-  /* intro → article body is 48px here on the source (grid items don't collapse
-     margins, so both first-row sections carry it and stay top-aligned) */
-  body.story main > .section.story-intro ~ .section.body-column,
-  body.story main > .section.story-intro ~ .section.sidebar {
-    margin-top: var(--story-intro-gap);
+  /* intro → aside: the box starts at the intro's edge and pads its content 32px down, level
+     with the body column's box (source .sidebar). Grid items don't collapse margins. */
+  body.story main > .section:first-of-type ~ .section.sidebar {
+    margin-top: 0;
+    padding-top: var(--story-aside-inset-top);
   }
 
   body.story main > .section.dark {

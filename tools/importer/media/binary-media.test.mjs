@@ -146,6 +146,18 @@ test('public proof refuses redirects and mismatched MIME/size', async () => {
       await verifyPublicBinary(hostedMp4, 'video', 42),
       { url: hostedMp4, mime: 'video/mp4', bytes: 42 },
     );
+    global.fetch = async () => new Response(null, {
+      status: 200,
+      headers: { 'content-type': 'video/mp4', 'content-length': '4941784081' },
+    });
+    assert.deepEqual(
+      await verifyPublicBinary(hostedMp4, 'video', 4_941_784_081),
+      { url: hostedMp4, mime: 'video/mp4', bytes: 4_941_784_081 },
+    );
+    await assert.rejects(
+      verifyPublicBinary(hostedMp4, 'video', 4_941_784_080),
+      /type\/size mismatch/,
+    );
     global.fetch = async () => new Response(null, { status: 302, headers: { location: 'https://signed.example.test/' } });
     await assert.rejects(verifyPublicBinary(hostedMp4, 'video', 42), /HEAD returned 302/);
     global.fetch = async () => new Response(null, { status: 403 });

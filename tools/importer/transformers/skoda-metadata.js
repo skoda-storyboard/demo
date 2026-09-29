@@ -211,6 +211,21 @@ function extractTagsAndFacets(document, pageUrl = '') {
       if (m) add('model', m[1].toLowerCase());
     }
   }
+
+  // Fallback: the page's OWN post <article> classes (`model-octavia view-exterior
+  // years-48727`) — a press-kit hub has no entry-tags row, its terms live only there.
+  // Only the article whose id is the body's `postid-N` (a single post): never a listing
+  // card. Numeric term ids are skipped. Keep in sync with
+  // skoda-metadata-extract.mjs::facetsFromPostClass.
+  if (tags.length === 0) {
+    const cls = (document.body && document.body.getAttribute('class')) || '';
+    const id = cls.match(/\bpostid-(\d+)\b/);
+    const post = id && document.querySelector(`article[data-post-id="${id[1]}"]`);
+    String((post && post.getAttribute('class')) || '').split(/\s+/).forEach((token) => {
+      const m = token.toLowerCase().match(/^([a-z]+)-([a-z0-9-]+)$/);
+      if (m && FACETS.includes(m[1]) && !/^\d+$/.test(m[2])) add(m[1], m[2]);
+    });
+  }
   return { tags, byFacet };
 }
 
@@ -246,7 +261,8 @@ export default function transform(hookName, element, payload) {
     || metaContent(document, 'meta[name="description"]') || '';
   const imageSrc = overrides.image || metaContent(document, 'meta[property="og:image"]') || '';
   const publisheddate = overrides.publisheddate || extractDate(document);
-  const template = overrides.template || extractTemplate(document);
+  // fixed override → the page's CPT signal → the importer's default (skoda-metadata-extract.mjs::pickTemplate)
+  const template = overrides.template || extractTemplate(document) || overrides.templateDefault || '';
   const category = overrides.category || extractCategory(pageUrl);
   const { tags: derivedTags, byFacet } = extractTagsAndFacets(document, pageUrl);
 

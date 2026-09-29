@@ -6,7 +6,7 @@
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1d *(planning estimate, not a quote)*
 - **Status (2026-09-29):** 🟡 IN REVIEW. The `Story Rail (press)` variant is built in `story-rail.css`
   only. It is QA'd on `/drafts/skoda-224-story-rail-press` and on the 4 M1 releases. AC 2 (click / drag)
-  is **blocked on SKODA-212a**: the shared carousel bug, which the story band has too.
+  now passes: `main` carries the SKODA-212a pointer fix, merged into this branch on 2026-09-29.
 
 ## Origin
 SKODA-607 phase split (2026-09-27); absorbs the block half of SKODA-612 (the importer half ships in 607).
@@ -34,7 +34,7 @@ SKODA-607 phase split (2026-09-27); absorbs the block half of SKODA-612 (the imp
 ## Acceptance Criteria
 - [ ] On Zellmer, National Theatre, Board and Peaq (branch preview), card and cell geometry match the source at
       1280/1024/768/500 (±2px); arrows behave as the source (Board: both disabled).
-- [ ] Card click navigates, drag scrolls (SKODA-212a behaviour); no `href=""` anywhere.
+- [x] Card click navigates, drag scrolls (SKODA-212a behaviour); no `href=""` anywhere.
 - [ ] Story related rails (SKODA-820) unchanged unless they opt into the variant.
 - [ ] lint + tests green; no re-import needed (contract shape 1).
 
@@ -102,9 +102,15 @@ SKODA-607 phase split (2026-09-27); absorbs the block half of SKODA-612 (the imp
   - **Why it was broken:** `decorateButtons` only buttonizes bold or italic links, and it outputs
     `button-wrapper` while the template expected `button-container`. The template now marks the plain
     "All" link itself (`decorateRelatedLinks`).
-- **Blocked:** card click and drag do nothing, because `carousel.js` captures the pointer on
-  `pointerdown`. The Epiq story band, which this ticket doesn't change, behaves the same. This is
-  SKODA-212a, and this ticket doesn't touch carousel code.
+- **Click / drag (unblocked 2026-09-29, after merging `main` with SKODA-212a):** on Zellmer at 1280 a
+  mouse drag scrolls the band one card (374px) without navigating, a card click opens that release,
+  "next" pages 1123 → 2246 → 2870 and disables with the "All" card in view, and the "All" card opens
+  the "All" listing. The last-page stop position (above) is unchanged by 212a.
+- **Merge with `main` (SKODA-208 / 212a / 826):** the rail now passes its variant classes to the
+  inner carousel (`carousel press`), which nothing styles; index mode keeps its `limit + 1` fetch
+  alongside the media-rail lightbox rows; `main`'s `--carousel-title-lines: 1` for the press-release
+  band agrees with this variant's one-line title. Geometry re-measured at 1280 / 1024 / 768 / 500:
+  unchanged.
 
 ## Dependencies
 SKODA-212 (rail), SKODA-212a (pointer fix), SKODA-820 (curated-mode fix, PR #157: rebase on it), SKODA-607 (emits

@@ -46,7 +46,7 @@ Archives + directories:
   an invalid index-driven `Listing` (the hub `tags` key is not read). **SKODA-207 must
   replace this** with source-order authored Cards: 25 directory cards (M2) and five
   M1 hub mosaics (8/14/10/5/12 tiles, mixed Story/Press Kits). `hero-banner.js`
-  must emit `Hero Image (overlay)`, not the boilerplate `Hero`; the shared mosaic
+  emits `Hero Image (overlay)` (done 2026-09-28, SKODA-208); the shared mosaic
   variant is SKODA-221. See [`series.md`](../ui-specs/series.md) §7.
 - **`home-sto`** / **`home-mr`** — `promo-box` (curated cards) + `home-rail` (self-classifying index rails; social strip dropped).
 - **`skodapedia`** — glossary directory index block (term-detail prebake → SKODA-802).
@@ -77,6 +77,19 @@ Whole-page shaping, run as `beforeTransform` / `afterTransform` hooks:
 - **`skoda-metadata.js`** — the shared, content-type-agnostic query-index Metadata block (SKODA-401); logic mirrored 1:1 by the unit-tested `skoda-metadata-extract.mjs`. All importers append it; do not hand-roll per-page metadata.
 - **`skoda-images.js`** — after block parsing, normalize default-content images to direct `<div>` children, preserve alt, and render `data-caption` without duplicating native figure captions. Wired into the M1 home, story, press-release, model, series-hub, and images/videos importers; future importers should reuse it.
 - **`skoda-links.js`** (SKODA-605): source-host link rewriting, registered **last** in `afterTransform` in all 16 importers, so it also sees links built by parsers and later transformers. A `[www.]skoda-storyboard.com` href becomes a site-relative EDS path (lowercase, no trailing slash, `/en/` → `/en`, query + hash kept) **only when the target is a demo page**: the M1 URL set + rail-feed corpus, generated between the `BEGIN/END GENERATED ALLOWLIST` markers by `npm run import:allowlist`. Every other source-host link stays absolute (D-3 default (b); SKODA-609). It also points root-relative `/direct-download/…` at the live source and strips `#s_aid`/`#s_cid`. After editing either URL list, run `npm run import:allowlist` and re-bundle; `skoda-links.test.mjs` fails on drift. Transformers must stay self-contained (no `import`, no named exports): the transformer validator and the bundles load them standalone.
+
+- **`skoda-nbsp.js`**: keeps the source's glued non-breaking spaces (`a&nbsp;roomy`). helix
+  `html2md` turns U+00A0 into a plain space before any hook sees the page, so every import-*.js
+  calls it from the import config's **`preprocess`** hook: each U+00A0 between two visible
+  characters becomes a plane-15 private-use placeholder (U+F00A0) that survives html2md and
+  md2da, and `push-lib` `wrapPage` restores U+00A0 before the DA upload. `content/*.plain.html`
+  therefore holds the placeholder, not U+00A0; always push through `import:push`. Pages
+  imported before 2026-09-28 lost their non-breaking spaces and wrap a line differently on
+  mobile until re-imported.
+- **Press-kit hubs (interim until SKODA-805):** `page-base` passes `templateDefault: 'page'`
+  (not a fixed `template`), so a flattened `single-press_kit` page keeps `template=press_kit`,
+  and `skoda-metadata` reads the page's own post classes (`model-octavia`) when there is no tag
+  row. That is enough for the Press Kits rails; the hub layout is SKODA-805's.
 
 ### `import-<name>.js` + `import-<name>.bundle.js`
 The `import-<name>.js` wires it together: embeds the `page-templates.json` entry, registers parsers + transformers, runs the two hooks around `WebImporter.rules`, and writes a sanitized output path. The **`.bundle.js` is the runnable artifact** — that's what the bulk runner executes.

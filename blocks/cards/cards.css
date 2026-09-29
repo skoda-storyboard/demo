@@ -37,6 +37,10 @@
   aspect-ratio: 16 / 9;
 }
 
+.cards.key-facts .card-teaser-image img {
+  aspect-ratio: 1;
+}
+
 .cards.tiles .card-teaser-image picture,
 .cards.tiles .card-teaser-image img {
   position: absolute;
@@ -164,12 +168,13 @@
 }
 
 /* ---- social variant (SKODA-217): homepage follow-profile tiles ----------
-   Layer 1: a centred grid capped at the source's card area (700px of 220px
-   cards). Layer 2: the source goes straight from one column to three (no
-   two-column state) at a 640px viewport; as a container query on the block's
-   own width that is 592px (640 less the 24px section padding either side), so
-   the switch lands on the same viewport and follows the block into any column
-   (recheck 639/640 when SKODA-826 changes the section padding).
+   Layer 1: a centred grid capped at the source's 720px grid (700px of 220px
+   cards plus the 10px slot insets). Layer 2: the source goes straight from one
+   column to three (no two-column state) at a 640px viewport; as a container query
+   on the block's own width that is 620px (640 less the 10px --page-gutter either
+   side, SKODA-826), so the switch lands on the same viewport and follows the block
+   into any column. Container conditions can't read custom properties: retune 620
+   if --page-gutter changes.
    Variant tokens (measured on the live /en/ .socials-static), read by the
    .card-teaser.social tiles inside (styles/card-teaser.css): 76px icon, 20px
    icon → handle and card gaps, content padding 32/16/8; the live grid is 720px
@@ -178,23 +183,26 @@
   --social-card-icon-size: 76px;
   --social-card-gap: 20px;
   --social-card-padding: 32px 16px 8px;
-  --social-card-grid-max: 700px;
+  --social-card-inset: 10px; /* live slot inset either side of the grid */
+  --social-card-grid-max: 720px; /* 700px of cards + the two insets */
 
   container: social-cards / inline-size;
 }
 
 .cards.social ul {
+  box-sizing: border-box;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--social-card-gap);
   max-width: var(--social-card-grid-max);
   margin-inline: auto;
+  padding-inline: var(--social-card-inset);
 }
 
 .cards.social li {
   margin: 0;
 }
 
-@container social-cards (width >= 592px) {
+@container social-cards (width >= 620px) {
   .cards.social ul {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -285,6 +293,107 @@
 @container (width >= 761px) {
   .cards.series-directory ul {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ==========================================================================
+   `key-facts` variant (SKODA-208 model page "Highlights"). Measured on the live Octavia /
+   Superb / Fabia pages (.widget_ys-so-widget-highlights .item):
+     <768  stacked: title (uppercase), a full-width 1:1 circle image, then the text
+     ≥768  one row per fact, image 25% / text 75%, vertically centred; the image sits
+           on the right for odd facts and on the left for even ones.
+   The circle is the cell minus a 10px gutter (195px in the 819px model column).
+   ========================================================================== */
+.cards.key-facts {
+  --key-facts-gap: 40px;
+  --key-facts-gutter: 10px;
+  --key-facts-text-inset: 30px;
+  --key-facts-title-size: 24px;
+  --key-facts-title-gap: 20px;
+}
+
+.cards.key-facts ul {
+  display: block;
+}
+
+.cards.key-facts .card-teaser {
+  flex-direction: column;
+  margin-bottom: var(--key-facts-gap);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
+}
+
+/* mobile order title → image → text needs the title out of the body box */
+.cards.key-facts .card-teaser-body {
+  display: contents;
+  gap: 0;
+}
+
+.cards.key-facts .card-teaser-title {
+  order: 1;
+  margin: 0 0 var(--key-facts-title-gap);
+  font-size: var(--key-facts-title-size);
+  font-weight: var(--weight-regular);
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.cards.key-facts .card-teaser-image {
+  order: 2;
+  margin-bottom: var(--key-facts-title-gap);
+  border-radius: 50%;
+  background-color: var(--divider-color);
+}
+
+.cards.key-facts .card-teaser-summary {
+  order: 3;
+  margin: 0 0 var(--key-facts-title-gap);
+  font-size: var(--body-font-size-m);
+  line-height: var(--line-height-body);
+}
+
+/* no zoom: the facts are not links */
+.cards.key-facts .card-teaser:hover .card-teaser-image img,
+.cards.key-facts .card-teaser:has(:focus-visible) .card-teaser-image img {
+  scale: none;
+}
+
+@media (width >= 768px) {
+  .cards.key-facts .card-teaser {
+    flex-direction: row-reverse; /* odd facts (1st, 3rd, …): image right */
+    align-items: center;
+  }
+
+  .cards.key-facts .card-teaser:nth-child(even) {
+    flex-direction: row;
+  }
+
+  .cards.key-facts .card-teaser-image {
+    order: 0;
+    flex: 0 0 calc(25% - var(--key-facts-gutter));
+    margin: 0 var(--key-facts-gutter) 0 0;
+  }
+
+  .cards.key-facts .card-teaser:nth-child(even) .card-teaser-image {
+    margin: 0 0 0 var(--key-facts-gutter);
+  }
+
+  .cards.key-facts .card-teaser-body {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    margin: 0;
+    padding: 0 var(--key-facts-text-inset) 0 var(--key-facts-gutter);
+  }
+
+  .cards.key-facts .card-teaser:nth-child(even) .card-teaser-body {
+    padding: 0 var(--key-facts-gutter) 0 var(--key-facts-text-inset);
+  }
+
+  .cards.key-facts .card-teaser-title {
+    text-transform: none;
   }
 }
 

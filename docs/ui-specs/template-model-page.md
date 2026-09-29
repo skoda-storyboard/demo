@@ -12,6 +12,25 @@ Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 > - Rail heading is `h3.search-results-heading` 26/32.5/600, not h2. The Bodywork rail centres its cells (`cellAlign:center`, `contain:false`).
 > - **Key Facts** (5–6 illustrated rows) and **Technical Data** (dark band, six spec rows + PDF) are unspecced. They are folded into the SKODA-208 ACs.
 
+> **Build re-capture (2026-09-28, SKODA-208 UI half).** Measured on Octavia / Superb / Fabia / Peaq / Epiq at
+> 1920–320; these values are what the build reproduces and override §2–§5 where they differ:
+> - **Hero:** image 9:5 (<768) with the chip overlapping its bottom edge and a 24/700 ink title below; 3:1 at
+>   768–1079 (24/700 ink title top-left, chip clipped); 5:2 at 1080–1439 (512 at 1280; chip + 36/700 white title at
+>   a 5% inset, 50% wide); 3:1 from 1440.
+> - **Nav:** 99px white bar, links 14/600 grey-500 with a 28px icon, hover/current = ink text, `#419468` icon and a
+>   3px bar; sticky from 768, hidden below.
+> - **Text panels:** 50px top padding, `h2` 40/300 (Tech Data 40/700 centred white), an 8/12 centred column from
+>   992. Short pages (Peaq, Epiq) have an extra 74px spacer (50px < 768) before the description.
+> - **Highlights:** rows 25% circle image / 75% text, image right on odd rows; stacked title → image → text on mobile.
+> - **Drawings:** h3 24/300 + full-column image, each a 50px panel. **Tech Data:** 1248 dark band, padding 80,
+>   figures 90/45/30% (value 32, unit 24, label 16/300), 50px apart; mint 194×48 PDF pill; Fabia banner at the top.
+> - **Rails:** margin 24/48 + 24px header pad; h3 26/600 + "Based on tags" 16/600 `#c4c6c7`; "All" ghost pill
+>   90×36; cells 90/45/30% (overlay, derivatives) or 90/30/22.5% (images, videos) of content + gutter. Derivatives
+>   centred with a 45px title strip; media cards: date row 44, two-line 15/18 title, (toolbar 50 — cart, not built).
+> - **EDS target (built):** template `skoda-model` + `hero-image (overlay)`, `cards (key-facts)`, `columns (stats)`,
+>   `story-rail` / `carousel` (`center`, `caption`, `media`, `video`). No `in-page-nav` / `spec-table` block.
+>   Runtime `template` metadata is `skoda_model` (§8 `model-page` is the importer's template name).
+
 ## 1. Identity
 
 - **Template:** Model page (one page per vehicle model).

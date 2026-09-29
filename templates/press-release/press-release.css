@@ -10,7 +10,7 @@
    ========================================================================== */
 
 body.press-release {
-  --pr-gutter: 10px;
+  --pr-gutter: var(--page-gutter);
   --pr-header-offset: 32px;
   --pr-sidebar-inset: var(--spacing-xxl);
   --pr-date-size: 11px;
