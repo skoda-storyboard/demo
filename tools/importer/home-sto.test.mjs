@@ -112,7 +112,7 @@ test('Storyboard home imports the 9-band stack in source order, dark Social + Se
   });
   assert.equal(path, '/en');
   assert.deepEqual(sections(element), [
-    'Cards (promo)',
+    'Promo Box', // indexed promo (SKODA-827): index config, no duplicated teaser markup
     'Stories:Latest Stories [cover-box]',
     'h2:Social media Cards (social) [cover-box, dark]',
     'Story Rail:Models [cover-box]',

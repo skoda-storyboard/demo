@@ -42,13 +42,23 @@ var CustomImportScript = (() => {
   });
 
   // tools/importer/parsers/promo-box.js
-  function parse(element, { document: document2 }) {
-    const items = Array.from(element.querySelectorAll("article.promo-box-item, .item article, .items > .item")).filter((el, i, arr) => arr.indexOf(el) === i);
+  function parse(element, { document: document2, indexDriven = false }) {
+    if (indexDriven) {
+      element.replaceWith(WebImporter.DOMUtils.createTable([
+        ["Promo Box"],
+        ["template", "story"],
+        ["path", "/en/"],
+        ["limit", "3"]
+      ], document2));
+      return;
+    }
+    const articles = [...element.querySelectorAll("article.promo-box-item, .item article")];
+    const items = (articles.length ? articles : [...element.querySelectorAll(".items > .item")]).filter((el, i, arr) => arr.indexOf(el) === i);
     if (items.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const cells = [["Cards (promo)"]];
+    const cells = [["Promo Box"]];
     let emitted = 0;
     items.forEach((item) => {
       const img = item.querySelector("img");

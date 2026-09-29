@@ -4,17 +4,18 @@
 /**
  * Import orchestrator: Škoda Storyboard home (template-homepage, /en/).
  *
- * Featured promo-box (curated cards), the index-driven "Latest Stories" feed
- * (home-stories → Stories, with the authored offset that skips the promo posts)
- * and a stack of index-driven Story Rails (home-rail self-classifies each
- * .search-results rail from its heading + "All" link / type-<cpt> class). The
- * "Social media" band (.socials-static) is not index-driven: social-cards turns it
- * into a heading + Cards (social) section of the three follow-profile links
- * (SKODA-217). Every other source `.cover-box` becomes its own section
- * (skoda-dark-bands; SKODA-218, SKODA-611a): light bands carry `Style: cover-box`,
- * dark ones (Series) `Style: cover-box, dark`, so the page keeps the source's
- * 9-band stack (promo + 8 cover-boxes). Metadata template=page (nav/direct only;
- * body class carries `page`). Content-driven detection only.
+ * The indexed featured promo-box (SKODA-827: index config, never duplicated
+ * teaser markup), the index-driven "Latest Stories" feed (home-stories → Stories,
+ * with the authored offset that skips the promo's 3 newest stories) and a stack of
+ * index-driven Story Rails (home-rail self-classifies each .search-results rail
+ * from its heading + "All" link / type-<cpt> class). The "Social media" band
+ * (.socials-static) is not index-driven: social-cards turns it into a heading +
+ * Cards (social) section of the three follow-profile links (SKODA-217). Every
+ * other source `.cover-box` becomes its own section (skoda-dark-bands; SKODA-218,
+ * SKODA-611a): light bands carry `Style: cover-box`, dark ones (Series)
+ * `Style: cover-box, dark`, so the page keeps the source's 9-band stack (promo +
+ * 8 cover-boxes). Metadata template=page (nav/direct only; body class carries
+ * `page`). Content-driven detection only.
  */
 
 import promoBoxParser from './parsers/promo-box.js';
@@ -38,7 +39,7 @@ const parsers = {
 const PAGE_TEMPLATE = {
   name: 'home-sto',
   description:
-    'Škoda Storyboard home (template-homepage). Curated promo-box cards + the Latest Stories feed (home-stories) + index-driven Story Rails (home-rail) + the Social media band as Cards (social) (social-cards), one section per source cover-box band. Metadata template=page. Content-driven detection only.',
+    'Škoda Storyboard home (template-homepage). Indexed Promo Box + the Latest Stories feed (home-stories) + index-driven Story Rails (home-rail) + the Social media band as Cards (social) (social-cards), one section per source cover-box band. Metadata template=page. Content-driven detection only.',
   urls: ['https://www.skoda-storyboard.com/en/'],
   metadata: { template: 'page' },
   // every light .cover-box is its own section too (skoda-dark-bands, SKODA-611a)
@@ -114,7 +115,9 @@ export default {
       const parser = parsers[block.name];
       if (parser) {
         try {
-          parser(block.element, { document, url, params });
+          parser(block.element, {
+            document, url, params, indexDriven: block.name === 'promo-box',
+          });
         } catch (e) {
           console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
         }

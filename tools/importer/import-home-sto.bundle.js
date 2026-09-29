@@ -42,13 +42,23 @@ var CustomImportScript = (() => {
   });
 
   // tools/importer/parsers/promo-box.js
-  function parse(element, { document: document2 }) {
-    const items = Array.from(element.querySelectorAll("article.promo-box-item, .item article, .items > .item")).filter((el, i, arr) => arr.indexOf(el) === i);
+  function parse(element, { document: document2, indexDriven = false }) {
+    if (indexDriven) {
+      element.replaceWith(WebImporter.DOMUtils.createTable([
+        ["Promo Box"],
+        ["template", "story"],
+        ["path", "/en/"],
+        ["limit", "3"]
+      ], document2));
+      return;
+    }
+    const articles = [...element.querySelectorAll("article.promo-box-item, .item article")];
+    const items = (articles.length ? articles : [...element.querySelectorAll(".items > .item")]).filter((el, i, arr) => arr.indexOf(el) === i);
     if (items.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const cells = [["Cards (promo)"]];
+    const cells = [["Promo Box"]];
     let emitted = 0;
     items.forEach((item) => {
       const img = item.querySelector("img");
@@ -948,7 +958,7 @@ var CustomImportScript = (() => {
   };
   var PAGE_TEMPLATE = {
     name: "home-sto",
-    description: "\u0160koda Storyboard home (template-homepage). Curated promo-box cards + the Latest Stories feed (home-stories) + index-driven Story Rails (home-rail) + the Social media band as Cards (social) (social-cards), one section per source cover-box band. Metadata template=page. Content-driven detection only.",
+    description: "\u0160koda Storyboard home (template-homepage). Indexed Promo Box + the Latest Stories feed (home-stories) + index-driven Story Rails (home-rail) + the Social media band as Cards (social) (social-cards), one section per source cover-box band. Metadata template=page. Content-driven detection only.",
     urls: ["https://www.skoda-storyboard.com/en/"],
     metadata: { template: "page" },
     // every light .cover-box is its own section too (skoda-dark-bands, SKODA-611a)
@@ -1013,7 +1023,12 @@ var CustomImportScript = (() => {
         const parser = parsers[block.name];
         if (parser) {
           try {
-            parser(block.element, { document: document2, url, params });
+            parser(block.element, {
+              document: document2,
+              url,
+              params,
+              indexDriven: block.name === "promo-box"
+            });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
           }

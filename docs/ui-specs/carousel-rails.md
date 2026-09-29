@@ -85,6 +85,13 @@ Standard rails (`.images / .models / .videos .items.flickity-enabled .item`, and
 Content-heavy rails (`.attachments / .news .items.flickity-enabled .item`): `90%` (<768) / `45%`
 (>=768, ~2.2/view) / `30%` (>=992, ~3.3/view) (· MR source CSS).
 
+On landing pages, the EDS `story-rail` applies this wider ladder only when its
+authored `template` is `press_release` (including the Storyboard home's "Latest
+News" and Media Room's "News"). The block expands through the generic section
+padding to the source's full-width rail, capped at `--content-max-width`; its
+reserved height follows the same cell width. Story, model, image, video and
+press-detail related rails keep their existing layouts.
+
 **Story-detail bottom Related Stories (SKODA-820)** follows the content-heavy ladder,
 not the homepage category ladder. Chrome DevTools CSS/DOM extraction on
 `/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/` (2026-09-25):
