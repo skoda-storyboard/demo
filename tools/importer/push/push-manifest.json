@@ -242,9 +242,24 @@
       "pushedAt": "2026-09-28T10:18:21.491Z",
       "previewedHash": "188cf779312589bc78793504387a00ac9c58cb15b2dedf99258c63371668c2b0"
     },
+    "/en/media-room": {
+      "hash": "fe3a51830fdc5e3c93623baf2d295eb4fc0f77cc154ebba0c21a287e73f71411",
+      "pushedAt": "2026-09-29T22:49:37.604Z",
+      "previewedHash": "fe3a51830fdc5e3c93623baf2d295eb4fc0f77cc154ebba0c21a287e73f71411"
+    },
     "/en/models/skoda-elroq-through-designers-eyes": {
       "hash": "f1bdf4fe2b1e14197d33b458fc5e1cc48a4ec90a0e2b317d757d869029641c7e",
       "pushedAt": "2026-09-26T06:46:02.390Z"
+    },
+    "/en/news": {
+      "hash": "deae8f359eac1497edd828b329f91ca79fea93a28423593898adf892637db9eb",
+      "pushedAt": "2026-09-29T22:46:38.907Z",
+      "previewedHash": "deae8f359eac1497edd828b329f91ca79fea93a28423593898adf892637db9eb"
+    },
+    "/en/press-kits": {
+      "hash": "4ce984ff53a48f916fc0971cb375e32e92d6d08ba867707afed40cc389a54195",
+      "pushedAt": "2026-09-29T22:46:38.907Z",
+      "previewedHash": "4ce984ff53a48f916fc0971cb375e32e92d6d08ba867707afed40cc389a54195"
     },
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit": {
       "hash": "dcecb1564ff72ec659fff6ae865ac33d6896a0cb42df0eca6f4e028b9c39b4d5",
