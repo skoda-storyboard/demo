@@ -108,10 +108,11 @@ function sectionsOf(element) {
   });
 }
 const cache = {};
-function importPage(key) {
-  if (cache[key]) return cache[key];
+function importPage(key, edit) {
+  if (cache[key] && !edit) return cache[key];
   const slug = PAGES[key];
   const dom = new JSDOM(readFileSync(path.join(FIXTURES, `${slug}.html`), 'utf8'), { url: `${SRC}/${slug}/` });
+  if (edit) edit(dom.window.document);
   globalThis.document = dom.window.document;
   globalThis.window = dom.window;
   importer.preprocess({ document: dom.window.document });
@@ -121,8 +122,9 @@ function importPage(key) {
     url: `${SRC}/${slug}/`,
     params: { originalURL: `${SRC}/${slug}/` },
   });
-  cache[key] = { element, sections: sectionsOf(element) };
-  return cache[key];
+  const result = { element, sections: sectionsOf(element) };
+  if (!edit) cache[key] = result;
+  return result;
 }
 
 const rowsOf = (table) => [...table.querySelectorAll('tr')].slice(1);
@@ -130,9 +132,12 @@ const find = (sections, name) => sections.flatMap((s) => s.nodes).find((n) => n.
 
 test('section model: header, body-column, sidebar, media-box, related (only when present)', { skip }, () => {
   const expect = ['body-column', 'sidebar', 'dark, full-width, media-box', 'dark, full-width, related'];
-  ['zellmer', 'theatre', 'board', 'peaq'].forEach((k) => {
+  ['theatre', 'board', 'peaq'].forEach((k) => {
     assert.deepEqual(importPage(k).sections.map((s) => s.style), [null, ...expect], k);
   });
+  // Zellmer's grey FAQ panel closes the body as its own highlight section (SKODA-824)
+  assert.deepEqual(importPage('zellmer').sections.map((s) => s.style), [
+    null, 'body-column', 'body-column, highlight-grey', ...expect.slice(1)]);
   // Superb has no Related Press Releases band
   assert.deepEqual(importPage('superb').sections.map((s) => s.style), [null, ...expect.slice(0, 3)]);
 });
@@ -173,11 +178,38 @@ test('body: every release keeps its Buzzsprout player; Peaq keeps the inline Vim
   assert.ok(!peaq.some((a) => /direct-download|attachment_id/.test(a.href)), 'video cart/download toolbar dropped');
 });
 
-test('body: no decorative <hr>, no empty paragraphs, FAQ panel kept as separate paragraphs', { skip }, () => {
+test('body: no decorative <hr>, no empty paragraphs', { skip }, () => {
   const z = importPage('zellmer').sections[1].content;
   assert.ok(!z.some((n) => n.tagName === 'P' && !txt(n) && !n.querySelector('img, a')), 'no empty <p>');
-  const faq = z.filter((n) => /^(Frequently Asked Questions|When did Klaus Zellmer|What has Klaus Zellmer)/.test(txt(n)));
-  assert.equal(faq.length, 3);
+});
+
+test('highlight (SKODA-824): the grey FAQ panel is its own body-column section, paragraphs kept', { skip }, () => {
+  const { sections } = importPage('zellmer');
+  const panel = sections.find((s) => s.style === 'body-column, highlight-grey');
+  assert.ok(panel, 'highlight section');
+  assert.deepEqual(panel.blocks, [], 'only default content');
+  assert.deepEqual(panel.content.map((n) => txt(n).slice(0, 25)), [
+    'Frequently Asked Question',
+    'When did Klaus Zellmer ta',
+    'What has Klaus Zellmer st',
+  ]);
+  assert.ok(!sections[1].content.some((n) => /Frequently Asked Questions/.test(txt(n))), 'moved out of the body');
+  assert.equal(sections.filter((s) => s.style === 'body-column').length, 1, 'no empty resumed body (the panel is last)');
+  ['theatre', 'superb', 'board', 'peaq'].forEach((k) => {
+    assert.ok(!importPage(k).sections.some((s) => /highlight/.test(s.style || '')), `${k}: no panel`);
+  });
+});
+
+test('highlight (SKODA-824): a panel that opens the body leaves no empty body section', { skip }, () => {
+  const { sections } = importPage('zellmer', (doc) => {
+    // Only the grey FAQ panel is left in the body: no lead image, bullets, perex or text.
+    doc.querySelectorAll('.column-primary .article-teaser img, .entry-summary, .bullet-points').forEach((n) => n.remove());
+    const content = doc.querySelector('.entry-content');
+    [...content.children].filter((n) => !/background/i.test(n.getAttribute('style') || '')).forEach((n) => n.remove());
+  });
+  const styles = sections.map((s) => s.style);
+  assert.equal(styles[1], 'body-column, highlight-grey', 'the panel follows the header directly');
+  assert.ok(!styles.includes('body-column'), 'no metadata-only body section');
 });
 
 test('quotes (SKODA-220): centred pull-quotes become Quote [quote, attribution] in the body column', { skip }, () => {

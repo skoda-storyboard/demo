@@ -279,6 +279,9 @@ var CustomImportScript = (() => {
   var LAYOUT_ATTR = "data-pr-layout";
   var SECTION_STYLES = {
     body: "body-column",
+    // Background panels in the body (Zellmer grey FAQ, SKODA-824, contract highlight v2).
+    "highlight-grey": "body-column, highlight-grey",
+    "highlight-dark": "body-column, highlight-dark",
     sidebar: "sidebar",
     "media-box": "dark, full-width, media-box",
     related: "dark, full-width, related"
@@ -352,6 +355,20 @@ var CustomImportScript = (() => {
     });
     return out;
   }
+  function panelVariant(style) {
+    const value = ((style || "").match(/background(?:-color)?\s*:\s*([^;]+)/i) || [])[1];
+    const hex = (value || "").trim().toLowerCase().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+    const rgb = (value || "").match(/rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/);
+    let channels = null;
+    if (hex) {
+      const h = hex[1].length === 3 ? hex[1].replace(/./g, "$&$&") : hex[1];
+      channels = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+    } else if (rgb) channels = rgb.slice(1, 4).map(Number);
+    if (!channels) return null;
+    const luminance = (0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]) / 255;
+    if (luminance > 0.98) return null;
+    return luminance < 0.5 ? "dark" : "grey";
+  }
   function bodyContent(document, primary) {
     const content = primary.querySelector(".entry-content");
     if (!content) return [];
@@ -376,11 +393,22 @@ var CustomImportScript = (() => {
       else iframe.replaceWith(...replacement ? [replacement] : []);
     });
     content.querySelectorAll("hr").forEach((hr) => hr.remove());
+    content.querySelectorAll(":scope > div[style]").forEach((div) => {
+      const variant = panelVariant(div.getAttribute("style"));
+      if (variant && text3(div)) {
+        div.replaceWith(marker(document, `highlight-${variant}`), ...div.childNodes, marker(document, "body"));
+      }
+    });
     content.querySelectorAll("div[style]").forEach((div) => div.replaceWith(...div.childNodes));
     content.querySelectorAll("p").forEach((p) => {
       if (isEmptyParagraph(p)) p.remove();
     });
     return [...content.childNodes].filter((n) => n.nodeType === 1 || text3(n));
+  }
+  function dropEmptyBodies(nodes) {
+    const isMarker = (n) => n && n.nodeType === 1 && n.hasAttribute(MARKER);
+    const nextElement = (i) => nodes.slice(i + 1).find((n) => n.nodeType === 1);
+    return nodes.filter((n, i) => !(isMarker(n) && n.getAttribute(MARKER) === "body" && (!nextElement(i) || isMarker(nextElement(i)))));
   }
   function sidebarContent(document, secondary, hasMediaBox) {
     const out = [];
@@ -488,7 +516,7 @@ var CustomImportScript = (() => {
     if (media.length) out.push(marker(document, "media-box"), ...media);
     const related = relatedBand ? relatedContent(document, relatedBand) : [];
     if (related.length) out.push(marker(document, "related"), ...related);
-    article.replaceChildren(...out);
+    article.replaceChildren(...dropEmptyBodies(out));
     article.setAttribute(LAYOUT_ATTR, "");
   }
   function finish(element, document) {
