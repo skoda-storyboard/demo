@@ -4,7 +4,7 @@
 - **Phase:** A · **Milestone:** M1 (demo-visible)
 - **GitHub issue:** [#140](https://github.com/skoda-storyboard/demo/issues/140)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🔵 TODO
+- **Status (2026-09-28):** 🟡 IN PROGRESS: importer done (`parsers/quote.js`, branch `skoda-220-quote-importer`); `blocks/quote` TODO. Pages carrying `Quote` stay preview-only until the block lands (contract rule 8).
 
 ## Origin
 Demo URL/block sweep, 2026-09-25 (report §5). Raised by the press-release and press-kit groups. The follow-up
@@ -26,8 +26,8 @@ check confirmed that no ticket covers it (SKODA-801's `skoda-quote` row is a dif
 ## Acceptance Criteria
 - [ ] 1440: quote centred 16/400/24 italic, rule 81×2 black centred, attribution centred bold (±2px).
 - [ ] 390: rule 37×2 centred; quote wraps within the 370 column.
-- [ ] Imported on the 4 PRs + the first-glimpse kit; no stray section breaks.
-- [ ] Lint + unit test for the importer detection.
+- [ ] Imported on the 4 PRs + the first-glimpse kit; no stray section breaks. *(Importer emits 6 + 2 `Quote` tables in local imports; not pushed to DA.)*
+- [x] Lint + unit test for the importer detection (`parsers/quote.test.mjs`, plus the press-release / press-kit-default suites).
 
 ## Dependencies
 SKODA-607 (press-release template), SKODA-805c (press-kit body), SKODA-801 (story quote widget).

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Press-kit local rendering fixture</title>
+  <link rel="stylesheet" href="../../styles/styles.css">
+  <link rel="stylesheet" href="../../blocks/hero-image/hero-image.css">
+  <link rel="stylesheet" href="../../blocks/cards/cards.css">
+  <link rel="stylesheet" href="../../templates/press-kit/press-kit.css">
+</head>
+<body class="press-kit">
+  <header></header>
+  <main>
+    <div class="section">
+      <div class="hero-image overlay block">
+        <div class="hero-image-media">
+          <picture><img src="https://cdn.skoda-storyboard.com/2026/08/peaq-ml-header_b224ade9-1440x773.jpg"
+            alt="Peaq press kit" width="1440" height="773"></picture>
+        </div>
+        <div class="hero-image-content"><h1>Škoda Peaq – Press Kit</h1>
+          <p>The all-new Škoda Peaq arrives as the brand’s new flagship model.</p></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="cards overlay tiles block">
+        <div>
+          <div><p>feature</p></div>
+          <div><img src="https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-1600x800-099_7bbf9e63-1440x720.jpg" alt="Introduction"></div>
+          <div><a href="/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio">Introduction</a></div>
+        </div>
+        <div>
+          <div><p>sq</p></div>
+          <div><img src="https://cdn.skoda-storyboard.com/2026/08/Peaq-ML-Button-1600x800-099_7bbf9e63-1440x720.jpg" alt="Exterior"></div>
+          <div><a href="https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/exterior/">Exterior</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="section press-kit-banners">
+      <div class="default-content-wrapper">
+        <p><a href="http://go.skoda.eu/whatsapp"><img
+          src="https://cdn.skoda-storyboard.com/2024/09/ikony_sb_landscape_WA_EN_f66c79bf.png"
+          alt="Follow Škoda Storyboard on WhatsApp"></a></p>
+        <p><a href="https://cdn.skoda-storyboard.com/2026/09/Skoda_Peaq_323f2835.zip"><img
+          src="https://cdn.skoda-storyboard.com/2023/10/ikony_sb_landscape_down_EN_E_dca67e28.png"
+          alt="Download the press kit ZIP"></a></p>
+      </div>
+    </div>
+  </main>
+  <script type="module">
+    import decorateCards from '../../blocks/cards/cards.js';
+    import decoratePressKit from '../../templates/press-kit/press-kit.js';
+
+    decorateCards(document.querySelector('.cards'));
+    decoratePressKit(document.querySelector('main'));
+  </script>
+</body>
+</html>

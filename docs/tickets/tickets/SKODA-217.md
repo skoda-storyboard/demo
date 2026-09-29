@@ -5,8 +5,9 @@
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo)
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1–2d *(planning estimate, not a quote)*
 - **Status (2026-09-28):** 🟡 In review, [PR #188](https://github.com/skoda-storyboard/demo/pull/188) (QA: matches
-  live at 1280/768/640/1920). Open against other tickets: 500px is 8px narrower and the 592px column switch depends
-  on the section padding (SKODA-826); the shared dark-band heading colour, 1440px cap and band spacing move to
+  live at 1280/768/640/1920). The 500px width and the column switch are resolved by SKODA-826 (branch
+  `skoda-826-gutter`): the query is retuned to 620px and the live 10px slot insets are added, so cards measure
+  335/460/599/186.7/220 at 375/500/639/640/1280, as on live. The shared dark-band heading colour, 1440px cap and band spacing move to
   SKODA-218's shared rules. The section style is `cover-box, dark`, as on every home dark band (SKODA-218).
 
 ## UI Specification

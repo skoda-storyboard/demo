@@ -177,7 +177,8 @@ function bodyContent(document, primary) {
     else iframe.replaceWith(...(replacement ? [replacement] : []));
   });
 
-  // Decorative quote rules: a bare <hr> would split the DA section (quote → SKODA-220).
+  // Stray rules: a bare <hr> would split the DA section. The pull-quote rules are consumed
+  // in `preprocess` (parsers/quote.js, SKODA-220) before helix drops every <hr>.
   content.querySelectorAll('hr').forEach((hr) => hr.remove());
 
   // Background panels (Zellmer grey FAQ, SKODA-824) get their own highlight section and

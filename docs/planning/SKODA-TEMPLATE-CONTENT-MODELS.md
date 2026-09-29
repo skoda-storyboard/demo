@@ -39,7 +39,7 @@ Meta: `template=page`; do not require all 25 linked hubs to be in the M1 index.
 
 ### T5 · Series hub (`/en/series/<slug>/`) — M1, five curated mosaics
 Sections: `Hero Image (overlay)` (image + H1 + SERIES label + perex) →
-`Cards (overlay, tiles)` (pinned `cards-tiles` v1 `[size token, picture, linked
+`Cards (overlay, tiles)` (`cards-tiles` shape 3 `[size token, picture, linked
 title]` rows). Tile counts are 8/14/10/5/12 in the five-hub M1 URL set;
 preserve source order and square/wide/third row mix, including the Press Kits
 tile on 130-years. No sort, tag-filtered Listing, facets or load-more.

@@ -17,13 +17,14 @@
  */
 
 import storyHeroParser from './parsers/story-hero.js';
-import storyFlattenParser, { markHighlights } from './parsers/story-flatten.js';
+import storyFlattenParser, { markHighlights, dropEmptySections } from './parsers/story-flatten.js';
 import pageCleanupTransformer from './transformers/skoda-page-cleanup.js';
 import storyCleanupTransformer from './transformers/skoda-story-cleanup.js';
 import storyAsideTransformer from './transformers/skoda-story-aside.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 import linksTransformer from './transformers/skoda-links.js';
+import nbspTransformer from './transformers/skoda-nbsp.js';
 import normalizeImages from './transformers/skoda-images.js';
 
 const parsers = {
@@ -123,10 +124,12 @@ export default {
   /**
    * Runs on the untouched DOM, before helix-importer's preProcess and the cleanup
    * transformers. The highlight rows' background colour (SKODA-824) is only in the
-   * SiteOrigin head CSS, so the rows are marked here for story-flatten.
+   * SiteOrigin head CSS, so the rows are marked here for story-flatten. Also keeps the
+   * source's glued non-breaking spaces (html2md would turn them into spaces).
    */
   preprocess: ({ document }) => {
     markHighlights(document);
+    nbspTransformer('preprocess', document.body, { document });
   },
 
   transform: (payload) => {
@@ -151,6 +154,8 @@ export default {
     });
 
     executeTransformers('afterTransform', main, payload);
+    // A leading highlight row (SKODA-824) leaves the body section with only its metadata.
+    dropEmptySections(main);
 
     WebImporter.rules.transformBackgroundImages(main, document);
     normalizeImages(main, document);

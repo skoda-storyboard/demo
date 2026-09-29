@@ -7,7 +7,8 @@ Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md). Ticket: [SKODA-207](../t
 **Delivery split:** the five hubs listed in §2 are M1; `/en/series-2/` is M2. This specifies both
 levels now, not 25 new hub imports in M1. Older two-column/newest-first/index-driven hub descriptions
 are superseded by the live URL-to-block [sweep](../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) and the
-direct measurements below. The existing importer and EDS blocks do **not** implement this spec yet.
+direct measurements below. The series hub importer now emits the authored tiles for
+15 preview-only hubs (SKODA-207); the SKODA-221 renderer needs measured QA before publish.
 
 ## 1. Identity
 
@@ -119,7 +120,10 @@ their x-position and size, not just a guessed image ratio. Map design values to 
 
 - One tab stop per card, title as accessible link name and visible `:focus-visible` ring; retain
   sensible image alt text without inventing it for decorative source images.
-- White over-image title contrast ≥4.5:1 with scrim; dark-on-light mobile H1/perex also clear.
+- White over-image tile title contrast ≥4.5:1 with a scoped title-line backdrop;
+  the source's two gradients alone measure as low as ~1.39:1 behind tile
+  titles on the M1 Motorsport hub. The title-only contrast upgrade is an
+  intentional fidelity deviation; dark-on-light mobile H1/perex also clear.
 - Real list (`<ul>/<li>`); one H1 in the hero per page; excerpt must not replace the link title.
 
 ## 7. EDS target
@@ -135,7 +139,7 @@ query index continues to supply the homepage Series rail from page metadata, not
 
 ### DA authoring model
 
-Hub, **pinned** `cards-tiles` v1 (`SKODA-PENDING-BLOCK-CONTRACTS.md`), one row per source tile in
+Hub, **pinned** `cards-tiles` shape 3 (`SKODA-PENDING-BLOCK-CONTRACTS.md`), one row per source tile in
 DOM order, including non-Story tiles:
 
 | Header | First cell | Second cell | Third cell |
@@ -143,13 +147,13 @@ DOM order, including non-Story tiles:
 | `Cards (overlay, tiles)` | `sq` / `sq-small` / `wide` / `third` / `feature` | `<picture>` with source alt | `<a href="/en/…">Title</a>` |
 
 E.g. motorsport row 1 = `sq, sq`; row 2 = `sq-small, wide, sq-small`; row 3 =
-`third, third, third`. **Order/row boundaries matter**: the variant must reproduce each
-source row, including partial final rows; a token-only row sequence must be checked against
-all five mosaics to ensure it can encode those boundaries without relying on auto-flow guesses.
-Card width tokens are **not** rendered card text. Today `blocks/cards/cards.js` only classifies
-image/toolbar/body cells; it would classify a leading token as text. The contract's claimed
-"readable" fallback must be verified in rendered preview, or publishing must wait for
-SKODA-221/its safe fallback.
+`third, third, third`. **Order/row boundaries matter**: a row fills 12/12
+or ends explicitly with `end` on its last tile (`wide end` for a short row).
+The series importer proves all 15 hub row compositions in `series-hub.test.mjs`;
+the renderer must reject overfilled/unterminated rows rather than guess.
+Card width tokens are **not** rendered card text. The SKODA-221 renderer consumes them
+and makes the linked title an H2; QA of all previewed series hubs is still required
+before publication.
 
 Directory, **proposed, not pinned**: `Cards (overlay, series-directory)`, one row per series
 `[<picture>, <a href="/en/series/…">Title</a> + <p>excerpt</p>]` (two cells, same base
@@ -160,7 +164,7 @@ the clipped image area; this likely needs variant-specific decoration/layout usi
 directory, `template=skoda_series` on hubs via `skoda-metadata.js`; Metadata also needs
 title, description and image, and hub metadata must stay indexable for the homepage rail.
 
-### Importer + runtime handoff (not implemented yet)
+### Importer + runtime handoff (series hubs preview-only; M2 directory still pending)
 
 1. `page-templates.json`, `import-series-hub.js`/`import-series-directory.js` and their bundles:
    expand the five-hub URL list; locate `.hero` and `.panel-layout` by source DOM, recognize

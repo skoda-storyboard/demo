@@ -109,6 +109,8 @@ QA must not accept an implementation merely because it:
 
 The rendered result must be inspected.
 
+Every QA/code review follows the mandatory review protocol in [`AGENTS.md` → Code review](AGENTS.md#code-review-mandatory-for-every-pr-review): read the ticket, read the supporting `docs/`, and for UI-affecting PRs measure against origin with Chrome DevTools MCP (measured values, no screenshots).
+
 ---
 
 # Ticket Ownership

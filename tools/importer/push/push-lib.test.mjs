@@ -6,7 +6,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  pagePath, parseList, wrapPage, hashOf, mainContent, contentHash, decideAction, PUSHING, chunk,
+  pagePath, parseList, wrapPage, NBSP_PLACEHOLDER, hashOf, mainContent, contentHash, decideAction,
+  PUSHING, chunk,
   parseJobDetails,
   fragmentPaths, bulkPatternMatches, imageCheck, summarize,
 } from './push-lib.mjs';
@@ -40,6 +41,15 @@ test('wrapPage produces the DA document shape (body > header + main + footer)', 
     wrapPage('  <div><p>x</p></div>\n'),
     '<body><header></header><main><div><p>x</p></div></main><footer></footer></body>',
   );
+});
+
+test('wrapPage restores the source non-breaking spaces from the import placeholder', () => {
+  const plain = `<div><p>plays to the${NBSP_PLACEHOLDER}strengths, offering a${NBSP_PLACEHOLDER}roomy boot</p></div>`;
+  assert.equal(
+    wrapPage(plain),
+    '<body><header></header><main><div><p>plays to the strengths, offering a roomy boot</p></div></main><footer></footer></body>',
+  );
+  assert.equal(NBSP_PLACEHOLDER, '\u{F00A0}', 'the same code point as transformers/skoda-nbsp.js');
 });
 
 test('contentHash ignores wrapper whitespace (no false conflict), not content changes', () => {
