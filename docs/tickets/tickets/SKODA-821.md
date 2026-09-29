@@ -33,5 +33,19 @@ against their own source components, not against the paragraph box.
       intentionally starts 10px farther left and extends 10px farther right.
 - [ ] The change is story-scoped and leaves other page/template spacing intact.
 
+## Re-check 2026-09-29 (review of PR #207)
+The horizontal ACs are **met on `main`**: PR #207's width rules made no difference to the computed boxes. Source vs
+`main`, Epiq story:
+
+| Width | Text x / w (source = `main`) | Slider x / w (source = `main`) |
+|---|---|---|
+| 1440 | 106 / 818.7 | 96 / 839 |
+| 1080 | 10 / 706.7 | 0 / 727 |
+| 768 | 10 / 498.7 | 0 / 519 |
+| 500 | 10 / 480 | 0 / 500 |
+| 375 | 10 / 355 | 0 / 375 |
+
+PR #207 now carries only the vertical intro → body / aside spacing, tracked as [SKODA-829](SKODA-829.md).
+
 ## Dependencies
 SKODA-801 layout (on main via SKODA-822 / PR #113); SKODA-826 global gutter (neighbour).
