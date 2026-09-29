@@ -113,10 +113,23 @@ and finishes it.
   1080, 1953/1953 at 992, 2603/2601 at 768, 2869/2867 at 375. Date, title and lead positions are
   identical at 1280, 1080 and 992.
 - Video: `readyState 4`, duration 368 s, playing (`currentTime` 3.7 s after 4 s), 812×457.
+- **Whole page (review round 2).** First-glimpse, origin/branch, landmarks from the video to the
+  footer (video, WhatsApp callout, banners, contacts, sidebar, band, first tile): **equal at 992 and
+  768**.
+  - At 1280 and 375 there is a constant +24 from the footnote's small print (see Deviations).
+  - Sidebar at 1280/768: headings, the menu (now with "Download Media Box"), Images, the "+51" pill
+    (x1196, 52×40) and Tags equal the source.
+  - Media Box: title 72px into the band, first tile 96px below the title.
+  - Changes: the WhatsApp row is `Columns (callout)` with its 50px icon, the sidebar and band follow the
+    source shell, the column end is 90/112px, accordion rows are 20px apart, and the clip starts 56px
+    after the text before it.
 
 ### Deviations (documented; the AC allows them)
 - **Video:** the native player streams the DAM master (947 MB for first-glimpse) until a web
   rendition exists. Only metadata loads until play.
+- **Footnote small print:** the source sets the "¹ … ²" footnote in `10pt` (`<span style="font-size:
+  10pt">`). DA carries no inline font size, so it renders at 16px: one line (24px) taller at 1280 and
+  375, which shifts everything below it by 24px (equal at 992/768, where both wrap alike).
 - **Show more pill:** 133px wide vs 138px, because the demo has no Škoda Next Medium (500) face.
 - **Media Box below 992:** 24px shorter (645 vs 669 at 768), because the source's tile captions
   switch to 20/24 there. This is downloads tile typography (SKODA-510), not changed here.
