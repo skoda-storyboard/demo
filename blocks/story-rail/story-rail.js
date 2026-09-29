@@ -29,6 +29,8 @@ import {
 } from '../../scripts/aem.js';
 import { loadQueryIndex, defaultIndexUrl, cleanTitle } from '../../scripts/query-index.js';
 import { formatCardDate } from '../../scripts/card-teaser.js';
+import { buildLightbox } from '../../scripts/lightbox.js';
+import { feedLightboxItem } from '../../scripts/media-lightbox.js';
 import {
   scopeRows, filterRows, sortRows, paginate, INDEX_FACETS,
 } from '../listing/listing-logic.mjs';
@@ -111,9 +113,60 @@ export function isConfigTable(block) {
   });
 }
 
+// Rail-chrome settings a curated (hand-picked) rail may keep next to its cards, e.g. the
+// "All" link and the `template` that picks the card style (SKODA-208 model rails).
+const CURATED_SETTINGS = new Set(['template', 'heading', 'viewall', 'view-all', 'all', 'dots']);
+
+/* A two-cell text row whose first cell is one of the curated rail settings (a card's
+   body cell carries a title heading, a setting's value never does). */
+function isSettingsRow(row) {
+  const cells = [...row.children];
+  if (cells.length !== 2) return false;
+  if (!CURATED_SETTINGS.has(toClassName(cells[0].textContent?.trim() || ''))) return false;
+  return !cells[0].querySelector?.('picture, img') && !cells[1].querySelector?.('h1, h2, h3, h4, h5, h6');
+}
+
 export function curatedRows(block) {
-  return [...block.children].map((row) => [...row.children]
+  return [...block.children].filter((row) => !isSettingsRow(row)).map((row) => [...row.children]
     .map((cell) => ({ elems: [...cell.childNodes] })));
+}
+
+/*
+ * The media card's action row (media feed rows, contract media-item): "add to media cart"
+ * and "download", as the shared card-teaser toolbar cell (`<p><a>` per button). The cart
+ * button carries the cart key (`data-id`) and stays inert until the media cart (SKODA-505)
+ * binds it; download links the original (image) or the MP4 (video). Icon-only buttons, so
+ * each gets its label from the source titles. Returns null for non-media rows.
+ */
+export function mediaToolbar(row) {
+  if (row.template !== 'image' && row.template !== 'video') return null;
+  const button = (action, label, href) => {
+    const p = document.createElement('p');
+    const a = document.createElement('a');
+    a.className = `media-cart-action ${action}`;
+    a.href = href;
+    a.title = label;
+    a.setAttribute('aria-label', label);
+    a.dataset.action = action;
+    p.append(a);
+    return { p, a };
+  };
+  const elems = [];
+  if (row.id) {
+    const { p, a } = button('add', 'Add to media cart', '#');
+    a.dataset.id = row.id;
+    a.setAttribute('role', 'button');
+    a.setAttribute('aria-disabled', 'true');
+    elems.push(p);
+  }
+  const file = row.template === 'image' ? row.original : row.mp4;
+  if (file) {
+    const { p, a } = button('download', row.template === 'image' ? 'Download original' : 'Download video', file);
+    a.setAttribute('download', '');
+    a.target = '_blank';
+    elems.push(p);
+  }
+  return elems.length ? { elems } : null;
 }
 
 /*
@@ -144,13 +197,14 @@ export function rowToCells(row) {
   h.append(link);
   elems.push(h);
   const body = { elems };
+  const toolbar = mediaToolbar(row);
 
   // OMIT the image cell entirely when the row has no image (SKODA-212 review
   // P2): an empty placeholder <div> would be sniffed as a second .card-teaser-
   // body, giving an overlay card two bodies + doubled 16/9 fallback height.
   // With only a body cell, decorateCardCells flags .card-teaser-no-image and the
   // single body gets the correct intrinsic height (matches buildCardTeaser).
-  return row.image
+  const cells = row.image
     ? [
       createOptimizedPicture(row.image, title, false, [
         { media: '(min-width: 768px)', width: '750' }, { width: '500' },
@@ -158,21 +212,93 @@ export function rowToCells(row) {
       body,
     ]
     : [body];
+  if (toolbar) cells.push(toolbar);
+  return cells;
 }
 
+/*
+ * The authored text of the "view all" link, when the cell holds a link (the model page's
+ * rails say "All"). readBlockConfig keeps only the href, so read the anchor directly.
+ */
+export function viewAllLabel(block) {
+  const row = [...block.children].find((r) => {
+    const key = toClassName(r.children[0]?.textContent.trim() || '');
+    return key === 'viewall' || key === 'view-all' || key === 'all';
+  });
+  const text = row?.children[1]?.querySelector('a')?.textContent.trim() || '';
+  // a bare URL as link text (the common DA paste) is not a label
+  return text && !/^(https?:\/\/|\/)/i.test(text) ? text : 'View all';
+}
+
+/*
+ * Image and video rails open the shared lightbox (the source colorbox; videos play in it)
+ * instead of the bare file / vimeo.com: a click anywhere on a card except its toolbar opens
+ * it at that card. Modifier clicks keep
+ * the link (new tab). The overlay lives on <body>: a fixed layer inside the carousel
+ * would be clipped by its transforms.
+ */
+function wireMediaLightbox(carousel, rows) {
+  const cards = [...carousel.querySelectorAll('.carousel-track > *')];
+  if (!cards.length) return;
+  const lightbox = buildLightbox(document.body, rows.slice(0, cards.length).map(feedLightboxItem));
+  carousel.addEventListener('click', (e) => {
+    const modified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
+    if (e.defaultPrevented || e.button !== 0 || modified) return;
+    const card = e.target.closest('.carousel-track > *');
+    if (!card || e.target.closest('.card-teaser-toolbar')) return;
+    const index = cards.indexOf(card);
+    if (index < 0) return;
+    e.preventDefault();
+    lightbox.open(index, card.querySelector('.card-teaser-link') || card);
+  });
+}
+
+// Classes that belong to the rail itself and are never passed to the inner carousel.
+const OWN_CLASSES = new Set(['story-rail', 'block']);
+
+/*
+ * Is this rail the only thing in its section apart from a short lead-in (a heading and at
+ * most one line such as "Based on tags: Octavia")? Then an empty rail takes the section
+ * with it (SKODA-208 / SKODA-608: an empty rail leaves no heading behind).
+ */
+export function isRailOnlySection(section, block) {
+  const wrappers = [...section.children];
+  const blocks = wrappers.filter((w) => !w.classList.contains('default-content-wrapper'));
+  if (blocks.length !== 1 || !blocks[0].contains(block)) return false;
+  const lead = wrappers.filter((w) => w.classList.contains('default-content-wrapper'))
+    .flatMap((w) => [...w.children]);
+  const paragraphs = lead.filter((el) => el.tagName === 'P');
+  return lead.every((el) => /^(H[1-6]|P)$/.test(el.tagName)) && paragraphs.length <= 1;
+}
+
+/*
+ * Terminal empty/error state: remove the rail so no blank reserved slot or dead
+ * "View all" lingers (SKODA-212 review P2, SKODA-608).
+ *   - the story page's related band (SKODA-820) goes as a whole section;
+ *   - so does any rail alone in its section with just a heading lead-in (the model
+ *     page's rails: heading + "Based on tags"), SKODA-208;
+ *   - otherwise the rail drops its own chrome (mount + header, "View all" included).
+ * `story-rail:empty` (bubbling) is dispatched first so a page template can drop in-page
+ * links to the removed section.
+ */
 export function collapseRail(block, mount, header) {
   const relatedSection = block.closest('body.story .section.dark.story-rail-container');
-  if (relatedSection) {
-    relatedSection.remove();
+  const section = relatedSection || block.closest('.section');
+  if (section && (relatedSection || isRailOnlySection(section, block))) {
+    section.dispatchEvent?.(new CustomEvent('story-rail:empty', { bubbles: true }));
+    section.remove();
     return;
   }
+  block.dispatchEvent?.(new CustomEvent('story-rail:empty', { bubbles: true }));
   mount.remove();
-  if (!header.children.length) header.remove();
+  header.remove();
 }
 
 export default async function decorate(block) {
   const cfg = parseConfig(block);
   const curated = !isConfigTable(block);
+  const allLabel = viewAllLabel(block);
+  const variants = [...block.classList].filter((c) => !OWN_CLASSES.has(c));
   if (!curated && cfg.layout === 'news' && document.body.classList.contains('page')) {
     block.classList.add('story-rail-news');
   }
@@ -191,7 +317,7 @@ export default async function decorate(block) {
     const a = document.createElement('a');
     a.className = 'story-rail-viewall';
     a.href = cfg.viewAll;
-    a.textContent = 'View all';
+    a.textContent = allLabel;
     header.append(a);
   }
 
@@ -208,10 +334,12 @@ export default async function decorate(block) {
   // don't all build on load.
   async function buildRail() {
     let rows = authoredRows;
+    let indexRows = [];
     if (!curated) {
       try {
         const all = await loadQueryIndex(cfg.index);
-        rows = selectRows(all, cfg).map((r) => rowToCells(r));
+        indexRows = selectRows(all, cfg);
+        rows = indexRows.map((r) => rowToCells(r));
       } catch (e) {
         // index load failed: remove the empty story band or generic rail
         // eslint-disable-next-line no-console
@@ -223,12 +351,19 @@ export default async function decorate(block) {
     if (!rows || !rows.length) { collapseRail(block, mount, header); return; }
 
     const carousel = buildBlock('carousel', rows);
+    // the rail's own variants (e.g. `center`, `caption`, `media`) style the inner carousel
+    carousel.classList.add(...variants);
     if (cfg.dots) carousel.classList.add('dots');
     if (heading) carousel.setAttribute('aria-label', heading);
     mount.append(carousel);
+    // the media cart (SKODA-505) isn't bound yet: its "#" button must not jump to the top
+    carousel.addEventListener('click', (e) => {
+      if (e.target.closest('.media-cart-action[aria-disabled="true"]')) e.preventDefault();
+    });
     decorateBlock(carousel);
     await loadBlock(carousel);
     mount.classList.add('is-built'); // release the reserved card geometry
+    if (['image', 'video'].includes(cfg.template) && indexRows.length) wireMediaLightbox(carousel, indexRows);
   }
 
   if (window.IntersectionObserver) {

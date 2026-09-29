@@ -27,6 +27,7 @@ function el(tag) {
     className: '',
     children: [],
     attributes: {},
+    dataset: {},
     _text: '',
     classList: { add() {}, contains() { return false; } },
     setAttribute(k, v) { this.attributes[k] = String(v); },
@@ -50,6 +51,7 @@ globalThis.document = {
 const {
   parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail,
 } = await import('./story-rail.js');
+const { feedLightboxItem } = await import('../../scripts/media-lightbox.js');
 
 /*
  * A block whose `children` are rows, each row's `children` are cells. cells are
@@ -292,6 +294,31 @@ test('rowToCells: an image-less row yields ONE body-only cell (no empty div → 
   assert.deepEqual(tags, ['P', 'H3']);
 });
 
+test('rowToCells: a media feed row gets the cart + download toolbar cell (media-item contract)', () => {
+  const image = rowToCells({
+    path: 'https://cdn.example/a.jpg', title: 'A', image: 'https://cdn.example/a-768x512.jpg', date: '2026-08-27',
+    template: 'image', id: '450812', original: 'https://cdn.example/a.jpg', mp4: '',
+  });
+  assert.equal(image.length, 3, 'image, body, toolbar');
+  const [cart, download] = image[2].elems.map((p) => p.children[0]);
+  assert.equal(image[2].elems.every((p) => p.tagName === 'P'), true, 'p > a, the card-teaser toolbar shape');
+  assert.equal(cart.className, 'media-cart-action add');
+  assert.equal(cart.dataset.id, '450812', 'carries the cart key for SKODA-505');
+  assert.equal(cart.getAttribute('aria-disabled'), 'true');
+  assert.equal(cart.getAttribute('aria-label'), 'Add to media cart');
+  assert.equal(download.className, 'media-cart-action download');
+  assert.equal(download.href, 'https://cdn.example/a.jpg', 'downloads the original');
+
+  const video = rowToCells({
+    path: 'https://vimeo.com/1', title: 'V', image: 'https://i.vimeocdn.com/v.jpg', date: '2025-06-23',
+    template: 'video', id: '410179', mp4: 'https://cdn.example/v.mp4',
+  });
+  assert.equal(video[2].elems[1].children[0].href, 'https://cdn.example/v.mp4', 'a video downloads its MP4');
+  const noFile = rowToCells({ title: 'N', image: 'https://x/n.jpg', template: 'video', id: '9' });
+  assert.equal(noFile[2].elems.length, 1, 'no download button without a file');
+  assert.equal(rowToCells({ path: '/en/s', title: 'S', image: 'https://x/s.jpg', template: 'story' }).length, 2, 'stories get no toolbar');
+});
+
 test('rowToCells removes the legacy site suffix from indexed teaser titles', () => {
   const [body] = rowToCells({
     path: '/en/epiq',
@@ -356,4 +383,51 @@ test('curatedRows passes the authored cell contents without nesting their wrappe
     { elems: [picture] },
     { elems: [date, title] },
   ]]);
+});
+
+test('feedLightboxItem: the source colorbox panel from a media feed row (shape 5)', () => {
+  const item = feedLightboxItem({
+    template: 'image',
+    title: 'Škoda Octavia turns 30', description: 'Caption', date: '2026-08-27', id: '450812',
+    original: 'https://cdn.example/a.jpg', 'rendition-1920': 'https://cdn.example/a-1920x1280.jpg',
+    filetype: 'JPG', filesize: '10 MB', dimensions: '8256 × 5504 px', labels: '2026, Octavia',
+    related: '/en/press-releases/octavia-30', 'related-title': 'Octavia turns 30',
+  });
+  assert.equal(item.full, 'https://cdn.example/a-1920x1280.jpg', 'the stage shows the 1920 rendition');
+  assert.equal(item.download, 'https://cdn.example/a.jpg', 'download is the original');
+  assert.equal(item.cartId, '450812');
+  const paras = item.caption.children;
+  const text = (node) => (node.children.length ? node.children.map((c) => (typeof c === 'string' ? c : text(c))).join('') : node.textContent);
+  assert.deepEqual(paras.map(text), [
+    'Škoda Octavia turns 30', 'Caption',
+    'File type: JPGFile size: 10 MBDimensions: 8256 × 5504 pxPublished: 27. 8. 2026',
+    '2026 · Octavia', 'Related article: Octavia turns 30',
+  ]);
+  assert.equal(item.actions, true, 'image rows keep the cart / download / link buttons');
+  const bare = feedLightboxItem({ title: 'T', original: 'https://cdn.example/b.jpg', date: '' });
+  assert.equal(bare.caption.children.length, 1, 'no empty metadata, tags or related lines');
+  assert.equal(bare.full, 'https://cdn.example/b.jpg');
+  const drawing = feedLightboxItem({
+    template: 'asset', title: 'Technical drawings limo', date: '2024-03-22', original: 'https://cdn.example/limo.jpg',
+    filetype: 'JPG', filesize: '599 KB', dimensions: '3151 × 1847 px',
+  });
+  assert.equal(drawing.actions, false, 'content images have no action buttons (source)');
+  assert.equal(drawing.caption.children.length, 2, 'title + file details');
+});
+
+test('feedLightboxItem: a video row plays the Vimeo player; its panel adds length / bitrate / audio', () => {
+  const item = feedLightboxItem({
+    template: 'video', title: "Let's Explore Albania | Footage", date: '2025-06-23', id: '410179',
+    'vimeo-id': '1095073143', mp4: 'https://cdn.example/f.mp4', poster: 'https://i.vimeocdn.com/p.jpg',
+    filetype: 'MP4', filesize: '3 GB', length: '14:05', bitrate: '29994kb/s', audioformat: 'quicktime',
+    dimensions: '3840 × 2160 px',
+  });
+  assert.equal(item.video, 'https://player.vimeo.com/video/1095073143?dnt=1&autoplay=1&muted=1');
+  assert.equal(item.src, 'https://i.vimeocdn.com/p.jpg', 'the poster stands in for the image');
+  assert.equal(item.download, 'https://cdn.example/f.mp4');
+  assert.equal(item.actions, true);
+  const text = (node) => (node.children.length ? node.children.map((c) => (typeof c === 'string' ? c : text(c))).join('') : node.textContent);
+  assert.equal(text(item.caption.children[1]), 'File type: MP4File size: 3 GBLength: 14:05Bitrate: 29994kb/sAudio format: quicktimeDimensions: 3840 × 2160 pxPublished: 23. 6. 2025');
+  const fileOnly = feedLightboxItem({ template: 'video', title: 'V', mp4: 'https://cdn.example/v.mp4' });
+  assert.equal(fileOnly.video, 'https://cdn.example/v.mp4', 'no Vimeo id: the MP4 plays');
 });

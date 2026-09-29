@@ -68,6 +68,18 @@ test('still strips #s_aid / #s_cid tracking fragments (unchanged)', { skip }, ()
   assert.equal(el.querySelector('a').getAttribute('href'), 'https://cdn.example.com/x.jpg');
 });
 
+test('extension-less Vimeo posters become the .jpg frame the media pipeline can ingest', { skip }, () => {
+  const el = runAfter(`<main>
+    <img src="https://i.vimeocdn.com/video/647038077-3fea71ce-d_640?region=us" alt="a">
+    <img src="https://i.vimeocdn.com/video/2028813185-0bab9216-d_295x166?region=us" alt="b">
+    <img src="https://cdn.skoda-storyboard.com/2024/05/x-768x512.jpg" alt="c"></main>`);
+  assert.deepEqual([...el.querySelectorAll('img')].map((i) => i.getAttribute('src')), [
+    'https://i.vimeocdn.com/video/647038077-3fea71ce-d_1280x720.jpg',
+    'https://i.vimeocdn.com/video/2028813185-0bab9216-d_1280x720.jpg',
+    'https://cdn.skoda-storyboard.com/2024/05/x-768x512.jpg',
+  ]);
+});
+
 test('malformed percent-encoding does not throw (left as-is)', { skip }, () => {
   const url = 'https://example.com/%E0%A4%A'; // truncated → decodeURIComponent throws
   const el = runAfter(`<main><a href="${url}">x</a></main>`);

@@ -180,6 +180,34 @@ test('body: no decorative <hr>, no empty paragraphs, FAQ panel kept as separate 
   assert.equal(faq.length, 3);
 });
 
+test('quotes (SKODA-220): centred pull-quotes become Quote [quote, attribution] in the body column', { skip }, () => {
+  const counts = {
+    zellmer: 2, theatre: 2, superb: 1, board: 1, peaq: 0,
+  };
+  Object.entries(counts).forEach(([k, n]) => {
+    const { element, sections } = importPage(k);
+    const quotes = sections.flatMap((s) => s.nodes
+      .filter((node) => node.tagName === 'TABLE' && blockName(node) === 'Quote')
+      .map((table) => ({ table, style: s.style })));
+    assert.equal(quotes.length, n, k);
+    quotes.forEach(({ table, style }) => {
+      assert.equal(style, 'body-column', `${k}: no extra section break`);
+      const rows = rowsOf(table);
+      assert.equal(rows.length, 1, k);
+      const [quote, by] = rows[0].children;
+      assert.match(txt(quote), /^“.+”$/, k);
+      assert.equal(quote.querySelectorAll('em, br').length, 0, `${k}: italics are the block's`);
+      assert.ok(by.querySelector('strong'), `${k}: bold attribution`);
+    });
+    assert.equal(element.querySelectorAll('[data-skoda-quote], [data-skoda-quote-by], p[style*="center"]').length, 0, k);
+  });
+  const [first] = importPage('zellmer').sections[1].nodes.filter((node) => node.tagName === 'TABLE');
+  assert.equal(
+    txt(rowsOf(first)[0].children[1]),
+    'Thomas Schäfer, Chairman of the Supervisory Board of Škoda Auto and Head of the Brand Group Core',
+  );
+});
+
 test('sidebar: Additional info list, Images + Gallery (preview), Tags heading + Tags', { skip }, () => {
   const side = importPage('peaq').sections[2];
   assert.deepEqual(side.content.filter((n) => n.tagName === 'H3').map(txt), ['Additional info', 'Images', 'Tags']);

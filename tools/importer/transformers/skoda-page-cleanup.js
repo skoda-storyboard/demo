@@ -111,5 +111,13 @@ export default function transform(hookName, element, payload) {
       }
       if (decoded !== href) a.setAttribute('href', encodeURI(decoded));
     });
+
+    // Vimeo posters come extension-less (`…-d_640?region=us`), which the media pipeline
+    // can't resolve (one such image blocks media:apply for the whole batch); the CDN serves
+    // the same frame as `…-d_1280x720.jpg` (same rewrite as parsers/downloads.js).
+    element.querySelectorAll('img[src^="https://i.vimeocdn.com/"]').forEach((img) => {
+      const src = img.getAttribute('src');
+      img.setAttribute('src', src.replace(/-d_\d+(?:x\d+)?(\.[a-z]+)?(\?.*)?$/i, '-d_1280x720.jpg'));
+    });
   }
 }

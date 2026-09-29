@@ -36,6 +36,11 @@
   --skoda-grey-400: #a1a1a1;
   --skoda-grey-700: #5a5b5c;
 
+  /* rail header greys (SKODA-208; measured on the live model pages, same values as the
+     press-release related band): "Based on tags" line + media-card dates, "All" ghost pill */
+  --skoda-grey-350: #c4c6c7;
+  --skoda-grey-750: #464748;
+
   /* social network brand colors (footer icon hover tints — raw brand hex) */
   --social-hover: #419468;
   --social-facebook: #3b5998;
@@ -70,6 +75,7 @@
   --gallery-accent: #419468;
   --gallery-divider: #5a5b5c;
   --gallery-nav-divider: #606060; /* nav cluster vertical rules (measured live) */
+  --gallery-counter-total: #808080; /* the "/ 20" total in the counter (measured live) */
   --gallery-backdrop: rgb(22 23 24);
   --gallery-heading-color: var(--skoda-grey-800); /* "Images" rail heading (measured live) */
 
@@ -112,6 +118,12 @@
   --pr-menu-border-color: #d2d2d2;   /* sidebar "Additional info" rows */
   --pr-band-meta-color: #c4c6c7;     /* Media Box stats / "Based on tags" line */
   --pr-ghost-color: #464748;         /* "All" ghost pill on the related band */
+
+  /* newsletter sidebar card (SKODA-823; measured on the live Epiq story
+     .newsletter-subscribe-widget, docs/ui-specs/newsletter.md §3) */
+  --newsletter-card-border: #ededed; /* 1px card outline */
+  --newsletter-consent-color: #d8d8d8; /* consent label on the dark card */
+  --error-color: #e11825;            /* source .response .error #e82b37 is 4.35:1 on white; same hue darkened to 4.82:1 (WCAG AA) */
 }
 
 /*
