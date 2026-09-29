@@ -52,7 +52,9 @@ export function isToolbarCell(cell) {
  * Layout-mode editability. Replace EDS's default 2000px sources with card-sized
  * ones as well as optimizing images that have no <source> elements yet.
  */
-export function optimizeImages(scope, { eager = false, desktopWidth = '750', mobileWidth = '500' } = {}) {
+export function optimizeImages(scope, {
+  eager = false, desktopWidth = '750', mobileWidth = '500', breakpoints,
+} = {}) {
   scope.querySelectorAll('.card-teaser-image img').forEach((img) => {
     let picture = img.closest('picture');
     if (!picture) {
@@ -63,7 +65,7 @@ export function optimizeImages(scope, { eager = false, desktopWidth = '750', mob
     const p = picture.parentElement;
     if (p?.tagName === 'P' && p.children.length === 1) p.replaceWith(picture);
     if (/^https?:/.test(img.src)) {
-      const optimized = createOptimizedPicture(img.src, img.alt, eager, [
+      const optimized = createOptimizedPicture(img.src, img.alt, eager, breakpoints || [
         { media: '(min-width: 768px)', width: desktopWidth }, { width: mobileWidth },
       ]);
       picture.querySelectorAll(':scope > source').forEach((source) => source.remove());

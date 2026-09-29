@@ -148,8 +148,10 @@ All rows: `measured (source-url · selector · viewport) → token`. `LANDING` =
 - **Tile grid:** multi-column **flex-wrap** (3/5/5 rows, mixed feature/square widths) holds down to `≥800`;
   it collapses to **1 across (full-width)** at **`≤780`** (the SiteOrigin Panels mobile breakpoint), **not
   992** (corrected 2026-09-15: measured `perRow` = [3,5,5] @1280/1024/900/800, all-1 @780/768/500; tile
-  `748px` @768/780, `480px` @500). For the rebuild adopt the card-teaser grid ladder (`768 / 992`) rather
-  than porting the SiteOrigin `~780` literal.
+  `748px` @768, `760px` @780, `480px` @500). The `cards-tiles` renderer preserves the
+  measured **781px** layout transition, distinct from the **768px** tile-ratio transition:
+  at 768–780 tiles remain one-up but retain their authored 1:1 or wide ratios;
+  below 768 all tiles are 16:9.
 - **Sub-page shell:** two-column `66.66 / 33.33` at `≥768`, stacked below content at `<768` (per
   story-detail.md §4).
 - **Chapter-nav:** full-width 44px bar; affixes to top on scroll (both landing and sub-pages).

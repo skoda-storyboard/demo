@@ -243,6 +243,33 @@ var CustomImportScript = (() => {
     }
   }
 
+  // tools/importer/transformers/skoda-dark-bands.js
+  var DARK_BAND_SELECTOR = ".cover-box.dark:not(.socials-static)";
+  var DARK_BAND_STYLE = "cover-box, dark";
+  function hasContent(el) {
+    return !!el && ((el.textContent || "").trim() !== "" || !!el.querySelector("img, picture, iframe, table"));
+  }
+  function hasContentBeside(band, root, step) {
+    for (let el = band; el && el !== root; el = el.parentElement) {
+      for (let n = el[step]; n; n = n[step]) if (hasContent(n)) return true;
+    }
+    return false;
+  }
+  function transform2(hookName, element, payload) {
+    if (hookName !== "beforeTransform") return;
+    const doc = element.ownerDocument;
+    const style = payload && payload.template && payload.template.darkBandStyle || DARK_BAND_STYLE;
+    [...element.querySelectorAll(DARK_BAND_SELECTOR)].forEach((band) => {
+      if (!hasContent(band)) return;
+      if (hasContentBeside(band, element, "previousElementSibling")) band.before(doc.createElement("hr"));
+      band.append(WebImporter.Blocks.createBlock(doc, {
+        name: "Section Metadata",
+        cells: { style }
+      }));
+      if (hasContentBeside(band, element, "nextElementSibling")) band.after(doc.createElement("hr"));
+    });
+  }
+
   // tools/importer/transformers/skoda-model-sections.js
   var SECTION_MARKER_ATTR = "data-excat-section-id";
   function querySection(root, selectors) {
@@ -254,7 +281,7 @@ var CustomImportScript = (() => {
     }
     return null;
   }
-  function transform2(hookName, element, payload) {
+  function transform3(hookName, element, payload) {
     const sections = payload && payload.template && payload.template.sections || [];
     if (sections.length < 2) return;
     if (hookName === "beforeTransform") {
@@ -450,7 +477,7 @@ var CustomImportScript = (() => {
     }
     return false;
   }
-  function transform3(hookName, element, payload) {
+  function transform4(hookName, element, payload) {
     if (hookName !== TransformHook2.afterTransform) return;
     if (hasMetadataBlock(element)) return;
     const { document: document2, url, params } = payload;
@@ -542,19 +569,69 @@ var CustomImportScript = (() => {
     "/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones",
     "/en/models/skoda-elroq-through-designers-eyes",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/images",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/motorsport-versions-of-the-skoda-favorit-1989-all-different-and-yet-familiar",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1000-mb-1964-and-1100-mb-b5-1966-a-family-saloon-in-rally",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1100-ohc-1957-the-beautiful-dream-of-le-mans",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-lr-1984-last-motorsport-model-from-mlada-boleslav-with-rear-mounted-engine",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-180-rs-and-200-rs-1974-rally-cars-from-another-league",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-f3-type-992-1964-european-class-formula-racing-car",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-r5-rally2-rally2-evo-successful-in-the-hands-of-factory-drivers-and-privateers-alike",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-super-2000-2008-successful-motorsport-comeback-for-the-works-team",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-wrc-2003-paving-the-way-for-future-success",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-felicia-kit-car-1995-the-next-chapter-in-an-international-success-story",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-touring-sport-1960-successful-return-to-international-rally-courses",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-wrc-1999-entering-the-highest-class-of-international-rallying",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-spider-b5-1972-and-skoda-spider-ii-1975-prototypes-for-the-racetrack",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos",
     "/en/press-kits/new-skoda-enyaq-press-kit-2",
     "/en/press-kits/skoda-elroq-press-kit",
     "/en/press-kits/skoda-elroq-press-kit-2",
     "/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
     "/en/press-kits/skoda-epiq-press-kit-2",
+    "/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance",
+    "/en/press-kits/skoda-epiq-press-kit-2/connectivity-intuitive-digital-services-and-seamless-vehicle-access",
+    "/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language",
+    "/en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details",
+    "/en/press-kits/skoda-epiq-press-kit-2/frequently-asked-questions",
+    "/en/press-kits/skoda-epiq-press-kit-2/images",
+    "/en/press-kits/skoda-epiq-press-kit-2/infographics",
+    "/en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience",
+    "/en/press-kits/skoda-epiq-press-kit-2/safety-and-assistance-systems-comprehensive-predictiveand-reassuring-driver-support",
+    "/en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality",
+    "/en/press-kits/skoda-epiq-press-kit-2/technical-data",
+    "/en/press-kits/skoda-epiq-press-kit-2/texts",
+    "/en/press-kits/skoda-epiq-press-kit-2/videos",
     "/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
     "/en/press-kits/skoda-peaq-press-kit",
     "/en/press-kits/skoda-peaq-press-kit-2",
+    "/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model",
+    "/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart",
+    "/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design",
+    "/en/press-kits/skoda-peaq-press-kit-2/frequently-asked-questions",
+    "/en/press-kits/skoda-peaq-press-kit-2/images",
+    "/en/press-kits/skoda-peaq-press-kit-2/infographics",
+    "/en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot",
+    "/en/press-kits/skoda-peaq-press-kit-2/safety-a-comprehensive-suite-of-active-and-passive-safety-systems",
+    "/en/press-kits/skoda-peaq-press-kit-2/technical-data",
+    "/en/press-kits/skoda-peaq-press-kit-2/texts",
+    "/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out",
+    "/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+    "/en/press-kits/skoda-peaq-press-kit-2/videos",
     "/en/press-kits/skoda-vision-o-press-kit",
     "/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design",
     "/en/press-kits/the-all-new-skoda-kodiaq-press-kit",
     "/en/press-kits/the-all-new-skoda-superb-press-kit",
+    "/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models",
     "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
     "/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq",
     "/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026",
@@ -680,7 +757,7 @@ var CustomImportScript = (() => {
     const bySlug = DEMO_PATHS.filter((p) => p.startsWith("/en/tag/") && p.endsWith(`/${slug}`) && p.split("/").length === 5);
     return bySlug.length === 1 ? bySlug[0] : null;
   }
-  function transform4(hookName, element, payload) {
+  function transform5(hookName, element, payload) {
     if (hookName !== TransformHook3.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
       let href = a.getAttribute("href");
@@ -692,7 +769,7 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/transformers/skoda-images.js
-  function hasContent(node) {
+  function hasContent2(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
   function withCaption(node, caption, document2) {
@@ -732,7 +809,7 @@ var CustomImportScript = (() => {
     before.append(beforeRange.extractContents());
     const imageNode = imageContainer(img, document2, linkedImage ? link : null);
     const image = withCaption(imageNode, caption, document2);
-    paragraph.replaceWith(...[before, image, after].filter(hasContent));
+    paragraph.replaceWith(...[before, image, after].filter(hasContent2));
   }
   function normalizeImages(root, document2 = root.ownerDocument) {
     root.querySelectorAll("img").forEach((img) => {
@@ -806,9 +883,10 @@ var CustomImportScript = (() => {
   };
   var transformers = [
     transform,
-    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform2] : [],
-    transform3,
-    transform4
+    transform2,
+    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform3] : [],
+    transform4,
+    transform5
   ];
   function executeTransformers(hookName, element, payload) {
     const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE });

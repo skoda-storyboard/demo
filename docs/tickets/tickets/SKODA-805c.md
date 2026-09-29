@@ -16,8 +16,8 @@ accordion per [`faq-accordion.md`](../../ui-specs/faq-accordion.md). Reference:
 `press_kit-template-default`, which is the same shell that press-kit child/chapter pages use. The live source has:
 - an article body with **8 row-toggle accordions**
 - tags
-- a Buzzsprout AI-audio embed and a Vimeo embed
-- a **Media Box of 60 images** (per the API; about 120 DOM media articles)
+- a Vimeo embed (no Buzzsprout player on this page)
+- a **Media Box of 60 assets** (55 images, one video, four file rows)
 
 Treating it as a hub loses the content, and treating it as a press release loses the press-kit metadata and the
 accordions.
@@ -61,3 +61,13 @@ accordions.
 
 ## Import contract (SKODA-603)
 Contract(s) `accordion`, `quote` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Pinned shape: `Accordion`, one row per toggle `[summary, body]`, all closed by default. Quotes use the `quote` contract. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.
+
+## Branch implementation (2026-09-28, not QA accepted)
+
+The SKODA-805a branch also imports first-glimpse with eight independent,
+closed-by-default Accordion rows, one inline Vimeo URL and 60 Media Box
+entries (55 image, one video and four file rows). File-only rows keep
+plain links pending SKODA-510; the gallery hides after eight tiles with
+an accessible Show more button. Live-source importer tests pass, but
+DA media conditioning, rendered QA, Lighthouse and the final chrome
+gate remain open.

@@ -20,7 +20,7 @@ import {
  * (a `template: page` page that shares a layout, e.g. the series directory → `skoda-series`).
  * Only listed templates load, so an unknown value never requests a missing file.
  */
-const TEMPLATES = ['press-release', 'skoda-series'];
+const TEMPLATES = ['press-release', 'skoda-series', 'press-kit'];
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
   const innerTT = window.trustedTypes.createPolicy('tt-inner', {
