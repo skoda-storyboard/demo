@@ -351,3 +351,62 @@ test('curatedRows passes the authored cell contents without nesting their wrappe
     { elems: [date, title] },
   ]]);
 });
+
+// --- press variant (SKODA-224): CSS-only, opt-in via `Story Rail (press)` ---------
+// The variant must not leak into other rails (AC: story/home rails unchanged unless they
+// opt in), and it shares the SKODA-820 related-band ladder rather than forking its values.
+const { readFile } = await import('node:fs/promises');
+const railCss = await readFile(new URL('./story-rail.css', import.meta.url), 'utf8');
+// split a selector list on top-level commas only (not the ones inside :is(...))
+const selectorList = (sel) => {
+  const out = [];
+  let depth = 0;
+  let cur = '';
+  [...sel].forEach((ch) => {
+    if (ch === '(') depth += 1;
+    if (ch === ')') depth -= 1;
+    if (ch === ',' && depth === 0) { out.push(cur.trim()); cur = ''; } else cur += ch;
+  });
+  if (cur.trim()) out.push(cur.trim());
+  return out;
+};
+const STORY_BAND = 'body.story .section.dark.story-rail-container .story-rail';
+const PRESS = '.story-rail.press';
+// the opt-in scopes: the press variant alone, or the band it shares with the story rail
+const optIn = (s) => s.startsWith(PRESS) || s.startsWith(STORY_BAND)
+  || s.startsWith(`:is(${STORY_BAND}, ${PRESS})`);
+const cssRules = railCss
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .split('}')
+  .map((chunk) => chunk.split('{'))
+  // a rule nested in @media splits into [media, selector, body]: keep the last two
+  .filter((parts) => parts.length >= 2)
+  .map((parts) => ({ selector: parts[parts.length - 2].trim(), body: parts[parts.length - 1].trim() }));
+
+test('press variant: every press selector is scoped to .story-rail.press', () => {
+  const pressSelectors = cssRules
+    .flatMap(({ selector }) => selectorList(selector))
+    .filter((s) => s.includes('press'));
+  assert.ok(pressSelectors.length > 0, 'press rules exist');
+  pressSelectors.forEach((s) => assert.ok(optIn(s), s));
+});
+
+test('press variant shares the related-band 90 / 45 / 30% cell ladder', () => {
+  const ladder = cssRules
+    .filter(({ selector }) => selectorList(selector).some((s) => s === PRESS || s === `:is(${STORY_BAND}, ${PRESS})`))
+    .map(({ body }) => body.match(/--carousel-cell-width:\s*([^;]+);/)?.[1])
+    .filter(Boolean);
+  assert.deepEqual(ladder, [
+    'calc(90cqw - var(--carousel-gap))',
+    'calc(45cqw - var(--carousel-gap))',
+    'calc(30cqw - var(--carousel-gap))',
+  ]);
+});
+
+test('press variant: default rails keep the carousel ladder (no unscoped cell width)', () => {
+  cssRules
+    .filter(({ body }) => body.includes('--carousel-cell-width'))
+    .forEach(({ selector }) => selectorList(selector).forEach((s) => {
+      assert.ok(optIn(s), `cell width set outside an opt-in scope: ${s}`);
+    }));
+});
