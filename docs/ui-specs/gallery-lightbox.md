@@ -54,8 +54,8 @@ body.storyboard-gallery-lightbox-active -> .sb-gallery-overlay{display:block}
 ├── .sb-gallery-lightbox-main
 │      ├── .sb-gallery-lightbox-above-image > img
 │      ├── .sb-gallery-lightbox-image > img
-│      ├── .sb-gallery-lightbox-prev / -next  (green disc)
-│      ├── .sb-gallery-lightbox-count         (e.g. "3 / 24")
+│      ├── .sb-gallery-lightbox-prev / -next  (green square, radius 0)
+│      ├── .sb-gallery-lightbox-count         (e.g. "3/24", no spaces)
 │      └── .sb-gallery-lightbox-info > .sb-gallery-description-toggle (+ description)
 └── .sb-gallery-lightbox-overview-wrapper (body.…-overview-active)
        └── .sb-gallery-lightbox-overview[--cols-4|--cols-5]
@@ -122,7 +122,7 @@ one accessible vanilla lightbox.
   `display:flex; align-items:center; justify-content:center`; `img{max-height:100%; width:auto}`
   (contain, never crop).
 - Prev/next (`.sb-gallery-lightbox-prev/-next`): `position:fixed`, `top:calc(50% + 46.5px)`,
-  background **`#419468`** (green disc), `padding:1em`, `box-shadow:1px 1px 6px 3px rgb(0 0 0 /.15)`,
+  background **`#419468`** (a green **square**, `border-radius:0`; 67×67 measured on the Favorit story, SKODA-216), `padding:1em`, `box-shadow:1px 1px 6px 3px rgb(0 0 0 /.15)`,
   svg `35×35`; `.prev{left:10px}` / `.next{right:10px}` (`left/right:30px` at `>=1690`). `#419468`
   has no token -> **candidate** `--gallery-accent: #419468` (a mid green, distinct from `--skoda-green`).
 - Close (`.sb-gallery-lightbox-close`): icon-font `content:"\e010"`; `font-size:2em` (<768) /
