@@ -91,7 +91,7 @@
   --heading-font-size-story-h3-mobile: 20px;
   --heading-font-size-story-h3: 24px;
   --story-meta-gap: 11px; /* published date → category tag, same row (live) */
-  --story-intro-gap: 48px; /* intro (date + tag) → article body at >=768 (live) */
+  --story-intro-gap: 0px; /* source .content has no top margin below 768 */
 
   /* hero geometry (hero.md §8; SKODA-202) */
   --hero-vh: 61.8vh;
@@ -756,6 +756,10 @@ body.story main > .section.body-column > .default-content-wrapper {
   padding-inline: var(--story-inset);
 }
 
+body.story main > .section.body-column {
+  margin-top: var(--story-intro-gap);
+}
+
 body.story main > .section.body-column .default-content-wrapper {
   font-size: var(--body-font-size-m);
   line-height: 1.5;
@@ -807,14 +811,8 @@ body.story main > .section.story-intro .tags-list li {
   margin-bottom: 0;
 }
 
-/* intro → article body: 16px on the source below 768 (the block margins collapse
-   there, so the body's top margin sets the gap) */
 body.story main > .section.story-intro {
   margin-bottom: 0;
-}
-
-body.story main > .section.story-intro + .section {
-  margin-top: var(--spacing-m);
 }
 
 body.story main > .section.body-column .default-content-wrapper ul {
@@ -858,6 +856,10 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
    body track is the 10px inset + 2/3 of the inset content box, so the text lands on
    the source's 819px at 1248 (707 at 1080, 499 at 768); the aside takes the rest. */
 @media (width >= 768px) {
+  body.story {
+    --story-intro-gap: 32px;
+  }
+
   body.story main {
     display: grid;
     grid-template-columns:
@@ -899,9 +901,8 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
     padding-inline: var(--spacing-xxl) var(--story-inset);
   }
 
-  /* intro → article body is 48px here on the source (grid items don't collapse
+  /* The source content column starts 32px below its container (grid items do not collapse
      margins, so both first-row sections carry it and stay top-aligned) */
-  body.story main > .section.story-intro ~ .section.body-column,
   body.story main > .section.story-intro ~ .section.sidebar {
     margin-top: var(--story-intro-gap);
   }
