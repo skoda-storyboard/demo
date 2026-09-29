@@ -31,7 +31,9 @@ function chapters(document) {
   links.forEach((sourceLink) => {
     const link = document.createElement('a');
     link.href = sourceLink.getAttribute('href');
-    link.textContent = text(sourceLink);
+    // The source labels the hub link "Introduction", like the first chapter; use its title.
+    link.textContent = (sourceLink.matches('.link-intro') && sourceLink.getAttribute('title')?.trim())
+      || text(sourceLink);
     const li = document.createElement('li');
     li.append(link);
     list.append(li);
@@ -50,7 +52,7 @@ function sidebar(document, secondary, mediaBox) {
       if (heading) heading.remove();
       nodes.push(make(document, 'h3', label || 'Images'), section);
       const more = section.querySelector('a.more');
-      if (more && text(more)) {
+      if (mediaBox && more && text(more)) {
         const link = document.createElement('a');
         link.href = '#media-box';
         link.textContent = text(more);
@@ -86,12 +88,36 @@ function sidebar(document, secondary, mediaBox) {
  * tables: a one-column layout table (the resource "Texts" chapter-PDF list) becomes its
  * header as a heading plus a list; a data table (e.g. the FAQ model table, which sits inside
  * an accordion answer, where no block may nest) becomes one text line per row.
+ * Any other multi-column table is layout (the chapters' "What's up, Škoda?" WhatsApp callout,
+ * the Enyaq RS Race "130 years" banner): its cells become content, keeping their links and
+ * images. The WhatsApp icon is a decorative 512px PNG sized by a width attribute DA drops; the
+ * channel link beside it carries the message (SKODA-805b, PR #202).
  */
+function layoutTable(table, document) {
+  table.querySelectorAll('img[src*="whatsapp"]').forEach((img) => {
+    const link = img.closest('a');
+    (link && !text(link) ? link : img).remove();
+  });
+  return [...table.querySelectorAll('td, th')].flatMap((cell) => {
+    if (!text(cell) && !cell.querySelector('img, a[href]')) return [];
+    if (cell.querySelector('p, ul, ol, h1, h2, h3, h4, h5, h6, div')) return [...cell.childNodes];
+    const p = document.createElement('p');
+    p.append(...cell.childNodes);
+    return [p];
+  });
+}
+
 function sourceTables(content, document) {
   content.querySelectorAll('table').forEach((table) => {
     const rows = [...table.rows].filter((row) => text(row) || row.querySelector('a[href], img'));
     if (!rows.length) { table.remove(); return; }
     const cols = Math.max(...rows.map((row) => row.cells.length));
+    // A data table has a header row plus label/value rows: two or more rows with 2+ text cells.
+    const labelled = rows.filter((row) => [...row.cells].filter((cell) => text(cell)).length >= 2);
+    if (cols > 1 && labelled.length < 2) {
+      table.replaceWith(...layoutTable(table, document));
+      return;
+    }
     const out = [];
     if (cols === 1) {
       const [first, ...rest] = rows;

@@ -13,7 +13,7 @@ New M1 tickets:
 | **SKODA-608** | image/video item index rows | 3 | Must |
 | **SKODA-609** | link containment + alias redirect | 2 | Must |
 | **SKODA-805a** | press-kit tiles hub | 3 | Must |
-| **SKODA-805b** | press-kit child pages; sized as option B | 3 | Could |
+| **SKODA-805b** | press-kit child pages; D-1 = A, all 49 imported (was sized as option B, 3) | 5–8 | Could |
 | **SKODA-805c** | `press_kit-template-default` | 3 | Should |
 
 - Ticket file created for the existing issue SKODA-306 (#102): 1 SP.
@@ -227,7 +227,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-612](tickets/SKODA-612.md) | Press-release Related Press Releases band imported as default content (empty-`href` card images) | E06 | 1.5 | 0.5 | 1–1.5 | 508,212,603 | ⤵ folded 2026-09-27: importer half → 607, block half → 224 |
 | [SKODA-801a](tickets/SKODA-801a.md) | M1 story import fidelity slice (Media Box + 21-story run; carousel → 819, Vimeo → 818) | E08 | 1.5 | 0.5–1 | 1.5–2 | 601,801,819,818,502,204 | 🟠 M1 Must; slice of 801; re-scoped 3 → 1.5 SP (review §15) |
 | [SKODA-805a](tickets/SKODA-805a.md) | Press-kit tiles hub, M1 slice + importer (3 hubs) | E08 | 3 | 1–2 | 3–4 | 601,602,202,201,305,609 | 🟠 M1 Must; slice of 805 |
-| [SKODA-805b](tickets/SKODA-805b.md) | Press-kit child pages for M1 hubs (import vs link-out, D-1) | E08 | 3 | 1–2 | 3–5 | 805a,805c,502,609 | 🟡 M1 Could; 50 child pages outside the set |
+| [SKODA-805b](tickets/SKODA-805b.md) | Press-kit child pages for M1 hubs (D-1 = A: import all 49) | E08 | 5–8 | 1–2 | 3–5 | 805a,805c,502,609 | 🟡 M1 Could; 49 child pages in the URL-set addendum |
 | [SKODA-805c](tickets/SKODA-805c.md) | `press_kit-template-default` article + accordion (first-glimpse) | E08 | 3 | 1–2 | 3 | 607,204,205,502,506 | 🟡 M1 Should; slice of 805/807 |
 | SKODA-701 | Lint + unit tests | E07 | 2 | 1 | 1–2 | E02,E03,E04 | 🟢 |
 | SKODA-702 | Performance (Lighthouse≈100/RUM) | E07 | 3 | 1–2 | 2–3 | 603 | 🟡 |

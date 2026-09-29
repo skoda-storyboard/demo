@@ -41614,9 +41614,7 @@
       "title": "MP4",
       "alt": "",
       "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/09/936_km_without_recharging__Skoda_peaq_sets_range_record_for_electric_seven_seater_suv-1080p_b9fcbb59.mp4"
-      ],
+      "seen_urls": [],
       "bytes": null,
       "steps": {
         "deliver": "n/a",
@@ -73063,7 +73061,6 @@
       "alt": "",
       "caption": "",
       "seen_urls": [
-        "https://www.skoda-storyboard.com/direct-download/2025/02/250214-30-years-since-the-foundation-stone-was-laid-M13-a-key-pillar-of-Skodas-production_c771869d.pdf",
         "https://www.skoda-storyboard.com/direct-download/2026/08/260820_Skoda-receives-Red-Dot-Award-for-its-Vision-App-concept_094b7c12.pdf"
       ],
       "bytes": null,
@@ -73154,9 +73151,7 @@
       "title": "MP4",
       "alt": "",
       "caption": "",
-      "seen_urls": [
-        "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_peaq___simply_clever___part_1_with_subtitles-1080p-1_526eb599.mp4"
-      ],
+      "seen_urls": [],
       "bytes": null,
       "steps": {
         "deliver": "n/a",
@@ -73187,7 +73182,6 @@
       "alt": "",
       "caption": "",
       "seen_urls": [
-        "https://www.skoda-storyboard.com/direct-download/2024/11/241108_Skoda-Octavia-Combi-RS-wins-prestigious-2024-Golden-Steering-Wheel-award-in-the-mid-sized-car-category_9317a721.pdf",
         "https://www.skoda-storyboard.com/direct-download/2026/08/260817_Simply-Clever-for-summer-smart-Skoda-features-that-make-every-trip-easier_4020084d.pdf"
       ],
       "bytes": null,
@@ -73279,8 +73273,7 @@
       "alt": "",
       "caption": "",
       "seen_urls": [
-        "https://www.skoda-storyboard.com/direct-download/2024/08/240829_Skoda-Auto-produces-first-units-of-updated-Octavia-in-Kvasiny_b25723c2.pdf",
-        "https://www.skoda-storyboard.com/direct-download/2026/08/260825_Skoda-Auto-supports-UCI-Mountain-Bike-World-Championships-as-official-partner-for-second-year-running_54e4195a.pdf"
+        "https://www.skoda-storyboard.com/direct-download/2024/08/240829_Skoda-Auto-produces-first-units-of-updated-Octavia-in-Kvasiny_b25723c2.pdf"
       ],
       "bytes": null,
       "steps": {
@@ -73881,9 +73874,7 @@
       "title": "MP4",
       "alt": "",
       "caption": "",
-      "seen_urls": [
-        "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4"
-      ],
+      "seen_urls": [],
       "bytes": null,
       "steps": {
         "deliver": "n/a",
@@ -82060,6 +82051,35 @@
         "da": "n/a"
       },
       "status": "partial",
+      "note": ""
+    },
+    "a818f128__Skoda_130_anniversary_logo_Years_RGB_Emerald_Green_5f24a5ce.png": {
+      "logical_id": "a818f128__Skoda_130_anniversary_logo_Years_RGB_Emerald_Green_5f24a5ce.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/02/Skoda_130_anniversary_logo_Years_RGB_Emerald_Green_5f24a5ce.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2025/02/Skoda_130_anniversary_logo_Years_RGB_Emerald_Green_5f24a5ce.png",
+      "dam_page_path": "en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models",
+      "page_refs": [
+        "en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/02/Skoda_130_anniversary_logo_Years_RGB_Emerald_Green_5f24a5ce.png",
+      "da_path": "",
+      "alt": "DSC01282_RET-1",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2025/02/Skoda_130_anniversary_logo_Years_RGB_Emerald_Green_5f24a5ce.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 8969,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
       "note": ""
     }
   }

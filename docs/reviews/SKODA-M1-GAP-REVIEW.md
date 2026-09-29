@@ -483,6 +483,11 @@ Videos) with no Media Box, which need the importer extended; 40 of the 50 link P
 (about 102), so their DA push waits for the developer-machine DAM ingest. The hubs publish
 with the documented plain-card fallback (SKODA-221 mosaic follows), once their children are
 live so no tile 404s. Publish and reindex remain a separately approved wave.
+Since PR #202 the 49 chapter/resource children carry `template=press_kit_chapter` (not
+`press_kit`), so they never enter the press-kit rails; the Introduction and Enyaq RS Race
+kits keep `press_kit`. No child has a Technical-data spec table: Technical data is a single
+PDF on the source (see C-4). The Peaq FAQ's one variant-spec table imports as one text line
+per row.
 
 **Human gates:**
 
@@ -539,7 +544,7 @@ The live source checks behind this section ran on 2026-09-24:
 | C-1 | **Media Room homepage** (§3, §6, MR-H01–H10) | **Not in the 43 URLs.** `/en/media-room/` returns 404 on preview | page missing | Add `/en/media-room/` to the set. `import-home-mr.js` already exists on `main`. Its rails reuse `story-rail` and are fed by the 603/608 rows | 1.5 |
 | C-2 | **Series: directory → hub**, two-level (§3, STO-S01–S03) | `/en/series-2/` is not in the set, and this review moved it to M2 | directory missing | Add `/en/series-2/`. `import-series-directory.js` already exists. The index-driven grid shows the 5 imported hubs | 1 |
 | C-3 | **English + Czech**, with the switcher showing only languages that exist (§3, §6, COM05) | The set is **EN only**. 303/CS is a Should (D-2) | CS pages missing; tier too low | Promote **303 to Must**. Add 3 CS counterparts: Peaq model, the Peaq-production story, and one series hub. Add the CS header/footer fragments. Do **not** import `/cs/` home, because it needs a per-locale index (1001, M2) | 1.5 + 1 |
-| C-4 | **One press kit end to end**: chaptered hub, a sub-page, spec table, grouped media and downloads (§3, §6, MR-PK01/02/04/06) | Hub = 805a (Must). The default article 805c is a Should. Children (805b) are Could | sub-page and narrative below Must | Promote **805c to Must**. Import **one** Peaq-2 chapter sub-page with the 805c importer. Reuse the 208 `spec-table` block | 3 + 1 |
+| C-4 | **One press kit end to end**: chaptered hub, a sub-page, spec table, grouped media and downloads (§3, §6, MR-PK01/02/04/06) | Hub = 805a (Must). The default article 805c is a Should. Children (805b) are Could | sub-page and narrative below Must | Promote **805c to Must**. Import **one** Peaq-2 chapter sub-page with the 805c importer. Reuse the 208 `spec-table` block. **Update (2026-09-28):** D-1 = A imports all 49 sub-pages (805b). The source's Technical data chapters have no spec table: both are a single PDF download. The only spec table is a 3-variant table in an answer on the Peaq FAQ, imported as one labelled list per variant (no block). So a `spec-table` chapter cannot be sourced from these kits | 3 + 1 |
 | C-5 | **Whole-kit ZIP**, "a pre-built file, so easy" (MR-PK07, marked Demo) | Explicitly excluded from 805a (listed as 806, M2) | promise contradicted | Add a download link to the existing CDN ZIP on the Peaq-2 and Epiq-2 hubs. This is a 805a AC, not 806 | 0.5 |
 | C-6 | **Social share** on story detail, with configurable channels (COM15, STO-D10) | 215 is Could, unowned, and has no issue | tier too low | Create the 215 issue and make it **Must** (vijay) | 1 |
 | C-7 | **Embargoed content**: group-restricted page, previewed privately, published on schedule (§3, §6, 6.5) | Ruled out: 811 is M2, and only the ungated form is stretch | contradicted | **Decision D-7.** The client doc contradicts itself: its 6.3 says "scheduling, review and embargo at go-live". Either (a) script a native walk-through (restricted preview + scheduled publish; Lars, ≈ 1 SP, proven on one page), or (b) correct the doc to the 6.3 wording before the demo. Default: **(b)**, unless the client confirms 6.5 | 0–1 |

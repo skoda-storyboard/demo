@@ -213,6 +213,8 @@ export function buildMetaFields({
   if (publisheddate) meta.publisheddate = publisheddate;
   if (template) meta.template = template;
   if (overrides.theme) meta.theme = overrides.theme;
+  // press-kit chapter/resource child → its hub path (SKODA-805b); not a rail template
+  if (overrides.presskit) meta.presskit = overrides.presskit;
   if (category) meta.category = category;
 
   const facetValues = {};
