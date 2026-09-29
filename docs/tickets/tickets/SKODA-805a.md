@@ -71,3 +71,15 @@ push those hubs with shape 3 before preview QA or publish.
 Keep rows in source order; mark a short row with `end`. The tile renderer
 rejects mixed series/press sizes or overfilled rows. If the importer needs a
 different DA shape, change the contract (and bump `shape`) in the same PR.
+
+## Branch implementation (2026-09-29, not QA accepted)
+
+`skoda-805a-press-kit-hubs` adds the three-hub importer, source-derived metadata
+and Peaq/Epiq image-link banners; first-glimpse uses the default-article importer.
+**D-1 = A (Architect sign-off 2026-09-28):** all 50 tile targets are in the M1
+set and link allow-list, so the tiles link site-relative to the SKODA-805b children.
+Live-source importer tests cover the 13/13/24 tiles in source order. The importer
+now emits shape 3 to match the SKODA-221 mosaic; the existing DA previews must be
+re-imported and pushed before visual QA or publication. **Keep the acceptance
+boxes open** pending the new previews, source-vs-EDS visual QA, SKODA-309 chrome
+and separate publish/reindex approval.
