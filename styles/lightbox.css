@@ -62,9 +62,32 @@ body.gallery-lightbox-open {
   cursor: pointer;
 }
 
+/* phones: the details toggle, a 60×60 cell top-left mirroring the close (the source's
+   "text" glyph); from 768 the panel is always beside the image and the toggle is hidden */
+.gallery-lightbox-details {
+  --lightbox-glyph: url('../icons/lightbox-details.svg');
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: var(--lightbox-control);
+  height: var(--lightbox-control);
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--skoda-white);
+  cursor: pointer;
+}
+
+.gallery-lightbox-details[hidden] {
+  display: none;
+}
+
 /* close + arrow glyphs: the source icon font's close / caret icons, masked so they take
    the text colour */
 .gallery-lightbox-close::before,
+.gallery-lightbox-details::before,
 .gallery-lightbox-prev::before,
 .gallery-lightbox-next::before {
   content: '';
@@ -274,7 +297,7 @@ body.gallery-lightbox-open {
   display: flex;
   flex-wrap: wrap;
   gap: 5px; /* source: 5px between chips; rows 27px apart (22px items) */
-  justify-content: center; /* mobile: centred with the rest of the panel */
+  justify-content: flex-start; /* with the panel text (left) */
 }
 
 .gallery-lightbox-tag {
@@ -461,4 +484,34 @@ body.gallery-lightbox-open {
 .gallery-overlay.reduced-motion .gallery-lightbox-stage,
 .gallery-overlay.reduced-motion .gallery-lightbox-image-frame.is-loading::after {
   animation: none;
+}
+
+/* phones, details open: the panel over the image, between the close and counter bands,
+   scrolling when long (image-first until the reader asks for it) */
+.gallery-overlay.is-details-open .gallery-lightbox-caption:not([hidden]) {
+  position: absolute;
+  inset: var(--lightbox-control) 0;
+  z-index: 1;
+  display: block;
+  max-width: none;
+  margin: 0;
+  padding: var(--spacing-m);
+  overflow-y: auto;
+  background: var(--gallery-backdrop);
+  text-align: left;
+  opacity: 1;
+}
+
+/* from 768 the panel always sits beside the image: no toggle, no overlay panel */
+@media (width >= 768px) {
+  .gallery-lightbox-details {
+    display: none;
+  }
+
+  .gallery-overlay.is-details-open .gallery-lightbox-caption:not([hidden]) {
+    position: static;
+    z-index: auto;
+    padding: var(--lightbox-panel-top) 0 0;
+    background: none;
+  }
 }

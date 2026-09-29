@@ -27,6 +27,9 @@ const LABELS = {
   prev: 'Previous image',
   next: 'Next image',
   close: 'Close gallery',
+  // phones: the detail panel is behind a toggle (image-first, caption still reachable)
+  showDetails: 'Show image details',
+  hideDetails: 'Hide image details',
   video: 'Video player',
   // the visible counter reads "N / total" (the total in grey); the aria-live label is the long form
   counterLabel: (n, total) => `Image ${n} of ${total}`,
@@ -37,6 +40,9 @@ const LABELS = {
 };
 
 const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+// a page can hold several overlays (gallery, image and video rails, drawings): unique ids
+let overlayCount = 0;
 
 /**
  * Turn the tags paragraph (e.g. "2026 · Peaq") into individual chips (the live
@@ -91,6 +97,12 @@ export function buildLightbox(host, items) {
 
   topbar.append(closeBtn);
 
+  // phones show the image alone; this toggle (top-left, mirroring the close) opens the
+  // detail panel over it, so the caption stays available at every viewport
+  const detailsBtn = document.createElement('button');
+  detailsBtn.type = 'button';
+  detailsBtn.className = 'gallery-lightbox-details';
+
   // bottom-right control cluster: prev + counter + next (matches the live
   // colorbox where the counter and arrows sit together bottom-right)
   const controls = document.createElement('div');
@@ -112,11 +124,13 @@ export function buildLightbox(host, items) {
   imageFrame.className = 'gallery-lightbox-image-frame';
   const stageImg = document.createElement('img');
   stageImg.className = 'gallery-lightbox-image';
-  stageImg.id = 'gallery-lightbox-image';
+  overlayCount += 1;
+  stageImg.id = `gallery-lightbox-image-${overlayCount}`;
   imageFrame.append(stageImg);
   const stageCaption = document.createElement('figcaption');
   stageCaption.className = 'gallery-lightbox-caption';
-  stageCaption.id = 'gallery-lightbox-caption';
+  stageCaption.id = `gallery-lightbox-caption-${overlayCount}`;
+  detailsBtn.setAttribute('aria-controls', stageCaption.id);
   figure.append(imageFrame, stageCaption);
   stage.append(figure);
 
@@ -155,7 +169,14 @@ export function buildLightbox(host, items) {
 
   stageImg.setAttribute('aria-describedby', stageCaption.id);
 
-  overlay.append(topbar, stage, controls);
+  overlay.append(topbar, detailsBtn, stage, controls);
+
+  const setDetails = (show) => {
+    overlay.classList.toggle('is-details-open', show);
+    detailsBtn.setAttribute('aria-expanded', String(show));
+    detailsBtn.setAttribute('aria-label', show ? LABELS.hideDetails : LABELS.showDetails);
+  };
+  setDetails(false);
   host.append(overlay);
 
   let current = 0;
@@ -238,8 +259,11 @@ export function buildLightbox(host, items) {
       // render the tags paragraph ("2026 · Peaq") as individual chips
       decorateTags(stageCaption);
       stageCaption.hidden = false;
+      detailsBtn.hidden = false;
     } else {
       stageCaption.hidden = true;
+      detailsBtn.hidden = true;
+      setDetails(false);
     }
     // "1 / 20": the total (with its separator) in grey, as the source counter
     const sep = document.createElement('span');
@@ -256,7 +280,11 @@ export function buildLightbox(host, items) {
     .filter((el) => el.offsetParent !== null);
 
   const onKeydown = (e) => {
-    if (e.key === 'Escape') {
+    if (e.key === 'Escape' && overlay.classList.contains('is-details-open')) {
+      e.preventDefault();
+      setDetails(false);
+      detailsBtn.focus();
+    } else if (e.key === 'Escape') {
       e.preventDefault();
       // eslint-disable-next-line no-use-before-define
       close();
@@ -301,6 +329,7 @@ export function buildLightbox(host, items) {
   const open = (index, trigger, single = false) => {
     lastFocused = trigger || document.activeElement;
     singleMode = single;
+    setDetails(false); // image first on every open
     render(index);
     // single-image view: no navigation cluster
     controls.hidden = single;
@@ -313,6 +342,7 @@ export function buildLightbox(host, items) {
   prevBtn.addEventListener('click', () => render(current - 1));
   nextBtn.addEventListener('click', () => render(current + 1));
   closeBtn.addEventListener('click', close);
+  detailsBtn.addEventListener('click', () => setDetails(!overlay.classList.contains('is-details-open')));
   // copy the current image's absolute URL to the clipboard
   linkBtn.addEventListener('click', async () => {
     const target = items[current].link || items[current].src.split('?')[0];

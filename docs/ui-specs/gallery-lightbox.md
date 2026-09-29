@@ -118,9 +118,11 @@ one accessible vanilla lightbox.
 - `#cboxClose` 60×60 in the corner (24px glyph, 18px padding); `#cboxCurrent` 108×60 "1" + grey (#808080) total
   with a `/` 12px each side; `#cboxPrevious` / `#cboxNext` 61×60, 1px #606060 left rule, cells 60px apart.
 - Tablet (768–991) keeps the desktop layout: image column = viewport − 288 (480 at 768), panel 256 at x=496.
-- Phones (<768, 2026-09-28, as the source colorbox): the image alone, full width, centred in the space between the
-  60px close band and the 60px counter band; **no detail panel** (supersedes the earlier "always show the caption"
-  rebuild decision); the close ✕ stays the 60×60 top-right cell.
+- Phones (<768, 2026-09-28): **image first**, as the source colorbox: the image alone, full width, centred between
+  the 60px close band and the 60px counter band; the close ✕ stays the 60×60 top-right cell. The caption / detail
+  panel is **not dropped**: a **details toggle** (60×60 top-left, the source "text" glyph, `aria-expanded`,
+  `aria-controls` → the caption) opens it over the image between the two bands, scrolling when long. Escape closes
+  the panel first, then the lightbox. Every open starts image-first. This keeps §6's caption requirement.
 
 ### Live colorbox chrome (measured · PR · 500-wide)
 - `#cboxOverlay`: `position:fixed`, background `#161718` (rgb 22,23,24), full-screen.
@@ -194,8 +196,9 @@ managed). The rebuild MUST:
 - Prev/next/close are `<button>` with `aria-label` ("Previous image" / "Next image" / "Close
   gallery"); visible `:focus-visible` ring on all controls.
 - Counter exposed via `aria-live="polite"` (e.g. "Image 3 of 24") so screen-reader users hear position.
-- Each image has meaningful `alt`; the caption (`data-caption`) is always shown (fix the mobile-hidden
-  colorbox caption) and associated via `aria-describedby`.
+- Each image has meaningful `alt`; the caption (`data-caption`) is available at every viewport (fix the
+  mobile-hidden colorbox caption) and associated via `aria-describedby`: beside the image from 768, behind the
+  labelled details toggle on phones (§3; image-first like the source).
 - Respect `prefers-reduced-motion` (no cross-fade / transform animation).
 
 ## 7. EDS target
@@ -255,7 +258,7 @@ WHAT / WHERE / viewport / expected / actual.
       stage height `calc(100vh - topbar - infobar)`.
 - [ ] Controls: prev/next/close are labeled `<button>`; prev/next disc accent `#419468`; close top-right.
 - [ ] Counter: updates on prev/next; `aria-live` announces "Image X of N".
-- [ ] Caption: `data-caption` shown as `<figcaption>` on grid AND in lightbox at every viewport.
+- [ ] Caption: `data-caption` as `<figcaption>` in the lightbox at every viewport (phones: via the details toggle).
 - [ ] Overview grid: `>19 -> 5`, `>9 -> 4`, `else 3` cols.
 - [ ] **A11y GATE:** `role=dialog aria-modal`; focus trapped; Escape closes; Left/Right navigate;
       focus returns to the invoking thumbnail; visible `:focus-visible` on all controls; every image
