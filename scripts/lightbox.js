@@ -28,7 +28,7 @@ const LABELS = {
   next: 'Next image',
   close: 'Close gallery',
   video: 'Video player',
-  // the visible counter is "N / total" (the "/" is CSS); the aria-live label is the long form
+  // the visible counter reads "N / total" (the total in grey); the aria-live label is the long form
   counterLabel: (n, total) => `Image ${n} of ${total}`,
   // detail-panel action buttons (Media-Room style)
   addToBox: 'Add to media box',
@@ -241,10 +241,13 @@ export function buildLightbox(host, items) {
     } else {
       stageCaption.hidden = true;
     }
-    // "1" + the total in grey (its "/" is a CSS ::before), as the source counter
+    // "1 / 20": the total (with its separator) in grey, as the source counter
+    const sep = document.createElement('span');
+    sep.className = 'gallery-lightbox-sep';
+    sep.textContent = ' / ';
     const total = document.createElement('span');
     total.className = 'gallery-lightbox-total';
-    total.textContent = String(items.length);
+    total.append(sep, String(items.length));
     counter.replaceChildren(String(current + 1), total);
     counter.setAttribute('aria-label', LABELS.counterLabel(current + 1, items.length));
   };

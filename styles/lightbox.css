@@ -388,9 +388,10 @@ body.gallery-lightbox-open {
   color: var(--gallery-counter-total);
 }
 
-.gallery-lightbox-total::before {
-  content: '/';
-  margin: 0 var(--spacing-s);
+/* the source "/" sits 12px from each number: the spaces around it plus the rest in margin */
+.gallery-lightbox-sep {
+  margin: 0 var(--lightbox-sep-margin, 6px);
+  white-space: pre;
 }
 
 .gallery-lightbox-prev,
