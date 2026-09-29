@@ -80,6 +80,38 @@ export function parseDetailPanel(doc) {
   };
 }
 
+/**
+ * The detail fields a row must carry to be published: every file the lightbox offers
+ * (images, content assets, videos with an MP4) shows its type, size and dimensions, as the
+ * source panel does. Vimeo-only videos have no file panel.
+ */
+export function requiredDetails(item) {
+  const hasFile = item.type === 'image' || item.type === 'asset'
+    || (item.type === 'video' && !!item.mp4);
+  return hasFile ? ['filetype', 'filesize', 'dimensions'] : [];
+}
+
+/** Rows missing a required detail field: [{ id, type, title, missing: [field…] }]. */
+export function detailGaps(items) {
+  return items.map((item) => ({
+    id: item.id,
+    type: item.type,
+    title: item.title,
+    missing: requiredDetails(item).filter((f) => !item[f]),
+  })).filter((g) => g.missing.length);
+}
+
+/**
+ * Gaps not covered by a recorded, verified source gap (sources.json `knownDetailGaps`):
+ * a known entry covers a row only for the fields it lists, so anything new still fails.
+ */
+export function unknownGaps(gaps, known = {}) {
+  return gaps.filter((g) => {
+    const entry = known[g.id];
+    return !entry || !g.missing.every((f) => (entry.missing || []).includes(f));
+  });
+}
+
 /** Lowercase, anything outside [a-z0-9-] becomes `-` (the EDS path rule, push/m1-status-lib). */
 export function slugify(value) {
   return String(value || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')

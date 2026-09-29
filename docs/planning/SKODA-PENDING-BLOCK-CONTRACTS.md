@@ -285,6 +285,11 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   listings and rails never show them (they scope `template=image|video`).
 - **Shape 6 (2026-09-28, SKODA-208):** + the video lines of the source panel: `length` (14:05), `bitrate`
   (29994kb/s), `audioformat` (the source's "Audio format", `.meta-dataformat`: quicktime). Empty for images.
+- **Detail gate (2026-09-29, #200 review):** every row the lightbox offers as a file (images, `asset` rows, videos
+  with an MP4) must carry `filetype`, `filesize` and `dimensions`. The builder re-fetches incomplete or missing
+  panels (3 attempts, fresh nonce), caches only complete ones, writes `detail-gaps.json`, and **fails the build**
+  on any gap not recorded as a verified source gap in `sources.json` `knownDetailGaps` (6 today: 5 Peaq / Epiq
+  videos with an empty source panel, 1 video without a dimensions line).
 - **Sharding:** a sheet holds 500k cells (~20k rows at ~30 columns); split by type/year before that (the loader
   pages with `offset`).
 - Domain-restricted Vimeo videos (oEmbed `domain_status_code: 403`) can't play on the demo and are not emitted.

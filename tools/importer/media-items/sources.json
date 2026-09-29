@@ -1,15 +1,115 @@
 {
   "comment": "SKODA-608 source listing queries. Each renders `n` cards server-side (ajax_search_results_<type>=n). Items are merged by source id. Sized so the Peaq/Epiq rails fill (≥12 images each, all Peaq videos, all 9 Epiq videos) and a facet filter still leaves a load-more (>12) on both listings. Octavia (SKODA-208): the model page's Images/Videos rails show the 20 newest of each; 24 covers domain-restricted videos that are dropped. assetPages: URL lists whose pages link images from their copy (the model-page Liftback / Combi drawings); those become `asset` rows for the lightbox.",
-  "assetPages": ["tools/importer/urls-model-page.txt"],
+  "assetPages": [
+    "tools/importer/urls-model-page.txt"
+  ],
   "queries": [
-    { "type": "image", "filter": { "model": "peaq" }, "n": 30 },
-    { "type": "image", "filter": { "model": "epiq" }, "n": 30 },
-    { "type": "image", "filter": { "model": "peaq", "view": "interior" }, "n": 12 },
-    { "type": "image", "filter": { "model": "octavia" }, "n": 24 },
-    { "type": "image", "n": 24 },
-    { "type": "video", "filter": { "model": "peaq" }, "n": 24 },
-    { "type": "video", "filter": { "model": "epiq" }, "n": 24 },
-    { "type": "video", "filter": { "model": "octavia" }, "n": 24 },
-    { "type": "video", "n": 24 }
-  ]
+    {
+      "type": "image",
+      "filter": {
+        "model": "peaq"
+      },
+      "n": 30
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "epiq"
+      },
+      "n": 30
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "peaq",
+        "view": "interior"
+      },
+      "n": 12
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "octavia"
+      },
+      "n": 24
+    },
+    {
+      "type": "image",
+      "n": 24
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "peaq"
+      },
+      "n": 24
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "epiq"
+      },
+      "n": 24
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "octavia"
+      },
+      "n": 24
+    },
+    {
+      "type": "video",
+      "n": 24
+    }
+  ],
+  "knownDetailGaps": {
+    "_comment": "Rows the source itself has no detail for (verified with repeated live requests). The feed build fails on any other incomplete row. Re-verify and drop an entry when the source fills it.",
+    "445970": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on every request, fresh nonce, 2026-09-29; the source lightbox shows no file details either"
+    },
+    "445988": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on every request, fresh nonce, 2026-09-29; the source lightbox shows no file details either"
+    },
+    "446003": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on every request, fresh nonce, 2026-09-29; the source lightbox shows no file details either"
+    },
+    "445991": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on every request, fresh nonce, 2026-09-29; the source lightbox shows no file details either"
+    },
+    "443382": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on every request, fresh nonce, 2026-09-29; the source lightbox shows no file details either"
+    },
+    "396289": {
+      "missing": [
+        "dimensions"
+      ],
+      "reason": "source panel has file type, size and date but no dimensions line, 2026-09-29"
+    }
+  }
 }

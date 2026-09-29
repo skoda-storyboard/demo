@@ -25,7 +25,8 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import {
   SOURCE_ORIGIN, facetOptions, parseCards, mergeItems, feedSheet, yearIds, vimeoPoster,
-  detailRequest, ajaxNonce, parseDetailPanel, parseAssetLinks, assetItem,
+  detailRequest, ajaxNonce, parseDetailPanel, parseAssetLinks, assetItem, requiredDetails,
+  detailGaps, unknownGaps,
 } from './media-items-lib.mjs';
 import { uploadToDA } from '../media/media-lib.mjs';
 import { readLists } from '../build-link-allowlist.mjs';
@@ -50,7 +51,12 @@ export function loadJSDOM() {
 
 function parseArgs(argv) {
   const a = {
-    out: path.join(ROOT, 'content'), cache: path.join(ROOT, '.migration/work/608/cache'), offline: false, dryRun: false, push: false,
+    out: path.join(ROOT, 'content'),
+    cache: path.join(ROOT, '.migration/work/608/cache'),
+    offline: false,
+    dryRun: false,
+    push: false,
+    allowIncomplete: false,
   };
   for (let i = 0; i < argv.length; i += 1) {
     const k = argv[i];
@@ -60,6 +66,7 @@ function parseArgs(argv) {
     else if (k === '--offline') a.offline = true;
     else if (k === '--dry-run') a.dryRun = true;
     else if (k === '--push') a.push = true;
+    else if (k === '--allow-incomplete') a.allowIncomplete = true;
     else throw new Error(`unknown flag ${k}`);
   }
   return a;
@@ -95,46 +102,81 @@ async function fetchText(url, cacheDir, offline) {
   throw new Error(`failed ${url}`);
 }
 
-/** POST with the same file cache as fetchText (keyed by `key`, not the URL). */
-async function fetchPost(url, body, key, cacheDir, offline) {
-  const file = path.join(cacheDir, `${key}.json`);
-  if (existsSync(file)) return readFileSync(file, 'utf8');
-  if (offline) throw new Error(`offline and not cached: ${key}`);
+/** POST a form to the source (no cache: callers decide what is worth caching). */
+async function postForm(url, body) {
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'user-agent': UA, 'content-type': 'application/x-www-form-urlencoded; charset=UTF-8' },
     body,
   });
-  if (!res.ok) throw new Error(`${res.status} ${url} (${key})`);
-  const out = await res.text();
-  mkdirSync(cacheDir, { recursive: true });
-  writeFileSync(file, out);
-  return out;
+  if (!res.ok) throw new Error(`${res.status} ${url}`);
+  return res.text();
+}
+
+/** A fresh ajax nonce from a live listing page (the cached one may have expired). */
+async function freshNonce() {
+  const res = await fetch(listingUrl({ type: 'image', n: 1 }), { headers: { 'user-agent': UA } });
+  return res.ok ? ajaxNonce(await res.text()) : '';
+}
+
+/**
+ * One item's source detail panel, validated: a cached panel is used only when it carries the
+ * item's required fields; otherwise it is fetched again (3 attempts, a fresh nonce after the
+ * first). Only a complete panel is cached, so an empty 200 (the source sometimes answers with
+ * `items_current: 0`) never sticks. Returns the parsed panel document, or null.
+ */
+async function fetchDetail(JSDOM, item, ctx) {
+  const file = path.join(ctx.cacheDir, `detail_${item.id}.json`);
+  const required = requiredDetails(item);
+  const parse = (text) => {
+    const doc = new JSDOM(JSON.parse(text).html || '').window.document;
+    const panel = parseDetailPanel(doc);
+    return { doc, complete: required.every((f) => panel[f]) };
+  };
+  let last = null;
+  if (existsSync(file)) {
+    try {
+      last = parse(readFileSync(file, 'utf8'));
+      if (last.complete) return last.doc;
+    } catch (e) { /* unreadable cache: fetch again */ }
+  }
+  if (ctx.offline) return last ? last.doc : null;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      if (attempt > 1) ctx.nonce = (await freshNonce()) || ctx.nonce;
+      const { url, body } = detailRequest(item.id, ctx.nonce);
+      // eslint-disable-next-line no-await-in-loop
+      const text = await postForm(url, body);
+      last = parse(text);
+      if (last.complete) {
+        mkdirSync(ctx.cacheDir, { recursive: true });
+        writeFileSync(file, text);
+        return last.doc;
+      }
+    } catch (e) { /* retry */ }
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((r) => { setTimeout(r, 750 * attempt); });
+  }
+  return last ? last.doc : null;
 }
 
 /**
  * The lightbox detail panel of every item (media-item shape 4): the source colorbox loads it
  * per item (`image-overlay-meta-data`). A related article that is a demo page links there.
  */
-async function addDetails(JSDOM, items, nonce, cacheDir, offline) {
+async function addDetails(JSDOM, items, ctx) {
   const demo = new Set(readLists().paths);
-  let missing = 0;
   for (const item of items) {
-    const { url, body } = detailRequest(item.id, nonce);
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      const json = JSON.parse(await fetchPost(url, body, `detail_${item.id}`, cacheDir, offline));
-      Object.assign(item, parseDetailPanel(new JSDOM(json.html || '').window.document));
-      if (item.related) {
-        const rel = new URL(item.related, SOURCE_ORIGIN);
-        const local = rel.pathname.toLowerCase().replace(/\/+$/, '');
-        if (demo.has(local)) item.related = local;
-      }
-    } catch (e) {
-      missing += 1;
+    // eslint-disable-next-line no-await-in-loop
+    const doc = await fetchDetail(JSDOM, item, ctx);
+    if (doc) Object.assign(item, parseDetailPanel(doc));
+    if (item.related) {
+      const rel = new URL(item.related, SOURCE_ORIGIN);
+      const local = rel.pathname.toLowerCase().replace(/\/+$/, '');
+      if (demo.has(local)) item.related = local;
     }
   }
-  if (missing) console.warn(`[media-items] no detail panel for ${missing} item(s)`);
 }
 
 /**
@@ -142,7 +184,8 @@ async function addDetails(JSDOM, items, nonce, cacheDir, offline) {
  * `asset` rows (media-item shape 5): the lightbox detail panel only, no listing or rail.
  * Pages come from the URL lists in sources.json `assetPages`.
  */
-async function collectAssets(JSDOM, lists, nonce, cacheDir, offline, known) {
+async function collectAssets(JSDOM, lists, ctx, known) {
+  const { cacheDir, offline } = ctx;
   const pages = lists.flatMap((file) => readFileSync(path.join(ROOT, file), 'utf8').split(/\r?\n/))
     .map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));
   const out = [];
@@ -156,13 +199,9 @@ async function collectAssets(JSDOM, lists, nonce, cacheDir, offline, known) {
     }
     for (const link of links.filter((l) => !known.has(l.id))) {
       known.add(link.id);
-      const { url: ajax, body } = detailRequest(link.id, nonce);
-      let panel = '';
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        panel = JSON.parse(await fetchPost(ajax, body, `detail_${link.id}`, cacheDir, offline)).html || '';
-      } catch (e) { /* the alt text still titles the lightbox */ }
-      out.push(assetItem(link, new JSDOM(panel).window.document));
+      // eslint-disable-next-line no-await-in-loop
+      const doc = await fetchDetail(JSDOM, { id: link.id, type: 'asset' }, ctx);
+      out.push(assetItem(link, doc || new JSDOM('').window.document));
     }
   }
   return out;
@@ -217,7 +256,8 @@ async function pushFeed(file) {
 export async function main(argv = process.argv.slice(2)) {
   const a = parseArgs(argv);
   const JSDOM = loadJSDOM();
-  const { queries, assetPages = [] } = JSON.parse(readFileSync(path.join(HERE, 'sources.json'), 'utf8'));
+  const sources = JSON.parse(readFileSync(path.join(HERE, 'sources.json'), 'utf8'));
+  const { queries, assetPages = [], knownDetailGaps = {} } = sources;
   const lists = [];
   const yearsById = {};
   let nonce = '';
@@ -255,10 +295,25 @@ export async function main(argv = process.argv.slice(2)) {
   };
   const dropped = items.filter((i) => reason(i));
   items = items.filter((i) => !reason(i));
-  await addDetails(JSDOM, items, nonce, a.cache, a.offline);
+  const ctx = { cacheDir: a.cache, offline: a.offline, nonce };
+  await addDetails(JSDOM, items, ctx);
   const known = new Set(items.map((i) => i.id));
-  const assets = await collectAssets(JSDOM, assetPages, nonce, a.cache, a.offline, known);
+  const assets = await collectAssets(JSDOM, assetPages, ctx, known);
   items = [...items, ...assets];
+
+  // gate: a row the lightbox offers as a file must carry its details (reported by id)
+  const gaps = detailGaps(items);
+  const gapReport = path.join(a.cache, 'detail-gaps.json');
+  mkdirSync(a.cache, { recursive: true });
+  writeFileSync(gapReport, `${JSON.stringify(gaps, null, 2)}\n`);
+  const unknown = unknownGaps(gaps, knownDetailGaps);
+  if (gaps.length) {
+    console.warn(`[media-items] ${gaps.length} row(s) without their detail fields, ${unknown.length} not a known source gap (${gapReport}):`);
+    gaps.forEach((g) => console.warn(`  ${unknown.includes(g) ? 'NEW  ' : 'known'} ${g.type} ${g.id} ${g.title}: ${g.missing.join(', ')}`));
+  }
+  if (unknown.length && !a.allowIncomplete) {
+    throw new Error(`${unknown.length} incomplete detail panel(s); not writing the feed (record verified source gaps in sources.json knownDetailGaps, or --allow-incomplete)`);
+  }
 
   const summary = {
     images: items.filter((i) => i.type === 'image').length,

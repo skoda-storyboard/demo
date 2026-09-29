@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import {
   slugify, isoDate, cdnUrl, vimeoPoster, facetOptions, cardTerms, parseCards, mergeItems,
   feedRow, feedSheet, itemSlug, sourceOrder, FACETS, DETAIL_FIELDS, parseDetailPanel, ajaxNonce,
-  detailRequest, parseAssetLinks, assetItem,
+  detailRequest, parseAssetLinks, assetItem, requiredDetails, detailGaps, unknownGaps,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 
@@ -225,4 +225,36 @@ test('video detail panel (shape 6): length, bitrate and audio format', { skip },
   assert.equal(panel.length, '14:05');
   assert.equal(panel.bitrate, '29994kb/s');
   assert.equal(panel.audioformat, 'quicktime');
+});
+
+test('detail gate: files need type, size and dimensions; Vimeo-only videos need none', () => {
+  assert.deepEqual(requiredDetails({ type: 'image' }), ['filetype', 'filesize', 'dimensions']);
+  assert.deepEqual(requiredDetails({ type: 'asset' }), ['filetype', 'filesize', 'dimensions']);
+  assert.deepEqual(requiredDetails({ type: 'video', mp4: 'https://cdn.example/v.mp4' }), ['filetype', 'filesize', 'dimensions']);
+  assert.deepEqual(requiredDetails({ type: 'video', mp4: '' }), []);
+  const gaps = detailGaps([
+    { id: '451237', type: 'image', title: 'Empty panel' },
+    {
+      id: '1', type: 'image', title: 'OK', filetype: 'JPG', filesize: '6 MB', dimensions: '5000 × 7496 px',
+    },
+    { id: '2', type: 'video', title: 'Vimeo only' },
+  ]);
+  assert.deepEqual(gaps, [{
+    id: '451237', type: 'image', title: 'Empty panel', missing: ['filetype', 'filesize', 'dimensions'],
+  }]);
+});
+
+test('detail gate: only a recorded source gap, for the fields it lists, lets a row through', () => {
+  const gaps = [
+    { id: '445970', missing: ['filetype', 'filesize', 'dimensions'] },
+    { id: '396289', missing: ['dimensions'] },
+    { id: '396289b', missing: ['filesize'] },
+    { id: '451237', missing: ['filetype'] },
+  ];
+  const known = {
+    445970: { missing: ['filetype', 'filesize', 'dimensions'] },
+    396289: { missing: ['dimensions'] },
+    '396289b': { missing: ['dimensions'] },
+  };
+  assert.deepEqual(unknownGaps(gaps, known).map((g) => g.id), ['396289b', '451237']);
 });
