@@ -1,0 +1,234 @@
+/* ==========================================================================
+ * float-dock — page-level floating action bar (SKODA-215)
+ * Spec: docs/ui-specs/social-share.md + media-cart.md §2; measured on the source
+ * `.sticky-buttons` bar (Epiq story, 390 / 767-769 / 991-992 / 1440, 2026-09-29):
+ * - fixed bottom 8px / right 16px, 6px inner padding; buttons 40px, 58px at >= 992
+ * - share → scroll-top pitch = button + 4px
+ * - share list: stacks upward (4px gap, 10px off the trigger) below 768;
+ *   runs leftward (3.2px gap, 9px off the trigger) at >= 768
+ * Mobile-first. Two independent transitions, one breakpoint each: 768 = list direction
+ * (+ WhatsApp, which the spec scopes to below 768), 992 = button size.
+ * Stacking order: --z-float-dock in styles.css.
+ * ========================================================================== */
+
+.float-dock {
+  --float-dock-button-size: 40px;
+  --float-dock-icon-size: 16px;
+  --float-dock-trigger-icon-size: 16px;
+  --float-dock-top-icon-size: 24px;
+  --float-dock-padding: 6px;
+  --float-dock-gap: 4px;
+  --float-dock-list-gap: 4px;
+  --float-dock-list-offset: 10px;
+  --float-dock-radius: var(--dropdown-radius);
+  --float-dock-shadow: var(--dropdown-shadow);
+  --float-dock-pitch: calc(var(--float-dock-button-size) + var(--float-dock-gap));
+
+  /* scroll-top reveal: the source's .sticky-button spring (opacity + slide, 0.3s) */
+  --float-dock-reveal: 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+
+  /* inline direction for the transform slides (the insets are logical already) */
+  --float-dock-dir: 1;
+
+  position: fixed;
+  inset-block-end: var(--spacing-xs);
+  inset-inline-end: var(--spacing-m);
+  z-index: var(--z-float-dock);
+  display: flex;
+  align-items: flex-end;
+  gap: var(--float-dock-gap);
+  box-sizing: border-box;
+  padding: var(--float-dock-padding);
+
+  /* the bar's padding box must not swallow clicks on the page; its controls opt back in */
+  pointer-events: none;
+}
+
+.float-dock:dir(rtl) {
+  --float-dock-dir: -1;
+}
+
+/* scripts.js loads this CSS before inserting the block, so it stays out of the layout until
+   decorated and then appears whole (no layout shift) */
+.float-dock:not([data-block-status='loaded']) {
+  display: none;
+}
+
+/* media-cart slot (SKODA-505a/b fills it); takes no space while empty */
+.float-dock .float-dock-slot {
+  transition: transform var(--float-dock-reveal);
+}
+
+.float-dock .float-dock-slot:empty {
+  display: none;
+}
+
+.float-dock .float-dock-share {
+  position: relative;
+  transition: transform var(--float-dock-reveal);
+}
+
+/* --- buttons (share trigger, scroll-top) and network links ---------------- */
+.float-dock .float-dock-button,
+.float-dock .float-dock-network {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  inline-size: var(--float-dock-button-size);
+  block-size: var(--float-dock-button-size);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--float-dock-radius);
+  box-shadow: var(--float-dock-shadow);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.float-dock .float-dock-button {
+  background-color: var(--background-color);
+}
+
+.float-dock .float-dock-button:focus-visible,
+.float-dock .float-dock-network:focus-visible {
+  outline: 2px solid var(--text-color);
+  outline-offset: 2px;
+}
+
+.float-dock .icon {
+  inline-size: var(--float-dock-icon-size);
+  block-size: var(--float-dock-icon-size);
+}
+
+.float-dock .float-dock-trigger .icon {
+  inline-size: var(--float-dock-trigger-icon-size);
+  block-size: var(--float-dock-trigger-icon-size);
+}
+
+.float-dock .float-dock-top .icon {
+  inline-size: var(--float-dock-top-icon-size);
+  block-size: var(--float-dock-top-icon-size);
+}
+
+/* network brand backgrounds, white glyphs (WhatsApp: ink glyph for contrast) */
+.float-dock .float-dock-network-x { background-color: var(--social-x); }
+.float-dock .float-dock-network-pinterest { background-color: var(--social-pinterest); }
+.float-dock .float-dock-network-linkedin { background-color: var(--social-linkedin); }
+.float-dock .float-dock-network-facebook { background-color: var(--social-facebook); }
+.float-dock .float-dock-network-whatsapp { background-color: var(--social-whatsapp); }
+
+/* source hover: glyph rgba(255 255 255 / 70%), X glyph #ccc (≈ 80% white on black);
+   hover-capable pointers only, so the dim state doesn't stick after a tap */
+@media (hover: hover) {
+  .float-dock .float-dock-network:hover .icon {
+    opacity: 0.7;
+  }
+
+  .float-dock .float-dock-network-x:hover .icon {
+    opacity: 0.8;
+  }
+}
+
+/* --- share list: stacked upward from the trigger (base) -------------------- */
+.float-dock .float-dock-share-list {
+  position: absolute;
+  inset-block-end: calc(100% + var(--float-dock-list-offset));
+  inset-inline-start: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--float-dock-list-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  /* collapsed (source .social-container): faded and nudged 15% back toward the trigger,
+     along the list axis (stacked: down; row: right, see the 768 query) */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(15%);
+
+  /* source timing: collapse 0.4s after 0.2s; expand 0.2s ease-out after 0.2s (the expanded
+     state swaps the variable, so this is the only transition declaration) */
+  --float-dock-list-motion: 0.4s cubic-bezier(0.55, -0.59, 0.2, 0.37) 0.2s;
+
+  transition:
+    opacity var(--float-dock-list-motion),
+    transform var(--float-dock-list-motion),
+    visibility var(--float-dock-list-motion);
+}
+
+/* cancel the global prose `li` rhythm; spacing comes from the list gap */
+.float-dock .float-dock-share-list li {
+  margin: 0;
+}
+
+
+.float-dock .float-dock-share.expanded .float-dock-share-list {
+  --float-dock-list-motion: 0.2s ease-out 0.2s;
+
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+/* --- scroll-top: hidden until 300px of scroll (float-dock.js) --------------
+   It keeps its slot; the share cluster (and cart slot) slide over it with a transform,
+   so the reveal is not a layout shift. */
+.float-dock .float-dock-top {
+  transition: opacity var(--float-dock-reveal), visibility var(--float-dock-reveal);
+}
+
+.float-dock:not(.scrolled) .float-dock-top {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.float-dock:not(.scrolled) .float-dock-share,
+.float-dock:not(.scrolled) .float-dock-slot {
+  transform: translateX(calc(var(--float-dock-pitch) * var(--float-dock-dir)));
+}
+
+/* list runs leftward from the trigger */
+@media (width >= 768px) {
+  .float-dock {
+    --float-dock-list-gap: 0.2rem;
+    --float-dock-list-offset: 9px;
+  }
+
+  .float-dock .float-dock-share-list {
+    inset-block-end: 0;
+    inset-inline: auto calc(100% + var(--float-dock-list-offset));
+    flex-direction: row-reverse;
+
+    /* the source row also carries a 60px end padding, so its 15% nudge is ~9px longer */
+    transform: translateX(calc((15% + var(--float-dock-list-offset)) * var(--float-dock-dir)));
+  }
+
+  .float-dock .float-dock-share.expanded .float-dock-share-list {
+    transform: none;
+  }
+
+  /* WhatsApp only below 768 (SKODA-215 spec, product decision 2026-09-29). This is a
+     deliberate exception to css-guidelines §8: the ticket keys it to the stacked mobile layout */
+  .float-dock .float-dock-share-item-whatsapp {
+    display: none;
+  }
+}
+
+/* desktop button size */
+@media (width >= 992px) {
+  .float-dock {
+    --float-dock-button-size: 58px;
+    --float-dock-icon-size: 24px;
+    --float-dock-trigger-icon-size: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-dock .float-dock-share,
+  .float-dock .float-dock-slot,
+  .float-dock .float-dock-share-list,
+  .float-dock .float-dock-top {
+    transition: none;
+  }
+}
