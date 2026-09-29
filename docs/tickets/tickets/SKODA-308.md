@@ -32,6 +32,16 @@ search open) on `/en`, a press release, the Epiq story and a press kit.
 Header/footer CSS + `header.js` (search expand + scope select, drawer), footer fragment content (legal links), topbar
 newsletter panel UI stub (shares markup/CSS with the SKODA-823 sidebar widget).
 
+**Header edge alignment (handed over from SKODA-826, 2026-09-29):**
+- 826 sets the page content to `--page-gutter` (10px at every width, inside the 1248 cap), so the header now sits
+  inside the content edge. The header nav row (`header nav` padding) and the topbar are still on
+  `var(--spacing-l)` / `var(--spacing-xl)`.
+- Measured on the Epiq story:
+  - logo at 24 on mobile (content 10; live logo image 16);
+  - logo at 24 at 1080 (live 10) and at 40 at 1280 (live 26 = the content edge).
+- Rebase the nav row and topbar inline padding onto `--page-gutter`, and adjust the drawer's negative-margin
+  compensations (`calc(-1 * var(--spacing-l))`) with them.
+
 ## Acceptance Criteria
 - [ ] Every value above matches at 1440 and 390 (±2px), verified on `.aem.page` **and** `.aem.live`.
 - [ ] Search opens the 624px bar with the scope select; Esc closes it; submit routes to the search page (SKODA-403).
