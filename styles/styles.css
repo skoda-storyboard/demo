@@ -91,7 +91,13 @@
   --heading-font-size-story-h3-mobile: 20px;
   --heading-font-size-story-h3: 24px;
   --story-meta-gap: 11px; /* published date → category tag, same row (live) */
-  --story-intro-gap: 0px; /* source .content has no top margin below 768 */
+
+  /* intro (hero caption: perex, date, tag) → article, measured on the live Epiq story from
+     the caption's bottom edge: the source .content column has margin-top 0 (<768) / 32px
+     (>=768) and its text sits 10px in (panel cell padding, = --story-inset); the aside box
+     starts at the edge with a 32px top padding (>=768) */
+  --story-body-gap: 0px;
+  --story-aside-inset-top: 32px;
 
   /* hero geometry (hero.md §8; SKODA-202) */
   --hero-vh: 61.8vh;
@@ -748,17 +754,6 @@ body.story main > .section.body-column > div {
   padding-inline: var(--story-inset);
 }
 
-body.story main > .section.body-column > .default-content-wrapper {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: none;
-  margin-inline: 0;
-}
-
-body.story main > .section.body-column {
-  margin-top: var(--story-intro-gap);
-}
-
 body.story main > .section.body-column .default-content-wrapper {
   font-size: var(--body-font-size-m);
   line-height: 1.5;
@@ -810,8 +805,16 @@ body.story main > .section.story-intro .tags-list li {
   margin-bottom: 0;
 }
 
-body.story main > .section.story-intro {
+/* intro → article body. The intro ends the first (hero) section on every story: in the
+   Hero Image caption, or in the hero section's own default content (.story-intro). Its
+   bottom margin is dropped so the gap is set once, on the section that follows. */
+body.story main > .section:first-of-type {
   margin-bottom: 0;
+}
+
+body.story main > .section:first-of-type + .section.body-column {
+  margin-top: var(--story-body-gap);
+  padding-top: var(--story-inset);
 }
 
 body.story main > .section.body-column .default-content-wrapper ul {
@@ -856,7 +859,7 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
    the source's 819px at 1248 (707 at 1080, 499 at 768); the aside takes the rest. */
 @media (width >= 768px) {
   body.story {
-    --story-intro-gap: 32px;
+    --story-body-gap: 32px;
   }
 
   body.story main {
@@ -872,10 +875,6 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
   /* the text ends where the aside track starts (the aside owns the 64px gap) */
   body.story main > .section.body-column > div {
     padding-inline: var(--story-inset) 0;
-  }
-
-  body.story main > .section.body-column > .default-content-wrapper {
-    /* Removed padding-inline: var(--story-inset) 0; */
   }
 
   /* Full-bleed sections (hero) opt out of the grid and span both tracks. */
@@ -900,10 +899,11 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
     padding-inline: var(--spacing-xxl) var(--story-inset);
   }
 
-  /* The source content column starts 32px below its container (grid items do not collapse
-     margins, so both first-row sections carry it and stay top-aligned) */
-  body.story main > .section.story-intro ~ .section.sidebar {
-    margin-top: var(--story-intro-gap);
+  /* intro → aside: the box starts at the intro's edge and pads its content 32px down, level
+     with the body column's box (source .sidebar). Grid items don't collapse margins. */
+  body.story main > .section:first-of-type ~ .section.sidebar {
+    margin-top: 0;
+    padding-top: var(--story-aside-inset-top);
   }
 
   body.story main > .section.dark {
