@@ -169,10 +169,17 @@ measured here.
   seeds the first slice; `perpage` (6) sizes each Load more; `columns: featured` selects the
   2-large-then-3-up grid (vs a plain 3-up). Authors omit/add cells → decorate defensively (fall through to
   sensible defaults; never assume a cell exists).
-  The Storyboard home importer instead authors `exclude` as a comma-separated
-  list of the promo's exact site-relative paths. This keeps the feed from
-  repeating curated promo stories even if their index positions change; do not
-  combine `exclude` with an `offset` that also skips those stories.
+  Two mutually exclusive ways to keep the feed from repeating the promo box, chosen by how the
+  promo is filled:
+  - **Indexed promo (the Storyboard home; SKODA-827, `home-stories.js`).** The Promo Box is index
+    config (`template story`, `path /en/`, `limit 3`), so promo and feed select the same eligible,
+    newest-first `/en/` stories and the feed skips the first three with `offset: 3`. This stays
+    complementary as new stories enter the index. Do **not** author fixed `exclude` paths here:
+    they would drift from what the indexed promo shows.
+  - **Curated (authored) promo.** When authors pick the promo stories by hand, their index
+    positions are arbitrary, so author `exclude` as a comma-separated list of the promo's exact
+    site-relative paths instead of an `offset`. Don't combine `exclude` with an `offset` that
+    also skips those stories.
 - **`decorate()` outline:** `readConfig(block)` → `{ index, template, offset, initial, perpage, sort, columns }`;
   load rows via `scripts/query-index.js`; `sortRows` (newest-first); render first `initial` `card-teaser`
   cards (first image `createOptimizedPicture` + `fetchpriority="high"`, rest lazy); append a centered
