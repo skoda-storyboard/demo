@@ -26,7 +26,7 @@ import { fileURLToPath } from 'node:url';
 import {
   SOURCE_ORIGIN, facetOptions, parseCards, mergeItems, feedSheet, yearIds, vimeoPoster,
   detailRequest, ajaxNonce, parseDetailPanel, parseAssetLinks, assetItem, requiredDetails,
-  detailGaps, unknownGaps,
+  detailGaps, unknownGaps, feedCoverageGaps,
 } from './media-items-lib.mjs';
 import { uploadToDA } from '../media/media-lib.mjs';
 import { readLists } from '../build-link-allowlist.mjs';
@@ -238,8 +238,24 @@ async function oembed(vimeoId, cacheDir, offline) {
   }
 }
 
+const MEDIA_MANIFEST = path.join(ROOT, 'tools/importer/media/media-manifest.json');
+
+/**
+ * Publication gate (SKODA-501/504 traceability): every binary the feed serves (thumbnail,
+ * 1920 rendition, original, poster, MP4) needs a media-manifest row, recorded with
+ * `npm run media:build -- --feed <feed file>`. Throws with the uncovered URLs.
+ */
+function assertManifestCoverage(file) {
+  const rows = existsSync(MEDIA_MANIFEST) ? JSON.parse(readFileSync(MEDIA_MANIFEST, 'utf8')).rows : {};
+  const gaps = feedCoverageGaps(JSON.parse(readFileSync(file, 'utf8')), rows);
+  if (!gaps.length) return;
+  gaps.slice(0, 20).forEach((g) => console.warn(`  unrecorded ${g.field} (${g.id}): ${g.url}`));
+  throw new Error(`${gaps.length} feed media URL(s) have no media-manifest row; run \`npm run media:build -- --feed ${path.relative(ROOT, file)}\` before --push`);
+}
+
 /** Upload the sheet to DA, then preview + publish it (credentials are injected for DA/admin). */
 async function pushFeed(file) {
+  assertManifestCoverage(file);
   const res = await uploadToDA({
     org: ORG, repo: REPO, daPath: `/${FEED_PATH}`, buffer: readFileSync(file), contentType: 'application/json',
   });

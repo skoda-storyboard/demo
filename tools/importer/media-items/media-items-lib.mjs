@@ -17,6 +17,8 @@
  * on saved fixtures (tools/importer/media-items/media-items.test.mjs).
  */
 
+import { logicalId } from '../media/media-lib.mjs';
+
 export const SOURCE_ORIGIN = 'https://www.skoda-storyboard.com';
 export const CDN_ORIGIN = 'https://cdn.skoda-storyboard.com';
 
@@ -408,4 +410,56 @@ export function feedSheet(items) {
   return {
     total: data.length, offset: 0, limit: data.length, data, ':type': 'sheet',
   };
+}
+
+/** Where a feed item's media lives (its DAM folder until AEM Assets owns it): the listing home. */
+const FEED_HOME = { image: 'en/images', video: 'en/videos', asset: 'en/assets' };
+
+/**
+ * Every binary the media feed serves, for the media-ingestion manifest (SKODA-501/504): image
+ * and asset rows serve the thumbnail, the 1920 rendition and the original (one logical master);
+ * video rows the Vimeo poster (an image) and the MP4 (a binary). `feedPath` is the feed document
+ * (`en/media-feed`), recorded as the referencing page; `home` is the item's DAM folder.
+ * @returns {Array<{url, kind: 'image'|'video', field, id, title, alt, caption, home}>}
+ */
+export function feedMediaRefs(sheet) {
+  const rows = (sheet && sheet.data) || [];
+  const refs = [];
+  rows.forEach((row) => {
+    const home = FEED_HOME[row.template];
+    if (!home) return;
+    const base = {
+      id: row.id, title: row.title || '', alt: row.title || '', caption: row.description || '', home,
+    };
+    const add = (field, kind) => {
+      const url = row[field];
+      if (url && /^https?:\/\//.test(url)) {
+        refs.push({
+          ...base, url, kind, field,
+        });
+      }
+    };
+    if (row.template === 'video') {
+      add('poster', 'image');
+      if (row.image !== row.poster) add('image', 'image');
+      add('mp4', 'video');
+    } else {
+      add('image', 'image');
+      add('rendition-1920', 'image');
+      add('original', 'image');
+    }
+  });
+  return refs;
+}
+
+/**
+ * Feed binaries without a media-manifest row (by logical id, or a URL the row has seen): the
+ * feed must not be published while any is missing.
+ * @param {object} sheet the media feed
+ * @param {Record<string, object>} manifestRows media-manifest.json `rows`
+ */
+export function feedCoverageGaps(sheet, manifestRows = {}) {
+  const seen = new Set(Object.values(manifestRows).flatMap((r) => r.seen_urls || []));
+  return feedMediaRefs(sheet)
+    .filter((ref) => !manifestRows[logicalId(ref.url)] && !seen.has(ref.url));
 }

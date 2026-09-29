@@ -290,6 +290,9 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   panels (3 attempts, fresh nonce), caches only complete ones, writes `detail-gaps.json`, and **fails the build**
   on any gap not recorded as a verified source gap in `sources.json` `knownDetailGaps` (6 today: 5 Peaq / Epiq
   videos with an empty source panel, 1 video without a dimensions line).
+- **Manifest gate (2026-09-29, #200 review):** every binary a row serves (thumbnail, `rendition-1920`, `original`,
+  `poster`, `mp4`) has a row in `tools/importer/media/media-manifest.json` (`npm run media:build -- --feed …`);
+  `media-items:build --push` refuses to publish while one is missing. DAM upload stays deferred (import-time rows).
 - **Sharding:** a sheet holds 500k cells (~20k rows at ~30 columns); split by type/year before that (the loader
   pages with `offset`).
 - Domain-restricted Vimeo videos (oEmbed `domain_status_code: 403`) can't play on the demo and are not emitted.

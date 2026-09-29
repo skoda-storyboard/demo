@@ -15,6 +15,7 @@ import {
   slugify, isoDate, cdnUrl, vimeoPoster, facetOptions, cardTerms, parseCards, mergeItems,
   feedRow, feedSheet, itemSlug, sourceOrder, FACETS, DETAIL_FIELDS, parseDetailPanel, ajaxNonce,
   detailRequest, parseAssetLinks, assetItem, requiredDetails, detailGaps, unknownGaps,
+  feedMediaRefs, feedCoverageGaps,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 
@@ -257,4 +258,42 @@ test('detail gate: only a recorded source gap, for the fields it lists, lets a r
     '396289b': { missing: ['dimensions'] },
   };
   assert.deepEqual(unknownGaps(gaps, known).map((g) => g.id), ['396289b', '451237']);
+});
+
+test('feed media refs: every binary a row serves, with its home folder (manifest traceability)', () => {
+  const sheet = {
+    data: [
+      {
+        id: '409837',
+        template: 'image',
+        title: 'Infographic',
+        image: 'https://cdn.skoda-storyboard.com/2025/06/i-768x432.jpg',
+        'rendition-1920': 'https://cdn.skoda-storyboard.com/2025/06/i-1920x1080.jpg',
+        original: 'https://cdn.skoda-storyboard.com/2025/06/i.jpg',
+      },
+      {
+        id: '410179',
+        template: 'video',
+        title: 'Footage',
+        poster: 'https://i.vimeocdn.com/video/1-d_1280x720.jpg',
+        image: 'https://i.vimeocdn.com/video/1-d_1280x720.jpg',
+        mp4: 'https://cdn.skoda-storyboard.com/2025/06/f.mp4',
+      },
+      {
+        id: '361053', template: 'asset', title: 'Drawing', original: 'https://cdn.skoda-storyboard.com/2024/03/d.jpg', image: 'https://cdn.skoda-storyboard.com/2024/03/d.jpg',
+      },
+      { id: 'x', template: 'story', image: 'https://cdn.skoda-storyboard.com/s.jpg' },
+    ],
+  };
+  const refs = feedMediaRefs(sheet);
+  assert.deepEqual(refs.map((r) => `${r.id} ${r.field} ${r.kind} ${r.home}`), [
+    '409837 image image en/images', '409837 rendition-1920 image en/images', '409837 original image en/images',
+    '410179 poster image en/videos', '410179 mp4 video en/videos',
+    '361053 image image en/assets', '361053 original image en/assets',
+  ]);
+  // a manifest row by logical id (the master) covers every rendition of that image
+  const rows = { 'x__i.jpg': {} };
+  const covered = { 'row-a': { seen_urls: ['https://i.vimeocdn.com/video/1-d_1280x720.jpg'] } };
+  assert.equal(feedCoverageGaps(sheet, { ...covered }).length, 6, 'only the poster is recorded');
+  assert.ok(feedCoverageGaps(sheet, rows).length > 0);
 });
