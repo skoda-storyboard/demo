@@ -487,6 +487,7 @@ export default async function main(args = process.argv.slice(2)) {
       const allOk = row.steps.dam === 'done' && row.steps.publish === 'done'
         && row.public_verified?.url === publicUrl && !!publicUrl;
       row.status = allOk ? 'done' : 'partial';
+      if (allOk && !row.note?.startsWith('DAM provenance metadata ')) row.note = '';
       if (allOk) counts.done += 1; else counts.failed += 1;
       console.log(`  ${allOk ? '✓' : '⚠'} ${id}  ${info.kind} → ${row.dam_asset_path ? `DAM:${row.dam_asset_path}` : 'DAM pending'}`);
     } catch (err) {

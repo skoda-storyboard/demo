@@ -120,8 +120,9 @@ completion POST is never automatically retried. Its pending state is saved
 before the request. An uncertain completion remains `partial`: a rerun checks
 the authenticated author original's exact MIME and byte count, and does not
 download or re-upload while the author asset is absent or mismatched.
-Failures block rewriting. The standalone
-`media:validate-binaries` check is **offline** and emits per-page JSON results
+Successful public verification clears transient completion/retry notes;
+provenance-metadata warnings remain visible. Failures block rewriting. The
+standalone `media:validate-binaries` check is **offline** and emits per-page JSON results
 with a nonzero exit for missing, unrehosted or misclassified links. `import:push`
 rewrites verified source PDF/MP4 anchors from the manifest in memory before
 its per-page offline gate and DA decision, then stores the rewritten page

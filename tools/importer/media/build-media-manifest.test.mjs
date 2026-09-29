@@ -391,6 +391,7 @@ test('approved PDF and redirecting MP4 originals upload once and verify public d
     assert.equal(row.public_url, publicPdf);
     assert.equal(row.public_verified.mime, 'application/pdf');
     assert.equal(row.status, 'done');
+    assert.equal(row.note, '', 'successful completion clears the transient pending note');
     assert.equal(JSON.parse(readFileSync(manifest, 'utf8')).rows[videoId].public_url, publicMp4);
     assert.deepEqual(dam.activations, [
       `${assetPath}TD-Kodiaq-en.pdf`, `${assetPath}annual.pdf`, `${assetPath}clip.mp4`,
@@ -528,6 +529,7 @@ test('activation failure blocks delivery; retry publishes the existing DAM origi
     assert.equal(row.steps.publish, 'done');
     assert.equal(row.public_url, publicUrl);
     assert.equal(row.status, 'done');
+    assert.equal(row.note, '', 'successful retry clears the prior activation error');
     assert.deepEqual(dam.uploads, ['%PDF-TECH'], 'activation retry does not re-upload');
     assert.deepEqual(dam.activations, [damPath]);
   } finally {
@@ -661,6 +663,7 @@ test('uncertain completion waits for matching author original before publish, ne
     assert.equal(row.status, 'done');
     assert.equal(row.steps.dam, 'done');
     assert.equal(row.dam_asset_path, damPath);
+    assert.equal(row.note, '', 'confirmed original clears the uncertain completion note');
     assert.deepEqual(dam.uploads, []);
     assert.deepEqual(dam.activations, [damPath]);
   } finally {
@@ -717,6 +720,7 @@ test('failed complete marks manifest uncertain before any subsequent automatic r
     await build(args);
     row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
     assert.equal(row.status, 'done');
+    assert.equal(row.note, '', 'verified recovery clears the failed completion note');
     assert.equal(dam.uploads.length, 1);
     assert.deepEqual(dam.activations, [assetPath]);
   } finally {
