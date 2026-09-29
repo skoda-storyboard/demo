@@ -43,6 +43,11 @@
   margin: 0;
 }
 
+/* ink like the quote, not the global grey figcaption (the source's attribution is #161718) */
+.quote .quote-attribution {
+  color: var(--text-color);
+}
+
 .quote .quote-attribution strong {
   font-weight: var(--weight-semibold);
 }
