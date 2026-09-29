@@ -53,8 +53,12 @@ function buildShare(ph) {
     const a = document.createElement('a');
     a.className = `float-dock-network float-dock-network-${id}`;
     a.href = shareUrl(id, data);
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
+    // web intents open in a new tab; whatsapp:// hands off to the app (a new tab would stay
+    // blank), as on the source
+    if (id !== 'whatsapp') {
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+    }
     a.setAttribute('aria-label', `${ph.shareOn || 'Share on'} ${label}`);
     // white glyph on WhatsApp green is ~1.7:1; the ink glyph passes (social-share.md §6)
     a.append(icon(id === 'whatsapp' ? 'whatsapp-ink' : id));
@@ -74,7 +78,9 @@ function buildShare(ph) {
     setExpanded(trigger.getAttribute('aria-expanded') !== 'true');
   });
 
-  share.addEventListener('keydown', (e) => {
+  // document-level: a mouse click doesn't focus the trigger in Safari, so Esc must work
+  // wherever focus is while the list is open
+  document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && share.classList.contains('expanded')) {
       setExpanded(false);
       trigger.focus();
@@ -93,7 +99,11 @@ function buildScrollTop(ph) {
   top.addEventListener('click', () => {
     const main = document.querySelector('main');
     if (main) {
-      if (!main.hasAttribute('tabindex')) main.tabIndex = -1;
+      // temporary focus target: dropped again on blur so main doesn't stay focusable
+      if (!main.hasAttribute('tabindex')) {
+        main.tabIndex = -1;
+        main.addEventListener('blur', () => main.removeAttribute('tabindex'), { once: true });
+      }
       main.focus({ preventScroll: true });
     }
     window.scrollTo({ top: 0, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
@@ -110,13 +120,21 @@ export default async function decorate(block) {
 
   block.replaceChildren(buildShare(ph), slot, top);
   decorateIcons(block);
+  // decorateIcons makes lazy <img>s, which wouldn't fetch while the bar is display:none;
+  // eager, so the glyphs are there when the bar appears
+  block.querySelectorAll('.icon img').forEach((img) => { img.loading = 'eager'; });
 
   // scroll-top is revealed past 300px of scroll, as on the source; the hidden button stays in
   // the layout (only transform/opacity change), so revealing it causes no layout shift
   let ticking = false;
+  let shown;
   const update = () => {
     ticking = false;
-    const shown = window.scrollY > SCROLL_TOP_THRESHOLD;
+    const next = window.scrollY > SCROLL_TOP_THRESHOLD;
+    if (next === shown) return; // only touch the DOM when the threshold is crossed
+    shown = next;
+    // don't strand keyboard focus on <body>: hand it to the share trigger before hiding
+    if (!shown && document.activeElement === top) block.querySelector('.float-dock-trigger').focus();
     block.classList.toggle('scrolled', shown);
     top.inert = !shown;
   };

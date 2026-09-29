@@ -55,7 +55,7 @@ test('reserved characters in the title are encoded, not passed through', () => {
 });
 
 const fakeDoc = ({
-  canonical, ogTitle, ogImage, title = 'Doc title', href = 'https://x.test/p#frag',
+  canonical, ogTitle, ogImage, title = 'Doc title', href = 'https://x.test/p?utm_source=nl&fbclid=abc#frag',
 }) => ({
   title,
   location: { href },
@@ -67,7 +67,7 @@ const fakeDoc = ({
   },
 });
 
-test('sharePageData prefers canonical + og:title, and falls back to location (no hash) + title', () => {
+test('sharePageData prefers canonical + og:title; falls back to origin + path (no query/hash) + title', () => {
   assert.deepEqual(
     sharePageData(fakeDoc({ canonical: page.url, ogTitle: page.title, ogImage: page.image })),
     page,

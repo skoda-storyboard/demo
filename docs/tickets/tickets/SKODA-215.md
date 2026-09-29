@@ -63,8 +63,9 @@ Plan B (§14 accepted): **Must**, since it delivers C-6 social share.
   from 768). Pitches: share→scroll-top = button + 4px; leftward list 9px off the trigger then 3.2px gaps (61px pitch
   at 58px); stacked list 10px off the trigger then 4px gaps (44px pitch). EDS positions match the source to the pixel
   at all six widths.
-- **Decisions:** WhatsApp shows in the stacked (<768) layout only, per this ticket (source hides it by UA); it uses an
-  ink glyph (`icons/whatsapp-ink.svg`), since white on `#43d854` fails contrast. **No `navigator.share`:** the trigger always
+- **Decisions:** WhatsApp shows below 768px only, per this ticket's spec (product decision 2026-09-29, confirmed after
+  code review). This is a deliberate exception to css-guidelines §8 (width-based rather than input-capability-based);
+  the source hides it by UA. It has no `target=_blank`, since `whatsapp://` hands off to the app. It uses an ink glyph (`icons/whatsapp-ink.svg`), since white on `#43d854` fails contrast. **No `navigator.share`:** the trigger always
   expands the intent list, as on the source (product decision 2026-09-29 after the branch-preview review). This
   supersedes the "prefer `navigator.share`" wording in the acceptance criteria. Facebook uses `sharer.php`.
 - **Live click behaviour (re-checked 2026-09-29 on https://www.skoda-storyboard.com/en/ and its source JS):**
@@ -73,8 +74,14 @@ Plan B (§14 accepted): **Must**, since it delivers C-6 social share.
   - The reveal uses the source spring `0.3s cubic-bezier(.68,-.55,.27,1.55)`.
   - The list opens and closes like the source: it fades in over 0.2s after a 0.2s delay, and out over 0.4s. It
     starts 15% back along its axis: sideways on desktop, upward on mobile.
-  - Clicking outside leaves the list open, as on the source. Esc closes it (an a11y addition per the ACs; the source
-    has none).
+  - Clicking outside leaves the list open, as on the source. Esc closes it from anywhere on the page (an a11y
+    addition per the ACs; the source has none).
+- **Code review (2 passes, 2026-09-29):**
+  - Fixed: test files unserved (`.hlxignore`), CSS-load failure handled, reduced motion covers open and close,
+    focus kept when scroll-top hides, `main` focus target cleaned up, eager icons, hover only on hover devices,
+    RTL-safe slides, share fallback URL strips the query.
+  - Kept, for source parity: the bar also shows on the 404 page, as on the live site.
+  - Kept, per spec: WhatsApp is shown by width (below 768), not by touch capability.
 - **404 page:** `404.html` now loads `styles/brand.css` before `styles.css`, as `head.html` does. Before this, none of
   the brand tokens resolved on the 404 page, so the bar there had no white fill or shadow.
 - **Layout shift:** the scroll-top keeps its slot, and the share cluster slides over it with a transform. The block's

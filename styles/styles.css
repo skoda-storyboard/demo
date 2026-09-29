@@ -487,6 +487,12 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
+/* <main> receives programmatic focus (tabindex=-1, e.g. the SKODA-215 scroll-to-top) only to
+   move the reading position; it is not a control, so it gets no page-sized focus ring */
+main[tabindex='-1']:focus {
+  outline: none;
+}
+
 /* buttons */
 p.button-wrapper {
   margin: var(--spacing-s) 0;

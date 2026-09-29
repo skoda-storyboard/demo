@@ -51,15 +51,17 @@ export function shareUrl(network, { url, title = '', image = '' } = {}) {
 }
 
 /**
- * Reads the share data for a document: the canonical URL (else the current URL without its
- * hash), the og:title (else the document title) and the og:image.
+ * Reads the share data for a document: the canonical URL (else the current origin + path,
+ * dropping query and hash so utm/fbclid tracking isn't re-shared), the og:title (else the
+ * document title) and the og:image.
  * @param {Document} doc
  * @returns {{ url: string, title: string, image: string }}
  */
 export function sharePageData(doc) {
   const meta = (property) => doc.querySelector(`meta[property="${property}"]`)?.content || '';
   const canonical = doc.querySelector('link[rel="canonical"]')?.href;
-  const url = canonical || doc.location.href.split('#')[0];
+  const { origin, pathname } = new URL(doc.location.href);
+  const url = canonical || `${origin}${pathname}`;
   return {
     url,
     title: meta('og:title') || doc.title,

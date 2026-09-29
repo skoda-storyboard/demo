@@ -7,7 +7,7 @@
  * - share list: stacks upward (4px gap, 10px off the trigger) below 768;
  *   runs leftward (3.2px gap, 9px off the trigger) at >= 768
  * Mobile-first. Two independent transitions, one breakpoint each: 768 = list direction
- * (+ WhatsApp, which the ticket scopes to the stacked/mobile layout), 992 = button size.
+ * (+ WhatsApp, which the spec scopes to below 768), 992 = button size.
  * Stacking order: --z-float-dock in styles.css.
  * ========================================================================== */
 
@@ -27,6 +27,9 @@
   /* scroll-top reveal: the source's .sticky-button spring (opacity + slide, 0.3s) */
   --float-dock-reveal: 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 
+  /* inline direction for the transform slides (the insets are logical already) */
+  --float-dock-dir: 1;
+
   position: fixed;
   inset-block-end: var(--spacing-xs);
   inset-inline-end: var(--spacing-m);
@@ -39,6 +42,10 @@
 
   /* the bar's padding box must not swallow clicks on the page; its controls opt back in */
   pointer-events: none;
+}
+
+.float-dock:dir(rtl) {
+  --float-dock-dir: -1;
 }
 
 /* scripts.js loads this CSS before inserting the block, so it stays out of the layout until
@@ -80,7 +87,6 @@
 
 .float-dock .float-dock-button {
   background-color: var(--background-color);
-  color: var(--text-color);
 }
 
 .float-dock .float-dock-button:focus-visible,
@@ -111,13 +117,16 @@
 .float-dock .float-dock-network-facebook { background-color: var(--social-facebook); }
 .float-dock .float-dock-network-whatsapp { background-color: var(--social-whatsapp); }
 
-/* source hover: glyph rgba(255 255 255 / 70%), X glyph #ccc (≈ 80% white on black) */
-.float-dock .float-dock-network:hover .icon {
-  opacity: 0.7;
-}
+/* source hover: glyph rgba(255 255 255 / 70%), X glyph #ccc (≈ 80% white on black);
+   hover-capable pointers only, so the dim state doesn't stick after a tap */
+@media (hover: hover) {
+  .float-dock .float-dock-network:hover .icon {
+    opacity: 0.7;
+  }
 
-.float-dock .float-dock-network-x:hover .icon {
-  opacity: 0.8;
+  .float-dock .float-dock-network-x:hover .icon {
+    opacity: 0.8;
+  }
 }
 
 /* --- share list: stacked upward from the trigger (base) -------------------- */
@@ -137,8 +146,15 @@
   opacity: 0;
   visibility: hidden;
   transform: translateY(15%);
-  transition: all 0.4s cubic-bezier(0.55, -0.59, 0.2, 0.37) 0.2s;
-  transition-property: opacity, transform, visibility;
+
+  /* source timing: collapse 0.4s after 0.2s; expand 0.2s ease-out after 0.2s (the expanded
+     state swaps the variable, so this is the only transition declaration) */
+  --float-dock-list-motion: 0.4s cubic-bezier(0.55, -0.59, 0.2, 0.37) 0.2s;
+
+  transition:
+    opacity var(--float-dock-list-motion),
+    transform var(--float-dock-list-motion),
+    visibility var(--float-dock-list-motion);
 }
 
 /* cancel the global prose `li` rhythm; spacing comes from the list gap */
@@ -146,12 +162,13 @@
   margin: 0;
 }
 
+
 .float-dock .float-dock-share.expanded .float-dock-share-list {
+  --float-dock-list-motion: 0.2s ease-out 0.2s;
+
   opacity: 1;
   visibility: visible;
   transform: none;
-  transition: all 0.2s ease-out 0.2s;
-  transition-property: opacity, transform, visibility;
 }
 
 /* --- scroll-top: hidden until 300px of scroll (float-dock.js) --------------
@@ -168,10 +185,10 @@
 
 .float-dock:not(.scrolled) .float-dock-share,
 .float-dock:not(.scrolled) .float-dock-slot {
-  transform: translateX(var(--float-dock-pitch));
+  transform: translateX(calc(var(--float-dock-pitch) * var(--float-dock-dir)));
 }
 
-/* list runs leftward from the trigger; WhatsApp is mobile-only (SKODA-215) */
+/* list runs leftward from the trigger */
 @media (width >= 768px) {
   .float-dock {
     --float-dock-list-gap: 0.2rem;
@@ -184,13 +201,15 @@
     flex-direction: row-reverse;
 
     /* the source row also carries a 60px end padding, so its 15% nudge is ~9px longer */
-    transform: translateX(calc(15% + var(--float-dock-list-offset)));
+    transform: translateX(calc((15% + var(--float-dock-list-offset)) * var(--float-dock-dir)));
   }
 
   .float-dock .float-dock-share.expanded .float-dock-share-list {
     transform: none;
   }
 
+  /* WhatsApp only below 768 (SKODA-215 spec, product decision 2026-09-29). This is a
+     deliberate exception to css-guidelines §8: the ticket keys it to the stacked mobile layout */
   .float-dock .float-dock-share-item-whatsapp {
     display: none;
   }
@@ -207,6 +226,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .float-dock .float-dock-share,
+  .float-dock .float-dock-slot,
   .float-dock .float-dock-share-list,
   .float-dock .float-dock-top {
     transition: none;
