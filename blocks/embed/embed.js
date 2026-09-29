@@ -13,11 +13,16 @@
  *   - Generic iframe provider: falls through as a video-ratio embed (the MR-PR03
  *     AI-audio JS *widget* is handled by the /widgets/ autoblock, not here).
  *
- * The iframe src is set directly so each provider's native player renders exactly as on the
- * live site (YouTube title / share / watch-on-YouTube overlay, Vimeo controls, etc.). This
- * matches the source, which loads its embeds directly; the site-wide OneTrust banner remains
- * the consent mechanism (the per-embed .page-embed_cookie placeholder only appears when a
- * category is actively blocked — out of Adobe M1 scope, D10 / SKODA-804/905).
+ * The provider's native player renders exactly as on the live site (YouTube title / share /
+ * watch-on-YouTube overlay, Vimeo controls, etc.).
+ *
+ * Consent gate (SKODA-204a): the block asks hasEmbedConsent() (scripts/embed-consent.js)
+ * first. With consent (the M1 default) nothing changes: the iframe lazy-loads on approach.
+ * Without it (e.g. ?consent=decline, or later SKODA-704/804), the iframe is kept out of the
+ * DOM so no request reaches the provider, and the source's click-to-load placeholder
+ * (.page-embed_cookie, embeds.md §3) is shown. Its button loads that one embed and focuses it;
+ * a later consent grant loads every waiting embed. (M1 limit: withdrawing consent doesn't
+ * unload players that already loaded; the SKODA-804 OneTrust wiring owns that.)
  *
  * Authoring: a bare provider URL on its own line autoblocks into `embed`
  * (buildEmbedAutoBlocks, scripts.js); descriptive link text becomes the iframe title. A table
@@ -26,6 +31,8 @@
  *
  * @param {Element} block the embed block element
  */
+
+import { hasEmbedConsent, onEmbedConsentChange } from '../../scripts/embed-consent.js';
 
 // Ratio keyword -> CSS aspect-ratio value (source ratio ladder, embeds.md §2).
 const RATIOS = {
@@ -133,9 +140,10 @@ const ALLOW = {
 /**
  * Builds the title'd iframe. The real URL is held in `data-src` and only promoted to `src`
  * when the embed nears the viewport (see observeLazyEmbed) — this is the source's own
- * data-src → src swap, rebuilt with IntersectionObserver. It keeps the native player (no
- * consent button) while deferring the third-party boot so N stacked embeds don't all execute
- * up front (cuts TBT). The `allow` list is provider-specific, matching the live source (ALLOW).
+ * data-src → src swap, rebuilt with IntersectionObserver. It defers the third-party boot so
+ * N stacked embeds don't all execute up front (cuts TBT). Without embed consent the iframe is
+ * held back entirely (renderConsentGate). The `allow` list is provider-specific, matching the
+ * live source (ALLOW).
  * @param {string} src The normalised embed URL
  * @param {string} title Accessible iframe title
  * @param {boolean} isAudio Whether this is an audio player
@@ -208,6 +216,96 @@ function observeLazyEmbed(wrapper) {
     });
   }, { rootMargin: '200px' });
   observer.observe(wrapper);
+}
+
+// Placeholder copy, as on the live site (English defaults; placeholders sheet keys
+// `Embed Consent Text` with a {host} token, and `Embed Consent Button`).
+const CONSENT_TEXT = 'This content is hosted by a third party ({host}). By accessing and viewing this external '
+  + 'content, you acknowledge personal data processing may occur by the relevant external provider and you '
+  + 'confirm that you are acquainted with the terms and conditions as well as relevant privacy notice of {host}.';
+const CONSENT_BUTTON = 'I acknowledge and confirm';
+let gateCount = 0;
+
+/**
+ * Swaps in the placeholders-sheet wording when the sheet has it. Loaded only for gated
+ * embeds, after the (English) placeholder is already shown, so it can't delay or reshape it.
+ * @param {HTMLElement} text The placeholder paragraph
+ * @param {HTMLElement} label The button label
+ * @param {string} host The provider host shown in the text
+ */
+async function localiseConsentGate(text, label, host) {
+  try {
+    const { fetchPlaceholders } = await import('../../scripts/placeholders.js');
+    const ph = await fetchPlaceholders();
+    if (ph.embedConsentText) text.textContent = ph.embedConsentText.replaceAll('{host}', host);
+    if (ph.embedConsentButton) label.textContent = ph.embedConsentButton;
+  } catch {
+    // keep the English defaults
+  }
+}
+
+/**
+ * Shows the click-to-load placeholder in place of a held-back iframe (no consent). The
+ * iframe stays out of the DOM, so nothing is requested from the provider until the button
+ * is activated or consent is granted. Built synchronously: the gated box has its final size
+ * from the first frame, and the consent listener is live before anything can grant.
+ * @param {Element} wrapper The .embed-video / .embed-audio wrapper (empty)
+ * @param {HTMLIFrameElement} iframe The iframe, its URL still in data-src
+ */
+function renderConsentGate(wrapper, iframe) {
+  const host = new URL(iframe.dataset.src).hostname;
+  gateCount += 1;
+  wrapper.classList.add('embed-gated');
+
+  const gate = document.createElement('div');
+  gate.className = 'embed-consent';
+  const inner = document.createElement('div');
+  inner.className = 'embed-consent-inner';
+  const text = document.createElement('p');
+  text.className = 'embed-consent-text';
+  text.id = `embed-consent-text-${gateCount}`;
+  text.textContent = CONSENT_TEXT.replaceAll('{host}', host);
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'embed-consent-button';
+  const label = document.createElement('span');
+  label.textContent = CONSENT_BUTTON;
+  button.append(label);
+  // name = the visible label; the text naming the provider host is its description
+  button.setAttribute('aria-describedby', text.id);
+  inner.append(text, button);
+  gate.append(inner);
+  wrapper.append(gate);
+
+  let unsubscribe = () => {};
+  const release = () => {
+    unsubscribe();
+    gate.remove();
+    wrapper.classList.remove('embed-gated');
+    wrapper.append(iframe);
+  };
+  button.addEventListener('click', () => {
+    release();
+    // the visitor asked for this one embed: load it now and move focus into it
+    iframe.setAttribute('src', iframe.dataset.src);
+    delete iframe.dataset.src;
+    iframe.focus();
+  });
+  unsubscribe = onEmbedConsentChange((consented) => {
+    if (wrapper.isConnected === false) {
+      unsubscribe(); // the block was removed (e.g. a re-rendered fragment): stop listening
+      return;
+    }
+    // M1 hook: a grant releases waiting embeds; a withdrawal does not unload players that
+    // already loaded (the SKODA-804 OneTrust wiring owns that)
+    if (!consented) return;
+    const hadFocus = gate.contains(document.activeElement);
+    release();
+    observeLazyEmbed(wrapper);
+    if (hadFocus) iframe.focus(); // don't drop keyboard focus to <body>
+  });
+
+  localiseConsentGate(text, label, host);
 }
 
 const HTTP_URL_RE = /^https?:\/\//i;
@@ -360,9 +458,17 @@ export default function decorate(block) {
     return;
   }
 
-  wrapper.append(buildIframe(src, title, isAudio, provider));
-
+  const iframe = buildIframe(src, title, isAudio, provider);
   block.classList.add(`embed-${provider}`);
+
+  if (!hasEmbedConsent()) {
+    // No consent: hold the iframe back and show the click-to-load placeholder (SKODA-204a).
+    block.append(wrapper);
+    renderConsentGate(wrapper, iframe);
+    return;
+  }
+
+  wrapper.append(iframe);
   block.append(wrapper);
 
   // Defer the third-party player until the embed nears the viewport (source parity + perf).

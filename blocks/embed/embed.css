@@ -3,12 +3,21 @@
  *
  * Fluid geometry only: video is a fixed-ratio box (default 16:9, author-overridable) with a
  * fluid width; audio is a fixed-height box. The provider iframe fills the box and renders its
- * own native player/controls (matching the live site) — there is no consent placeholder or
- * thumbnail facade. The media ratio is viewport-invariant, so no breakpoint touches it.
- * Scoped to .embed; -wrapper/-container are section classes.
+ * own native player/controls (matching the live site). The media ratio is viewport-invariant,
+ * so no breakpoint touches it. Without embed consent (SKODA-204a) the box shows the live
+ * click-to-load placeholder instead (.embed-consent, below). Scoped to .embed;
+ * -wrapper/-container are section classes.
  */
 
 .embed {
+  /* consent placeholder (SKODA-204a), measured on the live .page-embed_cookie */
+  --embed-consent-height: 25em;
+  --embed-consent-text-gap: 1.25rem;
+  --embed-consent-button-padding: 0.5rem;
+  --embed-consent-button-radius: 2em;
+  --embed-consent-icon-size: 1rem;
+  --embed-consent-icon-gap: 4px;
+
   display: block;
 }
 
@@ -50,4 +59,105 @@
 .embed .embed-video video {
   object-fit: contain;
   background: var(--skoda-black);
+}
+
+/* --- consent placeholder (SKODA-204a) ----------------------------------------
+   Measured on the live .page-embed_cookie (Epiq story, 1280): a 25em (400px) grey box with a
+   1px border; a centred inner panel at 85% × 80% with a soft shadow and 16px padding; centred
+   16/24 text, then a pill button with an ink outline. While gated, the media box drops its
+   ratio / fixed height so the placeholder sets the height and its text can never be clipped
+   (the box resizes only after the visitor's click, which CLS ignores). Tokens: see .embed. */
+.embed .embed-gated {
+  aspect-ratio: auto;
+  height: auto;
+  overflow: visible;
+}
+
+.embed .embed-consent {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--embed-consent-height);
+  border: 1px solid var(--embed-consent-border);
+  background-color: var(--embed-consent-bg);
+}
+
+.embed .embed-consent-inner {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 85%;
+  min-height: calc(var(--embed-consent-height) * 0.8);
+  margin-block: var(--spacing-m);
+  padding: var(--spacing-m);
+  background-color: var(--embed-consent-inner-bg);
+  box-shadow: var(--embed-consent-shadow);
+}
+
+.embed .embed-consent-text {
+  margin: 0 0 var(--embed-consent-text-gap);
+  font-size: var(--body-font-size-m);
+  line-height: var(--line-height-body);
+  text-align: center;
+}
+
+.embed .embed-consent-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--embed-consent-icon-gap);
+  padding: var(--embed-consent-button-padding);
+  border: 0;
+  border-radius: var(--embed-consent-button-radius);
+  box-shadow: inset 0 0 0 2px var(--skoda-ink);
+  background-color: var(--skoda-white);
+  color: var(--skoda-ink);
+  font: inherit;
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: background-color 0.25s;
+}
+
+/* live: a check glyph before the label (icon font \e00d → a masked SVG in the text colour) */
+.embed .embed-consent-button::before {
+  content: '';
+  flex: none;
+  inline-size: var(--embed-consent-icon-size);
+  block-size: var(--embed-consent-icon-size);
+  background-color: currentcolor;
+  mask: url('../../icons/check.svg') center / contain no-repeat;
+}
+
+.embed .embed-consent-button:hover,
+.embed .embed-consent-button:focus-visible,
+.embed .embed-consent-button:active {
+  background-color: var(--dropdown-hover-bg);
+}
+
+.embed .embed-consent-button:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+/* live: button padding .5rem → .875rem 1.5rem and icon gap 4 → 8px at 720 (its own secondary step) */
+@media (width >= 720px) {
+  .embed {
+    --embed-consent-button-padding: 0.875rem 1.5rem;
+    --embed-consent-icon-gap: 8px;
+  }
+}
+
+/* live: text → button gap 1.25rem → 2rem at 768 */
+@media (width >= 768px) {
+  .embed {
+    --embed-consent-text-gap: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .embed .embed-consent-button {
+    transition: none;
+  }
 }
