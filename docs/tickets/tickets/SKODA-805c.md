@@ -81,6 +81,19 @@ and finishes it.
   carry `Quote` no longer 404 its script.
 - **Media Box pill** sits 34px below the last row, giving a 708px collapsed box at 1280.
 - **CLS.** The press-kit lead image now reserves its box: CLS 0.24 → 0.063 on every press-kit page.
+- **Header (review P2).** The date, title and lead are measured to the source's press-release shell:
+  - The date is 11/11, weight 600, `#808080`, 32px below the bar above it and 16px above the title.
+  - The title is `#0a0a0a`, 28/35 up to 768 and 26/32.5 above, with a margin of 1em less 10px.
+  - The lead is a 16:9 crop, 30px above the first paragraph.
+  - On chapter pages the Chapters bar is the page's top bar, as on the source (`press-kit.js` moves it).
+- **Video (review decision, 2026-09-29).** The source's Vimeo account is domain-locked, so its
+  player showed "cannot be played here". A Vimeo clip that carries its MP4 master now imports as an
+  `Embed` of that master: a native `<video preload="metadata">`, named from its Media Box item or
+  its source caption.
+  - First-glimpse plays the 947 MB DAM master (368 s).
+  - The Peaq, Epiq and Motorsport Videos pages convert 11, 9 and 11 clips; Motorsport's 6 YouTube
+    clips stay players.
+  - Clips in accordion answers stay links, because blocks can't nest.
 - **Re-import.** All 51 `press_kit-template-default` pages were re-imported and pushed to DA with
   preview only: 35 updates, 16 unchanged. Every word, link and image is unchanged; only the new rows
   differ.
@@ -96,17 +109,23 @@ and finishes it.
   high and 34px below the last row.
 - Lighthouse mobile (branch preview): performance 99 / 99 on two runs, LCP 1.2–1.4 s, CLS 0.063,
   TBT 0.
+- Vertical parity (review P2), first accordion, origin/branch: 1962/1962 at 1280, 1934/1934 at
+  1080, 1953/1953 at 992, 2603/2601 at 768, 2869/2867 at 375. Date, title and lead positions are
+  identical at 1280, 1080 and 992.
+- Video: `readyState 4`, duration 368 s, playing (`currentTime` 3.7 s after 4 s), 812×457.
 
 ### Deviations (documented; the AC allows them)
-- **Vimeo:** the source's Vimeo account is domain-locked, so the player shows "cannot be played
-  here" on the demo (SKODA-204a consent PR open). The MP4 download link is kept.
+- **Video:** the native player streams the DAM master (947 MB for first-glimpse) until a web
+  rendition exists. Only metadata loads until play.
 - **Show more pill:** 133px wide vs 138px, because the demo has no Škoda Next Medium (500) face.
 - **Media Box below 992:** 24px shorter (645 vs 669 at 768), because the source's tile captions
   switch to 20/24 there. This is downloads tile typography (SKODA-510), not changed here.
-- **H1:** 26px at every width vs the source's 28px below 768, and `#161718` vs `#0a0a0a`. This is
-  the shared press-release/press-kit header style.
 - **Font swap:** the remaining CLS 0.063 is the H1 re-wrapping when Škoda Next replaces the fallback
   (global fallback metrics).
+- **Lead crop:** the source also scales its lead image 1.02 inside the crop, a 2% tighter framing;
+  not reproduced.
+- **Chapter quotes:** on chapter pages the `blockquote > em` quotes aren't `Quote` rows yet
+  (SKODA-220 follow-up). The Peaq Exterior chapter ends 49px short of the source because of this.
 - **WhatsApp icon:** the 50px decorative icon is dropped (SKODA-805b), so the WhatsApp line → banners
   gap is 40 vs 64.
 - **Peaq Images child:** its preview still fails in html2md (200-image page, unchanged in DA; 805a
