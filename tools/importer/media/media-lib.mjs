@@ -862,14 +862,14 @@ export async function verifyDamOriginal({
   };
 }
 
-/** Activate a single original on the AEM publish tier after its DAM upload. */
-export async function publishDamBinary({
+/** Activate one validated DAM original; callers constrain the asset type. */
+async function activateDamOriginal({
   damConfig, damPath, token, fetchImpl = fetch,
-}) {
+}, extensions) {
   const folder = (damConfig?.folder || '/content/dam/storyboard').replace(/\/$/, '');
   if (!damConfig?.baseUrl || !token || !damPath?.startsWith(`${folder}/`)
-    || path.posix.normalize(damPath) !== damPath || !/\.(pdf|mp4)$/i.test(damPath)) {
-    throw new Error(`Cannot activate an unconfigured or out-of-scope DAM binary: ${damPath}`);
+    || path.posix.normalize(damPath) !== damPath || !extensions.test(damPath)) {
+    throw new Error(`Cannot activate an unconfigured or out-of-scope DAM original: ${damPath}`);
   }
   const response = await fetchImpl(`${damConfig.baseUrl.replace(/\/$/, '')}/bin/replicate.json`, {
     method: 'POST',
@@ -889,6 +889,16 @@ export async function publishDamBinary({
     }
   }
   return response.status;
+}
+
+/** Activate a PDF/MP4 original on the AEM publish tier. */
+export async function publishDamBinary(options) {
+  return activateDamOriginal(options, /\.(pdf|mp4)$/i);
+}
+
+/** Activate an image original on the AEM publish tier. */
+export async function publishDamImage(options) {
+  return activateDamOriginal(options, /\.(png|jpe?g|gif|webp|svg|avif)$/i);
 }
 
 /**
