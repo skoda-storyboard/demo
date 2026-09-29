@@ -753,7 +753,6 @@ body.story main > .section.body-column > .default-content-wrapper {
   width: 100%;
   max-width: none;
   margin-inline: 0;
-  padding-inline: var(--story-inset);
 }
 
 body.story main > .section.body-column {
@@ -876,7 +875,7 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
   }
 
   body.story main > .section.body-column > .default-content-wrapper {
-    padding-inline: var(--story-inset) 0;
+    /* Removed padding-inline: var(--story-inset) 0; */
   }
 
   /* Full-bleed sections (hero) opt out of the grid and span both tracks. */
