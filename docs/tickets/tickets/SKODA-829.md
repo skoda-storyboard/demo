@@ -2,7 +2,7 @@
 - **Epic:** E08, Editorial at Scale
 - **Type:** styling
 - **Phase:** A · **Milestone:** M1 (demo story fidelity)
-- **GitHub issue:** *(draft on disk; issue to be opened with [PR #207](https://github.com/skoda-storyboard/demo/pull/207))*
+- **GitHub issue:** [#214](https://github.com/skoda-storyboard/demo/issues/214)
 - **Estimate:** 1 SP · AI-assisted 0.25d / manual 0.5d *(planning estimate, not a quote)*
 - **Status (2026-09-29):** 🟡 In review in [PR #207](https://github.com/skoda-storyboard/demo/pull/207) (branch
   `SKODA-821-fix`), which was retitled from SKODA-821 after the review found the horizontal ACs already met on `main`.
@@ -39,7 +39,7 @@ both intro variants are covered (Hero Image caption or `.story-intro`):
 - [x] All 59 published stories render the same box gaps (32 / 0 / aside 0 at 1440, body 0 at 375). Six stories were
       compared against their source pages at 1440 and 375; five match exactly.
 - [x] `npm run lint:css` and `npm test` are clean.
-- [ ] Branch preview check: `https://skoda-821-fix--demo--skoda-storyboard.aem.page/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds`
+- [x] Branch preview check (63b9235, all 5 widths match the source): `https://skoda-821-fix--demo--skoda-storyboard.aem.page/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds`
 
 ## Known exceptions (not template spacing)
 - `/en/simply-clever/park-your-skoda-using-your-mobile-phone-well-show-you-how-how`: the source's first widget has a
