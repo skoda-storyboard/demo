@@ -45,8 +45,10 @@ SKODA-607 phase split (2026-09-27); absorbs the block half of SKODA-612 (the imp
   - Both have `text-shadow: 0 1px 1px rgb(0 0 0 / 50%)`.
   - The fixed 90 / 30 / 22.5% ladder lives in `blocks/carousel/carousel.css`, not in story-rail.css.
 - **Ladder:** 90% below 768, 45% from 768 to 991, 30% from 992, capped by the 1248px band.
-  This is the SKODA-820 story related-band ladder, so the variant shares those rules with `:is()`
-  rather than copying the values.
+  This is the SKODA-820 story related-band ladder, so the variant shares those rules through
+  plain selector lists (press selector first) rather than copying the values. Each selector keeps
+  its own specificity: the press rules stay at (0,2,0), and the story band's selectors are
+  unchanged from `main`.
 
   | Viewport | Cell pitch | Card |
   |---|---|---|
@@ -60,10 +62,12 @@ SKODA-607 phase split (2026-09-27); absorbs the block half of SKODA-612 (the imp
   - The rail bleeds out of the press-release section wrapper's 10px inset, like the source Flickity viewport.
   - Dual scrim only (`--scrim-h`, `--scrim-v`), without the bottom text gradient.
   - The date line sits 13px above the title; this cancels the dark-band `p` margin.
-  - The title is clamped to 2 lines with "…".
+  - The title is clamped to **1 line** with "…", as on the source at every width (PR #206 review).
+    Title top 161.8 / 123.9 / 145.5 / 204.3 at 1280 / 1024 / 768 / 500, the same as the source.
 - **Arrows:** 32px and vertically centred on the card. Prev is at the first card edge; next is 10px
   from the band's right edge. Both are hidden when disabled; Board (1 card) has both hidden.
-  Each click pages 3 / 3 / 2 / 1 cells, the same as Flickity `groupCells`.
+  Each click pages 3 / 3 / 2 / 1 cells at 1280 / 1024 / 768 / 500. This matches the source on every
+  page except the last one (see the differences below).
 - **No layout shift:** the mount reserve equals the built height (199.3px at 1280).
 - **"All" end card (added on request, press variant only):** the source ends a *full* band (its
   10-release limit, with more matches) with an `.item-all` cell. Only Zellmer has one; National
@@ -78,8 +82,16 @@ SKODA-607 phase split (2026-09-27); absorbs the block half of SKODA-612 (the imp
   - **Arrows:** "next" disables only once the end card is reached.
   - **Measured at 1280:** 354.4×199.3 at the 374.4 pitch, with "All" 151.5px into the card
     (source 151.8).
-  - The source shortens titles per width with JS (dotdotdot). Imported titles carry their fixed "…",
-    so at narrow widths they may wrap to 2 lines where the source shows 1.
+- **Deliberate differences:**
+  - **Ellipsis position:** the source shortens titles with JS (dotdotdot) at a word boundary for
+    the current width. EDS clamps to one line with CSS, so the "…" can fall at a different
+    character. Line count and positions match.
+  - **Last page stop position (shared carousel, deferred to SKODA-212a):** Flickity runs without
+    `contain`, so the source aligns the last group to the left and leaves the rest of the band
+    empty. The EDS carousel clamps to the scroll end, so a partial card shows at the left edge.
+    At 1280 on Zellmer after the last "next": the source shows cell 9 at x=10 and the All card at
+    x=384.3; EDS shows cell 8 at x=135.1 (card 7 cut off) and the All card at x=883.9. It happens
+    at every width. The fix belongs in `blocks/carousel/carousel.js`, not this variant.
 - **"All" pill (added on request, press-release template):** the band's "All" link now renders as the
   source ghost pill. It is white with a 2px `#464748` border and text, 36px tall with 8/32 padding,
   16/600 text with 1px tracking, and fills `#f1f1f1` on hover. It sits on the heading row, right-aligned
