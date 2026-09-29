@@ -14,7 +14,8 @@ import nodePath from 'node:path';
 import {
   logicalId, masterUrl, normalizeExtension, isAspectCrop, derivativeSuffix,
   damPathFor, pagePathFromFile, splitBuffer, imageSize, ratiosDiffer,
-  uploadToDAM, publishDamBinary, ensureDamFolder, resolveDamToken, fetchBinaryToFile,
+  uploadToDAM, publishDamBinary, publishDamImage, ensureDamFolder, resolveDamToken,
+  fetchBinaryToFile,
   needsMediaBuild, OVERSIZE_BYTES, belowMinEdge, stepDownTooSmall, pickIngestUrl, renditionEdge,
 } from './media-lib.mjs';
 
@@ -1005,4 +1006,32 @@ test('publishDamBinary activates only a single binary under the configured DAM f
       status: 200, headers: { 'content-type': 'application/json' },
     }),
   }), /reported failure/);
+});
+
+test('publishDamImage activates only image originals under the configured DAM folder', async () => {
+  const calls = [];
+  const fetchImpl = async (url, options) => {
+    calls.push({ url, options });
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200, headers: { 'content-type': 'application/json' },
+    });
+  };
+  const path = '/content/dam/storyboard/en/model/image.jpg';
+  assert.equal(await publishDamImage({
+    damConfig: damCfg, damPath: path, token: 'mock', fetchImpl,
+  }), 200);
+  assert.deepEqual(Object.fromEntries(new URLSearchParams(calls[0].options.body)), {
+    cmd: 'Activate', path,
+  });
+  for (const invalid of [
+    '/content/dam/other/en/image.jpg',
+    '/content/dam/storyboard/../other/image.jpg',
+    '/content/dam/storyboard/en/model/spec.pdf',
+  ]) {
+    // eslint-disable-next-line no-await-in-loop
+    await assert.rejects(publishDamImage({
+      damConfig: damCfg, damPath: invalid, token: 'mock', fetchImpl,
+    }), /out-of-scope/);
+  }
+  assert.equal(calls.length, 1);
 });

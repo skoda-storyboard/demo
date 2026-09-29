@@ -279,6 +279,9 @@ var CustomImportScript = (() => {
   var LAYOUT_ATTR = "data-pr-layout";
   var SECTION_STYLES = {
     body: "body-column",
+    // Background panels in the body (Zellmer grey FAQ, SKODA-824, contract highlight v2).
+    "highlight-grey": "body-column, highlight-grey",
+    "highlight-dark": "body-column, highlight-dark",
     sidebar: "sidebar",
     "media-box": "dark, full-width, media-box",
     related: "dark, full-width, related"
@@ -352,6 +355,20 @@ var CustomImportScript = (() => {
     });
     return out;
   }
+  function panelVariant(style) {
+    const value = ((style || "").match(/background(?:-color)?\s*:\s*([^;]+)/i) || [])[1];
+    const hex = (value || "").trim().toLowerCase().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+    const rgb = (value || "").match(/rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/);
+    let channels = null;
+    if (hex) {
+      const h = hex[1].length === 3 ? hex[1].replace(/./g, "$&$&") : hex[1];
+      channels = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+    } else if (rgb) channels = rgb.slice(1, 4).map(Number);
+    if (!channels) return null;
+    const luminance = (0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]) / 255;
+    if (luminance > 0.98) return null;
+    return luminance < 0.5 ? "dark" : "grey";
+  }
   function bodyContent(document, primary) {
     const content = primary.querySelector(".entry-content");
     if (!content) return [];
@@ -376,11 +393,22 @@ var CustomImportScript = (() => {
       else iframe.replaceWith(...replacement ? [replacement] : []);
     });
     content.querySelectorAll("hr").forEach((hr) => hr.remove());
+    content.querySelectorAll(":scope > div[style]").forEach((div) => {
+      const variant = panelVariant(div.getAttribute("style"));
+      if (variant && text3(div)) {
+        div.replaceWith(marker(document, `highlight-${variant}`), ...div.childNodes, marker(document, "body"));
+      }
+    });
     content.querySelectorAll("div[style]").forEach((div) => div.replaceWith(...div.childNodes));
     content.querySelectorAll("p").forEach((p) => {
       if (isEmptyParagraph(p)) p.remove();
     });
     return [...content.childNodes].filter((n) => n.nodeType === 1 || text3(n));
+  }
+  function dropEmptyBodies(nodes) {
+    const isMarker = (n) => n && n.nodeType === 1 && n.hasAttribute(MARKER);
+    const nextElement = (i) => nodes.slice(i + 1).find((n) => n.nodeType === 1);
+    return nodes.filter((n, i) => !(isMarker(n) && n.getAttribute(MARKER) === "body" && (!nextElement(i) || isMarker(nextElement(i)))));
   }
   function sidebarContent(document, secondary, hasMediaBox) {
     const out = [];
@@ -488,7 +516,7 @@ var CustomImportScript = (() => {
     if (media.length) out.push(marker(document, "media-box"), ...media);
     const related = relatedBand ? relatedContent(document, relatedBand) : [];
     if (related.length) out.push(marker(document, "related"), ...related);
-    article.replaceChildren(...out);
+    article.replaceChildren(...dropEmptyBodies(out));
     article.setAttribute(LAYOUT_ATTR, "");
   }
   function finish(element, document) {
@@ -722,6 +750,7 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
@@ -789,8 +818,6 @@ var CustomImportScript = (() => {
     "/en/lifestyle/what-you-learn-on-the-circuit-can-save-you-on-the-road",
     "/en/models/skoda-elroq-through-designers-eyes",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
-    "/en/press-kits/4x4-winter-experience-press-kit",
-    "/en/press-kits/lets-explore-albania-press-kit",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/images",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model",
@@ -814,6 +841,8 @@ var CustomImportScript = (() => {
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos",
+    "/en/press-kits/4x4-winter-experience-press-kit",
+    "/en/press-kits/lets-explore-albania-press-kit",
     "/en/press-kits/new-skoda-enyaq-press-kit-2",
     "/en/press-kits/press-kit-skoda-at-the-iaa-2019",
     "/en/press-kits/skoda-elroq-press-kit",
@@ -842,8 +871,6 @@ var CustomImportScript = (() => {
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
     "/en/press-kits/skoda-peaq-press-kit",
     "/en/press-kits/skoda-peaq-press-kit-2",
-    "/en/press-kits/skoda-rs-driving-experience-press-kit",
-    "/en/press-kits/skoda-rs-experience-press-kit",
     "/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model",
     "/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart",
     "/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design",
@@ -857,12 +884,14 @@ var CustomImportScript = (() => {
     "/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out",
     "/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
     "/en/press-kits/skoda-peaq-press-kit-2/videos",
+    "/en/press-kits/skoda-rs-driving-experience-press-kit",
+    "/en/press-kits/skoda-rs-experience-press-kit",
     "/en/press-kits/skoda-vision-o-press-kit",
     "/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design",
     "/en/press-kits/the-all-new-skoda-kodiaq-press-kit",
     "/en/press-kits/the-all-new-skoda-superb-press-kit",
-    "/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production",
     "/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models",
+    "/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production",
     "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
     "/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq",
     "/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026",

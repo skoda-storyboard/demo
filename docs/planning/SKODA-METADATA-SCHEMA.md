@@ -21,6 +21,8 @@ back-compatible; new fields (`tags`, `model`, plus new `template` values) are ad
 | `template` | enum (below) | yes | primary content-type filter for every block |
 | `tags` | comma-separated slugs | model-related | model-tag rails ("Based on tags: `peaq`"), tag/model listings; values drawn from the 15-facet taxonomy + model slugs |
 | `model` | slug | model items | convenience single-model tag; equals the model slug (also present in `tags`) |
+| `presskit` | site path | press-kit chapters | the parent hub of a `press_kit_chapter` page, e.g. `/en/press-kits/skoda-peaq-press-kit-2` (SKODA-805b). Not indexed |
+| `theme` | `press-kit` | press-kit chapters | loads `templates/press-kit` for chapters, whose `template` value is not a template folder |
 
 ### `template` enum
 
@@ -31,6 +33,7 @@ back-compatible; new fields (`tags`, `model`, plus new `template` values) are ad
 | `skoda_series` | series hub | Series rail + directory |
 | `press_release` | press release | Latest News, MR News feed, `/en/news/`, model News rail |
 | `press_kit` | press-kit hub | MR Press Kits rail, model Press Kits rail |
+| `press_kit_chapter` | press-kit chapter/resource child (SKODA-805b) | nothing: kept out of the Press Kits rails on purpose; search labels it "Press Kits" |
 | `image` | image attachment page | Images listing + Images rails |
 | `video` | video attachment page | Videos listing + Videos rails |
 | `page` | generic/company page | (not indexed for rails; nav/direct only) |

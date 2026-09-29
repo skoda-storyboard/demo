@@ -33,6 +33,8 @@
  * coverage + robustness to arbitrary nesting / very large trees — which this delivers.
  * A genuine multi-column panel-grid (>1 non-empty cell) is preserved inline as a
  * Columns block (that is what the columns block is for), NOT linearized away.
+ * Exception (SKODA-824): a row with a background colour is a highlight panel and gets its
+ * own `body-column, highlight-<variant>` section; see markHighlights() below.
  *
  * WIDGET → EDS MAPPING (census §3; 17 canonical types; % of 35,159 instances):
  *   sow-editor / tinymce      83.5%  → default content (inner h/p/ul kept as-is)
@@ -331,6 +333,102 @@ function buttonNodes(panel, document) {
   return [p];
 }
 
+// ---- highlight rows (SKODA-824, contract highlight v2) ---------------------
+// A SiteOrigin row with a background colour (the story dark box, `#0e3a2f` on all 16 M1
+// rows) is a highlight panel, not scaffolding: it becomes its own section closed by
+// `Section Metadata` style `body-column, highlight-dark` (a light background → `-grey`).
+// `body-column` keeps the section in the story's reading track. The colour lives in the
+// page's SiteOrigin head CSS (`#pg-<id>> .panel-row-style { background-color: … }`),
+// which the cleanup transformers strip, so the importer's `preprocess` calls
+// markHighlights() on the untouched DOM and the walk below reads `data-highlight`.
+const BODY_STYLE = 'body-column'; // import-story-detail.js section-2 style
+const HIGHLIGHT_ATTR = 'data-highlight';
+
+/** `dark` / `grey` for a panel background colour; null for none, white or unparseable. */
+function highlightVariant(color) {
+  const value = (color || '').trim().toLowerCase();
+  let rgb = null;
+  const hex = value.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+  if (hex) {
+    const h = hex[1].length === 3 ? hex[1].replace(/./g, '$&$&') : hex[1];
+    rgb = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+  } else {
+    const fn = value.match(/^rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)(?:[\s,/]+([\d.]+%?))?\s*\)$/);
+    if (fn && !(fn[4] !== undefined && parseFloat(fn[4]) === 0)) rgb = fn.slice(1, 4).map(Number);
+  }
+  if (!rgb) return null;
+  const luminance = (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
+  if (luminance > 0.98) return null; // white: no panel
+  return luminance < 0.5 ? 'dark' : 'grey';
+}
+
+/** Mark every background-styled builder row (head CSS or inline). Returns the count. */
+export function markHighlights(document) {
+  const css = [...document.querySelectorAll('style')].map((s) => s.textContent || '').join('\n');
+  const byId = new Map();
+  for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+    const color = (body.match(/background(?:-color)?\s*:\s*([^;]+)/i) || [])[1];
+    const variant = highlightVariant(color && color.replace(/!important/i, ''));
+    if (!variant) continue;
+    selectors.split(',').forEach((sel) => {
+      const m = sel.trim().match(/^#(pg-[\w-]+)\s*>\s*\.panel-row-style$/);
+      if (m) byId.set(m[1], variant);
+    });
+  }
+  let count = 0;
+  document.querySelectorAll('.panel-grid').forEach((grid) => {
+    const row = grid.querySelector(':scope > .panel-row-style');
+    const inline = row && (row.getAttribute('style') || '').match(/background(?:-color)?\s*:\s*([^;]+)/i);
+    const variant = byId.get(grid.id) || (inline && highlightVariant(inline[1]));
+    if (!variant) return;
+    grid.setAttribute(HIGHLIGHT_ATTR, variant);
+    count += 1;
+  });
+  return count;
+}
+
+/** Whether readable content follows `node` inside `root` (avoids an empty section). */
+function hasContentAfter(node, root) {
+  for (let n = node; n && n !== root; n = n.parentNode) {
+    for (let s = n.nextSibling; s; s = s.nextSibling) {
+      if ((s.textContent || '').trim() || (s.querySelector && s.querySelector('img, picture, iframe, table'))) return true;
+    }
+  }
+  return false;
+}
+
+function sectionMetadata(style, document) {
+  return WebImporter.DOMUtils.createTable([['Section Metadata'], ['style', style]], document);
+}
+
+const isSectionMetadata = (el) => el.tagName === 'TABLE'
+  && /^section metadata$/i.test(((el.querySelector('tr > th, tr > td') || {}).textContent || '').trim());
+
+/**
+ * Drop every section that holds nothing but Section Metadata, e.g. the `body-column`
+ * section skoda-model-sections opens when the first builder row is a highlight panel.
+ * Call after afterTransform, once every break and Section Metadata is in place. Returns
+ * the number of sections dropped.
+ */
+export function dropEmptySections(root) {
+  const doc = root.ownerDocument;
+  const breaks = [...root.querySelectorAll('hr')].filter((hr) => !hr.closest('table'));
+  const between = (hr, i, el) => (hr.compareDocumentPosition(el) & hr.DOCUMENT_POSITION_FOLLOWING)
+    && (!breaks[i + 1] || (breaks[i + 1].compareDocumentPosition(el) & hr.DOCUMENT_POSITION_PRECEDING));
+  const empty = breaks.map((hr, i) => {
+    const range = doc.createRange();
+    range.setStartAfter(hr);
+    if (breaks[i + 1]) range.setEndBefore(breaks[i + 1]);
+    else range.setEnd(root, root.childNodes.length);
+    const rest = range.cloneContents();
+    rest.querySelectorAll('table').forEach((t) => { if (isSectionMetadata(t)) t.remove(); });
+    const isEmpty = !(rest.textContent || '').trim() && !rest.querySelector('img, picture, video, iframe, table');
+    return isEmpty && [hr, ...[...root.querySelectorAll('table')].filter((t) => isSectionMetadata(t) && between(hr, i, t))];
+  }).filter(Boolean);
+  empty.forEach((nodes) => nodes.forEach((n) => n.remove()));
+  return empty.length;
+}
+
 // ---- tree walk ------------------------------------------------------------
 
 // Direct panel-grid-cell children of a grid (SiteOrigin sometimes wraps cells in a
@@ -343,9 +441,11 @@ function cellsOf(grid) {
   return direct;
 }
 
-// Widgets (.so-panel) directly inside a cell.
+// Widgets (.so-panel) directly inside a cell, or inside the cell's style wrapper
+// (`.panel-cell-style`, e.g. the charging story's portrait cell; it was dropped as empty).
 function panelsOf(cell) {
-  return [...cell.querySelectorAll(':scope > .so-panel, :scope > [class*="widget_"]')];
+  return [...cell.querySelectorAll([':scope > .so-panel', ':scope > [class*="widget_"]',
+    ':scope > .panel-cell-style > .so-panel', ':scope > .panel-cell-style > [class*="widget_"]'].join(', '))];
 }
 
 // Flatten one widget → nodes / block table appended to `out`. Returns a stats delta.
@@ -415,19 +515,42 @@ export default function parse(element, { document }) {
 
   const out = [];
   const stats = {
-    grids: grids.length, byKind: {}, deferred: [], unknown: [], multiColumn: 0,
+    grids: grids.length, byKind: {}, deferred: [], unknown: [], multiColumn: 0, highlights: 0,
   };
 
+  // Highlight rows split the body: <hr> + row content + its Section Metadata, then the
+  // body resumes in a fresh `body-column` section. Consecutive rows are one section each
+  // (the runtime joins them). The body resumes only once a later row emits something
+  // (spacer-only rows don't), or when content follows the builder tree, so no empty
+  // section is emitted. A leading row still breaks here, keeping any body content before
+  // it (the body section's own `body-column` metadata comes from skoda-model-sections);
+  // if nothing precedes it, the importer's dropEmptySections() removes that empty section.
+  let resume = false; // a highlight section was closed and the body hasn't resumed yet
   grids.forEach((grid) => {
+    const variant = grid.getAttribute(HIGHLIGHT_ATTR);
+    const row = [];
     const cells = cellsOf(grid);
     const nonEmpty = cells.filter((c) => panelsOf(c).length > 0);
     if (nonEmpty.length > 1) {
-      emitMultiColumn(nonEmpty, document, out, stats);
+      emitMultiColumn(nonEmpty, document, row, stats);
     } else {
       // Single column (the common case): linearize widgets in order.
-      cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document, out, stats)));
+      cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document, row, stats)));
     }
+    if (!row.length) return;
+    if (variant) {
+      out.push(document.createElement('hr'), ...row, sectionMetadata(`${BODY_STYLE}, highlight-${variant}`, document));
+      stats.highlights += 1;
+      resume = true;
+      return;
+    }
+    if (resume) out.push(document.createElement('hr'), sectionMetadata(BODY_STYLE, document));
+    resume = false;
+    out.push(...row);
   });
+  if (resume && hasContentAfter(layout, element)) {
+    out.push(document.createElement('hr'), sectionMetadata(BODY_STYLE, document));
+  }
 
   // Replace the whole builder subtree with the flat sequence. Wrap in a plain <div>
   // so the parser's element (.content) keeps its shell; markdown conversion drops the
@@ -446,6 +569,7 @@ export default function parse(element, { document }) {
     widgets: Object.values(stats.byKind).reduce((a, b) => a + b, 0),
     byKind: stats.byKind,
     multiColumn: stats.multiColumn,
+    highlights: stats.highlights,
     deferred: stats.deferred,
     unknown: stats.unknown,
   };

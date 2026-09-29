@@ -481,6 +481,7 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
@@ -548,8 +549,6 @@ var CustomImportScript = (() => {
     "/en/lifestyle/what-you-learn-on-the-circuit-can-save-you-on-the-road",
     "/en/models/skoda-elroq-through-designers-eyes",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
-    "/en/press-kits/4x4-winter-experience-press-kit",
-    "/en/press-kits/lets-explore-albania-press-kit",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/images",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model",
@@ -573,6 +572,8 @@ var CustomImportScript = (() => {
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos",
+    "/en/press-kits/4x4-winter-experience-press-kit",
+    "/en/press-kits/lets-explore-albania-press-kit",
     "/en/press-kits/new-skoda-enyaq-press-kit-2",
     "/en/press-kits/press-kit-skoda-at-the-iaa-2019",
     "/en/press-kits/skoda-elroq-press-kit",
@@ -601,8 +602,6 @@ var CustomImportScript = (() => {
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
     "/en/press-kits/skoda-peaq-press-kit",
     "/en/press-kits/skoda-peaq-press-kit-2",
-    "/en/press-kits/skoda-rs-driving-experience-press-kit",
-    "/en/press-kits/skoda-rs-experience-press-kit",
     "/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model",
     "/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart",
     "/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design",
@@ -616,12 +615,14 @@ var CustomImportScript = (() => {
     "/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out",
     "/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
     "/en/press-kits/skoda-peaq-press-kit-2/videos",
+    "/en/press-kits/skoda-rs-driving-experience-press-kit",
+    "/en/press-kits/skoda-rs-experience-press-kit",
     "/en/press-kits/skoda-vision-o-press-kit",
     "/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design",
     "/en/press-kits/the-all-new-skoda-kodiaq-press-kit",
     "/en/press-kits/the-all-new-skoda-superb-press-kit",
-    "/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production",
     "/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models",
+    "/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production",
     "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
     "/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq",
     "/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026",
@@ -775,7 +776,7 @@ var CustomImportScript = (() => {
   // tools/importer/transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
-  function transform5(hookName, element, payload) {
+  function transform6(hookName, element, payload) {
     if (hookName !== "preprocess") return;
     const doc = element.ownerDocument || payload && payload.document;
     const walker = doc.createTreeWalker(
@@ -843,7 +844,7 @@ var CustomImportScript = (() => {
   }
   var import_home_mr_default = {
     // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
-    preprocess: ({ document: document2 }) => transform5("preprocess", document2.body, { document: document2 }),
+    preprocess: ({ document: document2 }) => transform6("preprocess", document2.body, { document: document2 }),
     transform: (payload) => {
       const { document: document2, url, params } = payload;
       const main = document2.body;

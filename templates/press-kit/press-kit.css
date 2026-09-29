@@ -73,6 +73,10 @@ body.press-kit .press-kit-chapters-nav li a {
   padding-block: var(--spacing-xs);
 }
 
+body.press-kit .press-kit-chapters-nav a[aria-current="page"] {
+  font-weight: var(--weight-semibold);
+}
+
 body.press-kit .press-kit-chapters-nav button:focus-visible,
 body.press-kit .press-kit-chapters-nav a:focus-visible {
   outline: 2px solid var(--link-color);
@@ -140,11 +144,12 @@ body.press-kit .section.media-box {
     grid-column: 1 / -1;
   }
 
-  body.press-kit main > .section.body-column {
+  /* same :has() as the rule above, so these column placements win over its full-width span */
+  body.press-kit main:has(.section.body-column) > .section.body-column {
     grid-column: 1;
   }
 
-  body.press-kit main > .section.sidebar {
+  body.press-kit main:has(.section.body-column) > .section.sidebar {
     grid-column: 2;
   }
 

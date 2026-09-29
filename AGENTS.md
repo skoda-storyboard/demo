@@ -34,6 +34,15 @@ For any frontend CSS, styling, responsive-layout, or UI-component work:
 - Keep global CSS to genuinely global concerns; keep component-specific CSS with the component.
 - Perform the guardrail self-check before returning CSS changes.
 
+## Code review (mandatory for every PR review)
+
+Any agent reviewing a PR must, before giving a verdict:
+
+1. **Read the ticket.** Open the `SKODA-*` ticket(s) the PR addresses under `docs/tickets/` and review against its scope + acceptance criteria, not just the diff.
+2. **Read the supporting docs under `docs/`** for that ticket: the relevant `docs/ui-specs/` spec (via `_TEMPLATES.md`), `docs/planning/` data models/requirement mapping, `docs/analysis/SKODA-MASTER.md` sections, and `docs/guardrails/css-guidelines.md` for CSS changes.
+3. **UI-affecting PRs: measure against origin with Chrome DevTools MCP.** Load the origin (live source) page and the PR's `{branch}--demo--skoda-storyboard.aem.page/{path}` preview, and compare **measured** values (computed styles, box geometry, typography, spacing, colors, DOM structure) at the spec's viewport bands (768/992/1080 plus mobile). **No screenshots**: evidence is measured numbers, not images. Follow the MCP isolation rules above.
+4. Report deviations as origin-vs-PR values with the selector and viewport; a UI review without measurements is incomplete.
+
 ## Outdated
 - `fstab.yaml`, `helix-query.yaml`, `paths.json` are retired. Config lives at tools.aem.live.
 
