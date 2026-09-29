@@ -197,7 +197,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-402a](tickets/SKODA-402a.md) | Listing layout QA fix: 1/3/4/4 grid + facets collapsed behind "Advanced filter (n)" (follow-up to 402) (#175) | E04 | 1 | 0.5 | 1 | 402,608 | 🔵 M1; from the 608 phase split (sweep V10) |
 | SKODA-403 | Search block (index-only) | E04 | 3 | 1–2 | 2–4 | 401 | 🟡 body-search deferred |
 | SKODA-405 | RSS feed generation (query-index → RSS 2.0) | E04 | 2 | 0.5–1 | 1–2 | 401 | 🟢 **M2** (aligned to board 2026-09-25; was M1 stretch); agent-fit |
-| [SKODA-406](tickets/SKODA-406.md) | Listing media-card cell (image/video: date, filename, download toolbar, video badge, lightbox) (#176) | E04 | 2 | 1 | 1.5–2 | 402,608,203,216,502,505a | 🔵 M1; from the 608 phase split (reads the media-item download columns) |
+| [SKODA-406](tickets/SKODA-406.md) | Listing media-card cell (image/video: date, filename, download toolbar, video badge, lightbox) (#176) | E04 | 2 | 1 | 1.5–2 | 402,608,203,216,502,505a | 🟡 M1; ready for QA 2026-09-29 (matches the source on DA test pages; 768 columns wait on 402a); from the 608 phase split |
 | SKODA-501 | Masters-only image ingest (img-out-of-`<p>`, alt/caption) | E05 | 3 | 1–2 | 2–3 | 102 | 🟢 |
 | SKODA-502 | Static Downloads block (mediabox) | E05 | 3 | 1–2 | 2–3 | 102 | 🟢 |
 | SKODA-503 | PDF/MP4 handling (link/DAM) | E05 | 2 | 0.5–1 | 1–2 | 501 | 🟡 MP4 signed-flow (cart now SKODA-505) |
