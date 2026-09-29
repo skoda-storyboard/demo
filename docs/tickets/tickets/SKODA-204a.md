@@ -5,7 +5,7 @@
 - **GitHub issue:** [#152](https://github.com/skoda-storyboard/demo/issues/152) · follow-up to [#18](https://github.com/skoda-storyboard/demo/issues/18) (SKODA-204, Done)
 - **Estimate:** 0.5 SP · AI-assisted 0.25d / manual 0.5d *(planning estimate, not a quote)*
 - **Priority:** P1
-- **Status (2026-09-29):** 🟡 Ready for review (branch `skoda-204a-consent-hook`, not pushed yet).
+- **Status (2026-09-29):** 🟡 Ready for review (branch `skoda-204a-consent-hook`, pushed; branch preview verified).
 
 ## Origin
 - Parallel demo sweep [`SKODA-DEMO-SWEEP-REPORT.md`](../../reviews/SKODA-DEMO-SWEEP-REPORT.md) §5, amendment 204.
@@ -34,7 +34,8 @@
 - [x] With the default stub ("consent"), behaviour is byte-identical to today: lazy load on intersection, the 16:9
       wrapper and no CLS.
 - [x] Unit tests cover both branches; `npm run lint` is clean.
-- [ ] Preview link: `https://skoda-204a-consent-hook--demo--skoda-storyboard.aem.page/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company`
+- [x] Preview link: `https://skoda-204a-consent-hook--demo--skoda-storyboard.aem.page/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company`
+      (verified 2026-09-29; add `?consent=decline` for the placeholders)
 
 ## Implementation notes (2026-09-29, branch `skoda-204a-consent-hook`)
 - **Live check (fresh visitor, no cookie consent):**
@@ -75,6 +76,12 @@
   - 32 embed tests (21 existing + 11 new): stub default, shared parser, hook and event, exact default markup with
     no sheet fetch, 4 providers gated, click, grant with focus kept, detached placeholder. Code-reviewed; the
     findings are fixed.
+  - Full `npm test`: 579 pass, 3 fail, 3 skipped. All 3 failures are in importer tooling, and 2 of them also fail on
+    main (`media-lib` temp-dir cleanup `ENOTEMPTY`, flaky, plus the `skoda-links` generated allow-list, which needs
+    `npm run import:allowlist`). None touch the embed or consent code.
+- **Branch preview (2026-09-29):** Epiq, Klaus and 936 km behave as in the local checks. With decline there are no
+  provider frames; one click loads only that embed. The side-by-side with the live placeholder matches, except
+  that our check stroke is slightly thinner than the live font glyph.
 
 ## Dependencies
 204 (#18, merged in #109). 704 wires the stub; 804 (M2) wires OneTrust.
