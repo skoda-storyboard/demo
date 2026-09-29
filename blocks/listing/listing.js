@@ -17,7 +17,7 @@ import { createOptimizedPicture, readBlockConfig } from '../../scripts/aem.js';
 import { loadQueryIndex, defaultIndexUrl, cleanTitle } from '../../scripts/query-index.js';
 import { fetchPlaceholders } from '../../scripts/placeholders.js';
 import { formatCardDate } from '../../scripts/card-teaser.js';
-import { mediaActions, playBadge } from '../../scripts/media-card.js';
+import { mediaActions, mediaLabels, playBadge } from '../../scripts/media-card.js';
 import {
   scopeRows, filterRows, sortRows, paginate, distinctFacetValues,
   decodeState, encodeState, selectedCount, INDEX_FACETS,
@@ -110,9 +110,10 @@ export const isMediaTemplate = (template) => template === 'image' || template ==
  * One media card (source article.media-cart-item): the 16:9 thumbnail link (a play badge
  * on videos), the date and the title / filename, then the add-to-cart + download actions.
  * No description. The thumbnail link keeps the file / Vimeo URL for modifier clicks and
- * no-JS; a plain click opens the lightbox (wireMediaLightbox).
+ * no-JS; a plain click opens the lightbox (wireMediaLightbox). `labels` is the control text
+ * (`mediaLabels(placeholders)`; English by default).
  */
-export function mediaCell(row, eager) {
+export function mediaCell(row, eager, labels = undefined) {
   const title = cleanTitle(row.title);
   const li = document.createElement('li');
   li.className = `listing-item media-asset${row.template === 'video' ? ' video' : ''}`;
@@ -156,25 +157,34 @@ export function mediaCell(row, eager) {
   body.append(h);
   li.append(body);
 
-  const actions = mediaActions(row, title);
+  const actions = mediaActions(row, title, labels);
   if (actions) li.append(actions);
   return li;
 }
+
+// the lightbox code, loaded on the first open (story / news listings never need it)
+const loadLightbox = async () => {
+  const [{ buildLightbox }, { feedLightboxItem }] = await Promise.all([
+    import('../../scripts/lightbox.js'), import('../../scripts/media-lightbox.js'),
+  ]);
+  return { buildLightbox, feedLightboxItem };
+};
 
 /*
  * The shared lightbox over the shown media cards (the source colorbox; videos play in it):
  * a click anywhere on a card except its actions opens it at that card, and focus returns to
  * the card's thumbnail link on close. Modifier clicks keep the link (new tab). Built lazily
  * on the first open and rebuilt when the shown rows change (filter, sort, load more); the
- * previous overlay is removed so they don't pile up on <body>.
+ * previous overlay is removed so they don't pile up on <body>. If the lightbox code fails to
+ * load, the click falls back to the thumbnail link (the file / Vimeo URL). The inert cart
+ * buttons cancel their own clicks (scripts/media-card.js), so they never get here.
+ * `opts.load` / `opts.navigate` are injectable for tests.
  */
-export function wireMediaLightbox(grid, getRows) {
+export function wireMediaLightbox(grid, getRows, {
+  load = loadLightbox, navigate = (url) => window.location.assign(url),
+} = {}) {
   let built = null; // { rows, lightbox }
   grid.addEventListener('click', async (e) => {
-    if (e.target.closest('.media-card-actions a[aria-disabled="true"]')) {
-      e.preventDefault(); // the media cart (SKODA-505a) isn't bound: no jump to the top
-      return;
-    }
     const modified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
     if (e.defaultPrevented || e.button !== 0 || modified) return;
     const card = e.target.closest('.listing-item.media-asset');
@@ -183,14 +193,21 @@ export function wireMediaLightbox(grid, getRows) {
     const rows = getRows();
     if (index < 0 || !rows[index]) return;
     e.preventDefault();
+    const thumb = card.querySelector('.media-asset-thumb');
     if (!built || built.rows !== rows) {
-      const [{ buildLightbox }, { feedLightboxItem }] = await Promise.all([
-        import('../../scripts/lightbox.js'), import('../../scripts/media-lightbox.js'),
-      ]);
-      built?.lightbox.overlay.remove();
-      built = { rows, lightbox: buildLightbox(document.body, rows.map(feedLightboxItem)) };
+      try {
+        const { buildLightbox, feedLightboxItem } = await load();
+        built?.lightbox.overlay.remove();
+        built = { rows, lightbox: buildLightbox(document.body, rows.map(feedLightboxItem)) };
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('listing: lightbox load failed', err);
+        const href = thumb?.getAttribute('href');
+        if (href && href !== '#') navigate(thumb.href);
+        return;
+      }
     }
-    built.lightbox.open(index, card.querySelector('.media-asset-thumb') || card);
+    built.lightbox.open(index, thumb || card);
   });
 }
 
@@ -198,7 +215,9 @@ export default async function decorate(block) {
   const cfg = parseListConfig(block);
   instanceSeq += 1;
   const uid = `l${instanceSeq}`; // unique id prefix for this block instance
-  const STRINGS = buildStrings(await fetchPlaceholders());
+  const placeholders = await fetchPlaceholders();
+  const STRINGS = buildStrings(placeholders);
+  const mediaText = mediaLabels(placeholders); // media card controls (SKODA-406)
 
   // State (restored from the deep-link URL).
   const initial = decodeState(window.location.search, cfg.facets, cfg.perpage);
@@ -303,7 +322,7 @@ export default async function decorate(block) {
     const shownRows = paginate(all, state.revealed);
     currentRows = shownRows;
     grid.textContent = '';
-    const cell = media ? mediaCell : cardCell;
+    const cell = media ? (row, eager) => mediaCell(row, eager, mediaText) : cardCell;
     shownRows.forEach((row, i) => grid.append(cell(row, i === 0)));
 
     status.hidden = all.length > 0;

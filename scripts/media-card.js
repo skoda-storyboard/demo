@@ -10,25 +10,56 @@
  *   - image: both buttons open a size menu (Original / 1920px) on click;
  *   - video: one add button and one MP4 download link, no menu.
  * The add actions carry the cart key (`data-id`, `data-size`) and stay inert
- * (`aria-disabled`) until the media cart (SKODA-505a) binds them.
+ * (`aria-disabled`, their click is cancelled here) until the media cart (SKODA-505a)
+ * binds them.
  *
- * i18n: all control text lives in LABELS (the single translation point).
+ * i18n: the control text comes from the caller's labels (`mediaLabels(placeholders)`, the
+ * per-locale placeholders sheet), with the English defaults below. `{size}` is replaced
+ * with the size row's label; the card title follows the add / download names.
  */
 
-const LABELS = {
-  add: (title) => `Add to media cart${title ? `: ${title}` : ''}`,
-  download: (title) => `Download${title ? `: ${title}` : ''}`,
-  // menu rows, the source's link titles
-  addSize: (size) => `Add/remove ${size} version`,
-  downloadSize: (size) => `Download ${size} version`,
+export const DEFAULT_LABELS = {
+  add: 'Add to media cart',
+  download: 'Download',
+  // menu rows + the single links, the source's link titles
+  addSize: 'Add/remove {size} version',
+  downloadSize: 'Download {size} version',
   addVideo: 'Add/remove this',
   downloadVideo: 'Download this',
+  // the size rows' visible text
+  sizeOriginal: 'Original',
+  size1920: '1920px',
 };
+
+// placeholders sheet keys (camelCased by fetchPlaceholders) → label keys
+const PLACEHOLDER_KEYS = {
+  add: 'mediaAddToCart',
+  download: 'mediaDownload',
+  addSize: 'mediaAddSize',
+  downloadSize: 'mediaDownloadSize',
+  addVideo: 'mediaAddVideo',
+  downloadVideo: 'mediaDownloadVideo',
+  sizeOriginal: 'mediaSizeOriginal',
+  size1920: 'mediaSize1920',
+};
+
+/**
+ * The media card labels from a placeholders map, falling back to English per key.
+ * @param {Record<string,string>} [ph] from fetchPlaceholders()
+ * @returns {typeof DEFAULT_LABELS}
+ */
+export function mediaLabels(ph = {}) {
+  return Object.fromEntries(Object.entries(DEFAULT_LABELS)
+    .map(([key, text]) => [key, ph[PLACEHOLDER_KEYS[key]] || text]));
+}
+
+const named = (label, title) => (title ? `${label}: ${title}` : label);
+const sized = (label, size) => label.replace('{size}', size);
 
 // the source cart's size keys: '' = the original file, 'giant' = the 1920px rendition
 const IMAGE_SIZES = [
-  { label: 'Original', field: 'original', size: '' },
-  { label: '1920px', field: 'rendition-1920', size: 'giant' },
+  { labelKey: 'sizeOriginal', field: 'original', size: '' },
+  { labelKey: 'size1920', field: 'rendition-1920', size: 'giant' },
 ];
 
 // one size menu is open at a time (the source closes the other on open)
@@ -54,7 +85,11 @@ function wireDocument() {
   });
 }
 
-/** The inert cart action: a `#` link that only carries the cart key (SKODA-505a binds it). */
+/**
+ * The inert cart action: a `#` link that only carries the cart key (SKODA-505a binds it).
+ * While it is disabled its click is cancelled here, so no consumer (listing, rails) jumps to
+ * the top of the page.
+ */
 function cartAction(el, row, size) {
   el.href = '#';
   el.dataset.action = 'add';
@@ -62,6 +97,9 @@ function cartAction(el, row, size) {
   el.dataset.size = size;
   el.setAttribute('role', el.getAttribute('role') || 'button');
   el.setAttribute('aria-disabled', 'true');
+  el.addEventListener('click', (e) => {
+    if (el.getAttribute('aria-disabled') === 'true') e.preventDefault();
+  });
   return el;
 }
 
@@ -157,42 +195,44 @@ function singleAction(action, label, title, build) {
  * for rows that are neither images nor videos, or that have nothing to offer.
  * @param {object} row media feed row (template, id, title, original, rendition-1920, mp4)
  * @param {string} [title] the card title, for the controls' accessible names
+ * @param {typeof DEFAULT_LABELS} [labels] the control text (`mediaLabels(placeholders)`)
  * @returns {HTMLDivElement|null}
  */
-export function mediaActions(row, title = '') {
+export function mediaActions(row, title = '', labels = DEFAULT_LABELS) {
+  const L = { ...DEFAULT_LABELS, ...labels };
   if (row.template !== 'image' && row.template !== 'video') return null;
   const actions = document.createElement('div');
   actions.className = 'media-card-actions';
 
   if (row.template === 'video') {
     if (row.id) {
-      actions.append(singleAction('add', LABELS.add(title), LABELS.addVideo, (a) => cartAction(a, row, '')));
+      actions.append(singleAction('add', named(L.add, title), L.addVideo, (a) => cartAction(a, row, '')));
     }
     if (row.mp4) {
-      actions.append(singleAction('download', LABELS.download(title), LABELS.downloadVideo, (a) => downloadAction(a, row.mp4)));
+      actions.append(singleAction('download', named(L.download, title), L.downloadVideo, (a) => downloadAction(a, row.mp4)));
     }
   } else {
     const sizes = IMAGE_SIZES.filter(({ field }) => row[field]);
     if (row.id && sizes.length) {
-      actions.append(sizeMenu('add', LABELS.add(title), sizes.map((s) => ({
-        label: s.label,
+      actions.append(sizeMenu('add', named(L.add, title), sizes.map((s) => ({
+        label: L[s.labelKey],
         build: (a) => {
-          a.title = LABELS.addSize(s.label);
+          a.title = sized(L.addSize, L[s.labelKey]);
           return cartAction(a, row, s.size);
         },
       }))));
     }
     if (sizes.length > 1) {
-      actions.append(sizeMenu('download', LABELS.download(title), sizes.map((s) => ({
-        label: s.label,
+      actions.append(sizeMenu('download', named(L.download, title), sizes.map((s) => ({
+        label: L[s.labelKey],
         build: (a) => {
-          a.title = LABELS.downloadSize(s.label);
+          a.title = sized(L.downloadSize, L[s.labelKey]);
           return downloadAction(a, row[s.field]);
         },
       }))));
     } else if (sizes.length === 1) {
       const [s] = sizes;
-      actions.append(singleAction('download', LABELS.download(title), LABELS.downloadSize(s.label), (a) => downloadAction(a, row[s.field])));
+      actions.append(singleAction('download', named(L.download, title), sized(L.downloadSize, L[s.labelKey]), (a) => downloadAction(a, row[s.field])));
     }
   }
   return actions.children.length ? actions : null;

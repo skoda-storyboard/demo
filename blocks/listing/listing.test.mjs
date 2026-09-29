@@ -184,3 +184,32 @@ test('decorate: a story listing keeps the story card (picture, title, descriptio
   assert.equal(li.querySelector('.listing-item-body p').textContent, 'Summary A');
   assert.equal(li.querySelector('.media-card-actions, time'), null);
 });
+
+test('lightbox load failure: the click falls back to the thumbnail link', async () => {
+  const grid = document.createElement('ul');
+  document.querySelector('main').replaceChildren(grid);
+  const rows = [imageRow(7)];
+  grid.append(mediaCell(rows[0], false));
+  const went = [];
+  const errors = [];
+  const { error } = console;
+  // eslint-disable-next-line no-console
+  console.error = (...args) => errors.push(args.join(' '));
+  wireMediaLightbox(grid, () => rows, {
+    load: async () => { throw new Error('chunk failed'); },
+    navigate: (url) => went.push(url),
+  });
+  click(grid.querySelector('.media-asset-title'));
+  await settle();
+  // eslint-disable-next-line no-console
+  console.error = error;
+  assert.deepEqual(went, ['https://cdn.example.com/img-7.jpg']);
+  assert.ok(errors.some((m) => m.includes('lightbox load failed')));
+});
+
+test('mediaCell passes its labels to the actions', () => {
+  const li = mediaCell(imageRow(8), false, { add: 'Přidat do košíku', download: 'Stáhnout' });
+  const [add, dl] = li.querySelectorAll('button.media-card-button');
+  assert.equal(add.getAttribute('aria-label'), 'Přidat do košíku: img-8');
+  assert.equal(dl.getAttribute('aria-label'), 'Stáhnout: img-8');
+});

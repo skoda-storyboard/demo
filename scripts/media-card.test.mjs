@@ -13,7 +13,9 @@ import { JSDOM } from 'jsdom';
 const dom = new JSDOM('<main></main>', { url: 'https://example.com/en/images' });
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
-const { mediaActions, playBadge } = await import('./media-card.js');
+const {
+  mediaActions, mediaLabels, playBadge, DEFAULT_LABELS,
+} = await import('./media-card.js');
 
 const image = {
   template: 'image',
@@ -124,4 +126,44 @@ test('play badge is decorative', () => {
   const badge = playBadge();
   assert.equal(badge.className, 'media-card-play');
   assert.equal(badge.getAttribute('aria-hidden'), 'true');
+});
+
+test('the inert cart actions cancel their own click (no jump to the top in any consumer)', () => {
+  // no listing around it: the helper alone must stop the `#` link
+  const image2 = mount(mediaActions(image, 'a'));
+  const click = (el) => el.dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true }));
+  const rows = [...image2.querySelectorAll('.media-card-action.add a')];
+  assert.ok(rows.length && rows.every((a) => click(a) === false), 'size-menu rows are cancelled');
+  const videoAdd = mount(mediaActions(video, 'v')).querySelector('.media-card-button.add');
+  assert.equal(click(videoAdd), false, 'the video add button is cancelled');
+  // once the media cart enables it, the click goes through
+  videoAdd.removeAttribute('aria-disabled');
+  assert.equal(click(videoAdd), true);
+  // downloads are never cancelled
+  assert.equal(click(mount(mediaActions(video, 'v')).querySelector('.media-card-button.download')), true);
+});
+
+test('labels: placeholders translate every control, missing keys fall back to English', () => {
+  const cz = mediaLabels({
+    mediaAddToCart: 'Přidat do košíku',
+    mediaDownload: 'Stáhnout',
+    mediaAddSize: 'Přidat/odebrat verzi {size}',
+    mediaDownloadSize: 'Stáhnout verzi {size}',
+    mediaSizeOriginal: 'Originál',
+  });
+  assert.equal(cz.size1920, '1920px', 'untranslated key keeps the English default');
+  assert.equal(cz.addVideo, DEFAULT_LABELS.addVideo);
+  const actions = mediaActions(image, 'hudebni-leto', cz);
+  const [add, dl] = actions.querySelectorAll('button.media-card-button');
+  assert.equal(add.getAttribute('aria-label'), 'Přidat do košíku: hudebni-leto');
+  assert.equal(dl.getAttribute('aria-label'), 'Stáhnout: hudebni-leto');
+  const rows = [...actions.querySelectorAll('.media-card-action.download a')];
+  assert.deepEqual(rows.map((a) => [a.textContent, a.title]), [
+    ['Originál', 'Stáhnout verzi Originál'],
+    ['1920px', 'Stáhnout verzi 1920px'],
+  ]);
+  assert.equal(actions.querySelector('.media-card-action.add a').title, 'Přidat/odebrat verzi Originál');
+  // no labels passed: English
+  assert.equal(mediaActions(image, 'x').querySelector('button').getAttribute('aria-label'), 'Add to media cart: x');
+  assert.deepEqual(mediaLabels(), DEFAULT_LABELS);
 });

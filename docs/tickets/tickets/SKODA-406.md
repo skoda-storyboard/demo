@@ -103,5 +103,20 @@ Compared with the live pages at desktop 1440 / 1280, tablet 1024 / 768 and mobil
 - **Outside this ticket (SKODA-208):** the model-page media rails show the same third-line bleed (Peaq: 3 of 28
   titles); `carousel.css` clamps the padded heading.
 
+## Code review (PR #217, 2026-09-29)
+- **Inert cart links:** `scripts/media-card.js` now cancels the click of a disabled cart action itself, so no
+  consumer (the listing now, the model-page rails after the follow-up) needs its own guard.
+- **Lightbox load failure:** if the lightbox code fails to load, the click falls back to the thumbnail link (the
+  file / Vimeo URL) and the error is logged.
+- **Labels:** `mediaActions(row, title, labels)` takes its text from `mediaLabels(placeholders)`, with English
+  defaults per key; the listing passes its placeholders. Placeholder keys: `media-add-to-cart`, `media-download`,
+  `media-add-size` / `media-download-size` (with `{size}`), `media-add-video`, `media-download-video`,
+  `media-size-original`, `media-size-1920`. The rows in the per-locale placeholders sheets (CZ, DE, SK, SR, SL) are
+  content for **SKODA-1003**. The lightbox's own chrome (`scripts/lightbox.js` LABELS) is also English-only there.
+- **Consent (dependency):** the video lightbox loads `player.vimeo.com` without a consent check (the path in
+  `scripts/media-lightbox.js` is on `main`; the M1 stub means "consent given"). When **SKODA-204a** (#215,
+  `hasEmbedConsent()`) merges, the lightbox's Vimeo load must go through the same gate before SKODA-704 / 804 flip it.
+
 ## Dependencies
-SKODA-402 (listing), SKODA-608 (rows), SKODA-203/216 (lightbox), SKODA-502 (download menu), SKODA-505a (cart).
+SKODA-402 (listing), SKODA-608 (rows), SKODA-203/216 (lightbox), SKODA-502 (download menu), SKODA-505a (cart),
+SKODA-204a (embed consent gate for the video lightbox), SKODA-1003 (per-locale placeholder rows).
