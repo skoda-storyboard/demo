@@ -2,7 +2,26 @@
 
 const text = (node) => (node?.textContent || '').replace(/\s+/g, ' ').trim();
 
-function embedUrls(root, document) {
+// The Media Box item for the same master names the clip ("Footage | Škoda Peaq Covered Drive").
+function clipTitle(document, file) {
+  const item = [...document.querySelectorAll('.search-results-item')]
+    .find((node) => [...node.querySelectorAll('a[href]')].some((a) => a.getAttribute('href') === file));
+  return text(item?.querySelector('.entry-title'));
+}
+
+// The source's Vimeo account is domain-locked, so its player errors on the demo (SKODA-805c
+// decision, 2026-09-29): a Vimeo clip that carries its MP4 master plays that natively instead, an
+// `Embed` table whose url is the master. Inside an accordion or Columns cell a block can't
+// nest, so there it stays the bare provider link.
+function videoEmbed(document, file) {
+  const link = Object.assign(document.createElement('a'), { href: file, textContent: file });
+  const rows = [['Embed'], ['url', link]];
+  const title = clipTitle(document, file);
+  if (title) rows.push(['title', title]);
+  return WebImporter.DOMUtils.createTable(rows, document);
+}
+
+function embedUrls(root, document, { nested = false } = {}) {
   root.querySelectorAll('iframe').forEach((frame) => {
     const url = frame.getAttribute('src') || frame.getAttribute('data-src');
     if (!url || !/^https?:\/\//.test(url)) {
@@ -25,7 +44,9 @@ function embedUrls(root, document) {
       // pages have no Media Box, SKODA-805b): keep it as a labelled link after the embed.
       const file = [...attachment.querySelectorAll('a.media-cart-action.download[href], a[data-action="download"][href]')]
         .map((link) => link.getAttribute('href')).find((href) => /\.mp4(?:[?#]|$)/i.test(href || ''));
-      const out = [p];
+      // Only Vimeo is domain-locked; YouTube clips (Motorsport Videos) play and stay embeds.
+      const locked = /(^|\.)vimeo\.com$/i.test(new URL(url).hostname);
+      const out = [file && locked && !nested ? videoEmbed(document, file) : p];
       if (file) {
         const dp = document.createElement('p');
         const link = document.createElement('a');
@@ -68,7 +89,7 @@ function inlineGalleries(root, document) {
   });
 }
 
-function contents(panel, document) {
+function contents(panel, document, { nested: inBlock = false } = {}) {
   const nested = panel.querySelector(':scope > .panel-widget-style .panel-layout, :scope > .panel-layout, .panel-layout');
   // The SiteOrigin grid and answer panels recursively contain one another.
   // eslint-disable-next-line no-use-before-define
@@ -79,7 +100,7 @@ function contents(panel, document) {
       // Images resource pages title each gallery group with the widget title.
       const title = text(widget.parentElement?.querySelector(':scope > .widget-title'));
       const heading = title ? [Object.assign(document.createElement('h2'), { textContent: title })] : [];
-      embedUrls(widget, document);
+      embedUrls(widget, document, { nested: inBlock });
       inlineGalleries(widget, document);
       // Stray rules would split the DA section; pull-quote rules are consumed in `preprocess`.
       widget.querySelectorAll('hr').forEach((rule) => rule.remove());
@@ -111,7 +132,7 @@ const hasContent = (cell) => text(cell) || cell.querySelector('img, iframe, a[hr
 function columnsRow(cells, document) {
   const row = cells.map((cell) => [...cell.children]
     .filter((node) => node.matches('.so-panel'))
-    .flatMap((panel) => contents(panel, document)));
+    .flatMap((panel) => contents(panel, document, { nested: true })));
   const name = row.every(bannerCell) ? 'Columns (banners)' : 'Columns';
   return WebImporter.DOMUtils.createTable([[name], row], document);
 }
@@ -161,7 +182,7 @@ function flatten(layout, document, { nested = false } = {}) {
           return;
         }
         flush();
-        output.push(...contents(panel, document));
+        output.push(...contents(panel, document, { nested }));
       });
     });
   });

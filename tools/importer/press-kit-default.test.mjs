@@ -313,18 +313,23 @@ test('resource Images child: inline asset grids become Downloads tables, no Medi
   assert.ok(!/Related Press Releases/.test(page.textContent), 'related band dropped, as on chapter pages');
 });
 
-test('resource Videos child: each video keeps its MP4 download as a labelled link after the embed', { skip: !JSDOM }, () => {
+test('resource Videos child: each clip plays its MP4 master natively, with a labelled download after it', { skip: !JSDOM }, () => {
   const video = (id, file) => `<h2>Škoda Peaq | Footage</h2><div class="media-cart-item attachment"><div class="video-container">
     <iframe src="https://player.vimeo.com/video/${id}?dnt=1"></iframe></div><div class="media-cart-actions">
     <a class="media-cart-action add" href="#" data-action="add"><i class="icon"></i></a>
     <a class="media-cart-action download" href="/direct-download/2026/08/${file}" data-action="download"><i class="icon"></i></a></div></div>`;
   const page = run(resourcePage(grid(widget(video(111, 'peaq-footage-1440p.mp4') + video(222, 'peaq-sportline-1440p.mp4')))), `${base}skoda-peaq-press-kit-2/videos/`);
-  const downloads = [...page.querySelectorAll('a[href$=".mp4"]')];
+  const downloads = [...page.querySelectorAll('p > a[href$=".mp4"]')];
   assert.deepEqual(downloads.map((a) => [txt(a), a.getAttribute('href')]), [
     ['Download video', 'https://www.skoda-storyboard.com/direct-download/2026/08/peaq-footage-1440p.mp4'],
     ['Download video', 'https://www.skoda-storyboard.com/direct-download/2026/08/peaq-sportline-1440p.mp4'],
   ]);
-  assert.equal(page.querySelectorAll('a[href^="https://player.vimeo.com/video/"]').length, 2, 'embed URLs kept');
+  // The domain-locked Vimeo player errors on the demo, so the Embed plays the master (SKODA-805c).
+  const embeds = blocks(page, 'Embed');
+  assert.deepEqual(embeds.map((t) => t.querySelector('tr:nth-child(2) a').getAttribute('href').split('/').pop()), [
+    'peaq-footage-1440p.mp4', 'peaq-sportline-1440p.mp4',
+  ]);
+  assert.equal(page.querySelectorAll('a[href^="https://player.vimeo.com/video/"]').length, 0);
   assert.equal(page.querySelectorAll('iframe, .media-cart-item').length, 0);
 });
 
@@ -527,7 +532,7 @@ test('a PDF thumbnail link with a real alt keeps the alt, which is also the titl
   assert.equal(link.querySelector('img').alt, 'Škoda Peaq');
 });
 
-test('Videos chapter keeps each embed and its icon-only master download as a named link', { skip: !JSDOM }, () => {
+test('Videos chapter plays each master natively and keeps its icon-only download as a named link', { skip: !JSDOM }, () => {
   // The add-to-cart action comes first and some clips give it a `download` class too: the MP4
   // master is picked by its file type, never by position (#189; PR #202 took the first action).
   const clip = (id) => `<h2>Clip ${id}</h2><div class="media-cart-item attachment"><div class="video-container"><iframe src="https://player.vimeo.com/video/${id}?dnt=1"></iframe></div><div class="media-cart-actions">
@@ -538,14 +543,33 @@ test('Videos chapter keeps each embed and its icon-only master download as a nam
     chapters: true, mediaBox: false, togglesCount: 0, extra: grid(widget(`${clip(11)}${clip(22)}`)),
   }), `${base}skoda-peaq-press-kit-2/videos/`);
   const body = page.querySelector('.entry-content');
-  [11, 22].forEach((id) => {
-    const embed = body.querySelector(`p > a[href^="https://player.vimeo.com/video/${id}"]`);
-    assert.ok(embed, `embed ${id}`);
-    const download = embed.parentElement.nextElementSibling?.querySelector('a');
+  const embeds = blocks(page, 'Embed');
+  [11, 22].forEach((id, i) => {
+    const embed = embeds[i];
+    assert.match(embed?.querySelector('tr:nth-child(2) a')?.getAttribute('href') || '', new RegExp(`clip-${id}\\.mp4$`));
+    const download = embed.nextElementSibling?.querySelector('a');
     assert.match(download?.getAttribute('href') || '', new RegExp(`/direct-download/2026/06/clip-${id}\\.mp4$`));
     assert.equal(txt(download), 'Download video');
   });
   assert.equal(body.querySelectorAll('a[href*="attachment_id"], .media-cart-actions').length, 0);
+});
+
+test('only a top-level Vimeo clip plays its master; nested and YouTube clips stay provider links', { skip: !JSDOM }, () => {
+  const clip = `<div class="media-cart-item attachment"><div class="video-container"><iframe src="https://player.vimeo.com/video/77?dnt=1"></iframe></div>
+    <div class="media-cart-actions"><a class="media-cart-action download" href="/direct-download/2026/03/clip-77.mp4" data-action="download"><i class="icon"></i></a></div></div>`;
+  const answer = grid(`<div class="so-panel widget_ys-row-toggle"><h2 class="row-title">With a clip</h2></div>
+    <div class="so-panel widget_siteorigin-panels-builder"><div class="panel-layout">${grid(widget(`<p>Answer</p>${clip}`))}</div></div>`);
+  // YouTube isn't domain-locked (Motorsport Videos): its clips stay provider embeds.
+  const youtube = clip.replace(/77/g, '99').replace('https://player.vimeo.com/video/99?dnt=1', 'https://www.youtube.com/embed/abc99');
+  const extra = grid(widget(clip.replace(/77/g, '88'))) + grid(widget(youtube)) + answer;
+  const page = run(fixture({ togglesCount: 0, extra }), target);
+  const embeds = blocks(page, 'Embed');
+  assert.equal(embeds.length, 1, 'only the top-level Vimeo clip');
+  assert.ok(page.querySelector('a[href="https://www.youtube.com/embed/abc99"]'));
+  assert.match(embeds[0].querySelector('tr:nth-child(2) a').getAttribute('href'), /clip-88\.mp4$/);
+  const body = rows(page, 'Accordion')[0].children[1];
+  assert.ok(body.querySelector('a[href^="https://player.vimeo.com/video/77"]'));
+  assert.equal(body.querySelectorAll('table').length, 0);
 });
 
 test('malformed mandatory article, toggle and asset fail rather than silently losing content', { skip: !JSDOM }, () => {

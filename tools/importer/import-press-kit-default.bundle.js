@@ -94,7 +94,18 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/press-kit-content.js
   var text = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
-  function embedUrls(root, document) {
+  function clipTitle(document, file) {
+    const item = [...document.querySelectorAll(".search-results-item")].find((node) => [...node.querySelectorAll("a[href]")].some((a) => a.getAttribute("href") === file));
+    return text(item == null ? void 0 : item.querySelector(".entry-title"));
+  }
+  function videoEmbed(document, file) {
+    const link = Object.assign(document.createElement("a"), { href: file, textContent: file });
+    const rows = [["Embed"], ["url", link]];
+    const title = clipTitle(document, file);
+    if (title) rows.push(["title", title]);
+    return WebImporter.DOMUtils.createTable(rows, document);
+  }
+  function embedUrls(root, document, { nested = false } = {}) {
     root.querySelectorAll("iframe").forEach((frame) => {
       const url = frame.getAttribute("src") || frame.getAttribute("data-src");
       if (!url || !/^https?:\/\//.test(url)) {
@@ -111,7 +122,8 @@ var CustomImportScript = (() => {
       bare == null ? void 0 : bare.querySelectorAll(".media-cart-actions").forEach((actions) => actions.remove());
       if (attachment && root.contains(attachment) && !text(bare) && attachment.querySelectorAll("iframe").length === 1 && !attachment.querySelector("img, video")) {
         const file = [...attachment.querySelectorAll('a.media-cart-action.download[href], a[data-action="download"][href]')].map((link) => link.getAttribute("href")).find((href) => /\.mp4(?:[?#]|$)/i.test(href || ""));
-        const out = [p];
+        const locked = /(^|\.)vimeo\.com$/i.test(new URL(url).hostname);
+        const out = [file && locked && !nested ? videoEmbed(document, file) : p];
         if (file) {
           const dp = document.createElement("p");
           const link = document.createElement("a");
@@ -149,7 +161,7 @@ var CustomImportScript = (() => {
       gallery.replaceWith(...nodes);
     });
   }
-  function contents(panel, document) {
+  function contents(panel, document, { nested: inBlock = false } = {}) {
     const nested = panel.querySelector(":scope > .panel-widget-style .panel-layout, :scope > .panel-layout, .panel-layout");
     if (nested) return flatten(nested, document, { nested: true });
     const widgets = panel.querySelectorAll(".textwidget");
@@ -158,7 +170,7 @@ var CustomImportScript = (() => {
         var _a;
         const title = text((_a = widget.parentElement) == null ? void 0 : _a.querySelector(":scope > .widget-title"));
         const heading = title ? [Object.assign(document.createElement("h2"), { textContent: title })] : [];
-        embedUrls(widget, document);
+        embedUrls(widget, document, { nested: inBlock });
         inlineGalleries(widget, document);
         widget.querySelectorAll("hr").forEach((rule) => rule.remove());
         const items = widget.childNodes;
@@ -178,7 +190,7 @@ var CustomImportScript = (() => {
   }
   var hasContent = (cell) => text(cell) || cell.querySelector("img, iframe, a[href]");
   function columnsRow(cells, document) {
-    const row = cells.map((cell) => [...cell.children].filter((node) => node.matches(".so-panel")).flatMap((panel) => contents(panel, document)));
+    const row = cells.map((cell) => [...cell.children].filter((node) => node.matches(".so-panel")).flatMap((panel) => contents(panel, document, { nested: true })));
     const name = row.every(bannerCell) ? "Columns (banners)" : "Columns";
     return WebImporter.DOMUtils.createTable([[name], row], document);
   }
@@ -228,7 +240,7 @@ var CustomImportScript = (() => {
             return;
           }
           flush();
-          output.push(...contents(panel, document));
+          output.push(...contents(panel, document, { nested }));
         });
       });
     });
