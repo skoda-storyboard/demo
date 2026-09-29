@@ -118,6 +118,12 @@
   --pr-menu-border-color: #d2d2d2;   /* sidebar "Additional info" rows */
   --pr-band-meta-color: #c4c6c7;     /* Media Box stats / "Based on tags" line */
   --pr-ghost-color: #464748;         /* "All" ghost pill on the related band */
+
+  /* newsletter sidebar card (SKODA-823; measured on the live Epiq story
+     .newsletter-subscribe-widget, docs/ui-specs/newsletter.md §3) */
+  --newsletter-card-border: #ededed; /* 1px card outline */
+  --newsletter-consent-color: #d8d8d8; /* consent label on the dark card */
+  --error-color: #e11825;            /* source .response .error #e82b37 is 4.35:1 on white; same hue darkened to 4.82:1 (WCAG AA) */
 }
 
 /*
