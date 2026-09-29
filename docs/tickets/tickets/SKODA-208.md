@@ -111,6 +111,100 @@ image, holding the master (`-WxH` stripped), `dam_page_path` and `steps.dam`.
     pages before 608: an empty rail left a ~116px heading + dead "View all". After 608, Octavia, Superb and Fabia
     Images/Videos rails are still empty and still show the leftover heading until this lands.
 
+**UI half built (2026-09-28, branch `skoda-208-model-template`): no new block.** Everything is a page template
+plus variants of existing blocks, built against the already-published pages (no re-import):
+- `templates/skoda-model/` (`TEMPLATES` += `skoda-model`): section roles from the importer's heading ids, source
+  anchors kept as aliases (`#intro`, `#keyfacts`, `#techdata`, `#derivatives`), the hero chip, the short-page flag.
+- **Icon nav (template, option A):** the importer's link list becomes `<nav aria-label="On this page">`, sticky from
+  768, 9 source icons (`icons/model-*.svg`, CSS mask so they recolour), scrollspy (`aria-current`), anchors land under
+  the nav. Links to missing or collapsed sections are dropped. Below 768 (source: hidden) it is a skip-link strip,
+  hidden until focused.
+- **Hero:** `hero-image (overlay)` restyled (9:5 → 3:1 → 5:2 at 1080 → 3:1 at 1440, measured).
+- **Highlights:** `cards (key-facts)` CSS variant. **Technical Data:** `columns (stats)` variant (value/unit split)
+  on a 1248 dark band, mint PDF pill, Fabia banner.
+- **Rails:** `story-rail` passes its variants to `carousel`, labels "View all" from the authored link ("All"), and an
+  empty rail removes its whole section (heading, "Based on tags", link) and fires `story-rail:empty` (the nav drops
+  its link). `carousel (caption)` forces title-below cards, `(center)` centres them; Derivatives =
+  `center caption`, Images/Videos = `media caption` (+ `video` play glyph). Card widths follow the source cells.
+- Measured against live at 1280/1024/768/375: the page layout matches on Octavia/Superb/Fabia/Peaq/Epiq. **Rail
+  parity is QA-complete for Octavia only**; the other four lack rail content (see "Rail content dependency" below)
+  and are not counted as QA-complete for the rails. Hero pixel diff 0.24–1.38% at
+  1024/768/500; 2.92% at 1280 is photo encoding (WebP 2000 vs source JPEG 1440), layout identical.
+- **Not in this slice:** lightbox, add-to-cart and size menus on Images/Videos cards (needs a shared lightbox from
+  `gallery` + SKODA-505a/b), inline Vimeo previews, the floating share / scroll-top group (SKODA-215), MR footer
+  routing (SKODA-305 follow-up).
+
+**Octavia rail data migrated (2026-09-28), all through the import pipeline, no authored cards:**
+- News: 9 press releases (`urls-press-release-octavia.txt`); Stories: 8 stories (`urls-story-detail-octavia.txt`);
+  Press Kits: the 10 hubs through the page-base importer (`urls-page-base-octavia-press-kits.txt`) as an interim
+  until SKODA-805 rebuilds the hub. All imported, pushed, previewed and published; corpus section "OCTAVIA".
+  Images/Videos: `model=octavia` queries in the media feed (`media-items/sources.json`), feed republished.
+- Importer fixes found on the way (all importers re-bundled): page-base uses `templateDefault` so a flattened CPT page
+  keeps its type (`press_kit`); `skoda-metadata` reads a single post's own `<facet>-<slug>` article classes when it
+  has no tag row (press-kit hubs); `hero-banner` emits `Hero Image (overlay)` (contract `hero`); page cleanup
+  rewrites extension-less Vimeo posters to `.jpg`; the media feed keeps the source listing order for same-day items;
+  **`skoda-nbsp`** keeps the source's glued non-breaking spaces (helix html2md turned them into spaces, so copy
+  wrapped a line differently on mobile; restored by `push-lib` `wrapPage`).
+- Media cards carry the source toolbar (40px ringed cart + download buttons, `mediaToolbar` in story-rail): download
+  links the original / MP4; the cart button holds `data-id` and stays inert until SKODA-505. Model rails now span the
+  section gutter like the source flickity viewport (arrows at 26 / 1222 at 1280).
+- QA vs live Octavia at 1280/1024/768/375: every rail box, card, arrow, toolbar button, "All" pill and the footer
+  match to the pixel (375: a 0.17px sub-pixel offset). Press Kits, Stories, Images and Videos list the same items in
+  the same order. **News differs by one card:** the source search index misses the Octavia tag on "Simply Clever
+  for summer" (17 Aug 2026; the page itself is tagged Octavia, and it is absent from every model-filtered live
+  listing), so our rail shows it and drops the oldest item. Not overridden: the index follows the page's tags.
+
+**Image lightbox (2026-09-28):** an Images card now opens the source colorbox view instead of the bare file.
+- The gallery block's lightbox moved, unchanged in behaviour, to the shared `scripts/lightbox.js` +
+  `styles/lightbox.css` (used by `gallery` and the rails); items may carry `full` / `download` / `link` / `cartId`.
+- Re-measured the live colorbox (model page + press release, 1024/1280/1440): panel 256 wide, 16 from the right
+  edge, text from y=96; close, counter and arrow cells 60px with the source close / caret glyphs; the counter total
+  in grey with a CSS "/". Press-release galleries get the same chrome.
+- The detail panel data is migrated, not authored: the media feed builder fetches each item's source panel
+  (`image-overlay-meta-data`) into contract `media-item` **shape 4** (`filetype`, `filesize`, `dimensions`,
+  `labels`, `related`, `related-title`); related articles that are demo pages link locally.
+- Carousel fix (all rails): the drag code captured the pointer on every press, which retargeted the click to the
+  track, so a plain mouse click never followed a card link. It now captures only once a drag passes the threshold.
+- QA vs live at 1024/1280/1440: image, panel blocks, close, counter and arrows match to the pixel.
+- Still open: ~~videos open vimeo.com~~ (done below); the press-release gallery panel only
+  has the authored caption (no title / file metadata / tags / related yet); the cart button is inert (SKODA-505).
+
+**Drawing lightbox (Liftback / Combi, 2026-09-28):** the Highlights drawings open the source's single-image colorbox
+(close ✕, title, file type / size / dimensions / published; no counter, arrows or buttons) instead of the bare file.
+- Data migrated: the feed builder scans the pages in `sources.json` `assetPages` (the 22 model pages) for images
+  their copy links to and writes them as `asset` rows (contract `media-item` shape 5) with the source panel's
+  details: 4 rows today (Octavia limo / combi, Superb, Superb Combi).
+- Runtime: `scripts/media-lightbox.js` (`feedLightboxItem`, moved from story-rail, and `wireImageLinks`); the
+  template wires the drawings. The stage shows the page's own media-bus image; an image without a feed row still
+  opens, titled by its alt.
+- QA vs live at 1024/1280/1440: title, metadata lines, close and the missing counter / arrows match; image within
+  1px (rounding). Esc closes and returns focus to the drawing.
+- Tablet / mobile (2026-09-28): 768 matches live (desktop layout, 480 image column + 256 panel). Below 768 the
+  shared lightbox shows the image alone, full width and vertically centred, no description, close ✕ in the 60px
+  top-right cell (as the source on phones); applies to the image rails, the drawings and press-release galleries.
+
+**Video lightbox (2026-09-28):** a Videos card opens the lightbox and plays the Vimeo player there (autoplay, muted,
+fullscreen allowed), as the source colorbox: the player fills the image column (992×900 at 1280, 480 at 768; phones
+full width 16:9, centred, no panel). Panel: title, cart / download (MP4) / link buttons, File type, File size,
+Length, Bitrate, Audio format, Dimensions, Published (feed shape 6), tag chips, related article. Prev / next switch
+videos; closing or moving on unloads the player. QA vs live at 768/1024/1280/1440: all measured points equal
+(player, title, buttons, metadata, chips, related, close, counter).
+
+**Non-breaking spaces on the 22 model pages (PR 200 review, 2026-09-29): importer fixed, delivery blocked.**
+- The importer keeps the source's glued U+00A0 (`skoda-nbsp`, `wrapPage` restore), but only Octavia was re-pushed
+  after the fix. `node tools/importer/check-nbsp-parity.mjs` (source authored copy vs preview): **5/22** pages at
+  parity (Octavia 37/37; Epiq, Peaq, Elroq RS, Enyaq RS have none in the source). The other 17 have 17–54 in the
+  source and 0 on the preview (Superb 45, Fabia 35).
+- All 22 re-import cleanly with the current bundle (metadata 22/22, blocks 0 errors), but `import:push` holds them:
+  - **17 pages `blocked-binary`** (main's SKODA-503 gate; 15 of them lack the NBSPs, Octavia and Enyaq RS are already
+    at parity): their Tech Data PDFs (9 distinct) are not yet uploaded, published and publicly verified in AEM Assets.
+    Owner: SKODA-503. The ingest runs on a developer machine with the DAM token (tools/importer/media/README.md);
+    then re-import + push these pages.
+  - **Elroq `conflict`**: its DA document was edited after our last push (the SKODA-503 PDF sample); reconcile that
+    edit before re-pushing. **Elroq Sportline** could push, but would also take the verified Elroq PDF link, which is
+    SKODA-503's rollout decision; held with the rest.
+- Nothing was pushed for this item. Re-run `check-nbsp-parity.mjs` after the ingest: it exits 1 while a page lags.
+
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/template-model-page.md`](../../ui-specs/template-model-page.md)** (captured via Chrome DevTools on the live Peaq model page). Read it before implementing. Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).
 
@@ -148,10 +242,14 @@ These **supersede** the conflicting items above: 8 anchors / not sticky.
 - [ ] Section-nav is a **sticky** icon nav on desktop with an accessible mobile equivalent. Match the source link
       count per model: 9 / 8 / 6. Emit only links whose target section exists (no dangling anchors). *(The "hero about
       480px" item moved to SKODA-828 F2, superseded by measured values.)*
-- [ ] Match the source rail count per model: 3 / 5 / 6. Rail tags and the subheading come per model from the source
-      (e.g. Fabia `model=fabia`, `bodywork=hatchback`), with an "All" deep link. A hardcoded `elroq` is rejected.
-      A two-cell subheading row is config, never a card. An empty rail removes its section. The Bodywork rail is
-      centred (`cellAlign: center`).
+- [x] **Rail configuration (code, this ticket):** rail tags and the subheading come per model from the source (e.g.
+      Fabia `model=fabia`, `bodywork=hatchback`), with an "All" deep link; no hardcoded `elroq`. A two-cell subheading
+      row is config, never a card. An empty rail removes its section (and its nav link). The Bodywork rail is centred
+      (`cellAlign: center`). *Verified on the five M1 model pages (2026-09-29).*
+- [ ] **Source rail parity (content, owned by SKODA-603 / SKODA-608):** each model shows the source's rails and
+      counts (3 / 5 / 6). Reconciled 2026-09-29 (PR 200 review): this is a content/import dependency, not a code
+      criterion of this ticket. **Octavia: done (6/6 rails, every count equal).** Superb, Fabia, Peaq and Epiq stay
+      open until their content is migrated; see "Rail content dependency" below.
 - [ ] **Block names:** the importer emits only blocks that exist. Today the Elroq page references `in-page-nav` and
       `spec-table`, and both 404 on preview and live. Map them to existing blocks/sections (e.g. `columns` + a 218
       dark section + a download link), or to the section-nav this ticket builds. Check: 0 block JS 404s on the 5
@@ -160,6 +258,26 @@ These **supersede** the conflicting items above: 8 anchors / not sticky.
       PDF) on Superb / Octavia / Fabia.
 - Estimate: +1.5 (§9, including Key Facts / Tech Data) +0.5 (block names) −1 (Key Facts / Tech Data → Should) =
   **+1 SP net Must**.
+
+## Rail content dependency (2026-09-29, PR 200 review)
+
+Measured on the branch preview after the deferred rails load (source → preview cards; "–" = no rail, section removed).
+The rails render whatever the index / media feed holds; the gap is content that has not been migrated yet.
+
+| Model | Rails | Bodywork | News | Press Kits | Stories | Images | Videos | Owner of the gap |
+|---|---|---|---|---|---|---|---|---|
+| Octavia | 6 → 6 | 2 → 2 | 10 → 10 | 10 → 10 | 10 → 10 | 20 → 20 | 20 → 20 | done (this ticket) |
+| Superb | 6 → 5 | 1 → 1 | 10 → 5 | 10 → 2 | 10 → 3 | 20 → – | 20 → 12 | 603 (news, kits, stories), 608 (images, videos) |
+| Fabia | 3 → 0 | – | – | 6 → – | – | 20 → – | 20 → – | 603 (kits), 608 (images, videos) |
+| Peaq | 5 → 4 | – | 10 → 2 | 3 → – | 10 → 10 | 20 → 20 | 13 → 8 | 603 (news, kits), 608 (videos) |
+| Epiq | 5 → 3 | – | 10 → – | 3 → – | 10 → 10 | 20 → 20 | 9 → 6 | 603 (news, kits), 608 (videos) |
+
+- **How to close a row** (the Octavia recipe, 2026-09-28): add the model's News / Press Kits / Stories source URLs to
+  the rail-feed corpus and import them with the press-release / story / page-base importers (SKODA-603); add a
+  `model=<slug>` image and video query to `tools/importer/media-items/sources.json` and rebuild the feed (SKODA-608);
+  record the feed binaries (`media:build --feed`). Some videos are domain-restricted on Vimeo and are dropped, so a
+  video count can stay below the source.
+- Person owners are not assigned in this repo yet (docs/tickets/OVERVIEW.md); the owning tickets above carry the work.
 
 ## Dependencies
 - Upstream: SKODA-202 (hero), SKODA-201 (cards/rails), SKODA-402 (query-index retrieval), SKODA-203 (gallery-lightbox), SKODA-505 (media-cart), SKODA-601 (import infra)

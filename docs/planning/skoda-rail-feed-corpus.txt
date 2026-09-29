@@ -104,6 +104,41 @@ https://www.skoda-storyboard.com/en/skoda-world/come-cheer-and-sing-along-meet-t
 https://www.skoda-storyboard.com/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details/
 https://www.skoda-storyboard.com/en/skoda-world/the-skoda-elroq-reveals-its-sustainable-interior/
 
+# ===== OCTAVIA model page (SKODA-208, 2026-09-28) — the items the live /en/skoda-model/octavia/ News,
+# Press Kits and Stories rails show (10 each). Already listed above: skoda-octavia-turns-30 (press
+# release), quiz-can-you-recognise-skoda-models (Elroq stories); the-versatile-octavia and
+# how-the-skoda-octavia-reached-365-km-h are imported. Press kits go through the page-base importer
+# until SKODA-805 (hub rebuild); their Metadata still carries template=press_kit + the model facets.
+# Press releases (9)
+https://www.skoda-storyboard.com/en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain/
+https://www.skoda-storyboard.com/en/press-releases/the-skoda-elroq-earns-5-star-euro-ncap-safety-rating-with-the-enyaq-and-octavia-retaining-their-top-scores/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-enters-saudi-arabian-market-strengthening-its-presence-in-the-middle-east/
+https://www.skoda-storyboard.com/en/press-releases/the-updated-octavia-now-with-all-wheel-drive/
+https://www.skoda-storyboard.com/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production/
+https://www.skoda-storyboard.com/en/press-releases/skoda-octavia-combi-rs-wins-prestigious-2024-golden-steering-wheel-award-in-the-mid-sized-car-category/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-produces-first-units-of-updated-octavia-in-kvasiny/
+https://www.skoda-storyboard.com/en/press-releases/when-driving-fun-meets-comfort-rally-ace-oliver-solberg-tests-the-skoda-octavia-rs/
+https://www.skoda-storyboard.com/en/press-releases/skodas-voice-assistant-laura-now-enhanced-with-chatgpt-capabilities/
+# Press kits (10)
+https://www.skoda-storyboard.com/en/press-kits/lets-explore-albania-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-rs-driving-experience-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-octavia-media-launch-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/4x4-winter-experience-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-rs-experience-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-octavia-rs-and-octavia-scout-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-octavia-press-kit-2/
+https://www.skoda-storyboard.com/en/press-kits/skoda-octavia-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/press-kit-skoda-at-the-iaa-2019/
+https://www.skoda-storyboard.com/en/press-kits/skoda-octavia-rs-245-sporty-spacious-practical-family-sportster-delivers-245-ps/
+# Stories (7)
+https://www.skoda-storyboard.com/en/skoda-world/the-immortal-octavia-see-what-it-looks-like-after-one-million-kilometres/
+https://www.skoda-storyboard.com/en/simply-clever/park-your-skoda-using-your-mobile-phone-well-show-you-how-how/
+https://www.skoda-storyboard.com/en/lifestyle/what-you-learn-on-the-circuit-can-save-you-on-the-road/
+https://www.skoda-storyboard.com/en/skoda-world/2024-a-year-of-new-electric-cars-and-innovated-favourites/
+https://www.skoda-storyboard.com/en/skoda-world/making-driving-easier-how-cruise-control-works/
+https://www.skoda-storyboard.com/en/skoda-world/sportline-models-dynamic-elegance-for-every-day/
+https://www.skoda-storyboard.com/en/skoda-world/oliver-solberg-behind-the-wheel-of-the-new-octavia-rs/
+
 # IMAGES / VIDEOS: no pages (SKODA-608, docs/architecture/SKODA-MEDIA-ITEMS-OPTIONS.md, option B).
 # The image/video rows live in the generated media feed /en/media-feed.json (74 images + 27 videos,
 # npm run media-items:build; record in tools/importer/media-items/items.json), read by the listings

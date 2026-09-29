@@ -68,6 +68,14 @@ Semantic map (use these downstream): `--background-color` → white, `--light-co
 `--checkbox-checked-color` (green-accent), `--checkbox-label-gap 9px`; `--consent-color` (grey-400);
 `--newsletter-manage-color` (emerald; a deliberate a11y deviation from the source's 3.4:1 `#419468`, see footer-mediaroom.md §0).
 
+## Model page (SKODA-208)
+
+Primitives: `--skoda-grey-350 #c4c6c7` ("Based on tags" line, media-card dates), `--skoda-grey-750 #464748`
+("All" ghost pill). Component tokens live with their variant: `.cards.key-facts` (`--key-facts-*`),
+`.columns.stats` (`--stats-*`), `.carousel.media` (`--media-card-*`), and the page layer in
+`templates/skoda-model/skoda-model.css` (`--model-*`: gutter, panel gap, nav height, hero sizes, rail cells).
+Breakpoint 1440 is allowed for the model hero ratio switch (measured).
+
 ## Breakpoints
 
 Canonical mobile-first ladder (`_FOUNDATIONS.md` §1): **768 / 992 / 1080** primary (+ 576 / 720

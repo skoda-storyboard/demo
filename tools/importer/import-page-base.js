@@ -17,6 +17,7 @@ import cleanupTransformer from './transformers/skoda-page-cleanup.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 import linksTransformer from './transformers/skoda-links.js';
+import nbspTransformer from './transformers/skoda-nbsp.js';
 
 // PARSER REGISTRY
 const parsers = {
@@ -29,7 +30,8 @@ const PAGE_TEMPLATE = {
   description:
     'Škoda editorial Page base shell. Hero banner -> single-column article body; SiteOrigin body flattened to plain default content (no widget-tree rebuild). Metadata template=page. Content-driven detection only.',
   urls: ['https://www.skoda-storyboard.com/en/brand-group-core-bgc/'],
-  metadata: { template: 'page' },
+  // a default, not an override: a CPT page flattened here (press-kit hub) keeps its type
+  metadata: { templateDefault: 'page' },
   blocks: [
     { name: 'hero-banner', instances: ['div.hero'] },
   ],
@@ -93,6 +95,9 @@ function findBlocksOnPage(document, template) {
 }
 
 export default {
+  // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
+  preprocess: ({ document }) => nbspTransformer('preprocess', document.body, { document }),
+
   transform: (payload) => {
     const { document, url, params } = payload;
     const main = document.body;

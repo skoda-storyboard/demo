@@ -13,6 +13,7 @@
  *     [--da-archive] [--org skoda-storyboard --repo demo] \
  *     [--public-urls reviewed-assets-map.json] \
  *     [--from-manifest --ids-file approved-binary-ids.txt] \
+ *     [--feed .migration/…/en/media-feed.json] \
  *     [--concurrency 4] [--dry-run] [--force] [--limit N] [--min-image-edge 768]
  *
  * Per distinct LOGICAL image (path-qualified id, F3) referenced by the pages:
@@ -48,6 +49,7 @@ import {
 import {
   binaryAnchors, binaryKind, binarySource, publicBinaryUrl, verifyPublicBinary, probeBinaryBytes,
 } from './binary-media.mjs';
+import { feedMediaRefs } from '../media-items/media-items-lib.mjs';
 
 const WORKSPACE = process.env.WORKSPACE_PATH || process.cwd();
 const DEFAULT_MANIFEST = path.join(WORKSPACE, 'tools', 'importer', 'media', 'media-manifest.json');
@@ -56,6 +58,7 @@ const MEDIA_DA_DIR = path.join(WORKSPACE, 'content', 'media-da');
 function parseArgs(args = process.argv.slice(2)) {
   const out = {
     pages: [],
+    feeds: [],
     manifest: DEFAULT_MANIFEST,
     org: 'skoda-storyboard',
     repo: 'demo',
@@ -78,6 +81,10 @@ function parseArgs(args = process.argv.slice(2)) {
     if (a === '--force') { out.force = true; continue; }
     if (a === '--da-archive') { out.daArchive = true; continue; }
     if (a === '--from-manifest') { out.fromManifest = true; continue; }
+    if (a === '--feed') {
+      if (!args[i + 1] || args[i + 1].startsWith('--')) throw new Error('--feed requires a media-feed.json path');
+      out.feeds.push(path.resolve(args[i + 1])); i += 1; continue;
+    }
     if (a === '--pages') {
       while (args[i + 1] && !args[i + 1].startsWith('--')) { out.pages.push(args[i + 1]); i += 1; }
       continue;
@@ -102,8 +109,8 @@ function parseArgs(args = process.argv.slice(2)) {
     if (a === '--min-image-edge') { out.minEdge = renditionEdge(val); i += 1; continue; }
     throw new Error(`Unexpected argument: ${a}`);
   }
-  if (out.pages.length === 0 && !out.fromManifest) {
-    throw new Error('Provide --pages <file> [...] or --from-manifest (re-ingest from the existing manifest\'s source_urls)');
+  if (out.pages.length === 0 && out.feeds.length === 0 && !out.fromManifest) {
+    throw new Error('Provide --pages <file> [...], --feed <media-feed.json> or --from-manifest (re-ingest from the existing manifest\'s source_urls)');
   }
   if (out.idsFile && !out.fromManifest) throw new Error('--ids-file requires --from-manifest');
   return out;
@@ -185,7 +192,7 @@ export default async function main(args = process.argv.slice(2)) {
     throw new Error('DAM ingest requested but no DAM token is available; no images were processed');
   }
   if (!cfg.fromManifest) {
-    const missing = cfg.pages.filter((page) => !existsSync(path.resolve(page)));
+    const missing = [...cfg.pages, ...cfg.feeds].filter((page) => !existsSync(path.resolve(page)));
     if (missing.length) throw new Error(`Requested page(s) not found: ${missing.join(', ')}`);
   }
 
@@ -273,6 +280,36 @@ export default async function main(args = process.argv.slice(2)) {
         }
       }
     }
+    // The media feed (SKODA-608) serves thumbnails, originals, posters and MP4s from a DA sheet,
+    // which EDS does not ingest into the media bus: each still gets a manifest row (source,
+    // delivery mapping, DAM path / status), deduplicated with the page assets by logical id.
+    // The item's listing home (en/images|videos|assets) owns the DAM folder unless a page
+    // already does; the feed document is recorded as the referencing page.
+    for (const feedFile of cfg.feeds) {
+      const feedPath = (feedFile.replace(/\\/g, '/').match(/([a-z]{2}\/media-feed)\.json$/) || [])[1] || 'en/media-feed';
+      for (const ref of feedMediaRefs(JSON.parse(readFileSync(feedFile, 'utf8')))) {
+        if (ref.kind === 'image' && !isImageUrl(ref.url)) continue;
+        const id = logicalId(ref.url);
+        const existing = byLogical.get(id);
+        if (existing) {
+          existing.seenUrls.add(ref.url);
+          existing.pageRefs.add(feedPath);
+          if (!existing.alt && ref.alt) existing.alt = ref.alt;
+          if (!existing.title && ref.title) existing.title = ref.title;
+        } else {
+          byLogical.set(id, {
+            kind: ref.kind,
+            title: ref.kind === 'image' ? '' : ref.title,
+            sourceUrl: ref.url,
+            alt: ref.kind === 'image' ? ref.alt : '',
+            caption: ref.kind === 'image' ? ref.caption : '',
+            seenUrls: new Set([ref.url]),
+            ownerPage: ref.home,
+            pageRefs: new Set([feedPath]),
+          });
+        }
+      }
+    }
   }
 
   let logicalIds = [...byLogical.keys()];
@@ -307,7 +344,8 @@ export default async function main(args = process.argv.slice(2)) {
     return url;
   };
   if (cfg.damBase) logicalIds.forEach(destination);
-  const srcLabel = cfg.fromManifest ? 'from manifest' : `across ${cfg.pages.length} page(s)`;
+  const srcLabel = cfg.fromManifest ? 'from manifest'
+    : `across ${cfg.pages.length} page(s)${cfg.feeds.length ? ` + ${cfg.feeds.length} media feed(s)` : ''}`;
   console.log(`[media] ${logicalIds.length} distinct logical asset(s) ${srcLabel}`);
   console.log(`[media] DAM: ${damConfig ? `${damConfig.baseUrl}${damConfig.folder} (token: ${damToken ? 'present' : 'dry-run only'})` : 'not configured'}`);
   console.log(`[media] DA archive: ${cfg.daArchive ? 'on' : 'off'}  ·  concurrency: ${cfg.concurrency}`);

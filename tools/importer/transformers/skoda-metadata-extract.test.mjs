@@ -16,8 +16,26 @@ import { fileURLToPath } from 'node:url';
 import {
   pickDate, normalizeDate, templateFromBodyClass, categoryFromUrl,
   parseTagHref, groupTags, splitList, buildMetaFields, facetFromBodyClass, FACETS,
-  SITE_SUFFIX, cleanTitle,
+  SITE_SUFFIX, cleanTitle, pickTemplate, facetsFromPostClass,
 } from './skoda-metadata-extract.mjs';
+
+test('pickTemplate: a fixed override wins, then the CPT signal, then the importer default', () => {
+  const pressKit = 'single single-press_kit postid-368313 media-room';
+  assert.equal(pickTemplate({ templateDefault: 'page' }, pressKit), 'press_kit', 'page-base keeps a CPT page\'s type');
+  assert.equal(pickTemplate({ templateDefault: 'page' }, 'page-template-default page'), 'page');
+  assert.equal(pickTemplate({ templateDefault: 'page' }, 'home blog'), 'page', 'no signal → default');
+  assert.equal(pickTemplate({ template: 'page' }, pressKit), 'page', 'a fixed override still wins');
+  assert.equal(pickTemplate({}, ''), '');
+});
+
+test('facetsFromPostClass reads the post\'s own <facet>-<slug> classes; skips ids and non-facets', () => {
+  const cls = 'post-368327 press_kit type-press_kit hentry category-octavia category-press-kits model-octavia years-48727 view-exterior technology-matrix-lights model-octavia';
+  assert.deepEqual(facetsFromPostClass(cls), {
+    tags: ['octavia', 'exterior', 'matrix-lights'],
+    byFacet: { model: ['octavia'], view: ['exterior'], technology: ['matrix-lights'] },
+  });
+  assert.deepEqual(facetsFromPostClass(''), { tags: [], byFacet: {} });
+});
 
 // ---- date: 4-way fallback + normalization --------------------------------
 test('pickDate prefers article:published_time, normalizes to YYYY-MM-DD', () => {

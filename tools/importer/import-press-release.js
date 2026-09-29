@@ -29,6 +29,7 @@ import cleanupTransformer from './transformers/skoda-press-release-cleanup.js';
 import layoutTransformer from './transformers/skoda-press-release-layout.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 import linksTransformer from './transformers/skoda-links.js';
+import nbspTransformer from './transformers/skoda-nbsp.js';
 import normalizeImages from './transformers/skoda-images.js';
 
 // PARSER REGISTRY
@@ -119,6 +120,8 @@ export default {
    * preProcess also drops every <hr>, so the pull-quotes are marked by their rule here.
    */
   preprocess: ({ document }) => {
+    // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
+    nbspTransformer('preprocess', document.body, { document });
     document.querySelectorAll('.search-results.media-box a.media-cart-action.download[href]').forEach((a) => {
       if (!(a.textContent || '').trim()) a.textContent = 'Download';
     });
