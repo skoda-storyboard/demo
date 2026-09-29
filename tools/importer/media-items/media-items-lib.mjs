@@ -17,6 +17,8 @@
  * on saved fixtures (tools/importer/media-items/media-items.test.mjs).
  */
 
+import { logicalId } from '../media/media-lib.mjs';
+
 export const SOURCE_ORIGIN = 'https://www.skoda-storyboard.com';
 export const CDN_ORIGIN = 'https://cdn.skoda-storyboard.com';
 
@@ -30,7 +32,87 @@ export const FACETS = [
 // Download fields, in the order they are written to the Metadata block + index.
 export const DOWNLOAD_FIELDS = ['original', 'rendition-1920', 'mp4', 'vimeo-id', 'poster'];
 
+// The lightbox detail-panel fields (media-item shapes 4 + 6): file metadata as the source
+// prints it (videos add length, bitrate and audio format), the tag chip labels in source
+// order, and the related article.
+export const DETAIL_FIELDS = ['filetype', 'filesize', 'length', 'bitrate', 'audioformat', 'dimensions',
+  'labels', 'related', 'related-title'];
+
 const text = (el) => (el ? (el.textContent || '').replace(/\s+/g, ' ').trim() : '');
+
+/** The source's per-item detail request (the colorbox panel, `image-overlay-meta-data`). */
+export function detailRequest(id, nonce) {
+  const body = new URLSearchParams({
+    action: 'skoda_ajax_loader',
+    nonce,
+    template: 'templates/image-overlay-meta-data',
+    loop: 'false',
+    'query_vars[post_type]': 'attachment',
+    'query_vars[offset]': '0',
+    'query_vars[p]': String(id),
+    'query_vars[include_hidden]': 'true',
+  });
+  return { url: `${SOURCE_ORIGIN}/wp/wp-admin/admin-ajax.php`, body: body.toString() };
+}
+
+/** The ajax loader nonce a source listing page embeds (`var skoda_ajax_loader = {…}`). */
+export function ajaxNonce(html) {
+  return (String(html || '').match(/skoda_ajax_loader\s*=\s*\{[^}]*"nonce":"([a-z0-9]+)"/i) || [])[1] || '';
+}
+
+/**
+ * The detail-panel fields from the source panel markup: `File type: JPG`, `File size: 10 MB`,
+ * `Dimensions: 8256 × 5504 px` (the source's non-breaking spaces become plain ones), the
+ * tag chip labels ("2026, Octavia") and the first related article (absolute source URL).
+ * @param {Document} doc the parsed panel HTML
+ */
+export function parseDetailPanel(doc) {
+  const strong = (sel) => text(doc.querySelector(`${sel} strong`));
+  const related = doc.querySelector('.related-links a.related-link[href]');
+  return {
+    filetype: strong('.meta-filetype'),
+    filesize: strong('.meta-filesize'),
+    length: strong('.meta-length'),
+    bitrate: strong('.meta-bitrate'),
+    audioformat: strong('.meta-dataformat'),
+    dimensions: strong('.meta-dimensions'),
+    labels: [...doc.querySelectorAll('.entry-tags a.label')].map(text).filter(Boolean).join(', '),
+    related: related ? related.getAttribute('href') : '',
+    'related-title': text(related),
+  };
+}
+
+/**
+ * The detail fields a row must carry to be published: every file the lightbox offers
+ * (images, content assets, videos with an MP4) shows its type, size and dimensions, as the
+ * source panel does. Vimeo-only videos have no file panel.
+ */
+export function requiredDetails(item) {
+  const hasFile = item.type === 'image' || item.type === 'asset'
+    || (item.type === 'video' && !!item.mp4);
+  return hasFile ? ['filetype', 'filesize', 'dimensions'] : [];
+}
+
+/** Rows missing a required detail field: [{ id, type, title, missing: [field…] }]. */
+export function detailGaps(items) {
+  return items.map((item) => ({
+    id: item.id,
+    type: item.type,
+    title: item.title,
+    missing: requiredDetails(item).filter((f) => !item[f]),
+  })).filter((g) => g.missing.length);
+}
+
+/**
+ * Gaps not covered by a recorded, verified source gap (sources.json `knownDetailGaps`):
+ * a known entry covers a row only for the fields it lists, so anything new still fails.
+ */
+export function unknownGaps(gaps, known = {}) {
+  return gaps.filter((g) => {
+    const entry = known[g.id];
+    return !entry || !g.missing.every((f) => (entry.missing || []).includes(f));
+  });
+}
 
 /** Lowercase, anything outside [a-z0-9-] becomes `-` (the EDS path rule, push/m1-status-lib). */
 export function slugify(value) {
@@ -126,6 +208,55 @@ export function itemSlug(sourceUrl, fileUrl) {
 }
 
 /**
+ * Images a source page links from its own copy (`<a href="…jpg"><img class="wp-image-N">`,
+ * e.g. the model pages' Liftback / Combi drawings): the source opens them in the same
+ * colorbox, with the attachment's detail panel. Listing and rail cards (`.article-teaser`) are not
+ * matched. Returns [{ id, original, alt }] in page order, de-duplicated by id.
+ * @param {Document} doc the source page
+ */
+export function parseAssetLinks(doc) {
+  const seen = new Set();
+  return [...doc.querySelectorAll('a[href]')].flatMap((a) => {
+    const img = a.querySelector(':scope > img[class*="wp-image-"]');
+    const href = cdnUrl(a.getAttribute('href'));
+    if (!img || !/\.(jpe?g|png|webp)$/i.test(href) || a.closest('.article-teaser')) return [];
+    const id = (img.getAttribute('class').match(/wp-image-(\d+)/) || [])[1];
+    if (!id || seen.has(id)) return [];
+    seen.add(id);
+    return [{ id, original: href, alt: (img.getAttribute('alt') || '').trim() }];
+  });
+}
+
+/**
+ * A content-linked image as a feed item (template `asset`, contract media-item shape 5): no
+ * listing, rail or cart; it only carries what the lightbox shows. Title and published date
+ * come from the source detail panel (its first line and "Published"), else the alt text.
+ * @param {{id: string, original: string, alt: string}} link from parseAssetLinks
+ * @param {Document} panelDoc the parsed source detail panel
+ */
+export function assetItem(link, panelDoc) {
+  const panel = parseDetailPanel(panelDoc);
+  const title = text(panelDoc.querySelector('p')) || link.alt;
+  const slug = slugify(link.original.split('/').pop().replace(/\.[a-z0-9]+$/i, ''));
+  return {
+    id: link.id,
+    type: 'asset',
+    title,
+    source: `${SOURCE_ORIGIN}/?attachment_id=${link.id}`,
+    date: isoDate(text(panelDoc.querySelector('.meta-published strong'))),
+    caption: '',
+    alt: link.alt,
+    original: link.original,
+    thumbnail: link.original,
+    image: link.original,
+    terms: {},
+    slug,
+    path: `/en/assets/${slug}`,
+    ...panel,
+  };
+}
+
+/**
  * Parse the media cards of a source listing page into item descriptors.
  * @param {Document} doc
  * @param {{options?: Map, yearsById?: object}} ctx
@@ -173,7 +304,51 @@ export function parseCards(doc, { options, yearsById } = {}) {
   });
 }
 
-/** Merge item lists by source id (first wins; terms are unioned). Resolves slug collisions. */
+/**
+ * Source ids in the source's own listing order. Every listing is a slice of one global
+ * order (newest first, then the source's gallery order, which neither the id nor the publish
+ * time reproduces), so consecutive cards give "a before b" edges; a topological merge of
+ * them rebuilds the order across listings. Unordered pairs go newest first, then (like any
+ * inconsistent pair) first-seen.
+ */
+export function sourceOrder(lists) {
+  const firstSeen = new Map();
+  const dates = new Map();
+  const next = new Map();
+  const indegree = new Map();
+  lists.forEach((list) => list.forEach((item, i) => {
+    if (!firstSeen.has(item.id)) {
+      firstSeen.set(item.id, firstSeen.size);
+      dates.set(item.id, item.date || '');
+      next.set(item.id, new Set());
+      indegree.set(item.id, 0);
+    }
+    const prev = list[i - 1];
+    if (prev && prev.id !== item.id && !next.get(prev.id).has(item.id)) {
+      next.get(prev.id).add(item.id);
+      indegree.set(item.id, indegree.get(item.id) + 1);
+    }
+  }));
+  const order = [];
+  const done = new Set();
+  const byDateThenSeen = (a, b) => dates.get(b).localeCompare(dates.get(a))
+    || firstSeen.get(a) - firstSeen.get(b);
+  while (order.length < firstSeen.size) {
+    const ready = [...firstSeen.keys()].filter((id) => !done.has(id) && indegree.get(id) === 0);
+    // a cycle (listings disagree): release the earliest-seen remaining id
+    const id = (ready.length ? ready : [...firstSeen.keys()].filter((x) => !done.has(x)))
+      .sort(byDateThenSeen)[0];
+    done.add(id);
+    order.push(id);
+    next.get(id).forEach((n) => indegree.set(n, indegree.get(n) - 1));
+  }
+  return order;
+}
+
+/**
+ * Merge item lists by source id (first wins; terms are unioned), in source listing order.
+ * Resolves slug collisions.
+ */
 export function mergeItems(lists) {
   const byId = new Map();
   lists.flat().forEach((item) => {
@@ -184,7 +359,7 @@ export function mergeItems(lists) {
     });
   });
   const seen = new Map();
-  return [...byId.values()].map((item) => {
+  return sourceOrder(lists).map((id) => byId.get(id)).map((item) => {
     const n = (seen.get(item.path) || 0) + 1;
     seen.set(item.path, n);
     if (n === 1) return item;
@@ -195,7 +370,7 @@ export function mergeItems(lists) {
 
 /** Link target of a feed row until the listing lightbox lands (SKODA-406). */
 function rowPath(item) {
-  if (item.type === 'image') return item.original;
+  if (item.type === 'image' || item.type === 'asset') return item.original;
   return item['vimeo-id'] ? `https://vimeo.com/${item['vimeo-id']}` : item.mp4;
 }
 
@@ -213,21 +388,78 @@ export function feedRow(item) {
     image: (item.type === 'image' ? item.thumbnail : item.poster) || item.image,
     template: item.type,
     date: item.date,
-    category: item.type === 'image' ? 'images' : 'videos',
+    category: { image: 'images', video: 'videos', asset: 'assets' }[item.type] || '',
     tags: [...new Set(FACETS.flatMap((tax) => item.terms[tax] || []))].join(', '),
   };
   FACETS.forEach((tax) => { row[tax] = (item.terms[tax] || []).join(', '); });
   DOWNLOAD_FIELDS.forEach((field) => { row[field] = item[field] || ''; });
+  DETAIL_FIELDS.forEach((field) => { row[field] = item[field] || ''; });
   row.id = item.id;
   row.source = item.source;
   return row;
 }
 
-/** The DA sheet JSON (`:type: sheet`, the shape DA stores and Edge Delivery serves). */
+/**
+ * The DA sheet JSON (`:type: sheet`, the shape DA stores and Edge Delivery serves). Newest
+ * first; same-day rows keep the source listing order (mergeItems), which the rails' stable
+ * date sort then preserves, so a rail lists them as the source does.
+ */
 export function feedSheet(items) {
   const data = items.map(feedRow)
-    .sort((a, b) => (b.date || '').localeCompare(a.date || '') || a.path.localeCompare(b.path));
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   return {
     total: data.length, offset: 0, limit: data.length, data, ':type': 'sheet',
   };
+}
+
+/** Where a feed item's media lives (its DAM folder until AEM Assets owns it): the listing home. */
+const FEED_HOME = { image: 'en/images', video: 'en/videos', asset: 'en/assets' };
+
+/**
+ * Every binary the media feed serves, for the media-ingestion manifest (SKODA-501/504): image
+ * and asset rows serve the thumbnail, the 1920 rendition and the original (one logical master);
+ * video rows the Vimeo poster (an image) and the MP4 (a binary). `feedPath` is the feed document
+ * (`en/media-feed`), recorded as the referencing page; `home` is the item's DAM folder.
+ * @returns {Array<{url, kind: 'image'|'video', field, id, title, alt, caption, home}>}
+ */
+export function feedMediaRefs(sheet) {
+  const rows = (sheet && sheet.data) || [];
+  const refs = [];
+  rows.forEach((row) => {
+    const home = FEED_HOME[row.template];
+    if (!home) return;
+    const base = {
+      id: row.id, title: row.title || '', alt: row.title || '', caption: row.description || '', home,
+    };
+    const add = (field, kind) => {
+      const url = row[field];
+      if (url && /^https?:\/\//.test(url)) {
+        refs.push({
+          ...base, url, kind, field,
+        });
+      }
+    };
+    if (row.template === 'video') {
+      add('poster', 'image');
+      if (row.image !== row.poster) add('image', 'image');
+      add('mp4', 'video');
+    } else {
+      add('image', 'image');
+      add('rendition-1920', 'image');
+      add('original', 'image');
+    }
+  });
+  return refs;
+}
+
+/**
+ * Feed binaries without a media-manifest row (by logical id, or a URL the row has seen): the
+ * feed must not be published while any is missing.
+ * @param {object} sheet the media feed
+ * @param {Record<string, object>} manifestRows media-manifest.json `rows`
+ */
+export function feedCoverageGaps(sheet, manifestRows = {}) {
+  const seen = new Set(Object.values(manifestRows).flatMap((r) => r.seen_urls || []));
+  return feedMediaRefs(sheet)
+    .filter((ref) => !manifestRows[logicalId(ref.url)] && !seen.has(ref.url));
 }

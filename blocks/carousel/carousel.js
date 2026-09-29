@@ -80,16 +80,20 @@ export function dotState({ scrollLeft = 0, scrollWidth = 0, clientWidth = 0 } = 
 }
 
 /* Turn each authored row into a shared card-teaser <li>, tagged overlay (dated)
- * or caption (taxonomy) from whether the primitive classified a date. */
+ * or caption (taxonomy) from whether the primitive classified a date. The
+ * `caption` variant forces the title-below card even for dated rows (model-page
+ * media and derivative rails show the date/title under the image). */
 function buildCards(block) {
   const track = document.createElement('ul');
   track.className = 'carousel-track';
+  const captionOnly = block.classList.contains('caption');
   [...block.children].forEach((row) => {
     const li = document.createElement('li');
     li.className = 'card-teaser';
     while (row.firstElementChild) li.append(row.firstElementChild);
     decorateCardCells(li); // shared content-sniff (image/body/date/title)
-    railVariant(!!li.querySelector('.card-teaser-date')).forEach((c) => li.classList.add(c));
+    const dated = !captionOnly && !!li.querySelector('.card-teaser-date');
+    railVariant(dated).forEach((c) => li.classList.add(c));
     track.append(li);
   });
   optimizeImages(track); // authored <picture> → optimized (shared with cards)
@@ -207,15 +211,19 @@ export default function decorate(block) {
     moved = false;
     startX = e.clientX;
     startLeft = track.scrollLeft;
-    track.setPointerCapture(e.pointerId);
-    track.classList.add('is-dragging');
   });
 
+  // Capture the pointer only once it really drags: capturing on pointerdown retargets the
+  // click to the track, so a plain click never reached the card link (or its lightbox).
   track.addEventListener('pointermove', (e) => {
     if (!dragging) return;
     const dx = e.clientX - startX;
-    if (Math.abs(dx) > DRAG_THRESHOLD) moved = true;
-    track.scrollLeft = startLeft - dx;
+    if (!moved && Math.abs(dx) > DRAG_THRESHOLD) {
+      moved = true;
+      track.setPointerCapture?.(e.pointerId);
+      track.classList.add('is-dragging');
+    }
+    if (moved) track.scrollLeft = startLeft - dx;
   });
 
   function endDrag(e) {

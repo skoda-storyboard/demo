@@ -49,12 +49,20 @@ export function parseList(text) {
 }
 
 /**
+ * The importer's stand-in for a source non-breaking space (transformers/skoda-nbsp.js): helix
+ * html2md turns U+00A0 into a plain space, a plane-15 private-use character survives it.
+ */
+export const NBSP_PLACEHOLDER = '\u{F00A0}';
+
+/**
  * Wrap a bare importer `.plain.html` body in the document shape DA expects (proven in the
- * 2026-09-24 Epiq push: DA stores and returns it byte-for-byte).
+ * 2026-09-24 Epiq push: DA stores and returns it byte-for-byte), restoring the source's
+ * non-breaking spaces from their import placeholder.
  * @param {string} plain the content of content/<path>.plain.html
  */
 export function wrapPage(plain) {
-  return `<body><header></header><main>${String(plain || '').trim()}</main><footer></footer></body>`;
+  const main = String(plain || '').trim().replaceAll(NBSP_PLACEHOLDER, '\u00a0');
+  return `<body><header></header><main>${main}</main><footer></footer></body>`;
 }
 
 /** Stable content hash (sha256 hex) of a string. */

@@ -3,6 +3,26 @@
 Reusable, re-runnable tooling to ingest source-site images into the project's
 media layer and re-point imported content at them. Not Elroq-specific.
 
+## Media feed binaries (SKODA-608 / #200 review)
+
+The generated media feed (`/en/media-feed.json`, `npm run media-items:build`) serves image
+thumbnails, 1920 renditions, originals, Vimeo posters and MP4s straight from a DA sheet. EDS does
+**not** ingest sheet URLs into the media bus the way it ingests a page `<img>`, so a CDN URL in the
+feed is not evidence of ingestion. Every one of them is recorded here like a page asset:
+
+```bash
+npm run media-items:build -- --out <dir>                    # writes <dir>/en/media-feed.json
+npm run media:build -- --feed <dir>/en/media-feed.json      # records every feed binary
+npm run media-items:build -- --offline --out <dir> --push   # publishes; refuses without coverage
+```
+
+`--feed` rows use the same path as pages: deduplicated by logical id with page assets, the
+delivery rendition + bytes for images, and the SKODA-503 import-time state for MP4s (`partial`,
+`steps.dam: n/a`, `steps.publish: pending`; the DAM upload runs later on a developer machine).
+The feed document (`en/media-feed`) is the referencing page; the item's listing home
+(`en/images`, `en/videos`, `en/assets`) owns the DAM folder unless a page already does.
+`--push` fails while any feed URL has no manifest row (`feedCoverageGaps`).
+
 ## PDF/MP4 links (SKODA-503)
 
 PDFs and self-hosted MP4s are **not images**: they are recorded as `document`
