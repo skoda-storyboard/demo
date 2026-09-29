@@ -1,0 +1,48 @@
+/* Quote (SKODA-220): the source's centred pull-quote, measured at 1440/1280/768/390. The
+   quote is 16/24 italic; a 2px black rule 10% of the column wide (81 at 1280, 37 at 390)
+   sits 20px below it and 10px above the attribution, whose name is 600. The paragraph
+   rhythm (20px) surrounds it. */
+.quote {
+  --quote-rule-width: 10%;
+  --quote-rule-height: 2px;
+  --quote-rule-gap: 10px;
+
+  text-align: center;
+}
+
+.quote figure {
+  margin: 0 0 var(--paragraph-gap);
+}
+
+.quote .quote-text,
+.quote .quote-attribution {
+  margin: 0;
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-regular);
+  line-height: var(--line-height-body);
+}
+
+/* centred, so without the global blockquote's leading accent (styles.css) */
+.quote .quote-text {
+  border: 0;
+  padding: 0;
+  font-style: italic;
+}
+
+.quote .quote-text::after {
+  content: "";
+  display: block;
+  width: var(--quote-rule-width);
+  height: var(--quote-rule-height);
+  margin: var(--paragraph-gap) auto var(--quote-rule-gap);
+  background: var(--skoda-black);
+}
+
+.quote .quote-text p,
+.quote .quote-attribution p {
+  margin: 0;
+}
+
+.quote .quote-attribution strong {
+  font-weight: var(--weight-semibold);
+}

@@ -98,12 +98,23 @@ test('classifyBlock: tiles are on main; gallery slider and columns split remain 
   assert.equal(classifyBlock(one(block('columns split-62', row('a', 'b'))), CONTRACTS, CODE).id, 'columns-split');
 });
 
-test('classifyBlock: pending block without code (quote, in-page-nav)', () => {
-  const code = new Set([...CODE].filter((b) => b !== 'quote'));
-  const q = classifyBlock(one(block('quote', row('Q', 'A'))), CONTRACTS, code);
-  assert.equal(q.status, 'pending');
-  assert.equal(q.ticket, 'SKODA-220');
-  assert.equal(classifyBlock(one(block('in-page-nav', row('<a href="#x">X</a>'))), CONTRACTS, code).id, 'in-page-nav');
+// A pinned block with no code yet. Quote (SKODA-220) and Accordion (SKODA-805c) were the
+// real ones until their blocks landed; the path still needs covering.
+const FUTURE = {
+  id: 'future-block', block: 'future-block', status: 'pinned', ticket: 'SKODA-000', fallback: 'readable', shape: 1, emittedBy: [],
+};
+const WITH_FUTURE = { ...CONTRACTS, pending: [...CONTRACTS.pending, FUTURE] };
+
+test('classifyBlock: pending block without code; quote, accordion and banner columns are on main', () => {
+  const f = classifyBlock(one(block('future-block', row('Q', 'A'))), WITH_FUTURE, CODE);
+  assert.equal(f.status, 'pending');
+  assert.equal(f.ticket, 'SKODA-000');
+  assert.equal(classifyBlock(one(block('in-page-nav', row('<a href="#x">X</a>'))), CONTRACTS, CODE).id, 'in-page-nav');
+  for (const cls of ['quote', 'accordion', 'columns banners']) {
+    const r = classifyBlock(one(block(cls, row('a', 'b'))), CONTRACTS, CODE);
+    assert.equal(r.status, 'main', cls);
+    assert.deepEqual(r.problems, [], cls);
+  }
 });
 
 test('classifyBlock: unknown block / unknown variant are errors', () => {
@@ -151,16 +162,18 @@ test('classifyBlock: a pending config key (story-rail subheading, 208) is pendin
 
 test('checkPage: pending ids de-duplicated; a pending BLOCK (no code) holds publish', () => {
   const html = page(
-    block('quote', row('Q1', 'A1')),
-    block('quote', row('Q2', 'A2')),
+    block('future-block', row('Q1', 'A1')),
+    block('future-block', row('Q2', 'A2')),
     block('metadata', row('template', 'press-release')),
   );
-  const r = checkPage(html, CONTRACTS, CODE);
+  const r = checkPage(html, WITH_FUTURE, CODE);
   assert.deepEqual(r.pending, [{
-    id: 'quote', ticket: 'SKODA-220', fallback: 'readable', missingCode: true,
+    id: 'future-block', ticket: 'SKODA-000', fallback: 'readable', missingCode: true,
   }]);
   assert.equal(r.errors.length, 0);
-  assert.equal(r.publishable, false); // quote.js would 404
+  assert.equal(r.publishable, false); // future-block.js would 404
+  const quotes = checkPage(page(block('quote', row('Q', 'A'))), CONTRACTS, CODE);
+  assert.equal(quotes.publishable, true, 'blocks/quote exists (SKODA-220)');
 });
 
 test('checkPage: implemented tiles may publish; broken pending config still holds', () => {
