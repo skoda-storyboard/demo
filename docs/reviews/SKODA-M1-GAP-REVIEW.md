@@ -4,6 +4,8 @@
 **Milestone:** M1 demo **Thu 15 Oct 2026** · **Build freeze:** Thu 8 Oct EOD · **Dry run + fixes:** Fri 9 – Wed 14 Oct
 **Scope:** [`docs/planning/skoda-m1-url-set.txt`](../planning/skoda-m1-url-set.txt): 43 URLs (42 unique pages) plus
 everything the docs **require and don't rule out** for them.
+**Scope update (2026-09-28):** D-1 = A adds the 49 press-kit child pages, so the set is now 93 lines /
+92 unique pages (§12 D-1). Counts in this review describe the original 43-URL snapshot.
 **Supersedes for M1 planning:** [`M1-BACKLOG-REVIEW.md`](./M1-BACKLOG-REVIEW.md) (21 Sep). That review is still valid for
 board hygiene, but it predates the 43-URL scope.
 **Status:** proposal. **No DA changes have been applied.** The GitHub side of §11 was applied **partially** in
@@ -458,7 +460,7 @@ QA-loop fixes, then Should.
 
 | # | Decision | Options | Default if undecided |
 |---|---|---|---|
-| D-1 | Press-kit child pages (50) | A: import all (5–8 SP) · **B: Peaq children only (3 SP, Could)** · C: link out to live (inside 609) | **C** for M1; upgrade to B if Could capacity opens |
+| D-1 | Press-kit child pages (50) | A: import all (5–8 SP) · **B: Peaq children only (3 SP, Could)** · C: link out to live (inside 609) | **Decided 2026-09-28 (Architect): A, import all 50** (supersedes the default C) |
 | D-2 | CS in the demo | none · **switcher filtered to existing locales + 1 CS story counterpart** · full CS | switcher shows only locales that exist; CS page is Should |
 | D-3 | Link policy for out-of-set targets | see the [SKODA-609](../tickets/tickets/SKODA-609.md) table | absolute to live + new tab for ruled-out pages; import or swap for stories |
 | D-4 | Series hub cards | index-driven + import linked stories · **static curated cards** | static cards for hubs whose stories are not in the corpus |
@@ -468,6 +470,24 @@ QA-loop fixes, then Should.
 | D-8 | "Search on a sample" (COM06 note; §14 C-8) | resume 403 as Should · **correct the note** | correct the note |
 | D-9 | Article sidebar STO-D07 (§14 C-9) | build the sidebar · **related rail + promo, doc wording corrected** | **Resolved by §15:** the sidebar is built (801 in #113, parity in 817). Subscription = 823 (Could) or doc wording "go-live" |
 | D-10 | Client-scope adds C-1…C-6 (§14) | accept + **extend the extra resource about 4–5 days** · accept with the §14.3 trims · reject (tell the client) | accept + extend; decide by Mon 28 Sep |
+
+**D-1 decided 2026-09-28: option A, import all children (Architect sign-off).** This
+supersedes the one-page Introduction subset first proposed in #189. All 50 tile targets of
+the 3 hubs join the M1 set under `PRESS KITS: CHILDREN (50)` in `skoda-m1-url-set.txt`:
+Peaq-2 13, Epiq-2 13, Motorsport 24 (23 children plus its cross-kit tile, the Enyaq RS Race
+kit, so no hub tile links out). 49 are new (the Introduction was already listed), so the set
+is 92 unique pages. All 50 use `press_kit-template-default` and are imported by
+`import-press-kit-default` (SKODA-805b). A source census on 2026-09-28 found 36 chapter
+pages import as-is and 14 resource pages (Texts, FAQ, Infographics, Technical data, Images,
+Videos) with no Media Box, which need the importer extended; 40 of the 50 link PDFs/MP4s
+(about 102), so their DA push waits for the developer-machine DAM ingest. The hubs publish
+with the documented plain-card fallback (SKODA-221 mosaic follows), once their children are
+live so no tile 404s. Publish and reindex remain a separately approved wave.
+Since PR #202 the 49 chapter/resource children carry `template=press_kit_chapter` (not
+`press_kit`), so they never enter the press-kit rails; the Introduction and Enyaq RS Race
+kits keep `press_kit`. No child has a Technical-data spec table: Technical data is a single
+PDF on the source (see C-4). The Peaq FAQ's one variant-spec table imports as one text line
+per row.
 
 **Human gates:**
 
@@ -524,7 +544,7 @@ The live source checks behind this section ran on 2026-09-24:
 | C-1 | **Media Room homepage** (§3, §6, MR-H01–H10) | **Not in the 43 URLs.** `/en/media-room/` returns 404 on preview | page missing | Add `/en/media-room/` to the set. `import-home-mr.js` already exists on `main`. Its rails reuse `story-rail` and are fed by the 603/608 rows | 1.5 |
 | C-2 | **Series: directory → hub**, two-level (§3, STO-S01–S03) | `/en/series-2/` is not in the set, and this review moved it to M2 | directory missing | Add `/en/series-2/`. `import-series-directory.js` already exists. The index-driven grid shows the 5 imported hubs | 1 |
 | C-3 | **English + Czech**, with the switcher showing only languages that exist (§3, §6, COM05) | The set is **EN only**. 303/CS is a Should (D-2) | CS pages missing; tier too low | Promote **303 to Must**. Add 3 CS counterparts: Peaq model, the Peaq-production story, and one series hub. Add the CS header/footer fragments. Do **not** import `/cs/` home, because it needs a per-locale index (1001, M2) | 1.5 + 1 |
-| C-4 | **One press kit end to end**: chaptered hub, a sub-page, spec table, grouped media and downloads (§3, §6, MR-PK01/02/04/06) | Hub = 805a (Must). The default article 805c is a Should. Children (805b) are Could | sub-page and narrative below Must | Promote **805c to Must**. Import **one** Peaq-2 chapter sub-page with the 805c importer. Reuse the 208 `spec-table` block | 3 + 1 |
+| C-4 | **One press kit end to end**: chaptered hub, a sub-page, spec table, grouped media and downloads (§3, §6, MR-PK01/02/04/06) | Hub = 805a (Must). The default article 805c is a Should. Children (805b) are Could | sub-page and narrative below Must | Promote **805c to Must**. Import **one** Peaq-2 chapter sub-page with the 805c importer. Reuse the 208 `spec-table` block. **Update (2026-09-28):** D-1 = A imports all 49 sub-pages (805b). The source's Technical data chapters have no spec table: both are a single PDF download. The only spec table is a 3-variant table in an answer on the Peaq FAQ, imported as one labelled list per variant (no block). So a `spec-table` chapter cannot be sourced from these kits | 3 + 1 |
 | C-5 | **Whole-kit ZIP**, "a pre-built file, so easy" (MR-PK07, marked Demo) | Explicitly excluded from 805a (listed as 806, M2) | promise contradicted | Add a download link to the existing CDN ZIP on the Peaq-2 and Epiq-2 hubs. This is a 805a AC, not 806 | 0.5 |
 | C-6 | **Social share** on story detail, with configurable channels (COM15, STO-D10) | 215 is Could, unowned, and has no issue | tier too low | Create the 215 issue and make it **Must** (vijay) | 1 |
 | C-7 | **Embargoed content**: group-restricted page, previewed privately, published on schedule (§3, §6, 6.5) | Ruled out: 811 is M2, and only the ungated form is stretch | contradicted | **Decision D-7.** The client doc contradicts itself: its 6.3 says "scheduling, review and embargo at go-live". Either (a) script a native walk-through (restricted preview + scheduled publish; Lars, ≈ 1 SP, proven on one page), or (b) correct the doc to the 6.3 wording before the demo. Default: **(b)**, unless the client confirms 6.5 | 0–1 |

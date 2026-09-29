@@ -55,8 +55,11 @@ attachment pages, HTTP-verified.
   - for **download**: the Original URL and the 1920px rendition (images), or the MP4 source URL (videos). The MP4 URL
     is recorded as metadata only; SKODA-503 routing is not required for this ticket.
 - **Model rails.** Items must carry the `model-*` tags that the rails need. Minimum: the Peaq and Epiq rails reach
-  ≥12. For Octavia, Superb and Fabia the rails will be empty. **Hide-empty is implemented in SKODA-208**
-  (`blocks/story-rail`); this ticket only supplies the rows.
+  ≥12. **Hide-empty is implemented in SKODA-208** (`blocks/story-rail`); this ticket only supplies the rows.
+  *Reconciled 2026-09-29 (PR 200 review):* an empty Superb / Fabia media rail is acceptable for **this ticket's**
+  phase 1, but it is an open **content gap** against SKODA-208's source rail parity, owned here: Octavia rows were
+  added on 2026-09-28 (`model=octavia` queries, 20 images / 20 videos); Superb, Fabia, Peaq and Epiq still need their
+  queries (counts in SKODA-208 "Rail content dependency").
 - **Faceting.** Tag enough items to prove facet narrowing on both listings: ≥18 per listing, so that one facet
   still leaves a load-more.
 - **Repeatability.** Import through the SKODA-602 pipeline, reindex, and record the rows in the SKODA-603 tracker.

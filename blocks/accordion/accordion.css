@@ -1,0 +1,74 @@
+.accordion {
+  --accordion-border-width: 1px;
+  --accordion-focus-width: 2px;
+  --accordion-icon-size: 1em;
+  --accordion-motion: 0.2s ease-in;
+}
+
+.accordion .accordion-item + .accordion-item {
+  margin-block-start: var(--spacing-l);
+}
+
+.accordion .accordion-heading {
+  margin: 0;
+}
+
+.accordion .accordion-heading button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-m);
+  width: 100%;
+  padding: var(--spacing-l);
+  border: 0;
+  border-block: var(--accordion-border-width) solid var(--divider-color);
+  background-color: var(--skoda-white);
+  color: var(--skoda-ink);
+  font: inherit;
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 1.125;
+  text-align: start;
+  cursor: pointer;
+}
+
+.accordion .accordion-heading button:focus-visible {
+  outline: var(--accordion-focus-width) solid var(--skoda-green);
+  outline-offset: var(--accordion-focus-width);
+}
+
+.accordion .accordion-icon {
+  flex: none;
+  width: var(--accordion-icon-size);
+  height: var(--accordion-icon-size);
+  border-radius: 50%;
+  transition: transform var(--accordion-motion);
+}
+
+.accordion .accordion-icon::before {
+  display: block;
+  content: '+';
+  text-align: center;
+}
+
+.accordion .accordion-heading button:hover .accordion-icon {
+  background-color: var(--skoda-grey-100);
+}
+
+.accordion .accordion-heading button[aria-expanded="true"] .accordion-icon {
+  transform: rotate(45deg);
+}
+
+.accordion .accordion-panel {
+  padding: var(--spacing-l);
+}
+
+.accordion .accordion-panel[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accordion .accordion-icon {
+    transition: none;
+  }
+}

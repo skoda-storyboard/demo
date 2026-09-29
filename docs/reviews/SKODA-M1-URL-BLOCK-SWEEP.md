@@ -206,7 +206,7 @@ Closed or M2 targets are **re-routed** to an open M1 ticket. The ⚠️ rows in 
 | 302 (open) | `aria-expanded` on the button, scroll lock, focus trap + Esc at 375 and 992 | 302 |
 | 213 (#110) | 3 sourced cards. Static mosaic ≥ 768. The mobile carousel advances every 10s and honours hover and reduced motion. First card 812×467 at 1280 | 213 |
 | 805a (open) | The 2-up WhatsApp / direct-ZIP row on Peaq and Epiq, or a recorded ZIP deferral with a working direct file. 375 dark caption below the image. 768 h1 28px | 805a (the ZIP part is from M2 806) |
-| 805b / 609 (open) | Record D-1 = C. Audit all 50 tile hrefs, incl. the cross-kit Enyaq RS Race card, for 0 in-site 404s. Alias → 301 | 609 |
+| 805b / 609 (open) | D-1 = A (2026-09-28): import the 49 children. Audit all hub tile hrefs, incl. the cross-kit Enyaq RS Race card (external, new tab), for 0 in-site 404s. Alias → 301 | 609 |
 | 805c (Should) | 6 intro PDF/JPG downloads, 2 PDF/share banners, 2 contact cards, the 3-link sidebar menu, the Images +51 preview, the 60-item mixed Media Box with Show more/less, **Vimeo (not Buzzsprout)**, 8 topical toggles (multi-open, keyboard/ARIA) | 805c (the toggles are from M2 807) |
 | 403 (#131, merged) | Autocomplete arrow / Enter / Esc / focus at desktop and mobile | re-verify on main (c0cc2f7 addressed keyboard/a11y) |
 | 106 (closed) | The gutter | **826** |
@@ -248,7 +248,7 @@ Not changed (recorded in the JSON for the spec owners):
 - **OneTrust consent:** 3 rows. M1 is the SKODA-704 consent stub only. The full CMP is outside M1.
 - **FAQ block** (807), **grouped media/ZIP service** (806) and **bulk import automation** (803) are M2. Their M1
   slices sit inside 805a/c and 607 (see §6).
-- **Press-kit child pages (50):** D-1 = C, i.e. they are external source links in M1 (609 audits them).
+- **Press-kit child pages (49):** ~~D-1 = C~~ **D-1 = A** (Lars, 2026-09-28): all 49 are imported in SKODA-805b. The cross-kit Enyaq RS Race tile stays an external source link.
 
 ## 9. Critical path and capacity impact
 

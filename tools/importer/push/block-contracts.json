@@ -13,7 +13,8 @@
         "overlay",
         "toolbar",
         "series-directory",
-        "social"
+        "social",
+        "tiles"
       ]
     },
     "carousel": {
@@ -252,9 +253,10 @@
       "status": "pinned",
       "ticket": "SKODA-221",
       "fallback": "broken",
-      "shape": 2,
+      "shape": 3,
       "emittedBy": [
-        "parsers/series-grid.js"
+        "parsers/series-grid.js",
+        "parsers/press-kit-hub-tiles.js"
       ]
     },
     {
@@ -276,7 +278,9 @@
       "ticket": "SKODA-220",
       "fallback": "readable",
       "shape": 1,
-      "emittedBy": []
+      "emittedBy": [
+        "parsers/quote.js"
+      ]
     },
     {
       "id": "columns-split",
@@ -297,7 +301,9 @@
       "ticket": "SKODA-805c",
       "fallback": "readable",
       "shape": 1,
-      "emittedBy": []
+      "emittedBy": [
+        "parsers/press-kit-content.js"
+      ]
     },
     {
       "id": "highlight",
@@ -329,7 +335,7 @@
       "status": "pinned",
       "ticket": "SKODA-608",
       "fallback": "readable",
-      "shape": 3,
+      "shape": 6,
       "emittedBy": [
         "media-items/build-media-items.mjs"
       ]

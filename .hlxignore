@@ -6,6 +6,8 @@ LICENSE
 package.json
 package-lock.json
 test/*
+scripts/*.test.mjs
+scripts/**/*.test.mjs
 tools/importer/*.test.mjs
 tools/importer/**/*.test.mjs
 blocks/promo-box/test/

@@ -3,6 +3,26 @@
 Reusable, re-runnable tooling to ingest source-site images into the project's
 media layer and re-point imported content at them. Not Elroq-specific.
 
+## Media feed binaries (SKODA-608 / #200 review)
+
+The generated media feed (`/en/media-feed.json`, `npm run media-items:build`) serves image
+thumbnails, 1920 renditions, originals, Vimeo posters and MP4s straight from a DA sheet. EDS does
+**not** ingest sheet URLs into the media bus the way it ingests a page `<img>`, so a CDN URL in the
+feed is not evidence of ingestion. Every one of them is recorded here like a page asset:
+
+```bash
+npm run media-items:build -- --out <dir>                    # writes <dir>/en/media-feed.json
+npm run media:build -- --feed <dir>/en/media-feed.json      # records every feed binary
+npm run media-items:build -- --offline --out <dir> --push   # publishes; refuses without coverage
+```
+
+`--feed` rows use the same path as pages: deduplicated by logical id with page assets, the
+delivery rendition + bytes for images, and the SKODA-503 import-time state for MP4s (`partial`,
+`steps.dam: n/a`, `steps.publish: pending`; the DAM upload runs later on a developer machine).
+The feed document (`en/media-feed`) is the referencing page; the item's listing home
+(`en/images`, `en/videos`, `en/assets`) owns the DAM folder unless a page already does.
+`--push` fails while any feed URL has no manifest row (`feedCoverageGaps`).
+
 ## PDF/MP4 links (SKODA-503)
 
 PDFs and self-hosted MP4s are **not images**: they are recorded as `document`
@@ -106,11 +126,23 @@ link must be a stable URL without a query string; query-bearing binaries block
 ingest rather than guessing whether dropping parameters changes the file.
 Analytics hash fragments may be stripped by the existing link transformer. The source
 may return `application/octet-stream` for MP4s, so verified MP4 signatures
-are uploaded with `video/mp4` MIME. Binary uploads are serial to bound memory
-usage (a measured M1 MP4 is about 101 MB). A signed MP4 route may reject HEAD
-but accept a one-byte ranged GET; the dry-run preflight handles that. Failures
-remain `partial` in the manifest and block rewriting. The standalone
-`media:validate-binaries` check is **offline** and emits per-page JSON results
+are uploaded with `video/mp4` MIME. PDF/MP4 originals download into a
+system temporary directory outside the served checkout, then upload as bounded
+file streams through the DAM's multipart URLs; the temporary file is removed
+on success or failure.
+Binary uploads are serial and support multi-GB originals without a whole-file
+Buffer, subject to available disk space and DAM part limits. AEM may offer more
+upload URLs than needed: use the first `ceil(bytes / maxPartSize)` in order,
+with a shorter final part; reject an offer with too few URLs. A signed MP4 route
+may reject HEAD but accept a one-byte ranged GET; the dry-run preflight handles
+that. Author folder/initiate calls have bounded deadlines and retries; the
+completion POST is never automatically retried. Its pending state is saved
+before the request. An uncertain completion remains `partial`: a rerun checks
+the authenticated author original's exact MIME and byte count, and does not
+download or re-upload while the author asset is absent or mismatched.
+Successful public verification clears transient completion/retry notes;
+provenance-metadata warnings remain visible. Failures block rewriting. The
+standalone `media:validate-binaries` check is **offline** and emits per-page JSON results
 with a nonzero exit for missing, unrehosted or misclassified links. `import:push`
 rewrites verified source PDF/MP4 anchors from the manifest in memory before
 its per-page offline gate and DA decision, then stores the rewritten page
@@ -328,6 +360,16 @@ upload set. Unknown, repeated, or empty ID lists fail rather than expanding
 the scope. With `--dam-base`, `--dry-run` HEAD-checks pending image originals and
 HEAD/range-probes pending PDF/MP4 originals (requesting one byte, then
 canceling the response body), reporting inaccessible sources without uploading.
+
+On 2026-09-29, a scoped batch of 1,979 first-party image originals from the
+import manifest was run against AEM Assets. The manifest records 1,947
+successful DAM uploads; authenticated author HEAD responses matched the source
+originals' byte counts and returned image MIME types. The other 32 originals return HTTP 403 to
+both source HEAD and ranged GET, so no derivative was substituted. Another
+65 external video-platform thumbnails were excluded from this batch pending
+rights review. This uploads originals to DAM only: it does not activate
+images on publish, rewrite DA content, or resolve separate oversized inline
+delivery warnings.
 
 ## Automatic wiring (PostToolUse hook)
 

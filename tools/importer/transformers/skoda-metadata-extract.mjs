@@ -80,6 +80,16 @@ export function templateFromBodyClass(bodyClass) {
 }
 
 /**
+ * Template precedence: an importer's fixed `template` override, then the page's own
+ * body-class CPT signal, then the importer's `templateDefault`. A shell importer (page-base)
+ * uses the default so a CPT page it flattens keeps its type, e.g. a press-kit hub stays
+ * `press_kit` and feeds the Press Kits rails until SKODA-805 rebuilds the hub.
+ */
+export function pickTemplate(overrides = {}, bodyClass = '') {
+  return overrides.template || templateFromBodyClass(bodyClass) || overrides.templateDefault || '';
+}
+
+/**
  * Category = the content-family slug. Normally the path segment after the locale
  * (`/en/press-releases/…` → `press-releases`), but archive URLs nest the real
  * slug one level deeper behind a routing prefix, so returning segs[1] verbatim
@@ -144,6 +154,26 @@ export function facetFromBodyClass(bodyClass) {
 }
 
 /**
+ * Facets from the page's OWN post <article> class list (WordPress post_class):
+ * `press_kit hentry category-octavia model-octavia years-48727 view-exterior`. A press-kit
+ * hub has no entry-tags row; its terms live only here. `<facet>-<slug>` tokens for the 15
+ * facets; numeric term ids (`years-48727`) are skipped. Same { tags, byFacet } shape as
+ * groupTags.
+ */
+export function facetsFromPostClass(postClass) {
+  const tags = [];
+  const byFacet = {};
+  String(postClass || '').split(/\s+/).forEach((token) => {
+    const m = token.toLowerCase().match(/^([a-z]+)-([a-z0-9-]+)$/);
+    if (!m || !FACETS.includes(m[1]) || /^\d+$/.test(m[2])) return;
+    if ((byFacet[m[1]] || []).includes(m[2])) return;
+    (byFacet[m[1]] = byFacet[m[1]] || []).push(m[2]);
+    tags.push(m[2]);
+  });
+  return { tags, byFacet };
+}
+
+/**
  * Group a list of tag hrefs into { tags:[slug,…], byFacet:{ taxonomy:[slug,…] } },
  * de-duped, order-preserving.
  */
@@ -183,6 +213,8 @@ export function buildMetaFields({
   if (publisheddate) meta.publisheddate = publisheddate;
   if (template) meta.template = template;
   if (overrides.theme) meta.theme = overrides.theme;
+  // press-kit chapter/resource child → its hub path (SKODA-805b); not a rail template
+  if (overrides.presskit) meta.presskit = overrides.presskit;
   if (category) meta.category = category;
 
   const facetValues = {};

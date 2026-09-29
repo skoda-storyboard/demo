@@ -134,3 +134,36 @@ test('a single image opens without prev/next; no rows leave the block empty', { 
   const none = preview(0);
   assert.equal(none.children.length, 0);
 });
+
+test('phones: the details toggle opens the caption panel; Escape closes it before the lightbox', { skip }, () => {
+  const block = preview(3);
+  thumbs(block)[0].click();
+  const btn = block.querySelector('.gallery-lightbox-details');
+  const caption = block.querySelector('.gallery-lightbox-caption');
+  assert.equal(btn.hidden, false, 'shown when the item has a caption');
+  assert.equal(btn.getAttribute('aria-controls'), caption.id);
+  assert.equal(btn.getAttribute('aria-expanded'), 'false', 'image first');
+  assert.equal(btn.getAttribute('aria-label'), 'Show image details');
+  btn.click();
+  assert.equal(overlay(block).classList.contains('is-details-open'), true);
+  assert.equal(btn.getAttribute('aria-expanded'), 'true');
+  assert.equal(btn.getAttribute('aria-label'), 'Hide image details');
+  esc();
+  assert.equal(overlay(block).hidden, false, 'the first Escape closes only the panel');
+  assert.equal(btn.getAttribute('aria-expanded'), 'false');
+  esc();
+  assert.equal(overlay(block).hidden, true, 'the second closes the lightbox');
+  btn.click();
+  thumbs(block)[1].click();
+  assert.equal(btn.getAttribute('aria-expanded'), 'false', 'every open starts image first');
+});
+
+test('the toggle is hidden for an image without a caption; overlays get unique ids', { skip }, () => {
+  const a = preview(2, () => '');
+  const b = preview(2);
+  thumbs(a)[0].click();
+  assert.equal(a.querySelector('.gallery-lightbox-details').hidden, true);
+  esc();
+  const ids = [a, b].map((blk) => blk.querySelector('.gallery-lightbox-caption').id);
+  assert.notEqual(ids[0], ids[1]);
+});

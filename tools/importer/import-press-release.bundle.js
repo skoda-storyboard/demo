@@ -77,11 +77,11 @@ var CustomImportScript = (() => {
     const cell = [];
     anchors.forEach((a) => {
       const href = a.getAttribute("href");
-      const text3 = (a.textContent || "").trim();
-      if (!href || !text3) return;
+      const text4 = (a.textContent || "").trim();
+      if (!href || !text4) return;
       const link2 = document.createElement("a");
       link2.setAttribute("href", href);
-      link2.textContent = text3;
+      link2.textContent = text4;
       cell.push(link2);
     });
     if (cell.length === 0) {
@@ -157,6 +157,64 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable(cells, document));
   }
 
+  // tools/importer/parsers/quote.js
+  var QUOTE = "data-skoda-quote";
+  var BY = "data-skoda-quote-by";
+  var text2 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
+  var centred = (p) => /text-align:\s*center/i.test(p.getAttribute("style") || "") || p.classList.contains("has-text-align-center");
+  function isQuote(p) {
+    if (!(p == null ? void 0 : p.matches("p")) || !centred(p)) return false;
+    const nodes = [...p.childNodes].filter((n) => n.nodeType === 1 || text2(n));
+    return nodes.some((n) => {
+      var _a;
+      return ((_a = n.matches) == null ? void 0 : _a.call(n, "em, i")) && text2(n);
+    }) && nodes.every((n) => n.nodeType === 1 && n.matches("em, i, br"));
+  }
+  function isAttribution(p) {
+    return !!(p == null ? void 0 : p.matches("p")) && centred(p) && !!p.querySelector("strong, b") && !isQuote(p);
+  }
+  function markRun(hr) {
+    const quote = hr.previousElementSibling;
+    if (!isQuote(quote)) return false;
+    quote.setAttribute(QUOTE, "");
+    const by = hr.nextElementSibling;
+    if (isAttribution(by)) by.setAttribute(BY, "");
+    hr.remove();
+    return true;
+  }
+  function markQuotes(root) {
+    return [...root.querySelectorAll("hr")].filter(markRun).length;
+  }
+  function quoteParagraph(quote, document) {
+    const p = document.createElement("p");
+    [...quote.childNodes].forEach((node) => {
+      if (node.nodeType === 1 && node.matches("em, i")) p.append(...node.childNodes);
+    });
+    const edge = (n) => n && (n.nodeType === 1 && n.matches("br") || n.nodeType === 3 && !text2(n));
+    while (edge(p.lastChild)) p.lastChild.remove();
+    while (edge(p.firstChild)) p.firstChild.remove();
+    return p;
+  }
+  function attributionParagraph(by, document) {
+    var _a;
+    const p = document.createElement("p");
+    p.append(...by.childNodes);
+    const first = (_a = p.querySelector("strong, b")) == null ? void 0 : _a.firstChild;
+    if ((first == null ? void 0 : first.nodeType) === 3) first.textContent = first.textContent.replace(/^\s+/, "");
+    return p;
+  }
+  function parse4(element, { document }) {
+    var _a;
+    if (!element.hasAttribute(QUOTE)) {
+      const hr = element.nextElementSibling;
+      if (!(hr == null ? void 0 : hr.matches("hr")) || !markRun(hr)) return;
+    }
+    const by = ((_a = element.nextElementSibling) == null ? void 0 : _a.hasAttribute(BY)) ? element.nextElementSibling : null;
+    const cells = [quoteParagraph(element, document), by ? attributionParagraph(by, document) : ""];
+    by == null ? void 0 : by.remove();
+    element.replaceWith(WebImporter.DOMUtils.createTable([["Quote"], cells], document));
+  }
+
   // tools/importer/transformers/skoda-press-release-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
@@ -225,7 +283,7 @@ var CustomImportScript = (() => {
     "media-box": "dark, full-width, media-box",
     related: "dark, full-width, related"
   };
-  var text2 = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
+  var text3 = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
   function make(document, tag, content) {
     const el = document.createElement(tag);
     if (typeof content === "string") el.textContent = content;
@@ -249,10 +307,10 @@ var CustomImportScript = (() => {
   function titleText(h1) {
     const clone = h1.cloneNode(true);
     clone.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
-    return text2(clone);
+    return text3(clone);
   }
   function isEmptyParagraph(p) {
-    return !text2(p) && !p.querySelector("img, picture, a[href], iframe");
+    return !text3(p) && !p.querySelector("img, picture, a[href], iframe");
   }
   function leadImage(document, primary) {
     const img = primary.querySelector(".article-teaser img");
@@ -278,7 +336,7 @@ var CustomImportScript = (() => {
     lines.forEach((html) => {
       const li = document.createElement("li");
       li.innerHTML = html.replace(/^\s*(?:›|&rsaquo;)\s*/, "").trim();
-      if (text2(li)) ul.append(li);
+      if (text3(li)) ul.append(li);
     });
     return ul.children.length ? ul : null;
   }
@@ -314,7 +372,7 @@ var CustomImportScript = (() => {
       const url = iframe.getAttribute("src") || iframe.getAttribute("data-src");
       const p = iframe.closest("p");
       const replacement = url && /^https?:/.test(url) ? urlParagraph(document, url) : null;
-      if (p && text2(p) === "") p.replaceWith(...replacement ? [replacement] : []);
+      if (p && text3(p) === "") p.replaceWith(...replacement ? [replacement] : []);
       else iframe.replaceWith(...replacement ? [replacement] : []);
     });
     content.querySelectorAll("hr").forEach((hr) => hr.remove());
@@ -322,14 +380,14 @@ var CustomImportScript = (() => {
     content.querySelectorAll("p").forEach((p) => {
       if (isEmptyParagraph(p)) p.remove();
     });
-    return [...content.childNodes].filter((n) => n.nodeType === 1 || text2(n));
+    return [...content.childNodes].filter((n) => n.nodeType === 1 || text3(n));
   }
   function sidebarContent(document, secondary, hasMediaBox) {
     const out = [];
     if (!secondary) return out;
     secondary.querySelectorAll(":scope > section").forEach((section) => {
       const heading = section.querySelector("h2, h3, .heading");
-      const headingText = text2(heading);
+      const headingText = text3(heading);
       if (section.matches(".images, .sa-media-kit-preview")) {
         if (heading) heading.remove();
         out.push(make(document, "h3", headingText || "Images"), section);
@@ -345,11 +403,11 @@ var CustomImportScript = (() => {
       const ul = document.createElement("ul");
       menu.querySelectorAll(":scope > li").forEach((li) => {
         const a = li.querySelector('a[href]:not([href="#"])');
-        if (a && text2(a)) {
-          ul.append(make(document, "li", link(document, a.getAttribute("href"), text2(a))));
+        if (a && text3(a)) {
+          ul.append(make(document, "li", link(document, a.getAttribute("href"), text3(a))));
           return;
         }
-        const label = text2(li.querySelector("span")) || text2(li);
+        const label = text3(li.querySelector("span")) || text3(li);
         if (label && hasMediaBox) ul.append(make(document, "li", link(document, "#media-box", label)));
       });
       if (!ul.children.length) return;
@@ -360,8 +418,8 @@ var CustomImportScript = (() => {
   function mediaBoxContent(document, band) {
     const box = band.querySelector(".search-results.media-box");
     if (!box) return [];
-    const heading = text2(box.querySelector(".search-results-heading")) || "Media Box";
-    const stats = text2(box.querySelector(".search-results-stats .stats, .stats"));
+    const heading = text3(box.querySelector(".search-results-heading")) || "Media Box";
+    const stats = text3(box.querySelector(".search-results-stats .stats, .stats"));
     box.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((n) => n.remove());
     const out = [make(document, "h2", heading)];
     if (stats) out.push(make(document, "p", stats));
@@ -375,28 +433,28 @@ var CustomImportScript = (() => {
     results.querySelectorAll("article.article-teaser").forEach((card) => {
       const titleLink = card.querySelector(".entry-title a[href]");
       const href = titleLink && titleLink.getAttribute("href");
-      if (!href || !text2(titleLink)) return;
+      if (!href || !text3(titleLink)) return;
       const img = card.querySelector(".article-teaser-media img");
       if (img) ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop"].forEach((a) => img.removeAttribute(a));
       const body = [];
-      const date = text2(card.querySelector(".entry-published"));
+      const date = text3(card.querySelector(".entry-published"));
       if (date) body.push(make(document, "p", date));
-      body.push(make(document, "h3", link(document, href, text2(titleLink))));
+      body.push(make(document, "h3", link(document, href, text3(titleLink))));
       rows.push([img || "", body]);
     });
     if (rows.length === 1) return [];
     const headingEl = results.querySelector(".search-results-heading");
-    const sub = text2(headingEl && headingEl.querySelector(".subheading"));
+    const sub = text3(headingEl && headingEl.querySelector(".subheading"));
     let heading = "Related Press Releases";
     if (headingEl) {
       const clone = headingEl.cloneNode(true);
       clone.querySelectorAll(".subheading").forEach((s) => s.remove());
-      heading = text2(clone) || heading;
+      heading = text3(clone) || heading;
     }
     const out = [make(document, "h2", heading)];
     if (sub) out.push(make(document, "p", sub));
     const all = results.querySelector("a.search-results-header-link[href], .search-results-header a[href]");
-    if (all && all.getAttribute("href")) out.push(make(document, "p", link(document, all.getAttribute("href"), text2(all) || "All")));
+    if (all && all.getAttribute("href")) out.push(make(document, "p", link(document, all.getAttribute("href"), text3(all) || "All")));
     out.push(WebImporter.DOMUtils.createTable(rows, document));
     return out;
   }
@@ -406,7 +464,7 @@ var CustomImportScript = (() => {
     const container = article.querySelector(":scope > .container") || article;
     const primary = container.querySelector(".column-primary");
     const header = container.querySelector(":scope > header") || container;
-    const date = text2(header.querySelector(".entry-published"));
+    const date = text3(header.querySelector(".entry-published"));
     const h1 = header.querySelector("h1");
     const secondary = container.querySelector(".column-secondary");
     const bands = [...article.querySelectorAll(".cover-box.dark")];
@@ -442,7 +500,7 @@ var CustomImportScript = (() => {
       let n = sidebar.nextElementSibling;
       while (n && !n.hasAttribute(MARKER)) {
         const cell = n.matches("table") && n.querySelector("tr > th, tr > td");
-        if (cell && text2(cell).toLowerCase() === "gallery") cell.textContent = "Gallery (preview)";
+        if (cell && text3(cell).toLowerCase() === "gallery") cell.textContent = "Gallery (preview)";
         n = n.nextElementSibling;
       }
     }
@@ -616,6 +674,15 @@ var CustomImportScript = (() => {
         if (m) add("model", m[1].toLowerCase());
       }
     }
+    if (tags.length === 0) {
+      const cls = document.body && document.body.getAttribute("class") || "";
+      const id = cls.match(/\bpostid-(\d+)\b/);
+      const post = id && document.querySelector(`article[data-post-id="${id[1]}"]`);
+      String(post && post.getAttribute("class") || "").split(/\s+/).forEach((token) => {
+        const m = token.toLowerCase().match(/^([a-z]+)-([a-z0-9-]+)$/);
+        if (m && FACETS.includes(m[1]) && !/^\d+$/.test(m[2])) add(m[1], m[2]);
+      });
+    }
     return { tags, byFacet };
   }
   function splitList(value) {
@@ -641,7 +708,7 @@ var CustomImportScript = (() => {
     const description = overrides.description || metaContent(document, 'meta[property="og:description"]') || metaContent(document, 'meta[name="description"]') || "";
     const imageSrc = overrides.image || metaContent(document, 'meta[property="og:image"]') || "";
     const publisheddate = overrides.publisheddate || extractDate(document);
-    const template = overrides.template || extractTemplate(document);
+    const template = overrides.template || extractTemplate(document) || overrides.templateDefault || "";
     const category = overrides.category || extractCategory(pageUrl);
     const { tags: derivedTags, byFacet } = extractTagsAndFacets(document, pageUrl);
     const meta = {};
@@ -655,6 +722,7 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
@@ -719,33 +787,103 @@ var CustomImportScript = (() => {
     "/en/lifestyle/ouninpohja-finlands-roller-coaster-stage",
     "/en/lifestyle/rs-four-ways-which-one-will-you-choose",
     "/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones",
+    "/en/lifestyle/what-you-learn-on-the-circuit-can-save-you-on-the-road",
     "/en/models/skoda-elroq-through-designers-eyes",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/images",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/motorsport-versions-of-the-skoda-favorit-1989-all-different-and-yet-familiar",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1000-mb-1964-and-1100-mb-b5-1966-a-family-saloon-in-rally",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-1100-ohc-1957-the-beautiful-dream-of-le-mans",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-lr-1984-last-motorsport-model-from-mlada-boleslav-with-rear-mounted-engine",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-180-rs-and-200-rs-1974-rally-cars-from-another-league",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-f3-type-992-1964-european-class-formula-racing-car",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-r5-rally2-rally2-evo-successful-in-the-hands-of-factory-drivers-and-privateers-alike",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-super-2000-2008-successful-motorsport-comeback-for-the-works-team",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-wrc-2003-paving-the-way-for-future-success",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-felicia-kit-car-1995-the-next-chapter-in-an-international-success-story",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-touring-sport-1960-successful-return-to-international-rally-courses",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-octavia-wrc-1999-entering-the-highest-class-of-international-rallying",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-spider-b5-1972-and-skoda-spider-ii-1975-prototypes-for-the-racetrack",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts",
+    "/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos",
+    "/en/press-kits/4x4-winter-experience-press-kit",
+    "/en/press-kits/lets-explore-albania-press-kit",
     "/en/press-kits/new-skoda-enyaq-press-kit-2",
+    "/en/press-kits/press-kit-skoda-at-the-iaa-2019",
     "/en/press-kits/skoda-elroq-press-kit",
     "/en/press-kits/skoda-elroq-press-kit-2",
     "/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
     "/en/press-kits/skoda-epiq-press-kit-2",
+    "/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance",
+    "/en/press-kits/skoda-epiq-press-kit-2/connectivity-intuitive-digital-services-and-seamless-vehicle-access",
+    "/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language",
+    "/en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details",
+    "/en/press-kits/skoda-epiq-press-kit-2/frequently-asked-questions",
+    "/en/press-kits/skoda-epiq-press-kit-2/images",
+    "/en/press-kits/skoda-epiq-press-kit-2/infographics",
+    "/en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience",
+    "/en/press-kits/skoda-epiq-press-kit-2/safety-and-assistance-systems-comprehensive-predictiveand-reassuring-driver-support",
+    "/en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality",
+    "/en/press-kits/skoda-epiq-press-kit-2/technical-data",
+    "/en/press-kits/skoda-epiq-press-kit-2/texts",
+    "/en/press-kits/skoda-epiq-press-kit-2/videos",
     "/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
+    "/en/press-kits/skoda-octavia-media-launch-press-kit",
+    "/en/press-kits/skoda-octavia-press-kit",
+    "/en/press-kits/skoda-octavia-press-kit-2",
+    "/en/press-kits/skoda-octavia-rs-245-sporty-spacious-practical-family-sportster-delivers-245-ps",
+    "/en/press-kits/skoda-octavia-rs-and-octavia-scout-press-kit",
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
     "/en/press-kits/skoda-peaq-press-kit",
     "/en/press-kits/skoda-peaq-press-kit-2",
+    "/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model",
+    "/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart",
+    "/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design",
+    "/en/press-kits/skoda-peaq-press-kit-2/frequently-asked-questions",
+    "/en/press-kits/skoda-peaq-press-kit-2/images",
+    "/en/press-kits/skoda-peaq-press-kit-2/infographics",
+    "/en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot",
+    "/en/press-kits/skoda-peaq-press-kit-2/safety-a-comprehensive-suite-of-active-and-passive-safety-systems",
+    "/en/press-kits/skoda-peaq-press-kit-2/technical-data",
+    "/en/press-kits/skoda-peaq-press-kit-2/texts",
+    "/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out",
+    "/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
+    "/en/press-kits/skoda-peaq-press-kit-2/videos",
+    "/en/press-kits/skoda-rs-driving-experience-press-kit",
+    "/en/press-kits/skoda-rs-experience-press-kit",
     "/en/press-kits/skoda-vision-o-press-kit",
     "/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design",
     "/en/press-kits/the-all-new-skoda-kodiaq-press-kit",
     "/en/press-kits/the-all-new-skoda-superb-press-kit",
+    "/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models",
+    "/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production",
     "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
     "/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq",
     "/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026",
     "/en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029",
     "/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management",
+    "/en/press-releases/skoda-auto-enters-saudi-arabian-market-strengthening-its-presence-in-the-middle-east",
     "/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company",
     "/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav",
     "/en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car",
+    "/en/press-releases/skoda-auto-produces-first-units-of-updated-octavia-in-kvasiny",
+    "/en/press-releases/skoda-octavia-combi-rs-wins-prestigious-2024-golden-steering-wheel-award-in-the-mid-sized-car-category",
     "/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
     "/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions",
     "/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence",
     "/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates",
+    "/en/press-releases/skodas-voice-assistant-laura-now-enhanced-with-chatgpt-capabilities",
+    "/en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+    "/en/press-releases/the-skoda-elroq-earns-5-star-euro-ncap-safety-rating-with-the-enyaq-and-octavia-retaining-their-top-scores",
+    "/en/press-releases/the-updated-octavia-now-with-all-wheel-drive",
+    "/en/press-releases/when-driving-fun-meets-comfort-rally-ace-oliver-solberg-tests-the-skoda-octavia-rs",
     "/en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available",
     "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich",
     "/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france",
@@ -764,6 +902,7 @@ var CustomImportScript = (() => {
     "/en/series/unexpected-jobs",
     "/en/series/unknown-parts",
     "/en/series/winter-tips",
+    "/en/simply-clever/park-your-skoda-using-your-mobile-phone-well-show-you-how-how",
     "/en/skoda-model/elroq",
     "/en/skoda-model/elroq/elroq-rs",
     "/en/skoda-model/elroq/elroq-sportline",
@@ -786,13 +925,18 @@ var CustomImportScript = (() => {
     "/en/skoda-model/octavia/octavia-sportline",
     "/en/skoda-model/peaq",
     "/en/skoda-model/scala",
+    "/en/skoda-world/2024-a-year-of-new-electric-cars-and-innovated-favourites",
     "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it",
     "/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute",
     "/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car",
     "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality",
     "/en/skoda-world/how-the-skoda-octavia-reached-365-km-h",
     "/en/skoda-world/legend-chris-froome-takes-you-behind-the-scenes-of-the-tour-de-france",
+    "/en/skoda-world/making-driving-easier-how-cruise-control-works",
+    "/en/skoda-world/oliver-solberg-behind-the-wheel-of-the-new-octavia-rs",
     "/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details",
+    "/en/skoda-world/sportline-models-dynamic-elegance-for-every-day",
+    "/en/skoda-world/the-immortal-octavia-see-what-it-looks-like-after-one-million-kilometres",
     "/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour",
     "/en/skoda-world/the-skoda-elroq-reveals-its-sustainable-interior",
     "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too",
@@ -868,6 +1012,24 @@ var CustomImportScript = (() => {
       else href = tagPageHref(href) || rewriteHref(href) || href;
       if (href !== a.getAttribute("href")) a.setAttribute("href", href);
     });
+  }
+
+  // tools/importer/transformers/skoda-nbsp.js
+  var NBSP_PLACEHOLDER = "\u{F00A0}";
+  var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
+  function transform5(hookName, element, payload) {
+    if (hookName !== "preprocess") return;
+    const doc = element.ownerDocument || payload && payload.document;
+    const walker = doc.createTreeWalker(
+      element,
+      4
+      /* NodeFilter.SHOW_TEXT */
+    );
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.nodeValue.includes("\xA0")) {
+        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER.repeat(run.length));
+      }
+    }
   }
 
   // tools/importer/transformers/skoda-images.js
@@ -971,7 +1133,8 @@ var CustomImportScript = (() => {
   var parsers = {
     gallery: parse,
     tags: parse2,
-    downloads: parse3
+    downloads: parse3,
+    quote: parse4
   };
   var PAGE_TEMPLATE = {
     name: "press-release",
@@ -982,7 +1145,9 @@ var CustomImportScript = (() => {
     blocks: [
       { name: "gallery", instances: ["section.images.sa-media-kit-preview"] },
       { name: "tags", instances: ["section.tags"] },
-      { name: "downloads", instances: [".search-results.media-box"] }
+      { name: "downloads", instances: [".search-results.media-box"] },
+      // Pull-quotes (SKODA-220): marked in `preprocess`, while their decorative <hr> exists.
+      { name: "quote", instances: ["article p[data-skoda-quote]"] }
     ],
     // Documentation of the emitted section model; skoda-press-release-layout builds it.
     sections: [
@@ -1036,11 +1201,14 @@ var CustomImportScript = (() => {
      * inline element. The Media Box's single download links (video MP4, PDF) are icon-only
      * `<a><i class="icon"></i></a>`, so they'd vanish before the downloads parser runs;
      * give them a text label so they survive (the parser labels them by file type).
+     * preProcess also drops every <hr>, so the pull-quotes are marked by their rule here.
      */
     preprocess: ({ document }) => {
+      transform5("preprocess", document.body, { document });
       document.querySelectorAll(".search-results.media-box a.media-cart-action.download[href]").forEach((a) => {
         if (!(a.textContent || "").trim()) a.textContent = "Download";
       });
+      document.querySelectorAll("article.press_release .entry-content").forEach(markQuotes);
     },
     transform: (payload) => {
       const { document, url, params } = payload;

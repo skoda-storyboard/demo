@@ -53,6 +53,15 @@ Semantic map (use these downstream): `--background-color` → white, `--light-co
 
 `--content-max-width 1248px`; `--nav-height 108px`; `--nav-main-height 64px`; `--nav-topbar-height 44px`.
 
+`--page-gutter 10px` (SKODA-826): the section inline gutter at **every** width, inside the 1248px cap
+(`main > .section > div` is `border-box`, as the source `.container` is). The content edge is 10 at
+375/768/992, 26 at 1280 and 106 at 1440, and the inner width is 1228 from 1248 up.
+- Derived from it: `--story-inset`, `--pr-gutter` and `.promo-box`'s `--promo-gutter`.
+- Other 10px insets are separate, source-measured values: `--footer-gutter`, `--series-gutter`,
+  `--related-band-heading-inset` and `--social-card-inset` (the social grid's slot inset).
+- **Coupled by hand:** the `Cards (social)` container query is `620px` (640 − 2 × `--page-gutter`), since
+  container conditions can't read custom properties. Retune it if the gutter changes.
+
 ## Footer shell (SKODA-304 / SKODA-305)
 
 `--footer-padding-y 4rem`; `--footer-row-gap 3rem` (widget margin + separator rhythm); `--footer-gutter 10px`
@@ -67,6 +76,14 @@ Semantic map (use these downstream): `--background-color` → white, `--light-co
 `--checkbox-size 18px`, `--checkbox-radius 3px`, `--checkbox-border-color` (grey-300),
 `--checkbox-checked-color` (green-accent), `--checkbox-label-gap 9px`; `--consent-color` (grey-400);
 `--newsletter-manage-color` (emerald; a deliberate a11y deviation from the source's 3.4:1 `#419468`, see footer-mediaroom.md §0).
+
+## Model page (SKODA-208)
+
+Primitives: `--skoda-grey-350 #c4c6c7` ("Based on tags" line, media-card dates), `--skoda-grey-750 #464748`
+("All" ghost pill). Component tokens live with their variant: `.cards.key-facts` (`--key-facts-*`),
+`.columns.stats` (`--stats-*`), `.carousel.media` (`--media-card-*`), and the page layer in
+`templates/skoda-model/skoda-model.css` (`--model-*`: gutter, panel gap, nav height, hero sizes, rail cells).
+Breakpoint 1440 is allowed for the model hero ratio switch (measured).
 
 ## Breakpoints
 
