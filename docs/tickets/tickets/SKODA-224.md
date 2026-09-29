@@ -65,9 +65,19 @@ SKODA-607 phase split (2026-09-27); absorbs the block half of SKODA-612 (the imp
   from the band's right edge. Both are hidden when disabled; Board (1 card) has both hidden.
   Each click pages 3 / 3 / 2 / 1 cells, the same as Flickity `groupCells`.
 - **No layout shift:** the mount reserve equals the built height (199.3px at 1280).
-- **Deliberate differences:**
-  - The source's Zellmer-only trailing "All" cell is not rendered. The pinned contract has no row
-    for it, and "All" is the header pill.
+- **"All" end card (added on request, press variant only):** the source ends a *full* band (its
+  10-release limit, with more matches) with an `.item-all` cell. Only Zellmer has one; National
+  Theatre (5), Board (1) and Peaq (6) don't.
+  - **Where it comes from:** `story-rail.js` appends the card after the carousel builds, linking to
+    the band's "All" header link, so no contract or re-import change is needed.
+  - **When:** the curated rows reach 10, or in index mode more rows match than the limit (the
+    selection fetches one extra row to tell).
+  - **Look:** card-sized 16:9 cell with a 1px white outline and square corners, "All" 16/600
+    centred, and a CSS chevron in a 16px cell 16px after the text. On hover the chevron nudges
+    8px (0.6s ease-in-out, infinite); this is off under reduced motion.
+  - **Arrows:** "next" disables only once the end card is reached.
+  - **Measured at 1280:** 354.4×199.3 at the 374.4 pitch, with "All" 151.5px into the card
+    (source 151.8).
   - The source shortens titles per width with JS (dotdotdot). Imported titles carry their fixed "…",
     so at narrow widths they may wrap to 2 lines where the source shows 1.
 - **"All" pill (added on request, press-release template):** the band's "All" link now renders as the

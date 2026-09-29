@@ -144,6 +144,74 @@
   overflow: hidden;
 }
 
+/* "All" end card of a full band (source .item-all): a card-sized 16:9 cell with a 1px white
+   outline and square corners, "All" 16/600 centred and a chevron 16px after it that nudges
+   8px right on hover (source keyframes: 0.6s ease-in-out, infinite) */
+.story-rail.press .carousel-track .story-rail-all {
+  flex: 0 0 var(--carousel-cell-width);
+  aspect-ratio: 16 / 9;
+  scroll-snap-align: start;
+}
+
+.story-rail.press .story-rail-all-link {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border: 1px solid var(--skoda-white);
+  color: var(--skoda-white);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 3;
+  text-decoration: none;
+}
+
+/* chevron: two borders of a rotated box, like the carousel arrows. It is centred in the
+   source glyph's 16px cell (10px box + 3px each side), 16px after the text, so "All" +
+   chevron centre in the card as on the source */
+.story-rail.press .story-rail-all-link::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  margin-inline: calc(var(--spacing-m) + 3px) 3px;
+  border-top: 2.5px solid currentcolor;
+  border-right: 2.5px solid currentcolor;
+  transform: rotate(45deg);
+}
+
+.story-rail.press .story-rail-all-link:hover,
+.story-rail.press .story-rail-all-link:focus-visible {
+  color: var(--skoda-white);
+  text-decoration: none;
+}
+
+.story-rail.press .story-rail-all-link:hover::after {
+  animation: story-rail-all-nudge 0.6s ease-in-out infinite;
+}
+
+.story-rail.press .story-rail-all-link:focus-visible {
+  outline: 2px solid var(--skoda-white);
+  outline-offset: -4px;
+}
+
+@keyframes story-rail-all-nudge {
+  0%,
+  100% {
+    transform: translateX(0) rotate(45deg);
+  }
+
+  50% {
+    transform: translateX(8px) rotate(45deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-rail.press .story-rail-all-link:hover::after {
+    animation: none;
+  }
+}
+
 body.story .section.dark.story-rail-container .story-rail .card-teaser-date {
   margin-block-end: var(--related-band-date-gap);
 }
