@@ -24,6 +24,9 @@
   --float-dock-shadow: var(--dropdown-shadow);
   --float-dock-pitch: calc(var(--float-dock-button-size) + var(--float-dock-gap));
 
+  /* scroll-top reveal: the source's .sticky-button spring (opacity + slide, 0.3s) */
+  --float-dock-reveal: 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+
   position: fixed;
   inset-block-end: var(--spacing-xs);
   inset-inline-end: var(--spacing-m);
@@ -45,13 +48,17 @@
 }
 
 /* media-cart slot (SKODA-505a/b fills it); takes no space while empty */
+.float-dock .float-dock-slot {
+  transition: transform var(--float-dock-reveal);
+}
+
 .float-dock .float-dock-slot:empty {
   display: none;
 }
 
 .float-dock .float-dock-share {
   position: relative;
-  transition: transform 0.2s ease-in-out;
+  transition: transform var(--float-dock-reveal);
 }
 
 /* --- buttons (share trigger, scroll-top) and network links ---------------- */
@@ -125,10 +132,11 @@
   padding: 0;
   list-style: none;
 
-  /* collapsed (source .social-container): faded, nudged 15% toward the edge */
+  /* collapsed (source .social-container): faded and nudged 15% back toward the trigger,
+     along the list axis (stacked: down; row: right, see the 768 query) */
   opacity: 0;
   visibility: hidden;
-  transform: translateX(15%);
+  transform: translateY(15%);
   transition: all 0.4s cubic-bezier(0.55, -0.59, 0.2, 0.37) 0.2s;
   transition-property: opacity, transform, visibility;
 }
@@ -146,11 +154,11 @@
   transition-property: opacity, transform, visibility;
 }
 
-/* --- scroll-top: hidden until one viewport of scroll ------------------------
+/* --- scroll-top: hidden until 300px of scroll (float-dock.js) --------------
    It keeps its slot; the share cluster (and cart slot) slide over it with a transform,
    so the reveal is not a layout shift. */
 .float-dock .float-dock-top {
-  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+  transition: opacity var(--float-dock-reveal), visibility var(--float-dock-reveal);
 }
 
 .float-dock:not(.scrolled) .float-dock-top {
@@ -174,6 +182,13 @@
     inset-block-end: 0;
     inset-inline: auto calc(100% + var(--float-dock-list-offset));
     flex-direction: row-reverse;
+
+    /* the source row also carries a 60px end padding, so its 15% nudge is ~9px longer */
+    transform: translateX(calc(15% + var(--float-dock-list-offset)));
+  }
+
+  .float-dock .float-dock-share.expanded .float-dock-share-list {
+    transform: none;
   }
 
   .float-dock .float-dock-share-item-whatsapp {

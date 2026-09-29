@@ -6,11 +6,11 @@
  * nav/footer fragments.
  *
  * Children, in source order: share cluster · media-cart slot · scroll-to-top.
- * - Share: where `navigator.share` exists the trigger opens the native share sheet;
- *   elsewhere (or if the native sheet fails) it expands the per-network intent links.
+ * - Share: the trigger always expands the per-network intent links, as on the source
+ *   (no native `navigator.share` sheet; product decision 2026-09-29, review of the branch preview).
  * - Media-cart slot: an empty `[data-slot="media-cart"]` the cart button (SKODA-505a/b) is
  *   appended into. The dock owns the position, 505 owns the button.
- * - Scroll-to-top: shown after one viewport of scroll.
+ * - Scroll-to-top: shown after 300px of scroll (source parity).
  */
 
 import { decorateIcons } from '../../scripts/aem.js';
@@ -18,6 +18,8 @@ import { fetchPlaceholders } from '../../scripts/placeholders.js';
 import { SHARE_NETWORKS, shareUrl, sharePageData } from '../../scripts/share.js';
 
 const LIST_ID = 'float-dock-share-list';
+// source (main.js / media-room.js): the scroll-top slot un-collapses once scrollTop > 300
+const SCROLL_TOP_THRESHOLD = 300;
 
 function icon(name) {
   const span = document.createElement('span');
@@ -65,25 +67,10 @@ function buildShare(ph) {
     share.classList.toggle('expanded', expanded);
     list.inert = !expanded;
   };
-  const listMode = () => {
-    trigger.setAttribute('aria-controls', LIST_ID);
-    setExpanded(false);
-  };
+  trigger.setAttribute('aria-controls', LIST_ID);
+  setExpanded(false);
 
-  let native = typeof navigator.share === 'function';
-  if (!native) listMode();
-
-  trigger.addEventListener('click', async () => {
-    if (native) {
-      try {
-        await navigator.share({ title: data.title, url: data.url });
-        return;
-      } catch (e) {
-        if (e.name === 'AbortError') return; // the user dismissed the sheet
-        native = false; // unsupported/blocked here: fall back to the intent links for good
-        listMode();
-      }
-    }
+  trigger.addEventListener('click', () => {
     setExpanded(trigger.getAttribute('aria-expanded') !== 'true');
   });
 
@@ -124,12 +111,12 @@ export default async function decorate(block) {
   block.replaceChildren(buildShare(ph), slot, top);
   decorateIcons(block);
 
-  // scroll-top is revealed after one viewport of scroll; the hidden button stays in the
-  // layout (only transform/opacity change), so revealing it causes no layout shift
+  // scroll-top is revealed past 300px of scroll, as on the source; the hidden button stays in
+  // the layout (only transform/opacity change), so revealing it causes no layout shift
   let ticking = false;
   const update = () => {
     ticking = false;
-    const shown = window.scrollY >= window.innerHeight;
+    const shown = window.scrollY > SCROLL_TOP_THRESHOLD;
     block.classList.toggle('scrolled', shown);
     top.inert = !shown;
   };
