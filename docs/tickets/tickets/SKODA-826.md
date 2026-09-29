@@ -4,7 +4,7 @@
 - **Phase:** A · **Milestone:** M1 (demo)
 - **GitHub issue:** [#149](https://github.com/skoda-storyboard/demo/issues/149)
 - **Estimate:** 0.5 SP · AI-assisted 0.25d / manual 0.5d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🔵 TODO
+- **Status (2026-09-29):** 🟡 In review. Implemented on `skoda-826-gutter`, ready for QA (see Implementation notes).
 
 ## Origin
 In the 2026-09-25 DevTools URL→block sweep
@@ -51,6 +51,35 @@ per-block width delta in the sweep is really this one global cause: for example 
   padding (`blocks/cards/cards.css`). When the gutter changes, retune it to 640 − 2 × the new gutter and recheck
   639 (1 column) / 640 (3 columns). Measured 2026-09-28: 1 column at 639, 3 at 640 on live and EDS; cards 184 vs
   186.7px wide at 640.
+
+## Implementation notes (2026-09-29, branch `skoda-826-gutter`)
+- **Re-measured before the change (main):** the story body, the press release and the series hub already sat at
+  10/26 (their own template insets, from SKODA-801/607/207). Still on the old 24/40 gutter: home, model pages, the
+  Images/Videos listings, press kits, archives and the story hero. The live site measures 10/355, 10/748, 10/972 and
+  26/1228 at 375/768/992/1280 on every template.
+- **Change:**
+  - `--page-gutter: 10px` on `main > .section > div` at every width; the 992 step-up is removed (one breakpoint
+    fewer, none added).
+  - The wrapper is now `box-sizing: border-box`. Without it the 1248 cap applied to the content and 1280 gave
+    16/1248 instead of 26/1228.
+  - `--story-inset` and `--pr-gutter` now derive from `--page-gutter`; their values are unchanged.
+  - `.promo-box`'s bleed uses `--page-gutter` (its own 992 step-up is removed).
+- **After (local, 8 templates × 375/768/992/1280/1440):** 10/355, 10/748, 10/972, 26/1228 and 106/1228 everywhere;
+  no horizontal overflow.
+  - Regression pair diff against main: press release and series hub identical; story changes only its hero
+    (→ 10/355 and 26/1228). Home, model and listing blocks move to the new edge only.
+  - Full-bleed parts are unchanged: the story Related Stories rail (0/375), the promo box (375 at 375, 1248 at
+    1280) and the Media Box band (section 0/375, dark).
+- **Recheck results (below):**
+  - `Cards (social)` container query retuned 592 → **620** (640 − 2 × 10): 1 column at 639, 3 at 640, as live.
+  - The social grid also gets the live 10px slot insets (`--social-card-inset`, grid max 720), so the card sizes
+    match live exactly: 335/460/599/186.7/220 at 375/500/639/640/1280, with equal card and band heights. This
+    closes the SKODA-217 500px open item.
+- **Follow-ups:**
+  - SKODA-308 (header topbar) and SKODA-821 (story body at 1440) rebase onto `--page-gutter`.
+  - Open PR #192 copies the old 24/40 section padding into `--news-rail-gutter`. Retune it to `--page-gutter`
+    before or after merge.
+  - Hero geometry beyond the wrapper edge stays with SKODA-828.
 
 ## Dependencies
 106 (closed; this is the token follow-up). It must land before 704 visual sign-off, because otherwise every 375 diff

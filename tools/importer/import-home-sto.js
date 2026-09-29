@@ -4,13 +4,18 @@
 /**
  * Import orchestrator: Škoda Storyboard home (template-homepage, /en/).
  *
- * Indexed featured promo-box, a Stories feed, and index-driven Story Rails
- * (home-rail self-classifies each .search-results rail from its heading + "All"
- * link / type-<cpt> class). The "Social media" band (.socials-static) is not
- * index-driven: social-cards turns it into a heading + Cards (social) section of
- * the three follow-profile links (SKODA-217). The home sections transformer
- * gives each cover-box band its own section and Style metadata, including the
- * dark Series band (SKODA-218). Metadata template=page (nav/direct only).
+ * The indexed featured promo-box (SKODA-827: index config, never duplicated
+ * teaser markup), the index-driven "Latest Stories" feed (home-stories → Stories,
+ * with the authored offset that skips the promo's 3 newest stories) and a stack of
+ * index-driven Story Rails (home-rail self-classifies each .search-results rail
+ * from its heading + "All" link / type-<cpt> class). The "Social media" band
+ * (.socials-static) is not index-driven: social-cards turns it into a heading +
+ * Cards (social) section of the three follow-profile links (SKODA-217). Every
+ * other source `.cover-box` becomes its own section (skoda-dark-bands; SKODA-218,
+ * SKODA-611a): light bands carry `Style: cover-box`, dark ones (Series)
+ * `Style: cover-box, dark`, so the page keeps the source's 9-band stack (promo +
+ * 8 cover-boxes). Metadata template=page (nav/direct only; body class carries
+ * `page`). Content-driven detection only.
  */
 
 import promoBoxParser from './parsers/promo-box.js';
@@ -18,7 +23,8 @@ import homeRailParser from './parsers/home-rail.js';
 import homeStoriesParser from './parsers/home-stories.js';
 import socialCardsParser from './parsers/social-cards.js';
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
-import sectionsTransformer from './transformers/skoda-home-sections.js';
+import darkBandsTransformer from './transformers/skoda-dark-bands.js';
+import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
 import linksTransformer from './transformers/skoda-links.js';
 import nbspTransformer from './transformers/skoda-nbsp.js';
@@ -33,9 +39,11 @@ const parsers = {
 const PAGE_TEMPLATE = {
   name: 'home-sto',
   description:
-    'Škoda Storyboard home (template-homepage). Indexed Promo Box, Stories feed and Story Rails in cover-box bands; Social media as Cards (social). Metadata template=page.',
+    'Škoda Storyboard home (template-homepage). Indexed Promo Box + the Latest Stories feed (home-stories) + index-driven Story Rails (home-rail) + the Social media band as Cards (social) (social-cards), one section per source cover-box band. Metadata template=page. Content-driven detection only.',
   urls: ['https://www.skoda-storyboard.com/en/'],
   metadata: { template: 'page' },
+  // every light .cover-box is its own section too (skoda-dark-bands, SKODA-611a)
+  lightBandStyle: 'cover-box',
   blocks: [
     { name: 'promo-box', instances: ['section.promo-box'] },
     { name: 'home-stories', instances: ['.cover-box .search-results.latest-articles'] },
@@ -46,7 +54,8 @@ const PAGE_TEMPLATE = {
 
 const transformers = [
   cleanupTransformer,
-  sectionsTransformer,
+  darkBandsTransformer,
+  ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
   metadataTransformer,
   linksTransformer,
 ];

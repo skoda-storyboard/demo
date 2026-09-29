@@ -55,6 +55,42 @@ Plan B (§14 accepted): **Must**, since it delivers C-6 social share.
 - [ ] No layout shift (fixed position, reserved size), and nothing runs on the main thread before LCP (loads in the delayed phase).
 - [ ] Preview link: `https://skoda-215-float-dock--demo--skoda-storyboard.aem.page/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds`
 
+## Implementation notes (2026-09-29, branch `skoda-215-float-dock`, ready for QA)
+- **Where:** `blocks/float-dock/` (code-only block, built by `loadFloatDock()` in `scripts/scripts.js` in the delayed
+  phase, skipped on `/nav` + `/footer` paths); intent URLs in `scripts/share.js` (+ `share.test.mjs`) for 216 to reuse.
+- **Measured corrections (source re-measured at 390 / 767–769 / 991–992 / 1440):** the button size flips at **992**
+  (40px below, 58px from 992), not 768; the share list direction flips at **768** (stacked upward below, leftward
+  from 768). Pitches: share→scroll-top = button + 4px; leftward list 9px off the trigger then 3.2px gaps (61px pitch
+  at 58px); stacked list 10px off the trigger then 4px gaps (44px pitch). EDS positions match the source to the pixel
+  at all six widths.
+- **Decisions:** WhatsApp shows below 768px only, per this ticket's spec (product decision 2026-09-29, confirmed after
+  code review). This is a deliberate exception to css-guidelines §8 (width-based rather than input-capability-based);
+  the source hides it by UA. It has no `target=_blank`, since `whatsapp://` hands off to the app. It uses an ink glyph (`icons/whatsapp-ink.svg`), since white on `#43d854` fails contrast. **No `navigator.share`:** the trigger always
+  expands the intent list, as on the source (product decision 2026-09-29 after the branch-preview review). This
+  supersedes the "prefer `navigator.share`" wording in the acceptance criteria. Facebook uses `sharer.php`.
+- **Live click behaviour (re-checked 2026-09-29 on https://www.skoda-storyboard.com/en/ and its source JS):**
+  - Scroll-top appears past **300px** of scroll (source `main.js`/`media-room.js`: `300 < scrollTop`) and hides
+    again below that. The bar follows the source, which supersedes the "after 1 viewport" acceptance criterion.
+  - The reveal uses the source spring `0.3s cubic-bezier(.68,-.55,.27,1.55)`.
+  - The list opens and closes like the source: it fades in over 0.2s after a 0.2s delay, and out over 0.4s. It
+    starts 15% back along its axis: sideways on desktop, upward on mobile.
+  - Clicking outside leaves the list open, as on the source. Esc closes it from anywhere on the page (an a11y
+    addition per the ACs; the source has none).
+- **Code review (2 passes, 2026-09-29):**
+  - Fixed: test files unserved (`.hlxignore`), CSS-load failure handled, reduced motion covers open and close,
+    focus kept when scroll-top hides, `main` focus target cleaned up, eager icons, hover only on hover devices,
+    RTL-safe slides, share fallback URL strips the query.
+  - Kept, for source parity: the bar also shows on the 404 page, as on the live site.
+  - Kept, per spec: WhatsApp is shown by width (below 768), not by touch capability.
+- **404 page:** `404.html` now loads `styles/brand.css` before `styles.css`, as `head.html` does. Before this, none of
+  the brand tokens resolved on the 404 page, so the bar there had no white fill or shadow.
+- **Layout shift:** the scroll-top keeps its slot, and the share cluster slides over it with a transform. The block's
+  CSS loads before insertion, and the bar stays `display:none` until decorated. Dock CLS is 0.
+- **Stacking:** `--z-float-dock: 18` (order documented in `styles/styles.css`): above in-page layers, below the header
+  and mobile drawer (20), the gallery lightbox and the consent banner.
+- **Cart slot:** `.float-dock [data-slot="media-cart"]`, empty (`display:none`) until SKODA-505a/b appends its
+  button. It sits between share and scroll-top, as on the source.
+
 ## Dependencies
 docs/ui-specs/social-share.md, SKODA-505a/b (cart slot), SKODA-704 (stacking against the consent banner), SKODA-216
 (gallery share, separate; reuses the `/scripts/` helper).

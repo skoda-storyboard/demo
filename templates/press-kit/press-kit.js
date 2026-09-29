@@ -11,6 +11,13 @@ function chapters(main) {
   const list = section?.querySelector('.default-content-wrapper > ul');
   if (!list) return;
   list.querySelector('a[href="#chapters-links"]')?.closest('li')?.remove();
+  const { origin, pathname } = document.location;
+  const here = pathname.replace(/\/$/, '');
+  list.querySelectorAll('a[href]').forEach((link) => {
+    if (link.origin === origin && link.pathname.replace(/\/$/, '') === here) {
+      link.setAttribute('aria-current', 'page');
+    }
+  });
   const nav = document.createElement('nav');
   nav.className = 'press-kit-chapters-nav';
   nav.setAttribute('aria-label', 'Chapters');
