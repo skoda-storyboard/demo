@@ -748,6 +748,14 @@ body.story main > .section.body-column > div {
   padding-inline: var(--story-inset);
 }
 
+body.story main > .section.body-column > .default-content-wrapper {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: var(--story-inset);
+}
+
 body.story main > .section.body-column .default-content-wrapper {
   font-size: var(--body-font-size-m);
   line-height: 1.5;
@@ -862,6 +870,10 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
 
   /* the text ends where the aside track starts (the aside owns the 64px gap) */
   body.story main > .section.body-column > div {
+    padding-inline: var(--story-inset) 0;
+  }
+
+  body.story main > .section.body-column > .default-content-wrapper {
     padding-inline: var(--story-inset) 0;
   }
 
