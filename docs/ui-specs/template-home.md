@@ -101,7 +101,8 @@ Values `getComputedStyle`, cited `(selector · viewport)`.
 ## 8. EDS target
 
 - DA `Metadata`: `template=landing` (STO) / `template=media-room-home` (MR); side selects chrome.
-- Section model: each home section = a DA section with `Style` = `cover-box` or `cover-box dark`
+- Section model: each home section = a DA section with `Style` = `cover-box` or `cover-box, dark` (the comma
+  makes two classes; SKODA-611a emits it for all 8 STO bands, and the promo-box section has no style)
   (`--section-dark-bg`), containing a `carousel`/`story-rail` or the feed block. Promo-box = the featured
   block. Reuse `story-rail`/`carousel` + `card-teaser`; the STO feed's Load more is the [`stories`](stories.md)
   query-index pager (reuses SKODA-402's loader/paginate).

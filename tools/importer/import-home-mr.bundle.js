@@ -213,7 +213,6 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/transformers/skoda-dark-bands.js
-  var DARK_BAND_SELECTOR = ".cover-box.dark:not(.socials-static)";
   var DARK_BAND_STYLE = "cover-box, dark";
   function hasContent(el) {
     return !!el && ((el.textContent || "").trim() !== "" || !!el.querySelector("img, picture, iframe, table"));
@@ -224,18 +223,26 @@ var CustomImportScript = (() => {
     }
     return false;
   }
+  var isBreak = (el) => !!el && el.tagName === "HR";
   function transform2(hookName, element, payload) {
     if (hookName !== "beforeTransform") return;
     const doc = element.ownerDocument;
-    const style = payload && payload.template && payload.template.darkBandStyle || DARK_BAND_STYLE;
-    [...element.querySelectorAll(DARK_BAND_SELECTOR)].forEach((band) => {
+    const template = payload && payload.template || {};
+    const darkStyle = template.darkBandStyle || DARK_BAND_STYLE;
+    const lightStyle = template.lightBandStyle || "";
+    const selector = lightStyle ? ".cover-box:not(.socials-static)" : ".cover-box.dark:not(.socials-static)";
+    [...element.querySelectorAll(selector)].forEach((band) => {
       if (!hasContent(band)) return;
-      if (hasContentBeside(band, element, "previousElementSibling")) band.before(doc.createElement("hr"));
+      if (!isBreak(band.previousElementSibling) && hasContentBeside(band, element, "previousElementSibling")) {
+        band.before(doc.createElement("hr"));
+      }
       band.append(WebImporter.Blocks.createBlock(doc, {
         name: "Section Metadata",
-        cells: { style }
+        cells: { style: band.classList.contains("dark") ? darkStyle : lightStyle }
       }));
-      if (hasContentBeside(band, element, "nextElementSibling")) band.after(doc.createElement("hr"));
+      if (!isBreak(band.nextElementSibling) && hasContentBeside(band, element, "nextElementSibling")) {
+        band.after(doc.createElement("hr"));
+      }
     });
   }
 

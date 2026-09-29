@@ -118,3 +118,38 @@ test('only beforeTransform acts (afterTransform is a no-op); pages without dark 
   const plain = run(coverBox('', 'News') + coverBox('', 'Models'));
   assert.equal(plain.querySelectorAll('hr, table').length, 0);
 });
+
+test('Storyboard home (lightBandStyle): every band is its own section, one break between neighbours', { skip }, () => {
+  const body = run([
+    '<section class="promo-box"><p>Featured</p></section>',
+    coverBox('', 'Latest Stories'),
+    coverBox('', 'Models'),
+    coverBox('', 'eMobility'),
+    coverBox('dark', 'Series'),
+    coverBox('', 'Latest News'),
+  ].join(''), { lightBandStyle: 'cover-box' });
+  assert.deepEqual(outline(body), [
+    'promo-box()',
+    'hr',
+    'cover-box(Latest Stories)[cover-box]',
+    'hr',
+    'cover-box(Models)[cover-box]',
+    'hr',
+    'cover-box(eMobility)[cover-box]',
+    'hr',
+    'cover-box dark(Series)[cover-box, dark]',
+    'hr',
+    'cover-box(Latest News)[cover-box]',
+  ]);
+});
+
+test('lightBandStyle: the social parser\'s own breaks are reused, never doubled', { skip }, () => {
+  // social-cards has already replaced the band with <hr> h2 table table <hr>
+  const body = run([
+    coverBox('', 'Latest Stories'),
+    '<hr><h2>Social media</h2><table><tr><td>Cards (social)</td></tr></table><hr>',
+    coverBox('', 'Models'),
+  ].join(''), { lightBandStyle: 'cover-box' });
+  const tags = [...body.children].map((el) => el.tagName.toLowerCase());
+  assert.deepEqual(tags, ['div', 'hr', 'h2', 'table', 'hr', 'div']);
+});
