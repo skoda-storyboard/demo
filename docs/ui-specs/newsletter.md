@@ -117,7 +117,9 @@ the curled `media-room-*.css`.
 - header: `padding-top:55%` (image aspect box), `clip-path:polygon(0 0,100% 0,100% 100%,0 75%)`
   (angled bottom edge), border-radius `.5rem .5rem 0 0`, overflow hidden (· 1280; source CSS).
 - header `h3`: absolute, color `#fff`, font-size `1.5em` (`24px`), weight `400`, line-height `1.5rem`,
-  top `15%` (· 1280) -> `--heading-font-size-m` (22px) is closest; `24px` candidate.
+  top `15%` (· 1280) -> `--heading-font-size-m` (22px) is closest; `24px` candidate. The source
+  also sets `transform: translateY(-20%)` (−9.6px for 2 lines, −14.4px for 3), which puts the
+  heading 18.7px below the image top at 1440 and 0.7px at 768 (SKODA-823 review).
 - label color `#d8d8d8`, font-size `.875em` (· source CSS).
 
 ### Inline widget input (`.inputs .input input`)
@@ -125,6 +127,8 @@ the curled `media-room-*.css`.
   padding `1em` (`14px`); width `100%`; margin `0 0 16px`; font-size `.875em` (`14px`) -> `14px` =
   `--body-font-size-s` (· 1280 · `.inputs .input input`). `#5a5b5c` -> `--gallery-divider` (reuse).
   Correction (verified live 2026-09-15): input margin-bottom is **`16px`**, not `24px`.
+  Refinement (2026-09-29): it is `16px` above 576px and **`24px` at ≤ 576px** (measured at
+  390 / 520 / 575 / 576; the card is 370×376.39 at 390).
 - focus: border-bottom `2px solid #419468` (· source CSS) -> `#419468` = `--gallery-accent`/`--facet-active` (reuse).
 
 ### Inline widget button (`.inputs button`)
@@ -133,7 +137,7 @@ the curled `media-room-*.css`.
 
 ### Response / states (`.mailguide-form .response`)
 - padding `.5rem .75rem`; background `#fff`; font-size `.875rem`, weight `500`; `:empty{display:none}`.
-- `.error` color `#e82b37` -> candidate `--error-color`; `.success` color `#419468`
+- `.error` color `#e82b37` -> `--error-color`, built as `#e11825` (the source red is 4.35:1 on white, below AA; darkened to 4.82:1, SKODA-823 review); `.success` color `#419468`
   (· source CSS `.mailguide-form .response .error/.success`). Loading: button `:before` spinner
   (`animation:a 7s infinite`, `border-radius:50%`).
 

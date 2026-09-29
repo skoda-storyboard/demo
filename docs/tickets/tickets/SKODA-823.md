@@ -57,6 +57,13 @@ drops it, so the EDS aside starts directly with "Explore more".
   (about 11px at 768) and the pill label spill out of its 60% pill. The card keeps the field
   inside and lets the pill grow to its label (`fit-content`). Below 240px of card width a
   container query tightens the insets.
+- PR #199 review (2026-09-29):
+  - The heading now has the source's `translateY(-20%)`: it sits 18.7px below the image top at
+    1440 and 0.7px at 768, the same as the source.
+  - The field-to-pill gap is 24px at 576px and below (16px above). The card at 390 is 370×376.39,
+    matching the source.
+  - The error text is `#e11825`, the source red darkened to 4.82:1 on white; the source `#e82b37`
+    is 4.35:1 and fails WCAG AA.
 - Consent opens on first focus and stays open; the source's opened card also carries the
   manage link, so ours is shorter until that link is authored.
 - Found in passing, not this ticket: the header nav overflows the viewport at 1080 (about 101px)

@@ -112,7 +112,7 @@
      .newsletter-subscribe-widget, docs/ui-specs/newsletter.md §3) */
   --newsletter-card-border: #ededed; /* 1px card outline */
   --newsletter-consent-color: #d8d8d8; /* consent label on the dark card */
-  --error-color: #e82b37;            /* source .mailguide-form .response .error */
+  --error-color: #e11825;            /* source .response .error #e82b37 is 4.35:1 on white; same hue darkened to 4.82:1 (WCAG AA) */
 }
 
 /*

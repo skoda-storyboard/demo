@@ -229,7 +229,9 @@
   object-fit: cover;
 }
 
-/* source h3: 24/24 regular, 15% down the image, 20px inset */
+/* source h3: 24/24 regular, 15% down the image, 20px inset, lifted by 20% of its own height
+   (translateY(-20%): -9.6px for 2 lines, -14.4px for 3, so the last line clears the angle at
+   768; measured 18.7px / 0.7px below the image top at 1440 / 768) */
 .newsletter-stub.card .newsletter-stub-heading {
   position: absolute;
   top: 15%;
@@ -240,6 +242,7 @@
   font-size: var(--heading-font-size-story-h3);
   font-weight: var(--weight-regular);
   line-height: 1;
+  transform: translateY(-20%);
 }
 
 /* stacked form; the response box sits above the field as on the source (order only, so the
@@ -256,11 +259,14 @@
   margin-bottom: 0;
 }
 
+/* field → pill gap: 16px, 24px on phones (set below) */
 .newsletter-stub.card .newsletter-stub-email {
+  --newsletter-field-gap: var(--spacing-m);
+
   flex: none;
   width: 100%;
   min-width: 0;
-  margin: 0 0 var(--spacing-m);
+  margin: 0 0 var(--newsletter-field-gap);
   padding: 14px;
   background-color: var(--skoda-white);
   font-size: var(--body-font-size-s);
@@ -268,7 +274,7 @@
 }
 
 .newsletter-stub.card .newsletter-stub-email:focus {
-  margin-bottom: calc(var(--spacing-m) - 1px);
+  margin-bottom: calc(var(--newsletter-field-gap) - 1px);
 }
 
 /* source pill: 60% of the form, 44px tall (16/16 + 14px padding), centred. Deliberate
@@ -355,6 +361,15 @@
 
   .newsletter-stub.card .newsletter-stub-submit {
     padding-inline: var(--spacing-s);
+  }
+}
+
+/* Phones: the source opens the field → pill gap to 24px at <= 576px (measured 24px at 390 / 520
+   / 575 / 576, 16px from 720 up; card 370x376 at 390). A viewport rule, not a container query:
+   the 185px sidebar card at 768 keeps 16px while wider stacked cards below 576 get 24px. */
+@media (width <= 576px) {
+  .newsletter-stub.card .newsletter-stub-email {
+    --newsletter-field-gap: var(--spacing-l);
   }
 }
 
