@@ -189,6 +189,20 @@ Length, Bitrate, Audio format, Dimensions, Published (feed shape 6), tag chips, 
 videos; closing or moving on unloads the player. QA vs live at 768/1024/1280/1440: all measured points equal
 (player, title, buttons, metadata, chips, related, close, counter).
 
+**Non-breaking spaces on the 22 model pages (PR 200 review, 2026-09-29): importer fixed, delivery blocked.**
+- The importer keeps the source's glued U+00A0 (`skoda-nbsp`, `wrapPage` restore), but only Octavia was re-pushed
+  after the fix. `node tools/importer/check-nbsp-parity.mjs` (source authored copy vs preview): **5/22** pages at
+  parity (Octavia 37/37; Epiq, Peaq, Elroq RS, Enyaq RS have none in the source). The other 17 have 17–54 in the
+  source and 0 on the preview (Superb 45, Fabia 35).
+- All 22 re-import cleanly with the current bundle (metadata 22/22, blocks 0 errors), but `import:push` holds them:
+  - **15 pages `blocked-binary`** (main's SKODA-503 gate): their Tech Data PDFs (12 distinct) are not yet uploaded,
+    published and publicly verified in AEM Assets. Owner: SKODA-503. The ingest runs on a developer machine with the
+    DAM token (tools/importer/media/README.md); then re-import + push these pages.
+  - **Elroq `conflict`**: its DA document was edited after our last push (the SKODA-503 PDF sample); reconcile that
+    edit before re-pushing. **Elroq Sportline** could push, but would also take the verified Elroq PDF link, which is
+    SKODA-503's rollout decision; held with the rest.
+- Nothing was pushed for this item. Re-run `check-nbsp-parity.mjs` after the ingest: it exits 1 while a page lags.
+
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/template-model-page.md`](../../ui-specs/template-model-page.md)** (captured via Chrome DevTools on the live Peaq model page). Read it before implementing. Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).
 
