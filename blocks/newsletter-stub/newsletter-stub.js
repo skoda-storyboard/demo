@@ -97,14 +97,22 @@ function buildHeader(cfg) {
 /**
  * Source reveal (jQuery slideDown, measured live): height 0 → full over 400ms with the
  * "swing" easing (0.5 - cos(πp)/2, i.e. easeInOutSine), clipped while it runs, no fade.
- * Skipped without the Web Animations API or under reduced motion (the block just appears).
+ * Vertical padding grows from 0 too, as slideDown does. Skipped without the Web Animations
+ * API or under reduced motion (the block just appears).
  * @param {Element} target
  */
 function slideDown(target) {
   if (!target?.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const { height } = target.getBoundingClientRect();
+  const { boxSizing, paddingTop, paddingBottom } = window.getComputedStyle(target);
+  const pad = parseFloat(paddingTop) + parseFloat(paddingBottom);
+  const end = boxSizing === 'border-box' ? height : height - pad;
   target.style.overflow = 'hidden';
-  target.animate({ height: ['0px', `${height}px`] }, {
+  target.animate({
+    height: ['0px', `${end}px`],
+    paddingTop: ['0px', paddingTop],
+    paddingBottom: ['0px', paddingBottom],
+  }, {
     duration: 400,
     easing: 'cubic-bezier(0.37, 0, 0.63, 1)',
   }).addEventListener('finish', () => target.style.removeProperty('overflow'));
@@ -220,7 +228,8 @@ export default function decorate(block) {
     form.addEventListener('focusin', () => {
       if (form.classList.contains('is-expanded')) return;
       form.classList.add('is-expanded');
-      slideDown(form.querySelector('.newsletter-stub-consent'));
+      // the source slides consent + "Manage subscription" as one block
+      form.querySelectorAll('.newsletter-stub-consent, .newsletter-stub-manage').forEach(slideDown);
     });
   }
 

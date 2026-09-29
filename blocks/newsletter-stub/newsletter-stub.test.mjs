@@ -143,29 +143,50 @@ test('card: consent opens on first focus and stays open', () => {
   assert.equal(form.classList.contains('is-expanded'), true);
 });
 
-test('card: consent slides open like the source (400ms swing), once, and not under reduced motion', () => {
+test('card: consent + manage slide open like the source (400ms swing), once, and not under reduced motion', () => {
+  const styles = {
+    'newsletter-stub-consent': { boxSizing: 'content-box', paddingTop: '0px', paddingBottom: '0px' },
+    'newsletter-stub-manage': { boxSizing: 'border-box', paddingTop: '8px', paddingBottom: '0px' },
+  };
   const run = (reduce) => {
-    globalThis.window = { matchMedia: () => ({ matches: reduce }) };
-    const form = build(CARD).querySelector('form');
-    const consent = form.querySelector('.newsletter-stub-consent');
-    const calls = [];
-    consent.style = { removeProperty: (p) => { delete consent.style[p]; } };
-    consent.getBoundingClientRect = () => ({ height: 137 });
-    consent.animate = (keyframes, options) => {
-      calls.push({ keyframes, options });
-      return { addEventListener: (type, fn) => type === 'finish' && fn() };
+    globalThis.window = {
+      matchMedia: () => ({ matches: reduce }),
+      getComputedStyle: (node) => styles[node.className],
     };
+    const form = build(CARD.replace('</div>\n</div>', `</div>
+  <div><div>manage</div><div><p><a href="https://www.skoda-storyboard.com/en/newsletter-settings/">Manage subscription</a></p></div></div>
+</div>`)).querySelector('form');
+    const calls = [];
+    const parts = [
+      [form.querySelector('.newsletter-stub-consent'), 108],
+      [form.querySelector('.newsletter-stub-manage'), 26],
+    ];
+    parts.forEach(([node, height]) => {
+      node.style = { removeProperty: (p) => { delete node.style[p]; } };
+      node.getBoundingClientRect = () => ({ height });
+      node.animate = (keyframes, options) => {
+        calls.push({ node: node.className, keyframes, options });
+        return { addEventListener: (type, fn) => type === 'finish' && fn() };
+      };
+    });
     form.dispatchEvent(new Event('focusin', { bubbles: true }));
     form.dispatchEvent(new Event('focusin', { bubbles: true }));
-    return { calls, consent };
+    return { calls, parts };
   };
   try {
-    const { calls, consent } = run(false);
-    assert.equal(calls.length, 1, 'opens once, a second focus does not replay it');
-    assert.deepEqual(calls[0].keyframes, { height: ['0px', '137px'] });
-    assert.equal(calls[0].options.duration, 400);
-    assert.equal(calls[0].options.easing, 'cubic-bezier(0.37, 0, 0.63, 1)');
-    assert.equal(consent.style.overflow, undefined, 'clip is removed when the slide finishes');
+    const { calls, parts } = run(false);
+    assert.equal(calls.length, 2, 'consent and manage open together, once');
+    assert.deepEqual(calls[0].keyframes, {
+      height: ['0px', '108px'], paddingTop: ['0px', '0px'], paddingBottom: ['0px', '0px'],
+    });
+    assert.deepEqual(calls[1].keyframes, {
+      height: ['0px', '26px'], paddingTop: ['0px', '8px'], paddingBottom: ['0px', '0px'],
+    }, 'border-box: the full height, padding grows from 0');
+    calls.forEach(({ options }) => {
+      assert.equal(options.duration, 400);
+      assert.equal(options.easing, 'cubic-bezier(0.37, 0, 0.63, 1)');
+    });
+    parts.forEach(([node]) => assert.equal(node.style.overflow, undefined, 'clip removed on finish'));
     assert.equal(run(true).calls.length, 0, 'reduced motion: consent just appears');
   } finally {
     delete globalThis.window;

@@ -48,8 +48,12 @@ drops it, so the EDS aside starts directly with "Explore more".
 
 ## Build notes (block slice, 2026-09-28)
 - Authoring: `Newsletter Stub (card)`, with the footer keys plus `image`, `heading`, `error` and
-  `consent-error` (see `docs/ui-specs/newsletter.md` §7). The draft uses plain-text consent and
-  no `manage` row, because the consent and newsletter-settings pages are not migrated yet.
+  `consent-error` (see `docs/ui-specs/newsletter.md` §7).
+- Consent links (2026-09-29, on request): the draft links "consent to the processing" and
+  "Manage subscription" to the live skoda-storyboard.com pages (both return 200). The EDS paths
+  don't exist yet (404), so switch the links to relative `/en/…` paths once those pages are
+  migrated. Both are emerald and underlined, and slide open together. With both links the
+  opened card is 345×491.83 at 1440 and 370×495.39 at 390, the same as the source.
 - Measured against the live Epiq story at 1440: card 345×355, header 343×189, field 295×50 and
   pill 177×44 all match; the gap to "Explore more" is 16px. At 390 the card is 370, the header 202,
   the field 320 and the pill 192, also matching.

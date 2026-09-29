@@ -331,18 +331,31 @@
   width: 80%;
 }
 
+/* block label: no inline-block strut gap under the text, so the manage line sits where the
+   source puts it */
 .newsletter-stub.card .newsletter-stub-consent label {
+  display: block;
   color: var(--newsletter-consent-color);
 }
 
+/* source links: emerald + underline ("consent to the processing", "Manage subscription") */
+.newsletter-stub.card .newsletter-stub-consent a {
+  text-decoration: underline;
+}
+
+/* source .manage-subscription-link: own line 8px under the consent text, aligned with it
+   (border-box so the 27px indent stays inside the 80% column) */
 .newsletter-stub.card .newsletter-stub-manage {
-  padding: 0 0 0 calc(var(--checkbox-size) + var(--checkbox-label-gap));
+  box-sizing: border-box;
+  padding: var(--spacing-xs) 0 0 calc(var(--checkbox-size) + var(--checkbox-label-gap));
   font-size: var(--body-font-size-s);
   line-height: var(--footer-small-line-height);
 }
 
-.newsletter-stub.card .newsletter-stub-manage a {
-  text-decoration: none;
+/* the source label is inline-block in a 16/24 line, which leaves 3px ((24 - 18) / 2) under
+   its last line (the manage link); keep that gap under whichever consent line comes last */
+.newsletter-stub.card .newsletter-stub-form > :is(.newsletter-stub-consent, .newsletter-stub-manage):last-child {
+  margin-bottom: 3px;
 }
 
 .newsletter-stub.card .newsletter-stub-form.is-expanded .newsletter-stub-consent,
