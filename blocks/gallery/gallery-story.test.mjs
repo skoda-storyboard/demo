@@ -114,6 +114,23 @@ test('the lead opens image 1, thumb k opens image k + 1; next wraps 5/5 → 1/5'
   assert.equal(document.activeElement, thumbs(block)[2]);
 });
 
+test('the bottom bar\'s "View N photos" button opens the set at image 1', { skip }, () => {
+  const block = story(5);
+  const view = block.querySelector('.gallery-story-bottom > .gallery-story-view');
+  assert.equal(view.tagName, 'BUTTON');
+  assert.equal(view.type, 'button');
+  assert.equal(view.textContent, 'View 5 photos');
+  assert.equal(view.querySelector('svg').getAttribute('aria-hidden'), 'true');
+  assert.equal(block.lastElementChild.previousElementSibling, view.parentElement, 'after the strip');
+  view.focus();
+  view.click();
+  assert.equal(overlay(block).hidden, false);
+  assert.equal(count(block), '1/5');
+  key('Escape');
+  assert.equal(document.activeElement, view, 'focus returns to the button');
+  assert.equal(story(1).querySelector('.gallery-story-view').textContent, 'View 1 photo');
+});
+
 test('the dialog is labelled by the story title; no media-cart actions or tag chips', { skip }, () => {
   const block = story(3, (i) => (i === 1 ? '<p>2026 · Favorit</p>' : ''));
   lead(block).click();

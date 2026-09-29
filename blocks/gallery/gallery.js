@@ -36,8 +36,9 @@ const LABELS = {
   openNamed: (n, alt) => (alt ? `${LABELS.open} ${n}: ${alt}` : `${LABELS.open} ${n}`),
   more: (n) => `+${n}`,
   moreLabel: (n) => `Show ${n} more ${n === 1 ? 'image' : 'images'}`,
-  // story variant (SKODA-216): the lead button name
+  // story variant (SKODA-216): the lead button name + the bottom-bar button text
   openGallery: (total) => `Open gallery, ${total} ${total === 1 ? 'image' : 'images'}`,
+  viewAll: (total) => `View ${total} ${total === 1 ? 'photo' : 'photos'}`,
 };
 
 /**
@@ -600,6 +601,21 @@ function buildStory(block) {
     });
     block.append(list);
   }
+
+  // bottom bar (source .sb-gallery-bottom): the green "View N photos" button, which
+  // opens the set at image 1 (the source opens its removed overview grid on phones).
+  // "Share gallery" is SKODA-215 and would sit at the bar's right end.
+  const bar = document.createElement('div');
+  bar.className = 'gallery-story-bottom';
+  const viewAll = document.createElement('button');
+  viewAll.type = 'button';
+  viewAll.className = 'gallery-story-view';
+  const viewLabel = document.createElement('span');
+  viewLabel.textContent = LABELS.viewAll(items.length);
+  viewAll.append(svgIcon(ICONS.images), viewLabel);
+  bar.append(viewAll);
+  block.append(bar);
+  triggers.push([viewAll, 0]);
 
   const lightbox = buildLightbox(block, items, { story: true, title });
   // the source's chevron in the green squares (the shared lightbox draws ‹ › glyphs)

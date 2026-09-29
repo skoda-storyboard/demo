@@ -101,6 +101,12 @@ press-release template or a new modal implementation.
   The source's 25% cells with 10px padding and a −10px margin are a 4-column grid with a 20px gap
   here. The badge is `rgb(0 0 0 / 60%)`, a 28px icon 6px before the total, 16/24 from 768 and 12/18
   below. The 768 step is viewport-driven (the 767 column is wider than the 768 one yet keeps 10px).
+- **"View N photos" button (added on request):** the source bottom bar (`.sb-gallery-bottom`,
+  flex, space-between) sits 20px under the strip (10px below 768) and starts with a green
+  `--gallery-accent` button in the badge's box: a 28px icon 6px before "View 5 photos", 8/16
+  padding and 16/24 text from 768 (167.2×44), 4.8/8 and 12/18 below (125.9×37.6). No hover change.
+  Measured and matched at 1280 / 768 / 500. It opens the set at image 1, as the source does from
+  768; below 768 the source opens its removed overview grid, so EDS opens the viewer there too.
 - **Lightbox, measured and matched at 1280 and 768 (900 high):**
   - Backdrop `rgb(0 0 0 / 95%)`.
   - Top bar 93px with a 1px `--gallery-divider` rule and 16px padding.
@@ -125,8 +131,8 @@ press-release template or a new modal implementation.
     match here.
   - **1690+ inset:** the source moves the squares and counter to 30px at 1690, a step outside the
     breakpoint allowlist; EDS keeps 10px.
-  - **Bottom bar:** "View 5 photos" is the removed overview entry and "Share gallery" is SKODA-215,
-    so neither is rendered.
+  - **"Share gallery":** the bar's right-hand share control is SKODA-215 and isn't rendered; the
+    bar's layout leaves its place at the right end.
   - **Focus trap outside the story:** the default, `preview` and media-rail lightboxes keep a
     buttons-only trap. This ticket only changes the story path; widening it for the others would
     change SKODA-203/208/223 behaviour.
