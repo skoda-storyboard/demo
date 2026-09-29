@@ -94,14 +94,21 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/press-kit-content.js
   var text = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
-  function clipTitle(document, file) {
-    const item = [...document.querySelectorAll(".search-results-item")].find((node) => [...node.querySelectorAll("a[href]")].some((a) => a.getAttribute("href") === file));
-    return text(item == null ? void 0 : item.querySelector(".entry-title"));
+  var boldCaption = (node) => (node == null ? void 0 : node.matches("p")) && !!text(node) && text(node) === [...node.querySelectorAll("strong, b")].map(text).join(" ").trim();
+  function clipTitle(document, file, attachment) {
+    const item = [...document.querySelectorAll(".search-results-item")].find((node2) => [...node2.querySelectorAll("a[href]")].some((a) => a.getAttribute("href") === file));
+    const own = text(item == null ? void 0 : item.querySelector(".entry-title"));
+    if (own) return own;
+    const before = attachment.previousElementSibling;
+    if (boldCaption(before)) return text(before);
+    let node = before;
+    while (node && !node.matches("h1, h2, h3, h4, h5, h6, .media-cart-item")) node = node.previousElementSibling;
+    return (node == null ? void 0 : node.matches(".media-cart-item")) ? "" : text(node);
   }
-  function videoEmbed(document, file) {
-    const link = Object.assign(document.createElement("a"), { href: file, textContent: file });
+  function videoEmbed(document, file, attachment) {
+    const title = clipTitle(document, file, attachment);
+    const link = Object.assign(document.createElement("a"), { href: file, textContent: title || "Video" });
     const rows = [["Embed"], ["url", link]];
-    const title = clipTitle(document, file);
     if (title) rows.push(["title", title]);
     return WebImporter.DOMUtils.createTable(rows, document);
   }
@@ -123,7 +130,7 @@ var CustomImportScript = (() => {
       if (attachment && root.contains(attachment) && !text(bare) && attachment.querySelectorAll("iframe").length === 1 && !attachment.querySelector("img, video")) {
         const file = [...attachment.querySelectorAll('a.media-cart-action.download[href], a[data-action="download"][href]')].map((link) => link.getAttribute("href")).find((href) => /\.mp4(?:[?#]|$)/i.test(href || ""));
         const locked = /(^|\.)vimeo\.com$/i.test(new URL(url).hostname);
-        const out = [file && locked && !nested ? videoEmbed(document, file) : p];
+        const out = [file && locked && !nested ? videoEmbed(document, file, attachment) : p];
         if (file) {
           const dp = document.createElement("p");
           const link = document.createElement("a");

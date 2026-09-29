@@ -326,6 +326,9 @@ test('resource Videos child: each clip plays its MP4 master natively, with a lab
   ]);
   // The domain-locked Vimeo player errors on the demo, so the Embed plays the master (SKODA-805c).
   const embeds = blocks(page, 'Embed');
+  assert.deepEqual(embeds.map((t) => txt(t.querySelector('tr:nth-child(2) a'))), [
+    'Škoda Peaq | Footage', 'Škoda Peaq | Footage',
+  ], 'named by the heading before each clip');
   assert.deepEqual(embeds.map((t) => t.querySelector('tr:nth-child(2) a').getAttribute('href').split('/').pop()), [
     'peaq-footage-1440p.mp4', 'peaq-sportline-1440p.mp4',
   ]);
@@ -566,7 +569,9 @@ test('only a top-level Vimeo clip plays its master; nested and YouTube clips sta
   const embeds = blocks(page, 'Embed');
   assert.equal(embeds.length, 1, 'only the top-level Vimeo clip');
   assert.ok(page.querySelector('a[href="https://www.youtube.com/embed/abc99"]'));
-  assert.match(embeds[0].querySelector('tr:nth-child(2) a').getAttribute('href'), /clip-88\.mp4$/);
+  const master = embeds[0].querySelector('tr:nth-child(2) a');
+  assert.match(master.getAttribute('href'), /clip-88\.mp4$/);
+  assert.doesNotMatch(txt(master), /\//, 'the link text is the accessible name, never the file path');
   const body = rows(page, 'Accordion')[0].children[1];
   assert.ok(body.querySelector('a[href^="https://player.vimeo.com/video/77"]'));
   assert.equal(body.querySelectorAll('table').length, 0);

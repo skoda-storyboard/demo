@@ -2,21 +2,35 @@
 
 const text = (node) => (node?.textContent || '').replace(/\s+/g, ' ').trim();
 
-// The Media Box item for the same master names the clip ("Footage | Škoda Peaq Covered Drive").
-function clipTitle(document, file) {
+// The clip's name: the Media Box item for the same master ("Footage | Škoda Peaq Covered
+// Drive"), else what titles it on resource "Videos" pages: the heading before it (Peaq, Epiq)
+// or the all-bold paragraph right before it (Motorsport: `<p><strong>Škoda 1100 OHC –
+// Footage</strong></p>`).
+const boldCaption = (node) => node?.matches('p') && !!text(node)
+  && text(node) === [...node.querySelectorAll('strong, b')].map(text).join(' ').trim();
+function clipTitle(document, file, attachment) {
   const item = [...document.querySelectorAll('.search-results-item')]
-    .find((node) => [...node.querySelectorAll('a[href]')].some((a) => a.getAttribute('href') === file));
-  return text(item?.querySelector('.entry-title'));
+    .find((node) => [...node.querySelectorAll('a[href]')]
+      .some((a) => a.getAttribute('href') === file));
+  const own = text(item?.querySelector('.entry-title'));
+  if (own) return own;
+  const before = attachment.previousElementSibling;
+  if (boldCaption(before)) return text(before);
+  let node = before;
+  while (node && !node.matches('h1, h2, h3, h4, h5, h6, .media-cart-item')) node = node.previousElementSibling;
+  return node?.matches('.media-cart-item') ? '' : text(node);
 }
 
 // The source's Vimeo account is domain-locked, so its player errors on the demo (SKODA-805c
 // decision, 2026-09-29): a Vimeo clip that carries its MP4 master plays that natively instead, an
 // `Embed` table whose url is the master. Inside an accordion or Columns cell a block can't
 // nest, so there it stays the bare provider link.
-function videoEmbed(document, file) {
-  const link = Object.assign(document.createElement('a'), { href: file, textContent: file });
+function videoEmbed(document, file, attachment) {
+  const title = clipTitle(document, file, attachment);
+  // The link text becomes the player's accessible name (decorateButtons copies it into the
+  // link title, which the embed block reads first), so it is the clip title, never the path.
+  const link = Object.assign(document.createElement('a'), { href: file, textContent: title || 'Video' });
   const rows = [['Embed'], ['url', link]];
-  const title = clipTitle(document, file);
   if (title) rows.push(['title', title]);
   return WebImporter.DOMUtils.createTable(rows, document);
 }
@@ -46,7 +60,7 @@ function embedUrls(root, document, { nested = false } = {}) {
         .map((link) => link.getAttribute('href')).find((href) => /\.mp4(?:[?#]|$)/i.test(href || ''));
       // Only Vimeo is domain-locked; YouTube clips (Motorsport Videos) play and stay embeds.
       const locked = /(^|\.)vimeo\.com$/i.test(new URL(url).hostname);
-      const out = [file && locked && !nested ? videoEmbed(document, file) : p];
+      const out = [file && locked && !nested ? videoEmbed(document, file, attachment) : p];
       if (file) {
         const dp = document.createElement('p');
         const link = document.createElement('a');
