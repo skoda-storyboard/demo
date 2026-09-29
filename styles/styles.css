@@ -718,11 +718,14 @@ main > .section.cover-box.dark {
   padding-block: var(--cover-box-padding-top) var(--cover-box-padding-bottom);
 }
 
-main > .section:has(+ .section.cover-box.dark) {
+/* Neighbours of a dark band. `:where(.dark)` keeps these at the specificity they had
+   before the rules became dark-only (SKODA-611a), so later section rules (e.g. the
+   story first-section reset) still win the cascade. */
+main > .section:has(+ .section.cover-box:where(.dark)) {
   margin-block-end: 0;
 }
 
-main > .section.cover-box.dark + .section {
+main > .section.cover-box:where(.dark) + .section {
   margin-block-start: 0;
 }
 
