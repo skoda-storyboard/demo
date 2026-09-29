@@ -176,3 +176,14 @@ test('columns (stats): value and unit are split; other cells are left alone', ()
   assert.equal(cells[2].querySelector('.columns-stat-value'), null);
   assert.equal(cells[2].querySelector('strong').textContent, 'n/a');
 });
+
+test('scrollspy: nothing is current while the page is still hidden (every section at top 0)', async () => {
+  const main = setup();
+  document.body.classList.remove('appear');
+  decorate(main);
+  await new Promise((r) => { setTimeout(r, 5); });
+  assert.equal(main.querySelector('nav.model-nav a[aria-current]'), null, 'not the last link (was Videos)');
+  document.body.classList.add('appear');
+  await new Promise((r) => { setTimeout(r, 5); });
+  assert.equal(main.querySelector('nav.model-nav a[aria-current]'), null, 'at the top of the page nothing is current (source)');
+});

@@ -128,16 +128,18 @@ function decorateNav(main) {
     if (id) list.querySelector(`li[data-target="${CSS.escape(id)}"]`)?.remove();
   });
 
-  // scrollspy: the current section is the last one whose top passed under the nav
+  // scrollspy: the current section is the last one whose top has passed under the nav (as
+  // the source: nothing is current at the top of the page, before the nav sticks). A nav
+  // jump lands the heading under the nav and its section starts above it, so it counts.
   let raf = 0;
   const spy = () => {
     raf = 0;
-    const offset = nav.getBoundingClientRect().bottom + 2;
+    const offset = nav.getBoundingClientRect().bottom - 1;
     let current = null;
     list.querySelectorAll(':scope > li').forEach((li) => {
       const el = document.getElementById(li.dataset.target);
       const top = el?.closest('.section')?.getBoundingClientRect().top;
-      if (top !== undefined && top <= offset) current = li;
+      if (top !== undefined && top < offset) current = li;
     });
     list.querySelectorAll(':scope > li').forEach((li) => {
       const a = li.querySelector('a');
@@ -146,7 +148,19 @@ function decorateNav(main) {
     });
   };
   window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(spy); }, { passive: true });
-  spy();
+  // the template runs before scripts.js shows the page (body.appear): hidden sections all
+  // measure top 0, so the first state is taken once the page is laid out, and again on load
+  const initial = () => requestAnimationFrame(spy);
+  if (document.body.classList.contains('appear')) initial();
+  else {
+    const shown = new window.MutationObserver(() => {
+      if (!document.body.classList.contains('appear')) return;
+      shown.disconnect();
+      initial();
+    });
+    shown.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  }
+  window.addEventListener('load', initial, { once: true });
 }
 
 export default function decorate(main) {
