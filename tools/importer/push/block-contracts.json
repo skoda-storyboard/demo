@@ -13,7 +13,8 @@
         "overlay",
         "toolbar",
         "series-directory",
-        "social"
+        "social",
+        "tiles"
       ]
     },
     "carousel": {
@@ -252,7 +253,7 @@
       "status": "pinned",
       "ticket": "SKODA-221",
       "fallback": "broken",
-      "shape": 2,
+      "shape": 3,
       "emittedBy": [
         "parsers/series-grid.js",
         "parsers/press-kit-hub-tiles.js"
@@ -313,6 +314,19 @@
       "fallback": "readable",
       "shape": 1,
       "emittedBy": []
+    },
+    {
+      "id": "cover-box",
+      "block": null,
+      "form": "section-style",
+      "status": "pinned",
+      "ticket": "SKODA-218",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": [
+        "transformers/skoda-dark-bands.js",
+        "parsers/social-cards.js"
+      ]
     },
     {
       "id": "media-item",

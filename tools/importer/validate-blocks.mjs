@@ -59,7 +59,7 @@ function main() {
 
   const results = targets.map((t) => {
     if (!existsSync(t.file)) return { path: t.path, missing: true };
-    return { path: t.path, ...checkPage(readFileSync(t.file, 'utf8'), contracts, codeBlocks) };
+    return { path: t.path, ...checkPage(readFileSync(t.file, 'utf8'), contracts, codeBlocks, t.path) };
   });
 
   if (a.json) {

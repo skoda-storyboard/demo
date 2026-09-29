@@ -160,6 +160,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-826](tickets/SKODA-826.md) | Global page gutter parity (10px at every width, not 24/40px) | E01 | 0.5 | 0.25 | 0.5 | 106 | 🟢 M1 Must; from the 2026-09-25 URL→block sweep (#149) |
 | SKODA-201 | Cards/Teaser (overlay/media/toolbar) | E02 | 5 | 2–3 | 5–7 | 102,106 | 🟢 |
 | SKODA-202 | Hero (image, LCP) | E02 | 2 | 1 | 2–3 | 102,106 | 🟢 |
+| [SKODA-828](tickets/SKODA-828.md) | Hero parity across templates: press kit, model, archive + ultrawide (sweep follow-ups) | E02 | 5 | 2–3 | 4–5 | 826,805a,208,209 | 🟠 M1; from the 2026-09-28 hero sweep (#196). Owns the hero UI moved out of 208/209/805a; pulls the archive banner M2→M1 |
 | SKODA-203 | Gallery + lightbox modal | E02 | 5 | 2–3 | 4–6 | 102,106 | 🟡 a11y modal `[RUNTIME-UNCONFIRMED]` |
 | SKODA-204 | Embeds (4 providers, dnt=1, lazy) | E02 | 3 | 1–2 | 2–4 | 102 | 🟢 |
 | [SKODA-204a](tickets/SKODA-204a.md) | Embeds consent placeholder + click-to-load hook (follow-up to #18) | E02 | 0.5 | 0.25 | 0.5 | 204,606 | 🟡 M1 Must; sweep §11.1 (204 AC l.47/49 gap); D1 follow-up, not a reopen |
@@ -179,7 +180,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-220](tickets/SKODA-220.md) | Quote block (centred pull-quote + rule + attribution) | E02 | 2 | 0.5–1 | 1–2 | 607,805c,801 | 🟡 M1; Demo sweep 2026-09-25; 4 PRs + 1 PK; importer done 2026-09-28, block TODO |
 | [SKODA-221](tickets/SKODA-221.md) | Cards `tiles`/mosaic variant (series + press-kit hubs) | E02 | 3 | 1 | 2–3 | 201,207,805a | 🟡 M1; Demo sweep 2026-09-25; 5 series + 3 PK hubs |
 | [SKODA-222](tickets/SKODA-222.md) | Stories: featured model card on model tag archives (UI) | E02 | 2 | 0.5–1 | 1–2 | 209,214 | 🔵 M1 Should; content imported (contract `stories-feature`) |
-| [SKODA-223](tickets/SKODA-223.md) | Gallery `preview` variant (press-release sidebar media-kit preview, "+N" pill) (#171) | E02 | 1.5 | 0.5 | 1–1.5 | 203,607,819 | 🔵 M1; from the 607 phase split (contract `gallery-preview`, readable fallback) |
+| [SKODA-223](tickets/SKODA-223.md) | Gallery `preview` variant (press-release sidebar media-kit preview, "+N" pill) (#171) | E02 | 1.5 | 0.5 | 1–1.5 | 203,607,819 | 🟡 In review ([PR #201](https://github.com/skoda-storyboard/demo/pull/201)), M1; from the 607 phase split (contract `gallery-preview`, readable fallback). Branch `skoda-223-gallery-preview` matches the source rects on all 5 releases |
 | [SKODA-224](tickets/SKODA-224.md) | Story Rail `press` variant (Related Press Releases band cards) (#172) | E02 | 1 | 0.5 | 1 | 212,212a,820,607 | 🔵 M1; from the 607 phase split + 612 block half (contract `story-rail-press`) |
 | [SKODA-225](tickets/SKODA-225.md) | Columns unequal split + intrinsic portrait (story 2-cell rows) | E02 | 1 | 0.5 | 1 | 801,824 | 🟢 cosmetic; Demo sweep 2026-09-25 |
 | SKODA-301 | Header + mega-menu (3 panels) | E03 | 5 | 2–3 | 4–6 | 102,106 | 🟡 |

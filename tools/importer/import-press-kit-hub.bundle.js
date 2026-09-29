@@ -28,7 +28,7 @@ var CustomImportScript = (() => {
   function parseHero(hero, document) {
     const image = hero.querySelector(".hero-image img");
     const title = hero.querySelector(".hero-caption h1");
-    if (!(image == null ? void 0 : image.getAttribute("src")) || !(title == null ? void 0 : title.textContent.trim())) {
+    if (!image?.getAttribute("src") || !title?.textContent.trim()) {
       throw new Error("Press-kit hub requires a hero image and title");
     }
     const caption = document.createElement("div");
@@ -36,7 +36,7 @@ var CustomImportScript = (() => {
     h1.textContent = title.textContent.trim();
     caption.append(h1);
     const perex = hero.querySelector(".hero-caption .perex");
-    if (perex == null ? void 0 : perex.textContent.trim()) {
+    if (perex?.textContent.trim()) {
       const p = document.createElement("p");
       p.textContent = perex.textContent.trim();
       caption.append(p);
@@ -54,25 +54,35 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/press-kit-hub-tiles.js
   function parseTiles(content, document) {
-    const tiles = [...content.querySelectorAll(".panel-grid article.article-teaser")];
-    if (!tiles.length) throw new Error("Press-kit hub has no chapter tiles");
+    const sourceRows = [...content.querySelectorAll(".panel-grid")].map((grid) => [...grid.querySelectorAll("article.article-teaser")]).filter((tiles) => tiles.length);
+    if (!sourceRows.length) throw new Error("Press-kit hub has no chapter tiles");
     const rows = [["Cards (overlay, tiles)"]];
-    tiles.forEach((tile, index) => {
-      const sourceLink = tile.querySelector(":scope > a[href]");
-      const sourceImage = tile.querySelector(".ratio-container img[src]");
-      const heading = tile.querySelector(".heading");
-      if (!sourceLink || !sourceImage || !(heading == null ? void 0 : heading.textContent.trim())) {
-        throw new Error(`Press-kit tile ${index + 1} needs a link, image and title`);
+    sourceRows.forEach((tiles, rowIndex) => {
+      const wide = tiles.filter((tile) => tile.querySelector(".ratio-container.ratio-2x1")).length;
+      const square = tiles.filter((tile) => tile.querySelector(".ratio-container.ratio-1x1")).length;
+      if (!(wide === 2 && square === 1 && tiles.length === 3 || wide === 0 && square === tiles.length && [4, 5].includes(tiles.length))) {
+        throw new Error(`Press-kit tile row ${rowIndex + 1} has an unsupported layout`);
       }
-      const title = heading.textContent.replace(/\s+/g, " ").trim();
-      const img = sourceImage.cloneNode(true);
-      img.setAttribute("alt", title);
-      img.removeAttribute("srcset");
-      img.removeAttribute("sizes");
-      const link = document.createElement("a");
-      link.href = sourceLink.href;
-      link.textContent = title;
-      rows.push([sourceImage.closest(".ratio-2x1") ? "feature" : "sq", img, link]);
+      tiles.forEach((tile) => {
+        const sourceLink = tile.querySelector(":scope > a[href]");
+        const sourceImage = tile.querySelector(".ratio-container img[src]");
+        const heading = tile.querySelector(".heading");
+        if (!sourceLink || !sourceImage || !heading?.textContent.trim()) {
+          throw new Error(`Press-kit tile ${rows.length} needs a link, image and title`);
+        }
+        const title = heading.textContent.replace(/\s+/g, " ").trim();
+        const img = sourceImage.cloneNode(true);
+        img.setAttribute("alt", title);
+        img.removeAttribute("srcset");
+        img.removeAttribute("sizes");
+        const link = document.createElement("a");
+        link.href = sourceLink.href;
+        link.textContent = title;
+        let token = "press-square";
+        if (tile.querySelector(".ratio-container.ratio-2x1")) token = "feature";
+        else if (tiles.length === 4) token = "press-quarter";
+        rows.push([token, img, link]);
+      });
     });
     return WebImporter.DOMUtils.createTable(rows, document);
   }
@@ -582,7 +592,7 @@ var CustomImportScript = (() => {
       if (img.closest("table, picture")) return;
       const figure = img.closest("figure");
       const wrapper = img.closest("[data-caption]");
-      const wrapperCaption = (wrapper == null ? void 0 : wrapper.querySelectorAll("img").length) === 1 ? editorialCaption(wrapper) : "";
+      const wrapperCaption = wrapper?.querySelectorAll("img").length === 1 ? editorialCaption(wrapper) : "";
       const caption = (img.hasAttribute("data-caption") ? editorialCaption(img) : "") || wrapperCaption;
       if (figure) {
         if (img.parentElement.tagName !== "DIV") {
@@ -666,8 +676,8 @@ var CustomImportScript = (() => {
   var import_press_kit_hub_default = {
     transform: ({ document, url, params }) => {
       const article = document.querySelector("article.press_kit");
-      const hero = article == null ? void 0 : article.querySelector(":scope > .hero");
-      const content = article == null ? void 0 : article.querySelector(":scope > .content");
+      const hero = article?.querySelector(":scope > .hero");
+      const content = article?.querySelector(":scope > .content");
       if (!article || !hero || !content) throw new Error("Expected a press-kit tiles hub with hero and content");
       const facets = sourceFacets(article);
       const heroBlock = parseHero(hero, document);
