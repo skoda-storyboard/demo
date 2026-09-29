@@ -63,12 +63,51 @@ accordions.
 ## Import contract (SKODA-603)
 Contract(s) `accordion`, `quote` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Pinned shape: `Accordion`, one row per toggle `[summary, body]`, all closed by default. Quotes use the `quote` contract. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.
 
-## Branch implementation (2026-09-28, not QA accepted)
+## Implementation (2026-09-29, branch `skoda-805c-first-glimpse`, ready for QA)
 
-The SKODA-805a branch also imports first-glimpse with eight independent,
-closed-by-default Accordion rows, one inline Vimeo URL and 60 Media Box
-entries (55 image, one video and four file rows). File-only rows keep
-plain links pending SKODA-510; the gallery hides after eight tiles with
-an accessible Show more button. Live-source importer tests pass, but
-DA media conditioning, rendered QA, Lighthouse and the final chrome
-gate remain open.
+The importer, `blocks/accordion` and the Media Box disclosure landed with SKODA-805a (#189) and 805b
+(#202). First-glimpse was never pushed, though: the SKODA-506 gate blocked it. This branch unblocks
+and finishes it.
+
+- **Media gate (SKODA-506).** The rendition ladder only knew WordPress's 3:2 names, so the 18.6 MB
+  16:9 `Skoda_all-electric_family` master had "no safe rendition". The gate now reads the master's
+  real size (streamed past a 640 KB ICC profile) and tries its own-ratio copies (`-2560x1440`). The
+  same fix unblocks the two Epiq children (`Skoda_Epiq_Battery_versions`).
+- **Two-cell rows.** The source sets two-cell SiteOrigin rows side by side above 780px. They are now
+  `Columns` (photo pairs, contact cards) and `Columns (banners)` (the 240×150 PDF/share buttons),
+  and the press-kit template lays them out as the source does. Before, first-glimpse was 1683px
+  too tall at 1280. The corpus has 36 banner rows, 16 contact rows and 4 photo pairs over 51 pages.
+- **Quote block (SKODA-220).** `blocks/quote` renders the Zellmer and Stefani quotes. Pages that
+  carry `Quote` no longer 404 its script.
+- **Media Box pill** sits 34px below the last row, giving a 708px collapsed box at 1280.
+- **CLS.** The press-kit lead image now reserves its box: CLS 0.24 → 0.063 on every press-kit page.
+- **Re-import.** All 51 `press_kit-template-default` pages were re-imported and pushed to DA with
+  preview only: 35 updates, 16 unchanged. Every word, link and image is unchanged; only the new rows
+  differ.
+
+### QA evidence (measured, origin vs branch preview; no screenshots)
+- Accordion: 8 buttons in `h2`, all `aria-expanded=false` with `region` panels labelled by their
+  button. Click, Enter and Space open independently (multi-open); Tab moves to the next header.
+- Rows at 1280: photos 396×264 at x26/x442, banners 240×150 at x26/x442, contacts w396, the same as
+  the origin. They stay 2-up at 781 and stack at 780 (origin 780/781 identical). Gaps: stacked 40,
+  row 40, quote → photos 43, all equal to the origin.
+- Quote rule: x471.4 w81.2 at 1440 and x176.5 w37 at 390, as on the origin. Rule → attribution 10px.
+- Media Box: 1 video, 55 images, 4 PDFs. Collapsed 708.3px at 1280 (origin 708.25), Show more 44px
+  high and 34px below the last row.
+- Lighthouse mobile (branch preview): performance 99 / 99 on two runs, LCP 1.2–1.4 s, CLS 0.063,
+  TBT 0.
+
+### Deviations (documented; the AC allows them)
+- **Vimeo:** the source's Vimeo account is domain-locked, so the player shows "cannot be played
+  here" on the demo (SKODA-204a consent PR open). The MP4 download link is kept.
+- **Show more pill:** 133px wide vs 138px, because the demo has no Škoda Next Medium (500) face.
+- **Media Box below 992:** 24px shorter (645 vs 669 at 768), because the source's tile captions
+  switch to 20/24 there. This is downloads tile typography (SKODA-510), not changed here.
+- **H1:** 26px at every width vs the source's 28px below 768, and `#161718` vs `#0a0a0a`. This is
+  the shared press-release/press-kit header style.
+- **Font swap:** the remaining CLS 0.063 is the H1 re-wrapping when Škoda Next replaces the fallback
+  (global fallback metrics).
+- **WhatsApp icon:** the 50px decorative icon is dropped (SKODA-805b), so the WhatsApp line → banners
+  gap is 40 vs 64.
+- **Peaq Images child:** its preview still fails in html2md (200-image page, unchanged in DA; 805a
+  follow-up).
