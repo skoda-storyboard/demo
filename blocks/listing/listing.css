@@ -1,10 +1,11 @@
 /*
  * Faceted Listing block (SKODA-402). Scoped to .listing; tokens only.
  * Measured spec: docs/ui-specs/faceted-listing.md §3 (facet bar, pills, panel,
- * chips, sort, count, grid, load-more, mobile drawer).
+ * chips, sort, count, grid, load-more; facets collapsed behind "Advanced filter (n)", SKODA-402a).
  *
  * Layer order (docs/guardrails/css-guidelines.md): fluid + intrinsic first;
- * breakpoints (768/992/1080) only for the grid column-count transitions.
+ * breakpoints only for the grid column-count transitions (576 / 768 / 992; minmax(0, 1fr)
+ * keeps columns equal whatever the content) and the filter toggle's row placement (768).
  */
 
 .listing {
@@ -25,12 +26,17 @@
   border: 0;
 }
 
-/* --- facet bar: top full-width pill bar (NOT a sidebar) --- */
+/* --- facet bar: full-width pill bar (NOT a sidebar), collapsed at every width behind
+   "Advanced filter (n)", as on the source (SKODA-402a) --- */
 .listing .listing-facets {
-  display: flex;
+  display: none;
   flex-wrap: wrap;
   gap: 0.5em 1em;
-  margin-block-end: var(--grid-gutter);
+  margin-block: var(--grid-gutter);
+}
+
+.listing.facets-open .listing-facets {
+  display: flex;
 }
 
 .listing .facet {
@@ -167,12 +173,14 @@
   outline-offset: 2px;
 }
 
-/* --- sort row (right-aligned): mobile filter toggle + sort options --- */
+/* --- sort row: sort options centred with the toggle on its own row beneath; from 768
+   the toggle moves left of the right-aligned sort options (source .soa-mobile / .soa-desktop) --- */
 .listing .listing-sort {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
-  gap: 1em;
+  justify-content: center;
+  gap: 0 1em;
   margin-block: 1em 0;
 }
 
@@ -200,17 +208,45 @@
   outline-offset: 2px;
 }
 
-/* the mobile "Advanced filter (N)" toggle — hidden on desktop */
+/* "Advanced filter (n)" toggle at every width (live .sort-options-advanced: 16/24 regular
+   uppercase #333, 5px top pad; the count and the caret each sit one gap after the text, the
+   16px glyph at the caret box end). Narrow: full-width centred row, 0.3em gap. */
 .listing .listing-filter-toggle {
-  display: none;
-  padding: 0;
-  font-size: var(--body-font-size-s);
-  font-weight: var(--weight-semibold);
+  --listing-caret-box: 24px;
+  --listing-caret-glyph: 16px;
+  --listing-toggle-gap: 0.3em;
+
+  display: inline-flex;
+  flex-basis: 100%;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5px 0 0;
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-regular);
+  line-height: var(--line-height-body);
   text-transform: uppercase;
-  color: var(--text-color);
+  color: var(--facet-toggle-color);
   background: none;
   border: 0;
   cursor: pointer;
+}
+
+.listing .listing-filter-toggle::after {
+  content: '';
+  inline-size: calc(var(--listing-toggle-gap) + var(--listing-caret-glyph));
+  block-size: var(--listing-caret-box);
+  background-color: currentcolor;
+  mask: url('../../icons/chevron-up.svg') left center / var(--listing-caret-glyph) no-repeat;
+  transform: rotate(180deg); /* flips the glyph to the box end, as on the source */
+}
+
+.listing .listing-filter-count {
+  padding-inline-start: var(--listing-toggle-gap);
+}
+
+.listing .listing-filter-toggle:focus-visible {
+  outline: 2px solid var(--facet-active);
+  outline-offset: 2px;
 }
 
 /* --- result count "N / total" --- */
@@ -239,7 +275,7 @@
 /* --- result grid: fluid/intrinsic 1-up; column count via breakpoints --- */
 .listing .listing-items {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--grid-gutter);
   padding: 0;
   margin: 0;
@@ -268,6 +304,7 @@
 .listing .listing-item-body h3 {
   margin-block: 0.5em 0.25em;
   font-size: var(--body-font-size-m);
+  overflow-wrap: anywhere; /* unbroken titles (e.g. file names) wrap, never widen a column */
 }
 
 .listing .listing-item-body p {
@@ -304,42 +341,56 @@
   outline-offset: 2px;
 }
 
-/* ===== breakpoints: grid column-count transitions only (768 / 992 / 1080) ===== */
+/* ===== breakpoints: grid column-count transitions (+ the toggle's desktop placement at 768) =====
+   Default listings: 1 / 2 (768) / 3 (992). `columns 4` media listings follow the source's
+   Bootstrap ladder (SKODA-402a, measured on /en/images + /en/videos): 1 / 2 (576) /
+   3 (768) / 4 (992). */
+@media (width >= 576px) {
+  .listing.columns-4 .listing-items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (width >= 768px) {
+  /* toggle joins the sort row on the left (35px tall, 8px gaps → 24px caret box) */
+  .listing .listing-filter-toggle {
+    --listing-toggle-gap: 8px;
+
+    flex-basis: auto;
+    order: -1;
+    block-size: 35px;
+    margin-inline-end: auto;
+  }
+
   .listing .listing-items {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .listing.columns-4 .listing-items {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (width >= 992px) {
   /* default desktop column count (3); the `columns-N` class from config overrides */
   .listing .listing-items {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .listing.columns-2 .listing-items {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   /* image listings go 4-up at >=992 */
   .listing.columns-4 .listing-items {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
-/* ===== mobile drawer: hide the inline facet bar; reveal via toggle ===== */
+/* ===== narrow: the open facet panel stacks its filters full-width ===== */
 @media (width < 768px) {
-  .listing .listing-facets {
-    display: none;
-  }
-
   .listing.facets-open .listing-facets {
-    display: flex;
     flex-direction: column;
-  }
-
-  .listing .listing-filter-toggle {
-    display: inline-flex;
   }
 
   .listing .facet {

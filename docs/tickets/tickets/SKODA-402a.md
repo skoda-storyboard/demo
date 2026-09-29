@@ -31,5 +31,33 @@ correction in `docs/ui-specs/faceted-listing.md`.
       open with the panel showing "(1)".
 - [ ] News/search listings unchanged apart from the collapsed facets; lint + tests green.
 
+## Implementation notes (2026-09-29, branch `skoda-402a-listing-layout`, ready for QA)
+- **Where:** `blocks/listing/listing.{js,css}`, `styles/brand.css` (`--facet-toggle-color`). `listing-logic.mjs` is
+  unchanged.
+- **Grid:** `columns 4` listings follow 1 / 2 (576) / 3 (768) / 4 (992); default listings keep 1 / 2 (768) / 3 (992).
+  Every track is `minmax(0, 1fr)` and titles use `overflow-wrap: anywhere`, so a long unbroken title (the Images
+  rows' file names) can't widen its column.
+- **Measured against the source (live DevTools, /en/images + /en/videos):** first-card width and x match at
+  500 / 576 / 767 / 768 / 991 / 992 / 1024 / 1280 (480 / 268 / 363.5 / 236 / 310.3 / 228 / 236 / 292; x 10, 26 at
+  1280). There is no horizontal overflow.
+- **Toggle:** it is always "Advanced filter (n)", with "(0)" included as on the source.
+  - **From 768 (`.soa-desktop`):** it sits left of the sort options, 189.5×35 with 8px gaps and a 24px caret box.
+  - **Below 768 (`.soa-mobile`):** it is a full-width centred row under the centred sort options, 29px tall with
+    0.3em gaps and a 20.8px caret box.
+  - Every box matches the source at 390 / 575 / 767 / 768 / 992 / 1280.
+- **Behaviour:**
+  - The facets are hidden until the toggle opens them, and they stay open while filtering.
+  - Esc closes one layer at a time: an open option list first (focus returns to its pill), then the panel (focus
+    returns to the toggle). Closing the panel also closes any open option list.
+  - An Esc that an inner control has already handled (`defaultPrevented`) is left alone. For example, closing a
+    media card's size menu (SKODA-406, PR #217) doesn't also close the filter panel.
+  - The mobile focus trap is gone, because the panel is now an inline disclosure, not a drawer.
+- **Focus order:** in the DOM the toggle comes after the sort options, and CSS `order` moves it left from 768. Tab
+  therefore runs toggle → panel at every width.
+- **Decision (2026-09-29):** a deep link that already filters (`?filter[model][]=peaq`) opens the panel showing
+  "(1)", per this ticket's acceptance criteria. The source keeps the panel closed and only shows the count.
+- **Out of scope (SKODA-402 styling), noted for follow-up:** the source sort links are 35px tall (14px/600, inactive
+  #ccc), ours are 21px. As a result, our mobile toggle row sits 14px higher than the source.
+
 ## Dependencies
 SKODA-402 (listing), SKODA-608 (rows + published listings). Related: SKODA-406 (media card).

@@ -133,7 +133,9 @@ export default async function decorate(block) {
   const loadMoreWrap = document.createElement('div');
   loadMoreWrap.className = 'listing-loadmore';
 
-  // Mobile "Advanced filter (N)" toggle lives in the sort row.
+  // "Advanced filter (N)" toggle (SKODA-402a): as on the source, the facets are collapsed
+  // behind it at every width. It sits in the sort row, and the facet panel follows the sort
+  // row, so the button comes before the region it reveals (disclosure order).
   const filterToggle = document.createElement('button');
   filterToggle.type = 'button';
   filterToggle.className = 'listing-filter-toggle';
@@ -141,7 +143,7 @@ export default async function decorate(block) {
   filterToggle.setAttribute('aria-controls', `${uid}-facets`);
   facetBar.id = `${uid}-facets`;
 
-  block.append(facetBar, chipsRow, sortRow, countEl, status, grid, loadMoreWrap);
+  block.append(sortRow, facetBar, chipsRow, countEl, status, grid, loadMoreWrap);
 
   // Load the index (self-contained; degrades to empty/error state).
   let scoped = [];
@@ -232,6 +234,10 @@ export default async function decorate(block) {
     }
   }
 
+  function activeFilterCount() {
+    return Object.values(state.active).reduce((s, v) => s + v.length, 0);
+  }
+
   // Update the pill "active" state + count badges from current selection.
   function refreshPillStates() {
     facetBar.querySelectorAll('.facet').forEach((f) => {
@@ -241,9 +247,12 @@ export default async function decorate(block) {
       pill.classList.toggle('active', n > 0);
       pill.querySelector('.facet-count').textContent = n ? String(n) : '';
     });
+    // the source always shows the count, "(0)" included
     filterToggle.textContent = '';
-    const totalSel = Object.values(state.active).reduce((s, v) => s + v.length, 0);
-    filterToggle.append(document.createTextNode(`${STRINGS.advancedFilter}${totalSel ? ` (${totalSel})` : ''}`));
+    const count = document.createElement('span');
+    count.className = 'listing-filter-count';
+    count.textContent = `(${activeFilterCount()})`;
+    filterToggle.append(document.createTextNode(`${STRINGS.advancedFilter} `), count);
   }
 
   // Re-sync facet-panel checkboxes with the current selection. The checkboxes
@@ -264,6 +273,16 @@ export default async function decorate(block) {
     refreshFacetOptions();
     renderChips();
     renderGrid();
+  }
+
+  // Close any open option list; returns its pill (or null) so Esc can hand focus back.
+  function closeOptionPanels() {
+    const openPill = facetBar.querySelector('.facet-pill[aria-expanded="true"]');
+    facetBar.querySelectorAll('.facet-pill[aria-expanded="true"]').forEach((p) => {
+      p.setAttribute('aria-expanded', 'false');
+      p.closest('.facet').querySelector('.facet-panel').hidden = true;
+    });
+    return openPill;
   }
 
   // --- facet bar ---------------------------------------------------------
@@ -322,11 +341,7 @@ export default async function decorate(block) {
 
     pill.addEventListener('click', () => {
       const open = pill.getAttribute('aria-expanded') === 'true';
-      // close others
-      facetBar.querySelectorAll('.facet-pill[aria-expanded="true"]').forEach((p) => {
-        p.setAttribute('aria-expanded', 'false');
-        p.closest('.facet').querySelector('.facet-panel').hidden = true;
-      });
+      closeOptionPanels();
       pill.setAttribute('aria-expanded', String(!open));
       panel.hidden = open;
     });
@@ -335,8 +350,8 @@ export default async function decorate(block) {
     facetBar.append(facet);
   });
 
-  // --- sort + mobile toggle ---------------------------------------------
-  sortRow.append(filterToggle);
+  // --- sort row: sort options + "Advanced filter (n)" toggle -------------
+  // The toggle comes last so Tab runs toggle → facet panel; CSS moves it to the left from 768.
   const sortList = document.createElement('div');
   sortList.className = 'listing-sort-options';
   [['newest', STRINGS.newest], ['oldest', STRINGS.oldest]].forEach(([val, lbl]) => {
@@ -354,48 +369,34 @@ export default async function decorate(block) {
     });
     sortList.append(s);
   });
-  sortRow.append(sortList);
+  sortRow.append(sortList, filterToggle);
 
-  // Mobile drawer: toggle exposes the facet bar; Esc closes; Tab is trapped
-  // between the toggle and the facet controls while open (focus restored to the
-  // trigger on close).
-  const drawerFocusables = () => [
-    filterToggle,
-    ...facetBar.querySelectorAll('button, input'),
-  ].filter((el) => !el.disabled && el.offsetParent !== null);
-
-  const closeDrawer = () => {
-    filterToggle.setAttribute('aria-expanded', 'false');
-    block.classList.remove('facets-open');
-    filterToggle.focus();
+  // Facet disclosure (SKODA-402a): an inline panel opened by the toggle at every width. It
+  // is not a modal, so focus stays on the toggle and Tab flows on into the panel (it follows
+  // the sort row). Esc closes one layer at a time: an open option list first (focus back to
+  // its pill), then the panel (focus back to the toggle); an Esc an inner control already
+  // handled (defaultPrevented) is left alone. It stays open while the visitor filters
+  // (rerender never closes it).
+  const setFacetsOpen = (open) => {
+    if (!open) closeOptionPanels();
+    filterToggle.setAttribute('aria-expanded', String(open));
+    block.classList.toggle('facets-open', open);
   };
 
   filterToggle.addEventListener('click', () => {
-    const open = filterToggle.getAttribute('aria-expanded') === 'true';
-    if (open) { closeDrawer(); return; }
-    filterToggle.setAttribute('aria-expanded', 'true');
-    block.classList.add('facets-open');
-    facetBar.querySelector('button, input')?.focus();
+    setFacetsOpen(filterToggle.getAttribute('aria-expanded') !== 'true');
   });
   block.addEventListener('keydown', (e) => {
-    if (!block.classList.contains('facets-open')) return;
-    if (e.key === 'Escape') {
-      closeDrawer();
+    // an inner control that already handled Esc (e.g. a media card's size menu) wins
+    if (e.key !== 'Escape' || e.defaultPrevented || !block.classList.contains('facets-open')) return;
+    e.preventDefault();
+    const openPill = closeOptionPanels();
+    if (openPill) {
+      openPill.focus();
       return;
     }
-    if (e.key === 'Tab') {
-      const f = drawerFocusables();
-      if (!f.length) return;
-      const first = f[0];
-      const last = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    }
+    setFacetsOpen(false);
+    filterToggle.focus();
   });
 
   // Restore state on back/forward.
@@ -411,7 +412,10 @@ export default async function decorate(block) {
     sortList.querySelectorAll('.listing-sort-btn').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.sort === state.sort)));
   });
 
-  // Initial paint (no pushState — respect the incoming URL).
+  // Initial paint (no pushState — respect the incoming URL). A deep link that already
+  // filters opens the panel, so the active filters are visible (product decision
+  // 2026-09-29; the source keeps it closed and only shows the count).
+  setFacetsOpen(activeFilterCount() > 0);
   refreshPillStates();
   renderChips();
   renderGrid();
