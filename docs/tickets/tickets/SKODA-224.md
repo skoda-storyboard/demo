@@ -70,6 +70,16 @@ SKODA-607 phase split (2026-09-27); absorbs the block half of SKODA-612 (the imp
     for it, and "All" is the header pill.
   - The source shortens titles per width with JS (dotdotdot). Imported titles carry their fixed "…",
     so at narrow widths they may wrap to 2 lines where the source shows 1.
+- **"All" pill (added on request, press-release template):** the band's "All" link now renders as the
+  source ghost pill. It is white with a 2px `#464748` border and text, 36px tall with 8/32 padding,
+  16/600 text with 1px tracking, and fills `#f1f1f1` on hover. It sits on the heading row, right-aligned
+  and vertically centred on the heading and subheading.
+  - Pill positions, measured from the heading top: x 1163.6 / y 14.3 at 1280, x 667.6 / y 14.3 at 768,
+    x 289.6 / y 30.3 at 390. These are the same as the source.
+  - The first card now starts 84.5px below the heading at ≥768 and 116.5px below 768, as on the source.
+  - **Why it was broken:** `decorateButtons` only buttonizes bold or italic links, and it outputs
+    `button-wrapper` while the template expected `button-container`. The template now marks the plain
+    "All" link itself (`decorateRelatedLinks`).
 - **Blocked:** card click and drag do nothing, because `carousel.js` captures the pointer on
   `pointerdown`. The Epiq story band, which this ticket doesn't change, behaves the same. This is
   SKODA-212a, and this ticket doesn't touch carousel code.

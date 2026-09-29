@@ -66,6 +66,24 @@ function decorateSidebar(section) {
 }
 
 /**
+ * Related bands: the "All" link authored after the heading + "Based on tags" line is a
+ * plain link (the importer emits `<p><a>All</a></p>`), which decorateButtons skips because
+ * it only buttonizes bold/italic links. Mark it as the band's button so the header grid
+ * puts the ghost pill beside the heading, as the source .search-results-header does.
+ * @param {Element} main The main element
+ */
+function decorateRelatedLinks(main) {
+  main.querySelectorAll(':scope > .section.related .default-content-wrapper > p').forEach((p) => {
+    const link = p.querySelector(':scope > a[href]');
+    const onlyLink = link && p.children.length === 1
+      && p.textContent.trim() === link.textContent.trim();
+    if (!onlyLink) return;
+    p.classList.add('button-container');
+    link.classList.add('button');
+  });
+}
+
+/**
  * Lays out a press release (SKODA-607): header, body column + sidebar, Media Box and
  * related bands. Sections come from the import contract `press-release-sections`.
  * @param {Element} main The main element
@@ -75,6 +93,7 @@ export default function decorate(main) {
   decorateHeader(sections.find((s) => s.querySelector('h1')) || sections[0]);
   decorateBody(main.querySelector(':scope > .section.body-column'));
   decorateSidebar(main.querySelector(':scope > .section.sidebar'));
+  decorateRelatedLinks(main);
   const mediaBox = main.querySelector(':scope > .section.media-box');
   if (mediaBox && !document.getElementById('media-box')) mediaBox.id = 'media-box';
 }

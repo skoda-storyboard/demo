@@ -156,12 +156,13 @@ body.press-release .section.media-box .default-content-wrapper {
   margin-bottom: var(--spacing-xl);
 }
 
-/* Related header: heading + "Based on tags" left, the "All" ghost pill right. */
+/* Related header: heading + "Based on tags" left, the "All" ghost pill right, centred on
+   the two lines (source .search-results-header: flex, align-items center, the pill pushed
+   to the right edge with no gap, so the heading column is the rest of the row). */
 body.press-release .section.related .default-content-wrapper {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  column-gap: var(--spacing-m);
   margin-bottom: var(--paragraph-gap);
 }
 
@@ -172,18 +173,32 @@ body.press-release .section.related .default-content-wrapper > :not(.button-cont
 body.press-release .section.related .default-content-wrapper > .button-container {
   grid-column: 2;
   grid-row: 1 / span 2;
+  margin: 0;
 }
 
+/* source .btn-ghost-compact: 36px pill (8px + 16/16 text + 8px, 2px border), 32px sides,
+   1px tracking; hover fills #f1f1f1 */
 body.press-release .section.related .button-container a.button {
+  display: flex;
+  align-items: center;
   margin: 0;
-  padding: var(--spacing-xs) var(--spacing-xl);
+  padding: var(--spacing-xs) calc(2 * var(--spacing-m));
   border: 2px solid var(--pr-ghost-color);
   border-radius: var(--pill-radius);
   background: var(--background-color);
   color: var(--pr-ghost-color);
   font-size: var(--body-font-size-m);
   font-weight: var(--weight-semibold);
+  letter-spacing: 1px;
   line-height: 1;
+  text-decoration: none;
+}
+
+body.press-release .section.related .button-container a.button:hover,
+body.press-release .section.related .button-container a.button:focus-visible {
+  background: var(--skoda-grey-50);
+  color: var(--pr-ghost-color);
+  text-decoration: none;
 }
 
 /* A sidebar heading closing its default content is the label of the block after it
