@@ -213,6 +213,13 @@
   --bp-tablet: 768px;
   --bp-desktop-s: 992px;
   --bp-desktop: 1080px;
+
+  /* stacking order for page-level fixed UI (SKODA-215), lowest → highest:
+     in-page layers (carousel/cards ≤ 2, downloads size menu 15) < floating action bar 18
+     < header + open mobile nav drawer and its backdrop (header .nav-wrapper, 20)
+     < gallery lightbox (99999) < consent banner (OneTrust ships its own ~2147483645, SKODA-704).
+     The bar stays under the drawer, lightbox and consent banner so they always cover it. */
+  --z-float-dock: 18;
 }
 
 /* The global element defaults below (body, headings, paragraphs, lists, strong/em, hr, line

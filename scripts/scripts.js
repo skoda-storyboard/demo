@@ -10,6 +10,8 @@ import {
   loadSections,
   loadCSS,
   buildBlock,
+  decorateBlock,
+  loadBlock,
   toClassName,
   getMetadata,
 } from './aem.js';
@@ -369,8 +371,24 @@ async function loadLazy(doc) {
  * Loads everything that happens a lot later,
  * without impacting the user experience.
  */
+async function loadFloatDock() {
+  // code-only chrome on every template (contract `floating-action-bar`), never on the
+  // nav/footer fragments (/nav, /footer, /media-room/nav, …) opened as pages
+  if (/\/(nav|footer)$/.test(window.location.pathname)) return;
+  // CSS first: it keeps the bar display:none until decorated, so it appears in one frame
+  // instead of growing from an empty fixed box (a layout shift)
+  await loadCSS(`${window.hlx.codeBasePath}/blocks/float-dock/float-dock.css`);
+  const block = buildBlock('float-dock', '');
+  const wrapper = document.createElement('div');
+  wrapper.append(block);
+  document.body.append(wrapper);
+  decorateBlock(block);
+  loadBlock(block);
+}
+
 function loadDelayed() {
   import('./consent-check.js');
+  loadFloatDock(); // SKODA-215 floating action bar
   // load anything that can be postponed to the latest here
 }
 

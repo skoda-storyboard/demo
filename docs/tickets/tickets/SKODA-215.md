@@ -55,6 +55,25 @@ Plan B (§14 accepted): **Must**, since it delivers C-6 social share.
 - [ ] No layout shift (fixed position, reserved size), and nothing runs on the main thread before LCP (loads in the delayed phase).
 - [ ] Preview link: `https://skoda-215-float-dock--demo--skoda-storyboard.aem.page/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds`
 
+## Implementation notes (2026-09-29, branch `skoda-215-float-dock`, ready for QA)
+- **Where:** `blocks/float-dock/` (code-only block, built by `loadFloatDock()` in `scripts/scripts.js` in the delayed
+  phase, skipped on `/nav` + `/footer` paths); intent URLs in `scripts/share.js` (+ `share.test.mjs`) for 216 to reuse.
+- **Measured corrections (source re-measured at 390 / 767–769 / 991–992 / 1440):** the button size flips at **992**
+  (40px below, 58px from 992), not 768; the share list direction flips at **768** (stacked upward below, leftward
+  from 768). Pitches: share→scroll-top = button + 4px; leftward list 9px off the trigger then 3.2px gaps (61px pitch
+  at 58px); stacked list 10px off the trigger then 4px gaps (44px pitch). EDS positions match the source to the pixel
+  at all six widths.
+- **Decisions:** WhatsApp shows in the stacked (<768) layout only, per this ticket (source hides it by UA); it uses an
+  ink glyph (`icons/whatsapp-ink.svg`), since white on `#43d854` fails contrast. `navigator.share` is used wherever
+  the browser supports it (product decision 2026-09-29); if it's blocked, the trigger falls back to the intent list for
+  the rest of the page view. Facebook uses `sharer.php`.
+- **Layout shift:** the scroll-top keeps its slot, and the share cluster slides over it with a transform. The block's
+  CSS loads before insertion, and the bar stays `display:none` until decorated. Dock CLS is 0.
+- **Stacking:** `--z-float-dock: 18` (order documented in `styles/styles.css`): above in-page layers, below the header
+  and mobile drawer (20), the gallery lightbox and the consent banner.
+- **Cart slot:** `.float-dock [data-slot="media-cart"]`, empty (`display:none`) until SKODA-505a/b appends its
+  button. It sits between share and scroll-top, as on the source.
+
 ## Dependencies
 docs/ui-specs/social-share.md, SKODA-505a/b (cart slot), SKODA-704 (stacking against the consent banner), SKODA-216
 (gallery share, separate; reuses the `/scripts/` helper).

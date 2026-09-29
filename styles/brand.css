@@ -41,6 +41,11 @@
   --social-facebook: #3b5998;
   --social-youtube: #f00;
   --social-whatsapp: #43d854;
+
+  /* page-level share buttons (SKODA-215 floating action bar; social-share.md §3) */
+  --social-x: var(--skoda-black);
+  --social-pinterest: #cb2027;
+  --social-linkedin: #0a66c2;
   --social-instagram-gradient: radial-gradient(circle at 30% 107%,
     #fdf497 0, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%);
 
