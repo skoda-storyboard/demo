@@ -146,10 +146,13 @@
 
 /* "All" end card of a full band (source .item-all): a card-sized 16:9 cell with a 1px white
    outline and square corners, "All" 16/600 centred and a chevron 16px after it that nudges
-   8px right on hover (source keyframes: 0.6s ease-in-out, infinite) */
+   8px right on hover (source keyframes: 0.6s ease-in-out, infinite). Margin 0: the global
+   `li` bottom margin would make this the row's tallest item, and the stretched cards would
+   show their white base under the images. */
 .story-rail.press .carousel-track .story-rail-all {
   flex: 0 0 var(--carousel-cell-width);
   aspect-ratio: 16 / 9;
+  margin: 0;
   scroll-snap-align: start;
 }
 
