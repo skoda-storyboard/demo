@@ -6,10 +6,20 @@ function sourceLinks(main) {
   });
 }
 
+// The date + title section (not a hub hero) gets a class, so the header layout doesn't depend
+// on section order.
+function header(main) {
+  const h1 = main.querySelector(':scope > .section > .default-content-wrapper > h1');
+  h1?.closest('.section').classList.add('press-kit-header');
+}
+
 function chapters(main) {
   const section = main.querySelector('.section.press-kit-chapters');
   const list = section?.querySelector('.default-content-wrapper > ul');
   if (!list) return;
+  // The source's Chapters bar is the page's top bar, above the date and title (SKODA-805c
+  // review: at 1280 it sits at y108 and the date at 184). DA keeps it after the title.
+  main.prepend(section);
   list.querySelector('a[href="#chapters-links"]')?.closest('li')?.remove();
   const { origin, pathname } = document.location;
   const here = pathname.replace(/\/$/, '');
@@ -61,6 +71,7 @@ function mediaBox(main) {
 export default function decorate(main) {
   sourceLinks(main);
   if (main.querySelector('.cards.tiles')) return;
+  header(main);
   chapters(main);
   mediaBox(main);
 }

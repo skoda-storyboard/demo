@@ -34,6 +34,18 @@ test('the Introduction alone gets a keyboard-accessible Chapters menu', () => {
   assert.equal(nav.querySelector('ul').hidden, true);
 });
 
+test('the Chapters bar moves above the date and title, which become the header', () => {
+  const main = setup(`<div class="section"><div class="default-content-wrapper"><p>21. 9. 2026</p><h1>Exterior</h1></div></div>
+    <div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
+      <li><a href="#chapters-links">Chapters</a></li><li><a href="/en/press-kits/kit">Kit</a></li>
+    </ul></div></div><div class="section body-column"><div class="default-content-wrapper"><p>Body</p></div></div>`);
+  decorate(main);
+  const sections = [...main.children];
+  assert.ok(sections[0].matches('.press-kit-chapters'));
+  assert.ok(sections[1].matches('.press-kit-header') && sections[1].querySelector('h1'));
+  assert.ok(sections[2].matches('.body-column') && !sections[2].matches('.press-kit-header'));
+});
+
 test('the Chapters menu marks the current chapter, not the hub or other chapters', () => {
   const main = setup(`<div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
       <li><a href="#chapters-links">Chapters</a></li>

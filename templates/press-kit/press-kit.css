@@ -5,8 +5,9 @@ body.press-kit {
   --pk-chapters-layer: 5;
   --pk-media-gap: var(--spacing-xl);
   --pk-sidebar-inset: var(--spacing-xxl);
-  --pk-article-top: var(--spacing-xl);
+  --pk-article-top: 32px;
   --pk-date-size: 11px;
+  --pk-title-size-compact: 28px;
   --pk-columns-gap: var(--grid-gutter);
   --pk-columns-stack-gap: var(--spacing-xl);
 }
@@ -62,19 +63,41 @@ body.press-kit .section.press-kit-banners img {
   height: auto;
 }
 
-body.press-kit main > .section:first-child:not(:has(.hero-image)) {
+/* Article header (date + title; press-kit.js classes it), measured as press-release.css: the
+   date 32px below the bar above it, 11/11 600 grey, 16px above the title; the title ink,
+   28/35 up to 768 and 26/32.5 above. Its 1em bottom margin less the columns' -10px leaves
+   18px / 16px above the lead image (SKODA-805c review). */
+body.press-kit main > .section.press-kit-header {
+  margin-block-end: 0;
   padding-block-start: var(--pk-article-top);
 }
 
-body.press-kit main > .section:first-child:not(:has(.hero-image)) h1 {
-  margin: 0;
-  font-size: var(--heading-font-size-l);
+body.press-kit .press-kit-header p {
+  margin: 0 0 var(--spacing-m);
+  color: var(--pr-date-color);
+  font-size: var(--pk-date-size);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+}
+
+body.press-kit .press-kit-header h1 {
+  margin: 0 0 calc(1em - var(--page-gutter));
+  color: var(--pr-title-color);
+  font-size: var(--pk-title-size-compact);
   font-weight: var(--weight-semibold);
   line-height: 1.25;
 }
 
+@media (width > 768px) {
+  body.press-kit .press-kit-header h1 {
+    font-size: var(--heading-font-size-l);
+  }
+}
+
+/* the Chapters bar is the top bar, right on the header (press-kit.js moves it there) */
 body.press-kit .section.press-kit-chapters {
   position: sticky;
+  margin-block-end: 0;
   top: 0;
   z-index: var(--pk-chapters-layer);
   background: var(--background-color);
@@ -126,20 +149,22 @@ body.press-kit .section.body-column .default-content-wrapper img {
   height: auto;
 }
 
-/* The lead image (the layout puts it first) fills the column, so its width/height attributes
-   reserve its box before it loads: under global `width: auto` it was 0×0 until then, a 0.18
-   layout shift on every press-kit page (SKODA-805c; press-release.css does the same). */
+/* The lead image (the layout puts it first) is the source's 16:9 crop of the column (812×457
+   at 1280). A definite width also reserves its box before it loads: under global `width: auto`
+   it was 0×0 until then, a 0.18 layout shift on every press-kit page (SKODA-805c). */
 body.press-kit .section.body-column .default-content-wrapper:first-child > p:first-child img {
   width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
 }
 
 body.press-kit .section.body-column .default-content-wrapper > p {
   margin-block: 0 var(--paragraph-gap);
 }
 
-body.press-kit main > .section:first-child:not(:has(.hero-image)) p {
-  font-size: var(--pk-date-size);
-  font-weight: var(--weight-semibold);
+/* the source's lead margin plus the entry's 10px inset: 30px to the first paragraph */
+body.press-kit .section.body-column .default-content-wrapper:first-child > p:first-child {
+  margin-block-end: calc(var(--paragraph-gap) + var(--page-gutter));
 }
 
 body.press-kit .section.media-box {
