@@ -151,7 +151,7 @@ var CustomImportScript = (() => {
   }
   function contents(panel, document) {
     const nested = panel.querySelector(":scope > .panel-widget-style .panel-layout, :scope > .panel-layout, .panel-layout");
-    if (nested) return flatten(nested, document);
+    if (nested) return flatten(nested, document, { nested: true });
     const widgets = panel.querySelectorAll(".textwidget");
     if (widgets.length) {
       return [...widgets].flatMap((widget) => {
@@ -168,7 +168,21 @@ var CustomImportScript = (() => {
     if (!text(panel) && !panel.querySelector("img, a[href]")) return [];
     throw new Error(`Unsupported press-kit content widget: ${panel.className}`);
   }
-  function flatten(layout, document) {
+  var BANNER_MAX_WIDTH = 400;
+  function bannerCell(nodes) {
+    var _a, _b, _c;
+    if (nodes.length !== 1 || text(nodes[0])) return false;
+    const imgs = ((_b = (_a = nodes[0]).querySelectorAll) == null ? void 0 : _b.call(_a, "img")) || [];
+    const width = Number((_c = imgs[0]) == null ? void 0 : _c.getAttribute("width"));
+    return imgs.length === 1 && !!imgs[0].closest("a[href]") && width > 0 && width <= BANNER_MAX_WIDTH;
+  }
+  var hasContent = (cell) => text(cell) || cell.querySelector("img, iframe, a[href]");
+  function columnsRow(cells, document) {
+    const row = cells.map((cell) => [...cell.children].filter((node) => node.matches(".so-panel")).flatMap((panel) => contents(panel, document)));
+    const name = row.every(bannerCell) ? "Columns (banners)" : "Columns";
+    return WebImporter.DOMUtils.createTable([[name], row], document);
+  }
+  function flatten(layout, document, { nested = false } = {}) {
     const output = [];
     let rows = [];
     const flush = () => {
@@ -178,6 +192,12 @@ var CustomImportScript = (() => {
     [...layout.children].forEach((grid) => {
       if (!grid.matches(".panel-grid")) {
         if (text(grid) || grid.querySelector("img, a[href]")) throw new Error("Unexpected press-kit article grid");
+        return;
+      }
+      const filled = [...grid.children].filter((cell) => cell.matches(".panel-grid-cell") && hasContent(cell));
+      if (!nested && filled.length > 1 && !grid.querySelector(".widget_ys-row-toggle, .widget_siteorigin-panels-builder")) {
+        flush();
+        output.push(columnsRow(filled, document));
         return;
       }
       [...grid.children].forEach((cell) => {
@@ -796,7 +816,7 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/transformers/skoda-images.js
-  function hasContent(node) {
+  function hasContent2(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
   function withCaption(node, caption, document) {
@@ -836,7 +856,7 @@ var CustomImportScript = (() => {
     before.append(beforeRange.extractContents());
     const imageNode = imageContainer(img, document, linkedImage ? link : null);
     const image = withCaption(imageNode, caption, document);
-    paragraph.replaceWith(...[before, image, after].filter(hasContent));
+    paragraph.replaceWith(...[before, image, after].filter(hasContent2));
   }
   function normalizeImages(root, document = root.ownerDocument) {
     root.querySelectorAll("img").forEach((img) => {

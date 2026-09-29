@@ -19,6 +19,16 @@
   display: block;
 }
 
+/* `banners` variant (SKODA-805c): cells of linked banner images (the press-kit PDF/share
+   buttons) keep their authored 240×150 instead of filling the cell. */
+.columns.banners {
+  --columns-banner-width: 240px;
+}
+
+.columns.banners > div > div img {
+  width: min(100%, var(--columns-banner-width));
+}
+
 @media (width >= 992px) {
   .columns > div {
     align-items: center;

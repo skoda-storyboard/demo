@@ -15,6 +15,10 @@
   --dl-title-size: 15px;
   --dl-toolbar-row: 50px;
   --dl-toggle-height: 44px;
+
+  /* the source's Show more pill sits 34px below the last row (a 708px collapsed box at
+     1280, SKODA-805c) */
+  --dl-toggle-gap: 34px;
 }
 
 /* --- grid: default image ladder 1 -> 2 (768) -> 4 (992) ------------------ */
@@ -195,7 +199,7 @@
 .downloads .downloads-more {
   display: block;
   min-height: var(--dl-toggle-height);
-  margin: var(--spacing-m) auto 0;
+  margin: var(--dl-toggle-gap) auto 0;
   border: 2px solid var(--skoda-ink);
   border-radius: var(--pill-radius);
   padding: var(--spacing-xs) var(--spacing-l);

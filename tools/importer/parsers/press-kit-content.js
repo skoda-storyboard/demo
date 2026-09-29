@@ -72,7 +72,7 @@ function contents(panel, document) {
   const nested = panel.querySelector(':scope > .panel-widget-style .panel-layout, :scope > .panel-layout, .panel-layout');
   // The SiteOrigin grid and answer panels recursively contain one another.
   // eslint-disable-next-line no-use-before-define
-  if (nested) return flatten(nested, document);
+  if (nested) return flatten(nested, document, { nested: true });
   const widgets = panel.querySelectorAll('.textwidget');
   if (widgets.length) {
     return [...widgets].flatMap((widget) => {
@@ -91,7 +91,32 @@ function contents(panel, document) {
   throw new Error(`Unsupported press-kit content widget: ${panel.className}`);
 }
 
-function flatten(layout, document) {
+// The widest authored image that still counts as a banner (the PDF/share banners are 240).
+const BANNER_MAX_WIDTH = 400;
+
+// A cell that is only a linked, narrow image: the PDF download and share banners.
+function bannerCell(nodes) {
+  if (nodes.length !== 1 || text(nodes[0])) return false;
+  const imgs = nodes[0].querySelectorAll?.('img') || [];
+  const width = Number(imgs[0]?.getAttribute('width'));
+  return imgs.length === 1 && !!imgs[0].closest('a[href]')
+    && width > 0 && width <= BANNER_MAX_WIDTH;
+}
+
+const hasContent = (cell) => text(cell) || cell.querySelector('img, iframe, a[href]');
+
+// A top-level row with 2+ filled cells sits side by side on the source (photo pairs,
+// contact cards, the PDF/share banners): one `Columns` row, one cell per source cell, as
+// story-flatten does. Banner rows keep their authored 240px width (`Columns (banners)`).
+function columnsRow(cells, document) {
+  const row = cells.map((cell) => [...cell.children]
+    .filter((node) => node.matches('.so-panel'))
+    .flatMap((panel) => contents(panel, document)));
+  const name = row.every(bannerCell) ? 'Columns (banners)' : 'Columns';
+  return WebImporter.DOMUtils.createTable([[name], row], document);
+}
+
+function flatten(layout, document, { nested = false } = {}) {
   const output = [];
   let rows = [];
   const flush = () => {
@@ -102,6 +127,14 @@ function flatten(layout, document) {
   [...layout.children].forEach((grid) => {
     if (!grid.matches('.panel-grid')) {
       if (text(grid) || grid.querySelector('img, a[href]')) throw new Error('Unexpected press-kit article grid');
+      return;
+    }
+    const filled = [...grid.children].filter((cell) => cell.matches('.panel-grid-cell') && hasContent(cell));
+    // Accordion answers are linear: DA blocks can't nest (accordion contract).
+    if (!nested && filled.length > 1
+      && !grid.querySelector('.widget_ys-row-toggle, .widget_siteorigin-panels-builder')) {
+      flush();
+      output.push(columnsRow(filled, document));
       return;
     }
     [...grid.children].forEach((cell) => {

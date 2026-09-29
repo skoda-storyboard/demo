@@ -237,6 +237,45 @@ test('first glimpse preserves six inline downloads, two linked banners and both 
   ]);
 });
 
+// Two-cell SiteOrigin rows as on the live source (2026-09-29): 36 of the 51 pages have the
+// 240px PDF/share banner row, 16 the contact-card row, 4 a full-size photo pair.
+const grid2 = (a, b) => `<div class="panel-grid"><div class="panel-grid-cell">${a}</div><div class="panel-grid-cell">${b}</div></div>`;
+const linkedImg = (href, src, width, alt = 'Škoda Peaq') => `<p><a href="${href}">
+  <img src="${src}" alt="${alt}" width="${width}" height="${Math.round(width / 1.5)}"></a></p>`;
+
+test('two-cell source rows become Columns; the 240px PDF/share banners Columns (banners)', { skip: !JSDOM }, () => {
+  const photos = grid2(
+    widget(linkedImg('https://cdn.skoda-storyboard.com/2026/03/02_Peaq.jpg', 'https://cdn.skoda-storyboard.com/2026/03/02_Peaq.jpg', 5000)),
+    widget(linkedImg('https://cdn.skoda-storyboard.com/2026/03/41_Peaq.jpg', 'https://cdn.skoda-storyboard.com/2026/03/41_Peaq.jpg', 5000)),
+  );
+  const banners = grid2(
+    widget(linkedImg('/direct-download/2026/03/Press_Kit.pdf', 'https://cdn.skoda-storyboard.com/2019/02/download-en.png', 240, 'download-de')),
+    widget(linkedImg('mailto:?body=https://www.skoda-storyboard.com/r/peaq', 'https://cdn.skoda-storyboard.com/2019/02/share-en.png', 240, 'share-de')),
+  );
+  const contacts = grid2(
+    widget('<p><strong>Vítězslav Kodym</strong><br>Head of Product Communications</p>'),
+    widget('<p><strong>Zbyněk Straškraba</strong><br>Spokesperson Product Communications</p>'),
+  );
+  // A two-cell row inside an accordion answer stays linear: DA blocks can't nest.
+  const nested = grid(`<div class="so-panel widget_ys-row-toggle"><h2 class="row-title">Nested row</h2></div>
+    <div class="so-panel widget_siteorigin-panels-builder"><div class="panel-layout">${grid2(widget('<p>Left cell</p>'), widget('<p>Right cell</p>'))}</div></div>`);
+  const extra = photos + nested + banners + contacts;
+  const page = run(fixture({ togglesCount: 1, extra }), target);
+  const columns = [...page.querySelectorAll('table')]
+    .filter((t) => /^Columns/.test(txt(t.querySelector('tr > td'))));
+  assert.deepEqual(columns.map((t) => txt(t.querySelector('tr > td'))), ['Columns', 'Columns (banners)', 'Columns']);
+  columns.forEach((t) => assert.equal(t.querySelectorAll('tr')[1].children.length, 2, 'one cell per source cell'));
+  const [photoRow, bannerRow, contactRow] = columns.map((t) => [...t.querySelectorAll('tr')[1].children]);
+  assert.deepEqual(photoRow.map((cell) => cell.querySelector('a').getAttribute('href').split('/').pop()), [
+    '02_Peaq.jpg', '41_Peaq.jpg',
+  ]);
+  assert.deepEqual(bannerRow.map((cell) => cell.querySelector('a').title), ['Download PDF', 'Share by email']);
+  assert.deepEqual(contactRow.map((cell) => txt(cell.querySelector('strong'))), ['Vítězslav Kodym', 'Zbyněk Straškraba']);
+  const answer = rows(page, 'Accordion').find((row) => txt(row.children[0]) === 'Nested row').children[1];
+  assert.equal(answer.querySelectorAll('table').length, 0);
+  assert.match(txt(answer), /Left cell.*Right cell/);
+});
+
 // Resource children (Texts, FAQ, Infographics, Technical data, Images, Videos; SKODA-805b) have
 // the default template and a body, but no Media Box. Shapes follow the live source (2026-09-28).
 function resourcePage(bodyGrids) {

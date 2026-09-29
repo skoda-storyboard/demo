@@ -7,10 +7,42 @@ body.press-kit {
   --pk-sidebar-inset: var(--spacing-xxl);
   --pk-article-top: var(--spacing-xl);
   --pk-date-size: 11px;
+  --pk-columns-gap: var(--grid-gutter);
+  --pk-columns-stack-gap: var(--spacing-xl);
 }
 
 body.press-kit main > .section {
   margin-block: 0 var(--spacing-xl);
+}
+
+/* Two-cell source rows (SKODA-805c): photo pairs, contact cards and the PDF/share banners.
+   The source stacks them 40px apart, and from its 781px SiteOrigin stack width (as in
+   blocks/cards) sets them side by side in equal cells 20px apart (1280: 396 | 396; the
+   banners are `Columns (banners)`). Source rows are 40px apart, so the
+   block takes that margin (collapsing with a paragraph's) and its cells drop their last one. */
+body.press-kit .section.body-column .columns {
+  margin-block: var(--pk-columns-stack-gap);
+}
+
+body.press-kit .section.body-column .columns > div {
+  gap: var(--pk-columns-stack-gap);
+}
+
+body.press-kit .section.body-column .columns > div > div > :last-child {
+  margin-block-end: 0;
+}
+
+@media (width >= 781px) {
+  body.press-kit .section.body-column .columns > div {
+    flex-direction: row;
+    align-items: start;
+    gap: var(--pk-columns-gap);
+  }
+
+  body.press-kit .section.body-column .columns > div > div {
+    flex: 1 1 0;
+    min-width: 0;
+  }
 }
 
 body.press-kit main > .section:first-child:has(.hero-image.overlay) > div {
