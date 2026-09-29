@@ -292,6 +292,7 @@
   --media-card-title-size: 15px;
   --media-card-title-line: 18px;
   --media-card-button: 40px;
+  --media-card-ring: 2px;
   --media-card-button-gap: 8px;
   --media-card-icon: 16px;
   --media-card-play: 32px;
@@ -317,15 +318,15 @@
   border-radius: 0;
 }
 
-/* video: the centred play glyph (same shape as the model-page video rails) */
+/* video: the source's centred 32px play glyph (a ringed, outlined triangle, white) */
 .listing.listing-media .media-card-play {
   position: absolute;
   top: 50%;
   left: 50%;
   width: var(--media-card-play);
   height: var(--media-card-play);
-  background: var(--skoda-white);
-  clip-path: polygon(25% 15%, 85% 50%, 25% 85%);
+  background-color: var(--skoda-white);
+  mask: url("../../icons/media-play.svg") center / contain no-repeat;
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
@@ -345,14 +346,18 @@
 }
 
 .listing.listing-media .media-asset-title {
-  display: -webkit-box;
-  min-height: calc(var(--media-card-title-line) * 2);
   padding-block-end: var(--media-card-pad);
   margin: 0;
-  overflow: hidden;
   font-size: var(--media-card-title-size);
   font-weight: var(--weight-regular);
   line-height: var(--media-card-title-line);
+}
+
+/* the clamp sits on the text, inside the heading's padding (no third line peeking through) */
+.listing.listing-media .media-asset-title span {
+  display: -webkit-box;
+  min-height: calc(var(--media-card-title-line) * 2);
+  overflow: hidden;
   overflow-wrap: anywhere; /* filenames have no spaces */
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -383,7 +388,7 @@
   padding: 0;
   color: var(--skoda-ink);
   background-color: var(--skoda-white);
-  border: 2px solid var(--skoda-ink);
+  border: var(--media-card-ring) solid var(--skoda-ink);
   border-radius: 50%;
   cursor: pointer;
 }
@@ -404,11 +409,13 @@
   --media-card-button-icon: url("../../icons/media-download.svg");
 }
 
-/* size menu: centred under its button, rows of 16/16 medium text with 12px padding */
+/* size menu, 7px below its button with rows of 16/16 medium text and 12px padding: it starts
+   at the button's inner edge (the source's left: 0 inside the 2px ring), so a first-column card
+   keeps it on screen; from 1080 it is centred under the button (below) */
 .listing.listing-media .media-card-menu {
   position: absolute;
   inset-block-start: calc(100% + var(--media-card-menu-gap));
-  inset-inline-start: 50%;
+  inset-inline-start: var(--media-card-ring);
   z-index: 2;
   min-width: max-content;
   padding: 0;
@@ -416,7 +423,6 @@
   list-style: none;
   background: var(--skoda-white);
   box-shadow: var(--dropdown-shadow);
-  transform: translateX(-50%);
 }
 
 .listing.listing-media .media-card-menu[hidden] {
@@ -489,6 +495,15 @@
   /* image listings go 4-up at >=992 */
   .listing.columns-4 .listing-items {
     grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* media card size menu: centred under its button from 1080 (source; below, it would run off
+   the left edge of a first-column card on narrow screens) */
+@media (width >= 1080px) {
+  .listing.listing-media .media-card-menu {
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
   }
 }
 

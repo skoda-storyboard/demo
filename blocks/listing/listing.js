@@ -146,9 +146,13 @@ export function mediaCell(row, eager) {
     time.textContent = dateText;
     body.append(time);
   }
+  // the inner span carries the 2-line clamp, so the heading's bottom padding stays clear of a
+  // third line (the source clamps the title link inside its padded h3 the same way)
   const h = document.createElement('h3');
   h.className = 'media-asset-title';
-  h.textContent = title;
+  const text = document.createElement('span');
+  text.textContent = title;
+  h.append(text);
   body.append(h);
   li.append(body);
 
