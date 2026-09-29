@@ -361,6 +361,16 @@ the scope. With `--dam-base`, `--dry-run` HEAD-checks pending image originals an
 HEAD/range-probes pending PDF/MP4 originals (requesting one byte, then
 canceling the response body), reporting inaccessible sources without uploading.
 
+On 2026-09-29, a scoped batch of 1,979 first-party image originals from the
+import manifest was run against AEM Assets. The manifest records 1,947
+successful DAM uploads; authenticated author HEAD responses matched the source
+originals' byte counts and returned image MIME types. The other 32 originals return HTTP 403 to
+both source HEAD and ranged GET, so no derivative was substituted. Another
+65 external video-platform thumbnails were excluded from this batch pending
+rights review. This uploads originals to DAM only: it does not activate
+images on publish, rewrite DA content, or resolve separate oversized inline
+delivery warnings.
+
 ## Automatic wiring (PostToolUse hook)
 
 `.claude/settings.json` registers a **PostToolUse(Bash) hook**
