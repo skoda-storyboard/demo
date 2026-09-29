@@ -89,9 +89,12 @@ body.press-release .section.related.story-rail-container .story-rail {
 
 /* Press-release rails use the source's wider news cells; category and model
    rails retain the standard carousel ladder. Bleed only this rail through the
-   generic section padding to the source's full-width (capped) home container. */
+   generic section padding to the source's full-width (capped) home container.
+   The bleed is exactly that padding, the SKODA-826 page gutter (10px at every
+   width): a wider fixed gutter pushed the rail past the viewport (14px of
+   horizontal page overflow at 375/768, 30px at 992/1080). */
 .story-rail.story-rail-news {
-  --news-rail-gutter: var(--spacing-l);
+  --news-rail-gutter: var(--page-gutter);
   --news-cell-width: calc(90cqw - var(--carousel-gap));
 
   position: relative;
@@ -129,7 +132,6 @@ body.press-release .section.related.story-rail-container .story-rail {
 
 @media (width >= 992px) {
   .story-rail.story-rail-news {
-    --news-rail-gutter: var(--spacing-xl);
     --news-cell-width: calc(30cqw - var(--carousel-gap));
   }
 }
