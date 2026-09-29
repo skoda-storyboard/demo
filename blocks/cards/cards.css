@@ -37,6 +37,10 @@
   aspect-ratio: 16 / 9;
 }
 
+.cards.key-facts .card-teaser-image img {
+  aspect-ratio: 1;
+}
+
 .cards.tiles .card-teaser-image picture,
 .cards.tiles .card-teaser-image img {
   position: absolute;
@@ -337,10 +341,6 @@
   margin-bottom: var(--key-facts-title-gap);
   border-radius: 50%;
   background-color: var(--divider-color);
-}
-
-.cards.key-facts .card-teaser-image img {
-  aspect-ratio: 1;
 }
 
 .cards.key-facts .card-teaser-summary {

@@ -577,7 +577,7 @@ body.skoda-model .carousel.center .card-teaser-title {
   }
 }
 
-@media (width >= 1440px) {
+@media (width >= calc(1080px + 360px)) {
   body.skoda-model .hero-image.overlay .hero-image-media picture,
   body.skoda-model .hero-image.overlay .hero-image-media img {
     aspect-ratio: 3 / 1;
