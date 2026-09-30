@@ -105316,12 +105316,16 @@
       "page_refs": [
         "en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Infographics-Peaq_EN_cadc8744.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Infographics-Peaq_EN_cadc8744.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Infographics-Peaq_EN_cadc8744.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Infographics-Peaq_EN_cadc8744.pdf",
+        "mime": "application/pdf",
+        "bytes": 511139
+      },
       "da_path": "",
       "title": "",
       "alt": "",
@@ -105329,15 +105333,19 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/08/Infographics-Peaq_EN_cadc8744.pdf"
       ],
-      "bytes": null,
+      "bytes": 511139,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:11:22.491Z"
     },
     "9f34d7bf__Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p_d8e78f93.mp4": {
       "kind": "video",
@@ -105348,12 +105356,16 @@
       "page_refs": [
         "en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p_d8e78f93.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p_d8e78f93.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p_d8e78f93.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p_d8e78f93.mp4",
+        "mime": "video/mp4",
+        "bytes": 202330559
+      },
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -105361,15 +105373,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p_d8e78f93.mp4"
       ],
-      "bytes": null,
+      "bytes": 202330559,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:13:33.620Z"
     },
     "9f34d7bf__Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p-1_9a67240d.mp4": {
       "kind": "video",
@@ -105380,12 +105396,16 @@
       "page_refs": [
         "en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p-1_9a67240d.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p-1_9a67240d.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p-1_9a67240d.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p-1_9a67240d.mp4",
+        "mime": "video/mp4",
+        "bytes": 23590092
+      },
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -105393,15 +105413,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p-1_9a67240d.mp4"
       ],
-      "bytes": null,
+      "bytes": 23590092,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:13:52.164Z"
     },
     "9f34d7bf__Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-540p_ed39b17d.mp4": {
       "kind": "video",
@@ -105412,12 +105436,16 @@
       "page_refs": [
         "en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-540p_ed39b17d.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-540p_ed39b17d.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-540p_ed39b17d.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-540p_ed39b17d.mp4",
+        "mime": "video/mp4",
+        "bytes": 13446654
+      },
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -105425,15 +105453,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-540p_ed39b17d.mp4"
       ],
-      "bytes": null,
+      "bytes": 13446654,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:14:02.462Z"
     },
     "9f34d7bf__Infographics-Peaq_EN_cadc8744.pdf": {
       "kind": "document",
@@ -105444,12 +105476,16 @@
       "page_refs": [
         "en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Infographics-Peaq_EN_cadc8744.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Infographics-Peaq_EN_cadc8744.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Infographics-Peaq_EN_cadc8744.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Infographics-Peaq_EN_cadc8744.pdf",
+        "mime": "application/pdf",
+        "bytes": 511139
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105457,15 +105493,18 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Infographics-Peaq_EN_cadc8744.pdf"
       ],
-      "bytes": null,
+      "bytes": 511139,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "Byte-identical CDN and direct-download sources share the published DAM original",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:11:22.491Z"
     },
     "9f34d7bf__Infographics-Models_EN_e765e83b.pdf": {
       "kind": "document",
@@ -105476,12 +105515,16 @@
       "page_refs": [
         "en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Infographics-Models_EN_e765e83b.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Infographics-Models_EN_e765e83b.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Infographics-Models_EN_e765e83b.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Infographics-Models_EN_e765e83b.pdf",
+        "mime": "application/pdf",
+        "bytes": 1184594
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105489,15 +105532,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/Infographics-Models_EN_e765e83b.pdf"
       ],
-      "bytes": null,
+      "bytes": 1184594,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:14:07.532Z"
     },
     "9f34d7bf__260806_Skoda-Auto-launches-production-of-the-new-Peaq-in-Mlada-Boleslav_ae476b99.pdf": {
       "kind": "document",
@@ -105508,12 +105555,16 @@
       "page_refs": [
         "en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/260806_Skoda-Auto-launches-production-of-the-new-Peaq-in-Mlada-Boleslav_ae476b99.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/08/260806_Skoda-Auto-launches-production-of-the-new-Peaq-in-Mlada-Boleslav_ae476b99.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/260806_Skoda-Auto-launches-production-of-the-new-Peaq-in-Mlada-Boleslav_ae476b99.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/260806_Skoda-Auto-launches-production-of-the-new-Peaq-in-Mlada-Boleslav_ae476b99.pdf",
+        "mime": "application/pdf",
+        "bytes": 472628
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105521,15 +105572,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/08/260806_Skoda-Auto-launches-production-of-the-new-Peaq-in-Mlada-Boleslav_ae476b99.pdf"
       ],
-      "bytes": null,
+      "bytes": 472628,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:14:10.037Z"
     },
     "d17b22d3__260702_Skoda-Auto-marks-23-years-as-Tour-de-France-main-partner-new-Skoda-Peaq-to-serve-as-Red-Car_c2e7ee41.pdf": {
       "kind": "document",
@@ -105540,12 +105595,16 @@
       "page_refs": [
         "en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car/260702_Skoda-Auto-marks-23-years-as-Tour-de-France-main-partner-new-Skoda-Peaq-to-serve-as-Red-Car_c2e7ee41.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/07/260702_Skoda-Auto-marks-23-years-as-Tour-de-France-main-partner-new-Skoda-Peaq-to-serve-as-Red-Car_c2e7ee41.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car/260702_Skoda-Auto-marks-23-years-as-Tour-de-France-main-partner-new-Skoda-Peaq-to-serve-as-Red-Car_c2e7ee41.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car/260702_Skoda-Auto-marks-23-years-as-Tour-de-France-main-partner-new-Skoda-Peaq-to-serve-as-Red-Car_c2e7ee41.pdf",
+        "mime": "application/pdf",
+        "bytes": 279097
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105553,15 +105612,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/07/260702_Skoda-Auto-marks-23-years-as-Tour-de-France-main-partner-new-Skoda-Peaq-to-serve-as-Red-Car_c2e7ee41.pdf"
       ],
-      "bytes": null,
+      "bytes": 279097,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:14:12.609Z"
     },
     "c0387e27__world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4": {
       "kind": "video",
@@ -105572,12 +105635,16 @@
       "page_refs": [
         "en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france/world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/06/world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france/world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france/world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4",
+        "mime": "video/mp4",
+        "bytes": 2999090
+      },
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -105585,15 +105652,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/06/world_premiere_of_the_all-new_skoda_peaq-1080p_6cacbdd4.mp4"
       ],
-      "bytes": null,
+      "bytes": 2999090,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:14:15.922Z"
     },
     "c0387e27__260622_World-premiere-of-the-all-new-Skoda-Peaq-livestream-from-France-_4001500a.pdf": {
       "kind": "document",
@@ -105604,12 +105675,16 @@
       "page_refs": [
         "en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france/260622_World-premiere-of-the-all-new-Skoda-Peaq-livestream-from-France-_4001500a.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/06/260622_World-premiere-of-the-all-new-Skoda-Peaq-livestream-from-France-_4001500a.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france/260622_World-premiere-of-the-all-new-Skoda-Peaq-livestream-from-France-_4001500a.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france/260622_World-premiere-of-the-all-new-Skoda-Peaq-livestream-from-France-_4001500a.pdf",
+        "mime": "application/pdf",
+        "bytes": 176025
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105617,15 +105692,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/06/260622_World-premiere-of-the-all-new-Skoda-Peaq-livestream-from-France-_4001500a.pdf"
       ],
-      "bytes": null,
+      "bytes": 176025,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:14:21.003Z"
     },
     "c0387e27__Skoda_peaq__proven_in_the_arizona_desert_and_in_freezing_conditions_north_of_the_arctic_circle-1080p_baf70ada.mp4": {
       "kind": "video",
@@ -105636,12 +105715,16 @@
       "page_refs": [
         "en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions/Skoda_peaq__proven_in_the_arizona_desert_and_in_freezing_conditions_north_of_the_arctic_circle-1080p_baf70ada.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_peaq__proven_in_the_arizona_desert_and_in_freezing_conditions_north_of_the_arctic_circle-1080p_baf70ada.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions/Skoda_peaq__proven_in_the_arizona_desert_and_in_freezing_conditions_north_of_the_arctic_circle-1080p_baf70ada.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions/Skoda_peaq__proven_in_the_arizona_desert_and_in_freezing_conditions_north_of_the_arctic_circle-1080p_baf70ada.mp4",
+        "mime": "video/mp4",
+        "bytes": 70571456
+      },
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -105649,15 +105732,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/06/Skoda_peaq__proven_in_the_arizona_desert_and_in_freezing_conditions_north_of_the_arctic_circle-1080p_baf70ada.mp4"
       ],
-      "bytes": null,
+      "bytes": 70571456,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:15:10.030Z"
     },
     "c0387e27__260615_Skoda-Peaq-Comprehensive-testing-in-extreme-conditions_fc03566c.pdf": {
       "kind": "document",
@@ -105668,12 +105755,16 @@
       "page_refs": [
         "en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions/260615_Skoda-Peaq-Comprehensive-testing-in-extreme-conditions_fc03566c.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/06/260615_Skoda-Peaq-Comprehensive-testing-in-extreme-conditions_fc03566c.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions/260615_Skoda-Peaq-Comprehensive-testing-in-extreme-conditions_fc03566c.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions/260615_Skoda-Peaq-Comprehensive-testing-in-extreme-conditions_fc03566c.pdf",
+        "mime": "application/pdf",
+        "bytes": 270587
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105681,15 +105772,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/06/260615_Skoda-Peaq-Comprehensive-testing-in-extreme-conditions_fc03566c.pdf"
       ],
-      "bytes": null,
+      "bytes": 270587,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:15:14.896Z"
     },
     "68eff613__241001-World-premiere-of-the-all-new-Skoda-Elroq-Press-materials-and-highlight-video-available_bde31307.pdf": {
       "kind": "document",
@@ -105700,12 +105795,16 @@
       "page_refs": [
         "en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available/241001-World-premiere-of-the-all-new-Skoda-Elroq-Press-materials-and-highlight-video-available_bde31307.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2024/10/241001-World-premiere-of-the-all-new-Skoda-Elroq-Press-materials-and-highlight-video-available_bde31307.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available/241001-World-premiere-of-the-all-new-Skoda-Elroq-Press-materials-and-highlight-video-available_bde31307.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available/241001-World-premiere-of-the-all-new-Skoda-Elroq-Press-materials-and-highlight-video-available_bde31307.pdf",
+        "mime": "application/pdf",
+        "bytes": 418306
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105713,15 +105812,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2024/10/241001-World-premiere-of-the-all-new-Skoda-Elroq-Press-materials-and-highlight-video-available_bde31307.pdf"
       ],
-      "bytes": null,
+      "bytes": 418306,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:15:17.623Z"
     },
     "87472c4b__260323-Infographics_Elroq-Enyaq_Infotainment_8f5ac7de.pdf": {
       "kind": "document",
@@ -105732,12 +105835,16 @@
       "page_refs": [
         "en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/260323-Infographics_Elroq-Enyaq_Infotainment_8f5ac7de.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/03/260323-Infographics_Elroq-Enyaq_Infotainment_8f5ac7de.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/260323-Infographics_Elroq-Enyaq_Infotainment_8f5ac7de.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/260323-Infographics_Elroq-Enyaq_Infotainment_8f5ac7de.pdf",
+        "mime": "application/pdf",
+        "bytes": 3150690
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105745,15 +105852,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/03/260323-Infographics_Elroq-Enyaq_Infotainment_8f5ac7de.pdf"
       ],
-      "bytes": null,
+      "bytes": 3150690,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:15:21.892Z"
     },
     "87472c4b__260323-Infographics_Elroq-Enyaq_Simply_Clever_5591acd6.pdf": {
       "kind": "document",
@@ -105764,12 +105875,16 @@
       "page_refs": [
         "en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/260323-Infographics_Elroq-Enyaq_Simply_Clever_5591acd6.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/03/260323-Infographics_Elroq-Enyaq_Simply_Clever_5591acd6.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/260323-Infographics_Elroq-Enyaq_Simply_Clever_5591acd6.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/260323-Infographics_Elroq-Enyaq_Simply_Clever_5591acd6.pdf",
+        "mime": "application/pdf",
+        "bytes": 2588684
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105777,15 +105892,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/03/260323-Infographics_Elroq-Enyaq_Simply_Clever_5591acd6.pdf"
       ],
-      "bytes": null,
+      "bytes": 2588684,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:15:25.575Z"
     },
     "87472c4b__260323-Infographics_Elroq-Enyaq_V2L_2f65a5c6.pdf": {
       "kind": "document",
@@ -105796,12 +105915,16 @@
       "page_refs": [
         "en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/260323-Infographics_Elroq-Enyaq_V2L_2f65a5c6.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/03/260323-Infographics_Elroq-Enyaq_V2L_2f65a5c6.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/260323-Infographics_Elroq-Enyaq_V2L_2f65a5c6.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/260323-Infographics_Elroq-Enyaq_V2L_2f65a5c6.pdf",
+        "mime": "application/pdf",
+        "bytes": 884357
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105809,15 +105932,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/03/260323-Infographics_Elroq-Enyaq_V2L_2f65a5c6.pdf"
       ],
-      "bytes": null,
+      "bytes": 884357,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:15:29.438Z"
     },
     "87472c4b__the_updated_elroq_and_enyaq_coupe-1080p_d6ed27eb.mp4": {
       "kind": "video",
@@ -105828,12 +105955,16 @@
       "page_refs": [
         "en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/the_updated_elroq_and_enyaq_coupe-1080p_d6ed27eb.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/03/the_updated_elroq_and_enyaq_coupe-1080p_d6ed27eb.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/the_updated_elroq_and_enyaq_coupe-1080p_d6ed27eb.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/the_updated_elroq_and_enyaq_coupe-1080p_d6ed27eb.mp4",
+        "mime": "video/mp4",
+        "bytes": 183715342
+      },
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -105841,15 +105972,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/03/the_updated_elroq_and_enyaq_coupe-1080p_d6ed27eb.mp4"
       ],
-      "bytes": null,
+      "bytes": 183715342,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:17:16.458Z"
     },
     "87472c4b__260323_Elroq_and_Enyaq_Model_year_updates_for_both_Skoda_electric_bestsellers_3ef1c7b1.pdf": {
       "kind": "document",
@@ -105860,12 +105995,16 @@
       "page_refs": [
         "en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/260323_Elroq_and_Enyaq_Model_year_updates_for_both_Skoda_electric_bestsellers_3ef1c7b1.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/03/260323_Elroq_and_Enyaq_Model_year_updates_for_both_Skoda_electric_bestsellers_3ef1c7b1.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/260323_Elroq_and_Enyaq_Model_year_updates_for_both_Skoda_electric_bestsellers_3ef1c7b1.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/260323_Elroq_and_Enyaq_Model_year_updates_for_both_Skoda_electric_bestsellers_3ef1c7b1.pdf",
+        "mime": "application/pdf",
+        "bytes": 293982
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105873,15 +106012,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/03/260323_Elroq_and_Enyaq_Model_year_updates_for_both_Skoda_electric_bestsellers_3ef1c7b1.pdf"
       ],
-      "bytes": null,
+      "bytes": 293982,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:17:20.902Z"
     },
     "d17b22d3__Infographics_Skoda-Karoq_1-million_9ef03081.pdf": {
       "kind": "document",
@@ -105892,12 +106035,16 @@
       "page_refs": [
         "en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq/Infographics_Skoda-Karoq_1-million_9ef03081.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/07/Infographics_Skoda-Karoq_1-million_9ef03081.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq/Infographics_Skoda-Karoq_1-million_9ef03081.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq/Infographics_Skoda-Karoq_1-million_9ef03081.pdf",
+        "mime": "application/pdf",
+        "bytes": 914662
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105905,15 +106052,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/07/Infographics_Skoda-Karoq_1-million_9ef03081.pdf"
       ],
-      "bytes": null,
+      "bytes": 914662,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:17:24.012Z"
     },
     "d17b22d3__260716_Production-milestone-Skoda-Auto-builds-its-one-millionth-Karoq_34a78d5c.pdf": {
       "kind": "document",
@@ -105924,12 +106075,16 @@
       "page_refs": [
         "en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq/260716_Production-milestone-Skoda-Auto-builds-its-one-millionth-Karoq_34a78d5c.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/07/260716_Production-milestone-Skoda-Auto-builds-its-one-millionth-Karoq_34a78d5c.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq/260716_Production-milestone-Skoda-Auto-builds-its-one-millionth-Karoq_34a78d5c.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq/260716_Production-milestone-Skoda-Auto-builds-its-one-millionth-Karoq_34a78d5c.pdf",
+        "mime": "application/pdf",
+        "bytes": 28642330
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105937,15 +106092,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/07/260716_Production-milestone-Skoda-Auto-builds-its-one-millionth-Karoq_34a78d5c.pdf"
       ],
-      "bytes": null,
+      "bytes": 28642330,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:17:38.975Z"
     },
     "d17b22d3__2026_2Q_EN_f3fb17e9.pdf": {
       "kind": "document",
@@ -105956,12 +106115,16 @@
       "page_refs": [
         "en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026/2026_2Q_EN_f3fb17e9.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/07/2026_2Q_EN_f3fb17e9.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026/2026_2Q_EN_f3fb17e9.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026/2026_2Q_EN_f3fb17e9.pdf",
+        "mime": "application/pdf",
+        "bytes": 924920
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -105969,15 +106132,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/07/2026_2Q_EN_f3fb17e9.pdf"
       ],
-      "bytes": null,
+      "bytes": 924920,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:17:45.789Z"
     },
     "d17b22d3__24072026_Skoda-Auto-achieves-strong-financial-results-record-EV-deliveries__529bccdb.pdf": {
       "kind": "document",
@@ -105988,12 +106155,16 @@
       "page_refs": [
         "en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026/24072026_Skoda-Auto-achieves-strong-financial-results-record-EV-deliveries__529bccdb.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/07/24072026_Skoda-Auto-achieves-strong-financial-results-record-EV-deliveries__529bccdb.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026/24072026_Skoda-Auto-achieves-strong-financial-results-record-EV-deliveries__529bccdb.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026/24072026_Skoda-Auto-achieves-strong-financial-results-record-EV-deliveries__529bccdb.pdf",
+        "mime": "application/pdf",
+        "bytes": 339735
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -106001,15 +106172,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/07/24072026_Skoda-Auto-achieves-strong-financial-results-record-EV-deliveries__529bccdb.pdf"
       ],
-      "bytes": null,
+      "bytes": 339735,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:17:48.097Z"
     },
     "c6d86b52__teaser_video__world_premiere_of_the_all-new_Skoda_epiq__livestream_from_zurich-1080p_15e605c9.mp4": {
       "kind": "video",
@@ -106020,12 +106195,16 @@
       "page_refs": [
         "en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich/teaser_video__world_premiere_of_the_all-new_Skoda_epiq__livestream_from_zurich-1080p_15e605c9.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/teaser_video__world_premiere_of_the_all-new_Skoda_epiq__livestream_from_zurich-1080p_15e605c9.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich/teaser_video__world_premiere_of_the_all-new_Skoda_epiq__livestream_from_zurich-1080p_15e605c9.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich/teaser_video__world_premiere_of_the_all-new_Skoda_epiq__livestream_from_zurich-1080p_15e605c9.mp4",
+        "mime": "video/mp4",
+        "bytes": 2549251
+      },
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -106033,15 +106212,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/teaser_video__world_premiere_of_the_all-new_Skoda_epiq__livestream_from_zurich-1080p_15e605c9.mp4"
       ],
-      "bytes": null,
+      "bytes": 2549251,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:17:51.259Z"
     },
     "c6d86b52__260511_World-premiere-of-the-all-new-Skoda-Epiq-livestream-from-Zurich_583d7951.pdf": {
       "kind": "document",
@@ -106052,12 +106235,16 @@
       "page_refs": [
         "en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich/260511_World-premiere-of-the-all-new-Skoda-Epiq-livestream-from-Zurich_583d7951.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/05/260511_World-premiere-of-the-all-new-Skoda-Epiq-livestream-from-Zurich_583d7951.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich/260511_World-premiere-of-the-all-new-Skoda-Epiq-livestream-from-Zurich_583d7951.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich/260511_World-premiere-of-the-all-new-Skoda-Epiq-livestream-from-Zurich_583d7951.pdf",
+        "mime": "application/pdf",
+        "bytes": 185940
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -106065,15 +106252,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/05/260511_World-premiere-of-the-all-new-Skoda-Epiq-livestream-from-Zurich_583d7951.pdf"
       ],
-      "bytes": null,
+      "bytes": 185940,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:17:53.416Z"
     },
     "1baa5686__Skoda_Elroq_Key_facts_ebe35d4c.jpg": {
       "logical_id": "1baa5686__Skoda_Elroq_Key_facts_ebe35d4c.jpg",
@@ -110034,12 +110225,16 @@
       "page_refs": [
         "en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Skoda_Elroq_Key_facts_5d839a32.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2024/06/Skoda_Elroq_Key_facts_5d839a32.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Skoda_Elroq_Key_facts_5d839a32.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Skoda_Elroq_Key_facts_5d839a32.pdf",
+        "mime": "application/pdf",
+        "bytes": 1242842
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -110047,15 +110242,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2024/06/Skoda_Elroq_Key_facts_5d839a32.pdf"
       ],
-      "bytes": null,
+      "bytes": 1242842,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:17:56.725Z"
     },
     "6e527c14__Skoda_Elroq_Battery_versions_2a9c3eba.pdf": {
       "kind": "document",
@@ -110066,12 +110265,16 @@
       "page_refs": [
         "en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Skoda_Elroq_Battery_versions_2a9c3eba.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2024/06/Skoda_Elroq_Battery_versions_2a9c3eba.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Skoda_Elroq_Battery_versions_2a9c3eba.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Skoda_Elroq_Battery_versions_2a9c3eba.pdf",
+        "mime": "application/pdf",
+        "bytes": 145637
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -110079,15 +110282,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2024/06/Skoda_Elroq_Battery_versions_2a9c3eba.pdf"
       ],
-      "bytes": null,
+      "bytes": 145637,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:17:58.913Z"
     },
     "6e527c14__Skoda_all-electric_family_f5c3c77f.pdf": {
       "kind": "document",
@@ -110098,12 +110305,16 @@
       "page_refs": [
         "en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Skoda_all-electric_family_f5c3c77f.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2024/06/Skoda_all-electric_family_f5c3c77f.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Skoda_all-electric_family_f5c3c77f.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Skoda_all-electric_family_f5c3c77f.pdf",
+        "mime": "application/pdf",
+        "bytes": 3481545
+      },
       "da_path": "",
       "title": "PDF download",
       "alt": "",
@@ -110111,15 +110322,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2024/06/Skoda_all-electric_family_f5c3c77f.pdf"
       ],
-      "bytes": null,
+      "bytes": 3481545,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:18:02.774Z"
     },
     "6e527c14__Skoda_Elroq_Covered_Drive_footage_1a84a7a7.mp4": {
       "kind": "video",
@@ -110130,12 +110345,16 @@
       "page_refs": [
         "en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Skoda_Elroq_Covered_Drive_footage_1a84a7a7.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2024/06/Skoda_Elroq_Covered_Drive_footage_1a84a7a7.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Skoda_Elroq_Covered_Drive_footage_1a84a7a7.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Skoda_Elroq_Covered_Drive_footage_1a84a7a7.mp4",
+        "mime": "video/mp4",
+        "bytes": 3883212859
+      },
       "da_path": "",
       "title": "Škoda Elroq – Covered Drive | Footage",
       "alt": "",
@@ -110143,15 +110362,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2024/06/Skoda_Elroq_Covered_Drive_footage_1a84a7a7.mp4"
       ],
-      "bytes": null,
+      "bytes": 3883212859,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:53:52.104Z"
     },
     "6e527c14__Press_Kit_Skoda_Elroq_Covered_Drive_f8fd33fc.pdf": {
       "kind": "document",
@@ -110162,12 +110385,16 @@
       "page_refs": [
         "en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Press_Kit_Skoda_Elroq_Covered_Drive_f8fd33fc.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2024/06/Press_Kit_Skoda_Elroq_Covered_Drive_f8fd33fc.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Press_Kit_Skoda_Elroq_Covered_Drive_f8fd33fc.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/Press_Kit_Skoda_Elroq_Covered_Drive_f8fd33fc.pdf",
+        "mime": "application/pdf",
+        "bytes": 188290
+      },
       "da_path": "",
       "title": "PDF",
       "alt": "",
@@ -110175,15 +110402,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2024/06/Press_Kit_Skoda_Elroq_Covered_Drive_f8fd33fc.pdf"
       ],
-      "bytes": null,
+      "bytes": 188290,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T10:53:57.077Z"
     },
     "963694c6__Skoda_Epiq_Cover_Drive_ver6_FullHD_7973d4fd.mp4": {
       "kind": "video",
@@ -110194,12 +110425,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car/Skoda_Epiq_Cover_Drive_ver6_FullHD_7973d4fd.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/01/Skoda_Epiq_Cover_Drive_ver6_FullHD_7973d4fd.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car/Skoda_Epiq_Cover_Drive_ver6_FullHD_7973d4fd.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car/Skoda_Epiq_Cover_Drive_ver6_FullHD_7973d4fd.mp4",
+        "mime": "video/mp4",
+        "bytes": 1386567853
+      },
       "da_path": "",
       "title": "Oliver Stefani, Chief Designer at Škoda Auto",
       "alt": "",
@@ -110207,15 +110442,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/01/Skoda_Epiq_Cover_Drive_ver6_FullHD_7973d4fd.mp4"
       ],
-      "bytes": null,
+      "bytes": 1386567853,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T12:02:27.482Z"
     },
     "963694c6__Press_Map_Skoda_Epiq_Covered_Drive_EN_6b3ff031.pdf": {
       "kind": "document",
@@ -110226,12 +110465,16 @@
       "page_refs": [
         "en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car/Press_Map_Skoda_Epiq_Covered_Drive_EN_6b3ff031.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/01/Press_Map_Skoda_Epiq_Covered_Drive_EN_6b3ff031.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car/Press_Map_Skoda_Epiq_Covered_Drive_EN_6b3ff031.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car/Press_Map_Skoda_Epiq_Covered_Drive_EN_6b3ff031.pdf",
+        "mime": "application/pdf",
+        "bytes": 263545
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -110239,15 +110482,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/01/Press_Map_Skoda_Epiq_Covered_Drive_EN_6b3ff031.pdf"
       ],
-      "bytes": null,
+      "bytes": 263545,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T11:11:16.541Z"
     },
     "2afbc684__EnyaqML_button_800x800px_0002_35_New_Skoda_Enyaq_Coupe_Sportline_800x800_f5284a8b.png": {
       "logical_id": "2afbc684__EnyaqML_button_800x800px_0002_35_New_Skoda_Enyaq_Coupe_Sportline_800x800_f5284a8b.png",
@@ -112283,12 +112530,16 @@
       "page_refs": [
         "en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/FABIA-SE-HIGHLIGHTS_H264UHD_ENG_e91b6d28.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2025/10/FABIA-SE-HIGHLIGHTS_H264UHD_ENG_e91b6d28.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/FABIA-SE-HIGHLIGHTS_H264UHD_ENG_e91b6d28.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/FABIA-SE-HIGHLIGHTS_H264UHD_ENG_e91b6d28.mp4",
+        "mime": "video/mp4",
+        "bytes": 139474810
+      },
       "da_path": "",
       "title": "Škoda Fabia 130: Special edition celebrates Škoda Auto’s anniversary and motorsport…",
       "alt": "",
@@ -112296,15 +112547,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2025/10/FABIA-SE-HIGHLIGHTS_H264UHD_ENG_e91b6d28.mp4"
       ],
-      "bytes": null,
+      "bytes": 139474810,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T11:12:36.955Z"
     },
     "5975b333__Skoda-Fabia-130-Special-edition_53053359.pdf": {
       "kind": "document",
@@ -112315,12 +112570,16 @@
       "page_refs": [
         "en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/Skoda-Fabia-130-Special-edition_53053359.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2025/10/Skoda-Fabia-130-Special-edition_53053359.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/Skoda-Fabia-130-Special-edition_53053359.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/Skoda-Fabia-130-Special-edition_53053359.pdf",
+        "mime": "application/pdf",
+        "bytes": 293333
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -112328,15 +112587,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2025/10/Skoda-Fabia-130-Special-edition_53053359.pdf"
       ],
-      "bytes": null,
+      "bytes": 293333,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T11:12:41.457Z"
     },
     "5975b333__FABIA-SE-FOOTAGE_H264HD_43e3e8e7.mp4": {
       "kind": "video",
@@ -112347,12 +112610,16 @@
       "page_refs": [
         "en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/FABIA-SE-FOOTAGE_H264HD_43e3e8e7.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2025/10/FABIA-SE-FOOTAGE_H264HD_43e3e8e7.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/FABIA-SE-FOOTAGE_H264HD_43e3e8e7.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/FABIA-SE-FOOTAGE_H264HD_43e3e8e7.mp4",
+        "mime": "video/mp4",
+        "bytes": 989526151
+      },
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -112360,15 +112627,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2025/10/FABIA-SE-FOOTAGE_H264HD_43e3e8e7.mp4"
       ],
-      "bytes": null,
+      "bytes": 989526151,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T11:24:13.208Z"
     },
     "05572b71__SKODA_Valencie_Fabia130_5821259d.mp4": {
       "kind": "video",
@@ -112379,12 +112650,16 @@
       "page_refs": [
         "en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/SKODA_Valencie_Fabia130_5821259d.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2025/12/SKODA_Valencie_Fabia130_5821259d.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/SKODA_Valencie_Fabia130_5821259d.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/SKODA_Valencie_Fabia130_5821259d.mp4",
+        "mime": "video/mp4",
+        "bytes": 452605130
+      },
       "da_path": "",
       "title": "MP4",
       "alt": "",
@@ -112392,15 +112667,19 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2025/12/SKODA_Valencie_Fabia130_5821259d.mp4"
       ],
-      "bytes": null,
+      "bytes": 452605130,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-09-30T11:28:18.556Z"
     }
   }
 }
