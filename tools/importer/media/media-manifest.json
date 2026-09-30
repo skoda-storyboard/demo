@@ -105307,46 +105307,6 @@
       "status": "done",
       "note": ""
     },
-    "728314ef__Infographics-Peaq_EN_cadc8744.pdf": {
-      "kind": "document",
-      "logical_id": "728314ef__Infographics-Peaq_EN_cadc8744.pdf",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Infographics-Peaq_EN_cadc8744.pdf",
-      "master_url": "https://cdn.skoda-storyboard.com/2026/08/Infographics-Peaq_EN_cadc8744.pdf",
-      "dam_page_path": "en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav",
-      "page_refs": [
-        "en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav"
-      ],
-      "dam_asset_path": "/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Infographics-Peaq_EN_cadc8744.pdf",
-      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/Infographics-Peaq_EN_cadc8744.pdf",
-      "original_download_url": "",
-      "delivery_url": "",
-      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Infographics-Peaq_EN_cadc8744.pdf",
-      "public_verified": {
-        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/Infographics-Peaq_EN_cadc8744.pdf",
-        "mime": "application/pdf",
-        "bytes": 511139
-      },
-      "da_path": "",
-      "title": "",
-      "alt": "",
-      "caption": "",
-      "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/Infographics-Peaq_EN_cadc8744.pdf"
-      ],
-      "bytes": 511139,
-      "steps": {
-        "deliver": "n/a",
-        "dam": "done",
-        "publish": "done",
-        "da": "n/a"
-      },
-      "status": "done",
-      "note": "",
-      "source_content_type": "application/pdf",
-      "dam_status": 200,
-      "publish_status": 200,
-      "published_at": "2026-09-30T10:11:22.491Z"
-    },
     "9f34d7bf__Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p_d8e78f93.mp4": {
       "kind": "video",
       "logical_id": "9f34d7bf__Skoda_auto_launches_production_of_the_new_peaq_in_mlada_boleslav-1080p_d8e78f93.mp4",
@@ -105491,7 +105451,8 @@
       "alt": "",
       "caption": "",
       "seen_urls": [
-        "https://www.skoda-storyboard.com/direct-download/2026/08/Infographics-Peaq_EN_cadc8744.pdf"
+        "https://www.skoda-storyboard.com/direct-download/2026/08/Infographics-Peaq_EN_cadc8744.pdf",
+        "https://cdn.skoda-storyboard.com/2026/08/Infographics-Peaq_EN_cadc8744.pdf"
       ],
       "bytes": 511139,
       "steps": {
