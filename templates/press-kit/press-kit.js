@@ -84,7 +84,8 @@ function galleryMore(main) {
 
 export default function decorate(main) {
   sourceLinks(main);
-  if (main.querySelector('.cards.tiles')) return;
+  // A hub is a tiles page without an article body; an article may carry tiles (2nd Elroq kit).
+  if (main.querySelector('.cards.tiles') && !main.querySelector('.section.body-column')) return;
   header(main);
   chapters(main);
   mediaBox(main);

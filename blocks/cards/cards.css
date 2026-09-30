@@ -91,7 +91,8 @@
   .cards.tiles .tile-quarter .card-teaser-image,
   .cards.tiles .tile-third .card-teaser-image,
   .cards.tiles .tile-two-thirds .card-teaser-image,
-  .cards.tiles .tile-feature .card-teaser-image {
+  .cards.tiles .tile-feature .card-teaser-image,
+  .cards.tiles .tile-press-half .card-teaser-image {
     aspect-ratio: auto;
   }
 
@@ -99,7 +100,8 @@
   .cards.tiles .tile-quarter .card-teaser-image::before,
   .cards.tiles .tile-third .card-teaser-image::before,
   .cards.tiles .tile-two-thirds .card-teaser-image::before,
-  .cards.tiles .tile-feature .card-teaser-image::before {
+  .cards.tiles .tile-feature .card-teaser-image::before,
+  .cards.tiles .tile-press-half .card-teaser-image::before {
     content: "";
     display: block;
     padding-block-end: calc((100% - var(--grid-gutter)) / 2);
@@ -155,6 +157,10 @@
 
   .cards.tiles .tile-press-quarter {
     grid-column-end: span 5;
+  }
+
+  .cards.tiles .tile-press-half {
+    grid-column-end: span 10;
   }
 
   .cards.tiles .tile-banner,

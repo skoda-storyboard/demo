@@ -151,3 +151,10 @@ test('the sidebar "+N" link becomes the Gallery (preview) pill data, pointing at
   assert.equal(main.querySelector('a[href="#media-box"]'), null, 'the separate link is gone');
   assert.ok(main.querySelector('.sidebar h3:last-child'), 'the Tags heading stays');
 });
+
+test('an article that carries a tiles mosaic is still an article (header, not a hub)', () => {
+  const main = setup(`<div class="section"><div class="default-content-wrapper"><p>9. 12. 2024</p><h1>Elroq kit</h1></div></div>
+    <div class="section body-column"><div class="cards-wrapper"><div class="cards overlay tiles"></div></div></div>`);
+  decorate(main);
+  assert.ok(main.querySelector('.press-kit-header h1'));
+});

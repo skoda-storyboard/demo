@@ -204,7 +204,12 @@
       "urls": [
         "https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/",
         "https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/",
-        "https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/"
+        "https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/",
+        "https://www.skoda-storyboard.com/en/press-kits/new-skoda-enyaq-press-kit-2/",
+        "https://www.skoda-storyboard.com/en/press-kits/skoda-vision-o-press-kit/",
+        "https://www.skoda-storyboard.com/en/press-kits/skoda-elroq-press-kit/",
+        "https://www.skoda-storyboard.com/en/press-kits/the-all-new-skoda-superb-press-kit/",
+        "https://www.skoda-storyboard.com/en/press-kits/the-all-new-skoda-kodiaq-press-kit/"
       ],
       "description": "Press-kit tiles hub: Hero Image (overlay), source-order Cards (overlay, tiles), optional introduction and linked WhatsApp/ZIP banners. Metadata template=press_kit; SKODA-805a.",
       "blocks": [
@@ -287,7 +292,11 @@
         "https://www.skoda-storyboard.com/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/",
         "https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/",
         "https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/images/",
-        "https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/"
+        "https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/",
+        "https://www.skoda-storyboard.com/en/press-kits/skoda-elroq-press-kit-2/",
+        "https://www.skoda-storyboard.com/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/",
+        "https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car/",
+        "https://www.skoda-storyboard.com/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/"
       ],
       "description": "Default press-kit article (chapter or resource child): source title, optional Chapters, primary content with optional row toggles as Accordion, inline asset grids as Downloads, source tables resolved to default content, sidebar Gallery (preview) and Tags, then an optional Media Box with Downloads and file rows. Metadata template=press_kit; SKODA-805b/c.",
       "blocks": [
@@ -345,7 +354,16 @@
     {
       "name": "press-release",
       "urls": [
-        "https://www.skoda-storyboard.com/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/"
+        "https://www.skoda-storyboard.com/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/",
+        "https://www.skoda-storyboard.com/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/",
+        "https://www.skoda-storyboard.com/en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car/",
+        "https://www.skoda-storyboard.com/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france/",
+        "https://www.skoda-storyboard.com/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions/",
+        "https://www.skoda-storyboard.com/en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available/",
+        "https://www.skoda-storyboard.com/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/",
+        "https://www.skoda-storyboard.com/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq/",
+        "https://www.skoda-storyboard.com/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026/",
+        "https://www.skoda-storyboard.com/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich/"
       ],
       "description": "Škoda press release detail (press_release CPT, Media Room side), SKODA-607. No hero. skoda-press-release-layout rebuilds the article into 5 sections: header (date <p> + h1) -> body-column (lead image, .bullet-points as <ul>, .entry-summary perex as <p><strong>, Buzzsprout + inline Vimeo as bare URLs, .entry-content body) -> sidebar (Additional info list, Gallery (preview) from section.images.sa-media-kit-preview, Tags from section.tags, each with an h3) -> dark Media Box band (heading + stats + Downloads from .search-results.media-box) -> optional dark Related Press Releases band (heading + 'Based on tags' + All link + curated Story Rail (press)). Newsletter/banner widgets removed by skoda-press-release-cleanup. Spec: docs/ui-specs/template-press-release.md; contracts gallery-preview, story-rail-press, downloads-file-rows, press-release-sections. Detection is content-driven only.",
       "blocks": [

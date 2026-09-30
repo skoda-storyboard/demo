@@ -9,6 +9,8 @@ const TILE_SIZES = {
   banner: { span: 12, mode: 'series' },
   'banner-tall': { span: 12, mode: 'series' },
   feature: { span: 8, mode: 'press' },
+  // A 2:1 tile over half the row (older kits: 2 wide, or 1 wide + 2 quarters; 604px at 1280).
+  'press-half': { span: 10, mode: 'press' },
   'press-square': { span: 4, mode: 'press' },
   'press-quarter': { span: 5, mode: 'press' },
 };

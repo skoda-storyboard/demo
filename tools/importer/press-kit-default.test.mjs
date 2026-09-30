@@ -35,6 +35,7 @@ globalThis.WebImporter = {
 
 const importer = JSDOM ? (await import('./import-press-kit-default.js')).default : null;
 const decorateAccordion = JSDOM ? (await import('../../blocks/accordion/accordion.js')).default : null;
+const { layoutTileRows } = await import('../../scripts/cards-tiles.js');
 const base = 'https://www.skoda-storyboard.com/en/press-kits/';
 const target = `${base}skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/`;
 const intro = `${base}skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio/`;
@@ -721,4 +722,73 @@ test('public SSR samples keep all real article and Media Box assets', {
     }
     assert.equal(page.querySelectorAll('a[href=""], a:not([href])').length, 0, url);
   }
+});
+
+// Older kit landing page in article form (second Elroq kit): teaser rows in the body column.
+const teaser = (i, ratio) => `<div class="so-panel widget_ys-so-widget-post-teaser"><article class="article-teaser">
+  <a href="${base}skoda-elroq-press-kit/chapter-${i}/"><div class="ratio-container ratio-${ratio}">
+  <img src="https://cdn.skoda-storyboard.com/elroq-${i}.jpg" alt=""></div><h2 class="heading">Chapter ${i}</h2></a></article></div>`;
+const teaserRow = (ratios, from) => `<div class="panel-grid">${ratios.map((ratio, i) => `<div class="panel-grid-cell">${teaser(from + i, ratio)}</div>`).join('')}</div>`;
+
+test('article-form kit landing: teaser rows become one tiles mosaic between the lead and the banners', { skip: !JSDOM }, () => {
+  const body = grid(widget('<p>The all-new Škoda Elroq.</p>'))
+    + teaserRow(['2x1', '2x1'], 1) + teaserRow(['1x1', '1x1', '1x1', '1x1'], 3)
+    + teaserRow(['1x1', '1x1', '1x1', '1x1', '1x1'], 7)
+    + grid(widget('<p><a href="https://cdn.skoda-storyboard.com/2025/06/Skoda_Elroq.zip"><img src="https://cdn.skoda-storyboard.com/zip.png" alt="Download"></a></p>'));
+  const summaryHtml = '<div class="entry-summary"><p>The all-new Škoda Elroq is the first all-electric compact SUV.</p></div>';
+  const html = resourcePage(body).replace('<div class="entry-content">', `${summaryHtml}<div class="entry-content">`);
+  const page = run(html, `${base}skoda-elroq-press-kit-2/`);
+  const [tiles] = blocks(page, 'Cards (overlay, tiles)');
+  assert.ok(tiles, 'one tiles block');
+  const tokens = [...tiles.querySelectorAll('tr')].slice(1).map((tr) => txt(tr.children[0]));
+  assert.deepEqual(tokens, ['press-half', 'press-half', ...Array(4).fill('press-quarter'), ...Array(5).fill('press-square')]);
+  const { tiles: laid } = layoutTileRows(tokens, { pressPage: true });
+  assert.equal(laid.filter((tile) => tile.rowStart).length, 3);
+  assert.equal(txt(tiles.querySelector('tr:last-child td:last-child')), 'Chapter 11');
+  const order = [...page.querySelectorAll('p, table')].map((el) => (el.matches('table') ? txt(el.querySelector('td')) : txt(el) || 'img'));
+  assert.ok(order.indexOf('The all-new Škoda Elroq.') < order.indexOf('Cards (overlay, tiles)'), 'intro before tiles');
+  const summary = [...page.querySelectorAll('p > strong')].find((s) => txt(s).includes('compact SUV'));
+  assert.ok(summary, 'the teaser summary is kept, bold, as on a press release');
+  assert.ok(order.indexOf(txt(summary)) < order.indexOf('The all-new Škoda Elroq.'), 'summary leads the body');
+  assert.ok(page.querySelector('a[href$=".zip"]'), 'banners after the tiles are kept');
+});
+
+test('floated 50px X / WhatsApp icons become Columns (callout), never full-width images', { skip: !JSDOM }, () => {
+  const x = 'https://cdn.skoda-storyboard.com/2023/09/Twitter-X_44c9e28a.png';
+  const wa = 'https://cdn.skoda-storyboard.com/2024/04/whatsapp.FI_46025435-384x281.png';
+  const body = grid(widget(`<p><img style="float: left; margin-right: 10px;" src="${x}" alt="DSC01282_RET-1" width="50" height="50"></p>
+    <div style="text-align: left;">Follow us at <a href="https://twitter.com/skodaautonews">X.com/skodaautonews</a> for all the latest news.</div>
+    <div>&nbsp;</div>
+    <p><img class="alignnone" style="float: left; margin-right: 10px;" src="${wa}" alt="DSC01282_RET-1" width="50" height="50"> Explore the new channel: <a href="http://go.skoda.eu/whatsapp">go.skoda.eu/whatsapp</a></p>
+    <p><img src="https://cdn.skoda-storyboard.com/body.jpg" alt="Body" width="1600"></p>`));
+  const page = run(resourcePage(body), `${base}skoda-elroq-covered/`);
+  const callouts = blocks(page, 'Columns (callout)');
+  assert.equal(callouts.length, 2);
+  callouts.forEach((t) => {
+    const [icon, copy] = t.querySelectorAll('tr:nth-child(2) > td');
+    assert.equal(icon.querySelectorAll('img').length, 1);
+    assert.equal(icon.querySelector('img').getAttribute('alt'), '', 'decorative icon');
+    assert.ok(txt(copy).length > 10 && copy.querySelector('a[href]'), 'the text and its link sit beside the icon');
+  });
+  assert.match(txt(callouts[0]), /X\.com\/skodaautonews/);
+  assert.match(txt(callouts[1]), /go\.skoda\.eu\/whatsapp/);
+  assert.equal(page.querySelectorAll('img[alt="DSC01282_RET-1"]').length, 0);
+  assert.ok(page.querySelector('img[alt="Body"]'), 'ordinary body images are untouched');
+});
+
+test('a WordPress video widget plays its MP4 master natively, named by its Media Box item', { skip: !JSDOM }, () => {
+  const file = '/direct-download/2025/10/FABIA-SE-HIGHLIGHTS_H264UHD_ENG_e91b6d28.mp4';
+  const videoWidget = `<div class="so-panel widget_media_video"><div class="media-cart-item attachment"><div class="video-container">
+    <iframe title="FABIA SE HIGHLIGHTS_H264UHD_ENG" src="https://player.vimeo.com/video/1124833374?dnt=1"></iframe></div>
+    <div class="media-cart-actions"><a class="media-cart-action download" href="${file}" data-action="download"><i class="icon"></i></a></div></div></div>`;
+  const html = resourcePage(grid(widget('<p>Škoda introduces the Fabia 130.</p>')) + grid(videoWidget))
+    .replace('</article>', `<div class="search-results media-box"><div class="search-results-item"><article class="media-cart-item">
+      <h3 class="entry-title">Škoda Fabia 130: Special edition</h3><a class="media-cart-action download" href="${file}">Download</a></article></div></div></article>`);
+  const page = run(html, `${base}skoda-fabia-130/`);
+  const [embed] = blocks(page, 'Embed');
+  assert.ok(embed, 'the clip is an Embed');
+  const link = embed.querySelector('tr:nth-child(2) a');
+  assert.equal(link.getAttribute('href').split('/').pop(), 'FABIA-SE-HIGHLIGHTS_H264UHD_ENG_e91b6d28.mp4');
+  assert.equal(txt(link), 'Škoda Fabia 130: Special edition');
+  assert.equal(page.querySelectorAll('iframe, a[href^="https://player.vimeo.com"]').length, 0);
 });

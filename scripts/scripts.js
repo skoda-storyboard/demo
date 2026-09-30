@@ -118,6 +118,8 @@ function buildEmbedAutoBlocks(main) {
   links.forEach((link) => {
     if (link.closest('.embed, .widget')) return;
     if (!isEmbedUrl(link.href)) return;
+    // A linked image is an authored banner (e.g. the press-kit Spotify banner), not a bare URL.
+    if (link.querySelector('img, picture')) return;
     const p = link.closest('p');
     // Only autoblock when the provider URL is alone on its line (its own paragraph).
     if (
