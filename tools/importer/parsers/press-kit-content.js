@@ -1,4 +1,5 @@
 /* global WebImporter */
+import parseTiles from './press-kit-hub-tiles.js';
 
 const text = (node) => (node?.textContent || '').replace(/\s+/g, ' ').trim();
 
@@ -101,6 +102,39 @@ function inlineGalleries(root, document) {
   });
 }
 
+// The widest floated image that still counts as a callout icon (the X/WhatsApp icons are 50).
+const FLOAT_ICON_MAX_WIDTH = 60;
+
+// A small left-floated icon before its text (the Elroq covered-drive X and WhatsApp lines:
+// `<p><img width="50" style="float:left"></p><div>text</div>`, or icon and text in one <p>)
+// is the same callout as the one-row layout table: `Columns (callout)`. Full width in DA
+// otherwise (DA drops the width). The icon is decorative (its text says it; the source alt
+// names an unrelated photo), so its alt is emptied.
+function floatCallouts(widget, document) {
+  widget.querySelectorAll(':scope > p > img[width]').forEach((img) => {
+    const width = Number(img.getAttribute('width'));
+    if (!(width > 0 && width <= FLOAT_ICON_MAX_WIDTH)
+      || !/float:\s*left/i.test(img.getAttribute('style') || '')) return;
+    const p = img.parentElement;
+    const rest = [...p.childNodes]
+      .filter((node) => node !== img && (node.nodeType === 1 || text(node)));
+    let body = rest;
+    if (!rest.length) {
+      const next = p.nextElementSibling;
+      if (!next || !text(next) || next.querySelector('img')) return;
+      body = [...next.childNodes];
+      next.remove();
+    }
+    img.setAttribute('alt', '');
+    ['style', 'class', 'loading', 'decoding'].forEach((attr) => img.removeAttribute(attr));
+    const icon = document.createElement('p');
+    icon.append(img);
+    const copy = document.createElement('p');
+    copy.append(...body);
+    p.replaceWith(WebImporter.DOMUtils.createTable([['Columns (callout)'], [[icon], [copy]]], document));
+  });
+}
+
 function contents(panel, document, { nested: inBlock = false } = {}) {
   const nested = panel.querySelector(':scope > .panel-widget-style .panel-layout, :scope > .panel-layout, .panel-layout');
   // The SiteOrigin grid and answer panels recursively contain one another.
@@ -114,11 +148,23 @@ function contents(panel, document, { nested: inBlock = false } = {}) {
       const heading = title ? [Object.assign(document.createElement('h2'), { textContent: title })] : [];
       embedUrls(widget, document, { nested: inBlock });
       inlineGalleries(widget, document);
+      // Blocks can't nest: inside an accordion answer or a Columns cell the icon stays inline.
+      if (!inBlock) floatCallouts(widget, document);
       // Stray rules would split the DA section; pull-quote rules are consumed in `preprocess`.
       widget.querySelectorAll('hr').forEach((rule) => rule.remove());
       const items = widget.childNodes;
       return [...heading, ...[...items].filter((node) => node.nodeType === 1 || text(node))];
     });
+  }
+  // A WordPress video widget holds one cart attachment, as in a text widget (Fabia 130: its
+  // Vimeo clip + MP4 master), so the same native-MP4 rule applies.
+  if (panel.matches('.widget_media_video')) {
+    const holder = panel.querySelector('.media-cart-item.attachment')?.parentElement;
+    if (!holder || panel.querySelectorAll('iframe').length !== 1) {
+      throw new Error('Press-kit video widget needs one cart attachment with a player');
+    }
+    embedUrls(holder, document, { nested: inBlock });
+    return [...holder.children];
   }
   if (!text(panel) && !panel.querySelector('img, a[href]')) return [];
   throw new Error(`Unsupported press-kit content widget: ${panel.className}`);
@@ -152,9 +198,19 @@ function columnsRow(cells, document) {
 function flatten(layout, document, { nested = false } = {}) {
   const output = [];
   let rows = [];
+  let tileGrids = [];
   const flush = () => {
     if (rows.length) output.push(WebImporter.DOMUtils.createTable([['Accordion'], ...rows], document));
     rows = [];
+  };
+  // Consecutive rows of chapter teasers (an older kit landing page in article form, e.g. the
+  // second Elroq kit) are one tiles mosaic, as on a hub.
+  const flushTiles = () => {
+    if (!tileGrids.length) return;
+    const holder = document.createElement('div');
+    holder.append(...tileGrids);
+    output.push(parseTiles(holder, document));
+    tileGrids = [];
   };
 
   [...layout.children].forEach((grid) => {
@@ -162,6 +218,14 @@ function flatten(layout, document, { nested = false } = {}) {
       if (text(grid) || grid.querySelector('img, a[href]')) throw new Error('Unexpected press-kit article grid');
       return;
     }
+    const gridPanels = [...grid.querySelectorAll(':scope > .panel-grid-cell > .so-panel')];
+    if (!nested && gridPanels.some((panel) => panel.matches('.widget_ys-so-widget-post-teaser'))
+      && gridPanels.every((panel) => panel.matches('.widget_ys-so-widget-post-teaser, .widget_skoda-offset'))) {
+      flush();
+      tileGrids.push(grid);
+      return;
+    }
+    flushTiles();
     const filled = [...grid.children].filter((cell) => cell.matches('.panel-grid-cell') && hasContent(cell));
     // Accordion answers are linear: DA blocks can't nest (accordion contract).
     if (!nested && filled.length > 1
@@ -199,6 +263,7 @@ function flatten(layout, document, { nested = false } = {}) {
     });
   });
   flush();
+  flushTiles();
   return output;
 }
 

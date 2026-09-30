@@ -134,6 +134,8 @@ var CustomImportScript = (() => {
       }
       cells.push(["template", template]);
     }
+    const [, railTemplate] = cells.find(([key]) => key === "template") || [];
+    if (railTemplate === "image" || railTemplate === "video") cells.push(["index", "/en/media-feed.json"]);
     const table = WebImporter.DOMUtils.createTable(cells, document2);
     element.replaceWith(table);
   }
@@ -759,7 +761,6 @@ var CustomImportScript = (() => {
     "/en/skoda-world/sportline-models-dynamic-elegance-for-every-day",
     "/en/skoda-world/the-immortal-octavia-see-what-it-looks-like-after-one-million-kilometres",
     "/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour",
-    "/en/skoda-world/the-skoda-elroq-reveals-its-sustainable-interior",
     "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too",
     "/en/tag/company/design",
     "/en/tag/company/production",

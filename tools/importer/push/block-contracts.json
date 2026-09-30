@@ -117,6 +117,7 @@
         "perpage",
         "columns",
         "excludefeatured",
+        "offset",
         "feature"
       ]
     },

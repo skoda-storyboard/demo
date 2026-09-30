@@ -9,7 +9,10 @@ export default function parseTiles(content, document) {
   sourceRows.forEach((tiles, rowIndex) => {
     const wide = tiles.filter((tile) => tile.querySelector('.ratio-container.ratio-2x1')).length;
     const square = tiles.filter((tile) => tile.querySelector('.ratio-container.ratio-1x1')).length;
-    if (!((wide === 2 && square === 1 && tiles.length === 3)
+    // Older kits also use half rows: 2 wide tiles, or 1 wide + 2 quarters in either order.
+    const half = (wide === 2 && tiles.length === 2)
+      || (wide === 1 && square === 2 && tiles.length === 3);
+    if (!((wide === 2 && square === 1 && tiles.length === 3) || half
       || (wide === 0 && square === tiles.length && [4, 5].includes(tiles.length)))) {
       throw new Error(`Press-kit tile row ${rowIndex + 1} has an unsupported layout`);
     }
@@ -28,9 +31,10 @@ export default function parseTiles(content, document) {
       const link = document.createElement('a');
       link.href = sourceLink.href;
       link.textContent = title;
+      const isWide = !!tile.querySelector('.ratio-container.ratio-2x1');
       let token = 'press-square';
-      if (tile.querySelector('.ratio-container.ratio-2x1')) token = 'feature';
-      else if (tiles.length === 4) token = 'press-quarter';
+      if (isWide) token = half ? 'press-half' : 'feature';
+      else if (tiles.length === 4 || half) token = 'press-quarter';
       rows.push([token, img, link]);
     });
   });
