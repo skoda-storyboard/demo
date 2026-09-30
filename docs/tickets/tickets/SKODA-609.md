@@ -29,8 +29,10 @@ is regenerated (227 paths + the alias), and all 18 bundles are rebuilt (`esbuild
 that #223 did not bundle. The index already holds exactly one mixed-reality row.
 
 Remaining (content, needs credentials):
-1. DA `/redirects` sheet row: `Source` `/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality`
-   → `Destination` `/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality`; preview + publish the sheet.
+1. ✅ Done 2026-09-30: DA `/redirects` sheet row `Source` `/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality`
+   → `Destination` `/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality`; sheet previewed + published. The
+   older press-kit rows now point to `/en/press-kits` (no trailing slash, since EDS 404s it). A stale DA doc still sits at
+   the alias path. Redirects should take precedence; if the alias still serves it, unpublish/delete that doc.
 2. SKODA-603 backlog imports clear 8 of the 9 dead targets: `/en/press-kits/skoda-peaq-press-kit-2/images`
    (13 links), the 5 press releases and the 2 press kits listed in the report.
 3. Re-import + push `/en/models/skoda-elroq-through-designers-eyes` so its Elroq sustainable-interior link turns
