@@ -123,11 +123,15 @@
   background-color: var(--light-color);
 }
 
-@media (width >= 768px) {
+/* the gap to the next section: live .promo-box { margin: 1rem 0 2rem }, and 0 below 720 (its own
+   source transition, apart from the 768 grid switch below) */
+@media (width >= 720px) {
   .promo-box {
     margin-block-end: var(--promo-following-gap);
   }
+}
 
+@media (width >= 768px) {
   .promo-box .promo-box-items {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);

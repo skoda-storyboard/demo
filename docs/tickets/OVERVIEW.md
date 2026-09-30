@@ -183,6 +183,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-223](tickets/SKODA-223.md) | Gallery `preview` variant (press-release sidebar media-kit preview, "+N" pill) (#171) | E02 | 1.5 | 0.5 | 1–1.5 | 203,607,819 | 🟡 In review ([PR #201](https://github.com/skoda-storyboard/demo/pull/201)), M1; from the 607 phase split (contract `gallery-preview`, readable fallback). Branch `skoda-223-gallery-preview` matches the source rects on all 5 releases |
 | [SKODA-224](tickets/SKODA-224.md) | Story Rail `press` variant (Related Press Releases band cards) (#172) | E02 | 1 | 0.5 | 1 | 212,212a,820,607 | 🔵 M1; from the 607 phase split + 612 block half (contract `story-rail-press`) |
 | [SKODA-225](tickets/SKODA-225.md) | Columns unequal split + intrinsic portrait (story 2-cell rows) | E02 | 1 | 0.5 | 1 | 801,824 | 🟢 cosmetic; Demo sweep 2026-09-25 |
+| [SKODA-226](tickets/SKODA-226.md) | Storyboard home rails: live card ladder (90/45/30) + "All" header button and end card | E02 | 2 | 0.5–1 | 1–2 | 611b,212,212a,224,611a,827 | 🔵 M1 Should; split from SKODA-611b (2026-09-30) |
 | SKODA-301 | Header + mega-menu (3 panels) | E03 | 5 | 2–3 | 4–6 | 102,106 | 🟡 |
 | SKODA-302 | Mobile nav toggle + ARIA (a11y fix) | E03 | 2 | 1 | 1–2 | 301 | 🟡 fixes source gap |
 | SKODA-303 | Language switcher (6 locales) | E03 | 2 | 1 | 1–2 | 301 | 🟢 |
@@ -223,7 +224,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-512](tickets/SKODA-512.md) | Media taxonomy in AEM Assets (15 facet tag namespaces + source-term mapping at ingest) (#179) | E05 | 2 | 0.5–1 | 1.5–2 | 504,401 | 🔵 M2; from the 608 decision (facets aren't AEM tags yet) |
 | [SKODA-611](tickets/SKODA-611.md) | Storyboard home composition (/en cover-box stack, promo exclusion) | E06 | 2.5 | 1 | 2–2.5 | 212,213,214,217,218,603 | 🟡 M1; Demo sweep 2026-09-25; no owner since 604 re-point; **parent** of 611a/611b (D2); promo exclusion already fixed by #110 |
 | [SKODA-611a](tickets/SKODA-611a.md) | Home section structure: 9 cover-box sections, dark bands, social strip (Must slice) | E06 | 1 | 0.5 | 1 | 213,214,217,218,603 | 🟡 In review (branch `skoda-611a-home-sections`); code + importer done; DA `/en` split pending a human author |
-| [SKODA-611b](tickets/SKODA-611b.md) | Home band spacing: 67px gap, 320px rail pitch (Should slice) | E06 | 1.5 | 0.5 | 1–1.5 | 611a,218 | 🟡 M1 Should |
+| [SKODA-611b](tickets/SKODA-611b.md) | Home band spacing: light-band padding + gaps to live (Should slice; card pitch → SKODA-226) | E06 | 1.5 | 0.5 | 1–1.5 | 611a,218 | 🟡 M1 Should; in progress 2026-09-30 (branch `skoda-611b-home-spacing`, local): band spacing only, rail cards → SKODA-226 |
 | [SKODA-612](tickets/SKODA-612.md) | Press-release Related Press Releases band imported as default content (empty-`href` card images) | E06 | 1.5 | 0.5 | 1–1.5 | 508,212,603 | ⤵ folded 2026-09-27: importer half → 607, block half → 224 |
 | [SKODA-801a](tickets/SKODA-801a.md) | M1 story import fidelity slice (Media Box + 21-story run; carousel → 819, Vimeo → 818) | E08 | 1.5 | 0.5–1 | 1.5–2 | 601,801,819,818,502,204 | 🟠 M1 Must; slice of 801; re-scoped 3 → 1.5 SP (review §15) |
 | [SKODA-805a](tickets/SKODA-805a.md) | Press-kit tiles hub, M1 slice + importer (3 hubs) | E08 | 3 | 1–2 | 3–4 | 601,602,202,201,305,609 | 🟠 M1 Must; slice of 805 |
