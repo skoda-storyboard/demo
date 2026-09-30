@@ -54,6 +54,6 @@ https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-pre
 # HELD by decision: Peaq Images (230 distinct images; html2md max 200 per document).
 # IN DA + PREVIEWED, publish after this branch merges (press-half tile runtime):
 #   the Enyaq, Vision O, Elroq, Superb and Kodiaq hubs + the second Elroq kit (article with tiles).
-# IMPORTED, HELD by the SKODA-503 binary gate (22 PDF + 12 MP4 rows recorded partial/pending in
+# IMPORTED, HELD by the SKODA-503 binary gate (23 PDF + 12 MP4 rows recorded partial/pending in
 #   media-manifest.json for the developer-machine DAM ingest; push + preview after it):
 #   the 9 press releases above, the Elroq and Epiq covered-drive kits, Fabia 130.
