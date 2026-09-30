@@ -4,8 +4,8 @@
 - **Phase:** A · **Milestone:** M1 Should (demo-visible on 11 model tag pages)
 - **GitHub issue:** [#167](https://github.com/skoda-storyboard/demo/issues/167)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
-- **Status (2026-09-30):** 🟡 In review. Built on branch `skoda-222-featured-model` (local, not yet committed or
-  pushed). The content was already imported: 11 archives carry the card in DA. No re-import is needed.
+- **Status (2026-09-30):** 🟡 In review. Branch `skoda-222-featured-model` is pushed (19b6909, 88f35ea); no PR yet.
+  The content was already imported: 11 archives carry the card in DA. No re-import is needed.
 
 ## Origin
 SKODA-209 M1 slice (2026-09-26). It's split out because it spans two areas (stakeholder decision): the
@@ -50,7 +50,8 @@ stakeholder decision (2026-09-26).
       the same content and CTAs. *(Also checked at 1280 / 1250 / 1200 / 1121 / 1120 / 1024 / 992 / 991 / 320.)*
 - [x] Below 992 the card starts collapsed and the title toggles it (keyboard + screen reader). *(The switch is at
       992, as on the source; the AC used to say 1024.)*
-- [x] Archives without a `feature` row are unchanged, as are the other `stories` uses (home feed).
+- [x] Archives without a `feature` row are unchanged, as are the other `stories` uses (home feed). *(One deliberate
+      change: at ≥1248 every stories grid, home feed included, is 20px wider, to match the source; see Implementation.)*
 - [x] No re-import needed (shape v1); the 11 pages re-QA'd.
 - [x] The first page shows 4 stories + the card, and Load more adds 6 (decision 2026-09-30).
 
@@ -63,7 +64,7 @@ stakeholder decision (2026-09-26).
   - `.hlxignore`: block test files are no longer served.
 - **Markup:** `li.stories-feature` is the grid's first cell. It holds:
   - `h2.stories-feature-title`, containing a `button.stories-feature-toggle[aria-expanded][aria-controls]` and the
-    plain `span.stories-feature-text`. CSS shows one or the other, so no viewport logic runs in JS. The title is an
+    plain `span.stories-feature-text`. CSS shows one or the other, so the layout needs no JS; JS only keeps focus in the card when the width crosses 992. The title is an
     h4 when the feed has an authored heading (h3).
   - `div.stories-feature-panel`, holding `picture.stories-feature-image` (480px rendition, authored width/height
     kept so the lazy image reserves its space) and `ul.stories-feature-ctas`.
