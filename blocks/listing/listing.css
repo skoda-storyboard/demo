@@ -12,8 +12,31 @@
   /* the source sort row height: sort links and the desktop "Advanced filter" toggle */
   --listing-sort-height: 35px;
 
+  position: relative; /* hosts the results-reload veil */
   width: min(100%, var(--content-max-width));
   margin-inline: auto;
+}
+
+/* results-reload veil (source #search-filter-results .overlay): after a filter change the
+   whole listing fades to a translucent white for the update and blocks clicks. It sits
+   above the cards' stretched links (z-index 1) and the media card menus (2). */
+.listing::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: var(--listing-loading-veil);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out, visibility 0s linear 0.2s;
+}
+
+.listing.is-loading::before {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.2s ease-in-out, visibility 0s;
 }
 
 /* sr-only utility (facet legends) */
@@ -41,16 +64,42 @@
   --facet-box: 18px;
   --facet-option-height: 24px;
   --facet-option-column: 160px;
+  --facet-reveal-time: 0.4s; /* source jQuery show(400): height, margins, opacity */
+  --facet-reveal: var(--facet-reveal-time) ease-in-out;
+  --facet-focus-room: 4px; /* focus ring + pill shadow stay visible inside the clip */
 
-  display: none;
-
-  /* open: 16px below where the sort row sits when closed (its own 1em top margin + 16px),
-     24px above the sort row (live form.search-filter) */
-  margin-block: calc(2 * var(--spacing-m)) var(--spacing-l);
+  /* collapsed: no height, no margins, invisible (and so unfocusable) */
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-block: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--facet-reveal),
+    margin-block var(--facet-reveal),
+    opacity var(--facet-reveal),
+    visibility 0s linear var(--facet-reveal-time);
 }
 
+/* open: 16px below where the sort row sits when closed (its own 1em top margin + 16px),
+   24px above the sort row (live form.search-filter) */
 .listing.facets-open .listing-facets {
-  display: block;
+  grid-template-rows: 1fr;
+  margin-block: calc(2 * var(--spacing-m)) var(--spacing-l);
+  opacity: 1;
+  visibility: visible;
+  transition:
+    grid-template-rows var(--facet-reveal),
+    margin-block var(--facet-reveal),
+    opacity var(--facet-reveal),
+    visibility 0s;
+}
+
+.listing .facet-inner {
+  min-block-size: 0;
+  padding: var(--facet-focus-room);
+  margin: calc(-1 * var(--facet-focus-room));
+  overflow: hidden;
 }
 
 /* pills wrap at their natural width; the source spaces them with a trailing margin */
@@ -65,7 +114,8 @@
   align-items: center;
   height: var(--facet-pill-height);
   padding: 0 21px;
-  margin: 0 var(--facet-pill-gap-inline) var(--facet-pill-gap-block) 0;
+  margin-block: 0 var(--facet-pill-gap-block);
+  margin-inline: 0 var(--facet-pill-gap-inline);
   font-size: var(--body-font-size-s);
   font-weight: var(--weight-semibold);
   line-height: 1.5;
@@ -136,16 +186,25 @@
   column-width: var(--facet-option-column);
   column-gap: var(--spacing-m);
   border: 0;
+  transition: opacity 0.2s ease-in-out; /* source .filter-input-options: fades in */
+}
+
+/* fade in from 0 each time a list is shown (display: none → block) */
+@starting-style {
+  .listing .facet-panel {
+    opacity: 0;
+  }
 }
 
 .listing .facet-panel[hidden] {
   display: none;
 }
 
+/* a row is at least 24px; a long or translated name wraps, the box stays on its first line */
 .listing .facet-option {
   position: relative;
   display: block;
-  block-size: var(--facet-option-height);
+  min-block-size: var(--facet-option-height);
   margin-inline-start: 8px;
   break-inside: avoid;
   cursor: pointer;
@@ -165,7 +224,8 @@
 .listing .facet-option-label {
   position: relative;
   display: inline-block;
-  padding: 0 5px 0 calc(var(--facet-box) + 9px);
+  padding-block: 0;
+  padding-inline: calc(var(--facet-box) + 9px) 5px;
   font-size: var(--body-font-size-s);
   font-weight: var(--weight-regular);
   line-height: var(--facet-box);
@@ -185,7 +245,7 @@
 
 /* unchecked: 2px inset grey outline */
 .listing .facet-option-label::before {
-  box-shadow: inset 0 0 0 2px var(--skoda-grey-300);
+  box-shadow: inset 0 0 0 2px var(--checkbox-border-color);
 }
 
 /* checked: green box, white tick */
@@ -653,3 +713,14 @@
   }
 }
 
+
+/* reduced motion: the filter panel, option lists and reload veil change without animating */
+@media (prefers-reduced-motion: reduce) {
+  .listing::before,
+  .listing.is-loading::before,
+  .listing .listing-facets,
+  .listing.facets-open .listing-facets,
+  .listing .facet-panel {
+    transition: none;
+  }
+}

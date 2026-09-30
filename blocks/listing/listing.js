@@ -47,6 +47,13 @@ function buildStrings(ph) {
 
 let instanceSeq = 0; // per-page counter → unique element ids when >1 listing on a page
 
+// After a filter change the source waits ~0.9s (so quick picks batch), veils the results
+// (0.2s fade), shows the new results and collapses the filter panel (measured on /en/images).
+export const FILTER_SETTLE_MS = 900;
+export const VEIL_MS = 200;
+export const REVEAL_MS = 400; // the panel's open/close animation (listing.css --facet-reveal)
+const reducedMotion = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
 const titleCase = (s) => String(s).replace(/(^|[\s-])([a-z])/g, (m) => m.toUpperCase());
 const labelFor = (key, labels) => labels[key] || FACET_LABELS[key] || titleCase(key);
 // Facet values are index slugs ("peaq", "enyaq-coupe"); the source shows names ("Peaq").
@@ -239,7 +246,11 @@ export default async function decorate(block) {
   facetPills.className = 'facet-pills';
   const facetOptions = document.createElement('div');
   facetOptions.className = 'facet-options';
-  facetBar.append(facetPills, facetOptions);
+  // the inner wrapper lets CSS animate the panel's height open and closed (grid 0fr → 1fr)
+  const facetInner = document.createElement('div');
+  facetInner.className = 'facet-inner';
+  facetInner.append(facetPills, facetOptions);
+  facetBar.append(facetInner);
   const chipsRow = document.createElement('div');
   chipsRow.className = 'listing-chips';
   const sortRow = document.createElement('div');
@@ -282,6 +293,19 @@ export default async function decorate(block) {
     return;
   }
 
+  // Deep-link values match the index value case-insensitively (`filter[model][]=Peaq` →
+  // "peaq"), so the checkbox shows as ticked and a second pick doesn't duplicate it.
+  function canonicalValues(active) {
+    const out = {};
+    Object.entries(active).forEach(([key, vals]) => {
+      const known = new Map(distinctFacetValues(scoped, key)
+        .map(({ value }) => [String(value).toLowerCase(), value]));
+      out[key] = [...new Set(vals.map((v) => known.get(String(v).toLowerCase()) ?? v))];
+    });
+    return out;
+  }
+  state.active = canonicalValues(state.active);
+
   // --- rendering ---------------------------------------------------------
   const filteredSorted = () => sortRows(filterRows(scoped, state.active), state.sort);
   let currentRows = []; // the rows the grid shows, in order (the media lightbox's items)
@@ -320,6 +344,7 @@ export default async function decorate(block) {
         chip.textContent = `${labelFor(key, cfg.facetLabels)}: ${valueLabel(val)}`;
         chip.setAttribute('aria-label', `${STRINGS.removeFilter}: ${labelFor(key, cfg.facetLabels)} — ${valueLabel(val)}`);
         chip.addEventListener('click', () => {
+          cancelPendingFilter(); // this render includes any pick still settling
           state.active[key] = (state.active[key] || []).filter((v) => v !== val);
           if (!state.active[key].length) delete state.active[key];
           state.revealed = cfg.perpage;
@@ -351,6 +376,7 @@ export default async function decorate(block) {
       btn.className = 'listing-loadmore-btn';
       btn.textContent = STRINGS.loadMore;
       btn.addEventListener('click', () => {
+        flushPendingFilter(); // a pick still settling shows first, so paging counts its rows
         const prev = grid.children.length;
         state.revealed += cfg.perpage;
         updateUrl(true); // load-more pushes a history entry (source offset paging)
@@ -402,11 +428,51 @@ export default async function decorate(block) {
     renderGrid();
   }
 
-  // Close any open option list; returns its pill (or null) so Esc can hand focus back.
+  // A checkbox change, as on the source: settle, veil the listing, show the new results and
+  // collapse the panel (focus goes to the toggle if it was in the panel), then unveil.
+  // The checkbox itself ticks at once; a later change (even under the veil) restarts it.
+  let settleTimer = 0;
+  let veilTimer = 0;
+  function cancelPendingFilter() {
+    clearTimeout(settleTimer);
+    clearTimeout(veilTimer);
+    settleTimer = 0;
+    veilTimer = 0;
+    block.classList.remove('is-loading');
+    block.removeAttribute('aria-busy');
+  }
+  // show a pick that is still settling now, without the veil or the collapse
+  function flushPendingFilter() {
+    if (!settleTimer && !veilTimer) return;
+    cancelPendingFilter();
+    rerender();
+  }
+  function applyFilterChange() {
+    cancelPendingFilter();
+    settleTimer = setTimeout(() => {
+      settleTimer = 0;
+      block.classList.add('is-loading');
+      block.setAttribute('aria-busy', 'true');
+      veilTimer = setTimeout(() => {
+        veilTimer = 0;
+        rerender();
+        const hadFocus = facetBar.contains(document.activeElement);
+        setFacetsOpen(false);
+        if (hadFocus) filterToggle.focus();
+        block.classList.remove('is-loading');
+        block.removeAttribute('aria-busy');
+      }, reducedMotion() ? 0 : VEIL_MS);
+    }, FILTER_SETTLE_MS);
+  }
+
+  // Open or close one pill's option list (panels are looked up by pill, not by id).
+  const panelFor = new Map();
   function setOptionsOpen(pill, open) {
     pill.setAttribute('aria-expanded', String(open));
-    facetOptions.querySelector(`#${pill.getAttribute('aria-controls')}`).hidden = !open;
+    panelFor.get(pill).hidden = !open;
   }
+
+  // Close any open option list; returns its pill (or null) so Esc can hand focus back.
 
   function closeOptionPanels() {
     const openPill = facetPills.querySelector('.facet-pill[aria-expanded="true"]');
@@ -461,7 +527,7 @@ export default async function decorate(block) {
         if (cb.checked) cur.add(value); else cur.delete(value);
         if (cur.size) state.active[key] = [...cur]; else delete state.active[key];
         state.revealed = cfg.perpage;
-        rerender();
+        applyFilterChange();
       });
       // name only, like the source ("Peaq"); the box is drawn on the text span in CSS
       const txt = document.createElement('span');
@@ -477,6 +543,7 @@ export default async function decorate(block) {
       setOptionsOpen(pill, !open);
     });
 
+    panelFor.set(pill, panel);
     facetPills.append(pill);
     facetOptions.append(panel);
   });
@@ -494,6 +561,7 @@ export default async function decorate(block) {
     s.textContent = lbl;
     s.setAttribute('aria-pressed', String(state.sort === val));
     s.addEventListener('click', () => {
+      cancelPendingFilter(); // this render includes any pick still settling
       state.sort = val;
       state.revealed = cfg.perpage;
       sortList.querySelectorAll('.listing-sort-btn').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.sort === val)));
@@ -508,9 +576,16 @@ export default async function decorate(block) {
   // panel, closes one layer at a time: an open option list first (focus back to its pill),
   // then the panel (focus back to the toggle). Esc elsewhere in the block (a result card,
   // Load more) and an Esc an inner control already handled (defaultPrevented) are left alone.
-  // It stays open while the visitor filters (rerender never closes it).
+  // A filter selection collapses it once the results show, as on the source (applyFilterChange).
+  // Closing leaves an open option list in place until the panel has animated shut, so the
+  // list collapses with it (like live) instead of vanishing first and jolting the page.
+  let closeListsTimer = 0;
   const setFacetsOpen = (open) => {
-    if (!open) closeOptionPanels();
+    clearTimeout(closeListsTimer);
+    if (!open) {
+      if (reducedMotion()) closeOptionPanels();
+      else closeListsTimer = setTimeout(closeOptionPanels, REVEAL_MS);
+    }
     filterToggle.setAttribute('aria-expanded', String(open));
     block.classList.toggle('facets-open', open);
   };
@@ -534,8 +609,9 @@ export default async function decorate(block) {
 
   // Restore state on back/forward.
   window.addEventListener('popstate', () => {
+    cancelPendingFilter(); // back/forward replaces the state, so a settling pick is dropped
     const restored = decodeState(window.location.search, cfg.facets, cfg.perpage);
-    state.active = restored.active;
+    state.active = canonicalValues(restored.active);
     state.sort = restored.sort;
     state.revealed = restored.revealed;
     refreshPillStates();

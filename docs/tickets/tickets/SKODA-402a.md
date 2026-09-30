@@ -22,8 +22,9 @@ correction in `docs/ui-specs/faceted-listing.md`.
 
 ## Scope
 - `blocks/listing`: the 1/3/4/4 column ladder (576/768/992) for `columns 4` listings; the facet panel collapsed
-  by default at every width behind "Advanced filter (n)" (a button with `aria-expanded`), open state kept while
-  filtering, n = active facet count.
+  by default at every width behind "Advanced filter (n)" (a button with `aria-expanded`), n = active facet count.
+  After a selection the panel collapses, as on live (decision 2026-09-30; it originally said "open state kept while
+  filtering", see "Motion + selection behaviour" below).
 - No change to the row/scope/facet logic (`listing-logic.mjs`).
 
 ## Acceptance Criteria
@@ -33,8 +34,8 @@ correction in `docs/ui-specs/faceted-listing.md`.
 - [ ] News/search listings unchanged apart from the collapsed facets; lint + tests green.
 
 ## Implementation notes (2026-09-29, branch `skoda-402a-listing-layout`, ready for QA)
-- **Where:** `blocks/listing/listing.{js,css}`, `styles/brand.css` (`--facet-toggle-color`). `listing-logic.mjs` is
-  unchanged.
+- **Where:** `blocks/listing/listing.{js,css}`, `styles/brand.css` (`--facet-toggle-color`; `--listing-loading-veil` from
+  2026-09-30), `icons/caret-up.svg`. `listing-logic.mjs` is unchanged.
 - **Grid:** `columns 4` listings follow 1 / 2 (576) / 3 (768) / 4 (992); default listings keep 1 / 2 (768) / 3 (992).
   Every track is `minmax(0, 1fr)` and titles use `overflow-wrap: anywhere`, so a long unbroken title (the Images
   rows' file names) can't widen its column.
@@ -47,7 +48,8 @@ correction in `docs/ui-specs/faceted-listing.md`.
     0.3em gaps and a 20.8px caret box.
   - Every box matches the source at 390 / 575 / 767 / 768 / 992 / 1280.
 - **Behaviour:**
-  - The facets are hidden until the toggle opens them, and they stay open while filtering.
+  - The facets are hidden until the toggle opens them. (A selection now collapses them again, as on live; see
+    "Motion + selection behaviour".)
   - Esc closes one layer at a time: an open option list first (focus returns to its pill), then the panel (focus
     returns to the toggle). Closing the panel also closes any open option list.
   - An Esc that an inner control has already handled (`defaultPrevented`) is left alone. For example, closing a
@@ -75,7 +77,7 @@ correction in `docs/ui-specs/faceted-listing.md`.
 - **Tests:** 6 new jsdom tests in `blocks/listing/listing.test.mjs`:
   - source order;
   - collapsed default and "(0)";
-  - filtering updates the count, and the panel stays open;
+  - filtering updates the count (since 2026-09-30, then collapses the panel);
   - a deep link opens the panel with "(1)";
   - Esc layers, and Esc on a card is ignored;
   - an Esc already handled by an inner control is left alone.
@@ -116,5 +118,48 @@ Measured on live `form.search-filter` (/en/images, 1280 / 390) and matched:
 - **Tests:** 3 more jsdom tests (19 in the file): the pill row + options area with one list open at a time;
   names-only labels and `valueLabel`; a deep link opening the filtered facet's options.
 
+## Motion + selection behaviour (2026-09-30, QA: "not smooth as live", "selection collapses")
+Measured on live `/en/images`, frame by frame:
+- **Panel open / close:** jQuery `show(400)` animates height, margins and opacity from 0. Ours animates
+  `grid-template-rows 0fr → 1fr`, margins and opacity over `0.4s ease-in-out`, with no JS animation. The panel
+  stays `visibility: hidden` (so unfocusable) when closed. Live also grows the width from 0, which reflows the
+  pills mid-animation; ours keeps the width.
+- **Option list:** fades in with `opacity 0.2s ease-in-out`, the same as live's `.filter-input-options`
+  (`@starting-style`).
+- **After a selection (AC change, decision 2026-09-30: "collapse like live").** The earlier AC said the panel
+  stays open while filtering. Live instead:
+  - waits ~0.9s after the change (quick picks batch);
+  - fades a translucent veil (`rgb(247 247 247 / 50%)`, 0.2s) over the whole listing, `#search-filter-results
+    .overlay`;
+  - shows the new results;
+  - collapses the panel, leaving "Advanced filter (n)" + the chip.
+
+  Ours does the same:
+  - `FILTER_SETTLE_MS` 900 and `VEIL_MS` 200 time it;
+  - `.listing.is-loading::before` is the veil, and `aria-busy` is set on the block while it shows;
+  - the panel collapses with its 0.4s animation, and focus moves from the now hidden checkbox to the toggle.
+  - Measured: the veil starts at ~955ms (live 917ms), reaches full opacity 0.2s later, then the results update,
+    the veil fades out and the panel closes. Live holds the veil for its server round-trip (~2.7s); ours clears
+    after 0.2s, because the index is already loaded.
+- **Reduced motion:** no panel, list or veil animation.
+- **Tests:** the filtering test now drives the flow with `mock.timers`:
+  - the tick is immediate, and a second quick pick restarts the settle;
+  - the veil and `aria-busy` are set, then cleared;
+  - the count and chips update, the panel and list collapse, and focus lands on the toggle.
+
+- **Code review (2026-09-30) fixes:**
+  - **Closing no longer drops the open option list first.** It stays in place until the panel has animated shut
+    (`REVEAL_MS` 400), so the list collapses with the panel instead of the content jumping ~90px.
+  - **A pick still settling is handled** by sort and chip removal (cancelled; their render includes it), Load more
+    (shown first, so paging counts its rows) and back/forward (dropped). None of these gets a late veil or collapse.
+  - **Both timers are tracked,** so a second pick under the veil restarts once: one veil, one collapse.
+  - **Option rows are `min-block-size` 24px:** long or translated names wrap, and the box stays on the first line.
+  - **Pill margins and label padding use logical properties** (RTL), and the box uses `--checkbox-border-color`.
+  - **Deep-link values match index values case-insensitively** (`?filter[model][]=Peaq` ticks "peaq"; no duplicate
+    chip).
+  - **Tests:** 24 in `listing.test.mjs`.
+- **For product review (WCAG 3.2.2 On Input):** collapsing the panel after a checkbox change, and moving focus to
+  the toggle, is a change of context caused by input. It follows the "collapse like live" decision. Keyboard and
+  screen-reader users must reopen the panel and the pill for each further pick.
 ## Dependencies
 SKODA-402 (listing), SKODA-608 (rows + published listings). Related: SKODA-406 (media card).

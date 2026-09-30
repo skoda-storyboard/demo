@@ -52,6 +52,7 @@ globalThis.fetch = async (url) => {
 
 const {
   default: decorate, mediaCell, isMediaTemplate, wireMediaLightbox, valueLabel,
+  FILTER_SETTLE_MS, VEIL_MS, REVEAL_MS,
 } = await import('./listing.js');
 
 const click = (el, init = {}) => el.dispatchEvent(new window.MouseEvent('click', {
@@ -251,15 +252,125 @@ test('402a: collapsed by default; the toggle always shows the count, "(0)" inclu
   assert.ok(block.classList.contains('facets-open'));
 });
 
-test('402a: filtering updates the count and keeps the panel open', async () => {
+test('402a: a selection settles, veils the listing, updates and collapses the panel (like live)', async (t) => {
   const { block, toggle } = await facetListing('/en/filter-index.json');
+  t.mock.timers.enable({ apis: ['setTimeout'] });
   click(toggle);
-  const peaq = block.querySelector('.facet-panel[data-facet="model"] input[value="Peaq"]');
-  peaq.checked = true;
-  peaq.dispatchEvent(new window.Event('change', { bubbles: true }));
-  assert.equal(toggle.textContent, 'Advanced filter (1)');
-  assert.ok(block.classList.contains('facets-open'), 'still open while filtering');
+  click(block.querySelector('.facet-pill[data-facet="model"]'));
+  const change = (value) => {
+    const cb = block.querySelector(`.facet-panel[data-facet="model"] input[value="${value}"]`);
+    cb.checked = true;
+    cb.focus();
+    cb.dispatchEvent(new window.Event('change', { bubbles: true }));
+  };
+  change('Peaq');
+  // the checkbox ticks at once; results wait for the settle time
+  assert.equal(toggle.textContent, 'Advanced filter (0)');
+  t.mock.timers.tick(FILTER_SETTLE_MS - 100);
+  change('Epiq'); // a second quick pick restarts the settle (batched)
+  t.mock.timers.tick(FILTER_SETTLE_MS - 1);
+  assert.equal(block.classList.contains('is-loading'), false);
+  t.mock.timers.tick(1);
+  assert.ok(block.classList.contains('is-loading'), 'veil fades in');
+  assert.equal(block.getAttribute('aria-busy'), 'true');
+  assert.ok(block.classList.contains('facets-open'), 'still open under the veil');
+  t.mock.timers.tick(VEIL_MS);
+  assert.equal(block.classList.contains('is-loading'), false, 'veil fades out');
+  assert.equal(block.hasAttribute('aria-busy'), false);
+  assert.equal(toggle.textContent, 'Advanced filter (2)');
+  assert.equal(block.querySelectorAll('.listing-chip').length, 2);
+  assert.equal(block.classList.contains('facets-open'), false, 'panel collapsed');
+  assert.equal(toggle.getAttribute('aria-expanded'), 'false');
+  assert.equal(document.activeElement, toggle, 'focus moves from the hidden checkbox to the toggle');
+  // the open list collapses inside the panel, then closes once the panel has animated shut
+  assert.ok(block.querySelector('.facet-pill[aria-expanded="true"]'), 'list still in place while collapsing');
+  t.mock.timers.tick(REVEAL_MS);
+  assert.equal(block.querySelector('.facet-pill[aria-expanded="true"]'), null, 'option list closed');
+});
+
+const pick = (block, value) => {
+  const cb = block.querySelector(`.facet-panel[data-facet="model"] input[value="${value}"]`);
+  cb.checked = true;
+  cb.dispatchEvent(new window.Event('change', { bubbles: true }));
+};
+
+test('402a: sort or back/forward during the settle cancels the delayed veil + collapse', async (t) => {
+  const { block, toggle } = await facetListing('/en/cancel-index.json');
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  click(toggle);
+  pick(block, 'Peaq');
+  click(block.querySelector('.listing-sort-btn[data-sort="oldest"]'));
+  assert.equal(toggle.textContent, 'Advanced filter (1)', 'the sort render includes the pick');
+  t.mock.timers.tick(FILTER_SETTLE_MS + VEIL_MS + REVEAL_MS);
+  assert.equal(block.classList.contains('is-loading'), false, 'no late veil');
+  assert.ok(block.classList.contains('facets-open'), 'no late collapse');
+  pick(block, 'Epiq');
+  window.dispatchEvent(new window.PopStateEvent('popstate'));
+  t.mock.timers.tick(FILTER_SETTLE_MS + VEIL_MS);
+  assert.equal(block.classList.contains('is-loading'), false);
+  assert.ok(block.classList.contains('facets-open'));
+});
+
+test('402a: Load more during the settle shows the pick first, with no late veil', async (t) => {
+  const { block, toggle } = await facetListing('/en/loadmore-index.json');
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  click(toggle);
+  pick(block, 'Peaq');
+  const more = block.querySelector('.listing-loadmore-btn');
+  if (more) click(more);
+  assert.equal(toggle.textContent, 'Advanced filter (1)', 'rendered at once');
+  assert.ok([...block.querySelectorAll('.listing-item h3')].every((h) => h.textContent !== 'Story 2'), 'only Peaq stories');
+  t.mock.timers.tick(FILTER_SETTLE_MS + VEIL_MS);
+  assert.equal(block.classList.contains('is-loading'), false);
+});
+
+test('402a: a second pick under the veil restarts once — a single collapse, no double veil', async (t) => {
+  const { block, toggle } = await facetListing('/en/veil-index.json');
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  click(toggle);
+  pick(block, 'Peaq');
+  t.mock.timers.tick(FILTER_SETTLE_MS);
+  assert.ok(block.classList.contains('is-loading'));
+  pick(block, 'Epiq'); // keyboard Space under the veil
+  assert.equal(block.classList.contains('is-loading'), false, 'the first veil is dropped');
+  t.mock.timers.tick(VEIL_MS);
+  assert.ok(block.classList.contains('facets-open'), 'no collapse from the first pick');
+  t.mock.timers.tick(FILTER_SETTLE_MS - VEIL_MS); // the restarted settle ends
+  assert.ok(block.classList.contains('is-loading'), 'one veil, for both picks');
+  t.mock.timers.tick(VEIL_MS);
+  assert.equal(toggle.textContent, 'Advanced filter (2)');
+  assert.equal(block.classList.contains('facets-open'), false);
+});
+
+test('402a: closing the panel keeps the open list until the panel has animated shut', async (t) => {
+  const { block, toggle } = await facetListing('/en/closelist-index.json');
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  click(toggle);
+  const pill = block.querySelector('.facet-pill[data-facet="model"]');
+  click(pill);
+  click(toggle);
+  assert.equal(block.classList.contains('facets-open'), false);
+  assert.equal(pill.getAttribute('aria-expanded'), 'true', 'the list collapses with the panel');
+  t.mock.timers.tick(REVEAL_MS);
+  assert.equal(pill.getAttribute('aria-expanded'), 'false');
+  // reopening before the close finishes keeps the list
+  click(toggle);
+  click(pill);
+  click(toggle);
+  click(toggle);
+  t.mock.timers.tick(REVEAL_MS);
+  assert.equal(pill.getAttribute('aria-expanded'), 'true');
+});
+
+test('402a: a deep link matches index values case-insensitively (Peaq → peaq, ticked, no duplicate)', async () => {
+  window.history.replaceState(null, '', '/en/news?filter[model][]=Peaq');
+  feed = [storyRow(1, 'peaq'), storyRow(2, 'epiq')];
+  const block = listingBlock('story', '/en/case-index.json');
+  await decorate(block);
+  const cb = block.querySelector('.facet-panel[data-facet="model"] input[value="peaq"]');
+  assert.equal(cb.checked, true);
   assert.equal(block.querySelectorAll('.listing-chip').length, 1);
+  assert.equal(block.querySelector('.listing-chip').textContent, 'Model: Peaq');
 });
 
 test('402a: a filtered deep link opens the panel showing "(1)"', async () => {
@@ -307,7 +418,7 @@ test('402a: pills in one row, the open pill\'s options full width in the area un
   const { block, toggle } = await facetListing('/en/rows-index.json');
   click(toggle);
   const bar = block.querySelector('.listing-facets');
-  assert.deepEqual([...bar.children].map((c) => c.className), ['facet-pills', 'facet-options']);
+  assert.deepEqual([...bar.querySelector('.facet-inner').children].map((c) => c.className), ['facet-pills', 'facet-options']);
   const pill = bar.querySelector('.facet-pills > .facet-pill[data-facet="model"]');
   const panel = bar.querySelector(`.facet-options > #${pill.getAttribute('aria-controls')}`);
   assert.ok(panel.hidden);

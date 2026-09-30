@@ -8,6 +8,15 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 > - Images / Videos: **initial page size 12, Load more +12** (not 6/+6).
 > - Grid is **1 / 3 / 4 / 4 columns at 375 / 768 / 992 / 1280** (not 1/2/3). The Videos DA document asks for 3 desktop columns, but the source shows 4.
 > - The facet form (15 groups) is **collapsed by default even at 1280** and revealed by "Advanced filter"; DA authored only six facets.
+>
+> **SKODA-402a re-measure (2026-09-30, /en/images + /en/news; overrides §3, §5, §6 and §9 where they differ):**
+> - The panel is a row of pills (`.filter-labels`); the open pill's option list sits full width under the whole row (`.filter-options`, 160px columns). It is not a dropdown under the pill.
+> - **Open pill:** green `#419468`, white text, caret up. A pill with selections stays grey with a green 24px count badge. There is no ✓ glyph and the pill does not turn green.
+> - **Options:** an 18px box with a 3px radius and a 2px inset `#d0d0d0` outline; green with a white tick when checked. Names only, no counts.
+> - **"Advanced filter (n)"** shows at every width, and its caret flips up when open. It is an inline disclosure, not a mobile drawer, so there is no focus trap.
+> - **Motion:** the panel opens and closes over 400ms (height, margins, opacity); an option list fades in over 0.2s.
+> - **After a selection:** ~0.9s later, a `rgb(247 247 247 / 50%)` veil fades over the listing (0.2s). The new results then show and the panel collapses.
+> - **The result count** sits under the grid, 16px below it and 32px above Load more.
 
 ## 1. Identity
 
