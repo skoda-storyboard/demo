@@ -90,5 +90,31 @@ correction in `docs/ui-specs/faceted-listing.md`.
   - Live's Images page has a media-cart notice above the grid (SKODA-505a).
   - Live's open panel holds 15 facets; DA authored 6 (spec §1).
 
+## Filter panel look & feel (2026-09-30, QA feedback: "not matching live")
+Measured on live `form.search-filter` (/en/images, 1280 / 390) and matched:
+- **Structure:** a row of pills (`.facet-pills`), then the open pill's options full width under the whole row
+  (`.facet-options`). Before, each list was a small bordered dropdown under its own pill.
+- **Pills:**
+  - Size and spacing: 35px tall, padding `0 21px`, margin `0 14px 7px 0`, `#f6f6f6`, 5px radius, `--facet-shadow`.
+    The first pill is 100.9×35 at x26 and the next starts at x140.9, as on live.
+  - **Caret:** 14px, 5px after the label (`icons/caret-up.svg`, ink 14×8 vs live 13×8). It points down, and up while
+    its options are open.
+  - **Open pill:** green `#419468`, white text.
+  - **A pill with selections:** stays grey and shows a green 24px count badge (3px border, `0 7px` margin). Before,
+    the whole pill went green with a ✓.
+- **Options:**
+  - Layout: 160px columns with a 16px gap (1280: x 34 / 212 / 389 / 567; 390: x 18 / 211, as on live). Rows are
+    24px, with an 8px indent, starting 23px under the last pill row.
+  - Checkbox: an 18×18, 3px-radius box with a 2px inset `--skoda-grey-300` outline; checked it is green with a
+    white ✓. The native checkbox stays focusable, with a focus ring on the box.
+  - Names only, title-cased from the index slug (`valueLabel`: "enyaq-coupe" → "Enyaq Coupe"), in name order, with
+    no "(n)" count. Chips use the name too.
+- **Toggle caret:** down when closed, up when open (`icon-caret-up` on live); ink 16×9 vs live 15×10.
+- **Deep link:** besides opening the panel, it opens the first filtered facet's options, as live shows them.
+- **Deliberate deviation:** option labels are `--skoda-grey-500`. Live's `#a1a1a1` (`--skoda-grey-400`) is 2.6:1
+  on white, as with the sort links.
+- **Tests:** 3 more jsdom tests (19 in the file): the pill row + options area with one list open at a time;
+  names-only labels and `valueLabel`; a deep link opening the filtered facet's options.
+
 ## Dependencies
 SKODA-402 (listing), SKODA-608 (rows + published listings). Related: SKODA-406 (media card).

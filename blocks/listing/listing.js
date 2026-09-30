@@ -49,6 +49,8 @@ let instanceSeq = 0; // per-page counter → unique element ids when >1 listing 
 
 const titleCase = (s) => String(s).replace(/(^|[\s-])([a-z])/g, (m) => m.toUpperCase());
 const labelFor = (key, labels) => labels[key] || FACET_LABELS[key] || titleCase(key);
+// Facet values are index slugs ("peaq", "enyaq-coupe"); the source shows names ("Peaq").
+export const valueLabel = (v) => titleCase(String(v).replace(/-/g, ' '));
 
 function parseListConfig(block) {
   const cfg = readBlockConfig(block);
@@ -228,9 +230,16 @@ export default async function decorate(block) {
   block.classList.add(`columns-${cfg.columns}`);
   const media = isMediaTemplate(cfg.template);
   if (media) block.classList.add('listing-media', `listing-${cfg.template}`);
+  // Facet panel, as on the source form.search-filter: a row of pills, then the open pill's
+  // option list full width under the whole row (not a dropdown under its pill).
   const facetBar = document.createElement('form');
   facetBar.className = 'listing-facets';
   facetBar.setAttribute('aria-label', STRINGS.filters);
+  const facetPills = document.createElement('div');
+  facetPills.className = 'facet-pills';
+  const facetOptions = document.createElement('div');
+  facetOptions.className = 'facet-options';
+  facetBar.append(facetPills, facetOptions);
   const chipsRow = document.createElement('div');
   chipsRow.className = 'listing-chips';
   const sortRow = document.createElement('div');
@@ -308,8 +317,8 @@ export default async function decorate(block) {
         const chip = document.createElement('button');
         chip.type = 'button';
         chip.className = 'listing-chip';
-        chip.textContent = `${labelFor(key, cfg.facetLabels)}: ${val}`;
-        chip.setAttribute('aria-label', `${STRINGS.removeFilter}: ${labelFor(key, cfg.facetLabels)} — ${val}`);
+        chip.textContent = `${labelFor(key, cfg.facetLabels)}: ${valueLabel(val)}`;
+        chip.setAttribute('aria-label', `${STRINGS.removeFilter}: ${labelFor(key, cfg.facetLabels)} — ${valueLabel(val)}`);
         chip.addEventListener('click', () => {
           state.active[key] = (state.active[key] || []).filter((v) => v !== val);
           if (!state.active[key].length) delete state.active[key];
@@ -360,10 +369,8 @@ export default async function decorate(block) {
 
   // Update the pill "active" state + count badges from current selection.
   function refreshPillStates() {
-    facetBar.querySelectorAll('.facet').forEach((f) => {
-      const key = f.dataset.facet;
-      const n = selectedCount(state.active, key);
-      const pill = f.querySelector('.facet-pill');
+    facetPills.querySelectorAll('.facet-pill').forEach((pill) => {
+      const n = selectedCount(state.active, pill.dataset.facet);
       pill.classList.toggle('active', n > 0);
       pill.querySelector('.facet-count').textContent = n ? String(n) : '';
     });
@@ -379,9 +386,9 @@ export default async function decorate(block) {
   // are built once, so any state change that doesn't originate from a checkbox
   // (chip remove, back/forward) must refresh their checked state here.
   function refreshFacetOptions() {
-    facetBar.querySelectorAll('.facet').forEach((f) => {
-      const sel = new Set(state.active[f.dataset.facet] || []);
-      f.querySelectorAll('.facet-option input').forEach((cb) => {
+    facetOptions.querySelectorAll('.facet-panel').forEach((panel) => {
+      const sel = new Set(state.active[panel.dataset.facet] || []);
+      panel.querySelectorAll('.facet-option input').forEach((cb) => {
         cb.checked = sel.has(cb.value);
       });
     });
@@ -396,27 +403,29 @@ export default async function decorate(block) {
   }
 
   // Close any open option list; returns its pill (or null) so Esc can hand focus back.
+  function setOptionsOpen(pill, open) {
+    pill.setAttribute('aria-expanded', String(open));
+    facetOptions.querySelector(`#${pill.getAttribute('aria-controls')}`).hidden = !open;
+  }
+
   function closeOptionPanels() {
-    const openPill = facetBar.querySelector('.facet-pill[aria-expanded="true"]');
-    facetBar.querySelectorAll('.facet-pill[aria-expanded="true"]').forEach((p) => {
-      p.setAttribute('aria-expanded', 'false');
-      p.closest('.facet').querySelector('.facet-panel').hidden = true;
-    });
+    const openPill = facetPills.querySelector('.facet-pill[aria-expanded="true"]');
+    facetPills.querySelectorAll('.facet-pill[aria-expanded="true"]').forEach((p) => setOptionsOpen(p, false));
     return openPill;
   }
 
   // --- facet bar ---------------------------------------------------------
   cfg.facets.forEach((key) => {
-    const values = distinctFacetValues(scoped, key);
+    // options in name order, filled column by column like the source
+    const byName = (a, b) => valueLabel(a.value)
+      .localeCompare(valueLabel(b.value), undefined, { numeric: true });
+    const values = distinctFacetValues(scoped, key).sort(byName);
     if (!values.length) return; // no data for this facet in scope → skip pill
-
-    const facet = document.createElement('div');
-    facet.className = 'facet';
-    facet.dataset.facet = key;
 
     const pill = document.createElement('button');
     pill.type = 'button';
     pill.className = 'facet-pill';
+    pill.dataset.facet = key;
     pill.setAttribute('aria-expanded', 'false');
     const panelId = `${uid}-facet-panel-${key}`;
     pill.setAttribute('aria-controls', panelId);
@@ -429,6 +438,7 @@ export default async function decorate(block) {
 
     const panel = document.createElement('fieldset');
     panel.className = 'facet-panel';
+    panel.dataset.facet = key;
     panel.id = panelId;
     panel.hidden = true;
     const legend = document.createElement('legend');
@@ -436,7 +446,7 @@ export default async function decorate(block) {
     legend.textContent = labelFor(key, cfg.facetLabels);
     panel.append(legend);
 
-    values.forEach(({ value, count }) => {
+    values.forEach(({ value }) => {
       const optId = `${uid}-facet-${key}-${value}`.replace(/[^a-z0-9-]/gi, '-');
       const wrap = document.createElement('label');
       wrap.className = 'facet-option';
@@ -453,8 +463,10 @@ export default async function decorate(block) {
         state.revealed = cfg.perpage;
         rerender();
       });
+      // name only, like the source ("Peaq"); the box is drawn on the text span in CSS
       const txt = document.createElement('span');
-      txt.textContent = `${value} (${count})`;
+      txt.className = 'facet-option-label';
+      txt.textContent = valueLabel(value);
       wrap.append(cb, txt);
       panel.append(wrap);
     });
@@ -462,12 +474,11 @@ export default async function decorate(block) {
     pill.addEventListener('click', () => {
       const open = pill.getAttribute('aria-expanded') === 'true';
       closeOptionPanels();
-      pill.setAttribute('aria-expanded', String(!open));
-      panel.hidden = open;
+      setOptionsOpen(pill, !open);
     });
 
-    facet.append(pill, panel);
-    facetBar.append(facet);
+    facetPills.append(pill);
+    facetOptions.append(panel);
   });
 
   // --- sort row: sort options + "Advanced filter (n)" toggle -------------
@@ -536,8 +547,12 @@ export default async function decorate(block) {
 
   // Initial paint (no pushState — respect the incoming URL). A deep link that already
   // filters opens the panel, so the active filters are visible (product decision
-  // 2026-09-29; the source keeps it closed and only shows the count).
+  // 2026-09-29; the source keeps it closed and only shows the count), with the first
+  // filtered facet's options open, as the source shows them once its panel is opened.
   setFacetsOpen(activeFilterCount() > 0);
+  const filteredPill = [...facetPills.querySelectorAll('.facet-pill')]
+    .find((p) => selectedCount(state.active, p.dataset.facet) > 0);
+  if (filteredPill) setOptionsOpen(filteredPill, true);
   refreshPillStates();
   renderChips();
   renderGrid();

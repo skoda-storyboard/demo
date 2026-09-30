@@ -51,7 +51,7 @@ globalThis.fetch = async (url) => {
 };
 
 const {
-  default: decorate, mediaCell, isMediaTemplate, wireMediaLightbox,
+  default: decorate, mediaCell, isMediaTemplate, wireMediaLightbox, valueLabel,
 } = await import('./listing.js');
 
 const click = (el, init = {}) => el.dispatchEvent(new window.MouseEvent('click', {
@@ -254,7 +254,7 @@ test('402a: collapsed by default; the toggle always shows the count, "(0)" inclu
 test('402a: filtering updates the count and keeps the panel open', async () => {
   const { block, toggle } = await facetListing('/en/filter-index.json');
   click(toggle);
-  const peaq = block.querySelector('.facet[data-facet="model"] input[value="Peaq"]');
+  const peaq = block.querySelector('.facet-panel[data-facet="model"] input[value="Peaq"]');
   peaq.checked = true;
   peaq.dispatchEvent(new window.Event('change', { bubbles: true }));
   assert.equal(toggle.textContent, 'Advanced filter (1)');
@@ -301,4 +301,44 @@ test('402a: an Esc an inner control already handled does not close the panel', a
   pill.addEventListener('keydown', (e) => e.preventDefault(), { once: true });
   key(pill, 'Escape');
   assert.ok(block.classList.contains('facets-open'));
+});
+
+test('402a: pills in one row, the open pill\'s options full width in the area under it (source form.search-filter)', async () => {
+  const { block, toggle } = await facetListing('/en/rows-index.json');
+  click(toggle);
+  const bar = block.querySelector('.listing-facets');
+  assert.deepEqual([...bar.children].map((c) => c.className), ['facet-pills', 'facet-options']);
+  const pill = bar.querySelector('.facet-pills > .facet-pill[data-facet="model"]');
+  const panel = bar.querySelector(`.facet-options > #${pill.getAttribute('aria-controls')}`);
+  assert.ok(panel.hidden);
+  click(pill);
+  assert.equal(pill.getAttribute('aria-expanded'), 'true');
+  assert.equal(panel.hidden, false);
+  // one list at a time: opening another pill closes the first
+  const other = bar.querySelectorAll('.facet-pill')[1];
+  if (other) {
+    click(other);
+    assert.equal(pill.getAttribute('aria-expanded'), 'false');
+    assert.ok(panel.hidden);
+  }
+});
+
+test('402a: options show the name only ("Peaq"), no count; chips use the name too', async () => {
+  const { block, toggle } = await facetListing('/en/names-index.json');
+  click(toggle);
+  const labels = [...block.querySelectorAll('.facet-panel[data-facet="model"] .facet-option-label')].map((l) => l.textContent);
+  assert.ok(labels.length > 0);
+  assert.ok(labels.every((l) => !l.includes('(')), 'no "(n)" counts');
+  assert.ok(labels.every((l) => l[0] === l[0].toUpperCase()), 'title-cased names');
+  assert.equal(valueLabel('enyaq-coupe'), 'Enyaq Coupe');
+  assert.equal(valueLabel('peaq'), 'Peaq');
+});
+
+test('402a: a filtered deep link opens that facet\'s option list, like the source', async () => {
+  const { block } = await facetListing('/en/deeplink-options-index.json', '?filter[model][]=Peaq');
+  const pill = block.querySelector('.facet-pill[data-facet="model"]');
+  assert.equal(pill.getAttribute('aria-expanded'), 'true');
+  assert.equal(block.querySelector(`#${pill.getAttribute('aria-controls')}`).hidden, false);
+  assert.ok(pill.classList.contains('active'), 'has a selection → count badge');
+  assert.equal(pill.querySelector('.facet-count').textContent, '1');
 });

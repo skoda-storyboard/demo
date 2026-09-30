@@ -29,12 +29,20 @@
   border: 0;
 }
 
-/* --- facet bar: full-width pill bar (NOT a sidebar), collapsed at every width behind
-   "Advanced filter (n)", as on the source (SKODA-402a) --- */
+/* --- facet panel (live form.search-filter), collapsed at every width behind "Advanced
+   filter (n)" (SKODA-402a): a row of pills, then the open pill's options full width under
+   the whole row. Measured on /en/images + /en/news at 1280 / 390. --- */
 .listing .listing-facets {
+  --facet-pill-height: 35px;
+  --facet-pill-gap-inline: 14px;
+  --facet-pill-gap-block: 7px;
+  --facet-caret: 14px;
+  --facet-badge: 24px;
+  --facet-box: 18px;
+  --facet-option-height: 24px;
+  --facet-option-column: 160px;
+
   display: none;
-  flex-wrap: wrap;
-  gap: 0.5em 1em;
 
   /* open: 16px below where the sort row sits when closed (its own 1em top margin + 16px),
      24px above the sort row (live form.search-filter) */
@@ -42,25 +50,25 @@
 }
 
 .listing.facets-open .listing-facets {
+  display: block;
+}
+
+/* pills wrap at their natural width; the source spaces them with a trailing margin */
+.listing .facet-pills {
   display: flex;
+  flex-wrap: wrap;
 }
 
-.listing .facet {
-  position: relative;
-  display: inline-flex;
-  flex-direction: column;
-}
-
-/* facet pill (default) */
+/* facet pill: label, optional count badge, caret (down; up while its options are open) */
 .listing .facet-pill {
   display: inline-flex;
-  gap: 0.4em;
   align-items: center;
-  justify-content: center;
-  height: 35px;
+  height: var(--facet-pill-height);
   padding: 0 21px;
+  margin: 0 var(--facet-pill-gap-inline) var(--facet-pill-gap-block) 0;
   font-size: var(--body-font-size-s);
   font-weight: var(--weight-semibold);
+  line-height: 1.5;
   color: var(--text-color);
   background: var(--facet-pill-bg);
   border: 0;
@@ -68,6 +76,16 @@
   box-shadow: var(--facet-shadow);
   cursor: pointer;
   transition: background-color 0.15s ease-in-out;
+}
+
+.listing .facet-pill::after {
+  content: '';
+  inline-size: var(--facet-caret);
+  block-size: var(--facet-caret);
+  margin-inline-start: 5px;
+  background-color: currentcolor;
+  mask: url('../../icons/caret-up.svg') center / var(--facet-caret) no-repeat;
+  transform: rotate(180deg);
 }
 
 .listing .facet-pill:hover {
@@ -79,16 +97,17 @@
   outline-offset: 2px;
 }
 
-/* selected pill: green + white + ✓ glyph + count badge (dual-encoded) */
-.listing .facet-pill.active {
+/* open pill: green + white, caret up (source .filter-label.active) */
+.listing .facet-pill[aria-expanded="true"] {
   color: var(--skoda-white);
   background: var(--facet-active);
 }
 
-.listing .facet-pill.active .facet-label::before {
-  content: "\2713 "; /* ✓ — not color-only */
+.listing .facet-pill[aria-expanded="true"]::after {
+  transform: none;
 }
 
+/* a facet with selections: the green count badge (source .filter-label > em) */
 .listing .facet-count:empty {
   display: none;
 }
@@ -97,31 +116,26 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  font-size: var(--body-font-size-2xs);
+  box-sizing: border-box;
+  inline-size: var(--facet-badge);
+  block-size: var(--facet-badge);
+  margin-inline: 7px;
+  font-size: var(--body-font-size-s);
   font-weight: var(--weight-bold);
-  color: var(--facet-active);
-  background: var(--skoda-white);
+  color: var(--skoda-white);
+  background: var(--facet-active);
+  border: 3px solid var(--facet-active);
   border-radius: 50%;
 }
 
-/* option panel: multi-column checkbox list, fade in */
+/* option list: full width under the pills, 160px columns, no box (source .filter-options) */
 .listing .facet-panel {
-  position: absolute;
-  z-index: 2;
-  inset-block-start: calc(35px + 6px);
-  inset-inline-start: 0;
-  min-width: 220px;
-  max-width: min(90vw, 520px);
-  padding: 12px 14px;
-  margin: 0;
-  column-width: 160px;
-  column-gap: 1em;
-  background: var(--skoda-white);
-  border: 1px solid var(--border-color);
-  border-radius: var(--facet-radius);
-  box-shadow: var(--dropdown-shadow);
+  min-inline-size: 0;
+  padding: 0;
+  margin: var(--spacing-m) 0 0;
+  column-width: var(--facet-option-column);
+  column-gap: var(--spacing-m);
+  border: 0;
 }
 
 .listing .facet-panel[hidden] {
@@ -129,17 +143,65 @@
 }
 
 .listing .facet-option {
-  display: flex;
-  gap: 0.5em;
-  align-items: baseline;
-  padding: 4px 0;
-  font-size: var(--body-font-size-s);
+  position: relative;
+  display: block;
+  block-size: var(--facet-option-height);
+  margin-inline-start: 8px;
   break-inside: avoid;
   cursor: pointer;
 }
 
+/* the native checkbox stays focusable and announced; the box is drawn on the label text */
 .listing .facet-option input {
-  accent-color: var(--facet-active);
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: 0;
+  opacity: 0;
+}
+
+/* source label: 14/500 (renders regular) grey; --skoda-grey-500, not the source #a1a1a1
+   (2.6:1 on white), keeps the names readable */
+.listing .facet-option-label {
+  position: relative;
+  display: inline-block;
+  padding: 0 5px 0 calc(var(--facet-box) + 9px);
+  font-size: var(--body-font-size-s);
+  font-weight: var(--weight-regular);
+  line-height: var(--facet-box);
+  color: var(--skoda-grey-500);
+}
+
+.listing .facet-option-label::before,
+.listing .facet-option-label::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inline-size: var(--facet-box);
+  block-size: var(--facet-box);
+  border-radius: 3px;
+}
+
+/* unchecked: 2px inset grey outline */
+.listing .facet-option-label::before {
+  box-shadow: inset 0 0 0 2px var(--skoda-grey-300);
+}
+
+/* checked: green box, white tick */
+.listing .facet-option input:checked + .facet-option-label::before {
+  background-color: var(--facet-active);
+  box-shadow: none;
+}
+
+.listing .facet-option input:checked + .facet-option-label::after {
+  background-color: var(--skoda-white);
+  mask: url('../../icons/check.svg') center / 12px no-repeat;
+}
+
+.listing .facet-option input:focus-visible + .facet-option-label::before {
+  outline: 2px solid var(--facet-active);
+  outline-offset: 2px;
 }
 
 /* --- applied-filter chips --- */
@@ -246,8 +308,14 @@
   inline-size: calc(var(--listing-toggle-gap) + var(--listing-caret-glyph));
   block-size: var(--listing-caret-box);
   background-color: currentcolor;
-  mask: url('../../icons/chevron-up.svg') left center / var(--listing-caret-glyph) no-repeat;
-  transform: rotate(180deg); /* flips the glyph to the box end, as on the source */
+  mask: url('../../icons/caret-up.svg') left center / var(--listing-caret-glyph) no-repeat;
+  transform: rotate(180deg); /* caret down, the glyph at the box end, as on the source */
+}
+
+/* open: caret up (source .icon-caret-up), the glyph still at the box end */
+.listing .listing-filter-toggle[aria-expanded="true"]::after {
+  mask-position: right center;
+  transform: none;
 }
 
 .listing .listing-filter-count {
@@ -585,19 +653,3 @@
   }
 }
 
-/* ===== narrow: the open facet panel stacks its filters full-width ===== */
-@media (width < 768px) {
-  .listing.facets-open .listing-facets {
-    flex-direction: column;
-  }
-
-  .listing .facet {
-    width: 100%;
-  }
-
-  .listing .facet-panel {
-    position: static;
-    column-width: auto;
-    box-shadow: none;
-  }
-}
