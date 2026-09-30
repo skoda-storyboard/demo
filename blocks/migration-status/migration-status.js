@@ -90,7 +90,12 @@ function typeCard({ type, pages, live }) {
 }
 
 function attention(rows) {
-  const items = rows.filter((row) => row.Status !== 'live' || row.Note);
+  // Most urgent first: held / not live, then preview, redirects, and live pages with a note.
+  const rank = ['held', 'not live', 'preview', 'redirect', 'live'];
+  const items = rows.filter((row) => row.Status !== 'live' || row.Note)
+    .map((row, i) => ({ row, i }))
+    .sort((a, b) => (rank.indexOf(a.row.Status) - rank.indexOf(b.row.Status)) || a.i - b.i)
+    .map(({ row }) => row);
   if (!items.length) return null;
   const list = el('ul', { className: 'migration-status-attention' });
   items.forEach((row) => {

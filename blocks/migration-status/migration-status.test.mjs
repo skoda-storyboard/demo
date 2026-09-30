@@ -30,7 +30,7 @@ const row = (type, title, p, status, extra = {}) => ({
   ...extra,
 });
 const ROWS = [
-  row('Home', 'Škoda Storyboard', '/en', 'live'),
+  row('Home', 'Škoda Storyboard', '/en', 'live', { Note: 'Live on an earlier import.' }),
   row('Press kits', 'Peaq – Press Kit', '/en/press-kits/peaq-2', 'live'),
   row('Press kits', 'Images', '/en/press-kits/peaq-2/images', 'held', { Note: 'Not published: 230 images, over the platform limit of 200 per page.' }),
   row('Press kits', 'Peaq press kit', '/en/press-kits/peaq', 'redirect', { Note: 'Redirects to /en/press-kits/peaq-2' }),
@@ -68,7 +68,7 @@ test('needs attention lists only the exceptions, in plain words, with both links
   const el = block();
   render(el, ROWS);
   const items = [...el.querySelectorAll('.migration-status-attention li')];
-  assert.deepEqual(items.map((li) => li.querySelector('.migration-status-title').textContent), ['Images', 'Peaq press kit', 'Mixed reality']);
+  assert.deepEqual(items.map((li) => li.querySelector('.migration-status-title').textContent), ['Images', 'Peaq press kit', 'Mixed reality', 'Škoda Storyboard'], 'held first, live-with-a-note last');
   assert.match(items[0].textContent, /over the platform limit of 200/);
   const [src, dst] = items[0].querySelectorAll('a');
   assert.equal(src.href, `${SRC}/en/press-kits/peaq-2/images/`);
