@@ -204,7 +204,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-504 | Map S3 images → AEM Assets (manifest) | E05 | 3 | 1–2 | 2–3 | 501,601 | 🟠 A/B unconfirmed; M2 scale = rights+dedup |
 | SKODA-505 | Demo media-cart + client-side zip (device-ID, no login) | E05 | 8 | 3–5 | 6–10 | 502,501,504,601 | 🟠 mission-critical demo; CORS/AEM-Assets linchpin |
 | SKODA-506 | Media pre-conditioning: strip/replace oversized masters before publish | E05 | 2 | 0.5–1 | 1–2 | 501 | 🟠 build-confirmed: 25–40 MB masters 409 the content bus; gates publish |
-| SKODA-505a | Media-cart download logic (device-ID + originals + multi-select zip) | E05 | 5 | 2–3 | 4–6 | 501,504,502,601 | 🟠 split from 505 (logic half); agent-fit |
+| SKODA-505a | Media-cart download logic (device-ID + originals + multi-select zip) (#50) | E05 | 5 | 2–3 | 4–6 | 501,504,502,601 | 🟡 M1; ready for QA 2026-09-30 (headless store + resolver index + fflate zip; binds the listing, story-rail and lightbox adds; 505b builds the visuals on its API) |
 | SKODA-505b | Media-cart presentation + live AEM DAM delivery wiring | E05 | 3 | 1–2 | 2–3 | 505a,501,504 | 🔴 split from 505 (presentation half); human-gate |
 | SKODA-507 | Native AEM Assets picker in DA/EW (Media Bus delivery) | E05 | 2 | 0.5–1 | 1–2 | 504,505b | 🔴 BLOCKED (client AEM env + DA site config, creds) |
 | SKODA-601 | Import infra: parsers + transformers | E06 | 5 | 2–3 | 4–6 | 102 | 🟡 content-driven only |

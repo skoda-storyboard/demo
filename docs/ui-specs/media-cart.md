@@ -170,6 +170,20 @@ toolbars. Cart state in `localStorage` for guests (id + size per item); a small 
 `.in-cart` markers. "Download package" calls the packaging endpoint. Reuse `cards-toolbar` for the
 affordance row and card-teaser markup for cart item rows.
 
+**Built in SKODA-505a (#50), the logic half.** `/scripts/media-cart.js` is the store and
+binding. It exposes `add`, `addMany`, `remove`, `has`, `clear` and `getCart`,
+`onChange` / `media-cart:change`, and `download` / `downloadItems`.
+- The cart holds DAM originals only, capped at 80 items **and** 1 GiB. The source's
+  `skoda-media-cart-limit` is 80, not the `50` shown below.
+- **One item** downloads directly. **Two or more** become a client-side STORE zip (vendored
+  fflate), not a packaging endpoint.
+- The existing add controls reflect state as `aria-pressed` / `aria-checked` +
+  `data-in-cart`, where this outline says `.in-cart`. They are the listing media card, the
+  story-rail media rails and the shared lightbox.
+- The 1920px row stays inert (originals only).
+- 505b builds the visuals, badge, cart page and new add buttons on that API. See
+  [SKODA-505b](../tickets/tickets/SKODA-505b.md#handoff-from-skoda-505a-50).
+
 ### `Media Cart` block config table (DA authoring)
 
 | key | example | meaning |

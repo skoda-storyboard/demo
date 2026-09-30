@@ -49,6 +49,7 @@ Whether these render as **tabs, accordion, or stacked sections** is a visual/int
 - Downstream: SKODA-902 (production download-reduction hardening, the ZIP at scale)
 
 ## Risks / Flags
+- **Demo path available (SKODA-505a, #50):** `downloadItems(items, { onProgress, signal })` in `/scripts/media-cart.js` zips an explicit list of DAM originals client-side (STORE, 1 GiB cap). The items come from `resolve(href)` in `/scripts/media-cart-resolver.js`. `addMany(entries)` adds a gallery to the cart with the source's partial-fill cap. The whole-kit zip can use them in M1 until the D2 server-side reduction exists; don't build a second zip path.
 - **ZIP mechanism (🟠, §11.12):** dynamic/scripted control not seen in snapshot, confirm implementation with the technical team; depends on the D2 media-cart reduction approach.
 - **Presentation TBD (🟡, §11.11):** tabs vs accordion vs stacked, design decision; if tabs/accordion, adds a11y focus/ARIA scope.
 - Rendition strategy (Original/1920px) ties to Dynamic Media confirmation (D5/§6.9).

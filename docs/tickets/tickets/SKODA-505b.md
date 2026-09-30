@@ -25,5 +25,17 @@ The visual and live-delivery half of the media cart: pixel design per `docs/ui-s
 - Upstream: SKODA-505a (download logic), SKODA-501 + SKODA-504 (CORS-enabled DAM delivery).
 - Downstream: SKODA-603.
 
+## Handoff from SKODA-505a (#50)
+505a ships the behaviour. 505b renders the pixels and the new surfaces, and calls the API; it builds no second store.
+- **API** (`/scripts/media-cart.js`): `getCart`, `add`, `addMany`, `remove`, `has`, `clear`, `onChange`, `download({ onProgress, signal })`, `downloadItems`, `trackView`, `bindCartControl`. See [SKODA-505a](SKODA-505a.md#implementation-2026-09-30-developer-verified-qa-pending).
+- **State to style:** bound controls carry `data-in-cart`, plus `aria-pressed` (buttons) or `aria-checked` (size-menu rows); unavailable controls get `aria-disabled="true"`. The `.in-cart` scrim/glyph hangs off these; no class is set.
+- **New buttons** (Downloads tiles, media-box group add, press-release sidebar, dock badge): call `bindCartControl(el, { href, title })` for a single asset, or `addMany(entries)` for a group. Refusals return `skipped[{ href, reason }]`, which feeds the "added X / skipped Y" popup and the cap indicator. Bound controls also fire a bubbling `media-cart:refused` event.
+- **Badge:** `onChange((cart) => cart.count)`, or listen for `media-cart:change` on `window`.
+- **Review surface:** `getCart().items` (`title`, `filename`, `bytes`, `kind`, `url`), `remove(id)`, and `download()` for single or zip; call `trackView()` on open.
+- **Still open for 505b:**
+  - Prove live CORS zipping from the preview (the DAM answers `Access-Control-Allow-Origin: *`).
+  - Pick the Original/1920px menu visuals. The 1920px row stays inert (originals only, D5).
+  - Design the gallery-lightbox add, which is disabled until content carries the original.
+
 ## Human gate
 Visual fidelity + live CORS/DAM delivery are not agent-handoffable (pixel judgment + live endpoint).

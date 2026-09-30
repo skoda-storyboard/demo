@@ -13,7 +13,9 @@
  *   full     the URL shown in the stage (default: `src` as a 2000px media-bus rendition)
  *   download the download link (default: `src` as JPEG)
  *   link     the URL "copy link" copies (default: `src`)
- *   cartId   the media-cart key on the add button (SKODA-505 binds it)
+ *   cartId   the source cart key on the add button (`data-id`)
+ *   cartHref the original the add button puts in the media cart (SKODA-505a); without it
+ *            the add button is disabled (e.g. gallery images: no DAM original)
  *   actions  false: no action buttons (the source's content images), spacing kept
  *   video    an embed URL (Vimeo player): the stage plays it instead of the image
  *
@@ -154,6 +156,22 @@ export function buildLightbox(host, items) {
   linkBtn.setAttribute('aria-label', LABELS.copyLink);
   linkBtn.classList.add('link');
   actions.append(addBtn, downloadBtn, linkBtn);
+  // one add button per overlay, re-pointed at each item's original (SKODA-505a). The media
+  // cart loads on the first item that has one; a stale (slower) bind never wins.
+  let cartSeq = 0;
+  const bindCart = (item) => {
+    cartSeq += 1;
+    const seq = cartSeq;
+    const href = item.cartHref || '';
+    if (!href && !addBtn.hasAttribute('data-cart-control')) {
+      addBtn.setAttribute('aria-disabled', 'true');
+      return;
+    }
+    if (href && !addBtn.hasAttribute('data-cart-control')) addBtn.setAttribute('aria-disabled', 'true');
+    import('./media-cart.js').then(({ bindCartControl }) => {
+      if (seq === cartSeq) bindCartControl(addBtn, { href, title: item.alt || '' });
+    });
+  };
 
   const prevBtn = document.createElement('button');
   prevBtn.type = 'button';
@@ -250,6 +268,7 @@ export function buildLightbox(host, items) {
       actions.classList.toggle('is-empty', item.actions === false);
       if (item.cartId) addBtn.dataset.id = item.cartId;
       else delete addBtn.dataset.id;
+      bindCart(item);
       // insert before the first "File type…"/metadata paragraph if present,
       // otherwise fall back to the end of the panel
       const paras = [...stageCaption.querySelectorAll('p')];

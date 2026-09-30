@@ -57,6 +57,7 @@ export function feedLightboxItem(row) {
       download: row.mp4 || '',
       link: vimeo ? `https://vimeo.com/${vimeo}` : row.mp4,
       cartId: row.id || '',
+      cartHref: row.mp4 || '',
       actions: true,
     };
   }
@@ -69,6 +70,7 @@ export function feedLightboxItem(row) {
     download: row.original || src,
     link: row.original || src,
     cartId: row.id || '',
+    cartHref: row.original || '',
     // content images (asset rows) have no cart / download / link buttons on the source
     actions: row.template !== 'asset',
   };

@@ -9,9 +9,10 @@
  * Source (.article-teaser-toolbar, measured 2026-09-29): 40px ink-ringed round buttons.
  *   - image: both buttons open a size menu (Original / 1920px) on click;
  *   - video: one add button and one MP4 download link, no menu.
- * The add actions carry the cart key (`data-id`, `data-size`) and stay inert
- * (`aria-disabled`, their click is cancelled here) until the media cart (SKODA-505a)
- * binds them.
+ * The add actions carry the source cart key (`data-id`, `data-size`). The original's add
+ * (image "Original" row, the video button) is a media-cart toggle (SKODA-505a) for the
+ * original file; the 1920px row stays inert (`aria-disabled`, its click cancelled here):
+ * the cart collects DAM originals only.
  *
  * i18n: the control text comes from the caller's labels (`mediaLabels(placeholders)`, the
  * per-locale placeholders sheet), with the English defaults below. `{size}` is replaced
@@ -86,11 +87,11 @@ function wireDocument() {
 }
 
 /**
- * The inert cart action: a `#` link that only carries the cart key (SKODA-505a binds it).
- * While it is disabled its click is cancelled here, so no consumer (listing, rails) jumps to
- * the top of the page.
+ * A cart action: a `#` link carrying the source cart key. The original's add is bound to the
+ * media cart for `original` (the file's link); the others stay inert. While disabled, its
+ * click is cancelled here, so no consumer (listing, rails) jumps to the top of the page.
  */
-function cartAction(el, row, size) {
+function cartAction(el, row, size, original = '', title = '') {
   el.href = '#';
   el.dataset.action = 'add';
   el.dataset.id = row.id;
@@ -100,6 +101,10 @@ function cartAction(el, row, size) {
   el.addEventListener('click', (e) => {
     if (el.getAttribute('aria-disabled') === 'true') e.preventDefault();
   });
+  // the cart module loads only where an add control renders; until then it stays disabled
+  if (original) {
+    import('./media-cart.js').then(({ bindCartControl }) => bindCartControl(el, { href: original, title }));
+  }
   return el;
 }
 
@@ -206,7 +211,7 @@ export function mediaActions(row, title = '', labels = DEFAULT_LABELS) {
 
   if (row.template === 'video') {
     if (row.id) {
-      actions.append(singleAction('add', named(L.add, title), L.addVideo, (a) => cartAction(a, row, '')));
+      actions.append(singleAction('add', named(L.add, title), L.addVideo, (a) => cartAction(a, row, '', row.mp4, title)));
     }
     if (row.mp4) {
       actions.append(singleAction('download', named(L.download, title), L.downloadVideo, (a) => downloadAction(a, row.mp4)));
@@ -218,7 +223,7 @@ export function mediaActions(row, title = '', labels = DEFAULT_LABELS) {
         label: L[s.labelKey],
         build: (a) => {
           a.title = sized(L.addSize, L[s.labelKey]);
-          return cartAction(a, row, s.size);
+          return cartAction(a, row, s.size, s.size === '' ? row[s.field] : '', title);
         },
       }))));
     }
