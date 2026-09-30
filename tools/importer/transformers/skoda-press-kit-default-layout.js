@@ -212,6 +212,14 @@ function rebuild(element, document) {
     p.append(img);
     out.push(p);
   }
+  // An article-form kit landing page (the second Elroq kit) introduces itself in the teaser
+  // summary, as a press release does: one bold paragraph, as the release importer emits it.
+  const summary = text(article.querySelector('.column-primary > .entry-summary'));
+  if (summary) {
+    const intro = make(document, 'p', '');
+    intro.append(make(document, 'strong', summary));
+    out.push(intro);
+  }
   out.push(content);
   const side = sidebar(document, article.querySelector('.column-secondary'), !!media);
   if (side.length) out.push(marker(document, 'sidebar'), ...side);
@@ -237,9 +245,13 @@ function rebuild(element, document) {
 // `share-de`, even on English pages) and the links have no text. Name the link (`title`, which
 // survives DA; the SKODA-503 binary gate reads it) and the image by what the link does; an
 // image-only link with a real alt is named by that alt.
-const PLACEHOLDER_ALT = /^(?:download|share)-[a-z]{2}$/i;
+// Older kits alt their banners with the upload file name (`ikony_sb_landscape_WA_EN_f66c79bf`).
+const PLACEHOLDER_ALT = /^(?:(?:download|share)-[a-z]{2}|ikon[ay]_\S*_[0-9a-f]{8})$/i;
 function bannerLabel(href) {
   if (/\.pdf(?:$|[?#])/i.test(href)) return 'Download PDF';
+  // Named as on the kit hubs (import-press-kit-hub.js).
+  if (/\.zip(?:$|[?#])/i.test(href)) return 'Download the press kit ZIP';
+  if (/whatsapp/i.test(href)) return 'Follow Škoda Storyboard on WhatsApp';
   if (/\.mp4(?:$|[?#])/i.test(href)) return 'Download video';
   if (/^mailto:\?/i.test(href)) return 'Share by email';
   return '';

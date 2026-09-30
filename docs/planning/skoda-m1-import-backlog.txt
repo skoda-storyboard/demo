@@ -46,3 +46,14 @@ https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/infographi
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/images/
 # Pushed + previewed 2026-09-29, never published → QA, then --stage publish.
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success/
+
+# ===== STATUS 2026-09-30 (branch skoda-603-m1-backlog) =====
+# DONE before this run (published 2026-09-30 with the 51 press-kit pages): first glimpse, the two
+#   Epiq children, the Fabia RS Rally2 chapter.
+# EXCLUDED: /en/press-kits/skoda-peaq-press-kit/ is a source redirect to skoda-peaq-press-kit-2 (live).
+# HELD by decision: Peaq Images (230 distinct images; html2md max 200 per document).
+# IN DA + PREVIEWED, publish after this branch merges (press-half tile runtime):
+#   the Enyaq, Vision O, Elroq, Superb and Kodiaq hubs + the second Elroq kit (article with tiles).
+# DAM ingest done (60f7b98: 23 PDF + 12 MP4, 34 published originals); media applied, then
+#   IN DA + PREVIEWED: the 9 press releases above, the Elroq and Epiq covered-drive kits, Fabia 130.
+# => all 18 pages previewed; none published.
