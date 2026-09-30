@@ -9,7 +9,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import {
-  LOCALES, currentLocale, localeOf, localeEntries, isLocaleGroup, buildLocaleList, siblingHref,
+  LOCALES, currentLocale, localeOf, localeEntries, isLocaleGroup, buildLocaleList, siblingHref, localizedPath,
 } from './header-locales.js';
 
 const BASE = 'https://main--demo--skoda-storyboard.aem.page/en/emobility/x';
@@ -114,6 +114,45 @@ test('Media Room nav: /{locale}/media-room links, DE external in a new tab, EN o
   assert.equal(cz.querySelector('a[hreflang="en"]').getAttribute('href'), '/en/media-room');
 });
 
+test('localizedPath: only the locale segment changes; null outside a locale tree', () => {
+  assert.equal(localizedPath('/en/emobility/skoda-epiq-x', 'cs'), '/cs/emobility/skoda-epiq-x');
+  assert.equal(localizedPath('/en/press-releases/936-km', 'sk'), '/sk/press-releases/936-km');
+  assert.equal(localizedPath('/en/media-room', 'de'), '/de/media-room');
+  assert.equal(localizedPath('/en', 'sl'), '/sl');
+  assert.equal(localizedPath('/cs/e-mobilita-cs/y/', 'en'), '/en/e-mobilita-cs/y/', 'a trailing slash is kept as is');
+  assert.equal(localizedPath('/CS/x', 'en'), '/en/x');
+  assert.equal(localizedPath('/', 'cs'), null);
+  assert.equal(localizedPath('/drafts/skoda-303', 'cs'), null);
+  assert.equal(localizedPath('/english/x', 'cs'), null, 'a segment that merely starts with a code');
+  assert.equal(localizedPath('', 'cs'), null);
+});
+
+test('buildLocaleList with the page path: every locale links this page in that locale', () => {
+  const p = para(AUTHORED);
+  const ul = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument, '/en/emobility/skoda-epiq-x');
+  assert.deepEqual([...ul.querySelectorAll('a')].map((a) => a.getAttribute('href')),
+    ['/cs/emobility/skoda-epiq-x', '/de/emobility/skoda-epiq-x', '/sk/emobility/skoda-epiq-x', '/sr/emobility/skoda-epiq-x', '/sl/emobility/skoda-epiq-x']);
+  // from a CZ page, the (authored-bold) EN keeps the path too
+  const cz = buildLocaleList(localeEntries(p, BASE), 'cs', p.ownerDocument, '/cs/emobility/skoda-epiq-x');
+  assert.equal(cz.querySelector('a[hreflang="en"]').getAttribute('href'), '/en/emobility/skoda-epiq-x');
+  // outside a locale tree the authored targets stay
+  const root = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument, '/');
+  assert.equal(root.querySelector('a[hreflang="cs"]').getAttribute('href'), '/cs');
+});
+
+test('buildLocaleList with the page path: an authored external link still wins (Media Room DE)', () => {
+  const p = para(AUTHORED_MR);
+  const ul = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument, '/en/press-releases/936-km');
+  const hrefs = [...ul.querySelectorAll('a')].map((a) => [a.textContent, a.getAttribute('href'), a.getAttribute('target')]);
+  assert.deepEqual(hrefs, [
+    ['CZ', '/cs/press-releases/936-km', null],
+    ['DE', 'https://www.skoda-media.de/', '_blank'],
+    ['SK', '/sk/press-releases/936-km', null],
+    ['SR', '/sr/press-releases/936-km', null],
+    ['SL', '/sl/press-releases/936-km', null],
+  ]);
+});
+
 test('buildLocaleList: nothing to build returns null; every LOCALES code has a label and name', () => {
   assert.equal(buildLocaleList([], 'en', new JSDOM('').window.document), null);
   assert.deepEqual(LOCALES.map((l) => l.code), ['en', 'cs', 'de', 'sk', 'sr', 'sl']);
@@ -159,6 +198,7 @@ test('header: the topbar group becomes a <div> list and the drawer gets an ident
   assert.ok(drawer, 'drawer copy');
   assert.equal(drawer.outerHTML, topbar.querySelector('.nav-locales-list').outerHTML);
   assert.equal(topbar.querySelector('[aria-current]').textContent, 'EN');
+  assert.equal(topbar.querySelector('a[hreflang="cs"]').getAttribute('href'), '/cs/emobility/x', 'the path is kept');
   // Subscribe is untouched
   assert.ok(block.querySelector('.nav-topbar p.nav-topbar-utility a.nav-subscribe'));
 });
@@ -167,5 +207,5 @@ test('header on a /cs/ page marks CZ current (the authored bold EN turns into a 
   const block = await renderHeader('/cs/e-mobilita-cs/y');
   const list = block.querySelector('.nav-topbar .nav-locales-list');
   assert.equal(list.querySelector('[aria-current]').textContent, 'CZ');
-  assert.equal(list.querySelector('a[hreflang="en"]').getAttribute('href'), '/en');
+  assert.equal(list.querySelector('a[hreflang="en"]').getAttribute('href'), '/en/e-mobilita-cs/y', 'the path is kept');
 });

@@ -86,6 +86,11 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
   - the drawer is `min-width: min(375px, 100%)`, so it no longer runs 55px off a 320px screen and cuts off the locale row.
 - **Result:** the switcher's values are identical to live at every width, and both visual diffs are 0% at the same
   absolute position.
+- **Review follow-up:** switching language keeps the page path, as live. Each locale links the current path with only
+  the locale segment swapped (`/en/emobility/x` → `/cs/emobility/x`); an authored external link still wins, and pages
+  outside a locale tree use the authored target. The live site also translates the category and slug segments
+  (`/cs/e-mobilita-cs/…`); EDS keeps them as they are, so a translated tree has to mirror the EN paths for these
+  links to resolve (locale migration, SKODA-1003).
 - **Left to SKODA-308 (decision):** on short phones the drawer's locale row sits lower than live because the menu
   above it is taller. Each row is 73px + an 8px margin vs 61px, and search is 80 vs 64px.
 

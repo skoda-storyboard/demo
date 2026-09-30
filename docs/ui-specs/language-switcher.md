@@ -181,7 +181,11 @@ Every link was clicked on the home page, a story, a press release, the Media Roo
   - `/nav`: `/cs` `/de` `/sk` `/sr` `/sl`;
   - `/media-room/nav`: `/cs/media-room`, `https://www.skoda-media.de/`, `/sk/media-room`, `/sr/media-room`, `/sl/media-room`.
 - **Header behaviour:**
-  - the bold (unlinked) locale takes its siblings' pattern (`/en`, `/en/media-room`);
+  - **switching language keeps the page:** every locale links the current path with only its locale segment
+    changed (`/en/emobility/x` → `/cs/emobility/x`, `/en/media-room` → `/cs/media-room`);
+  - an authored link to another site still wins (Media Room DE);
+  - pages outside a locale tree (`/`, `/drafts/…`) use the authored target; there the bold (unlinked) locale takes
+    its siblings' pattern (`/en`, `/en/media-room`);
   - a link to another site opens in a new tab with `rel="noopener"` and "(opens in a new tab)" in its name.
 - **Translated article targets:** out of the pilot (SKODA-1003).
 

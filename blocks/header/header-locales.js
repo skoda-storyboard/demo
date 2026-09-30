@@ -104,6 +104,21 @@ export function siblingHref(code, entries) {
   return pattern ? `/${code}${pattern.href.slice(pattern.code.length + 1)}` : `/${code}`;
 }
 
+/**
+ * The current page in another locale: the page path with only its locale segment swapped
+ * (`/en/emobility/x` → `/cs/emobility/x`), as the source keeps the page when the language
+ * changes. Null when the page isn't in a locale tree (`/`, `/drafts/…`): its authored target
+ * is used instead.
+ * @param {string} pathname the current page path
+ * @param {string} code the target locale
+ * @returns {string|null}
+ */
+export function localizedPath(pathname, code) {
+  const [, seg, ...rest] = String(pathname || '').split('/');
+  if (!byCode.has(String(seg).toLowerCase())) return null;
+  return ['', code, ...rest].join('/');
+}
+
 /** A link to another site (the source's Media Room DE goes to skoda-media.de, in a new tab). */
 function isExternal(href, doc) {
   try {
@@ -116,15 +131,20 @@ function isExternal(href, doc) {
 
 /**
  * The switcher list: the current locale as `<span aria-current="true">`, every other one as
- * a link with `hreflang` / `lang` and its own language name. An entry authored without a link
- * (the bold one) takes its siblings' URL pattern (siblingHref). A link to another site opens
- * in a new tab, as on the source, and says so in its name.
+ * a link with `hreflang` / `lang` and its own language name.
+ * Targets, as on the source:
+ *   - an authored link to another site wins, and opens in a new tab (Media Room DE);
+ *   - otherwise the current page in that locale (localizedPath: only the locale segment of
+ *     the path changes);
+ *   - on a page outside a locale tree, the authored target (a bold entry without a link
+ *     takes its siblings' pattern, siblingHref).
  * @param {Array<{code: string, href: string|null}>} entries from localeEntries()
  * @param {string} current the page's locale, from currentLocale()
  * @param {Document} doc the document to build in
+ * @param {string} [pathname] the current page path (default: the authored targets only)
  * @returns {HTMLUListElement|null} null when there are no entries
  */
-export function buildLocaleList(entries, current, doc) {
+export function buildLocaleList(entries, current, doc, pathname = '') {
   if (!entries.length) return null;
   const ul = doc.createElement('ul');
   ul.className = 'nav-locales-list';
@@ -137,7 +157,10 @@ export function buildLocaleList(entries, current, doc) {
       item = doc.createElement('span');
       item.setAttribute('aria-current', 'true');
     } else {
-      const target = href || siblingHref(code, entries);
+      const authored = href || siblingHref(code, entries);
+      const target = isExternal(authored, doc)
+        ? authored
+        : localizedPath(pathname, code) || authored;
       item = doc.createElement('a');
       item.setAttribute('href', target);
       item.setAttribute('hreflang', code);

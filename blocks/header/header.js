@@ -222,6 +222,7 @@ export default async function decorate(block) {
       localeEntries(localeGroup, base),
       currentLocale(window.location.pathname),
       document,
+      window.location.pathname, // each locale links this page in that locale
     );
     if (locales) {
       // a list can't live in a <p>: the group becomes a <div> in the same place
