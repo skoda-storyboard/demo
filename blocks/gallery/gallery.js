@@ -477,6 +477,9 @@ function buildPreview(block) {
     return [btn, i];
   });
 
+  // A preview whose other images live elsewhere (the press-kit Media Box, SKODA-805c) takes
+  // its "+N" from the template (data-more-count / data-more-href): the same pill, as a link.
+  const outside = Number(block.dataset.moreCount);
   if (more) {
     const pill = document.createElement('button');
     pill.type = 'button';
@@ -485,6 +488,13 @@ function buildPreview(block) {
     pill.textContent = LABELS.more(more);
     grid.lastElementChild.append(pill);
     triggers.push([pill, moreIndex]);
+  } else if (outside > 0 && block.dataset.moreHref) {
+    const pill = document.createElement('a');
+    pill.className = 'gallery-preview-more';
+    pill.href = block.dataset.moreHref;
+    pill.setAttribute('aria-label', LABELS.moreLabel(outside));
+    pill.textContent = LABELS.more(outside);
+    grid.lastElementChild.append(pill);
   }
   block.append(grid);
 

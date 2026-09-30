@@ -13,14 +13,17 @@ async function fixture(run, overrides = {}) {
     if (entry === 'error') { res.writeHead(503); res.end(); return; }
     if (entry.status) { res.writeHead(entry.status, { 'content-type': 'application/xml' }); res.end(); return; }
     const bytes = typeof entry === 'number' ? entry : entry.bytes;
+    // `body`: the leading bytes a GET serves (e.g. a real JPEG header), while HEAD
+    // still advertises the full `bytes`.
+    const body = req.method === 'HEAD' ? undefined : entry.body || Buffer.alloc(bytes, 1);
     const headers = {
       'content-type': entry.type || 'image/jpeg',
       ...(entry.noHeadLength && req.method === 'HEAD' ? {} : {
-        'content-length': String(entry.headLength && req.method === 'HEAD' ? entry.headLength : bytes),
+        'content-length': String(entry.headLength && req.method === 'HEAD' ? entry.headLength : body?.length ?? bytes),
       }),
     };
     res.writeHead(200, headers);
-    res.end(req.method === 'HEAD' ? undefined : Buffer.alloc(bytes, 1));
+    res.end(body);
   });
   await new Promise((resolve) => { server.listen(0, '127.0.0.1', resolve); });
   const base = `http://127.0.0.1:${server.address().port}/page.html`;
@@ -32,6 +35,23 @@ async function fixture(run, overrides = {}) {
 }
 
 const opts = (base) => ({ base, maxBytes: 10 });
+
+// A JPEG's leading bytes: SOI, `padding` bytes of APP2 (an embedded ICC profile), then SOF0.
+function jpegHeader(w, h, padding = 0) {
+  const parts = [Buffer.from([0xff, 0xd8])];
+  for (let left = padding; left > 0; left -= 65533) {
+    const n = Math.min(65533, left);
+    const app2 = Buffer.alloc(n + 4);
+    app2[0] = 0xff;
+    app2[1] = 0xe2;
+    app2.writeUInt16BE(n + 2, 2);
+    parts.push(app2);
+  }
+  // eslint-disable-next-line no-bitwise
+  parts.push(Buffer.from([0xff, 0xc0, 0, 17, 8, h >> 8, h & 255, w >> 8, w & 255,
+    3, 1, 0x22, 0, 2, 0x11, 1, 3, 0x11, 1]));
+  return Buffer.concat(parts);
+}
 
 test('configured byte limit rejects invalid values', () => {
   for (const value of [0, -1, 1.5, '', 'bogus']) assert.throws(() => imageLimit(value));
@@ -176,6 +196,31 @@ test('a CDN 403 means a missing derivative, so body imagery is stripped, not blo
   }, Object.fromEntries(['/gone.jpg', '/big-2560x1707.jpg', '/big-2048x1365.jpg', '/big-1920x1280.jpg',
     '/big-1536x1024.jpg', '/big-1440x960.jpg', '/big-768x512.jpg', '/big-384x256.jpg', '/big-272x182.jpg']
     .map((url) => [url, { status: 403 }])));
+});
+
+test('a 16:9 master steps down at its own ratio, even inside a protected image link', async () => {
+  // Real case (SKODA-805c): the 18.6 MB 8000x4500 `Skoda_all-electric_family` master is a
+  // linked body image; its ICC profile puts the SOF at byte 654933. Only -1920x1080-style
+  // copies exist, and the -272x182 thumbnail is a 3:2 crop of it.
+  await fixture(async (base) => {
+    const html = '<p><a href="/wide.jpg"><picture><img src="/wide.jpg" alt="Family"></picture></a></p>';
+    const result = await conditionInlineMedia(html, opts(base));
+    assert.deepEqual(result.errors, []);
+    assert.deepEqual(result.changes.map((c) => [c.action, c.to.split('/').pop()]), [['substitute', 'wide-2048x1152.jpg']]);
+    assert.match(result.html, /<a href="\/wide\.jpg"><picture><img src="[^"]+\/wide-2048x1152\.jpg" alt="Family">/);
+  }, {
+    '/wide.jpg': { bytes: 24, body: jpegHeader(8000, 4500, 700000) },
+    '/wide-2560x1440.jpg': 24, // exists, still oversized
+    '/wide-2048x1152.jpg': 8,
+    '/wide-272x182.jpg': 8,
+  });
+});
+
+test('an unreadable master size keeps the 3:2 ladder and rejects non-ladder suffixes', async () => {
+  await fixture(async (base) => {
+    const result = await conditionInlineMedia('<div><img src="/big.jpg" alt="Hero"></div>', opts(base));
+    assert.match(result.errors[0], /cannot be stripped/);
+  }, { '/big-1920x1080.jpg': 8 });
 });
 
 test('a thumbnail-width rendition is never substituted for a body image', async () => {

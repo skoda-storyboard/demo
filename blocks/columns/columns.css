@@ -19,6 +19,16 @@
   display: block;
 }
 
+/* `banners` variant (SKODA-805c): cells of linked banner images (the press-kit PDF/share
+   buttons) keep their authored 240×150 instead of filling the cell. */
+.columns.banners {
+  --columns-banner-width: 240px;
+}
+
+.columns.banners > div > div img {
+  width: min(100%, var(--columns-banner-width));
+}
+
 @media (width >= 992px) {
   .columns > div {
     align-items: center;
@@ -100,4 +110,32 @@
   .columns.stats > div > .columns-stat {
     flex: 0 0 var(--stats-cell);
   }
+}
+
+/* `callout` variant (SKODA-805c review): a small icon beside its text, the press-kit "What's up,
+   Škoda?" WhatsApp callout. The source sets the 50px icon in a 60px cell and the text 15px
+   after it, centred on the icon, at every width. */
+.columns.callout {
+  --columns-callout-size: 50px;
+  --columns-callout-cell: 60px;
+  --columns-callout-gap: 15px;
+}
+
+.columns.callout > div > div img {
+  width: var(--columns-callout-size);
+}
+
+.columns.callout > div {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--columns-callout-gap);
+}
+
+.columns.callout > div > div:first-child {
+  flex: 0 0 var(--columns-callout-cell);
+}
+
+/* the source's text cell keeps its 8px table-cell padding: a two-line callout is 64px tall */
+.columns.callout > div > div:last-child {
+  padding-block: var(--spacing-xs);
 }

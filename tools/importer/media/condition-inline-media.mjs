@@ -1,8 +1,9 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { JSDOM } from 'jsdom';
 import {
-  OVERSIZE_BYTES, MIN_RENDITION_EDGE, logicalId, sizedRenditions, isAspectCrop,
-  derivativeSuffix, ratiosDiffer, isImageUrl, belowMinEdge, renditionEdge,
+  OVERSIZE_BYTES, MIN_RENDITION_EDGE, logicalId, renditionCandidates, isAspectCrop,
+  suffixSize, ratiosDiffer, isImageUrl, belowMinEdge, renditionEdge, masterUrl,
+  remoteImageSize,
 } from './media-lib.mjs';
 
 const TIMEOUT_MS = 20000;
@@ -99,17 +100,18 @@ function protectedImage(img) {
   return !img.closest('figure, p');
 }
 
-function sameFraming(source, candidate) {
+// With the master's real size, a suffix is judged by its ratio, so a 16:9 master's
+// -1920x1080 is a scaled copy and its -272x182 thumbnail a crop. Without it, a
+// non-ladder suffix is presumed a crop (isAspectCrop).
+function sameFraming(source, candidate, master = null) {
+  if (master) {
+    const want = suffixSize(source) || master;
+    const got = suffixSize(candidate) || (isAspectCrop(source) ? null : master);
+    return !!got && !ratiosDiffer(want, got);
+  }
   if (!isAspectCrop(source)) return !isAspectCrop(candidate);
-  const dimensions = (url) => {
-    const suffix = derivativeSuffix(url);
-    if (!suffix) return null;
-    const [w, h] = suffix.split('x').map(Number);
-    return { w, h };
-  };
-  const original = dimensions(source);
-  const replacement = dimensions(candidate);
-  return !!replacement && !ratiosDiffer(original, replacement);
+  const replacement = suffixSize(candidate);
+  return !!replacement && !ratiosDiffer(suffixSize(source), replacement);
 }
 
 function removeBodyImage(img) {
@@ -148,6 +150,11 @@ export async function conditionInlineMedia(html, {
     if (!cache.has(key)) cache.set(key, imageBytes(url, { fetchImpl, maxBytes, verify }));
     return cache.get(key);
   };
+  const measureSize = async (url) => {
+    const key = `${url}:size`;
+    if (!cache.has(key)) cache.set(key, remoteImageSize(url, { fetchImpl }));
+    return cache.get(key);
+  };
   for (const img of [...document.querySelectorAll('img')]) {
     const src = img.getAttribute('src') || '(missing)';
     try {
@@ -162,8 +169,10 @@ export async function conditionInlineMedia(html, {
 
       const picture = img.closest('picture');
       if (img.closest('.metadata')) throw new Error('Metadata imagery must not be modified');
+      const ladder = !isAspectCrop(urls[0]) && !/\/media_[0-9a-f]+\./i.test(urls[0]);
+      const master = ladder ? await measureSize(masterUrl(urls[0])) : null;
       if (picture && urls.slice(1).some((url) => logicalId(url) !== logicalId(urls[0])
-        || !sameFraming(urls[0], url))) {
+        || !sameFraming(urls[0], url, master))) {
         throw new Error('Art-directed picture needs a manually reviewed safe rendition');
       }
       const row = manifest.rows?.[logicalId(urls[0])];
@@ -171,13 +180,12 @@ export async function conditionInlineMedia(html, {
         ...(lengths[0] <= maxBytes ? [urls[0]] : []),
         row?.delivery_url,
         ...urls.filter((url) => url !== urls[0]),
-        ...(!isAspectCrop(urls[0]) && !/\/media_[0-9a-f]+\./i.test(urls[0])
-          ? sizedRenditions(urls[0]) : []),
+        ...(ladder ? renditionCandidates(urls[0], master) : []),
       ].filter((url, i, all) => url && all.indexOf(url) === i);
       let safe = null;
       const tooSmall = [];
       for (const candidate of candidates) {
-        if (!sameFraming(urls[0], candidate)) continue;
+        if (!sameFraming(urls[0], candidate, master)) continue;
         if (candidate !== urls[0] && belowMinEdge(candidate, minEdge)) {
           tooSmall.push(candidate);
           continue;
