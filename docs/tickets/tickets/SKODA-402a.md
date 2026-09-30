@@ -51,7 +51,7 @@ correction in `docs/ui-specs/faceted-listing.md`.
   - The facets are hidden until the toggle opens them. (A selection now collapses them again, as on live; see
     "Motion + selection behaviour".)
   - Esc closes one layer at a time: an open option list first (focus returns to its pill), then the panel (focus
-    returns to the toggle). Closing the panel also closes any open option list.
+    returns to the toggle). Collapsing the panel keeps the open option list (see "QA round 2026-09-30").
   - An Esc that an inner control has already handled (`defaultPrevented`) is left alone. For example, closing a
     media card's size menu (SKODA-406, PR #217) doesn't also close the filter panel.
   - The mobile focus trap is gone, because the panel is now an inline disclosure, not a drawer.
@@ -148,8 +148,8 @@ Measured on live `/en/images`, frame by frame:
   - the count and chips update, the panel and list collapse, and focus lands on the toggle.
 
 - **Code review (2026-09-30) fixes:**
-  - **Closing no longer drops the open option list first.** It stays in place until the panel has animated shut
-    (`REVEAL_MS` 400), so the list collapses with the panel instead of the content jumping ~90px.
+  - **Closing no longer drops the open option list first,** so the list collapses with the panel instead of the
+    content jumping ~90px. Since the QA round below, the list is not closed at all when the panel collapses.
   - **A pick still settling is handled** by sort and chip removal (cancelled; their render includes it), Load more
     (shown first, so paging counts its rows) and back/forward (dropped). None of these gets a late veil or collapse.
   - **Both timers are tracked,** so a second pick under the veil restarts once: one veil, one collapse.
@@ -161,5 +161,25 @@ Measured on live `/en/images`, frame by frame:
 - **For product review (WCAG 3.2.2 On Input):** collapsing the panel after a checkbox change, and moving focus to
   the toggle, is a change of context caused by input. It follows the "collapse like live" decision. Keyboard and
   screen-reader users must reopen the panel and the pill for each further pick.
+## QA round 2026-09-30 (two findings, both measured on live /en/images)
+- **Chips live inside the panel.** Live's `.search-filter-selected` is in `form.search-filter`, under the
+  options, so the "Model: Peaq" chips hide when the panel collapses and show when it expands. Ours sat outside the
+  panel and stayed visible. `.listing-chips` now moves into `.facet-inner`, after the options. Geometry, as live:
+  - options → chips: 24px (the options area's own bottom margin);
+  - chips: 35px tall, `0 14px` padding, `0 7px 7px 0` margin, 2px `--chip-border`, 14/600;
+  - sort row right after the chips' 7px, or 24px after the options with no chips;
+  - panel top: 16px below where the sort row sat;
+  - checked at 1280 and 390 — pills 0–42, options from 58, chips 24px under the options.
+- **The open pill list survives a collapse.** Live keeps the open list across collapse and expand (Model stays
+  open; switch to Bodywork and that one stays). A reload after a selection shows the selected facet open on expand.
+  Ours closed the list when the panel closed. Now only Esc or its pill closes a list. The list shrinks away inside
+  the panel and is open again on expand.
+- **The sort row's own 1em top margin is dropped under the open panel,** as on live, and animated with the reveal.
+  Opening and closing move the grid 164px over ~44 frames, at most 12px per frame.
+- **Tests:** 24 in `listing.test.mjs`, including:
+  - chips inside the panel;
+  - collapse + expand keeping the open list;
+  - a selection → collapse → expand showing the list still open.
+
 ## Dependencies
 SKODA-402 (listing), SKODA-608 (rows + published listings). Related: SKODA-406 (media card).

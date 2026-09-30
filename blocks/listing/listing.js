@@ -51,7 +51,6 @@ let instanceSeq = 0; // per-page counter → unique element ids when >1 listing 
 // (0.2s fade), shows the new results and collapses the filter panel (measured on /en/images).
 export const FILTER_SETTLE_MS = 900;
 export const VEIL_MS = 200;
-export const REVEAL_MS = 400; // the panel's open/close animation (listing.css --facet-reveal)
 const reducedMotion = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 const titleCase = (s) => String(s).replace(/(^|[\s-])([a-z])/g, (m) => m.toUpperCase());
@@ -249,10 +248,12 @@ export default async function decorate(block) {
   // the inner wrapper lets CSS animate the panel's height open and closed (grid 0fr → 1fr)
   const facetInner = document.createElement('div');
   facetInner.className = 'facet-inner';
-  facetInner.append(facetPills, facetOptions);
-  facetBar.append(facetInner);
+  // the applied-filter chips live inside the panel, under the options, so they hide and show
+  // with it (source form.search-filter > .search-filter-selected)
   const chipsRow = document.createElement('div');
   chipsRow.className = 'listing-chips';
+  facetInner.append(facetPills, facetOptions, chipsRow);
+  facetBar.append(facetInner);
   const sortRow = document.createElement('div');
   sortRow.className = 'listing-sort';
   const countEl = document.createElement('div');
@@ -277,9 +278,9 @@ export default async function decorate(block) {
   filterToggle.setAttribute('aria-controls', `${uid}-facets`);
   facetBar.id = `${uid}-facets`;
 
-  // Source order: facet panel, chips, sort row, grid, then the "N / total" count right above
-  // Load more (measured on /en/news, /en/images).
-  block.append(facetBar, chipsRow, sortRow, status, grid, countEl, loadMoreWrap);
+  // Source order: facet panel (pills, options, chips), sort row, grid, then the "N / total"
+  // count right above Load more (measured on /en/news, /en/images).
+  block.append(facetBar, sortRow, status, grid, countEl, loadMoreWrap);
 
   // Load the index (self-contained; degrades to empty/error state).
   let scoped = [];
@@ -577,15 +578,9 @@ export default async function decorate(block) {
   // then the panel (focus back to the toggle). Esc elsewhere in the block (a result card,
   // Load more) and an Esc an inner control already handled (defaultPrevented) are left alone.
   // A filter selection collapses it once the results show, as on the source (applyFilterChange).
-  // Closing leaves an open option list in place until the panel has animated shut, so the
-  // list collapses with it (like live) instead of vanishing first and jolting the page.
-  let closeListsTimer = 0;
+  // Collapsing keeps the open option list (as on live): it shrinks away inside the panel and
+  // is still open when the panel is expanded again. Only Esc or its pill closes a list.
   const setFacetsOpen = (open) => {
-    clearTimeout(closeListsTimer);
-    if (!open) {
-      if (reducedMotion()) closeOptionPanels();
-      else closeListsTimer = setTimeout(closeOptionPanels, REVEAL_MS);
-    }
     filterToggle.setAttribute('aria-expanded', String(open));
     block.classList.toggle('facets-open', open);
   };

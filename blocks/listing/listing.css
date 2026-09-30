@@ -81,11 +81,11 @@
     visibility 0s linear var(--facet-reveal-time);
 }
 
-/* open: 16px below where the sort row sits when closed (its own 1em top margin + 16px),
-   24px above the sort row (live form.search-filter) */
+/* open: 16px below where the sort row sits when closed (its own 1em top margin + 16px); the
+   options area's 24px bottom margin (then the chips, if any) sets the gap to the sort row */
 .listing.facets-open .listing-facets {
   grid-template-rows: 1fr;
-  margin-block: calc(2 * var(--spacing-m)) var(--spacing-l);
+  margin-block: calc(2 * var(--spacing-m)) 0;
   opacity: 1;
   visibility: visible;
   transition:
@@ -178,6 +178,11 @@
   border-radius: 50%;
 }
 
+/* options area: always 24px above the chips / sort row (source .filter-options margin) */
+.listing .facet-options {
+  margin-block-end: var(--spacing-l);
+}
+
 /* option list: full width under the pills, 160px columns, no box (source .filter-options) */
 .listing .facet-panel {
   min-inline-size: 0;
@@ -264,11 +269,11 @@
   outline-offset: 2px;
 }
 
-/* --- applied-filter chips --- */
+/* --- applied-filter chips: inside the panel, under the options, so they hide and show with it
+   (source .search-filter-selected > a.option-reset) --- */
 .listing .listing-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5em;
 }
 
 .listing .listing-chips:empty {
@@ -279,10 +284,13 @@
   display: inline-flex;
   gap: 0.4em;
   align-items: center;
-  height: 35px;
-  padding: 0 1em;
+  height: var(--facet-pill-height);
+  padding: 0 14px;
+  margin-block: 0 var(--facet-pill-gap-block);
+  margin-inline: 0 var(--facet-pill-gap-block);
   font-size: var(--body-font-size-s);
   font-weight: var(--weight-semibold);
+  line-height: 1.5;
   color: var(--text-color);
   background: var(--skoda-white);
   border: 2px solid var(--chip-border);
@@ -310,6 +318,13 @@
   justify-content: center;
   gap: 0 1em;
   margin-block: 1em 0;
+  transition: margin-block-start 0.4s ease-in-out; /* with the panel's reveal */
+}
+
+/* under the open panel the sort row sits right after it (live .sort-options follows the form
+   directly): the options' 24px, or the chips' 7px, is the gap */
+.listing.facets-open .listing-sort {
+  margin-block-start: 0;
 }
 
 .listing .listing-sort-options {
@@ -720,7 +735,8 @@
   .listing.is-loading::before,
   .listing .listing-facets,
   .listing.facets-open .listing-facets,
-  .listing .facet-panel {
+  .listing .facet-panel,
+  .listing .listing-sort {
     transition: none;
   }
 }

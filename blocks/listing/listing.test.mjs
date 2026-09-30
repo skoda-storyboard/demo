@@ -52,7 +52,7 @@ globalThis.fetch = async (url) => {
 
 const {
   default: decorate, mediaCell, isMediaTemplate, wireMediaLightbox, valueLabel,
-  FILTER_SETTLE_MS, VEIL_MS, REVEAL_MS,
+  FILTER_SETTLE_MS, VEIL_MS,
 } = await import('./listing.js');
 
 const click = (el, init = {}) => el.dispatchEvent(new window.MouseEvent('click', {
@@ -232,11 +232,14 @@ async function facetListing(index, search = '') {
   };
 }
 
-test('402a: source order — facet panel, chips, sort row (with the toggle), grid, count, load more', async () => {
+test('402a: source order — facet panel (pills, options, chips), sort row (with the toggle), grid, count, load more', async () => {
   const { block } = await facetListing('/en/order-index.json');
   assert.deepEqual([...block.children].map((c) => c.className.split(' ')[0]), [
-    'listing-facets', 'listing-chips', 'listing-sort', 'listing-status', 'listing-items', 'listing-count', 'listing-loadmore',
+    'listing-facets', 'listing-sort', 'listing-status', 'listing-items', 'listing-count', 'listing-loadmore',
   ]);
+  assert.deepEqual([...block.querySelector('.facet-inner').children].map((c) => c.className), [
+    'facet-pills', 'facet-options', 'listing-chips',
+  ], 'the chips hide and show with the panel, as on live');
   assert.ok(block.querySelector('.listing-sort > .listing-filter-toggle'));
 });
 
@@ -282,10 +285,10 @@ test('402a: a selection settles, veils the listing, updates and collapses the pa
   assert.equal(block.classList.contains('facets-open'), false, 'panel collapsed');
   assert.equal(toggle.getAttribute('aria-expanded'), 'false');
   assert.equal(document.activeElement, toggle, 'focus moves from the hidden checkbox to the toggle');
-  // the open list collapses inside the panel, then closes once the panel has animated shut
-  assert.ok(block.querySelector('.facet-pill[aria-expanded="true"]'), 'list still in place while collapsing');
-  t.mock.timers.tick(REVEAL_MS);
-  assert.equal(block.querySelector('.facet-pill[aria-expanded="true"]'), null, 'option list closed');
+  // the list collapses inside the panel and is still open when the panel is expanded again
+  click(toggle);
+  assert.equal(block.querySelector('.facet-pill[aria-expanded="true"]')?.dataset.facet, 'model', 'Model list open again');
+  assert.ok(block.querySelector('.listing-facets .listing-chips .listing-chip'), 'chips are inside the panel');
 });
 
 const pick = (block, value) => {
@@ -301,7 +304,7 @@ test('402a: sort or back/forward during the settle cancels the delayed veil + co
   pick(block, 'Peaq');
   click(block.querySelector('.listing-sort-btn[data-sort="oldest"]'));
   assert.equal(toggle.textContent, 'Advanced filter (1)', 'the sort render includes the pick');
-  t.mock.timers.tick(FILTER_SETTLE_MS + VEIL_MS + REVEAL_MS);
+  t.mock.timers.tick(FILTER_SETTLE_MS + VEIL_MS + 400);
   assert.equal(block.classList.contains('is-loading'), false, 'no late veil');
   assert.ok(block.classList.contains('facets-open'), 'no late collapse');
   pick(block, 'Epiq');
@@ -342,7 +345,7 @@ test('402a: a second pick under the veil restarts once — a single collapse, no
   assert.equal(block.classList.contains('facets-open'), false);
 });
 
-test('402a: closing the panel keeps the open list until the panel has animated shut', async (t) => {
+test('402a: collapse + expand keeps the open pill list, like live (only Esc or its pill closes it)', async (t) => {
   const { block, toggle } = await facetListing('/en/closelist-index.json');
   t.mock.timers.enable({ apis: ['setTimeout'] });
   click(toggle);
@@ -350,16 +353,20 @@ test('402a: closing the panel keeps the open list until the panel has animated s
   click(pill);
   click(toggle);
   assert.equal(block.classList.contains('facets-open'), false);
-  assert.equal(pill.getAttribute('aria-expanded'), 'true', 'the list collapses with the panel');
-  t.mock.timers.tick(REVEAL_MS);
-  assert.equal(pill.getAttribute('aria-expanded'), 'false');
-  // reopening before the close finishes keeps the list
+  t.mock.timers.tick(1000);
+  assert.equal(pill.getAttribute('aria-expanded'), 'true', 'the list collapses with the panel, not before');
   click(toggle);
-  click(pill);
-  click(toggle);
-  click(toggle);
-  t.mock.timers.tick(REVEAL_MS);
-  assert.equal(pill.getAttribute('aria-expanded'), 'true');
+  assert.equal(pill.getAttribute('aria-expanded'), 'true', 'still open after expanding again');
+  assert.equal(block.querySelector(`#${pill.getAttribute('aria-controls')}`).hidden, false);
+  // a different pill switches the list, and that one survives a collapse too
+  const other = block.querySelectorAll('.facet-pill')[1];
+  if (other) {
+    click(other);
+    click(toggle);
+    click(toggle);
+    assert.equal(other.getAttribute('aria-expanded'), 'true');
+    assert.equal(pill.getAttribute('aria-expanded'), 'false');
+  }
 });
 
 test('402a: a deep link matches index values case-insensitively (Peaq → peaq, ticked, no duplicate)', async () => {
@@ -418,7 +425,7 @@ test('402a: pills in one row, the open pill\'s options full width in the area un
   const { block, toggle } = await facetListing('/en/rows-index.json');
   click(toggle);
   const bar = block.querySelector('.listing-facets');
-  assert.deepEqual([...bar.querySelector('.facet-inner').children].map((c) => c.className), ['facet-pills', 'facet-options']);
+  assert.deepEqual([...bar.querySelector('.facet-inner').children].map((c) => c.className), ['facet-pills', 'facet-options', 'listing-chips']);
   const pill = bar.querySelector('.facet-pills > .facet-pill[data-facet="model"]');
   const panel = bar.querySelector(`.facet-options > #${pill.getAttribute('aria-controls')}`);
   assert.ok(panel.hidden);
