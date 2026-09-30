@@ -206,7 +206,10 @@
         "https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/",
         "https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/",
         "https://www.skoda-storyboard.com/en/press-kits/new-skoda-enyaq-press-kit-2/",
-        "https://www.skoda-storyboard.com/en/press-kits/skoda-vision-o-press-kit/"
+        "https://www.skoda-storyboard.com/en/press-kits/skoda-vision-o-press-kit/",
+        "https://www.skoda-storyboard.com/en/press-kits/skoda-elroq-press-kit/",
+        "https://www.skoda-storyboard.com/en/press-kits/the-all-new-skoda-superb-press-kit/",
+        "https://www.skoda-storyboard.com/en/press-kits/the-all-new-skoda-kodiaq-press-kit/"
       ],
       "description": "Press-kit tiles hub: Hero Image (overlay), source-order Cards (overlay, tiles), optional introduction and linked WhatsApp/ZIP banners. Metadata template=press_kit; SKODA-805a.",
       "blocks": [
@@ -290,12 +293,9 @@
         "https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/",
         "https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/images/",
         "https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/",
-        "https://www.skoda-storyboard.com/en/press-kits/skoda-elroq-press-kit/",
         "https://www.skoda-storyboard.com/en/press-kits/skoda-elroq-press-kit-2/",
         "https://www.skoda-storyboard.com/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/",
         "https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car/",
-        "https://www.skoda-storyboard.com/en/press-kits/the-all-new-skoda-superb-press-kit/",
-        "https://www.skoda-storyboard.com/en/press-kits/the-all-new-skoda-kodiaq-press-kit/",
         "https://www.skoda-storyboard.com/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/"
       ],
       "description": "Default press-kit article (chapter or resource child): source title, optional Chapters, primary content with optional row toggles as Accordion, inline asset grids as Downloads, source tables resolved to default content, sidebar Gallery (preview) and Tags, then an optional Media Box with Downloads and file rows. Metadata template=press_kit; SKODA-805b/c.",

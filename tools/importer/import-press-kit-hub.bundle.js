@@ -60,7 +60,8 @@ var CustomImportScript = (() => {
     sourceRows.forEach((tiles, rowIndex) => {
       const wide = tiles.filter((tile) => tile.querySelector(".ratio-container.ratio-2x1")).length;
       const square = tiles.filter((tile) => tile.querySelector(".ratio-container.ratio-1x1")).length;
-      if (!(wide === 2 && square === 1 && tiles.length === 3 || wide === 0 && square === tiles.length && [4, 5].includes(tiles.length))) {
+      const half = wide === 2 && tiles.length === 2 || wide === 1 && square === 2 && tiles.length === 3;
+      if (!(wide === 2 && square === 1 && tiles.length === 3 || half || wide === 0 && square === tiles.length && [4, 5].includes(tiles.length))) {
         throw new Error(`Press-kit tile row ${rowIndex + 1} has an unsupported layout`);
       }
       tiles.forEach((tile) => {
@@ -78,9 +79,10 @@ var CustomImportScript = (() => {
         const link = document.createElement("a");
         link.href = sourceLink.href;
         link.textContent = title;
+        const isWide = !!tile.querySelector(".ratio-container.ratio-2x1");
         let token = "press-square";
-        if (tile.querySelector(".ratio-container.ratio-2x1")) token = "feature";
-        else if (tiles.length === 4) token = "press-quarter";
+        if (isWide) token = half ? "press-half" : "feature";
+        else if (tiles.length === 4 || half) token = "press-quarter";
         rows.push([token, img, link]);
       });
     });
@@ -691,6 +693,10 @@ var CustomImportScript = (() => {
   function bannerAlt(href, img) {
     if (/\.zip(?:$|[?#])/i.test(href)) return "Download the press kit ZIP";
     if (/whatsapp/i.test(href)) return "Follow \u0160koda Storyboard on WhatsApp";
+    if (/^https?:\/\/(?:www\.)?threads\.(?:com|net)\//i.test(href)) {
+      return "\u0160koda on Threads: the latest news and updates from the world of \u0160koda";
+    }
+    if (/^https?:\/\/open\.spotify\.com\//i.test(href)) return "Listen to the #Explore\u0160koda Podcast on Spotify";
     const alt = (img.getAttribute("alt") || img.getAttribute("title") || "").trim();
     if (alt) return alt;
     throw new Error(`Press-kit hub banner has no accessible name: ${href}`);
@@ -719,7 +725,7 @@ var CustomImportScript = (() => {
       const heroBlock = parseHero(hero, document);
       const tilesBlock = parseTiles(content, document);
       const banners = bannerLinks(content, document);
-      const intro = [...content.querySelectorAll(".widget_sow-editor .textwidget")].filter((widget) => !widget.querySelector("img") && widget.textContent.trim()).flatMap((widget) => [...widget.children].map((child) => child.cloneNode(true)));
+      const intro = [...content.querySelectorAll(".widget_sow-editor .textwidget")].filter((widget) => !widget.querySelector("img, a.twitter-timeline") && widget.textContent.trim()).flatMap((widget) => [...widget.children].map((child) => child.cloneNode(true)));
       const main = document.body;
       main.replaceChildren(article);
       article.replaceChildren(heroBlock);
