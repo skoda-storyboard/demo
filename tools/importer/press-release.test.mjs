@@ -319,3 +319,16 @@ test('metadata: template press_release, publish date and tags survive the rebuil
   assert.equal(rows.publisheddate, '2026-09-11');
   assert.match(rows.tags, /superb/);
 });
+
+test('an image-only PDF link is named by its image alt (binary gate label), prose links untouched', { skip }, () => {
+  const pdf = 'https://cdn.skoda-storyboard.com/2026/08/Infographics-Peaq_EN_cadc8744.pdf';
+  const { element } = importPage('peaq', (doc) => {
+    doc.querySelector('.column-primary .entry-content').insertAdjacentHTML('beforeend', `<p><a href="${pdf}">
+      <img src="https://cdn.skoda-storyboard.com/2026/08/gfhgfhsfhdgdgd_a3212940.jpg" alt="Infographics | Production of the Škoda Peaq"></a></p>`);
+  });
+  const link = element.querySelector(`a[href="${pdf}"]`);
+  assert.equal(link.title, 'Infographics | Production of the Škoda Peaq');
+  const imageLinks = [...element.querySelectorAll('a[href][title]')]
+    .filter((a) => !/\.(?:pdf|mp4)(?:$|[?#])/i.test(a.getAttribute('href')) && a.querySelector('img') && !txt(a));
+  assert.equal(imageLinks.length, 0, 'only PDF/MP4 image links gain a title');
+});

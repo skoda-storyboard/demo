@@ -546,6 +546,12 @@ var CustomImportScript = (() => {
       hr.removeAttribute(MARKER);
     });
     article.querySelectorAll('a[href=""], a:not([href])').forEach((a) => a.replaceWith(...a.childNodes));
+    article.querySelectorAll("a[href]").forEach((a) => {
+      const img = a.querySelector("img");
+      const alt = ((img == null ? void 0 : img.getAttribute("alt")) || "").trim();
+      if (!alt || text3(a) || a.title || !/\.(?:pdf|mp4)(?:$|[?#])/i.test(a.getAttribute("href"))) return;
+      a.title = alt;
+    });
   }
   function transform2(hookName, element, payload) {
     const document = element.ownerDocument || typeof window !== "undefined" && window.document;

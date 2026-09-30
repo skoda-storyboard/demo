@@ -1,4 +1,5 @@
 /* global WebImporter */
+import parseTiles from './press-kit-hub-tiles.js';
 
 const text = (node) => (node?.textContent || '').replace(/\s+/g, ' ').trim();
 
@@ -120,6 +121,16 @@ function contents(panel, document, { nested: inBlock = false } = {}) {
       return [...heading, ...[...items].filter((node) => node.nodeType === 1 || text(node))];
     });
   }
+  // A WordPress video widget holds one cart attachment, as in a text widget (Fabia 130: its
+  // Vimeo clip + MP4 master), so the same native-MP4 rule applies.
+  if (panel.matches('.widget_media_video')) {
+    const holder = panel.querySelector('.media-cart-item.attachment')?.parentElement;
+    if (!holder || panel.querySelectorAll('iframe').length !== 1) {
+      throw new Error('Press-kit video widget needs one cart attachment with a player');
+    }
+    embedUrls(holder, document, { nested: inBlock });
+    return [...holder.children];
+  }
   if (!text(panel) && !panel.querySelector('img, a[href]')) return [];
   throw new Error(`Unsupported press-kit content widget: ${panel.className}`);
 }
@@ -152,9 +163,19 @@ function columnsRow(cells, document) {
 function flatten(layout, document, { nested = false } = {}) {
   const output = [];
   let rows = [];
+  let tileGrids = [];
   const flush = () => {
     if (rows.length) output.push(WebImporter.DOMUtils.createTable([['Accordion'], ...rows], document));
     rows = [];
+  };
+  // Consecutive rows of chapter teasers (an older kit landing page in article form, e.g. the
+  // second Elroq kit) are one tiles mosaic, as on a hub.
+  const flushTiles = () => {
+    if (!tileGrids.length) return;
+    const holder = document.createElement('div');
+    holder.append(...tileGrids);
+    output.push(parseTiles(holder, document));
+    tileGrids = [];
   };
 
   [...layout.children].forEach((grid) => {
@@ -162,6 +183,14 @@ function flatten(layout, document, { nested = false } = {}) {
       if (text(grid) || grid.querySelector('img, a[href]')) throw new Error('Unexpected press-kit article grid');
       return;
     }
+    const gridPanels = [...grid.querySelectorAll(':scope > .panel-grid-cell > .so-panel')];
+    if (!nested && gridPanels.some((panel) => panel.matches('.widget_ys-so-widget-post-teaser'))
+      && gridPanels.every((panel) => panel.matches('.widget_ys-so-widget-post-teaser, .widget_skoda-offset'))) {
+      flush();
+      tileGrids.push(grid);
+      return;
+    }
+    flushTiles();
     const filled = [...grid.children].filter((cell) => cell.matches('.panel-grid-cell') && hasContent(cell));
     // Accordion answers are linear: DA blocks can't nest (accordion contract).
     if (!nested && filled.length > 1
@@ -199,6 +228,7 @@ function flatten(layout, document, { nested = false } = {}) {
     });
   });
   flush();
+  flushTiles();
   return output;
 }
 

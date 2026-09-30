@@ -358,6 +358,15 @@ function finish(element, document) {
 
   // Never ship an empty link (source `a.colorbox href=""`, SKODA-612).
   article.querySelectorAll('a[href=""], a:not([href])').forEach((a) => a.replaceWith(...a.childNodes));
+
+  // An image-only PDF/MP4 link (the Peaq production infographic) is named by its image, in the
+  // link title the SKODA-503 binary gate reads, as the press-kit importer does.
+  article.querySelectorAll('a[href]').forEach((a) => {
+    const img = a.querySelector('img');
+    const alt = (img?.getAttribute('alt') || '').trim();
+    if (!alt || text(a) || a.title || !/\.(?:pdf|mp4)(?:$|[?#])/i.test(a.getAttribute('href'))) return;
+    a.title = alt;
+  });
 }
 
 export default function transform(hookName, element, payload) {
