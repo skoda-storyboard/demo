@@ -164,11 +164,13 @@ test('buildFeature: crossing 992 keeps focus in the card (toggle → first CTA; 
     const toggle = card.querySelector('.stories-feature-toggle');
     const [first] = card.querySelectorAll('.stories-feature-cta');
     toggle.focus();
-    wide.matches = true; // e.g. a tablet rotated to landscape: the toggle is about to be display:none
+    wide.matches = true; // e.g. a tablet rotated to landscape: the ≥992 CSS hides the toggle
+    toggle.style.display = 'none';
     listeners.forEach((fn) => fn());
     assert.equal(document.activeElement, first);
     assert.equal(card.classList.contains('is-expanded'), false);
     wide.matches = false; // back under 992 with focus on a CTA of a collapsed card
+    toggle.style.display = '';
     listeners.forEach((fn) => fn());
     assert.equal(card.classList.contains('is-expanded'), true);
     assert.equal(toggle.getAttribute('aria-expanded'), 'true');
@@ -176,6 +178,33 @@ test('buildFeature: crossing 992 keeps focus in the card (toggle → first CTA; 
   } finally {
     window.matchMedia = realMatchMedia;
   }
+});
+
+test('buildFeature: focus survives when the browser drops it from the hidden toggle before the width change', async () => {
+  const card = buildFeature(readFeature(storiesBlock('/x.json')));
+  document.querySelector('main').replaceChildren(card);
+  const toggle = card.querySelector('.stories-feature-toggle');
+  const [first] = card.querySelectorAll('.stories-feature-cta');
+  toggle.focus();
+  toggle.style.display = 'none'; // the ≥992 layout hides it…
+  toggle.blur(); // …and the browser's focus fix-up drops focus to <body> (focusout, no relatedTarget)
+  await Promise.resolve();
+  assert.equal(document.activeElement, first, 'focus lands on the first CTA, not <body>');
+});
+
+test('buildFeature: a user moving focus away is left alone', async () => {
+  const card = buildFeature(readFeature(storiesBlock('/x.json')));
+  const outside = document.createElement('button');
+  document.querySelector('main').replaceChildren(card, outside);
+  const toggle = card.querySelector('.stories-feature-toggle');
+  toggle.focus();
+  outside.focus(); // focusout with a relatedTarget: a real move
+  await Promise.resolve();
+  assert.equal(document.activeElement, outside);
+  toggle.focus();
+  toggle.blur(); // a plain blur while the toggle is still shown (e.g. a click on the page)
+  await Promise.resolve();
+  assert.equal(document.activeElement, document.body);
 });
 
 test('buildFeature: the title is an h4 under an authored feed heading', () => {
@@ -266,6 +295,45 @@ test('decorate: the card paints before the index and stays when the index fails'
   } finally {
     globalThis.fetch = realFetch;
   }
+});
+
+test('decorate: a malformed feature image drops only the image; the card links and the feed survive (PR #231)', async (t) => {
+  t.mock.method(console, 'warn', () => {});
+  const block = await decorated('/en/feature-bad-image.json', 8, {
+    feature: `<p><picture><img src="https://" alt=""></picture></p>
+      <h3>Explore the Epiq</h3><p><strong><a href="/en/skoda-model/epiq">Discover the highlights</a></strong></p>
+      <p><a href="/en/images">Images</a></p>`,
+  });
+  const card = block.querySelector('.stories-items > li.stories-feature');
+  assert.ok(card, 'the card still renders');
+  assert.equal(card.querySelector('.stories-feature-image'), null, 'without the broken image');
+  assert.deepEqual([...card.querySelectorAll('.stories-feature-cta')].map((a) => a.textContent), ['Discover the highlights', 'Images']);
+  assert.equal(block.querySelectorAll('.stories-item').length, 4, 'the story feed renders');
+  assert.equal(console.warn.mock.callCount(), 1, 'the skipped image is reported');
+});
+
+test('decorate: if the feature card cannot be built at all, the story feed still renders', async (t) => {
+  t.mock.method(console, 'error', () => {});
+  // a title whose text read throws stands in for any unexpected build failure
+  const block = storiesBlock('/en/feature-broken-build.json');
+  feeds['/en/feature-broken-build.json'] = Array.from({ length: 8 }, (_, i) => story(i + 1));
+  const cell = block.querySelector(':scope > div:last-child > div:last-child');
+  const orig = document.createElement;
+  let calls = 0;
+  document.createElement = function create(tag, ...rest) {
+    if (tag === 'li' && calls === 0) { calls += 1; throw new Error('boom'); }
+    return orig.call(this, tag, ...rest);
+  };
+  try {
+    window.history.replaceState(null, '', '/en/tag/model/epiq');
+    await decorate(block);
+  } finally {
+    document.createElement = orig;
+  }
+  assert.ok(cell);
+  assert.equal(block.querySelector('.stories-feature'), null);
+  assert.ok(block.querySelectorAll('.stories-item').length > 0, 'stories render');
+  assert.equal(console.error.mock.callCount(), 1);
 });
 
 test('decorate: no feature row keeps the feed as before (6 stories, no card, no has-feature)', async () => {

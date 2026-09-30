@@ -135,6 +135,37 @@ stakeholder decision (2026-09-26).
   - Every stop shows the 2px ring; there's no trap. At 320–991 there's no horizontal overflow.
 - **Tests:** 47 stories tests (18 new), including the resize-focus case and the new-tab name.
 
+## PR #231 review (2026-09-30, larsauffarth)
+- **[P2] Malformed optional image removed the whole feed:** fixed.
+  - The cause: a feature cell with `<img src="https://">` made `createOptimizedPicture` throw after `decorate()` had
+    cleared the block, so no card, no stories and no status rendered.
+  - `featurePicture()` now catches it: only the image is dropped, with a console warning naming the src. The card,
+    its CTAs and the feed render.
+  - `decorate()` also isolates the whole card build. If it ever fails, the card is skipped with a console error
+    and the feed still renders.
+  - 2 regression tests. In a real browser, with the image src rewritten to `https://` on the Octavia archive, the
+    card renders without the image, with its 4 CTAs and the 4 stories.
+- **Found during the requested UI QA, fixed:** crossing 992 could still drop focus to `<body>`.
+  - Chrome may run its focus fix-up on the now-hidden toggle before it reports the width change, so the
+    `matchMedia` handler saw `<body>`. This reproduced after the card had been opened and closed once.
+  - The card now also handles a `focusout` to nowhere from a control the layout just hid: the toggle hands focus
+    to the first CTA, and a CTA of a collapsed card reopens its panel.
+  - Verified 6 of 6 runs (900 → 1200 → 800, fresh and after keyboard use). 2 tests added.
+- **UI QA, origin vs local** (Octavia archive; the reviewer's mobile / 768 / 992 / 1080 bands, plus 1440):
+  - **1440:** card 938 / 396×466, source 465. Title 32/36.8/600, image 240×135, CTA 250×30 at +225, stories at
+    the same offsets.
+  - **1080 / 992:** x, width, title (24/27.6), image (175×98) and CTAs (250×30 at +147) are the same. The card is
+    403 / 370 tall against 415: the documented no-overlap deviation. Stories at the source's offsets.
+  - **768 / 375:** card 748×161 / 355×201, the bar 24/24/600, the first CTA 692 / 299 wide at +154 / +194, and the
+    stories are identical to the source.
+  - **Keyboard:** Enter opens, Tab reaches the first CTA, and Space closes. When the card is collapsed, Tab skips
+    the hidden CTAs.
+  - **Load more:** 4 → 10 stories, the card stays the first cell, focus moves to the first new story, and the URL
+    becomes `?offset=10`.
+  - **Home feed at 1440:** 604 / 604 / 396 ×3 from x106, the same as the source.
+- **Merged `main`:** `stories.configKeys` now has both `offset` (from main) and `feature`, and the contract doc row
+  matches.
+
 ## Deliberate deviations
 - **Tab order at ≥ 992:** the card's CTAs come before story 1, although the card sits top right. The DOM order
   is the source's, and on mobile the card is visually first.

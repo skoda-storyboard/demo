@@ -138,6 +138,32 @@ export function readFeature(block) {
 }
 
 /*
+ * The card's optimized picture, or null. The image is optional: an authored src the URL
+ * parser rejects (e.g. "https://") drops only the image, never the card or the feed (PR #231).
+ */
+function featurePicture({
+  src, alt, width, height,
+}) {
+  let picture;
+  try {
+    // 240 CSS px at most (source `.featured-model img`), so 480 covers 2x screens
+    picture = createOptimizedPicture(src, alt, false, [{ width: '480' }]);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('stories: featured model image skipped, invalid src', src, e);
+    return null;
+  }
+  picture.classList.add('stories-feature-image');
+  const img = picture.querySelector('img');
+  // keep the authored ratio so the lazy image reserves its space (no shift under the title)
+  if (img && width && height) {
+    img.setAttribute('width', width);
+    img.setAttribute('height', height);
+  }
+  return picture;
+}
+
+/*
  * The card is the grid's first cell. Below 992px the title is a disclosure <button> (the source
  * `h2.toggle`) and the CTAs start collapsed; from 992px CSS shows the plain title instead and
  * the CTAs are always open, so layout needs no JS. JS only keeps focus when the width crosses
@@ -168,15 +194,31 @@ export function buildFeature(feature, { titleLevel = 2, newTab = 'opens in a new
       item.classList.toggle('is-expanded', open);
     };
     toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
-    // the change fires before the new layout hides the focused control, so focus can move first
+    // Crossing 992 (a rotated tablet, a zoomed window) hides the focused control: the toggle
+    // from 992, a collapsed CTA below it. Keep focus in the card, whichever the browser does
+    // first (it may report the width change before or after it drops focus from the hidden
+    // control). `from` is the control that had or lost focus.
+    const keepFocus = (from) => {
+      if (from === toggle && window.getComputedStyle(toggle).display === 'none') {
+        item.querySelector('.stories-feature-cta')?.focus();
+      } else if (from.matches?.('.stories-feature-cta') && toggle.getAttribute('aria-expanded') !== 'true'
+        && window.getComputedStyle(toggle).display !== 'none') {
+        setOpen(true); // keep the panel the CTA sits in open
+        from.focus();
+      }
+    };
     const wide = window.matchMedia?.(FEATURE_WIDE);
     wide?.addEventListener?.('change', () => {
-      if (!item.contains(document.activeElement)) return;
-      if (wide.matches) {
-        if (document.activeElement === toggle) item.querySelector('.stories-feature-cta')?.focus();
-      } else if (toggle.getAttribute('aria-expanded') !== 'true') {
-        setOpen(true); // a CTA had focus: keep the panel it sits in open
-      }
+      if (item.contains(document.activeElement)) keepFocus(document.activeElement);
+    });
+    item.addEventListener('focusout', (e) => {
+      if (e.relatedTarget) return; // focus went somewhere: the user moved it
+      const from = e.target;
+      queueMicrotask(() => {
+        // still nowhere: the browser dropped it from a control the layout just hid
+        const lost = !document.activeElement || document.activeElement === document.body;
+        if (from.isConnected && lost) keepFocus(from);
+      });
     });
     const text = document.createElement('span');
     text.className = 'stories-feature-text';
@@ -187,18 +229,8 @@ export function buildFeature(feature, { titleLevel = 2, newTab = 'opens in a new
     item.classList.add('is-expanded'); // nothing to toggle with: keep the CTAs reachable
   }
 
-  if (feature.image) {
-    // 240 CSS px at most (source `.featured-model img`), so 480 covers 2x screens
-    const picture = createOptimizedPicture(feature.image.src, feature.image.alt, false, [{ width: '480' }]);
-    picture.classList.add('stories-feature-image');
-    const img = picture.querySelector('img');
-    // keep the authored ratio so the lazy image reserves its space (no shift under the title)
-    if (feature.image.width && feature.image.height) {
-      img.setAttribute('width', feature.image.width);
-      img.setAttribute('height', feature.image.height);
-    }
-    panel.append(picture);
-  }
+  const picture = feature.image && featurePicture(feature.image);
+  if (picture) panel.append(picture);
   const ctas = document.createElement('ul');
   ctas.className = 'stories-feature-ctas';
   feature.links.forEach((link) => {
@@ -248,8 +280,15 @@ export default async function decorate(block) {
   // Skeleton.
   block.textContent = '';
   block.classList.add(Number(cfg.columns) ? `stories-cols-${Number(cfg.columns)}` : 'stories-featured');
-  const featureCell = feature
-    && buildFeature(feature, { titleLevel: cfg.heading ? 4 : 2, newTab: STRINGS.newTab });
+  // the card is optional, authored content: whatever goes wrong building it, the feed still renders
+  let featureCell = null;
+  try {
+    featureCell = feature
+      && buildFeature(feature, { titleLevel: cfg.heading ? 4 : 2, newTab: STRINGS.newTab });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('stories: featured model card skipped', e);
+  }
   if (featureCell) block.classList.add('has-feature');
 
   if (cfg.heading) {
