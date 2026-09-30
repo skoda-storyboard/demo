@@ -98,6 +98,7 @@
   --gallery-story-badge: rgb(0 0 0 / 60%);
   --gallery-story-placeholder: rgb(0 0 0 / 5%);
   --gallery-story-arrow-shadow: 1px 1px 6px 3px rgb(0 0 0 / 15%);
+  --gallery-story-info: rgb(0 0 0 / 60%); /* caption panel (source .sb-gallery-lightbox-info) */
 
   /* faceted-listing (SKODA-402; measured in docs/ui-specs/faceted-listing.md §3) */
   --facet-radius: 5px;

@@ -101,12 +101,6 @@ press-release template or a new modal implementation.
   The source's 25% cells with 10px padding and a −10px margin are a 4-column grid with a 20px gap
   here. The badge is `rgb(0 0 0 / 60%)`, a 28px icon 6px before the total, 16/24 from 768 and 12/18
   below. The 768 step is viewport-driven (the 767 column is wider than the 768 one yet keeps 10px).
-- **"View N photos" button (added on request):** the source bottom bar (`.sb-gallery-bottom`,
-  flex, space-between) sits 20px under the strip (10px below 768) and starts with a green
-  `--gallery-accent` button in the badge's box: a 28px icon 6px before "View 5 photos", 8/16
-  padding and 16/24 text from 768 (167.2×44), 4.8/8 and 12/18 below (125.9×37.6). No hover change.
-  Measured and matched at 1280 / 768 / 500. It opens the set at image 1, as the source does from
-  768; below 768 the source opens its removed overview grid, so EDS opens the viewer there too.
 - **Lightbox, measured and matched at 1280 and 768 (900 high):**
   - Backdrop `rgb(0 0 0 / 95%)`.
   - Top bar 93px with a 1px `--gallery-divider` rule and 16px padding.
@@ -122,7 +116,14 @@ press-release template or a new modal implementation.
   - The dialog is labelled by the title.
   - Ids stay unique per overlay (the shared lightbox numbers them), so two galleries never share one.
   - The focus trap includes authored caption links (close → link → prev → next → close).
-  - An authored caption shows on one line in the bottom band, left of the counter.
+  - An authored caption sits at the bottom, left of the counter, on a 60% black panel (the
+    source info bar). It **wraps** upward over the image and scrolls past 40vh, so text and
+    links are never clipped (PR #212 review P1: at 320px the earlier one-line ellipsis hid the
+    caption link; now the link's two line boxes are both on screen and tappable).
+  - Changing image while focus is on a caption link or action keeps focus in the dialog, on the
+    arrow in the direction of travel (the close button when there are no arrows). This lives in
+    the shared `scripts/lightbox.js`, so the default and `preview` galleries get it too (PR #212
+    review P2).
 - **Tokens (brand.css):** `--gallery-story-backdrop`, `--gallery-story-badge`,
   `--gallery-story-placeholder`, `--gallery-story-arrow-shadow`.
 - **Deliberate differences:**
@@ -131,8 +132,12 @@ press-release template or a new modal implementation.
     match here.
   - **1690+ inset:** the source moves the squares and counter to 30px at 1690, a step outside the
     breakpoint allowlist; EDS keeps 10px.
-  - **"Share gallery":** the bar's right-hand share control is SKODA-215 and isn't rendered; the
-    bar's layout leaves its place at the right end.
+  - **Bottom bar:** "View 5 photos" is the source overview entry, removed by stakeholder decision
+    and out of scope here, so it isn't rendered (PR #212 review; a trial version was taken out
+    again). "Share gallery" is SKODA-215.
+  - **Title bar at 768:** the source title wraps to two lines (379.6 × 46 at 16,23) because its
+    overview and share controls share the bar; without them, the EDS title is one line (660 × 23
+    at 16,34.5). Title size, weight and the 93px bar match; the bar content differs by design.
   - **Focus trap outside the story:** the default, `preview` and media-rail lightboxes keep a
     buttons-only trap. This ticket only changes the story path; widening it for the others would
     change SKODA-203/208/223 behaviour.

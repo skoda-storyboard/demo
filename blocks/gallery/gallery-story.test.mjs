@@ -114,23 +114,6 @@ test('the lead opens image 1, thumb k opens image k + 1; next wraps 5/5 → 1/5'
   assert.equal(document.activeElement, thumbs(block)[2]);
 });
 
-test('the bottom bar\'s "View N photos" button opens the set at image 1', { skip }, () => {
-  const block = story(5);
-  const view = block.querySelector('.gallery-story-bottom > .gallery-story-view');
-  assert.equal(view.tagName, 'BUTTON');
-  assert.equal(view.type, 'button');
-  assert.equal(view.textContent, 'View 5 photos');
-  assert.equal(view.querySelector('svg').getAttribute('aria-hidden'), 'true');
-  assert.equal(block.lastElementChild.previousElementSibling, view.parentElement, 'after the strip');
-  view.focus();
-  view.click();
-  assert.equal(overlay(block).hidden, false);
-  assert.equal(count(block), '1/5');
-  key('Escape');
-  assert.equal(document.activeElement, view, 'focus returns to the button');
-  assert.equal(story(1).querySelector('.gallery-story-view').textContent, 'View 1 photo');
-});
-
 test('the dialog is labelled by the story title; no media-cart actions or tag chips', { skip }, () => {
   const block = story(3, (i) => (i === 1 ? '<p>2026 · Favorit</p>' : ''));
   lead(block).click();
@@ -180,6 +163,25 @@ test('the focus trap includes an authored caption link', { skip }, () => {
   } finally {
     window.Element.prototype.getClientRects = getClientRects;
   }
+});
+
+test('changing image from a focused caption link keeps focus inside the dialog', { skip }, () => {
+  const block = story(3, (i) => (i === 1 ? '<p>See <a href="/en/emobility">more</a></p>' : ''));
+  lead(block).click();
+  const link = block.querySelector('.gallery-lightbox-caption a');
+  link.focus();
+  assert.equal(document.activeElement, link);
+  key('ArrowRight');
+  assert.equal(count(block), '2/3');
+  assert.equal(document.activeElement, block.querySelector('.gallery-lightbox-next'), 'forward → next arrow');
+  // back to image 1 (caption link again), then backwards from the link → prev arrow
+  key('ArrowLeft');
+  block.querySelector('.gallery-lightbox-caption a').focus();
+  key('ArrowLeft');
+  assert.equal(count(block), '3/3');
+  assert.equal(document.activeElement, block.querySelector('.gallery-lightbox-prev'), 'back → prev arrow');
+  assert.ok(overlay(block).contains(document.activeElement));
+  key('Escape');
 });
 
 test('a single image: no strip, opens without prev/next; no rows leave it empty', { skip }, () => {

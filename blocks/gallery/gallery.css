@@ -565,58 +565,25 @@ body.story .section.body-column .gallery.slider {
   object-fit: cover;
 }
 
-/* the lead's count badge and the bottom bar's "View N photos" button share the source
-   .sb-gallery-show-more box: a 28px icon 6px before the text, 4.8/8 padding + 12/18 text
-   below 768, 8/16 + 16/24 from 768 (badge 57 x 38 / 75 x 44, button 126 x 38 / 167 x 44) */
-.gallery.story .gallery-story-count,
-.gallery.story .gallery-story-view {
+/* count badge (source .sb-gallery-show-more): 60% black, bottom-left of the lead,
+   a 28px icon 6px before the total; 57 x 38 below 768, 75 x 44 from 768 */
+.gallery.story .gallery-story-count {
+  position: absolute;
+  bottom: var(--gallery-story-gap);
+  left: var(--gallery-story-gap);
   display: flex;
   align-items: center;
   padding: 4.8px var(--spacing-xs);
+  background: var(--gallery-story-badge);
   color: var(--skoda-white);
   font-size: var(--body-font-size-2xs);
   line-height: 18px;
 }
 
-.gallery.story .gallery-story-count svg,
-.gallery.story .gallery-story-view svg {
-  flex: none;
+.gallery.story .gallery-story-count svg {
   width: 28px;
   height: 28px;
   margin-inline-end: 6px;
-}
-
-/* badge: 60% black, bottom-left of the lead */
-.gallery.story .gallery-story-count {
-  position: absolute;
-  bottom: var(--gallery-story-gap);
-  left: var(--gallery-story-gap);
-  background: var(--gallery-story-badge);
-}
-
-/* bottom bar (source .sb-gallery-bottom): flex row, the button at the start, a gap
-   below the strip; the source button is green with no hover change */
-.gallery.story .gallery-story-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-block-start: var(--gallery-story-gap);
-}
-
-.gallery.story .gallery-story-view {
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-  background: var(--gallery-accent);
-  font-family: inherit;
-  font-weight: var(--weight-regular);
-  text-align: left;
-  cursor: pointer;
-}
-
-.gallery.story .gallery-story-view:hover {
-  background: var(--gallery-accent);
-  color: var(--skoda-white);
 }
 
 .gallery.story .gallery-story-strip {
@@ -633,8 +600,7 @@ body.story .section.body-column .gallery.slider {
 }
 
 .gallery.story .gallery-story-lead:focus-visible,
-.gallery.story .gallery-story-thumb:focus-visible,
-.gallery.story .gallery-story-view:focus-visible {
+.gallery.story .gallery-story-thumb:focus-visible {
   outline: 2px solid var(--skoda-ink);
   outline-offset: 2px;
 }
@@ -704,8 +670,11 @@ body.story .section.body-column .gallery.slider {
   max-height: none;
 }
 
-/* an authored caption sits in the bottom band, left of the counter, on one line, at
-   every width (the shared lightbox keeps captions off phones and beside the image) */
+/* an authored caption sits at the bottom, left of the counter, at every width (the shared
+   lightbox keeps captions off phones and beside the image). It wraps upward over the image
+   on the source info-bar panel (.sb-gallery-lightbox-info, 60% black) and scrolls when
+   long, so authored text and links are never clipped (SKODA-216 review: at 320px a
+   one-line ellipsis hid the caption link) */
 .gallery.story .gallery-lightbox-caption {
   position: absolute;
   right: calc(var(--spacing-xxl) + var(--spacing-l));
@@ -713,17 +682,22 @@ body.story .section.body-column .gallery.slider {
   left: var(--gallery-story-edge);
   display: block;
   max-width: none;
+  max-height: 40vh;
   margin: 0;
-  padding: 0;
+  padding: var(--spacing-xs) var(--spacing-s);
+  background: var(--gallery-story-info);
   line-height: 24px;
   text-align: left;
+  overflow-wrap: anywhere;
+  overflow-y: auto;
 }
 
 .gallery.story .gallery-lightbox-caption p {
   margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.gallery.story .gallery-lightbox-caption p + p {
+  margin-top: var(--spacing-xs);
 }
 
 .gallery.story .gallery-lightbox-count {
@@ -782,8 +756,7 @@ body.story .section.body-column .gallery.slider {
     --gallery-story-arrow-offset: 44.9px; /* 46.5px less the source 0.1em lift */
   }
 
-  .gallery.story .gallery-story-count,
-  .gallery.story .gallery-story-view {
+  .gallery.story .gallery-story-count {
     padding: var(--spacing-xs) var(--spacing-m);
     font-size: var(--body-font-size-m);
     line-height: 24px;

@@ -224,6 +224,10 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
   };
 
   const render = (index) => {
+    // the caption is rebuilt below: if focus is on one of its links or actions, it would
+    // fall to <body>, outside the dialog (SKODA-216 review), so remember it and the direction
+    const captionHadFocus = stageCaption.contains(document.activeElement);
+    const forward = index >= current;
     current = (index + items.length) % items.length;
     const item = items[current];
     // request a large lightbox rendition from the authored source
@@ -289,6 +293,12 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
       stageCaption.hidden = true;
       detailsBtn.hidden = true;
       setDetails(false);
+    }
+    // focus stays in the dialog: on the arrow the reader is moving with (close when the
+    // single-image view has no arrows)
+    if (captionHadFocus && !overlay.contains(document.activeElement)) {
+      if (controls.hidden) closeBtn.focus();
+      else (forward ? nextBtn : prevBtn).focus();
     }
     if (story) {
       counter.textContent = LABELS.storyCounter(current + 1, items.length);
