@@ -311,9 +311,16 @@
       "form": "section-style",
       "status": "pinned",
       "ticket": "SKODA-824",
-      "fallback": "readable",
-      "shape": 1,
-      "emittedBy": []
+      "fallback": "broken",
+      "styles": [
+        "highlight-dark",
+        "highlight-grey"
+      ],
+      "shape": 2,
+      "emittedBy": [
+        "parsers/story-flatten.js",
+        "transformers/skoda-press-release-layout.js"
+      ]
     },
     {
       "id": "cover-box",

@@ -32,7 +32,16 @@ class El {
     return {
       contains: (c) => self.className.split(/\s+/).includes(c),
       add: (c) => { if (!self.className.split(/\s+/).includes(c)) self.className = `${self.className} ${c}`.trim(); },
+      remove: (c) => { self.className = self.className.split(/\s+/).filter((x) => x && x !== c).join(' '); },
     };
+  }
+
+  focus() { globalThis.__focused = this; globalThis.document.activeElement = this; }
+
+  contains(node) {
+    let n = node;
+    while (n && n !== this) n = n._parent;
+    return n === this;
   }
 
   set textContent(v) { this._text = v; this.children = []; }
@@ -103,9 +112,17 @@ class El {
 }
 
 globalThis.window = globalThis.window || {
-  location: { href: 'https://x/' },
+  location: { href: 'https://x/', pathname: '/en/test', search: '' },
   hlx: { codeBasePath: '' },
 };
+// window events for scripts/embed-consent.js (SKODA-204a)
+const windowEvents = new EventTarget();
+globalThis.window.addEventListener = windowEvents.addEventListener.bind(windowEvents);
+globalThis.window.removeEventListener = windowEvents.removeEventListener.bind(windowEvents);
+globalThis.window.dispatchEvent = windowEvents.dispatchEvent.bind(windowEvents);
+// the no-consent placeholder reads the placeholders sheet: none in tests (English defaults)
+globalThis.__fetches = 0;
+globalThis.fetch = async () => { globalThis.__fetches += 1; return { ok: false }; };
 globalThis.document = { createElement: (t) => new El(t) };
 globalThis.window.document = globalThis.document;
 
@@ -364,4 +381,139 @@ test('self-hosted video without a poster row has no poster attribute', () => {
   const block = buildEmbed('https://cdn.example.com/v/clip.mp4');
   decorate(block);
   assert.equal(block.querySelector('video').getAttribute('poster'), null);
+});
+
+// --- SKODA-204a: consent gate ----------------------------------------------
+const consent = await import('../../scripts/embed-consent.js');
+
+const withSearch = async (search, fn) => {
+  const prev = window.location.search;
+  window.location.search = search;
+  try { await fn(); } finally { window.location.search = prev; }
+};
+
+// Gated blocks stay subscribed to consent changes; detach + notify so a test's placeholders
+// unsubscribe instead of reacting to later tests.
+const retire = (...blocks) => {
+  blocks.forEach((b) => b.querySelectorAll('.embed-gated').forEach((w) => { w.isConnected = false; }));
+  consent.setEmbedConsent(null);
+};
+
+test('embed consent: granted by default (M1 stub), ?consent= switch wins over the hook', async () => {
+  consent.setEmbedConsent(null);
+  assert.equal(consent.hasEmbedConsent(), true, 'default: granted');
+  await withSearch('?consent=decline', () => assert.equal(consent.hasEmbedConsent(), false));
+  await withSearch('?consent=accept', () => assert.equal(consent.hasEmbedConsent(), true));
+  consent.setEmbedConsent(false);
+  assert.equal(consent.hasEmbedConsent(), false, 'hook: boolean');
+  await withSearch('?consent=accept', () => assert.equal(consent.hasEmbedConsent(), true, 'query wins'));
+  consent.setEmbedConsent(() => false);
+  assert.equal(consent.hasEmbedConsent(), false, 'hook: function');
+  consent.setEmbedConsent(null);
+});
+
+test('embed consent: consentFromQuery is the shared ?consent= parser (null when absent)', () => {
+  assert.equal(consent.consentFromQuery(''), null);
+  assert.equal(consent.consentFromQuery('?consent=decline'), false);
+  assert.equal(consent.consentFromQuery('?consent=YES'), true);
+  assert.equal(consent.consentFromQuery('?utm_source=x'), null);
+});
+
+test('embed consent: setEmbedConsent notifies subscribers with the resulting state', () => {
+  const seen = [];
+  const off = consent.onEmbedConsentChange((c) => seen.push(c));
+  consent.setEmbedConsent(false);
+  consent.setEmbedConsent(true);
+  off();
+  consent.setEmbedConsent(false);
+  assert.deepEqual(seen, [false, true], 'unsubscribe stops notifications');
+  consent.setEmbedConsent(null);
+});
+
+test('with consent (default): same markup as before 204a, no placeholders fetch', () => {
+  const fetches = globalThis.__fetches;
+  const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
+  decorate(block);
+  assert.equal(block.className, 'embed embed-youtube');
+  assert.equal(block.children.length, 1);
+  const wrapper = block.children[0];
+  assert.equal(wrapper.className, 'embed-video');
+  assert.equal(wrapper.children.length, 1);
+  const iframe = wrapper.children[0];
+  assert.deepEqual(Object.keys(iframe.attributes).sort(), ['allow', 'frameborder', 'loading', 'src', 'title']);
+  assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/9LfK-A20pgw?feature=oembed&enablejsapi=1');
+  assert.equal(block.querySelector('.embed-consent'), null);
+  assert.equal(globalThis.__fetches, fetches, 'the consented path loads no placeholder sheet');
+});
+
+[
+  ['https://www.youtube.com/watch?v=9LfK-A20pgw', 'www.youtube.com'],
+  ['https://vimeo.com/1221703335', 'player.vimeo.com'],
+  ['https://www.buzzsprout.com/1730804/episodes/123', 'www.buzzsprout.com'],
+  ['https://open.spotify.com/episode/abc', 'open.spotify.com'],
+].forEach(([href, host]) => {
+  test(`no consent (${host}): no iframe in the DOM, labelled placeholder naming the host`, async () => {
+    await withSearch('?consent=decline', async () => {
+      const block = buildEmbed(href);
+      decorate(block);
+      assert.equal(block.querySelector('iframe'), null, 'iframe held back: nothing can reach the provider');
+      assert.ok(block.querySelector('.embed-gated'), 'gated class set synchronously (final size from frame 1)');
+      const text = block.querySelector('.embed-consent-text');
+      assert.match(text.textContent, new RegExp(`third party \\(${host.replace(/\./g, '\\.')}\\)`));
+      const button = block.querySelector('button');
+      assert.equal(button.getAttribute('type'), 'button');
+      assert.equal(button.textContent, 'I acknowledge and confirm', 'accessible name = visible label');
+      assert.equal(button.getAttribute('aria-describedby'), text.id, 'the host text describes the button');
+      assert.ok(text.id);
+      retire(block);
+    });
+  });
+});
+
+test('no consent: activating the placeholder loads that one embed and focuses it', async () => {
+  await withSearch('?consent=decline', async () => {
+    const block = buildEmbed('https://vimeo.com/1221703335', { title: 'Octavia film' });
+    const other = buildEmbed('https://www.buzzsprout.com/1730804/episodes/123');
+    decorate(block);
+    decorate(other);
+    block.querySelector('button').dispatch('click');
+    assert.equal(block.querySelector('.embed-consent'), null, 'placeholder removed');
+    const iframe = block.querySelector('iframe');
+    assert.ok(iframe.getAttribute('src').startsWith('https://player.vimeo.com/video/1221703335?'));
+    assert.equal(iframe.dataset.src, undefined);
+    assert.equal(iframe.getAttribute('title'), 'Octavia film');
+    assert.equal(globalThis.__focused, iframe, 'focus moves to the iframe');
+    assert.equal(block.querySelector('.embed-video').classList.contains('embed-gated'), false);
+    assert.ok(other.querySelector('.embed-consent'), 'the other embed stays gated');
+    assert.equal(other.querySelector('iframe'), null);
+    retire(other);
+  });
+});
+
+test('no consent, then consent granted through the hook: waiting embeds load; focus kept', async () => {
+  await withSearch('?consent=decline', async () => {
+    const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
+    decorate(block);
+    block.querySelector('button').focus(); // a keyboard user is on the placeholder button
+    window.location.search = ''; // the CMP now decides
+    consent.setEmbedConsent(true);
+    const iframe = block.querySelector('iframe');
+    assert.ok(iframe, 'iframe back in the DOM');
+    assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/9LfK-A20pgw?feature=oembed&enablejsapi=1');
+    assert.equal(block.querySelector('.embed-consent'), null);
+    assert.equal(globalThis.__focused, iframe, 'focus moves from the removed button to the iframe');
+    consent.setEmbedConsent(null);
+  });
+});
+
+test('no consent: a detached placeholder stops listening and is not released', async () => {
+  await withSearch('?consent=decline', async () => {
+    const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
+    decorate(block);
+    block.querySelector('.embed-gated').isConnected = false; // e.g. a re-rendered fragment
+    window.location.search = '';
+    consent.setEmbedConsent(true);
+    assert.equal(block.querySelector('iframe'), null, 'no iframe appended into a detached block');
+    consent.setEmbedConsent(null);
+  });
 });

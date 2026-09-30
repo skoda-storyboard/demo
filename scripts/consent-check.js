@@ -1,3 +1,5 @@
+import { consentFromQuery } from './embed-consent.js';
+
 let consentedLoaded = false;
 
 /**
@@ -11,13 +13,14 @@ let consentedLoaded = false;
  *   ?consent=accept   grant consent (loads consented.js)
  *   ?consent=decline  decline consent (default behavior)
  *
+ * The ?consent= parsing is shared with the embed gate (scripts/embed-consent.js), so one URL
+ * means the same thing for analytics and embeds; only the defaults differ.
+ *
  * @returns {boolean} true if the user has consented
  */
 function hasConsent() {
-  const consent = new URLSearchParams(window.location.search).get('consent');
-  if (consent !== null) {
-    return ['accept', 'true', '1', 'yes'].includes(consent.toLowerCase());
-  }
+  const fromQuery = consentFromQuery();
+  if (fromQuery !== null) return fromQuery;
   // default: decline
   return false;
 }

@@ -10,6 +10,7 @@
     "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"poc/**/test.mjs\" \"blocks/**/*.test.mjs\" \"scripts/**/*.test.mjs\" \"templates/**/*.test.mjs\" \"tools/importer/**/*.test.mjs\"",
     "media:build": "node tools/importer/media/build-media-manifest.mjs",
+    "media:publish-images": "node tools/importer/media/publish-dam-images.mjs",
     "media:apply": "node tools/importer/media/apply-media-manifest.mjs",
     "media:audit": "node tools/importer/media/audit-m1-media.mjs",
     "media:validate-binaries": "node tools/importer/media/validate-binary-media.mjs",

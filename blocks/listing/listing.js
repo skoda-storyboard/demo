@@ -14,8 +14,10 @@
 /* eslint-disable no-use-before-define */
 
 import { createOptimizedPicture, readBlockConfig } from '../../scripts/aem.js';
-import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
+import { loadQueryIndex, defaultIndexUrl, cleanTitle } from '../../scripts/query-index.js';
 import { fetchPlaceholders } from '../../scripts/placeholders.js';
+import { formatCardDate } from '../../scripts/card-teaser.js';
+import { mediaActions, mediaLabels, playBadge } from '../../scripts/media-card.js';
 import {
   scopeRows, filterRows, sortRows, paginate, distinctFacetValues,
   decodeState, encodeState, selectedCount, INDEX_FACETS,
@@ -101,11 +103,121 @@ function cardCell(row, eager) {
   return li;
 }
 
+/** Image / video listings (media feed rows) render the media card (SKODA-406). */
+export const isMediaTemplate = (template) => template === 'image' || template === 'video';
+
+/*
+ * One media card (source article.media-cart-item): the 16:9 thumbnail link (a play badge
+ * on videos), the date and the title / filename, then the add-to-cart + download actions.
+ * No description. The thumbnail link keeps the file / Vimeo URL for modifier clicks and
+ * no-JS; a plain click opens the lightbox (wireMediaLightbox). `labels` is the control text
+ * (`mediaLabels(placeholders)`; English by default).
+ */
+export function mediaCell(row, eager, labels = undefined) {
+  const title = cleanTitle(row.title);
+  const li = document.createElement('li');
+  li.className = `listing-item media-asset${row.template === 'video' ? ' video' : ''}`;
+
+  const a = document.createElement('a');
+  a.className = 'listing-item-link media-asset-thumb';
+  a.href = row.path || row.original || row.mp4 || '#';
+  const imgWrap = document.createElement('div');
+  imgWrap.className = 'listing-item-image';
+  const src = row.image || row.poster;
+  if (src) {
+    const pic = createOptimizedPicture(src, title, eager, [
+      { media: '(min-width: 768px)', width: '750' }, { width: '500' },
+    ]);
+    if (eager) pic.querySelector('img')?.setAttribute('fetchpriority', 'high');
+    imgWrap.append(pic);
+  } else {
+    a.setAttribute('aria-label', title);
+  }
+  if (row.template === 'video') imgWrap.append(playBadge());
+  a.append(imgWrap);
+  li.append(a);
+
+  const body = document.createElement('div');
+  body.className = 'listing-item-body';
+  const dateText = formatCardDate(row.date);
+  if (dateText) {
+    const time = document.createElement('time');
+    time.className = 'media-asset-date';
+    time.setAttribute('datetime', String(row.date));
+    time.textContent = dateText;
+    body.append(time);
+  }
+  // the inner span carries the 2-line clamp, so the heading's bottom padding stays clear of a
+  // third line (the source clamps the title link inside its padded h3 the same way)
+  const h = document.createElement('h3');
+  h.className = 'media-asset-title';
+  const text = document.createElement('span');
+  text.textContent = title;
+  h.append(text);
+  body.append(h);
+  li.append(body);
+
+  const actions = mediaActions(row, title, labels);
+  if (actions) li.append(actions);
+  return li;
+}
+
+// the lightbox code, loaded on the first open (story / news listings never need it)
+const loadLightbox = async () => {
+  const [{ buildLightbox }, { feedLightboxItem }] = await Promise.all([
+    import('../../scripts/lightbox.js'), import('../../scripts/media-lightbox.js'),
+  ]);
+  return { buildLightbox, feedLightboxItem };
+};
+
+/*
+ * The shared lightbox over the shown media cards (the source colorbox; videos play in it):
+ * a click anywhere on a card except its actions opens it at that card, and focus returns to
+ * the card's thumbnail link on close. Modifier clicks keep the link (new tab). Built lazily
+ * on the first open and rebuilt when the shown rows change (filter, sort, load more); the
+ * previous overlay is removed so they don't pile up on <body>. If the lightbox code fails to
+ * load, the click falls back to the thumbnail link (the file / Vimeo URL). The inert cart
+ * buttons cancel their own clicks (scripts/media-card.js), so they never get here.
+ * `opts.load` / `opts.navigate` are injectable for tests.
+ */
+export function wireMediaLightbox(grid, getRows, {
+  load = loadLightbox, navigate = (url) => window.location.assign(url),
+} = {}) {
+  let built = null; // { rows, lightbox }
+  grid.addEventListener('click', async (e) => {
+    const modified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
+    if (e.defaultPrevented || e.button !== 0 || modified) return;
+    const card = e.target.closest('.listing-item.media-asset');
+    if (!card || e.target.closest('.media-card-actions')) return;
+    const index = [...grid.children].indexOf(card);
+    const rows = getRows();
+    if (index < 0 || !rows[index]) return;
+    e.preventDefault();
+    const thumb = card.querySelector('.media-asset-thumb');
+    if (!built || built.rows !== rows) {
+      try {
+        const { buildLightbox, feedLightboxItem } = await load();
+        built?.lightbox.overlay.remove();
+        built = { rows, lightbox: buildLightbox(document.body, rows.map(feedLightboxItem)) };
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('listing: lightbox load failed', err);
+        const href = thumb?.getAttribute('href');
+        if (href && href !== '#') navigate(thumb.href);
+        return;
+      }
+    }
+    built.lightbox.open(index, thumb || card);
+  });
+}
+
 export default async function decorate(block) {
   const cfg = parseListConfig(block);
   instanceSeq += 1;
   const uid = `l${instanceSeq}`; // unique id prefix for this block instance
-  const STRINGS = buildStrings(await fetchPlaceholders());
+  const placeholders = await fetchPlaceholders();
+  const STRINGS = buildStrings(placeholders);
+  const mediaText = mediaLabels(placeholders); // media card controls (SKODA-406)
 
   // State (restored from the deep-link URL).
   const initial = decodeState(window.location.search, cfg.facets, cfg.perpage);
@@ -114,6 +226,8 @@ export default async function decorate(block) {
   // Skeleton.
   block.textContent = '';
   block.classList.add(`columns-${cfg.columns}`);
+  const media = isMediaTemplate(cfg.template);
+  if (media) block.classList.add('listing-media', `listing-${cfg.template}`);
   const facetBar = document.createElement('form');
   facetBar.className = 'listing-facets';
   facetBar.setAttribute('aria-label', STRINGS.filters);
@@ -159,6 +273,8 @@ export default async function decorate(block) {
 
   // --- rendering ---------------------------------------------------------
   const filteredSorted = () => sortRows(filterRows(scoped, state.active), state.sort);
+  let currentRows = []; // the rows the grid shows, in order (the media lightbox's items)
+  if (media) wireMediaLightbox(grid, () => currentRows);
 
   // Filter/sort changes replace the current history entry (keeps the URL
   // deep-linkable without a back-stack entry per toggle); only load-more pushes
@@ -206,8 +322,10 @@ export default async function decorate(block) {
   function renderGrid() {
     const all = filteredSorted();
     const shownRows = paginate(all, state.revealed);
+    currentRows = shownRows;
     grid.textContent = '';
-    shownRows.forEach((row, i) => grid.append(cardCell(row, i === 0)));
+    const cell = media ? (row, eager) => mediaCell(row, eager, mediaText) : cardCell;
+    shownRows.forEach((row, i) => grid.append(cell(row, i === 0)));
 
     status.hidden = all.length > 0;
     if (!all.length) status.textContent = STRINGS.noResults;

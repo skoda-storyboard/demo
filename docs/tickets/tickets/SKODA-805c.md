@@ -39,7 +39,8 @@ accordions.
   - collapsed by default, matching the source
 - **Media Box.** Large media sets must pass the SKODA-506 pre-conditioning gate. The downloads block paginates or
   lazy-loads, and does not render 60 eager images.
-- **Reuse.** SKODA-805b child pages reuse this importer.
+- **Reuse.** SKODA-805b child pages reuse this importer. It now also handles pages without a Media Box
+  (FAQ, Texts, Infographics, Technical data, Images), grouped Images galleries and layout tables.
 
 ## Acceptance Criteria
 - [ ] The first-glimpse page renders all 8 accordions (with correct open/close and ARIA), the embeds, the tags and

@@ -1,28 +1,34 @@
 /* eslint-disable */
 /* global WebImporter */
 /**
- * Parser: promo-box (block name: "Cards (promo)")
+ * Parser: promo-box (block name: "Promo Box")
  * Source: the homepage featured slider — section.promo-box > .items[data-flickity]
  *   > .item > article.promo-box-item (typically 3 hand-picked posts).
  * (measured against .migration/work/samples/sto-home.html + mr-home.html;
  *  ties to docs/ui-specs/template-home.md.)
  *
- * ⚠️ CURATED, NOT INDEX-DRIVEN. The promo-box is an editorially hand-picked set
- * (mixed content types, specific order) that a query-index config (template/tags/
- * limit) cannot reproduce. So — unlike the rails — we DO carry the picked items as
- * authored default-content cards (image + title + link), giving authors an editable
- * starting point. (Open decision in template-home.md §"open decisions": a curated-
- * items block that stores N index paths could replace this later.)
+ * Storyboard home uses the newest three /en/ stories from the query index;
+ * Media Room keeps its independently curated items.
  *
  * ⚠️ CONTENT-DRIVEN, NOT POSITIONAL. Items are read from the matched element; bails
  * (unwrap) if none are present.
  *
- * DA table shape (one row per picked item): [linkedImage, titleLink].
- *   ['Cards (promo)']
- *   [img(wrapped in its link), <a href>title</a>]
+ * DA table shape (one row per picked item, Media Room only): [image, linked title].
+ *   ['Promo Box']
+ *   [img, <a href>title</a>]
  */
-export default function parse(element, { document }) {
-  const items = Array.from(element.querySelectorAll('article.promo-box-item, .item article, .items > .item'))
+export default function parse(element, { document, indexDriven = false }) {
+  if (indexDriven) {
+    element.replaceWith(WebImporter.DOMUtils.createTable([
+      ['Promo Box'],
+      ['template', 'story'],
+      ['path', '/en/'],
+      ['limit', '3'],
+    ], document));
+    return;
+  }
+  const articles = [...element.querySelectorAll('article.promo-box-item, .item article')];
+  const items = (articles.length ? articles : [...element.querySelectorAll('.items > .item')])
     .filter((el, i, arr) => arr.indexOf(el) === i);
 
   if (items.length === 0) {
@@ -30,7 +36,7 @@ export default function parse(element, { document }) {
     return;
   }
 
-  const cells = [['Cards (promo)']];
+  const cells = [['Promo Box']];
   let emitted = 0;
 
   items.forEach((item) => {

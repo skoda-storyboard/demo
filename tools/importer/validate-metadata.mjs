@@ -30,7 +30,8 @@ import path from 'node:path';
 const WORKSPACE = process.env.WORKSPACE_PATH || process.cwd();
 
 const TEMPLATE_ENUM = new Set([
-  'story', 'skoda_model', 'skoda_series', 'press_release', 'press_kit', 'image', 'video', 'page',
+  'story', 'skoda_model', 'skoda_series', 'press_release', 'press_kit', 'press_kit_chapter',
+  'image', 'video', 'page',
 ]);
 // Templates that don't need rail-facing facets (nav/utility/direct only).
 const RAIL_EXEMPT = new Set(['page']);

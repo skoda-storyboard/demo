@@ -361,6 +361,47 @@ the scope. With `--dam-base`, `--dry-run` HEAD-checks pending image originals an
 HEAD/range-probes pending PDF/MP4 originals (requesting one byte, then
 canceling the response body), reporting inaccessible sources without uploading.
 
+On 2026-09-29, a scoped batch of 1,979 first-party image originals from the
+import manifest was run against AEM Assets. The manifest records 1,947
+successful DAM uploads; authenticated author HEAD responses matched the source
+originals' byte counts and returned image MIME types. The other 32 originals return HTTP 403 to
+both source HEAD and ranged GET, so no derivative was substituted. Another
+65 external video-platform thumbnails were excluded from this batch pending
+rights review. This uploads originals to DAM only: it does not activate
+images on publish, rewrite DA content, or resolve separate oversized inline
+delivery warnings.
+
+To activate an approved set of **already uploaded images** on AEM publish,
+provide a reviewed list of image `logical_id`s (one per line). The publisher
+authenticates to author, activates one DAM original, and records a public URL,
+MIME type, and byte count only after anonymous publish HEAD matches author.
+It never uploads images or publishes DA pages:
+
+```bash
+npm run media:publish-images -- \
+  --ids-file /path/to/approved-image-ids.txt \
+  --token-file /path/to/gitignored/aem-token --concurrency 4
+```
+
+Rows with `steps.publish: pending` after an uncertain activation are checked
+for public delivery on resume, but never reactivated automatically. Public
+404 or MIME/byte mismatches leave the row unverified and require investigation.
+Image `status` and `delivery_url` remain unchanged: AEM Assets publication is
+separate from EDS inline-image delivery.
+
+**Publication checkpoint (2026-09-29):** a newly restored first-party icon
+was also uploaded, bringing the DAM image total to 2,297. All 2,215 non-WebP
+originals have an anonymous public HEAD proof with image MIME and the exact
+author-original byte count in the manifest. Four WebP originals received
+successful activation responses and show `Activate` on author, but still
+return HTTP 404 on publish (both HEAD and GET, even when authenticated).
+They remain `steps.publish: pending`; the other 78 WebP originals were not
+activated while this delivery failure is unresolved. Do not count any of
+those 82 as published or reactivate the uncertain four without investigation
+(tracked in [#219](https://github.com/skoda-storyboard/demo/issues/219)).
+The 32 source-403 originals and 65 excluded external thumbnails are still
+not uploaded to DAM. No DA pages were changed or published.
+
 ## Automatic wiring (PostToolUse hook)
 
 `.claude/settings.json` registers a **PostToolUse(Bash) hook**
