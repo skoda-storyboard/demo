@@ -33,6 +33,9 @@ Remaining (content, needs credentials):
    → `Destination` `/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality`; sheet previewed + published. The
    older press-kit rows now point to `/en/press-kits` (no trailing slash, since EDS 404s it). A stale DA doc still sits at
    the alias path. Redirects should take precedence; if the alias still serves it, unpublish/delete that doc.
+   ✅ Added 2026-09-30: `/en/press-kits/skoda-peaq-press-kit` and `/en/press-kits/skoda-peaq-press-kit/` →
+   `/en/press-kits/skoda-peaq-press-kit-2` (the source redirects the old kit URL the same way). Matching is exact, so
+   both forms are listed. The sheet (5 rows) is previewed + published; both paths return 301 on `.aem.page` and `.aem.live`.
 2. SKODA-603 backlog imports clear 8 of the 9 dead targets: `/en/press-kits/skoda-peaq-press-kit-2/images`
    (13 links), the 5 press releases and the 2 press kits listed in the report.
 3. Re-import + push `/en/models/skoda-elroq-through-designers-eyes` so its Elroq sustainable-interior link turns

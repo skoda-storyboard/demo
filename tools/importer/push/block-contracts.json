@@ -116,7 +116,8 @@
         "initial",
         "perpage",
         "columns",
-        "excludefeatured"
+        "excludefeatured",
+        "offset"
       ]
     },
     "story-rail": {
