@@ -65,5 +65,10 @@ Measured with DevTools on both sides, Storyboard (`/en/lifestyle/ouninpohja-finl
   - Escape resets `aria-expanded` on a desktop dropdown, but `li:focus-within > ul` (header.css ~837) keeps the panel visible.
   - Space on a focused dropdown trigger scrolls the page (its default isn't prevented).
 
+## Language links: covered by SKODA-303 (2026-09-30)
+The language-link values above (topbar 12/300, line height 18, margin 12; drawer 16/700) are done in SKODA-303 (#24,
+branch `skoda-303-language-switcher`). What stays here is the topbar's inline padding: the switcher sits 14px left of
+the source edge (1320 vs 1334 @1440) until the header rebases onto `--page-gutter`.
+
 ## Dependencies
 SKODA-301/302/303/304 (built chrome), SKODA-307 (null guard), SKODA-403 (search), SKODA-823 / SKODA-904 (newsletter).

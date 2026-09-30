@@ -3,6 +3,9 @@
 - **Type:** fragment
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo)
 - **Estimate:** 2 SP · AI-assisted 1d / manual 1–2d *(planning estimate, not a quote)*
+- **GitHub issue:** [#24](https://github.com/skoda-storyboard/demo/issues/24)
+- **Status (2026-09-30):** 🟡 Ready for QA on branch `skoda-303-language-switcher`: matches the live switcher at every
+  width (see "Implementation" below); QA pending.
 
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/language-switcher.md`](../../ui-specs/language-switcher.md)** (captured via Chrome DevTools, token-mapped, pixel-perfect AC). Read it before implementing.
@@ -28,10 +31,54 @@ The source topbar exposes a language switcher (`lang-links`) with all **6 locale
 
 ## Acceptance Criteria
 Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-switcher.md); summary:
-- [ ] 6 locales (en/cs/de/sk/sr/sl) render as **inline text links** in the tools region (topbar-right desktop `12px`, drawer-bottom mobile `16px`).
-- [ ] Each locale links to its per-locale tree; current = bold ink, others links.
-- [ ] Inactive-locale contrast ≥ 4.5:1 (darken source `#7c7d7e`).
-- [ ] Keyboard-accessible with an accessible name; `npm run lint` passes.
+- [x] 6 locales (en/cs/de/sk/sr/sl) render as **inline text links** in the tools region (topbar-right desktop `12px`, drawer-bottom mobile `16px`).
+- [x] Each locale links to its per-locale tree; current = bold ink, others links.
+      *The trees `/cs` … `/sl` don't exist on EDS yet (404, only `/en`); links kept by decision (2026-09-30).*
+- [x] Inactive-locale contrast ≥ 4.5:1 (darken source `#7c7d7e`): `--skoda-grey-700`, 5.45 / 6.03 / 6.81:1.
+- [x] Keyboard-accessible with an accessible name; `npm run lint` passes.
+
+## Implementation (2026-09-30, developer-verified; QA pending)
+- `blocks/header/header-locales.js` (new, pure):
+  - the locale table (code, visible label, endonym);
+  - `currentLocale(pathname)`;
+  - `localeEntries()` reads the authored bold text and links; the code comes from the href's first segment,
+    else the label, so `#` and relative links never count;
+  - `buildLocaleList()`.
+- `header.js`: the authored locale `<p>` becomes `<div class="nav-topbar-utility nav-topbar-locales">` with
+  `<ul class="nav-locales-list" aria-label="Language">`.
+  - The **current locale comes from the URL** (the authored bold is ignored): a `<span aria-current="true" lang>`,
+    in source order.
+  - Other locales are `<a href hreflang lang aria-label="Čeština">CZ</a>`, and so on.
+  - The same list is copied into the drawer footer.
+  - A locale authored without a link (the bold one) links `/{code}`, e.g. `/en`, the EDS home.
+- `header.css`: the measured topbar and drawer values; `--skoda-grey-700` links; a focus ring (the source has
+  none); items as block line boxes (inline, the bold and light faces grow the row to 19px); no drawer border.
+- Spec: [`language-switcher.md`](../../ui-specs/language-switcher.md), the re-capture note and §8 decisions.
+
+**Live vs EDS (local preview, computed boxes):**
+
+| Width | Live | EDS |
+|---|---|---|
+| 1440 / 1280 / 1080 topbar | 149×18 at y13; items +0/28/55/83/110/136; 12/18, 700 / 300 | identical |
+| Topbar right edge | 1334 / 1254 / 1070 | 1320 / 1240 / 1056 (−14: header padding, SKODA-308) |
+| 1079 / 1024 / 768 / 500 / 390 / 375 drawer | items x815.2 / 859.8 … (1079), 126.2 … (390); 16/24, 700, 0.32px; y852 | identical |
+| Visual diff (switcher crop) | 1280 topbar / 500 drawer | 0% / 0% (colour tolerance covers the AA grey) |
+
+- **Gate** (home, story, press release, Media Room × 1440 / 1080 / 1079 / 768 / 375): 212 of 212 switcher checks pass.
+  - One visible switcher at each width (topbar ≥ 1080, drawer ≤ 1079); fixed order EN CZ DE SK SR SL.
+  - `aria-current` span; labelled list; `hreflang` / `lang` / endonyms.
+  - Contrast 5.45 / 6.03 / 6.81; a focus ring on each link; Tab order CZ → SL; Enter follows the link.
+  - Subscribe and section tabs unchanged; no page errors.
+  - The 1080 page overflow (104px, 31 on the Media Room) is **identical on `main`** (SKODA-308).
+- **Tests:** `header-locales.test.mjs` (9 tests: the helper plus the real header on `/en` and `/cs` pages); `npm test`
+  704 / 707, 0 failures, 3 skipped.
+
+**Findings for other tickets:**
+- **Per-page targets (SKODA-1003):** on articles the live list links each translated article and omits missing
+  translations (Epiq story: EN / CZ / DE / SK; Peaq press release: EN / CZ / SK), following the page's hreflang set.
+  On the Media Room, DE links `https://www.skoda-media.de/`. The pilot links the locale homes.
+- **`/en/` is a 404 on EDS** (the home is `/en`), and so is the authored Stories tab link `/en/` in `/nav` (SKODA-301 / 308).
+  When the locale trees are migrated, check that `/cs/` … resolve, or author them as `/cs` …
 
 ## Dependencies
 - Upstream: SKODA-301 (Header + nav fragment) / Downstream: SKODA-1003 (language-negotiated root routing + per-locale placeholders)
