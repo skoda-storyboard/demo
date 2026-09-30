@@ -294,12 +294,66 @@ export function collapseRail(block, mount, header) {
   header.remove();
 }
 
+// `press` variant (SKODA-224): the source Related Press Releases band shows at most this many
+// cards; when it is full (more releases match) it ends with an "All" card linking to the
+// band's "All" listing (live Zellmer release: 10 cards + the .item-all cell; bands with
+// fewer cards have none).
+export const PRESS_BAND_SIZE = 10;
+
+/**
+ * The band's "All" link: the default-content paragraph before the block whose only content
+ * is one link (the header pill), or null.
+ * @param {Element} block
+ * @returns {HTMLAnchorElement|null}
+ */
+export function pressAllLink(block) {
+  const paragraphs = block.closest('.section')?.querySelectorAll('.default-content-wrapper p') || [];
+  return [...paragraphs].map((p) => {
+    const link = p.querySelector(':scope > a[href]');
+    const onlyLink = link && p.children.length === 1
+      && p.textContent.trim() === link.textContent.trim();
+    return onlyLink ? link : null;
+  }).find(Boolean) || null;
+}
+
+/**
+ * Whether a press band is full, so it gets the trailing "All" card.
+ * @param {number} shown cards in the rail
+ * @param {boolean} more index mode: more rows match than the limit
+ */
+export function pressBandIsFull(shown, more = false) {
+  return more || shown >= PRESS_BAND_SIZE;
+}
+
+/**
+ * Appends the "All" end card after the last press card (source .item-all).
+ * @param {Element} carousel the built carousel block
+ * @param {HTMLAnchorElement} link the band's "All" link
+ */
+function appendPressAllCard(carousel, link) {
+  const track = carousel.querySelector('.carousel-track');
+  if (!track) return;
+  const cell = document.createElement('li');
+  cell.className = 'story-rail-all';
+  const a = document.createElement('a');
+  a.className = 'story-rail-all-link';
+  a.href = link.getAttribute('href');
+  a.textContent = link.textContent.trim();
+  cell.append(a);
+  track.append(cell);
+  // the carousel recomputes its arrows on scroll: count the new end cell right away
+  track.dispatchEvent(new Event('scroll'));
+}
+
 export default async function decorate(block) {
   const cfg = parseConfig(block);
   const curated = !isConfigTable(block);
+  const press = block.classList.contains('press');
   const allLabel = viewAllLabel(block);
   const variants = [...block.classList].filter((c) => !OWN_CLASSES.has(c));
-  if (!curated && cfg.layout === 'news' && document.body.classList.contains('page')) {
+  // the home news layout (SKODA-827); an explicit `Story Rail (press)` band keeps its own
+  // related-band layout (SKODA-224), the two set different widths and insets
+  if (!press && !curated && cfg.layout === 'news' && document.body.classList.contains('page')) {
     block.classList.add('story-rail-news');
   }
 
@@ -334,11 +388,15 @@ export default async function decorate(block) {
   // don't all build on load.
   async function buildRail() {
     let rows = authoredRows;
+    let more = false;
     let indexRows = [];
     if (!curated) {
       try {
         const all = await loadQueryIndex(cfg.index);
-        indexRows = selectRows(all, cfg);
+        // one extra row tells a full press band apart from one that just fits
+        const matches = selectRows(all, press ? { ...cfg, limit: cfg.limit + 1 } : cfg);
+        more = matches.length > cfg.limit;
+        indexRows = matches.slice(0, cfg.limit);
         rows = indexRows.map((r) => rowToCells(r));
       } catch (e) {
         // index load failed: remove the empty story band or generic rail
@@ -362,6 +420,8 @@ export default async function decorate(block) {
     });
     decorateBlock(carousel);
     await loadBlock(carousel);
+    const allLink = press && pressBandIsFull(rows.length, more) ? pressAllLink(block) : null;
+    if (allLink) appendPressAllCard(carousel, allLink);
     mount.classList.add('is-built'); // release the reserved card geometry
     if (['image', 'video'].includes(cfg.template) && indexRows.length) wireMediaLightbox(carousel, indexRows);
   }
