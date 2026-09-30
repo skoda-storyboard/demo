@@ -157,12 +157,13 @@ export function buildLightbox(host, items) {
   linkBtn.classList.add('link');
   actions.append(addBtn, downloadBtn, linkBtn);
   // one add button per overlay, re-pointed at each item's original (SKODA-505a). The media
-  // cart loads on the first item that has one; a stale (slower) bind never wins.
+  // cart loads on the first item that shows one; a stale (slower) bind never wins.
   let cartSeq = 0;
   const bindCart = (item) => {
     cartSeq += 1;
     const seq = cartSeq;
-    const href = item.cartHref || '';
+    // `actions: false` hides the buttons: nothing to add, and no cart to load
+    const href = item.actions === false ? '' : item.cartHref || '';
     if (!href && !addBtn.hasAttribute('data-cart-control')) {
       addBtn.setAttribute('aria-disabled', 'true');
       return;

@@ -35,11 +35,12 @@ Design agreed with the product owner on #50 (D1–D7, R1–R3). The approach is 
     - `add({ href, title }) → { ok, item?, reason? }`
     - `addMany(entries) → { added, skipped[{ href, reason }] }`: fills in order up to the cap (the source's cart-limit behaviour) and fires one change.
     - `remove`, `has`, `clear`, `onChange(cb) → unsubscribe`
-    - `download(opts)`, `downloadItems(items, opts)`
+    - `download(opts)`, `downloadItems(items, opts)`: one item downloads directly at any size. A zip applies the caps in order, and items past them come back in `failed` with their reason.
     - `trackView()`, `bindCartControl(el, { href, title })`
-  - Refusal reasons: `unresolved | duplicate | limit-items | limit-bytes | storage`.
+  - Refusal reasons: `unresolved | network | duplicate | limit-items | limit-bytes | storage`. `network` means the index or the DAM couldn't be reached; the control stays usable, so the user can try again.
 - **`scripts/media-cart-resolver.js`** maps a page link to the DAM original `{ id, url, filename, bytes, mime, kind }` (D3).
   - DAM links pass through; unindexed ones are sized with a HEAD request.
+  - `null` means no published original. A network error or 5xx/408/429 rejects instead, so the cart can tell "try again" from "unavailable".
   - Source links (`cdn.skoda-storyboard.com/YYYY/MM/…`, `/direct-download/…`) are looked up in `scripts/media-cart-index.json`: the exact key first, then the `-WxH` / `-scaled` stripped one.
   - The resolver never falls back to a source or WordPress URL.
   - The index is fetched once, on the first add, hover or focus of a cart control; a failed fetch is retried.
@@ -63,10 +64,11 @@ Design agreed with the product owner on #50 (D1–D7, R1–R3). The approach is 
   - State shows as `aria-pressed` (buttons) or `menuitemcheckbox` + `aria-checked` (size-menu rows), plus `data-in-cart` for 505b to style.
   - A `#` control never navigates.
   - Links that resolve nowhere are disabled after the first hover or focus (or after a refused click), which fires `media-cart:refused` `{ href, reason }`.
+  - Those links are remembered, so a re-bind (the lightbox, on every render) keeps them disabled.
   - Covered controls:
     - `scripts/media-card.js` (listing `/en/images`, `/en/videos`): the image *Original* row and the video add. *1920px* stays inert (D5).
     - `blocks/story-rail` media rails (media room, model pages): the add button (`data-href` = original / MP4).
-    - `scripts/lightbox.js`: the one add button per overlay is re-pointed at each item's `cartHref` (new item field; `media-lightbox.js` sets the original / MP4). Gallery images have no DAM original, so their add is disabled.
+    - `scripts/lightbox.js`: the one add button per overlay is re-pointed at each item's `cartHref` (new item field; `media-lightbox.js` sets the original / MP4). Gallery images have no DAM original, so their add is disabled. Items with `actions: false` (content images) don't bind and don't load the cart.
 - **Tests:** `scripts/media-cart*.test.mjs`, `scripts/lightbox-cart.test.mjs` and `tools/importer/media/build-cart-index.test.mjs`. They cover cart ops, dedupe, caps, persistence, corrupt/blocked/full storage, cross-tab sync, binding, the resolver and the index generator. The zip test reconciles the manifest against the archive: it unzips with fflate and checks CRC32 against `zlib`. The media-card and story-rail tests were updated.
 - **Known limits (demo data, not code):**
   - 37 of 51 videos in the media feed are `publish: pending` in the manifest, so their add stays disabled until they are published and the index is regenerated.

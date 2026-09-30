@@ -43,6 +43,9 @@ const items = [
     src: 'https://example.com/a.jpg', alt: 'Elroq', caption: caption('Elroq'), cartId: '1', cartHref: ORIGINAL,
   },
   { src: 'https://example.com/b.jpg', alt: 'Gallery image', caption: caption('Gallery') },
+  {
+    src: 'https://example.com/c.jpg', alt: 'Content image', caption: caption('Content'), cartHref: ORIGINAL, actions: false,
+  },
 ];
 
 function lightbox() {
@@ -71,6 +74,14 @@ test('an item with an original gets an enabled cart toggle; one without disables
   open(0);
   await settle();
   assert.equal(add.hasAttribute('aria-disabled'), false, 're-enabled for the original');
+});
+
+test('an item without actions (content images) never binds its hidden add button', async () => {
+  const { open, add } = lightbox();
+  await settle();
+  open(2);
+  await settle();
+  assert.deepEqual([add.getAttribute('aria-disabled'), add.dataset.href], ['true', undefined]);
 });
 
 test('clicking the add button toggles the item in the cart', async () => {

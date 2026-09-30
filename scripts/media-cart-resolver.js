@@ -91,6 +91,9 @@ export function decodeIndex(json) {
 
 const defaultIndexUrl = () => `${window.hlx?.codeBasePath || ''}/scripts/media-cart-index.json`;
 
+// the DAM or the network may recover: not a verdict on the asset
+const transient = (status) => status >= 500 || status === 408 || status === 429;
+
 /**
  * `fetchImpl` / `indexUrl` are injectable for tests. A failed index load is not cached, so
  * the next resolve retries.
@@ -116,21 +119,20 @@ export function createResolver({
     id: path, url: `${DAM_HOST}${path}`, filename: filenameOf(path), bytes, mime, kind: kindOf(mime),
   });
 
-  // a DAM link the index doesn't know yet (published after the last index build)
+  // a DAM link the index doesn't know yet (published after the last index build); a
+  // network error or a 5xx throws, a 4xx or an unsized answer is a miss
   async function head(path) {
-    try {
-      const res = await fetchImpl(`${DAM_HOST}${path}`, { method: 'HEAD', mode: 'cors', credentials: 'omit' });
-      const bytes = Number(res.headers.get('content-length'));
-      if (!res.ok || !(bytes > 0)) return null;
-      return item(path, bytes, (res.headers.get('content-type') || '').split(';')[0].trim());
-    } catch {
-      return null;
-    }
+    const res = await fetchImpl(`${DAM_HOST}${path}`, { method: 'HEAD', mode: 'cors', credentials: 'omit' });
+    if (!res.ok && transient(res.status)) throw new Error(`media cart: HEAD ${res.status}`);
+    const bytes = Number(res.headers.get('content-length'));
+    if (!res.ok || !(bytes > 0)) return null;
+    return item(path, bytes, (res.headers.get('content-type') || '').split(';')[0].trim());
   }
 
   /**
-   * → `{ id, url, filename, bytes, mime, kind, sourceKey }` or null. `id` is the DAM
-   * asset path (the cart's dedupe key), `url` the published original.
+   * → `{ id, url, filename, bytes, mime, kind, sourceKey }`, or null when the link has no
+   * published original. `id` is the DAM asset path (the cart's dedupe key), `url` the
+   * published original. Rejects when the index or the DAM can't be reached (try again).
    */
   async function resolve(href) {
     const dam = damPath(href);
@@ -139,8 +141,8 @@ export function createResolver({
     let index = null;
     try {
       index = await loadIndex();
-    } catch {
-      if (!dam) return null;
+    } catch (e) {
+      if (!dam) throw e;
     }
     if (dam) {
       const i = index?.byPath.get(dam);

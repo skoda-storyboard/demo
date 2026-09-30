@@ -7,7 +7,8 @@
  * credentials), checked against its indexed size, and stored uncompressed in one zip
  * (JPEG / PNG / MP4 / PDF don't shrink; STORE keeps it fast). The vendored fflate is only
  * imported here. Items that fail are skipped and reported; an abort stops everything and
- * saves nothing. The caps (media-cart.js) keep the zip in memory and under 4 GiB (no ZIP64).
+ * saves nothing. media-cart.js applies the caps before calling, so the zip fits in memory
+ * and under 4 GiB (fflate writes no ZIP64).
  */
 
 const pad = (n) => String(n).padStart(2, '0');

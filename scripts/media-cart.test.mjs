@@ -270,6 +270,32 @@ test('download hands the items to the download module (lazy) and tracks it', asy
   ]);
 });
 
+test('downloadItems: one item goes direct at any size; a zip stays within the caps (in order)', async () => {
+  const calls = [];
+  const { cart } = make({
+    limits: { items: 2, bytes: 250 },
+    loadDownloader: async () => ({
+      downloadItems: async (items) => {
+        calls.push(items.map((it) => it.filename));
+        return items.length === 1 ? { mode: 'single', filename: items[0].filename, failed: [] }
+          : { mode: 'zip', filename: 'z.zip', failed: [] };
+      },
+    }),
+  });
+  const item = (name, bytes) => ({ ...asset(name, bytes), title: name, sourceKeys: [] });
+  const huge = item('huge.mp4', 5 * 1024 ** 3);
+  assert.equal((await cart.downloadItems([huge])).mode, 'single', 'no zip, no memory: no cap');
+  const res = await cart.downloadItems([
+    item('a.jpg', 100), huge, item('unsized.jpg', 0), item('b.jpg', 100), item('c.jpg', 10),
+  ]);
+  assert.deepEqual(calls, [['huge.mp4'], ['a.jpg', 'b.jpg']]);
+  assert.deepEqual(res.failed.map((f) => [f.item.filename, f.reason]), [
+    ['huge.mp4', 'limit-bytes'], ['unsized.jpg', 'limit-bytes'], ['c.jpg', 'limit-items'],
+  ]);
+  const none = await cart.downloadItems([huge, item('huge2.mp4', 5 * 1024 ** 3)]);
+  assert.deepEqual([none.mode, none.failed.length, calls.length], ['none', 2, 2], 'nothing fits: nothing saved');
+});
+
 /* ---------- bound controls ---------- */
 
 const mount = (...els) => { document.querySelector('main').replaceChildren(...els); return els; };
@@ -346,6 +372,53 @@ test('bind: a refused add disables unresolvable links and reports the reason', a
   assert.deepEqual(refused, [[gone, 'unresolved'], [b, 'limit-items']]);
   assert.equal(b.getAttribute('aria-pressed'), 'false');
   assert.equal(b.hasAttribute('aria-busy'), false);
+});
+
+test('bind: a network failure refuses the add but keeps the control usable', async () => {
+  let down = true;
+  const { cart } = make({
+    resolve: async (href) => {
+      if (down) throw new TypeError('Failed to fetch');
+      return KNOWN[href] ? { ...KNOWN[href] } : null;
+    },
+  });
+  const [a] = mount(link());
+  cart.bind(a, { href: src('a.jpg') });
+  const refused = [];
+  const on = (e) => refused.push(e.detail.reason);
+  document.addEventListener('media-cart:refused', on);
+  a.dispatchEvent(new window.Event('focus'));
+  await settle();
+  assert.equal(a.hasAttribute('aria-disabled'), false, 'the sweep does not judge a link it could not check');
+  click(a);
+  await settle();
+  document.removeEventListener('media-cart:refused', on);
+  assert.deepEqual(refused, ['network']);
+  assert.deepEqual([a.hasAttribute('aria-disabled'), cart.getCart().count], [false, 0]);
+  down = false;
+  click(a);
+  await settle();
+  assert.deepEqual([a.getAttribute('aria-pressed'), cart.getCart().count], ['true', 1]);
+});
+
+test('bind: a link known to be unresolvable stays disabled when re-bound (lightbox reopen)', async () => {
+  const { cart } = make();
+  const [btn] = mount(document.createElement('button'));
+  cart.bind(btn, { href: src('unpublished.mp4') });
+  click(btn);
+  await settle();
+  assert.equal(btn.getAttribute('aria-disabled'), 'true');
+  cart.bind(btn, { href: src('a.jpg') });
+  assert.equal(btn.hasAttribute('aria-disabled'), false);
+  cart.bind(btn, { href: src('unpublished.mp4') });
+  assert.equal(btn.getAttribute('aria-disabled'), 'true', 'no second trip to find out');
+  // also a miss found by the hover sweep
+  const [x] = mount(document.createElement('button'));
+  cart.bind(x, { href: src('gone.jpg') });
+  x.dispatchEvent(new window.Event('pointerenter'));
+  await settle();
+  cart.bind(x, { href: src('gone.jpg') });
+  assert.equal(x.getAttribute('aria-disabled'), 'true');
 });
 
 test('bind: re-binding one button to another item (the lightbox) updates link, title and state', async () => {

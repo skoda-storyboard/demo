@@ -141,15 +141,37 @@ test('resolve: DAM links pass through (indexed → index data, else a HEAD)', as
   assert.deepEqual(calls.filter(([, m]) => m === 'HEAD').length, 2);
 });
 
-test('resolve: a failed index load resolves null and is retried next time', async () => {
+test('resolve: a failed index load rejects (not a miss) and is retried next time', async () => {
   let fail = true;
   const { resolve, calls } = resolver({
     index: () => (fail ? { ok: false, status: 503 } : json(INDEX)),
   });
-  assert.equal(await resolve('https://cdn.skoda-storyboard.com/2026/08/hero_ab12.jpg'), null);
+  await assert.rejects(resolve('https://cdn.skoda-storyboard.com/2026/08/hero_ab12.jpg'), /HTTP 503/);
   fail = false;
   assert.ok(await resolve('https://cdn.skoda-storyboard.com/2026/08/hero_ab12.jpg'));
   assert.equal(calls.length, 2);
+});
+
+test('resolve: an unreachable DAM rejects; a 4xx or an unsized answer is a miss', async () => {
+  const unindexed = `${DAM_HOST}/content/dam/storyboard/en/new.png`;
+  const answer = (init) => ({ headers: new Map([['content-length', '10']]), ...init });
+  let head = () => { throw new TypeError('Failed to fetch'); };
+  const { resolve } = resolver({ head: (url) => head(url) });
+  await assert.rejects(resolve(unindexed), /Failed to fetch/);
+  head = () => answer({ ok: false, status: 503 });
+  await assert.rejects(resolve(unindexed), /HEAD 503/);
+  head = () => answer({ ok: false, status: 429 });
+  await assert.rejects(resolve(unindexed), /HEAD 429/);
+  head = () => answer({ ok: false, status: 404 });
+  assert.equal(await resolve(unindexed), null);
+  head = () => ({ ok: true, status: 200, headers: new Map() });
+  assert.equal(await resolve(unindexed), null, 'no size: the caps could not hold');
+  // the index being down doesn't block a DAM link: it is sized by HEAD
+  const down = resolver({
+    index: () => ({ ok: false, status: 503 }),
+    head: () => answer({ ok: true, status: 200 }),
+  });
+  assert.equal((await down.resolve(unindexed)).bytes, 10);
 });
 
 test('the committed index decodes and every key points at an asset', () => {

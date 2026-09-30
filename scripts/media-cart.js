@@ -12,10 +12,10 @@
  *
  * API (see docs/tickets/tickets/SKODA-505a.md):
  *   getCart() → { deviceId, items, count, bytes, limits }
- *   add({ href, title }) → { ok, item?, reason? }   reasons: see REASONS
+ *   add({ href, title }) → { ok, item?, reason? }   reasons: see REASONS (`network`: try again)
  *   addMany([{ href, title }]) → { added[], skipped[{ href, reason }] }  (fills up to the caps)
  *   remove(idOrHref) · has(idOrHref) · clear() · onChange(cb) → unsubscribe
- *   download(opts) · downloadItems(items, opts) → { mode, filename, failed[] }
+ *   download(opts) · downloadItems(items, opts) → { mode, filename, failed[] }  (zip: within caps)
  *   trackView() · bindCartControl(el, { href, title })
  * Events on window: `media-cart:change` (detail = getCart()), `media-cart:analytics`.
  * A bound control that refuses an add dispatches `media-cart:refused` ({ href, reason }).
@@ -32,6 +32,8 @@ export const STORAGE_KEY = 'skoda-media-cart';
 export const LIMITS = Object.freeze({ items: 80, bytes: 1024 ** 3 });
 export const REASONS = Object.freeze({
   unresolved: 'unresolved',
+  // the index or the DAM couldn't be reached: the link may still resolve later
+  network: 'network',
   duplicate: 'duplicate',
   limitItems: 'limit-items',
   limitBytes: 'limit-bytes',
@@ -200,7 +202,12 @@ export function createCart({
     const known = find(href);
     if (known) return { ok: false, reason: REASONS.duplicate, item: { ...known } };
     if (state.items.length >= limits.items) return { ok: false, reason: REASONS.limitItems };
-    const resolved = await resolve(href);
+    let resolved;
+    try {
+      resolved = await resolve(href);
+    } catch {
+      return { ok: false, reason: REASONS.network };
+    }
     if (!resolved) return { ok: false, reason: REASONS.unresolved };
     const key = normalizeSource(href);
     const same = state.items.find((it) => it.id === resolved.id);
@@ -289,14 +296,33 @@ export function createCart({
     return () => listeners.delete(cb);
   }
 
+  /**
+   * One item downloads directly, whatever its size. Several are zipped in memory, so the
+   * caps apply here too (fflate writes no ZIP64): items past them, in order, are reported
+   * in `failed` with their reason (e.g. a whole press kit over 1 GiB, SKODA-806).
+   */
   async function downloadItems(items, opts = {}) {
-    const list = (items || []).filter(validItem);
-    if (!list.length) return { mode: 'none', filename: null, failed: [] };
+    const valid = (items || []).filter(validItem);
+    if (!valid.length) return { mode: 'none', filename: null, failed: [] };
+    const list = [];
+    const over = [];
+    let bytes = 0;
+    valid.forEach((item) => {
+      if (valid.length === 1) list.push(item);
+      else if (list.length >= limits.items) over.push({ item, reason: REASONS.limitItems });
+      else if (!(item.bytes > 0) || bytes + item.bytes > limits.bytes) {
+        over.push({ item, reason: REASONS.limitBytes });
+      } else {
+        list.push(item);
+        bytes += item.bytes;
+      }
+    });
+    if (!list.length) return { mode: 'none', filename: null, failed: over };
     const { downloadItems: run } = await loadDownloader();
     const res = await run(list, opts);
     if (res.mode === 'single') track('Download', 'download', list[0].id);
     else if (res.filename) track('Download', 'bulk-download', String(list.length - res.failed.length));
-    return res;
+    return { ...res, failed: [...over, ...res.failed] };
   }
 
   const download = (opts) => downloadItems(state.items, opts);
@@ -304,8 +330,17 @@ export function createCart({
   // the review surface (505b) reports its opening
   const trackView = () => track('MediaCart', 'view', String(state.items.length));
 
+  // links known to have no published original: their controls stay disabled, also when
+  // re-bound (the lightbox re-binds its button on every render)
+  const missing = new Set();
+  const unavailable = (href) => {
+    missing.add(href);
+    controls().filter((c) => c.dataset.href === href && !has(href)).forEach(disable);
+  };
+
   // links that can't reach a published original: disable their controls (once the index
-  // is there, i.e. after the first hover / focus). Each control + link is checked once.
+  // is there, i.e. after the first hover / focus). Each control + link is checked once;
+  // a network failure leaves it enabled and unchecked.
   const checked = new WeakMap();
   function sweep() {
     return loadIndex().then(() => Promise.all(controls()
@@ -313,7 +348,11 @@ export function createCart({
       .map(async (el) => {
         const { href } = el.dataset;
         checked.set(el, href);
-        if (!has(href) && !(await resolve(href)) && el.dataset.href === href) disable(el);
+        try {
+          if (!has(href) && !(await resolve(href))) unavailable(href);
+        } catch {
+          if (checked.get(el) === href) checked.delete(el);
+        }
       }))).catch(() => {});
   }
 
@@ -330,9 +369,7 @@ export function createCart({
     try {
       const res = await add({ href, title });
       if (res.ok || res.reason === REASONS.duplicate) return;
-      if (res.reason === REASONS.unresolved) {
-        controls().filter((c) => c.dataset.href === href).forEach(disable);
-      }
+      if (res.reason === REASONS.unresolved) unavailable(href);
       el.dispatchEvent(new win.CustomEvent('media-cart:refused', {
         bubbles: true, detail: { href, reason: res.reason },
       }));
@@ -368,7 +405,7 @@ export function createCart({
       el.addEventListener('pointerenter', warm, { once: true });
       el.addEventListener('focus', warm, { once: true });
     }
-    if (!href || !(normalizeSource(href) || damPath(href))) {
+    if (!href || !(normalizeSource(href) || damPath(href)) || (missing.has(href) && !has(href))) {
       disable(el);
       return el;
     }
