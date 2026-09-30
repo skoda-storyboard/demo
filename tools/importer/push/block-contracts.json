@@ -116,7 +116,8 @@
         "initial",
         "perpage",
         "columns",
-        "excludefeatured"
+        "excludefeatured",
+        "feature"
       ]
     },
     "story-rail": {
@@ -363,20 +364,6 @@
       "shape": 1,
       "emittedBy": [
         "parsers/skodapedia.js"
-      ]
-    },
-    {
-      "id": "stories-feature",
-      "block": "stories",
-      "addsConfigKeys": [
-        "feature"
-      ],
-      "status": "pinned",
-      "ticket": "SKODA-222",
-      "fallback": "readable",
-      "shape": 1,
-      "emittedBy": [
-        "parsers/archive-list.js"
       ]
     },
     {

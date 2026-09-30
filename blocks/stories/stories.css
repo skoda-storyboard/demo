@@ -14,9 +14,10 @@
 @import url("../../styles/card-teaser.css");
 
 /* The generic section wrapper pads by 24/40px; the source feed uses a
-   1248px outer measure with a 10px inset at every viewport. */
+   1248px outer measure with a 10px inset at every viewport (cards from x106
+   at 1440 on the home feed and the archives). */
 .stories-container > .stories-wrapper {
-  max-width: calc(var(--content-max-width) - var(--grid-gutter));
+  max-width: var(--content-max-width);
   padding-inline: calc(var(--grid-gutter) / 2);
 }
 
@@ -69,6 +70,174 @@
   box-sizing: border-box;
   flex: 0 0 100%; /* mobile: 1-up */
   margin-block-end: var(--grid-gutter); /* incl. final row — source parity */
+}
+
+/*
+ * --- featured model card (SKODA-222; source `.featured-model`, /en/tag/model/<model>/) ---
+ * Compact (below 992): the first cell, full width, with no card surface. The title is a
+ * dark disclosure bar with a round chevron; the CTAs slide open as full-width pills and
+ * the image stays hidden, as on the source.
+ */
+.stories .stories-feature {
+  --feature-pad-start: 10px;
+  --feature-pad-inline: var(--grid-gutter);
+  --feature-pad-end: 15px;
+  --feature-title-size: 24px;
+  --feature-toggle-pad: 48px; /* source h2 padding 2em */
+  --feature-icon-size: 40px; /* 24px glyph + 8px padding */
+  --feature-icon-inset: 38px; /* toggle padding less the source translate(10px, -10px) */
+  --feature-icon-drop: 16px; /* narrow bar: the icon sits under the title, 1rem lower */
+  --feature-cta-pad: var(--spacing-xs) var(--spacing-m); /* source .5rem 1rem */
+  --feature-cta-size: var(--body-font-size-m);
+  --feature-cta-letter-spacing: 1px;
+  --feature-cta-radius: 2em; /* 32px at 16px, 28px at 14px (source border-radius 2em) */
+  --feature-cta-min-width: 250px;
+  --feature-panel-max: 400px; /* source max-height target; the contract's 3-4 CTAs need 144-192px */
+  --feature-reveal-time: 0.2s; /* source ul transition: all .2s ease-in-out */
+  --feature-reveal: var(--feature-reveal-time) ease-in-out;
+
+  box-sizing: border-box;
+  flex: 0 0 100%;
+  margin-block-end: var(--grid-gutter);
+  padding: var(--feature-pad-start) var(--feature-pad-inline) var(--feature-pad-end);
+  border-radius: var(--card-radius);
+  color: var(--skoda-black);
+  list-style: none;
+}
+
+.stories .stories-feature-title {
+  margin: 0 0 var(--spacing-m);
+  color: inherit;
+  font-size: var(--feature-title-size);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  text-align: center;
+}
+
+.stories .stories-feature-text {
+  display: none;
+}
+
+.stories .stories-feature-toggle {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  margin: 0;
+  padding: var(--feature-toggle-pad);
+  border: 0;
+  border-radius: 0;
+  background: var(--skoda-green);
+  color: var(--skoda-green-emerald);
+  font: inherit;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+}
+
+.stories .stories-feature-toggle::after {
+  position: absolute;
+  inset-block-start: var(--feature-icon-inset);
+  inset-inline-end: var(--feature-icon-inset);
+  inline-size: var(--feature-icon-size);
+  block-size: var(--feature-icon-size);
+  border-radius: 50%;
+  background: var(--skoda-green-emerald) url("../../icons/chevron-down-green.svg") center / 24px no-repeat;
+  content: "";
+  transition: rotate var(--feature-reveal);
+}
+
+.stories .stories-feature.is-expanded .stories-feature-toggle::after {
+  rotate: 180deg;
+}
+
+/* the collapsed panel is out of the tab order and the accessibility tree, and
+   only turns hidden once its 0.2s close has run */
+.stories .stories-feature-panel {
+  overflow: hidden;
+  max-block-size: 0;
+  visibility: hidden;
+  transition: max-block-size var(--feature-reveal), visibility 0s linear var(--feature-reveal-time);
+}
+
+.stories .stories-feature.is-expanded .stories-feature-panel {
+  max-block-size: var(--feature-panel-max);
+  visibility: visible;
+  transition: max-block-size var(--feature-reveal), visibility 0s;
+}
+
+.stories .stories-feature-image {
+  display: none;
+}
+
+.stories .stories-feature-ctas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* each row keeps its pill's 8px margins (48px pitch, as the source's floated rows) */
+.stories .stories-feature-ctas li {
+  display: flow-root;
+  margin: 0;
+}
+
+.stories .stories-feature-cta {
+  display: block;
+  box-sizing: border-box;
+  min-inline-size: min(var(--feature-cta-min-width), 100%); /* the source's 250px, capped to its row */
+  margin: var(--spacing-xs);
+  padding: var(--feature-cta-pad);
+  border-radius: var(--feature-cta-radius);
+  background: var(--skoda-green-emerald);
+  color: var(--skoda-black);
+  font-size: var(--feature-cta-size);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  letter-spacing: var(--feature-cta-letter-spacing);
+  text-align: center;
+  text-decoration: none;
+}
+
+.stories .stories-feature-cta.secondary {
+  background: var(--skoda-grey-750);
+  color: var(--skoda-white);
+}
+
+.stories .stories-feature-cta.primary:hover {
+  background: var(--skoda-green-emerald-hover);
+}
+
+.stories .stories-feature-cta.secondary:hover {
+  background: var(--skoda-grey-700);
+}
+
+.stories .stories-feature-toggle:focus-visible,
+.stories .stories-feature-cta:focus-visible {
+  outline: 2px solid var(--facet-active);
+  outline-offset: 2px;
+}
+
+/*
+ * The source steps the card at viewport 410 / 1120 / 1260. The grid is the viewport less
+ * the 20px wrapper inset, so its width carries the first two exactly: 390 and 1100. It
+ * stops growing at 1228 (viewport 1248), so the 1260 step lands 12px early.
+ */
+.stories.has-feature .stories-items {
+  container: stories-grid / inline-size;
+}
+
+/* a narrow bar stacks the chevron under the title (source ≤410px) */
+@container stories-grid (inline-size <= 390px) {
+  .stories .stories-feature-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .stories .stories-feature-toggle::after {
+    position: static;
+    translate: 0 var(--feature-icon-drop);
+  }
 }
 
 /* --- load-more: ghost pill (stories.md §3, measured) --- */
@@ -128,8 +297,117 @@
     flex-basis: calc((100% - 2 * var(--grid-gutter)) / 3);
   }
 
-  .stories.stories-featured .stories-item:nth-child(-n + 2) {
+  .stories.stories-featured .stories-item:nth-child(-n + 2 of .stories-item) {
     flex-basis: calc((100% - var(--grid-gutter)) / 2);
+  }
+}
+
+/*
+ * Featured model card, wide (≥ 992): a grey card pinned to the third column across the
+ * first two rows. The source absolutely positions it (min-height 465 / 415) and pushes
+ * cards 2 and 4 to the next row, so from 992 to 1279 it hangs 14px into the third row.
+ * Here the grid spans it over the two rows instead, so it is exactly two cards tall and
+ * never overlaps the stories that Load more adds.
+ */
+@media (width >= 992px) {
+  .stories .stories-feature {
+    --feature-image-width: 175px;
+    --feature-min-height: 415px;
+    --feature-cta-size: var(--body-font-size-s);
+
+    border: 1px solid var(--divider-color);
+    background: var(--skoda-grey-50);
+  }
+
+  .stories.stories-cols-3.has-feature .stories-items {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .stories.stories-cols-3.has-feature .stories-item {
+    align-self: start; /* a taller card grows its rows, never the story cards */
+  }
+
+  .stories.stories-cols-3.has-feature .stories-feature {
+    grid-area: 1 / 3 / span 2;
+  }
+
+  /* with 3 stories or fewer nothing sits under the card, so it keeps the source's minimum */
+  .stories.stories-cols-3.has-feature .stories-feature:nth-last-child(-n + 4) {
+    min-block-size: var(--feature-min-height);
+  }
+
+  .stories .stories-feature-title {
+    margin-block-end: 0.25em;
+    line-height: 1.15;
+  }
+
+  .stories .stories-feature-toggle {
+    display: none;
+  }
+
+  .stories .stories-feature-text {
+    display: inline;
+  }
+
+  .stories .stories-feature-panel,
+  .stories .stories-feature.is-expanded .stories-feature-panel {
+    overflow: visible;
+    max-block-size: none;
+    visibility: visible;
+    transition: none;
+  }
+
+  .stories .stories-feature-image {
+    display: block;
+  }
+
+  .stories .stories-feature-image img {
+    display: block;
+    inline-size: var(--feature-image-width);
+    max-inline-size: 100%;
+    block-size: auto;
+    margin: 0 auto 0.25em;
+    pointer-events: none;
+  }
+
+  .stories .stories-feature-ctas li {
+    text-align: center;
+  }
+
+  .stories .stories-feature-ctas li + li {
+    margin-block-start: 1em;
+  }
+
+  .stories .stories-feature-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
+}
+
+/* the card's padding (source viewport > 1120) and its title + image (> 1260) */
+@container stories-grid (inline-size > 1100px) {
+  .stories .stories-feature {
+    --feature-pad-start: var(--spacing-xl);
+    --feature-pad-end: 28px;
+    --feature-min-height: 465px;
+  }
+}
+
+@container stories-grid (inline-size >= 1228px) {
+  .stories .stories-feature {
+    --feature-title-size: 32px;
+    --feature-image-width: 240px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stories .stories-feature-panel,
+  .stories .stories-feature.is-expanded .stories-feature-panel,
+  .stories .stories-feature-toggle::after {
+    transition: none;
   }
 }
 
