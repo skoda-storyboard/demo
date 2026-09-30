@@ -8,6 +8,15 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 > - Images / Videos: **initial page size 12, Load more +12** (not 6/+6).
 > - Grid is **1 / 3 / 4 / 4 columns at 375 / 768 / 992 / 1280** (not 1/2/3). The Videos DA document asks for 3 desktop columns, but the source shows 4.
 > - The facet form (15 groups) is **collapsed by default even at 1280** and revealed by "Advanced filter"; DA authored only six facets.
+>
+> **SKODA-402a re-measure (2026-09-30, /en/images + /en/news; overrides §3, §5, §6 and §9 where they differ):**
+> - The panel is a row of pills (`.filter-labels`); the open pill's option list sits full width under the whole row (`.filter-options`, 160px columns). It is not a dropdown under the pill.
+> - **Open pill:** green `#419468`, white text, caret up. A pill with selections stays grey with a green 24px count badge. There is no ✓ glyph and the pill does not turn green.
+> - **Options:** an 18px box with a 3px radius and a 2px inset `#d0d0d0` outline; green with a white tick when checked. Names only, no counts.
+> - **"Advanced filter (n)"** shows at every width, and its caret flips up when open. It is an inline disclosure, not a mobile drawer, so there is no focus trap.
+> - **Motion:** the panel opens and closes over 400ms (height, margins, opacity); an option list fades in over 0.2s.
+> - **After a selection:** ~0.9s later, a `rgb(247 247 247 / 50%)` veil fades over the listing (0.2s). The new results then show and the panel collapses.
+> - **The result count** sits under the grid, 16px below it and 32px above Load more.
 
 ## 1. Identity
 
@@ -120,6 +129,27 @@ All rows: `measured (source-url · selector · viewport) -> token`. Source URL f
   `~100%`/`500px` (mobile, 1-col). Image listings additionally go 4-col at `>=992`
   (`.images .items .item:nth-child(4n+1){clear:left}`).
 - Each cell holds an `.article-teaser`, see [`card-teaser.md`](card-teaser.md).
+
+### Media card: `/en/images`, `/en/videos` (`article.media-cart-item.image|video`, SKODA-406)
+Measured on the live listings 2026-09-29 (Playwright, computed boxes); EDS `blocks/listing` `mediaCell` +
+`scripts/media-card.js`, `.listing.listing-media`.
+
+| Part | Source (all widths) | EDS token / rule |
+|---|---|---|
+| Thumbnail | `.image-holder.ratio-16x9`, cover crop, radius 8, bg `rgba(0,0,0,.05)`; the link opens the colorbox | `--media-card-radius: 8px`, 16:9, lightbox on click |
+| Date row | `.entry-meta` padding 10px 0, 44px tall; `span.entry-published` 11px / 600 / `#c4c6c7` | `--media-card-pad`, `--media-card-date-row: 24px`, `--card-meta-font-size`, `--skoda-grey-350` |
+| Title / filename | `h3.entry-title` 15/18, 400, `#161718`, 2 lines, padding-bottom 10 → **46px even for one line**; the clamp is on the inner link, so a third line never shows in the padding | `--media-card-title-size/-line`; the clamp (2 lines, min-height 2 lines) on an inner `span` |
+| Toolbar | `.article-teaser-toolbar` padding-bottom 10 → 50px; two 40px round buttons, 2px ink ring, white, 8px apart | `--media-card-button: 40px`, `--media-card-button-gap: 8px` |
+| Image buttons | both open a **size menu on click** (`.is-active`): **Add** (`Add/remove Original / 1920px version`, `data-size` `''` / `giant`) and **Download** (`Download Original / 1920px version`, `/direct-download/…`, `_blank`) | `button[aria-expanded]` + `ul[role=menu]`; an image with one size gets a direct link |
+| Size menu | 89×80, 7px below the button: **centred** (−24.5, +47) at **≥1080**, **left-aligned inside the 2px ring** (+2, +47) below 1080; white, `0 3px 8px rgba(0,0,0,.15)`, z 15; rows 40px: padding 12, 16/16, 500, letter-spacing 1px; the button and rows turn `#f1f1f1` on hover only (no open-state colour) | `--media-card-menu-gap: 7px`, `--media-card-menu-pad: 12px`, `--media-card-ring: 2px`, `--dropdown-shadow`; centred in `@media (width >= 1080px)` |
+| Video buttons | no menus: `a.add` (`Add/remove this`, `data-original-only`) + `a.download` (`Download this`, MP4, `_blank`) | single links |
+| Play badge | `.has-play-button::after`, `skoda-bnr-icons` U+E026, 32px white: a 2px ring around an outlined triangle, centred | `--media-card-play: 32px`, `icons/media-play.svg` as a mask |
+| Card height | thumbnail + **140** (44 + 46 + 50): 304.3 @1280 (292 wide), 272.8 @1024/768 (236), 410 @500 (480) | same formula: EDS 300.3 @285, 264.3 @221, 394.3 @452 |
+
+Grid: source 4 / 4 / 3 / 1 columns at 1280 / 1024 / 768 / 500, gap 20 (`--grid-gutter`). The column
+ladder (EDS 4 / 4 / 2 / 1) is SKODA-402a; the card widths also follow the page gutter (SKODA-826).
+The source thumbnail on videos is a live Vimeo iframe; EDS shows the feed `poster` / `image` plus the
+badge and plays the video in the lightbox (no iframe per card).
 
 ### Load-more (`button.ajax-loader-button`)
 - text "Load more"; display flex; border-radius `50px` -> `--pill-radius`; background `#fff`

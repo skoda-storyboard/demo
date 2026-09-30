@@ -517,6 +517,11 @@ body.story .section.body-column .gallery.slider {
   }
 }
 
+/* the "+N" pill as a link (the press-kit preview points at its Media Box, SKODA-805c) */
+.gallery.preview a.gallery-preview-more {
+  text-decoration: none;
+}
+
 /* ==========================================================================
  * Story variant — `Gallery (story)` (SKODA-216)
  * Story in-body gallery, measured on the live Favorit story (.sb-gallery): a

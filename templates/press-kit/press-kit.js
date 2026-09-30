@@ -6,11 +6,28 @@ function sourceLinks(main) {
   });
 }
 
+// The date + title section (not a hub hero) gets a class, so the header layout doesn't depend
+// on section order.
+function header(main) {
+  const h1 = main.querySelector(':scope > .section > .default-content-wrapper > h1');
+  h1?.closest('.section').classList.add('press-kit-header');
+}
+
 function chapters(main) {
   const section = main.querySelector('.section.press-kit-chapters');
   const list = section?.querySelector('.default-content-wrapper > ul');
   if (!list) return;
+  // The source's Chapters bar is the page's top bar, above the date and title (SKODA-805c
+  // review: at 1280 it sits at y108 and the date at 184). DA keeps it after the title.
+  main.prepend(section);
   list.querySelector('a[href="#chapters-links"]')?.closest('li')?.remove();
+  const { origin, pathname } = document.location;
+  const here = pathname.replace(/\/$/, '');
+  list.querySelectorAll('a[href]').forEach((link) => {
+    if (link.origin === origin && link.pathname.replace(/\/$/, '') === here) {
+      link.setAttribute('aria-current', 'page');
+    }
+  });
   const nav = document.createElement('nav');
   nav.className = 'press-kit-chapters-nav';
   nav.setAttribute('aria-label', 'Chapters');
@@ -51,9 +68,25 @@ function mediaBox(main) {
   if (section?.querySelector('.downloads')) section.id = 'media-box';
 }
 
+// The sidebar preview shows 4 images; the source's "+51" pill on the last one points at the
+// rest, which are the Media Box. The import keeps it as a `+N` link after the gallery: hand it
+// to the (not yet decorated) Gallery (preview) block, which draws the pill.
+function galleryMore(main) {
+  const gallery = main.querySelector('.section.sidebar .gallery.preview');
+  const wrapper = gallery?.closest('.gallery-wrapper')?.nextElementSibling;
+  const link = wrapper?.querySelector(':scope > p:first-child > a[href^="#"]');
+  const [, count] = link?.textContent.trim().match(/^\+(\d+)$/) || [];
+  if (!count) return;
+  gallery.dataset.moreCount = count;
+  gallery.dataset.moreHref = link.getAttribute('href');
+  link.closest('p').remove();
+}
+
 export default function decorate(main) {
   sourceLinks(main);
   if (main.querySelector('.cards.tiles')) return;
+  header(main);
   chapters(main);
   mediaBox(main);
+  galleryMore(main);
 }

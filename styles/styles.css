@@ -155,9 +155,9 @@
   /* page gutter (SKODA-826): the source's constant Bootstrap 10px gutter at every width,
      inside the 1248px container (content edge 10 at 375/768/992, 26 at 1280, inner 1228) */
   --page-gutter: 10px;
-  --cover-box-max-width: 1440px; /* live home .cover-box band cap (SKODA-218) */
-  --cover-box-padding-top: 66px; /* band top → first heading (Storyboard home) */
-  --cover-box-padding-bottom: 60px; /* last rail cards → band end */
+  --cover-box-max-width: 1440px; /* live home .cover-box band cap, light + dark (SKODA-218/611a) */
+  --cover-box-padding-top: 66px; /* dark band top → first heading (Storyboard home) */
+  --cover-box-padding-bottom: 60px; /* dark band: last rail cards → band end */
   --cover-box-rail-gap: 48px; /* rail cards → next rail heading inside a band */
   --cover-box-dark-margin: 2.25em auto 1.5em; /* live .cover-box.dark (36px / 24px) */
   --cover-box-compact-padding-top: 48px; /* Media Room home band */
@@ -693,32 +693,39 @@ main .section.dark > .default-content-wrapper :is(h1, h2, h3, h4, h5, h6) {
   color: inherit;
 }
 
-/* cover-box: the homepage band box (Section Metadata `Style: cover-box, dark`,
-   the Storyboard "Series" and Media Room "Models" bands; SKODA-218), measured on
-   the live homes at 1280/768/500. Live caps it at 1440px and centres it on wider
-   screens (x240 @1920); the inner content stays capped at 1248px by the section
-   wrappers. Inside: band top → first heading 66px (Media Room: 48px, `compact`),
-   rail cards → the next rail's heading 48px, last cards → band end 60px (live's
-   32/12 band padding plus its inner containers' offsets; our markup has no such
-   containers, so the section padding carries the whole distance). Outside, the
-   dark band takes live's own margin, 2.25em auto 1.5em (Media Room 0 auto 1em),
-   added to its neighbours as on live: they drop their 40px section margin on the
-   band's side instead of collapsing into it. */
+/* cover-box: the homepage band box. Every home section is one (Section Metadata
+   `Style: cover-box`, dark ones `Style: cover-box, dark`; SKODA-218, SKODA-611a).
+   Live caps every band, light and dark, at 1440px and centres it on wider screens
+   (x240 @1920); the inner content stays capped at 1248px by the section wrappers.
+   Light bands keep the default section rhythm here; their measured pitch is
+   SKODA-611b.
+
+   The dark band (the Storyboard "Series" and Media Room "Models" bands), measured
+   on the live homes at 1280/768/500. Inside: band top → first heading 66px (Media
+   Room: 48px, `compact`), rail cards → the next rail's heading 48px, last cards →
+   band end 60px (live's 32/12 band padding plus its inner containers' offsets;
+   our markup has no such containers, so the section padding carries the whole
+   distance). Outside, it takes live's own margin, 2.25em auto 1.5em (Media Room
+   0 auto 1em), added to its neighbours as on live: they drop their 40px section
+   margin on the band's side instead of collapsing into it. */
 main > .section.cover-box {
   max-width: var(--cover-box-max-width);
   margin-inline: auto;
-  padding-block: var(--cover-box-padding-top) var(--cover-box-padding-bottom);
 }
 
 main > .section.cover-box.dark {
   margin: var(--cover-box-dark-margin);
+  padding-block: var(--cover-box-padding-top) var(--cover-box-padding-bottom);
 }
 
-main > .section:has(+ .section.cover-box) {
+/* Neighbours of a dark band. `:where(.dark)` keeps these at the specificity they had
+   before the rules became dark-only (SKODA-611a), so later section rules (e.g. the
+   story first-section reset) still win the cascade. */
+main > .section:has(+ .section.cover-box:where(.dark)) {
   margin-block-end: 0;
 }
 
-main > .section.cover-box + .section {
+main > .section.cover-box:where(.dark) + .section {
   margin-block-start: 0;
 }
 
@@ -727,8 +734,8 @@ main > .section.cover-box.dark.compact {
   padding-block-start: var(--cover-box-compact-padding-top);
 }
 
-/* the band sets its own rhythm: no stray list margin under the rail cards */
-main > .section.cover-box .carousel-track .card-teaser {
+/* the dark band sets its own rhythm: no stray list margin under the rail cards */
+main > .section.cover-box.dark .carousel-track .card-teaser {
   margin-block-end: 0;
 }
 

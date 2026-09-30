@@ -31,7 +31,9 @@ function chapters(document) {
   links.forEach((sourceLink) => {
     const link = document.createElement('a');
     link.href = sourceLink.getAttribute('href');
-    link.textContent = text(sourceLink);
+    // The source labels the hub link "Introduction", like the first chapter; use its title.
+    link.textContent = (sourceLink.matches('.link-intro') && sourceLink.getAttribute('title')?.trim())
+      || text(sourceLink);
     const li = document.createElement('li');
     li.append(link);
     list.append(li);
@@ -50,7 +52,7 @@ function sidebar(document, secondary, mediaBox) {
       if (heading) heading.remove();
       nodes.push(make(document, 'h3', label || 'Images'), section);
       const more = section.querySelector('a.more');
-      if (more && text(more)) {
+      if (mediaBox && more && text(more)) {
         const link = document.createElement('a');
         link.href = '#media-box';
         link.textContent = text(more);
@@ -65,7 +67,9 @@ function sidebar(document, secondary, mediaBox) {
       const ul = document.createElement('ul');
       section.querySelectorAll('ul.menu > li').forEach((li) => {
         const a = li.querySelector('a[href]:not([href="#"])');
-        const title = text(a) || text(li.querySelector('span'));
+        // helix-importer unwraps classless spans before transform: "Download Media Box" is then
+        // the item's own text beside its icon-only cart action.
+        const title = text(a) || text(li);
         if (!title || (!a && !mediaBox)) return;
         const link = document.createElement('a');
         link.href = a?.getAttribute('href') || '#media-box';
@@ -86,12 +90,60 @@ function sidebar(document, secondary, mediaBox) {
  * tables: a one-column layout table (the resource "Texts" chapter-PDF list) becomes its
  * header as a heading plus a list; a data table (e.g. the FAQ model table, which sits inside
  * an accordion answer, where no block may nest) becomes one text line per row.
+ * Any other multi-column table is layout (the Enyaq RS Race "130 years" banner): its cells
+ * become content, keeping their links and images.
  */
+
+// The widest authored image that still reads as an icon (the WhatsApp callout's is 50).
+const ICON_MAX_WIDTH = 60;
+
+// A one-row [small image | text] layout table is an icon callout (the chapters' "What's up,
+// Škoda?" WhatsApp row: a 512px PNG shown at 50px beside the channel link). DA drops the width
+// attribute, so it becomes `Columns (callout)`, which keeps the icon at its authored size
+// (SKODA-805c review; SKODA-805b dropped the icon, which cost the row its 50px height).
+function iconCallout(table, document) {
+  const rows = [...table.rows];
+  const cells = rows.length === 1 ? [...rows[0].cells] : [];
+  if (cells.length !== 2 || text(cells[0])) return null;
+  const imgs = cells[0].querySelectorAll('img');
+  const width = Number(imgs[0]?.getAttribute('width'));
+  if (imgs.length !== 1 || !(width > 0 && width <= ICON_MAX_WIDTH) || !text(cells[1])) return null;
+  const icon = make(document, 'p', '');
+  icon.append(cells[0].querySelector('a:has(img)') || imgs[0]);
+  const body = make(document, 'p', '');
+  body.append(...cells[1].childNodes);
+  return WebImporter.DOMUtils.createTable([['Columns (callout)'], [[icon], [body]]], document);
+}
+
+function layoutTable(table, document) {
+  const callout = iconCallout(table, document);
+  if (callout) return [callout];
+  // Outside that callout a WhatsApp image is a 512px PNG sized only by an attribute DA drops,
+  // and the channel link beside it carries the message (SKODA-805b, PR #202).
+  table.querySelectorAll('img[src*="whatsapp"]').forEach((img) => {
+    const link = img.closest('a');
+    (link && !text(link) ? link : img).remove();
+  });
+  return [...table.querySelectorAll('td, th')].flatMap((cell) => {
+    if (!text(cell) && !cell.querySelector('img, a[href]')) return [];
+    if (cell.querySelector('p, ul, ol, h1, h2, h3, h4, h5, h6, div')) return [...cell.childNodes];
+    const p = document.createElement('p');
+    p.append(...cell.childNodes);
+    return [p];
+  });
+}
+
 function sourceTables(content, document) {
   content.querySelectorAll('table').forEach((table) => {
     const rows = [...table.rows].filter((row) => text(row) || row.querySelector('a[href], img'));
     if (!rows.length) { table.remove(); return; }
     const cols = Math.max(...rows.map((row) => row.cells.length));
+    // A data table has a header row plus label/value rows: two or more rows with 2+ text cells.
+    const labelled = rows.filter((row) => [...row.cells].filter((cell) => text(cell)).length >= 2);
+    if (cols > 1 && labelled.length < 2) {
+      table.replaceWith(...layoutTable(table, document));
+      return;
+    }
     const out = [];
     if (cols === 1) {
       const [first, ...rest] = rows;

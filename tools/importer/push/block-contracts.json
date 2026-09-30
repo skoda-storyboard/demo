@@ -7,6 +7,9 @@
     "section-metadata"
   ],
   "main": {
+    "accordion": {
+      "variants": []
+    },
     "cards": {
       "variants": [
         "media",
@@ -23,7 +26,10 @@
       ]
     },
     "columns": {
-      "variants": []
+      "variants": [
+        "banners",
+        "callout"
+      ]
     },
     "downloads": {
       "variants": [
@@ -88,6 +94,9 @@
       "replaces": [
         "cards (promo)"
       ]
+    },
+    "quote": {
+      "variants": []
     },
     "search": {
       "variants": []
@@ -272,17 +281,6 @@
       "emittedBy": []
     },
     {
-      "id": "quote",
-      "block": "quote",
-      "status": "pinned",
-      "ticket": "SKODA-220",
-      "fallback": "readable",
-      "shape": 1,
-      "emittedBy": [
-        "parsers/quote.js"
-      ]
-    },
-    {
       "id": "columns-split",
       "block": "columns",
       "variantPatterns": [
@@ -295,25 +293,21 @@
       "emittedBy": []
     },
     {
-      "id": "accordion",
-      "block": "accordion",
-      "status": "pinned",
-      "ticket": "SKODA-805c",
-      "fallback": "readable",
-      "shape": 1,
-      "emittedBy": [
-        "parsers/press-kit-content.js"
-      ]
-    },
-    {
       "id": "highlight",
       "block": null,
       "form": "section-style",
       "status": "pinned",
       "ticket": "SKODA-824",
-      "fallback": "readable",
-      "shape": 1,
-      "emittedBy": []
+      "fallback": "broken",
+      "styles": [
+        "highlight-dark",
+        "highlight-grey"
+      ],
+      "shape": 2,
+      "emittedBy": [
+        "parsers/story-flatten.js",
+        "transformers/skoda-press-release-layout.js"
+      ]
     },
     {
       "id": "cover-box",

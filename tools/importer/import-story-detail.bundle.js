@@ -278,6 +278,78 @@ var CustomImportScript = (() => {
     p.appendChild(strong);
     return [p];
   }
+  var BODY_STYLE = "body-column";
+  var HIGHLIGHT_ATTR = "data-highlight";
+  function highlightVariant(color) {
+    const value = (color || "").trim().toLowerCase();
+    let rgb = null;
+    const hex = value.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+    if (hex) {
+      const h = hex[1].length === 3 ? hex[1].replace(/./g, "$&$&") : hex[1];
+      rgb = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
+    } else {
+      const fn = value.match(/^rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)(?:[\s,/]+([\d.]+%?))?\s*\)$/);
+      if (fn && !(fn[4] !== void 0 && parseFloat(fn[4]) === 0)) rgb = fn.slice(1, 4).map(Number);
+    }
+    if (!rgb) return null;
+    const luminance = (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]) / 255;
+    if (luminance > 0.98) return null;
+    return luminance < 0.5 ? "dark" : "grey";
+  }
+  function markHighlights(document2) {
+    const css = [...document2.querySelectorAll("style")].map((s) => s.textContent || "").join("\n");
+    const byId = /* @__PURE__ */ new Map();
+    for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+      const color = (body.match(/background(?:-color)?\s*:\s*([^;]+)/i) || [])[1];
+      const variant = highlightVariant(color && color.replace(/!important/i, ""));
+      if (!variant) continue;
+      selectors.split(",").forEach((sel) => {
+        const m = sel.trim().match(/^#(pg-[\w-]+)\s*>\s*\.panel-row-style$/);
+        if (m) byId.set(m[1], variant);
+      });
+    }
+    let count = 0;
+    document2.querySelectorAll(".panel-grid").forEach((grid) => {
+      const row = grid.querySelector(":scope > .panel-row-style");
+      const inline = row && (row.getAttribute("style") || "").match(/background(?:-color)?\s*:\s*([^;]+)/i);
+      const variant = byId.get(grid.id) || inline && highlightVariant(inline[1]);
+      if (!variant) return;
+      grid.setAttribute(HIGHLIGHT_ATTR, variant);
+      count += 1;
+    });
+    return count;
+  }
+  function hasContentAfter(node, root) {
+    for (let n = node; n && n !== root; n = n.parentNode) {
+      for (let s = n.nextSibling; s; s = s.nextSibling) {
+        if ((s.textContent || "").trim() || s.querySelector && s.querySelector("img, picture, iframe, table")) return true;
+      }
+    }
+    return false;
+  }
+  function sectionMetadata(style, document2) {
+    return WebImporter.DOMUtils.createTable([["Section Metadata"], ["style", style]], document2);
+  }
+  var isSectionMetadata = (el) => el.tagName === "TABLE" && /^section metadata$/i.test(((el.querySelector("tr > th, tr > td") || {}).textContent || "").trim());
+  function dropEmptySections(root) {
+    const doc = root.ownerDocument;
+    const breaks = [...root.querySelectorAll("hr")].filter((hr) => !hr.closest("table"));
+    const between = (hr, i, el) => hr.compareDocumentPosition(el) & hr.DOCUMENT_POSITION_FOLLOWING && (!breaks[i + 1] || breaks[i + 1].compareDocumentPosition(el) & hr.DOCUMENT_POSITION_PRECEDING);
+    const empty = breaks.map((hr, i) => {
+      const range = doc.createRange();
+      range.setStartAfter(hr);
+      if (breaks[i + 1]) range.setEndBefore(breaks[i + 1]);
+      else range.setEnd(root, root.childNodes.length);
+      const rest = range.cloneContents();
+      rest.querySelectorAll("table").forEach((t) => {
+        if (isSectionMetadata(t)) t.remove();
+      });
+      const isEmpty = !(rest.textContent || "").trim() && !rest.querySelector("img, picture, video, iframe, table");
+      return isEmpty && [hr, ...[...root.querySelectorAll("table")].filter((t) => isSectionMetadata(t) && between(hr, i, t))];
+    }).filter(Boolean);
+    empty.forEach((nodes) => nodes.forEach((n) => n.remove()));
+    return empty.length;
+  }
   function cellsOf(grid) {
     const direct = [...grid.children].flatMap((c) => {
       if (c.classList && c.classList.contains("panel-grid-cell")) return [c];
@@ -286,7 +358,12 @@ var CustomImportScript = (() => {
     return direct;
   }
   function panelsOf(cell) {
-    return [...cell.querySelectorAll(':scope > .so-panel, :scope > [class*="widget_"]')];
+    return [...cell.querySelectorAll([
+      ":scope > .so-panel",
+      ':scope > [class*="widget_"]',
+      ":scope > .panel-cell-style > .so-panel",
+      ':scope > .panel-cell-style > [class*="widget_"]'
+    ].join(", "))];
   }
   function emitWidget(panel, document2, out, stats) {
     const kind = classifyWidget(panel);
@@ -302,6 +379,8 @@ var CustomImportScript = (() => {
       case "editor":
         nodes = editorNodes(panel, document2);
         break;
+      // carousel-widget routes by content (Cards if teasers-with-links, else Gallery (slider));
+      // sow-slider is always an image slider → Gallery.
       case "carousel":
         cells = carouselCells(panel, document2);
         break;
@@ -363,17 +442,34 @@ var CustomImportScript = (() => {
       byKind: {},
       deferred: [],
       unknown: [],
-      multiColumn: 0
+      multiColumn: 0,
+      highlights: 0
     };
+    let resume = false;
     grids.forEach((grid) => {
+      const variant = grid.getAttribute(HIGHLIGHT_ATTR);
+      const row = [];
       const cells = cellsOf(grid);
       const nonEmpty = cells.filter((c) => panelsOf(c).length > 0);
       if (nonEmpty.length > 1) {
-        emitMultiColumn(nonEmpty, document2, out, stats);
+        emitMultiColumn(nonEmpty, document2, row, stats);
       } else {
-        cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document2, out, stats)));
+        cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document2, row, stats)));
       }
+      if (!row.length) return;
+      if (variant) {
+        out.push(document2.createElement("hr"), ...row, sectionMetadata(`${BODY_STYLE}, highlight-${variant}`, document2));
+        stats.highlights += 1;
+        resume = true;
+        return;
+      }
+      if (resume) out.push(document2.createElement("hr"), sectionMetadata(BODY_STYLE, document2));
+      resume = false;
+      out.push(...row);
     });
+    if (resume && hasContentAfter(layout, element)) {
+      out.push(document2.createElement("hr"), sectionMetadata(BODY_STYLE, document2));
+    }
     const container = layout.closest(".entry-content") || layout.parentElement;
     const holder = document2.createElement("div");
     out.forEach((n) => holder.appendChild(n));
@@ -384,6 +480,7 @@ var CustomImportScript = (() => {
       widgets: Object.values(stats.byKind).reduce((a, b) => a + b, 0),
       byKind: stats.byKind,
       multiColumn: stats.multiColumn,
+      highlights: stats.highlights,
       deferred: stats.deferred,
       unknown: stats.unknown
     };
@@ -972,6 +1069,7 @@ var CustomImportScript = (() => {
     if (publisheddate) meta.publisheddate = publisheddate;
     if (template) meta.template = template;
     if (overrides.theme) meta.theme = overrides.theme;
+    if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
@@ -1039,8 +1137,6 @@ var CustomImportScript = (() => {
     "/en/lifestyle/what-you-learn-on-the-circuit-can-save-you-on-the-road",
     "/en/models/skoda-elroq-through-designers-eyes",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
-    "/en/press-kits/4x4-winter-experience-press-kit",
-    "/en/press-kits/lets-explore-albania-press-kit",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/images",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-rk-m-1921-racing-driver-count-sascha-kolowrat-krakowskys-favourite-model",
@@ -1064,6 +1160,8 @@ var CustomImportScript = (() => {
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos",
+    "/en/press-kits/4x4-winter-experience-press-kit",
+    "/en/press-kits/lets-explore-albania-press-kit",
     "/en/press-kits/new-skoda-enyaq-press-kit-2",
     "/en/press-kits/press-kit-skoda-at-the-iaa-2019",
     "/en/press-kits/skoda-elroq-press-kit",
@@ -1092,8 +1190,6 @@ var CustomImportScript = (() => {
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
     "/en/press-kits/skoda-peaq-press-kit",
     "/en/press-kits/skoda-peaq-press-kit-2",
-    "/en/press-kits/skoda-rs-driving-experience-press-kit",
-    "/en/press-kits/skoda-rs-experience-press-kit",
     "/en/press-kits/skoda-peaq-press-kit-2/battery-and-powertrain-variants-the-longest-rangeof-any-skoda-electric-model",
     "/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart",
     "/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design",
@@ -1107,12 +1203,14 @@ var CustomImportScript = (() => {
     "/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out",
     "/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio",
     "/en/press-kits/skoda-peaq-press-kit-2/videos",
+    "/en/press-kits/skoda-rs-driving-experience-press-kit",
+    "/en/press-kits/skoda-rs-experience-press-kit",
     "/en/press-kits/skoda-vision-o-press-kit",
     "/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design",
     "/en/press-kits/the-all-new-skoda-kodiaq-press-kit",
     "/en/press-kits/the-all-new-skoda-superb-press-kit",
-    "/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production",
     "/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models",
+    "/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production",
     "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
     "/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq",
     "/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026",
@@ -1464,8 +1562,16 @@ var CustomImportScript = (() => {
     return pageBlocks;
   }
   var import_story_detail_default = {
-    // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
-    preprocess: ({ document: document2 }) => transform7("preprocess", document2.body, { document: document2 }),
+    /**
+     * Runs on the untouched DOM, before helix-importer's preProcess and the cleanup
+     * transformers. The highlight rows' background colour (SKODA-824) is only in the
+     * SiteOrigin head CSS, so the rows are marked here for story-flatten. Also keeps the
+     * source's glued non-breaking spaces (html2md would turn them into spaces).
+     */
+    preprocess: ({ document: document2 }) => {
+      markHighlights(document2);
+      transform7("preprocess", document2.body, { document: document2 });
+    },
     transform: (payload) => {
       const { document: document2, url, params } = payload;
       const main = document2.body;
@@ -1485,6 +1591,7 @@ var CustomImportScript = (() => {
         }
       });
       executeTransformers("afterTransform", main, payload);
+      dropEmptySections(main);
       WebImporter.rules.transformBackgroundImages(main, document2);
       normalizeImages(main, document2);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);

@@ -87,7 +87,8 @@ image preview) + [`tags`](tags.md) (grey chips) + [`promo-banner`](promo-banner.
   column (`downloads.md` round `50px` `+` button, links to the media box / cart package).
 - **`sa-media-kit-preview` "Images"**: a 2x2 preview grid feeding gallery-lightbox + media-cart.
 - **Dark related-media band** (`.cover-box.dark`): full-bleed dark section of related media/press items
-  after the article (non-selected slides fade to `opacity:.3`, see `carousel-rails.md`).
+  after the article. Measured 2026-09-29 on Zellmer: every cell stays at `opacity:1`, with no fade
+  (SKODA-224). The EDS `Story Rail (press)` variant is described in `docs/tickets/tickets/SKODA-224.md`.
 
 ## 5. Measured template-level visual base
 
@@ -124,9 +125,17 @@ All values `getComputedStyle` on the Superb release, cited `(selector · viewpor
 
 ## 6. Interaction / behavior
 
-- Dark related-media band uses the `.cover-box` Flickity variant (non-selected `opacity:.3`,
-  `transition:.5s`); verify per instance whether it auto-rotates (read the inline `data-flickity`, see
-  `carousel-rails.md`). The core PR body is static.
+- Dark related-media band: Flickity `{"cellAlign":"left","groupCells":true,"pageDots":false}`.
+  Measured on Zellmer 2026-09-29 (SKODA-224):
+  - No autoplay or wrap, and every cell stays at `opacity:1`.
+  - Arrows are hidden (`opacity:0`) when disabled.
+  - Each click pages one group: 3 / 3 / 2 / 1 cells at 1280 / 1024 / 768 / 500.
+  - Cells follow a 90 / 45 / 30% ladder (breakpoints 768 / 992, capped at the 1248 band): a 374.4px
+    cell with a 354.4×199.3 card at 1280.
+  - Card title 18/21.6/400 and date 11/600 with 1.1px letter-spacing, both with a
+    `0 1px 1px rgb(0 0 0/50%)` shadow.
+
+  The core PR body is static.
 - "Download Media Box" triggers the media-cart/package download path (D2 server-side reduction).
 
 ## 7. Accessibility

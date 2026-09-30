@@ -8,7 +8,8 @@
  *  ties to docs/ui-specs/template-home.md.)
  *
  * ⚠️ INDEX-DRIVEN: do NOT port the SSR flickity cards. The runtime story-rail block
- * reads the emitted config and pulls its items from the published query-index.
+ * reads the emitted config and pulls its items from the published query-index (image/video
+ * rails: the media feed).
  *
  * ⚠️ CONTENT-DRIVEN, NOT POSITIONAL. Config is derived from the rail's own DOM:
  *   - heading  ← .search-results-heading text
@@ -82,6 +83,11 @@ export default function parse(element, { document }) {
     }
     cells.push(['template', template]);
   }
+
+  // Image/video rows live in the generated media feed, not the page index (SKODA-608), as
+  // in the model-page rails (story-rail.js).
+  const [, railTemplate] = cells.find(([key]) => key === 'template') || [];
+  if (railTemplate === 'image' || railTemplate === 'video') cells.push(['index', '/en/media-feed.json']);
 
   const table = WebImporter.DOMUtils.createTable(cells, document);
   element.replaceWith(table);

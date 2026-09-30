@@ -81,13 +81,13 @@ function asset(i, pdf = false) {
   </article></div>`;
 }
 function fixture({
-  chapters = false, total = 60, togglesCount = 8, inline = 0, files = 4,
+  chapters = false, total = 60, togglesCount = 8, inline = 0, files = 4, mediaBox = true, extra = '', hubTitle = '',
 }) {
   const images = Array.from({ length: inline }, (_, i) => grid(widget(
     `<p><img src="https://cdn.skoda-storyboard.com/body-${i}.jpg" alt="Body ${i}"></p>`,
   ))).join('');
   const nav = chapters ? `<div class="chapter-nav">
-    <div class="chapter-nav-header"><a class="link-intro" href="${base}skoda-peaq-press-kit-2/">Introduction</a><a class="link-chapters" href="#">Chapters</a></div>
+    <div class="chapter-nav-header"><a class="link-intro" href="${base}skoda-peaq-press-kit-2/"${hubTitle ? ` title="${hubTitle}"` : ''}>Introduction</a><a class="link-chapters" href="#">Chapters</a></div>
     <div class="chapter-nav-body"><ul>${Array.from({ length: 13 }, (_, i) => `<a href="${base}chapter-${i}/"><li>Chapter ${i}</li></a>`).join('')}</ul></div>
   </div>` : '';
   const bannersAndContacts = chapters ? '' : `${grid(widget(
@@ -113,17 +113,17 @@ function fixture({
     <div class="columns"><div class="column-primary">
       <div class="article-teaser-media"><img src="https://cdn.skoda-storyboard.com/lead.jpg" alt="Lead"></div>
       <div class="entry-content"><div class="panel-layout">
-      ${grid(widget('<p><strong>Intro copy</strong></p><hr><p>Quote attribution</p>'))}${chapters ? '' : grid(widget(QUOTES))}${images}${toggles(togglesCount, !chapters)}
+      ${grid(widget('<p><strong>Intro copy</strong></p><hr><p>Quote attribution</p>'))}${chapters ? '' : grid(widget(QUOTES))}${images}${toggles(togglesCount, !chapters)}${extra}
       ${grid(widget('<div class="media-cart-item attachment"><div class="video-container"><iframe src="https://player.vimeo.com/video/1234?dnt=1"></iframe></div><div class="media-cart-actions"><a href="#"><i class="icon"></i></a></div></div><p><a href="mailto:press@skoda-auto.cz">Press contact</a></p>'))}
       ${bannersAndContacts}
       </div></div></div><div class="column-secondary">
       <section><h3>Additional info</h3><ul class="menu"><li><a href="https://www.skoda-storyboard.com/en/contacts/">Media contacts</a></li><li><span>Download Media Box</span></li></ul></section>
       <section class="images sa-media-kit-preview"><h3>Images</h3><div class="items"><article class="gallery-item"><img src="https://cdn.skoda-storyboard.com/preview.jpg" alt="Preview"></article></div><a class="more" href="#">+51</a></section>
       <section class="tags"><h3>Tags</h3><ol class="entry-tags"><li><a class="label" href="${base}?filter%5Bmodel%5D%5B%5D=peaq">Peaq</a></li></ol></section>
-    </div></div></div><div class="cover-box dark"><div class="search-results media-box">
+    </div></div></div>${mediaBox ? `<div class="cover-box dark"><div class="search-results media-box">
       <h2 class="search-results-heading">Media Box</h2><div class="search-results-stats"><div class="stats">${total - files} images, ${files} PDFs</div></div>
       <div class="search-results-container">${assets}</div>
-    </div></div></article><footer>Site chrome</footer></body></html>`;
+    </div></div>` : ''}</article><footer>Site chrome</footer></body></html>`;
 }
 function run(html, url, script = importer) {
   const dom = new JSDOM(html, { url });
@@ -182,6 +182,7 @@ test('first glimpse: eight paired rich accordions, 60 unique media assets and ac
   assert.match(meta.tags, /peaq/);
   assert.equal(meta.model, 'peaq');
   assert.ok(!('nav' in meta) && !('footer' in meta));
+  assert.ok(!('theme' in meta) && !('presskit' in meta), 'first glimpse is a kit, not a chapter');
   assert.equal(page.querySelectorAll('#chapters-links').length, 0);
   assert.deepEqual(
     rows(page, 'Section Metadata').map((row) => txt(row.children[1])),
@@ -236,6 +237,45 @@ test('first glimpse preserves six inline downloads, two linked banners and both 
   ]);
 });
 
+// Two-cell SiteOrigin rows as on the live source (2026-09-29): 36 of the 51 pages have the
+// 240px PDF/share banner row, 16 the contact-card row, 4 a full-size photo pair.
+const grid2 = (a, b) => `<div class="panel-grid"><div class="panel-grid-cell">${a}</div><div class="panel-grid-cell">${b}</div></div>`;
+const linkedImg = (href, src, width, alt = 'Škoda Peaq') => `<p><a href="${href}">
+  <img src="${src}" alt="${alt}" width="${width}" height="${Math.round(width / 1.5)}"></a></p>`;
+
+test('two-cell source rows become Columns; the 240px PDF/share banners Columns (banners)', { skip: !JSDOM }, () => {
+  const photos = grid2(
+    widget(linkedImg('https://cdn.skoda-storyboard.com/2026/03/02_Peaq.jpg', 'https://cdn.skoda-storyboard.com/2026/03/02_Peaq.jpg', 5000)),
+    widget(linkedImg('https://cdn.skoda-storyboard.com/2026/03/41_Peaq.jpg', 'https://cdn.skoda-storyboard.com/2026/03/41_Peaq.jpg', 5000)),
+  );
+  const banners = grid2(
+    widget(linkedImg('/direct-download/2026/03/Press_Kit.pdf', 'https://cdn.skoda-storyboard.com/2019/02/download-en.png', 240, 'download-de')),
+    widget(linkedImg('mailto:?body=https://www.skoda-storyboard.com/r/peaq', 'https://cdn.skoda-storyboard.com/2019/02/share-en.png', 240, 'share-de')),
+  );
+  const contacts = grid2(
+    widget('<p><strong>Vítězslav Kodym</strong><br>Head of Product Communications</p>'),
+    widget('<p><strong>Zbyněk Straškraba</strong><br>Spokesperson Product Communications</p>'),
+  );
+  // A two-cell row inside an accordion answer stays linear: DA blocks can't nest.
+  const nested = grid(`<div class="so-panel widget_ys-row-toggle"><h2 class="row-title">Nested row</h2></div>
+    <div class="so-panel widget_siteorigin-panels-builder"><div class="panel-layout">${grid2(widget('<p>Left cell</p>'), widget('<p>Right cell</p>'))}</div></div>`);
+  const extra = photos + nested + banners + contacts;
+  const page = run(fixture({ togglesCount: 1, extra }), target);
+  const columns = [...page.querySelectorAll('table')]
+    .filter((t) => /^Columns/.test(txt(t.querySelector('tr > td'))));
+  assert.deepEqual(columns.map((t) => txt(t.querySelector('tr > td'))), ['Columns', 'Columns (banners)', 'Columns']);
+  columns.forEach((t) => assert.equal(t.querySelectorAll('tr')[1].children.length, 2, 'one cell per source cell'));
+  const [photoRow, bannerRow, contactRow] = columns.map((t) => [...t.querySelectorAll('tr')[1].children]);
+  assert.deepEqual(photoRow.map((cell) => cell.querySelector('a').getAttribute('href').split('/').pop()), [
+    '02_Peaq.jpg', '41_Peaq.jpg',
+  ]);
+  assert.deepEqual(bannerRow.map((cell) => cell.querySelector('a').title), ['Download PDF', 'Share by email']);
+  assert.deepEqual(contactRow.map((cell) => txt(cell.querySelector('strong'))), ['Vítězslav Kodym', 'Zbyněk Straškraba']);
+  const answer = rows(page, 'Accordion').find((row) => txt(row.children[0]) === 'Nested row').children[1];
+  assert.equal(answer.querySelectorAll('table').length, 0);
+  assert.match(txt(answer), /Left cell.*Right cell/);
+});
+
 // Resource children (Texts, FAQ, Infographics, Technical data, Images, Videos; SKODA-805b) have
 // the default template and a body, but no Media Box. Shapes follow the live source (2026-09-28).
 function resourcePage(bodyGrids) {
@@ -273,18 +313,26 @@ test('resource Images child: inline asset grids become Downloads tables, no Medi
   assert.ok(!/Related Press Releases/.test(page.textContent), 'related band dropped, as on chapter pages');
 });
 
-test('resource Videos child: each video keeps its MP4 download as a labelled link after the embed', { skip: !JSDOM }, () => {
+test('resource Videos child: each clip plays its MP4 master natively, with a labelled download after it', { skip: !JSDOM }, () => {
   const video = (id, file) => `<h2>Škoda Peaq | Footage</h2><div class="media-cart-item attachment"><div class="video-container">
     <iframe src="https://player.vimeo.com/video/${id}?dnt=1"></iframe></div><div class="media-cart-actions">
     <a class="media-cart-action add" href="#" data-action="add"><i class="icon"></i></a>
     <a class="media-cart-action download" href="/direct-download/2026/08/${file}" data-action="download"><i class="icon"></i></a></div></div>`;
   const page = run(resourcePage(grid(widget(video(111, 'peaq-footage-1440p.mp4') + video(222, 'peaq-sportline-1440p.mp4')))), `${base}skoda-peaq-press-kit-2/videos/`);
-  const downloads = [...page.querySelectorAll('a[href$=".mp4"]')];
+  const downloads = [...page.querySelectorAll('p > a[href$=".mp4"]')];
   assert.deepEqual(downloads.map((a) => [txt(a), a.getAttribute('href')]), [
     ['Download video', 'https://www.skoda-storyboard.com/direct-download/2026/08/peaq-footage-1440p.mp4'],
     ['Download video', 'https://www.skoda-storyboard.com/direct-download/2026/08/peaq-sportline-1440p.mp4'],
   ]);
-  assert.equal(page.querySelectorAll('a[href^="https://player.vimeo.com/video/"]').length, 2, 'embed URLs kept');
+  // The domain-locked Vimeo player errors on the demo, so the Embed plays the master (SKODA-805c).
+  const embeds = blocks(page, 'Embed');
+  assert.deepEqual(embeds.map((t) => txt(t.querySelector('tr:nth-child(2) a'))), [
+    'Škoda Peaq | Footage', 'Škoda Peaq | Footage',
+  ], 'named by the heading before each clip');
+  assert.deepEqual(embeds.map((t) => t.querySelector('tr:nth-child(2) a').getAttribute('href').split('/').pop()), [
+    'peaq-footage-1440p.mp4', 'peaq-sportline-1440p.mp4',
+  ]);
+  assert.equal(page.querySelectorAll('a[href^="https://player.vimeo.com/video/"]').length, 0);
   assert.equal(page.querySelectorAll('iframe, .media-cart-item').length, 0);
 });
 
@@ -348,6 +396,11 @@ test('chapter introduction: 15 Chapters links coexist with six independent rich 
   assert.equal(article.getAttribute('data-publish-date'), '2026-09-21T08:00:00+02:00');
   const keys = rows(page, 'Metadata').map((row) => txt(row.children[0]).toLowerCase());
   assert.ok(!keys.includes('nav') && !keys.includes('footer'));
+  const meta = Object.fromEntries(rows(page, 'Metadata').map((row) => [txt(row.children[0]), txt(row.children[1])]));
+  assert.equal(meta.template, 'press_kit_chapter', 'children stay out of the template=press_kit rails');
+  assert.equal(meta.presskit, '/en/press-kits/skoda-peaq-press-kit-2');
+  assert.equal(meta.theme, 'press-kit', 'scripts.js loads the press-kit layout from the theme');
+  assert.equal(meta.model, 'peaq');
 
   const block = page.ownerDocument.createElement('div');
   block.className = 'accordion';
@@ -373,6 +426,176 @@ test('chapter introduction: 15 Chapters links coexist with six independent rich 
   assert.equal(page.querySelectorAll('ul#chapters-links > li > a[href]').length, 15);
 });
 
+function galleryGroup(title, from, count) {
+  const items = Array.from({ length: count }, (_, i) => asset(from + i)).join('');
+  return grid(`<div class="so-panel widget_sow-editor"><div class="so-widget-sow-editor">
+    <h3 class="widget-title">${title}</h3><div class="textwidget"><div class="search-results search-results-gallery">
+    <div class="search-results-container"><div class="search-results-items">${items}</div></div></div></div></div></div>`);
+}
+
+test('resource child without a Media Box: grouped galleries in source order, no Media Box section', {
+  skip: !JSDOM,
+}, () => {
+  const page = run(fixture({
+    chapters: true,
+    mediaBox: false,
+    togglesCount: 0,
+    extra: `${galleryGroup('Exterior', 0, 3)}${galleryGroup('Interior', 3, 2)}`,
+    hubTitle: 'Škoda Peaq – Press Kit',
+  }), `${base}skoda-peaq-press-kit-2/images/`);
+  const groups = blocks(page, 'Downloads');
+  // Header + `collapse | auto` config row, then one row per asset.
+  assert.deepEqual(groups.map((block) => block.querySelectorAll('tr').length - 2), [3, 2]);
+  groups.forEach((block) => assert.deepEqual(
+    [...block.querySelectorAll('tr')[1].children].map(txt),
+    ['collapse', 'auto'],
+    'gallery groups use the Downloads block disclosure',
+  ));
+  assert.deepEqual(groups.map((block) => txt(block.previousElementSibling)), ['Exterior', 'Interior']);
+  groups.forEach((block) => assert.equal(block.previousElementSibling.tagName, 'H2'));
+  const hrefs = groups.flatMap((block) => [...block.querySelectorAll('a[href]')]).map((a) => a.href);
+  assert.equal(new Set(hrefs).size, 10, 'Original + 1920px per image, no duplicates');
+  assert.equal(page.querySelectorAll('.search-results-gallery, .widget-title').length, 0);
+  assert.equal(page.querySelectorAll('a[href="#media-box"]').length, 0, 'no dangling Media Box links');
+  assert.deepEqual(
+    rows(page, 'Section Metadata').map((row) => txt(row.children[1])),
+    ['press-kit-chapters', 'body-column', 'sidebar'],
+  );
+  const hub = [...page.querySelectorAll('ul#chapters-links > li > a[href]')]
+    .find((a) => /\/skoda-peaq-press-kit-2\/?$/.test(a.getAttribute('href')));
+  assert.equal(txt(hub), 'Škoda Peaq – Press Kit', 'the hub link is not a second "Introduction"');
+  const meta = Object.fromEntries(rows(page, 'Metadata').map((row) => [txt(row.children[0]), txt(row.children[1])]));
+  assert.equal(meta.template, 'press_kit_chapter');
+  assert.equal(meta.presskit, '/en/press-kits/skoda-peaq-press-kit-2');
+});
+
+test('in-body Storyboard gallery keeps its lead image and caption and links the rest to the Media Box', {
+  skip: !JSDOM,
+}, () => {
+  const thumb = (i) => `<div class="sb-gallery-image"><a class="sb-gallery-link" href="#"><div class="image-holder ratio-container">
+    <img src="https://cdn.skoda-storyboard.com/sb-${i}.jpg" alt="Rally ${i}" data-caption="Caption ${i}" srcset="x 1w"></div></a></div>`;
+  const sbGallery = `<div class="sb-gallery">${thumb(0).replace('sb-gallery-image"', 'sb-gallery-image sb-gallery-image-main"')
+    .replace('</a>', '<div class="sb-gallery-show-more"><svg></svg><span>22</span></div></a>')}
+    <div class="sb-gallery-bottom"><div class="sb-gallery-thumbnails">${[1, 2, 3, 4].map(thumb).join('')}</div></div></div>`;
+  const page = run(fixture({
+    chapters: true, togglesCount: 0, extra: grid(widget(sbGallery)),
+  }), `${base}skoda-peaq-press-kit-2/rally/`);
+  const body = page.querySelector('.entry-content');
+  assert.equal(body.querySelectorAll('[class*="sb-"], .image-holder, svg').length, 0);
+  assert.deepEqual([...body.querySelectorAll('img[src*="/sb-"]')].map((img) => img.getAttribute('alt')), ['Rally 0']);
+  assert.ok([...body.querySelectorAll('p')].some((p) => txt(p) === 'Caption 0'));
+  assert.equal(body.querySelector('a[href="#media-box"]')?.textContent, '+22');
+});
+
+test('SiteOrigin layout tables flatten to default content, never an unnamed block', { skip: !JSDOM }, () => {
+  const layoutTable = `<table width="629"><tbody>
+    <tr><td><strong>Find out more:</strong> <a href="https://www.skoda-storyboard.com/en/images/?q=FC">all photos</a></td><td> </td></tr>
+    <tr><td><a href="https://www.example.com/channel"><img src="https://cdn.skoda-storyboard.com/whatsapp-banner.png" alt=""></a></td></tr>
+    <tr><td><p><a href="/direct-download/2026/03/chapter.pdf">Chapter PDF</a></p></td></tr>
+  </tbody></table>`;
+  const page = run(fixture({
+    chapters: true, mediaBox: false, togglesCount: 0, extra: grid(widget(layoutTable)),
+  }), `${base}skoda-peaq-press-kit-2/texts/`);
+  const named = new Set(['Accordion', 'Downloads', 'Gallery (preview)', 'Tags', 'Section Metadata', 'Metadata']);
+  [...page.querySelectorAll('table')].forEach((t) => assert.ok(named.has(txt(t.querySelector('tr > td'))), txt(t)));
+  const body = page.querySelector('.entry-content');
+  assert.match(txt([...body.querySelectorAll('p')].find((p) => /Find out more/.test(txt(p)))), /all photos/);
+  assert.equal(body.querySelectorAll('img[src*="whatsapp"], a[href="https://www.example.com/channel"]').length, 0, 'decorative icon dropped');
+  assert.ok(body.querySelector('p > a[href$="/chapter.pdf"]'));
+  assert.equal([...body.querySelectorAll('p')].filter((p) => !txt(p) && !p.querySelector('img, a')).length, 0);
+});
+
+test('the WhatsApp callout keeps its 50px icon as Columns (callout); the menu keeps Download Media Box', { skip: !JSDOM }, () => {
+  // Live shape: a one-row [icon | text] layout table, then an empty spacer paragraph.
+  const callout = `<table><tbody><tr>
+    <td style="padding: 0; width: 60px;"><img src="https://cdn.skoda-storyboard.com/2024/11/whatsapp_66fb5aee.png" alt="DSC01282_RET-1" width="50"></td>
+    <td style="padding-left: 15px;">Explore the ‘What’s up, Škoda?’ channel: <a href="http://go.skoda.eu/whatsapp">go.skoda.eu/whatsapp</a></td>
+  </tr></tbody></table><p>&nbsp;</p>`;
+  const html = fixture({ extra: grid(widget(callout)) })
+    // helix-importer unwraps classless spans before transform: the menu item is bare text.
+    .replace('<li><span>Download Media Box</span></li>', '<li>Download Media Box <a class="media-cart-action add" href="#"></a></li>');
+  const page = run(html, target);
+  const [callBlock] = blocks(page, 'Columns (callout)');
+  assert.ok(callBlock, 'Columns (callout)');
+  const [icon, body] = [...callBlock.querySelectorAll('tr')[1].children];
+  assert.match(icon.querySelector('img').getAttribute('src'), /whatsapp_66fb5aee\.png$/);
+  assert.match(txt(body), /^Explore the ‘What’s up, Škoda\?’ channel: go\.skoda\.eu\/whatsapp$/);
+  assert.equal(body.querySelector('a').getAttribute('href'), 'http://go.skoda.eu/whatsapp');
+  assert.equal(page.querySelector('a[href="#media-box"]')?.textContent, 'Download Media Box');
+});
+
+test('a data table (2+ labelled rows) becomes one text line per row, every value kept', { skip: !JSDOM }, () => {
+  // #189's table engine (skoda-press-kit-default-layout sourceTables) wins over PR #202's
+  // per-column lists: the published FAQ pages already use this shape (SKODA-805b merge).
+  const specs = `<table><tbody>
+    <tr><td>Model</td><td><strong>Peaq 60</strong></td><td><strong>Peaq 90</strong></td></tr>
+    <tr><td>Range</td><td>Over 450 km</td><td>Over 640 km</td></tr>
+    <tr><td>Power</td><td>150 kW</td><td>210 kW</td></tr>
+  </tbody></table>`;
+  const page = run(fixture({
+    chapters: true, mediaBox: false, togglesCount: 0, extra: grid(widget(specs)),
+  }), `${base}skoda-peaq-press-kit-2/frequently-asked-questions/`);
+  const body = page.querySelector('.entry-content');
+  const lines = [...body.querySelectorAll('li')].map(txt).filter((t) => t.startsWith('Range') || t.startsWith('Power'));
+  assert.deepEqual(lines, [
+    'Range: Peaq 60: Over 450 km · Peaq 90: Over 640 km',
+    'Power: Peaq 60: 150 kW · Peaq 90: 210 kW',
+  ]);
+  assert.equal(body.querySelectorAll('table').length, 0);
+});
+
+test('a PDF thumbnail link with a real alt keeps the alt, which is also the title the binary gate reads', { skip: !JSDOM }, () => {
+  const thumb = '<p><a href="https://cdn.skoda-storyboard.com/2026/08/TD_Skoda_Peaq_en.pdf"><img src="https://cdn.skoda-storyboard.com/2026/08/005_Skoda_Peaq-384x256.jpg" alt="Škoda Peaq"></a></p>';
+  const page = run(fixture({
+    chapters: true, mediaBox: false, togglesCount: 0, extra: grid(widget(thumb)),
+  }), `${base}skoda-peaq-press-kit-2/technical-data/`);
+  const link = page.querySelector('a[href$="TD_Skoda_Peaq_en.pdf"]');
+  assert.equal(link.title, 'Škoda Peaq', 'a real alt names the link (#189); a placeholder alt gets "Download PDF"');
+  assert.equal(link.querySelector('img').alt, 'Škoda Peaq');
+});
+
+test('Videos chapter plays each master natively and keeps its icon-only download as a named link', { skip: !JSDOM }, () => {
+  // The add-to-cart action comes first and some clips give it a `download` class too: the MP4
+  // master is picked by its file type, never by position (#189; PR #202 took the first action).
+  const clip = (id) => `<h2>Clip ${id}</h2><div class="media-cart-item attachment"><div class="video-container"><iframe src="https://player.vimeo.com/video/${id}?dnt=1"></iframe></div><div class="media-cart-actions">
+    <a class="media-cart-action add download" href="#" data-action="add"><i class="icon"></i></a>
+    <a class="media-cart-action download" href="/direct-download/2026/06/clip-${id}.mp4" data-action="download"><i class="icon"></i></a>
+    <a class="media-cart-action link" href="https://www.skoda-storyboard.com/?attachment_id=${id}"><i class="icon icon-link"></i></a></div></div>`;
+  const page = run(fixture({
+    chapters: true, mediaBox: false, togglesCount: 0, extra: grid(widget(`${clip(11)}${clip(22)}`)),
+  }), `${base}skoda-peaq-press-kit-2/videos/`);
+  const body = page.querySelector('.entry-content');
+  const embeds = blocks(page, 'Embed');
+  [11, 22].forEach((id, i) => {
+    const embed = embeds[i];
+    assert.match(embed?.querySelector('tr:nth-child(2) a')?.getAttribute('href') || '', new RegExp(`clip-${id}\\.mp4$`));
+    const download = embed.nextElementSibling?.querySelector('a');
+    assert.match(download?.getAttribute('href') || '', new RegExp(`/direct-download/2026/06/clip-${id}\\.mp4$`));
+    assert.equal(txt(download), 'Download video');
+  });
+  assert.equal(body.querySelectorAll('a[href*="attachment_id"], .media-cart-actions').length, 0);
+});
+
+test('only a top-level Vimeo clip plays its master; nested and YouTube clips stay provider links', { skip: !JSDOM }, () => {
+  const clip = `<div class="media-cart-item attachment"><div class="video-container"><iframe src="https://player.vimeo.com/video/77?dnt=1"></iframe></div>
+    <div class="media-cart-actions"><a class="media-cart-action download" href="/direct-download/2026/03/clip-77.mp4" data-action="download"><i class="icon"></i></a></div></div>`;
+  const answer = grid(`<div class="so-panel widget_ys-row-toggle"><h2 class="row-title">With a clip</h2></div>
+    <div class="so-panel widget_siteorigin-panels-builder"><div class="panel-layout">${grid(widget(`<p>Answer</p>${clip}`))}</div></div>`);
+  // YouTube isn't domain-locked (Motorsport Videos): its clips stay provider embeds.
+  const youtube = clip.replace(/77/g, '99').replace('https://player.vimeo.com/video/99?dnt=1', 'https://www.youtube.com/embed/abc99');
+  const extra = grid(widget(clip.replace(/77/g, '88'))) + grid(widget(youtube)) + answer;
+  const page = run(fixture({ togglesCount: 0, extra }), target);
+  const embeds = blocks(page, 'Embed');
+  assert.equal(embeds.length, 1, 'only the top-level Vimeo clip');
+  assert.ok(page.querySelector('a[href="https://www.youtube.com/embed/abc99"]'));
+  const master = embeds[0].querySelector('tr:nth-child(2) a');
+  assert.match(master.getAttribute('href'), /clip-88\.mp4$/);
+  assert.doesNotMatch(txt(master), /\//, 'the link text is the accessible name, never the file path');
+  const body = rows(page, 'Accordion')[0].children[1];
+  assert.ok(body.querySelector('a[href^="https://player.vimeo.com/video/77"]'));
+  assert.equal(body.querySelectorAll('table').length, 0);
+});
+
 test('malformed mandatory article, toggle and asset fail rather than silently losing content', { skip: !JSDOM }, () => {
   assert.throws(() => run(fixture({}).replace('press_kit-template-default', ''), target), /body class/);
   // A missing body still fails; a missing Media Box no longer does (resource children, SKODA-805b).
@@ -395,6 +618,9 @@ test('generated standalone bundle matches the source importer', { skip: !JSDOM }
       chapters: true, total: 26, togglesCount: 6, inline: 11, files: 1,
     })],
     [target, fixture({})],
+    [`${base}skoda-peaq-press-kit-2/images/`, fixture({
+      chapters: true, mediaBox: false, togglesCount: 0, extra: galleryGroup('Exterior', 0, 2),
+    })],
   ]) {
     assert.equal(run(html, url, bundled).outerHTML, run(html, url).outerHTML);
   }

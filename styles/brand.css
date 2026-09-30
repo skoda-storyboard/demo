@@ -68,6 +68,12 @@
   --dropdown-hover-bg: #f1f1f1;
   --divider-color: #e4e4e4;
 
+  /* embed consent placeholder (SKODA-204a; live .page-embed_cookie, embeds.md §3) */
+  --embed-consent-bg: #c4c6c7;
+  --embed-consent-border: #9f9f9f;
+  --embed-consent-inner-bg: #e4e4e4;
+  --embed-consent-shadow: 0 0 10px 0 #7e7e7e;
+
   /* hero scrim (dual gradient over the image; _FOUNDATIONS §8, hero.md §3; SKODA-202) */
   --scrim-h: linear-gradient(270deg, transparent, rgb(0 0 0 / 25%));
   --scrim-v: linear-gradient(180deg, transparent, rgb(0 0 0 / 10%));
@@ -98,6 +104,8 @@
   --facet-pill-bg: #f6f6f6;          /* distinct from --skoda-grey-100 #f5f5f5 */
   --facet-pill-hover: #e4e4e4;       /* == --divider-color */
   --facet-active: #419468;           /* selected pill / checked box / remove glyph */
+  --facet-toggle-color: #333;        /* "Advanced filter (n)" toggle (live .sort-options-advanced) */
+  --listing-loading-veil: rgb(247 247 247 / 50%); /* results reload veil (live #search-filter-results .overlay) */
   --facet-shadow: 0 2px 1px -1px rgb(0 0 0 / 10%), 0 1px 1px 0 rgb(0 0 0 / 5%), 0 1px 3px 0 rgb(0 0 0 / 5%);
   --chip-border: #d4d4d4;            /* applied-filter chip border */
   --pagination-border: #c9cdd3;      /* result-count underline */

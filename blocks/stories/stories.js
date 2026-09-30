@@ -57,11 +57,16 @@ export function parseFeedConfig(block) {
     console.warn('stories: offset must be a non-negative integer; using 0');
     offset = 0;
   }
+  const exclude = tokens(cfg.exclude).map((path) => {
+    if (!/^\/(?!\/)/.test(path)) throw new Error('stories: exclude requires site-relative paths');
+    return path.replace(/\/+$/, '');
+  });
   return {
     index: cfg.index || defaultIndexUrl(),
     path: cfg.path || '',
     template: cfg.template || '',
     offset, // skip sorted, scoped rows before applying the load-more slice
+    exclude, // exact promo paths, independent of their position in the index
     // category/tag: within-value OR, across-key AND (reuses listing-logic filterRows)
     category: tokens(cfg.category),
     tag: tokens(cfg.tag || cfg.tags),
@@ -74,7 +79,7 @@ export function parseFeedConfig(block) {
     // 'featured' (default): 2 large + 3-up; a number → plain N-up grid
     columns: cfg.columns || 'featured',
     // Use either the authored skip or flagged promo rows by default, not both.
-    excludeFeatured: String(cfg.excludefeatured ?? (offset ? 'false' : 'true')) !== 'false',
+    excludeFeatured: String(cfg.excludefeatured ?? (offset || exclude.length ? 'false' : 'true')) !== 'false',
   };
 }
 
@@ -86,7 +91,11 @@ export const isFeatured = (row) => {
   return v === true || v === 'true' || v === '1' || v === 1;
 };
 
-export const selectFeedRows = (rows, sort, offset) => sortRows(rows, sort).slice(offset);
+export const selectFeedRows = (rows, sort, offset, exclude = []) => sortRows(
+  rows.filter((row) => typeof row.path === 'string' && /^\/(?!\/)/.test(row.path)
+    && row.title && !exclude.includes(row.path.replace(/\/+$/, ''))),
+  sort,
+).slice(offset);
 
 /*
  * One feed cell = the shared overlay card-teaser (scripts/card-teaser.js), which
@@ -149,7 +158,7 @@ export default async function decorate(block) {
     return;
   }
 
-  const sortedRows = () => selectFeedRows(scoped, state.sort, cfg.offset);
+  const sortedRows = () => selectFeedRows(scoped, state.sort, cfg.offset, cfg.exclude);
 
   // Load-more pushes a new history entry (offset paging, matching the source);
   // there is no filter/sort UI here, so no replaceState path is needed.

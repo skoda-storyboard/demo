@@ -17,7 +17,7 @@
  */
 
 import storyHeroParser from './parsers/story-hero.js';
-import storyFlattenParser from './parsers/story-flatten.js';
+import storyFlattenParser, { markHighlights, dropEmptySections } from './parsers/story-flatten.js';
 import pageCleanupTransformer from './transformers/skoda-page-cleanup.js';
 import storyCleanupTransformer from './transformers/skoda-story-cleanup.js';
 import storyAsideTransformer from './transformers/skoda-story-aside.js';
@@ -121,8 +121,16 @@ function findBlocksOnPage(document, template) {
 }
 
 export default {
-  // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
-  preprocess: ({ document }) => nbspTransformer('preprocess', document.body, { document }),
+  /**
+   * Runs on the untouched DOM, before helix-importer's preProcess and the cleanup
+   * transformers. The highlight rows' background colour (SKODA-824) is only in the
+   * SiteOrigin head CSS, so the rows are marked here for story-flatten. Also keeps the
+   * source's glued non-breaking spaces (html2md would turn them into spaces).
+   */
+  preprocess: ({ document }) => {
+    markHighlights(document);
+    nbspTransformer('preprocess', document.body, { document });
+  },
 
   transform: (payload) => {
     const { document, url, params } = payload;
@@ -146,6 +154,8 @@ export default {
     });
 
     executeTransformers('afterTransform', main, payload);
+    // A leading highlight row (SKODA-824) leaves the body section with only its metadata.
+    dropEmptySections(main);
 
     WebImporter.rules.transformBackgroundImages(main, document);
     normalizeImages(main, document);

@@ -85,6 +85,13 @@ Standard rails (`.images / .models / .videos .items.flickity-enabled .item`, and
 Content-heavy rails (`.attachments / .news .items.flickity-enabled .item`): `90%` (<768) / `45%`
 (>=768, ~2.2/view) / `30%` (>=992, ~3.3/view) (· MR source CSS).
 
+On landing pages, the EDS `story-rail` applies this wider ladder only when its
+authored `template` is `press_release` (including the Storyboard home's "Latest
+News" and Media Room's "News"). The block expands through the generic section
+padding to the source's full-width rail, capped at `--content-max-width`; its
+reserved height follows the same cell width. Story, model, image, video and
+press-detail related rails keep their existing layouts.
+
 **Story-detail bottom Related Stories (SKODA-820)** follows the content-heavy ladder,
 not the homepage category ladder. Chrome DevTools CSS/DOM extraction on
 `/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/` (2026-09-25):
@@ -247,8 +254,11 @@ Taxonomy `Carousel` (no date -> `.carousel-caption`, bold title below wide image
   filter by template=story + category, drop slugs already shown above (featured promo + `stories`
   grid), sort by `publisheddate` desc, slice; **defer** the `buildBlock('carousel', rows)` +
   `decorateBlock` + `loadBlock` behind an `IntersectionObserver` (`rootMargin:'600px 0px'`) so the
-  4+ rails don't all build on load; degrade silently on any failure. Reserve `min-height:190px` to
-  avoid CLS until built.
+  4+ rails don't all build on load; handle empty/error states by collapsing the rail.
+  Reserve fluid card geometry to avoid CLS until built, and keep the inserted carousel hidden
+  until its CSS and decoration finish loading; then release the
+  reserve and reveal the carousel in the same frame. This avoids both an unstyled intermediate
+  layout and a frame with the reserved pseudo-element stacked above the finished carousel.
 
 ## 8. Open decisions + recommended default
 

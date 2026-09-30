@@ -60,6 +60,11 @@ export function renditionEdge(value = MIN_RENDITION_EDGE) {
 const DERIVATIVE_LADDER = ['2560x1707', '2048x1365', '1920x1280', '1536x1024', '1440x960', '768x512', '384x256', '272x182'];
 const LADDER_SET = new Set(DERIVATIVE_LADDER);
 
+// The same scaled sizes as long edges. WordPress fits each into a square box, so a
+// master that is not exactly 3:2 gets its own suffixes: an 8000x4500 master has
+// -1920x1080 and -1536x864, which the 3:2 names above never match (SKODA-805c/506).
+const LADDER_EDGES = [2560, 2048, 1920, 1536, 1440, 768];
+
 /** Strip query string + hash from a URL, returning the bare path. */
 export function cleanUrl(url) {
   return url.split('#')[0].split('?')[0];
@@ -169,6 +174,14 @@ export function sizedRenditions(url) {
   return DERIVATIVE_LADDER.map((size) => `${base}-${size}${ext}`);
 }
 
+/** `-WxH` suffix as { w, h }, or null. */
+export function suffixSize(url) {
+  const suffix = derivativeSuffix(url);
+  if (!suffix) return null;
+  const [w, h] = suffix.split('x').map(Number);
+  return { w, h };
+}
+
 /**
  * F3 — logical id for a source image (the dedup key). Path-qualified so two
  * different images that happen to share a basename in different folders (e.g.
@@ -259,12 +272,72 @@ export function imageSize(buffer) {
   return null;
 }
 
+/**
+ * Intrinsic size of a remote image from its leading bytes, or null (never throws).
+ * Streams until the size header is found: an embedded ICC profile can put a JPEG's
+ * SOF past 600 KB (the 18.6 MB `Skoda_all-electric_family` master: byte 654933).
+ */
+export async function remoteImageSize(url, {
+  fetchImpl = fetch, maxBytes = 4 * 1024 * 1024, timeoutMs = 20000,
+} = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetchImpl(url, {
+      headers: { Range: `bytes=0-${maxBytes - 1}`, 'Accept-Encoding': 'identity' },
+      signal: controller.signal,
+    });
+    if (!res.ok || !res.body) return null;
+    const reader = res.body.getReader();
+    const chunks = [];
+    let count = 0;
+    try {
+      while (count < maxBytes) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        count += value.length;
+        const size = imageSize(Buffer.concat(chunks));
+        if (size?.w && size?.h) return size;
+      }
+      return null;
+    } finally {
+      await reader.cancel().catch(() => {});
+    }
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /** Aspect ratios differ beyond tolerance (F7 crop confirmation). */
 export function ratiosDiffer(a, b, tol = 0.02) {
   if (!a || !b || !a.w || !a.h || !b.w || !b.h) return false;
   const ra = a.w / a.h;
   const rb = b.w / b.h;
   return Math.abs(ra - rb) / Math.max(ra, rb) > tol;
+}
+
+/**
+ * Step-down candidates for a master, largest first. With the master's real size
+ * (see remoteImageSize), the scaled sizes keep its own ratio (rounded as WordPress
+ * does) and 3:2 names are kept only when they match it; without it, the 3:2 ladder.
+ */
+export function renditionCandidates(url, size = null) {
+  if (!size?.w || !size?.h) return sizedRenditions(url);
+  const master = masterUrl(url);
+  const ext = path.extname(cleanUrl(master));
+  if (!ext) return [];
+  const base = master.slice(0, -ext.length);
+  const long = Math.max(size.w, size.h);
+  const scaled = LADDER_EDGES.filter((edge) => edge < long).map((edge) => {
+    const ratio = edge / long;
+    return `${base}-${Math.round(size.w * ratio)}x${Math.round(size.h * ratio)}${ext}`;
+  });
+  const named = sizedRenditions(url)
+    .filter((candidate) => !ratiosDiffer(size, suffixSize(candidate)));
+  return [...new Set([...scaled, ...named])];
 }
 
 /** Sleep helper for backoff. */
@@ -447,8 +520,10 @@ export async function pickIngestUrl(sourceUrl, {
     };
   }
 
-  // Master oversized: step down the ladder to the first rendition under limit.
-  for (const candidate of sizedRenditions(master)) {
+  // Master oversized: step down the ladder (at the master's own ratio) to the first
+  // rendition under limit.
+  const size = await remoteImageSize(master);
+  for (const candidate of renditionCandidates(master, size)) {
     if (belowMinEdge(candidate, minEdge)) continue;
     const bytes = await headBytes(candidate);
     if (bytes !== null && bytes <= oversizeBytes) {
@@ -862,14 +937,14 @@ export async function verifyDamOriginal({
   };
 }
 
-/** Activate a single original on the AEM publish tier after its DAM upload. */
-export async function publishDamBinary({
+/** Activate one validated DAM original; callers constrain the asset type. */
+async function activateDamOriginal({
   damConfig, damPath, token, fetchImpl = fetch,
-}) {
+}, extensions) {
   const folder = (damConfig?.folder || '/content/dam/storyboard').replace(/\/$/, '');
   if (!damConfig?.baseUrl || !token || !damPath?.startsWith(`${folder}/`)
-    || path.posix.normalize(damPath) !== damPath || !/\.(pdf|mp4)$/i.test(damPath)) {
-    throw new Error(`Cannot activate an unconfigured or out-of-scope DAM binary: ${damPath}`);
+    || path.posix.normalize(damPath) !== damPath || !extensions.test(damPath)) {
+    throw new Error(`Cannot activate an unconfigured or out-of-scope DAM original: ${damPath}`);
   }
   const response = await fetchImpl(`${damConfig.baseUrl.replace(/\/$/, '')}/bin/replicate.json`, {
     method: 'POST',
@@ -889,6 +964,16 @@ export async function publishDamBinary({
     }
   }
   return response.status;
+}
+
+/** Activate a PDF/MP4 original on the AEM publish tier. */
+export async function publishDamBinary(options) {
+  return activateDamOriginal(options, /\.(pdf|mp4)$/i);
+}
+
+/** Activate an image original on the AEM publish tier. */
+export async function publishDamImage(options) {
+  return activateDamOriginal(options, /\.(png|jpe?g|gif|webp|svg|avif)$/i);
 }
 
 /**

@@ -118,6 +118,12 @@ test('parseConfig reads keys and applies defaults', () => {
   assert.equal(cfg.dots, false);
 });
 
+test('press releases select the wider news layout without changing standard rails', () => {
+  assert.equal(parseConfig(cfgBlock([['template', 'press_release']])).layout, 'news');
+  assert.equal(parseConfig(cfgBlock([['template', 'skoda_model']])).layout, 'standard');
+  assert.equal(parseConfig(cfgBlock([['template', 'story']])).layout, 'standard');
+});
+
 test('parseConfig tokenizes comma lists and floors limit to >=1', () => {
   const cfg = parseConfig(cfgBlock([['tag', 'enyaq, 2026'], ['limit', '-5'], ['exclude', 'teaser, promo']]));
   assert.deepEqual(cfg.tag, ['enyaq', '2026']);
@@ -377,6 +383,100 @@ test('curatedRows passes the authored cell contents without nesting their wrappe
     { elems: [picture] },
     { elems: [date, title] },
   ]]);
+});
+
+// --- press variant (SKODA-224): CSS-only, opt-in via `Story Rail (press)` ---------
+// The variant must not leak into other rails (AC: story/home rails unchanged unless they
+// opt in), and it shares the SKODA-820 related-band ladder rather than forking its values.
+const { readFile } = await import('node:fs/promises');
+const railCss = await readFile(new URL('./story-rail.css', import.meta.url), 'utf8');
+// split a selector list on top-level commas only (not the ones inside :is(...))
+const selectorList = (sel) => {
+  const out = [];
+  let depth = 0;
+  let cur = '';
+  [...sel].forEach((ch) => {
+    if (ch === '(') depth += 1;
+    if (ch === ')') depth -= 1;
+    if (ch === ',' && depth === 0) { out.push(cur.trim()); cur = ''; } else cur += ch;
+  });
+  if (cur.trim()) out.push(cur.trim());
+  return out;
+};
+const STORY_BAND = 'body.story .section.dark.story-rail-container .story-rail';
+const PRESS = '.story-rail.press';
+// the opt-in scopes: the press variant alone, or the band it shares with the story rail
+const optIn = (s) => s.startsWith(PRESS) || s.startsWith(STORY_BAND)
+  || s.startsWith(`:is(${STORY_BAND}, ${PRESS})`);
+const cssRules = railCss
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .split('}')
+  .map((chunk) => chunk.split('{'))
+  // a rule nested in @media splits into [media, selector, body]: keep the last two
+  .filter((parts) => parts.length >= 2)
+  .map((parts) => ({ selector: parts[parts.length - 2].trim(), body: parts[parts.length - 1].trim() }));
+
+test('press variant: every press selector is scoped to .story-rail.press', () => {
+  const pressSelectors = cssRules
+    .flatMap(({ selector }) => selectorList(selector))
+    // the `.press` variant class, not the `body.press-release` template (SKODA-212a clamp)
+    .filter((s) => /\.press(?![\w-])/.test(s));
+  assert.ok(pressSelectors.length > 0, 'press rules exist');
+  pressSelectors.forEach((s) => assert.ok(optIn(s), s));
+});
+
+test('press variant shares the related-band 90 / 45 / 30% cell ladder', () => {
+  const ladder = cssRules
+    .filter(({ selector }) => selectorList(selector).some((s) => s === PRESS || s === `:is(${STORY_BAND}, ${PRESS})`))
+    .map(({ body }) => body.match(/--carousel-cell-width:\s*([^;]+);/)?.[1])
+    .filter(Boolean);
+  assert.deepEqual(ladder, [
+    'calc(90cqw - var(--carousel-gap))',
+    'calc(45cqw - var(--carousel-gap))',
+    'calc(30cqw - var(--carousel-gap))',
+  ]);
+});
+
+test('press variant: default rails keep the carousel ladder (no unscoped cell width)', () => {
+  cssRules
+    .filter(({ body }) => body.includes('--carousel-cell-width'))
+    .forEach(({ selector }) => selectorList(selector).forEach((s) => {
+      assert.ok(optIn(s), `cell width set outside an opt-in scope: ${s}`);
+    }));
+});
+
+// --- press "All" end card (SKODA-224): only a full band gets it ----------------------
+const { PRESS_BAND_SIZE, pressBandIsFull, pressAllLink } = await import('./story-rail.js');
+
+test('press band is full at the source band size (10 cards) or when the index has more', () => {
+  assert.equal(PRESS_BAND_SIZE, 10);
+  assert.equal(pressBandIsFull(10), true, 'Zellmer: 10 curated cards → All card');
+  assert.equal(pressBandIsFull(6), false, 'Peaq: 6 cards → none');
+  assert.equal(pressBandIsFull(1), false, 'Board: 1 card → none');
+  assert.equal(pressBandIsFull(4, true), true, 'index mode with more matches than the limit');
+});
+
+// a paragraph stub: its only child is a link unless extra text is given
+function para(linkText, href, extraText = '') {
+  const link = href ? { textContent: linkText, getAttribute: () => href } : null;
+  return {
+    children: link ? [link] : [],
+    textContent: `${linkText}${extraText}`,
+    querySelector: () => link,
+  };
+}
+
+test('pressAllLink finds the band header link, skipping text paragraphs and inline links', () => {
+  const allHref = 'https://www.skoda-storyboard.com/en/news/?filter';
+  const paragraphs = [
+    para('Based on tags: 2026, board members', null),
+    para('Read more', '/x', ' about the release'),
+    para('All', allHref),
+  ];
+  const block = { closest: () => ({ querySelectorAll: () => paragraphs }) };
+  assert.equal(pressAllLink(block).getAttribute('href'), allHref);
+  assert.equal(pressAllLink({ closest: () => ({ querySelectorAll: () => paragraphs.slice(0, 2) }) }), null);
+  assert.equal(pressAllLink({ closest: () => null }), null, 'no section → no card');
 });
 
 test('feedLightboxItem: the source colorbox panel from a media feed row (shape 5)', () => {

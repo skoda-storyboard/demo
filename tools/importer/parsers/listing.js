@@ -3,7 +3,7 @@
 /**
  * Parser: listing (block name: "Listing")
  * Source: the shared faceted-listing engine (template-search-results) used by
- *   /en/news/, /en/images/, /en/videos/, /en/search/ —
+ *   /en/news/, /en/press-kits/, /en/images/, /en/videos/, /en/search/ —
  *   form.search-filter (top pill bar) + .search-results-items grid + .ajax-loader-button,
  *   all inside #search-filter-results.
  * (ties to docs/ui-specs/faceted-listing.md, SKODA-402/403.)
@@ -13,7 +13,8 @@
  * emitted here and pulls its rows from the published query-index at render time.
  *
  * ⚠️ CONTENT-DRIVEN, NOT POSITIONAL. The variant is selected from the <body> class
- * token the source itself carries (images | videos | search | news→press_release),
+ * token the source itself carries (images | videos | search | press-kits→press_kit |
+ * news→press_release),
  * NOT from the URL or section position — the four pages are one engine differing only
  * by that signal. The parser confirms a faceted engine is present before emitting;
  * otherwise it unwraps and bails.
@@ -51,6 +52,17 @@ const VARIANTS = {
     ['perpage', '6'],
     ['columns', '3'],
   ],
+  // Press Kits: the same engine and facets as News, over the kit hubs. `template` matches
+  // exactly, so chapter pages (`press_kit_chapter`) stay out, as on the source.
+  'press-kits': [
+    ['index', '/en/query-index.json'],
+    ['path', '/en/press-kits/'],
+    ['template', 'press_kit'],
+    ['facets', FACETS_DEFAULT],
+    ['sort', 'newest'],
+    ['perpage', '6'],
+    ['columns', '3'],
+  ],
   images: [
     ['index', '/en/media-feed.json'],
     ['template', 'image'],
@@ -82,12 +94,13 @@ const VARIANTS = {
 // `page-template-template-search-results`, so a substring/word-boundary test on
 // "search" would false-match every variant. Match the STANDALONE class token
 // instead (split on whitespace, exact-equal), which the source sets to exactly
-// one of images | videos | search | news. Default → news.
+// one of images | videos | search | press-kits | news. Default → news.
 function variantFromBody(document) {
   const tokens = ((document.body && document.body.getAttribute('class')) || '').split(/\s+/);
   if (tokens.includes('images')) return 'images';
   if (tokens.includes('videos')) return 'videos';
   if (tokens.includes('search')) return 'search';
+  if (tokens.includes('press-kits')) return 'press-kits';
   return 'news';
 }
 

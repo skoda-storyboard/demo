@@ -6,8 +6,8 @@ import { createRequire } from 'node:module';
 const { JSDOM } = createRequire(import.meta.url)('jsdom');
 const { default: decorate } = await import('./press-kit.js');
 
-function setup(markup) {
-  const dom = new JSDOM(`<main>${markup}</main>`, { url: 'https://demo.example/en/press-kits/kit' });
+function setup(markup, url = 'https://demo.example/en/press-kits/kit') {
+  const dom = new JSDOM(`<main>${markup}</main>`, { url });
   globalThis.document = dom.window.document;
   globalThis.MutationObserver = dom.window.MutationObserver;
   return dom.window.document.querySelector('main');
@@ -32,6 +32,32 @@ test('the Introduction alone gets a keyboard-accessible Chapters menu', () => {
   assert.equal(nav.querySelector('a[href^="https://"]').target, '_blank');
   nav.querySelector('a[href^="https://"]').click();
   assert.equal(nav.querySelector('ul').hidden, true);
+});
+
+test('the Chapters bar moves above the date and title, which become the header', () => {
+  const main = setup(`<div class="section"><div class="default-content-wrapper"><p>21. 9. 2026</p><h1>Exterior</h1></div></div>
+    <div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
+      <li><a href="#chapters-links">Chapters</a></li><li><a href="/en/press-kits/kit">Kit</a></li>
+    </ul></div></div><div class="section body-column"><div class="default-content-wrapper"><p>Body</p></div></div>`);
+  decorate(main);
+  const sections = [...main.children];
+  assert.ok(sections[0].matches('.press-kit-chapters'));
+  assert.ok(sections[1].matches('.press-kit-header') && sections[1].querySelector('h1'));
+  assert.ok(sections[2].matches('.body-column') && !sections[2].matches('.press-kit-header'));
+});
+
+test('the Chapters menu marks the current chapter, not the hub or other chapters', () => {
+  const main = setup(`<div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
+      <li><a href="#chapters-links">Chapters</a></li>
+      <li><a href="/en/press-kits/kit">Škoda Peaq – Press Kit</a></li>
+      <li><a href="/en/press-kits/kit/images">Images</a></li>
+      <li><a href="/en/press-kits/kit/videos">Videos</a></li>
+    </ul></div></div><div class="section body-column"></div>`, 'https://demo.example/en/press-kits/kit/images/');
+  decorate(main);
+  assert.deepEqual(
+    [...main.querySelectorAll('nav a[aria-current="page"]')].map((a) => a.textContent),
+    ['Images'],
+  );
 });
 
 // Authored Downloads rows as they come from DA (contract `downloads`): image rows and
@@ -84,6 +110,24 @@ test('Media Box: the Downloads block alone owns the disclosure and renders file 
   assert.equal(section.querySelectorAll('.downloads-file').length, 2, 'PDF + MP4 render as file tiles');
 });
 
+test('Images chapter: each gallery group with `collapse auto` gets its own block disclosure', async () => {
+  const group = (from, count) => `<div class="downloads-wrapper"><div class="downloads">
+    <div><div>collapse</div><div>auto</div></div>${Array.from({ length: count }, (_, i) => imageRow(from + i)).join('')}</div></div>`;
+  const main = setupWindow(`<div class="section body-column"><div class="default-content-wrapper"><h2>Exterior</h2></div>
+    ${group(0, 12)}<div class="default-content-wrapper"><h2>Interior</h2></div>${group(12, 3)}</div>
+    <div class="section sidebar"></div>`);
+  decorate(main);
+  const { default: decorateDownloads } = await import('../../blocks/downloads/downloads.js');
+  const [exterior, interior] = main.querySelectorAll('.downloads');
+  await decorateDownloads(exterior);
+  await decorateDownloads(interior);
+  assert.equal(exterior.querySelectorAll('.downloads-items > li:not([hidden])').length, 8, 'two rows at 1280');
+  assert.equal(interior.querySelectorAll('.downloads-items > li:not([hidden])').length, 3);
+  assert.equal(main.querySelectorAll('.downloads-more').length, 1, 'only the group above 8 tiles gets a control');
+  assert.ok(exterior.querySelector('.downloads-more'));
+  assert.equal(main.querySelectorAll('#media-box, .press-kit-show-more').length, 0);
+});
+
 test('a hub keeps links and has no article-only controls', () => {
   const main = setup(`<div class="section"><div class="cards tiles">
     <div><a href="/en/press-kits/intro">Introduction</a></div>
@@ -94,4 +138,16 @@ test('a hub keeps links and has no article-only controls', () => {
   assert.equal(main.querySelector('a[href^="https://"]').rel, 'noopener noreferrer');
   assert.equal(main.querySelector('a[href^="/en"]').target, '');
   assert.equal(main.querySelectorAll('.press-kit-chapters-nav, .press-kit-show-more').length, 0);
+});
+
+test('the sidebar "+N" link becomes the Gallery (preview) pill data, pointing at the Media Box', () => {
+  const main = setup(`<div class="section sidebar"><div class="default-content-wrapper"><h3>Images</h3></div>
+    <div class="gallery-wrapper"><div class="gallery preview"><div><div>img</div></div></div></div>
+    <div class="default-content-wrapper"><p><a href="#media-box">+51</a></p><h3>Tags</h3></div></div>`);
+  decorate(main);
+  const gallery = main.querySelector('.gallery.preview');
+  assert.equal(gallery.dataset.moreCount, '51');
+  assert.equal(gallery.dataset.moreHref, '#media-box');
+  assert.equal(main.querySelector('a[href="#media-box"]'), null, 'the separate link is gone');
+  assert.ok(main.querySelector('.sidebar h3:last-child'), 'the Tags heading stays');
 });

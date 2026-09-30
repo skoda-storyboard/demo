@@ -237,9 +237,22 @@ export function classifyBlock(block, contracts, codeBlocks) {
 }
 
 /**
+ * Section Metadata `style` tokens of a `.plain.html`, one normalised list per section
+ * (`body-column, highlight-dark` → ['body-column', 'highlight-dark']).
+ */
+export function sectionStyles(html) {
+  return parseBlocks(html)
+    .filter((b) => b.name === 'section-metadata')
+    .map((b) => b.rows.find((r) => r.cells.length === 2 && normKey(r.cells[0].text) === 'style'))
+    .filter(Boolean)
+    .map((r) => r.cells[1].text.split(',').map(normKey).filter(Boolean));
+}
+
+/**
  * Check one page's `.plain.html`.
  * @returns {{blocks: object[], pending: {id: string, ticket: string, fallback: string}[],
  *   errors: string[], warnings: string[], publishable: boolean}}
+ *   pending also covers section-style contracts whose `styles` token is in a Section Metadata.
  *   publishable = no errors, every pending entry has a readable fallback, and none is a block whose
  *   code is missing (its JS would 404 on the page; 208/801a require 0 block JS 404s).
  */
@@ -279,6 +292,14 @@ export function checkPage(html, contracts, codeBlocks, path = '') {
   blocks.forEach((b) => (b.pendingKeys || []).forEach((e) => add({
     id: e.id, ticket: e.ticket, fallback: e.fallback, missingCode: false,
   })));
+  // Section-style contracts that list their `styles` tokens (e.g. highlight, SKODA-824):
+  // Section Metadata is not a block, so the block walk above never sees them.
+  const styled = (contracts.pending || []).filter((e) => e.form === 'section-style' && (e.styles || []).length);
+  sectionStyles(html).forEach((tokens) => styled
+    .filter((e) => e.styles.some((st) => tokens.includes(st)))
+    .forEach((e) => add({
+      id: e.id, ticket: e.ticket, fallback: e.fallback, missingCode: false,
+    })));
   const all = blocks.flatMap((b) => b.problems.map((p) => `${b.label}: ${p}`));
   const errors = [...new Set(all)].map((e) => {
     const n = all.filter((x) => x === e).length;
@@ -306,6 +327,9 @@ export function registryProblems(contracts, docText) {
     if (!e.ticket) problems.push(`contract "${e.id}" has no ticket`);
     if (!['readable', 'broken'].includes(e.fallback)) problems.push(`contract "${e.id}" fallback must be readable|broken`);
     if (!Number.isInteger(e.shape)) problems.push(`contract "${e.id}" needs an integer shape version`);
+    if (e.styles && (e.form !== 'section-style' || !e.styles.every((st) => st === normKey(st)))) {
+      problems.push(`contract "${e.id}" styles need form "section-style" and normalised tokens`);
+    }
   });
   return problems;
 }
