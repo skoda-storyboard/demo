@@ -160,6 +160,7 @@ test('statusSheet: plain-language rows, redirects and held pages explained', () 
   assert.equal(sheet[2].Note, 'Redirects to /en/press-kits/kit-2');
   assert.equal(sheet[3].Note, 'Redirects to /en/x');
   assert.deepEqual(sheet.map((r) => r.Kind), ['page', 'page', 'page', 'alias', 'page']);
+  assert.deepEqual(sheet.map((r) => r.Demo), ['yes', 'yes', '', 'yes', 'yes'], 'set and set+corpus pages are demo pages');
   assert.ok(sheet.every((r) => r.Checked === '2026-09-30 13:21 UTC'));
 });
 

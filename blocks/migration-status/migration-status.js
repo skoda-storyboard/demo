@@ -12,7 +12,8 @@
  *
  * Renders, answer first: a headline ("185 of 186 pages live"), one card per page type, the
  * exceptions in plain words, a page finder, then every page grouped by type in <details>. The
- * counts are derived from the rows, so the summary can't disagree with the list.
+ * counts are derived from the rows, so the summary can't disagree with the list. Pages asked
+ * for in the demo (Demo = yes: the M1 URL set, not only the rail corpus) carry a ⭐.
  */
 
 import { readBlockConfig } from '../../scripts/aem.js';
@@ -27,6 +28,8 @@ const STATUS_LABELS = {
 
 // A redirect row is a reachable old address: it counts as live, as in the tracker.
 const isLive = (row) => row.Status === 'live' || row.Status === 'redirect';
+// Pages explicitly asked for in the demo (the M1 URL set) carry a star.
+const isDemo = (row) => row.Demo === 'yes';
 
 function el(tag, props = {}, ...children) {
   const node = document.createElement(tag);
@@ -48,6 +51,12 @@ function badge(status) {
   return el('span', { className: `migration-status-badge status-${status.replace(/\s+/g, '-')}` }, STATUS_LABELS[status] || status);
 }
 
+function star() {
+  return el('span', {
+    className: 'migration-status-star', role: 'img', 'aria-label': 'Demo page', title: 'Asked for in the demo',
+  }, '⭐');
+}
+
 /** "2026-09-30 13:21 UTC" → "30 Sep 2026, 13:21 UTC"; anything else is shown as is. */
 export function formatChecked(value) {
   const m = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}:\d{2}) UTC$/);
@@ -59,11 +68,13 @@ export function formatChecked(value) {
 /** Page counts per type, in first-seen order; aliases are listed but not counted. */
 export function summarize(rows) {
   const types = new Map();
-  const total = { pages: 0, live: 0 };
+  const total = {
+    pages: 0, live: 0, demo: 0, demoLive: 0,
+  };
   rows.forEach((row) => {
     if (!types.has(row.Type)) {
       types.set(row.Type, {
-        type: row.Type, pages: 0, live: 0, rows: [],
+        type: row.Type, pages: 0, live: 0, demo: 0, demoLive: 0, rows: [],
       });
     }
     const t = types.get(row.Type);
@@ -72,12 +83,16 @@ export function summarize(rows) {
     [t, total].forEach((acc) => {
       acc.pages += 1;
       if (isLive(row)) acc.live += 1;
+      if (isDemo(row)) acc.demo += 1;
+      if (isDemo(row) && isLive(row)) acc.demoLive += 1;
     });
   });
   return { types: [...types.values()], total };
 }
 
-function typeCard({ type, pages, live }) {
+function typeCard({
+  type, pages, live, demo, demoLive,
+}) {
   const bar = el('span', { className: 'migration-status-bar', 'aria-hidden': 'true' });
   bar.style.setProperty('--migration-status-share', pages ? live / pages : 0);
   return el(
@@ -86,6 +101,7 @@ function typeCard({ type, pages, live }) {
     el('span', { className: 'migration-status-type' }, type),
     el('span', { className: 'migration-status-count' }, el('strong', {}, String(live)), ` of ${pages} live`),
     bar,
+    demo ? el('span', { className: 'migration-status-note' }, star(), ` ${demoLive} of ${demo} demo pages live`) : null,
   );
 }
 
@@ -103,7 +119,7 @@ function attention(rows) {
       'li',
       {},
       badge(row.Status),
-      el('span', { className: 'migration-status-title' }, row.Title),
+      el('span', { className: 'migration-status-title' }, isDemo(row) ? star() : null, row.Title),
       row.Note ? el('span', { className: 'migration-status-note' }, row.Note) : null,
       el(
         'span',
@@ -116,13 +132,19 @@ function attention(rows) {
   return el('section', { 'aria-labelledby': 'migration-status-attention' }, el('h2', { id: 'migration-status-attention' }, 'Needs attention'), list);
 }
 
+// Title and URL paths only: every new-site host contains "demo" and "skoda-storyboard".
+function searchText(row) {
+  const pathOf = (u) => { try { return new URL(u).pathname; } catch { return String(u || ''); } };
+  return `${row.Title} ${pathOf(row.Source)} ${pathOf(row.Migrated)}${isDemo(row) ? ' demo' : ''}`.toLowerCase();
+}
+
 function typeTable(group) {
   const tbody = el('tbody');
   group.rows.forEach((row) => {
     const tr = el(
       'tr',
-      { 'data-search': `${row.Title} ${row.Source} ${row.Migrated}`.toLowerCase() },
-      el('th', { scope: 'row' }, row.Title, row.Kind === 'alias' ? el('span', { className: 'migration-status-note' }, ' (old address)') : null),
+      { 'data-search': searchText(row) },
+      el('th', { scope: 'row' }, isDemo(row) ? star() : null, row.Title, row.Kind === 'alias' ? el('span', { className: 'migration-status-note' }, ' (old address)') : null),
       el('td', {}, badge(row.Status), row.Note ? el('span', { className: 'migration-status-note' }, row.Note) : null),
       el('td', {}, outLink(row.Source, 'Source ↗', `${row.Title} on the source site`)),
       el('td', {}, outLink(row.Migrated, 'New ↗', `${row.Title} on the new site`)),
@@ -146,7 +168,7 @@ function typeTable(group) {
 
 function finder(groups, status) {
   const input = el('input', {
-    type: 'search', id: 'migration-status-find', placeholder: 'Page title or URL', autocomplete: 'off',
+    type: 'search', id: 'migration-status-find', placeholder: 'Page title, URL or “demo”', autocomplete: 'off',
   });
   input.addEventListener('input', () => {
     const q = input.value.trim().toLowerCase();
@@ -184,6 +206,12 @@ export function render(block, rows) {
     { className: 'migration-status-head' },
     el('p', { className: 'migration-status-headline' }, el('strong', {}, `${total.live} of ${total.pages}`), ' pilot pages are live'),
     checked ? el('p', { className: 'migration-status-checked' }, `Checked ${checked}`) : null,
+    total.demo ? el(
+      'p',
+      { className: 'migration-status-demo' },
+      star(),
+      ` ${total.demoLive} of ${total.demo} demo pages are live. The star marks the pages asked for in the demo; the others feed its rails and listings.`,
+    ) : null,
     el('ul', { className: 'migration-status-legend', 'aria-label': 'Pages by status' }, ...counts.map(([s, n]) => el('li', {}, badge(s), ` ${n}`))),
   );
   const cards = el('ul', { className: 'migration-status-types', 'aria-label': 'Pages by type' }, ...types.map(typeCard));

@@ -47,7 +47,9 @@ function block() {
 
 test('counts pages per type; redirects count as live, aliases are listed but not counted', () => {
   const { types, total } = summarize(ROWS);
-  assert.deepEqual(total, { pages: 5, live: 4 });
+  assert.deepEqual(total, {
+    pages: 5, live: 4, demo: 0, demoLive: 0,
+  });
   assert.deepEqual(types.map((t) => [t.type, t.live, t.pages, t.rows.length]), [
     ['Home', 1, 1, 1], ['Press kits', 2, 3, 3], ['Stories', 1, 1, 2],
   ]);
@@ -128,4 +130,25 @@ test('decorate reads the source row and fetches the sheet; errors are shown, not
 test('formatChecked keeps unknown formats as they are', () => {
   assert.equal(formatChecked('2026-09-30 13:21 UTC'), '30 Sep 2026, 13:21 UTC');
   assert.equal(formatChecked('today'), 'today');
+});
+
+test('demo pages carry a star, a legend line, per-type counts, and "demo" finds them', () => {
+  const rows = ROWS.map((r, i) => ({ ...r, Demo: [0, 1, 2, 4].includes(i) ? 'yes' : '' }));
+  const el = block();
+  render(el, rows);
+  assert.equal(
+    el.querySelector('.migration-status-demo').textContent,
+    '⭐ 2 of 3 demo pages are live. The star marks the pages asked for in the demo; the others feed its rails and listings.',
+  );
+  const stars = [...el.querySelectorAll('tbody th .migration-status-star')];
+  assert.equal(stars.length, 4, 'one star per demo row (the alias too)');
+  assert.equal(stars[0].getAttribute('aria-label'), 'Demo page');
+  const kits = [...el.querySelectorAll('.migration-status-types li')][1];
+  assert.match(kits.textContent, /⭐ 1 of 2 demo pages live/);
+  const [held] = el.querySelectorAll('.migration-status-attention li');
+  assert.ok(held.querySelector('.migration-status-title .migration-status-star'), 'starred in Needs attention');
+  const input = el.querySelector('#migration-status-find');
+  input.value = 'demo';
+  input.dispatchEvent(new window.Event('input'));
+  assert.equal(el.querySelector('.migration-status-found').textContent, '4 pages found');
 });

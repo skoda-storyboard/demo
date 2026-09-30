@@ -45,6 +45,7 @@
 }
 
 .migration-status .migration-status-checked,
+.migration-status .migration-status-demo,
 .migration-status .migration-status-note {
   color: var(--migration-status-note-color);
   font-size: var(--body-font-size-s);
@@ -237,4 +238,8 @@
 
 .migration-status td a {
   white-space: nowrap;
+}
+
+.migration-status .migration-status-star {
+  margin-inline-end: var(--spacing-xs);
 }

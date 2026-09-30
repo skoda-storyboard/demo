@@ -233,7 +233,8 @@ export function titleFromPath(p) {
  *   Status: live | redirect | preview | held | not live. A redirect (tracker alias or a
  *   /redirects row) wins; a page that isn't live but carries a `publicNote` is held.
  *   Note: the redirect target and the override's `publicNote` (the engineering `note` stays
- *   in the tracker). Kind: page | alias (aliases are listed, not counted, as in the tracker).
+ *   in the tracker). Kind: page | alias (aliases are listed, not counted, as in the tracker). Demo: yes for
+ *   pages in the M1 demo URL set (source set | set+corpus), empty for rail-corpus-only pages.
  * meta: { families, titles: {path: title}, redirects: {source: destination},
  *   publicNotes: {path: text}, checked, origin, site }
  */
@@ -263,6 +264,8 @@ export function statusSheet(rows, meta = {}) {
       Type: (fam[r.family] || {}).label || r.family,
       // An alias is a second address of a listed page: shown, but not counted as a page.
       Kind: r.alias ? 'alias' : 'page',
+      // Explicitly asked for in the demo (skoda-m1-url-set.txt), not only a rail feed page.
+      Demo: String(r.source || '').includes('set') ? 'yes' : '',
       Title: target && titles[target] ? titleOf(target) : titleOf(r.path),
       Source: `${origin}${r.path}/`,
       Migrated: `${site}${r.path}`,
