@@ -20,18 +20,17 @@ Split from SKODA-611 (sweep-reconciliation decision D2, [`SKODA-M1-URL-BLOCK-SWE
   `docs/guardrails/css-guidelines.md` (fluid first; no new breakpoint without a layout reason).
 
 ## Scope decision (2026-09-30)
-Band spacing only. Measured on 2026-09-30, the 320px pitch at 1440 also needs live's larger rail cards (354×199
-against our 276×155) and the "All" header button. That is rail work, split out to
-[SKODA-226](SKODA-226.md): the pitch parts of the ACs below are met where the cards already match (below 768)
-and complete with 226.
+Band spacing only. Measured on 2026-09-30, the 320px pitch at 1440 also needs the source's larger rail cards and
+its "All" links. That is rail work and is not in this ticket (see "Out of scope, found" below). The pitch parts of
+the ACs below are met where the cards already match (below 768).
 
 ## Acceptance Criteria
 - [ ] 1440: 67px heading-to-previous-track gap as on the source; 320px rail pitch (±4px). *(Re-measured, the
       source gap is 66px (rail end → heading); ours is 64. The 2px left is the heading centred in live's 36px
-      "All" header, SKODA-226. The pitch is 272 until SKODA-226 resizes the cards: 12 + 24 + 33 + 20 + 155 + 16 +
-      12.)*
+      "All" header (rail work, out of scope). The pitch is 272 until the rail cards match the source: 12 + 24 +
+      33 + 20 + 155 + 16 + 12.)*
 - [ ] 768 / 375: band spacing follows the source within the sweep thresholds (±2px or ±2%). *(Spacing yes, at
-      every width. The 375 pitch is 296–297 against 298–299; at 768 the pitch waits on SKODA-226.)*
+      every width. The 375 pitch is 296–297 against 298–299; at 768 the pitch waits on the rail card size.)*
 - [ ] `npm run lint:css` passes; story pages (which share the section styles) are unchanged.
 - [ ] Preview link on the PR: `{branch}--demo--skoda-storyboard.aem.page/en`.
 
@@ -68,8 +67,23 @@ and complete with 226.
     38px predates this branch: the Media Room band spacing is outside 611b.
 - **Code review (2026-09-30):**
   - The promo gap is set once, in `promo-box.css`, instead of a second section rule and token.
-  - SKODA-226 builds on the existing `press` end card and the `story-rail-news` ladder.
   - Doc numbers and wording fixed.
+
+## Out of scope, found (2026-09-30, for the backlog owner; no ticket opened)
+Measured on the live `/en/` light category rails (Models, eMobility, Lifestyle, Škoda World) at 375 / 768 / 992 /
+1440:
+- **Card ladder:** the source uses 90% / 45% / 30% cells.
+  - Its cards are 318×179 / 326×183 / 278×156 / 354×199.
+  - Ours use the generic 90% / 30% / 22.5% ladder (`carousel-rails.md`), so the cards are 320×180 / 224×126 /
+    … / 276×155. They match only below 768.
+  - The home "Latest News" rail already has the wide ladder (`story-rail-news`, SKODA-827).
+- **"All" header button:** the source's rail headers have a grey ghost pill (90×36, 16/600, 2px `#464748` border,
+  50px radius) linking to the category archive, e.g. `/en/category/emobility/`. `story-rail` supports a `viewall`
+  key, but the home content doesn't author it.
+- **"All" end card:** each source rail ends with a card-sized "All" link (1px `#161718` border, 16/600 ink). EDS
+  builds one only for the `press` variant (`appendPressAllCard`, SKODA-224).
+- **Effect:** with the band spacing matched, a light band is still 48px shorter than the source at 1440, 36 at 992
+  and 60 at 768.
 
 ## Dependencies
 SKODA-611a (section structure), SKODA-218 (dark sections).

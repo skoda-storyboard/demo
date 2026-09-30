@@ -73,7 +73,7 @@ All values `measured (source-url · selector · viewport) -> token`. `HP` = `htt
 Cells are sized by percentage width; the gutter is a container `margin: 0 -10px` with `padding: 0 10px`
 per cell = a **20px effective gap** (· `.items` / `.item` · MR source CSS).
 
-> **Re-measure 2026-09-30 (SKODA-611b → [SKODA-226](../tickets/tickets/SKODA-226.md)).** The live Storyboard home
+> **Re-measure 2026-09-30 (SKODA-611b, out of scope there; see its "Out of scope, found").** The live Storyboard home
 > category rails (`.cover-box .search-results.type-post .search-results-items`) now measure the **content-heavy
 > ladder, 90% / 45% / 30%**, not the 22.5% row below. Cells are 338 / 346 / 298 / 374px at 375 / 768 / 992 / 1440,
 > and cards are 354×199 at 1440. Each rail also has an "All" ghost-pill header link (90×36) and an "All" end card.
