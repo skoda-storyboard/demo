@@ -123,8 +123,8 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Shape:** the `Highlights` heading stays as default content above the table. Header `Cards (key-facts)`, then rows `[square <picture>, <h3>title</h3><p>text</p>]` (the cards row shape). The variant only changes the styling.
 
 ### `stories-feature`
-- **Status:** ✅ **on `main`** with SKODA-222 (`feature` is in `stories`' baseline config keys above and is no longer a
-  pending entry; this section stays as the shape reference). **Ticket:** SKODA-222
+- **Status:** ✅ **on `main` once SKODA-222 merges** (the same PR adds `feature` to `stories`' baseline config keys above
+  and drops the pending entry; this section stays as the shape reference). **Ticket:** SKODA-222
 - **Runtime (SKODA-222):** the card is the grid's first cell. From 992 it's a grey card in the third column across
   the first two rows; below 992 it's first and full width, collapsed behind a dark disclosure bar. With it, the first
   page shows `initial - 2` stories (the source's archive offset is 4). The primary CTA is read from `<strong>` or, as

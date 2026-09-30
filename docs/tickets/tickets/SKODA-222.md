@@ -110,9 +110,35 @@ stakeholder decision (2026-09-26).
     hidden CTAs; Enter/Space toggle.
   - At ≥ 992 it reads as a heading plus the 3 links, with no dead button.
   - Focus rings are 2px.
-- **Checks:** ESLint + Stylelint clean; 46 stories tests (17 new) and the contract tests (55) pass.
+- **Checks:** ESLint + Stylelint clean; the stories tests and the contract tests (55) pass (see Code review 2).
+
+## Code review 2 (2026-09-30, a11y / keyboard / mobile)
+- **Contrast, computed:** mint on `#0e3a2f` 9.66:1; black on mint 16.1:1; white on `#464748` 9.31:1 (hover
+  `#5a5b5c` 6.82:1). The `#419468` focus ring is ≥ 3.28:1 on every background it sits on.
+- **Fixed, title under the chevron (411–460):** the title is now centred in the room left of the 40px icon,
+  as the source's floated icon does. Measured equal to the source: text 82–289 at 411, 91–299 at 430, 106–314 at
+  460, 260–468 at 768. Before, "Explore the Kodiaq" ran 6px under the icon at 411, and the title sat 20px right of
+  the source from 411 to 991. At ≤ 410 the stacked bar keeps its symmetric padding.
+- **Fixed, focus when the width crosses 992** (a rotated tablet, a zoomed window):
+  - A focused toggle hands focus to the first CTA when it is hidden.
+  - A focused CTA of a collapsed card reopens the panel.
+  - Measured by resizing 900 → 1200 → 800.
+- **Fixed, new-tab links:** the configurator CTA is named "Configure your <Model> (opens in a new tab)", the
+  cards-social convention (placeholder `newTab`).
+- **Tidied:** removed the dead `list-style` and `pointer-events` rules; `initial` became `firstPage` in
+  decorate; the contract doc says "on main once SKODA-222 merges".
+- **Keyboard walk, measured:**
+  - 390 collapsed: toggle → stories → Load more.
+  - 390 open: toggle → the 4 CTAs → stories.
+  - 1440: the 4 CTAs → stories.
+  - Every stop shows the 2px ring; there's no trap. At 320–991 there's no horizontal overflow.
+- **Tests:** 47 stories tests (18 new), including the resize-focus case and the new-tab name.
 
 ## Deliberate deviations
+- **Tab order at ≥ 992:** the card's CTAs come before story 1, although the card sits top right. The DOM order
+  is the source's, and on mobile the card is visually first.
+- **List count:** the card is an `li` of the story list, so screen readers count it in the list ("11 items"
+  when 10 stories show).
 - **992–1247, 4+ stories:** the card is exactly two story rows tall (e.g. 381 at 1024, 447 at 1200) instead of
   the source's 415 / 465. The source card overlaps the first loaded story by 14px there; ours doesn't
   (decision 2026-09-30).

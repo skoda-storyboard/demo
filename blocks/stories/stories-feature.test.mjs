@@ -35,7 +35,7 @@ globalThis.fetch = async (url) => {
 };
 
 const {
-  default: decorate, readFeature, buildFeature, FEATURE_SLOTS,
+  default: decorate, readFeature, buildFeature, FEATURE_SLOTS, FEATURE_WIDE,
 } = await import('./stories.js');
 
 const FEATURE_CELL = `
@@ -146,9 +146,36 @@ test('buildFeature: the external configurator CTA opens in a new tab; site links
   assert.equal(site.target, '');
   assert.equal(external.target, '_blank');
   assert.equal(external.rel, 'noopener noreferrer');
+  assert.equal(external.getAttribute('aria-label'), 'Configure your Elroq (opens in a new tab)');
+  assert.equal(site.getAttribute('aria-label'), null);
   assert.ok(external.classList.contains('secondary'));
   const mail = buildFeature(readFeature(storiesBlock('/x.json', { feature: '<p><a href="mailto:press@skoda-auto.cz">Mail</a></p>' })));
   assert.equal(mail.querySelector('a').target, '', 'mailto/tel stay in place');
+});
+
+test('buildFeature: crossing 992 keeps focus in the card (toggle → first CTA; a focused CTA reopens the panel)', () => {
+  const realMatchMedia = window.matchMedia;
+  const listeners = [];
+  const wide = { matches: false, addEventListener: (type, fn) => listeners.push(fn) };
+  window.matchMedia = (q) => (q === FEATURE_WIDE ? wide : { matches: false, addEventListener() {} });
+  try {
+    const card = buildFeature(readFeature(storiesBlock('/x.json')));
+    document.querySelector('main').replaceChildren(card);
+    const toggle = card.querySelector('.stories-feature-toggle');
+    const [first] = card.querySelectorAll('.stories-feature-cta');
+    toggle.focus();
+    wide.matches = true; // e.g. a tablet rotated to landscape: the toggle is about to be display:none
+    listeners.forEach((fn) => fn());
+    assert.equal(document.activeElement, first);
+    assert.equal(card.classList.contains('is-expanded'), false);
+    wide.matches = false; // back under 992 with focus on a CTA of a collapsed card
+    listeners.forEach((fn) => fn());
+    assert.equal(card.classList.contains('is-expanded'), true);
+    assert.equal(toggle.getAttribute('aria-expanded'), 'true');
+    assert.equal(document.activeElement, first);
+  } finally {
+    window.matchMedia = realMatchMedia;
+  }
 });
 
 test('buildFeature: the title is an h4 under an authored feed heading', () => {

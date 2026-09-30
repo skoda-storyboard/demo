@@ -46,6 +46,7 @@ function buildStrings(ph) {
     noResults: ph.listingNoResults || 'Nothing to show yet.',
     // "N shown" — announced on load-more for screen readers.
     resultsShown: ph.storiesResultsShown || 'stories shown',
+    newTab: ph.newTab || 'opens in a new tab',
   };
 }
 
@@ -139,10 +140,13 @@ export function readFeature(block) {
 /*
  * The card is the grid's first cell. Below 992px the title is a disclosure <button> (the source
  * `h2.toggle`) and the CTAs start collapsed; from 992px CSS shows the plain title instead and
- * the CTAs are always open, so no viewport logic runs in JS. The title is an h2 (source
- * parity) or, under an authored feed heading (h3), an h4 so the outline stays in order.
+ * the CTAs are always open, so layout needs no JS. JS only keeps focus when the width crosses
+ * 992 (a rotated tablet, a zoomed window) while focus is in the card. The title is an h2
+ * (source parity) or, under an authored feed heading (h3), an h4 so the outline stays in order.
  */
-export function buildFeature(feature, { titleLevel = 2 } = {}) {
+export const FEATURE_WIDE = '(width >= 992px)';
+
+export function buildFeature(feature, { titleLevel = 2, newTab = 'opens in a new tab' } = {}) {
   featureSeq += 1;
   const item = document.createElement('li');
   item.className = 'stories-feature';
@@ -159,10 +163,20 @@ export function buildFeature(feature, { titleLevel = 2 } = {}) {
     toggle.textContent = feature.title;
     toggle.setAttribute('aria-expanded', 'false');
     toggle.setAttribute('aria-controls', panel.id);
-    toggle.addEventListener('click', () => {
-      const open = toggle.getAttribute('aria-expanded') !== 'true';
+    const setOpen = (open) => {
       toggle.setAttribute('aria-expanded', String(open));
       item.classList.toggle('is-expanded', open);
+    };
+    toggle.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+    // the change fires before the new layout hides the focused control, so focus can move first
+    const wide = window.matchMedia?.(FEATURE_WIDE);
+    wide?.addEventListener?.('change', () => {
+      if (!item.contains(document.activeElement)) return;
+      if (wide.matches) {
+        if (document.activeElement === toggle) item.querySelector('.stories-feature-cta')?.focus();
+      } else if (toggle.getAttribute('aria-expanded') !== 'true') {
+        setOpen(true); // a CTA had focus: keep the panel it sits in open
+      }
     });
     const text = document.createElement('span');
     text.className = 'stories-feature-text';
@@ -197,6 +211,7 @@ export function buildFeature(feature, { titleLevel = 2 } = {}) {
       // "Configure your <Model>" goes to the Škoda configurator, in a new tab as on the source
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
+      a.setAttribute('aria-label', `${link.text} (${newTab})`); // as cards-social does
     }
     li.append(a);
     ctas.append(li);
@@ -223,17 +238,18 @@ export default async function decorate(block) {
   const feature = readFeature(block); // read before the config rows are cleared
   const STRINGS = buildStrings(await fetchPlaceholders());
   // the featured model card takes two story slots on the first page (source parity)
-  const initial = feature ? Math.max(1, cfg.initial - FEATURE_SLOTS) : cfg.initial;
+  const firstPage = feature ? Math.max(1, cfg.initial - FEATURE_SLOTS) : cfg.initial;
 
   // State restored from the deep-link URL. `initial` (5) is the baseline page
   // size the shared codec floors to; load-more grows `revealed` by `perpage` (6).
-  const restored = decodeState(window.location.search, NO_FACETS, initial);
+  const restored = decodeState(window.location.search, NO_FACETS, firstPage);
   const state = { sort: cfg.sort || restored.sort, revealed: restored.revealed };
 
   // Skeleton.
   block.textContent = '';
   block.classList.add(Number(cfg.columns) ? `stories-cols-${Number(cfg.columns)}` : 'stories-featured');
-  const featureCell = feature && buildFeature(feature, { titleLevel: cfg.heading ? 4 : 2 });
+  const featureCell = feature
+    && buildFeature(feature, { titleLevel: cfg.heading ? 4 : 2, newTab: STRINGS.newTab });
   if (featureCell) block.classList.add('has-feature');
 
   if (cfg.heading) {
@@ -281,10 +297,10 @@ export default async function decorate(block) {
   function updateUrl() {
     // Encode on top of the CURRENT search so unrelated params survive; only our
     // offset/sortby keys change (facetKeys empty → nothing else is touched).
-    // `initial` is the baseline: offset is omitted while revealed === initial.
+    // `firstPage` is the baseline: offset is omitted while revealed === firstPage.
     const qs = encodeState(
       { active: {}, sort: state.sort, revealed: state.revealed },
-      initial,
+      firstPage,
       window.location.search,
       NO_FACETS,
     );
@@ -326,7 +342,7 @@ export default async function decorate(block) {
 
   // Restore state on back/forward.
   window.addEventListener('popstate', () => {
-    const back = decodeState(window.location.search, NO_FACETS, initial);
+    const back = decodeState(window.location.search, NO_FACETS, firstPage);
     state.sort = cfg.sort || back.sort;
     state.revealed = back.revealed;
     renderGrid();

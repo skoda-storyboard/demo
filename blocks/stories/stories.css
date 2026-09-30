@@ -102,7 +102,6 @@
   padding: var(--feature-pad-start) var(--feature-pad-inline) var(--feature-pad-end);
   border-radius: var(--card-radius);
   color: var(--skoda-black);
-  list-style: none;
 }
 
 .stories .stories-feature-title {
@@ -124,6 +123,9 @@
   inline-size: 100%;
   margin: 0;
   padding: var(--feature-toggle-pad);
+
+  /* the source floats the icon, so the title centres in the room left of it, never under it */
+  padding-inline-end: calc(var(--feature-toggle-pad) + var(--feature-icon-size));
   border: 0;
   border-radius: 0;
   background: var(--skoda-green);
@@ -232,6 +234,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-inline-end: var(--feature-toggle-pad);
   }
 
   .stories .stories-feature-toggle::after {
@@ -368,7 +371,6 @@
     max-inline-size: 100%;
     block-size: auto;
     margin: 0 auto 0.25em;
-    pointer-events: none;
   }
 
   .stories .stories-feature-ctas li {
