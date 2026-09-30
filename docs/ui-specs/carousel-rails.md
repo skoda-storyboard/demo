@@ -254,8 +254,11 @@ Taxonomy `Carousel` (no date -> `.carousel-caption`, bold title below wide image
   filter by template=story + category, drop slugs already shown above (featured promo + `stories`
   grid), sort by `publisheddate` desc, slice; **defer** the `buildBlock('carousel', rows)` +
   `decorateBlock` + `loadBlock` behind an `IntersectionObserver` (`rootMargin:'600px 0px'`) so the
-  4+ rails don't all build on load; degrade silently on any failure. Reserve `min-height:190px` to
-  avoid CLS until built.
+  4+ rails don't all build on load; handle empty/error states by collapsing the rail.
+  Reserve fluid card geometry to avoid CLS until built, and keep the inserted carousel hidden
+  until its CSS and decoration finish loading; then release the
+  reserve and reveal the carousel in the same frame. This avoids both an unstyled intermediate
+  layout and a frame with the reserved pseudo-element stacked above the finished carousel.
 
 ## 8. Open decisions + recommended default
 

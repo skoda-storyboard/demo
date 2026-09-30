@@ -103581,6 +103581,64 @@
       },
       "publish_note": ""
     },
+    "b5e98464__260716_Production-milestone-Skoda-Auto-builds-its-one-millionth-Karoq-1_d5aa0f64_0857ce31.jpg": {
+      "logical_id": "b5e98464__260716_Production-milestone-Skoda-Auto-builds-its-one-millionth-Karoq-1_d5aa0f64_0857ce31.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/260716_Production-milestone-Skoda-Auto-builds-its-one-millionth-Karoq-1_d5aa0f64_0857ce31-1440x960.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/09/260716_Production-milestone-Skoda-Auto-builds-its-one-millionth-Karoq-1_d5aa0f64_0857ce31.jpg",
+      "dam_page_path": "en/media-room",
+      "page_refs": [
+        "en/media-room"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/09/260716_Production-milestone-Skoda-Auto-builds-its-one-millionth-Karoq-1_d5aa0f64_0857ce31-2560x1707.jpg",
+      "da_path": "",
+      "alt": "Newsletter for employees and residents living near the Škoda Auto Kvasiny plant 3/2026",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/09/260716_Production-milestone-Skoda-Auto-builds-its-one-millionth-Karoq-1_d5aa0f64_0857ce31-1440x960.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 1128467,
+      "preconditioned": true,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "b5e98464__prevodovka_0546ef47.jpg": {
+      "logical_id": "b5e98464__prevodovka_0546ef47.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/prevodovka_0546ef47-1440x960.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/09/prevodovka_0546ef47.jpg",
+      "dam_page_path": "en/media-room",
+      "page_refs": [
+        "en/media-room"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/09/prevodovka_0546ef47.jpg",
+      "da_path": "",
+      "alt": "Newsletter for employees and residents living near the Škoda Auto Vrchlabí plant 3/2026",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/09/prevodovka_0546ef47-1440x960.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 2716176,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
     "1ef83eb0__whatsapp_66fb5aee.png": {
       "logical_id": "1ef83eb0__whatsapp_66fb5aee.png",
       "source_url": "https://cdn.skoda-storyboard.com/2024/11/whatsapp_66fb5aee.png",
