@@ -355,6 +355,7 @@ export default async function decorate(block) {
     carousel.classList.add(...variants);
     if (cfg.dots) carousel.classList.add('dots');
     if (heading) carousel.setAttribute('aria-label', heading);
+    carousel.hidden = true;
     mount.append(carousel);
     // the media cart (SKODA-505) isn't bound yet: its "#" button must not jump to the top
     carousel.addEventListener('click', (e) => {
@@ -362,7 +363,8 @@ export default async function decorate(block) {
     });
     decorateBlock(carousel);
     await loadBlock(carousel);
-    mount.classList.add('is-built'); // release the reserved card geometry
+    mount.classList.add('is-built');
+    carousel.hidden = false;
     if (['image', 'video'].includes(cfg.template) && indexRows.length) wireMediaLightbox(carousel, indexRows);
   }
 
