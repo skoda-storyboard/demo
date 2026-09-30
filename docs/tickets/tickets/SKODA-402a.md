@@ -61,7 +61,8 @@ correction in `docs/ui-specs/faceted-listing.md`.
 ## Review fixes (2026-09-30, measured against live /en/news and /en/images at 1280 and 390)
 - **Panel above the sort row, as on live.** Live opens `form.search-filter` above `.sort-options`, 16px below where
   the sort row sits when closed and 24px above it. The branch had put the panel under the sort row. The DOM order is
-  now facets → chips → sort row, so the visual order and the focus order match. The toggle stays last in the sort
+  now facets → chips → sort row (since superseded: the chips moved inside the panel, see "QA round"), so the visual
+  order and the focus order match. The toggle stays last in the sort
   row: below 768 it is its own row under the sort options; from 768 CSS `order` moves it left.
 - **Count under the grid.** Live puts `.search-results-pagination` after the grid (16px below it) and 32px above Load
   more. It had been above the grid, pushing the results 53px down. It now follows the grid, Load more gets the
@@ -150,17 +151,20 @@ Measured on live `/en/images`, frame by frame:
 - **Code review (2026-09-30) fixes:**
   - **Closing no longer drops the open option list first,** so the list collapses with the panel instead of the
     content jumping ~90px. Since the QA round below, the list is not closed at all when the panel collapses.
-  - **A pick still settling is handled** by sort and chip removal (cancelled; their render includes it), Load more
-    (shown first, so paging counts its rows) and back/forward (dropped). None of these gets a late veil or collapse.
+  - **A pick still settling is handled** by sort (cancelled; its render includes the pick), Load more (shown first,
+    so paging counts its rows) and back/forward (dropped). None of these gets a late veil or collapse. A chip
+    removal restarts the flow at once instead (see "QA round (chip removal)"), so it gets one veil and one collapse.
   - **Both timers are tracked,** so a second pick under the veil restarts once: one veil, one collapse.
   - **Option rows are `min-block-size` 24px:** long or translated names wrap, and the box stays on the first line.
   - **Pill margins and label padding use logical properties** (RTL), and the box uses `--checkbox-border-color`.
   - **Deep-link values match index values case-insensitively** (`?filter[model][]=Peaq` ticks "peaq"; no duplicate
     chip).
   - **Tests:** 24 in `listing.test.mjs`.
-- **For product review (WCAG 3.2.2 On Input):** collapsing the panel after a checkbox change, and moving focus to
-  the toggle, is a change of context caused by input. It follows the "collapse like live" decision. Keyboard and
-  screen-reader users must reopen the panel and the pill for each further pick.
+- **For product review (WCAG 3.2.2 On Input):** collapsing the panel after a checkbox change or a chip removal,
+  and moving focus to the toggle, is a change of context caused by input. It follows the "collapse like live"
+  decision. Keyboard and screen-reader users must reopen the panel for each further pick; the open pill list is
+  kept, so they don't have to reopen the pill.
+
 ## QA round 2026-09-30 (two findings, both measured on live /en/images)
 - **Chips live inside the panel.** Live's `.search-filter-selected` is in `form.search-filter`, under the
   options, so the "Model: Peaq" chips hide when the panel collapses and show when it expands. Ours sat outside the
@@ -180,6 +184,77 @@ Measured on live `/en/images`, frame by frame:
   - chips inside the panel;
   - collapse + expand keeping the open list;
   - a selection → collapse → expand showing the list still open.
+
+## QA round 2026-09-30 (chip removal)
+- **Clicking a chip ("Model: Peaq") now veils, updates and collapses like live.** Before, it only re-rendered.
+  - Live: the veil fades in straight away (0.2s, no settle, because the chip is a link), the results reload, the
+    panel collapses, and the veil fades out.
+  - Ours runs the same flow as a pick, with `applyFilterChange(0)`:
+    - measured veil at once;
+    - chip removed at full veil;
+    - veil out and a smooth panel collapse (148px → 0);
+    - focus on the toggle.
+- **Focus fix:** focus is checked before the re-render, which removes the clicked chip; before, focus fell to
+  `<body>`.
+- **Test:** chip removal → immediate veil → update, collapse and focus (25 in `listing.test.mjs`).
+
+## Code review 2 (2026-09-30, before commit)
+- **Esc on the toggle** now closes the panel and keeps focus on the toggle. Before, with a list still open (it now
+  persists), Esc closed the list and moved focus forward to its pill.
+- **The panel reveal timing** (`--facet-reveal`) moved to `.listing`, so the sort row's margin transition reads
+  it instead of a copied 0.4s. Chip sizes are tokens (`--chip-pad-inline`, `--chip-gap`, `--chip-icon`,
+  `--chip-icon-gap`).
+- **Open pill:** its count badge is hidden while its list is open, and shows on the grey pill with selections, as
+  on live (open Model pill 101px wide = live). The chip's × has live's 14px icon box ("Model: Peaq" 128px vs live
+  131px). The badge change is CSS only, checked in the browser.
+- **Tests (28):** the test data gained a second facet (bodywork), so the "another pill" branches now run. New tests:
+  - chip removal while a pick is settling runs one flow;
+  - chip removal keeps the open list;
+  - Esc on the toggle.
+- **Mobile, 320 / 390 / 767, live vs ours** (touch, deep link with 2 filters):
+  - option columns match (x 18 / 211; 18 / 209 / 400 / 590);
+  - chips → sort row is 42px;
+  - the toggle is 35px under the sort row;
+  - there is no horizontal scroll;
+  - a tap on an option runs the settle, veil and collapse; a tap on a chip veils at once, then collapses;
+  - reopening keeps the list, and focus lands on the toggle.
+
+## QA round 2026-09-30 (sort + Load more)
+Measured on live /en/images:
+- **Newest / Oldest** is an AJAX link (not a navigation). The veil fades in at once (0.2s); about 1s later the
+  results swap and the active sort switches (it stays on the old one under the veil); an open panel collapses; the
+  veil fades out; the URL gets `sortby`.
+  - Ours: a sort click runs `applyFilterChange(0)`, the same flow as a chip removal. `aria-pressed` switches in
+    the update render (`syncSortButtons` in `rerender`), not on click, and a click on the active sort is inert.
+  - Measured, 1280 and 390 touch: veil at once → pressed state and first card switch at full veil (~0.28s) → panel
+    collapses → veil out; URL `?sortby=oldest`; focus stays on the sort button.
+- **Load more:** no veil. The button gets `.loading` and swaps its label for a 4-dot ellipsis loader (60×12, 12px
+  dots, 0.5s cycle) until the next 12 items append (~1s of server time).
+  - Ours: `.is-loading` + `aria-busy`, the label hidden (the button keeps 178×44, so nothing moves; live shrinks
+    to 166×42), and the same 4 dots at 6 / 6 / 24 / 42 in a 60px box.
+  - After `LOAD_MORE_MS` (500, one dot cycle) the page appends and focus moves to its first card.
+  - A second click while loading is ignored. A filter, sort or back/forward change cancels a pending Load more.
+- **Reduced motion:** no dot animation, and no Load more wait.
+- **Tests:** 30 in `listing.test.mjs` (sort flow and inert active sort, sort during a settle, Load more loader →
+  append → focus).
+
+## Code review 3 (2026-09-30, sort + Load more)
+- **Load more after a flush:** when it applies a pick still settling, focus follows to the re-rendered button, or
+  to the first card if the pick left nothing more to load. Before, focus fell to `<body>`.
+- **Loading state:** the label is hidden with `opacity: 0`, not `visibility`, so the button keeps its accessible
+  name ("Load more") while loading. A cancelled Load more stops its loader at once.
+- **The loader is decorative and direction-free:** it uses physical `left` / `translateX`, so it doesn't sit
+  off-centre or run backwards in RTL.
+- **Reduced motion:** `animation-name: none` on the dots. `--listing-loader-cycle` (0.5s) is cross-referenced
+  with `LOAD_MORE_MS`.
+- **Tests:** 33 in the file:
+  - Load more during a settle, with and without rows left (focus);
+  - a sort during a pending Load more (no old page, the loader stops);
+  - reduced motion (no veil or Load more wait).
+- **Kept for source parity:** the active sort is inert (plain text on live), while its button keeps
+  `aria-pressed="true"`.
+- **Out of scope, noted:** the SKODA-406 media-card menu centring (`inset-inline-start: 50%` + `translateX(-50%)` at
+  1080) has the same RTL drift.
 
 ## Dependencies
 SKODA-402 (listing), SKODA-608 (rows + published listings). Related: SKODA-406 (media card).

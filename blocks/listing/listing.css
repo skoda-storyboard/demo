@@ -12,6 +12,11 @@
   /* the source sort row height: sort links and the desktop "Advanced filter" toggle */
   --listing-sort-height: 35px;
 
+  /* the filter panel's reveal (source jQuery show(400): height, margins, opacity); the sort
+     row's margin moves with it, so both read the same timing */
+  --facet-reveal-time: 0.4s;
+  --facet-reveal: var(--facet-reveal-time) ease-in-out;
+
   position: relative; /* hosts the results-reload veil */
   width: min(100%, var(--content-max-width));
   margin-inline: auto;
@@ -64,8 +69,10 @@
   --facet-box: 18px;
   --facet-option-height: 24px;
   --facet-option-column: 160px;
-  --facet-reveal-time: 0.4s; /* source jQuery show(400): height, margins, opacity */
-  --facet-reveal: var(--facet-reveal-time) ease-in-out;
+  --chip-pad-inline: 14px;
+  --chip-gap: 7px;
+  --chip-icon: 14px;
+  --chip-icon-gap: 4px;
   --facet-focus-room: 4px; /* focus ring + pill shadow stay visible inside the clip */
 
   /* collapsed: no height, no margins, invisible (and so unfocusable) */
@@ -162,7 +169,12 @@
   display: none;
 }
 
-.listing .facet-pill.active .facet-count {
+/* while its list is open the pill is green and the badge steps back, as on live */
+.listing .facet-pill[aria-expanded="true"] .facet-count {
+  display: none;
+}
+
+.listing .facet-pill.active:not([aria-expanded="true"]) .facet-count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -282,12 +294,12 @@
 
 .listing .listing-chip {
   display: inline-flex;
-  gap: 0.4em;
+  gap: var(--chip-icon-gap);
   align-items: center;
   height: var(--facet-pill-height);
-  padding: 0 14px;
-  margin-block: 0 var(--facet-pill-gap-block);
-  margin-inline: 0 var(--facet-pill-gap-block);
+  padding: 0 var(--chip-pad-inline);
+  margin-block: 0 var(--chip-gap);
+  margin-inline: 0 var(--chip-gap);
   font-size: var(--body-font-size-s);
   font-weight: var(--weight-semibold);
   line-height: 1.5;
@@ -298,9 +310,12 @@
   cursor: pointer;
 }
 
+/* the remove glyph gets the source icon's 14px box (live chip "Model: Peaq" 131px wide) */
 .listing .listing-chip::before {
   content: "\00d7"; /* × */
+  inline-size: var(--chip-icon);
   font-size: 1.1em;
+  text-align: center;
   color: var(--facet-active);
 }
 
@@ -318,7 +333,7 @@
   justify-content: center;
   gap: 0 1em;
   margin-block: 1em 0;
-  transition: margin-block-start 0.4s ease-in-out; /* with the panel's reveal */
+  transition: margin-block-start var(--facet-reveal); /* with the panel's reveal */
 }
 
 /* under the open panel the sort row sits right after it (live .sort-options follows the form
@@ -650,6 +665,13 @@
 }
 
 .listing .listing-loadmore-btn {
+  --listing-loader-width: 60px;
+  --listing-loader-dot: 12px;
+  --listing-loader-step: 18px;
+  --listing-loader-inset: 6px; /* dots at 6 / 6 / 24 / 42 in the 60px box, like live */
+  --listing-loader-cycle: 0.5s; /* = LOAD_MORE_MS in listing.js */
+
+  position: relative;
   padding: 8px 48px;
   font-size: var(--body-font-size-m);
   font-weight: var(--weight-semibold);
@@ -663,6 +685,78 @@
 .listing .listing-loadmore-btn:focus-visible {
   outline: 2px solid var(--facet-active);
   outline-offset: 2px;
+}
+
+/* loading (source .ajax-loader-button.loading): the label steps back for a 4-dot ellipsis
+   loader (60x12, 12px dots, 0.5s); the button keeps its size so nothing below it moves */
+.listing .listing-loadmore-btn.is-loading {
+  pointer-events: none;
+}
+
+/* opacity, not visibility: the label stays the button's accessible name while it loads */
+.listing .listing-loadmore-btn.is-loading .listing-loadmore-label {
+  opacity: 0;
+}
+
+/* the loader is decorative and direction-free (it doesn't mirror in RTL), so it is placed
+   and animated with physical left / translateX */
+.listing .listing-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: none;
+  inline-size: var(--listing-loader-width);
+  block-size: var(--listing-loader-dot);
+  translate: -50% -50%;
+}
+
+.listing .listing-loadmore-btn.is-loading .listing-loader {
+  display: block;
+}
+
+.listing .listing-loader-dot {
+  position: absolute;
+  top: 0;
+  inline-size: var(--listing-loader-dot);
+  block-size: var(--listing-loader-dot);
+  border-radius: 50%;
+  background: currentcolor;
+  animation: var(--listing-loader-cycle) cubic-bezier(0, 1, 1, 0) infinite;
+}
+
+.listing .listing-loader-dot:nth-child(1) {
+  left: var(--listing-loader-inset);
+  animation-name: listing-dot-in;
+}
+
+.listing .listing-loader-dot:nth-child(2) {
+  left: var(--listing-loader-inset);
+  animation-name: listing-dot-move;
+}
+
+.listing .listing-loader-dot:nth-child(3) {
+  left: calc(var(--listing-loader-inset) + var(--listing-loader-step));
+  animation-name: listing-dot-move;
+}
+
+.listing .listing-loader-dot:nth-child(4) {
+  left: calc(var(--listing-loader-inset) + 2 * var(--listing-loader-step));
+  animation-name: listing-dot-out;
+}
+
+@keyframes listing-dot-in {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+
+@keyframes listing-dot-move {
+  from { transform: translateX(0); }
+  to { transform: translateX(var(--listing-loader-step)); }
+}
+
+@keyframes listing-dot-out {
+  from { transform: scale(1); }
+  to { transform: scale(0); }
 }
 
 /* ===== breakpoints: grid column-count transitions (+ the toggle's desktop placement at 768) =====
@@ -728,7 +822,6 @@
   }
 }
 
-
 /* reduced motion: the filter panel, option lists and reload veil change without animating */
 @media (prefers-reduced-motion: reduce) {
   .listing::before,
@@ -738,5 +831,9 @@
   .listing .facet-panel,
   .listing .listing-sort {
     transition: none;
+  }
+
+  .listing .listing-loader-dot:nth-child(n) {
+    animation-name: none;
   }
 }

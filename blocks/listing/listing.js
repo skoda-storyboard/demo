@@ -51,6 +51,10 @@ let instanceSeq = 0; // per-page counter → unique element ids when >1 listing 
 // (0.2s fade), shows the new results and collapses the filter panel (measured on /en/images).
 export const FILTER_SETTLE_MS = 900;
 export const VEIL_MS = 200;
+// Load more shows the source's 4-dot loader in its button for one dot cycle (live waits on
+// the server, ~1s; the index is already here) before the next items appear. Keep equal to
+// the dot cycle in listing.css (--listing-loader-cycle).
+export const LOAD_MORE_MS = 500;
 const reducedMotion = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 const titleCase = (s) => String(s).replace(/(^|[\s-])([a-z])/g, (m) => m.toUpperCase());
@@ -344,12 +348,13 @@ export default async function decorate(block) {
         chip.className = 'listing-chip';
         chip.textContent = `${labelFor(key, cfg.facetLabels)}: ${valueLabel(val)}`;
         chip.setAttribute('aria-label', `${STRINGS.removeFilter}: ${labelFor(key, cfg.facetLabels)} — ${valueLabel(val)}`);
+        // removing a filter veils, updates and collapses like a pick, but at once (live: the
+        // chip is a link, so there is no settle time)
         chip.addEventListener('click', () => {
-          cancelPendingFilter(); // this render includes any pick still settling
           state.active[key] = (state.active[key] || []).filter((v) => v !== val);
           if (!state.active[key].length) delete state.active[key];
           state.revealed = cfg.perpage;
-          rerender();
+          applyFilterChange(0);
         });
         chipsRow.append(chip);
       });
@@ -375,19 +380,53 @@ export default async function decorate(block) {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'listing-loadmore-btn';
-      btn.textContent = STRINGS.loadMore;
-      btn.addEventListener('click', () => {
-        flushPendingFilter(); // a pick still settling shows first, so paging counts its rows
-        const prev = grid.children.length;
-        state.revealed += cfg.perpage;
-        updateUrl(true); // load-more pushes a history entry (source offset paging)
-        renderGrid();
-        // move focus to the first newly-added cell (a11y)
-        const firstNew = grid.children[prev];
-        firstNew?.querySelector('a')?.focus();
-      });
+      const label = document.createElement('span');
+      label.className = 'listing-loadmore-label';
+      label.textContent = STRINGS.loadMore;
+      // the source ajax-loader-button's 4-dot loader, shown while the next items load
+      const loader = document.createElement('span');
+      loader.className = 'listing-loader';
+      loader.setAttribute('aria-hidden', 'true');
+      loader.append(...Array.from({ length: 4 }, () => {
+        const dot = document.createElement('span');
+        dot.className = 'listing-loader-dot';
+        return dot;
+      }));
+      btn.append(label, loader);
+      btn.addEventListener('click', loadMore);
       loadMoreWrap.append(btn);
     }
+  }
+
+  // Load more: the button shows its loader, then the next page appends and focus moves to its
+  // first card (a11y). A pick still settling shows first, so paging counts its rows.
+  let loadTimer = 0;
+  function loadMore() {
+    if (loadTimer) return;
+    const clicked = loadMoreWrap.querySelector('.listing-loadmore-btn');
+    const hadFocus = document.activeElement === clicked;
+    flushPendingFilter(); // may re-render the grid and so replace the button
+    const btn = loadMoreWrap.querySelector('.listing-loadmore-btn');
+    if (!btn) {
+      // the pick left nothing more to load: keep focus in the results, not on <body>
+      if (hadFocus) grid.querySelector('a')?.focus();
+      return;
+    }
+    if (hadFocus && btn !== clicked) btn.focus();
+    btn.classList.add('is-loading');
+    btn.setAttribute('aria-busy', 'true');
+    loadTimer = setTimeout(() => {
+      loadTimer = 0;
+      const prev = grid.children.length;
+      state.revealed += cfg.perpage;
+      updateUrl(true); // load-more pushes a history entry (source offset paging)
+      renderGrid();
+      grid.children[prev]?.querySelector('a')?.focus();
+    }, reducedMotion() ? 0 : LOAD_MORE_MS);
+  }
+
+  function syncSortButtons() {
+    sortList.querySelectorAll('.listing-sort-btn').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.sort === state.sort)));
   }
 
   function activeFilterCount() {
@@ -423,22 +462,28 @@ export default async function decorate(block) {
 
   function rerender() {
     updateUrl();
+    syncSortButtons();
     refreshPillStates();
     refreshFacetOptions();
     renderChips();
     renderGrid();
   }
 
-  // A checkbox change, as on the source: settle, veil the listing, show the new results and
+  // A filter change, as on the source: settle, veil the listing, show the new results and
   // collapse the panel (focus goes to the toggle if it was in the panel), then unveil.
-  // The checkbox itself ticks at once; a later change (even under the veil) restarts it.
+  // A checkbox ticks at once and settles (a later change, even under the veil, restarts it);
+  // a chip removal or a sort change passes settleMs 0 and veils at once.
   let settleTimer = 0;
   let veilTimer = 0;
   function cancelPendingFilter() {
     clearTimeout(settleTimer);
     clearTimeout(veilTimer);
+    clearTimeout(loadTimer); // a pending Load more would page the old results
     settleTimer = 0;
     veilTimer = 0;
+    loadTimer = 0;
+    loadMoreWrap.querySelector('.listing-loadmore-btn.is-loading')?.classList.remove('is-loading');
+    loadMoreWrap.querySelector('.listing-loadmore-btn[aria-busy]')?.removeAttribute('aria-busy');
     block.classList.remove('is-loading');
     block.removeAttribute('aria-busy');
   }
@@ -448,7 +493,7 @@ export default async function decorate(block) {
     cancelPendingFilter();
     rerender();
   }
-  function applyFilterChange() {
+  function applyFilterChange(settleMs = FILTER_SETTLE_MS) {
     cancelPendingFilter();
     settleTimer = setTimeout(() => {
       settleTimer = 0;
@@ -456,14 +501,15 @@ export default async function decorate(block) {
       block.setAttribute('aria-busy', 'true');
       veilTimer = setTimeout(() => {
         veilTimer = 0;
-        rerender();
+        // before the render: it removes a clicked chip, which would drop focus to <body>
         const hadFocus = facetBar.contains(document.activeElement);
+        rerender();
         setFacetsOpen(false);
         if (hadFocus) filterToggle.focus();
         block.classList.remove('is-loading');
         block.removeAttribute('aria-busy');
       }, reducedMotion() ? 0 : VEIL_MS);
-    }, FILTER_SETTLE_MS);
+    }, settleMs);
   }
 
   // Open or close one pill's option list (panels are looked up by pill, not by id).
@@ -474,7 +520,6 @@ export default async function decorate(block) {
   }
 
   // Close any open option list; returns its pill (or null) so Esc can hand focus back.
-
   function closeOptionPanels() {
     const openPill = facetPills.querySelector('.facet-pill[aria-expanded="true"]');
     facetPills.querySelectorAll('.facet-pill[aria-expanded="true"]').forEach((p) => setOptionsOpen(p, false));
@@ -561,22 +606,24 @@ export default async function decorate(block) {
     s.dataset.sort = val;
     s.textContent = lbl;
     s.setAttribute('aria-pressed', String(state.sort === val));
+    // a sort change veils, updates and collapses like a chip removal (live: veil at once; the
+    // active sort switches with the new results)
     s.addEventListener('click', () => {
-      cancelPendingFilter(); // this render includes any pick still settling
+      if (state.sort === val) return; // the source's active sort is plain text
       state.sort = val;
       state.revealed = cfg.perpage;
-      sortList.querySelectorAll('.listing-sort-btn').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.sort === val)));
-      rerender();
+      applyFilterChange(0);
     });
     sortList.append(s);
   });
   sortRow.append(sortList, filterToggle);
 
   // Facet disclosure (SKODA-402a): an inline panel opened by the toggle at every width. It
-  // is not a modal, so focus stays on the toggle. Esc, with focus on the toggle or in the
-  // panel, closes one layer at a time: an open option list first (focus back to its pill),
-  // then the panel (focus back to the toggle). Esc elsewhere in the block (a result card,
-  // Load more) and an Esc an inner control already handled (defaultPrevented) are left alone.
+  // is not a modal, so focus stays on the toggle. Esc on the toggle closes the panel (focus
+  // stays). Esc in the panel closes one layer at a time: an open option list first (focus back
+  // to its pill), then the panel (focus back to the toggle). Esc elsewhere in the block (a
+  // result card, Load more) and an Esc an inner control already handled (defaultPrevented) are
+  // left alone.
   // A filter selection collapses it once the results show, as on the source (applyFilterChange).
   // Collapsing keeps the open option list (as on live): it shrinks away inside the panel and
   // is still open when the panel is expanded again. Only Esc or its pill closes a list.
@@ -593,6 +640,11 @@ export default async function decorate(block) {
     if (e.key !== 'Escape' || e.defaultPrevented || !block.classList.contains('facets-open')) return;
     if (e.target !== filterToggle && !facetBar.contains(e.target)) return;
     e.preventDefault();
+    // on the toggle itself: close the panel and stay put (an open list persists for next time)
+    if (e.target === filterToggle) {
+      setFacetsOpen(false);
+      return;
+    }
     const openPill = closeOptionPanels();
     if (openPill) {
       openPill.focus();
@@ -613,7 +665,7 @@ export default async function decorate(block) {
     refreshFacetOptions();
     renderChips();
     renderGrid();
-    sortList.querySelectorAll('.listing-sort-btn').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.sort === state.sort)));
+    syncSortButtons();
   });
 
   // Initial paint (no pushState — respect the incoming URL). A deep link that already
