@@ -169,6 +169,10 @@ export function mediaToolbar(row) {
   return elems.length ? { elems } : null;
 }
 
+// Taxonomy rows (models, series) show no date: the carousel then renders the source's
+// caption card, the title under the image (carousel-rails.md §2, SKODA-611b).
+export const TAXONOMY_TEMPLATES = new Set(['skoda_model', 'skoda_series']);
+
 /*
  * Synthesize one carousel row (image cell + body cell) from an index row. The
  * body is returned as buildBlock's `{ elems }` form so the date <p> and title
@@ -183,7 +187,8 @@ export function rowToCells(row) {
   // body cell: date paragraph (→ overlay) + title heading (link), as flat elems
   const elems = [];
   const title = cleanTitle(row.title);
-  const iso = row.date || row.publisheddate || row.publishDate;
+  const iso = TAXONOMY_TEMPLATES.has(row.template) ? ''
+    : (row.date || row.publisheddate || row.publishDate);
   const dateText = formatCardDate(iso);
   if (dateText) {
     const p = document.createElement('p');
@@ -194,6 +199,8 @@ export function rowToCells(row) {
   const link = document.createElement('a');
   link.href = row.path || '#';
   link.textContent = title;
+  // a caption card shows its title on one line (ellipsis): keep the whole title on hover
+  if (TAXONOMY_TEMPLATES.has(row.template)) link.title = title;
   h.append(link);
   elems.push(h);
   const body = { elems };
@@ -326,23 +333,55 @@ export function pressBandIsFull(shown, more = false) {
 }
 
 /**
- * Appends the "All" end card after the last press card (source .item-all).
+ * Appends the "All" end card after the last card (source .item-all): the press band's, and
+ * a full post rail's on the Storyboard home (SKODA-611b).
  * @param {Element} carousel the built carousel block
- * @param {HTMLAnchorElement} link the band's "All" link
+ * @param {string} href the rail's "All" target
+ * @param {string} label the visible text ("All")
+ * @param {string} [name] the accessible name, when the label alone is ambiguous
  */
-function appendPressAllCard(carousel, link) {
+function appendAllCard(carousel, href, label, name = '') {
   const track = carousel.querySelector('.carousel-track');
   if (!track) return;
   const cell = document.createElement('li');
   cell.className = 'story-rail-all';
   const a = document.createElement('a');
   a.className = 'story-rail-all-link';
-  a.href = link.getAttribute('href');
-  a.textContent = link.textContent.trim();
+  a.href = href;
+  a.textContent = label;
+  if (name) a.setAttribute('aria-label', name);
   cell.append(a);
   track.append(cell);
   // the carousel recomputes its arrows on scroll: count the new end cell right away
   track.dispatchEvent(new Event('scroll'));
+}
+
+/**
+ * The landing-page rail layout, as a pure decision (exported for tests). The wide layout is
+ * the source's full 1248px rail with 90 / 45 / 30% cells: landing-page news rails have it
+ * (SKODA-827), and so does every index rail in a home `cover-box` band (SKODA-611b: the
+ * Storyboard home's bands and the Media Room's Models band), where the Models rail keeps
+ * the source's model ladder and models + series show caption cards. A full post rail in a
+ * home band ends with the source's "All" card; models and series, which show every item,
+ * have none. An explicit `Story Rail (press)` band keeps its own layout (SKODA-224).
+ * @returns {{ classes: string[], endCard: boolean }}
+ */
+export function railLayout({
+  press, curated, landing, homeBand, layout, template, viewAll,
+}) {
+  const classes = [];
+  const indexRail = !press && !curated;
+  if (indexRail && landing && (layout === 'news' || homeBand)) {
+    classes.push('story-rail-wide');
+    // the home band's own chrome (pill, end card, caption cards) keys on this, not on the section
+    if (homeBand) classes.push('story-rail-home');
+    if (template === 'skoda_model') classes.push('story-rail-models');
+    if (TAXONOMY_TEMPLATES.has(template)) classes.push('story-rail-caption');
+  }
+  // the end card is sized by the wide layout, so only a wide home-band rail has one
+  const endCard = classes.includes('story-rail-wide') && homeBand && !!viewAll
+    && !TAXONOMY_TEMPLATES.has(template);
+  return { classes, endCard };
 }
 
 export default async function decorate(block) {
@@ -351,11 +390,16 @@ export default async function decorate(block) {
   const press = block.classList.contains('press');
   const allLabel = viewAllLabel(block);
   const variants = [...block.classList].filter((c) => !OWN_CLASSES.has(c));
-  // the home news layout (SKODA-827); an explicit `Story Rail (press)` band keeps its own
-  // related-band layout (SKODA-224), the two set different widths and insets
-  if (!press && !curated && cfg.layout === 'news' && document.body.classList.contains('page')) {
-    block.classList.add('story-rail-news');
-  }
+  const { classes, endCard } = railLayout({
+    press,
+    curated,
+    landing: document.body.classList.contains('page'),
+    homeBand: !!block.closest('.section.cover-box'),
+    layout: cfg.layout,
+    template: cfg.template,
+    viewAll: cfg.viewAll,
+  });
+  block.classList.add(...classes);
 
   // --- header (heading + optional "view all") --------------------------------
   const heading = cfg.heading || getMetadata('story-rail-heading') || '';
@@ -372,6 +416,8 @@ export default async function decorate(block) {
     a.className = 'story-rail-viewall';
     a.href = cfg.viewAll;
     a.textContent = allLabel;
+    // "All" alone repeats on every rail: name it after its rail, as the end card is
+    if (heading) a.setAttribute('aria-label', `${allLabel}: ${heading}`);
     header.append(a);
   }
 
@@ -394,7 +440,7 @@ export default async function decorate(block) {
       try {
         const all = await loadQueryIndex(cfg.index);
         // one extra row tells a full press band apart from one that just fits
-        const matches = selectRows(all, press ? { ...cfg, limit: cfg.limit + 1 } : cfg);
+        const matches = selectRows(all, press || endCard ? { ...cfg, limit: cfg.limit + 1 } : cfg);
         more = matches.length > cfg.limit;
         indexRows = matches.slice(0, cfg.limit);
         rows = indexRows.map((r) => rowToCells(r));
@@ -422,7 +468,10 @@ export default async function decorate(block) {
     decorateBlock(carousel);
     await loadBlock(carousel);
     const allLink = press && pressBandIsFull(rows.length, more) ? pressAllLink(block) : null;
-    if (allLink) appendPressAllCard(carousel, allLink);
+    if (allLink) appendAllCard(carousel, allLink.getAttribute('href'), allLink.textContent.trim());
+    if (endCard && more) {
+      appendAllCard(carousel, cfg.viewAll, allLabel, heading ? `${allLabel}: ${heading}` : '');
+    }
     mount.classList.add('is-built');
     carousel.hidden = false;
     if (['image', 'video'].includes(cfg.template) && indexRows.length) wireMediaLightbox(carousel, indexRows);

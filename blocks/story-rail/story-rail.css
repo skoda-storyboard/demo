@@ -87,52 +87,77 @@ body.press-release .section.related.story-rail-container .story-rail {
   aspect-ratio: auto;
 }
 
-/* Press-release rails use the source's wider news cells; category and model
-   rails retain the standard carousel ladder. Bleed only this rail through the
-   generic section padding to the source's full-width (capped) home container.
-   The bleed is exactly that padding, the SKODA-826 page gutter (10px at every
-   width): a wider fixed gutter pushed the rail past the viewport (14px of
-   horizontal page overflow at 375/768, 30px at 992/1080). */
-.story-rail.story-rail-news {
-  --news-rail-gutter: var(--page-gutter);
-  --news-cell-width: calc(90cqw - var(--carousel-gap));
+/* The wide landing-page rail: the source's full-width (capped) rail with 90 / 45 / 30% cells,
+   for landing-page news rails (SKODA-827) and every index rail in a home `cover-box` band
+   (SKODA-611b: the Storyboard home, and the Media Room's Models band; the Models rails take
+   the source's model ladder, below). Bleed the rail
+   through the generic section padding to the source's 1248px home container. The bleed is
+   exactly that padding, the SKODA-826 page gutter (10px at every width): a wider fixed gutter
+   pushed the rail past the viewport (14px of horizontal page overflow at 375/768, 30px at
+   992/1080). The header keeps the section's content edge. */
+.story-rail.story-rail-wide {
+  --wide-rail-gutter: var(--page-gutter);
+  --wide-cell-width: calc(90cqw - var(--carousel-gap));
+  --wide-caption-title: 0px; /* taxonomy rails add their caption row to the reserve */
 
   position: relative;
   left: 50%;
-  width: min(calc(100% + 2 * var(--news-rail-gutter)), var(--content-max-width));
+  width: min(calc(100% + 2 * var(--wide-rail-gutter)), var(--content-max-width));
   transform: translateX(-50%);
   container-type: inline-size;
 }
 
-.story-rail.story-rail-news .story-rail-mount {
+.story-rail.story-rail-wide .story-rail-header {
+  padding-inline: var(--wide-rail-gutter);
+}
+
+.story-rail.story-rail-wide .story-rail-mount {
   aspect-ratio: auto;
 }
 
-.story-rail.story-rail-news .story-rail-mount:not(.is-built)::before {
+/* reserve one card until the rail builds: its 16:9 image plus, on a caption card, the title row */
+.story-rail.story-rail-wide .story-rail-mount:not(.is-built)::before {
   content: "";
+  box-sizing: content-box; /* the caption row is added below the 16:9 box, not inside it */
   display: block;
-  width: var(--news-cell-width);
+  width: var(--wide-cell-width);
   aspect-ratio: 16 / 9;
+  padding-block-end: var(--wide-caption-title);
 }
 
-.story-rail.story-rail-news .carousel-track {
+.story-rail.story-rail-wide .carousel-track {
   padding-inline: calc(var(--carousel-gap) / 2);
   scroll-padding-inline: calc(var(--carousel-gap) / 2);
 }
 
-.story-rail.story-rail-news .carousel-track .card-teaser {
-  flex-basis: var(--news-cell-width);
+.story-rail.story-rail-wide .carousel-track .card-teaser {
+  flex-basis: var(--wide-cell-width);
+}
+
+/* source .type-skoda_model rails: 90% → 45% (576) → 30% (768) → 22.5% (992) */
+@media (width >= 576px) {
+  .story-rail.story-rail-wide.story-rail-models {
+    --wide-cell-width: calc(45cqw - var(--carousel-gap));
+  }
 }
 
 @media (width >= 768px) {
-  .story-rail.story-rail-news {
-    --news-cell-width: calc(45cqw - var(--carousel-gap));
+  .story-rail.story-rail-wide {
+    --wide-cell-width: calc(45cqw - var(--carousel-gap));
+  }
+
+  .story-rail.story-rail-wide.story-rail-models {
+    --wide-cell-width: calc(30cqw - var(--carousel-gap));
   }
 }
 
 @media (width >= 992px) {
-  .story-rail.story-rail-news {
-    --news-cell-width: calc(30cqw - var(--carousel-gap));
+  .story-rail.story-rail-wide {
+    --wide-cell-width: calc(30cqw - var(--carousel-gap));
+  }
+
+  .story-rail.story-rail-wide.story-rail-models {
+    --wide-cell-width: calc(22.5cqw - var(--carousel-gap));
   }
 }
 
@@ -213,21 +238,30 @@ body.story .section.dark.story-rail-container .story-rail .carousel-track .card-
    8px right on hover (source keyframes: 0.6s ease-in-out, infinite). Margin 0: the global
    `li` bottom margin would make this the row's tallest item, and the stretched cards would
    show their white base under the images. */
-.story-rail.press .carousel-track .story-rail-all {
-  flex: 0 0 var(--carousel-cell-width);
+.story-rail .carousel-track .story-rail-all {
   aspect-ratio: 16 / 9;
   margin: 0;
   scroll-snap-align: start;
 }
 
-.story-rail.press .story-rail-all-link {
+/* each band sizes the cell like its cards: the press band's ladder here, the home band's
+   wide cells below */
+.story-rail.press .carousel-track .story-rail-all {
+  flex: 0 0 var(--carousel-cell-width);
+}
+
+/* the colour follows the band: white on the press release's dark band, ink on the
+   Storyboard home's white bands (SKODA-611b) */
+.story-rail .carousel-track .story-rail-all-link {
+  --story-rail-all-color: var(--skoda-white);
+
   box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
-  border: 1px solid var(--skoda-white);
-  color: var(--skoda-white);
+  border: 1px solid var(--story-rail-all-color);
+  color: var(--story-rail-all-color);
   font-size: var(--body-font-size-m);
   font-weight: var(--weight-semibold);
   line-height: 3;
@@ -237,7 +271,7 @@ body.story .section.dark.story-rail-container .story-rail .carousel-track .card-
 /* chevron: two borders of a rotated box, like the carousel arrows. It is centred in the
    source glyph's 16px cell (10px box + 3px each side), 16px after the text, so "All" +
    chevron centre in the card as on the source */
-.story-rail.press .story-rail-all-link::after {
+.story-rail .carousel-track .story-rail-all-link::after {
   content: "";
   width: 10px;
   height: 10px;
@@ -247,18 +281,18 @@ body.story .section.dark.story-rail-container .story-rail .carousel-track .card-
   transform: rotate(45deg);
 }
 
-.story-rail.press .story-rail-all-link:hover,
-.story-rail.press .story-rail-all-link:focus-visible {
-  color: var(--skoda-white);
+.story-rail .carousel-track .story-rail-all-link:hover,
+.story-rail .carousel-track .story-rail-all-link:focus-visible {
+  color: var(--story-rail-all-color);
   text-decoration: none;
 }
 
-.story-rail.press .story-rail-all-link:hover::after {
+.story-rail .carousel-track .story-rail-all-link:hover::after {
   animation: story-rail-all-nudge 0.6s ease-in-out infinite;
 }
 
-.story-rail.press .story-rail-all-link:focus-visible {
-  outline: 2px solid var(--skoda-white);
+.story-rail .carousel-track .story-rail-all-link:focus-visible {
+  outline: 2px solid var(--story-rail-all-color);
   outline-offset: -4px;
 }
 
@@ -274,9 +308,115 @@ body.story .section.dark.story-rail-container .story-rail .carousel-track .card-
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .story-rail.press .story-rail-all-link:hover::after {
+  .story-rail .carousel-track .story-rail-all-link:hover::after {
     animation: none;
   }
+}
+
+/* --- home cover-box bands (SKODA-611b; live /en and /en/media-room rails, measured 375–1440) --- */
+
+/* header: the heading and the "All" ghost pill (source a.btn-ghost-compact.search-results-header-
+   link, 90×36: 16/600, 8px 32px, 2px #464748, 50px radius), centred on one 36px row; the pill is
+   white in the dark Series band too */
+.story-rail.story-rail-home {
+  --rail-pill-border: 2px; /* source .btn-ghost-compact */
+  --rail-pill-letter-spacing: 1px;
+}
+
+.story-rail.story-rail-home .story-rail-header {
+  align-items: center;
+}
+
+.story-rail.story-rail-home .story-rail-viewall {
+  margin-inline-start: auto; /* right-aligned even when the rail has no heading */
+  padding: var(--spacing-xs) calc(2 * var(--spacing-m));
+  border: var(--rail-pill-border) solid var(--skoda-grey-750);
+  border-radius: var(--pill-radius);
+  background: var(--skoda-white);
+  color: var(--skoda-grey-750);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  letter-spacing: var(--rail-pill-letter-spacing);
+  text-decoration: none;
+}
+
+/* hover: the source's light grey fill (#f1f1f1), text and border unchanged */
+.story-rail.story-rail-home .story-rail-viewall:hover,
+.story-rail.story-rail-home .story-rail-viewall:focus-visible {
+  background: var(--skoda-grey-50);
+  text-decoration: none;
+}
+
+.story-rail.story-rail-home .story-rail-viewall:focus-visible {
+  outline: 2px solid var(--facet-active);
+  outline-offset: 2px;
+}
+
+/* the end card of a full post rail: a wide cell, ink on white */
+.story-rail.story-rail-home .carousel-track .story-rail-all {
+  flex: 0 0 var(--wide-cell-width); /* the whole shorthand: never shrink in the overflowing track */
+}
+
+.story-rail.story-rail-home .carousel-track .story-rail-all-link {
+  --story-rail-all-color: var(--skoda-ink);
+}
+
+/* …and white on a dark home band (the Media Room's Press Kits; source .cover-box.dark a.link-all) */
+.section.dark .story-rail.story-rail-home .carousel-track .story-rail-all-link {
+  --story-rail-all-color: var(--skoda-white);
+}
+
+/* caption cards (Models, Series): a 16:9 image with 8px corners, then the title centred on a
+   45px white row, 16/600 black (Series: the image and row share one rounded card) */
+.story-rail.story-rail-caption {
+  --wide-caption-title: var(--card-caption-row);
+}
+
+.story-rail.story-rail-home.story-rail-caption .carousel-caption {
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.story-rail.story-rail-home.story-rail-caption .carousel-caption .card-teaser-image {
+  overflow: hidden;
+  border-radius: var(--card-radius);
+}
+
+.story-rail.story-rail-home.story-rail-caption .carousel-caption .card-teaser-image img {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.story-rail.story-rail-home.story-rail-caption .carousel-caption .card-teaser-body {
+  padding: 0;
+  margin: 0;
+}
+
+.story-rail-home.story-rail-caption .carousel-caption .card-teaser-title {
+  overflow: hidden;
+  margin: 0;
+  background: var(--skoda-white);
+  color: var(--skoda-black);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: var(--wide-caption-title);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.story-rail.story-rail-home.story-rail-caption .carousel-caption .card-teaser-title a {
+  color: inherit;
+}
+
+.section.dark .story-rail.story-rail-home.story-rail-caption .carousel-caption .card-teaser-image {
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
+}
+
+.section.dark .story-rail-home.story-rail-caption .carousel-caption .card-teaser-title {
+  border-radius: 0 0 var(--card-radius) var(--card-radius);
 }
 
 body.story .section.dark.story-rail-container .story-rail .card-teaser-date {

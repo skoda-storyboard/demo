@@ -59,6 +59,7 @@
   --story-sidebar-inset: var(--story-inset);
   --story-sidebar-heading-size-compact: 20px;
   --story-sidebar-heading-line-height: 45px;
+  --card-caption-row: 45px; /* taxonomy caption card: the white title row under the image (source .entry-title) */
   --story-related-band-max-width: var(--cover-box-max-width); /* the same live .cover-box cap */
 
   /* body sizes (mobile-first base) */

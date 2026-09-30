@@ -134,6 +134,12 @@ var CustomImportScript = (() => {
       }
       cells.push(["template", template]);
     }
+    if (href) {
+      const link = document2.createElement("a");
+      link.setAttribute("href", href);
+      link.textContent = (allLink.textContent || "").trim() || "All";
+      cells.push(["viewall", link]);
+    }
     const [, railTemplate] = cells.find(([key]) => key === "template") || [];
     if (railTemplate === "image" || railTemplate === "video") cells.push(["index", "/en/media-feed.json"]);
     const table = WebImporter.DOMUtils.createTable(cells, document2);

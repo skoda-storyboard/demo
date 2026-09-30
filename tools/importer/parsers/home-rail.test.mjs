@@ -20,7 +20,7 @@ function createTable(rows, doc) {
     const tr = doc.createElement('tr');
     cells.forEach((c) => {
       const td = doc.createElement('td');
-      td.append(doc.createTextNode(c));
+      td.append(typeof c === 'string' ? doc.createTextNode(c) : c);
       tr.append(td);
     });
     table.append(tr);
@@ -42,13 +42,31 @@ function run(type, heading, href = '') {
 }
 
 test('Images and Videos rails read the media feed, where their rows are', { skip }, () => {
-  assert.deepEqual(run('attachment', 'Images', '/en/images/'), { heading: 'Images', template: 'image', index: '/en/media-feed.json' });
+  assert.deepEqual(run('attachment', 'Images', '/en/images/'), {
+    heading: 'Images', template: 'image', viewall: 'All', index: '/en/media-feed.json',
+  });
   assert.equal(run('attachment', 'Videos').index, '/en/media-feed.json');
   assert.equal(run('attachment', 'Videos').template, 'video');
 });
 
 test('page rails keep the default page index', { skip }, () => {
-  assert.deepEqual(run('press_release', 'News', '/en/news/'), { heading: 'News', template: 'press_release' });
+  assert.deepEqual(run('press_release', 'News', '/en/news/'), { heading: 'News', template: 'press_release', viewall: 'All' });
   assert.equal(run('press_kit', 'Press Kits').index, undefined);
   assert.equal(run('post', 'Latest Stories').template, 'story');
+});
+
+test('the source "All" header link is kept as a viewall link; rails without one get none', { skip }, () => {
+  const { document } = new JSDOM(`<div class="cover-box"><div class="search-results type-post">
+    <h3 class="search-results-heading">eMobility</h3>
+    <a class="btn-ghost-compact search-results-header-link" href="https://www.skoda-storyboard.com/en/category/emobility/">All</a>
+  </div></div>`).window;
+  homeRail(document.querySelector('.search-results'), { document });
+  const rows = [...document.querySelectorAll('tr')].slice(1).map((tr) => [...tr.children]);
+  const [, cell] = rows.find(([k]) => k.textContent === 'viewall');
+  const a = cell.querySelector('a');
+  assert.equal(a.getAttribute('href'), 'https://www.skoda-storyboard.com/en/category/emobility/');
+  assert.equal(a.textContent, 'All');
+  assert.equal(rows.find(([k]) => k.textContent === 'category')[1].textContent, 'emobility');
+  // the Models rail has no header link on the source, so no viewall row
+  assert.equal(run('skoda_model', 'Models').viewall, undefined);
 });

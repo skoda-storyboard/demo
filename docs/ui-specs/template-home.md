@@ -65,7 +65,8 @@ Values `getComputedStyle`, cited `(selector · viewport)`.
 
 **Layout**
 - Full-width stacked `.cover-box` sections; inner content caps at `1248px`. Rails follow
-  `carousel-rails.md` cell math (~4.4 / 3.3 / 1.1 cells at 1280/768/mobile).
+  `carousel-rails.md` cell math. Re-measured 2026-09-30 (SKODA-611b): the STO home rails are 30 / 45 / 90% cells
+  (~3.3 / 2.2 / 1.1 per view), and Models is 22.5 / 30 / 45 / 90%.
 - STO home section tops (1280): promo `y124`, then rails on a consistent step (~319px per rail row).
 
 **Spacing / vertical rhythm**
@@ -118,7 +119,8 @@ Values `getComputedStyle`, cited `(selector · viewport)`.
 
 - [ ] STO home renders the 9-section stack in order (promo-box → Latest Stories feed → Social media dark →
       Models/eMobility/Lifestyle/Škoda World rails → Series dark → Latest News); MR home the 4-section stack.
-- [ ] Sections are `.cover-box` / `.cover-box.dark` bands; dark bg `#0e3a2f`; padding `12px`; headings
+- [ ] Sections are `.cover-box` / `.cover-box.dark` bands; dark bg `#0e3a2f`; padding `12px` (EDS light bands carry it
+      plus the rail container's 24 / 16px margins, 36 / 28px, since the markup has no inner container, SKODA-611b); headings
       `26px/32.5/600`.
 - [ ] Promo-box leads both homes with the per-breakpoint behavior (rotating mosaic ≥768 / carousel <768).
 - [ ] First feed uses an accessible Load more button; rails reflow per `carousel-rails.md`.

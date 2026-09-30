@@ -1,12 +1,14 @@
 # SKODA-611b, Storyboard home: band spacing (Should slice of SKODA-611)
 - **Epic:** E06, Import Pilot Content
 - **Parent:** [SKODA-611](SKODA-611.md) (home composition, [#147](https://github.com/skoda-storyboard/demo/issues/147))
-- **Type:** section styling (CSS)
+- **Type:** section styling (CSS) + home rails (block + import)
 - **Phase:** A · **Milestone:** M1 · **Tier:** Should (§11.2 cut line; builds on 611a)
 - **GitHub issue:** [#153](https://github.com/skoda-storyboard/demo/issues/153)
 - **Estimate:** 1.5 SP · AI-assisted 0.5d / manual 1–1.5d *(planning estimate, not a quote)*
-- **Status (2026-09-30):** 🟡 In progress. Built on branch `skoda-611b-home-spacing` (local, not yet committed or
-  pushed).
+- **Status (2026-09-30):** 🟡 In progress, branch `skoda-611b-home-spacing`.
+  - The band spacing is pushed (2437b94).
+  - The home rails round is local and not yet committed.
+  - The re-imported `/en` (with the rails' "All" links) is not yet pushed to DA; that waits on approval.
 
 ## Origin
 Split from SKODA-611 (sweep-reconciliation decision D2, [`SKODA-M1-URL-BLOCK-SWEEP.md`](../../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §11).
@@ -20,18 +22,16 @@ Split from SKODA-611 (sweep-reconciliation decision D2, [`SKODA-M1-URL-BLOCK-SWE
   `docs/guardrails/css-guidelines.md` (fluid first; no new breakpoint without a layout reason).
 
 ## Scope decision (2026-09-30)
-Band spacing only. Measured on 2026-09-30, the 320px pitch at 1440 also needs the source's larger rail cards and
-its "All" links. That is rail work and is not in this ticket (see "Out of scope, found" below). The pitch parts of
-the ACs below are met where the cards already match (below 768).
+First pass: band spacing only. Measured on 2026-09-30, the 320px pitch at 1440 also needs the source's larger rail
+cards and its "All" links. **Decision (2026-09-30): fix those here too**, in the same branch; no separate ticket.
 
 ## Acceptance Criteria
-- [ ] 1440: 67px heading-to-previous-track gap as on the source; 320px rail pitch (±4px). *(Re-measured, the
-      source gap is 66px (rail end → heading); ours is 64. The 2px left is the heading centred in live's 36px
-      "All" header (rail work, out of scope). The pitch is 272 until the rail cards match the source: 12 + 24 +
-      33 + 20 + 155 + 16 + 12.)*
-- [ ] 768 / 375: band spacing follows the source within the sweep thresholds (±2px or ±2%). *(Spacing yes, at
-      every width. The 375 pitch is 296–297 against 298–299; at 768 the pitch waits on the rail card size.)*
-- [ ] `npm run lint:css` passes; story pages (which share the section styles) are unchanged.
+- [x] 1440: 67px heading-to-previous-track gap as on the source; 320px rail pitch (±4px). *(Re-measured, the
+      source gap is 66px, rail end → heading. With the rails round the pitch is 310 / 319 / 320 against the
+      source's 310 / 320 / 319.)*
+- [x] 768 / 375: band spacing follows the source within the sweep thresholds (±2px or ±2%). *(Every band heading is
+      within 1–2px of the source at 375 / 768 / 992.)*
+- [x] `npm run lint:css` passes; story pages (which share the section styles) are unchanged.
 - [ ] Preview link on the PR: `{branch}--demo--skoda-storyboard.aem.page/en`.
 
 ## Implementation (2026-09-30, branch `skoda-611b-home-spacing`)
@@ -69,9 +69,8 @@ the ACs below are met where the cards already match (below 768).
   - The promo gap is set once, in `promo-box.css`, instead of a second section rule and token.
   - Doc numbers and wording fixed.
 
-## Out of scope, found (2026-09-30, for the backlog owner; no ticket opened)
-Measured on the live `/en/` light category rails (Models, eMobility, Lifestyle, Škoda World) at 375 / 768 / 992 /
-1440:
+## Home rails round (2026-09-30, decision "fix it in 611b")
+Found while matching the pitch, measured on the live `/en/` rails at 375 / 768 / 992 / 1440:
 - **Card ladder:** the source uses 90% / 45% / 30% cells.
   - Its cards are 318×179 / 326×183 / 278×156 / 354×199.
   - Ours use the generic 90% / 30% / 22.5% ladder (`carousel-rails.md`), so the cards are 320×180 / 224×126 /
@@ -84,6 +83,64 @@ Measured on the live `/en/` light category rails (Models, eMobility, Lifestyle, 
   builds one only for the `press` variant (`appendPressAllCard`, SKODA-224).
 - **Effect:** with the band spacing matched, a light band is still 48px shorter than the source at 1440, 36 at 992
   and 60 at 768.
+- **Caption cards:** the source's Models and Series rails (and the Media Room's Models band) are taxonomy cards.
+  - Each is a 16:9 image with 8px corners, then the title centred on a 45px white row, 16/600 black. On a dark
+    band the two share one rounded card.
+  - They have no date. EDS rendered them as overlay cards because their index rows carry a date.
+- **Which rails get what, on the source:**
+  - The post rails (eMobility, Lifestyle, Škoda World, Latest News) show 10 cards plus the "All" end card.
+  - Models and Series show every item and have no end card. Series has the header pill, Models has neither.
+
+**Built (branch `skoda-611b-home-spacing`):**
+- `blocks/story-rail/story-rail.js`:
+  - `railLayout()` (pure, tested) gives every index rail in a home `cover-box` band the wide layout (`story-rail-wide`,
+    the former `story-rail-news`: the 1248px bleed track, cells in container units).
+  - Models (`story-rail-models`) keeps the source's model ladder: 90 → 45 (576) → 30 (768) → 22.5% (992).
+  - Models and series (`story-rail-caption`) render caption cards: `rowToCells` drops the date for
+    `skoda_model` / `skoda_series` rows.
+  - A post rail with a `viewall` link gets the "All" end card when more stories match than it shows. This
+    generalises the press band's `appendAllCard`, and its accessible name is "All: <heading>".
+- `blocks/story-rail/story-rail.css`:
+  - The wide ladder, with the model ladder on top.
+  - The caption cards, and a reserve that adds the 45px caption row.
+  - The ghost "All" pill (90×36; hover fills `#f1f1f1`, as on the source).
+  - The end card: shared geometry, with its colour and cell width set per band (white on the press band, ink on
+    the home's white bands).
+- `tools/importer/parsers/home-rail.js`: keeps the source's "All" header link as a `viewall` row (tested). Both
+  home bundles are re-bundled.
+- `tools/importer/push/block-contracts.json`: `stories` allows `offset` / `exclude`, which the block has read since
+  SKODA-214. Without them the /en contract check held the page from publishing.
+- **Content:** the re-imported `/en` adds a `viewall` row to eMobility, Lifestyle, Škoda World, Series and Latest
+  News. `import:validate-blocks` passes. **Not yet pushed to DA.**
+  - The Series and Latest News links stay absolute (`https://www.skoda-storyboard.com/en/series-2/`, `/en/news/`):
+    those pages exist on EDS but aren't in the SKODA-605 allow-list (link policy, SKODA-609 / #228).
+
+**Measured, ours vs live** (the `viewall` rows injected into the published `/en` for the test):
+- Cards are equal at 1440 / 992 / 768 / 600 / 375:
+  - Models: 261×192 / 203×159 / 210×163 / 250×186 / 318×224.
+  - Post rails: 354×199 / 278×156 / 326×183 / 520×293 / 318×179.
+  - Series: 354×244 / 278×201 / 326×228 / 520×338 / 318×224.
+- Pill 90×36, header 36px. The end card is card-sized.
+- The loading reserve equals the built height on every rail, and there is no horizontal overflow.
+- Band headings sit within 1–2px of the source at 375 / 768 / 992. At 1440 the pitch matches; the page sits 10px
+  higher until SKODA-222 (#231) widens the Latest Stories cards.
+- Lifestyle has no end card: only 9 of its stories are migrated, so the rail isn't full.
+- Unchanged against `main`: the Zellmer press band (end card included), the Octavia model page and the Epiq story.
+- **Media Room home, compact dark band:**
+  - The Models band now equals the source at 1440 / 768 / 375: card 261×192 / 210×163 / 318×224 and band height
+    652 / 607 / 663.
+  - Its Press Kits rail (the same band) now equals the source too: 354×199 / 278×156 / 326×183 / 318×179 at 1440 /
+    992 / 768 / 375. Before this, it was 276×155 / 219×123 / 224×126 / 320×180.
+  - Its News heading is now at the source's x106 / x10. Before, the wide rail's header sat 10px left, x96 / x0.
+  - **On the next Media Room re-import**, the rebundled home-mr importer also emits `viewall` for its rails with a source
+    "All" link. Press Kits then gets the pill and end card, as on the source. The light-band rails (News, Images,
+    Videos, Latest Stories) get the plain `.story-rail-viewall` link, since the pill is scoped to cover-box bands.
+    That is not measured yet.
+- **Code review (rails round):** the end card needs the wide layout. The pill is named "All: <heading>", like the
+  end card. A caption title keeps the full text as a tooltip. The 45px caption row is one token,
+  `--card-caption-row`, shared with the model page's derivatives rail. Tests were added for Press Kits and the
+  wide-cell scope.
+- **Known, not changed:** the source's Series rail shows all 24 series; ours shows 10 of the 15 indexed.
 
 ## Dependencies
 SKODA-611a (section structure), SKODA-218 (dark sections).
