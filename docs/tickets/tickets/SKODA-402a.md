@@ -256,5 +256,26 @@ Measured on live /en/images:
 - **Out of scope, noted:** the SKODA-406 media-card menu centring (`inset-inline-start: 50%` + `translateX(-50%)` at
   1080) has the same RTL drift.
 
+## PR #227 review (2026-09-30, larsauffarth: keyboard navigation)
+- **Finding:** opening "Advanced filter" left focus on the toggle, but the panel comes before the toggle in the DOM
+  (it opens above the sort row). So Tab from the toggle skipped every pill and checkbox and went to the first
+  result card.
+- **Fix:**
+  - Opening the panel from the toggle moves focus to its first stop: the open list's pill, or else the first pill.
+  - Opening a pill's list moves focus to its first option, because the lists follow the whole pill row in the DOM.
+  - Closing is unchanged: Esc returns focus one layer at a time (option → pill → toggle), a pick that collapses
+    the panel returns focus to the toggle, and closing from the toggle keeps focus there.
+  - A filtered deep link still opens the panel on load without moving focus.
+  - Live has no keyboard path to copy: its toggle is a plain `li`.
+- **Verified (1280 + 390, real key presses):**
+  - toggle Enter → Model pill → Tab through the 6 pills → Newest / Oldest → toggle → results;
+  - Model Enter → first checkbox (Epiq) → Tab → Karoq → Space → settle + veil → the panel collapses, and focus is
+    on "Advanced filter (1)";
+  - Esc, Esc → pill → toggle.
+  - Rings: pills and the toggle 2px; checkboxes drawn on the box. Opening with a mouse or a tap moves focus with no
+    visible ring (`:focus-visible` false) and no scroll.
+- **Tests:** 4 new keyboard tests in `listing.test.mjs` (37 in the file): focus into the panel and back, focus
+  into a pill's list and back, the persisted list's pill on reopen, and no focus move on a deep-link load.
+
 ## Dependencies
 SKODA-402 (listing), SKODA-608 (rows + published listings). Related: SKODA-406 (media card).

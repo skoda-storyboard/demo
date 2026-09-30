@@ -587,6 +587,9 @@ export default async function decorate(block) {
       const open = pill.getAttribute('aria-expanded') === 'true';
       closeOptionPanels();
       setOptionsOpen(pill, !open);
+      // the lists sit after the whole pill row, so Tab from this pill would reach the next
+      // pill first: opening hands focus to its first option (Esc returns it to the pill)
+      if (!open) panel.querySelector('input')?.focus();
     });
 
     panelFor.set(pill, panel);
@@ -619,11 +622,13 @@ export default async function decorate(block) {
   sortRow.append(sortList, filterToggle);
 
   // Facet disclosure (SKODA-402a): an inline panel opened by the toggle at every width. It
-  // is not a modal, so focus stays on the toggle. Esc on the toggle closes the panel (focus
-  // stays). Esc in the panel closes one layer at a time: an open option list first (focus back
-  // to its pill), then the panel (focus back to the toggle). Esc elsewhere in the block (a
-  // result card, Load more) and an Esc an inner control already handled (defaultPrevented) are
-  // left alone.
+  // is not a modal. The panel comes before the toggle in the DOM (it opens above the sort row),
+  // so Tab from the toggle would skip it: opening hands focus to the panel's first stop, the
+  // open list's pill or else the first pill (PR #227 review). Closing it from the toggle keeps
+  // focus there. Esc on the toggle closes the panel (focus stays). Esc in the panel closes one
+  // layer at a time: an open option list first (focus back to its pill), then the panel (focus
+  // back to the toggle). Esc elsewhere in the block (a result card, Load more) and an Esc an
+  // inner control already handled (defaultPrevented) are left alone.
   // A filter selection collapses it once the results show, as on the source (applyFilterChange).
   // Collapsing keeps the open option list (as on live): it shrinks away inside the panel and
   // is still open when the panel is expanded again. Only Esc or its pill closes a list.
@@ -633,7 +638,12 @@ export default async function decorate(block) {
   };
 
   filterToggle.addEventListener('click', () => {
-    setFacetsOpen(filterToggle.getAttribute('aria-expanded') !== 'true');
+    const open = filterToggle.getAttribute('aria-expanded') !== 'true';
+    setFacetsOpen(open);
+    if (open) {
+      (facetPills.querySelector('.facet-pill[aria-expanded="true"]')
+        || facetPills.querySelector('.facet-pill'))?.focus();
+    }
   });
   block.addEventListener('keydown', (e) => {
     // an inner control that already handled Esc (e.g. a media card's size menu) wins

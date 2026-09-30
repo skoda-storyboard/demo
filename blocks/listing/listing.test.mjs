@@ -395,6 +395,65 @@ test('402a: Esc on the toggle closes the panel and keeps focus there, even with 
   assert.equal(block.querySelector('.facet-pill[aria-expanded="true"]')?.dataset.facet, 'model', 'the list persists');
 });
 
+test('402a: opening the panel moves focus into it (first pill), closing from the toggle keeps it there', async () => {
+  // the panel precedes the toggle in the DOM, so Tab from the toggle would skip every filter (PR #227)
+  const { block, toggle } = await facetListing('/en/focus-open-index.json');
+  toggle.focus();
+  click(toggle);
+  assert.equal(block.classList.contains('facets-open'), true);
+  const first = block.querySelector('.facet-pill');
+  assert.equal(document.activeElement, first, 'the first filter is the focused stop');
+  // Esc from there closes the panel and returns focus to the toggle
+  key(first, 'Escape');
+  assert.equal(block.classList.contains('facets-open'), false);
+  assert.equal(document.activeElement, toggle);
+  // closing from the toggle itself keeps focus on the toggle
+  click(toggle);
+  toggle.focus();
+  click(toggle);
+  assert.equal(block.classList.contains('facets-open'), false);
+  assert.equal(document.activeElement, toggle);
+});
+
+test('402a: opening a pill\'s list moves focus to its first option; Esc hands it back to the pill', async () => {
+  // the lists follow the whole pill row in the DOM, so Tab from the pill would reach the next pill first
+  const { block, toggle } = await facetListing('/en/focus-pill-index.json');
+  click(toggle);
+  const pill = block.querySelector('.facet-pill[data-facet="model"]');
+  click(pill);
+  const firstOption = block.querySelector('.facet-panel[data-facet="model"] input');
+  assert.equal(document.activeElement, firstOption);
+  key(firstOption, 'Escape');
+  assert.equal(pill.getAttribute('aria-expanded'), 'false');
+  assert.equal(document.activeElement, pill);
+  // closing the list from its pill keeps focus on the pill
+  click(pill);
+  pill.focus();
+  click(pill);
+  assert.equal(document.activeElement, pill);
+});
+
+test('402a: reopening with an option list still open focuses that list\'s pill', async () => {
+  const { block, toggle } = await facetListing('/en/focus-reopen-index.json', '', [
+    storyRow(1, 'Peaq'), storyRow(2, 'Epiq'), storyRow(3, 'Elroq'),
+  ]);
+  click(toggle);
+  const pills = [...block.querySelectorAll('.facet-pill')];
+  assert.ok(pills.length > 1, 'two facets, so "the open one" differs from "the first"');
+  click(pills[1]);
+  toggle.focus();
+  click(toggle); // collapse: the list persists
+  click(toggle); // reopen
+  assert.equal(document.activeElement, pills[1]);
+});
+
+test('402a: a filtered deep link opens the panel without moving focus on load', async () => {
+  document.activeElement?.blur();
+  const { block } = await facetListing('/en/focus-deeplink-index.json', '?filter[model][]=Peaq');
+  assert.equal(block.classList.contains('facets-open'), true);
+  assert.equal(document.activeElement, document.body, 'the page load does not steal focus');
+});
+
 test('402a: Load more shows the loader, then appends the next page and focuses its first card', async (t) => {
   const { block } = await facetListing('/en/more-index.json');
   t.mock.timers.enable({ apis: ['setTimeout'] });
