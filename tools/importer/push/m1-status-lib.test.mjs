@@ -146,6 +146,7 @@ test('statusSheet: plain-language rows, redirects and held pages explained', () 
     titles: { '/en': 'Škoda Storyboard', '/en/press-kits/kit-2': 'Kit 2 – Press Kit', '/en/x': 'X story' },
     redirects: { '/en/press-kits/old-kit/': '/en/press-kits/kit-2' },
     publicNotes: { '/en/press-kits/kit-2/images': 'Not published: 230 images, over the 200 limit.' },
+    demo: new Set(['/en', '/en/press-kits/old-kit', '/en/x/alias', '/en/series/road-trip']),
     checked: '2026-09-30 13:21 UTC',
   });
   assert.deepEqual(sheet.map((r) => [r.Title, r.Status]), [
@@ -160,7 +161,7 @@ test('statusSheet: plain-language rows, redirects and held pages explained', () 
   assert.equal(sheet[2].Note, 'Redirects to /en/press-kits/kit-2');
   assert.equal(sheet[3].Note, 'Redirects to /en/x');
   assert.deepEqual(sheet.map((r) => r.Kind), ['page', 'page', 'page', 'alias', 'page']);
-  assert.deepEqual(sheet.map((r) => r.Demo), ['yes', 'yes', '', 'yes', 'yes'], 'set and set+corpus pages are demo pages');
+  assert.deepEqual(sheet.map((r) => r.Demo), ['yes', '', 'yes', '', 'yes'], 'demo pages only, never an alias');
   assert.ok(sheet.every((r) => r.Checked === '2026-09-30 13:21 UTC'));
 });
 

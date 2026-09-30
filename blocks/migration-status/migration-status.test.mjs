@@ -138,7 +138,7 @@ test('demo pages carry a star, a legend line, per-type counts, and "demo" finds 
   render(el, rows);
   assert.equal(
     el.querySelector('.migration-status-demo').textContent,
-    '⭐ 2 of 3 demo pages are live. The star marks the pages asked for in the demo; the others feed its rails and listings.',
+    '⭐ 2 of 3 demo pages are live. The star marks the pages asked for in the demo; the others are press-kit chapters and the pages that feed its rails and listings.',
   );
   const stars = [...el.querySelectorAll('tbody th .migration-status-star')];
   assert.equal(stars.length, 4, 'one star per demo row (the alias too)');

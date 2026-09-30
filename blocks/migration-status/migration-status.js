@@ -13,7 +13,7 @@
  * Renders, answer first: a headline ("185 of 186 pages live"), one card per page type, the
  * exceptions in plain words, a page finder, then every page grouped by type in <details>. The
  * counts are derived from the rows, so the summary can't disagree with the list. Pages asked
- * for in the demo (Demo = yes: the M1 URL set, not only the rail corpus) carry a ⭐.
+ * for in the demo (Demo = yes: the pages the demo walks through) carry a ⭐.
  */
 
 import { readBlockConfig } from '../../scripts/aem.js';
@@ -28,7 +28,7 @@ const STATUS_LABELS = {
 
 // A redirect row is a reachable old address: it counts as live, as in the tracker.
 const isLive = (row) => row.Status === 'live' || row.Status === 'redirect';
-// Pages explicitly asked for in the demo (the M1 URL set) carry a star.
+// Pages the demo walks through carry a star.
 const isDemo = (row) => row.Demo === 'yes';
 
 function el(tag, props = {}, ...children) {
@@ -210,7 +210,7 @@ export function render(block, rows) {
       'p',
       { className: 'migration-status-demo' },
       star(),
-      ` ${total.demoLive} of ${total.demo} demo pages are live. The star marks the pages asked for in the demo; the others feed its rails and listings.`,
+      ` ${total.demoLive} of ${total.demo} demo pages are live. The star marks the pages asked for in the demo; the others are press-kit chapters and the pages that feed its rails and listings.`,
     ) : null,
     el('ul', { className: 'migration-status-legend', 'aria-label': 'Pages by status' }, ...counts.map(([s, n]) => el('li', {}, badge(s), ` ${n}`))),
   );

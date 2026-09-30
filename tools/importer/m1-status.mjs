@@ -18,7 +18,8 @@
  *   npm run import:status -- --offline    # local facts only (preview/live/index = ?)
  *   … [--content-dir content] [--ref main] [--out <file>]
  *   … --sheet <file>   also write the human-readable status rows as a DA sheet (JSON) for
- *                      the /drafts/migration-status page (block `migration-status`)
+ *                      the /drafts/migration-status page (block `migration-status`); the pages
+ *                      in skoda-m1-demo-pages.txt are starred
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -144,6 +145,7 @@ async function main() {
       redirects: a.offline ? {} : await liveRedirects(a),
       publicNotes: Object.fromEntries(Object.entries(overrides.pages || {})
         .filter(([, o]) => o.publicNote).map(([p, o]) => [p, o.publicNote])),
+      demo: new Set(parseSectionedList(read('skoda-m1-demo-pages.txt')).map((r) => r.path)),
       checked: generated,
     });
     writeFileSync(a.sheet, `${JSON.stringify({
