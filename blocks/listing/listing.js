@@ -248,8 +248,8 @@ export default async function decorate(block) {
   loadMoreWrap.className = 'listing-loadmore';
 
   // "Advanced filter (N)" toggle (SKODA-402a): as on the source, the facets are collapsed
-  // behind it at every width. It sits in the sort row, and the facet panel follows the sort
-  // row, so the button comes before the region it reveals (disclosure order).
+  // behind it at every width. It sits in the sort row; the panel it reveals opens ABOVE the
+  // sort row (live), and the DOM follows that visual order.
   const filterToggle = document.createElement('button');
   filterToggle.type = 'button';
   filterToggle.className = 'listing-filter-toggle';
@@ -257,7 +257,9 @@ export default async function decorate(block) {
   filterToggle.setAttribute('aria-controls', `${uid}-facets`);
   facetBar.id = `${uid}-facets`;
 
-  block.append(sortRow, facetBar, chipsRow, countEl, status, grid, loadMoreWrap);
+  // Source order: facet panel, chips, sort row, grid, then the "N / total" count right above
+  // Load more (measured on /en/news, /en/images).
+  block.append(facetBar, chipsRow, sortRow, status, grid, countEl, loadMoreWrap);
 
   // Load the index (self-contained; degrades to empty/error state).
   let scoped = [];
@@ -469,7 +471,8 @@ export default async function decorate(block) {
   });
 
   // --- sort row: sort options + "Advanced filter (n)" toggle -------------
-  // The toggle comes last so Tab runs toggle → facet panel; CSS moves it to the left from 768.
+  // The toggle comes last: below 768 it is its own row under the sort options; from 768 CSS
+  // moves it to the left of them.
   const sortList = document.createElement('div');
   sortList.className = 'listing-sort-options';
   [['newest', STRINGS.newest], ['oldest', STRINGS.oldest]].forEach(([val, lbl]) => {
@@ -490,11 +493,11 @@ export default async function decorate(block) {
   sortRow.append(sortList, filterToggle);
 
   // Facet disclosure (SKODA-402a): an inline panel opened by the toggle at every width. It
-  // is not a modal, so focus stays on the toggle and Tab flows on into the panel (it follows
-  // the sort row). Esc closes one layer at a time: an open option list first (focus back to
-  // its pill), then the panel (focus back to the toggle); an Esc an inner control already
-  // handled (defaultPrevented) is left alone. It stays open while the visitor filters
-  // (rerender never closes it).
+  // is not a modal, so focus stays on the toggle. Esc, with focus on the toggle or in the
+  // panel, closes one layer at a time: an open option list first (focus back to its pill),
+  // then the panel (focus back to the toggle). Esc elsewhere in the block (a result card,
+  // Load more) and an Esc an inner control already handled (defaultPrevented) are left alone.
+  // It stays open while the visitor filters (rerender never closes it).
   const setFacetsOpen = (open) => {
     if (!open) closeOptionPanels();
     filterToggle.setAttribute('aria-expanded', String(open));
@@ -507,6 +510,7 @@ export default async function decorate(block) {
   block.addEventListener('keydown', (e) => {
     // an inner control that already handled Esc (e.g. a media card's size menu) wins
     if (e.key !== 'Escape' || e.defaultPrevented || !block.classList.contains('facets-open')) return;
+    if (e.target !== filterToggle && !facetBar.contains(e.target)) return;
     e.preventDefault();
     const openPill = closeOptionPanels();
     if (openPill) {

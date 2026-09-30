@@ -4,7 +4,8 @@
 - **Phase:** A · **Milestone:** M1 (demo-visible on /en/images, /en/videos and every listing)
 - **GitHub issue:** [#175](https://github.com/skoda-storyboard/demo/issues/175) (sub-issue of #117)
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1d *(planning estimate, not a quote)*
-- **Status (2026-09-27):** 🔵 TODO
+- **Status (2026-09-30):** 🟡 In review (branch `skoda-402a-listing-layout`; review fixes of 2026-09-30 are local and
+  uncommitted, awaiting approval)
 
 ## Origin
 SKODA-608 phase split (2026-09-27): 608 delivers the image/video rows and publishes the two media listings; the
@@ -52,12 +53,42 @@ correction in `docs/ui-specs/faceted-listing.md`.
   - An Esc that an inner control has already handled (`defaultPrevented`) is left alone. For example, closing a
     media card's size menu (SKODA-406, PR #217) doesn't also close the filter panel.
   - The mobile focus trap is gone, because the panel is now an inline disclosure, not a drawer.
-- **Focus order:** in the DOM the toggle comes after the sort options, and CSS `order` moves it left from 768. Tab
-  therefore runs toggle → panel at every width.
 - **Decision (2026-09-29):** a deep link that already filters (`?filter[model][]=peaq`) opens the panel showing
   "(1)", per this ticket's acceptance criteria. The source keeps the panel closed and only shows the count.
-- **Out of scope (SKODA-402 styling), noted for follow-up:** the source sort links are 35px tall (14px/600, inactive
-  #ccc), ours are 21px. As a result, our mobile toggle row sits 14px higher than the source.
+
+## Review fixes (2026-09-30, measured against live /en/news and /en/images at 1280 and 390)
+- **Panel above the sort row, as on live.** Live opens `form.search-filter` above `.sort-options`, 16px below where
+  the sort row sits when closed and 24px above it. The branch had put the panel under the sort row. The DOM order is
+  now facets → chips → sort row, so the visual order and the focus order match. The toggle stays last in the sort
+  row: below 768 it is its own row under the sort options; from 768 CSS `order` moves it left.
+- **Count under the grid.** Live puts `.search-results-pagination` after the grid (16px below it) and 32px above Load
+  more. It had been above the grid, pushing the results 53px down. It now follows the grid, Load more gets the
+  source's 16px padding, and the grid sits 24px under the sort row.
+- **Sort links:**
+  - The 35px-tall, 14px-padded boxes with no gap now match live exactly: Newest 77×35 at x1107, Oldest 71×35 at x1183
+    at 1280.
+  - This also fixes the mobile toggle, which sat 10px high. Its row is now 35px below the sort row, like live.
+  - **The inactive colour stays `--skoda-grey-500`, on purpose.** Live's `#ccc` is 1.6:1 on white.
+- **Esc scope.** Esc acts only when focus is on the toggle or in the panel. Before, Esc on a result card or Load more
+  closed the panel and moved focus up to the toggle.
+- **Tokens:** `--listing-sort-height: 35px` replaces the literal on the toggle.
+- **Tests:** 6 new jsdom tests in `blocks/listing/listing.test.mjs`:
+  - source order;
+  - collapsed default and "(0)";
+  - filtering updates the count, and the panel stays open;
+  - a deep link opens the panel with "(1)";
+  - Esc layers, and Esc on a card is ignored;
+  - an Esc already handled by an inner control is left alone.
+
+  Each of the 6 behaviours was removed in turn, and every removal fails a test.
+- **Verified (local build of this branch + main):**
+  - The grid still matches live exactly at 1280 / 1024 / 992 / 991 / 768 / 767 / 576 / 575 / 500 / 390.
+  - The closed sort row, toggle and grid → count → Load more gaps match live at 1280 / 390.
+  - The open panel's 16 / 24px gaps match live at 1280 / 767 / 390.
+  - 274 block/script tests pass; ESLint and Stylelint are clean.
+- **Not in scope:**
+  - Live's Images page has a media-cart notice above the grid (SKODA-505a).
+  - Live's open panel holds 15 facets; DA authored 6 (spec §1).
 
 ## Dependencies
 SKODA-402 (listing), SKODA-608 (rows + published listings). Related: SKODA-406 (media card).

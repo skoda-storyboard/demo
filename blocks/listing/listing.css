@@ -9,6 +9,9 @@
  */
 
 .listing {
+  /* the source sort row height: sort links and the desktop "Advanced filter" toggle */
+  --listing-sort-height: 35px;
+
   width: min(100%, var(--content-max-width));
   margin-inline: auto;
 }
@@ -32,7 +35,10 @@
   display: none;
   flex-wrap: wrap;
   gap: 0.5em 1em;
-  margin-block: var(--grid-gutter);
+
+  /* open: 16px below where the sort row sits when closed (its own 1em top margin + 16px),
+     24px above the sort row (live form.search-filter) */
+  margin-block: calc(2 * var(--spacing-m)) var(--spacing-l);
 }
 
 .listing.facets-open .listing-facets {
@@ -186,11 +192,15 @@
 
 .listing .listing-sort-options {
   display: flex;
-  gap: 0.75em;
 }
 
+/* live .sort-options span / a: 14/600/21 in a 35px-tall, 14px-padded box, no gap between.
+   Inactive stays --skoda-grey-500: the source #ccc is 1.6:1 on white. */
 .listing .listing-sort-btn {
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--listing-sort-height);
+  padding: 0 1em;
   font-size: var(--body-font-size-s);
   font-weight: var(--weight-semibold);
   color: var(--skoda-grey-500);
@@ -249,7 +259,7 @@
   outline-offset: 2px;
 }
 
-/* --- result count "N / total" --- */
+/* --- result count "N / total": under the grid, above Load more (source) --- */
 .listing .listing-count {
   padding-block: 0.5em;
   margin-block: 1em;
@@ -278,7 +288,7 @@
   grid-template-columns: minmax(0, 1fr);
   gap: var(--grid-gutter);
   padding: 0;
-  margin: 0;
+  margin: var(--spacing-l) 0 0; /* 24px under the sort row (source) */
   list-style: none;
 }
 
@@ -489,11 +499,11 @@
   outline-offset: 2px;
 }
 
-/* --- load-more: shared ghost pill --- */
+/* --- load-more: shared ghost pill; under the count, 16px padded like the source --- */
 .listing .listing-loadmore {
   display: flex;
   justify-content: center;
-  margin-block: var(--grid-gutter);
+  padding-block: var(--spacing-m);
 }
 
 .listing .listing-loadmore-btn {
@@ -529,7 +539,7 @@
 
     flex-basis: auto;
     order: -1;
-    block-size: 35px;
+    block-size: var(--listing-sort-height);
     margin-inline-end: auto;
   }
 

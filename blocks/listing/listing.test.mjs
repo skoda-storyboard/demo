@@ -213,3 +213,92 @@ test('mediaCell passes its labels to the actions', () => {
   assert.equal(add.getAttribute('aria-label'), 'Přidat do košíku: img-8');
   assert.equal(dl.getAttribute('aria-label'), 'Stáhnout: img-8');
 });
+
+// ---- SKODA-402a: facets collapsed behind "Advanced filter (n)" ------------------------
+const storyRow = (n, model) => ({
+  path: `/en/s-${n}`, title: `Story ${n}`, image: '/media_1.jpg', template: 'story', date: `2026-09-${String(10 + n).padStart(2, '0')}`, model,
+});
+const key = (el, k) => el.dispatchEvent(new window.KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+async function facetListing(index, search = '') {
+  window.history.replaceState(null, '', `/en/news${search}`);
+  feed = [storyRow(1, 'Peaq'), storyRow(2, 'Epiq'), storyRow(3, 'Peaq, Elroq')];
+  const block = listingBlock('story', index);
+  await decorate(block);
+  return {
+    block,
+    toggle: block.querySelector('.listing-filter-toggle'),
+    panel: block.querySelector('.listing-facets'),
+  };
+}
+
+test('402a: source order — facet panel, chips, sort row (with the toggle), grid, count, load more', async () => {
+  const { block } = await facetListing('/en/order-index.json');
+  assert.deepEqual([...block.children].map((c) => c.className.split(' ')[0]), [
+    'listing-facets', 'listing-chips', 'listing-sort', 'listing-status', 'listing-items', 'listing-count', 'listing-loadmore',
+  ]);
+  assert.ok(block.querySelector('.listing-sort > .listing-filter-toggle'));
+});
+
+test('402a: collapsed by default; the toggle always shows the count, "(0)" included', async () => {
+  const { block, toggle, panel } = await facetListing('/en/collapsed-index.json');
+  assert.equal(toggle.tagName, 'BUTTON');
+  assert.equal(toggle.getAttribute('aria-controls'), panel.id);
+  assert.equal(toggle.getAttribute('aria-expanded'), 'false');
+  assert.equal(block.classList.contains('facets-open'), false);
+  assert.equal(toggle.textContent, 'Advanced filter (0)');
+  click(toggle);
+  assert.equal(toggle.getAttribute('aria-expanded'), 'true');
+  assert.ok(block.classList.contains('facets-open'));
+});
+
+test('402a: filtering updates the count and keeps the panel open', async () => {
+  const { block, toggle } = await facetListing('/en/filter-index.json');
+  click(toggle);
+  const peaq = block.querySelector('.facet[data-facet="model"] input[value="Peaq"]');
+  peaq.checked = true;
+  peaq.dispatchEvent(new window.Event('change', { bubbles: true }));
+  assert.equal(toggle.textContent, 'Advanced filter (1)');
+  assert.ok(block.classList.contains('facets-open'), 'still open while filtering');
+  assert.equal(block.querySelectorAll('.listing-chip').length, 1);
+});
+
+test('402a: a filtered deep link opens the panel showing "(1)"', async () => {
+  const { block, toggle } = await facetListing('/en/deeplink-index.json', '?filter[model][]=Peaq');
+  assert.equal(toggle.getAttribute('aria-expanded'), 'true');
+  assert.ok(block.classList.contains('facets-open'));
+  assert.equal(toggle.textContent, 'Advanced filter (1)');
+});
+
+test('402a: Esc closes an option list, then the panel; Esc elsewhere in the block is ignored', async () => {
+  const { block, toggle } = await facetListing('/en/esc-index.json');
+  click(toggle);
+  const pill = block.querySelector('.facet-pill');
+  click(pill);
+  assert.equal(pill.getAttribute('aria-expanded'), 'true');
+  // Esc on a result card: nothing closes, focus stays
+  const card = block.querySelector('.listing-item a');
+  card.focus();
+  key(card, 'Escape');
+  assert.equal(pill.getAttribute('aria-expanded'), 'true');
+  assert.equal(document.activeElement, card);
+  // Esc in the panel: the option list first (focus → its pill), then the panel (focus → toggle)
+  const option = block.querySelector('.facet-panel:not([hidden]) input');
+  option.focus();
+  key(option, 'Escape');
+  assert.equal(pill.getAttribute('aria-expanded'), 'false');
+  assert.equal(document.activeElement, pill);
+  assert.ok(block.classList.contains('facets-open'));
+  key(pill, 'Escape');
+  assert.equal(block.classList.contains('facets-open'), false);
+  assert.equal(toggle.getAttribute('aria-expanded'), 'false');
+  assert.equal(document.activeElement, toggle);
+});
+
+test('402a: an Esc an inner control already handled does not close the panel', async () => {
+  const { block, toggle } = await facetListing('/en/handled-index.json');
+  click(toggle);
+  const pill = block.querySelector('.facet-pill');
+  pill.addEventListener('keydown', (e) => e.preventDefault(), { once: true });
+  key(pill, 'Escape');
+  assert.ok(block.classList.contains('facets-open'));
+});
