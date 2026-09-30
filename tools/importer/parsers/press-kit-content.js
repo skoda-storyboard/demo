@@ -44,6 +44,30 @@ function embedUrls(root, document) {
   });
 }
 
+// An in-body Storyboard gallery shows five thumbnails of the Media Box set and opens it in a
+// lightbox. Keep its lead image and caption and link the "+N" count to the imported Media Box.
+function inlineGalleries(root, document) {
+  root.querySelectorAll('.sb-gallery').forEach((gallery) => {
+    const img = gallery.querySelector('.sb-gallery-image-main img') || gallery.querySelector('img');
+    if (!img) throw new Error('Press-kit in-body gallery has no image');
+    const nodes = [];
+    const figure = document.createElement('p');
+    const caption = img.getAttribute('data-caption')?.trim();
+    ['data-caption', 'data-video_title', 'data-video_src', 'srcset', 'sizes', 'itemprop']
+      .forEach((attr) => img.removeAttribute(attr));
+    figure.append(img);
+    nodes.push(figure);
+    if (caption) nodes.push(Object.assign(document.createElement('p'), { textContent: caption }));
+    const more = text(gallery.querySelector('.sb-gallery-show-more'));
+    if (more && document.querySelector('.search-results.media-box')) {
+      const p = document.createElement('p');
+      p.append(Object.assign(document.createElement('a'), { href: '#media-box', textContent: `+${more}` }));
+      nodes.push(p);
+    }
+    gallery.replaceWith(...nodes);
+  });
+}
+
 function contents(panel, document) {
   const nested = panel.querySelector(':scope > .panel-widget-style .panel-layout, :scope > .panel-layout, .panel-layout');
   // The SiteOrigin grid and answer panels recursively contain one another.
@@ -52,10 +76,15 @@ function contents(panel, document) {
   const widgets = panel.querySelectorAll('.textwidget');
   if (widgets.length) {
     return [...widgets].flatMap((widget) => {
+      // Images resource pages title each gallery group with the widget title.
+      const title = text(widget.parentElement?.querySelector(':scope > .widget-title'));
+      const heading = title ? [Object.assign(document.createElement('h2'), { textContent: title })] : [];
       embedUrls(widget, document);
+      inlineGalleries(widget, document);
       // Stray rules would split the DA section; pull-quote rules are consumed in `preprocess`.
       widget.querySelectorAll('hr').forEach((rule) => rule.remove());
-      return [...widget.childNodes].filter((node) => node.nodeType === 1 || text(node));
+      const items = widget.childNodes;
+      return [...heading, ...[...items].filter((node) => node.nodeType === 1 || text(node))];
     });
   }
   if (!text(panel) && !panel.querySelector('img, a[href]')) return [];

@@ -87,6 +87,55 @@ body.press-release .section.related.story-rail-container .story-rail {
   aspect-ratio: auto;
 }
 
+/* Press-release rails use the source's wider news cells; category and model
+   rails retain the standard carousel ladder. Bleed only this rail through the
+   generic section padding to the source's full-width (capped) home container.
+   The bleed is exactly that padding, the SKODA-826 page gutter (10px at every
+   width): a wider fixed gutter pushed the rail past the viewport (14px of
+   horizontal page overflow at 375/768, 30px at 992/1080). */
+.story-rail.story-rail-news {
+  --news-rail-gutter: var(--page-gutter);
+  --news-cell-width: calc(90cqw - var(--carousel-gap));
+
+  position: relative;
+  left: 50%;
+  width: min(calc(100% + 2 * var(--news-rail-gutter)), var(--content-max-width));
+  transform: translateX(-50%);
+  container-type: inline-size;
+}
+
+.story-rail.story-rail-news .story-rail-mount {
+  aspect-ratio: auto;
+}
+
+.story-rail.story-rail-news .story-rail-mount:not(.is-built)::before {
+  content: "";
+  display: block;
+  width: var(--news-cell-width);
+  aspect-ratio: 16 / 9;
+}
+
+.story-rail.story-rail-news .carousel-track {
+  padding-inline: calc(var(--carousel-gap) / 2);
+  scroll-padding-inline: calc(var(--carousel-gap) / 2);
+}
+
+.story-rail.story-rail-news .carousel-track .card-teaser {
+  flex-basis: var(--news-cell-width);
+}
+
+@media (width >= 768px) {
+  .story-rail.story-rail-news {
+    --news-cell-width: calc(45cqw - var(--carousel-gap));
+  }
+}
+
+@media (width >= 992px) {
+  .story-rail.story-rail-news {
+    --news-cell-width: calc(30cqw - var(--carousel-gap));
+  }
+}
+
 /* Related-story teasers (SKODA-820) and the press release "Related Press Releases" band
    (`Story Rail (press)`, SKODA-224) use the source's larger content-rail cells: the same
    measured 90% / 45% / 30% ladder (374.4px cell / 354.4 x 199.3 card at 1280). The query

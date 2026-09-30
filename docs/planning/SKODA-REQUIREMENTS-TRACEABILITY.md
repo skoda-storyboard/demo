@@ -316,7 +316,7 @@ All MIG IDs map to the import infra (SKODA-601/602) for the demo sample and SKOD
 > **Pulled into M1 by the set:**
 > - **208** (model page: STO-M / MR-M)
 > - **805a** (press-kit hub, MR-PK01/04/06) and **805c** (default press-kit article, MR-PK02); **805b** children
->   are M1 scope since D-1 = A (2026-09-28). §14 of the review proposes adding MR-PK07 (whole-kit ZIP link) to 805a
+>   are M1 scope since D-1 = A (2026-09-28); the 49 chapter/resource children carry `template=press_kit_chapter` (PR #202), so they stay out of the Press Kits rails. §14 of the review proposes adding MR-PK07 (whole-kit ZIP link) to 805a
 > - **819** (supersedes 219) + **801a** (story in-body carousel, Media Box, embeds: STO-D); story fidelity **816/817/818/820/821** (review §15)
 > - **608** (image/video item rows: MR-I/MR-V listings + model media rails)
 > - **609** (link containment + alias redirect: COM, MIG06)

@@ -73,6 +73,9 @@ measured here.
 **Feed container / grid**
 - `.search-results-container` `max-width 1248px` → `--content-max-width`; `padding 0 10px`
   (· 1280/1024/768/500).
+- Override only the Stories section's generic 24/40px wrapper inset with
+  `--grid-gutter / 2` (10px); cap its outer width at 1248px so the first card
+  aligns at x=26 (1280px) and x=10 (500px), as on the source.
 - `.search-results-items` `display:flex; flex-wrap:wrap; margin:0 -10px` (negative gutter).
 - `.search-results-item` `padding:0 10px`, `margin:0 0 20px` → effective **20px column gutter + 20px row
   gap** → candidate `--grid-gutter: 20px` (shared with `faceted-listing.md`). `box-sizing:border-box`.
@@ -166,6 +169,17 @@ measured here.
   seeds the first slice; `perpage` (6) sizes each Load more; `columns: featured` selects the
   2-large-then-3-up grid (vs a plain 3-up). Authors omit/add cells → decorate defensively (fall through to
   sensible defaults; never assume a cell exists).
+  Two mutually exclusive ways to keep the feed from repeating the promo box, chosen by how the
+  promo is filled:
+  - **Indexed promo (the Storyboard home; SKODA-827, `home-stories.js`).** The Promo Box is index
+    config (`template story`, `path /en/`, `limit 3`), so promo and feed select the same eligible,
+    newest-first `/en/` stories and the feed skips the first three with `offset: 3`. This stays
+    complementary as new stories enter the index. Do **not** author fixed `exclude` paths here:
+    they would drift from what the indexed promo shows.
+  - **Curated (authored) promo.** When authors pick the promo stories by hand, their index
+    positions are arbitrary, so author `exclude` as a comma-separated list of the promo's exact
+    site-relative paths instead of an `offset`. Don't combine `exclude` with an `offset` that
+    also skips those stories.
 - **`decorate()` outline:** `readConfig(block)` → `{ index, template, offset, initial, perpage, sort, columns }`;
   load rows via `scripts/query-index.js`; `sortRows` (newest-first); render first `initial` `card-teaser`
   cards (first image `createOptimizedPicture` + `fetchpriority="high"`, rest lazy); append a centered

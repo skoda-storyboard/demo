@@ -11,7 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   textOf, normKey, blockLabel, parseBlocks, configProblems, classifyBlock, checkPage,
-  registryProblems,
+  registryProblems, sectionStyles,
 } from './block-check.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -266,6 +266,29 @@ test('checkPage: tiles reject titles that the renderer cannot decorate', () => {
 });
 
 // ---- registry ---------------------------------------------------------------------------
+
+test('sectionStyles reads each Section Metadata style row as normalised tokens', () => {
+  const html = page(
+    `<p>Body</p>${block('section-metadata', row('Style', 'body-column'))}`,
+    `<p>Panel</p>${block('section-metadata', row('style', '<p>Body-Column, Highlight-Dark</p>'))}`,
+    block('section-metadata', row('background', 'x')),
+  );
+  assert.deepEqual(sectionStyles(html), [['body-column'], ['body-column', 'highlight-dark']]);
+});
+
+test('checkPage: a highlight section style holds publish until the SKODA-824 runtime', () => {
+  const body = `<p>Intro</p>${block('section-metadata', row('style', 'body-column'))}`;
+  const panel = (variant) => `<h3>Panel</h3>${block('section-metadata', row('style', `body-column, highlight-${variant}`))}`;
+  const r = checkPage(page(body, panel('dark'), panel('grey')), CONTRACTS, CODE);
+  assert.deepEqual(r.pending, [{
+    id: 'highlight', ticket: 'SKODA-824', fallback: 'broken', missingCode: false,
+  }]);
+  assert.equal(r.errors.length, 0);
+  assert.equal(r.publishable, false);
+  const plain = checkPage(page(body, block('section-metadata', row('style', 'dark, full-width'))), CONTRACTS, CODE);
+  assert.deepEqual(plain.pending, [], 'unrelated section styles are not the highlight contract');
+  assert.equal(plain.publishable, true);
+});
 
 test('committed registry is self-consistent and fully documented', () => {
   const doc = readFileSync(path.join(ROOT, CONTRACTS.doc), 'utf8');

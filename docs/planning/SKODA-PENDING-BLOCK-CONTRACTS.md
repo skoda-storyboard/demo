@@ -39,6 +39,7 @@ This contract pins **one DA table shape per pending block**. The importers emit 
 | `status` | `pinned` (import against it) · `proposed` (shape drafted, owner confirmation outstanding; the check warns) · `resolve` (the current importer output must change first; the check fails) · `out-of-scope` (the check fails) |
 | `ticket` | the owning ticket, which builds the block against this shape |
 | `fallback` | `readable` or `broken`: how the page renders before the code lands (rule 8) |
+| `styles` | section-style entries only: the Section Metadata `Style` tokens that identify the contract (`highlight-dark`), so the check can hold publish on section styles, which aren't blocks |
 | `shape` | the shape version; parsers cite it as `contract <id> v<shape>` in their header comment |
 | `configKeys` / `config` | allowed keys; `only` = every row is config, `or-curated` = config table or curated rows |
 | `emittedBy` | the importer parsers and transformers that emit it today (empty = parser still to write) |
@@ -245,11 +246,24 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Example** (`/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/`): 8 rows.
 
 ### `highlight`
-- **Status:** `pinned` (decided 2026-09-25: section style) · **Ticket:** SKODA-824 · **Fallback:** readable (plain ink text, as today)
+- **Status:** `pinned` (decided 2026-09-25: section style; **shape 2** 2026-09-28) · **Ticket:** SKODA-824 · **Fallback:** **broken** until the runtime lands (the panel has no box or text treatment, and each extra `body-column` section moves the sidebar; see Runtime) · **Styles:** `highlight-dark`, `highlight-grey`
 - **Form: section style, not a block.** The dark box can contain a `Gallery (slider)` or a `Columns` row, and DA blocks can't nest (rule 5).
-- **Shape:** a section holding the panel's content (h3, text, images, and any nested blocks), closed by `Section Metadata` with `Style` = `highlight, dark` (story panel) or `highlight, grey` (PR FAQ/info callout). Consecutive highlighted rows each become their own section with the same style; the runtime joins them.
-- **Runtime:** a body-column-scoped treatment through the `scripts.js` section hook. It must not reuse the full-bleed `.section.dark` rule.
-- **Until the importer emits it** (824 importer half), pages keep the current unwrap (default content) and are marked `re-import on SKODA-824`. The shape is fixed, so the 824 runtime and importer can be built in parallel.
+- **Shape (v2):** a section holding the panel's content (h3, text, images, and any nested blocks), closed by `Section Metadata` with `Style` = `body-column, highlight-dark` (story panel) or `body-column, highlight-grey` (PR FAQ/info callout). The body resumes after it in a new `body-column` section; no resumed section is emitted when nothing follows, and none is left before a panel that opens the body (story: `dropEmptySections()` after `afterTransform`; press release: the leading body marker is dropped). Consecutive highlighted rows each become their own section with the same style; the runtime joins them.
+- **Why v2 (was `highlight, dark` / `highlight, grey`):** v1 collided with existing CSS, so its "readable" fallback wasn't true:
+  - `.section.dark` is the full-bleed 100vw story band (`body.story main > .section.dark`) and the press-release dark bands;
+  - `.section.highlight` is the boilerplate light band in `styles.css`;
+  - both templates (`body.story`, `body.press-release`) only keep `.body-column` sections in the reading track, so every other section spans the full grid.
+
+  `body-column` keeps the panel in the text column. The single `highlight-*` class matches no existing rule.
+- **Variant:** from the background colour's luminance, `dark` below 0.5 and `grey` above (white = no panel). All 16 M1 story rows are `#0e3a2f`; the Zellmer FAQ panel is `#f3f3f3`.
+- **Importers:**
+  - `parsers/story-flatten.js`: `import-story-detail.js`'s `preprocess` calls `markHighlights()`, because the row colour is only in the SiteOrigin head CSS (`#pg-<id>> .panel-row-style`). This gives 16 rows on 11 of the 19 M1 stories: Epiq, Octavia, Slavia, plates, graffiti, Froome, Peaq production, Peaq Tour de France, Kylaq ×3, paper Kodiaq ×3, and charging ×2 (consecutive; one is a 2-cell Columns row).
+  - `transformers/skoda-press-release-layout.js`: a `div[style*=background]` direct child of `.entry-content` (the Zellmer FAQ, the last body content).
+- **Runtime (824 runtime half, still TODO):**
+  - style `.section.body-column.highlight-dark` / `.highlight-grey` (the ticket ACs);
+  - join consecutive panels;
+  - **span the sidebar across the split body.** Grid auto-placement puts `.section.sidebar` beside the *last* `body-column` section, so pages carrying a highlight section hold publish until this lands.
+- **Publish gate (enforced):** the entry lists its `styles`, so `checkPage` reports `highlight` as pending on any page whose Section Metadata carries one; with `fallback: broken` the page is `[hold publish]` in `import:validate-blocks` / `import:status`, and `import:push --stage publish` previews it but refuses to publish (`--approve-hold highlight` overrides, rule 8). When the runtime lands, set `fallback` to `readable`.
 
 ### `cover-box`
 - **Status:** `pinned` (2026-09-28) · **Ticket:** SKODA-218 · **Fallback:** readable (a light rail, as before)

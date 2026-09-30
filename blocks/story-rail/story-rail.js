@@ -61,6 +61,7 @@ export function parseConfig(block) {
     viewAll: cfg.viewall || cfg.viewAll || cfg.all || '',
     // 'oldest'/'publishdate' → ascending; else newest-first
     sort: (cfg.sort === 'oldest' || cfg.sort === 'publishdate') ? 'oldest' : 'newest',
+    layout: cfg.template === 'press_release' ? 'news' : 'standard',
     limit: Math.max(1, Number(cfg.limit) || 10),
     // comma list of path-slug fragments to exclude (already shown above)
     exclude: tokens(cfg.exclude),
@@ -350,6 +351,11 @@ export default async function decorate(block) {
   const press = block.classList.contains('press');
   const allLabel = viewAllLabel(block);
   const variants = [...block.classList].filter((c) => !OWN_CLASSES.has(c));
+  // the home news layout (SKODA-827); an explicit `Story Rail (press)` band keeps its own
+  // related-band layout (SKODA-224), the two set different widths and insets
+  if (!press && !curated && cfg.layout === 'news' && document.body.classList.contains('page')) {
+    block.classList.add('story-rail-news');
+  }
 
   // --- header (heading + optional "view all") --------------------------------
   const heading = cfg.heading || getMetadata('story-rail-heading') || '';

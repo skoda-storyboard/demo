@@ -22,6 +22,8 @@
  *   --publish-fragments            publish /nav, /footer (+ metadata overrides) if they are
  *                                  previewed but not live (a missing live /footer empties the
  *                                  footer on every .aem.live page — 2026-09-25 incident)
+ *   --approve-hold <id,…>          publish despite these contracts' broken fallback (rule 8:
+ *                                  approved at the wave gate), e.g. `highlight`
  *   --content-dir <dir>            importer output root (default: content)
  *   --org / --repo / --ref         default skoda-storyboard / demo / main
  *   --limit <n>                    only the first n paths
@@ -36,6 +38,8 @@
  * Output: tools/importer/reports/push/<stamp>.json (per-URL report) and
  * <stamp>-urls.txt (validated preview URLs for SKODA-603). Shared push state:
  * tools/importer/push/push-manifest.json (committed, like media-manifest.json).
+ * Publish holds pages the import contract marks [hold publish] (push/block-check.mjs
+ * checkPage, the same check as `npm run import:validate-blocks`); they still preview.
  * Exit code 1 when any page conflicts, errors, or fails validation/publish.
  */
 
@@ -53,6 +57,8 @@ import {
   parseList, wrapPage, contentHash, decideAction, PUSHING, chunk, parseJobDetails,
   fragmentPaths, imageCheck, summarize,
 } from './push/push-lib.mjs';
+import { checkPage } from './push/block-check.mjs';
+import { loadContracts } from './validate-blocks.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const MANIFEST = path.join(HERE, 'push', 'push-manifest.json');
@@ -79,6 +85,7 @@ function parseArgs(argv) {
     dryRun: false,
     force: false,
     publishFragments: false,
+    approveHold: new Set(),
     maxImageBytes: OVERSIZE_BYTES,
     minImageEdge: MIN_RENDITION_EDGE,
   };
@@ -99,6 +106,7 @@ function parseArgs(argv) {
     else if (k === '--dry-run') a.dryRun = true;
     else if (k === '--force') a.force = true;
     else if (k === '--publish-fragments') a.publishFragments = true;
+    else if (k === '--approve-hold') a.approveHold = new Set(v().split(',').map((id) => id.trim()).filter(Boolean));
     else throw new Error(`unknown flag ${k}`);
   }
   if (!a.list) throw new Error('--urls <file> (or --paths <file>) is required');
@@ -406,6 +414,27 @@ export default async function main(argv = process.argv.slice(2), {
   });
 
   // 5) publish ------------------------------------------------------------------------------
+  // Import-contract gate (SKODA-603): a page `import:validate-blocks` marks [hold publish]
+  // (block errors, a pending block without code, or a pending contract whose fallback is
+  // broken, e.g. a highlight section before its SKODA-824 runtime) is previewed but never
+  // published.
+  if (wantPublish) {
+    const { contracts, codeBlocks } = loadContracts();
+    pages.filter((pg) => pg.plain && !pg.error).forEach((pg) => {
+      const check = checkPage(pg.plain, contracts, codeBlocks, pg.path);
+      if (check.publishable) return;
+      // Rule 8: a broken fallback may publish once approved at the wave gate; errors and
+      // pending blocks without code never do.
+      const held = check.pending
+        .filter((pd) => pd.missingCode || (pd.fallback !== 'readable' && !a.approveHold.has(pd.id)))
+        .map((pd) => `${pd.id} (${pd.ticket}${pd.missingCode ? ', no block code' : `, fallback ${pd.fallback}`})`);
+      if (!check.errors.length && !held.length) {
+        log(`[push] ${pg.path}: publishing with approved broken fallback(s) ${check.pending.map((pd) => pd.id).join(', ')}`);
+        return;
+      }
+      pg.error = `Hold publish (import contract): ${[...check.errors, ...held].join('; ')}`;
+    });
+  }
   if (wantPublish && !a.dryRun) {
     const ready = [];
     for (const pg of pages.filter((page) => page.valid && !page.error)) {
@@ -463,6 +492,7 @@ export default async function main(argv = process.argv.slice(2), {
       dryRun: a.dryRun,
       force: a.force,
       publishFragments: a.publishFragments,
+      approveHold: [...a.approveHold],
       maxImageBytes: a.maxImageBytes,
       minImageEdge: a.minImageEdge,
       ref: a.ref,
