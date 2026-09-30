@@ -63,19 +63,23 @@
     },
     "/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company": {
       "qa": "pending",
-      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510",
+      "publicNote": "Live on an earlier import. The final version (quotes) waits for its PDF upload (#140) and the grey highlight panel (SKODA-824)."
     },
     "/en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029": {
       "qa": "pending",
-      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510",
+      "publicNote": "Live on an earlier import. The final version (quotes) waits for its PDF upload (#140)."
     },
     "/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence": {
       "qa": "pending",
-      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510",
+      "publicNote": "Live on an earlier import. The final version (quotes) waits for its PDF upload (#140)."
     },
     "/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management": {
       "qa": "pending",
-      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510",
+      "publicNote": "Live on an earlier import. The final version (quotes) waits for its PDF upload (#140)."
     },
     "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs": {
       "qa": "pending",
@@ -84,6 +88,9 @@
     "/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon": {
       "qa": "pending",
       "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+    },
+    "/en/press-kits/skoda-peaq-press-kit-2/images": {
+      "publicNote": "Not published: 230 images, over the platform limit of 200 per page. Held by decision (2026-09-30)."
     }
   }
 }

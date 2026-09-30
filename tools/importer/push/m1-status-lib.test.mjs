@@ -11,7 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   familyOf, edsPath, parseSectionedList, mergeLists, templateOf, blocksCell, buildRow,
-  summarizeRows, renderTracker,
+  summarizeRows, renderTracker, statusSheet, titleFromPath,
 } from './m1-status-lib.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -129,4 +129,43 @@ test('renderTracker writes summary + family tables and escapes pipes', () => {
   assert.match(md, /\| Home \| SKODA-609 \| 1 \| 1 \|/);
   assert.match(md, /0 of 1 expected pages/);
   assert.match(md, /a \\\| b/);
+});
+
+test('statusSheet: plain-language rows, redirects and held pages explained', () => {
+  const rows = [
+    buildRow({ path: '/en', family: 'home', source: 'set' }, { preview: 200, live: 200, indexed: true }),
+    buildRow({ path: '/en/press-kits/kit-2/images', family: 'press-kits', source: 'set' }, { preview: 404, live: 404 }),
+    buildRow({ path: '/en/press-kits/old-kit', family: 'press-kits', source: 'corpus' }, { preview: 200, live: 200 }),
+    buildRow({
+      path: '/en/x/alias', family: 'stories', source: 'set', alias: '/en/x',
+    }, {}),
+    buildRow({ path: '/en/series/road-trip', family: 'series', source: 'set' }, { preview: 200, live: 404 }),
+  ];
+  const sheet = statusSheet(rows, {
+    families: { home: { label: 'Home' }, 'press-kits': { label: 'Press kits' } },
+    titles: { '/en': 'Škoda Storyboard', '/en/press-kits/kit-2': 'Kit 2 – Press Kit', '/en/x': 'X story' },
+    redirects: { '/en/press-kits/old-kit/': '/en/press-kits/kit-2' },
+    publicNotes: { '/en/press-kits/kit-2/images': 'Not published: 230 images, over the 200 limit.' },
+    demo: new Set(['/en', '/en/press-kits/old-kit', '/en/x/alias', '/en/series/road-trip']),
+    checked: '2026-09-30 13:21 UTC',
+  });
+  assert.deepEqual(sheet.map((r) => [r.Title, r.Status]), [
+    ['Škoda Storyboard', 'live'], ['Kit 2 – Press Kit › Images', 'held'], ['Kit 2 – Press Kit', 'redirect'],
+    ['X story', 'redirect'],
+    ['Road trip', 'preview'],
+  ]);
+  assert.equal(sheet[0].Source, 'https://www.skoda-storyboard.com/en/');
+  assert.equal(sheet[0].Migrated, 'https://main--demo--skoda-storyboard.aem.live/en');
+  assert.equal(sheet[1].Type, 'Press kits');
+  assert.equal(sheet[1].Note, 'Not published: 230 images, over the 200 limit.');
+  assert.equal(sheet[2].Note, 'Redirects to /en/press-kits/kit-2');
+  assert.equal(sheet[3].Note, 'Redirects to /en/x');
+  assert.deepEqual(sheet.map((r) => r.Kind), ['page', 'page', 'page', 'alias', 'page']);
+  assert.deepEqual(sheet.map((r) => r.Demo), ['yes', '', 'yes', '', 'yes'], 'demo pages only, never an alias');
+  assert.ok(sheet.every((r) => r.Checked === '2026-09-30 13:21 UTC'));
+});
+
+test('titleFromPath reads the last segment as words', () => {
+  assert.equal(titleFromPath('/en/series/road-trip'), 'Road trip');
+  assert.equal(titleFromPath('/en'), 'En');
 });

@@ -101,6 +101,11 @@
     "search": {
       "variants": []
     },
+    "migration-status": {
+      "variants": [],
+      "config": "only",
+      "configKeys": ["source"]
+    },
     "stories": {
       "variants": [],
       "config": "only",
