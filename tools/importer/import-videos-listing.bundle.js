@@ -55,6 +55,17 @@ var CustomImportScript = (() => {
       ["perpage", "6"],
       ["columns", "3"]
     ],
+    // Press Kits: the same engine and facets as News, over the kit hubs. `template` matches
+    // exactly, so chapter pages (`press_kit_chapter`) stay out, as on the source.
+    "press-kits": [
+      ["index", "/en/query-index.json"],
+      ["path", "/en/press-kits/"],
+      ["template", "press_kit"],
+      ["facets", FACETS_DEFAULT],
+      ["sort", "newest"],
+      ["perpage", "6"],
+      ["columns", "3"]
+    ],
     images: [
       ["index", "/en/media-feed.json"],
       ["template", "image"],
@@ -87,6 +98,7 @@ var CustomImportScript = (() => {
     if (tokens.includes("images")) return "images";
     if (tokens.includes("videos")) return "videos";
     if (tokens.includes("search")) return "search";
+    if (tokens.includes("press-kits")) return "press-kits";
     return "news";
   }
   function parse(element, { document: document2 }) {
@@ -606,7 +618,6 @@ var CustomImportScript = (() => {
     "/en/skoda-world/sportline-models-dynamic-elegance-for-every-day",
     "/en/skoda-world/the-immortal-octavia-see-what-it-looks-like-after-one-million-kilometres",
     "/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour",
-    "/en/skoda-world/the-skoda-elroq-reveals-its-sustainable-interior",
     "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too",
     "/en/tag/company/design",
     "/en/tag/company/production",

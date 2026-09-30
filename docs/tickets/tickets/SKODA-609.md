@@ -7,6 +7,38 @@
 - **GitHub issue:** [#118](https://github.com/skoda-storyboard/demo/issues/118)
 - **Discovered in:** M1 gap review, 2026-09-24
 
+## Status (2026-09-30)
+🟡 **Code done; content steps pending** (they need DA/admin credentials). Dead-link report:
+[`docs/reviews/SKODA-609-DEAD-LINKS.md`](../../reviews/SKODA-609-DEAD-LINKS.md) (`npm run import:deadlinks`).
+The crawl covers 226 index pages plus `/nav`, `/footer`, `/media-room/nav` and `/media-room/footer`. It found
+61 dead in-site targets before this ticket and 9 after.
+
+Committed policy (runtime, [`scripts/links.js`](../../../scripts/links.js); applied in `decorateMain`, which also
+runs on the nav/footer fragments, again after blocks load, and on click as a catch-all):
+
+| Link | Result |
+|---|---|
+| Live host (`[www.]skoda-storyboard.com`) | unchanged, `target=_blank` + `rel="noopener noreferrer"` (D-3 b; SKODA-306) |
+| Live host → demo listing (`DEMO_LISTINGS`: `/en`, `/en/media-room`, `/en/news`, `/en/press-kits`, `/en/images`, `/en/videos`, `/en/series-2`, `/en/search`) | site-relative, same tab, query + hash kept (the DA Media Room nav) |
+| Site-relative → `LIVE_ONLY` (other locales, `/en/skodapedia`, `/en/feed`, `/en/press-releases/feed`, `/en/contacts`, `/en/documents/…`, `/en/newsletter-settings`, `/en/media-cart`, `/direct-download/…`) | absolute to live, new tab. The nav's `/en/category/podcast/` goes to the live `/en/category/podcast-en/` (the source slug) |
+| Site-relative with a trailing slash (`/en/`, `/en/media-room/`, `/en/news/?filter…`) | slash dropped (EDS 404s it); this also covers `skoda-model-tags.js` |
+
+Import side: the Elroq sustainable-interior story 404s on the source, so it is dropped from the corpus. The allow-list
+is regenerated (227 paths + the alias), and all 18 bundles are rebuilt (`esbuild --bundle --format=iife
+--global-name=CustomImportScript --target=es2017`). The 3 listing bundles also pick up the Press Kits listing variant
+that #223 did not bundle. The index already holds exactly one mixed-reality row.
+
+Remaining (content, needs credentials):
+1. DA `/redirects` sheet row: `Source` `/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality`
+   → `Destination` `/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality`; preview + publish the sheet.
+2. SKODA-603 backlog imports clear 8 of the 9 dead targets: `/en/press-kits/skoda-peaq-press-kit-2/images`
+   (13 links), the 5 press releases and the 2 press kits listed in the report.
+3. Re-import + push `/en/models/skoda-elroq-through-designers-eyes` so its Elroq sustainable-interior link turns
+   absolute (the 9th).
+4. Optional cleanup: fix the DA nav/footer hrefs to the policy targets (the runtime already does it), and re-push
+   the 3 press releases with relative `/direct-download/` links (transformer rule 2 already makes them absolute).
+5. Card swaps: out-of-set promo/related cards are absolute to live + new tab. No 404, so no swap is needed for M1.
+
 ## Summary
 M1 imports the 43-URL set ([`skoda-m1-url-set.txt`](../../planning/skoda-m1-url-set.txt)) plus the rail-feed corpus.
 Most links on those pages point **outside** that set:

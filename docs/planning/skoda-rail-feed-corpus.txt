@@ -102,7 +102,9 @@ https://www.skoda-storyboard.com/en/lifestyle/rs-four-ways-which-one-will-you-ch
 https://www.skoda-storyboard.com/en/models/skoda-elroq-through-designers-eyes/
 https://www.skoda-storyboard.com/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car/
 https://www.skoda-storyboard.com/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details/
-https://www.skoda-storyboard.com/en/skoda-world/the-skoda-elroq-reveals-its-sustainable-interior/
+# Dropped (SKODA-609, 2026-09-30): /en/skoda-world/the-skoda-elroq-reveals-its-sustainable-interior/
+# 404s on the source too (no redirect, not found by site search), so it can't be imported; links
+# to it stay absolute to the live site, as on the source.
 
 # ===== OCTAVIA model page (SKODA-208, 2026-09-28) — the items the live /en/skoda-model/octavia/ News,
 # Press Kits and Stories rails show (10 each). Already listed above: skoda-octavia-turns-30 (press

@@ -15,6 +15,7 @@ import {
   toClassName,
   getMetadata,
 } from './aem.js';
+import { decorateLinks, installLinkPolicy } from './links.js';
 
 /**
  * Page templates with their own layout code: `templates/<name>/<name>.{js,css}`, selected by
@@ -320,6 +321,7 @@ export function decorateMain(main) {
   decorateTemplateSections(main);
   decorateBlocks(main);
   decorateButtons(main);
+  decorateLinks(main);
 }
 
 /**
@@ -352,10 +354,13 @@ async function loadEager(doc) {
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
+  installLinkPolicy(doc);
   loadHeader(doc.querySelector('body > header'));
 
   const main = doc.querySelector('main');
   await loadSections(main);
+  // blocks build links while loading (downloads, tags, cards): apply the link policy to them too
+  decorateLinks(main);
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
