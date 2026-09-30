@@ -21,6 +21,7 @@
     "import:validate-blocks": "node tools/importer/validate-blocks.mjs",
     "import:status": "node tools/importer/m1-status.mjs",
     "import:allowlist": "node tools/importer/build-link-allowlist.mjs",
+    "import:deadlinks": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON tools/importer/check-dead-links.mjs",
     "prepare": "husky"
   },
   "repository": {
