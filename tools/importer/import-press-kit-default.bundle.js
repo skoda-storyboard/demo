@@ -204,6 +204,29 @@ var CustomImportScript = (() => {
       gallery.replaceWith(...nodes);
     });
   }
+  var FLOAT_ICON_MAX_WIDTH = 60;
+  function floatCallouts(widget, document) {
+    widget.querySelectorAll(":scope > p > img[width]").forEach((img) => {
+      const width = Number(img.getAttribute("width"));
+      if (!(width > 0 && width <= FLOAT_ICON_MAX_WIDTH) || !/float:\s*left/i.test(img.getAttribute("style") || "")) return;
+      const p = img.parentElement;
+      const rest = [...p.childNodes].filter((node) => node !== img && (node.nodeType === 1 || text(node)));
+      let body = rest;
+      if (!rest.length) {
+        const next = p.nextElementSibling;
+        if (!next || !text(next) || next.querySelector("img")) return;
+        body = [...next.childNodes];
+        next.remove();
+      }
+      img.setAttribute("alt", "");
+      ["style", "class", "loading", "decoding"].forEach((attr) => img.removeAttribute(attr));
+      const icon = document.createElement("p");
+      icon.append(img);
+      const copy = document.createElement("p");
+      copy.append(...body);
+      p.replaceWith(WebImporter.DOMUtils.createTable([["Columns (callout)"], [[icon], [copy]]], document));
+    });
+  }
   function contents(panel, document, { nested: inBlock = false } = {}) {
     var _a;
     const nested = panel.querySelector(":scope > .panel-widget-style .panel-layout, :scope > .panel-layout, .panel-layout");
@@ -216,6 +239,7 @@ var CustomImportScript = (() => {
         const heading = title ? [Object.assign(document.createElement("h2"), { textContent: title })] : [];
         embedUrls(widget, document, { nested: inBlock });
         inlineGalleries(widget, document);
+        if (!inBlock) floatCallouts(widget, document);
         widget.querySelectorAll("hr").forEach((rule) => rule.remove());
         const items = widget.childNodes;
         return [...heading, ...[...items].filter((node) => node.nodeType === 1 || text(node))];

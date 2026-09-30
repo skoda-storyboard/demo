@@ -403,7 +403,33 @@ var CustomImportScript = (() => {
     content.querySelectorAll("p").forEach((p) => {
       if (isEmptyParagraph(p)) p.remove();
     });
+    dataTables(document, content);
     return [...content.childNodes].filter((n) => n.nodeType === 1 || text3(n));
+  }
+  function dataTables(document, content) {
+    content.querySelectorAll("table").forEach((table) => {
+      const rows = [...table.rows].filter((row) => text3(row));
+      const filled = (row) => [...row.cells].filter((cell) => text3(cell));
+      if (rows.filter((row) => filled(row).length >= 2).length < 2) return;
+      const [head, ...body] = rows;
+      const labels = [...head.cells].map((cell) => text3(cell));
+      const out = [];
+      if (labels[0]) out.push(make(document, "p", labels[0]));
+      const list = document.createElement("ul");
+      body.forEach((row) => {
+        const [first, ...cells] = [...row.cells];
+        const li = document.createElement("li");
+        const label = document.createElement("strong");
+        label.append(...[...first.childNodes].map((node) => node.cloneNode(true)));
+        label.querySelectorAll("strong, b").forEach((inner) => inner.replaceWith(...inner.childNodes));
+        const values = cells.map((cell, i) => [text3(cell) && labels[i + 1], text3(cell)]).filter(([, value]) => value).map((pair) => pair.filter(Boolean).join(": "));
+        if (text3(label)) li.append(label, values.length ? `: ${values.join(" \xB7 ")}` : "");
+        else li.append(values.join(" \xB7 "));
+        list.append(li);
+      });
+      out.push(list);
+      table.replaceWith(...out);
+    });
   }
   function dropEmptyBodies(nodes) {
     const isMarker = (n) => n && n.nodeType === 1 && n.hasAttribute(MARKER);

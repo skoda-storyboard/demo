@@ -192,7 +192,42 @@ function bodyContent(document, primary) {
   content.querySelectorAll('div[style]').forEach((div) => div.replaceWith(...div.childNodes));
 
   content.querySelectorAll('p').forEach((p) => { if (isEmptyParagraph(p)) p.remove(); });
+  dataTables(document, content);
   return [...content.childNodes].filter((n) => n.nodeType === 1 || text(n));
+}
+
+/**
+ * A source data table (spec or results figures: 2+ rows with 2+ filled cells) would become an
+ * unknown DA block named after its first cell (`Škoda Elroq` → `koda-elroq`). As on the press
+ * kits (SKODA-805b), each row becomes one line: the bold row label (its footnote <sup> kept),
+ * then `column: value` pairs; the header's first cell leads the list. Other tables are left.
+ */
+function dataTables(document, content) {
+  content.querySelectorAll('table').forEach((table) => {
+    const rows = [...table.rows].filter((row) => text(row));
+    const filled = (row) => [...row.cells].filter((cell) => text(cell));
+    if (rows.filter((row) => filled(row).length >= 2).length < 2) return;
+    const [head, ...body] = rows;
+    const labels = [...head.cells].map((cell) => text(cell));
+    const out = [];
+    if (labels[0]) out.push(make(document, 'p', labels[0]));
+    const list = document.createElement('ul');
+    body.forEach((row) => {
+      const [first, ...cells] = [...row.cells];
+      const li = document.createElement('li');
+      const label = document.createElement('strong');
+      label.append(...[...first.childNodes].map((node) => node.cloneNode(true)));
+      label.querySelectorAll('strong, b').forEach((inner) => inner.replaceWith(...inner.childNodes));
+      const values = cells.map((cell, i) => [text(cell) && labels[i + 1], text(cell)])
+        .filter(([, value]) => value)
+        .map((pair) => pair.filter(Boolean).join(': '));
+      if (text(label)) li.append(label, values.length ? `: ${values.join(' · ')}` : '');
+      else li.append(values.join(' · '));
+      list.append(li);
+    });
+    out.push(list);
+    table.replaceWith(...out);
+  });
 }
 
 /** No empty body section: drop a body marker that is last or directly before another marker. */

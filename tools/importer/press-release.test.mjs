@@ -332,3 +332,27 @@ test('an image-only PDF link is named by its image alt (binary gate label), pros
     .filter((a) => !/\.(?:pdf|mp4)(?:$|[?#])/i.test(a.getAttribute('href')) && a.querySelector('img') && !txt(a));
   assert.equal(imageLinks.length, 0, 'only PDF/MP4 image links gain a title');
 });
+
+test('data tables become one line per row, never an unknown block named after the first cell', { skip }, () => {
+  const specs = `<table><tbody>
+    <tr><td><strong>Škoda Elroq</strong></td><td>&nbsp;</td><td><strong>Elroq 60</strong></td><td><b>Elroq RS</b></td></tr>
+    <tr><td>Battery capacity (brutto/netto)</td><td>[kWh]</td><td>61/58</td><td>82/77</td></tr>
+    <tr><td>Max. charging power<sup>3</sup></td><td>[kW]</td><td>105</td><td>165</td></tr></tbody></table>`;
+  const results = `<table><tbody>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td><strong>H1 2026</strong></td><td><strong>Change (%)</strong></td></tr>
+    <tr><td>Deliveries to Customers</td><td>cars</td><td>555,700</td><td>+9.1</td></tr>
+    <tr><td><strong>Western Europe</strong></td><td>&nbsp;</td><td>329,600</td><td>+12.4</td></tr></tbody></table>`;
+  const { element } = importPage('peaq', (doc) => {
+    doc.querySelector('.column-primary .entry-content').insertAdjacentHTML('beforeend', specs + results);
+  });
+  const names = [...element.querySelectorAll('table')].map(blockName);
+  const known = ['Quote', 'Gallery (preview)', 'Tags', 'Downloads', 'Section Metadata', 'Metadata', 'Story Rail (press)'];
+  assert.deepEqual(names.filter((n) => !known.includes(n)), [], 'no data-table block');
+  const lines = [...element.querySelectorAll('li')].map(txt);
+  assert.ok(lines.includes('Battery capacity (brutto/netto): [kWh] · Elroq 60: 61/58 · Elroq RS: 82/77'), lines.join('\n'));
+  assert.ok(lines.includes('Deliveries to Customers: cars · H1 2026: 555,700 · Change (%): +9.1'));
+  assert.ok(lines.includes('Western Europe: H1 2026: 329,600 · Change (%): +12.4'));
+  const power = [...element.querySelectorAll('li > strong')].find((s) => txt(s).startsWith('Max. charging power'));
+  assert.equal(power.querySelector('sup')?.textContent, '3', 'the footnote marker stays a superscript');
+  assert.ok([...element.querySelectorAll('p')].some((p) => txt(p) === 'Škoda Elroq'), 'the header label leads the list');
+});

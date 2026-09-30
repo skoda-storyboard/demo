@@ -753,6 +753,29 @@ test('article-form kit landing: teaser rows become one tiles mosaic between the 
   assert.ok(page.querySelector('a[href$=".zip"]'), 'banners after the tiles are kept');
 });
 
+test('floated 50px X / WhatsApp icons become Columns (callout), never full-width images', { skip: !JSDOM }, () => {
+  const x = 'https://cdn.skoda-storyboard.com/2023/09/Twitter-X_44c9e28a.png';
+  const wa = 'https://cdn.skoda-storyboard.com/2024/04/whatsapp.FI_46025435-384x281.png';
+  const body = grid(widget(`<p><img style="float: left; margin-right: 10px;" src="${x}" alt="DSC01282_RET-1" width="50" height="50"></p>
+    <div style="text-align: left;">Follow us at <a href="https://twitter.com/skodaautonews">X.com/skodaautonews</a> for all the latest news.</div>
+    <div>&nbsp;</div>
+    <p><img class="alignnone" style="float: left; margin-right: 10px;" src="${wa}" alt="DSC01282_RET-1" width="50" height="50"> Explore the new channel: <a href="http://go.skoda.eu/whatsapp">go.skoda.eu/whatsapp</a></p>
+    <p><img src="https://cdn.skoda-storyboard.com/body.jpg" alt="Body" width="1600"></p>`));
+  const page = run(resourcePage(body), `${base}skoda-elroq-covered/`);
+  const callouts = blocks(page, 'Columns (callout)');
+  assert.equal(callouts.length, 2);
+  callouts.forEach((t) => {
+    const [icon, copy] = t.querySelectorAll('tr:nth-child(2) > td');
+    assert.equal(icon.querySelectorAll('img').length, 1);
+    assert.equal(icon.querySelector('img').getAttribute('alt'), '', 'decorative icon');
+    assert.ok(txt(copy).length > 10 && copy.querySelector('a[href]'), 'the text and its link sit beside the icon');
+  });
+  assert.match(txt(callouts[0]), /X\.com\/skodaautonews/);
+  assert.match(txt(callouts[1]), /go\.skoda\.eu\/whatsapp/);
+  assert.equal(page.querySelectorAll('img[alt="DSC01282_RET-1"]').length, 0);
+  assert.ok(page.querySelector('img[alt="Body"]'), 'ordinary body images are untouched');
+});
+
 test('a WordPress video widget plays its MP4 master natively, named by its Media Box item', { skip: !JSDOM }, () => {
   const file = '/direct-download/2025/10/FABIA-SE-HIGHLIGHTS_H264UHD_ENG_e91b6d28.mp4';
   const videoWidget = `<div class="so-panel widget_media_video"><div class="media-cart-item attachment"><div class="video-container">

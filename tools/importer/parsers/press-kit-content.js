@@ -102,6 +102,39 @@ function inlineGalleries(root, document) {
   });
 }
 
+// The widest floated image that still counts as a callout icon (the X/WhatsApp icons are 50).
+const FLOAT_ICON_MAX_WIDTH = 60;
+
+// A small left-floated icon before its text (the Elroq covered-drive X and WhatsApp lines:
+// `<p><img width="50" style="float:left"></p><div>text</div>`, or icon and text in one <p>)
+// is the same callout as the one-row layout table: `Columns (callout)`. Full width in DA
+// otherwise (DA drops the width). The icon is decorative (its text says it; the source alt
+// names an unrelated photo), so its alt is emptied.
+function floatCallouts(widget, document) {
+  widget.querySelectorAll(':scope > p > img[width]').forEach((img) => {
+    const width = Number(img.getAttribute('width'));
+    if (!(width > 0 && width <= FLOAT_ICON_MAX_WIDTH)
+      || !/float:\s*left/i.test(img.getAttribute('style') || '')) return;
+    const p = img.parentElement;
+    const rest = [...p.childNodes]
+      .filter((node) => node !== img && (node.nodeType === 1 || text(node)));
+    let body = rest;
+    if (!rest.length) {
+      const next = p.nextElementSibling;
+      if (!next || !text(next) || next.querySelector('img')) return;
+      body = [...next.childNodes];
+      next.remove();
+    }
+    img.setAttribute('alt', '');
+    ['style', 'class', 'loading', 'decoding'].forEach((attr) => img.removeAttribute(attr));
+    const icon = document.createElement('p');
+    icon.append(img);
+    const copy = document.createElement('p');
+    copy.append(...body);
+    p.replaceWith(WebImporter.DOMUtils.createTable([['Columns (callout)'], [[icon], [copy]]], document));
+  });
+}
+
 function contents(panel, document, { nested: inBlock = false } = {}) {
   const nested = panel.querySelector(':scope > .panel-widget-style .panel-layout, :scope > .panel-layout, .panel-layout');
   // The SiteOrigin grid and answer panels recursively contain one another.
@@ -115,6 +148,8 @@ function contents(panel, document, { nested: inBlock = false } = {}) {
       const heading = title ? [Object.assign(document.createElement('h2'), { textContent: title })] : [];
       embedUrls(widget, document, { nested: inBlock });
       inlineGalleries(widget, document);
+      // Blocks can't nest: inside an accordion answer or a Columns cell the icon stays inline.
+      if (!inBlock) floatCallouts(widget, document);
       // Stray rules would split the DA section; pull-quote rules are consumed in `preprocess`.
       widget.querySelectorAll('hr').forEach((rule) => rule.remove());
       const items = widget.childNodes;
