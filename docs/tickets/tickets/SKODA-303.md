@@ -73,6 +73,22 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
 - **Tests:** `header-locales.test.mjs` (9 tests: the helper plus the real header on `/en` and `/cs` pages); `npm test`
   704 / 707, 0 failures, 3 skipped.
 
+**Re-check 2026-09-30 (click behaviour, URL patterns, 19 breakpoints 320–2560):**
+- **Click behaviour:** matches live apart from the per-article targets (SKODA-1003). See [`language-switcher.md` §8a](../../ui-specs/language-switcher.md).
+  - Media Room: `/{locale}/media-room`, with DE on `skoda-media.de` in a new tab.
+  - The unlinked EN follows its siblings' pattern.
+  - Both nav documents now use the EDS URL form without a trailing slash; the DA edit was approved.
+- **Fixed:**
+  - the topbar inner padding onto `--page-gutter`, so the switcher ends on the live content edge (1254 @1280) and the
+    section tabs start at 106 @1440;
+  - Subscribe → EN is 30px (was 40);
+  - the current locale keeps the arrow cursor;
+  - the drawer is `min-width: min(375px, 100%)`, so it no longer runs 55px off a 320px screen and cuts off the locale row.
+- **Result:** the switcher's values are identical to live at every width, and both visual diffs are 0% at the same
+  absolute position.
+- **Left to SKODA-308 (decision):** on short phones the drawer's locale row sits lower than live because the menu
+  above it is taller. Each row is 73px + an 8px margin vs 61px, and search is 80 vs 64px.
+
 **Findings for other tickets:**
 - **Per-page targets (SKODA-1003):** on articles the live list links each translated article and omits missing
   translations (Epiq story: EN / CZ / DE / SK; Peaq press release: EN / CZ / SK), following the page's hreflang set.

@@ -164,12 +164,34 @@ current locale is plain text (bold) and the rest are links:
 - Optional: drop a locale whose translated page does not exist (per-page existence; needs a manifest or
   a HEAD check, see §8).
 
+## 8a. Click behaviour + URL patterns (live, re-checked 2026-09-30)
+Every link was clicked on the home page, a story, a press release, the Media Room, `/cs/` and a CZ story.
+- **Behaviour:**
+  - a plain same-tab navigation straight to a 200 page, with no redirect (the only extra hop is the analytics sync);
+  - no language cookie or preference is stored;
+  - the current locale is an inert `<span>`;
+  - **exception:** on the Media Room, DE opens `https://www.skoda-media.de/` in a **new tab** (`target="_blank"`).
+- **Live URL forms** (absolute, always with a trailing slash):
+  - locale home: `/{locale}/`;
+  - article: `/{locale}/{translated category}/{translated slug}/`, for example `/cs/e-mobilita-cs/…`, `/de/emobilitat-de/…`,
+    `/sk/emobilita-sk/…`, `/cs/tiskove-zpravy-archiv/…`, `/sk/tlacova-sprava/…`;
+  - Media Room: `/{locale}/media-room/`.
+- **EDS URL forms:** the locale home is the root document `{locale}.html`, served **without** a trailing slash (`/en`;
+  `/en/` is a 404), and pages sit in the `{locale}/` folder (`/en/media-room`). The nav fragments link:
+  - `/nav`: `/cs` `/de` `/sk` `/sr` `/sl`;
+  - `/media-room/nav`: `/cs/media-room`, `https://www.skoda-media.de/`, `/sk/media-room`, `/sr/media-room`, `/sl/media-room`.
+- **Header behaviour:**
+  - the bold (unlinked) locale takes its siblings' pattern (`/en`, `/en/media-room`);
+  - a link to another site opens in a new tab with `rel="noopener"` and "(opens in a new tab)" in its name.
+- **Translated article targets:** out of the pilot (SKODA-1003).
+
 ## 8. Open decisions + recommended default
 
 > **Decided (2026-09-30, SKODA-303 pilot):**
 > - **Control form:** inline links.
 > - **Current locale:** taken from the URL, not the authored `<strong>`.
-> - **Targets:** all 6 link the EDS locale homes (`/cs/` …). Only `/en` exists on EDS yet; the others 404 until
+> - **Targets:** all 6 link the EDS locale homes (`/cs` …, no trailing slash; Media Room `/{locale}/media-room`, DE on
+>   `skoda-media.de`, see §8a). Only `/en` exists on EDS yet; the others 404 until
 >   the locale trees are migrated, a known gap.
 > - **Out of the pilot:** per-page translated targets and hiding locales without a translation (SKODA-1003).
 > - **Contrast:** inactive links use `--skoda-grey-700`.

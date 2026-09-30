@@ -174,6 +174,7 @@ header :is(.nav-topbar-locales, .nav-locales) .nav-locales-list a {
 header :is(.nav-topbar-locales, .nav-locales) .nav-locales-list [aria-current] {
   color: var(--skoda-ink);
   font-weight: var(--weight-bold);
+  cursor: default;
 }
 
 /* the source has no focus ring on these links: EDS adds one */
@@ -560,7 +561,7 @@ header nav .nav-search .search-suggest-meta {
      through, blurred by the backdrop below) */
   header nav[aria-expanded='true'] {
     max-width: 85%;
-    min-width: 375px;
+    min-width: min(375px, 100%); /* full width below 375 (source), never wider than the screen */
     margin-right: 0;
     margin-left: auto;
     background: var(--background-color);
@@ -757,10 +758,12 @@ header nav .nav-search .search-suggest-meta {
     overflow: visible;
   }
 
+  /* inner padding = the page gutter (source: 10px inside the 1248 container), so the language
+     switcher ends on the content edge (1254 @1280, 1070 @1080) and the tabs start at 106 @1440 */
   header .nav-topbar .default-content-wrapper {
     gap: var(--spacing-m);
     max-width: var(--content-max-width);
-    padding: 0 var(--spacing-l);
+    padding: 0 var(--page-gutter);
   }
 
   /* Subscribe + locales become visible, flush right (as one group) */
@@ -774,8 +777,9 @@ header nav .nav-search .search-suggest-meta {
     margin-left: auto;
   }
 
+  /* Subscribe → the language switcher: 30px on the source, the flex gap included */
   header .nav-topbar-utility + .nav-topbar-utility {
-    margin-left: var(--spacing-l);
+    margin-left: calc(30px - var(--spacing-m));
   }
 
   /* switcher shrinks to an auto-width pair at the left of the grey bar */

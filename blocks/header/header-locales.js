@@ -15,6 +15,7 @@
 
 const LABELS = {
   list: 'Language',
+  newTab: (name) => `${name} (opens in a new tab)`,
 };
 
 /** The site's locales: code (URL segment), the visible label, the language's own name. */
@@ -89,9 +90,35 @@ export function isLocaleGroup(p, base) {
 }
 
 /**
+ * The target of a locale authored without a link (the bold one): the URL pattern of its
+ * siblings with the locale segment swapped (`/cs/media-room` → `/en/media-room`, `/cs` → `/en`),
+ * as the source links every locale in the same form. Only site paths are used as the
+ * pattern; with none, the locale home `/{code}` (EDS serves the home without a trailing slash).
+ * @param {string} code the locale to link
+ * @param {Array<{code: string, href: string|null}>} entries the authored entries
+ * @returns {string}
+ */
+export function siblingHref(code, entries) {
+  const pattern = entries.find(({ code: c, href }) => href && href.startsWith(`/${c}`)
+    && !href.startsWith('//') && /^\/[a-z]{2}(\/|$|[?#])/i.test(href));
+  return pattern ? `/${code}${pattern.href.slice(pattern.code.length + 1)}` : `/${code}`;
+}
+
+/** A link to another site (the source's Media Room DE goes to skoda-media.de, in a new tab). */
+function isExternal(href, doc) {
+  try {
+    const url = new URL(href, doc.baseURI);
+    return /^https?:$/.test(url.protocol) && url.host !== new URL(doc.baseURI).host;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
  * The switcher list: the current locale as `<span aria-current="true">`, every other one as
  * a link with `hreflang` / `lang` and its own language name. An entry authored without a link
- * (the bold one) links its locale home, `/{code}` (as `/en`).
+ * (the bold one) takes its siblings' URL pattern (siblingHref). A link to another site opens
+ * in a new tab, as on the source, and says so in its name.
  * @param {Array<{code: string, href: string|null}>} entries from localeEntries()
  * @param {string} current the page's locale, from currentLocale()
  * @param {Document} doc the document to build in
@@ -110,10 +137,17 @@ export function buildLocaleList(entries, current, doc) {
       item = doc.createElement('span');
       item.setAttribute('aria-current', 'true');
     } else {
+      const target = href || siblingHref(code, entries);
       item = doc.createElement('a');
-      item.setAttribute('href', href || `/${code}`);
+      item.setAttribute('href', target);
       item.setAttribute('hreflang', code);
-      item.setAttribute('aria-label', name);
+      if (isExternal(target, doc)) {
+        item.setAttribute('target', '_blank');
+        item.setAttribute('rel', 'noopener');
+        item.setAttribute('aria-label', LABELS.newTab(name));
+      } else {
+        item.setAttribute('aria-label', name);
+      }
     }
     item.setAttribute('lang', code);
     item.textContent = label;
