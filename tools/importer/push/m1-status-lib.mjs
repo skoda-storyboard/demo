@@ -219,3 +219,57 @@ export function renderTracker(rows, meta) {
   });
   return `${out.join('\n').trimEnd()}\n`;
 }
+
+/** A readable fallback title from the last path segment (`/en/series/road-trip` → "Road trip"). */
+export function titleFromPath(p) {
+  const slug = String(p || '').split('/').filter(Boolean).pop() || '';
+  const words = slug.replace(/-/g, ' ').trim();
+  return words ? words[0].toUpperCase() + words.slice(1) : String(p || '');
+}
+
+/**
+ * Rows for the human-readable status page (`/drafts/migration-status`, block
+ * `migration-status`): one plain-language row per tracker page.
+ *   Status: live | redirect | preview | held | not live. A redirect (tracker alias or a
+ *   /redirects row) wins; a page that isn't live but carries a `publicNote` is held.
+ *   Note: the redirect target and the override's `publicNote` (the engineering `note` stays
+ *   in the tracker). Kind: page | alias (aliases are listed, not counted, as in the tracker).
+ * meta: { families, titles: {path: title}, redirects: {source: destination},
+ *   publicNotes: {path: text}, checked, origin, site }
+ */
+export function statusSheet(rows, meta = {}) {
+  const origin = meta.origin || 'https://www.skoda-storyboard.com';
+  const site = meta.site || 'https://main--demo--skoda-storyboard.aem.live';
+  const fam = meta.families || {};
+  const redirects = meta.redirects || {};
+  const notes = meta.publicNotes || {};
+  const titles = meta.titles || {};
+  // A child page is named with its parent (three kits each have an "Images" chapter); a
+  // redirect by the page it lands on.
+  const titleOf = (p) => {
+    const own = titles[p] || titleFromPath(p);
+    const parent = p.split('/').slice(0, -1).join('/');
+    return parent.split('/').length > 3 && titles[parent] ? `${titles[parent]} › ${own}` : own;
+  };
+  return rows.filter((r) => !r.unmapped).map((r) => {
+    const target = r.alias || redirects[r.path] || redirects[`${r.path}/`] || '';
+    const note = notes[r.path] || '';
+    let status = 'not live';
+    if (target) status = 'redirect';
+    else if (r.done.published) status = 'live';
+    else if (note) status = 'held';
+    else if (r.done.previewed) status = 'preview';
+    return {
+      Type: (fam[r.family] || {}).label || r.family,
+      // An alias is a second address of a listed page: shown, but not counted as a page.
+      Kind: r.alias ? 'alias' : 'page',
+      Title: target && titles[target] ? titleOf(target) : titleOf(r.path),
+      Source: `${origin}${r.path}/`,
+      Migrated: `${site}${r.path}`,
+      Status: status,
+      QA: r.done.qa ? 'accepted' : '',
+      Note: [target ? `Redirects to ${target}` : '', note].filter(Boolean).join('. '),
+      Checked: meta.checked || '',
+    };
+  });
+}

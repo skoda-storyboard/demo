@@ -1,0 +1,240 @@
+/* Migration status block (SKODA-603): pilot status page at /drafts/migration-status. */
+
+.migration-status {
+  --migration-status-card-min: 14rem;
+  --migration-status-finder-max: 30rem;
+  --migration-status-bar-height: var(--spacing-xs);
+  --migration-status-bar-track: var(--skoda-grey-200);
+  --migration-status-bar-fill: var(--skoda-green-accent);
+  --migration-status-bar-open: var(--skoda-grey-500);
+  --migration-status-live-bg: var(--skoda-green-emerald);
+  --migration-status-muted-bg: var(--skoda-grey-200);
+  --migration-status-held-bg: var(--skoda-grey-800);
+  --migration-status-held-color: var(--skoda-white);
+  --migration-status-note-color: var(--skoda-grey-700);
+
+  display: grid;
+  gap: var(--spacing-xl);
+}
+
+.migration-status h2 {
+  margin-block: 0 var(--spacing-m);
+  font-size: var(--heading-font-size-m);
+}
+
+.migration-status ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* headline */
+
+.migration-status .migration-status-head {
+  display: grid;
+  gap: var(--spacing-s);
+}
+
+.migration-status .migration-status-head p {
+  margin: 0;
+}
+
+.migration-status .migration-status-headline {
+  font-size: var(--heading-font-size-l);
+  line-height: var(--line-height-heading);
+}
+
+.migration-status .migration-status-checked,
+.migration-status .migration-status-note {
+  color: var(--migration-status-note-color);
+  font-size: var(--body-font-size-s);
+}
+
+.migration-status .migration-status-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-s) var(--spacing-m);
+}
+
+/* status badges */
+
+.migration-status .migration-status-badge {
+  display: inline-block;
+  padding: 0 var(--spacing-s);
+  border-radius: var(--pill-radius);
+  background-color: var(--migration-status-muted-bg);
+  font-size: var(--body-font-size-xs);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-body);
+}
+
+.migration-status .migration-status-badge.status-live {
+  background-color: var(--migration-status-live-bg);
+}
+
+.migration-status .migration-status-badge.status-held,
+.migration-status .migration-status-badge.status-not-live {
+  background-color: var(--migration-status-held-bg);
+  color: var(--migration-status-held-color);
+}
+
+/* one card per page type: as many columns as fit */
+
+.migration-status .migration-status-types {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--migration-status-card-min)), 1fr));
+  gap: var(--spacing-m);
+}
+
+.migration-status .migration-status-types li {
+  display: grid;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-m);
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+}
+
+.migration-status .migration-status-type {
+  font-weight: var(--weight-semibold);
+}
+
+.migration-status .migration-status-types strong {
+  font-size: var(--heading-font-size-m);
+}
+
+.migration-status .migration-status-bar {
+  display: block;
+  block-size: var(--migration-status-bar-height);
+  border-radius: var(--pill-radius);
+  background: linear-gradient(
+    to right,
+    var(--migration-status-bar-fill) calc(var(--migration-status-share, 0) * 100%),
+    var(--migration-status-bar-track) 0
+  );
+}
+
+.migration-status .migration-status-types .incomplete .migration-status-bar {
+  --migration-status-bar-fill: var(--migration-status-bar-open);
+}
+
+/* needs attention */
+
+.migration-status .migration-status-attention {
+  display: grid;
+  gap: var(--spacing-m);
+}
+
+.migration-status .migration-status-attention li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs) var(--spacing-s);
+  align-items: baseline;
+  padding-block-end: var(--spacing-m);
+  border-block-end: 1px solid var(--border-color);
+}
+
+.migration-status .migration-status-attention .migration-status-title {
+  font-weight: var(--weight-semibold);
+}
+
+.migration-status .migration-status-attention .migration-status-note {
+  flex-basis: 100%;
+}
+
+.migration-status .migration-status-links {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-m);
+}
+
+/* finder */
+
+.migration-status .migration-status-finder {
+  display: grid;
+  gap: var(--spacing-xs);
+  max-inline-size: var(--migration-status-finder-max);
+  margin-block-end: var(--spacing-m);
+}
+
+.migration-status .migration-status-finder label {
+  font-weight: var(--weight-semibold);
+}
+
+.migration-status .migration-status-finder input {
+  padding: var(--input-padding);
+  border: 1px solid var(--input-border-color);
+  border-radius: var(--input-radius);
+  font: inherit;
+}
+
+.migration-status .migration-status-found {
+  margin: 0 0 var(--spacing-s);
+  font-size: var(--body-font-size-s);
+}
+
+.migration-status .migration-status-found:empty {
+  display: none;
+}
+
+/* all pages, grouped by type */
+
+.migration-status .migration-status-group {
+  border-block-start: 1px solid var(--border-color);
+}
+
+.migration-status .migration-status-group:last-child {
+  border-block-end: 1px solid var(--border-color);
+}
+
+.migration-status .migration-status-group summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-s);
+  justify-content: space-between;
+  padding-block: var(--spacing-m);
+  cursor: pointer;
+  font-weight: var(--weight-semibold);
+}
+
+.migration-status .migration-status-group summary:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
+}
+
+.migration-status .migration-status-scroll {
+  overflow-x: auto;
+  margin-block-end: var(--spacing-m);
+}
+
+.migration-status table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--body-font-size-s);
+}
+
+.migration-status caption {
+  padding-block-end: var(--spacing-s);
+  color: var(--migration-status-note-color);
+  text-align: start;
+}
+
+.migration-status th,
+.migration-status td {
+  padding: var(--spacing-xs) var(--spacing-s);
+  border-block-end: 1px solid var(--border-color);
+  text-align: start;
+  vertical-align: top;
+}
+
+.migration-status tbody th {
+  font-weight: var(--weight-regular);
+}
+
+.migration-status .migration-status-scroll .migration-status-note {
+  display: block;
+  margin-block-start: var(--spacing-xs);
+}
+
+.migration-status td a {
+  white-space: nowrap;
+}

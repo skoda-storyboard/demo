@@ -17,6 +17,8 @@
  *   npm run import:status                 # full (network) run
  *   npm run import:status -- --offline    # local facts only (preview/live/index = ?)
  *   … [--content-dir content] [--ref main] [--out <file>]
+ *   … --sheet <file>   also write the human-readable status rows as a DA sheet (JSON) for
+ *                      the /drafts/migration-status page (block `migration-status`)
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -26,7 +28,7 @@ import { fetchWithRetry } from './media/media-lib.mjs';
 import { checkPage } from './push/block-check.mjs';
 import { loadContracts } from './validate-blocks.mjs';
 import {
-  parseSectionedList, mergeLists, buildRow, renderTracker,
+  parseSectionedList, mergeLists, buildRow, renderTracker, statusSheet,
 } from './push/m1-status-lib.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -43,6 +45,7 @@ function parseArgs(argv) {
     repo: 'demo',
     ref: 'main',
     out: path.join(PLANNING, 'skoda-m1-url-status.md'),
+    sheet: null,
   };
   for (let i = 0; i < argv.length; i += 1) {
     const k = argv[i];
@@ -51,6 +54,7 @@ function parseArgs(argv) {
     else if (k === '--content-dir') a.contentDir = v();
     else if (k === '--ref') a.ref = v();
     else if (k === '--out') a.out = v();
+    else if (k === '--sheet') a.sheet = v();
     else throw new Error(`unknown flag ${k}`);
   }
   return a;
@@ -72,7 +76,14 @@ async function adminStatus(a, p) {
 async function liveIndex(a) {
   const res = await fetchWithRetry(`https://${a.ref}--${a.repo}--${a.org}.aem.live/en/query-index.json?limit=5000&cb=${Date.now()}`);
   if (!res.ok) return null;
-  return ((await res.json()).data || []).map((row) => row.path);
+  return (await res.json()).data || [];
+}
+
+/** The published /redirects sheet as { source: destination } (empty when unavailable). */
+async function liveRedirects(a) {
+  const res = await fetchWithRetry(`https://${a.ref}--${a.repo}--${a.org}.aem.live/redirects.json?cb=${Date.now()}`);
+  if (!res.ok) return {};
+  return Object.fromEntries(((await res.json()).data || []).map((r) => [r.Source, r.Destination]));
 }
 
 async function main() {
@@ -88,7 +99,8 @@ async function main() {
   const { contracts, codeBlocks, registry } = loadContracts();
   registry.forEach((p) => console.log(`[status] ⚠ registry: ${p}`));
 
-  const index = a.offline ? null : await liveIndex(a);
+  const indexRows = a.offline ? null : await liveIndex(a);
+  const index = indexRows && indexRows.map((row) => row.path);
   const indexSet = new Set(index || []);
   console.log(`[status] ${rows.length} rows · ${a.offline ? 'offline' : `index ${index ? index.length : '?'} rows`}`);
 
@@ -111,8 +123,9 @@ async function main() {
   }
 
   const pages = built.filter((r) => !r.alias);
+  const generated = `${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC`;
   const md = renderTracker(built, {
-    generated: `${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC`,
+    generated,
     ref: a.ref,
     mode: a.offline ? 'offline: preview/live/index not checked' : 'live check',
     families: overrides.families,
@@ -123,6 +136,21 @@ async function main() {
     } : null,
   });
   writeFileSync(a.out, md);
+  if (a.sheet) {
+    // Same shape as a DA sheet document (the /redirects sheet), so it can be POSTed as is.
+    const data = statusSheet(built, {
+      families: overrides.families,
+      titles: Object.fromEntries((indexRows || []).map((row) => [row.path, row.title])),
+      redirects: a.offline ? {} : await liveRedirects(a),
+      publicNotes: Object.fromEntries(Object.entries(overrides.pages || {})
+        .filter(([, o]) => o.publicNote).map(([p, o]) => [p, o.publicNote])),
+      checked: generated,
+    });
+    writeFileSync(a.sheet, `${JSON.stringify({
+      total: data.length, limit: data.length, offset: 0, data, ':sheetname': 'data', ':type': 'sheet',
+    }, null, 2)}\n`);
+    console.log(`[status] wrote ${data.length} status rows to ${path.relative(process.cwd(), a.sheet)}`);
+  }
   const c = (k) => pages.filter((r) => r.done[k]).length;
   console.log(`[status] ${pages.length} pages · imported ${c('imported')} · previewed ${c('previewed')} · published ${c('published')} · indexed ${c('indexed')} · QA ${c('qa')} · block errors ${c('blockErrors')}`);
   console.log(`[status] wrote ${path.relative(process.cwd(), a.out)}`);
