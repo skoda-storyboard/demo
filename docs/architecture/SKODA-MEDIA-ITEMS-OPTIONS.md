@@ -59,7 +59,8 @@ asset id / DAM path) and the lightbox (SKODA-406) already want to work.
    still sourced from the source listing (AEM Assets isn't populated yet). The listing and rail configs get
    `index: /en/media-feed.json`. The 101 item pages are unpublished and deleted, and the five index columns added
    in #177 are reverted. Cards link to the lightbox once SKODA-406 lands; until then to the image itself.
-   Thumbnails come from the source CDN `-768x512` renditions for the demo.
+   Thumbnails come from the source CDN `-768x512` renditions for the demo, put on the Media Bus
+   through carrier documents (update 2026-09-30, below).
 2. **M2:** a sync job (App Builder action or GitHub Action, on AEM Assets events or a schedule) reads published
    Media Room assets and their tags, and writes the same feed shape, sharded by year/type. Nothing downstream
    changes.
@@ -101,6 +102,10 @@ rows to Edge Delivery. Pages per item are retired.
 **Demo (M1) specifics:** AEM Assets isn't populated or tagged yet, so the demo feed is generated from the source
 listing (the #177 generator, writing one sheet instead of 101 pages). Its thumbnails are the source CDN `-768x512`
 renditions: they aren't resized by the Media Bus params, but they are small enough for cards.
+**Update 2026-09-30:** the thumbnails are now on the Media Bus. `media-items:build --push` previews
+carrier documents (`/en/fragments/media-feed-images[-N]`, one image per thumbnail) and rewrites
+`image` to their `media_<hash>` paths, so the cards get webp + responsive widths. Downloads and
+video posters stay on the source URLs (`tools/importer/media/README.md`).
 
 **Follow-up tickets:**
 - **M2:** AEM Assets → media feed sync job (published assets, sharded feed, trigger/owner TBD).

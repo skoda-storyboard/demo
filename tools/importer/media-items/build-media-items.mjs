@@ -3,6 +3,7 @@
  * build-media-items.mjs - SKODA-608: generate the media feed (en/media-feed.json).
  *
  *   npm run media-items:build -- [--out <dir>] [--cache <dir>] [--offline] [--dry-run] [--push]
+ *   npm run media-items:build -- --feed <sheet.json> --push [--out <dir>]
  *
  * AEM Assets is the source of truth for images/videos (docs/architecture/
  * SKODA-MEDIA-ITEMS-OPTIONS.md, option B): no page per item. This M1 generator builds the
@@ -12,8 +13,12 @@
  * videos. The M2 sync job writes the same rows from published AEM Assets. Writes:
  *   <out>/en/media-feed.json                 the DA sheet (query-index shape, `:type: sheet`)
  *   tools/importer/media-items/items.json    committed record (id, template, title, date, source)
- * `--push` uploads the sheet to DA and previews + publishes it. The listing and story-rail
- * blocks read it via their `index: /en/media-feed.json` config row.
+ * `--push` puts the card thumbnails on the Media Bus (carrier documents under /en/fragments/,
+ * previewed + published: a sheet's images are not ingested), rewrites `image` to their
+ * `media_<hash>` paths, then uploads the sheet to DA and previews + publishes it. Without
+ * `--push` the written sheet keeps the source thumbnail URLs. `--feed` skips the source build
+ * and re-publishes an existing sheet (e.g. the DA source) with Media Bus thumbnails. The
+ * listing and story-rail blocks read it via their `index: /en/media-feed.json` config row.
  * Download URLs are stable CDN URLs (/direct-download/ redirects to a presigned S3 URL).
  */
 
@@ -27,6 +32,7 @@ import {
   SOURCE_ORIGIN, facetOptions, parseCards, mergeItems, feedSheet, yearIds, vimeoPoster,
   detailRequest, ajaxNonce, parseDetailPanel, parseAssetLinks, assetItem, requiredDetails,
   detailGaps, unknownGaps, feedCoverageGaps,
+  feedThumbnails, carrierDocs, parseCarrier, withMediaBus,
 } from './media-items-lib.mjs';
 import { uploadToDA } from '../media/media-lib.mjs';
 import { readLists } from '../build-link-allowlist.mjs';
@@ -57,6 +63,7 @@ function parseArgs(argv) {
     dryRun: false,
     push: false,
     allowIncomplete: false,
+    feed: '',
   };
   for (let i = 0; i < argv.length; i += 1) {
     const k = argv[i];
@@ -67,8 +74,10 @@ function parseArgs(argv) {
     else if (k === '--dry-run') a.dryRun = true;
     else if (k === '--push') a.push = true;
     else if (k === '--allow-incomplete') a.allowIncomplete = true;
+    else if (k === '--feed') a.feed = path.resolve(v());
     else throw new Error(`unknown flag ${k}`);
   }
+  if (a.feed && !a.push) throw new Error('--feed re-publishes an existing sheet: it needs --push');
   return a;
 }
 
@@ -253,25 +262,83 @@ function assertManifestCoverage(file) {
   throw new Error(`${gaps.length} feed media URL(s) have no media-manifest row; run \`npm run media:build -- --feed ${path.relative(ROOT, file)}\` before --push`);
 }
 
-/** Upload the sheet to DA, then preview + publish it (credentials are injected for DA/admin). */
+/** Preview + publish a DA document (credentials are injected for DA/admin). */
+async function previewAndPublish(docPath) {
+  for (const stage of ['preview', 'live']) {
+    // eslint-disable-next-line no-await-in-loop
+    const r = await fetch(`https://admin.hlx.page/${stage}/${ORG}/${REPO}/main/${docPath}`, { method: 'POST' });
+    // eslint-disable-next-line no-await-in-loop
+    if (!r.ok) throw new Error(`${stage} ${docPath} ${r.status} ${await r.text()}`);
+  }
+}
+
+/** Upload the sheet to DA, then preview + publish it. */
 async function pushFeed(file) {
   assertManifestCoverage(file);
   const res = await uploadToDA({
     org: ORG, repo: REPO, daPath: `/${FEED_PATH}`, buffer: readFileSync(file), contentType: 'application/json',
   });
   if (!res.ok) throw new Error(`DA upload ${res.status}: ${res.body.slice(0, 200)}`);
-  for (const stage of ['preview', 'live']) {
-    // eslint-disable-next-line no-await-in-loop
-    const r = await fetch(`https://admin.hlx.page/${stage}/${ORG}/${REPO}/main/${FEED_PATH}`, { method: 'POST' });
-    // eslint-disable-next-line no-await-in-loop
-    if (!r.ok) throw new Error(`${stage} ${r.status} ${await r.text()}`);
-  }
+  await previewAndPublish(FEED_PATH);
   console.log(`[media-items] pushed, previewed and published /${FEED_PATH}`);
+}
+
+/**
+ * Put the feed thumbnails on the Media Bus: upload, preview + publish the carrier documents,
+ * then read each carrier's previewed `.plain.html` for the `media_<hash>` paths.
+ * @returns {Promise<Map<string, string>>} source URL → Media Bus path
+ */
+async function pushCarriers(JSDOM, sheet) {
+  const map = new Map();
+  for (const doc of carrierDocs(feedThumbnails(sheet))) {
+    // eslint-disable-next-line no-await-in-loop
+    const res = await uploadToDA({
+      org: ORG, repo: REPO, daPath: `/${doc.path}.html`, buffer: Buffer.from(doc.html), contentType: 'text/html',
+    });
+    if (!res.ok) throw new Error(`DA upload ${doc.path} ${res.status}: ${res.body.slice(0, 200)}`);
+    // eslint-disable-next-line no-await-in-loop
+    await previewAndPublish(doc.path);
+    // eslint-disable-next-line no-await-in-loop
+    const plain = await fetch(`https://main--${REPO}--${ORG}.aem.page/${doc.path}.plain.html?ck=${Date.now()}`, { cache: 'no-store' });
+    if (!plain.ok) throw new Error(`${doc.path}.plain.html ${plain.status}`);
+    // eslint-disable-next-line no-await-in-loop
+    const found = parseCarrier(new JSDOM(await plain.text()).window.document, doc.path);
+    found.forEach((bus, url) => map.set(url, bus));
+    console.log(`[media-items] carrier /${doc.path}: ${found.size}/${doc.urls.length} thumbnails on the Media Bus`);
+  }
+  return map;
+}
+
+/**
+ * Publish the sheet: gate it, put its thumbnails on the Media Bus, rewrite `image`, write it
+ * to `feedFile` and push it.
+ */
+async function publishFeed(JSDOM, sheet, feedFile) {
+  // the gate runs on the source URLs: the Media Bus copies are of the recorded binaries
+  assertManifestCoverage(feedFile);
+  const thumbs = feedThumbnails(sheet);
+  const bus = withMediaBus(sheet, await pushCarriers(JSDOM, sheet));
+  if (bus.missing.length === thumbs.length && thumbs.length) {
+    throw new Error('the Media Bus ingested no thumbnail; not publishing the feed');
+  }
+  bus.missing.forEach((u) => console.warn(`  not on the Media Bus, kept: ${u}`));
+  writeFileSync(feedFile, `${JSON.stringify(bus.sheet, null, 2)}\n`);
+  await pushFeed(feedFile);
+  return { thumbnails: thumbs.length, kept: bus.missing.length };
 }
 
 export async function main(argv = process.argv.slice(2)) {
   const a = parseArgs(argv);
   const JSDOM = loadJSDOM();
+  const feedFile = path.join(a.out, FEED_PATH);
+  if (a.feed) {
+    const sheet = JSON.parse(readFileSync(a.feed, 'utf8'));
+    mkdirSync(path.dirname(feedFile), { recursive: true });
+    writeFileSync(feedFile, `${JSON.stringify(sheet, null, 2)}\n`);
+    const mediaBus = await publishFeed(JSDOM, sheet, feedFile);
+    console.log(JSON.stringify({ rows: sheet.data.length, mediaBus }));
+    return { mediaBus };
+  }
   const sources = JSON.parse(readFileSync(path.join(HERE, 'sources.json'), 'utf8'));
   const { queries, assetPages = [], knownDetailGaps = {} } = sources;
   const lists = [];
@@ -350,7 +417,6 @@ export async function main(argv = process.argv.slice(2)) {
   if (a.dryRun) return summary;
 
   const sheet = feedSheet(items);
-  const feedFile = path.join(a.out, FEED_PATH);
   mkdirSync(path.dirname(feedFile), { recursive: true });
   writeFileSync(feedFile, `${JSON.stringify(sheet, null, 2)}\n`);
   const record = sheet.data.map((r) => ({
@@ -359,7 +425,7 @@ export async function main(argv = process.argv.slice(2)) {
   const generated = new Date().toISOString().slice(0, 10);
   writeFileSync(path.join(HERE, 'items.json'), `${JSON.stringify({ generated, feed: `/${FEED_PATH}`, items: record }, null, 2)}\n`);
   console.log(`[media-items] wrote ${sheet.total} rows -> ${feedFile}`);
-  if (a.push) await pushFeed(feedFile);
+  if (a.push) summary.mediaBus = await publishFeed(JSDOM, sheet, feedFile);
   return summary;
 }
 

@@ -16,6 +16,7 @@ import {
   feedRow, feedSheet, itemSlug, sourceOrder, FACETS, DETAIL_FIELDS, parseDetailPanel, ajaxNonce,
   detailRequest, parseAssetLinks, assetItem, requiredDetails, detailGaps, unknownGaps,
   feedMediaRefs, feedCoverageGaps,
+  feedThumbnails, carrierDocs, parseCarrier, withMediaBus, CARRIER_MAX,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 
@@ -296,4 +297,43 @@ test('feed media refs: every binary a row serves, with its home folder (manifest
   const covered = { 'row-a': { seen_urls: ['https://i.vimeocdn.com/video/1-d_1280x720.jpg'] } };
   assert.equal(feedCoverageGaps(sheet, { ...covered }).length, 6, 'only the poster is recorded');
   assert.ok(feedCoverageGaps(sheet, rows).length > 0);
+});
+
+test('Media Bus thumbnails: carrier documents, previewed paths, feed rewrite', { skip }, () => {
+  const a = 'https://cdn.skoda-storyboard.com/2026/09/a_b-768x512.jpg';
+  const v = 'https://i.vimeocdn.com/video/1-d_1280x720.jpg';
+  const sheet = {
+    total: 3,
+    data: [
+      { id: '1', template: 'image', image: a },
+      {
+        id: '2', template: 'video', image: v, poster: v,
+      },
+      { id: '3', template: 'image', image: a },
+    ],
+  };
+  assert.deepEqual(feedThumbnails(sheet), [a, v], 'deduplicated, in feed order');
+
+  const docs = carrierDocs(feedThumbnails(sheet));
+  assert.deepEqual(docs.map((d) => d.path), ['en/fragments/media-feed-images']);
+  const carrier = new JSDOM(docs[0].html).window.document;
+  assert.deepEqual([...carrier.querySelectorAll('main img')].map((i) => [i.getAttribute('src'), i.alt]), [[a, a], [v, v]]);
+  const many = Array.from({ length: CARRIER_MAX + 1 }, (_, i) => `https://cdn.skoda-storyboard.com/${i}.jpg`);
+  assert.deepEqual(carrierDocs(many).map((d) => [d.path, d.urls.length]), [
+    ['en/fragments/media-feed-images', CARRIER_MAX], ['en/fragments/media-feed-images-2', 1],
+  ]);
+
+  // the previewed .plain.html: ingested images become ./media_<hash>; one was not ingested
+  const plain = new JSDOM(`<div><p><picture><img src="./media_13c4b0.jpg?width=750&amp;format=jpg&amp;optimize=medium" alt="${a}"></picture></p>
+    <p><img src="${v}" alt="${v}"></p></div>`).window.document;
+  const map = parseCarrier(plain, docs[0].path);
+  assert.deepEqual([...map], [[a, '/en/fragments/media_13c4b0.jpg']]);
+
+  const bus = withMediaBus(sheet, map);
+  assert.deepEqual(bus.sheet.data.map((r) => r.image), ['/en/fragments/media_13c4b0.jpg', v, '/en/fragments/media_13c4b0.jpg']);
+  assert.deepEqual(bus.missing, [v]);
+  assert.equal(bus.sheet.data[1].poster, v, 'the poster stays on its source URL');
+  assert.equal(sheet.data[0].image, a, 'the input sheet is not mutated');
+  // the manifest gate still sees the source binaries (Media Bus paths are not refs)
+  assert.deepEqual(feedMediaRefs(bus.sheet).map((r) => r.field), ['poster']);
 });
