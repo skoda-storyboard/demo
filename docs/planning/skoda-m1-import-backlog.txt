@@ -1,0 +1,48 @@
+# Škoda M1: remaining import backlog (SKODA-603, #37). Built 2026-09-30 from origin/main 36a0306.
+# Source: `npm run import:status` live run (index 162 of 187 expected pages) against
+# skoda-m1-url-set.txt + skoda-rail-feed-corpus.txt. Lists only pages NOT yet in /en/query-index.json.
+# Preview/live states come from push-manifest.json (admin status wasn't checked: no credentials).
+# Feed per section: npm run import:push -- --urls <section copy> (push + preview), then --stage publish.
+# Excluded: the mixed-reality alias (SKODA-609 redirect) and the Elroq sustainable-interior story
+# (source 404: drop it from skoda-rail-feed-corpus.txt or find the moved URL).
+
+# ===== PRESS RELEASES (9), corpus, never imported; importer: import-press-release (SKODA-607) =====
+# Not yet in page-templates.json / urls-press-release.txt; add them there before running the bundle.
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car/
+https://www.skoda-storyboard.com/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france/
+https://www.skoda-storyboard.com/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions/
+https://www.skoda-storyboard.com/en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available/
+https://www.skoda-storyboard.com/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates/
+https://www.skoda-storyboard.com/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq/
+https://www.skoda-storyboard.com/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026/
+https://www.skoda-storyboard.com/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich/
+
+# ===== PRESS KITS: CORPUS HUBS (10), never imported; importer: TBD =====
+# Unmapped in page-templates.json. Classify each source page first: tiles hub → import-press-kit-hub
+# (SKODA-805a), single article → import-press-kit-default. (The Octavia press kits used import-page-base.)
+https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-elroq-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-elroq-press-kit-2/
+https://www.skoda-storyboard.com/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design/
+https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car/
+https://www.skoda-storyboard.com/en/press-kits/the-all-new-skoda-superb-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/the-all-new-skoda-kodiaq-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/new-skoda-enyaq-press-kit-2/
+https://www.skoda-storyboard.com/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage/
+https://www.skoda-storyboard.com/en/press-kits/skoda-vision-o-press-kit/
+
+# ===== PRESS KIT: FIRST GLIMPSE (1), set+corpus; importer: import-press-kit-default (SKODA-805c) =====
+# In flight on open PR #222 (16:9 media gate, Quote block → publish waits for SKODA-220, #140).
+https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/
+
+# ===== PRESS KITS: EPIQ CHILDREN (2), set, no DA push record; importer: import-press-kit-default =====
+# SKODA-805b resource/chapter pages; check binary (SKODA-503) and media gates before pushing.
+https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance/
+https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/infographics/
+
+# ===== PRESS KITS: IN DA, NOT LIVE (2), no re-import; finish the pipeline =====
+# Pushed 2026-09-29, never previewed → run preview + QA, then publish.
+https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/images/
+# Pushed + previewed 2026-09-29, never published → QA, then --stage publish.
+https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success/

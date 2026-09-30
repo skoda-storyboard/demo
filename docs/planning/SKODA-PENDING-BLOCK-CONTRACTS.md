@@ -53,7 +53,8 @@ These blocks have code on `main`, with the variants and config keys that code re
 |---|---|---|
 | `cards` | `media`, `overlay`, `toolbar`, `tiles`, `series-directory`, `social` (SKODA-217: one row per profile, one cell with a link whose text is the handle; its section carries `Style: cover-box, dark`, the SKODA-218 home band) | – |
 | `carousel` | `dots` | – |
-| `columns` | – | – |
+| `accordion` | – | – (SKODA-805c; see `accordion` below) |
+| `columns` | `banners` (SKODA-805c: a row of linked banner images at their authored 240px, the press-kit PDF/share buttons; see `columns-banners` below), `callout` (SKODA-805c: `[icon, text]`, the 50px icon in a 60px cell beside its text; the press-kit WhatsApp callout) | – |
 | `downloads` | `media-box` (SKODA-510) | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes`, `collapse` (SKODA-502/510) |
 | `embed` | – | `url`, `ratio`, `title`, `poster` (`or-curated`: a bare Vimeo / YouTube / Buzzsprout / Spotify URL on its own line still autoblocks). A self-hosted `.mp4`/`.webm`/`.mov`/`.m4v` `url` renders a native `<video>` with the `poster` image (SKODA-801a, WordPress `[video]`) |
 | `gallery` | – | – |
@@ -62,6 +63,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `stories` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured` (config only) |
 | `story-rail` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows |
 | `tags` | `chips` | – |
+| `quote` | – | – (SKODA-220; see `quote` below) |
 | `promo-box` | – | curated rows **or** config (`index`, `template`, `path`, `category`, `tags`, `limit`, `sort`); never mixed (PR #110, merged) |
 | `search`, `fragment`, `header`, `footer`, `widget`, `newsletter-stub` | – | – |
 
@@ -227,7 +229,8 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   5. `Style: dark, full-width, related` (optional): see `story-rail-press`.
 
 ### `quote`
-- **Status:** `pinned` · **Ticket:** SKODA-220 · **Fallback:** readable (two text cells)
+- **Status:** ✅ **on `main`** with `blocks/quote` (SKODA-220 block, landed with SKODA-805c). It moved to the baseline table above and is no longer a pending entry; this section stays as the shape reference. **Ticket:** SKODA-220
+- **Runtime:** each row renders as `figure > blockquote + figcaption`: the quote centred 16/24 italic, a 2px black rule 10% of the column wide 20px below it and 10px above the attribution (measured on first-glimpse at 1440/1280/768/390). The rule is CSS, never an `hr`.
 - **Shape:** header `Quote`, then a single row `[<p>quote text</p>, <p><strong>Attribution</strong>, role</p>]`. An empty attribution cell is kept. The source's decorative `hr` is **never** emitted, because a bare `hr` in DA splits sections.
 - **Importers:** `parsers/quote.js` (SKODA-220). It detects a centred `p` with only `em` content, the `hr` right after it, and an optional centred `p > strong`. helix-importer's preProcess drops every `hr` before `transform`, so each importer's `preprocess` marks the runs (`markQuotes`) and the parser builds the table after the layouts have run.
   - `import-press-release.js`: 6 quotes on the 4 M1 releases (Zellmer 2, National Theatre 2, Superb 1, Board 1; Peaq none). They stay in the `body-column` section.
@@ -240,8 +243,15 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Shape:** header `Columns (split-NN)`, where `NN` is the first cell's share of the row width in percent, rounded (source 518 | 320 → `split-62`). The rows are the normal `columns` rows. The check accepts `split-10` … `split-99`.
 - **Emitted by:** `story-flatten.js` for 2-cell SiteOrigin rows with unequal cells (graffiti, Kylaq, charging, Peaq comfort).
 
+### `columns-banners`
+- **Status:** ✅ **on `main`** (variant of `columns`, SKODA-805c). **Fallback:** readable (the banners fill their cells)
+- **Shape:** header `Columns (banners)`, then one row of normal `columns` cells, each only a linked image (the source's `download-en.png` / `share-en.png`, authored at 240×150).
+- **Emitted by:** `parsers/press-kit-content.js` for a top-level SiteOrigin row whose 2+ filled cells are each a single linked image with an authored `width` ≤ 400. Other 2+-cell rows (photo pairs, the contact cards) become plain `Columns`, one cell per source cell, as in `story-flatten.js`. Rows inside an accordion answer stay linear (DA blocks can't nest). In the corpus, 36 of the 51 `press_kit-template-default` pages have the banner row, 16 the contact row and 4 a photo pair.
+- **`Columns (callout)`:** `skoda-press-kit-default-layout.js` emits it for a one-row `[small image | text]` layout table (authored width ≤ 60): the chapters' "What's up, Škoda?" WhatsApp callout, whose 512px PNG DA can't size.
+- **Runtime:** `blocks/columns` keeps banner images at 240px, and callout icons at 50px in a 60px cell. `templates/press-kit` sets body-column rows side by side from the source's 781px stack width, 20px apart, and stacks them 40px apart below.
+
 ### `accordion`
-- **Status:** `pinned` · **Ticket:** SKODA-805c (minimal SKODA-807) · **Fallback:** readable (all panels open as text)
+- **Status:** ✅ **on `main`** with `blocks/accordion` (SKODA-805a/805c; minimal SKODA-807). It moved to the baseline table above; this section stays as the shape reference. **Ticket:** SKODA-805c
 - **Shape:** header `Accordion`, then one row per toggle: `[summary label (text), body (rich content: paragraphs, lists, links, images)]`. Rows appear in source order and are all closed by default. Nested blocks inside a panel aren't supported: an embed inside a panel stays a bare link.
 - **Example** (`/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/`): 8 rows.
 

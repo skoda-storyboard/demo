@@ -136,19 +136,25 @@ body.press-release .section.related.story-rail-container .story-rail {
   }
 }
 
-/* Related-story teasers use the source's larger content-rail cells. The query
-   container keeps the reserved image width equal to the decorated card width,
-   including the track's two 10px insets. */
+/* Related-story teasers (SKODA-820) and the press release "Related Press Releases" band
+   (`Story Rail (press)`, SKODA-224) use the source's larger content-rail cells: the same
+   measured 90% / 45% / 30% ladder (374.4px cell / 354.4 x 199.3 card at 1280). The query
+   container keeps the reserved image width equal to the decorated card width, including
+   the track's two 10px insets. Plain selector lists (press first), not :is(), so each
+   selector keeps its own specificity (css-guidelines §10). */
+.story-rail.press,
 body.story .section.dark.story-rail-container .story-rail {
   container-type: inline-size;
 
   --carousel-cell-width: calc(90cqw - var(--carousel-gap));
 }
 
+.story-rail.press .story-rail-mount,
 body.story .section.dark.story-rail-container .story-rail-mount {
   aspect-ratio: auto;
 }
 
+.story-rail.press .story-rail-mount:not(.is-built)::before,
 body.story .section.dark.story-rail-container .story-rail-mount:not(.is-built)::before {
   content: "";
   display: block;
@@ -156,13 +162,121 @@ body.story .section.dark.story-rail-container .story-rail-mount:not(.is-built)::
   aspect-ratio: 16 / 9;
 }
 
+.story-rail.press .carousel-track,
 body.story .section.dark.story-rail-container .story-rail .carousel-track {
   padding-inline: var(--related-band-heading-inset);
   scroll-padding-inline: var(--related-band-heading-inset);
 }
 
+.story-rail.press .carousel-track .card-teaser,
 body.story .section.dark.story-rail-container .story-rail .carousel-track .card-teaser {
   margin-block-end: 0;
+}
+
+/* ---- press variant only (SKODA-224; measured on the live Zellmer release) ----
+   The source Flickity viewport spans the whole band (1248px at 1280); the press-release
+   section wrapper insets its content by the band inset, so the rail bleeds back out by
+   the same amount. The shared track inset + the default 10px arrow insets then land on
+   the source: first card and prev arrow at the band edge + 10, next arrow 10 from the
+   right edge. */
+.story-rail.press {
+  width: auto;
+  margin-inline: calc(-1 * var(--related-band-heading-inset));
+}
+
+/* source .article-teaser-overlay: the dual scrim only, no bottom legibility gradient
+   (the text-shadow carries legibility, as on the source) */
+.story-rail.press .card-teaser.overlay .card-teaser-body {
+  background-image: var(--scrim-h), var(--scrim-v);
+}
+
+/* date line box sits 13px above the title (source .entry-meta); cancels the dark-band
+   paragraph margin, like the story band's date gap below */
+.story-rail.press .card-teaser-date {
+  margin-block-end: calc(13px - var(--spacing-xs));
+}
+
+/* source .entry-title: 18/21.6 at every width, one line ending in "…" (the source
+   truncates with dotdotdot to a single line at every width; imported titles are already
+   shortened, index-mode titles are clamped here, as the shared card-teaser clamps its
+   summary) */
+.story-rail.press .card-teaser-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  max-height: 1.2em;
+  overflow: hidden;
+}
+
+/* "All" end card of a full band (source .item-all): a card-sized 16:9 cell with a 1px white
+   outline and square corners, "All" 16/600 centred and a chevron 16px after it that nudges
+   8px right on hover (source keyframes: 0.6s ease-in-out, infinite). Margin 0: the global
+   `li` bottom margin would make this the row's tallest item, and the stretched cards would
+   show their white base under the images. */
+.story-rail.press .carousel-track .story-rail-all {
+  flex: 0 0 var(--carousel-cell-width);
+  aspect-ratio: 16 / 9;
+  margin: 0;
+  scroll-snap-align: start;
+}
+
+.story-rail.press .story-rail-all-link {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border: 1px solid var(--skoda-white);
+  color: var(--skoda-white);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 3;
+  text-decoration: none;
+}
+
+/* chevron: two borders of a rotated box, like the carousel arrows. It is centred in the
+   source glyph's 16px cell (10px box + 3px each side), 16px after the text, so "All" +
+   chevron centre in the card as on the source */
+.story-rail.press .story-rail-all-link::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  margin-inline: calc(var(--spacing-m) + 3px) 3px;
+  border-top: 2.5px solid currentcolor;
+  border-right: 2.5px solid currentcolor;
+  transform: rotate(45deg);
+}
+
+.story-rail.press .story-rail-all-link:hover,
+.story-rail.press .story-rail-all-link:focus-visible {
+  color: var(--skoda-white);
+  text-decoration: none;
+}
+
+.story-rail.press .story-rail-all-link:hover::after {
+  animation: story-rail-all-nudge 0.6s ease-in-out infinite;
+}
+
+.story-rail.press .story-rail-all-link:focus-visible {
+  outline: 2px solid var(--skoda-white);
+  outline-offset: -4px;
+}
+
+@keyframes story-rail-all-nudge {
+  0%,
+  100% {
+    transform: translateX(0) rotate(45deg);
+  }
+
+  50% {
+    transform: translateX(8px) rotate(45deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-rail.press .story-rail-all-link:hover::after {
+    animation: none;
+  }
 }
 
 body.story .section.dark.story-rail-container .story-rail .card-teaser-date {
@@ -174,6 +288,7 @@ body.story .section.dark.story-rail-container .story-rail .card-teaser-title {
 }
 
 @media (width >= 768px) {
+  .story-rail.press,
   body.story .section.dark.story-rail-container .story-rail {
     --carousel-cell-width: calc(45cqw - var(--carousel-gap));
   }
@@ -192,6 +307,7 @@ body.story .section.dark.story-rail-container .story-rail .card-teaser-title {
 }
 
 @media (width >= 992px) {
+  .story-rail.press,
   body.story .section.dark.story-rail-container .story-rail {
     --carousel-cell-width: calc(30cqw - var(--carousel-gap));
   }

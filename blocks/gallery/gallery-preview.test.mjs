@@ -91,6 +91,22 @@ test('4 rows (the M1 maximum) render 4 thumbs and no pill', { skip }, () => {
   assert.equal(pill(block), null);
 });
 
+test('4 rows with an outside "+51" (press-kit Media Box) render the pill as a link to it', { skip }, () => {
+  const block = document.createElement('div');
+  block.className = 'gallery preview';
+  block.dataset.moreCount = '51';
+  block.dataset.moreHref = '#media-box';
+  block.innerHTML = Array.from({ length: 4 }, (_, i) => row(i + 1)).join('');
+  document.querySelector('main').append(block);
+  decorate(block);
+  assert.equal(thumbs(block).length, 4);
+  assert.equal(pill(block).tagName, 'A');
+  assert.equal(pill(block).getAttribute('href'), '#media-box');
+  assert.equal(pill(block).textContent, '+51');
+  assert.equal(pill(block).getAttribute('aria-label'), 'Show 51 more images');
+  assert.equal(pill(block).closest('li'), thumbs(block)[3].closest('li'));
+});
+
 test('thumbs are labelled buttons; captions are not rendered on the page', { skip }, () => {
   const block = preview(3);
   thumbs(block).forEach((btn, i) => {

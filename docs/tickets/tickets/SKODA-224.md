@@ -4,7 +4,9 @@
 - **Phase:** A · **Milestone:** M1 (demo-visible on 4 of 5 M1 press releases)
 - **GitHub issue:** [#172](https://github.com/skoda-storyboard/demo/issues/172) (sub-issue of #47)
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1d *(planning estimate, not a quote)*
-- **Status (2026-09-27):** 🔵 TODO
+- **Status (2026-09-29):** 🟡 IN REVIEW. The `Story Rail (press)` variant is built in `story-rail.css`
+  only. It is QA'd on `/drafts/skoda-224-story-rail-press` and on the 4 M1 releases. AC 2 (click / drag)
+  now passes: `main` carries the SKODA-212a pointer fix, merged into this branch on 2026-09-29.
 
 ## Origin
 SKODA-607 phase split (2026-09-27); absorbs the block half of SKODA-612 (the importer half ships in 607).
@@ -32,9 +34,83 @@ SKODA-607 phase split (2026-09-27); absorbs the block half of SKODA-612 (the imp
 ## Acceptance Criteria
 - [ ] On Zellmer, National Theatre, Board and Peaq (branch preview), card and cell geometry match the source at
       1280/1024/768/500 (±2px); arrows behave as the source (Board: both disabled).
-- [ ] Card click navigates, drag scrolls (SKODA-212a behaviour); no `href=""` anywhere.
+- [x] Card click navigates, drag scrolls (SKODA-212a behaviour); no `href=""` anywhere.
 - [ ] Story related rails (SKODA-820) unchanged unless they opt into the variant.
 - [ ] lint + tests green; no re-import needed (contract shape 1).
+
+## Build notes (2026-09-29, live DevTools on the Zellmer release)
+- **Corrections to the Problem section:**
+  - The card title is **18px / 21.6 / 400** at every width, not 26px/32.5/600.
+  - The date is 11px / 600 / line-height 11px with 1.1px letter-spacing.
+  - Both have `text-shadow: 0 1px 1px rgb(0 0 0 / 50%)`.
+  - The fixed 90 / 30 / 22.5% ladder lives in `blocks/carousel/carousel.css`, not in story-rail.css.
+- **Ladder:** 90% below 768, 45% from 768 to 991, 30% from 992, capped by the 1248px band.
+  This is the SKODA-820 story related-band ladder, so the variant shares those rules through
+  plain selector lists (press selector first) rather than copying the values. Each selector keeps
+  its own specificity: the press rules stay at (0,2,0), and the story band's selectors are
+  unchanged from `main`.
+
+  | Viewport | Cell pitch | Card |
+  |---|---|---|
+  | 1280 | 374.4 | 354.4×199.3 |
+  | 1024 | 307.2 | 287.2×161.5 |
+  | 768 | 345.6 | 325.6×183.1 |
+  | 500 | 450 | 430×241.9 |
+
+  EDS matches all of these, plus 992/991, 767 and 390.
+- **Press-only rules:**
+  - The rail bleeds out of the press-release section wrapper's 10px inset, like the source Flickity viewport.
+  - Dual scrim only (`--scrim-h`, `--scrim-v`), without the bottom text gradient.
+  - The date line sits 13px above the title; this cancels the dark-band `p` margin.
+  - The title is clamped to **1 line** with "…", as on the source at every width (PR #206 review).
+    Title top 161.8 / 123.9 / 145.5 / 204.3 at 1280 / 1024 / 768 / 500, the same as the source.
+- **Arrows:** 32px and vertically centred on the card. Prev is at the first card edge; next is 10px
+  from the band's right edge. Both are hidden when disabled; Board (1 card) has both hidden.
+  Each click pages 3 / 3 / 2 / 1 cells at 1280 / 1024 / 768 / 500. This matches the source on every
+  page except the last one (see the differences below).
+- **No layout shift:** the mount reserve equals the built height (199.3px at 1280).
+- **"All" end card (added on request, press variant only):** the source ends a *full* band (its
+  10-release limit, with more matches) with an `.item-all` cell. Only Zellmer has one; National
+  Theatre (5), Board (1) and Peaq (6) don't.
+  - **Where it comes from:** `story-rail.js` appends the card after the carousel builds, linking to
+    the band's "All" header link, so no contract or re-import change is needed.
+  - **When:** the curated rows reach 10, or in index mode more rows match than the limit (the
+    selection fetches one extra row to tell).
+  - **Look:** card-sized 16:9 cell with a 1px white outline and square corners, "All" 16/600
+    centred, and a CSS chevron in a 16px cell 16px after the text. On hover the chevron nudges
+    8px (0.6s ease-in-out, infinite); this is off under reduced motion.
+  - **Arrows:** "next" disables only once the end card is reached.
+  - **Measured at 1280:** 354.4×199.3 at the 374.4 pitch, with "All" 151.5px into the card
+    (source 151.8).
+- **Deliberate differences:**
+  - **Ellipsis position:** the source shortens titles with JS (dotdotdot) at a word boundary for
+    the current width. EDS clamps to one line with CSS, so the "…" can fall at a different
+    character. Line count and positions match.
+  - **Last page stop position (shared carousel, deferred to SKODA-212a):** Flickity runs without
+    `contain`, so the source aligns the last group to the left and leaves the rest of the band
+    empty. The EDS carousel clamps to the scroll end, so a partial card shows at the left edge.
+    At 1280 on Zellmer after the last "next": the source shows cell 9 at x=10 and the All card at
+    x=384.3; EDS shows cell 8 at x=135.1 (card 7 cut off) and the All card at x=883.9. It happens
+    at every width. The fix belongs in `blocks/carousel/carousel.js`, not this variant.
+- **"All" pill (added on request, press-release template):** the band's "All" link now renders as the
+  source ghost pill. It is white with a 2px `#464748` border and text, 36px tall with 8/32 padding,
+  16/600 text with 1px tracking, and fills `#f1f1f1` on hover. It sits on the heading row, right-aligned
+  and vertically centred on the heading and subheading.
+  - Pill positions, measured from the heading top: x 1163.6 / y 14.3 at 1280, x 667.6 / y 14.3 at 768,
+    x 289.6 / y 30.3 at 390. These are the same as the source.
+  - The first card now starts 84.5px below the heading at ≥768 and 116.5px below 768, as on the source.
+  - **Why it was broken:** `decorateButtons` only buttonizes bold or italic links, and it outputs
+    `button-wrapper` while the template expected `button-container`. The template now marks the plain
+    "All" link itself (`decorateRelatedLinks`).
+- **Click / drag (unblocked 2026-09-29, after merging `main` with SKODA-212a):** on Zellmer at 1280 a
+  mouse drag scrolls the band one card (374px) without navigating, a card click opens that release,
+  "next" pages 1123 → 2246 → 2870 and disables with the "All" card in view, and the "All" card opens
+  the "All" listing. The last-page stop position (above) is unchanged by 212a.
+- **Merge with `main` (SKODA-208 / 212a / 826):** the rail now passes its variant classes to the
+  inner carousel (`carousel press`), which nothing styles; index mode keeps its `limit + 1` fetch
+  alongside the media-rail lightbox rows; `main`'s `--carousel-title-lines: 1` for the press-release
+  band agrees with this variant's one-line title. Geometry re-measured at 1280 / 1024 / 768 / 500:
+  unchanged.
 
 ## Dependencies
 SKODA-212 (rail), SKODA-212a (pointer fix), SKODA-820 (curated-mode fix, PR #157: rebase on it), SKODA-607 (emits

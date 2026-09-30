@@ -94,7 +94,24 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/press-kit-content.js
   var text = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
-  function embedUrls(root, document) {
+  var boldCaption = (node) => (node == null ? void 0 : node.matches("p")) && !!text(node) && text(node) === [...node.querySelectorAll("strong, b")].map(text).join(" ").trim();
+  function clipTitle(document, file, attachment) {
+    const before = attachment.previousElementSibling;
+    if (boldCaption(before)) return text(before);
+    let node = before;
+    while (node && !node.matches("h1, h2, h3, h4, h5, h6, .media-cart-item")) node = node.previousElementSibling;
+    if (node && !node.matches(".media-cart-item") && text(node)) return text(node);
+    const item = [...document.querySelectorAll(".search-results-item")].find((el) => [...el.querySelectorAll("a[href]")].some((a) => a.getAttribute("href") === file));
+    return text(item == null ? void 0 : item.querySelector(".entry-title"));
+  }
+  function videoEmbed(document, file, attachment) {
+    const title = clipTitle(document, file, attachment);
+    const link = Object.assign(document.createElement("a"), { href: file, textContent: title || "Video" });
+    const rows = [["Embed"], ["url", link]];
+    if (title) rows.push(["title", title]);
+    return WebImporter.DOMUtils.createTable(rows, document);
+  }
+  function embedUrls(root, document, { nested = false } = {}) {
     root.querySelectorAll("iframe").forEach((frame) => {
       const url = frame.getAttribute("src") || frame.getAttribute("data-src");
       if (!url || !/^https?:\/\//.test(url)) {
@@ -111,7 +128,8 @@ var CustomImportScript = (() => {
       bare == null ? void 0 : bare.querySelectorAll(".media-cart-actions").forEach((actions) => actions.remove());
       if (attachment && root.contains(attachment) && !text(bare) && attachment.querySelectorAll("iframe").length === 1 && !attachment.querySelector("img, video")) {
         const file = [...attachment.querySelectorAll('a.media-cart-action.download[href], a[data-action="download"][href]')].map((link) => link.getAttribute("href")).find((href) => /\.mp4(?:[?#]|$)/i.test(href || ""));
-        const out = [p];
+        const locked = /(^|\.)vimeo\.com$/i.test(new URL(url).hostname);
+        const out = [file && locked && !nested ? videoEmbed(document, file, attachment) : p];
         if (file) {
           const dp = document.createElement("p");
           const link = document.createElement("a");
@@ -149,16 +167,16 @@ var CustomImportScript = (() => {
       gallery.replaceWith(...nodes);
     });
   }
-  function contents(panel, document) {
+  function contents(panel, document, { nested: inBlock = false } = {}) {
     const nested = panel.querySelector(":scope > .panel-widget-style .panel-layout, :scope > .panel-layout, .panel-layout");
-    if (nested) return flatten(nested, document);
+    if (nested) return flatten(nested, document, { nested: true });
     const widgets = panel.querySelectorAll(".textwidget");
     if (widgets.length) {
       return [...widgets].flatMap((widget) => {
         var _a;
         const title = text((_a = widget.parentElement) == null ? void 0 : _a.querySelector(":scope > .widget-title"));
         const heading = title ? [Object.assign(document.createElement("h2"), { textContent: title })] : [];
-        embedUrls(widget, document);
+        embedUrls(widget, document, { nested: inBlock });
         inlineGalleries(widget, document);
         widget.querySelectorAll("hr").forEach((rule) => rule.remove());
         const items = widget.childNodes;
@@ -168,7 +186,21 @@ var CustomImportScript = (() => {
     if (!text(panel) && !panel.querySelector("img, a[href]")) return [];
     throw new Error(`Unsupported press-kit content widget: ${panel.className}`);
   }
-  function flatten(layout, document) {
+  var BANNER_MAX_WIDTH = 400;
+  function bannerCell(nodes) {
+    var _a, _b, _c;
+    if (nodes.length !== 1 || text(nodes[0])) return false;
+    const imgs = ((_b = (_a = nodes[0]).querySelectorAll) == null ? void 0 : _b.call(_a, "img")) || [];
+    const width = Number((_c = imgs[0]) == null ? void 0 : _c.getAttribute("width"));
+    return imgs.length === 1 && !!imgs[0].closest("a[href]") && width > 0 && width <= BANNER_MAX_WIDTH;
+  }
+  var hasContent = (cell) => text(cell) || cell.querySelector("img, iframe, a[href]");
+  function columnsRow(cells, document) {
+    const row = cells.map((cell) => [...cell.children].filter((node) => node.matches(".so-panel")).flatMap((panel) => contents(panel, document, { nested: true })));
+    const name = row.every(bannerCell) ? "Columns (banners)" : "Columns";
+    return WebImporter.DOMUtils.createTable([[name], row], document);
+  }
+  function flatten(layout, document, { nested = false } = {}) {
     const output = [];
     let rows = [];
     const flush = () => {
@@ -178,6 +210,12 @@ var CustomImportScript = (() => {
     [...layout.children].forEach((grid) => {
       if (!grid.matches(".panel-grid")) {
         if (text(grid) || grid.querySelector("img, a[href]")) throw new Error("Unexpected press-kit article grid");
+        return;
+      }
+      const filled = [...grid.children].filter((cell) => cell.matches(".panel-grid-cell") && hasContent(cell));
+      if (!nested && filled.length > 1 && !grid.querySelector(".widget_ys-row-toggle, .widget_siteorigin-panels-builder")) {
+        flush();
+        output.push(columnsRow(filled, document));
         return;
       }
       [...grid.children].forEach((cell) => {
@@ -208,7 +246,7 @@ var CustomImportScript = (() => {
             return;
           }
           flush();
-          output.push(...contents(panel, document));
+          output.push(...contents(panel, document, { nested }));
         });
       });
     });
@@ -406,7 +444,7 @@ var CustomImportScript = (() => {
         const ul = document.createElement("ul");
         section.querySelectorAll("ul.menu > li").forEach((li) => {
           const a = li.querySelector('a[href]:not([href="#"])');
-          const title = text4(a) || text4(li.querySelector("span"));
+          const title = text4(a) || text4(li);
           if (!title || !a && !mediaBox) return;
           const link = document.createElement("a");
           link.href = (a == null ? void 0 : a.getAttribute("href")) || "#media-box";
@@ -420,7 +458,24 @@ var CustomImportScript = (() => {
     });
     return nodes;
   }
+  var ICON_MAX_WIDTH = 60;
+  function iconCallout(table, document) {
+    var _a;
+    const rows = [...table.rows];
+    const cells = rows.length === 1 ? [...rows[0].cells] : [];
+    if (cells.length !== 2 || text4(cells[0])) return null;
+    const imgs = cells[0].querySelectorAll("img");
+    const width = Number((_a = imgs[0]) == null ? void 0 : _a.getAttribute("width"));
+    if (imgs.length !== 1 || !(width > 0 && width <= ICON_MAX_WIDTH) || !text4(cells[1])) return null;
+    const icon = make(document, "p", "");
+    icon.append(cells[0].querySelector("a:has(img)") || imgs[0]);
+    const body = make(document, "p", "");
+    body.append(...cells[1].childNodes);
+    return WebImporter.DOMUtils.createTable([["Columns (callout)"], [[icon], [body]]], document);
+  }
   function layoutTable(table, document) {
+    const callout = iconCallout(table, document);
+    if (callout) return [callout];
     table.querySelectorAll('img[src*="whatsapp"]').forEach((img) => {
       const link = img.closest("a");
       (link && !text4(link) ? link : img).remove();
@@ -796,7 +851,7 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/transformers/skoda-images.js
-  function hasContent(node) {
+  function hasContent2(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
   function withCaption(node, caption, document) {
@@ -836,7 +891,7 @@ var CustomImportScript = (() => {
     before.append(beforeRange.extractContents());
     const imageNode = imageContainer(img, document, linkedImage ? link : null);
     const image = withCaption(imageNode, caption, document);
-    paragraph.replaceWith(...[before, image, after].filter(hasContent));
+    paragraph.replaceWith(...[before, image, after].filter(hasContent2));
   }
   function normalizeImages(root, document = root.ownerDocument) {
     root.querySelectorAll("img").forEach((img) => {
