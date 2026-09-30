@@ -376,10 +376,25 @@
       "pushedAt": "2026-09-28T10:31:34.272Z",
       "previewedHash": "cc90fbe3ca3e777ea593b1d3ee42b214e1b7aacfabde23ac584842a8ee8d67c7"
     },
+    "/en/press-kits/new-skoda-enyaq-press-kit-2": {
+      "hash": "a52b456b233d3716b5e7b3ac4b1987b3096f44a8b2e55b7ff0d034c9bc3ec736",
+      "pushedAt": "2026-09-30T09:05:08.718Z",
+      "previewedHash": "a52b456b233d3716b5e7b3ac4b1987b3096f44a8b2e55b7ff0d034c9bc3ec736"
+    },
     "/en/press-kits/press-kit-skoda-at-the-iaa-2019": {
       "hash": "749af724d0bcc5ca6623376b3b952d3b01e1025bb37e40c3c07f620beafbb769",
       "pushedAt": "2026-09-28T10:31:34.272Z",
       "previewedHash": "749af724d0bcc5ca6623376b3b952d3b01e1025bb37e40c3c07f620beafbb769"
+    },
+    "/en/press-kits/skoda-elroq-press-kit": {
+      "hash": "eada06c598e0953d26d537e19c3dd248ac701c6cd8ac756c84cfd4dbaa363980",
+      "pushedAt": "2026-09-30T09:05:08.718Z",
+      "previewedHash": "eada06c598e0953d26d537e19c3dd248ac701c6cd8ac756c84cfd4dbaa363980"
+    },
+    "/en/press-kits/skoda-elroq-press-kit-2": {
+      "hash": "2421884fc45433b1e71a0de1616140b86bdd5078566d79fd80d4284a97b05bc4",
+      "pushedAt": "2026-09-30T09:32:40.279Z",
+      "previewedHash": "2421884fc45433b1e71a0de1616140b86bdd5078566d79fd80d4284a97b05bc4"
     },
     "/en/press-kits/skoda-epiq-press-kit-2": {
       "hash": "2fad3a89054b558c2e4e568ee22bd378b952a99bdbf9c355a16755a00243b5cb",
@@ -559,6 +574,21 @@
       "hash": "9d5109e7de38b8de0c17977bd3e5269f2b0de5d67d6e3ccff516eb261faeb24c",
       "pushedAt": "2026-09-28T10:31:34.272Z",
       "previewedHash": "9d5109e7de38b8de0c17977bd3e5269f2b0de5d67d6e3ccff516eb261faeb24c"
+    },
+    "/en/press-kits/skoda-vision-o-press-kit": {
+      "hash": "0d2ff02e2d93ad2194aca1941ca1508df80a1dbf262a8208bea0247e2bc9bc8d",
+      "pushedAt": "2026-09-30T09:05:08.718Z",
+      "previewedHash": "0d2ff02e2d93ad2194aca1941ca1508df80a1dbf262a8208bea0247e2bc9bc8d"
+    },
+    "/en/press-kits/the-all-new-skoda-kodiaq-press-kit": {
+      "hash": "ba9272bb16b46a9b1e3a105372740dfe64cae996238e2b11c17cf7ac1df4a4df",
+      "pushedAt": "2026-09-30T09:05:08.718Z",
+      "previewedHash": "ba9272bb16b46a9b1e3a105372740dfe64cae996238e2b11c17cf7ac1df4a4df"
+    },
+    "/en/press-kits/the-all-new-skoda-superb-press-kit": {
+      "hash": "ad94f91172955560d00517bfb2a3ad0c95285efa463743779a70cef7cbfc84b6",
+      "pushedAt": "2026-09-30T09:05:08.718Z",
+      "previewedHash": "ad94f91172955560d00517bfb2a3ad0c95285efa463743779a70cef7cbfc84b6"
     },
     "/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models": {
       "hash": "70939a379f6f59d24f1148cf10aac863f6cab9e5925966da06006d1037c2fa4e",
