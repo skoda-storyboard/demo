@@ -141,5 +141,14 @@ and finishes it.
   (SKODA-220 follow-up). Because of this, from the quote down the Peaq Exterior chapter sits 29px
   above the source at 1280 and 4px above at 768/375 (the sidebar is unaffected). Its footer is 28px
   higher at 1280, 768 and 375.
-- **Peaq Images child:** its preview still fails in html2md (200-image page, unchanged in DA; 805a
-  follow-up).
+- **Peaq Images child (unpublished):** html2md accepts at most 200 images per document, and the page has
+  230 distinct images across 10 Downloads groups (preview fails with 409 `maximum number of images reached:
+  230 of 200 max`).
+  - Decision (project owner, 2026-09-30): leave it unpublished. Until it is fixed, the Peaq chapter menu's
+    "Images" link is a 404 on `.aem.live`.
+  - Fix options for the 805a follow-up: split the galleries into fragment documents (each under 200), or
+    use link-only thumbnails (this changes the Downloads contract).
+
+## Publish (2026-09-30, after PR #222)
+- 50 of the 51 `press-kit-default` pages are published and indexed; DA matched the reviewed preview on all 51.
+- The one held is Peaq Images (see Deviations).
