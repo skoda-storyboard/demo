@@ -118,7 +118,8 @@
         "columns",
         "excludefeatured",
         "offset",
-        "exclude"
+        "exclude",
+        "feature"
       ]
     },
     "story-rail": {
@@ -368,20 +369,6 @@
       ]
     },
     {
-      "id": "stories-feature",
-      "block": "stories",
-      "addsConfigKeys": [
-        "feature"
-      ],
-      "status": "pinned",
-      "ticket": "SKODA-222",
-      "fallback": "readable",
-      "shape": 1,
-      "emittedBy": [
-        "parsers/archive-list.js"
-      ]
-    },
-    {
       "id": "gallery-preview",
       "block": "gallery",
       "variants": [
@@ -394,6 +381,18 @@
       "emittedBy": [
         "transformers/skoda-press-release-layout.js"
       ]
+    },
+    {
+      "id": "gallery-story",
+      "block": "gallery",
+      "variants": [
+        "story"
+      ],
+      "status": "pinned",
+      "ticket": "SKODA-216",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": []
     },
     {
       "id": "story-rail-press",

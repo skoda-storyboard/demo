@@ -12,6 +12,7 @@ tools/importer/*.test.mjs
 tools/importer/**/*.test.mjs
 blocks/promo-box/test/
 blocks/promo-box/promo-box.test.mjs
+blocks/**/*.test.mjs
 poc/**/test.mjs
 sync-block-collection.sh
 drafts/
