@@ -352,6 +352,11 @@ async function loadEager(doc) {
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
+  // a refused media-cart add (full package, no network, …) says why (SKODA-505b); the notice
+  // code loads only then
+  window.addEventListener('media-cart:refused', (e) => {
+    import('./media-cart-ui.js').then(({ onRefused }) => onRefused(e)).catch(() => {});
+  });
   loadHeader(doc.querySelector('body > header'));
 
   const main = doc.querySelector('main');

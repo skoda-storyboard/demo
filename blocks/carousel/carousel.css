@@ -183,6 +183,43 @@
   --media-card-button-icon: url("../../icons/media-download.svg");
 }
 
+/* media cart state (SKODA-505b), as on the listing's media card: an added card gets the
+   scrim + white cart glyph (fading in, 64 → 48px), and its add button the remove glyph */
+.carousel.media .card-teaser-image::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: url("../../icons/media-cart-added.svg") center / var(--cart-added-glyph-from) no-repeat var(--cart-added-scrim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--cart-added-motion), background-size var(--cart-added-motion);
+}
+
+.carousel.media .card-teaser:has([data-in-cart]) .card-teaser-image::before {
+  background-size: var(--cart-added-glyph);
+  opacity: 1;
+}
+
+.carousel.media .card-teaser-button.add[data-in-cart] {
+  --media-card-button-icon: url("../../icons/media-remove.svg");
+}
+
+.carousel.media .card-teaser-button[data-cart-control][aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.carousel.media .card-teaser-button[data-cart-control][aria-busy="true"] {
+  cursor: progress;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel.media .card-teaser-image::before {
+    transition: none;
+  }
+}
+
 .carousel.video .card-teaser-image::after {
   content: "";
   position: absolute;

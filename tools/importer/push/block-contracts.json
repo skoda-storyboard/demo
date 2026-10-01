@@ -79,6 +79,9 @@
         "columns"
       ]
     },
+    "media-cart": {
+      "variants": []
+    },
     "promo-box": {
       "variants": [],
       "config": "or-curated",

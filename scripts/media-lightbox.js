@@ -58,6 +58,7 @@ export function feedLightboxItem(row) {
       link: vimeo ? `https://vimeo.com/${vimeo}` : row.mp4,
       cartId: row.id || '',
       cartHref: row.mp4 || '',
+      thumb: row.poster || row.image || '',
       actions: true,
     };
   }
@@ -71,6 +72,8 @@ export function feedLightboxItem(row) {
     link: row.original || src,
     cartId: row.id || '',
     cartHref: row.original || '',
+    // the cart page's card image: the listing's 768px image, not the 1920px slide / original
+    thumb: row.image || '',
     // content images (asset rows) have no cart / download / link buttons on the source
     actions: row.template !== 'asset',
   };

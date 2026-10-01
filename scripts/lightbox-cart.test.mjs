@@ -41,6 +41,7 @@ const caption = (text) => {
 const items = [
   {
     src: 'https://example.com/a.jpg', alt: 'Elroq', caption: caption('Elroq'), cartId: '1', cartHref: ORIGINAL,
+    thumb: 'https://example.com/a-768.jpg',
   },
   { src: 'https://example.com/b.jpg', alt: 'Gallery image', caption: caption('Gallery') },
   {
@@ -65,6 +66,7 @@ test('an item with an original gets an enabled cart toggle; one without disables
     [add.hasAttribute('aria-disabled'), add.getAttribute('aria-pressed'), add.dataset.href, add.dataset.title],
     [false, 'false', ORIGINAL, 'Elroq'],
   );
+  assert.equal(add.dataset.thumb, 'https://example.com/a-768.jpg', 'the card image, for the cart page (505b)');
   open(1);
   await settle();
   assert.deepEqual(

@@ -12,11 +12,15 @@
  *
  * API (see docs/tickets/tickets/SKODA-505a.md):
  *   getCart() → { deviceId, items, count, bytes, limits }
- *   add({ href, title }) → { ok, item?, reason? }   reasons: see REASONS (`network`: try again)
- *   addMany([{ href, title }]) → { added[], skipped[{ href, reason }] }  (fills up to the caps)
+ *   add({ href, title, thumb? }) → { ok, item?, reason? }
+ *     reasons: see REASONS (`network`: try again)
+ *   addMany([{ href, title, thumb? }]) → { added[], skipped[{ href, reason }] }
+ *     (fills up to the caps)
  *   remove(idOrHref) · has(idOrHref) · clear() · onChange(cb) → unsubscribe
  *   download(opts) · downloadItems(items, opts) → { mode, filename, failed[] }  (zip: within caps)
- *   trackView() · bindCartControl(el, { href, title })
+ *   trackView() · bindCartControl(el, { href, title, thumb? })
+ * `thumb` (SKODA-505b) is the card image the cart page shows; kept only when root-relative
+ * or https.
  * Events on window: `media-cart:change` (detail = getCart()), `media-cart:analytics`.
  * A bound control that refuses an add dispatches `media-cart:refused` ({ href, reason }).
  */
@@ -49,6 +53,17 @@ const emptyState = () => ({
 const validItem = (it) => it && typeof it.id === 'string' && it.id.startsWith(DAM_ROOT)
   && it.url === `${DAM_HOST}${it.id}` && Number.isFinite(it.bytes) && it.bytes >= 0;
 
+// the card image shown on the cart page (505b): root-relative (media bus) or https only
+const safeThumb = (thumb) => (typeof thumb === 'string' && /^(\/(?!\/)|https:\/\/)/.test(thumb)
+  ? thumb : '');
+
+// an item as stored: sourceKeys always a list, thumb only when it is safe
+function cleanItem({ thumb, ...it }) {
+  const item = { ...it, sourceKeys: Array.isArray(it.sourceKeys) ? it.sourceKeys : [] };
+  if (safeThumb(thumb)) item.thumb = thumb;
+  return item;
+}
+
 function parseState(text) {
   if (!text) return emptyState();
   try {
@@ -56,7 +71,7 @@ function parseState(text) {
     if (s?.v !== 1 || !Array.isArray(s.items)) return emptyState();
     const seen = new Set();
     const items = s.items.filter((it) => validItem(it) && !seen.has(it.id) && seen.add(it.id))
-      .map((it) => ({ ...it, sourceKeys: Array.isArray(it.sourceKeys) ? it.sourceKeys : [] }));
+      .map(cleanItem);
     return {
       v: 1,
       deviceId: typeof s.deviceId === 'string' ? s.deviceId : null,
@@ -196,8 +211,16 @@ export function createCart({
     return true;
   }
 
+  // links known to have no published original: their controls stay disabled, also when
+  // re-bound (the lightbox re-binds its button on every render)
+  const missing = new Set();
+  const unavailable = (href) => {
+    missing.add(href);
+    controls().filter((c) => c.dataset.href === href && !has(href)).forEach(disable);
+  };
+
   // one add without emitting (addMany emits once)
-  async function addOne({ href, title = '' } = {}) {
+  async function addOne({ href, title = '', thumb = '' } = {}) {
     if (!href) return { ok: false, reason: REASONS.unresolved };
     const known = find(href);
     if (known) return { ok: false, reason: REASONS.duplicate, item: { ...known } };
@@ -224,7 +247,7 @@ export function createCart({
     if (state.items.length >= limits.items) return { ok: false, reason: REASONS.limitItems };
     const bytes = state.items.reduce((sum, it) => sum + it.bytes, 0);
     if (bytes + resolved.bytes > limits.bytes) return { ok: false, reason: REASONS.limitBytes };
-    const item = {
+    const item = cleanItem({
       id: resolved.id,
       url: resolved.url,
       filename: resolved.filename,
@@ -236,7 +259,8 @@ export function createCart({
       sourceKeys: key ? [key] : [],
       page: win.location?.pathname || '',
       addedAt: now().toISOString(),
-    };
+      thumb,
+    });
     const next = {
       ...state,
       deviceId: state.deviceId || uuid(),
@@ -257,7 +281,8 @@ export function createCart({
 
   /**
    * Add several links in order, filling up to the caps (the source's group add): what
-   * doesn't fit or doesn't resolve is skipped with its reason.
+   * doesn't fit or doesn't resolve is skipped with its reason; the controls of links that
+   * don't resolve are disabled, as after a refused click.
    */
   async function addMany(entries = []) {
     const added = [];
@@ -268,7 +293,10 @@ export function createCart({
       // eslint-disable-next-line no-await-in-loop
       const res = await addOne(entry);
       if (res.ok) added.push(res.item);
-      else skipped.push({ href: entry?.href || '', reason: res.reason });
+      else {
+        skipped.push({ href: entry?.href || '', reason: res.reason });
+        if (res.reason === REASONS.unresolved && entry?.href) unavailable(entry.href);
+      }
     }
     if (added.length) emit();
     return { added, skipped };
@@ -330,14 +358,6 @@ export function createCart({
   // the review surface (505b) reports its opening
   const trackView = () => track('MediaCart', 'view', String(state.items.length));
 
-  // links known to have no published original: their controls stay disabled, also when
-  // re-bound (the lightbox re-binds its button on every render)
-  const missing = new Set();
-  const unavailable = (href) => {
-    missing.add(href);
-    controls().filter((c) => c.dataset.href === href && !has(href)).forEach(disable);
-  };
-
   // links that can't reach a published original: disable their controls (once the index
   // is there, i.e. after the first hover / focus). Each control + link is checked once;
   // a network failure leaves it enabled and unchecked.
@@ -360,14 +380,14 @@ export function createCart({
     const el = e.currentTarget;
     e.preventDefault();
     if (el.getAttribute('aria-disabled') === 'true' || el.getAttribute('aria-busy') === 'true') return;
-    const { href, title } = el.dataset;
+    const { href, title, thumb } = el.dataset;
     if (has(href)) {
       remove(href);
       return;
     }
     el.setAttribute('aria-busy', 'true');
     try {
-      const res = await add({ href, title });
+      const res = await add({ href, title, thumb });
       if (res.ok || res.reason === REASONS.duplicate) return;
       if (res.reason === REASONS.unresolved) unavailable(href);
       el.dispatchEvent(new win.CustomEvent('media-cart:refused', {
@@ -390,15 +410,19 @@ export function createCart({
    * original). Re-binding updates the link (the lightbox reuses one button). A control
    * without a resolvable-looking link is disabled; its click is still cancelled.
    * @param {Element} el
-   * @param {{href?: string, title?: string}} [o]
+   * @param {{href?: string, title?: string, thumb?: string}} [o] thumb: the card image
    * @returns {Element}
    */
-  function bind(el, { href = el.dataset.href, title = el.dataset.title } = {}) {
+  function bind(el, {
+    href = el.dataset.href, title = el.dataset.title, thumb = el.dataset.thumb,
+  } = {}) {
     el.setAttribute('data-cart-control', '');
     if (href) el.dataset.href = href;
     else delete el.dataset.href;
     if (title) el.dataset.title = title;
     else delete el.dataset.title;
+    if (safeThumb(thumb)) el.dataset.thumb = thumb;
+    else delete el.dataset.thumb;
     if (!bound.has(el)) {
       bound.add(el);
       el.addEventListener('click', onControlClick);

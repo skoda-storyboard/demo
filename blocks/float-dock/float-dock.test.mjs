@@ -1,0 +1,77 @@
+/*
+ * Unit tests for the float-dock media-cart badge (SKODA-505b): link to the locale's cart
+ * page, count bubble (hidden when empty), accessible name with the count, polite
+ * announcements on change and aria-current on the cart page itself.
+ * Run: node --test blocks/float-dock/float-dock.test.mjs
+ */
+/* global globalThis */
+/* eslint-disable import/no-extraneous-dependencies */
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { JSDOM } from 'jsdom';
+
+const dom = new JSDOM('<head></head><body></body>', { url: 'https://example.com/de/images' });
+globalThis.window = dom.window;
+globalThis.document = dom.window.document;
+const { buildCartBadge } = await import('./float-dock.js');
+const ui = await import('../../scripts/media-cart-ui.js');
+
+function fakeCart(count) {
+  let listener;
+  return {
+    getCart: () => ({ count }),
+    onChange(cb) { listener = cb; },
+    set(n) { listener({ count: n }); },
+  };
+}
+
+const load = (cart) => async () => [cart, ui];
+
+test('badge: the cart link with a count bubble, hidden when the cart is empty', async () => {
+  const slot = document.createElement('div');
+  const cart = fakeCart(0);
+  const link = await buildCartBadge(slot, {}, load(cart));
+  assert.equal(slot.firstElementChild, link);
+  assert.equal(link.getAttribute('href'), '/de/media-cart');
+  assert.equal(link.className, 'float-dock-button float-dock-cart');
+  assert.ok(link.querySelector('.icon.icon-media-cart'));
+  const count = link.querySelector('.float-dock-cart-count');
+  const status = slot.querySelector('.float-dock-cart-status');
+  assert.deepEqual([count.hidden, count.textContent, count.getAttribute('aria-hidden')], [true, '', 'true']);
+  assert.equal(link.getAttribute('aria-label'), 'Media cart');
+  assert.equal(status.getAttribute('role'), 'status');
+  assert.equal(status.textContent, '', 'nothing is announced on load');
+  assert.equal(link.hasAttribute('aria-current'), false);
+
+  cart.set(1);
+  assert.deepEqual([count.hidden, count.textContent], [false, '1']);
+  assert.equal(link.getAttribute('aria-label'), 'Media cart, 1 item');
+  assert.equal(status.textContent, '1 item in the media cart');
+  cart.set(12);
+  assert.equal(link.getAttribute('aria-label'), 'Media cart, 12 items');
+  cart.set(0);
+  assert.equal(count.hidden, true);
+  assert.equal(status.textContent, '0 items in the media cart');
+});
+
+test('badge: flagged empty (no badge shown, as on the source) until something is added', async () => {
+  const slot = document.createElement('div');
+  const cart = fakeCart(0);
+  const link = await buildCartBadge(slot, {}, load(cart));
+  assert.equal(link.hasAttribute('data-empty'), true);
+  cart.set(2);
+  assert.equal(link.hasAttribute('data-empty'), false);
+  cart.set(0);
+  assert.equal(link.hasAttribute('data-empty'), true);
+  assert.ok(slot.querySelector('.float-dock-cart-status'), 'the status region stays for announcements');
+});
+
+test('badge: labels from the placeholders sheet; aria-current on the cart page', async () => {
+  window.history.replaceState({}, '', '/de/media-cart/');
+  const slot = document.createElement('div');
+  const link = await buildCartBadge(slot, {
+    mediaCartBadge: 'Medienkorb', mediaCartBadgeCount: 'Medienkorb, {n} Dateien',
+  }, load(fakeCart(3)));
+  assert.equal(link.getAttribute('aria-label'), 'Medienkorb, 3 Dateien');
+  assert.equal(link.getAttribute('aria-current'), 'page');
+});

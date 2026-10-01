@@ -12,6 +12,8 @@ tools/importer/*.test.mjs
 tools/importer/**/*.test.mjs
 blocks/promo-box/test/
 blocks/promo-box/promo-box.test.mjs
+blocks/media-cart/media-cart.test.mjs
+blocks/float-dock/float-dock.test.mjs
 poc/**/test.mjs
 sync-block-collection.sh
 drafts/

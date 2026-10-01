@@ -8,8 +8,9 @@
  * Children, in source order: share cluster · media-cart slot · scroll-to-top.
  * - Share: the trigger always expands the per-network intent links, as on the source
  *   (no native `navigator.share` sheet; product decision 2026-09-29, review of the branch preview).
- * - Media-cart slot: an empty `[data-slot="media-cart"]` the cart button (SKODA-505a/b) is
- *   appended into. The dock owns the position, 505 owns the button.
+ * - Media-cart slot `[data-slot="media-cart"]`: the cart badge (SKODA-505b, media-cart.md §2/§3),
+ *   a link to the cart page with the item count, kept in sync with /scripts/media-cart.js
+ *   (loaded here, in the delayed phase). If the cart can't load, the slot stays empty.
  * - Scroll-to-top: shown after 300px of scroll (source parity).
  */
 
@@ -111,12 +112,59 @@ function buildScrollTop(ph) {
   return top;
 }
 
+/**
+ * The media-cart badge: the source a.media-cart-icon (cart glyph, red count bubble when not
+ * empty), linking to the cart page. The count changes are announced politely.
+ * @param {Element} slot
+ * @param {Record<string,string>} ph placeholders
+ * @param {function(): Promise<Array>} [load] the cart + its UI module (injectable for tests)
+ */
+export async function buildCartBadge(slot, ph, load = () => Promise.all([
+  import('../../scripts/media-cart.js'), import('../../scripts/media-cart-ui.js'),
+])) {
+  const [cart, ui] = await load();
+  const labels = ui.cartLabels(ph);
+  const link = document.createElement('a');
+  link.className = 'float-dock-button float-dock-cart';
+  link.href = ui.cartHref();
+  if (window.location.pathname.replace(/\/$/, '') === link.getAttribute('href')) {
+    link.setAttribute('aria-current', 'page');
+  }
+  const count = document.createElement('span');
+  count.className = 'float-dock-cart-count';
+  count.setAttribute('aria-hidden', 'true');
+  link.append(icon('media-cart'), count);
+  const status = document.createElement('span');
+  status.className = 'float-dock-cart-status';
+  status.setAttribute('role', 'status');
+
+  const render = ({ count: n }, announce) => {
+    count.textContent = n ? String(n) : '';
+    count.hidden = !n;
+    // an empty cart shows no badge, as on the source (float-dock.css)
+    link.toggleAttribute('data-empty', !n);
+    link.setAttribute('aria-label', n ? ui.plural(labels, 'badgeCount', n) : labels.badge);
+    if (announce) status.textContent = ui.plural(labels, 'countChanged', n);
+  };
+  render(cart.getCart(), false);
+  cart.onChange((c) => render(c, true));
+  slot.append(link, status);
+  return link;
+}
+
 export default async function decorate(block) {
   const ph = await fetchPlaceholders();
   const slot = document.createElement('div');
   slot.className = 'float-dock-slot';
   slot.dataset.slot = 'media-cart';
   const top = buildScrollTop(ph);
+  // in place before the bar shows, so the share cluster doesn't jump when it arrives
+  try {
+    await buildCartBadge(slot, ph);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('float-dock: media cart unavailable', e);
+  }
 
   block.replaceChildren(buildShare(ph), slot, top);
   decorateIcons(block);

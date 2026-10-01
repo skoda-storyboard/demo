@@ -103,7 +103,8 @@ function cartAction(el, row, size, original = '', title = '') {
   });
   // the cart module loads only where an add control renders; until then it stays disabled
   if (original) {
-    import('./media-cart.js').then(({ bindCartControl }) => bindCartControl(el, { href: original, title }));
+    const thumb = row.image || row.poster || '';
+    import('./media-cart.js').then(({ bindCartControl }) => bindCartControl(el, { href: original, title, thumb }));
   }
   return el;
 }

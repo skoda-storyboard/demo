@@ -374,6 +374,19 @@ test('bind: a refused add disables unresolvable links and reports the reason', a
   assert.equal(b.hasAttribute('aria-busy'), false);
 });
 
+test('addMany: the controls of links that don\'t resolve are disabled, as after a click', async () => {
+  const { cart } = make();
+  const [gone, a] = mount(link(), link());
+  cart.bind(gone, { href: src('unpublished.mp4') });
+  cart.bind(a, { href: src('a.jpg') });
+  const res = await cart.addMany([{ href: src('a.jpg') }, { href: src('unpublished.mp4') }]);
+  assert.deepEqual(res.skipped, [{ href: src('unpublished.mp4'), reason: 'unresolved' }]);
+  assert.equal(gone.getAttribute('aria-disabled'), 'true');
+  assert.equal(a.getAttribute('aria-pressed'), 'true');
+  cart.bind(gone, { href: src('unpublished.mp4') });
+  assert.equal(gone.getAttribute('aria-disabled'), 'true', 'stays disabled when re-bound');
+});
+
 test('bind: a network failure refuses the add but keeps the control usable', async () => {
   let down = true;
   const { cart } = make({
@@ -462,4 +475,29 @@ test('bind: once warmed, a re-pointed or newly bound link is checked as it is bo
   cart.bind(later, { href: src('also-unpublished.jpg') });
   await settle();
   assert.equal(later.getAttribute('aria-disabled'), 'true');
+});
+
+test('thumb (505b): kept only when root-relative or https, from add, bind and storage', async () => {
+  const { cart, storage } = make();
+  await cart.add({ href: src('a.jpg'), title: 'A', thumb: '/en/press/media_1.jpg?width=750' });
+  await cart.add({ href: src('b.jpg'), thumb: 'javascript:alert(1)' });
+  await cart.add({ href: src('c.jpg'), thumb: '//evil.example/x.jpg' });
+  assert.deepEqual(cart.getCart().items.map((it) => it.thumb), [
+    '/en/press/media_1.jpg?width=750', undefined, undefined,
+  ]);
+
+  const [a, b] = mount(link(), link());
+  cart.bind(a, { href: src('big.mp4'), thumb: 'https://cdn.skoda-storyboard.com/p.jpg' });
+  cart.bind(b, { href: src('big.mp4'), thumb: 'http://cdn.skoda-storyboard.com/p.jpg' });
+  assert.equal(a.dataset.thumb, 'https://cdn.skoda-storyboard.com/p.jpg');
+  assert.equal('thumb' in b.dataset, false, 'plain http is dropped');
+  click(a);
+  await settle();
+  assert.equal(cart.getCart().items.at(-1).thumb, 'https://cdn.skoda-storyboard.com/p.jpg');
+
+  const stored = JSON.parse(storage.getItem(STORAGE_KEY));
+  stored.items[0].thumb = 'data:image/svg+xml,<svg onload=alert(1)>';
+  const again = make({ storage: memoryStorage({ [STORAGE_KEY]: JSON.stringify(stored) }) });
+  assert.equal(again.cart.getCart().items[0].thumb, undefined, 'a tampered thumb is dropped');
+  assert.equal(again.cart.getCart().items.at(-1).thumb, 'https://cdn.skoda-storyboard.com/p.jpg');
 });
