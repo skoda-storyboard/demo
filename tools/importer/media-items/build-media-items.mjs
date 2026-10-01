@@ -15,7 +15,8 @@
  *   tools/importer/media-items/items.json    committed record (id, template, title, date, source)
  * `--push` puts the card thumbnails on the Media Bus (carrier documents under /en/fragments/,
  * previewed + published: a sheet's images are not ingested), rewrites `image` to their
- * `media_<hash>` paths, then uploads the sheet to DA and previews + publishes it. Without
+ * `media_<hash>` paths, points `original` at the published AEM Assets original (media-manifest
+ * `public_url`), then uploads the sheet to DA and previews + publishes it. Without
  * `--push` the written sheet keeps the source thumbnail URLs. `--feed` skips the source build
  * and re-publishes an existing sheet (e.g. the DA source) with Media Bus thumbnails. The
  * listing and story-rail blocks read it via their `index: /en/media-feed.json` config row.
@@ -32,7 +33,7 @@ import {
   SOURCE_ORIGIN, facetOptions, parseCards, mergeItems, feedSheet, yearIds, vimeoPoster,
   detailRequest, ajaxNonce, parseDetailPanel, parseAssetLinks, assetItem, requiredDetails,
   detailGaps, unknownGaps, feedCoverageGaps,
-  feedThumbnails, carrierDocs, parseCarrier, withMediaBus,
+  feedThumbnails, carrierDocs, parseCarrier, withMediaBus, withDamOriginals,
 } from './media-items-lib.mjs';
 import { uploadToDA } from '../media/media-lib.mjs';
 import { readLists } from '../build-link-allowlist.mjs';
@@ -254,8 +255,10 @@ const MEDIA_MANIFEST = path.join(ROOT, 'tools/importer/media/media-manifest.json
  * 1920 rendition, original, poster, MP4) needs a media-manifest row, recorded with
  * `npm run media:build -- --feed <feed file>`. Throws with the uncovered URLs.
  */
+const manifestRows = () => (existsSync(MEDIA_MANIFEST) ? JSON.parse(readFileSync(MEDIA_MANIFEST, 'utf8')).rows : {});
+
 function assertManifestCoverage(file) {
-  const rows = existsSync(MEDIA_MANIFEST) ? JSON.parse(readFileSync(MEDIA_MANIFEST, 'utf8')).rows : {};
+  const rows = manifestRows();
   const gaps = feedCoverageGaps(JSON.parse(readFileSync(file, 'utf8')), rows);
   if (!gaps.length) return;
   gaps.slice(0, 20).forEach((g) => console.warn(`  unrecorded ${g.field} (${g.id}): ${g.url}`));
@@ -310,21 +313,29 @@ async function pushCarriers(JSDOM, sheet) {
 }
 
 /**
- * Publish the sheet: gate it, put its thumbnails on the Media Bus, rewrite `image`, write it
- * to `feedFile` and push it.
+ * Publish the sheet: gate it, point `original` at the published AEM Assets originals, put the
+ * thumbnails on the Media Bus (`image`), write it to `feedFile` and push it.
  */
 async function publishFeed(JSDOM, sheet, feedFile) {
-  // the gate runs on the source URLs: the Media Bus copies are of the recorded binaries
+  // the gate runs on the source URLs: the DAM and Media Bus copies are of the recorded binaries
   assertManifestCoverage(feedFile);
-  const thumbs = feedThumbnails(sheet);
-  const bus = withMediaBus(sheet, await pushCarriers(JSDOM, sheet));
+  const dam = withDamOriginals(sheet, manifestRows());
+  dam.missing.forEach((u) => console.warn(`  original not published on AEM Assets, kept: ${u}`));
+  const thumbs = feedThumbnails(dam.sheet);
+  const bus = withMediaBus(dam.sheet, await pushCarriers(JSDOM, dam.sheet));
   if (bus.missing.length === thumbs.length && thumbs.length) {
     throw new Error('the Media Bus ingested no thumbnail; not publishing the feed');
   }
   bus.missing.forEach((u) => console.warn(`  not on the Media Bus, kept: ${u}`));
   writeFileSync(feedFile, `${JSON.stringify(bus.sheet, null, 2)}\n`);
   await pushFeed(feedFile);
-  return { thumbnails: thumbs.length, kept: bus.missing.length };
+  const originals = dam.sheet.data.filter((r) => r.original).length;
+  return {
+    thumbnails: thumbs.length,
+    kept: bus.missing.length,
+    originalsOnDam: originals - dam.missing.length,
+    originalsKept: dam.missing.length,
+  };
 }
 
 export async function main(argv = process.argv.slice(2)) {

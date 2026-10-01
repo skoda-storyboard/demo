@@ -104,8 +104,10 @@ listing (the #177 generator, writing one sheet instead of 101 pages). Its thumbn
 renditions: they aren't resized by the Media Bus params, but they are small enough for cards.
 **Update 2026-09-30:** the thumbnails are now on the Media Bus. `media-items:build --push` previews
 carrier documents (`/en/fragments/media-feed-images[-N]`, one image per thumbnail) and rewrites
-`image` to their `media_<hash>` paths, so the cards get webp + responsive widths. Downloads and
-video posters stay on the source URLs (`tools/importer/media/README.md`).
+`image` to their `media_<hash>` paths, so the cards get webp + responsive widths. **Update
+2026-10-01:** `original` (the "Original" download, the lightbox download + copy link) points at the
+published AEM Assets original from the media manifest (`public_url`, all 102). The 1920 rendition,
+MP4s and video posters stay on the source URLs (`tools/importer/media/README.md`).
 
 **Follow-up tickets:**
 - **M2:** AEM Assets → media feed sync job (published assets, sharded feed, trigger/owner TBD).

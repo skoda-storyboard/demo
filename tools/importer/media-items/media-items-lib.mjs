@@ -459,9 +459,49 @@ export function feedMediaRefs(sheet) {
  * @param {Record<string, object>} manifestRows media-manifest.json `rows`
  */
 export function feedCoverageGaps(sheet, manifestRows = {}) {
-  const seen = new Set(Object.values(manifestRows).flatMap((r) => r.seen_urls || []));
+  const seen = new Set(Object.values(manifestRows)
+    .flatMap((r) => [...(r.seen_urls || []), ...(r.public_url ? [r.public_url] : [])]));
   return feedMediaRefs(sheet)
     .filter((ref) => !manifestRows[logicalId(ref.url)] && !seen.has(ref.url));
+}
+
+/**
+ * The published AEM Assets URL of a feed original: the manifest row (by logical id, or a URL
+ * it has seen) must hold that master, uploaded to the DAM, published, and publicly verified
+ * at `public_url`. Otherwise '' (the original stays on its source URL).
+ * @param {string} url the feed's `original` (source master URL)
+ * @param {Record<string, object>} manifestRows media-manifest.json `rows`
+ */
+export function damOriginal(url, manifestRows = {}) {
+  if (!/^https?:\/\//.test(url || '')) return '';
+  const row = manifestRows[logicalId(url)]
+    || Object.values(manifestRows).find((r) => (r.seen_urls || []).includes(url));
+  if (!row || row.master_url !== url) return '';
+  const { steps = {}, public_url: pub, public_verified: verified } = row;
+  return steps.dam === 'done' && steps.publish === 'done' && pub && verified && verified.url === pub
+    ? pub : '';
+}
+
+/**
+ * The feed with each `original` on AEM Assets (the "Original" download, the lightbox link)
+ * where the DAM holds it published. The 1920 rendition stays on the source: the DAM keeps
+ * originals only.
+ * @returns {{sheet: object, missing: string[]}} missing = originals left on their source URL
+ */
+export function withDamOriginals(sheet, manifestRows) {
+  const published = new Set(Object.values(manifestRows).map((r) => r.public_url).filter(Boolean));
+  const missing = [];
+  const data = sheet.data.map((row) => {
+    // no original, or already on AEM Assets (a re-push)
+    if (!/^https?:\/\//.test(row.original || '') || published.has(row.original)) return row;
+    const dam = damOriginal(row.original, manifestRows);
+    if (!dam) {
+      missing.push(row.original);
+      return row;
+    }
+    return { ...row, original: dam };
+  });
+  return { sheet: { ...sheet, data }, missing };
 }
 
 /*

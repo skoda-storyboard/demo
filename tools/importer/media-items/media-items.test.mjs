@@ -17,8 +17,10 @@ import {
   detailRequest, parseAssetLinks, assetItem, requiredDetails, detailGaps, unknownGaps,
   feedMediaRefs, feedCoverageGaps,
   feedThumbnails, carrierDocs, parseCarrier, withMediaBus, CARRIER_MAX,
+  damOriginal, withDamOriginals,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
+import { logicalId } from '../media/media-lib.mjs';
 
 let JSDOM = null;
 try {
@@ -336,4 +338,49 @@ test('Media Bus thumbnails: carrier documents, previewed paths, feed rewrite', {
   assert.equal(sheet.data[0].image, a, 'the input sheet is not mutated');
   // the manifest gate still sees the source binaries (Media Bus paths are not refs)
   assert.deepEqual(feedMediaRefs(bus.sheet).map((r) => r.field), ['poster']);
+});
+
+test('DAM originals: the feed original points at the published, verified AEM Assets URL', () => {
+  const master = 'https://cdn.skoda-storyboard.com/2026/09/a_b.jpg';
+  const pending = 'https://cdn.skoda-storyboard.com/2026/09/c_d.jpg';
+  const pub = 'https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/images/a-b/a_b.jpg';
+  const rows = {
+    [logicalId(master)]: {
+      master_url: master,
+      seen_urls: [master, 'https://cdn.skoda-storyboard.com/2026/09/a_b-768x512.jpg'],
+      steps: { dam: 'done', publish: 'done' },
+      public_url: pub,
+      public_verified: { url: pub, mime: 'image/jpeg', bytes: 10 },
+    },
+    // uploaded but not published: stays on the source
+    [logicalId(pending)]: {
+      master_url: pending, seen_urls: [pending], steps: { dam: 'done', publish: 'pending' }, public_url: '',
+    },
+  };
+  assert.equal(damOriginal(master, rows), pub);
+  assert.equal(damOriginal(pending, rows), '');
+  assert.equal(damOriginal('https://cdn.skoda-storyboard.com/2026/09/a_b-1920x1280.jpg', {
+    x: { ...rows[logicalId(master)], seen_urls: ['https://cdn.skoda-storyboard.com/2026/09/a_b-1920x1280.jpg'] },
+  }), '', 'a rendition is never mapped to the original');
+  assert.equal(damOriginal(master, {
+    [logicalId(master)]: { ...rows[logicalId(master)], public_verified: null },
+  }), '', 'unverified public URL');
+
+  const sheet = {
+    data: [
+      {
+        id: '1', template: 'image', original: master, 'rendition-1920': 'https://cdn.skoda-storyboard.com/2026/09/a_b-1920x1280.jpg',
+      },
+      { id: '2', template: 'image', original: pending },
+      { id: '3', template: 'video', original: '' },
+    ],
+  };
+  const out = withDamOriginals(sheet, rows);
+  assert.deepEqual(out.sheet.data.map((r) => r.original), [pub, pending, '']);
+  assert.equal(out.sheet.data[0]['rendition-1920'], sheet.data[0]['rendition-1920'], 'the 1920 rendition stays');
+  assert.deepEqual(out.missing, [pending]);
+  assert.equal(sheet.data[0].original, master, 'the input sheet is not mutated');
+  // idempotent on a re-push, and the manifest gate accepts the published URL
+  assert.deepEqual(withDamOriginals(out.sheet, rows).sheet.data.map((r) => r.original), [pub, pending, '']);
+  assert.ok(!feedCoverageGaps(out.sheet, rows).some((g) => g.url === pub));
 });

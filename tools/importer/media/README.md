@@ -28,10 +28,18 @@ carrier documents, `/en/fragments/media-feed-images[-N]` (150 images each, under
 200-image limit; `/en/fragments/**` is outside the query index). One `<img>` per thumbnail with
 `alt` = its source URL; after the preview the builder reads each carrier's `.plain.html` and
 rewrites `image` to `/en/fragments/media_<hash>.<ext>` (a `media_` path resolves from any folder,
-on `.aem.page` and `.aem.live`). The cards' `createOptimizedPicture` params then resize it. The
-gate runs on the source URLs first; downloads (original, 1920, MP4) and the video `poster` stay on
-the source URLs. Don't edit or unpublish the carriers: the next push regenerates them. To move an
-already-published feed onto the Media Bus without re-scraping the source:
+on `.aem.page` and `.aem.live`). The cards' `createOptimizedPicture` params then resize it.
+Don't edit or unpublish the carriers: the next push regenerates them.
+
+**AEM Assets originals.** `--push` also points `original` (the "Original" download, the lightbox
+download and copy link) at the published AEM Assets original: the manifest row's `public_url`,
+only when `steps.dam` and `steps.publish` are `done` and `public_verified.url` matches; otherwise
+it stays on the source URL and the push logs it. The publish host sends
+`content-disposition: attachment`, so "Download original" saves the file. The 1920 rendition, MP4s
+and video posters stay on the source URLs (the DAM keeps originals only). The manifest gate runs on
+the source URLs first.
+
+To move an already-published feed onto the Media Bus and AEM Assets without re-scraping the source:
 
 ```bash
 curl -s https://admin.da.live/source/skoda-storyboard/demo/en/media-feed.json -o feed.json
