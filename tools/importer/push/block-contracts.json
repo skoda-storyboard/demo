@@ -96,7 +96,9 @@
       ]
     },
     "quote": {
-      "variants": []
+      "variants": [
+        "left"
+      ]
     },
     "search": {
       "variants": []
