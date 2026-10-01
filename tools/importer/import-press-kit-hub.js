@@ -28,6 +28,11 @@ function sourceFacets(article) {
 function bannerAlt(href, img) {
   if (/\.zip(?:$|[?#])/i.test(href)) return 'Download the press kit ZIP';
   if (/whatsapp/i.test(href)) return 'Follow Škoda Storyboard on WhatsApp';
+  // The Threads and Spotify banners (Vision O) name themselves in the image text.
+  if (/^https?:\/\/(?:www\.)?threads\.(?:com|net)\//i.test(href)) {
+    return 'Škoda on Threads: the latest news and updates from the world of Škoda';
+  }
+  if (/^https?:\/\/open\.spotify\.com\//i.test(href)) return 'Listen to the #ExploreŠkoda Podcast on Spotify';
   const alt = (img.getAttribute('alt') || img.getAttribute('title') || '').trim();
   if (alt) return alt;
   throw new Error(`Press-kit hub banner has no accessible name: ${href}`);
@@ -60,8 +65,9 @@ export default {
     const heroBlock = parseHero(hero, document);
     const tilesBlock = parseTiles(content, document);
     const banners = bannerLinks(content, document);
+    // An X (Twitter) timeline embed is a third-party widget, not kit content; it is dropped.
     const intro = [...content.querySelectorAll('.widget_sow-editor .textwidget')]
-      .filter((widget) => !widget.querySelector('img') && widget.textContent.trim())
+      .filter((widget) => !widget.querySelector('img, a.twitter-timeline') && widget.textContent.trim())
       .flatMap((widget) => [...widget.children].map((child) => child.cloneNode(true)));
 
     const main = document.body;
