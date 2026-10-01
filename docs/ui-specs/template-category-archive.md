@@ -111,6 +111,23 @@ Values `getComputedStyle` on the eMobility category, cited `(selector · viewpor
       new results.
 - [ ] Visual diff vs source at 1280/768/500 ≤ 2% per-pixel (hero + grid).
 
+## 10a. Featured model card (model tag archives; measured 2026-09-30, SKODA-222)
+
+Source `div.featured-model` inside the first `.search-results-item`, on 11 of the 13 `/en/tag/model/<model>/`
+archives (not Kylaq and Slavia). Values are live DevTools measurements (Octavia / Epiq) and the source CSS
+(`media-room-*.css` / `lite-*.css`). The first page is **4 stories + the card** (`ajax_model_search` offset 4),
+then +6 per Load more. EDS: `stories` `feature` row → `li.stories-feature`.
+
+| Band | Source |
+|---|---|
+| **≥ 992** | Item `position:absolute; right:0` (33.33%), items 3 and 5 get `margin-right:33.33%`, so the card sits in column 3 over rows 1–2. Card bg `#f1f1f1`, `1px solid #e4e4e4`, radius 8px, color `#000`, `min-height 465` (**415 ≤ 1120**), padding `40px 20px 28px` (**10px 20px 15px ≤ 1120**). Title `h2` 32px / 1.15 / 600, centred, margin-bottom .25em (**24px ≤ 1260**). Image width 240 (**175 ≤ 1260**), centred, margin-bottom .25em. CTAs `inline-flex`, min-width 250, padding .5rem 1rem, 14px / 1 / 600, letter-spacing 1px, radius 2em; `li + li` 1em apart. 1440: card 396×465 at x938; the first story 396×223 at x106. |
+| **< 992** | Full width, first. No bg or border, padding `10px 20px 15px`. The `h2.toggle` is a bar: bg `#0e3a2f`, color `#78faae`, 24px / 1 / 600, padding 2em (48px), margin-bottom 16px. `::after` is a 40px mint circle holding a dark chevron (`skoda-bnr-icons` `\e007`, `\e00a` open), floated right and nudged `translate(10px,-10px)`; **≤ 410** the bar is a centred column and the icon sits 1rem under the title. The image is hidden. CTAs: `ul` max-height 0 → 400px (`.expanded`), `all .2s ease-in-out`; each a full-width 32px pill, 16px, margin .5em (48px pitch). 390: bar 330×160, card 370×201 collapsed / 345 open. |
+| Colours | Primary `#78faae` text `#000`, hover `#a8ffcc`. Secondary `#464748` text `#fff`, hover `#5a5b5c`. "Configure your <Model>" (7 of 11) is secondary and opens the configurator in a new tab. |
+
+**Source bug not copied:** at 992–1279 the 415 / 465 min-height is taller than two story rows, so the card
+overlaps the first story Load more adds (14px at 1024). EDS spans the card over the two rows instead, so it is
+exactly two rows tall there; with 3 stories or fewer (nothing below it) it keeps the source minimum.
+
 ## 11. Reference screenshots
 
 - `assets/template-category-archive/desktop-1280.png`, `assets/template-category-archive/mobile-500.png`.

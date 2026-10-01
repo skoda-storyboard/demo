@@ -73,7 +73,7 @@
 | Req | Requirement | Ticket(s) | Epic | M | Build | Status |
 |---|---|---|---|:--:|:--:|---|
 | STO-M01 | Model Hero | SKODA-202 | E02 | M1 | 🟦 | ✅ hero reused |
-| STO-M02 | Featured Model | SKODA-201 | E02 | M1 | 🟦 | 🔴 editorial purpose/config to confirm |
+| STO-M02 | Featured Model | SKODA-201, SKODA-222 | E02 | M1 | 🟦 | 🟡 built on the 11 model tag archives (`stories` `feature` row, SKODA-222, in review) |
 | STO-M03 | Model-related Stories Grid | SKODA-402 | E04 | M1 | 🟦 | ✅ tag-driven; retrieval rules 🟡 |
 | STO-M04 | Story Card | SKODA-201 | E02 | M1 | 🟩 | ✅ built |
 | STO-M05 | Pagination / Load More | SKODA-402 | E04 | M1 | 🟩 | ✅ built |
