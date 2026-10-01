@@ -12,6 +12,57 @@ function phrasing(nodes) {
   });
 }
 
+/*
+ * Blocks can't nest in DA: a Quote inside an answer arrives as a plain table whose first row
+ * names it ("Quote", "Quote (left)"). Rebuild it as a quote block in its own wrapper, so the
+ * answer reads as on the source (the Elroq press kit's toggled pull-quote, SKODA-220). Only a
+ * top-level Quote is rebuilt; any other table, and anything inside a table, stays as authored.
+ */
+const NESTED_QUOTE = /^quote(?:\s*\(([^)]*)\))?$/i;
+const className = (value) => value.trim().toLowerCase().replace(/[^0-9a-z]+/g, '-').replace(/^-|-$/g, '');
+
+function nestedQuotes(panel) {
+  const built = [];
+  [...panel.querySelectorAll('table')].forEach((table) => {
+    if (table.parentElement.closest('table')) return;
+    const [head, ...rows] = [...table.rows];
+    const match = head?.cells.length === 1 && head.textContent.trim().match(NESTED_QUOTE);
+    if (!match || !rows.length) return;
+    const quote = document.createElement('div');
+    quote.className = ['quote', ...(match[1] || '').split(',').map(className).filter(Boolean)].join(' ');
+    rows.forEach((tr) => {
+      const row = document.createElement('div');
+      [...tr.cells].forEach((td) => {
+        const cell = document.createElement('div');
+        cell.append(...td.childNodes);
+        row.append(cell);
+      });
+      quote.append(row);
+    });
+    const wrapper = document.createElement('div');
+    wrapper.append(quote);
+    table.replaceWith(wrapper);
+    built.push(quote);
+  });
+  if (!built.length) return;
+  // The page has aem.js loaded already; importing it lazily keeps the accordion's own module
+  // free of it (and loadable without a page window, as in the unit tests).
+  import('../../scripts/aem.js').then(({ decorateBlock, loadBlock }) => {
+    built.forEach((quote) => {
+      // decorateBlock also marks the section `quote-container`: that describes the section's
+      // own blocks, which a quote inside an answer isn't
+      const section = quote.closest('.section');
+      const marked = section?.classList.contains('quote-container');
+      decorateBlock(quote);
+      if (!marked) section?.classList.remove('quote-container');
+      loadBlock(quote);
+    });
+  }).catch((e) => {
+    // eslint-disable-next-line no-console
+    console.error('accordion: nested quote not loaded', e);
+  });
+}
+
 export default function decorate(block) {
   const items = [];
   [...block.children].forEach((row) => {
@@ -53,6 +104,7 @@ export default function decorate(block) {
     panel.setAttribute('aria-labelledby', button.id);
     panel.hidden = true;
     panel.append(...extra, ...answer.childNodes);
+    nestedQuotes(panel);
     button.addEventListener('click', () => {
       panel.hidden = !panel.hidden;
       button.setAttribute('aria-expanded', String(!panel.hidden));

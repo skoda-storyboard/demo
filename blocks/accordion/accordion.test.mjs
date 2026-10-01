@@ -60,3 +60,76 @@ test('an h1 summary becomes h2, and non-heading summaries keep only phrasing con
   assert.equal(block.querySelectorAll('button p, button div, button h1, button h2, button h3').length, 0);
   assert.equal(second.querySelector('button strong').textContent, 'summary');
 });
+
+test('a Quote table in an answer (blocks can’t nest in DA) becomes a quote block; other tables stay', { skip: !JSDOM }, async () => {
+  const dom = new JSDOM(`<div class="accordion">
+    <div><div><h2>Modern Solid design</h2></div><div>
+      <p>Before.</p>
+      <table><tr><td>Quote</td></tr><tr><td><p>“Centred.”</p></td><td><p><strong>Oliver Stefani</strong></p></td></tr></table>
+      <table><thead><tr><th>Quote (Left, Wide)</th></tr></thead><tbody><tr><td><p>Left.</p></td><td></td></tr></tbody></table>
+      <table><tr><td>Specs</td></tr><tr><td>Range</td><td>560 km</td></tr></table>
+      <table><tr><td>Quote</td><td>two cells</td></tr><tr><td>Not a block head</td></tr></table>
+      <table><tr><td>Quote</td></tr></table>
+      <table><tr><td>Quoted figures</td></tr><tr><td>x</td></tr></table>
+      <table><tr><td>Data</td></tr><tr><td><table><tr><td>Quote</td></tr><tr><td>In a cell</td></tr></table></td></tr></table>
+      <p>After.</p>
+    </div></div>
+  </div>`, { url: 'https://example.com/en/x' });
+  // the page globals aem.js reads, so the nested quote is decorated as on the page
+  Object.assign(globalThis, { window: dom.window, document: dom.window.document });
+  const section = document.createElement('div');
+  section.className = 'section accordion-container';
+  const wrapper = document.createElement('div');
+  wrapper.className = 'accordion-wrapper';
+  const block = document.querySelector('.accordion');
+  block.replaceWith(section);
+  section.append(wrapper);
+  wrapper.append(block);
+  const { error } = console;
+  console.error = () => {}; // the quote's own module can't be fetched here
+  try {
+    decorate(block);
+    await new Promise((resolve) => { setTimeout(resolve, 200); });
+  } finally {
+    console.error = error;
+  }
+  const panel = block.querySelector('.accordion-panel');
+  const quotes = [...panel.querySelectorAll('div.quote')];
+  assert.deepEqual(quotes.map((q) => [...q.classList].filter((c) => c !== 'block')), [['quote'], ['quote', 'left', 'wide']]);
+  assert.ok(quotes.every((q) => q.dataset.blockName === 'quote'), 'decorated as a block');
+  assert.ok(quotes.every((q) => q.parentElement.matches('.quote-wrapper') && q.parentElement.parentElement === panel));
+  assert.equal(section.className, 'section accordion-container', 'the section keeps its own classes');
+  // loaded: the quote block's own decoration ran (its stylesheet can't load here)
+  const [centred, left] = quotes;
+  assert.equal(centred.querySelector('figure > blockquote.quote-text > p').textContent, '“Centred.”');
+  assert.equal(centred.querySelector('figure > figcaption.quote-attribution strong').textContent, 'Oliver Stefani');
+  assert.equal(left.querySelectorAll('figure').length, 1, 'the head row is not content');
+  assert.equal(left.querySelector('figcaption'), null, 'an empty attribution cell renders no caption');
+  assert.equal(panel.querySelectorAll(':scope > table').length, 5, 'non-Quote and malformed tables are left as authored');
+  assert.equal(panel.querySelectorAll('table table').length, 1, 'a Quote inside a table cell is left as authored');
+  assert.match(panel.textContent, /Before\.[\s\S]*Centred[\s\S]*Left\.[\s\S]*Specs[\s\S]*After\./, 'source order kept');
+
+  // a second accordion on the page: its own items, ids and quote, the first one untouched
+  const second = document.createElement('div');
+  second.className = 'accordion';
+  second.innerHTML = '<div><div><h2>Two</h2></div><div><table><tr><td>Quote</td></tr>'
+    + '<tr><td><p>Other.</p></td><td></td></tr></table></div></div>';
+  section.append(second);
+  console.error = () => {};
+  try {
+    decorate(second);
+    await new Promise((resolve) => { setTimeout(resolve, 200); });
+  } finally {
+    console.error = error;
+  }
+  const ids = [...document.querySelectorAll('.accordion-panel')].map((p) => p.id);
+  assert.equal(new Set(ids).size, ids.length, 'unique panel ids across instances');
+  assert.equal(second.querySelectorAll('div.quote').length, 1);
+  assert.equal(panel.querySelectorAll('div.quote').length, 2, 'the first accordion keeps its own quotes');
+  block.querySelector('button').click();
+  second.querySelector('button').click();
+  second.querySelector('button').click();
+  assert.equal(panel.hidden, false, 'toggling the second accordion leaves the first one open');
+  assert.equal(second.querySelector('.accordion-panel').hidden, true);
+  delete globalThis.window;
+});

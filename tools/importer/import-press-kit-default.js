@@ -4,7 +4,7 @@ import gallery from './parsers/gallery.js';
 import tags from './parsers/tags.js';
 import content from './parsers/press-kit-content.js';
 import media from './parsers/press-kit-media.js';
-import quote, { markQuotes } from './parsers/quote.js';
+import quote, { markQuotes, parseFigure } from './parsers/quote.js';
 import layout from './transformers/skoda-press-kit-default-layout.js';
 import metadata from './transformers/skoda-metadata.js';
 import normalizeImages from './transformers/skoda-images.js';
@@ -53,6 +53,8 @@ export default {
     content(body, { document });
     // After the layout, whose source-table pass would flatten a Quote table.
     body.querySelectorAll('p[data-skoda-quote]').forEach((p) => quote(p, payload));
+    // The chapters' WordPress figure quotes (left-aligned, no rule): `Quote (left)`.
+    body.querySelectorAll('figure').forEach((figure) => parseFigure(figure, payload));
 
     article.querySelectorAll('section.images.sa-media-kit-preview')
       .forEach((section) => gallery(section, payload));

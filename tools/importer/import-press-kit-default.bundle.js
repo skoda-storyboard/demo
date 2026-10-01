@@ -386,13 +386,13 @@ var CustomImportScript = (() => {
       const img = item.querySelector(".article-teaser-media img");
       const title = text2(item.querySelector(".entry-title")) || (img == null ? void 0 : img.getAttribute("alt")) || "";
       if (!title) throw new Error("Press-kit Media Box asset has no title");
-      const paragraphs = links.map((link) => {
+      const paragraphs2 = links.map((link) => {
         const p = document.createElement("p");
         p.append(link);
         return p;
       });
       if (!img) {
-        rows.push(["", title, paragraphs]);
+        rows.push(["", title, paragraphs2]);
         return;
       }
       if (!((_a = img.getAttribute("alt")) == null ? void 0 : _a.trim())) img.alt = ((_b = img.getAttribute("title")) == null ? void 0 : _b.replace(/^Video\s*\|\s*/i, "")) || title;
@@ -401,7 +401,7 @@ var CustomImportScript = (() => {
         img.src = src.replace(/-d_\d+x\d+(\.[a-z]+)?(\?.*)?$/i, "-d_1280x720.jpg");
       }
       ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop", "title"].forEach((attr) => img.removeAttribute(attr));
-      rows.push([img, title, paragraphs]);
+      rows.push([img, title, paragraphs2]);
     });
     const config = element.matches(".search-results-gallery") ? [["collapse", "auto"]] : [];
     element.replaceWith(WebImporter.DOMUtils.createTable([["Downloads"], ...config, ...rows], document));
@@ -440,9 +440,9 @@ var CustomImportScript = (() => {
     [...quote.childNodes].forEach((node) => {
       if (node.nodeType === 1 && node.matches("em, i")) p.append(...node.childNodes);
     });
-    const edge = (n) => n && (n.nodeType === 1 && n.matches("br") || n.nodeType === 3 && !text3(n));
-    while (edge(p.lastChild)) p.lastChild.remove();
-    while (edge(p.firstChild)) p.firstChild.remove();
+    const edge2 = (n) => n && (n.nodeType === 1 && n.matches("br") || n.nodeType === 3 && !text3(n));
+    while (edge2(p.lastChild)) p.lastChild.remove();
+    while (edge2(p.firstChild)) p.firstChild.remove();
     return p;
   }
   function attributionParagraph(by, document) {
@@ -452,6 +452,86 @@ var CustomImportScript = (() => {
     const first = (_a = p.querySelector("strong, b")) == null ? void 0 : _a.firstChild;
     if ((first == null ? void 0 : first.nodeType) === 3) first.textContent = first.textContent.replace(/^\s+/, "");
     return p;
+  }
+  var LEFT = "Quote (left)";
+  var MEDIA = "img, picture, video, audio, iframe, svg, object, embed, canvas";
+  var BLOCK = "address, article, aside, blockquote, details, div, dl, fieldset, figure, form, h1, h2, h3, h4, h5, h6, hr, ol, pre, section, table, ul";
+  var is = (node, selector) => (node == null ? void 0 : node.nodeType) === 1 && node.matches(selector);
+  function isFigureQuote(node) {
+    const quoteEl = is(node, "figure") ? node.querySelector(":scope > blockquote") : null;
+    return !!quoteEl && !node.querySelector(MEDIA) && [...quoteEl.childNodes].some((n) => !is(n, "cite") && text3(n));
+  }
+  var edge = (n) => is(n, "br") || (n == null ? void 0 : n.nodeType) === 3 && !text3(n);
+  var trim = (node, re) => {
+    if ((node == null ? void 0 : node.nodeType) === 3) node.textContent = node.textContent.replace(re, "");
+  };
+  function plainParagraph(nodes, document) {
+    const p = document.createElement("p");
+    p.append(...nodes.map((node) => node.cloneNode(true)));
+    p.querySelectorAll("em, i").forEach((it) => it.replaceWith(...it.childNodes));
+    while (edge(p.lastChild)) p.lastChild.remove();
+    while (edge(p.firstChild)) p.firstChild.remove();
+    const inner = (n, side) => is(n, "strong, b") ? n[side] : n;
+    trim(inner(p.lastChild, "lastChild"), /\s+$/);
+    trim(inner(p.firstChild, "firstChild"), /^\s+/);
+    return p;
+  }
+  function paragraphs(nodes, document) {
+    const cell = [];
+    let run = [];
+    const flush = () => {
+      if (run.length) cell.push(plainParagraph(run, document));
+      run = [];
+    };
+    nodes.forEach((node) => {
+      if (is(node, "p")) {
+        flush();
+        cell.push(...paragraphs([...node.childNodes], document));
+      } else if (is(node, BLOCK)) {
+        flush();
+        const copy = node.cloneNode(true);
+        copy.querySelectorAll("em, i").forEach((it) => it.replaceWith(...it.childNodes));
+        cell.push(copy);
+      } else {
+        run.push(node);
+      }
+    });
+    flush();
+    return cell.filter((el) => text3(el));
+  }
+  function figureRow(figure, document) {
+    const nodes = [...figure.childNodes].filter((node) => !is(node, "figcaption"));
+    const cites = nodes.filter((node) => is(node, "blockquote")).flatMap((quoteEl) => [...quoteEl.querySelectorAll(":scope > cite")]);
+    const quote = nodes.flatMap((node) => paragraphs(is(node, "blockquote") ? [...node.childNodes].filter((child) => !cites.includes(child)) : [node], document));
+    const cited = cites.flatMap((cite) => paragraphs([...cite.childNodes], document));
+    let by = [...figure.querySelectorAll(":scope > figcaption")].flatMap((caption) => paragraphs([...caption.childNodes], document));
+    if (by.length) quote.push(...cited);
+    else by = cited;
+    if (!by.length) return [quote, ""];
+    if (!by.some((el) => el.querySelector("strong, b")) && is(by[0], "p")) {
+      const strong = document.createElement("strong");
+      strong.append(...by[0].childNodes);
+      by[0].append(strong);
+    }
+    return [quote, by];
+  }
+  var isLeftTable = (node) => is(node, "table") && text3(node.querySelector("th, td")) === LEFT;
+  function leftTableBefore(figure) {
+    let node = figure.previousSibling;
+    while ((node == null ? void 0 : node.nodeType) === 3 && !text3(node)) node = node.previousSibling;
+    return isLeftTable(node) ? node : null;
+  }
+  function parseFigure(figure, { document }) {
+    if (!isFigureQuote(figure)) return;
+    const table = WebImporter.DOMUtils.createTable([[LEFT], figureRow(figure, document)], document);
+    const prev = leftTableBefore(figure);
+    if (prev) {
+      const row = [...table.querySelectorAll("tr")].pop();
+      [...prev.querySelectorAll("tr")].pop().after(row);
+      figure.remove();
+      return;
+    }
+    figure.replaceWith(table);
   }
   function parse5(element, { document }) {
     var _a;
@@ -1350,6 +1430,7 @@ var CustomImportScript = (() => {
       body.querySelectorAll(".search-results-items").forEach((grid) => parse4(grid, payload));
       parse3(body, { document });
       body.querySelectorAll("p[data-skoda-quote]").forEach((p) => parse5(p, payload));
+      body.querySelectorAll("figure").forEach((figure) => parseFigure(figure, payload));
       article.querySelectorAll("section.images.sa-media-kit-preview").forEach((section) => parse(section, payload));
       article.querySelectorAll("section.tags").forEach((section) => parse2(section, payload));
       const mediaBox = article.querySelector(".search-results.media-box");
