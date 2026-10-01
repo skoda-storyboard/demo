@@ -6,9 +6,9 @@
 - **GitHub issue:** [#153](https://github.com/skoda-storyboard/demo/issues/153)
 - **Estimate:** 1.5 SP · AI-assisted 0.5d / manual 1–1.5d *(planning estimate, not a quote; the home rails added on
   2026-09-30 are about 2 SP more, not re-estimated)*
-- **Status (2026-09-30):** 🟡 In review prep, branch `skoda-611b-home-spacing`.
-  - The band spacing (2437b94) and the home rails (2b335cc) are pushed. The pre-PR review round and the merge of
-    `main` are local.
+- **Status (2026-10-01):** 🟡 In review, PR #238 (branch `skoda-611b-home-spacing`).
+  - The latest `main` (222, 303, 216, 702a) is merged. The one conflict was `stories.configKeys`, resolved by keeping both `exclude` (this branch) and `feature` (222).
+  - With 222's wider Latest Stories cards, the last gap is closed: every band heading and the footer are within 1px of live at 375 / 768 / 992 / 1280 / 1440 (see "After merging main").
   - The re-imported `/en` (with the rails' "All" links) goes to DA after the PR merges.
 
 ## Origin
@@ -33,7 +33,8 @@ cards and its "All" links. **Decision (2026-09-30): fix those here too**, in the
 - [x] 768 / 375: band spacing follows the source within the sweep thresholds (±2px or ±2%). *(Every band heading is
       within 1–2px of the source at 375 / 768 / 992.)*
 - [x] `npm run lint:css` passes; story pages (which share the section styles) are unchanged.
-- [ ] Preview link on the PR: `{branch}--demo--skoda-storyboard.aem.page/en`.
+- [x] Preview link on the PR: `{branch}--demo--skoda-storyboard.aem.page/en`. *(PR #238: `/en` and `/en/media-room`.
+      The preview shows the pills and end cards only once the re-imported `/en` is pushed to DA.)*
 
 ## Implementation (2026-09-30, branch `skoda-611b-home-spacing`)
 - **Source (live `/en/`, CSS + DevTools):**
@@ -53,8 +54,8 @@ cards and its "All" links. **Decision (2026-09-30): fix those here too**, in the
     8px taller than live and than its loading reserve.
 - **Measured, ours vs live** (heading y at 375 / 719 / 720 / 767 / 768 / 991 / 992 / 1280 / 1440):
   - Latest Stories: within 1px at every width.
-  - Social media and Models: within 1px where the cards above match (≤ 992). At 1280 / 1440 they sit 10px
-    higher, because the Latest Stories cards there are narrower until SKODA-222 (#231) lands.
+  - Social media and Models: within 1px where the cards above match (≤ 992). At 1280 / 1440 they sat 10px
+    higher, because the Latest Stories cards there were narrower until SKODA-222 (#231). *(Closed 2026-10-01 after merging main: within 1px.)*
   - Rail end → next heading: 64 against 66. Series: 130 = 130. Latest News: 120 against 122.
   - The last band meets the footer (gap 0), as on live.
 - **Loading reserve:** each light rail's reserve now equals its built height (155 → 155 at 1440, 126 → 126 at 768,
@@ -123,8 +124,8 @@ Found while matching the pitch, measured on the live `/en/` rails at 375 / 768 /
   - Series: 354×244 / 278×201 / 326×228 / 520×338 / 318×224.
 - Pill 90×36, header 36px. The end card is card-sized.
 - The loading reserve equals the built height on every rail, and there is no horizontal overflow.
-- Band headings sit within 1–2px of the source at 375 / 768 / 992. At 1440 the pitch matches; the page sits 10px
-  higher until SKODA-222 (#231) widens the Latest Stories cards.
+- Band headings sit within 1–2px of the source at 375 / 768 / 992. At 1440 the pitch matches; the page sat 10px
+  higher until SKODA-222 (#231) widened the Latest Stories cards. *(Closed 2026-10-01: within 1px.)*
 - Lifestyle has no end card: only 9 of its stories are migrated, so the rail isn't full.
 - Unchanged against `main`: the Zellmer press band (end card included), the Octavia model page and the Epiq story.
 - **Media Room home, compact dark band:**
@@ -179,7 +180,7 @@ Found while matching the pitch, measured on the live `/en/` rails at 375 / 768 /
 - **Measured sweep:** origin `/en` vs ours (with the re-imported `viewall` rows injected) at 320 / 375 / 390 / 414 / 576 / 600 /
   720 / 767 / 768 / 991 / 992 / 1079 / 1080 / 1280 / 1440 / 1920. For every band, the band height, heading position, pill
   box, first card box, card gap and end card are within 2px. The exceptions are all explained:
-  - Latest Stories at ≥ 1248 is 10px narrower until SKODA-222 (#231) lands.
+  - Latest Stories at ≥ 1248 was 10px narrower until SKODA-222 (#231). *(Closed 2026-10-01 after merging main.)*
   - Lifestyle has no end card because only 9 of its stories are migrated.
   - The Social media heading text sits at the same x (644–796); the source heading box is just shorter.
 - **Fixed in this round:**
@@ -206,4 +207,18 @@ Found while matching the pitch, measured on the live `/en/` rails at 375 / 768 /
   - Caption titles are one line with an ellipsis; the full title is in the link's tooltip.
   - The home end card shows only when more stories match than the rail shows.
   - A heading-less rail's pill is named just "All".
+
+## After merging main (2026-10-01: 222, 303, 216, 702a)
+- **Conflict:** `block-contracts.json` `stories.configKeys`, resolved as `offset`, `exclude`, `feature`. The contract doc's baseline row now lists `exclude` too.
+- **Unchanged:** both home bundles rebuild byte for byte, ESLint and Stylelint are clean, `import:validate-blocks` passes on `/en`, and the story-rail, stories, promo-box, home-rail and push tests pass.
+- **Measured, ours vs live** (the merged code with the published `/en` plus the 5 re-imported `viewall` rows; heading y and footer):
+  - Δ 0 at 375.
+  - Δ −1 at 768, 992, 1280 and 1440, for every band (Latest Stories, Social media, Models, eMobility, Lifestyle, Škoda World, Series, Latest News) and the footer.
+  - The first Latest Stories card equals live: 355×200 / 364×205 / 476×268 / 604×340 / 604×340.
+  - 5 pills and 3 end cards (Lifestyle and Series have none, as explained above). No horizontal overflow.
+- **303's header** is 108px tall on live, `main` and this branch, so it moves nothing.
+- **Found on `main`, not changed:** `blocks/header/header-locales.test.mjs` "the topbar group becomes a <div> list…" fails. It expects `/cs/emobility/x` and gets `https://www.skoda-storyboard.com/cs`. It fails the same way with `main` plus an unrelated branch, so it came with 303 (#232); owner SKODA-303.
+- **Content freshness (not code):** live has published one newer story ("King of space… Superb celebrates 25 years"), not migrated yet. Live's promo and feed are one story ahead of ours until it is.
+
+## Dependencies
 SKODA-611a (section structure), SKODA-218 (dark sections).
