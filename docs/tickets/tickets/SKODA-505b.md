@@ -77,7 +77,7 @@ Stacked on 505a. The approach is presentation only: the store stays in `/scripts
     - Live CORS zip of 4 press-release files: per-file progress, then "Your package is ready.", with focus still on *Download package*.
 - **Tests:** `scripts/media-cart-ui.test.mjs`, `blocks/media-cart/media-cart.test.mjs`, `blocks/float-dock/float-dock.test.mjs`, plus additions to the store, downloads, story-rail, media-card and lightbox-cart tests.
 - **Needs a human (content, not code):**
-  - Author the DA page `/en/media-cart`: an `h1` "Your downloads" (a dark section, like the source), then an empty `Media Cart` block. Metadata as on `/en/images` (section media-room, nav `/media-room/nav`, footer `/media-room/footer`).
+  - ~~Author the DA page `/en/media-cart`~~ **Done 2026-10-01:** imported with `tools/importer/import-media-cart.js` (`Style: dark` section with the h1 "Your downloads", then an empty `Media Cart` block; metadata `template: page`), pushed, previewed and published with `import:push`. Media Room nav/footer/section come from a new `/en/media-cart` bulk metadata row. `media-cart` is registered on `main` in `tools/importer/push/block-contracts.json` (without it the block gate holds the page). Until this PR merges, `main--…aem.live/en/media-cart` shows the band with an empty block (the block code 404s on main).
   - Optional `mediaCart*` rows in the placeholders sheet for other locales.
 
 ## Human gate
