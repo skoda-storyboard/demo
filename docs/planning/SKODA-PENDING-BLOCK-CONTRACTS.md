@@ -250,9 +250,12 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Example:** the Zellmer press release (`/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/`).
 
 ### `columns-split`
-- **Status:** `pinned` · **Ticket:** SKODA-225 · **Fallback:** readable (equal columns, portrait stretched)
-- **Shape:** header `Columns (split-NN)`, where `NN` is the first cell's share of the row width in percent, rounded (source 518 | 320 → `split-62`). The rows are the normal `columns` rows. The check accepts `split-10` … `split-99`.
-- **Emitted by:** `story-flatten.js` for 2-cell SiteOrigin rows with unequal cells (graffiti, Kylaq, charging, Peaq comfort).
+- **Status:** `pinned` (shape 2, 2026-10-01) · **Ticket:** SKODA-225 · **Fallback:** readable (equal columns, portrait stretched)
+- **Shape:** header `Columns (split-NN)` or `Columns (split-NN, portrait-NNN)`.
+  - `split-NN` is the first cell's share of the row width in percent, rounded (source 518 | 320 → `split-62`). The rows are the normal `columns` rows. The check accepts `split-10` … `split-99`.
+  - **Shape 2 adds `portrait-NNN`:** the authored display width in px of the row's single image, when it's smaller than the file. The source shows `width="235"` portraits of 500px files; DA keeps only the file's own size, so the width travels in the variant. An image at its file size (the charging `sow-image`, `width` = its largest `srcset` entry) gets no token and fills its cell. The check accepts `portrait-10` … `portrait-999`.
+- **Emitted by:** `parsers/story-flatten.js` for 2-cell SiteOrigin rows with unequal cells (graffiti, Kylaq, Peaq comfort: `split-62, portrait-235`; charging: `split-75`). The cell widths come from the page's head CSS (`#pgc-<id>{width:61.8%}`), read in `import-story-detail.js`'s `preprocess` (`markCellWidths()`). Equal rows, unmeasured rows and 3+ cell rows stay plain `Columns`.
+- **Re-import:** the stories imported with shape 1 output (plain `Columns`) are re-imported through the push tool's `update` path.
 
 ### `columns-banners`
 - **Status:** ✅ **on `main`** (variant of `columns`, SKODA-805c). **Fallback:** readable (the banners fill their cells)
