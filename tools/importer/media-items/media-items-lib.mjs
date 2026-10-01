@@ -55,6 +55,53 @@ export function detailRequest(id, nonce) {
   return { url: `${SOURCE_ORIGIN}/wp/wp-admin/admin-ajax.php`, body: body.toString() };
 }
 
+/**
+ * One page of the source media library, newest first, published within [after, before]: the
+ * listing's "load more" request (`ys_ajax_loader`, the loop template the listing renders). The
+ * response is JSON `{ data: { html, found_posts, post_count } }`. The search backend only serves
+ * the first 10,000 results of a query, so the library is read in date slices (librarySlices).
+ * @param {{nonce: string, type: 'image'|'video', offset?: number, perPage?: number,
+ *   after: string, before: string}} q dates as `yyyy-mm-dd`, inclusive
+ */
+export function libraryRequest({
+  nonce, type, offset = 0, perPage = 200, after, before,
+}) {
+  const body = new URLSearchParams({
+    action: 'ys_ajax_loader',
+    nonce,
+    'query_vars[post_type]': 'attachment',
+    'query_vars[post_mime_type]': type === 'video' ? 'video/*' : 'image/*',
+    'query_vars[posts_per_page]': String(perPage),
+    'query_vars[ys_search_filter]': 'true',
+    'query_vars[ep_integrate]': 'true',
+    'query_vars[orderby]': 'post_date',
+    'query_vars[order]': 'DESC',
+    'query_vars[offset]': String(offset),
+    'query_vars[date_query][0][after]': after,
+    'query_vars[date_query][0][before]': before,
+    'query_vars[date_query][0][inclusive]': 'true',
+    template: 'modules/media-room/templates/partials/loop',
+    loop: 'true',
+    ajax_loader_id: `ajax_search_results_${type}`,
+    lang: 'en',
+  });
+  body.append('query_vars[post_status][]', 'publish');
+  body.append('query_vars[post_status][]', 'inherit');
+  return { url: `${SOURCE_ORIGIN}/wp/wp-admin/admin-ajax.php`, body: body.toString() };
+}
+
+/** One slice per calendar year, newest first (a year stays under the 10,000-result window). */
+export function librarySlices(fromYear, toYear) {
+  const slices = [];
+  for (let y = toYear; y >= fromYear; y -= 1) slices.push({ year: y, after: `${y}-01-01`, before: `${y}-12-31` });
+  return slices;
+}
+
+/** The listing's "load more" nonce (`var ys_ajax_loader = {"nonce":"…"}`). */
+export function libraryNonce(html) {
+  return (String(html).match(/var ys_ajax_loader\s*=\s*\{[^}]*"nonce":"([^"]+)"/) || [])[1] || '';
+}
+
 /** The ajax loader nonce a source listing page embeds (`var skoda_ajax_loader = {…}`). */
 export function ajaxNonce(html) {
   return (String(html || '').match(/skoda_ajax_loader\s*=\s*\{[^}]*"nonce":"([a-z0-9]+)"/i) || [])[1] || '';
@@ -459,7 +506,149 @@ export function feedMediaRefs(sheet) {
  * @param {Record<string, object>} manifestRows media-manifest.json `rows`
  */
 export function feedCoverageGaps(sheet, manifestRows = {}) {
-  const seen = new Set(Object.values(manifestRows).flatMap((r) => r.seen_urls || []));
+  const seen = new Set(Object.values(manifestRows)
+    .flatMap((r) => [...(r.seen_urls || []), ...(r.public_url ? [r.public_url] : [])]));
   return feedMediaRefs(sheet)
     .filter((ref) => !manifestRows[logicalId(ref.url)] && !seen.has(ref.url));
+}
+
+/** The feed columns that serve a DAM-held file: the image original and the video MP4. */
+export const DAM_FIELDS = ['original', 'mp4'];
+
+/** A source file's canonical URL: `/direct-download/<yyyy>/<mm>/<file>` = its CDN path. */
+const canonicalUrl = (url) => cdnUrl(url) || String(url || '').split(/[?#]/)[0];
+
+/**
+ * The media manifest's published files: canonical master URL → AEM Assets `public_url`, for rows
+ * uploaded to the DAM, published, and publicly verified at that URL. Keyed by the master only,
+ * so a rendition never resolves to its original.
+ * @param {Record<string, object>} manifestRows media-manifest.json `rows`
+ * @returns {Map<string, string>}
+ */
+export function damIndex(manifestRows = {}) {
+  const index = new Map();
+  Object.values(manifestRows).forEach((r) => {
+    const { steps = {}, public_url: pub, public_verified: verified } = r;
+    if (r.master_url && steps.dam === 'done' && steps.publish === 'done'
+      && pub && verified && verified.url === pub) index.set(canonicalUrl(r.master_url), pub);
+  });
+  return index;
+}
+
+/**
+ * The published AEM Assets URL of a feed file (`original` or `mp4`), or '' (it stays on its
+ * source URL). A file a page import published under its `/direct-download/` URL counts.
+ * @param {string} url the feed's source URL
+ * @param {Map<string, string>} index damIndex()
+ */
+export function damFile(url, index) {
+  return /^https?:\/\//.test(url || '') ? index.get(canonicalUrl(url)) || '' : '';
+}
+
+/**
+ * The feed with each `original` (the "Original" download, the lightbox download and link) and
+ * `mp4` (the video download and player) on AEM Assets where the DAM holds it published. The 1920
+ * rendition and video posters stay on the source: the DAM keeps originals only.
+ * @returns {{sheet: object, missing: Array<{id, field, url}>}} files left on their source URL
+ */
+export function withDamFiles(sheet, manifestRows) {
+  const index = damIndex(manifestRows);
+  const published = new Set(index.values());
+  const missing = [];
+  const data = sheet.data.map((row) => {
+    const out = { ...row };
+    DAM_FIELDS.forEach((field) => {
+      const url = row[field];
+      // no file, or already on AEM Assets (a re-push)
+      if (!/^https?:\/\//.test(url || '') || published.has(url)) return;
+      const dam = damFile(url, index);
+      if (dam) out[field] = dam;
+      else missing.push({ id: row.id, field, url });
+    });
+    return out;
+  });
+  return { sheet: { ...sheet, data }, missing };
+}
+
+/*
+ * Media Bus thumbnails. Images in a sheet are not ingested by the Media Bus, only images in
+ * page content. So the card thumbnails go through carrier documents: one image per thumbnail
+ * (alt = its source URL, the key back), previewed so Edge Delivery ingests them. Their
+ * `media_<hash>` paths then replace the feed's `image` column; the cards' createOptimizedPicture
+ * resizing params apply to them. Downloads (original, 1920, MP4) and the video poster stay on
+ * the source URLs. The carriers sit under /en/fragments/, which the query index excludes.
+ */
+
+/** Where the carrier documents live (excluded from the query index). */
+export const CARRIER_BASE = 'en/fragments/media-feed-images';
+
+/** Images per carrier: html2md refuses a document with more than 200 images (409 on preview). */
+export const CARRIER_MAX = 150;
+
+/** The feed's absolute `image` URLs, deduplicated, in feed order. */
+export function feedThumbnails(sheet) {
+  const urls = ((sheet && sheet.data) || []).map((r) => r.image).filter((u) => /^https?:\/\//.test(u || ''));
+  return [...new Set(urls)];
+}
+
+const escapeAttr = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+/**
+ * The carrier documents (DA HTML) for `urls`, CARRIER_MAX images each:
+ * `en/fragments/media-feed-images`, `…-2`, …
+ * @returns {Array<{path: string, urls: string[], html: string}>}
+ */
+export function carrierDocs(urls, base = CARRIER_BASE) {
+  const docs = [];
+  for (let i = 0; i < urls.length; i += CARRIER_MAX) {
+    const chunk = urls.slice(i, i + CARRIER_MAX);
+    const n = docs.length + 1;
+    const note = 'Generated by <code>npm run media-items:build -- --push</code> (SKODA-608): the media feed card thumbnails, '
+      + 'on this page so the Media Bus ingests them. Do not edit or unpublish; the next push regenerates it.';
+    const imgs = chunk.map((u) => `<p><img src="${escapeAttr(u)}" alt="${escapeAttr(u)}"></p>`).join('');
+    docs.push({
+      path: n === 1 ? base : `${base}-${n}`,
+      urls: chunk,
+      html: `<body><header></header><main><div><p>${note}</p>${imgs}</div></main><footer></footer></body>`,
+    });
+  }
+  return docs;
+}
+
+/**
+ * Source URL → Media Bus path from a previewed carrier's `.plain.html` document. The Media Bus
+ * returns `./media_<hash>.<ext>?…`, resolved against the carrier's folder, without the query
+ * (the cards add their own). Images the Media Bus did not ingest keep a non-media src: skipped.
+ * @param {Document} doc the parsed `.plain.html`
+ * @param {string} carrierPath e.g. `en/fragments/media-feed-images`
+ * @returns {Map<string, string>}
+ */
+export function parseCarrier(doc, carrierPath) {
+  const folder = `/${carrierPath.replace(/^\/+/, '').replace(/[^/]*$/, '')}`;
+  const map = new Map();
+  doc.querySelectorAll('img').forEach((img) => {
+    const src = (img.getAttribute('src') || '').split('?')[0];
+    const file = src.match(/^(?:\.\/)?(media_[0-9a-f]+\.[a-z0-9]+)$/i);
+    const alt = img.getAttribute('alt') || '';
+    if (file && alt) map.set(alt, `${folder}${file[1]}`);
+  });
+  return map;
+}
+
+/**
+ * The feed with each `image` on the Media Bus where the carriers ingested it.
+ * @returns {{sheet: object, missing: string[]}} missing = thumbnails left on their source URL
+ */
+export function withMediaBus(sheet, map) {
+  const missing = new Set();
+  const data = sheet.data.map((row) => {
+    if (!/^https?:\/\//.test(row.image || '')) return row;
+    const bus = map.get(row.image);
+    if (!bus) {
+      missing.add(row.image);
+      return row;
+    }
+    return { ...row, image: bus };
+  });
+  return { sheet: { ...sheet, data }, missing: [...missing] };
 }
