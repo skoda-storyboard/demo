@@ -108,5 +108,28 @@ test('a Quote table in an answer (blocks can’t nest in DA) becomes a quote blo
   assert.equal(panel.querySelectorAll(':scope > table').length, 5, 'non-Quote and malformed tables are left as authored');
   assert.equal(panel.querySelectorAll('table table').length, 1, 'a Quote inside a table cell is left as authored');
   assert.match(panel.textContent, /Before\.[\s\S]*Centred[\s\S]*Left\.[\s\S]*Specs[\s\S]*After\./, 'source order kept');
+
+  // a second accordion on the page: its own items, ids and quote, the first one untouched
+  const second = document.createElement('div');
+  second.className = 'accordion';
+  second.innerHTML = '<div><div><h2>Two</h2></div><div><table><tr><td>Quote</td></tr>'
+    + '<tr><td><p>Other.</p></td><td></td></tr></table></div></div>';
+  section.append(second);
+  console.error = () => {};
+  try {
+    decorate(second);
+    await new Promise((resolve) => { setTimeout(resolve, 200); });
+  } finally {
+    console.error = error;
+  }
+  const ids = [...document.querySelectorAll('.accordion-panel')].map((p) => p.id);
+  assert.equal(new Set(ids).size, ids.length, 'unique panel ids across instances');
+  assert.equal(second.querySelectorAll('div.quote').length, 1);
+  assert.equal(panel.querySelectorAll('div.quote').length, 2, 'the first accordion keeps its own quotes');
+  block.querySelector('button').click();
+  second.querySelector('button').click();
+  second.querySelector('button').click();
+  assert.equal(panel.hidden, false, 'toggling the second accordion leaves the first one open');
+  assert.equal(second.querySelector('.accordion-panel').hidden, true);
   delete globalThis.window;
 });
