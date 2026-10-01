@@ -10,7 +10,10 @@
  * feed from the server-rendered source listings (`ajax_search_results_<type>=N` renders N
  * cards; many attachment pages 404, the cards don't), resolves `years-<termId>` classes by
  * probing each year filter, takes Vimeo posters from oEmbed and skips domain-restricted
- * videos. The M2 sync job writes the same rows from published AEM Assets. Writes:
+ * videos. `sources.json` `library` adds the source media library itself (every year, paged
+ * through the listing's "load more" endpoint), kept to the items whose original is published on
+ * AEM Assets (media manifest). The M2 sync job writes the same rows from published AEM Assets.
+ * Writes:
  *   <out>/en/media-feed.json                 the DA sheet (query-index shape, `:type: sheet`)
  *   tools/importer/media-items/items.json    committed record (id, template, title, date, source)
  * `--push` puts the card thumbnails on the Media Bus (carrier documents under /en/fragments/,
@@ -34,6 +37,7 @@ import {
   detailRequest, ajaxNonce, parseDetailPanel, parseAssetLinks, assetItem, requiredDetails,
   detailGaps, unknownGaps, feedCoverageGaps,
   feedThumbnails, carrierDocs, parseCarrier, withMediaBus, withDamFiles,
+  libraryRequest, librarySlices, libraryNonce, damIndex, damFile,
 } from './media-items-lib.mjs';
 import { uploadToDA } from '../media/media-lib.mjs';
 import { readLists } from '../build-link-allowlist.mjs';
@@ -171,22 +175,105 @@ async function fetchDetail(JSDOM, item, ctx) {
   return last ? last.doc : null;
 }
 
+/** Detail panels fetched at a time (one is ~1 s on the source). */
+const DETAIL_WORKERS = 4;
+
 /**
  * The lightbox detail panel of every item (media-item shape 4): the source colorbox loads it
  * per item (`image-overlay-meta-data`). A related article that is a demo page links there.
  */
 async function addDetails(JSDOM, items, ctx) {
   const demo = new Set(readLists().paths);
-  for (const item of items) {
-    // eslint-disable-next-line no-await-in-loop
-    const doc = await fetchDetail(JSDOM, item, ctx);
-    if (doc) Object.assign(item, parseDetailPanel(doc));
-    if (item.related) {
-      const rel = new URL(item.related, SOURCE_ORIGIN);
-      const local = rel.pathname.toLowerCase().replace(/\/+$/, '');
-      if (demo.has(local)) item.related = local;
+  let next = 0;
+  let done = 0;
+  // DETAIL_WORKERS panels at a time (one is ~1 s on the source); cached panels return at once
+  const worker = async () => {
+    while (next < items.length) {
+      const item = items[next];
+      next += 1;
+      // eslint-disable-next-line no-await-in-loop
+      const doc = await fetchDetail(JSDOM, item, ctx);
+      if (doc) Object.assign(item, parseDetailPanel(doc));
+      if (item.related) {
+        const rel = new URL(item.related, SOURCE_ORIGIN);
+        const local = rel.pathname.toLowerCase().replace(/\/+$/, '');
+        if (demo.has(local)) item.related = local;
+      }
+      done += 1;
+      if (done % 250 === 0) console.log(`[media-items] detail panels ${done}/${items.length}`);
     }
+  };
+  await Promise.all(Array.from({ length: DETAIL_WORKERS }, worker));
+}
+
+/** The first year the source media library holds. */
+const LIBRARY_FROM = 2014;
+
+/** One library page (cached as JSON): `{ html, found, count }`. */
+async function libraryPage(q, ctx) {
+  const file = path.join(ctx.cacheDir, `library_${q.type}_${q.after}_${q.offset}_${q.perPage}.json`);
+  if (existsSync(file)) return JSON.parse(readFileSync(file, 'utf8'));
+  if (ctx.offline) throw new Error(`offline and not cached: library ${q.type} ${q.after} offset ${q.offset}`);
+  if (!ctx.libraryNonce) {
+    const res = await fetch(listingUrl({ type: q.type, n: 1 }), { headers: { 'user-agent': UA } });
+    ctx.libraryNonce = libraryNonce(await res.text());
   }
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const { url, body } = libraryRequest({ ...q, nonce: ctx.libraryNonce });
+      // eslint-disable-next-line no-await-in-loop
+      const json = JSON.parse(await postForm(url, body));
+      const d = json.data || {};
+      if (json.status !== false && typeof d.html === 'string') {
+        const page = {
+          html: d.html, found: Number(d.found_posts) || 0, count: Number(d.post_count) || 0,
+        };
+        mkdirSync(ctx.cacheDir, { recursive: true });
+        writeFileSync(file, JSON.stringify(page));
+        return page;
+      }
+    } catch (e) { /* retry */ }
+    ctx.libraryNonce = '';
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((r) => { setTimeout(r, 1500 * attempt); });
+  }
+  throw new Error(`library page failed: ${q.type} ${q.after} offset ${q.offset}`);
+}
+
+/**
+ * The source media library of a type, every card from LIBRARY_FROM to this year, newest first,
+ * kept to the items whose original is published on AEM Assets. Each year is paged to its end;
+ * a year at the 10,000-result window would be incomplete, so it fails.
+ * @returns {Promise<{cards: object[], listed: number, kept: number}>}
+ */
+async function collectLibrary(JSDOM, type, parseCtx, index, ctx) {
+  const onDam = (c) => damFile(type === 'video' ? c.mp4 : c.original, index);
+  const cards = [];
+  let listed = 0;
+  const perPage = 200;
+  for (const slice of librarySlices(LIBRARY_FROM, new Date().getFullYear())) {
+    let offset = 0;
+    let found = 0;
+    do {
+      // eslint-disable-next-line no-await-in-loop
+      const page = await libraryPage({
+        type, offset, perPage, after: slice.after, before: slice.before,
+      }, ctx);
+      found = page.found;
+      if (found >= 10000) throw new Error(`library ${type} ${slice.year}: ${found} items, over the 10,000 window; slice it finer`);
+      const dom = new JSDOM(page.html);
+      cards.push(...parseCards(dom.window.document, parseCtx).filter(onDam));
+      dom.window.close();
+      // let jsdom release the closed window (a cached run never yields otherwise)
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((r) => { setImmediate(r); });
+      if (!page.count) break;
+      offset += page.count;
+    } while (offset < found);
+    listed += found;
+    console.log(`[media-items] library ${type} ${slice.year}: ${found} listed`);
+  }
+  return { cards, listed, kept: cards.length };
 }
 
 /**
@@ -354,9 +441,14 @@ export async function main(argv = process.argv.slice(2)) {
     return { mediaBus };
   }
   const sources = JSON.parse(readFileSync(path.join(HERE, 'sources.json'), 'utf8'));
-  const { queries, assetPages = [], knownDetailGaps = {} } = sources;
+  const {
+    queries, assetPages = [], knownDetailGaps = {}, library = [],
+  } = sources;
   const lists = [];
   const yearsById = {};
+  const libraryReport = {};
+  const index = damIndex(manifestRows());
+  const libCtx = { cacheDir: a.cache, offline: a.offline, libraryNonce: '' };
   let nonce = '';
 
   for (const type of ['image', 'video']) {
@@ -372,6 +464,12 @@ export async function main(argv = process.argv.slice(2)) {
       // eslint-disable-next-line no-await-in-loop
       const doc = new JSDOM(await fetchText(listingUrl(q), a.cache, a.offline)).window.document;
       lists.push(parseCards(doc, { options, yearsById }));
+    }
+    if (library.includes(type)) {
+      // eslint-disable-next-line no-await-in-loop
+      const lib = await collectLibrary(JSDOM, type, { options, yearsById }, index, libCtx);
+      lists.push(lib.cards);
+      libraryReport[type] = { listed: lib.listed, onAemAssets: lib.kept };
     }
   }
 
@@ -417,6 +515,7 @@ export async function main(argv = process.argv.slice(2)) {
     videos: items.filter((i) => i.type === 'video').length,
     assets: items.filter((i) => i.type === 'asset').length,
     dropped: dropped.map((i) => `${i.type} ${i.id} ${i.title} (${reason(i)})`),
+    library: libraryReport,
     yearsById,
   };
   const count = (type, tax, value) => items

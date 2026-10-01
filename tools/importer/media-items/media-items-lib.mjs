@@ -55,6 +55,53 @@ export function detailRequest(id, nonce) {
   return { url: `${SOURCE_ORIGIN}/wp/wp-admin/admin-ajax.php`, body: body.toString() };
 }
 
+/**
+ * One page of the source media library, newest first, published within [after, before]: the
+ * listing's "load more" request (`ys_ajax_loader`, the loop template the listing renders). The
+ * response is JSON `{ data: { html, found_posts, post_count } }`. The search backend only serves
+ * the first 10,000 results of a query, so the library is read in date slices (librarySlices).
+ * @param {{nonce: string, type: 'image'|'video', offset?: number, perPage?: number,
+ *   after: string, before: string}} q dates as `yyyy-mm-dd`, inclusive
+ */
+export function libraryRequest({
+  nonce, type, offset = 0, perPage = 200, after, before,
+}) {
+  const body = new URLSearchParams({
+    action: 'ys_ajax_loader',
+    nonce,
+    'query_vars[post_type]': 'attachment',
+    'query_vars[post_mime_type]': type === 'video' ? 'video/*' : 'image/*',
+    'query_vars[posts_per_page]': String(perPage),
+    'query_vars[ys_search_filter]': 'true',
+    'query_vars[ep_integrate]': 'true',
+    'query_vars[orderby]': 'post_date',
+    'query_vars[order]': 'DESC',
+    'query_vars[offset]': String(offset),
+    'query_vars[date_query][0][after]': after,
+    'query_vars[date_query][0][before]': before,
+    'query_vars[date_query][0][inclusive]': 'true',
+    template: 'modules/media-room/templates/partials/loop',
+    loop: 'true',
+    ajax_loader_id: `ajax_search_results_${type}`,
+    lang: 'en',
+  });
+  body.append('query_vars[post_status][]', 'publish');
+  body.append('query_vars[post_status][]', 'inherit');
+  return { url: `${SOURCE_ORIGIN}/wp/wp-admin/admin-ajax.php`, body: body.toString() };
+}
+
+/** One slice per calendar year, newest first (a year stays under the 10,000-result window). */
+export function librarySlices(fromYear, toYear) {
+  const slices = [];
+  for (let y = toYear; y >= fromYear; y -= 1) slices.push({ year: y, after: `${y}-01-01`, before: `${y}-12-31` });
+  return slices;
+}
+
+/** The listing's "load more" nonce (`var ys_ajax_loader = {"nonce":"…"}`). */
+export function libraryNonce(html) {
+  return (String(html).match(/var ys_ajax_loader\s*=\s*\{[^}]*"nonce":"([^"]+)"/) || [])[1] || '';
+}
+
 /** The ajax loader nonce a source listing page embeds (`var skoda_ajax_loader = {…}`). */
 export function ajaxNonce(html) {
   return (String(html || '').match(/skoda_ajax_loader\s*=\s*\{[^}]*"nonce":"([a-z0-9]+)"/i) || [])[1] || '';

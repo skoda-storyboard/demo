@@ -17,7 +17,7 @@ import {
   detailRequest, parseAssetLinks, assetItem, requiredDetails, detailGaps, unknownGaps,
   feedMediaRefs, feedCoverageGaps,
   feedThumbnails, carrierDocs, parseCarrier, withMediaBus, CARRIER_MAX,
-  damIndex, damFile, withDamFiles,
+  damIndex, damFile, withDamFiles, libraryRequest, librarySlices, libraryNonce,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 import { logicalId } from '../media/media-lib.mjs';
@@ -401,4 +401,30 @@ test('DAM files: original + MP4 point at the published, verified AEM Assets URL'
   // idempotent on a re-push, and the manifest gate accepts the published URLs
   assert.deepEqual(withDamFiles(out.sheet, rows).sheet.data, out.sheet.data);
   assert.ok(!feedCoverageGaps(out.sheet, rows).some((g) => g.url === pub || g.url === mp4Pub));
+});
+
+test('library paging: load-more request, year slices, nonce', () => {
+  const { url, body } = libraryRequest({
+    nonce: 'n1', type: 'image', offset: 400, perPage: 200, after: '2021-01-01', before: '2021-12-31',
+  });
+  assert.equal(url, 'https://www.skoda-storyboard.com/wp/wp-admin/admin-ajax.php');
+  const p = new URLSearchParams(body);
+  assert.equal(p.get('action'), 'ys_ajax_loader');
+  assert.equal(p.get('nonce'), 'n1');
+  assert.equal(p.get('query_vars[post_mime_type]'), 'image/*');
+  assert.equal(p.get('query_vars[offset]'), '400');
+  assert.equal(p.get('query_vars[posts_per_page]'), '200');
+  assert.equal(p.get('query_vars[order]'), 'DESC');
+  assert.equal(p.get('query_vars[date_query][0][after]'), '2021-01-01');
+  assert.equal(p.get('query_vars[date_query][0][before]'), '2021-12-31');
+  assert.deepEqual(p.getAll('query_vars[post_status][]'), ['publish', 'inherit']);
+  assert.equal(new URLSearchParams(libraryRequest({
+    nonce: 'n', type: 'video', after: 'a', before: 'b',
+  }).body)
+    .get('query_vars[post_mime_type]'), 'video/*');
+  assert.deepEqual(librarySlices(2024, 2026).map((x) => [x.year, x.after, x.before]), [
+    [2026, '2026-01-01', '2026-12-31'], [2025, '2025-01-01', '2025-12-31'], [2024, '2024-01-01', '2024-12-31'],
+  ]);
+  assert.equal(libraryNonce('<script>var ys_ajax_loader = {"nonce":"fb6b5f0a56"};</script>'), 'fb6b5f0a56');
+  assert.equal(libraryNonce('<script>var skoda_ajax_loader = {"nonce":"x"};</script>'), '');
 });

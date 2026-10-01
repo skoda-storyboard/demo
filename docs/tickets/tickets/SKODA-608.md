@@ -33,6 +33,10 @@ attachment pages, HTTP-verified.
 >   151 distinct files). Since 2026-10-01 `original` points at the published AEM Assets original (manifest
 >   `public_url`, all 102 image/asset rows), and `mp4` at the AEM Assets MP4 where a press-kit import already published
 >   it (18 of 51; 33 aren't in the DAM yet). The 1920 rendition and video posters stay on the source URLs.
+> - **Library images (2026-10-01):** `sources.json` `library` adds every source library image whose original is
+>   published on AEM Assets: 1,715 of 33,457 (the other ~500 published images are page-only, not in the library).
+>   The feed is 1,769 rows (1,714 images, 51 videos, 4 assets); 64 new items have empty source detail panels
+>   (recorded in `knownDetailGaps`).
 > - **Retired:** the 101 item pages first published in PR #177 (unpublished + deleted 2026-09-27) and the 5 download
 >   columns added to the query-index config (reverted on the admin service).
 > - **Scope:** import/feed only; block work is ticketed: **SKODA-402a** (listing 1/3/4/4 + collapsed facets),

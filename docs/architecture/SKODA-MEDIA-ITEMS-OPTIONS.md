@@ -109,7 +109,11 @@ carrier documents (`/en/fragments/media-feed-images[-N]`, one image per thumbnai
 published AEM Assets original from the media manifest (`public_url`, all 102), and `mp4` at the
 published AEM Assets MP4 where a page import already published it (18 of 51; the other 33 aren't in
 the DAM yet). The 1920 rendition and video posters stay on the source URLs
-(`tools/importer/media/README.md`).
+(`tools/importer/media/README.md`). **Update 2026-10-01 (library):** the feed now also holds every
+source library image whose original is published on AEM Assets (1,715 of 33,457; 1,769 rows,
+~170 KB gzipped in two 1,000-row pages), read year by year through the listing's load-more endpoint.
+This is the M2 shape (published AEM Assets → feed), with the media manifest standing in for an AEM
+Assets query and the source supplying dates, facets and file details.
 
 **Follow-up tickets:**
 - **M2:** AEM Assets → media feed sync job (published assets, sharded feed, trigger/owner TBD).

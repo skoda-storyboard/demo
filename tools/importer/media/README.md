@@ -41,6 +41,15 @@ is the same file as the feed's CDN URL (`cdnUrl`). The publish host sends
 posters stay on the source URLs (the DAM keeps originals only). The manifest gate runs on the
 source URLs first.
 
+**Library source.** `sources.json` `library: ["image"]` adds the whole source image library to
+the feed, kept to the items whose original is published on AEM Assets (2026-10-01: 1,715 of 33,457).
+The builder pages the listing's "load more" endpoint (`ys_ajax_loader`, `query_vars[offset]`) one
+calendar year at a time, because the source search backend serves only the first 10,000 results of
+a query; a year at that window fails the build. Library pages are cached as JSON
+(`library_<type>_<year>-01-01_<offset>_200.json`); detail panels load 4 at a time. Source items whose
+detail panel is empty on every request are recorded in `knownDetailGaps`. A rendition whose file
+name defeats the master match (`X.PNG-353x768.png`) is added to its master row's `seen_urls`.
+
 To move an already-published feed onto the Media Bus and AEM Assets without re-scraping the source:
 
 ```bash
