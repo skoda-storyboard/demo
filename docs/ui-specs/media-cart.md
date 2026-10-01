@@ -131,7 +131,7 @@ component captured across [`social-share.md`](social-share.md) + this spec + scr
 
 ## 4. Responsive behavior
 
-- Floating cart badge is fixed size (`58px` icon, `24px` count) at all bands.
+- Floating cart badge is `58px` at >= 992 and `40px` below (measured 2026-10-01 at 1080 and 390), `24px` count at all bands. With an empty cart it is not shown (its slot collapses under the scroll-top button).
 - Add affordance is fixed `40x40` at all bands (icon button).
 - Cart page: the `25%` sidebar (panel context) collapses to full-width above the item list on narrow
   viewports (source uses the `.media-cart:not(body)` float rule for the in-page 4-col context; the
