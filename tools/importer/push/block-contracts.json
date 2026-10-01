@@ -118,6 +118,7 @@
         "columns",
         "excludefeatured",
         "offset",
+        "exclude",
         "feature"
       ]
     },

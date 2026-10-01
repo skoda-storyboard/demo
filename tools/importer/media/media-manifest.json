@@ -112699,6 +112699,35 @@
       "dam_status": 200,
       "publish_status": 200,
       "published_at": "2026-09-30T11:28:18.556Z"
+    },
+    "b5e98464__Navrh-bez-nazvu-241_9e50de64.png": {
+      "logical_id": "b5e98464__Navrh-bez-nazvu-241_9e50de64.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/09/Navrh-bez-nazvu-241_9e50de64.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/09/Navrh-bez-nazvu-241_9e50de64.png",
+      "dam_page_path": "en",
+      "page_refs": [
+        "en"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/09/Navrh-bez-nazvu-241_9e50de64.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/09/Navrh-bez-nazvu-241_9e50de64.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3050526,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
     }
   }
 }

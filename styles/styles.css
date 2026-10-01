@@ -59,6 +59,7 @@
   --story-sidebar-inset: var(--story-inset);
   --story-sidebar-heading-size-compact: 20px;
   --story-sidebar-heading-line-height: 45px;
+  --card-caption-row: 45px; /* taxonomy caption card: the white title row under the image (source .entry-title) */
   --story-related-band-max-width: var(--cover-box-max-width); /* the same live .cover-box cap */
 
   /* body sizes (mobile-first base) */
@@ -156,12 +157,20 @@
      inside the 1248px container (content edge 10 at 375/768/992, 26 at 1280, inner 1228) */
   --page-gutter: 10px;
   --cover-box-max-width: 1440px; /* live home .cover-box band cap, light + dark (SKODA-218/611a) */
-  --cover-box-padding-top: 66px; /* dark band top → first heading (Storyboard home) */
+  --cover-box-padding-top: 64px; /* dark band top → first rail header row (Storyboard home): source
+                                     .cover-box.dark 2em + .search-results 2em; the heading sits centred in
+                                     the 36px row with the "All" pill, at 66 as on the source (SKODA-611b) */
   --cover-box-padding-bottom: 60px; /* dark band: last rail cards → band end */
   --cover-box-rail-gap: 48px; /* rail cards → next rail heading inside a band */
   --cover-box-dark-margin: 2.25em auto 1.5em; /* live .cover-box.dark (36px / 24px) */
   --cover-box-compact-padding-top: 48px; /* Media Room home band */
   --cover-box-compact-margin: 0 auto 1em; /* live Media Room .cover-box.dark (0 0 16px) */
+
+  /* light band (SKODA-611b): live .cover-box padding .75em 0 plus its .search-results
+     margin 1.5em 0 1em, carried by the section since our markup has no inner container */
+  --cover-box-light-padding-top: calc(var(--spacing-s) + var(--spacing-l)); /* 12px band + 24px above the rail header */
+  --cover-box-light-padding-bottom: calc(var(--spacing-m) + var(--spacing-s)); /* 16px below the rail + 12px band */
+  --cover-box-feed-padding-bottom: var(--spacing-s); /* Latest Stories: no margin under Load more */
   --nav-height: 108px;
   --nav-main-height: 64px;
   --nav-topbar-height: 44px;
@@ -697,11 +706,15 @@ main .section.dark > .default-content-wrapper :is(h1, h2, h3, h4, h5, h6) {
    `Style: cover-box`, dark ones `Style: cover-box, dark`; SKODA-218, SKODA-611a).
    Live caps every band, light and dark, at 1440px and centres it on wider screens
    (x240 @1920); the inner content stays capped at 1248px by the section wrappers.
-   Light bands keep the default section rhythm here; their measured pitch is
-   SKODA-611b.
+
+   Light bands (SKODA-611b, measured on the live Storyboard home at 1440/768/375) have
+   no margin, so neighbours stack flush, and carry live's band padding plus its rail
+   container's margins: band top → rail header 36px, rail cards → band end 28px. So a
+   rail's cards sit 64px above the next band's heading, and 28px + the dark band's own
+   36px margin above a dark band, as on live.
 
    The dark band (the Storyboard "Series" and Media Room "Models" bands), measured
-   on the live homes at 1280/768/500. Inside: band top → first heading 66px (Media
+   on the live homes at 1280/768/500. Inside: band top → first rail header row 64px (the heading at 66; Media
    Room: 48px, `compact`), rail cards → the next rail's heading 48px, last cards →
    band end 60px (live's 32/12 band padding plus its inner containers' offsets;
    our markup has no such containers, so the section padding carries the whole
@@ -711,6 +724,24 @@ main .section.dark > .default-content-wrapper :is(h1, h2, h3, h4, h5, h6) {
 main > .section.cover-box {
   max-width: var(--cover-box-max-width);
   margin-inline: auto;
+}
+
+main > .section.cover-box:not(.dark) {
+  margin-block: 0;
+  padding-block: var(--cover-box-light-padding-top) var(--cover-box-light-padding-bottom);
+}
+
+/* the Latest Stories feed band: live's .search-results.latest-articles has no bottom
+   margin, so the band ends 12px under the Load more wrapper */
+main > .section.cover-box.stories-container:not(.dark) {
+  padding-block-end: var(--cover-box-feed-padding-bottom);
+}
+
+/* a section before a light band (on the home, the promo slider) drops its 40px margin:
+   the gap is live's .promo-box margin, which the promo-box block sets. `:where` keeps the
+   :has() out of the specificity, so later section rules still win */
+main > .section:not(.cover-box):where(:has(+ .section.cover-box:not(.dark))) {
+  margin-block-end: 0;
 }
 
 main > .section.cover-box.dark {
@@ -734,8 +765,9 @@ main > .section.cover-box.dark.compact {
   padding-block-start: var(--cover-box-compact-padding-top);
 }
 
-/* the dark band sets its own rhythm: no stray list margin under the rail cards */
-main > .section.cover-box.dark .carousel-track .card-teaser {
+/* a band sets its own rhythm: no stray list margin under the rail cards (light bands too,
+   SKODA-611b: the global li margin made a light rail 8px taller than live and its reserve) */
+main > .section.cover-box .carousel-track .card-teaser {
   margin-block-end: 0;
 }
 
