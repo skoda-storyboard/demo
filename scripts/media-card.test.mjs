@@ -153,12 +153,15 @@ test('the inert cart actions cancel their own click (no jump to the top in any c
 test('media cart (SKODA-505a): the original\'s add is a cart toggle, the 1920px row stays inert', async () => {
   const original = 'https://cdn.skoda-storyboard.com/2026/08/a.jpg';
   const actions = mediaActions({
-    ...image, original, 'rendition-1920': 'https://cdn.skoda-storyboard.com/2026/08/a-1920x1280.jpg',
+    ...image,
+    original,
+    'rendition-1920': 'https://cdn.skoda-storyboard.com/2026/08/a-1920x1280.jpg',
+    image: 'https://cdn.skoda-storyboard.com/2026/08/a-768x512.jpg',
   }, 'Elroq');
   const [orig, big] = actions.querySelectorAll('.media-card-action.add a');
   assert.equal(orig.getAttribute('aria-disabled'), 'true', 'disabled until the cart module binds it');
   const mp4 = 'https://cdn.skoda-storyboard.com/2026/06/v.mp4';
-  const add = mediaActions({ ...video, mp4 }, 'Footage').querySelector('.media-card-button.add');
+  const add = mediaActions({ ...video, mp4, poster: '/en/poster.jpg' }, 'Footage').querySelector('.media-card-button.add');
   await bound();
   assert.deepEqual(
     [orig.hasAttribute('aria-disabled'), orig.getAttribute('role'), orig.getAttribute('aria-checked'), orig.dataset.href, orig.dataset.title],
@@ -173,6 +176,8 @@ test('media cart (SKODA-505a): the original\'s add is a cart toggle, the 1920px 
     [add.hasAttribute('aria-disabled'), add.getAttribute('aria-pressed'), add.dataset.href, add.dataset.title],
     [false, 'false', mp4, 'Footage'],
   );
+  assert.equal(orig.dataset.thumb, 'https://cdn.skoda-storyboard.com/2026/08/a-768x512.jpg', 'the card image goes with it (505b)');
+  assert.equal(add.dataset.thumb, '/en/poster.jpg', 'a video without an image: its poster');
 });
 
 test('labels: placeholders translate every control, missing keys fall back to English', () => {

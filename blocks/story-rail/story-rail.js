@@ -160,6 +160,9 @@ export function mediaToolbar(row) {
     if (file) a.dataset.href = file;
     const title = cleanTitle(row.title || '');
     if (title) a.dataset.title = title;
+    // the card image, shown on the cart page (SKODA-505b)
+    const thumb = row.image || row.poster;
+    if (thumb) a.dataset.thumb = thumb;
     a.setAttribute('role', 'button');
     a.setAttribute('aria-disabled', 'true');
     elems.push(p);

@@ -306,6 +306,7 @@ test('rowToCells: a media feed row gets the cart + download toolbar cell (media-
   assert.equal(cart.dataset.id, '450812', 'carries the source key');
   assert.equal(cart.dataset.href, 'https://cdn.example/a.jpg', 'adds the original (SKODA-505a)');
   assert.equal(cart.dataset.title, 'A');
+  assert.equal(cart.dataset.thumb, 'https://cdn.example/a-768x512.jpg', 'the card image, for the cart page (505b)');
   assert.equal(cart.getAttribute('aria-disabled'), 'true', 'inert until the built rail binds it');
   assert.equal(cart.getAttribute('aria-label'), 'Add to media cart');
   assert.equal(download.className, 'media-cart-action download');
@@ -495,6 +496,8 @@ test('feedLightboxItem: the source colorbox panel from a media feed row (shape 5
   assert.equal(item.download, 'https://cdn.example/a.jpg', 'download is the original');
   assert.equal(item.cartId, '450812');
   assert.equal(item.cartHref, 'https://cdn.example/a.jpg', 'the add button adds the original (SKODA-505a)');
+  assert.equal(item.thumb, '', 'no listing image: the cart page shows a type tile, not the original');
+  assert.equal(feedLightboxItem({ title: 'T', image: '/media_x.jpg', original: 'https://cdn.example/x.jpg' }).thumb, '/media_x.jpg');
   const paras = item.caption.children;
   const text = (node) => (node.children.length ? node.children.map((c) => (typeof c === 'string' ? c : text(c))).join('') : node.textContent);
   assert.deepEqual(paras.map(text), [

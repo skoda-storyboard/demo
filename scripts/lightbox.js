@@ -16,6 +16,7 @@
  *   cartId   the source cart key on the add button (`data-id`)
  *   cartHref the original the add button puts in the media cart (SKODA-505a); without it
  *            the add button is disabled (e.g. gallery images: no DAM original)
+ *   thumb    the cart page's card image for that add (SKODA-505b; default: `src`)
  *   actions  false: no action buttons (the source's content images), spacing kept
  *   video    an embed URL (Vimeo player): the stage plays it instead of the image
  *
@@ -170,7 +171,9 @@ export function buildLightbox(host, items) {
     }
     if (href && !addBtn.hasAttribute('data-cart-control')) addBtn.setAttribute('aria-disabled', 'true');
     import('./media-cart.js').then(({ bindCartControl }) => {
-      if (seq === cartSeq) bindCartControl(addBtn, { href, title: item.alt || '' });
+      if (seq === cartSeq) {
+        bindCartControl(addBtn, { href, title: item.alt || '', thumb: item.thumb || item.src || '' });
+      }
     });
   };
 

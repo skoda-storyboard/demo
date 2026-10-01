@@ -226,10 +226,25 @@
 
   /* stacking order for page-level fixed UI (SKODA-215), lowest → highest:
      in-page layers (carousel/cards ≤ 2, downloads size menu 15) < floating action bar 18
-     < header + open mobile nav drawer and its backdrop (header .nav-wrapper, 20)
+     < media-cart notice 19 < header + open mobile nav drawer and its backdrop (header .nav-wrapper, 20)
      < gallery lightbox (99999) < consent banner (OneTrust ships its own ~2147483645, SKODA-704).
      The bar stays under the drawer, lightbox and consent banner so they always cover it. */
   --z-float-dock: 18;
+
+  /* media cart (SKODA-505b; media-cart.md §3, measured on the source 2026-09-30): the red
+     count bubble on the cart badge, the dark scrim over an added card, the limit notice's
+     accent (brand green) and the popup shadow */
+  --cart-badge-bg: var(--skoda-coral);
+  --cart-added-scrim: rgb(0 0 0 / 40%);
+  --cart-limit-accent: var(--skoda-green);
+  --cart-popup-shadow: 0 18px 50px rgb(0 0 0 / 25%);
+
+  /* the added card's glyph shrinks into place (64 → 48px) and fades in with the source's
+     spring, 0.3s after the click */
+  --cart-added-glyph: 48px;
+  --cart-added-glyph-from: 64px;
+  --cart-added-motion: 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) 0.3s;
+  --z-cart-notice: 19;
 }
 
 /* The global element defaults below (body, headings, paragraphs, lists, strong/em, hr, line

@@ -41,6 +41,9 @@
   --skoda-grey-350: #c4c6c7;
   --skoda-grey-750: #464748;
 
+  /* media-cart count bubble (SKODA-505b; the source badge's #f66) */
+  --skoda-coral: #f66;
+
   /* social network brand colors (footer icon hover tints — raw brand hex) */
   --social-hover: #419468;
   --social-facebook: #3b5998;
