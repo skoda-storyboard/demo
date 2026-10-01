@@ -15,8 +15,8 @@
  *   tools/importer/media-items/items.json    committed record (id, template, title, date, source)
  * `--push` puts the card thumbnails on the Media Bus (carrier documents under /en/fragments/,
  * previewed + published: a sheet's images are not ingested), rewrites `image` to their
- * `media_<hash>` paths, points `original` at the published AEM Assets original (media-manifest
- * `public_url`), then uploads the sheet to DA and previews + publishes it. Without
+ * `media_<hash>` paths, points `original` and `mp4` at the published AEM Assets files
+ * (media-manifest `public_url`), then uploads the sheet to DA and previews + publishes it. Without
  * `--push` the written sheet keeps the source thumbnail URLs. `--feed` skips the source build
  * and re-publishes an existing sheet (e.g. the DA source) with Media Bus thumbnails. The
  * listing and story-rail blocks read it via their `index: /en/media-feed.json` config row.
@@ -33,7 +33,7 @@ import {
   SOURCE_ORIGIN, facetOptions, parseCards, mergeItems, feedSheet, yearIds, vimeoPoster,
   detailRequest, ajaxNonce, parseDetailPanel, parseAssetLinks, assetItem, requiredDetails,
   detailGaps, unknownGaps, feedCoverageGaps,
-  feedThumbnails, carrierDocs, parseCarrier, withMediaBus, withDamOriginals,
+  feedThumbnails, carrierDocs, parseCarrier, withMediaBus, withDamFiles,
 } from './media-items-lib.mjs';
 import { uploadToDA } from '../media/media-lib.mjs';
 import { readLists } from '../build-link-allowlist.mjs';
@@ -313,14 +313,15 @@ async function pushCarriers(JSDOM, sheet) {
 }
 
 /**
- * Publish the sheet: gate it, point `original` at the published AEM Assets originals, put the
+ * Publish the sheet: gate it, point `original`/`mp4` at the published AEM Assets files, put the
  * thumbnails on the Media Bus (`image`), write it to `feedFile` and push it.
  */
 async function publishFeed(JSDOM, sheet, feedFile) {
   // the gate runs on the source URLs: the DAM and Media Bus copies are of the recorded binaries
   assertManifestCoverage(feedFile);
-  const dam = withDamOriginals(sheet, manifestRows());
-  dam.missing.forEach((u) => console.warn(`  original not published on AEM Assets, kept: ${u}`));
+  const dam = withDamFiles(sheet, manifestRows());
+  const kept = (field) => dam.missing.filter((m) => m.field === field).length;
+  console.log(`[media-items] not on AEM Assets, kept on the source: ${kept('original')} original(s), ${kept('mp4')} MP4(s)`);
   const thumbs = feedThumbnails(dam.sheet);
   const bus = withMediaBus(dam.sheet, await pushCarriers(JSDOM, dam.sheet));
   if (bus.missing.length === thumbs.length && thumbs.length) {
@@ -329,12 +330,14 @@ async function publishFeed(JSDOM, sheet, feedFile) {
   bus.missing.forEach((u) => console.warn(`  not on the Media Bus, kept: ${u}`));
   writeFileSync(feedFile, `${JSON.stringify(bus.sheet, null, 2)}\n`);
   await pushFeed(feedFile);
-  const originals = dam.sheet.data.filter((r) => r.original).length;
+  const onDam = (field) => dam.sheet.data.filter((r) => r[field]).length - kept(field);
   return {
     thumbnails: thumbs.length,
     kept: bus.missing.length,
-    originalsOnDam: originals - dam.missing.length,
-    originalsKept: dam.missing.length,
+    originalsOnDam: onDam('original'),
+    originalsKept: kept('original'),
+    mp4OnDam: onDam('mp4'),
+    mp4Kept: kept('mp4'),
   };
 }
 

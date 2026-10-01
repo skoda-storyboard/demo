@@ -106,8 +106,10 @@ renditions: they aren't resized by the Media Bus params, but they are small enou
 carrier documents (`/en/fragments/media-feed-images[-N]`, one image per thumbnail) and rewrites
 `image` to their `media_<hash>` paths, so the cards get webp + responsive widths. **Update
 2026-10-01:** `original` (the "Original" download, the lightbox download + copy link) points at the
-published AEM Assets original from the media manifest (`public_url`, all 102). The 1920 rendition,
-MP4s and video posters stay on the source URLs (`tools/importer/media/README.md`).
+published AEM Assets original from the media manifest (`public_url`, all 102), and `mp4` at the
+published AEM Assets MP4 where a page import already published it (18 of 51; the other 33 aren't in
+the DAM yet). The 1920 rendition and video posters stay on the source URLs
+(`tools/importer/media/README.md`).
 
 **Follow-up tickets:**
 - **M2:** AEM Assets → media feed sync job (published assets, sharded feed, trigger/owner TBD).

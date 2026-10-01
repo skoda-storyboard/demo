@@ -17,7 +17,7 @@ import {
   detailRequest, parseAssetLinks, assetItem, requiredDetails, detailGaps, unknownGaps,
   feedMediaRefs, feedCoverageGaps,
   feedThumbnails, carrierDocs, parseCarrier, withMediaBus, CARRIER_MAX,
-  damOriginal, withDamOriginals,
+  damIndex, damFile, withDamFiles,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 import { logicalId } from '../media/media-lib.mjs';
@@ -340,15 +340,19 @@ test('Media Bus thumbnails: carrier documents, previewed paths, feed rewrite', {
   assert.deepEqual(feedMediaRefs(bus.sheet).map((r) => r.field), ['poster']);
 });
 
-test('DAM originals: the feed original points at the published, verified AEM Assets URL', () => {
+test('DAM files: original + MP4 point at the published, verified AEM Assets URL', () => {
   const master = 'https://cdn.skoda-storyboard.com/2026/09/a_b.jpg';
   const pending = 'https://cdn.skoda-storyboard.com/2026/09/c_d.jpg';
   const pub = 'https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/images/a-b/a_b.jpg';
+  // an MP4 a press-kit import published under its /direct-download/ URL; the feed has the CDN URL
+  const mp4 = 'https://cdn.skoda-storyboard.com/2026/03/Drive_4a806aa2.mp4';
+  const mp4Pub = 'https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/x/Drive_4a806aa2.mp4';
+  const done = { dam: 'done', publish: 'done' };
   const rows = {
     [logicalId(master)]: {
       master_url: master,
       seen_urls: [master, 'https://cdn.skoda-storyboard.com/2026/09/a_b-768x512.jpg'],
-      steps: { dam: 'done', publish: 'done' },
+      steps: done,
       public_url: pub,
       public_verified: { url: pub, mime: 'image/jpeg', bytes: 10 },
     },
@@ -356,31 +360,45 @@ test('DAM originals: the feed original points at the published, verified AEM Ass
     [logicalId(pending)]: {
       master_url: pending, seen_urls: [pending], steps: { dam: 'done', publish: 'pending' }, public_url: '',
     },
+    'kit__Drive_4a806aa2.mp4': {
+      master_url: 'https://www.skoda-storyboard.com/direct-download/2026/03/Drive_4a806aa2.mp4',
+      steps: done,
+      public_url: mp4Pub,
+      public_verified: { url: mp4Pub, mime: 'video/mp4', bytes: 20 },
+    },
+    // the feed's own CDN-URL row for the same MP4, not uploaded
+    [logicalId(mp4)]: { master_url: mp4, steps: { dam: 'n/a', publish: 'pending' }, public_url: '' },
   };
-  assert.equal(damOriginal(master, rows), pub);
-  assert.equal(damOriginal(pending, rows), '');
-  assert.equal(damOriginal('https://cdn.skoda-storyboard.com/2026/09/a_b-1920x1280.jpg', {
-    x: { ...rows[logicalId(master)], seen_urls: ['https://cdn.skoda-storyboard.com/2026/09/a_b-1920x1280.jpg'] },
-  }), '', 'a rendition is never mapped to the original');
-  assert.equal(damOriginal(master, {
+  const index = damIndex(rows);
+  assert.equal(damFile(master, index), pub);
+  assert.equal(damFile(pending, index), '');
+  assert.equal(damFile(mp4, index), mp4Pub, '/direct-download/ and the CDN path are one file');
+  assert.equal(damFile('https://cdn.skoda-storyboard.com/2026/09/a_b-1920x1280.jpg', index), '', 'a rendition never maps to the original');
+  assert.equal(damFile(master, damIndex({
     [logicalId(master)]: { ...rows[logicalId(master)], public_verified: null },
-  }), '', 'unverified public URL');
+  })), '', 'unverified public URL');
 
   const sheet = {
     data: [
       {
-        id: '1', template: 'image', original: master, 'rendition-1920': 'https://cdn.skoda-storyboard.com/2026/09/a_b-1920x1280.jpg',
+        id: '1', template: 'image', original: master, 'rendition-1920': 'https://cdn.skoda-storyboard.com/2026/09/a_b-1920x1280.jpg', mp4: '',
       },
       { id: '2', template: 'image', original: pending },
-      { id: '3', template: 'video', original: '' },
+      {
+        id: '3', template: 'video', original: '', mp4, poster: 'https://i.vimeocdn.com/video/1-d_1280x720.jpg',
+      },
+      { id: '4', template: 'video', mp4: 'https://cdn.skoda-storyboard.com/2026/03/other.mp4' },
     ],
   };
-  const out = withDamOriginals(sheet, rows);
-  assert.deepEqual(out.sheet.data.map((r) => r.original), [pub, pending, '']);
+  const out = withDamFiles(sheet, rows);
+  assert.deepEqual(out.sheet.data.map((r) => [r.original, r.mp4]), [
+    [pub, ''], [pending, undefined], ['', mp4Pub], [undefined, 'https://cdn.skoda-storyboard.com/2026/03/other.mp4'],
+  ]);
   assert.equal(out.sheet.data[0]['rendition-1920'], sheet.data[0]['rendition-1920'], 'the 1920 rendition stays');
-  assert.deepEqual(out.missing, [pending]);
+  assert.equal(out.sheet.data[2].poster, sheet.data[2].poster, 'the poster stays');
+  assert.deepEqual(out.missing.map((m) => `${m.id} ${m.field}`), ['2 original', '4 mp4']);
   assert.equal(sheet.data[0].original, master, 'the input sheet is not mutated');
-  // idempotent on a re-push, and the manifest gate accepts the published URL
-  assert.deepEqual(withDamOriginals(out.sheet, rows).sheet.data.map((r) => r.original), [pub, pending, '']);
-  assert.ok(!feedCoverageGaps(out.sheet, rows).some((g) => g.url === pub));
+  // idempotent on a re-push, and the manifest gate accepts the published URLs
+  assert.deepEqual(withDamFiles(out.sheet, rows).sheet.data, out.sheet.data);
+  assert.ok(!feedCoverageGaps(out.sheet, rows).some((g) => g.url === pub || g.url === mp4Pub));
 });

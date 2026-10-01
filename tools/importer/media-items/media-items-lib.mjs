@@ -465,41 +465,60 @@ export function feedCoverageGaps(sheet, manifestRows = {}) {
     .filter((ref) => !manifestRows[logicalId(ref.url)] && !seen.has(ref.url));
 }
 
+/** The feed columns that serve a DAM-held file: the image original and the video MP4. */
+export const DAM_FIELDS = ['original', 'mp4'];
+
+/** A source file's canonical URL: `/direct-download/<yyyy>/<mm>/<file>` = its CDN path. */
+const canonicalUrl = (url) => cdnUrl(url) || String(url || '').split(/[?#]/)[0];
+
 /**
- * The published AEM Assets URL of a feed original: the manifest row (by logical id, or a URL
- * it has seen) must hold that master, uploaded to the DAM, published, and publicly verified
- * at `public_url`. Otherwise '' (the original stays on its source URL).
- * @param {string} url the feed's `original` (source master URL)
+ * The media manifest's published files: canonical master URL → AEM Assets `public_url`, for rows
+ * uploaded to the DAM, published, and publicly verified at that URL. Keyed by the master only,
+ * so a rendition never resolves to its original.
  * @param {Record<string, object>} manifestRows media-manifest.json `rows`
+ * @returns {Map<string, string>}
  */
-export function damOriginal(url, manifestRows = {}) {
-  if (!/^https?:\/\//.test(url || '')) return '';
-  const row = manifestRows[logicalId(url)]
-    || Object.values(manifestRows).find((r) => (r.seen_urls || []).includes(url));
-  if (!row || row.master_url !== url) return '';
-  const { steps = {}, public_url: pub, public_verified: verified } = row;
-  return steps.dam === 'done' && steps.publish === 'done' && pub && verified && verified.url === pub
-    ? pub : '';
+export function damIndex(manifestRows = {}) {
+  const index = new Map();
+  Object.values(manifestRows).forEach((r) => {
+    const { steps = {}, public_url: pub, public_verified: verified } = r;
+    if (r.master_url && steps.dam === 'done' && steps.publish === 'done'
+      && pub && verified && verified.url === pub) index.set(canonicalUrl(r.master_url), pub);
+  });
+  return index;
 }
 
 /**
- * The feed with each `original` on AEM Assets (the "Original" download, the lightbox link)
- * where the DAM holds it published. The 1920 rendition stays on the source: the DAM keeps
- * originals only.
- * @returns {{sheet: object, missing: string[]}} missing = originals left on their source URL
+ * The published AEM Assets URL of a feed file (`original` or `mp4`), or '' (it stays on its
+ * source URL). A file a page import published under its `/direct-download/` URL counts.
+ * @param {string} url the feed's source URL
+ * @param {Map<string, string>} index damIndex()
  */
-export function withDamOriginals(sheet, manifestRows) {
-  const published = new Set(Object.values(manifestRows).map((r) => r.public_url).filter(Boolean));
+export function damFile(url, index) {
+  return /^https?:\/\//.test(url || '') ? index.get(canonicalUrl(url)) || '' : '';
+}
+
+/**
+ * The feed with each `original` (the "Original" download, the lightbox download and link) and
+ * `mp4` (the video download and player) on AEM Assets where the DAM holds it published. The 1920
+ * rendition and video posters stay on the source: the DAM keeps originals only.
+ * @returns {{sheet: object, missing: Array<{id, field, url}>}} files left on their source URL
+ */
+export function withDamFiles(sheet, manifestRows) {
+  const index = damIndex(manifestRows);
+  const published = new Set(index.values());
   const missing = [];
   const data = sheet.data.map((row) => {
-    // no original, or already on AEM Assets (a re-push)
-    if (!/^https?:\/\//.test(row.original || '') || published.has(row.original)) return row;
-    const dam = damOriginal(row.original, manifestRows);
-    if (!dam) {
-      missing.push(row.original);
-      return row;
-    }
-    return { ...row, original: dam };
+    const out = { ...row };
+    DAM_FIELDS.forEach((field) => {
+      const url = row[field];
+      // no file, or already on AEM Assets (a re-push)
+      if (!/^https?:\/\//.test(url || '') || published.has(url)) return;
+      const dam = damFile(url, index);
+      if (dam) out[field] = dam;
+      else missing.push({ id: row.id, field, url });
+    });
+    return out;
   });
   return { sheet: { ...sheet, data }, missing };
 }
