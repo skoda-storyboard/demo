@@ -65,5 +65,17 @@ Measured with DevTools on both sides, Storyboard (`/en/lifestyle/ouninpohja-finl
   - Escape resets `aria-expanded` on a desktop dropdown, but `li:focus-within > ul` (header.css ~837) keeps the panel visible.
   - Space on a focused dropdown trigger scrolls the page (its default isn't prevented).
 
+## Language links: covered by SKODA-303 (2026-09-30)
+The language-link values above (topbar 12/300, line height 18, margin 12; drawer 16/700) are done in SKODA-303 (#24,
+PR #232). **The topbar's inline padding is also done there** (`--page-gutter`): the switcher now ends on the source edge,
+and the section tabs start at 106 @1440. The nav row padding (logo, mega-menu) stays here.
+
+**Drawer menu height (measured 2026-09-30, 390×800, open drawer):**
+- the 8 top-level rows are **61px** on the source with no margin; EDS rows are **73px + 8px** `margin-bottom` (+160px);
+- the search row is **64px** vs 80;
+- the source drawer starts at y108 (under the bar), EDS at y44 with the logo row inside.
+So on phones shorter than about 860px the language row sits below the fold on EDS (it's the drawer's last item) where
+the source shows it at the bottom.
+
 ## Dependencies
 SKODA-301/302/303/304 (built chrome), SKODA-307 (null guard), SKODA-403 (search), SKODA-823 / SKODA-904 (newsletter).

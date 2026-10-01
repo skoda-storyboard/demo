@@ -179,13 +179,13 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-215](tickets/SKODA-215.md) | Floating action bar: share cluster + scroll-to-top | E02 | 2 | 0.5–1 | 1–2 | 106,505a | 🟡 M1; Demo sweep 2026-09-25; ID existed, file created. The DevTools census puts the dock on **all 42 URLs** (every template), not only stories/series/2 kits; draft 827 folded in (8 anchors, cart slot, intent URLs, a11y) |
 | [SKODA-220](tickets/SKODA-220.md) | Quote block (centred pull-quote + rule + attribution) | E02 | 2 | 0.5–1 | 1–2 | 607,805c,801 | 🟡 M1; Demo sweep 2026-09-25; 4 PRs + 1 PK; importer on main, block ready for QA 2026-09-29 (805c PR) |
 | [SKODA-221](tickets/SKODA-221.md) | Cards `tiles`/mosaic variant (series + press-kit hubs) | E02 | 3 | 1 | 2–3 | 201,207,805a | 🟡 M1; Demo sweep 2026-09-25; 5 series + 3 PK hubs |
-| [SKODA-222](tickets/SKODA-222.md) | Stories: featured model card on model tag archives (UI) | E02 | 2 | 0.5–1 | 1–2 | 209,214 | 🔵 M1 Should; content imported (contract `stories-feature`) |
+| [SKODA-222](tickets/SKODA-222.md) | Stories: featured model card on model tag archives (UI) | E02 | 2 | 0.5–1 | 1–2 | 209,214 | 🟡 M1 Should; in review 2026-09-30 (branch `skoda-222-featured-model`, pushed; no PR yet); content imported (contract `stories-feature`, now on main) |
 | [SKODA-223](tickets/SKODA-223.md) | Gallery `preview` variant (press-release sidebar media-kit preview, "+N" pill) (#171) | E02 | 1.5 | 0.5 | 1–1.5 | 203,607,819 | 🟡 In review ([PR #201](https://github.com/skoda-storyboard/demo/pull/201)), M1; from the 607 phase split (contract `gallery-preview`, readable fallback). Branch `skoda-223-gallery-preview` matches the source rects on all 5 releases |
 | [SKODA-224](tickets/SKODA-224.md) | Story Rail `press` variant (Related Press Releases band cards) (#172) | E02 | 1 | 0.5 | 1 | 212,212a,820,607 | 🔵 M1; from the 607 phase split + 612 block half (contract `story-rail-press`) |
 | [SKODA-225](tickets/SKODA-225.md) | Columns unequal split + intrinsic portrait (story 2-cell rows) | E02 | 1 | 0.5 | 1 | 801,824 | 🟢 cosmetic; Demo sweep 2026-09-25 |
 | SKODA-301 | Header + mega-menu (3 panels) | E03 | 5 | 2–3 | 4–6 | 102,106 | 🟡 |
 | SKODA-302 | Mobile nav toggle + ARIA (a11y fix) | E03 | 2 | 1 | 1–2 | 301 | 🟡 fixes source gap |
-| SKODA-303 | Language switcher (6 locales) | E03 | 2 | 1 | 1–2 | 301 | 🟢 |
+| [SKODA-303](tickets/SKODA-303.md) | Language switcher (6 locales) (#24) | E03 | 2 | 1 | 1–2 | 301 | 🟡 ready for QA 2026-09-30: matches live at every width, AA links, current from the URL; locale trees not on EDS yet |
 | SKODA-304 | Footer fragment | E03 | 3 | 1–2 | 2–4 | 102,106 | 🟢 |
 | SKODA-305 | Media Room footer variant | E03 | 2 | 1 | 1–2 | 304,301 | ✅ Done (PR #134, issue #26); closes gap G1 (COM18); unify-vs-distinct 🟡 |
 | [SKODA-306](tickets/SKODA-306.md) | Footer outbound-link browsing-context parity (`target=_blank`) | E03 | 1 | 0.5 | 1 | 304 | 🟢 M1; issue #102; file added 2026-09-24 |
@@ -231,6 +231,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-805c](tickets/SKODA-805c.md) | `press_kit-template-default` article + accordion (first-glimpse) | E08 | 3 | 1–2 | 3 | 607,204,205,502,506 | 🟡 M1 Should; slice of 805/807; ready for QA 2026-09-29 (DA previewed, not published) |
 | SKODA-701 | Lint + unit tests | E07 | 2 | 1 | 1–2 | E02,E03,E04 | 🟢 |
 | SKODA-702 | Performance (Lighthouse≈100/RUM) | E07 | 3 | 1–2 | 2–3 | 603 | 🟡 |
+| [SKODA-702a](tickets/SKODA-702a.md) | Epiq story performance: YouTube click-to-load facade (desktop TBT) | E07 | 2 | 0.5–1 | 1–2 | 702,204a,818 | 🔵 M1; from the PR #232 PSI failure (desktop 74, TBT 570ms; `main` 64–69 locally); live uses `lite-youtube`, EDS boots the full player on load |
 | SKODA-703 | Accessibility audit | E07 | 3 | 1–2 | 2–4 | 603 | 🟠 several `[RUNTIME-UNCONFIRMED]` |
 | SKODA-704 | Visual critique + consent/analytics stubs + sign-off | E07 | 3 | 1–2 | 2–3 | 702,703 | 🟡 |
 

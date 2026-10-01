@@ -60,7 +60,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `gallery` | – | – |
 | `hero-image` | `story` (default), `overlay`, `archive` | – |
 | `listing` | – | `index`, `path`, `template`, `facets`, `facetlabels`, `sort`, `perpage`, `columns` (config only) |
-| `stories` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured`, `offset` (config only) |
+| `stories` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured`, `offset`, `feature` (config only; `feature` since SKODA-222) |
 | `story-rail` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows |
 | `tags` | `chips` | – |
 | `quote` | – | – (SKODA-220; see `quote` below) |
@@ -123,13 +123,18 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Shape:** the `Highlights` heading stays as default content above the table. Header `Cards (key-facts)`, then rows `[square <picture>, <h3>title</h3><p>text</p>]` (the cards row shape). The variant only changes the styling.
 
 ### `stories-feature`
-- **Status:** `pinned` · **Ticket:** SKODA-222 · **Fallback:** **readable**. `stories` clears its authored rows
-  before rendering, so until 222 lands the card is simply absent and the page reads as it does without it.
+- **Status:** ✅ **on `main` once SKODA-222 merges** (the same PR adds `feature` to `stories`' baseline config keys above
+  and drops the pending entry; this section stays as the shape reference). **Ticket:** SKODA-222
+- **Runtime (SKODA-222):** the card is the grid's first cell. From 992 it's a grey card in the third column across
+  the first two rows; below 992 it's first and full width, collapsed behind a dark disclosure bar. With it, the first
+  page shows `initial - 2` stories (the source's archive offset is 4). The primary CTA is read from `<strong>` or, as
+  the page holds it by the time blocks run, `a.button.primary` (`decorateButtons`). External links (the configurator)
+  open in a new tab.
 - **Form:** a config key added to `stories`, not a block. Row `[feature, <cell>]`. The cell holds a `<picture>`,
   then an `<h3>` title ("Explore the Epiq"), then one `<p>` per CTA link. The primary CTA is wrapped in `<strong>`
   (source `a.btn`); secondary CTAs are plain links (source `a.btn-secondary`).
 - **Placement is not imported.** It's responsive layout (SKODA-222). The source puts the card in the right column,
-  ~2 rows tall, at 1440, and first, full-width and collapsible (`h2.toggle`) at 768/390. In the DOM it's item 1.
+  ~2 rows tall, from 992, and first, full-width and collapsible (`h2.toggle`) below 992. In the DOM it's item 1.
 - **Emitted by:** `parsers/archive-list.js` from the source `.featured-model` card. That's on 11 model tag
   archives: Elroq, Enyaq, Epiq, Fabia, Kamiq, Karoq, Kodiaq, Octavia, Peaq, Scala, Superb.
 - **CTA links** go through the SKODA-605 rewrite. The model pages (SKODA-208) and the Images/Videos listings
@@ -197,6 +202,12 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Landing:** branch `skoda-223-gallery-preview` renders this shape as-is: no re-import, and the fallback goes away
   once it merges. Rows beyond 4 stay in the lightbox behind a "+N" pill. Keep the contract pinned until the branch
   merges and QA verifies it.
+
+### `gallery-story`
+- **Status:** `pinned` (2026-09-29) · **Ticket:** SKODA-216 · **Fallback:** readable (the normal Gallery: main image + thumbnails)
+- **Emitted by:** nothing yet. `transformers/skoda-story-cleanup.js` drops `.sb-gallery` today (deferred to SKODA-604/801); emitting this shape is that work, not SKODA-216.
+- **Shape:** header `Gallery (story)`, then one row per image in the source `data-gallery` order: `[<picture>, caption paragraph or empty]`, the same rows as `Gallery`. The first row is the lead image; the strip shows rows 2–5. The lightbox title is the story `h1` (the source `data-title`), so no title row. The source `content` is empty on the measured galleries, so the caption cell is usually empty.
+- **Example** (`/en/emobility/an-icon-in-modern-form-the-electrifying-favorit/`): 5 rows. Rendered on `/drafts/skoda-216-story-gallery`.
 
 ### `story-rail-press`
 - **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-224 · **Fallback:** readable (the default carousel cards)
