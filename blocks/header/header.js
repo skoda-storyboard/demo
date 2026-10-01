@@ -63,8 +63,121 @@ function focusNavSection() {
 function toggleAllNavSections(sections, expanded = false) {
   if (!sections) return;
   sections.querySelectorAll('.nav-sections .default-content-wrapper > ul > li').forEach((section) => {
-    section.setAttribute('aria-expanded', expanded);
+    // eslint-disable-next-line no-use-before-define
+    setDropState(section, String(expanded) === 'true');
   });
+}
+
+/**
+ * The row link of a top-level nav item (`<p><a>` from the fragment, or a bare `<a>`).
+ * @param {Element} li A top-level nav li
+ * @returns {Element|null}
+ */
+function dropTrigger(li) {
+  return li.querySelector(':scope > p > a, :scope > a');
+}
+
+/**
+ * Sets a nav item's open state: on the li (the CSS keys off it) and, in the drawer, on its
+ * accordion trigger too, so the button a screen reader hears reports the same state.
+ * @param {Element} li A top-level nav li
+ * @param {boolean} open Whether its sub-menu is open
+ */
+function setDropState(li, open) {
+  li.setAttribute('aria-expanded', open ? 'true' : 'false');
+  const trigger = dropTrigger(li);
+  if (trigger?.dataset.drawerTrigger) trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+let subMenuCount = 0;
+
+/**
+ * Drawer band (SKODA-302): each dropdown parent's row link is an accordion button that
+ * controls its sub-menu (`role="button"`, `aria-expanded`, `aria-controls`). From 1080 the
+ * link goes back to its desktop form (SKODA-301 hover/keyboard dropdown), including the
+ * `role="button"` a text-only parent already had (linkDropLabel).
+ * @param {Element} navSections The nav sections container
+ * @param {boolean} drawer Whether the drawer band is active
+ */
+function setDropTriggers(navSections, drawer) {
+  navSections?.querySelectorAll('.nav-drop').forEach((li) => {
+    const trigger = dropTrigger(li);
+    const sub = li.querySelector(':scope > ul');
+    if (!trigger || !sub) return;
+    if (!('desktopRole' in trigger.dataset)) trigger.dataset.desktopRole = trigger.getAttribute('role') || '';
+    if (drawer) {
+      if (!sub.id) {
+        subMenuCount += 1;
+        sub.id = `nav-sub-${subMenuCount}`;
+      }
+      trigger.dataset.drawerTrigger = 'true';
+      trigger.setAttribute('role', 'button');
+      trigger.setAttribute('aria-controls', sub.id);
+      trigger.setAttribute('aria-expanded', li.getAttribute('aria-expanded') === 'true' ? 'true' : 'false');
+    } else {
+      delete trigger.dataset.drawerTrigger;
+      if (trigger.dataset.desktopRole) trigger.setAttribute('role', trigger.dataset.desktopRole);
+      else trigger.removeAttribute('role');
+      trigger.removeAttribute('aria-controls');
+      trigger.removeAttribute('aria-expanded');
+    }
+  });
+}
+
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]';
+
+/**
+ * What Tab can reach while the drawer is open: the visible controls of the nav and of the
+ * section switcher above it (the topbar is outside <nav> but stays on screen).
+ * @param {Element} nav The nav element
+ * @returns {Element[]}
+ */
+function drawerFocusables(nav) {
+  const scope = nav.closest('.nav-wrapper') || nav;
+  // checkVisibility also drops the links of a collapsed sub-menu (visibility: hidden)
+  const shown = (el) => (el.checkVisibility
+    ? el.checkVisibility({ visibilityProperty: true })
+    : el.getClientRects().length > 0);
+  return [...scope.querySelectorAll(FOCUSABLE)].filter((el) => el.tabIndex >= 0 && shown(el));
+}
+
+/**
+ * Focus trap of the open drawer: Tab / Shift+Tab cycle inside it (SKODA-302 §6).
+ * @param {KeyboardEvent} e
+ */
+function trapFocus(e) {
+  if (e.key !== 'Tab') return;
+  const nav = document.getElementById('nav');
+  if (!nav || isDesktop.matches || nav.getAttribute('aria-expanded') !== 'true') return;
+  const focusables = drawerFocusables(nav);
+  if (!focusables.length) return;
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  const inside = focusables.includes(document.activeElement);
+  if (e.shiftKey && (document.activeElement === first || !inside)) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
+/**
+ * A tap or click outside the open drawer (its blurred backdrop) closes it and returns focus
+ * to the hamburger. The focus trap keeps focus inside, so focusout can't do this any more.
+ * `click` (not pointerdown): it fires after the browser has moved focus for the press, so
+ * the hamburger keeps it.
+ * @param {MouseEvent} e
+ */
+function closeOnPointerOutside(e) {
+  const nav = document.getElementById('nav');
+  if (!nav || isDesktop.matches || nav.getAttribute('aria-expanded') !== 'true') return;
+  const topbar = nav.closest('.nav-wrapper')?.querySelector('.nav-topbar');
+  if (nav.contains(e.target) || topbar?.contains(e.target)) return;
+  // eslint-disable-next-line no-use-before-define
+  toggleMenu(nav, nav.querySelector('.nav-sections'), false);
+  nav.querySelector('.nav-hamburger button')?.focus();
 }
 
 /**
@@ -90,12 +203,17 @@ function syncSearchTabbable(nav) {
 function toggleMenu(nav, navSections, forceExpanded = null) {
   const expanded = forceExpanded !== null ? !forceExpanded : nav.getAttribute('aria-expanded') === 'true';
   const button = nav.querySelector('.nav-hamburger button');
+  const drawerOpen = !expanded && !isDesktop.matches;
   document.body.style.overflowY = (expanded || isDesktop.matches) ? '' : 'hidden';
   nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+  // drawer band: accordion buttons; desktop: the SKODA-301 dropdown links
+  setDropTriggers(navSections, !isDesktop.matches);
   // always collapse the accordion sub-menus when opening/closing the drawer
   // (mobile accordions start collapsed; user taps a parent to expand)
   toggleAllNavSections(navSections, 'false');
   button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
+  // the hamburger reports the drawer state itself (SKODA-302 AC), not only the <nav>
+  button.setAttribute('aria-expanded', drawerOpen ? 'true' : 'false');
   // the drawer shows the search field, so it must be tabbable while open
   syncSearchTabbable(nav);
   // enable nav dropdown keyboard accessibility
@@ -116,11 +234,17 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
     }
   }
 
-  // enable menu collapse on escape keypress
-  if (!expanded || isDesktop.matches) {
-    // collapse menu on escape press
+  // Escape closes; the open drawer also traps focus and closes on a tap outside (focus
+  // can't leave it, so focusout no longer fires there); desktop keeps focusout-close
+  window.removeEventListener('keydown', trapFocus);
+  document.removeEventListener('click', closeOnPointerOutside);
+  if (drawerOpen) {
     window.addEventListener('keydown', closeOnEscape);
-    // collapse menu on focus lost
+    window.addEventListener('keydown', trapFocus);
+    document.addEventListener('click', closeOnPointerOutside);
+    nav.removeEventListener('focusout', closeOnFocusLost);
+  } else if (isDesktop.matches) {
+    window.addEventListener('keydown', closeOnEscape);
     nav.addEventListener('focusout', closeOnFocusLost);
   } else {
     window.removeEventListener('keydown', closeOnEscape);
@@ -263,13 +387,20 @@ export default async function decorate(block) {
           // drawer: tapping a parent row toggles its accordion instead of
           // navigating; only intercept taps on the parent row itself, not on
           // an already-revealed child link
-          const parentLink = navSection.querySelector(':scope > p > a, :scope > a');
+          const parentLink = dropTrigger(navSection);
           if (e.target.closest('a') === parentLink) {
             e.preventDefault();
-            const expanded = navSection.getAttribute('aria-expanded') === 'true';
-            navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+            setDropState(navSection, navSection.getAttribute('aria-expanded') !== 'true');
           }
         }
+      });
+      // drawer accordion buttons toggle on Enter and Space (Space would otherwise scroll,
+      // Enter follow the category link); desktop links keep their SKODA-301 keys
+      const trigger = isDrop ? dropTrigger(navSection) : null;
+      trigger?.addEventListener('keydown', (e) => {
+        if (!trigger.dataset.drawerTrigger || (e.key !== 'Enter' && e.key !== ' ')) return;
+        e.preventDefault();
+        setDropState(navSection, navSection.getAttribute('aria-expanded') !== 'true');
       });
     });
   }
@@ -376,7 +507,7 @@ export default async function decorate(block) {
   // hamburger for mobile
   const hamburger = document.createElement('div');
   hamburger.classList.add('nav-hamburger');
-  hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
+  hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-expanded="false" aria-label="Open navigation">
       <span class="nav-hamburger-icon"></span>
     </button>`;
   hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
