@@ -395,6 +395,18 @@
       ]
     },
     {
+      "id": "gallery-story",
+      "block": "gallery",
+      "variants": [
+        "story"
+      ],
+      "status": "pinned",
+      "ticket": "SKODA-216",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": []
+    },
+    {
       "id": "story-rail-press",
       "block": "story-rail",
       "variants": [

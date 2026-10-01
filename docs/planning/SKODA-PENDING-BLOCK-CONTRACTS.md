@@ -198,6 +198,12 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   once it merges. Rows beyond 4 stay in the lightbox behind a "+N" pill. Keep the contract pinned until the branch
   merges and QA verifies it.
 
+### `gallery-story`
+- **Status:** `pinned` (2026-09-29) · **Ticket:** SKODA-216 · **Fallback:** readable (the normal Gallery: main image + thumbnails)
+- **Emitted by:** nothing yet. `transformers/skoda-story-cleanup.js` drops `.sb-gallery` today (deferred to SKODA-604/801); emitting this shape is that work, not SKODA-216.
+- **Shape:** header `Gallery (story)`, then one row per image in the source `data-gallery` order: `[<picture>, caption paragraph or empty]`, the same rows as `Gallery`. The first row is the lead image; the strip shows rows 2–5. The lightbox title is the story `h1` (the source `data-title`), so no title row. The source `content` is empty on the measured galleries, so the caption cell is usually empty.
+- **Example** (`/en/emobility/an-icon-in-modern-form-the-electrifying-favorit/`): 5 rows. Rendered on `/drafts/skoda-216-story-gallery`.
+
 ### `story-rail-press`
 - **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-224 · **Fallback:** readable (the default carousel cards)
 - **Emitted by:** `transformers/skoda-press-release-layout.js` (the "Related Press Releases" band; replaces the default-content cards of SKODA-612).
