@@ -4,11 +4,12 @@
 - **Type:** section styling (CSS) + home rails (block + import)
 - **Phase:** A · **Milestone:** M1 · **Tier:** Should (§11.2 cut line; builds on 611a)
 - **GitHub issue:** [#153](https://github.com/skoda-storyboard/demo/issues/153)
-- **Estimate:** 1.5 SP · AI-assisted 0.5d / manual 1–1.5d *(planning estimate, not a quote)*
-- **Status (2026-09-30):** 🟡 In progress, branch `skoda-611b-home-spacing`.
-  - The band spacing is pushed (2437b94).
-  - The home rails round is local and not yet committed.
-  - The re-imported `/en` (with the rails' "All" links) is not yet pushed to DA; that waits on approval.
+- **Estimate:** 1.5 SP · AI-assisted 0.5d / manual 1–1.5d *(planning estimate, not a quote; the home rails added on
+  2026-09-30 are about 2 SP more, not re-estimated)*
+- **Status (2026-09-30):** 🟡 In review prep, branch `skoda-611b-home-spacing`.
+  - The band spacing (2437b94) and the home rails (2b335cc) are pushed. The pre-PR review round and the merge of
+    `main` are local.
+  - The re-imported `/en` (with the rails' "All" links) goes to DA after the PR merges.
 
 ## Origin
 Split from SKODA-611 (sweep-reconciliation decision D2, [`SKODA-M1-URL-BLOCK-SWEEP.md`](../../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §11).
@@ -142,5 +143,67 @@ Found while matching the pitch, measured on the live `/en/` rails at 375 / 768 /
   wide-cell scope.
 - **Known, not changed:** the source's Series rail shows all 24 series; ours shows 10 of the 15 indexed.
 
-## Dependencies
+## Pre-PR code review (2026-09-30: malformed input, crash isolation, state; after PR #231's P2)
+- **Merged `main`:**
+  - `stories.configKeys` keeps `offset` (main) plus `exclude`.
+  - `media-manifest.json` is main's rows plus this branch's one `/en` og-image row.
+  - Both home bundles are rebuilt from the merged sources; they match the auto-merge byte for byte.
+- **Fixed, major:** a row image the URL parser rejects (e.g. `https://`) in the story index made `rowToCells` throw, and
+  the whole home band collapsed. The code predates this branch, but every home band now goes through it. The card
+  now falls back to its image-less form with a console warning. In the browser, with one eMobility row's image set
+  to `https://`, the rail keeps its 10 cards and 1 is image-less.
+- **Fixed, the "All" link is validated** (`safeViewAll`):
+  - Only an http(s) link or a root-relative path that leaves the page counts.
+  - `javascript:`, `data:`, `https://`, `#`, plain text, a protocol-relative link or the current page give no pill and
+    no end card. With several links, the first is used.
+  - The importer emits `viewall` only for an absolute http(s) or root-relative source href.
+- **Fixed:**
+  - `template` is trimmed and lowercased.
+  - A rail build that throws outside the index try collapses the rail instead of leaving it stuck and hidden
+    (`buildRailSafely`).
+  - If a rail collapses while its pill has focus, focus moves to the next focusable element instead of `<body>`.
+  - The end card gets the demo link policy (`decorateLinks`, #228): live `/en/news/` and `/en/series-2/` links now become
+    the demo pages on the pill and the end card alike.
+- **Kept on purpose:** `limit: -5` still becomes 1, as pinned by the SKODA-212 test.
+- **Tests:**
+  - `safeViewAll`: 13 rejected values.
+  - A malformed viewall and a padded template through `parseConfig`.
+  - `rowToCells` with invalid image urls.
+  - The importer skipping `#`, `javascript:`, relative and empty hrefs.
+- **Found, not changed (pre-existing, outside 611b):**
+  - A curated `carousel` with an `<img src="https://">` renders empty: `carousel.js` `optimizeImages` throws after the
+    cells moved. This affects model-page curated rails; home rails are index rails.
+  - The carousel's Tab order is Previous → cards → Next.
+
+## Full pre-PR review (2026-10-01; reviewer process: ACs, specs, measured origin vs ours, a11y, code)
+- **Measured sweep:** origin `/en` vs ours (with the re-imported `viewall` rows injected) at 320 / 375 / 390 / 414 / 576 / 600 /
+  720 / 767 / 768 / 991 / 992 / 1079 / 1080 / 1280 / 1440 / 1920. For every band, the band height, heading position, pill
+  box, first card box, card gap and end card are within 2px. The exceptions are all explained:
+  - Latest Stories at ≥ 1248 is 10px narrower until SKODA-222 (#231) lands.
+  - Lifestyle has no end card because only 9 of its stories are migrated.
+  - The Social media heading text sits at the same x (644–796); the source heading box is just shorter.
+- **Fixed in this round:**
+  - The Series dark band's header row sits at 64px, as on the source (`--cover-box-padding-top` was 66). With the
+    "All" pill its heading is at 66, and the band is 424 tall, both matching the source.
+  - A long rail heading wraps beside the pill instead of pushing it off a narrow screen.
+  - The rail's `layout` follows the normalised template, so ` Press_Release ` stays wide.
+  - `safeViewAll` rejects backslash URLs and treats `/en/` on `/en` as the same page.
+  - The focus hand-off skips hidden, unrendered and disabled targets.
+  - A carousel that fails to decorate (`loadBlock` swallows its errors) collapses the rail.
+  - The importer keeps the trimmed href.
+  - Doc fixes: the rail spec ACs, and the requirement mapping and traceability rows for STO-H03–H08.
+  - Tests: a jsdom focus test file, padded template → layout, safeViewAll backslash and trailing slash, importer
+    padded href.
+- **Site-wide effects (beyond the home):** `safeViewAll`, the "All: <heading>" pill name and the template normalisation
+  apply to every story-rail, model pages included. Model-page rails with a valid "All" link are unchanged; they
+  measured identical to `main`.
+- **Found, not changed (pre-existing, outside 611b):**
+  - The site header overflows horizontally from 1080 to about 1180px (scroll width 1181 at 1080, `.nav-sections` /
+    `.nav-tools`), on `main` too.
+  - Rail card images use the title as alt text, so it is read twice. The re-imported `/en` has no h1.
+  - The curated-carousel image throw and the carousel Tab order are noted above.
+- **Kept as the source has it:**
+  - Caption titles are one line with an ellipsis; the full title is in the link's tooltip.
+  - The home end card shows only when more stories match than the rail shows.
+  - A heading-less rail's pill is named just "All".
 SKODA-611a (section structure), SKODA-218 (dark sections).

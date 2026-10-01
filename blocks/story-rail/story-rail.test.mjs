@@ -49,7 +49,7 @@ globalThis.document = {
 };
 
 const {
-  parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail, railLayout,
+  parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail, railLayout, safeViewAll,
   TAXONOMY_TEMPLATES,
 } = await import('./story-rail.js');
 const { feedLightboxItem } = await import('../../scripts/media-lightbox.js');
@@ -106,6 +106,9 @@ const rows = [
 ];
 
 // --- parseConfig -----------------------------------------------------------
+
+// a script-URL scheme, assembled so no literal javascript: URL sits in the source
+const JS = ['java', 'script:'].join('');
 
 test('parseConfig reads keys and applies defaults', () => {
   const cfg = parseConfig(cfgBlock([
@@ -592,4 +595,36 @@ test('rowToCells: model and series rows carry no date, so they render as caption
     path: '/en/s', title: 'S', image: 'https://x/s.jpg', template: 'story', date: '2026-05-01',
   });
   assert.equal(story.elems.length, 2, 'stories keep their date (overlay card)');
+});
+
+// --- malformed authored / index input (SKODA-611b pre-PR review; the #231 failure class) ----
+test('safeViewAll keeps only a real http(s) link that leaves the page', () => {
+  assert.equal(safeViewAll('http://localhost/en/', 'http://localhost/en'), '', 'the page itself, trailing slash or not');
+  const base = 'http://localhost/en/';
+  assert.equal(safeViewAll('http://localhost/en/category/emobility', base), 'http://localhost/en/category/emobility');
+  assert.equal(safeViewAll('/en/news', base), 'http://localhost/en/news', 'root-relative text is a path');
+  assert.equal(safeViewAll('https://www.skoda-storyboard.com/en/series-2/', base), 'https://www.skoda-storyboard.com/en/series-2/');
+  assert.equal(safeViewAll(['http://localhost/a', 'http://localhost/b'], base), 'http://localhost/a', 'first of several links');
+  ['', undefined, 'https://', `${JS}alert(1)`, `Java${JS.slice(4)}alert(1)`, 'data:text/html,x', 'All', 'en/x', '//evil.example/x',
+    'mailto:a@b.c', 'http://localhost/en/', 'http://localhost/en/#', 'http://localhost/en/#top', '/\\evil.example/x'].forEach((v) => {
+    assert.equal(safeViewAll(v, base), '', `rejected: ${v}`);
+  });
+});
+
+test('parseConfig: a malformed "All" link gives no viewall; the template is normalised', () => {
+  assert.equal(parseConfig(cfgBlock([['viewall', `${JS}alert(1)`]])).viewAll, '');
+  assert.equal(parseConfig(cfgBlock([['viewall', 'https://']])).viewAll, '');
+  assert.equal(parseConfig(cfgBlock([['template', ' Skoda_Model ']])).template, 'skoda_model');
+  assert.equal(parseConfig(cfgBlock([['template', '  ']])).template, 'story');
+  assert.equal(parseConfig(cfgBlock([['template', ' Press_Release ']])).layout, 'news', 'layout follows the normalised template');
+});
+
+test('rowToCells: an invalid image url drops the image, not the card (the rail survives)', (t) => {
+  t.mock.method(console, 'warn', () => {});
+  ['https://', 'http:', '//'].forEach((image) => {
+    const cells = rowToCells({ path: '/en/s', title: 'S', image, template: 'story', date: '2026-05-01' });
+    assert.equal(cells.length, 1, `${image}: body only`);
+    assert.equal(cells[0].elems.at(-1).tagName, 'H3');
+  });
+  assert.equal(console.warn.mock.callCount(), 3);
 });

@@ -1,10 +1,12 @@
 /*
  * Story rail (SKODA-212) — the index-driven rail wrapper.
  *
- * This block builds a `carousel` (all rail chrome + card visuals live there and
- * in the shared card-teaser primitive). This file owns ONLY the rail header
- * (heading + "view all") and the reserved height that prevents layout shift
- * while the inner carousel is deferred-built. Tokens only; scoped to .story-rail.
+ * This block builds a `carousel` (the track, arrows and card visuals live there and
+ * in the shared card-teaser primitive). This file owns the rail header (heading +
+ * "view all"), the reserved height that prevents layout shift while the inner
+ * carousel is deferred-built, the rail layouts (press band, related bands, the wide
+ * landing rail) and the home cover-box chrome (pill, end card, caption cards,
+ * SKODA-611b). Tokens only; scoped to .story-rail.
  */
 
 .story-rail {
@@ -24,7 +26,9 @@
 /* colour follows the section: ink on light sections, white on a dark band
    (SKODA-218; the source Series / Models headings are white 26/600) */
 .story-rail-heading {
+  min-width: 0; /* a long heading wraps beside the "All" pill instead of pushing it out */
   margin: 0;
+  overflow-wrap: anywhere;
   font-size: var(--section-heading, var(--heading-font-size-l));
   font-weight: var(--weight-semibold);
   color: inherit;
@@ -394,6 +398,8 @@ body.story .section.dark.story-rail-container .story-rail .carousel-track .card-
   margin: 0;
 }
 
+/* (0,4,0) here, (0,6,0) on a dark band: under the story band's (0,6,1) title rule, which they must
+   precede (no-descending-specificity), and above carousel.css's (0,2,0) caption title */
 .story-rail-home.story-rail-caption .carousel-caption .card-teaser-title {
   overflow: hidden;
   margin: 0;

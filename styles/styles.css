@@ -157,7 +157,9 @@
      inside the 1248px container (content edge 10 at 375/768/992, 26 at 1280, inner 1228) */
   --page-gutter: 10px;
   --cover-box-max-width: 1440px; /* live home .cover-box band cap, light + dark (SKODA-218/611a) */
-  --cover-box-padding-top: 66px; /* dark band top → first heading (Storyboard home) */
+  --cover-box-padding-top: 64px; /* dark band top → first rail header row (Storyboard home): source
+                                     .cover-box.dark 2em + .search-results 2em; the heading sits centred in
+                                     the 36px row with the "All" pill, at 66 as on the source (SKODA-611b) */
   --cover-box-padding-bottom: 60px; /* dark band: last rail cards → band end */
   --cover-box-rail-gap: 48px; /* rail cards → next rail heading inside a band */
   --cover-box-dark-margin: 2.25em auto 1.5em; /* live .cover-box.dark (36px / 24px) */
@@ -712,7 +714,7 @@ main .section.dark > .default-content-wrapper :is(h1, h2, h3, h4, h5, h6) {
    36px margin above a dark band, as on live.
 
    The dark band (the Storyboard "Series" and Media Room "Models" bands), measured
-   on the live homes at 1280/768/500. Inside: band top → first heading 66px (Media
+   on the live homes at 1280/768/500. Inside: band top → first rail header row 64px (the heading at 66; Media
    Room: 48px, `compact`), rail cards → the next rail's heading 48px, last cards →
    band end 60px (live's 32/12 band padding plus its inner containers' offsets;
    our markup has no such containers, so the section padding carries the whole

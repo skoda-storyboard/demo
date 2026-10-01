@@ -31,6 +31,7 @@ import { loadQueryIndex, defaultIndexUrl, cleanTitle } from '../../scripts/query
 import { formatCardDate } from '../../scripts/card-teaser.js';
 import { buildLightbox } from '../../scripts/lightbox.js';
 import { feedLightboxItem } from '../../scripts/media-lightbox.js';
+import { decorateLinks } from '../../scripts/links.js';
 import {
   scopeRows, filterRows, sortRows, paginate, INDEX_FACETS,
 } from '../listing/listing-logic.mjs';
@@ -38,15 +39,40 @@ import {
 // Split a comma-separated config value into trimmed tokens.
 const tokens = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
 
+/**
+ * The rail's "All" target as an absolute http(s) URL, or '' (no pill, no end card). Authored
+ * cells may hold anything: several links (readBlockConfig then returns an array), plain text,
+ * `#`, `javascript:` or a URL the parser rejects (`https://`). Only a real link that leaves
+ * the current page counts (SKODA-611b review).
+ * @param {string|string[]} value readBlockConfig's value for the cell
+ * @param {string} [base] the page URL
+ */
+export function safeViewAll(value, base = window.location.href) {
+  const raw = String((Array.isArray(value) ? value[0] : value) || '').trim();
+  if (!/^(?:https?:\/\/|\/(?!\/))/i.test(raw) || raw.includes('\\')) return '';
+  try {
+    const url = new URL(raw, base);
+    const here = new URL(base);
+    if (!/^https?:$/.test(url.protocol) || !url.hostname) return '';
+    const path = (u) => u.pathname.replace(/\/+$/, '') || '/';
+    const samePage = url.origin === here.origin && path(url) === path(here)
+      && url.search === here.search;
+    return samePage ? '' : url.href;
+  } catch (e) {
+    return '';
+  }
+}
+
 export function parseConfig(block) {
   const cfg = readBlockConfig(block);
+  const template = String(cfg.template || 'story').trim().toLowerCase() || 'story';
   return {
     index: cfg.index || defaultIndexUrl(),
     path: cfg.path || '',
     // default to the story template so a category-only rail stays scoped to
     // stories (not press releases / other indexed content); an author widens
     // scope by setting `template` explicitly (SKODA-212 review P1).
-    template: cfg.template || 'story',
+    template,
     category: tokens(cfg.category),
     tag: tokens(cfg.tag || cfg.tags),
     // index facet columns (model, years, …) as config keys (SKODA-820): each key is
@@ -58,10 +84,10 @@ export function parseConfig(block) {
       .filter(([, vals]) => vals.length)),
     heading: cfg.heading || '',
     // header "view all" link (source a.link-all)
-    viewAll: cfg.viewall || cfg.viewAll || cfg.all || '',
+    viewAll: safeViewAll(cfg.viewall || cfg.viewAll || cfg.all),
     // 'oldest'/'publishdate' → ascending; else newest-first
     sort: (cfg.sort === 'oldest' || cfg.sort === 'publishdate') ? 'oldest' : 'newest',
-    layout: cfg.template === 'press_release' ? 'news' : 'standard',
+    layout: template === 'press_release' ? 'news' : 'standard',
     limit: Math.max(1, Number(cfg.limit) || 10),
     // comma list of path-slug fragments to exclude (already shown above)
     exclude: tokens(cfg.exclude),
@@ -211,14 +237,20 @@ export function rowToCells(row) {
   // body, giving an overlay card two bodies + doubled 16/9 fallback height.
   // With only a body cell, decorateCardCells flags .card-teaser-no-image and the
   // single body gets the correct intrinsic height (matches buildCardTeaser).
-  const cells = row.image
-    ? [
-      createOptimizedPicture(row.image, title, false, [
+  // A row image the URL parser rejects (e.g. "https://") drops the image, not the rail: the
+  // card falls back to its image-less form (SKODA-611b review; the #231 failure class).
+  let picture = null;
+  if (row.image) {
+    try {
+      picture = createOptimizedPicture(row.image, title, false, [
         { media: '(min-width: 768px)', width: '750' }, { width: '500' },
-      ]),
-      body,
-    ]
-    : [body];
+      ]);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('story-rail: card image skipped, invalid url', row.image, e);
+    }
+  }
+  const cells = picture ? [picture, body] : [body];
   if (toolbar) cells.push(toolbar);
   return cells;
 }
@@ -278,6 +310,18 @@ export function isRailOnlySection(section, block) {
   return lead.every((el) => /^(H[1-6]|P)$/.test(el.tagName)) && paragraphs.length <= 1;
 }
 
+/* Focus that sat in a removed rail (e.g. its "All" pill, tabbable before the rail builds) moves
+   to the next visible, enabled focusable element after it instead of dropping to <body>. */
+export function keepFocusPast(removed) {
+  if (!removed?.contains?.(document.activeElement) || !document.querySelectorAll) return;
+  const focusable = 'a[href], button:not([disabled]), input:not([type="hidden"]):not([disabled]), '
+    + 'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  const next = [...document.querySelectorAll(focusable)].find((el) => !removed.contains(el)
+    && removed.compareDocumentPosition(el) === Node.DOCUMENT_POSITION_FOLLOWING
+    && el.getClientRects().length > 0 && !el.closest('[hidden], [inert]'));
+  next?.focus();
+}
+
 /*
  * Terminal empty/error state: remove the rail so no blank reserved slot or dead
  * "View all" lingers (SKODA-212 review P2, SKODA-608).
@@ -292,11 +336,13 @@ export function collapseRail(block, mount, header) {
   const relatedSection = block.closest('body.story .section.dark.story-rail-container');
   const section = relatedSection || block.closest('.section');
   if (section && (relatedSection || isRailOnlySection(section, block))) {
+    keepFocusPast(section);
     section.dispatchEvent?.(new CustomEvent('story-rail:empty', { bubbles: true }));
     section.remove();
     return;
   }
   block.dispatchEvent?.(new CustomEvent('story-rail:empty', { bubbles: true }));
+  keepFocusPast(block);
   mount.remove();
   header.remove();
 }
@@ -467,25 +513,43 @@ export default async function decorate(block) {
     });
     decorateBlock(carousel);
     await loadBlock(carousel);
+    // loadBlock logs and swallows the carousel's own failures: no track means no rail
+    if (!carousel.querySelector('.carousel-track')) {
+      collapseRail(block, mount, header);
+      return;
+    }
     const allLink = press && pressBandIsFull(rows.length, more) ? pressAllLink(block) : null;
     if (allLink) appendAllCard(carousel, allLink.getAttribute('href'), allLink.textContent.trim());
     if (endCard && more) {
       appendAllCard(carousel, cfg.viewAll, allLabel, heading ? `${allLabel}: ${heading}` : '');
+      // built after the page's link pass: apply the demo link policy (scripts/links.js) here too
+      decorateLinks(carousel.querySelector('.story-rail-all'));
     }
     mount.classList.add('is-built');
     carousel.hidden = false;
     if (['image', 'video'].includes(cfg.template) && indexRows.length) wireMediaLightbox(carousel, indexRows);
   }
 
+  async function buildRailSafely() {
+    try {
+      await buildRail();
+    } catch (e) {
+      // anything outside the index try (building, decorating, the end card): no stuck rail
+      // eslint-disable-next-line no-console
+      console.error('story-rail: rail build failed', e);
+      collapseRail(block, mount, header);
+    }
+  }
+
   if (window.IntersectionObserver) {
     const io = new IntersectionObserver((entries, obs) => {
       if (entries.some((en) => en.isIntersecting)) {
         obs.disconnect();
-        buildRail();
+        buildRailSafely();
       }
     }, { rootMargin: '600px 0px' });
     io.observe(block);
   } else {
-    buildRail();
+    buildRailSafely();
   }
 }

@@ -41,6 +41,9 @@ function run(type, heading, href = '') {
     .map((tr) => [...tr.children].map((td) => td.textContent)));
 }
 
+// a script-URL scheme, assembled so no literal javascript: URL sits in the source
+const JS = ['java', 'script:'].join('');
+
 test('Images and Videos rails read the media feed, where their rows are', { skip }, () => {
   assert.deepEqual(run('attachment', 'Images', '/en/images/'), {
     heading: 'Images', template: 'image', viewall: 'All', index: '/en/media-feed.json',
@@ -69,4 +72,12 @@ test('the source "All" header link is kept as a viewall link; rails without one 
   assert.equal(rows.find(([k]) => k.textContent === 'category')[1].textContent, 'emobility');
   // the Models rail has no header link on the source, so no viewall row
   assert.equal(run('skoda_model', 'Models').viewall, undefined);
+});
+
+test('only a real source "All" link becomes a viewall row (not #, javascript:, relative or empty)', { skip }, () => {
+  ['#', `${JS}void(0)`, 'category/emobility/', ' '].forEach((href) => {
+    assert.equal(run('post', 'eMobility', href).viewall, undefined, `skipped: "${href}"`);
+  });
+  assert.equal(run('post', 'eMobility', '/en/category/emobility/').viewall, 'All');
+  assert.equal(run('post', 'eMobility', '  https://www.skoda-storyboard.com/en/category/emobility/  ').viewall, 'All', 'padded href');
 });

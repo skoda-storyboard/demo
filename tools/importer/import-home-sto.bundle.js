@@ -134,9 +134,9 @@ var CustomImportScript = (() => {
       }
       cells.push(["template", template]);
     }
-    if (href) {
+    if (href && /^(?:https?:\/\/|\/(?!\/))/i.test(href.trim())) {
       const link = document2.createElement("a");
-      link.setAttribute("href", href);
+      link.setAttribute("href", href.trim());
       link.textContent = (allLink.textContent || "").trim() || "All";
       cells.push(["viewall", link]);
     }

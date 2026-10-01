@@ -88,9 +88,10 @@ export default function parse(element, { document }) {
 
   // The source's "All" header link (SKODA-611b): story-rail renders it as the header pill and,
   // on a full post rail, as the "All" end card. Its label is the source's own text.
-  if (href) {
+  // only a real link (absolute http(s) or root-relative): not #, javascript:, empty or relative
+  if (href && /^(?:https?:\/\/|\/(?!\/))/i.test(href.trim())) {
     const link = document.createElement('a');
-    link.setAttribute('href', href);
+    link.setAttribute('href', href.trim());
     link.textContent = (allLink.textContent || '').trim() || 'All';
     cells.push(['viewall', link]);
   }

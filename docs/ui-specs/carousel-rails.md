@@ -287,8 +287,9 @@ Taxonomy `Carousel` (no date -> `.carousel-caption`, bold title below wide image
 
 Compare EDS `/en` render to source at each viewport. WHAT / WHERE / viewport / expected / actual.
 
-- [ ] Items-per-view: `.carousel li` / 1280 / **~4.4** visible (cell ≈`22.5%`, `281px` @1248 track).
-- [ ] Items-per-view: `.carousel li` / 768 / **~3.3** visible (cell `30%`, `230px`).
+- [ ] Items-per-view: `.carousel li` / 1280 / **~4.4** visible (cell ≈`22.5%`, `281px` @1248 track): Media Room standard
+      rails and the home Models rail. The Storyboard home's other rails are **~3.3** (30%), SKODA-611b.
+- [ ] Items-per-view: `.carousel li` / 768 / **~3.3** visible (cell `30%`, `230px`); the home's non-Models rails **~2.2** (45%).
 - [ ] Items-per-view: `.carousel li` / <768 / **~1.1** visible with next peeking (cell `90%`).
 - [ ] Gap: `.carousel ul` / all / effective inter-card gap = **`20px`**.
 - [ ] Arrow: `.carousel-arrow` / all / `32×32`, `border-radius:50%`, at track edges; `opacity:0` when
@@ -296,7 +297,8 @@ Compare EDS `/en` render to source at each viewport. WHAT / WHERE / viewport / e
 - [ ] Dots (dots variant only): `10×10`, `#d8d8d8`, selected `#686868`; hidden when single page.
 - [ ] Drag: track scrolls on pointer-drag; post-drag click on a card is suppressed (no navigation).
 - [ ] Touch: `touch-action:pan-y`, vertical page scroll unaffected while swiping horizontally.
-- [ ] Taxonomy rail: `.carousel-caption` img aspect `383/150` in light sections; title below, bold.
+- [ ] Taxonomy rail: `.carousel-caption` title below the image, bold. Home bands (SKODA-611b): a 16:9 image with 8px
+      corners and a 45px white title row, 16/600 black (the `383/150` letterbox is the image's own crop inside it).
 - [ ] story-rail: builds a `.carousel`, defers build until near viewport, no repeat of stories shown
       in the featured promo / `stories` grid; reserves height (no CLS).
 - [ ] Promo-box mode: `.promo-box` / `>=768` / **rotating mosaic** (1 big `66.66%` + 2 small `33.33%`,
