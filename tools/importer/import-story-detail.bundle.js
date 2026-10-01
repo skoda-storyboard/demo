@@ -319,6 +319,45 @@ var CustomImportScript = (() => {
     });
     return count;
   }
+  var CELL_WIDTH_ATTR = "data-cell-width";
+  function markCellWidths(document2) {
+    const css = [...document2.querySelectorAll("style")].map((s) => s.textContent || "").join("\n");
+    const byId = /* @__PURE__ */ new Map();
+    for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+      const width = (body.match(/(?:^|;)\s*width\s*:\s*(?:calc\(\s*)?([\d.]+)%/i) || [])[1];
+      if (!width) continue;
+      selectors.split(",").forEach((sel) => {
+        const m = sel.trim().match(/^#(pgc-[\w-]+)$/);
+        if (m) byId.set(m[1], parseFloat(width));
+      });
+    }
+    let count = 0;
+    document2.querySelectorAll(".panel-grid-cell[id]").forEach((cell) => {
+      const width = byId.get(cell.id);
+      if (!width) return;
+      cell.setAttribute(CELL_WIDTH_ATTR, String(width));
+      count += 1;
+    });
+    return count;
+  }
+  function splitVariant(cells) {
+    if (cells.length !== 2) return null;
+    const [a, b] = cells.map((c) => parseFloat(c.getAttribute(CELL_WIDTH_ATTR)));
+    if (!(a > 0) || !(b > 0) || Math.abs(a - b) < 2) return null;
+    const share = Math.round(a / (a + b) * 100);
+    return share >= 10 && share <= 99 ? `split-${share}` : null;
+  }
+  function portraitVariant(cells) {
+    const imgs = cells.flatMap((c) => [...c.querySelectorAll("img")]);
+    if (imgs.length !== 1) return null;
+    const img = imgs[0];
+    const width = parseInt(img.getAttribute("width"), 10);
+    if (!(width >= 10 && width <= 999)) return null;
+    const descriptors = (img.getAttribute("srcset") || "").match(/\s(\d+)w\b/g) || [];
+    const fileWidth = Math.max(0, ...descriptors.map((d) => parseInt(d, 10)));
+    if (fileWidth && width >= fileWidth) return null;
+    return `portrait-${width}`;
+  }
   function hasContentAfter(node, root) {
     for (let n = node; n && n !== root; n = n.parentNode) {
       for (let s = n.nextSibling; s; s = s.nextSibling) {
@@ -420,14 +459,22 @@ var CustomImportScript = (() => {
   }
   function emitMultiColumn(cells, document2, out, stats) {
     const row = [];
+    const filled = [];
     cells.forEach((cell) => {
       const cellOut = [];
       panelsOf(cell).forEach((p) => emitWidget(p, document2, cellOut, stats));
-      if (cellOut.length) row.push(cellOut);
+      if (cellOut.length) {
+        row.push(cellOut);
+        filled.push(cell);
+      }
     });
     if (row.length > 1) {
-      out.push(WebImporter.DOMUtils.createTable([["Columns"], row], document2));
+      const split = splitVariant(filled);
+      const variants = split ? [split, portraitVariant(filled)].filter(Boolean) : [];
+      const header = variants.length ? `Columns (${variants.join(", ")})` : "Columns";
+      out.push(WebImporter.DOMUtils.createTable([[header], row], document2));
       stats.multiColumn += 1;
+      if (split) stats.split = (stats.split || 0) + 1;
     } else if (row.length === 1) {
       row[0].forEach((n) => out.push(n));
     }
@@ -480,6 +527,7 @@ var CustomImportScript = (() => {
       widgets: Object.values(stats.byKind).reduce((a, b) => a + b, 0),
       byKind: stats.byKind,
       multiColumn: stats.multiColumn,
+      split: stats.split || 0,
       highlights: stats.highlights,
       deferred: stats.deferred,
       unknown: stats.unknown
@@ -1564,11 +1612,13 @@ var CustomImportScript = (() => {
     /**
      * Runs on the untouched DOM, before helix-importer's preProcess and the cleanup
      * transformers. The highlight rows' background colour (SKODA-824) is only in the
-     * SiteOrigin head CSS, so the rows are marked here for story-flatten. Also keeps the
+     * SiteOrigin head CSS, so the rows are marked here for story-flatten, and so are the cell
+     * widths of unequal 2-cell rows (SKODA-225, Columns (split-NN)). Also keeps the
      * source's glued non-breaking spaces (html2md would turn them into spaces).
      */
     preprocess: ({ document: document2 }) => {
       markHighlights(document2);
+      markCellWidths(document2);
       transform7("preprocess", document2.body, { document: document2 });
     },
     transform: (payload) => {
