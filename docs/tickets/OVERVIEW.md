@@ -231,6 +231,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-805c](tickets/SKODA-805c.md) | `press_kit-template-default` article + accordion (first-glimpse) | E08 | 3 | 1–2 | 3 | 607,204,205,502,506 | 🟡 M1 Should; slice of 805/807; ready for QA 2026-09-29 (DA previewed, not published) |
 | SKODA-701 | Lint + unit tests | E07 | 2 | 1 | 1–2 | E02,E03,E04 | 🟢 |
 | SKODA-702 | Performance (Lighthouse≈100/RUM) | E07 | 3 | 1–2 | 2–3 | 603 | 🟡 |
+| [SKODA-702a](tickets/SKODA-702a.md) | Epiq story performance: YouTube click-to-load facade (desktop TBT) | E07 | 2 | 0.5–1 | 1–2 | 702,204a,818 | 🔵 M1; from the PR #232 PSI failure (desktop 74, TBT 570ms; `main` 64–69 locally); live uses `lite-youtube`, EDS boots the full player on load |
 | SKODA-703 | Accessibility audit | E07 | 3 | 1–2 | 2–4 | 603 | 🟠 several `[RUNTIME-UNCONFIRMED]` |
 | SKODA-704 | Visual critique + consent/analytics stubs + sign-off | E07 | 3 | 1–2 | 2–3 | 702,703 | 🟡 |
 
