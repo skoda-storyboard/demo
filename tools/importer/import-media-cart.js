@@ -5,8 +5,9 @@
  * Import orchestrator: Škoda media cart page (template-media-cart, /en/media-cart/).
  *
  * SKODA-505b. The cart is client-side (the device's SKODA-505a store), so the page is only
- * its shell: a `Style: dark` section with the h1 "Your downloads", then an empty `Media Cart`
- * block that blocks/media-cart/media-cart.js renders. Metadata template=page (a utility page,
+ * its shell: a `Style: page-header` section (the source's title band) with the h1 "Your
+ * downloads", then an empty `Media Cart` block that blocks/media-cart/media-cart.js renders.
+ * Metadata template=page (a utility page,
  * not a rail row); nav/footer/section come from the `/en/media-cart` bulk metadata row
  * (Media Room chrome, as /en/images). Content-driven detection only.
  */

@@ -5,8 +5,11 @@
  * heading 20px above a grid of 16:9 cards (radius 8px; meta 16/24 with 10px above and below;
  * title 15/18 on two lines; 280px wide, 20px apart at 1200), an "Original" remove pill (white, 2px ink ring, 14px 24px, 48px)
  * and a centred "No downloads" (400 32/48, 64px above and below).
- * Below 560px of block width the pills are icon-only 53px circles (the source switches at
- * the 768px viewport, whose content column is 748px).
+ * Below the 992px viewport the pills are icon-only 53px circles, as on the source (icon-only
+ * at 390/768/991, labelled at 992+, measured 2026-10-01): a page-level switch tied to the
+ * viewport, not to the room the block has (a 748px column at 768 would fit the labels).
+ * The row starts right under the section above (the source's pills are 40px under its title
+ * band: the section gap, no extra padding).
  * ========================================================================== */
 
 .media-cart {
@@ -25,8 +28,6 @@
   --media-cart-ring: 2px;
   --media-cart-empty-color: var(--skoda-grey-500);
   --media-cart-empty-size: 32px;
-
-  container: media-cart / inline-size;
 }
 
 /* --- actions: Download package · Empty package · "n / 80 files · size" ------------------ */
@@ -35,7 +36,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-xs);
-  padding-block: var(--spacing-l);
+  padding-block: 0 var(--spacing-l);
 }
 
 .media-cart .media-cart-button {
@@ -275,8 +276,8 @@
   outline: none;
 }
 
-/* --- room for the labels: the source's labelled pills ---------------------------------- */
-@container media-cart (width >= 560px) {
+/* --- the source's labelled pills, from its 992 breakpoint --------------------------------- */
+@media (width >= 992px) {
   .media-cart .media-cart-button {
     gap: var(--spacing-xs);
     padding: var(--media-cart-pill-pad);

@@ -44,6 +44,9 @@
   /* media-cart count bubble (SKODA-505b; the source badge's #f66) */
   --skoda-coral: #f66;
 
+  /* the source's page-header title band (#ccc; media cart page, SKODA-505b) */
+  --skoda-grey-250: #ccc;
+
   /* social network brand colors (footer icon hover tints — raw brand hex) */
   --social-hover: #419468;
   --social-facebook: #3b5998;

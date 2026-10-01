@@ -236,6 +236,18 @@
   transform: translateX(calc(var(--float-dock-pitch) * var(--float-dock-dir)));
 }
 
+/* an empty cart shows no badge: on the source its slot collapses and the badge sits under the
+   scroll-top button (measured 2026-10-01: x1062 at the top, x1000 scrolled, as scroll-top),
+   coming out beside it on the first add. The slot leaves the row; its status region stays
+   (absolutely positioned) so the first count change is still announced */
+.float-dock .float-dock-slot:has(> .float-dock-cart[data-empty]) {
+  display: contents;
+}
+
+.float-dock .float-dock-cart[data-empty] {
+  display: none;
+}
+
 /* list runs leftward from the trigger */
 @media (width >= 768px) {
   .float-dock {

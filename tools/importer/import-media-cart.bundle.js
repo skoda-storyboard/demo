@@ -104,7 +104,7 @@ var CustomImportScript = (() => {
     h1.textContent = (sourceTitle && sourceTitle.textContent || "").trim() || "Your downloads";
     const nodes = [
       h1,
-      WebImporter.Blocks.createBlock(document, { name: "Section Metadata", cells: { Style: "dark" } }),
+      WebImporter.Blocks.createBlock(document, { name: "Section Metadata", cells: { Style: "page-header" } }),
       document.createElement("hr"),
       WebImporter.DOMUtils.createTable([["Media Cart"], [""]], document)
     ];

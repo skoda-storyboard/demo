@@ -141,6 +141,8 @@ export async function buildCartBadge(slot, ph, load = () => Promise.all([
   const render = ({ count: n }, announce) => {
     count.textContent = n ? String(n) : '';
     count.hidden = !n;
+    // an empty cart shows no badge, as on the source (float-dock.css)
+    link.toggleAttribute('data-empty', !n);
     link.setAttribute('aria-label', n ? ui.plural(labels, 'badgeCount', n) : labels.badge);
     if (announce) status.textContent = ui.plural(labels, 'countChanged', n);
   };

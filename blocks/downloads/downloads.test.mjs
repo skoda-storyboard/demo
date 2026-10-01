@@ -277,6 +277,34 @@ test('Media Box: the group toggle sits on the section stats line', async () => {
   assert.deepEqual([all.type, all.getAttribute('aria-label'), all.getAttribute('aria-disabled')], ['button', 'Add all files to the media cart', 'true']);
 });
 
+test('Media Box: intro copy, a linked line or a second block never takes the stats line', async () => {
+  setup();
+  document.body.innerHTML = '<div class="section media-box">'
+    + '<div class="default-content-wrapper"><h2>Media Box</h2><p>Press photos of the new model.</p></div>'
+    + '<div class="downloads-wrapper"><div class="downloads" id="d1"></div></div>'
+    + '<div class="default-content-wrapper"><p>2 images</p></div>'
+    + '<div class="downloads-wrapper"><div class="downloads" id="d2"></div></div>'
+    + '<div class="downloads-wrapper"><div class="downloads" id="d3"></div></div>'
+    + '<div class="default-content-wrapper"><p>See <a href="/en/x">all files</a></p></div>'
+    + '<div class="downloads-wrapper"><div class="downloads" id="d4"></div></div>'
+    + '</div>';
+  document.body.className = 'press-release';
+  const blocks = ['d1', 'd2', 'd3', 'd4'].map((id) => document.getElementById(id));
+  blocks.forEach((b, i) => addRow(b, { src: `/${i}.jpg`, title: `T${i}`, links: [['Original', `https://www.skoda-storyboard.com/direct-download/${i}.jpg`]] }));
+  // position decides: a line counts only when it is the paragraph right before its block
+  const { statsLine } = await import('./downloads.js');
+  assert.equal(statsLine(blocks[2]), null, 'd3 follows another block, not default content');
+  assert.equal(statsLine(blocks[3]), null, 'a line with a link is copy, not stats');
+  await Promise.all(blocks.map((b) => decorate(b)));
+  const stats = document.querySelector('#d2').closest('.section').querySelectorAll('.downloads-stats');
+  assert.equal([...stats].filter((p) => p.textContent.startsWith('2 images')).length, 1);
+  assert.equal(document.querySelectorAll('.downloads-stats .downloads-add-all').length,
+    [...stats].length, 'one group toggle per taken line');
+  assert.ok(blocks[2].querySelector('.downloads-toolbar .downloads-add-all'), 'd3 gets its toolbar');
+  assert.ok(blocks[3].querySelector('.downloads-toolbar .downloads-add-all'), 'd4 gets its toolbar');
+  assert.equal(document.querySelector('a[href="/en/x"]').parentElement.querySelector('.downloads-add-all'), null);
+});
+
 function fakeDownloadsCart(refuse = {}, initial = []) {
   const inCart = new Set(initial);
   let listener = () => {};

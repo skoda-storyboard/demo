@@ -314,10 +314,26 @@ function buildAdd(asset) {
 }
 
 /**
+ * The block's stats line ("1 video, 3 images, 1 PDF"): the last paragraph of the default content
+ * right before this block, when it is plain text (no link or image) and no other block has taken
+ * it. Intro copy elsewhere in the section, or a second block's line, is never used.
+ * @returns {HTMLParagraphElement|null}
+ */
+export function statsLine(block) {
+  const wrapper = block.parentElement?.classList.contains('downloads-wrapper') ? block.parentElement : block;
+  const before = wrapper.previousElementSibling;
+  if (!before?.classList.contains('default-content-wrapper')) return null;
+  const p = before.lastElementChild;
+  if (p?.tagName !== 'P' || !p.textContent.trim() || p.classList.contains('downloads-stats')
+    || p.querySelector('a, img, picture')) return null;
+  return p;
+}
+
+/**
  * The Media Box group toggle (source .search-results-stats .entry-buttons): adds every tile's
  * original that isn't in the cart yet, or removes them all once every one is in. Right-aligned
- * on the section's stats line ("1 video, 3 images, 1 PDF") when there is one, else above the
- * grid. Returns the button (inert until wired).
+ * on the block's stats line (statsLine) when there is one, else above the grid. Returns the
+ * button (inert until wired).
  */
 function buildAddAll(block) {
   const btn = document.createElement('button');
@@ -325,9 +341,8 @@ function buildAddAll(block) {
   btn.className = 'downloads-add downloads-add-all';
   btn.setAttribute('aria-label', LABELS.addAll);
   btn.setAttribute('aria-disabled', 'true');
-  const stats = block.closest('.section')
-    ?.querySelector('.default-content-wrapper > p:last-child');
-  if (stats && stats.textContent.trim()) {
+  const stats = statsLine(block);
+  if (stats) {
     stats.classList.add('downloads-stats');
     stats.append(btn);
   } else {
@@ -356,7 +371,9 @@ export async function bindCart(block, addAll, load = () => Promise.all([
   const [cart, ui, { fetchPlaceholders }] = await load();
   tiles.forEach((btn) => cart.bindCartControl(btn));
   if (!addAll) return;
-  const labels = ui.cartLabels(await fetchPlaceholders());
+  // the notice's styles before a partial add can show it (no unstyled flash)
+  const [ph] = await Promise.all([fetchPlaceholders(), ui.loadCartStyles()]);
+  const labels = ui.cartLabels(ph);
   const live = () => tiles.filter((t) => t.getAttribute('aria-disabled') !== 'true' && t.dataset.href);
   const sync = () => {
     const open = live();

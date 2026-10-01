@@ -228,11 +228,13 @@ export default async function decorate(block) {
   instanceSeq += 1;
   const uid = `l${instanceSeq}`; // unique id prefix for this block instance
   const media = isMediaTemplate(cfg.template);
-  // media listings show the cart's package-limit notice (SKODA-505b); loaded with the
-  // placeholders, so it is in the skeleton (no shift above the grid)
+  // media listings show the cart's package-limit notice (SKODA-505b); it and its stylesheet
+  // load with the placeholders, so it is in the skeleton, styled (no shift above the grid)
   const [placeholders, cartUi] = await Promise.all([
     fetchPlaceholders(),
-    media ? import('../../scripts/media-cart-ui.js').catch(() => null) : null,
+    media ? import('../../scripts/media-cart-ui.js')
+      .then(async (ui) => { await ui.loadCartStyles(); return ui; })
+      .catch(() => null) : null,
   ]);
   const STRINGS = buildStrings(placeholders);
   const mediaText = mediaLabels(placeholders); // media card controls (SKODA-406)

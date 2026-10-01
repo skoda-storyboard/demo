@@ -114,6 +114,11 @@
   --spacing-xxl: 64px;
   --section-padding: 40px;
 
+  /* page-header section style: the source's title band (SKODA-505b) */
+  --page-header-min-height: 240px;
+  --page-header-bg: var(--skoda-grey-250);
+  --page-header-color: var(--skoda-white);
+
   /* radii / shadow / border */
   --card-radius: 8px;
   --card-shadow: 0 1px 10px 0 rgb(0 0 0 / 7%), 0 2px 2px -2px rgb(0 0 0 / 10%);
@@ -706,6 +711,31 @@ main .section.dark a {
    white-bodied cards keep their ink titles. */
 main .section.dark > .default-content-wrapper :is(h1, h2, h3, h4, h5, h6) {
   color: inherit;
+}
+
+/* page-header: the source's title band (WordPress `.page-header`, measured on /en/media-cart/
+   at 390–1440, SKODA-505b): at least 240px of #ccc with the white light title centred both
+   ways, 40px above the next section. Section Metadata `Style: page-header`. White on #ccc is
+   1.6:1, the source's own contrast, kept by decision (exact origin, 2026-10-01). The band grows
+   with a long or scaled title (min-block-size, not a fixed height). */
+main > .section.page-header {
+  display: grid;
+  align-content: center;
+  box-sizing: border-box;
+  min-block-size: var(--page-header-min-height);
+  margin: 0 0 var(--spacing-xl);
+  padding: 0;
+  background-color: var(--page-header-bg);
+  color: var(--page-header-color);
+}
+
+main > .section.page-header > .default-content-wrapper :is(h1, h2) {
+  margin: 0;
+  color: inherit;
+  font-size: var(--heading-font-size-hero);
+  font-weight: var(--weight-light);
+  line-height: 1.1;
+  text-align: center;
 }
 
 /* cover-box: the homepage band box. Every home section is one (Section Metadata

@@ -102,12 +102,31 @@ export function formatBytes(bytes = 0) {
 /** The cart page for the current locale (the source `/en/media-cart/`). */
 export const cartHref = (pathname = window.location.pathname) => `/${currentLocale(pathname)}/media-cart`;
 
-export const loadCartStyles = () => loadCSS(`${window.hlx?.codeBasePath || ''}/styles/media-cart.css`)
-  .catch(() => {});
+// one load for the page: loadCSS resolves at once for a sheet that is already linked but
+// still loading, so callers share this promise to wait for the real load
+let cartStyles = null;
+
+/** The longest a render waits for the sheet; after that the cart renders and styles itself late. */
+export const CART_STYLES_TIMEOUT_MS = 3000;
+
+/**
+ * Load /styles/media-cart.css (the banner and the notice). Await it before showing either, or
+ * they appear unstyled and then grow (a layout shift). Never rejects, and settles within
+ * CART_STYLES_TIMEOUT_MS even if the sheet stalls (or never reports, as in jsdom).
+ * @returns {Promise<void>}
+ */
+export const loadCartStyles = () => {
+  cartStyles ||= Promise.race([
+    loadCSS(`${window.hlx?.codeBasePath || ''}/styles/media-cart.css`).catch(() => {}),
+    new Promise((resolve) => { setTimeout(resolve, CART_STYLES_TIMEOUT_MS); }),
+  ]);
+  return cartStyles;
+};
 
 /**
  * The source's package-limit notice (media-cart-limit plugin): an info banner above a media
- * grid and on the cart page.
+ * grid and on the cart page. Its styles are in /styles/media-cart.css: callers await
+ * loadCartStyles() before rendering it (the listing and the cart page do).
  * @param {typeof DEFAULT_LABELS} [labels]
  * @param {{items: number, bytes: number}} [limits]
  * @returns {HTMLDivElement}
@@ -173,9 +192,13 @@ export function showNotice(text, labels = DEFAULT_LABELS) {
     close.className = 'media-cart-notice-close';
     close.addEventListener('click', closeNotice);
     notice.append(message, close);
-    // capture: the notice closes first, not a dialog under it (the lightbox listens too)
+    // capture: the notice closes first, not a dialog under it (the lightbox listens too).
+    // Only when it is on top: a lightbox opened over a page notice covers it, so Escape is the
+    // lightbox's (the notice still closes itself after NOTICE_MS).
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape' || !notice?.isConnected || notice.closest('[hidden]')) return;
+      const overlay = document.querySelector('.gallery-overlay:not([hidden])');
+      if (overlay && !overlay.contains(notice)) return;
       e.stopPropagation();
       closeNotice();
     }, true);
@@ -202,6 +225,7 @@ export async function onRefused(e) {
   const reason = e?.detail?.reason;
   if (!reason || reason === 'duplicate') return;
   const { fetchPlaceholders } = await import('./placeholders.js');
-  const labels = cartLabels(await fetchPlaceholders());
+  const [ph] = await Promise.all([fetchPlaceholders(), loadCartStyles()]);
+  const labels = cartLabels(ph);
   showNotice(refusalMessage(reason, labels), labels);
 }

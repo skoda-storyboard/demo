@@ -580,7 +580,7 @@
       "urls": [
         "https://www.skoda-storyboard.com/en/media-cart/"
       ],
-      "description": "Škoda media cart page (body.media-cart, SKODA-505b). Emits a Style: dark section with the h1 \"Your downloads\", then an empty Media Cart block (blocks/media-cart renders the device's cart); the client-rendered cart widget and package history are not ported. Metadata template=page; Media Room nav/footer/section from the /en/media-cart bulk metadata row.",
+      "description": "Škoda media cart page (body.media-cart, SKODA-505b). Emits a Style: page-header section (the source's 240px grey title band) with the h1 \"Your downloads\", then an empty Media Cart block (blocks/media-cart renders the device's cart); the client-rendered cart widget and package history are not ported. Metadata template=page; Media Room nav/footer/section from the /en/media-cart bulk metadata row.",
       "metadata": {
         "template": "page"
       },

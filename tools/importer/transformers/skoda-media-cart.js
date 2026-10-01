@@ -10,7 +10,7 @@
  * below the title is authorable: the cart lives in the visitor's browser (SKODA-505a store).
  *
  * Output (SKODA-505b authoring contract, blocks/media-cart/media-cart.js):
- *   section 1  `Style: dark`  h1 "Your downloads"
+ *   section 1  `Style: page-header`  h1 "Your downloads" (the source's 240px grey title band)
  *   section 2  an empty `Media Cart` block (the block renders the device's cart)
  * Package history is out of scope (SKODA-505b deviations), so `#media-cart-history` is dropped.
  * Runs after the listing chrome cleanup; the metadata transformer appends the Metadata block.
@@ -32,7 +32,7 @@ export default function transform(hookName, element, payload) {
 
   const nodes = [
     h1,
-    WebImporter.Blocks.createBlock(document, { name: 'Section Metadata', cells: { Style: 'dark' } }),
+    WebImporter.Blocks.createBlock(document, { name: 'Section Metadata', cells: { Style: 'page-header' } }),
     document.createElement('hr'),
     WebImporter.DOMUtils.createTable([['Media Cart'], ['']], document),
   ];

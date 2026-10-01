@@ -17,7 +17,7 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
 import { fetchPlaceholders } from '../../scripts/placeholders.js';
 import * as store from '../../scripts/media-cart.js';
 import {
-  DEFAULT_LABELS, cartLabels, format, formatBytes, limitBanner, plural,
+  DEFAULT_LABELS, cartLabels, format, formatBytes, limitBanner, loadCartStyles, plural,
 } from '../../scripts/media-cart-ui.js';
 
 const KINDS = [
@@ -246,12 +246,11 @@ export function renderCart(block, {
 }
 
 export default async function decorate(block) {
-  let placeholders = {};
-  try {
-    placeholders = await fetchPlaceholders();
-  } catch {
-    // English defaults
-  }
+  // the limit banner's styles (/styles/media-cart.css) before the first render: no shift
+  const [placeholders] = await Promise.all([
+    fetchPlaceholders().catch(() => ({})), // English defaults
+    loadCartStyles(),
+  ]);
   renderCart(block, { labels: cartLabels(placeholders) });
   store.trackView();
 }

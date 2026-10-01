@@ -127,6 +127,29 @@ test('showNotice: over an open lightbox it shows inside the dialog, and Escape c
   ui.showNotice('x').querySelector('.media-cart-notice-close').click();
 });
 
+test('loadCartStyles: one load for the page, shared by every caller', () => {
+  const first = ui.loadCartStyles();
+  assert.equal(ui.loadCartStyles(), first, 'a second caller waits for the same load');
+  assert.equal(document.head.querySelectorAll('link[href$="/styles/media-cart.css"]').length, 1);
+});
+
+test('showNotice: a page notice covered by a lightbox opened later leaves Escape to the lightbox', () => {
+  const notice = ui.showNotice('Full');
+  assert.equal(notice.parentElement, document.body);
+  const overlay = document.createElement('div');
+  overlay.className = 'gallery-overlay';
+  document.body.append(overlay);
+  const closedByLightbox = [];
+  const onKey = (e) => { if (e.key === 'Escape') closedByLightbox.push(e.key); };
+  document.addEventListener('keydown', onKey);
+  document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  assert.deepEqual(closedByLightbox, ['Escape'], 'one press closes the lightbox, the visible dialog');
+  assert.equal(notice.hidden, false, 'the covered notice is left to its timer');
+  document.removeEventListener('keydown', onKey);
+  overlay.remove();
+  notice.querySelector('.media-cart-notice-close').click();
+});
+
 test('onRefused: says why in the page language; duplicates stay silent', async () => {
   const notice = document.querySelector('.media-cart-notice');
   await ui.onRefused({ detail: { reason: 'duplicate' } });
