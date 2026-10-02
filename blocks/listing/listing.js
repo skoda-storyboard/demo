@@ -227,7 +227,15 @@ export default async function decorate(block) {
   const cfg = parseListConfig(block);
   instanceSeq += 1;
   const uid = `l${instanceSeq}`; // unique id prefix for this block instance
-  const placeholders = await fetchPlaceholders();
+  const media = isMediaTemplate(cfg.template);
+  // media listings show the cart's package-limit notice (SKODA-505b); it and its stylesheet
+  // load with the placeholders, so it is in the skeleton, styled (no shift above the grid)
+  const [placeholders, cartUi] = await Promise.all([
+    fetchPlaceholders(),
+    media ? import('../../scripts/media-cart-ui.js')
+      .then(async (ui) => { await ui.loadCartStyles(); return ui; })
+      .catch(() => null) : null,
+  ]);
   const STRINGS = buildStrings(placeholders);
   const mediaText = mediaLabels(placeholders); // media card controls (SKODA-406)
 
@@ -238,7 +246,6 @@ export default async function decorate(block) {
   // Skeleton.
   block.textContent = '';
   block.classList.add(`columns-${cfg.columns}`);
-  const media = isMediaTemplate(cfg.template);
   if (media) block.classList.add('listing-media', `listing-${cfg.template}`);
   // Facet panel, as on the source form.search-filter: a row of pills, then the open pill's
   // option list full width under the whole row (not a dropdown under its pill).
@@ -285,6 +292,7 @@ export default async function decorate(block) {
   // Source order: facet panel (pills, options, chips), sort row, grid, then the "N / total"
   // count right above Load more (measured on /en/news, /en/images).
   block.append(facetBar, sortRow, status, grid, countEl, loadMoreWrap);
+  if (cartUi) sortRow.after(cartUi.limitBanner(cartUi.cartLabels(placeholders)));
 
   // Load the index (self-contained; degrades to empty/error state).
   let scoped = [];

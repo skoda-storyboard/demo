@@ -51,8 +51,18 @@ test('LIVE_ONLY chrome targets go to the live site in a new tab', () => {
     '/cs/', '/de/', '/sk/', '/sl/', '/sr/', '/de/some/page/',
     '/en/skodapedia/', '/en/feed/', '/en/press-releases/feed/', '/en/contacts/',
     '/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing/',
-    '/en/newsletter-settings/', '/en/media-cart/',
+    '/en/newsletter-settings/',
   ].forEach((href) => assert.deepEqual(policyHref(href, PAGE), { href: `${LIVE_ORIGIN}${href}`, newTab: true }, href));
+});
+
+test('the media cart page is the demo\'s own (SKODA-505b): it stays in the tab', () => {
+  assert.equal(policyHref('/en/media-cart', PAGE), null, 'the cart badge link is left as it is');
+  assert.deepEqual(policyHref('/en/media-cart/', PAGE), { href: '/en/media-cart', newTab: false });
+  assert.deepEqual(
+    policyHref(`${LIVE_ORIGIN}/en/media-cart/`, PAGE),
+    { href: '/en/media-cart', newTab: false },
+    'a chrome link to the live cart page comes to the demo page',
+  );
 });
 
 test('source-only downloads go to the live site', () => {

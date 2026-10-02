@@ -1,0 +1,294 @@
+/* ==========================================================================
+ * media-cart — the cart page (SKODA-505b). Spec: docs/ui-specs/media-cart.md §3; measured on
+ * the source /en/media-cart/ (2026-09-30, 1200px): emerald action pills (radius 32px, 16px 32px,
+ * 500 16px, 53px tall, 8px apart; label .85em, icon 1.3em after it), groups with a 600 26px
+ * heading 20px above a grid of 16:9 cards (radius 8px; meta 16/24 with 10px above and below;
+ * title 15/18 on two lines; 280px wide, 20px apart at 1200), an "Original" remove pill (white, 2px ink ring, 14px 24px, 48px)
+ * and a centred "No downloads" (400 32/48, 64px above and below).
+ * Below the 992px viewport the pills are icon-only 53px circles, as on the source (icon-only
+ * at 390/768/991, labelled at 992+, measured 2026-10-01): a page-level switch tied to the
+ * viewport, not to the room the block has (a 748px column at 768 would fit the labels).
+ * The row starts right under the section above (the source's pills are 40px under its title
+ * band: the section gap, no extra padding).
+ * ========================================================================== */
+
+.media-cart {
+  --media-cart-pill-bg: var(--skoda-green-emerald);
+  --media-cart-pill-bg-hover: var(--skoda-green-emerald-hover);
+  --media-cart-pill-radius: 32px;
+  --media-cart-pill-size: 53px;
+  --media-cart-pill-pad: 16px 32px;
+  --media-cart-pill-icon: 1.3em;
+  --media-cart-card-min: 240px;
+  --media-cart-grid-gap: 20px;
+  --media-cart-card-radius: 8px;
+  --media-cart-title-size: 15px;
+  --media-cart-title-line: 18px;
+  --media-cart-remove-pad: 14px 24px;
+  --media-cart-ring: 2px;
+  --media-cart-empty-color: var(--skoda-grey-500);
+  --media-cart-empty-size: 32px;
+}
+
+/* --- actions: Download package · Empty package · "n / 80 files · size" ------------------ */
+.media-cart .media-cart-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding-block: 0 var(--spacing-l);
+}
+
+.media-cart .media-cart-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-inline-size: var(--media-cart-pill-size);
+  min-block-size: var(--media-cart-pill-size);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--media-cart-pill-radius);
+  background-color: var(--media-cart-pill-bg);
+  color: var(--text-color);
+  font: inherit;
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.media-cart .media-cart-button::after {
+  content: "";
+  flex: none;
+  inline-size: var(--media-cart-pill-icon);
+  block-size: var(--media-cart-pill-icon);
+  background-color: currentcolor;
+  mask: var(--media-cart-button-icon) center / contain no-repeat;
+}
+
+.media-cart .media-cart-download {
+  --media-cart-button-icon: url("../../icons/media-download.svg");
+}
+
+.media-cart .media-cart-download.is-busy {
+  --media-cart-button-icon: url("../../icons/lightbox-close.svg");
+}
+
+.media-cart .media-cart-clear {
+  --media-cart-button-icon: url("../../icons/media-remove.svg");
+}
+
+/* an empty cart: nothing to download or empty */
+.media-cart .media-cart-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.media-cart .media-cart-button:focus-visible {
+  outline: var(--media-cart-ring) solid var(--text-color);
+  outline-offset: var(--media-cart-ring);
+  background-color: var(--media-cart-pill-bg-hover);
+}
+
+.media-cart .media-cart-button:enabled:hover {
+  background-color: var(--media-cart-pill-bg-hover);
+}
+
+.media-cart .media-cart-count {
+  margin: 0 0 0 auto;
+  font-size: var(--body-font-size-s);
+}
+
+/* icon-only pills: the label is still the button's name */
+.media-cart .media-cart-button-label,
+.media-cart .media-cart-visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.media-cart .media-cart-limit {
+  margin-block: 0 var(--spacing-l);
+}
+
+/* --- download progress + the files that didn't make it into the package -------------- */
+.media-cart .media-cart-status {
+  margin: 0;
+  font-size: var(--body-font-size-s);
+}
+
+.media-cart .media-cart-status:not(:empty) {
+  margin-block-end: var(--spacing-s);
+}
+
+.media-cart .media-cart-bar {
+  display: block;
+  inline-size: 100%;
+  block-size: var(--spacing-xs);
+  margin-block-end: var(--spacing-l);
+  accent-color: var(--dark-color);
+}
+
+.media-cart .media-cart-bar[hidden],
+.media-cart .media-cart-failed[hidden] {
+  display: none;
+}
+
+.media-cart .media-cart-failed {
+  margin: 0 0 var(--spacing-l);
+  padding-inline-start: var(--spacing-l);
+  font-size: var(--body-font-size-s);
+}
+
+/* --- groups + cards ------------------------------------------------------------------ */
+.media-cart .media-cart-group + .media-cart-group {
+  margin-block-start: var(--spacing-xl);
+}
+
+.media-cart .media-cart-group-title {
+  margin: 0 0 20px;
+  font-size: var(--heading-font-size-l);
+  font-weight: var(--weight-semibold);
+  line-height: 1.25;
+}
+
+.media-cart .media-cart-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--media-cart-card-min)), 1fr));
+  gap: var(--spacing-xl) var(--media-cart-grid-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.media-cart .media-cart-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-inline-size: 0;
+}
+
+.media-cart .media-cart-thumb {
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--media-cart-card-radius);
+  background-color: var(--light-color);
+}
+
+.media-cart .media-cart-thumb picture,
+.media-cart .media-cart-thumb img {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.media-cart .media-cart-thumb img {
+  object-fit: cover;
+}
+
+.media-cart .media-cart-thumb-type {
+  color: var(--skoda-grey-700);
+  font-size: var(--heading-font-size-s);
+  font-weight: var(--weight-semibold);
+}
+
+.media-cart .media-cart-meta {
+  align-self: stretch;
+  margin: 0;
+  padding-block: 10px;
+  color: var(--skoda-grey-700);
+  font-size: var(--body-font-size-m);
+  line-height: 1.5;
+}
+
+.media-cart .media-cart-title {
+  display: -webkit-box;
+  align-self: stretch;
+  margin: 0 0 var(--spacing-m);
+  overflow: hidden;
+  font-size: var(--media-cart-title-size);
+  line-height: var(--media-cart-title-line);
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* the "Original" remove pill, at the foot of the card so a row's pills line up */
+.media-cart .media-cart-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  box-sizing: border-box;
+  margin: auto 0 0;
+  padding: var(--media-cart-remove-pad);
+  border: var(--media-cart-ring) solid var(--text-color);
+  border-radius: var(--pill-radius);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font: inherit;
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.media-cart .media-cart-remove::after {
+  content: "";
+  inline-size: var(--body-font-size-m);
+  block-size: var(--body-font-size-m);
+  background-color: currentcolor;
+  mask: url("../../icons/media-remove.svg") center / contain no-repeat;
+}
+
+.media-cart .media-cart-remove:hover {
+  background-color: var(--dropdown-hover-bg);
+}
+
+.media-cart .media-cart-remove:focus-visible {
+  outline: var(--media-cart-ring) solid var(--text-color);
+  outline-offset: var(--media-cart-ring);
+}
+
+/* --- empty: readable text; the source's #ccc is 1.6:1, grey-500 passes for large text -- */
+.media-cart .media-cart-empty {
+  margin: var(--spacing-xxl) 0;
+  color: var(--media-cart-empty-color);
+  font-size: var(--media-cart-empty-size);
+  font-weight: var(--weight-regular);
+  line-height: 1.5;
+  text-align: center;
+}
+
+.media-cart .media-cart-empty[hidden] {
+  display: none;
+}
+
+.media-cart .media-cart-empty:focus {
+  outline: none;
+}
+
+/* --- the source's labelled pills, from its 992 breakpoint --------------------------------- */
+@media (width >= 992px) {
+  .media-cart .media-cart-button {
+    gap: var(--spacing-xs);
+    padding: var(--media-cart-pill-pad);
+  }
+
+  .media-cart .media-cart-button-label {
+    position: static;
+    inline-size: auto;
+    block-size: auto;
+    overflow: visible;
+    clip-path: none;
+    font-size: 0.85em;
+  }
+}
