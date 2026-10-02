@@ -104,7 +104,13 @@ function cartAction(el, row, size, original = '', title = '') {
   // the cart module loads only where an add control renders; until then it stays disabled
   if (original) {
     const thumb = row.image || row.poster || '';
-    import('./media-cart.js').then(({ bindCartControl }) => bindCartControl(el, { href: original, title, thumb }));
+    import('./media-cart.js')
+      .then(({ bindCartControl }) => bindCartControl(el, { href: original, title, thumb }))
+      .catch((e) => {
+        // the control stays disabled (set above)
+        // eslint-disable-next-line no-console
+        console.warn('media card: the media cart did not load', e);
+      });
   }
   return el;
 }

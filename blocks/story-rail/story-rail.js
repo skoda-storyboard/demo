@@ -431,6 +431,10 @@ export default async function decorate(block) {
     if (cartControls.length) {
       import('../../scripts/media-cart.js').then(({ bindCartControl }) => {
         cartControls.forEach((a) => bindCartControl(a));
+      }).catch((e) => {
+        // the add buttons stay disabled (as rendered)
+        // eslint-disable-next-line no-console
+        console.warn('story-rail: the media cart did not load', e);
       });
     }
     decorateBlock(carousel);

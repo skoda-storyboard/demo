@@ -71,9 +71,17 @@ Design agreed with the product owner on #50 (D1–D7, R1–R3). The approach is 
     - `scripts/lightbox.js`: the one add button per overlay is re-pointed at each item's `cartHref` (new item field; `media-lightbox.js` sets the original / MP4). Gallery images have no DAM original, so their add is disabled. Items with `actions: false` (content images) don't bind and don't load the cart.
 - **Tests:** `scripts/media-cart*.test.mjs`, `scripts/lightbox-cart.test.mjs` and `tools/importer/media/build-cart-index.test.mjs`. They cover cart ops, dedupe, caps, persistence, corrupt/blocked/full storage, cross-tab sync, binding, the resolver and the index generator. The zip test reconciles the manifest against the archive: it unzips with fflate and checks CRC32 against `zlib`. The media-card and story-rail tests were updated.
 - **Known limits (demo data, not code):**
-  - 37 of 51 videos in the media feed are `publish: pending` in the manifest, so their add stays disabled until they are published and the index is regenerated.
+  - 33 of 51 videos in the media feed aren't published on AEM Assets yet (2026-10-02), so their add stays disabled until they are published and the index is regenerated.
+  - **Press-release and press-kit images not on the DAM:** 291 of the 1,362 images those pages reference have no published original (285 `steps.dam: n/a`, never uploaded; 6 `dam: error`), on 34 pages (2026-10-02). Their Media Box tiles show the add as unavailable; e.g. `/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav` has 9 of 10 images disabled (its videos and PDFs are in). The fix is data: upload + publish these originals (SKODA-501/504 scope, DAM ingest on a developer machine per AGENTS.md), then `npm run media:cart-index`. **Decision needed:** whether the M1 demo ingests them.
   - Page links that aren't in the index (the #219 WebP originals) show as unavailable.
   - Live CORS zipping end to end is 505b's acceptance. The DAM sends `Access-Control-Allow-Origin: *`.
+  - Analytics consent (the push only checks that a `dataLayer` exists) is out of scope here: SKODA-804/905.
+- **Review fixes (2026-10-02, issue #50 review):**
+  - **Index regenerated** against main's manifest after the merge: 2,394 assets (+22 PDFs, +12 MP4s). `npm run media:cart-index -- --check` passes; rerun it after every DAM publish.
+  - **HEAD requests:** the resolver keeps one HEAD per DAM path for the page (shared by the hover sweep, a later click and other controls for the same file; a failure isn't kept, so it is retried). The hover sweep resolves `SWEEP_CONCURRENCY` (4) links at a time, each once, instead of every unindexed link at once.
+  - **Failures are reported, not swallowed:** a failed lazy import of the cart (lightbox, media card, story rail) logs a warning and leaves the control disabled; a sweep whose index doesn't load logs a warning and leaves the controls enabled (a click resolves its own link).
+  - **Zip memory:** after each file the zip output is folded into a Blob (kept by the browser outside the JS heap, and paged to disk if needed), and the zip is a Blob of those Blobs. The JS heap holds about one original at a time, not the whole package twice.
+  - **Abort:** a cancel that lands after the last file is read (or while fflate loads) saves nothing.
 
 ## Dependencies
 - Upstream: SKODA-501 + SKODA-504 (CORS-enabled AEM DAM delivery, the linchpin), SKODA-502 (mediabox data), SKODA-601 (import wires per-asset hooks).

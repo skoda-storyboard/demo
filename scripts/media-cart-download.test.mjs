@@ -199,3 +199,44 @@ test('vendored fflate is the pinned npm build, byte for byte', () => {
   assert.ok(read('./vendor/fflate.js').equals(readFileSync(new URL('esm/browser.js', npmDir))), 'run npm run vendor:fflate');
   assert.ok(read('./vendor/fflate.LICENSE.txt').equals(readFileSync(new URL('LICENSE', npmDir))));
 });
+
+test('an abort after the last file is read saves nothing', async () => {
+  const a = bytes(500, 1);
+  const b = bytes(700, 2);
+  const ctrl = new AbortController();
+  const h = harness({ [`${DAM}/a.jpg`]: a, [`${DAM}/b.jpg`]: b }, {
+    signal: ctrl.signal,
+    onProgress: (p) => { if (p.done === 2) ctrl.abort(); },
+  });
+  await assert.rejects(downloadItems([item('a.jpg', a), item('b.jpg', b)], h.opts), { name: 'AbortError' });
+  assert.deepEqual(h.saved, []);
+  assert.equal(h.blobs.size, 0, 'no object URL was made');
+});
+
+test('the zip leaves the JS heap per file: one Blob per stored file, joined without a copy', async () => {
+  const files = [bytes(3000, 1), bytes(1, 2), bytes(4500, 3)];
+  const names = ['a.jpg', 'b.png', 'c.mp4'];
+  const h = harness(Object.fromEntries(names.map((n, i) => [`${DAM}/${n}`, files[i]])));
+  const Real = globalThis.Blob;
+  const made = [];
+  globalThis.Blob = class extends Real {
+    constructor(parts = [], o = undefined) {
+      super(parts, o);
+      made.push(parts.map((p) => (p instanceof Real ? 'blob' : 'bytes')));
+    }
+  };
+  let res;
+  try {
+    res = await downloadItems(names.map((n, i) => item(n, files[i])), h.opts);
+  } finally {
+    globalThis.Blob = Real;
+  }
+  const final = made.at(-1);
+  assert.ok(final.length === 4 && final.every((p) => p === 'blob'), 'the zip is a Blob of 3 file Blobs + the directory');
+  assert.equal(made.slice(0, -1).length, 4, 'folded after each file, then the directory');
+  assert.ok(made.slice(0, -1).every((parts) => parts.every((p) => p === 'bytes')));
+  const out = await h.unzip(h.saved[0].href);
+  assert.deepEqual(Object.keys(out), names);
+  names.forEach((n, i) => assert.deepEqual(out[n], files[i]));
+  assert.equal(res.mode, 'zip');
+});

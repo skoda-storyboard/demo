@@ -194,6 +194,10 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
       if (seq === cartSeq) {
         bindCartControl(addBtn, { href, title: item.alt || '', thumb: item.thumb || item.src || '' });
       }
+    }).catch((e) => {
+      // the add stays disabled (set above)
+      // eslint-disable-next-line no-console
+      console.warn('lightbox: the media cart did not load', e);
     });
   };
 

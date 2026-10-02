@@ -14,7 +14,7 @@ const dom = new JSDOM('<main></main>', { url: 'https://example.com/en/images' })
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
 const {
-  createCart, STORAGE_KEY, REASONS,
+  createCart, STORAGE_KEY, REASONS, SWEEP_CONCURRENCY,
 } = await import('./media-cart.js');
 
 const HOST = 'https://publish-p220607-e2281243.adobeaemcloud.com';
@@ -459,6 +459,34 @@ test('bind: the first hover loads the index and disables links that resolve nowh
   assert.equal(loads, 1);
   assert.equal(ok.hasAttribute('aria-disabled'), false);
   assert.equal(gone.getAttribute('aria-disabled'), 'true');
+});
+
+test('bind: the hover sweep checks a few links at a time, each link once', async () => {
+  let inFlight = 0;
+  let peak = 0;
+  const seen = [];
+  const { cart } = make({
+    resolve: async (href) => {
+      seen.push(href);
+      inFlight += 1;
+      peak = Math.max(peak, inFlight);
+      await new Promise((r) => { setTimeout(r, 5); });
+      inFlight -= 1;
+      return null;
+    },
+  });
+  const els = mount(...Array.from({ length: 10 }, () => link()));
+  els.forEach((el, i) => cart.bind(el, { href: src(`gone-${i}.jpg`) }));
+  els[0].dispatchEvent(new window.Event('pointerenter'));
+  // a control bound while that sweep runs starts another; it must not re-check the queue
+  const late = link();
+  document.querySelector('main').append(late);
+  cart.bind(late, { href: src('gone-late.jpg') });
+  await new Promise((r) => { setTimeout(r, 120); });
+  assert.equal(peak, SWEEP_CONCURRENCY, 'never more than SWEEP_CONCURRENCY at once');
+  assert.equal(seen.length, 11, 'each link once');
+  assert.equal(new Set(seen).size, 11);
+  assert.ok([...els, late].every((el) => el.getAttribute('aria-disabled') === 'true'));
 });
 
 test('bind: once warmed, a re-pointed or newly bound link is checked as it is bound', async () => {

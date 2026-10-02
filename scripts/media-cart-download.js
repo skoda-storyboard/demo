@@ -6,9 +6,12 @@
  * attachment with its filename). Several: each original is fetched in turn (CORS, no
  * credentials), checked against its indexed size, and stored uncompressed in one zip
  * (JPEG / PNG / MP4 / PDF don't shrink; STORE keeps it fast). The vendored fflate is only
- * imported here. Items that fail are skipped and reported; an abort stops everything and
- * saves nothing. media-cart.js applies the caps before calling, so the zip fits in memory
- * and under 4 GiB (fflate writes no ZIP64).
+ * imported here. Items that fail are skipped and reported; an abort (until the save)
+ * stops everything and saves nothing. Memory: one original is held at a time; after each
+ * file the zip output so far is folded into a Blob, which the browser keeps outside the JS
+ * heap (and may page to disk), and the final zip is a Blob of those Blobs, not a copy.
+ * media-cart.js applies the caps before calling, so the zip stays under 4 GiB (fflate
+ * writes no ZIP64).
  */
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -106,9 +109,17 @@ export async function downloadItems(items, {
   }
 
   const { Zip, ZipPassThrough } = await loadZip();
+  if (signal?.aborted) throw abortError();
   const names = uniqueNames(items.map((it) => it.filename));
   const totalBytes = items.reduce((sum, it) => sum + (it.bytes || 0), 0);
-  const parts = [];
+  // zip output not yet folded, and the Blobs it was folded into (one per stored file)
+  let parts = [];
+  const blobs = [];
+  const fold = () => {
+    if (!parts.length) return;
+    blobs.push(new Blob(parts));
+    parts = [];
+  };
   let zipError = null;
   const zip = new Zip((err, data) => {
     if (err) zipError = err;
@@ -141,6 +152,8 @@ export async function downloadItems(items, {
       zip.add(file);
       if (!chunks.length) file.push(new Uint8Array(0), true);
       chunks.forEach((chunk, c) => file.push(chunk, c === chunks.length - 1));
+      // this file's bytes leave the JS heap before the next one is fetched
+      fold();
       stored += 1;
     } catch (e) {
       if (e?.name === 'AbortError' || signal?.aborted) throw abortError();
@@ -152,10 +165,12 @@ export async function downloadItems(items, {
     });
   }
 
+  if (signal?.aborted) throw abortError();
   if (!stored) return { mode: 'zip', filename: null, failed };
   zip.end();
   if (zipError) throw zipError;
-  const blob = new Blob(parts, { type: 'application/zip' });
+  fold();
+  const blob = new Blob(blobs, { type: 'application/zip' });
   const filename = zipName(now());
   const href = createObjectURL(blob);
   save(doc, href, filename);

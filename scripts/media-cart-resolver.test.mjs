@@ -141,6 +141,21 @@ test('resolve: DAM links pass through (indexed → index data, else a HEAD)', as
   assert.deepEqual(calls.filter(([, m]) => m === 'HEAD').length, 2);
 });
 
+test('resolve: one HEAD per unindexed DAM path, shared; a failed one is retried', async () => {
+  let fail = true;
+  const head = () => (fail
+    ? { ok: false, status: 503, headers: new Map() }
+    : { ok: true, status: 200, headers: new Map([['content-length', '10'], ['content-type', 'image/png']]) });
+  const { resolve, calls } = resolver({ head });
+  const url = `${DAM_HOST}/content/dam/storyboard/en/fresh.png`;
+  await assert.rejects(resolve(url), /HEAD 503/);
+  fail = false;
+  const [a, b] = await Promise.all([resolve(url), resolve(url)]);
+  assert.deepEqual([a.bytes, b.bytes], [10, 10]);
+  assert.equal((await resolve(url)).bytes, 10, 'a later click reuses the answer');
+  assert.equal(calls.filter(([, m]) => m === 'HEAD').length, 2, 'the failure, then one shared request');
+});
+
 test('resolve: a failed index load rejects (not a miss) and is retried next time', async () => {
   let fail = true;
   const { resolve, calls } = resolver({

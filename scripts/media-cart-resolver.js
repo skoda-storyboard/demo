@@ -129,6 +129,19 @@ export function createResolver({
     return item(path, bytes, (res.headers.get('content-type') || '').split(';')[0].trim());
   }
 
+  // one HEAD per DAM path for the page: the hover sweep, a later click and other controls
+  // for the same file share the request and its answer. A rejection (network, 5xx/408/429)
+  // is not kept, so the next resolve tries again.
+  const heads = new Map();
+  function headOnce(path) {
+    if (!heads.has(path)) {
+      const answer = head(path);
+      heads.set(path, answer);
+      answer.catch(() => heads.delete(path));
+    }
+    return heads.get(path);
+  }
+
   /**
    * → `{ id, url, filename, bytes, mime, kind, sourceKey }`, or null when the link has no
    * published original. `id` is the DAM asset path (the cart's dedupe key), `url` the
@@ -146,7 +159,7 @@ export function createResolver({
     }
     if (dam) {
       const i = index?.byPath.get(dam);
-      if (i === undefined) return head(dam);
+      if (i === undefined) return headOnce(dam);
       const a = index.assets[i];
       return { ...item(a.path, a.bytes, a.mime), sourceKey };
     }

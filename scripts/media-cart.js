@@ -116,6 +116,9 @@ function storageOf(win) {
  * @param {function(): Promise<object>} [o.loadDownloader] the download module
  * @param {{items: number, bytes: number}} [o.limits]
  */
+/** Links the hover sweep resolves at once (each may be a HEAD to the DAM). */
+export const SWEEP_CONCURRENCY = 4;
+
 export function createCart({
   win = window,
   storage = storageOf(win),
@@ -359,21 +362,36 @@ export function createCart({
   const trackView = () => track('MediaCart', 'view', String(state.items.length));
 
   // links that can't reach a published original: disable their controls (once the index
-  // is there, i.e. after the first hover / focus). Each control + link is checked once;
-  // a network failure leaves it enabled and unchecked.
+  // is there, i.e. after the first hover / focus). Each control + link is checked once,
+  // SWEEP_CONCURRENCY at a time (a listing of unindexed DAM links would otherwise fire every
+  // HEAD at once); a network failure leaves it enabled and unchecked.
   const checked = new WeakMap();
   function sweep() {
-    return loadIndex().then(() => Promise.all(controls()
-      .filter((el) => el.getAttribute('aria-disabled') !== 'true' && checked.get(el) !== el.dataset.href)
-      .map(async (el) => {
-        const { href } = el.dataset;
-        checked.set(el, href);
+    return loadIndex().then(() => {
+      const queue = controls()
+        .filter((el) => el.getAttribute('aria-disabled') !== 'true' && checked.get(el) !== el.dataset.href);
+      // marked before they run, so a second sweep (a control bound meanwhile) skips them
+      queue.forEach((el) => checked.set(el, el.dataset.href));
+      const check = async (el, href) => {
         try {
           if (!has(href) && !(await resolve(href))) unavailable(href);
         } catch {
           if (checked.get(el) === href) checked.delete(el);
         }
-      }))).catch(() => {});
+      };
+      const worker = async () => {
+        while (queue.length) {
+          const el = queue.shift();
+          // eslint-disable-next-line no-await-in-loop
+          await check(el, checked.get(el));
+        }
+      };
+      return Promise.all(Array.from({ length: Math.min(SWEEP_CONCURRENCY, queue.length) }, worker));
+    }).catch((e) => {
+      // the index didn't load: the controls stay enabled, and a click resolves its own link
+      // eslint-disable-next-line no-console
+      console.warn('media cart: links not checked, the index did not load', e);
+    });
   }
 
   async function onControlClick(e) {
