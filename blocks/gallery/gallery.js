@@ -36,6 +36,38 @@ const LABELS = {
   openNamed: (n, alt) => (alt ? `${LABELS.open} ${n}: ${alt}` : `${LABELS.open} ${n}`),
   more: (n) => `+${n}`,
   moreLabel: (n) => `Show ${n} more ${n === 1 ? 'image' : 'images'}`,
+  // story variant (SKODA-216): the lead button name
+  openGallery: (total) => `Open gallery, ${total} ${total === 1 ? 'image' : 'images'}`,
+};
+
+/**
+ * Build an inline SVG icon (Trusted-Types safe: namespaced elements, no innerHTML).
+ * Filled house-style matching the project icon set (icons/mail.svg, search.svg):
+ * 24×24 viewBox, solid fill via currentColor.
+ * @param {string[]} paths one or more SVG path `d` strings
+ * @returns {SVGElement}
+ */
+function svgIcon(paths) {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('width', '24');
+  svg.setAttribute('height', '24');
+  svg.setAttribute('fill', 'currentColor');
+  svg.setAttribute('aria-hidden', 'true');
+  paths.forEach((d) => {
+    const p = document.createElementNS(NS, 'path');
+    p.setAttribute('d', d);
+    svg.append(p);
+  });
+  return svg;
+}
+
+// story variant (SKODA-216) icons, 24×24 solid fill: the lead-image count badge
+// (stacked photos) and the lightbox prev chevron (next mirrors it in CSS)
+const ICONS = {
+  images: ['M22,16V4c0-1.1-0.9-2-2-2H8C6.9,2,6,2.9,6,4v12c0,1.1,0.9,2,2,2h12C21.1,18,22,17.1,22,16z M11,12l2,2.7l3-3.7l4,5H8L11,12z M2,6v14c0,1.1,0.9,2,2,2h14v-2H4V6H2z'],
+  chevron: ['M15.4,7.4L14,6l-6,6l6,6l1.4-1.4L10.8,12L15.4,7.4z'],
 };
 
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -505,10 +537,98 @@ function buildPreview(block) {
   });
 }
 
+/* ==========================================================================
+ * Story variant — `Gallery (story)` (SKODA-216)
+ *
+ * The story in-body gallery (source .sb-gallery, measured on the live Favorit
+ * story): a full-column 16:9 lead image carrying a count badge, then a 4-across
+ * strip of the NEXT images (the lead is not repeated). The lead opens the lightbox
+ * at image 1, thumb k at image k + 1; it is one navigable set per block, so two
+ * galleries on a page never mix. The lightbox title is the story title (source
+ * data-title). Overview, share and media-cart actions are out of scope.
+ * ========================================================================== */
+
+const STORY_STRIP_MAX = 4;
+
+/**
+ * Which images the story strip shows for a given image count.
+ * @param {number} count number of images
+ * @param {number} max most thumbs in the strip
+ * @returns {number[]} item indexes in the strip (the lead, index 0, is never repeated)
+ */
+export function storyStrip(count, max = STORY_STRIP_MAX) {
+  const shown = Math.max(0, Math.min(count - 1, max));
+  return Array.from({ length: shown }, (_, i) => i + 1);
+}
+
+function storyPicture(item) {
+  const pic = createOptimizedPicture(item.src, item.alt, false, [
+    { media: '(min-width: 768px)', width: '1600' },
+    { width: '1000' },
+  ]);
+  pic.querySelector('img').draggable = false;
+  return pic;
+}
+
+function buildStory(block) {
+  const items = readItems(block);
+  block.textContent = '';
+  if (!items.length) return;
+
+  const title = document.querySelector('main h1')?.textContent.trim() || items[0].alt;
+
+  const lead = document.createElement('button');
+  lead.type = 'button';
+  lead.className = 'gallery-story-lead';
+  lead.setAttribute('aria-label', LABELS.openGallery(items.length));
+  // count badge (source .sb-gallery-show-more): icon + total, decorative
+  const badge = document.createElement('span');
+  badge.className = 'gallery-story-count';
+  badge.setAttribute('aria-hidden', 'true');
+  const total = document.createElement('span');
+  total.textContent = String(items.length);
+  badge.append(svgIcon(ICONS.images), total);
+  lead.append(storyPicture(items[0]), badge);
+  const triggers = [[lead, 0]];
+  block.append(lead);
+
+  const strip = storyStrip(items.length);
+  if (strip.length) {
+    const list = document.createElement('ul');
+    list.className = 'gallery-story-strip';
+    strip.forEach((index) => {
+      const li = document.createElement('li');
+      li.className = 'gallery-story-item';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'gallery-story-thumb';
+      btn.setAttribute('aria-label', LABELS.openNamed(index + 1, items[index].alt));
+      btn.append(createOptimizedPicture(items[index].src, items[index].alt, false, [{ width: '750' }]));
+      li.append(btn);
+      list.append(li);
+      triggers.push([btn, index]);
+    });
+    block.append(list);
+  }
+
+  const lightbox = buildLightbox(block, items, { story: true, title });
+  // the source's chevron in the green squares (the shared lightbox draws ‹ › glyphs)
+  lightbox.overlay.querySelectorAll('.gallery-lightbox-prev, .gallery-lightbox-next')
+    .forEach((btn) => btn.append(svgIcon(ICONS.chevron)));
+  const single = items.length === 1;
+  triggers.forEach(([btn, index]) => {
+    btn.addEventListener('click', () => lightbox.open(index, btn, single));
+  });
+}
+
 /**
  * @param {Element} block the gallery block element
  */
 export default function decorate(block) {
+  if (block.classList.contains('story')) {
+    buildStory(block);
+    return;
+  }
   if (block.classList.contains('slider')) {
     buildSlider(block);
     return;

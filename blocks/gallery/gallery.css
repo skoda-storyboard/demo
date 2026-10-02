@@ -521,3 +521,275 @@ body.story .section.body-column .gallery.slider {
 .gallery.preview a.gallery-preview-more {
   text-decoration: none;
 }
+
+/* ==========================================================================
+ * Story variant — `Gallery (story)` (SKODA-216)
+ * Story in-body gallery, measured on the live Favorit story (.sb-gallery): a
+ * full-column 16:9 lead image (818.7 x 460.5 @1280) with a count badge, then a
+ * 4-across strip of the next images (189.7 wide @1280, the source 25% cells with
+ * 10px padding = a 4-column grid with a 20px gap). Gaps, badge inset and the block
+ * bottom margin are 20px from 768, 10px below. The lightbox is the shared one
+ * with the source story chrome.
+ * ========================================================================== */
+.gallery.story {
+  --gallery-story-gap: calc(var(--grid-gutter) / 2);
+  --gallery-story-edge: calc(var(--grid-gutter) / 2);
+  --gallery-story-band: 56px;
+  --gallery-story-arrow-offset: 24.5px;
+
+  margin-block-end: var(--gallery-story-gap);
+}
+
+/* lead + thumbs: square-cornered 16:9 cover crops on a faint placeholder fill */
+.gallery.story .gallery-story-lead,
+.gallery.story .gallery-story-thumb {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: var(--gallery-story-placeholder);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.gallery.story .gallery-story-lead picture,
+.gallery.story .gallery-story-lead img,
+.gallery.story .gallery-story-thumb picture,
+.gallery.story .gallery-story-thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* count badge (source .sb-gallery-show-more): 60% black, bottom-left of the lead,
+   a 28px icon 6px before the total; 57 x 38 below 768, 75 x 44 from 768 */
+.gallery.story .gallery-story-count {
+  position: absolute;
+  bottom: var(--gallery-story-gap);
+  left: var(--gallery-story-gap);
+  display: flex;
+  align-items: center;
+  padding: 4.8px var(--spacing-xs);
+  background: var(--gallery-story-badge);
+  color: var(--skoda-white);
+  font-size: var(--body-font-size-2xs);
+  line-height: 18px;
+}
+
+.gallery.story .gallery-story-count svg {
+  width: 28px;
+  height: 28px;
+  margin-inline-end: 6px;
+}
+
+.gallery.story .gallery-story-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gallery-story-gap);
+  margin: var(--gallery-story-gap) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gallery.story .gallery-story-item {
+  margin: 0;
+}
+
+.gallery.story .gallery-story-lead:focus-visible,
+.gallery.story .gallery-story-thumb:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+/* lightbox: title bar (49px below 768, 93px from 768, with the divider rule), the
+   contained image, then the 56px band holding the "N/total" counter 10px from the
+   right and 16px from the bottom. Ink backdrop below 768, 95% black from 768. */
+.gallery.story .gallery-overlay {
+  grid-template-rows: auto minmax(0, 1fr) var(--gallery-story-band);
+}
+
+/* fade the backdrop in from transparent to whichever backdrop applies (the shared
+   keyframes end on the opaque ink, which would override the 95% backdrop) */
+@keyframes gallery-story-backdrop-in {
+  from { background-color: transparent; }
+}
+
+.gallery.story .gallery-overlay:not([hidden], .reduced-motion) {
+  animation-name: gallery-story-backdrop-in;
+}
+
+.gallery.story .gallery-lightbox-top {
+  position: static;
+  gap: var(--spacing-m);
+  justify-content: space-between;
+  padding: var(--spacing-xs);
+  border-bottom: 1px solid var(--gallery-divider);
+}
+
+.gallery.story .gallery-lightbox-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: var(--skoda-white);
+  font-size: var(--heading-font-size-story-h3-mobile);
+  font-weight: var(--weight-regular);
+  line-height: 1.15;
+}
+
+.gallery.story .gallery-lightbox-close {
+  flex: none;
+  width: 32px;
+  height: 32px;
+}
+
+.gallery.story .gallery-lightbox-stage {
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
+}
+
+.gallery.story .gallery-lightbox-figure {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  height: 100%;
+}
+
+.gallery.story .gallery-lightbox-image-frame {
+  flex: 1 1 auto;
+  max-height: none;
+}
+
+.gallery.story .gallery-lightbox-image {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+}
+
+/* an authored caption sits at the bottom, left of the counter, at every width (the shared
+   lightbox keeps captions off phones and beside the image). It wraps upward over the image
+   on the source info-bar panel (.sb-gallery-lightbox-info, 60% black) and scrolls when
+   long, so authored text and links are never clipped (SKODA-216 review: at 320px a
+   one-line ellipsis hid the caption link) */
+.gallery.story .gallery-lightbox-caption {
+  position: absolute;
+  right: calc(var(--spacing-xxl) + var(--spacing-l));
+  bottom: var(--spacing-m);
+  left: var(--gallery-story-edge);
+  display: block;
+  max-width: none;
+  max-height: 40vh;
+  margin: 0;
+  padding: var(--spacing-xs) var(--spacing-s);
+  background: var(--gallery-story-info);
+  line-height: 24px;
+  text-align: left;
+  overflow-wrap: anywhere;
+  overflow-y: auto;
+}
+
+.gallery.story .gallery-lightbox-caption p {
+  margin: 0;
+}
+
+.gallery.story .gallery-lightbox-caption p + p {
+  margin-top: var(--spacing-xs);
+}
+
+.gallery.story .gallery-lightbox-count {
+  padding: 0 var(--gallery-story-edge) var(--spacing-m) 0;
+  color: var(--skoda-white);
+  font-size: var(--body-font-size-m);
+  line-height: 24px;
+}
+
+/* prev / next: green squares (not discs) with a soft shadow, fixed 10px from the
+   viewport edges, centred half a title bar below the viewport middle (source
+   top: calc(50% + 46.5px) from 768); 44px below 768, 67px (16px padding + a 35px
+   chevron) from 768 */
+.gallery.story .gallery-lightbox-prev,
+.gallery.story .gallery-lightbox-next {
+  position: fixed;
+  top: calc(50% + var(--gallery-story-arrow-offset));
+  z-index: 1;
+  border: 0;
+  margin: 0; /* not the shared cluster's -1px divider overlap */
+  padding: var(--spacing-xs);
+  background: var(--gallery-accent);
+  box-shadow: var(--gallery-story-arrow-shadow);
+  transform: translateY(-50%);
+}
+
+.gallery.story .gallery-lightbox-prev {
+  left: var(--gallery-story-edge);
+}
+
+.gallery.story .gallery-lightbox-next {
+  right: var(--gallery-story-edge);
+}
+
+.gallery.story .gallery-lightbox-prev::before,
+.gallery.story .gallery-lightbox-next::before {
+  content: none;
+}
+
+.gallery.story .gallery-lightbox-prev svg,
+.gallery.story .gallery-lightbox-next svg {
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+
+.gallery.story .gallery-lightbox-next svg {
+  transform: scaleX(-1);
+}
+
+/* the story's single on-page transition, the source's 768 step (viewport-driven:
+   the 767 column is wider than the 768 one yet keeps the 10px gaps) */
+@media (width >= 768px) {
+  .gallery.story {
+    --gallery-story-gap: var(--grid-gutter);
+    --gallery-story-arrow-offset: 44.9px; /* 46.5px less the source 0.1em lift */
+  }
+
+  .gallery.story .gallery-story-count {
+    padding: var(--spacing-xs) var(--spacing-m);
+    font-size: var(--body-font-size-m);
+    line-height: 24px;
+  }
+
+  .gallery.story .gallery-overlay {
+    background: var(--gallery-story-backdrop);
+  }
+
+  .gallery.story .gallery-lightbox-top {
+    padding: var(--spacing-m);
+  }
+
+  .gallery.story .gallery-lightbox-close {
+    width: 60px;
+    height: 60px;
+  }
+
+  .gallery.story .gallery-lightbox-prev,
+  .gallery.story .gallery-lightbox-next {
+    padding: var(--spacing-m);
+  }
+
+  .gallery.story .gallery-lightbox-prev svg,
+  .gallery.story .gallery-lightbox-next svg {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+/* the title steps up just above 768 (measured 20px at 768, 24px at 769) */
+@media (width > 768px) {
+  .gallery.story .gallery-lightbox-title {
+    font-size: var(--heading-font-size-story-h3);
+  }
+}

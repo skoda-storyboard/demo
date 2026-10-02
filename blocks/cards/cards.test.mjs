@@ -106,6 +106,25 @@ test('press kits use a distinct 20-column track for features, fifths and quarter
   });
 });
 
+test('older press kits use half rows: 2 wide, or 1 wide + 2 quarters in either order', async () => {
+  const block = makeBlock([
+    'press-half', 'press-half',
+    'press-half', 'press-quarter', 'press-quarter',
+    'press-quarter', 'press-quarter', 'press-half',
+  ]);
+  [...block.querySelectorAll('img')].forEach((img) => {
+    img.src = 'https://example.com/media.jpg?width=750';
+  });
+  await decorate(block);
+  assert.equal(block.querySelector('ul').classList.contains('tiles-press'), true);
+  assert.deepEqual(
+    [...block.querySelectorAll('.tile-row-start')].map((li) => li.textContent.trim()),
+    ['Tile 1', 'Tile 3', 'Tile 6'],
+  );
+  const source = block.querySelector('li.tile-press-half source[media="(min-width: 781px)"]');
+  assert.equal(new URL(source.srcset).searchParams.get('width'), '1250');
+});
+
 test('empty or omitted series token uses the documented small-square default', async () => {
   const block = makeBlock(['', 'sq-small', 'sq-small', 'sq-small']);
   await decorate(block);

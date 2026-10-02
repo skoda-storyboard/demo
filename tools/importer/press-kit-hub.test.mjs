@@ -178,3 +178,59 @@ test('live SSR hubs retain exact chapter titles, dates, facets and banner assets
     assert.equal(starts.length, model ? 3 : 5);
   }
 });
+
+// Older kits (Enyaq, Superb, Kodiaq, Elroq, Vision O): rows given as source ratios.
+function olderKit(rows, { timeline = false } = {}) {
+  let index = 0;
+  const grids = rows.map((ratios) => `<div class="panel-grid">${ratios.map((ratio) => {
+    index += 1;
+    return `<article class="article-teaser"><a href="${root}older-${index}/">
+      <div class="ratio-container ratio-${ratio}"><img src="https://cdn.skoda-storyboard.com/o${index}.jpg" alt=""></div>
+      <h2 class="heading">Chapter ${index}</h2></a></article>`;
+  }).join('')}</div>`).join('');
+  const x = timeline ? `<div class="widget_sow-editor"><div class="textwidget"><p>
+    <a class="twitter-timeline" href="https://twitter.com/skodaautonews">Tweets by skodaautonews</a>
+    <script async src="https://platform.twitter.com/widgets.js"></script></p></div></div>` : '';
+  return new JSDOM(`<!doctype html><title>Kit</title><body class="single-press_kit">
+    <article class="press_kit category-press-kits model-superb" data-publish-date="2023-11-02T08:00:00+01:00">
+      <div class="hero"><div class="hero-image"><img src="https://cdn.skoda-storyboard.com/h.jpg" alt="Kit"></div><div class="hero-caption"><h1>Kit</h1></div></div>
+      <div class="content">${grids}${x}</div></article></body>`, { url: root }).window.document;
+}
+
+test('older kits: 2-wide and 1-wide + 2-square rows become half + quarter tiles', () => {
+  const { element } = output(olderKit([
+    ['2x1', '1x1', '1x1'], ['1x1', '1x1', '2x1'], ['2x1', '2x1'], ['1x1', '1x1', '1x1', '1x1', '1x1'],
+  ]), `${root}new-skoda-enyaq-press-kit-2/`);
+  const cards = [...element.querySelectorAll('table')].find((t) => t.rows[0].textContent.includes('Cards'));
+  const tokens = [...cards.rows].slice(1).map((row) => row.cells[0].textContent);
+  assert.deepEqual(tokens.slice(0, 8), [
+    'press-half', 'press-quarter', 'press-quarter',
+    'press-quarter', 'press-quarter', 'press-half',
+    'press-half', 'press-half',
+  ]);
+  assert.deepEqual(tokens.slice(8), Array(5).fill('press-square'));
+  const starts = layoutTileRows(tokens, { pressPage: true }).tiles.filter((tile) => tile.rowStart);
+  assert.equal(starts.length, 4, 'one row per source row');
+});
+
+test('older kits: an X timeline widget is dropped, not imported as intro text', () => {
+  const { element } = output(olderKit([['2x1', '2x1'], ['1x1', '1x1', '1x1', '1x1']], { timeline: true }));
+  assert.equal(element.querySelectorAll('a[href*="twitter.com"], script').length, 0);
+  assert.equal(element.textContent.includes('Tweets by'), false);
+});
+
+test('a lone wide + square row is still rejected', () => {
+  assert.throws(() => output(olderKit([['2x1', '1x1']])), /tile row 1 has an unsupported layout/);
+});
+
+test('Threads and Spotify banners are named by their image text', () => {
+  const document = page(13);
+  document.querySelector('.content').insertAdjacentHTML('beforeend', `
+    <div class="widget_sow-editor"><div class="textwidget"><p><a href="https://www.threads.com/@skodagram"><img src="https://cdn.skoda-storyboard.com/EN-THREADS.png" alt=""></a></p></div></div>
+    <div class="widget_sow-editor"><div class="textwidget"><p><a href="https://open.spotify.com/episode/5qh"><img src="https://cdn.skoda-storyboard.com/CZ-Threads.jpg" alt=""></a></p></div></div>`);
+  const alts = [...output(document).element.querySelectorAll('a[href*="threads"] img, a[href*="spotify"] img')].map((img) => img.alt);
+  assert.deepEqual(alts, [
+    'Škoda on Threads: the latest news and updates from the world of Škoda',
+    'Listen to the #ExploreŠkoda Podcast on Spotify',
+  ]);
+});

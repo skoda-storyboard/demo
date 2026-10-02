@@ -15,6 +15,7 @@ import {
   toClassName,
   getMetadata,
 } from './aem.js';
+import { decorateLinks, installLinkPolicy } from './links.js';
 
 /**
  * Page templates with their own layout code: `templates/<name>/<name>.{js,css}`, selected by
@@ -118,6 +119,8 @@ function buildEmbedAutoBlocks(main) {
   links.forEach((link) => {
     if (link.closest('.embed, .widget')) return;
     if (!isEmbedUrl(link.href)) return;
+    // A linked image is an authored banner (e.g. the press-kit Spotify banner), not a bare URL.
+    if (link.querySelector('img, picture')) return;
     const p = link.closest('p');
     // Only autoblock when the provider URL is alone on its line (its own paragraph).
     if (
@@ -320,6 +323,7 @@ export function decorateMain(main) {
   decorateTemplateSections(main);
   decorateBlocks(main);
   decorateButtons(main);
+  decorateLinks(main);
 }
 
 /**
@@ -357,10 +361,13 @@ async function loadLazy(doc) {
   window.addEventListener('media-cart:refused', (e) => {
     import('./media-cart-ui.js').then(({ onRefused }) => onRefused(e)).catch(() => {});
   });
+  installLinkPolicy(doc);
   loadHeader(doc.querySelector('body > header'));
 
   const main = doc.querySelector('main');
   await loadSections(main);
+  // blocks build links while loading (downloads, tags, cards): apply the link policy to them too
+  decorateLinks(main);
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
