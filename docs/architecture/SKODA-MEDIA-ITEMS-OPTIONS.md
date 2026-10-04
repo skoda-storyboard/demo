@@ -59,7 +59,8 @@ asset id / DAM path) and the lightbox (SKODA-406) already want to work.
    still sourced from the source listing (AEM Assets isn't populated yet). The listing and rail configs get
    `index: /en/media-feed.json`. The 101 item pages are unpublished and deleted, and the five index columns added
    in #177 are reverted. Cards link to the lightbox once SKODA-406 lands; until then to the image itself.
-   Thumbnails come from the source CDN `-768x512` renditions for the demo.
+   Thumbnails come from the source CDN `-768x512` renditions for the demo, put on the Media Bus
+   through carrier documents (update 2026-09-30, below).
 2. **M2:** a sync job (App Builder action or GitHub Action, on AEM Assets events or a schedule) reads published
    Media Room assets and their tags, and writes the same feed shape, sharded by year/type. Nothing downstream
    changes.
@@ -101,6 +102,18 @@ rows to Edge Delivery. Pages per item are retired.
 **Demo (M1) specifics:** AEM Assets isn't populated or tagged yet, so the demo feed is generated from the source
 listing (the #177 generator, writing one sheet instead of 101 pages). Its thumbnails are the source CDN `-768x512`
 renditions: they aren't resized by the Media Bus params, but they are small enough for cards.
+**Update 2026-09-30:** the thumbnails are now on the Media Bus. `media-items:build --push` previews
+carrier documents (`/en/fragments/media-feed-images[-N]`, one image per thumbnail) and rewrites
+`image` to their `media_<hash>` paths, so the cards get webp + responsive widths. **Update
+2026-10-01:** `original` (the "Original" download, the lightbox download + copy link) points at the
+published AEM Assets original from the media manifest (`public_url`, all 102), and `mp4` at the
+published AEM Assets MP4 where a page import already published it (18 of 51; the other 33 aren't in
+the DAM yet). The 1920 rendition and video posters stay on the source URLs
+(`tools/importer/media/README.md`). **Update 2026-10-01 (library):** the feed now also holds every
+source library image whose original is published on AEM Assets (1,715 of 33,457; 1,769 rows,
+~170 KB gzipped in two 1,000-row pages), read year by year through the listing's load-more endpoint.
+This is the M2 shape (published AEM Assets → feed), with the media manifest standing in for an AEM
+Assets query and the source supplying dates, facets and file details.
 
 **Follow-up tickets:**
 - **M2:** AEM Assets → media feed sync job (published assets, sharded feed, trigger/owner TBD).
