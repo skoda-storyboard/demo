@@ -136,14 +136,16 @@ function editorNodes(panel, document) {
   return out;
 }
 
-function itemCaption(img, item) {
+// `withAlt` is for card TITLES only (a teaser needs a label). A gallery caption is never the
+// alt (often the file name or the page title, never shown on the source; SKODA-830 audit 4.4).
+function itemCaption(img, item, withAlt = true) {
   // data-caption first (~53% of Škoda captions live there), then colorbox title, then alt.
   const capSource = (img.getAttribute('data-caption') && img)
     || item.querySelector?.('[data-caption]')
     || item;
   return (capSource.getAttribute && capSource.getAttribute('data-caption'))
     || (item.querySelector?.('a[title]') && item.querySelector('a[title]').getAttribute('title'))
-    || img.getAttribute('alt') || '';
+    || (withAlt && img.getAttribute('alt')) || '';
 }
 
 // The slider's visible caption is the carousel item's optional description
@@ -170,7 +172,7 @@ function itemDescription(item, document) {
 // [img, caption]. Used for link-free image sets (sow-slider and image carousels).
 // `blockName` picks the variant: link-free carousels render as the one-image
 // slider (`Gallery (slider)`, SKODA-819) captioned by the item description;
-// sow-slider keeps the default Gallery and its data-caption → title → alt caption.
+// sow-slider keeps the default Gallery and its data-caption → title caption (no alt).
 function galleryCells(panel, document, blockName = 'Gallery') {
   const imgs = [...panel.querySelectorAll('img')];
   if (!imgs.length) return null;
@@ -178,7 +180,7 @@ function galleryCells(panel, document, blockName = 'Gallery') {
   const cells = [[blockName]];
   imgs.forEach((img) => {
     const item = img.closest('.search-results-item, .item, figure') || img;
-    cells.push([img, slider ? itemDescription(item, document) : itemCaption(img, item)]);
+    cells.push([img, slider ? itemDescription(item, document) : itemCaption(img, item, false)]);
   });
   return cells.length > 1 ? cells : null;
 }

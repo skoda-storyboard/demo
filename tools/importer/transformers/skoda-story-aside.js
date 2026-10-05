@@ -90,6 +90,9 @@ function tagsCell(sidebar, document) {
     const href = a.getAttribute('href');
     const text = (a.textContent || '').trim();
     if (!href || !text) return;
+    // The "+N" show-more toggle (`a.show-hidden-terms href="#"`) is tag-row UI, not a tag
+    // (audit 4.11); the tags it reveals are real `hidden-term` links and are kept.
+    if (href === '#' || a.classList.contains('show-hidden-terms')) return;
     const link = document.createElement('a');
     link.setAttribute('href', href);
     link.textContent = text;

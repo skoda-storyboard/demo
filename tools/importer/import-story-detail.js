@@ -18,6 +18,7 @@
 
 import storyHeroParser from './parsers/story-hero.js';
 import storyFlattenParser, { markHighlights, markCellWidths, dropEmptySections } from './parsers/story-flatten.js';
+import downloadsParser from './parsers/downloads.js';
 import pageCleanupTransformer from './transformers/skoda-page-cleanup.js';
 import storyCleanupTransformer from './transformers/skoda-story-cleanup.js';
 import storyAsideTransformer from './transformers/skoda-story-aside.js';
@@ -32,6 +33,8 @@ const parsers = {
   // inside one block, not the overlay Hero banner used by page/archive.
   'story-hero': storyHeroParser,
   'story-flatten': storyFlattenParser,
+  // SKODA-801a: the Media Box band → Downloads (its section is built by skoda-story-cleanup).
+  downloads: downloadsParser,
 };
 
 const PAGE_TEMPLATE = {
@@ -45,6 +48,7 @@ const PAGE_TEMPLATE = {
     // parser self-detects the builder tree and no-ops (linear-story fallback) when
     // absent, so the 3.6% non-Page-Builder stories fall through to default content.
     { name: 'story-flatten', instances: ['.columns > .content', 'article .content', '.entry-content'] },
+    { name: 'downloads', instances: ['.search-results.media-box'] },
   ],
   sections: [
     {
@@ -132,6 +136,11 @@ export default {
     markHighlights(document);
     markCellWidths(document);
     nbspTransformer('preprocess', document.body, { document });
+    // SKODA-801a: icon-only Media Box downloads (MP4/PDF) need a label to survive
+    // helix-importer's preProcess (it drops empty inline elements); as in import-press-release.js.
+    document.querySelectorAll('.search-results.media-box a.media-cart-action.download[href]').forEach((a) => {
+      if (!(a.textContent || '').trim()) a.textContent = 'Download';
+    });
   },
 
   transform: (payload) => {
