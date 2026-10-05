@@ -63,7 +63,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `stories` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured`, `offset`, `exclude`, `feature` (config only; `exclude` registered by SKODA-611b, `feature` since SKODA-222) |
 | `story-rail` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows |
 | `tags` | `chips` | – |
-| `quote` | – | – (SKODA-220; see `quote` below) |
+| `quote` | `left` | – (SKODA-220; see `quote` below) |
 | `footnotes` | – | – (SKODA-805d; see `footnotes` below) |
 | `promo-box` | – | curated rows **or** config (`index`, `template`, `path`, `category`, `tags`, `limit`, `sort`); never mixed (PR #110, merged) |
 | `search`, `fragment`, `header`, `footer`, `widget`, `newsletter-stub` | – | – |
@@ -243,10 +243,12 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 ### `quote`
 - **Status:** ✅ **on `main`** with `blocks/quote` (SKODA-220 block, landed with SKODA-805c). It moved to the baseline table above and is no longer a pending entry; this section stays as the shape reference. **Ticket:** SKODA-220
 - **Runtime:** each row renders as `figure > blockquote + figcaption`: the quote centred 16/24 italic, a 2px black rule 10% of the column wide 20px below it and 10px above the attribution (measured on first-glimpse at 1440/1280/768/390). The rule is CSS, never an `hr`.
-- **Shape:** header `Quote`, then a single row `[<p>quote text</p>, <p><strong>Attribution</strong>, role</p>]`. An empty attribution cell is kept. The source's decorative `hr` is **never** emitted, because a bare `hr` in DA splits sections.
+- **Shape:** header `Quote`, then one row per quote `[<p>quote text</p>, <p><strong>Attribution</strong>, role</p>]`. The centred imports emit one row per table, and `Quote (left)` emits one row per consecutive quote; the block renders every row. An empty attribution cell is kept. The source's decorative `hr` is **never** emitted, because a bare `hr` in DA splits sections.
+- **`Quote (left)`** (SKODA-220, press-kit chapters): the WordPress `figure.quote > blockquote > p > em` + `figcaption > em > strong` quote. It is left-aligned with no rule. The browser's open and close marks each sit on their own 24px line, the paragraphs are italic with a 20px rhythm, and the name is 600 italic. The rows are the same `[quote, attribution]`, **one row per quote**: consecutive figures (flush on the source, 0px apart) share one block, and a paragraph between them starts a new one. Several quote paragraphs stay several `<p>`, and other blocks in the figure are kept, never inside a `<p>`. A `cite` stands in for a missing `figcaption`, and a figure holding media is left as authored. Measured against the Peaq/Epiq chapters at 1440/1080/992/768/390 (identical heights and gaps; see SKODA-220).
+- **Nested in an accordion answer:** blocks can't nest in DA, so a `Quote` / `Quote (variant)` table in an accordion answer arrives as a plain `<table>`. `blocks/accordion` rebuilds it as a quote block in its own wrapper and loads it (Elroq press kit, "Modern Solid design with Tech-Deck Face"). Other tables, a multi-cell head, a head with no rows, or a Quote inside a table cell stay as authored.
 - **Importers:** `parsers/quote.js` (SKODA-220). It detects a centred `p` with only `em` content, the `hr` right after it, and an optional centred `p > strong`. helix-importer's preProcess drops every `hr` before `transform`, so each importer's `preprocess` marks the runs (`markQuotes`) and the parser builds the table after the layouts have run.
   - `import-press-release.js`: 6 quotes on the 4 M1 releases (Zellmer 2, National Theatre 2, Superb 1, Board 1; Peaq none). They stay in the `body-column` section.
-  - `import-press-kit-default.js`: the 2 first-glimpse quotes (Zellmer, Stefani). They are built after `press-kit-content` flattening, so the layout's source-table pass never sees them.
+  - `import-press-kit-default.js`: the 2 first-glimpse quotes (Zellmer, Stefani). They are built after `press-kit-content` flattening, so the layout's source-table pass never sees them. The same importer also runs `parseFigure` for the chapters' figure quotes (`Quote (left)`). That gives 5 chapters: Peaq intro (Zellmer, Jahn, Neft in one block), Peaq exterior (Stefani), Epiq intro (Zellmer, Jahn), Epiq exterior (Stefani) and Epiq battery (Neft).
   - `story-flatten.js` `skoda-quote`: not switched yet. It still emits a default-content `<blockquote>` and loses the attribution, and W1 switches it to this table.
 - **Example:** the Zellmer press release (`/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/`).
 
@@ -259,7 +261,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - Green on white is 3.71:1, under WCAG AA's 4.5:1 for text this size; the source has the same.
 - **Shape:** header `Footnotes`, then one row per paragraph of small print, one cell: `[<p>¹ … <a href>HERE</a><br>² …</p>]`. Links, line breaks and `sup` markers stay. Consecutive small-print paragraphs share one table.
 - **Importer:** `parsers/footnotes.js`, run by `import-press-kit-default.js`. `preprocess` marks the paragraphs (`markFootnotes`) on the source as published, before helix-importer's clean-up (which keeps styled spans today); the parser builds the table after the layouts have run, whose source-table pass would flatten it.
-  - **Counts:** a `p` whose every word is set below the 16px body size by its nearest sized ancestor (a span; px or pt, the last `font-size` declaration wins). A `sup` marker outside the sized span is neutral.
+  - **Counts:** a `p` whose every word is set below the 16px body size by its nearest sized ancestor (a span). The size is the one CSS applies, the CSSOM's winning `font-size` declaration (`!important` beats a later one; invalid values are dropped), and it must be a plain px or pt length. A `sup` marker outside the sized span is neutral.
   - **Doesn't count:**
     - a few small letters inside an ordinary sentence ("1st", "7th");
     - a paragraph set small as a whole (`<p style="font-size: 12px">`, the Peaq/Epiq chapters' 12/18 style, not handled yet);
@@ -271,9 +273,12 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - The rule also matches the Epiq-2 First Edition chapter's ⁷ ⁸ ⁹ notes (same shape: 10pt lines with `sup` markers), on its next re-import.
 
 ### `columns-split`
-- **Status:** `pinned` · **Ticket:** SKODA-225 · **Fallback:** readable (equal columns, portrait stretched)
-- **Shape:** header `Columns (split-NN)`, where `NN` is the first cell's share of the row width in percent, rounded (source 518 | 320 → `split-62`). The rows are the normal `columns` rows. The check accepts `split-10` … `split-99`.
-- **Emitted by:** `story-flatten.js` for 2-cell SiteOrigin rows with unequal cells (graffiti, Kylaq, charging, Peaq comfort).
+- **Status:** `pinned` (shape 2, 2026-10-01) · **Ticket:** SKODA-225 · **Fallback:** readable (equal columns, portrait stretched)
+- **Shape:** header `Columns (split-NN)` or `Columns (split-NN, portrait-NNN)`.
+  - `split-NN` is the first cell's share of the row width in percent, rounded (source 518 | 320 → `split-62`). The rows are the normal `columns` rows. The check accepts `split-10` … `split-99`.
+  - **Shape 2 adds `portrait-NNN`:** the authored display width in px of the row's single image, when it's smaller than the file. The source shows `width="235"` portraits of 500px files; DA keeps only the file's own size, so the width travels in the variant. An image at its file size (the charging `sow-image`, `width` = its largest `srcset` entry) gets no token and fills its cell. The check accepts `portrait-10` … `portrait-999`.
+- **Emitted by:** `parsers/story-flatten.js` for 2-cell SiteOrigin rows with unequal cells (graffiti, Kylaq, Peaq comfort: `split-62, portrait-235`; charging: `split-75`). The cell widths come from the page's head CSS (`#pgc-<id>{width:61.8%}`), read in `import-story-detail.js`'s `preprocess` (`markCellWidths()`). Equal rows, unmeasured rows and 3+ cell rows stay plain `Columns`.
+- **Re-import:** the stories imported with shape 1 output (plain `Columns`) are re-imported through the push tool's `update` path.
 
 ### `columns-banners`
 - **Status:** ✅ **on `main`** (variant of `columns`, SKODA-805c). **Fallback:** readable (the banners fill their cells)

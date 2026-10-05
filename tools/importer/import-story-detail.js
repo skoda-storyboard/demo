@@ -17,7 +17,7 @@
  */
 
 import storyHeroParser from './parsers/story-hero.js';
-import storyFlattenParser, { markHighlights, dropEmptySections } from './parsers/story-flatten.js';
+import storyFlattenParser, { markHighlights, markCellWidths, dropEmptySections } from './parsers/story-flatten.js';
 import pageCleanupTransformer from './transformers/skoda-page-cleanup.js';
 import storyCleanupTransformer from './transformers/skoda-story-cleanup.js';
 import storyAsideTransformer from './transformers/skoda-story-aside.js';
@@ -124,11 +124,13 @@ export default {
   /**
    * Runs on the untouched DOM, before helix-importer's preProcess and the cleanup
    * transformers. The highlight rows' background colour (SKODA-824) is only in the
-   * SiteOrigin head CSS, so the rows are marked here for story-flatten. Also keeps the
+   * SiteOrigin head CSS, so the rows are marked here for story-flatten, and so are the cell
+   * widths of unequal 2-cell rows (SKODA-225, Columns (split-NN)). Also keeps the
    * source's glued non-breaking spaces (html2md would turn them into spaces).
    */
   preprocess: ({ document }) => {
     markHighlights(document);
+    markCellWidths(document);
     nbspTransformer('preprocess', document.body, { document });
   },
 

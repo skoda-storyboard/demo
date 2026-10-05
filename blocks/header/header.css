@@ -27,7 +27,7 @@ header nav {
   display: grid;
   grid-template:
     'brand tools' var(--nav-main-height)
-    'sections sections' 1fr / 1fr auto;
+    'sections sections' 1fr / minmax(0, 1fr) auto;
   align-items: center;
   gap: 0 24px;
   max-width: var(--content-max-width);
@@ -37,13 +37,14 @@ header nav {
   font-family: var(--body-font-family);
 }
 
-/* mobile action cluster (mail + hamburger), right-aligned */
+/* mobile action cluster (mail + hamburger), right-aligned; the hamburger's hit box ends on
+   the viewport edge, as the source's (pulled out over the nav's inline padding) */
 header nav .nav-mobile-tools {
   grid-area: tools;
   display: flex;
   align-items: center;
-  gap: var(--spacing-m);
   justify-content: flex-end;
+  margin-right: calc(-1 * var(--spacing-l));
 }
 
 header nav .nav-mail {
@@ -81,7 +82,7 @@ header nav[aria-expanded='true'] {
   grid-template:
     'brand tools' var(--nav-main-height)
     'search search' auto
-    'sections sections' 1fr / 1fr auto;
+    'sections sections' 1fr / minmax(0, 1fr) auto;
   min-height: calc(100dvh - var(--nav-topbar-height));
   overflow-y: auto;
 }
@@ -232,11 +233,16 @@ header .nav-section-switcher li.active a {
 header nav .nav-hamburger {
   display: flex;
   align-items: center;
-  height: 22px;
+  height: var(--nav-main-height);
 }
 
+/* source button.menu-toggle: a 68 x 64 tap target (the icon keeps its size, centred) */
 header nav .nav-hamburger button {
-  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--nav-hamburger-width);
+  height: var(--nav-main-height);
   margin: 0;
   border: 0;
   border-radius: 0;
@@ -246,6 +252,12 @@ header nav .nav-hamburger button {
   overflow: initial;
   text-overflow: initial;
   white-space: initial;
+}
+
+/* the source toggle has outline:0; EDS shows a ring, inset so the viewport edge can't clip it */
+header nav .nav-hamburger button:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: -4px;
 }
 
 header nav .nav-hamburger-icon,
@@ -557,6 +569,25 @@ header nav .nav-search .search-suggest-meta {
  * expanded to the full column width (no click-to-expand overlay here).
  * ========================================================================== */
 @media (width < 1080px) {
+  /* the logo fits its column (up to its 194px), so the brand row never pushes the 68px
+     hamburger off narrow screens: 180px at 320, 190 at 330, full size from 334 (the source
+     shrinks its wordmark the same way and keeps the toggle on the viewport edge) */
+  header .nav-brand {
+    min-width: 0;
+    container-type: inline-size;
+  }
+
+  header .nav-brand .icon-skoda-storyboard-logo {
+    width: min(194px, 100cqi);
+    height: auto;
+    aspect-ratio: 194 / 18;
+  }
+
+  header .nav-brand .icon-skoda-storyboard-logo img {
+    width: 100%;
+    height: auto;
+  }
+
   /* open drawer = right-anchored panel with a gap on the left (page shows
      through, blurred by the backdrop below) */
   header nav[aria-expanded='true'] {
@@ -564,8 +595,11 @@ header nav .nav-search .search-suggest-meta {
     min-width: min(375px, 100%); /* full width below 375 (source), never wider than the screen */
     margin-right: 0;
     margin-left: auto;
+
+    /* SKODA-302: the source panel is half the viewport, at least 375px (375 / 375 / 384 /
+       512 / 540 at 375 / 500 / 768 / 1024 / 1079), with no shadow on the frosted backdrop */
+    width: min(100%, max(375px, 50%));
     background: var(--background-color);
-    box-shadow: var(--dropdown-shadow);
   }
 
   /* keep the collapsed bar full-width so brand + actions span the header */
@@ -602,29 +636,33 @@ header nav .nav-search .search-suggest-meta {
     position: fixed;
     inset: 0;
     z-index: -1;
-    background: rgb(0 0 0 / 15%);
-    backdrop-filter: blur(4px);
+    background: var(--nav-drawer-backdrop);
+    backdrop-filter: blur(10px);
   }
 
-  /* tap-friendly accordion list */
+  /* drawer rows (source .topnav .menu > .menu-item > a): the full panel width, 18/28 light
+     with .02rem tracking, 16 16 16 24 padding and a 1px rule under each row = 61px rows */
   header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul {
     display: flex;
     flex-direction: column;
-    font-size: var(--body-font-size-m);
+    margin: 0 calc(-1 * var(--spacing-l));
+    font-size: var(--heading-font-size-s);
   }
 
   header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul > li {
-    border-bottom: 1px solid var(--divider-color);
+    margin: 0;
   }
 
   header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul > li > a,
   header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul > li > p > a {
     display: flex;
     align-items: center;
-    min-height: 48px;
-    padding: var(--spacing-s) 0;
+    padding: var(--spacing-m) var(--spacing-m) var(--spacing-m) var(--spacing-l);
+    border-bottom: 1px solid var(--divider-color);
     color: var(--skoda-ink);
-    font-weight: var(--weight-semibold);
+    font-weight: var(--weight-light);
+    line-height: 28px;
+    letter-spacing: 0.02rem;
     text-decoration: none;
   }
 
@@ -645,7 +683,7 @@ header nav .nav-search .search-suggest-meta {
     flex: 0 0 auto;
     width: 8px;
     height: 8px;
-    margin-right: 4px;
+    margin-right: 7px; /* centres the 10px caret in the source's 24px glyph box */
     border: 2px solid currentcolor;
     border-width: 0 2px 2px 0;
     border-radius: 0 0 1px;
@@ -658,31 +696,45 @@ header nav .nav-search .search-suggest-meta {
     transform: rotate(-135deg);
   }
 
-  /* collapsed sub-menu; expands when the parent li is aria-expanded. Expanded
-     panel gets a light grey fill spanning the full drawer width. */
+  /* collapsed sub-menu; expands when the parent li is aria-expanded (source .open >
+     .sub-menu: opacity + max-height over .2s, #f1f1f1 rows, links 16/24 at 16px / 40px = 56px) */
   header nav[aria-expanded='true'] .nav-sections .nav-drop > ul {
     max-height: 0;
-    margin: 0 calc(-1 * var(--spacing-l));
-    padding: 0 var(--spacing-l) 0 calc(var(--spacing-l) + var(--spacing-m));
-    background: var(--skoda-grey-100);
+    margin: 0;
+    padding: 0;
+    background: var(--skoda-grey-50);
+    opacity: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease;
+
+    /* hidden only after the collapse animation, so a closed sub-menu's links leave the tab
+       order and the accessibility tree */
+    visibility: hidden;
+    transition: opacity 0.2s ease-in-out, max-height 0.2s ease-in-out, visibility 0s linear 0.2s;
   }
 
   header nav[aria-expanded='true'] .nav-sections .nav-drop[aria-expanded='true'] > ul {
     max-height: 999px;
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  header nav[aria-expanded='true'] .nav-sections .nav-drop > ul > li {
+    margin: 0;
   }
 
   header nav[aria-expanded='true'] .nav-sections .nav-drop > ul > li > a {
-    display: flex;
-    align-items: center;
-    min-height: 0;
-    padding: 10px 0;
+    display: block;
+    padding: var(--spacing-m) calc(var(--spacing-l) + var(--spacing-m));
     color: var(--skoda-ink);
-    font-size: var(--body-font-size-s);
+    font-size: var(--body-font-size-m);
     font-weight: var(--weight-regular);
-    line-height: 1.2;
+    line-height: 24px;
     text-decoration: none;
+  }
+
+  header nav[aria-expanded='true'] .nav-sections .nav-drop > ul > li > a:hover {
+    text-decoration: underline;
   }
 
   /* hide the search entirely on the collapsed bar; show it in the open drawer */
@@ -690,9 +742,11 @@ header nav .nav-search .search-suggest-meta {
     display: none;
   }
 
+  /* source .search-bar: a 64px row, the 48px pill 24px from the left and 16px from the right */
   header nav[aria-expanded='true'] .nav-tools {
     display: block;
-    padding: var(--spacing-m) 0;
+    margin-right: calc(var(--spacing-m) - var(--spacing-l));
+    padding: var(--spacing-xs) 0;
   }
 
   /* positioned so the suggestion overlay anchors to the field */
@@ -737,6 +791,14 @@ header nav .nav-search .search-suggest-meta {
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
+  }
+}
+
+@media (width < 1080px) and (prefers-reduced-motion: reduce) {
+  header nav[aria-expanded='true'] .nav-sections .nav-drop > ul,
+  header nav[aria-expanded='true'] .nav-sections .nav-drop > a::after,
+  header nav[aria-expanded='true'] .nav-sections .nav-drop > p > a::after {
+    transition: none;
   }
 }
 

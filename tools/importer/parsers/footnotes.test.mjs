@@ -122,6 +122,11 @@ test('the nearest size wins, sizes are read as CSS reads them, and media is neve
   assert.equal(isFootnote(p('<span style="--font-size: 10pt">Custom property</span>')), false, 'not the font-size property');
   assert.equal(isFootnote(p('<span style="mso-font-size: 10pt">Word paste</span>')), false);
   assert.equal(isFootnote(p('<span style="font-size: 10pt; font-size: 18pt">Last declaration wins</span>')), false);
+  // PR #251 review: the CSSOM's winning declaration, as Chrome applies it
+  assert.equal(isFootnote(p('<span style="font-size:10pt !important; font-size:18pt">¹ Important wins</span>')), true, '!important beats a later declaration');
+  assert.equal(isFootnote(p('<span style="font-size:10pt; font-size:invalid">¹ Invalid ignored</span>')), true, 'an invalid later value is ignored');
+  assert.equal(isFootnote(p('<span style="font-size:18pt; font-size:10pt nonsense">Ordinary large text</span>')), false, 'a malformed value is not small print');
+  assert.equal(isFootnote(p('<span style="font-size: calc(10pt + 1px)">Computed</span>')), false, 'only plain px/pt lengths count');
   assert.equal(isFootnote(p('<span style="font-size: 0px">Hidden</span>')), false, 'hidden text is not small print');
   assert.equal(isFootnote(p('<span style="font-size: 0.8em">Relative</span>')), false, 'only px/pt lengths count');
   assert.equal(isFootnote(p('<img src="a.jpg" alt="A"><span style="font-size: 10pt">Photo: Škoda</span>')), false, 'an image caption line');

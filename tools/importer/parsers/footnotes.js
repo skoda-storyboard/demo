@@ -30,19 +30,17 @@ const MEDIA = 'img, picture, video, audio, iframe, svg, object, embed, canvas';
 const text = (node) => (node?.textContent || '').replace(/\s+/g, ' ').trim();
 
 /**
- * The element's inline font size in px (pt converted), as CSS reads it: the last `font-size`
- * declaration wins. null when it sets none; NaN when its value isn't a px/pt length.
+ * The element's inline font size in px (pt converted), as CSS applies it. The CSSOM's
+ * `style.fontSize` is the winning declaration: `!important` beats a later one, and invalid
+ * values (`invalid`, `10pt nonsense`) are dropped (PR #251 review). null when it sets none;
+ * NaN when the winning value isn't a plain px/pt length (em, %, keywords, calc).
  */
 function fontPx(el) {
-  let px = null;
-  (el.getAttribute?.('style') || '').split(';').forEach((declaration) => {
-    const [property, ...value] = declaration.split(':');
-    if (property.trim().toLowerCase() !== 'font-size') return;
-    const match = value.join(':').trim().match(/^([\d.]+)\s*(px|pt)\b/i);
-    if (!match) px = NaN;
-    else px = match[2].toLowerCase() === 'pt' ? (Number(match[1]) * 4) / 3 : Number(match[1]);
-  });
-  return px;
+  const value = el.style?.fontSize;
+  if (!value) return null;
+  const match = value.match(/^([\d.]+)(px|pt)$/i);
+  if (!match) return NaN;
+  return match[2].toLowerCase() === 'pt' ? (Number(match[1]) * 4) / 3 : Number(match[1]);
 }
 
 const isSmall = (px) => px > 0 && px < BODY_PX;
