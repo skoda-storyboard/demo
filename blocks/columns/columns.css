@@ -139,3 +139,91 @@
 .columns.callout > div > div:last-child {
   padding-block: var(--spacing-xs);
 }
+
+/* ==========================================================================
+   `split-NN` variant (SKODA-225): an unequal 2-cell story row, measured on the live
+   graffiti / Kylaq / Peaq comfort / charging stories (SiteOrigin rows, 2026-10-01):
+   - the first cell is NN% of the row (61.8 → 62; charging 75), the second takes the rest,
+     both top-aligned; each cell has 10px padding and the row reaches 10px past the text
+     column on both sides, so the text inside lines up with the body (518.3 | 320.4 @1440);
+   - side by side from 781px, stacked at 780 and below (SiteOrigin's mobile collapse, the
+     same switch as the cards tiles), text first;
+   - the image: its authored width (`portrait-NNN` → --columns-portrait, the 235px portraits
+     of 500px files) capped at the cell and centred, or the full cell without a token;
+   - the caption under a portrait, centred: name 13/19.5 600, role 10pt, each a 24px line,
+     20px below the card.
+   ========================================================================== */
+.columns.split {
+  --columns-split-gutter: 10px; /* SiteOrigin cell padding */
+  --columns-caption-line: 24px; /* the source paragraph's 16/24 line box */
+  --columns-caption-name-size: 13px;
+  --columns-caption-name-line: 19.5px;
+  --columns-caption-role-size: 10pt;
+
+  margin-inline: calc(-1 * var(--columns-split-gutter));
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- split and callout never combine on one block */
+.columns.split > div {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+/* source order at every width (the base rules move a picture-only cell first) */
+/* stylelint-disable-next-line no-descending-specificity -- split and callout never combine on one block */
+.columns.split > div > div {
+  box-sizing: border-box;
+  order: unset;
+  min-width: 0;
+  padding: var(--columns-split-gutter);
+}
+
+.columns.split .columns-portrait {
+  text-align: center;
+}
+
+.columns.split .columns-portrait img {
+  display: block;
+  height: auto;
+  margin-inline: auto;
+}
+
+.columns.split.portrait .columns-portrait img {
+  width: min(var(--columns-portrait), 100%);
+}
+
+.columns.split .columns-portrait p {
+  margin: 0;
+  line-height: var(--columns-caption-line);
+}
+
+/* the role: the caption paragraph after the name */
+.columns.split .columns-portrait p:has(> strong) + p {
+  font-size: var(--columns-caption-role-size);
+}
+
+.columns.split .columns-portrait strong {
+  font-size: var(--columns-caption-name-size);
+  font-weight: var(--weight-semibold);
+  line-height: var(--columns-caption-name-line);
+}
+
+.columns.split .columns-portrait p:last-child {
+  margin-block-end: var(--paragraph-gap);
+}
+
+@media (width >= 781px) {
+  .columns.split > div {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .columns.split > div > div + div {
+    flex: 1 1 0;
+  }
+
+  .columns.split > div > div:first-child {
+    flex: 0 0 var(--columns-split);
+  }
+}
