@@ -127,11 +127,16 @@ function cartAction(el, row, size, original = '', title = '') {
   el.setAttribute('aria-disabled', 'true');
   el.addEventListener('keydown', activateOnSpace);
   let bound = null;
-  const bind = () => {
+  const bind = (trigger) => {
     if (!original) return Promise.resolve(false);
     bound ||= loadCart()
       .then(({ bindCartControl }) => {
         bindCartControl(el, { href: original, title, thumb: row.image || row.poster || '' });
+        // bound by a hover / focus: replay it, so the cart's link check (which starts on the
+        // first hover or focus of a bound control) runs as it did when controls bound at render
+        if (trigger?.type === 'pointerenter' || trigger?.type === 'focus') {
+          el.dispatchEvent(new window.Event(trigger.type));
+        }
         return true;
       })
       .catch((e) => {
@@ -147,12 +152,12 @@ function cartAction(el, row, size, original = '', title = '') {
     e.preventDefault();
     // not bound yet: bind now, then replay the click if the cart enabled the control
     if (original && !el.hasAttribute('data-cart-control')) {
-      bind().then((ok) => { if (ok && el.getAttribute('aria-disabled') !== 'true') el.click(); });
+      bind(e).then((ok) => { if (ok && el.getAttribute('aria-disabled') !== 'true') el.click(); });
     }
   });
   if (original) {
     ['pointerenter', 'focus'].forEach((type) => el.addEventListener(type, bind, { once: true }));
-    whenPageLoaded().then(bind);
+    whenPageLoaded().then(() => bind());
   }
   return el;
 }

@@ -62,6 +62,21 @@ const attempts = (el) => {
   return seen;
 };
 
+test('a hover that binds a control also starts the cart\'s link check, as at render', async () => {
+  const warned = [];
+  const { warn } = console; // eslint-disable-line no-console
+  console.warn = (...args) => warned.push(String(args[0])); // eslint-disable-line no-console
+  try {
+    const add = card('w');
+    add.dispatchEvent(new window.Event('pointerenter'));
+    await tick(50);
+    // no index in jsdom: the check runs and reports it couldn't load the index
+    assert.ok(warned.some((w) => w.includes('links not checked')), 'the link check ran on that first hover');
+  } finally {
+    console.warn = warn; // eslint-disable-line no-console
+  }
+});
+
 test('a click before binding is not lost: the cart loads and the click is replayed', async () => {
   const add = card('c');
   const seen = attempts(add);

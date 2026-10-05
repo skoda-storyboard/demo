@@ -228,3 +228,18 @@ test('download package: the same button cancels; a failure says so', async () =>
   await tick();
   assert.match($('.media-cart-status').textContent, /^The package couldn't be prepared\. .* 2 files/);
 });
+
+test('removals on the cart page are announced: the page has its live region before the first change', async () => {
+  const block = document.createElement('div');
+  block.className = 'media-cart block';
+  document.querySelector('main').replaceChildren(block);
+  renderCart(block, { cart: fakeCart([]), picture });
+  const region = document.querySelector('body > .media-cart-live');
+  assert.ok(region, 'created with the cart page, before any change');
+  assert.deepEqual([region.getAttribute('aria-live'), region.textContent, region.hidden], ['polite', '', false]);
+  // what the store dispatches on a removal
+  window.dispatchEvent(new window.CustomEvent('media-cart:change', { detail: { count: 2 } }));
+  await new Promise((r) => { setTimeout(r, 120); });
+  assert.equal(region.textContent, '2 items in the media cart', 'the cart labels, as on the listing');
+});
+

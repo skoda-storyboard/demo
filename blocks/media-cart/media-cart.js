@@ -19,6 +19,9 @@ import * as store from '../../scripts/media-cart.js';
 import {
   DEFAULT_LABELS, cartLabels, format, formatBytes, limitBanner, loadCartStyles, plural,
 } from '../../scripts/media-cart-ui.js';
+// the page has no add controls to create the cart's live region: the cart page creates it,
+// so its removals and "Empty package" are announced (spec §6)
+import { prepareAnnouncements } from '../../scripts/media-cart-live.js';
 
 const KINDS = [
   ['image', 'kindImage'],
@@ -98,7 +101,7 @@ function actionButton(className, label) {
  * @returns {{refresh: function(): void}}
  */
 export function renderCart(block, {
-  cart = store, labels = DEFAULT_LABELS, picture = createOptimizedPicture,
+  cart = store, labels = DEFAULT_LABELS, picture = createOptimizedPicture, countText = undefined,
 } = {}) {
   const actions = el('div', 'media-cart-actions');
   const downloadButton = actionButton('media-cart-download', labels.downloadPackage);
@@ -120,6 +123,7 @@ export function renderCart(block, {
   empty.tabIndex = -1;
 
   block.replaceChildren(actions, limitBanner(labels), progress, groups, empty);
+  prepareAnnouncements(block, window, countText);
 
   const cards = new Map();
   let controller = null;
@@ -246,11 +250,10 @@ export function renderCart(block, {
 }
 
 export default async function decorate(block) {
-  // the limit banner's styles (/styles/media-cart.css) before the first render: no shift
-  const [placeholders] = await Promise.all([
-    fetchPlaceholders().catch(() => ({})), // English defaults
-    loadCartStyles(),
-  ]);
+  // the limit banner is styled by this block's CSS; /styles/media-cart.css only styles the
+  // refusal notice, so it loads alongside rather than ahead of the first render
+  loadCartStyles();
+  const placeholders = await fetchPlaceholders().catch(() => ({})); // English defaults
   renderCart(block, { labels: cartLabels(placeholders) });
   store.trackView();
 }
