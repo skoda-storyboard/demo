@@ -529,3 +529,94 @@ test('thumb (505b): kept only when root-relative or https, from add, bind and st
   assert.equal(again.cart.getCart().items[0].thumb, undefined, 'a tampered thumb is dropped');
   assert.equal(again.cart.getCart().items.at(-1).thumb, 'https://cdn.skoda-storyboard.com/p.jpg');
 });
+
+// --- SKODA-505a review: Space activates link controls; the add/remove announcement ---------
+const { ANNOUNCE_DELAY_MS } = await import('./media-cart-live.js');
+const announced = () => new Promise((r) => { setTimeout(r, ANNOUNCE_DELAY_MS + 20); });
+function freshPage(html = '<main></main>') {
+  const page = new JSDOM(`<body>${html}</body>`, { url: 'https://example.com/en/images' });
+  const { window: w } = page;
+  const a = w.document.createElement('a');
+  a.href = '#';
+  a.setAttribute('role', 'button');
+  a.setAttribute('aria-disabled', 'true');
+  (w.document.querySelector('main') || w.document.body).append(a);
+  const { cart } = make({ win: w, countText: async (n) => `${n} in cart` });
+  return { w, a, cart };
+}
+const key = (el, k, w) => {
+  const e = new w.KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true });
+  el.dispatchEvent(e);
+  return e;
+};
+
+test('Space activates a bound link control once, without scrolling the page; Enter is native', async () => {
+  const { w, a, cart } = freshPage();
+  cart.bind(a, { href: src('a.jpg'), title: 'A' });
+  const e = key(a, ' ', w);
+  assert.equal(e.defaultPrevented, true, 'no page scroll');
+  await settle();
+  assert.equal(cart.getCart().count, 1);
+  assert.equal(a.getAttribute('aria-pressed'), 'true');
+  // a control whose own handler already took the key (media-card) is not activated twice
+  a.addEventListener('keydown', (ev) => { if (ev.key === ' ') ev.preventDefault(); }, { capture: true });
+  key(a, ' ', w);
+  await settle();
+  assert.equal(cart.getCart().count, 1, 'not toggled by an already-handled Space');
+  assert.equal(key(a, 'Enter', w).defaultPrevented, false, 'Enter stays the link\'s own activation');
+});
+
+test('Space activates a size row (menuitemcheckbox) and leaves real buttons alone', async () => {
+  const { w, cart } = freshPage();
+  const row = w.document.createElement('a');
+  row.href = '#';
+  row.setAttribute('role', 'menuitem');
+  const button = w.document.createElement('button');
+  w.document.body.append(row, button);
+  cart.bind(row, { href: src('b.jpg') });
+  cart.bind(button, { href: src('c.jpg') });
+  key(row, ' ', w);
+  await settle();
+  assert.equal(row.getAttribute('aria-checked'), 'true');
+  assert.equal(key(button, ' ', w).defaultPrevented, false, 'a <button> activates on Space by itself');
+});
+
+test('announcement: one permanent region exists, empty, before the first add, and reads it', async () => {
+  const { w, a, cart } = freshPage();
+  const before = w.document.querySelectorAll('.media-cart-live');
+  assert.equal(before.length, 0, 'nothing before a control is bound');
+  cart.bind(a, { href: src('a.jpg') });
+  const [region] = w.document.querySelectorAll('body > .media-cart-live');
+  assert.ok(region, 'the region is there once a control is bound');
+  assert.deepEqual([region.getAttribute('role'), region.getAttribute('aria-live'), region.textContent], ['status', 'polite', '']);
+  assert.equal(region.hidden, false, 'never display-toggled');
+  click(a);
+  await settle();
+  await announced();
+  assert.equal(region.textContent, '1 in cart', 'the first add is announced');
+  assert.equal(w.document.querySelectorAll('.media-cart-live').length, 1, 'one region, reused');
+  click(a);
+  await settle();
+  await announced();
+  assert.equal(region.textContent, '0 in cart');
+});
+
+test('announcement: inside an open lightbox (aria-modal), it is read from a region in the dialog', async () => {
+  const { w, cart } = freshPage('<div class="gallery-overlay" role="dialog" aria-modal="true"><button class="add"></button></div><main></main>');
+  const overlay = w.document.querySelector('.gallery-overlay');
+  const add = overlay.querySelector('.add');
+  cart.bind(add, { href: src('a.jpg') });
+  const inDialog = overlay.querySelector(':scope > .media-cart-live');
+  assert.ok(inDialog, 'the dialog has its own region from the bind, before the add');
+  assert.equal(inDialog.textContent, '');
+  click(add);
+  await settle();
+  await announced();
+  assert.equal(inDialog.textContent, '1 in cart');
+  assert.equal(w.document.querySelector('body > .media-cart-live').textContent, '', 'not the page region');
+  overlay.hidden = true;
+  click(add);
+  await settle();
+  await announced();
+  assert.equal(w.document.querySelector('body > .media-cart-live').textContent, '0 in cart', 'closed: the page region');
+});

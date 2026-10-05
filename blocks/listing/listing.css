@@ -711,9 +711,48 @@
 }
 
 /* the cart's package-limit notice (source media-cart-limit plugin), between the sort row and
-   the grid: 24px from each, like the grid under the sort row */
+   the grid: 24px from each, like the grid under the sort row. Styled here, not in the lazy
+   /styles/media-cart.css, so it is styled in the first paint (SKODA-505a review). Same box as
+   on the cart page (blocks/media-cart/media-cart.css); media-cart-limits.test.mjs keeps them
+   in step. */
 .listing.listing-media .media-cart-limit {
+  --media-cart-limit-rule: 4px;
+  --media-cart-limit-disc: 18px;
+  --media-cart-limit-pad: 14px;
+  --media-cart-limit-pad-end: 18px;
+  --media-cart-limit-pad-start: 46px;
+  --media-cart-limit-disc-inset: 16px;
+
+  position: relative;
+  box-sizing: border-box;
   margin-block: var(--spacing-l) 0;
+  padding-block: var(--media-cart-limit-pad);
+  padding-inline: var(--media-cart-limit-pad-start) var(--media-cart-limit-pad-end);
+  border-inline-start: var(--media-cart-limit-rule) solid var(--cart-limit-accent);
+  border-radius: var(--dropdown-radius);
+  background: var(--skoda-grey-50);
+  color: var(--text-color);
+  font-size: var(--body-font-size-s);
+  line-height: 1.45;
+}
+
+.listing.listing-media .media-cart-limit::before {
+  content: "i";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: var(--media-cart-limit-disc-inset);
+  display: grid;
+  place-items: center;
+  inline-size: var(--media-cart-limit-disc);
+  block-size: var(--media-cart-limit-disc);
+  border-radius: 50%;
+  background: var(--cart-limit-accent);
+  color: var(--skoda-white);
+  font-size: var(--body-font-size-2xs);
+  font-style: italic;
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  transform: translateY(-50%);
 }
 
 @media (prefers-reduced-motion: reduce) {

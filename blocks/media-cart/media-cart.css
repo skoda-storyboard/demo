@@ -113,8 +113,46 @@
   white-space: nowrap;
 }
 
+/* the package-limit banner, in the block's first paint (same box as the listing's,
+   blocks/listing/listing.css; media-cart-limits.test.mjs keeps them in step) */
 .media-cart .media-cart-limit {
+  --media-cart-limit-rule: 4px;
+  --media-cart-limit-disc: 18px;
+  --media-cart-limit-pad: 14px;
+  --media-cart-limit-pad-end: 18px;
+  --media-cart-limit-pad-start: 46px;
+  --media-cart-limit-disc-inset: 16px;
+
+  position: relative;
+  box-sizing: border-box;
   margin-block: 0 var(--spacing-l);
+  padding-block: var(--media-cart-limit-pad);
+  padding-inline: var(--media-cart-limit-pad-start) var(--media-cart-limit-pad-end);
+  border-inline-start: var(--media-cart-limit-rule) solid var(--cart-limit-accent);
+  border-radius: var(--dropdown-radius);
+  background: var(--skoda-grey-50);
+  color: var(--text-color);
+  font-size: var(--body-font-size-s);
+  line-height: 1.45;
+}
+
+.media-cart .media-cart-limit::before {
+  content: "i";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: var(--media-cart-limit-disc-inset);
+  display: grid;
+  place-items: center;
+  inline-size: var(--media-cart-limit-disc);
+  block-size: var(--media-cart-limit-disc);
+  border-radius: 50%;
+  background: var(--cart-limit-accent);
+  color: var(--skoda-white);
+  font-size: var(--body-font-size-2xs);
+  font-style: italic;
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  transform: translateY(-50%);
 }
 
 /* --- download progress + the files that didn't make it into the package -------------- */

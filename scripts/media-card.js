@@ -86,10 +86,37 @@ function wireDocument() {
   });
 }
 
+// The cart loads after the page has loaded (then on idle), never during the first render:
+// a media listing is the first section of /en/images and /en/videos, so anything loaded while
+// its cards render competes with the LCP image (SKODA-505a review). A first hover, focus,
+// click or Space on a control loads it at once.
+let cartModule = null;
+const loadCart = () => {
+  cartModule ||= import('./media-cart.js');
+  return cartModule;
+};
+let afterLoad = null;
+const whenPageLoaded = () => {
+  afterLoad ||= new Promise((resolve) => {
+    const idle = () => (window.requestIdleCallback || ((cb) => setTimeout(cb, 1)))(resolve);
+    if (document.readyState === 'complete') idle();
+    else window.addEventListener('load', idle, { once: true });
+  });
+  return afterLoad;
+};
+
+/** Space activates a link-based control (role button / menuitemcheckbox) without scrolling. */
+export function activateOnSpace(e) {
+  if (e.key !== ' ' || e.currentTarget.localName === 'button') return;
+  e.preventDefault();
+  e.currentTarget.click();
+}
+
 /**
  * A cart action: a `#` link carrying the source cart key. The original's add is bound to the
  * media cart for `original` (the file's link); the others stay inert. While disabled, its
- * click is cancelled here, so no consumer (listing, rails) jumps to the top of the page.
+ * click is cancelled here, so no consumer (listing, rails) jumps to the top of the page; a
+ * click (or Space) before the cart has loaded loads it and is replayed once the control works.
  */
 function cartAction(el, row, size, original = '', title = '') {
   el.href = '#';
@@ -98,19 +125,34 @@ function cartAction(el, row, size, original = '', title = '') {
   el.dataset.size = size;
   el.setAttribute('role', el.getAttribute('role') || 'button');
   el.setAttribute('aria-disabled', 'true');
-  el.addEventListener('click', (e) => {
-    if (el.getAttribute('aria-disabled') === 'true') e.preventDefault();
-  });
-  // the cart module loads only where an add control renders; until then it stays disabled
-  if (original) {
-    const thumb = row.image || row.poster || '';
-    import('./media-cart.js')
-      .then(({ bindCartControl }) => bindCartControl(el, { href: original, title, thumb }))
+  el.addEventListener('keydown', activateOnSpace);
+  let bound = null;
+  const bind = () => {
+    if (!original) return Promise.resolve(false);
+    bound ||= loadCart()
+      .then(({ bindCartControl }) => {
+        bindCartControl(el, { href: original, title, thumb: row.image || row.poster || '' });
+        return true;
+      })
       .catch((e) => {
         // the control stays disabled (set above)
         // eslint-disable-next-line no-console
         console.warn('media card: the media cart did not load', e);
+        return false;
       });
+    return bound;
+  };
+  el.addEventListener('click', (e) => {
+    if (el.getAttribute('aria-disabled') !== 'true') return;
+    e.preventDefault();
+    // not bound yet: bind now, then replay the click if the cart enabled the control
+    if (original && !el.hasAttribute('data-cart-control')) {
+      bind().then((ok) => { if (ok && el.getAttribute('aria-disabled') !== 'true') el.click(); });
+    }
+  });
+  if (original) {
+    ['pointerenter', 'focus'].forEach((type) => el.addEventListener(type, bind, { once: true }));
+    whenPageLoaded().then(bind);
   }
   return el;
 }

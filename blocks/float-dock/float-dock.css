@@ -149,16 +149,6 @@
   display: none;
 }
 
-/* the count announcement: read out, not shown */
-.float-dock .float-dock-cart-status {
-  position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
 /* network brand backgrounds, white glyphs (WhatsApp: ink glyph for contrast) */
 .float-dock .float-dock-network-x { background-color: var(--social-x); }
 .float-dock .float-dock-network-pinterest { background-color: var(--social-pinterest); }

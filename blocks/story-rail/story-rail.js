@@ -518,6 +518,15 @@ export default async function decorate(block) {
     carousel.addEventListener('click', (e) => {
       if (e.target.closest('.media-cart-action[aria-disabled="true"]')) e.preventDefault();
     });
+    // Space on a cart link (role button) must not scroll the page: before the cart binds it,
+    // it does nothing; once bound, the cart's own handler has already taken the key
+    carousel.addEventListener('keydown', (e) => {
+      if (e.key !== ' ' || e.defaultPrevented) return;
+      const action = e.target.closest('a.media-cart-action[role="button"]');
+      if (!action) return;
+      e.preventDefault();
+      action.click();
+    });
     // the add buttons become media-cart toggles (SKODA-505a); the cart loads only here
     const cartControls = carousel.querySelectorAll('.media-cart-action.add');
     if (cartControls.length) {

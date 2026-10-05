@@ -29,11 +29,13 @@ import {
   resolve as defaultResolve, loadIndex as defaultLoadIndex, normalizeSource, damPath,
   DAM_HOST, DAM_ROOT,
 } from './media-cart-resolver.js';
+// the limits live in a dependency-free module, so the listing banner needn't load the store
+import { LIMITS } from './media-cart-limits.js';
+// the add/remove announcement: its live region exists from the first bound control (spec §6)
+import { prepareAnnouncements } from './media-cart-live.js';
 
 export const STORAGE_KEY = 'skoda-media-cart';
-// the source cart-limit plugin's 80 items; 1 GiB keeps the zip in browser memory (and
-// under the classic ZIP limits: fflate writes no ZIP64)
-export const LIMITS = Object.freeze({ items: 80, bytes: 1024 ** 3 });
+export { LIMITS };
 export const REASONS = Object.freeze({
   unresolved: 'unresolved',
   // the index or the DAM couldn't be reached: the link may still resolve later
@@ -128,6 +130,8 @@ export function createCart({
   limits = LIMITS,
   now = () => new Date(),
   uuid = () => uuidOf(win),
+  // the announcement for a count (default: the cart labels; injectable for tests)
+  countText = undefined,
 } = {}) {
   const listeners = new Set();
   let memory = null; // the state when storage is unavailable
@@ -416,6 +420,15 @@ export function createCart({
     }
   }
 
+  // Space activates a link-based control (role button / menuitemcheckbox) without scrolling the
+  // page; a control's own handler that already did (media-card) has cancelled the key
+  function onControlKey(e) {
+    const el = e.currentTarget;
+    if (e.key !== ' ' || e.defaultPrevented || el.localName === 'button') return;
+    e.preventDefault();
+    el.click();
+  }
+
   // after the first hover / focus, later (re-)bound links are checked as they are bound
   let warmed = false;
   const warm = () => {
@@ -435,6 +448,7 @@ export function createCart({
     href = el.dataset.href, title = el.dataset.title, thumb = el.dataset.thumb,
   } = {}) {
     el.setAttribute('data-cart-control', '');
+    prepareAnnouncements(el, win, countText);
     if (href) el.dataset.href = href;
     else delete el.dataset.href;
     if (title) el.dataset.title = title;
@@ -444,6 +458,7 @@ export function createCart({
     if (!bound.has(el)) {
       bound.add(el);
       el.addEventListener('click', onControlClick);
+      el.addEventListener('keydown', onControlKey);
       el.addEventListener('pointerenter', warm, { once: true });
       el.addEventListener('focus', warm, { once: true });
     }

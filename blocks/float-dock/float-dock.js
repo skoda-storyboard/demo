@@ -114,7 +114,8 @@ function buildScrollTop(ph) {
 
 /**
  * The media-cart badge: the source a.media-cart-icon (cart glyph, red count bubble when not
- * empty), linking to the cart page. The count changes are announced politely.
+ * empty), linking to the cart page. Count changes are announced by the cart's own live region
+ * (scripts/media-cart-live.js), not here: the dock loads late and its slot is display-toggled.
  * @param {Element} slot
  * @param {Record<string,string>} ph placeholders
  * @param {function(): Promise<Array>} [load] the cart + its UI module (injectable for tests)
@@ -134,21 +135,16 @@ export async function buildCartBadge(slot, ph, load = () => Promise.all([
   count.className = 'float-dock-cart-count';
   count.setAttribute('aria-hidden', 'true');
   link.append(icon('media-cart'), count);
-  const status = document.createElement('span');
-  status.className = 'float-dock-cart-status';
-  status.setAttribute('role', 'status');
-
-  const render = ({ count: n }, announce) => {
+  const render = ({ count: n }) => {
     count.textContent = n ? String(n) : '';
     count.hidden = !n;
     // an empty cart shows no badge, as on the source (float-dock.css)
     link.toggleAttribute('data-empty', !n);
     link.setAttribute('aria-label', n ? ui.plural(labels, 'badgeCount', n) : labels.badge);
-    if (announce) status.textContent = ui.plural(labels, 'countChanged', n);
   };
-  render(cart.getCart(), false);
-  cart.onChange((c) => render(c, true));
-  slot.append(link, status);
+  render(cart.getCart());
+  cart.onChange(render);
+  slot.append(link);
   return link;
 }
 

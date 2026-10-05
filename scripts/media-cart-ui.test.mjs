@@ -61,11 +61,12 @@ test('cartHref follows the locale of the page', () => {
   assert.equal(ui.cartHref(), '/cs/media-cart');
 });
 
-test('limitBanner states both caps and loads the shared styles', () => {
+test('limitBanner states both caps and needs no shared stylesheet (the blocks style it)', () => {
+  document.head.querySelectorAll('link[href$="/styles/media-cart.css"]').forEach((l) => l.remove());
   const banner = ui.limitBanner(ui.DEFAULT_LABELS, { items: 80, bytes: 1024 ** 3 });
   assert.equal(banner.className, 'media-cart-limit');
   assert.match(banner.textContent, /up to 80 files \(1 GB in total\)/);
-  assert.ok(document.head.querySelector('link[href$="/styles/media-cart.css"]'));
+  assert.equal(document.head.querySelector('link[href$="/styles/media-cart.css"]'), null);
 });
 
 test('refusalMessage: one text per reason; duplicates and unknown reasons say nothing', () => {

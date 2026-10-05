@@ -16,6 +16,8 @@
 import { createOptimizedPicture, readBlockConfig } from '../../scripts/aem.js';
 import { loadQueryIndex, defaultIndexUrl, cleanTitle } from '../../scripts/query-index.js';
 import { fetchPlaceholders } from '../../scripts/placeholders.js';
+// dependency-free: the limit banner renders in the first paint without the cart (SKODA-505b)
+import { buildLimitBanner, LIMIT_BANNER_TEXT } from '../../scripts/media-cart-limits.js';
 import { formatCardDate } from '../../scripts/card-teaser.js';
 import { mediaActions, mediaLabels, playBadge } from '../../scripts/media-card.js';
 import {
@@ -228,14 +230,10 @@ export default async function decorate(block) {
   instanceSeq += 1;
   const uid = `l${instanceSeq}`; // unique id prefix for this block instance
   const media = isMediaTemplate(cfg.template);
-  // media listings show the cart's package-limit notice (SKODA-505b); it and its stylesheet
-  // load with the placeholders, so it is in the skeleton, styled (no shift above the grid)
-  const [placeholders, cartUi] = await Promise.all([
-    fetchPlaceholders(),
-    media ? import('../../scripts/media-cart-ui.js')
-      .then(async (ui) => { await ui.loadCartStyles(); return ui; })
-      .catch(() => null) : null,
-  ]);
+  // media listings show the cart's package-limit notice (SKODA-505b) in the skeleton, styled
+  // by listing.css (no shift above the grid). The cart itself loads after first paint
+  // (media-card.js), so nothing of it is on this eager path (SKODA-505a review).
+  const placeholders = await fetchPlaceholders();
   const STRINGS = buildStrings(placeholders);
   const mediaText = mediaLabels(placeholders); // media card controls (SKODA-406)
 
@@ -292,7 +290,9 @@ export default async function decorate(block) {
   // Source order: facet panel (pills, options, chips), sort row, grid, then the "N / total"
   // count right above Load more (measured on /en/news, /en/images).
   block.append(facetBar, sortRow, status, grid, countEl, loadMoreWrap);
-  if (cartUi) sortRow.after(cartUi.limitBanner(cartUi.cartLabels(placeholders)));
+  if (media) {
+    sortRow.after(buildLimitBanner(placeholders.mediaCartLimitBanner || LIMIT_BANNER_TEXT));
+  }
 
   // Load the index (self-contained; degrades to empty/error state).
   let scoped = [];

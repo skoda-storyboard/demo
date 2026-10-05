@@ -11,7 +11,12 @@
 
 import { loadCSS } from './aem.js';
 import { currentLocale } from './query-index.js';
-import { LIMITS } from './media-cart.js';
+// not the store: the UI and the listing banner must not pull it in (SKODA-505a review)
+import {
+  LIMITS, LIMIT_BANNER_TEXT, buildLimitBanner, format, formatBytes,
+} from './media-cart-limits.js';
+
+export { format, formatBytes };
 
 export const DEFAULT_LABELS = {
   badge: 'Media cart',
@@ -37,7 +42,7 @@ export const DEFAULT_LABELS = {
   kindOther: 'Other files',
   sizeOriginal: 'Original',
   remove: 'Remove {title} from the media cart',
-  limitBanner: 'A download package can contain up to {max} files ({size} in total). Larger selections need to be downloaded as several packages.',
+  limitBanner: LIMIT_BANNER_TEXT,
   limitItems: 'Your download package is full: it can contain up to {max} files. Download or empty it to add more.',
   limitBytes: 'This file doesn\'t fit: a download package can contain up to {size}.',
   network: 'The file couldn\'t be added to the media cart. Please try again.',
@@ -73,10 +78,6 @@ export function cartLabels(ph = {}) {
   }));
 }
 
-/** Replace `{name}` tokens; unknown tokens stay as they are. */
-export const format = (text, values = {}) => String(text)
-  .replace(/\{(\w+)\}/g, (m, name) => (name in values ? String(values[name]) : m));
-
 /**
  * A counted text: `{key}One` for exactly one (when the sheet has it), else `{key}`, with `{n}`
  * and any other values filled in.
@@ -85,19 +86,6 @@ export const plural = (labels, key, n, values = {}) => format(
   (n === 1 && labels[`${key}One`]) || labels[key],
   { ...values, n },
 );
-
-/** A byte count for people: 1.2 MB, 850 KB, 1 GB. */
-export function formatBytes(bytes = 0) {
-  const units = ['B', 'KB', 'MB', 'GB'];
-  let value = Math.max(0, Number(bytes) || 0);
-  let unit = 0;
-  while (value >= 1024 && unit < units.length - 1) {
-    value /= 1024;
-    unit += 1;
-  }
-  const digits = unit === 0 || value >= 10 || Number.isInteger(value) ? 0 : 1;
-  return `${Number(value.toFixed(digits))} ${units[unit]}`;
-}
 
 /** The cart page for the current locale (the source `/en/media-cart/`). */
 export const cartHref = (pathname = window.location.pathname) => `/${currentLocale(pathname)}/media-cart`;
@@ -110,8 +98,8 @@ let cartStyles = null;
 export const CART_STYLES_TIMEOUT_MS = 3000;
 
 /**
- * Load /styles/media-cart.css (the banner and the notice). Await it before showing either, or
- * they appear unstyled and then grow (a layout shift). Never rejects, and settles within
+ * Load /styles/media-cart.css (the refusal notice). Await it before showing the notice, or it
+ * appears unstyled and then grows (a layout shift). Never rejects, and settles within
  * CART_STYLES_TIMEOUT_MS even if the sheet stalls (or never reports, as in jsdom).
  * @returns {Promise<void>}
  */
@@ -125,20 +113,14 @@ export const loadCartStyles = () => {
 
 /**
  * The source's package-limit notice (media-cart-limit plugin): an info banner above a media
- * grid and on the cart page. Its styles are in /styles/media-cart.css: callers await
- * loadCartStyles() before rendering it (the listing and the cart page do).
+ * grid and on the cart page. Built by media-cart-limits.js; styled by the block showing it
+ * (listing.css, media-cart.css), so it renders styled with no extra stylesheet.
  * @param {typeof DEFAULT_LABELS} [labels]
  * @param {{items: number, bytes: number}} [limits]
  * @returns {HTMLDivElement}
  */
 export function limitBanner(labels = DEFAULT_LABELS, limits = LIMITS) {
-  loadCartStyles();
-  const banner = document.createElement('div');
-  banner.className = 'media-cart-limit';
-  banner.textContent = format(labels.limitBanner, {
-    max: limits.items, size: formatBytes(limits.bytes),
-  });
-  return banner;
+  return buildLimitBanner(labels.limitBanner, limits);
 }
 
 /**
