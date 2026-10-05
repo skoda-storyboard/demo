@@ -2,8 +2,9 @@ import { createOptimizedPicture } from '../../scripts/aem.js';
 
 /**
  * The archive term h1 as label chips (SKODA-828 F3): each line of the authored
- * `<h1>Models<br>Peaq</h1>` becomes a `.hero-image-label`. A space between the chips
- * keeps the accessible name "Models Peaq". An h1 without breaks is one chip.
+ * `<h1>Models<br>Peaq</h1>` becomes a `.hero-image-label`. A line that is only a link
+ * (a category and its parent, as on the source) is the chip itself. A space between the
+ * chips keeps the accessible name "Models Peaq". An h1 without breaks is one chip.
  * @param {Element} h1 the archive heading
  */
 function decorateLabels(h1) {
@@ -15,6 +16,12 @@ function decorateLabels(h1) {
   const labels = lines
     .filter((nodes) => nodes.some((node) => node.textContent.trim()))
     .map((nodes) => {
+      const content = nodes
+        .filter((node) => node.nodeType !== Node.TEXT_NODE || node.textContent.trim());
+      if (content.length === 1 && content[0].nodeName === 'A') {
+        content[0].classList.add('hero-image-label');
+        return content[0];
+      }
       const label = document.createElement('span');
       label.className = 'hero-image-label';
       label.append(...nodes);

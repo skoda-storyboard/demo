@@ -132,12 +132,31 @@ test('archive hero → Hero Image (archive): banner row + h1 with one line per l
 
 test('archive hero without a banner keeps an empty image row (the empty band)', { skip }, () => {
   const doc = page('', `<div class="hero"><div class="hero-image"></div>
-    <div class="hero-caption"><div class="container"><span class="category"><a class="label" href="/en/category/design-eng/">Design &amp; Engineering</a></span></div></div></div>`);
+    <div class="hero-caption"><div class="container"><span class="category"><a class="label" href="/en/category/design-eng/">Design</a></span></div></div></div>`);
   archiveHero(doc.querySelector('.hero'), { document: doc });
   const table = doc.querySelector('table');
-  assert.deepEqual(rows(table), [['Hero Image (archive)'], [''], ['Design & Engineering']]);
+  assert.deepEqual(rows(table), [['Hero Image (archive)'], [''], ['Design']]);
+  assert.equal(table.querySelector('h1 > a').getAttribute('href'), '/en/category/design-eng/');
   assert.equal(table.querySelector('img'), null);
   assert.equal(table.querySelector('h1 br'), null);
+});
+
+test('archive hero keeps category labels as links (parent, then term) and equal tag labels', { skip }, () => {
+  const sub = page('', `<div class="hero"><div class="hero-image"><img src="https://cdn.x/people.jpg" alt=""></div>
+    <div class="hero-caption"><div class="container"><span class="category"><a class="label label-default" href="https://www.skoda-storyboard.com/en/category/lifestyle/">Lifestyle</a> <a class="label label-default" href="https://www.skoda-storyboard.com/en/category/lifestyle/people/">People</a></span></div></div></div>`);
+  archiveHero(sub.querySelector('.hero'), { document: sub });
+  const links = [...sub.querySelectorAll('table h1 > a')];
+  assert.deepEqual(links.map((a) => [a.textContent, a.getAttribute('href')]), [
+    ['Lifestyle', 'https://www.skoda-storyboard.com/en/category/lifestyle/'],
+    ['People', 'https://www.skoda-storyboard.com/en/category/lifestyle/people/'],
+  ]);
+  assert.equal(sub.querySelectorAll('table h1 br').length, 1);
+
+  const dup = page('', `<div class="hero"><div class="hero-image"></div>
+    <div class="hero-caption"><div class="container"><span class="category"><span class="label label-secondary">Technology</span> <span class="label label-secondary">Technology</span></span></div></div></div>`);
+  archiveHero(dup.querySelector('.hero'), { document: dup });
+  assert.deepEqual(lines(dup.querySelector('table h1')), ['Technology', 'Technology']);
+  assert.equal(dup.querySelector('table h1 a'), null, 'tag labels are not links');
 });
 
 test('archive hero without labels falls back to the <title> term (site suffix trimmed)', { skip }, () => {

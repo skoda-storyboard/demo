@@ -17,12 +17,24 @@
  */
 export default function parse(element, { document }) {
   const img = element.querySelector('.hero-image img, img');
-  const labels = [...element.querySelectorAll('.hero-caption .label, .hero-caption .category > *')]
-    .map((l) => (l.textContent || '').replace(/\s+/g, ' ').trim())
+  // One entry per source label ELEMENT (both selectors can match the same one). Equal texts
+  // stay: /en/tag/crew/technology shows "Technology" twice. A category label is a link to
+  // its term (parent, then child on a sub-category); a tag label is plain text.
+  const labelEls = [...new Set(element.querySelectorAll('.hero-caption .label, .hero-caption .category > *'))];
+  const lines = labelEls
+    .map((l) => {
+      const text = (l.textContent || '').replace(/\s+/g, ' ').trim();
+      if (!text) return null;
+      const href = l.matches('a[href]') ? l.getAttribute('href') : '';
+      if (!href) return text;
+      const a = document.createElement('a');
+      a.setAttribute('href', href);
+      a.textContent = text;
+      return a;
+    })
     .filter(Boolean);
-  const unique = labels.filter((l, i) => labels.indexOf(l) === i);
   const docTitle = (document.title || '').replace(/\s+[-–|]\s+Škoda Storyboard\s*$/, '').trim();
-  const lines = unique.length ? unique : [docTitle].filter(Boolean);
+  if (!lines.length && docTitle) lines.push(docTitle);
 
   if (!img && !lines.length) {
     element.replaceWith(...element.childNodes);

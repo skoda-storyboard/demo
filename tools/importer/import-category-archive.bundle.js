@@ -44,10 +44,19 @@ var CustomImportScript = (() => {
   // tools/importer/parsers/archive-hero.js
   function parse(element, { document: document2 }) {
     const img = element.querySelector(".hero-image img, img");
-    const labels = [...element.querySelectorAll(".hero-caption .label, .hero-caption .category > *")].map((l) => (l.textContent || "").replace(/\s+/g, " ").trim()).filter(Boolean);
-    const unique = labels.filter((l, i) => labels.indexOf(l) === i);
+    const labelEls = [...new Set(element.querySelectorAll(".hero-caption .label, .hero-caption .category > *"))];
+    const lines = labelEls.map((l) => {
+      const text = (l.textContent || "").replace(/\s+/g, " ").trim();
+      if (!text) return null;
+      const href = l.matches("a[href]") ? l.getAttribute("href") : "";
+      if (!href) return text;
+      const a = document2.createElement("a");
+      a.setAttribute("href", href);
+      a.textContent = text;
+      return a;
+    }).filter(Boolean);
     const docTitle = (document2.title || "").replace(/\s+[-–|]\s+Škoda Storyboard\s*$/, "").trim();
-    const lines = unique.length ? unique : [docTitle].filter(Boolean);
+    if (!lines.length && docTitle) lines.push(docTitle);
     if (!img && !lines.length) {
       element.replaceWith(...element.childNodes);
       return;

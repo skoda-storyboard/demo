@@ -4,8 +4,8 @@
 - **Phase:** A · **Milestone:** M1 (demo)
 - **GitHub issue:** [#196](https://github.com/skoda-storyboard/demo/issues/196)
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–5d *(planning estimate, not a quote; excludes the SKODA-826 gutter work)*
-- **Status (2026-10-05):** 🟡 In review. Implemented on `skoda-828-hero-parity` (local, not yet pushed); DA push of the
-  41 archive pages and 6 stories pending (after merge, decision 2026-10-05). See Implementation notes.
+- **Status (2026-10-05):** 🟡 In review. Implemented on `skoda-828-hero-parity` (pushed, no PR yet); DA push of the
+  41 archive pages and 6 stories pending. See Implementation notes.
 
 > **Ownership (2026-09-28).** This ticket is the single owner of the hero **UI** (rendered box, type, position,
 > responsive and ultrawide behaviour) for press kits, model pages and category/tag archives. The hero acceptance
@@ -224,6 +224,15 @@ the 1248 column like the source (x106).
 | F5 story meta | chip `margin-block: -1px -2px` (not −3/−7: the source chip starts 1px above the date line; −3/−7 would leave it 1.5px off) | Epiq hero 755.63 at 1440/1080, 585.55 at 768, 486.08 at 375, date and chip offsets equal to the source to 0.01px |
 | F6 hero masters | cause: the masters are 19–26 MB, so `pickIngestUrl` steps down, but its named 3:2 guesses (`-2560x1707`) miss the real `-2560x1708` copies and fell to `-768x512`; the two `.JPG` masters are private (403) so the 1440 page reference was kept. Fix: `story-hero.js` takes the largest `srcset` copy ≤2560w; `pickIngestUrl` tries the page's own `-WxH` alongside the ladder; `build-media-manifest` no longer drops `steps.publish` on a delivery-only rebuild | the 6 heroes now deliver `-2560x1708`/`-2560x1707`; forced rebuild of their 100 images: 100 done, 20 delivery upgrades, 17 partial→done, no DAM/publish state lost |
 | F7 no-hero kit | the RS 245 kit has no body column (source press-release template): its header section takes the 2/3 column from 768 and its lead image the article 16:9 crop | h1 26/32.5/600 `#0a0a0a` (28/35 ≤768) as before; lead 812×457 at 1440/1280, 492×277 at 768, 355×200 at 375, text column 812: equal to the source's visible image box |
+
+**Review fix (2026-10-05, archive variants).** All 41 live term heroes surveyed: top-level category (1 link chip to
+itself), sub-category (2 link chips: parent, then itself), tag with and without a banner (2 text chips), and a category
+without a banner (`design-eng`). The parser had flattened category chips to text and dropped equal labels
+(`tag/crew/technology` shows "Technology" twice). Now: category chips are links (site-relative), equal labels stay,
+chips are 2.75px apart (one 16px space, as the source's inline gap; was 3px), hover underline as on the source, and a
+visible `:focus-visible` ring (the source drops the outline: deliberate a11y deviation). 7 pages covering every variant
+× 375/576/768/1280/1440/3840: chip tag, text, x (0.1px), y and width equal to the source, 42/42. The branch preview only
+shows this once the re-imported archive pages are pushed to DA (it still serves the old plain-content shape).
 
 **Acceptance criteria corrected by measurement (source is the reference):**
 - F1 "at 375 and 768": the source switches to the overlay at **768**; the dark caption below the image is ≤767. At exactly

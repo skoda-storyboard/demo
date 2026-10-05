@@ -111,6 +111,22 @@ test('archive renders the band and turns the h1 lines into label chips', () => {
   assert.equal(h1.querySelector('br'), null);
 });
 
+test('archive link lines become link chips; the accessible name keeps the space', () => {
+  const archive = block('archive', `
+    <div><div><picture><img src="/banner.jpg" alt=""></picture></div></div>
+    <div><div><h1><a href="/en/category/lifestyle">Lifestyle</a><br><a href="/en/category/lifestyle/people">People</a></h1></div></div>
+  `);
+  decorate(archive);
+  const h1 = archive.querySelector('h1');
+  const chips = [...h1.querySelectorAll('.hero-image-label')];
+  assert.deepEqual(chips.map((c) => [c.tagName, c.textContent, c.getAttribute('href')]), [
+    ['A', 'Lifestyle', '/en/category/lifestyle'],
+    ['A', 'People', '/en/category/lifestyle/people'],
+  ]);
+  assert.equal(h1.textContent, 'Lifestyle People');
+  assert.equal(h1.querySelector('span'), null, 'a link line is not wrapped again');
+});
+
 test('archive without a banner keeps an empty band; an h1 without breaks is one chip', () => {
   const archive = block('archive', `
     <div><div></div></div>

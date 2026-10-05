@@ -219,10 +219,12 @@
  * ARCHIVE VARIANT (SKODA-828 F3) — the category/tag term band, measured on
  * /en/tag/model/peaq: full bleed, 184/224/240px, the image covering it (no
  * scrim) or an empty band; the term h1 as grey label chips on the bottom-left
- * of the column (+8px), 3px apart. The source has no h1, so ours carries it.
+ * of the column (+8px), 2.75px apart; category chips link to their term. The
+ * source has no h1, so ours carries it.
  * ========================================================================== */
 .hero-image.archive {
-  --hero-archive-label-gap: 3px;
+  /* the source's inline space between labels: one 16px SKODA Next space, 2.75px */
+  --hero-archive-label-gap: 2.75px;
 
   gap: 0;
 }
@@ -267,7 +269,19 @@
   color: var(--skoda-white);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tag-letter-spacing);
+  text-decoration: none;
   text-transform: uppercase;
+}
+
+/* category chips link to their term: underline on hover as on the source; the source drops
+   the focus outline, ours keeps a visible ring (css-guidelines §8) */
+.hero-image.archive a.hero-image-label:hover {
+  text-decoration: underline;
+}
+
+.hero-image.archive a.hero-image-label:focus-visible {
+  outline: 2px solid var(--skoda-white);
+  outline-offset: 2px;
 }
 
 /* the band steps up at 576 / 768 */
