@@ -173,6 +173,100 @@ export function facetsFromPostClass(postClass) {
   return { tags, byFacet };
 }
 
+/*
+ * The English WordPress category tree, child slug → parent slug (root categories have no
+ * entry). Generated from /wp-json/wp/v2/categories by build-category-parents.mjs; the
+ * transformer (skoda-metadata.js) carries the same inline copy (a test asserts they match).
+ */
+// BEGIN GENERATED CATEGORY PARENTS (build-category-parents.mjs; do not edit by hand)
+export const CATEGORY_PARENTS = {
+  '120-years-of-skoda-motorsport': 'motorsport',
+  adventures: 'lifestyle',
+  'annual-reports': 'media',
+  citigo: 'models',
+  connectivity: 'innovation-and-technology',
+  cycling: 'sports',
+  design: 'skoda-world',
+  elroq: 'models',
+  enyaq: 'models',
+  'enyaq-coupe-rs-iv': 'models',
+  epiq: 'models',
+  fabia: 'models',
+  heritage: 'skoda-world',
+  hockey: 'sports',
+  'innovation-and-technology': 'skoda-world',
+  kamiq: 'models',
+  'kamiq-china': 'models',
+  karoq: 'models',
+  kodiaq: 'models',
+  kushaq: 'models',
+  kylaq: 'models',
+  livestream: 'media',
+  motorsport: 'lifestyle',
+  octavia: 'models',
+  'octavia-combi': 'models',
+  'octavia-combi-greenline': 'models',
+  'octavia-combi-rs': 'models',
+  'octavia-greenline': 'models',
+  'octavia-rs': 'models',
+  'octavia-scout': 'models',
+  other: 'media',
+  'peaq-en': 'models',
+  people: 'lifestyle',
+  rapid: 'models',
+  'rapid-spaceback': 'models',
+  responsibility: 'skoda-world',
+  scala: 'models',
+  slavia: 'models',
+  speeches: 'media',
+  sports: 'lifestyle',
+  superb: 'models',
+  'superb-combi': 'models',
+  'technical-data': 'media',
+  technology: 'innovation-and-technology',
+  yeti: 'models',
+  'yeti-outdoor': 'models',
+};
+// END GENERATED CATEGORY PARENTS
+
+/** The `category-<slug>` tokens of a post class list, lowercase, de-duped, in class order. */
+export function categoriesFromPostClass(postClass) {
+  const out = [];
+  String(postClass || '').split(/\s+/).forEach((token) => {
+    const m = token.toLowerCase().match(/^category-([a-z0-9_-]+)$/);
+    if (m && !out.includes(m[1])) out.push(m[1]);
+  });
+  return out;
+}
+
+/**
+ * A story's categories with every ancestor (source category archives list their
+ * descendants' stories too): each slug, then its parent chain, de-duped, first-seen order.
+ * Unknown slugs are kept as they are (a root, or a category the tree doesn't have yet).
+ */
+export function withCategoryAncestors(slugs, parents = CATEGORY_PARENTS) {
+  const out = [];
+  (slugs || []).forEach((slug) => {
+    let s = slug;
+    while (s && !out.includes(s)) {
+      out.push(s);
+      s = parents[s];
+    }
+  });
+  return out;
+}
+
+/**
+ * The `categories` metadata of a story (SKODA-831): the category-<slug> classes of the
+ * page's own post <article class="post-<postid> …"> (postid from the body's `postid-N`)
+ * plus their ancestors. Story pages only: '' for any other template or when the post
+ * article is missing. Comma-joined like the facets (a plain name= meta, not split).
+ */
+export function pickCategories({ template = '', postClass = '' } = {}, parents = CATEGORY_PARENTS) {
+  if (template !== 'story') return '';
+  return withCategoryAncestors(categoriesFromPostClass(postClass), parents).join(', ');
+}
+
 /**
  * Group a list of tag hrefs into { tags:[slug,…], byFacet:{ taxonomy:[slug,…] } },
  * de-duped, order-preserving.
@@ -205,7 +299,7 @@ export function splitList(value) {
  */
 export function buildMetaFields({
   title = '', description = '', publisheddate = '', template = '', category = '',
-  derived = { tags: [], byFacet: {} }, overrides = {},
+  categories = '', derived = { tags: [], byFacet: {} }, overrides = {},
 } = {}) {
   const meta = {};
   if (cleanTitle(title)) meta.Title = cleanTitle(title);
@@ -216,6 +310,8 @@ export function buildMetaFields({
   // press-kit chapter/resource child → its hub path (SKODA-805b); not a rail template
   if (overrides.presskit) meta.presskit = overrides.presskit;
   if (category) meta.category = category;
+  // story: its WP categories + ancestors, for the category archives (pickCategories, SKODA-831)
+  if (categories) meta.categories = categories;
 
   const facetValues = {};
   FACETS.forEach((f) => {

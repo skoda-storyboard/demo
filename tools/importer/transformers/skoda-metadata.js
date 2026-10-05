@@ -139,6 +139,85 @@ function extractCategory(url) {
   return '';
 }
 
+/*
+ * The English WordPress category tree, child slug → parent slug (root categories have no
+ * entry), from /wp-json/wp/v2/categories. Mirror of skoda-metadata-extract.mjs
+ * CATEGORY_PARENTS; both are written by build-category-parents.mjs (a test asserts they match).
+ */
+// BEGIN GENERATED CATEGORY PARENTS (build-category-parents.mjs; do not edit by hand)
+const CATEGORY_PARENTS = {
+  '120-years-of-skoda-motorsport': 'motorsport',
+  adventures: 'lifestyle',
+  'annual-reports': 'media',
+  citigo: 'models',
+  connectivity: 'innovation-and-technology',
+  cycling: 'sports',
+  design: 'skoda-world',
+  elroq: 'models',
+  enyaq: 'models',
+  'enyaq-coupe-rs-iv': 'models',
+  epiq: 'models',
+  fabia: 'models',
+  heritage: 'skoda-world',
+  hockey: 'sports',
+  'innovation-and-technology': 'skoda-world',
+  kamiq: 'models',
+  'kamiq-china': 'models',
+  karoq: 'models',
+  kodiaq: 'models',
+  kushaq: 'models',
+  kylaq: 'models',
+  livestream: 'media',
+  motorsport: 'lifestyle',
+  octavia: 'models',
+  'octavia-combi': 'models',
+  'octavia-combi-greenline': 'models',
+  'octavia-combi-rs': 'models',
+  'octavia-greenline': 'models',
+  'octavia-rs': 'models',
+  'octavia-scout': 'models',
+  other: 'media',
+  'peaq-en': 'models',
+  people: 'lifestyle',
+  rapid: 'models',
+  'rapid-spaceback': 'models',
+  responsibility: 'skoda-world',
+  scala: 'models',
+  slavia: 'models',
+  speeches: 'media',
+  sports: 'lifestyle',
+  superb: 'models',
+  'superb-combi': 'models',
+  'technical-data': 'media',
+  technology: 'innovation-and-technology',
+  yeti: 'models',
+  'yeti-outdoor': 'models',
+};
+// END GENERATED CATEGORY PARENTS
+
+/**
+ * `categories` (SKODA-831): the category-<slug> classes of the page's own post
+ * <article class="post-<postid> …"> (postid from the body's `postid-N`), each followed by
+ * its ancestors, de-duped. A source category archive lists its descendants' stories, so
+ * the design story is also in skoda-world. Story pages only (the caller gates on template).
+ * Keep in sync with skoda-metadata-extract.mjs::pickCategories.
+ */
+function extractCategories(document) {
+  const cls = (document.body && document.body.getAttribute('class')) || '';
+  const id = cls.match(/\bpostid-(\d+)\b/);
+  const post = id && document.querySelector(`article.post-${id[1]}`);
+  const out = [];
+  String((post && post.getAttribute('class')) || '').split(/\s+/).forEach((token) => {
+    const m = token.toLowerCase().match(/^category-([a-z0-9_-]+)$/);
+    let slug = m && m[1];
+    while (slug && !out.includes(slug)) {
+      out.push(slug);
+      slug = CATEGORY_PARENTS[slug];
+    }
+  });
+  return out;
+}
+
 /**
  * Tags + per-facet values from the entry-tags row links. Handles both measured
  * href shapes (docs/ui-specs/tags.md):
@@ -281,6 +360,9 @@ export default function transform(hookName, element, payload) {
   // press-kit chapter/resource child → its hub path (SKODA-805b); not a rail template
   if (overrides.presskit) meta.presskit = overrides.presskit;
   if (category) meta.category = category;
+  // story: its WP categories + ancestors, for the category archives (SKODA-831)
+  const categories = template === 'story' ? extractCategories(document) : [];
+  if (categories.length) meta.categories = categories.join(', ');
 
   // tags = derived ∪ override (comma-joined → AEM splits into article:tag metas).
   const allTags = [...new Set([...derivedTags, ...splitList(overrides.tags)])];
