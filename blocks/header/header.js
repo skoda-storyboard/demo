@@ -2,6 +2,9 @@ import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 import attachSuggest from '../../scripts/search-suggest.js';
 import { hrefPath, pickActiveTab } from './header-switcher.js';
+import {
+  buildLocaleList, currentLocale, isLocaleGroup, localeEntries,
+} from './header-locales.js';
 
 // desktop >= 1080px per source ladder (SKODA-301); below is the drawer band (SKODA-302)
 const isDesktop = window.matchMedia('(min-width: 1080px)');
@@ -332,15 +335,28 @@ export default async function decorate(block) {
       mail.className = 'icon icon-mail';
       subscribeLink.prepend(mail);
     }
-    // The topbar (incl. the locale switcher) is lifted OUT of <nav>, so it can't
-    // appear inside the mobile drawer. Clone the locale group into a drawer
-    // footer so the language list shows at the bottom on mobile (CSS shows it
-    // only in the open drawer; the original stays in the topbar for desktop).
-    const localeGroup = [...navTopbar.querySelectorAll(':scope .default-content-wrapper > p')]
-      .find((p) => p.querySelector('strong'));
-    if (localeGroup) {
-      const localeFooter = localeGroup.cloneNode(true);
+    // Language switcher (SKODA-303): the authored locale paragraph becomes a labelled list
+    // with the page's locale (from the URL) as the current one (header-locales.js). The
+    // topbar is lifted OUT of <nav>, so it can't appear inside the mobile drawer: a copy of
+    // the list goes into a drawer footer (CSS shows it only in the open drawer; the topbar
+    // one is the desktop instance).
+    const base = window.location.href;
+    const localeGroup = [...utility].find((p) => isLocaleGroup(p, base));
+    const locales = localeGroup && buildLocaleList(
+      localeEntries(localeGroup, base),
+      currentLocale(window.location.pathname),
+      document,
+      window.location.pathname, // each locale links this page in that locale
+    );
+    if (locales) {
+      // a list can't live in a <p>: the group becomes a <div> in the same place
+      const group = document.createElement('div');
+      group.className = 'nav-topbar-utility nav-topbar-locales';
+      group.append(locales);
+      localeGroup.replaceWith(group);
+      const localeFooter = document.createElement('div');
       localeFooter.className = 'nav-locales';
+      localeFooter.append(locales.cloneNode(true));
       nav.append(localeFooter);
     }
   }

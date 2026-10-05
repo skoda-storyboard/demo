@@ -134,15 +134,54 @@ header .nav-topbar .nav-subscribe .icon-mail img {
   height: 16px;
 }
 
-header .nav-topbar .nav-topbar-utility strong {
-  color: var(--skoda-ink);
-  font-weight: var(--weight-bold);
+/* --- Language switcher (SKODA-303, language-switcher.md): inline locale links, the page's
+   locale as bold ink text; the same list in the topbar (>= 1080) and the drawer footer.
+   Links use --skoda-grey-700: 5.45:1 on the #e6e6e6 bar, 6.03 on the Media Room #f1f1f1,
+   6.81 on the white drawer. The source #7c7d7e is 3.3:1 there, failing AA.
+   Topbar: 12/18, links 300, 12px apart (source .topbar .lang-links). ---------------- */
+header .nav-locales-list {
+  --nav-locale-gap: 12px;
+
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  line-height: 1.5;
+  text-transform: uppercase;
 }
 
-/* locale switcher: gap between each locale (spec: .lang-links > * + *) */
-header .nav-topbar .nav-topbar-utility strong + a,
-header .nav-topbar .nav-topbar-utility a + a {
-  margin-left: 0.5em;
+header .nav-locales-list li {
+  margin: 0;
+}
+
+/* each locale is its own line box, as the source's flex children: inline on one baseline,
+   the bold and light faces' different metrics grow the row to 19px (18 on the source) */
+header .nav-locales-list li > :is(a, span) {
+  display: block;
+}
+
+header .nav-locales-list li + li {
+  margin-left: var(--nav-locale-gap);
+}
+
+/* :is() matches the Subscribe rule's specificity above, so these win by order */
+header :is(.nav-topbar-locales, .nav-locales) .nav-locales-list a {
+  color: var(--skoda-grey-700);
+  font-weight: var(--weight-light);
+  text-decoration: none;
+}
+
+header :is(.nav-topbar-locales, .nav-locales) .nav-locales-list [aria-current] {
+  color: var(--skoda-ink);
+  font-weight: var(--weight-bold);
+  cursor: default;
+}
+
+/* the source has no focus ring on these links: EDS adds one */
+header :is(.nav-topbar-locales, .nav-locales) .nav-locales-list a:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
 }
 
 header nav[aria-expanded='true'] .nav-topbar-utility {
@@ -550,27 +589,25 @@ header nav .nav-search .search-suggest-meta {
     min-width: 0;
   }
 
-  /* locale switcher pinned flush to the bottom edge of the open drawer, right-aligned */
+  /* language switcher pinned to the bottom of the open drawer, flush right (source .topnav
+     .lang-links: the last item, margin-top auto, padding 0 16 24 24, no rule above it;
+     16/24, every locale 700, 0.32px tracking, 24px apart) */
   header nav[aria-expanded='true'] .nav-locales {
     grid-column: 1 / -1;
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
     justify-content: flex-end;
-    gap: var(--spacing-m);
     margin: auto calc(-1 * var(--spacing-l)) 0;
-    padding: var(--spacing-l);
-    border-top: 1px solid var(--divider-color);
-    font-size: var(--body-font-size-s);
+    padding: 0 var(--spacing-m) var(--spacing-l) var(--spacing-l);
+    font-size: var(--body-font-size-m);
   }
 
-  header nav[aria-expanded='true'] .nav-locales a {
-    color: var(--skoda-grey-500);
-    text-decoration: none;
+  header nav .nav-locales .nav-locales-list {
+    --nav-locale-gap: var(--spacing-l);
+
+    letter-spacing: 0.02rem;
   }
 
-  header nav[aria-expanded='true'] .nav-locales strong {
-    color: var(--skoda-ink);
+  header nav .nav-locales .nav-locales-list a {
     font-weight: var(--weight-bold);
   }
 
@@ -764,10 +801,12 @@ header nav .nav-search .search-suggest-meta {
     overflow: visible;
   }
 
+  /* inner padding = the page gutter (source: 10px inside the 1248 container), so the language
+     switcher ends on the content edge (1254 @1280, 1070 @1080) and the tabs start at 106 @1440 */
   header .nav-topbar .default-content-wrapper {
     gap: var(--spacing-m);
     max-width: var(--content-max-width);
-    padding: 0 var(--spacing-l);
+    padding: 0 var(--page-gutter);
   }
 
   /* Subscribe + locales become visible, flush right (as one group) */
@@ -775,13 +814,15 @@ header nav .nav-search .search-suggest-meta {
     display: block;
   }
 
-  /* push the whole utility group (Subscribe first, then locales) to the right */
-  header .nav-topbar-utility:first-of-type {
+  /* push the whole utility group (Subscribe first, then locales) to the right: the first
+     utility item, whatever its element (the locale group is a <div>, SKODA-303) */
+  header .nav-topbar-utility:not(.nav-topbar-utility ~ .nav-topbar-utility) {
     margin-left: auto;
   }
 
+  /* Subscribe → the language switcher: 30px on the source, the flex gap included */
   header .nav-topbar-utility + .nav-topbar-utility {
-    margin-left: var(--spacing-l);
+    margin-left: calc(30px - var(--spacing-m));
   }
 
   /* switcher shrinks to an auto-width pair at the left of the grey bar */

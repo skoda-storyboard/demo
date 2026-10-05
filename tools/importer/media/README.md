@@ -23,6 +23,40 @@ The feed document (`en/media-feed`) is the referencing page; the item's listing 
 (`en/images`, `en/videos`, `en/assets`) owns the DAM folder unless a page already does.
 `--push` fails while any feed URL has no manifest row (`feedCoverageGaps`).
 
+**Media Bus thumbnails.** `--push` then puts the card thumbnails (`image`) on the Media Bus through
+carrier documents, `/en/fragments/media-feed-images[-N]` (150 images each, under html2md's
+200-image limit; `/en/fragments/**` is outside the query index). One `<img>` per thumbnail with
+`alt` = its source URL; after the preview the builder reads each carrier's `.plain.html` and
+rewrites `image` to `/en/fragments/media_<hash>.<ext>` (a `media_` path resolves from any folder,
+on `.aem.page` and `.aem.live`). The cards' `createOptimizedPicture` params then resize it.
+Don't edit or unpublish the carriers: the next push regenerates them.
+
+**AEM Assets files.** `--push` also points `original` (the "Original" download, the lightbox
+download and copy link) and `mp4` (the video download) at the published AEM Assets file: the
+`public_url` of the manifest row for that master, only when `steps.dam` and `steps.publish` are
+`done` and `public_verified.url` matches; otherwise it stays on the source URL and the push logs
+the count. A master published by a page import under its `/direct-download/<yyyy>/<mm>/<file>` URL
+is the same file as the feed's CDN URL (`cdnUrl`). The publish host sends
+`content-disposition: attachment`, so a download saves the file. The 1920 rendition and video
+posters stay on the source URLs (the DAM keeps originals only). The manifest gate runs on the
+source URLs first.
+
+**Library source.** `sources.json` `library: ["image"]` adds the whole source image library to
+the feed, kept to the items whose original is published on AEM Assets (2026-10-01: 1,715 of 33,457).
+The builder pages the listing's "load more" endpoint (`ys_ajax_loader`, `query_vars[offset]`) one
+calendar year at a time, because the source search backend serves only the first 10,000 results of
+a query; a year at that window fails the build. Library pages are cached as JSON
+(`library_<type>_<year>-01-01_<offset>_200.json`); detail panels load 4 at a time. Source items whose
+detail panel is empty on every request are recorded in `knownDetailGaps`. A rendition whose file
+name defeats the master match (`X.PNG-353x768.png`) is added to its master row's `seen_urls`.
+
+To move an already-published feed onto the Media Bus and AEM Assets without re-scraping the source:
+
+```bash
+curl -s https://admin.da.live/source/skoda-storyboard/demo/en/media-feed.json -o feed.json
+npm run media-items:build -- --feed feed.json --push --out <dir>
+```
+
 ## PDF/MP4 links (SKODA-503)
 
 PDFs and self-hosted MP4s are **not images**: they are recorded as `document`

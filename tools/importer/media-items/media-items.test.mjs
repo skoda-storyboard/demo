@@ -16,8 +16,11 @@ import {
   feedRow, feedSheet, itemSlug, sourceOrder, FACETS, DETAIL_FIELDS, parseDetailPanel, ajaxNonce,
   detailRequest, parseAssetLinks, assetItem, requiredDetails, detailGaps, unknownGaps,
   feedMediaRefs, feedCoverageGaps,
+  feedThumbnails, carrierDocs, parseCarrier, withMediaBus, CARRIER_MAX,
+  damIndex, damFile, withDamFiles, libraryRequest, librarySlices, libraryNonce,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
+import { logicalId } from '../media/media-lib.mjs';
 
 let JSDOM = null;
 try {
@@ -296,4 +299,132 @@ test('feed media refs: every binary a row serves, with its home folder (manifest
   const covered = { 'row-a': { seen_urls: ['https://i.vimeocdn.com/video/1-d_1280x720.jpg'] } };
   assert.equal(feedCoverageGaps(sheet, { ...covered }).length, 6, 'only the poster is recorded');
   assert.ok(feedCoverageGaps(sheet, rows).length > 0);
+});
+
+test('Media Bus thumbnails: carrier documents, previewed paths, feed rewrite', { skip }, () => {
+  const a = 'https://cdn.skoda-storyboard.com/2026/09/a_b-768x512.jpg';
+  const v = 'https://i.vimeocdn.com/video/1-d_1280x720.jpg';
+  const sheet = {
+    total: 3,
+    data: [
+      { id: '1', template: 'image', image: a },
+      {
+        id: '2', template: 'video', image: v, poster: v,
+      },
+      { id: '3', template: 'image', image: a },
+    ],
+  };
+  assert.deepEqual(feedThumbnails(sheet), [a, v], 'deduplicated, in feed order');
+
+  const docs = carrierDocs(feedThumbnails(sheet));
+  assert.deepEqual(docs.map((d) => d.path), ['en/fragments/media-feed-images']);
+  const carrier = new JSDOM(docs[0].html).window.document;
+  assert.deepEqual([...carrier.querySelectorAll('main img')].map((i) => [i.getAttribute('src'), i.alt]), [[a, a], [v, v]]);
+  const many = Array.from({ length: CARRIER_MAX + 1 }, (_, i) => `https://cdn.skoda-storyboard.com/${i}.jpg`);
+  assert.deepEqual(carrierDocs(many).map((d) => [d.path, d.urls.length]), [
+    ['en/fragments/media-feed-images', CARRIER_MAX], ['en/fragments/media-feed-images-2', 1],
+  ]);
+
+  // the previewed .plain.html: ingested images become ./media_<hash>; one was not ingested
+  const plain = new JSDOM(`<div><p><picture><img src="./media_13c4b0.jpg?width=750&amp;format=jpg&amp;optimize=medium" alt="${a}"></picture></p>
+    <p><img src="${v}" alt="${v}"></p></div>`).window.document;
+  const map = parseCarrier(plain, docs[0].path);
+  assert.deepEqual([...map], [[a, '/en/fragments/media_13c4b0.jpg']]);
+
+  const bus = withMediaBus(sheet, map);
+  assert.deepEqual(bus.sheet.data.map((r) => r.image), ['/en/fragments/media_13c4b0.jpg', v, '/en/fragments/media_13c4b0.jpg']);
+  assert.deepEqual(bus.missing, [v]);
+  assert.equal(bus.sheet.data[1].poster, v, 'the poster stays on its source URL');
+  assert.equal(sheet.data[0].image, a, 'the input sheet is not mutated');
+  // the manifest gate still sees the source binaries (Media Bus paths are not refs)
+  assert.deepEqual(feedMediaRefs(bus.sheet).map((r) => r.field), ['poster']);
+});
+
+test('DAM files: original + MP4 point at the published, verified AEM Assets URL', () => {
+  const master = 'https://cdn.skoda-storyboard.com/2026/09/a_b.jpg';
+  const pending = 'https://cdn.skoda-storyboard.com/2026/09/c_d.jpg';
+  const pub = 'https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/images/a-b/a_b.jpg';
+  // an MP4 a press-kit import published under its /direct-download/ URL; the feed has the CDN URL
+  const mp4 = 'https://cdn.skoda-storyboard.com/2026/03/Drive_4a806aa2.mp4';
+  const mp4Pub = 'https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/x/Drive_4a806aa2.mp4';
+  const done = { dam: 'done', publish: 'done' };
+  const rows = {
+    [logicalId(master)]: {
+      master_url: master,
+      seen_urls: [master, 'https://cdn.skoda-storyboard.com/2026/09/a_b-768x512.jpg'],
+      steps: done,
+      public_url: pub,
+      public_verified: { url: pub, mime: 'image/jpeg', bytes: 10 },
+    },
+    // uploaded but not published: stays on the source
+    [logicalId(pending)]: {
+      master_url: pending, seen_urls: [pending], steps: { dam: 'done', publish: 'pending' }, public_url: '',
+    },
+    'kit__Drive_4a806aa2.mp4': {
+      master_url: 'https://www.skoda-storyboard.com/direct-download/2026/03/Drive_4a806aa2.mp4',
+      steps: done,
+      public_url: mp4Pub,
+      public_verified: { url: mp4Pub, mime: 'video/mp4', bytes: 20 },
+    },
+    // the feed's own CDN-URL row for the same MP4, not uploaded
+    [logicalId(mp4)]: { master_url: mp4, steps: { dam: 'n/a', publish: 'pending' }, public_url: '' },
+  };
+  const index = damIndex(rows);
+  assert.equal(damFile(master, index), pub);
+  assert.equal(damFile(pending, index), '');
+  assert.equal(damFile(mp4, index), mp4Pub, '/direct-download/ and the CDN path are one file');
+  assert.equal(damFile('https://cdn.skoda-storyboard.com/2026/09/a_b-1920x1280.jpg', index), '', 'a rendition never maps to the original');
+  assert.equal(damFile(master, damIndex({
+    [logicalId(master)]: { ...rows[logicalId(master)], public_verified: null },
+  })), '', 'unverified public URL');
+
+  const sheet = {
+    data: [
+      {
+        id: '1', template: 'image', original: master, 'rendition-1920': 'https://cdn.skoda-storyboard.com/2026/09/a_b-1920x1280.jpg', mp4: '',
+      },
+      { id: '2', template: 'image', original: pending },
+      {
+        id: '3', template: 'video', original: '', mp4, poster: 'https://i.vimeocdn.com/video/1-d_1280x720.jpg',
+      },
+      { id: '4', template: 'video', mp4: 'https://cdn.skoda-storyboard.com/2026/03/other.mp4' },
+    ],
+  };
+  const out = withDamFiles(sheet, rows);
+  assert.deepEqual(out.sheet.data.map((r) => [r.original, r.mp4]), [
+    [pub, ''], [pending, undefined], ['', mp4Pub], [undefined, 'https://cdn.skoda-storyboard.com/2026/03/other.mp4'],
+  ]);
+  assert.equal(out.sheet.data[0]['rendition-1920'], sheet.data[0]['rendition-1920'], 'the 1920 rendition stays');
+  assert.equal(out.sheet.data[2].poster, sheet.data[2].poster, 'the poster stays');
+  assert.deepEqual(out.missing.map((m) => `${m.id} ${m.field}`), ['2 original', '4 mp4']);
+  assert.equal(sheet.data[0].original, master, 'the input sheet is not mutated');
+  // idempotent on a re-push, and the manifest gate accepts the published URLs
+  assert.deepEqual(withDamFiles(out.sheet, rows).sheet.data, out.sheet.data);
+  assert.ok(!feedCoverageGaps(out.sheet, rows).some((g) => g.url === pub || g.url === mp4Pub));
+});
+
+test('library paging: load-more request, year slices, nonce', () => {
+  const { url, body } = libraryRequest({
+    nonce: 'n1', type: 'image', offset: 400, perPage: 200, after: '2021-01-01', before: '2021-12-31',
+  });
+  assert.equal(url, 'https://www.skoda-storyboard.com/wp/wp-admin/admin-ajax.php');
+  const p = new URLSearchParams(body);
+  assert.equal(p.get('action'), 'ys_ajax_loader');
+  assert.equal(p.get('nonce'), 'n1');
+  assert.equal(p.get('query_vars[post_mime_type]'), 'image/*');
+  assert.equal(p.get('query_vars[offset]'), '400');
+  assert.equal(p.get('query_vars[posts_per_page]'), '200');
+  assert.equal(p.get('query_vars[order]'), 'DESC');
+  assert.equal(p.get('query_vars[date_query][0][after]'), '2021-01-01');
+  assert.equal(p.get('query_vars[date_query][0][before]'), '2021-12-31');
+  assert.deepEqual(p.getAll('query_vars[post_status][]'), ['publish', 'inherit']);
+  assert.equal(new URLSearchParams(libraryRequest({
+    nonce: 'n', type: 'video', after: 'a', before: 'b',
+  }).body)
+    .get('query_vars[post_mime_type]'), 'video/*');
+  assert.deepEqual(librarySlices(2024, 2026).map((x) => [x.year, x.after, x.before]), [
+    [2026, '2026-01-01', '2026-12-31'], [2025, '2025-01-01', '2025-12-31'], [2024, '2024-01-01', '2024-12-31'],
+  ]);
+  assert.equal(libraryNonce('<script>var ys_ajax_loader = {"nonce":"fb6b5f0a56"};</script>'), 'fb6b5f0a56');
+  assert.equal(libraryNonce('<script>var skoda_ajax_loader = {"nonce":"x"};</script>'), '');
 });

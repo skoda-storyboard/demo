@@ -32,7 +32,8 @@
  * (the M1 "single-column stacked" behaviour). Full fidelity here means full WIDGET
  * coverage + robustness to arbitrary nesting / very large trees — which this delivers.
  * A genuine multi-column panel-grid (>1 non-empty cell) is preserved inline as a
- * Columns block (that is what the columns block is for), NOT linearized away.
+ * Columns block (that is what the columns block is for), NOT linearized away. Two unequal
+ * cells emit `Columns (split-NN[, portrait-NNN])` (contract columns-split v2, SKODA-225).
  * Exception (SKODA-824): a row with a background colour is a highlight panel and gets its
  * own `body-column, highlight-<variant>` section; see markHighlights() below.
  *
@@ -387,6 +388,65 @@ export function markHighlights(document) {
   return count;
 }
 
+// ---- unequal 2-cell rows (SKODA-225, contract columns-split v2) -------------------
+// SiteOrigin sizes each cell in the page's head CSS (`#pgc-<id> { width:61.8% }`, sometimes
+// `calc(61.8% - …)`), which the cleanup transformers strip, so the importer's `preprocess`
+// calls markCellWidths() on the untouched DOM and emitMultiColumn() reads `data-cell-width`.
+const CELL_WIDTH_ATTR = 'data-cell-width';
+
+/** Tag every builder cell with its CSS width share (a % number). Returns the count. */
+export function markCellWidths(document) {
+  const css = [...document.querySelectorAll('style')].map((s) => s.textContent || '').join('\n');
+  const byId = new Map();
+  for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+    const width = (body.match(/(?:^|;)\s*width\s*:\s*(?:calc\(\s*)?([\d.]+)%/i) || [])[1];
+    if (!width) continue;
+    selectors.split(',').forEach((sel) => {
+      const m = sel.trim().match(/^#(pgc-[\w-]+)$/);
+      if (m) byId.set(m[1], parseFloat(width));
+    });
+  }
+  let count = 0;
+  document.querySelectorAll('.panel-grid-cell[id]').forEach((cell) => {
+    const width = byId.get(cell.id);
+    if (!width) return;
+    cell.setAttribute(CELL_WIDTH_ATTR, String(width));
+    count += 1;
+  });
+  return count;
+}
+
+/**
+ * The `split-NN` variant for a row's two non-empty cells: the first cell's share of the two,
+ * in %, rounded. Null when a width is unknown, the cells are (nearly) equal, or the share is
+ * outside the contract's 10–99.
+ */
+export function splitVariant(cells) {
+  if (cells.length !== 2) return null;
+  const [a, b] = cells.map((c) => parseFloat(c.getAttribute(CELL_WIDTH_ATTR)));
+  if (!(a > 0) || !(b > 0) || Math.abs(a - b) < 2) return null;
+  const share = Math.round((a / (a + b)) * 100);
+  return share >= 10 && share <= 99 ? `split-${share}` : null;
+}
+
+/**
+ * The `portrait-NNN` variant: the authored display width of a cell's single image, when it
+ * is smaller than the file (the source shows `width="235"` portraits of 500px files; DA keeps
+ * only the file's own size). An image whose width is its file width (the largest `srcset`
+ * descriptor, e.g. a sow-image) fills its cell instead: no token.
+ */
+export function portraitVariant(cells) {
+  const imgs = cells.flatMap((c) => [...c.querySelectorAll('img')]);
+  if (imgs.length !== 1) return null;
+  const img = imgs[0];
+  const width = parseInt(img.getAttribute('width'), 10);
+  if (!(width >= 10 && width <= 999)) return null;
+  const descriptors = (img.getAttribute('srcset') || '').match(/\s(\d+)w\b/g) || [];
+  const fileWidth = Math.max(0, ...descriptors.map((d) => parseInt(d, 10)));
+  if (fileWidth && width >= fileWidth) return null;
+  return `portrait-${width}`;
+}
+
 /** Whether readable content follows `node` inside `root` (avoids an empty section). */
 function hasContentAfter(node, root) {
   for (let n = node; n && n !== root; n = n.parentNode) {
@@ -486,16 +546,23 @@ function emitWidget(panel, document, out, stats) {
 // Emit a genuine multi-column grid as a Columns block: one row, one cell per column.
 // createTable takes plain-array cells (a cell = an array of nodes) — NOT an { elems }
 // object (that is the runtime buildBlock format; here it serialises to "[object Object]").
+// Two unequal cells carry their width ratio, and an authored-size image its width, as
+// variants (`Columns (split-62, portrait-235)`, contract columns-split v2, SKODA-225).
 function emitMultiColumn(cells, document, out, stats) {
   const row = [];
+  const filled = [];
   cells.forEach((cell) => {
     const cellOut = [];
     panelsOf(cell).forEach((p) => emitWidget(p, document, cellOut, stats));
-    if (cellOut.length) row.push(cellOut);
+    if (cellOut.length) { row.push(cellOut); filled.push(cell); }
   });
   if (row.length > 1) {
-    out.push(WebImporter.DOMUtils.createTable([['Columns'], row], document));
+    const split = splitVariant(filled);
+    const variants = split ? [split, portraitVariant(filled)].filter(Boolean) : [];
+    const header = variants.length ? `Columns (${variants.join(', ')})` : 'Columns';
+    out.push(WebImporter.DOMUtils.createTable([[header], row], document));
     stats.multiColumn += 1;
+    if (split) stats.split = (stats.split || 0) + 1;
   } else if (row.length === 1) {
     // Only one non-empty column after mapping — linearize (no block needed).
     row[0].forEach((n) => out.push(n));
@@ -569,6 +636,7 @@ export default function parse(element, { document }) {
     widgets: Object.values(stats.byKind).reduce((a, b) => a + b, 0),
     byKind: stats.byKind,
     multiColumn: stats.multiColumn,
+    split: stats.split || 0,
     highlights: stats.highlights,
     deferred: stats.deferred,
     unknown: stats.unknown,
@@ -582,5 +650,5 @@ export default function parse(element, { document }) {
 
 // Exposed for unit/prototype testing (harness-only; ignored by the bundle default).
 export const __test = {
-  classifyWidget, cellsOf, panelsOf, WIDGET_KINDS,
+  classifyWidget, cellsOf, panelsOf, WIDGET_KINDS, splitVariant, portraitVariant,
 };
