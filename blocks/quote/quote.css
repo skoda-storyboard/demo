@@ -51,3 +51,44 @@
 .quote .quote-attribution strong {
   font-weight: var(--weight-semibold);
 }
+
+/* `left` (SKODA-220): the press-kit chapters' WordPress quote, measured on the live Peaq / Epiq
+   chapters at 1440/1080/992/768/390. Left-aligned and without the rule: the browser's opening
+   and closing marks (`quotes: auto`, so in the page language) each sit on their own 24px line
+   (upright, as they belong to the blockquote, not the italic text), the italic paragraphs keep their 20px rhythm, and the name follows in
+   600 italic. Consecutive quotes are one block, one row each, flush as on the source; the block
+   keeps the paragraph gap after it. */
+.quote.left {
+  margin-block-end: var(--paragraph-gap);
+  text-align: start;
+}
+
+.quote.left figure {
+  margin: 0;
+}
+
+.quote.left .quote-text::before,
+.quote.left .quote-text::after {
+  display: block;
+  width: auto;
+  height: auto;
+  margin: 0;
+  background: none;
+  font-style: normal;
+}
+
+.quote.left .quote-text::before {
+  content: open-quote;
+}
+
+.quote.left .quote-text::after {
+  content: close-quote;
+}
+
+.quote.left .quote-text p {
+  margin-block-end: var(--paragraph-gap);
+}
+
+.quote.left .quote-attribution {
+  font-style: italic;
+}
