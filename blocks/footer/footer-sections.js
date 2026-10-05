@@ -146,12 +146,42 @@ function decorateLegal(section) {
 }
 
 /**
+ * Outbound links (the app stores, social networks and the skoda-auto.com legal pages) open in a
+ * new tab, as on the source (SKODA-306). DA keeps no `target`, so it is set here. Same-site
+ * links stay in the tab, and links the link policy already settled when the fragment loaded
+ * (scripts/links.js: live-site links → new tab, demo listings → same site) are left as they are.
+ * @param {Element} footer
+ * @param {string} origin the page origin
+ */
+export function openOutboundLinks(footer, origin) {
+  footer.querySelectorAll('a[href]').forEach((a) => {
+    if (a.getAttribute('target')) return;
+    let url;
+    try {
+      url = new URL(a.getAttribute('href'), origin);
+    } catch (e) {
+      return;
+    }
+    if (!/^https?:$/.test(url.protocol) || url.origin === origin) return;
+    a.setAttribute('target', '_blank');
+    const rel = new Set((a.getAttribute('rel') || '').split(/\s+/).filter(Boolean));
+    rel.add('noopener');
+    rel.add('noreferrer');
+    a.setAttribute('rel', [...rel].join(' '));
+  });
+}
+
+/**
  * Tags and decorates the three authored footer sections, in order: social / middle / legal.
  * The middle section is the Storyboard sitemap, or — when it carries headings — the Media Room
  * widget columns.
  * @param {Element} footer container whose children are the fragment sections
+ * @param {string} [origin] the page origin, for the outbound-link rule
  */
-export default function decorateFooterSections(footer) {
+export default function decorateFooterSections(
+  footer,
+  origin = typeof window !== 'undefined' ? window.location?.origin : '',
+) {
   const [social, middle, legal] = footer.children;
 
   if (social) {
@@ -171,4 +201,6 @@ export default function decorateFooterSections(footer) {
     legal.classList.add('footer-legal');
     decorateLegal(legal);
   }
+
+  if (origin) openOutboundLinks(footer, origin);
 }
