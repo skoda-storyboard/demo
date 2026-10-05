@@ -25,7 +25,6 @@ export const LIVE_ONLY = [
   /^\/en\/contacts(?:\/|$)/i,
   /^\/en\/documents\//i,
   /^\/en\/newsletter-settings(?:\/|$)/i,
-  /^\/en\/media-cart(?:\/|$)/i,
 ];
 
 // Authored chrome paths whose live counterpart has another slug.
@@ -35,9 +34,10 @@ export const LIVE_ALIASES = {
 
 // Demo listing/entry pages that DA chrome (the Media Room nav) and tag chips link to on the
 // live host: they stay on the demo, site-relative, query + hash kept (listing filters).
+// `/en/media-cart` is the demo's own cart page (SKODA-505b): the cart badge links there.
 export const DEMO_LISTINGS = new Set([
   '/en', '/en/media-room', '/en/news', '/en/press-kits', '/en/images', '/en/videos',
-  '/en/series-2', '/en/search',
+  '/en/series-2', '/en/search', '/en/media-cart',
 ]);
 
 /**

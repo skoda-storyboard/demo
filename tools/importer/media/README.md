@@ -219,9 +219,26 @@ which pastes a plain image that also lands in the media bus — same delivery pa
 **B) Media-cart "download original" — DAM asset path is the join key.** The cart
 needs the *original* (not the optimized media-bus copy). The manifest records
 each image's `dam_asset_path` (`/content/dam/storyboard/<page-path>/<file>`);
-`apply` emits `content/media-index.json` — the **cart resolver seam** — mapping
-`logical_id → { dam_asset_path, original_download_url, alt }`. The `media-cart`
-block (SKODA-505) reads this to resolve "download original".
+`apply` emits `content/media-index.json`, mapping
+`logical_id → { dam_asset_path, original_download_url, alt }`. That file only lists rows
+with an `original_download_url`, which only `--da-archive` sets, so it is empty for M1.
+
+**The media cart's served index (SKODA-505a).** `npm run media:cart-index`
+(`build-cart-index.mjs`) turns the manifest's *verified* published originals
+(`public_url` + `public_verified`) into `scripts/media-cart-index.json`. That file is
+committed and served by the code bus, and loaded on the first cart action.
+- It maps every page link the manifest saw (`seen_urls`: `cdn.skoda-storyboard.com/YYYY/MM/…`,
+  `/direct-download/…`) to its DAM original's path, size and type.
+- The format is compact: `{ v, base, mimes, assets[[path, bytes, mime]], keys }`.
+- Keys stay percent-encoded. `-WxH` / `-scaled` derivative keys are left out, because
+  `scripts/media-cart-resolver.js` strips them at lookup.
+- A key claimed by two different files is dropped. The same PDF filed twice maps to the
+  first copy.
+
+**Regenerate after DAM publishes or manifest changes:**
+`npm run media:cart-index`. `npm run media:cart-index -- --check` exits non-zero when the
+committed index is stale. It isn't part of `npm test`, so manifest PRs aren't blocked.
+Links that aren't in the index (unpublished rows) show as unavailable in the cart.
 
 > **Demo-only limitation (accepted for M1):** this route surfaces DAM paths for
 > *migrated* pages only. Production authors picking **new** assets via the native
@@ -267,7 +284,7 @@ original is never replaced by a derivative under the original's DAM path.
 Then **`apply-media-manifest.mjs`** rewrites content `<img src>` →
 `delivery_url`, removes the old WordPress `srcset` ladder so EDS builds its own,
 and rewrites verified PDF/MP4 anchors to their public Assets URLs,
-and emits `content/media-index.json` (the cart resolver). A missing page or
+and emits `content/media-index.json` (see mechanism B). A missing page or
 unresolved image fails the entire requested apply before changing any page;
 the sole exception is a manifest `partial` row explicitly marked
 `no safe delivery rendition`, whose original reference stays intact and is
@@ -511,13 +528,16 @@ Candidate models for surfacing the DAM original for **new** author-picked assets
 - Content-hash reconciliation index (heavier, standard-instance).
 - Author-recorded DAM path in a block field (manual).
 
-Only the resolver seam's *source* changes; the cart block does not.
+Only the resolver seam's *source* changes (`scripts/media-cart-resolver.js` and its
+index); the cart store and controls don't.
 
 ## Files
 
 - `media-lib.mjs` — pure helpers + AEMaaCS uploader + auth loader.
 - `build-media-manifest.mjs` — ingest + manifest builder.
-- `apply-media-manifest.mjs` — content rewrite + cart resolver index.
+- `apply-media-manifest.mjs` — content rewrite + `content/media-index.json`.
+- `build-cart-index.mjs` — the media cart's served index `scripts/media-cart-index.json`
+  (`npm run media:cart-index [-- --check]`; test: `build-cart-index.test.mjs`).
 - `media-lib.test.mjs` — unit + mock-DAM integration tests (`npm run test:media`).
 - `media-manifest.json` — generated manifest (git-tracked; inspectable).
 

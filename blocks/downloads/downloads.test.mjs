@@ -231,3 +231,179 @@ test('mediabox API mode still renders configured images without a file tile', as
     globalThis.fetch = originalFetch;
   }
 });
+
+/* --- media cart (SKODA-505b) ------------------------------------------------------------- */
+const { cartSize, cartThumb, bindCart } = await import('./downloads.js');
+
+test('cartSize picks the original, else the first size; cartThumb keeps this site root-relative', () => {
+  setup();
+  const original = { label: 'Original', href: '/o.jpg' };
+  assert.equal(cartSize([{ label: '1920px', href: '/g.jpg' }, original]), original);
+  assert.equal(cartSize([{ label: 'MP4', href: '/v.mp4' }]).href, '/v.mp4');
+  assert.equal(cartSize([]), null);
+  assert.equal(cartThumb('https://example.com/en/press/media_1.jpg?width=750'), '/en/press/media_1.jpg?width=750');
+  assert.equal(cartThumb('https://cdn.example/x.jpg'), 'https://cdn.example/x.jpg');
+  assert.equal(cartThumb(''), '');
+});
+
+test('each tile gets an inert add toggle for its original next to its download control', async () => {
+  const block = setup();
+  addRow(block, {
+    src: '/media_1.jpg',
+    title: 'Front view',
+    links: [['1920px', 'https://www.skoda-storyboard.com/direct-download/a-1920x1080.jpg'], ['Original', 'https://www.skoda-storyboard.com/direct-download/a.jpg']],
+  });
+  await decorate(block);
+  const actions = block.querySelector('.downloads-actions');
+  const add = actions.querySelector('.downloads-add');
+  assert.equal(actions.firstElementChild, add);
+  assert.ok(actions.querySelector('.downloads-action'));
+  assert.deepEqual([add.type, add.getAttribute('aria-label')], ['button', 'Add to media cart: Front view']);
+  assert.equal(add.dataset.href, 'https://www.skoda-storyboard.com/direct-download/a.jpg');
+  assert.equal(add.dataset.title, 'Front view');
+  assert.match(add.dataset.thumb, /^\/media_1\.jpg/);
+});
+
+test('Media Box: the group toggle sits on the section stats line', async () => {
+  setup();
+  document.body.innerHTML = '<div class="section media-box"><div class="default-content-wrapper"><h2>Media Box</h2><p>2 images</p></div><div class="downloads"></div></div>';
+  document.body.className = 'press-release';
+  const block = document.querySelector('.downloads');
+  addRow(block, { src: '/a.jpg', title: 'A', links: [['Original', 'https://www.skoda-storyboard.com/direct-download/a.jpg']] });
+  await decorate(block);
+  const stats = document.querySelector('.default-content-wrapper p');
+  assert.ok(stats.classList.contains('downloads-stats'));
+  const all = stats.querySelector('.downloads-add-all');
+  assert.deepEqual([all.type, all.getAttribute('aria-label'), all.getAttribute('aria-disabled')], ['button', 'Add all files to the media cart', 'true']);
+});
+
+test('Media Box: intro copy, a linked line or a second block never takes the stats line', async () => {
+  setup();
+  document.body.innerHTML = '<div class="section media-box">'
+    + '<div class="default-content-wrapper"><h2>Media Box</h2><p>Press photos of the new model.</p></div>'
+    + '<div class="downloads-wrapper"><div class="downloads" id="d1"></div></div>'
+    + '<div class="default-content-wrapper"><p>2 images</p></div>'
+    + '<div class="downloads-wrapper"><div class="downloads" id="d2"></div></div>'
+    + '<div class="downloads-wrapper"><div class="downloads" id="d3"></div></div>'
+    + '<div class="default-content-wrapper"><p>See <a href="/en/x">all files</a></p></div>'
+    + '<div class="downloads-wrapper"><div class="downloads" id="d4"></div></div>'
+    + '</div>';
+  document.body.className = 'press-release';
+  const blocks = ['d1', 'd2', 'd3', 'd4'].map((id) => document.getElementById(id));
+  blocks.forEach((b, i) => addRow(b, { src: `/${i}.jpg`, title: `T${i}`, links: [['Original', `https://www.skoda-storyboard.com/direct-download/${i}.jpg`]] }));
+  // position decides: a line counts only when it is the paragraph right before its block
+  const { statsLine } = await import('./downloads.js');
+  assert.equal(statsLine(blocks[2]), null, 'd3 follows another block, not default content');
+  assert.equal(statsLine(blocks[3]), null, 'a line with a link is copy, not stats');
+  await Promise.all(blocks.map((b) => decorate(b)));
+  const stats = document.querySelector('#d2').closest('.section').querySelectorAll('.downloads-stats');
+  assert.equal([...stats].filter((p) => p.textContent.startsWith('2 images')).length, 1);
+  assert.equal(document.querySelectorAll('.downloads-stats .downloads-add-all').length,
+    [...stats].length, 'one group toggle per taken line');
+  assert.ok(blocks[2].querySelector('.downloads-toolbar .downloads-add-all'), 'd3 gets its toolbar');
+  assert.ok(blocks[3].querySelector('.downloads-toolbar .downloads-add-all'), 'd4 gets its toolbar');
+  assert.equal(document.querySelector('a[href="/en/x"]').parentElement.querySelector('.downloads-add-all'), null);
+});
+
+function fakeDownloadsCart(refuse = {}, initial = []) {
+  const inCart = new Set(initial);
+  let listener = () => {};
+  const cart = {
+    calls: [],
+    bindCartControl(el) {
+      el.setAttribute('data-cart-control', '');
+      if (el.dataset.href.includes('gone')) el.setAttribute('aria-disabled', 'true');
+      else el.removeAttribute('aria-disabled');
+    },
+    has: (href) => inCart.has(href),
+    remove(href) {
+      inCart.delete(href);
+      listener();
+    },
+    async addMany(entries) {
+      cart.calls.push(entries);
+      const added = [];
+      const skipped = [];
+      entries.forEach((e) => {
+        if (refuse[e.href]) {
+          skipped.push({ href: e.href, reason: refuse[e.href] });
+          // the store disables the controls of links that don't resolve
+          if (refuse[e.href] === 'unresolved') {
+            document.querySelectorAll(`[data-href="${e.href}"]`)
+              .forEach((el) => el.setAttribute('aria-disabled', 'true'));
+          }
+        } else {
+          inCart.add(e.href);
+          added.push(e);
+        }
+      });
+      listener();
+      return { added, skipped };
+    },
+    onChange(cb) { listener = cb; },
+  };
+  return cart;
+}
+
+function groupBlock(hrefs) {
+  setup();
+  const block = document.querySelector('.downloads');
+  block.innerHTML = hrefs.map((h) => `<button class="downloads-add" data-href="${h}" data-title="T ${h}" data-thumb="/t/${h}.jpg" aria-disabled="true"></button>`).join('');
+  const all = document.createElement('button');
+  all.className = 'downloads-add downloads-add-all';
+  all.setAttribute('aria-disabled', 'true');
+  block.before(all);
+  return { block, all };
+}
+
+const settle = () => new Promise((r) => { setTimeout(r, 0); });
+
+test('group toggle: adds the missing originals in one go, then removes them all', async () => {
+  const { block, all } = groupBlock(['a', 'b', 'gone']);
+  const cart = fakeDownloadsCart({}, ['a']);
+  const ui = await import('../../scripts/media-cart-ui.js');
+  await bindCart(block, all, async () => [cart, ui, { fetchPlaceholders: async () => ({}) }]);
+  assert.equal(all.hasAttribute('aria-disabled'), false);
+  assert.equal(all.getAttribute('aria-pressed'), 'false');
+  assert.ok(all.hasAttribute('data-wired'));
+
+  all.click();
+  await settle();
+  assert.deepEqual(cart.calls[0], [{ href: 'b', title: 'T b', thumb: '/t/b.jpg' }], 'only what is missing, never the unavailable tile');
+  assert.equal(all.getAttribute('aria-pressed'), 'true');
+  assert.ok(all.hasAttribute('data-in-cart'));
+  assert.equal(all.getAttribute('aria-label'), 'Add all files to the media cart', 'a toggle keeps its name');
+
+  all.click();
+  await settle();
+  assert.deepEqual([cart.has('a'), cart.has('b')], [false, false]);
+  assert.equal(all.getAttribute('aria-pressed'), 'false');
+  assert.equal(all.getAttribute('aria-label'), 'Add all files to the media cart');
+});
+
+test('group toggle: pressed once everything is in; a refused add names the reason', async () => {
+  const { block, all } = groupBlock(['a', 'b']);
+  const cart = fakeDownloadsCart({ b: 'limit-items' });
+  const ui = await import('../../scripts/media-cart-ui.js');
+  await bindCart(block, all, async () => [cart, ui, { fetchPlaceholders: async () => ({}) }]);
+  all.click();
+  await settle();
+  const notice = document.querySelector('.media-cart-notice');
+  assert.ok(notice && !notice.hidden);
+  assert.match(notice.textContent, /^Added 1 of 2 files to the media cart\. Your download package is full/);
+  assert.equal(all.getAttribute('aria-pressed'), 'false', 'not everything is in');
+  assert.equal(all.hasAttribute('aria-busy'), false);
+});
+
+test('group toggle: counts the files that can\'t be added, then counts as complete', async () => {
+  const { block, all } = groupBlock(['a', 'x', 'y']);
+  const cart = fakeDownloadsCart({ x: 'unresolved', y: 'unresolved' });
+  const ui = await import('../../scripts/media-cart-ui.js');
+  await bindCart(block, all, async () => [cart, ui, { fetchPlaceholders: async () => ({}) }]);
+  all.click();
+  await settle();
+  const notice = document.querySelector('.media-cart-notice');
+  assert.equal(notice.querySelector('[role="alert"]').textContent, 'Added 1 of 3 files to the media cart. 2 files can\'t be added to the media cart.');
+  assert.equal(all.getAttribute('aria-pressed'), 'true', 'everything that can be added is in');
+  assert.equal(all.getAttribute('aria-label'), 'Add all files to the media cart', 'a toggle keeps its name');
+});

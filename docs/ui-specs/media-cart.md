@@ -120,10 +120,18 @@ component captured across [`social-share.md`](social-share.md) + this spec + scr
 - **Cart page grouping:** items are grouped by media type (e.g. an "Images" group heading); each item
   reuses the listing tile (`.media-cart-item.search-results-item`). "Your packages" (`data-action=showHistory`)
   opens saved/previous packages, a package-history feature, confirm scope with the technical team.
+- **Measured 2026-09-30 at 1200 (for 505b):** action pills `#78faae`, radius `32px`, padding `16px 32px`,
+  weight `500` 16px, height `53px`, gap `8px` (label `.85em`, icon `1.3em`; icon-only below 768). Group
+  title `h3` 600 `26px/32.5px`, margin-bottom `20px`. Cards `280px` wide, 4 per row (20px apart); thumb
+  16:9 radius `8px`; date `16px/24px`, padding `10px 0`; title `15px/18px`. Remove pill "Original":
+  `2px` ink ring, radius `50px`, padding `14px 24px`, height `48px`. Empty: "No downloads" `32px/48px`
+  `#ccc`, margin `64px`. Limit banner (media-cart-limit 1.0.4): padding `14px 18px 14px 46px`, bg
+  `#f1f1f1`, `4px` `#0e3a2f` start border, `14px/1.45`; limit popup max `420px`, padding
+  `36px 32px 30px`, radius `8px`, shadow `0 18px 50px rgb(0 0 0 /.25)`.
 
 ## 4. Responsive behavior
 
-- Floating cart badge is fixed size (`58px` icon, `24px` count) at all bands.
+- Floating cart badge is `58px` at >= 992 and `40px` below (measured 2026-10-01 at 1080 and 390), `24px` count at all bands. With an empty cart it is not shown (its slot collapses under the scroll-top button).
 - Add affordance is fixed `40x40` at all bands (icon button).
 - Cart page: the `25%` sidebar (panel context) collapses to full-width above the item list on narrow
   viewports (source uses the `.media-cart:not(body)` float rule for the in-page 4-col context; the
@@ -148,6 +156,9 @@ component captured across [`social-share.md`](social-share.md) + this spec + scr
 - **Cart action buttons:** `mr-media-cart-button` hover -> bg `#78faae`, color `#fff`.
 - **Limit:** `skoda-media-cart-limit` is a JS config value; **no visual limit indicator / "cart full"
   message found in the CSS**, flag to design (recommend a count "N / limit" + a disabled-add state).
+  The live site's `media-cart-limit` plugin does add an info banner above the media grids and a
+  centred popup when an add would pass the limit (measured in §3). 505b builds both, and adds the
+  count "n / 80 files · size" on the cart page.
 
 ## 6. Accessibility
 
@@ -169,6 +180,32 @@ toolbars. Cart state in `localStorage` for guests (id + size per item); a small 
 `add/remove/list/clear` + a `cart:change` event that updates the floating cart badge `data-count` and any
 `.in-cart` markers. "Download package" calls the packaging endpoint. Reuse `cards-toolbar` for the
 affordance row and card-teaser markup for cart item rows.
+
+**Built in SKODA-505a (#50), the logic half.** `/scripts/media-cart.js` is the store and
+binding. It exposes `add`, `addMany`, `remove`, `has`, `clear` and `getCart`,
+`onChange` / `media-cart:change`, and `download` / `downloadItems`.
+- The cart holds DAM originals only, capped at 80 items **and** 1 GiB. The source's
+  `skoda-media-cart-limit` is 80, not the `50` shown below.
+- **One item** downloads directly. **Two or more** become a client-side STORE zip (vendored
+  fflate), not a packaging endpoint.
+- The existing add controls reflect state as `aria-pressed` / `aria-checked` +
+  `data-in-cart`, where this outline says `.in-cart`. They are the listing media card, the
+  story-rail media rails and the shared lightbox.
+- The 1920px row stays inert (originals only).
+- 505b builds the visuals, badge, cart page and new add buttons on that API. See
+  [SKODA-505b](../tickets/tickets/SKODA-505b.md#handoff-from-skoda-505a-50).
+
+**Built in SKODA-505b (#51), the presentation half.** No config table and no endpoint: the cart
+page is `/{lang}/media-cart` with an empty `Media Cart` block, and the cap comes from the store.
+- `scripts/media-cart-ui.js` + `styles/media-cart.css`: labels (placeholders `mediaCart*`), the
+  limit banner, and the refusal notice (the source's limit popup).
+- Added state: CSS off `[data-in-cart]` (the source's `.in-cart` scrim and glyph) on the listing
+  card, media carousels / story rails, the lightbox and the downloads tiles.
+- The badge is the float-dock `media-cart` slot. The downloads block gains per-tile adds and the
+  Media Box group add on the stats line.
+- Deviations and measurements: see
+  [SKODA-505b](../tickets/tickets/SKODA-505b.md#implementation-2026-09-30-developer-verified-qa-pending).
+  The outline below is the pre-build plan, kept for reference.
 
 ### `Media Cart` block config table (DA authoring)
 
@@ -197,6 +234,13 @@ The per-asset affordance is not authored per-card; the `media-cart-action` decor
 4. CSS scoped to `.media-cart` / `.media-cart-action`; tokens only.
 
 ## 8. Open decisions + recommended default
+
+Resolved in 505b (2026-09-30): a **page**, not a drawer; `localStorage` guest cart (505a); limit UX =
+banner + refusal notice + "n / 80" count on the cart page; sizes = originals only (the 1920px row
+stays inert); no bulk multi-select beyond the source's Media Box group add. Tokens landed as
+`--cart-badge-bg`, `--cart-added-scrim`, `--cart-limit-accent`, `--cart-popup-shadow` (+ the added
+glyph size and motion); the dropdown shadow stayed with the existing size menu. The items below
+are the original open list.
 
 - **Cart storage:** `localStorage` guest cart for M1 (assumption to confirm); server/session cart +
   signed download URLs later (SKODA-505 behavior).
