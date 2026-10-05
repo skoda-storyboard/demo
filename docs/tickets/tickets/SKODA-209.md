@@ -24,6 +24,9 @@
   `excludefeatured: false`. Scope comes from the canonical URL. Tag archives use `tag: <slug>` (index `tags`).
   Category and sub-category archives use `path: /en/<cat>[/<sub>]/`, because story URLs carry the sub-category and
   the index `category` column is top-level only.
+  - **Superseded (SKODA-831, 2026-10-05):** story URLs do not carry the sub-category (`/en/skoda-world/<slug>`), so
+    the 7 sub-category archives stayed empty. Category archives now use `categories: <term slug>`; the index
+    `categories` column holds each story's WP categories plus their ancestors (`SKODA-METADATA-SCHEMA.md`).
   - The old path-scoped `Listing` matched no row, so every archive was empty.
   - The source pager ("4 / 19", Load more) is removed.
   - The source archives list stories only (post type `post`).
