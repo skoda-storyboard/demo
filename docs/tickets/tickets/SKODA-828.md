@@ -4,8 +4,9 @@
 - **Phase:** A · **Milestone:** M1 (demo)
 - **GitHub issue:** [#196](https://github.com/skoda-storyboard/demo/issues/196)
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–5d *(planning estimate, not a quote; excludes the SKODA-826 gutter work)*
-- **Status (2026-10-05):** 🟡 In review. Implemented on `skoda-828-hero-parity` (pushed, no PR yet); DA push of the
-  41 archive pages and 6 stories pending. See Implementation notes.
+- **Status (2026-10-05):** 🟡 In review ([PR #253](https://github.com/skoda-storyboard/demo/pull/253), branch
+  `skoda-828-hero-parity`). The 41 archive pages are pushed to DA and previewed; the 6 stories are pushed after merge.
+  See Implementation notes.
 
 > **Ownership (2026-09-28).** This ticket is the single owner of the hero **UI** (rendered box, type, position,
 > responsive and ultrawide behaviour) for press kits, model pages and category/tag archives. The hero acceptance
