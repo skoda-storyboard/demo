@@ -65,6 +65,12 @@ Measurable gates live in [`mobile-nav.md` §9](../../ui-specs/mobile-nav.md); su
   - Sub-menu: `#f1f1f1` rows, links 16 / 24 / 400 at 16px / 40px = 56px, opacity + max-height .2s
     ease-in-out (none under reduced motion); the caret sits in the source's 24px box 16px from the edge.
   - All matched at 375 / 500 / 768 / 1024 / 1079; no horizontal overflow at any width.
+  - **Narrow screens (PR #237 review):** the 68px hamburger plus the fixed 194px logo made the
+    closed bar 334px wide (14px overflow at 320). The brand column may now shrink
+    (`minmax(0, 1fr)`) and the drawer-band logo fits it (`min(194px, 100cqi)`): 180px at 320,
+    190 at 330, 194 from 334, like the source wordmark (160 / 170 / 194). The closed bar's
+    scrollWidth equals the viewport at 320 / 330 / 334 / 360 / 375 on both navs; the toggle ends
+    on the viewport edge (252→320, 262→330, the source's positions).
 - **Out of scope here:** the drawer's language list is SKODA-303 (PR #232), which restyles it to
   the source. This branch sets the panel `min-width` to the same `min(375px, 100%)` as #232, so
   the two merge cleanly.

@@ -161,3 +161,25 @@ test('from 1080 the triggers are the desktop dropdown links again', () => {
   assert.equal(trigger(models).getAttribute('role'), 'button');
   assert.equal(models.getAttribute('tabindex'), null);
 });
+
+// --- closed bar on narrow screens (PR #237 review): CSS guards ----------------------------
+// jsdom has no layout, so these pin the two rules that keep the closed bar inside 320 / 330px
+// viewports with the 68px hamburger: a brand column that may shrink and a logo that fits it.
+// Measured in the browser: scrollWidth = viewport at 320 / 330, toggle 252→320 / 262→330.
+const { readFile } = await import('node:fs/promises');
+const css = await readFile(new URL('./header.css', import.meta.url), 'utf8');
+const drawerBand = css.slice(css.indexOf('@media (width < 1080px) {'));
+
+test('narrow screens: the brand column can shrink below the logo width', () => {
+  const templates = css.match(/'sections sections' 1fr \/ [^;]+;/g);
+  assert.ok(templates?.length >= 2);
+  templates.forEach((t) => assert.match(t, /\/ minmax\(0, 1fr\) auto;/, t));
+});
+
+test('narrow screens: the drawer-band logo fits its column, up to 194px', () => {
+  const rule = drawerBand.match(/header \.nav-brand \.icon-skoda-storyboard-logo \{([^}]+)\}/)?.[1] || '';
+  assert.match(rule, /width: min\(194px, 100cqi\)/);
+  assert.match(rule, /aspect-ratio: 194 \/ 18/);
+  assert.match(drawerBand.match(/header \.nav-brand \{([^}]+)\}/)?.[1] || '', /container-type: inline-size/);
+  assert.match(css, /width: var\(--nav-hamburger-width\)/, 'the 68px touch target is kept');
+});
