@@ -100,10 +100,12 @@
   --story-body-gap: 0px;
   --story-aside-inset-top: 32px;
 
-  /* hero geometry (hero.md §8; SKODA-202) */
+  /* hero geometry (hero.md §8; SKODA-202). The archive band is the source's whole term hero,
+     measured on /en/tag/model/peaq at 375/576/768 (SKODA-828): a 160/200px image row plus the
+     24px label row below 768 (the image covers both), 240px with the labels overlaid above */
   --hero-vh: 61.8vh;
-  --hero-archive-h-base: 160px;
-  --hero-archive-h-sm: 200px;
+  --hero-archive-h-base: 184px;
+  --hero-archive-h-sm: 224px;
   --hero-archive-h-md: 240px;
 
   /* spacing scale */
@@ -657,6 +659,14 @@ main > .section > div {
   padding: 0 var(--page-gutter);
 }
 
+/* Full-bleed heroes (SKODA-828): the overlay hero (series hub, press kit, model) and the
+   archive band span the viewport, so their wrapper leaves the column. Content after the hero
+   in the same section keeps the column. */
+main > .section > .hero-image-wrapper:has(> .hero-image:is(.overlay, .archive)) {
+  max-width: none;
+  padding: 0;
+}
+
 main > .section:first-of-type {
   margin-top: 0;
 }
@@ -868,6 +878,15 @@ body.story main > .section:first-of-type {
 body.story main > .section:first-of-type + .section.body-column {
   margin-top: var(--story-body-gap);
   padding-top: var(--story-inset);
+}
+
+/* the archive's story grid starts 24px under the term band (source, every width) */
+main > .section:has(> .hero-image-wrapper > .hero-image.archive) {
+  margin-bottom: var(--spacing-l);
+}
+
+main > .section:has(> .hero-image-wrapper > .hero-image.archive) + .section {
+  margin-top: 0;
 }
 
 body.story main > .section.body-column .default-content-wrapper ul {

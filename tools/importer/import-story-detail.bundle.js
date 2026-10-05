@@ -42,9 +42,17 @@ var CustomImportScript = (() => {
   });
 
   // tools/importer/parsers/story-hero.js
+  var HERO_MAX_WIDTH = 2560;
+  function useLargestRendition(img) {
+    const best = (img.getAttribute("srcset") || "").split(",").map((entry) => entry.trim().split(/\s+/)).map(([url, descriptor]) => ({ url, width: parseInt(descriptor, 10) })).filter(({ url, width }) => url && width > 0 && width <= HERO_MAX_WIDTH).sort((a, b) => b.width - a.width)[0];
+    if (best) img.setAttribute("src", best.url);
+    img.removeAttribute("srcset");
+    img.removeAttribute("sizes");
+  }
   function parse(element, { document: document2 }) {
     const img = element.querySelector(".hero-image img, .hero-wrapper img, img");
     const heading = element.querySelector(".hero-heading h1, h1, .heading, h2");
+    if (img) useLargestRendition(img);
     if (!img && !heading) {
       element.replaceWith(...element.childNodes);
       return;

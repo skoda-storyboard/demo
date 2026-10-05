@@ -67,15 +67,11 @@ body.skoda-model main > .section > div {
 }
 
 /* ---- hero: `Hero Image (overlay)` restyled ---------------------------------
-   <768: 16:9 image, then the chip (overlapping the image edge) and a 24/700 ink title.
-   768–1079: 3:1 image, 24/700 ink title over its top-left corner (chip clipped, as live).
-   ≥1080: 5:2 image (512px at 1280), chip + 36/700 white title at the container's 5% inset.
-   ≥1440: 3:1 again (480 at 1440, 640 at 1920). */
-body.skoda-model main > .hero-image-container > .hero-image-wrapper {
-  max-width: none;
-  padding: 0;
-}
-
+   Full bleed via styles.css. Shape steps measured on the source carousel (SKODA-828 F2):
+   <720: 9:5 image, then the chip (overlapping the image edge) and a 24/700 black title.
+   720–1079: 3:1 image, 24/700 black title over its top-left corner (chip clipped, as live).
+   1080–1391: 5:2 image (512px at 1280), chip + 36/700 white title at the container's 5% inset.
+   ≥1392: 3:1 again (464 at 1392, 640 at 1920, 1280 at 3840). */
 body.skoda-model .hero-image.overlay .hero-image-media picture,
 body.skoda-model .hero-image.overlay .hero-image-media img {
   height: auto;
@@ -96,7 +92,7 @@ body.skoda-model .hero-image.overlay .hero-image-content {
 
 body.skoda-model .hero-image.overlay .hero-image-content h1 {
   margin: 0 0 6px;
-  color: var(--text-color);
+  color: var(--skoda-black);
   font-size: var(--model-hero-title-size-compact);
   font-weight: var(--weight-bold);
   line-height: 1.25;
@@ -466,19 +462,9 @@ body.skoda-model .carousel.center .card-teaser-title {
 }
 
 /* ---- breakpoints ------------------------------------------------------------ */
-@media (width >= 768px) {
-  body.skoda-model {
-    --model-rail-cell: 0.45;
-    --model-media-cell: 0.3;
-    --model-scroll-offset: var(--model-nav-height);
-    --model-offset: 74px;
-  }
 
-  body.skoda-model .model-rail .carousel.center .card-teaser:first-child,
-  body.skoda-model .model-rail .carousel.center .card-teaser:last-child {
-    margin-inline: 0;
-  }
-
+/* the hero's compact shape changes at 720, before the rest of the page's 768 layout */
+@media (width >= 720px) {
   body.skoda-model .hero-image.overlay .hero-image-media picture,
   body.skoda-model .hero-image.overlay .hero-image-media img {
     aspect-ratio: 3 / 1;
@@ -491,13 +477,27 @@ body.skoda-model .carousel.center .card-teaser-title {
     padding: 0 calc(var(--model-gutter) * 2);
   }
 
-  /* 768–1079 the source clips the chip above the image edge */
+  /* 720–1079 the source clips the chip above the image edge */
   body.skoda-model .hero-image.overlay .hero-image-content .hero-image-badge {
     position: absolute;
     width: 1px;
     height: 1px;
     overflow: hidden;
     clip-path: inset(50%);
+  }
+}
+
+@media (width >= 768px) {
+  body.skoda-model {
+    --model-rail-cell: 0.45;
+    --model-media-cell: 0.3;
+    --model-scroll-offset: var(--model-nav-height);
+    --model-offset: 74px;
+  }
+
+  body.skoda-model .model-rail .carousel.center .card-teaser:first-child,
+  body.skoda-model .model-rail .carousel.center .card-teaser:last-child {
+    margin-inline: 0;
   }
 
   body.skoda-model main > .section.model-nav-section,
@@ -542,7 +542,10 @@ body.skoda-model .carousel.center .card-teaser-title {
     max-width: calc(100% * 2 / 3);
     margin-inline: auto;
   }
+}
 
+/* the hero title column halves from 1024 (source: 952px wide at 992, 492 at 1024) */
+@media (width >= calc(992px + 32px)) {
   body.skoda-model .hero-image.overlay .hero-image-content > :is(h1, p) {
     max-width: 50%;
   }
@@ -577,7 +580,8 @@ body.skoda-model .carousel.center .card-teaser-title {
   }
 }
 
-@media (width >= calc(1080px + 360px)) {
+/* 1392 is the source carousel's own step back to 3:1, off the shared ladder */
+@media (width >= calc(1080px + 312px)) {
   body.skoda-model .hero-image.overlay .hero-image-media picture,
   body.skoda-model .hero-image.overlay .hero-image-media img {
     aspect-ratio: 3 / 1;

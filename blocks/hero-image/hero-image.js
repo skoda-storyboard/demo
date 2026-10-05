@@ -1,17 +1,48 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
 
 /**
+ * The archive term h1 as label chips (SKODA-828 F3): each line of the authored
+ * `<h1>Models<br>Peaq</h1>` becomes a `.hero-image-label`. A space between the chips
+ * keeps the accessible name "Models Peaq". An h1 without breaks is one chip.
+ * @param {Element} h1 the archive heading
+ */
+function decorateLabels(h1) {
+  const lines = [[]];
+  [...h1.childNodes].forEach((node) => {
+    if (node.nodeName === 'BR') lines.push([]);
+    else lines[lines.length - 1].push(node);
+  });
+  const labels = lines
+    .filter((nodes) => nodes.some((node) => node.textContent.trim()))
+    .map((nodes) => {
+      const label = document.createElement('span');
+      label.className = 'hero-image-label';
+      label.append(...nodes);
+      label.normalize();
+      const { firstChild: first, lastChild: last } = label;
+      if (first.nodeType === Node.TEXT_NODE) first.textContent = first.textContent.trimStart();
+      if (last.nodeType === Node.TEXT_NODE) last.textContent = last.textContent.trimEnd();
+      return label;
+    });
+  h1.textContent = '';
+  labels.forEach((label, i) => {
+    if (i) h1.append(' ');
+    h1.append(label);
+  });
+}
+
+/**
  * Hero (image variant) — SKODA-202.
  *
  * One block, three rendering variants selected by the authored block class
  * (hero.md §1/§3/§7):
  *   - default / `story`  → title ABOVE a 16:9 image on desktop; image-above-title
  *                          order swap at <=1079; ink title. Never overlaid.
- *   - `overlay`          → full-bleed image (61.8vh); heading + caption overlaid
- *                          bottom-left in white over a scrim (landing/series/
- *                          press-kit form).
- *   - `archive`          → image-only fixed-height band (160/200/240); no scrim,
- *                          no heading (the page <h1> lives in the content column).
+ *   - `overlay`          → 16:9 image with the caption below on mobile; from 768 a
+ *                          full-bleed 61.8vh image with the heading + caption
+ *                          overlaid in white (series / press-kit / model form).
+ *   - `archive`          → full-bleed band (184/224/240), no scrim; the term h1
+ *                          renders as label chips. With no image the band is empty.
  *
  * The image is the eager-phase LCP element: real <img> in a <picture>,
  * fetchpriority=high + loading=eager, width/height preserved for low CLS.
@@ -115,10 +146,24 @@ export default function decorate(block) {
   // Rebuild the block per variant.
   block.textContent = '';
   if (isArchive) {
-    // image-only band: no heading/caption, no scrim (CSS drops ::after)
-    if (media) block.append(media);
+    // the band keeps its height without an image (the source's empty term band)
+    if (!media) {
+      media = document.createElement('div');
+      media.className = 'hero-image-media';
+    }
+    block.append(media);
+    const h1 = content.querySelector('h1');
+    if (h1) {
+      decorateLabels(h1);
+      content.replaceChildren(h1);
+      block.append(content);
+    }
   } else if (block.classList.contains('overlay')) {
-    // overlay: media first, content layered on top (CSS position:absolute)
+    // overlay: media first, then the caption (CSS overlays it from 768). A paragraph
+    // after the heading is the perex unless a template has classed it already.
+    content.querySelectorAll(':scope > :is(h1, h2) ~ p:not([class])').forEach((p) => {
+      if (!p.querySelector('img, picture')) p.classList.add('hero-image-perex');
+    });
     if (media) block.append(media);
     if (content.childNodes.length) block.append(content);
   } else {

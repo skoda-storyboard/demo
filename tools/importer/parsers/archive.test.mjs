@@ -112,20 +112,44 @@ test('no archive canonical → grid dropped (never an unscoped feed of every sto
   assert.equal(doc.querySelector('.search-results-items'), null);
 });
 
-test('archive hero → banner picture + h1 from parent + term labels', { skip }, () => {
+const lines = (h1) => [...h1.childNodes].filter((n) => n.nodeName !== 'BR').map((n) => n.textContent);
+
+test('archive hero → Hero Image (archive): banner row + h1 with one line per label', { skip }, () => {
   const doc = page('', `<div class="hero"><div class="hero-image"><img src="https://cdn.x/peaq-1920x375.jpg" srcset="a 1x" sizes="100vw" alt="Peaq"></div>
     <div class="hero-caption"><div class="container"><span class="category"><span class="label">Models</span> <span class="label">Peaq</span></span></div></div></div>`);
   archiveHero(doc.querySelector('.hero'), { document: doc });
-  assert.equal(doc.querySelector('h1').textContent, 'Models Peaq');
-  const img = doc.querySelector('p > img');
+  const table = doc.querySelector('table');
+  assert.equal(rows(table)[0][0], 'Hero Image (archive)');
+  const img = table.querySelector('tr:nth-child(2) img');
   assert.equal(img.getAttribute('src'), 'https://cdn.x/peaq-1920x375.jpg');
   assert.equal(img.hasAttribute('srcset'), false);
+  const h1 = table.querySelector('tr:nth-child(3) h1');
+  assert.deepEqual(lines(h1), ['Models', 'Peaq']);
+  assert.equal(h1.querySelectorAll('br').length, 1);
+  assert.equal(doc.querySelectorAll('h1').length, 1);
   assert.equal(doc.querySelector('.hero'), null);
+});
+
+test('archive hero without a banner keeps an empty image row (the empty band)', { skip }, () => {
+  const doc = page('', `<div class="hero"><div class="hero-image"></div>
+    <div class="hero-caption"><div class="container"><span class="category"><a class="label" href="/en/category/design-eng/">Design &amp; Engineering</a></span></div></div></div>`);
+  archiveHero(doc.querySelector('.hero'), { document: doc });
+  const table = doc.querySelector('table');
+  assert.deepEqual(rows(table), [['Hero Image (archive)'], [''], ['Design & Engineering']]);
+  assert.equal(table.querySelector('img'), null);
+  assert.equal(table.querySelector('h1 br'), null);
 });
 
 test('archive hero without labels falls back to the <title> term (site suffix trimmed)', { skip }, () => {
   const doc = page('', '<div class="hero"><div class="hero-caption"></div></div>', 'Heritage - Škoda Storyboard');
   archiveHero(doc.querySelector('.hero'), { document: doc });
-  assert.equal(doc.querySelector('h1').textContent, 'Heritage');
+  assert.equal(doc.querySelector('table h1').textContent, 'Heritage');
   assert.equal(doc.querySelector('img'), null);
+});
+
+test('archive hero with no image and no title is unwrapped', { skip }, () => {
+  const doc = page('', '<main><div class="hero"><div class="hero-caption"></div></div></main>', '');
+  archiveHero(doc.querySelector('.hero'), { document: doc });
+  assert.equal(doc.querySelector('table'), null);
+  assert.equal(doc.querySelector('.hero'), null);
 });

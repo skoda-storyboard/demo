@@ -4,7 +4,8 @@
 - **Phase:** A · **Milestone:** M1 (demo)
 - **GitHub issue:** [#196](https://github.com/skoda-storyboard/demo/issues/196)
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–5d *(planning estimate, not a quote; excludes the SKODA-826 gutter work)*
-- **Status (2026-09-28):** 🔵 TODO
+- **Status (2026-10-05):** 🟡 In review. Implemented on `skoda-828-hero-parity` (local, not yet pushed); DA push of the
+  41 archive pages and 6 stories pending (after merge, decision 2026-10-05). See Implementation notes.
 
 > **Ownership (2026-09-28).** This ticket is the single owner of the hero **UI** (rendered box, type, position,
 > responsive and ultrawide behaviour) for press kits, model pages and category/tag archives. The hero acceptance
@@ -202,6 +203,45 @@ width. This belongs to the header tickets, not the hero.
 - [ ] `npm test` and `npm run lint` are clean, and the CSS guardrail self-check is noted in the PR.
 - [ ] Preview links: `https://skoda-828-hero-parity--demo--skoda-storyboard.aem.page/en/press-kits/skoda-octavia-press-kit`,
       `/en/skoda-model/octavia` and `/en/category/emobility`.
+
+## Implementation notes (2026-10-05, branch `skoda-828-hero-parity`)
+Measured source vs EDS with computed styles and box geometry (no screenshots). The code is checked on the local preview
+against the DA content; F3/F6 against the freshly imported content. Upstream state: PR #189 and SKODA-826 (#210) are
+both on `main` (the SKODA-826 ticket file still says "In review": stale).
+
+**Shared:** one full-bleed rule in `styles/styles.css` (`main > .section > .hero-image-wrapper:has(> .hero-image:is(.overlay,
+.archive))`) replaces the three template copies (series, model, press kit). Content after a hero in the same section
+stays in the column: on the 9 kits that is the tile list, which was edge-to-edge (x0, 800 wide at 1440) and now sits in
+the 1248 column like the source (x106).
+
+| Finding | Change | Measured result |
+|---|---|---|
+| F1 press kit | `.hero-image.overlay` is now the series behaviour: 16:9 + ink caption below 768, uncapped `61.8vh` + white caption on the bottom of the 1248 column from 768; title 28 → 48 at 769; perex 20/30/600; 16px title gap, 8px under the perex. `press-kit.css` hero copies removed; `skoda-series.css` keeps only series rules (badge, 48px at every width, gutters) | `skoda-octavia-press-kit` equal to the source at 375/500/767/769/991/1079/1080/1280/1440/1920/2560×1080/3440×1440/3840×1600 (e.g. 3840: 3840×989, h1 1306,822). 6 kits (3 hubs + 3 of the 9) within ±2px incl. colour at 375–3840: 48/48 |
+| F1 regression | n/a | 15 series hubs + `series-2`, `main` vs branch at 375/767/768/1440/3440: 80/80 identical (0.1px) |
+| F2 model | the shape steps move to the source carousel's own widths: 9:5 <720, 3:1 720–1079, 5:2 1080–1391, 3:1 ≥1392 (`calc(1080px + 312px)`); compact title `--skoda-black`; title column 50% from 1024 (was 992) | Octavia equal to the source at 16 widths 375–3840 incl. 719/720 and 1391/1392; 7 more models (Peaq, Epiq, New Superb, New Fabia, Kamiq, Karoq, Elroq) ±2px incl. colour at 10 widths: 70/70 |
+| F3 archive | `archive-hero.js` emits `Hero Image (archive)` (banner or empty row; `<h1>` one line per label, `<br>`); the block renders the band and the h1 as label chips (space between, accessible name "Models Peaq"); band 184/224/240; grid 24px below | `tag/model/peaq`, `category/emobility`, `category/design-eng` (no banner): band, chip x/y/size and style equal to the source at 375/575/576/767/768/1080/1280/1440/1920/2560/3840; eager + `fetchpriority=high`; one h1; grid +24. 41 pages re-imported locally: 25 with banner, 16 empty band; `import:validate-blocks` 41/41, metadata gate 41/41 |
+| F4 story gutters | none | after SKODA-826, `main` equals the source at 375/768/1024/1280/1440 (image, h1, perex boxes). No follow-up needed |
+| F5 story meta | chip `margin-block: -1px -2px` (not −3/−7: the source chip starts 1px above the date line; −3/−7 would leave it 1.5px off) | Epiq hero 755.63 at 1440/1080, 585.55 at 768, 486.08 at 375, date and chip offsets equal to the source to 0.01px |
+| F6 hero masters | cause: the masters are 19–26 MB, so `pickIngestUrl` steps down, but its named 3:2 guesses (`-2560x1707`) miss the real `-2560x1708` copies and fell to `-768x512`; the two `.JPG` masters are private (403) so the 1440 page reference was kept. Fix: `story-hero.js` takes the largest `srcset` copy ≤2560w; `pickIngestUrl` tries the page's own `-WxH` alongside the ladder; `build-media-manifest` no longer drops `steps.publish` on a delivery-only rebuild | the 6 heroes now deliver `-2560x1708`/`-2560x1707`; forced rebuild of their 100 images: 100 done, 20 delivery upgrades, 17 partial→done, no DAM/publish state lost |
+| F7 no-hero kit | the RS 245 kit has no body column (source press-release template): its header section takes the 2/3 column from 768 and its lead image the article 16:9 crop | h1 26/32.5/600 `#0a0a0a` (28/35 ≤768) as before; lead 812×457 at 1440/1280, 492×277 at 768, 355×200 at 375, text column 812: equal to the source's visible image box |
+
+**Acceptance criteria corrected by measurement (source is the reference):**
+- F1 "at 375 and 768": the source switches to the overlay at **768**; the dark caption below the image is ≤767. At exactly
+  768 the source caption hangs 16px below the image (perex overflows the image edge); EDS keeps it inside. Recorded as
+  a deliberate one-pixel-band deviation.
+- F3 "240px at ≥768 and 160px at 375": the band is **184px at 375** and 224 at 576–767; 160/200 is the image row.
+- F7 "lead image 828×552": that is the source `<img>` overflowing its 16:9 holder; the visible box is **812×457**.
+- F2 "chip + title top left (+51px) at ≥1080": met; the compact (≤1079) title colour is `#000`, not ink.
+
+**Not done / open:**
+- DA push of the 41 archive pages and the 6 stories (after merge, with approval). 4 of the 6 re-imported stories also
+  pick up other tickets' importer output that DA doesn't have yet (SKODA-824 `highlight` sections, held from publish).
+  Decision 2026-10-05: push all 6 to preview; the 4 stay unpublished behind the hold-publish gate until SKODA-824.
+- The visual diff (≤2% per pixel) is not run: no pixel-diff tool in the repo, and the review protocol asks for measured
+  numbers; the box/type measurements above stand in for it.
+- Follow-up: the 9 non-hub kits' tile lists are plain paragraphs, not `Cards (tiles)` (source: a 3-up tile grid).
+- `npm test`: 2 failures that also fail on `main` (`header-locales.test.mjs` path-keeping; media-lib truncated download
+  in this sandbox).
 
 ## Dependencies
 - **Upstream:**

@@ -52,7 +52,8 @@ title) → a flex-wrap grid of [`card-teaser`](card-teaser.md) (media/overlay 16
 Values `getComputedStyle` on the eMobility category, cited `(selector · viewport)`.
 
 **Layout**
-- `main > .hero` full-bleed, height **`240px` desktop / `184px` at 500** (· `.hero` · 1280/500).
+- `main > .hero` full-bleed, height **`240px` ≥768 / `224px` 576–767 / `184px` <576** (· `.hero` · 375/576/768/1280,
+  re-measured to 3840 in SKODA-828: the image row is 160/200/240 and the 24px label row sits under it below 768).
 - `.container` caps at `1248px`, gutter `~16px` margin (· `.container` · 1280).
 - Grid `.search-results-items` `display:flex; flex-wrap:wrap`; cards ~`396px` (3-up) at 1280,
   `364px` (2-up) at 768, `480px` (1-up) at 500 (· `.article-teaser` · per viewport).
@@ -69,7 +70,7 @@ Values `getComputedStyle` on the eMobility category, cited `(selector · viewpor
 **Responsiveness**
 - Grid columns **3 → 2 → 1**: 3-up at 1280, 2-up at 768, 1-up at 500 (break points align to the
   768/992-1080 ladder; confirm the 3→2 step precisely at build).
-- Hero shrinks `240 → 184px` on mobile.
+- Hero shrinks `240 → 224 → 184px` at 768 / 576 (SKODA-828).
 - **Open:** the category rendered 3-up at 1280 while the tag archive rendered 2-up at the same width,
   confirm whether tag archives use a narrower grid or it was a content-count artifact.
 
@@ -103,7 +104,7 @@ Values `getComputedStyle` on the eMobility category, cited `(selector · viewpor
 ## 10. Pixel-perfect acceptance criteria
 
 - [ ] Shell: STO header + footer; single `h1` = term name (category term; tag = parent + term).
-- [ ] Hero banner ~`240px` desktop / `184px` mobile; term title from `hero.md` scale.
+- [ ] Hero banner `240 / 224 / 184px` (≥768 / 576–767 / <576), label chips bottom-left; owned by SKODA-828 F3.
 - [ ] Card grid `.search-results-items` flex-wrap; **3-up 1280 / 2-up 768 / 1-up 500**; cards `16:9`.
 - [ ] **No facet panel** (this is the plain archive, not the MR faceted listing).
 - [ ] Content cap `1248`, gutter `~16px`.

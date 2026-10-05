@@ -1,15 +1,16 @@
 /* eslint-disable */
 /* global WebImporter */
 /**
- * Parser: archive-hero (default content, no block) — category / tag archive term hero.
+ * Parser: archive-hero (block name: "Hero Image (archive)") — category / tag archive term hero.
  * Source: div.hero > .hero-image img (1920×375 banner) + .hero-caption .category .label ×N
  *   (tag: "Models" "Peaq"; category: "Lifestyle" "People"). The source has no <h1>.
  *
- * Replaces hero-banner for the archive template only: hero-banner emits the `Hero` block,
- * which is an empty stub on main. The archive term hero is emitted as default content —
- * the banner picture + one <h1> built from the labels (parent + term, as measured in
- * docs/ui-specs/template-category-archive.md §4: "Models Octavia"). The styled short banner
- * (240px) is SKODA-209's visual work.
+ * Output (SKODA-828 F3; pinned contract `hero`, SKODA-PENDING-BLOCK-CONTRACTS.md):
+ *   Hero Image (archive) | banner picture (empty cell when the term has no banner) |
+ *                        | h1: one line per label (`<br>` between), parent + term     |
+ * The block renders the band (184/224/240px) and each h1 line as a grey label chip; the h1
+ * stays the page's single heading (SKODA-209: "Models Peaq"). The empty image row keeps the
+ * source's empty band for the 16 terms without a banner.
  *
  * ⚠️ CONTENT-DRIVEN: every part optional. No labels → the <title> term (site suffix trimmed).
  * No image and no title → unwrap and bail.
@@ -21,25 +22,28 @@ export default function parse(element, { document }) {
     .filter(Boolean);
   const unique = labels.filter((l, i) => labels.indexOf(l) === i);
   const docTitle = (document.title || '').replace(/\s+[-–|]\s+Škoda Storyboard\s*$/, '').trim();
-  const title = unique.length ? unique.join(' ') : docTitle;
+  const lines = unique.length ? unique : [docTitle].filter(Boolean);
 
-  if (!img && !title) {
+  if (!img && !lines.length) {
     element.replaceWith(...element.childNodes);
     return;
   }
 
-  const out = [];
+  const cells = [['Hero Image (archive)']];
   if (img) {
-    const p = document.createElement('p');
     img.removeAttribute('srcset');
     img.removeAttribute('sizes');
-    p.append(img);
-    out.push(p);
+    cells.push([img]);
+  } else {
+    cells.push(['']);
   }
-  if (title) {
+  if (lines.length) {
     const h1 = document.createElement('h1');
-    h1.textContent = title;
-    out.push(h1);
+    lines.forEach((line, i) => {
+      if (i) h1.append(document.createElement('br'));
+      h1.append(line);
+    });
+    cells.push([h1]);
   }
-  element.replaceWith(...out);
+  element.replaceWith(WebImporter.DOMUtils.createTable(cells, document));
 }

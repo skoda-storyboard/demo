@@ -1041,29 +1041,29 @@
     },
     "728314ef__PEAQ_Record_Run-00074_50dd3404.jpg": {
       "logical_id": "728314ef__PEAQ_Record_Run-00074_50dd3404.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404-768x512.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404-2560x1708.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404.jpg",
       "dam_page_path": "en",
       "dam_asset_path": "/content/dam/storyboard/en/PEAQ_Record_Run-00074_50dd3404.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404-768x512.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404-2560x1708.jpg",
       "da_path": "",
       "alt": "Peaq Sets a Record: From the Heart of Europe to the Sea Without Recharging",
-      "caption": null,
+      "caption": "",
       "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404-2560x1708.jpg",
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404-768x512.jpg",
-        "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404-1440x961.jpg",
-        "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404-1920x1281.jpg"
+        "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00074_50dd3404-1440x961.jpg"
       ],
-      "aspect_crop_source": false,
-      "bytes": 76710,
+      "aspect_crop_source": true,
+      "bytes": 403065,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -5352,8 +5352,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -5504,8 +5504,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -5529,7 +5529,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00010_252f35cb.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00010_252f35cb.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00010_252f35cb-768x512.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00010_252f35cb-2560x1708.jpg",
       "da_path": "",
       "alt": "Klaus Zellmer, CEO of Škoda Auto, also personally wished the crew good luck.",
       "caption": "",
@@ -5537,13 +5537,13 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00010_252f35cb-768x512.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 119625,
+      "bytes": 667265,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -5567,7 +5567,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00013_05d54f32.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00013_05d54f32.jpg",
       "original_download_url": "",
-      "delivery_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00013_05d54f32-2560x1709.jpg",
       "da_path": "",
       "alt": "Board member Johannes Neft was also present at the start.",
       "caption": "",
@@ -5575,16 +5575,16 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00013_05d54f32-768x513.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": null,
-      "preconditioned": false,
+      "bytes": 781568,
+      "preconditioned": true,
       "steps": {
-        "deliver": "skipped",
+        "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
-      "status": "partial",
-      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(25075730, min 768px)",
+      "status": "done",
+      "note": "",
       "page_refs": [
         "en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging"
       ],
@@ -5605,7 +5605,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00018_b37f31f7.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00018_b37f31f7.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00018_b37f31f7-768x512.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00018_b37f31f7-2560x1708.jpg",
       "da_path": "",
       "alt": "Marek and Jakub are setting out from Mladá Boleslav.",
       "caption": "",
@@ -5613,13 +5613,13 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00018_b37f31f7-768x512.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 125378,
+      "bytes": 735780,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -5643,7 +5643,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00020_bd2116ad.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00020_bd2116ad.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00020_bd2116ad-768x512.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00020_bd2116ad-2560x1708.jpg",
       "da_path": "",
       "alt": "The Škoda Peaq 90 was in completely stock condition.",
       "caption": "",
@@ -5651,13 +5651,13 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00020_bd2116ad-768x512.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 125427,
+      "bytes": 743354,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -5681,7 +5681,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00001-2_d3e53ce2.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00001-2_d3e53ce2.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00001-2_d3e53ce2-768x512.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00001-2_d3e53ce2-2560x1708.jpg",
       "da_path": "",
       "alt": "The crew sent data from the car to their colleagues, who were able to chat with them.",
       "caption": "",
@@ -5689,13 +5689,13 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00001-2_d3e53ce2-768x512.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 108739,
+      "bytes": 611454,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -5719,7 +5719,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00047_bc0b2e81.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00047_bc0b2e81.jpg",
       "original_download_url": "",
-      "delivery_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00047_bc0b2e81-2560x1708.jpg",
       "da_path": "",
       "alt": "Peaq Sets a Record: From the Heart of Europe to the Sea Without Recharging",
       "caption": "",
@@ -5727,16 +5727,16 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00047_bc0b2e81-768x513.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": null,
-      "preconditioned": false,
+      "bytes": 1379758,
+      "preconditioned": true,
       "steps": {
-        "deliver": "skipped",
+        "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
-      "status": "partial",
-      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(16549961, min 768px)",
+      "status": "done",
+      "note": "",
       "page_refs": [
         "en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging"
       ],
@@ -5757,7 +5757,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00093_2d3d933d.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00093_2d3d933d.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00093_2d3d933d-768x512.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00093_2d3d933d-2560x1708.jpg",
       "da_path": "",
       "alt": "Peaq Sets a Record: From the Heart of Europe to the Sea Without Recharging",
       "caption": "",
@@ -5765,13 +5765,13 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00093_2d3d933d-768x512.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 119399,
+      "bytes": 792447,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -5795,7 +5795,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00064_8260c6d7.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00064_8260c6d7.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00064_8260c6d7-768x512.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00064_8260c6d7-2560x1708.jpg",
       "da_path": "",
       "alt": "Peaq Sets a Record: From the Heart of Europe to the Sea Without Recharging",
       "caption": "",
@@ -5803,13 +5803,13 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00064_8260c6d7-768x512.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 100754,
+      "bytes": 772665,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -5846,8 +5846,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -5871,7 +5871,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00053_bc50ad11.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00053_bc50ad11.jpg",
       "original_download_url": "",
-      "delivery_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00053_bc50ad11-2560x1708.jpg",
       "da_path": "",
       "alt": "Peaq Sets a Record: From the Heart of Europe to the Sea Without Recharging",
       "caption": "",
@@ -5879,16 +5879,16 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00053_bc50ad11-768x513.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": null,
-      "preconditioned": false,
+      "bytes": 579459,
+      "preconditioned": true,
       "steps": {
-        "deliver": "skipped",
+        "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
-      "status": "partial",
-      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(15549630, min 768px)",
+      "status": "done",
+      "note": "",
       "page_refs": [
         "en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging"
       ],
@@ -5909,7 +5909,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00045_0f66705f.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00045_0f66705f.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00045_0f66705f-768x512.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00045_0f66705f-2560x1708.jpg",
       "da_path": "",
       "alt": "Peaq Sets a Record: From the Heart of Europe to the Sea Without Recharging",
       "caption": "",
@@ -5917,13 +5917,13 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00045_0f66705f-768x512.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 132164,
+      "bytes": 878405,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -5960,8 +5960,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -5998,8 +5998,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -6036,8 +6036,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -6061,7 +6061,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00075_9fdf75c0.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00075_9fdf75c0.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00075_9fdf75c0-768x512.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00075_9fdf75c0-2560x1708.jpg",
       "da_path": "",
       "alt": "The Škoda Peaq 90 reached its destination in the Netherlands.",
       "caption": "",
@@ -6069,13 +6069,13 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00075_9fdf75c0-768x512.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 162216,
+      "bytes": 1405048,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -6130,7 +6130,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00120_08a741aa.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00120_08a741aa.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00120_08a741aa-768x512.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00120_08a741aa-2560x1708.jpg",
       "da_path": "",
       "alt": "The Škoda Peaq 90 reached its destination in the Netherlands.",
       "caption": "",
@@ -6138,13 +6138,13 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00120_08a741aa-768x512.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 101947,
+      "bytes": 749514,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -6168,7 +6168,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging/PEAQ_Record_Run-00105_4d436b75.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00105_4d436b75.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00105_4d436b75-768x512.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00105_4d436b75-2560x1708.jpg",
       "da_path": "",
       "alt": "The crew violated the sticker's terms and didn't recharge the car until after 936 kilometers.",
       "caption": "",
@@ -6176,13 +6176,13 @@
         "https://cdn.skoda-storyboard.com/2026/08/PEAQ_Record_Run-00105_4d436b75-768x512.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 91746,
+      "bytes": 459359,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -6524,7 +6524,7 @@
     },
     "728314ef__Untitled-design-13_0e4f37fb.png": {
       "logical_id": "728314ef__Untitled-design-13_0e4f37fb.png",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Untitled-design-13_0e4f37fb.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/Untitled-design-13_0e4f37fb-1440x810.png",
       "master_url": "https://cdn.skoda-storyboard.com/2026/08/Untitled-design-13_0e4f37fb.png",
       "dam_page_path": "en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
       "dam_asset_path": "/content/dam/storyboard/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq/Untitled-design-13_0e4f37fb.png",
@@ -6532,10 +6532,9 @@
       "original_download_url": "",
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/Untitled-design-13_0e4f37fb.png",
       "da_path": "",
-      "alt": "Spacious, comfortable, and striking. Five reasons to want the Škoda Peaq",
-      "caption": null,
+      "alt": "",
+      "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/Untitled-design-13_0e4f37fb.png",
         "https://cdn.skoda-storyboard.com/2026/08/Untitled-design-13_0e4f37fb-1440x810.png"
       ],
       "aspect_crop_source": true,
@@ -6544,8 +6543,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7347,8 +7346,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7385,8 +7384,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7462,8 +7461,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7500,8 +7499,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7538,8 +7537,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7576,8 +7575,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7595,29 +7594,28 @@
     },
     "9dd7d96c__EPIQ_Praha-00032_1c32679e.jpg": {
       "logical_id": "9dd7d96c__EPIQ_Praha-00032_1c32679e.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/07/EPIQ_Praha-00032_1c32679e-1920x1281.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/07/EPIQ_Praha-00032_1c32679e-2560x1708.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2026/07/EPIQ_Praha-00032_1c32679e.jpg",
       "dam_page_path": "en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq",
       "dam_asset_path": "/content/dam/storyboard/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq/EPIQ_Praha-00032_1c32679e.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/07/EPIQ_Praha-00032_1c32679e.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/07/EPIQ_Praha-00032_1c32679e-768x512.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/07/EPIQ_Praha-00032_1c32679e-2560x1708.jpg",
       "da_path": "",
       "alt": "Practical, fun, stylish. 5 reasons to choose the Epiq",
-      "caption": null,
+      "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/07/EPIQ_Praha-00032_1c32679e-1920x1281.jpg",
-        "https://cdn.skoda-storyboard.com/2026/07/EPIQ_Praha-00032_1c32679e-1440x961.jpg",
-        "https://cdn.skoda-storyboard.com/2026/07/EPIQ_Praha-00032_1c32679e-768x512.jpg"
+        "https://cdn.skoda-storyboard.com/2026/07/EPIQ_Praha-00032_1c32679e-2560x1708.jpg",
+        "https://cdn.skoda-storyboard.com/2026/07/EPIQ_Praha-00032_1c32679e-1440x961.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 158274,
+      "bytes": 947554,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7656,8 +7654,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7694,8 +7692,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7732,8 +7730,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7770,8 +7768,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7808,8 +7806,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7846,8 +7844,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7884,8 +7882,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7922,8 +7920,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7960,8 +7958,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -7998,8 +7996,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -8093,7 +8091,7 @@
     },
     "728314ef__DSC2118ret_a9ade9fc.jpg": {
       "logical_id": "728314ef__DSC2118ret_a9ade9fc.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/08/DSC2118ret_a9ade9fc-1920x1280.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/08/DSC2118ret_a9ade9fc-1440x960.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2026/08/DSC2118ret_a9ade9fc.jpg",
       "dam_page_path": "en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia",
       "dam_asset_path": "/content/dam/storyboard/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia/DSC2118ret_a9ade9fc.jpg",
@@ -8101,10 +8099,9 @@
       "original_download_url": "",
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/08/DSC2118ret_a9ade9fc.jpg",
       "da_path": "",
-      "alt": "Peaq enters production, sharing the line with the Octavia",
-      "caption": null,
+      "alt": "",
+      "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/08/DSC2118ret_a9ade9fc-1920x1280.jpg",
         "https://cdn.skoda-storyboard.com/2026/08/DSC2118ret_a9ade9fc-1440x960.jpg"
       ],
       "aspect_crop_source": false,
@@ -8113,8 +8110,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -8524,10 +8521,9 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/skoda-epiq-m62-exterior-01_040f6fc9.jpg",
       "da_path": "",
       "alt": "",
-      "caption": null,
+      "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/05/skoda-epiq-m62-exterior-01_040f6fc9-1440x720.jpg",
-        "https://cdn.skoda-storyboard.com/2026/05/skoda-epiq-m62-exterior-01_040f6fc9.jpg"
+        "https://cdn.skoda-storyboard.com/2026/05/skoda-epiq-m62-exterior-01_040f6fc9-1440x720.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 8205070,
@@ -8535,8 +8531,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -8564,23 +8560,22 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/Epiq_selection_34rear_3b477159.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Epiq_selection_34rear_3b477159.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/Epiq_selection_34rear_3b477159-768x512.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/Epiq_selection_34rear_3b477159-2560x1708.jpg",
       "da_path": "",
       "alt": "What’s behind Epiq design?",
-      "caption": null,
+      "caption": "",
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/05/Epiq_selection_34rear_3b477159-1440x961.jpg",
-        "https://cdn.skoda-storyboard.com/2026/05/Epiq_selection_34rear_3b477159-768x512.jpg",
-        "https://cdn.skoda-storyboard.com/2026/05/Epiq_selection_34rear_3b477159-1920x1281.jpg"
+        "https://cdn.skoda-storyboard.com/2026/05/Epiq_selection_34rear_3b477159-2560x1708.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 97041,
+      "bytes": 731134,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -10953,8 +10948,8 @@
       "original_download_url": "",
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/07/Untitled-design-7_35d9e36c.png",
       "da_path": "",
-      "alt": "Designers on the Peaq: It’s modern, durable, and practical",
-      "caption": null,
+      "alt": "",
+      "caption": "",
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/07/Untitled-design-7_35d9e36c.png"
       ],
@@ -10964,8 +10959,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -13562,7 +13557,7 @@
     },
     "8b558dfa__Navrh-bez-nazvu-154_1340a7cb.png": {
       "logical_id": "8b558dfa__Navrh-bez-nazvu-154_1340a7cb.png",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/05/Navrh-bez-nazvu-154_1340a7cb-768x432.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/05/Navrh-bez-nazvu-154_1340a7cb-1440x810.png",
       "master_url": "https://cdn.skoda-storyboard.com/2026/05/Navrh-bez-nazvu-154_1340a7cb.png",
       "dam_page_path": "en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
       "dam_asset_path": "/content/dam/storyboard/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/Navrh-bez-nazvu-154_1340a7cb.png",
@@ -13570,12 +13565,10 @@
       "original_download_url": "",
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/Navrh-bez-nazvu-154_1340a7cb.png",
       "da_path": "",
-      "alt": "This is Epiq! A behind-the-scenes look at the premiere",
-      "caption": null,
+      "alt": "",
+      "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/05/Navrh-bez-nazvu-154_1340a7cb-768x432.png",
-        "https://cdn.skoda-storyboard.com/2026/05/Navrh-bez-nazvu-154_1340a7cb-1440x810.png",
-        "https://cdn.skoda-storyboard.com/2026/05/Navrh-bez-nazvu-154_1340a7cb.png"
+        "https://cdn.skoda-storyboard.com/2026/05/Navrh-bez-nazvu-154_1340a7cb-1440x810.png"
       ],
       "aspect_crop_source": true,
       "bytes": 3368993,
@@ -13583,8 +13576,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -13688,7 +13681,7 @@
     },
     "86741f96__DSC_1994_7e4fa6b5.jpg": {
       "logical_id": "86741f96__DSC_1994_7e4fa6b5.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/02/DSC_1994_7e4fa6b5-768x512.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/02/DSC_1994_7e4fa6b5-1440x960.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2026/02/DSC_1994_7e4fa6b5.jpg",
       "dam_page_path": "en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
       "dam_asset_path": "/content/dam/storyboard/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/DSC_1994_7e4fa6b5.jpg",
@@ -13696,12 +13689,10 @@
       "original_download_url": "",
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/02/DSC_1994_7e4fa6b5-2560x1707.jpg",
       "da_path": "",
-      "alt": "Big possibilities in a small package. The new Škoda Epiq!",
-      "caption": null,
+      "alt": "",
+      "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/02/DSC_1994_7e4fa6b5-768x512.jpg",
-        "https://cdn.skoda-storyboard.com/2026/02/DSC_1994_7e4fa6b5-1440x960.jpg",
-        "https://cdn.skoda-storyboard.com/2026/02/DSC_1994_7e4fa6b5-1920x1280.jpg"
+        "https://cdn.skoda-storyboard.com/2026/02/DSC_1994_7e4fa6b5-1440x960.jpg"
       ],
       "aspect_crop_source": false,
       "bytes": 856707,
@@ -13709,8 +13700,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -13733,7 +13724,7 @@
     },
     "9dd7d96c__Y7A2693_581ce238.jpg": {
       "logical_id": "9dd7d96c__Y7A2693_581ce238.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/07/Y7A2693_581ce238-768x512.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/07/Y7A2693_581ce238-1440x960.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2026/07/Y7A2693_581ce238.jpg",
       "dam_page_path": "en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
       "dam_asset_path": "/content/dam/storyboard/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/Y7A2693_581ce238.jpg",
@@ -13741,11 +13732,9 @@
       "original_download_url": "",
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/07/Y7A2693_581ce238.jpg",
       "da_path": "",
-      "alt": "An Epic Start to the Tour de France: Škoda Got Barcelona Moving",
-      "caption": null,
+      "alt": "",
+      "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/07/Y7A2693_581ce238-768x512.jpg",
-        "https://cdn.skoda-storyboard.com/2026/07/Y7A2693_581ce238-1920x1281.jpg",
         "https://cdn.skoda-storyboard.com/2026/07/Y7A2693_581ce238-1440x960.jpg"
       ],
       "aspect_crop_source": false,
@@ -13754,8 +13743,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -14226,11 +14215,10 @@
       "original_download_url": "",
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/06/Snimek-obrazovky-2026-06-26-v-22.27.58_ec05e222.png",
       "da_path": "",
-      "alt": "A custom-made sunroof, walkie-talkies and champagne. The Škoda Peaq at the Tour de France",
+      "alt": "",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/06/Snimek-obrazovky-2026-06-26-v-22.27.58_ec05e222-1440x951.png",
-        "https://cdn.skoda-storyboard.com/2026/06/Snimek-obrazovky-2026-06-26-v-22.27.58_ec05e222.png"
+        "https://cdn.skoda-storyboard.com/2026/06/Snimek-obrazovky-2026-06-26-v-22.27.58_ec05e222-1440x951.png"
       ],
       "aspect_crop_source": true,
       "bytes": 5903340,
@@ -14238,8 +14226,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -14323,8 +14311,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -14810,8 +14798,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -14970,8 +14958,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -15010,8 +14998,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -15090,8 +15078,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -15130,8 +15118,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -15277,7 +15265,7 @@
       "dam_asset_path": "/content/dam/storyboard/en/emobility/whats-behind-epiq-design/Epiq_selection_C_pillar_12d5f887.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/05/Epiq_selection_C_pillar_12d5f887.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/Epiq_selection_C_pillar_12d5f887-1440x960.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/05/Epiq_selection_C_pillar_12d5f887-2560x1708.jpg",
       "da_path": "",
       "alt": "What’s behind Epiq design?",
       "caption": "",
@@ -15285,13 +15273,13 @@
         "https://cdn.skoda-storyboard.com/2026/05/Epiq_selection_C_pillar_12d5f887-768x512.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 187757,
+      "bytes": 474550,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -18655,8 +18643,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -19686,7 +19674,7 @@
     },
     "9dd7d96c__KMC7001_34f1977d.jpg": {
       "logical_id": "9dd7d96c__KMC7001_34f1977d.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/07/KMC7001_34f1977d.JPG-1440x960.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/07/KMC7001_34f1977d.JPG-2560x1707.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2026/07/KMC7001_34f1977d.jpg",
       "dam_page_path": "en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour",
       "page_refs": [
@@ -19696,24 +19684,24 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/07/KMC7001_34f1977d.JPG-1440x960.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/07/KMC7001_34f1977d.JPG-2560x1707.jpg",
       "da_path": "",
       "alt": "13 countries, over 19,000 kilometers. The Kylaq traveled from Pune to Prague",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/07/KMC7001_34f1977d.JPG-1440x960.jpg",
-        "https://cdn.skoda-storyboard.com/2026/07/KMC7001_34f1977d.JPG-1920x1280.jpg"
+        "https://cdn.skoda-storyboard.com/2026/07/KMC7001_34f1977d.JPG-2560x1707.jpg",
+        "https://cdn.skoda-storyboard.com/2026/07/KMC7001_34f1977d.JPG-1440x960.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 274692,
+      "bytes": 612211,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2026/07/KMC7001_34f1977d.jpg"
+      "status": "done",
+      "note": ""
     },
     "86741f96__Skoda-PR-1-copy_ad1a1c49.jpg": {
       "logical_id": "86741f96__Skoda-PR-1-copy_ad1a1c49.jpg",
@@ -19881,7 +19869,7 @@
     },
     "9dd7d96c__Peaq_049_Wireless_charging_Togless-1_2d9a0c99.jpg": {
       "logical_id": "9dd7d96c__Peaq_049_Wireless_charging_Togless-1_2d9a0c99.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2026/07/Peaq_049_Wireless_charging_Togless-1_2d9a0c99-1440x960.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/07/Peaq_049_Wireless_charging_Togless-1_2d9a0c99-2560x1708.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2026/07/Peaq_049_Wireless_charging_Togless-1_2d9a0c99.jpg",
       "dam_page_path": "en/skoda-world/explore-the-new-skoda-models-in-mixed-reality",
       "page_refs": [
@@ -19892,22 +19880,22 @@
       "dam_asset_path": "/content/dam/storyboard/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality/Peaq_049_Wireless_charging_Togless-1_2d9a0c99.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2026/07/Peaq_049_Wireless_charging_Togless-1_2d9a0c99.jpg",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/07/Peaq_049_Wireless_charging_Togless-1_2d9a0c99-1440x960.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/07/Peaq_049_Wireless_charging_Togless-1_2d9a0c99-2560x1708.jpg",
       "da_path": "",
       "alt": "Škoda’s smarter wireless charging goes beyond phones",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/07/Peaq_049_Wireless_charging_Togless-1_2d9a0c99-1440x960.jpg",
-        "https://cdn.skoda-storyboard.com/2026/07/Peaq_049_Wireless_charging_Togless-1_2d9a0c99-1920x1281.jpg"
+        "https://cdn.skoda-storyboard.com/2026/07/Peaq_049_Wireless_charging_Togless-1_2d9a0c99-2560x1708.jpg",
+        "https://cdn.skoda-storyboard.com/2026/07/Peaq_049_Wireless_charging_Togless-1_2d9a0c99-1440x960.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": 183598,
+      "bytes": 477768,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -22317,8 +22305,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -22397,8 +22385,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -22439,8 +22427,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2026/07/AAB5287_524ee379.jpg"
+      "status": "done",
+      "note": ""
     },
     "9dd7d96c__AAB7627_fbcab370.jpg": {
       "logical_id": "9dd7d96c__AAB7627_fbcab370.jpg",
@@ -22468,8 +22456,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2026/07/AAB7627_fbcab370.jpg"
+      "status": "done",
+      "note": ""
     },
     "9dd7d96c__AAB5811_42bde0a1.jpg": {
       "logical_id": "9dd7d96c__AAB5811_42bde0a1.jpg",
@@ -22497,8 +22485,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2026/07/AAB5811_42bde0a1.jpg"
+      "status": "done",
+      "note": ""
     },
     "9dd7d96c__AAB7009_bc79b70e.jpg": {
       "logical_id": "9dd7d96c__AAB7009_bc79b70e.jpg",
@@ -22526,8 +22514,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2026/07/AAB7009_bc79b70e.jpg"
+      "status": "done",
+      "note": ""
     },
     "9dd7d96c__AAB5965_4f251831.jpg": {
       "logical_id": "9dd7d96c__AAB5965_4f251831.jpg",
@@ -22555,8 +22543,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2026/07/AAB5965_4f251831.jpg"
+      "status": "done",
+      "note": ""
     },
     "9dd7d96c__AAB0576_59cfbb0b.jpg": {
       "logical_id": "9dd7d96c__AAB0576_59cfbb0b.jpg",
@@ -22584,8 +22572,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2026/07/AAB0576_59cfbb0b.jpg"
+      "status": "done",
+      "note": ""
     },
     "9dd7d96c__AAB1191_05c8a9ac.jpg": {
       "logical_id": "9dd7d96c__AAB1191_05c8a9ac.jpg",
@@ -22613,8 +22601,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2026/07/AAB1191_05c8a9ac.jpg"
+      "status": "done",
+      "note": ""
     },
     "9dd7d96c__AAB1112_ad752790.jpg": {
       "logical_id": "9dd7d96c__AAB1112_ad752790.jpg",
@@ -22642,8 +22630,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2026/07/AAB1112_ad752790.jpg"
+      "status": "done",
+      "note": ""
     },
     "9dd7d96c__03-DSC07065_49c99e39.jpg": {
       "logical_id": "9dd7d96c__03-DSC07065_49c99e39.jpg",
@@ -22669,8 +22657,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -22709,8 +22697,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -22749,8 +22737,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -22789,8 +22777,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -22831,8 +22819,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2026/07/KMC8480_128b63af.jpg"
+      "status": "done",
+      "note": ""
     },
     "9dd7d96c__KMC8013_69930c2f.jpg": {
       "logical_id": "9dd7d96c__KMC8013_69930c2f.jpg",
@@ -22860,8 +22848,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2026/07/KMC8013_69930c2f.jpg"
+      "status": "done",
+      "note": ""
     },
     "9dd7d96c__KMC0785_5e68147a.jpg": {
       "logical_id": "9dd7d96c__KMC0785_5e68147a.jpg",
@@ -22889,8 +22877,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2026/07/KMC0785_5e68147a.jpg"
+      "status": "done",
+      "note": ""
     },
     "9dd7d96c__Kyrgyzstan_4-jpg_a6214d78.jpg": {
       "logical_id": "9dd7d96c__Kyrgyzstan_4-jpg_a6214d78.jpg",
@@ -22916,8 +22904,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -22956,8 +22944,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -22996,8 +22984,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -23036,8 +23024,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -23076,8 +23064,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -23116,8 +23104,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -23156,8 +23144,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -23196,8 +23184,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -23236,8 +23224,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -23278,8 +23266,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2026/07/AAB5474_c0805ea4.jpg"
+      "status": "done",
+      "note": ""
     },
     "9dd7d96c__Navrh-bez-nazvu-70_f6909f56.png": {
       "logical_id": "9dd7d96c__Navrh-bez-nazvu-70_f6909f56.png",
@@ -23305,8 +23293,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -23346,8 +23334,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -23386,8 +23374,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -23426,8 +23414,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -23466,8 +23454,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -23924,8 +23912,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -24034,8 +24022,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -24074,8 +24062,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -24114,8 +24102,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -24154,8 +24142,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -24194,8 +24182,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -26800,8 +26788,7 @@
       "alt": "",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2025/01/DSC_8212_ec4ef5e1-1440x960.jpg",
-        "https://cdn.skoda-storyboard.com/2025/01/DSC_8212_ec4ef5e1-2560x1707.jpg"
+        "https://cdn.skoda-storyboard.com/2025/01/DSC_8212_ec4ef5e1-1440x960.jpg"
       ],
       "aspect_crop_source": false,
       "bytes": 951199,
@@ -26809,8 +26796,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -29152,7 +29139,7 @@
     },
     "f983e4d3__DSC_4443_bb625d0a.jpg": {
       "logical_id": "f983e4d3__DSC_4443_bb625d0a.jpg",
-      "source_url": "https://cdn.skoda-storyboard.com/2025/05/DSC_4443_bb625d0a.JPG-1440x960.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2025/05/DSC_4443_bb625d0a.JPG-2560x1707.jpg",
       "master_url": "https://cdn.skoda-storyboard.com/2025/05/DSC_4443_bb625d0a.jpg",
       "dam_page_path": "en/emobility/enyaq-and-elroq-now-double-as-gaming-consoles-and-thats-not-all",
       "page_refs": [
@@ -29162,24 +29149,24 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2025/05/DSC_4443_bb625d0a.JPG-1440x960.jpg",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2025/05/DSC_4443_bb625d0a.JPG-2560x1707.jpg",
       "da_path": "",
       "alt": "Park your Škoda using your mobile phone. We'll show you how",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2025/05/DSC_4443_bb625d0a.JPG-1440x960.jpg",
-        "https://cdn.skoda-storyboard.com/2025/05/DSC_4443_bb625d0a.JPG-1920x1280.jpg"
+        "https://cdn.skoda-storyboard.com/2025/05/DSC_4443_bb625d0a.JPG-2560x1707.jpg",
+        "https://cdn.skoda-storyboard.com/2025/05/DSC_4443_bb625d0a.JPG-1440x960.jpg"
       ],
       "aspect_crop_source": false,
-      "bytes": 137890,
+      "bytes": 311135,
       "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2025/05/DSC_4443_bb625d0a.jpg"
+      "status": "done",
+      "note": ""
     },
     "86741f96__DSF7403ret_5bd3d135.jpg": {
       "logical_id": "86741f96__DSF7403ret_5bd3d135.jpg",
@@ -93953,8 +93940,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -94064,8 +94051,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -94104,8 +94091,8 @@
       "steps": {
         "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
       "status": "done",
       "note": "",
@@ -112731,6 +112718,35 @@
       ],
       "aspect_crop_source": false,
       "bytes": 3050526,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "9dd7d96c__Untitled-design-3_a6a0026c.png": {
+      "logical_id": "9dd7d96c__Untitled-design-3_a6a0026c.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/07/Untitled-design-3_a6a0026c.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/07/Untitled-design-3_a6a0026c.png",
+      "dam_page_path": "en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones",
+      "page_refs": [
+        "en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/07/Untitled-design-3_a6a0026c.png",
+      "da_path": "",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/07/Untitled-design-3_a6a0026c.png"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 2019955,
       "preconditioned": false,
       "steps": {
         "deliver": "done",

@@ -73,16 +73,58 @@ test('story normalizes DA-stripped date markup without duplicating the date or l
   assert.equal(meta.textContent, '15. 9. 2026Category');
 });
 
-test('overlay keeps one content layer over media; archive stays image-only', () => {
+test('overlay keeps one content layer after the media and marks the perex', () => {
   const overlay = block('overlay');
   decorate(overlay);
   assert.deepEqual([...overlay.children].map((el) => el.className), [
     'hero-image-media', 'hero-image-content',
   ]);
   assert.equal(overlay.querySelector('.hero-image-content h1').textContent, 'Epiq title');
-  assert.equal(overlay.querySelector('.hero-image-content p').textContent, 'The perex.');
+  assert.equal(overlay.querySelector('.hero-image-perex').textContent, 'The perex.');
 
-  const archive = block('archive');
+  // a template's own classes win: the series badge and the model chip stay as they are
+  const series = block('overlay', `
+    <div><div><picture><img src="/hero.png" alt=""></picture></div></div>
+    <div><div><p class="hero-image-badge">Series</p><h1>130 years</h1><p>Standfirst</p></div></div>
+  `);
+  decorate(series);
+  assert.deepEqual([...series.querySelectorAll('.hero-image-content p')].map((p) => p.className), [
+    'hero-image-badge', 'hero-image-perex',
+  ]);
+});
+
+test('archive renders the band and turns the h1 lines into label chips', () => {
+  const archive = block('archive', `
+    <div><div><picture><img src="/banner.jpg" alt="" width="1920" height="369"></picture></div></div>
+    <div><div><h1>Models<br>Peaq</h1></div></div>
+  `);
   decorate(archive);
-  assert.deepEqual([...archive.children].map((el) => el.className), ['hero-image-media']);
+  assert.deepEqual([...archive.children].map((el) => el.className), [
+    'hero-image-media', 'hero-image-content',
+  ]);
+  const img = archive.querySelector('.hero-image-media img');
+  assert.equal(img.getAttribute('fetchpriority'), 'high');
+  assert.equal(img.getAttribute('loading'), 'eager');
+  const h1 = archive.querySelector('.hero-image-content h1');
+  assert.deepEqual([...h1.querySelectorAll('.hero-image-label')].map((l) => l.textContent), ['Models', 'Peaq']);
+  assert.equal(h1.textContent, 'Models Peaq', 'the accessible name keeps a space between labels');
+  assert.equal(h1.querySelector('br'), null);
+});
+
+test('archive without a banner keeps an empty band; an h1 without breaks is one chip', () => {
+  const archive = block('archive', `
+    <div><div></div></div>
+    <div><div><h1>Design &amp; Engineering</h1></div></div>
+  `);
+  decorate(archive);
+  const media = archive.querySelector('.hero-image-media');
+  assert.ok(media, 'the band renders without an image');
+  assert.equal(media.children.length, 0);
+  assert.deepEqual([...archive.querySelectorAll('.hero-image-label')].map((l) => l.textContent), [
+    'Design & Engineering',
+  ]);
+
+  const imageOnly = block('archive', '<div><div><picture><img src="/banner.jpg" alt=""></picture></div></div>');
+  decorate(imageOnly);
+  assert.deepEqual([...imageOnly.children].map((el) => el.className), ['hero-image-media']);
 });

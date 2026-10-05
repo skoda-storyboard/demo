@@ -9,6 +9,20 @@ center, order-swap + `28px` at `≤768`, box 970×546 / 748×421 16:9; series ov
 `1920×1080`) and the size-drop breakpoint refined to `≤768`.
 Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 
+> **SKODA-828 re-capture (2026-10-05, measured source vs EDS at 375–3840).** Overrides §3B/§3C/§8 where they differ:
+> - **Archive band (B):** the visible band is the whole term hero, **184 / 224 / 240px** (<576 / 576–767 / ≥768) at
+>   every width up to 3840. The 160/200px figures are the image row only; below 768 the 24px label row sits under it
+>   and the image covers both. The labels are grey chips (11/11/600 uppercase, `#7c7d7e`, 5px 10px, radius 2px,
+>   3px apart) on the bottom-left of the column (+8px). No `<h1>` on the source; EDS renders its single h1 as the
+>   chips. Terms without a banner keep the empty band. The story grid starts 24px below.
+> - **Overlay (C):** no height cap: `61.8vh` at every width from 768 (3440×1440 → 890, 3840×1600 → 989). Below 768
+>   a 16:9 image, then the ink caption 16px below it in the 10px gutter (scrim kept). The caption sits on the
+>   bottom of the 1248px column: title 28/30.8/300 up to 768 and 48/52.8/300 from 769, 16px, perex 20/30/600, 8px.
+>   Series hubs keep 48px at every width. At exactly 768 the source caption hangs 16px below the image; EDS keeps it
+>   inside (one-pixel band, not reproduced).
+> - **Model:** the carousel's own steps are 9:5 <720, 3:1 720–1079, 5:2 1080–1391, 3:1 ≥1392 (not 768/1440); the
+>   compact title is `#000`, the title column halves from 1024. See `template-model-page.md`.
+
 ## 1. Identity
 
 - **Component:** Hero (the page-top banner). Four measured shapes: story-detail hero, category/archive
@@ -205,8 +219,8 @@ absolute `<picture>` and a `900px` breakpoint, none match the source. Adopt the 
   uses `fill`, which distorts non-16:9 masters). No visual regression on 16:9 sources.
 - **`hero` vs `hero-image`:** recommend folding the empty `hero` stub into `hero-image` and using a
   text-only variant flag rather than a second block (assumption to confirm).
-- **Overlay-hero height:** recommend `min(61.8vh, 640px)` to avoid over-tall heroes on short-wide
-  desktops (assumption to confirm; source is a raw `61.8vh`).
+- **Overlay-hero height:** ~~recommend `min(61.8vh, 640px)`~~ resolved (SKODA-828): a raw `61.8vh`, as the
+  source, measured to 3840×1600.
 - **New tokens** (assumption to confirm): `--heading-font-size-hero: 48px`,
   `--heading-font-size-hero-story: 40px`, `--weight-light: 300`, `--hero-vh: 61.8vh`,
   `--hero-archive-h-base/-sm/-md: 160/200/240px`, scrim gradients (`--scrim-h`, `--scrim-v`), plus define
@@ -219,7 +233,8 @@ Compare EDS render to source at each viewport. Format: WHAT / WHERE / viewport /
 - [ ] Real `<img>`: hero uses an `<img>`/`<picture>`, never a CSS background · `.hero-image img` · all.
 - [ ] Story box: `.hero-image` rendered box = **16:9 ±1px** · all; desktop width-capped ≈ 970px
       (546px tall) at 1280/1024; 748×421 at 768; 480×270 at 500.
-- [ ] Archive band: `body.archive .hero-image` height = **160 / 200 / 240px** at <576 / ≥576 / ≥768.
+- [ ] Archive band: the term band height = **184 / 224 / 240px** at <576 / ≥576 / ≥768 (SKODA-828; the
+      image row is 160 / 200 / 240).
 - [ ] Overlay hero: `.hero-image` height = **61.8vh**; scrim present; title white `48px / weight 300`.
 - [ ] Story title: `.hero-heading .heading` = `40px / 44px / weight 600 / #161718` at ≥1080 center;
       `28px / 30.8px` left at ≤767; image-above-title order at ≤1079.
