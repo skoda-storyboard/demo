@@ -73,8 +73,15 @@ All values `measured (source-url · selector · viewport) -> token`. `HP` = `htt
 Cells are sized by percentage width; the gutter is a container `margin: 0 -10px` with `padding: 0 10px`
 per cell = a **20px effective gap** (· `.items` / `.item` · MR source CSS).
 
+> **Re-measure 2026-09-30 (SKODA-611b, built there: see its "Home rails round").** The live Storyboard home
+> category rails (`.cover-box .search-results.type-post .search-results-items`) now measure the **content-heavy
+> ladder, 90% / 45% / 30%**, not the 22.5% row below. Cells are 338 / 346 / 298 / 374px at 375 / 768 / 992 / 1440,
+> and cards are 354×199 at 1440. Each rail also has an "All" ghost-pill header link (90×36) and an "All" end card.
+> Models keeps a model ladder (90 → 45 → 30 → 22.5%), and Models and Series are caption cards (16:9 image + 45px title row).
+> The table below stays as the Media Room standard-rail measurement.
+
 Standard rails (`.images / .models / .videos .items.flickity-enabled .item`, and the homepage
-`.search-results-items` rails, which measure identically):
+`.search-results-items` rails, which measured identically on 2026-09-23):
 
 | Viewport | cell width (CSS) | measured cell px | items-per-view (measured) |
 |---|---|---|---|
@@ -85,12 +92,14 @@ Standard rails (`.images / .models / .videos .items.flickity-enabled .item`, and
 Content-heavy rails (`.attachments / .news .items.flickity-enabled .item`): `90%` (<768) / `45%`
 (>=768, ~2.2/view) / `30%` (>=992, ~3.3/view) (· MR source CSS).
 
-On landing pages, the EDS `story-rail` applies this wider ladder only when its
-authored `template` is `press_release` (including the Storyboard home's "Latest
-News" and Media Room's "News"). The block expands through the generic section
-padding to the source's full-width rail, capped at `--content-max-width`; its
-reserved height follows the same cell width. Story, model, image, video and
-press-detail related rails keep their existing layouts.
+On landing pages, the EDS `story-rail` applies this wider ladder (`story-rail-wide`) to
+`press_release` rails (the Storyboard home's "Latest News", the Media Room's "News") and,
+since SKODA-611b, to every index rail in a home `cover-box` band: the Storyboard home's
+bands and the Media Room's compact band (Models, Press Kits). Models there keep the source's
+model ladder (90 → 45 → 30 → 22.5%). The block expands through the generic section padding
+to the source's full-width rail, capped at `--content-max-width`; its reserved height
+follows the same cell width. Other rails keep their layouts: model-page, image, video and
+press-detail related rails, and the Media Room's light-band rails.
 
 **Story-detail bottom Related Stories (SKODA-820)** follows the content-heavy ladder,
 not the homepage category ladder. Chrome DevTools CSS/DOM extraction on
@@ -278,8 +287,9 @@ Taxonomy `Carousel` (no date -> `.carousel-caption`, bold title below wide image
 
 Compare EDS `/en` render to source at each viewport. WHAT / WHERE / viewport / expected / actual.
 
-- [ ] Items-per-view: `.carousel li` / 1280 / **~4.4** visible (cell ≈`22.5%`, `281px` @1248 track).
-- [ ] Items-per-view: `.carousel li` / 768 / **~3.3** visible (cell `30%`, `230px`).
+- [ ] Items-per-view: `.carousel li` / 1280 / **~4.4** visible (cell ≈`22.5%`, `281px` @1248 track): Media Room standard
+      rails and the home Models rail. The Storyboard home's other rails are **~3.3** (30%), SKODA-611b.
+- [ ] Items-per-view: `.carousel li` / 768 / **~3.3** visible (cell `30%`, `230px`); the home's non-Models rails **~2.2** (45%).
 - [ ] Items-per-view: `.carousel li` / <768 / **~1.1** visible with next peeking (cell `90%`).
 - [ ] Gap: `.carousel ul` / all / effective inter-card gap = **`20px`**.
 - [ ] Arrow: `.carousel-arrow` / all / `32×32`, `border-radius:50%`, at track edges; `opacity:0` when
@@ -287,7 +297,8 @@ Compare EDS `/en` render to source at each viewport. WHAT / WHERE / viewport / e
 - [ ] Dots (dots variant only): `10×10`, `#d8d8d8`, selected `#686868`; hidden when single page.
 - [ ] Drag: track scrolls on pointer-drag; post-drag click on a card is suppressed (no navigation).
 - [ ] Touch: `touch-action:pan-y`, vertical page scroll unaffected while swiping horizontally.
-- [ ] Taxonomy rail: `.carousel-caption` img aspect `383/150` in light sections; title below, bold.
+- [ ] Taxonomy rail: `.carousel-caption` title below the image, bold. Home bands (SKODA-611b): a 16:9 image with 8px
+      corners and a 45px white title row, 16/600 black (the `383/150` letterbox is the image's own crop inside it).
 - [ ] story-rail: builds a `.carousel`, defers build until near viewport, no repeat of stories shown
       in the featured promo / `stories` grid; reserves height (no CLS).
 - [ ] Promo-box mode: `.promo-box` / `>=768` / **rotating mosaic** (1 big `66.66%` + 2 small `33.33%`,

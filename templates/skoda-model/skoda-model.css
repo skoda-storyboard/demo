@@ -461,7 +461,7 @@ body.skoda-model .carousel.center .card-teaser-title {
   color: var(--skoda-black);
   font-size: var(--body-font-size-m);
   font-weight: var(--weight-semibold);
-  line-height: 45px;
+  line-height: var(--card-caption-row);
   text-align: center;
 }
 

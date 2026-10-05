@@ -96,6 +96,11 @@ test('classifyBlock: tiles are on main; gallery slider and columns split remain 
   assert.equal(tiles.status, 'main');
   assert.equal(classifyBlock(one(block('gallery slider', row('x'))), CONTRACTS, CODE).id, 'gallery-slider');
   assert.equal(classifyBlock(one(block('columns split-62', row('a', 'b'))), CONTRACTS, CODE).id, 'columns-split');
+  // shape 2 (SKODA-225): the authored portrait width travels as a second variant
+  const portrait = classifyBlock(one(block('columns split-62 portrait-235', row('a', 'b'))), CONTRACTS, CODE);
+  assert.equal(portrait.id, 'columns-split');
+  assert.deepEqual(portrait.problems, []);
+  assert.equal(classifyBlock(one(block('columns split-62 portrait-2350', row('a', 'b'))), CONTRACTS, CODE).status, 'error', 'portrait over 999px');
 });
 
 // A pinned block with no code yet. Quote (SKODA-220) and Accordion (SKODA-805c) were the

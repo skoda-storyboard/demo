@@ -22,6 +22,8 @@
  *                  type-skoda_model→skoda_model, type-press_release→press_release,
  *                  type-skoda_series→skoda_series, type-press_kit→press_kit,
  *                  type-attachment→(image|video by heading), type-post→story.
+ *   - viewall  ← the same "All" header link, kept as a link (SKODA-611b): the rail's header
+ *                pill, and on post rails its "All" end card. skoda-links rewrites the href.
  * Never keyed on section order or the page URL. Rails it cannot classify (e.g. the
  * live-Instagram `type-social` strip) unwrap and bail — they are not index-driven.
  */
@@ -82,6 +84,16 @@ export default function parse(element, { document }) {
       return;
     }
     cells.push(['template', template]);
+  }
+
+  // The source's "All" header link (SKODA-611b): story-rail renders it as the header pill and,
+  // on a full post rail, as the "All" end card. Its label is the source's own text.
+  // only a real link (absolute http(s) or root-relative): not #, javascript:, empty or relative
+  if (href && /^(?:https?:\/\/|\/(?!\/))/i.test(href.trim())) {
+    const link = document.createElement('a');
+    link.setAttribute('href', href.trim());
+    link.textContent = (allLink.textContent || '').trim() || 'All';
+    cells.push(['viewall', link]);
   }
 
   // Image/video rows live in the generated media feed, not the page index (SKODA-608), as

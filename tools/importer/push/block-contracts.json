@@ -121,6 +121,7 @@
         "columns",
         "excludefeatured",
         "offset",
+        "exclude",
         "feature"
       ]
     },
@@ -289,13 +290,16 @@
       "id": "columns-split",
       "block": "columns",
       "variantPatterns": [
-        "^split-[1-9][0-9]$"
+        "^split-[1-9][0-9]$",
+        "^portrait-[1-9][0-9]{1,2}$"
       ],
       "status": "pinned",
       "ticket": "SKODA-225",
       "fallback": "readable",
-      "shape": 1,
-      "emittedBy": []
+      "shape": 2,
+      "emittedBy": [
+        "parsers/story-flatten.js"
+      ]
     },
     {
       "id": "highlight",
