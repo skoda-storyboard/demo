@@ -1,0 +1,16 @@
+/* Footnotes (SKODA-805d): the press-kit small print, measured on the live first-glimpse press
+   kit at 375/768/992/1080/1280/1440. The source sets each line in a 10pt (13.33px) span inside an
+   ordinary paragraph, so the text keeps the paragraph's 24px line and its 20px gap; only the
+   size, and with it the wrapping, changes. Ink as the body copy. */
+.footnotes {
+  --footnotes-font-size: 10pt;
+
+  font-size: var(--footnotes-font-size);
+  line-height: calc(var(--body-font-size-m) * var(--line-height-body));
+}
+
+.footnotes > p,
+.footnotes > ul,
+.footnotes > ol {
+  margin-block: 0 var(--paragraph-gap);
+}

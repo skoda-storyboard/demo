@@ -792,3 +792,50 @@ test('a WordPress video widget plays its MP4 master natively, named by its Media
   assert.equal(txt(link), 'Škoda Fabia 130: Special edition');
   assert.equal(page.querySelectorAll('iframe, a[href^="https://player.vimeo.com"]').length, 0);
 });
+
+test('first-glimpse small print becomes Footnotes; small letters in a sentence, 12px paragraphs and answers stay text', { skip: !JSDOM }, () => {
+  // Live shapes, 2026-10-05: first-glimpse (10pt spans), a Motorsport ordinal, a Peaq chapter's
+  // 12px paragraph, and small print inside a row-toggle answer (Epiq interior).
+  const small = '<p><span style="font-size: 10pt;">¹ The availability of MOON&nbsp;POWER services on selected markets can be found '
+    + '<a href="https://www.moon-power.com/business/products/charging-stations/bidirectional-charging/skoda">HERE</a></span><br>\n'
+    + '<span style="font-size: 10pt;">² All 85, 85x, or RS&nbsp;electric models are eligible.</span></p>';
+  const ordinal = '<p>Škoda won the 1<span style="font-size: 10pt;">st</span> round.</p>';
+  const twelve = '<p style="font-size: 12px;">⁶ Maximum charging power and charging time.</p>';
+  const answer = grid(`
+    <div class="so-panel widget_ys-row-toggle"><h2 class="row-title"><span>Interior</span></h2></div>
+    <div class="so-panel widget_siteorigin-panels-builder"><div class="panel-layout">${grid(widget(
+    '<p>Boot space.</p><p><span style="font-size: 10pt;">³ Liquid volume.</span></p>',
+  ))}</div></div>`);
+  const page = run(fixture({ extra: grid(widget(`${ordinal}${twelve}`)) + answer + grid(widget(small)) }), target);
+  const [footnotes, ...more] = blocks(page, 'Footnotes');
+  assert.ok(footnotes, 'Footnotes table');
+  assert.equal(more.length, 0, 'only the top-level small print');
+  const cell = footnotes.querySelectorAll('tr')[1].children[0];
+  assert.match(txt(cell), /^¹ The availability of MOON POWER services on selected markets can be found HERE ² All 85, 85x, or RS electric models are eligible\.$/);
+  assert.equal(cell.querySelector('a').getAttribute('href'), 'https://www.moon-power.com/business/products/charging-stations/bidirectional-charging/skoda');
+  assert.equal(cell.querySelectorAll('br').length, 1);
+  const para = (re) => [...page.querySelectorAll('p')].find((p) => re.test(txt(p)) && !p.closest('table'));
+  assert.equal(txt(para(/won the 1/)), 'Škoda won the 1st round.', 'the ordinal sentence is untouched');
+  assert.ok(para(/^⁶ Maximum charging power/), 'the 12px paragraph stays an ordinary paragraph (follow-up)');
+  const inAnswer = rows(page, 'Accordion').find((row) => /Interior/.test(txt(row.children[0])))?.children[1];
+  assert.match(txt(inAnswer), /Boot space\.\s*³ Liquid volume\./, 'answer small print stays readable text');
+  assert.equal(inAnswer.querySelectorAll('table').length, 0, 'no nested table in the answer');
+  assert.equal(page.querySelectorAll('[data-skoda-footnote]').length, 0, 'no marker reaches DA');
+});
+
+test('footnotes in consecutive widgets share one block, in place; in a Columns cell they stay text', { skip: !JSDOM }, () => {
+  const line = (t) => `<p><span style="font-size: 10pt;">${t}</span></p>`;
+  const twoCells = '<div class="panel-grid">'
+    + `<div class="panel-grid-cell">${widget('<p>Left cell copy.</p>')}</div>`
+    + `<div class="panel-grid-cell">${widget(`<p>Right cell copy.</p>${line('⁹ In a cell.')}`)}</div></div>`;
+  const page = run(fixture({
+    extra: grid(widget('<p>Before the notes.</p>')) + grid(widget(line('⁷ First.'))) + grid(widget(line('⁸ Second.'))) + twoCells,
+  }), target);
+  const [footnotes, ...more] = blocks(page, 'Footnotes');
+  assert.equal(more.length, 0);
+  assert.deepEqual([...footnotes.querySelectorAll('tr')].slice(1).map(txt), ['⁷ First.', '⁸ Second.']);
+  assert.equal(txt(footnotes.previousElementSibling), 'Before the notes.', 'in source order');
+  const cells = rows(page, 'Columns').flatMap((row) => [...row.children]);
+  assert.ok(cells.some((cell) => /Right cell copy\.\s*⁹ In a cell\./.test(txt(cell))), 'the cell keeps its small print as text');
+  assert.equal(cells.flatMap((cell) => [...cell.querySelectorAll('table')]).length, 0);
+});

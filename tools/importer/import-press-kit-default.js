@@ -5,6 +5,7 @@ import tags from './parsers/tags.js';
 import content from './parsers/press-kit-content.js';
 import media from './parsers/press-kit-media.js';
 import quote, { markQuotes } from './parsers/quote.js';
+import footnotes, { markFootnotes } from './parsers/footnotes.js';
 import layout from './transformers/skoda-press-kit-default-layout.js';
 import metadata from './transformers/skoda-metadata.js';
 import normalizeImages from './transformers/skoda-images.js';
@@ -36,6 +37,9 @@ export default {
       .forEach((a) => { if (!a.textContent.trim()) a.textContent = 'Download'; });
     // preProcess also drops every <hr>: mark the pull-quotes by their rule first (SKODA-220).
     document.querySelectorAll('article.press_kit .entry-content').forEach(markQuotes);
+    // Small print, read from the source as published, before helix-importer's clean-up
+    // (SKODA-805d).
+    document.querySelectorAll('article.press_kit .entry-content').forEach(markFootnotes);
   },
   transform: (payload) => {
     const { document, url, params } = payload;
@@ -53,6 +57,9 @@ export default {
     content(body, { document });
     // After the layout, whose source-table pass would flatten a Quote table.
     body.querySelectorAll('p[data-skoda-quote]').forEach((p) => quote(p, payload));
+    body.querySelectorAll('p[data-skoda-footnote]').forEach((p) => footnotes(p, payload));
+    // a mark outside the article body (another .entry-content) never reaches DA
+    main.querySelectorAll('[data-skoda-footnote]').forEach((p) => p.removeAttribute('data-skoda-footnote'));
 
     article.querySelectorAll('section.images.sa-media-kit-preview')
       .forEach((section) => gallery(section, payload));
