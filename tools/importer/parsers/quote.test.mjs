@@ -225,3 +225,32 @@ test('figures that are not quotes are left as authored', { skip }, () => {
   assert.equal(root.querySelectorAll('svg').length, 1);
   assert.equal(root.querySelectorAll('img').length, 2, 'media is never dropped');
 });
+
+// PR #245 review (P2): the merge moves the outer table's own last row, never a row of a table
+// nested in a quote cell.
+test('consecutive figures merge by outer rows when a cell holds a table (first or second figure)', { skip }, () => {
+  const data = '<table><tr><td>Range</td><td>560 km</td></tr></table>';
+  const fig = (q, by, extra = '') => `<figure><blockquote><p>${q}</p>${extra}</blockquote><figcaption>${by}</figcaption></figure>`;
+  [
+    ['nested in the second', fig('One.', 'A') + fig('Two lead.', 'B', data)],
+    ['nested in the first', fig('One lead.', 'A', data) + fig('Two.', 'B')],
+  ].forEach(([name, html]) => {
+    const root = runFigures(html);
+    const [table, ...more] = leftQuotes(root);
+    assert.equal(more.length, 0, `${name}: one block`);
+    assert.equal(table.rows.length, 3, `${name}: header + two outer rows`);
+    assert.deepEqual([...table.rows].slice(1).map((r) => txt(r.cells[1])), ['A', 'B'], `${name}: both attributions`);
+    assert.match(txt(table), /One( lead)?\..*Range 560 km|One( lead)?\..*Two( lead)?\./, `${name}: quote text kept`);
+    ['One', 'Two', 'Range', '560 km', 'A', 'B'].forEach((w) => assert.ok(txt(table).includes(w), `${name}: keeps ${w}`));
+    assert.equal(table.querySelectorAll('table').length, 1, `${name}: the nested table stays in its cell`);
+    assert.equal(root.querySelectorAll('figure').length, 0);
+  });
+});
+
+test('a centred quote run inside a figure quote is its text, not a Quote of its own', { skip }, () => {
+  const { document } = new JSDOM(`<div class="entry-content"><figure class="quote"><blockquote><p>Lead.</p>${quote('“Inner.”', 'Inner author')}</blockquote>`
+    + `<figcaption>Name</figcaption></figure>${quote('“Outer.”', 'Outer author')}</div>`).window;
+  const root = document.querySelector('.entry-content');
+  assert.equal(markQuotes(root), 1, 'only the run outside the figure');
+  assert.equal(root.querySelectorAll('figure hr').length, 1, 'its rule is left for the layouts to drop');
+});

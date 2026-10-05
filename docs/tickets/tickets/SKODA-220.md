@@ -31,6 +31,7 @@ Before this fix, the 5 chapters rendered a default blockquote (green leading bor
 - `parsers/quote.js` `parseFigure()`, run by `import-press-kit-default.js`, emits `Quote (left)` with rows `[quote, attribution]`.
   - It drops the italics and the edge `<br>`/`&nbsp;` (also inside an edge `strong`, never mid-sentence), and keeps a plain-text caption bold.
   - Consecutive figures share one block, one row each. Text between two figures keeps them apart.
+  - The merge moves the outer table's own rows, so a table inside a quote cell can't swallow the next quote. A centred quote run inside a figure quote stays part of that quote's text and never becomes a `Quote` of its own, since blocks can't nest (PR #245 review, P2). The 5 chapters import identically.
   - A `cite` stands in for a missing caption; beside a caption it stays quote text.
   - A figure with media (`img, picture, video, audio, iframe, svg, object, embed, canvas`), or with no quote text, is left as authored.
   - Everything else in the figure is kept, so no words are lost: several blockquotes, loose text, lists and other blocks. A block is never wrapped in a `<p>`. That includes the source's stray `</p>` in the Peaq Neft caption.

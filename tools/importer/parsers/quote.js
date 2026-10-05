@@ -38,8 +38,13 @@ function isAttribution(p) {
   return !!p?.matches('p') && centred(p) && !!p.querySelector('strong, b') && !isQuote(p);
 }
 
-/** Mark every quote run (centred italic <p> + rule + optional attribution) and drop its rule. */
+/**
+ * Mark every quote run (centred italic <p> + rule + optional attribution) and drop its rule.
+ * A run inside a figure quote is part of that quote's text, never a block of its own: blocks
+ * can't nest (PR #245 review).
+ */
 function markRun(hr) {
+  if (hr.closest('figure blockquote')) return false;
   const quote = hr.previousElementSibling;
   if (!isQuote(quote)) return false;
   quote.setAttribute(QUOTE, '');
@@ -176,8 +181,9 @@ export function parseFigure(figure, { document }) {
   const table = WebImporter.DOMUtils.createTable([[LEFT], figureRow(figure, document)], document);
   const prev = leftTableBefore(figure);
   if (prev) {
-    const row = [...table.querySelectorAll('tr')].pop();
-    [...prev.querySelectorAll('tr')].pop().after(row);
+    // the outer tables' own rows: a cell may hold a table of its own (PR #245 review)
+    const row = [...table.rows].pop();
+    [...prev.rows].pop().after(row);
     figure.remove();
     return;
   }

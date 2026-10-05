@@ -792,3 +792,31 @@ test('a WordPress video widget plays its MP4 master natively, named by its Media
   assert.equal(txt(link), 'Škoda Fabia 130: Special edition');
   assert.equal(page.querySelectorAll('iframe, a[href^="https://player.vimeo.com"]').length, 0);
 });
+
+// PR #245 review (P2): consecutive figure quotes merge by their outer rows, never a nested row,
+// and a centred quote inside a figure quote never becomes a nested Quote table.
+test('consecutive figure quotes with nested content keep every word, first or second figure', { skip: !JSDOM }, () => {
+  const plain = (q, by) => `<figure class="quote"><blockquote><p>${q}</p></blockquote><figcaption>${by}</figcaption></figure>`;
+  const nested = (lead, by) => `<figure class="quote"><blockquote><p>${lead}</p>
+    <p style="text-align:center"><em>Inner quote.</em></p><hr>
+    <p style="text-align:center"><strong>Inner author</strong></p></blockquote><figcaption>${by}</figcaption></figure>`;
+  const cases = {
+    'nested second': plain('First quote.', 'First author') + nested('Second quote lead.', 'Second author'),
+    'nested first': nested('First quote lead.', 'First author') + plain('Second quote.', 'Second author'),
+  };
+  Object.entries(cases).forEach(([name, figures]) => {
+    const page = run(fixture({ chapters: true, extra: grid(widget(figures)) }), intro);
+    const tables = blocks(page, 'Quote (left)');
+    assert.equal(tables.length, 1, `${name}: one block`);
+    assert.equal(tables[0].rows.length, 3, `${name}: header + two outer rows`);
+    assert.equal(tables[0].querySelectorAll('table').length, 0, `${name}: no nested table`);
+    assert.equal(blocks(page, 'Quote').length, 0, `${name}: the inner centred quote is not a block of its own`);
+    const all = txt(tables[0]);
+    ['quote lead.', 'Inner quote.', 'Inner author', 'First author', 'Second author'].forEach((words) => {
+      assert.ok(all.includes(words), `${name}: keeps "${words}"`);
+    });
+    const [first, second] = [...tables[0].rows].slice(1);
+    assert.match(txt(first.cells[1]), /^First author$/);
+    assert.match(txt(second.cells[1]), /^Second author$/);
+  });
+});
