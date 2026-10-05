@@ -100,6 +100,17 @@
   --story-body-gap: 0px;
   --story-aside-inset-top: 32px;
 
+  /* in-column highlight panel (SKODA-824, docs/ui-specs/highlight.md). The source panel is
+     a SiteOrigin row: 32px top padding (>=768), a 10px cell padding (= --story-inset) and
+     the widget's 15px margin, on all sides up to 780px and inline only from 781px. */
+  --highlight-row-top: 0px;
+  --highlight-widget-block: 15px;
+  --highlight-widget-inline: 15px;
+  --highlight-callout-padding: 25px; /* Zellmer FAQ callout (inline style on the source) */
+  --highlight-dark-bg: var(--dark-color);
+  --highlight-dark-color: var(--background-color);
+  --highlight-grey-bg: var(--skoda-grey-75);
+
   /* hero geometry (hero.md §8; SKODA-202) */
   --hero-vh: 61.8vh;
   --hero-archive-h-base: 160px;
@@ -702,6 +713,28 @@ main .section.dark > .default-content-wrapper :is(h1, h2, h3, h4, h5, h6) {
   color: inherit;
 }
 
+/* In-column highlight panel colours (SKODA-824; Section Metadata `Style: body-column,
+   highlight-dark|grey`). Geometry is per template: the story rules below, the press
+   release in its template CSS. Everything in the panel, nested Columns included, takes
+   its text colour. */
+main > .section.highlight-dark {
+  background-color: var(--highlight-dark-bg);
+  color: var(--highlight-dark-color);
+}
+
+main > .section.highlight-grey {
+  background-color: var(--highlight-grey-bg);
+  color: var(--highlight-grey-color);
+}
+
+main > .section:is(.highlight-dark, .highlight-grey) :is(h1, h2, h3, h4, h5, h6) {
+  color: inherit;
+}
+
+main > .section.highlight-dark a:any-link {
+  color: var(--highlight-dark-link-color);
+}
+
 /* cover-box: the homepage band box. Every home section is one (Section Metadata
    `Style: cover-box`, dark ones `Style: cover-box, dark`; SKODA-218, SKODA-611a).
    Live caps every band, light and dark, at 1440px and centres it on wider screens
@@ -904,6 +937,53 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
   line-height: var(--story-sidebar-heading-line-height);
 }
 
+/* In-column highlight panel (SKODA-824, docs/ui-specs/highlight.md). The importer splits the
+   body around each coloured source row: `Style: body-column, highlight-dark|grey`, then the
+   body resumes in a new body-column section. Below 768 the panel bleeds to the screen edges;
+   its content sits the source cell + widget inset in (25px). The panel touches the body on
+   both sides, which keeps the source cell's 10px padding there, and panels in a row read as
+   one band: the source pulls the second row 40px up over the first's empty bottom, so the
+   first drops its bottom inset and the second keeps the 10px cell padding (text 30px apart,
+   32 on the source). */
+/* stylelint-disable-next-line no-descending-specificity -- the intro → body rule above must
+   keep winning on a leading panel's top margin */
+body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) {
+  margin-block-start: 0;
+  padding-block:
+    calc(var(--highlight-row-top) + var(--story-inset) + var(--highlight-widget-block))
+    calc(var(--story-inset) + var(--highlight-widget-block));
+}
+
+body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) > div {
+  padding-inline: calc(var(--story-inset) + var(--highlight-widget-inline));
+}
+
+/* A leading panel keeps the intro → body gap but its own top inset (after the intro → body
+   rule, which has the same specificity). */
+body.story main > .section:first-of-type + .section:is(.highlight-dark, .highlight-grey) {
+  padding-block-start:
+    calc(var(--highlight-row-top) + var(--story-inset) + var(--highlight-widget-block));
+}
+
+body.story main > .section:is(.highlight-dark, .highlight-grey):has(+ .section.body-column),
+body.story main > .section.body-column:has(+ .section:is(.highlight-dark, .highlight-grey)) {
+  margin-block-end: 0;
+}
+
+body.story main > .section:is(.highlight-dark, .highlight-grey) + .section.body-column {
+  margin-block-start: 0;
+  padding-block-start: var(--story-inset);
+}
+
+body.story main > .section.highlight-dark:has(+ .section.highlight-dark),
+body.story main > .section.highlight-grey:has(+ .section.highlight-grey) {
+  padding-block-end: 0;
+}
+
+body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has(+ .section:is(.highlight-dark, .highlight-grey)) {
+  padding-block-end: var(--story-inset);
+}
+
 /* Layer 2 / Layer 3 — at ≥768 the article becomes a real two-column grid. This is a
    genuine structural transition (single stack → side-by-side), so it earns the one
    breakpoint. `main` is the grid; the body column spans the left track and the aside
@@ -913,6 +993,7 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
 @media (width >= 768px) {
   body.story {
     --story-body-gap: 32px;
+    --highlight-row-top: 32px;
   }
 
   body.story main {
@@ -923,6 +1004,9 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
     max-width: var(--content-max-width);
     margin-inline: auto;
     align-items: start;
+
+    /* rows: see the sidebar rule below */
+    grid-template-rows: repeat(var(--body-rows-before-last), auto) 1fr;
   }
 
   /* the text ends where the aside track starts (the aside owns the 64px gap) */
@@ -945,6 +1029,17 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
      confirmed with the client (source aside is static). */
   body.story main > .section.sidebar {
     grid-column: 2;
+    grid-row: var(--body-row-start) / span var(--body-rows);
+  }
+
+  /* A highlight panel splits the body into several sections (SKODA-824). The aside then
+     spans all of them from the first, and the last body row takes up the slack when the
+     aside is the taller one, so the body parts stay flush. The counts come from
+     spanSidebar() (scripts/split-body.js); without them both rules fall back to auto.
+     The panel itself runs to the aside's edge: the body track plus the 10px the text
+     keeps clear. */
+  body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) {
+    margin-inline-end: calc(-1 * var(--story-inset));
   }
 
   /* 64px after the text, ending the source's 10px from the container edge */
@@ -978,6 +1073,14 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
 
   body.story main > .section.dark.story-rail-container::before {
     max-width: var(--story-related-band-max-width);
+  }
+}
+
+/* From 781 the source's SiteOrigin widgets drop their 15px top/bottom margin (its 780px
+   mobile collapse), so the highlight panel content starts 42px down instead of 57px. */
+@media (width >= 781px) {
+  body.story {
+    --highlight-widget-block: 0px;
   }
 }
 

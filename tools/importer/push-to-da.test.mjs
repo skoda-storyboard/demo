@@ -17,7 +17,7 @@ const videoPublic = 'https://publish-p123.adobeaemcloud.com/content/dam/clip.mp4
 async function scenario(stage, remoteMatches, {
   previewed = false, image = 'small', extra = [], edited = false, fragmentBlocked = false,
   blockedSibling = false,
-  binary = '', binarySibling = false, video = false, highlight = false,
+  binary = '', binarySibling = false, video = false, held = false,
 } = {}) {
   const dir = mkdtempSync(path.join(tmpdir(), 'skoda-506-push-'));
   const previousFetch = global.fetch;
@@ -31,7 +31,7 @@ async function scenario(stage, remoteMatches, {
     + `<div class="metadata"><div><div>Image</div><div>https://cdn.example.test/card.jpg</div></div></div>${
       binary ? `<p><a href="${binary === 'hosted' ? binaryPublic : binarySource}">Report PDF</a></p>` : ''}${
       video ? `<p><a href="${videoSource}">Download video</a></p>` : ''}${
-      highlight ? '<div><p>Panel</p><div class="section-metadata"><div><div>style</div><div>body-column, highlight-dark</div></div></div></div>' : ''}`;
+      held ? '<div><div class="story-rail"><div><div>heading</div><div>News</div></div><div><div>subheading</div><div>x</div></div><div><div>template</div><div>story</div></div></div></div>' : ''}`;
   let da = remoteMatches ? plain : '<div>Edited in DA</div>';
   const requests = [];
   mkdirSync(path.join(contentDir, 'en'), { recursive: true });
@@ -213,21 +213,21 @@ test('combined stage re-previews conditioned DA before live and reports the gate
   assert.ok(result.requests.some((req) => req.includes('POST https://admin.hlx.page/live/')));
 });
 
-test('a page the import contract holds (highlight section, SKODA-824) previews but is never published', async () => {
-  const result = await scenario('all', true, { highlight: true });
+test('a page the import contract holds (story-rail subheading, SKODA-208) previews but is never published', async () => {
+  const result = await scenario('all', true, { held: true });
   const [story] = result.report.pages;
   assert.equal(story.valid, true);
-  assert.match(story.error, /Hold publish \(import contract\): highlight \(SKODA-824, fallback broken\)/);
+  assert.match(story.error, /Hold publish \(import contract\): story-rail-subheading \(SKODA-208, fallback broken\)/);
   assert.equal(story.liveStatus, undefined);
   assert.ok(result.requests.some((req) => req.includes('POST https://admin.hlx.page/preview/')));
   assert.ok(!result.requests.some((req) => req.includes('POST https://admin.hlx.page/live/')));
 });
 
 test('--approve-hold publishes a wave-gate-approved broken fallback (rule 8)', async () => {
-  const result = await scenario('all', true, { highlight: true, extra: ['--approve-hold', 'highlight'] });
+  const result = await scenario('all', true, { held: true, extra: ['--approve-hold', 'story-rail-subheading'] });
   assert.equal(result.report.pages[0].error, undefined);
   assert.equal(result.report.pages[0].liveStatus, 200);
-  assert.deepEqual(result.report.args.approveHold, ['highlight']);
+  assert.deepEqual(result.report.args.approveHold, ['story-rail-subheading']);
 });
 
 test('an unconditioned shared fragment cannot bypass the gate via --publish-fragments', async () => {

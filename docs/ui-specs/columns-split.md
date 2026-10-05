@@ -54,5 +54,10 @@ Contract: `columns-split` v2 in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../planning
   - the desktop spacer widgets (`skoda-offset`): the portrait sits 24px higher (y10 vs y34) at ≥781;
   - whitespace-only lines (graffiti's leading `&nbsp;&nbsp;<br>`, Peaq's empty `<p>&nbsp; &nbsp;</p>`): stacked, the
     second cell starts 24 / 44px earlier.
-- **Charging:** the panel's 32px top and 15px inner padding are SKODA-824's runtime half (still TODO). Until then the
-  image fills the cell (189.7 vs 149.7 @1440).
+- **Charging (inside the SKODA-824 highlight panel, landed 2026-10-05):**
+  - The panel now gives the row its 32px top padding and the 25px panel inset. The text cell content sits at x121, matching
+    the source; it is 586 wide against 594.
+  - Still open, in this block's own CSS: the source adds the widget's 15px inline margin inside *each* cell, which the
+    panel inset can't reproduce. The image is 182 wide against 149.7 at 1440.
+  - The cell's h2 takes the global 34/42.5 weight 600 with a 27px top margin, not the story prose 40/45 weight 300 with
+    no top margin. The story heading rules cover default content only.
