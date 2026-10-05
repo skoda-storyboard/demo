@@ -93,7 +93,13 @@ function leadImage(document, primary) {
   return make(document, 'p', img);
 }
 
-/** `.bullet-points`: one or more <p> of "›"-prefixed lines split by <br> (or real <li>). */
+const BULLET = /^\s*(?:›|&rsaquo;)/;
+
+/**
+ * `.bullet-points`: one or more <p> of "›"-prefixed lines split by <br> (or real <li>).
+ * When the lines carry "›" markers, a <br> before an unmarked line is a soft wrap inside
+ * one bullet (Karoq: "…and remains <br>a key model…"), so that line joins the previous one.
+ */
 function bulletList(document, primary) {
   const box = primary.querySelector('.bullet-points');
   if (!box) return null;
@@ -103,7 +109,12 @@ function bulletList(document, primary) {
     lis.forEach((li) => lines.push(li.innerHTML));
   } else {
     box.querySelectorAll('p').forEach((p) => {
-      p.innerHTML.split(/<br\s*\/?>/i).forEach((line) => lines.push(line));
+      const parts = p.innerHTML.split(/<br\s*\/?>/i).filter((line) => line.replace(/&nbsp;/g, ' ').trim());
+      const marked = parts.some((line) => BULLET.test(line));
+      parts.forEach((line, i) => {
+        if (marked && i > 0 && !BULLET.test(line)) lines[lines.length - 1] = `${lines[lines.length - 1].trimEnd()} ${line.trim()}`;
+        else lines.push(line);
+      });
     });
   }
   const ul = document.createElement('ul');
@@ -158,6 +169,20 @@ function bodyContent(document, primary) {
     const url = iframe && (iframe.getAttribute('data-src') || iframe.getAttribute('src'));
     wrap.replaceWith(...(url ? [urlParagraph(document, url)] : []));
   });
+
+  // <lite-youtube videoid> (Solberg Octavia RS): by import time the page script has hydrated it
+  // into a poster + "Play" links, so it becomes the bare watch URL the embed autoblock plays, as
+  // on stories (SKODA-818). Its consent shell (.page-embed.yt-embed-cookie) carries no content.
+  content.querySelectorAll('lite-youtube').forEach((el) => {
+    const id = (el.getAttribute('videoid') || '').trim();
+    const wrap = el.closest('.video-container, .ratio-container');
+    const box = wrap && wrap !== content && content.contains(wrap) ? wrap : el;
+    const p = box.closest('p');
+    const replacement = /^[\w-]{6,}$/.test(id) ? [urlParagraph(document, `https://www.youtube.com/watch?v=${id}`)] : [];
+    if (p && text(p) === text(box)) p.replaceWith(...replacement);
+    else box.replaceWith(...replacement);
+  });
+  content.querySelectorAll('.page-embed.yt-embed-cookie').forEach((n) => n.remove());
 
   // Inline video attachment (Peaq): Vimeo iframe + cart/download toolbar → bare URL.
   content.querySelectorAll('.media-cart-item.attachment, .video-container').forEach((wrap) => {

@@ -38,6 +38,10 @@ const PAGES = {
   board: 'skoda-auto-announces-changes-to-its-board-of-management',
   peaq: '936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs',
 };
+// Import validity audit fixtures (SKODA-833), kept out of PAGES so the M1 loops stay on the 5.
+const AUDIT = {
+  fourByFour: 'the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain',
+};
 
 function createTable(rows, doc) {
   const table = doc.createElement('table');
@@ -110,7 +114,7 @@ function sectionsOf(element) {
 const cache = {};
 function importPage(key, edit) {
   if (cache[key] && !edit) return cache[key];
-  const slug = PAGES[key];
+  const slug = PAGES[key] || AUDIT[key];
   const dom = new JSDOM(readFileSync(path.join(FIXTURES, `${slug}.html`), 'utf8'), { url: `${SRC}/${slug}/` });
   if (edit) edit(dom.window.document);
   globalThis.document = dom.window.document;
@@ -355,4 +359,79 @@ test('data tables become one line per row, never an unknown block named after th
   const power = [...element.querySelectorAll('li > strong')].find((s) => txt(s).startsWith('Max. charging power'));
   assert.equal(power.querySelector('sup')?.textContent, '3', 'the footnote marker stays a superscript');
   assert.ok([...element.querySelectorAll('p')].some((p) => txt(p) === 'Škoda Elroq'), 'the header label leads the list');
+});
+
+// SKODA-833 (import validity audit, F5)
+
+test('4x4 Media Box: all 15 items in one Downloads block, MP4 hrefs URL-serialised', { skip }, () => {
+  const { element, sections } = importPage('fourByFour');
+  const band = sections.find((s) => s.style === 'dark, full-width, media-box');
+  assert.deepEqual(band.blocks, ['Downloads'], 'one block in the band');
+  assert.equal(txt(band.content[1]), '9 videos, 3 images, 3 PDFs');
+  const rows = rowsOf(find(sections, 'Downloads'));
+  assert.equal(rows.length, 15);
+  const titles = rows.map((r) => txt(r.children[1]));
+  assert.ok(titles.includes('Video | Škoda Elroq'), titles.join('\n'));
+  const links = rows.flatMap((r) => [...r.children[2].querySelectorAll('a')]);
+  const mp4 = links.filter((a) => a.getAttribute('href').endsWith('.mp4'));
+  assert.equal(mp4.length, 9);
+  // helix-importer rewrites .mp4 links in the markdown to `new URL(href).href` after the grid
+  // table is laid out; a raw `×` would make that row 5 characters wider and break the table.
+  mp4.forEach((a) => assert.equal(a.getAttribute('href'), new URL(a.getAttribute('href')).href));
+  assert.ok(mp4.some((a) => a.getAttribute('href').includes('the_Skoda_4%C3%974_range')));
+  // only MP4s are re-encoded; the PDF keeps its source href
+  assert.ok(links.some((a) => a.getAttribute('href').endsWith('/260224_The-Skoda-4×4-model-range-Safe-driving-in-all-weather-and-challenging-terrain_dd892767.pdf')));
+  assert.ok([...element.querySelectorAll('table')].every((t) => blockName(t)), 'no nameless block');
+});
+
+test('lite-youtube: the hydrated player becomes a bare YouTube watch URL (SKODA-818 parity)', { skip }, () => {
+  const embed = 'https://www.youtube-nocookie.com/embed/d1xYSMyyWWA?enablejsapi=1&autoplay=1&playsinline=1';
+  const { sections } = importPage('superb', (doc) => {
+    doc.querySelector('.column-primary .entry-content').insertAdjacentHTML('beforeend', `
+      <div class="page-embed yt-embed-cookie hidden"><div class="page-embed_cookie"><span>This content is hosted by a third party (www.youtube.com).</span><button class="yt-cookie-consent-button">I acknowledge and confirm</button></div></div>
+      <lite-youtube videoid="d1xYSMyyWWA" params="enablejsapi=1" js-api><img src="https://i.ytimg.com/vi/d1xYSMyyWWA/maxresdefault.jpg" alt="">Play<a class="lyt-playbtn" href="${embed}"><span class="lyt-visually-hidden">Play</span></a><a href="${embed}">Play</a></lite-youtube>
+      <p><lite-youtube videoid="abcdef12345"></lite-youtube></p>`);
+  });
+  const body = sections[1].nodes;
+  const urls = body
+    .filter((n) => n.tagName === 'P' && n.querySelectorAll('a').length === 1 && txt(n) === n.querySelector('a').getAttribute('href'))
+    .map((n) => n.querySelector('a').getAttribute('href'));
+  assert.ok(urls.includes('https://www.youtube.com/watch?v=d1xYSMyyWWA'), urls.join('\n'));
+  assert.ok(urls.includes('https://www.youtube.com/watch?v=abcdef12345'), 'an unhydrated player too');
+  assert.ok(!body.some((n) => /\bPlay\b|third party/.test(txt(n))), 'no Play links or consent text');
+  assert.ok(!body.some((n) => n.querySelector('img[src*="ytimg.com"], lite-youtube, a[href*="youtube-nocookie"]')), 'no poster or player chrome');
+});
+
+test('tags: the "+N" show-more toggle is skipped and the tags it reveals are kept', { skip }, () => {
+  const before = rowsOf(find(importPage('peaq').sections, 'Tags'))[0].querySelectorAll('a').length;
+  const { sections } = importPage('peaq', (doc) => {
+    doc.querySelector('ol.entry-tags').insertAdjacentHTML('beforeend', `
+      <li><a class="label show-hidden-terms" href="#" title="All tags">+1</a></li>
+      <li><a class="label hidden-term" href="https://www.skoda-storyboard.com/en/news/?filter%5Bbodywork%5D%5B%5D=suv" title="SUV">SUV</a></li>`);
+  });
+  const chips = [...find(sections, 'Tags').querySelectorAll('a')];
+  assert.ok(!chips.some((a) => /^\+\d+$/.test(txt(a)) || a.getAttribute('href') === '#'), 'no toggle chip');
+  assert.ok(chips.some((a) => txt(a) === 'SUV'), 'hidden tag kept');
+  assert.equal(chips.length, before + 1);
+});
+
+test('bullets: a <br> inside one "›" bullet is a soft wrap, not a new bullet', { skip }, () => {
+  const { sections } = importPage('superb', (doc) => {
+    doc.querySelector('.bullet-points').innerHTML = `<p>›\tMilestone vehicle is a&nbsp;Karoq 1.5 TSI 110 kW in&nbsp;Graphite Grey<br />
+›\tLaunched in 2017, the compact SUV is now sold in around 60 markets and remains <br />
+a&nbsp;key model in Škoda’s SUV line-up<br />
+› Today, Hall M13 is a prime example, producing both ICE and </br> all-electric vehicles<br /></p>`;
+  });
+  const ul = sections[1].content.find((n) => n.tagName === 'UL');
+  // glued non-breaking spaces stay skoda-nbsp's placeholder until the push
+  assert.deepEqual([...ul.children].map((li) => txt(li).replace(/[\u00a0\u{F00A0}]/gu, ' ')), [
+    'Milestone vehicle is a Karoq 1.5 TSI 110 kW in Graphite Grey',
+    'Launched in 2017, the compact SUV is now sold in around 60 markets and remains a key model in Škoda’s SUV line-up',
+    'Today, Hall M13 is a prime example, producing both ICE and all-electric vehicles',
+  ]);
+  // without any "›" marker every <br> still starts a new bullet
+  const plain = importPage('superb', (doc) => {
+    doc.querySelector('.bullet-points').innerHTML = '<p>First line<br>Second line</p>';
+  }).sections[1].content.find((n) => n.tagName === 'UL');
+  assert.equal(plain.children.length, 2);
 });
