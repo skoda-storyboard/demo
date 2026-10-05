@@ -117,6 +117,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Finding:** a raw source spec table (`<table class="version">`) leaks through the story flattener as an unknown `version` block (published Epiq story; a 404 in the demo sweep). The contract `replaces: version`, so the check fails any page that still emits it.
 - **Shape:** header `Spec Table (versions)`. The first row is `[ "", version 1 name, version 2 name, … ]`, and each following row is `[label, value 1, value 2, …]` with units kept in the value text. It's the same block as `spec-table`, and the variant adds the multi-column layout.
 - **Resolve to:** `Columns` rows or text in the story importer (801a), since `spec-table` isn't built. The shape above applies only if 208 builds `spec-table`.
+- **Resolved (SKODA-830, 2026-10-05):** `transformers/skoda-story-cleanup.js` turns every body data table into `Columns`: the source header row first (`Version | Epiq 35 | Epiq 40 | Epiq 55`), then one row per source row, a `colspan` value repeated across the columns it spans. No `version` block is emitted.
 
 ### `cards-key-facts`
 - **Status:** `pinned` · **Ticket:** SKODA-208 · **Fallback:** readable (`cards.js` renders them as plain cards)
@@ -226,7 +227,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   controls the two-row disclosure (default `auto` in a Media Box, `none` elsewhere); authored
   `columns` controls desktop columns and the number disclosed. Neither option changes the three-cell
   asset row shape. Keep the contract pinned until the branch merges and QA verifies it.
-- **Emitted by:** `parsers/downloads.js` (press-release Media Box). A row shape of the `downloads` block on `main`, so the check classifies these pages as `main`, not pending.
+- **Emitted by:** `parsers/downloads.js` (press-release Media Box; since SKODA-830 also the story Media Box, wired in `import-story-detail.js`, in a `dark, full-width, media-box` section built by `skoda-story-cleanup.js`: `h2` Media Box, the stats paragraph, `Downloads`, between the `sidebar` and the related band). A row shape of the `downloads` block on `main`, so the check classifies these pages as `main`, not pending.
 - **Shape:** header `Downloads`, then 3 cells per row: `[<picture> or empty, title text, links]`. The links cell holds one `<a>` per size, its text the size label: `Original` + `1920px` (image, `/direct-download/…` and `…-1920xH.jpg`), `MP4` (video, Vimeo poster as the picture), `PDF` (document, empty picture cell).
 - **Example** (Peaq): 5 rows, `MP4`, 3 × `Original`+`1920px`, `PDF`.
 
