@@ -253,7 +253,10 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 ### `footnotes`
 - **Status:** ✅ on `main` with `blocks/footnotes` once SKODA-805d merges (block and importer land together). **Ticket:** SKODA-805d
 - **Why a block:** the source sets small print with an inline size (`<span style="font-size: 10pt">`). DA keeps no inline size, and its inline marks are only `strong`/`b`, `em`/`i`, `u`, `s`, `sup`, `sub`, `code` (no `small`, no `span`). It keeps classes only on block `<div>`s, so the small print has to be a block.
-- **Runtime:** each paragraph renders at 10pt (13.33px) on the body's 24px line, with the 20px paragraph gap, in ink, as the source does (measured on first-glimpse at 375/768/992/1080/1280).
+- **Runtime:** each paragraph renders at 10pt (13.33px) on the body's 24px line, with the 20px paragraph gap, in ink, as the source does (measured on first-glimpse at 375/768/992/1080/1280/1440).
+  - Links are the source's accent green (`--skoda-green-accent`, `#419468`), ink on hover, no underline. They keep the global `:focus-visible` ring, which the source lacks.
+  - Only the footnote link is green (decision 2026-10-05); other body links stay `--link-color` ink.
+  - Green on white is 3.71:1, under WCAG AA's 4.5:1 for text this size; the source has the same.
 - **Shape:** header `Footnotes`, then one row per paragraph of small print, one cell: `[<p>¹ … <a href>HERE</a><br>² …</p>]`. Links, line breaks and `sup` markers stay. Consecutive small-print paragraphs share one table.
 - **Importer:** `parsers/footnotes.js`, run by `import-press-kit-default.js`. `preprocess` marks the paragraphs (`markFootnotes`) on the source as published, before helix-importer's clean-up (which keeps styled spans today); the parser builds the table after the layouts have run, whose source-table pass would flatten it.
   - **Counts:** a `p` whose every word is set below the 16px body size by its nearest sized ancestor (a span; px or pt, the last `font-size` declaration wins). A `sup` marker outside the sized span is neutral.

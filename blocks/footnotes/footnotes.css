@@ -14,3 +14,15 @@
 .footnotes > ol {
   margin-block: 0 var(--paragraph-gap);
 }
+
+/* The source's footnote link is its accent green, turning ink on hover without an underline
+   (measured on first-glimpse). The source shows no focus outline; ours keeps the global
+   :focus-visible ring. Plain `.footnotes a`, as styles.css asks blocks to override. */
+.footnotes a {
+  color: var(--skoda-green-accent);
+}
+
+.footnotes a:hover {
+  color: var(--text-color);
+  text-decoration: none;
+}
