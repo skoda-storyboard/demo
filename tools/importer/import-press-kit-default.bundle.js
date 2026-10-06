@@ -77,11 +77,11 @@ var CustomImportScript = (() => {
     const cell = [];
     anchors.forEach((a) => {
       const href = a.getAttribute("href");
-      const text5 = (a.textContent || "").trim();
-      if (!href || !text5) return;
+      const text6 = (a.textContent || "").trim();
+      if (!href || !text6) return;
       const link = document.createElement("a");
       link.setAttribute("href", href);
-      link.textContent = text5;
+      link.textContent = text6;
       cell.push(link);
     });
     if (cell.length === 0) {
@@ -386,13 +386,13 @@ var CustomImportScript = (() => {
       const img = item.querySelector(".article-teaser-media img");
       const title = text2(item.querySelector(".entry-title")) || (img == null ? void 0 : img.getAttribute("alt")) || "";
       if (!title) throw new Error("Press-kit Media Box asset has no title");
-      const paragraphs = links.map((link) => {
+      const paragraphs2 = links.map((link) => {
         const p = document.createElement("p");
         p.append(link);
         return p;
       });
       if (!img) {
-        rows.push(["", title, paragraphs]);
+        rows.push(["", title, paragraphs2]);
         return;
       }
       if (!((_a = img.getAttribute("alt")) == null ? void 0 : _a.trim())) img.alt = ((_b = img.getAttribute("title")) == null ? void 0 : _b.replace(/^Video\s*\|\s*/i, "")) || title;
@@ -401,7 +401,7 @@ var CustomImportScript = (() => {
         img.src = src.replace(/-d_\d+x\d+(\.[a-z]+)?(\?.*)?$/i, "-d_1280x720.jpg");
       }
       ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop", "title"].forEach((attr) => img.removeAttribute(attr));
-      rows.push([img, title, paragraphs]);
+      rows.push([img, title, paragraphs2]);
     });
     const config = element.matches(".search-results-gallery") ? [["collapse", "auto"]] : [];
     element.replaceWith(WebImporter.DOMUtils.createTable([["Downloads"], ...config, ...rows], document));
@@ -424,6 +424,7 @@ var CustomImportScript = (() => {
     return !!(p == null ? void 0 : p.matches("p")) && centred(p) && !!p.querySelector("strong, b") && !isQuote(p);
   }
   function markRun(hr) {
+    if (hr.closest("figure blockquote")) return false;
     const quote = hr.previousElementSibling;
     if (!isQuote(quote)) return false;
     quote.setAttribute(QUOTE, "");
@@ -440,9 +441,9 @@ var CustomImportScript = (() => {
     [...quote.childNodes].forEach((node) => {
       if (node.nodeType === 1 && node.matches("em, i")) p.append(...node.childNodes);
     });
-    const edge = (n) => n && (n.nodeType === 1 && n.matches("br") || n.nodeType === 3 && !text3(n));
-    while (edge(p.lastChild)) p.lastChild.remove();
-    while (edge(p.firstChild)) p.firstChild.remove();
+    const edge3 = (n) => n && (n.nodeType === 1 && n.matches("br") || n.nodeType === 3 && !text3(n));
+    while (edge3(p.lastChild)) p.lastChild.remove();
+    while (edge3(p.firstChild)) p.firstChild.remove();
     return p;
   }
   function attributionParagraph(by, document) {
@@ -452,6 +453,86 @@ var CustomImportScript = (() => {
     const first = (_a = p.querySelector("strong, b")) == null ? void 0 : _a.firstChild;
     if ((first == null ? void 0 : first.nodeType) === 3) first.textContent = first.textContent.replace(/^\s+/, "");
     return p;
+  }
+  var LEFT = "Quote (left)";
+  var MEDIA = "img, picture, video, audio, iframe, svg, object, embed, canvas";
+  var BLOCK = "address, article, aside, blockquote, details, div, dl, fieldset, figure, form, h1, h2, h3, h4, h5, h6, hr, ol, pre, section, table, ul";
+  var is = (node, selector) => (node == null ? void 0 : node.nodeType) === 1 && node.matches(selector);
+  function isFigureQuote(node) {
+    const quoteEl = is(node, "figure") ? node.querySelector(":scope > blockquote") : null;
+    return !!quoteEl && !node.querySelector(MEDIA) && [...quoteEl.childNodes].some((n) => !is(n, "cite") && text3(n));
+  }
+  var edge = (n) => is(n, "br") || (n == null ? void 0 : n.nodeType) === 3 && !text3(n);
+  var trim = (node, re) => {
+    if ((node == null ? void 0 : node.nodeType) === 3) node.textContent = node.textContent.replace(re, "");
+  };
+  function plainParagraph(nodes, document) {
+    const p = document.createElement("p");
+    p.append(...nodes.map((node) => node.cloneNode(true)));
+    p.querySelectorAll("em, i").forEach((it) => it.replaceWith(...it.childNodes));
+    while (edge(p.lastChild)) p.lastChild.remove();
+    while (edge(p.firstChild)) p.firstChild.remove();
+    const inner = (n, side) => is(n, "strong, b") ? n[side] : n;
+    trim(inner(p.lastChild, "lastChild"), /\s+$/);
+    trim(inner(p.firstChild, "firstChild"), /^\s+/);
+    return p;
+  }
+  function paragraphs(nodes, document) {
+    const cell = [];
+    let run = [];
+    const flush = () => {
+      if (run.length) cell.push(plainParagraph(run, document));
+      run = [];
+    };
+    nodes.forEach((node) => {
+      if (is(node, "p")) {
+        flush();
+        cell.push(...paragraphs([...node.childNodes], document));
+      } else if (is(node, BLOCK)) {
+        flush();
+        const copy = node.cloneNode(true);
+        copy.querySelectorAll("em, i").forEach((it) => it.replaceWith(...it.childNodes));
+        cell.push(copy);
+      } else {
+        run.push(node);
+      }
+    });
+    flush();
+    return cell.filter((el) => text3(el));
+  }
+  function figureRow(figure, document) {
+    const nodes = [...figure.childNodes].filter((node) => !is(node, "figcaption"));
+    const cites = nodes.filter((node) => is(node, "blockquote")).flatMap((quoteEl) => [...quoteEl.querySelectorAll(":scope > cite")]);
+    const quote = nodes.flatMap((node) => paragraphs(is(node, "blockquote") ? [...node.childNodes].filter((child) => !cites.includes(child)) : [node], document));
+    const cited = cites.flatMap((cite) => paragraphs([...cite.childNodes], document));
+    let by = [...figure.querySelectorAll(":scope > figcaption")].flatMap((caption) => paragraphs([...caption.childNodes], document));
+    if (by.length) quote.push(...cited);
+    else by = cited;
+    if (!by.length) return [quote, ""];
+    if (!by.some((el) => el.querySelector("strong, b")) && is(by[0], "p")) {
+      const strong = document.createElement("strong");
+      strong.append(...by[0].childNodes);
+      by[0].append(strong);
+    }
+    return [quote, by];
+  }
+  var isLeftTable = (node) => is(node, "table") && text3(node.querySelector("th, td")) === LEFT;
+  function leftTableBefore(figure) {
+    let node = figure.previousSibling;
+    while ((node == null ? void 0 : node.nodeType) === 3 && !text3(node)) node = node.previousSibling;
+    return isLeftTable(node) ? node : null;
+  }
+  function parseFigure(figure, { document }) {
+    if (!isFigureQuote(figure)) return;
+    const table = WebImporter.DOMUtils.createTable([[LEFT], figureRow(figure, document)], document);
+    const prev = leftTableBefore(figure);
+    if (prev) {
+      const row = [...table.rows].pop();
+      [...prev.rows].pop().after(row);
+      figure.remove();
+      return;
+    }
+    figure.replaceWith(table);
   }
   function parse5(element, { document }) {
     var _a;
@@ -465,8 +546,87 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable([["Quote"], cells], document));
   }
 
-  // tools/importer/transformers/skoda-press-kit-default-layout.js
+  // tools/importer/parsers/footnotes.js
+  var MARK = "data-skoda-footnote";
+  var NAME = "Footnotes";
+  var BODY_PX = 16;
+  var MEDIA2 = "img, picture, video, audio, iframe, svg, object, embed, canvas";
   var text4 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
+  function fontPx(el) {
+    var _a;
+    const value = (_a = el.style) == null ? void 0 : _a.fontSize;
+    if (!value) return null;
+    const match = value.match(/^([\d.]+)(px|pt)$/i);
+    if (!match) return NaN;
+    return match[2].toLowerCase() === "pt" ? Number(match[1]) * 4 / 3 : Number(match[1]);
+  }
+  var isSmall = (px) => px > 0 && px < BODY_PX;
+  function isFootnote(p) {
+    var _a;
+    if (!((_a = p == null ? void 0 : p.matches) == null ? void 0 : _a.call(p, "p")) || fontPx(p) !== null || !text4(p) || p.querySelector(MEDIA2)) return false;
+    const walker = p.ownerDocument.createTreeWalker(
+      p,
+      4
+      /* NodeFilter.SHOW_TEXT */
+    );
+    let small = false;
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (text4(node)) {
+        let el = node.parentElement;
+        let marker2 = false;
+        while (el !== p && fontPx(el) === null) {
+          if (el.matches("sup")) marker2 = true;
+          el = el.parentElement;
+        }
+        if (el !== p) {
+          if (!isSmall(fontPx(el))) return false;
+          small = true;
+        } else if (!marker2) {
+          return false;
+        }
+      }
+    }
+    return small;
+  }
+  function markFootnotes(root) {
+    const found = [...root.querySelectorAll("p")].filter(isFootnote);
+    found.forEach((p) => p.setAttribute(MARK, ""));
+    return found.length;
+  }
+  var edge2 = (n) => n && (n.nodeType === 1 && n.matches("br") || n.nodeType === 3 && !text4(n));
+  function footnoteParagraph(p, document) {
+    var _a, _b;
+    const copy = document.createElement("p");
+    copy.append(...[...p.childNodes].map((node) => node.cloneNode(true)));
+    copy.querySelectorAll("span").forEach((span) => span.replaceWith(...span.childNodes));
+    copy.querySelectorAll("[style]").forEach((el) => el.removeAttribute("style"));
+    while (edge2(copy.lastChild)) copy.lastChild.remove();
+    while (edge2(copy.firstChild)) copy.firstChild.remove();
+    if (((_a = copy.lastChild) == null ? void 0 : _a.nodeType) === 3) copy.lastChild.textContent = copy.lastChild.textContent.replace(/\s+$/, "");
+    if (((_b = copy.firstChild) == null ? void 0 : _b.nodeType) === 3) copy.firstChild.textContent = copy.firstChild.textContent.replace(/^\s+/, "");
+    return copy;
+  }
+  function tableBefore(p) {
+    let node = p.previousSibling;
+    while ((node == null ? void 0 : node.nodeType) === 3 && !text4(node)) node = node.previousSibling;
+    return (node == null ? void 0 : node.nodeType) === 1 && node.matches("table") && text4(node.querySelector("th, td")) === NAME ? node : null;
+  }
+  function parse6(p, { document }) {
+    p.removeAttribute(MARK);
+    if (p.closest("table, li, blockquote, figure") || !text4(p)) return;
+    const row = [footnoteParagraph(p, document)];
+    const table = WebImporter.DOMUtils.createTable([[NAME], row], document);
+    const prev = tableBefore(p);
+    if (prev) {
+      [...prev.rows].pop().after([...table.rows].pop());
+      p.remove();
+      return;
+    }
+    p.replaceWith(table);
+  }
+
+  // tools/importer/transformers/skoda-press-kit-default-layout.js
+  var text5 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
   var marker = (document, style) => {
     const hr = document.createElement("hr");
     hr.dataset.pressKitSection = style;
@@ -489,7 +649,7 @@ var CustomImportScript = (() => {
     list.id = "chapters-links";
     const chaptersLink = document.createElement("a");
     chaptersLink.href = "#chapters-links";
-    chaptersLink.textContent = text4(source.querySelector(".link-chapters")) || "Chapters";
+    chaptersLink.textContent = text5(source.querySelector(".link-chapters")) || "Chapters";
     const chaptersItem = document.createElement("li");
     chaptersItem.append(chaptersLink);
     list.append(chaptersItem);
@@ -497,7 +657,7 @@ var CustomImportScript = (() => {
       var _a;
       const link = document.createElement("a");
       link.href = sourceLink.getAttribute("href");
-      link.textContent = sourceLink.matches(".link-intro") && ((_a = sourceLink.getAttribute("title")) == null ? void 0 : _a.trim()) || text4(sourceLink);
+      link.textContent = sourceLink.matches(".link-intro") && ((_a = sourceLink.getAttribute("title")) == null ? void 0 : _a.trim()) || text5(sourceLink);
       const li = document.createElement("li");
       li.append(link);
       list.append(li);
@@ -510,15 +670,15 @@ var CustomImportScript = (() => {
     [...secondary.querySelectorAll(":scope > section")].forEach((section) => {
       if (section.matches(".newsletter-subscribe-widget, .side-banner")) return;
       const heading = section.querySelector("h2, h3");
-      const label = text4(heading);
+      const label = text5(heading);
       if (section.matches(".images.sa-media-kit-preview")) {
         if (heading) heading.remove();
         nodes.push(make(document, "h3", label || "Images"), section);
         const more = section.querySelector("a.more");
-        if (mediaBox && more && text4(more)) {
+        if (mediaBox && more && text5(more)) {
           const link = document.createElement("a");
           link.href = "#media-box";
-          link.textContent = text4(more);
+          link.textContent = text5(more);
           const p = document.createElement("p");
           p.append(link);
           nodes.push(p);
@@ -530,7 +690,7 @@ var CustomImportScript = (() => {
         const ul = document.createElement("ul");
         section.querySelectorAll("ul.menu > li").forEach((li) => {
           const a = li.querySelector('a[href]:not([href="#"])');
-          const title = text4(a) || text4(li);
+          const title = text5(a) || text5(li);
           if (!title || !a && !mediaBox) return;
           const link = document.createElement("a");
           link.href = (a == null ? void 0 : a.getAttribute("href")) || "#media-box";
@@ -549,10 +709,10 @@ var CustomImportScript = (() => {
     var _a;
     const rows = [...table.rows];
     const cells = rows.length === 1 ? [...rows[0].cells] : [];
-    if (cells.length !== 2 || text4(cells[0])) return null;
+    if (cells.length !== 2 || text5(cells[0])) return null;
     const imgs = cells[0].querySelectorAll("img");
     const width = Number((_a = imgs[0]) == null ? void 0 : _a.getAttribute("width"));
-    if (imgs.length !== 1 || !(width > 0 && width <= ICON_MAX_WIDTH) || !text4(cells[1])) return null;
+    if (imgs.length !== 1 || !(width > 0 && width <= ICON_MAX_WIDTH) || !text5(cells[1])) return null;
     const icon = make(document, "p", "");
     icon.append(cells[0].querySelector("a:has(img)") || imgs[0]);
     const body = make(document, "p", "");
@@ -564,10 +724,10 @@ var CustomImportScript = (() => {
     if (callout) return [callout];
     table.querySelectorAll('img[src*="whatsapp"]').forEach((img) => {
       const link = img.closest("a");
-      (link && !text4(link) ? link : img).remove();
+      (link && !text5(link) ? link : img).remove();
     });
     return [...table.querySelectorAll("td, th")].flatMap((cell) => {
-      if (!text4(cell) && !cell.querySelector("img, a[href]")) return [];
+      if (!text5(cell) && !cell.querySelector("img, a[href]")) return [];
       if (cell.querySelector("p, ul, ol, h1, h2, h3, h4, h5, h6, div")) return [...cell.childNodes];
       const p = document.createElement("p");
       p.append(...cell.childNodes);
@@ -576,13 +736,13 @@ var CustomImportScript = (() => {
   }
   function sourceTables(content, document) {
     content.querySelectorAll("table").forEach((table) => {
-      const rows = [...table.rows].filter((row) => text4(row) || row.querySelector("a[href], img"));
+      const rows = [...table.rows].filter((row) => text5(row) || row.querySelector("a[href], img"));
       if (!rows.length) {
         table.remove();
         return;
       }
       const cols = Math.max(...rows.map((row) => row.cells.length));
-      const labelled = rows.filter((row) => [...row.cells].filter((cell) => text4(cell)).length >= 2);
+      const labelled = rows.filter((row) => [...row.cells].filter((cell) => text5(cell)).length >= 2);
       if (cols > 1 && labelled.length < 2) {
         table.replaceWith(...layoutTable(table, document));
         return;
@@ -591,7 +751,7 @@ var CustomImportScript = (() => {
       if (cols === 1) {
         const [first, ...rest] = rows;
         const headed = !first.querySelector("a[href], img") && rest.length;
-        if (headed) out.push(make(document, "h3", text4(first)));
+        if (headed) out.push(make(document, "h3", text5(first)));
         const list = document.createElement("ul");
         (headed ? rest : rows).forEach((row) => {
           const li = document.createElement("li");
@@ -601,13 +761,13 @@ var CustomImportScript = (() => {
         out.push(list);
       } else {
         const [head, ...body] = rows;
-        const labels = [...head.cells].map((cell) => text4(cell));
+        const labels = [...head.cells].map((cell) => text5(cell));
         const list = document.createElement("ul");
         body.forEach((row) => {
           const cells = [...row.cells];
           const li = document.createElement("li");
-          const strong = make(document, "strong", text4(cells[0]));
-          const values = cells.slice(1).map((cell, i) => [labels[i + 1], text4(cell)].filter(Boolean).join(": "));
+          const strong = make(document, "strong", text5(cells[0]));
+          const values = cells.slice(1).map((cell, i) => [labels[i + 1], text5(cell)].filter(Boolean).join(": "));
           li.append(strong, `: ${values.join(" \xB7 ")}`);
           list.append(li);
         });
@@ -626,12 +786,12 @@ var CustomImportScript = (() => {
     const h1 = article.querySelector(".container > header h1");
     const content = article.querySelector(".column-primary .entry-content");
     const media = article.querySelector(".search-results.media-box");
-    if (!h1 || !text4(h1) || !(content == null ? void 0 : content.querySelector(":scope > .panel-layout"))) {
+    if (!h1 || !text5(h1) || !(content == null ? void 0 : content.querySelector(":scope > .panel-layout"))) {
       throw new Error("Default press-kit article requires a title and body");
     }
     sourceTables(content, document);
     const out = [];
-    const date = text4(article.querySelector(".container > header .entry-published"));
+    const date = text5(article.querySelector(".container > header .entry-published"));
     if (date) out.push(make(document, "p", date));
     const title = h1.cloneNode(true);
     title.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
@@ -648,7 +808,7 @@ var CustomImportScript = (() => {
       p.append(img);
       out.push(p);
     }
-    const summary = text4(article.querySelector(".column-primary > .entry-summary"));
+    const summary = text5(article.querySelector(".column-primary > .entry-summary"));
     if (summary) {
       const intro = make(document, "p", "");
       intro.append(make(document, "strong", summary));
@@ -658,8 +818,8 @@ var CustomImportScript = (() => {
     const side = sidebar(document, article.querySelector(".column-secondary"), !!media);
     if (side.length) out.push(marker(document, "sidebar"), ...side);
     if (media) {
-      const heading = text4(media.querySelector(".search-results-heading")) || "Media Box";
-      const stats = text4(media.querySelector(".search-results-stats .stats"));
+      const heading = text5(media.querySelector(".search-results-heading")) || "Media Box";
+      const stats = text5(media.querySelector(".search-results-stats .stats"));
       const totals = [...stats.matchAll(/\b(\d+)\s+(?:images?|videos?|PDFs?)\b/gi)];
       if (totals.length) {
         media.dataset.expectedAssets = totals.reduce((sum, match) => sum + Number(match[1]), 0);
@@ -684,7 +844,7 @@ var CustomImportScript = (() => {
   function labelImageLinks(article) {
     article.querySelectorAll("a[href]").forEach((a) => {
       const img = a.querySelector("img");
-      if (!img || text4(a) || a.title) return;
+      if (!img || text5(a) || a.title) return;
       const alt = (img.getAttribute("alt") || "").trim();
       if (alt && !PLACEHOLDER_ALT.test(alt)) {
         a.title = alt;
@@ -710,7 +870,7 @@ var CustomImportScript = (() => {
       let node = sidebarStart.nextElementSibling;
       while (node && !node.matches("hr[data-press-kit-section]")) {
         const first = node.matches("table") && node.querySelector("tr > td, tr > th");
-        if (first && text4(first) === "Gallery") first.textContent = "Gallery (preview)";
+        if (first && text5(first) === "Gallery") first.textContent = "Gallery (preview)";
         node = node.nextElementSibling;
       }
     }
@@ -1338,6 +1498,7 @@ var CustomImportScript = (() => {
         if (!a.textContent.trim()) a.textContent = "Download";
       });
       document.querySelectorAll("article.press_kit .entry-content").forEach(markQuotes);
+      document.querySelectorAll("article.press_kit .entry-content").forEach(markFootnotes);
     },
     transform: (payload) => {
       const { document, url, params } = payload;
@@ -1350,6 +1511,9 @@ var CustomImportScript = (() => {
       body.querySelectorAll(".search-results-items").forEach((grid) => parse4(grid, payload));
       parse3(body, { document });
       body.querySelectorAll("p[data-skoda-quote]").forEach((p) => parse5(p, payload));
+      body.querySelectorAll("figure").forEach((figure) => parseFigure(figure, payload));
+      body.querySelectorAll("p[data-skoda-footnote]").forEach((p) => parse6(p, payload));
+      main.querySelectorAll("[data-skoda-footnote]").forEach((p) => p.removeAttribute("data-skoda-footnote"));
       article.querySelectorAll("section.images.sa-media-kit-preview").forEach((section) => parse(section, payload));
       article.querySelectorAll("section.tags").forEach((section) => parse2(section, payload));
       const mediaBox = article.querySelector(".search-results.media-box");

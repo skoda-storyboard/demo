@@ -49,6 +49,9 @@
     "footer": {
       "variants": []
     },
+    "footnotes": {
+      "variants": []
+    },
     "fragment": {
       "variants": []
     },
@@ -79,6 +82,9 @@
         "columns"
       ]
     },
+    "media-cart": {
+      "variants": []
+    },
     "promo-box": {
       "variants": [],
       "config": "or-curated",
@@ -96,7 +102,9 @@
       ]
     },
     "quote": {
-      "variants": []
+      "variants": [
+        "left"
+      ]
     },
     "search": {
       "variants": []
@@ -304,7 +312,7 @@
       "form": "section-style",
       "status": "pinned",
       "ticket": "SKODA-824",
-      "fallback": "broken",
+      "fallback": "readable",
       "styles": [
         "highlight-dark",
         "highlight-grey"

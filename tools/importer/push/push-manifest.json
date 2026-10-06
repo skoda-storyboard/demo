@@ -257,6 +257,11 @@
       "pushedAt": "2026-09-28T10:18:21.491Z",
       "previewedHash": "188cf779312589bc78793504387a00ac9c58cb15b2dedf99258c63371668c2b0"
     },
+    "/en/media-cart": {
+      "hash": "38438976c38bf5979ebad7e3e208f82a5121d929f4217fd4d3d77b8b54597e81",
+      "pushedAt": "2026-10-01T21:09:36.060Z",
+      "previewedHash": "38438976c38bf5979ebad7e3e208f82a5121d929f4217fd4d3d77b8b54597e81"
+    },
     "/en/media-room": {
       "hash": "fe3a51830fdc5e3c93623baf2d295eb4fc0f77cc154ebba0c21a287e73f71411",
       "pushedAt": "2026-09-29T22:49:37.604Z",
@@ -437,9 +442,9 @@
       "previewedHash": "2fad3a89054b558c2e4e568ee22bd378b952a99bdbf9c355a16755a00243b5cb"
     },
     "/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance": {
-      "hash": "26d5ce3f29918927f0fab17bc6ae9af70efa82f62b663e8780d35f615ceedc24",
-      "pushedAt": "2026-09-29T22:26:21.547Z",
-      "previewedHash": "26d5ce3f29918927f0fab17bc6ae9af70efa82f62b663e8780d35f615ceedc24"
+      "hash": "ae4cbc75940d2c787a2a7f07ee76e99a312265e6f0a7606979f3b3f04e4124d2",
+      "pushedAt": "2026-10-01T08:21:37.733Z",
+      "previewedHash": "ae4cbc75940d2c787a2a7f07ee76e99a312265e6f0a7606979f3b3f04e4124d2"
     },
     "/en/press-kits/skoda-epiq-press-kit-2/connectivity-intuitive-digital-services-and-seamless-vehicle-access": {
       "hash": "315ebcabf1a9863eb9bf53105ebfb0672fc94312735ae1adf5f998092b3aa6ee",
@@ -447,9 +452,9 @@
       "previewedHash": "315ebcabf1a9863eb9bf53105ebfb0672fc94312735ae1adf5f998092b3aa6ee"
     },
     "/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language": {
-      "hash": "29e62b92245f4f9cd7143d4c00c6e89205f0240f1d8ed4fa4dcb5f9f2e93aa89",
-      "pushedAt": "2026-09-29T22:26:21.547Z",
-      "previewedHash": "29e62b92245f4f9cd7143d4c00c6e89205f0240f1d8ed4fa4dcb5f9f2e93aa89"
+      "hash": "c1803f01c29f17fa238f4ad01a1819e579a484809083d6354faf1f9f7d92fc18",
+      "pushedAt": "2026-10-01T08:21:37.733Z",
+      "previewedHash": "c1803f01c29f17fa238f4ad01a1819e579a484809083d6354faf1f9f7d92fc18"
     },
     "/en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details": {
       "hash": "7577c75e77b137204e131c57d5bf4813ca48f731b3d40d361e1ec9c022abee5b",
@@ -482,9 +487,9 @@
       "previewedHash": "ef33a816d3c6375cf136dbdb552938ca912e00bbaf6aa3f43a37cc88718ac2cd"
     },
     "/en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality": {
-      "hash": "e3d53421c9b94d77b3947d4316c07400fdc1e1eb72cf91d9b8eb971b4be99cb9",
-      "pushedAt": "2026-09-29T22:26:21.547Z",
-      "previewedHash": "e3d53421c9b94d77b3947d4316c07400fdc1e1eb72cf91d9b8eb971b4be99cb9"
+      "hash": "f42bcd553563178fd9f4e652d786ffd061ef6ce2bcf4dbc3810387dfc1b8c475",
+      "pushedAt": "2026-10-01T08:21:37.733Z",
+      "previewedHash": "f42bcd553563178fd9f4e652d786ffd061ef6ce2bcf4dbc3810387dfc1b8c475"
     },
     "/en/press-kits/skoda-epiq-press-kit-2/technical-data": {
       "hash": "caaf9e41de375ca7e1b82d72487976ba0c1b8e72ad921cfeed10adff6badf314",
@@ -532,9 +537,9 @@
       "previewedHash": "5ba026056d03f5f39b3a4ff6623d07136c69da2ce78f4e439bdff9db5dd9a97f"
     },
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship": {
-      "hash": "5dfd3c1cb38916af4335e43997d25c93949d9bee1979edd9c64180fc16fb9ff9",
-      "pushedAt": "2026-09-29T22:26:21.547Z",
-      "previewedHash": "5dfd3c1cb38916af4335e43997d25c93949d9bee1979edd9c64180fc16fb9ff9"
+      "hash": "2b4893079e8c3f768a0a92fc3902900a469dca071da40833cc643d821898c92b",
+      "pushedAt": "2026-10-05T09:03:53.037Z",
+      "previewedHash": "2b4893079e8c3f768a0a92fc3902900a469dca071da40833cc643d821898c92b"
     },
     "/en/press-kits/skoda-peaq-press-kit-2": {
       "hash": "19fae5910cb967fc3e969447228c688fb7b6a1dcabd25ee73514e9f46b8ae00c",
@@ -552,9 +557,9 @@
       "previewedHash": "2646ffecbc35a626d0d8da64fd6fdbae1bebe8d31fa39306f4bb0f33a728996e"
     },
     "/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design": {
-      "hash": "4b57a89699c363722ca4180d9f9a2701d7bb37625fdf18a0a2fe62751762cb84",
-      "pushedAt": "2026-09-29T22:26:21.547Z",
-      "previewedHash": "4b57a89699c363722ca4180d9f9a2701d7bb37625fdf18a0a2fe62751762cb84"
+      "hash": "7efd0847849ab3b8e0b2807e540af3e3f6f29f0ba8d08b480fb81f822d0e1bbc",
+      "pushedAt": "2026-10-01T08:21:37.733Z",
+      "previewedHash": "7efd0847849ab3b8e0b2807e540af3e3f6f29f0ba8d08b480fb81f822d0e1bbc"
     },
     "/en/press-kits/skoda-peaq-press-kit-2/frequently-asked-questions": {
       "hash": "c3db42358b7d9715feeeb22264beadd0590199be9bc20186144ce63fe604a7be",
@@ -596,9 +601,9 @@
       "previewedHash": "7ba25568181eaafb626000ddd833b3622b1d8390a6a3ca87b5f59fe2b0212276"
     },
     "/en/press-kits/skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio": {
-      "hash": "786f02cd6391a436a5ee3d48eee4378aa6f93662cb97c9a502d1ade4d8a0111e",
-      "pushedAt": "2026-09-29T22:26:21.547Z",
-      "previewedHash": "786f02cd6391a436a5ee3d48eee4378aa6f93662cb97c9a502d1ade4d8a0111e"
+      "hash": "f8290b77587ffaff140255dd59658000893a4c951ae466a0e11156b686d6874a",
+      "pushedAt": "2026-10-01T08:21:37.733Z",
+      "previewedHash": "f8290b77587ffaff140255dd59658000893a4c951ae466a0e11156b686d6874a"
     },
     "/en/press-kits/skoda-peaq-press-kit-2/videos": {
       "hash": "7bffcc17f5572d10fcb737600023d34f22e4e52b8ad52165838818c1cc9a47d1",

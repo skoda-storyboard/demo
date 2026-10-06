@@ -136,3 +136,60 @@ test('missing sections are tolerated', () => {
   assert.ok(footer.children[0].classList.contains('footer-social'));
   assert.doesNotThrow(() => decorateFooterSections(parseHTML('')));
 });
+
+/* SKODA-306: outbound links open in a new tab, as on the live footers (measured 2026-10-05). */
+const ORIGIN = 'https://main--demo--skoda-storyboard.aem.page';
+// the live disclaimer's closing sentence with its four legal links
+const LEGAL_LINKS = 'Without consent from Škoda Auto a.s., third parties are only allowed to use all published content. '
+  + 'For more details see <a href="https://www.skoda-auto.com/other/personal-data">Data Protection</a>, '
+  + '<a href="https://www.skoda-storyboard.com/en/copyright/">Copyright</a>, '
+  + '<a href="https://www.skoda-auto.com/system/cookie-settings">Cookies policies</a> and '
+  + '<a href="https://www.skoda-auto.com/company/sustainability-company-governance">Whistleblower system</a>.';
+const decorated = (...sections) => {
+  const footer = parseHTML(sections.join(''));
+  decorateFooterSections(footer, ORIGIN);
+  return footer;
+};
+const newTab = (a) => a.getAttribute('target') === '_blank'
+  && /\bnoopener\b/.test(a.getAttribute('rel') || '') && /\bnoreferrer\b/.test(a.getAttribute('rel') || '');
+
+test('outbound: app badges, social icons and the legal links open in a new tab', () => {
+  const footer = decorated(SOCIAL, SITEMAP, LEGAL(LEGAL_LINKS));
+  const social = [...footer.children[0].querySelectorAll('a')];
+  assert.equal(social.length, 6);
+  assert.ok(social.every(newTab), 'App Store, Google Play, Facebook, Instagram, YouTube, WhatsApp');
+  assert.deepEqual(social.map((a) => a.getAttribute('aria-label')), [
+    'Škoda Media Room on the App Store', 'Škoda Media Room on Google Play',
+    'Facebook', 'Instagram', 'YouTube', 'WhatsApp'], 'accessible names unchanged');
+  const legalText = footer.children[2].querySelector('.copyright-text');
+  assert.ok(legalText, 'the disclaimer with its links is still the copyright text');
+  const legal = [...legalText.querySelectorAll('a')];
+  assert.deepEqual(legal.map((a) => a.textContent), ['Data Protection', 'Copyright', 'Cookies policies', 'Whistleblower system']);
+  assert.ok(legal.every(newTab));
+});
+
+test('outbound: same-site sitemap and feed links stay in the tab', () => {
+  const footer = decorated(SOCIAL, SITEMAP, LEGAL('Usage text'));
+  const internal = [...footer.children[1].querySelectorAll('a'), ...footer.children[2].querySelectorAll('.feed-links a')];
+  assert.ok(internal.length >= 5);
+  assert.ok(internal.every((a) => a.getAttribute('target') === null && a.getAttribute('rel') === null));
+});
+
+test('outbound: links the link policy already settled, and non-web links, are left alone', () => {
+  const footer = decorated(`<div class="section"><div class="default-content-wrapper"><p>
+    <a href="https://www.skoda-storyboard.com/en/skodapedia/" target="_blank" rel="noopener">Škodapedia</a>
+    <a href="${ORIGIN}/en/news">News (absolute, same site)</a>
+    <a href="mailto:press@skoda-auto.cz">Mail</a><a href="tel:+420">Phone</a><a href="#top">Top</a>
+    <a href="https://example.com/x" rel="nofollow">Partner</a><a href="http://[bad">Broken</a>
+  </p></div></div>`);
+  const [policy, same, mail, tel, hash, partner, broken] = footer.querySelectorAll('a');
+  assert.equal(policy.getAttribute('rel'), 'noopener', 'an existing target keeps its rel as authored');
+  [same, mail, tel, hash, broken].forEach((a) => assert.equal(a.getAttribute('target'), null, a.textContent));
+  assert.equal(partner.getAttribute('rel'), 'nofollow noopener noreferrer', 'an existing rel is kept and extended');
+});
+
+test('outbound: without a page origin nothing is changed', () => {
+  const footer = parseHTML(SOCIAL);
+  decorateFooterSections(footer, '');
+  assert.ok([...footer.querySelectorAll('a')].every((a) => a.getAttribute('target') === null));
+});

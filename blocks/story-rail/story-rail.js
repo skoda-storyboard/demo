@@ -160,9 +160,10 @@ export function curatedRows(block) {
 /*
  * The media card's action row (media feed rows, contract media-item): "add to media cart"
  * and "download", as the shared card-teaser toolbar cell (`<p><a>` per button). The cart
- * button carries the cart key (`data-id`) and stays inert until the media cart (SKODA-505)
- * binds it; download links the original (image) or the MP4 (video). Icon-only buttons, so
- * each gets its label from the source titles. Returns null for non-media rows.
+ * button carries the source key (`data-id`), the link to the original it adds (`data-href`:
+ * the image original / the MP4) and the card title; it is inert until the built rail binds
+ * it to the media cart (SKODA-505a). Download links the same original. Icon-only buttons,
+ * so each gets its label from the source titles. Returns null for non-media rows.
  */
 export function mediaToolbar(row) {
   if (row.template !== 'image' && row.template !== 'video') return null;
@@ -178,14 +179,20 @@ export function mediaToolbar(row) {
     return { p, a };
   };
   const elems = [];
+  const file = row.template === 'image' ? row.original : row.mp4;
   if (row.id) {
     const { p, a } = button('add', 'Add to media cart', '#');
     a.dataset.id = row.id;
+    if (file) a.dataset.href = file;
+    const title = cleanTitle(row.title || '');
+    if (title) a.dataset.title = title;
+    // the card image, shown on the cart page (SKODA-505b)
+    const thumb = row.image || row.poster;
+    if (thumb) a.dataset.thumb = thumb;
     a.setAttribute('role', 'button');
     a.setAttribute('aria-disabled', 'true');
     elems.push(p);
   }
-  const file = row.template === 'image' ? row.original : row.mp4;
   if (file) {
     const { p, a } = button('download', row.template === 'image' ? 'Download original' : 'Download video', file);
     a.setAttribute('download', '');
@@ -507,10 +514,30 @@ export default async function decorate(block) {
     if (heading) carousel.setAttribute('aria-label', heading);
     carousel.hidden = true;
     mount.append(carousel);
-    // the media cart (SKODA-505) isn't bound yet: its "#" button must not jump to the top
+    // a "#" cart button must not jump to the top, also before (or without) the media cart
     carousel.addEventListener('click', (e) => {
       if (e.target.closest('.media-cart-action[aria-disabled="true"]')) e.preventDefault();
     });
+    // Space on a cart link (role button) must not scroll the page: before the cart binds it,
+    // it does nothing; once bound, the cart's own handler has already taken the key
+    carousel.addEventListener('keydown', (e) => {
+      if (e.key !== ' ' || e.defaultPrevented) return;
+      const action = e.target.closest('a.media-cart-action[role="button"]');
+      if (!action) return;
+      e.preventDefault();
+      action.click();
+    });
+    // the add buttons become media-cart toggles (SKODA-505a); the cart loads only here
+    const cartControls = carousel.querySelectorAll('.media-cart-action.add');
+    if (cartControls.length) {
+      import('../../scripts/media-cart.js').then(({ bindCartControl }) => {
+        cartControls.forEach((a) => bindCartControl(a));
+      }).catch((e) => {
+        // the add buttons stay disabled (as rendered)
+        // eslint-disable-next-line no-console
+        console.warn('story-rail: the media cart did not load', e);
+      });
+    }
     decorateBlock(carousel);
     await loadBlock(carousel);
     // loadBlock logs and swallows the carousel's own failures: no track means no rail

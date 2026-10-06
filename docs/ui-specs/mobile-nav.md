@@ -89,6 +89,17 @@ the whole `<= 1079` band (single drawer step).
   (`margin 0 1rem 0 1.5rem`). **lang-links** sit at the drawer bottom (`order:2`, see
   language-switcher.md).
 
+### Re-measured 2026-10-01 (source changed since the capture above)
+- The open drawer is a **right-anchored panel**, not a full-width column: width `max(375px, 50%)`
+  of the viewport, capped at 100% (375 / 375 / 384 / 512 / 540 at 375 / 500 / 768 / 1024 / 1079),
+  from y = 108 to the bottom, white, no shadow. The brand row moves into the panel.
+- Behind it the header turns fixed and full screen: `rgba(227, 227, 227, .8)` + `backdrop-filter:
+  blur(10px)` (the "frosted" backdrop).
+- Search: the first row, a 48px `#f1f1f1` pill (radius 200) 24px from the left and 16px from the
+  right of the panel, in a 64px row.
+- Rows and sub-menus are as in §3 (18 / 28 / 300 rows = 61px; 16 / 24 sub-rows = 56px on `#f1f1f1`).
+- The source still closes on neither Escape nor a tap outside; the EDS drawer does both (§6).
+
 ## 4. Responsive behavior
 
 - **Single breakpoint: `1080px`.** `<= 1079px` = hamburger + drawer; `>= 1080px` = desktop nav (see

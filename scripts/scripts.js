@@ -16,6 +16,7 @@ import {
   getMetadata,
 } from './aem.js';
 import { decorateLinks, installLinkPolicy } from './links.js';
+import { spanSidebar } from './split-body.js';
 
 /**
  * Page templates with their own layout code: `templates/<name>/<name>.{js,css}`, selected by
@@ -273,6 +274,7 @@ function decorateStoryIntro(main) {
 function decorateStorySections(main) {
   if (!document.body.classList.contains('story')) return;
   applySectionStyles(main);
+  spanSidebar(main);
 }
 
 /** The page's template (or theme), if it has its own layout code (see TEMPLATES). */
@@ -288,7 +290,9 @@ function pageTemplate() {
  * @param {Element} main The main element
  */
 function decorateTemplateSections(main) {
-  if (pageTemplate()) applySectionStyles(main);
+  if (!pageTemplate()) return;
+  applySectionStyles(main);
+  spanSidebar(main);
 }
 
 /**
@@ -356,6 +360,11 @@ async function loadEager(doc) {
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
+  // a refused media-cart add (full package, no network, …) says why (SKODA-505b); the notice
+  // code loads only then
+  window.addEventListener('media-cart:refused', (e) => {
+    import('./media-cart-ui.js').then(({ onRefused }) => onRefused(e)).catch(() => {});
+  });
   installLinkPolicy(doc);
   loadHeader(doc.querySelector('body > header'));
 
