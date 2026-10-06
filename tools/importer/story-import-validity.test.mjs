@@ -298,3 +298,130 @@ test('sow-slider Gallery: data-caption kept, alt (file name / page title) never 
   const gallery = allTables(doc.body, 'Gallery')[0];
   assert.deepEqual(rowsOf(gallery).map((tr) => txt(tr.children[1])), ['Real caption', '']);
 });
+
+// ---- SKODA-823: sidebar newsletter widget → Newsletter Stub (card) ----------------------
+
+const NEWSLETTER = 'Newsletter Stub (card)';
+const kvRows = (table) => Object.fromEntries(
+  rowsOf(table).map((tr) => [txt(tr.children[0]), tr.children[1]]),
+);
+
+test('sidebar newsletter widget → Newsletter Stub (card), first in the aside, above "Explore more"', { skip }, () => {
+  Object.keys(PAGES).forEach((k) => {
+    const { sections, element } = importPage(k);
+    const aside = sections.find((s) => s.style === 'sidebar');
+    assert.ok(aside, `${k}: sidebar section`);
+    assert.equal(aside.blocks[0], NEWSLETTER, `${k}: card first`);
+    assert.equal(allTables(element, NEWSLETTER).length, 1, `${k}: one card`);
+    const card = aside.tables[0];
+    // the card precedes the "Explore more" heading
+    const asideEl = card.parentElement;
+    const kids = [...asideEl.children];
+    const h = kids.find((n) => n.tagName === 'H2');
+    if (h) assert.ok(kids.indexOf(card) < kids.indexOf(h), `${k}: card above ${txt(h)}`);
+    assert.ok(!element.querySelector('.newsletter-subscribe-widget, form, input, button'), `${k}: no source form`);
+    assert.ok(!element.querySelector('.side-banner, .sa-bnr'), `${k}: side banner still dropped (SKODA-903)`);
+  });
+});
+
+test('Newsletter Stub (card) rows: source heading + image, form strings, origin consent/manage links', { skip }, () => {
+  const { element } = importPage('epiq');
+  const cfg = kvRows(allTables(element, NEWSLETTER)[0]);
+  assert.deepEqual(Object.keys(cfg), [
+    'image', 'heading', 'label', 'placeholder', 'button', 'consent', 'manage',
+    'message', 'error', 'consent-error', 'list', 'language',
+  ]);
+  const img = cfg.image.querySelector('img');
+  assert.match(img.getAttribute('src'), /^https:\/\/cdn\.skoda-storyboard\.com\/.*\/newsletter_subscribe\.webp$/);
+  assert.equal(img.getAttribute('alt'), '', 'decorative background');
+  // the authored line break is kept; the source's glued &nbsp; survive as placeholders
+  assert.equal(cfg.heading.querySelectorAll('br').length, 1);
+  assert.equal(txt(cfg.heading).replace(/\u{F00A0}/gu, ' '), 'Be the firstto get the latest stories');
+  assert.equal(txt(cfg.placeholder), 'Enter your e-mail');
+  assert.equal(txt(cfg.button), 'Subscribe now!');
+  assert.equal(txt(cfg.message), 'Newsletter signup is not available yet', 'never a success message');
+  assert.equal(txt(cfg['consent-error']), 'Please accept the terms before continuing.');
+  assert.equal(txt(cfg.list), '389');
+  assert.equal(txt(cfg.language), 'en_GB');
+  // consent: label text only (manage link moved to its own row), link to the live origin page
+  assert.match(cfg.consent.textContent, /^Hereby I give my consent to the processing of my personal data .* Škoda Auto\.$/);
+  const consent = cfg.consent.querySelector('a');
+  assert.equal(consent.getAttribute('href'), 'https://www.skoda-storyboard.com/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing/');
+  assert.equal(consent.attributes.length, 1, 'href only, no target');
+  assert.ok(!/Manage subscription/.test(cfg.consent.textContent));
+  const manage = cfg.manage.querySelector('a');
+  assert.equal(txt(manage), 'Manage subscription');
+  assert.equal(manage.getAttribute('href'), 'https://www.skoda-storyboard.com/en/newsletter-settings/');
+});
+
+test('a story without the newsletter widget gets no card; a widget-only sidebar keeps its section', { skip }, () => {
+  const slug = PAGES.cruise;
+  const url = `${SRC}/${slug}/`;
+  const run = (mutate) => {
+    const dom = new JSDOM(readFileSync(path.join(FIXTURES, `${slug.split('/').pop()}.html`), 'utf8'), { url });
+    mutate(dom.window.document);
+    globalThis.document = dom.window.document;
+    globalThis.window = dom.window;
+    importer.preprocess({ document: dom.window.document });
+    helixPreProcess(dom.window.document);
+    const [{ element }] = importer.transform({
+      document: dom.window.document, url, params: { originalURL: url },
+    });
+    return element;
+  };
+  const none = run((doc) => doc.querySelectorAll('.newsletter-subscribe-widget').forEach((n) => n.remove()));
+  assert.equal(allTables(none, NEWSLETTER).length, 0);
+  assert.equal(sectionsOf(none).find((s) => s.style === 'sidebar').blocks[0], 'Cards (overlay)');
+  const only = run((doc) => doc.querySelectorAll('.sidebar .related, .sidebar section.tags').forEach((n) => n.remove()));
+  const aside = sectionsOf(only).find((s) => s.style === 'sidebar');
+  assert.deepEqual(aside.blocks, [NEWSLETTER]);
+});
+
+// ---- D5 (user decision 2026-10-06): regulatory lightbox captions stay visible ----------
+
+const WLTP_EPIQ = 'Škoda Epiq: Power consumption combined: 13,7-14,1 kWh/100 km, CO₂ emissions combined: 0 g/km. Information on consumption and CO₂ emissions, shown in ranges, depends on the selected vehicle equipment.';
+
+test('isRegulatoryCaption: consumption + emissions disclaimers only, conservatively', { skip }, async () => {
+  const { isRegulatoryCaption } = await import('./parsers/story-flatten.js');
+  [
+    WLTP_EPIQ,
+    'Škoda Octavia: Power consumption combined: 4.3 – 7.2 l/100 km, CO₂ emissions combined: 110 – 163 g/km.',
+    'Combined WLTP energy consumption: 13.0–13.1 kWh/100 km',
+    'Fuel consumption 5.1 l/100 km, CO2 emissions 117 g/km',
+  ].forEach((t) => assert.ok(isRegulatoryCaption(t), t));
+  [
+    '',
+    'Aerodynamics have a major impact on energy consumption and, therefore, on the driving range.',
+    'Without recharging the traction battery, the seven-seater Škoda Peaq covered 936 km at an average energy consumption of just 9.2 kWh/100 km.',
+    'Villa d’Este is one of the most luxurious destinations on the lake.',
+    'Škoda Epiq',
+  ].forEach((t) => assert.ok(!isRegulatoryCaption(t), t));
+});
+
+test('Gallery (slider): a regulatory data-caption becomes a visible note, other lightbox captions stay dropped', { skip }, async () => {
+  const { default: flatten } = await import('./parsers/story-flatten.js');
+  const dom = new JSDOM(`<body><div class="entry-content"><div class="panel-layout">
+    <div class="panel-grid"><div class="panel-grid-cell">
+      <div class="so-panel widget widget_skoda-carousel-widget"><div class="search-results carousel-widget">
+        <div class="search-results-items">
+          <div class="search-results-item"><div class="image-holder"><img src="a.jpg" alt="Škoda Epiq" data-caption="${WLTP_EPIQ}"></div></div>
+          <div class="search-results-item"><div class="image-holder"><img src="b.jpg" alt="Škoda Epiq" data-caption="The Epiq at the lake"></div></div>
+          <div class="search-results-item"><div class="image-holder"><img src="c.jpg" alt="c" data-caption="${WLTP_EPIQ}"></div>
+            <div class="search-results-item-description"><p>The boot holds 475 l.</p></div></div>
+          <div class="search-results-item"><div class="image-holder"><img src="d.jpg" alt="d" data-caption="${WLTP_EPIQ}"></div>
+            <div class="search-results-item-description"><p>${WLTP_EPIQ}</p></div></div>
+        </div>
+      </div></div>
+    </div></div></div></div></body>`);
+  const doc = dom.window.document;
+  globalThis.document = doc;
+  flatten(doc.querySelector('.entry-content'), { document: doc });
+  const gallery = allTables(doc.body, 'Gallery (slider)')[0];
+  const caps = rowsOf(gallery).map((tr) => [...tr.children[1].querySelectorAll('p')].map(txt));
+  assert.deepEqual(caps, [
+    [WLTP_EPIQ], // lightbox-only regulatory text → visible
+    [], // lightbox-only narrative caption → dropped (no visible caption on the source)
+    ['The boot holds 475 l.', WLTP_EPIQ], // a note under the visible description
+    [WLTP_EPIQ], // already visible → not repeated
+  ]);
+});

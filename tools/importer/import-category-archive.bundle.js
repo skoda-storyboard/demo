@@ -44,28 +44,40 @@ var CustomImportScript = (() => {
   // tools/importer/parsers/archive-hero.js
   function parse(element, { document: document2 }) {
     const img = element.querySelector(".hero-image img, img");
-    const labels = [...element.querySelectorAll(".hero-caption .label, .hero-caption .category > *")].map((l) => (l.textContent || "").replace(/\s+/g, " ").trim()).filter(Boolean);
-    const unique = labels.filter((l, i) => labels.indexOf(l) === i);
+    const labelEls = [...new Set(element.querySelectorAll(".hero-caption .label, .hero-caption .category > *"))];
+    const lines = labelEls.map((l) => {
+      const text = (l.textContent || "").replace(/\s+/g, " ").trim();
+      if (!text) return null;
+      const href = l.matches("a[href]") ? l.getAttribute("href") : "";
+      if (!href) return text;
+      const a = document2.createElement("a");
+      a.setAttribute("href", href);
+      a.textContent = text;
+      return a;
+    }).filter(Boolean);
     const docTitle = (document2.title || "").replace(/\s+[-–|]\s+Škoda Storyboard\s*$/, "").trim();
-    const title = unique.length ? unique.join(" ") : docTitle;
-    if (!img && !title) {
+    if (!lines.length && docTitle) lines.push(docTitle);
+    if (!img && !lines.length) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const out = [];
+    const cells = [["Hero Image (archive)"]];
     if (img) {
-      const p = document2.createElement("p");
       img.removeAttribute("srcset");
       img.removeAttribute("sizes");
-      p.append(img);
-      out.push(p);
+      cells.push([img]);
+    } else {
+      cells.push([""]);
     }
-    if (title) {
+    if (lines.length) {
       const h1 = document2.createElement("h1");
-      h1.textContent = title;
-      out.push(h1);
+      lines.forEach((line, i) => {
+        if (i) h1.append(document2.createElement("br"));
+        h1.append(line);
+      });
+      cells.push([h1]);
     }
-    element.replaceWith(...out);
+    element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
 
   // tools/importer/parsers/archive-list.js

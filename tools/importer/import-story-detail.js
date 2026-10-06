@@ -40,7 +40,7 @@ const parsers = {
 const PAGE_TEMPLATE = {
   name: 'story-detail',
   description:
-    'Škoda story detail (single-post + SiteOrigin), full-fidelity SiteOrigin flatten (SKODA-801). Hero banner + primary .content SiteOrigin widget tree flattened to default content + block tables (17-widget map, census-driven). The secondary .sidebar column is rebuilt as a Style:sidebar section (Cards + Tags) beside the body via the grid-on-main story layout. In-body galleries/embeds/Media Box remain SKODA-604 full-restore work. Metadata template=story. Content-driven detection only.',
+    'Škoda story detail (single-post + SiteOrigin), full-fidelity SiteOrigin flatten (SKODA-801). Hero banner + primary .content SiteOrigin widget tree flattened to default content + block tables (17-widget map, census-driven). The secondary .sidebar column is rebuilt as a Style:sidebar section (Newsletter Stub (card) + Cards + Tags) beside the body via the grid-on-main story layout. In-body galleries/embeds/Media Box remain SKODA-604 full-restore work. Metadata template=story. Content-driven detection only.',
   urls: ['https://www.skoda-storyboard.com/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/'],
   blocks: [
     { name: 'story-hero', instances: ['div.hero'] },
@@ -136,6 +136,9 @@ export default {
     markHighlights(document);
     markCellWidths(document);
     nbspTransformer('preprocess', document.body, { document });
+    // SKODA-823: the sidebar newsletter widget → Newsletter Stub (card), before the shared
+    // page cleanup removes the widget and helix preProcess drops its empty inputs.
+    storyAsideTransformer('preprocess', document.body, { document });
     // SKODA-801a: icon-only Media Box downloads (MP4/PDF) need a label to survive
     // helix-importer's preProcess (it drops empty inline elements); as in import-press-release.js.
     document.querySelectorAll('.search-results.media-box a.media-cart-action.download[href]').forEach((a) => {

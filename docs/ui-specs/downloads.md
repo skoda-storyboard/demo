@@ -15,6 +15,23 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 > press-release boxes. The block shows file-only rows as PDF icon tiles and a decorative play badge on
 > MP4 posters; the MP4 action remains a direct download, not a video player.
 
+> **SKODA-830 D2 (2026-10-06, read from the source media-room.js togglebox + media-room.css):** the
+> collapse is row-triggered. With `i` = the tallest tile + its 20px margin, the grid is clipped to
+> `2i - 2 + 60` px whenever the items are taller than two rows at the current column count, with the
+> mint `.btn` pill ("Show more", 137.6×44, `#78faae`, no border, 2em radius, weight 500, 14/24
+> insets, 1px tracking, hover `#a8ffcc`) in the 60px under row 2; open, the box grows to the grid +
+> 60 and the pill reads "Show less" (127.4×44). Measured collapsed heights: 708.25 / 636.25 /
+> 669.25 / 803.11 px at 1440 / 992 / 768 / 375 on stories (release tiles are 12px shorter at ≤768:
+> 645.25 / 779.11). So 8 assets collapse at 1–3 columns but not at 4; the "above 8 assets" wording
+> in SKODA-801a is this rule at 4 columns. As on the source, the block clips the list (two measured
+> rows + 34 + 44px, `overflow: hidden`) and the pill overlaps the clip's bottom edge, so the top 58px
+> of row 3 shows behind it; the tiles past row 2 are `inert` while collapsed. The pill is a real
+> button with `aria-expanded`/`aria-controls`, and collapsing keeps it in view.
+> The note above that Peaq (5 tiles) has no control at 500px holds only after resizing a wide window
+> (the source's resize handler never shows the opener); loaded at 375 the 936 km release collapses to
+> 779.11px. An uncollapsed box keeps the grid's last 20px row margin: 80px from the last tile to the
+> band end.
+
 ## 1. Identity
 
 - **Component:** Downloads, the **static** per-image download gallery ("Media Box" / "Images" section)

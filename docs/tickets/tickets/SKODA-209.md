@@ -96,7 +96,8 @@ Confirmed live. This ticket delivers:
 ## Acceptance Criteria
 Measurable gates live in [`template-category-archive.md` §10](../../ui-specs/template-category-archive.md); summary:
 - [ ] STO shell; single `h1` = term name (category term; tag = parent + term).
-- *(Hero banner criterion moved to SKODA-828 F3, 2026-09-28. The source measured 160px at 375, not 184px.)*
+- *(Hero banner criterion moved to SKODA-828 F3, 2026-09-28. Resolved 2026-10-05: both figures were right. The
+  band is 184px at 375 (224 at 576–767, 240 from 768); 160px is its image row, with the 24px label row under it.)*
 - [ ] Card grid flex-wrap **3-up 1280 / 2-up 768 / 1-up 500**; cards `16:9`; **no facet panel**.
 - [ ] Pagination via accessible "Load more" (or confirmed source mechanism); new results announced, focus managed.
 - [ ] Content cap `1248`, gutter `~16px`.

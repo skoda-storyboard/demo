@@ -69,7 +69,7 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/tags.js
   function parse2(element, { document }) {
-    const anchors = Array.from(element.querySelectorAll("a.label[href], li a[href], a[href]")).filter((el, i, arr) => arr.indexOf(el) === i);
+    const anchors = Array.from(element.querySelectorAll("a.label[href], li a[href], a[href]")).filter((el, i, arr) => arr.indexOf(el) === i).filter((a) => !a.matches(".show-hidden-terms") && a.getAttribute("href") !== "#");
     if (anchors.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
@@ -94,6 +94,16 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/downloads.js
   var text = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
+  function serialiseMp4(href) {
+    try {
+      const url = new URL(href, "https://www.skoda-storyboard.com");
+      if (!/\.mp4$/i.test(url.pathname) || url.href === href) return href;
+      if (/^[a-z][a-z\d+.-]*:/i.test(href)) return url.href;
+      return href.startsWith("/") && !href.startsWith("//") ? `${url.pathname}${url.search}${url.hash}` : href;
+    } catch (e) {
+      return href;
+    }
+  }
   function fileLabel(href) {
     const ext = ((href || "").split(/[?#]/)[0].split(".").pop() || "").toLowerCase();
     if (/^(jpe?g|png|webp|gif|tiff?)$/.test(ext)) return "Original";
@@ -101,8 +111,10 @@ var CustomImportScript = (() => {
   }
   function sizeLinks(item, document) {
     const links = [];
-    const add = (href, label) => {
-      if (!href || href === "#" || links.some((l) => l.getAttribute("href") === href)) return;
+    const add = (raw, label) => {
+      if (!raw || raw === "#") return;
+      const href = serialiseMp4(raw);
+      if (links.some((l) => l.getAttribute("href") === href)) return;
       const a = document.createElement("a");
       a.setAttribute("href", href);
       a.textContent = label;
@@ -324,6 +336,8 @@ var CustomImportScript = (() => {
     img.setAttribute("alt", alt);
     return make(document, "p", img);
   }
+  var BULLET = /^\s*(?:›|&rsaquo;)/;
+  var continues = (html) => new RegExp("^\\p{Ll}", "u").test(html.replace(/<[^>]*>|&[a-z]+;|&#\d+;/gi, " ").trim());
   function bulletList(document, primary) {
     const box = primary.querySelector(".bullet-points");
     if (!box) return null;
@@ -333,7 +347,12 @@ var CustomImportScript = (() => {
       lis.forEach((li) => lines.push(li.innerHTML));
     } else {
       box.querySelectorAll("p").forEach((p) => {
-        p.innerHTML.split(/<br\s*\/?>/i).forEach((line) => lines.push(line));
+        const parts = p.innerHTML.split(/<br\s*\/?>/i).filter((line) => line.replace(/&nbsp;/g, " ").trim());
+        const marked = parts.some((line) => BULLET.test(line));
+        parts.forEach((line, i) => {
+          if (marked && i > 0 && !BULLET.test(line) && continues(line)) lines[lines.length - 1] = `${lines[lines.length - 1].trimEnd()} ${line.trim()}`;
+          else lines.push(line);
+        });
       });
     }
     const ul = document.createElement("ul");
@@ -379,6 +398,16 @@ var CustomImportScript = (() => {
       const url = iframe && (iframe.getAttribute("data-src") || iframe.getAttribute("src"));
       wrap.replaceWith(...url ? [urlParagraph(document, url)] : []);
     });
+    content.querySelectorAll("lite-youtube").forEach((el) => {
+      const id = (el.getAttribute("videoid") || "").trim();
+      const wrap = el.closest(".video-container, .ratio-container");
+      const box = wrap && wrap !== content && content.contains(wrap) ? wrap : el;
+      const p = box.closest("p");
+      const replacement = /^[\w-]{6,}$/.test(id) ? [urlParagraph(document, `https://www.youtube.com/watch?v=${id}`)] : [];
+      if (p && text3(p) === text3(box)) p.replaceWith(...replacement);
+      else box.replaceWith(...replacement);
+    });
+    content.querySelectorAll(".page-embed.yt-embed-cookie").forEach((n) => n.remove());
     content.querySelectorAll(".media-cart-item.attachment, .video-container").forEach((wrap) => {
       if (!wrap.parentNode) return;
       const iframe = wrap.querySelector("iframe[src], iframe[data-src]");

@@ -45,14 +45,14 @@ test('parseSectionedList: families, de-duplication, alias → next entry', () =>
   ]);
 });
 
-test('the committed M1 set parses to 93 entries, 92 pages + 1 alias (D-1 = A adds 49 press-kit children)', () => {
+test('the committed M1 set parses to 102 entries, 101 pages + 1 alias (D-1 = A adds 49 press-kit children; SKODA-828 the 9 overlay kits)', () => {
   const set = parseSectionedList(readFileSync(path.join(PLANNING, 'skoda-m1-url-set.txt'), 'utf8'));
-  assert.equal(set.length, 93);
+  assert.equal(set.length, 102);
   assert.equal(set.filter((r) => r.alias).length, 1);
   const count = (f) => set.filter((r) => r.family === f && !r.alias).length;
   assert.deepEqual(
     ['home', 'listings', 'press-releases', 'press-kits', 'models', 'series', 'stories', 'other'].map(count),
-    [1, 2, 5, 54, 5, 5, 20, 0],
+    [1, 2, 5, 63, 5, 5, 20, 0],
   );
 });
 

@@ -100,10 +100,25 @@
   --story-body-gap: 0px;
   --story-aside-inset-top: 32px;
 
+  /* hero geometry (hero.md §8; SKODA-202). The archive band is the source's whole-term hero,
+     measured on /en/tag/model/peaq at 375/576/768 (SKODA-828): a 160/200px image row plus the
+     24px label row below 768 (the image covers both), 240px with the labels overlaid above */
+
+  /* in-column highlight panel (SKODA-824, docs/ui-specs/highlight.md). The source panel is
+     a SiteOrigin row: 32px top padding (>=768), a 10px cell padding (= --story-inset) and
+     the widget's 15px margin, on all sides up to 780px and inline only from 781px. */
+  --highlight-row-top: 0px;
+  --highlight-widget-block: 15px;
+  --highlight-widget-inline: 15px;
+  --highlight-callout-padding: 25px; /* Zellmer FAQ callout (inline style on the source) */
+  --highlight-dark-bg: var(--dark-color);
+  --highlight-dark-color: var(--background-color);
+  --highlight-grey-bg: var(--skoda-grey-75);
+
   /* hero geometry (hero.md §8; SKODA-202) */
   --hero-vh: 61.8vh;
-  --hero-archive-h-base: 160px;
-  --hero-archive-h-sm: 200px;
+  --hero-archive-h-base: 184px;
+  --hero-archive-h-sm: 224px;
   --hero-archive-h-md: 240px;
 
   /* spacing scale */
@@ -114,6 +129,22 @@
   --spacing-xl: 40px;
   --spacing-xxl: 64px;
   --section-padding: 40px;
+
+  /* Media Box band (Style: dark, full-width, media-box; SKODA-830 D1), measured on the live
+     .cover-box.dark > .search-results.media-box of stories, releases and kits: the title
+     26/32.5 (20/25 up to 768 on stories and kits), 60px under the box (its 48px margin + the
+     band's 12px). The top inset is the band padding + the box margin: 32 + 32 on stories,
+     16 + 32 + 24 on releases and kits (their templates set it). */
+  --media-box-padding-top: var(--spacing-xxl);
+  --media-box-padding-bottom: 60px;
+  --media-box-title-size: var(--heading-font-size-l);
+  --media-box-title-size-compact: 20px;
+
+  /* story + kit Media Box tiles up to 768: the source's 20/24 article h3 reaches the tile
+     titles (two lines + the 10px under them = a 58px row; 15/18 in a 46px row elsewhere and
+     on releases) */
+  --media-box-tile-title-size-compact: 20px;
+  --media-box-tile-title-row-compact: 58px;
 
   /* page-header section style: the source's title band (SKODA-505b) */
   --page-header-min-height: 240px;
@@ -677,6 +708,14 @@ main > .section > div {
   padding: 0 var(--page-gutter);
 }
 
+/* Full-bleed heroes (SKODA-828): the overlay hero (series hub, press kit, model) and the
+   archive band span the viewport, so their wrapper leaves the column. Content after the hero
+   in the same section keeps the column. */
+main > .section > .hero-image-wrapper:has(> .hero-image:is(.overlay, .archive)) {
+  max-width: none;
+  padding: 0;
+}
+
 main > .section:first-of-type {
   margin-top: 0;
 }
@@ -720,6 +759,57 @@ main .section.dark a {
    white-bodied cards keep their ink titles. */
 main .section.dark > .default-content-wrapper :is(h1, h2, h3, h4, h5, h6) {
   color: inherit;
+}
+
+/* Media Box band (SKODA-830 D1): one rhythm for every template's Media Box section. The
+   stats line sits in the 44px row of the Downloads add-all toggle (4px top inset, as the
+   source .search-results-stats), then 20px to the grid: heading top → grid 96.5px (89 with
+   the compact title). */
+main > .section.media-box {
+  padding-block: var(--media-box-padding-top) var(--media-box-padding-bottom);
+}
+
+main > .section.media-box > .default-content-wrapper {
+  margin-block-end: var(--paragraph-gap);
+}
+
+main > .section.media-box > .default-content-wrapper > h2 {
+  margin: 0;
+  color: inherit;
+  font-size: var(--media-box-title-size);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-heading);
+}
+
+main > .section.media-box > .default-content-wrapper > p {
+  margin: 0;
+  padding-block-start: calc(var(--spacing-xs) / 2);
+  color: var(--pr-band-meta-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 2;
+}
+
+/* In-column highlight panel colours (SKODA-824; Section Metadata `Style: body-column,
+   highlight-dark|grey`). Geometry is per template: the story rules below, the press
+   release in its template CSS. Everything in the panel, nested Columns included, takes
+   its text colour. */
+main > .section.highlight-dark {
+  background-color: var(--highlight-dark-bg);
+  color: var(--highlight-dark-color);
+}
+
+main > .section.highlight-grey {
+  background-color: var(--highlight-grey-bg);
+  color: var(--highlight-grey-color);
+}
+
+main > .section:is(.highlight-dark, .highlight-grey) :is(h1, h2, h3, h4, h5, h6) {
+  color: inherit;
+}
+
+main > .section.highlight-dark a:any-link {
+  color: var(--highlight-dark-link-color);
 }
 
 /* page-header: the source's title band (WordPress `.page-header`, measured on /en/media-cart/
@@ -915,6 +1005,15 @@ body.story main > .section:first-of-type + .section.body-column {
   padding-top: var(--story-inset);
 }
 
+/* the archive's story grid starts 24px under the term band (source, every width) */
+main > .section:has(> .hero-image-wrapper > .hero-image.archive) {
+  margin-bottom: var(--spacing-l);
+}
+
+main > .section:has(> .hero-image-wrapper > .hero-image.archive) + .section {
+  margin-top: 0;
+}
+
 body.story main > .section.body-column .default-content-wrapper ul {
   list-style: none;
   padding-left: 1.5em;
@@ -949,6 +1048,59 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
   line-height: var(--story-sidebar-heading-line-height);
 }
 
+/* In-column highlight panel (SKODA-824, docs/ui-specs/highlight.md). The importer splits the
+   body around each coloured source row: `Style: body-column, highlight-dark|grey`, then the
+   body resumes in a new body-column section. Below 768 the panel bleeds to the screen edges;
+   its content sits the source cell + widget inset in (25px). The panel touches the body on
+   both sides, which keeps the source cell's 10px padding there, and panels in a row read as
+   one band: the source pulls the second row 40px up over the first's empty bottom, so the
+   first drops its bottom inset and the second keeps the 10px cell padding (text 30px apart,
+   32 on the source). */
+/* stylelint-disable-next-line no-descending-specificity -- the intro → body rule above must
+   keep winning on a leading panel's top margin */
+body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) {
+  margin-block-start: 0;
+  padding-block:
+    calc(var(--highlight-row-top) + var(--story-inset) + var(--highlight-widget-block))
+    calc(var(--story-inset) + var(--highlight-widget-block));
+}
+
+body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) > div {
+  padding-inline: calc(var(--story-inset) + var(--highlight-widget-inline));
+}
+
+/* panel images are block-level, as on the source: an inline image leaves the paragraph's
+   baseline descender gap (7px) under it, making the panel taller than the source's */
+body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) .default-content-wrapper :is(picture, img) {
+  display: block;
+}
+
+/* A leading panel keeps the intro → body gap but its own top inset (after the intro → body
+   rule, which has the same specificity). */
+body.story main > .section:first-of-type + .section:is(.highlight-dark, .highlight-grey) {
+  padding-block-start:
+    calc(var(--highlight-row-top) + var(--story-inset) + var(--highlight-widget-block));
+}
+
+body.story main > .section:is(.highlight-dark, .highlight-grey):has(+ .section.body-column),
+body.story main > .section.body-column:has(+ .section:is(.highlight-dark, .highlight-grey)) {
+  margin-block-end: 0;
+}
+
+body.story main > .section:is(.highlight-dark, .highlight-grey) + .section.body-column {
+  margin-block-start: 0;
+  padding-block-start: var(--story-inset);
+}
+
+body.story main > .section.highlight-dark:has(+ .section.highlight-dark),
+body.story main > .section.highlight-grey:has(+ .section.highlight-grey) {
+  padding-block-end: 0;
+}
+
+body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has(+ .section:is(.highlight-dark, .highlight-grey)) {
+  padding-block-end: var(--story-inset);
+}
+
 /* Layer 2 / Layer 3 — at ≥768 the article becomes a real two-column grid. This is a
    genuine structural transition (single stack → side-by-side), so it earns the one
    breakpoint. `main` is the grid; the body column spans the left track and the aside
@@ -958,6 +1110,7 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
 @media (width >= 768px) {
   body.story {
     --story-body-gap: 32px;
+    --highlight-row-top: 32px;
   }
 
   body.story main {
@@ -968,6 +1121,9 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
     max-width: var(--content-max-width);
     margin-inline: auto;
     align-items: start;
+
+    /* rows: see the sidebar rule below */
+    grid-template-rows: repeat(var(--body-rows-before-last), auto) 1fr;
   }
 
   /* the text ends where the aside track starts (the aside owns the 64px gap) */
@@ -990,6 +1146,17 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
      confirmed with the client (source aside is static). */
   body.story main > .section.sidebar {
     grid-column: 2;
+    grid-row: var(--body-row-start) / span var(--body-rows);
+  }
+
+  /* A highlight panel splits the body into several sections (SKODA-824). The aside then
+     spans all of them from the first, and the last body row takes up the slack when the
+     aside is the taller one, so the body parts stay flush. The counts come from
+     spanSidebar() (scripts/split-body.js); without them both rules fall back to auto.
+     The panel itself runs to the aside's edge: the body track plus the 10px the text
+     keeps clear. */
+  body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) {
+    margin-inline-end: calc(-1 * var(--story-inset));
   }
 
   /* 64px after the text, ending the source's 10px from the container edge */
@@ -1023,6 +1190,14 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
 
   body.story main > .section.dark.story-rail-container::before {
     max-width: var(--story-related-band-max-width);
+  }
+}
+
+/* From 781 the source's SiteOrigin widgets drop their 15px top/bottom margin (its 780px
+   mobile collapse), so the highlight panel content starts 42px down instead of 57px. */
+@media (width >= 781px) {
+  body.story {
+    --highlight-widget-block: 0px;
   }
 }
 
@@ -1077,8 +1252,18 @@ body.story main > .section.dark.story-rail-container .default-content-wrapper p 
   line-height: 2;
 }
 
+/* The story Media Box title is 20/25 up to 768px, 26/32.5 above (the source step). Story and
+   kit tile titles step at the same width (blocks/downloads/downloads.css). */
+body.story {
+  --media-box-title-size: var(--media-box-title-size-compact);
+}
+
 /* The source keeps the 20px sidebar headings at exactly 768px, then uses 16px. */
 @media (width > 768px) {
+  body.story {
+    --media-box-title-size: var(--heading-font-size-l);
+  }
+
   body.story main > .section.sidebar .default-content-wrapper > h2 {
     font-size: var(--body-font-size-m);
   }
