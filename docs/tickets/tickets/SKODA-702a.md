@@ -44,6 +44,17 @@ notice, which hide it until then):
   | LCP | hero image | hero image |
 
   This machine scores `main` far higher than the 2026-10-01 runs did, so the **`aem-psi-check` on the PR is the deciding gate** for the desktop ≥ 90 / TBT < 200ms criterion.
+- **Lighthouse 12 on the CDN previews** (`main--…aem.page` vs `skoda-702a-youtube-facade--…aem.page`, interleaved, 3 runs each, median):
+
+  | Run | `main` | Branch |
+  |---|---|---|
+  | Mobile score | 90 (90 / 98 / 81) | **99** (97 / 99 / 99) |
+  | Mobile TBT | 382ms | **109ms** |
+  | Desktop score / TBT | 100 / 10ms | 99 / 0ms |
+  | YouTube on load | 8–11 requests, about 1 MB | **1 (the 142 KB poster)** |
+  | Desktop weight | 2,407 KB, 98 requests | **1,439 KB, 84 requests** |
+
+  LCP is on the hero image in both (desktop 0.7–0.8s, mobile 1.55–1.59s).
 - **Keyboard:** Tab reaches the poster (the ring shows, the glyph turns red), and Enter (1280) / Space (390) plays it, with focus in the player.
 - **Other pages** (scrolled end to end, YouTube player requests `main` → branch):
   - 2024 year-in-review: 11 posters, 93 → 0 requests. Its Vimeo is unchanged.
