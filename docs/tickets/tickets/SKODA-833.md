@@ -3,6 +3,7 @@
 - **Epic:** E08, Editorial at Scale
 - **Type:** import / parser
 - **Phase:** A · **Milestone:** M1
+- **GitHub issue:** [#262](https://github.com/skoda-storyboard/demo/issues/262)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §3.3 / §5 / §8 F5; relates to [SKODA-607](SKODA-607.md), SKODA-502, SKODA-204, SKODA-818
 - **Branch:** `skoda-833-press-release-import-validity`
 - **Status (2026-10-06):** 🟡 Developer done (head b233db9, pushed). QA was started but interrupted; it needs a re-run.
