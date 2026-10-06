@@ -609,6 +609,40 @@ test('malformed mandatory article, toggle and asset fail rather than silently lo
   );
 });
 
+test('a kit FAQ chapter emits Accordion (faq), which the block turns into FAQPage data (SKODA-807)', { skip: !JSDOM }, () => {
+  const faqUrl = `${base}skoda-peaq-press-kit-2/frequently-asked-questions/`;
+  const page = run(fixture({
+    chapters: true, mediaBox: false, togglesCount: 3,
+  }), faqUrl);
+  assert.equal(blocks(page, 'Accordion (faq)').length, 1);
+  assert.equal(blocks(page, 'Accordion').length, 0);
+  assert.deepEqual(rows(page, 'Accordion (faq)').map((row) => txt(row.children[0])), ['Chapter 1', 'Chapter 2', 'Chapter 3']);
+  // other chapters and the first-glimpse kit keep the plain accordion
+  assert.equal(blocks(run(fixture({ chapters: true, mediaBox: false, togglesCount: 2 }), intro), 'Accordion (faq)').length, 0);
+  assert.equal(blocks(run(fixture({}), target), 'Accordion (faq)').length, 0);
+
+  // decorated as on the page: one FAQPage with the three Q/As
+  const document = page.ownerDocument;
+  globalThis.document = document;
+  const block = document.createElement('div');
+  block.className = 'accordion faq';
+  rows(page, 'Accordion (faq)').forEach((row) => {
+    const authored = document.createElement('div');
+    [...row.children].forEach((td) => {
+      const cell = document.createElement('div');
+      cell.append(...td.childNodes);
+      authored.append(cell);
+    });
+    block.append(authored);
+  });
+  blocks(page, 'Accordion (faq)')[0].replaceWith(block);
+  decorateAccordion(block);
+  const data = JSON.parse(document.head.querySelector('script[type="application/ld+json"][data-accordion-faq]').textContent);
+  assert.equal(data['@type'], 'FAQPage');
+  assert.deepEqual(data.mainEntity.map((q) => [q.name, q.acceptedAnswer.text]), [1, 2, 3]
+    .map((i) => [`Chapter ${i}`, `Answer ${i} reference.`]));
+});
+
 test('generated standalone bundle matches the source importer', { skip: !JSDOM }, () => {
   const code = readFileSync(new URL('./import-press-kit-default.bundle.js', import.meta.url), 'utf8');
   const bundled = vm.runInNewContext(`${code}\nCustomImportScript.default`, {
@@ -621,6 +655,9 @@ test('generated standalone bundle matches the source importer', { skip: !JSDOM }
     [target, fixture({})],
     [`${base}skoda-peaq-press-kit-2/images/`, fixture({
       chapters: true, mediaBox: false, togglesCount: 0, extra: galleryGroup('Exterior', 0, 2),
+    })],
+    [`${base}skoda-peaq-press-kit-2/frequently-asked-questions/`, fixture({
+      chapters: true, mediaBox: false, togglesCount: 3,
     })],
   ]) {
     assert.equal(run(html, url, bundled).outerHTML, run(html, url).outerHTML);

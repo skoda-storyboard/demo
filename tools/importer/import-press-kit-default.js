@@ -54,7 +54,9 @@ export default {
     // (`collapse auto`), so its select-all toolbar and Show more/less toggle go with it (PR #202).
     body.querySelectorAll('.search-results.search-results-gallery').forEach((group) => media(group, payload));
     body.querySelectorAll('.search-results-items').forEach((grid) => media(grid, payload));
-    content(body, { document });
+    // the kit's FAQ chapter (`…/frequently-asked-questions/`) emits `Accordion (faq)` (SKODA-807)
+    const faq = /\/frequently-asked-questions\/?$/.test(new URL(params.originalURL).pathname);
+    content(body, { document, faq });
     // After the layout, whose source-table pass would flatten a Quote table.
     body.querySelectorAll('p[data-skoda-quote]').forEach((p) => quote(p, payload));
     // The chapters' WordPress figure quotes (left-aligned, no rule): `Quote (left)`.

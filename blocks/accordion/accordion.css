@@ -1,8 +1,20 @@
 .accordion {
   --accordion-border-width: 1px;
   --accordion-focus-width: 2px;
+
+  /* the source plus (SKODA-807, faq-accordion.md §3): a 16px glyph with 1.5px arms in a
+     round 32px hit area, right on the trigger's content edge. The question keeps the
+     source's 1.45em reserve beside it, so long questions wrap where the source's do. */
   --accordion-icon-size: 1em;
+  --accordion-icon-pad: var(--spacing-xs);
+  --accordion-icon-box: calc(var(--accordion-icon-size) + 2 * var(--accordion-icon-pad));
+  --accordion-icon-stroke: 1.5px;
+  --accordion-label-reserve: 1.45em;
+  --accordion-line-height: 1.125;
   --accordion-motion: 0.2s ease-in;
+
+  /* the answer starts 10px under its question, full width (the source builder cell) */
+  --accordion-panel-inset: var(--page-gutter);
 }
 
 .accordion .accordion-item + .accordion-item {
@@ -17,7 +29,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--spacing-m);
   width: 100%;
   padding: var(--spacing-l);
   border: 0;
@@ -27,7 +38,7 @@
   font: inherit;
   font-size: var(--body-font-size-m);
   font-weight: var(--weight-semibold);
-  line-height: 1.125;
+  line-height: var(--accordion-line-height);
   text-align: start;
   cursor: pointer;
 }
@@ -39,20 +50,31 @@
 
 .accordion .accordion-icon {
   flex: none;
+  box-sizing: content-box;
   width: var(--accordion-icon-size);
   height: var(--accordion-icon-size);
+  padding: var(--accordion-icon-pad);
+
+  /* the box overhangs the text line and the label reserve, as the source's absolute icon
+     does, so the trigger stays 68px tall and the question keeps its width */
+  margin-block: calc((var(--accordion-line-height) * 1em - var(--accordion-icon-box)) / 2);
+  margin-inline-start: calc(var(--accordion-label-reserve) - var(--accordion-icon-box));
   border-radius: 50%;
   transition: transform var(--accordion-motion);
 }
 
 .accordion .accordion-icon::before {
   display: block;
-  content: '+';
-  text-align: center;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(currentcolor, currentcolor) center / 100% var(--accordion-icon-stroke) no-repeat,
+    linear-gradient(currentcolor, currentcolor) center / var(--accordion-icon-stroke) 100% no-repeat;
+  content: '';
 }
 
 .accordion .accordion-heading button:hover .accordion-icon {
-  background-color: var(--skoda-grey-100);
+  background-color: var(--skoda-grey-50);
 }
 
 .accordion .accordion-heading button[aria-expanded="true"] .accordion-icon {
@@ -60,7 +82,7 @@
 }
 
 .accordion .accordion-panel {
-  padding: var(--spacing-l);
+  padding: var(--accordion-panel-inset) 0;
 }
 
 .accordion .accordion-panel[hidden] {

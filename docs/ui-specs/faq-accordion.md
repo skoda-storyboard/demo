@@ -1,7 +1,7 @@
 # Component Spec: FAQ / Accordion
 
-Status: **CAPTURED** (measured 2026-09-15 via Chrome DevTools MCP on page id 1; source CSS
-`media-room-515d2d102b.css` `.row-title` rules; open + closed states measured; screenshot saved).
+Status: **CAPTURED + BUILT** (measured 2026-09-15 via Chrome DevTools MCP; re-measured on the M1 Peaq-2 /
+Epiq-2 FAQ chapters 2026-10-06 against the SKODA-807 build, see §11).
 Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 
 ## 1. Identity
@@ -14,7 +14,9 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 - **Ticket:** SKODA-807.
 - **Source references (URL used):**
   `https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit/frequently-asked-questions/`
-  (reached from the kit landing "Frequently Asked Questions" tile + chapter-nav).
+  (reached from the kit landing "Frequently Asked Questions" tile + chapter-nav). M1 pages:
+  `/en/press-kits/skoda-peaq-press-kit-2/frequently-asked-questions/` (28 Qs) and
+  `/en/press-kits/skoda-epiq-press-kit-2/frequently-asked-questions/` (5 Qs).
 - **Top-level selectors:** `.so-panel.widget_ys-row-toggle` (one Q/A item; gains `.active` when open),
   `h2.row-title > span` (the trigger + `::after` icon), `.widget_siteorigin-panels-builder` (the answer
   panel, `display:none` when collapsed).
@@ -173,3 +175,43 @@ Compare EDS render to source at each viewport. WHAT / WHERE / viewport / expecte
 
 `assets/faq-accordion/`: `faq-open-1280.png` (the Peaq FAQ with the first question expanded: `row-title`
 triggers, `#e4e4e4` dividers, rotated icon, rich-text answer). Closed-state + mobile captures pending.
+
+## 11. Build (SKODA-807, 2026-10-06)
+
+The shared `blocks/accordion` (built for SKODA-805a/805c) already carried the a11y gate: a `<button aria-expanded
+aria-controls>` in the authored heading level, `role=region aria-labelledby` panels, `hidden`, multi-open,
+`:focus-visible`, an `aria-hidden` icon, and reduced motion. SKODA-807 adds:
+
+- **DA shape:** header `Accordion (faq)` on a kit's FAQ chapter. Cell 1 is the source heading (`h2`, kept), and cell 2
+  is the rich answer. `parsers/press-kit-content.js` picks the variant from the chapter slug. Other chapters and the
+  first-glimpse kit stay `Accordion`.
+- **FAQPage JSON-LD:** one `script[type=application/ld+json][data-accordion-faq]` in the head for all FAQ accordions on
+  the page, with plain-text `name` / `acceptedAnswer.text` (a space between blocks). It is set through `textContent`,
+  which the page's Trusted Types `default` policy passes; no console errors were measured. The Peaq-2 FAQ gives
+  `FAQPage` with 28 `Question`s.
+- **Answer inset:** `10px 0`, the source builder cell (`--page-gutter`). This replaces the 24px all round, for every
+  accordion; the source CSS is the same on first glimpse and Elroq.
+- **Icon:** a 16px CSS-drawn plus (1.5px arms, two gradients) in a round 32px box (8px padding) on the trigger's content
+  edge. It overhangs the 18px line by −7px, so the trigger stays 68px tall. The question keeps the source's 1.45em
+  reserve. The hover tint is `--skoda-grey-50` (`#f1f1f1`, the source's 5.88% ink on white); it rotates 45° over
+  `.2s ease-in`.
+
+Measured, draft `/drafts/skoda-807-faq-accordion` against the source Peaq-2 FAQ:
+
+| Width | Trigger (x, w×h) | Icon box x | First answer (x, w×h), text +top | Item gap |
+|---|---|---|---|---|
+| 1440 | 106, 812×68 = | 862–894 = | 106, 812×136 =, +10 = | 20 = |
+| 1080 | 10, 700×68 = | 654–686 = | 10, 700×160 =, +10 = | 20 = |
+| 992 | 10, 641.3×68 = | 595.3–627.3 = | 10, 641.3×160 =, +10 = | 20 = |
+| 768 | 10, 492×68 = | 446–478 = | 10, 492×208 =, +10 = | 20 = |
+| 390 | 10, 370×68 = | 324–356 = | 10, 370×256 =, +10 = | 20 = |
+
+- **Wrapping:** all 28 trigger heights are identical to the source at 390 (19 wrap to two lines) and at 1440.
+- **Other pages:** first glimpse (8) and Elroq (12, with the nested quote at 176 / 272) have trigger heights and
+  answer boxes identical to the source at 1440 / 768.
+- **Not built:**
+  - the `single` (one-open) variant, which isn't on the source;
+  - arrow-key header navigation, which is optional in the WAI pattern;
+  - height animation, because the source swaps `display`.
+- The pixel-diff AC in §9 is replaced by these measured values (repo review rule: measured evidence, no screenshots).
+

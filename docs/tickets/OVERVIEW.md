@@ -249,7 +249,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-804 | Consent + analytics wiring (OneTrust, GTM, skoda-analytics) | E08 | B | 5 | 2–3 | 4–6 | 603 | 🟠 consent OUT of Adobe scope (D10) |
 | SKODA-805 | Press Kit template + structured narrative sections | E08 | B | 5 | 2–3 | 4–6 | 801,202,402 | 🟡 fixed-vs-conditional sections (§11.8) |
 | SKODA-806 | Press Kit grouped media/download areas + whole-kit ZIP | E08 | B | 5 | 2–3 | 4–6 | 805,502,505 | 🟠 ZIP = D2 reduction service |
-| SKODA-807 | FAQ block (Press Kit) | E08 | B | 2 | 0.5–1 | 1–2 | 805,106 | 🟡 per-kit vs shared pool (§11.10) |
+| SKODA-807 | FAQ block (Press Kit) | E08 | B | 2 | 0.5–1 | 1–2 | 805,106 | 🟡 in review 2026-10-06: `Accordion (faq)` + FAQPage JSON-LD, source-parity inset/icon; per-kit authored |
 | SKODA-808 | Press Kit variant subsections + selector + categorization | E08 | B | 3 | 1–2 | 2–3 | 805,806,401 | 🟡 selector interaction (§11.7/11.9) |
 | SKODA-810 | Company/Page family (board/annual-reports/logo/app/contacts) | E08 | B | 8 | 3–5 | 6–10 | 202,304,502,601,602,803,813 | 🟢 M2 (D18); 5 net-new blocks on the 813 shell |
 | SKODA-813 | Generic Page base shell (STO page + MR media-room-page) | E08 | B | 2 | 0.5–1 | 1–2 | 202,801 | 🟢 M2; shared shell under 810; spec `ui-specs/template-page-base.md` |

@@ -63,6 +63,51 @@ function nestedQuotes(panel) {
   });
 }
 
+/*
+ * `Accordion (faq)` (SKODA-807): the press-kit FAQ chapters also describe their Q/A pairs as
+ * schema.org FAQPage structured data, which the source lacks. Every FAQ accordion on the page
+ * feeds one JSON-LD script in the head. Its text is set through textContent, a Trusted Types
+ * script sink that the page's default policy (scripts.js) passes.
+ */
+const FAQ_SCRIPT = 'script[type="application/ld+json"][data-accordion-faq]';
+// text with a space between block-level parts (paragraphs, list items, line breaks)
+function plain(node) {
+  const copy = node.cloneNode(true);
+  copy.querySelectorAll(`${BLOCK_LEVEL}, br`).forEach((el) => el.after(' '));
+  return copy.textContent.replace(/\s+/g, ' ').trim();
+}
+const faqEntries = new Map();
+
+function addFaq(block, items) {
+  const entries = items.filter((item) => item.matches('.accordion-item')).map((item) => {
+    const label = item.querySelector('.accordion-heading button').cloneNode(true);
+    label.querySelector('.accordion-icon')?.remove();
+    return { question: plain(label), answer: plain(item.querySelector('.accordion-panel')) };
+  }).filter(({ question, answer }) => question && answer);
+  if (!entries.length) return;
+  faqEntries.set(block, entries);
+  // blocks no longer on this page drop out
+  [...faqEntries.keys()].forEach((key) => {
+    if (!key.isConnected || key.ownerDocument !== document) faqEntries.delete(key);
+  });
+  let script = document.head.querySelector(FAQ_SCRIPT);
+  if (!script) {
+    script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.dataset.accordionFaq = '';
+    document.head.append(script);
+  }
+  script.textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [...faqEntries.values()].flat().map(({ question, answer }) => ({
+      '@type': 'Question',
+      name: question,
+      acceptedAnswer: { '@type': 'Answer', text: answer },
+    })),
+  });
+}
+
 export default function decorate(block) {
   const items = [];
   [...block.children].forEach((row) => {
@@ -115,4 +160,5 @@ export default function decorate(block) {
     items.push(item);
   });
   block.replaceChildren(...items);
+  if (block.classList.contains('faq')) addFaq(block, items);
 }

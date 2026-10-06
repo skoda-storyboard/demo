@@ -133,3 +133,65 @@ test('a Quote table in an answer (blocks can’t nest in DA) becomes a quote blo
   assert.equal(second.querySelector('.accordion-panel').hidden, true);
   delete globalThis.window;
 });
+
+// --- FAQ variant (SKODA-807): FAQPage structured data -------------------------------------
+const faqDom = (html) => {
+  const dom = new JSDOM(`<!DOCTYPE html><html><head></head><body><main>${html}</main></body></html>`, { url: 'https://example.com/en/press-kits/kit/frequently-asked-questions' });
+  globalThis.document = dom.window.document;
+  return dom.window.document;
+};
+const faqScripts = (doc) => [...doc.head.querySelectorAll('script[type="application/ld+json"]')];
+
+test('Accordion (faq) emits one FAQPage JSON-LD with every complete Q/A, whitespace normalised', { skip: !JSDOM }, () => {
+  const doc = faqDom(`<div class="accordion faq">
+    <div><div><h2 class="row-title"><span>What is the  Škoda Peaq?</span></h2></div><div><p>The new
+      <strong>flagship</strong>.</p><p>Seven seats.</p></div></div>
+    <div><div><h2>How far does it go?</h2></div><div><ul><li>Up to 600 km</li></ul></div></div>
+    <div><div>Incomplete row</div></div>
+  </div>`);
+  decorate(doc.querySelector('.accordion'));
+  const scripts = faqScripts(doc);
+  assert.equal(scripts.length, 1);
+  const data = JSON.parse(scripts[0].textContent);
+  assert.equal(data['@context'], 'https://schema.org');
+  assert.equal(data['@type'], 'FAQPage');
+  assert.deepEqual(data.mainEntity, [
+    { '@type': 'Question', name: 'What is the Škoda Peaq?', acceptedAnswer: { '@type': 'Answer', text: 'The new flagship. Seven seats.' } },
+    { '@type': 'Question', name: 'How far does it go?', acceptedAnswer: { '@type': 'Answer', text: 'Up to 600 km' } },
+  ]);
+  // the accordion itself behaves as the default variant
+  assert.equal(doc.querySelectorAll('.accordion button[aria-expanded="false"]').length, 2);
+  assert.match(doc.querySelector('.accordion').textContent, /Incomplete row/);
+});
+
+test('two FAQ accordions share one FAQPage; a plain accordion adds nothing', { skip: !JSDOM }, () => {
+  const doc = faqDom(`<div class="accordion faq"><div><div><h2>Q1</h2></div><div><p>A1</p></div></div></div>
+    <div class="accordion"><div><div><h2>Not FAQ</h2></div><div><p>Topical toggle</p></div></div></div>
+    <div class="accordion faq"><div><div><h2>Q2</h2></div><div><p>A2</p></div></div></div>`);
+  doc.querySelectorAll('.accordion').forEach((block) => decorate(block));
+  const scripts = faqScripts(doc);
+  assert.equal(scripts.length, 1);
+  assert.deepEqual(JSON.parse(scripts[0].textContent).mainEntity.map((q) => q.name), ['Q1', 'Q2']);
+});
+
+test('a page with only plain accordions, or an FAQ with no complete row, gets no JSON-LD', { skip: !JSDOM }, () => {
+  const plain = faqDom('<div class="accordion"><div><div><h2>Q</h2></div><div><p>A</p></div></div></div>');
+  decorate(plain.querySelector('.accordion'));
+  assert.equal(faqScripts(plain).length, 0);
+  const empty = faqDom('<div class="accordion faq"><div><div>Only a summary</div></div></div>');
+  decorate(empty.querySelector('.accordion'));
+  assert.equal(faqScripts(empty).length, 0);
+});
+
+test('CSS: answer starts 10px under its question at full width; the plus sits in a 32px round box', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = await readFile(new URL('./accordion.css', import.meta.url), 'utf8');
+  const rule = (selector) => css.match(new RegExp(`(?:^|\\n)${selector.replace(/[.[\]="]/g, '\\$&')} \\{([^}]+)\\}`))?.[1] || '';
+  assert.match(rule('.accordion .accordion-panel'), /padding: var\(--accordion-panel-inset\) 0;/);
+  assert.match(rule('.accordion'), /--accordion-panel-inset: var\(--page-gutter\);/);
+  assert.match(rule('.accordion'), /--accordion-icon-box: calc\(var\(--accordion-icon-size\) \+ 2 \* var\(--accordion-icon-pad\)\);/);
+  assert.match(rule('.accordion .accordion-icon'), /padding: var\(--accordion-icon-pad\);/);
+  assert.match(rule('.accordion .accordion-icon'), /border-radius: 50%;/);
+  assert.match(rule('.accordion .accordion-heading button[aria-expanded="true"] .accordion-icon'), /transform: rotate\(45deg\);/);
+});
+

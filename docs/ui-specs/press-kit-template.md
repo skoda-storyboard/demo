@@ -200,7 +200,7 @@ block carries the facets. A `Section Metadata` `Style: press-kit-chapter` marks 
 ## Safety and assistance systems
 ## Connectivity
 [ Press Kit Variant ]               ← block, press-kit-variant.md
-[ Accordion (faq) ]                 ← block, faq-accordion.md
+[ Accordion (faq) ]                 ← block, faq-accordion.md (FAQ chapter; FAQPage JSON-LD, SKODA-807)
 [ Press Kit Media ]                 ← block, press-kit-media.md
 | Metadata |                        |
 | template | press-kit             |
