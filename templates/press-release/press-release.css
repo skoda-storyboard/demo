@@ -127,6 +127,18 @@ body.press-release .section.sidebar .default-content-wrapper > ul a {
   text-decoration: none;
 }
 
+/* Highlight callout (SKODA-824; the Zellmer FAQ, a `div[style*=background]` in the source
+   .entry-content): `Style: body-column, highlight-grey|dark`. The box is the text column
+   itself (106/812 at 1440, 10/370 at 390), padded 25px; colours are global (styles.css). */
+body.press-release main > .section.body-column:is(.highlight-grey, .highlight-dark) {
+  margin-inline: var(--pr-gutter);
+  padding: var(--highlight-callout-padding);
+}
+
+body.press-release main > .section.body-column:is(.highlight-grey, .highlight-dark) > div {
+  padding-inline: 0;
+}
+
 /* Dark bands: Media Box (32px below the article), then Related directly after it. */
 body.press-release main > .section.dark {
   padding: var(--pr-band-padding-top) 0 var(--pr-band-padding-bottom);
@@ -218,6 +230,9 @@ body.press-release .section.sidebar aside > .default-content-wrapper:has(> h3:la
     align-items: start;
     max-width: var(--content-max-width);
     margin-inline: auto;
+
+    /* a highlight callout splits the body (SKODA-824): the last part takes the slack */
+    grid-template-rows: repeat(var(--body-rows-before-last), auto) 1fr;
   }
 
   body.press-release main > .section {
@@ -228,8 +243,10 @@ body.press-release .section.sidebar aside > .default-content-wrapper:has(> h3:la
     grid-column: 1;
   }
 
+  /* the sidebar spans every body part from the first (counts: scripts/split-body.js) */
   body.press-release main > .section.sidebar {
     grid-column: 2;
+    grid-row: var(--body-row-start) / span var(--body-rows);
   }
 
   body.press-release main > .section.dark {

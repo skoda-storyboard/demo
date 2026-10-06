@@ -49,6 +49,9 @@
     "footer": {
       "variants": []
     },
+    "footnotes": {
+      "variants": []
+    },
     "fragment": {
       "variants": []
     },
@@ -309,7 +312,7 @@
       "form": "section-style",
       "status": "pinned",
       "ticket": "SKODA-824",
-      "fallback": "broken",
+      "fallback": "readable",
       "styles": [
         "highlight-dark",
         "highlight-grey"
