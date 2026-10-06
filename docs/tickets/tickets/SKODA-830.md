@@ -184,6 +184,16 @@ Evidence: `.migration/qa-830/run2/` (full run at cfa90ef) and `.migration/qa-830
     (Gallery → slider, page-title captions removed), and the new import contains them.
   - elroq-through-designers-eyes: DA edit at 09:22 with no rendered difference.
 
+### PR #269 review (2026-10-06, issuecomment-6024206752): fixed
+- **Media Box band background:** it was painted 100vw (only Related Stories was capped). The cap now sits on the
+  shared story `.section.dark::before` (`--story-dark-band-max-width: var(--cover-box-max-width)`).
+  On cruise-control at 1920 / 2560 / 3440: x 240 / 560 / 1000, width 1440, equal to origin (was full-viewport at x=0).
+- **Gap between bands:** a single 36px separator between the Media Box and Related Stories
+  (`.section.media-box + .section.dark.story-rail-container`, `--story-dark-band-gap: 2.25em`). The 24px gap from
+  Related Stories to the footer is unchanged. Measured 36 / 24 at 375 / 768 / 992 / 1080 / 1440 / 1920 / 2560 / 3440.
+- **Found while checking, pre-existing on main, not this PR:** the press-release Media Box band is 1248px wide
+  (x=656 at 2560) vs origin 1440px (x=560), with a 0px gap to the footer vs origin 16px.
+
 ### Follow-ups (non-blocking)
 - D2-F1: without a ResizeObserver measurement, the tiles stay `inert` and the pill overlaps (outside the supported
   browsers). Apply collapsed + inert only once measured.

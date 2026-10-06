@@ -60,7 +60,8 @@
   --story-sidebar-heading-size-compact: 20px;
   --story-sidebar-heading-line-height: 45px;
   --card-caption-row: 45px; /* taxonomy caption card: the white title row under the image (source .entry-title) */
-  --story-related-band-max-width: var(--cover-box-max-width); /* the same live .cover-box cap */
+  --story-dark-band-max-width: var(--cover-box-max-width); /* live story .cover-box.dark cap: Media Box + Related Stories */
+  --story-dark-band-gap: 2.25em; /* live .cover-box.dark top margin (36px) between stacked story bands */
 
   /* body sizes (mobile-first base) */
   --body-font-size-lead: 20px; /* story perex under the hero (live: 20/30 wt600) */
@@ -1183,13 +1184,10 @@ body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has
     inset-block: 0;
     left: 50%;
     width: 100vw;
+    max-width: var(--story-dark-band-max-width);
     transform: translateX(-50%);
     background: var(--dark-color);
     z-index: -1;
-  }
-
-  body.story main > .section.dark.story-rail-container::before {
-    max-width: var(--story-related-band-max-width);
   }
 }
 
@@ -1226,6 +1224,14 @@ body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has
 body.story main > .section.dark.story-rail-container {
   margin-block-end: var(--spacing-l);
   padding-block: var(--spacing-xxl) calc(var(--spacing-xl) + var(--paragraph-gap));
+}
+
+/* Live's separate .cover-box.dark wrappers (36px top / 24px bottom margin) collapse to one 36px
+   white gap between the Media Box and Related Stories. EDS main is a grid, where margins add
+   instead of collapsing, so only the rail's top margin carries the gap; its 24px bottom margin
+   before the footer is unchanged. */
+body.story main > .section.media-box + .section.dark.story-rail-container {
+  margin-block-start: var(--story-dark-band-gap);
 }
 
 body.story main > .section.dark.story-rail-container > div {
