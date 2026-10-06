@@ -25,6 +25,8 @@ header .nav-wrapper {
   --nav-search-bar-width: 624px;
   --nav-search-scope-width: 84px;
   --nav-drop-chevron-space: 44px; /* dropdown trigger end padding */
+  --nav-drop-chevron-width: 11.16px; /* source caret glyph U+E007 (icons/nav-chevron.svg), .75 × 16px */
+  --nav-drop-chevron-height: 6.7px;
   --nav-tab-padding: 21px;
   --nav-newsletter-width: 550px; /* the panel's form (source label max-width / field + pill) */
 
@@ -138,12 +140,14 @@ header .nav-topbar .nav-topbar-utility a {
   text-decoration: none;
 }
 
-/* Subscribe CTA: mail icon inline before the label; source 12/600 (link or panel button) */
+/* Subscribe CTA: mail icon inline before the label; source 12/18/600 (link or panel button), so
+   it sits on the language links' line (text y14 @1440) */
 header .nav-topbar .nav-subscribe {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
   font-weight: var(--weight-semibold);
+  line-height: 18px;
 }
 
 header .nav-topbar .nav-subscribe .icon-mail,
@@ -229,13 +233,15 @@ header .nav-section-switcher li {
   margin: 0;
 }
 
-/* source tab: 21px inline padding, 14/600 with 0.28px tracking (Stories 90, Media Room 125 wide) */
+/* source tab: 21px inline padding, 14/600 with 0.28px tracking (Stories 90, Media Room 125 wide);
+   the source li pads 13px above a 20px line, which puts the text at y15 (not centred) */
 header .nav-section-switcher li a {
   display: flex;
   flex: 1;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 0 var(--nav-tab-padding);
+  padding: 13px var(--nav-tab-padding) 0;
+  line-height: 20px;
   color: var(--skoda-grey-500);
   font-size: var(--body-font-size-s);
   font-weight: var(--weight-semibold);
@@ -355,10 +361,12 @@ header .nav-brand .nav-brand-logo {
   padding-left: calc(var(--nav-logo-inset) - var(--page-gutter));
 }
 
+/* the source wordmark (its own SVG, 255.19 x 23.1): 194 x 17.56 */
 header .nav-brand .icon-skoda-storyboard-logo,
 header .nav-brand .icon-skoda-storyboard-logo img {
   width: 194px;
-  height: 18px;
+  height: auto;
+  aspect-ratio: 255.19 / 23.1;
 }
 
 /* --- Sections (main nav items + dropdown panels) --------------------------- */
@@ -401,8 +409,9 @@ header nav .nav-tools p {
 }
 
 /* search (source .search-bar, SKODA-308): a search button that opens a bar, the scope select
-   and a pill field, over the menu; while open the button is the bar's ✕. In the drawer the
-   pill is a static row (below). Icons are CSS masks in the text colour. */
+   and a pill field, over the menu; while open the button is the source's invisible submit at
+   the pill's end (searches with a query, closes without one). In the drawer the pill is a
+   static row (below). Icons are CSS masks of the source glyphs in the text colour. */
 header nav .nav-search {
   position: relative;
 }
@@ -430,11 +439,15 @@ header nav .nav-search-field {
   background-color: var(--dropdown-hover-bg);
 }
 
-header nav .nav-search-field:focus-within {
+/* the source field shows no focus ring: ours appears for keyboard use only (Tab, or the
+   button pressed from the keyboard; data-keyboard is set by header.js, cleared by the pointer).
+   Inset, so the bar's overflow can't clip it at the pill's end. */
+header nav .nav-search-bar[data-keyboard] .nav-search-field:focus-within {
   outline: 2px solid var(--skoda-ink);
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
+/* the source glyph (icon font `search`, U+E02D), 19.2px #464748, 16px into the pill */
 header nav .nav-search-icon {
   position: absolute;
   top: 50%;
@@ -443,7 +456,7 @@ header nav .nav-search-icon {
   height: var(--spacing-l);
   background-color: var(--skoda-grey-750);
   transform: translateY(-50%);
-  mask: url('../../icons/search.svg') center / 80% no-repeat;
+  mask: url('../../icons/nav-search.svg') center / 80% no-repeat;
   pointer-events: none;
 }
 
@@ -466,13 +479,19 @@ header nav .nav-search-input:focus-visible {
   outline: none;
 }
 
-/* source placeholder #464748 (8.6:1 on the pill) */
-header nav .nav-search-input::placeholder {
-  color: var(--skoda-grey-750);
-  opacity: 1;
+/* no browser clear "×" once text is typed (the source shows none) */
+header nav .nav-search-input::-webkit-search-cancel-button {
+  display: none;
 }
 
-/* the search button: a 24px magnifier, the 19.2px grey ✕ while the bar is open (source glyphs) */
+/* source placeholder: #464748 at 30% */
+header nav .nav-search-input::placeholder {
+  color: var(--skoda-grey-750);
+  opacity: 0.3;
+}
+
+/* the search button: the source's 24px magnifier glyph; open, it is the source's submit at the
+   pill's end, which shows nothing there (its glyph sits under the field) */
 header nav .nav-search-toggle {
   display: inline-flex;
   flex: 0 0 auto;
@@ -494,17 +513,11 @@ header nav .nav-search-toggle::before {
   width: var(--spacing-l);
   height: var(--spacing-l);
   background-color: currentcolor;
-  mask: url('../../icons/search.svg') center / contain no-repeat;
-}
-
-header nav .nav-search.nav-search-open .nav-search-toggle {
-  color: var(--skoda-grey-750);
+  mask: url('../../icons/nav-search.svg') center / contain no-repeat;
 }
 
 header nav .nav-search.nav-search-open .nav-search-toggle::before {
-  width: 19.2px;
-  height: 19.2px;
-  mask-image: url('../../icons/lightbox-close.svg');
+  visibility: hidden;
 }
 
 header nav .nav-search-toggle:focus-visible {
@@ -628,7 +641,7 @@ header nav .nav-search .search-suggest-meta {
   header .nav-brand .icon-skoda-storyboard-logo {
     width: min(194px, 100cqi);
     height: auto;
-    aspect-ratio: 194 / 18;
+    aspect-ratio: 255.19 / 23.1;
   }
 
   header .nav-brand .icon-skoda-storyboard-logo img {
@@ -876,9 +889,11 @@ header nav .nav-search .search-suggest-meta {
     padding: 0 var(--page-gutter);
   }
 
-  /* Subscribe + locales become visible, flush right (as one group) */
+  /* Subscribe + locales become visible, flush right (as one group); flex boxes, as the source
+     .right-section items, so the 18px lines sit exactly on the bar's middle (y13 @44px) */
   header .nav-topbar-utility {
-    display: block;
+    display: flex;
+    align-items: center;
   }
 
   /* push the whole utility group (Subscribe first, then locales) to the right: the first
@@ -999,6 +1014,12 @@ header nav .nav-search .search-suggest-meta {
     pointer-events: auto;
   }
 
+  /* a dismissed panel (Escape / Space) also leaves the tab order: Tab never lands on its
+     hidden links (it shows again once focus or the pointer comes back) */
+  header nav .nav-sections .default-content-wrapper > ul > li[data-dismissed] > ul {
+    visibility: hidden;
+  }
+
   header nav .nav-sections .default-content-wrapper > ul > li > ul > li {
     margin: 0;
     font-weight: var(--weight-regular);
@@ -1029,7 +1050,9 @@ header nav .nav-search .search-suggest-meta {
     cursor: pointer;
   }
 
-  /* source trigger: 20px start / 44px end padding, the chevron centred 29px from the end */
+  /* source trigger: 20px start / 44px end padding. The chevron is the source glyph (icon font
+     e007 at 16px, scaled .75): an 11.2 x 6.7px "v", ~1.7px strokes, centred 29px from the end
+     and on the row's middle */
   header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > a,
   header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > p > a {
     padding-right: var(--nav-drop-chevron-space);
@@ -1039,14 +1062,12 @@ header nav .nav-search .search-suggest-meta {
   header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > p > a::after {
     content: '';
     position: absolute;
-    top: calc(50% - 4px);
-    right: 25px;
-    width: 6px;
-    height: 6px;
-    border: 2px solid currentcolor;
-    border-width: 2px 2px 0 0;
-    border-radius: 0 1px 0 0;
-    transform: rotate(135deg);
+    top: calc(50% - var(--nav-drop-chevron-height) / 2);
+    right: calc(29px - var(--nav-drop-chevron-width) / 2);
+    width: var(--nav-drop-chevron-width);
+    height: var(--nav-drop-chevron-height);
+    background-color: currentcolor;
+    mask: url('../../icons/nav-chevron.svg') center / contain no-repeat;
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li.nav-drop:hover > a::before,
@@ -1078,32 +1099,37 @@ header nav .nav-search .search-suggest-meta {
     z-index: 1;
   }
 
-  /* the open bar (source .search-bar.expanded): 624px, half the viewport below 1248, white,
-     over the menu, ending on the slot's right edge: the 84px scope select + the pill */
+  /* the bar (source .search-bar, `width .15s ease-in-out`): grows from the 48px slot to 624px
+     (half the viewport below 1248) leftwards, over the menu, white: the 84px scope select and
+     the pill, which takes the rest as it grows. Hidden once shrunk back. */
   header nav .nav-search-bar {
     position: absolute;
     top: 0;
     right: 0;
-    width: min(var(--nav-search-bar-width), 50vw);
+    width: var(--nav-search-slot);
     height: var(--nav-main-height);
+    overflow: hidden;
     background-color: var(--background-color);
-    opacity: 0;
+
+    /* covers the menu label the bar's edge lands on (sub-pixel glyph edges show otherwise) */
+    box-shadow: -4px 0 0 var(--background-color);
     visibility: hidden;
-    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+    transition: width 0.15s ease-in-out, visibility 0s linear 0.15s;
   }
 
   header nav .nav-search.nav-search-open .nav-search-bar {
-    opacity: 1;
+    width: min(var(--nav-search-bar-width), 50vw);
     visibility: visible;
     transition-delay: 0s;
   }
 
-  /* the ✕ sits inside the pill's end, so its text stops before it */
+  /* the button sits inside the pill's end, so the text stops before it */
   header nav .nav-search-input {
     padding-right: var(--nav-search-slot);
   }
 
-  /* scope select: source 84 x 48, 16px ink, 16px start / 32px end padding, chevron 9px in */
+  /* scope select: source 84 x 48, 16px ink, 16px start / 32px end padding (the label ellipsed,
+     "Sto…"), the caret glyph (12px: 11.2 x 6.7) centred 15px from its end */
   header nav .nav-search-scope {
     display: block;
     position: relative;
@@ -1115,13 +1141,12 @@ header nav .nav-search .search-suggest-meta {
   header nav .nav-search-scope::after {
     content: '';
     position: absolute;
-    top: 50%;
-    right: 9px;
-    width: 12px;
-    height: 12px;
+    top: calc(50% - var(--nav-drop-chevron-height) / 2);
+    right: calc(15px - var(--nav-drop-chevron-width) / 2);
+    width: var(--nav-drop-chevron-width);
+    height: var(--nav-drop-chevron-height);
     background-color: currentcolor;
-    transform: translateY(-50%) rotate(180deg);
-    mask: url('../../icons/chevron-up.svg') center / contain no-repeat;
+    mask: url('../../icons/nav-chevron.svg') center / contain no-repeat;
     pointer-events: none;
   }
 
@@ -1132,12 +1157,15 @@ header nav .nav-search .search-suggest-meta {
     margin: 0;
     border: 0;
     border-radius: 0;
-    padding: 0 var(--spacing-xl) 0 var(--spacing-m);
+    padding: 0 32px 0 var(--spacing-m);
     appearance: none;
     background: transparent;
     color: inherit;
     font: inherit;
     font-size: var(--body-font-size-m);
+
+    /* not the tools row's line-height 0, which would draw the label as a sliver */
+    line-height: var(--line-height-body);
     text-overflow: ellipsis;
     cursor: pointer;
   }
@@ -1151,6 +1179,13 @@ header nav .nav-search .search-suggest-meta {
      content has no height of its own (all of it is positioned), so this is from its top */
   header nav .nav-search .search-suggest {
     top: calc(var(--nav-main-height) - var(--spacing-xs));
+    width: min(var(--nav-search-bar-width), 50vw);
+  }
+}
+
+@media (width >= 1080px) and (prefers-reduced-motion: reduce) {
+  header nav .nav-search-bar {
+    transition: none;
   }
 }
 
@@ -1171,11 +1206,12 @@ header nav button.nav-mail {
   cursor: pointer;
 }
 
-/* after the reset's `font: inherit`: the CTA's 600 */
+/* after the reset's `font: inherit`: the CTA's 600 and 18px line, as the link */
 header .nav-topbar button.nav-subscribe {
   position: relative;
   color: var(--skoda-grey-700);
   font-weight: var(--weight-semibold);
+  line-height: 18px;
 }
 
 /* source .newsletter-button__active: a 2px ink bar under the open trigger */
@@ -1250,4 +1286,20 @@ header .nav-newsletter-close:focus-visible {
 /* Media Room side: the active section tab text is ink #161718, not the Storyboard black (measured SKODA-309) */
 header .header[data-section='media-room'] .nav-section-switcher li.active a {
   color: var(--skoda-ink);
+}
+
+/* Windows High Contrast / forced colors: the mask-drawn glyphs (search, chevrons, the panel ✕)
+   paint their background colour, which forced colors would reset; keep them in the system
+   text colour so the icons stay visible */
+@media (forced-colors: active) {
+  header nav .nav-search-toggle::before,
+  header nav .nav-search-icon,
+  header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > a::after,
+  header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > p > a::after,
+  header nav .nav-search-scope::after,
+  header .nav-newsletter-close::before {
+    /* stylelint-disable-next-line scale-unlimited/declaration-strict-value -- a system colour */
+    background-color: canvastext;
+    forced-color-adjust: none;
+  }
 }

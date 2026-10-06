@@ -26,6 +26,7 @@ const NAV = `
 <div><ul>
   <li><p><a href="/en/category/models">Models</a></p><ul><li><a href="/en/tag/model/fabia">Fabia</a></li></ul></li>
   <li><p><a href="/en/category/emobility">eMobility</a></p></li>
+  <li><p>Company</p><ul><li><a href="/en/contacts">Contacts</a></li></ul></li>
 </ul></div>
 <div><p><a href="/en/search">Search</a></p></div>`;
 
@@ -97,19 +98,86 @@ test('search: the button opens the bar (focus in the field) and, open, closes it
   const search = nav.querySelector('.nav-search');
   const input = search.querySelector('input');
   const scope = search.querySelector('select');
-  toggle.click();
+  toggle.focus();
+  toggle.click(); // a keyboard press (detail 0)
   assert.ok(search.classList.contains('nav-search-open'));
   assert.equal(toggle.getAttribute('aria-expanded'), 'true');
-  assert.equal(toggle.getAttribute('aria-label'), 'Close search');
+  assert.equal(toggle.getAttribute('aria-label'), 'Close search', 'open and empty: it closes');
   assert.equal(document.activeElement, input);
   assert.equal(input.tabIndex, 0);
   assert.equal(scope.tabIndex, 0, 'the scope is reachable while open');
+  assert.equal(search.querySelector('.nav-search-bar').dataset.keyboard, 'true', 'keyboard: the field ring shows');
+
+  // with a query the open button is the source's submit: it searches instead of closing
   input.value = 'peaq';
-  toggle.click(); // the ✕: closes, it doesn't submit
+  input.dispatchEvent(new window.Event('input', { bubbles: true }));
+  assert.equal(toggle.getAttribute('aria-label'), 'Search');
+  toggle.click();
+  assert.ok(search.classList.contains('nav-search-open'), 'submitted, not closed');
+
+  input.value = '';
+  input.dispatchEvent(new window.Event('input', { bubbles: true }));
+  toggle.click();
   assert.equal(search.classList.contains('nav-search-open'), false);
   assert.equal(toggle.getAttribute('aria-label'), 'Search');
   assert.equal(scope.tabIndex, -1);
-  assert.equal(document.activeElement, toggle, 'focus is not left in the hidden field');
+  assert.equal(search.querySelector('.nav-search-bar').dataset.keyboard, undefined);
+});
+
+test('search: a pointer press keeps the field ring off; a pointer close leaves no focus ring', () => {
+  const toggle = nav.querySelector('.nav-search-toggle');
+  const search = nav.querySelector('.nav-search');
+  const bar = search.querySelector('.nav-search-bar');
+  const pointerClick = () => toggle.dispatchEvent(new window.MouseEvent('click', { bubbles: true, detail: 1 }));
+  pointerClick();
+  assert.ok(search.classList.contains('nav-search-open'));
+  assert.equal(bar.dataset.keyboard, undefined, 'no ring for the mouse (the source shows none)');
+  key(search.querySelector('input'), 'Tab');
+  assert.equal(bar.dataset.keyboard, 'true', 'Tab brings the ring back');
+  bar.dispatchEvent(new window.Event('pointerdown', { bubbles: true }));
+  assert.equal(bar.dataset.keyboard, undefined);
+  search.querySelector('input').focus(); // where focus is while the bar is open
+  pointerClick();
+  assert.equal(search.classList.contains('nav-search-open'), false);
+  assert.equal(document.activeElement, document.body, 'released: not on the button (no ring), not in the hidden field');
+});
+
+test('search: a Tab anywhere in the nav (e.g. into the drawer field) turns the keyboard ring on', () => {
+  const bar = nav.querySelector('.nav-search-bar');
+  delete bar.dataset.keyboard;
+  key(nav.querySelector('.nav-brand a'), 'Tab');
+  assert.equal(bar.dataset.keyboard, 'true');
+  document.dispatchEvent(new window.Event('pointerdown', { bubbles: true }));
+  assert.equal(bar.dataset.keyboard, undefined);
+});
+
+test('search: focus moving on or a click elsewhere closes the bar, even with a query', () => {
+  const toggle = nav.querySelector('.nav-search-toggle');
+  const search = nav.querySelector('.nav-search');
+  const input = search.querySelector('input');
+  toggle.click();
+  input.value = 'peaq';
+  search.dispatchEvent(new window.FocusEvent('focusout', { bubbles: true, relatedTarget: null }));
+  assert.ok(search.classList.contains('nav-search-open'), 'focus moving nowhere (a click on its text) keeps it');
+  search.dispatchEvent(new window.FocusEvent('focusout', { bubbles: true, relatedTarget: nav.querySelector('.nav-brand a') }));
+  assert.equal(search.classList.contains('nav-search-open'), false, 'Tab away closes it');
+  assert.equal(input.value, 'peaq', 'the query is kept');
+  toggle.click();
+  input.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+  assert.ok(search.classList.contains('nav-search-open'), 'a click inside keeps it');
+  document.querySelector('main p').dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+  assert.equal(search.classList.contains('nav-search-open'), false, 'a click elsewhere closes it');
+  input.value = '';
+});
+
+test('search: only web links are used as the results page', () => {
+  const origin = 'https://main--demo--skoda-storyboard.aem.page';
+  assert.equal(header.isWebUrl('/en/search', origin), true);
+  assert.equal(header.isWebUrl('https://www.skoda-storyboard.com/en/search/', origin), true);
+  // eslint-disable-next-line no-script-url
+  assert.equal(header.isWebUrl('javascript:alert(1)', origin), false);
+  assert.equal(header.isWebUrl('mailto:x@y.z', origin), false);
+  assert.equal(header.isWebUrl('http://[::1', origin), false, 'malformed');
 });
 
 test('search: pressing the button keeps focus where it is (Safari / Firefox focusout race)', () => {
@@ -163,7 +231,7 @@ test('desktop dropdown: focus moving on closes an open dropdown (one at a time)'
   assert.equal(models.getAttribute('aria-expanded'), 'false');
 });
 
-test('desktop dropdown: Escape hides a panel shown by focus; it returns once focus leaves', () => {
+test('desktop dropdown: Escape on a panel link hides the panel and moves focus to its trigger', () => {
   const models = nav.querySelector('.nav-drop');
   delete models.dataset.dismissed;
   const sub = models.querySelector('ul a');
@@ -171,10 +239,41 @@ test('desktop dropdown: Escape hides a panel shown by focus; it returns once foc
   key(sub, 'Escape');
   assert.equal(models.dataset.dismissed, 'true');
   assert.equal(models.getAttribute('aria-expanded'), 'false');
-  assert.equal(document.activeElement, sub, 'focus stays where it was');
+  assert.equal(document.activeElement, models.querySelector(':scope > p > a'), 'never left on a hidden link');
   const outside = nav.querySelector('.nav-brand a');
   models.dispatchEvent(new window.FocusEvent('focusout', { bubbles: true, relatedTarget: outside }));
+  assert.equal(models.dataset.dismissed, undefined, 'it shows again on the next visit');
+});
+
+test('desktop dropdown: the pointer coming back clears a dismissal', () => {
+  const models = nav.querySelector('.nav-drop');
+  models.dataset.dismissed = 'true';
+  models.dispatchEvent(new window.Event('pointerenter'));
   assert.equal(models.dataset.dismissed, undefined);
+});
+
+test('desktop dropdown: Space on a focused item (li) toggles it without scrolling', () => {
+  const models = nav.querySelector('.nav-drop');
+  delete models.dataset.dismissed;
+  models.setAttribute('aria-expanded', 'false');
+  models.focus();
+  const space = key(models, ' ');
+  assert.equal(space.defaultPrevented, true);
+  assert.equal(models.dataset.dismissed, 'true', 'focus was showing it: the first press hides it');
+  key(models, ' ');
+  assert.equal(models.getAttribute('aria-expanded'), 'true');
+});
+
+test('desktop dropdown: a text-only parent toggles what is on screen on click / Enter', () => {
+  const company = [...nav.querySelectorAll('.nav-drop')].find((li) => li.textContent.includes('Company'));
+  const trigger = company.querySelector(':scope > p > a');
+  assert.equal(trigger.getAttribute('href'), '#');
+  trigger.focus(); // :focus-within shows it
+  trigger.click();
+  assert.equal(company.dataset.dismissed, 'true', 'the first click hides the panel focus was showing');
+  trigger.click();
+  assert.equal(company.getAttribute('aria-expanded'), 'true');
+  assert.equal(company.dataset.dismissed, undefined);
 });
 
 test('desktop dropdown: the panel rule honours the dismissal (CSS guard, jsdom has no cascade)', async () => {
@@ -183,6 +282,8 @@ test('desktop dropdown: the panel rule honours the dismissal (CSS guard, jsdom h
   assert.match(css, /li:focus-within:not\(\[data-dismissed\]\) > ul/);
   assert.match(css, /li:hover:not\(\[data-dismissed\]\) > ul/, 'a hover-shown panel is dismissible (WCAG 1.4.13)');
   assert.doesNotMatch(css, /li:(focus-within|hover) > ul/);
+  assert.match(css, /li\[data-dismissed\] > ul \{\s*visibility: hidden;/, 'a dismissed panel leaves the tab order');
+  assert.match(css, /@media \(forced-colors: active\)/, 'mask icons stay visible in forced colors');
 });
 
 // ---- newsletter panel ----------------------------------------------------------------------

@@ -426,7 +426,7 @@
   border-radius: 0;
   padding: 0.875em;
   background-color: var(--skoda-white);
-  color: var(--skoda-ink);
+  color: var(--skoda-black);
   font-size: 0.8rem;
   line-height: 1.5;
 }
@@ -523,7 +523,7 @@
   .newsletter-stub.topbar .newsletter-stub-submit {
     order: 1;
     min-height: 44px;
-    margin-top: 12px;
+    margin-top: var(--spacing-s);
     font-size: 0.8rem;
   }
 }

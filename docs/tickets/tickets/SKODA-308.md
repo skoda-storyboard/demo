@@ -25,7 +25,7 @@ then, from 302 / 303 / 304 / 826:
 | Hover underline | under the label only (52.1px for Models), 17px from the bottom | same |
 | Dropdown panel | as wide as its item (116), rows 12px 24px, 48px (72 when a label wraps between words), no mid-word breaks | Models 116.1×696, identical rows |
 | Search closed | 41×41 at 1310,56 | 1309.5,55.5 |
-| Search open | 730–1354 (624; 540 at 1080 = 50vw), white, over the menu; scope select 84×48 (All / Stories / News / Press Kits / Images / Videos; Stories on Storyboard pages, All in the Media Room); pill 540×48 `#f1f1f1` r200 with the leading icon, 16px, placeholder `#464748`; the button becomes a 19.2px grey ✕ | same; Esc closes, focus back on the button; submit goes to `/en/search?filter[search]=…&search_type=…` |
+| Search open | 730–1354 (624; 540 at 1080 = 50vw), white, over the menu; scope select 84×48 (All / Stories / News / Press Kits / Images / Videos; Stories on Storyboard pages, All in the Media Room); pill 540×48 `#f1f1f1` r200 with the leading icon, 16px, placeholder `#464748`; the button becomes the source's invisible submit at the pill's end (a query searches, none closes; see the search QA round) | same; Esc closes, focus back on the button; submit goes to `/en/search?filter[search]=…&search_type=…` |
 | 1080–1180 overflow | — | fixed: one row at every width, no horizontal scroll (1080 / 1120 / 1179 / 1280 / 1440) |
 | Newsletter panel | `#0e3a2f`, 575.6,44 626.8×198.9 @1440; 390×311 full width @390 | 626.8×198.9; 390×310 |
 | Newsletter form | label 12.8/19.2; field 392.2×41.6; Subscribe 142.8×41.6 emerald r32; consent 14/18 `#a1a1a1`, 18px box; links emerald; ✕ 25.6 at 1164,56.8; on phones the pill under the consent (127×44) | same, phones pill 128.8×44 |
@@ -50,10 +50,58 @@ then, from 302 / 303 / 304 / 826:
   - It sits in the DOM right after the topbar CTA, so Tab moves into it.
   - It closes on Escape at a trigger, on focus moving to another control, on a click outside, and when the drawer opens.
   - A trigger replaced while focused keeps focus.
-- **Search extras:** the ✕ no longer moves focus on press. In Safari / Firefox on macOS a clicked button isn't focused, so the field's `focusout` used to close the bar and the click re-opened it. Closing returns focus to the button.
+- **Search extras:** the search button no longer moves focus on press. In Safari / Firefox on macOS a clicked button isn't focused, so the field's `focusout` used to close the bar and the click re-opened it. A keyboard close keeps focus on the button; a pointer close releases it.
 - **Suggestions:** they open under the pill (y100 @1440, as the source `.suggest-container`).
+- **QA round (2026-10-06):**
+  - **Logo:** `icons/skoda-storyboard-logo.svg` was a typed-text placeholder ("ŠKODA" + "Storyboard" in a font). It's now the source's own wordmark SVG (7 paths, `#0e3a2f`, viewBox 255.19 × 23.1), shown at 194 × 17.56. The Media Room uses the same one, as on the source.
+  - **Tabs:** text at y15 like the source (13px above a 20px line), not centred (was y13.5).
+  - **Subscribe:** an 18px line in a flex utility box (text y15, icon y14), was 1px high.
+  - **Pixel-identical to the source at 1440:** tabs (127 / 216.6, y15), Subscribe (x1022.7), the locales (1184.1–1320.4).
+  - **Dropdown chevron:** now `icons/nav-chevron.svg`, drawn from the source glyph (icon font e007 at 16px, scaled .75): an 11.2 × 6.7px "v", ~1.7px strokes, centred 29px from the end and on the row's middle. Was a rotated 8px border box, smaller, bolder and ~3px low.
+- **Search QA round (2026-10-06).** Re-measured live, including its icon font `skoda-bnr-icons`, whose glyph outlines were read from the woff2.
+  - **Icons:** `icons/nav-search.svg` is the source `search` glyph (U+E02D), a thin ring + handle: 24px on the button, 19.2px `#464748` in the pill. Was the heavier filled `search.svg`. `icons/nav-chevron.svg` is now the exact `caret-down` glyph (U+E007), at 11.16 × 6.7px for the menu and the scope select.
+  - **No ✕:** the open bar shows none, as the source (its submit glyph sits under the field). The button at the pill's end now searches with a query and closes the bar without one, as the source's submit does. The label follows: "Search" / "Close search". The browser's own search-field clear "×" is hidden.
+  - **No focus ring for the mouse:** the source shows none. The field's ring now appears only for keyboard use (Tab, or the button pressed from the keyboard). A pointer close leaves focus nowhere instead of moving a ring onto the button.
+  - **Opening:** the bar now grows from the 48px slot to 624px leftwards (`width .15s ease-in-out`, the source's own transition), the pill taking the rest as it grows. Was a 0.2s fade.
+  - **Text:** placeholder `#464748` at 30% opacity (source). Scope label ellipsed in its 84px, "Sto…" (16 / 32px padding). Its label had inherited the tools row's `line-height: 0` and was drawn as a sliver.
+  - **Suggestions:** as wide as the bar (624px from x730 @1440, source).
+  - **Clicking outside** closes the bar, as on the source.
+  - **Escape still closes it** (the source keeps it open). Kept for keyboard users.
+  - **Contrast note:** the 30% placeholder is ~1.7:1 on the pill, below AA for text. It matches the source; the field is named by its `aria-label` and the visible magnifier. Flagged for SKODA-703.
+- **Full review round (2026-10-06):** a second independent code review plus a measured live-vs-ours sweep. The sweep covered:
+  - **1440 / 1080 / 390:** topbar, tabs, Subscribe, locales, logo, items, search button, content start.
+  - **Desktop 1440 states:** dropdown panel / rows / hover / underline; search bar, scope, pill and icon; newsletter panel and form.
+  - **390 states:** drawer rows / chevrons / sub-menu / search row / locales; the phone newsletter panel.
+
+  The sweep matched live everywhere except the documented items:
+  - the AA greys;
+  - the 1080–1128 one-row choice;
+  - live's 10px overflow at ≤ 1268;
+  - the 1 – 2px sub-pixel offsets.
+
+  Fixed from the review:
+  - **Dropdowns:**
+    - Escape on a panel link moves focus to the trigger, never left on a hidden link.
+    - A dismissed panel is `visibility: hidden`, so Tab skips its links.
+    - Text-only parents (Media Room "Models") toggle what's on screen on click / Enter.
+    - The pointer coming back (`pointerenter`) clears a dismissal.
+  - **Search:**
+    - The keyboard ring flag is set by any Tab in the nav (the drawer field too) and cleared by any pointer press.
+    - The ring is inset, so the bar's overflow doesn't clip it.
+    - Focus moving to another control or a click elsewhere closes the bar even with a query (kept). A click on the bar's own text doesn't.
+    - A mouse close releases focus from any bar control.
+    - The authored search link must resolve to http(s) (`isWebUrl`), else the locale's /search.
+  - **Forced colors:** the mask glyphs (search, chevrons, panel ✕) use `canvastext`, so they stay visible in Windows High Contrast.
+  - **Newsletter field** text black (source).
+  - **Comments:** stale comments corrected.
+  - **Tests:** header-chrome 21. Blocks / scripts / templates 523/525; the 2 also fail on `main`.
+
+  Left as noted:
+  - English chrome strings ("Close search", "Search in", scope names), as the rest of the M1 chrome. Locale copy belongs to SKODA-1001.
+  - In the drawer, one Escape in the search field closes the whole drawer.
+  - `icons/search.svg` is no longer used by the header and is kept as the house icon (gallery reference).
 - **Review:** an independent read-only review (one must-fix: the suggestions covered the field; six should-fixes) was addressed in full and re-measured.
-- **Tests:** `header-chrome.test.mjs` (14: search, URL, dropdown keys, hover / focus dismissal, newsletter panel). `newsletter-stub.test.mjs` +2 (topbar).
+- **Tests:** `header-chrome.test.mjs` (21 after the review rounds: search, URL, dropdown keys, hover / focus dismissal, newsletter panel). `newsletter-stub.test.mjs` +2 (topbar).
   - Header, footer and newsletter tests are green.
   - Blocks / scripts / templates: 512/514. The 2 also fail on `main`: `header-locales` (SKODA-303a) and `media-cart-download` (a missing `fflate` here).
   - `npm run lint` is clean.

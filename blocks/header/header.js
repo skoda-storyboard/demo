@@ -25,7 +25,14 @@ function closeOnEscape(e) {
       // dismissed until focus / the pointer leaves it, so :focus-within / :hover can't keep it
       // on screen; focus only moves for a dropdown opened from the keyboard (not under the mouse)
       shown.dataset.dismissed = 'true';
-      if (shown === navSectionExpanded && !shown.contains(document.activeElement)) shown.focus();
+      const sub = shown.querySelector(':scope > ul');
+      if (sub?.contains(document.activeElement)) {
+        // focus was on a link of the now hidden panel: back to its trigger, never on hidden links
+        // eslint-disable-next-line no-use-before-define
+        dropTrigger(shown)?.focus();
+      } else if (shown === navSectionExpanded && !shown.contains(document.activeElement)) {
+        shown.focus();
+      }
     } else if (!isDesktop.matches) {
       // eslint-disable-next-line no-use-before-define
       toggleMenu(nav, navSections);
@@ -260,6 +267,20 @@ export function buildSearchScope(selected) {
   wrapper.className = 'nav-search-scope';
   wrapper.append(select);
   return { wrapper, select };
+}
+
+/**
+ * Whether an authored link resolves to a web page (http / https), so it can be navigated to.
+ * @param {string} href
+ * @param {string} origin The page origin, for relative hrefs
+ * @returns {boolean}
+ */
+export function isWebUrl(href, origin) {
+  try {
+    return /^https?:$/.test(new URL(href, origin).protocol);
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -575,8 +596,8 @@ export default async function decorate(block) {
         if (isDesktop.matches) {
           const expanded = navSection.getAttribute('aria-expanded') === 'true';
           if (isDrop) {
-            // closed with the pointer while focused (a text-only parent): dismissed too
-            setDesktopDrop(navSection, !expanded);
+            // toggles what is on screen (a text-only parent: click or Enter), as Space does
+            setDesktopDrop(navSection, !dropShown(navSection));
           } else {
             toggleAllNavSections(navSections);
             navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
@@ -615,16 +636,16 @@ export default async function decorate(block) {
           delete navSection.dataset.dismissed;
           if (isDesktop.matches) navSection.setAttribute('aria-expanded', 'false');
         });
-        navSection.addEventListener('pointerleave', () => {
-          if (!navSection.contains(document.activeElement)) delete navSection.dataset.dismissed;
-        });
+        // the pointer coming back shows it again (also after a click closed it while focused)
+        navSection.addEventListener('pointerenter', () => { delete navSection.dataset.dismissed; });
       }
     });
   }
 
   // tools row: render the search link as the source's search control (SKODA-308): a search
-  // button that opens a bar (scope select + pill field) over the menu and turns into its close
-  // button. DA strips authored icon tokens, so the icons are CSS masks.
+  // button that opens a bar (scope select + pill field) over the menu and then is the bar's
+  // invisible submit (a query searches, none closes). DA strips authored icon tokens, so the
+  // icons are CSS masks.
   const navTools = nav.querySelector('.nav-tools');
   if (navTools) {
     const searchLink = navTools.querySelector('a[href*="#search"], a');
@@ -664,13 +685,25 @@ export default async function decorate(block) {
       searchBar.className = 'nav-search';
       searchBar.append(bar, toggle);
 
+      // open, the button is the source's submit: it searches with a query, closes without one
+      const syncToggleLabel = () => {
+        const open = searchBar.classList.contains('nav-search-open');
+        toggle.setAttribute('aria-label', open && !input.value.trim() ? 'Close search' : label);
+      };
       const setOpen = (open) => {
         searchBar.classList.toggle('nav-search-open', open);
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-        toggle.setAttribute('aria-label', open ? 'Close search' : label);
+        syncToggleLabel();
         syncSearchTabbable(nav);
         if (open) input.focus();
+        else delete bar.dataset.keyboard;
       };
+      input.addEventListener('input', syncToggleLabel);
+      // the field's focus ring is for keyboard use only (the source shows none): set by any Tab
+      // in the nav (also tabbing into the drawer's field) or a keyboard press of the button,
+      // cleared by the pointer
+      nav.addEventListener('keydown', (e) => { if (e.key === 'Tab') bar.dataset.keyboard = 'true'; });
+      document.addEventListener('pointerdown', () => { delete bar.dataset.keyboard; });
       // Submit the query to the search results page (the SKODA-403 block reads
       // ?filter[search]= from the URL). Target: the authored search link's href
       // if it points to a real page, else the locale's /search (mirrors the live
@@ -679,6 +712,7 @@ export default async function decorate(block) {
       const localeMatch = window.location.pathname.match(/^\/([a-z]{2})(?:\/|$)/i);
       const locale = localeMatch ? localeMatch[1] : 'en';
       const searchPath = authoredHref && !authoredHref.startsWith('#')
+        && isWebUrl(authoredHref, window.location.origin)
         ? authoredHref
         : `/${locale}/search`;
       const submitSearch = (value) => {
@@ -691,26 +725,40 @@ export default async function decorate(block) {
       // helper owns the dropdown, arrow-key nav, and Enter; onSubmit fires when
       // Enter is pressed with no suggestion highlighted (submits the raw query).
       // Append the dropdown to .nav-search (positioned, not overflow:hidden) —
-      // the .nav-search-field pill clips its overflow for the collapse anim.
+      // the .nav-search-bar clips its overflow for the width animation.
       attachSuggest(input, { container: searchBar, onSubmit: submitSearch });
 
-      // the search button opens the bar; while open it is the bar's close button (source ✕).
-      // No focus move on press: Safari / Firefox on macOS don't focus a clicked button, so the
-      // field's focusout would close the bar and the click re-open it
+      // the search button opens the bar; while open it is the source's (invisible) submit at the
+      // pill's end: it searches with a query and closes the bar without one. No focus move on
+      // press: Safari / Firefox on macOS don't focus a clicked button, so the field's focusout
+      // would close the bar and the click re-open it
       toggle.addEventListener('mousedown', (e) => e.preventDefault());
-      toggle.addEventListener('click', () => {
-        const wasOpen = searchBar.classList.contains('nav-search-open');
-        setOpen(!wasOpen);
-        if (wasOpen) toggle.focus(); // not left in the hidden field
+      toggle.addEventListener('click', (e) => {
+        const keyboard = e.detail === 0; // Enter / Space on the button
+        if (!searchBar.classList.contains('nav-search-open')) {
+          if (keyboard) bar.dataset.keyboard = 'true';
+          setOpen(true);
+        } else if (input.value.trim()) {
+          submitSearch(input.value);
+        } else {
+          setOpen(false);
+          // a pointer close leaves focus nowhere (no ring, as on the source), not on a hidden
+          // bar control; from the keyboard it stays on the button
+          if (!keyboard && bar.contains(document.activeElement)) document.activeElement.blur();
+        }
       });
       // Escape closes the whole search bar (the suggest helper also closes its
       // own dropdown on Escape; this additionally collapses the field).
       bar.addEventListener('keydown', (e) => {
         if (e.code === 'Escape') { setOpen(false); toggle.focus(); }
       });
-      // close when focus leaves the search control (if input is empty)
+      // focus moving on to another control, or a click elsewhere, closes the bar (the query is
+      // kept), so it never stays over the menu; a click on the bar's own text moves focus nowhere
       searchBar.addEventListener('focusout', (e) => {
-        if (!searchBar.contains(e.relatedTarget) && !input.value) setOpen(false);
+        if (e.relatedTarget && !searchBar.contains(e.relatedTarget)) setOpen(false);
+      });
+      document.addEventListener('click', (e) => {
+        if (searchBar.classList.contains('nav-search-open') && !searchBar.contains(e.target)) setOpen(false);
       });
 
       searchLink.replaceWith(searchBar);
