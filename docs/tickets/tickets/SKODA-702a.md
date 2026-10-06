@@ -4,7 +4,81 @@
 - **Phase:** A · **Milestone:** M1 (15 Oct demo)
 - **GitHub issue:** [#239](https://github.com/skoda-storyboard/demo/issues/239) (sub-issue of #42)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
-- **Status (2026-10-01):** 🔵 TODO
+- **Status:** 🟡 built 2026-10-06, see below (was 🔵 TODO 2026-10-01)
+
+## Status (2026-10-06): 🟡 built on branch `skoda-702a-youtube-facade` (local)
+**Measured on the live `lite-youtube`** (Epiq story; after the OneTrust banner and the "I acknowledge and confirm"
+notice, which hide it until then):
+- The poster `i.ytimg.com/vi/{id}/maxresdefault.jpg` covers the 16:9 box on black.
+- A 99px top shade (`lite-youtube::before`).
+- The 68×48 YouTube glyph, centred, grayscale until hover / focus.
+- The whole box is one button, named "Play". There's no focus ring, and focus stays on the page after the click.
+- The click loads `youtube.com/embed/{id}?enablejsapi=1&autoplay=1&playsinline=1`.
+- Before the click, there's one request: the poster.
+
+**Built.**
+- **`blocks/embed/embed.js`:** YouTube renders a poster button (`.embed-play`: an `<img alt="">` poster plus the glyph) in place of the iframe.
+  - The click swaps in the player with `autoplay=1&playsinline=1` and moves focus into it.
+  - The poster falls back to `hqdefault` once, when `maxresdefault` errors or is YouTube's 120×90 placeholder.
+  - The accessible name is "Play video: {title}", or "Play YouTube video" for a bare-URL embed. Its only label is the generic "YouTube video", and the real title would cost a YouTube request.
+- **Consent (SKODA-204a):** with consent declined, nothing reaches YouTube, not even the poster.
+  - "I acknowledge and confirm" loads **and plays** the video, in one click.
+  - A grant through the hook shows the poster, and keyboard focus moves to it.
+  - If consent is withdrawn after the poster showed, its click shows the placeholder (focused) instead of loading YouTube.
+- **Video ids are validated** (`[A-Za-z0-9_-]`, first path segment for `youtu.be`). A malformed id (a `/`, `#` or quote in `v=`) is rejected like any invalid embed URL, with a console warning and nothing rendered. Before, it built a broken player URL.
+- **Unchanged:** Vimeo, Buzzsprout, Spotify, MP4 and generic embeds. Vimeo has no thumbnail without an API request, so a facade isn't cheap there.
+- **`embed.css` + `icons/youtube-play.svg`:** the live glyph, shade and states.
+  - The focus ring (2px, offset 2px, as the consent button) is drawn on the media box, whose `overflow` would clip a ring around the button. It's `currentcolor`: ink in the light story body, white in a dark section.
+  - Reduced motion drops the glyph transition.
+
+**Verified (local, branch vs `main`, same dev server):**
+- **Poster geometry** equals live at 390 / 768 / 992 / 1080 / 1280: 370×208.1, 498.7×280.5, 648×364.5, 706.7×397.5 and 818.7×460.5, with the glyph centred.
+- **Lighthouse 12** (interleaved, 3 runs each, median):
+
+  | Run | `main` | Branch |
+  |---|---|---|
+  | Desktop score / TBT | 99 / 0ms | 99 / 0ms |
+  | Desktop weight | 2,473 KB, 99 requests | **1,509 KB, 85 requests** |
+  | YouTube on load | 8 requests, 1,027 KB | **1 request (the 142 KB poster)** |
+  | Mobile score | 98 | 97 (TBT 0–290ms on both, noise) |
+  | LCP | hero image | hero image |
+
+  This machine scores `main` far higher than the 2026-10-01 runs did, so the **`aem-psi-check` on the PR is the deciding gate** for the desktop ≥ 90 / TBT < 200ms criterion.
+- **Keyboard:** Tab reaches the poster (the ring shows, the glyph turns red), and Enter (1280) / Space (390) plays it, with focus in the player.
+- **Other pages** (scrolled end to end, YouTube player requests `main` → branch):
+  - 2024 year-in-review: 11 posters, 93 → 0 requests. Its Vimeo is unchanged.
+  - Motorsport press-kit videos: 6 posters, 54 → 0. Its 11 MP4s are unchanged.
+  - RS four ways: 2 posters, 23 → 0.
+  - Park-your-Škoda: 1 poster, 9 → 0, plus 2 Vimeo unchanged.
+  - Octavia 30 (Vimeo + Buzzsprout) and Enyaq gaming (MP4) are identical to `main`.
+  - No script errors.
+- **Sliders (secondary):** no change needed.
+  - All images are `loading="lazy"`.
+  - At 1350×940 only the first slider (y1529, inside Chrome's lazy margin) fetches images (5 of 7); the 2nd/3rd fetch none.
+  - Autoplay pauses offscreen.
+  - With the poster there are no long tasks during load.
+- **Spacing and fonts vs live** (390 / 768 / 992 / 1080 / 1280): the poster box and x match, the gap above is 20px on both, and the paragraphs around it are Škoda Next 16/24 w400 ink on both. The poster has no visible text, as on live.
+- **Accessibility:** the accessibility tree shows one `button "Play YouTube video"`, with the poster image decorative (`alt=""`). The whole box is the touch target, and the focus ring is visible.
+- **Tests:** `embed.test.mjs` 43/43. 12 are new or reworked:
+  - the poster, the fallback and the second click;
+  - consent then play, a grant through the hook, and consent withdrawn after the poster;
+  - multiple instances, Shorts, `list=` / extra `youtu.be` segments, and rejected malformed ids.
+
+  The test DOM now honours `{ once: true }`. `npm run lint` is clean.
+  - Outside this change, failing the same on `main`: `header-locales` (SKODA-303a), and `media-cart-download` / `media-lib` (this machine's missing `fflate` and temp-dir cleanup).
+
+**Notes.**
+- **CLS < 0.01 (AC 2) can't be ticked by this ticket.** The mobile Epiq story is 0.066–0.070 on `main` **and** the branch. The shift is the header brand and the hero caption at start-up (SKODA-828, PR #253), not the poster, whose 16:9 box adds no shift. Desktop is 0.004–0.008.
+- **AC 3 "side-by-side screenshot":** replaced by the measured geometry above, per the AGENTS.md review protocol (measured values, no screenshots).
+- **Spacing below the video** (story import fidelity, not this block): live has 24px between the video and the next paragraph from 768 up; `main` and the branch have 0.
+  - On live it's an authored SiteOrigin spacer widget (`so-widget-skoda-offset`, 24px tall at ≥ 768, none at 390) that the story import doesn't carry over.
+  - Belongs with the story-body fidelity work (SKODA-801a).
+- **The Oliver Solberg press release** (`/en/press-releases/when-driving-fun-meets-comfort-rally-ace-oliver-solberg-tests-the-skoda-octavia-rs`) still has the SKODA-818 problem: the video was imported as a poster `<picture>` plus "Play" links to `youtube-nocookie.com/embed/…`.
+  - SKODA-818 fixed the story importer only, not the press-release importer.
+  - It's the same on `main`, and it isn't an embed block, so this change doesn't affect it.
+- **Playlists** (`/embed/videoseries?list=…`): `list` was already dropped on `main`, so the player shows "unavailable". With the poster, the box shows black and the glyph, because there's no thumbnail. No migrated page uses a playlist.
+- **iOS:** autoplay inside the swapped-in player may still need a second tap, the same trade-off as live.
+- **Language:** the "Play" label is English, like the rest of the M1 chrome. Locale copy belongs to SKODA-1001.
 
 ## Origin
 The `aem-psi-check` failed on PR #232 (SKODA-303) with **Lighthouse 74** on the **desktop** Epiq story
