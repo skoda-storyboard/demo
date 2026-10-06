@@ -6,8 +6,13 @@
 - **GitHub issue:** [#260](https://github.com/skoda-storyboard/demo/issues/260)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §3.2 / §8 F2; relates to [SKODA-209](SKODA-209.md), SKODA-214
 - **Branch:** `skoda-831-category-archive-membership`, stacked on `skoda-830-story-import-validity`
-- **Status (2026-10-06):** 🟡 Developer done (head e57cdb1, pushed). QA was started but interrupted; it needs a re-run.
-  Nothing has been pushed to DA, previewed or published, and the index config has not been pushed.
+- **Status (2026-10-06):** 🟡 Rollout steps 1–2 done; steps 3–4 wait for this branch's code on main.
+  - **Step 1:** index config pushed (`categories` column; readback equals `query-index-config.yaml`).
+  - **Step 2:** 57 stories re-imported with the merged 830+831 bundle, pushed, previewed and published. The only
+    diff vs the published SKODA-830 content is the new `categories` row. Live + preview index: 57/58 stories carry
+    `categories` (gaming-consoles stays blocked on its MP4).
+  - **Steps 3–4** (push + publish the 15 archives) need `blocks/stories/stories.js` with the `categories` key on
+    main; old code ignores it and would list every story. QA re-run still pending.
 
 ## Problem
 `parsers/archive-list.js` scoped sub-category archives to `path: /en/<cat>/<sub>/`, but story URLs are flat, so the
@@ -68,7 +73,7 @@ would render empty, including the parents that work today.
 - [x] Every sub-category archive matches its imported WordPress members (simulation)
 - [x] No change for configs without `categories`; home / rails / promo unaffected
 - [ ] QA PASS (re-run; also assess a defensive fallback in `stories.js` to remove the ordering risk)
-- [ ] Rolled out in the order above; rendered check of 3 archives on preview
+- [ ] Rolled out in the order above (steps 1–2 done 2026-10-06); rendered check of 3 archives on preview
 
 ## Risks
 - The category tree is a snapshot: new WP categories need `build-category-parents.mjs` + a bundle rebuild.
