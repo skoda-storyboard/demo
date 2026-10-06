@@ -9,9 +9,10 @@
  * Source (.article-teaser-toolbar, measured 2026-09-29): 40px ink-ringed round buttons.
  *   - image: both buttons open a size menu (Original / 1920px) on click;
  *   - video: one add button and one MP4 download link, no menu.
- * The add actions carry the cart key (`data-id`, `data-size`) and stay inert
- * (`aria-disabled`, their click is cancelled here) until the media cart (SKODA-505a)
- * binds them.
+ * The add actions carry the source cart key (`data-id`, `data-size`). The original's add
+ * (image "Original" row, the video button) is a media-cart toggle (SKODA-505a) for the
+ * original file; the 1920px row stays inert (`aria-disabled`, its click cancelled here):
+ * the cart collects DAM originals only.
  *
  * i18n: the control text comes from the caller's labels (`mediaLabels(placeholders)`, the
  * per-locale placeholders sheet), with the English defaults below. `{size}` is replaced
@@ -85,21 +86,79 @@ function wireDocument() {
   });
 }
 
+// The cart loads after the page has loaded (then on idle), never during the first render:
+// a media listing is the first section of /en/images and /en/videos, so anything loaded while
+// its cards render competes with the LCP image (SKODA-505a review). A first hover, focus,
+// click or Space on a control loads it at once.
+let cartModule = null;
+const loadCart = () => {
+  cartModule ||= import('./media-cart.js');
+  return cartModule;
+};
+let afterLoad = null;
+const whenPageLoaded = () => {
+  afterLoad ||= new Promise((resolve) => {
+    const idle = () => (window.requestIdleCallback || ((cb) => setTimeout(cb, 1)))(resolve);
+    if (document.readyState === 'complete') idle();
+    else window.addEventListener('load', idle, { once: true });
+  });
+  return afterLoad;
+};
+
+/** Space activates a link-based control (role button / menuitemcheckbox) without scrolling. */
+export function activateOnSpace(e) {
+  if (e.key !== ' ' || e.currentTarget.localName === 'button') return;
+  e.preventDefault();
+  e.currentTarget.click();
+}
+
 /**
- * The inert cart action: a `#` link that only carries the cart key (SKODA-505a binds it).
- * While it is disabled its click is cancelled here, so no consumer (listing, rails) jumps to
- * the top of the page.
+ * A cart action: a `#` link carrying the source cart key. The original's add is bound to the
+ * media cart for `original` (the file's link); the others stay inert. While disabled, its
+ * click is cancelled here, so no consumer (listing, rails) jumps to the top of the page; a
+ * click (or Space) before the cart has loaded loads it and is replayed once the control works.
  */
-function cartAction(el, row, size) {
+function cartAction(el, row, size, original = '', title = '') {
   el.href = '#';
   el.dataset.action = 'add';
   el.dataset.id = row.id;
   el.dataset.size = size;
   el.setAttribute('role', el.getAttribute('role') || 'button');
   el.setAttribute('aria-disabled', 'true');
+  el.addEventListener('keydown', activateOnSpace);
+  let bound = null;
+  const bind = (trigger) => {
+    if (!original) return Promise.resolve(false);
+    bound ||= loadCart()
+      .then(({ bindCartControl }) => {
+        bindCartControl(el, { href: original, title, thumb: row.image || row.poster || '' });
+        // bound by a hover / focus: replay it, so the cart's link check (which starts on the
+        // first hover or focus of a bound control) runs as it did when controls bound at render
+        if (trigger?.type === 'pointerenter' || trigger?.type === 'focus') {
+          el.dispatchEvent(new window.Event(trigger.type));
+        }
+        return true;
+      })
+      .catch((e) => {
+        // the control stays disabled (set above)
+        // eslint-disable-next-line no-console
+        console.warn('media card: the media cart did not load', e);
+        return false;
+      });
+    return bound;
+  };
   el.addEventListener('click', (e) => {
-    if (el.getAttribute('aria-disabled') === 'true') e.preventDefault();
+    if (el.getAttribute('aria-disabled') !== 'true') return;
+    e.preventDefault();
+    // not bound yet: bind now, then replay the click if the cart enabled the control
+    if (original && !el.hasAttribute('data-cart-control')) {
+      bind(e).then((ok) => { if (ok && el.getAttribute('aria-disabled') !== 'true') el.click(); });
+    }
   });
+  if (original) {
+    ['pointerenter', 'focus'].forEach((type) => el.addEventListener(type, bind, { once: true }));
+    whenPageLoaded().then(() => bind());
+  }
   return el;
 }
 
@@ -206,7 +265,7 @@ export function mediaActions(row, title = '', labels = DEFAULT_LABELS) {
 
   if (row.template === 'video') {
     if (row.id) {
-      actions.append(singleAction('add', named(L.add, title), L.addVideo, (a) => cartAction(a, row, '')));
+      actions.append(singleAction('add', named(L.add, title), L.addVideo, (a) => cartAction(a, row, '', row.mp4, title)));
     }
     if (row.mp4) {
       actions.append(singleAction('download', named(L.download, title), L.downloadVideo, (a) => downloadAction(a, row.mp4)));
@@ -218,7 +277,7 @@ export function mediaActions(row, title = '', labels = DEFAULT_LABELS) {
         label: L[s.labelKey],
         build: (a) => {
           a.title = sized(L.addSize, L[s.labelKey]);
-          return cartAction(a, row, s.size);
+          return cartAction(a, row, s.size, s.size === '' ? row[s.field] : '', title);
         },
       }))));
     }

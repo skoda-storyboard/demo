@@ -242,6 +242,11 @@
       "pushedAt": "2026-09-28T10:18:21.491Z",
       "previewedHash": "188cf779312589bc78793504387a00ac9c58cb15b2dedf99258c63371668c2b0"
     },
+    "/en/media-cart": {
+      "hash": "38438976c38bf5979ebad7e3e208f82a5121d929f4217fd4d3d77b8b54597e81",
+      "pushedAt": "2026-10-01T21:09:36.060Z",
+      "previewedHash": "38438976c38bf5979ebad7e3e208f82a5121d929f4217fd4d3d77b8b54597e81"
+    },
     "/en/media-room": {
       "hash": "fe3a51830fdc5e3c93623baf2d295eb4fc0f77cc154ebba0c21a287e73f71411",
       "pushedAt": "2026-09-29T22:49:37.604Z",
@@ -517,9 +522,9 @@
       "previewedHash": "5ba026056d03f5f39b3a4ff6623d07136c69da2ce78f4e439bdff9db5dd9a97f"
     },
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship": {
-      "hash": "5dfd3c1cb38916af4335e43997d25c93949d9bee1979edd9c64180fc16fb9ff9",
-      "pushedAt": "2026-09-29T22:26:21.547Z",
-      "previewedHash": "5dfd3c1cb38916af4335e43997d25c93949d9bee1979edd9c64180fc16fb9ff9"
+      "hash": "2b4893079e8c3f768a0a92fc3902900a469dca071da40833cc643d821898c92b",
+      "pushedAt": "2026-10-05T09:03:53.037Z",
+      "previewedHash": "2b4893079e8c3f768a0a92fc3902900a469dca071da40833cc643d821898c92b"
     },
     "/en/press-kits/skoda-peaq-press-kit-2": {
       "hash": "19fae5910cb967fc3e969447228c688fb7b6a1dcabd25ee73514e9f46b8ae00c",

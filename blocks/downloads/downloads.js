@@ -4,9 +4,12 @@
  * A thumbnail grid where each tile is one downloadable asset: a 16:9 image
  * (opens the lightbox via the gallery-lightbox convention) plus a round
  * download control offering the authored size(s) (e.g. Original / 1920px).
- * This is the STATIC per-page download list — no cart, no server state, no
- * signed-URL service (that is the Media Cart, SKODA-505/902). Spec:
- * docs/ui-specs/downloads.md.
+ * No server state, no signed-URL service (SKODA-902). Spec: docs/ui-specs/downloads.md.
+ *
+ * Media cart (SKODA-505b, media-cart.md §3): every tile with a download also gets a round
+ * "add to media cart" toggle for its original (the size labelled Original, else the first),
+ * bound to /scripts/media-cart.js; in a Media Box a group toggle on the section's stats line
+ * adds (or removes) all of them at once, as on the source.
  *
  * Authored as one row per asset (content-sniffed, never by position):
  *
@@ -32,6 +35,10 @@ const LABELS = {
   videoPoster: 'View video poster',
   more: 'Show more',
   less: 'Show less',
+  // aria-label for a tile's add-to-cart toggle and the Media Box group toggle (until the
+  // cart's placeholders labels replace it)
+  add: (title) => (title ? `Add to media cart: ${title}` : 'Add to media cart'),
+  addAll: 'Add all files to the media cart',
 };
 
 /**
@@ -270,6 +277,148 @@ function buildDownload(asset) {
   return wrap;
 }
 
+/** The link the cart adds for a tile: its original (the source adds originals only). */
+export function cartSize(sizes = []) {
+  return sizes.find(({ label }) => /original/i.test(label)) || sizes[0] || null;
+}
+
+/** The tile image as the cart keeps it: root-relative on this site, else the absolute URL. */
+export function cartThumb(src = '') {
+  if (!src) return '';
+  try {
+    const u = new URL(src, window.location.href);
+    return u.origin === window.location.origin ? `${u.pathname}${u.search}` : u.href;
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * The tile's add-to-media-cart toggle: inert (`aria-disabled`) until the cart binds it, which
+ * the block does once for all tiles (bindCart).
+ * @param {{title: string, alt?: string, src?: string, sizes: Array<{label,href}>}} asset
+ * @returns {HTMLButtonElement}
+ */
+function buildAdd(asset) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'downloads-add';
+  const title = asset.title || asset.alt || '';
+  btn.setAttribute('aria-label', LABELS.add(title));
+  btn.setAttribute('aria-disabled', 'true');
+  btn.dataset.href = cartSize(asset.sizes)?.href || '';
+  if (title) btn.dataset.title = title;
+  const thumb = cartThumb(asset.src);
+  if (thumb) btn.dataset.thumb = thumb;
+  return btn;
+}
+
+/**
+ * The block's stats line ("1 video, 3 images, 1 PDF"): the last paragraph of the default content
+ * right before this block, when it is plain text (no link or image) and no other block has taken
+ * it. Intro copy elsewhere in the section, or a second block's line, is never used.
+ * @returns {HTMLParagraphElement|null}
+ */
+export function statsLine(block) {
+  const wrapper = block.parentElement?.classList.contains('downloads-wrapper') ? block.parentElement : block;
+  const before = wrapper.previousElementSibling;
+  if (!before?.classList.contains('default-content-wrapper')) return null;
+  const p = before.lastElementChild;
+  if (p?.tagName !== 'P' || !p.textContent.trim() || p.classList.contains('downloads-stats')
+    || p.querySelector('a, img, picture')) return null;
+  return p;
+}
+
+/**
+ * The Media Box group toggle (source .search-results-stats .entry-buttons): adds every tile's
+ * original that isn't in the cart yet, or removes them all once every one is in. Right-aligned
+ * on the block's stats line (statsLine) when there is one, else above the grid. Returns the
+ * button (inert until wired).
+ */
+function buildAddAll(block) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'downloads-add downloads-add-all';
+  btn.setAttribute('aria-label', LABELS.addAll);
+  btn.setAttribute('aria-disabled', 'true');
+  const stats = statsLine(block);
+  if (stats) {
+    stats.classList.add('downloads-stats');
+    stats.append(btn);
+  } else {
+    const bar = document.createElement('div');
+    bar.className = 'downloads-toolbar';
+    bar.append(btn);
+    block.prepend(bar);
+  }
+  return btn;
+}
+
+/**
+ * Bind the tiles' add toggles to the media cart (loaded here, only where a tile has one) and
+ * wire the Media Box group toggle.
+ * @param {Element} block
+ * @param {HTMLButtonElement|null} addAll
+ * @param {function(): Promise<object>} [load] the cart + its UI (injectable for tests)
+ */
+export async function bindCart(block, addAll, load = () => Promise.all([
+  import('../../scripts/media-cart.js'),
+  import('../../scripts/media-cart-ui.js'),
+  import('../../scripts/placeholders.js'),
+])) {
+  const tiles = [...block.querySelectorAll('.downloads-add:not(.downloads-add-all)')];
+  if (!tiles.length) return;
+  const [cart, ui, { fetchPlaceholders }] = await load();
+  tiles.forEach((btn) => cart.bindCartControl(btn));
+  if (!addAll) return;
+  // the notice's styles before a partial add can show it (no unstyled flash)
+  const [ph] = await Promise.all([fetchPlaceholders(), ui.loadCartStyles()]);
+  const labels = ui.cartLabels(ph);
+  const live = () => tiles.filter((t) => t.getAttribute('aria-disabled') !== 'true' && t.dataset.href);
+  const sync = () => {
+    const open = live();
+    const full = open.length > 0 && open.every((t) => cart.has(t.dataset.href));
+    addAll.toggleAttribute('data-in-cart', full);
+    // a toggle keeps its name; pressed says everything is in (a click then removes it all)
+    addAll.setAttribute('aria-pressed', String(full));
+    addAll.setAttribute('aria-label', labels.addAll);
+    if (open.length) addAll.removeAttribute('aria-disabled');
+    else addAll.setAttribute('aria-disabled', 'true');
+  };
+  addAll.addEventListener('click', async () => {
+    if (addAll.getAttribute('aria-disabled') === 'true' || addAll.getAttribute('aria-busy') === 'true') return;
+    const open = live();
+    if (addAll.hasAttribute('data-in-cart')) {
+      open.forEach((t) => cart.remove(t.dataset.href));
+      return;
+    }
+    const entries = open.filter((t) => !cart.has(t.dataset.href)).map((t) => ({
+      href: t.dataset.href, title: t.dataset.title, thumb: t.dataset.thumb,
+    }));
+    addAll.setAttribute('aria-busy', 'true');
+    try {
+      const { added, skipped } = await cart.addMany(entries);
+      const refused = skipped.filter((s) => s.reason !== 'duplicate');
+      if (!refused.length) return;
+      // name the first reason that matters most: a full package beats a network hiccup
+      const order = ['limit-items', 'limit-bytes', 'storage', 'network', 'unresolved'];
+      const reason = order.find((r) => refused.some((s) => s.reason === r));
+      const count = refused.filter((s) => s.reason === reason).length;
+      const text = [
+        ui.format(labels.addedSome, { added: added.length, total: entries.length }),
+        ui.refusalMessage(reason, labels, undefined, count),
+      ].filter(Boolean).join(' ');
+      ui.showNotice(text, labels);
+    } finally {
+      addAll.removeAttribute('aria-busy');
+      sync();
+    }
+  });
+  cart.onChange(sync);
+  addAll.dataset.wired = '';
+  sync();
+}
+
 /**
  * Build one download tile (<li>) from a normalized asset descriptor. Shared by
  * both the authored and mediabox-API paths.
@@ -323,7 +472,13 @@ function buildTile(asset) {
   }
 
   const action = buildDownload(asset);
-  if (action) figure.append(action);
+  if (action) {
+    // add to cart, then download (source order); the size menu stays anchored to its toggle
+    const actions = document.createElement('div');
+    actions.className = 'downloads-actions';
+    actions.append(buildAdd(asset), action);
+    figure.append(actions);
+  }
 
   li.append(figure);
   return li;
@@ -367,6 +522,11 @@ export default async function decorate(block) {
   });
 
   block.replaceChildren(list);
+  const addAll = mediaBox && list.querySelector('.downloads-add') ? buildAddAll(block) : null;
+  bindCart(block, addAll).catch((e) => {
+    // eslint-disable-next-line no-console
+    console.error('downloads: media cart unavailable', e);
+  });
   if ((cfg.collapse === 'auto' || (cfg.collapse === null && mediaBox)) && list.children.length > 8) {
     disclosureSeq += 1;
     list.id = `downloads-items-${disclosureSeq}`;

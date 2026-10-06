@@ -41,6 +41,12 @@
   --skoda-grey-350: #c4c6c7;
   --skoda-grey-750: #464748;
 
+  /* media-cart count bubble (SKODA-505b; the source badge's #f66) */
+  --skoda-coral: #f66;
+
+  /* the source's page-header title band (#ccc; media cart page, SKODA-505b) */
+  --skoda-grey-250: #ccc;
+
   /* social network brand colors (footer icon hover tints — raw brand hex) */
   --social-hover: #419468;
   --social-facebook: #3b5998;
@@ -139,6 +145,14 @@
   --slider-dot: rgb(51 51 51 / 25%);
   --slider-arrow-disc: rgb(255 255 255 / 90%);
   --slider-focus-ring: #19f; /* Flickity's focus ring, shown on arrows + dots */
+
+  /* in-column highlight panel (SKODA-824; measured on the live stories + the Zellmer
+     release, docs/ui-specs/highlight.md): the grey callout fill and its black text. The
+     dark panel is --skoda-green. Its links are the source accent green lightened in hue
+     (#419468 is 3.4:1 on the panel green; #55ad80 is 4.6:1, WCAG AA). */
+  --skoda-grey-75: #f3f3f3;
+  --highlight-grey-color: var(--skoda-black);
+  --highlight-dark-link-color: #55ad80;
 
   /* press release (SKODA-607; measured on the 5 M1 releases, template-press-release.md) */
   --pr-title-color: #0a0a0a;         /* h1.entry-title */

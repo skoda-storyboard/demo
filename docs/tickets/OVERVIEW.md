@@ -204,8 +204,8 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-504 | Map S3 images → AEM Assets (manifest) | E05 | 3 | 1–2 | 2–3 | 501,601 | 🟠 A/B unconfirmed; M2 scale = rights+dedup |
 | SKODA-505 | Demo media-cart + client-side zip (device-ID, no login) | E05 | 8 | 3–5 | 6–10 | 502,501,504,601 | 🟠 mission-critical demo; CORS/AEM-Assets linchpin |
 | SKODA-506 | Media pre-conditioning: strip/replace oversized masters before publish | E05 | 2 | 0.5–1 | 1–2 | 501 | 🟠 build-confirmed: 25–40 MB masters 409 the content bus; gates publish |
-| SKODA-505a | Media-cart download logic (device-ID + originals + multi-select zip) | E05 | 5 | 2–3 | 4–6 | 501,504,502,601 | 🟠 split from 505 (logic half); agent-fit |
-| SKODA-505b | Media-cart presentation + live AEM DAM delivery wiring | E05 | 3 | 1–2 | 2–3 | 505a,501,504 | 🔴 split from 505 (presentation half); human-gate |
+| SKODA-505a | Media-cart download logic (device-ID + originals + multi-select zip) (#50) | E05 | 5 | 2–3 | 4–6 | 501,504,502,601 | 🟡 M1; ready for QA 2026-09-30 (headless store + resolver index + fflate zip; binds the listing, story-rail and lightbox adds; 505b builds the visuals on its API) |
+| SKODA-505b | Media-cart presentation + live AEM DAM delivery wiring (#51) | E05 | 3 | 1–2 | 2–3 | 505a,501,504 | 🟡 M1; ready for QA 2026-09-30 (badge, added states, limit banner/notice, `/en/media-cart` page block, downloads tile + group adds; live CORS zip verified); human gate: visual sign-off + author the DA cart page |
 | SKODA-507 | Native AEM Assets picker in DA/EW (Media Bus delivery) | E05 | 2 | 0.5–1 | 1–2 | 504,505b | 🔴 BLOCKED (client AEM env + DA site config, creds) |
 | SKODA-601 | Import infra: parsers + transformers | E06 | 5 | 2–3 | 4–6 | 102 | 🟡 content-driven only |
 | [SKODA-602](tickets/SKODA-602.md) | DA source-API push + bulk-op publish | E06 | 3 | 1–2 | 2–3 | 601 | 🟢 **built + piloted 2026-09-25** (`push-to-da.mjs`, branch `skoda-602-da-push`); credential gate resolved |
@@ -264,7 +264,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-829](tickets/SKODA-829.md) | Story intro → body / aside vertical spacing parity | E08 | A | 1 | 0.25 | 0.5 | 801,821,828 | 🟡 #214; PR #207 review follow-up (2026-09-29); body +32 / aside +0 at ≥768, body +0 below; text 10px in |
 | SKODA-822 | Ship SKODA-801 two-column story layout to `main` | E08 | A | 1 | — | — | 801 | ✅ merged as PR #113 (2026-09-24 21:35) |
 | SKODA-823 | Story sidebar newsletter sign-up widget (UI stub) | E08 | A | 2 | 0.5–1 | 1–2 | 904,801 | 🟡 extend footer `newsletter-stub` for the sidebar; no ESP, no false success; side banner → 903; **M1 Could** (review §15) |
-| [SKODA-824](tickets/SKODA-824.md) | In-column highlight panel (story dark box + PR grey callout) | E08 | A | 3 | 1 | 2–3 | 801,814,218,819,225 | 🟡 M1; Demo sweep 2026-09-25; 12 stories + 1 PR; importer done 2026-09-28 (contract shape 2), runtime TODO |
+| [SKODA-824](tickets/SKODA-824.md) | In-column highlight panel (story dark box + PR grey callout) | E08 | A | 3 | 1 | 2–3 | 801,814,218,819,225 | 🟡 M1; Demo sweep 2026-09-25; 12 stories + 1 PR; importer done 2026-09-28 (contract shape 2); runtime in review 2026-10-05 |
 | SKODA-809 | Roles & permissions (7 editorial groups) | E08 | B | 5 | 2–3 | 4–8 | 101,602 | 🟠 gap G2 (§6.4); blocked on D15 RACI |
 | SKODA-811 | Content embargo (staged-publish, group access) | E08 | B | 3 | 1–2 | 2–4 | 602,809 | 🟢 gap G3 (§6.5/D9) approach agreed; M1-Stretch only *ungated* (group-gate needs 809/M2/D15, F4) |
 | SKODA-812 | Auditability (author change-history) | E08 | B | 2 | 0.5–1 | 1–3 | 101,602,809 | 🟡 gap G5 (§6.7); validate DA/EW capability |

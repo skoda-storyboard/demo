@@ -1,6 +1,7 @@
 /*
  * Unit tests for the media card actions (SKODA-406): which controls a feed row gets, their
- * links / cart keys / names, and the size menu's keyboard + one-open-at-a-time behaviour.
+ * links / cart keys / names, the size menu's keyboard + one-open-at-a-time behaviour, and
+ * which add actions the media cart binds (SKODA-505a).
  * Run: node --test scripts/media-card.test.mjs
  */
 /* global globalThis */
@@ -26,6 +27,11 @@ const image = {
 const video = { template: 'video', id: '452721', mp4: 'https://cdn.example.com/v.mp4' };
 
 const mount = (el) => { document.querySelector('main').replaceChildren(el); return el; };
+// the media cart is imported lazily by the add controls; wait for it to bind them
+const bound = async () => {
+  await import('./media-cart.js');
+  await new Promise((r) => { setTimeout(r, 0); });
+};
 const key = (el, k) => el.dispatchEvent(new window.KeyboardEvent('keydown', { key: k, bubbles: true }));
 
 test('image with both sizes: an add menu and a download menu, Original + 1920px', () => {
@@ -128,19 +134,50 @@ test('play badge is decorative', () => {
   assert.equal(badge.getAttribute('aria-hidden'), 'true');
 });
 
-test('the inert cart actions cancel their own click (no jump to the top in any consumer)', () => {
-  // no listing around it: the helper alone must stop the `#` link
+test('the inert cart actions cancel their own click (no jump to the top in any consumer)', async () => {
+  // no listing around it: the helper alone must stop the `#` link. These fixtures link a
+  // foreign host, so the media cart can't take them: they stay disabled.
   const image2 = mount(mediaActions(image, 'a'));
   const click = (el) => el.dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true }));
   const rows = [...image2.querySelectorAll('.media-card-action.add a')];
   assert.ok(rows.length && rows.every((a) => click(a) === false), 'size-menu rows are cancelled');
   const videoAdd = mount(mediaActions(video, 'v')).querySelector('.media-card-button.add');
   assert.equal(click(videoAdd), false, 'the video add button is cancelled');
-  // once the media cart enables it, the click goes through
-  videoAdd.removeAttribute('aria-disabled');
-  assert.equal(click(videoAdd), true);
+  await bound();
+  assert.ok(rows.every((a) => a.getAttribute('aria-disabled') === 'true'), 'still disabled once bound');
+  assert.ok([...rows, videoAdd].every((a) => click(a) === false), 'still cancelled once bound');
   // downloads are never cancelled
   assert.equal(click(mount(mediaActions(video, 'v')).querySelector('.media-card-button.download')), true);
+});
+
+test('media cart (SKODA-505a): the original\'s add is a cart toggle, the 1920px row stays inert', async () => {
+  const original = 'https://cdn.skoda-storyboard.com/2026/08/a.jpg';
+  const actions = mediaActions({
+    ...image,
+    original,
+    'rendition-1920': 'https://cdn.skoda-storyboard.com/2026/08/a-1920x1280.jpg',
+    image: 'https://cdn.skoda-storyboard.com/2026/08/a-768x512.jpg',
+  }, 'Elroq');
+  const [orig, big] = actions.querySelectorAll('.media-card-action.add a');
+  assert.equal(orig.getAttribute('aria-disabled'), 'true', 'disabled until the cart module binds it');
+  const mp4 = 'https://cdn.skoda-storyboard.com/2026/06/v.mp4';
+  const add = mediaActions({ ...video, mp4, poster: '/en/poster.jpg' }, 'Footage').querySelector('.media-card-button.add');
+  await bound();
+  assert.deepEqual(
+    [orig.hasAttribute('aria-disabled'), orig.getAttribute('role'), orig.getAttribute('aria-checked'), orig.dataset.href, orig.dataset.title],
+    [false, 'menuitemcheckbox', 'false', original, 'Elroq'],
+  );
+  assert.ok(orig.hasAttribute('data-cart-control'));
+  assert.deepEqual(
+    [big.getAttribute('aria-disabled'), big.getAttribute('role'), big.dataset.href, big.hasAttribute('data-cart-control')],
+    ['true', 'menuitem', undefined, false],
+  );
+  assert.deepEqual(
+    [add.hasAttribute('aria-disabled'), add.getAttribute('aria-pressed'), add.dataset.href, add.dataset.title],
+    [false, 'false', mp4, 'Footage'],
+  );
+  assert.equal(orig.dataset.thumb, 'https://cdn.skoda-storyboard.com/2026/08/a-768x512.jpg', 'the card image goes with it (505b)');
+  assert.equal(add.dataset.thumb, '/en/poster.jpg', 'a video without an image: its poster');
 });
 
 test('labels: placeholders translate every control, missing keys fall back to English', () => {
