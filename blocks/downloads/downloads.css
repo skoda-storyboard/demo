@@ -100,6 +100,7 @@
 }
 
 .downloads .downloads-file {
+  position: relative; /* holds the media-cart scrim */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -251,6 +252,124 @@
 
 .downloads.downloads-media-box .downloads-action {
   min-height: var(--dl-toolbar-row);
+}
+
+/* --- media cart (SKODA-505b; media-cart.md §3): add toggle before the download, the added
+   tile's scrim + glyph, the Media Box group toggle ------------------------------------ */
+.downloads .downloads-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.downloads .downloads-add,
+.downloads-stats .downloads-add-all {
+  --dl-add-icon: url("../../icons/media-cart-add.svg");
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--skoda-ink);
+  border-radius: var(--pill-radius);
+  padding: 0;
+  background: var(--skoda-white);
+  color: var(--skoda-ink);
+  cursor: pointer;
+}
+
+.downloads .downloads-add::before,
+.downloads-stats .downloads-add-all::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  background-color: currentcolor;
+  mask: var(--dl-add-icon) center / contain no-repeat;
+}
+
+.downloads .downloads-add[data-in-cart],
+.downloads-stats .downloads-add-all[data-in-cart] {
+  --dl-add-icon: url("../../icons/media-remove.svg");
+}
+
+.downloads .downloads-add:hover,
+.downloads .downloads-add:focus-visible,
+.downloads-stats .downloads-add-all:hover,
+.downloads-stats .downloads-add-all:focus-visible {
+  background: var(--dropdown-hover-bg);
+}
+
+.downloads .downloads-add:focus-visible,
+.downloads-stats .downloads-add-all:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+/* on the dark Media Box band the focus ring is white */
+.downloads.downloads-media-box .downloads-add:focus-visible,
+.downloads-stats .downloads-add-all:focus-visible {
+  outline-color: var(--skoda-white);
+}
+
+/* bound but unavailable (no published original) / still binding: shown as unavailable only
+   once the cart has checked it (data-cart-control), so tiles don't flash dimmed on load */
+.downloads [data-cart-control][aria-disabled="true"],
+.downloads .downloads-add-all[data-wired][aria-disabled="true"],
+.downloads-stats .downloads-add-all[data-wired][aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.downloads [aria-busy="true"],
+.downloads-stats [aria-busy="true"] {
+  cursor: progress;
+}
+
+.downloads .downloads-thumb::before,
+.downloads .downloads-file::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: url("../../icons/media-cart-added.svg") center / var(--cart-added-glyph-from) no-repeat var(--cart-added-scrim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--cart-added-motion), background-size var(--cart-added-motion);
+}
+
+.downloads .downloads-figure:has(.downloads-add[data-in-cart]) .downloads-thumb::before,
+.downloads .downloads-figure:has(.downloads-add[data-in-cart]) .downloads-file::before {
+  background-size: var(--cart-added-glyph);
+  opacity: 1;
+}
+
+.downloads .downloads-figure:has(.downloads-add[data-in-cart]) .downloads-play {
+  visibility: hidden;
+}
+
+/* the Media Box stats line (section default content) carries the group toggle at its end,
+   as the source's .search-results-stats row */
+.downloads-stats {
+  display: flex;
+  gap: var(--spacing-m);
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* no stats line: the group toggle sits above the grid, at its end */
+.downloads .downloads-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-block-end: var(--spacing-m);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .downloads .downloads-thumb::before,
+  .downloads .downloads-file::before {
+    transition: none;
+  }
 }
 
 .downloads.downloads-media-box .downloads-file {

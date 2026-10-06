@@ -174,6 +174,7 @@ var CustomImportScript = (() => {
     return !!(p == null ? void 0 : p.matches("p")) && centred(p) && !!p.querySelector("strong, b") && !isQuote(p);
   }
   function markRun(hr) {
+    if (hr.closest("figure blockquote")) return false;
     const quote = hr.previousElementSibling;
     if (!isQuote(quote)) return false;
     quote.setAttribute(QUOTE, "");

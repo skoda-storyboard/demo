@@ -267,6 +267,20 @@ body.gallery-lightbox-open {
   --lightbox-glyph: url('../icons/media-cart-add.svg');
 }
 
+/* in the media cart (SKODA-505b): the add becomes a remove, as on the cards */
+.gallery-lightbox-action.add[data-in-cart] {
+  --lightbox-glyph: url('../icons/media-remove.svg');
+}
+
+.gallery-lightbox-action.add[data-cart-control][aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gallery-lightbox-action.add[aria-busy='true'] {
+  cursor: progress;
+}
+
 .gallery-lightbox-action.download {
   --lightbox-glyph: url('../icons/media-download.svg');
 }

@@ -54,7 +54,7 @@
   display: none;
 }
 
-/* media-cart slot (SKODA-505a/b fills it); takes no space while empty */
+/* media-cart slot (SKODA-505b fills it); takes no space while empty */
 .float-dock .float-dock-slot {
   transition: transform var(--float-dock-reveal);
 }
@@ -110,6 +110,45 @@
   block-size: var(--float-dock-top-icon-size);
 }
 
+/* --- media-cart badge (SKODA-505b; source a.media-cart-icon, measured 2026-09-30): a white
+   button with the cart glyph (28px at 58) and, when not empty, a 24px red count bubble with
+   a 2px white ring in its top end corner --------------------------------------------- */
+.float-dock .float-dock-cart {
+  --float-dock-cart-count-size: 24px;
+  --float-dock-cart-count-ring: 2px;
+
+  position: relative;
+  color: var(--text-color);
+}
+
+.float-dock .float-dock-cart .icon {
+  inline-size: var(--float-dock-trigger-icon-size);
+  block-size: var(--float-dock-trigger-icon-size);
+}
+
+.float-dock .float-dock-cart-count {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-inline-size: var(--float-dock-cart-count-size);
+  block-size: var(--float-dock-cart-count-size);
+  padding-inline: var(--float-dock-cart-count-ring);
+  border: var(--float-dock-cart-count-ring) solid var(--skoda-white);
+  border-radius: var(--pill-radius);
+  background-color: var(--cart-badge-bg);
+  color: var(--skoda-white);
+  font-size: var(--body-font-size-2xs);
+  font-weight: var(--weight-regular);
+  line-height: 1;
+}
+
+.float-dock .float-dock-cart-count[hidden] {
+  display: none;
+}
+
 /* network brand backgrounds, white glyphs (WhatsApp: ink glyph for contrast) */
 .float-dock .float-dock-network-x { background-color: var(--social-x); }
 .float-dock .float-dock-network-pinterest { background-color: var(--social-pinterest); }
@@ -162,7 +201,6 @@
   margin: 0;
 }
 
-
 .float-dock .float-dock-share.expanded .float-dock-share-list {
   --float-dock-list-motion: 0.2s ease-out 0.2s;
 
@@ -186,6 +224,18 @@
 .float-dock:not(.scrolled) .float-dock-share,
 .float-dock:not(.scrolled) .float-dock-slot {
   transform: translateX(calc(var(--float-dock-pitch) * var(--float-dock-dir)));
+}
+
+/* an empty cart shows no badge: on the source its slot collapses and the badge sits under the
+   scroll-top button (measured 2026-10-01: x1062 at the top, x1000 scrolled, as scroll-top),
+   coming out beside it on the first add. The slot leaves the row; its status region stays
+   (absolutely positioned) so the first count change is still announced */
+.float-dock .float-dock-slot:has(> .float-dock-cart[data-empty]) {
+  display: contents;
+}
+
+.float-dock .float-dock-cart[data-empty] {
+  display: none;
 }
 
 /* list runs leftward from the trigger */

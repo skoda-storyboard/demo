@@ -41,6 +41,12 @@
   --skoda-grey-350: #c4c6c7;
   --skoda-grey-750: #464748;
 
+  /* media-cart count bubble (SKODA-505b; the source badge's #f66) */
+  --skoda-coral: #f66;
+
+  /* the source's page-header title band (#ccc; media cart page, SKODA-505b) */
+  --skoda-grey-250: #ccc;
+
   /* social network brand colors (footer icon hover tints — raw brand hex) */
   --social-hover: #419468;
   --social-facebook: #3b5998;
@@ -67,6 +73,11 @@
   --dropdown-shadow: 0 3px 8px rgb(0 0 0 / 15%);
   --dropdown-hover-bg: #f1f1f1;
   --divider-color: #e4e4e4;
+
+  /* mobile nav drawer (SKODA-302; measured on the live header, 2026-09-30): the frosted
+     backdrop the open drawer sits on, and the source hamburger's 68px tap target */
+  --nav-drawer-backdrop: rgb(227 227 227 / 80%);
+  --nav-hamburger-width: 68px;
 
   /* embed consent placeholder (SKODA-204a; live .page-embed_cookie, embeds.md §3) */
   --embed-consent-bg: #c4c6c7;

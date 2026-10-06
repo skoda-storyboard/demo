@@ -79,6 +79,9 @@
         "columns"
       ]
     },
+    "media-cart": {
+      "variants": []
+    },
     "promo-box": {
       "variants": [],
       "config": "or-curated",
@@ -96,7 +99,9 @@
       ]
     },
     "quote": {
-      "variants": []
+      "variants": [
+        "left"
+      ]
     },
     "search": {
       "variants": []
