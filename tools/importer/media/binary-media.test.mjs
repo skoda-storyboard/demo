@@ -112,6 +112,28 @@ test('single-quoted and unquoted binary anchors rewrite without modifying labels
   assert.match(binaryErrors('<source type="video/mp4" src="/videos/download">', manifest).join(' '), /source src points at a PDF\/MP4/);
 });
 
+test('a CDN alias row of an asset the page already links is not reported missing', () => {
+  const cdn = 'https://cdn.skoda-storyboard.com/clip.mp4';
+  const alias = { ...row(cdn, hostedMp4, 'video'), page_refs: ['en/videos/clip', 'en/press-releases/example'] };
+  const aliased = { rows: { ...manifest.rows, [alias.logical_id]: alias } };
+  assert.notEqual(alias.logical_id, manifest.rows[logicalId(mp4)].logical_id);
+  assert.deepEqual(binaryErrors(
+    `<p><a href="${hostedPdf}">PDF</a><a href="${hostedMp4}">MP4</a></p>`,
+    aliased,
+    'en/press-releases/example',
+  ), []);
+  // A different asset referenced by the page but not linked is still caught.
+  const other = {
+    ...row('https://cdn.skoda-storyboard.com/other.mp4', 'https://publish-p123.adobeaemcloud.com/content/dam/other.mp4', 'video'),
+    dam_asset_path: '/content/dam/other.mp4',
+  };
+  assert.match(binaryErrors(
+    `<p><a href="${hostedPdf}">PDF</a><a href="${hostedMp4}">MP4</a></p>`,
+    { rows: { ...aliased.rows, [other.logical_id]: other } },
+    'en/press-releases/example',
+  ).join(' '), new RegExp(`imported binary link missing: ${other.logical_id}`));
+});
+
 test('offline gate fails closed for missing refs, wrong tags and unverified destinations', () => {
   assert.deepEqual(binaryErrors(
     `<p><a href="${hostedPdf}">PDF</a><a href="${hostedMp4}">MP4</a></p>`,
