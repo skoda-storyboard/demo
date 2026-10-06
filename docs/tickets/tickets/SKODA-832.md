@@ -3,6 +3,7 @@
 - **Epic:** E08, Editorial at Scale
 - **Type:** import
 - **Phase:** A · **Milestone:** M1 (link targets of the ★ Octavia model page's Press Kits rail)
+- **GitHub issue:** [#261](https://github.com/skoda-storyboard/demo/issues/261)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §3.1 / §8 F1; follows up the interim noted in [SKODA-208](SKODA-208.md)
 - **Branch:** `skoda-832-octavia-hubs-reimport`
 - **Status (2026-10-06):** 🟡 Developer done (head 3a591aa, pushed). QA (rendered) not yet run. Nothing has been
