@@ -7,9 +7,11 @@
 - **Implements:** [SKODA-801a](SKODA-801a.md) (Media Box → `downloads` on stories), plus the story findings of
   [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §4 / §8 F3–F4
 - **Branch:** `skoda-830-story-import-validity`
-- **Status (2026-10-06):** 🟡 **READY FOR QA RE-CHECK.** QA run 2 passed everything except the D2 peek, the
-  newsletter card button weight and one guardrail §6 rule; all three are fixed (developer result 3 below). Nothing has
-  been pushed to DA, previewed or published.
+- **Status (2026-10-06):** 🟢 **QA PASS (run 3); 57 stories pushed to DA and previewed** from this branch's import
+  (54 updated + 3 overwritten after review of their 28 Sep DA edits; 57/57 preview 200). **Not published.**
+  gaming-consoles stays blocked (unverified MP4 `7_skoda-x-airconsole_hero_16-9_v08_056c7d9e.mp4`, needs DAM
+  ingest); the `innovation-and-technology/…mixed-reality` alias is excluded (301). Until this branch merges,
+  `main--…aem.page` renders the new content with main's old Media Box CSS/JS; the branch preview shows it correctly.
 
 ## Scope (approved 2026-10-05)
 1. Media Box (`.search-results.media-box`) becomes its own `dark, full-width, media-box` section: heading, stats line,
@@ -201,7 +203,7 @@ Evidence: `.migration/qa-830/run2/` (full run at cfa90ef) and `.migration/qa-830
 - [x] D5: WLTP/CO₂ disclaimer text visible under its image (dev; QA re-run pending)
 - [x] SKODA-823 importer slice: `Newsletter Stub (card)` first in every story aside (59/59) (dev; QA re-run pending)
 - [ ] D3 (optional): spec table readable at 375
-- [ ] QA re-run PASS; then `media:build` + `media:apply`, DA dry-run (resolve the 3 story DA conflicts:
+- [x] QA re-run PASS; then `media:build` + `media:apply`, DA dry-run (resolve the 3 story DA conflicts:
       epiq-will-win, elroq-through-designers-eyes, the-versatile-octavia), push + preview. Publishing needs a separate go-ahead.
 
 ## Dependencies / collisions
