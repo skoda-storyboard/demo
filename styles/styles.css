@@ -100,9 +100,10 @@
   --story-body-gap: 0px;
   --story-aside-inset-top: 32px;
 
-  /* hero geometry (hero.md §8; SKODA-202). The archive band is the source's whole term hero,
+  /* hero geometry (hero.md §8; SKODA-202). The archive band is the source's whole-term hero,
      measured on /en/tag/model/peaq at 375/576/768 (SKODA-828): a 160/200px image row plus the
      24px label row below 768 (the image covers both), 240px with the labels overlaid above */
+
   /* in-column highlight panel (SKODA-824, docs/ui-specs/highlight.md). The source panel is
      a SiteOrigin row: 32px top padding (>=768), a 10px cell padding (= --story-inset) and
      the widget's 15px margin, on all sides up to 780px and inline only from 781px. */
