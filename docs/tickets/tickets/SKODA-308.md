@@ -91,7 +91,7 @@ then, from 302 / 303 / 304 / 826:
     - Focus moving to another control or a click elsewhere closes the bar even with a query (kept). A click on the bar's own text doesn't.
     - A mouse close releases focus from any bar control.
     - The authored search link must resolve to http(s) (`isWebUrl`), else the locale's /search.
-  - **Forced colors:** the mask glyphs (search, chevrons, panel ✕) use `canvastext`, so they stay visible in Windows High Contrast.
+  - **Forced colors:** the mask-drawn panel ✕ uses `canvastext`, so it stays visible in Windows High Contrast. The search and caret glyphs are inline SVG in the text colour since the loading round (below), which forced colors repaint on their own.
   - **Newsletter field** text black (source).
   - **Comments:** stale comments corrected.
   - **Tests:** header-chrome 21. Blocks / scripts / templates 523/525; the 2 also fail on `main`.
@@ -101,9 +101,25 @@ then, from 302 / 303 / 304 / 826:
   - In the drawer, one Escape in the search field closes the whole drawer.
   - `icons/search.svg` is no longer used by the header and is kept as the house icon (gallery reference).
 - **Review:** an independent read-only review (one must-fix: the suggestions covered the field; six should-fixes) was addressed in full and re-measured.
-- **Tests:** `header-chrome.test.mjs` (21 after the review rounds: search, URL, dropdown keys, hover / focus dismissal, newsletter panel). `newsletter-stub.test.mjs` +2 (topbar).
+- **Loading / "jerk" round (2026-10-06, QA: the logo jumps for about a second, the Subscribe icon jumps, the search icon size differs, the menu arrows are jerky).** Measured on a cold load at 1440, live vs ours:
+  - **Topbar faces:** the SKODA Next 300 / 700 faces arrived after the header showed, and their swap moved the right-aligned Subscribe + language group about 8px. This also happens on `main`, and live moves 38px.
+    - Now the header waits for those faces and the logo before it shows, for at most 250ms (`preloadHeaderAssets`), so a slow network never holds it back longer.
+    - After that: one paint in the final position, zero header layout shifts. Logo y67.8, Subscribe x998.7.
+  - **Logo:** it now starts at its final place (top padding 15.8px, matching the live ink at y68) and is decoded before the header shows, so it no longer pops in and moves.
+  - **Subscribe icon:** a fixed 20×16 box with a 4px gap. The ink is at x1002.2 y17.3, 13.5×9.5, the same as live.
+  - **Glyphs (search, dropdown caret, scope caret):** they were CSS masks. Chrome snaps a CSS mask or background image to whole pixels:
+    - the 11.2px caret drew 10 × 6 (ink 16.4 vs live 19.6) and could jump a pixel as the row settled;
+    - the magnifier drew 20.0 where live draws 20.3.
+    - They are now inline SVG (`glyph()` in header.js, `aria-hidden`, `fill: currentcolor`) with the exact source outlines (skoda-bnr-icons U+E02D / U+E007).
+    - Ink vs live: caret 11.0 wide, 19.3 / 19.6; scope caret 19.3 / 19.6; magnifier 81.8 / 82.7; pill icon 56.1 / 56.7.
+    - `icons/nav-search.svg` and `icons/nav-chevron.svg` are removed (no longer used).
+  - **Menu underline:** live keeps the line at full label width and grows it from 0 to 2px (`all .2s ease-in`, white → ink), as `header-megamenu.md` says. Ours swept in from the left (width 0 → 52px), which read as a jerk next to the caret. It now matches live.
+  - **Drawer (390):** unchanged. Its rows keep their own accordion caret, and the desktop caret is hidden there.
+- **Tests:** `header-chrome.test.mjs` (22: search, URL, dropdown keys, hover / focus dismissal, newsletter panel, inline glyphs). `newsletter-stub.test.mjs` +2 (topbar).
   - Header, footer and newsletter tests are green.
-  - Blocks / scripts / templates: 512/514. The 2 also fail on `main`: `header-locales` (SKODA-303a) and `media-cart-download` (a missing `fflate` here).
+  - Blocks / scripts / templates: 532/534. The 2 also fail on `main`:
+    - `header-locales` (SKODA-303a): the CZ link resolves to the site root instead of keeping `/cs/emobility/x`;
+    - `media-cart-download`: a missing `fflate` here.
   - `npm run lint` is clean.
 
 **Content (pending approval):** a new DA page `/nav-newsletter` with the `Newsletter Stub (topbar)` block, using the live wording, list 389 and en_GB. Upload + preview now (harmless for `main`), publish after merge.

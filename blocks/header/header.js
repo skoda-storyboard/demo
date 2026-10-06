@@ -245,6 +245,34 @@ export const SEARCH_SCOPES = [
   ['video', 'Videos'],
 ];
 
+// the source icon-font glyphs (skoda-bnr-icons search U+E02D, caret-down U+E007) as inline SVG,
+// [viewBox, path]: a CSS mask or background image snaps to whole pixels (a 11.2px caret drew
+// 10 or 12px, and jumped a pixel as the row settled), an inline SVG draws at the source size
+const GLYPHS = {
+  search: ['0 0 16 16', 'M14.656 16L16 14.656L11.469 10.125Q12.063 9.313 12.391 8.375Q12.719 7.391 12.719 6.359Q12.719 4.625 11.844 3.156Q11 1.719 9.563 0.875Q8.078 0 6.352 0Q4.625 0 3.156 0.875Q1.719 1.719 0.875 3.156Q0 4.625 0 6.352Q0 8.078 0.875 9.563Q1.719 11 3.156 11.844Q4.625 12.719 6.359 12.719Q7.391 12.719 8.375 12.375Q9.313 12.063 10.125 11.469L14.656 16M1.266 6.359Q1.266 4.984 1.969 3.797Q2.641 2.641 3.797 1.969Q4.984 1.266 6.359 1.266Q7.734 1.266 8.922 1.969Q10.078 2.641 10.75 3.797Q11.438 4.984 11.438 6.359Q11.438 7.734 10.75 8.922Q10.078 10.078 8.922 10.75Q7.734 11.438 6.359 11.438Q4.984 11.438 3.797 10.75Q2.641 10.078 1.969 8.922Q1.266 7.734 1.266 6.359Z'],
+  caret: ['0.563 3.531 14.875 8.938', 'M8 12.469L0.563 5.031L2.063 3.531L8 9.469L13.938 3.531L15.438 5.031Z'],
+};
+
+/**
+ * A decorative source glyph, drawn in the text colour (`fill: currentcolor`, see header.css).
+ * @param {'search'|'caret'} name
+ * @param {string} className
+ * @returns {SVGSVGElement}
+ */
+function glyph(name, className) {
+  const ns = 'http://www.w3.org/2000/svg';
+  const [viewBox, d] = GLYPHS[name];
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('class', `nav-glyph ${className}`);
+  svg.setAttribute('viewBox', viewBox);
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('d', d);
+  svg.append(path);
+  return svg;
+}
+
 /**
  * The search scope select (source custom select: All / Stories / News / Press Kits / Images /
  * Videos). A native select, styled as the source's, inside a wrapper that draws its chevron.
@@ -265,7 +293,7 @@ export function buildSearchScope(selected) {
   });
   const wrapper = document.createElement('span');
   wrapper.className = 'nav-search-scope';
-  wrapper.append(select);
+  wrapper.append(select, glyph('caret', 'nav-search-scope-caret'));
   return { wrapper, select };
 }
 
@@ -355,6 +383,30 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
     window.removeEventListener('keydown', closeOnEscape);
     nav.removeEventListener('focusout', closeOnFocusLost);
   }
+}
+
+// faces first used by the topbar (locales 300 / 700): requested only when the header first
+// paints, their swap re-flowed the right-aligned Subscribe + locales group by ~8px (SKODA-308)
+const HEADER_FONTS = ['300 12px "skoda next"', '700 12px "skoda next"'];
+const HEADER_ASSET_WAIT = 250; // ms: the longest the header waits for them
+
+/**
+ * Starts loading what the header shows first (the logo, the topbar faces) while the nav
+ * fragment loads, so the header appears complete instead of the logo popping in and the
+ * topbar text moving a moment later. Resolves when they are ready, at the latest after
+ * HEADER_ASSET_WAIT: the header is never held back for long, and failures don't matter
+ * (the browser shows them when they arrive).
+ * @returns {Promise<void>}
+ */
+function preloadHeaderAssets() {
+  const logo = document.createElement('img');
+  logo.src = `${window.hlx?.codeBasePath || ''}/icons/skoda-storyboard-logo.svg`;
+  const pending = [
+    logo.decode?.().catch(() => {}),
+    ...HEADER_FONTS.map((font) => document.fonts?.load(font).catch(() => {})),
+  ];
+  const timeout = new Promise((resolve) => { setTimeout(resolve, HEADER_ASSET_WAIT); });
+  return Promise.race([Promise.all(pending), timeout]);
 }
 
 /**
@@ -475,6 +527,8 @@ export function linkDropLabel(navSection) {
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
+  // the logo and the topbar faces load while the nav fragment does (see preloadHeaderAssets)
+  const assetsReady = preloadHeaderAssets();
   // load nav as fragment
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
@@ -585,6 +639,8 @@ export default async function decorate(block) {
       if (navSection.querySelector('ul')) {
         navSection.classList.add('nav-drop');
         linkDropLabel(navSection);
+        // the desktop caret (the drawer draws its own, see header.css)
+        dropTrigger(navSection)?.append(glyph('caret', 'nav-drop-caret'));
       }
       // Newsletter is drawer-only on desktop (server strips the authored class; re-tag by href)
       if (navSection.querySelector('a[href*="#newsletter"]')) {
@@ -645,7 +701,7 @@ export default async function decorate(block) {
   // tools row: render the search link as the source's search control (SKODA-308): a search
   // button that opens a bar (scope select + pill field) over the menu and then is the bar's
   // invisible submit (a query searches, none closes). DA strips authored icon tokens, so the
-  // icons are CSS masks.
+  // icons are the source glyphs (inline SVG).
   const navTools = nav.querySelector('.nav-tools');
   if (navTools) {
     const searchLink = navTools.querySelector('a[href*="#search"], a');
@@ -657,6 +713,7 @@ export default async function decorate(block) {
       toggle.setAttribute('aria-label', label);
       toggle.setAttribute('aria-expanded', 'false');
       toggle.setAttribute('aria-controls', 'nav-search-bar');
+      toggle.append(glyph('search', 'nav-search-toggle-glyph'));
       const input = document.createElement('input');
       input.type = 'search';
       input.id = 'nav-search-input';
@@ -671,9 +728,7 @@ export default async function decorate(block) {
       // pill field: decorative leading icon + input
       const field = document.createElement('div');
       field.className = 'nav-search-field';
-      const icon = document.createElement('span');
-      icon.className = 'nav-search-icon';
-      field.append(icon, input);
+      field.append(glyph('search', 'nav-search-icon'), input);
 
       const bar = document.createElement('div');
       bar.id = 'nav-search-bar';
@@ -809,6 +864,8 @@ export default async function decorate(block) {
   if (navTopbar) navWrapper.append(navTopbar);
   navWrapper.append(nav);
 
+  // shown complete: no logo popping in, no topbar text re-flowing as its faces arrive
+  await assetsReady;
   block.append(navWrapper);
 
   // the Subscribe CTA (topbar) and the mail shortcut (phones) open the newsletter panel once

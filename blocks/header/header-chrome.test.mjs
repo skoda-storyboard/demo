@@ -286,6 +286,27 @@ test('desktop dropdown: the panel rule honours the dismissal (CSS guard, jsdom h
   assert.match(css, /@media \(forced-colors: active\)/, 'mask icons stay visible in forced colors');
 });
 
+test('glyphs: the search and caret icons are decorative inline SVG in the text colour', async () => {
+  const glyphs = [...nav.querySelectorAll('svg.nav-glyph')];
+  const where = (sel) => glyphs.filter((g) => g.closest(sel));
+  assert.equal(where('.nav-search-toggle').length, 1, 'the button magnifier');
+  assert.equal(where('.nav-search-field').length, 1, 'the pill magnifier');
+  assert.equal(where('.nav-search-scope').length, 1, 'the scope caret');
+  nav.querySelectorAll('.nav-drop').forEach((li) => {
+    assert.equal(li.querySelector(':scope > p > a, :scope > a').querySelectorAll('.nav-drop-caret').length, 1, 'one caret per dropdown trigger');
+  });
+  glyphs.forEach((g) => {
+    assert.equal(g.getAttribute('aria-hidden'), 'true');
+    assert.equal(g.getAttribute('focusable'), 'false');
+    assert.ok(g.querySelector('path').getAttribute('d').startsWith('M'));
+  });
+  assert.equal(nav.querySelector('.nav-drop .nav-drop-caret').closest('a').textContent, 'Models', 'the label text is unchanged');
+  const { readFile } = await import('node:fs/promises');
+  const css = await readFile(new URL('./header.css', import.meta.url), 'utf8');
+  assert.match(css, /\.nav-glyph \{[^}]*fill: currentcolor;/);
+  assert.doesNotMatch(css, /--nav-glyph-|icons\/nav-(search|chevron)\.svg/, 'no pixel-snapped CSS image glyphs');
+});
+
 // ---- newsletter panel ----------------------------------------------------------------------
 
 test('newsletter: the panel holds the block of the nav companion fragment (/nav-newsletter)', () => {
