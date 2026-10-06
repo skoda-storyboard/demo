@@ -6,9 +6,11 @@
 - **GitHub issue:** [#262](https://github.com/skoda-storyboard/demo/issues/262)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §3.3 / §5 / §8 F5; relates to [SKODA-607](SKODA-607.md), SKODA-502, SKODA-204, SKODA-818
 - **Branch:** `skoda-833-press-release-import-validity`
-- **Status (2026-10-06):** 🟡 Developer done (head b233db9, pushed). QA was started but interrupted; it needs a re-run.
-  19 of 28 releases are **blocked on DAM ingest** of PDF/MP4 binaries. Nothing has been pushed to DA, previewed or
-  published.
+- **Status (2026-10-06):** 🟡 Parser developer work done; **Assets ingest/publication and Assets-only QA complete**.
+  The 28-release batch now has all 258 distinct originals uploaded and publicly verified.
+  This run added 114 originals (77 images, 22 PDFs, 15 videos), including the missing UCI PDF
+  and Laura video. DA content has not been changed, previewed or published by this run.
+  `media:apply`, DA dry-run/push/preview and rendered QA remain separate pending work.
 
 ## Change
 - `parsers/downloads.js` (shared, backwards-compatible): MP4 links are URL-encoded before the table is written.
@@ -39,13 +41,45 @@ exists (containment policy, all 28 releases), and the Elroq premiere PDF title "
 - Regressions vs baseline: none. `validate-blocks` 28 pages, 0 errors, 1 hold (Zellmer, SKODA-824).
 - Tests: lint clean; `npm test` 943 pass, 3 skipped, only the 2 pre-existing failures.
 
-## DAM ingest needed (developer machine; blocks `media:apply` on 19/28 releases)
+## DAM ingest completed (2026-10-06)
+
+The approved scope was both `urls-press-release.txt` and `urls-press-release-octavia.txt`
+(28 releases), not the entire site manifest. All 261 scoped manifest rows now point to
+258 verified published originals; three CDN/direct-download video aliases reuse one
+uploaded asset each instead of creating duplicate originals.
+
+`tools/importer/media/media-manifest.json` records each actual `dam_asset_path`,
+`dam_original_url`, `public_url`, `public_verified` MIME/byte count, and completed
+`steps.dam` / `steps.publish`. `scripts/media-cart-index.json` was regenerated from
+those verified mappings.
+
+Independent Assets QA checked all 258 anonymous public URLs: HTTP 200 with exact
+recorded MIME and original byte counts. After replacing the token, the previously
+blocked authenticated author recheck passed for all 114 newly uploaded originals.
+Fresh anonymous checks of those same 114 originals also passed with exact matching
+MIME and byte counts; the manifest hash was unchanged throughout the read-only QA.
+**Assets-only QA PASS.** No asset upload, activation or author-auth check is pending.
+The media suite passed 105 tests, the changed tooling passed ESLint, and the
+regenerated cart index passed its `--check`.
+
+- Two image masters use real `.JPG.jpg` filenames; their original bytes were uploaded,
+  not their resized derivatives.
+- The Slavia Monte Carlo `.mov_….mp4` source is actually QuickTime; the uploader and
+  binary gate preserve and verify `video/quicktime` through `mime_type`.
+- AEM escaped the percent-encoded 4×4 PDF/video filenames. The actual stored paths were
+  verified on author, recorded, and activated without re-uploading those originals.
+- Two existing image rows remain `partial` solely for their separate unsafe inline
+  delivery renditions (SKODA-506). Their DAM originals and public proofs are complete:
+  `4397252d__skoda_4X4_6_dda8c372.jpg` and
+  `cbfef660__251118-Skoda-Auto-enters-Saudi-Arabian-market_908e1587.jpg`.
+
+Previously blocking originals, now ingested and published:
 All under `www.skoda-storyboard.com/direct-download/`:
 - **Slavia:** `2026/08/Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4`, `Skoda_Slavia_Prestige_69ae887f.mp4`, PDF `260818_…_fd432da8.pdf`
 - **Red Dot:** `2026/08/Skoda_receives_red_dot_award_for_its_vision_app_concept-720p_cd084254.mp4`, PDF `260820_…_094b7c12.pdf`
 - **4x4 (`2026/02/`):** the 9 `-1080p` videos (Elroq, Enyaq, Enyaq RS, Kodiaq, Kodiaq RS, Superb, Superb Combi,
   Octavia Combi, "the Škoda 4×4 range") + 3 PDFs (markets / models infographics, release PDF)
-- **UCI MTB:** PDF `2026/08/260825_…_54e4195a.pdf` (no manifest row yet)
+- **UCI MTB:** PDF `2026/08/260825_…_54e4195a.pdf` (manifest row added and verified)
 
 The full list of the 37 blocked links per page is in the scratch `media/unverified.txt` (not in git).
 
@@ -53,7 +87,9 @@ The full list of the 37 blocked links per page is in the scratch `media/unverifi
 - [x] 4x4 Media Box parses into one Downloads block with all 15 items
 - [x] YouTube / Buzzsprout embeds, tags, bullets, quotes as above; no regressions
 - [ ] QA PASS (code + content; rendered check of the 4x4 Media Box and a Buzzsprout embed)
-- [ ] DAM ingest of the binaries above, then `media:apply`, DA dry-run, push + preview. Publishing needs a separate go-ahead.
+- [x] Scoped image/PDF/video originals uploaded and published on AEM Assets; actual paths and public MIME/byte proofs recorded in the manifest
+- [x] Independent Assets-only QA: all 114 new author originals match their anonymous published copies; authentication blocker resolved
+- [ ] `media:apply`, DA dry-run, push + preview. DA page publishing needs a separate go-ahead.
 
 ## Collisions
 - `parsers/downloads.js` is also edited on `skoda-830-story-import-validity` (D4 title recovery); merge carefully.

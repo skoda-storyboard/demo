@@ -60,6 +60,34 @@ test('PDF/MP4 links rewrite without touching text, embeds or image references', 
   assert.equal(rewriteBinaryLinks(result.html, manifest).rewrites, 0);
 });
 
+test('a proven QuickTime original keeps its actual MIME behind a source .mp4 link', async () => {
+  const mapping = structuredClone(manifest);
+  const video = mapping.rows[logicalId(mp4)];
+  video.mime_type = 'video/quicktime';
+  video.public_verified.mime = 'video/quicktime';
+  assert.deepEqual(rewriteBinaryLinks(`<a href="${mp4}">Video</a>`, mapping).errors, []);
+  assert.deepEqual(binaryErrors(`<a href="${hostedMp4}">Video</a>`, mapping), []);
+  video.public_verified.mime = 'video/mp4';
+  assert.match(binaryErrors(`<a href="${hostedMp4}">Video</a>`, mapping).join(' '), /unverified video/);
+
+  const previousFetch = global.fetch;
+  try {
+    global.fetch = async () => new Response(null, {
+      status: 200,
+      headers: { 'content-type': 'video/quicktime', 'content-length': '42' },
+    });
+    assert.deepEqual(await verifyPublicBinary(hostedMp4, 'video', 42, {
+      mime: 'video/quicktime',
+    }), { url: hostedMp4, mime: 'video/quicktime', bytes: 42 });
+    await assert.rejects(verifyPublicBinary(hostedMp4, 'video', 42), /type\/size mismatch/);
+    await assert.rejects(verifyPublicBinary(hostedMp4, 'video', 42, {
+      mime: 'text/html',
+    }), /Unsupported original binary MIME/);
+  } finally {
+    global.fetch = previousFetch;
+  }
+});
+
 test('a declared MIME identifies a binary when the source URL has no extension', () => {
   const source = 'https://www.skoda-storyboard.com/reports/annual';
   const rows = structuredClone(manifest);

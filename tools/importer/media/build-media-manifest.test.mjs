@@ -54,6 +54,9 @@ async function mockDam() {
       } else if (req.url === '/invalid.mp4') {
         res.writeHead(200, { 'content-type': 'video/mp4', 'content-length': '11' });
         res.end(req.method === 'HEAD' ? undefined : 'not-a-video');
+      } else if (req.url === '/clip-quicktime.mp4') {
+        res.writeHead(200, { 'content-type': 'video/quicktime', 'content-length': '20' });
+        res.end(req.method === 'HEAD' ? undefined : '\0\0\0\x14ftypqt  \0\0\x02\0qt  ');
       } else if (req.method === 'HEAD' && req.url.startsWith('/content/dam/')
         && req.url.endsWith('.mp4')) {
         res.writeHead(originalHeadStatus, originalHeadStatus === 200
@@ -422,6 +425,70 @@ test('approved PDF and redirecting MP4 originals upload once and verify public d
     await build(args);
     assert.equal(JSON.parse(readFileSync(manifest, 'utf8')).rows[id].status, 'done');
     assert.equal(dam.uploads.length, 3, 'public retry only verifies delivery');
+  } finally {
+    global.fetch = previousFetch;
+    process.exitCode = previousExitCode;
+    if (previousToken === undefined) delete process.env.AEM_DAM_TOKEN;
+    else process.env.AEM_DAM_TOKEN = previousToken;
+    await dam.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('QuickTime originals preserve MIME and resume at the actual stored DAM path', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-binary-quicktime-'));
+  const dam = await mockDam();
+  const previousFetch = global.fetch;
+  const previousToken = process.env.AEM_DAM_TOKEN;
+  const previousExitCode = process.exitCode;
+  try {
+    const source = `${dam.base}/clip-quicktime.mp4`;
+    const id = logicalId(source);
+    const manifest = path.join(dir, 'manifest.json');
+    const urls = path.join(dir, 'public-urls.json');
+    const page = path.join(dir, 'content', 'en', 'story.plain.html');
+    const damPath = '/content/dam/storyboard/en/story/clip-quicktime.mp4';
+    const publicUrl = `https://assets.example.test${damPath}`;
+    mkdirSync(path.dirname(page), { recursive: true });
+    writeFileSync(page, `<a href="${source}">Original video</a>`);
+    writeFileSync(urls, JSON.stringify({ [damPath]: publicUrl }));
+    process.env.AEM_DAM_TOKEN = 'mock';
+    global.fetch = (url, options) => {
+      if (String(url).startsWith('https://assets.example.test/')) {
+        return Promise.resolve(new Response(null, {
+          status: 200,
+          headers: { 'content-type': 'video/quicktime', 'content-length': '20' },
+        }));
+      }
+      return previousFetch(url, options);
+    };
+    const args = ['--pages', page, '--manifest', manifest, '--dam-base', dam.base, '--public-urls', urls];
+    await build(args);
+    const mapping = JSON.parse(readFileSync(manifest, 'utf8'));
+    const video = mapping.rows[id];
+    assert.equal(video.status, 'done');
+    assert.equal(video.mime_type, 'video/quicktime');
+    assert.equal(video.public_verified.mime, 'video/quicktime');
+    assert.equal(video.bytes, 20);
+    assert.deepEqual(dam.uploads, ['\0\0\0\x14ftypqt  \0\0\x02\0qt  ']);
+
+    const actualPath = '/content/dam/storyboard/en/story/clip%25-quicktime.mp4';
+    video.dam_asset_path = actualPath;
+    video.steps.publish = 'pending';
+    video.status = 'partial';
+    video.public_url = '';
+    video.public_verified = null;
+    writeFileSync(manifest, JSON.stringify(mapping));
+    writeFileSync(urls, JSON.stringify({
+      [actualPath]: 'https://assets.example.test/content/dam/storyboard/en/story/clip%2525-quicktime.mp4',
+    }));
+    await build(args);
+    const resumed = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(resumed.status, 'done');
+    assert.equal(resumed.dam_asset_path, actualPath);
+    assert.equal(resumed.public_verified.mime, 'video/quicktime');
+    assert.deepEqual(dam.activations, [damPath, actualPath]);
+    assert.equal(dam.uploads.length, 1, 'stored original is not uploaded again');
   } finally {
     global.fetch = previousFetch;
     process.exitCode = previousExitCode;
