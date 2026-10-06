@@ -78,6 +78,11 @@ body.skoda-model .hero-image.overlay .hero-image-media img {
   aspect-ratio: 9 / 5;
 }
 
+/* the model carousel draws its image at 1, unlike the other hero types (hero-image.css) */
+body.skoda-model .hero-image.overlay .hero-image-media img {
+  scale: none;
+}
+
 body.skoda-model .hero-image.overlay .hero-image-media::after {
   background-image: var(--scrim-h);
 }

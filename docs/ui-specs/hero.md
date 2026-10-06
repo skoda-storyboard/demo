@@ -48,6 +48,15 @@ The source hero is a **real `<img>`**, never a CSS background. Container height 
 (`body.archive`). The image is `object-fit: fill` (distorts) and, on the ratio variants, is wider than
 its container (`cover-width`, clipped by `overflow:hidden`).
 
+**2% zoom (measured 2026-10-06, PR #253 review):** a `snap-center` hero draws its image at a constant
+`translate(-50%, -50%) scale(1.02)` (at every width and scroll position, not a hover state), so the painted `<img>`
+reaches 1% past each edge of the box and is clipped. That covers story, press-kit, press-kit hub and series-directory
+heroes (17 of 17 sampled in the M1 URL set). The 15 series hubs (no `snap-center`), the model hero and the archive
+band are drawn at 1. The box doesn't change: the "image ends at y669 vs y664" reading at 1280×900 on the Octavia kit
+is the clipped painted box (live 1418×567 painted in a 1280×556 box), not a layout difference. EDS:
+`.hero-image:not(.archive) .hero-image-media img { scale: 1.02 }`, reset on `body.skoda-model` and on the series hubs
+(`body.skoda-series:not(.page)`). The visible crop then equals the source within 0.2 percentage points per edge.
+
 ```
 .hero  (flex column; position relative)
 ├── .hero-heading                order:2 on <=1079, default(1st) on desktop

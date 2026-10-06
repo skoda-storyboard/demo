@@ -234,6 +234,18 @@ image 32.5px lower (y248 vs 215.5); at 1080 it was 700×65 vs 1060×32.5. Now on
 title 972×32.5 at y167, lead 641.33×360.73 at y215.5). Octavia overlay kit and Epiq kit: every `main` box identical
 to the previous CSS at 375 / 768 / 992 / 1440.
 
+**Review fix (2026-10-06, PR #253, hero image zoom).** The review's open measurement, the Octavia kit's hero image
+ending at y664 (branch) vs y669 (live) at 1280×900: at identical viewports the header (108) and the hero box
+(1280×556.19 at y108) are equal. The source draws `snap-center` hero images at a constant `scale(1.02)`, clipped by
+the box; y669 is that painted box (1418.28×567.31). The visible difference was the crop, about 1% wider per edge on
+EDS. Now `hero-image.css` draws the image at 1.02 for every variant except the archive band, and the model template and
+the series hubs (no `snap-center` on the source) reset it to 1. Visible crop vs the source (% of the image per edge):
+- Octavia kit, Epiq hub, `series-2`, the Epiq story, Octavia model and `category/emobility` at 375 / 768 / 1280 / 1440 /
+  3440×1440: within 0.2 points (30/30). Before the fix the overlay heroes were 1 point off per edge (e.g. Octavia kit at
+  1280: L4.0 R96.0 T0 B100 vs live L4.9 R95.1 T1 B99).
+- The 15 series hubs at 375 / 1440 / 3440×1440: within 0.1 points (45/45), still unzoomed as on the source.
+- Hero boxes unchanged everywhere: `scale` doesn't affect layout.
+
 **Review fix (2026-10-05, archive variants).** All 41 live term heroes surveyed: top-level category (1 link chip to
 itself), sub-category (2 link chips: parent, then itself), tag with and without a banner (2 text chips), and a category
 without a banner (`design-eng`). The parser had flattened category chips to text and dropped equal labels

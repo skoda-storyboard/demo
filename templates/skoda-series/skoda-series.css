@@ -41,6 +41,12 @@ body.page.skoda-series .hero-image.overlay .hero-image-content {
   margin-top: 0;
 }
 
+/* The hubs draw the hero image at 1 (their source hero has no `snap-center`); the directory
+   keeps the block's 2% zoom (hero-image.css). */
+body.skoda-series:not(.page) .hero-image .hero-image-media img {
+  scale: none;
+}
+
 /* The series title keeps 48/300 at every width (the source never shrinks it). */
 body.skoda-series .hero-image.overlay .hero-image-content h1 {
   font-size: var(--heading-font-size-hero);

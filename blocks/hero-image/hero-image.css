@@ -55,6 +55,14 @@
   object-fit: cover;
 }
 
+/* The source draws its story / press-kit / series-directory hero image 2% larger than the box,
+   centred and clipped by it (a constant `scale(1.02)` on its `snap-center` heroes, not a hover
+   state; PR #253 review). The box doesn't change. The archive band, the model hero
+   (skoda-model.css) and the series hubs (skoda-series.css) are drawn at 1. */
+.hero-image:not(.archive) .hero-image-media img {
+  scale: 1.02;
+}
+
 /* dual-gradient scrim over the image (story + overlay; dropped on archive) */
 .hero-image .hero-image-media::after {
   content: '';
