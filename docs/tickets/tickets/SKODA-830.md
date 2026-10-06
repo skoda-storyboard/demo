@@ -3,6 +3,7 @@
 - **Epic:** E08, Editorial at Scale
 - **Type:** import / transformer (+ downloads block CSS/JS for the QA defects)
 - **Phase:** A · **Milestone:** M1 (build freeze Thu 8 Oct 2026, demo 15 Oct)
+- **GitHub issue:** [#259](https://github.com/skoda-storyboard/demo/issues/259)
 - **Implements:** [SKODA-801a](SKODA-801a.md) (Media Box → `downloads` on stories), plus the story findings of
   [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §4 / §8 F3–F4
 - **Branch:** `skoda-830-story-import-validity`
