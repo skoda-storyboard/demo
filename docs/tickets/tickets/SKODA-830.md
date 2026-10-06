@@ -162,6 +162,35 @@ QA run 2 evidence: `.migration/qa-830/run2/`. Measured with Chrome DevTools (iso
 - Open (not measured): a row-2 tile's size menu opens downward inside the clipped list, so a long menu can be cut
   off while collapsed (the source's wrap clips with `overflow: hidden` too).
 
+## QA result 3 (2026-10-06, head fec4c0a): PASS
+Evidence: `.migration/qa-830/run2/` (full run at cfa90ef) and `.migration/qa-830/run3/` (D2 re-check), both outside git.
+- **D1:** pass. On stories, releases and kits: band top→title 64, title 26/32.5 (20/25 ≤768), stats 16/32/600
+  `#c4c6c7`, title→grid 96.5/89, all equal to origin. Main was 112.5 on releases.
+- **D2:** pass.
+  - Collapsed box: Lake Como 708.25 / 636.25 / 669.25 / 803.13; 4x4 release 708.25 / 636.25 / 645.25 / 779.13.
+  - Row 3 peeks by 58px at all 4 widths, equal to origin.
+  - Pill 137.58×44 `#78faae` w500; Show less 127.42×44.
+  - Clipped tiles are `inert` (Tab skips them, unlike origin). Re-measures on resize.
+- **Newsletter card (SKODA-823 importer slice):** pass. 59/59 cards first in the sidebar.
+  345.33×354.83 / 260×307.89 / 185.33×266.83 / 355×368.14 at 1440/992/768/375; button w500.
+- **D5:** pass. 7/7 regulatory lightbox captions kept visible; 6/6 non-regulatory ones dropped (scan of all 59 origins).
+- **Regression:** press releases and kits equal origin and are closer to it than main; nothing is worse than main.
+- **Push readiness (predicted):** 54 update, 3 conflicts, 1 blocked-binary (gaming-consoles: unverified MP4); the
+  `innovation-and-technology/…mixed-reality` alias is excluded (301).
+  - epiq-will-win and the-versatile-octavia: DA edits at 28 Sep 05:45 look like a scripted SKODA-819/801 re-push
+    (Gallery → slider, page-title captions removed), and the new import contains them.
+  - elroq-through-designers-eyes: DA edit at 09:22 with no rendered difference.
+
+### Follow-ups (non-blocking)
+- D2-F1: without a ResizeObserver measurement, the tiles stay `inert` and the pill overlaps (outside the supported
+  browsers). Apply collapsed + inert only once measured.
+- Guardrail §7: D2 measures layout in JS and uses a -44px overlap. A CSS-only alternative (JS marks row-3 tiles, CSS
+  caps them at 58px) is possible; accepted for M1.
+- Minor, not part of this ticket:
+  - The caption-less slider bottom gap is 40px vs 16px (SKODA-819).
+  - The "Five questions" Columns box inset, h2 and image size are already listed in SKODA-824 / `columns-split.md` §5.
+  - The open "Show less" sits 34px under the grid vs 36px on origin.
+
 ## Acceptance Criteria
 - [x] All 57 stories with an origin Media Box get a Downloads section whose rows, order and hrefs match the origin
 - [x] Lightbox chrome, quiz JSON/UI, `+N` pill and "Show more Show less" text gone; captions = visible origin captions
