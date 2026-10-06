@@ -294,18 +294,33 @@ test('sectionStyles reads each Section Metadata style row as normalised tokens',
   assert.deepEqual(sectionStyles(html), [['body-column'], ['body-column', 'highlight-dark']]);
 });
 
-test('checkPage: a highlight section style holds publish until the SKODA-824 runtime', () => {
+test('checkPage: a highlight section style is the SKODA-824 contract and publishes (runtime landed)', () => {
   const body = `<p>Intro</p>${block('section-metadata', row('style', 'body-column'))}`;
   const panel = (variant) => `<h3>Panel</h3>${block('section-metadata', row('style', `body-column, highlight-${variant}`))}`;
   const r = checkPage(page(body, panel('dark'), panel('grey')), CONTRACTS, CODE);
+  assert.deepEqual(r.pending, [{
+    id: 'highlight', ticket: 'SKODA-824', fallback: 'readable', missingCode: false,
+  }]);
+  assert.equal(r.errors.length, 0);
+  assert.equal(r.publishable, true);
+  const plain = checkPage(page(body, block('section-metadata', row('style', 'dark, full-width'))), CONTRACTS, CODE);
+  assert.deepEqual(plain.pending, [], 'unrelated section styles are not the highlight contract');
+  assert.equal(plain.publishable, true);
+});
+
+test('checkPage: a section-style contract with a broken fallback holds publish', () => {
+  // the hold mechanism the highlight contract used until its runtime landed (SKODA-824)
+  const held = {
+    ...CONTRACTS,
+    pending: CONTRACTS.pending.map((c) => (c.id === 'highlight' ? { ...c, fallback: 'broken' } : c)),
+  };
+  const panel = `<h3>Panel</h3>${block('section-metadata', row('style', 'body-column, highlight-dark'))}`;
+  const r = checkPage(page(panel), held, CODE);
   assert.deepEqual(r.pending, [{
     id: 'highlight', ticket: 'SKODA-824', fallback: 'broken', missingCode: false,
   }]);
   assert.equal(r.errors.length, 0);
   assert.equal(r.publishable, false);
-  const plain = checkPage(page(body, block('section-metadata', row('style', 'dark, full-width'))), CONTRACTS, CODE);
-  assert.deepEqual(plain.pending, [], 'unrelated section styles are not the highlight contract');
-  assert.equal(plain.publishable, true);
 });
 
 test('committed registry is self-consistent and fully documented', () => {

@@ -294,7 +294,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Example** (`/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/`): 8 rows.
 
 ### `highlight`
-- **Status:** `pinned` (decided 2026-09-25: section style; **shape 2** 2026-09-28) · **Ticket:** SKODA-824 · **Fallback:** **broken** until the runtime lands (the panel has no box or text treatment, and each extra `body-column` section moves the sidebar; see Runtime) · **Styles:** `highlight-dark`, `highlight-grey`
+- **Status:** `pinned` (decided 2026-09-25: section style; **shape 2** 2026-09-28; runtime landed 2026-10-05) · **Ticket:** SKODA-824 · **Fallback:** `readable` (it was `broken` until the runtime landed: the panel had no box or text treatment, and each extra `body-column` section moved the sidebar) · **Styles:** `highlight-dark`, `highlight-grey`
 - **Form: section style, not a block.** The dark box can contain a `Gallery (slider)` or a `Columns` row, and DA blocks can't nest (rule 5).
 - **Shape (v2):** a section holding the panel's content (h3, text, images, and any nested blocks), closed by `Section Metadata` with `Style` = `body-column, highlight-dark` (story panel) or `body-column, highlight-grey` (PR FAQ/info callout). The body resumes after it in a new `body-column` section; no resumed section is emitted when nothing follows, and none is left before a panel that opens the body (story: `dropEmptySections()` after `afterTransform`; press release: the leading body marker is dropped). Consecutive highlighted rows each become their own section with the same style; the runtime joins them.
 - **Why v2 (was `highlight, dark` / `highlight, grey`):** v1 collided with existing CSS, so its "readable" fallback wasn't true:
@@ -307,11 +307,11 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Importers:**
   - `parsers/story-flatten.js`: `import-story-detail.js`'s `preprocess` calls `markHighlights()`, because the row colour is only in the SiteOrigin head CSS (`#pg-<id>> .panel-row-style`). This gives 16 rows on 11 of the 19 M1 stories: Epiq, Octavia, Slavia, plates, graffiti, Froome, Peaq production, Peaq Tour de France, Kylaq ×3, paper Kodiaq ×3, and charging ×2 (consecutive; one is a 2-cell Columns row).
   - `transformers/skoda-press-release-layout.js`: a `div[style*=background]` direct child of `.entry-content` (the Zellmer FAQ, the last body content).
-- **Runtime (824 runtime half, still TODO):**
-  - style `.section.body-column.highlight-dark` / `.highlight-grey` (the ticket ACs);
-  - join consecutive panels;
-  - **span the sidebar across the split body.** Grid auto-placement puts `.section.sidebar` beside the *last* `body-column` section, so pages carrying a highlight section hold publish until this lands.
-- **Publish gate (enforced):** the entry lists its `styles`, so `checkPage` reports `highlight` as pending on any page whose Section Metadata carries one; with `fallback: broken` the page is `[hold publish]` in `import:validate-blocks` / `import:status`, and `import:push --stage publish` previews it but refuses to publish (`--approve-hold highlight` overrides, rule 8). When the runtime lands, set `fallback` to `readable`.
+- **Runtime (SKODA-824 runtime half, landed 2026-10-05; measured spec: [`highlight.md`](../ui-specs/highlight.md)):**
+  - **Panel styling.** The colours are global in `styles/styles.css`. The story geometry is also in `styles.css`: the panel spans the body track plus 10px, bleeds full width below 768, and keeps the source's 25px content inset. The press-release callout geometry is in `templates/press-release/press-release.css`: the text column, padded 25px.
+  - **Join.** Consecutive same-variant panels read as one band. The first drops its bottom inset, and the second keeps the 10px cell padding.
+  - **Sidebar span.** `scripts/split-body.js` `spanSidebar()` counts the `body-column` run that the `.section.sidebar` closes. It runs from `decorateStorySections` and `decorateTemplateSections`. Both grids span the sidebar from the first part, and the last part takes the slack (`grid-template-rows: repeat(n, auto) 1fr`). A page with a single body section gets no counts, so its layout is unchanged.
+- **Publish gate:** the entry lists its `styles`, so `checkPage` still reports `highlight` as pending on any page whose Section Metadata carries one. With `fallback: readable` the page publishes. The hold mechanism for a broken section-style fallback stays covered in `block-check.test.mjs`.
 
 ### `cover-box`
 - **Status:** `pinned` (2026-09-28) · **Ticket:** SKODA-218 · **Fallback:** readable (a light rail, as before)
