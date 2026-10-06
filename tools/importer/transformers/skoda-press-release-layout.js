@@ -95,10 +95,15 @@ function leadImage(document, primary) {
 
 const BULLET = /^\s*(?:›|&rsaquo;)/;
 
+/** The line's text starts lower-case (tags, entities and spaces skipped): a sentence continues. */
+const continues = (html) => /^\p{Ll}/u.test(html.replace(/<[^>]*>|&[a-z]+;|&#\d+;/gi, ' ').trim());
+
 /**
  * `.bullet-points`: one or more <p> of "›"-prefixed lines split by <br> (or real <li>).
- * When the lines carry "›" markers, a <br> before an unmarked line is a soft wrap inside
- * one bullet (Karoq: "…and remains <br>a key model…"), so that line joins the previous one.
+ * When the lines carry "›" markers, a <br> before an unmarked line that carries on the
+ * sentence in lower case is a soft wrap inside one bullet (Karoq: "…and remains <br>a key
+ * model…"), so that line joins the previous one. An unmarked line that starts a new sentence
+ * (Solberg: "…in a video<br>The new Škoda Octavia RS…") stays a bullet of its own.
  */
 function bulletList(document, primary) {
   const box = primary.querySelector('.bullet-points');
@@ -112,7 +117,7 @@ function bulletList(document, primary) {
       const parts = p.innerHTML.split(/<br\s*\/?>/i).filter((line) => line.replace(/&nbsp;/g, ' ').trim());
       const marked = parts.some((line) => BULLET.test(line));
       parts.forEach((line, i) => {
-        if (marked && i > 0 && !BULLET.test(line)) lines[lines.length - 1] = `${lines[lines.length - 1].trimEnd()} ${line.trim()}`;
+        if (marked && i > 0 && !BULLET.test(line) && continues(line)) lines[lines.length - 1] = `${lines[lines.length - 1].trimEnd()} ${line.trim()}`;
         else lines.push(line);
       });
     });

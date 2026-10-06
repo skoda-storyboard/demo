@@ -112749,6 +112749,355 @@
       },
       "status": "done",
       "note": ""
+    },
+    "4e5a58fb__2125743409-b6aaaf667b8d15ac971c61794c7a8e3dda15625bf2b0733b510f6cd571cf958a-d_1280x720.jpg": {
+      "logical_id": "4e5a58fb__2125743409-b6aaaf667b8d15ac971c61794c7a8e3dda15625bf2b0733b510f6cd571cf958a-d_1280x720.jpg",
+      "source_url": "https://i.vimeocdn.com/video/2125743409-b6aaaf667b8d15ac971c61794c7a8e3dda15625bf2b0733b510f6cd571cf958a-d_1280x720.jpg",
+      "master_url": "https://i.vimeocdn.com/video/2125743409-b6aaaf667b8d15ac971c61794c7a8e3dda15625bf2b0733b510f6cd571cf958a-d_1280x720.jpg",
+      "dam_page_path": "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+      "page_refs": [
+        "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://i.vimeocdn.com/video/2125743409-b6aaaf667b8d15ac971c61794c7a8e3dda15625bf2b0733b510f6cd571cf958a-d_1280x720.jpg",
+      "da_path": "",
+      "alt": "Škoda Elroq",
+      "caption": "",
+      "seen_urls": [
+        "https://i.vimeocdn.com/video/2125743409-b6aaaf667b8d15ac971c61794c7a8e3dda15625bf2b0733b510f6cd571cf958a-d_1280x720.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 92565,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "9f34d7bf__Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4": {
+      "kind": "video",
+      "logical_id": "9f34d7bf__Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4",
+      "dam_page_path": "en/press-releases/skoda-auto-unveils-updated-slavia-in-india",
+      "page_refs": [
+        "en/press-releases/skoda-auto-unveils-updated-slavia-in-india"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/08/Skoda_Slavia_Monte_Carlo.mov_125225b2.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "36819689__the_Skoda_4%C3%974_range__safe_driving_in_all_weather_and_challenging_terrain-1080p_f38a498f.mp4": {
+      "kind": "video",
+      "logical_id": "36819689__the_Skoda_4%C3%974_range__safe_driving_in_all_weather_and_challenging_terrain-1080p_f38a498f.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/02/the_Skoda_4%C3%974_range__safe_driving_in_all_weather_and_challenging_terrain-1080p_f38a498f.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/02/the_Skoda_4%C3%974_range__safe_driving_in_all_weather_and_challenging_terrain-1080p_f38a498f.mp4",
+      "dam_page_path": "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+      "page_refs": [
+        "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/02/the_Skoda_4%C3%974_range__safe_driving_in_all_weather_and_challenging_terrain-1080p_f38a498f.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "36819689__Skoda_elroq-1080p_5d17e1e7.mp4": {
+      "kind": "video",
+      "logical_id": "36819689__Skoda_elroq-1080p_5d17e1e7.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_elroq-1080p_5d17e1e7.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_elroq-1080p_5d17e1e7.mp4",
+      "dam_page_path": "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+      "page_refs": [
+        "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_elroq-1080p_5d17e1e7.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "36819689__Skoda_enyaq-1080p_c44af10e.mp4": {
+      "kind": "video",
+      "logical_id": "36819689__Skoda_enyaq-1080p_c44af10e.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_enyaq-1080p_c44af10e.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_enyaq-1080p_c44af10e.mp4",
+      "dam_page_path": "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+      "page_refs": [
+        "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_enyaq-1080p_c44af10e.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "36819689__Skoda_enyaq_rs-1080p_73fed786.mp4": {
+      "kind": "video",
+      "logical_id": "36819689__Skoda_enyaq_rs-1080p_73fed786.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_enyaq_rs-1080p_73fed786.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_enyaq_rs-1080p_73fed786.mp4",
+      "dam_page_path": "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+      "page_refs": [
+        "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_enyaq_rs-1080p_73fed786.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "36819689__Skoda_kodiaq-1080p_072b0a7b.mp4": {
+      "kind": "video",
+      "logical_id": "36819689__Skoda_kodiaq-1080p_072b0a7b.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_kodiaq-1080p_072b0a7b.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_kodiaq-1080p_072b0a7b.mp4",
+      "dam_page_path": "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+      "page_refs": [
+        "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_kodiaq-1080p_072b0a7b.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "36819689__Skoda_kodiaq_rs-1080p_02939b2b.mp4": {
+      "kind": "video",
+      "logical_id": "36819689__Skoda_kodiaq_rs-1080p_02939b2b.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_kodiaq_rs-1080p_02939b2b.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_kodiaq_rs-1080p_02939b2b.mp4",
+      "dam_page_path": "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+      "page_refs": [
+        "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_kodiaq_rs-1080p_02939b2b.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "36819689__Skoda_superb-1080p_5750921c.mp4": {
+      "kind": "video",
+      "logical_id": "36819689__Skoda_superb-1080p_5750921c.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_superb-1080p_5750921c.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_superb-1080p_5750921c.mp4",
+      "dam_page_path": "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+      "page_refs": [
+        "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_superb-1080p_5750921c.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "36819689__Skoda_superb_combi-1080p_75215e21.mp4": {
+      "kind": "video",
+      "logical_id": "36819689__Skoda_superb_combi-1080p_75215e21.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_superb_combi-1080p_75215e21.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_superb_combi-1080p_75215e21.mp4",
+      "dam_page_path": "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+      "page_refs": [
+        "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_superb_combi-1080p_75215e21.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "36819689__Skoda_octavia_combi-1080p_15b9973e.mp4": {
+      "kind": "video",
+      "logical_id": "36819689__Skoda_octavia_combi-1080p_15b9973e.mp4",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_octavia_combi-1080p_15b9973e.mp4",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_octavia_combi-1080p_15b9973e.mp4",
+      "dam_page_path": "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
+      "page_refs": [
+        "en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "MP4",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/02/Skoda_octavia_combi-1080p_15b9973e.mp4"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
     }
   }
 }

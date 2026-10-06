@@ -429,6 +429,17 @@ a&nbsp;key model in Škoda’s SUV line-up<br />
     'Launched in 2017, the compact SUV is now sold in around 60 markets and remains a key model in Škoda’s SUV line-up',
     'Today, Hall M13 is a prime example, producing both ICE and all-electric vehicles',
   ]);
+  // an unmarked line that starts a new sentence stays its own bullet (Solberg Octavia RS)
+  const solberg = importPage('superb', (doc) => {
+    doc.querySelector('.bullet-points').innerHTML = `<p>› Oliver Solberg recorded his driving impressions in a <a href="https://www.youtube.com/watch?v=d1xYSMyyWWA">video</a><br />
+The new Škoda Octavia RS offers a 195 kW (265 PS) petrol engine<br />
+› New to the latest Škoda Octavia RS, an electronically controlled differential</p>`;
+  }).sections[1].content.find((n) => n.tagName === 'UL');
+  assert.deepEqual([...solberg.children].map((li) => txt(li)), [
+    'Oliver Solberg recorded his driving impressions in a video',
+    'The new Škoda Octavia RS offers a 195 kW (265 PS) petrol engine',
+    'New to the latest Škoda Octavia RS, an electronically controlled differential',
+  ]);
   // without any "›" marker every <br> still starts a new bullet
   const plain = importPage('superb', (doc) => {
     doc.querySelector('.bullet-points').innerHTML = '<p>First line<br>Second line</p>';

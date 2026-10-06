@@ -337,6 +337,7 @@ var CustomImportScript = (() => {
     return make(document, "p", img);
   }
   var BULLET = /^\s*(?:›|&rsaquo;)/;
+  var continues = (html) => new RegExp("^\\p{Ll}", "u").test(html.replace(/<[^>]*>|&[a-z]+;|&#\d+;/gi, " ").trim());
   function bulletList(document, primary) {
     const box = primary.querySelector(".bullet-points");
     if (!box) return null;
@@ -349,7 +350,7 @@ var CustomImportScript = (() => {
         const parts = p.innerHTML.split(/<br\s*\/?>/i).filter((line) => line.replace(/&nbsp;/g, " ").trim());
         const marked = parts.some((line) => BULLET.test(line));
         parts.forEach((line, i) => {
-          if (marked && i > 0 && !BULLET.test(line)) lines[lines.length - 1] = `${lines[lines.length - 1].trimEnd()} ${line.trim()}`;
+          if (marked && i > 0 && !BULLET.test(line) && continues(line)) lines[lines.length - 1] = `${lines[lines.length - 1].trimEnd()} ${line.trim()}`;
           else lines.push(line);
         });
       });
