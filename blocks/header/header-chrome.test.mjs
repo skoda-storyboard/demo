@@ -292,6 +292,11 @@ test('glyphs: the search and caret icons are decorative inline SVG in the text c
   assert.equal(where('.nav-search-toggle').length, 1, 'the button magnifier');
   assert.equal(where('.nav-search-field').length, 1, 'the pill magnifier');
   assert.equal(where('.nav-search-scope').length, 1, 'the scope caret');
+  const burger = nav.querySelector('.nav-hamburger button');
+  assert.deepEqual([...burger.querySelectorAll('svg')].map((g) => g.classList[1]), ['nav-hamburger-menu', 'nav-hamburger-close'], 'the menu / close glyphs');
+  assert.ok(burger.getAttribute('aria-label'), 'the button keeps its name');
+  assert.equal(where('.nav-mail').length, 1, 'the phone mail symbol');
+  assert.equal(nav.querySelector('.nav-mail img'), null, 'no late icon image');
   nav.querySelectorAll('.nav-drop').forEach((li) => {
     assert.equal(li.querySelector(':scope > p > a, :scope > a').querySelectorAll('.nav-drop-caret').length, 1, 'one caret per dropdown trigger');
   });

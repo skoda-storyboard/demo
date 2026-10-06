@@ -1,6 +1,7 @@
 import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 import attachSuggest from '../../scripts/search-suggest.js';
+import iconsReady from '../../scripts/icons-ready.js';
 import { hrefPath, pickActiveTab } from './header-switcher.js';
 import {
   buildLocaleList, currentLocale, isLocaleGroup, localeEntries,
@@ -245,17 +246,22 @@ export const SEARCH_SCOPES = [
   ['video', 'Videos'],
 ];
 
-// the source icon-font glyphs (skoda-bnr-icons search U+E02D, caret-down U+E007) as inline SVG,
-// [viewBox, path]: a CSS mask or background image snaps to whole pixels (a 11.2px caret drew
-// 10 or 12px, and jumped a pixel as the row settled), an inline SVG draws at the source size
+// the source icons as inline SVG, [viewBox, path]: the icon-font glyphs (skoda-bnr-icons search
+// U+E02D, caret-down U+E007, menu U+E01F, close U+E010, in their 16-unit em box) and the
+// phone mail symbol (#mail-thick). A CSS mask or background image snaps to whole pixels (a
+// 11.2px caret drew 10 or 12px, and jumped a pixel as the row settled) and an icon image pops
+// in after the header shows; an inline SVG draws at the source size with the header
 const GLYPHS = {
+  menu: ['0 0 16 16', 'M0 0.969L0 2.938L16 2.938L16 0.969ZM0 7.016L0 8.984L16 8.984L16 7.016ZM0 13.063L0 15.031L16 15.031L16 13.063Z'],
+  close: ['0 0 16 16', 'M13.422 12.594L8.828 8L13.422 3.406Q13.578 3.250 13.422 3.078L12.922 2.578Q12.750 2.422 12.594 2.578L8 7.172L3.406 2.578Q3.250 2.422 3.078 2.578L2.578 3.078Q2.422 3.250 2.578 3.406L7.172 8L2.578 12.594Q2.422 12.750 2.578 12.922L3.078 13.422Q3.250 13.578 3.406 13.422L8 8.828L12.594 13.422Q12.750 13.578 12.922 13.422L13.422 12.922Q13.578 12.750 13.422 12.594Z'],
+  mail: ['0 0 30 24', 'M29.076 23.218V.846H.924v22.372h28.152ZM5.412 3.634h19.176L15 11.556 5.412 3.634ZM26.118 20.09H3.882V5.946L15 15.092l11.118-9.146V20.09Z'],
   search: ['0 0 16 16', 'M14.656 16L16 14.656L11.469 10.125Q12.063 9.313 12.391 8.375Q12.719 7.391 12.719 6.359Q12.719 4.625 11.844 3.156Q11 1.719 9.563 0.875Q8.078 0 6.352 0Q4.625 0 3.156 0.875Q1.719 1.719 0.875 3.156Q0 4.625 0 6.352Q0 8.078 0.875 9.563Q1.719 11 3.156 11.844Q4.625 12.719 6.359 12.719Q7.391 12.719 8.375 12.375Q9.313 12.063 10.125 11.469L14.656 16M1.266 6.359Q1.266 4.984 1.969 3.797Q2.641 2.641 3.797 1.969Q4.984 1.266 6.359 1.266Q7.734 1.266 8.922 1.969Q10.078 2.641 10.75 3.797Q11.438 4.984 11.438 6.359Q11.438 7.734 10.75 8.922Q10.078 10.078 8.922 10.75Q7.734 11.438 6.359 11.438Q4.984 11.438 3.797 10.75Q2.641 10.078 1.969 8.922Q1.266 7.734 1.266 6.359Z'],
   caret: ['0.563 3.531 14.875 8.938', 'M8 12.469L0.563 5.031L2.063 3.531L8 9.469L13.938 3.531L15.438 5.031Z'],
 };
 
 /**
  * A decorative source glyph, drawn in the text colour (`fill: currentcolor`, see header.css).
- * @param {'search'|'caret'} name
+ * @param {'search'|'caret'|'menu'|'close'|'mail'} name
  * @param {string} className
  * @returns {SVGSVGElement}
  */
@@ -830,15 +836,17 @@ export default async function decorate(block) {
     mail.className = 'nav-mail';
     mail.href = '#subscribe';
     mail.setAttribute('aria-label', 'Subscribe to our stories');
-    mail.innerHTML = '<span class="icon icon-mail"></span>';
+    mail.append(glyph('mail', 'nav-mail-glyph'));
   }
 
-  // hamburger for mobile
+  // hamburger for mobile: the source menu / close glyphs, one shown per drawer state
   const hamburger = document.createElement('div');
   hamburger.classList.add('nav-hamburger');
-  hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-expanded="false" aria-label="Open navigation">
-      <span class="nav-hamburger-icon"></span>
-    </button>`;
+  hamburger.innerHTML = '<button type="button" aria-controls="nav" aria-expanded="false" aria-label="Open navigation"></button>';
+  hamburger.firstElementChild.append(
+    glyph('menu', 'nav-hamburger-menu'),
+    glyph('close', 'nav-hamburger-close'),
+  );
   // the newsletter panel (loaded later, below) closes when the drawer opens
   let setNewsletterOpen = null;
   hamburger.addEventListener('click', () => {
@@ -864,8 +872,8 @@ export default async function decorate(block) {
   if (navTopbar) navWrapper.append(navTopbar);
   navWrapper.append(nav);
 
-  // shown complete: no logo popping in, no topbar text re-flowing as its faces arrive
-  await assetsReady;
+  // shown complete: no logo or icon popping in, no topbar text re-flowing as its faces arrive
+  await Promise.all([assetsReady, iconsReady(navWrapper)]);
   block.append(navWrapper);
 
   // the Subscribe CTA (topbar) and the mail shortcut (phones) open the newsletter panel once

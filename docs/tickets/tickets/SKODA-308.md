@@ -115,9 +115,25 @@ then, from 302 / 303 / 304 / 826:
     - `icons/nav-search.svg` and `icons/nav-chevron.svg` are removed (no longer used).
   - **Menu underline:** live keeps the line at full label width and grows it from 0 to 2px (`all .2s ease-in`, white → ink), as `header-megamenu.md` says. Ours swept in from the left (width 0 → 52px), which read as a jerk next to the caret. It now matches live.
   - **Drawer (390):** unchanged. Its rows keep their own accordion caret, and the desktop caret is hidden there.
-- **Tests:** `header-chrome.test.mjs` (22: search, URL, dropdown keys, hover / focus dismissal, newsletter panel, inline glyphs). `newsletter-stub.test.mjs` +2 (topbar).
+- **Footer + phone chrome round (2026-10-06, QA: "Innovation & Technology" doesn't wrap as on live, a jerk in the footer; on phones the hamburger, mail and close icons differ and jerk, the drawer isn't see-through, the search placeholder differs).** Measured live vs ours:
+  - **Footer columns:**
+    - From a 1004px menu (the 1024px viewport), live's columns are 14.25% each, not 1/7. At 1440 that's 175 / 153.0px, just under the label's 153.3px, so "Innovation & Technology" wraps.
+    - Below that (992–1023) live lays the columns out as one flex row of content-width columns with the space shared evenly (its clearfix pseudo-elements act as end items), so nothing wraps.
+    - Ours now does both: a container query on the footer nav, not a new viewport breakpoint. Column widths are identical to live at 992 / 1023 / 1024 / 1080 / 1200 / 1440.
+  - **Footer "jerk":** no layout shift on either site. The six icons (app badges, social) appeared 30–90ms after the footer text (lazy `<img>`s). The footer now waits for them, for at most 250ms (`scripts/icons-ready.js`, shared with the header), before it shows.
+  - **Phone header icons (source glyphs, inline SVG):**
+    - The hamburger is icon-font menu U+E01F and the close is U+E010, both at 17.6px, centred in the 68 × 64 tap target. They replace the CSS-drawn 20px bars / 24px ✕. Ink vs live: menu 98.6 / 98.1, close 33.3 / 33.1.
+    - The mail shortcut is the source `#mail-thick` symbol in a 26 × 18 box at 292,67, 4px before the tap target. It was a 24 × 24 lazy image at 298, which popped in after the header showed. Ink 165.8 / 165.8.
+    - The header also waits for its remaining icon images (the logo, the desktop Subscribe mail) with the same 250ms cap.
+  - **Drawer:**
+    - The page now shows through the frosted strip left of the panel, as on live (the open header is `rgb(227 227 227 / 80%)` + `blur(10px)`). The wrapper, as tall as the open drawer, painted white under the backdrop, so the strip was a solid grey.
+    - The search placeholder is the full #464748 (live's drawer field; the desktop bar's stays at 30%).
+    - The row caret is the source glyph at 16px (14.9 × 8.9), centred in a 24px box, flipped at once when a row opens (live swaps to caret-up U+E00A, its mirror). It was an 8px rotated border.
+    - No rule under the last row (Newsletter), as on live.
+  - **Load trace (cold, 390 + 1440):** the header and footer each show once, complete, with zero layout shifts.
+- **Tests:** `header-chrome.test.mjs` (22: search, URL, dropdown keys, hover / focus dismissal, newsletter panel, inline glyphs incl. menu / close / mail). `newsletter-stub.test.mjs` +2 (topbar). `scripts/icons-ready.test.mjs` 3.
   - Header, footer and newsletter tests are green.
-  - Blocks / scripts / templates: 532/534. The 2 also fail on `main`:
+  - Blocks / scripts / templates: 536/538. The 2 also fail on `main`:
     - `header-locales` (SKODA-303a): the CZ link resolves to the site root instead of keeping `/cs/emobility/x`;
     - `media-cart-download`: a missing `fflate` here.
   - `npm run lint` is clean.
@@ -132,8 +148,9 @@ then, from 302 / 303 / 304 / 826:
 - **Search scope:** the select carries the scope (`search_type`), but the SKODA-403 search page doesn't filter by type yet, so results are all types. Belongs to 403's follow-up.
 - **Subscribe colour:** `--skoda-grey-700`, as the language links (SKODA-303): 5.45:1 on the bar, where the source `#7c7d7e` is 3.3:1 and fails AA.
   - The inactive section tab has the same 3.3:1 issue. It's kept as on the source; flagged for SKODA-703.
-- **Footer at 992–1079:** live's columns are irregular (flex) there; ours stay 1/7 columns.
-- **Phone mail icon:** ours is 24×24 at x298; live's glyph is 26×18 at x292.
+- **Footer at 992–1079:** matched since the footer round above: content-width columns to 1023, 14.25% from 1024.
+- **Phone mail icon:** matched since the footer round above (26 × 18 at x292).
+- **Outside this ticket:** on phones the home hero carousel's dots and pause button shift about 6px sideways once after load (the promo-box block, not the chrome).
 - **Drawer:** the panel starts at y44 with the logo row inside. Live's `nav` starts at y108 under a white logo row, so the white area is the same (y44–844).
 - **Not verified yet** (needs push / publish): the AC's `.aem.page` and `.aem.live` checks.
 

@@ -90,9 +90,11 @@ footer .footer-widgets .footer-column p {
 /* ---- nav sitemap (.footer-nav) ----
    The legal copy follows the sitemap directly (source: the last item's 12px margin is the only
    gap, SKODA-308). Every row is 19px: the source item is a 16px / 18px line holding a 12px / 18px
-   link, so the shared baseline makes the line box 19px (sitemap 446px tall at 1440). */
+   link, so the shared baseline makes the line box 19px (sitemap 446px tall at 1440). The nav
+   is the container the desktop columns query (below). */
 footer .footer-nav nav {
   margin: 0;
+  container: footer-nav / inline-size;
 }
 
 /* flow-root keeps the last item's margin inside the list, as the source's floated columns do */
@@ -325,14 +327,25 @@ footer .footer-social .social-icons a.social-instagram:hover {
     display: block;
   }
 
-  /* source columns: 1/7 of the content box each, text kept 22px clear of the next column
-     (175 / 153px at 1440) */
+  /* source below 1024: one row of content-width columns, the free space shared evenly around
+     them (a flex row whose clearfix pseudo-elements act as end items), so no label wraps */
   footer .footer-nav nav > ul {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    display: flex;
+    justify-content: space-evenly;
   }
 
+  /* text kept 22px clear of the next column */
   footer .footer-nav nav > ul > li {
     padding-inline-end: var(--footer-nav-column-gap);
+  }
+}
+
+/* source from a 1004px menu (the 1024px viewport less its 10px gutters): columns of 14.25% of
+   the content box (not 1/7: the 0.25% is left over at the end), 175 / 153px at 1440, where
+   "Innovation & Technology" (153.3px) wraps as on the source */
+@container footer-nav (width >= 1004px) {
+  footer .footer-nav nav > ul {
+    display: grid;
+    grid-template-columns: repeat(7, 14.25%);
   }
 }

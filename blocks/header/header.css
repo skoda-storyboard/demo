@@ -22,6 +22,7 @@ header .nav-wrapper {
   --nav-logo-height: 48px;
   --nav-logo-top: 15.8px;
   --nav-search-glyph: 20.3px;
+  --nav-menu-glyph: 17.6px; /* the source toggle's icon font size (1.1em) */
   --nav-search-slot: 48px; /* .search-bar */
   --nav-search-toggle: 41px;
   --nav-search-bar-width: 624px;
@@ -29,6 +30,8 @@ header .nav-wrapper {
   --nav-drop-chevron-space: 44px; /* dropdown trigger end padding */
   --nav-drop-chevron-width: 11.16px; /* the caret glyph (header.js) at its source size, .75 × 16px */
   --nav-drop-chevron-height: 6.7px;
+  --nav-drawer-caret-width: 14.875px; /* the same glyph in the drawer rows, at 16px */
+  --nav-drawer-caret-height: 8.938px;
   --nav-tab-padding: 21px;
   --nav-newsletter-width: 550px; /* the panel's form (source label max-width / field + pill) */
 
@@ -63,9 +66,12 @@ header nav .nav-mobile-tools {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  gap: calc(var(--spacing-xs) / 2); /* source: the mail icon ends 4px before the hamburger's tap target */
   margin-right: calc(-1 * var(--page-gutter));
 }
 
+/* source a.newsletter-header: the #mail-thick symbol in a 26 x 18 box (21.1 x 16.8 ink) at
+   292,67 @390 */
 header nav .nav-mail {
   display: inline-flex;
   align-items: center;
@@ -77,10 +83,9 @@ header nav[aria-expanded='true'] .nav-mail {
   display: none;
 }
 
-header nav .nav-mail .icon,
-header nav .nav-mail .icon img {
-  width: 24px;
-  height: 24px;
+header nav .nav-mail-glyph {
+  width: 26px;
+  height: 18px;
 }
 
 header nav p {
@@ -296,57 +301,16 @@ header nav .nav-hamburger button:focus-visible {
   outline-offset: -4px;
 }
 
-header nav .nav-hamburger-icon,
-header nav .nav-hamburger-icon::before,
-header nav .nav-hamburger-icon::after {
-  box-sizing: border-box;
-  display: block;
-  position: relative;
-  width: 20px;
+/* source .menu-toggle::after: the icon-font menu glyph (U+E01F, three 2.2px bars), close
+   (U+E010) while the drawer is open, at 17.6px, centred in the tap target */
+header nav .nav-hamburger .nav-glyph {
+  width: var(--nav-menu-glyph);
+  height: var(--nav-menu-glyph);
 }
 
-header nav .nav-hamburger-icon::before,
-header nav .nav-hamburger-icon::after {
-  content: '';
-  position: absolute;
-  background: currentcolor;
-}
-
-header nav[aria-expanded='false'] .nav-hamburger-icon,
-header nav[aria-expanded='false'] .nav-hamburger-icon::before,
-header nav[aria-expanded='false'] .nav-hamburger-icon::after {
-  height: 2px;
-  border-radius: 2px;
-  background: currentcolor;
-}
-
-header nav[aria-expanded='false'] .nav-hamburger-icon::before {
-  top: -6px;
-}
-
-header nav[aria-expanded='false'] .nav-hamburger-icon::after {
-  top: 6px;
-}
-
-header nav[aria-expanded='true'] .nav-hamburger-icon {
-  height: 22px;
-}
-
-header nav[aria-expanded='true'] .nav-hamburger-icon::before,
-header nav[aria-expanded='true'] .nav-hamburger-icon::after {
-  top: 3px;
-  left: 1px;
-  width: 24px;
-  height: 2px;
-  border-radius: 2px;
-  transform: rotate(45deg);
-  transform-origin: 2px 1px;
-}
-
-header nav[aria-expanded='true'] .nav-hamburger-icon::after {
-  top: unset;
-  bottom: 3px;
-  transform: rotate(-45deg);
+header nav[aria-expanded='false'] .nav-hamburger-close,
+header nav[aria-expanded='true'] .nav-hamburger-menu {
+  display: none;
 }
 
 /* --- Brand / logo ---------------------------------------------------------- */
@@ -714,7 +678,13 @@ header nav .nav-search .search-suggest-meta {
     font-weight: var(--weight-bold);
   }
 
-  /* blurred backdrop behind the open drawer (covers the whole viewport) */
+  /* blurred backdrop behind the open drawer (covers the whole viewport; source header:
+     rgb(227 227 227 / 80%) + blur(10px)). The wrapper, as tall as the drawer then, drops its
+     white so the page shows through the frosted strip left of the panel */
+  header .nav-wrapper:has(nav[aria-expanded='true']) {
+    background-color: transparent;
+  }
+
   header .nav-wrapper:has(nav[aria-expanded='true'])::before {
     content: '';
     position: fixed;
@@ -761,23 +731,28 @@ header nav .nav-search .search-suggest-meta {
     justify-content: space-between;
   }
 
-  header nav[aria-expanded='true'] .nav-sections .nav-drop > a::after,
-  header nav[aria-expanded='true'] .nav-sections .nav-drop > p > a::after {
-    content: '';
-    flex: 0 0 auto;
-    width: 8px;
-    height: 8px;
-    margin-right: 7px; /* centres the 10px caret in the source's 24px glyph box */
-    border: 2px solid currentcolor;
-    border-width: 0 2px 2px 0;
-    border-radius: 0 0 1px;
-    transform: rotate(45deg);
-    transition: transform 0.2s ease;
+  /* the row caret: the source glyph at 16px (14.9 x 8.9) centred in a 24px box on the row's
+     end; open, the source swaps it for caret-up (U+E00A, its mirror) at once */
+  header nav[aria-expanded='true'] .nav-sections .nav-drop .nav-drop-caret {
+    display: block;
+    width: var(--nav-drawer-caret-width);
+    height: var(--nav-drawer-caret-height);
+    margin-right: calc((var(--spacing-l) - var(--nav-drawer-caret-width)) / 2);
   }
 
-  header nav[aria-expanded='true'] .nav-sections .nav-drop[aria-expanded='true'] > a::after,
-  header nav[aria-expanded='true'] .nav-sections .nav-drop[aria-expanded='true'] > p > a::after {
-    transform: rotate(-135deg);
+  header nav[aria-expanded='true'] .nav-sections .nav-drop[aria-expanded='true'] .nav-drop-caret {
+    transform: rotate(180deg);
+  }
+
+  /* source: no rule under the last row (Newsletter) */
+  header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul > li:last-child > a,
+  header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul > li:last-child > p > a {
+    border-bottom: 0;
+  }
+
+  /* the drawer field's placeholder is the full #464748 (the desktop bar's is at 30%) */
+  header nav .nav-search-input::placeholder {
+    opacity: 1;
   }
 
   /* collapsed sub-menu; expands when the parent li is aria-expanded (source .open >
@@ -857,9 +832,7 @@ header nav .nav-search .search-suggest-meta {
 }
 
 @media (width < 1080px) and (prefers-reduced-motion: reduce) {
-  header nav[aria-expanded='true'] .nav-sections .nav-drop > ul,
-  header nav[aria-expanded='true'] .nav-sections .nav-drop > a::after,
-  header nav[aria-expanded='true'] .nav-sections .nav-drop > p > a::after {
+  header nav[aria-expanded='true'] .nav-sections .nav-drop > ul {
     transition: none;
   }
 }
