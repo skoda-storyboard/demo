@@ -6,11 +6,9 @@
 - **GitHub issue:** [#262](https://github.com/skoda-storyboard/demo/issues/262)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §3.3 / §5 / §8 F5; relates to [SKODA-607](SKODA-607.md), SKODA-502, SKODA-204, SKODA-818
 - **Branch:** `skoda-833-press-release-import-validity`
-- **Status (2026-10-06):** 🟡 Parser developer work done; **Assets ingest/publication and Assets-only QA complete**.
-  The 28-release batch now has all 258 distinct originals uploaded and publicly verified.
-  This run added 114 originals (77 images, 22 PDFs, 15 videos), including the missing UCI PDF
-  and Laura video. DA content has not been changed, previewed or published by this run.
-  `media:apply`, DA dry-run/push/preview and rendered QA remain separate pending work.
+- **Status (2026-10-06):** 🟢 **QA PASS; pushed to DA and previewed** (28/28 preview 200, push report
+  `2026-10-06T12-23-54-957Z`: 23 updated, 5 unchanged, 0 conflicts). **Not published**: `.aem.live` still serves the
+  previous versions until a separate publish go-ahead. Assets ingest + Assets-only QA complete (258 originals).
 
 ## Change
 - `parsers/downloads.js` (shared, backwards-compatible): MP4 links are URL-encoded before the table is written.
@@ -86,10 +84,21 @@ The full list of the 37 blocked links per page is in the scratch `media/unverifi
 ## Acceptance Criteria
 - [x] 4x4 Media Box parses into one Downloads block with all 15 items
 - [x] YouTube / Buzzsprout embeds, tags, bullets, quotes as above; no regressions
-- [ ] QA PASS (code + content; rendered check of the 4x4 Media Box and a Buzzsprout embed)
+- [x] QA PASS (code + content; rendered check of the 4x4 Media Box and a Buzzsprout embed). Independent fresh import of all 28,
+      real `media:apply` (297 rewrites) + `media:validate-binaries` 28/28; Buzzsprout 812/641/492/355×200 and YouTube
+      812×457… equal to origin at 1440/992/768/375; 258/258 public Assets URLs 200 with exact MIME/bytes.
 - [x] Scoped image/PDF/video originals uploaded and published on AEM Assets; actual paths and public MIME/byte proofs recorded in the manifest
 - [x] Independent Assets-only QA: all 114 new author originals match their anonymous published copies; authentication blocker resolved
-- [ ] `media:apply`, DA dry-run, push + preview. DA page publishing needs a separate go-ahead.
+- [x] `media:apply`, DA dry-run, push + preview (2026-10-06, from this branch: main's binary gate lacks e7a0e65)
+- [ ] Publish (separate go-ahead)
+
+## QA follow-ups (non-blocking)
+- 4×4 Assets filenames are double-escaped (`the_Skoda_4%2525C3%2525974_range…`): downloads save as
+  `…4%25C3%25974…`. Rename to the decoded name before publish? (needs manifest update + re-apply + re-push)
+- Bullet rule: a lower-case brand-name bullet (`eMobility…`, `iV…`) would be joined; a digit/dash continuation split.
+  Not present in the 28.
+- `serialiseMp4` leaves protocol-relative / relative `×.mp4` hrefs raw. Not present in the 28.
+- Shared Media Box collapse/pill deviations are SKODA-830 D1/D2 (identical on main).
 
 ## Collisions
 - `parsers/downloads.js` is also edited on `skoda-830-story-import-validity` (D4 title recovery); merge carefully.
