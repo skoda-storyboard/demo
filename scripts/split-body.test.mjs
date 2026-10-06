@@ -90,3 +90,7 @@ test('the story panel is the body track plus the inset, and joined panels drop t
   assert.match(styles, /\.section\.highlight-dark:has\(\+ \.section\.highlight-dark\),\s+body\.story main > \.section\.highlight-grey:has\(\+ \.section\.highlight-grey\) \{\s+padding-block-end: 0;/);
   assert.match(styles, /@media \(width >= 781px\) \{\s+body\.story \{\s+--highlight-widget-block: 0px;/);
 });
+
+test('panel images are block-level, so no baseline gap makes the panel taller (PR #252 review)', () => {
+  assert.match(styles, /\.section\.body-column:is\(\.highlight-dark, \.highlight-grey\) \.default-content-wrapper :is\(picture, img\) \{\s+display: block;/);
+});

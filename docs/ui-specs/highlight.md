@@ -72,6 +72,9 @@ identical at 1440 / 1080 / 992 / 781 / 780 / 768 / 390, including the 780 → 78
   - the panel padding is composed from tokens: `--highlight-row-top` (0 → 32px at 768), `--story-inset` (the 10px
     cell), `--highlight-widget-block` (15px → 0 at 781) and `--highlight-widget-inline` (15px);
   - from 768 the panel takes `margin-inline-end: -10px`, which is the body track plus the inset;
+  - panel images (`picture`, `img`) are `display: block`, as on the source. Inline, they left a 7px baseline gap, which
+    made the panel 6.5–7px taller (PR #252 review). The Epiq panel now measures 771.2 / 708.2 / 620.1 / 640.6 / 631.3
+    at 1440 / 1080 / 781 / 768 / 390, against the source's 772.2 / 709.2 / 621.1 / 640.6 / 631.3;
   - body neighbours drop their 40px section margin on the panel side and keep 10px of padding;
   - joined panels: the first drops its bottom inset, and the second starts 10px down (text 30px apart, 32 on the
     source).

@@ -1003,6 +1003,12 @@ body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) > di
   padding-inline: calc(var(--story-inset) + var(--highlight-widget-inline));
 }
 
+/* panel images are block-level, as on the source: an inline image leaves the paragraph's
+   baseline descender gap (7px) under it, making the panel taller than the source's */
+body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) .default-content-wrapper :is(picture, img) {
+  display: block;
+}
+
 /* A leading panel keeps the intro → body gap but its own top inset (after the intro → body
    rule, which has the same specificity). */
 body.story main > .section:first-of-type + .section:is(.highlight-dark, .highlight-grey) {
