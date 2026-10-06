@@ -308,10 +308,16 @@ var CustomImportScript = (() => {
   function urlParagraph(document, url) {
     return make(document, "p", link(document, url, url));
   }
-  function titleText(h1) {
-    const clone = h1.cloneNode(true);
-    clone.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
-    return text3(clone);
+  function titleContent(document, h1) {
+    const lines = [[]];
+    const walk = (node) => node.childNodes.forEach((child) => {
+      if (child.nodeType === 1 && child.tagName === "BR") lines.push([]);
+      else if (child.nodeType === 3) lines.at(-1).push(child.textContent);
+      else if (child.nodeType === 1) walk(child);
+    });
+    walk(h1);
+    const parts = lines.map((line) => line.join("").replace(/\s+/g, " ").trim()).filter(Boolean);
+    return parts.flatMap((line, i) => i ? [document.createElement("br"), line] : [line]);
   }
   function isEmptyParagraph(p) {
     return !text3(p) && !p.querySelector("img, picture, a[href], iframe");
@@ -527,7 +533,7 @@ var CustomImportScript = (() => {
     const relatedBand = bands.find((b) => b !== mediaBand && b.querySelector("article.article-teaser"));
     const out = [];
     if (date) out.push(make(document, "p", date));
-    if (h1) out.push(make(document, "h1", titleText(h1)));
+    if (h1) out.push(make(document, "h1", titleContent(document, h1)));
     out.push(marker(document, "body"));
     [
       leadImage(document, primary),

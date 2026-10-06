@@ -527,7 +527,10 @@ export default async function decorate(block) {
     // eslint-disable-next-line no-console
     console.error('downloads: media cart unavailable', e);
   });
-  if ((cfg.collapse === 'auto' || (cfg.collapse === null && mediaBox)) && list.children.length > 8) {
+  // The source collapses once the tiles need more than two rows at the current width (a
+  // 5-tile press-release box below 768px, SKODA-607a); syncVisibility() hides the toggle
+  // whenever they fit. Two tiles always fit (two rows of the one-column grid).
+  if ((cfg.collapse === 'auto' || (cfg.collapse === null && mediaBox)) && list.children.length > 2) {
     disclosureSeq += 1;
     list.id = `downloads-items-${disclosureSeq}`;
     const toggle = document.createElement('button');

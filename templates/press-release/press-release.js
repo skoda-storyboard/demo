@@ -36,11 +36,14 @@ function decorateHeader(section) {
 
 /**
  * Body column: mark the bullet list and the perex (a paragraph that is all <strong>).
- * Both are optional, so they are found by content.
- * @param {Element} section The body-column section
+ * Both are optional, so they are found by content. Only the first body part is the lead
+ * (lead image, bullets, perex, podcast); a highlight callout splits the rest of the body
+ * into later parts (SKODA-824), whose bold paragraphs (the FAQ questions) stay as they are.
+ * @param {Element} section The first body-column section
  */
 function decorateBody(section) {
   if (!section) return;
+  section.classList.add('press-release-lead');
   const content = section.querySelector('.default-content-wrapper');
   if (!content) return;
   const bullets = content.querySelector(':scope > ul');

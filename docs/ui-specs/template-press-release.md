@@ -20,6 +20,19 @@ Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 > - **§5 header:** header padding-top 24; date 11/11/600 `#808080` (inline-block, lands at y=140), 16px below; h1 26/32.5/600 `#0a0a0a`. The h1's 26px margin collapses out of the header: the h1 → lead-image gap is **16px**.
 > - **§3/§10 newsletter:** hidden (`display:none`) on all 5; out of scope (904).
 >
+> **Page-level re-measure (2026-10-06, SKODA-607a, all 5 M1 releases at 1280/1024/768/500, measured against the source):**
+>
+> - **Column ends:** `.column-primary` margin-bottom **60px** and `.column-secondary` **24px**. Both are flex items, so these never collapse with the next box. The `.columns` row has −10px margins. The sidebar ends with an empty side-banner slot (15px, plus its 15px group gap).
+> - **Bands:** Media Box `margin-top` 32px from the row (−10px). Each `.cover-box.dark` has a **16px margin-bottom**, a white strip before Related and before the footer.
+> - **Podcast:** `.entry-content` opens with an empty TinyMCE `<p>` (20px) before the Buzzsprout player, so the player sits 40px below the perex.
+> - **Media Box:**
+>   - stats line `padding-top: 4px`, 20px to the tiles;
+>   - the tile grid keeps its last row's 20px bottom margin;
+>   - collapse rule: see `downloads.md` (row-triggered).
+> - **Lead image:** the 16:9 `.article-teaser` frame has radius 8px and a resting `scale(1.02)` (no hover change). It links to the original (colorbox).
+> - **Title:** an authored `<br>` stays (Peaq).
+> - **Teaser images** (Media Box tiles, sidebar Images, Related cards) are bottom-aligned in their 16:9 frame (`bottom: 0; transform: translateX(-50%) scale(1.02)`, radius 8px). Ticketed in SKODA-607a's blockers.
+>
 > **§8 EDS target, as built (SKODA-607 phase 1):** the press release has its **own template**, `templates/press-release/` (JS + CSS), loaded from `template: press_release` through the `scripts.js` `TEMPLATES` allow-list. It is not the story CSS. Sections follow the import contract `press-release-sections` (header · `body-column` · `sidebar` · `dark, full-width, media-box` · optional `dark, full-width, related`). Block visuals are separate tickets: SKODA-223 (Gallery `preview`), SKODA-224 (Story Rail `press`), SKODA-510 (Downloads file tiles).
 
 ## 1. Identity

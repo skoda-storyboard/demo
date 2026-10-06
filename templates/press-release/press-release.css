@@ -14,13 +14,29 @@ body.press-release {
   --pr-header-offset: 32px;
   --pr-sidebar-inset: var(--spacing-xxl);
   --pr-date-size: 11px;
+  --pr-group-gap: 15px;
   --pr-band-gap: 32px;
   --pr-band-padding-top: 72px;
   --pr-band-padding-bottom: 60px;
+
+  /* the source .column-primary / .column-secondary bottom margins (SKODA-607a) */
+  --pr-column-end: 60px;
+  --pr-sidebar-end: var(--spacing-l);
+
+  /* the source sidebar ends with an empty side-banner slot (15px) and its group gap; the
+     banner itself is out of scope (SKODA-903), its blank space is kept */
+  --pr-side-banner-slot: calc(2 * var(--pr-group-gap));
 }
 
 /* Layer 1 — fluid. Mobile first: every section stacks in source order with the
-   constant 10px source gutter; the sidebar follows the body column. */
+   constant 10px source gutter; the sidebar follows the body column. `main` is a one-column
+   grid already: the source columns are flex items, so their margins never collapse into
+   the next section's (the 60/24px column ends, the band's 32px). */
+body.press-release main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
 body.press-release main > .section {
   margin: 0;
 }
@@ -65,11 +81,28 @@ body.press-release .section.body-column .default-content-wrapper > ul {
   margin: 0 0 var(--paragraph-gap);
 }
 
-body.press-release .section.body-column .default-content-wrapper:first-child > p:first-child img {
+/* Only the first body part holds the lead image: a part after a highlight callout may start
+   with an ordinary image (press-release.js marks the lead part). The source .article-teaser
+   frame is a rounded 16:9 crop of the image at a resting 1.02 zoom (its teaser transform). */
+body.press-release .section.press-release-lead > .default-content-wrapper:first-child > p:first-child picture {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--card-radius);
+}
+
+body.press-release .section.press-release-lead > .default-content-wrapper:first-child > p:first-child img {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
+  scale: 1.02;
+}
+
+/* The podcast player opens the source .entry-content after an empty paragraph (TinyMCE's
+   shortcode line), so it sits two paragraph gaps below the perex. Padding, not margin: a
+   margin would collapse with the perex's. Measured 40px on all 5 M1 releases. */
+body.press-release .section.press-release-lead > .default-content-wrapper:first-child + .embed-wrapper {
+  padding-top: var(--paragraph-gap);
 }
 
 body.press-release .section.body-column .press-release-bullets {
@@ -92,7 +125,7 @@ body.press-release .section.body-column .press-release-perex strong {
 
 /* Sidebar: Additional info list, Images, Tags; 16/45 headings, 15px between groups. */
 body.press-release .section.sidebar aside > div {
-  margin-bottom: 15px;
+  margin-bottom: var(--pr-group-gap);
 }
 
 /* Blocks in the body column (embeds) keep the paragraph rhythm. */
@@ -109,7 +142,7 @@ body.press-release .section.sidebar h3 {
 }
 
 body.press-release .section.sidebar .default-content-wrapper > ul {
-  margin: 0 0 15px;
+  margin: 0 0 var(--pr-group-gap);
   padding: 0;
   list-style: none;
 }
@@ -139,13 +172,46 @@ body.press-release main > .section.body-column:is(.highlight-grey, .highlight-da
   padding-inline: 0;
 }
 
-/* Dark bands: Media Box (32px below the article), then Related directly after it. */
+/* Sidebar tag rows sit 24px apart, as on the source (inline-block <li>s on a 24px line): no
+   flex row gap, and not the global 8px list-item margin. */
+body.press-release .section.sidebar .tags .tags-list {
+  row-gap: 0;
+}
+
+body.press-release .section.sidebar .tags .tags-list > li {
+  margin: 0;
+}
+
+/* The source columns end with their own bottom margin (60px article, 24px sidebar), after
+   their last child's (grid items keep it inside, as the source flex items do). The
+   sidebar's also covers the empty side-banner slot. The body's goes on its last part,
+   a highlight callout included. */
+body.press-release main > .section.body-column:not(:has(~ .section.body-column)) {
+  margin-bottom: var(--pr-column-end);
+}
+
+body.press-release main > .section.sidebar {
+  margin-bottom: calc(var(--pr-side-banner-slot) + var(--pr-sidebar-end));
+}
+
+/* Dark bands: Media Box 32px below the article row, then Related. Each source .cover-box has
+   a 16px bottom margin (a white strip before the next band and before the footer). The row
+   above ends 10px early (the source .columns row's -10px gutter margin). */
 body.press-release main > .section.dark {
+  margin-bottom: var(--spacing-m);
   padding: var(--pr-band-padding-top) 0 var(--pr-band-padding-bottom);
 }
 
 body.press-release main > .section.media-box {
-  margin-top: var(--pr-band-gap);
+  margin-top: calc(var(--pr-band-gap) - var(--pr-gutter));
+
+  /* the source tile grid keeps its last row's 20px bottom margin */
+  padding-bottom: calc(var(--pr-band-padding-bottom) + var(--paragraph-gap));
+}
+
+/* ...but a collapsed box ends on its Show more pill (the source clips the tiles above it) */
+body.press-release main > .section.media-box:has(.downloads-more:not([hidden])) {
+  padding-bottom: var(--pr-band-padding-bottom);
 }
 
 body.press-release .section.dark .default-content-wrapper > h2 {
@@ -164,8 +230,13 @@ body.press-release .section.dark .default-content-wrapper > p {
   line-height: 2;
 }
 
+/* source .search-results-stats: 4px above the stats line, 20px to the tiles */
 body.press-release .section.media-box .default-content-wrapper {
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--paragraph-gap);
+}
+
+body.press-release .section.media-box .default-content-wrapper > p {
+  padding-top: 4px;
 }
 
 /* Related header: heading + "Based on tags" left, the "All" ghost pill right, centred on
@@ -220,12 +291,11 @@ body.press-release .section.sidebar aside > .default-content-wrapper:has(> h3:la
   margin-bottom: 0;
 }
 
-/* Layer 2 / Layer 3 — at ≥768 the article becomes a real two-column grid (the source's
-   single structural transition). `main` is the grid, capped by --content-max-width;
+/* Layer 2 / Layer 3 — at ≥768 the one-column grid gets the sidebar column (the source's
+   single structural transition), capped by --content-max-width;
    the header and both bands span it, and the bands bleed to the viewport edges. */
 @media (width >= 768px) {
   body.press-release main {
-    display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
     align-items: start;
     max-width: var(--content-max-width);

@@ -8,7 +8,7 @@
  * template (templates/press-release/) lays out. Measured on the 5 M1 releases
  * (docs/ui-specs/template-press-release.md, SKODA-607 amendment 2026-09-27):
  *
- *   1. header (full width)        date <p> + h1 (a <br> in the title becomes a space)
+ *   1. header (full width)        date <p> + h1 (plain text; a <br> in the title is kept)
  *   2. Style: body-column         lead image, bullets <ul>, perex <p><strong>,
  *                                 Buzzsprout URL, body, inline Vimeo URL
  *   3. Style: sidebar             "Additional info" h3 + list, "Images" h3 +
@@ -72,11 +72,21 @@ function urlParagraph(document, url) {
   return make(document, 'p', link(document, url, url));
 }
 
-/** Title text with <br> as a space (Peaq: "range record<br>for seven-seater"). */
-function titleText(h1) {
-  const clone = h1.cloneNode(true);
-  clone.querySelectorAll('br').forEach((br) => br.replaceWith(' '));
-  return text(clone);
+/**
+ * Title as plain text, keeping an authored <br> as a line break (Peaq: "range record<br>for
+ * seven-seater" breaks there on the source at every width, SKODA-607a). The metadata Title
+ * comes from og:title, so it stays one line.
+ */
+function titleContent(document, h1) {
+  const lines = [[]];
+  const walk = (node) => node.childNodes.forEach((child) => {
+    if (child.nodeType === 1 && child.tagName === 'BR') lines.push([]);
+    else if (child.nodeType === 3) lines.at(-1).push(child.textContent);
+    else if (child.nodeType === 1) walk(child);
+  });
+  walk(h1);
+  const parts = lines.map((line) => line.join('').replace(/\s+/g, ' ').trim()).filter(Boolean);
+  return parts.flatMap((line, i) => (i ? [document.createElement('br'), line] : [line]));
 }
 
 function isEmptyParagraph(p) {
@@ -346,7 +356,7 @@ function rebuild(element, document) {
 
   const out = [];
   if (date) out.push(make(document, 'p', date));
-  if (h1) out.push(make(document, 'h1', titleText(h1)));
+  if (h1) out.push(make(document, 'h1', titleContent(document, h1)));
 
   out.push(marker(document, 'body'));
   [leadImage(document, primary), bulletList(document, primary), ...perex(document, primary),

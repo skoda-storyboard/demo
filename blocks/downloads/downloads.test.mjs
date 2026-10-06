@@ -128,12 +128,46 @@ test('image sizes remain an accessible two-link menu, and incomplete files do no
   assert.equal(block.querySelectorAll('.downloads-size[aria-label^="Download Front view"]').length, 2);
 });
 
-test('large media-box variant discloses two rows across widths and authored columns', async () => {
-  const small = setup();
-  for (let i = 0; i < 8; i += 1) addRow(small, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
-  await decorate(small);
-  assert.equal(small.querySelector('.downloads-more'), null);
+test('a press-release Media Box collapses only while its tiles need more than two rows', async () => {
+  // two tiles always fit two rows: no disclosure at all (Zellmer)
+  const pair = setup();
+  for (let i = 0; i < 2; i += 1) addRow(pair, { title: `Image ${i}`, links: [['Original', `/image${i}.jpg`]] });
+  await decorate(pair);
+  assert.equal(pair.querySelector('.downloads-more'), null);
 
+  // five tiles (Superb, Peaq): 1 column at 500, 2 from 520, 3 from 768, 4 from 992 (SKODA-607a)
+  const five = setup();
+  for (let i = 0; i < 5; i += 1) addRow(five, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
+  await decorate(five);
+  const toggle = five.querySelector('.downloads-more');
+  const visible = () => [...five.querySelectorAll('.downloads-item')].filter((tile) => !tile.hidden).length;
+  assert.equal(toggle.hidden, false);
+  assert.equal(visible(), 2);
+  window.setViewport(520);
+  assert.equal(toggle.hidden, false);
+  assert.equal(visible(), 4);
+  window.setViewport(768);
+  assert.equal(toggle.hidden, true);
+  assert.equal(visible(), 5);
+  window.setViewport(992);
+  assert.equal(toggle.hidden, true);
+  assert.equal(visible(), 5);
+  window.setViewport(500);
+  assert.equal(toggle.hidden, false);
+  assert.equal(toggle.getAttribute('aria-expanded'), 'false');
+  assert.equal(visible(), 2);
+
+  // eight tiles fit two 4-up rows from 992 only
+  const eight = setup();
+  for (let i = 0; i < 8; i += 1) addRow(eight, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
+  await decorate(eight);
+  assert.equal(eight.querySelector('.downloads-more').hidden, false);
+  window.setViewport(992);
+  assert.equal(eight.querySelector('.downloads-more').hidden, true);
+  window.setViewport(500);
+});
+
+test('large media-box variant discloses two rows across widths and authored columns', async () => {
   const large = setup();
   addConfig(large, 'columns', '3');
   for (let i = 0; i < 11; i += 1) addRow(large, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
