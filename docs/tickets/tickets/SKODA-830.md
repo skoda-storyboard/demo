@@ -8,7 +8,8 @@
   [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §4 / §8 F3–F4
 - **Branch:** `skoda-830-story-import-validity`
 - **Status (2026-10-06):** 🟢 **QA PASS (run 3); 57 stories pushed to DA and previewed** from this branch's import
-  (54 updated + 3 overwritten after review of their 28 Sep DA edits; 57/57 preview 200). **Not published.**
+  (54 updated + 3 overwritten after review of their 28 Sep DA edits; 57/57 preview 200). **Published 2026-10-06** on user
+  go-ahead, before #269 merged (57/57 live 200 + indexed): live shows the Media Box with main's old CSS/JS until #269 lands.
   gaming-consoles stays blocked (unverified MP4 `7_skoda-x-airconsole_hero_16-9_v08_056c7d9e.mp4`, needs DAM
   ingest); the `innovation-and-technology/…mixed-reality` alias is excluded (301). Until this branch merges,
   `main--…aem.page` renders the new content with main's old Media Box CSS/JS; the branch preview shows it correctly.
