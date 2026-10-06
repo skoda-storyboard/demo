@@ -5,7 +5,7 @@
 - **Milestone:** M1 (15 Oct demo)
 - **Parent:** SKODA-607 (#47, closed 2026-09-30) · **GitHub issue:** [#224](https://github.com/skoda-storyboard/demo/issues/224)
 - **Depends on:** SKODA-220 (#140, quotes, closed), SKODA-824 (#148, grey FAQ callout; runtime merged in #252)
-- **Status (2026-10-06):** 🟡 IN PROGRESS: branch `skoda-607a-press-release-parity`. Geometry parity reached on the 5 M1 releases (re-imported as drafts). The ≤2% per-pixel gate is **not** passed; every remaining failure has a measured cause, listed in [Blockers](#blockers-for-the-2-gate) with its owner. QA sign-off pending.
+- **Status (2026-10-06):** 🟡 IN PROGRESS: branch `skoda-607a-press-release-parity`. Geometry matches the source down to the first quote on the 5 M1 releases (re-imported as drafts); the rest is offset only by measured, ticketed causes. The ≤2% per-pixel gate is **not** passed; every remaining failure has a measured cause, listed in [Blockers](#blockers-for-the-2-gate) with its owner. QA sign-off pending.
 
 ## Scope
 The remaining page-level alignment and the final visual gate on the five M1 press releases
@@ -31,18 +31,21 @@ The remaining page-level alignment and the final visual gate on the five M1 pres
 The 5 releases were re-imported with the current bundle (quotes from SKODA-220: National Theatre 2, Zellmer 2, Board 1, Superb 1; the Zellmer FAQ as `body-column, highlight-grey`; text identical to DA word for word). They are pushed to DA and previewed as **drafts only** at `/drafts/skoda-607a/<slug>` (a one-off local script running the `import:push` steps except the binary gate, never publishing; approved 2026-10-06, not committed), **not** over the real pages:
 `import:push` blocks all 5 on the binary gate (5 PDFs + the Peaq MP4 have no DAM `delivery_url`; the ingest runs on a developer machine). **The real pages need that ingest before the re-import can be pushed.**
 
-## Geometry, source → EDS (drafts with branch code), Δ in px
-Anchors from [`docs/ui-specs/tools/press-release-anchors.mjs`](../../ui-specs/tools/press-release-anchors.mjs) (`getBoundingClientRect` after a full scroll).
+## Geometry, source → EDS (branch preview of the drafts), Δ in px
+Anchors from [`docs/ui-specs/tools/press-release-anchors.mjs`](../../ui-specs/tools/press-release-anchors.mjs) (`getBoundingClientRect` after a full scroll and `document.fonts.ready`).
 
-| Release | 1280 | 1024 | 768 | 500 |
-|---|---|---|---|---|
-| National Theatre | 0 everywhere | 0 | Media Box h −0.9 | 0 |
-| Board | 0 | 0 | 0 | 0 |
-| Superb (no Related) | Media Box h −0.9 | Media Box h −0.9 | 0 | 0 |
-| Zellmer | FAQ panel h **−24** → every anchor below −24 | same | same | same |
-| Peaq | article end **−48** → bands/footer −44 | same | same | same |
+The header, lead image, bullets, perex and podcast player sit at the **same y (Δ 0)** on all 5 at every width. Everything below them is offset only by the causes in the last column. The band heights match within 0.9px.
 
-Breakpoint edges (519/520, 767, 991/992, 1079/1080) on Superb are within 0.9px, and Zellmer only shows its −24px.
+| Release | Media Box top Δ 1280 / 1024 / 768 / 500 | Cause |
+|---|---|---|
+| Superb (1 quote, no Related) | −7 / −9 / −12 / −12 | the quote paragraph in the source's real italic face (blocker 1) |
+| Board (1 quote) | −9 / −10 / −14 / −15 | quote (blocker 1) |
+| National Theatre (2 quotes) | −8 / −10 / −14 / −14 | quotes (blocker 1) |
+| Zellmer (2 quotes + FAQ) | −34 / −36 / −40 / −40 | quotes −10…−16 (blocker 1), then the FAQ panel 302 → 278px, −24 (blocker 3) |
+| Peaq (no quotes) | −44 / −44 / −44 / −44 | article end −48, the video's media-cart bar (blocker 4) |
+
+Measured before the source's italic face has loaded (it loads lazily), the quote rows match too, and National Theatre, Board and Superb sit within 1px everywhere. So the italic face accounts for the whole quote offset.
+Breakpoint edges (519/520, 767, 991/992, 1079/1080) on Superb and Zellmer show no other offset.
 Before this ticket (main, 2026-10-06), the Media Box top was −82…−168px off at 1280 and −130…−229px at 500, and the 500px footer was up to +1071px off (the Media Box didn't collapse).
 
 **Regression:** the Media Box collapse matches the source on all 39 press-kit pages × 500/768/1280 and on every Images-chapter group (Epiq, Motorsport). The corpus Octavia release improves from −146 to −56px at 1280 (its content isn't re-imported yet).
@@ -89,7 +92,7 @@ Each is measured. None is press-release template CSS, so none is fixed here.
 Systemic leak found on the way (not fixed): the global `li { margin-bottom: 8px }` reaches the Tags block's list items everywhere. This PR overrides it only in the press-release sidebar; the story tags likely need the same.
 
 ## Acceptance criteria (from #224)
-- [x] Source vs EDS on all 5 releases at 1280/1024/768/500, measured geometry for the article, sidebar, Media Box, optional Related and footer anchors (tables above). The Zellmer drift is resolved except the −24px FAQ line (blocker 3).
+- [x] Source vs EDS on all 5 releases at 1280/1024/768/500, measured geometry for the article, sidebar, Media Box, optional Related and footer anchors (tables above). The Zellmer drift (−168 → −34px at 1280) is resolved except the quotes' italic face (blocker 1) and the −24px FAQ line (blocker 3).
 - [x] Content order and rhythm kept, no page-specific offsets; checked on releases without bullets (Zellmer), without Related (Superb) and with the FAQ.
 - [x] Dark bands and the two-column/stacked layout correct with and without Related; Peaq's video/PDF tiles checked (collapse at 500/767, open from 768).
 - [x] ≤2% per-pixel diff run and recorded (above): **FAIL**, blockers documented.

@@ -29,6 +29,10 @@ async function measure(url, width, isSource) {
     window.scrollTo(0, 0);
   });
   await page.waitForTimeout(2000);
+  // The source loads its SKODA Next italic face only once a quote scrolls in; wait for every
+  // pending face, or the quotes are measured in a synthesized italic (5–7px shorter)
+  await page.evaluate(() => document.fonts.ready);
+  await page.waitForTimeout(500);
   const result = await page.evaluate((src) => {
     const r1 = (n) => Math.round(n * 10) / 10;
     const top = (e) => (e ? r1(e.getBoundingClientRect().top + scrollY) : null);

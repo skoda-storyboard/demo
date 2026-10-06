@@ -63,23 +63,23 @@
     },
     "/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company": {
       "qa": "pending",
-      "note": "607a 2026-10-06 (dev evidence, QA pending): re-import with quotes/FAQ previewed as /drafts/skoda-607a/*; geometry vs source ≤1px at 1280/1024/768/500 except the FAQ blank line −24px (#148); ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224) — see SKODA-607a.md; real page re-push waits for the PDF/MP4 DAM ingest"
+      "note": "607a 2026-10-06 (dev evidence, QA pending): re-import with quotes/FAQ previewed as /drafts/skoda-607a/*; geometry = source down to the first quote, then −10…−16 (quotes, italic face) and −24 (FAQ blank line, #148); ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224) — see SKODA-607a.md; real page re-push waits for the PDF/MP4 DAM ingest"
     },
     "/en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029": {
       "qa": "pending",
-      "note": "607a 2026-10-06 (dev evidence, QA pending): re-import with quotes/FAQ previewed as /drafts/skoda-607a/*; geometry vs source ≤1px at 1280/1024/768/500; ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224) — see SKODA-607a.md; real page re-push waits for the PDF/MP4 DAM ingest"
+      "note": "607a 2026-10-06 (dev evidence, QA pending): re-import with quotes/FAQ previewed as /drafts/skoda-607a/*; geometry = source down to the first quote, then −8…−14 (quotes, italic face); ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224) — see SKODA-607a.md; real page re-push waits for the PDF/MP4 DAM ingest"
     },
     "/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence": {
       "qa": "pending",
-      "note": "607a 2026-10-06 (dev evidence, QA pending): re-import with quotes/FAQ previewed as /drafts/skoda-607a/*; geometry vs source ≤1px at 1280/1024/768/500; ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224) — see SKODA-607a.md; real page re-push waits for the PDF/MP4 DAM ingest"
+      "note": "607a 2026-10-06 (dev evidence, QA pending): re-import with quotes/FAQ previewed as /drafts/skoda-607a/*; geometry = source down to the first quote, then −7…−12 (quote, italic face); ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224) — see SKODA-607a.md; real page re-push waits for the PDF/MP4 DAM ingest"
     },
     "/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management": {
       "qa": "pending",
-      "note": "607a 2026-10-06 (dev evidence, QA pending): re-import with quotes/FAQ previewed as /drafts/skoda-607a/*; geometry vs source ≤1px at 1280/1024/768/500; ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224) — see SKODA-607a.md; real page re-push waits for the PDF/MP4 DAM ingest"
+      "note": "607a 2026-10-06 (dev evidence, QA pending): re-import with quotes/FAQ previewed as /drafts/skoda-607a/*; geometry = source down to the first quote, then −9…−15 (quote, italic face); ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224) — see SKODA-607a.md; real page re-push waits for the PDF/MP4 DAM ingest"
     },
     "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs": {
       "qa": "pending",
-      "note": "607a 2026-10-06 (dev evidence, QA pending): re-import with quotes/FAQ previewed as /drafts/skoda-607a/*; geometry vs source ≤1px at 1280/1024/768/500 except the video media-cart bar −48px; ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224) — see SKODA-607a.md; real page re-push waits for the PDF/MP4 DAM ingest"
+      "note": "607a 2026-10-06 (dev evidence, QA pending): re-import with quotes/FAQ previewed as /drafts/skoda-607a/*; geometry = source down to the first quote, then −48 (no quotes; the video media-cart bar); ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224) — see SKODA-607a.md; real page re-push waits for the PDF/MP4 DAM ingest"
     },
     "/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon": {
       "qa": "pending",
