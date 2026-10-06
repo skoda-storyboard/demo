@@ -7,8 +7,8 @@
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §3.3 / §5 / §8 F5; relates to [SKODA-607](SKODA-607.md), SKODA-502, SKODA-204, SKODA-818
 - **Branch:** `skoda-833-press-release-import-validity`
 - **Status (2026-10-06):** 🟢 **QA PASS; pushed to DA and previewed** (28/28 preview 200, push report
-  `2026-10-06T12-23-54-957Z`: 23 updated, 5 unchanged, 0 conflicts). **Not published**: `.aem.live` still serves the
-  previous versions until a separate publish go-ahead. Assets ingest + Assets-only QA complete (258 originals).
+  `2026-10-06T12-23-54-957Z`: 23 updated, 5 unchanged, 0 conflicts). **Published 2026-10-06** on user go-ahead
+  (report `2026-10-06T12-37-27-228Z`: 28/28 live=200, indexed). PR #265. Assets ingest + Assets-only QA complete (258 originals).
 
 ## Change
 - `parsers/downloads.js` (shared, backwards-compatible): MP4 links are URL-encoded before the table is written.
@@ -90,7 +90,7 @@ The full list of the 37 blocked links per page is in the scratch `media/unverifi
 - [x] Scoped image/PDF/video originals uploaded and published on AEM Assets; actual paths and public MIME/byte proofs recorded in the manifest
 - [x] Independent Assets-only QA: all 114 new author originals match their anonymous published copies; authentication blocker resolved
 - [x] `media:apply`, DA dry-run, push + preview (2026-10-06, from this branch: main's binary gate lacks e7a0e65)
-- [ ] Publish (separate go-ahead)
+- [x] Published 2026-10-06 (28/28 live 200 + indexed); the cart index for the new images goes live when #265 merges
 
 ## QA follow-ups (non-blocking)
 - 4×4 Assets filenames are double-escaped (`the_Skoda_4%2525C3%2525974_range…`): downloads save as
