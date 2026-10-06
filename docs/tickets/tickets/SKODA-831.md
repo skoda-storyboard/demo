@@ -3,6 +3,7 @@
 - **Epic:** E02, Templates & Blocks
 - **Type:** block + import + index config
 - **Phase:** A · **Milestone:** M1
+- **GitHub issue:** [#260](https://github.com/skoda-storyboard/demo/issues/260)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §3.2 / §8 F2; relates to [SKODA-209](SKODA-209.md), SKODA-214
 - **Branch:** `skoda-831-category-archive-membership`, stacked on `skoda-830-story-import-validity`
 - **Status (2026-10-06):** 🟡 Developer done (head e57cdb1, pushed). QA was started but interrupted; it needs a re-run.
