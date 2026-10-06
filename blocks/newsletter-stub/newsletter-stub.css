@@ -84,12 +84,14 @@
   position: relative;
 }
 
+/* source .response .success: #419468 on the white box. It is 3.71:1, below AA for 14px text;
+   kept for source parity by decision (SKODA-308, 2026-10-06) */
 .newsletter-stub .newsletter-stub-status {
   position: absolute;
   inset-inline: 0;
   top: 0;
   z-index: 1;
-  color: var(--skoda-ink);
+  color: var(--skoda-green-accent);
   font-size: var(--body-font-size-s);
   font-weight: var(--weight-regular);
 }
@@ -97,6 +99,11 @@
 .newsletter-stub .newsletter-stub-status:not(:empty) {
   padding: var(--spacing-xs) var(--spacing-s);
   background-color: var(--skoda-white);
+}
+
+/* focused after a submit only so focus isn't lost with the button: no ring on a message */
+.newsletter-stub .newsletter-stub-status:focus {
+  outline: none;
 }
 
 /* consent: custom 18px checkbox on a real (accessible) input, label offset 27px */
@@ -355,6 +362,12 @@
   line-height: var(--footer-small-line-height);
 }
 
+/* emerald on the card, as on the source (the footer form's link is its own #419468); it
+   outranks the shared hover rule too */
+.newsletter-stub.card .newsletter-stub-manage a {
+  color: var(--skoda-green-emerald);
+}
+
 /* the source label is inline-block in a 16/24 line, which leaves 3px ((24 - 18) / 2) under
    its last line (the manage link); keep that gap under whichever consent line comes last */
 .newsletter-stub.card .newsletter-stub-form > :is(.newsletter-stub-consent, .newsletter-stub-manage):last-child {
@@ -451,27 +464,17 @@
   margin-top: 10px;
 }
 
-/* stylelint-disable-next-line no-descending-specificity -- a .card rule never matches .topbar */
-.newsletter-stub.topbar .newsletter-stub-error {
-  margin: 0;
-  color: var(--error-color);
-  font-weight: var(--weight-regular);
-}
-
-.newsletter-stub.topbar .newsletter-stub-error:empty {
-  display: none;
-}
-
-.newsletter-stub.topbar .newsletter-stub-status:not(:empty),
-.newsletter-stub.topbar .newsletter-stub-error:not(:empty) {
+.newsletter-stub.topbar .newsletter-stub-status:not(:empty) {
   padding: var(--spacing-xs) var(--spacing-s);
   background-color: var(--skoda-white);
   font-size: var(--body-font-size-s);
   line-height: var(--line-height-body);
 }
 
-.newsletter-stub.topbar .newsletter-stub-error:not(:empty) {
-  margin-bottom: var(--spacing-xs);
+/* sent (source): the message box starts right under the label, over the 25px gap (the label's
+   15px margin + this slot's 10px) and the consent's first line */
+.newsletter-stub.topbar .newsletter-stub-form.is-sent .newsletter-stub-status {
+  top: -25px;
 }
 
 /* block label: no inline-block strut gap under the two consent lines */
@@ -526,10 +529,27 @@
     margin-top: var(--spacing-s);
     font-size: 0.8rem;
   }
+
+  /* the message slot spans the form, as the field does (its box is laid over it) */
+  .newsletter-stub.topbar .newsletter-stub-response {
+    align-self: stretch;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .newsletter-stub .newsletter-stub-submit {
     transition: none;
   }
+}
+
+/* a sent form, every variant (source): the field and the button go, the message box takes
+   their place. Last, so it wins over the variants' display rules */
+.newsletter-stub .newsletter-stub-form.is-sent .newsletter-stub-email,
+.newsletter-stub .newsletter-stub-form.is-sent .newsletter-stub-submit {
+  display: none;
+}
+
+/* the source card keeps its emptied field wrapper (0 0 16px margin) under the message */
+.newsletter-stub.card .newsletter-stub-form.is-sent .newsletter-stub-status {
+  margin-bottom: calc(2 * var(--spacing-m));
 }

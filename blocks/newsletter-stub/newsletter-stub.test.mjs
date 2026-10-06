@@ -73,6 +73,7 @@ test('submit sends nothing: default prevented, message announced, hand-off event
   assert.equal(submit.defaultPrevented, true);
   assert.equal(form.querySelector('[role=status]').textContent, 'Newsletter sign-up will be available soon.');
   assert.deepEqual(detail, { email: 'journalist@example.com', list: '339', language: 'en_GB' });
+  assert.ok(form.classList.contains('is-sent'), 'source: the field and the button give way to the message');
 
   form.querySelector('input[type=email]').dispatchEvent(new Event('input'));
   assert.equal(form.querySelector('[role=status]').textContent, '', 'editing the email clears the message');
@@ -288,26 +289,24 @@ test('topbar: the authored label names the field; consent is shown from the star
   assert.equal(form.querySelector('.newsletter-stub-manage a').textContent, 'Manage subscription');
 });
 
-test('topbar: validated in the block as the card is; valid input sends nothing', () => {
+test('topbar: the browser validates it (source tooltips, no error box); a valid submit sends nothing', () => {
   const block = build(TOPBAR);
   const form = block.querySelector('form');
   const input = form.querySelector('input[type=email]');
-  assert.ok(form.hasAttribute('novalidate'));
+  assert.equal(form.hasAttribute('novalidate'), false, 'native validation, as the source');
+  assert.ok(input.hasAttribute('required'));
+  assert.ok(form.querySelector('input[type=checkbox]').hasAttribute('required'), 'consent required natively');
+  assert.equal(form.querySelector('.newsletter-stub-error'), null, 'no in-form error box');
   let detail = null;
   block.addEventListener('newsletter:subscribe', (e) => { detail = e.detail; });
 
-  input.value = 'not an e-mail';
-  assert.equal(submit(form).defaultPrevented, true);
-  assert.equal(form.querySelector('.newsletter-stub-error').textContent, 'Please enter a valid e-mail address.');
-  assert.equal(input.getAttribute('aria-invalid'), 'true');
-  assert.equal(detail, null);
-
+  // the browser only fires submit for a valid form
   input.value = 'journalist@example.com';
-  submit(form);
-  assert.equal(form.querySelector('input[type=checkbox]').getAttribute('aria-invalid'), 'true', 'consent required');
   form.querySelector('input[type=checkbox]').checked = true;
-  submit(form);
+  assert.equal(submit(form).defaultPrevented, true);
   assert.equal(form.querySelector('[role=status]').textContent, 'Newsletter signup is not available yet');
+  assert.ok(form.classList.contains('is-sent'), 'field + button give way to the message');
+  assert.equal(form.querySelector('[role=status]').tabIndex, -1, 'focusable, so focus moves to it');
   assert.equal(detail.email, 'journalist@example.com');
 });
 

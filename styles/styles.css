@@ -237,10 +237,10 @@
   --checkbox-label-gap: 9px;
   --consent-color: var(--skoda-grey-400);
 
-  /* "Manage subscription" link: brand emerald (9.7:1 on the footer green). Deliberate a11y
-     deviation: the source uses #419468 here, which is only 3.4:1 (fails AA for 16px text); the
-     source's own .light variant of this link is emerald. */
-  --newsletter-manage-color: var(--skoda-green-emerald);
+  /* Media Room footer "Manage subscription" link: the source #419468. It is 3.4:1 on the footer
+     green, below AA for 16px text; kept for source parity by decision (SKODA-308, 2026-10-06),
+     replacing the earlier emerald a11y deviation (9.7:1) */
+  --newsletter-manage-color: var(--skoda-green-accent);
 
   /* breakpoint tokens — for JS / container-query reuse ONLY. CSS custom properties cannot be
      used inside @media conditions, so the literals 768/992/1080 below remain the source of

@@ -131,6 +131,23 @@ then, from 302 / 303 / 304 / 826:
     - The row caret is the source glyph at 16px (14.9 × 8.9), centred in a 24px box, flipped at once when a row opens (live swaps to caret-up U+E00A, its mirror). It was an 8px rotated border.
     - No rule under the last row (Newsletter), as on live.
   - **Load trace (cold, 390 + 1440):** the header and footer each show once, complete, with zero layout shifts.
+- **Footer spacing + newsletter states round (2026-10-06, QA: footer list spacing; the Subscribe error, thank-you and "Manage subscription" views vs live, header and footer).**
+  - **Method:** live's forms were driven with their `wp-json/newsletter` request intercepted in the test browser (mocked replies), so nothing reached the live service.
+  - **Footer columns:** from the 4th column on, ours sat 1.1–2.6px right of live at 1440. The 992–1023 band's `space-evenly` also spread the 14.25% grid's 0.25% leftover between the columns. It now stays at the end: column x 106 / 281 / 456 / 631 / 805.9 / 980.9 / 1155.9, identical to live. Every other footer text (Storyboard + Media Room, 1440 / 390) matched live in position, size and colour.
+  - **Weight 500:** live sets 500 on the footer links, the consent and the pills but has no 500 face, so it renders the 400 face, as ours does. No change.
+  - **Validation (topbar panel):** live adds nothing to the panel. The browser's own tooltip shows on the field ("Please include an '@'…") or on the required consent box. Ours drew a red text box under the form and the panel grew. The topbar form now uses native validation, as the Media Room footer form already did.
+  - **Sent view (all three forms):** live removes the field and the button and shows the message in a white box, 8 / 12px padding, green #419468 14 / 21px, laid over the top of the consent text. Ours kept the field and the button, with ink text.
+    - Now `is-sent` hides them and the box takes their place. Focus moves to the message (`tabindex=-1`), so it isn't lost with the button.
+    - Measured identical to live: panel 550 × 106.2 (box at +19.2, consent +44.2; at 390: 161.4, box +38.4); Media Room form 386 × 117 (box and consent at +10, manage +95); card 343.3 × 206 (consent +69).
+    - The text stays our authored "not available yet" notice (M1 is UI-only, SKODA-904).
+  - **"Manage subscription":** it goes to the live page **in the same tab**, as on live. That's a new `LIVE_SAME_TAB` exception to the SKODA-609 D-3(b) new-tab rule (`scripts/links.js`), also honoured by the footer's outbound-link tagging. The consent document keeps its new tab, as on live.
+  - **Colours, decided for parity (2026-10-06), both below WCAG AA:**
+    - The Media Room footer link is the source #419468 (3.40:1 on #0e3a2f). This replaces the 2026-09-25 emerald deviation; `footer-mediaroom.md` is updated.
+    - The sent message is #419468 on white (3.71:1).
+    - The topbar and card links stay emerald, as on live.
+  - **Consent / manage destinations:** both still point at the live site (`/en/documents/…`, `/en/newsletter-settings/`). The demo doesn't carry those pages (SKODA-609 LIVE_ONLY). They need migrated destinations before a real sign-up (SKODA-904, `newsletter.md` §8).
+  - **Card (SKODA-823) error view unchanged:** live writes its messages into the field in red ("You must provide an e-mail."). The card keeps its described error box (`aria-invalid` / `aria-describedby`), as decided in 823.
+  - **Tests:** `newsletter-stub` 15 (topbar native validation, `is-sent`), `links` (+1, same tab).
 - **Tests:** `header-chrome.test.mjs` (22: search, URL, dropdown keys, hover / focus dismissal, newsletter panel, inline glyphs incl. menu / close / mail). `newsletter-stub.test.mjs` +2 (topbar). `scripts/icons-ready.test.mjs` 3.
   - Header, footer and newsletter tests are green.
   - Blocks / scripts / templates: 536/538. The 2 also fail on `main`:

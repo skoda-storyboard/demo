@@ -16,7 +16,10 @@
  *   language    mailguide language code (kept as data for SKODA-904)
  *
  * `topbar` variant (SKODA-308): the form of the header's "Subscribe to our stories" panel,
- * authored in the nav fragment. Visible label, validated in the block as the card is.
+ * authored in the nav fragment. Visible label; the browser validates it, as the footer form.
+ *
+ * Every variant, once a valid submit is announced, drops the field and the button and shows the
+ * message in their place (the source's sent form, `is-sent`).
  *
  * `card` variant (SKODA-823): the story-sidebar widget (.newsletter-subscribe-widget,
  * docs/ui-specs/newsletter.md §3). Adds an image header and validates in the block, so an
@@ -168,12 +171,10 @@ function cardValidation(cfg, form, input, id) {
 export default function decorate(block) {
   const cfg = readConfig(block);
   const isCard = block.classList.contains('card');
-  // the header's newsletter panel (SKODA-308): a visible label, validated as the card is
-  const isTopbar = block.classList.contains('topbar');
   instance += 1;
   const id = `newsletter-stub-${instance}`;
 
-  // footer: native validation (required email + consent) gates the submit event;
+  // footer + topbar: native validation (required email + consent) gates the submit event;
   // card: validated in the block (see cardValidation)
   const form = el('form', 'newsletter-stub-form');
   const list = text(cfg.list);
@@ -227,7 +228,9 @@ export default function decorate(block) {
     form.append(manage);
   }
 
-  const validate = (isCard || isTopbar) ? cardValidation(cfg, form, input, id) : () => true;
+  // the topbar and footer forms keep the browser's own validation (source: its tooltip on the
+  // field / the consent box, nothing added to the form); the card validates in the block
+  const validate = isCard ? cardValidation(cfg, form, input, id) : () => true;
   if (isCard) {
     // source slides the consent block open once the form is first used, then keeps it open
     form.addEventListener('focusin', () => {
@@ -246,6 +249,11 @@ export default function decorate(block) {
       return;
     }
     status.textContent = message;
+    // source: a sent form drops its field and button and shows the message in their place
+    // (SKODA-308); focus moves to the message so it isn't lost with the button
+    form.classList.add('is-sent');
+    status.tabIndex = -1;
+    status.focus?.({ preventScroll: true });
     block.dispatchEvent(new CustomEvent('newsletter:subscribe', {
       bubbles: true,
       detail: { email: input.value, list, language },

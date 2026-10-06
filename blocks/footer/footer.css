@@ -347,5 +347,9 @@ footer .footer-social .social-icons a.social-instagram:hover {
   footer .footer-nav nav > ul {
     display: grid;
     grid-template-columns: repeat(7, 14.25%);
+
+    /* the leftover stays at the end, not shared between the columns (the band below's
+       space-evenly would push the 7th column 2.6px right at 1440) */
+    justify-content: start;
   }
 }
