@@ -2,6 +2,7 @@
  * Link containment policy (SKODA-609, decision D-3 (b); new-tab parity with SKODA-306).
  * Pure core (policyHref) so node:test and tools/importer/check-dead-links.mjs share it.
  *
+ * - Explicit comparison links marked `data-preserve-href` bypass the runtime policy.
  * - Links to the live source host (`[www.]skoda-storyboard.com`, not `cdn.`) are out of the
  *   demo set by construction (the importer only rewrites allow-listed targets site-relative):
  *   they open in a new tab. Exception: DEMO_LISTINGS (demo entry/listing pages the DA Media
@@ -78,6 +79,7 @@ export function policyHref(href, base) {
 }
 
 function applyTo(a, base) {
+  if (a.hasAttribute('data-preserve-href')) return;
   const result = policyHref(a.getAttribute('href'), base);
   if (!result) return;
   if (result.href !== a.getAttribute('href')) a.setAttribute('href', result.href);

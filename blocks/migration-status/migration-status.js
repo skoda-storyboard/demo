@@ -14,6 +14,7 @@
  * exceptions in plain words, a page finder, then every page grouped by type in <details>. The
  * counts are derived from the rows, so the summary can't disagree with the list. Pages asked
  * for in the demo (Demo = yes: the pages the demo walks through) carry a ⭐.
+ * Source / New comparison links preserve the sheet URLs instead of following demo containment.
  */
 
 import { readBlockConfig } from '../../scripts/aem.js';
@@ -43,7 +44,7 @@ function el(tag, props = {}, ...children) {
 
 function outLink(href, text, label) {
   return el('a', {
-    href, target: '_blank', rel: 'noopener noreferrer', 'aria-label': `${label} (opens in a new tab)`,
+    href, target: '_blank', rel: 'noopener noreferrer', 'data-preserve-href': '', 'aria-label': `${label} (opens in a new tab)`,
   }, text);
 }
 

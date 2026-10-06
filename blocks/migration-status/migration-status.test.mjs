@@ -7,6 +7,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
+import { decorateLinks, installLinkPolicy, DEMO_LISTINGS } from '../../scripts/links.js';
 
 const boot = new JSDOM('', { url: 'https://example.com/drafts/migration-status' });
 globalThis.window = boot.window;
@@ -91,6 +92,36 @@ test('every page is in a collapsed per-type table with a caption and row headers
   assert.match(groups[2].querySelector('tbody tr th').textContent, /\(old address\)/);
 });
 
+test('source and new-site links keep their sheet URLs despite the demo link policy', () => {
+  const rows = [...DEMO_LISTINGS].map((p) => row('Listings', p, p, 'live', {
+    Source: `${SRC}${p}/?model=peaq#gallery`,
+    Migrated: `${NEW}${p}?model=peaq#gallery`,
+    Note: 'Compare both sites.',
+  }));
+  const el = block();
+  render(el, rows);
+  const sources = [...el.querySelectorAll('a[aria-label*="on the source site"]')];
+  const migrated = [...el.querySelectorAll('a[aria-label*="on the new site"]')];
+  const sourceHrefs = rows.map((r) => r.Source);
+  const migratedHrefs = rows.map((r) => r.Migrated);
+
+  decorateLinks(el);
+  decorateLinks(el);
+  assert.deepEqual(sources.map((a) => a.href), [...sourceHrefs, ...sourceHrefs]);
+  assert.deepEqual(migrated.map((a) => a.href), [...migratedHrefs, ...migratedHrefs]);
+
+  installLinkPolicy(document);
+  document.addEventListener('click', (event) => event.preventDefault());
+  [...sources, ...migrated].forEach((a) => {
+    a.dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true }));
+  });
+  assert.deepEqual(sources.map((a) => a.href), [...sourceHrefs, ...sourceHrefs]);
+  assert.deepEqual(migrated.map((a) => a.href), [...migratedHrefs, ...migratedHrefs]);
+  assert.ok([...sources, ...migrated].every((a) => (
+    a.target === '_blank' && a.rel === 'noopener noreferrer'
+  )));
+});
+
 test('the finder filters rows, opens matching groups and announces the count', () => {
   const el = block();
   render(el, ROWS);
@@ -99,7 +130,10 @@ test('the finder filters rows, opens matching groups and announces the count', (
   input.value = 'images';
   input.dispatchEvent(new window.Event('input'));
   const groups = [...el.querySelectorAll('details')];
-  assert.deepEqual(groups.map((d) => [d.hidden, d.open]), [[true, false], [false, true], [true, false]]);
+  assert.deepEqual(
+    groups.map((d) => [d.hidden, d.open]),
+    [[true, false], [false, true], [true, false]],
+  );
   assert.equal(groups[1].querySelectorAll('tbody tr:not([hidden])').length, 1);
   assert.equal(el.querySelector('.migration-status-found').textContent, '1 page found');
   input.value = '';

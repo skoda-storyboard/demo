@@ -1,6 +1,11 @@
+/* global globalThis */
+/* eslint-disable import/no-extraneous-dependencies */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { policyHref, LIVE_ORIGIN } from './links.js';
+import { JSDOM } from 'jsdom';
+import {
+  policyHref, LIVE_ORIGIN, decorateLinks, installLinkPolicy,
+} from './links.js';
 
 const PAGE = 'https://main--demo--skoda-storyboard.aem.page/en/emobility/some-story';
 
@@ -75,4 +80,35 @@ test('the en locale and look-alike paths are not caught by the locale rule', () 
   ['/en', '/en/tag/model/elroq', '/nav', '/footer', '/media-room/nav'].forEach((href) => {
     assert.equal(policyHref(href, PAGE), null, href);
   });
+});
+
+test('explicit comparison links keep their href during decoration and clicks', (t) => {
+  const href = `${LIVE_ORIGIN}/en/images/?model=peaq#gallery`;
+  const dom = new JSDOM(`<main>
+    <a data-preserve-href href="${href}" target="_blank" rel="noopener noreferrer">Source</a>
+    <a href="${href}">Navigation</a>
+  </main>`, { url: PAGE });
+  const previousWindow = globalThis.window;
+  globalThis.window = dom.window;
+  t.after(() => {
+    globalThis.window = previousWindow;
+    dom.window.close();
+  });
+  const { document } = dom.window;
+  const [source, navigation] = document.querySelectorAll('a');
+
+  decorateLinks(document.querySelector('main'));
+  assert.equal(source.getAttribute('href'), href);
+  assert.equal(navigation.getAttribute('href'), '/en/images?model=peaq#gallery');
+
+  installLinkPolicy(document);
+  document.addEventListener('click', (event) => event.preventDefault());
+  navigation.setAttribute('href', href);
+  [source, navigation].forEach((a) => {
+    a.dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true, cancelable: true }));
+  });
+  assert.equal(source.getAttribute('href'), href);
+  assert.equal(source.target, '_blank');
+  assert.equal(source.rel, 'noopener noreferrer');
+  assert.equal(navigation.getAttribute('href'), '/en/images?model=peaq#gallery');
 });

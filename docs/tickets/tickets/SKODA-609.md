@@ -18,6 +18,7 @@ runs on the nav/footer fragments, again after blocks load, and on click as a cat
 
 | Link | Result |
 |---|---|
+| Explicit comparison link (`data-preserve-href`, e.g. migration-status Source / New links) | URL, target and rel stay unchanged during decoration and clicks; Source links always point to the original site |
 | Live host (`[www.]skoda-storyboard.com`) | unchanged, `target=_blank` + `rel="noopener noreferrer"` (D-3 b; SKODA-306) |
 | Live host → demo listing (`DEMO_LISTINGS`: `/en`, `/en/media-room`, `/en/news`, `/en/press-kits`, `/en/images`, `/en/videos`, `/en/series-2`, `/en/search`) | site-relative, same tab, query + hash kept (the DA Media Room nav) |
 | Site-relative → `LIVE_ONLY` (other locales, `/en/skodapedia`, `/en/feed`, `/en/press-releases/feed`, `/en/contacts`, `/en/documents/…`, `/en/newsletter-settings`, `/en/media-cart`, `/direct-download/…`) | absolute to live, new tab. The nav's `/en/category/podcast/` goes to the live `/en/category/podcast-en/` (the source slug) |
