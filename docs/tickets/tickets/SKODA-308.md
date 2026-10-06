@@ -148,6 +148,19 @@ then, from 302 / 303 / 304 / 826:
   - **Consent / manage destinations:** both still point at the live site (`/en/documents/…`, `/en/newsletter-settings/`). The demo doesn't carry those pages (SKODA-609 LIVE_ONLY). They need migrated destinations before a real sign-up (SKODA-904, `newsletter.md` §8).
   - **Card (SKODA-823) error view unchanged:** live writes its messages into the field in red ("You must provide an e-mail."). The card keeps its described error box (`aria-invalid` / `aria-describedby`), as decided in 823.
   - **Tests:** `newsletter-stub` 15 (topbar native validation, `is-sent`), `links` (+1, same tab).
+- **Footer list gaps at display scaling (2026-10-06, QA: the space between Models, Fabia… is not as on live).**
+  - **The footer is identical to live:** same boxes, the same 31px pitch at 992–1920, and 0 differing pixels at 1× and 2×.
+  - **But at in-between scaling** (110 / 125 / 150%, Windows laptops or browser zoom) the line gaps rounded differently: at 125% live drew 39, 38, 39, 39… and ours 38, 39, 39, 39…
+  - **Cause:** the page above the footer was 0.765px shorter on ours, so every footer line had another sub-pixel phase. The home hero (`promo-box`, SKODA-213 / 611) was the source of it:
+    - Live's big card is 16:9 + 10px tall, which sets the box: 812 × 466.75 at 1440, 662.66 × 382.73 at 1024, 492 × 286.75 at 768.
+    - It also keeps the column's 8px start inset.
+    - Ours took the two small cards' height (466 / 382 / 286), and the big card was 8px wider (x0 vs live's x8 in the 1248 box).
+  - **Fixed (decided to do it here, 2026-10-06):** the big card is now `content-box` 16:9 with 10px bottom padding and margins of 8 / 12px. Image and caption cover the padding too; the caption stays 84 / 16px from the bottom, as on live. The 2nd grid row takes the extra, so the 3rd card stays at y241. An in-flow toolbar (the Media Room home's pill cards) is pulled into the padding, so its pill stays 12px from the bottom, level with the small cards'. The single-card case stays plain 16:9.
+    - Review: both homes (Storyboard + Media Room) match live at 1440 / 1024 / 768 / 390: card boxes, caption 29.6 / 35.52 white and summary 16 / 20, caption gaps, 16px row gap. Keyboard focus rings the full big card.
+    - The hero now equals live at 768–1920. 390 was already equal.
+    - The footer starts at 3904.141 vs live's 3904.156 (was 3903.39).
+    - The footer gaps now render identically at 1, 1.1, 1.25, 1.5 and 1.75×.
+  - **Other pages** can carry their own sub-pixel height differences above the footer. They show only at in-between scaling and belong to the blocks on those pages. The Epiq story's footer box positions measured equal to live.
 - **Tests:** `header-chrome.test.mjs` (22: search, URL, dropdown keys, hover / focus dismissal, newsletter panel, inline glyphs incl. menu / close / mail). `newsletter-stub.test.mjs` +2 (topbar). `scripts/icons-ready.test.mjs` 3.
   - Header, footer and newsletter tests are green.
   - Blocks / scripts / templates: 536/538. The 2 also fail on `main`:
