@@ -15,6 +15,9 @@
  *   list        mailguide list id (kept as data for SKODA-904)
  *   language    mailguide language code (kept as data for SKODA-904)
  *
+ * `topbar` variant (SKODA-308): the form of the header's "Subscribe to our stories" panel,
+ * authored in the nav fragment. Visible label, validated in the block as the card is.
+ *
  * `card` variant (SKODA-823): the story-sidebar widget (.newsletter-subscribe-widget,
  * docs/ui-specs/newsletter.md §3). Adds an image header and validates in the block, so an
  * invalid e-mail or unchecked consent shows a visible, described error. Consent stays hidden
@@ -165,6 +168,8 @@ function cardValidation(cfg, form, input, id) {
 export default function decorate(block) {
   const cfg = readConfig(block);
   const isCard = block.classList.contains('card');
+  // the header's newsletter panel (SKODA-308): a visible label, validated as the card is
+  const isTopbar = block.classList.contains('topbar');
   instance += 1;
   const id = `newsletter-stub-${instance}`;
 
@@ -222,7 +227,7 @@ export default function decorate(block) {
     form.append(manage);
   }
 
-  const validate = isCard ? cardValidation(cfg, form, input, id) : () => true;
+  const validate = (isCard || isTopbar) ? cardValidation(cfg, form, input, id) : () => true;
   if (isCard) {
     // source slides the consent block open once the form is first used, then keeps it open
     form.addEventListener('focusin', () => {

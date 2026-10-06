@@ -15,6 +15,19 @@
  * ========================================================================== */
 
 header .nav-wrapper {
+  /* SKODA-308, measured on the source header (1440 / 390) */
+  --nav-logo-inset: 16px; /* wordmark inset: a.logo padding-left */
+  --nav-brand-width: 256px; /* a.logo box (16 + 194 wordmark + 46) */
+  --nav-brand-min: 210px; /* the box shrinks to the wordmark at 1080–1118 so the row fits */
+  --nav-logo-height: 48px;
+  --nav-search-slot: 48px; /* .search-bar */
+  --nav-search-toggle: 41px;
+  --nav-search-bar-width: 624px;
+  --nav-search-scope-width: 84px;
+  --nav-drop-chevron-space: 44px; /* dropdown trigger end padding */
+  --nav-tab-padding: 21px;
+  --nav-newsletter-width: 550px; /* the panel's form (source label max-width / field + pill) */
+
   position: relative;
   width: 100%;
   background-color: var(--background-color);
@@ -22,6 +35,8 @@ header .nav-wrapper {
 }
 
 /* --- Main nav row (generic element rules first, ascending specificity) ------ */
+
+/* the row sits on the page gutter, as the content (SKODA-826 handover) */
 header nav {
   box-sizing: border-box;
   display: grid;
@@ -33,7 +48,7 @@ header nav {
   max-width: var(--content-max-width);
   height: var(--nav-main-height);
   margin: auto;
-  padding: 0 var(--spacing-l);
+  padding: 0 var(--page-gutter);
   font-family: var(--body-font-family);
 }
 
@@ -44,7 +59,7 @@ header nav .nav-mobile-tools {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-right: calc(-1 * var(--spacing-l));
+  margin-right: calc(-1 * var(--page-gutter));
 }
 
 header nav .nav-mail {
@@ -116,16 +131,19 @@ header .nav-topbar-utility {
   font-size: var(--body-font-size-2xs);
 }
 
+/* --skoda-grey-700, as the language links (SKODA-303): 5.45:1 on the #e6e6e6 bar; the source
+   #7c7d7e is 3.3:1 there, failing AA for this 12px text (SKODA-308) */
 header .nav-topbar .nav-topbar-utility a {
-  color: var(--skoda-grey-500);
+  color: var(--skoda-grey-700);
   text-decoration: none;
 }
 
-/* Subscribe CTA: mail icon inline before the label */
+/* Subscribe CTA: mail icon inline before the label; source 12/600 (link or panel button) */
 header .nav-topbar .nav-subscribe {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
+  font-weight: var(--weight-semibold);
 }
 
 header .nav-topbar .nav-subscribe .icon-mail,
@@ -211,15 +229,17 @@ header .nav-section-switcher li {
   margin: 0;
 }
 
+/* source tab: 21px inline padding, 14/600 with 0.28px tracking (Stories 90, Media Room 125 wide) */
 header .nav-section-switcher li a {
   display: flex;
   flex: 1;
   align-items: center;
   justify-content: center;
-  padding: 0 var(--spacing-l);
+  padding: 0 var(--nav-tab-padding);
   color: var(--skoda-grey-500);
-  font-size: var(--body-font-size-xs);
+  font-size: var(--body-font-size-s);
   font-weight: var(--weight-semibold);
+  letter-spacing: 0.02em;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -325,6 +345,16 @@ header .nav-brand p {
   line-height: 0;
 }
 
+/* source a.logo: a 48px link box; on phones the source bar has no gutter, so the wordmark
+   sits 16px from the viewport edge (6px inside our 10px gutter), 16px inside it from 1080 */
+header .nav-brand .nav-brand-logo {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  height: var(--nav-logo-height);
+  padding-left: calc(var(--nav-logo-inset) - var(--page-gutter));
+}
+
 header .nav-brand .icon-skoda-storyboard-logo,
 header .nav-brand .icon-skoda-storyboard-logo img {
   width: 194px;
@@ -370,98 +400,116 @@ header nav .nav-tools p {
   line-height: 0;
 }
 
-header nav .nav-tools .icon {
-  width: 24px;
-  height: 24px;
-}
-
-/* search: click-to-expand pill (leading icon + input; overlays left, no reflow) */
+/* search (source .search-bar, SKODA-308): a search button that opens a bar, the scope select
+   and a pill field, over the menu; while open the button is the bar's ✕. In the drawer the
+   pill is a static row (below). Icons are CSS masks in the text colour. */
 header nav .nav-search {
-  display: flex;
   position: relative;
-  align-items: center;
-  justify-content: flex-end;
-  width: 24px;
 }
 
-/* the pill field: collapsed = just the round icon button; open = full pill */
+header nav .nav-search-bar {
+  display: flex;
+  align-items: center;
+}
+
+/* the scope select (desktop only, see the desktop band) */
+header nav .nav-search-scope {
+  display: none;
+}
+
+/* the pill: decorative leading icon + input (source input: #f1f1f1, 200px radius, 48px pad) */
 header nav .nav-search-field {
   box-sizing: border-box;
   display: flex;
-  position: absolute;
-  top: 50%;
-  right: 0;
+  position: relative;
+  flex: 1 1 auto;
   align-items: center;
-  width: 3em;
+  min-width: 0;
   height: 3em;
   border-radius: 200px;
-  background: transparent;
+  background-color: var(--dropdown-hover-bg);
+}
+
+header nav .nav-search-field:focus-within {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+header nav .nav-search-icon {
+  position: absolute;
+  top: 50%;
+  left: var(--spacing-m);
+  width: var(--spacing-l);
+  height: var(--spacing-l);
+  background-color: var(--skoda-grey-750);
   transform: translateY(-50%);
-  overflow: hidden;
-  transition: width 0.3s ease, background-color 0.2s ease;
-}
-
-/* open width = the source's search input: its bar is min(624px, 50vw) less
-   the 84px Stories/News type select we don't have → 540px from 1248px,
-   456px at 1080 */
-header nav .nav-search.nav-search-open .nav-search-field {
-  width: min(540px, calc(50vw - 84px));
-  background: var(--dropdown-hover-bg);
-}
-
-/* leading search icon (also the toggle when collapsed) */
-header nav .nav-search-toggle {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 3em;
-  height: 3em;
-  margin: 0;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-}
-
-header nav .nav-search-toggle .icon,
-header nav .nav-search-toggle .icon img {
-  width: 24px;
-  height: 24px;
+  mask: url('../../icons/search.svg') center / 80% no-repeat;
+  pointer-events: none;
 }
 
 header nav .nav-search-input {
+  box-sizing: border-box;
   flex: 1 1 auto;
   width: 0;
   min-width: 0;
   height: 100%;
   border: 0;
-  padding: 0 var(--spacing-m) 0 0;
+  border-radius: inherit;
+  padding: 0 var(--spacing-m) 0 calc(var(--spacing-m) + var(--spacing-l) + var(--spacing-xs));
   background: transparent;
   color: var(--skoda-ink);
   font-size: var(--body-font-size-m); /* 16px, as the source input */
-  opacity: 0;
-  transition: opacity 0.2s ease;
 }
 
-header nav .nav-search.nav-search-open .nav-search-input {
-  opacity: 1;
-}
-
+/* the pill draws the focus ring */
 header nav .nav-search-input:focus-visible {
   outline: none;
 }
 
-/*
- * Placeholder stays visible when the pill expands and fades IN with the input
- * (the input's opacity 0->1 transition carries the placeholder). It disappears
- * on its own once the user types (native behaviour). Do NOT hide it on :focus —
- * the toggle auto-focuses the input, which would erase the placeholder instantly.
- */
+/* source placeholder #464748 (8.6:1 on the pill) */
 header nav .nav-search-input::placeholder {
-  color: var(--skoda-grey-500);
+  color: var(--skoda-grey-750);
   opacity: 1;
+}
+
+/* the search button: a 24px magnifier, the 19.2px grey ✕ while the bar is open (source glyphs) */
+header nav .nav-search-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: var(--nav-search-toggle);
+  height: var(--nav-search-toggle);
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background: transparent;
+  color: var(--skoda-ink);
+  cursor: pointer;
+}
+
+header nav .nav-search-toggle::before {
+  content: '';
+  width: var(--spacing-l);
+  height: var(--spacing-l);
+  background-color: currentcolor;
+  mask: url('../../icons/search.svg') center / contain no-repeat;
+}
+
+header nav .nav-search.nav-search-open .nav-search-toggle {
+  color: var(--skoda-grey-750);
+}
+
+header nav .nav-search.nav-search-open .nav-search-toggle::before {
+  width: 19.2px;
+  height: 19.2px;
+  mask-image: url('../../icons/lightbox-close.svg');
+}
+
+header nav .nav-search-toggle:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 0;
 }
 
 /* live suggestion dropdown (SKODA-403; shared /scripts/search-suggest.js).
@@ -615,7 +663,7 @@ header nav .nav-search .search-suggest-meta {
     grid-column: 1 / -1;
     display: flex;
     justify-content: flex-end;
-    margin: auto calc(-1 * var(--spacing-l)) 0;
+    margin: auto calc(-1 * var(--page-gutter)) 0;
     padding: 0 var(--spacing-m) var(--spacing-l) var(--spacing-l);
     font-size: var(--body-font-size-m);
   }
@@ -645,7 +693,7 @@ header nav .nav-search .search-suggest-meta {
   header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul {
     display: flex;
     flex-direction: column;
-    margin: 0 calc(-1 * var(--spacing-l));
+    margin: 0 calc(-1 * var(--page-gutter));
     font-size: var(--heading-font-size-s);
   }
 
@@ -745,36 +793,14 @@ header nav .nav-search .search-suggest-meta {
   /* source .search-bar: a 64px row, the 48px pill 24px from the left and 16px from the right */
   header nav[aria-expanded='true'] .nav-tools {
     display: block;
-    margin-right: calc(var(--spacing-m) - var(--spacing-l));
+    margin: 0 calc(var(--spacing-m) - var(--page-gutter)) 0 calc(var(--spacing-l) - var(--page-gutter));
     padding: var(--spacing-xs) 0;
   }
 
-  /* positioned so the suggestion overlay anchors to the field */
-  header nav[aria-expanded='true'] .nav-search {
-    position: relative;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  /* static pill, always open, full column width (source: 335px @375) */
-  header nav[aria-expanded='true'] .nav-search-field {
-    position: static;
-    width: 100%;
-    height: 3em;
-    background: var(--dropdown-hover-bg);
-    transform: none;
-  }
-
-  header nav[aria-expanded='true'] .nav-search-input {
-    width: auto;
-    opacity: 1;
-  }
-
-  /* drawer: keep the pill full width (the desktop open width would shrink it) */
-  header nav[aria-expanded='true'] .nav-search.nav-search-open .nav-search-field {
-    width: 100%;
+  /* the drawer row is the pill alone, always open at the column width (source: 335px @375):
+     no scope select and no open / close button */
+  header nav[aria-expanded='true'] .nav-search-toggle {
+    display: none;
   }
 
   /* drawer: suggestions overlay the menu directly under the field, at the
@@ -807,11 +833,33 @@ header nav .nav-search .search-suggest-meta {
  * dropdowns. The section switcher collapses to a left-aligned auto-width pair.
  * ========================================================================== */
 @media (width >= 1080px) {
-  /* main nav becomes a single horizontal row: brand | menu | search */
+  /* main nav becomes a single horizontal row: brand | menu, the search slot pinned on the
+     right. The source's menu follows the 256px logo box with no gap (x362 @1440). It wraps
+     onto a second row where it doesn't fit (1080–1128): here the logo box gives way first
+     (to the wordmark, --nav-brand-min) so the row fits and the header keeps its reserved
+     108px. Wrapping stays as the fallback for a longer authored menu. */
   header nav {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 0 var(--spacing-l);
+    gap: 0;
+    height: auto;
+    min-height: var(--nav-main-height);
+  }
+
+  header .nav-brand {
+    flex: 1 0 var(--nav-brand-min);
+    max-width: var(--nav-brand-width);
+  }
+
+  header .nav-brand > div,
+  header .nav-brand p {
+    width: 100%;
+  }
+
+  header .nav-brand .nav-brand-logo {
+    width: 100%;
+    padding-left: var(--nav-logo-inset);
   }
 
   /* desktop nav is never the full-height drawer even when aria-expanded is set */
@@ -839,8 +887,9 @@ header nav .nav-search .search-suggest-meta {
     margin-left: auto;
   }
 
-  /* Subscribe → the language switcher: 30px on the source, the flex gap included */
-  header .nav-topbar-utility + .nav-topbar-utility {
+  /* Subscribe → the language switcher: 30px on the source, the flex gap included (`~`: the
+     newsletter panel, positioned out of the flow, may sit between them) */
+  header .nav-topbar-utility ~ .nav-topbar-utility {
     margin-left: calc(30px - var(--spacing-m));
   }
 
@@ -853,10 +902,6 @@ header nav .nav-search .search-suggest-meta {
     flex: 0 0 auto;
   }
 
-  header .nav-section-switcher li a {
-    font-size: var(--body-font-size-s);
-  }
-
   header nav .nav-mobile-tools {
     display: none;
     visibility: hidden;
@@ -864,6 +909,7 @@ header nav .nav-search .search-suggest-meta {
 
   header nav .nav-sections {
     display: block;
+    flex: 0 0 auto;
     visibility: visible;
     white-space: nowrap;
   }
@@ -872,15 +918,19 @@ header nav .nav-search .search-suggest-meta {
     align-self: unset;
   }
 
+  /* the end padding keeps the menu clear of the search slot where the slot reaches into the
+     content box (below 1268px, where there is no page margin for it) */
   header nav .nav-sections .default-content-wrapper > ul {
     display: flex;
     gap: 0;
-    padding-right: 4rem; /* reserve the search-icon slot */
+    padding-right: calc(var(--nav-search-slot) - var(--page-gutter));
   }
 
+  /* no global li rhythm: the source items are exactly the 64px row (the panels open at y108) */
   header nav .nav-sections .default-content-wrapper > ul > li {
     position: relative;
     flex: 0 1 auto;
+    margin: 0;
   }
 
   /* Newsletter is drawer-only on desktop */
@@ -888,6 +938,7 @@ header nav .nav-search .search-suggest-meta {
     display: none;
   }
 
+  /* source item: 16/24 with 0.032px (0.002em) tracking, 20px padding */
   header nav .nav-sections .default-content-wrapper > ul > li > a,
   header nav .nav-sections .default-content-wrapper > ul > li > p > a {
     display: flex;
@@ -896,16 +947,18 @@ header nav .nav-search .search-suggest-meta {
     padding: 0 20px;
     color: var(--skoda-ink);
     font-size: var(--body-font-size-m);
+    letter-spacing: 0.002em;
     line-height: 1.5;
     text-decoration: none;
   }
 
-  /* animated 2px ink underline on hover (source treatment, no color swap) */
+  /* animated 2px ink underline on hover (source treatment, no color swap): under the label
+     only, 17px above the row's bottom */
   header nav .nav-sections .default-content-wrapper > ul > li > a::before,
   header nav .nav-sections .default-content-wrapper > ul > li > p > a::before {
     content: '';
     position: absolute;
-    bottom: 18px;
+    bottom: 17px;
     left: 20px;
     width: 0;
     height: 2px;
@@ -918,13 +971,15 @@ header nav .nav-search .search-suggest-meta {
     width: calc(100% - 40px);
   }
 
-  /* dropdown panel — single-column list, opens on hover/focus/active */
+  /* dropdown panel — single-column list as wide as its menu item (source: Models 116px, long
+     labels wrap, e.g. "Classic Cars"), opens on hover / focus / Space; Escape dismisses it
+     while focus stays (data-dismissed) */
   header nav .nav-sections .default-content-wrapper > ul > li > ul {
     display: block;
     position: absolute;
     top: 100%;
     left: 0;
-    min-width: 100%;
+    width: 100%;
     max-height: 0;
     padding: 0;
     background-color: var(--skoda-white);
@@ -936,8 +991,8 @@ header nav .nav-search .search-suggest-meta {
     transition: opacity 0.1s ease-in-out;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li:hover > ul,
-  header nav .nav-sections .default-content-wrapper > ul > li:focus-within > ul,
+  header nav .nav-sections .default-content-wrapper > ul > li:hover:not([data-dismissed]) > ul,
+  header nav .nav-sections .default-content-wrapper > ul > li:focus-within:not([data-dismissed]) > ul,
   header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] > ul {
     max-height: 999em;
     opacity: 1;
@@ -945,19 +1000,24 @@ header nav .nav-search .search-suggest-meta {
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li > ul > li {
+    margin: 0;
     font-weight: var(--weight-regular);
   }
 
+  /* source rows: 12px 24px padding, 16/24 → 48px a line (72px when a label wraps between
+     words); a single word never breaks (the source lets "Concepts" overhang its 68px by
+     0.2px rather than split it) */
   header nav .nav-sections .default-content-wrapper > ul > li > ul > li > a {
     box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    height: 48px;
+    display: block;
     padding: var(--spacing-s) var(--spacing-l);
     color: var(--skoda-ink);
     font-size: var(--body-font-size-m);
+    letter-spacing: 0.002em;
+    line-height: var(--spacing-l);
     text-decoration: none;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: normal;
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li > ul > li > a:hover {
@@ -969,9 +1029,10 @@ header nav .nav-search .search-suggest-meta {
     cursor: pointer;
   }
 
+  /* source trigger: 20px start / 44px end padding, the chevron centred 29px from the end */
   header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > a,
   header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > p > a {
-    padding-right: 52px;
+    padding-right: var(--nav-drop-chevron-space);
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li.nav-drop > a::after,
@@ -979,13 +1040,210 @@ header nav .nav-search .search-suggest-meta {
     content: '';
     position: absolute;
     top: calc(50% - 4px);
-    right: 16px;
+    right: 25px;
     width: 6px;
     height: 6px;
     border: 2px solid currentcolor;
     border-width: 2px 2px 0 0;
     border-radius: 0 1px 0 0;
     transform: rotate(135deg);
+  }
+
+  header nav .nav-sections .default-content-wrapper > ul > li.nav-drop:hover > a::before,
+  header nav .nav-sections .default-content-wrapper > ul > li.nav-drop:hover > p > a::before {
+    width: calc(100% - 20px - var(--nav-drop-chevron-space));
+  }
+
+  /* the search slot (source .search-bar, 48 x 64) on the row's right end, 10px into the page
+     margin where there is one (1354 @1440, 1274 @1280), at the viewport edge below 1268px.
+     Positioned on the full-width .nav-wrapper (the nav itself is not positioned). */
+  header nav .nav-tools {
+    position: absolute;
+    right: max(0px, (100% - var(--content-max-width)) / 2 - var(--page-gutter));
+    align-self: flex-start;
+    width: var(--nav-search-slot);
+    height: var(--nav-main-height);
+  }
+
+  header nav .nav-search {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* the 41px button, centred in the slot (1310,56 @1440) and above the open bar */
+  header nav .nav-search-toggle {
+    position: absolute;
+    top: calc((var(--nav-main-height) - var(--nav-search-toggle)) / 2);
+    right: calc((var(--nav-search-slot) - var(--nav-search-toggle)) / 2);
+    z-index: 1;
+  }
+
+  /* the open bar (source .search-bar.expanded): 624px, half the viewport below 1248, white,
+     over the menu, ending on the slot's right edge: the 84px scope select + the pill */
+  header nav .nav-search-bar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: min(var(--nav-search-bar-width), 50vw);
+    height: var(--nav-main-height);
+    background-color: var(--background-color);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+  }
+
+  header nav .nav-search.nav-search-open .nav-search-bar {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  /* the ✕ sits inside the pill's end, so its text stops before it */
+  header nav .nav-search-input {
+    padding-right: var(--nav-search-slot);
+  }
+
+  /* scope select: source 84 x 48, 16px ink, 16px start / 32px end padding, chevron 9px in */
+  header nav .nav-search-scope {
+    display: block;
+    position: relative;
+    flex: 0 0 var(--nav-search-scope-width);
+    height: 3em;
+    color: var(--skoda-ink);
+  }
+
+  header nav .nav-search-scope::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 9px;
+    width: 12px;
+    height: 12px;
+    background-color: currentcolor;
+    transform: translateY(-50%) rotate(180deg);
+    mask: url('../../icons/chevron-up.svg') center / contain no-repeat;
+    pointer-events: none;
+  }
+
+  header nav .nav-search-type {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    padding: 0 var(--spacing-xl) 0 var(--spacing-m);
+    appearance: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--body-font-size-m);
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+
+  header nav .nav-search-type:focus-visible {
+    outline: 2px solid var(--skoda-ink);
+    outline-offset: -2px;
+  }
+
+  /* the suggestions open under the pill (source .suggest-container at y100 @1440); the slot's
+     content has no height of its own (all of it is positioned), so this is from its top */
+  header nav .nav-search .search-suggest {
+    top: calc(var(--nav-main-height) - var(--spacing-xs));
+  }
+}
+
+/* --- Newsletter panel (SKODA-308) ----------------------------------------------------------
+   The source's "Subscribe to our stories" dropdown (.topbar__dropdown__newsletter): flat dark
+   green (no radius / shadow) under the topbar, 25.6 / 38.4px padding, a white 25.6px ✕ 12.8px
+   in. Phones: the full width, over the nav row (390 x 311 @390); from 1080 the 550px form,
+   16.5% from the right (575.6 → 1202.4 @1440). The form is the nav fragment's Newsletter Stub
+   (topbar) block. Its triggers: the topbar Subscribe CTA and the phone mail shortcut. */
+header .nav-topbar button.nav-subscribe,
+header nav button.nav-mail {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* after the reset's `font: inherit`: the CTA's 600 */
+header .nav-topbar button.nav-subscribe {
+  position: relative;
+  color: var(--skoda-grey-700);
+  font-weight: var(--weight-semibold);
+}
+
+/* source .newsletter-button__active: a 2px ink bar under the open trigger */
+header .nav-topbar button.nav-subscribe[aria-expanded='true']::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -2px;
+  left: 0;
+  height: 2px;
+  background-color: var(--skoda-ink);
+}
+
+header .nav-topbar button.nav-subscribe:focus-visible,
+header nav button.nav-mail:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+header .nav-newsletter-panel {
+  position: absolute;
+  top: var(--nav-topbar-height);
+  inset-inline: 0;
+  z-index: 2;
+  box-sizing: border-box;
+  padding: 1.6em 2.4em;
+  background-color: var(--skoda-green);
+  color: var(--skoda-white);
+  font-size: var(--body-font-size-m);
+}
+
+header .nav-newsletter-panel[hidden] {
+  display: none;
+}
+
+header .nav-newsletter-close {
+  position: absolute;
+  top: 0.8em;
+  right: 0.8em;
+  width: 1.6em;
+  height: 1.6em;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--skoda-white);
+  cursor: pointer;
+}
+
+header .nav-newsletter-close::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: currentcolor;
+  mask: url('../../icons/lightbox-close.svg') center / contain no-repeat;
+}
+
+header .nav-newsletter-close:focus-visible {
+  outline: 2px solid var(--skoda-white);
+  outline-offset: 2px;
+}
+
+@media (width >= 1080px) {
+  header .nav-newsletter-panel {
+    right: 16.5%;
+    left: auto;
+    width: calc(var(--nav-newsletter-width) + 4.8em);
   }
 }
 

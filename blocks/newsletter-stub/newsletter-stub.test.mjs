@@ -261,6 +261,56 @@ test('card: error messages are authorable', () => {
   assert.equal(form.querySelector('.newsletter-stub-error').textContent, 'Potvrďte souhlas.');
 });
 
+// ---- topbar variant (SKODA-308, the header's newsletter panel) ----
+
+const TOPBAR = `
+<div class="newsletter-stub topbar">
+  <div><div>label</div><div>Subscribe to our stories, so you don't miss out on anything:</div></div>
+  <div><div>placeholder</div><div>Enter your email address</div></div>
+  <div><div>button</div><div>Subscribe</div></div>
+  <div><div>consent</div><div>Hereby I give my <a href="/en/documents/consent/">consent to the processing</a> of my personal data.</div></div>
+  <div><div>manage</div><div><a href="/en/newsletter-settings/">Manage subscription</a></div></div>
+  <div><div>message</div><div>Newsletter signup is not available yet</div></div>
+</div>`;
+
+test('topbar: the authored label names the field; consent is shown from the start (no slide)', () => {
+  const block = build(TOPBAR);
+  const form = block.querySelector('form');
+  const input = form.querySelector('input[type=email]');
+  const label = form.querySelector('.newsletter-stub-label');
+  assert.equal(label.getAttribute('for'), input.id);
+  assert.equal(label.textContent, "Subscribe to our stories, so you don't miss out on anything:");
+  assert.equal(input.getAttribute('placeholder'), 'Enter your email address');
+  assert.equal(block.querySelector('.newsletter-stub-header'), null, 'no card header');
+  form.dispatchEvent(new Event('focusin', { bubbles: true }));
+  assert.equal(form.classList.contains('is-expanded'), false, 'no first-focus reveal (card only)');
+  assert.ok(form.querySelector('.newsletter-stub-consent a'));
+  assert.equal(form.querySelector('.newsletter-stub-manage a').textContent, 'Manage subscription');
+});
+
+test('topbar: validated in the block as the card is; valid input sends nothing', () => {
+  const block = build(TOPBAR);
+  const form = block.querySelector('form');
+  const input = form.querySelector('input[type=email]');
+  assert.ok(form.hasAttribute('novalidate'));
+  let detail = null;
+  block.addEventListener('newsletter:subscribe', (e) => { detail = e.detail; });
+
+  input.value = 'not an e-mail';
+  assert.equal(submit(form).defaultPrevented, true);
+  assert.equal(form.querySelector('.newsletter-stub-error').textContent, 'Please enter a valid e-mail address.');
+  assert.equal(input.getAttribute('aria-invalid'), 'true');
+  assert.equal(detail, null);
+
+  input.value = 'journalist@example.com';
+  submit(form);
+  assert.equal(form.querySelector('input[type=checkbox]').getAttribute('aria-invalid'), 'true', 'consent required');
+  form.querySelector('input[type=checkbox]').checked = true;
+  submit(form);
+  assert.equal(form.querySelector('[role=status]').textContent, 'Newsletter signup is not available yet');
+  assert.equal(detail.email, 'journalist@example.com');
+});
+
 test('keys are case-insensitive and malformed rows are skipped', () => {
   const block = build(`
 <div class="newsletter-stub">
