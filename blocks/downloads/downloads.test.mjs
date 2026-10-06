@@ -134,7 +134,7 @@ test('media-box collapses whenever the items need more than two rows (source tog
   for (let i = 0; i < 8; i += 1) addRow(eight, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
   await decorate(eight);
   const toggle = eight.querySelector('.downloads-more');
-  const visible = () => [...eight.querySelectorAll('.downloads-item')].filter((tile) => !tile.hidden).length;
+  const visible = () => [...eight.querySelectorAll('.downloads-item')].filter((tile) => !tile.hasAttribute('inert')).length;
   assert.equal(toggle.hidden, false, '375: one column');
   assert.equal(visible(), 2);
   window.setViewport(520);
@@ -184,7 +184,7 @@ test('large media-box variant discloses two rows across widths and authored colu
   assert.equal(toggle.textContent, 'Show more');
   assert.equal(toggle.getAttribute('aria-expanded'), 'false');
   assert.equal(toggle.getAttribute('aria-controls'), large.querySelector('.downloads-items').id);
-  const visible = () => [...large.querySelectorAll('.downloads-item')].filter((tile) => !tile.hidden).length;
+  const visible = () => [...large.querySelectorAll('.downloads-item')].filter((tile) => !tile.hasAttribute('inert')).length;
   assert.equal(visible(), 2);
   window.setViewport(520);
   assert.equal(visible(), 4);
@@ -216,7 +216,7 @@ test('explicit variant and collapse setting let authors opt in or out without a 
   await decorate(variant);
   assert.equal(variant.querySelector('.downloads-more').hidden, false);
   window.setViewport(992);
-  assert.equal([...variant.querySelectorAll('.downloads-item')].filter((tile) => tile.hidden).length, 1);
+  assert.equal([...variant.querySelectorAll('.downloads-item')].filter((tile) => tile.hasAttribute('inert')).length, 1);
 
   const disabled = setup();
   addConfig(disabled, 'collapse', 'none');
@@ -228,7 +228,7 @@ test('explicit variant and collapse setting let authors opt in or out without a 
   addConfig(optedIn, 'collapse', 'auto');
   for (let i = 0; i < 9; i += 1) addRow(optedIn, { title: `File ${i}`, links: [['PDF', `/file${i}.pdf`]] });
   await decorate(optedIn);
-  assert.equal([...optedIn.querySelectorAll('.downloads-item')].filter((tile) => !tile.hidden).length, 2);
+  assert.equal([...optedIn.querySelectorAll('.downloads-item')].filter((tile) => !tile.hasAttribute('inert')).length, 2);
 });
 
 test('disclosure disappears when a configured wide grid fits every item', async () => {
@@ -239,10 +239,61 @@ test('disclosure disappears when a configured wide grid fits every item', async 
   assert.equal(block.querySelector('.downloads-more').hidden, false);
   window.setViewport(992);
   assert.equal(block.querySelector('.downloads-more').hidden, true);
-  assert.equal([...block.querySelectorAll('.downloads-item')].filter((tile) => tile.hidden).length, 0);
+  assert.equal([...block.querySelectorAll('.downloads-item')].filter((tile) => tile.hasAttribute('inert')).length, 0);
   window.setViewport(500);
   assert.equal(block.querySelector('.downloads-more').hidden, false);
-  assert.equal([...block.querySelectorAll('.downloads-item')].filter((tile) => tile.hidden).length, 7);
+  assert.equal([...block.querySelectorAll('.downloads-item')].filter((tile) => tile.hasAttribute('inert')).length, 7);
+});
+
+test('collapsed: the list is clipped to the measured two rows (row 3 peeks), clipped tiles are inert', async () => {
+  const block = setup();
+  window.setViewport(1440); // four columns
+  const observed = [];
+  let onResize;
+  window.ResizeObserver = class {
+    constructor(callback) { onResize = callback; }
+
+    observe(el) { observed.push(el); }
+  };
+  for (let i = 0; i < 13; i += 1) addRow(block, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
+  await decorate(block);
+  delete window.ResizeObserver;
+  const list = block.querySelector('.downloads-items');
+  const tiles = [...list.children];
+  const toggle = block.querySelector('.downloads-more');
+  const inert = () => tiles.map((tile, i) => (tile.hasAttribute('inert') ? i : null)).filter((i) => i !== null);
+  assert.equal(observed.length, 13, 'every tile is observed');
+  assert.ok(block.classList.contains('downloads-collapsed'));
+  assert.deepEqual(inert(), [8, 9, 10, 11, 12], 'rows 3+ are inert');
+  assert.equal(tiles.filter((tile) => tile.hidden).length, 0, 'nothing is display:none (row 3 peeks)');
+  assert.equal(list.style.getPropertyValue('--dl-rows-height'), '', 'not laid out yet: unclipped');
+
+  // the section shows: 305.13px tiles in 20px-gap rows from y=100, so two rows end at 630.25
+  const rect = (top, bottom) => ({ top, bottom });
+  list.getBoundingClientRect = () => rect(100, 1400);
+  tiles.forEach((tile, i) => {
+    const top = 100 + Math.floor(i / 4) * 325.125;
+    tile.getBoundingClientRect = () => rect(top, top + 305.125);
+  });
+  onResize([]);
+  assert.equal(list.style.getPropertyValue('--dl-rows-height'), '630.25px');
+
+  toggle.click();
+  assert.equal(toggle.getAttribute('aria-expanded'), 'true');
+  assert.equal(block.classList.contains('downloads-collapsed'), false);
+  assert.deepEqual(inert(), [], 'expanded: every tile is reachable');
+  assert.equal(list.style.getPropertyValue('--dl-rows-height'), '', 'expanded: no clip');
+  onResize([]);
+  assert.deepEqual(inert(), [], 'a resize keeps it open');
+
+  toggle.click();
+  assert.equal(toggle.getAttribute('aria-expanded'), 'false');
+  assert.deepEqual(inert(), [8, 9, 10, 11, 12]);
+  assert.equal(list.style.getPropertyValue('--dl-rows-height'), '630.25px');
+  window.setViewport(992); // still four columns: same clip
+  window.setViewport(768); // three columns: rows 3+ start at tile 6
+  assert.deepEqual(inert(), [6, 7, 8, 9, 10, 11, 12]);
+  window.setViewport(500);
 });
 
 test('invalid collapse or column settings report errors rather than silently hiding content', async () => {

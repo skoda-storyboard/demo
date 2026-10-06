@@ -291,6 +291,7 @@
   min-height: 0;
   margin: 0 0 14px;
   padding: 14px var(--spacing-l);
+  font-weight: var(--weight-medium); /* the widget's "Subscribe now!" is 500 (footer: 400) */
   line-height: 1;
 }
 

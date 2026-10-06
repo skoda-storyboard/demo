@@ -7,9 +7,9 @@
 - **Implements:** [SKODA-801a](SKODA-801a.md) (Media Box → `downloads` on stories), plus the story findings of
   [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §4 / §8 F3–F4
 - **Branch:** `skoda-830-story-import-validity`
-- **Status (2026-10-06):** 🟡 **READY FOR QA RE-RUN.** D1, D2 and D5 are fixed and the SKODA-823 newsletter card is
-  imported (developer result 2 below); the first QA run failed on D1/D2. Nothing has been pushed to DA, previewed or
-  published.
+- **Status (2026-10-06):** 🟡 **READY FOR QA RE-CHECK.** QA run 2 passed everything except the D2 peek, the
+  newsletter card button weight and one guardrail §6 rule; all three are fixed (developer result 3 below). Nothing has
+  been pushed to DA, previewed or published.
 
 ## Scope (approved 2026-10-05)
 1. Media Box (`.search-results.media-box`) becomes its own `dark, full-width, media-box` section: heading, stats line,
@@ -51,7 +51,7 @@ Evidence: `.migration/qa-830/` (not in git).
 | # | What | Where | Origin (expected) | EDS (actual) | Severity |
 |---|---|---|---|---|---|
 | D1 | Media Box heading / stats / band padding unstyled on stories | `.section.media-box h2`, `.downloads-stats`; rules exist only under `body.press-release` / `body.press-kit` | h 26px/32.5 (≥992), 20px/25 (≤768); stats 16px/600/32px `#c4c6c7`; padding 32/12; heading→grid 96–97 (89 ≤768) | h2 34px/42.5 all widths; stats 400/24px white; padding 40/40; heading→grid 111 | **blocking** (18 ★ stories) → **fixed** (dev result 2) |
-| D2 | "Show more" collapse and pill | shared `blocks/downloads` | collapsed 708/636/669/803 px at 1440/992/768/375 (peek of row 3); pill 137.6×44 `#78faae` r32 w500; collapses 8 assets at 375 | 630/558/567/701 (exactly 2 rows); pill 132.6×44 white r50 w400; all 8 shown at 375 (2864px) | **blocking** for 801a sign-off → **fixed** (dev result 2) |
+| D2 | "Show more" collapse and pill | shared `blocks/downloads` | collapsed 708/636/669/803 px at 1440/992/768/375 (peek of row 3); pill 137.6×44 `#78faae` r32 w500; collapses 8 assets at 375 | 630/558/567/701 (exactly 2 rows); pill 132.6×44 white r50 w400; all 8 shown at 375 (2864px) | **blocking** for 801a sign-off → **fixed** (dev result 2); QA run 2: heights/pill pass, peek missing (row 3 `hidden`, 0px under the pill vs 58px) → **fixed** (dev result 3), ready for QA re-check |
 | D3 | Epiq spec table unreadable on mobile | `.columns.columns-4-cols`, big-possibilities | 4-col table at 375; 819×503, 14px, 36px rows, bold header | one stacked 355px column at 375; 819×784, 16px, header 400 | nice-to-have (not M1) |
 | D4 | 66/716 Media Box titles cut short with "…" (19 pages, 7 ★) | `parsers/downloads.js` reads `.entry-title` after the origin's dotdotdot | full title (it is in the img `alt`) | truncated text in figcaption + aria-label | nice-to-have (do it) |
 | D5 | Lightbox-only `data-caption` text (WLTP consumption/CO₂ disclaimers) would be removed from DA by the re-import | carousel captions; e.g. practical-fun Epiq ×12, even-opening Peaq | — | dropped (also on the main baseline, since SKODA-819) | decision needed → **decided** → **fixed** (dev result 2) |
@@ -118,6 +118,49 @@ the merged sources (the other 18 bundles rebuild unchanged). Evidence and tools:
 - Open (2px): opened, the source pill sits 36px under the grid (34 when closed); ours stays at 34.
 - Not fixed, found while measuring: below 768 the aside starts 85px under the last body line (origin 77px), a
   SKODA-801 spacing; it predates the card.
+
+## Developer result 3 (2026-10-06, after QA run 2)
+QA run 2 evidence: `.migration/qa-830/run2/`. Measured with Chrome DevTools (isolated context) on `aem up
+--html-folder` (Como, metadata as `<meta>`) and the `main` proxy (4x4 release, Epiq kit Images); origin
+`www.skoda-storyboard.com`.
+
+- **D2 peek.** `downloads.js` no longer sets `hidden` on rows 3+. A collapsed block gets `downloads-collapsed`: the
+  list is clipped (`overflow: hidden`, `max-height: calc(var(--dl-rows-height) + --dl-toggle-gap +
+  --dl-toggle-height)`) and the pill overlaps the clip's bottom edge (`margin-block-start: -44px`, z-index 2), like
+  the source `.search-results-items-wrap`. `--dl-rows-height` is measured from the tiles (tallest bottom of the first
+  two rows); a `ResizeObserver` on the tiles re-measures between breakpoints and once the section is shown. Rows 3+
+  are `inert` (not focusable, out of the a11y tree) until expanded; expanding drops the clip and `inert`.
+  Show more / less, `aria-expanded` / `aria-controls` and the matchMedia column rule are unchanged.
+
+  | Page @ width | Collapsed box: origin / before / after | Row 3 visible: origin / before / after |
+  |---|---|---|
+  | Como 1440 | 708.25 / 708.25 / 708.25 | 58 / 0 / 58 |
+  | Como 992 | 636.25 / 636.25 / 636.25 | 58 / 0 / 58 |
+  | Como 768 | 669.25 / 669.25 / 669.25 | 58 / 0 / 58 |
+  | Como 375 | 803.11 / 803.12 / 803.13 | 57.98 / 0 / 58 |
+  | 4x4 release 1440 | 708.25 / 708.25 / 708.25 | 58 / 0 / 58 |
+  | 4x4 release 992 | 636.25 / 636.25 / 636.25 | 58 / 0 / 58 |
+  | 4x4 release 768 | 645.25 / 645.25 / 645.25 | 58 / 0 / 58 |
+  | 4x4 release 375 | 779.11 / 779.13 / 779.13 | 57.98 / 0 / 58 |
+
+  Pill 137.58×44 `rgb(120,250,174)` w500 everywhere, hit-tests on top of the peeking tiles; band end 60px under
+  it (grid top → band end 768.25 at 1440, Como). Como at 1200: 694.75 with 58 visible (re-measured on resize, no
+  reload); 769: 645.59 (= origin). Expanded: no clip, 0 inert, pill 34px under the grid.
+- **Press-kit Images (`collapse auto`).** Epiq kit Images at 1440: the 6 groups with more than two rows collapse
+  (clipped, inert rows 3+), the 3-tile group keeps a hidden toggle, single-tile groups have none. Peek there is 62px
+  (default variant gap 16px; origin 58px with 20px gap). Pre-existing, not part of this fix: the kit gallery tiles
+  are taller than the origin's (EDS 2 rows 399.25px with titles vs origin 105.75px image-only tiles).
+- **Newsletter card button.** `.newsletter-stub.card .newsletter-stub-submit` weight 500 (origin "Subscribe now!"
+  500; before 400). Footer variant unchanged (400).
+- **Guardrail §6.** The story/kit Media Box tile-title rule moved from `styles/styles.css` to
+  `blocks/downloads/downloads.css`, mobile-first (compact 20px / 58px row by default, the block's 15px / 46px from
+  769px via `--dl-title-*-base`). Tile title 20px at 375/768, 15px at 769/992/1440 (unchanged).
+- Tests: new clip/inert test (measured `--dl-rows-height`, inert rows, expand/collapse, column change); the
+  disclosure tests and the press-kit Images-chapter test count `inert` tiles instead of `hidden`. `npm run lint`
+  clean. `npm test`: 1013/1020 pass; failures are the known `header-locales`, `media-cart-download` (fflate) and
+  `media-lib` ENOTEMPTY (NFS worktree; a second media-lib test hit the same ENOTEMPTY once and passes on rerun).
+- Open (not measured): a row-2 tile's size menu opens downward inside the clipped list, so a long menu can be cut
+  off while collapsed (the source's wrap clips with `overflow: hidden` too).
 
 ## Acceptance Criteria
 - [x] All 57 stories with an origin Media Box get a Downloads section whose rows, order and hrefs match the origin
