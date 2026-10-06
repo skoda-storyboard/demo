@@ -26,6 +26,18 @@ https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/
 
+# ===== PRESS KITS: OVERLAY-HERO KITS ALREADY IN DA (9), SKODA-828 F1 open decision (2026-10-05): =====
+# join M1 (their hero is fixed in SKODA-828; their tile grids are still plain content, follow-up)
+https://www.skoda-storyboard.com/en/press-kits/4x4-winter-experience-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/lets-explore-albania-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/press-kit-skoda-at-the-iaa-2019/
+https://www.skoda-storyboard.com/en/press-kits/skoda-octavia-media-launch-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-octavia-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-octavia-press-kit-2/
+https://www.skoda-storyboard.com/en/press-kits/skoda-octavia-rs-and-octavia-scout-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-rs-driving-experience-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/skoda-rs-experience-press-kit/
+
 # ===== PRESS KITS: CHILDREN (50), SKODA-805b: D-1 = A, Architect sign-off 2026-09-28 =====
 # Every tile target of the 3 hubs above, in source tile order (import all children;
 # SKODA-M1-GAP-REVIEW D-1). All use press_kit-template-default (import-press-kit-default).

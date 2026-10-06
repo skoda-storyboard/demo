@@ -1106,3 +1106,32 @@ test('publishDamImage activates only image originals under the configured DAM fo
   }
   assert.equal(calls.length, 1);
 });
+
+test('pickIngestUrl keeps the page\'s own large rendition when the ladder guesses miss', async () => {
+  // Real case (SKODA-828 F6): PEAQ_Record_Run-00074 is a 22 MB master whose copies are
+  // rounded to -2560x1708; the named -2560x1707 guess 403s, and so did every size to -768x512.
+  const sizes = {
+    'https://cdn.x.com/peaq.jpg': 22442113,
+    'https://cdn.x.com/peaq-2560x1708.jpg': 403065,
+    'https://cdn.x.com/peaq-768x512.jpg': 76710,
+  };
+  const previous = global.fetch;
+  global.fetch = async (url, init = {}) => {
+    if (init.method !== 'HEAD') return new Response(null, { status: 403 }); // size unreadable
+    const bytes = sizes[String(url)];
+    return bytes
+      ? new Response(null, { status: 200, headers: { 'content-length': String(bytes) } })
+      : new Response(null, { status: 403 });
+  };
+  try {
+    const pick = await pickIngestUrl('https://cdn.x.com/peaq-2560x1708.jpg');
+    assert.equal(pick.ok, true);
+    assert.equal(pick.url, 'https://cdn.x.com/peaq-2560x1708.jpg');
+    assert.equal(pick.preconditioned, true);
+    // a smaller page reference still steps to the largest copy that exists
+    const small = await pickIngestUrl('https://cdn.x.com/peaq-768x512.jpg');
+    assert.equal(small.url, 'https://cdn.x.com/peaq-768x512.jpg');
+  } finally {
+    global.fetch = previous;
+  }
+});
