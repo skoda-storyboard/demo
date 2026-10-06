@@ -527,7 +527,11 @@ export default async function decorate(block) {
     // eslint-disable-next-line no-console
     console.error('downloads: media cart unavailable', e);
   });
-  if ((cfg.collapse === 'auto' || (cfg.collapse === null && mediaBox)) && list.children.length > 8) {
+  // The source Media Box (media-room.js togglebox) clips its grid to two rows whenever the
+  // items need more than two rows at the current column count, then shows "Show more" in the
+  // space below (2 rows + 34px + the 44px pill; "Show less" once open). So the threshold
+  // follows the columns: 8 assets collapse at 1 / 2 / 3 columns, not at 4 (SKODA-830 D2).
+  if ((cfg.collapse === 'auto' || (cfg.collapse === null && mediaBox)) && list.children.length > 2) {
     disclosureSeq += 1;
     list.id = `downloads-items-${disclosureSeq}`;
     const toggle = document.createElement('button');
@@ -553,8 +557,10 @@ export default async function decorate(block) {
       toggle.textContent = expanded ? LABELS.less : LABELS.more;
     };
     toggle.addEventListener('click', () => {
-      block.classList.toggle('downloads-expanded');
+      const expanded = block.classList.toggle('downloads-expanded');
       syncVisibility();
+      // collapsing pulls the toggle (and its focus) up past the hidden rows: keep it in view
+      if (!expanded) toggle.scrollIntoView?.({ block: 'nearest' });
     });
     block.append(toggle);
     [compact, medium, wide].forEach((query) => query.addEventListener('change', syncVisibility));

@@ -128,11 +128,52 @@ test('image sizes remain an accessible two-link menu, and incomplete files do no
   assert.equal(block.querySelectorAll('.downloads-size[aria-label^="Download Front view"]').length, 2);
 });
 
+test('media-box collapses whenever the items need more than two rows (source togglebox, SKODA-830 D2)', async () => {
+  // 8 assets: two rows of four at 992+, so nothing to collapse there; 1 / 2 / 3 columns below
+  const eight = setup();
+  for (let i = 0; i < 8; i += 1) addRow(eight, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
+  await decorate(eight);
+  const toggle = eight.querySelector('.downloads-more');
+  const visible = () => [...eight.querySelectorAll('.downloads-item')].filter((tile) => !tile.hidden).length;
+  assert.equal(toggle.hidden, false, '375: one column');
+  assert.equal(visible(), 2);
+  window.setViewport(520);
+  assert.equal(visible(), 4);
+  window.setViewport(768);
+  assert.equal(visible(), 6);
+  window.setViewport(992);
+  assert.equal(toggle.hidden, true, '992: two rows of four fit');
+  assert.equal(visible(), 8);
+  window.setViewport(500);
+
+  // two assets never need a third row: no toggle at all
+  const two = setup();
+  for (let i = 0; i < 2; i += 1) addRow(two, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
+  await decorate(two);
+  assert.equal(two.querySelector('.downloads-more'), null);
+});
+
+test('the toggle stays a labelled button: Show less once open, focus kept in view on collapse', async () => {
+  const block = setup();
+  for (let i = 0; i < 5; i += 1) addRow(block, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
+  await decorate(block);
+  const toggle = block.querySelector('.downloads-more');
+  assert.equal(toggle.tagName, 'BUTTON');
+  assert.equal(toggle.type, 'button');
+  let scrolled = 0;
+  toggle.scrollIntoView = () => { scrolled += 1; };
+  toggle.focus();
+  toggle.click();
+  assert.equal(toggle.textContent, 'Show less');
+  assert.equal(toggle.hidden, false);
+  assert.equal(scrolled, 0, 'expanding leaves the scroll position alone');
+  toggle.click();
+  assert.equal(toggle.textContent, 'Show more');
+  assert.equal(scrolled, 1, 'collapsing keeps the button in view');
+  assert.equal(document.activeElement, toggle);
+});
+
 test('large media-box variant discloses two rows across widths and authored columns', async () => {
-  const small = setup();
-  for (let i = 0; i < 8; i += 1) addRow(small, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
-  await decorate(small);
-  assert.equal(small.querySelector('.downloads-more'), null);
 
   const large = setup();
   addConfig(large, 'columns', '3');

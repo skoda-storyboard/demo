@@ -19,6 +19,9 @@
   /* the source's Show more pill sits 34px below the last row (a 708px collapsed box at
      1280, SKODA-805c) */
   --dl-toggle-gap: 34px;
+
+  /* the source .btn pill (SKODA-830 D2): 1px tracking */
+  --dl-toggle-tracking: 1px;
 }
 
 /* --- grid: default image ladder 1 -> 2 (768) -> 4 (992) ------------------ */
@@ -197,27 +200,41 @@
   background: var(--dropdown-hover-bg);
 }
 
+/* "Show more" / "Show less": the source's mint .btn pill (137.6×44 at 16px, weight 500,
+   14px/24px insets, no border; hover #a8ffcc), centred under the grid */
 .downloads .downloads-more {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: fit-content;
   min-height: var(--dl-toggle-height);
   margin: var(--dl-toggle-gap) auto 0;
-  border: 2px solid var(--skoda-ink);
+  border: 0;
   border-radius: var(--pill-radius);
-  padding: var(--spacing-xs) var(--spacing-l);
-  background: var(--skoda-white);
+  padding: 0 var(--spacing-l);
+  background: var(--skoda-green-emerald);
   color: var(--skoda-ink);
   font: inherit;
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--dl-toggle-tracking);
+  line-height: 1;
   cursor: pointer;
 }
 
 .downloads .downloads-more:hover,
 .downloads .downloads-more:focus-visible {
-  background: var(--dropdown-hover-bg);
+  background: var(--skoda-green-emerald-hover);
 }
 
 .downloads .downloads-more:focus-visible {
   outline: 2px solid var(--skoda-ink);
   outline-offset: 2px;
+}
+
+/* on the dark Media Box band the focus ring is white */
+.downloads.downloads-media-box .downloads-more:focus-visible {
+  outline-color: var(--skoda-white);
 }
 
 .downloads .downloads-more[hidden],
@@ -228,6 +245,12 @@
 /* The media-box variant uses the source's 20px gap and tile rhythm. */
 .downloads.downloads-media-box .downloads-items {
   gap: var(--dl-tile-gap);
+}
+
+/* without a shown Show more pill the source grid keeps its last row's 20px margin above the box
+   end (80px from the last tile to the band end, SKODA-830) */
+.downloads.downloads-media-box:not(:has(> .downloads-more:not([hidden]))) .downloads-items {
+  margin-block-end: var(--dl-tile-gap);
 }
 
 .downloads.downloads-media-box .downloads-figure {
@@ -350,11 +373,11 @@
 }
 
 /* the Media Box stats line (section default content) carries the group toggle at its end,
-   as the source's .search-results-stats row */
+   as the source's .search-results-stats row (text and toggle top-aligned there) */
 .downloads-stats {
   display: flex;
   gap: var(--spacing-m);
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
 }
 

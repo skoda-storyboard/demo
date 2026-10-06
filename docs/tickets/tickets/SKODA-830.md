@@ -7,8 +7,9 @@
 - **Implements:** [SKODA-801a](SKODA-801a.md) (Media Box → `downloads` on stories), plus the story findings of
   [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §4 / §8 F3–F4
 - **Branch:** `skoda-830-story-import-validity`
-- **Status (2026-10-06):** 🔴 **QA FAIL.** Content passes; the Media Box rendering on stories fails (D1, D2). The fix is
-  in progress. Nothing has been pushed to DA, previewed or published.
+- **Status (2026-10-06):** 🟡 **READY FOR QA RE-RUN.** D1, D2 and D5 are fixed and the SKODA-823 newsletter card is
+  imported (developer result 2 below); the first QA run failed on D1/D2. Nothing has been pushed to DA, previewed or
+  published.
 
 ## Scope (approved 2026-10-05)
 1. Media Box (`.search-results.media-box`) becomes its own `dark, full-width, media-box` section: heading, stats line,
@@ -49,11 +50,11 @@ Evidence: `.migration/qa-830/` (not in git).
 ### Defects
 | # | What | Where | Origin (expected) | EDS (actual) | Severity |
 |---|---|---|---|---|---|
-| D1 | Media Box heading / stats / band padding unstyled on stories | `.section.media-box h2`, `.downloads-stats`; rules exist only under `body.press-release` / `body.press-kit` | h 26px/32.5 (≥992), 20px/25 (≤768); stats 16px/600/32px `#c4c6c7`; padding 32/12; heading→grid 96–97 (89 ≤768) | h2 34px/42.5 all widths; stats 400/24px white; padding 40/40; heading→grid 111 | **blocking** (18 ★ stories) |
-| D2 | "Show more" collapse and pill | shared `blocks/downloads` | collapsed 708/636/669/803 px at 1440/992/768/375 (peek of row 3); pill 137.6×44 `#78faae` r32 w500; collapses 8 assets at 375 | 630/558/567/701 (exactly 2 rows); pill 132.6×44 white r50 w400; all 8 shown at 375 (2864px) | **blocking** for 801a sign-off |
+| D1 | Media Box heading / stats / band padding unstyled on stories | `.section.media-box h2`, `.downloads-stats`; rules exist only under `body.press-release` / `body.press-kit` | h 26px/32.5 (≥992), 20px/25 (≤768); stats 16px/600/32px `#c4c6c7`; padding 32/12; heading→grid 96–97 (89 ≤768) | h2 34px/42.5 all widths; stats 400/24px white; padding 40/40; heading→grid 111 | **blocking** (18 ★ stories) → **fixed** (dev result 2) |
+| D2 | "Show more" collapse and pill | shared `blocks/downloads` | collapsed 708/636/669/803 px at 1440/992/768/375 (peek of row 3); pill 137.6×44 `#78faae` r32 w500; collapses 8 assets at 375 | 630/558/567/701 (exactly 2 rows); pill 132.6×44 white r50 w400; all 8 shown at 375 (2864px) | **blocking** for 801a sign-off → **fixed** (dev result 2) |
 | D3 | Epiq spec table unreadable on mobile | `.columns.columns-4-cols`, big-possibilities | 4-col table at 375; 819×503, 14px, 36px rows, bold header | one stacked 355px column at 375; 819×784, 16px, header 400 | nice-to-have (not M1) |
 | D4 | 66/716 Media Box titles cut short with "…" (19 pages, 7 ★) | `parsers/downloads.js` reads `.entry-title` after the origin's dotdotdot | full title (it is in the img `alt`) | truncated text in figcaption + aria-label | nice-to-have (do it) |
-| D5 | Lightbox-only `data-caption` text (WLTP consumption/CO₂ disclaimers) would be removed from DA by the re-import | carousel captions; e.g. practical-fun Epiq ×12, even-opening Peaq | — | dropped (also on the main baseline, since SKODA-819) | decision needed → **decided** |
+| D5 | Lightbox-only `data-caption` text (WLTP consumption/CO₂ disclaimers) would be removed from DA by the re-import | carousel captions; e.g. practical-fun Epiq ×12, even-opening Peaq | — | dropped (also on the main baseline, since SKODA-819) | decision needed → **decided** → **fixed** (dev result 2) |
 
 **D5 decision (user, 2026-10-06): "Keep it, visible".** Regulatory consumption/CO₂ text is kept as a visible
 caption or note under the image. Other lightbox-only captions stay dropped. This also applies to the press-kit
@@ -64,14 +65,69 @@ Notes, not defects:
   design). This depends on the origin staying up at go-live.
 - `media:apply` has so far run on only 5 pages.
 
+## Developer result 2 (2026-10-06, after the QA FAIL)
+Branch merged with `origin/main` (#251–#255, #258, #265; no conflicts); `import-story-detail.bundle.js` rebuilt from
+the merged sources (the other 18 bundles rebuild unchanged). Evidence and tools:
+`.migration/wt-830-story-scratch/run-823-d1d2/` (not in git).
+
+- **Newsletter (SKODA-823 importer slice).** `skoda-story-aside.js` turns the sidebar `.newsletter-subscribe-widget`
+  into `Newsletter Stub (card)` at the top of the aside, on the `preprocess` hook (the shared page cleanup removes
+  the widget in beforeTransform). Heading (with its line break), image, placeholder, button, consent text,
+  consent-error and the list/language ids come from the widget; `label`, `message` and `error` are the block draft's
+  strings. The consent and "Manage subscription" links stay the live origin URLs (skoda-links leaves them absolute;
+  their EDS pages 404). `.side-banner` is still dropped (SKODA-903). `block-contracts.json` registers
+  `newsletter-stub` / `card` (config only). Re-import: **59/59** stories have the card first in the sidebar section;
+  59/59 origins have the widget. Rendered vs origin (wireless charging, Epiq, Como): 345.3×354.8 / 260×307.9 /
+  185.3×266.8 / 355×368.1 at 1440/992/768/375, all equal to the origin; top 32px in the aside (≥768), 16px to
+  "Explore more". Field/pill at 768–1200 keep the documented SKODA-823 deviation.
+- **D1.** One shared Media Box band in `styles/styles.css` (`main > .section.media-box`, `--media-box-*` tokens):
+  top inset 64 (story) / 72 (release, kit), 60 under the box, title 26/32.5 600 (story + kit 20/25 up to 768),
+  stats 16/32 600 `#c4c6c7` with a 4px inset in the 44px add-all row, 20px to the grid. The kit's own copies are
+  gone; releases keep their 26px title at every width (as the source).
+  Stories, origin → before → after: band top→title 64 → 40 → 64; title 26/32.5 (20/25 ≤768) → 34/42.5 → equal;
+  stats 16/32/600 `#c4c6c7` → 16/24/400 white → equal; title→grid 96.5 (89 ≤768) → 111 → equal; box→band end 60 →
+  40 → 60.
+- **D2.** Rule read from the source (media-room.js togglebox): collapse when the items need more than two rows at the
+  current column count; clip at `2 × (tile + 20) − 2 + 60`. The block now collapses at > 2 rows (was > 8 assets) and
+  the pill is the source's mint `.btn` (emerald, no border, weight 500, 1px tracking, hover `#a8ffcc`). The source
+  shows "Show less" once open (`.open .close {display:block}`, 127.4×44), so the button stays, as before; collapsing
+  keeps it in view. The 801a "above 8 assets" line is this rule at 4 columns. Story/kit tile titles are 20/24 in a
+  58px row up to 768 (the source's article h3), which the collapsed heights depend on.
+  Como (13): origin 708.25/636.25/669.25/803.11 → before 708.25/636.25/645.25/779.13 → after 708.25/636.25/669.25/
+  803.13. Epiq (8): origin 650.25 (no control)/578.25/669.25/803.11 → before 630.25/558.25/860.88/2864.5 (never
+  collapsed) → after 630.25/558.25/669.25/803.13. An uncollapsed box keeps the source's last 20px row margin: last
+  tile → band end 80 (origin 80, before 60). Pill: 137.58×44 `#78faae`, no border, weight 500 → before
+  132.58×44 white, 2px border, 400 → after 137.58×44 `#78faae`, 0, 500 (radius `--pill-radius`, same capsule as 2em
+  at 44px). 769px: 645.59 = origin.
+- **D5.** `story-flatten.js` `isRegulatoryCaption()` (a WLTP mention, or a kWh/100 km or l/100 km figure together
+  with a CO₂/CO2 emissions or g/km figure). A carousel image's lightbox-only regulatory `data-caption` becomes a
+  visible caption (after the description, if any; not repeated). Other lightbox-only captions stay dropped (the Peaq
+  aerodynamics and 936 km captions are not matched). Re-import: 7 captions on 2 stories, practical-fun Epiq 6 and
+  even-opening Peaq 1, equal to the origin's carousel disclaimers. The other 6 practical-fun disclaimers are on the
+  same images' Media Box tiles (title-only on the source too).
+- **Releases (regression).** 4x4 (15) and Slavia (35), before → after at 1440/992/768/375: title→grid 112.5 → 96.5
+  (origin 96.5); band 72/60, title 26/32.5, box heights 708.25/636.25/645.25/779.13 unchanged (= origin); pill as
+  above. Small boxes now follow the row rule: the 936 km release (5) collapses at 375 to 779.13 (origin 779.11,
+  before not collapsed) and ends 80px under its last tile at 1440–768 (origin 80, before 60). Kit 1100 OHC: title→grid 104.5/97 → 96.5/89 (= origin); tiles ≤768 now 285.63 / 352.56 (= origin).
+- Re-import diff vs the d4f82c7 run: blocks and hrefs equal on all 59 pages apart from the card; text differs only on
+  the 2 D5 pages; image changes are the #253 hero renditions. `validate-blocks`: 59 checked, 0 errors.
+- Tests: newsletter (3), D5 (2), contract (1), downloads disclosure (2 new, 1 updated), press-kit Images-chapter test
+  now counts visible controls. `npm test`: 1013/1019 pass; failures are `header-locales`, `media-cart-download`
+  (fflate) and `media-lib` "rejects truncated bodies" (ENOTEMPTY on the NFS worktree; it fails the same on the merge
+  commit before these changes). `npm run lint` clean.
+- Open (2px): opened, the source pill sits 36px under the grid (34 when closed); ours stays at 34.
+- Not fixed, found while measuring: below 768 the aside starts 85px under the last body line (origin 77px), a
+  SKODA-801 spacing; it predates the card.
+
 ## Acceptance Criteria
 - [x] All 57 stories with an origin Media Box get a Downloads section whose rows, order and hrefs match the origin
 - [x] Lightbox chrome, quiz JSON/UI, `+N` pill and "Show more Show less" text gone; captions = visible origin captions
 - [x] Epiq table keeps its header row; no `version` block (`validate-blocks` 0 errors)
-- [ ] D1: Media Box heading / stats / padding match the origin at 1440/992/768/375 on stories; releases/kits unchanged or closer to the origin
-- [ ] D2: collapse height, peek, threshold and pill match the measured origin (reconcile with the 801a "708px / 139×44" line)
+- [x] D1: Media Box heading / stats / padding match the origin at 1440/992/768/375 on stories; releases/kits unchanged or closer to the origin (dev; QA re-run pending)
+- [x] D2: collapse height, peek, threshold and pill match the measured origin (reconcile with the 801a "708px / 139×44" line) (dev; QA re-run pending)
 - [ ] D4: full Media Box titles (alt-prefix recovery)
-- [ ] D5: WLTP/CO₂ disclaimer text visible under its image
+- [x] D5: WLTP/CO₂ disclaimer text visible under its image (dev; QA re-run pending)
+- [x] SKODA-823 importer slice: `Newsletter Stub (card)` first in every story aside (59/59) (dev; QA re-run pending)
 - [ ] D3 (optional): spec table readable at 375
 - [ ] QA re-run PASS; then `media:build` + `media:apply`, DA dry-run (resolve the 3 story DA conflicts:
       epiq-will-win, elroq-through-designers-eyes, the-versatile-octavia), push + preview. Publishing needs a separate go-ahead.

@@ -154,17 +154,33 @@ var CustomImportScript = (() => {
     const capSource = img.getAttribute("data-caption") && img || ((_a = item.querySelector) == null ? void 0 : _a.call(item, "[data-caption]")) || item;
     return capSource.getAttribute && capSource.getAttribute("data-caption") || ((_b = item.querySelector) == null ? void 0 : _b.call(item, "a[title]")) && item.querySelector("a[title]").getAttribute("title") || withAlt && img.getAttribute("alt") || "";
   }
-  function itemDescription(item, document2) {
+  function itemDescription(item, document2, img) {
     var _a;
     const desc = (_a = item.querySelector) == null ? void 0 : _a.call(item, ".search-results-item-description");
-    if (!desc || !(desc.textContent || "").trim()) return "";
-    const paras = [...desc.querySelectorAll("p")].map((p) => (p.textContent || "").replace(/\s+/g, " ").trim()).filter(Boolean);
-    const texts = paras.length ? paras : [desc.textContent.replace(/\s+/g, " ").trim()];
+    const paras = desc ? [...desc.querySelectorAll("p")].map((p) => (p.textContent || "").replace(/\s+/g, " ").trim()).filter(Boolean) : [];
+    const descText = desc ? desc.textContent.replace(/\s+/g, " ").trim() : "";
+    const texts = paras.length || !descText ? paras : [descText];
+    const note = regulatoryCaption(img, item);
+    if (note && !texts.some((t) => t.includes(note))) texts.push(note);
+    if (!texts.length) return "";
     return texts.map((t) => {
       const p = document2.createElement("p");
       p.textContent = t;
       return p;
     });
+  }
+  var CONSUMPTION_RE = /\b(?:kWh|l)\s*\/\s*100\s*km\b/i;
+  var EMISSIONS_RE = /\bCO(?:₂|2)\s+emissions?\b|\bg\s*\/\s*km\b/i;
+  function isRegulatoryCaption(text2) {
+    const t = (text2 || "").replace(/\s+/g, " ").trim();
+    if (!t) return false;
+    return /\bWLTP\b/.test(t) || CONSUMPTION_RE.test(t) && EMISSIONS_RE.test(t);
+  }
+  function regulatoryCaption(img, item) {
+    var _a;
+    const holder = img && img.getAttribute && img.getAttribute("data-caption") && img || ((_a = item.querySelector) == null ? void 0 : _a.call(item, "[data-caption]"));
+    const text2 = holder ? (holder.getAttribute("data-caption") || "").replace(/\s+/g, " ").trim() : "";
+    return isRegulatoryCaption(text2) ? text2 : "";
   }
   function galleryCells(panel, document2, blockName = "Gallery") {
     const imgs = [...panel.querySelectorAll("img")];
@@ -173,7 +189,7 @@ var CustomImportScript = (() => {
     const cells = [[blockName]];
     imgs.forEach((img) => {
       const item = img.closest(".search-results-item, .item, figure") || img;
-      cells.push([img, slider ? itemDescription(item, document2) : itemCaption(img, item, false)]);
+      cells.push([img, slider ? itemDescription(item, document2, img) : itemCaption(img, item, false)]);
     });
     return cells.length > 1 ? cells : null;
   }
@@ -1011,6 +1027,90 @@ var CustomImportScript = (() => {
 
   // tools/importer/transformers/skoda-story-aside.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  var NEWSLETTER_BLOCK = "Newsletter Stub (card)";
+  var NEWSLETTER_DEFAULTS = {
+    label: "Email address",
+    message: "Newsletter signup is not available yet",
+    error: "Please enter a valid e-mail address.",
+    "consent-error": "Please accept the terms before continuing."
+  };
+  var squash2 = (s) => (s || "").replace(/[ \t\r\n]+/g, " ").trim();
+  function inlineNodes(source, document2) {
+    const nodes = [];
+    source.childNodes.forEach((n) => {
+      if (n.nodeType === 3) {
+        const t = n.nodeValue.replace(/[ \t\r\n]+/g, " ");
+        if (t) nodes.push(document2.createTextNode(t));
+      } else if (n.nodeName === "BR") {
+        nodes.push(document2.createElement("br"));
+      } else if (n.nodeName === "A" && n.getAttribute("href")) {
+        const a = document2.createElement("a");
+        a.setAttribute("href", n.getAttribute("href"));
+        a.textContent = squash2(n.textContent);
+        if (a.textContent) nodes.push(a);
+      } else if (n.nodeType === 1) {
+        const t = squash2(n.textContent);
+        if (t) nodes.push(document2.createTextNode(t));
+      }
+    });
+    const edge = (i, re) => {
+      while (nodes.length && nodes[i()].nodeType === 3) {
+        const n = nodes[i()];
+        n.nodeValue = n.nodeValue.replace(re, "");
+        if (n.nodeValue) break;
+        nodes.splice(i(), 1);
+      }
+    };
+    edge(() => 0, /^[ \u00a0]+/);
+    edge(() => nodes.length - 1, /[ \u00a0]+$/);
+    return nodes.filter((n) => n.nodeType !== 3 || n.nodeValue);
+  }
+  function newsletterCard(widget, document2) {
+    const rows = [[NEWSLETTER_BLOCK]];
+    const add = (key, value2) => {
+      if (Array.isArray(value2) ? value2.length : value2) rows.push([key, value2]);
+    };
+    const value = (sel, attr) => {
+      const el = widget.querySelector(sel);
+      if (!el) return "";
+      return squash2(attr ? el.getAttribute(attr) : el.textContent);
+    };
+    const src = widget.querySelector("header img");
+    if (src && src.getAttribute("src")) {
+      const img = document2.createElement("img");
+      img.setAttribute("src", src.getAttribute("src"));
+      img.setAttribute("alt", "");
+      add("image", [img]);
+    }
+    const heading = widget.querySelector("header h1, header h2, header h3, header h4");
+    if (heading) add("heading", inlineNodes(heading, document2));
+    add("label", NEWSLETTER_DEFAULTS.label);
+    add("placeholder", value('input[type="email"], input.email', "placeholder"));
+    add("button", value('button[type="submit"], button'));
+    const terms = widget.querySelector(".terms label, label[for]");
+    if (terms) {
+      const label = terms.cloneNode(true);
+      label.querySelectorAll(".manage-subscription-link").forEach((n) => n.remove());
+      add("consent", inlineNodes(label, document2));
+    }
+    const manage = widget.querySelector(".manage-subscription-link a[href]");
+    if (manage && squash2(manage.textContent)) {
+      const a = document2.createElement("a");
+      a.setAttribute("href", manage.getAttribute("href"));
+      a.textContent = squash2(manage.textContent);
+      add("manage", [a]);
+    }
+    add("message", NEWSLETTER_DEFAULTS.message);
+    add("error", NEWSLETTER_DEFAULTS.error);
+    add("consent-error", value(".checkbox-error") || NEWSLETTER_DEFAULTS["consent-error"]);
+    add("list", value('input[name="list"]', "value"));
+    add("language", value('input[name="language"]', "value"));
+    return rows.some(([k]) => k === "heading" || k === "button") ? rows : null;
+  }
+  var isNewsletterTable = (table) => {
+    const cell = table.querySelector("tr > th, tr > td");
+    return !!cell && squash2(cell.textContent) === NEWSLETTER_BLOCK;
+  };
   function relatedCards(sidebar, document2) {
     const matched = [...sidebar.querySelectorAll(".related .article-teaser, .related article")];
     const teasers = matched.filter((el, i, arr) => arr.indexOf(el) === i).filter((el) => !matched.some((other) => other !== el && other.contains(el)));
@@ -1058,15 +1158,26 @@ var CustomImportScript = (() => {
     return cell.length ? [["Tags"], [cell]] : null;
   }
   function transform3(hookName, element, payload) {
+    if (hookName === "preprocess") {
+      const doc = element.ownerDocument || payload && payload.document;
+      element.querySelectorAll(".sidebar .newsletter-subscribe-widget").forEach((widget) => {
+        const rows = newsletterCard(widget, doc);
+        if (rows) widget.replaceWith(WebImporter.DOMUtils.createTable(rows, doc));
+        else widget.remove();
+      });
+      return;
+    }
     if (hookName !== TransformHook3.afterTransform) return;
     const sidebar = element.querySelector(".sidebar");
     if (!sidebar) return;
     const cards = relatedCards(sidebar, document);
     const tags = tagsCell(sidebar, document);
+    const newsletter = [...sidebar.querySelectorAll("table")].find(isNewsletterTable) || null;
     const frag = document.createElement("div");
     const hr = document.createElement("hr");
     frag.appendChild(hr);
     const aside = document.createElement("aside");
+    if (newsletter) aside.appendChild(newsletter);
     const heading = sidebar.querySelector(".related .heading, .related h2, .related h3");
     if (heading) {
       const h = document.createElement("h2");
@@ -1089,7 +1200,7 @@ var CustomImportScript = (() => {
       cells: { Style: "sidebar" }
     });
     frag.appendChild(metadataBlock);
-    if (!cards && !tags) {
+    if (!cards && !tags && !newsletter) {
       sidebar.remove();
       return;
     }
@@ -1755,7 +1866,7 @@ var CustomImportScript = (() => {
   };
   var PAGE_TEMPLATE = {
     name: "story-detail",
-    description: "\u0160koda story detail (single-post + SiteOrigin), full-fidelity SiteOrigin flatten (SKODA-801). Hero banner + primary .content SiteOrigin widget tree flattened to default content + block tables (17-widget map, census-driven). The secondary .sidebar column is rebuilt as a Style:sidebar section (Cards + Tags) beside the body via the grid-on-main story layout. In-body galleries/embeds/Media Box remain SKODA-604 full-restore work. Metadata template=story. Content-driven detection only.",
+    description: "\u0160koda story detail (single-post + SiteOrigin), full-fidelity SiteOrigin flatten (SKODA-801). Hero banner + primary .content SiteOrigin widget tree flattened to default content + block tables (17-widget map, census-driven). The secondary .sidebar column is rebuilt as a Style:sidebar section (Newsletter Stub (card) + Cards + Tags) beside the body via the grid-on-main story layout. In-body galleries/embeds/Media Box remain SKODA-604 full-restore work. Metadata template=story. Content-driven detection only.",
     urls: ["https://www.skoda-storyboard.com/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/"],
     blocks: [
       { name: "story-hero", instances: ["div.hero"] },
@@ -1844,6 +1955,7 @@ var CustomImportScript = (() => {
       markHighlights(document2);
       markCellWidths(document2);
       transform7("preprocess", document2.body, { document: document2 });
+      transform3("preprocess", document2.body, { document: document2 });
       document2.querySelectorAll(".search-results.media-box a.media-cart-action.download[href]").forEach((a) => {
         if (!(a.textContent || "").trim()) a.textContent = "Download";
       });

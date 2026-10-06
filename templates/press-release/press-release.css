@@ -164,10 +164,6 @@ body.press-release .section.dark .default-content-wrapper > p {
   line-height: 2;
 }
 
-body.press-release .section.media-box .default-content-wrapper {
-  margin-bottom: var(--spacing-xl);
-}
-
 /* Related header: heading + "Based on tags" left, the "All" ghost pill right, centred on
    the two lines (source .search-results-header: flex, align-items center, the pill pushed
    to the right edge with no gap, so the heading column is the rest of the row). */
