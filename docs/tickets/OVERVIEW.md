@@ -160,7 +160,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-826](tickets/SKODA-826.md) | Global page gutter parity (10px at every width, not 24/40px) | E01 | 0.5 | 0.25 | 0.5 | 106 | 🟢 M1 Must; from the 2026-09-25 URL→block sweep (#149) |
 | SKODA-201 | Cards/Teaser (overlay/media/toolbar) | E02 | 5 | 2–3 | 5–7 | 102,106 | 🟢 |
 | SKODA-202 | Hero (image, LCP) | E02 | 2 | 1 | 2–3 | 102,106 | 🟢 |
-| [SKODA-828](tickets/SKODA-828.md) | Hero parity across templates: press kit, model, archive + ultrawide (sweep follow-ups) | E02 | 5 | 2–3 | 4–5 | 826,805a,208,209 | 🟠 M1; from the 2026-09-28 hero sweep (#196). Owns the hero UI moved out of 208/209/805a; pulls the archive banner M2→M1 |
+| [SKODA-828](tickets/SKODA-828.md) | Hero parity across templates: press kit, model, archive + ultrawide (sweep follow-ups) | E02 | 5 | 2–3 | 4–5 | 826,805a,208,209 | 🟡 M1; in review 2026-10-05 ([PR #253](https://github.com/skoda-storyboard/demo/pull/253), branch `skoda-828-hero-parity`): press kit, model, archive and story hero match the source 375–3840; 41 archive pages in DA, 6-story push after merge. From the 2026-09-28 hero sweep (#196); owns the hero UI moved out of 208/209/805a |
 | SKODA-203 | Gallery + lightbox modal | E02 | 5 | 2–3 | 4–6 | 102,106 | 🟡 a11y modal `[RUNTIME-UNCONFIRMED]` |
 | SKODA-204 | Embeds (4 providers, dnt=1, lazy) | E02 | 3 | 1–2 | 2–4 | 102 | 🟢 |
 | [SKODA-204a](tickets/SKODA-204a.md) | Embeds consent placeholder + click-to-load hook (follow-up to #18) | E02 | 0.5 | 0.25 | 0.5 | 204,606 | 🟡 M1 Must; sweep §11.1 (204 AC l.47/49 gap); D1 follow-up, not a reopen |

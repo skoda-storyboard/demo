@@ -608,10 +608,12 @@ export default async function main(args = process.argv.slice(2)) {
       aspect_crop_source: [...info.seenUrls].some((u) => isAspectCrop(u)),
       bytes: delivered ? prior.bytes : null,
       preconditioned: delivered ? prior.preconditioned : false,
-      // Per-step status (F5).
+      // Per-step status (F5). The DAM publish step (media:publish-images) stays with the
+      // stored original: a delivery-only rebuild must not drop it (SKODA-828).
       steps: {
         deliver: delivered ? 'done' : 'pending',
         dam: damStep,
+        ...(storedInDam && prior?.steps?.publish ? { publish: prior.steps.publish } : {}),
         da: daStep,
       },
       status: 'pending',
