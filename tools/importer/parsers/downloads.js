@@ -27,6 +27,25 @@
 
 const text = (el) => (el ? (el.textContent || '').replace(/\s+/g, ' ').trim() : '');
 
+/**
+ * An `.mp4` href in its URL-serialised form (non-ASCII and spaces percent-encoded), relative
+ * hrefs kept relative. helix-importer rewrites every `.mp4` link in the markdown to
+ * `new URL(href).href` AFTER the grid table is laid out, so a raw `4×4` in the filename grows
+ * the row by 5 characters per `×`; md2da then can't parse the grid, and the Media Box lands in
+ * DA as literal `+---+` text plus a nameless block that ate the next row (SKODA-833, the 4×4
+ * release). Serialising first makes that rewrite a no-op. Other links are left as they are.
+ */
+function serialiseMp4(href) {
+  try {
+    const url = new URL(href, 'https://www.skoda-storyboard.com');
+    if (!/\.mp4$/i.test(url.pathname) || url.href === href) return href;
+    if (/^[a-z][a-z\d+.-]*:/i.test(href)) return url.href;
+    return href.startsWith('/') && !href.startsWith('//') ? `${url.pathname}${url.search}${url.hash}` : href;
+  } catch (e) {
+    return href;
+  }
+}
+
 // Size label for a single-download item: its file type (SKODA-503 keeps binaries as links).
 function fileLabel(href) {
   const ext = ((href || '').split(/[?#]/)[0].split('.').pop() || '').toLowerCase();
@@ -36,8 +55,10 @@ function fileLabel(href) {
 
 function sizeLinks(item, document) {
   const links = [];
-  const add = (href, label) => {
-    if (!href || href === '#' || links.some((l) => l.getAttribute('href') === href)) return;
+  const add = (raw, label) => {
+    if (!raw || raw === '#') return;
+    const href = serialiseMp4(raw);
+    if (links.some((l) => l.getAttribute('href') === href)) return;
     const a = document.createElement('a');
     a.setAttribute('href', href);
     a.textContent = label;

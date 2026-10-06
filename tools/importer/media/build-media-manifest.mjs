@@ -47,7 +47,8 @@ import {
   needsMediaBuild, stepDownTooSmall, renditionEdge, OVERSIZE_BYTES, MIN_RENDITION_EDGE,
 } from './media-lib.mjs';
 import {
-  binaryAnchors, binaryKind, binarySource, publicBinaryUrl, verifyPublicBinary, probeBinaryBytes,
+  binaryAnchors, binaryKind, binaryMime, binarySource,
+  publicBinaryUrl, verifyPublicBinary, probeBinaryBytes,
 } from './binary-media.mjs';
 import { feedMediaRefs } from '../media-items/media-items-lib.mjs';
 
@@ -334,7 +335,8 @@ export default async function main(args = process.argv.slice(2)) {
     const info = byLogical.get(id);
     if (info.kind === 'image') return '';
     const prior = manifest.rows[id];
-    const damPath = binaryDamPath(info.sourceUrl, info.kind, {
+    const storedPath = prior?.steps?.dam === 'done' ? prior.dam_asset_path : '';
+    const damPath = storedPath || binaryDamPath(info.sourceUrl, info.kind, {
       damFolder: cfg.damFolder, pagePath: prior?.dam_page_path || info.ownerPage,
     });
     const url = publicUrls[damPath];
@@ -366,7 +368,8 @@ export default async function main(args = process.argv.slice(2)) {
   // PDF/MP4 originals go to the DAM, never to the inline image delivery path.
   async function processBinary(id, info, prior) {
     const pagePath = (prior && prior.dam_page_path) || info.ownerPage;
-    const damAssetPath = damConfig ? binaryDamPath(info.sourceUrl, info.kind, {
+    const storedPath = prior?.steps?.dam === 'done' ? prior.dam_asset_path : '';
+    const damAssetPath = damConfig ? storedPath || binaryDamPath(info.sourceUrl, info.kind, {
       damFolder: cfg.damFolder, pagePath,
     }) : '';
     const publicUrl = damConfig ? destination(id) : prior?.public_url || '';
@@ -411,7 +414,7 @@ export default async function main(args = process.argv.slice(2)) {
           && !(Number.isFinite(bytes) && bytes > 0);
         const activationPending = damConfig && damStep === 'done' && publishStep !== 'done';
         if (damConfig && damStep === 'done' && publishStep === 'done') {
-          await verifyPublicBinary(publicUrl, info.kind, row.bytes);
+          await verifyPublicBinary(publicUrl, info.kind, row.bytes, { mime: binaryMime(row) });
         }
         if (unavailable || !damConfig || pendingConfirmation) counts.failed += 1;
         console.log(`  · ${id}  ${info.kind}${unavailable ? ' [original unavailable]' : ''}${pendingConfirmation ? ' [completion uncertain; author HEAD required]' : ''}${activationPending ? ' [activation pending]' : ''} → DAM ${damAssetPath || '(not configured)'}`);
@@ -430,7 +433,7 @@ export default async function main(args = process.argv.slice(2)) {
           damPath: damAssetPath,
           token: damToken,
           bytes: row.bytes,
-          contentType: info.kind === 'document' ? 'application/pdf' : 'video/mp4',
+          contentType: binaryMime(row),
         });
         if (!check.ok) {
           row.note = `DAM completion uncertain: ${check.body}; no re-upload`;
@@ -452,7 +455,9 @@ export default async function main(args = process.argv.slice(2)) {
           const got = await fetchBinaryToFile(row.master_url, {
             filePath: path.join(tempDir, 'original'),
           });
-          const mime = info.kind === 'document' ? 'application/pdf' : 'video/mp4';
+          const videoMime = got.header.subarray(8, 12).toString() === 'qt  '
+            ? 'video/quicktime' : 'video/mp4';
+          const mime = info.kind === 'document' ? 'application/pdf' : videoMime;
           const type = got.contentType.split(';')[0].trim().toLowerCase();
           const signature = info.kind === 'document'
             ? got.header.subarray(0, 5).toString() === '%PDF-'
@@ -461,6 +466,7 @@ export default async function main(args = process.argv.slice(2)) {
             throw new Error(`Original is not a non-empty ${mime}: ${row.master_url}`);
           }
           row.bytes = got.bytes;
+          row.mime_type = mime;
           row.source_content_type = type;
           row.dam_original_url = row.master_url;
           dam = await uploadToDAM({
@@ -519,6 +525,7 @@ export default async function main(args = process.argv.slice(2)) {
       if (damConfig && row.steps.publish === 'done') {
         row.public_verified = await verifyPublicBinary(publicUrl, info.kind, row.bytes, {
           attempts: activatedNow ? 11 : 1,
+          mime: binaryMime(row),
         });
         row.public_url = publicUrl;
       }

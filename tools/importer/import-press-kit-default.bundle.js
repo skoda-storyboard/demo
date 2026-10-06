@@ -69,7 +69,7 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/tags.js
   function parse2(element, { document }) {
-    const anchors = Array.from(element.querySelectorAll("a.label[href], li a[href], a[href]")).filter((el, i, arr) => arr.indexOf(el) === i);
+    const anchors = Array.from(element.querySelectorAll("a.label[href], li a[href], a[href]")).filter((el, i, arr) => arr.indexOf(el) === i).filter((a) => !a.matches(".show-hidden-terms") && a.getAttribute("href") !== "#");
     if (anchors.length === 0) {
       element.replaceWith(...element.childNodes);
       return;

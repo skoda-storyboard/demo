@@ -301,6 +301,7 @@ test('file download retries a stalled transfer from byte zero and checks the fin
     assert.equal(requests, 2);
     assert.equal(got.bytes, 12);
     assert.equal(got.header.subarray(4, 8).toString(), 'ftyp');
+    assert.equal(got.header.subarray(8, 12).toString(), 'mock');
     assert.equal(readFileSync(filePath).toString(), '\0\0\0\0ftypmock');
   } finally {
     await new Promise((resolve) => { server.close(resolve); });

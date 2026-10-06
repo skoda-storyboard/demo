@@ -443,7 +443,7 @@ export async function fetchBinaryToFile(url, {
       }
       // eslint-disable-next-line no-await-in-loop
       const handle = await open(filePath, 'r');
-      const header = Buffer.alloc(8);
+      const header = Buffer.alloc(12);
       try {
         // eslint-disable-next-line no-await-in-loop
         await handle.read(header, 0, header.length, 0);
