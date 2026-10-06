@@ -42,9 +42,17 @@ var CustomImportScript = (() => {
   });
 
   // tools/importer/parsers/story-hero.js
+  var HERO_MAX_WIDTH = 2560;
+  function useLargestRendition(img) {
+    const best = (img.getAttribute("srcset") || "").split(",").map((entry) => entry.trim().split(/\s+/)).map(([url, descriptor]) => ({ url, width: parseInt(descriptor, 10) })).filter(({ url, width }) => url && width > 0 && width <= HERO_MAX_WIDTH).sort((a, b) => b.width - a.width)[0];
+    if (best) img.setAttribute("src", best.url);
+    img.removeAttribute("srcset");
+    img.removeAttribute("sizes");
+  }
   function parse(element, { document: document2 }) {
     const img = element.querySelector(".hero-image img, .hero-wrapper img, img");
     const heading = element.querySelector(".hero-heading h1, h1, .heading, h2");
+    if (img) useLargestRendition(img);
     if (!img && !heading) {
       element.replaceWith(...element.childNodes);
       return;
@@ -539,6 +547,16 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/downloads.js
   var text = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
+  function serialiseMp4(href) {
+    try {
+      const url = new URL(href, "https://www.skoda-storyboard.com");
+      if (!/\.mp4$/i.test(url.pathname) || url.href === href) return href;
+      if (/^[a-z][a-z\d+.-]*:/i.test(href)) return url.href;
+      return href.startsWith("/") && !href.startsWith("//") ? `${url.pathname}${url.search}${url.hash}` : href;
+    } catch (e) {
+      return href;
+    }
+  }
   function fileLabel(href) {
     const ext = ((href || "").split(/[?#]/)[0].split(".").pop() || "").toLowerCase();
     if (/^(jpe?g|png|webp|gif|tiff?)$/.test(ext)) return "Original";
@@ -546,8 +564,10 @@ var CustomImportScript = (() => {
   }
   function sizeLinks(item, document2) {
     const links = [];
-    const add = (href, label) => {
-      if (!href || href === "#" || links.some((l) => l.getAttribute("href") === href)) return;
+    const add = (raw, label) => {
+      if (!raw || raw === "#") return;
+      const href = serialiseMp4(raw);
+      if (links.some((l) => l.getAttribute("href") === href)) return;
       const a = document2.createElement("a");
       a.setAttribute("href", href);
       a.textContent = label;
