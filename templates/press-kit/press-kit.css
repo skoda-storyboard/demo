@@ -264,7 +264,8 @@ body.press-kit .section.body-column .default-content-wrapper img {
 
 /* A kit with no hero and no body column (the source's press-release template: the RS 245 kit,
    SKODA-828 F7) is all header section. Its lead image is an article's 16:9 crop (812×457 at
-   1440), and from 768 the article takes the source's 2/3 column (812 at 1440, 492 at 768). */
+   1440), and from 768 everything after the title takes the source's 2/3 column (812 at 1440,
+   492 at 768); the date and title stay full width. */
 body.press-kit main:not(:has(.section.body-column)) > .section.press-kit-header h1 + p img {
   display: block;
   width: 100%;
@@ -347,9 +348,10 @@ body.press-kit .section.body-column .columns.callout {
     margin-inline: auto;
   }
 
-  body.press-kit main:not(:has(.section.body-column)) > .section.press-kit-header > .default-content-wrapper {
-    max-width: calc(100% * 2 / 3);
-    margin-inline: 0;
+  /* the date and title keep the full width, as the source's entry header (PR #253 review); the
+     column (everything after the title) is 2/3 of the row including its 10px gutters, less the gutters */
+  body.press-kit main:not(:has(.section.body-column)) > .section.press-kit-header > .default-content-wrapper > :not(h1, :has(~ h1)) {
+    max-width: calc((100% + 2 * var(--page-gutter)) * 2 / 3 - 2 * var(--page-gutter));
   }
 
   body.press-kit main > .section.media-box {

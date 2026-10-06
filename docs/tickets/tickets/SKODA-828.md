@@ -224,7 +224,15 @@ the 1248 column like the source (x106).
 | F4 story gutters | none | after SKODA-826, `main` equals the source at 375/768/1024/1280/1440 (image, h1, perex boxes). No follow-up needed |
 | F5 story meta | chip `margin-block: -1px -2px` (not −3/−7: the source chip starts 1px above the date line; −3/−7 would leave it 1.5px off) | Epiq hero 755.63 at 1440/1080, 585.55 at 768, 486.08 at 375, date and chip offsets equal to the source to 0.01px |
 | F6 hero masters | cause: the masters are 19–26 MB, so `pickIngestUrl` steps down, but its named 3:2 guesses (`-2560x1707`) miss the real `-2560x1708` copies and fell to `-768x512`; the two `.JPG` masters are private (403) so the 1440 page reference was kept. Fix: `story-hero.js` takes the largest `srcset` copy ≤2560w; `pickIngestUrl` tries the page's own `-WxH` alongside the ladder; `build-media-manifest` no longer drops `steps.publish` on a delivery-only rebuild | the 6 heroes now deliver `-2560x1708`/`-2560x1707`; forced rebuild of their 100 images: 100 done, 20 delivery upgrades, 17 partial→done, no DAM/publish state lost |
-| F7 no-hero kit | the RS 245 kit has no body column (source press-release template): its header section takes the 2/3 column from 768 and its lead image the article 16:9 crop | h1 26/32.5/600 `#0a0a0a` (28/35 ≤768) as before; lead 812×457 at 1440/1280, 492×277 at 768, 355×200 at 375, text column 812: equal to the source's visible image box |
+| F7 no-hero kit | the RS 245 kit has no body column (source press-release template): from 768 everything after the title takes the source's 2/3 column (the date and title stay full width, review fix below), and its lead image the article 16:9 crop | h1 26/32.5/600 `#0a0a0a` (28/35 ≤768) as before; lead 812×457 at 1440/1280, 492×277 at 768, 355×200 at 375, text column 812: equal to the source's visible image box |
+
+**Review fix (2026-10-06, PR #253, F7 title width).** The 2/3 column was on the whole header wrapper, so it narrowed the
+date and title too: at 992 the title wrapped to two lines (641.33×65 vs the source's 972×32.5), which pushed the lead
+image 32.5px lower (y248 vs 215.5); at 1080 it was 700×65 vs 1060×32.5. Now only what follows the title takes the column,
+`(row + 2 × 10px gutter) × 2/3 − 2 × 10px`, as the source's `col-8`. Measured against the source on the RS 245 kit at
+375 / 767 / 768 / 992 / 1080 / 1280 / 1440: title, lead image and text column boxes equal within 0.02px (e.g. 992:
+title 972×32.5 at y167, lead 641.33×360.73 at y215.5). Octavia overlay kit and Epiq kit: every `main` box identical
+to the previous CSS at 375 / 768 / 992 / 1440.
 
 **Review fix (2026-10-05, archive variants).** All 41 live term heroes surveyed: top-level category (1 link chip to
 itself), sub-category (2 link chips: parent, then itself), tag with and without a banner (2 text chips), and a category
