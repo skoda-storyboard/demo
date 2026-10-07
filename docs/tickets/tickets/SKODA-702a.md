@@ -4,9 +4,11 @@
 - **Phase:** A · **Milestone:** M1 (15 Oct demo)
 - **GitHub issue:** [#239](https://github.com/skoda-storyboard/demo/issues/239) (sub-issue of #42)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
-- **Status:** 🟡 built 2026-10-06, see below (was 🔵 TODO 2026-10-01)
+- **Status:** ✅ Done, merged 2026-10-06 ([PR #258](https://github.com/skoda-storyboard/demo/pull/258), `40f4656`; issue #239 closed) (was 🟡 built 2026-10-06, 🔵 TODO 2026-10-01)
 
-## Status (2026-10-06): 🟡 built on branch `skoda-702a-youtube-facade` (local)
+> **Done (2026-10-07).** Verified on `main--demo--skoda-storyboard.aem.live` after the merge: the Epiq story renders the poster button (818.7 × 460.5 at 1280, "Play YouTube video"), and the only YouTube request before a click is the poster (`i.ytimg.com/vi/1Y3QHmZeLxk/maxresdefault.jpg`). No content publish was needed (code only). The notes below stay with their owners: CLS → SKODA-828, spacing below the video → SKODA-801a, the Oliver Solberg press release → SKODA-818.
+
+## Status (2026-10-06): built on branch `skoda-702a-youtube-facade`, merged in #258
 **Measured on the live `lite-youtube`** (Epiq story; after the OneTrust banner and the "I acknowledge and confirm"
 notice, which hide it until then):
 - The poster `i.ytimg.com/vi/{id}/maxresdefault.jpg` covers the 16:9 box on black.
