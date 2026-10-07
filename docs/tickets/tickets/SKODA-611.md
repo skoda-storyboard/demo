@@ -17,6 +17,10 @@
     - AC 1 and AC 3 hold on `main`: 9 sections in source order, Social media and Series dark, and the feed starts at the 4th newest migrated story with 0 overlap.
     - AC 2 holds on the 611b branch merged with `main` (with its re-imported `viewall` rows): every band heading is within 1px of live at 375 / 768 / 992 / 1280 / 1440.
   - **Content freshness, not code:** live has since published one newer story ("King of space… Superb celebrates 25 years"), not migrated yet. Live's promo and feed therefore run one story ahead of ours until it is imported.
+  - **Note (2026-10-06, fixed on the SKODA-308 branch):** the home promo box's big card was 8px too wide (no start inset) and 0.75px too short.
+    - Live's card is 16:9 + 10px tall (812 × 466.75 at 1440), and it sets the box height.
+    - The shortfall moved every band below, and the footer, 0.765px up. At 125 / 150% display scaling that rounded the footer lines a device pixel off.
+    - Now equal to live at 768–1920. See SKODA-308's "Footer list gaps at display scaling".
 
   **Re-verified 2026-09-25 on main after #110** (CDP, 1440): the promo exclusion **already works**. `/en` shows 3
   promo posts and Latest Stories starts at Epiq (15. 9. 2026) with **0 overlap**, via the authored `offset` in

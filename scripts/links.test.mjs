@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { policyHref, LIVE_ORIGIN } from './links.js';
+import { policyHref, opensInSameTab, LIVE_ORIGIN } from './links.js';
 
 const PAGE = 'https://main--demo--skoda-storyboard.aem.page/en/emobility/some-story';
 
@@ -51,8 +51,16 @@ test('LIVE_ONLY chrome targets go to the live site in a new tab', () => {
     '/cs/', '/de/', '/sk/', '/sl/', '/sr/', '/de/some/page/',
     '/en/skodapedia/', '/en/feed/', '/en/press-releases/feed/', '/en/contacts/',
     '/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing/',
-    '/en/newsletter-settings/',
   ].forEach((href) => assert.deepEqual(policyHref(href, PAGE), { href: `${LIVE_ORIGIN}${href}`, newTab: true }, href));
+});
+
+test('"Manage subscription" goes to the live page in the same tab, as on the source (SKODA-308)', () => {
+  assert.deepEqual(policyHref('/en/newsletter-settings/', PAGE), { href: `${LIVE_ORIGIN}/en/newsletter-settings/`, newTab: false });
+  const live = `${LIVE_ORIGIN}/en/newsletter-settings/`;
+  assert.deepEqual(policyHref(live, PAGE), { href: live, newTab: false }, 'an absolute live link too');
+  assert.equal(opensInSameTab(live), true);
+  assert.equal(opensInSameTab('https://example.com/en/newsletter-settings/'), false, 'only the live host');
+  assert.equal(opensInSameTab(`${LIVE_ORIGIN}/en/documents/x/`), false, 'the consent document keeps its new tab');
 });
 
 test('the media cart page is the demo\'s own (SKODA-505b): it stays in the tab', () => {

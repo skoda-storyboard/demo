@@ -71,8 +71,11 @@ export function parseFeedConfig(block) {
     template: cfg.template || '',
     offset, // skip sorted, scoped rows before applying the load-more slice
     exclude, // exact promo paths, independent of their position in the index
-    // category/tag: within-value OR, across-key AND (reuses listing-logic filterRows)
+    // category/categories/tag: within-value OR, across-key AND (reuses listing-logic filterRows).
+    // `category` is the story's top-level family (home, model rails); `categories` is every
+    // WP category of the story plus its ancestors (category archives, SKODA-831).
     category: tokens(cfg.category),
+    categories: tokens(cfg.categories),
     tag: tokens(cfg.tag || cfg.tags),
     heading: cfg.heading || '',
     // 'oldest'/'publishDate' → ascending; anything else (incl. '-publishDate') → newest
@@ -94,6 +97,23 @@ export const isFeatured = (row) => {
   const v = row.featured ?? row.promo ?? row.carousel;
   return v === true || v === 'true' || v === '1' || v === 1;
 };
+
+/*
+ * The feed's index rows for a parsed config: template/path scope, then the category /
+ * categories / tag filter (listing-logic filterRows: any-of within a key, all keys must
+ * match), then the promo-box hero posts out (source exclude_carousel_posts parity).
+ * Non-mutating; exported so tests and the archive simulation run the production path.
+ */
+export function scopeFeedRows(rows, cfg) {
+  let scoped = scopeRows(rows, { template: cfg.template, path: cfg.path });
+  const active = {};
+  if (cfg.category?.length) active.category = cfg.category;
+  if (cfg.categories?.length) active.categories = cfg.categories;
+  if (cfg.tag?.length) active.tags = cfg.tag;
+  if (Object.keys(active).length) scoped = filterRows(scoped, active);
+  if (cfg.excludeFeatured) scoped = scoped.filter((r) => !isFeatured(r));
+  return scoped;
+}
 
 export const selectFeedRows = (rows, sort, offset, exclude = []) => sortRows(
   rows.filter((row) => typeof row.path === 'string' && /^\/(?!\/)/.test(row.path)
@@ -314,14 +334,7 @@ export default async function decorate(block) {
   let scoped = [];
   try {
     const rows = await loadQueryIndex(cfg.index);
-    // template/path scope, then category/tag facet filter (reuses listing-logic)
-    scoped = scopeRows(rows, { template: cfg.template, path: cfg.path });
-    const active = {};
-    if (cfg.category.length) active.category = cfg.category;
-    if (cfg.tag.length) active.tags = cfg.tag;
-    if (Object.keys(active).length) scoped = filterRows(scoped, active);
-    // exclude the promo-box hero posts (source exclude_carousel_posts parity)
-    if (cfg.excludeFeatured) scoped = scoped.filter((r) => !isFeatured(r));
+    scoped = scopeFeedRows(rows, cfg);
   } catch (e) {
     status.textContent = STRINGS.loadError;
     // eslint-disable-next-line no-console

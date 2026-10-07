@@ -136,14 +136,16 @@ function editorNodes(panel, document) {
   return out;
 }
 
-function itemCaption(img, item) {
+// `withAlt` is for card TITLES only (a teaser needs a label). A gallery caption is never the
+// alt (often the file name or the page title, never shown on the source; SKODA-830 audit 4.4).
+function itemCaption(img, item, withAlt = true) {
   // data-caption first (~53% of Škoda captions live there), then colorbox title, then alt.
   const capSource = (img.getAttribute('data-caption') && img)
     || item.querySelector?.('[data-caption]')
     || item;
   return (capSource.getAttribute && capSource.getAttribute('data-caption'))
     || (item.querySelector?.('a[title]') && item.querySelector('a[title]').getAttribute('title'))
-    || img.getAttribute('alt') || '';
+    || (withAlt && img.getAttribute('alt')) || '';
 }
 
 // The slider's visible caption is the carousel item's optional description
@@ -152,13 +154,20 @@ function itemCaption(img, item) {
 // an alt fallback would put a caption under every Epiq image. Absent → empty cell.
 // Only the paragraphs' text is kept (the source's inline font-size/centring styles
 // are presentation, owned by the block).
-function itemDescription(item, document) {
+//
+// D5 (SKODA-830, user decision 2026-10-06 "Keep it, visible"): a lightbox-only data-caption
+// that is a regulatory consumption / CO₂ disclaimer stays, as a visible note under the
+// image (after the description, if any). Every other lightbox-only caption is dropped.
+function itemDescription(item, document, img) {
   const desc = item.querySelector?.('.search-results-item-description');
-  if (!desc || !(desc.textContent || '').trim()) return '';
-  const paras = [...desc.querySelectorAll('p')]
+  const paras = desc ? [...desc.querySelectorAll('p')]
     .map((p) => (p.textContent || '').replace(/\s+/g, ' ').trim())
-    .filter(Boolean);
-  const texts = paras.length ? paras : [desc.textContent.replace(/\s+/g, ' ').trim()];
+    .filter(Boolean) : [];
+  const descText = desc ? desc.textContent.replace(/\s+/g, ' ').trim() : '';
+  const texts = paras.length || !descText ? paras : [descText];
+  const note = regulatoryCaption(img, item);
+  if (note && !texts.some((t) => t.includes(note))) texts.push(note);
+  if (!texts.length) return '';
   return texts.map((t) => {
     const p = document.createElement('p');
     p.textContent = t;
@@ -166,11 +175,30 @@ function itemDescription(item, document) {
   });
 }
 
+// A consumption / CO₂ disclaimer, detected conservatively: a WLTP mention, or a consumption
+// figure (kWh/100 km, l/100 km) together with an emissions figure (CO₂/CO2 emissions, g/km).
+// A narrative caption that only mentions "energy consumption" or a kWh/100 km result (e.g.
+// the Peaq aerodynamics or 936 km range photos) is not one.
+const CONSUMPTION_RE = /\b(?:kWh|l)\s*\/\s*100\s*km\b/i;
+const EMISSIONS_RE = /\bCO(?:₂|2)\s+emissions?\b|\bg\s*\/\s*km\b/i;
+export function isRegulatoryCaption(text) {
+  const t = (text || '').replace(/\s+/g, ' ').trim();
+  if (!t) return false;
+  return /\bWLTP\b/.test(t) || (CONSUMPTION_RE.test(t) && EMISSIONS_RE.test(t));
+}
+
+function regulatoryCaption(img, item) {
+  const holder = (img && img.getAttribute && img.getAttribute('data-caption') && img)
+    || item.querySelector?.('[data-caption]');
+  const text = holder ? (holder.getAttribute('data-caption') || '').replace(/\s+/g, ' ').trim() : '';
+  return isRegulatoryCaption(text) ? text : '';
+}
+
 // Build a Gallery block (SKODA-203 / story-detail.md STO-D04): one row per image,
 // [img, caption]. Used for link-free image sets (sow-slider and image carousels).
 // `blockName` picks the variant: link-free carousels render as the one-image
 // slider (`Gallery (slider)`, SKODA-819) captioned by the item description;
-// sow-slider keeps the default Gallery and its data-caption → title → alt caption.
+// sow-slider keeps the default Gallery and its data-caption → title caption (no alt).
 function galleryCells(panel, document, blockName = 'Gallery') {
   const imgs = [...panel.querySelectorAll('img')];
   if (!imgs.length) return null;
@@ -178,7 +206,7 @@ function galleryCells(panel, document, blockName = 'Gallery') {
   const cells = [[blockName]];
   imgs.forEach((img) => {
     const item = img.closest('.search-results-item, .item, figure') || img;
-    cells.push([img, slider ? itemDescription(item, document) : itemCaption(img, item)]);
+    cells.push([img, slider ? itemDescription(item, document, img) : itemCaption(img, item, false)]);
   });
   return cells.length > 1 ? cells : null;
 }

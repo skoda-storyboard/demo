@@ -67,7 +67,9 @@ reconstruct the media that exists in all 21 stories, and keep the rest of SKODA-
     Octavia), and assert the slider count per page.
   - **0 block JS 404s:** the older Epiq import references a `version` block that doesn't exist.
   - The story Media Box collapses behind "Show more" above 8 assets (708px collapsed, 139×44 pill; routed here from
-    the closed 502).
+    the closed 502). *Reconciled in SKODA-830 D2 (2026-10-06):* the source rule is "more than two rows at the current
+    column count", which is "above 8" only at 4 columns; 708.25px (1440) and the 137.6×44 pill are matched, see
+    `docs/ui-specs/downloads.md`.
 
 ## Dependencies
 - Upstream: SKODA-601 (importer), SKODA-801 (#113), SKODA-819 (was 219), SKODA-818, SKODA-502 (#111), SKODA-204 (#109), SKODA-501/506.

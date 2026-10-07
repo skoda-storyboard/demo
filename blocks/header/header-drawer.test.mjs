@@ -179,7 +179,7 @@ test('narrow screens: the brand column can shrink below the logo width', () => {
 test('narrow screens: the drawer-band logo fits its column, up to 194px', () => {
   const rule = drawerBand.match(/header \.nav-brand \.icon-skoda-storyboard-logo \{([^}]+)\}/)?.[1] || '';
   assert.match(rule, /width: min\(194px, 100cqi\)/);
-  assert.match(rule, /aspect-ratio: 194 \/ 18/);
+  assert.match(rule, /aspect-ratio: 255\.19 \/ 23\.1/, 'the source wordmark proportions (SKODA-308)');
   assert.match(drawerBand.match(/header \.nav-brand \{([^}]+)\}/)?.[1] || '', /container-type: inline-size/);
   assert.match(css, /width: var\(--nav-hamburger-width\)/, 'the 68px touch target is kept');
 });

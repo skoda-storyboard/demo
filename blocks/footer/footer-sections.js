@@ -3,6 +3,8 @@
  * fragment dependency, so they unit-test in plain node (see footer.test.mjs).
  */
 
+import { opensInSameTab } from '../../scripts/links.js';
+
 // social network → accessible label + hover-tint class, keyed by icon token name
 const SOCIAL_LABELS = {
   facebook: 'Facebook',
@@ -163,6 +165,8 @@ export function openOutboundLinks(footer, origin) {
       return;
     }
     if (!/^https?:$/.test(url.protocol) || url.origin === origin) return;
+    // the live pages the source opens in the tab (the newsletter "Manage subscription")
+    if (opensInSameTab(url.href)) return;
     a.setAttribute('target', '_blank');
     const rel = new Set((a.getAttribute('rel') || '').split(/\s+/).filter(Boolean));
     rel.add('noopener');
