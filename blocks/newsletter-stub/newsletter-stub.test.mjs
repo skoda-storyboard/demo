@@ -71,12 +71,12 @@ test('submit sends nothing: default prevented, message announced, hand-off event
   form.dispatchEvent(submit);
 
   assert.equal(submit.defaultPrevented, true);
-  assert.equal(form.querySelector('[role=status]').textContent, 'Newsletter sign-up will be available soon.');
+  assert.equal(form.querySelector('.newsletter-stub-status').textContent, 'Newsletter sign-up will be available soon.');
   assert.deepEqual(detail, { email: 'journalist@example.com', list: '339', language: 'en_GB' });
   assert.ok(form.classList.contains('is-sent'), 'source: the field and the button give way to the message');
 
   form.querySelector('input[type=email]').dispatchEvent(new Event('input'));
-  assert.equal(form.querySelector('[role=status]').textContent, '', 'editing the email clears the message');
+  assert.equal(form.querySelector('.newsletter-stub-status').textContent, '', 'editing the email clears the message');
 });
 
 test('ids are unique per instance', () => {
@@ -208,7 +208,7 @@ test('card: invalid e-mail shows a described error, no status and no hand-off', 
     assert.equal(error.textContent, 'Please enter a valid e-mail address.');
     assert.equal(input.getAttribute('aria-invalid'), 'true');
     assert.equal(input.getAttribute('aria-describedby'), error.id);
-    assert.equal(form.querySelector('[role=status]').textContent, '');
+    assert.equal(form.querySelector('.newsletter-stub-status').textContent, '');
   });
   assert.equal(fired, false);
   assert.equal(form.classList.contains('is-expanded'), true, 'required consent is never left hidden');
@@ -227,7 +227,7 @@ test('card: unchecked consent is reported on the checkbox', () => {
   assert.equal(form.querySelector('.newsletter-stub-error').textContent, 'Please accept the terms before continuing.');
   assert.equal(checkbox.getAttribute('aria-invalid'), 'true');
   assert.equal(input.getAttribute('aria-invalid'), null);
-  assert.equal(form.querySelector('[role=status]').textContent, '');
+  assert.equal(form.querySelector('.newsletter-stub-status').textContent, '');
 });
 
 test('card: valid input announces "not available yet" and sends nothing', () => {
@@ -242,7 +242,7 @@ test('card: valid input announces "not available yet" and sends nothing', () => 
     block.addEventListener('newsletter:subscribe', (e) => { detail = e.detail; });
 
     assert.equal(submit(form).defaultPrevented, true);
-    assert.equal(form.querySelector('[role=status]').textContent, 'Newsletter signup is not available yet');
+    assert.equal(form.querySelector('.newsletter-stub-status').textContent, 'Newsletter signup is not available yet');
     assert.equal(form.querySelector('.newsletter-stub-error').textContent, '');
     assert.deepEqual(detail, { email: 'journalist@example.com', list: '389', language: 'en_GB' });
   } finally {
@@ -304,9 +304,10 @@ test('topbar: the browser validates it (source tooltips, no error box); a valid 
   input.value = 'journalist@example.com';
   form.querySelector('input[type=checkbox]').checked = true;
   assert.equal(submit(form).defaultPrevented, true);
-  assert.equal(form.querySelector('[role=status]').textContent, 'Newsletter signup is not available yet');
+  assert.equal(form.querySelector('.newsletter-stub-status').textContent, 'Newsletter signup is not available yet');
   assert.ok(form.classList.contains('is-sent'), 'field + button give way to the message');
-  assert.equal(form.querySelector('[role=status]').tabIndex, -1, 'focusable, so focus moves to it');
+  assert.equal(form.querySelector('.newsletter-stub-status').tabIndex, -1, 'focusable, so focus moves to it');
+  assert.equal(form.querySelector('[role=status], [aria-live]'), null, 'focused, it is read once, not also as a live update');
   assert.equal(detail.email, 'journalist@example.com');
 });
 

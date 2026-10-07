@@ -161,6 +161,21 @@ then, from 302 / 303 / 304 / 826:
     - The footer starts at 3904.141 vs live's 3904.156 (was 3903.39).
     - The footer gaps now render identically at 1, 1.1, 1.25, 1.5 and 1.75×.
   - **Other pages** can carry their own sub-pixel height differences above the footer. They show only at in-between scaling and belong to the blocks on those pages. The Epiq story's footer box positions measured equal to live.
+- **PR #271 merge + review round (2026-10-07).**
+  - **Merged main after #268** (the header wordmark fix). The conflict on `icons/skoda-storyboard-logo.svg` was resolved to #268's file: the same artwork, rendering identically with this branch's CSS (122,67.8 194×17.55). #268's `header-logo.test.mjs` passes. Its spec note was corrected (measured size, the `<img alt="">` name, the brand row).
+  - **Fixed from the review:**
+    - **Desktop dropdown click / tap:** a pointer click on a parent closed the panel it was hovering, and a tablet tap at ≥ 1080px could never open it (pointerenter cleared the dismissal, then the click dismissed again).
+      - A pointer click or tap (`detail > 0`) now opens the dropdown, or closes the one it opened. From the keyboard, Enter still toggles what's on screen.
+      - Verified with a mouse at 1440 and touch at 1280; new test.
+    - **Escape during the header's ≤ 250ms asset wait** threw: `#nav` wasn't in the document yet. It's now guarded.
+    - **Newsletter:**
+      - Reopening the topbar panel after a send focuses the message (the field is gone).
+      - The sent message leaves the live region before taking focus, so it's read once.
+    - **Tidy:** one `HEADER_ASSET_WAIT` for both header waits. `--nav-topbar-line` and `--footer-small-line-height` replace hard-coded 18px; the 4px gap is `calc(var(--spacing-xs) / 2)`.
+  - **Decided, kept for source parity (2026-10-07):** the desktop search placeholder `#464748` at 30% (about 1.6:1 on `#f1f1f1`, below AA). This joins the 2026-10-06 colour decisions.
+  - **Left as noted:**
+    - The scope select has no effect until SKODA-403 filters by type.
+    - The footer's own outbound new-tab rule sits beside `scripts/links.js`; the same-tab exception is shared via `opensInSameTab`.
 - **Tests:** `header-chrome.test.mjs` (22: search, URL, dropdown keys, hover / focus dismissal, newsletter panel, inline glyphs incl. menu / close / mail). `newsletter-stub.test.mjs` +2 (topbar). `scripts/icons-ready.test.mjs` 3.
   - Header, footer and newsletter tests are green.
   - Blocks / scripts / templates: 536/538. The 2 also fail on `main`:

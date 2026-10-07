@@ -248,9 +248,12 @@ export default function decorate(block) {
       status.textContent = '';
       return;
     }
-    status.textContent = message;
     // source: a sent form drops its field and button and shows the message in their place
-    // (SKODA-308); focus moves to the message so it isn't lost with the button
+    // (SKODA-308); focus moves to the message so it isn't lost with the button. Focused, it is
+    // read once as the focused text, so it leaves the live region first (not announced twice).
+    status.removeAttribute('role');
+    status.removeAttribute('aria-live');
+    status.textContent = message;
     form.classList.add('is-sent');
     status.tabIndex = -1;
     status.focus?.({ preventScroll: true });

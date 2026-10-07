@@ -13,6 +13,8 @@ const isDesktop = window.matchMedia('(min-width: 1080px)');
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
     const nav = document.getElementById('nav');
+    // the listener is live before the header is shown (it waits up to HEADER_ASSET_WAIT)
+    if (!nav) return;
     const navSections = nav.querySelector('.nav-sections');
     if (!navSections) return;
     const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
@@ -478,7 +480,10 @@ export function wireNewsletterPanel(panel, triggers) {
     triggers.forEach((t) => t.setAttribute('aria-expanded', open ? 'true' : 'false'));
     if (open) {
       opener = from;
-      panel.querySelector('input[type="email"]')?.focus();
+      // the e-mail field, or the sent message once the form has dropped its field
+      const field = panel.querySelector('input[type="email"]');
+      const sent = field?.closest('.is-sent');
+      (sent ? sent.querySelector('.newsletter-stub-status') : field)?.focus();
     } else if (opener && panel.contains(document.activeElement)) {
       opener.focus();
     }
@@ -658,8 +663,14 @@ export default async function decorate(block) {
         if (isDesktop.matches) {
           const expanded = navSection.getAttribute('aria-expanded') === 'true';
           if (isDrop) {
-            // toggles what is on screen (a text-only parent: click or Enter), as Space does
-            setDesktopDrop(navSection, !dropShown(navSection));
+            // a pointer click or tap (detail > 0) opens the dropdown, or closes the one it
+            // opened: a hover-shown panel stays, and a tablet tap (pointerenter, then click)
+            // opens it. From the keyboard (Enter on a text-only parent) it toggles what is on
+            // screen, as Space does.
+            const open = e.detail > 0
+              ? navSection.getAttribute('aria-expanded') !== 'true'
+              : !dropShown(navSection);
+            setDesktopDrop(navSection, open);
           } else {
             toggleAllNavSections(navSections);
             navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
@@ -873,7 +884,7 @@ export default async function decorate(block) {
   navWrapper.append(nav);
 
   // shown complete: no logo or icon popping in, no topbar text re-flowing as its faces arrive
-  await Promise.all([assetsReady, iconsReady(navWrapper)]);
+  await Promise.all([assetsReady, iconsReady(navWrapper, HEADER_ASSET_WAIT)]);
   block.append(navWrapper);
 
   // the Subscribe CTA (topbar) and the mail shortcut (phones) open the newsletter panel once

@@ -33,6 +33,7 @@ header .nav-wrapper {
   --nav-drawer-caret-width: 14.875px; /* the same glyph in the drawer rows, at 16px */
   --nav-drawer-caret-height: 8.938px;
   --nav-tab-padding: 21px;
+  --nav-topbar-line: 18px; /* the source topbar 12/18 line (Subscribe CTA, locales) */
   --nav-newsletter-width: 550px; /* the panel's form (source label max-width / field + pill) */
 
   position: relative;
@@ -152,9 +153,9 @@ header .nav-topbar .nav-topbar-utility a {
 header .nav-topbar .nav-subscribe {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: calc(var(--spacing-xs) / 2);
   font-weight: var(--weight-semibold);
-  line-height: 18px;
+  line-height: var(--nav-topbar-line);
 }
 
 /* source: a 20 x 16 icon box with the 16px glyph centred, 4px before the label (glyph at x1002,
@@ -1203,7 +1204,7 @@ header .nav-topbar button.nav-subscribe {
   position: relative;
   color: var(--skoda-grey-700);
   font-weight: var(--weight-semibold);
-  line-height: 18px;
+  line-height: var(--nav-topbar-line);
 }
 
 /* source .newsletter-button__active: a 2px ink bar under the open trigger */

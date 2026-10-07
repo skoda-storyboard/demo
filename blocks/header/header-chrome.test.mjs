@@ -264,16 +264,35 @@ test('desktop dropdown: Space on a focused item (li) toggles it without scrollin
   assert.equal(models.getAttribute('aria-expanded'), 'true');
 });
 
-test('desktop dropdown: a text-only parent toggles what is on screen on click / Enter', () => {
+test('desktop dropdown: a text-only parent toggles what is on screen on a keyboard click / Enter', () => {
   const company = [...nav.querySelectorAll('.nav-drop')].find((li) => li.textContent.includes('Company'));
   const trigger = company.querySelector(':scope > p > a');
   assert.equal(trigger.getAttribute('href'), '#');
   trigger.focus(); // :focus-within shows it
-  trigger.click();
+  trigger.click(); // keyboard activation (detail 0)
   assert.equal(company.dataset.dismissed, 'true', 'the first click hides the panel focus was showing');
   trigger.click();
   assert.equal(company.getAttribute('aria-expanded'), 'true');
   assert.equal(company.dataset.dismissed, undefined);
+});
+
+test('desktop dropdown: a pointer click or tap opens a text-only parent, a second one closes it', () => {
+  const company = [...nav.querySelectorAll('.nav-drop')].find((li) => li.textContent.includes('Company'));
+  const trigger = company.querySelector(':scope > p > a');
+  const tap = () => trigger.dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
+  company.setAttribute('aria-expanded', 'false');
+  delete company.dataset.dismissed;
+  // a hover-shown panel (not dismissed): the click opens it rather than hiding it
+  tap();
+  assert.equal(company.getAttribute('aria-expanded'), 'true');
+  assert.equal(company.dataset.dismissed, undefined);
+  tap();
+  assert.equal(company.getAttribute('aria-expanded'), 'false');
+  assert.equal(company.dataset.dismissed, 'true', 'closed under the pointer');
+  // a tablet tap: pointerenter clears the dismissal, then the click opens it again
+  company.dispatchEvent(new window.Event('pointerenter'));
+  tap();
+  assert.equal(company.getAttribute('aria-expanded'), 'true');
 });
 
 test('desktop dropdown: the panel rule honours the dismissal (CSS guard, jsdom has no cascade)', async () => {

@@ -107,7 +107,7 @@ footer .footer-nav nav > ul {
 
 footer .footer-nav li {
   font-size: var(--body-font-size-m);
-  line-height: 18px;
+  line-height: var(--footer-small-line-height);
 }
 
 /* top-level = column heading + its sub-list. Source item rhythm is 12px (--spacing-s),
@@ -136,7 +136,7 @@ footer .footer-nav nav > ul > li > p > a {
   font-size: var(--body-font-size-2xs);
   font-weight: var(--weight-regular);
   letter-spacing: 1px;
-  line-height: 18px;
+  line-height: var(--footer-small-line-height);
 }
 
 /* ---- social + app-badge row (.footer-social) ----
