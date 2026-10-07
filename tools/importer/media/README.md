@@ -160,7 +160,15 @@ link must be a stable URL without a query string; query-bearing binaries block
 ingest rather than guessing whether dropping parameters changes the file.
 Analytics hash fragments may be stripped by the existing link transformer. The source
 may return `application/octet-stream` for MP4s, so verified MP4 signatures
-are uploaded with `video/mp4` MIME. PDF/MP4 originals download into a
+are uploaded with `video/mp4` MIME.
+The Slavia Monte Carlo `.mov_….mp4` source is a QuickTime original despite its
+final extension. An `ftyp` QuickTime brand and matching source MIME are required
+before upload; its original bytes retain `video/quicktime`, recorded as
+`mime_type` and checked by public verification and the binary gate. It is
+neither converted nor mislabeled as MP4. Completed rows reuse their recorded
+`dam_asset_path`, including AEM-escaped filenames, when resuming publication;
+the public-URL map must use that actual stored path.
+PDF/MP4 originals download into a
 system temporary directory outside the served checkout, then upload as bounded
 file streams through the DAM's multipart URLs; the temporary file is removed
 on success or failure.

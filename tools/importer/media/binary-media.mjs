@@ -5,6 +5,14 @@ import { isIP } from 'node:net';
 const MIME = { document: 'application/pdf', video: 'video/mp4' };
 const SOURCE = 'https://www.skoda-storyboard.com';
 
+export function binaryMime(row) {
+  const mime = row.mime_type || MIME[row.kind];
+  if (mime !== MIME[row.kind] && !(row.kind === 'video' && mime === 'video/quicktime')) {
+    throw new Error(`Unsupported original binary MIME: ${mime}`);
+  }
+  return mime;
+}
+
 export function binaryKind(href, declaredType = '') {
   try {
     const url = new URL(href, SOURCE);
@@ -86,16 +94,22 @@ export function binaryErrors(html, manifest, pagePath = '') {
     });
   });
   const seen = new Set();
+  // CDN and /direct-download/ aliases of one original are separate rows sharing a DAM asset;
+  // the page links it once, so a row counts as present when its asset is.
+  const seenAssets = new Set();
   for (const {
     href, kind, label, title,
   } of binaryAnchors(html)) {
     const row = lookup.get(binarySource(href, pagePath));
-    if (row) seen.add(row.logical_id);
+    if (row) {
+      seen.add(row.logical_id);
+      if (row.dam_asset_path) seenAssets.add(row.dam_asset_path);
+    }
     if (!row || row.kind !== kind || row.status !== 'done'
       || row.steps?.dam !== 'done' || row.steps?.publish !== 'done'
       || !row.dam_asset_path || !row.public_url || !publicBinaryUrl(row.public_url)
       || row.public_verified?.url !== row.public_url
-      || row.public_verified?.mime !== MIME[kind]
+      || row.public_verified?.mime !== binaryMime(row)
       || !Number.isSafeInteger(row.public_verified?.bytes)
       || !Number.isSafeInteger(row.bytes)
       || row.bytes < 1
@@ -108,7 +122,8 @@ export function binaryErrors(html, manifest, pagePath = '') {
   }
   if (pagePath) {
     Object.values(manifest.rows || {}).filter((row) => MIME[row.kind]
-      && (row.page_refs || []).includes(pagePath) && !seen.has(row.logical_id))
+      && (row.page_refs || []).includes(pagePath) && !seen.has(row.logical_id)
+      && !(row.dam_asset_path && seenAssets.has(row.dam_asset_path)))
       .forEach((row) => errors.push(`imported binary link missing: ${row.logical_id}`));
   }
   return errors;
@@ -132,7 +147,7 @@ export function rewriteBinaryLinks(html, manifest, pagePath = '') {
       || row.steps?.dam !== 'done' || row.steps?.publish !== 'done'
       || !publicBinaryUrl(row.public_url)
       || row.public_verified?.url !== row.public_url
-      || row.public_verified?.mime !== MIME[kind]
+      || row.public_verified?.mime !== binaryMime(row)
       || !Number.isSafeInteger(row.public_verified?.bytes)
       || !Number.isSafeInteger(row.bytes)
       || row.bytes < 1
@@ -153,9 +168,10 @@ export function rewriteBinaryLinks(html, manifest, pagePath = '') {
 }
 
 export async function verifyPublicBinary(url, kind, bytes, {
-  attempts = 1, intervalMs = 2000,
+  attempts = 1, intervalMs = 2000, mime: expectedMime = MIME[kind],
 } = {}) {
   if (!publicBinaryUrl(url)) throw new Error(`Not a public Assets binary URL: ${url}`);
+  binaryMime({ kind, mime_type: expectedMime });
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     // eslint-disable-next-line no-await-in-loop
     const response = await fetch(url, {
@@ -169,8 +185,8 @@ export async function verifyPublicBinary(url, kind, bytes, {
     if (!response.ok) throw new Error(`Public binary HEAD returned ${response.status}: ${url}`);
     const mime = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
     const size = Number(response.headers.get('content-length'));
-    if (mime !== MIME[kind] || !Number.isSafeInteger(size) || size < 1 || size !== bytes) {
-      throw new Error(`Public binary type/size mismatch: ${url} (${mime}, ${size} bytes; expected ${MIME[kind]}, ${bytes})`);
+    if (mime !== expectedMime || !Number.isSafeInteger(size) || size < 1 || size !== bytes) {
+      throw new Error(`Public binary type/size mismatch: ${url} (${mime}, ${size} bytes; expected ${expectedMime}, ${bytes})`);
     }
     return { url, mime, bytes: size };
   }

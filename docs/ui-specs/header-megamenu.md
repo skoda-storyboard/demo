@@ -104,6 +104,12 @@ All rows: `measured (selector · viewport) -> token`. Source URL for every row:
   `position:relative` (the dropdown anchor).
 - **brand/logo**: `.brand` `256×64`, `flex; align-items:center`. Logo `svg` renders `194×18`
   (· `.brand a.logo svg` · 1280); viewBox `0 0 255.19 23.1`. Matches `header.css` sizing (194×18).
+  **Asset provenance (logo-only correction, 2026-10-06):** `icons/skoda-storyboard-logo.svg` copies
+  the original seven-path wordmark from the source `.brand a.logo svg` above, preserving its
+  viewBox, `evenodd` fill rule and dark-green `#0e3a2f` fills. It is font-independent, with no text
+  or external resources, and retains `role="img"` / `aria-label="Škoda Storyboard, home"`.
+  `header.js` injects `.icon.icon-skoda-storyboard-logo` into the authored home link;
+  `decorateIcons(nav)` loads this local `/icons/skoda-storyboard-logo.svg` asset.
 - **`#primary_top_menu`**: `display:flex`, `padding-right 4rem` (`64px`, reserves the search icon slot).
 - **top-level `li > a`**: `display:flex; align-items:center`, `padding 0 20px` (· `.topnav .menu >
   .menu-item > a` · 1280), font-size `1em` = `16px` -> `--body-font-size-m`, line-height `1.5em`
