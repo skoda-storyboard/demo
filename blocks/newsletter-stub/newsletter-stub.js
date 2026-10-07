@@ -228,6 +228,16 @@ export default function decorate(block) {
     form.append(manage);
   }
 
+  // topbar: a second submit at the end of the form, as the source's. Phones show the pill under
+  // the consent, so it must also come after it in the tab order (email → consent → manage →
+  // submit); the CSS shows one of the two buttons per band, the other is display:none (out of
+  // the tab order and the accessibility tree)
+  if (block.classList.contains('topbar')) {
+    const endButton = el('button', 'newsletter-stub-submit newsletter-stub-submit-end', { type: 'submit' });
+    endButton.textContent = button.textContent;
+    form.append(endButton);
+  }
+
   // the topbar and footer forms keep the browser's own validation (source: its tooltip on the
   // field / the consent box, nothing added to the form); the card validates in the block
   const validate = isCard ? cardValidation(cfg, form, input, id) : () => true;

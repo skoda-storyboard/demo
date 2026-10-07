@@ -504,8 +504,15 @@
   color: var(--skoda-green-emerald);
 }
 
-/* phones / the drawer band: field full width less its 15px gap, the pill last (order only, so
-   the tab order stays e-mail → submit → consent, as on the source) */
+/* the source's two submit buttons, one per band: the row's beside the field from 1080, the
+   form-end one (after consent + manage) below it, so the tab order follows what is on screen.
+   The hidden one is display:none, out of the tab order. */
+.newsletter-stub.topbar .newsletter-stub-submit-end {
+  display: none;
+}
+
+/* phones / the drawer band: field full width less its 15px gap, the pill last, under the
+   consent and the manage link (the form-end button; tab order email → consent → submit) */
 @media (width < 1080px) {
   .newsletter-stub.topbar .newsletter-stub-form {
     display: flex;
@@ -523,8 +530,12 @@
     flex: none;
   }
 
-  .newsletter-stub.topbar .newsletter-stub-submit {
-    order: 1;
+  .newsletter-stub.topbar .newsletter-stub-row .newsletter-stub-submit {
+    display: none;
+  }
+
+  .newsletter-stub.topbar .newsletter-stub-submit-end {
+    display: block;
     min-height: 44px;
     margin-top: var(--spacing-s);
     font-size: 0.8rem;

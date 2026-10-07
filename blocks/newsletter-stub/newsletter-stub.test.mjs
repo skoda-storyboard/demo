@@ -289,6 +289,28 @@ test('topbar: the authored label names the field; consent is shown from the star
   assert.equal(form.querySelector('.newsletter-stub-manage a').textContent, 'Manage subscription');
 });
 
+test('topbar: a second submit ends the form, so the phone tab order is email → consent → manage → submit (#271 review)', async () => {
+  const form = build(TOPBAR).querySelector('form');
+  const submits = [...form.querySelectorAll('button[type=submit]')];
+  assert.equal(submits.length, 2, 'the source pair: the row button and the form-end one');
+  const [rowButton, endButton] = submits;
+  assert.ok(rowButton.closest('.newsletter-stub-row'), 'beside the field (shown from 1080)');
+  assert.ok(endButton.classList.contains('newsletter-stub-submit-end'));
+  assert.equal(endButton.textContent, rowButton.textContent);
+  assert.equal([...form.children].at(-1), endButton, 'after consent + manage in the DOM');
+  const order = [...form.querySelectorAll('input[type=email], input[type=checkbox], a, button')].map((n) => n.className || n.tagName);
+  assert.deepEqual(order.slice(-3), ['A', 'A', 'newsletter-stub-submit newsletter-stub-submit-end'], 'consent link, manage link, then the end button');
+  // only one shows per band: the CSS hides the end button wide and the row button on phones
+  const { readFile } = await import('node:fs/promises');
+  const css = await readFile(new URL('./newsletter-stub.css', import.meta.url), 'utf8');
+  assert.match(css, /\.newsletter-stub\.topbar \.newsletter-stub-submit-end \{\s*display: none;/);
+  assert.match(css, /@media \(width < 1080px\)[\s\S]*\.newsletter-stub\.topbar \.newsletter-stub-row \.newsletter-stub-submit \{\s*display: none;/);
+  assert.doesNotMatch(css, /order: 1;/, 'no visual-only reordering');
+  // the footer and the card keep a single button
+  assert.equal(build().querySelectorAll('button[type=submit]').length, 1);
+  assert.equal(build(CARD).querySelectorAll('button[type=submit]').length, 1);
+});
+
 test('topbar: the browser validates it (source tooltips, no error box); a valid submit sends nothing', () => {
   const block = build(TOPBAR);
   const form = block.querySelector('form');
