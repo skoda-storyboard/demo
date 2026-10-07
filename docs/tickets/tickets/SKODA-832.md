@@ -6,8 +6,9 @@
 - **GitHub issue:** [#261](https://github.com/skoda-storyboard/demo/issues/261)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §3.1 / §8 F1; follows up the interim noted in [SKODA-208](SKODA-208.md)
 - **Branch:** `skoda-832-octavia-hubs-reimport`
-- **Status (2026-10-06):** 🟡 Developer done (head 3a591aa, pushed). QA (rendered) not yet run. Nothing has been
-  pushed to DA, previewed or published.
+- **Status (2026-10-07):** 🟡 **9 hubs pushed to DA and previewed** (9 × update, 0 conflicts, 9/9 preview 200), not
+  published. QA (2026-10-07): content PASS; rendered FAIL on D2 (lone download banner, code-only fix pending).
+  RS 245 is excluded (D1: no importer for its template).
 
 ## Problem
 The 10 Octavia-rail press kits were imported through `page-base` as an interim. 9 of them are hubs, so the chapter
@@ -47,11 +48,44 @@ Twitter text. The 10th (Octavia RS 245) is a press-kit article.
 - Chapter pages are not migrated, so tile links correctly stay absolute to the origin (link policy).
 - The scratch import ran without the media step: run `media:apply` before any push.
 
+## QA result (2026-10-07, head ab03c9a)
+Evidence: `.migration/qa-832/` (outside git).
+- **Code / tests / bundles:** pass. All 19 bundles rebuild byte-identical. The press-kit-default bundle embeds
+  `press-kit-hub-tiles.js` and was rebuilt in the main merge.
+- **Regression:** 55/55 press-kit-default pages and 8/8 existing hubs are byte-identical between main's and the
+  branch's bundles.
+- **Content (9 hubs):** pass. Tiles, banners and contacts match origin, with no Twitter junk. Nothing is lost vs the
+  old DA docs. `media:apply` made 39 rewrites; `validate-binaries` reports 0 errors; `validate-blocks` 9/9.
+- **D1 (high): RS 245 has no importer.**
+  - The origin body class is `press_kit-template-template-press-release`, which the press-kit-default layout guard
+    rejects ("Not a default press-kit article").
+  - The press-release bundle keeps 110 "Add/remove" links.
+  - Needs a template-variant follow-up; excluded from the push. DA still holds the flattened page-base doc.
+- **D2 (high, visual): a lone download banner spans the content width.**
+  - `.section.press-kit-banners` grid `repeat(auto-fit, minmax(min(100%, 25rem), 1fr))`.
+  - Scout, 4x4, RS Experience: 1228×1228 at 1440 (origin 292×292); 972×972 at 992 (origin 228).
+  - Octavia -2, IAA: 1228×1228 (origin 307×307).
+  - Octavia 4:1 banner: 1228×307 (origin 634×159).
+  - Fix in CSS (size a lone banner like its origin tile: square → quarter, 4:1 → half); no re-push needed.
+- **D3 (medium): approximation not yet recorded.**
+  - Origin shows the last 5 resource tiles 2-up (292/307) beside the X timeline; EDS shows them 5-across at
+    230×230 (178 at 992).
+  - The Octavia kit's 6 tiles become 4+2 at 292 (origin 307).
+- **D4 (known approximations, measured):**
+  - Scout 4:1 intro tile at 1440 is 604×292 (origin 1228×292).
+  - The 4x4 1/3 squares are 292 (origin 396).
+- **D5 (low):**
+  - IAA ZIP stays `/direct-download/` (CDN `.zip` returns 200).
+  - The Octavia ZIP with no extension returns 403 (editorial).
+- **D6 (low):** `bannerAlt` treats any "download" image name as the ZIP banner.
+- **D7 (observation):** contact cells are 602×116 vs 604×96; banners start 40px below the tiles vs 20px on origin.
+
 ## Acceptance Criteria
 - [x] All 9 hubs import through press-kit-hub with every tile (count, titles, links, images) in the cards/tiles block
 - [x] No Twitter junk; sane description; no text or image lost vs the current DA docs
 - [ ] Rendered QA (measured, 1440/992/768/375) vs origin, incl. the contacts Columns and the two size approximations
-- [ ] `media:apply`, DA dry-run, push + preview. Publishing needs a separate go-ahead.
+- [x] `media:apply`, DA dry-run, push + preview (2026-10-07: 9 hubs; RS 245 excluded, D1)
+- [ ] D2 banner sizing fixed + rendered re-check; then publish (separate go-ahead)
 
 ## Follow-ups
 - The cards tiles block has no full-width or one-third tile size (block change), which is behind the 2 approximations.
