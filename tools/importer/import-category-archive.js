@@ -4,7 +4,7 @@
 /**
  * Import orchestrator: Škoda category/tag ARCHIVE listing (body.archive).
  *
- * Term hero (banner + h1 from the source labels, default content) + an index-driven
+ * Term hero (`Hero Image (archive)`: banner + h1 from the source labels, SKODA-828) + an index-driven
  * Stories grid (tag / path scope derived from the page canonical URL). Distinct from
  * pr-listing (which has the facet engine). Serves both /en/category/<x>/ and
  * /en/tag/model/<x>/ — same DOM shape. One template = one import script.

@@ -60,6 +60,34 @@ test('PDF/MP4 links rewrite without touching text, embeds or image references', 
   assert.equal(rewriteBinaryLinks(result.html, manifest).rewrites, 0);
 });
 
+test('a proven QuickTime original keeps its actual MIME behind a source .mp4 link', async () => {
+  const mapping = structuredClone(manifest);
+  const video = mapping.rows[logicalId(mp4)];
+  video.mime_type = 'video/quicktime';
+  video.public_verified.mime = 'video/quicktime';
+  assert.deepEqual(rewriteBinaryLinks(`<a href="${mp4}">Video</a>`, mapping).errors, []);
+  assert.deepEqual(binaryErrors(`<a href="${hostedMp4}">Video</a>`, mapping), []);
+  video.public_verified.mime = 'video/mp4';
+  assert.match(binaryErrors(`<a href="${hostedMp4}">Video</a>`, mapping).join(' '), /unverified video/);
+
+  const previousFetch = global.fetch;
+  try {
+    global.fetch = async () => new Response(null, {
+      status: 200,
+      headers: { 'content-type': 'video/quicktime', 'content-length': '42' },
+    });
+    assert.deepEqual(await verifyPublicBinary(hostedMp4, 'video', 42, {
+      mime: 'video/quicktime',
+    }), { url: hostedMp4, mime: 'video/quicktime', bytes: 42 });
+    await assert.rejects(verifyPublicBinary(hostedMp4, 'video', 42), /type\/size mismatch/);
+    await assert.rejects(verifyPublicBinary(hostedMp4, 'video', 42, {
+      mime: 'text/html',
+    }), /Unsupported original binary MIME/);
+  } finally {
+    global.fetch = previousFetch;
+  }
+});
+
 test('a declared MIME identifies a binary when the source URL has no extension', () => {
   const source = 'https://www.skoda-storyboard.com/reports/annual';
   const rows = structuredClone(manifest);
@@ -82,6 +110,28 @@ test('single-quoted and unquoted binary anchors rewrite without modifying labels
   assert.match(result.html, new RegExp(`href='${hostedMp4}'>MP4`));
   assert.match(result.html, /Second MP4/);
   assert.match(binaryErrors('<source type="video/mp4" src="/videos/download">', manifest).join(' '), /source src points at a PDF\/MP4/);
+});
+
+test('a CDN alias row of an asset the page already links is not reported missing', () => {
+  const cdn = 'https://cdn.skoda-storyboard.com/clip.mp4';
+  const alias = { ...row(cdn, hostedMp4, 'video'), page_refs: ['en/videos/clip', 'en/press-releases/example'] };
+  const aliased = { rows: { ...manifest.rows, [alias.logical_id]: alias } };
+  assert.notEqual(alias.logical_id, manifest.rows[logicalId(mp4)].logical_id);
+  assert.deepEqual(binaryErrors(
+    `<p><a href="${hostedPdf}">PDF</a><a href="${hostedMp4}">MP4</a></p>`,
+    aliased,
+    'en/press-releases/example',
+  ), []);
+  // A different asset referenced by the page but not linked is still caught.
+  const other = {
+    ...row('https://cdn.skoda-storyboard.com/other.mp4', 'https://publish-p123.adobeaemcloud.com/content/dam/other.mp4', 'video'),
+    dam_asset_path: '/content/dam/other.mp4',
+  };
+  assert.match(binaryErrors(
+    `<p><a href="${hostedPdf}">PDF</a><a href="${hostedMp4}">MP4</a></p>`,
+    { rows: { ...aliased.rows, [other.logical_id]: other } },
+    'en/press-releases/example',
+  ).join(' '), new RegExp(`imported binary link missing: ${other.logical_id}`));
 });
 
 test('offline gate fails closed for missing refs, wrong tags and unverified destinations', () => {

@@ -12,7 +12,7 @@ hero → [`hero.md`](hero.md); tiles → [`card-teaser.md`](card-teaser.md).
 
 > **Sweep correction (2026-09-25).** The DevTools URL→block sweep ([registry](../analysis/SKODA-M1-URL-BLOCK-REGISTRY.md), [report](../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §7) disproved the points below on the live M1 pages. They override the sections they name until this spec is re-captured:
 >
-> - At 375 the hub hero is a 211px image **above** a separate dark-text caption (no white overlay). The h1 stays 28px at 768 and becomes 48px at 992.
+> - At 375 the hub hero is a 211px image **above** a separate dark-text caption (no white overlay). The h1 stays 28px at 768 and becomes 48px **from 769** (re-measured SKODA-828, 2026-10-05: 48px at 769/991/992; the 992 reading was EDS's own step).
 > - The M1 hubs have **no chapter-nav, variant selector or accordion** (child pages only). Motorsport has 24 cards: 20 historical square, 1 cross-kit (Enyaq RS Race), 3 resource.
 > - First glimpse: a **Vimeo** iframe (not Buzzsprout). **Eight topical row toggles** (not a FAQPage section). The Media Box is 1 video + 55 images + 4 PDFs, plus a separate sidebar Images preview (+51).
 
@@ -94,7 +94,7 @@ All rows: `measured (source-url · selector · viewport) → token`. `LANDING` =
   drop, below). The earlier single `281px @500 = 61.8vh` reading was wrong; @500 the box is 16:9, not `61.8vh`.
 - Scrim: `.hero-image::after` dual gradient (per hero.md) → `--scrim-h`/`--scrim-v`.
 - Title `.hero-caption .heading`: `48px / 52.8px / weight 300 / #fff` @1280 (· LANDING · 1280) →
-  `--heading-font-size-hero: 48px`, `--weight-light: 300`, `--skoda-white`. Drops to **`28px`** @768/500.
+  `--heading-font-size-hero: 48px`, `--weight-light: 300`, `--skoda-white`. Drops to **`28px`** at ≤768 (48 from 769).
 - Caption `.hero-caption`: `position:absolute; color:#fff; background:transparent; text-align:start`
   (· LANDING · 1280), overlaid bottom-left.
 - Perex `.hero-caption .perex`: `20px / weight 600 / #fff` (· LANDING · 1280) → `--body-font-size-*`

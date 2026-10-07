@@ -63,11 +63,6 @@ body.press-kit .section.body-column .columns > div > div > :last-child {
   }
 }
 
-body.press-kit main > .section:first-child:has(.hero-image.overlay) > div {
-  max-width: none;
-  padding: 0;
-}
-
 body.press-kit .section.press-kit-banners .default-content-wrapper {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 25rem), 1fr));
@@ -267,6 +262,17 @@ body.press-kit .section.body-column .default-content-wrapper img {
   height: auto;
 }
 
+/* A kit with no hero and no body column (the source's press-release template: the RS 245 kit,
+   SKODA-828 F7) is all header section. Its lead image is an article's 16:9 crop (812×457 at
+   1440), and from 768 everything after the title takes the source's 2/3 column (812 at 1440,
+   492 at 768); the date and title stay full width. */
+body.press-kit main:not(:has(.section.body-column)) > .section.press-kit-header h1 + p img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
 /* The lead image (the layout puts it first) is the source's 16:9 crop of the column (812×457
    at 1280). A definite width also reserves its box before it loads: under global `width: auto`
    it was 0×0 until then, a 0.18 layout shift on every press-kit page (SKODA-805c). */
@@ -321,29 +327,6 @@ body.press-kit .section.body-column .columns.callout {
   margin-block-end: calc(var(--pk-columns-stack-gap) + var(--spacing-l));
 }
 
-/* Hub hero (press-kit-template.md sweep correction): below 768 the caption leaves the image
-   and sits under it in ink, as on the series hubs (templates/skoda-series); 48px from 992. */
-@media (width < 768px) {
-  body.press-kit .hero-image.overlay .hero-image-media img {
-    height: auto;
-    aspect-ratio: 16 / 9;
-  }
-
-  body.press-kit .hero-image.overlay .hero-image-media::after {
-    content: none;
-  }
-
-  body.press-kit .hero-image.overlay .hero-image-content {
-    position: static;
-    color: var(--skoda-ink);
-  }
-
-  body.press-kit .hero-image.overlay .hero-image-content h1,
-  body.press-kit .hero-image.overlay .hero-image-content p {
-    color: var(--skoda-ink);
-  }
-}
-
 /* At this viewport the article and sidebar change from a stack to a two-column shell. */
 @media (width >= 768px) {
   body.press-kit main:has(.section.body-column) {
@@ -367,6 +350,17 @@ body.press-kit .section.body-column .columns.callout {
     grid-column: 2;
   }
 
+  body.press-kit main:not(:has(.section.body-column)) > .section.press-kit-header {
+    max-width: var(--content-max-width);
+    margin-inline: auto;
+  }
+
+  /* the date and title keep the full width, as the source's entry header (PR #253 review); the
+     column (everything after the title) is 2/3 of the row including its 10px gutters, less the gutters */
+  body.press-kit main:not(:has(.section.body-column)) > .section.press-kit-header > .default-content-wrapper > :not(h1, :has(~ h1)) {
+    max-width: calc((100% + 2 * var(--page-gutter)) * 2 / 3 - 2 * var(--page-gutter));
+  }
+
   body.press-kit main > .section.media-box {
     box-shadow: 0 0 0 100vmax var(--dark-color);
     clip-path: inset(0 -100vmax);
@@ -374,10 +368,6 @@ body.press-kit .section.body-column .columns.callout {
 }
 
 @media (width >= 992px) {
-  body.press-kit .hero-image.overlay .hero-image-content h1 {
-    font-size: var(--heading-font-size-hero);
-  }
-
   body.press-kit main > .section.sidebar > div {
     padding-inline-start: var(--pk-sidebar-inset);
   }
