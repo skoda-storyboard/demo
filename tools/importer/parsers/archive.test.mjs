@@ -94,12 +94,12 @@ test('archives without a featured card emit no feature rows', { skip }, () => {
   assert.ok(!rows(doc.querySelector('table')).some(([k]) => k === 'feature'));
 });
 
-test('category and sub-category archives → Stories scoped by the story path prefix', { skip }, () => {
-  [['https://www.skoda-storyboard.com/en/category/emobility/', '/en/emobility/'],
-    ['https://www.skoda-storyboard.com/en/category/lifestyle/people/', '/en/lifestyle/people/']].forEach(([url, path]) => {
+test('category and sub-category archives → Stories scoped by categories (SKODA-831, archive-list.test.mjs)', { skip }, () => {
+  [['https://www.skoda-storyboard.com/en/category/emobility/', 'emobility'],
+    ['https://www.skoda-storyboard.com/en/category/lifestyle/people/', 'people']].forEach(([url, slug]) => {
     const doc = page(url, GRID);
     archiveList(doc.querySelector('.search-results-items'), { document: doc });
-    assert.deepEqual(rows(doc.querySelector('table'))[3], ['path', path]);
+    assert.deepEqual(rows(doc.querySelector('table'))[3], ['categories', slug]);
   });
 });
 
@@ -112,20 +112,63 @@ test('no archive canonical → grid dropped (never an unscoped feed of every sto
   assert.equal(doc.querySelector('.search-results-items'), null);
 });
 
-test('archive hero → banner picture + h1 from parent + term labels', { skip }, () => {
+const lines = (h1) => [...h1.childNodes].filter((n) => n.nodeName !== 'BR').map((n) => n.textContent);
+
+test('archive hero → Hero Image (archive): banner row + h1 with one line per label', { skip }, () => {
   const doc = page('', `<div class="hero"><div class="hero-image"><img src="https://cdn.x/peaq-1920x375.jpg" srcset="a 1x" sizes="100vw" alt="Peaq"></div>
     <div class="hero-caption"><div class="container"><span class="category"><span class="label">Models</span> <span class="label">Peaq</span></span></div></div></div>`);
   archiveHero(doc.querySelector('.hero'), { document: doc });
-  assert.equal(doc.querySelector('h1').textContent, 'Models Peaq');
-  const img = doc.querySelector('p > img');
+  const table = doc.querySelector('table');
+  assert.equal(rows(table)[0][0], 'Hero Image (archive)');
+  const img = table.querySelector('tr:nth-child(2) img');
   assert.equal(img.getAttribute('src'), 'https://cdn.x/peaq-1920x375.jpg');
   assert.equal(img.hasAttribute('srcset'), false);
+  const h1 = table.querySelector('tr:nth-child(3) h1');
+  assert.deepEqual(lines(h1), ['Models', 'Peaq']);
+  assert.equal(h1.querySelectorAll('br').length, 1);
+  assert.equal(doc.querySelectorAll('h1').length, 1);
   assert.equal(doc.querySelector('.hero'), null);
+});
+
+test('archive hero without a banner keeps an empty image row (the empty band)', { skip }, () => {
+  const doc = page('', `<div class="hero"><div class="hero-image"></div>
+    <div class="hero-caption"><div class="container"><span class="category"><a class="label" href="/en/category/design-eng/">Design</a></span></div></div></div>`);
+  archiveHero(doc.querySelector('.hero'), { document: doc });
+  const table = doc.querySelector('table');
+  assert.deepEqual(rows(table), [['Hero Image (archive)'], [''], ['Design']]);
+  assert.equal(table.querySelector('h1 > a').getAttribute('href'), '/en/category/design-eng/');
+  assert.equal(table.querySelector('img'), null);
+  assert.equal(table.querySelector('h1 br'), null);
+});
+
+test('archive hero keeps category labels as links (parent, then term) and equal tag labels', { skip }, () => {
+  const sub = page('', `<div class="hero"><div class="hero-image"><img src="https://cdn.x/people.jpg" alt=""></div>
+    <div class="hero-caption"><div class="container"><span class="category"><a class="label label-default" href="https://www.skoda-storyboard.com/en/category/lifestyle/">Lifestyle</a> <a class="label label-default" href="https://www.skoda-storyboard.com/en/category/lifestyle/people/">People</a></span></div></div></div>`);
+  archiveHero(sub.querySelector('.hero'), { document: sub });
+  const links = [...sub.querySelectorAll('table h1 > a')];
+  assert.deepEqual(links.map((a) => [a.textContent, a.getAttribute('href')]), [
+    ['Lifestyle', 'https://www.skoda-storyboard.com/en/category/lifestyle/'],
+    ['People', 'https://www.skoda-storyboard.com/en/category/lifestyle/people/'],
+  ]);
+  assert.equal(sub.querySelectorAll('table h1 br').length, 1);
+
+  const dup = page('', `<div class="hero"><div class="hero-image"></div>
+    <div class="hero-caption"><div class="container"><span class="category"><span class="label label-secondary">Technology</span> <span class="label label-secondary">Technology</span></span></div></div></div>`);
+  archiveHero(dup.querySelector('.hero'), { document: dup });
+  assert.deepEqual(lines(dup.querySelector('table h1')), ['Technology', 'Technology']);
+  assert.equal(dup.querySelector('table h1 a'), null, 'tag labels are not links');
 });
 
 test('archive hero without labels falls back to the <title> term (site suffix trimmed)', { skip }, () => {
   const doc = page('', '<div class="hero"><div class="hero-caption"></div></div>', 'Heritage - Škoda Storyboard');
   archiveHero(doc.querySelector('.hero'), { document: doc });
-  assert.equal(doc.querySelector('h1').textContent, 'Heritage');
+  assert.equal(doc.querySelector('table h1').textContent, 'Heritage');
   assert.equal(doc.querySelector('img'), null);
+});
+
+test('archive hero with no image and no title is unwrapped', { skip }, () => {
+  const doc = page('', '<main><div class="hero"><div class="hero-caption"></div></div></main>', '');
+  archiveHero(doc.querySelector('.hero'), { document: doc });
+  assert.equal(doc.querySelector('table'), null);
+  assert.equal(doc.querySelector('.hero'), null);
 });

@@ -160,10 +160,12 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-826](tickets/SKODA-826.md) | Global page gutter parity (10px at every width, not 24/40px) | E01 | 0.5 | 0.25 | 0.5 | 106 | 🟢 M1 Must; from the 2026-09-25 URL→block sweep (#149) |
 | SKODA-201 | Cards/Teaser (overlay/media/toolbar) | E02 | 5 | 2–3 | 5–7 | 102,106 | 🟢 |
 | SKODA-202 | Hero (image, LCP) | E02 | 2 | 1 | 2–3 | 102,106 | 🟢 |
-| [SKODA-828](tickets/SKODA-828.md) | Hero parity across templates: press kit, model, archive + ultrawide (sweep follow-ups) | E02 | 5 | 2–3 | 4–5 | 826,805a,208,209 | 🟠 M1; from the 2026-09-28 hero sweep (#196). Owns the hero UI moved out of 208/209/805a; pulls the archive banner M2→M1 |
+| [SKODA-828](tickets/SKODA-828.md) | Hero parity across templates: press kit, model, archive + ultrawide (sweep follow-ups) | E02 | 5 | 2–3 | 4–5 | 826,805a,208,209 | 🟡 M1; in review 2026-10-05 ([PR #253](https://github.com/skoda-storyboard/demo/pull/253), branch `skoda-828-hero-parity`): press kit, model, archive and story hero match the source 375–3840; 41 archive pages in DA, 6-story push after merge. From the 2026-09-28 hero sweep (#196); owns the hero UI moved out of 208/209/805a |
 | SKODA-203 | Gallery + lightbox modal | E02 | 5 | 2–3 | 4–6 | 102,106 | 🟡 a11y modal `[RUNTIME-UNCONFIRMED]` |
 | SKODA-204 | Embeds (4 providers, dnt=1, lazy) | E02 | 3 | 1–2 | 2–4 | 102 | 🟢 |
 | [SKODA-204a](tickets/SKODA-204a.md) | Embeds consent placeholder + click-to-load hook (follow-up to #18) | E02 | 0.5 | 0.25 | 0.5 | 204,606 | 🟡 M1 Must; sweep §11.1 (204 AC l.47/49 gap); D1 follow-up, not a reopen |
+| [SKODA-834](tickets/SKODA-834.md) | Widget autoblock: same-origin `/widgets/` links only, never insert a failed response | E02 | 1 | 0.25–0.5 | 0.5–1 | 828,805c | 🔵 M1; #256 (renumbered from 830, 2026-10-07), from the PR #253 review (2026-10-06): 6 overlay kits' Twitter `/widgets/` link loads 3 local 404s and inserts the 404 page (1440×900 on `skoda-octavia-press-kit`); pre-existing on `main` |
+| [SKODA-831](tickets/SKODA-831.md) | Category archives scope stories by WordPress category membership (`categories` index column) | E02 | – | – | – | 209,214,830 | 🟡 M1; #260, audit F2; rollout steps 1–2 done 2026-10-06 (index column + 57 stories), archives wait for the code on main |
 | SKODA-205 | Tags / metadata | E02 | 1 | 0.5 | 1 | 102 | 🟢 |
 | SKODA-206 | Škodapedia glossary block (directory + A–Z filter + modal) | E02 | 5 | 2–3 | 4–6 | 102,106 | 🟡 modal a11y `[RUNTIME-UNCONFIRMED]`; **M2** on the board (aligned 2026-09-25) |
 | SKODA-207 | Series template (2-level: directory + hub) | E02 | 3 | 1–2 | 2–4 | 201,202,402,601 | 🟢 M1 (D18); reuses cards/hero/grid |
@@ -262,9 +264,12 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-820 | Story bottom "Related Stories" band restored (tag-based rail) | E08 | A/B | 2 | 0.5–1 | 1–2 | 212,218,801,603 | 🟡 #133 Epiq index rail live (10 cards); scoped CSS parity in PR #157. Curated bands remain (sweep amendment); desktop pointer → 212a; Media Box → 801a |
 | [SKODA-821](tickets/SKODA-821.md) | Story body text inset vs intentionally bleeding image slider | E08 | A/B | 1 | 0.25 | 0.5 | 801 | 🟢 story CSS only; 10px media bleed retained. Re-check 2026-09-29: horizontal ACs met on `main` |
 | [SKODA-829](tickets/SKODA-829.md) | Story intro → body / aside vertical spacing parity | E08 | A | 1 | 0.25 | 0.5 | 801,821,828 | 🟡 #214; PR #207 review follow-up (2026-09-29); body +32 / aside +0 at ≥768, body +0 below; text 10px in |
+| [SKODA-830](tickets/SKODA-830.md) | Story importer validity fixes + Media Box → Downloads (801a) + newsletter card (823) + Media Box parity | E08 | A | – | – | – | 801a,604,819,823 | 🟡 M1; #259, PR #269; audit F3+F4; QA PASS run 3; 57 stories published 2026-10-06 |
+| [SKODA-832](tickets/SKODA-832.md) | Re-import the Octavia-rail press-kit hubs with press-kit-hub (was page-base) | E08 | A | – | – | – | 208,805 | 🟡 M1; #261, audit F1; developer done, rendered QA pending |
+| [SKODA-833](tickets/SKODA-833.md) | Press-release importer validity fixes + DAM originals for 28 releases | E08 | A | – | – | – | 607,502,503 | 🟢 M1; #262, PR #265 merged; 28 releases published 2026-10-06 |
 | SKODA-822 | Ship SKODA-801 two-column story layout to `main` | E08 | A | 1 | — | — | 801 | ✅ merged as PR #113 (2026-09-24 21:35) |
 | SKODA-823 | Story sidebar newsletter sign-up widget (UI stub) | E08 | A | 2 | 0.5–1 | 1–2 | 904,801 | 🟡 extend footer `newsletter-stub` for the sidebar; no ESP, no false success; side banner → 903; **M1 Could** (review §15) |
-| [SKODA-824](tickets/SKODA-824.md) | In-column highlight panel (story dark box + PR grey callout) | E08 | A | 3 | 1 | 2–3 | 801,814,218,819,225 | 🟡 M1; Demo sweep 2026-09-25; 12 stories + 1 PR; importer done 2026-09-28 (contract shape 2), runtime TODO |
+| [SKODA-824](tickets/SKODA-824.md) | In-column highlight panel (story dark box + PR grey callout) | E08 | A | 3 | 1 | 2–3 | 801,814,218,819,225 | 🟡 M1; Demo sweep 2026-09-25; 12 stories + 1 PR; importer done 2026-09-28 (contract shape 2); runtime in review 2026-10-05 |
 | SKODA-809 | Roles & permissions (7 editorial groups) | E08 | B | 5 | 2–3 | 4–8 | 101,602 | 🟠 gap G2 (§6.4); blocked on D15 RACI |
 | SKODA-811 | Content embargo (staged-publish, group access) | E08 | B | 3 | 1–2 | 2–4 | 602,809 | 🟢 gap G3 (§6.5/D9) approach agreed; M1-Stretch only *ungated* (group-gate needs 809/M2/D15, F4) |
 | SKODA-812 | Auditability (author change-history) | E08 | B | 2 | 0.5–1 | 1–3 | 101,602,809 | 🟡 gap G5 (§6.7); validate DA/EW capability |

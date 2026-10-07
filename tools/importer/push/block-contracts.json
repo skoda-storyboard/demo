@@ -49,6 +49,9 @@
     "footer": {
       "variants": []
     },
+    "footnotes": {
+      "variants": []
+    },
     "fragment": {
       "variants": []
     },
@@ -82,6 +85,26 @@
     "media-cart": {
       "variants": []
     },
+    "newsletter-stub": {
+      "variants": [
+        "card"
+      ],
+      "config": "only",
+      "configKeys": [
+        "label",
+        "placeholder",
+        "button",
+        "consent",
+        "manage",
+        "message",
+        "list",
+        "language",
+        "image",
+        "heading",
+        "error",
+        "consent-error"
+      ]
+    },
     "promo-box": {
       "variants": [],
       "config": "or-curated",
@@ -114,6 +137,7 @@
         "path",
         "template",
         "category",
+        "categories",
         "tag",
         "tags",
         "heading",
@@ -182,7 +206,7 @@
       "emittedBy": [
         "parsers/hero-banner.js"
       ],
-      "resolveTo": "emit Hero Image (overlay) / Hero Image (archive); blocks/hero is an empty boilerplate stub. parsers/hero.js (model) resolved in SKODA-208: Hero Image (overlay)"
+      "resolveTo": "emit Hero Image (overlay) / Hero Image (archive); blocks/hero is an empty boilerplate stub. parsers/hero.js (model) resolved in SKODA-208: Hero Image (overlay). parsers/archive-hero.js (category/tag) resolved in SKODA-828: Hero Image (archive), row 1 the banner picture or an empty cell, row 2 the h1 with one line per label (<br>); category labels are links to their term"
     },
     {
       "id": "in-page-nav",
@@ -309,7 +333,7 @@
       "form": "section-style",
       "status": "pinned",
       "ticket": "SKODA-824",
-      "fallback": "broken",
+      "fallback": "readable",
       "styles": [
         "highlight-dark",
         "highlight-grey"

@@ -42,9 +42,17 @@ var CustomImportScript = (() => {
   });
 
   // tools/importer/parsers/story-hero.js
+  var HERO_MAX_WIDTH = 2560;
+  function useLargestRendition(img) {
+    const best = (img.getAttribute("srcset") || "").split(",").map((entry) => entry.trim().split(/\s+/)).map(([url, descriptor]) => ({ url, width: parseInt(descriptor, 10) })).filter(({ url, width }) => url && width > 0 && width <= HERO_MAX_WIDTH).sort((a, b) => b.width - a.width)[0];
+    if (best) img.setAttribute("src", best.url);
+    img.removeAttribute("srcset");
+    img.removeAttribute("sizes");
+  }
   function parse(element, { document: document2 }) {
     const img = element.querySelector(".hero-image img, .hero-wrapper img, img");
     const heading = element.querySelector(".hero-heading h1, h1, .heading, h2");
+    if (img) useLargestRendition(img);
     if (!img && !heading) {
       element.replaceWith(...element.childNodes);
       return;
@@ -141,22 +149,38 @@ var CustomImportScript = (() => {
     });
     return out;
   }
-  function itemCaption(img, item) {
+  function itemCaption(img, item, withAlt = true) {
     var _a, _b;
     const capSource = img.getAttribute("data-caption") && img || ((_a = item.querySelector) == null ? void 0 : _a.call(item, "[data-caption]")) || item;
-    return capSource.getAttribute && capSource.getAttribute("data-caption") || ((_b = item.querySelector) == null ? void 0 : _b.call(item, "a[title]")) && item.querySelector("a[title]").getAttribute("title") || img.getAttribute("alt") || "";
+    return capSource.getAttribute && capSource.getAttribute("data-caption") || ((_b = item.querySelector) == null ? void 0 : _b.call(item, "a[title]")) && item.querySelector("a[title]").getAttribute("title") || withAlt && img.getAttribute("alt") || "";
   }
-  function itemDescription(item, document2) {
+  function itemDescription(item, document2, img) {
     var _a;
     const desc = (_a = item.querySelector) == null ? void 0 : _a.call(item, ".search-results-item-description");
-    if (!desc || !(desc.textContent || "").trim()) return "";
-    const paras = [...desc.querySelectorAll("p")].map((p) => (p.textContent || "").replace(/\s+/g, " ").trim()).filter(Boolean);
-    const texts = paras.length ? paras : [desc.textContent.replace(/\s+/g, " ").trim()];
+    const paras = desc ? [...desc.querySelectorAll("p")].map((p) => (p.textContent || "").replace(/\s+/g, " ").trim()).filter(Boolean) : [];
+    const descText = desc ? desc.textContent.replace(/\s+/g, " ").trim() : "";
+    const texts = paras.length || !descText ? paras : [descText];
+    const note = regulatoryCaption(img, item);
+    if (note && !texts.some((t) => t.includes(note))) texts.push(note);
+    if (!texts.length) return "";
     return texts.map((t) => {
       const p = document2.createElement("p");
       p.textContent = t;
       return p;
     });
+  }
+  var CONSUMPTION_RE = /\b(?:kWh|l)\s*\/\s*100\s*km\b/i;
+  var EMISSIONS_RE = /\bCO(?:₂|2)\s+emissions?\b|\bg\s*\/\s*km\b/i;
+  function isRegulatoryCaption(text2) {
+    const t = (text2 || "").replace(/\s+/g, " ").trim();
+    if (!t) return false;
+    return /\bWLTP\b/.test(t) || CONSUMPTION_RE.test(t) && EMISSIONS_RE.test(t);
+  }
+  function regulatoryCaption(img, item) {
+    var _a;
+    const holder = img && img.getAttribute && img.getAttribute("data-caption") && img || ((_a = item.querySelector) == null ? void 0 : _a.call(item, "[data-caption]"));
+    const text2 = holder ? (holder.getAttribute("data-caption") || "").replace(/\s+/g, " ").trim() : "";
+    return isRegulatoryCaption(text2) ? text2 : "";
   }
   function galleryCells(panel, document2, blockName = "Gallery") {
     const imgs = [...panel.querySelectorAll("img")];
@@ -165,7 +189,7 @@ var CustomImportScript = (() => {
     const cells = [[blockName]];
     imgs.forEach((img) => {
       const item = img.closest(".search-results-item, .item, figure") || img;
-      cells.push([img, slider ? itemDescription(item, document2) : itemCaption(img, item)]);
+      cells.push([img, slider ? itemDescription(item, document2, img) : itemCaption(img, item, false)]);
     });
     return cells.length > 1 ? cells : null;
   }
@@ -195,11 +219,11 @@ var CustomImportScript = (() => {
     return cells.length > 1 ? cells : null;
   }
   function quoteNodes(panel, document2) {
-    const text = (panel.textContent || "").replace(/\s+/g, " ").trim();
-    if (!text) return [];
+    const text2 = (panel.textContent || "").replace(/\s+/g, " ").trim();
+    if (!text2) return [];
     const bq = document2.createElement("blockquote");
     const p = document2.createElement("p");
-    p.textContent = text;
+    p.textContent = text2;
     bq.appendChild(p);
     return [bq];
   }
@@ -227,10 +251,10 @@ var CustomImportScript = (() => {
     if (rich.length) {
       rich.forEach((n) => out.push(n));
     } else {
-      const text = (body.textContent || "").replace(/\s+/g, " ").trim();
-      if (text) {
+      const text2 = (body.textContent || "").replace(/\s+/g, " ").trim();
+      if (text2) {
         const p = document2.createElement("p");
-        p.textContent = text;
+        p.textContent = text2;
         out.push(p);
       }
     }
@@ -257,10 +281,10 @@ var CustomImportScript = (() => {
     });
     if (!out.length) {
       panel.querySelectorAll("img").forEach((img) => out.push(img));
-      const text = (panel.textContent || "").replace(/\s+/g, " ").trim();
-      if (text && !panel.querySelector("img")) {
+      const text2 = (panel.textContent || "").replace(/\s+/g, " ").trim();
+      if (text2 && !panel.querySelector("img")) {
         const p = document2.createElement("p");
-        p.textContent = text;
+        p.textContent = text2;
         out.push(p);
       }
     }
@@ -418,8 +442,6 @@ var CustomImportScript = (() => {
       case "editor":
         nodes = editorNodes(panel, document2);
         break;
-      // carousel-widget routes by content (Cards if teasers-with-links, else Gallery (slider));
-      // sow-slider is always an image slider → Gallery.
       case "carousel":
         cells = carouselCells(panel, document2);
         break;
@@ -537,6 +559,83 @@ var CustomImportScript = (() => {
     } else {
       console.log(`[story-flatten] flattened: ${JSON.stringify(summary)}`);
     }
+  }
+
+  // tools/importer/parsers/downloads.js
+  var text = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
+  function serialiseMp4(href) {
+    try {
+      const url = new URL(href, "https://www.skoda-storyboard.com");
+      if (!/\.mp4$/i.test(url.pathname) || url.href === href) return href;
+      if (/^[a-z][a-z\d+.-]*:/i.test(href)) return url.href;
+      return href.startsWith("/") && !href.startsWith("//") ? `${url.pathname}${url.search}${url.hash}` : href;
+    } catch (e) {
+      return href;
+    }
+  }
+  function fileLabel(href) {
+    const ext = ((href || "").split(/[?#]/)[0].split(".").pop() || "").toLowerCase();
+    if (/^(jpe?g|png|webp|gif|tiff?)$/.test(ext)) return "Original";
+    return ext ? ext.toUpperCase() : "Download";
+  }
+  function sizeLinks(item, document2) {
+    const links = [];
+    const add = (raw, label) => {
+      if (!raw || raw === "#") return;
+      const href = serialiseMp4(raw);
+      if (links.some((l) => l.getAttribute("href") === href)) return;
+      const a = document2.createElement("a");
+      a.setAttribute("href", href);
+      a.textContent = label;
+      links.push(a);
+    };
+    item.querySelectorAll(".media-cart-action-multi.download a[href]").forEach((a) => {
+      const href = a.getAttribute("href");
+      add(href, text(a) || fileLabel(href));
+    });
+    if (links.length) return links;
+    const single = item.querySelector('a.media-cart-action.download[href], a[data-action="download"][href]') || item.querySelector('a[href*="direct-download"]');
+    if (single) add(single.getAttribute("href"), fileLabel(single.getAttribute("href")));
+    return links;
+  }
+  function parse3(element, { document: document2 }) {
+    let items = Array.from(element.querySelectorAll("article.media-cart-item"));
+    if (items.length === 0) {
+      items = Array.from(element.querySelectorAll(".search-results-item, .items > .item"));
+    }
+    if (items.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const cells = [["Downloads"]];
+    items.forEach((item) => {
+      const links = sizeLinks(item, document2);
+      if (!links.length) return;
+      const img = item.querySelector(".article-teaser-media img, .entry-thumbnail img, img");
+      if (img) {
+        if (!(img.getAttribute("alt") || "").trim() && img.getAttribute("title")) {
+          img.setAttribute("alt", img.getAttribute("title").replace(/^Video\s*\|\s*/i, "").trim());
+        }
+        const src = img.getAttribute("src") || "";
+        if (/^https:\/\/i\.vimeocdn\.com\//.test(src)) {
+          img.setAttribute("src", src.replace(/-d_\d+x\d+(\.[a-z]+)?(\?.*)?$/i, "-d_1280x720.jpg"));
+        }
+        ["data-caption", "data-video_title", "data-video_src", "data-media-url", "srcset", "sizes", "itemprop", "title"].forEach((a) => img.removeAttribute(a));
+      }
+      const filename = links[0].getAttribute("href").split("/").pop().split(/[?#]/)[0];
+      const title = text(item.querySelector(".entry-title")) || img && img.getAttribute("alt") || filename;
+      const linkCell = links.map((a) => {
+        const p = document2.createElement("p");
+        p.append(a);
+        return p;
+      });
+      cells.push([img || "", title, linkCell]);
+    });
+    if (cells.length === 1) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
 
   // tools/importer/transformers/skoda-page-cleanup.js
@@ -756,19 +855,156 @@ var CustomImportScript = (() => {
     }));
     cover.replaceWith(...out);
   }
+  var CHROME_SELECTORS = [
+    ".sb-gallery-overlay",
+    ".sb-gallery-lightbox",
+    ".sb-gallery-share",
+    ".sb-gallery-share-dropdown",
+    "#colorbox",
+    "#cboxOverlay",
+    ".togglebox-opener"
+  ];
+  var MEDIA_BOX_STYLE = "dark, full-width, media-box";
+  var MEDIA_BOX_MARKER = "data-story-media-box";
+  var squash = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
+  function flattenQuiz(element) {
+    element.querySelectorAll(".knowledge-test").forEach((quiz) => {
+      quiz.querySelectorAll([
+        ".jsonStruct",
+        ".position",
+        ".next-wrap",
+        ".prev-wrap",
+        ".question-results",
+        "button",
+        "input"
+      ].join(", ")).forEach((n) => n.remove());
+    });
+  }
+  function tablesToColumns(element, document2) {
+    const bodies = element.querySelectorAll(".columns > .content, article .content, .entry-content");
+    const tables = /* @__PURE__ */ new Set();
+    bodies.forEach((body) => body.querySelectorAll("table").forEach((t) => tables.add(t)));
+    tables.forEach((table) => {
+      if (table.parentElement && table.parentElement.closest("table")) return;
+      const rows = [...table.querySelectorAll(":scope > tbody > tr, :scope > thead > tr, :scope > tr")].map((tr) => {
+        const cells = [];
+        [...tr.children].filter((c) => /^(td|th)$/i.test(c.tagName)).forEach((c) => {
+          const span = Math.max(1, parseInt(c.getAttribute("colspan"), 10) || 1);
+          for (let i = 0; i < span; i += 1) {
+            const cell = [...(i ? c.cloneNode(true) : c).childNodes];
+            cells.push(cell.length ? cell : "");
+          }
+        });
+        return cells;
+      }).filter((cells) => cells.some((c) => c && c.some((n) => (n.textContent || "").trim() || n.querySelector && n.querySelector("img"))));
+      if (!rows.length) {
+        table.remove();
+        return;
+      }
+      const width = Math.max(...rows.map((r) => r.length));
+      rows.forEach((r) => {
+        while (r.length < width) r.push("");
+      });
+      table.replaceWith(WebImporter.DOMUtils.createTable([["Columns"], ...rows], document2));
+    });
+  }
+  function seriesNavCards(element, document2) {
+    element.querySelectorAll(".series-nav").forEach((nav) => {
+      const rows = [["Cards (overlay)"]];
+      nav.querySelectorAll("article.article-teaser").forEach((card) => {
+        const link = card.querySelector(".entry-title a[href]") || card.querySelector("a.link-more[href]");
+        const href = link && link.getAttribute("href");
+        if (!href) return;
+        const img = card.querySelector("img");
+        const alt = img ? (img.getAttribute("alt") || "").trim() : "";
+        let title = squash(card.querySelector(".entry-title"));
+        if (/(…|\.\.\.)$/.test(title) && alt.startsWith(title.replace(/(…|\.\.\.)$/, "").trim())) title = alt;
+        title = title || alt;
+        if (!title) return;
+        if (img) ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop"].forEach((a2) => img.removeAttribute(a2));
+        const body = [];
+        const date = squash(card.querySelector(".entry-published"));
+        if (date) {
+          const p = document2.createElement("p");
+          p.textContent = date;
+          body.push(p);
+        }
+        const h3 = document2.createElement("h3");
+        const a = document2.createElement("a");
+        a.setAttribute("href", href);
+        a.textContent = title;
+        h3.append(a);
+        body.push(h3);
+        rows.push([img || "", body]);
+      });
+      const heading = nav.querySelector(":scope > .heading, :scope > h2, :scope > h3");
+      const out = [];
+      if (heading && squash(heading)) {
+        const h3 = document2.createElement("h3");
+        h3.append(...heading.childNodes);
+        out.push(h3);
+      }
+      if (rows.length > 1) out.push(WebImporter.DOMUtils.createTable(rows, document2));
+      nav.replaceWith(...out);
+    });
+  }
+  function mediaBoxBand(element, document2) {
+    element.querySelectorAll(".search-results.media-box").forEach((box) => {
+      if (box.closest(".sidebar")) return;
+      const band = box.closest(".cover-box") || box;
+      const heading = squash(box.querySelector(".search-results-heading")) || "Media Box";
+      const stats = squash(box.querySelector(".search-results-stats .stats, .stats"));
+      box.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((n) => n.remove());
+      const hr = document2.createElement("hr");
+      hr.setAttribute(MEDIA_BOX_MARKER, "");
+      const h2 = document2.createElement("h2");
+      h2.textContent = heading;
+      const out = [hr, h2];
+      if (stats) {
+        const p = document2.createElement("p");
+        p.textContent = stats;
+        out.push(p);
+      }
+      out.push(box);
+      band.replaceWith(...out);
+    });
+  }
+  var isBlockNamed = (el, re) => el && el.tagName === "TABLE" && re.test(squash(el.querySelector("tr > th, tr > td")));
+  function finishMediaBox(element, document2) {
+    element.querySelectorAll(`hr[${MEDIA_BOX_MARKER}]`).forEach((hr) => {
+      const nodes = [];
+      for (let n = hr.nextElementSibling; n && n.tagName !== "HR"; n = n.nextElementSibling) nodes.push(n);
+      hr.removeAttribute(MEDIA_BOX_MARKER);
+      if (!nodes.some((n) => isBlockNamed(n, /^downloads\b/i))) {
+        console.warn("[story-cleanup] Media Box had no downloadable asset; section dropped");
+        [hr, ...nodes].forEach((n) => n.remove());
+        return;
+      }
+      nodes[nodes.length - 1].after(WebImporter.Blocks.createBlock(document2, {
+        name: "Section Metadata",
+        cells: { style: MEDIA_BOX_STYLE }
+      }));
+    });
+  }
   function transform2(hookName, element, payload) {
     if (hookName === TransformHook2.beforeTransform) {
+      const doc = element.ownerDocument || document;
       WebImporter.DOMUtils.remove(element, [
         ".btn-group.social",
-        ".social-container"
+        ".social-container",
+        ...CHROME_SELECTORS
       ]);
-      videosToUrls(element, element.ownerDocument || document);
-      wpVideosToEmbeds(element, element.ownerDocument || document);
+      tablesToColumns(element, doc);
+      videosToUrls(element, doc);
+      wpVideosToEmbeds(element, doc);
+      flattenQuiz(element);
+      seriesNavCards(element, doc);
+      mediaBoxBand(element, doc);
     }
     if (hookName === TransformHook2.afterTransform) {
       relatedBand(element, element.ownerDocument || document, payload);
+      finishMediaBox(element, element.ownerDocument || document);
       const deferredSelectors = [
-        ".search-results.media-box",
         ".sb-gallery",
         "a.colorbox",
         ".embed-controller-wrapper",
@@ -791,6 +1027,90 @@ var CustomImportScript = (() => {
 
   // tools/importer/transformers/skoda-story-aside.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  var NEWSLETTER_BLOCK = "Newsletter Stub (card)";
+  var NEWSLETTER_DEFAULTS = {
+    label: "Email address",
+    message: "Newsletter signup is not available yet",
+    error: "Please enter a valid e-mail address.",
+    "consent-error": "Please accept the terms before continuing."
+  };
+  var squash2 = (s) => (s || "").replace(/[ \t\r\n]+/g, " ").trim();
+  function inlineNodes(source, document2) {
+    const nodes = [];
+    source.childNodes.forEach((n) => {
+      if (n.nodeType === 3) {
+        const t = n.nodeValue.replace(/[ \t\r\n]+/g, " ");
+        if (t) nodes.push(document2.createTextNode(t));
+      } else if (n.nodeName === "BR") {
+        nodes.push(document2.createElement("br"));
+      } else if (n.nodeName === "A" && n.getAttribute("href")) {
+        const a = document2.createElement("a");
+        a.setAttribute("href", n.getAttribute("href"));
+        a.textContent = squash2(n.textContent);
+        if (a.textContent) nodes.push(a);
+      } else if (n.nodeType === 1) {
+        const t = squash2(n.textContent);
+        if (t) nodes.push(document2.createTextNode(t));
+      }
+    });
+    const edge = (i, re) => {
+      while (nodes.length && nodes[i()].nodeType === 3) {
+        const n = nodes[i()];
+        n.nodeValue = n.nodeValue.replace(re, "");
+        if (n.nodeValue) break;
+        nodes.splice(i(), 1);
+      }
+    };
+    edge(() => 0, /^[ \u00a0]+/);
+    edge(() => nodes.length - 1, /[ \u00a0]+$/);
+    return nodes.filter((n) => n.nodeType !== 3 || n.nodeValue);
+  }
+  function newsletterCard(widget, document2) {
+    const rows = [[NEWSLETTER_BLOCK]];
+    const add = (key, value2) => {
+      if (Array.isArray(value2) ? value2.length : value2) rows.push([key, value2]);
+    };
+    const value = (sel, attr) => {
+      const el = widget.querySelector(sel);
+      if (!el) return "";
+      return squash2(attr ? el.getAttribute(attr) : el.textContent);
+    };
+    const src = widget.querySelector("header img");
+    if (src && src.getAttribute("src")) {
+      const img = document2.createElement("img");
+      img.setAttribute("src", src.getAttribute("src"));
+      img.setAttribute("alt", "");
+      add("image", [img]);
+    }
+    const heading = widget.querySelector("header h1, header h2, header h3, header h4");
+    if (heading) add("heading", inlineNodes(heading, document2));
+    add("label", NEWSLETTER_DEFAULTS.label);
+    add("placeholder", value('input[type="email"], input.email', "placeholder"));
+    add("button", value('button[type="submit"], button'));
+    const terms = widget.querySelector(".terms label, label[for]");
+    if (terms) {
+      const label = terms.cloneNode(true);
+      label.querySelectorAll(".manage-subscription-link").forEach((n) => n.remove());
+      add("consent", inlineNodes(label, document2));
+    }
+    const manage = widget.querySelector(".manage-subscription-link a[href]");
+    if (manage && squash2(manage.textContent)) {
+      const a = document2.createElement("a");
+      a.setAttribute("href", manage.getAttribute("href"));
+      a.textContent = squash2(manage.textContent);
+      add("manage", [a]);
+    }
+    add("message", NEWSLETTER_DEFAULTS.message);
+    add("error", NEWSLETTER_DEFAULTS.error);
+    add("consent-error", value(".checkbox-error") || NEWSLETTER_DEFAULTS["consent-error"]);
+    add("list", value('input[name="list"]', "value"));
+    add("language", value('input[name="language"]', "value"));
+    return rows.some(([k]) => k === "heading" || k === "button") ? rows : null;
+  }
+  var isNewsletterTable = (table) => {
+    const cell = table.querySelector("tr > th, tr > td");
+    return !!cell && squash2(cell.textContent) === NEWSLETTER_BLOCK;
+  };
   function relatedCards(sidebar, document2) {
     const matched = [...sidebar.querySelectorAll(".related .article-teaser, .related article")];
     const teasers = matched.filter((el, i, arr) => arr.indexOf(el) === i).filter((el) => !matched.some((other) => other !== el && other.contains(el)));
@@ -827,25 +1147,37 @@ var CustomImportScript = (() => {
     const cell = [];
     anchors.forEach((a) => {
       const href = a.getAttribute("href");
-      const text = (a.textContent || "").trim();
-      if (!href || !text) return;
+      const text2 = (a.textContent || "").trim();
+      if (!href || !text2) return;
+      if (href === "#" || a.classList.contains("show-hidden-terms")) return;
       const link = document2.createElement("a");
       link.setAttribute("href", href);
-      link.textContent = text;
+      link.textContent = text2;
       cell.push(link);
     });
     return cell.length ? [["Tags"], [cell]] : null;
   }
   function transform3(hookName, element, payload) {
+    if (hookName === "preprocess") {
+      const doc = element.ownerDocument || payload && payload.document;
+      element.querySelectorAll(".sidebar .newsletter-subscribe-widget").forEach((widget) => {
+        const rows = newsletterCard(widget, doc);
+        if (rows) widget.replaceWith(WebImporter.DOMUtils.createTable(rows, doc));
+        else widget.remove();
+      });
+      return;
+    }
     if (hookName !== TransformHook3.afterTransform) return;
     const sidebar = element.querySelector(".sidebar");
     if (!sidebar) return;
     const cards = relatedCards(sidebar, document);
     const tags = tagsCell(sidebar, document);
+    const newsletter = [...sidebar.querySelectorAll("table")].find(isNewsletterTable) || null;
     const frag = document.createElement("div");
     const hr = document.createElement("hr");
     frag.appendChild(hr);
     const aside = document.createElement("aside");
+    if (newsletter) aside.appendChild(newsletter);
     const heading = sidebar.querySelector(".related .heading, .related h2, .related h3");
     if (heading) {
       const h = document.createElement("h2");
@@ -868,7 +1200,7 @@ var CustomImportScript = (() => {
       cells: { Style: "sidebar" }
     });
     frag.appendChild(metadataBlock);
-    if (!cards && !tags) {
+    if (!cards && !tags && !newsletter) {
       sidebar.remove();
       return;
     }
@@ -1013,6 +1345,69 @@ var CustomImportScript = (() => {
     }
     return "";
   }
+  var CATEGORY_PARENTS = {
+    "120-years-of-skoda-motorsport": "motorsport",
+    adventures: "lifestyle",
+    "annual-reports": "media",
+    citigo: "models",
+    connectivity: "innovation-and-technology",
+    cycling: "sports",
+    design: "skoda-world",
+    elroq: "models",
+    enyaq: "models",
+    "enyaq-coupe-rs-iv": "models",
+    epiq: "models",
+    fabia: "models",
+    heritage: "skoda-world",
+    hockey: "sports",
+    "innovation-and-technology": "skoda-world",
+    kamiq: "models",
+    "kamiq-china": "models",
+    karoq: "models",
+    kodiaq: "models",
+    kushaq: "models",
+    kylaq: "models",
+    livestream: "media",
+    motorsport: "lifestyle",
+    octavia: "models",
+    "octavia-combi": "models",
+    "octavia-combi-greenline": "models",
+    "octavia-combi-rs": "models",
+    "octavia-greenline": "models",
+    "octavia-rs": "models",
+    "octavia-scout": "models",
+    other: "media",
+    "peaq-en": "models",
+    people: "lifestyle",
+    rapid: "models",
+    "rapid-spaceback": "models",
+    responsibility: "skoda-world",
+    scala: "models",
+    slavia: "models",
+    speeches: "media",
+    sports: "lifestyle",
+    superb: "models",
+    "superb-combi": "models",
+    "technical-data": "media",
+    technology: "innovation-and-technology",
+    yeti: "models",
+    "yeti-outdoor": "models"
+  };
+  function extractCategories(document2) {
+    const cls = document2.body && document2.body.getAttribute("class") || "";
+    const id = cls.match(/\bpostid-(\d+)\b/);
+    const post = id && document2.querySelector(`article.post-${id[1]}`);
+    const out = [];
+    String(post && post.getAttribute("class") || "").split(/\s+/).forEach((token) => {
+      const m = token.toLowerCase().match(/^category-([a-z0-9_-]+)$/);
+      let slug = m && m[1];
+      while (slug && !out.includes(slug)) {
+        out.push(slug);
+        slug = CATEGORY_PARENTS[slug];
+      }
+    });
+    return out;
+  }
   function extractTagsAndFacets(document2, pageUrl = "") {
     const tags = [];
     const byFacet = {};
@@ -1119,6 +1514,8 @@ var CustomImportScript = (() => {
     if (overrides.theme) meta.theme = overrides.theme;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
+    const categories = template === "story" ? extractCategories(document2) : [];
+    if (categories.length) meta.categories = categories.join(", ");
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
     FACETS2.forEach((f) => {
@@ -1528,18 +1925,21 @@ var CustomImportScript = (() => {
     // SKODA-816: story hero → Hero Image with heading, caption and metadata
     // inside one block, not the overlay Hero banner used by page/archive.
     "story-hero": parse,
-    "story-flatten": parse2
+    "story-flatten": parse2,
+    // SKODA-801a: the Media Box band → Downloads (its section is built by skoda-story-cleanup).
+    downloads: parse3
   };
   var PAGE_TEMPLATE = {
     name: "story-detail",
-    description: "\u0160koda story detail (single-post + SiteOrigin), full-fidelity SiteOrigin flatten (SKODA-801). Hero banner + primary .content SiteOrigin widget tree flattened to default content + block tables (17-widget map, census-driven). The secondary .sidebar column is rebuilt as a Style:sidebar section (Cards + Tags) beside the body via the grid-on-main story layout. In-body galleries/embeds/Media Box remain SKODA-604 full-restore work. Metadata template=story. Content-driven detection only.",
+    description: "\u0160koda story detail (single-post + SiteOrigin), full-fidelity SiteOrigin flatten (SKODA-801). Hero banner + primary .content SiteOrigin widget tree flattened to default content + block tables (17-widget map, census-driven). The secondary .sidebar column is rebuilt as a Style:sidebar section (Newsletter Stub (card) + Cards + Tags) beside the body via the grid-on-main story layout. In-body galleries/embeds/Media Box remain SKODA-604 full-restore work. Metadata template=story. Content-driven detection only.",
     urls: ["https://www.skoda-storyboard.com/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic/"],
     blocks: [
       { name: "story-hero", instances: ["div.hero"] },
       // Flatten the SiteOrigin widget tree inside the primary reading column. The
       // parser self-detects the builder tree and no-ops (linear-story fallback) when
       // absent, so the 3.6% non-Page-Builder stories fall through to default content.
-      { name: "story-flatten", instances: [".columns > .content", "article .content", ".entry-content"] }
+      { name: "story-flatten", instances: [".columns > .content", "article .content", ".entry-content"] },
+      { name: "downloads", instances: [".search-results.media-box"] }
     ],
     sections: [
       {
@@ -1620,6 +2020,10 @@ var CustomImportScript = (() => {
       markHighlights(document2);
       markCellWidths(document2);
       transform7("preprocess", document2.body, { document: document2 });
+      transform3("preprocess", document2.body, { document: document2 });
+      document2.querySelectorAll(".search-results.media-box a.media-cart-action.download[href]").forEach((a) => {
+        if (!(a.textContent || "").trim()) a.textContent = "Download";
+      });
     },
     transform: (payload) => {
       const { document: document2, url, params } = payload;

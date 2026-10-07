@@ -195,29 +195,198 @@ function relatedBand(element, document, payload) {
   cover.replaceWith(...out);
 }
 
+// ---- SKODA-830 (import validity audit F3/F4) ----------------------------------------
+
+// Lightbox / gallery UI the source injects at the end of <body> or around a gallery
+// (`.sb-gallery-overlay`: "Gallery overview", "Share gallery" + share links; colorbox's
+// own overlay; the "Show more / Show less" togglebox of teaser grids). None of it is
+// content; left in, it lands as paragraphs after the related band (audit 4.3, 4.9).
+const CHROME_SELECTORS = [
+  '.sb-gallery-overlay', '.sb-gallery-lightbox', '.sb-gallery-share', '.sb-gallery-share-dropdown',
+  '#colorbox', '#cboxOverlay', '.togglebox-opener',
+];
+
+// Media Box section style: the press-release contract (downloads-file-rows, SKODA-510):
+// the `media-box` class gives the Downloads block its Media Box look and disclosure.
+const MEDIA_BOX_STYLE = 'dark, full-width, media-box';
+const MEDIA_BOX_MARKER = 'data-story-media-box';
+
+const squash = (el) => (el ? (el.textContent || '').replace(/\s+/g, ' ').trim() : '');
+
+// Quiz widget (`.knowledge-test`, audit 4.7): keep each question (heading + image) and its
+// answer options as a plain list; drop the hidden JSON config, the checkboxes, the pager
+// ("1 / 14"), the navigation buttons and the server-graded result panels.
+function flattenQuiz(element) {
+  element.querySelectorAll('.knowledge-test').forEach((quiz) => {
+    quiz.querySelectorAll([
+      '.jsonStruct', '.position', '.next-wrap', '.prev-wrap', '.question-results',
+      'button', 'input',
+    ].join(', ')).forEach((n) => n.remove());
+  });
+}
+
+// A data table in the story body (the Epiq spec table, audit 4.6) would become a block
+// named after its first cell (`version`, a block-JS 404) and lose its header row. Emit it
+// as a Columns block instead (contract spec-table-versions: "resolve to Columns rows"),
+// keeping every source row, the header row first. A colspan value is repeated across the
+// columns it spans, so each row has the same number of cells.
+function tablesToColumns(element, document) {
+  const bodies = element.querySelectorAll('.columns > .content, article .content, .entry-content');
+  const tables = new Set();
+  bodies.forEach((body) => body.querySelectorAll('table').forEach((t) => tables.add(t)));
+  tables.forEach((table) => {
+    if (table.parentElement && table.parentElement.closest('table')) return;
+    const rows = [...table.querySelectorAll(':scope > tbody > tr, :scope > thead > tr, :scope > tr')]
+      .map((tr) => {
+        const cells = [];
+        [...tr.children].filter((c) => /^(td|th)$/i.test(c.tagName)).forEach((c) => {
+          const span = Math.max(1, parseInt(c.getAttribute('colspan'), 10) || 1);
+          for (let i = 0; i < span; i += 1) {
+            const cell = [...(i ? c.cloneNode(true) : c).childNodes];
+            cells.push(cell.length ? cell : '');
+          }
+        });
+        return cells;
+      })
+      .filter((cells) => cells.some((c) => c && c.some((n) => (n.textContent || '').trim() || (n.querySelector && n.querySelector('img')))));
+    if (!rows.length) {
+      table.remove();
+      return;
+    }
+    const width = Math.max(...rows.map((r) => r.length));
+    rows.forEach((r) => { while (r.length < width) r.push(''); });
+    table.replaceWith(WebImporter.DOMUtils.createTable([['Columns'], ...rows], document));
+  });
+}
+
+// "Next up in <series> series" teaser grid below the story body (audit 4.9). The teasers'
+// images sit in an empty `a.colorbox` (dropped later) and their titles are truncated by
+// the source's dotdotdot script, so rebuild them as Cards (overlay), like the aside's
+// "Explore more": [image, <p>date</p><h3><a>title</a></h3>]. The full title is the image's
+// alt when the visible one ends in an ellipsis.
+function seriesNavCards(element, document) {
+  element.querySelectorAll('.series-nav').forEach((nav) => {
+    const rows = [['Cards (overlay)']];
+    nav.querySelectorAll('article.article-teaser').forEach((card) => {
+      const link = card.querySelector('.entry-title a[href]') || card.querySelector('a.link-more[href]');
+      const href = link && link.getAttribute('href');
+      if (!href) return;
+      const img = card.querySelector('img');
+      const alt = img ? (img.getAttribute('alt') || '').trim() : '';
+      let title = squash(card.querySelector('.entry-title'));
+      if (/(…|\.\.\.)$/.test(title) && alt.startsWith(title.replace(/(…|\.\.\.)$/, '').trim())) title = alt;
+      title = title || alt;
+      if (!title) return;
+      if (img) ['data-caption', 'data-video_title', 'data-video_src', 'srcset', 'sizes', 'itemprop'].forEach((a) => img.removeAttribute(a));
+      const body = [];
+      const date = squash(card.querySelector('.entry-published'));
+      if (date) {
+        const p = document.createElement('p');
+        p.textContent = date;
+        body.push(p);
+      }
+      const h3 = document.createElement('h3');
+      const a = document.createElement('a');
+      a.setAttribute('href', href);
+      a.textContent = title;
+      h3.append(a);
+      body.push(h3);
+      rows.push([img || '', body]);
+    });
+    const heading = nav.querySelector(':scope > .heading, :scope > h2, :scope > h3');
+    const out = [];
+    if (heading && squash(heading)) {
+      const h3 = document.createElement('h3');
+      h3.append(...heading.childNodes);
+      out.push(h3);
+    }
+    if (rows.length > 1) out.push(WebImporter.DOMUtils.createTable(rows, document));
+    nav.replaceWith(...out);
+  });
+}
+
+// Media Box band (`.cover-box.dark > .search-results.media-box`, SKODA-801a, audit 4.1/F4)
+// → its own section, as on press releases: `h2` heading, the stats line ("13 images"),
+// then the Media Box element itself, which the downloads parser turns into the Downloads
+// table between the hooks. The band is unwrapped out of `.cover-box.dark` (still dropped
+// below) and opened with a marker <hr>; finishMediaBox() closes it with Section Metadata.
+function mediaBoxBand(element, document) {
+  element.querySelectorAll('.search-results.media-box').forEach((box) => {
+    if (box.closest('.sidebar')) return;
+    const band = box.closest('.cover-box') || box;
+    const heading = squash(box.querySelector('.search-results-heading')) || 'Media Box';
+    const stats = squash(box.querySelector('.search-results-stats .stats, .stats'));
+    box.querySelectorAll('.search-results-header, .search-results-stats, .togglebox-opener').forEach((n) => n.remove());
+    const hr = document.createElement('hr');
+    hr.setAttribute(MEDIA_BOX_MARKER, '');
+    const h2 = document.createElement('h2');
+    h2.textContent = heading;
+    const out = [hr, h2];
+    if (stats) {
+      const p = document.createElement('p');
+      p.textContent = stats;
+      out.push(p);
+    }
+    out.push(box);
+    band.replaceWith(...out);
+  });
+}
+
+const isBlockNamed = (el, re) => el && el.tagName === 'TABLE'
+  && re.test(squash(el.querySelector('tr > th, tr > td')));
+
+// Close each Media Box section with its Section Metadata. When the downloads parser found
+// no asset (the box unwrapped or is still there), the whole section is dropped and logged,
+// so no empty dark band or stray thumbnails are left.
+function finishMediaBox(element, document) {
+  element.querySelectorAll(`hr[${MEDIA_BOX_MARKER}]`).forEach((hr) => {
+    const nodes = [];
+    for (let n = hr.nextElementSibling; n && n.tagName !== 'HR'; n = n.nextElementSibling) nodes.push(n);
+    hr.removeAttribute(MEDIA_BOX_MARKER);
+    if (!nodes.some((n) => isBlockNamed(n, /^downloads\b/i))) {
+      console.warn('[story-cleanup] Media Box had no downloadable asset; section dropped');
+      [hr, ...nodes].forEach((n) => n.remove());
+      return;
+    }
+    nodes[nodes.length - 1].after(WebImporter.Blocks.createBlock(document, {
+      name: 'Section Metadata',
+      cells: { style: MEDIA_BOX_STYLE },
+    }));
+  });
+}
+
 export default function transform(hookName, element, payload) {
   if (hookName === TransformHook.beforeTransform) {
+    const doc = element.ownerDocument || document;
     WebImporter.DOMUtils.remove(element, [
       '.btn-group.social',
       '.social-container',
+      ...CHROME_SELECTORS,
     ]);
-    videosToUrls(element, element.ownerDocument || document);
-    wpVideosToEmbeds(element, element.ownerDocument || document);
+    // First: only source tables exist yet (the Embed/Cards tables below are blocks).
+    tablesToColumns(element, doc);
+    videosToUrls(element, doc);
+    wpVideosToEmbeds(element, doc);
+    flattenQuiz(element);
+    seriesNavCards(element, doc);
+    mediaBoxBand(element, doc);
   }
 
   if (hookName === TransformHook.afterTransform) {
     // Must run before the removals below (the band's teasers contain a.colorbox) and
     // before skoda-story-aside (it reads the still-present sidebar entry-tags).
     relatedBand(element, element.ownerDocument || document, payload);
+    finishMediaBox(element, element.ownerDocument || document);
 
-    // In-body galleries / embeds / Media Box are the must-keep content this
+    // In-body lightbox galleries / audio embeds are the must-keep content this
     // flatten pass does NOT reconstruct (→ SKODA-604 full restore). Remove them
     // from the flattened body so the story is clean linear default content, and
     // LOG the counts so the drop is never silent. The sidebar is intentionally
-    // left untouched here — skoda-story-aside rebuilds it. The remaining
-    // `.cover-box.dark` is the Media Box band (the related band was rebuilt above).
+    // left untouched here — skoda-story-aside rebuilds it. The Media Box is no longer
+    // dropped (SKODA-801a: Downloads section above); any `.cover-box.dark` left is a
+    // band the importer does not know.
     const deferredSelectors = [
-      '.search-results.media-box', '.sb-gallery', 'a.colorbox',
+      '.sb-gallery', 'a.colorbox',
       '.embed-controller-wrapper', '.page-embed',
       '.cover-box.dark',
     ];

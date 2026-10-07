@@ -9,6 +9,8 @@
  * - Site-relative links to sections the demo does not carry (LIVE_ONLY: other locales,
  *   Škodapedia, feeds, Media Room service pages, source-only downloads) point at the live site
  *   and open in a new tab, instead of 404ing on EDS. Mostly the DA nav/footer fragments.
+ *   Exception: LIVE_SAME_TAB pages (the newsletter "Manage subscription") stay in the tab, as
+ *   on the source (SKODA-308).
  * - A trailing slash on any other site-relative path is dropped: EDS 404s `/en/`, serves `/en`.
  */
 
@@ -26,6 +28,26 @@ export const LIVE_ONLY = [
   /^\/en\/documents\//i,
   /^\/en\/newsletter-settings(?:\/|$)/i,
 ];
+
+// Live-only pages that open in the same tab, as on the source (SKODA-308, decided 2026-10-06:
+// the newsletter forms' "Manage subscription"). Their links still go to the live site.
+export const LIVE_SAME_TAB = [
+  /^\/en\/newsletter-settings(?:\/|$)/i,
+];
+
+/**
+ * Whether a live-site link opens in the same tab (LIVE_SAME_TAB) instead of a new one.
+ * @param {string} href
+ * @returns {boolean}
+ */
+export function opensInSameTab(href) {
+  try {
+    const url = new URL(href, LIVE_ORIGIN);
+    return LIVE_HOST.test(url.hostname) && LIVE_SAME_TAB.some((re) => re.test(url.pathname));
+  } catch (e) {
+    return false;
+  }
+}
 
 // Authored chrome paths whose live counterpart has another slug.
 export const LIVE_ALIASES = {
@@ -61,14 +83,14 @@ export function policyHref(href, base) {
   const trimmed = url.pathname.replace(/\/+$/, '') || '/';
   if (LIVE_HOST.test(url.hostname)) {
     if (DEMO_LISTINGS.has(trimmed.toLowerCase())) return { href: `${trimmed.toLowerCase()}${tail}`, newTab: false };
-    return { href, newTab: true };
+    return { href, newTab: !opensInSameTab(href) };
   }
   if (url.origin !== origin) return null;
 
   if (LIVE_ONLY.some((re) => re.test(url.pathname))) {
     const livePath = LIVE_ALIASES[trimmed.toLowerCase()];
     const path = livePath ? `${livePath}/` : url.pathname;
-    return { href: `${LIVE_ORIGIN}${path}${tail}`, newTab: true };
+    return { href: `${LIVE_ORIGIN}${path}${tail}`, newTab: !opensInSameTab(path) };
   }
   if (trimmed !== url.pathname) {
     const relative = !/^[a-z]+:|^\/\//i.test(href);
