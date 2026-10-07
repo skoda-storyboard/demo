@@ -164,6 +164,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-203 | Gallery + lightbox modal | E02 | 5 | 2–3 | 4–6 | 102,106 | 🟡 a11y modal `[RUNTIME-UNCONFIRMED]` |
 | SKODA-204 | Embeds (4 providers, dnt=1, lazy) | E02 | 3 | 1–2 | 2–4 | 102 | 🟢 |
 | [SKODA-204a](tickets/SKODA-204a.md) | Embeds consent placeholder + click-to-load hook (follow-up to #18) | E02 | 0.5 | 0.25 | 0.5 | 204,606 | 🟡 M1 Must; sweep §11.1 (204 AC l.47/49 gap); D1 follow-up, not a reopen |
+| [SKODA-830](tickets/SKODA-830.md) | Widget autoblock: same-origin `/widgets/` links only, never insert a failed response | E02 | 1 | 0.25–0.5 | 0.5–1 | 828,805c | 🔵 M1; #256, from the PR #253 review (2026-10-06): 6 overlay kits' Twitter `/widgets/` link loads 3 local 404s and inserts the 404 page (1440×900 on `skoda-octavia-press-kit`); pre-existing on `main` |
 | SKODA-205 | Tags / metadata | E02 | 1 | 0.5 | 1 | 102 | 🟢 |
 | SKODA-206 | Škodapedia glossary block (directory + A–Z filter + modal) | E02 | 5 | 2–3 | 4–6 | 102,106 | 🟡 modal a11y `[RUNTIME-UNCONFIRMED]`; **M2** on the board (aligned 2026-09-25) |
 | SKODA-207 | Series template (2-level: directory + hub) | E02 | 3 | 1–2 | 2–4 | 201,202,402,601 | 🟢 M1 (D18); reuses cards/hero/grid |
