@@ -5,14 +5,15 @@
 - **Phase:** A · **Milestone:** M1
 - **GitHub issue:** [#260](https://github.com/skoda-storyboard/demo/issues/260)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §3.2 / §8 F2; relates to [SKODA-209](SKODA-209.md), SKODA-214
-- **Branch:** `skoda-831-category-archive-membership`, stacked on `skoda-830-story-import-validity`
-- **Status (2026-10-06):** 🟡 Rollout steps 1–2 done; steps 3–4 wait for this branch's code on main.
-  - **Step 1:** index config pushed (`categories` column; readback equals `query-index-config.yaml`).
-  - **Step 2:** 57 stories re-imported with the merged 830+831 bundle, pushed, previewed and published. The only
-    diff vs the published SKODA-830 content is the new `categories` row. Live + preview index: 57/58 stories carry
-    `categories` (gaming-consoles stays blocked on its MP4).
-  - **Steps 3–4** (push + publish the 15 archives) need `blocks/stories/stories.js` with the `categories` key on
-    main; old code ignores it and would list every story. QA re-run still pending.
+- **Branch:** `skoda-831-category-archive-membership` (based on `main` since #269 merged)
+- **Status (2026-10-07):** 🟡 QA PASS (run 2); PR open. Rollout (see "Rollout order"):
+  - **Step 2 done:** the `categories` index column (2026-10-06; readback equals `query-index-config.yaml`).
+  - **Step 3 done:** 57 stories re-pushed and published with `categories`; the live + preview index carry it on
+    57/58 stories (gaming-consoles is blocked on its MP4).
+  - **Step 1 pending:** merge this PR.
+  - **Step 4 waits for the merge:** push and publish the 15 archives. The content in
+    `.migration/wt-831b-scratch/archives-rollout/` has had `media:apply`, and each page differs from DA only in
+    its Stories scope row.
 
 ## Problem
 `parsers/archive-list.js` scoped sub-category archives to `path: /en/<cat>/<sub>/`, but story URLs are flat, so the
@@ -41,7 +42,8 @@ parser-only fix was impossible.
 ## Developer result
 - Tests: lint clean; `npm test` 975 → 970 pass, 3 skipped, only the 2 pre-existing failures.
 - Re-import: 59 stories + 15 archives. The only story diff vs the old bundle is the new `categories` row. In the
-  archives only the scope row changed.
+  archives only the scope row changes **once `media:apply` has run** (QA run 2 D1: without it, 13 heroes would drop to
+  the source's `-1920x…` rendition).
 - 8/8 spot-checks match the live origin article classes, including camouflage (design, skoda-world, …) and the
   women's cycling story (cycling, sports, lifestyle).
 - Simulation with the block's own `parseFeedConfig` / `scopeFeedRows` / `selectFeedRows`: no imported first-page
@@ -69,10 +71,33 @@ parser-only fix was impossible.
 Before step 4 the old `stories.js` ignores `categories` and would list every story; archives pushed before step 3
 would render empty, including the parents that work today.
 
+## QA result 2 (2026-10-07, head 48bde76): PASS
+Evidence: `.migration/qa-831/run2/` (outside git).
+- **Code review:** pass.
+  - Configs without the key are unchanged; matching uses the shared `filterRows` (case/whitespace-safe, whole tokens).
+  - Transformer is standalone, stories only.
+  - Category tree rebuilt from the live WP API (469 categories): 46 child→parent entries, equal to the inlined copy.
+  - 57/57 live-index stories equal their WP categories plus ancestors.
+  - All 19 bundles byte-identical; lint clean; `npm test` only the 2 known failures.
+- **Matching against today's live index:**
+  - Every imported first-page origin teaser appears, in order, on all 15 archives.
+  - Counts as simulated, except emobility 31 and models 29: gaming-consoles is not yet indexed with `categories`.
+- **Rendered with branch code:**
+  - skoda-world/design: 6 cards, then Load more to 8.
+  - lifestyle/sports: 2 cards.
+  - models: 6, then Load more to 29.
+  - No empty state or block errors at 1440/375. Main's current `stories.js` ignores the key (all 58 stories), so
+    the PR must merge before step 4.
+- **Defensive fallback in `stories.js`:** not needed. The index has the column, and old code can't be changed by
+  new code.
+- **D1 (fixed in content, not code):** the rollout import had no `media:apply`, so 13 heroes would have pushed the
+  1920px rendition. After applying it, 13 rewrites; all 15 differ from DA only in the scope row.
+- **Dry-run:** 15 × update, 0 conflicts.
+
 ## Acceptance Criteria
 - [x] Every sub-category archive matches its imported WordPress members (simulation)
 - [x] No change for configs without `categories`; home / rails / promo unaffected
-- [ ] QA PASS (re-run; also assess a defensive fallback in `stories.js` to remove the ordering risk)
+- [x] QA PASS (run 2, 2026-10-07); defensive fallback assessed: not needed
 - [ ] Rolled out in the order above (steps 1–2 done 2026-10-06); rendered check of 3 archives on preview
 
 ## Risks
