@@ -132,9 +132,12 @@
 }
 
 @media (width >= 768px) {
+  /* the 2nd row takes what the big card adds over the two 16:9 cards (0.75px at 1440), so the
+     3rd card stays 16px under the 2nd, as on the source */
   .promo-box .promo-box-items {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
     row-gap: var(--spacing-m);
     overflow: visible;
     scroll-snap-type: none;
@@ -144,10 +147,22 @@
     margin-inline: var(--spacing-xs);
   }
 
+  /* source big card: its column less 8px / 12px, and 16:9 + 10px tall (812 x 466.75 at 1440,
+     492 x 286.75 at 768). It sets the box height, so the page below sits where the source's
+     does (SKODA-308: a 0.75px shorter box moved the footer lines a device pixel at 125% /
+     150% scaling). Image and caption are laid over the whole card, padding included. */
   .promo-box .card-teaser:first-child {
+    box-sizing: content-box;
     grid-row: span 2;
-    aspect-ratio: auto;
-    margin-inline: 0 var(--spacing-s);
+    aspect-ratio: 16 / 9;
+    margin-inline: var(--spacing-xs) var(--spacing-s);
+    padding-bottom: 10px;
+  }
+
+  /* an in-flow toolbar (the Media Room's pill cards) stays on the card's bottom edge, level
+     with the small cards' pills, not 10px up */
+  .promo-box .card-teaser:first-child > .card-teaser-toolbar {
+    margin-bottom: -10px;
   }
 
   .promo-box .card-teaser:not(:first-child) {
@@ -184,7 +199,13 @@
   }
 
   .promo-box .promo-box-items:has(.card-teaser:only-child) .card-teaser {
+    box-sizing: border-box;
     grid-row: auto;
     aspect-ratio: 16 / 9;
+    padding-bottom: 0;
+  }
+
+  .promo-box .promo-box-items:has(.card-teaser:only-child) .card-teaser > .card-teaser-toolbar {
+    margin-bottom: 0;
   }
 }

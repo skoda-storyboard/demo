@@ -77,10 +77,11 @@ source rendering on a half-pixel row plus the `fi` ligature (the global `text-re
 **Known deviations (deliberate / open):** weight 500 → 400 face (identical rendering); button radius
 `--pill-radius` (50px) vs `2em` (both fully round at 49px); the stub shows an "available soon" message instead
 of posting; a visible white `:focus-visible` ring is added on all controls (source has none).
-**A11y deviation (decided 2026-09-25):** the source "Manage subscription" link (`#419468` on `#0e3a2f`) is
-**3.40:1** and fails AA for 16px text, so the build uses the brand emerald (`#78faae`, 9.66:1), the colour of
-the source's own `.light` variant (`--newsletter-manage-color`). The browser-default placeholder stays
-source-exact (4.08:1 on `#f1f1f1`).
+**Contrast, decided for source parity (2026-10-06, SKODA-308; replaces the 2026-09-25 emerald deviation):**
+the "Manage subscription" link is the source `#419468` on `#0e3a2f` (`--newsletter-manage-color`), **3.40:1**,
+below AA for 16px text; it opens `/en/newsletter-settings/` on the live site in the same tab, as the source does.
+The sent message is the source `.success` `#419468` on its white box (3.71:1, below AA for 14px text). The
+browser-default placeholder stays source-exact (4.08:1 on `#f1f1f1`).
 
 **Routing (decided 2026-09-25):** activated **after merge**. The bulk metadata sheet gets
 `footer: /media-room/footer` rows for the MR sections listed above. The QA page `/drafts/mr-footer-qa`

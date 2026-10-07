@@ -1,6 +1,7 @@
 import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 import attachSuggest from '../../scripts/search-suggest.js';
+import iconsReady from '../../scripts/icons-ready.js';
 import { hrefPath, pickActiveTab } from './header-switcher.js';
 import {
   buildLocaleList, currentLocale, isLocaleGroup, localeEntries,
@@ -12,17 +13,33 @@ const isDesktop = window.matchMedia('(min-width: 1080px)');
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
     const nav = document.getElementById('nav');
+    // the listener is live before the header is shown (it waits up to HEADER_ASSET_WAIT)
+    if (!nav) return;
     const navSections = nav.querySelector('.nav-sections');
     if (!navSections) return;
     const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
-    if (navSectionExpanded && isDesktop.matches) {
+    // desktop: the open dropdown, or the one shown because focus is inside it (:focus-within)
+    // or the pointer is over it (:hover), which must be dismissible too (WCAG 1.4.13)
+    const shown = navSectionExpanded || document.activeElement?.closest?.('.nav-drop')
+      || navSections.querySelector('.nav-drop:hover');
+    if (shown && isDesktop.matches) {
       // eslint-disable-next-line no-use-before-define
       toggleAllNavSections(navSections);
-      navSectionExpanded.focus();
+      // dismissed until focus / the pointer leaves it, so :focus-within / :hover can't keep it
+      // on screen; focus only moves for a dropdown opened from the keyboard (not under the mouse)
+      shown.dataset.dismissed = 'true';
+      const sub = shown.querySelector(':scope > ul');
+      if (sub?.contains(document.activeElement)) {
+        // focus was on a link of the now hidden panel: back to its trigger, never on hidden links
+        // eslint-disable-next-line no-use-before-define
+        dropTrigger(shown)?.focus();
+      } else if (shown === navSectionExpanded && !shown.contains(document.activeElement)) {
+        shown.focus();
+      }
     } else if (!isDesktop.matches) {
       // eslint-disable-next-line no-use-before-define
       toggleMenu(nav, navSections);
-      nav.querySelector('button').focus();
+      nav.querySelector('.nav-hamburger button').focus();
     }
   }
 }
@@ -43,14 +60,34 @@ function closeOnFocusLost(e) {
   }
 }
 
+/**
+ * Whether a desktop dropdown is on screen while focus is inside it: open, or shown by
+ * :focus-within unless dismissed (see the panel rule in header.css).
+ * @param {Element} li A top-level nav li
+ */
+const dropShown = (li) => li.getAttribute('aria-expanded') === 'true' || !li.dataset.dismissed;
+
+/**
+ * Shows / hides a focused desktop dropdown (Space, Enter on the li, a click on a text-only
+ * parent): one item open at a time; hiding it while focus stays sets data-dismissed so the
+ * :focus-within rule can't keep it on screen.
+ * @param {Element} li A top-level nav li
+ * @param {boolean} open
+ */
+function setDesktopDrop(li, open) {
+  // eslint-disable-next-line no-use-before-define
+  toggleAllNavSections(li.closest('.nav-sections'));
+  li.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) delete li.dataset.dismissed;
+  else li.dataset.dismissed = 'true';
+}
+
 function openOnKeydown(e) {
   const focused = document.activeElement;
-  const isNavDrop = focused.className === 'nav-drop';
+  const isNavDrop = focused.classList.contains('nav-drop');
   if (isNavDrop && (e.code === 'Enter' || e.code === 'Space')) {
-    const dropExpanded = focused.getAttribute('aria-expanded') === 'true';
-    // eslint-disable-next-line no-use-before-define
-    toggleAllNavSections(focused.closest('.nav-sections'));
-    focused.setAttribute('aria-expanded', dropExpanded ? 'false' : 'true');
+    e.preventDefault(); // Space would scroll the page
+    setDesktopDrop(focused, !dropShown(focused));
   }
 }
 
@@ -194,7 +231,108 @@ function syncSearchTabbable(nav) {
   const input = bar?.querySelector('.nav-search-input');
   if (!input) return;
   const drawerOpen = !isDesktop.matches && nav.getAttribute('aria-expanded') === 'true';
-  input.tabIndex = (drawerOpen || bar.classList.contains('nav-search-open')) ? 0 : -1;
+  const open = bar.classList.contains('nav-search-open');
+  input.tabIndex = (drawerOpen || open) ? 0 : -1;
+  // the scope select is desktop-only (the drawer row is the field alone, as on the source)
+  const scope = bar.querySelector('.nav-search-type');
+  if (scope) scope.tabIndex = (open && !drawerOpen) ? 0 : -1;
+}
+
+// search scopes of the source header form (value = its `search_type`)
+export const SEARCH_SCOPES = [
+  ['', 'All'],
+  ['post', 'Stories'],
+  ['press_release', 'News'],
+  ['press_kit', 'Press Kits'],
+  ['image', 'Images'],
+  ['video', 'Videos'],
+];
+
+// the source icons as inline SVG, [viewBox, path]: the icon-font glyphs (skoda-bnr-icons search
+// U+E02D, caret-down U+E007, menu U+E01F, close U+E010, in their 16-unit em box) and the
+// phone mail symbol (#mail-thick). A CSS mask or background image snaps to whole pixels (a
+// 11.2px caret drew 10 or 12px, and jumped a pixel as the row settled) and an icon image pops
+// in after the header shows; an inline SVG draws at the source size with the header
+const GLYPHS = {
+  menu: ['0 0 16 16', 'M0 0.969L0 2.938L16 2.938L16 0.969ZM0 7.016L0 8.984L16 8.984L16 7.016ZM0 13.063L0 15.031L16 15.031L16 13.063Z'],
+  close: ['0 0 16 16', 'M13.422 12.594L8.828 8L13.422 3.406Q13.578 3.250 13.422 3.078L12.922 2.578Q12.750 2.422 12.594 2.578L8 7.172L3.406 2.578Q3.250 2.422 3.078 2.578L2.578 3.078Q2.422 3.250 2.578 3.406L7.172 8L2.578 12.594Q2.422 12.750 2.578 12.922L3.078 13.422Q3.250 13.578 3.406 13.422L8 8.828L12.594 13.422Q12.750 13.578 12.922 13.422L13.422 12.922Q13.578 12.750 13.422 12.594Z'],
+  mail: ['0 0 30 24', 'M29.076 23.218V.846H.924v22.372h28.152ZM5.412 3.634h19.176L15 11.556 5.412 3.634ZM26.118 20.09H3.882V5.946L15 15.092l11.118-9.146V20.09Z'],
+  search: ['0 0 16 16', 'M14.656 16L16 14.656L11.469 10.125Q12.063 9.313 12.391 8.375Q12.719 7.391 12.719 6.359Q12.719 4.625 11.844 3.156Q11 1.719 9.563 0.875Q8.078 0 6.352 0Q4.625 0 3.156 0.875Q1.719 1.719 0.875 3.156Q0 4.625 0 6.352Q0 8.078 0.875 9.563Q1.719 11 3.156 11.844Q4.625 12.719 6.359 12.719Q7.391 12.719 8.375 12.375Q9.313 12.063 10.125 11.469L14.656 16M1.266 6.359Q1.266 4.984 1.969 3.797Q2.641 2.641 3.797 1.969Q4.984 1.266 6.359 1.266Q7.734 1.266 8.922 1.969Q10.078 2.641 10.75 3.797Q11.438 4.984 11.438 6.359Q11.438 7.734 10.75 8.922Q10.078 10.078 8.922 10.75Q7.734 11.438 6.359 11.438Q4.984 11.438 3.797 10.75Q2.641 10.078 1.969 8.922Q1.266 7.734 1.266 6.359Z'],
+  caret: ['0.563 3.531 14.875 8.938', 'M8 12.469L0.563 5.031L2.063 3.531L8 9.469L13.938 3.531L15.438 5.031Z'],
+};
+
+/**
+ * A decorative source glyph, drawn in the text colour (`fill: currentcolor`, see header.css).
+ * @param {'search'|'caret'|'menu'|'close'|'mail'} name
+ * @param {string} className
+ * @returns {SVGSVGElement}
+ */
+function glyph(name, className) {
+  const ns = 'http://www.w3.org/2000/svg';
+  const [viewBox, d] = GLYPHS[name];
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('class', `nav-glyph ${className}`);
+  svg.setAttribute('viewBox', viewBox);
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('d', d);
+  svg.append(path);
+  return svg;
+}
+
+/**
+ * The search scope select (source custom select: All / Stories / News / Press Kits / Images /
+ * Videos). A native select, styled as the source's, inside a wrapper that draws its chevron.
+ * @param {string} selected The pre-selected scope value
+ * @returns {{ wrapper: HTMLElement, select: HTMLSelectElement }}
+ */
+export function buildSearchScope(selected) {
+  const select = document.createElement('select');
+  select.className = 'nav-search-type';
+  select.setAttribute('aria-label', 'Search in');
+  select.tabIndex = -1;
+  SEARCH_SCOPES.forEach(([value, text]) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = text;
+    if (value === selected) option.selected = true;
+    select.append(option);
+  });
+  const wrapper = document.createElement('span');
+  wrapper.className = 'nav-search-scope';
+  wrapper.append(select, glyph('caret', 'nav-search-scope-caret'));
+  return { wrapper, select };
+}
+
+/**
+ * Whether an authored link resolves to a web page (http / https), so it can be navigated to.
+ * @param {string} href
+ * @param {string} origin The page origin, for relative hrefs
+ * @returns {boolean}
+ */
+export function isWebUrl(href, origin) {
+  try {
+    return /^https?:$/.test(new URL(href, origin).protocol);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The results URL: the search page with the query (`filter[search]`, read by SKODA-403) and,
+ * as on the source form, the chosen scope (`search_type`, omitted for All).
+ * @param {string} path The search page path
+ * @param {string} query The trimmed query
+ * @param {string} scope The scope value ('' = All)
+ * @param {string} origin The page origin
+ * @returns {string}
+ */
+export function searchUrl(path, query, scope, origin) {
+  const url = new URL(path, origin);
+  url.searchParams.set('filter[search]', query);
+  if (scope) url.searchParams.set('search_type', scope);
+  return url.href;
 }
 
 /**
@@ -255,6 +393,128 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   }
 }
 
+// faces first used by the topbar (locales 300 / 700): requested only when the header first
+// paints, their swap re-flowed the right-aligned Subscribe + locales group by ~8px (SKODA-308)
+const HEADER_FONTS = ['300 12px "skoda next"', '700 12px "skoda next"'];
+const HEADER_ASSET_WAIT = 250; // ms: the longest the header waits for them
+
+/**
+ * Starts loading what the header shows first (the logo, the topbar faces) while the nav
+ * fragment loads, so the header appears complete instead of the logo popping in and the
+ * topbar text moving a moment later. Resolves when they are ready, at the latest after
+ * HEADER_ASSET_WAIT: the header is never held back for long, and failures don't matter
+ * (the browser shows them when they arrive).
+ * @returns {Promise<void>}
+ */
+function preloadHeaderAssets() {
+  const logo = document.createElement('img');
+  logo.src = `${window.hlx?.codeBasePath || ''}/icons/skoda-storyboard-logo.svg`;
+  const pending = [
+    logo.decode?.().catch(() => {}),
+    ...HEADER_FONTS.map((font) => document.fonts?.load(font).catch(() => {})),
+  ];
+  const timeout = new Promise((resolve) => { setTimeout(resolve, HEADER_ASSET_WAIT); });
+  return Promise.race([Promise.all(pending), timeout]);
+}
+
+/**
+ * Topbar newsletter panel (SKODA-308): the source's "Subscribe to our stories" dropdown. Its
+ * form is the `Newsletter Stub (topbar)` block (SKODA-305 / 823: UI only, it posts nothing) of
+ * the nav's companion fragment (`{nav}-newsletter`, e.g. /nav-newsletter). Null when the
+ * fragment has none: the Subscribe link then stays a plain link.
+ * @param {Element|null} fragment The loaded companion fragment
+ * @returns {HTMLElement|null}
+ */
+export function takeNewsletterPanel(fragment) {
+  const stub = fragment?.querySelector('.newsletter-stub');
+  if (!stub) return null;
+  stub.remove();
+  const panel = document.createElement('div');
+  panel.id = 'nav-newsletter';
+  panel.className = 'nav-newsletter-panel';
+  panel.hidden = true;
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'nav-newsletter-close';
+  close.setAttribute('aria-label', 'Close newsletter subscription');
+  panel.append(close, stub);
+  return panel;
+}
+
+/**
+ * Replaces a Subscribe link with the panel's disclosure button, keeping its content, class
+ * and accessible name.
+ * @param {HTMLAnchorElement} link
+ * @param {HTMLElement} panel
+ * @returns {HTMLButtonElement}
+ */
+export function toPanelButton(link, panel) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = link.className;
+  const name = link.getAttribute('aria-label');
+  if (name) button.setAttribute('aria-label', name);
+  button.setAttribute('aria-expanded', 'false');
+  button.setAttribute('aria-controls', panel.id);
+  const hadFocus = document.activeElement === link;
+  button.append(...link.childNodes);
+  link.replaceWith(button);
+  if (hadFocus) button.focus(); // the panel loads late: don't drop keyboard focus to <body>
+  return button;
+}
+
+/**
+ * Opens / closes the newsletter panel from its triggers: opening moves focus to the e-mail
+ * field; the close button and Escape (in the panel or on a trigger) close it and return focus
+ * to the trigger that opened it. Focus or a click moving elsewhere also closes it, so it never
+ * stays over the menu.
+ * @param {HTMLElement} panel
+ * @param {HTMLButtonElement[]} triggers
+ * @returns {(open: boolean) => void} sets the panel state (e.g. closed when the drawer opens)
+ */
+export function wireNewsletterPanel(panel, triggers) {
+  let opener = null;
+  const ours = (node) => !!node && (panel.contains(node) || triggers.includes(node));
+  const setOpen = (open, from = null) => {
+    panel.hidden = !open;
+    triggers.forEach((t) => t.setAttribute('aria-expanded', open ? 'true' : 'false'));
+    if (open) {
+      opener = from;
+      // the e-mail field, or the sent message once the form has dropped its field
+      const field = panel.querySelector('input[type="email"]');
+      const sent = field?.closest('.is-sent');
+      (sent ? sent.querySelector('.newsletter-stub-status') : field)?.focus();
+    } else if (opener && panel.contains(document.activeElement)) {
+      opener.focus();
+    }
+  };
+  triggers.forEach((t) => {
+    t.addEventListener('click', () => setOpen(panel.hidden, t));
+    t.addEventListener('keydown', (e) => {
+      if (e.code === 'Escape' && !panel.hidden) setOpen(false);
+    });
+  });
+  panel.querySelector('.nav-newsletter-close')?.addEventListener('click', () => {
+    opener?.focus();
+    setOpen(false);
+  });
+  panel.addEventListener('keydown', (e) => {
+    if (e.code !== 'Escape') return;
+    e.stopPropagation(); // the nav's own Escape handling is not for this panel
+    setOpen(false);
+  });
+  // focus moving on to another control closes it (a click on the panel's own text, which
+  // moves focus nowhere, does not)
+  panel.addEventListener('focusout', (e) => {
+    if (e.relatedTarget && !ours(e.relatedTarget)) setOpen(false);
+  });
+  document.addEventListener('click', (e) => {
+    const onTrigger = triggers.some((t) => t.contains(e.target));
+    if (!panel.hidden && !ours(e.target) && !onTrigger) setOpen(false);
+  });
+  return setOpen;
+}
+
 /**
  * A dropdown parent authored as plain text (`<p>Models</p>`, the Media Room nav) gets the
  * same trigger link as a linked parent (`#`, as on the source), so it takes focus (the
@@ -278,6 +538,8 @@ export function linkDropLabel(navSection) {
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
+  // the logo and the topbar faces load while the nav fragment does (see preloadHeaderAssets)
+  const assetsReady = preloadHeaderAssets();
   // load nav as fragment
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
@@ -311,6 +573,7 @@ export default async function decorate(block) {
   // topbar: section switcher (COM-04) + subscribe/locales group, lifted above <nav>
   const navTopbar = nav.querySelector('.nav-topbar');
   let hasSubscribe = false;
+  let subscribeLink = null;
   if (navTopbar) {
     const switcher = navTopbar.querySelector(':scope .default-content-wrapper > ul, :scope > ul');
     if (switcher) {
@@ -327,7 +590,7 @@ export default async function decorate(block) {
     const utility = navTopbar.querySelectorAll(':scope .default-content-wrapper > p');
     utility.forEach((p) => p.classList.add('nav-topbar-utility'));
     // prefix the Subscribe CTA with a mail icon (injected here; DA strips authored tokens)
-    const subscribeLink = navTopbar.querySelector('a[href*="#subscribe"]');
+    subscribeLink = navTopbar.querySelector('a[href*="#subscribe"]');
     hasSubscribe = !!subscribeLink;
     if (subscribeLink && !subscribeLink.querySelector('.icon')) {
       subscribeLink.classList.add('nav-subscribe');
@@ -387,6 +650,8 @@ export default async function decorate(block) {
       if (navSection.querySelector('ul')) {
         navSection.classList.add('nav-drop');
         linkDropLabel(navSection);
+        // the desktop caret (the drawer draws its own, see header.css)
+        dropTrigger(navSection)?.append(glyph('caret', 'nav-drop-caret'));
       }
       // Newsletter is drawer-only on desktop (server strips the authored class; re-tag by href)
       if (navSection.querySelector('a[href*="#newsletter"]')) {
@@ -397,8 +662,19 @@ export default async function decorate(block) {
       navSection.addEventListener('click', (e) => {
         if (isDesktop.matches) {
           const expanded = navSection.getAttribute('aria-expanded') === 'true';
-          toggleAllNavSections(navSections);
-          navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+          if (isDrop) {
+            // a pointer click or tap (detail > 0) opens the dropdown, or closes the one it
+            // opened: a hover-shown panel stays, and a tablet tap (pointerenter, then click)
+            // opens it. From the keyboard (Enter on a text-only parent) it toggles what is on
+            // screen, as Space does.
+            const open = e.detail > 0
+              ? navSection.getAttribute('aria-expanded') !== 'true'
+              : !dropShown(navSection);
+            setDesktopDrop(navSection, open);
+          } else {
+            toggleAllNavSections(navSections);
+            navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+          }
         } else if (isDrop) {
           // drawer: tapping a parent row toggles its accordion instead of
           // navigating; only intercept taps on the parent row itself, not on
@@ -411,31 +687,50 @@ export default async function decorate(block) {
         }
       });
       // drawer accordion buttons toggle on Enter and Space (Space would otherwise scroll,
-      // Enter follow the category link); desktop links keep their SKODA-301 keys
+      // Enter follow the category link); on desktop Enter follows the link (SKODA-301) and
+      // Space shows / hides the dropdown instead of scrolling the page (SKODA-308)
       const trigger = isDrop ? dropTrigger(navSection) : null;
       trigger?.addEventListener('keydown', (e) => {
-        if (!trigger.dataset.drawerTrigger || (e.key !== 'Enter' && e.key !== ' ')) return;
+        const drawer = !!trigger.dataset.drawerTrigger;
+        if (e.key !== ' ' && !(drawer && e.key === 'Enter')) return;
         e.preventDefault();
-        setDropState(navSection, navSection.getAttribute('aria-expanded') !== 'true');
+        if (drawer) {
+          setDropState(navSection, navSection.getAttribute('aria-expanded') !== 'true');
+        } else {
+          // the focused trigger already shows its panel (:focus-within): Space hides it first
+          setDesktopDrop(navSection, !dropShown(navSection));
+        }
       });
+      if (isDrop) {
+        // desktop: focus moving on closes the dropdown (one open at a time, as on hover) and
+        // forgets a dismissal (Escape), so it shows again on the next visit
+        navSection.addEventListener('focusout', (e) => {
+          if (navSection.contains(e.relatedTarget)) return;
+          delete navSection.dataset.dismissed;
+          if (isDesktop.matches) navSection.setAttribute('aria-expanded', 'false');
+        });
+        // the pointer coming back shows it again (also after a click closed it while focused)
+        navSection.addEventListener('pointerenter', () => { delete navSection.dataset.dismissed; });
+      }
     });
   }
 
-  // tools row: render the search link as a click-to-expand search control.
-  // DA strips authored icon tokens, so build the icon + input here.
+  // tools row: render the search link as the source's search control (SKODA-308): a search
+  // button that opens a bar (scope select + pill field) over the menu and then is the bar's
+  // invisible submit (a query searches, none closes). DA strips authored icon tokens, so the
+  // icons are the source glyphs (inline SVG).
   const navTools = nav.querySelector('.nav-tools');
   if (navTools) {
     const searchLink = navTools.querySelector('a[href*="#search"], a');
     if (searchLink) {
       const label = searchLink.textContent.trim() || 'Search';
-      // toggle button (the search icon)
       const toggle = document.createElement('button');
       toggle.type = 'button';
       toggle.className = 'nav-search-toggle';
       toggle.setAttribute('aria-label', label);
       toggle.setAttribute('aria-expanded', 'false');
-      toggle.innerHTML = '<span class="icon icon-search"></span>';
-      // search input (collapsed by default)
+      toggle.setAttribute('aria-controls', 'nav-search-bar');
+      toggle.append(glyph('search', 'nav-search-toggle-glyph'));
       const input = document.createElement('input');
       input.type = 'search';
       input.id = 'nav-search-input';
@@ -444,23 +739,43 @@ export default async function decorate(block) {
       input.setAttribute('aria-label', label);
       input.setAttribute('autocomplete', 'off');
       input.tabIndex = -1;
+      // the scope select; Storyboard pages default to Stories, the Media Room to All (source)
+      const scope = buildSearchScope(siteSection === 'media-room' ? '' : 'post');
 
-      // pill field holds the leading icon + input; icon sits before the
-      // placeholder when open, input fills the rest
+      // pill field: decorative leading icon + input
       const field = document.createElement('div');
       field.className = 'nav-search-field';
-      field.append(toggle, input);
+      field.append(glyph('search', 'nav-search-icon'), input);
+
+      const bar = document.createElement('div');
+      bar.id = 'nav-search-bar';
+      bar.className = 'nav-search-bar';
+      bar.setAttribute('role', 'search');
+      bar.append(scope.wrapper, field);
 
       const searchBar = document.createElement('div');
       searchBar.className = 'nav-search';
-      searchBar.append(field);
+      searchBar.append(bar, toggle);
 
+      // open, the button is the source's submit: it searches with a query, closes without one
+      const syncToggleLabel = () => {
+        const open = searchBar.classList.contains('nav-search-open');
+        toggle.setAttribute('aria-label', open && !input.value.trim() ? 'Close search' : label);
+      };
       const setOpen = (open) => {
         searchBar.classList.toggle('nav-search-open', open);
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        syncToggleLabel();
         syncSearchTabbable(nav);
         if (open) input.focus();
+        else delete bar.dataset.keyboard;
       };
+      input.addEventListener('input', syncToggleLabel);
+      // the field's focus ring is for keyboard use only (the source shows none): set by any Tab
+      // in the nav (also tabbing into the drawer's field) or a keyboard press of the button,
+      // cleared by the pointer
+      nav.addEventListener('keydown', (e) => { if (e.key === 'Tab') bar.dataset.keyboard = 'true'; });
+      document.addEventListener('pointerdown', () => { delete bar.dataset.keyboard; });
       // Submit the query to the search results page (the SKODA-403 block reads
       // ?filter[search]= from the URL). Target: the authored search link's href
       // if it points to a real page, else the locale's /search (mirrors the live
@@ -469,38 +784,53 @@ export default async function decorate(block) {
       const localeMatch = window.location.pathname.match(/^\/([a-z]{2})(?:\/|$)/i);
       const locale = localeMatch ? localeMatch[1] : 'en';
       const searchPath = authoredHref && !authoredHref.startsWith('#')
+        && isWebUrl(authoredHref, window.location.origin)
         ? authoredHref
         : `/${locale}/search`;
       const submitSearch = (value) => {
         const q = String(value || '').trim();
         if (!q) { input.focus(); return; }
-        const url = new URL(searchPath, window.location.origin);
-        url.searchParams.set('filter[search]', q);
-        window.location.assign(url.href);
+        const { origin } = window.location;
+        window.location.assign(searchUrl(searchPath, q, scope.select.value, origin));
       };
       // live suggestions (index-driven) + Enter → results page. The shared
       // helper owns the dropdown, arrow-key nav, and Enter; onSubmit fires when
       // Enter is pressed with no suggestion highlighted (submits the raw query).
       // Append the dropdown to .nav-search (positioned, not overflow:hidden) —
-      // the .nav-search-field pill clips its overflow for the collapse anim.
+      // the .nav-search-bar clips its overflow for the width animation.
       attachSuggest(input, { container: searchBar, onSubmit: submitSearch });
 
-      toggle.addEventListener('click', () => {
-        // when already open with a query, the icon acts as submit; else toggle
-        if (searchBar.classList.contains('nav-search-open') && input.value.trim()) {
+      // the search button opens the bar; while open it is the source's (invisible) submit at the
+      // pill's end: it searches with a query and closes the bar without one. No focus move on
+      // press: Safari / Firefox on macOS don't focus a clicked button, so the field's focusout
+      // would close the bar and the click re-open it
+      toggle.addEventListener('mousedown', (e) => e.preventDefault());
+      toggle.addEventListener('click', (e) => {
+        const keyboard = e.detail === 0; // Enter / Space on the button
+        if (!searchBar.classList.contains('nav-search-open')) {
+          if (keyboard) bar.dataset.keyboard = 'true';
+          setOpen(true);
+        } else if (input.value.trim()) {
           submitSearch(input.value);
         } else {
-          setOpen(!searchBar.classList.contains('nav-search-open'));
+          setOpen(false);
+          // a pointer close leaves focus nowhere (no ring, as on the source), not on a hidden
+          // bar control; from the keyboard it stays on the button
+          if (!keyboard && bar.contains(document.activeElement)) document.activeElement.blur();
         }
       });
       // Escape closes the whole search bar (the suggest helper also closes its
       // own dropdown on Escape; this additionally collapses the field).
-      input.addEventListener('keydown', (e) => {
+      bar.addEventListener('keydown', (e) => {
         if (e.code === 'Escape') { setOpen(false); toggle.focus(); }
       });
-      // close when focus leaves the search control (if input is empty)
+      // focus moving on to another control, or a click elsewhere, closes the bar (the query is
+      // kept), so it never stays over the menu; a click on the bar's own text moves focus nowhere
       searchBar.addEventListener('focusout', (e) => {
-        if (!searchBar.contains(e.relatedTarget) && !input.value) setOpen(false);
+        if (e.relatedTarget && !searchBar.contains(e.relatedTarget)) setOpen(false);
+      });
+      document.addEventListener('click', (e) => {
+        if (searchBar.classList.contains('nav-search-open') && !searchBar.contains(e.target)) setOpen(false);
       });
 
       searchLink.replaceWith(searchBar);
@@ -508,25 +838,32 @@ export default async function decorate(block) {
   }
 
   // mobile action cluster: mail shortcut + hamburger (mail sits before the
-  // hamburger, mobile-only). Mail is an anchor so it is not picked up by the
-  // nav's `querySelector('button')` focus/close logic. Only a nav that authors
-  // the Subscribe CTA gets it: the Media Room nav has none (SKODA-309).
+  // hamburger, mobile-only). With the newsletter panel it becomes the panel's
+  // button (below). Only a nav that authors the Subscribe CTA gets it: the
+  // Media Room nav has none (SKODA-309).
   let mail;
   if (hasSubscribe) {
     mail = document.createElement('a');
     mail.className = 'nav-mail';
     mail.href = '#subscribe';
     mail.setAttribute('aria-label', 'Subscribe to our stories');
-    mail.innerHTML = '<span class="icon icon-mail"></span>';
+    mail.append(glyph('mail', 'nav-mail-glyph'));
   }
 
-  // hamburger for mobile
+  // hamburger for mobile: the source menu / close glyphs, one shown per drawer state
   const hamburger = document.createElement('div');
   hamburger.classList.add('nav-hamburger');
-  hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-expanded="false" aria-label="Open navigation">
-      <span class="nav-hamburger-icon"></span>
-    </button>`;
-  hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
+  hamburger.innerHTML = '<button type="button" aria-controls="nav" aria-expanded="false" aria-label="Open navigation"></button>';
+  hamburger.firstElementChild.append(
+    glyph('menu', 'nav-hamburger-menu'),
+    glyph('close', 'nav-hamburger-close'),
+  );
+  // the newsletter panel (loaded later, below) closes when the drawer opens
+  let setNewsletterOpen = null;
+  hamburger.addEventListener('click', () => {
+    setNewsletterOpen?.(false);
+    toggleMenu(nav, navSections);
+  });
 
   const mobileTools = document.createElement('div');
   mobileTools.className = 'nav-mobile-tools';
@@ -545,5 +882,30 @@ export default async function decorate(block) {
   // lift the topbar to full-width (grey utility bar), above the main nav row
   if (navTopbar) navWrapper.append(navTopbar);
   navWrapper.append(nav);
+
+  // shown complete: no logo or icon popping in, no topbar text re-flowing as its faces arrive
+  await Promise.all([assetsReady, iconsReady(navWrapper, HEADER_ASSET_WAIT)]);
   block.append(navWrapper);
+
+  // the Subscribe CTA (topbar) and the mail shortcut (phones) open the newsletter panel once
+  // its fragment has loaded (not awaited: the header never waits for it; until then, or
+  // without it, they stay plain links)
+  const panelTriggers = [subscribeLink, mail].filter(Boolean);
+  if (panelTriggers.length) {
+    const newsletterPath = `${navPath}-newsletter`;
+    loadFragment(newsletterPath).then((newsletter) => {
+      const panel = takeNewsletterPanel(newsletter);
+      if (!panel) return;
+      // in the DOM right after the topbar CTA, so Tab moves from it into the panel (the panel
+      // is positioned on .nav-wrapper wherever it sits)
+      const anchor = subscribeLink?.closest('.nav-topbar-utility');
+      if (anchor) anchor.after(panel);
+      else navWrapper.append(panel);
+      const buttons = panelTriggers.map((t) => toPanelButton(t, panel));
+      setNewsletterOpen = wireNewsletterPanel(panel, buttons);
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.warn(`header: newsletter fragment ${newsletterPath} could not be loaded`, error);
+    });
+  }
 }
