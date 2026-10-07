@@ -11,12 +11,15 @@
  * Spec: docs/ui-specs/hero.md. Real <img>/<picture>, never a CSS background.
  * Three variants selected by block class:
  *   default/story  → title above 16:9 image (order-swap <=1079); ink title
- *   .overlay       → full-bleed 61.8vh image; white title + caption overlaid
- *   .archive       → image-only fixed-height band (160/200/240); no scrim
- * Mobile-first.
+ *   .overlay       → 16:9 image with an ink caption below; from 768 a full-bleed
+ *                    61.8vh image with the white caption overlaid (SKODA-828)
+ *   .archive       → full-bleed 184/224/240 band, the h1 as grey label chips
+ * Mobile-first. The section wrapper's full bleed is in styles.css.
  * ========================================================================== */
 
 .hero-image.block {
+  --hero-perex-size: 20px;
+
   position: relative;
   display: flex;
   flex-direction: column;
@@ -27,7 +30,6 @@
 
 .hero-image:not(.overlay, .archive) {
   --hero-story-media-max-width: 970px;
-  --hero-story-perex-size: 20px;
   --hero-story-date-size: 12px;
   --hero-story-title-gap: 32px;
 
@@ -51,6 +53,14 @@
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
+}
+
+/* The source draws its story / press-kit / series-directory hero image 2% larger than the box,
+   centred and clipped by it (a constant `scale(1.02)` on its `snap-center` heroes, not a hover
+   state; PR #253 review). The box doesn't change. The archive band, the model hero
+   (skoda-model.css) and the series hubs (skoda-series.css) are drawn at 1. */
+.hero-image:not(.archive) .hero-image-media img {
+  scale: 1.02;
 }
 
 /* dual-gradient scrim over the image (story + overlay; dropped on archive) */
@@ -102,7 +112,7 @@
 
 .hero-image .hero-image-caption .hero-image-perex {
   margin: var(--spacing-m) 0 var(--spacing-xs);
-  font-size: var(--hero-story-perex-size);
+  font-size: var(--hero-perex-size);
   line-height: 1.5;
   font-weight: var(--weight-semibold);
 }
@@ -122,8 +132,11 @@
   line-height: 1.5;
 }
 
+/* The source chip starts 1px above the 18px date line and doesn't make the row taller
+   (Epiq story, 756px hero at 1440; SKODA-828 F5): 21px chip less 1 + 2 = an 18px row. */
 .hero-image .hero-image-meta a {
   display: inline-block;
+  margin-block: -1px -2px;
   padding: var(--tag-padding);
   border-radius: var(--tag-radius);
   background-color: var(--skoda-grey-500);
@@ -146,56 +159,154 @@
 }
 
 /* ==========================================================================
- * OVERLAY VARIANT — full-bleed image, white title + caption overlaid.
+ * OVERLAY VARIANT (SKODA-828) — measured on the press kits and series hubs.
+ * Layer 1, mobile first: the 16:9 image, then the ink caption in the column
+ * (16px below the image, 10px gutter): title, 16px, perex, 8px.
+ * Layer 3: from 768 the image is an uncapped 61.8vh and the caption overlays
+ * it in white, on the bottom edge of the centred 1248px column.
  * ========================================================================== */
 .hero-image.overlay {
   gap: 0;
 }
 
-.hero-image.overlay .hero-image-media picture,
-.hero-image.overlay .hero-image-media img {
-  aspect-ratio: auto;
-  height: min(var(--hero-vh), 640px);
-}
-
 .hero-image.overlay .hero-image-content {
-  position: absolute;
-  inset: auto 0 0;
-  z-index: 1;
   box-sizing: border-box;
   max-width: var(--content-max-width);
-  margin: 0 auto;
-  padding: var(--spacing-l);
+  margin: var(--spacing-m) auto 0;
+  padding: 0 var(--page-gutter);
 }
 
 .hero-image.overlay .hero-image-content h1,
 .hero-image.overlay .hero-image-content h2 {
-  margin: 0 0 var(--spacing-s);
-  color: var(--skoda-white);
+  margin: 0 0 var(--spacing-m);
+  color: var(--skoda-ink);
   font-weight: var(--weight-light);
 }
 
 .hero-image.overlay .hero-image-content p {
   margin: 0;
-  color: var(--skoda-white);
+  color: var(--skoda-ink);
   font-weight: var(--weight-semibold);
 }
 
+.hero-image.overlay .hero-image-content .hero-image-perex {
+  margin-block-end: var(--spacing-xs);
+  font-size: var(--hero-perex-size);
+  line-height: var(--line-height-body);
+}
+
+@media (width >= 768px) {
+  .hero-image.overlay .hero-image-media picture,
+  .hero-image.overlay .hero-image-media img {
+    aspect-ratio: auto;
+    height: var(--hero-vh);
+  }
+
+  .hero-image.overlay .hero-image-content {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 1;
+    margin: 0 auto;
+  }
+
+  .hero-image.overlay .hero-image-content :is(h1, h2, p) {
+    color: var(--skoda-white);
+  }
+}
+
+/* The title steps 28 -> 48px one pixel after the layout change: the source keeps 28px at
+   exactly 768 (its max-width:768 type query), so the two are deliberately separate. */
+@media (width > 768px) {
+  .hero-image.overlay .hero-image-content h1,
+  .hero-image.overlay .hero-image-content h2 {
+    font-size: var(--heading-font-size-hero);
+  }
+}
+
 /* ==========================================================================
- * ARCHIVE VARIANT — image-only fixed-height band, no scrim, no title.
+ * ARCHIVE VARIANT (SKODA-828 F3) — the category/tag term band, measured on
+ * /en/tag/model/peaq: full bleed, 184/224/240px, the image covering it (no
+ * scrim) or an empty band; the term h1 as grey label chips on the bottom-left
+ * of the column (+8px), 2.75px apart; category chips link to their term. The
+ * source has no h1, so ours carries it.
  * ========================================================================== */
+.hero-image.archive {
+  /* the source's inline space between labels: one 16px SKODA Next space, 2.75px */
+  --hero-archive-label-gap: 2.75px;
+
+  gap: 0;
+}
+
+.hero-image.archive .hero-image-media {
+  height: var(--hero-archive-h-base);
+}
+
 .hero-image.archive .hero-image-media picture,
 .hero-image.archive .hero-image-media img {
   aspect-ratio: auto;
-  height: var(--hero-archive-h-base);
+  height: 100%;
 }
 
 .hero-image.archive .hero-image-media::after {
   content: none; /* no scrim on the archive band */
 }
 
+.hero-image.archive .hero-image-content {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  box-sizing: border-box;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--page-gutter);
+}
+
+.hero-image.archive .hero-image-content h1 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hero-archive-label-gap);
+  margin: 0 0 0 var(--spacing-xs);
+  font-size: var(--tag-font-size);
+  line-height: 1;
+}
+
+.hero-image.archive .hero-image-label {
+  padding: var(--tag-padding);
+  border-radius: var(--tag-radius);
+  background-color: var(--skoda-grey-500);
+  color: var(--skoda-white);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tag-letter-spacing);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+/* category chips link to their term: underline on hover as on the source; the source drops
+   the focus outline, ours keeps a visible ring (css-guidelines §8) */
+.hero-image.archive a.hero-image-label:hover {
+  text-decoration: underline;
+}
+
+.hero-image.archive a.hero-image-label:focus-visible {
+  outline: 2px solid var(--skoda-white);
+  outline-offset: 2px;
+}
+
+/* the band steps up at 576 / 768 */
+@media (width >= 576px) {
+  .hero-image.archive .hero-image-media {
+    height: var(--hero-archive-h-sm);
+  }
+}
+
+@media (width >= 768px) {
+  .hero-image.archive .hero-image-media {
+    height: var(--hero-archive-h-md);
+  }
+}
+
 /* ==========================================================================
- * DESKTOP (>= 1080): story title above image (centered); overlay title 48px.
+ * DESKTOP (>= 1080): story title above image (centered).
  * ========================================================================== */
 @media (width >= 1080px) {
   /* story: title first (above image), centered; image width-capped ~970px */
@@ -212,30 +323,5 @@
 
   .hero-image:not(.overlay, .archive) .hero-image-media {
     order: 2;
-  }
-
-  /* overlay: larger overlaid title, content padded to the column */
-  .hero-image.overlay .hero-image-content {
-    padding: var(--spacing-xl) var(--spacing-l);
-  }
-
-  .hero-image.overlay .hero-image-content h1,
-  .hero-image.overlay .hero-image-content h2 {
-    font-size: var(--heading-font-size-hero);
-  }
-}
-
-/* archive band steps up at 576 / 768 (hero.md §3B) */
-@media (width >= 576px) {
-  .hero-image.archive .hero-image-media picture,
-  .hero-image.archive .hero-image-media img {
-    height: var(--hero-archive-h-sm);
-  }
-}
-
-@media (width >= 768px) {
-  .hero-image.archive .hero-image-media picture,
-  .hero-image.archive .hero-image-media img {
-    height: var(--hero-archive-h-md);
   }
 }
