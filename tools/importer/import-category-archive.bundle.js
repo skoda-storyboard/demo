@@ -123,9 +123,9 @@ var CustomImportScript = (() => {
   }
   function scopeFor(pathname) {
     const segs = pathname.split("/").filter(Boolean);
-    const [locale, kind, ...rest] = segs;
+    const [, kind, ...rest] = segs;
     if (kind === "tag" && rest.length) return ["tag", rest[rest.length - 1]];
-    if (kind === "category" && rest.length) return ["path", `/${locale}/${rest.join("/")}/`];
+    if (kind === "category" && rest.length) return ["categories", rest[rest.length - 1]];
     return null;
   }
   function parse2(element, { document: document2 }) {
@@ -388,6 +388,69 @@ var CustomImportScript = (() => {
     }
     return "";
   }
+  var CATEGORY_PARENTS = {
+    "120-years-of-skoda-motorsport": "motorsport",
+    adventures: "lifestyle",
+    "annual-reports": "media",
+    citigo: "models",
+    connectivity: "innovation-and-technology",
+    cycling: "sports",
+    design: "skoda-world",
+    elroq: "models",
+    enyaq: "models",
+    "enyaq-coupe-rs-iv": "models",
+    epiq: "models",
+    fabia: "models",
+    heritage: "skoda-world",
+    hockey: "sports",
+    "innovation-and-technology": "skoda-world",
+    kamiq: "models",
+    "kamiq-china": "models",
+    karoq: "models",
+    kodiaq: "models",
+    kushaq: "models",
+    kylaq: "models",
+    livestream: "media",
+    motorsport: "lifestyle",
+    octavia: "models",
+    "octavia-combi": "models",
+    "octavia-combi-greenline": "models",
+    "octavia-combi-rs": "models",
+    "octavia-greenline": "models",
+    "octavia-rs": "models",
+    "octavia-scout": "models",
+    other: "media",
+    "peaq-en": "models",
+    people: "lifestyle",
+    rapid: "models",
+    "rapid-spaceback": "models",
+    responsibility: "skoda-world",
+    scala: "models",
+    slavia: "models",
+    speeches: "media",
+    sports: "lifestyle",
+    superb: "models",
+    "superb-combi": "models",
+    "technical-data": "media",
+    technology: "innovation-and-technology",
+    yeti: "models",
+    "yeti-outdoor": "models"
+  };
+  function extractCategories(document2) {
+    const cls = document2.body && document2.body.getAttribute("class") || "";
+    const id = cls.match(/\bpostid-(\d+)\b/);
+    const post = id && document2.querySelector(`article.post-${id[1]}`);
+    const out = [];
+    String(post && post.getAttribute("class") || "").split(/\s+/).forEach((token) => {
+      const m = token.toLowerCase().match(/^category-([a-z0-9_-]+)$/);
+      let slug = m && m[1];
+      while (slug && !out.includes(slug)) {
+        out.push(slug);
+        slug = CATEGORY_PARENTS[slug];
+      }
+    });
+    return out;
+  }
   function extractTagsAndFacets(document2, pageUrl = "") {
     const tags = [];
     const byFacet = {};
@@ -494,6 +557,8 @@ var CustomImportScript = (() => {
     if (overrides.theme) meta.theme = overrides.theme;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
+    const categories = template === "story" ? extractCategories(document2) : [];
+    if (categories.length) meta.categories = categories.join(", ");
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
     FACETS.forEach((f) => {

@@ -102,14 +102,18 @@ All rows: `measured (selector · viewport) -> token`. Source URL for every row:
 ### Main nav row (COM-02)
 - inner `.container`: height `64px` -> `--nav-main-height`, `display:flex`, `max-width 1248px`,
   `position:relative` (the dropdown anchor).
-- **brand/logo**: `.brand` `256×64`, `flex; align-items:center`. Logo `svg` renders `194×18`
-  (· `.brand a.logo svg` · 1280); viewBox `0 0 255.19 23.1`. Matches `header.css` sizing (194×18).
+- **brand/logo**: `.brand` `256×64`, `flex; align-items:center`. Logo `svg` renders `193.83×17.55`
+  at 122,67.75 (· `.brand a.logo svg` · 1440; 16,67.75 at 390); viewBox `0 0 255.19 23.1`.
+  `header.css` sizes it 194 wide at the viewBox ratio (`aspect-ratio: 255.19 / 23.1`, 194×17.55),
+  15.8px from the row top (SKODA-308; the earlier 194×18 box was the placeholder's).
   **Asset provenance (logo-only correction, 2026-10-06):** `icons/skoda-storyboard-logo.svg` copies
   the original seven-path wordmark from the source `.brand a.logo svg` above, preserving its
   viewBox, `evenodd` fill rule and dark-green `#0e3a2f` fills. It is font-independent, with no text
   or external resources, and retains `role="img"` / `aria-label="Škoda Storyboard, home"`.
   `header.js` injects `.icon.icon-skoda-storyboard-logo` into the authored home link;
-  `decorateIcons(nav)` loads this local `/icons/skoda-storyboard-logo.svg` asset.
+  `decorateIcons(nav)` loads this local `/icons/skoda-storyboard-logo.svg` asset as an
+  `<img alt="">`, so the ARIA inside the file is not exposed: the link's accessible name is the
+  `aria-label` header.js sets on it ("Škoda Storyboard").
 - **`#primary_top_menu`**: `display:flex`, `padding-right 4rem` (`64px`, reserves the search icon slot).
 - **top-level `li > a`**: `display:flex; align-items:center`, `padding 0 20px` (· `.topnav .menu >
   .menu-item > a` · 1280), font-size `1em` = `16px` -> `--body-font-size-m`, line-height `1.5em`
@@ -198,7 +202,8 @@ Four content rows (the `header.js` `hasTopbar` path, `children.length >= 4`):
 1. **Topbar row** (utility): a paragraph with the section switcher links (`Stories`, `Media Room`) and a
    second paragraph with `Subscribe` + the locale list (see language-switcher.md). Decorated to
    `.nav-topbar`, lifted above `<nav>` as a full-width grey bar.
-2. **Brand row:** the logo icon token `:skoda-storyboard-logo:` linked to `/en/`. -> `.nav-brand`.
+2. **Brand row:** a link to `/en/`. -> `.nav-brand`; header.js replaces its content with the
+   logo icon (DA strips an authored `:skoda-storyboard-logo:` token from an empty link).
 3. **Sections row:** a nested list, each top-level item is an `<li>`; drop items carry a child `<ul>`
    of links. -> `.nav-sections`; `header.js` adds `.nav-drop` to any `<li>` that contains a `<ul>`.
 

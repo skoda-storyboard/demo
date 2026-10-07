@@ -4,7 +4,200 @@
 - **Phase:** A · **Milestone:** M1 (demo-visible on every page)
 - **GitHub issue:** [#144](https://github.com/skoda-storyboard/demo/issues/144)
 - **Estimate:** 3 SP · AI-assisted 1d / manual 2–3d *(planning estimate, not a quote)*
-- **Status (2026-09-25):** 🔵 TODO
+- **Status:** 🟡 built 2026-10-06 on branch `skoda-308-chrome-parity` (local), see below (was 🔵 TODO)
+
+## Status (2026-10-06)
+Re-measured live vs ours before building (live DOM / computed styles, 1440 / 1280 / 1080 / 768 / 390). Already matching
+then, from 302 / 303 / 304 / 826:
+- the hamburger (68×64 at 322,44) and the drawer (375×800, 61px rows, 64px search row, backdrop);
+- content starting at y124;
+- the footer badges and social row, the © line font, and the legal links (306).
+
+**Built** (`blocks/header/*`, `blocks/footer/footer.css`, `blocks/newsletter-stub/*`):
+
+| Item | Live | Now |
+|---|---|---|
+| Nav row and topbar inline padding | `--page-gutter` (826 handover); drawer compensations rebased | same |
+| Logo (`a.logo`) | 256×48 at x106 (1440), wordmark at 122,68; phones: wordmark x16 (x31 in the drawer) | 106,52 256×48 / 122,67; 16 / 31 |
+| Section tabs | 90 / 125 wide, 21px padding, 14/600 0.28px (14px on phones too) | 89.6 / 124.8 |
+| Mega-menu | x362 (no brand gap), items y44 h64, panel top y108 | same (the global 8px `li` margin dropped) |
+| Item widths (16/24, 0.032px tracking) | 116.1 / 106.5 / 123.9 / 155.6 / 83.4 / 122.1 / 97.5 | exact; drop triggers 20 / 44px padding, chevron 29px from the end |
+| Hover underline | under the label only (52.1px for Models), 17px from the bottom | same |
+| Dropdown panel | as wide as its item (116), rows 12px 24px, 48px (72 when a label wraps between words), no mid-word breaks | Models 116.1×696, identical rows |
+| Search closed | 41×41 at 1310,56 | 1309.5,55.5 |
+| Search open | 730–1354 (624; 540 at 1080 = 50vw), white, over the menu; scope select 84×48 (All / Stories / News / Press Kits / Images / Videos; Stories on Storyboard pages, All in the Media Room); pill 540×48 `#f1f1f1` r200 with the leading icon, 16px, placeholder `#464748`; the button becomes the source's invisible submit at the pill's end (a query searches, none closes; see the search QA round) | same; Esc closes, focus back on the button; submit goes to `/en/search?filter[search]=…&search_type=…` |
+| 1080–1180 overflow | — | fixed: one row at every width, no horizontal scroll (1080 / 1120 / 1179 / 1280 / 1440) |
+| Newsletter panel | `#0e3a2f`, 575.6,44 626.8×198.9 @1440; 390×311 full width @390 | 626.8×198.9; 390×310 |
+| Newsletter form | label 12.8/19.2; field 392.2×41.6; Subscribe 142.8×41.6 emerald r32; consent 14/18 `#a1a1a1`, 18px box; links emerald; ✕ 25.6 at 1164,56.8; on phones the pill under the consent (127×44) | same, phones pill 128.8×44 |
+| Footer sitemap | the legal copy follows it directly; rows 19px (a 16/18 line with a 12/18 link); headings and sub-links 12/18, 1px tracking; columns 1/7 + 22px end padding | footer 830 / disclaimer 647 / © 733 at 1080–1440; 809 / 554 / 694 at 390; columns 175px at 1440 (were 179) |
+
+- **1080–1180 fix:** the logo box gives way first (`--nav-brand-min`, flex 210 → 256px). Wrapping stays as the fallback for a longer authored menu.
+- **Newsletter panel content:** the form is the existing `newsletter-stub` block, as a new `topbar` variant.
+  - It's validated in the block like the card, and posts nothing (SKODA-904 owns the ESP).
+  - The topbar Subscribe and the phone mail icon become disclosure buttons (`aria-expanded` / `aria-controls`).
+  - The ✕ and Esc close the panel and return focus to the opening trigger.
+  - The 2px ink bar under the open trigger is kept.
+  - The content is a new companion fragment `/nav-newsletter` (a `Newsletter Stub (topbar)` block). The header loads it after rendering and never waits for it. Without it the triggers stay links.
+  - Not added to `/nav` itself: a 5th nav section would render inside the header with the current `main` code, and preview content is shared across branches.
+- **Keyboard (309 QA):**
+  - Escape now hides a desktop dropdown shown by `:focus-within` or `:hover` (`data-dismissed`, WCAG 1.4.13).
+    - The dismissal is cleared when focus or the pointer leaves.
+    - Focus only moves for a dropdown opened from the keyboard.
+  - Space on a trigger, or on the focused `li`, toggles what's on screen without scrolling. A trigger whose panel is shown by focus hides it on the first press. Enter still follows the link.
+  - Focus moving on closes an open dropdown (one at a time).
+  - Escape on phones returns focus to the hamburger (no longer the first nav button).
+- **Newsletter panel extras:**
+  - It sits in the DOM right after the topbar CTA, so Tab moves into it.
+  - It closes on Escape at a trigger, on focus moving to another control, on a click outside, and when the drawer opens.
+  - A trigger replaced while focused keeps focus.
+- **Search extras:** the search button no longer moves focus on press. In Safari / Firefox on macOS a clicked button isn't focused, so the field's `focusout` used to close the bar and the click re-opened it. A keyboard close keeps focus on the button; a pointer close releases it.
+- **Suggestions:** they open under the pill (y100 @1440, as the source `.suggest-container`).
+- **QA round (2026-10-06):**
+  - **Logo:** `icons/skoda-storyboard-logo.svg` was a typed-text placeholder ("ŠKODA" + "Storyboard" in a font). It's now the source's own wordmark SVG (7 paths, `#0e3a2f`, viewBox 255.19 × 23.1), shown at 194 × 17.56. The Media Room uses the same one, as on the source.
+  - **Tabs:** text at y15 like the source (13px above a 20px line), not centred (was y13.5).
+  - **Subscribe:** an 18px line in a flex utility box (text y15, icon y14), was 1px high.
+  - **Pixel-identical to the source at 1440:** tabs (127 / 216.6, y15), Subscribe (x1022.7), the locales (1184.1–1320.4).
+  - **Dropdown chevron:** now `icons/nav-chevron.svg`, drawn from the source glyph (icon font e007 at 16px, scaled .75): an 11.2 × 6.7px "v", ~1.7px strokes, centred 29px from the end and on the row's middle. Was a rotated 8px border box, smaller, bolder and ~3px low.
+- **Search QA round (2026-10-06).** Re-measured live, including its icon font `skoda-bnr-icons`, whose glyph outlines were read from the woff2.
+  - **Icons:** `icons/nav-search.svg` is the source `search` glyph (U+E02D), a thin ring + handle: 24px on the button, 19.2px `#464748` in the pill. Was the heavier filled `search.svg`. `icons/nav-chevron.svg` is now the exact `caret-down` glyph (U+E007), at 11.16 × 6.7px for the menu and the scope select.
+  - **No ✕:** the open bar shows none, as the source (its submit glyph sits under the field). The button at the pill's end now searches with a query and closes the bar without one, as the source's submit does. The label follows: "Search" / "Close search". The browser's own search-field clear "×" is hidden.
+  - **No focus ring for the mouse:** the source shows none. The field's ring now appears only for keyboard use (Tab, or the button pressed from the keyboard). A pointer close leaves focus nowhere instead of moving a ring onto the button.
+  - **Opening:** the bar now grows from the 48px slot to 624px leftwards (`width .15s ease-in-out`, the source's own transition), the pill taking the rest as it grows. Was a 0.2s fade.
+  - **Text:** placeholder `#464748` at 30% opacity (source). Scope label ellipsed in its 84px, "Sto…" (16 / 32px padding). Its label had inherited the tools row's `line-height: 0` and was drawn as a sliver.
+  - **Suggestions:** as wide as the bar (624px from x730 @1440, source).
+  - **Clicking outside** closes the bar, as on the source.
+  - **Escape still closes it** (the source keeps it open). Kept for keyboard users.
+  - **Contrast note:** the 30% placeholder is ~1.7:1 on the pill, below AA for text. It matches the source; the field is named by its `aria-label` and the visible magnifier. Flagged for SKODA-703.
+- **Full review round (2026-10-06):** a second independent code review plus a measured live-vs-ours sweep. The sweep covered:
+  - **1440 / 1080 / 390:** topbar, tabs, Subscribe, locales, logo, items, search button, content start.
+  - **Desktop 1440 states:** dropdown panel / rows / hover / underline; search bar, scope, pill and icon; newsletter panel and form.
+  - **390 states:** drawer rows / chevrons / sub-menu / search row / locales; the phone newsletter panel.
+
+  The sweep matched live everywhere except the documented items:
+  - the AA greys;
+  - the 1080–1128 one-row choice;
+  - live's 10px overflow at ≤ 1268;
+  - the 1 – 2px sub-pixel offsets.
+
+  Fixed from the review:
+  - **Dropdowns:**
+    - Escape on a panel link moves focus to the trigger, never left on a hidden link.
+    - A dismissed panel is `visibility: hidden`, so Tab skips its links.
+    - Text-only parents (Media Room "Models") toggle what's on screen on click / Enter.
+    - The pointer coming back (`pointerenter`) clears a dismissal.
+  - **Search:**
+    - The keyboard ring flag is set by any Tab in the nav (the drawer field too) and cleared by any pointer press.
+    - The ring is inset, so the bar's overflow doesn't clip it.
+    - Focus moving to another control or a click elsewhere closes the bar even with a query (kept). A click on the bar's own text doesn't.
+    - A mouse close releases focus from any bar control.
+    - The authored search link must resolve to http(s) (`isWebUrl`), else the locale's /search.
+  - **Forced colors:** the mask-drawn panel ✕ uses `canvastext`, so it stays visible in Windows High Contrast. The search and caret glyphs are inline SVG in the text colour since the loading round (below), which forced colors repaint on their own.
+  - **Newsletter field** text black (source).
+  - **Comments:** stale comments corrected.
+  - **Tests:** header-chrome 21. Blocks / scripts / templates 523/525; the 2 also fail on `main`.
+
+  Left as noted:
+  - English chrome strings ("Close search", "Search in", scope names), as the rest of the M1 chrome. Locale copy belongs to SKODA-1001.
+  - In the drawer, one Escape in the search field closes the whole drawer.
+  - `icons/search.svg` is no longer used by the header and is kept as the house icon (gallery reference).
+- **Review:** an independent read-only review (one must-fix: the suggestions covered the field; six should-fixes) was addressed in full and re-measured.
+- **Loading / "jerk" round (2026-10-06, QA: the logo jumps for about a second, the Subscribe icon jumps, the search icon size differs, the menu arrows are jerky).** Measured on a cold load at 1440, live vs ours:
+  - **Topbar faces:** the SKODA Next 300 / 700 faces arrived after the header showed, and their swap moved the right-aligned Subscribe + language group about 8px. This also happens on `main`, and live moves 38px.
+    - Now the header waits for those faces and the logo before it shows, for at most 250ms (`preloadHeaderAssets`), so a slow network never holds it back longer.
+    - After that: one paint in the final position, zero header layout shifts. Logo y67.8, Subscribe x998.7.
+  - **Logo:** it now starts at its final place (top padding 15.8px, matching the live ink at y68) and is decoded before the header shows, so it no longer pops in and moves.
+  - **Subscribe icon:** a fixed 20×16 box with a 4px gap. The ink is at x1002.2 y17.3, 13.5×9.5, the same as live.
+  - **Glyphs (search, dropdown caret, scope caret):** they were CSS masks. Chrome snaps a CSS mask or background image to whole pixels:
+    - the 11.2px caret drew 10 × 6 (ink 16.4 vs live 19.6) and could jump a pixel as the row settled;
+    - the magnifier drew 20.0 where live draws 20.3.
+    - They are now inline SVG (`glyph()` in header.js, `aria-hidden`, `fill: currentcolor`) with the exact source outlines (skoda-bnr-icons U+E02D / U+E007).
+    - Ink vs live: caret 11.0 wide, 19.3 / 19.6; scope caret 19.3 / 19.6; magnifier 81.8 / 82.7; pill icon 56.1 / 56.7.
+    - `icons/nav-search.svg` and `icons/nav-chevron.svg` are removed (no longer used).
+  - **Menu underline:** live keeps the line at full label width and grows it from 0 to 2px (`all .2s ease-in`, white → ink), as `header-megamenu.md` says. Ours swept in from the left (width 0 → 52px), which read as a jerk next to the caret. It now matches live.
+  - **Drawer (390):** unchanged. Its rows keep their own accordion caret, and the desktop caret is hidden there.
+- **Footer + phone chrome round (2026-10-06, QA: "Innovation & Technology" doesn't wrap as on live, a jerk in the footer; on phones the hamburger, mail and close icons differ and jerk, the drawer isn't see-through, the search placeholder differs).** Measured live vs ours:
+  - **Footer columns:**
+    - From a 1004px menu (the 1024px viewport), live's columns are 14.25% each, not 1/7. At 1440 that's 175 / 153.0px, just under the label's 153.3px, so "Innovation & Technology" wraps.
+    - Below that (992–1023) live lays the columns out as one flex row of content-width columns with the space shared evenly (its clearfix pseudo-elements act as end items), so nothing wraps.
+    - Ours now does both: a container query on the footer nav, not a new viewport breakpoint. Column widths are identical to live at 992 / 1023 / 1024 / 1080 / 1200 / 1440.
+  - **Footer "jerk":** no layout shift on either site. The six icons (app badges, social) appeared 30–90ms after the footer text (lazy `<img>`s). The footer now waits for them, for at most 250ms (`scripts/icons-ready.js`, shared with the header), before it shows.
+  - **Phone header icons (source glyphs, inline SVG):**
+    - The hamburger is icon-font menu U+E01F and the close is U+E010, both at 17.6px, centred in the 68 × 64 tap target. They replace the CSS-drawn 20px bars / 24px ✕. Ink vs live: menu 98.6 / 98.1, close 33.3 / 33.1.
+    - The mail shortcut is the source `#mail-thick` symbol in a 26 × 18 box at 292,67, 4px before the tap target. It was a 24 × 24 lazy image at 298, which popped in after the header showed. Ink 165.8 / 165.8.
+    - The header also waits for its remaining icon images (the logo, the desktop Subscribe mail) with the same 250ms cap.
+  - **Drawer:**
+    - The page now shows through the frosted strip left of the panel, as on live (the open header is `rgb(227 227 227 / 80%)` + `blur(10px)`). The wrapper, as tall as the open drawer, painted white under the backdrop, so the strip was a solid grey.
+    - The search placeholder is the full #464748 (live's drawer field; the desktop bar's stays at 30%).
+    - The row caret is the source glyph at 16px (14.9 × 8.9), centred in a 24px box, flipped at once when a row opens (live swaps to caret-up U+E00A, its mirror). It was an 8px rotated border.
+    - No rule under the last row (Newsletter), as on live.
+  - **Load trace (cold, 390 + 1440):** the header and footer each show once, complete, with zero layout shifts.
+- **Footer spacing + newsletter states round (2026-10-06, QA: footer list spacing; the Subscribe error, thank-you and "Manage subscription" views vs live, header and footer).**
+  - **Method:** live's forms were driven with their `wp-json/newsletter` request intercepted in the test browser (mocked replies), so nothing reached the live service.
+  - **Footer columns:** from the 4th column on, ours sat 1.1–2.6px right of live at 1440. The 992–1023 band's `space-evenly` also spread the 14.25% grid's 0.25% leftover between the columns. It now stays at the end: column x 106 / 281 / 456 / 631 / 805.9 / 980.9 / 1155.9, identical to live. Every other footer text (Storyboard + Media Room, 1440 / 390) matched live in position, size and colour.
+  - **Weight 500:** live sets 500 on the footer links, the consent and the pills but has no 500 face, so it renders the 400 face, as ours does. No change.
+  - **Validation (topbar panel):** live adds nothing to the panel. The browser's own tooltip shows on the field ("Please include an '@'…") or on the required consent box. Ours drew a red text box under the form and the panel grew. The topbar form now uses native validation, as the Media Room footer form already did.
+  - **Sent view (all three forms):** live removes the field and the button and shows the message in a white box, 8 / 12px padding, green #419468 14 / 21px, laid over the top of the consent text. Ours kept the field and the button, with ink text.
+    - Now `is-sent` hides them and the box takes their place. Focus moves to the message (`tabindex=-1`), so it isn't lost with the button.
+    - Measured identical to live: panel 550 × 106.2 (box at +19.2, consent +44.2; at 390: 161.4, box +38.4); Media Room form 386 × 117 (box and consent at +10, manage +95); card 343.3 × 206 (consent +69).
+    - The text stays our authored "not available yet" notice (M1 is UI-only, SKODA-904).
+  - **"Manage subscription":** it goes to the live page **in the same tab**, as on live. That's a new `LIVE_SAME_TAB` exception to the SKODA-609 D-3(b) new-tab rule (`scripts/links.js`), also honoured by the footer's outbound-link tagging. The consent document keeps its new tab, as on live.
+  - **Colours, decided for parity (2026-10-06), both below WCAG AA:**
+    - The Media Room footer link is the source #419468 (3.40:1 on #0e3a2f). This replaces the 2026-09-25 emerald deviation; `footer-mediaroom.md` is updated.
+    - The sent message is #419468 on white (3.71:1).
+    - The topbar and card links stay emerald, as on live.
+  - **Consent / manage destinations:** both still point at the live site (`/en/documents/…`, `/en/newsletter-settings/`). The demo doesn't carry those pages (SKODA-609 LIVE_ONLY). They need migrated destinations before a real sign-up (SKODA-904, `newsletter.md` §8).
+  - **Card (SKODA-823) error view unchanged:** live writes its messages into the field in red ("You must provide an e-mail."). The card keeps its described error box (`aria-invalid` / `aria-describedby`), as decided in 823.
+  - **Tests:** `newsletter-stub` 15 (topbar native validation, `is-sent`), `links` (+1, same tab).
+- **Footer list gaps at display scaling (2026-10-06, QA: the space between Models, Fabia… is not as on live).**
+  - **The footer is identical to live:** same boxes, the same 31px pitch at 992–1920, and 0 differing pixels at 1× and 2×.
+  - **But at in-between scaling** (110 / 125 / 150%, Windows laptops or browser zoom) the line gaps rounded differently: at 125% live drew 39, 38, 39, 39… and ours 38, 39, 39, 39…
+  - **Cause:** the page above the footer was 0.765px shorter on ours, so every footer line had another sub-pixel phase. The home hero (`promo-box`, SKODA-213 / 611) was the source of it:
+    - Live's big card is 16:9 + 10px tall, which sets the box: 812 × 466.75 at 1440, 662.66 × 382.73 at 1024, 492 × 286.75 at 768.
+    - It also keeps the column's 8px start inset.
+    - Ours took the two small cards' height (466 / 382 / 286), and the big card was 8px wider (x0 vs live's x8 in the 1248 box).
+  - **Fixed (decided to do it here, 2026-10-06):** the big card is now `content-box` 16:9 with 10px bottom padding and margins of 8 / 12px. Image and caption cover the padding too; the caption stays 84 / 16px from the bottom, as on live. The 2nd grid row takes the extra, so the 3rd card stays at y241. An in-flow toolbar (the Media Room home's pill cards) is pulled into the padding, so its pill stays 12px from the bottom, level with the small cards'. The single-card case stays plain 16:9.
+    - Review: both homes (Storyboard + Media Room) match live at 1440 / 1024 / 768 / 390: card boxes, caption 29.6 / 35.52 white and summary 16 / 20, caption gaps, 16px row gap. Keyboard focus rings the full big card.
+    - The hero now equals live at 768–1920. 390 was already equal.
+    - The footer starts at 3904.141 vs live's 3904.156 (was 3903.39).
+    - The footer gaps now render identically at 1, 1.1, 1.25, 1.5 and 1.75×.
+  - **Other pages** can carry their own sub-pixel height differences above the footer. They show only at in-between scaling and belong to the blocks on those pages. The Epiq story's footer box positions measured equal to live.
+- **PR #271 merge + review round (2026-10-07).**
+  - **Merged main after #268** (the header wordmark fix). The conflict on `icons/skoda-storyboard-logo.svg` was resolved to #268's file: the same artwork, rendering identically with this branch's CSS (122,67.8 194×17.55). #268's `header-logo.test.mjs` passes. Its spec note was corrected (measured size, the `<img alt="">` name, the brand row).
+  - **Fixed from the review:**
+    - **Desktop dropdown click / tap:** a pointer click on a parent closed the panel it was hovering, and a tablet tap at ≥ 1080px could never open it (pointerenter cleared the dismissal, then the click dismissed again).
+      - A pointer click or tap (`detail > 0`) now opens the dropdown, or closes the one it opened. From the keyboard, Enter still toggles what's on screen.
+      - Verified with a mouse at 1440 and touch at 1280; new test.
+    - **Escape during the header's ≤ 250ms asset wait** threw: `#nav` wasn't in the document yet. It's now guarded.
+    - **Newsletter:**
+      - Reopening the topbar panel after a send focuses the message (the field is gone).
+      - The sent message leaves the live region before taking focus, so it's read once.
+    - **Tidy:** one `HEADER_ASSET_WAIT` for both header waits. `--nav-topbar-line` and `--footer-small-line-height` replace hard-coded 18px; the 4px gap is `calc(var(--spacing-xs) / 2)`.
+  - **Decided, kept for source parity (2026-10-07):** the desktop search placeholder `#464748` at 30% (about 1.6:1 on `#f1f1f1`, below AA). This joins the 2026-10-06 colour decisions.
+  - **Left as noted:**
+    - The scope select has no effect until SKODA-403 filters by type.
+    - The footer's own outbound new-tab rule sits beside `scripts/links.js`; the same-tab exception is shared via `opensInSameTab`.
+- **Tests:** `header-chrome.test.mjs` (22: search, URL, dropdown keys, hover / focus dismissal, newsletter panel, inline glyphs incl. menu / close / mail). `newsletter-stub.test.mjs` +2 (topbar). `scripts/icons-ready.test.mjs` 3.
+  - Header, footer and newsletter tests are green.
+  - Blocks / scripts / templates: 536/538. The 2 also fail on `main`:
+    - `header-locales` (SKODA-303a): the CZ link resolves to the site root instead of keeping `/cs/emobility/x`;
+    - `media-cart-download`: a missing `fflate` here.
+  - `npm run lint` is clean.
+
+**Content (pending approval):** a new DA page `/nav-newsletter` with the `Newsletter Stub (topbar)` block, using the live wording, list 389 and en_GB. Upload + preview now (harmless for `main`), publish after merge.
+
+**Notes.**
+- **1080–1128 (Storyboard):** live wraps the menu onto a second row (header 172px, which also has a 10px horizontal scroll). Ours keeps one row by shrinking the logo box's spare space (≤ 46px).
+  - This is the AC's "compress" option; a 172px header would shift the page once the header loads.
+  - The Media Room menu (787px) fits on live and on ours.
+- **Live overflow not copied:** live's search slot sits 10px past the container, so live scrolls horizontally by 10px below 1268px. Ours stops at the viewport edge.
+- **Search scope:** the select carries the scope (`search_type`), but the SKODA-403 search page doesn't filter by type yet, so results are all types. Belongs to 403's follow-up.
+- **Subscribe colour:** `--skoda-grey-700`, as the language links (SKODA-303): 5.45:1 on the bar, where the source `#7c7d7e` is 3.3:1 and fails AA.
+  - The inactive section tab has the same 3.3:1 issue. It's kept as on the source; flagged for SKODA-703.
+- **Footer at 992–1079:** matched since the footer round above: content-width columns to 1023, 14.25% from 1024.
+- **Phone mail icon:** matched since the footer round above (26 × 18 at x292).
+- **Outside this ticket:** on phones the home hero carousel's dots and pause button shift about 6px sideways once after load (the promo-box block, not the chrome).
+- **Drawer:** the panel starts at y44 with the logo row inside. Live's `nav` starts at y108 under a white logo row, so the white area is the same (y44–844).
+- **Not verified yet** (needs push / publish): the AC's `.aem.page` and `.aem.live` checks.
 
 ## Origin
 Demo URL/block sweep, 2026-09-25 (report §4 V9, §5). Measured with scripted interaction states (mega-menu hover, drawer open,
