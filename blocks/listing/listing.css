@@ -325,14 +325,16 @@
 }
 
 /* --- sort row: sort options centred with the toggle on its own row beneath; from 768
-   the toggle moves left of the right-aligned sort options (source .soa-mobile / .soa-desktop) --- */
+   the toggle moves left of the right-aligned sort options (source .soa-mobile / .soa-desktop).
+   Collapsed, it starts 12px under the header, as the source's (its .cover-box 12px top
+   padding; SKODA-402b: was 1em, 4px low on Images / Videos / News / Press Kits) --- */
 .listing .listing-sort {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 0 1em;
-  margin-block: 1em 0;
+  margin-block: var(--spacing-s) 0;
   transition: margin-block-start var(--facet-reveal); /* with the panel's reveal */
 }
 
@@ -347,7 +349,8 @@
 }
 
 /* live .sort-options span / a: 14/600/21 in a 35px-tall, 14px-padded box, no gap between.
-   Inactive stays --skoda-grey-500: the source #ccc is 1.6:1 on white. */
+   Active is the source black (span.active #000); inactive stays --skoda-grey-500: the source
+   #ccc is 1.6:1 on white. */
 .listing .listing-sort-btn {
   display: inline-flex;
   align-items: center;
@@ -362,7 +365,7 @@
 }
 
 .listing .listing-sort-btn[aria-pressed="true"] {
-  color: var(--text-color);
+  color: var(--skoda-black);
 }
 
 .listing .listing-sort-btn:focus-visible {
