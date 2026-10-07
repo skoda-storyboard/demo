@@ -169,16 +169,61 @@
 }
 
 /*
- * Fallback font for the SKODA Next stack. SKODA Next is self-hosted and embedded via fonts.css
- * (lazy); this size-adjusted local fallback matches its horizontal metrics so text painted with
- * font-display: swap does not reflow when the real face arrives (minimizes CLS).
+ * Fallback fonts for the SKODA Next stack. SKODA Next is self-hosted and embedded via fonts.css
+ * (lazy on mobile); text paints first in a local font (font-display: swap), so each fallback is
+ * size-adjusted to SKODA Next's line lengths and the swap does not re-wrap text (CLS).
  *
- * size-adjust 87.32% measured: SKODA Next's average advance width is ~0.8732× Helvetica/Arial's
- * for a representative Latin + Czech-diacritics sample (4232 vs 4846 at 100px). Re-measure if the
- * font version changes.
+ * One family per local font, since size-adjust can't depend on which src matched; a family
+ * whose fonts aren't installed is skipped. Each has its own bold face for the 600/700 text
+ * (headings, perex, strong): without one the browser fakes bold from the regular face.
+ *
+ * size-adjust calibrated 2026-10-07 (SKODA-702) on the M1 pages themselves: each value is the
+ * one at which a page rendered in the fallback wraps like SKODA Next (header and body heights
+ * at 412px; press kit, 2 press releases, story, home, model), starting from the measured width
+ * ratio. Bold covers 600 (the site's heading weight) and 700. Arial-metric = Arimo, metric-
+ * compatible with Arial, Helvetica and Liberation Sans. Re-calibrate if the SKODA Next files
+ * change (.migration/skoda-702/fallback-sweep.mjs).
  */
 @font-face {
   font-family: skoda-next-fallback;
-  size-adjust: 87.32%;
-  src: local('Helvetica'), local('Arial');
+  font-weight: 100 500;
+  size-adjust: 100%;
+  src: local('Helvetica'), local('Arial'), local('ArialMT'), local('Liberation Sans'), local('LiberationSans'), local('Arimo Regular'), local('Arimo-Regular');
+}
+
+@font-face {
+  font-family: skoda-next-fallback;
+  font-weight: 600 900;
+  size-adjust: 97.5%;
+  src: local('Helvetica Bold'), local('Helvetica-Bold'), local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('LiberationSans-Bold'), local('Arimo Bold'), local('Arimo-Bold');
+}
+
+/* Android: Roboto */
+@font-face {
+  font-family: skoda-next-fallback-roboto;
+  font-weight: 100 500;
+  size-adjust: 103%;
+  src: local('Roboto'), local('Roboto-Regular');
+}
+
+@font-face {
+  font-family: skoda-next-fallback-roboto;
+  font-weight: 600 900;
+  size-adjust: 100%;
+  src: local('Roboto Bold'), local('Roboto-Bold');
+}
+
+/* Linux without Arial metrics (and the Lighthouse / PSI hosts): DejaVu Sans */
+@font-face {
+  font-family: skoda-next-fallback-dejavu;
+  font-weight: 100 500;
+  size-adjust: 86.59%;
+  src: local('DejaVu Sans'), local('DejaVuSans');
+}
+
+@font-face {
+  font-family: skoda-next-fallback-dejavu;
+  font-weight: 600 900;
+  size-adjust: 81.5%;
+  src: local('DejaVu Sans Bold'), local('DejaVuSans-Bold');
 }

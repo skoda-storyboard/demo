@@ -32,7 +32,7 @@
      lazily; brand.css supplies the size-adjusted fallback). The family name is unquoted and
      lowercased ("skoda next") per Stylelint (font-family-name-quotes + value-keyword-case);
      font-family matching is case-insensitive so this matches the @font-face descriptor. */
-  --body-font-family: skoda next, skoda-next-fallback, helvetica, arial, sans-serif;
+  --body-font-family: skoda next, skoda-next-fallback, skoda-next-fallback-roboto, skoda-next-fallback-dejavu, helvetica, arial, sans-serif;
   --heading-font-family: var(--body-font-family);
 
   /* font weights — source uses 500 for story-aside titles, despite no dedicated 500 face. */
