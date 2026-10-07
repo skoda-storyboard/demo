@@ -11,14 +11,19 @@
   --dl-play-size: 32px;
   --dl-file-icon-size: 48px;
   --dl-meta-space: 44px;
-  --dl-title-row: 46px;
-  --dl-title-size: 15px;
+  --dl-title-row-base: 46px;
+  --dl-title-size-base: 15px;
+  --dl-title-row: var(--dl-title-row-base);
+  --dl-title-size: var(--dl-title-size-base);
   --dl-toolbar-row: 50px;
   --dl-toggle-height: 44px;
 
   /* the source's Show more pill sits 34px below the last row (a 708px collapsed box at
      1280, SKODA-805c) */
   --dl-toggle-gap: 34px;
+
+  /* the source .btn pill (SKODA-830 D2): 1px tracking */
+  --dl-toggle-tracking: 1px;
 }
 
 /* --- grid: default image ladder 1 -> 2 (768) -> 4 (992) ------------------ */
@@ -197,22 +202,63 @@
   background: var(--dropdown-hover-bg);
 }
 
+/* "Show more" / "Show less": the source's mint .btn pill (137.6×44 at 16px, weight 500,
+   14px/24px insets, no border; hover #a8ffcc), centred under the grid */
 .downloads .downloads-more {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: fit-content;
   min-height: var(--dl-toggle-height);
   margin: var(--dl-toggle-gap) auto 0;
-  border: 2px solid var(--skoda-ink);
+  border: 0;
   border-radius: var(--pill-radius);
-  padding: var(--spacing-xs) var(--spacing-l);
-  background: var(--skoda-white);
+  padding: 0 var(--spacing-l);
+  background: var(--skoda-green-emerald);
   color: var(--skoda-ink);
   font: inherit;
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--dl-toggle-tracking);
+  line-height: 1;
   cursor: pointer;
+}
+
+/* Collapsed (SKODA-830 D2), as the source togglebox: the list is clipped to its first two rows
+   (--dl-rows-height, measured from the tiles by downloads.js) plus the pill's gap and height,
+   and the pill sits over the clip's bottom edge, so the top of row 3 shows behind it (58px at
+   the 20px Media Box gap). The clipped tiles are inert. Unmeasured, the calc is invalid and the
+   list stays unclipped.
+   The clip gets --dl-focus-room on its top and sides (padding, cancelled by an equal negative
+   margin so the grid doesn't move) so the edge tiles' focus ring (2px outline + 2px offset)
+   isn't cut off (WCAG 2.4.7). The bottom gets none: the clip edge stays at the pill's bottom,
+   so the row-3 peek is unchanged. --dl-rows-height is measured from the padded list top, so a
+   border-box max-height already covers the top room. */
+.downloads.downloads-collapsed .downloads-items {
+  --dl-focus-room: 4px;
+
+  box-sizing: border-box;
+  max-height: calc(var(--dl-rows-height) + var(--dl-toggle-gap) + var(--dl-toggle-height));
+  margin: calc(-1 * var(--dl-focus-room)) calc(-1 * var(--dl-focus-room)) 0;
+  padding: var(--dl-focus-room) var(--dl-focus-room) 0;
+  overflow: hidden;
+}
+
+/* the clipped (inert) tiles take no pointer input either, also where `inert` isn't native */
+.downloads.downloads-collapsed .downloads-item[inert] {
+  pointer-events: none;
+}
+
+/* in-page layer 2 (styles.css z-index scale): above the peeking tiles' cart scrims (1) */
+.downloads.downloads-collapsed .downloads-more {
+  position: relative;
+  z-index: 2;
+  margin-block-start: calc(-1 * var(--dl-toggle-height));
 }
 
 .downloads .downloads-more:hover,
 .downloads .downloads-more:focus-visible {
-  background: var(--dropdown-hover-bg);
+  background: var(--skoda-green-emerald-hover);
 }
 
 .downloads .downloads-more:focus-visible {
@@ -220,14 +266,24 @@
   outline-offset: 2px;
 }
 
-.downloads .downloads-more[hidden],
-.downloads .downloads-item[hidden] {
+/* on the dark Media Box band the focus ring is white */
+.downloads.downloads-media-box .downloads-more:focus-visible {
+  outline-color: var(--skoda-white);
+}
+
+.downloads .downloads-more[hidden] {
   display: none;
 }
 
 /* The media-box variant uses the source's 20px gap and tile rhythm. */
 .downloads.downloads-media-box .downloads-items {
   gap: var(--dl-tile-gap);
+}
+
+/* without a shown Show more pill the source grid keeps its last row's 20px margin above the box
+   end (80px from the last tile to the band end, SKODA-830) */
+.downloads.downloads-media-box:not(:has(> .downloads-more:not([hidden]))) .downloads-items {
+  margin-block-end: var(--dl-tile-gap);
 }
 
 .downloads.downloads-media-box .downloads-figure {
@@ -350,11 +406,11 @@
 }
 
 /* the Media Box stats line (section default content) carries the group toggle at its end,
-   as the source's .search-results-stats row */
+   as the source's .search-results-stats row (text and toggle top-aligned there) */
 .downloads-stats {
   display: flex;
   gap: var(--spacing-m);
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
 }
 
@@ -375,6 +431,21 @@
 .downloads.downloads-media-box .downloads-file {
   background: var(--dark-color);
   color: var(--skoda-white);
+}
+
+/* Story and press-kit Media Box tile titles: 20/24 in a 58px row up to 768 (the source's
+   article h3), the block's 15px above; releases keep 15px at every width (SKODA-830 D1/D2).
+   The page template is the context, so the selector keeps the body class. */
+:is(body.story, body.press-kit) main > .section.media-box .downloads {
+  --dl-title-size: var(--media-box-tile-title-size-compact);
+  --dl-title-row: var(--media-box-tile-title-row-compact);
+}
+
+@media (width > 768px) {
+  :is(body.story, body.press-kit) main > .section.media-box .downloads {
+    --dl-title-size: var(--dl-title-size-base);
+    --dl-title-row: var(--dl-title-row-base);
+  }
 }
 
 /* --- responsive column ladder: media-box 1 / 2 / 3 / 4, default 1 / 2 / 4 --- */

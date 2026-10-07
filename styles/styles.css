@@ -60,7 +60,8 @@
   --story-sidebar-heading-size-compact: 20px;
   --story-sidebar-heading-line-height: 45px;
   --card-caption-row: 45px; /* taxonomy caption card: the white title row under the image (source .entry-title) */
-  --story-related-band-max-width: var(--cover-box-max-width); /* the same live .cover-box cap */
+  --story-dark-band-max-width: var(--cover-box-max-width); /* live story .cover-box.dark cap: Media Box + Related Stories */
+  --story-dark-band-gap: 2.25em; /* live .cover-box.dark top margin (36px) between stacked story bands */
 
   /* body sizes (mobile-first base) */
   --body-font-size-lead: 20px; /* story perex under the hero (live: 20/30 wt600) */
@@ -129,6 +130,22 @@
   --spacing-xl: 40px;
   --spacing-xxl: 64px;
   --section-padding: 40px;
+
+  /* Media Box band (Style: dark, full-width, media-box; SKODA-830 D1), measured on the live
+     .cover-box.dark > .search-results.media-box of stories, releases and kits: the title
+     26/32.5 (20/25 up to 768 on stories and kits), 60px under the box (its 48px margin + the
+     band's 12px). The top inset is the band padding + the box margin: 32 + 32 on stories,
+     16 + 32 + 24 on releases and kits (their templates set it). */
+  --media-box-padding-top: var(--spacing-xxl);
+  --media-box-padding-bottom: 60px;
+  --media-box-title-size: var(--heading-font-size-l);
+  --media-box-title-size-compact: 20px;
+
+  /* story + kit Media Box tiles up to 768: the source's 20/24 article h3 reaches the tile
+     titles (two lines + the 10px under them = a 58px row; 15/18 in a 46px row elsewhere and
+     on releases) */
+  --media-box-tile-title-size-compact: 20px;
+  --media-box-tile-title-row-compact: 58px;
 
   /* page-header section style: the source's title band (SKODA-505b) */
   --page-header-min-height: 240px;
@@ -745,6 +762,35 @@ main .section.dark > .default-content-wrapper :is(h1, h2, h3, h4, h5, h6) {
   color: inherit;
 }
 
+/* Media Box band (SKODA-830 D1): one rhythm for every template's Media Box section. The
+   stats line sits in the 44px row of the Downloads add-all toggle (4px top inset, as the
+   source .search-results-stats), then 20px to the grid: heading top → grid 96.5px (89 with
+   the compact title). */
+main > .section.media-box {
+  padding-block: var(--media-box-padding-top) var(--media-box-padding-bottom);
+}
+
+main > .section.media-box > .default-content-wrapper {
+  margin-block-end: var(--paragraph-gap);
+}
+
+main > .section.media-box > .default-content-wrapper > h2 {
+  margin: 0;
+  color: inherit;
+  font-size: var(--media-box-title-size);
+  font-weight: var(--weight-semibold);
+  line-height: var(--line-height-heading);
+}
+
+main > .section.media-box > .default-content-wrapper > p {
+  margin: 0;
+  padding-block-start: calc(var(--spacing-xs) / 2);
+  color: var(--pr-band-meta-color);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-semibold);
+  line-height: 2;
+}
+
 /* In-column highlight panel colours (SKODA-824; Section Metadata `Style: body-column,
    highlight-dark|grey`). Geometry is per template: the story rules below, the press
    release in its template CSS. Everything in the panel, nested Columns included, takes
@@ -1138,13 +1184,10 @@ body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has
     inset-block: 0;
     left: 50%;
     width: 100vw;
+    max-width: var(--story-dark-band-max-width);
     transform: translateX(-50%);
     background: var(--dark-color);
     z-index: -1;
-  }
-
-  body.story main > .section.dark.story-rail-container::before {
-    max-width: var(--story-related-band-max-width);
   }
 }
 
@@ -1183,6 +1226,14 @@ body.story main > .section.dark.story-rail-container {
   padding-block: var(--spacing-xxl) calc(var(--spacing-xl) + var(--paragraph-gap));
 }
 
+/* Live's separate .cover-box.dark wrappers (36px top / 24px bottom margin) collapse to one 36px
+   white gap between the Media Box and Related Stories. EDS main is a grid, where margins add
+   instead of collapsing, so only the rail's top margin carries the gap; its 24px bottom margin
+   before the footer is unchanged. */
+body.story main > .section.media-box + .section.dark.story-rail-container {
+  margin-block-start: var(--story-dark-band-gap);
+}
+
 body.story main > .section.dark.story-rail-container > div {
   padding-inline: 0;
 }
@@ -1207,8 +1258,18 @@ body.story main > .section.dark.story-rail-container .default-content-wrapper p 
   line-height: 2;
 }
 
+/* The story Media Box title is 20/25 up to 768px, 26/32.5 above (the source step). Story and
+   kit tile titles step at the same width (blocks/downloads/downloads.css). */
+body.story {
+  --media-box-title-size: var(--media-box-title-size-compact);
+}
+
 /* The source keeps the 20px sidebar headings at exactly 768px, then uses 16px. */
 @media (width > 768px) {
+  body.story {
+    --media-box-title-size: var(--heading-font-size-l);
+  }
+
   body.story main > .section.sidebar .default-content-wrapper > h2 {
     font-size: var(--body-font-size-m);
   }

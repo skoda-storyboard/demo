@@ -341,3 +341,23 @@ test('registryProblems flags duplicate ids and undocumented entries', () => {
   assert.ok(p.some((x) => /fallback/.test(x)));
   assert.ok(registryProblems(c, '').some((x) => /no "### a"/.test(x)));
 });
+
+test('classifyBlock: the Newsletter Stub card (SKODA-823) and the footer stub are on main, config only', () => {
+  const card = classifyBlock(one(block(
+    'newsletter-stub card',
+    row('image', '<picture><img src="n.webp"></picture>'),
+    row('heading', 'Be the first<br>to get the latest stories'),
+    row('button', 'Subscribe now!'),
+    row('consent', 'Hereby I give my <a href="https://www.skoda-storyboard.com/en/documents/x/">consent</a>'),
+    row('manage', '<a href="https://www.skoda-storyboard.com/en/newsletter-settings/">Manage subscription</a>'),
+    row('error', 'Please enter a valid e-mail address.'),
+    row('consent-error', 'Please accept the terms before continuing.'),
+    row('list', '389'),
+  )), CONTRACTS, CODE);
+  assert.equal(card.status, 'main');
+  assert.deepEqual(card.problems, []);
+  const footer = classifyBlock(one(block('newsletter-stub', row('label', 'Email'), row('message', 'Not yet'))), CONTRACTS, CODE);
+  assert.equal(footer.status, 'main');
+  const bad = classifyBlock(one(block('newsletter-stub card', row('honeypot', 'x'))), CONTRACTS, CODE);
+  assert.equal(bad.status, 'error');
+});

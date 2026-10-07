@@ -4,11 +4,10 @@
 - **Phase:** A · **Milestone:** M1 (demo, UI only, no ESP wiring)
 - **GitHub issue:** [#126](https://github.com/skoda-storyboard/demo/issues/126)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
-- **Status (2026-09-28):** 🟡 IN REVIEW, block slice. The `Newsletter Stub (card)` variant is built
-  and QA'd on the draft `/drafts/skoda-823-newsletter-sidebar`; footer output is unchanged. **Still
-  open:** the importer slice (`skoda-story-aside.js` emits the card, `block-contracts.json`
-  registers `newsletter-stub` / `card`, story re-import), kept to a follow-up PR so this PR only
-  touches the block.
+- **Status (2026-10-06):** 🟡 IN QA. Block slice merged (#199). **Importer slice done on
+  `skoda-830-story-import-validity` (SKODA-830 developer result 2):** `skoda-story-aside.js` emits the
+  card at the top of the aside, `block-contracts.json` registers `newsletter-stub` / `card`, and the
+  scratch re-import puts it in 59/59 stories (not pushed to DA yet; it goes with the 830 push).
 
 ## Origin
 Side-by-side QA of the Epiq story (2026-09-24). No existing ticket covers the **inline sidebar**
@@ -36,7 +35,7 @@ drops it, so the EDS aside starts directly with "Explore more".
 - Out of scope: the side banner (`.side-banner .sa-bnr`, 345×345) → **SKODA-903** banner platform.
 
 ## Acceptance Criteria
-- [ ] 1440: widget at the top of the aside, 345px wide, matching newsletter.md (colours, button, input).
+- [x] 1440: widget at the top of the aside, 345px wide, matching newsletter.md (colours, button, input).
 - [ ] Accessible form: labelled input, real button, visible focus, and an error for an invalid e-mail.
 - [ ] No network submission in M1; after valid local input, the user sees
       "Newsletter signup is not available yet" in an accessible status region.
@@ -72,6 +71,21 @@ drops it, so the EDS aside starts directly with "Explore more".
   manage link, so ours is shorter until that link is authored.
 - Found in passing, not this ticket: the header nav overflows the viewport at 1080 (about 101px)
   and at 280 (`.nav-mobile-tools`, about 22px). It affects every page.
+
+## Importer slice (2026-10-06, on SKODA-830)
+- `transformers/skoda-story-aside.js` builds the table on the `preprocess` hook, which
+  `import-story-detail.js` calls (the shared page cleanup removes `.newsletter-subscribe-widget` in
+  beforeTransform). Only the widget inside `.sidebar` is converted.
+- Rows: `image` (the widget's `newsletter_subscribe.webp`, alt ""), `heading` (the widget h3, line
+  break kept), `label` "Email address", `placeholder` and `button` from the widget, `consent` (label
+  text + its link), `manage`, `message` "Newsletter signup is not available yet", `error`,
+  `consent-error` (from the widget's `.checkbox-error`), `list` 389, `language` en_GB.
+- Consent / "Manage subscription" link to the live skoda-storyboard.com pages, as the draft does
+  (their EDS paths 404). skoda-links leaves them absolute; switch them when those pages migrate.
+- `.side-banner` stays dropped (SKODA-903).
+- Rendered from the re-import against the origin (wireless charging story): 345.3×354.8 (1440),
+  260×307.9 (992), 185.3×266.8 (768), 355×368.1 (375); equal to the origin, top of the aside, 16px
+  above "Explore more".
 
 ## Dependencies
 SKODA-801 (aside rebuild). SKODA-904 (M2 ESP) and SKODA-903 (banner

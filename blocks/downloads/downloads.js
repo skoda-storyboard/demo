@@ -201,6 +201,9 @@ function readAsset(row) {
 let menuSeq = 0;
 let disclosureSeq = 0;
 
+// controls a clipped tile takes out of the tab order where native `inert` is missing
+const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]';
+
 /**
  * Build the round download control for a tile. With one size it is a single
  * download <a>; with several it is a toggle button revealing a size menu, each
@@ -527,7 +530,35 @@ export default async function decorate(block) {
     // eslint-disable-next-line no-console
     console.error('downloads: media cart unavailable', e);
   });
-  if ((cfg.collapse === 'auto' || (cfg.collapse === null && mediaBox)) && list.children.length > 8) {
+  // A clipped tile is `inert`. Engines without native inert (Safari < 15.5, which already has
+  // ResizeObserver, so the clip applies there) get the same effect by hand: the tile leaves the
+  // accessibility tree and its controls leave the tab order, and both are restored on expand
+  // (an author tabindex is kept in data-dl-tabindex). Pointer clicks on the peeking row are
+  // blocked in CSS via the [inert] attribute, which those engines still match.
+  const nativeInert = 'inert' in window.HTMLElement.prototype;
+  const setClipped = (tile, clipped) => {
+    tile.toggleAttribute('inert', clipped);
+    if (nativeInert) return;
+    if (clipped) tile.setAttribute('aria-hidden', 'true');
+    else tile.removeAttribute('aria-hidden');
+    tile.querySelectorAll(FOCUSABLE).forEach((control) => {
+      const { dataset } = control;
+      if (clipped) {
+        if (!('dlTabindex' in dataset)) dataset.dlTabindex = control.getAttribute('tabindex') ?? '';
+        control.setAttribute('tabindex', '-1');
+      } else if ('dlTabindex' in dataset) {
+        if (dataset.dlTabindex) control.setAttribute('tabindex', dataset.dlTabindex);
+        else control.removeAttribute('tabindex');
+        delete dataset.dlTabindex;
+      }
+    });
+  };
+  // The source Media Box (media-room.js togglebox) clips its grid whenever the items need more
+  // than two rows at the current column count: the clip is 2 rows + 34px + the 44px pill, and
+  // the pill sits at its bottom, so the top of row 3 shows behind it ("Show less" once open).
+  // So the threshold follows the columns: 8 assets collapse at 1 / 2 / 3 columns, not at 4
+  // (SKODA-830 D2). The clipped tiles are inert (no focus, hidden from AT) until expanded.
+  if ((cfg.collapse === 'auto' || (cfg.collapse === null && mediaBox)) && list.children.length > 2) {
     disclosureSeq += 1;
     list.id = `downloads-items-${disclosureSeq}`;
     const toggle = document.createElement('button');
@@ -537,27 +568,47 @@ export default async function decorate(block) {
     const compact = window.matchMedia('(min-width: 520px)');
     const medium = window.matchMedia('(min-width: 768px)');
     const wide = window.matchMedia('(min-width: 992px)');
+    // the first two rows' rendered height (tallest tile bottom, so uneven rows count too); the
+    // CSS adds the pill's gap and height to it. Unmeasured (not laid out yet) leaves it unset,
+    // which keeps the list unclipped until the tiles' ResizeObserver reports their size.
+    const measureRows = (shown) => {
+      const { top } = list.getBoundingClientRect();
+      const bottom = Math.max(...shown.map((tile) => tile.getBoundingClientRect().bottom));
+      if (bottom > top) list.style.setProperty('--dl-rows-height', `${bottom - top}px`);
+      else list.style.removeProperty('--dl-rows-height');
+    };
     const syncVisibility = () => {
       let columns = 1;
       if (compact.matches && mediaBox) columns = 2;
       if (medium.matches) columns = mediaBox ? 3 : 2;
       if (wide.matches) columns = Number(cfg.columns) || 4;
-      const overflow = list.children.length > 2 * columns;
+      const tiles = [...list.children];
+      const overflow = tiles.length > 2 * columns;
       if (!overflow) block.classList.remove('downloads-expanded');
       const expanded = block.classList.contains('downloads-expanded');
-      [...list.children].forEach((tile, index) => {
-        tile.hidden = overflow && !expanded && index >= 2 * columns;
-      });
+      const collapsed = overflow && !expanded;
+      block.classList.toggle('downloads-collapsed', collapsed);
+      tiles.forEach((tile, index) => setClipped(tile, collapsed && index >= 2 * columns));
+      if (collapsed) measureRows(tiles.slice(0, 2 * columns));
+      else list.style.removeProperty('--dl-rows-height');
       toggle.hidden = !overflow;
       toggle.setAttribute('aria-expanded', String(expanded));
       toggle.textContent = expanded ? LABELS.less : LABELS.more;
     };
     toggle.addEventListener('click', () => {
-      block.classList.toggle('downloads-expanded');
+      const expanded = block.classList.toggle('downloads-expanded');
       syncVisibility();
+      // collapsing pulls the toggle (and its focus) up past the clipped rows: keep it in view
+      if (!expanded) toggle.scrollIntoView?.({ block: 'nearest' });
     });
     block.append(toggle);
     [compact, medium, wide].forEach((query) => query.addEventListener('change', syncVisibility));
+    // tile heights follow the width between breakpoints too (16:9 thumbs) and are 0 until the
+    // section shows: re-measure whenever a tile resizes (the clip never resizes a tile)
+    if (window.ResizeObserver) {
+      const observer = new window.ResizeObserver(syncVisibility);
+      [...list.children].forEach((tile) => observer.observe(tile));
+    }
     syncVisibility();
   }
 }

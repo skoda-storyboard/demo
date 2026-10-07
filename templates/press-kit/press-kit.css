@@ -13,9 +13,10 @@ body.press-kit {
   --pk-column-end: 60px;
   --pk-band-gap: calc(32px - var(--page-gutter));
   --pk-band-padding-top: 72px;
-  --pk-band-padding-bottom: 60px;
-  --pk-band-title-size-compact: 20px;
-  --pk-band-stats-gap: calc(var(--paragraph-gap) + var(--spacing-xs));
+
+  /* the shared Media Box band (styles.css): the kit's 72px top inset and 20px compact title */
+  --media-box-padding-top: var(--pk-band-padding-top);
+  --media-box-title-size: var(--media-box-title-size-compact);
   --pk-side-group-gap: 15px;
   --pk-side-heading-compact: 20px;
   --pk-side-line: 45px;
@@ -212,42 +213,19 @@ body.press-kit .section.sidebar .tags-wrapper {
   margin-block-end: var(--pk-side-group-gap);
 }
 
-/* Media Box band: the source's band padding plus the Media Box margin and header inset
-   (16 + 32 + 24 above the title, 48 + 12 below the grid), 32px after the article and 16px
-   before the footer. The title is 20/25 up to 768, 26/32.5 above; the stats line 16/32. */
+/* Media Box band: the shared band (styles.css), 32px after the article and 16px before the
+   footer. The title is 20/25 up to 768, 26/32.5 above. */
 body.press-kit main > .section.media-box {
   margin-block: var(--pk-band-gap) var(--spacing-m);
-  padding-block: var(--pk-band-padding-top) var(--pk-band-padding-bottom);
-}
-
-body.press-kit .section.media-box .default-content-wrapper {
-  margin-block-end: var(--pk-band-stats-gap);
-}
-
-body.press-kit .section.media-box .default-content-wrapper > h2 {
-  margin: 0;
-  color: var(--background-color);
-  font-size: var(--pk-band-title-size-compact);
-  font-weight: var(--weight-semibold);
-  line-height: 1.25;
-}
-
-body.press-kit .section.media-box .default-content-wrapper > p {
-  margin: 0;
-  padding-block-start: calc(var(--spacing-xs) / 2);
-  color: var(--pr-band-meta-color);
-  font-size: var(--body-font-size-m);
-  font-weight: var(--weight-semibold);
-  line-height: 2;
 }
 
 @media (width > 768px) {
-  body.press-kit .section.sidebar h3 {
-    font-size: var(--body-font-size-m);
+  body.press-kit {
+    --media-box-title-size: var(--heading-font-size-l);
   }
 
-  body.press-kit .section.media-box .default-content-wrapper > h2 {
-    font-size: var(--heading-font-size-l);
+  body.press-kit .section.sidebar h3 {
+    font-size: var(--body-font-size-m);
   }
 }
 

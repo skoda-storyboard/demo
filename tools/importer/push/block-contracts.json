@@ -85,6 +85,26 @@
     "media-cart": {
       "variants": []
     },
+    "newsletter-stub": {
+      "variants": [
+        "card"
+      ],
+      "config": "only",
+      "configKeys": [
+        "label",
+        "placeholder",
+        "button",
+        "consent",
+        "manage",
+        "message",
+        "list",
+        "language",
+        "image",
+        "heading",
+        "error",
+        "consent-error"
+      ]
+    },
     "promo-box": {
       "variants": [],
       "config": "or-curated",
