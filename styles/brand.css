@@ -182,7 +182,7 @@
  * at 412px; press kit, 2 press releases, story, home, model), starting from the measured width
  * ratio. Bold covers 600 (the site's heading weight) and 700. Arial-metric = Arimo, metric-
  * compatible with Arial, Helvetica and Liberation Sans. Re-calibrate if the SKODA Next files
- * change (.migration/skoda-702/fallback-sweep.mjs).
+ * change (docs/ui-specs/tools/fallback-sweep.mjs).
  */
 @font-face {
   font-family: skoda-next-fallback;
