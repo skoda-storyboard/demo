@@ -228,9 +228,19 @@
    (--dl-rows-height, measured from the tiles by downloads.js) plus the pill's gap and height,
    and the pill sits over the clip's bottom edge, so the top of row 3 shows behind it (58px at
    the 20px Media Box gap). The clipped tiles are inert. Unmeasured, the calc is invalid and the
-   list stays unclipped. */
+   list stays unclipped.
+   The clip gets --dl-focus-room on its top and sides (padding, cancelled by an equal negative
+   margin so the grid doesn't move) so the edge tiles' focus ring (2px outline + 2px offset)
+   isn't cut off (WCAG 2.4.7). The bottom gets none: the clip edge stays at the pill's bottom,
+   so the row-3 peek is unchanged. --dl-rows-height is measured from the padded list top, so a
+   border-box max-height already covers the top room. */
 .downloads.downloads-collapsed .downloads-items {
+  --dl-focus-room: 4px;
+
+  box-sizing: border-box;
   max-height: calc(var(--dl-rows-height) + var(--dl-toggle-gap) + var(--dl-toggle-height));
+  margin: calc(-1 * var(--dl-focus-room)) calc(-1 * var(--dl-focus-room)) 0;
+  padding: var(--dl-focus-room) var(--dl-focus-room) 0;
   overflow: hidden;
 }
 

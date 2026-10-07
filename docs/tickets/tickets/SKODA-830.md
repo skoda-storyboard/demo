@@ -194,6 +194,18 @@ Evidence: `.migration/qa-830/run2/` (full run at cfa90ef) and `.migration/qa-830
 - **Found while checking, pre-existing on main, not this PR:** the press-release Media Box band is 1248px wide
   (x=656 at 2560) vs origin 1440px (x=560), with a 0px gap to the footer vs origin 16px.
 
+### PR #269 review (2026-10-07, saran-adobe, downloads.css:234): fixed
+- **Problem:** the collapsed Media Box `overflow: hidden` clipped the 2px + 2px focus ring of the edge tiles
+  (WCAG 2.4.7, css-guidelines §8).
+- **Fix:** the collapsed list gets `--dl-focus-room: 4px` padding on its top and sides, cancelled by an equal
+  negative margin, plus `box-sizing: border-box`. There is no bottom room, so the clip edge stays at the pill
+  bottom and the peek is unchanged.
+- **Measured** with branch code on Lake Como and the 4x4 release at 1440/992/768/375:
+  - 0 of 138 focusable tile controls have a clipped ring.
+  - A real Tab onto tile 1 gives `:focus-visible`, with the ring exactly at the clip edge (0px cut; it was 4px).
+  - Collapsed box: Lake Como 708.25/636.25/669.25/803.13, 4x4 708.25/636.25/645.25/779.13.
+  - Peek: 58 at all widths; grid x unchanged. All equal to the values before the fix and to origin.
+
 ### Follow-ups (non-blocking)
 - D2-F1: without a ResizeObserver measurement, the tiles stay `inert` and the pill overlaps (outside the supported
   browsers). Apply collapsed + inert only once measured.
