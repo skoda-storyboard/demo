@@ -6,14 +6,12 @@
 - **GitHub issue:** [#260](https://github.com/skoda-storyboard/demo/issues/260)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §3.2 / §8 F2; relates to [SKODA-209](SKODA-209.md), SKODA-214
 - **Branch:** `skoda-831-category-archive-membership` (based on `main` since #269 merged)
-- **Status (2026-10-07):** 🟡 QA PASS (run 2); PR open. Rollout (see "Rollout order"):
-  - **Step 2 done:** the `categories` index column (2026-10-06; readback equals `query-index-config.yaml`).
-  - **Step 3 done:** 57 stories re-pushed and published with `categories`; the live + preview index carry it on
-    57/58 stories (gaming-consoles is blocked on its MP4).
-  - **Step 1 pending:** merge this PR.
-  - **Step 4 waits for the merge:** push and publish the 15 archives. The content in
-    `.migration/wt-831b-scratch/archives-rollout/` has had `media:apply`, and each page differs from DA only in
-    its Stories scope row.
+- **Status (2026-10-07):** 🟢 **Rolled out.** PR #276 merged (`ea712bc`). Steps 2–3 done 2026-10-06. Step 4 done
+  2026-10-07, after confirming `tokens(cfg.categories)` is deployed on .aem.page and .aem.live: 15 archives pushed
+  (15 × update, 0 conflicts), previewed and published (15/15 live 200, indexed).
+  - Live check: skoda-world/design 6 + Load more (8), innovation-and-technology 6 + Load more (12), lifestyle/sports 2,
+    models 6 + Load more (29).
+  - Empty, as expected (none of their stories migrated yet): people, classic-cars, concepts, corporate-life.
 
 ## Problem
 `parsers/archive-list.js` scoped sub-category archives to `path: /en/<cat>/<sub>/`, but story URLs are flat, so the
@@ -98,7 +96,7 @@ Evidence: `.migration/qa-831/run2/` (outside git).
 - [x] Every sub-category archive matches its imported WordPress members (simulation)
 - [x] No change for configs without `categories`; home / rails / promo unaffected
 - [x] QA PASS (run 2, 2026-10-07); defensive fallback assessed: not needed
-- [ ] Rolled out in the order above (steps 1–2 done 2026-10-06); rendered check of 3 archives on preview
+- [x] Rolled out in the order above (2026-10-06/07); rendered check of 13 archives on preview and 4 on live
 
 ## Risks
 - The category tree is a snapshot: new WP categories need `build-category-parents.mjs` + a bundle rebuild.
