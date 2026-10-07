@@ -233,7 +233,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-805c](tickets/SKODA-805c.md) | `press_kit-template-default` article + accordion (first-glimpse) | E08 | 3 | 1–2 | 3 | 607,204,205,502,506 | 🟡 M1 Should; slice of 805/807; ready for QA 2026-09-29 (DA previewed, not published) |
 | SKODA-701 | Lint + unit tests | E07 | 2 | 1 | 1–2 | E02,E03,E04 | 🟢 |
 | SKODA-702 | Performance (Lighthouse≈100/RUM) | E07 | 3 | 1–2 | 2–3 | 603 | 🟡 |
-| [SKODA-702a](tickets/SKODA-702a.md) | Epiq story performance: YouTube click-to-load facade (desktop TBT) | E07 | 2 | 0.5–1 | 1–2 | 702,204a,818 | 🔵 M1; from the PR #232 PSI failure (desktop 74, TBT 570ms; `main` 64–69 locally); live uses `lite-youtube`, EDS boots the full player on load |
+| [SKODA-702a](tickets/SKODA-702a.md) | Epiq story performance: YouTube click-to-load facade (desktop TBT) | E07 | 2 | 0.5–1 | 1–2 | 702,204a,818 | ✅ Done (PR #258 merged 2026-10-06, #239 closed); M1; from the PR #232 PSI failure (desktop 74, TBT 570ms; `main` 64–69 locally); live uses `lite-youtube`, EDS boots the full player on load |
 | SKODA-703 | Accessibility audit | E07 | 3 | 1–2 | 2–4 | 603 | 🟠 several `[RUNTIME-UNCONFIRMED]` |
 | SKODA-704 | Visual critique + consent/analytics stubs + sign-off | E07 | 3 | 1–2 | 2–3 | 702,703 | 🟡 |
 
@@ -265,7 +265,9 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-821](tickets/SKODA-821.md) | Story body text inset vs intentionally bleeding image slider | E08 | A/B | 1 | 0.25 | 0.5 | 801 | 🟢 story CSS only; 10px media bleed retained. Re-check 2026-09-29: horizontal ACs met on `main` |
 | [SKODA-829](tickets/SKODA-829.md) | Story intro → body / aside vertical spacing parity | E08 | A | 1 | 0.25 | 0.5 | 801,821,828 | 🟡 #214; PR #207 review follow-up (2026-09-29); body +32 / aside +0 at ≥768, body +0 below; text 10px in |
 | [SKODA-830](tickets/SKODA-830.md) | Story importer validity fixes + Media Box → Downloads (801a) + newsletter card (823) + Media Box parity | E08 | A | – | – | – | 801a,604,819,823 | 🟡 M1; #259, PR #269; audit F3+F4; QA PASS run 3; 57 stories published 2026-10-06 |
-| [SKODA-832](tickets/SKODA-832.md) | Re-import the Octavia-rail press-kit hubs with press-kit-hub (was page-base) | E08 | A | – | – | – | 208,805 | 🟡 M1; #261, audit F1; developer done, rendered QA pending |
+| [SKODA-832](tickets/SKODA-832.md) | Re-import the Octavia-rail press-kit hubs with press-kit-hub (was page-base) | E08 | A | – | – | – | 208,805 | 🟡 M1; #261; 9 hubs pushed + previewed 2026-10-07 (QA content PASS); banners → 835, RS 245 → 836 |
+| [SKODA-835](tickets/SKODA-835.md) | Press-kit hub: size a lone download banner like its origin tile (1228×1228 vs 292×292) | E08 | A | – | – | – | 832,805 | 🔵 M1; #279, from SKODA-832 QA D2 (2026-10-07) |
+| [SKODA-836](tickets/SKODA-836.md) | Press-kit article importer for the `template-press-release` variant (Octavia RS 245) | E08 | A | – | – | – | 805,503,832 | 🔵 M2; #280, from SKODA-832 QA D1 (2026-10-07) |
 | [SKODA-833](tickets/SKODA-833.md) | Press-release importer validity fixes + DAM originals for 28 releases | E08 | A | – | – | – | 607,502,503 | 🟢 M1; #262, PR #265 merged; 28 releases published 2026-10-06 |
 | SKODA-822 | Ship SKODA-801 two-column story layout to `main` | E08 | A | 1 | — | — | 801 | ✅ merged as PR #113 (2026-09-24 21:35) |
 | SKODA-823 | Story sidebar newsletter sign-up widget (UI stub) | E08 | A | 2 | 0.5–1 | 1–2 | 904,801 | 🟡 extend footer `newsletter-stub` for the sidebar; no ESP, no false success; side banner → 903; **M1 Could** (review §15) |
