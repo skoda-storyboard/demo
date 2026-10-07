@@ -85,7 +85,7 @@ Evidence: `.migration/qa-832/` (outside git).
 - [x] No Twitter junk; sane description; no text or image lost vs the current DA docs
 - [ ] Rendered QA (measured, 1440/992/768/375) vs origin, incl. the contacts Columns and the two size approximations
 - [x] `media:apply`, DA dry-run, push + preview (2026-10-07: 9 hubs; RS 245 excluded, D1)
-- [ ] D2 banner sizing fixed + rendered re-check; then publish (separate go-ahead)
+- [ ] Publish (separate go-ahead). Follow-ups: D2 banner sizing → [SKODA-835](SKODA-835.md) (#279); D1 RS 245 → [SKODA-836](SKODA-836.md) (#280)
 
 ## Follow-ups
 - The cards tiles block has no full-width or one-third tile size (block change), which is behind the 2 approximations.
