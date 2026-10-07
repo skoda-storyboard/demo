@@ -186,6 +186,42 @@ test('two FAQ accordions share one FAQPage; a plain accordion adds nothing', { s
   assert.deepEqual(JSON.parse(scripts[0].textContent).mainEntity.map((q) => q.name), ['Q1', 'Q2']);
 });
 
+test('an FAQ decorated in a detached fragment counts, mounted or not, alongside the page FAQ (PR #263 review)', { skip: !JSDOM }, () => {
+  const doc = faqDom('<div class="accordion faq"><div><div><h2>Page Q</h2></div><div><p>Page A</p></div></div></div>');
+  const faqData = () => JSON.parse(faqScripts(doc)[0].textContent).mainEntity.map((q) => q.name);
+  decorate(doc.querySelector('.accordion'));
+  // blocks/fragment: decorateMain + loadSections run on a detached <main>, then its children move in
+  const fragment = doc.createElement('main');
+  fragment.innerHTML = '<div class="section"><div class="accordion-wrapper"><div class="accordion faq">'
+    + '<div><div><h2>Fragment Q</h2></div><div><p>Fragment A</p></div></div></div></div></div>';
+  decorate(fragment.querySelector('.accordion'));
+  assert.equal(fragment.isConnected, false);
+  assert.deepEqual(faqData(), ['Page Q', 'Fragment Q'], 'the detached fragment FAQ is kept');
+  doc.querySelector('main').append(...fragment.childNodes);
+  // a later FAQ on the page re-renders the data: the now-mounted fragment block stays in
+  const later = doc.createElement('div');
+  later.className = 'accordion faq';
+  later.innerHTML = '<div><div><h2>Later Q</h2></div><div><p>Later A</p></div></div>';
+  doc.querySelector('main').append(later);
+  decorate(later);
+  assert.deepEqual(faqData(), ['Page Q', 'Fragment Q', 'Later Q']);
+  assert.equal(faqScripts(doc).length, 1);
+});
+
+test('an FAQ that was on the page and is removed drops out on the next FAQ decoration', { skip: !JSDOM }, () => {
+  const doc = faqDom(`<div class="accordion faq" id="gone"><div><div><h2>Gone Q</h2></div><div><p>A</p></div></div></div>
+    <div class="accordion faq" id="kept"><div><div><h2>Kept Q</h2></div><div><p>A</p></div></div></div>`);
+  decorate(doc.getElementById('gone'));
+  decorate(doc.getElementById('kept'));
+  doc.getElementById('gone').remove();
+  const next = doc.createElement('div');
+  next.className = 'accordion faq';
+  next.innerHTML = '<div><div><h2>Next Q</h2></div><div><p>A</p></div></div>';
+  doc.querySelector('main').append(next);
+  decorate(next);
+  assert.deepEqual(JSON.parse(faqScripts(doc)[0].textContent).mainEntity.map((q) => q.name), ['Kept Q', 'Next Q']);
+});
+
 test('a page with only plain accordions, or an FAQ with no complete row, gets no JSON-LD', { skip: !JSDOM }, () => {
   const plain = faqDom('<div class="accordion"><div><div><h2>Q</h2></div><div><p>A</p></div></div></div>');
   decorate(plain.querySelector('.accordion'));

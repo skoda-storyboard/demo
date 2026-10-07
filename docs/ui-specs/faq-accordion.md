@@ -222,6 +222,15 @@ Measured, draft `/drafts/skoda-807-faq-accordion` against the source Peaq-2 FAQ:
     chapters lost every source `&nbsp;` (`a&nbsp;Škoda`, `16&nbsp;speakers`) and wrapped a line short. Question 26
     was 136 against 160 @768. It is now registered: the Peaq-2 FAQ keeps 125, and question 26 matches.
   - **Result:** all 28 trigger heights and 26 of 28 answer heights are identical to the source at 1440 / 1280 / 768 / 390.
+- **PR #263 re-review (2026-10-07): FAQ in a fragment.**
+  - `blocks/fragment` decorates a fragment's detached `<main>` before inserting its children. The JSON-LD registry used
+    to drop any block that wasn't connected, so a fragment FAQ never reached the data: page and fragment rendered 56
+    questions against 28 entries.
+  - A block decorated off the page now counts until it's mounted. Only a block that was on the page and has left it
+    (or one from another document) drops out, on the next FAQ decoration.
+  - Through the real fragment loader: 56 questions, 56 entries, one script.
+  - Covered by `accordion.test.mjs`: a detached fragment that is then mounted, aggregated with a page FAQ and a later
+    one; and a removed block dropping out.
 - **Remaining differences:**
   - **Question 6** (24px short at every width): the source's last paragraph opens with a whitespace-only line
     (`&nbsp;<br>`), which the importer drops as on every template (SKODA-801 spacing policy).

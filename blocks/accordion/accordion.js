@@ -78,6 +78,8 @@ function plain(node) {
   return copy.textContent.replace(/\s+/g, ' ').trim();
 }
 const faqEntries = new Map();
+// blocks seen on the page: only these drop out once they leave it (see addFaq)
+const mounted = new WeakSet();
 
 function addFaq(block, items) {
   const entries = items.filter((item) => item.matches('.accordion-item')).map((item) => {
@@ -87,9 +89,13 @@ function addFaq(block, items) {
   }).filter(({ question, answer }) => question && answer);
   if (!entries.length) return;
   faqEntries.set(block, entries);
-  // blocks no longer on this page drop out
+  // A block decorated off the page counts until it's mounted: blocks/fragment decorates a
+  // fragment's detached <main> before inserting its children (PR #263 review). A block that was
+  // on the page and has left it, or one from another document, drops out.
   [...faqEntries.keys()].forEach((key) => {
-    if (!key.isConnected || key.ownerDocument !== document) faqEntries.delete(key);
+    if (key.ownerDocument !== document) faqEntries.delete(key);
+    else if (key.isConnected) mounted.add(key);
+    else if (mounted.has(key)) faqEntries.delete(key);
   });
   let script = document.head.querySelector(FAQ_SCRIPT);
   if (!script) {
