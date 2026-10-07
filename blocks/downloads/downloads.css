@@ -244,6 +244,11 @@
   overflow: hidden;
 }
 
+/* the clipped (inert) tiles take no pointer input either, also where `inert` isn't native */
+.downloads.downloads-collapsed .downloads-item[inert] {
+  pointer-events: none;
+}
+
 /* in-page layer 2 (styles.css z-index scale): above the peeking tiles' cart scrims (1) */
 .downloads.downloads-collapsed .downloads-more {
   position: relative;

@@ -206,6 +206,21 @@ Evidence: `.migration/qa-830/run2/` (full run at cfa90ef) and `.migration/qa-830
   - Collapsed box: Lake Como 708.25/636.25/669.25/803.13, 4x4 708.25/636.25/645.25/779.13.
   - Peek: 58 at all widths; grid x unchanged. All equal to the values before the fix and to origin.
 
+### PR #269 review (2026-10-07, vijayr-adobe, downloads.js:565): fixed
+- **Problem:** Safari 15.4 has ResizeObserver but no native `inert`, so the clipped rows-3+ controls stayed in the
+  tab order and the AT tree.
+- **Fix:** where `'inert' in HTMLElement.prototype` is false, a clipped tile gets `aria-hidden="true"` and its
+  controls `tabindex="-1"` (an author tabindex is kept in `data-dl-tabindex` and restored on expand). Native
+  engines are unchanged.
+- **Pointer:** clipped tiles get `pointer-events: none` via `[inert]`, which also matches without native support.
+- **Tests:** 2 new tests, one per path (fallback + author-tabindex round trip; native).
+- **Chrome check:**
+  - Native: 5 inert tiles, no extra attributes, 708.25 collapsed.
+  - Forced fallback (prototype removed before load): 5/5 `aria-hidden`, 25/25 clipped controls at -1, rows 1–2
+    untouched. Expand restores everything with nothing left over, and collapse re-applies.
+- **Noted for later:** `gallery` and `float-dock` also rely on native `inert`. The repo has no documented browser
+  baseline.
+
 ### Follow-ups (non-blocking)
 - D2-F1: without a ResizeObserver measurement, the tiles stay `inert` and the pill overlaps (outside the supported
   browsers). Apply collapsed + inert only once measured.

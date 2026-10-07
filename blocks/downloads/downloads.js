@@ -201,6 +201,9 @@ function readAsset(row) {
 let menuSeq = 0;
 let disclosureSeq = 0;
 
+// controls a clipped tile takes out of the tab order where native `inert` is missing
+const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]';
+
 /**
  * Build the round download control for a tile. With one size it is a single
  * download <a>; with several it is a toggle button revealing a size menu, each
@@ -527,6 +530,29 @@ export default async function decorate(block) {
     // eslint-disable-next-line no-console
     console.error('downloads: media cart unavailable', e);
   });
+  // A clipped tile is `inert`. Engines without native inert (Safari < 15.5, which already has
+  // ResizeObserver, so the clip applies there) get the same effect by hand: the tile leaves the
+  // accessibility tree and its controls leave the tab order, and both are restored on expand
+  // (an author tabindex is kept in data-dl-tabindex). Pointer clicks on the peeking row are
+  // blocked in CSS via the [inert] attribute, which those engines still match.
+  const nativeInert = 'inert' in window.HTMLElement.prototype;
+  const setClipped = (tile, clipped) => {
+    tile.toggleAttribute('inert', clipped);
+    if (nativeInert) return;
+    if (clipped) tile.setAttribute('aria-hidden', 'true');
+    else tile.removeAttribute('aria-hidden');
+    tile.querySelectorAll(FOCUSABLE).forEach((control) => {
+      const { dataset } = control;
+      if (clipped) {
+        if (!('dlTabindex' in dataset)) dataset.dlTabindex = control.getAttribute('tabindex') ?? '';
+        control.setAttribute('tabindex', '-1');
+      } else if ('dlTabindex' in dataset) {
+        if (dataset.dlTabindex) control.setAttribute('tabindex', dataset.dlTabindex);
+        else control.removeAttribute('tabindex');
+        delete dataset.dlTabindex;
+      }
+    });
+  };
   // The source Media Box (media-room.js togglebox) clips its grid whenever the items need more
   // than two rows at the current column count: the clip is 2 rows + 34px + the 44px pill, and
   // the pill sits at its bottom, so the top of row 3 shows behind it ("Show less" once open).
@@ -562,7 +588,7 @@ export default async function decorate(block) {
       const expanded = block.classList.contains('downloads-expanded');
       const collapsed = overflow && !expanded;
       block.classList.toggle('downloads-collapsed', collapsed);
-      tiles.forEach((tile, index) => tile.toggleAttribute('inert', collapsed && index >= 2 * columns));
+      tiles.forEach((tile, index) => setClipped(tile, collapsed && index >= 2 * columns));
       if (collapsed) measureRows(tiles.slice(0, 2 * columns));
       else list.style.removeProperty('--dl-rows-height');
       toggle.hidden = !overflow;
