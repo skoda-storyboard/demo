@@ -32,7 +32,7 @@ Confirmed on the live Peaq press kit (§11.10): a named FAQ section of question/
 - [x] FAQ renders as a named section of Q/A pairs from authored content. *(The FAQ chapter page, under its "Frequently Asked Questions" h1: `Accordion (faq)`, 28 / 5 rows on Peaq-2 / Epiq-2.)*
 - [x] Expand/collapse works via mouse and keyboard; `aria-expanded` reflects state; screen-reader announces the region. *(A native button: Enter opens, Space closes, Tab moves on. The panel is `role=region aria-labelledby`.)*
 - [x] Structured data (FAQPage) emitted where content allows; passes validation. *(One FAQPage with 28 Question/acceptedAnswer pairs on Peaq-2. It is checked against the schema.org required properties in the unit tests; the Google Rich Results test was not run.)*
-- [x] Output passes lint and matches source in local preview.
+- [x] Output passes lint and matches source in local preview. *(PR #263 review: leading 10px inset, answer lists and the kit importer's `&nbsp;` keeper fixed. All 28 triggers and 26 of 28 answers are identical at 1440/1280/768/390. Q6 (a whitespace-only line) and Q17 (table → lines, SKODA-805b) are documented in spec §11.)*
 - [x] Accordion mechanics match source (trigger `16px`/600, `24px` padding, `#e4e4e4` dividers, plus-icon rotates 45° `.2s`) with added `aria-expanded` + FAQPage schema. *(Measured identical at 1440/1080/992/768/390, see spec §11. The visual-diff clause is met with measured values, not screenshots, per the repo review rule.)*
 
 ## Dependencies
@@ -54,5 +54,10 @@ The full-site recount (`docs/analysis/SKODA-BLOCK-RECOUNT.md`) confirms the FAQ 
 - The importer emits `Accordion (faq)` on `…/frequently-asked-questions/` chapters (`parsers/press-kit-content.js`,
   `import-press-kit-default.js`, re-bundled). Contract: `main.accordion.variants: ["faq"]`.
 - No regressions: first glimpse and Elroq (nested quote) match the source.
+- PR #263 review (2026-10-07):
+  - FAQ answer text keeps table-cell boundaries;
+  - answer lists match the source (16px items, dash bullet);
+  - FAQ chapters get the 10px leading inset;
+  - `import-press-kit-default.js` now keeps `&nbsp;` (`skoda-nbsp`).
 - The two M1 FAQ pages are re-imported locally. They get pushed to DA (`import:push`) after merge.
 

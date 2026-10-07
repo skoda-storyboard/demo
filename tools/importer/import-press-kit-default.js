@@ -10,6 +10,7 @@ import layout from './transformers/skoda-press-kit-default-layout.js';
 import metadata from './transformers/skoda-metadata.js';
 import normalizeImages from './transformers/skoda-images.js';
 import links from './transformers/skoda-links.js';
+import nbspTransformer from './transformers/skoda-nbsp.js';
 
 const TEMPLATE = { name: 'press-kit-default', metadata: { template: 'press_kit' } };
 
@@ -30,6 +31,9 @@ function templateFor(document, pageUrl) {
 
 export default {
   preprocess: ({ document }) => {
+    // keep the source's glued non-breaking spaces (html2md would turn them into spaces): the
+    // FAQ answers wrap a line differently without them (PR #263 review)
+    nbspTransformer('preprocess', document.body, { document });
     // Icon-only cart download links would be stripped as empty inline elements before
     // transform. Give every one text: Media Box and inline grid assets, and the video
     // attachments of resource "Videos" children (SKODA-805b).

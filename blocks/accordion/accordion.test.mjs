@@ -164,6 +164,18 @@ test('Accordion (faq) emits one FAQPage JSON-LD with every complete Q/A, whitesp
   assert.match(doc.querySelector('.accordion').textContent, /Incomplete row/);
 });
 
+test('FAQ answer text keeps table cells and rows apart (PR #263 review)', { skip: !JSDOM }, () => {
+  const doc = faqDom(`<div class="accordion faq">
+    <div><div><h2>What is the range?</h2></div><div><p>It depends on the battery:</p><table>
+      <thead><tr><th>Variant</th><th>Range</th></tr></thead>
+      <tbody><tr><td>Peaq 60</td><td>450 km</td></tr><tr><td>Peaq 90</td><td>640 km</td></tr></tbody>
+    </table></div></div>
+  </div>`);
+  decorate(doc.querySelector('.accordion'));
+  const [entry] = JSON.parse(faqScripts(doc)[0].textContent).mainEntity;
+  assert.equal(entry.acceptedAnswer.text, 'It depends on the battery: Variant Range Peaq 60 450 km Peaq 90 640 km');
+});
+
 test('two FAQ accordions share one FAQPage; a plain accordion adds nothing', { skip: !JSDOM }, () => {
   const doc = faqDom(`<div class="accordion faq"><div><div><h2>Q1</h2></div><div><p>A1</p></div></div></div>
     <div class="accordion"><div><div><h2>Not FAQ</h2></div><div><p>Topical toggle</p></div></div></div>
@@ -193,5 +205,10 @@ test('CSS: answer starts 10px under its question at full width; the plus sits in
   assert.match(rule('.accordion .accordion-icon'), /padding: var\(--accordion-icon-pad\);/);
   assert.match(rule('.accordion .accordion-icon'), /border-radius: 50%;/);
   assert.match(rule('.accordion .accordion-heading button[aria-expanded="true"] .accordion-icon'), /transform: rotate\(45deg\);/);
+  // answer lists as on the source (PR #263 review): 16px after each item, no list margin, a dash
+  assert.match(rule('.accordion .accordion-panel ul'), /margin-block-end: 0;[\s\S]*list-style: none;/);
+  assert.match(rule('.accordion .accordion-panel ul > li'), /margin-block-end: var\(--accordion-list-item-gap\);/);
+  assert.match(rule('.accordion'), /--accordion-list-item-gap: var\(--spacing-m\);/);
+  assert.match(rule('.accordion .accordion-panel ul > li::before'), /border-block-end: var\(--accordion-bullet-weight\) solid var\(--skoda-black\);/);
 });
 

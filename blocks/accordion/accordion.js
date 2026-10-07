@@ -70,10 +70,11 @@ function nestedQuotes(panel) {
  * script sink that the page's default policy (scripts.js) passes.
  */
 const FAQ_SCRIPT = 'script[type="application/ld+json"][data-accordion-faq]';
-// text with a space between block-level parts (paragraphs, list items, line breaks)
+// text with a space between block-level parts (paragraphs, list items, table cells and rows,
+// line breaks), so `Variant | Range` over `Peaq 90 | 640 km` reads "Variant Range Peaq 90 640 km"
 function plain(node) {
   const copy = node.cloneNode(true);
-  copy.querySelectorAll(`${BLOCK_LEVEL}, br`).forEach((el) => el.after(' '));
+  copy.querySelectorAll(`${BLOCK_LEVEL}, tr, th, td, br`).forEach((el) => el.after(' '));
   return copy.textContent.replace(/\s+/g, ' ').trim();
 }
 const faqEntries = new Map();

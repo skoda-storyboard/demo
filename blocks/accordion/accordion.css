@@ -15,6 +15,15 @@
 
   /* the answer starts 10px under its question, full width (the source builder cell) */
   --accordion-panel-inset: var(--page-gutter);
+
+  /* answer lists (source .textwidget ul, measured on the Peaq FAQ): 24px indent, 16px after
+     each item, no list margin, and a 0.3em × 1px dash for a bullet at 45% of the item's
+     height (10.8px on a one-line item, 21.6px on a two-line one) */
+  --accordion-list-indent: var(--spacing-l);
+  --accordion-list-item-gap: var(--spacing-m);
+  --accordion-bullet-width: 0.3em;
+  --accordion-bullet-weight: 1px;
+  --accordion-bullet-top: 45%;
 }
 
 .accordion .accordion-item + .accordion-item {
@@ -83,6 +92,26 @@
 
 .accordion .accordion-panel {
   padding: var(--accordion-panel-inset) 0;
+}
+
+.accordion .accordion-panel ul {
+  margin-block-end: 0;
+  padding-inline-start: var(--accordion-list-indent);
+  list-style: none;
+}
+
+.accordion .accordion-panel ul > li {
+  position: relative;
+  margin-block-end: var(--accordion-list-item-gap);
+}
+
+.accordion .accordion-panel ul > li::before {
+  position: absolute;
+  inset-block-start: var(--accordion-bullet-top);
+  inset-inline-start: calc(-1 * var(--accordion-list-indent));
+  width: var(--accordion-bullet-width);
+  border-block-end: var(--accordion-bullet-weight) solid var(--skoda-black);
+  content: '';
 }
 
 .accordion .accordion-panel[hidden] {

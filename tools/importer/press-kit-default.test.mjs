@@ -39,7 +39,10 @@ const { layoutTileRows } = await import('../../scripts/cards-tiles.js');
 const base = 'https://www.skoda-storyboard.com/en/press-kits/';
 const target = `${base}skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/`;
 const intro = `${base}skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio/`;
-const txt = (el) => (el?.textContent || '').trim().replace(/\s+/g, ' ');
+// the importer keeps a source &nbsp; as the skoda-nbsp placeholder (push restores U+00A0):
+// read it as the space it renders as
+const NBSP_PLACEHOLDER = '\u{F00A0}';
+const txt = (el) => (el?.textContent || '').replaceAll(NBSP_PLACEHOLDER, ' ').trim().replace(/\s+/g, ' ');
 const inBodyDownloads = [
   ['PDF download', '/direct-download/2026/03/Skoda_all-electric_family_d82d4b7a.pdf'],
   ['JPG download', '/direct-download/2026/03/Skoda_all-electric_family_80fcb8d2.jpg'],
@@ -641,6 +644,18 @@ test('a kit FAQ chapter emits Accordion (faq), which the block turns into FAQPag
   assert.equal(data['@type'], 'FAQPage');
   assert.deepEqual(data.mainEntity.map((q) => [q.name, q.acceptedAnswer.text]), [1, 2, 3]
     .map((i) => [`Chapter ${i}`, `Answer ${i} reference.`]));
+});
+
+test('the source\u2019s glued non-breaking spaces survive the import (skoda-nbsp; PR #263 review)', { skip: !JSDOM }, () => {
+  const page = run(fixture({
+    chapters: true,
+    mediaBox: false,
+    togglesCount: 0,
+    extra: grid(widget('<p>The system features 16&nbsp;speakers and a&nbsp;total output of 755&nbsp;W.</p><p>&nbsp;</p>')),
+  }), `${base}skoda-peaq-press-kit-2/frequently-asked-questions/`);
+  const p = [...page.querySelectorAll('p')].find((el) => el.textContent.includes('speakers'));
+  assert.equal(p.textContent, `The system features 16${NBSP_PLACEHOLDER}speakers and a${NBSP_PLACEHOLDER}total output of 755${NBSP_PLACEHOLDER}W.`);
+  assert.ok(![...page.querySelectorAll('p')].some((el) => el.textContent.includes(NBSP_PLACEHOLDER) && !el.textContent.trim().replaceAll(NBSP_PLACEHOLDER, '')), 'a whitespace-only spacer is not glued');
 });
 
 test('generated standalone bundle matches the source importer', { skip: !JSDOM }, () => {

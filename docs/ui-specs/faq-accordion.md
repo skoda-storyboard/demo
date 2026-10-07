@@ -209,6 +209,28 @@ Measured, draft `/drafts/skoda-807-faq-accordion` against the source Peaq-2 FAQ:
 - **Wrapping:** all 28 trigger heights are identical to the source at 390 (19 wrap to two lines) and at 1440.
 - **Other pages:** first glimpse (8) and Elroq (12, with the nested quote at 176 / 272) have trigger heights and
   answer boxes identical to the source at 1440 / 768.
+- **PR #263 review fixes (2026-10-07):**
+  - **FAQ answer text** keeps table cells and rows apart. `Variant | Range` over `Peaq 90 | 640 km` reads "Variant
+    Range Peaq 90 640 km"; it used to read `VariantRangePeaq 90640 km`.
+  - **Answer lists** follow the source `.textwidget ul`: 24px indent, 16px after each item, no list margin, and a
+    0.3em × 1px dash bullet at 45% of the item height (10.8px on a one-line item, 21.6 on two lines). Peaq question 6's
+    list now matches the source item by item at 1440 / 1280 / 768 / 390.
+  - **Leading inset.** When the toggles open the body (a kit's FAQ chapter), the source row cell's 10px sits above the
+    first question (`templates/press-kit/press-kit.css`). Title → first trigger is 26 = 26 @1440/1280 and 28 = 28
+    @768/390. First glimpse and Elroq, where the accordion follows other content, keep their 40 = 40.
+  - **Non-breaking spaces.** `import-press-kit-default.js` didn't register the shared `skoda-nbsp` keeper, so the kit
+    chapters lost every source `&nbsp;` (`a&nbsp;Škoda`, `16&nbsp;speakers`) and wrapped a line short. Question 26
+    was 136 against 160 @768. It is now registered: the Peaq-2 FAQ keeps 125, and question 26 matches.
+  - **Result:** all 28 trigger heights and 26 of 28 answer heights are identical to the source at 1440 / 1280 / 768 / 390.
+- **Remaining differences:**
+  - **Question 6** (24px short at every width): the source's last paragraph opens with a whitespace-only line
+    (`&nbsp;<br>`), which the importer drops as on every template (SKODA-801 spacing policy).
+  - **Question 17** (−5 @1280, −32 @768): the source's spec table becomes one text line per row. This is the
+    SKODA-805b importer decision that the published FAQ pages already use.
+  - **First glimpse / Elroq answers** (already on `main`, outside this ticket): two authored `aligncenter` images that
+    sit side by side on the source (396×264 each @1440) stack full width. Follow-up for SKODA-805c.
+  - **Press-kit hubs** (`import-press-kit-hub.js`) don't register `skoda-nbsp` either. That's a follow-up; the hubs
+    have no accordions.
 - **Not built:**
   - the `single` (one-open) variant, which isn't on the source;
   - arrow-key header navigation, which is optional in the WAI pattern;
