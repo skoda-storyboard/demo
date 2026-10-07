@@ -83,6 +83,19 @@ test('sections get their roles and the source anchors as aliases', () => {
   assert.ok(main.querySelector('#derivatives.model-rail'));
 });
 
+test('the RS derivatives\' panel titles get the same roles (SKODA-208a: Elroq RS, Enyaq RS)', () => {
+  const rs = PAGE
+    .replace('<h2 id="model-description">Model Description</h2>', '<h2 id="model-introduction">Model introduction</h2>')
+    .replace('<h2 id="highlights">Highlights</h2>', '<h2 id="key-specifications">Key Specifications</h2>');
+  let main = setup(rs);
+  decorate(main);
+  assert.ok(main.querySelector('#intro.model-intro'), 'Model introduction is the intro panel (40/300 heading, 40px gap)');
+  assert.ok(main.querySelector('#keyfacts.model-highlights'), 'Key Specifications is the key-facts panel');
+  main = setup(PAGE.replace('<h2 id="highlights">Highlights</h2>', '<h2 id="key-highlights">Key Highlights</h2>'));
+  decorate(main);
+  assert.ok(main.querySelector('#keyfacts.model-highlights'), 'Key Highlights (Enyaq RS) too');
+});
+
 test('hero chip, tech data parts, drawings and rail lead-ins are marked', () => {
   const main = setup();
   decorate(main);

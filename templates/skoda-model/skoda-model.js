@@ -17,13 +17,15 @@
 import { wireImageLinks } from '../../scripts/media-lightbox.js';
 
 // heading id (importer slug) → section role, nav icon (icons/model-*.svg) and the source's
-// anchor (so old deep links such as /en/skoda-model/octavia/#keyfacts still land)
+// anchor (so old deep links such as /en/skoda-model/octavia/#keyfacts still land). The RS
+// derivatives title their panels "Model introduction" and "Key Specifications" / "Key
+// Highlights" (SKODA-208a): the same source panels, so the same roles.
 const SECTIONS = [
   {
-    test: /^model-description/, role: 'model-intro', icon: 'model-description', alias: 'intro',
+    test: /^model-(description|introduction)/, role: 'model-intro', icon: 'model-description', alias: 'intro',
   },
   {
-    test: /^(highlights|key-facts)/, role: 'model-highlights', icon: 'model-key-facts', alias: 'keyfacts',
+    test: /^(highlights|key-facts|key-specifications|key-highlights)/, role: 'model-highlights', icon: 'model-key-facts', alias: 'keyfacts',
   },
   {
     test: /^technical-data/, role: 'model-techdata', icon: 'model-technical-data', alias: 'techdata',
