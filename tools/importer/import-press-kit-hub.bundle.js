@@ -53,18 +53,34 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/parsers/press-kit-hub-tiles.js
+  var ratioOf = (tile) => {
+    var _a, _b;
+    return (_b = (_a = tile.querySelector(".ratio-container")) == null ? void 0 : _a.className.match(/\bratio-(\d+x\d+)\b/)) == null ? void 0 : _b[1];
+  };
+  function rowTokens(tiles, rowIndex) {
+    const ratios = tiles.map(ratioOf);
+    const wide = ratios.filter((ratio) => ratio === "2x1").length;
+    const square = ratios.filter((ratio) => ratio === "1x1").length;
+    if (tiles.length === 1 && ["2x1", "4x1"].includes(ratios[0])) return ["press-half end"];
+    if (wide === 2 && square === 1 && tiles.length === 3) {
+      return ratios.map((ratio) => ratio === "2x1" ? "feature" : "press-square");
+    }
+    if (wide === 2 && tiles.length === 2 || wide === 1 && square === 2 && tiles.length === 3) {
+      return ratios.map((ratio) => ratio === "2x1" ? "press-half" : "press-quarter");
+    }
+    if (square === tiles.length && tiles.length === 5) return Array(5).fill("press-square");
+    if (square === tiles.length) {
+      return tiles.map((tile, index) => index === tiles.length - 1 && tiles.length % 4 ? "press-quarter end" : "press-quarter");
+    }
+    throw new Error(`Press-kit tile row ${rowIndex + 1} has an unsupported layout`);
+  }
   function parseTiles(content, document) {
-    const sourceRows = [...content.querySelectorAll(".panel-grid")].map((grid) => [...grid.querySelectorAll("article.article-teaser")]).filter((tiles) => tiles.length);
+    const sourceRows = [...content.querySelectorAll(".panel-grid")].filter((grid) => !grid.parentElement.closest(".panel-grid")).map((grid) => [...grid.querySelectorAll("article.article-teaser")]).filter((tiles) => tiles.length);
     if (!sourceRows.length) throw new Error("Press-kit hub has no chapter tiles");
     const rows = [["Cards (overlay, tiles)"]];
     sourceRows.forEach((tiles, rowIndex) => {
-      const wide = tiles.filter((tile) => tile.querySelector(".ratio-container.ratio-2x1")).length;
-      const square = tiles.filter((tile) => tile.querySelector(".ratio-container.ratio-1x1")).length;
-      const half = wide === 2 && tiles.length === 2 || wide === 1 && square === 2 && tiles.length === 3;
-      if (!(wide === 2 && square === 1 && tiles.length === 3 || half || wide === 0 && square === tiles.length && [4, 5].includes(tiles.length))) {
-        throw new Error(`Press-kit tile row ${rowIndex + 1} has an unsupported layout`);
-      }
-      tiles.forEach((tile) => {
+      const tokens = rowTokens(tiles, rowIndex);
+      tiles.forEach((tile, index) => {
         const sourceLink = tile.querySelector(":scope > a[href]");
         const sourceImage = tile.querySelector(".ratio-container img[src]");
         const heading = tile.querySelector(".heading");
@@ -79,11 +95,7 @@ var CustomImportScript = (() => {
         const link = document.createElement("a");
         link.href = sourceLink.href;
         link.textContent = title;
-        const isWide = !!tile.querySelector(".ratio-container.ratio-2x1");
-        let token = "press-square";
-        if (isWide) token = half ? "press-half" : "feature";
-        else if (tiles.length === 4 || half) token = "press-quarter";
-        rows.push([token, img, link]);
+        rows.push([tokens[index], img, link]);
       });
     });
     return WebImporter.DOMUtils.createTable(rows, document);
@@ -755,12 +767,17 @@ var CustomImportScript = (() => {
     return result;
   }
   function bannerAlt(href, img) {
-    if (/\.zip(?:$|[?#])/i.test(href)) return "Download the press kit ZIP";
+    if (/\.zip(?:$|[?#])/i.test(href) || /download/i.test(img.getAttribute("src").split("/").pop())) {
+      return "Download the press kit ZIP";
+    }
     if (/whatsapp/i.test(href)) return "Follow \u0160koda Storyboard on WhatsApp";
     if (/^https?:\/\/(?:www\.)?threads\.(?:com|net)\//i.test(href)) {
       return "\u0160koda on Threads: the latest news and updates from the world of \u0160koda";
     }
     if (/^https?:\/\/open\.spotify\.com\//i.test(href)) return "Listen to the #Explore\u0160koda Podcast on Spotify";
+    if (/^https?:\/\/(?:www\.)?(?:twitter|x)\.com\/skodaautonews\/?$/i.test(href)) {
+      return "Follow @skodaautonews on the X platform";
+    }
     const alt = (img.getAttribute("alt") || img.getAttribute("title") || "").trim();
     if (alt) return alt;
     throw new Error(`Press-kit hub banner has no accessible name: ${href}`);
@@ -779,6 +796,34 @@ var CustomImportScript = (() => {
       return p;
     });
   }
+  var isTimeline = (widget) => !!widget.querySelector(
+    '.twitter-timeline, iframe[src*="twitter.com"], script[src*="platform.twitter.com"]'
+  );
+  function textWidgets(content, document) {
+    const order = [...content.querySelectorAll("article.article-teaser, .widget_sow-editor .textwidget")];
+    const firstTile = order.findIndex((node) => node.matches("article.article-teaser"));
+    const intro = [];
+    const contacts = /* @__PURE__ */ new Map();
+    order.filter((node) => node.matches(".textwidget")).filter((widget) => !widget.querySelector("img") && !isTimeline(widget) && widget.textContent.trim()).forEach((widget) => {
+      const children = [...widget.children].map((child) => child.cloneNode(true));
+      if (firstTile < 0 || order.indexOf(widget) < firstTile) {
+        intro.push(...children);
+        return;
+      }
+      const grid = widget.closest(".panel-grid") || content;
+      if (!contacts.has(grid)) contacts.set(grid, []);
+      contacts.get(grid).push(children);
+    });
+    const outro = [...contacts.values()].flatMap((cells) => cells.length > 1 ? [WebImporter.DOMUtils.createTable([["Columns"], cells], document)] : cells[0]);
+    return { intro, outro };
+  }
+  function leakedDescription(document, hero) {
+    var _a;
+    const og = document.querySelector('meta[property="og:description"]');
+    if (!/^\s*Tweets by\b/i.test((og == null ? void 0 : og.content) || "")) return void 0;
+    og.remove();
+    return ((_a = hero.querySelector(".hero-caption .perex")) == null ? void 0 : _a.textContent.trim()) || void 0;
+  }
   var import_press_kit_hub_default = {
     transform: ({ document, url, params }) => {
       const article = document.querySelector("article.press_kit");
@@ -786,10 +831,12 @@ var CustomImportScript = (() => {
       const content = article == null ? void 0 : article.querySelector(":scope > .content");
       if (!article || !hero || !content) throw new Error("Expected a press-kit tiles hub with hero and content");
       const facets = sourceFacets(article);
+      const description = leakedDescription(document, hero);
+      if (description) facets.description = description;
       const heroBlock = parseHero(hero, document);
       const tilesBlock = parseTiles(content, document);
       const banners = bannerLinks(content, document);
-      const intro = [...content.querySelectorAll(".widget_sow-editor .textwidget")].filter((widget) => !widget.querySelector("img, a.twitter-timeline") && widget.textContent.trim()).flatMap((widget) => [...widget.children].map((child) => child.cloneNode(true)));
+      const { intro, outro } = textWidgets(content, document);
       const main = document.body;
       main.replaceChildren(article);
       article.replaceChildren(heroBlock);
@@ -802,6 +849,7 @@ var CustomImportScript = (() => {
           cells: { Style: "press-kit-banners" }
         }));
       }
+      if (outro.length) article.append(document.createElement("hr"), ...outro);
       const payload = {
         document,
         url,
