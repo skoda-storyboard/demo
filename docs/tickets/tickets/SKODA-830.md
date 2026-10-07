@@ -184,6 +184,43 @@ Evidence: `.migration/qa-830/run2/` (full run at cfa90ef) and `.migration/qa-830
     (Gallery → slider, page-title captions removed), and the new import contains them.
   - elroq-through-designers-eyes: DA edit at 09:22 with no rendered difference.
 
+### PR #269 review (2026-10-06, issuecomment-6024206752): fixed
+- **Media Box band background:** it was painted 100vw (only Related Stories was capped). The cap now sits on the
+  shared story `.section.dark::before` (`--story-dark-band-max-width: var(--cover-box-max-width)`).
+  On cruise-control at 1920 / 2560 / 3440: x 240 / 560 / 1000, width 1440, equal to origin (was full-viewport at x=0).
+- **Gap between bands:** a single 36px separator between the Media Box and Related Stories
+  (`.section.media-box + .section.dark.story-rail-container`, `--story-dark-band-gap: 2.25em`). The 24px gap from
+  Related Stories to the footer is unchanged. Measured 36 / 24 at 375 / 768 / 992 / 1080 / 1440 / 1920 / 2560 / 3440.
+- **Found while checking, pre-existing on main, not this PR:** the press-release Media Box band is 1248px wide
+  (x=656 at 2560) vs origin 1440px (x=560), with a 0px gap to the footer vs origin 16px.
+
+### PR #269 review (2026-10-07, saran-adobe, downloads.css:234): fixed
+- **Problem:** the collapsed Media Box `overflow: hidden` clipped the 2px + 2px focus ring of the edge tiles
+  (WCAG 2.4.7, css-guidelines §8).
+- **Fix:** the collapsed list gets `--dl-focus-room: 4px` padding on its top and sides, cancelled by an equal
+  negative margin, plus `box-sizing: border-box`. There is no bottom room, so the clip edge stays at the pill
+  bottom and the peek is unchanged.
+- **Measured** with branch code on Lake Como and the 4x4 release at 1440/992/768/375:
+  - 0 of 138 focusable tile controls have a clipped ring.
+  - A real Tab onto tile 1 gives `:focus-visible`, with the ring exactly at the clip edge (0px cut; it was 4px).
+  - Collapsed box: Lake Como 708.25/636.25/669.25/803.13, 4x4 708.25/636.25/645.25/779.13.
+  - Peek: 58 at all widths; grid x unchanged. All equal to the values before the fix and to origin.
+
+### PR #269 review (2026-10-07, vijayr-adobe, downloads.js:565): fixed
+- **Problem:** Safari 15.4 has ResizeObserver but no native `inert`, so the clipped rows-3+ controls stayed in the
+  tab order and the AT tree.
+- **Fix:** where `'inert' in HTMLElement.prototype` is false, a clipped tile gets `aria-hidden="true"` and its
+  controls `tabindex="-1"` (an author tabindex is kept in `data-dl-tabindex` and restored on expand). Native
+  engines are unchanged.
+- **Pointer:** clipped tiles get `pointer-events: none` via `[inert]`, which also matches without native support.
+- **Tests:** 2 new tests, one per path (fallback + author-tabindex round trip; native).
+- **Chrome check:**
+  - Native: 5 inert tiles, no extra attributes, 708.25 collapsed.
+  - Forced fallback (prototype removed before load): 5/5 `aria-hidden`, 25/25 clipped controls at -1, rows 1–2
+    untouched. Expand restores everything with nothing left over, and collapse re-applies.
+- **Noted for later:** `gallery` and `float-dock` also rely on native `inert`. The repo has no documented browser
+  baseline.
+
 ### Follow-ups (non-blocking)
 - D2-F1: without a ResizeObserver measurement, the tiles stay `inert` and the pill overlaps (outside the supported
   browsers). Apply collapsed + inert only once measured.

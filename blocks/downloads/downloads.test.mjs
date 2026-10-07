@@ -296,6 +296,62 @@ test('collapsed: the list is clipped to the measured two rows (row 3 peeks), cli
   window.setViewport(500);
 });
 
+test('without native inert (Safari < 15.5) clipped tiles leave the tab order and the AT tree', async () => {
+  const block = setup();
+  window.setViewport(1440); // four columns
+  for (let i = 0; i < 10; i += 1) addRow(block, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
+  assert.equal('inert' in window.HTMLElement.prototype, false, 'jsdom has no native inert');
+  await decorate(block);
+  const tiles = [...block.querySelectorAll('.downloads-item')];
+  const toggle = block.querySelector('.downloads-more');
+  const controls = (tile) => [...tile.querySelectorAll('a[href], button')];
+  const reachable = (tile) => controls(tile).filter((c) => c.getAttribute('tabindex') !== '-1').length;
+  assert.ok(controls(tiles[9]).length > 0, 'a clipped tile has controls');
+  tiles.slice(8).forEach((tile) => {
+    assert.equal(tile.getAttribute('aria-hidden'), 'true', 'clipped tile hidden from AT');
+    assert.equal(reachable(tile), 0, 'clipped controls are out of the tab order');
+  });
+  tiles.slice(0, 8).forEach((tile) => {
+    assert.equal(tile.hasAttribute('aria-hidden'), false);
+    assert.equal(reachable(tile), controls(tile).length, 'rows 1–2 stay reachable');
+  });
+
+  // an author tabindex survives the round trip
+  const authored = controls(tiles[9])[0];
+  toggle.click(); // expand
+  authored.setAttribute('tabindex', '0');
+  toggle.click(); // collapse
+  assert.equal(authored.getAttribute('tabindex'), '-1');
+  toggle.click(); // expand
+  assert.equal(authored.getAttribute('tabindex'), '0', 'author tabindex restored');
+  tiles.forEach((tile) => {
+    assert.equal(tile.hasAttribute('aria-hidden'), false, 'expanded: back in the AT tree');
+    assert.equal(tile.hasAttribute('inert'), false);
+  });
+  assert.equal(controls(tiles[8]).every((c) => !c.hasAttribute('tabindex') && !('dlTabindex' in c.dataset)), true, 'no tabindex left behind');
+  window.setViewport(500);
+});
+
+test('with native inert the clipped tiles only get the attribute', async () => {
+  const block = setup();
+  window.setViewport(1440);
+  Object.defineProperty(window.HTMLElement.prototype, 'inert', {
+    configurable: true,
+    get() { return this.hasAttribute('inert'); },
+    set(value) { this.toggleAttribute('inert', Boolean(value)); },
+  });
+  try {
+    for (let i = 0; i < 10; i += 1) addRow(block, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
+    await decorate(block);
+    const tiles = [...block.querySelectorAll('.downloads-item')];
+    assert.deepEqual(tiles.map((t) => t.hasAttribute('inert')), [...Array(10)].map((_, i) => i >= 8));
+    assert.equal(block.querySelectorAll('[aria-hidden="true"].downloads-item, .downloads-item [tabindex="-1"]').length, 0, 'native inert does the rest');
+  } finally {
+    delete window.HTMLElement.prototype.inert;
+    window.setViewport(500);
+  }
+});
+
 test('invalid collapse or column settings report errors rather than silently hiding content', async () => {
   const block = setup();
   addConfig(block, 'collapse', 'sometimes');
