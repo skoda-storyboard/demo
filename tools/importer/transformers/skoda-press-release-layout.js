@@ -33,6 +33,8 @@
 
 const TransformHook = { beforeTransform: 'beforeTransform', afterTransform: 'afterTransform' };
 const MARKER = 'data-pr-section';
+// skoda-nbsp.js / push-lib.mjs NBSP_PLACEHOLDER (keep in sync)
+const NBSP_PLACEHOLDER = '\u{F00A0}';
 const LAYOUT_ATTR = 'data-pr-layout';
 
 const SECTION_STYLES = {
@@ -86,7 +88,11 @@ function titleContent(document, h1) {
   });
   walk(h1);
   const parts = lines.map((line) => line.join('').replace(/\s+/g, ' ').trim()).filter(Boolean);
-  return parts.flatMap((line, i) => (i ? [document.createElement('br'), line] : [line]));
+  // a no-break space before each <br>, so the heading's text reads "record for", not
+  // "recordfor" (the gallery lightbox title is the h1's textContent, PR #267 review). html2md
+  // trims a plain space at a line break, so it is emitted as skoda-nbsp's placeholder, which
+  // push-lib's wrapPage turns back into U+00A0 before the DA upload.
+  return parts.flatMap((line, i) => (i < parts.length - 1 ? [`${line}${NBSP_PLACEHOLDER}`, document.createElement('br')] : [line]));
 }
 
 function isEmptyParagraph(p) {

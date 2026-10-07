@@ -123,9 +123,7 @@ test('Images chapter: each gallery group with `collapse auto` gets its own block
   await decorateDownloads(interior);
   assert.equal(exterior.querySelectorAll('.downloads-items > li:not([hidden])').length, 8, 'two rows at 1280');
   assert.equal(interior.querySelectorAll('.downloads-items > li:not([hidden])').length, 3);
-  // the source collapses a group once it needs more than two rows: at 1280 only Exterior does
-  // (the 3-tile Interior group collapses below 520px, SKODA-607a)
-  assert.equal(main.querySelectorAll('.downloads-more:not([hidden])').length, 1, 'only the group above two rows shows a control');
+  assert.equal(main.querySelectorAll('.downloads-more').length, 1, 'only the group above 8 tiles gets a control');
   assert.ok(exterior.querySelector('.downloads-more'));
   assert.equal(main.querySelectorAll('#media-box, .press-kit-show-more').length, 0);
 });

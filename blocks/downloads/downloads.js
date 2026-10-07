@@ -527,10 +527,13 @@ export default async function decorate(block) {
     // eslint-disable-next-line no-console
     console.error('downloads: media cart unavailable', e);
   });
-  // The source collapses once the tiles need more than two rows at the current width (a
-  // 5-tile press-release box below 768px, SKODA-607a); syncVisibility() hides the toggle
-  // whenever they fit. Two tiles always fit (two rows of the one-column grid).
-  if ((cfg.collapse === 'auto' || (cfg.collapse === null && mediaBox)) && list.children.length > 2) {
+  // A Media Box collapses once its tiles need more than two rows at the current width, as on
+  // the source (a 5-tile press-release box below 768px, SKODA-607a); two tiles always fit.
+  // Other `collapse auto` groups (press-kit Images chapters) keep the >8 gate: their grid
+  // stays one column until 768 while the source's goes 2-up at 520, so counting rows on it
+  // would collapse groups the source shows open (PR #267 review).
+  const minTiles = mediaBox ? 3 : 9;
+  if ((cfg.collapse === 'auto' || (cfg.collapse === null && mediaBox)) && list.children.length >= minTiles) {
     disclosureSeq += 1;
     list.id = `downloads-items-${disclosureSeq}`;
     const toggle = document.createElement('button');

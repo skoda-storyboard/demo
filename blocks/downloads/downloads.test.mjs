@@ -157,6 +157,17 @@ test('a press-release Media Box collapses only while its tiles need more than tw
   assert.equal(toggle.getAttribute('aria-expanded'), 'false');
   assert.equal(visible(), 2);
 
+  // an Images-chapter group (collapse auto, not a media box) keeps the >8 gate: its grid is
+  // one column until 768, the source's 2-up from 520 (PR #267 review)
+  const group = setup(false);
+  addConfig(group, 'collapse', 'auto');
+  for (let i = 0; i < 4; i += 1) addRow(group, { title: `Image ${i}`, links: [['Original', `/group${i}.jpg`]] });
+  window.setViewport(600);
+  await decorate(group);
+  assert.equal(group.querySelector('.downloads-more'), null);
+  assert.equal([...group.querySelectorAll('.downloads-item')].filter((tile) => tile.hidden).length, 0);
+  window.setViewport(500);
+
   // eight tiles fit two 4-up rows from 992 only
   const eight = setup();
   for (let i = 0; i < 8; i += 1) addRow(eight, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });

@@ -289,6 +289,7 @@ var CustomImportScript = (() => {
   // tools/importer/transformers/skoda-press-release-layout.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var MARKER = "data-pr-section";
+  var NBSP_PLACEHOLDER = "\u{F00A0}";
   var LAYOUT_ATTR = "data-pr-layout";
   var SECTION_STYLES = {
     body: "body-column",
@@ -329,7 +330,7 @@ var CustomImportScript = (() => {
     });
     walk(h1);
     const parts = lines.map((line) => line.join("").replace(/\s+/g, " ").trim()).filter(Boolean);
-    return parts.flatMap((line, i) => i ? [document.createElement("br"), line] : [line]);
+    return parts.flatMap((line, i) => i < parts.length - 1 ? [`${line}${NBSP_PLACEHOLDER}`, document.createElement("br")] : [line]);
   }
   function isEmptyParagraph(p) {
     return !text3(p) && !p.querySelector("img, picture, a[href], iframe");
@@ -1110,7 +1111,7 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/transformers/skoda-nbsp.js
-  var NBSP_PLACEHOLDER = "\u{F00A0}";
+  var NBSP_PLACEHOLDER2 = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform5(hookName, element, payload) {
     if (hookName !== "preprocess") return;
@@ -1122,7 +1123,7 @@ var CustomImportScript = (() => {
     );
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
       if (node.nodeValue.includes("\xA0")) {
-        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER.repeat(run.length));
+        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER2.repeat(run.length));
       }
     }
   }
