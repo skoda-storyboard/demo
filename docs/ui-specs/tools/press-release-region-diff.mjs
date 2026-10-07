@@ -2,9 +2,11 @@
 /*
  * SKODA-607a per-pixel visual diff, per page region (template-press-release.md §10: article +
  * secondary + bands), source vs EDS, at each width. docs/ui-specs/tools/visual-diff.mjs takes
- * one selector for both pages; the source and EDS DOMs differ, so each region is cropped from
- * a full-page shot by its own selector on each side. Same pixelmatch settings as the harness
- * (threshold 0.1, includeAA false); the % is mismatched pixels / padded region area.
+ * one selector for both pages; the source and EDS DOMs differ, so each region is found by its
+ * own selector on each side and shot in viewport tiles while scrolling (no full-page shot: one
+ * side re-lays out on it). Each pair is padded to the larger box, so content missing on either
+ * side counts. Same pixelmatch settings as the harness (threshold 0.1, includeAA false); the %
+ * is mismatched pixels / padded region area.
  *
  *   node press-release-region-diff.mjs <slug> [widths] [edsPrefix] [outDir]
  */
@@ -49,7 +51,8 @@ function regions(isSource) {
     return {
       header: strip(rect([q('article .container > header')])),
       article: rect([q('.column-primary')]),
-      sidebar: rect([q('.column-secondary')]),
+      // the column stretches to the row: measure its content (the visible groups)
+      sidebar: rect([...q('.column-secondary').children]),
       mediaBox: strip(rect([bands[0]])),
       related: strip(rect([bands[1]])),
       page: doc,
@@ -58,7 +61,7 @@ function regions(isSource) {
   return {
     header: strip(rect([q('main > .section.press-release-header')])),
     article: rect([...document.querySelectorAll('main > .section.body-column')]),
-    sidebar: rect([q('main > .section.sidebar')]),
+    sidebar: rect([...(q('main > .section.sidebar aside') || q('main > .section.sidebar') || { children: [] }).children]),
     mediaBox: strip(rect([q('main > .section.media-box')])),
     related: strip(rect([q('main > .section.related')])),
     page: doc,
@@ -142,8 +145,7 @@ try {
         results.push({ width, name, pct: 100, note: `${a ? 'EDS' : 'source'} has no ${name}` });
         return;
       }
-      // the source sidebar column stretches to the row; compare the same height on both
-      const H = name === 'sidebar' ? Math.min(a.h, Math.max(b.h, 1)) : Math.max(a.h, b.h);
+      const H = Math.max(a.h, b.h);
       const W = Math.max(a.w, b.w);
       const at = { x: 0, y: 0, w: a.w, h: a.h };
       const bt = { x: 0, y: 0, w: b.w, h: b.h };

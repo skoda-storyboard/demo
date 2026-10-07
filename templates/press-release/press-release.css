@@ -204,14 +204,18 @@ body.press-release main > .section.dark {
 
 body.press-release main > .section.media-box {
   margin-top: calc(var(--pr-band-gap) - var(--pr-gutter));
-
-  /* the source tile grid keeps its last row's 20px bottom margin */
-  padding-bottom: calc(var(--pr-band-padding-bottom) + var(--paragraph-gap));
 }
 
-/* ...but a collapsed box ends on its Show more pill (the source clips the tiles above it) */
-body.press-release main > .section.media-box:has(.downloads-more:not([hidden])) {
-  padding-bottom: var(--pr-band-padding-bottom);
+/* The source tile grid keeps its last row's 20px bottom margin, so an open box ends 80px below
+   its tiles. With Show more, the pill sits where it would without that margin: collapsed it
+   ends the box 60px above the band edge, expanded too (2442.9 / 2440px at 500, Superb). The
+   margin lives on the list, so the band is the same whether the pill shows or not. */
+body.press-release .section.media-box .downloads-items {
+  padding-bottom: var(--paragraph-gap);
+}
+
+body.press-release .section.media-box .downloads-more {
+  margin-top: calc(var(--dl-toggle-gap) - var(--paragraph-gap));
 }
 
 body.press-release .section.dark .default-content-wrapper > h2 {

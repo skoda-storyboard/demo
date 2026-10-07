@@ -19,7 +19,7 @@ The remaining page-level alignment and the final visual gate on the five M1 pres
 | ″ | The last body part ends with `--pr-column-end` (60px), the sidebar with `--pr-sidebar-end` (24px) + `--pr-side-banner-slot` (30px) | `.column-primary` mb 60, `.column-secondary` mb 24, the empty 15px side-banner slot + its 15px gap (banner out of scope, SKODA-903) |
 | ″ | Media Box `margin-top: calc(32px − gutter)`; each dark band `margin-bottom: 16px` | `.columns` row margin −10px before the band's 32px; `.cover-box` 32/16 margins (the white strip between the bands and before the footer) |
 | ″ | Podcast player 20px lower (padding, `press-release-lead` only) | `.entry-content` opens with an empty TinyMCE `<p>` (20px) before the Buzzsprout player, on all 5 |
-| ″ | Media Box stats line 4px top padding, 20px to the tiles; +20px below the tiles unless collapsed | `.search-results-stats` padding-top 4px / mb 20; the tile grid keeps its last row's 20px margin; a collapsed box ends on its Show more pill |
+| ″ | Media Box stats line 4px top padding, 20px to the tiles; the tile list carries the last row's 20px, and the Show more pill sits 20px closer to compensate | `.search-results-stats` padding-top 4px / mb 20; the source grid keeps its last row's 20px margin; a collapsed or expanded box ends 60px below its pill (Superb 500: 1148.3 = 1148.3 collapsed, 2442.9 / 2440 expanded). The first version keyed the band padding on the pill's visibility (`:has()`, review finding 4) |
 | ″ | Sidebar tag rows: no row gap, no `li` margin | 24px rows on the source; EDS added the global `li` 8px margin and a 5px gap |
 | ″ | Lead image: rounded (`--card-radius`) clipping frame, resting `scale: 1.02`; the rule only matches the lead part | The source `.article-teaser` frame (radius 8, `transform: … scale(1.02)`). A later body part (after a callout) may start with an image (SKODA-824 re-review R1) |
 | `templates/press-release/press-release.js` | `decorateBody()` marks the first body part `press-release-lead` | Lead-only rules; the FAQ callout's bold questions are not a perex (R5) |
@@ -54,32 +54,32 @@ Before this ticket (main, 2026-10-06), the Media Box top was −82…−168px of
 **Regression:** the Media Box collapse matches the source on all 39 press-kit Media Boxes × 500/768/1280. Press-kit **Images chapters** behave as on `main`: no disclosure under 9 tiles. The first version of this PR also collapsed 3–4 tile groups at 520–767, where the source shows them open; review fix. So small groups still don't collapse below 520, where the source does, and that waits on the standard grid's 1→2 column step moving to 520 (Downloads follow-up). The corpus Octavia release improves from −146 to −56px at 1280 (its content isn't re-imported yet).
 
 ## Per-pixel diff (≤2% gate), recorded
-[`docs/ui-specs/tools/press-release-region-diff.mjs`](../../ui-specs/tools/press-release-region-diff.mjs): regions per template-press-release.md §10, each cropped by its own selector on each side. Each region is shot in viewport tiles while scrolling, because a full-page capture makes one side re-lay out. pixelmatch threshold 0.1, `includeAA: false` (as `docs/ui-specs/tools/visual-diff.mjs`). Consent accepted; fixed/sticky chrome (the source share buttons, the EDS float dock) hidden on both sides.
+[`docs/ui-specs/tools/press-release-region-diff.mjs`](../../ui-specs/tools/press-release-region-diff.mjs): regions per template-press-release.md §10, each cropped by its own selector on each side. Each region is shot in viewport tiles while scrolling, because a full-page capture makes one side re-lay out. Each pair is padded to the larger box, so content missing on either side counts; the sidebar is measured by its content on both sides (the source column stretches to the row). pixelmatch threshold 0.1, `includeAA: false` (as `docs/ui-specs/tools/visual-diff.mjs`). Consent accepted; fixed/sticky chrome (the source share buttons, the EDS float dock) hidden on both sides.
 
 | Release | Width | Header | Article | Sidebar | Media Box | Related | Full page |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Peaq | 1280 | 0.09 | 0.49 | 1.48 | 1.49 | 4.34 ✗ | 13.45 ✗ |
-| Peaq | 1024 | 0.11 | 0.47 | 0.41 | 1.45 | 3.70 ✗ | 12.40 ✗ |
-| Peaq | 768 | 0.15 | 0.85 | 0.63 | 1.63 | 5.88 ✗ | 16.36 ✗ |
-| Peaq | 500 | 0.18 | 0.64 | 1.49 | 3.19 ✗ | 14.45 ✗ | 28.87 ✗ |
-| National Theatre | 1280 | 0.13 | 19.51 ✗ | 6.81 ✗ | 9.73 ✗ | 7.64 ✗ | 16.36 ✗ |
-| National Theatre | 1024 | 0.16 | 16.52 ✗ | 8.47 ✗ | 6.19 ✗ | 6.45 ✗ | 15.07 ✗ |
-| National Theatre | 768 | 0.17 | 13.85 ✗ | 5.32 ✗ | 5.17 ✗ | 8.76 ✗ | 15.35 ✗ |
-| National Theatre | 500 | 0.26 | 13.55 ✗ | 16.57 ✗ | 21.26 ✗ | 11.59 ✗ | 27.40 ✗ |
-| Board | 1280 | 0.11 | 9.05 ✗ | 1.66 | 1.74 | 4.13 ✗ | 10.66 ✗ |
-| Board | 1024 | 0.14 | 8.96 ✗ | 4.31 ✗ | 1.61 | 3.70 ✗ | 10.28 ✗ |
-| Board | 768 | 0.19 | 8.91 ✗ | 3.47 ✗ | 1.84 | 6.29 ✗ | 12.60 ✗ |
-| Board | 500 | 0.22 | 8.57 ✗ | 6.33 ✗ | 5.51 ✗ | 13.34 ✗ | 19.28 ✗ |
-| Zellmer | 1280 | 0.11 | 4.82 ✗ | 1.73 | 0.54 | 3.60 ✗ | 12.50 ✗ |
-| Zellmer | 1024 | 0.14 | 5.94 ✗ | 0.51 | 0.70 | 3.75 ✗ | 12.10 ✗ |
-| Zellmer | 768 | 0.19 | 7.10 ✗ | 0.51 | 0.67 | 4.55 ✗ | 14.71 ✗ |
-| Zellmer | 500 | 0.23 | 7.19 ✗ | 1.11 | 1.25 | 6.68 ✗ | 19.19 ✗ |
-| Superb | 1280 | 0.11 | 5.47 ✗ | 1.97 | 1.77 | — | 9.17 ✗ |
-| Superb | 1024 | 0.14 | 6.70 ✗ | 2.63 ✗ | 1.57 | — | 9.35 ✗ |
-| Superb | 768 | 0.15 | 7.14 ✗ | 1.13 | 1.59 | — | 11.15 ✗ |
-| Superb | 500 | 0.23 | 7.29 ✗ | 1.79 | 4.07 ✗ | — | 20.28 ✗ |
+| Peaq | 1280 | 0.09 | 0.51 | 2.12 ✗ | 1.60 | 4.39 ✗ | 13.45 ✗ |
+| Peaq | 1024 | 0.11 | 0.96 | 0.45 | 1.59 | 3.77 ✗ | 12.55 ✗ |
+| Peaq | 768 | 0.15 | 0.93 | 0.95 | 1.70 | 6.01 ✗ | 16.41 ✗ |
+| Peaq | 500 | 0.18 | 0.86 | 2.26 ✗ | 3.42 ✗ | 14.50 ✗ | 28.97 ✗ |
+| National Theatre | 1280 | 0.13 | 19.51 ✗ | 8.06 ✗ | 9.73 ✗ | 7.64 ✗ | 16.38 ✗ |
+| National Theatre | 1024 | 0.16 | 16.52 ✗ | 8.78 ✗ | 6.19 ✗ | 6.45 ✗ | 15.07 ✗ |
+| National Theatre | 768 | 0.17 | 13.85 ✗ | 5.60 ✗ | 5.17 ✗ | 8.62 ✗ | 15.35 ✗ |
+| National Theatre | 500 | 0.26 | 13.55 ✗ | 17.03 ✗ | 21.26 ✗ | 11.59 ✗ | 27.40 ✗ |
+| Board | 1280 | 0.11 | 9.05 ✗ | 1.96 | 1.74 | 4.13 ✗ | 10.67 ✗ |
+| Board | 1024 | 0.14 | 8.96 ✗ | 4.44 ✗ | 1.61 | 3.70 ✗ | 10.28 ✗ |
+| Board | 768 | 0.19 | 8.91 ✗ | 4.00 ✗ | 1.84 | 6.31 ✗ | 12.60 ✗ |
+| Board | 500 | 0.22 | 8.57 ✗ | 6.49 ✗ | 5.51 ✗ | 13.34 ✗ | 19.29 ✗ |
+| Zellmer | 1280 | 0.11 | 4.82 ✗ | 2.32 ✗ | 0.54 | 3.60 ✗ | 12.50 ✗ |
+| Zellmer | 1024 | 0.14 | 5.94 ✗ | 0.53 | 0.70 | 3.75 ✗ | 12.10 ✗ |
+| Zellmer | 768 | 0.19 | 7.10 ✗ | 0.55 | 0.67 | 4.55 ✗ | 14.71 ✗ |
+| Zellmer | 500 | 0.23 | 7.19 ✗ | 1.14 | 1.25 | 6.68 ✗ | 19.19 ✗ |
+| Superb | 1280 | 0.11 | 5.47 ✗ | 2.34 ✗ | 1.77 | — | 9.15 ✗ |
+| Superb | 1024 | 0.14 | 6.70 ✗ | 2.73 ✗ | 1.57 | — | 9.36 ✗ |
+| Superb | 768 | 0.15 | 7.14 ✗ | 1.20 | 1.59 | — | 11.15 ✗ |
+| Superb | 500 | 0.23 | 7.29 ✗ | 1.84 | 4.07 ✗ | — | 20.28 ✗ |
 
-**Gate result: FAIL.** 49 of 96 region measurements (the full-page column excluded) are ≤2%: every header, Peaq's article, most sidebars and Media Boxes at ≥768. Peaq, the only release without quotes, has an article at 0.47–0.85% at every width.
+**Gate result: FAIL.** 45 of 96 region measurements (the full-page column excluded) are ≤2% (re-run 2026-10-07 after the review fixes): every header, Peaq's article, about half the sidebars and most Media Boxes at ≥768. Peaq, the only release without quotes, has an article at 0.51–0.96% at every width. The first run reported 49/96 because its sidebar crop cut both sides to the shorter height (review finding 5).
 
 ## Blockers for the 2% gate
 Each is measured. None is press-release template CSS, so none is fixed here.
