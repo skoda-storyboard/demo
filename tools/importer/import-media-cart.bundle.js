@@ -35,13 +35,13 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // .migration/wt-505b/tools/importer/import-media-cart.js
+  // tools/importer/import-media-cart.js
   var import_media_cart_exports = {};
   __export(import_media_cart_exports, {
     default: () => import_media_cart_default
   });
 
-  // .migration/wt-505b/tools/importer/transformers/skoda-listing-cleanup.js
+  // tools/importer/transformers/skoda-listing-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
@@ -89,7 +89,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // .migration/wt-505b/tools/importer/transformers/skoda-media-cart.js
+  // tools/importer/transformers/skoda-media-cart.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform2(hookName, element, payload) {
     if (hookName !== TransformHook2.afterTransform) return;
@@ -111,7 +111,7 @@ var CustomImportScript = (() => {
     element.replaceChildren(...nodes);
   }
 
-  // .migration/wt-505b/tools/importer/transformers/skoda-metadata.js
+  // tools/importer/transformers/skoda-metadata.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -203,6 +203,69 @@ var CustomImportScript = (() => {
     } catch (e) {
     }
     return "";
+  }
+  var CATEGORY_PARENTS = {
+    "120-years-of-skoda-motorsport": "motorsport",
+    adventures: "lifestyle",
+    "annual-reports": "media",
+    citigo: "models",
+    connectivity: "innovation-and-technology",
+    cycling: "sports",
+    design: "skoda-world",
+    elroq: "models",
+    enyaq: "models",
+    "enyaq-coupe-rs-iv": "models",
+    epiq: "models",
+    fabia: "models",
+    heritage: "skoda-world",
+    hockey: "sports",
+    "innovation-and-technology": "skoda-world",
+    kamiq: "models",
+    "kamiq-china": "models",
+    karoq: "models",
+    kodiaq: "models",
+    kushaq: "models",
+    kylaq: "models",
+    livestream: "media",
+    motorsport: "lifestyle",
+    octavia: "models",
+    "octavia-combi": "models",
+    "octavia-combi-greenline": "models",
+    "octavia-combi-rs": "models",
+    "octavia-greenline": "models",
+    "octavia-rs": "models",
+    "octavia-scout": "models",
+    other: "media",
+    "peaq-en": "models",
+    people: "lifestyle",
+    rapid: "models",
+    "rapid-spaceback": "models",
+    responsibility: "skoda-world",
+    scala: "models",
+    slavia: "models",
+    speeches: "media",
+    sports: "lifestyle",
+    superb: "models",
+    "superb-combi": "models",
+    "technical-data": "media",
+    technology: "innovation-and-technology",
+    yeti: "models",
+    "yeti-outdoor": "models"
+  };
+  function extractCategories(document) {
+    const cls = document.body && document.body.getAttribute("class") || "";
+    const id = cls.match(/\bpostid-(\d+)\b/);
+    const post = id && document.querySelector(`article.post-${id[1]}`);
+    const out = [];
+    String(post && post.getAttribute("class") || "").split(/\s+/).forEach((token) => {
+      const m = token.toLowerCase().match(/^category-([a-z0-9_-]+)$/);
+      let slug = m && m[1];
+      while (slug && !out.includes(slug)) {
+        out.push(slug);
+        slug = CATEGORY_PARENTS[slug];
+      }
+    });
+    return out;
   }
   function extractTagsAndFacets(document, pageUrl = "") {
     const tags = [];
@@ -310,6 +373,8 @@ var CustomImportScript = (() => {
     if (overrides.theme) meta.theme = overrides.theme;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
+    const categories = template === "story" ? extractCategories(document) : [];
+    if (categories.length) meta.categories = categories.join(", ");
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
     FACETS.forEach((f) => {
@@ -320,7 +385,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // .migration/wt-505b/tools/importer/transformers/skoda-nbsp.js
+  // tools/importer/transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform4(hookName, element, payload) {
@@ -338,7 +403,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // .migration/wt-505b/tools/importer/import-media-cart.js
+  // tools/importer/import-media-cart.js
   var PAGE_TEMPLATE = {
     name: "media-cart",
     description: "\u0160koda media cart page (body.media-cart). Emits a dark h1 section + an empty Media Cart block (blocks/media-cart, SKODA-505b); the cart widget and package history are client-side and not ported. Metadata template=page.",

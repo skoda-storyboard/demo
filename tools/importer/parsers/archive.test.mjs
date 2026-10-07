@@ -94,12 +94,12 @@ test('archives without a featured card emit no feature rows', { skip }, () => {
   assert.ok(!rows(doc.querySelector('table')).some(([k]) => k === 'feature'));
 });
 
-test('category and sub-category archives → Stories scoped by the story path prefix', { skip }, () => {
-  [['https://www.skoda-storyboard.com/en/category/emobility/', '/en/emobility/'],
-    ['https://www.skoda-storyboard.com/en/category/lifestyle/people/', '/en/lifestyle/people/']].forEach(([url, path]) => {
+test('category and sub-category archives → Stories scoped by categories (SKODA-831, archive-list.test.mjs)', { skip }, () => {
+  [['https://www.skoda-storyboard.com/en/category/emobility/', 'emobility'],
+    ['https://www.skoda-storyboard.com/en/category/lifestyle/people/', 'people']].forEach(([url, slug]) => {
     const doc = page(url, GRID);
     archiveList(doc.querySelector('.search-results-items'), { document: doc });
-    assert.deepEqual(rows(doc.querySelector('table'))[3], ['path', path]);
+    assert.deepEqual(rows(doc.querySelector('table'))[3], ['categories', slug]);
   });
 });
 

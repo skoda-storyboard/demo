@@ -137,6 +137,7 @@
         "path",
         "template",
         "category",
+        "categories",
         "tag",
         "tags",
         "heading",
