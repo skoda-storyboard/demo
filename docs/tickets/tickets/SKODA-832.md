@@ -6,9 +6,9 @@
 - **GitHub issue:** [#261](https://github.com/skoda-storyboard/demo/issues/261)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §3.1 / §8 F1; follows up the interim noted in [SKODA-208](SKODA-208.md)
 - **Branch:** `skoda-832-octavia-hubs-reimport`
-- **Status (2026-10-07):** 🟡 **9 hubs pushed to DA and previewed** (9 × update, 0 conflicts, 9/9 preview 200), not
-  published. QA (2026-10-07): content PASS; rendered FAIL on D2 (lone download banner, code-only fix pending).
-  RS 245 is excluded (D1: no importer for its template).
+- **Status (2026-10-07):** 🟢 **9 hubs published** (PR #281 merged; 9/9 live 200 + indexed, after a publish dry-run
+  showed DA = the QA'd content). Open follow-ups: lone banner sizing → SKODA-835 (#279); RS 245 → SKODA-836 (#280),
+  still on its flattened page-base doc.
 
 ## Problem
 The 10 Octavia-rail press kits were imported through `page-base` as an interim. 9 of them are hubs, so the chapter
@@ -85,7 +85,7 @@ Evidence: `.migration/qa-832/` (outside git).
 - [x] No Twitter junk; sane description; no text or image lost vs the current DA docs
 - [ ] Rendered QA (measured, 1440/992/768/375) vs origin, incl. the contacts Columns and the two size approximations
 - [x] `media:apply`, DA dry-run, push + preview (2026-10-07: 9 hubs; RS 245 excluded, D1)
-- [ ] Publish (separate go-ahead). Follow-ups: D2 banner sizing → [SKODA-835](SKODA-835.md) (#279); D1 RS 245 → [SKODA-836](SKODA-836.md) (#280)
+- [x] Published 2026-10-07 (9/9 live, indexed). Follow-ups: D2 banner sizing → [SKODA-835](SKODA-835.md) (#279); D1 RS 245 → [SKODA-836](SKODA-836.md) (#280)
 
 ## Follow-ups
 - The cards tiles block has no full-width or one-third tile size (block change), which is behind the 2 approximations.
