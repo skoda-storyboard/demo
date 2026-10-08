@@ -5,7 +5,7 @@
 - **GitHub issue:** [#279](https://github.com/skoda-storyboard/demo/issues/279)
 - **Phase:** A · **Milestone:** M1
 - **Origin:** SKODA-832 QA (2026-10-07, defect D2), deferred by the user when PR for SKODA-832 was opened as is
-- **Status (2026-10-07):** 🟡 ready for QA (branch `skoda-835-hub-banner-size`; CSS only, no content change)
+- **Status (2026-10-08):** 🟢 QA PASS (Architect-run, 2026-10-08); PR open. CSS only: the 9 published hubs pick it up on merge, no re-push.
 
 ## Problem
 `.section.press-kit-banners` lays its banners out with `repeat(auto-fit, minmax(min(100%, 25rem), 1fr))`, so a hub
@@ -27,6 +27,34 @@ On origin the download banner is a tile of the hub grid: a square takes a quarte
   already match origin and must not change.
 - Banner gap to the tile grid: origin 20px, EDS 40px (SKODA-832 QA D7).
 - No re-import or re-push: the content is already in DA (SKODA-832).
+
+## QA result (2026-10-08, head df63618 + main merge)
+Run by the Architect directly. Branch code was served locally against main's content and compared with main's code on
+`.aem.live`; origin values are from the developer's table and the SKODA-832 QA.
+
+| Hub | Width | Main (before) | Branch | Origin |
+|---|---|---|---|---|
+| RS Experience, Scout, IAA 2019 (square) | 1440 / 992 / 375 | 1228 / 972 / 355 | **292 / 228 / 355** | 292 (IAA 307) / 228 (IAA 243) / 355 |
+| Octavia (4:1 strip) | 1440 / 992 / 375 | 1228×307 / 972×243 / 355×89 | **604×151 / 476×119 / 355×89** | 634×159 / 506×127 / 385×96 |
+| Albania, Media Launch (2 banners) | 1440 / 992 / 375 | 602×301 ×2 / 474×237 ×2 / 355×178 | unchanged | = |
+| Superb (2:1), Vision O (4) | all | unchanged | unchanged | (M2, not in scope) |
+| Tiles → banner gap | all | 40 | **20** | 20 (varies 10–44 by hub) |
+
+- **Aspect detection:** the `width`/`height` attributes are the banner images' real pixel sizes, set at media
+  ingest: 800×800 squares, 1920×480 strip, 1600×800 for 2:1. They change only if an image is replaced, and a
+  replaced image falls back to today's full-row layout. **Accepted.**
+- **Checks:**
+  - No horizontal overflow at any measured width.
+  - The banner is still a link (`<a>` wraps the picture) and the centre click hits the link.
+  - The image keeps its width/height attributes, so no layout shift.
+- **Tests:** stylelint and `npm run lint` clean; press-kit template tests 8/8.
+
+### Accepted differences (user, 2026-10-08)
+- A square banner starts the row (x 106 / 10); origin places it in column 2.
+- On the three "307" hubs, the banner follows our tile grid (292) instead of origin's 307 cells.
+- The gap is 20px on every hub (origin varies 10–44).
+- Hub tile approximations from SKODA-832 QA D3/D4: 5-across resource tiles, the Scout half-width 4:1 intro tile,
+  the 4x4 1/3 squares shown as quarters.
 
 ## Acceptance Criteria
 - [~] The 6 single-banner hubs match origin banner geometry (±2px) at 1440 / 992 / 768 / 375: size matches on the
