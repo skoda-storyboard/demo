@@ -127,19 +127,29 @@ All files below are under `www.skoda-storyboard.com/direct-download/`, except th
   Cache-bypass/revalidation probes and original-rendition
   routes also return 404. The manifest retains `steps.publish: pending`; no public proof
   was fabricated and no blind reactivation or replacement upload ran.
+- With refreshed author access, the native publish-agent log confirms
+  `Successfully applied package`, type `ADD`, at `2026-10-08T16:39:08.947Z` for the exact
+  WebP path (package `dstrpck-1791477547317-b7ff990d-c088-4b05-b7dc-52bceafef66b`).
+  Both `persisted` and `fully published` queues are `Idle`, with **0 pending items**.
+  The same-folder JPEG returns anonymous 200 while the WebP still returns 404.
+  Distribution succeeded; public-original delivery remains unproven. A format-specific
+  Dispatcher restriction is plausible, not confirmed without the active configuration.
 - Regenerated the media cart resolver index from verified publication proof. The pending WebP
   is excluded. All 233 added assets and 421 first-party source links resolve correctly;
   all 2,508 previous indexed assets retain their paths, MIME, and bytes.
   The generated index check and all 124 focused media/resolver tests pass.
 - The stored REST token subsequently returned 401 during follow-up author inspection.
   Activation had already run successfully; authenticated MCP asset search remained available.
-  Refresh the local REST token before resuming the scoped CLI publisher.
+  The user refreshed the token; normalizing the local secret file restored authenticated
+  author HEAD 200 with `image/webp` and 51,012 bytes. The credential remains local and
+  gitignored with permissions `600`; no credential values were recorded or committed.
 - No DA content writes, previews, or page publication ran. Issue #300 remains open.
 
 ## Next
-1. Investigate the remaining WebP's AEM publish-side delivery failure, then resume scoped
-   verification from its pending state with a refreshed local REST token; do not force
-   reactivation without establishing the cause.
+1. Inspect the AEM publish/Dispatcher project's active delivery configuration for the
+   remaining WebP's public 404; that configuration is not in this EDS repository.
+   Author access is restored and distribution succeeded. Resume scoped verification
+   from the pending state once public delivery works; do not force reactivation.
 2. With the 33 binary originals publicly verified, `media:apply`, push + preview of the 3 chapters (content in `.migration/f7/import-pk/`)
    and the 20 new blocked pages (`.migration/new-content/import/`).
 3. Publish the pages (separate go-ahead).
