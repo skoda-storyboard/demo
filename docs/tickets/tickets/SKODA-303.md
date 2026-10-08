@@ -104,15 +104,22 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
 **SKODA-303a follow-up (#243, decided 2026-10-08, branch `skoda-303a-locale-links`):**
 - **Conflict:** SKODA-609's link pass already sent the locale links to the live site in a new tab, so the "keep the
   page path" rule above never applied on `main`, and `header-locales.test.mjs` failed.
-- **Rule (option A, PO):** every locale links its **live locale home** in the **same tab**, as the source
-  (`https://www.skoda-storyboard.com/cs/`; Media Room `…/cs/media-room/`). Media Room DE stays on `skoda-media.de` in
-  a new tab. The path swap (`localizedPath`) is removed: the source translates its slugs, so it 404'd on both sites.
-- **Code:** in `scripts/links.js`, `LIVE_SAME_TAB` gains the locale homes and those targets get the source's slash.
-  In `header-locales.js`, a new tab only for another site, and a broken authored href falls back to the siblings'
-  pattern.
-- **Content:** the published `/media-room/nav` still authors `/cs/` … and `/de/`. Its preview already has
-  `/cs/media-room` … + `skoda-media.de` (that's the only difference), so the Media Room needs that fragment
-  published.
+- **Rule (Lars on #243, adopted by the PO; supersedes the first "live locale home" pass):** the switcher is generated
+  from the page's **hreflang alternates** (`alternates` metadata). Each locale links its declared translated URL;
+  nothing is inferred from the locale prefix (`localizedPath` removed); locales without a translation are omitted;
+  `x-default` is ignored; the current locale is plain text; desktop and the drawer share one list; there is no
+  locale-home fallback. Links open in the same tab, as the source. Media Room DE keeps the visible source behaviour
+  (`skoda-media.de`, new tab) through the nav row's authored link.
+- **Migration caveat:** the source hreflang only proves the translation exists on the source. Each one must resolve
+  to a published EDS variant or to a permitted legacy (live) URL in its own locale's tree; anything else is dropped.
+- **Code:** `header-locales.js` (`parseAlternates`, `permittedTranslation`), the list is marked
+  `data-link-policy="resolved"`, and `scripts/links.js` leaves such links alone. The importer writes `alternates`
+  (`skoda-metadata.js` + `skoda-metadata-extract.mjs::pickAlternates`; the 19 bundles are rebuilt).
+- **Content:** the 245 published pages imported before this get their `alternates` from the bulk metadata sheet
+  (`tools/importer/build-locale-alternates.mjs`, rows only `URL` + `alternates`; no page document touched). Dry run
+  2026-10-08: 242 pages with translations, 0 dead; 2 without any (Elroq press kit 2, `category/design-eng`, EN only,
+  as the source); `/en/test/listing-demo` skipped (no source). `/media-room/nav` was published (it still had the
+  locale homes and `/de/`).
 
 ## Dependencies
 - Upstream: SKODA-301 (Header + nav fragment) / Downstream: SKODA-1003 (language-negotiated root routing + per-locale placeholders)

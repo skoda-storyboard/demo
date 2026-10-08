@@ -4,7 +4,7 @@ import attachSuggest from '../../scripts/search-suggest.js';
 import iconsReady from '../../scripts/icons-ready.js';
 import { hrefPath, pickActiveTab } from './header-switcher.js';
 import {
-  buildLocaleList, currentLocale, isLocaleGroup, localeEntries,
+  buildLocaleList, currentLocale, isLocaleGroup, localeEntries, parseAlternates,
 } from './header-locales.js';
 
 // desktop >= 1080px per source ladder (SKODA-301); below is the drawer band (SKODA-302)
@@ -599,16 +599,18 @@ export default async function decorate(block) {
       subscribeLink.prepend(mail);
     }
     // Language switcher (SKODA-303): the authored locale paragraph becomes a labelled list
-    // with the page's locale (from the URL) as the current one, each other locale linking its
-    // live locale home (header-locales.js, SKODA-303a). The topbar is lifted OUT of <nav>, so
-    // it can't appear inside the mobile drawer: a copy of the list goes into a drawer footer
-    // (CSS shows it only in the open drawer; the topbar one is the desktop instance).
+    // with the page's locale (from the URL) as the current one and the page's declared
+    // translations (`alternates` metadata, SKODA-303a) as the links (header-locales.js). The
+    // topbar is lifted OUT of <nav>, so it can't appear inside the mobile drawer: a copy of
+    // the list goes into a drawer footer (CSS shows it only in the open drawer; the topbar
+    // one is the desktop instance), so both use the same mapping.
     const base = window.location.href;
     const localeGroup = [...utility].find((p) => isLocaleGroup(p, base));
     const locales = localeGroup && buildLocaleList(
       localeEntries(localeGroup, base),
       currentLocale(window.location.pathname),
       document,
+      parseAlternates(getMetadata('alternates')),
     );
     if (locales) {
       // a list can't live in a <p>: the group becomes a <div> in the same place

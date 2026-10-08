@@ -838,6 +838,29 @@ var CustomImportScript = (() => {
     }
     return { tags, byFacet };
   }
+  var ALTERNATE_LOCALES = ["en", "cs", "de", "sk", "sr", "sl"];
+  function extractAlternates(document, pageUrl) {
+    let own = "";
+    try {
+      own = new URL(pageUrl).pathname.split("/")[1].toLowerCase();
+    } catch (e) {
+    }
+    const found = /* @__PURE__ */ new Map();
+    document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((link2) => {
+      const code = String(link2.getAttribute("hreflang") || "").trim().toLowerCase().split("-")[0];
+      if (!ALTERNATE_LOCALES.includes(code) || code === own || found.has(code)) return;
+      let url;
+      try {
+        url = new URL(link2.getAttribute("href"));
+      } catch (e) {
+        return;
+      }
+      if (!/^https?:$/.test(url.protocol)) return;
+      if ((url.pathname.split("/")[1] || "").toLowerCase() !== code) return;
+      found.set(code, url.href);
+    });
+    return ALTERNATE_LOCALES.filter((c) => found.has(c)).map((c) => `${c}: ${found.get(c)}`).join(", ");
+  }
   function splitList(value) {
     return value ? String(value).split(",").map((s) => s.trim()).filter(Boolean) : [];
   }
@@ -879,6 +902,8 @@ var CustomImportScript = (() => {
     if (category) meta.category = category;
     const categories = template === "story" ? extractCategories(document) : [];
     if (categories.length) meta.categories = categories.join(", ");
+    const alternates = extractAlternates(document, pageUrl);
+    if (alternates) meta.alternates = alternates;
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
     FACETS.forEach((f) => {

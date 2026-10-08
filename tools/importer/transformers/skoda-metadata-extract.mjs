@@ -287,6 +287,36 @@ export function groupTags(hrefs = []) {
   return { tags, byFacet };
 }
 
+// The site's locales, in the switcher's order (blocks/header/header-locales.js LOCALES).
+export const ALTERNATE_LOCALES = ['en', 'cs', 'de', 'sk', 'sr', 'sl'];
+
+/**
+ * `alternates` (SKODA-303a): the page's declared translations from the source head's
+ * `<link rel="alternate" hreflang href>`, as `cs: https://…/, de: https://…/` for the header's
+ * language switcher. Dropped: x-default, the page's own locale, unsupported codes (a region
+ * subtag is ignored, `de-AT` → de), non-http(s) URLs and URLs outside their locale's tree;
+ * the first per locale wins. Ordered as ALTERNATE_LOCALES. Empty string when none.
+ * Keep in sync with skoda-metadata.js::extractAlternates.
+ * @param {Array<[string, string]>} links [hreflang, href] pairs in source order
+ * @param {string} pageUrl the source page URL (its first segment is its own locale)
+ * @returns {string}
+ */
+export function pickAlternates(links = [], pageUrl = '') {
+  let own = '';
+  try { own = new URL(pageUrl).pathname.split('/')[1].toLowerCase(); } catch (e) { /* no url */ }
+  const found = new Map();
+  links.forEach(([lang, href]) => {
+    const code = String(lang || '').trim().toLowerCase().split('-')[0];
+    if (!ALTERNATE_LOCALES.includes(code) || code === own || found.has(code)) return;
+    let url;
+    try { url = new URL(href); } catch (e) { return; }
+    if (!/^https?:$/.test(url.protocol)) return;
+    if ((url.pathname.split('/')[1] || '').toLowerCase() !== code) return;
+    found.set(code, url.href);
+  });
+  return ALTERNATE_LOCALES.filter((c) => found.has(c)).map((c) => `${c}: ${found.get(c)}`).join(', ');
+}
+
 /** Split a comma list into trimmed non-empty tokens. */
 export function splitList(value) {
   return value ? String(value).split(',').map((s) => s.trim()).filter(Boolean) : [];
@@ -299,7 +329,7 @@ export function splitList(value) {
  */
 export function buildMetaFields({
   title = '', description = '', publisheddate = '', template = '', category = '',
-  categories = '', derived = { tags: [], byFacet: {} }, overrides = {},
+  categories = '', alternates = '', derived = { tags: [], byFacet: {} }, overrides = {},
 } = {}) {
   const meta = {};
   if (cleanTitle(title)) meta.Title = cleanTitle(title);
@@ -312,6 +342,8 @@ export function buildMetaFields({
   if (category) meta.category = category;
   // story: its WP categories + ancestors, for the category archives (pickCategories, SKODA-831)
   if (categories) meta.categories = categories;
+  // the page's declared translations, for the language switcher (pickAlternates, SKODA-303a)
+  if (alternates) meta.alternates = alternates;
 
   const facetValues = {};
   FACETS.forEach((f) => {

@@ -24,6 +24,7 @@ back-compatible; new fields (`tags`, `model`, plus new `template` values) are ad
 | `model` | slug | model items | convenience single-model tag; equals the model slug (also present in `tags`) |
 | `presskit` | site path | press-kit chapters | the parent hub of a `press_kit_chapter` page, e.g. `/en/press-kits/skoda-peaq-press-kit-2` (SKODA-805b). Not indexed |
 | `theme` | `press-kit` | press-kit chapters | loads `templates/press-kit` for chapters, whose `template` value is not a template folder |
+| `alternates` | `code: URL` pairs, comma-separated | pages with translations | the page's declared translations, from the source head's `<link rel="alternate" hreflang>` (no `x-default`, no own locale), e.g. `cs: https://www.skoda-storyboard.com/cs/e-mobilita-cs/…/, de: …`. The header's language switcher links only these (SKODA-303a). Written by the importer (`pickAlternates`); pages imported before that get it from the bulk `/metadata` sheet (`tools/importer/build-locale-alternates.mjs`). Not indexed |
 
 ### `template` enum
 

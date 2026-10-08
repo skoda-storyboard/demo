@@ -48,25 +48,10 @@ test('a trailing slash on a demo path is dropped, query + hash kept, relative st
 
 test('LIVE_ONLY chrome targets go to the live site in a new tab', () => {
   [
-    '/de/some/page/', '/cs/media-room/x/',
+    '/cs/', '/de/', '/sk/', '/sl/', '/sr/', '/de/some/page/',
     '/en/skodapedia/', '/en/feed/', '/en/press-releases/feed/', '/en/contacts/',
     '/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing/',
   ].forEach((href) => assert.deepEqual(policyHref(href, PAGE), { href: `${LIVE_ORIGIN}${href}`, newTab: true }, href));
-});
-
-test('locale homes (the language switcher, SKODA-303a) go to the live site in the same tab, with its slash', () => {
-  [
-    ['/cs/', '/cs/'], ['/de', '/de/'], ['/sk/', '/sk/'], ['/sr', '/sr/'], ['/sl/', '/sl/'],
-    ['/cs/media-room', '/cs/media-room/'], ['/sl/media-room/', '/sl/media-room/'],
-  ].forEach(([href, live]) => assert.deepEqual(policyHref(href, PAGE), { href: `${LIVE_ORIGIN}${live}`, newTab: false }, href));
-  // the click-time pass meets the rewritten absolute link: it stays in the tab
-  const home = `${LIVE_ORIGIN}/cs/`;
-  assert.deepEqual(policyHref(home, PAGE), { href: home, newTab: false });
-  assert.equal(opensInSameTab(`${LIVE_ORIGIN}/de/media-room/`), true);
-  assert.equal(opensInSameTab(`${LIVE_ORIGIN}/cs/e-mobilita-cs/x/`), false, 'a live article keeps its new tab');
-  assert.equal(opensInSameTab('https://www.skoda-media.de/'), false, 'another site keeps its new tab');
-  assert.equal(opensInSameTab(`${LIVE_ORIGIN}/en/`), false, 'en is not a live-only locale');
-  assert.equal(opensInSameTab(`${LIVE_ORIGIN}/csx/`), false, 'nor a look-alike segment');
 });
 
 test('"Manage subscription" goes to the live page in the same tab, as on the source (SKODA-308)', () => {
@@ -108,4 +93,23 @@ test('the en locale and look-alike paths are not caught by the locale rule', () 
   ['/en', '/en/tag/model/elroq', '/nav', '/footer', '/media-room/nav'].forEach((href) => {
     assert.equal(policyHref(href, PAGE), null, href);
   });
+});
+
+test('links inside [data-link-policy="resolved"] keep the target and tab their block chose (SKODA-303a)', async () => {
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  const { JSDOM } = await import('jsdom');
+  const { window } = new JSDOM(`<main>
+    <ul data-link-policy="resolved"><li><a id="kept" href="${LIVE_ORIGIN}/cs/e-mobilita-cs/x/">CZ</a></li></ul>
+    <p><a id="policed" href="${LIVE_ORIGIN}/cs/e-mobilita-cs/x/">CZ</a></p></main>`, { url: PAGE });
+  const { decorateLinks } = await import('./links.js');
+  globalThis.window = window;
+  try {
+    decorateLinks(window.document.querySelector('main'));
+  } finally {
+    delete globalThis.window;
+  }
+  const kept = window.document.getElementById('kept');
+  const policed = window.document.getElementById('policed');
+  assert.deepEqual([kept.getAttribute('target'), kept.getAttribute('rel')], [null, null]);
+  assert.equal(policed.getAttribute('target'), '_blank', 'other live links keep the policy');
 });

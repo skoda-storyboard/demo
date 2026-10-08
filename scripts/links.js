@@ -9,13 +9,11 @@
  * - Site-relative links to sections the demo does not carry (LIVE_ONLY: other locales,
  *   Škodapedia, feeds, Media Room service pages, source-only downloads) point at the live site
  *   and open in a new tab, instead of 404ing on EDS. Mostly the DA nav/footer fragments.
- *   Exception: LIVE_SAME_TAB pages (the newsletter "Manage subscription", SKODA-308; the
- *   language switcher's locale homes, SKODA-303a) stay in the tab, as on the source.
- * - Language switcher (SKODA-303a, decided 2026-10-08): CZ / DE / SK / SR / SL link the live
- *   locale home (`/cs/`; on the Media Room `/cs/media-room/`) in the same tab, with the
- *   source's trailing slash. The page path isn't kept: the live site translates its slugs,
- *   so per-page targets wait for the locale trees (SKODA-1003).
+ *   Exception: LIVE_SAME_TAB pages (the newsletter "Manage subscription") stay in the tab, as
+ *   on the source (SKODA-308).
  * - A trailing slash on any other site-relative path is dropped: EDS 404s `/en/`, serves `/en`.
+ * - Links inside `[data-link-policy="resolved"]` are left alone: their block already chose
+ *   the target and the tab (the language switcher's translations, SKODA-303a).
  */
 
 export const LIVE_ORIGIN = 'https://www.skoda-storyboard.com';
@@ -33,15 +31,10 @@ export const LIVE_ONLY = [
   /^\/en\/newsletter-settings(?:\/|$)/i,
 ];
 
-// A locale home or Media Room on the live site: the language switcher's targets (SKODA-303a)
-const LIVE_LOCALE_HOME = /^\/(?!en(?:\/|$))[a-z]{2}(?:\/media-room)?\/?$/i;
-
 // Live-only pages that open in the same tab, as on the source (SKODA-308, decided 2026-10-06:
-// the newsletter forms' "Manage subscription"; SKODA-303a, 2026-10-08: the locale homes).
-// Their links still go to the live site.
+// the newsletter forms' "Manage subscription"). Their links still go to the live site.
 export const LIVE_SAME_TAB = [
   /^\/en\/newsletter-settings(?:\/|$)/i,
-  LIVE_LOCALE_HOME,
 ];
 
 /**
@@ -97,9 +90,7 @@ export function policyHref(href, base) {
   if (url.origin !== origin) return null;
 
   if (LIVE_ONLY.some((re) => re.test(url.pathname))) {
-    // an alias or a locale home takes the source's trailing slash (no redirect hop)
-    const livePath = LIVE_ALIASES[trimmed.toLowerCase()]
-      || (LIVE_LOCALE_HOME.test(trimmed) ? trimmed : null);
+    const livePath = LIVE_ALIASES[trimmed.toLowerCase()];
     const path = livePath ? `${livePath}/` : url.pathname;
     return { href: `${LIVE_ORIGIN}${path}${tail}`, newTab: !opensInSameTab(path) };
   }
@@ -111,6 +102,7 @@ export function policyHref(href, base) {
 }
 
 function applyTo(a, base) {
+  if (a.closest('[data-link-policy="resolved"]')) return;
   const result = policyHref(a.getAttribute('href'), base);
   if (!result) return;
   if (result.href !== a.getAttribute('href')) a.setAttribute('href', result.href);

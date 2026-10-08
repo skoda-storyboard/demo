@@ -72,8 +72,8 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 - **Per-page existence behavior:** on an article, a locale link appears only if the translated article
   exists in that locale (backend/dynamic, WordPress). The home page (measured) exposes all 6. In EDS
   this becomes a per-page decision (see §8).
-- **Libraries to retire:** none specific; it is plain markup. Drop the WordPress hreflang plumbing;
-  reproduce with an authored/generated list.
+- **Libraries to retire:** none specific; it is plain markup. The WordPress hreflang set is imported as the
+  page's `alternates` metadata, which generates the list (SKODA-303a, §8a).
 
 ## 3. Measured visual spec
 
@@ -180,38 +180,44 @@ Every link was clicked on the home page, a story, a press release, the Media Roo
   `/en/` is a 404), and pages sit in the `{locale}/` folder (`/en/media-room`). The nav fragments link:
   - `/nav`: `/cs` `/de` `/sk` `/sr` `/sl`;
   - `/media-room/nav`: `/cs/media-room`, `https://www.skoda-media.de/`, `/sk/media-room`, `/sr/media-room`, `/sl/media-room`.
-- **Header behaviour (SKODA-303a, decided 2026-10-08):**
-  - every locale links its **live locale home**, in the **same tab** as on the source: the nav's link pass
-    (`scripts/links.js`, SKODA-609) turns the authored `/cs` into `https://www.skoda-storyboard.com/cs/` (the source's
-    trailing slash, no redirect hop), and `/cs/media-room` into `…/cs/media-room/` on the Media Room;
-  - the page path is **not** kept: the source translates its slugs (`/cs/e-mobilita-cs/…`), so a swapped path
-    would 404 on both sites;
-  - an authored link to another site opens in a new tab with `rel="noopener"` and "(opens in a new tab)" in its
-    name (Media Room DE → `skoda-media.de`);
-  - the bold (unlinked) locale takes its siblings' pattern (`/en`, `/en/media-room`), as does a broken authored
-    href (`javascript:`, `//host`, empty).
-- **Known gaps vs the source:** it links the page's own translation and lists only the locales the page has
-  (e.g. the Peaq press kit: CZ SK; the Epiq model page: CZ only), while EDS shows all six and links the locale home.
-  Per-page targets and hiding locales without a translation are SKODA-1003.
+- **Source of truth (SKODA-303a, #243, 2026-10-08):** the page's `<link rel="alternate" hreflang href>` set in the
+  source head. It matches the visible list on every page checked (home, Epiq story, Zellmer press release, Peaq press
+  kit, Epiq model page, Media Room); the one exception is the Media Room DE (hreflang `/de/media-room/`, visible link
+  `skoda-media.de` in a new tab), where the visible behaviour is kept.
+- **Header behaviour (SKODA-303a):** the switcher is generated from the page's **`alternates` metadata**
+  (`cs: https://…/, de: https://…/`), the source hreflang set without `x-default` and the page's own locale:
+  - each locale links its **declared translated URL**; nothing is inferred by swapping the locale prefix;
+  - a locale **without a declared translation is omitted**, never replaced by its locale home; a page without
+    alternates shows only the current locale (as the source: the Elroq press kit 2, `category/design-eng`);
+  - a translation must sit in its own locale's tree, on EDS (a migrated variant) or on the live site (the permitted
+    legacy URL while the locale trees aren't migrated); anything else is dropped;
+  - links open in the **same tab**, as on the source; the list carries `data-link-policy="resolved"` so the
+    site's link pass (`scripts/links.js`) leaves it alone;
+  - the nav row only names the locales and their order; an authored link there to **another site** replaces a
+    declared translation, in a new tab with `rel="noopener"` and "(opens in a new tab)" in its name (Media Room DE →
+    `skoda-media.de`; a press release without a DE translation shows no DE, as the source);
+  - the current locale is a `<span aria-current="true">`; desktop and the drawer use the same list.
+- **Where `alternates` comes from:** new imports write it into the page's Metadata block (`skoda-metadata.js`,
+  rule `skoda-metadata-extract.mjs::pickAlternates`). The pages imported before that get it from the bulk metadata
+  sheet `/metadata` (one `URL` + `alternates` row per page, `tools/importer/build-locale-alternates.mjs`), which
+  checks that every translation resolves (an EDS variant, else the live URL answering 200) and drops the rest.
 
 ## 8. Open decisions + recommended default
 
 > **Decided (2026-09-30, SKODA-303 pilot):**
 > - **Control form:** inline links.
 > - **Current locale:** taken from the URL, not the authored `<strong>`.
-> - **Targets:** the fragments author the locale homes (`/cs` …; Media Room `/{locale}/media-room`, DE on
->   `skoda-media.de`). **SKODA-303a (2026-10-08):** until the locale trees are migrated they open the **live**
->   locale home in the **same tab** (§8a), so nothing 404s on EDS.
-> - **Out of the pilot:** per-page translated targets and hiding locales without a translation (SKODA-1003).
+> - **Targets (SKODA-303a, 2026-10-08, superseding the locale homes):** the page's declared translations from its
+>   source hreflang set (`alternates` metadata, §8a), same tab; locales without one are hidden. The fragments'
+>   locale row keeps the order and the Media Room DE → `skoda-media.de` override.
+> - **Out of the pilot:** language-negotiated root routing and per-locale placeholders (SKODA-1003).
 > - **Contrast:** inactive links use `--skoda-grey-700`.
 
 - **Control form:** source is **inline links**; recommend keeping **inline links** as the EDS-native
   default (lightest, no JS, matches source). A dropdown/disclosure is only worth it if the locale count
   grows well beyond 6, assumption to confirm with the client (COM-05).
-- **Per-page existence:** source hides locales lacking a translation. EDS default recommendation: show
-  all configured locales and let the target 404/redirect to the locale home, OR build a per-page locale
-  manifest in the query-index. Recommend **manifest-driven** so dead links are hidden, assumption to
-  confirm (depends on content migration completeness).
+- **Per-page existence:** source hides locales lacking a translation. **Decided (SKODA-303a):** EDS hides them
+  too, from the page's `alternates` metadata (the source hreflang set, §8a); no locale-home fallback.
 - **Contrast:** darken the inactive locale link to meet AA (assumption: `#7c7d7e` fails on the grey
   topbar; confirm final color).
 - **New tokens** (assumption to confirm): `--body-font-size-2xs: 12px`, define `--skoda-grey-500:
