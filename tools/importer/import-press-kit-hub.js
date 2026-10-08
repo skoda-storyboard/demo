@@ -24,9 +24,48 @@ function sourceFacets(article) {
   return result;
 }
 
+// Banner ZIP download hrefs (SKODA-832). Applied to the hub banners only; every other link
+// keeps the shared skoda-links policy.
+//
+// Rule: `www.skoda-storyboard.com/direct-download/<path>.zip` 301s to a signed, expiring S3 URL.
+// The same object is served at `cdn.skoda-storyboard.com/<path>.zip` (200 application/zip),
+// which is where the other hubs' banners already point. Checked on 2026-10-08 for IAA 2019
+// (2019/11), Kodiaq (2023/06) and Superb (2023/07).
+const SOURCE_HOSTNAME = /^(?:www\.)?skoda-storyboard\.com$/i;
+const DIRECT_DOWNLOAD_PREFIX = '/direct-download/';
+const CDN_ORIGIN = 'https://cdn.skoda-storyboard.com';
+
+// Explicit corrections of verified dead banner ZIP links (approved by the user, checked on
+// 2026-10-08), keyed by the href without query or fragment. The 2020 Octavia kit links its
+// ZIP without the extension: the bare URL returns 403 (no such S3 object) and the `.zip`
+// returns 200 application/zip.
+const BANNER_ZIP_CORRECTIONS = new Map([
+  ['https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA', 'https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA.zip'],
+]);
+
+function bannerHref(href) {
+  let url;
+  try {
+    url = new URL(href);
+  } catch {
+    return href;
+  }
+  // A query string would make it something other than a plain object path: leave it.
+  if (url.search) return href;
+  // The fragment (e.g. a rotating `#s_aid=`) is kept here and stripped later by skoda-links.
+  const correction = BANNER_ZIP_CORRECTIONS.get(`${url.origin}${url.pathname}`);
+  if (correction) return `${correction}${url.hash}`;
+  const isDirectDownloadZip = SOURCE_HOSTNAME.test(url.hostname)
+    && url.pathname.startsWith(DIRECT_DOWNLOAD_PREFIX)
+    && /\.zip$/i.test(url.pathname);
+  if (!isDirectDownloadZip) return href;
+  return `${CDN_ORIGIN}/${url.pathname.slice(DIRECT_DOWNLOAD_PREFIX.length)}${url.hash}`;
+}
+
 // The source banner images carry no useful alt; name them by what the link does.
 function bannerAlt(href, img) {
-  // The 2020 Octavia kit's download banner links the ZIP without its extension.
+  // A ZIP is also recognised by its banner image name, for a source link that lacks the
+  // extension and is not in BANNER_ZIP_CORRECTIONS.
   if (/\.zip(?:$|[?#])/i.test(href) || /download/i.test(img.getAttribute('src').split('/').pop())) {
     return 'Download the press kit ZIP';
   }
@@ -49,7 +88,7 @@ function bannerLinks(content, document) {
     .filter((a) => a.querySelector('img[src]'))
     .map((source) => {
       const link = document.createElement('a');
-      link.href = source.href;
+      link.href = bannerHref(source.href);
       const img = source.querySelector('img').cloneNode(true);
       img.removeAttribute('srcset');
       img.removeAttribute('sizes');
