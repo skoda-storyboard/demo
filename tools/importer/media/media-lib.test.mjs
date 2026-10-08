@@ -12,7 +12,7 @@ import {
 } from 'node:fs';
 import nodePath from 'node:path';
 import {
-  logicalId, masterUrl, normalizeExtension, isAspectCrop, derivativeSuffix,
+  logicalId, masterUrl, imageOriginalUrl, normalizeExtension, isAspectCrop, derivativeSuffix,
   damPathFor, pagePathFromFile, splitBuffer, imageSize, ratiosDiffer,
   uploadToDAM, publishDamBinary, publishDamImage, ensureDamFolder, resolveDamToken,
   fetchBinaryToFile,
@@ -31,6 +31,16 @@ const jpegHead = (w, h, padding) => {
   sof.writeUInt16BE(w, 7);
   return Buffer.concat([Buffer.from([0xff, 0xd8]), app2, sof]);
 };
+
+test('original image fetch URLs preserve double extensions and case without changing identity', () => {
+  const source = 'https://cdn.x.com/2026/06/photo.JPG-768x512.jpg?cache=1#caption';
+  assert.equal(imageOriginalUrl(source), 'https://cdn.x.com/2026/06/photo.JPG.jpg');
+  assert.equal(masterUrl(source), 'https://cdn.x.com/2026/06/photo.jpg');
+  assert.equal(logicalId(source), logicalId('https://cdn.x.com/2026/06/photo.jpg'));
+  assert.equal(imageOriginalUrl('https://cdn.x.com/photo-768x512.JPG'), 'https://cdn.x.com/photo.JPG');
+  assert.equal(imageOriginalUrl('https://cdn.x.com/photo.JPG.jpg'), 'https://cdn.x.com/photo.JPG.jpg');
+  assert.equal(imageOriginalUrl('https://cdn.x.com/photo-768x512.jpg'), 'https://cdn.x.com/photo.jpg');
+});
 
 test('renditionCandidates keeps a non-3:2 master at its own ratio', () => {
   const url = 'https://cdn.x.com/2026/03/wide.jpg';
