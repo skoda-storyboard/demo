@@ -6,7 +6,7 @@
 - **GitHub issue:** [#297](https://github.com/skoda-storyboard/demo/issues/297)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §5 / §8 F6 (approved 2026-10-05; user asked for it 2026-10-08)
 - **Branch:** `skoda-837-press-kit-validity`
-- **Status (2026-10-08):** 🟡 6 pages pushed to DA (5 previewed; Peaq 2 Images DA-only, see below). Not published.
+- **Status (2026-10-08):** 🟢 5 pages **published** (5/5 live 200; no `.pdff` left, PDFs on AEM Assets, Epiq notes live). Peaq 2 Images is updated in DA only (held, >200 images). PR #298 brings the 32px note spacing.
 
 ## Problems and fixes
 1. **Stray lead image on the Images children** (125 years, Epiq 2, Peaq 2).
@@ -54,4 +54,4 @@
 - [x] No `.pdff` link; the 3 links resolve to the AEM Assets PDFs
 - [x] Regulatory captions visible once per gallery group; other lightbox captions stay dropped
 - [x] Only the 6 target pages change (old/new bundle diff); DA diff = intended changes
-- [ ] Publish the 5 previewed pages (separate go-ahead)
+- [x] Published the 5 previewed pages (2026-10-08, user go-ahead)
