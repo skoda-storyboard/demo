@@ -766,6 +766,26 @@ var CustomImportScript = (() => {
     if (tags.length) result.tags = [...new Set(tags)].join(", ");
     return result;
   }
+  var SOURCE_HOSTNAME = /^(?:www\.)?skoda-storyboard\.com$/i;
+  var DIRECT_DOWNLOAD_PREFIX = "/direct-download/";
+  var CDN_ORIGIN = "https://cdn.skoda-storyboard.com";
+  var BANNER_ZIP_CORRECTIONS = /* @__PURE__ */ new Map([
+    ["https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA", "https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA.zip"]
+  ]);
+  function bannerHref(href) {
+    let url;
+    try {
+      url = new URL(href);
+    } catch (e) {
+      return href;
+    }
+    if (url.search) return href;
+    const correction = BANNER_ZIP_CORRECTIONS.get(`${url.origin}${url.pathname}`);
+    if (correction) return `${correction}${url.hash}`;
+    const isDirectDownloadZip = SOURCE_HOSTNAME.test(url.hostname) && url.pathname.startsWith(DIRECT_DOWNLOAD_PREFIX) && /\.zip$/i.test(url.pathname);
+    if (!isDirectDownloadZip) return href;
+    return `${CDN_ORIGIN}/${url.pathname.slice(DIRECT_DOWNLOAD_PREFIX.length)}${url.hash}`;
+  }
   function bannerAlt(href, img) {
     if (/\.zip(?:$|[?#])/i.test(href) || /download/i.test(img.getAttribute("src").split("/").pop())) {
       return "Download the press kit ZIP";
@@ -785,7 +805,7 @@ var CustomImportScript = (() => {
   function bannerLinks(content, document) {
     return [...content.querySelectorAll(".widget_sow-editor .textwidget a[href]")].filter((a) => a.querySelector("img[src]")).map((source) => {
       const link = document.createElement("a");
-      link.href = source.href;
+      link.href = bannerHref(source.href);
       const img = source.querySelector("img").cloneNode(true);
       img.removeAttribute("srcset");
       img.removeAttribute("sizes");
