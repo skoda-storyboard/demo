@@ -243,6 +243,16 @@ body.press-kit main > .section.media-box {
   margin-block: var(--pk-band-gap) var(--spacing-m);
 }
 
+/* An Images chapter's group heading (SKODA-806): the source widget title, 20/23 weight 300 up to
+   768 and 24/27.6 above, with the group's "Original" / "1920px" pills right under it. It stays an
+   h2 (the source skips from the h1 to an h3). */
+body.press-kit .section.body-column .default-content-wrapper:has(+ .downloads-wrapper > .downloads.gallery) > h2:last-child {
+  margin-block-end: 0;
+  font-size: var(--heading-font-size-story-h3-mobile);
+  font-weight: var(--weight-light);
+  line-height: 1.15;
+}
+
 @media (width > 768px) {
   body.press-kit {
     --media-box-title-size: var(--heading-font-size-l);
@@ -250,6 +260,10 @@ body.press-kit main > .section.media-box {
 
   body.press-kit .section.sidebar h3 {
     font-size: var(--body-font-size-m);
+  }
+
+  body.press-kit .section.body-column .default-content-wrapper:has(+ .downloads-wrapper > .downloads.gallery) > h2:last-child {
+    font-size: var(--heading-font-size-story-h3);
   }
 }
 

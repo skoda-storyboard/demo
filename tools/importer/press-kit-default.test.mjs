@@ -34,6 +34,7 @@ globalThis.WebImporter = {
 };
 
 const importer = JSDOM ? (await import('./import-press-kit-default.js')).default : null;
+const { fragmentGroups, fragmentPath, IMAGE_LIMIT } = JSDOM ? await import('./import-press-kit-default.js') : {};
 const decorateAccordion = JSDOM ? (await import('../../blocks/accordion/accordion.js')).default : null;
 const { layoutTileRows } = await import('../../scripts/cards-tiles.js');
 const base = 'https://www.skoda-storyboard.com/en/press-kits/';
@@ -447,7 +448,8 @@ test('resource child without a Media Box: grouped galleries in source order, no 
     extra: `${galleryGroup('Exterior', 0, 3)}${galleryGroup('Interior', 3, 2)}`,
     hubTitle: 'Škoda Peaq – Press Kit',
   }), `${base}skoda-peaq-press-kit-2/images/`);
-  const groups = blocks(page, 'Downloads');
+  const groups = blocks(page, 'Downloads (gallery)');
+  assert.equal(blocks(page, 'Downloads').length, 0, 'gallery groups are the gallery variant (SKODA-806)');
   // Header + `collapse | auto` config row, then one row per asset.
   assert.deepEqual(groups.map((block) => block.querySelectorAll('tr').length - 2), [3, 2]);
   groups.forEach((block) => assert.deepEqual(
@@ -656,6 +658,102 @@ test('the source\u2019s glued non-breaking spaces survive the import (skoda-nbsp
   const p = [...page.querySelectorAll('p')].find((el) => el.textContent.includes('speakers'));
   assert.equal(p.textContent, `The system features 16${NBSP_PLACEHOLDER}speakers and a${NBSP_PLACEHOLDER}total output of 755${NBSP_PLACEHOLDER}W.`);
   assert.ok(![...page.querySelectorAll('p')].some((el) => el.textContent.includes(NBSP_PLACEHOLDER) && !el.textContent.trim().replaceAll(NBSP_PLACEHOLDER, '')), 'a whitespace-only spacer is not glued');
+});
+
+const BLOCK_ORDER = new Set(['Downloads (gallery)', 'Fragment']);
+
+test('an Images chapter past the image budget moves its largest groups to fragments (SKODA-806)', { skip: !JSDOM }, () => {
+  const images = `${base}skoda-peaq-press-kit-2/images/`;
+  const html = fixture({
+    chapters: true,
+    mediaBox: false,
+    togglesCount: 0,
+    extra: `${galleryGroup('Introduction', 0, 30)}${galleryGroup('Exterior', 30, 120)}${galleryGroup('Škoda Peaq Sportline', 150, 60)}`,
+  });
+  const page = run(html, images);
+  // 210 tiles > 200: Exterior (120) leaves, 90 stay inline
+  assert.deepEqual(blocks(page, 'Downloads (gallery)').map((t) => t.querySelectorAll('tr').length - 2), [30, 60]);
+  const [frag] = blocks(page, 'Fragment');
+  assert.ok(frag, 'a Fragment block in place of the group');
+  assert.equal(frag.querySelector('a').getAttribute('href'), '/fragments/en/press-kits/skoda-peaq-press-kit-2/images/exterior');
+  // source order kept: Introduction, the Exterior fragment, Sportline
+  const order = [...page.querySelectorAll('table')].map((t) => txt(t.querySelector('tr > td')))
+    .filter((name) => BLOCK_ORDER.has(name));
+  assert.deepEqual(order, ['Downloads (gallery)', 'Fragment', 'Downloads (gallery)']);
+  assert.ok(![...page.querySelectorAll('h2')].some((h) => txt(h) === 'Exterior'), 'the heading moves with the group');
+  assert.ok(page.querySelectorAll('img').length < 200);
+
+  // the fragment itself: the same URL with ?fragment=<slug>
+  const fragmentRun = (slug) => {
+    const pageUrl = `${images}?fragment=${slug}`;
+    const dom = new JSDOM(html, { url: pageUrl });
+    const { document } = dom.window;
+    globalThis.document = document;
+    globalThis.window = dom.window;
+    importer.preprocess({ document });
+    return importer.transform({ document, url: pageUrl, params: { originalURL: pageUrl } })[0];
+  };
+  const out = fragmentRun('exterior');
+  assert.equal(out.path, '/fragments/en/press-kits/skoda-peaq-press-kit-2/images/exterior');
+  assert.equal(txt(out.element.querySelector('h2')), 'Exterior');
+  assert.equal(blocks(out.element, 'Downloads (gallery)').length, 1);
+  assert.equal(rows(out.element, 'Downloads (gallery)').length - 1, 120, 'collapse row + 120 assets');
+  assert.equal(out.element.querySelectorAll('table').length, 1, 'nothing else from the page');
+  assert.equal(fragmentRun('skoda-peaq-sportline').path, '/fragments/en/press-kits/skoda-peaq-press-kit-2/images/skoda-peaq-sportline');
+  assert.throws(() => fragmentRun('nope'), /no gallery group "nope"/);
+
+  // within budget (the Epiq chapter, 194): no fragments
+  const small = run(fixture({
+    chapters: true, mediaBox: false, togglesCount: 0, extra: `${galleryGroup('Exterior', 0, 3)}${galleryGroup('Interior', 3, 2)}`,
+  }), images);
+  assert.equal(blocks(small, 'Fragment').length, 0);
+});
+
+test('fragmentGroups: largest first until every image fits, others counted, oversized refused', { skip: !JSDOM }, () => {
+  const g = (size, slug) => ({ size, slug, title: slug });
+  // the live Peaq Images chapter: 246 tiles in 10 groups + its 2 other images; Exterior (69) leaves
+  const peaq = [25, 69, 20, 1, 1, 2, 56, 36, 14, 22].map((size, i) => g(size, `g${i}`));
+  assert.deepEqual(fragmentGroups(peaq, 2).map((x) => x.slug), ['g1']);
+  // the largest go first, until the rest fits
+  assert.deepEqual(fragmentGroups([g(100, 'a'), g(90, 'b'), g(80, 'c'), g(70, 'd')]).map((x) => x.slug), ['a', 'b']);
+  assert.deepEqual(fragmentGroups([g(100, 'a'), g(90, 'b')], 0, 1000), []);
+  // the page's other images count: 195 tiles + 6 others is 201, one too many; 194 + 6 fits
+  assert.deepEqual(fragmentGroups([g(100, 'a'), g(95, 'b')], 6).map((x) => x.slug), ['a']);
+  assert.deepEqual(fragmentGroups([g(100, 'a'), g(94, 'b')], 6), []);
+  // a group past the limit on its own can't be a fragment either
+  assert.throws(() => fragmentGroups([g(201, 'big'), g(5, 'small')]), /"big" has 201 images; a document holds at most 200/);
+  assert.equal(IMAGE_LIMIT, 200);
+  assert.equal(fragmentPath('/en/press-kits/kit/images/', 'exterior'), '/fragments/en/press-kits/kit/images/exterior');
+});
+
+test('every emitted document stays within 200 images: other images count, oversized groups are refused (PR #287 review)', { skip: !JSDOM }, () => {
+  const images = `${base}skoda-peaq-press-kit-2/images/`;
+  const page = (extra, inline = 0) => fixture({
+    chapters: true, mediaBox: false, togglesCount: 0, inline, extra,
+  });
+  // the fixture's own images outside the groups (lead image etc.)
+  const baseline = run(page(galleryGroup('One', 0, 1)), images).querySelectorAll('img').length - 1;
+  // 195 gallery tiles + 6 inline images + the baseline: past the limit, so a group leaves
+  const crowded = run(page(`${galleryGroup('Exterior', 0, 100)}${galleryGroup('Interior', 100, 95)}`, 6), images);
+  assert.equal(blocks(crowded, 'Fragment').length, 1, 'the inline images push the page past the limit');
+  assert.ok(crowded.querySelectorAll('img').length <= 200);
+  // exactly at the limit: no fragment
+  const atLimit = run(page(`${galleryGroup('Exterior', 0, 100)}${galleryGroup('Interior', 100, 100 - baseline)}`), images);
+  assert.equal(atLimit.querySelectorAll('img').length, 200);
+  assert.equal(blocks(atLimit, 'Fragment').length, 0);
+  // a 201-image group can be neither inline nor a fragment
+  const oversized = page(`${galleryGroup('Huge', 0, 201)}${galleryGroup('Small', 201, 3)}`);
+  assert.throws(() => run(oversized, images), /"Huge" has 201 images; a document holds at most 200/);
+  const hugeUrl = `${images}?fragment=huge`;
+  const dom = new JSDOM(oversized, { url: hugeUrl });
+  const { document } = dom.window;
+  globalThis.document = document;
+  globalThis.window = dom.window;
+  importer.preprocess({ document });
+  assert.throws(
+    () => importer.transform({ document, url: hugeUrl, params: { originalURL: hugeUrl } }),
+    /fragment "huge" holds 201 images; a document holds at most 200/,
+  );
 });
 
 test('generated standalone bundle matches the source importer', { skip: !JSDOM }, () => {
@@ -933,6 +1031,9 @@ function captionedGroup(title, from, captions) {
     <div class="search-results-container"><div class="search-results-items">${items}</div></div></div></div></div></div>`);
 }
 const imagesUrl = `${base}skoda-epiq-press-kit-2/images/`;
+// gallery groups are `Downloads (gallery)` since SKODA-806; Media Boxes stay `Downloads`
+const grids = (root) => [...root.querySelectorAll('table')]
+  .filter((t) => ['Downloads', 'Downloads (gallery)'].includes(txt(t.querySelector('tr > td'))));
 
 test('an Images child without its own teaser gets no stray lead copied from a gallery tile', { skip: !JSDOM }, () => {
   const html = fixture({
@@ -941,7 +1042,7 @@ test('an Images child without its own teaser gets no stray lead copied from a ga
   const page = run(html, imagesUrl);
   const firstTileSrc = 'https://cdn.skoda-storyboard.com/img-0.jpg';
   const outsideDownloads = [...page.querySelectorAll('img')]
-    .filter((img) => !blocks(page, 'Downloads').some((block) => block.contains(img)));
+    .filter((img) => !grids(page).some((block) => block.contains(img)));
   assert.ok(!outsideDownloads.some((img) => img.getAttribute('src') === firstTileSrc), 'no gallery tile above the first section');
   // A real article teaser is still the lead.
   const withLead = run(fixture({
@@ -949,7 +1050,7 @@ test('an Images child without its own teaser gets no stray lead copied from a ga
   }), imagesUrl);
   assert.ok([...withLead.querySelectorAll('img')]
     .some((img) => img.getAttribute('src').endsWith('/lead.jpg')
-      && !blocks(withLead, 'Downloads').some((block) => block.contains(img))), 'the article teaser stays the lead');
+      && !grids(withLead).some((block) => block.contains(img))), 'the article teaser stays the lead');
 });
 
 test('a source .pdff link is imported as the .pdf and named Download PDF', { skip: !JSDOM }, () => {
@@ -974,7 +1075,7 @@ test('an Images-child gallery keeps each distinct regulatory caption once, under
     extra: captionedGroup('Exterior', 0, [REG, REG, 'A quiet morning on the test track'])
       + captionedGroup('History', 3, ['The FC model had a front engine.', 'Built in 1908.']),
   }), imagesUrl);
-  const [exterior] = blocks(page, 'Downloads');
+  const [exterior] = grids(page);
   assert.equal(txt(exterior.nextElementSibling), REG, 'the note sits right after its group');
   assert.equal([...page.querySelectorAll('p')].filter((p) => txt(p) === REG).length, 1, 'once, not per image');
   assert.ok(!page.textContent.includes('quiet morning'), 'a plain lightbox caption stays dropped');

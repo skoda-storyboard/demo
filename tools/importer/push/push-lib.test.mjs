@@ -6,7 +6,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  pagePath, parseList, wrapPage, NBSP_PLACEHOLDER, hashOf, mainContent, contentHash, decideAction,
+  pagePath, contentFragmentPaths, fragmentOrder, fragmentHolds,
+  parseList, wrapPage, NBSP_PLACEHOLDER, hashOf, mainContent, contentHash, decideAction,
   PUSHING, chunk,
   parseJobDetails,
   fragmentPaths, bulkPatternMatches, imageCheck, summarize,
@@ -18,6 +19,13 @@ test('pagePath maps source URLs and paths to EDS page paths', () => {
   assert.equal(pagePath('https://www.skoda-storyboard.com/en/emobility/foo/'), '/en/emobility/foo');
   assert.equal(pagePath('/en/emobility/foo'), '/en/emobility/foo');
   assert.equal(pagePath('/en/emobility/foo.plain.html'), '/en/emobility/foo');
+  // a press-kit Images group imported on its own (SKODA-806)
+  assert.equal(
+    pagePath('https://www.skoda-storyboard.com/en/press-kits/kit/images/?fragment=exterior'),
+    '/fragments/en/press-kits/kit/images/exterior',
+  );
+  assert.equal(pagePath('https://www.skoda-storyboard.com/en/x/?fragment=../evil'), '/en/x', 'only a plain slug');
+  assert.equal(pagePath('https://www.skoda-storyboard.com/en/x/?utm=1'), '/en/x', 'other queries are ignored');
   assert.equal(pagePath('https://www.skoda-storyboard.com/'), '/index');
   assert.equal(pagePath(''), '');
 });
@@ -197,4 +205,27 @@ test('summarize counts actions', () => {
     summarize([{ action: 'new' }, { action: 'unchanged' }, { action: 'unchanged' }, { action: 'conflict' }]),
     { new: 1, unchanged: 2, conflict: 1 },
   );
+});
+
+test('contentFragmentPaths: Fragment block and /fragments/ links, same site only, in order', () => {
+  const plain = '<div class="fragment"><div><div><a href="/fragments/en/kit/images/exterior">x</a></div></div></div>'
+    + '<p><a href="https://www.skoda-storyboard.com/fragments/en/kit/images/interior">y</a></p>'
+    + '<p><a href="https://main--demo--skoda-storyboard.aem.page/drafts/fragments/part">z</a></p>'
+    + '<p><a href="https://example.com/fragments/elsewhere">not ours</a></p>'
+    + '<p><a href="/fragments/en/kit/images/exterior">again</a><a href="/en/kit">a page</a></p>';
+  assert.deepEqual(contentFragmentPaths(plain), [
+    '/fragments/en/kit/images/exterior', '/fragments/en/kit/images/interior', '/drafts/fragments/part',
+  ]);
+  assert.deepEqual(contentFragmentPaths(''), []);
+});
+
+test('fragmentOrder publishes the needed fragments first; fragmentHolds names what is not live', () => {
+  const deps = { '/en/a': ['/fragments/a'], '/en/b': [], '/fragments/a': [] };
+  const of = (p) => deps[p] || [];
+  assert.deepEqual(fragmentOrder(['/en/a', '/en/b', '/fragments/a'], of), {
+    first: ['/fragments/a'], rest: ['/en/a', '/en/b'],
+  });
+  const held = fragmentHolds(['/en/a', '/en/b'], of, (f) => f !== '/fragments/a');
+  assert.deepEqual([...held], [['/en/a', ['/fragments/a']]]);
+  assert.equal(fragmentHolds(['/en/a'], of, () => true).size, 0);
 });

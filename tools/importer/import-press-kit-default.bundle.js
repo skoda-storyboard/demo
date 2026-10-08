@@ -38,7 +38,10 @@ var CustomImportScript = (() => {
   // tools/importer/import-press-kit-default.js
   var import_press_kit_default_exports = {};
   __export(import_press_kit_default_exports, {
-    default: () => import_press_kit_default_default
+    IMAGE_LIMIT: () => IMAGE_LIMIT,
+    default: () => import_press_kit_default_default,
+    fragmentGroups: () => fragmentGroups,
+    fragmentPath: () => fragmentPath
   });
 
   // tools/importer/parsers/gallery.js
@@ -420,7 +423,8 @@ var CustomImportScript = (() => {
       rows.push([img, title, paragraphs2]);
     });
     const config = gallery ? [["collapse", "auto"]] : [];
-    const table = WebImporter.DOMUtils.createTable([["Downloads"], ...config, ...rows], document);
+    const name = gallery ? "Downloads (gallery)" : "Downloads";
+    const table = WebImporter.DOMUtils.createTable([[name], ...config, ...rows], document);
     element.replaceWith(table, ...notes.map((note) => Object.assign(document.createElement("p"), { textContent: note })));
   }
 
@@ -1601,6 +1605,48 @@ var CustomImportScript = (() => {
       metadata: { template: "press_kit_chapter", theme: "press-kit", presskit: path(hubUrl) }
     });
   }
+  var IMAGE_LIMIT = 200;
+  function checkImageLimit(root, what) {
+    const count = root.querySelectorAll("img").length;
+    if (count > IMAGE_LIMIT) {
+      throw new Error(`${what} holds ${count} images; a document holds at most ${IMAGE_LIMIT}`);
+    }
+  }
+  var slugOf = (value) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  function galleryGroups(body) {
+    const seen = /* @__PURE__ */ new Map();
+    return [...body.querySelectorAll(".search-results.search-results-gallery")].map((el) => {
+      var _a, _b;
+      const titleEl = (_b = (_a = el.closest(".textwidget")) == null ? void 0 : _a.parentElement) == null ? void 0 : _b.querySelector(":scope > .widget-title");
+      const title = ((titleEl == null ? void 0 : titleEl.textContent) || "").trim();
+      const base = slugOf(title) || "images";
+      const n = (seen.get(base) || 0) + 1;
+      seen.set(base, n);
+      return {
+        el,
+        titleEl,
+        title,
+        slug: n > 1 ? `${base}-${n}` : base,
+        size: el.querySelectorAll("img").length
+      };
+    });
+  }
+  function fragmentGroups(groups, others = 0, limit = IMAGE_LIMIT) {
+    let total = others + groups.reduce((n, group) => n + group.size, 0);
+    const out = /* @__PURE__ */ new Set();
+    [...groups].sort((a, b) => b.size - a.size).forEach((group) => {
+      if (total <= limit) return;
+      if (group.size > limit) {
+        throw new Error(`Press-kit Images group "${group.title || group.slug}" has ${group.size} images; a document holds at most ${limit}`);
+      }
+      out.add(group);
+      total -= group.size;
+    });
+    return groups.filter((group) => out.has(group));
+  }
+  function fragmentPath(pagePath, slug) {
+    return `/fragments${pagePath.replace(/\/$/, "")}/${slug}`;
+  }
   var import_press_kit_default_default = {
     preprocess: ({ document }) => {
       transform4("preprocess", document.body, { document });
@@ -1617,11 +1663,47 @@ var CustomImportScript = (() => {
       transform("beforeTransform", main, payload);
       const article = main.querySelector("article.press_kit");
       const body = article.querySelector(".entry-content");
+      const pagePath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
+      const groups = galleryGroups(body);
+      const wanted = new URL(params.originalURL).searchParams.get("fragment");
+      if (wanted) {
+        const group = groups.find(({ slug }) => slug === wanted);
+        if (!group) throw new Error(`Press-kit Images chapter has no gallery group "${wanted}"`);
+        const holder = document.createElement("div");
+        if (group.title) holder.append(Object.assign(document.createElement("h2"), { textContent: group.title }));
+        holder.append(group.el);
+        parse4(group.el, payload);
+        main.replaceChildren(holder);
+        normalizeImages(main, document);
+        WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
+        transform3("afterTransform", main, payload);
+        checkImageLimit(main, `Press-kit Images fragment "${group.slug}"`);
+        return [{
+          element: main,
+          path: WebImporter.FileUtils.sanitizePath(fragmentPath(pagePath, group.slug)),
+          report: { title: group.title, template: TEMPLATE.name }
+        }];
+      }
+      const others = main.querySelectorAll("img").length - groups.reduce((n, group) => n + group.size, 0);
+      fragmentGroups(groups, others).forEach((group) => {
+        var _a;
+        const mark = document.createElement("p");
+        mark.dataset.skodaFragment = fragmentPath(pagePath, group.slug);
+        const link = Object.assign(document.createElement("a"), { href: mark.dataset.skodaFragment });
+        link.textContent = mark.dataset.skodaFragment;
+        mark.append(link);
+        group.el.replaceWith(mark);
+        (_a = group.titleEl) == null ? void 0 : _a.remove();
+      });
       body.querySelectorAll(".search-results.search-results-gallery").forEach((group) => parse4(group, payload));
       body.querySelectorAll(".search-results-items").forEach((grid) => parse4(grid, payload));
       const faq = /\/frequently-asked-questions\/?$/.test(new URL(params.originalURL).pathname);
       parse3(body, { document, faq });
       body.querySelectorAll("p[data-skoda-quote]").forEach((p) => parse5(p, payload));
+      body.querySelectorAll("p[data-skoda-fragment]").forEach((p) => {
+        const link = p.querySelector("a");
+        p.replaceWith(WebImporter.DOMUtils.createTable([["Fragment"], [link]], document));
+      });
       body.querySelectorAll("figure").forEach((figure) => parseFigure(figure, payload));
       body.querySelectorAll("p[data-skoda-footnote]").forEach((p) => parse6(p, payload));
       main.querySelectorAll("[data-skoda-footnote]").forEach((p) => p.removeAttribute("data-skoda-footnote"));
@@ -1635,10 +1717,10 @@ var CustomImportScript = (() => {
       normalizeImages(main, document);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       transform3("afterTransform", main, payload);
-      const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
+      checkImageLimit(main, `Press-kit page ${pagePath}`);
       return [{
         element: main,
-        path: WebImporter.FileUtils.sanitizePath(rawPath || "/index"),
+        path: WebImporter.FileUtils.sanitizePath(pagePath || "/index"),
         report: { title: document.title, template: TEMPLATE.name }
       }];
     }
