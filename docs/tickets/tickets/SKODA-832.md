@@ -87,7 +87,7 @@ Evidence: `.migration/qa-832/` (outside git).
     `….zip`.
   - Hub banners only. All targets were checked as 200 `application/zip`.
 - **Pages:** 4 hubs re-imported; each differs from DA only in the ZIP href. Pushed and previewed (4 × update,
-  0 conflicts); every preview ZIP link returns 200.
+  0 conflicts), then **published 2026-10-08** (4/4 live 200); every live ZIP link returns 200.
 
 | Hub | Before | After |
 |---|---|---|
