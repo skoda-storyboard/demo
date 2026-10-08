@@ -113,7 +113,9 @@ var CustomImportScript = (() => {
         locales.append(link(document, `/${code}/`, label2));
       }
     });
-    root.append(switcher, para(document, link(document, "#subscribe", text(subscribe))), locales);
+    root.append(switcher);
+    if (text(subscribe)) root.append(para(document, link(document, "#subscribe", text(subscribe))));
+    root.append(locales);
     root.append(document.createElement("hr"));
     const logo = document.querySelector("header a.logo");
     root.append(para(document, link(document, logo ? logo.getAttribute("href") : `/${locale}/`, "\u0160koda Storyboard", "\u0160koda Storyboard")));

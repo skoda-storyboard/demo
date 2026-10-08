@@ -121,7 +121,10 @@ export function buildNav(document, locale) {
       locales.append(link(document, `/${code}/`, label));
     }
   });
-  root.append(switcher, para(document, link(document, '#subscribe', text(subscribe))), locales);
+  root.append(switcher);
+  // some locales have no Subscribe in the topbar (DE / SK / SR): none is authored then
+  if (text(subscribe)) root.append(para(document, link(document, '#subscribe', text(subscribe))));
+  root.append(locales);
   root.append(document.createElement('hr'));
   // 2) brand
   const logo = document.querySelector('header a.logo');

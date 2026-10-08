@@ -1,3 +1,4 @@
+/* global globalThis */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { policyHref, opensInSameTab, LIVE_ORIGIN } from './links.js';

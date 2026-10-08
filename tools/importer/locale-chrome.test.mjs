@@ -138,3 +138,12 @@ test('a page without the chrome: empty fragments, no throw', () => {
   assert.equal(buildNewsletter(bare, 'cs').children.length, 0);
   assert.equal(sections(buildNav(bare, 'cs')).length, 4, 'the nav keeps its 4 sections');
 });
+
+test('buildNav: a topbar without Subscribe (DE / SK / SR on the source) authors none', () => {
+  const d = doc();
+  d.querySelector('.topbar__newsletter').remove();
+  const [topbar] = sections(buildNav(d, 'de'));
+  assert.equal(topbar.length, 2, 'switcher + locale row');
+  assert.equal(topbar[1].querySelector('strong').textContent, 'DE');
+  assert.equal(topbar.some((el) => el.querySelector('a[href="#subscribe"]')), false);
+});
