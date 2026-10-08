@@ -1,12 +1,12 @@
 # SKODA-838, Origin-drift re-imports (audit F7)
 
 - **Epic:** E08, Editorial at Scale
-- **Type:** import (content refresh; no importer code change)
+- **Type:** import (content refresh; media-ingest corrections)
 - **Phase:** A · **Milestone:** M1
 - **GitHub issue:** [#300](https://github.com/skoda-storyboard/demo/issues/300)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §6 / §8 F7 (approved 2026-10-05; user asked for it 2026-10-08)
 - **Branch:** `skoda-838-origin-drift`
-- **Status (2026-10-08):** 🟡 Drift: 3 pages **published** (3/3 live 200; Media Room promo = origin, Enyaq new title, Epiq City SUV sentences removed). 3 chapters wait for DAM ingest of their new PDFs.
+- **Status (2026-10-08):** 🟡 Drift: 3 pages **published** (3/3 live 200; Media Room promo = origin, Enyaq new title, Epiq City SUV sentences removed). All **234 scoped originals uploaded and verified in author DAM**. The 3 chapters and 20 new blocked pages still wait for PDF/MP4 activation, public verification, and DA push/preview.
 
 ## Scope
 These pages differ from DA because the origin was edited after our import. The other drift findings in the audit
@@ -20,9 +20,9 @@ were already refreshed elsewhere:
 | `/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models` | title → "The new Enyaq RS Race" (heading id changes with it), shortened highlights, CO₂ wording, the "Sustainable biocomposite parts" infographic removed | pushed + previewed |
 | `/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car` | sentences removed (e.g. "using 100% recycled PES for the seat textiles") | pushed + previewed |
 | `/en/media-room` | promo box rotated: the Octavia full hybrid and Epiq Sportline Paris releases replace the Kvasiny newsletter and Zellmer; the News/Images/Videos rails get their "All" links | pushed + previewed |
-| `/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain` | new PDF `2026/09/Skoda_130_RS_c70f7919.pdf`; image added | **blocked: DAM ingest** |
-| `/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success` | new PDF `2026/09/Skoda_Fabia_RS_c8336ee5.pdf` | **blocked: DAM ingest** |
-| `/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain` | new PDF `2026/09/Skoda_Sport_1d69baf7.pdf` | **blocked: DAM ingest** |
+| `/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain` | new PDF `2026/09/Skoda_130_RS_c70f7919.pdf`; image added | author DAM verified; **blocked: asset activation** |
+| `/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success` | new PDF `2026/09/Skoda_Fabia_RS_c8336ee5.pdf` | author DAM verified; **blocked: asset activation** |
+| `/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain` | new PDF `2026/09/Skoda_Sport_1d69baf7.pdf` | author DAM verified; **blocked: asset activation** |
 
 ## Method
 - **Re-import:** all 6 pages from the live origin with main's importers (press-kit-default with SKODA-837 + #287;
@@ -36,8 +36,8 @@ were already refreshed elsewhere:
   references the Enyaq RS Race kit, because the origin removed the infographic. The binary gate otherwise reported
   "imported binary link missing". The DAM asset stays.
 - **Media Room:** the new promo image (Octavia full hybrid, 3.8 MB) is recorded with a delivery-only `media:build`.
-- **125-years chapters:** the 3 new PDFs are recorded as `partial` (`publish: pending`), ready for the
-  developer-machine ingest (`tools/importer/media/README.md`, "PDF/MP4 links").
+- **125-years chapters:** the 3 new PDFs remain `partial` (`dam: done`, `publish: pending`),
+  with authenticated author-original MIME/byte proof. Asset activation is separate from upload.
   - The 130 RS added image is recorded too (5 MB, done).
   - The build also resolved 3 existing rows from `partial` to `done`: two Škoda Sport `.JPG` images, and the 130 RS
     1975 image, which now has a safe 2560px rendition.
@@ -64,8 +64,9 @@ were already refreshed elsewhere:
   - No row went from done back to not-done.
 - **Pushed + previewed (14 "new" pages, 0 conflicts, 14/14 preview 200):** the 10 stories (each carries `categories`
   meta) and the 4 plant newsletters. They enter the query index on publish.
-- **Blocked by the binary gate (20 pages):** 19 releases and the Enyaq Coupé iV link 30 PDFs/MP4s that must be
-  ingested to AEM Assets on a developer machine (`tools/importer/media/README.md`, "PDF/MP4 links"). The imported
+- **Blocked by the binary gate (20 pages):** 19 releases and the Enyaq Coupé iV link 30 PDFs/MP4s now uploaded
+  to author DAM, but still needing approved activation and public verification
+  (`tools/importer/media/README.md`, "PDF/MP4 links"). The imported
   content is ready in `.migration/new-content/import/`.
 
 All files below are under `www.skoda-storyboard.com/direct-download/`, except the Enyaq Coupé TD PDF, which is under
@@ -94,18 +95,38 @@ All files below are under `www.skoda-storyboard.com/direct-download/`, except th
 | `/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-pictures-on-the-skoda-storyboard` | `2026/05/260519_World-premiere-of-the-all-new-Skoda-Epiq-photorelease_00c4f24e.pdf` |
 | `/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv` | `2022/03/TD-Enyaq-Coupe-en_new_44e9640d.pdf` |
 
+## DAM upload execution (2026-10-08)
+- Frozen scope: the branch's 222 new rows (189 images, 26 PDFs, 7 MP4s), plus 12
+  previously referenced images whose DAM step was missing or failed.
+- Uploaded **201 images, 26 PDFs, and 7 MP4s** to `author-p220607-e2281243.adobeaemcloud.com`,
+  under the existing page-mirrored `/content/dam/storyboard/` paths, without `--force`.
+- Authenticated author HEAD verified **234/234 originals** against their MIME and byte counts:
+  **1,204,695,477 bytes** total. Each row carries `dam_verified` proof.
+- Fixed six original-image fetches: `.JPG-WxH.jpg` references have real `.JPG.jpg`
+  originals. Fetching preserves their double extensions; logical IDs and DAM filenames stay unchanged.
+- PDF/MP4 uploads used `--upload-only`: all 33 have `steps.dam: done`, remain
+  `partial` with `steps.publish: pending`, and have no public-delivery proof.
+  No asset activation, DA writes, previews, or page publication ran.
+- Media regression suite: 111 passed. Repository `npm run lint` passed.
+  Explicit `.mjs` lint found only the two existing `eqeqeq` violations in `media-lib.mjs`;
+  the modified builder and tests pass explicit lint.
+
 ## Next
-1. DAM ingest of the 3 PDFs (developer machine).
-2. Then `media:apply`, push + preview of the 3 chapters (content in `.migration/f7/import-pk/`).
-3. Publish (separate go-ahead).
+1. Approve activation of the 33 uploaded PDFs/MP4s, then resume the scoped build without
+   `--upload-only`, using the public-URL map; this verifies public delivery without re-uploading.
+2. Then `media:apply`, push + preview of the 3 chapters (content in `.migration/f7/import-pk/`)
+   and the 20 new blocked pages (`.migration/new-content/import/`).
+3. Publish the pages (separate go-ahead).
 
 ## Acceptance Criteria
 - [x] The 6 drifted pages re-imported from the current origin; the DA diff shows only origin edits
 - [x] 3 pages pushed + previewed (0 conflicts)
-- [ ] 3 new PDFs ingested to AEM Assets; the 3 chapters pushed + previewed
+- [x] 3 new PDFs uploaded to AEM Assets author DAM and original MIME/bytes verified
+- [ ] 3 new PDFs activated and publicly verified; the 3 chapters pushed + previewed
 - [x] The 3 refreshed pages published (2026-10-08, user go-ahead)
 - [ ] The 3 chapters published after ingest (separate go-ahead)
 - [x] Latest content imported: 34 pages; 14 pushed + previewed
-- [ ] 30 new PDFs/MP4s ingested; the 20 blocked pages pushed + previewed
+- [x] 30 new PDFs/MP4s uploaded to author DAM and original MIME/bytes verified
+- [ ] 30 new PDFs/MP4s activated and publicly verified; the 20 blocked pages pushed + previewed
 - [x] The 14 ready new pages published (2026-10-08, user go-ahead): 14/14 live 200 and indexed; the live index now leads with Peaq designblok (8 Oct), Octavia full hybrid (5 Oct), Superb 25 (29 Sep)
 - [ ] The 20 blocked new pages published after ingest (separate go-ahead)
