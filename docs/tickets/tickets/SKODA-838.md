@@ -107,4 +107,5 @@ All files below are under `www.skoda-storyboard.com/direct-download/`, except th
 - [ ] The 3 chapters published after ingest (separate go-ahead)
 - [x] Latest content imported: 34 pages; 14 pushed + previewed
 - [ ] 30 new PDFs/MP4s ingested; the 20 blocked pages pushed + previewed
-- [ ] Publish the new pages (separate go-ahead)
+- [x] The 14 ready new pages published (2026-10-08, user go-ahead): 14/14 live 200 and indexed; the live index now leads with Peaq designblok (8 Oct), Octavia full hybrid (5 Oct), Superb 25 (29 Sep)
+- [ ] The 20 blocked new pages published after ingest (separate go-ahead)
