@@ -6,7 +6,7 @@
 - **GitHub issue:** [#300](https://github.com/skoda-storyboard/demo/issues/300)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §6 / §8 F7 (approved 2026-10-05; user asked for it 2026-10-08)
 - **Branch:** `skoda-838-origin-drift`
-- **Status (2026-10-08):** 🟡 3 pages pushed + previewed (not published). 3 chapters wait for DAM ingest of their new PDFs.
+- **Status (2026-10-08):** 🟡 3 pages **published** (3/3 live 200; Media Room promo = origin, Enyaq new title, Epiq City SUV sentences removed). 3 chapters wait for DAM ingest of their new PDFs.
 
 ## Scope
 These pages differ from DA because the origin was edited after our import. The other drift findings in the audit
@@ -52,4 +52,5 @@ were already refreshed elsewhere:
 - [x] The 6 drifted pages re-imported from the current origin; the DA diff shows only origin edits
 - [x] 3 pages pushed + previewed (0 conflicts)
 - [ ] 3 new PDFs ingested to AEM Assets; the 3 chapters pushed + previewed
-- [ ] Published (separate go-ahead)
+- [x] The 3 refreshed pages published (2026-10-08, user go-ahead)
+- [ ] The 3 chapters published after ingest (separate go-ahead)
