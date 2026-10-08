@@ -60848,8 +60848,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2021/06/210628-SKODA-SPORT-12.jpg"
+      "status": "done",
+      "note": ""
     },
     "c5eeff22__01.jpg": {
       "logical_id": "c5eeff22__01.jpg",
@@ -62077,25 +62077,24 @@
       "dam_asset_path": "/content/dam/storyboard/en/press-kits/125-years-of-skoda-motorsport-press-kit/images/211025-SKODA-130-RS-1975-2.jpg",
       "dam_original_url": "https://cdn.skoda-storyboard.com/2021/10/211025-SKODA-130-RS-1975-2.jpg",
       "original_download_url": "",
-      "delivery_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2021/10/211025-SKODA-130-RS-1975-2-2560x1810.jpg",
       "da_path": "",
       "alt": "Škoda 130 RS Rallye Monte Carlo",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2021/10/211025-SKODA-130-RS-1975-2-768x543.jpg",
-        "https://cdn.skoda-storyboard.com/2021/10/211025-SKODA-130-RS-1975-2-384x272.jpg"
+        "https://cdn.skoda-storyboard.com/2021/10/211025-SKODA-130-RS-1975-2-768x543.jpg"
       ],
       "aspect_crop_source": true,
-      "bytes": null,
-      "preconditioned": false,
+      "bytes": 676685,
+      "preconditioned": true,
       "steps": {
-        "deliver": "skipped",
+        "deliver": "done",
         "dam": "done",
-        "da": "n/a",
-        "publish": "done"
+        "publish": "done",
+        "da": "n/a"
       },
-      "status": "partial",
-      "note": "no safe delivery rendition: oversize-no-derivative-under-threshold(11992377, min 768px)",
+      "status": "done",
+      "note": "",
       "dam_status": 200,
       "publish_status": 200,
       "published_at": "2026-09-29T13:48:51.995Z",
@@ -69966,8 +69965,8 @@
         "dam": "error",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": "HTTP 403 for https://cdn.skoda-storyboard.com/2021/06/210628-SKODA-SPORT-14.jpg"
+      "status": "done",
+      "note": ""
     },
     "8b558dfa__Skoda_Epiq_Exterior_front_3ecc3636.jpg": {
       "logical_id": "8b558dfa__Skoda_Epiq_Exterior_front_3ecc3636.jpg",
@@ -92723,9 +92722,7 @@
       "source_url": "https://www.skoda-storyboard.com/direct-download/2025/06/New_Enyaq_RS_Race_Sustainable_biocomposite_parts_28a6e66c.pdf",
       "master_url": "https://www.skoda-storyboard.com/direct-download/2025/06/New_Enyaq_RS_Race_Sustainable_biocomposite_parts_28a6e66c.pdf",
       "dam_page_path": "en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models",
-      "page_refs": [
-        "en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models"
-      ],
+      "page_refs": [],
       "dam_asset_path": "/content/dam/storyboard/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models/New_Enyaq_RS_Race_Sustainable_biocomposite_parts_28a6e66c.pdf",
       "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2025/06/New_Enyaq_RS_Race_Sustainable_biocomposite_parts_28a6e66c.pdf",
       "original_download_url": "",
@@ -92751,7 +92748,7 @@
         "da": "n/a"
       },
       "status": "done",
-      "note": "",
+      "note": "2026-10-08: origin removed this infographic from the Enyaq RS Race kit (SKODA-838 drift); no page links it now",
       "source_content_type": "application/octet-stream",
       "dam_status": 200,
       "publish_status": 200,
@@ -104402,7 +104399,10 @@
         "en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
         "en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design",
         "en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance",
-        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+        "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success",
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -118207,6 +118207,160 @@
         "da": "n/a"
       },
       "status": "done",
+      "note": ""
+    },
+    "971e68b7__Skoda-Octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain-1_4034be13.jpg": {
+      "logical_id": "971e68b7__Skoda-Octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain-1_4034be13.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Skoda-Octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain-1_4034be13-1440x960.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Skoda-Octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain-1_4034be13.jpg",
+      "dam_page_path": "en/media-room",
+      "page_refs": [
+        "en/media-room"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Skoda-Octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain-1_4034be13.jpg",
+      "da_path": "",
+      "alt": "Škoda Octavia is the brand’s first model with a full hybrid powertrain",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Skoda-Octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain-1_4034be13-1440x960.jpg"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 3774456,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__Skoda-130-RS_614a27e2.jpg": {
+      "logical_id": "971e68b7__Skoda-130-RS_614a27e2.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Skoda-130-RS_614a27e2-768x510.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Skoda-130-RS_614a27e2.jpg",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Skoda-130-RS_614a27e2.jpg",
+      "da_path": "",
+      "alt": "Škoda 130 RS",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Skoda-130-RS_614a27e2-768x510.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 5011437,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "2ba8cd9d__Skoda_Sport_1d69baf7.pdf": {
+      "kind": "document",
+      "logical_id": "2ba8cd9d__Skoda_Sport_1d69baf7.pdf",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Sport_1d69baf7.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Sport_1d69baf7.pdf",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "PDF",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Sport_1d69baf7.pdf"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "2ba8cd9d__Skoda_Fabia_RS_c8336ee5.pdf": {
+      "kind": "document",
+      "logical_id": "2ba8cd9d__Skoda_Fabia_RS_c8336ee5.pdf",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Fabia_RS_c8336ee5.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Fabia_RS_c8336ee5.pdf",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "PDF",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Fabia_RS_c8336ee5.pdf"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
+      "note": ""
+    },
+    "2ba8cd9d__Skoda_130_RS_c70f7919.pdf": {
+      "kind": "document",
+      "logical_id": "2ba8cd9d__Skoda_130_RS_c70f7919.pdf",
+      "source_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_130_RS_c70f7919.pdf",
+      "master_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_130_RS_c70f7919.pdf",
+      "dam_page_path": "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain",
+      "page_refs": [
+        "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "",
+      "public_url": "",
+      "public_verified": null,
+      "da_path": "",
+      "title": "PDF",
+      "alt": "",
+      "caption": "",
+      "seen_urls": [
+        "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_130_RS_c70f7919.pdf"
+      ],
+      "bytes": null,
+      "steps": {
+        "deliver": "n/a",
+        "dam": "n/a",
+        "publish": "pending",
+        "da": "n/a"
+      },
+      "status": "partial",
       "note": ""
     }
   }
