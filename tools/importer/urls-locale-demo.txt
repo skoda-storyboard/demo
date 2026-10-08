@@ -1,0 +1,15 @@
+# SKODA-303a M1 demo: the Epiq story's translations + the translated chrome (push-to-da list).
+# DE / SK / SR keep the English /footer (PO, M1: their source footer links a non-DAM cookie PDF).
+/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund
+/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund
+/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds
+/cs/nav
+/cs/nav-newsletter
+/cs/footer
+/de/nav
+/de/nav-newsletter
+/sk/nav
+/sk/nav-newsletter
+/sr/nav
+/sr/nav-newsletter

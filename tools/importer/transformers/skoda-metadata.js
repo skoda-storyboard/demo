@@ -8,8 +8,7 @@
  * Replaces per-page hardcoded metadata transformers (e.g. the Elroq-specific
  * skoda-model-metadata.js) with ONE extractor that derives, from ANY source page,
  * the fields the published query-index + the tags block read:
- *   Title, Description, Image, publisheddate, template, category, tags + 15 facets,
- *   and alternates (the page's hreflang translations, the header's language switcher).
+ *   Title, Description, Image, publisheddate, template, category, tags + 15 facets.
  *
  * ⚠️ SELF-CONTAINED ON PURPOSE. This transformer is loaded standalone by the
  * per-save transformer-validator (no module resolution) AND inlined by the import
@@ -309,33 +308,6 @@ function extractTagsAndFacets(document, pageUrl = '') {
   return { tags, byFacet };
 }
 
-// The site's locales, in the switcher's order. Mirror of skoda-metadata-extract.mjs
-// ALTERNATE_LOCALES (a test asserts they match).
-const ALTERNATE_LOCALES = ['en', 'cs', 'de', 'sk', 'sr', 'sl'];
-
-/**
- * `alternates` (SKODA-303a): the page's declared translations from the source head's
- * <link rel="alternate" hreflang href>, as `cs: https://…/, de: https://…/` for the header's
- * language switcher. Drops x-default, the page's own locale, unsupported codes, non-http(s)
- * URLs and URLs outside their locale's tree; first per locale wins; ALTERNATE_LOCALES order.
- * Keep in sync with skoda-metadata-extract.mjs::pickAlternates.
- */
-function extractAlternates(document, pageUrl) {
-  let own = '';
-  try { own = new URL(pageUrl).pathname.split('/')[1].toLowerCase(); } catch (e) { /* no url */ }
-  const found = new Map();
-  document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((link) => {
-    const code = String(link.getAttribute('hreflang') || '').trim().toLowerCase().split('-')[0];
-    if (!ALTERNATE_LOCALES.includes(code) || code === own || found.has(code)) return;
-    let url;
-    try { url = new URL(link.getAttribute('href')); } catch (e) { return; }
-    if (!/^https?:$/.test(url.protocol)) return;
-    if ((url.pathname.split('/')[1] || '').toLowerCase() !== code) return;
-    found.set(code, url.href);
-  });
-  return ALTERNATE_LOCALES.filter((c) => found.has(c)).map((c) => `${c}: ${found.get(c)}`).join(', ');
-}
-
 function splitList(value) {
   return value ? String(value).split(',').map((s) => s.trim()).filter(Boolean) : [];
 }
@@ -391,9 +363,6 @@ export default function transform(hookName, element, payload) {
   // story: its WP categories + ancestors, for the category archives (SKODA-831)
   const categories = template === 'story' ? extractCategories(document) : [];
   if (categories.length) meta.categories = categories.join(', ');
-  // the page's declared translations, for the language switcher (SKODA-303a)
-  const alternates = extractAlternates(document, pageUrl);
-  if (alternates) meta.alternates = alternates;
 
   // tags = derived ∪ override (comma-joined → AEM splits into article:tag metas).
   const allTags = [...new Set([...derivedTags, ...splitList(overrides.tags)])];

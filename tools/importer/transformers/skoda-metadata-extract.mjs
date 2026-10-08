@@ -292,11 +292,11 @@ export const ALTERNATE_LOCALES = ['en', 'cs', 'de', 'sk', 'sr', 'sl'];
 
 /**
  * `alternates` (SKODA-303a): the page's declared translations from the source head's
- * `<link rel="alternate" hreflang href>`, as `cs: https://…/, de: https://…/` for the header's
- * language switcher. Dropped: x-default, the page's own locale, unsupported codes (a region
- * subtag is ignored, `de-AT` → de), non-http(s) URLs and URLs outside their locale's tree;
- * the first per locale wins. Ordered as ALTERNATE_LOCALES. Empty string when none.
- * Keep in sync with skoda-metadata.js::extractAlternates.
+ * `<link rel="alternate" hreflang href>`, as `cs: https://…/, de: https://…/`. Dropped:
+ * x-default, the page's own locale, unsupported codes (a region subtag is ignored, `de-AT` →
+ * de), non-http(s) URLs and URLs outside their locale's tree; the first per locale wins.
+ * Ordered as ALTERNATE_LOCALES. Empty string when none. build-locale-alternates.mjs maps the
+ * result to the migrated EDS pages for the header's language switcher.
  * @param {Array<[string, string]>} links [hreflang, href] pairs in source order
  * @param {string} pageUrl the source page URL (its first segment is its own locale)
  * @returns {string}
@@ -329,7 +329,7 @@ export function splitList(value) {
  */
 export function buildMetaFields({
   title = '', description = '', publisheddate = '', template = '', category = '',
-  categories = '', alternates = '', derived = { tags: [], byFacet: {} }, overrides = {},
+  categories = '', derived = { tags: [], byFacet: {} }, overrides = {},
 } = {}) {
   const meta = {};
   if (cleanTitle(title)) meta.Title = cleanTitle(title);
@@ -342,8 +342,6 @@ export function buildMetaFields({
   if (category) meta.category = category;
   // story: its WP categories + ancestors, for the category archives (pickCategories, SKODA-831)
   if (categories) meta.categories = categories;
-  // the page's declared translations, for the language switcher (pickAlternates, SKODA-303a)
-  if (alternates) meta.alternates = alternates;
 
   const facetValues = {};
   FACETS.forEach((f) => {

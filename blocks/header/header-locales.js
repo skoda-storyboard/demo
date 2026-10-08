@@ -9,13 +9,13 @@
  * fragment serves every locale tree. Each link gets `hreflang` / `lang` and the language's own
  * name as its accessible name; the visible text stays the code.
  *
- * Targets (SKODA-303a): the page's declared translations, the `alternates` metadata the
- * importer takes from the source page's `<link rel="alternate" hreflang>` (x-default dropped).
- * A locale without a declared translation is omitted: no prefix swap, no locale-home fallback.
- * A translation must be in its own locale's tree, on EDS or on the live site (the permitted
- * legacy URLs while the locale trees aren't migrated); it opens in the same tab, as on the
- * source. Only an authored link to another site replaces a declared translation, in a new tab
- * (the Media Room DE → skoda-media.de, as on the source). The list is marked
+ * Targets (SKODA-303a): the page's declared translations, the `alternates` metadata built
+ * from the source page's `<link rel="alternate" hreflang>` (x-default dropped) for the pairs
+ * migrated to EDS (tools/importer/build-locale-alternates.mjs). A locale without one is
+ * omitted: no prefix swap, no locale-home fallback, never a live-site URL. A translation must
+ * be a page of this site in its own locale's tree; it opens in the same tab, as on the source.
+ * Only an authored link to another site replaces a declared translation, in a new tab (the
+ * Media Room DE → skoda-media.de, as on the source). The list is marked
  * `data-link-policy="resolved"` so the site's link pass (scripts/links.js) leaves it alone.
  *
  * i18n: the list's name lives in LABELS (English, the header's other control text is too;
@@ -120,13 +120,13 @@ export function parseAlternates(value) {
 }
 
 /**
- * A declared translation as a permitted link target, else null: an http(s) URL in its own
- * locale's tree (`/cs/…` for cs), on this site (a migrated EDS variant) or on the live site
- * (the permitted legacy URL).
+ * A declared translation as a permitted link target, else null: a page of this site (a
+ * migrated EDS variant) in its own locale's tree (`/cs/…` for cs). Live-site URLs are not
+ * targets: the switcher never leaves the demo (SKODA-303a, PO 2026-10-08).
  * @param {string} code the locale
- * @param {string} href the declared URL
+ * @param {string} href the declared URL (site-relative, as the generator writes it)
  * @param {string} base the page URL
- * @returns {string|null} the absolute URL
+ * @returns {string|null} the site-relative path (+ query / hash)
  */
 export function permittedTranslation(code, href, base) {
   let url;
@@ -135,9 +135,9 @@ export function permittedTranslation(code, href, base) {
   } catch (e) {
     return null;
   }
-  if (!/^https?:$/.test(url.protocol)) return null;
+  if (!/^https?:$/.test(url.protocol) || url.host !== new URL(base).host) return null;
   if (url.pathname.split('/')[1]?.toLowerCase() !== code) return null;
-  return [new URL(base).host, LIVE_HOST].includes(url.host) ? url.href : null;
+  return `${url.pathname}${url.search}${url.hash}`;
 }
 
 /** An authored link to another site (neither this one nor the live storyboard). */

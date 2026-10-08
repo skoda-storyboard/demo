@@ -266,15 +266,6 @@ test('pickAlternates: unsupported, malformed, off-tree and repeated alternates a
   assert.equal(pickAlternates([['en', `${LIVE}/en/x/`]], 'not a url'), `en: ${LIVE}/en/x/`);
 });
 
-test('buildMetaFields carries alternates; empty stays out', () => {
-  assert.equal(buildMetaFields({ alternates: `cs: ${LIVE}/cs/` }).meta.alternates, `cs: ${LIVE}/cs/`);
-  assert.equal('alternates' in buildMetaFields({}).meta, false);
-});
-
-test('the transformer and the header use the same locale list as pickAlternates', () => {
-  const here = path.dirname(fileURLToPath(import.meta.url));
-  const src = readFileSync(path.join(here, 'skoda-metadata.js'), 'utf8');
-  const declared = `const ALTERNATE_LOCALES = [${ALTERNATE_LOCALES.map((c) => `'${c}'`).join(', ')}];`;
-  assert.ok(src.includes(declared), 'skoda-metadata.js must declare the same ALTERNATE_LOCALES');
+test('pickAlternates uses the locale list of the header switcher', () => {
   assert.deepEqual(LOCALES.map((l) => l.code), ALTERNATE_LOCALES);
 });

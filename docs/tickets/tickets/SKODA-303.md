@@ -110,16 +110,24 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
   `x-default` is ignored; the current locale is plain text; desktop and the drawer share one list; there is no
   locale-home fallback. Links open in the same tab, as the source. Media Room DE keeps the visible source behaviour
   (`skoda-media.de`, new tab) through the nav row's authored link.
-- **Migration caveat:** the source hreflang only proves the translation exists on the source. Each one must resolve
-  to a published EDS variant or to a permitted legacy (live) URL in its own locale's tree; anything else is dropped.
-- **Code:** `header-locales.js` (`parseAlternates`, `permittedTranslation`), the list is marked
-  `data-link-policy="resolved"`, and `scripts/links.js` leaves such links alone. The importer writes `alternates`
-  (`skoda-metadata.js` + `skoda-metadata-extract.mjs::pickAlternates`; the 19 bundles are rebuilt).
-- **Content:** the 245 published pages imported before this get their `alternates` from the bulk metadata sheet
-  (`tools/importer/build-locale-alternates.mjs`, rows only `URL` + `alternates`; no page document touched). Dry run
-  2026-10-08: 242 pages with translations, 0 dead; 2 without any (Elroq press kit 2, `category/design-eng`, EN only,
-  as the source); `/en/test/listing-demo` skipped (no source). `/media-room/nav` was published (it still had the
-  locale homes and `/de/`).
+- **PO, 2026-10-08: the switch never navigates to the live site.** Only translations migrated to EDS are linked
+  (Lars's caveat: hreflang proves availability on the source, not on EDS). For M1 one page family is migrated: the
+  Epiq story in EN + CS / DE / SK / SR (live has no SL). Every other page shows only its own language.
+- **Code:** `header-locales.js` (`parseAlternates`, `permittedTranslation`: same-site pages in their own locale
+  tree only), the list is marked `data-link-policy="resolved"`, and `scripts/links.js` leaves such links alone;
+  `scripts.js` sets `<html lang>` from the locale tree. The importer doesn't write `alternates` (it can't know what
+  is migrated): `tools/importer/build-locale-alternates.mjs` derives them from the source hreflang for the pairs on
+  EDS and writes `URL` + `alternates` rows into the bulk `/metadata` sheet (plus `/{locale}/**` → `/{locale}/nav`,
+  `/{locale}/footer` with `--chrome`).
+- **Content (DA preview, 2026-10-08):** the 4 translated stories (story importer, `urls-story-detail-locales.txt`;
+  metadata + block gates pass, images on the media bus) and the translated chrome per locale (`/{locale}/nav`,
+  `/{locale}/nav-newsletter`, `/{locale}/footer`, `import-locale-*.js`, `urls-locale-chrome.txt`). The DE / SK / SR
+  pages keep the English `/footer` (PO, M1): their source footer links the cookie-policy PDF on
+  `assets.cookies.skoda-auto.com`, which the binary gate holds (not in DAM).
+  `/media-room/nav` was published (it still had the locale homes and `/de/`).
+- **Known gaps:** the Subscribe panel's thank-you text stays English (no source text, the source shows its ESP
+  response); the header's search scope labels are English strings (SKODA-1003); the app badges keep the English
+  artwork; the translated menus' targets aren't migrated, so the link policy sends them to the live site.
 
 ## Dependencies
 - Upstream: SKODA-301 (Header + nav fragment) / Downstream: SKODA-1003 (language-negotiated root routing + per-locale placeholders)
