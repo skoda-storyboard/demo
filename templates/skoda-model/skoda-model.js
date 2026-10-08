@@ -17,10 +17,11 @@
 import { wireImageLinks } from '../../scripts/media-lightbox.js';
 
 // heading id (importer slug) → section role, nav icon (icons/model-*.svg) and the source's
-// anchor (so old deep links such as /en/skoda-model/octavia/#keyfacts still land)
+// anchor (so old deep links such as /en/skoda-model/octavia/#keyfacts still land). The RS
+// derivatives title the intro "Model introduction" (SKODA-208a).
 const SECTIONS = [
   {
-    test: /^model-description/, role: 'model-intro', icon: 'model-description', alias: 'intro',
+    test: /^model-(description|introduction)/, role: 'model-intro', icon: 'model-description', alias: 'intro',
   },
   {
     test: /^(highlights|key-facts)/, role: 'model-highlights', icon: 'model-key-facts', alias: 'keyfacts',
@@ -39,6 +40,17 @@ const SECTIONS = [
 ];
 
 const sectionFor = (id) => SECTIONS.find((s) => s.test.test(id || ''));
+
+/**
+ * A section's role: the key-facts panel by its authored block (`Cards (key-facts)`, whatever
+ * its title: Highlights, Key Facts, the RS pages' Key Specifications / Key Highlights), the
+ * others by their heading id.
+ * @param {Element} section
+ * @param {string} [id] The section heading's id
+ */
+const roleFor = (section, id) => (section.querySelector('.cards.key-facts')
+  ? SECTIONS.find((s) => s.role === 'model-highlights')
+  : sectionFor(id));
 
 /** The `template` value of a story-rail config table (before the block decorates). */
 function railTemplate(rail) {
@@ -59,9 +71,10 @@ function decorateHero(main) {
 function decorateSections(main) {
   main.querySelectorAll(':scope > .section').forEach((section) => {
     const heading = section.querySelector(':scope > .default-content-wrapper > h2[id]');
-    const match = sectionFor(heading?.id);
+    const match = roleFor(section, heading?.id);
     if (!match) return;
     section.classList.add(match.role);
+    section.dataset.modelIcon = match.icon; // the nav item's icon follows the section's role
     if (match.alias && !document.getElementById(match.alias)) section.id = match.alias;
 
     if (match.role === 'model-techdata') {
@@ -112,7 +125,8 @@ function decorateNav(main) {
     const target = document.getElementById(id);
     if (!target) { li.remove(); return; } // never a dangling link (source bug)
     const icon = document.createElement('span');
-    icon.className = `model-nav-icon icon-${sectionFor(id)?.icon || 'model-description'}`;
+    const role = target.closest('.section')?.dataset.modelIcon || sectionFor(id)?.icon;
+    icon.className = `model-nav-icon icon-${role || 'model-description'}`;
     icon.setAttribute('aria-hidden', 'true');
     a.prepend(icon);
     li.dataset.target = id;
