@@ -288,6 +288,13 @@ body.press-kit .section.body-column .default-content-wrapper > p {
   margin-block: 0 var(--paragraph-gap);
 }
 
+/* Text right after a Downloads grid on an Images child (the 125-years "For more photos…" lines,
+   the regulatory note under a gallery group, SKODA-837) sits the source's 32px below the grid;
+   it used to touch the grid / its Show more pill (0px). */
+body.press-kit .section.body-column .downloads-wrapper + .default-content-wrapper > p:first-child {
+  margin-block-start: calc(2 * var(--spacing-m));
+}
+
 /* the source's lead margin plus the entry's 10px inset: 30px to the first paragraph */
 body.press-kit .section.body-column .default-content-wrapper:first-child > p:first-child {
   margin-block-end: calc(var(--paragraph-gap) + var(--page-gutter));

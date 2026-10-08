@@ -919,3 +919,65 @@ test('consecutive figure quotes with nested content keep every word, first or se
     assert.match(txt(second.cells[1]), /^Second author$/);
   });
 });
+
+// SKODA-837 (audit F6) ------------------------------------------------------------------------
+const LEAD = '<div class="article-teaser-media"><img src="https://cdn.skoda-storyboard.com/lead.jpg" alt="Lead"></div>';
+const REG = 'Škoda Epiq: Power consumption combined: 13,7-14,1 kWh/100 km, CO₂ emissions combined: 0 g/km.';
+function captioned(i, caption) {
+  return asset(i).replace(/<img ([^>]*)>/, `<img $1 data-caption="${caption}">`);
+}
+function captionedGroup(title, from, captions) {
+  const items = captions.map((caption, i) => captioned(from + i, caption)).join('');
+  return grid(`<div class="so-panel widget_sow-editor"><div class="so-widget-sow-editor">
+    <h3 class="widget-title">${title}</h3><div class="textwidget"><div class="search-results search-results-gallery">
+    <div class="search-results-container"><div class="search-results-items">${items}</div></div></div></div></div></div>`);
+}
+const imagesUrl = `${base}skoda-epiq-press-kit-2/images/`;
+
+test('an Images child without its own teaser gets no stray lead copied from a gallery tile', { skip: !JSDOM }, () => {
+  const html = fixture({
+    chapters: true, mediaBox: false, togglesCount: 0, extra: galleryGroup('Exterior', 0, 3),
+  }).replace(LEAD, '');
+  const page = run(html, imagesUrl);
+  const firstTileSrc = 'https://cdn.skoda-storyboard.com/img-0.jpg';
+  const outsideDownloads = [...page.querySelectorAll('img')]
+    .filter((img) => !blocks(page, 'Downloads').some((block) => block.contains(img)));
+  assert.ok(!outsideDownloads.some((img) => img.getAttribute('src') === firstTileSrc), 'no gallery tile above the first section');
+  // A real article teaser is still the lead.
+  const withLead = run(fixture({
+    chapters: true, mediaBox: false, togglesCount: 0, extra: galleryGroup('Exterior', 0, 3),
+  }), imagesUrl);
+  assert.ok([...withLead.querySelectorAll('img')]
+    .some((img) => img.getAttribute('src').endsWith('/lead.jpg')
+      && !blocks(withLead, 'Downloads').some((block) => block.contains(img))), 'the article teaser stays the lead');
+});
+
+test('a source .pdff link is imported as the .pdf and named Download PDF', { skip: !JSDOM }, () => {
+  const html = fixture({}).replace(
+    'Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdf"',
+    'Press_Kit_Skoda_Peaq_Covered-Drive_fec49d8b.pdff"',
+  );
+  const page = run(html, target);
+  const hrefs = [...page.querySelectorAll('a[href]')].map((a) => a.getAttribute('href'));
+  assert.ok(!hrefs.some((href) => href.toLowerCase().includes('.pdff')), 'no .pdff left');
+  const fixed = [...page.querySelectorAll('a[href]')]
+    .find((a) => a.getAttribute('href').endsWith('Covered-Drive_fec49d8b.pdf'));
+  assert.ok(fixed, 'the .pdf link');
+  assert.equal(fixed.title, 'Download PDF');
+});
+
+test('an Images-child gallery keeps each distinct regulatory caption once, under its group; plain captions stay out', { skip: !JSDOM }, () => {
+  const page = run(fixture({
+    chapters: true,
+    mediaBox: false,
+    togglesCount: 0,
+    extra: captionedGroup('Exterior', 0, [REG, REG, 'A quiet morning on the test track'])
+      + captionedGroup('History', 3, ['The FC model had a front engine.', 'Built in 1908.']),
+  }), imagesUrl);
+  const [exterior] = blocks(page, 'Downloads');
+  assert.equal(txt(exterior.nextElementSibling), REG, 'the note sits right after its group');
+  assert.equal([...page.querySelectorAll('p')].filter((p) => txt(p) === REG).length, 1, 'once, not per image');
+  assert.ok(!page.textContent.includes('quiet morning'), 'a plain lightbox caption stays dropped');
+  assert.ok(!page.textContent.includes('FC model had a front engine'), 'a non-regulatory group gets no note');
+  assert.equal(page.querySelectorAll('[data-caption]').length, 0, 'no data-caption leaks');
+});
