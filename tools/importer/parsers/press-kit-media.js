@@ -63,6 +63,10 @@ export default function parse(element, { document }) {
   });
   // A gallery group sits in the article column, where the Downloads block would show every tile;
   // the source's togglebox shows two rows first, which is the block's `collapse auto` (SKODA-510).
-  const config = element.matches('.search-results-gallery') ? [['collapse', 'auto']] : [];
-  element.replaceWith(WebImporter.DOMUtils.createTable([['Downloads'], ...config, ...rows], document));
+  // It is `Downloads (gallery)`: the Images-chapter tile, grid and group pills (SKODA-806); without
+  // the variant it still reads as a collapsed Downloads grid.
+  const gallery = element.matches('.search-results-gallery');
+  const config = gallery ? [['collapse', 'auto']] : [];
+  const name = gallery ? 'Downloads (gallery)' : 'Downloads';
+  element.replaceWith(WebImporter.DOMUtils.createTable([[name], ...config, ...rows], document));
 }

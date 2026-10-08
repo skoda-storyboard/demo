@@ -11,6 +11,12 @@
  * bound to /scripts/media-cart.js; in a Media Box a group toggle on the section's stats line
  * adds (or removes) all of them at once, as on the source.
  *
+ * `Downloads (gallery)` (SKODA-806, press-kit-media.md §3): an Images-chapter group of a press
+ * kit. Same rows; the tile shows only its thumbnail with the add and download controls over its
+ * lower left corner, the grid follows the Media Box ladder (1 / 2 / 3 / 4 at 520 / 768 / 992), and
+ * the group carries the source's "Original" / "1920px" pills above it. "Original" adds (or
+ * removes) the whole group; "1920px" stays inert, as the cart holds originals only (SKODA-505a).
+ *
  * Authored as one row per asset (content-sniffed, never by position):
  *
  *   | Downloads                                        |
@@ -39,6 +45,10 @@ const LABELS = {
   // cart's placeholders labels replace it)
   add: (title) => (title ? `Add to media cart: ${title}` : 'Add to media cart'),
   addAll: 'Add all files to the media cart',
+  // the gallery group pills (visible text = the size, as on the source)
+  groupSize: (size) => size,
+  groupAdd: (size) => `Add all ${size} versions to the media cart`,
+  groupUnavailable: (size) => `${size} versions can't be added to the media cart`,
 };
 
 /**
@@ -338,12 +348,30 @@ export function statsLine(block) {
  * on the block's stats line (statsLine) when there is one, else above the grid. Returns the
  * button (inert until wired).
  */
-function buildAddAll(block) {
+function buildAddAll(block, gallery = false) {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'downloads-add downloads-add-all';
   btn.setAttribute('aria-label', LABELS.addAll);
   btn.setAttribute('aria-disabled', 'true');
+  if (gallery) {
+    // the source group's pills: "Original" is the group toggle, "1920px" can't be in the cart
+    btn.classList.add('downloads-group-size');
+    btn.textContent = LABELS.groupSize('Original');
+    btn.dataset.label = LABELS.groupAdd('Original');
+    btn.setAttribute('aria-label', btn.dataset.label);
+    const giant = document.createElement('button');
+    giant.type = 'button';
+    giant.className = 'downloads-group-size';
+    giant.textContent = LABELS.groupSize('1920px');
+    giant.setAttribute('aria-label', LABELS.groupUnavailable('1920px'));
+    giant.setAttribute('aria-disabled', 'true');
+    const bar = document.createElement('div');
+    bar.className = 'downloads-toolbar downloads-group';
+    bar.append(btn, giant);
+    block.prepend(bar);
+    return btn;
+  }
   const stats = statsLine(block);
   if (stats) {
     stats.classList.add('downloads-stats');
@@ -384,7 +412,7 @@ export async function bindCart(block, addAll, load = () => Promise.all([
     addAll.toggleAttribute('data-in-cart', full);
     // a toggle keeps its name; pressed says everything is in (a click then removes it all)
     addAll.setAttribute('aria-pressed', String(full));
-    addAll.setAttribute('aria-label', labels.addAll);
+    addAll.setAttribute('aria-label', addAll.dataset.label || labels.addAll);
     if (open.length) addAll.removeAttribute('aria-disabled');
     else addAll.setAttribute('aria-disabled', 'true');
   };
@@ -495,6 +523,10 @@ export default async function decorate(block) {
   const cfg = readConfig(block);
   const mediaBox = block.classList.contains('media-box') || !!block.closest('.section.media-box');
   if (mediaBox) block.classList.add('downloads-media-box');
+  // a press-kit Images group (SKODA-806). A Media Box keeps its own presentation: the class goes,
+  // so no gallery style reaches it either (PR #287 review)
+  const gallery = !mediaBox && block.classList.contains('gallery');
+  if (mediaBox) block.classList.remove('gallery');
   if (cfg.collapse !== null && !['auto', 'none'].includes(cfg.collapse)) {
     throw new Error('downloads: collapse must be auto or none');
   }
@@ -525,7 +557,8 @@ export default async function decorate(block) {
   });
 
   block.replaceChildren(list);
-  const addAll = mediaBox && list.querySelector('.downloads-add') ? buildAddAll(block) : null;
+  const addAll = (mediaBox || gallery) && list.querySelector('.downloads-add')
+    ? buildAddAll(block, gallery) : null;
   bindCart(block, addAll).catch((e) => {
     // eslint-disable-next-line no-console
     console.error('downloads: media cart unavailable', e);
@@ -558,7 +591,9 @@ export default async function decorate(block) {
   // the pill sits at its bottom, so the top of row 3 shows behind it ("Show less" once open).
   // So the threshold follows the columns: 8 assets collapse at 1 / 2 / 3 columns, not at 4
   // (SKODA-830 D2). The clipped tiles are inert (no focus, hidden from AT) until expanded.
-  if ((cfg.collapse === 'auto' || (cfg.collapse === null && mediaBox)) && list.children.length > 2) {
+  // a Media Box and a gallery group collapse by default, as on the source; `collapse none` opts out
+  if ((cfg.collapse === 'auto' || (cfg.collapse === null && (mediaBox || gallery)))
+    && list.children.length > 2) {
     disclosureSeq += 1;
     list.id = `downloads-items-${disclosureSeq}`;
     const toggle = document.createElement('button');
@@ -578,9 +613,11 @@ export default async function decorate(block) {
       else list.style.removeProperty('--dl-rows-height');
     };
     const syncVisibility = () => {
+      // a gallery group shares the Media Box ladder (1 / 2 / 3 / 4)
+      const ladder = mediaBox || gallery;
       let columns = 1;
-      if (compact.matches && mediaBox) columns = 2;
-      if (medium.matches) columns = mediaBox ? 3 : 2;
+      if (compact.matches && ladder) columns = 2;
+      if (medium.matches) columns = ladder ? 3 : 2;
       if (wide.matches) columns = Number(cfg.columns) || 4;
       const tiles = [...list.children];
       const overflow = tiles.length > 2 * columns;

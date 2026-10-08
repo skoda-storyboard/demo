@@ -301,7 +301,7 @@ test('default-template kits: X timeline dropped, ZIP and contacts kept in source
   const { element } = output(defaultKit(), `${root}skoda-octavia-press-kit/`);
   assert.equal(element.querySelectorAll('iframe, script, a[href*="twitter.com"]').length, 0);
   assert.equal(element.textContent.includes('jQuery'), false);
-  const zip = element.querySelector('a[href$="/SKODA-OCTAVIA"] img');
+  const zip = element.querySelector('a[href="https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA.zip"] img');
   assert.equal(zip.alt, 'Download the press kit ZIP');
   const article = element.querySelector('article');
   // blocks and section breaks only (the banner paragraph sits between the 2nd HR and its metadata)
@@ -329,4 +329,66 @@ test('the X follow banner is named by its image text', () => {
   const document = page(13);
   document.querySelector('.content').insertAdjacentHTML('beforeend', '<div class="widget_sow-editor"><div class="textwidget"><p><a href="https://twitter.com/skodaautonews"><img src="https://cdn.skoda-storyboard.com/ikony_sb_landscape_X_EN_E_458fd3eb.png" alt="ikony_sb_landscape_X_EN_E_458fd3eb"></a></p></div></div>');
   assert.equal(output(document).element.querySelector('a[href*="twitter.com"] img').alt, 'Follow @skodaautonews on the X platform');
+});
+
+// SKODA-832: the banner ZIP download links, made stable inside the hub importer only.
+function bannerLink(href, { img = 'https://cdn.skoda-storyboard.com/2019/11/Download_EN.jpg', alt = '' } = {}) {
+  const document = page(13);
+  document.querySelector('.content').insertAdjacentHTML('beforeend', `<div class="widget_sow-editor"><div class="textwidget"><p><a href="${href}"><img src="${img}" alt="${alt}"></a></p></div></div>`);
+  return output(document).element.querySelector(`img[src="${img}"]`).closest('a');
+}
+
+test('a /direct-download/ banner ZIP points at the same object on the cdn', () => {
+  const iaa = 'https://cdn.skoda-storyboard.com/2019/11/IAA_FRANKFURT_2019.zip';
+  [
+    'https://www.skoda-storyboard.com/direct-download/2019/11/IAA_FRANKFURT_2019.zip',
+    'https://skoda-storyboard.com/direct-download/2019/11/IAA_FRANKFURT_2019.zip',
+    '/direct-download/2019/11/IAA_FRANKFURT_2019.zip',
+    // the rotating analytics fragment is stripped afterwards by skoda-links
+    'https://www.skoda-storyboard.com/direct-download/2019/11/IAA_FRANKFURT_2019.zip#s_aid=abc123',
+  ].forEach((href) => {
+    const link = bannerLink(href);
+    assert.equal(link.getAttribute('href'), iaa, href);
+    assert.equal(link.querySelector('img').alt, 'Download the press kit ZIP');
+  });
+  assert.equal(
+    bannerLink('https://www.skoda-storyboard.com/direct-download/2023/06/koda_Kodiaq_Covered_drive_868a3959.zip').getAttribute('href'),
+    'https://cdn.skoda-storyboard.com/2023/06/koda_Kodiaq_Covered_drive_868a3959.zip',
+  );
+});
+
+test('banner links that are not a plain /direct-download/ ZIP keep their href', () => {
+  [
+    // not a ZIP
+    ['https://www.skoda-storyboard.com/direct-download/2019/11/kit.pdf', { img: 'https://cdn.skoda-storyboard.com/pdf.png', alt: 'Download the PDF' }],
+    // a query string is not a plain object path
+    ['https://www.skoda-storyboard.com/direct-download/2019/11/kit.zip?v=2'],
+    // another host's /direct-download/
+    ['https://example.com/direct-download/2019/11/kit.zip'],
+    // already on the cdn
+    ['https://cdn.skoda-storyboard.com/2025/06/Skoda_Elroq_89d07123.zip'],
+  ].forEach(([href, options]) => {
+    assert.equal(bannerLink(href, options).getAttribute('href'), href);
+  });
+});
+
+test('the extensionless 2020 Octavia ZIP is corrected by the explicit map only', () => {
+  const img = 'https://cdn.skoda-storyboard.com/2019/11/13_download_OCTAVIA_EN.jpg';
+  const fixed = 'https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA.zip';
+  const octavia = bannerLink('https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA', { img });
+  assert.equal(octavia.getAttribute('href'), fixed);
+  assert.equal(octavia.querySelector('img').alt, 'Download the press kit ZIP');
+  assert.equal(bannerLink('https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA#s_aid=abc123', { img }).getAttribute('href'), fixed);
+  // no blind ".zip" append: another extensionless cdn link is untouched
+  const other = 'https://cdn.skoda-storyboard.com/2020/04/SKODA-KAROQ';
+  assert.equal(bannerLink(other, { img: 'https://cdn.skoda-storyboard.com/k.jpg', alt: 'Karoq' }).getAttribute('href'), other);
+});
+
+test('the ZIP corrections apply to banners only, not to text links', () => {
+  const document = page(13, { intro: true });
+  document.querySelector('.content .textwidget').insertAdjacentHTML('beforeend', '<p><a href="https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA">kit</a> <a href="https://www.skoda-storyboard.com/direct-download/2019/11/IAA_FRANKFURT_2019.zip">zip</a></p>');
+  const hrefs = [...output(document).element.querySelectorAll('a')].map((a) => a.getAttribute('href'));
+  assert.ok(hrefs.includes('https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA'));
+  assert.ok(hrefs.includes('https://www.skoda-storyboard.com/direct-download/2019/11/IAA_FRANKFURT_2019.zip'));
+  assert.equal(hrefs.some((href) => href.endsWith('SKODA-OCTAVIA.zip') || href.startsWith('https://cdn.skoda-storyboard.com/2019/')), false);
 });
