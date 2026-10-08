@@ -268,6 +268,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-832](tickets/SKODA-832.md) | Re-import the Octavia-rail press-kit hubs with press-kit-hub (was page-base) | E08 | A | – | – | – | 208,805 | 🟡 M1; #261; 9 hubs pushed + previewed 2026-10-07 (QA content PASS); banners → 835, RS 245 → 836 |
 | [SKODA-835](tickets/SKODA-835.md) | Press-kit hub: size a lone download banner like its origin tile (1228×1228 vs 292×292) | E08 | A | – | – | – | 832,805 | 🔵 M1; #279, from SKODA-832 QA D2 (2026-10-07) |
 | [SKODA-836](tickets/SKODA-836.md) | Press-kit article importer for the `template-press-release` variant (Octavia RS 245) | E08 | A | – | – | – | 805,503,832 | 🔵 M2; #280, from SKODA-832 QA D1 (2026-10-07) |
+| [SKODA-837](tickets/SKODA-837.md) | Press-kit import validity fixes (audit F6): Images-child stray lead, `.pdff` links, regulatory gallery notes | E08 | A | – | – | – | 805,830 | 🟡 M1; #297; 6 pages pushed (5 previewed, Peaq Images DA-only) 2026-10-08 |
 | [SKODA-833](tickets/SKODA-833.md) | Press-release importer validity fixes + DAM originals for 28 releases | E08 | A | – | – | – | 607,502,503 | 🟢 M1; #262, PR #265 merged; 28 releases published 2026-10-06 |
 | SKODA-822 | Ship SKODA-801 two-column story layout to `main` | E08 | A | 1 | — | — | 801 | ✅ merged as PR #113 (2026-09-24 21:35) |
 | SKODA-823 | Story sidebar newsletter sign-up widget (UI stub) | E08 | A | 2 | 0.5–1 | 1–2 | 904,801 | 🟡 extend footer `newsletter-stub` for the sidebar; no ESP, no false success; side banner → 903; **M1 Could** (review §15) |
