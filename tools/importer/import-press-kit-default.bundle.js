@@ -382,7 +382,10 @@ var CustomImportScript = (() => {
       return [link];
     });
   }
+  var REGULATORY = /\bWLTP\b|(?=.*\b\d[\d.,\s–-]*(?:kWh|l)\s*\/\s*100\s*km)(?=.*(?:CO[₂2]|g\s*\/\s*km))/i;
   function parse4(element, { document }) {
+    const gallery = element.matches(".search-results-gallery");
+    const notes = gallery ? [...new Set([...element.querySelectorAll(".article-teaser-media img[data-caption]")].map((img) => text2(Object.assign(document.createElement("div"), { innerHTML: img.getAttribute("data-caption") }))).filter((caption) => caption && REGULATORY.test(caption)))] : [];
     const items = [...element.querySelectorAll(".search-results-item")];
     if (!items.length) throw new Error("Press-kit Media Box has no assets");
     const expected = Number(element.dataset.expectedAssets);
@@ -416,8 +419,9 @@ var CustomImportScript = (() => {
       ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop", "title"].forEach((attr) => img.removeAttribute(attr));
       rows.push([img, title, paragraphs2]);
     });
-    const config = element.matches(".search-results-gallery") ? [["collapse", "auto"]] : [];
-    element.replaceWith(WebImporter.DOMUtils.createTable([["Downloads"], ...config, ...rows], document));
+    const config = gallery ? [["collapse", "auto"]] : [];
+    const table = WebImporter.DOMUtils.createTable([["Downloads"], ...config, ...rows], document);
+    element.replaceWith(table, ...notes.map((note) => Object.assign(document.createElement("p"), { textContent: note })));
   }
 
   // tools/importer/parsers/quote.js
@@ -812,7 +816,7 @@ var CustomImportScript = (() => {
     const chapterLinks = chapters(document);
     if (chapterLinks) out.push(marker(document, "press-kit-chapters"), chapterLinks);
     out.push(marker(document, "body-column"));
-    const lead = article.querySelector(".column-primary .article-teaser-media img");
+    const lead = [...article.querySelectorAll(".column-primary .article-teaser-media img")].find((img) => !img.closest(".search-results"));
     if (lead) {
       const img = lead.cloneNode(true);
       img.alt = (img.alt || "").replace(/<br\s*\/?>/gi, " ");
@@ -875,9 +879,18 @@ var CustomImportScript = (() => {
       a.title = label;
     });
   }
+  function fixPdfTypos(article) {
+    article.querySelectorAll("a[href]").forEach((a) => {
+      const href = a.getAttribute("href");
+      if (/\.pdff(?=$|[?#])/i.test(href)) a.setAttribute("href", href.replace(/\.pdff(?=$|[?#])/i, ".pdf"));
+    });
+  }
   function finish(element, document) {
     const article = element.querySelector("article.press_kit");
-    if (article) labelImageLinks(article);
+    if (article) {
+      fixPdfTypos(article);
+      labelImageLinks(article);
+    }
     const sidebarStart = article == null ? void 0 : article.querySelector('hr[data-press-kit-section="sidebar"]');
     if (sidebarStart) {
       let node = sidebarStart.nextElementSibling;
