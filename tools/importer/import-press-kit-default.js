@@ -10,6 +10,7 @@ import layout from './transformers/skoda-press-kit-default-layout.js';
 import metadata from './transformers/skoda-metadata.js';
 import normalizeImages from './transformers/skoda-images.js';
 import links from './transformers/skoda-links.js';
+import nbspTransformer from './transformers/skoda-nbsp.js';
 
 const TEMPLATE = { name: 'press-kit-default', metadata: { template: 'press_kit' } };
 
@@ -30,6 +31,9 @@ function templateFor(document, pageUrl) {
 
 export default {
   preprocess: ({ document }) => {
+    // keep the source's glued non-breaking spaces (html2md would turn them into spaces): the
+    // FAQ answers wrap a line differently without them (PR #263 review)
+    nbspTransformer('preprocess', document.body, { document });
     // Icon-only cart download links would be stripped as empty inline elements before
     // transform. Give every one text: Media Box and inline grid assets, and the video
     // attachments of resource "Videos" children (SKODA-805b).
@@ -54,7 +58,9 @@ export default {
     // (`collapse auto`), so its select-all toolbar and Show more/less toggle go with it (PR #202).
     body.querySelectorAll('.search-results.search-results-gallery').forEach((group) => media(group, payload));
     body.querySelectorAll('.search-results-items').forEach((grid) => media(grid, payload));
-    content(body, { document });
+    // the kit's FAQ chapter (`…/frequently-asked-questions/`) emits `Accordion (faq)` (SKODA-807)
+    const faq = /\/frequently-asked-questions\/?$/.test(new URL(params.originalURL).pathname);
+    content(body, { document, faq });
     // After the layout, whose source-table pass would flatten a Quote table.
     body.querySelectorAll('p[data-skoda-quote]').forEach((p) => quote(p, payload));
     // The chapters' WordPress figure quotes (left-aligned, no rule): `Quote (left)`.

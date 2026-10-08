@@ -282,12 +282,13 @@ var CustomImportScript = (() => {
     const name = row.every(bannerCell) ? "Columns (banners)" : "Columns";
     return WebImporter.DOMUtils.createTable([[name], row], document);
   }
-  function flatten(layout, document, { nested = false } = {}) {
+  function flatten(layout, document, { nested = false, faq = false } = {}) {
     const output = [];
     let rows = [];
     let tileGrids = [];
+    const name = faq && !nested ? "Accordion (faq)" : "Accordion";
     const flush = () => {
-      if (rows.length) output.push(WebImporter.DOMUtils.createTable([["Accordion"], ...rows], document));
+      if (rows.length) output.push(WebImporter.DOMUtils.createTable([[name], ...rows], document));
       rows = [];
     };
     const flushTiles = () => {
@@ -351,10 +352,10 @@ var CustomImportScript = (() => {
     flushTiles();
     return output;
   }
-  function parse3(element, { document }) {
+  function parse3(element, { document, faq = false }) {
     const layout = element.querySelector(":scope > .panel-layout");
     if (!layout) throw new Error("Press-kit article is missing SiteOrigin body content");
-    const nodes = flatten(layout, document);
+    const nodes = flatten(layout, document, { faq });
     if (!nodes.length) throw new Error("Press-kit article body is empty");
     layout.replaceWith(...nodes);
     element.querySelectorAll(".sa-bnr, .media-cart-actions").forEach((node) => node.remove());
@@ -1557,6 +1558,24 @@ var CustomImportScript = (() => {
     });
   }
 
+  // tools/importer/transformers/skoda-nbsp.js
+  var NBSP_PLACEHOLDER = "\u{F00A0}";
+  var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
+  function transform4(hookName, element, payload) {
+    if (hookName !== "preprocess") return;
+    const doc = element.ownerDocument || payload && payload.document;
+    const walker = doc.createTreeWalker(
+      element,
+      4
+      /* NodeFilter.SHOW_TEXT */
+    );
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.nodeValue.includes("\xA0")) {
+        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER.repeat(run.length));
+      }
+    }
+  }
+
   // tools/importer/import-press-kit-default.js
   var TEMPLATE = { name: "press-kit-default", metadata: { template: "press_kit" } };
   function templateFor(document, pageUrl) {
@@ -1571,6 +1590,7 @@ var CustomImportScript = (() => {
   }
   var import_press_kit_default_default = {
     preprocess: ({ document }) => {
+      transform4("preprocess", document.body, { document });
       document.querySelectorAll('article.press_kit a.media-cart-action.download[href], article.press_kit a[data-action="download"][href]').forEach((a) => {
         if (!a.textContent.trim()) a.textContent = "Download";
       });
@@ -1586,7 +1606,8 @@ var CustomImportScript = (() => {
       const body = article.querySelector(".entry-content");
       body.querySelectorAll(".search-results.search-results-gallery").forEach((group) => parse4(group, payload));
       body.querySelectorAll(".search-results-items").forEach((grid) => parse4(grid, payload));
-      parse3(body, { document });
+      const faq = /\/frequently-asked-questions\/?$/.test(new URL(params.originalURL).pathname);
+      parse3(body, { document, faq });
       body.querySelectorAll("p[data-skoda-quote]").forEach((p) => parse5(p, payload));
       body.querySelectorAll("figure").forEach((figure) => parseFigure(figure, payload));
       body.querySelectorAll("p[data-skoda-footnote]").forEach((p) => parse6(p, payload));
