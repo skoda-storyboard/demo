@@ -523,8 +523,10 @@ export default async function decorate(block) {
   const cfg = readConfig(block);
   const mediaBox = block.classList.contains('media-box') || !!block.closest('.section.media-box');
   if (mediaBox) block.classList.add('downloads-media-box');
-  // a press-kit Images group (SKODA-806); a Media Box keeps its own presentation
+  // a press-kit Images group (SKODA-806). A Media Box keeps its own presentation: the class goes,
+  // so no gallery style reaches it either (PR #287 review)
   const gallery = !mediaBox && block.classList.contains('gallery');
+  if (mediaBox) block.classList.remove('gallery');
   if (cfg.collapse !== null && !['auto', 'none'].includes(cfg.collapse)) {
     throw new Error('downloads: collapse must be auto or none');
   }

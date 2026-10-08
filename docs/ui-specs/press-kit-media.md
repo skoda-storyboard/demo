@@ -246,7 +246,12 @@ Images, Videos. There is no wrapper block. The Images chapter is the piece this 
   group.
 - **Peaq-2 Images (246 tiles) is past the 200-images-per-document limit.** `import-press-kit-default.js` moves its
   largest group (Exterior, 69) to a fragment, so the page holds 179. The mechanism is in
-  `IMPORT-PIPELINE.md`, "Group fragments". Epiq-2 (194) stays one page.
+  `IMPORT-PIPELINE.md`, "Group fragments". Epiq-2 (196 images) stays one page.
+  - The split counts every image the page keeps, refuses a group over 200 on its own, and checks every emitted
+    document.
+  - `import:push` publishes a fragment before the page that loads it, and holds the page if the fragment isn't live
+    (PR #287 review).
+  - In a Media Box section, a `gallery` block is the Media Box: the class is dropped, so no gallery style applies.
 
 **EDS vs source, draft `/drafts/skoda-806-press-kit-images`** (Peaq-2 Images, with Exterior loaded as a fragment):
 

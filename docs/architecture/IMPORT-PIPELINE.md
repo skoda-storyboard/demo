@@ -140,6 +140,12 @@ largest gallery groups out of the page:
 - `push-lib` `pagePath()` maps the same URL to the same path, so `import:push` and
   `import:validate-blocks` handle it like any page;
 - `/fragments/…` stays outside the `/en` tree, so feeds never list a fragment.
+- **Limit (PR #287 review):** the split counts every image the page keeps (lead image, inline images, sidebar), not
+  just gallery tiles. A group over 200 images on its own is refused, since it can't be a fragment either. Every emitted
+  page and fragment is checked once built, and the import fails rather than writing a document past the limit.
+- **Publish order:** `import:push` reads the content fragments a page loads (a `Fragment` block, or any `/fragments/`
+  link; `contentFragmentPaths`). The fragments in the run publish first, and a page whose fragment is missing or
+  failed is held (`Hold publish: content fragment not live: …`) while the rest publish.
 
 ---
 

@@ -38,6 +38,7 @@ var CustomImportScript = (() => {
   // tools/importer/import-press-kit-default.js
   var import_press_kit_default_exports = {};
   __export(import_press_kit_default_exports, {
+    IMAGE_LIMIT: () => IMAGE_LIMIT,
     default: () => import_press_kit_default_default,
     fragmentGroups: () => fragmentGroups,
     fragmentPath: () => fragmentPath
@@ -1592,7 +1593,13 @@ var CustomImportScript = (() => {
       metadata: { template: "press_kit_chapter", theme: "press-kit", presskit: path(hubUrl) }
     });
   }
-  var IMAGE_BUDGET = 195;
+  var IMAGE_LIMIT = 200;
+  function checkImageLimit(root, what) {
+    const count = root.querySelectorAll("img").length;
+    if (count > IMAGE_LIMIT) {
+      throw new Error(`${what} holds ${count} images; a document holds at most ${IMAGE_LIMIT}`);
+    }
+  }
   var slugOf = (value) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   function galleryGroups(body) {
     const seen = /* @__PURE__ */ new Map();
@@ -1608,15 +1615,18 @@ var CustomImportScript = (() => {
         titleEl,
         title,
         slug: n > 1 ? `${base}-${n}` : base,
-        size: el.querySelectorAll(".search-results-item").length
+        size: el.querySelectorAll("img").length
       };
     });
   }
-  function fragmentGroups(groups, budget = IMAGE_BUDGET) {
-    let total = groups.reduce((n, group) => n + group.size, 0);
+  function fragmentGroups(groups, others = 0, limit = IMAGE_LIMIT) {
+    let total = others + groups.reduce((n, group) => n + group.size, 0);
     const out = /* @__PURE__ */ new Set();
     [...groups].sort((a, b) => b.size - a.size).forEach((group) => {
-      if (total <= budget) return;
+      if (total <= limit) return;
+      if (group.size > limit) {
+        throw new Error(`Press-kit Images group "${group.title || group.slug}" has ${group.size} images; a document holds at most ${limit}`);
+      }
       out.add(group);
       total -= group.size;
     });
@@ -1655,13 +1665,15 @@ var CustomImportScript = (() => {
         normalizeImages(main, document);
         WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
         transform3("afterTransform", main, payload);
+        checkImageLimit(main, `Press-kit Images fragment "${group.slug}"`);
         return [{
           element: main,
           path: WebImporter.FileUtils.sanitizePath(fragmentPath(pagePath, group.slug)),
           report: { title: group.title, template: TEMPLATE.name }
         }];
       }
-      fragmentGroups(groups).forEach((group) => {
+      const others = main.querySelectorAll("img").length - groups.reduce((n, group) => n + group.size, 0);
+      fragmentGroups(groups, others).forEach((group) => {
         var _a;
         const mark = document.createElement("p");
         mark.dataset.skodaFragment = fragmentPath(pagePath, group.slug);
@@ -1693,6 +1705,7 @@ var CustomImportScript = (() => {
       normalizeImages(main, document);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       transform3("afterTransform", main, payload);
+      checkImageLimit(main, `Press-kit page ${pagePath}`);
       return [{
         element: main,
         path: WebImporter.FileUtils.sanitizePath(pagePath || "/index"),

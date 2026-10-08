@@ -175,6 +175,56 @@ export function bulkPatternMatches(pattern, page) {
 }
 
 /**
+ * The content fragments a page loads (SKODA-806): a Fragment block's link, or any
+ * `/fragments/` link (the runtime auto-blocks those too). Same-site paths only.
+ * @param {string} plain the page's .plain.html
+ * @returns {string[]} fragment page paths, de-duplicated, in document order
+ */
+export function contentFragmentPaths(plain) {
+  const out = [];
+  const re = /href="([^"]*\/fragments\/[^"]*)"/gi;
+  let m = re.exec(String(plain || ''));
+  while (m) {
+    const href = m[1].replace(/&amp;/g, '&');
+    const sameSite = href.startsWith('/') || /^https:\/\/(www\.)?skoda-storyboard\.com\//i.test(href)
+      || /^https:\/\/[^/]+\.aem\.(page|live)\//i.test(href);
+    const p = sameSite ? pagePath(href) : '';
+    if (p && !out.includes(p)) out.push(p);
+    m = re.exec(String(plain || ''));
+  }
+  return out;
+}
+
+/**
+ * Split the pages ready to publish by their content fragments: a page publishes only once
+ * every fragment it loads is live, either already or by being published in this run first.
+ * @param {string[]} ready page paths that passed every other gate
+ * @param {(path: string) => string[]} fragmentsOf the content fragments a page loads
+ * @returns {{first: string[], rest: string[]}} fragments to publish first; the other pages
+ */
+export function fragmentOrder(ready, fragmentsOf) {
+  const needed = new Set(ready.flatMap((p) => fragmentsOf(p)));
+  const first = ready.filter((p) => needed.has(p));
+  return { first, rest: ready.filter((p) => !needed.has(p)) };
+}
+
+/**
+ * The pages to hold: each one whose content fragments aren't all live.
+ * @param {string[]} pages candidate page paths
+ * @param {(path: string) => string[]} fragmentsOf
+ * @param {(fragment: string) => boolean} isLive
+ * @returns {Map<string, string[]>} page path → its fragments that aren't live
+ */
+export function fragmentHolds(pages, fragmentsOf, isLive) {
+  const held = new Map();
+  pages.forEach((p) => {
+    const missing = fragmentsOf(p).filter((f) => !isLive(f));
+    if (missing.length) held.set(p, missing);
+  });
+  return held;
+}
+
+/**
  * Shared fragments a page depends on: the header/footer blocks load `/nav` and `/footer`
  * unless page metadata overrides them (blocks/header/header.js, blocks/footer/footer.js).
  * Reads a `nav` / `footer` row from the importer's Metadata block, and from the bulk

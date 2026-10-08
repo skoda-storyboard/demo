@@ -30,10 +30,20 @@ function templateFor(document, pageUrl) {
 }
 
 // A document holds at most 200 images (helix html2md). An Images chapter past that (the Peaq kit:
-// 246 tiles) moves its largest gallery groups to fragments until the page is within budget; the
-// page loads each with a Fragment block where the group was. A fragment is imported from the page
-// URL with `?fragment=<slug>` (the bulk runner writes one document per URL), SKODA-806.
-const IMAGE_BUDGET = 195; // the Epiq chapter's 194 tiles publish as one page
+// 246 tiles) moves its largest gallery groups to fragments until the page, counting every image
+// it keeps, is within the limit; the page loads each with a Fragment block where the group was. A
+// fragment is imported from the page URL with `?fragment=<slug>` (the bulk runner writes one
+// document per URL), SKODA-806. A group past the limit on its own can't be a fragment either, and
+// every emitted document is checked once built (PR #287 review).
+export const IMAGE_LIMIT = 200;
+
+/** Throws when an emitted document holds more images than one document can. */
+function checkImageLimit(root, what) {
+  const count = root.querySelectorAll('img').length;
+  if (count > IMAGE_LIMIT) {
+    throw new Error(`${what} holds ${count} images; a document holds at most ${IMAGE_LIMIT}`);
+  }
+}
 
 const slugOf = (value) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
   .replace(/[^a-z0-9]+/g, '-')
@@ -49,17 +59,27 @@ function galleryGroups(body) {
     const n = (seen.get(base) || 0) + 1;
     seen.set(base, n);
     return {
-      el, titleEl, title, slug: n > 1 ? `${base}-${n}` : base, size: el.querySelectorAll('.search-results-item').length,
+      el, titleEl, title, slug: n > 1 ? `${base}-${n}` : base, size: el.querySelectorAll('img').length,
     };
   });
 }
 
-/** The groups that leave the page: the largest first, until the rest is within IMAGE_BUDGET. */
-export function fragmentGroups(groups, budget = IMAGE_BUDGET) {
-  let total = groups.reduce((n, group) => n + group.size, 0);
+/**
+ * The groups that leave the page: the largest first, until the page's images (`others` outside
+ * the groups plus the groups that stay) are within the limit. A group too big for a document of
+ * its own is refused rather than split, as its tiles are one Downloads block.
+ * @param {Array<{size: number, title?: string, slug: string}>} groups images per group
+ * @param {number} [others] the page's images outside the groups
+ * @param {number} [limit]
+ */
+export function fragmentGroups(groups, others = 0, limit = IMAGE_LIMIT) {
+  let total = others + groups.reduce((n, group) => n + group.size, 0);
   const out = new Set();
   [...groups].sort((a, b) => b.size - a.size).forEach((group) => {
-    if (total <= budget) return;
+    if (total <= limit) return;
+    if (group.size > limit) {
+      throw new Error(`Press-kit Images group "${group.title || group.slug}" has ${group.size} images; a document holds at most ${limit}`);
+    }
     out.add(group);
     total -= group.size;
   });
@@ -109,6 +129,7 @@ export default {
       normalizeImages(main, document);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       links('afterTransform', main, payload);
+      checkImageLimit(main, `Press-kit Images fragment "${group.slug}"`);
       return [{
         element: main,
         path: WebImporter.FileUtils.sanitizePath(fragmentPath(pagePath, group.slug)),
@@ -117,7 +138,9 @@ export default {
     }
     // an oversize Images chapter: these groups become Fragment blocks (marked, then built after
     // the layout, whose table pass would flatten the block table)
-    fragmentGroups(groups).forEach((group) => {
+    // the page's other images (lead image, inline grids, sidebar) count towards its limit too
+    const others = main.querySelectorAll('img').length - groups.reduce((n, group) => n + group.size, 0);
+    fragmentGroups(groups, others).forEach((group) => {
       const mark = document.createElement('p');
       mark.dataset.skodaFragment = fragmentPath(pagePath, group.slug);
       const link = Object.assign(document.createElement('a'), { href: mark.dataset.skodaFragment });
@@ -161,6 +184,7 @@ export default {
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
     links('afterTransform', main, payload);
 
+    checkImageLimit(main, `Press-kit page ${pagePath}`);
     return [{
       element: main,
       path: WebImporter.FileUtils.sanitizePath(pagePath || '/index'),

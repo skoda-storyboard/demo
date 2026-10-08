@@ -76,10 +76,16 @@ Whether these render as **tabs, accordion, or stacked sections** is a visual/int
     `?fragment=<slug>`;
   - `push-lib` `pagePath()` maps that URL to the fragment path;
   - `urls-press-kit-default.txt` lists it. Contract: `main.downloads.variants` gains `gallery`.
+- **PR #287 review (2026-10-08):**
+  - **publish order:** `import:push` publishes a page's content fragments first and holds the page while one is
+    missing or failed (`contentFragmentPaths` / `fragmentOrder` / `fragmentHolds`, push regression tests);
+  - **image limit:** the split counts every image the page keeps, refuses a group over 200, and checks each emitted
+    document (boundary tests);
+  - **Media Box precedence:** a `gallery` block in a Media Box section loses the class, with a CSS isolation test.
 - **Follow-ups:**
   - the ZIP in the DAM (archive kind + manifest rows);
   - the Texts table rows, the Infographics spacer rhythm and the Technical-data image width (template / importer
     polish);
   - pushing the re-imported Images chapters and the fragment after merge (`import:push`, with
-    `--publish-fragments` not needed: the fragment is a listed page).
+    `--publish-fragments` not needed: the fragment is a listed page, and push publishes it before the chapter).
 

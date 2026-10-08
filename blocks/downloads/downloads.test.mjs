@@ -657,6 +657,30 @@ test('gallery inside a Media Box section is the Media Box', async () => {
   await decorate(block);
   assert.ok(block.classList.contains('downloads-media-box'));
   assert.equal(block.querySelector('.downloads-group'), null);
+  // presentation isolation (PR #287 review): the effective variant is the Media Box alone, and
+  // every gallery rule needs the class, so none applies (no clipped title, no overlaid controls)
+  assert.equal(block.classList.contains('gallery'), false);
+  assert.equal(block.querySelector('.downloads-title').closest('.gallery'), null);
+  const { readFile } = await import('node:fs/promises');
+  const css = (await readFile(new URL('./downloads.css', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  const selectors = css.split('{').map((part) => part.split('}').pop().trim())
+    .filter((sel) => sel.includes('.gallery')).flatMap((sel) => {
+      // top-level commas only (`:is(a, b)` stays whole)
+      const parts = [''];
+      let depth = 0;
+      [...sel].forEach((ch) => {
+        if (ch === '(') depth += 1;
+        if (ch === ')') depth -= 1;
+        if (ch === ',' && depth === 0) parts.push('');
+        else parts[parts.length - 1] += ch;
+      });
+      return parts.map((one) => one.trim());
+    });
+  assert.ok(selectors.length > 10);
+  selectors.forEach((sel) => assert.ok(
+    sel.startsWith('.downloads.gallery') || sel.startsWith('.downloads:is(.downloads-media-box, .gallery)'),
+    `a gallery rule outside the gallery scope: ${sel}`,
+  ));
 });
 
 test('gallery CSS: Media Box ladder, overlay controls, source opener bar', async () => {

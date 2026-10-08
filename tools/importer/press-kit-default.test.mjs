@@ -34,7 +34,7 @@ globalThis.WebImporter = {
 };
 
 const importer = JSDOM ? (await import('./import-press-kit-default.js')).default : null;
-const { fragmentGroups, fragmentPath } = JSDOM ? await import('./import-press-kit-default.js') : {};
+const { fragmentGroups, fragmentPath, IMAGE_LIMIT } = JSDOM ? await import('./import-press-kit-default.js') : {};
 const decorateAccordion = JSDOM ? (await import('../../blocks/accordion/accordion.js')).default : null;
 const { layoutTileRows } = await import('../../scripts/cards-tiles.js');
 const base = 'https://www.skoda-storyboard.com/en/press-kits/';
@@ -671,7 +671,7 @@ test('an Images chapter past the image budget moves its largest groups to fragme
     extra: `${galleryGroup('Introduction', 0, 30)}${galleryGroup('Exterior', 30, 120)}${galleryGroup('Škoda Peaq Sportline', 150, 60)}`,
   });
   const page = run(html, images);
-  // 210 tiles > 195: Exterior (120) leaves, 90 stay inline
+  // 210 tiles > 200: Exterior (120) leaves, 90 stay inline
   assert.deepEqual(blocks(page, 'Downloads (gallery)').map((t) => t.querySelectorAll('tr').length - 2), [30, 60]);
   const [frag] = blocks(page, 'Fragment');
   assert.ok(frag, 'a Fragment block in place of the group');
@@ -709,16 +709,51 @@ test('an Images chapter past the image budget moves its largest groups to fragme
   assert.equal(blocks(small, 'Fragment').length, 0);
 });
 
-test('fragmentGroups takes the largest groups first until the rest fits; fragment paths', { skip: !JSDOM }, () => {
-  const g = (size, slug) => ({ size, slug });
-  // the live Peaq Images chapter: 246 tiles in 10 groups; Exterior (69) leaves, 177 stay
+test('fragmentGroups: largest first until every image fits, others counted, oversized refused', { skip: !JSDOM }, () => {
+  const g = (size, slug) => ({ size, slug, title: slug });
+  // the live Peaq Images chapter: 246 tiles in 10 groups + its 2 other images; Exterior (69) leaves
   const peaq = [25, 69, 20, 1, 1, 2, 56, 36, 14, 22].map((size, i) => g(size, `g${i}`));
-  assert.deepEqual(fragmentGroups(peaq).map((x) => x.slug), ['g1']);
+  assert.deepEqual(fragmentGroups(peaq, 2).map((x) => x.slug), ['g1']);
   // the largest go first, until the rest fits
-  const groups = [g(100, 'a'), g(90, 'b'), g(80, 'c'), g(70, 'd')];
-  assert.deepEqual(fragmentGroups(groups).map((x) => x.slug), ['a', 'b']);
-  assert.deepEqual(fragmentGroups(groups, 1000), []);
+  assert.deepEqual(fragmentGroups([g(100, 'a'), g(90, 'b'), g(80, 'c'), g(70, 'd')]).map((x) => x.slug), ['a', 'b']);
+  assert.deepEqual(fragmentGroups([g(100, 'a'), g(90, 'b')], 0, 1000), []);
+  // the page's other images count: 195 tiles + 6 others is 201, one too many; 194 + 6 fits
+  assert.deepEqual(fragmentGroups([g(100, 'a'), g(95, 'b')], 6).map((x) => x.slug), ['a']);
+  assert.deepEqual(fragmentGroups([g(100, 'a'), g(94, 'b')], 6), []);
+  // a group past the limit on its own can't be a fragment either
+  assert.throws(() => fragmentGroups([g(201, 'big'), g(5, 'small')]), /"big" has 201 images; a document holds at most 200/);
+  assert.equal(IMAGE_LIMIT, 200);
   assert.equal(fragmentPath('/en/press-kits/kit/images/', 'exterior'), '/fragments/en/press-kits/kit/images/exterior');
+});
+
+test('every emitted document stays within 200 images: other images count, oversized groups are refused (PR #287 review)', { skip: !JSDOM }, () => {
+  const images = `${base}skoda-peaq-press-kit-2/images/`;
+  const page = (extra, inline = 0) => fixture({
+    chapters: true, mediaBox: false, togglesCount: 0, inline, extra,
+  });
+  // the fixture's own images outside the groups (lead image etc.)
+  const baseline = run(page(galleryGroup('One', 0, 1)), images).querySelectorAll('img').length - 1;
+  // 195 gallery tiles + 6 inline images + the baseline: past the limit, so a group leaves
+  const crowded = run(page(`${galleryGroup('Exterior', 0, 100)}${galleryGroup('Interior', 100, 95)}`, 6), images);
+  assert.equal(blocks(crowded, 'Fragment').length, 1, 'the inline images push the page past the limit');
+  assert.ok(crowded.querySelectorAll('img').length <= 200);
+  // exactly at the limit: no fragment
+  const atLimit = run(page(`${galleryGroup('Exterior', 0, 100)}${galleryGroup('Interior', 100, 100 - baseline)}`), images);
+  assert.equal(atLimit.querySelectorAll('img').length, 200);
+  assert.equal(blocks(atLimit, 'Fragment').length, 0);
+  // a 201-image group can be neither inline nor a fragment
+  const oversized = page(`${galleryGroup('Huge', 0, 201)}${galleryGroup('Small', 201, 3)}`);
+  assert.throws(() => run(oversized, images), /"Huge" has 201 images; a document holds at most 200/);
+  const hugeUrl = `${images}?fragment=huge`;
+  const dom = new JSDOM(oversized, { url: hugeUrl });
+  const { document } = dom.window;
+  globalThis.document = document;
+  globalThis.window = dom.window;
+  importer.preprocess({ document });
+  assert.throws(
+    () => importer.transform({ document, url: hugeUrl, params: { originalURL: hugeUrl } }),
+    /fragment "huge" holds 201 images; a document holds at most 200/,
+  );
 });
 
 test('generated standalone bundle matches the source importer', { skip: !JSDOM }, () => {
