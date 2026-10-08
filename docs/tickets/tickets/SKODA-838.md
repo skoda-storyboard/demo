@@ -6,7 +6,7 @@
 - **GitHub issue:** [#300](https://github.com/skoda-storyboard/demo/issues/300)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §6 / §8 F7 (approved 2026-10-05; user asked for it 2026-10-08)
 - **Branch:** `skoda-838-origin-drift`
-- **Status (2026-10-08):** 🟡 Drift: 3 pages **published** (3/3 live 200; Media Room promo = origin, Enyaq new title, Epiq City SUV sentences removed). All **234 scoped originals uploaded and verified in author DAM**; **233 publicly verified** after approved activation, including all 33 PDFs/MP4s. One WebP remains delivery-blocked (public 404 despite author activation metadata). The 3 chapters and 20 previously blocked pages still wait for DA push/preview and separate page-publication approval.
+- **Status (2026-10-08):** 🟡 Drift: 3 pages **published** (3/3 live 200; Media Room promo = origin, Enyaq new title, Epiq City SUV sentences removed). All **234 scoped originals uploaded and verified in author DAM**; **233 publicly verified** after approved activation, including all 33 PDFs/MP4s. One WebP remains delivery-blocked (public 404 despite author activation metadata). The 3 chapters and 20 previously blocked pages are **pushed + previewed** (23/23 preview 200, every PDF/MP4 link on AEM Assets); publishing them needs a separate go-ahead.
 
 ## Scope
 These pages differ from DA because the origin was edited after our import. The other drift findings in the audit
@@ -67,7 +67,7 @@ were already refreshed elsewhere:
   meta) and the 4 plant newsletters. They enter the query index on publish.
 - **Previously blocked by the binary gate (20 pages):** 19 releases and the Enyaq Coupé iV link 30 PDFs/MP4s
   now uploaded, activated, and publicly verified (`tools/importer/media/README.md`, "PDF/MP4 links").
-  DA push/preview remains pending. The imported content is ready in `.migration/new-content/import/`.
+  Pushed + previewed on 2026-10-08 (see "Push + preview of the 23 waiting pages").
 
 All files below are under `www.skoda-storyboard.com/direct-download/`, except the Enyaq Coupé TD PDF, which is under
 `cdn.skoda-storyboard.com/`.
@@ -145,26 +145,38 @@ All files below are under `www.skoda-storyboard.com/direct-download/`, except th
   gitignored with permissions `600`; no credential values were recorded or committed.
 - No DA content writes, previews, or page publication ran. Issue #300 remains open.
 
+## Push + preview of the 23 waiting pages (2026-10-08)
+- **Public check:** anonymous HEAD on all 33 activated PDFs/MP4s: 33/33 return 200, and MIME and bytes match
+  each row's `public_verified`.
+- **Media:** `media:apply` (main's manifest) on copies of the 20 new pages and the 3 chapters: 236 rewrites,
+  0 unverified binaries. Every PDF/MP4 link now points at the AEM Assets publish tier.
+- **DA diff of the 3 chapters** (push conditioning vs current DA): origin edits only. These are the new 130 RS
+  image (Media Box 22 → 23 images), the renamed 2026/09 PDFs and the edited sentences.
+- **Push:** dry-run, then `--stage push,preview` from main: 20 new + 3 updates, 0 conflicts.
+- **Preview:** 23/23 return 200. All 36 distinct PDF/MP4 links return 200, and none point at the origin.
+- **Rendered spot-check** (Pamplona release, Enyaq Coupé iV, 130 RS chapter):
+  - all blocks load, with no broken content images and no horizontal overflow;
+  - the Media Box counts match the origin (2 videos, 9 images, 3 PDFs; 23 images, 1 PDF).
+  - Like the origin, the 130 RS chapter keeps both PDFs: the May banner PDF and the September Media Box PDF.
+
 ## Next
 1. Inspect the AEM publish/Dispatcher project's active delivery configuration for the
    remaining WebP's public 404; that configuration is not in this EDS repository.
    Author access is restored and distribution succeeded. Resume scoped verification
    from the pending state once public delivery works; do not force reactivation.
-2. With the 33 binary originals publicly verified, `media:apply`, push + preview of the 3 chapters (content in `.migration/f7/import-pk/`)
-   and the 20 new blocked pages (`.migration/new-content/import/`).
-3. Publish the pages (separate go-ahead).
+2. Publish the 23 pages (separate go-ahead). The 20 new pages enter the query index on publish.
 
 ## Acceptance Criteria
 - [x] The 6 drifted pages re-imported from the current origin; the DA diff shows only origin edits
 - [x] 3 pages pushed + previewed (0 conflicts)
 - [x] 3 new PDFs uploaded to AEM Assets author DAM and original MIME/bytes verified
 - [x] 3 new PDFs activated and publicly verified
-- [ ] The 3 chapters pushed + previewed
+- [x] The 3 chapters pushed + previewed (2026-10-08, 3 updates, 0 conflicts)
 - [x] The 3 refreshed pages published (2026-10-08, user go-ahead)
 - [ ] The 3 chapters published after ingest (separate go-ahead)
 - [x] Latest content imported: 34 pages; 14 pushed + previewed
 - [x] 30 new PDFs/MP4s uploaded to author DAM and original MIME/bytes verified
 - [x] 30 new PDFs/MP4s activated and publicly verified
-- [ ] The 20 previously blocked pages pushed + previewed
+- [x] The 20 previously blocked pages pushed + previewed (2026-10-08, 20/20 preview 200)
 - [x] The 14 ready new pages published (2026-10-08, user go-ahead): 14/14 live 200 and indexed; the live index now leads with Peaq designblok (8 Oct), Octavia full hybrid (5 Oct), Superb 25 (29 Sep)
 - [ ] The 20 blocked new pages published after ingest (separate go-ahead)
