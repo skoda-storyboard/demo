@@ -304,6 +304,13 @@ body.press-kit .section.body-column .accordion {
   margin-block-end: var(--paragraph-gap);
 }
 
+/* Toggles that open the body (a kit's FAQ chapter) keep the source row cell's 10px above the
+   first question: title → first trigger 26px at 1280, 28 at 768 (PR #263 review). After other
+   content the source gap is already met by the rhythm above (40px on first glimpse / Elroq). */
+body.press-kit .section.body-column > .accordion-wrapper:first-child .accordion {
+  padding-block-start: var(--page-gutter);
+}
+
 body.press-kit .section.body-column .embed {
   margin-block-start: calc(var(--pk-columns-stack-gap) + var(--spacing-m));
 }

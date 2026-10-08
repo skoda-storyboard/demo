@@ -198,7 +198,10 @@ test('header: the topbar group becomes a <div> list and the drawer gets an ident
   assert.ok(drawer, 'drawer copy');
   assert.equal(drawer.outerHTML, topbar.querySelector('.nav-locales-list').outerHTML);
   assert.equal(topbar.querySelector('[aria-current]').textContent, 'EN');
-  assert.equal(topbar.querySelector('a[hreflang="cs"]').getAttribute('href'), '/cs/emobility/x', 'the path is kept');
+  const czechLink = topbar.querySelector('a[hreflang="cs"]');
+  assert.equal(czechLink.getAttribute('href'), 'https://www.skoda-storyboard.com/cs');
+  assert.equal(czechLink.target, '_blank');
+  assert.match(czechLink.rel, /noopener/);
   // Subscribe is untouched
   assert.ok(block.querySelector('.nav-topbar p.nav-topbar-utility a.nav-subscribe'));
 });
