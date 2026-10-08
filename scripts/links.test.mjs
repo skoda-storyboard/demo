@@ -48,10 +48,25 @@ test('a trailing slash on a demo path is dropped, query + hash kept, relative st
 
 test('LIVE_ONLY chrome targets go to the live site in a new tab', () => {
   [
-    '/cs/', '/de/', '/sk/', '/sl/', '/sr/', '/de/some/page/',
+    '/de/some/page/', '/cs/media-room/x/',
     '/en/skodapedia/', '/en/feed/', '/en/press-releases/feed/', '/en/contacts/',
     '/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing/',
   ].forEach((href) => assert.deepEqual(policyHref(href, PAGE), { href: `${LIVE_ORIGIN}${href}`, newTab: true }, href));
+});
+
+test('locale homes (the language switcher, SKODA-303a) go to the live site in the same tab, with its slash', () => {
+  [
+    ['/cs/', '/cs/'], ['/de', '/de/'], ['/sk/', '/sk/'], ['/sr', '/sr/'], ['/sl/', '/sl/'],
+    ['/cs/media-room', '/cs/media-room/'], ['/sl/media-room/', '/sl/media-room/'],
+  ].forEach(([href, live]) => assert.deepEqual(policyHref(href, PAGE), { href: `${LIVE_ORIGIN}${live}`, newTab: false }, href));
+  // the click-time pass meets the rewritten absolute link: it stays in the tab
+  const home = `${LIVE_ORIGIN}/cs/`;
+  assert.deepEqual(policyHref(home, PAGE), { href: home, newTab: false });
+  assert.equal(opensInSameTab(`${LIVE_ORIGIN}/de/media-room/`), true);
+  assert.equal(opensInSameTab(`${LIVE_ORIGIN}/cs/e-mobilita-cs/x/`), false, 'a live article keeps its new tab');
+  assert.equal(opensInSameTab('https://www.skoda-media.de/'), false, 'another site keeps its new tab');
+  assert.equal(opensInSameTab(`${LIVE_ORIGIN}/en/`), false, 'en is not a live-only locale');
+  assert.equal(opensInSameTab(`${LIVE_ORIGIN}/csx/`), false, 'nor a look-alike segment');
 });
 
 test('"Manage subscription" goes to the live page in the same tab, as on the source (SKODA-308)', () => {

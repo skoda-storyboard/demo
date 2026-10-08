@@ -180,23 +180,28 @@ Every link was clicked on the home page, a story, a press release, the Media Roo
   `/en/` is a 404), and pages sit in the `{locale}/` folder (`/en/media-room`). The nav fragments link:
   - `/nav`: `/cs` `/de` `/sk` `/sr` `/sl`;
   - `/media-room/nav`: `/cs/media-room`, `https://www.skoda-media.de/`, `/sk/media-room`, `/sr/media-room`, `/sl/media-room`.
-- **Header behaviour:**
-  - **switching language keeps the page:** every locale links the current path with only its locale segment
-    changed (`/en/emobility/x` → `/cs/emobility/x`, `/en/media-room` → `/cs/media-room`);
-  - an authored link to another site still wins (Media Room DE);
-  - pages outside a locale tree (`/`, `/drafts/…`) use the authored target; there the bold (unlinked) locale takes
-    its siblings' pattern (`/en`, `/en/media-room`);
-  - a link to another site opens in a new tab with `rel="noopener"` and "(opens in a new tab)" in its name.
-- **Translated article targets:** out of the pilot (SKODA-1003).
+- **Header behaviour (SKODA-303a, decided 2026-10-08):**
+  - every locale links its **live locale home**, in the **same tab** as on the source: the nav's link pass
+    (`scripts/links.js`, SKODA-609) turns the authored `/cs` into `https://www.skoda-storyboard.com/cs/` (the source's
+    trailing slash, no redirect hop), and `/cs/media-room` into `…/cs/media-room/` on the Media Room;
+  - the page path is **not** kept: the source translates its slugs (`/cs/e-mobilita-cs/…`), so a swapped path
+    would 404 on both sites;
+  - an authored link to another site opens in a new tab with `rel="noopener"` and "(opens in a new tab)" in its
+    name (Media Room DE → `skoda-media.de`);
+  - the bold (unlinked) locale takes its siblings' pattern (`/en`, `/en/media-room`), as does a broken authored
+    href (`javascript:`, `//host`, empty).
+- **Known gaps vs the source:** it links the page's own translation and lists only the locales the page has
+  (e.g. the Peaq press kit: CZ SK; the Epiq model page: CZ only), while EDS shows all six and links the locale home.
+  Per-page targets and hiding locales without a translation are SKODA-1003.
 
 ## 8. Open decisions + recommended default
 
 > **Decided (2026-09-30, SKODA-303 pilot):**
 > - **Control form:** inline links.
 > - **Current locale:** taken from the URL, not the authored `<strong>`.
-> - **Targets:** all 6 link the EDS locale homes (`/cs` …, no trailing slash; Media Room `/{locale}/media-room`, DE on
->   `skoda-media.de`, see §8a). Only `/en` exists on EDS yet; the others 404 until
->   the locale trees are migrated, a known gap.
+> - **Targets:** the fragments author the locale homes (`/cs` …; Media Room `/{locale}/media-room`, DE on
+>   `skoda-media.de`). **SKODA-303a (2026-10-08):** until the locale trees are migrated they open the **live**
+>   locale home in the **same tab** (§8a), so nothing 404s on EDS.
 > - **Out of the pilot:** per-page translated targets and hiding locales without a translation (SKODA-1003).
 > - **Contrast:** inactive links use `--skoda-grey-700`.
 

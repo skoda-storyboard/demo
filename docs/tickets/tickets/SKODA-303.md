@@ -86,7 +86,7 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
   - the drawer is `min-width: min(375px, 100%)`, so it no longer runs 55px off a 320px screen and cuts off the locale row.
 - **Result:** the switcher's values are identical to live at every width, and both visual diffs are 0% at the same
   absolute position.
-- **Review follow-up:** switching language keeps the page path, as live. Each locale links the current path with only
+- **Review follow-up (superseded by SKODA-303a, below):** switching language keeps the page path, as live. Each locale links the current path with only
   the locale segment swapped (`/en/emobility/x` → `/cs/emobility/x`); an authored external link still wins, and pages
   outside a locale tree use the authored target. The live site also translates the category and slug segments
   (`/cs/e-mobilita-cs/…`); EDS keeps them as they are, so a translated tree has to mirror the EN paths for these
@@ -100,6 +100,19 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
   On the Media Room, DE links `https://www.skoda-media.de/`. The pilot links the locale homes.
 - **`/en/` is a 404 on EDS** (the home is `/en`), and so is the authored Stories tab link `/en/` in `/nav` (SKODA-301 / 308).
   When the locale trees are migrated, check that `/cs/` … resolve, or author them as `/cs` …
+
+**SKODA-303a follow-up (#243, decided 2026-10-08, branch `skoda-303a-locale-links`):**
+- **Conflict:** SKODA-609's link pass already sent the locale links to the live site in a new tab, so the "keep the
+  page path" rule above never applied on `main`, and `header-locales.test.mjs` failed.
+- **Rule (option A, PO):** every locale links its **live locale home** in the **same tab**, as the source
+  (`https://www.skoda-storyboard.com/cs/`; Media Room `…/cs/media-room/`). Media Room DE stays on `skoda-media.de` in
+  a new tab. The path swap (`localizedPath`) is removed: the source translates its slugs, so it 404'd on both sites.
+- **Code:** in `scripts/links.js`, `LIVE_SAME_TAB` gains the locale homes and those targets get the source's slash.
+  In `header-locales.js`, a new tab only for another site, and a broken authored href falls back to the siblings'
+  pattern.
+- **Content:** the published `/media-room/nav` still authors `/cs/` … and `/de/`. Its preview already has
+  `/cs/media-room` … + `skoda-media.de` (that's the only difference), so the Media Room needs that fragment
+  published.
 
 ## Dependencies
 - Upstream: SKODA-301 (Header + nav fragment) / Downstream: SKODA-1003 (language-negotiated root routing + per-locale placeholders)

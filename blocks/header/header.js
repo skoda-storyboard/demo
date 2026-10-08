@@ -599,17 +599,16 @@ export default async function decorate(block) {
       subscribeLink.prepend(mail);
     }
     // Language switcher (SKODA-303): the authored locale paragraph becomes a labelled list
-    // with the page's locale (from the URL) as the current one (header-locales.js). The
-    // topbar is lifted OUT of <nav>, so it can't appear inside the mobile drawer: a copy of
-    // the list goes into a drawer footer (CSS shows it only in the open drawer; the topbar
-    // one is the desktop instance).
+    // with the page's locale (from the URL) as the current one, each other locale linking its
+    // live locale home (header-locales.js, SKODA-303a). The topbar is lifted OUT of <nav>, so
+    // it can't appear inside the mobile drawer: a copy of the list goes into a drawer footer
+    // (CSS shows it only in the open drawer; the topbar one is the desktop instance).
     const base = window.location.href;
     const localeGroup = [...utility].find((p) => isLocaleGroup(p, base));
     const locales = localeGroup && buildLocaleList(
       localeEntries(localeGroup, base),
       currentLocale(window.location.pathname),
       document,
-      window.location.pathname, // each locale links this page in that locale
     );
     if (locales) {
       // a list can't live in a <p>: the group becomes a <div> in the same place

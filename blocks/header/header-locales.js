@@ -9,9 +9,16 @@
  * EN CZ DE SK SR SL; the current locale doesn't move). Each link gets `hreflang` / `lang` and
  * the language's own name as its accessible name; the visible text stays the code.
  *
+ * Targets (SKODA-303a, decided 2026-10-08): the authored locale home. The nav fragment's link
+ * pass (scripts/links.js) points it at the live site, in the same tab as on the source; only a
+ * link to another site (the Media Room DE, skoda-media.de) opens a new tab. The page path isn't
+ * kept: live translates its slugs, so per-page targets wait for SKODA-1003.
+ *
  * i18n: the list's name lives in LABELS (English, the header's other control text is too;
  * per-locale placeholders are SKODA-1003). The language names are endonyms, locale-neutral.
  */
+
+import { opensInSameTab } from '../../scripts/links.js';
 
 const LABELS = {
   list: 'Language',
@@ -105,25 +112,14 @@ export function siblingHref(code, entries) {
 }
 
 /**
- * The current page in another locale: the page path with only its locale segment swapped
- * (`/en/emobility/x` → `/cs/emobility/x`), as the source keeps the page when the language
- * changes. Null when the page isn't in a locale tree (`/`, `/drafts/…`): its authored target
- * is used instead.
- * @param {string} pathname the current page path
- * @param {string} code the target locale
- * @returns {string|null}
+ * A link that opens a new tab: one to another site (the source's Media Room DE goes to
+ * skoda-media.de). The live storyboard's locale homes stay in the tab (opensInSameTab).
  */
-export function localizedPath(pathname, code) {
-  const [, seg, ...rest] = String(pathname || '').split('/');
-  if (!byCode.has(String(seg).toLowerCase())) return null;
-  return ['', code, ...rest].join('/');
-}
-
-/** A link to another site (the source's Media Room DE goes to skoda-media.de, in a new tab). */
-function isExternal(href, doc) {
+function opensNewTab(href, doc) {
   try {
     const url = new URL(href, doc.baseURI);
-    return /^https?:$/.test(url.protocol) && url.host !== new URL(doc.baseURI).host;
+    return /^https?:$/.test(url.protocol) && url.host !== new URL(doc.baseURI).host
+      && !opensInSameTab(url.href);
   } catch (e) {
     return false;
   }
@@ -131,20 +127,14 @@ function isExternal(href, doc) {
 
 /**
  * The switcher list: the current locale as `<span aria-current="true">`, every other one as
- * a link with `hreflang` / `lang` and its own language name.
- * Targets, as on the source:
- *   - an authored link to another site wins, and opens in a new tab (Media Room DE);
- *   - otherwise the current page in that locale (localizedPath: only the locale segment of
- *     the path changes);
- *   - on a page outside a locale tree, the authored target (a bold entry without a link
- *     takes its siblings' pattern, siblingHref).
+ * a link with `hreflang` / `lang` and its own language name, to its authored target (a bold
+ * entry without a link takes its siblings' pattern, siblingHref).
  * @param {Array<{code: string, href: string|null}>} entries from localeEntries()
  * @param {string} current the page's locale, from currentLocale()
  * @param {Document} doc the document to build in
- * @param {string} [pathname] the current page path (default: the authored targets only)
  * @returns {HTMLUListElement|null} null when there are no entries
  */
-export function buildLocaleList(entries, current, doc, pathname = '') {
+export function buildLocaleList(entries, current, doc) {
   if (!entries.length) return null;
   const ul = doc.createElement('ul');
   ul.className = 'nav-locales-list';
@@ -157,14 +147,14 @@ export function buildLocaleList(entries, current, doc, pathname = '') {
       item = doc.createElement('span');
       item.setAttribute('aria-current', 'true');
     } else {
-      const authored = href || siblingHref(code, entries);
-      const target = isExternal(authored, doc)
-        ? authored
-        : localizedPath(pathname, code) || authored;
+      // only a site path or a web URL is a target: a broken authored href (`javascript:`,
+      // `//host`, empty) falls back to the siblings' pattern
+      const usable = href && /^(?:\/(?!\/)|https?:\/\/)/i.test(href);
+      const target = usable ? href : siblingHref(code, entries);
       item = doc.createElement('a');
       item.setAttribute('href', target);
       item.setAttribute('hreflang', code);
-      if (isExternal(target, doc)) {
+      if (opensNewTab(target, doc)) {
         item.setAttribute('target', '_blank');
         item.setAttribute('rel', 'noopener');
         item.setAttribute('aria-label', LABELS.newTab(name));
