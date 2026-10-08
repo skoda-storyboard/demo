@@ -4,6 +4,44 @@ Mandatory for JavaScript development and defect fixes in blocks, shared scripts,
 templates, importers, and tests. Follow existing repository conventions and ESLint;
 these rules supplement, not replace, the ticket's acceptance criteria.
 
+## Core JavaScript
+
+These language-level rules apply to browser code, Node tooling, and tests. ESLint
+enforces syntax/style conventions; review and tests must verify behavior.
+
+### Values and Comparisons
+
+- Default to `const`; use `let` only when reassignment is needed, never `var`. `const` prevents rebinding, not object/array mutation.
+- Prefer strict equality (`===`/`!==`) and explicit conversions at input boundaries. Do not rely on implicit coercion when comparing or calculating with authored, URL, or remote values.
+- Distinguish missing values from valid falsy values. Use `??` for null/undefined defaults when `0`, `false`, or `''` must survive; use `||` only when all falsy values should trigger the fallback.
+- Use optional chaining for genuinely optional data, not to hide broken required contracts. Validate required fields and types at the boundary; keep internal code working with a known shape.
+- Validate numeric input before use: reject blank strings when they are not valid numbers, convert explicitly, and check `Number.isFinite` plus domain bounds. Use `Number.isInteger`/`Number.isSafeInteger` where required; `parseInt` accepts partial input and is not whole-value validation.
+
+### Functions and Control Flow
+
+- Give variables and functions descriptive, domain-specific names; name booleans as predicates (`isOpen`, `hasItems`). Replace meaningful repeated literals with named constants rather than unexplained magic values.
+- Keep functions focused on one responsibility with explicit inputs and predictable return values. Prefer guard clauses over deep nesting; avoid nested ternaries and boolean expressions used only for side effects.
+- Separate parsing/validation and pure calculation from DOM/network side effects when it makes behavior easier to test. Prefer explicit parameters over hidden dependencies on mutable module state.
+- Do not mutate caller-owned inputs or shared results unless mutation is the API's explicit contract. Local mutation is acceptable; remember spread copies are shallow and nested values remain shared.
+- Use default parameters/destructuring only when they clarify the contract. Avoid boolean mode flags or long positional argument lists when a small named options object would make calls unambiguous.
+
+### Objects and Collections
+
+- Use `map` for transformation, `filter` for selection, `find` for one match, and `some`/`every` for predicates. Do not use `map` for side effects or force a complex multi-step operation into `reduce`; choose the clearest loop allowed by the local lint configuration.
+- Handle empty collections and missing matches explicitly. Give `reduce` an initial value, and use numeric comparators for numeric sorting. `sort`/`reverse` mutate arrays; copy first when callers must retain the original order.
+- Use `Set` for uniqueness and `Map` for dynamic key/value lookups where appropriate. For plain-object own-property checks, use `Object.hasOwn` where supported or `Object.prototype.hasOwnProperty.call`; never trust an input object's own `hasOwnProperty` method.
+- Validate external object shapes before destructuring or merging them. Do not blindly merge untrusted keys into configuration/state; select allowed fields explicitly and preserve required defaults.
+- Use standard structured APIs (`JSON.parse`, `URL`, `URLSearchParams`) rather than hand-written string parsing for their formats. Catch malformed input at its boundary; parsing JSON does not validate its schema.
+
+### Promises and Errors
+
+- Every promise must be awaited, returned to a caller that handles it, or explicitly given a rejection handler for intentional background work. Never use an async `forEach` callback when completion or failures must be tracked.
+- Run independent work concurrently with `Promise.all` only when all results are required; use `Promise.allSettled` when partial success is meaningful and handle each outcome. Bound concurrency for large collections; keep dependent work sequential. Promise rejection does not cancel sibling operations.
+- Use `AbortController` for cancellable fetches and guard against stale completions. Release resources in `finally` when cleanup must happen after both success and failure.
+- Throw `Error` instances, not strings. Catch only where code can recover, add useful context, or present a fallback; otherwise let the owning boundary handle the failure. Preserve the original cause when wrapping errors and avoid duplicate logging or returning fake success values.
+- Keep `try` blocks narrow enough to distinguish expected operational failures from programming errors. Treat cancellation separately from failure; do not retry indefinitely or retry non-idempotent operations without an explicit policy.
+- Choose language features supported by the project's browser/Node targets. Do not assume newer syntax or built-ins are available merely because the editor accepts them; do not add polyfills or runtime dependencies without agreement.
+
 ## EDS Contracts
 
 - Read the ticket, relevant UI spec, and owning implementation before editing. Inspect actual backend markup (`curl http://localhost:3000/{path}.plain.html`); `buildAutoBlocks` transforms it before block decoration.
@@ -16,7 +54,7 @@ these rules supplement, not replace, the ticket's acceptance criteria.
 
 ## Code and State
 
-- Prefer `const`, clear names, small functions, and the simplest existing pattern. Avoid unnecessary abstractions, duplicated utilities, globals, and unrelated cleanup.
+- Apply the core JavaScript rules above using the simplest existing pattern. Avoid unnecessary abstractions, duplicated utilities, globals, and unrelated cleanup.
 - Scope DOM queries, styles/classes, and state to the owning block unless deliberately implementing shared page behavior. Multiple block instances must remain independent; generate unique IDs for ARIA relationships.
 - Use explicit state transitions and one source of truth. Avoid duplicate initialization/listeners when reinitialization is supported; release timers, observers, and listeners when their owning UI is removed or replaced.
 - Handle async failures at the owning boundary: check `response.ok`, distinguish cancellation, and keep a usable fallback. Prevent stale responses from overwriting newer state; reuse shared caching and never mutate shared read-only results. Do not silently swallow errors.
@@ -37,5 +75,6 @@ these rules supplement, not replace, the ticket's acceptance criteria.
 ## Before Handoff
 
 - Add/update focused tests using existing helpers: normal flow, malformed/empty content, async failure where applicable, multiple instances, and keyboard/focus behavior. For defects, pin the failing behavior with a regression test when practical.
+- For core logic, cover relevant boundary values (missing vs. falsy, invalid numbers, empty collections), input non-mutation where promised, and async rejection/cancellation/stale-result behavior. Assert observable results, not incidental implementation details.
 - Run the narrowest relevant tests first, then `npm run lint`. For UI changes, compare measured source/main behavior at the ticket's viewport bands using Chrome DevTools; follow the repository review protocol (no screenshots).
-- Self-check: authored variants/fallbacks preserved; state and IDs isolated; safe DOM/URLs; consent respected; keyboard/focus usable; lifecycle and cleanup correct; tests/lint and applicable UI evidence recorded. Explicitly report anything unverified; development completion is not QA acceptance.
+- Self-check: value/coercion and mutation contracts explicit; collection edge cases handled; promises/errors owned; runtime features supported; authored variants/fallbacks preserved; state and IDs isolated; safe DOM/URLs; consent respected; keyboard/focus usable; lifecycle and cleanup correct; tests/lint and applicable UI evidence recorded. Explicitly report anything unverified; development completion is not QA acceptance.
