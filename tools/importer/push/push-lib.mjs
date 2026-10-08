@@ -15,19 +15,24 @@ import { createHash } from 'node:crypto';
  * Source URL (or already-a-path) → EDS page path: no host, no trailing slash, no
  * extension, `/` → `/index`. Mirrors the importers' own path rule
  * (import-*.js: pathname, strip trailing slash + .html, sanitized by the importer).
+ * A `?fragment=<slug>` URL names a press-kit group fragment: /fragments<page path>/<slug>.
  * @param {string} input e.g. https://www.skoda-storyboard.com/en/emobility/foo/ or /en/emobility/foo
  * @returns {string} e.g. /en/emobility/foo
  */
 export function pagePath(input) {
   const raw = String(input || '').trim();
   if (!raw) return '';
-  let p;
+  let url;
   try {
-    p = new URL(raw, 'https://www.skoda-storyboard.com').pathname;
+    url = new URL(raw, 'https://www.skoda-storyboard.com');
   } catch (e) {
     return '';
   }
-  p = decodeURIComponent(p).replace(/\.plain\.html$|\.html?$/i, '').replace(/\/+$/, '');
+  let p = decodeURIComponent(url.pathname).replace(/\.plain\.html$|\.html?$/i, '').replace(/\/+$/, '');
+  // `<page>?fragment=<slug>`: a group the press-kit importer writes as its own document
+  // (import-press-kit-default.js fragmentPath, SKODA-806)
+  const fragment = url.searchParams.get('fragment');
+  if (fragment && /^[a-z0-9-]+$/.test(fragment)) p = `/fragments${p}/${fragment}`;
   return p === '' ? '/index' : p;
 }
 

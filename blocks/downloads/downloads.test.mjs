@@ -555,3 +555,115 @@ test('group toggle: counts the files that can\'t be added, then counts as comple
   assert.equal(all.getAttribute('aria-pressed'), 'true', 'everything that can be added is in');
   assert.equal(all.getAttribute('aria-label'), 'Add all files to the media cart', 'a toggle keeps its name');
 });
+
+// --- gallery variant (SKODA-806): a press-kit Images-chapter group -------------------------
+const galleryBlock = (count, config = []) => {
+  const block = setup(false);
+  block.classList.add('gallery');
+  // a group heading before the block: it must not be taken as a stats line
+  const intro = document.createElement('div');
+  intro.className = 'default-content-wrapper';
+  intro.innerHTML = '<p>Plain copy before the group</p>';
+  block.before(intro);
+  config.forEach(([k, v]) => addConfig(block, k, v));
+  for (let i = 0; i < count; i += 1) {
+    addRow(block, {
+      src: `/img${i}.jpg`,
+      title: `Image ${i}`,
+      links: [['Original', `https://www.skoda-storyboard.com/direct-download/img${i}.jpg`], ['1920px', `https://www.skoda-storyboard.com/direct-download/img${i}-1920x1080.jpg`]],
+    });
+  }
+  return block;
+};
+
+test('gallery: the group pills sit above the grid; "Original" is the group toggle, "1920px" is inert', async () => {
+  const block = galleryBlock(3);
+  await decorate(block);
+  const bar = block.querySelector(':scope > .downloads-toolbar.downloads-group');
+  assert.ok(bar, 'a toolbar above the grid, not on the copy before the block');
+  assert.equal(document.querySelector('.downloads-stats'), null);
+  const [original, giant] = [...bar.querySelectorAll('button')];
+  assert.equal(original.textContent, 'Original');
+  assert.ok(original.classList.contains('downloads-add-all'));
+  assert.equal(original.getAttribute('aria-label'), 'Add all Original versions to the media cart');
+  assert.equal(giant.textContent, '1920px');
+  assert.equal(giant.getAttribute('aria-disabled'), 'true');
+  assert.equal(giant.getAttribute('aria-label'), '1920px versions can\'t be added to the media cart');
+  assert.ok(!giant.classList.contains('downloads-add'), 'never bound as a tile toggle');
+  // each tile keeps its add + download controls and both sizes in the menu
+  const tiles = [...block.querySelectorAll('.downloads-item')];
+  assert.equal(tiles.length, 3);
+  tiles.forEach((tile) => {
+    assert.equal(tile.querySelectorAll('.downloads-actions > .downloads-add, .downloads-actions .downloads-download').length, 2);
+    assert.deepEqual([...tile.querySelectorAll('.downloads-size')].map((a) => a.textContent), ['Original', '1920px']);
+  });
+  assert.equal(block.classList.contains('downloads-media-box'), false);
+});
+
+test('gallery: collapses to two rows by default on the Media Box ladder (1 / 2 / 3 / 4); collapse none opts out', async () => {
+  const block = galleryBlock(9);
+  await decorate(block);
+  const toggle = block.querySelector('.downloads-more');
+  assert.ok(toggle, 'collapses without a collapse row');
+  const visible = () => [...block.querySelectorAll('.downloads-item')].filter((tile) => !tile.hasAttribute('inert')).length;
+  assert.equal(visible(), 2, '1 column at 500');
+  window.setViewport(520);
+  assert.equal(visible(), 4, '2 columns from 520');
+  window.setViewport(768);
+  assert.equal(visible(), 6, '3 columns from 768');
+  window.setViewport(992);
+  assert.equal(visible(), 8, '4 columns from 992');
+  toggle.click();
+  assert.equal(visible(), 9);
+  assert.equal(toggle.textContent, 'Show less');
+
+  const open = galleryBlock(9, [['collapse', 'none']]);
+  await decorate(open);
+  assert.equal(open.querySelector('.downloads-more'), null);
+  assert.ok(open.querySelector('.downloads-toolbar.downloads-group'), 'the pills stay');
+});
+
+test('gallery: the "Original" pill adds the group\'s originals and keeps its own name', async () => {
+  const block = galleryBlock(2);
+  await decorate(block);
+  // decorate() binds the real cart in the background: rebind a fresh pill to the fake one
+  const built = block.querySelector('.downloads-add-all');
+  const original = built.cloneNode(true);
+  built.replaceWith(original);
+  const giant = block.querySelector('.downloads-group-size:not(.downloads-add-all)');
+  const cart = fakeDownloadsCart();
+  const ui = await import('../../scripts/media-cart-ui.js');
+  const { bindCart } = await import('./downloads.js');
+  await bindCart(block, original, async () => [cart, ui, { fetchPlaceholders: async () => ({}) }]);
+  original.click();
+  await settle();
+  assert.deepEqual(cart.calls[0].map((e) => e.href), [
+    'https://www.skoda-storyboard.com/direct-download/img0.jpg',
+    'https://www.skoda-storyboard.com/direct-download/img1.jpg',
+  ], 'originals only');
+  assert.equal(original.getAttribute('aria-pressed'), 'true');
+  assert.equal(original.getAttribute('aria-label'), 'Add all Original versions to the media cart', 'label in name kept');
+  original.click();
+  await settle();
+  assert.equal(original.getAttribute('aria-pressed'), 'false');
+  assert.equal(giant.getAttribute('aria-disabled'), 'true', 'the 1920px pill is never wired');
+  assert.equal(giant.hasAttribute('data-cart-control'), false);
+});
+
+test('gallery inside a Media Box section is the Media Box', async () => {
+  const block = setup(true);
+  block.classList.add('gallery');
+  addRow(block, { src: '/a.jpg', title: 'A', links: [['Original', '/a.jpg']] });
+  await decorate(block);
+  assert.ok(block.classList.contains('downloads-media-box'));
+  assert.equal(block.querySelector('.downloads-group'), null);
+});
+
+test('gallery CSS: Media Box ladder, overlay controls, source opener bar', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = await readFile(new URL('./downloads.css', import.meta.url), 'utf8');
+  assert.match(css, /@media \(width >= 520px\) \{\s+\.downloads:is\(\.downloads-media-box, \.gallery\) \.downloads-items \{\s+--dl-cols: 2;/);
+  assert.match(css, /\.downloads:is\(\.downloads-media-box, \.gallery\) \.downloads-items \{\s+--dl-cols: 3;/);
+  assert.match(css, /\.downloads\.gallery \.downloads-actions \{\s+position: absolute;\s+inset-block-end: var\(--dl-overlay-inset\);\s+inset-inline-start: var\(--dl-overlay-inset\);/);
+  assert.match(css, /\.downloads\.gallery\.downloads-collapsed \.downloads-more \{\s+margin-block-start: calc\(-1 \* var\(--dl-gallery-bar\)\);/);
+});

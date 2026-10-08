@@ -18,6 +18,13 @@ test('pagePath maps source URLs and paths to EDS page paths', () => {
   assert.equal(pagePath('https://www.skoda-storyboard.com/en/emobility/foo/'), '/en/emobility/foo');
   assert.equal(pagePath('/en/emobility/foo'), '/en/emobility/foo');
   assert.equal(pagePath('/en/emobility/foo.plain.html'), '/en/emobility/foo');
+  // a press-kit Images group imported on its own (SKODA-806)
+  assert.equal(
+    pagePath('https://www.skoda-storyboard.com/en/press-kits/kit/images/?fragment=exterior'),
+    '/fragments/en/press-kits/kit/images/exterior',
+  );
+  assert.equal(pagePath('https://www.skoda-storyboard.com/en/x/?fragment=../evil'), '/en/x', 'only a plain slug');
+  assert.equal(pagePath('https://www.skoda-storyboard.com/en/x/?utm=1'), '/en/x', 'other queries are ignored');
   assert.equal(pagePath('https://www.skoda-storyboard.com/'), '/index');
   assert.equal(pagePath(''), '');
 });

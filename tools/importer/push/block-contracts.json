@@ -33,7 +33,8 @@
     },
     "downloads": {
       "variants": [
-        "media-box"
+        "media-box",
+        "gallery"
       ]
     },
     "embed": {

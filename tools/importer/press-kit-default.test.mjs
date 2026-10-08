@@ -34,6 +34,7 @@ globalThis.WebImporter = {
 };
 
 const importer = JSDOM ? (await import('./import-press-kit-default.js')).default : null;
+const { fragmentGroups, fragmentPath } = JSDOM ? await import('./import-press-kit-default.js') : {};
 const decorateAccordion = JSDOM ? (await import('../../blocks/accordion/accordion.js')).default : null;
 const { layoutTileRows } = await import('../../scripts/cards-tiles.js');
 const base = 'https://www.skoda-storyboard.com/en/press-kits/';
@@ -447,7 +448,8 @@ test('resource child without a Media Box: grouped galleries in source order, no 
     extra: `${galleryGroup('Exterior', 0, 3)}${galleryGroup('Interior', 3, 2)}`,
     hubTitle: 'Škoda Peaq – Press Kit',
   }), `${base}skoda-peaq-press-kit-2/images/`);
-  const groups = blocks(page, 'Downloads');
+  const groups = blocks(page, 'Downloads (gallery)');
+  assert.equal(blocks(page, 'Downloads').length, 0, 'gallery groups are the gallery variant (SKODA-806)');
   // Header + `collapse | auto` config row, then one row per asset.
   assert.deepEqual(groups.map((block) => block.querySelectorAll('tr').length - 2), [3, 2]);
   groups.forEach((block) => assert.deepEqual(
@@ -656,6 +658,67 @@ test('the source\u2019s glued non-breaking spaces survive the import (skoda-nbsp
   const p = [...page.querySelectorAll('p')].find((el) => el.textContent.includes('speakers'));
   assert.equal(p.textContent, `The system features 16${NBSP_PLACEHOLDER}speakers and a${NBSP_PLACEHOLDER}total output of 755${NBSP_PLACEHOLDER}W.`);
   assert.ok(![...page.querySelectorAll('p')].some((el) => el.textContent.includes(NBSP_PLACEHOLDER) && !el.textContent.trim().replaceAll(NBSP_PLACEHOLDER, '')), 'a whitespace-only spacer is not glued');
+});
+
+const BLOCK_ORDER = new Set(['Downloads (gallery)', 'Fragment']);
+
+test('an Images chapter past the image budget moves its largest groups to fragments (SKODA-806)', { skip: !JSDOM }, () => {
+  const images = `${base}skoda-peaq-press-kit-2/images/`;
+  const html = fixture({
+    chapters: true,
+    mediaBox: false,
+    togglesCount: 0,
+    extra: `${galleryGroup('Introduction', 0, 30)}${galleryGroup('Exterior', 30, 120)}${galleryGroup('Škoda Peaq Sportline', 150, 60)}`,
+  });
+  const page = run(html, images);
+  // 210 tiles > 195: Exterior (120) leaves, 90 stay inline
+  assert.deepEqual(blocks(page, 'Downloads (gallery)').map((t) => t.querySelectorAll('tr').length - 2), [30, 60]);
+  const [frag] = blocks(page, 'Fragment');
+  assert.ok(frag, 'a Fragment block in place of the group');
+  assert.equal(frag.querySelector('a').getAttribute('href'), '/fragments/en/press-kits/skoda-peaq-press-kit-2/images/exterior');
+  // source order kept: Introduction, the Exterior fragment, Sportline
+  const order = [...page.querySelectorAll('table')].map((t) => txt(t.querySelector('tr > td')))
+    .filter((name) => BLOCK_ORDER.has(name));
+  assert.deepEqual(order, ['Downloads (gallery)', 'Fragment', 'Downloads (gallery)']);
+  assert.ok(![...page.querySelectorAll('h2')].some((h) => txt(h) === 'Exterior'), 'the heading moves with the group');
+  assert.ok(page.querySelectorAll('img').length < 200);
+
+  // the fragment itself: the same URL with ?fragment=<slug>
+  const fragmentRun = (slug) => {
+    const pageUrl = `${images}?fragment=${slug}`;
+    const dom = new JSDOM(html, { url: pageUrl });
+    const { document } = dom.window;
+    globalThis.document = document;
+    globalThis.window = dom.window;
+    importer.preprocess({ document });
+    return importer.transform({ document, url: pageUrl, params: { originalURL: pageUrl } })[0];
+  };
+  const out = fragmentRun('exterior');
+  assert.equal(out.path, '/fragments/en/press-kits/skoda-peaq-press-kit-2/images/exterior');
+  assert.equal(txt(out.element.querySelector('h2')), 'Exterior');
+  assert.equal(blocks(out.element, 'Downloads (gallery)').length, 1);
+  assert.equal(rows(out.element, 'Downloads (gallery)').length - 1, 120, 'collapse row + 120 assets');
+  assert.equal(out.element.querySelectorAll('table').length, 1, 'nothing else from the page');
+  assert.equal(fragmentRun('skoda-peaq-sportline').path, '/fragments/en/press-kits/skoda-peaq-press-kit-2/images/skoda-peaq-sportline');
+  assert.throws(() => fragmentRun('nope'), /no gallery group "nope"/);
+
+  // within budget (the Epiq chapter, 194): no fragments
+  const small = run(fixture({
+    chapters: true, mediaBox: false, togglesCount: 0, extra: `${galleryGroup('Exterior', 0, 3)}${galleryGroup('Interior', 3, 2)}`,
+  }), images);
+  assert.equal(blocks(small, 'Fragment').length, 0);
+});
+
+test('fragmentGroups takes the largest groups first until the rest fits; fragment paths', { skip: !JSDOM }, () => {
+  const g = (size, slug) => ({ size, slug });
+  // the live Peaq Images chapter: 246 tiles in 10 groups; Exterior (69) leaves, 177 stay
+  const peaq = [25, 69, 20, 1, 1, 2, 56, 36, 14, 22].map((size, i) => g(size, `g${i}`));
+  assert.deepEqual(fragmentGroups(peaq).map((x) => x.slug), ['g1']);
+  // the largest go first, until the rest fits
+  const groups = [g(100, 'a'), g(90, 'b'), g(80, 'c'), g(70, 'd')];
+  assert.deepEqual(fragmentGroups(groups).map((x) => x.slug), ['a', 'b']);
+  assert.deepEqual(fragmentGroups(groups, 1000), []);
+  assert.equal(fragmentPath('/en/press-kits/kit/images/', 'exterior'), '/fragments/en/press-kits/kit/images/exterior');
 });
 
 test('generated standalone bundle matches the source importer', { skip: !JSDOM }, () => {

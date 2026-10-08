@@ -1,7 +1,8 @@
 # Component Spec: Press Kit Media (grouped download areas + whole-kit ZIP)
 
-Status: **CAPTURED** (measured 2026-09-15 via Chrome DevTools MCP on page id 1; source CSS
-cross-checked against `media-room-515d2d102b.css`; reference screenshot saved).
+Status: **CAPTURED; Images groups BUILT** (measured 2026-09-15; re-measured on the M1 Peaq-2 / Epiq-2
+chapters 2026-10-08 against the SKODA-806 build, see §11). §7's single-page `press-kit-media` wrapper is
+**superseded**: the kit's areas stay separate child pages, as on the source (SKODA-805b D-1 = A).
 Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 
 Reuses [`downloads.md`](downloads.md) for per-item rendering and [`media-cart.md`](media-cart.md) for the
@@ -213,3 +214,67 @@ Compare EDS render to source at each viewport. WHAT / WHERE / viewport / expecte
 `assets/press-kit-media/`: `images-1280.png` (the Images group page: 16:9 download tiles with per-item
 download + link buttons and the Original/1920px size dropdown, chapter-nav above). Texts / Infographics /
 Technical data / Videos group captures and the ZIP control (dynamic) pending.
+
+## 11. Build (SKODA-806, 2026-10-08)
+
+**Model.** Each area is the kit's own child page, as on the source (SKODA-805b): Texts, Infographics, Technical data,
+Images, Videos. There is no wrapper block. The Images chapter is the piece this ticket builds.
+
+**Measured on the source** (Peaq-2 / Epiq-2 `/images/`, Chrome DevTools, no screenshots):
+
+| Property | Source |
+|---|---|
+| Group heading | `h3.widget-title` 24/27.6/300 (20/23 at ≤768), ink; the pill bar right under it |
+| Group pills | "Original" 115.2×48, "1920px" 109.2×48, 8px apart, right-aligned: `padding 14px 24px`, 16/16 weight 500, 1px tracking, 2px ink ring, radius 50, white. No hover or added look. `data-action=add data-ids=<group>`, `data-size="" / "giant"` |
+| Grid | 20px below the pills; columns 1 / 2 / 3 / 4 at <520 / 520 / 768 / 992; 20px gaps; 16:9 thumb (188×106 at 1280), no border or radius |
+| Tile controls | add and download discs (40×40, 8px apart) over the thumb's lower left corner, 10px in; always visible; no title shown |
+| Collapse | the grid clips to two rows + 78px. A 64px full-width `.togglebox-opener` sits over the clip's foot, `linear-gradient(0deg, #fff 30%, transparent)`, with the plain "Show more" text (16/24/400, `14px 24px`) at its bottom. Open: the bar sits 16px under the grid, without the fade ("Show less") |
+| Group gap | 32px from the bar (or 20px row margin + 32px when the group fits in two rows) to the next heading |
+
+**EDS build:**
+- **`Downloads (gallery)`** (`blocks/downloads`, see [`downloads.md`](downloads.md)): a variant of the owning
+  block.
+  - Its tile, grid ladder, opener bar, spacing and group pills follow the table above.
+  - "Original" is the group add toggle, reusing the Media Box `buildAddAll` / `bindCart` wiring; its name is "Add
+    all Original versions to the media cart", so the label is in the name.
+  - "1920px" is shown but inert ("1920px versions can't be added to the media cart"): the cart holds originals
+    only (SKODA-505a).
+  - The default and Media Box variants are unchanged.
+- **Heading:** `h2`. The source skips from the h1 to an h3; here it is styled as the source h3 in
+  `templates/press-kit/press-kit.css`.
+- **Importer:** `parsers/press-kit-media.js` emits `Downloads (gallery)` (plus `collapse | auto`) for each gallery
+  group.
+- **Peaq-2 Images (246 tiles) is past the 200-images-per-document limit.** `import-press-kit-default.js` moves its
+  largest group (Exterior, 69) to a fragment, so the page holds 179. The mechanism is in
+  `IMPORT-PIPELINE.md`, "Group fragments". Epiq-2 (194) stays one page.
+
+**EDS vs source, draft `/drafts/skoda-806-press-kit-images`** (Peaq-2 Images, with Exterior loaded as a fragment):
+
+| Width | All ten group headings (offset from the first, px) | Result |
+|---|---|---|
+| 1280 | 0, 437, 874, 1311, 1565, 1818, 2071, 2508, 2946, 3383 | identical |
+| 992 | 0, 389, 778, 1167, 1397, 1626, 1855, 2244, 2633, 3022 (EDS +1 on the last) | ±1 |
+| 768 | 0, 390, 781, 1171, 1399, 1627, 1855, 2245, 2636, 3026 (EDS +1 on two) | ±1 |
+| 520 | 0, 491, 982, 1473, 1751, 2029, 2307, 2798, 3289, 3780 | identical |
+| 390 | 0, 637, 1275, 1912, 2263, 2614, 3193, 3831, 4468, 5105 | identical |
+
+Group 1 (Introduction) in detail:
+- **Pill boxes:** identical x/y/w/h at every width (e.g. 606 / 729 × 115 / 109 × 48 at 1280).
+- **Tiles:** identical (188×106 at 1280, 151×85 at 768, 370×208 at 390), and so are the columns (4 / 4 / 3 / 2 / 1).
+- **Overlay discs:** identical (36,+56 / 84 at 1280).
+- **Collapsed opener bar:** top and text top identical (341 / 369 from the heading at 1280).
+- **Opened:** the next heading moves by the source's amount (1068 at 1280).
+
+Cart, through the browser:
+- "Original" adds the group's 25 originals (badge 25) and removes them again; `aria-pressed` follows.
+- "1920px" never binds.
+- The fragment-loaded Exterior group binds as well.
+- Media Box bands, the story / press-release / first-glimpse pages and the Epiq Images page in its current content are
+  identical to `main` at 1280 / 768 / 390.
+
+**Not in this ticket's PR:**
+- the whole-kit ZIP: on the source a banner links a pre-built ZIP on the source CDN, and the EDS hubs already carry
+  that link. Hosting it in the DAM needs an `archive` binary kind in the media pipeline, so it is a separate PR;
+- the Texts / Infographics / Technical-data page polish: the Texts table rows, the Infographics spacer rhythm, and
+  the Technical-data image width.
+

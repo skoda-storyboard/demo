@@ -3,6 +3,8 @@
 - **Type:** block / import
 - **Phase:** B  ·  **Pilot:** No · **Milestone:** M2 (go-live)
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–6d *(planning estimate, not a quote)*
+- **Status (2026-10-08):** 🟡 IN REVIEW (Images chapters), branch `skoda-806-press-kit-media`. Draft: `/drafts/skoda-806-press-kit-images`.
+  The whole-kit ZIP (DAM hosting) is a follow-up PR; see Build notes. Spec: [`press-kit-media.md`](../../ui-specs/press-kit-media.md) §11.
 
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/press-kit-media.md`](../../ui-specs/press-kit-media.md)** (captured via Chrome DevTools on the live Peaq kit). Read it before implementing.
@@ -36,12 +38,12 @@ Whether these render as **tabs, accordion, or stacked sections** is a visual/int
 - Individual asset download (MR-PK06) = the existing per-item Downloads behaviour.
 
 ## Acceptance Criteria
-- [ ] All five groups render in the confirmed order with per-item downloads.
+- [x] All five groups render in the confirmed order with per-item downloads. *(The five areas are the kit's child pages, as on the source (805b). Peaq-2 Images no longer 404s once pushed: its Exterior group is a fragment.)*
 - [ ] Infographic items show a preview image linking to a downloadable PDF.
-- [ ] Image items expose the Original + 1920px renditions.
+- [x] Image items expose the Original + 1920px renditions. *(Per-tile menu Original / 1920px; group pills "Original" (adds the group) / "1920px" (inert, originals-only cart).)*
 - [ ] "Download complete press kit" produces a single package via the shared reduction/packaging service (no separate bespoke zip implementation).
-- [ ] Presentation is **stacked** (source-confirmed; no tabs/accordion). Any optional tab/accordion variant stays accessible (keyboard + ARIA) if used.
-- [ ] Output passes lint and matches source grouping in local preview.
+- [x] Presentation is **stacked** (source-confirmed; no tabs/accordion). Any optional tab/accordion variant stays accessible (keyboard + ARIA) if used.
+- [x] Output passes lint and matches source grouping in local preview. *(All ten Peaq group headings at the source offsets at 1280/520/390, ±1px at 992/768; spec §11.)*
 - [ ] Visual diff vs source at 1280/768 ≤ 2% per-pixel (per [`press-kit-media.md` §9](../../ui-specs/press-kit-media.md)).
 
 ## Dependencies
@@ -53,3 +55,31 @@ Whether these render as **tabs, accordion, or stacked sections** is a visual/int
 - **ZIP mechanism (🟠, §11.12):** dynamic/scripted control not seen in snapshot, confirm implementation with the technical team; depends on the D2 media-cart reduction approach.
 - **Presentation TBD (🟡, §11.11):** tabs vs accordion vs stacked, design decision; if tabs/accordion, adds a11y focus/ARIA scope.
 - Rendition strategy (Original/1920px) ties to Dynamic Media confirmation (D5/§6.9).
+
+## Build notes (2026-10-08)
+- **Source findings that changed the plan:**
+  - **The whole-kit ZIP is not dynamic.** The hub's download banner (`ikony_sb_landscape_down…png`, 604×302) links a
+    pre-built ZIP on the source CDN (`2026/09/Skoda_Peaq_323f2835.zip`, `2026/08/Skoda_Epiq_c5a5f2fe.zip`), and the
+    EDS hubs already carry it (`Columns (banners)`). Moving it to the DAM needs an `archive` kind in the shared binary
+    pipeline (SKODA-503 gate: the hubs would hold publish until the ingest), so it is a separate PR. **The ZIP AC stays
+    open.**
+  - **Source Images groups collapse** (two rows + a fading 64px opener bar), so collapsing stays.
+- **`Downloads (gallery)`** (`blocks/downloads`, the owning block; the default and Media Box variants are unchanged):
+  - the source tile (thumb only, discs over the lower left), the Media Box grid ladder, the opener bar and group gaps;
+  - the "Original" / "1920px" group pills ("Original" adds the group, "1920px" is inert because the cart holds
+    originals only).
+- **Heading:** the group heading is styled as the source h3 (`templates/press-kit/press-kit.css`) and stays an h2.
+- **Importer:**
+  - `press-kit-media.js` emits the variant;
+  - `import-press-kit-default.js` moves an Images chapter's largest groups to fragments past 195 tiles (Peaq-2:
+    Exterior → `/fragments/en/press-kits/skoda-peaq-press-kit-2/images/exterior`), each imported from
+    `?fragment=<slug>`;
+  - `push-lib` `pagePath()` maps that URL to the fragment path;
+  - `urls-press-kit-default.txt` lists it. Contract: `main.downloads.variants` gains `gallery`.
+- **Follow-ups:**
+  - the ZIP in the DAM (archive kind + manifest rows);
+  - the Texts table rows, the Infographics spacer rhythm and the Technical-data image width (template / importer
+    polish);
+  - pushing the re-imported Images chapters and the fragment after merge (`import:push`, with
+    `--publish-fragments` not needed: the fragment is a listed page).
+

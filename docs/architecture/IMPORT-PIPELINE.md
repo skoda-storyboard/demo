@@ -130,6 +130,17 @@ offline gate uploads or activates Assets originals.
 ### `urls-<name>.txt`
 The input URL list for the run.
 
+**Group fragments (SKODA-806).** A document holds at most 200 images (helix html2md), and the bulk runner
+writes one document per URL. So a press-kit Images chapter past that budget (Peaq-2: 246 tiles) keeps its
+largest gallery groups out of the page:
+
+- the page gets a `Fragment` block where each moved group was;
+- each fragment is its own list entry, the page URL with `?fragment=<slug>`. The importer writes that one
+  group, its heading plus `Downloads (gallery)`, to `/fragments<page path>/<slug>`;
+- `push-lib` `pagePath()` maps the same URL to the same path, so `import:push` and
+  `import:validate-blocks` handle it like any page;
+- `/fragments/…` stays outside the `/en` tree, so feeds never list a fragment.
+
 ---
 
 ## 3. Running an import (existing template)

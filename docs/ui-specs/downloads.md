@@ -169,6 +169,18 @@ row per asset (picture or empty cell + title + download links). Reuse `createOpt
 `optimizeImageInPlace` for authored ones. Reuse the card-teaser markup for each tile and the
 `gallery-lightbox` block for the enlarged view.
 
+### `Downloads (gallery)` (SKODA-806)
+
+A press-kit Images-chapter group (`parsers/press-kit-media.js`). The measured spec is in
+[`press-kit-media.md`](press-kit-media.md) §3 and §11. Same rows as the default variant:
+
+- **Grid:** the Media Box ladder (1 / 2 / 3 / 4 at 520 / 768 / 992), 20px gaps.
+- **Tile:** the thumbnail only, with the add and download discs over its lower left corner (10px inset).
+- **Group pills:** "Original" / "1920px" above the grid. "Original" is the group add toggle; "1920px" stays
+  inert, because the cart holds originals only.
+- **Collapse:** two rows by default (`collapse none` opts out), with the source's 64px fading opener bar.
+- **Spacing:** 32px to the next group.
+
 ### `Downloads` block config table (DA authoring)
 
 | key | example | meaning |
