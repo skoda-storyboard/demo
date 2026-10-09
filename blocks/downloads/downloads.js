@@ -449,6 +449,9 @@ export async function bindCart(block, addAll, load = () => Promise.all([
   if (!tiles.length) return;
   const [cart, ui, { fetchPlaceholders }] = await load();
   tiles.forEach((btn) => cart.bindCartControl(btn));
+  // an added tile's picture flies to the cart badge, as on the source (#275); decorative
+  import('../../scripts/media-cart-fly.js').then(({ installFlyToCart }) => installFlyToCart())
+    .catch(() => { /* no flight */ });
   if (!addAll) return;
   // the notice's styles before a partial add can show it (no unstyled flash)
   const [ph] = await Promise.all([fetchPlaceholders(), ui.loadCartStyles()]);

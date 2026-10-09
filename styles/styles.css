@@ -285,12 +285,15 @@
   --cart-limit-accent: var(--skoda-green);
   --cart-popup-shadow: 0 18px 50px rgb(0 0 0 / 25%);
 
-  /* the added card's glyph shrinks into place (64 → 48px) and fades in with the source's
-     spring, 0.3s after the click */
+  /* the added card's glyph (the source's \e02f bag, icons/media-cart-added.svg) shrinks into
+     place (64 → 48px) and fades in with the source's spring, 0.3s after the click; it goes
+     at once when the file leaves the cart (#275) */
   --cart-added-glyph: 48px;
   --cart-added-glyph-from: 64px;
-  --cart-added-motion: 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) 0.3s;
+  --cart-added-motion: 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  --cart-added-delay: 0.3s;
   --z-cart-notice: 19;
+  --z-cart-flying: 20; /* the card's copy flying to the cart badge, over the dock (scripts/media-cart-fly.js) */
 }
 
 /* The global element defaults below (body, headings, paragraphs, lists, strong/em, hr, line

@@ -538,6 +538,7 @@
 .downloads .downloads-figure:has(:is(.downloads-add, .downloads-add-size)[data-in-cart]) .downloads-file::before {
   background-size: var(--cart-added-glyph);
   opacity: 1;
+  transition-delay: var(--cart-added-delay);
 }
 
 .downloads .downloads-figure:has(:is(.downloads-add, .downloads-add-size)[data-in-cart]) .downloads-play {

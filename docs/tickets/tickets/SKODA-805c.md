@@ -197,3 +197,9 @@ Press kits QA observations, FG (this page). Measured origin vs branch at 1440 / 
     - "1920px" stays inert: the cart holds originals only (SKODA-505a, D5). On the source it adds the 1920px rendition.
   - **Both size menus:** the source's geometry. 47px under the button and 2px in; 40px rows of 16/16 text, weight 500, 1px tracking, 12px insets; the centred 75% hairline between rows. Measured: menu 87.2 × 80 on both, 111 with the trash glyph.
   - PDF / MP4 tiles, the video's + and the sidebar + stay single toggles that swap to the trash glyph when added, as on the source.
+- **Round 5 (2026-10-09), PO review:**
+  - **Added card's icon:** the source's bag glyph `\e02f` (`icons/media-cart-added.svg`, white, regular weight, 48px on the 40% scrim). It fades in 0.3s after the add, and leaves at once on remove, as the source's (`--cart-added-delay`).
+  - **Flying to cart:** `scripts/media-cart-fly.js`.
+    - When a card's add goes in (new `media-cart:added` event from the cart's controls), a 70% copy of its picture flies to the dock's cart badge, fitting a 100px box (700ms easeInOutExpo), then shrinks and fades out (400ms). The badge wobbles a second after the click (8 / −6 / 4 / −2 / 1px, 0.5s).
+    - Frames match the source's (e.g. 292×165 → 100×56).
+    - Media Box tiles, the images / videos listing and the media rails. Files and the clip toolbar don't fly, as on the source. Nothing moves under reduced motion; the copy is inert and hidden from assistive tech.
