@@ -3,8 +3,8 @@
  * when a card's add goes in (`media-cart:added`, scripts/media-cart.js), a 70% copy of its
  * picture flies from the card to the dock's cart badge (blocks/float-dock), fitting into a
  * 100px box on the way (700ms, easeInOutExpo), then shrinks away and fades out (400ms, swing);
- * the badge wobbles a second after the click. Decorative only: the copy is inert and hidden
- * from assistive tech (the cart announces the count itself), and nothing moves under
+ * the badge's count bubble wobbles a second after the click. Decorative only: the copy is inert
+ * and hidden from assistive tech (the cart announces the count itself), and nothing moves under
  * prefers-reduced-motion. Cards without a picture (files, the clip's toolbar) don't fly, as on
  * the source.
  */
@@ -38,11 +38,17 @@ const visible = (el) => {
   return rect.width > 0 && rect.height > 0 ? rect : null;
 };
 
+// the source wobbles the badge's count bubble (its icon's :after), the whole badge only when
+// it shows no count
+const COUNT = '.float-dock-cart-count';
+
 function wobble(target) {
-  target.classList.remove('is-wobbling');
+  const count = target.querySelector(COUNT);
+  const el = count && !count.hidden ? count : target;
+  el.classList.remove('is-wobbling');
   // restart the animation when a second add comes in while it still runs
-  window.requestAnimationFrame(() => target.classList.add('is-wobbling'));
-  target.addEventListener('animationend', () => target.classList.remove('is-wobbling'), { once: true });
+  window.requestAnimationFrame(() => el.classList.add('is-wobbling'));
+  el.addEventListener('animationend', () => el.classList.remove('is-wobbling'), { once: true });
 }
 
 /**

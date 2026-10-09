@@ -122,8 +122,10 @@
 }
 
 /* the source's wobble when a card's picture lands in the cart (scripts/media-cart-fly.js, #275):
-   0.5s ease-in-out, 8 / -6 / 4 / -2 / 1px */
-.float-dock .float-dock-cart.is-wobbling {
+   0.5s ease-in-out, 8 / -6 / 4 / -2 / 1px, on the count bubble (the whole badge only when it
+   shows no count) */
+.float-dock .float-dock-cart.is-wobbling,
+.float-dock .float-dock-cart-count.is-wobbling {
   animation: float-dock-cart-wobble 0.5s ease-in-out 1;
 }
 
@@ -137,7 +139,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .float-dock .float-dock-cart.is-wobbling {
+  .float-dock .float-dock-cart.is-wobbling,
+  .float-dock .float-dock-cart-count.is-wobbling {
     animation: none;
   }
 }

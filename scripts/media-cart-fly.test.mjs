@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
+/* global globalThis */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
@@ -44,6 +45,7 @@ test('a flight: an inert, hidden copy at the picture lands on the badge centre, 
   picture.id = 'thumb';
   picture.innerHTML = '<img id="img" alt="Peaq">';
   const target = box(document.createElement('a'), 1300, 830, 58, 58);
+  target.innerHTML = '<span class="float-dock-cart-count">1</span>';
   document.body.append(picture, target);
   const frames = [];
   window.HTMLElement.prototype.animate = function animate(keyframes, options) {
@@ -66,7 +68,8 @@ test('a flight: an inert, hidden copy at the picture lands on the badge centre, 
   assert.match(move.keyframes[1].transform, /^translate\(1223px, 559px\) scale\(0\.342/);
   assert.deepEqual([move.options.duration, fade.options.duration], [700, 400]);
   assert.equal(fade.keyframes[1].opacity, 0);
-  assert.ok(target.classList.contains('is-wobbling'), 'the badge wobbles');
+  assert.ok(target.querySelector('.float-dock-cart-count').classList.contains('is-wobbling'), 'the count bubble wobbles');
+  assert.equal(target.classList.contains('is-wobbling'), false, 'not the whole badge');
 });
 
 test('installFlyToCart: an added control inside a card flies that card\'s picture; others don\'t', async () => {
