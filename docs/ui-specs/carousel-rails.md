@@ -255,6 +255,15 @@ Taxonomy `Carousel` (no date -> `.carousel-caption`, bold title below wide image
 | limit      | 10          |
 | exclude    | teaser      |
 
+Hand-picked index pages (`order`, #272): a comma list of page paths, shown in that order whatever
+their template; the `template` still picks the card style. Every listed page shows unless a
+`limit` is set; a path missing from the index is skipped. The Storyboard home's Models band:
+| Story rail |             |
+|------------|-------------|
+| heading    | Models      |
+| template   | skoda_model |
+| order      | /en/tag/model/elroq, /en/tag/model/kodiaq, … /en/tag/model/peaq |
+
 ### decorate() outline
 - `carousel.js`: rows -> `<ul>/<li>`; classify cells; detect date -> `carousel-overlay` else
   `carousel-caption`; build `viewport > [prev, track(ul), next]`; `enableDrag`; rAF-gated
