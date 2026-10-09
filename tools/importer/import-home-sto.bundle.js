@@ -112,7 +112,16 @@ var CustomImportScript = (() => {
     }
     return null;
   }
-  function parse2(element, { document: document2 }) {
+  function modelOrder(element) {
+    return [...element.querySelectorAll(".search-results-item .entry-title a[href]")].map((a) => {
+      try {
+        return new URL(a.getAttribute("href"), "https://www.skoda-storyboard.com").pathname.replace(/\/+$/, "");
+      } catch (e) {
+        return "";
+      }
+    }).filter((path) => path.startsWith("/"));
+  }
+  function parse2(element, { document: document2, orderModels = false }) {
     if (/\btype-social\b/.test(element.className || "") || element.closest(".socials-static")) {
       element.replaceWith(...element.childNodes);
       return;
@@ -133,6 +142,10 @@ var CustomImportScript = (() => {
         return;
       }
       cells.push(["template", template]);
+      if (orderModels && template === "skoda_model") {
+        const order = modelOrder(element);
+        if (order.length) cells.push(["order", order.join(", ")]);
+      }
     }
     if (href && /^(?:https?:\/\/|\/(?!\/))/i.test(href.trim())) {
       const link = document2.createElement("a");
@@ -181,9 +194,9 @@ var CustomImportScript = (() => {
     const headingEl = element.querySelector(".search-results-heading, .search-results-header h2, .search-results-header h3");
     const headingText = headingEl && headingEl.textContent.trim();
     if (headingText) {
-      const h2 = document2.createElement("h2");
-      h2.textContent = headingText;
-      out.push(h2);
+      const h3 = document2.createElement("h3");
+      h3.textContent = headingText;
+      out.push(h3);
     }
     out.push(WebImporter.DOMUtils.createTable([["Cards (social)"], ...rows], document2));
     out.push(WebImporter.DOMUtils.createTable([["Section Metadata"], ["Style", "cover-box, dark"]], document2));
@@ -1099,7 +1112,8 @@ var CustomImportScript = (() => {
               document: document2,
               url,
               params,
-              indexDriven: block.name === "promo-box"
+              indexDriven: block.name === "promo-box",
+              orderModels: true
             });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);

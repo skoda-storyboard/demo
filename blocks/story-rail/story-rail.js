@@ -63,9 +63,30 @@ export function safeViewAll(value, base = window.location.href) {
   }
 }
 
+/**
+ * The authored `order` as index paths: a comma list of page paths (or links, which
+ * readBlockConfig returns as hrefs), each without its host, trailing slash or `.html`.
+ * @param {string|string[]} value readBlockConfig's value for the cell
+ * @returns {string[]}
+ */
+export function orderPaths(value) {
+  const list = Array.isArray(value) ? value : tokens(value);
+  return list.map((entry) => {
+    try {
+      const { pathname } = new URL(String(entry).trim(), 'https://rail.invalid');
+      return pathname.replace(/\.html$/, '').replace(/\/+$/, '') || '/';
+    } catch (e) {
+      return '';
+    }
+  }).filter(Boolean);
+}
+
 export function parseConfig(block) {
   const cfg = readBlockConfig(block);
   const template = String(cfg.template || 'story').trim().toLowerCase() || 'story';
+  // hand-picked index pages, in the authored order (#272: the Storyboard home's Models band
+  // lists the model tag pages, as the source does); every listed page shows unless a limit is set
+  const order = orderPaths(cfg.order);
   return {
     index: cfg.index || defaultIndexUrl(),
     path: cfg.path || '',
@@ -88,9 +109,10 @@ export function parseConfig(block) {
     // 'oldest'/'publishdate' → ascending; else newest-first
     sort: (cfg.sort === 'oldest' || cfg.sort === 'publishdate') ? 'oldest' : 'newest',
     layout: template === 'press_release' ? 'news' : 'standard',
-    limit: Math.max(1, Number(cfg.limit) || 10),
+    limit: Math.max(1, Number(cfg.limit) || order.length || 10),
     // comma list of path-slug fragments to exclude (already shown above)
     exclude: tokens(cfg.exclude),
+    order,
     dots: String(cfg.dots ?? 'false') === 'true',
   };
 }
@@ -101,6 +123,13 @@ export function parseConfig(block) {
  * reuse gate: it must delegate to listing-logic, not a fork). Returns index rows.
  */
 export function selectRows(all, cfg) {
+  // an `order` picks the rows itself: those pages in that order, whatever their template (the
+  // rail's `template` still sets the card style); scope, facets, exclude and sort don't apply,
+  // and a listed page missing from the index is skipped
+  if (cfg.order?.length) {
+    const byPath = new Map(all.map((row) => [String(row.path || '').replace(/\/+$/, ''), row]));
+    return cfg.order.map((path) => byPath.get(path)).filter(Boolean);
+  }
   let scoped = scopeRows(all, { template: cfg.template, path: cfg.path });
   const active = { ...(cfg.facets || {}) };
   if (cfg.category.length) active.category = cfg.category;
@@ -119,7 +148,7 @@ export function selectRows(all, cfg) {
 // curated rail whose authors omit images must still be treated as curated.
 const CONFIG_KEYS = new Set([
   'index', 'path', 'template', 'category', 'tag', 'tags', 'heading',
-  'viewall', 'view-all', 'all', 'sort', 'limit', 'exclude', 'dots',
+  'viewall', 'view-all', 'all', 'sort', 'limit', 'exclude', 'order', 'dots',
   ...INDEX_FACETS,
 ]);
 
@@ -437,6 +466,15 @@ export function railLayout({
   return { classes, endCard };
 }
 
+/**
+ * The rail heading's element: the home bands' section headings are h3 on the source
+ * (.search-results-heading on both homes, #272); every other rail keeps its h2.
+ * @param {string[]} classes the rail's layout classes (railLayout)
+ */
+export function railHeadingTag(classes) {
+  return classes.includes('story-rail-home') ? 'h3' : 'h2';
+}
+
 export default async function decorate(block) {
   const cfg = parseConfig(block);
   const curated = !isConfigTable(block);
@@ -459,7 +497,7 @@ export default async function decorate(block) {
   const header = document.createElement('div');
   header.className = 'story-rail-header';
   if (heading) {
-    const h = document.createElement('h2');
+    const h = document.createElement(railHeadingTag(classes));
     h.className = 'story-rail-heading';
     h.textContent = heading;
     header.append(h);

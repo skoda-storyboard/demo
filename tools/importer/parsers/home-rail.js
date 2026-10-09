@@ -54,7 +54,21 @@ function templateFromTypeClass(element, headingText) {
   return null;
 }
 
-export default function parse(element, { document }) {
+// The Storyboard home's Models band is hand-picked on the source (#272): the base models in the
+// editors' order, each linking to its model tag page, not the newest model pages with their
+// derivatives. Their paths, in source order, for the rail's `order` row (story-rail picks those
+// index pages in that order).
+function modelOrder(element) {
+  return [...element.querySelectorAll('.search-results-item .entry-title a[href]')].map((a) => {
+    try {
+      return new URL(a.getAttribute('href'), 'https://www.skoda-storyboard.com').pathname.replace(/\/+$/, '');
+    } catch (e) {
+      return '';
+    }
+  }).filter((path) => path.startsWith('/'));
+}
+
+export default function parse(element, { document, orderModels = false }) {
   // The live-Instagram social strip (`type-social`, in a `.socials-static` band)
   // is NOT an index-driven rail — bail before anything else so it isn't mistaken
   // for a `type-post` story rail.
@@ -84,6 +98,11 @@ export default function parse(element, { document }) {
       return;
     }
     cells.push(['template', template]);
+    // the Storyboard home's Models band (home-sto only; the Media Room's stays index-sorted)
+    if (orderModels && template === 'skoda_model') {
+      const order = modelOrder(element);
+      if (order.length) cells.push(['order', order.join(', ')]);
+    }
   }
 
   // The source's "All" header link (SKODA-611b): story-rail renders it as the header pill and,

@@ -115,8 +115,9 @@ export default {
       const parser = parsers[block.name];
       if (parser) {
         try {
+          // the Models band keeps the source's hand-picked order on this home (#272, home-rail)
           parser(block.element, {
-            document, url, params, indexDriven: block.name === 'promo-box',
+            document, url, params, indexDriven: block.name === 'promo-box', orderModels: true,
           });
         } catch (e) {
           console.error(`Failed to parse ${block.name} (${block.selector}):`, e);

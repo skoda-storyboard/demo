@@ -50,7 +50,7 @@ globalThis.document = {
 
 const {
   parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail, railLayout, safeViewAll,
-  TAXONOMY_TEMPLATES,
+  TAXONOMY_TEMPLATES, orderPaths, railHeadingTag,
 } = await import('./story-rail.js');
 const { feedLightboxItem } = await import('../../scripts/media-lightbox.js');
 
@@ -636,3 +636,57 @@ test('rowToCells: an invalid image url drops the image, not the card (the rail s
   });
   assert.equal(console.warn.mock.callCount(), 3);
 });
+
+// --- #272: the home's hand-picked Models band (`order`) and the h3 home headings ------------
+
+// the index rows of the Storyboard home's Models band: the model tag pages are `page` rows
+const tagRows = ['elroq', 'kodiaq', 'enyaq', 'peaq'].map((m, i) => ({
+  path: `/en/tag/model/${m}`, title: m, template: 'page', date: '', image: `/m/${m}.jpg`, n: i,
+}));
+const modelRows = [{ path: '/en/skoda-model/elroq/elroq-rs', title: 'Elroq RS', template: 'skoda_model', date: '2026-09-01' }];
+
+test('orderPaths: a comma list of paths or links, without host, trailing slash or .html', () => {
+  assert.deepEqual(orderPaths('/en/tag/model/elroq, /en/tag/model/kodiaq/'), ['/en/tag/model/elroq', '/en/tag/model/kodiaq']);
+  assert.deepEqual(orderPaths(['https://www.skoda-storyboard.com/en/tag/model/peaq/', '/en/x.html']), ['/en/tag/model/peaq', '/en/x']);
+  assert.deepEqual(orderPaths(''), []);
+  assert.deepEqual(orderPaths(undefined), []);
+});
+
+test('selectRows with an order: those pages in that order, whatever their template; missing ones skipped', () => {
+  const cfg = parseConfig(cfgBlock([
+    ['heading', 'Models'], ['template', 'skoda_model'],
+    ['order', '/en/tag/model/kodiaq, /en/tag/model/elroq, /en/tag/model/missing, /en/tag/model/peaq'],
+  ]));
+  const picked = selectRows([...modelRows, ...tagRows], cfg);
+  assert.deepEqual(picked.map((r) => r.path), ['/en/tag/model/kodiaq', '/en/tag/model/elroq', '/en/tag/model/peaq']);
+  assert.equal(cfg.template, 'skoda_model', 'the template still sets the caption card style');
+});
+
+test('an order shows every listed page (no default limit of 10); an authored limit still caps it', () => {
+  const eleven = Array.from({ length: 11 }, (_, i) => `/en/tag/model/m${i}`).join(', ');
+  assert.equal(parseConfig(cfgBlock([['order', eleven]])).limit, 11);
+  assert.equal(parseConfig(cfgBlock([['order', eleven], ['limit', '4']])).limit, 4);
+  assert.equal(parseConfig(cfgBlock([['category', 'emobility']])).limit, 10, 'rails without an order keep 10');
+});
+
+test('rails without an order are unchanged: scope, sort and limit as before', () => {
+  const cfg = parseConfig(cfgBlock([['template', 'skoda_model']]));
+  assert.deepEqual(cfg.order, []);
+  assert.deepEqual(selectRows([...modelRows, ...tagRows], cfg).map((r) => r.path), ['/en/skoda-model/elroq/elroq-rs']);
+});
+
+test('isConfigTable: an order row keeps the Models band a config table (not curated cards)', () => {
+  assert.equal(isConfigTable(railBlock([
+    [['heading'], ['Models']], [['template'], ['skoda_model']], [['order'], ['/en/tag/model/elroq']],
+  ])), true);
+});
+
+test('railHeadingTag: the home bands get the source h3, every other rail keeps h2', () => {
+  assert.equal(railHeadingTag(railLayout({ ...home, template: 'story' }).classes), 'h3');
+  assert.equal(railHeadingTag(railLayout({ ...home, template: 'skoda_model' }).classes), 'h3');
+  assert.equal(railHeadingTag(railLayout({ ...home, homeBand: false, template: 'press_release', layout: 'news' }).classes), 'h2', 'a news rail outside a home band');
+  assert.equal(railHeadingTag(railLayout({ ...home, press: true, template: 'press_release' }).classes), 'h2', 'the press band');
+  assert.equal(railHeadingTag(railLayout({ ...home, landing: false, template: 'story' }).classes), 'h2', 'a model page rail');
+  assert.equal(railHeadingTag(railLayout({ ...home, curated: true, template: 'story' }).classes), 'h2', 'a curated rail');
+});
+

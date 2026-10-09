@@ -111,6 +111,20 @@
   display: none;
 }
 
+/* the source shows no pause control (#272); it stays for keyboard and screen-reader users
+   (WCAG 2.2.2), visually hidden until it has keyboard focus, then shown where it sits */
+.promo-box .promo-box-pause:not(:focus-visible) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .promo-box .promo-box-dots button:focus-visible,
 .promo-box .promo-box-pause:focus-visible {
   outline: 2px solid var(--link-color);
