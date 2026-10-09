@@ -31,7 +31,7 @@ globalThis.WebImporter = {
   FileUtils: { sanitizePath: (p) => p },
 };
 
-const { default: importer } = await import('./import-press-kit-hub.js');
+const { default: importer, YEAR_TERMS } = await import('./import-press-kit-hub.js');
 const root = 'https://www.skoda-storyboard.com/en/press-kits/';
 const child = `${root}skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio/`;
 
@@ -391,4 +391,55 @@ test('the ZIP corrections apply to banners only, not to text links', () => {
   assert.ok(hrefs.includes('https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA'));
   assert.ok(hrefs.includes('https://www.skoda-storyboard.com/direct-download/2019/11/IAA_FRANKFURT_2019.zip'));
   assert.equal(hrefs.some((href) => href.endsWith('SKODA-OCTAVIA.zip') || href.startsWith('https://cdn.skoda-storyboard.com/2019/')), false);
+});
+
+// --- kit facets (SKODA-808): every facet class, years term ids as their year -----------------
+function facetKit(classes) {
+  return new JSDOM(`<!doctype html><title>Press Kit</title><body class="single-press_kit">
+    <article class="press_kit category-press-kits ${classes}" data-publish-date="2024-12-03T08:00:00+01:00">
+      <div class="hero"><div class="hero-image"><img src="https://cdn.skoda-storyboard.com/hero.jpg" alt="Kit"></div>
+      <div class="hero-caption"><h1>Kit</h1><p class="perex">Perex</p></div></div>
+      <div class="content"><div class="panel-grid"><article class="article-teaser"><a href="${root}skoda-elroq-press-kit/intro/">
+        <div class="ratio-container ratio-1x1"><img src="https://cdn.skoda-storyboard.com/1.jpg" alt=""></div>
+        <h2 class="heading">Introduction</h2></a></article></div></div></article></body>`, { url: root }).window.document;
+}
+
+test('a kit carries every source facet: derivative, and years as the year, not the term id', () => {
+  const { element } = output(facetKit('model-elroq derivative-sportline bodywork-suv technology-meb years-57053'), `${root}skoda-elroq-press-kit/`);
+  const meta = metaRows(element);
+  assert.equal(meta.model, 'elroq');
+  assert.equal(meta.derivative, 'sportline');
+  assert.equal(meta.bodywork, 'suv');
+  assert.equal(meta.years, '2025', 'tagged 2025 although published in December 2024');
+  assert.match(meta.tags, /\bsportline\b/);
+  assert.match(meta.tags, /\b2025\b/);
+  assert.equal(YEAR_TERMS.get('61572'), '2026');
+});
+
+test('an unknown years term id is skipped with a warning, never guessed', () => {
+  const { warn } = console;
+  const warnings = [];
+  console.warn = (...args) => warnings.push(args.join(' '));
+  try {
+    const { element } = output(facetKit('model-peaq years-99999 years-61572'), `${root}skoda-peaq-press-kit-2/`);
+    assert.equal(metaRows(element).years, '2026');
+    assert.ok(warnings.some((w) => /unknown years term id 99999/.test(w)));
+  } finally {
+    console.warn = warn;
+  }
+});
+
+test('generated standalone bundle matches the source importer (kit facets)', async () => {
+  const { readFileSync } = await import('node:fs');
+  const vm = await import('node:vm');
+  const code = readFileSync(new URL('./import-press-kit-hub.bundle.js', import.meta.url), 'utf8');
+  const bundled = vm.runInNewContext(`${code}\nCustomImportScript.default`, {
+    WebImporter: globalThis.WebImporter, console, URL,
+  });
+  const url = `${root}skoda-elroq-press-kit/`;
+  const classes = 'model-elroq derivative-sportline bodywork-suv years-57053';
+  const run = (script) => script.transform({
+    document: facetKit(classes), url, params: { originalURL: url },
+  })[0].element.outerHTML;
+  assert.equal(run(bundled), run(importer));
 });

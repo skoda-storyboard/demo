@@ -74,3 +74,10 @@ fields — no App Builder. Production can swap the hardcoded lists for a governe
 environment, happening, history, sponsorship, vip` — plus model slugs (`peaq`, `elroq`, `enyaq-iv-2`,
 `epiq`, `octavia`, `scala`, `kamiq`, `karoq-6`, `new-fabia`, `new-kodiaq`, `new-superb`) used as `tags`
 values for the model-tag rails.
+
+**Press-kit hub facets (SKODA-808).** A hub has no Tags sidebar, so `import-press-kit-hub.js` reads all 15 facets from
+the article classes (`model-peaq derivative-sportline years-61572 …`). The `years` class holds the source term id, and
+the listing filters on the year, so the importer maps the id (`YEAR_TERMS`: 1572→2016, 11039→2017, 17169→2018,
+23835→2019, 29912→2020, 29936→2021, 42472→2022, 46476→2023, 48727→2024, 57053→2025, 61572→2026, read from the source
+`/en/tag/years/<year>/` archives). An unknown id is skipped with a warning, never derived from the publish date.
+

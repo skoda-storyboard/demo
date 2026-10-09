@@ -6,15 +6,41 @@ import metadata from './transformers/skoda-metadata.js';
 import links from './transformers/skoda-links.js';
 import normalizeImages from './transformers/skoda-images.js';
 
-const FACETS = ['model', 'bodywork', 'motorsport', 'history', 'technology'];
+// The kit's facets live only in its article classes (a hub has no Tags sidebar): every facet
+// of the shared 15-facet set (SKODA-401; skoda-metadata.js FACETS), so a kit is found under any
+// listing filter its source is (SKODA-808: derivative, years, …).
+const FACETS = [
+  'model', 'bodywork', 'derivative', 'motorsport', 'equipment', 'technology', 'years', 'view',
+  'company', 'concept', 'environment', 'happening', 'history', 'sponsorship', 'vip',
+];
+
+// The `years` class holds the source term id (`years-61572`), the listing filters on the year
+// (`filter[years][]=2026`). Read from the source year archives `/en/tag/years/<year>/` (their
+// body class `term-<id>`), 2026-10-09. The publish date is no substitute: the Elroq kit is tagged
+// 2025 but was published in December 2024.
+export const YEAR_TERMS = new Map([
+  ['1572', '2016'], ['11039', '2017'], ['17169', '2018'], ['23835', '2019'], ['29912', '2020'],
+  ['29936', '2021'], ['42472', '2022'], ['46476', '2023'], ['48727', '2024'], ['57053', '2025'],
+  ['61572', '2026'],
+]);
+
+/** A facet class value as its listing slug: a years term id becomes its year, other ids go. */
+function facetValue(facet, value) {
+  if (!/^\d+$/.test(value)) return value;
+  if (facet === 'years' && YEAR_TERMS.has(value)) return YEAR_TERMS.get(value);
+  // eslint-disable-next-line no-console
+  console.warn(`press-kit hub: unknown ${facet} term id ${value}, not mapped`);
+  return '';
+}
 
 function sourceFacets(article) {
   const result = { template: 'press_kit', category: 'press-kits' };
   const tags = [];
   FACETS.forEach((facet) => {
-    const values = [...article.classList]
+    const values = [...new Set([...article.classList]
       .filter((cls) => cls.startsWith(`${facet}-`))
-      .map((cls) => cls.slice(facet.length + 1));
+      .map((cls) => facetValue(facet, cls.slice(facet.length + 1)))
+      .filter(Boolean))];
     if (values.length) {
       result[facet] = values.join(', ');
       tags.push(...values);

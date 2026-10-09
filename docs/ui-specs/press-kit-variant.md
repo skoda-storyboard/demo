@@ -197,3 +197,32 @@ Compare EDS render to source at each viewport. WHAT / WHERE / viewport / expecte
 `assets/press-kit-variant/`: `sportline-1280.png` (the "Škoda Peaq Sportline" variant sub-page: chapter-nav
 listing the variant, two-column shell, model/bodywork facet classes on the article). Selector-control and
 mobile captures pending (source has no dedicated selector widget; the selector is a rebuild addition).
+
+## 11. Build (SKODA-808, 2026-10-09)
+
+**Model.** As on the source, the variant is a chapter of its kit, not a block: a tile in the hub grid after the core
+narrative, an entry in the Chapters nav, and its own `press_kit_chapter` page under the kit path. `main` already
+renders all three (SKODA-805b). This ticket pins them with tests and closes the facet gap. No block code changes.
+
+**Measured: source vs EDS** (Chrome DevTools and the live query index, no screenshots):
+
+| What | Source | EDS before | EDS after |
+|---|---|---|---|
+| Peaq-2 hub tiles | 13; "Škoda Peaq Sportline" 7th, after Connectivity | same | same |
+| Chapters nav on the Sportline page | variant listed, current | listed, `aria-current="page"` | unchanged |
+| Sportline chapter facets | `derivative-sportline`, `model-peaq`, `bodywork-suv`, years 2026 | `derivative=sportline`, `model=peaq`, `bodywork=suv`, `years=2026` | unchanged |
+| Epiq First Edition derivative | none | none | none |
+| Peaq-2 / Epiq-2 / Motorsport hub `years` | 2026 (class `years-61572`) | missing | `2026` |
+| Enyaq-2 / Vision O / Elroq hub `years` | 2025 (`years-57053`) | missing | `2025` |
+| Superb / Kodiaq hub `years` | 2023 (`years-46476`) | missing | `2023` |
+| Kits under `filter[years][]=2026` | 5 | 2 | 5 |
+| Elroq hub `derivative` | sportline | sportline | sportline |
+
+**Importer** (`import-press-kit-hub.js`, re-bundled): the hub's facets come from its article classes, now all 15
+facets. A `years` term id becomes its year (`YEAR_TERMS`); any other numeric id is skipped with a warning.
+
+**Selector.** Not built: the source has no selector widget, and MR-PK03 is pending client confirmation (§8). The
+Chapters nav is the variant navigation.
+
+**Draft:** `/drafts/skoda-808-press-kit-variant`, the re-imported Peaq-2 hub (`robots noindex`).
+

@@ -21,6 +21,7 @@ var CustomImportScript = (() => {
   // tools/importer/import-press-kit-hub.js
   var import_press_kit_hub_exports = {};
   __export(import_press_kit_hub_exports, {
+    YEAR_TERMS: () => YEAR_TERMS,
     default: () => import_press_kit_hub_default
   });
 
@@ -752,12 +753,47 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/import-press-kit-hub.js
-  var FACETS2 = ["model", "bodywork", "motorsport", "history", "technology"];
+  var FACETS2 = [
+    "model",
+    "bodywork",
+    "derivative",
+    "motorsport",
+    "equipment",
+    "technology",
+    "years",
+    "view",
+    "company",
+    "concept",
+    "environment",
+    "happening",
+    "history",
+    "sponsorship",
+    "vip"
+  ];
+  var YEAR_TERMS = /* @__PURE__ */ new Map([
+    ["1572", "2016"],
+    ["11039", "2017"],
+    ["17169", "2018"],
+    ["23835", "2019"],
+    ["29912", "2020"],
+    ["29936", "2021"],
+    ["42472", "2022"],
+    ["46476", "2023"],
+    ["48727", "2024"],
+    ["57053", "2025"],
+    ["61572", "2026"]
+  ]);
+  function facetValue(facet, value) {
+    if (!/^\d+$/.test(value)) return value;
+    if (facet === "years" && YEAR_TERMS.has(value)) return YEAR_TERMS.get(value);
+    console.warn(`press-kit hub: unknown ${facet} term id ${value}, not mapped`);
+    return "";
+  }
   function sourceFacets(article) {
     const result = { template: "press_kit", category: "press-kits" };
     const tags = [];
     FACETS2.forEach((facet) => {
-      const values = [...article.classList].filter((cls) => cls.startsWith(`${facet}-`)).map((cls) => cls.slice(facet.length + 1));
+      const values = [...new Set([...article.classList].filter((cls) => cls.startsWith(`${facet}-`)).map((cls) => facetValue(facet, cls.slice(facet.length + 1))).filter(Boolean))];
       if (values.length) {
         result[facet] = values.join(", ");
         tags.push(...values);
