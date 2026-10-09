@@ -23,7 +23,18 @@ function downloads(item, document) {
   });
 }
 
+// Regulatory consumption / CO₂ text (WLTP), as on stories (SKODA-830 D5): a WLTP mention, or a
+// consumption figure together with a CO₂ figure. Plain lightbox captions don't match.
+const REGULATORY = /\bWLTP\b|(?=.*\b\d[\d.,\s–-]*(?:kWh|l)\s*\/\s*100\s*km)(?=.*(?:CO[₂2]|g\s*\/\s*km))/i;
+
 export default function parse(element, { document }) {
+  // An Images-child gallery shows the regulatory disclaimer only in each image's lightbox
+  // (`data-caption`); the user decided it stays visible (SKODA-837 / 830 D5). It repeats on
+  // nearly every image, so each distinct text is kept once, as a note under its group.
+  const gallery = element.matches('.search-results-gallery');
+  const notes = gallery ? [...new Set([...element.querySelectorAll('.article-teaser-media img[data-caption]')]
+    .map((img) => text(Object.assign(document.createElement('div'), { innerHTML: img.getAttribute('data-caption') })))
+    .filter((caption) => caption && REGULATORY.test(caption)))] : [];
   const items = [...element.querySelectorAll('.search-results-item')];
   if (!items.length) throw new Error('Press-kit Media Box has no assets');
   const expected = Number(element.dataset.expectedAssets);
@@ -64,9 +75,10 @@ export default function parse(element, { document }) {
   // A gallery group sits in the article column, where the Downloads block would show every tile;
   // the source's togglebox shows two rows first, which is the block's `collapse auto` (SKODA-510).
   // It is `Downloads (gallery)`: the Images-chapter tile, grid and group pills (SKODA-806); without
-  // the variant it still reads as a collapsed Downloads grid.
-  const gallery = element.matches('.search-results-gallery');
+  // the variant it still reads as a collapsed Downloads grid. A gallery group's regulatory notes
+  // follow the table (SKODA-837).
   const config = gallery ? [['collapse', 'auto']] : [];
   const name = gallery ? 'Downloads (gallery)' : 'Downloads';
-  element.replaceWith(WebImporter.DOMUtils.createTable([[name], ...config, ...rows], document));
+  const table = WebImporter.DOMUtils.createTable([[name], ...config, ...rows], document);
+  element.replaceWith(table, ...notes.map((note) => Object.assign(document.createElement('p'), { textContent: note })));
 }

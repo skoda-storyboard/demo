@@ -144,8 +144,8 @@ npm run import:push -- --paths /path/to/approved-page-paths.txt --dry-run
 # rewrites verified binary links if media:apply has not already done so.
 ```
 
-The Assets builder requires a public URL mapping **before** uploading any
-selected binary. After DAM upload (and metadata), it sends one
+In the default upload-and-activate mode, the Assets builder requires a public URL
+mapping **before** uploading any selected binary. After DAM upload (and metadata), it sends one
 `POST /bin/replicate.json` on author with `cmd=Activate` and the selected
 binary's exact DAM path, using the DAM token. It waits briefly for anonymous
 `HEAD` access, exact PDF/MP4 MIME, original byte length and no redirect.
@@ -206,7 +206,16 @@ activation; page-based runs are scoped by their explicit `--pages` list.
 `--dry-run` never activates an asset. The user authorized a scoped live
 resume of the already uploaded Elroq PDF; it completed without re-upload.
 Obtain explicit activation approval for each new batch before running the
-non-dry command, even for already uploaded originals.
+default non-dry command, even for already uploaded originals.
+
+When only DAM upload is approved, add `--upload-only` with `--dam-base` and the
+reviewed page/ID scope. This skips activation and public delivery, and does not
+require a public-URL map. Authenticated author HEAD verifies each PDF/MP4
+original's MIME and byte count. Uploaded binaries remain `partial` with
+`steps.dam: "done"` and `steps.publish: "pending"`; a successful upload-only
+command is not permission to rewrite or publish their page links. A later
+approved run without `--upload-only`, with the public-URL map, resumes activation
+and public verification without re-uploading.
 
 Implements the media half of **SKODA-501** (masters-only ingest), **SKODA-504**
 (mapping manifest, page-mirrored DAM foldering), **SKODA-505** (media-cart
@@ -288,6 +297,9 @@ publish issue.
 Original fetches must return non-empty image bytes, and the direct-upload response
 must provide enough parts to cover every byte before any part is sent. A missing
 original is never replaced by a derivative under the original's DAM path.
+Original image fetch URLs preserve filename case and double extensions: a
+`photo.JPG-768x512.jpg` rendition resolves to `photo.JPG.jpg`. Logical IDs and
+DAM filenames keep their existing normalized `photo.jpg` identity.
 
 Then **`apply-media-manifest.mjs`** rewrites content `<img src>` →
 `delivery_url`, removes the old WordPress `srcset` ladder so EDS builds its own,

@@ -27,7 +27,7 @@ async function mockDam() {
     const chunks = [];
     req.on('data', (chunk) => chunks.push(chunk));
     req.on('end', () => {
-      if (req.url === '/master.jpg') {
+      if (req.url === '/master.jpg' || req.url === '/master.JPG.jpg') {
         if (!originalAvailable) { res.writeHead(404); res.end(); return; }
         res.writeHead(200, { 'content-type': 'image/jpeg', 'content-length': '8' });
         res.end(req.method === 'HEAD' ? undefined : 'ORIGINAL');
@@ -58,9 +58,12 @@ async function mockDam() {
         res.writeHead(200, { 'content-type': 'video/quicktime', 'content-length': '20' });
         res.end(req.method === 'HEAD' ? undefined : '\0\0\0\x14ftypqt  \0\0\x02\0qt  ');
       } else if (req.method === 'HEAD' && req.url.startsWith('/content/dam/')
-        && req.url.endsWith('.mp4')) {
+        && /\.(pdf|mp4)$/.test(req.url)) {
         res.writeHead(originalHeadStatus, originalHeadStatus === 200
-          ? { 'content-type': 'video/mp4', 'content-length': String(originalHeadBytes) } : {});
+          ? {
+            'content-type': req.url.endsWith('.pdf') ? 'application/pdf' : 'video/mp4',
+            'content-length': String(originalHeadBytes),
+          } : {});
         res.end();
       } else if (req.url === '/bin/replicate.json' && req.method === 'POST') {
         const form = new URLSearchParams(Buffer.concat(chunks).toString());
@@ -172,6 +175,112 @@ test('a delivery-only row resumes DAM ingest with the ORIGINAL, then becomes ide
     await dam.close();
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('DAM ingest fetches a double-extension original while retaining the logical DAM filename', async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'skoda-media-double-extension-'));
+  const dam = await mockDam();
+  try {
+    const source = `${dam.base}/master.JPG-768x512.jpg`;
+    const id = logicalId(source);
+    const manifest = path.join(dir, 'manifest.json');
+    writeFileSync(manifest, JSON.stringify({
+      rows: {
+        [id]: {
+          logical_id: id,
+          source_url: source,
+          master_url: `${dam.base}/master.jpg`,
+          delivery_url: source,
+          bytes: 4,
+          preconditioned: true,
+          status: 'done',
+          seen_urls: [source],
+          dam_page_path: 'en/story',
+          steps: { deliver: 'done', dam: 'n/a', da: 'n/a' },
+        },
+      },
+    }));
+    const args = [script, '--from-manifest', '--manifest', manifest, '--dam-base', dam.base];
+    const options = { cwd: dir, env: { ...process.env, AEM_DAM_TOKEN: 'mock' } };
+    const before = readFileSync(manifest, 'utf8');
+    await exec(process.execPath, [...args, '--dry-run'], options);
+    assert.equal(readFileSync(manifest, 'utf8'), before);
+    assert.deepEqual(dam.uploads, []);
+    await exec(process.execPath, args, options);
+    const row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.deepEqual(dam.uploads, ['ORIGINAL']);
+    assert.equal(row.master_url, `${dam.base}/master.JPG.jpg`);
+    assert.equal(row.dam_original_url, row.master_url);
+    assert.equal(row.dam_asset_path, '/content/dam/storyboard/en/story/master.jpg');
+    assert.equal(row.delivery_url, source);
+    assert.equal(row.status, 'done');
+    await exec(process.execPath, args, options);
+    assert.equal(dam.uploads.length, 1);
+  } finally {
+    await dam.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+[
+  {
+    source: 'TD-Kodiaq-en.pdf', bytes: 9, mime: 'application/pdf', body: '%PDF-TECH',
+  },
+  {
+    source: 'direct-download/clip.mp4', bytes: 12, mime: 'video/mp4', body: '\0\0\0\0ftypmock',
+  },
+].forEach((original) => {
+  test(`upload-only verifies a private ${original.mime} without activating or claiming public readiness`, async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'skoda-media-upload-only-'));
+    const dam = await mockDam();
+    try {
+      dam.setOriginalHeadStatus(200);
+      dam.setOriginalHeadBytes(original.bytes);
+      const source = `${dam.base}/${original.source}`;
+      const id = logicalId(source);
+      const manifest = path.join(dir, 'manifest.json');
+      const page = path.join(dir, 'content', 'en', 'story.plain.html');
+      mkdirSync(path.dirname(page), { recursive: true });
+      writeFileSync(page, `<a href="${source}">Download PDF</a>`);
+      const args = [
+        script, '--pages', page, '--manifest', manifest, '--dam-base', dam.base, '--upload-only',
+      ];
+      const options = { cwd: dir, env: { ...process.env, AEM_DAM_TOKEN: 'mock' } };
+      await assert.rejects(
+        exec(process.execPath, [script, '--pages', page, '--upload-only'], {
+          ...options, env: { ...options.env, DAM_BASE_URL: '' },
+        }),
+        /--upload-only requires --dam-base/,
+      );
+      await exec(process.execPath, [...args, '--dry-run'], options);
+      assert.deepEqual(dam.uploads, []);
+      assert.deepEqual(dam.activations, []);
+      await exec(process.execPath, args, options);
+      const row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+      assert.deepEqual(dam.uploads, [original.body]);
+      assert.deepEqual(dam.activations, []);
+      assert.equal(row.steps.dam, 'done');
+      assert.equal(row.steps.publish, 'pending');
+      assert.equal(row.public_url, '');
+      assert.equal(row.public_verified, null);
+      assert.equal(row.status, 'partial');
+      assert.equal(row.dam_verified.bytes, original.bytes);
+      assert.equal(row.dam_verified.mime, original.mime);
+      await exec(process.execPath, args, options);
+      assert.equal(dam.uploads.length, 1);
+      assert.deepEqual(dam.activations, []);
+      dam.setOriginalHeadBytes(original.bytes - 1);
+      await assert.rejects(exec(process.execPath, args, options), /Command failed/);
+      const failed = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+      assert.match(failed.note, /DAM original verification failed/);
+      assert.equal(failed.steps.dam, 'done');
+      assert.equal(dam.uploads.length, 1);
+      assert.deepEqual(dam.activations, []);
+    } finally {
+      await dam.close();
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
 });
 
 test('an unavailable master cannot be replaced by the resized delivery file in DAM', async () => {
