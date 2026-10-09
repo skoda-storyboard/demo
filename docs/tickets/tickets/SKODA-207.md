@@ -188,3 +188,16 @@ directory excerpt variant proposed above must be pinned in Markdown **and**
 JSON before M2 import. Do not change the machine-readable contract in a
 documentation-only revision. A hub shape change requires a same-PR
 `shape` bump and re-import/re-QA of affected pages (SKODA-603 rules).
+
+## QA #285 (2026-10-09, branch `bug-285-series-hubs-qa`)
+Series hubs QA observations. All 5 hubs (130 years, 125 years of motorsport, roads & places, unexpected jobs, minutes from car production) were measured origin vs branch at 1440 / 1080 / 992 / 768 / 390.
+- **#1 title background:** fixed. The tile titles have no backdrop, as the source (PO decision, the same as the press-kit tiles in #275). `series.md` §6 is updated.
+- **#2 tiles → footer:** fixed. The last row ends 10px (its cell inset) above the footer; it was the 40px section margin. Footer top and page height now equal the source on all 5 hubs at 1440 / 992 / 390.
+- **768:** the tiles start 16px lower at exactly 768, as the source (whose hero image takes its stacked margin there). The source's caption, which then overhangs the image onto the white page, is not copied.
+- **Footer sitemap links:** the computed weight is 500, as the source. Neither site has a 500 face, so they look the same.
+- **#3 / #4 links to live:** confirmed by the PO as expected, not defects (link policy SKODA-609). The card targets aren't migrated yet; the legal links go to skoda-auto.com, as the source, and Copyright isn't migrated.
+- **#5 Lighthouse (branch = main):** accessibility 91, SEO 69.
+  - Contrast: the topbar "Media Room" link and the footer, as the source.
+  - Footer legal links are shown by colour only, as the source.
+  - SEO: `noindex` on aem hosts only.
+- **Regression:** the series directory, press-kit hubs, home and a story are unchanged (height and footer position).

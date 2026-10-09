@@ -120,10 +120,10 @@ their x-position and size, not just a guessed image ratio. Map design values to 
 
 - One tab stop per card, title as accessible link name and visible `:focus-visible` ring; retain
   sensible image alt text without inventing it for decorative source images.
-- White over-image tile title contrast ≥4.5:1 with a scoped title-line backdrop;
-  the source's two gradients alone measure as low as ~1.39:1 behind tile
-  titles on the M1 Motorsport hub. The title-only contrast upgrade is an
-  intentional fidelity deviation; dark-on-light mobile H1/perex also clear.
+- Tile titles: white on the source's two gradients only, **no backdrop**, as the source (PO
+  decision, #285 / #275, 2026-10-09). This reverses the earlier title-line backdrop (56% black)
+  that raised contrast to ≥4.5:1; the gradients alone measure as low as ~1.39:1 behind tile
+  titles on the M1 Motorsport hub, as on the source. Dark-on-light mobile H1/perex still clear.
 - Real list (`<ul>/<li>`); one H1 in the hero per page; excerpt must not replace the link title.
 
 ## 7. EDS target
