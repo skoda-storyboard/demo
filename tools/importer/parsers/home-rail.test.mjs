@@ -81,3 +81,34 @@ test('only a real source "All" link becomes a viewall row (not #, javascript:, r
   assert.equal(run('post', 'eMobility', '/en/category/emobility/').viewall, 'All');
   assert.equal(run('post', 'eMobility', '  https://www.skoda-storyboard.com/en/category/emobility/  ').viewall, 'All', 'padded href');
 });
+
+// The Storyboard home's Models band (#272): the source cards' tag-page links, in source order.
+function models(options) {
+  const { document } = new JSDOM(`<div class="cover-box"><div class="search-results type-skoda_model">
+    <h3 class="search-results-heading">Models</h3><div class="search-results-items">
+    ${['elroq', 'kodiaq', 'peaq'].map((m) => `<div class="search-results-item"><article>
+      <h3 class="entry-title"><a href="https://www.skoda-storyboard.com/en/tag/model/${m}/">${m}</a></h3>
+    </article></div>`).join('')}</div></div></div>`).window;
+  homeRail(document.querySelector('.search-results'), { document, ...options });
+  return Object.fromEntries([...document.querySelectorAll('tr')].slice(1)
+    .map((tr) => [...tr.children].map((td) => td.textContent)));
+}
+
+test('the Storyboard home Models band keeps the source order as an order row (#272)', { skip }, () => {
+  assert.deepEqual(models({ orderModels: true }), {
+    heading: 'Models',
+    template: 'skoda_model',
+    order: '/en/tag/model/elroq, /en/tag/model/kodiaq, /en/tag/model/peaq',
+  });
+});
+
+test('without orderModels (the Media Room home) the Models band stays index-sorted', { skip }, () => {
+  assert.deepEqual(models(), { heading: 'Models', template: 'skoda_model' });
+  // and a non-model rail never gets an order, even on the Storyboard home
+  const { document } = new JSDOM(`<div class="search-results type-post">
+    <h3 class="search-results-heading">eMobility</h3>
+    <a class="search-results-header-link" href="/en/category/emobility/">All</a>
+    <div class="search-results-item"><h3 class="entry-title"><a href="/en/emobility/a/">A</a></h3></div></div>`).window;
+  homeRail(document.querySelector('.search-results'), { document, orderModels: true });
+  assert.equal(document.body.textContent.includes('order'), false);
+});

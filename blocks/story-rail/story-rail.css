@@ -371,6 +371,38 @@ body.story .section.dark.story-rail-container .story-rail .carousel-track .card-
   --story-rail-all-color: var(--skoda-white);
 }
 
+/* a card title keeps its colour and gets no underline on hover, as the source .entry-title link
+   (#272): the global a:hover would paint it green and underline it, and the card's stretched
+   link makes the whole card its hover area */
+.story-rail.story-rail-home .card-teaser-title a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* the source .entry-published line box sits 12px above the title (#272, measured 375–1440);
+   cancels the paragraph margin, like the press band's date gap. The date then clears the
+   arrows' band, as on the source */
+.story-rail.story-rail-home .card-teaser-date {
+  margin-block-end: calc(12px - var(--spacing-xs));
+}
+
+/* arrows: the source glyph (skoda-bnr-icons \e00b / \e00c, #272), a 90% white disc with the
+   arrow cut out over the ink disc, so the arrow reads ink on white. Size, position, disabled
+   fade and focus ring stay the carousel's */
+.story-rail.story-rail-home .carousel-arrow::after {
+  inset: 0;
+  width: auto;
+  height: auto;
+  border: 0;
+  background-color: color-mix(in srgb, var(--skoda-white) 90%, transparent);
+  transform: none;
+  mask: url("../../icons/rail-arrow-prev.svg") center / 100% 100% no-repeat;
+}
+
+.story-rail.story-rail-home .carousel-next::after {
+  mask-image: url("../../icons/rail-arrow-next.svg");
+}
+
 /* caption cards (Models, Series): a 16:9 image with 8px corners, then the title centred on a
    45px white row, 16/600 black (Series: the image and row share one rounded card) */
 .story-rail.story-rail-caption {

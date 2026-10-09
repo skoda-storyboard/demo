@@ -130,3 +130,24 @@ Values `getComputedStyle`, cited `(selector · viewport)`.
 ## 11. Reference screenshots
 
 - `assets/template-home/storyboard-desktop-1280.png`, `assets/template-home/mediaroom-desktop-1280.png`.
+
+## 12. Home page QA fixes (issue #272, 2026-10-09)
+
+Measured with Chrome DevTools against the live `/en/` (375 / 768 / 1080 / 1440, no screenshots). Scoped to the home
+bands (`.story-rail-home`) and the promo box, so model, press, story and other rails keep their layout.
+
+| Observation | Source | EDS before | EDS after |
+|---|---|---|---|
+| Section headings (5, 10, 14, 19, 24, 27, 32) | all 8 `h3.search-results-heading`, 26/600 | rails + Social media `h2` (card titles already `h3`) | `h3`, 26 / 600 / 32.5 (the Media Room's Models and Press Kits bands too) |
+| Title hover (8, 11, 16, 21, 28, 29) | colour kept, no underline | `rgb(14,58,47)` + underline | white / black kept, `none` |
+| Date → title (12, 17, 22, 30) | 12px | 28px | 12px |
+| Date vs arrow after Next (15, 20, 25, 33) | 1440: date below the arrow band | date at 101 in the 84–116 band | date at 117.2, title at 140.2, as the source. At 375 the source overlaps too (date box ends 107.4 in both) |
+| Arrow icon (9, 13, 18, 23, 26, 31) | skoda-bnr-icons `\e00b`/`\e00c`: ink arrow on a 90% white disc, 32px | white chevron on an ink disc | the source glyph (`icons/rail-arrow-prev.svg` / `rail-arrow-next.svg` as a mask) |
+| Models rail (7) | 11 base models, editors' order, → `/en/tag/model/<x>` | 10 newest model pages incl. derivatives | the source 11, in order, via `order` (card 260.8 × 191.69, as the source) |
+| Pause rotation (1) | none | visible 113 × 44 | visually hidden until keyboard focus (then 113 × 44 at the same spot; WCAG 2.2.2) |
+
+Already at parity on `main` (closed with evidence): promo lead card 812 × 466.75 at x 104 (4); its 2px inset vs Latest
+Stories, which the source has too (8 vs 10 at 768, 104 vs 106 at 1440) (2); the logo SVG and box (3); the footer sentence
+(34); search results (35, 43 results for "peaq"); the outside-click close (37); Skoda Next renders, the fallback face is
+the CLS guard (6). Header items (36, 38, 39) and Lighthouse (40) are tracked in SKODA-308, PR #299 and PR #288.
+

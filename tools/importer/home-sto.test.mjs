@@ -76,7 +76,9 @@ const HTML = `<html><head><title>Škoda Storyboard</title></head><body><main>
     <div class="search-results-items">${social}</div></div></div></div>
   <div class="cover-box"><div class="search-results type-skoda_model"><div class="search-results-container">
     <header class="search-results-header"><h3 class="search-results-heading">Models</h3></header>
-    <div class="search-results-items"><article><h3>Elroq</h3></article></div></div></div></div>
+    <div class="search-results-items">${['elroq', 'kodiaq', 'enyaq'].map((m) => `<div class="search-results-item">
+      <article class="skoda_model type-skoda_model"><div class="entry-thumbnail"><img src="https://cdn.example/${m}.jpg" alt=""></div>
+      <h3 class="entry-title"><a href="https://www.skoda-storyboard.com/en/tag/model/${m}/">${m}</a></h3></article></div>`).join('')}</div></div></div></div>
   ${rail('', 'eMobility', '/en/category/emobility/')}
   ${rail('', 'Lifestyle', '/en/category/lifestyle/')}
   ${rail('', 'Škoda World', '/en/category/skoda-world/')}
@@ -91,10 +93,11 @@ const config = (t) => Object.fromEntries([...t.rows].slice(1)
 // split the imported body at its <hr> breaks: one entry per DA section
 function sections(root) {
   const out = [[]];
-  [...root.querySelectorAll('hr, table, h2')].forEach((el) => {
+  [...root.querySelectorAll('hr, table, h2, h3')].forEach((el) => {
     if (el.tagName === 'HR') out.push([]);
-    else if (el.tagName === 'H2') out.at(-1).push(`h2:${el.textContent.trim()}`);
-    else if (!el.parentElement.closest('table')) {
+    else if (/^H[23]$/.test(el.tagName)) {
+      if (!el.closest('table')) out.at(-1).push(`${el.tagName.toLowerCase()}:${el.textContent.trim()}`);
+    } else if (!el.parentElement.closest('table')) {
       const n = name(el);
       if (n === 'Section Metadata') out.at(-1).push(`[${config(el).style}]`);
       else if (n === 'Story Rail' || n === 'Stories') out.at(-1).push(`${n}:${config(el).heading}`);
@@ -114,7 +117,7 @@ test('Storyboard home imports the 9-band stack in source order, dark Social + Se
   assert.deepEqual(sections(element), [
     'Promo Box', // indexed promo (SKODA-827): index config, no duplicated teaser markup
     'Stories:Latest Stories [cover-box]',
-    'h2:Social media Cards (social) [cover-box, dark]',
+    'h3:Social media Cards (social) [cover-box, dark]', // an h3 like every source home heading (#272)
     'Story Rail:Models [cover-box]',
     'Story Rail:eMobility [cover-box]',
     'Story Rail:Lifestyle [cover-box]',
@@ -124,6 +127,23 @@ test('Storyboard home imports the 9-band stack in source order, dark Social + Se
   ]);
   const cards = [...element.querySelectorAll('table')].find((t) => name(t) === 'Cards (social)');
   assert.equal(cards.rows.length - 1, 3, 'three profile tiles');
+});
+
+test('the Models band keeps the source order of its hand-picked model tag pages (#272)', { skip }, () => {
+  const { document } = new JSDOM(HTML, { url: SOURCE }).window;
+  globalThis.document = document;
+  const [{ element }] = importer.transform({
+    document, url: SOURCE, params: { originalURL: SOURCE },
+  });
+  const rails = [...element.querySelectorAll('table')].filter((t) => name(t) === 'Story Rail');
+  const models = rails.find((t) => config(t).heading === 'Models');
+  assert.deepEqual(config(models), {
+    heading: 'Models',
+    template: 'skoda_model',
+    order: '/en/tag/model/elroq, /en/tag/model/kodiaq, /en/tag/model/enyaq',
+  });
+  // only the Models band is hand-picked: the category rails stay index-sorted
+  assert.equal(rails.filter((t) => config(t).order).length, 1);
 });
 
 test('the Latest Stories feed keeps the authored offset (promo posts excluded)', { skip }, () => {
