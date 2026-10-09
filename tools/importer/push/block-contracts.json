@@ -448,9 +448,10 @@
       "status": "pinned",
       "ticket": "SKODA-510",
       "fallback": "readable",
-      "shape": 1,
+      "shape": 2,
       "emittedBy": [
-        "parsers/downloads.js"
+        "parsers/downloads.js",
+        "parsers/press-kit-media.js"
       ]
     },
     {

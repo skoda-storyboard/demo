@@ -24,7 +24,11 @@
  *
  *   - image cell = a cell whose only child wraps a <picture>
  *   - links cell = a cell whose links are the download sizes (link text = size label)
+ *   - date cell (optional, #275) = a text cell that is a source date ("23. 3. 2026")
  *   - any remaining text cell = the tile title
+ *
+ * In a Media Box the title is the source's h3 with its date above it, and a file tile (PDF / MP4
+ * without a poster) opens its file: a PDF shows the source's PDF glyph, a clip its first frame.
  *
  * i18n: user-facing control text lives in LABELS (single translation point).
  * Decoration is defensive: authors omit/add cells, so every lookup is guarded.
@@ -39,6 +43,8 @@ const LABELS = {
   sizes: (title) => `Download sizes for ${title}`,
   open: 'View image',
   videoPoster: 'View video poster',
+  // a file tile's own link (#275): it opens the file, as the source's tile does
+  openFile: (title, type) => `Open ${title || 'file'}${type ? ` (${type})` : ''}`,
   more: 'Show more',
   less: 'Show less',
   // aria-label for a tile's add-to-cart toggle and the Media Box group toggle (until the
@@ -175,6 +181,10 @@ function isLinksCell(cell) {
   return links.length > 0 && !cell.querySelector('img');
 }
 
+// the source's date line ("23. 3. 2026"); an optional cell before the title (#275)
+const DATE = /^\d{1,2}\.\s?\d{1,2}\.\s?\d{4}$/;
+export const isDate = (text = '') => DATE.test(text);
+
 /**
  * Read one authored row into an asset descriptor by content-sniffing its cells.
  * @param {Element} row
@@ -187,7 +197,9 @@ function readAsset(row) {
   let title = '';
   const sizes = [];
 
+  let date = '';
   cells.forEach((cell) => {
+    const text = cell.textContent.trim();
     if (isImageCell(cell)) {
       const img = cell.querySelector('img');
       src = img.src;
@@ -196,13 +208,15 @@ function readAsset(row) {
       cell.querySelectorAll('a[href]').forEach((a) => {
         sizes.push({ label: a.textContent.trim(), href: a.getAttribute('href') });
       });
-    } else if (cell.textContent.trim()) {
-      title = cell.textContent.trim();
+    } else if (isDate(text) && !date) {
+      date = text;
+    } else if (text) {
+      title = text;
     }
   });
 
   return {
-    src, alt, title, sizes,
+    src, alt, title, date, sizes,
   };
 }
 
@@ -450,13 +464,72 @@ export async function bindCart(block, addAll, load = () => Promise.all([
   sync();
 }
 
+let frameObserver;
+
+/** Sets a video's src once it scrolls into view (at once without IntersectionObserver). */
+function showWhenVisible(video, src) {
+  if (!window.IntersectionObserver) {
+    video.src = src;
+    return;
+  }
+  frameObserver ??= new window.IntersectionObserver((entries) => {
+    entries.filter((entry) => entry.isIntersecting).forEach(({ target }) => {
+      frameObserver.unobserve(target);
+      target.src = target.dataset.src;
+    });
+  }, { rootMargin: '200px' });
+  video.dataset.src = src;
+  frameObserver.observe(video);
+}
+
+/**
+ * A file tile (no poster): the file-type icon and label, as a link that opens the file in a new
+ * tab. In a Media Box an MP4 shows its first frame (metadata only until then) under a play badge.
+ * @param {{title: string, sizes: Array<{label,href}>}} asset
+ * @param {boolean} mediaBox
+ * @returns {HTMLAnchorElement}
+ */
+function buildFile(asset, mediaBox) {
+  const [{ label, href }] = asset.sizes;
+  const type = (label || 'File').trim();
+  const file = document.createElement('a');
+  file.className = 'downloads-file';
+  file.href = href;
+  file.target = '_blank';
+  file.rel = 'noopener';
+  file.dataset.fileType = type.toLowerCase();
+  file.setAttribute('aria-label', LABELS.openFile(asset.title, type));
+  file.append(fileIcon());
+  const typeLabel = document.createElement('span');
+  typeLabel.className = 'downloads-file-type';
+  typeLabel.textContent = type;
+  file.append(typeLabel);
+  if (mediaBox && /\.mp4(?:[?#]|$)/i.test(href)) {
+    const video = document.createElement('video');
+    video.className = 'downloads-file-frame';
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'metadata';
+    video.setAttribute('aria-hidden', 'true');
+    video.tabIndex = -1;
+    // the first frame, not the black one before it; fetched once the tile is in view (a clipped
+    // Media Box row isn't), as the clip may be a large master
+    showWhenVisible(video, `${href.split('#')[0]}#t=0.1`);
+    const badge = document.createElement('span');
+    badge.className = 'downloads-play';
+    badge.setAttribute('aria-hidden', 'true');
+    file.append(video, badge);
+  }
+  return file;
+}
+
 /**
  * Build one download tile (<li>) from a normalized asset descriptor. Shared by
  * both the authored and mediabox-API paths.
  * @param {{src: string, alt?: string, title: string, sizes: Array<{label,href}>}} asset
  * @returns {HTMLLIElement|null} null if the asset has neither image nor download
  */
-function buildTile(asset) {
+function buildTile(asset, { mediaBox = false } = {}) {
   if (!asset.src && !asset.sizes.length) return null;
 
   const li = document.createElement('li');
@@ -485,18 +558,18 @@ function buildTile(asset) {
     }
     figure.append(thumb);
   } else {
-    const file = document.createElement('div');
-    file.className = 'downloads-file';
-    file.append(fileIcon());
-    const type = document.createElement('span');
-    type.className = 'downloads-file-type';
-    type.textContent = asset.sizes[0].label || 'File';
-    file.append(type);
-    figure.append(file);
+    figure.append(buildFile(asset, mediaBox));
+  }
+
+  if (mediaBox && asset.date) {
+    const date = document.createElement('p');
+    date.className = 'downloads-date';
+    date.textContent = asset.date;
+    figure.append(date);
   }
 
   if (asset.title) {
-    const cap = document.createElement('figcaption');
+    const cap = document.createElement(mediaBox ? 'h3' : 'figcaption');
     cap.className = 'downloads-title';
     cap.textContent = asset.title;
     figure.append(cap);
@@ -552,7 +625,7 @@ export default async function decorate(block) {
   }
 
   assets.forEach((asset) => {
-    const tile = buildTile(asset);
+    const tile = buildTile(asset, { mediaBox });
     if (tile) list.append(tile);
   });
 

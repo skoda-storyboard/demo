@@ -1082,3 +1082,33 @@ test('an Images-child gallery keeps each distinct regulatory caption once, under
   assert.ok(!page.textContent.includes('FC model had a front engine'), 'a non-regulatory group gets no note');
   assert.equal(page.querySelectorAll('[data-caption]').length, 0, 'no data-caption leaks');
 });
+
+// #275: the Media Box tiles keep their source date, the lead keeps its full-size image link
+const LEAD_275 = '<div class="article-teaser-media"><img src="https://cdn.skoda-storyboard.com/lead.jpg" alt="Lead"></div>';
+const datedAsset = (match, i) => `<div class="entry-meta"><span class="entry-published">${Number(i) === 3 ? 'yesterday' : '23. 3. 2026'}</span></div>${match}`;
+
+test('Media Box tiles keep their source date in a cell before the title; the lead links its full image', { skip: !JSDOM }, () => {
+  const html = fixture({})
+    .replace(/<h3 class="entry-title">Asset (\d+)<\/h3>/g, datedAsset)
+    .replace(LEAD_275, LEAD_275.replace('<img', '<a class="colorbox" href="https://cdn.skoda-storyboard.com/lead-full.jpg"><img').replace('</div>', '</a></div>'));
+  const page = run(html, target);
+  const assets = rows(page, 'Downloads');
+  assert.equal(assets.length, 60);
+  const dated = assets.filter((row) => row.children.length === 4);
+  assert.equal(dated.length, 59, 'one tile has no source-form date, so it keeps the 3-cell row');
+  dated.forEach((row) => {
+    assert.equal(txt(row.children[1]), '23. 3. 2026');
+    assert.match(txt(row.children[2]), /^Asset \d+$/);
+  });
+  const undated = assets.find((row) => row.children.length === 3);
+  assert.equal(txt(undated.children[1]), 'Asset 3');
+  fileRows(page).forEach((row) => assert.equal(txt(row.children[0]), '', 'a file row keeps its empty picture cell'));
+  const lead = page.querySelector('img[src$="/lead.jpg"]');
+  assert.equal(lead.closest('a')?.getAttribute('href'), 'https://cdn.skoda-storyboard.com/lead-full.jpg');
+});
+
+test('a lead without a full-size image link stays a bare image (#275)', { skip: !JSDOM }, () => {
+  const html = fixture({}).replace(LEAD_275, LEAD_275.replace('<img', '<a href="#"><img').replace('</div>', '</a></div>'));
+  const page = run(html, target);
+  assert.equal(page.querySelector('img[src$="/lead.jpg"]').closest('a'), null);
+});

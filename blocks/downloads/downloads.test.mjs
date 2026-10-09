@@ -691,3 +691,74 @@ test('gallery CSS: Media Box ladder, overlay controls, source opener bar', async
   assert.match(css, /\.downloads\.gallery \.downloads-actions \{\s+position: absolute;\s+inset-block-end: var\(--dl-overlay-inset\);\s+inset-inline-start: var\(--dl-overlay-inset\);/);
   assert.match(css, /\.downloads\.gallery\.downloads-collapsed \.downloads-more \{\s+margin-block-start: calc\(-1 \* var\(--dl-gallery-bar\)\);/);
 });
+
+// #275: the source tile's date, h3 title and clickable file tiles in a Media Box
+function addDatedRow(block, { src = '', date = '', title = '', links = [] }) {
+  addRow(block, { src, title, links });
+  const row = block.lastElementChild;
+  if (date) {
+    const cell = document.createElement('div');
+    cell.textContent = date;
+    row.children[0].after(cell);
+  }
+}
+
+test('a Media Box tile shows its date above an h3 title; a 3-cell row still renders (#275)', async () => {
+  const block = setup();
+  addDatedRow(block, {
+    src: '/a.jpg', date: '23. 3. 2026', title: 'Škoda Peaq', links: [['Original', '/a.jpg'], ['1920px', '/a-1920.jpg']],
+  });
+  addRow(block, { src: '/b.jpg', title: 'Undated', links: [['Original', '/b.jpg']] });
+  await decorate(block);
+  const [dated, undated] = block.querySelectorAll('.downloads-item figure');
+  assert.equal(dated.querySelector('.downloads-date').textContent, '23. 3. 2026');
+  assert.equal(dated.querySelector('.downloads-date + .downloads-title').tagName, 'H3');
+  assert.equal(dated.querySelector('.downloads-title').textContent, 'Škoda Peaq', 'the date is never taken for the title');
+  assert.equal(undated.querySelector('.downloads-date'), null);
+  assert.equal(undated.querySelector('.downloads-title').tagName, 'H3');
+});
+
+test('outside a Media Box the title stays a figcaption and no date shows (#275)', async () => {
+  const block = setup(false);
+  addDatedRow(block, { src: '/a.jpg', date: '23. 3. 2026', title: 'Front', links: [['Original', '/a.jpg']] });
+  await decorate(block);
+  assert.equal(block.querySelector('.downloads-title').tagName, 'FIGCAPTION');
+  assert.equal(block.querySelector('.downloads-title').textContent, 'Front');
+  assert.equal(block.querySelector('.downloads-date'), null);
+});
+
+test('a malformed date stays the title; only the source "d. m. yyyy" form is a date (#275)', async () => {
+  const block = setup();
+  addDatedRow(block, { src: '/a.jpg', date: '2026-03-23', title: '', links: [['Original', '/a.jpg']] });
+  await decorate(block);
+  assert.equal(block.querySelector('.downloads-date'), null);
+  assert.equal(block.querySelector('.downloads-title').textContent, '2026-03-23');
+});
+
+test('a file tile opens its file in a new tab; a Media Box clip shows its frame under a play badge (#275)', async () => {
+  const block = setup();
+  addRow(block, { title: 'Family', links: [['PDF', 'https://dam.example/family.pdf']] });
+  addRow(block, { title: 'Covered Drive', links: [['MP4', 'https://dam.example/clip.mp4']] });
+  await decorate(block);
+  const [pdf, clip] = block.querySelectorAll('.downloads-file');
+  assert.equal(pdf.tagName, 'A');
+  assert.equal(pdf.getAttribute('href'), 'https://dam.example/family.pdf');
+  assert.equal(pdf.target, '_blank');
+  assert.equal(pdf.getAttribute('aria-label'), 'Open Family (PDF)');
+  assert.equal(pdf.dataset.fileType, 'pdf');
+  assert.equal(pdf.querySelector('video'), null);
+  const video = clip.querySelector('video.downloads-file-frame');
+  assert.ok(video, 'a clip without a poster shows its own frame');
+  assert.equal(video.getAttribute('aria-hidden'), 'true');
+  assert.equal(video.muted, true);
+  assert.match(video.src || video.dataset.src, /clip\.mp4#t=0\.1$/);
+  assert.equal(clip.querySelector('.downloads-play').getAttribute('aria-hidden'), 'true');
+});
+
+test('outside a Media Box a clip file tile has no video frame (#275)', async () => {
+  const block = setup(false);
+  addRow(block, { title: 'Clip', links: [['MP4', '/clip.mp4']] });
+  await decorate(block);
+  assert.equal(block.querySelector('.downloads-file video'), null);
+  assert.equal(block.querySelector('.downloads-file-type').textContent, 'MP4');
+});

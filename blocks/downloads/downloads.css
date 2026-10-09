@@ -24,6 +24,17 @@
 
   /* the source .btn pill (SKODA-830 D2): 1px tracking */
   --dl-toggle-tracking: 1px;
+
+  /* Media Box tile date (#275): the source .entry-meta line, 11/11 600 with 1.1px tracking,
+     its text 17px under the thumbnail (its 11px line box sits 1px above the glyphs), in the
+     title's 44px meta row */
+  --dl-date-size: 11px;
+  --dl-date-tracking: 0.1em;
+  --dl-date-inset: 18px;
+
+  /* Media Box file tile (#275): the source's 30% black holder, its 48px PDF glyph and the
+     play ring over a clip */
+  --dl-file-backdrop: rgb(0 0 0 / 30%);
 }
 
 /* --- grid: default image ladder 1 -> 2 (768) -> 4 (992) ------------------ */
@@ -104,6 +115,29 @@
   height: 100%;
 }
 
+/* a clip's file tile (Media Box, #275): its first frame under the source's play ring */
+.downloads .downloads-file-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.downloads .downloads-file .downloads-play {
+  box-sizing: border-box;
+  border: 2px solid var(--skoda-white);
+  border-radius: 50%;
+}
+
+.downloads .downloads-file .downloads-play::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  background-color: currentcolor;
+  mask: url("../../icons/media-play-outline.svg") center / contain no-repeat;
+}
+
 .downloads .downloads-file {
   position: relative; /* holds the media-cart scrim */
   display: flex;
@@ -116,6 +150,12 @@
   border: 1px solid var(--thumb-hairline);
   background: var(--skoda-grey-100);
   color: var(--skoda-ink);
+  text-decoration: none;
+}
+
+.downloads .downloads-file:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
 }
 
 .downloads .downloads-file svg {
@@ -190,15 +230,17 @@
   margin: 0;
 }
 
-.downloads .downloads-size {
+/* the menu is white on every band: its links keep the ink over the dark band's white links
+   (main .section.dark a), as the source's #161718 (#275) */
+.downloads .downloads-sizes .downloads-size {
   display: block;
   padding: var(--spacing-xs) var(--spacing-s);
   color: var(--text-color);
   text-decoration: none;
 }
 
-.downloads .downloads-size:hover,
-.downloads .downloads-size:focus-visible {
+.downloads .downloads-sizes .downloads-size:hover,
+.downloads .downloads-sizes .downloads-size:focus-visible {
   background: var(--dropdown-hover-bg);
 }
 
@@ -309,6 +351,7 @@
 .downloads.downloads-media-box .downloads-action {
   min-height: var(--dl-toolbar-row);
 }
+
 
 /* --- media cart (SKODA-505b; media-cart.md §3): add toggle before the download, the added
    tile's scrim + glyph, the Media Box group toggle ------------------------------------ */
@@ -428,9 +471,29 @@
   }
 }
 
+/* A Media Box file tile is the source's: a 30% black holder with 8px corners, a PDF its 48px
+   glyph (no label), a clip its first frame under the play ring (#275) */
 .downloads.downloads-media-box .downloads-file {
-  background: var(--dark-color);
-  color: var(--skoda-white);
+  overflow: hidden;
+  border-radius: var(--card-radius);
+  background: var(--dl-file-backdrop);
+  color: var(--pr-band-meta-color);
+}
+
+.downloads.downloads-media-box .downloads-file:focus-visible {
+  outline-color: var(--skoda-white);
+}
+
+.downloads.downloads-media-box .downloads-file:is([data-file-type="pdf"], :has(> video)) > :is(svg, .downloads-file-type) {
+  display: none;
+}
+
+.downloads.downloads-media-box .downloads-file[data-file-type="pdf"]::after {
+  content: "";
+  width: var(--dl-file-icon-size);
+  height: var(--dl-file-icon-size);
+  background-color: currentcolor;
+  mask: url("../../icons/media-file-pdf.svg") center / contain no-repeat;
 }
 
 /* Story and press-kit Media Box tile titles: 20/24 in a 58px row up to 768 (the source's
@@ -606,4 +669,28 @@
   .downloads:is(.downloads-media-box, .gallery) .downloads-items {
     --dl-cols: var(--dl-cols-lg, 4);
   }
+}
+
+/* the date takes the title's meta row (#275); the title keeps its own row under it */
+.downloads.downloads-media-box .downloads-date {
+  box-sizing: border-box;
+  height: var(--dl-meta-space);
+  margin: 0;
+  padding-top: var(--dl-date-inset);
+  color: var(--pr-band-meta-color);
+  font-size: var(--dl-date-size);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--dl-date-tracking);
+  line-height: 1;
+}
+
+.downloads.downloads-media-box .downloads-date + .downloads-title {
+  height: var(--dl-title-row);
+  padding-top: 0;
+}
+
+/* the source's h3.entry-title: the block's tile type, not the page's heading style */
+.downloads.downloads-media-box h3.downloads-title {
+  font-family: inherit;
+  font-weight: var(--weight-regular);
 }

@@ -152,3 +152,22 @@ and finishes it.
 ## Publish (2026-09-30, after PR #222)
 - 50 of the 51 `press-kit-default` pages are published and indexed; DA matched the reviewed preview on all 51.
 - The one held is Peaq Images (see Deviations).
+
+## QA #275 (2026-10-09, branch `bug-275-press-kits-qa`)
+Press kits QA observations, FG (this page). Measured origin vs branch at 1440 / 1080 / 992 / 768 / 390.
+- **Fixed:**
+  - Body links (contact emails, the accordions' "PDF download" / "JPG download", the WhatsApp row) are the source's `#419468` (`press-kit.css`, 3.7:1 on white, as the source).
+  - Sidebar: "Media contacts" ends in the source's green chevron (`\e009`, `icons/chevron-right.svg`). "Download Media Box" is the source's label plus a round + that drives the Media Box's group toggle and mirrors its state (`press-kit.js`). Same position as the source (40px at x1294 at 1440).
+  - Accordion answers: an image and the links paragraph after it form one source cell, two or more in a row side by side from 781px (396px apart by 20 at 1440), links centred 23px apart. Items 2, 4, 5 and 7 are equal to the source at 1440 / 780 / 390.
+  - Video: the "Download video" link is the source's three round controls (add to cart, download, open the clip), at the source's positions at every width. The row keeps its 36px, so nothing below moves.
+  - Media Box: `h3` tile titles, the source date above each title (all 60 tiles, contract `downloads-file-rows` v2, emitted by `parsers/press-kit-media.js`), the size menu's "Original" / "1920px" `#161718` again (the dark band's white links had overridden it), PDF tiles with the source's PDF glyph on its 30% black holder, a clip's tile showing its first frame under the play ring (loaded when it scrolls into view), and file tiles that open their file.
+  - Lead image: imported with its full-size image link, so it opens the lightbox as the source's colorbox. The answers' photos do too (`scripts/media-lightbox.js` `wireImageLinks`).
+- **Already as the source:** the accordion "+" (both 16×16 ink, 1.5px stroke; the source's 32px is the glyph box), Show more `#78FAAE`, the sidebar link colour (`#353535` vs `#363636`).
+- **Deviations:** item 1's source has an empty paragraph after its image cells (44px), which DA doesn't keep. The source's item 3 images are 399 / 393 wide (unequal cells) against 396 / 396. The video stays the native DAM player (decision above), and its "open" control links the clip, because the source's attachment page has no counterpart.
+- **Re-import (DA preview only, publish after merge):** 35 press-kit pages updated (dates, lead link) after a text/link/image diff against DA showed nothing else changed.
+  - 3 conflicts (DA changed since the last recorded push, content identical) wait for an OK: 125-years `skoda-130-rs-1975…`, `skoda-fabia-rs-rally2…`, `skoda-sport-1949…`.
+  - Not pushed: `skoda-fabia-130-special-edition…` (its PDF / 3 MP4s aren't in the DAM yet), and 7 pages whose fresh import also carries other changes not yet in DA (Images galleries `Downloads (gallery)`, `Accordion (faq)`, `Footnotes`, origin drift): 125-years `/images`, Epiq `/images`, `/frequently-asked-questions`, `first-edition…`, Peaq `/images`, `/frequently-asked-questions`, `the-skoda-peaq-skodas-new-flagship…`.
+- **Notes (not changed here):**
+  - At 768 the Media Box tiles are 285×316 against the source's 236×286 (main as well).
+  - At 768 the page sits 24px above the source from the top (main as well).
+  - The source's Media Box thumbnails now have 8px corners (`downloads.md` measured 0).

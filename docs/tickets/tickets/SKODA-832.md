@@ -112,3 +112,17 @@ Evidence: `.migration/qa-832/` (outside git).
 ## Follow-ups
 - The cards tiles block has no full-width or one-third tile size (block change), which is behind the 2 approximations.
 - The Octavia press kit's ZIP link correction (editorial).
+
+## QA #275 (2026-10-09, branch `bug-275-press-kits-qa`)
+Press kits QA observations, HUB (Peaq hub). Measured origin vs branch at 1440 / 1080 / 992 / 768 / 390.
+- **Fixed:**
+  - Hero → tiles is 34px, as the source (it was the 40px section margin); 50px at exactly 768, where the source's hero image already takes its 16px stacked margin. This also covers the mobile "white space below the hero".
+  - Banners: one equal cell each from 781px, 20px apart (2 → 604, 3 → 396, 4 → 292 at 1440), a lone banner half the row, stacked 40px apart below 781. The footer follows 30px after the last banner (it was 60). Checked on Peaq, Enyaq (3), Vision O (4) and Superb (1).
+  - Tile titles: no 56% backdrop on press-kit tiles, as the source (PO decision). The series tiles keep theirs (`series.md` §6).
+  - Media Room footer: Contacts / Subscribe / Company are `h3` (`footer-sections.js`); the "consent to the processing" link has no hover underline (`newsletter-stub.css`).
+- **Already as the source:** hero perex 20px, "Manage subscription" `#419468`.
+- **Held:** the Images tile still goes to the unpublished Images chapter (404 on `.aem.live`), PO decision 2026-10-09.
+- **Notes (not changed here):**
+  - The Superb and RS Experience hubs' tile areas are shorter than the source (Superb banner at y1640 vs 1984 at 1440).
+  - The RS Experience lone square banner sits in column 1, the source in column 2 (x418).
+  - Lighthouse (hub, branch = main): accessibility 92 (footer contrast / colour-only consent link, as the source; redundant tile alts), SEO 69 (`noindex` on aem hosts only).
