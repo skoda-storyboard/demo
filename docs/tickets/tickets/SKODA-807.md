@@ -3,6 +3,7 @@
 - **Type:** block
 - **Phase:** B  ·  **Pilot:** No · **Milestone:** M2 (go-live)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
+- **Status (2026-10-06):** 🟡 IN REVIEW, branch `skoda-807-faq-accordion`. Draft: `/drafts/skoda-807-faq-accordion`. Measured build notes: [`faq-accordion.md`](../../ui-specs/faq-accordion.md) §11.
 
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/faq-accordion.md`](../../ui-specs/faq-accordion.md)** (captured via Chrome DevTools, FAQ opened live on the Peaq kit). Read it before implementing.
@@ -28,11 +29,11 @@ Confirmed on the live Peaq press kit (§11.10): a named FAQ section of question/
 - Content-driven; no runtime fetch in the per-kit (default) model.
 
 ## Acceptance Criteria
-- [ ] FAQ renders as a named section of Q/A pairs from authored content.
-- [ ] Expand/collapse works via mouse and keyboard; `aria-expanded` reflects state; screen-reader announces the region.
-- [ ] Structured data (FAQPage) emitted where content allows; passes validation.
-- [ ] Output passes lint and matches source in local preview.
-- [ ] Accordion mechanics match source (trigger `16px`/600, `24px` padding, `#e4e4e4` dividers, plus-icon rotates 45° `.2s`) with added `aria-expanded` + FAQPage schema; visual diff vs source ≤ 2% per-pixel.
+- [x] FAQ renders as a named section of Q/A pairs from authored content. *(The FAQ chapter page, under its "Frequently Asked Questions" h1: `Accordion (faq)`, 28 / 5 rows on Peaq-2 / Epiq-2.)*
+- [x] Expand/collapse works via mouse and keyboard; `aria-expanded` reflects state; screen-reader announces the region. *(A native button: Enter opens, Space closes, Tab moves on. The panel is `role=region aria-labelledby`.)*
+- [x] Structured data (FAQPage) emitted where content allows; passes validation. *(One FAQPage with 28 Question/acceptedAnswer pairs on Peaq-2. It is checked against the schema.org required properties in the unit tests; the Google Rich Results test was not run.)*
+- [x] Output passes lint and matches source in local preview. *(PR #263 review: leading 10px inset, answer lists and the kit importer's `&nbsp;` keeper fixed. All 28 triggers and 26 of 28 answers are identical at 1440/1280/768/390. Q6 (a whitespace-only line) and Q17 (table → lines, SKODA-805b) are documented in spec §11.)*
+- [x] Accordion mechanics match source (trigger `16px`/600, `24px` padding, `#e4e4e4` dividers, plus-icon rotates 45° `.2s`) with added `aria-expanded` + FAQPage schema. *(Measured identical at 1440/1080/992/768/390, see spec §11. The visual-diff clause is met with measured values, not screenshots, per the repo review rule.)*
 
 ## Dependencies
 - Upstream: SKODA-805 (press-kit template hosts the FAQ section), SKODA-106 (design tokens)
@@ -44,3 +45,19 @@ Confirmed on the live Peaq press kit (§11.10): a named FAQ section of question/
 
 ## Note — 2026-09-15 block recount
 The full-site recount (`docs/analysis/SKODA-BLOCK-RECOUNT.md`) confirms the FAQ is **one instance of a shared `row_toggle` collapsible primitive** (`ys-row-toggle`) that also powers board exec-bio "show more" (SKODA-810) and press-kit content sections — 33 pages carry it site-wide; a standalone Q/A FAQ did **not** render on the sampled press-kit hub/sub-pages (it's a separate `/frequently-asked-questions/` chapter). **Scope implication (simplification):** build **one shared accordion block** and reuse it here + in SKODA-810, rather than a press-kit-specific FAQ block. SP held at 2 pending the press-kit walkthrough (§10 Q6).
+
+## Build notes (2026-10-06)
+- `blocks/accordion` already passed the a11y gate (SKODA-805a/805c). This ticket adds:
+  - the `faq` variant with FAQPage JSON-LD;
+  - the source answer inset `10px 0` (it was 24px all round);
+  - the 32px round icon box with a CSS plus, and the `#f1f1f1` hover.
+- The importer emits `Accordion (faq)` on `…/frequently-asked-questions/` chapters (`parsers/press-kit-content.js`,
+  `import-press-kit-default.js`, re-bundled). Contract: `main.accordion.variants: ["faq"]`.
+- No regressions: first glimpse and Elroq (nested quote) match the source.
+- PR #263 review (2026-10-07):
+  - FAQ answer text keeps table-cell boundaries;
+  - answer lists match the source (16px items, dash bullet);
+  - FAQ chapters get the 10px leading inset;
+  - `import-press-kit-default.js` now keeps `&nbsp;` (`skoda-nbsp`).
+- The two M1 FAQ pages are re-imported locally. They get pushed to DA (`import:push`) after merge.
+

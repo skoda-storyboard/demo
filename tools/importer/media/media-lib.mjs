@@ -166,6 +166,11 @@ export function masterUrl(url) {
   return normalizeExtension(url).replace(DERIVATIVE_SUFFIX_RE, '');
 }
 
+/** Original fetch URL; unlike the logical identity, preserve case and double extensions. */
+export function imageOriginalUrl(url) {
+  return cleanUrl(url).replace(DERIVATIVE_SUFFIX_RE, '');
+}
+
 export function sizedRenditions(url) {
   const master = masterUrl(url);
   const ext = path.extname(cleanUrl(master));

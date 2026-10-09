@@ -13,7 +13,16 @@ module.exports = {
   rules: {
     'import/extensions': ['error', { js: 'always', mjs: 'always' }], // require explicit file extensions in imports
     'linebreak-style': ['error', 'unix'], // enforce unix linebreaks
-    'no-param-reassign': [2, { props: false }], // allow modifying properties of param
+    eqeqeq: ['error', 'always'],
+    'no-async-promise-executor': 'error',
+    'no-eval': 'error',
+    'no-implicit-coercion': 'error',
+    'no-nested-ternary': 'error',
+    'no-new-func': 'error',
+    'no-param-reassign': ['error', { props: false }],
+    'no-throw-literal': 'error',
+    'no-var': 'error',
+    'prefer-const': 'error',
   },
   overrides: [
     {

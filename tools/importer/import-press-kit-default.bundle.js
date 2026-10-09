@@ -38,7 +38,10 @@ var CustomImportScript = (() => {
   // tools/importer/import-press-kit-default.js
   var import_press_kit_default_exports = {};
   __export(import_press_kit_default_exports, {
-    default: () => import_press_kit_default_default
+    IMAGE_LIMIT: () => IMAGE_LIMIT,
+    default: () => import_press_kit_default_default,
+    fragmentGroups: () => fragmentGroups,
+    fragmentPath: () => fragmentPath
   });
 
   // tools/importer/parsers/gallery.js
@@ -93,18 +96,34 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/parsers/press-kit-hub-tiles.js
+  var ratioOf = (tile) => {
+    var _a, _b;
+    return (_b = (_a = tile.querySelector(".ratio-container")) == null ? void 0 : _a.className.match(/\bratio-(\d+x\d+)\b/)) == null ? void 0 : _b[1];
+  };
+  function rowTokens(tiles, rowIndex) {
+    const ratios = tiles.map(ratioOf);
+    const wide = ratios.filter((ratio) => ratio === "2x1").length;
+    const square = ratios.filter((ratio) => ratio === "1x1").length;
+    if (tiles.length === 1 && ["2x1", "4x1"].includes(ratios[0])) return ["press-half end"];
+    if (wide === 2 && square === 1 && tiles.length === 3) {
+      return ratios.map((ratio) => ratio === "2x1" ? "feature" : "press-square");
+    }
+    if (wide === 2 && tiles.length === 2 || wide === 1 && square === 2 && tiles.length === 3) {
+      return ratios.map((ratio) => ratio === "2x1" ? "press-half" : "press-quarter");
+    }
+    if (square === tiles.length && tiles.length === 5) return Array(5).fill("press-square");
+    if (square === tiles.length) {
+      return tiles.map((tile, index) => index === tiles.length - 1 && tiles.length % 4 ? "press-quarter end" : "press-quarter");
+    }
+    throw new Error(`Press-kit tile row ${rowIndex + 1} has an unsupported layout`);
+  }
   function parseTiles(content, document) {
-    const sourceRows = [...content.querySelectorAll(".panel-grid")].map((grid) => [...grid.querySelectorAll("article.article-teaser")]).filter((tiles) => tiles.length);
+    const sourceRows = [...content.querySelectorAll(".panel-grid")].filter((grid) => !grid.parentElement.closest(".panel-grid")).map((grid) => [...grid.querySelectorAll("article.article-teaser")]).filter((tiles) => tiles.length);
     if (!sourceRows.length) throw new Error("Press-kit hub has no chapter tiles");
     const rows = [["Cards (overlay, tiles)"]];
     sourceRows.forEach((tiles, rowIndex) => {
-      const wide = tiles.filter((tile) => tile.querySelector(".ratio-container.ratio-2x1")).length;
-      const square = tiles.filter((tile) => tile.querySelector(".ratio-container.ratio-1x1")).length;
-      const half = wide === 2 && tiles.length === 2 || wide === 1 && square === 2 && tiles.length === 3;
-      if (!(wide === 2 && square === 1 && tiles.length === 3 || half || wide === 0 && square === tiles.length && [4, 5].includes(tiles.length))) {
-        throw new Error(`Press-kit tile row ${rowIndex + 1} has an unsupported layout`);
-      }
-      tiles.forEach((tile) => {
+      const tokens = rowTokens(tiles, rowIndex);
+      tiles.forEach((tile, index) => {
         const sourceLink = tile.querySelector(":scope > a[href]");
         const sourceImage = tile.querySelector(".ratio-container img[src]");
         const heading = tile.querySelector(".heading");
@@ -119,11 +138,7 @@ var CustomImportScript = (() => {
         const link = document.createElement("a");
         link.href = sourceLink.href;
         link.textContent = title;
-        const isWide = !!tile.querySelector(".ratio-container.ratio-2x1");
-        let token = "press-square";
-        if (isWide) token = half ? "press-half" : "feature";
-        else if (tiles.length === 4 || half) token = "press-quarter";
-        rows.push([token, img, link]);
+        rows.push([tokens[index], img, link]);
       });
     });
     return WebImporter.DOMUtils.createTable(rows, document);
@@ -270,12 +285,13 @@ var CustomImportScript = (() => {
     const name = row.every(bannerCell) ? "Columns (banners)" : "Columns";
     return WebImporter.DOMUtils.createTable([[name], row], document);
   }
-  function flatten(layout, document, { nested = false } = {}) {
+  function flatten(layout, document, { nested = false, faq = false } = {}) {
     const output = [];
     let rows = [];
     let tileGrids = [];
+    const name = faq && !nested ? "Accordion (faq)" : "Accordion";
     const flush = () => {
-      if (rows.length) output.push(WebImporter.DOMUtils.createTable([["Accordion"], ...rows], document));
+      if (rows.length) output.push(WebImporter.DOMUtils.createTable([[name], ...rows], document));
       rows = [];
     };
     const flushTiles = () => {
@@ -339,10 +355,10 @@ var CustomImportScript = (() => {
     flushTiles();
     return output;
   }
-  function parse3(element, { document }) {
+  function parse3(element, { document, faq = false }) {
     const layout = element.querySelector(":scope > .panel-layout");
     if (!layout) throw new Error("Press-kit article is missing SiteOrigin body content");
-    const nodes = flatten(layout, document);
+    const nodes = flatten(layout, document, { faq });
     if (!nodes.length) throw new Error("Press-kit article body is empty");
     layout.replaceWith(...nodes);
     element.querySelectorAll(".sa-bnr, .media-cart-actions").forEach((node) => node.remove());
@@ -369,7 +385,10 @@ var CustomImportScript = (() => {
       return [link];
     });
   }
+  var REGULATORY = /\bWLTP\b|(?=.*\b\d[\d.,\s–-]*(?:kWh|l)\s*\/\s*100\s*km)(?=.*(?:CO[₂2]|g\s*\/\s*km))/i;
   function parse4(element, { document }) {
+    const gallery = element.matches(".search-results-gallery");
+    const notes = gallery ? [...new Set([...element.querySelectorAll(".article-teaser-media img[data-caption]")].map((img) => text2(Object.assign(document.createElement("div"), { innerHTML: img.getAttribute("data-caption") }))).filter((caption) => caption && REGULATORY.test(caption)))] : [];
     const items = [...element.querySelectorAll(".search-results-item")];
     if (!items.length) throw new Error("Press-kit Media Box has no assets");
     const expected = Number(element.dataset.expectedAssets);
@@ -403,8 +422,10 @@ var CustomImportScript = (() => {
       ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop", "title"].forEach((attr) => img.removeAttribute(attr));
       rows.push([img, title, paragraphs2]);
     });
-    const config = element.matches(".search-results-gallery") ? [["collapse", "auto"]] : [];
-    element.replaceWith(WebImporter.DOMUtils.createTable([["Downloads"], ...config, ...rows], document));
+    const config = gallery ? [["collapse", "auto"]] : [];
+    const name = gallery ? "Downloads (gallery)" : "Downloads";
+    const table = WebImporter.DOMUtils.createTable([[name], ...config, ...rows], document);
+    element.replaceWith(table, ...notes.map((note) => Object.assign(document.createElement("p"), { textContent: note })));
   }
 
   // tools/importer/parsers/quote.js
@@ -799,7 +820,7 @@ var CustomImportScript = (() => {
     const chapterLinks = chapters(document);
     if (chapterLinks) out.push(marker(document, "press-kit-chapters"), chapterLinks);
     out.push(marker(document, "body-column"));
-    const lead = article.querySelector(".column-primary .article-teaser-media img");
+    const lead = [...article.querySelectorAll(".column-primary .article-teaser-media img")].find((img) => !img.closest(".search-results"));
     if (lead) {
       const img = lead.cloneNode(true);
       img.alt = (img.alt || "").replace(/<br\s*\/?>/gi, " ");
@@ -862,9 +883,18 @@ var CustomImportScript = (() => {
       a.title = label;
     });
   }
+  function fixPdfTypos(article) {
+    article.querySelectorAll("a[href]").forEach((a) => {
+      const href = a.getAttribute("href");
+      if (/\.pdff(?=$|[?#])/i.test(href)) a.setAttribute("href", href.replace(/\.pdff(?=$|[?#])/i, ".pdf"));
+    });
+  }
   function finish(element, document) {
     const article = element.querySelector("article.press_kit");
-    if (article) labelImageLinks(article);
+    if (article) {
+      fixPdfTypos(article);
+      labelImageLinks(article);
+    }
     const sidebarStart = article == null ? void 0 : article.querySelector('hr[data-press-kit-section="sidebar"]');
     if (sidebarStart) {
       let node = sidebarStart.nextElementSibling;
@@ -1545,6 +1575,24 @@ var CustomImportScript = (() => {
     });
   }
 
+  // tools/importer/transformers/skoda-nbsp.js
+  var NBSP_PLACEHOLDER = "\u{F00A0}";
+  var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
+  function transform4(hookName, element, payload) {
+    if (hookName !== "preprocess") return;
+    const doc = element.ownerDocument || payload && payload.document;
+    const walker = doc.createTreeWalker(
+      element,
+      4
+      /* NodeFilter.SHOW_TEXT */
+    );
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.nodeValue.includes("\xA0")) {
+        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER.repeat(run.length));
+      }
+    }
+  }
+
   // tools/importer/import-press-kit-default.js
   var TEMPLATE = { name: "press-kit-default", metadata: { template: "press_kit" } };
   function templateFor(document, pageUrl) {
@@ -1557,8 +1605,51 @@ var CustomImportScript = (() => {
       metadata: { template: "press_kit_chapter", theme: "press-kit", presskit: path(hubUrl) }
     });
   }
+  var IMAGE_LIMIT = 200;
+  function checkImageLimit(root, what) {
+    const count = root.querySelectorAll("img").length;
+    if (count > IMAGE_LIMIT) {
+      throw new Error(`${what} holds ${count} images; a document holds at most ${IMAGE_LIMIT}`);
+    }
+  }
+  var slugOf = (value) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  function galleryGroups(body) {
+    const seen = /* @__PURE__ */ new Map();
+    return [...body.querySelectorAll(".search-results.search-results-gallery")].map((el) => {
+      var _a, _b;
+      const titleEl = (_b = (_a = el.closest(".textwidget")) == null ? void 0 : _a.parentElement) == null ? void 0 : _b.querySelector(":scope > .widget-title");
+      const title = ((titleEl == null ? void 0 : titleEl.textContent) || "").trim();
+      const base = slugOf(title) || "images";
+      const n = (seen.get(base) || 0) + 1;
+      seen.set(base, n);
+      return {
+        el,
+        titleEl,
+        title,
+        slug: n > 1 ? `${base}-${n}` : base,
+        size: el.querySelectorAll("img").length
+      };
+    });
+  }
+  function fragmentGroups(groups, others = 0, limit = IMAGE_LIMIT) {
+    let total = others + groups.reduce((n, group) => n + group.size, 0);
+    const out = /* @__PURE__ */ new Set();
+    [...groups].sort((a, b) => b.size - a.size).forEach((group) => {
+      if (total <= limit) return;
+      if (group.size > limit) {
+        throw new Error(`Press-kit Images group "${group.title || group.slug}" has ${group.size} images; a document holds at most ${limit}`);
+      }
+      out.add(group);
+      total -= group.size;
+    });
+    return groups.filter((group) => out.has(group));
+  }
+  function fragmentPath(pagePath, slug) {
+    return `/fragments${pagePath.replace(/\/$/, "")}/${slug}`;
+  }
   var import_press_kit_default_default = {
     preprocess: ({ document }) => {
+      transform4("preprocess", document.body, { document });
       document.querySelectorAll('article.press_kit a.media-cart-action.download[href], article.press_kit a[data-action="download"][href]').forEach((a) => {
         if (!a.textContent.trim()) a.textContent = "Download";
       });
@@ -1572,10 +1663,47 @@ var CustomImportScript = (() => {
       transform("beforeTransform", main, payload);
       const article = main.querySelector("article.press_kit");
       const body = article.querySelector(".entry-content");
+      const pagePath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
+      const groups = galleryGroups(body);
+      const wanted = new URL(params.originalURL).searchParams.get("fragment");
+      if (wanted) {
+        const group = groups.find(({ slug }) => slug === wanted);
+        if (!group) throw new Error(`Press-kit Images chapter has no gallery group "${wanted}"`);
+        const holder = document.createElement("div");
+        if (group.title) holder.append(Object.assign(document.createElement("h2"), { textContent: group.title }));
+        holder.append(group.el);
+        parse4(group.el, payload);
+        main.replaceChildren(holder);
+        normalizeImages(main, document);
+        WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
+        transform3("afterTransform", main, payload);
+        checkImageLimit(main, `Press-kit Images fragment "${group.slug}"`);
+        return [{
+          element: main,
+          path: WebImporter.FileUtils.sanitizePath(fragmentPath(pagePath, group.slug)),
+          report: { title: group.title, template: TEMPLATE.name }
+        }];
+      }
+      const others = main.querySelectorAll("img").length - groups.reduce((n, group) => n + group.size, 0);
+      fragmentGroups(groups, others).forEach((group) => {
+        var _a;
+        const mark = document.createElement("p");
+        mark.dataset.skodaFragment = fragmentPath(pagePath, group.slug);
+        const link = Object.assign(document.createElement("a"), { href: mark.dataset.skodaFragment });
+        link.textContent = mark.dataset.skodaFragment;
+        mark.append(link);
+        group.el.replaceWith(mark);
+        (_a = group.titleEl) == null ? void 0 : _a.remove();
+      });
       body.querySelectorAll(".search-results.search-results-gallery").forEach((group) => parse4(group, payload));
       body.querySelectorAll(".search-results-items").forEach((grid) => parse4(grid, payload));
-      parse3(body, { document });
+      const faq = /\/frequently-asked-questions\/?$/.test(new URL(params.originalURL).pathname);
+      parse3(body, { document, faq });
       body.querySelectorAll("p[data-skoda-quote]").forEach((p) => parse5(p, payload));
+      body.querySelectorAll("p[data-skoda-fragment]").forEach((p) => {
+        const link = p.querySelector("a");
+        p.replaceWith(WebImporter.DOMUtils.createTable([["Fragment"], [link]], document));
+      });
       body.querySelectorAll("figure").forEach((figure) => parseFigure(figure, payload));
       body.querySelectorAll("p[data-skoda-footnote]").forEach((p) => parse6(p, payload));
       main.querySelectorAll("[data-skoda-footnote]").forEach((p) => p.removeAttribute("data-skoda-footnote"));
@@ -1589,10 +1717,10 @@ var CustomImportScript = (() => {
       normalizeImages(main, document);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       transform3("afterTransform", main, payload);
-      const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
+      checkImageLimit(main, `Press-kit page ${pagePath}`);
       return [{
         element: main,
-        path: WebImporter.FileUtils.sanitizePath(rawPath || "/index"),
+        path: WebImporter.FileUtils.sanitizePath(pagePath || "/index"),
         report: { title: document.title, template: TEMPLATE.name }
       }];
     }

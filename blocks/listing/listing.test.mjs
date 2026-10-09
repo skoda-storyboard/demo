@@ -700,3 +700,11 @@ test('the index is requested alongside the placeholders (SKODA-702)', async () =
     globalThis.fetch = realFetch;
   }
 });
+
+test('toolbar parity (SKODA-402b, CSS guard): collapsed sort row 12px under the header, active sort black', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = await readFile(new URL('./listing.css', import.meta.url), 'utf8');
+  assert.match(css, /\.listing \.listing-sort \{[^}]*margin-block: var\(--spacing-s\) 0;/, 'source .cover-box 12px top padding');
+  assert.match(css, /\.listing\.facets-open \.listing-sort \{\s*margin-block-start: 0;/, 'the open panel keeps its zero start margin');
+  assert.match(css, /\.listing-sort-btn\[aria-pressed="true"\] \{\s*color: var\(--skoda-black\);/, 'source span.active #000');
+});

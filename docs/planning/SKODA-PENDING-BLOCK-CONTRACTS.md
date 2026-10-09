@@ -53,9 +53,9 @@ These blocks have code on `main`, with the variants and config keys that code re
 |---|---|---|
 | `cards` | `media`, `overlay`, `toolbar`, `tiles`, `series-directory`, `social` (SKODA-217: one row per profile, one cell with a link whose text is the handle; its section carries `Style: cover-box, dark`, the SKODA-218 home band) | – |
 | `carousel` | `dots` | – |
-| `accordion` | – | – (SKODA-805c; see `accordion` below) |
+| `accordion` | `faq` (SKODA-807: FAQPage JSON-LD on a kit's FAQ chapter) | – (SKODA-805c; see `accordion` below) |
 | `columns` | `banners` (SKODA-805c: a row of linked banner images at their authored 240px, the press-kit PDF/share buttons; see `columns-banners` below), `callout` (SKODA-805c: `[icon, text]`, the 50px icon in a 60px cell beside its text; the press-kit WhatsApp callout) | – |
-| `downloads` | `media-box` (SKODA-510) | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes`, `collapse` (SKODA-502/510) |
+| `downloads` | `media-box` (SKODA-510), `gallery` (SKODA-806: a press-kit Images-chapter group, emitted by `parsers/press-kit-media.js` with `collapse | auto`; an Images chapter past 200 images moves its largest groups to `Fragment` blocks, `/fragments<page>/<slug>`) | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes`, `collapse` (SKODA-502/510) |
 | `embed` | – | `url`, `ratio`, `title`, `poster` (`or-curated`: a bare Vimeo / YouTube / Buzzsprout / Spotify URL on its own line still autoblocks). A self-hosted `.mp4`/`.webm`/`.mov`/`.m4v` `url` renders a native `<video>` with the `poster` image (SKODA-801a, WordPress `[video]`) |
 | `gallery` | – | – |
 | `hero-image` | `story` (default), `overlay`, `archive` | – |
@@ -295,6 +295,11 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Status:** ✅ **on `main`** with `blocks/accordion` (SKODA-805a/805c; minimal SKODA-807). It moved to the baseline table above; this section stays as the shape reference. **Ticket:** SKODA-805c
 - **Shape:** header `Accordion`, then one row per toggle: `[summary label (text), body (rich content: paragraphs, lists, links, images)]`. Rows appear in source order and are all closed by default. Nested blocks inside a panel aren't supported: an embed inside a panel stays a bare link.
 - **Example** (`/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/`): 8 rows.
+- **Variant `faq` (SKODA-807, on `main` with the block):**
+  - Header `Accordion (faq)`, with the same rows.
+  - `parsers/press-kit-content.js` emits it on a kit's FAQ chapter, a `…/frequently-asked-questions/` page (Peaq-2: 28 rows, Epiq-2: 5).
+  - The block behaves as the default variant and adds one schema.org `FAQPage` JSON-LD script to the head. It has one `Question` / `acceptedAnswer` per complete row; every FAQ accordion on the page shares that one script.
+  - Fallback: without the variant code the block is a plain accordion (`readable`).
 
 ### `highlight`
 - **Status:** `pinned` (decided 2026-09-25: section style; **shape 2** 2026-09-28; runtime landed 2026-10-05) · **Ticket:** SKODA-824 · **Fallback:** `readable` (it was `broken` until the runtime landed: the panel had no box or text treatment, and each extra `body-column` section moved the sidebar) · **Styles:** `highlight-dark`, `highlight-grey`

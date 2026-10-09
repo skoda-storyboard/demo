@@ -1,20 +1,44 @@
 /*
- * Unit tests for the float-dock media-cart badge (SKODA-505b): link to the locale's cart
+ * Unit tests for the float-dock: the media-cart badge (SKODA-505b): link to the locale's cart
  * page, count bubble (hidden when empty), accessible name with the count, polite
- * announcements on change and aria-current on the cart page itself.
+ * announcements on change and aria-current on the cart page itself; and the dock's
+ * interactions (SKODA-215): share disclosure, Escape dismissal with focus restoration,
+ * and the scroll-to-top threshold.
  * Run: node --test blocks/float-dock/float-dock.test.mjs
  */
 /* global globalThis */
 /* eslint-disable import/no-extraneous-dependencies */
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 
+const GLOBALS = ['window', 'document', 'fetch'];
+const snapshotGlobals = () => new Map(GLOBALS.map((key) => [
+  key,
+  Object.getOwnPropertyDescriptor(globalThis, key),
+]));
+const restoreGlobals = (snapshot) => {
+  snapshot.forEach((descriptor, key) => {
+    if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+    else delete globalThis[key];
+  });
+};
+
+const originalGlobals = snapshotGlobals();
 const dom = new JSDOM('<head></head><body></body>', { url: 'https://example.com/de/images' });
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
-const { buildCartBadge } = await import('./float-dock.js');
+// what decorate() reads: placeholders (fetch + hlx) and the reduced-motion query
+globalThis.fetch = async () => ({ ok: false });
+window.hlx = { codeBasePath: '' };
+window.matchMedia = () => ({ matches: false, addEventListener() {} });
+const { default: decorate, buildCartBadge } = await import('./float-dock.js');
 const ui = await import('../../scripts/media-cart-ui.js');
+
+after(() => {
+  dom.window.close();
+  restoreGlobals(originalGlobals);
+});
 
 function fakeCart(count) {
   let listener;
@@ -69,4 +93,78 @@ test('badge: labels from the placeholders sheet; aria-current on the cart page',
   }, load(fakeCart(3)));
   assert.equal(link.getAttribute('aria-label'), 'Medienkorb, 3 Dateien');
   assert.equal(link.getAttribute('aria-current'), 'page');
+});
+
+/** A page with an undecorated dock, its own window and a controllable scrollY. */
+function setup(t) {
+  const previousGlobals = snapshotGlobals();
+  const page = new JSDOM('<main><div class="float-dock block"></div></main>', {
+    url: 'https://demo.example/en/story',
+    pretendToBeVisual: true,
+  });
+  let scrollY = 0;
+  Object.defineProperty(page.window, 'scrollY', { configurable: true, get: () => scrollY });
+  page.window.hlx = { codeBasePath: '' };
+  page.window.matchMedia = () => ({ matches: false, addEventListener() {} });
+  page.window.requestAnimationFrame = (callback) => callback();
+  page.window.scrollTo = () => {};
+  globalThis.window = page.window;
+  globalThis.document = page.window.document;
+  globalThis.fetch = async () => ({ ok: false });
+  t.after(() => {
+    page.window.close();
+    restoreGlobals(previousGlobals);
+  });
+
+  return {
+    block: document.querySelector('.float-dock'),
+    setScrollY(value) { scrollY = value; },
+  };
+}
+
+test('share disclosure is labelled, keyboard dismissible, and restores focus', async (t) => {
+  const { block } = setup(t);
+  await decorate(block);
+
+  const trigger = block.querySelector('.float-dock-trigger');
+  const list = block.querySelector('.float-dock-share-list');
+  assert.equal(trigger.getAttribute('aria-label'), 'Share this page');
+  assert.equal(trigger.getAttribute('aria-controls'), list.id);
+  assert.equal(trigger.getAttribute('aria-expanded'), 'false');
+  assert.equal(list.inert, true);
+
+  trigger.click();
+  assert.equal(trigger.getAttribute('aria-expanded'), 'true');
+  assert.equal(list.inert, false);
+  list.querySelector('a').focus();
+  document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape' }));
+
+  assert.equal(trigger.getAttribute('aria-expanded'), 'false');
+  assert.equal(list.inert, true);
+  assert.equal(document.activeElement, trigger);
+});
+
+test('scroll-to-top appears past the threshold and returns focus before hiding', async (t) => {
+  const { block, setScrollY } = setup(t);
+  await decorate(block);
+
+  const top = block.querySelector('.float-dock-top');
+  const trigger = block.querySelector('.float-dock-trigger');
+  assert.equal(top.inert, true);
+
+  setScrollY(300);
+  window.dispatchEvent(new window.Event('scroll'));
+  assert.equal(block.classList.contains('scrolled'), false);
+
+  setScrollY(301);
+  window.dispatchEvent(new window.Event('scroll'));
+  assert.equal(block.classList.contains('scrolled'), true);
+  assert.equal(top.inert, false);
+
+  top.focus();
+  setScrollY(0);
+  window.dispatchEvent(new window.Event('scroll'));
+  assert.equal(block.classList.contains('scrolled'), false);
+  assert.equal(top.inert, true);
+  assert.equal(document.activeElement, trigger);
 });

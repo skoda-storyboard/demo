@@ -76,6 +76,30 @@ body.press-kit .section.press-kit-banners img {
   height: auto;
 }
 
+/* SKODA-835: the banners sit one tile-grid gutter under the hub's tiles (the source's 20px;
+   the section margin alone left 40). */
+body.press-kit main > .section:has(+ .section.press-kit-banners) {
+  margin-block-end: var(--grid-gutter);
+}
+
+/* SKODA-835: on the source a lone download banner is a tile of the hub's 4-up grid: a square
+   one fills a column (292 at 1440, 228 at 992), the 4:1 one two (half the row). CSS can't read
+   an image's aspect ratio, so the authored banner's intrinsic size keys it (the corpus's
+   800×800 squares and its 1920×480 strip); any other lone banner (the 2:1 ones) keeps the full
+   row. The grid is the tiles' (blocks/cards `.tiles-press`: 4 columns of span 5, 20px apart),
+   so the banner un-stacks with the tiles at the same 781px width and stays one column wide
+   below it. */
+@media (width >= 781px) {
+  body.press-kit .section.press-kit-banners .default-content-wrapper:has(> p:only-child img:is([width="800"][height="800"], [width="1920"][height="480"])) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--grid-gutter);
+  }
+
+  body.press-kit .section.press-kit-banners .default-content-wrapper > p:only-child:has(img[width="1920"][height="480"]) {
+    grid-column-end: span 2;
+  }
+}
+
 /* Article header (date + title; press-kit.js classes it), measured as press-release.css: the
    date 32px below the bar above it, 11/11 600 grey, 16px above the title; the title ink,
    28/35 up to 768 and 26/32.5 above. Its 1em bottom margin less the columns' -10px leaves
@@ -219,6 +243,16 @@ body.press-kit main > .section.media-box {
   margin-block: var(--pk-band-gap) var(--spacing-m);
 }
 
+/* An Images chapter's group heading (SKODA-806): the source widget title, 20/23 weight 300 up to
+   768 and 24/27.6 above, with the group's "Original" / "1920px" pills right under it. It stays an
+   h2 (the source skips from the h1 to an h3). */
+body.press-kit .section.body-column .default-content-wrapper:has(+ .downloads-wrapper > .downloads.gallery) > h2:last-child {
+  margin-block-end: 0;
+  font-size: var(--heading-font-size-story-h3-mobile);
+  font-weight: var(--weight-light);
+  line-height: 1.15;
+}
+
 @media (width > 768px) {
   body.press-kit {
     --media-box-title-size: var(--heading-font-size-l);
@@ -226,6 +260,10 @@ body.press-kit main > .section.media-box {
 
   body.press-kit .section.sidebar h3 {
     font-size: var(--body-font-size-m);
+  }
+
+  body.press-kit .section.body-column .default-content-wrapper:has(+ .downloads-wrapper > .downloads.gallery) > h2:last-child {
+    font-size: var(--heading-font-size-story-h3);
   }
 }
 
@@ -264,6 +302,13 @@ body.press-kit .section.body-column .default-content-wrapper > p {
   margin-block: 0 var(--paragraph-gap);
 }
 
+/* Text right after a Downloads grid on an Images child (the 125-years "For more photos…" lines,
+   the regulatory note under a gallery group, SKODA-837) sits the source's 32px below the grid;
+   it used to touch the grid / its Show more pill (0px). */
+body.press-kit .section.body-column .downloads-wrapper + .default-content-wrapper > p:first-child {
+  margin-block-start: calc(2 * var(--spacing-m));
+}
+
 /* the source's lead margin plus the entry's 10px inset: 30px to the first paragraph */
 body.press-kit .section.body-column .default-content-wrapper:first-child > p:first-child {
   margin-block-end: calc(var(--paragraph-gap) + var(--page-gutter));
@@ -278,6 +323,13 @@ body.press-kit .section.body-column .accordion .accordion-item + .accordion-item
 
 body.press-kit .section.body-column .accordion {
   margin-block-end: var(--paragraph-gap);
+}
+
+/* Toggles that open the body (a kit's FAQ chapter) keep the source row cell's 10px above the
+   first question: title → first trigger 26px at 1280, 28 at 768 (PR #263 review). After other
+   content the source gap is already met by the rhythm above (40px on first glimpse / Elroq). */
+body.press-kit .section.body-column > .accordion-wrapper:first-child .accordion {
+  padding-block-start: var(--page-gutter);
 }
 
 body.press-kit .section.body-column .embed {
