@@ -60,6 +60,20 @@ test('the Chapters menu marks the current chapter, not the hub or other chapters
   );
 });
 
+test('a variant chapter (SKODA-808) is marked current in the Chapters menu, in source order', () => {
+  const main = setup(`<div class="section press-kit-chapters"><div class="default-content-wrapper"><ul>
+      <li><a href="#chapters-links">Chapters</a></li>
+      <li><a href="/en/press-kits/skoda-peaq-press-kit-2">Škoda Peaq – Press Kit</a></li>
+      <li><a href="/en/press-kits/skoda-peaq-press-kit-2/connectivity">Connectivity</a></li>
+      <li><a href="/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out">Sportline</a></li>
+      <li><a href="/en/press-kits/skoda-peaq-press-kit-2/frequently-asked-questions">Frequently Asked Questions</a></li>
+    </ul></div></div><div class="section body-column"></div>`, 'https://demo.example/en/press-kits/skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out');
+  decorate(main);
+  const links = [...main.querySelectorAll('nav a')];
+  assert.deepEqual(links.map((a) => a.textContent), ['Škoda Peaq – Press Kit', 'Connectivity', 'Sportline', 'Frequently Asked Questions']);
+  assert.deepEqual(links.filter((a) => a.getAttribute('aria-current') === 'page').map((a) => a.textContent), ['Sportline']);
+});
+
 // Authored Downloads rows as they come from DA (contract `downloads`): image rows and
 // file-only rows with an empty picture cell.
 function imageRow(i) {

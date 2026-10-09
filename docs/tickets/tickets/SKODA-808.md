@@ -3,6 +3,8 @@
 - **Type:** block / template
 - **Phase:** B  ·  **Pilot:** No · **Milestone:** M2 (go-live)
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–3d *(planning estimate, not a quote)*
+- **Status (2026-10-09):** 🟡 IN REVIEW (hub facets), branch `skoda-808-press-kit-variant`. Draft: `/drafts/skoda-808-press-kit-variant`.
+  The selector widget is not built (MR-PK03 unconfirmed, the source has none). Spec: [`press-kit-variant.md`](../../ui-specs/press-kit-variant.md) §11.
 
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/press-kit-variant.md`](../../ui-specs/press-kit-variant.md)** (captured via Chrome DevTools, "Peaq Sportline" sub-page live). Read it before implementing.
@@ -30,12 +32,35 @@ Confirmed on the live Peaq kit (§11.9): a dedicated subsection for a specific m
 - No new taxonomy invented, reuse the confirmed 15-facet model.
 
 ## Acceptance Criteria
-- [ ] A press kit renders one or more variant subsections nested after the core narrative, in source order.
-- [ ] The variant is reachable via the Chapters anchor-nav (in-page anchor/link), accessibly (keyboard + ARIA); this is the required navigation.
+- [x] A press kit renders one or more variant subsections nested after the core narrative, in source order. *(already on `main`: the variant tile and chapter page, SKODA-805b; pinned by tests)*
+- [x] The variant is reachable via the Chapters anchor-nav (in-page anchor/link), accessibly (keyboard + ARIA); this is the required navigation. *(already on `main`: `aria-current="page"` on the variant; pinned by a template test)*
 - [ ] *Conditional (only if MR-PK03 is confirmed as a requirement):* a standalone variant/bodywork selector switches between variants accessibly (keyboard + `aria-current`/`aria-selected`). Not required to close this ticket if the client does not want a net-new selector.
-- [ ] Kit Metadata carries model/bodywork/derivative/category facets and the kit surfaces correctly under the relevant listing facets (MR-L03) and model-page strips (MR-M04).
+- [x] Kit Metadata carries model/bodywork/derivative/category facets and the kit surfaces correctly under the relevant listing facets (MR-L03) and model-page strips (MR-M04).
 - [ ] Output passes lint and matches source structure in local preview.
 - [ ] Variant renders as a nested sub-page + Chapters-nav anchor (per [`press-kit-variant.md`](../../ui-specs/press-kit-variant.md)); visual diff vs source ≤ 2% per-pixel.
+
+## Build notes (2026-10-09)
+- **Already at parity on `main` (measured):** the hub tile grid lists "Škoda Peaq Sportline" after Connectivity, as the
+  source does. The Chapters nav lists the variant and marks it `aria-current="page"` on its own page. The Sportline
+  chapter's metadata carries `derivative=sportline` from its Tags. The Epiq First Edition chapter has no derivative on
+  the source either.
+- **Gap closed: hub facets.** A hub has no Tags sidebar, so `import-press-kit-hub.js` reads its facets from the
+  article classes. It read only 5 of the 15 facets and kept the class value as is, so no hub had `years`: the class
+  holds the source term id (`years-61572`), not the year.
+  - The importer now reads all 15 facets.
+  - It maps the `years` term id to its year (`YEAR_TERMS`, 2016–2026, read from the source year archives
+    `/en/tag/years/<year>/`, body class `term-<id>`).
+  - An unknown id is skipped with a warning, never guessed. The publish date is no substitute: the Elroq kit is tagged
+    2025 but was published in December 2024.
+- **Effect (measured on the live index, before → after `import:push`):** `filter[years][]=2026` among kits goes from 2
+  to 5, matching the source's 5 (the Peaq-2, Epiq-2 and Motorsport hubs added). All 8 hubs in
+  `urls-press-kit-hub.txt` gain `years`. Re-imported against `main`'s importer, each hub differs only by its `years` row
+  and the year in `tags`.
+- **Not in scope:**
+  - The standalone selector widget (MR-PK03: the source has none; pending client confirmation).
+  - The two `filter[derivative][]=sportline` source kits that EDS lacks: a non-hub Kodiaq kit, and Karoq Media Launch,
+    which isn't imported yet.
+  - Kits imported outside `urls-press-kit-hub.txt` keep their current facets.
 
 ## Dependencies
 - Upstream: SKODA-805 (press-kit template), SKODA-806 (grouped media reused within a variant), SKODA-401 (facet normalization / query-index)
