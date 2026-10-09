@@ -5,6 +5,13 @@ Superb-25-years release; a second release cross-checked for structure).
 Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Map: [`_TEMPLATES.md`](_TEMPLATES.md).
 Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 
+> **Wide-screen correction (2026-10-09, PR #267 follow-up):** Media Box and Related dark
+> backgrounds are viewport-wide only up to **1440px**, then centered at a **1440px cap**
+> (`--cover-box-max-width`). At 1920px, Zellmer's source `.cover-box.dark` bands both have
+> x=240px and width=1440px, background `rgb(14, 58, 47)`; heights 553.625px / 415.84375px.
+> This supersedes the unlimited "full-bleed" wording below. Inner content remains capped
+> at 1248px. Band sizing belongs to CSS, not an import change.
+
 > **Sweep correction (2026-09-25).** The DevTools URL→block sweep ([registry](../analysis/SKODA-M1-URL-BLOCK-REGISTRY.md), [report](../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §7) disproved the points below on the live M1 pages. They override the sections they name until this spec is re-captured:
 >
 > - **Bullets are optional**: the Klaus Zellmer release has none.

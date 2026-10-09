@@ -34,8 +34,10 @@ node --test docs/ui-specs/tools/press-release-spacing.test.mjs
 
 Run the test in a second terminal while AEM stays running. `EDS_PREFIX` overrides the draft URL
 prefix; `CHROME_PATH` overrides the Chrome executable. The check measures rendered geometry,
-without screenshots: Peaq's collapsed overlay, expand/collapse round trip, no-disclosure spacing
-at 768/992/1080/1280px, and Zellmer's short Media Box. The pinned live-source band heights are
+without screenshots: Peaq's collapsed overlay, expand/collapse round trip, shared expanded
+spacing, no-disclosure spacing at 768/992/1080/1280px, and Zellmer's short Media Box. Both dark
+bands' widths and centering are checked at 375/768/992/1080/1439/1440/1441/1920px against
+the source's 1440px cap. The pinned live-source band heights are
 1148.25px (Peaq, 500px) and 553.625px (Zellmer, 1280px); remeasure before updating them if the
 draft content changes.
 

@@ -448,9 +448,142 @@
   }
 }
 
-/* --- responsive column ladder: media-box 1 / 2 / 3 / 4, default 1 / 2 / 4 --- */
+/* --- gallery variant (SKODA-806; press-kit-media.md §3, measured on the Epiq / Peaq Images
+   chapters): a group of 16:9 thumbnails 20px apart, each with its add + download discs over
+   the lower left corner (the source toolbar's 10px inset) and no visible title (the controls
+   and the thumbnail link name it). The "Original" / "1920px" pills sit right-aligned under the
+   group heading, 20px above the grid. ------------------------------------------------ */
+.downloads.gallery {
+  --dl-overlay-inset: 10px;
+  --dl-group-pill-pad: 14px var(--spacing-l);
+
+  /* the source togglebox opener: a 64px full-width bar with the plain "Show more" text at its
+     foot, fading the clipped row out (white from 30%); 16px under the grid once open. The group
+     ends 32px above the next heading (the source gallery's margin). */
+  --dl-gallery-bar: 64px;
+  --dl-gallery-bar-gap: var(--spacing-m);
+  --dl-gallery-gap: 32px;
+
+  display: flow-root; /* the grid's row margin stays inside, not merged into the group gap */
+  margin-block-end: var(--dl-gallery-gap);
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- a gallery is never a Media Box */
+.downloads.gallery .downloads-items {
+  gap: var(--dl-tile-gap);
+}
+
+.downloads.gallery .downloads-figure {
+  position: relative;
+  gap: 0;
+}
+
+.downloads.gallery .downloads-thumb {
+  border: 0;
+  border-radius: 0;
+}
+
+.downloads.gallery .downloads-title {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* in-page layer 2 (styles.css z-index scale): over the added tile's scrim (1); a tile whose size
+   menu is open stacks above its neighbours' controls */
+.downloads.gallery .downloads-actions {
+  position: absolute;
+  inset-block-end: var(--dl-overlay-inset);
+  inset-inline-start: var(--dl-overlay-inset);
+  z-index: 2;
+}
+
+.downloads.gallery .downloads-item:has(.downloads-sizes:not([hidden])) {
+  position: relative;
+  z-index: 3;
+}
+
+.downloads.gallery .downloads-group {
+  gap: var(--spacing-xs);
+  margin-block-end: var(--dl-tile-gap);
+}
+
+/* the source .media-cart-action.wide pill: 2px ink ring, 16/16 weight 500, 1px tracking, no
+   hover or added look of its own (the pressed state is announced, aria-pressed) */
+.downloads.gallery .downloads-group-size {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: auto;
+  height: auto;
+  border: 2px solid var(--skoda-ink);
+  border-radius: var(--pill-radius);
+  padding: var(--dl-group-pill-pad);
+  background: var(--skoda-white);
+  color: var(--skoda-ink);
+  font: inherit;
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--dl-toggle-tracking);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.downloads.gallery .downloads-group-size::before {
+  content: none;
+}
+
+.downloads.gallery .downloads-group-size:hover {
+  background: var(--skoda-white);
+}
+
+.downloads.gallery .downloads-group-size:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+.downloads.gallery .downloads-group-size[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* a group that fits in two rows keeps the grid's 20px row margin (52px to the next heading) */
+.downloads.gallery:not(:has(> .downloads-more:not([hidden]))) .downloads-items {
+  margin-block-end: var(--dl-tile-gap);
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- a gallery is never a Media Box */
+.downloads.gallery .downloads-more {
+  align-items: flex-end;
+  width: 100%;
+  min-height: var(--dl-gallery-bar);
+  margin: var(--dl-gallery-bar-gap) 0 0;
+  border-radius: 0;
+  padding: var(--dl-group-pill-pad);
+  background: none;
+  font-weight: var(--weight-regular);
+  letter-spacing: normal;
+  line-height: var(--line-height-body);
+}
+
+.downloads.gallery.downloads-collapsed .downloads-more {
+  margin-block-start: calc(-1 * var(--dl-gallery-bar));
+  background: linear-gradient(0deg, var(--skoda-white) 30%, transparent);
+}
+
+.downloads.gallery .downloads-more:is(:hover, :focus-visible) {
+  background: none;
+}
+
+.downloads.gallery.downloads-collapsed .downloads-more:is(:hover, :focus-visible) {
+  background: linear-gradient(0deg, var(--skoda-white) 30%, transparent);
+}
+
+/* --- responsive column ladder: media-box and gallery 1 / 2 / 3 / 4, default 1 / 2 / 4 --- */
 @media (width >= 520px) {
-  .downloads.downloads-media-box .downloads-items {
+  .downloads:is(.downloads-media-box, .gallery) .downloads-items {
     --dl-cols: 2;
   }
 }
@@ -460,7 +593,7 @@
     --dl-cols: 2;
   }
 
-  .downloads.downloads-media-box .downloads-items {
+  .downloads:is(.downloads-media-box, .gallery) .downloads-items {
     --dl-cols: 3;
   }
 }
@@ -470,7 +603,7 @@
     --dl-cols: var(--dl-cols-lg, 4);
   }
 
-  .downloads.downloads-media-box .downloads-items {
+  .downloads:is(.downloads-media-box, .gallery) .downloads-items {
     --dl-cols: var(--dl-cols-lg, 4);
   }
 }

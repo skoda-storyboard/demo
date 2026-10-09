@@ -15,19 +15,24 @@ import { createHash } from 'node:crypto';
  * Source URL (or already-a-path) → EDS page path: no host, no trailing slash, no
  * extension, `/` → `/index`. Mirrors the importers' own path rule
  * (import-*.js: pathname, strip trailing slash + .html, sanitized by the importer).
+ * A `?fragment=<slug>` URL names a press-kit group fragment: /fragments<page path>/<slug>.
  * @param {string} input e.g. https://www.skoda-storyboard.com/en/emobility/foo/ or /en/emobility/foo
  * @returns {string} e.g. /en/emobility/foo
  */
 export function pagePath(input) {
   const raw = String(input || '').trim();
   if (!raw) return '';
-  let p;
+  let url;
   try {
-    p = new URL(raw, 'https://www.skoda-storyboard.com').pathname;
+    url = new URL(raw, 'https://www.skoda-storyboard.com');
   } catch (e) {
     return '';
   }
-  p = decodeURIComponent(p).replace(/\.plain\.html$|\.html?$/i, '').replace(/\/+$/, '');
+  let p = decodeURIComponent(url.pathname).replace(/\.plain\.html$|\.html?$/i, '').replace(/\/+$/, '');
+  // `<page>?fragment=<slug>`: a group the press-kit importer writes as its own document
+  // (import-press-kit-default.js fragmentPath, SKODA-806)
+  const fragment = url.searchParams.get('fragment');
+  if (fragment && /^[a-z0-9-]+$/.test(fragment)) p = `/fragments${p}/${fragment}`;
   return p === '' ? '/index' : p;
 }
 
@@ -167,6 +172,56 @@ export function bulkPatternMatches(pattern, page) {
     return part.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
   }).join('');
   return new RegExp(`^${re}$`).test(trim(page));
+}
+
+/**
+ * The content fragments a page loads (SKODA-806): a Fragment block's link, or any
+ * `/fragments/` link (the runtime auto-blocks those too). Same-site paths only.
+ * @param {string} plain the page's .plain.html
+ * @returns {string[]} fragment page paths, de-duplicated, in document order
+ */
+export function contentFragmentPaths(plain) {
+  const out = [];
+  const re = /href="([^"]*\/fragments\/[^"]*)"/gi;
+  let m = re.exec(String(plain || ''));
+  while (m) {
+    const href = m[1].replace(/&amp;/g, '&');
+    const sameSite = href.startsWith('/') || /^https:\/\/(www\.)?skoda-storyboard\.com\//i.test(href)
+      || /^https:\/\/[^/]+\.aem\.(page|live)\//i.test(href);
+    const p = sameSite ? pagePath(href) : '';
+    if (p && !out.includes(p)) out.push(p);
+    m = re.exec(String(plain || ''));
+  }
+  return out;
+}
+
+/**
+ * Split the pages ready to publish by their content fragments: a page publishes only once
+ * every fragment it loads is live, either already or by being published in this run first.
+ * @param {string[]} ready page paths that passed every other gate
+ * @param {(path: string) => string[]} fragmentsOf the content fragments a page loads
+ * @returns {{first: string[], rest: string[]}} fragments to publish first; the other pages
+ */
+export function fragmentOrder(ready, fragmentsOf) {
+  const needed = new Set(ready.flatMap((p) => fragmentsOf(p)));
+  const first = ready.filter((p) => needed.has(p));
+  return { first, rest: ready.filter((p) => !needed.has(p)) };
+}
+
+/**
+ * The pages to hold: each one whose content fragments aren't all live.
+ * @param {string[]} pages candidate page paths
+ * @param {(path: string) => string[]} fragmentsOf
+ * @param {(fragment: string) => boolean} isLive
+ * @returns {Map<string, string[]>} page path → its fragments that aren't live
+ */
+export function fragmentHolds(pages, fragmentsOf, isLive) {
+  const held = new Map();
+  pages.forEach((p) => {
+    const missing = fragmentsOf(p).filter((f) => !isLive(f));
+    if (missing.length) held.set(p, missing);
+  });
+  return held;
 }
 
 /**

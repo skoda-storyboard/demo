@@ -6,9 +6,9 @@
 - **GitHub issue:** [#261](https://github.com/skoda-storyboard/demo/issues/261)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §3.1 / §8 F1; follows up the interim noted in [SKODA-208](SKODA-208.md)
 - **Branch:** `skoda-832-octavia-hubs-reimport`
-- **Status (2026-10-07):** 🟡 **9 hubs pushed to DA and previewed** (9 × update, 0 conflicts, 9/9 preview 200), not
-  published. QA (2026-10-07): content PASS; rendered FAIL on D2 (lone download banner, code-only fix pending).
-  RS 245 is excluded (D1: no importer for its template).
+- **Status (2026-10-07):** 🟢 **9 hubs published** (PR #281 merged; 9/9 live 200 + indexed, after a publish dry-run
+  showed DA = the QA'd content). Open follow-ups: lone banner sizing → SKODA-835 (#279); RS 245 → SKODA-836 (#280),
+  still on its flattened page-base doc.
 
 ## Problem
 The 10 Octavia-rail press kits were imported through `page-base` as an interim. 9 of them are hubs, so the chapter
@@ -80,12 +80,34 @@ Evidence: `.migration/qa-832/` (outside git).
 - **D6 (low):** `bannerAlt` treats any "download" image name as the ZIP banner.
 - **D7 (observation):** contact cells are 602×116 vs 604×96; banners start 40px below the tiles vs 20px on origin.
 
+## ZIP link fix (2026-10-08, user decision; branch `skoda-832-zip-links`)
+- **Importer:** `import-press-kit-hub.js` `bannerHref()`:
+  - `www…/direct-download/<path>.zip` (301 to an expiring signed S3 URL) becomes `cdn.skoda-storyboard.com/<path>.zip`.
+  - Plus one explicit, user-approved correction: Octavia's extensionless `…/2020/04/SKODA-OCTAVIA` (403) becomes
+    `….zip`.
+  - Hub banners only. All targets were checked as 200 `application/zip`.
+- **Pages:** 4 hubs re-imported; each differs from DA only in the ZIP href. Pushed and previewed (4 × update,
+  0 conflicts), then **published 2026-10-08** (4/4 live 200); every live ZIP link returns 200.
+
+| Hub | Before | After |
+|---|---|---|
+| press-kit-skoda-at-the-iaa-2019 (M1) | direct-download …IAA_FRANKFURT_2019.zip (301) | cdn …/2019/11/IAA_FRANKFURT_2019.zip (200, 1.59 GB) |
+| skoda-octavia-press-kit (M1) | cdn …/2020/04/SKODA-OCTAVIA (403) | cdn …/2020/04/SKODA-OCTAVIA.zip (200, 1.60 GB) |
+| the-all-new-skoda-kodiaq-press-kit | direct-download …868a3959.zip (301) | cdn … (200) |
+| the-all-new-skoda-superb-press-kit | direct-download …454bb916.zip (301) | cdn … (200) |
+
+## Accepted differences (user, 2026-10-08)
+- D3: resource tiles 5-across (origin 2-up beside the X timeline); the Octavia kit's 6 tiles as 4+2 at 292.
+- D4: the Scout 4:1 intro tile at half width; the 4x4 1/3 squares as quarters.
+- D7: contact cells 602×116 vs 604×96.
+- Banner placement and size details are in SKODA-835.
+
 ## Acceptance Criteria
 - [x] All 9 hubs import through press-kit-hub with every tile (count, titles, links, images) in the cards/tiles block
 - [x] No Twitter junk; sane description; no text or image lost vs the current DA docs
-- [ ] Rendered QA (measured, 1440/992/768/375) vs origin, incl. the contacts Columns and the two size approximations
+- [x] Rendered QA (measured, 1440/992/768/375) vs origin, incl. the contacts Columns and the two size approximations; the remaining differences are accepted by the user (2026-10-08)
 - [x] `media:apply`, DA dry-run, push + preview (2026-10-07: 9 hubs; RS 245 excluded, D1)
-- [ ] Publish (separate go-ahead). Follow-ups: D2 banner sizing → [SKODA-835](SKODA-835.md) (#279); D1 RS 245 → [SKODA-836](SKODA-836.md) (#280)
+- [x] Published 2026-10-07 (9/9 live, indexed). Follow-ups: D2 banner sizing → [SKODA-835](SKODA-835.md) (#279); D1 RS 245 → [SKODA-836](SKODA-836.md) (#280)
 
 ## Follow-ups
 - The cards tiles block has no full-width or one-third tile size (block change), which is behind the 2 approximations.

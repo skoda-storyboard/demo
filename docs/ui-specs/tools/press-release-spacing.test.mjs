@@ -54,7 +54,8 @@ test('press-release Media Box keeps the collapsed overlay and counts last-row sp
     await page.locator('.media-box .downloads-more').click();
     const expanded = await spacing(page);
     assert.equal(expanded.inertCount, 0);
-    assert.equal(expanded.paddingBottom + expanded.toggleMargin, 34);
+    assert.equal(expanded.paddingBottom, 0);
+    assert.equal(expanded.toggleMargin, 34);
     assert.equal(expanded.bottomGap, 60);
     await page.locator('.media-box .downloads-more').click();
     assert.equal((await spacing(page)).bandHeight, collapsed.bandHeight);
@@ -76,6 +77,19 @@ test('press-release Media Box keeps the collapsed overlay and counts last-row sp
     assert.equal(short.paddingBottom, 0);
     assert.equal(short.marginBottom, short.tileGap);
     assert.ok(Math.abs(short.bandHeight - 553.625) < 1, JSON.stringify(short));
+    for (const width of [375, 768, 992, 1080, 1439, 1440, 1441, 1920]) {
+      await shortPage.setViewportSize({ width, height: 900 });
+      const bands = await shortPage.locator('main > .section.dark').evaluateAll((elements) => elements.map((element) => {
+        const rect = element.getBoundingClientRect();
+        return { width: rect.width, x: rect.x };
+      }));
+      assert.equal(bands.length, 2);
+      const expectedWidth = Math.min(width, 1440);
+      for (const band of bands) {
+        assert.ok(Math.abs(band.width - expectedWidth) < 0.05, JSON.stringify({ width, band }));
+        assert.ok(Math.abs(band.x - (width - expectedWidth) / 2) < 0.05, JSON.stringify({ width, band }));
+      }
+    }
     await shortPage.close();
   } finally {
     await browser.close();

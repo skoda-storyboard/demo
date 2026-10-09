@@ -198,20 +198,14 @@ body.press-release main > .section.sidebar {
    a 16px bottom margin (a white strip before the next band and before the footer). The row
    above ends 10px early (the source .columns row's -10px gutter margin). */
 body.press-release main > .section.dark {
+  width: min(100%, var(--cover-box-max-width));
+  margin-inline: auto;
   margin-bottom: var(--spacing-m);
   padding: var(--pr-band-padding-top) 0 var(--pr-band-padding-bottom);
 }
 
 body.press-release main > .section.media-box {
   margin-top: calc(var(--pr-band-gap) - var(--pr-gutter));
-}
-
-body.press-release .section.media-box .downloads.downloads-expanded .downloads-items {
-  padding-bottom: var(--paragraph-gap);
-}
-
-body.press-release .section.media-box .downloads.downloads-expanded .downloads-more {
-  margin-top: calc(var(--dl-toggle-gap) - var(--paragraph-gap));
 }
 
 body.press-release .section.dark .default-content-wrapper > h2 {
@@ -293,7 +287,7 @@ body.press-release .section.sidebar aside > .default-content-wrapper:has(> h3:la
 
 /* Layer 2 / Layer 3 — at ≥768 the one-column grid gets the sidebar column (the source's
    single structural transition), capped by --content-max-width;
-   the header and both bands span it, and the bands bleed to the viewport edges. */
+  the header and both bands span it, with the bands capped by --cover-box-max-width. */
 @media (width >= 768px) {
   body.press-release main {
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
@@ -320,8 +314,9 @@ body.press-release .section.sidebar aside > .default-content-wrapper:has(> h3:la
   }
 
   body.press-release main > .section.dark {
-    box-shadow: 0 0 0 100vmax var(--dark-color);
-    clip-path: inset(0 -100vmax);
+    justify-self: center;
+    width: min(100vw, var(--cover-box-max-width));
+    margin-inline: 0;
   }
 }
 

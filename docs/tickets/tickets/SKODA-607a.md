@@ -29,9 +29,9 @@ The remaining page-level alignment and the final visual gate on the five M1 pres
 
 ## PR #267 review fixes (2026-10-09)
 
-- The template's list padding and toggle-margin compensation now apply only to expanded
-  downloads. Collapsed downloads retain the block's negative overlay margin; boxes without
-  a visible disclosure retain only the block's last-row margin.
+- The initial correction limited template list padding and toggle compensation to expanded
+  downloads. After Lars's current-main cross-check, both overrides were removed entirely:
+  shared Downloads CSS owns collapsed, expanded and no-disclosure spacing.
 - Chrome DevTools reproduced Peaq's 500px regression: branch 1206.25px, source 1148.25px.
   Local corrected code measures 1148.25px, with a -44px toggle margin and 60px band-end gap.
 - The collapse regression counts `inert` tiles and pins the unchanged standard-group behavior.
@@ -52,6 +52,41 @@ Chrome DevTools band-height measurements, fresh-load source compared with local 
 
 All values are CSS pixels for source `.cover-box.dark` and EDS `main > .section.media-box`.
 At 768/992/1080/1280, corrected no-disclosure lists have 0px bottom padding and 20px margin.
+
+### Lars's follow-up comments (2026-10-09)
+
+- Integrated current `origin/main` without conflicts; the merge remains uncommitted. The
+  corrected inert-based test has a unique name and passes alongside main's gallery tests.
+- Removed both template Downloads spacing rules rather than override the shared collapse
+  contract. Expanded lists now have 0px bottom padding and a 34px toggle margin.
+- Source `.cover-box.dark` backgrounds are capped at 1440px, not indefinitely full-bleed.
+  Replaced the template's desktop box-shadow bleed with real, centered band geometry using
+  `--cover-box-max-width`. No importer/content change is needed for this styling fix.
+- Chrome DevTools at 1920px, Zellmer source/local: both bands x=240px, width=1440px,
+  background rgb(14, 58, 47); Media Box height=553.625px and Related height=415.84375px
+  on both. The local bands have no box-shadow.
+- Rendered regression checks both band widths/centering at 375/768/992/1080px and
+  1439/1440/1441/1920px, plus shared expanded spacing. The check and repository lint pass.
+
+These follow-up measurements use local merged code, not the pushed branch preview.
+Independent QA accepted these two comments only: 117 checks passed, 2 public-SSR sample
+tests skipped, and repository lint passed. No acceptance of the full fidelity gate.
+
+Fresh-load 4x4 release, first tile top to collapsed pill bottom (CSS pixels):
+
+| Viewport | Origin | Live main | Local merged |
+|---:|---:|---:|---:|
+| 1440 | 708.25 | 708.25 | 708.25 |
+| 992 | 636.25 | 636.25 | 636.25 |
+| 768 | 645.25 | 645.25 | 645.25 |
+| 375 | 779.109 | 779.125 | 779.125 |
+| 1080 | 661 | 661 | 661 |
+
+EDS's literal list top is 4px above the first tile for focus-ring clearance, so list-top
+measurements add 4px to the main/local values. At 1440px, all three band heights are
+936.75px (937px rounded). Local/main collapsed margin=-44px, padding-bottom=0px;
+expanded margin=34px, padding-bottom=0px. These QA measurements use separate Playwright
+Chrome processes and fresh loads without screenshots.
 
 The existing page-level fidelity blockers and QA acceptance status are unchanged.
 
