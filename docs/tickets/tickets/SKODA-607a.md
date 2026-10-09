@@ -23,9 +23,37 @@ The remaining page-level alignment and the final visual gate on the five M1 pres
 | ″ | Sidebar tag rows: no row gap, no `li` margin | 24px rows on the source; EDS added the global `li` 8px margin and a 5px gap |
 | ″ | Lead image: rounded (`--card-radius`) clipping frame, resting `scale: 1.02`; the rule only matches the lead part | The source `.article-teaser` frame (radius 8, `transform: … scale(1.02)`). A later body part (after a callout) may start with an image (SKODA-824 re-review R1) |
 | `templates/press-release/press-release.js` | `decorateBody()` marks the first body part `press-release-lead` | Lead-only rules; the FAQ callout's bold questions are not a perex (R5) |
-| `blocks/downloads/downloads.js` | A **Media Box** builds its Show more disclosure from 3 tiles (was: more than 8); `syncVisibility()` already hides it while two rows fit. Other `collapse auto` groups (press-kit Images chapters) keep the >8 gate (PR #267 review) | The source collapses a Media Box once it needs more than two rows: a 5-tile press release at 500 and 767 (1-up / 2-up). Images groups can't use the row rule yet: the standard Downloads grid stays one column until 768, while the source's goes 2-up at 520 (at 600, 4-tile Motorsport groups are open on the source) |
+| `blocks/downloads/downloads.test.mjs` | Pins the existing row-triggered disclosure for Media Boxes and standard `collapse auto` groups; clipped tiles are `inert`, not `hidden`. No runtime change in this PR | The source collapses a Media Box once it needs more than two rows: a 5-tile press release at 500 and 767 (1-up / 2-up). Standard Downloads stays one column until 768, while the source's goes 2-up at 520, so a 4-tile Images group still collapses at 600 in EDS. The standard-group grid difference remains outside this ticket; no >8 exception is implemented |
 | `tools/importer/transformers/skoda-press-release-layout.js` (+ bundle) | The h1 keeps an authored `<br>`, with a no-break space before it (skoda-nbsp's placeholder; html2md trims a plain one) | Peaq's title breaks after "record" at every width (−32.5px at 1280 without it). The space keeps the heading's text "record for" (the gallery lightbox title reads it; review fix). Metadata Title still comes from `og:title` |
 | Tests | `templates/press-release/press-release.test.mjs` (new, 3), `blocks/downloads` (+1 case set), `press-release.test.mjs` (title), `press-kit.test.mjs` (visible controls) | The new cases fail on `main` |
+
+## PR #267 review fixes (2026-10-09)
+
+- The template's list padding and toggle-margin compensation now apply only to expanded
+  downloads. Collapsed downloads retain the block's negative overlay margin; boxes without
+  a visible disclosure retain only the block's last-row margin.
+- Chrome DevTools reproduced Peaq's 500px regression: branch 1206.25px, source 1148.25px.
+  Local corrected code measures 1148.25px, with a -44px toggle margin and 60px band-end gap.
+- The collapse regression counts `inert` tiles and pins the unchanged standard-group behavior.
+  The prior >8 exception claim was incorrect and has been removed from this ticket and the spec.
+- Rendered regression: `node --test docs/ui-specs/tools/press-release-spacing.test.mjs`
+  (local AEM required; setup in the tools README). It covers collapsed/expanded/always-open
+  spacing and responsive transitions, with source-height baselines for Peaq and Zellmer.
+
+Chrome DevTools band-height measurements, fresh-load source compared with local corrected code:
+
+| Release | Viewport | Source | PR preview before fix | Local corrected |
+|---|---:|---:|---:|---:|
+| Peaq | 500 | 1148.25 | 1206.25 | 1148.25 |
+| Peaq | 768 | 815.75 | not remeasured | 815.75 |
+| Peaq | 992 | 806.75 | not remeasured | 805.867 |
+| Peaq | 1080 | 831.5 | not remeasured | 830.625 |
+| Zellmer | 1280 | 553.625 | 573.625 | 553.625 |
+
+All values are CSS pixels for source `.cover-box.dark` and EDS `main > .section.media-box`.
+At 768/992/1080/1280, corrected no-disclosure lists have 0px bottom padding and 20px margin.
+
+The existing page-level fidelity blockers and QA acceptance status are unchanged.
 
 ## Content
 - **Measured content:** the 5 releases were re-imported with the 607a bundle and pushed to DA as **drafts only** at `/drafts/skoda-607a/<slug>`, previewed and never published. They went up through a one-off local script running the `import:push` steps except the binary gate (approved 2026-10-06, not committed). Quotes from SKODA-220: National Theatre 2, Zellmer 2, Board 1, Superb 1. The Zellmer FAQ is `body-column, highlight-grey`. The text is identical to DA word for word.
@@ -51,7 +79,7 @@ Measured before the source's italic face has loaded (it loads lazily), the quote
 Breakpoint edges (519/520, 767, 991/992, 1079/1080) on Superb and Zellmer show no other offset.
 Before this ticket (main, 2026-10-06), the Media Box top was −82…−168px off at 1280 and −130…−229px at 500, and the 500px footer was up to +1071px off (the Media Box didn't collapse).
 
-**Regression:** the Media Box collapse matches the source on all 39 press-kit Media Boxes × 500/768/1280. Press-kit **Images chapters** behave as on `main`: no disclosure under 9 tiles. The first version of this PR also collapsed 3–4 tile groups at 520–767, where the source shows them open; review fix. So small groups still don't collapse below 520, where the source does, and that waits on the standard grid's 1→2 column step moving to 520 (Downloads follow-up). The corpus Octavia release improves from −146 to −56px at 1280 (its content isn't re-imported yet).
+**Regression:** the earlier Media Box collapse sweep recorded source parity on all 39 press-kit Media Boxes × 500/768/1280. Press-kit **Images chapters** retain `main`'s row-triggered `collapse:auto` behavior, not a >8-tile gate. Standard groups stay one column until 768, so four tiles collapse at 600 and open at 768; the source already uses two columns at 600. Moving the standard grid's 1→2 column step to 520 remains a Downloads follow-up, outside this PR. The corpus Octavia release improves from −146 to −56px at 1280 (its content isn't re-imported yet).
 
 ## Per-pixel diff (≤2% gate), recorded
 [`docs/ui-specs/tools/press-release-region-diff.mjs`](../../ui-specs/tools/press-release-region-diff.mjs): regions per template-press-release.md §10, each cropped by its own selector on each side. Each region is shot in viewport tiles while scrolling, because a full-page capture makes one side re-lay out. Each pair is padded to the larger box, so content missing on either side counts; the sidebar is measured by its content on both sides (the source column stretches to the row). pixelmatch threshold 0.1, `includeAA: false` (as `docs/ui-specs/tools/visual-diff.mjs`). Consent accepted; fixed/sticky chrome (the source share buttons, the EDS float dock) hidden on both sides.

@@ -206,15 +206,11 @@ body.press-release main > .section.media-box {
   margin-top: calc(var(--pr-band-gap) - var(--pr-gutter));
 }
 
-/* The source tile grid keeps its last row's 20px bottom margin, so an open box ends 80px below
-   its tiles. With Show more, the pill sits where it would without that margin: collapsed it
-   ends the box 60px above the band edge, expanded too (2442.9 / 2440px at 500, Superb). The
-   margin lives on the list, so the band is the same whether the pill shows or not. */
-body.press-release .section.media-box .downloads-items {
+body.press-release .section.media-box .downloads.downloads-expanded .downloads-items {
   padding-bottom: var(--paragraph-gap);
 }
 
-body.press-release .section.media-box .downloads-more {
+body.press-release .section.media-box .downloads.downloads-expanded .downloads-more {
   margin-top: calc(var(--dl-toggle-gap) - var(--paragraph-gap));
 }
 

@@ -173,14 +173,14 @@ test('the toggle stays a labelled button: Show less once open, focus kept in vie
   assert.equal(document.activeElement, toggle);
 });
 
-test('large media-box variant discloses two rows across widths and authored columns', async () => {
+test('media-box and standard auto groups disclose according to their responsive columns', async () => {
 
   // five tiles (Superb, Peaq): 1 column at 500, 2 from 520, 3 from 768, 4 from 992 (SKODA-607a)
   const five = setup();
   for (let i = 0; i < 5; i += 1) addRow(five, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
   await decorate(five);
   const toggle = five.querySelector('.downloads-more');
-  const visible = () => [...five.querySelectorAll('.downloads-item')].filter((tile) => !tile.hidden).length;
+  const visible = () => [...five.querySelectorAll('.downloads-item')].filter((tile) => !tile.hasAttribute('inert')).length;
   assert.equal(toggle.hidden, false);
   assert.equal(visible(), 2);
   window.setViewport(520);
@@ -197,15 +197,16 @@ test('large media-box variant discloses two rows across widths and authored colu
   assert.equal(toggle.getAttribute('aria-expanded'), 'false');
   assert.equal(visible(), 2);
 
-  // an Images-chapter group (collapse auto, not a media box) keeps the >8 gate: its grid is
-  // one column until 768, the source's 2-up from 520 (PR #267 review)
   const group = setup(false);
   addConfig(group, 'collapse', 'auto');
   for (let i = 0; i < 4; i += 1) addRow(group, { title: `Image ${i}`, links: [['Original', `/group${i}.jpg`]] });
   window.setViewport(600);
   await decorate(group);
-  assert.equal(group.querySelector('.downloads-more'), null);
-  assert.equal([...group.querySelectorAll('.downloads-item')].filter((tile) => tile.hidden).length, 0);
+  assert.equal(group.querySelector('.downloads-more').hidden, false);
+  assert.equal([...group.querySelectorAll('.downloads-item')].filter((tile) => tile.hasAttribute('inert')).length, 2);
+  window.setViewport(768);
+  assert.equal(group.querySelector('.downloads-more').hidden, true);
+  assert.equal([...group.querySelectorAll('.downloads-item')].filter((tile) => tile.hasAttribute('inert')).length, 0);
   window.setViewport(500);
 
   // eight tiles fit two 4-up rows from 992 only
