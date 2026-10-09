@@ -50,6 +50,17 @@
 
    - **CLS (mobile):** first-glimpse 0.070 → 0.007, Peaq 0.071 → 0.001, Epiq 0.051 → 0, Como 0.054 → 0, news 0.022 → 0.
 
+3. **`scripts/scripts.js`, `prioritizeLeadImage()` (2026-10-09, after the PSI check on the main merge).**
+   - **Symptom:** PSI mobile 88 on the press release (FCP 2.4s, SI 4.8s, LCP 3.0s, TBT 0); 100 in the earlier passes.
+   - **Cause:** press releases and no-hero press kits open with a text-only header section (date + title), so `waitForFirstImage` found no image and the lead image, the LCP element (392×221 at y248 at 412px), stayed `loading=lazy` with no `fetchpriority`. Its load delay swung 156–757ms between runs, so the score did too.
+   - **Fix:** when the first section has no image, the next section's lead image (`.default-content-wrapper:first-child > p:first-child > picture img`) gets `loading=eager` + `fetchpriority=high`. Pages that open with a hero, listing or promo box (story, series, model, hubs, home, images, videos) and one-section kits (RS 245) are unchanged.
+   - **Result (local Lighthouse mobile, 4 runs each on the same dev server):** Zellmer press release 88–95 / LCP 2.7–3.5s → 96–98 / LCP 2.1–2.4s. First-glimpse kit (also header-first): 97 / 97 → 96 / 96 (LCP 2.4–2.5 → 2.6–2.7s), within noise.
+
+**PSI SEO (69 everywhere, 61 on three pages) is not a page defect.**
+- **−31 on every page:** `is-crawlable` fails because `*.aem.page` / `*.aem.live` send `x-robots-tag: noindex, nofollow` (and serve the default robots.txt). That's the platform's preview/branch behaviour; it goes away on the production domain. Don't remove it from previews.
+- **−8 on `/en/images` and `/en/videos`:** no meta description. The source pages have none either; adding one is a content (DA metadata) decision.
+- **−8 on the first-glimpse kit:** `link-text`, one link reading "HERE" (moon-power.com). The same as the source.
+
 **Lighthouse A/B (local, medians), score `main` → branch.**
 
 | Page | Mobile | Desktop |
@@ -78,7 +89,7 @@
 1. **Lighthouse ≈ 100:** CLS, the main lever, is fixed. The bar is met locally except the noisy mobile TBT pages and the category LCP (follow-up 1). The 234 Lighthouse JSON reports are kept locally (`.migration/skoda-702/lh/`, not committed) and summarised here. The PR's PSI check decides.
 2. **RUM:** `?rum=on` sends `top`, `enter`, `language`, `viewblock`, `viewmedia`, `loadresource`, `click` and `cwv` beacons to `/.rum/1`, and the RUM enhancer loads from `ot.aem.live` with the `cwv`, `a11y`, `martech` and `form` plugins. Default sampling is 1 in 100. **Field data in the aem.live RUM explorer is not verified** (needs the domain key).
 3. **LCP / CLS:**
-   - **LCP** is the hero, lead or first-card image, `eager` with `fetchpriority=high`.
+   - **LCP** is the hero, lead or first-card image, `eager` with `fetchpriority=high` (the press-release / no-hero press-kit lead image since fix 3).
    - **Image dimensions:** no image shifts in the traces.
    - **CLS** is ≤ 0.007 on every A/B page after the fixes.
 4. **Three phases:**

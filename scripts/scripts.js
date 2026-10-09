@@ -348,6 +348,22 @@ function startListingIndex(main) {
 }
 
 /**
+ * Press releases and no-hero press kits open with a text-only header section (date + title),
+ * so `waitForFirstImage` finds no image there and the lead image, the LCP element at the top
+ * of the next section, stayed lazy and low priority (SKODA-702). Load it eagerly at high
+ * priority. Only that lead position counts: other images further down stay lazy.
+ * @param {Element} main The main element (decorated, template applied)
+ */
+function prioritizeLeadImage(main) {
+  const [first, next] = main.querySelectorAll(':scope > .section');
+  if (!first || !next || first.querySelector('img')) return;
+  const lead = next.querySelector(':scope > .default-content-wrapper:first-child > p:first-child > picture img');
+  if (!lead) return;
+  lead.setAttribute('loading', 'eager');
+  lead.setAttribute('fetchpriority', 'high');
+}
+
+/**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
  */
@@ -359,6 +375,7 @@ async function loadEager(doc) {
     decorateMain(main);
     startListingIndex(main);
     await loadTemplate(main);
+    prioritizeLeadImage(main);
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
   }
