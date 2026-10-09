@@ -190,3 +190,10 @@ Press kits QA observations, FG (this page). Measured origin vs branch at 1440 / 
     - The icons now carry that weight: a 56-unit stroke in a 1080-unit box (link 40 / 1064), with each icon box scaled to keep the 16px em (link 24px). Measured ink at 4×, source vs branch: + 139.0 / 139.1 px², download 100.6 / 99.9, link 102.1 / 99.0, accordion + 57.1 / 55.7 (bars 1.65px).
     - Same in the Media Box tiles (the tile ↓ now uses the source glyph), the images listing (139.0 / 139.1), the carousel and the lightbox.
   - **Show more:** the source's `togglebox-opener`, a strip in the band's colour (the pill plus the 20px gap, 64px) behind the collapsed pill. Row 3 no longer peeks around the pill; on white Images chapters the strip is white.
+- **Round 4 (2026-10-09), PO review:**
+  - **Accordion "+":** now the source glyph `\e027` with its faux-bold weight (`icons/accordion-plus.svg`, a 48-unit stroke) instead of two CSS bars, which the browser snapped to whole pixels. Ink at 4×, source vs branch: closed 45.2 / 45.1 px², open 44.3 / 44.3, bars 1.42 / 1.46px.
+  - **Media Box image tiles:** the + opens the source's size menu instead of adding at once.
+    - "Original" adds or removes the original. While it's in the cart, the row ends in the source's trash glyph (`\e034`, now `icons/media-remove.svg` everywhere) and the image shows the cart overlay. The + itself keeps its plus, as on the source.
+    - "1920px" stays inert: the cart holds originals only (SKODA-505a, D5). On the source it adds the 1920px rendition.
+  - **Both size menus:** the source's geometry. 47px under the button and 2px in; 40px rows of 16/16 text, weight 500, 1px tracking, 12px insets; the centred 75% hairline between rows. Measured: menu 87.2 × 80 on both, 111 with the trash glyph.
+  - PDF / MP4 tiles, the video's + and the sidebar + stay single toggles that swap to the trash glyph when added, as on the source.

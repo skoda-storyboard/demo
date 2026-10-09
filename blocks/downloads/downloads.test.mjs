@@ -122,7 +122,7 @@ test('image sizes remain an accessible two-link menu, and incomplete files do no
   assert.equal(block.querySelector('.downloads-play'), null);
   const toggle = block.querySelector('.downloads-download');
   assert.equal(toggle.getAttribute('aria-expanded'), 'false');
-  assert.equal(block.querySelectorAll('.downloads-size').length, 2);
+  assert.equal(block.querySelectorAll('a.downloads-size').length, 2);
   toggle.click();
   assert.equal(toggle.getAttribute('aria-expanded'), 'true');
   assert.equal(block.querySelectorAll('.downloads-size[aria-label^="Download Front view"]').length, 2);
@@ -419,7 +419,7 @@ test('mediabox API mode still renders configured images without a file tile', as
     await decorate(block);
     assert.equal(block.querySelectorAll('.downloads-item').length, 1);
     assert.equal(block.querySelector('.downloads-file'), null);
-    assert.equal(block.querySelectorAll('.downloads-size').length, 2);
+    assert.equal(block.querySelectorAll('a.downloads-size').length, 2);
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -439,7 +439,7 @@ test('cartSize picks the original, else the first size; cartThumb keeps this sit
   assert.equal(cartThumb(''), '');
 });
 
-test('each tile gets an inert add toggle for its original next to its download control', async () => {
+test('a Media Box image tile adds through the source size menu: Original toggles, 1920px stays inert (#275)', async () => {
   const block = setup();
   addRow(block, {
     src: '/media_1.jpg',
@@ -448,13 +448,41 @@ test('each tile gets an inert add toggle for its original next to its download c
   });
   await decorate(block);
   const actions = block.querySelector('.downloads-actions');
-  const add = actions.querySelector('.downloads-add');
-  assert.equal(actions.firstElementChild, add);
-  assert.ok(actions.querySelector('.downloads-action'));
-  assert.deepEqual([add.type, add.getAttribute('aria-label')], ['button', 'Add to media cart: Front view']);
-  assert.equal(add.dataset.href, 'https://www.skoda-storyboard.com/direct-download/a.jpg');
-  assert.equal(add.dataset.title, 'Front view');
-  assert.match(add.dataset.thumb, /^\/media_1\.jpg/);
+  const toggle = actions.querySelector('.downloads-add-toggle');
+  assert.equal(actions.firstElementChild, toggle.parentElement, 'the + comes before the download control');
+  assert.equal(actions.querySelector('.downloads-add'), null, 'no single add toggle on an image tile');
+  assert.deepEqual([toggle.type, toggle.getAttribute('aria-label'), toggle.getAttribute('aria-haspopup')], ['button', 'Add to media cart: Front view', 'true']);
+  const menu = document.getElementById(toggle.getAttribute('aria-controls'));
+  assert.equal(menu.hidden, true);
+  const rows = [...menu.querySelectorAll('.downloads-add-size')];
+  assert.deepEqual(rows.map((r) => r.textContent), ['1920px', 'Original']);
+  const [giant, original] = rows;
+  assert.equal(original.dataset.href, 'https://www.skoda-storyboard.com/direct-download/a.jpg');
+  assert.equal(original.dataset.title, 'Front view');
+  assert.match(original.dataset.thumb, /^\/media_1\.jpg/);
+  assert.equal(original.getAttribute('aria-label'), 'Add/remove Original version: Front view');
+  assert.equal(giant.dataset.href, undefined, 'the cart holds originals only (D5)');
+  assert.equal(giant.getAttribute('aria-disabled'), 'true');
+  assert.equal(giant.getAttribute('aria-label'), "1920px version can't be added to the media cart");
+  toggle.click();
+  assert.equal(menu.hidden, false);
+  assert.equal(toggle.getAttribute('aria-expanded'), 'true');
+  menu.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  assert.equal(menu.hidden, true);
+  assert.equal(document.activeElement, toggle, 'Escape returns focus to the +');
+});
+
+test('outside a Media Box, and for a single-size tile, the add stays one round toggle (#275)', async () => {
+  const block = setup(false);
+  addRow(block, { src: '/a.jpg', title: 'A', links: [['Original', '/a.jpg'], ['1920px', '/a-1920.jpg']] });
+  await decorate(block);
+  assert.ok(block.querySelector('.downloads-add'));
+  assert.equal(block.querySelector('.downloads-add-toggle'), null);
+  const box = setup();
+  addRow(box, { src: '/b.jpg', title: 'B', links: [['Original', '/b.jpg']] });
+  await decorate(box);
+  assert.ok(box.querySelector('.downloads-add'));
+  assert.equal(box.querySelector('.downloads-add-toggle'), null);
 });
 
 test('Media Box: the group toggle sits on the section stats line', async () => {

@@ -8,7 +8,11 @@
   --accordion-icon-size: 1em;
   --accordion-icon-pad: var(--spacing-xs);
   --accordion-icon-box: calc(var(--accordion-icon-size) + 2 * var(--accordion-icon-pad));
-  --accordion-icon-stroke: 1.65px; /* the source's faux-bold \e027 glyph (1.48px of ink) */
+
+  /* the source's + is its icon font's \e027 at weight 600 (faux bold, no bold face): the glyph
+     in icons/accordion-plus.svg with that stroke, in a 1072-unit box round its 1024 em, so the
+     box overhangs the em by 24 units each side (16.5px of ink, 1.42px bars, #275) */
+  --accordion-icon-bleed: calc(var(--accordion-icon-size) * 24 / 1024);
   --accordion-label-reserve: 1.45em;
   --accordion-line-height: 1.125;
   --accordion-motion: 0.2s ease-in;
@@ -74,11 +78,11 @@
 
 .accordion .accordion-icon::before {
   display: block;
-  width: 100%;
-  height: 100%;
-  background:
-    linear-gradient(currentcolor, currentcolor) center / 100% var(--accordion-icon-stroke) no-repeat,
-    linear-gradient(currentcolor, currentcolor) center / var(--accordion-icon-stroke) 100% no-repeat;
+  width: calc(100% + 2 * var(--accordion-icon-bleed));
+  height: calc(100% + 2 * var(--accordion-icon-bleed));
+  margin: calc(-1 * var(--accordion-icon-bleed));
+  background-color: currentcolor;
+  mask: url("../../icons/accordion-plus.svg") center / contain no-repeat;
   content: '';
 }
 

@@ -32,6 +32,13 @@
   --dl-date-tracking: 0.1em;
   --dl-date-inset: 18px;
 
+  /* the size menus (#275): under the control's 2px ring, 45px down; rows tracked 1px, with a
+     hairline (the source's 20% #f2f2f2) between them */
+  --dl-ring: 2px;
+  --dl-menu-offset: 45px;
+  --dl-menu-tracking: 1px;
+  --dl-menu-divider: rgb(242 242 242 / 20%);
+
   /* Media Box file tile (#275): the source's 30% black holder, its 48px PDF glyph and the
      play ring over a clip */
   --dl-file-backdrop: rgb(0 0 0 / 30%);
@@ -220,12 +227,14 @@
   outline-offset: 2px;
 }
 
-/* size menu: absolute dropdown of direct-download links (Original / 1920px).
-   Sizes to its content (≈87px live), not a fixed min-width. */
+/* size menu: the absolute dropdown under a round control, the download links or a Media Box
+   tile's add rows (Original / 1920px). Sizes to its content (87px at the source, 111 with a
+   row's trash glyph). The source places it inside the control's 2px ring: 45px down, so 47px
+   and 2px from the button's outer edge (re-measured #275). */
 .downloads .downloads-sizes {
   position: absolute;
-  top: 45px; /* measured live (downloads.md §3); not 40px + spacing-xs = 48px */
-  left: 0;
+  top: calc(var(--dl-menu-offset) + var(--dl-ring));
+  left: var(--dl-ring);
   z-index: 15;
   width: max-content;
   margin: 0;
@@ -244,13 +253,58 @@
   margin: 0;
 }
 
-/* the menu is white on every band: its links keep the ink over the dark band's white links
-   (main .section.dark a), as the source's #161718 (#275) */
+/* The rows: the source's 40px rows of 16/16 text, weight 500 and 1px tracking, 12px insets,
+   a centred 75% hairline above every row but the first. The menu is white on every band: its
+   rows keep the ink over the dark band's white links (main .section.dark a), the source's
+   #161718 (#275). */
 .downloads .downloads-sizes .downloads-size {
-  display: block;
-  padding: var(--spacing-xs) var(--spacing-s);
+  position: relative;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+  margin: 0;
+  border: 0;
+  padding: var(--spacing-s);
+  background: var(--skoda-white);
   color: var(--text-color);
+  font: inherit;
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--dl-menu-tracking);
+  line-height: 1;
+  text-align: start;
   text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.downloads .downloads-sizes li + li .downloads-size::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 75%;
+  border-bottom: 1px solid var(--dl-menu-divider);
+  transform: translateX(-50%);
+}
+
+/* a size the cart can't hold (the 1920px add row, D5) */
+.downloads .downloads-sizes .downloads-add-size[aria-disabled="true"] {
+  cursor: default;
+}
+
+/* an add row whose file is in the cart ends in the source's trash glyph (\e034) */
+.downloads .downloads-sizes .downloads-add-size[data-in-cart]::after {
+  content: "";
+  flex: none;
+  width: calc(16px * 1080 / 1024);
+  height: calc(16px * 1080 / 1024);
+
+  /* the glyph box takes the em's 16px in the row, as the source's */
+  margin: calc((16px - 16px * 1080 / 1024) / 2);
+  background-color: currentcolor;
+  mask: url("../../icons/media-remove.svg") center / contain no-repeat;
 }
 
 .downloads .downloads-sizes .downloads-size:hover,
@@ -393,6 +447,7 @@
 }
 
 .downloads .downloads-add,
+.downloads .downloads-add-toggle,
 .downloads-stats .downloads-add-all {
   --dl-add-icon: url("../../icons/media-cart-add.svg");
 
@@ -412,6 +467,7 @@
 }
 
 .downloads .downloads-add::before,
+.downloads .downloads-add-toggle::before,
 .downloads-stats .downloads-add-all::before {
   content: "";
 
@@ -429,12 +485,17 @@
 
 .downloads .downloads-add:hover,
 .downloads .downloads-add:focus-visible,
+.downloads .downloads-add-toggle:hover,
+.downloads .downloads-add-toggle:focus-visible,
+.downloads .downloads-add-toggle[aria-expanded="true"],
+.downloads .downloads-download[aria-expanded="true"],
 .downloads-stats .downloads-add-all:hover,
 .downloads-stats .downloads-add-all:focus-visible {
   background: var(--dropdown-hover-bg);
 }
 
 .downloads .downloads-add:focus-visible,
+.downloads .downloads-add-toggle:focus-visible,
 .downloads-stats .downloads-add-all:focus-visible {
   outline: 2px solid var(--skoda-ink);
   outline-offset: 2px;
@@ -442,6 +503,7 @@
 
 /* on the dark Media Box band the focus ring is white */
 .downloads.downloads-media-box .downloads-add:focus-visible,
+.downloads.downloads-media-box .downloads-add-toggle:focus-visible,
 .downloads-stats .downloads-add-all:focus-visible {
   outline-color: var(--skoda-white);
 }
@@ -472,13 +534,13 @@
   transition: opacity var(--cart-added-motion), background-size var(--cart-added-motion);
 }
 
-.downloads .downloads-figure:has(.downloads-add[data-in-cart]) .downloads-thumb::before,
-.downloads .downloads-figure:has(.downloads-add[data-in-cart]) .downloads-file::before {
+.downloads .downloads-figure:has(:is(.downloads-add, .downloads-add-size)[data-in-cart]) .downloads-thumb::before,
+.downloads .downloads-figure:has(:is(.downloads-add, .downloads-add-size)[data-in-cart]) .downloads-file::before {
   background-size: var(--cart-added-glyph);
   opacity: 1;
 }
 
-.downloads .downloads-figure:has(.downloads-add[data-in-cart]) .downloads-play {
+.downloads .downloads-figure:has(:is(.downloads-add, .downloads-add-size)[data-in-cart]) .downloads-play {
   visibility: hidden;
 }
 

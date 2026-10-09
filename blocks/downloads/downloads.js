@@ -50,6 +50,9 @@ const LABELS = {
   // aria-label for a tile's add-to-cart toggle and the Media Box group toggle (until the
   // cart's placeholders labels replace it)
   add: (title) => (title ? `Add to media cart: ${title}` : 'Add to media cart'),
+  // a Media Box tile's add menu rows (the source's link titles)
+  addSize: (size, title) => `Add/remove ${size} version${title ? `: ${title}` : ''}`,
+  sizeUnavailable: (size) => `${size} version can't be added to the media cart`,
   addAll: 'Add all files to the media cart',
   // the gallery group pills (visible text = the size, as on the source)
   groupSize: (size) => size,
@@ -201,6 +204,29 @@ let disclosureSeq = 0;
 const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]';
 
 /**
+ * Opens and closes a tile's size menu from its toggle: click toggles it, Escape closes it
+ * (from the menu, focus goes back to the toggle), a click outside the control closes it.
+ * @param {HTMLElement} wrap the control (toggle + menu)
+ * @param {HTMLButtonElement} toggle
+ * @param {HTMLUListElement} menu
+ */
+function wireMenu(wrap, toggle, menu) {
+  const setOpen = (on) => {
+    menu.hidden = !on;
+    toggle.setAttribute('aria-expanded', on ? 'true' : 'false');
+  };
+  toggle.addEventListener('click', () => setOpen(menu.hidden));
+  toggle.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+  menu.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { setOpen(false); toggle.focus(); }
+  });
+  document.addEventListener('click', (e) => {
+    if (!wrap.contains(e.target)) setOpen(false);
+  });
+  wrap.append(toggle, menu);
+}
+
+/**
  * Build the round download control for a tile. With one size it is a single
  * download <a>; with several it is a toggle button revealing a size menu, each
  * row a direct-download <a> (no server round-trip, no signed URL).
@@ -256,21 +282,7 @@ function buildDownload(asset) {
     menu.append(li);
   });
 
-  const setOpen = (on) => {
-    menu.hidden = !on;
-    toggle.setAttribute('aria-expanded', on ? 'true' : 'false');
-  };
-  toggle.addEventListener('click', () => setOpen(menu.hidden));
-  // close on outside click / Escape
-  toggle.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
-  menu.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { setOpen(false); toggle.focus(); }
-  });
-  document.addEventListener('click', (e) => {
-    if (!wrap.contains(e.target)) setOpen(false);
-  });
-
-  wrap.append(toggle, menu);
+  wireMenu(wrap, toggle, menu);
   return wrap;
 }
 
@@ -308,6 +320,57 @@ function buildAdd(asset) {
   const thumb = cartThumb(asset.src);
   if (thumb) btn.dataset.thumb = thumb;
   return btn;
+}
+
+/**
+ * A Media Box image tile's add control, as the source's (#275): a round + opening the tile's
+ * size menu. "Original" toggles the original in the media cart (the menu row shows the source's
+ * trash glyph while it is in, the + keeps its plus); the other sizes stay inert, as the cart
+ * holds originals only (SKODA-505a, D5). Bound by bindCart with the tiles' single toggles.
+ * @param {{title: string, alt?: string, src?: string, sizes: Array<{label,href}>}} asset
+ * @returns {HTMLDivElement}
+ */
+function buildAddMenu(asset) {
+  const title = asset.title || asset.alt || '';
+  const original = cartSize(asset.sizes);
+  menuSeq += 1;
+  const wrap = document.createElement('div');
+  wrap.className = 'downloads-action downloads-add-action';
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'downloads-add-toggle';
+  toggle.setAttribute('aria-label', LABELS.add(title));
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.setAttribute('aria-haspopup', 'true');
+  const menu = document.createElement('ul');
+  menu.className = 'downloads-sizes';
+  menu.id = `downloads-sizes-${menuSeq}`;
+  menu.setAttribute('role', 'menu');
+  menu.hidden = true;
+  toggle.setAttribute('aria-controls', menu.id);
+  asset.sizes.forEach(({ label, href }) => {
+    const li = document.createElement('li');
+    li.setAttribute('role', 'none');
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'downloads-size downloads-add-size';
+    row.setAttribute('role', 'menuitem');
+    row.setAttribute('aria-disabled', 'true');
+    row.textContent = label;
+    if (href === original?.href) {
+      row.setAttribute('aria-label', LABELS.addSize(label, title));
+      row.dataset.href = href;
+      if (title) row.dataset.title = title;
+      const thumb = cartThumb(asset.src);
+      if (thumb) row.dataset.thumb = thumb;
+    } else {
+      row.setAttribute('aria-label', LABELS.sizeUnavailable(label));
+    }
+    li.append(row);
+    menu.append(li);
+  });
+  wireMenu(wrap, toggle, menu);
+  return wrap;
 }
 
 /**
@@ -381,7 +444,8 @@ export async function bindCart(block, addAll, load = () => Promise.all([
   import('../../scripts/media-cart-ui.js'),
   import('../../scripts/placeholders.js'),
 ])) {
-  const tiles = [...block.querySelectorAll('.downloads-add:not(.downloads-add-all)')];
+  // each tile's cart control: its round toggle, or the "Original" row of its add menu
+  const tiles = [...block.querySelectorAll('.downloads-add:not(.downloads-add-all), .downloads-add-size[data-href]')];
   if (!tiles.length) return;
   const [cart, ui, { fetchPlaceholders }] = await load();
   tiles.forEach((btn) => cart.bindCartControl(btn));
@@ -550,7 +614,9 @@ function buildTile(asset, { mediaBox = false } = {}) {
     // add to cart, then download (source order); the size menu stays anchored to its toggle
     const actions = document.createElement('div');
     actions.className = 'downloads-actions';
-    actions.append(buildAdd(asset), action);
+    const sizeMenu = mediaBox && asset.src && asset.sizes.length > 1;
+    const add = sizeMenu ? buildAddMenu(asset) : buildAdd(asset);
+    actions.append(add, action);
     figure.append(actions);
   }
 
@@ -600,7 +666,7 @@ export default async function decorate(block) {
   });
 
   block.replaceChildren(list);
-  const addAll = (mediaBox || gallery) && list.querySelector('.downloads-add')
+  const addAll = (mediaBox || gallery) && list.querySelector('.downloads-add, .downloads-add-size[data-href]')
     ? buildAddAll(block, gallery) : null;
   bindCart(block, addAll).catch((e) => {
     // eslint-disable-next-line no-console
