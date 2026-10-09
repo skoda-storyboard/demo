@@ -135,9 +135,11 @@
   flex: 0 0 var(--columns-callout-cell);
 }
 
-/* the source's text cell keeps its 8px table-cell padding: a two-line callout is 64px tall */
+/* the source's text cell keeps its table-cell padding: 8px above and below (a two-line callout
+   is 64px tall) and 24px at the end, which sets where the text wraps (#275, 390px) */
 .columns.callout > div > div:last-child {
   padding-block: var(--spacing-xs);
+  padding-inline-end: var(--spacing-l);
 }
 
 /* ==========================================================================

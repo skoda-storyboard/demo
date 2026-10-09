@@ -126,3 +126,5 @@ Press kits QA observations, HUB (Peaq hub). Measured origin vs branch at 1440 / 
   - The Superb and RS Experience hubs' tile areas are shorter than the source (Superb banner at y1640 vs 1984 at 1440).
   - The RS Experience lone square banner sits in column 1, the source in column 2 (x418).
   - Lighthouse (hub, branch = main): accessibility 92 (footer contrast / colour-only consent link, as the source; redundant tile alts), SEO 69 (`noindex` on aem hosts only).
+- **Round 2 (2026-10-09):** text and box sweep at 1440 / 1080 / 992 / 768 / 390. Tiles, banners, footer top, footer height and page height equal the source. The footer titles are 20/25 up to 768 on press-kit pages, as the source (other templates keep 26px). Newsletter weights are 500.
+  - Deviation (deliberate): at exactly 768 the source's hero caption hangs 16px below the image, so the bottom of its white perex sits on the white page. That isn't copied; the tiles still sit where the source's do.

@@ -71,7 +71,7 @@
   background-color: var(--skoda-green-emerald);
   color: var(--skoda-ink);
   font-size: var(--body-font-size-m);
-  font-weight: var(--weight-regular);
+  font-weight: var(--weight-medium); /* the source's 500 (#275); no 500 face on either site, so it renders as 400 */
   letter-spacing: 1px;
   line-height: var(--line-height-body);
   white-space: nowrap;
@@ -133,14 +133,14 @@
   padding-inline: calc(var(--checkbox-size) + var(--checkbox-label-gap)) 5px;
   color: var(--consent-color);
   font-size: var(--body-font-size-s);
-  font-weight: var(--weight-regular);
+  font-weight: var(--weight-medium);
   line-height: var(--footer-small-line-height);
   cursor: pointer;
 }
 
 .newsletter-stub .newsletter-stub-consent a {
   color: var(--skoda-green-emerald);
-  font-weight: var(--weight-regular);
+  font-weight: var(--weight-medium);
 }
 
 .newsletter-stub .newsletter-stub-manage {
@@ -303,7 +303,7 @@
   min-height: 0;
   margin: 0 0 14px;
   padding: 14px var(--spacing-l);
-  font-weight: var(--weight-medium); /* the widget's "Subscribe now!" is 500 (footer: 400) */
+  font-weight: var(--weight-medium); /* the widget's "Subscribe now!" is 500, as the footer's Submit */
   line-height: 1;
 }
 

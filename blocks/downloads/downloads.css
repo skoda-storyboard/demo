@@ -42,7 +42,10 @@
   --dl-cols: 1;
 
   display: grid;
-  grid-template-columns: repeat(var(--dl-cols), 1fr);
+
+  /* minmax(0, …): a long unbroken title (a file name) must not widen its column; at 768 the
+     three Media Box columns overflowed the page (285 / 258 / 290px instead of 3 × 236, #275) */
+  grid-template-columns: repeat(var(--dl-cols), minmax(0, 1fr));
   gap: var(--spacing-m);
   margin: 0;
   padding: 0;
@@ -170,6 +173,7 @@
 
 /* --- title -------------------------------------------------------------- */
 .downloads .downloads-title {
+  overflow-wrap: break-word; /* as the source's tile titles: a file name breaks inside its tile */
   color: var(--text-color);
   font-size: var(--body-font-size-s);
   line-height: 1.3;
@@ -332,9 +336,10 @@
   gap: 0;
 }
 
+/* the source's Media Box thumbnails have 8px corners (releases and kits, re-measured #275) */
 .downloads.downloads-media-box .downloads-thumb {
   box-sizing: border-box;
-  border-radius: 0;
+  border-radius: var(--card-radius);
 }
 
 .downloads.downloads-media-box .downloads-title {

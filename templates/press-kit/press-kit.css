@@ -36,6 +36,9 @@ body.press-kit {
 
   /* article (#275), measured on the source's first-glimpse at 1440 */
   --pk-link-color: var(--skoda-green-accent); /* .entry-content a */
+  --pk-side-link-color: var(--pr-menu-link-color);
+  --pk-tag-gap: 5px;
+  --pk-tag-space: 3.8px; /* below 768 the source's chips are centred inline-blocks: a word space apart */
   --pk-action-size: 40px; /* the round cart / download / link controls */
   --pk-action-icon: 16px;
   --pk-side-chevron-size: 16px; /* the source icon-font chevron (\e009), 10px in from the row end */
@@ -155,6 +158,7 @@ body.press-kit .press-kit-header p {
   color: var(--pr-date-color);
   font-size: var(--pk-date-size);
   font-weight: var(--weight-semibold);
+  letter-spacing: 0.1em; /* the source's 1.1px (#275) */
   line-height: 1;
 }
 
@@ -251,12 +255,20 @@ body.press-kit .section.sidebar h3 {
   line-height: var(--pk-side-line);
 }
 
+/* tag chips: each keeps the source's 5px end margin, the last in a row too, so rows break
+   where the source's do (a 5px gap alone let one more chip fit, #275) */
 body.press-kit .section.sidebar .tags-list {
-  row-gap: 0;
+  gap: 0;
 }
 
 body.press-kit .section.sidebar .tags-list > li {
-  margin: 0;
+  margin: 0 var(--pk-tag-gap) 0 0;
+}
+
+@media (width < 768px) {
+  body.press-kit .section.sidebar .tags-list {
+    column-gap: var(--pk-tag-space);
+  }
 }
 
 body.press-kit .section.sidebar .default-content-wrapper > ul {
@@ -274,7 +286,7 @@ body.press-kit .section.sidebar .default-content-wrapper > ul a {
   position: relative;
   display: block;
   padding: var(--spacing-xs) 0;
-  color: var(--skoda-grey-800);
+  color: var(--pk-side-link-color);
   line-height: var(--pk-side-line);
   text-decoration: none;
 }
@@ -301,7 +313,7 @@ body.press-kit .section.sidebar .press-kit-media-box-row {
 
 body.press-kit .section.sidebar .press-kit-media-box-row > span {
   padding: var(--spacing-xs) 0;
-  color: var(--skoda-grey-800);
+  color: var(--pk-side-link-color);
   line-height: var(--pk-side-line);
 }
 
@@ -587,7 +599,17 @@ body.press-kit .section.body-column .columns.callout {
   }
 }
 
-@media (width >= 992px) {
+/* The press-kit footer's widget titles are 20/25 up to 768 on the source (the kit template's
+   type; other templates keep 26px, #275). The 1em margin under them follows the size. */
+@media (width <= 768px) {
+  body.press-kit footer .footer-widgets :is(h2, h3) {
+    font-size: var(--heading-font-size-story-h3-mobile);
+  }
+}
+
+/* the source's sidebar takes its 64px inset from 1080 (#275: up to 1079 it is 10px, and the tag
+   rows and menu are 54px wider there) */
+@media (width >= 1080px) {
   body.press-kit main > .section.sidebar > div {
     padding-inline-start: var(--pk-sidebar-inset);
   }

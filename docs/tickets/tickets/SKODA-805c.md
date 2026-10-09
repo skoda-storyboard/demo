@@ -171,3 +171,16 @@ Press kits QA observations, FG (this page). Measured origin vs branch at 1440 / 
   - At 768 the Media Box tiles are 285×316 against the source's 236×286 (main as well).
   - At 768 the page sits 24px above the source from the top (main as well).
   - The source's Media Box thumbnails now have 8px corners (`downloads.md` measured 0).
+- **Round 2 (2026-10-09), full text and box sweep against the source at 1440 / 1080 / 992 / 768 / 390.**
+  - Every text element (size, weight, line height, colour, tracking, position) and box (lead, video, callout, tags, Media Box tiles, footer) now equals the source, apart from the deviations below. Footer top, footer height and page height are equal at 1440 / 768 / 390.
+  - Fixed in this round:
+    - the header date's 1.1px tracking;
+    - the sidebar rows `#363636`;
+    - the sidebar's 64px inset only from 1080, the source's switch (it was 992, so the menu and tags were 54px narrower at 992–1079);
+    - tag chips with the source's 5px end margin, a word space apart when centred below 768, so they wrap where the source's do;
+    - the Media Box grid no longer widened by a long file name (at 768 the three columns were 285 / 258 / 290px and overflowed; now 3 × 236);
+    - Media Box thumbnails with the source's 8px corners;
+    - the WhatsApp callout text keeps its 24px end padding (it wrapped differently at 390);
+    - the newsletter Submit / consent text at the source's weight 500 (neither site has a 500 face, so it renders as 400);
+    - the press-kit footer titles at 20/25 up to 768.
+  - Deviation, confirmed: the source's empty paragraph after item 1's images (44px) can't be carried. A `<p>&nbsp;</p>` pushed to DA is dropped by the preview pipeline (tested on a draft, since removed).
