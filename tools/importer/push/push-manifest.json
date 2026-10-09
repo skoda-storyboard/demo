@@ -1,6 +1,41 @@
 {
   "version": 1,
   "pages": {
+    "/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund": {
+      "hash": "33ea164a6ffff0ecfd156091d90985e863c853cb5c51701f2d1e07210f59992b",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "33ea164a6ffff0ecfd156091d90985e863c853cb5c51701f2d1e07210f59992b"
+    },
+    "/cs/footer": {
+      "hash": "a08c6a2294044491e18212598a32c1f88166b1e47b3240a3062ccfb3df749004",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "a08c6a2294044491e18212598a32c1f88166b1e47b3240a3062ccfb3df749004"
+    },
+    "/cs/nav": {
+      "hash": "2dd490f96badf3c95169a4b901a51d14d790d24fde63b87380ae5de833097edf",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "2dd490f96badf3c95169a4b901a51d14d790d24fde63b87380ae5de833097edf"
+    },
+    "/cs/nav-newsletter": {
+      "hash": "e3e4bf09b22dec3e79f0c95a3cfb459796eb9137706e425d5b1ff875404a4b13",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "e3e4bf09b22dec3e79f0c95a3cfb459796eb9137706e425d5b1ff875404a4b13"
+    },
+    "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds": {
+      "hash": "43dab62e10a7e4e1655004e194e594c2a0ab91d200d820f0a1e75f63938f30f4",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "43dab62e10a7e4e1655004e194e594c2a0ab91d200d820f0a1e75f63938f30f4"
+    },
+    "/de/nav": {
+      "hash": "7c1e014900b2b99ae9bbe7df73fb1d00b45bd827cd31a5b7d878bb08f8bc299e",
+      "pushedAt": "2026-10-08T10:57:31.472Z",
+      "previewedHash": "7c1e014900b2b99ae9bbe7df73fb1d00b45bd827cd31a5b7d878bb08f8bc299e"
+    },
+    "/de/nav-newsletter": {
+      "hash": "e879cf9ae3dd44b5807e64af0239f598998660a2eafdba492d600031b8c96818",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "e879cf9ae3dd44b5807e64af0239f598998660a2eafdba492d600031b8c96818"
+    },
     "/en": {
       "hash": "3d2e68160fca7228da14646002a8c24e80789041e6a7cca4977b27c487992120",
       "pushedAt": "2026-10-01T10:51:44.794Z",
@@ -1302,6 +1337,36 @@
       "hash": "9be605a50d052fa90c8975e14242c75b2e47f00b271b59660567723536056bbc",
       "pushedAt": "2026-09-26T06:56:28.280Z",
       "adopted": true
+    },
+    "/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund": {
+      "hash": "a5c428c7c0655c86071bfeca244838a4a4b14e1b8922691bd9cab413193c0698",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "a5c428c7c0655c86071bfeca244838a4a4b14e1b8922691bd9cab413193c0698"
+    },
+    "/sk/nav": {
+      "hash": "55eea3e17c9a2d16f8c432ffdfe44aa7f59c5b11155a1bc0c4f03fa70ee384cd",
+      "pushedAt": "2026-10-08T10:57:31.472Z",
+      "previewedHash": "55eea3e17c9a2d16f8c432ffdfe44aa7f59c5b11155a1bc0c4f03fa70ee384cd"
+    },
+    "/sk/nav-newsletter": {
+      "hash": "105521d4e50af9eab107723c2b2fe9f6caf7ee402f2d4023e8aab7d4363643b4",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "105521d4e50af9eab107723c2b2fe9f6caf7ee402f2d4023e8aab7d4363643b4"
+    },
+    "/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds": {
+      "hash": "8b5ef0374288f31833852fb9d473ed66a252afa42e4f86f62b6b93d680f2a507",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "8b5ef0374288f31833852fb9d473ed66a252afa42e4f86f62b6b93d680f2a507"
+    },
+    "/sr/nav": {
+      "hash": "ca6499c196c493ad8499ad2ad42c1d74ec853dec385f74610869ead22bcf0523",
+      "pushedAt": "2026-10-08T10:57:31.472Z",
+      "previewedHash": "ca6499c196c493ad8499ad2ad42c1d74ec853dec385f74610869ead22bcf0523"
+    },
+    "/sr/nav-newsletter": {
+      "hash": "87639631bc04aecac80cdc7033f9e8935d5c5f7c9c7c7cac800911a4c9033fa1",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "87639631bc04aecac80cdc7033f9e8935d5c5f7c9c7c7cac800911a4c9033fa1"
     }
   }
 }

@@ -86,7 +86,7 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
   - the drawer is `min-width: min(375px, 100%)`, so it no longer runs 55px off a 320px screen and cuts off the locale row.
 - **Result:** the switcher's values are identical to live at every width, and both visual diffs are 0% at the same
   absolute position.
-- **Review follow-up:** switching language keeps the page path, as live. Each locale links the current path with only
+- **Review follow-up (superseded by SKODA-303a, below):** switching language keeps the page path, as live. Each locale links the current path with only
   the locale segment swapped (`/en/emobility/x` → `/cs/emobility/x`); an authored external link still wins, and pages
   outside a locale tree use the authored target. The live site also translates the category and slug segments
   (`/cs/e-mobilita-cs/…`); EDS keeps them as they are, so a translated tree has to mirror the EN paths for these
@@ -100,6 +100,34 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
   On the Media Room, DE links `https://www.skoda-media.de/`. The pilot links the locale homes.
 - **`/en/` is a 404 on EDS** (the home is `/en`), and so is the authored Stories tab link `/en/` in `/nav` (SKODA-301 / 308).
   When the locale trees are migrated, check that `/cs/` … resolve, or author them as `/cs` …
+
+**SKODA-303a follow-up (#243, decided 2026-10-08, branch `skoda-303a-locale-links`):**
+- **Conflict:** SKODA-609's link pass already sent the locale links to the live site in a new tab, so the "keep the
+  page path" rule above never applied on `main`, and `header-locales.test.mjs` failed.
+- **Rule (Lars on #243, adopted by the PO; supersedes the first "live locale home" pass):** the switcher is generated
+  from the page's **hreflang alternates** (`alternates` metadata). Each locale links its declared translated URL;
+  nothing is inferred from the locale prefix (`localizedPath` removed); locales without a translation are omitted;
+  `x-default` is ignored; the current locale is plain text; desktop and the drawer share one list; there is no
+  locale-home fallback. Links open in the same tab, as the source. Media Room DE keeps the visible source behaviour
+  (`skoda-media.de`, new tab) through the nav row's authored link.
+- **PO, 2026-10-08: the switch never navigates to the live site.** Only translations migrated to EDS are linked
+  (Lars's caveat: hreflang proves availability on the source, not on EDS). For M1 one page family is migrated: the
+  Epiq story in EN + CS / DE / SK / SR (live has no SL). Every other page shows only its own language.
+- **Code:** `header-locales.js` (`parseAlternates`, `permittedTranslation`: same-site pages in their own locale
+  tree only), the list is marked `data-link-policy="resolved"`, and `scripts/links.js` leaves such links alone;
+  `scripts.js` sets `<html lang>` from the locale tree. The importer doesn't write `alternates` (it can't know what
+  is migrated): `tools/importer/build-locale-alternates.mjs` derives them from the source hreflang for the pairs on
+  EDS and writes `URL` + `alternates` rows into the bulk `/metadata` sheet (plus `/{locale}/**` → `/{locale}/nav`,
+  `/{locale}/footer` with `--chrome`).
+- **Content (DA preview, 2026-10-08):** the 4 translated stories (story importer, `urls-story-detail-locales.txt`;
+  metadata + block gates pass, images on the media bus) and the translated chrome per locale (`/{locale}/nav`,
+  `/{locale}/nav-newsletter`, `/{locale}/footer`, `import-locale-*.js`, `urls-locale-chrome.txt`). The DE / SK / SR
+  pages keep the English `/footer` (PO, M1): their source footer links the cookie-policy PDF on
+  `assets.cookies.skoda-auto.com`, which the binary gate holds (not in DAM).
+  `/media-room/nav` was published (it still had the locale homes and `/de/`).
+- **Known gaps:** the Subscribe panel's thank-you text stays English (no source text, the source shows its ESP
+  response); the header's search scope labels are English strings (SKODA-1003); the app badges keep the English
+  artwork; the translated menus' targets aren't migrated, so the link policy sends them to the live site.
 
 ## Dependencies
 - Upstream: SKODA-301 (Header + nav fragment) / Downstream: SKODA-1003 (language-negotiated root routing + per-locale placeholders)

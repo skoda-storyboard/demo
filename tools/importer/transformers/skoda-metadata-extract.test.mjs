@@ -16,8 +16,9 @@ import { fileURLToPath } from 'node:url';
 import {
   pickDate, normalizeDate, templateFromBodyClass, categoryFromUrl,
   parseTagHref, groupTags, splitList, buildMetaFields, facetFromBodyClass, FACETS,
-  SITE_SUFFIX, cleanTitle, pickTemplate, facetsFromPostClass,
+  SITE_SUFFIX, cleanTitle, pickTemplate, facetsFromPostClass, pickAlternates, ALTERNATE_LOCALES,
 } from './skoda-metadata-extract.mjs';
+import { LOCALES } from '../../../blocks/header/header-locales.js';
 
 test('pickTemplate: a fixed override wins, then the CPT signal, then the importer default', () => {
   const pressKit = 'single single-press_kit postid-368313 media-room';
@@ -222,4 +223,49 @@ test('the transformer + runtime mirrors use the same SITE_SUFFIX rule', () => {
     const src = readFileSync(f, 'utf8');
     assert.ok(src.includes(`SITE_SUFFIX = ${SITE_SUFFIX.toString()};`), `${path.basename(f)} must declare SITE_SUFFIX = ${SITE_SUFFIX}`);
   });
+});
+
+// --- SKODA-303a: the page's hreflang translations → `alternates` ----------------------------
+const LIVE = 'https://www.skoda-storyboard.com';
+const EPIQ = `${LIVE}/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`;
+
+test('pickAlternates: the source hreflang set, own locale + x-default dropped, switcher order', () => {
+  // the Epiq story's head, in source order (no SL translation)
+  const links = [
+    ['cs', `${LIVE}/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/`],
+    ['sk', `${LIVE}/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund/`],
+    ['en', EPIQ],
+    ['de', `${LIVE}/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`],
+    ['sr', `${LIVE}/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`],
+  ];
+  assert.equal(pickAlternates(links, EPIQ), [
+    `cs: ${LIVE}/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/`,
+    `de: ${LIVE}/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`,
+    `sk: ${LIVE}/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund/`,
+    `sr: ${LIVE}/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`,
+  ].join(', '));
+  // the home: x-default dropped
+  assert.equal(pickAlternates([['cs', `${LIVE}/cs/`], ['en', `${LIVE}/en/`], ['x-default', `${LIVE}/`]], `${LIVE}/en/`), `cs: ${LIVE}/cs/`);
+});
+
+test('pickAlternates: unsupported, malformed, off-tree and repeated alternates are dropped', () => {
+  const links = [
+    ['fr', `${LIVE}/fr/x/`],
+    ['de-AT', `${LIVE}/de/at/`],
+    ['de', `${LIVE}/de/second/`],
+    ['sk', 'javascript:alert(1)'], // eslint-disable-line no-script-url
+    ['sr', 'not a url'],
+    ['sl', `${LIVE}/en/wrong-tree/`],
+    ['', `${LIVE}/cs/x/`],
+    [null, null],
+  ];
+  assert.equal(pickAlternates(links, EPIQ), `de: ${LIVE}/de/at/`);
+  assert.equal(pickAlternates([], EPIQ), '');
+  assert.equal(pickAlternates(undefined, ''), '');
+  // a page with no locale segment keeps every locale's translation
+  assert.equal(pickAlternates([['en', `${LIVE}/en/x/`]], 'not a url'), `en: ${LIVE}/en/x/`);
+});
+
+test('pickAlternates uses the locale list of the header switcher', () => {
+  assert.deepEqual(LOCALES.map((l) => l.code), ALTERNATE_LOCALES);
 });

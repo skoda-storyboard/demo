@@ -1,3 +1,4 @@
+/* global globalThis */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { policyHref, opensInSameTab, LIVE_ORIGIN } from './links.js';
@@ -93,4 +94,23 @@ test('the en locale and look-alike paths are not caught by the locale rule', () 
   ['/en', '/en/tag/model/elroq', '/nav', '/footer', '/media-room/nav'].forEach((href) => {
     assert.equal(policyHref(href, PAGE), null, href);
   });
+});
+
+test('links inside [data-link-policy="resolved"] keep the target and tab their block chose (SKODA-303a)', async () => {
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  const { JSDOM } = await import('jsdom');
+  const { window } = new JSDOM(`<main>
+    <ul data-link-policy="resolved"><li><a id="kept" href="${LIVE_ORIGIN}/cs/e-mobilita-cs/x/">CZ</a></li></ul>
+    <p><a id="policed" href="${LIVE_ORIGIN}/cs/e-mobilita-cs/x/">CZ</a></p></main>`, { url: PAGE });
+  const { decorateLinks } = await import('./links.js');
+  globalThis.window = window;
+  try {
+    decorateLinks(window.document.querySelector('main'));
+  } finally {
+    delete globalThis.window;
+  }
+  const kept = window.document.getElementById('kept');
+  const policed = window.document.getElementById('policed');
+  assert.deepEqual([kept.getAttribute('target'), kept.getAttribute('rel')], [null, null]);
+  assert.equal(policed.getAttribute('target'), '_blank', 'other live links keep the policy');
 });

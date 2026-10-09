@@ -4,14 +4,27 @@
  *
  * Authored in the nav fragment's topbar row as one paragraph, the current locale bold and the
  * rest as links:  **EN** [CZ](/cs/) [DE](/de/) [SK](/sk/) [SR](/sr/) [SL](/sl/)
- * The authored bold only marks a locale; the current one is taken from the page URL, so one
- * fragment serves every locale tree. Source order is kept (the live list is always
- * EN CZ DE SK SR SL; the current locale doesn't move). Each link gets `hreflang` / `lang` and
- * the language's own name as its accessible name; the visible text stays the code.
+ * The row names the site's locales and their order (the live list is always EN CZ DE SK SR SL;
+ * the current locale doesn't move); the current one is taken from the page URL, so one
+ * fragment serves every locale tree. Each link gets `hreflang` / `lang` and the language's own
+ * name as its accessible name; the visible text stays the code.
+ *
+ * Targets (SKODA-303a): the page's declared translations, the `alternates` metadata built
+ * from the source page's `<link rel="alternate" hreflang>` (x-default dropped) for the pairs
+ * migrated to EDS (tools/importer/build-locale-alternates.mjs). A locale without one is
+ * omitted: no prefix swap, no locale-home fallback, never a live-site URL. A translation must
+ * be a page of this site in its own locale's tree; it opens in the same tab, as on the source.
+ * Only an authored link to another site replaces a declared translation, in a new tab (the
+ * Media Room DE → skoda-media.de, as on the source). The list is marked
+ * `data-link-policy="resolved"` so the site's link pass (scripts/links.js) leaves it alone.
  *
  * i18n: the list's name lives in LABELS (English, the header's other control text is too;
  * per-locale placeholders are SKODA-1003). The language names are endonyms, locale-neutral.
  */
+
+import { LIVE_ORIGIN } from '../../scripts/links.js';
+
+const LIVE_HOST = new URL(LIVE_ORIGIN).host;
 
 const LABELS = {
   list: 'Language',
@@ -90,81 +103,86 @@ export function isLocaleGroup(p, base) {
 }
 
 /**
- * The target of a locale authored without a link (the bold one): the URL pattern of its
- * siblings with the locale segment swapped (`/cs/media-room` → `/en/media-room`, `/cs` → `/en`),
- * as the source links every locale in the same form. Only site paths are used as the
- * pattern; with none, the locale home `/{code}` (EDS serves the home without a trailing slash).
- * @param {string} code the locale to link
- * @param {Array<{code: string, href: string|null}>} entries the authored entries
- * @returns {string}
+ * The page's declared translations: the `alternates` metadata, `cs: https://…/, de: https://…/`
+ * (one `code: URL` pair per locale, comma-separated). A region subtag is dropped (`de-AT` → de);
+ * unknown codes, `x-default`, malformed pairs and repeats (the first wins) are ignored.
+ * @param {string|null} value the metadata value
+ * @returns {Map<string, string>} locale code → URL as declared
  */
-export function siblingHref(code, entries) {
-  const pattern = entries.find(({ code: c, href }) => href && href.startsWith(`/${c}`)
-    && !href.startsWith('//') && /^\/[a-z]{2}(\/|$|[?#])/i.test(href));
-  return pattern ? `/${code}${pattern.href.slice(pattern.code.length + 1)}` : `/${code}`;
+export function parseAlternates(value) {
+  const map = new Map();
+  String(value || '').split(/,\s*(?=[a-z]{1,8}(?:-[a-z0-9]+)*\s*:)/i).forEach((pair) => {
+    const m = pair.trim().match(/^([a-z]{2})(?:-[a-z0-9]+)*\s*:\s*(\S+)$/i);
+    const code = m?.[1].toLowerCase();
+    if (code && byCode.has(code) && !map.has(code)) map.set(code, m[2]);
+  });
+  return map;
 }
 
 /**
- * The current page in another locale: the page path with only its locale segment swapped
- * (`/en/emobility/x` → `/cs/emobility/x`), as the source keeps the page when the language
- * changes. Null when the page isn't in a locale tree (`/`, `/drafts/…`): its authored target
- * is used instead.
- * @param {string} pathname the current page path
- * @param {string} code the target locale
- * @returns {string|null}
+ * A declared translation as a permitted link target, else null: a page of this site (a
+ * migrated EDS variant) in its own locale's tree (`/cs/…` for cs). Live-site URLs are not
+ * targets: the switcher never leaves the demo (SKODA-303a, PO 2026-10-08).
+ * @param {string} code the locale
+ * @param {string} href the declared URL (site-relative, as the generator writes it)
+ * @param {string} base the page URL
+ * @returns {string|null} the site-relative path (+ query / hash)
  */
-export function localizedPath(pathname, code) {
-  const [, seg, ...rest] = String(pathname || '').split('/');
-  if (!byCode.has(String(seg).toLowerCase())) return null;
-  return ['', code, ...rest].join('/');
+export function permittedTranslation(code, href, base) {
+  let url;
+  try {
+    url = new URL(href, base);
+  } catch (e) {
+    return null;
+  }
+  if (!/^https?:$/.test(url.protocol) || url.host !== new URL(base).host) return null;
+  if (url.pathname.split('/')[1]?.toLowerCase() !== code) return null;
+  return `${url.pathname}${url.search}${url.hash}`;
 }
 
-/** A link to another site (the source's Media Room DE goes to skoda-media.de, in a new tab). */
-function isExternal(href, doc) {
+/** An authored link to another site (neither this one nor the live storyboard). */
+function isOtherSite(href, base) {
   try {
-    const url = new URL(href, doc.baseURI);
-    return /^https?:$/.test(url.protocol) && url.host !== new URL(doc.baseURI).host;
+    const url = new URL(href, base);
+    return /^https?:$/.test(url.protocol) && ![new URL(base).host, LIVE_HOST].includes(url.host);
   } catch (e) {
     return false;
   }
 }
 
 /**
- * The switcher list: the current locale as `<span aria-current="true">`, every other one as
- * a link with `hreflang` / `lang` and its own language name.
- * Targets, as on the source:
- *   - an authored link to another site wins, and opens in a new tab (Media Room DE);
- *   - otherwise the current page in that locale (localizedPath: only the locale segment of
- *     the path changes);
- *   - on a page outside a locale tree, the authored target (a bold entry without a link
- *     takes its siblings' pattern, siblingHref).
+ * The switcher list, in the authored order: the current locale as
+ * `<span aria-current="true">`, every other locale with a permitted declared translation as a
+ * link with `hreflang` / `lang` and its own language name (an authored link to another site
+ * replaces the translation, in a new tab). Locales without one are left out.
  * @param {Array<{code: string, href: string|null}>} entries from localeEntries()
  * @param {string} current the page's locale, from currentLocale()
  * @param {Document} doc the document to build in
- * @param {string} [pathname] the current page path (default: the authored targets only)
+ * @param {Map<string, string>} [alternates] from parseAlternates()
  * @returns {HTMLUListElement|null} null when there are no entries
  */
-export function buildLocaleList(entries, current, doc, pathname = '') {
+export function buildLocaleList(entries, current, doc, alternates = new Map()) {
   if (!entries.length) return null;
+  const base = doc.baseURI;
   const ul = doc.createElement('ul');
   ul.className = 'nav-locales-list';
   ul.setAttribute('aria-label', LABELS.list);
+  ul.dataset.linkPolicy = 'resolved';
   entries.forEach(({ code, href }) => {
     const { label, name } = byCode.get(code);
-    const li = doc.createElement('li');
     let item;
     if (code === current) {
       item = doc.createElement('span');
       item.setAttribute('aria-current', 'true');
     } else {
-      const authored = href || siblingHref(code, entries);
-      const target = isExternal(authored, doc)
-        ? authored
-        : localizedPath(pathname, code) || authored;
+      const translation = alternates.has(code)
+        && permittedTranslation(code, alternates.get(code), base);
+      if (!translation) return; // no declared translation: omitted, never a locale home
+      const elsewhere = isOtherSite(href, base);
       item = doc.createElement('a');
-      item.setAttribute('href', target);
+      item.setAttribute('href', elsewhere ? href : translation);
       item.setAttribute('hreflang', code);
-      if (isExternal(target, doc)) {
+      if (elsewhere) {
         item.setAttribute('target', '_blank');
         item.setAttribute('rel', 'noopener');
         item.setAttribute('aria-label', LABELS.newTab(name));
@@ -174,6 +192,7 @@ export function buildLocaleList(entries, current, doc, pathname = '') {
     }
     item.setAttribute('lang', code);
     item.textContent = label;
+    const li = doc.createElement('li');
     li.append(item);
     ul.append(li);
   });
