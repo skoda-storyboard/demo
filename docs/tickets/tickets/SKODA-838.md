@@ -6,7 +6,7 @@
 - **GitHub issue:** [#300](https://github.com/skoda-storyboard/demo/issues/300)
 - **Fixes:** [`SKODA-IMPORT-VALIDITY-2026-10-05.md`](../../reviews/SKODA-IMPORT-VALIDITY-2026-10-05.md) §6 / §8 F7 (approved 2026-10-05; user asked for it 2026-10-08)
 - **Branch:** `skoda-838-origin-drift`
-- **Status (2026-10-08):** 🟡 Drift: 3 pages **published** (3/3 live 200; Media Room promo = origin, Enyaq new title, Epiq City SUV sentences removed). All **234 scoped originals uploaded and verified in author DAM**; **233 publicly verified** after approved activation, including all 33 PDFs/MP4s. One WebP remains delivery-blocked (public 404 despite author activation metadata). The 3 chapters and 20 previously blocked pages are **pushed + previewed** (23/23 preview 200, every PDF/MP4 link on AEM Assets); publishing them needs a separate go-ahead.
+- **Status (2026-10-08):** 🟡 Drift: 3 pages **published** (3/3 live 200; Media Room promo = origin, Enyaq new title, Epiq City SUV sentences removed). All **234 scoped originals uploaded and verified in author DAM**; **233 publicly verified** after approved activation, including all 33 PDFs/MP4s. One WebP remains delivery-blocked (public 404 despite author activation metadata). The 3 chapters and 20 previously blocked pages are **published** (2026-10-09, 23/23 live 200, every PDF/MP4 link on AEM Assets, 20/20 new pages in the live index).
 
 ## Scope
 These pages differ from DA because the origin was edited after our import. The other drift findings in the audit
@@ -159,12 +159,24 @@ All files below are under `www.skoda-storyboard.com/direct-download/`, except th
   - the Media Box counts match the origin (2 videos, 9 images, 3 PDFs; 23 images, 1 PDF).
   - Like the origin, the 130 RS chapter keeps both PDFs: the May banner PDF and the September Media Box PDF.
 
+## Publish (2026-10-09, user go-ahead)
+- **20 new pages:** published with `--stage publish` (bulk preview + live), 20/20 live 200. The live query index lists
+  all 20.
+- **3 chapters:** the publish run reported a DA conflict. On 2026-10-09 at 07:09 UTC, after our push,
+  `vat71010@adobe.com` re-pushed them with the SKODA-607a (#267) importer.
+  - **DA vs our pushed documents:** additions only (a lead image link and the Media Box tile dates). Nothing was
+    removed, and our origin updates are intact: the new 130 RS image and both PDFs per chapter on AEM Assets.
+  - **Action:** they were published **as they are in DA** (admin preview + live, 3/3 200), without overwriting.
+  - **Note:** the push manifest still holds our 2026-10-08 hash for these 3, so a future push reports them as
+    conflicts until the next deliberate re-import.
+- **Live:** 23/23 return 200, and every PDF/MP4 link is on AEM Assets.
+
 ## Next
 1. Inspect the AEM publish/Dispatcher project's active delivery configuration for the
    remaining WebP's public 404; that configuration is not in this EDS repository.
    Author access is restored and distribution succeeded. Resume scoped verification
    from the pending state once public delivery works; do not force reactivation.
-2. Publish the 23 pages (separate go-ahead). The 20 new pages enter the query index on publish.
+2. Close #300 once the WebP delivery question is settled or split into its own ticket.
 
 ## Acceptance Criteria
 - [x] The 6 drifted pages re-imported from the current origin; the DA diff shows only origin edits
@@ -173,10 +185,10 @@ All files below are under `www.skoda-storyboard.com/direct-download/`, except th
 - [x] 3 new PDFs activated and publicly verified
 - [x] The 3 chapters pushed + previewed (2026-10-08, 3 updates, 0 conflicts)
 - [x] The 3 refreshed pages published (2026-10-08, user go-ahead)
-- [ ] The 3 chapters published after ingest (separate go-ahead)
+- [x] The 3 chapters published after ingest (2026-10-09, user go-ahead; the current DA version, which includes the #267 additions)
 - [x] Latest content imported: 34 pages; 14 pushed + previewed
 - [x] 30 new PDFs/MP4s uploaded to author DAM and original MIME/bytes verified
 - [x] 30 new PDFs/MP4s activated and publicly verified
 - [x] The 20 previously blocked pages pushed + previewed (2026-10-08, 20/20 preview 200)
 - [x] The 14 ready new pages published (2026-10-08, user go-ahead): 14/14 live 200 and indexed; the live index now leads with Peaq designblok (8 Oct), Octavia full hybrid (5 Oct), Superb 25 (29 Sep)
-- [ ] The 20 blocked new pages published after ingest (separate go-ahead)
+- [x] The 20 blocked new pages published after ingest (2026-10-09, user go-ahead): 20/20 live 200 and indexed
