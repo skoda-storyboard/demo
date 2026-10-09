@@ -28,6 +28,27 @@ body.press-kit {
   --pk-video-toolbar: 36px;
   --pk-columns-gap: var(--grid-gutter);
   --pk-columns-stack-gap: var(--spacing-xl);
+
+  /* hub (#275): the source's content block sits 24px under the hero, plus its 10px cell inset;
+     the last banner row ends in its 20px widget margin and 10px row inset */
+  --pk-hub-hero-gap: calc(var(--spacing-l) + var(--page-gutter));
+  --pk-hub-banners-end: calc(var(--grid-gutter) + var(--page-gutter));
+
+  /* article (#275), measured on the source's first-glimpse at 1440 */
+  --pk-link-color: var(--skoda-green-accent); /* .entry-content a */
+  --pk-side-link-color: var(--pr-menu-link-color);
+  --pk-tag-gap: 5px;
+  --pk-tag-space: 3.8px; /* below 768 the source's chips are centred inline-blocks: a word space apart */
+  --pk-action-size: 40px; /* the round cart / download / link controls */
+
+  /* their glyphs: the source's icon font at 16px (the link 24px), faux-bold (weight 600 on a
+     font with no bold face). The icons carry that stroke in a 1080-unit box around the 1024
+     em, so the box grows by the same ratio to keep the glyph's 16px em */
+  --pk-action-icon: calc(16px * 1080 / 1024);
+  --pk-action-icon-link: calc(24px * 1064 / 1024); /* its lighter stroke: a 1064-unit box */
+  --pk-side-chevron-size: 16px; /* the source icon-font chevron (\e009), 10px in from the row end */
+  --pk-side-chevron-inset: 10px;
+  --pk-media-links-gap: 23px; /* the "   " between "PDF download" and "JPG download" */
 }
 
 body.press-kit main > .section {
@@ -64,10 +85,29 @@ body.press-kit .section.body-column .columns > div > div > :last-child {
   }
 }
 
+/* Hub hero → tiles, as the source at every width (#275: it was the 40px section margin). At
+   exactly 768 the source's hero image already takes its 16px stacked margin while the caption
+   still overlays it, so the tiles start 16px lower there. */
+body.press-kit main > .section.hero-image-container {
+  margin-block-end: var(--pk-hub-hero-gap);
+}
+
+@media (width: 768px) {
+  body.press-kit main > .section.hero-image-container {
+    margin-block-end: calc(var(--pk-hub-hero-gap) + var(--spacing-m));
+  }
+}
+
+/* Hub banners (#275), as the source: stacked 40px apart below its 781px stack width; from it,
+   one equal cell each, 20px apart (2 → 604, 3 → 396, 4 → 292 at 1440), and a lone banner half
+   the row. The footer follows 30px after the last one. */
+body.press-kit main > .section.press-kit-banners {
+  margin-block-end: var(--pk-hub-banners-end);
+}
+
 body.press-kit .section.press-kit-banners .default-content-wrapper {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 25rem), 1fr));
-  gap: var(--spacing-l);
+  gap: var(--pk-columns-stack-gap) var(--grid-gutter);
 }
 
 body.press-kit .section.press-kit-banners img {
@@ -85,11 +125,20 @@ body.press-kit main > .section:has(+ .section.press-kit-banners) {
 /* SKODA-835: on the source a lone download banner is a tile of the hub's 4-up grid: a square
    one fills a column (292 at 1440, 228 at 992), the 4:1 one two (half the row). CSS can't read
    an image's aspect ratio, so the authored banner's intrinsic size keys it (the corpus's
-   800×800 squares and its 1920×480 strip); any other lone banner (the 2:1 ones) keeps the full
-   row. The grid is the tiles' (blocks/cards `.tiles-press`: 4 columns of span 5, 20px apart),
-   so the banner un-stacks with the tiles at the same 781px width and stays one column wide
-   below it. */
+   800×800 squares and its 1920×480 strip); any other lone banner (the 2:1 ones) takes half the
+   row (#275). The grid is the tiles' (blocks/cards `.tiles-press`: 4 columns of span 5, 20px
+   apart), so the banner un-stacks with the tiles at the same 781px width and stays one column
+   wide below it. */
 @media (width >= 781px) {
+  body.press-kit .section.press-kit-banners .default-content-wrapper {
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+  }
+
+  body.press-kit .section.press-kit-banners .default-content-wrapper:has(> p:only-child) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   body.press-kit .section.press-kit-banners .default-content-wrapper:has(> p:only-child img:is([width="800"][height="800"], [width="1920"][height="480"])) {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--grid-gutter);
@@ -114,6 +163,7 @@ body.press-kit .press-kit-header p {
   color: var(--pr-date-color);
   font-size: var(--pk-date-size);
   font-weight: var(--weight-semibold);
+  letter-spacing: 0.1em; /* the source's 1.1px (#275) */
   line-height: 1;
 }
 
@@ -123,6 +173,11 @@ body.press-kit .press-kit-header h1 {
   font-size: var(--pk-title-size-compact);
   font-weight: var(--weight-semibold);
   line-height: 1.25;
+}
+
+/* the hub banners' paragraphs: the grid gaps space them (#275) */
+body.press-kit .section.press-kit-banners .default-content-wrapper > p {
+  margin: 0;
 }
 
 @media (width > 768px) {
@@ -205,12 +260,20 @@ body.press-kit .section.sidebar h3 {
   line-height: var(--pk-side-line);
 }
 
+/* tag chips: each keeps the source's 5px end margin, the last in a row too, so rows break
+   where the source's do (a 5px gap alone let one more chip fit, #275) */
 body.press-kit .section.sidebar .tags-list {
-  row-gap: 0;
+  gap: 0;
 }
 
 body.press-kit .section.sidebar .tags-list > li {
-  margin: 0;
+  margin: 0 var(--pk-tag-gap) 0 0;
+}
+
+@media (width < 768px) {
+  body.press-kit .section.sidebar .tags-list {
+    column-gap: var(--pk-tag-space);
+  }
 }
 
 body.press-kit .section.sidebar .default-content-wrapper > ul {
@@ -225,16 +288,102 @@ body.press-kit .section.sidebar .default-content-wrapper > ul > li {
 }
 
 body.press-kit .section.sidebar .default-content-wrapper > ul a {
+  position: relative;
   display: block;
   padding: var(--spacing-xs) 0;
-  color: var(--skoda-grey-800);
+  color: var(--pk-side-link-color);
   line-height: var(--pk-side-line);
   text-decoration: none;
+}
+
+/* "Media contacts" ends in the source's accent chevron (#275) */
+body.press-kit .section.sidebar .default-content-wrapper > ul a::after {
+  content: "";
+  position: absolute;
+  inset-block-start: calc(50% - var(--pk-side-chevron-size) / 2);
+  inset-inline-end: var(--pk-side-chevron-inset);
+  width: var(--pk-side-chevron-size);
+  height: var(--pk-side-chevron-size);
+  background-color: var(--pk-link-color);
+  mask: url("../../icons/chevron-right.svg") center / contain no-repeat;
+}
+
+/* "Download Media Box": the label and the round + at the row's end (press-kit.js) */
+body.press-kit .section.sidebar .press-kit-media-box-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-xs);
+}
+
+body.press-kit .section.sidebar .press-kit-media-box-row > span {
+  padding: var(--spacing-xs) 0;
+  color: var(--pk-side-link-color);
+  line-height: var(--pk-side-line);
 }
 
 body.press-kit .section.sidebar .gallery-wrapper,
 body.press-kit .section.sidebar .tags-wrapper {
   margin-block-end: var(--pk-side-group-gap);
+}
+
+/* The source's round cart controls (#275): the sidebar's Media Box +, and add / download / link
+   under a clip. Same look as the Downloads tiles' + (blocks/downloads). */
+body.press-kit .press-kit-action {
+  --pk-action-glyph: url("../../icons/media-cart-add.svg");
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--pk-action-size);
+  height: var(--pk-action-size);
+  border: 2px solid var(--skoda-ink);
+  border-radius: var(--pill-radius);
+  padding: 0;
+  background: var(--skoda-white);
+  color: var(--skoda-ink);
+  cursor: pointer;
+}
+
+body.press-kit .press-kit-action::before {
+  content: "";
+  width: var(--pk-action-icon);
+  height: var(--pk-action-icon);
+  background-color: currentcolor;
+  mask: var(--pk-action-glyph) center / contain no-repeat;
+}
+
+body.press-kit .press-kit-action.add[data-in-cart] {
+  --pk-action-glyph: url("../../icons/media-remove.svg");
+}
+
+body.press-kit .press-kit-action.download {
+  --pk-action-glyph: url("../../icons/media-download.svg");
+}
+
+body.press-kit .press-kit-action.link {
+  --pk-action-glyph: url("../../icons/media-link.svg");
+  --pk-action-icon: var(--pk-action-icon-link);
+}
+
+body.press-kit .press-kit-action:hover,
+body.press-kit .press-kit-action:focus-visible {
+  background: var(--dropdown-hover-bg);
+}
+
+body.press-kit .press-kit-action:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+body.press-kit .press-kit-action[aria-disabled="true"] {
+  cursor: default;
+}
+
+body.press-kit .press-kit-action[aria-busy="true"] {
+  cursor: progress;
 }
 
 /* Media Box band: the shared band (styles.css), 32px after the article and 16px before the
@@ -278,6 +427,63 @@ body.press-kit .section.body-column .default-content-wrapper img {
   height: auto;
 }
 
+/* The article's text links are the source's accent green (#275; 3.7:1 on white, as the
+   source). Controls drawn by blocks (cart, download menus) keep their own colours. */
+body.press-kit .section.body-column :is(.default-content-wrapper, .columns, .accordion-panel) a:any-link:not(.press-kit-action) {
+  color: var(--pk-link-color);
+}
+
+/* An accordion answer's image cells (press-kit.js): the source's two-cell rows, side by side
+   from its 781px stack width with 20px between the images, each cell 10px inset with its
+   centred download links under the image. (The first answer's source also has an empty
+   paragraph after its cells, 44px; DA keeps no empty paragraphs.) */
+body.press-kit .section.body-column .press-kit-media-row {
+  display: grid;
+  gap: var(--page-gutter) var(--pk-columns-gap);
+  padding-block-start: var(--page-gutter);
+}
+
+/* text after the cells starts below their 10px bottom inset and the row's own 10px */
+body.press-kit .section.body-column .press-kit-media-row:not(:last-child) {
+  padding-block-end: calc(2 * var(--page-gutter));
+}
+
+/* each cell's 10px top inset; its bottom one is the panel's own inset (accordion.css), or the
+   row gap between stacked cells */
+body.press-kit .section.body-column .press-kit-media {
+  padding-block-start: var(--page-gutter);
+}
+
+body.press-kit .section.body-column .press-kit-media > :is(.press-kit-media-image, .press-kit-media-links) {
+  margin: 0 0 var(--paragraph-gap);
+}
+
+body.press-kit .section.body-column .press-kit-media-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+body.press-kit .section.body-column .press-kit-media-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: var(--pk-media-links-gap);
+  min-height: calc(1em * var(--line-height-body));
+}
+
+/* the links keep their inline text box (as in the source's centred paragraph) */
+body.press-kit .section.body-column .press-kit-media-links > :any-link {
+  line-height: normal;
+}
+
+@media (width >= 781px) {
+  body.press-kit .section.body-column .press-kit-media-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* A kit with no hero and no body column (the source's press-release template: the RS 245 kit,
    SKODA-828 F7) is all header section. Its lead image is an article's 16:9 crop (812×457 at
    1440), and from 768 everything after the title takes the source's 2/3 column (812 at 1440,
@@ -296,6 +502,7 @@ body.press-kit .section.body-column .default-content-wrapper:first-child > p:fir
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
+  border-radius: var(--card-radius);
 }
 
 body.press-kit .section.body-column .default-content-wrapper > p {
@@ -312,6 +519,21 @@ body.press-kit .section.body-column .downloads-wrapper + .default-content-wrappe
 /* the source's lead margin plus the entry's 10px inset: 30px to the first paragraph */
 body.press-kit .section.body-column .default-content-wrapper:first-child > p:first-child {
   margin-block-end: calc(var(--paragraph-gap) + var(--page-gutter));
+}
+
+/* ...with the source's 8px corners and its teaser overlay, the two light scrims (#275); the
+   overlay lets clicks through to the lightbox link */
+body.press-kit .section.body-column .default-content-wrapper:first-child > p:first-child:has(img) {
+  position: relative;
+}
+
+body.press-kit .section.body-column .default-content-wrapper:first-child > p:first-child:has(img)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--card-radius);
+  background-image: var(--scrim-h), var(--scrim-v);
+  pointer-events: none;
 }
 
 /* Row toggles are the source's 20px rows apart (the block's own gap is 24), and the text after
@@ -343,6 +565,15 @@ body.press-kit .section.body-column .embed-wrapper + .default-content-wrapper > 
   align-items: center;
   min-height: var(--pk-video-toolbar);
   margin-block-start: var(--spacing-xs);
+}
+
+/* ...drawn as the source's three round controls at the row's end, 12px apart (#275). They are
+   40px high and hang 4px out of the row's 36px, as on the source, so nothing after it moves. */
+body.press-kit .section.body-column .default-content-wrapper > p.press-kit-actions {
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: var(--spacing-s);
+  height: var(--pk-video-toolbar);
 }
 
 /* The WhatsApp callout (`Columns (callout)`): the source's empty paragraph after it adds 24px. */
@@ -390,7 +621,17 @@ body.press-kit .section.body-column .columns.callout {
   }
 }
 
-@media (width >= 992px) {
+/* The press-kit footer's widget titles are 20/25 up to 768 on the source (the kit template's
+   type; other templates keep 26px, #275). The 1em margin under them follows the size. */
+@media (width <= 768px) {
+  body.press-kit footer .footer-widgets :is(h2, h3) {
+    font-size: var(--heading-font-size-story-h3-mobile);
+  }
+}
+
+/* the source's sidebar takes its 64px inset from 1080 (#275: up to 1079 it is 10px, and the tag
+   rows and menu are 54px wider there) */
+@media (width >= 1080px) {
   body.press-kit main > .section.sidebar > div {
     padding-inline-start: var(--pk-sidebar-inset);
   }

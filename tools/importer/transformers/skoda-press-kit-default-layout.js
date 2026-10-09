@@ -213,7 +213,17 @@ function rebuild(element, document) {
     ['data-caption', 'data-video_title', 'data-video_src', 'srcset', 'sizes', 'itemprop']
       .forEach((attr) => img.removeAttribute(attr));
     const p = document.createElement('p');
-    p.append(img);
+    // The source lead opens its full-size image (a colorbox link, #275): keep that link, as
+    // the article's other linked images, so the page opens it in its lightbox.
+    const full = lead.closest('a[href]')?.getAttribute('href') || '';
+    if (/^https?:\/\/[^?#]+\.(?:jpe?g|png|webp)(?:[?#]|$)/i.test(full)) {
+      const link = document.createElement('a');
+      link.setAttribute('href', full);
+      link.append(img);
+      p.append(link);
+    } else {
+      p.append(img);
+    }
     out.push(p);
   }
   // An article-form kit landing page (the second Elroq kit) introduces itself in the teaser

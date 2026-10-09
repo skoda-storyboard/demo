@@ -82,16 +82,19 @@ test('Media Room middle section (headings) becomes one column per heading', () =
   assert.equal(middle.classList.contains('footer-nav'), false);
   assert.equal(middle.querySelector('nav'), null);
   const columns = middle.querySelectorAll('.footer-columns > .footer-column');
-  assert.deepEqual(columns.map((c) => c.querySelector('h2').textContent), ['Contacts', 'Subscribe', 'Company']);
+  // the source's widget titles are h3 (#275); the fragment authors h2
+  assert.deepEqual(columns.map((c) => c.querySelector('h3').textContent), ['Contacts', 'Subscribe', 'Company']);
+  assert.equal(middle.querySelector('h2'), null);
+  assert.equal(middle.querySelector('h3').getAttribute('id'), null);
 });
 
 test('Media Room columns keep their content, blocks and authored order', () => {
   const footer = footerOf(SOCIAL, WIDGETS, LEGAL('x'));
   const [contacts, subscribe, company] = footer.children[1].querySelectorAll('.footer-column');
   assert.deepEqual(contacts.querySelectorAll('a').map((a) => a.getAttribute('href')), ['/en/contacts/#corporate', '/en/contacts/#product']);
-  assert.deepEqual(subscribe.children.map((c) => c.tagName), ['H2', 'P', 'DIV']);
+  assert.deepEqual(subscribe.children.map((c) => c.tagName), ['H3', 'P', 'DIV']);
   assert.ok(subscribe.children[2].querySelector('.newsletter-stub'));
-  assert.deepEqual(company.children.map((c) => c.tagName), ['H2', 'P']);
+  assert.deepEqual(company.children.map((c) => c.tagName), ['H3', 'P']);
   // the original wrappers are gone (no stray empty wrappers left in the section)
   assert.equal(footer.children[1].querySelectorAll('.default-content-wrapper').length, 0);
 });

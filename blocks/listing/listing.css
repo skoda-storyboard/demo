@@ -502,7 +502,7 @@
   --media-card-button: 40px;
   --media-card-ring: 2px;
   --media-card-button-gap: 8px;
-  --media-card-icon: 16px;
+  --media-card-icon: calc(16px * 1080 / 1024); /* the faux-bold glyph's 1080-unit box around its 16px em (#275) */
   --media-card-play: 32px;
   --media-card-menu-gap: 7px;
   --media-card-menu-pad: 12px;
@@ -678,6 +678,7 @@
 .listing.listing-media .media-asset:has([data-in-cart]) .listing-item-image::before {
   background-size: var(--cart-added-glyph);
   opacity: 1;
+  transition-delay: var(--cart-added-delay);
 }
 
 .listing.listing-media .media-asset:has([data-in-cart]) .media-card-play {

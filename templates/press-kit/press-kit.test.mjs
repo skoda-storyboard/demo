@@ -163,3 +163,87 @@ test('an article that carries a tiles mosaic is still an article (header, not a 
   decorate(main);
   assert.ok(main.querySelector('.press-kit-header h1'));
 });
+
+// #275: an accordion answer's image cells, the source's two-cell rows
+const ANSWER = (cells) => `<div class="section body-column"><div class="accordion-wrapper"><div class="accordion">
+  <div><div><h2>Largest model</h2></div><div>${cells}</div></div></div></div></div>`;
+const IMG = (name) => `<p><a href="https://cdn.example/${name}.jpg"><picture><img src="./${name}.jpg" alt="${name}"></picture></a></p>`;
+const LINKS = '<p><a href="/one.pdf">PDF download</a> <a href="/one.jpg">JPG download</a></p>';
+
+test('accordion images pair with their download links, two or more in a row become one media row (#275)', () => {
+  const main = setup(ANSWER(`<p>Intro text</p>${IMG('a')}${LINKS}${IMG('b')}<p>After text</p>`));
+  decorate(main);
+  const cell = main.querySelector('.accordion > div > div:nth-child(2)');
+  assert.deepEqual([...cell.children].map((el) => el.className || el.tagName), ['P', 'press-kit-media-row', 'P']);
+  const media = [...cell.querySelectorAll('.press-kit-media-row > .press-kit-media')];
+  assert.equal(media.length, 2);
+  assert.deepEqual([...media[0].children].map((el) => el.className), ['press-kit-media-image', 'press-kit-media-links']);
+  assert.deepEqual([...media[1].children].map((el) => el.className), ['press-kit-media-image']);
+  assert.equal(cell.lastElementChild.textContent, 'After text', 'text after the row stays where it was');
+});
+
+test('a lone image, an image with text and a links paragraph with text are not media cells (#275)', () => {
+  const main = setup(ANSWER(`${IMG('a')}<p>Text</p><p><a href="/x.jpg"><picture><img src="./x.jpg" alt=""></picture></a> caption</p>${IMG('b')}<p><a href="/b.pdf">PDF download</a> and more</p>`));
+  decorate(main);
+  assert.equal(main.querySelector('.press-kit-media-row'), null);
+  assert.equal(main.querySelector('.press-kit-media-links'), null);
+});
+
+const SIDEBAR = `<div class="section sidebar"><div class="default-content-wrapper"><h3>Additional info</h3><ul>
+  <li><a href="https://www.skoda-storyboard.com/en/contacts/">Media contacts</a></li>
+  <li><a href="#media-box">Download Media Box</a></li></ul></div></div>`;
+
+test('the sidebar "Download Media Box" row is the label and a + that drives the Media Box group toggle (#275)', async () => {
+  const main = setup(`<div class="section body-column"></div>${SIDEBAR}
+    <div class="section media-box"><div class="downloads-wrapper"><div class="downloads"></div></div></div>`);
+  decorate(main);
+  const row = main.querySelector('.press-kit-media-box-row');
+  assert.equal(row.querySelector('a[href="#media-box"]'), null);
+  assert.equal(row.querySelector('span').textContent, 'Download Media Box');
+  const add = row.querySelector('button.press-kit-action.add');
+  assert.equal(add.getAttribute('aria-label'), 'Add all files to the media cart');
+  assert.equal(add.getAttribute('aria-disabled'), 'true', 'inert until the Media Box toggle exists');
+  add.click(); // no toggle yet: nothing happens, nothing throws
+  // the Downloads block adds its group toggle later; the + follows its state and clicks it
+  const toggle = document.createElement('button');
+  toggle.className = 'downloads-add downloads-add-all';
+  let clicks = 0;
+  toggle.addEventListener('click', () => { clicks += 1; });
+  main.querySelector('.downloads').append(toggle);
+  toggle.setAttribute('aria-pressed', 'true');
+  toggle.toggleAttribute('data-in-cart', true);
+  await new Promise((resolve) => { setTimeout(resolve, 0); });
+  assert.equal(add.getAttribute('aria-pressed'), 'true');
+  assert.ok(add.hasAttribute('data-in-cart'));
+  assert.equal(add.hasAttribute('aria-disabled'), false);
+  add.click();
+  assert.equal(clicks, 1);
+});
+
+test('without a Media Box the sidebar keeps its "Download Media Box" link (#275)', () => {
+  const main = setup(`<div class="section body-column"></div>${SIDEBAR}`);
+  decorate(main);
+  assert.ok(main.querySelector('.section.sidebar a[href="#media-box"]'));
+  assert.equal(main.querySelector('.press-kit-action'), null);
+});
+
+test('a clip\'s "Download video" link becomes add / download / open controls; other links stay (#275)', () => {
+  const clip = 'https://dam.example/content/dam/clip.mp4';
+  const main = setup(`<div class="section body-column">
+    <div class="embed-wrapper"><div class="embed"><div><div>url</div><div><a href="${clip}">Covered Drive</a></div></div></div></div>
+    <div class="default-content-wrapper"><p><a href="${clip}" title="Download video">Download video</a></p></div>
+    <div class="embed-wrapper"><div class="embed"><div><div>url</div><div><a href="https://www.youtube.com/watch?v=x">Clip</a></div></div></div></div>
+    <div class="default-content-wrapper"><p><a href="/brochure.pdf">Brochure</a></p></div></div>`);
+  decorate(main);
+  const [toolbar, other] = main.querySelectorAll('.embed-wrapper + .default-content-wrapper > p');
+  assert.ok(toolbar.classList.contains('press-kit-actions'));
+  const controls = [...toolbar.children];
+  assert.deepEqual(controls.map((el) => `${el.tagName} ${el.classList[1]}`), ['BUTTON add', 'A download', 'A link']);
+  assert.deepEqual(controls.map((el) => el.getAttribute('aria-label')), [
+    'Add to media cart: Covered Drive', 'Download Covered Drive', 'Open Covered Drive']);
+  assert.equal(controls[0].getAttribute('aria-disabled'), 'true', 'disabled until the cart binds it');
+  assert.equal(controls[1].getAttribute('href'), clip);
+  assert.equal(controls[1].getAttribute('download'), '');
+  assert.equal(other.textContent, 'Brochure');
+  assert.equal(other.classList.contains('press-kit-actions'), false);
+});
