@@ -13,7 +13,7 @@
     },
     "press-releases": {
       "label": "Press releases",
-      "gate": "W1 (610 PR #138, 506, 508) · W4: SKODA-607 phase 1 live 2026-09-27 (PR #170); final QA after 223/224/510",
+      "gate": "W1 (610 PR #138, 506, 508) · W4: SKODA-607 phase 1 live 2026-09-27 (PR #170); final QA after 223/224/510 · SKODA-607a (#224) in progress 2026-10-06",
       "note": "SKODA-607 phase 1 (2026-09-27): the 5 set PRs + Octavia re-imported with the press-release layout (own template `templates/press-release/`), pushed and published (PR #170). Pending variants with readable fallbacks: Gallery (preview) → 223, Story Rail (press) → 224, Downloads file rows → 510 (PDF shown via the template fallback). Media Room chrome → 309. The 9 remaining corpus PRs can re-import with the new importer (803). Quote contract (220) applies."
     },
     "press-kits": {
@@ -63,23 +63,23 @@
     },
     "/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company": {
       "qa": "pending",
-      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+      "note": "607a (dev evidence, QA pending): live content (SKODA-833 publish, 2026-10-06) already carries the quotes + the FAQ callout; with PR #267's code, geometry = source down to the first quote, then −10…−16 (quotes, italic face) and −24 (FAQ blank line, #148); ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224), see SKODA-607a.md"
     },
     "/en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029": {
       "qa": "pending",
-      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+      "note": "607a (dev evidence, QA pending): live content (SKODA-833 publish, 2026-10-06) already carries the quotes; with PR #267's code, geometry = source down to the first quote, then −8…−14 (quotes, italic face); ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224), see SKODA-607a.md"
     },
     "/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence": {
       "qa": "pending",
-      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+      "note": "607a (dev evidence, QA pending): live content (SKODA-833 publish, 2026-10-06) already carries the quotes; with PR #267's code, geometry = source down to the first quote, then −7…−12 (quote, italic face); ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224), see SKODA-607a.md"
     },
     "/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management": {
       "qa": "pending",
-      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+      "note": "607a (dev evidence, QA pending): live content (SKODA-833 publish, 2026-10-06) already carries the quotes; with PR #267's code, geometry = source down to the first quote, then −9…−15 (quote, italic face); ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224), see SKODA-607a.md"
     },
     "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs": {
       "qa": "pending",
-      "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+      "note": "607a (dev evidence, QA pending): live content (SKODA-833 publish, 2026-10-06) is current except the title; with PR #267's code, geometry = source down to the first quote, then −48 (no quotes; the video media-cart bar); ≤2% per-pixel gate FAIL (italic face, teaser crop 510/223/224), see SKODA-607a.md; after merge: re-import + push for the title's <br> (live is still one line, −32.5px at 1280)"
     },
     "/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon": {
       "qa": "pending",
