@@ -289,6 +289,7 @@ var CustomImportScript = (() => {
   // tools/importer/transformers/skoda-press-release-layout.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var MARKER = "data-pr-section";
+  var NBSP_PLACEHOLDER = "\u{F00A0}";
   var LAYOUT_ATTR = "data-pr-layout";
   var SECTION_STYLES = {
     body: "body-column",
@@ -320,10 +321,16 @@ var CustomImportScript = (() => {
   function urlParagraph(document, url) {
     return make(document, "p", link(document, url, url));
   }
-  function titleText(h1) {
-    const clone = h1.cloneNode(true);
-    clone.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
-    return text3(clone);
+  function titleContent(document, h1) {
+    const lines = [[]];
+    const walk = (node) => node.childNodes.forEach((child) => {
+      if (child.nodeType === 1 && child.tagName === "BR") lines.push([]);
+      else if (child.nodeType === 3) lines.at(-1).push(child.textContent);
+      else if (child.nodeType === 1) walk(child);
+    });
+    walk(h1);
+    const parts = lines.map((line) => line.join("").replace(/\s+/g, " ").trim()).filter(Boolean);
+    return parts.flatMap((line, i) => i < parts.length - 1 ? [`${line}${NBSP_PLACEHOLDER}`, document.createElement("br")] : [line]);
   }
   function isEmptyParagraph(p) {
     return !text3(p) && !p.querySelector("img, picture, a[href], iframe");
@@ -556,7 +563,7 @@ var CustomImportScript = (() => {
     const relatedBand = bands.find((b) => b !== mediaBand && b.querySelector("article.article-teaser"));
     const out = [];
     if (date) out.push(make(document, "p", date));
-    if (h1) out.push(make(document, "h1", titleText(h1)));
+    if (h1) out.push(make(document, "h1", titleContent(document, h1)));
     out.push(marker(document, "body"));
     [
       leadImage(document, primary),
@@ -1169,7 +1176,7 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/transformers/skoda-nbsp.js
-  var NBSP_PLACEHOLDER = "\u{F00A0}";
+  var NBSP_PLACEHOLDER2 = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform5(hookName, element, payload) {
     if (hookName !== "preprocess") return;
@@ -1181,7 +1188,7 @@ var CustomImportScript = (() => {
     );
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
       if (node.nodeValue.includes("\xA0")) {
-        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER.repeat(run.length));
+        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER2.repeat(run.length));
       }
     }
   }
