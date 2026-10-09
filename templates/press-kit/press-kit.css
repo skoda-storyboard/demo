@@ -352,9 +352,13 @@ body.press-kit .section.body-column .columns.callout {
 
 /* At this viewport the article and sidebar change from a stack to a two-column shell. */
 @media (width >= 768px) {
+  /* align-content: rows keep their own height. `main` has a min-height, and while the later
+     sections are still display:none (loading) the visible rows would otherwise stretch to fill
+     it: the header painted 340px low, then jumped up (CLS 0.21 on chapter pages, SKODA-702). */
   body.press-kit main:has(.section.body-column) {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    align-content: start;
     align-items: start;
     max-width: var(--content-max-width);
     margin-inline: auto;

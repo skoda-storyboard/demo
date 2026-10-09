@@ -230,6 +230,10 @@ export default async function decorate(block) {
   instanceSeq += 1;
   const uid = `l${instanceSeq}`; // unique id prefix for this block instance
   const media = isMediaTemplate(cfg.template);
+  // The index doesn't need the placeholders: request it now, alongside them. The listing's
+  // first paint and LCP wait for it (SKODA-702). Its failure is handled where it's awaited.
+  const indexRows = loadQueryIndex(cfg.index);
+  indexRows.catch(() => {});
   // media listings show the cart's package-limit notice (SKODA-505b) in the skeleton, styled
   // by listing.css (no shift above the grid). The cart itself loads after first paint
   // (media-card.js), so nothing of it is on this eager path (SKODA-505a review).
@@ -297,7 +301,7 @@ export default async function decorate(block) {
   // Load the index (self-contained; degrades to empty/error state).
   let scoped = [];
   try {
-    const rows = await loadQueryIndex(cfg.index);
+    const rows = await indexRows;
     scoped = scopeRows(rows, { template: cfg.template, path: cfg.path });
   } catch (e) {
     status.textContent = STRINGS.loadError;

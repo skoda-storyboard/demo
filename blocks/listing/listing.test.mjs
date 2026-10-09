@@ -671,6 +671,36 @@ test('402a: a filtered deep link opens that facet\'s option list, like the sourc
   assert.equal(pill.querySelector('.facet-count').textContent, '1');
 });
 
+test('the index is requested alongside the placeholders (SKODA-702)', async () => {
+  const { clearPlaceholdersCache } = await import('../../scripts/placeholders.js');
+  clearPlaceholdersCache();
+  window.history.replaceState({}, '', '/en/images'); // no filters left in the URL by earlier tests
+  feed = [imageRow(1), imageRow(2)];
+  const requested = [];
+  let releasePlaceholders;
+  const held = new Promise((resolve) => { releasePlaceholders = resolve; });
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    requested.push(u.includes('placeholders') ? 'placeholders' : 'index');
+    if (u.includes('placeholders')) await held; // the placeholders answer slowly
+    return realFetch(url);
+  };
+  try {
+    const block = listingBlock('image', '/en/parallel-feed.json');
+    const done = decorate(block);
+    await settle();
+    // both in flight before the placeholders answer
+    assert.deepEqual([...new Set(requested)].sort(), ['index', 'placeholders']);
+    releasePlaceholders();
+    await done;
+    assert.equal(block.querySelectorAll('.listing-items > li').length, 2);
+    assert.equal(requested.filter((r) => r === 'index').length, 1, 'one index request');
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
+
 test('toolbar parity (SKODA-402b, CSS guard): collapsed sort row 12px under the header, active sort black', async () => {
   const { readFile } = await import('node:fs/promises');
   const css = await readFile(new URL('./listing.css', import.meta.url), 'utf8');

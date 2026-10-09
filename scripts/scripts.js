@@ -14,6 +14,7 @@ import {
   loadBlock,
   toClassName,
   getMetadata,
+  readBlockConfig,
 } from './aem.js';
 import { decorateLinks, installLinkPolicy } from './links.js';
 import { spanSidebar } from './split-body.js';
@@ -331,6 +332,38 @@ export function decorateMain(main) {
 }
 
 /**
+ * A Listing in the first section shows nothing until its index has loaded, so the page's
+ * first paint and LCP wait for that request (the media feed is 157KB). Start it now, before
+ * the block's own code has loaded; query-index.js is memoized per URL, so the block reuses
+ * this request (SKODA-702). Pages without a listing up front are untouched.
+ * @param {Element} main The main element (decorated)
+ */
+function startListingIndex(main) {
+  const listing = main.querySelector('.section')?.querySelector('.listing');
+  if (!listing) return;
+  const { index } = readBlockConfig(listing);
+  import('./query-index.js')
+    .then(({ loadQueryIndex, defaultIndexUrl }) => loadQueryIndex(index || defaultIndexUrl()))
+    .catch(() => {}); // the block reports a failed load itself
+}
+
+/**
+ * Press releases and no-hero press kits open with a text-only header section (date + title),
+ * so `waitForFirstImage` finds no image there and the lead image, the LCP element at the top
+ * of the next section, stayed lazy and low priority (SKODA-702). Load it eagerly at high
+ * priority. Only that lead position counts: other images further down stay lazy.
+ * @param {Element} main The main element (decorated, template applied)
+ */
+function prioritizeLeadImage(main) {
+  const [first, next] = main.querySelectorAll(':scope > .section');
+  if (!first || !next || first.querySelector('img')) return;
+  const lead = next.querySelector(':scope > .default-content-wrapper:first-child > p:first-child > picture img');
+  if (!lead) return;
+  lead.setAttribute('loading', 'eager');
+  lead.setAttribute('fetchpriority', 'high');
+}
+
+/**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
  */
@@ -340,7 +373,9 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
+    startListingIndex(main);
     await loadTemplate(main);
+    prioritizeLeadImage(main);
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
   }
