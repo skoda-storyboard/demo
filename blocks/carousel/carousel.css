@@ -109,7 +109,7 @@
   --media-card-title-line: 18px;
   --media-card-button: 40px;
   --media-card-button-gap: 8px;
-  --media-card-icon: 16px;
+  --media-card-icon: calc(16px * 1080 / 1024); /* the faux-bold glyph's 1080-unit box around its 16px em (#275) */
 }
 
 .carousel.media .carousel-track .card-teaser {

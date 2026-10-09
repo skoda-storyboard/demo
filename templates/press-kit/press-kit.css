@@ -40,7 +40,12 @@ body.press-kit {
   --pk-tag-gap: 5px;
   --pk-tag-space: 3.8px; /* below 768 the source's chips are centred inline-blocks: a word space apart */
   --pk-action-size: 40px; /* the round cart / download / link controls */
-  --pk-action-icon: 16px;
+
+  /* their glyphs: the source's icon font at 16px (the link 24px), faux-bold (weight 600 on a
+     font with no bold face). The icons carry that stroke in a 1080-unit box around the 1024
+     em, so the box grows by the same ratio to keep the glyph's 16px em */
+  --pk-action-icon: calc(16px * 1080 / 1024);
+  --pk-action-icon-link: calc(24px * 1064 / 1024); /* its lighter stroke: a 1064-unit box */
   --pk-side-chevron-size: 16px; /* the source icon-font chevron (\e009), 10px in from the row end */
   --pk-side-chevron-inset: 10px;
   --pk-media-links-gap: 23px; /* the "   " between "PDF download" and "JPG download" */
@@ -360,6 +365,7 @@ body.press-kit .press-kit-action.download {
 
 body.press-kit .press-kit-action.link {
   --pk-action-glyph: url("../../icons/media-link.svg");
+  --pk-action-icon: var(--pk-action-icon-link);
 }
 
 body.press-kit .press-kit-action:hover,
@@ -496,6 +502,7 @@ body.press-kit .section.body-column .default-content-wrapper:first-child > p:fir
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
+  border-radius: var(--card-radius);
 }
 
 body.press-kit .section.body-column .default-content-wrapper > p {
@@ -512,6 +519,21 @@ body.press-kit .section.body-column .downloads-wrapper + .default-content-wrappe
 /* the source's lead margin plus the entry's 10px inset: 30px to the first paragraph */
 body.press-kit .section.body-column .default-content-wrapper:first-child > p:first-child {
   margin-block-end: calc(var(--paragraph-gap) + var(--page-gutter));
+}
+
+/* ...with the source's 8px corners and its teaser overlay, the two light scrims (#275); the
+   overlay lets clicks through to the lightbox link */
+body.press-kit .section.body-column .default-content-wrapper:first-child > p:first-child:has(img) {
+  position: relative;
+}
+
+body.press-kit .section.body-column .default-content-wrapper:first-child > p:first-child:has(img)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--card-radius);
+  background-image: var(--scrim-h), var(--scrim-v);
+  pointer-events: none;
 }
 
 /* Row toggles are the source's 20px rows apart (the block's own gap is 24), and the text after

@@ -184,3 +184,9 @@ Press kits QA observations, FG (this page). Measured origin vs branch at 1440 / 
     - the newsletter Submit / consent text at the source's weight 500 (neither site has a 500 face, so it renders as 400);
     - the press-kit footer titles at 20/25 up to 768.
   - Deviation, confirmed: the source's empty paragraph after item 1's images (44px) can't be carried. A `<p>&nbsp;</p>` pushed to DA is dropped by the preview pipeline (tested on a draft, since removed).
+- **Round 3 (2026-10-09), PO review:**
+  - **Hero image:** the source's 8px corners and its teaser overlay (the two light scrims).
+  - **Icons:** the source's cart / download / link and accordion "+" glyphs are its icon font at weight 600, which has no bold face, so the browser faux-bolds them.
+    - The icons now carry that weight: a 56-unit stroke in a 1080-unit box (link 40 / 1064), with each icon box scaled to keep the 16px em (link 24px). Measured ink at 4×, source vs branch: + 139.0 / 139.1 px², download 100.6 / 99.9, link 102.1 / 99.0, accordion + 57.1 / 55.7 (bars 1.65px).
+    - Same in the Media Box tiles (the tile ↓ now uses the source glyph), the images listing (139.0 / 139.1), the carousel and the lightbox.
+  - **Show more:** the source's `togglebox-opener`, a strip in the band's colour (the pill plus the 20px gap, 64px) behind the collapsed pill. Row 3 no longer peeks around the pill; on white Images chapters the strip is white.

@@ -8,7 +8,7 @@
   --accordion-icon-size: 1em;
   --accordion-icon-pad: var(--spacing-xs);
   --accordion-icon-box: calc(var(--accordion-icon-size) + 2 * var(--accordion-icon-pad));
-  --accordion-icon-stroke: 1.5px;
+  --accordion-icon-stroke: 1.65px; /* the source's faux-bold \e027 glyph (1.48px of ink) */
   --accordion-label-reserve: 1.45em;
   --accordion-line-height: 1.125;
   --accordion-motion: 0.2s ease-in;

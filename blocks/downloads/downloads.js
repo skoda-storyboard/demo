@@ -57,34 +57,6 @@ const LABELS = {
   groupUnavailable: (size) => `${size} versions can't be added to the media cart`,
 };
 
-/**
- * Inline SVG download icon (Trusted-Types safe: createElementNS, no innerHTML).
- * Reproduces the source icon-font glyph (\e012, `skoda-bnr-icons`): a thin
- * line-style down arrow (vertical stem + chevron head) over a separate tray
- * baseline. Stroked (not filled) to match the source weight; currentColor.
- * @returns {SVGElement}
- */
-function downloadIcon() {
-  const NS = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(NS, 'svg');
-  svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('width', '16');
-  svg.setAttribute('height', '16');
-  svg.setAttribute('fill', 'none');
-  svg.setAttribute('stroke', 'currentColor');
-  svg.setAttribute('stroke-width', '2');
-  svg.setAttribute('stroke-linecap', 'square');
-  svg.setAttribute('stroke-linejoin', 'miter');
-  svg.setAttribute('aria-hidden', 'true');
-  // vertical stem + chevron arrowhead, then a detached tray baseline underneath
-  const arrow = document.createElementNS(NS, 'path');
-  arrow.setAttribute('d', 'M12 3 V15 M6.5 10 L12 15.5 L17.5 10');
-  const base = document.createElementNS(NS, 'path');
-  base.setAttribute('d', 'M4 20 H20');
-  svg.append(arrow, base);
-  return svg;
-}
-
 function fileIcon() {
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
@@ -250,7 +222,6 @@ function buildDownload(asset) {
     a.href = href;
     a.setAttribute('download', '');
     a.setAttribute('aria-label', LABELS.download(title, label));
-    a.append(downloadIcon());
     wrap.append(a);
     return wrap;
   }
@@ -265,7 +236,6 @@ function buildDownload(asset) {
   toggle.setAttribute('aria-expanded', 'false');
   toggle.setAttribute('aria-haspopup', 'true');
   toggle.setAttribute('aria-controls', menuId);
-  toggle.append(downloadIcon());
 
   const menu = document.createElement('ul');
   menu.className = 'downloads-sizes';
