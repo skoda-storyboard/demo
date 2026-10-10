@@ -15,7 +15,9 @@ import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readLists, renderInto, TARGET } from '../build-link-allowlist.mjs';
+import {
+  buildAllowlist, readLists, renderInto, renderPublished, TARGET,
+} from '../build-link-allowlist.mjs';
 
 let JSDOM = null;
 try {
@@ -77,9 +79,9 @@ test('the mixed-reality alias goes straight to its canonical', { skip }, () => {
 test('source-host links outside the demo stay absolute (D-3 (b))', { skip }, () => {
   [
     `${SRC}/en/tag/model/yeti/`, // a tag archive that isn't imported
-    `${SRC}/en/news/?filter%5Bvip%5D%5B%5D=jahn`, // no demo tag page for the term (607 rule 4)
     `${SRC}/en/category/podcast/`, // 404 on the source, not an archive page here
-    `${SRC}/en/emobility/whats-behind-epiq-design/`,
+    `${SRC}/en/news/?filter%5Bvip%5D%5B%5D=jahn`, // no demo tag page for the term (607 rule 4)
+    `${SRC}/en/lifestyle/explore-albania/`, // a story that isn't imported
     `${SRC}/?attachment_id=454117`,
     `${SRC}/en/?p=312022`, // WordPress post-id shortlink, not the /en page (SKODA-207)
     `${SRC}/en/?page_id=105035`,
@@ -142,7 +144,7 @@ test('idempotent: a second run changes nothing', { skip }, () => {
 
 test('every URL-set, corpus and archive page (non-attachment) is on the allow-list', { skip }, () => {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
-  const lines = ['skoda-m1-url-set.txt', 'skoda-rail-feed-corpus.txt', 'skoda-archive-url-set.txt']
+  const lines = ['skoda-m1-url-set.txt', 'skoda-rail-feed-corpus.txt', 'skoda-archive-url-set.txt', 'skoda-published-url-set.txt']
     .flatMap((f) => readFileSync(path.join(root, 'docs/planning', f), 'utf8').split(/\r?\n/))
     .map((l) => l.trim())
     .filter((l) => l.startsWith('https://www.skoda-storyboard.com/') && !l.includes('attachment_id='));
@@ -150,7 +152,31 @@ test('every URL-set, corpus and archive page (non-attachment) is on the allow-li
   lines.forEach((url) => assert.ok(one(url).startsWith('/'), `not rewritten: ${url}`));
 });
 
-test('the generated allow-list block matches the URL set + corpus + archives (run npm run import:allowlist)', () => {
+test('pages known only from the live index take plain links; listing filters to them stay live (SKODA-801a)', { skip }, () => {
+  // plain links to live-only pages: a story imported after the planned lists, a hub
+  assert.equal(one(`${SRC}/en/skoda-world/octavia-arrives-with-a-new-full-hybrid-powertrain/`), '/en/skoda-world/octavia-arrives-with-a-new-full-hybrid-powertrain');
+  assert.equal(one(`${SRC}/en/press-kits/`), '/en/press-kits');
+  assert.equal(one(`${SRC}/en/news/#latest`), '/en/news#latest');
+  // a listing filter to a live-only hub keeps the live filtered listing (facets differ per listing)
+  [`${SRC}/en/press-kits/?filter%5Bhistory%5D%5B%5D=motorsport-history`,
+    `${SRC}/en/news/?filter[years]%5B0%5D=61572`].forEach((href) => assert.equal(one(href), href));
+  // search's own query is always read
+  assert.equal(one(`${SRC}/en/search/?filter%5Bsearch%5D%5B%5D=peaq`), '/en/search?filter%5Bsearch%5D%5B%5D=peaq');
+});
+
+test('published list: live index paths → sorted unique source URLs, QA fixtures and drafts left out (SKODA-801a)', () => {
+  const text = renderPublished(['/en/news', '/en', '/en/test/listing-demo', '/drafts/x', '/en/news', '/en/emobility/teaser'], '2026-10-10');
+  const urls = text.split('\n').filter((l) => l.startsWith('https://'));
+  assert.deepEqual(urls, [
+    'https://www.skoda-storyboard.com/en/',
+    'https://www.skoda-storyboard.com/en/emobility/teaser/',
+    'https://www.skoda-storyboard.com/en/news/',
+  ]);
+  assert.match(text, /^# ===== PUBLISHED \(3\) =====$/m);
+  assert.deepEqual(buildAllowlist('', '', '', text).paths, ['/en', '/en/emobility/teaser', '/en/news']);
+});
+
+test('the generated allow-list block matches the URL set + corpus + archives + published (run npm run import:allowlist)', () => {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
   const source = readFileSync(path.join(root, TARGET), 'utf8');
   assert.equal(renderInto(source, readLists(root)), source);
