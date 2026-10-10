@@ -1,0 +1,37 @@
+{
+  "variantName": "accordion",
+  "baseBlock": "accordion",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Accordion",
+  "description": "Expandable rows: first cell = the label (question), second cell = the content. One row per item.",
+  "visualCharacteristics": {
+    "purpose": "expandable question/answer or label/content pairs"
+  },
+  "contentPattern": {
+    "structure": "title-body-expandable"
+  },
+  "options": [
+    {
+      "class": "faq",
+      "label": "faq",
+      "description": "FAQ chapter of a press kit: same rows, and the page gets FAQPage structured data for search engines."
+    }
+  ],
+  "usage": {
+    "pagesUsing": [
+      "en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
+      "en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance",
+      "en/press-kits/skoda-epiq-press-kit-2/connectivity-intuitive-digital-services-and-seamless-vehicle-access",
+      "en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language",
+      "en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details",
+      "en/press-kits/skoda-epiq-press-kit-2/frequently-asked-questions",
+      "en/press-kits/skoda-epiq-press-kit-2/interior-designed-for-space-intuitive-use-and-everyday-convenience",
+      "en/press-kits/skoda-epiq-press-kit-2/safety-and-assistance-systems-comprehensive-predictiveand-reassuring-driver-support",
+      "en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality",
+      "en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage"
+    ],
+    "reuseCount": 21,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}

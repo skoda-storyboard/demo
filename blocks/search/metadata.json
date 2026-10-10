@@ -1,0 +1,21 @@
+{
+  "variantName": "search",
+  "baseBlock": "search",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Search",
+  "description": "Only on the search page (/en/search). Leave it empty: it shows the results for the query from the header search.",
+  "visualCharacteristics": {
+    "purpose": "search results page"
+  },
+  "contentPattern": {
+    "structure": "empty"
+  },
+  "usage": {
+    "pagesUsing": [
+      "en/search"
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}
