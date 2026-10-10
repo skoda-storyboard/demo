@@ -5,10 +5,12 @@
 - **Phase:** A · **Milestone:** M1
 - **GitHub issue:** [#310](https://github.com/skoda-storyboard/demo/issues/310)
 - **Origin:** user question 2026-10-09 ("why do the model cards on /en have a different image than on origin?")
-- **Depends on:** #306 (#272: Models rail order and card set, model tag pages as cards)
+- **Related:** #306 (#272: Models rail order and card set, model tag pages as cards).
+  - This PR is independent: it shares no files with #306 and merges to `main` in either order.
+  - The home shows the result once #306 is merged and `/en` is re-pushed.
 - **Branch:** `skoda-839-model-card-image`
 - **Status (2026-10-10):** 🟢 11 tag pages **published** (user go-ahead): live index `image` = card image, 11/11.
-  With #306's code, the Models rail shows the source card images. The rail goes live when #306 merges. Open:
+  With #306's code, the Models rail shows the source card images. `/en` shows it after #306 merges and the home is re-pushed. Open:
   card frame aspect (see "Measured").
 
 ## Problem
