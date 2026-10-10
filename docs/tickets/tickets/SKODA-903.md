@@ -3,6 +3,7 @@
 - **Type:** service
 - **Phase:** C  ·  **Pilot:** No · **Milestone:** M2 (go-live)
 - **Estimate:** 8 SP · AI-assisted 3–5d / manual 6–12d *(planning estimate, not a quote)*
+- **GitHub issue:** [#79](https://github.com/skoda-storyboard/demo/issues/79)
 
 ## Summary
 Rebuild the bespoke per-market banner ad server as a small vanilla-JS block over a locale feed, with content-tag + geo + frequency targeting. Challenge whether the full ad-server machinery is warranted vs. a simpler featured-promo block.
@@ -44,6 +45,9 @@ Rebuild = two pieces: **(a) data source** — either reuse the existing `skoda-b
   - Each row has `id`, `title`, `type`, `creative`, `imgAlt`, `url`, `tags`, `blackListedCountries`, `minViews`,
     `showMax`, `showMaxExpiration`, `popupTriggerDelay` and `popupTriggerScroll`.
   - This is the data the D3 keep / rebuild / drop decision and the "reuse API vs EDS feed" choice work from.
+- **QA report:** [#296](https://github.com/skoda-storyboard/demo/issues/296) Stories QA, item EPQ #4: the Epiq story's
+  banner below Tags (`sa-bnr__image`, `pageTag: ["epiq"]`). It was triaged 2026-10-08 as out of M1 scope and moved
+  here.
 - **M1 decision (user, 2026-10-10):** no demo banner; this stays M2.
 
 ## Dependencies
