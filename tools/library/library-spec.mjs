@@ -28,7 +28,7 @@ export const SPEC = {
     description: 'One row per card: cell 1 = image, cell 2 = title (as a link to the target page) and optional text. Use Story Rail or Stories instead when the cards should list pages automatically.',
     variants: [
       { class: 'overlay', label: 'overlay', description: 'Title over the image (dark gradient), as the "Explore more" cards in the story sidebar.' },
-      { class: 'overlay tiles', label: 'overlay, tiles', description: 'Mosaic of tiles for series hubs and press-kit hubs. Each row starts with a size cell (sq, wide or third), then the image and the linked title. Keep the source order.' },
+      { class: 'overlay tiles', label: 'overlay, tiles', description: 'Mosaic of tiles for series hubs and press-kit hubs. Each row starts with a size cell, then the image and the linked title. Every mosaic row must fill up exactly, or its last tile gets "end" (e.g. "press-square end"). Press-kit hubs, rows of 20: feature 8 (the first two chapters), press-half 10, press-quarter 5, press-square 4. Series hubs, rows of 12: banner / banner-tall 12, two-thirds 8, sq / wide 6, third / third-sq 4, quarter / sq-small 3.' },
       { class: 'key-facts', label: 'key-facts', description: 'Model page "Highlights": square image + h3 title + text per row. Keep the "Highlights" heading above the block as normal text.' },
       { class: 'social', label: 'social', description: 'Home page social profiles: one row per profile, one cell with a link whose text is the handle (e.g. @skodaglobal). Put it in a section with Style "cover-box, dark".' },
       { class: 'series-directory', label: 'series-directory', description: 'The Series directory page: one row per series, image + linked title + excerpt below the image.' },

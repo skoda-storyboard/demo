@@ -11,8 +11,10 @@
  *    neutral samples, repeats trimmed) or a synthesized sample, plus a library-metadata name +
  *    description. Section Metadata gets one section per Style token.
  * 3. Writes <out>/blocks.json (the Blocks sheet) and refreshes blocks/<block>/metadata.json.
+ * 4. Writes <out>/templates/<key>.plain.html (templates-spec.mjs), <out>/templates.json and the
+ *    author note <out>/README.plain.html.
  *
- * Upload <out>/blocks/ to DA (library/blocks/<block>) and POST blocks.json to the Source API;
+ * Upload <out>/blocks/ and <out>/templates/ to DA and POST the two sheets to the Source API;
  * README.md has the steps. library-check.mjs fails when the spec misses a block or variant.
  */
 import {
@@ -21,11 +23,14 @@ import {
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SPEC, SECTION_STYLES } from './library-spec.mjs';
+import { TEMPLATES, README } from './templates-spec.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..', '..');
 const HOST = 'https://main--demo--skoda-storyboard.aem.live';
-const DA_BLOCKS = 'https://content.da.live/skoda-storyboard/demo/library/blocks';
+const DA_LIBRARY = 'https://content.da.live/skoda-storyboard/demo/library';
+const DA_BLOCKS = `${DA_LIBRARY}/blocks`;
+const PLACEHOLDERS = ['placeholder-16x9.png', 'placeholder-4x3.png'];
 const EXTRA_PATHS = ['/en', '/en/media-room', '/en/news', '/en/images', '/en/videos', '/en/press-kits',
   '/en/search', '/en/media-cart', '/en/series-2', '/nav', '/footer', '/media-room/nav',
   '/media-room/footer', '/nav-newsletter'];
@@ -163,6 +168,15 @@ export function blocksSheet(names) {
   };
 }
 
+/** The Templates sheet: key = the name in the Templates panel, value = the template document. */
+export function templatesSheet(templates) {
+  const data = Object.entries(templates)
+    .map(([key, t]) => ({ key: t.name, value: `${DA_LIBRARY}/templates/${key}` }));
+  return {
+    total: data.length, offset: 0, limit: data.length, data, ':type': 'sheet',
+  };
+}
+
 /** Block + variant usage (sorted class key -> page paths) across the cached pages. */
 export function usageOf(pageMap) {
   const usage = {};
@@ -206,10 +220,18 @@ async function main(argv) {
     .map((f) => [`/${f.replace('.plain.html', '').replace(/__/g, '/')}`, readFileSync(path.join(refs, f), 'utf8')]));
   const docs = buildDocuments(Object.values(pageMap));
 
-  mkdirSync(path.join(out, 'blocks', 'images'), { recursive: true });
-  ['placeholder-16x9.png', 'placeholder-4x3.png'].forEach((f) => copyFileSync(path.join(HERE, 'images', f), path.join(out, 'blocks', 'images', f)));
+  const folder = (name) => {
+    mkdirSync(path.join(out, name, 'images'), { recursive: true });
+    PLACEHOLDERS.forEach((f) => copyFileSync(path.join(HERE, 'images', f), path.join(out, name, 'images', f)));
+  };
+  const sheet = (name, json) => writeFileSync(path.join(out, name), `${JSON.stringify(json, null, 2)}\n`);
+  folder('blocks');
   Object.entries(docs).forEach(([name, d]) => writeFileSync(path.join(out, 'blocks', `${name}.plain.html`), d.html));
-  writeFileSync(path.join(out, 'blocks.json'), `${JSON.stringify(blocksSheet(Object.keys(docs)), null, 2)}\n`);
+  sheet('blocks.json', blocksSheet(Object.keys(docs)));
+  folder('templates');
+  Object.entries(TEMPLATES).forEach(([key, t]) => writeFileSync(path.join(out, 'templates', `${key}.plain.html`), `${t.sections.join('\n')}\n`));
+  sheet('templates.json', templatesSheet(TEMPLATES));
+  writeFileSync(path.join(out, 'README.plain.html'), `${README.join('\n')}\n`);
 
   // blocks/<block>/metadata.json: refresh the inferable fields, keep created/version
   const usage = usageOf(pageMap);
@@ -235,13 +257,20 @@ async function main(argv) {
       }));
     }
     if (used.length) {
-      meta.usage = { pagesUsing: used.slice(0, 10), reuseCount: used.length, lastUsed: now };
+      // keep the old timestamp while the usage is unchanged, so a rebuild doesn't churn every file
+      const same = prev.usage?.reuseCount === used.length
+        && JSON.stringify(prev.usage.pagesUsing) === JSON.stringify(used.slice(0, 10));
+      meta.usage = {
+        pagesUsing: used.slice(0, 10),
+        reuseCount: used.length,
+        lastUsed: same ? prev.usage.lastUsed : now,
+      };
     }
     writeFileSync(file, `${JSON.stringify(meta, null, 2)}\n`);
   });
 
   Object.values(docs).forEach((d) => console.log(d.report.join('\n')));
-  console.log(`\n${Object.keys(docs).length} documents + blocks.json in ${path.relative(ROOT, out)}; ${Object.keys(SPEC).length} metadata.json refreshed`);
+  console.log(`\n${Object.keys(docs).length} block documents, ${Object.keys(TEMPLATES).length} templates and their sheets in ${path.relative(ROOT, out)}; ${Object.keys(SPEC).length} metadata.json refreshed`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) await main(process.argv.slice(2));
