@@ -1,9 +1,10 @@
 /*
  * Downloads block (SKODA-502) — the static "Media Box" download grid.
  *
- * A thumbnail grid where each tile is one downloadable asset: a 16:9 image
- * (opens the lightbox via the gallery-lightbox convention) plus a round
- * download control offering the authored size(s) (e.g. Original / 1920px).
+ * A thumbnail grid where each tile is one downloadable asset: a 16:9 image plus a round
+ * download control offering the authored size(s) (e.g. Original / 1920px). In a Media Box and a
+ * gallery group the image opens the shared lightbox (scripts/lightbox.js) on that block's
+ * images, as the source colorbox group does (SKODA-604 / #38); elsewhere it links the image.
  * No server state, no signed-URL service (SKODA-902). Spec: docs/ui-specs/downloads.md.
  *
  * Media cart (SKODA-505b, media-cart.md §3): every tile with a download also gets a round
@@ -627,6 +628,85 @@ function buildTile(asset, { mediaBox = false } = {}) {
   return li;
 }
 
+const fileType = (href = '') => ((href.split(/[?#]/)[0].match(/\.([a-z0-9]+)$/i) || [])[1] || '')
+  .toUpperCase();
+
+/**
+ * One shared-lightbox item for a tile, as the source colorbox panel: the title, the add /
+ * download / link actions on the original, the file metadata the row carries (type, date) and
+ * the page as the related article. A clip plays its MP4 in the stage.
+ * @param {{src: string, alt?: string, title: string, date?: string, sizes: Array}} asset a tile
+ * @param {{title?: string, href?: string}} [related] the related article (this page)
+ * @returns {object} a lightbox item (scripts/lightbox.js)
+ */
+export function lightboxItem(asset, related = {}) {
+  const href = cartSize(asset.sizes)?.href || '';
+  const title = asset.title || asset.alt || '';
+  const caption = document.createElement('div');
+  const para = (...nodes) => {
+    const p = document.createElement('p');
+    p.append(...nodes);
+    caption.append(p);
+    return p;
+  };
+  if (title) para(title);
+  const meta = [['File type', fileType(href)], ['Published', asset.date]].filter(([, v]) => v);
+  if (meta.length) {
+    const p = para();
+    meta.forEach(([label, value], i) => {
+      if (i) p.append(document.createElement('br'));
+      const strong = document.createElement('strong');
+      strong.textContent = value;
+      p.append(`${label}: `, strong);
+    });
+  }
+  if (related.title && related.href) {
+    const a = document.createElement('a');
+    a.href = related.href;
+    a.textContent = related.title;
+    para('Related article: ', a);
+  }
+  const item = {
+    src: asset.src, alt: title, caption, cartHref: href, thumb: cartThumb(asset.src),
+  };
+  if (href) Object.assign(item, { download: href, link: href });
+  if (/\.mp4(?:[?#]|$)/i.test(href)) item.video = href;
+  return item;
+}
+
+/**
+ * Open the shared lightbox from the tile images, on the block's whole image set (the source
+ * colorbox `rel` group). Modifier clicks keep the image link; the lightbox code loads on the
+ * first click, and if it fails to load the link is followed.
+ * @param {Array<{asset: object, thumb: HTMLAnchorElement}>} entries tiles in grid order
+ */
+function wireLightbox(entries) {
+  if (!entries.length) return;
+  const related = {
+    title: document.querySelector('main h1')?.textContent.trim() || '',
+    href: window.location.pathname,
+  };
+  let pending = null;
+  const lightbox = () => {
+    pending = pending || import('../../scripts/lightbox.js').then(({ buildLightbox }) => (
+      buildLightbox(document.body, entries.map(({ asset }) => lightboxItem(asset, related)))));
+    return pending;
+  };
+  entries.forEach(({ thumb }, index) => {
+    thumb.addEventListener('click', async (e) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      try {
+        (await lightbox()).open(index, thumb);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn('downloads: the lightbox did not load', error);
+        window.location.assign(thumb.href);
+      }
+    });
+  });
+}
+
 /**
  * @param {Element} block the downloads block element
  */
@@ -663,12 +743,17 @@ export default async function decorate(block) {
     assets = [...block.children].map(readAsset);
   }
 
+  const lightboxEntries = [];
   assets.forEach((asset) => {
     const tile = buildTile(asset, { mediaBox });
-    if (tile) list.append(tile);
+    if (!tile) return;
+    list.append(tile);
+    const thumb = tile.querySelector('.downloads-thumb');
+    if (thumb) lightboxEntries.push({ asset, thumb });
   });
 
   block.replaceChildren(list);
+  if (mediaBox || gallery) wireLightbox(lightboxEntries);
   const addAll = (mediaBox || gallery) && list.querySelector('.downloads-add, .downloads-add-size[data-href]')
     ? buildAddAll(block, gallery) : null;
   bindCart(block, addAll).catch((e) => {
