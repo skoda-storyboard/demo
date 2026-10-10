@@ -16076,7 +16076,8 @@
       "note": "",
       "page_refs": [
         "en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
-        "en/skoda-model/epiq"
+        "en/skoda-model/epiq",
+        "en/tag/model/epiq"
       ],
       "dam_status": 200,
       "publish_status": 200,
@@ -128599,6 +128600,64 @@
       },
       "publish_status": 200,
       "published_at": "2026-10-08T16:40:23.713Z"
+    },
+    "971e68b7__Peaq_siroky_header_2d359265.jpg": {
+      "logical_id": "971e68b7__Peaq_siroky_header_2d359265.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Peaq_siroky_header_2d359265-1920x375.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Peaq_siroky_header_2d359265.jpg",
+      "dam_page_path": "en/tag/model/peaq",
+      "page_refs": [
+        "en/tag/model/peaq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Peaq_siroky_header_2d359265.jpg",
+      "da_path": "",
+      "alt": "Peaq_siroky_header_2d359265",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Peaq_siroky_header_2d359265-1920x375.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 543851,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__Skoda_Epiq_header_siroky_6d5065bc.jpg": {
+      "logical_id": "971e68b7__Skoda_Epiq_header_siroky_6d5065bc.jpg",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Skoda_Epiq_header_siroky_6d5065bc-1920x704.jpg",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Skoda_Epiq_header_siroky_6d5065bc.jpg",
+      "dam_page_path": "en/tag/model/epiq",
+      "page_refs": [
+        "en/tag/model/epiq"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Skoda_Epiq_header_siroky_6d5065bc-2560x939.jpg",
+      "da_path": "",
+      "alt": "Skoda_Epiq_header_siroky_6d5065bc",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Skoda_Epiq_header_siroky_6d5065bc-1920x704.jpg"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 283087,
+      "preconditioned": true,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
     }
   }
 }
