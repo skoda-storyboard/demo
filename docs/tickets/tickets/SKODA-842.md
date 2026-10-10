@@ -13,7 +13,10 @@
     `tools/importer/push/block-contracts.json` (the block contracts the library documents).
 - **Tooling:** the `excat-block-library` plugin was enabled on 2026-10-10 (user). It generates sample block documents,
   uploads them to DA and wires the Library panel. Use it, then review its output against the contracts.
-- **Status (2026-10-10):** 🔵 TODO
+- **Status (2026-10-10):** 🟡 IN PROGRESS. PR [#322](https://github.com/skoda-storyboard/demo/pull/322) holds the generator, the
+  spec and the coverage check (`tools/library/`). The DA sheets, the config rows and the `/library/**` noindex row (preview)
+  are done. Waiting on: the upload of the library documents, the acceptance checks in the editor, and the live publish of
+  the bulk metadata sheet. See "Progress".
 
 ## Problem
 - **The library is empty.** DA has no `/library`, `/blocks` or `/templates`, and the project `library` config holds one
@@ -62,3 +65,30 @@ Follow the Experience Workspace "Set up library" guide.
 
 ## Effort
 About 2–3 days for blocks and templates; the story template alone is about half a day.
+
+## Progress (2026-10-10, PR #322)
+- **Blocks:**
+  - 18 authorable blocks with 25 variants, plus Section Metadata with 12 Style examples. They're generated from
+    `tools/library/library-spec.mjs` and the smallest live instance of each variant. Variants no page uses yet get
+    synthesized examples.
+  - Not in the library, with the reason: `header`, `footer`, `float-dock`, `carousel`, `hero`, `widget`.
+  - Local render: every block loads without block errors.
+- **Templates:**
+  - The five templates, each from one canonical live page with `[prompts]`.
+  - Unfilled, each fails `validate-metadata` (on the `publisheddate` prompt). Filled in, each passes.
+  - The Tags block is empty, so it shows the `tags` metadata (one entry, toward SKODA-841).
+- **Check:** `library-check` (in `npm test`) fails on a block, contract variant or contract section style without a
+  library entry.
+- **DA:**
+  - `library/blocks.json` and `library/templates.json` are uploaded.
+  - The config `library` tab has Tag picker, Blocks and Templates.
+  - The bulk metadata row `/library/** | robots: noindex, nofollow` is previewed.
+- **Decisions:**
+  - **No Placeholders row:** `/en/placeholders.json` holds code UI strings, and DA `{{key}}` tokens aren't resolved.
+  - **Regeneration** is `npm run library:build`, documented in `tools/library/README.md`.
+- **Open:**
+  1. Upload `library/blocks/`, `library/templates/` and `library/README` to DA (the app's DA upload). Then check, in the
+     editor, inserting each block and starting a story and a press release from a template.
+  2. Publish `/metadata.json`. This waits on the 9 previewed but never published language rows (cs/de/sk/sr) that the
+     publish would also ship.
+  3. Templates still carry origin-CDN icons (AR-01) and the newsletter card (SKODA-840).
