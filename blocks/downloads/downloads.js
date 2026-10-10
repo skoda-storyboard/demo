@@ -634,7 +634,7 @@ const fileType = (href = '') => ((href.split(/[?#]/)[0].match(/\.([a-z0-9]+)$/i)
 /**
  * One shared-lightbox item for a tile, as the source colorbox panel: the title, the add /
  * download / link actions on the original, the file metadata the row carries (type, date) and
- * the page as the related article. A clip plays its MP4 in the stage.
+ * the page as the related article. A clip shows its poster, with the MP4 as the download.
  * @param {{src: string, alt?: string, title: string, date?: string, sizes: Array}} asset a tile
  * @param {{title?: string, href?: string}} [related] the related article (this page)
  * @returns {object} a lightbox item (scripts/lightbox.js)
@@ -669,8 +669,9 @@ export function lightboxItem(asset, related = {}) {
   const item = {
     src: asset.src, alt: title, caption, cartHref: href, thumb: cartThumb(asset.src),
   };
+  // a clip shows its poster: the MP4 is the download action, never the stage, because the
+  // AEM Assets original is served as an attachment (a player frame would download it)
   if (href) Object.assign(item, { download: href, link: href });
-  if (/\.mp4(?:[?#]|$)/i.test(href)) item.video = href;
   return item;
 }
 

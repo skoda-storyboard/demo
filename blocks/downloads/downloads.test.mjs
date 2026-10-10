@@ -895,7 +895,7 @@ test('Media Box lightbox: modifier clicks keep the image link; outside a Media B
   assert.equal(click(block.querySelector('.downloads-thumb')).defaultPrevented, false);
 });
 
-test('lightboxItem: the original drives download, link and cart; a clip plays its MP4; the date is published (SKODA-604)', async () => {
+test('lightboxItem: the original drives download, link and cart; a clip shows its poster and downloads its MP4 (SKODA-604)', async () => {
   setup();
   const { lightboxItem } = await import('./downloads.js');
   const image = lightboxItem({
@@ -907,6 +907,8 @@ test('lightboxItem: the original drives download, link and cart; a clip plays it
   assert.match(image.caption.textContent, /File type: JPG.*Published: 6\. 8\. 2026/s);
   assert.equal(image.caption.querySelector('a').getAttribute('href'), '/en/story');
   const clip = lightboxItem({ src: '/p.jpg', title: 'Clip', sizes: [{ label: 'MP4', href: 'https://dam.example/c.mp4' }] });
-  assert.equal(clip.video, 'https://dam.example/c.mp4');
+  assert.equal(clip.video, undefined, 'the attachment MP4 never loads in a player frame');
+  assert.equal(clip.src, '/p.jpg');
+  assert.equal(clip.download, 'https://dam.example/c.mp4');
   assert.equal(clip.caption.querySelector('a'), null, 'no related article without a page title');
 });
