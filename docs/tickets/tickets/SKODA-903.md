@@ -27,6 +27,25 @@ Rebuild = two pieces: **(a) data source** — either reuse the existing `skoda-b
 - [ ] Sidebar/inline/popup render correctly; popup respects delay + scroll triggers; clicks route through the tracked redirect.
 - [ ] Consent-gated; no banner logic runs pre-consent; banner events feed the dataLayer.
 
+## Observed on the demo stories (2026-10-10, user review of SKODA-604)
+- **The story sidebar slot:**
+  - `div.sidebar > section.side-banner > div.sa-bnr > section.sa-bnr-side[data-desktop][data-mobile]` is an empty
+    mount in the source HTML, and the plugin SPA fills it after load. The importer therefore has no content to carry,
+    and migrated stories show no banner there.
+  - It is the last sidebar item, after the newsletter box, related stories and tags.
+- **Example:** `/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia/` at 1440.
+  - The banner box is 345×369 and shows "Peaq | EN | Side banner", a 1000×1000 creative
+    (`2026/07/SKODApeaq1000x1000px26.10EN_810a1921.jpg`).
+  - It links through the tracked redirect `/wp-json/skoda-banners/v1/redirect/banner/448560/en` (`target=_blank`).
+  - It carries the dataLayer promotion attributes `data-promotion-label="ŠKODA Banner|448560"` and
+    `data-promotion-context="Sidebar"`.
+- **Live feed:** `/wp-json/skoda-banners/v1/list/en` returns 200 with 44 banners: 26 `widget`, 16 `sidebar`, 2
+  `positional`.
+  - Each row has `id`, `title`, `type`, `creative`, `imgAlt`, `url`, `tags`, `blackListedCountries`, `minViews`,
+    `showMax`, `showMaxExpiration`, `popupTriggerDelay` and `popupTriggerScroll`.
+  - This is the data the D3 keep / rebuild / drop decision and the "reuse API vs EDS feed" choice work from.
+- **M1 decision (user, 2026-10-10):** no demo banner; this stays M2.
+
 ## Dependencies
 - Upstream: SKODA-106 (design tokens + global CSS) / Downstream: SKODA-905 (banner event wiring)
 
