@@ -6,9 +6,13 @@
 - **Estimate:** 1.5 SP (was 3 SP; re-scoped 2026-09-24, see below) · AI-assisted 0.5–1d / manual 1.5–2d *(planning estimate, not a quote)*
 - **Parent:** SKODA-801 (#48) · **GitHub issue:** [#127](https://github.com/skoda-storyboard/demo/issues/127)
 - **Discovered in:** M1 gap review, 2026-09-24
-- **Status (2026-10-10):** 🟡 Delivered by [SKODA-830](SKODA-830.md) (PR #269; 57 stories published 2026-10-06) and
-  verified live today, see "Close-out check". The stale link allow-list fix (PR #312) is pushed + previewed on 50
-  pages. Publish them after #312 merges (user decision 2026-10-10), then close #127.
+- **Status (2026-10-10):** 🟢 Done.
+  - Delivered by [SKODA-830](SKODA-830.md) (PR #269; 57 stories published 2026-10-06) and verified live, see
+    "Close-out check".
+  - The link allow-list fix (PR #312, merged) is **published** on 50 pages: 50/50 live 200, 89/89 link targets
+    relative.
+  - The 20 in-scope stories have 0 source links left to live demo pages.
+  - #127 closed. `/en` and `/en/media-room` follow with the #306 home re-push.
 
 > **Re-scoped (2026-09-24, review §15): 3 → 1.5 SP.** PR #113 merged SKODA-801 and parts of 816–818/820, so:
 > - carousel → **SKODA-819** (Gallery `slider`; the importer already emits `Gallery`)
@@ -103,9 +107,10 @@ reconstruct the media that exists in all 21 stories, and keep the rest of SKODA-
       *(SKODA-830; live check 2026-10-10: 20/20 + alias, counts = origin)*
 - [x] Spot-check 3 stories (one per category) against the source: component presence and order, captions and alt
       text, download link counts. *(2026-10-10, see "Close-out check")*
-- [ ] No `skoda-storyboard.com` absolute links remain (SKODA-605) and no consent residue remains (SKODA-606).
-      *(Consent 0. Links to demo pages: fixed on preview for 50 pages; publish after #312 merges. Links to
-      non-demo pages and file downloads stay absolute by policy.)*
+- [x] No `skoda-storyboard.com` absolute links remain (SKODA-605) and no consent residue remains (SKODA-606).
+      *(Consent 0. Links to demo pages: published 2026-10-10 on 50 pages, 89/89 relative; 0 left on the 20
+      in-scope stories. Links to non-demo pages, listing filters on live-only hubs and file downloads stay absolute
+      by policy.)*
 - [x] Importer unit or fixture tests cover the Media Box mapping. `npm run lint` is clean.
       *(`story-import-validity.test.mjs`; link rules `skoda-links.test.mjs` 17/17)*
 - [x] **Amendment (2026-09-25, sweep reconciliation):** *(SKODA-830: 57 stories re-imported 2026-10-06; 0 block 404s
