@@ -7,8 +7,9 @@
 - **Origin:** user question 2026-10-09 ("why do the model cards on /en have a different image than on origin?")
 - **Depends on:** #306 (#272: Models rail order and card set, model tag pages as cards)
 - **Branch:** `skoda-839-model-card-image`
-- **Status (2026-10-10):** 🟡 11 tag pages pushed + previewed (0 conflicts); publish waits for a go-ahead. The rail
-  shows the new images once the pages are live (the index builds from live) and #306 is merged.
+- **Status (2026-10-10):** 🟢 11 tag pages **published** (user go-ahead): live index `image` = card image, 11/11.
+  With #306's code, the Models rail shows the source card images. The rail goes live when #306 merges. Open:
+  card frame aspect (see "Measured").
 
 ## Problem
 Measured 2026-10-09 on `/en`, origin vs live:
@@ -51,10 +52,23 @@ Measured 2026-10-09 on `/en`, origin vs live:
 - **Preview `og:image`:** 11/11 are the card image, with the source card proportions (768×300, 768×292, 768×291,
   768×438, 768×432). Elroq and Octavia resolve to the same media as their model page heroes.
 
+## Publish (2026-10-10, user go-ahead)
+- `--stage publish`: 11/11 (bulk preview + live), 0 conflicts.
+- **Live:** the `og:image` and the live query-index `image` match on 11/11 tag pages.
+
+## Measured: origin vs #306 + this content (780px viewport)
+- **Rail on #306's draft home** (`fix-272-home-qa--…/drafts/issue-272-home`): 11 cards in source order, linking to
+  `/en/tag/model/<slug>`. Each image is the source card image (e.g. Elroq = `elroq_header_fede6794` media).
+- **Card image frame:**
+  - Origin `article.type-skoda_model img`: 314×123 (2.55:1), `object-fit: fill`, so the full banner shows.
+  - #306 `.story-rail` card image: 214×120 (1.78:1), `object-fit: cover`, so the banner's sides are cropped.
+  - This is rail card sizing (#306 / SKODA-611b model ladder), not content; reported on #306.
+
 ## Acceptance Criteria
 - [x] The 11 model tag pages carry their source home card image as the page image
 - [x] Other archives unchanged (the source og:image or none)
 - [x] Importer test + bundle; lint clean
 - [x] 11 pages pushed + previewed (0 conflicts)
-- [ ] 11 pages published (separate go-ahead); the live index `image` = the card image
-- [ ] After #306: the live home Models cards show the source card images (measured vs origin)
+- [x] 11 pages published (2026-10-10, user go-ahead); the live index `image` = the card image, 11/11
+- [x] With #306's code: the Models cards show the source card images (measured on its draft home)
+- [ ] Card frame aspect matches the origin (2.55:1, uncropped); owned by #306
