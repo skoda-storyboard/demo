@@ -11,14 +11,19 @@
  * beside the body:
  *   .related  ("Explore more", 3 .article-teaser)  → Cards (overlay) block
  *   section.tags (ol.entry-tags)                    → Tags block
- *   .newsletter-subscribe-widget                    → Newsletter Stub (card) block at the
- *       top of the aside (SKODA-823, docs/ui-specs/newsletter.md §7). Built on the
- *       `preprocess` hook (import-story-detail.js calls it): skoda-page-cleanup removes
- *       the widget in beforeTransform, and helix preProcess would drop its empty inputs.
- *       The heading, image, placeholder, button, consent + manage links, consent error
- *       and the list/language ids come from the source widget; the consent and manage
- *       links stay absolute source URLs (their EDS pages 404 until migrated; skoda-links
- *       leaves non-demo source links absolute). UI only: the block posts nothing (M1).
+ *   .newsletter-subscribe-widget                    → NOT in the story (SKODA-840). Every
+ *       story shows the same card, so it lives once in `/{locale}/fragments/newsletter-card`
+ *       and scripts/story-newsletter.js puts it at the top of the sidebar at runtime. The
+ *       `preprocess` hook (import-story-detail.js calls it) only marks the sidebar
+ *       (`data-newsletter-card`), so a sidebar that held nothing but the widget still gets
+ *       its section, and drops the widget.
+ *       The `newsletter-card` hook builds the Newsletter Stub (card) table from the widget
+ *       (SKODA-823, docs/ui-specs/newsletter.md §7) for that fragment (import-newsletter-card.js).
+ *       It runs before skoda-page-cleanup removes the widget and before helix preProcess drops
+ *       its empty inputs. The heading, image, placeholder, button, consent + manage links,
+ *       consent error and the list/language ids come from the source widget; the consent and
+ *       manage links stay absolute source URLs (their EDS pages 404 until migrated). UI only:
+ *       the block posts nothing (M1).
  *   .side-banner                                    → DROPPED (external banner slot,
  *       SKODA-903).
  * A Section Metadata block (Style: sidebar) is emitted so the section is tagged; the
@@ -133,11 +138,6 @@ function newsletterCard(widget, document) {
   return rows.some(([k]) => k === 'heading' || k === 'button') ? rows : null;
 }
 
-const isNewsletterTable = (table) => {
-  const cell = table.querySelector('tr > th, tr > td');
-  return !!cell && squash(cell.textContent) === NEWSLETTER_BLOCK;
-};
-
 // Build a Cards block from the related "Explore more" teasers.
 function relatedCards(sidebar, document) {
   // The source nests `div.article-teaser > article`, so both selectors match the same
@@ -209,13 +209,24 @@ function tagsCell(sidebar, document) {
 }
 
 export default function transform(hookName, element, payload) {
-  if (hookName === 'preprocess') {
-    // The sidebar widget only (a newsletter form elsewhere is site chrome).
+  // The sidebar widget only (a newsletter form elsewhere is site chrome).
+  const widgets = () => element.querySelectorAll('.sidebar .newsletter-subscribe-widget');
+  if (hookName === 'newsletter-card') {
+    // the fragment importer: the widget → the Newsletter Stub (card) table, in place
     const doc = element.ownerDocument || (payload && payload.document);
-    element.querySelectorAll('.sidebar .newsletter-subscribe-widget').forEach((widget) => {
+    widgets().forEach((widget) => {
       const rows = newsletterCard(widget, doc);
       if (rows) widget.replaceWith(WebImporter.DOMUtils.createTable(rows, doc));
       else widget.remove();
+    });
+    return;
+  }
+  if (hookName === 'preprocess') {
+    // the story: the card comes from the shared fragment at runtime (SKODA-840)
+    widgets().forEach((widget) => {
+      const sidebar = widget.closest('.sidebar');
+      if (sidebar && newsletterCard(widget, element.ownerDocument)) sidebar.setAttribute('data-newsletter-card', 'shared');
+      widget.remove();
     });
     return;
   }
@@ -226,18 +237,17 @@ export default function transform(hookName, element, payload) {
 
   const cards = relatedCards(sidebar, document);
   const tags = tagsCell(sidebar, document);
-  const newsletter = [...sidebar.querySelectorAll('table')].find(isNewsletterTable) || null;
+  // the source sidebar opened with the newsletter widget; its card is added at runtime
+  const newsletter = sidebar.getAttribute('data-newsletter-card') === 'shared';
 
   // Rebuild the sidebar as a clean section: a leading break, an <aside> holding the
-  // Newsletter Stub (card) + Cards + Tags blocks, then the Section Metadata (Style: sidebar).
+  // Cards + Tags blocks, then the Section Metadata (Style: sidebar).
   const frag = document.createElement('div');
 
   const hr = document.createElement('hr');
   frag.appendChild(hr);
 
   const aside = document.createElement('aside');
-  // the source sidebar opens with the newsletter widget, above "Explore more"
-  if (newsletter) aside.appendChild(newsletter);
   const heading = sidebar.querySelector('.related .heading, .related h2, .related h3');
   if (heading) {
     const h = document.createElement('h2');
@@ -256,6 +266,21 @@ export default function transform(hookName, element, payload) {
     }
     aside.appendChild(WebImporter.DOMUtils.createTable(tags, document));
   }
+  if (newsletter && !cards && !tags) {
+    // only the widget: an explicit Fragment block for the shared card, so the section has
+    // content (story-flatten's dropEmptySections drops a metadata-only section). The
+    // runtime treats this block as the card and adds no second one.
+    const source = (payload && payload.params && payload.params.originalURL) || '';
+    let locale = 'en';
+    try {
+      const first = new URL(source).pathname.split('/')[1] || '';
+      if (/^[a-z]{2}$/.test(first)) locale = first;
+    } catch (e) { /* keep en */ }
+    const link = document.createElement('a');
+    link.setAttribute('href', `/${locale}/fragments/newsletter-card`);
+    link.textContent = link.getAttribute('href');
+    aside.appendChild(WebImporter.DOMUtils.createTable([['Fragment'], [[link]]], document));
+  }
   frag.appendChild(aside);
 
   // Section Metadata: Style = sidebar (consumed by the story-scoped runtime hook).
@@ -265,7 +290,8 @@ export default function transform(hookName, element, payload) {
   });
   frag.appendChild(metadataBlock);
 
-  // If nothing survived, don't emit an empty styled section — just drop.
+  // If nothing survived, don't emit an empty styled section — just drop. A sidebar that held
+  // only the newsletter widget keeps its (empty) section: the runtime card goes there.
   if (!cards && !tags && !newsletter) {
     sidebar.remove();
     return;

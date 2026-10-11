@@ -306,26 +306,58 @@ const kvRows = (table) => Object.fromEntries(
   rowsOf(table).map((tr) => [txt(tr.children[0]), tr.children[1]]),
 );
 
-test('sidebar newsletter widget → Newsletter Stub (card), first in the aside, above "Explore more"', { skip }, () => {
+// SKODA-840: the card is one shared fragment (import-newsletter-card.js), added to the sidebar
+// at runtime (scripts/story-newsletter.js), so the story itself carries no card table.
+test('SKODA-840: the story carries no Newsletter Stub (card); the sidebar opens with "Explore more"', { skip }, () => {
   Object.keys(PAGES).forEach((k) => {
     const { sections, element } = importPage(k);
     const aside = sections.find((s) => s.style === 'sidebar');
     assert.ok(aside, `${k}: sidebar section`);
-    assert.equal(aside.blocks[0], NEWSLETTER, `${k}: card first`);
-    assert.equal(allTables(element, NEWSLETTER).length, 1, `${k}: one card`);
-    const card = aside.tables[0];
-    // the card precedes the "Explore more" heading
-    const asideEl = card.parentElement;
-    const kids = [...asideEl.children];
-    const h = kids.find((n) => n.tagName === 'H2');
-    if (h) assert.ok(kids.indexOf(card) < kids.indexOf(h), `${k}: card above ${txt(h)}`);
+    assert.equal(allTables(element, NEWSLETTER).length, 0, `${k}: no card table`);
+    assert.ok(!aside.blocks.includes(NEWSLETTER), `${k}: not in the aside`);
+    assert.ok(!element.querySelector('[data-newsletter-card]'), `${k}: the marker never lands as content`);
     assert.ok(!element.querySelector('.newsletter-subscribe-widget, form, input, button'), `${k}: no source form`);
     assert.ok(!element.querySelector('.side-banner, .sa-bnr'), `${k}: side banner still dropped (SKODA-903)`);
   });
 });
 
+// ---- SKODA-840: the shared fragment, import-newsletter-card.js -----------------------------
+
+const cardImporter = JSDOM ? (await import('./import-newsletter-card.js')).default : null;
+
+/** The card fragment imported from a source story fixture. */
+function importCard(key, mutate = () => {}) {
+  const slug = PAGES[key];
+  const url = `${SRC}/${slug}/`;
+  const dom = new JSDOM(readFileSync(path.join(FIXTURES, `${slug.split('/').pop()}.html`), 'utf8'), { url });
+  mutate(dom.window.document);
+  globalThis.document = dom.window.document;
+  globalThis.window = dom.window;
+  cardImporter.preprocess({ document: dom.window.document });
+  helixPreProcess(dom.window.document);
+  const payload = { document: dom.window.document, url, params: { originalURL: url } };
+  return cardImporter.transform(payload)[0];
+}
+
+test('SKODA-840 fragment: only the card table, at /en/fragments/newsletter-card', { skip }, () => {
+  const { element, path: out } = importCard('epiq');
+  assert.equal(out, '/en/fragments/newsletter-card');
+  const tables = [...element.querySelectorAll('table')].filter((t) => !t.parentElement.closest('table'));
+  assert.deepEqual(tables.map(blockName), [NEWSLETTER]);
+  assert.equal(element.children.length, 1, 'nothing but the card: no metadata, no section break');
+});
+
+test('SKODA-840 fragment: every source story yields the same card', { skip }, () => {
+  const cards = Object.keys(PAGES).map((k) => importCard(k).element.innerHTML);
+  assert.equal(new Set(cards).size, 1);
+});
+
+test('SKODA-840 fragment: a story without the widget fails loudly', { skip }, () => {
+  assert.throws(() => importCard('epiq', (doc) => doc.querySelectorAll('.newsletter-subscribe-widget').forEach((n) => n.remove())), /no sidebar newsletter widget/);
+});
+
 test('Newsletter Stub (card) rows: source heading + image, form strings, origin consent/manage links', { skip }, () => {
-  const { element } = importPage('epiq');
+  const { element } = importCard('epiq');
   const cfg = kvRows(allTables(element, NEWSLETTER)[0]);
   assert.deepEqual(Object.keys(cfg), [
     'image', 'heading', 'label', 'placeholder', 'button', 'consent', 'manage',
@@ -354,7 +386,7 @@ test('Newsletter Stub (card) rows: source heading + image, form strings, origin 
   assert.equal(manage.getAttribute('href'), 'https://www.skoda-storyboard.com/en/newsletter-settings/');
 });
 
-test('a story without the newsletter widget gets no card; a widget-only sidebar keeps its section', { skip }, () => {
+test('a story without the newsletter widget drops an empty sidebar; a widget-only sidebar keeps its (empty) section', { skip }, () => {
   const slug = PAGES.cruise;
   const url = `${SRC}/${slug}/`;
   const run = (mutate) => {
@@ -372,9 +404,15 @@ test('a story without the newsletter widget gets no card; a widget-only sidebar 
   const none = run((doc) => doc.querySelectorAll('.newsletter-subscribe-widget').forEach((n) => n.remove()));
   assert.equal(allTables(none, NEWSLETTER).length, 0);
   assert.equal(sectionsOf(none).find((s) => s.style === 'sidebar').blocks[0], 'Cards (overlay)');
+  // only the widget: the section stays, with an explicit Fragment block for the shared card
   const only = run((doc) => doc.querySelectorAll('.sidebar .related, .sidebar section.tags').forEach((n) => n.remove()));
   const aside = sectionsOf(only).find((s) => s.style === 'sidebar');
-  assert.deepEqual(aside.blocks, [NEWSLETTER]);
+  assert.ok(aside, 'widget-only sidebar keeps its section');
+  assert.deepEqual(aside.blocks, ['Fragment']);
+  assert.equal(aside.tables[0].querySelector('a').getAttribute('href'), '/en/fragments/newsletter-card');
+  // nothing at all: no styled section
+  const empty = run((doc) => doc.querySelectorAll('.sidebar .related, .sidebar section.tags, .newsletter-subscribe-widget').forEach((n) => n.remove()));
+  assert.equal(sectionsOf(empty).find((s) => s.style === 'sidebar'), undefined);
 });
 
 // ---- D5 (user decision 2026-10-06): regulatory lightbox captions stay visible ----------

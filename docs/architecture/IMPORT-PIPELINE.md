@@ -53,7 +53,8 @@ Archives + directories:
 
 Flatten-to-default (SiteOrigin widget tree NOT reconstructed — deferred to SKODA-801/814/604/810/210):
 - **`company-page`** — hero + `.entry-content` flattened; sub-type blocks/galleries → SKODA-810.
-- **`story-detail`** — hero + primary `.content` flattened by SKODA-801; `.sidebar` rebuilt as a separate section; in-body Media Box deferred to SKODA-801a/604.
+- **`story-detail`** — hero + primary `.content` flattened by SKODA-801; `.sidebar` rebuilt as a separate section; in-body Media Box deferred to SKODA-801a/604. The sidebar newsletter card is not in the story (SKODA-840): it is the shared fragment below, added at runtime.
+- **`newsletter-card`** — one source story's sidebar `.newsletter-subscribe-widget` → the single `Newsletter Stub (card)` table of `/{locale}/fragments/newsletter-card` (SKODA-840; the builder is skoda-story-aside's `newsletter-card` hook). Publish it before the stories.
 - **`error-404`** — `.error-message` dead-end copy + homepage link; site-root `404.html` shell.
 
 > Detection is **content-driven only** — blocks are located by the `page-templates.json` DOM selectors; parsers self-identify from the DOM (body-class token, `data-content-type`, `type-<cpt>` class), never from URL/template/section-order/position. Where a URL is read for archives, it derives the rail filter, never detection. **Series is an exception to index-driven grid output, not to DOM-based detection:** preserve the authored SiteOrigin row/order/size signals and use its canonical URL only for Metadata/links. Mixed Story/Press Kits tiles must not make a hub look like a directory.
