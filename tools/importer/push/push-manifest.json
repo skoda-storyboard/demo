@@ -621,8 +621,9 @@
       "previewedHash": "c3db42358b7d9715feeeb22264beadd0590199be9bc20186144ce63fe604a7be"
     },
     "/en/press-kits/skoda-peaq-press-kit-2/images": {
-      "hash": "9bb37aa80765fc9b886cde740cd3c4d4709ba034e920de2e765bc38c50c39d9d",
-      "pushedAt": "2026-10-08T10:40:00.873Z"
+      "hash": "46e04c96f94b6a086f91cef845706627361489689915e8103b6d27d8dee13d3a",
+      "pushedAt": "2026-10-11T20:05:15.583Z",
+      "previewedHash": "46e04c96f94b6a086f91cef845706627361489689915e8103b6d27d8dee13d3a"
     },
     "/en/press-kits/skoda-peaq-press-kit-2/infographics": {
       "hash": "8fb892b84d2f21f13b29bd30c479ade8204525f3da7b842ef23ffba58a220447",
@@ -1402,6 +1403,11 @@
       "hash": "ae1d9dda39eb67eb53e658b9ec2af23b2d9cc25d1011e9f90607113a64671495",
       "pushedAt": "2026-09-26T06:56:28.280Z",
       "adopted": true
+    },
+    "/fragments/en/press-kits/skoda-peaq-press-kit-2/images/exterior": {
+      "hash": "d5b9ce34f6de4a937c9034dd10240b5eef7c8648ce28cd49d73d8ebac1b5970b",
+      "pushedAt": "2026-10-11T20:05:15.583Z",
+      "previewedHash": "d5b9ce34f6de4a937c9034dd10240b5eef7c8648ce28cd49d73d8ebac1b5970b"
     },
     "/nav": {
       "hash": "9be605a50d052fa90c8975e14242c75b2e47f00b271b59660567723536056bbc",
