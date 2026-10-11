@@ -1,0 +1,30 @@
+{
+  "variantName": "stories",
+  "baseBlock": "stories",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Stories",
+  "description": "Newest pages as a card grid with \"Load more\". Settings: template (story, press_release, …), category / categories, tag(s), heading, sort, initial, perpage, columns, offset, exclude, excludefeatured, feature. Pages appear after they are published.",
+  "visualCharacteristics": {
+    "purpose": "grid of story cards with Load more"
+  },
+  "contentPattern": {
+    "structure": "config only"
+  },
+  "usage": {
+    "pagesUsing": [
+      "en",
+      "en/category/classic-cars",
+      "en/category/concepts",
+      "en/category/corporate-life",
+      "en/category/design-eng",
+      "en/category/emobility",
+      "en/category/lifestyle",
+      "en/category/lifestyle/adventures",
+      "en/category/lifestyle/people",
+      "en/category/lifestyle/sports"
+    ],
+    "reuseCount": 42,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}

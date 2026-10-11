@@ -1,0 +1,21 @@
+{
+  "variantName": "media-cart",
+  "baseBlock": "media-cart",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Media Cart",
+  "description": "Only on the media cart page (/en/media-cart), under an h1. Leave the block empty: it shows the visitor's own cart.",
+  "visualCharacteristics": {
+    "purpose": "the media cart page"
+  },
+  "contentPattern": {
+    "structure": "empty"
+  },
+  "usage": {
+    "pagesUsing": [
+      "en/media-cart"
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}
