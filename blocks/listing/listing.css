@@ -6,7 +6,12 @@
  * Layer order (docs/guardrails/css-guidelines.md): fluid + intrinsic first;
  * breakpoints only for the grid column-count transitions (576 / 768 / 992; minmax(0, 1fr)
  * keeps columns equal whatever the content) and the filter toggle's row placement (768).
+ *
+ * News and Press Kits results are the shared overlay card-teaser (date + title over the
+ * image), so the primitive's stylesheet is imported; this file only places the cards.
  */
+
+@import url("../../styles/card-teaser.css");
 
 .listing {
   /* the source sort row height: sort links and the desktop "Advanced filter" toggle */
