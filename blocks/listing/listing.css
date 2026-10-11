@@ -426,11 +426,14 @@
 }
 
 /* --- result count "N / total": under the grid, above Load more (source) --- */
+
+/* the source count sits 36px under the last card (the grid's trailing 20px gutter + its own
+   16px margin) and is ink (measured /en/news + /en/images, 2026-10-11; #273 obs. 8) */
 .listing .listing-count {
   padding-block: 0.5em;
-  margin-block: 1em;
+  margin-block: calc(var(--grid-gutter) + 1em) 1em;
   font-weight: var(--weight-semibold); /* source measured 500; SKODA Next has no 500 face → 600 per _FOUNDATIONS §weights */
-  color: var(--skoda-grey-500);
+  color: var(--text-color);
   border-block-end: 1px solid var(--pagination-border);
 }
 
@@ -460,6 +463,12 @@
 
 .listing .listing-item {
   margin: 0;
+}
+
+/* News / Press Kits overlay cards: the source .entry-meta date line ends 12px above the
+   title (the primitive's default caption gap is 8px) */
+.listing .card-teaser.overlay .card-teaser-body {
+  gap: var(--spacing-s);
 }
 
 .listing .listing-item-link {
@@ -770,10 +779,14 @@
 }
 
 /* --- load-more: shared ghost pill; under the count, 16px padded like the source --- */
+
+/* Load more sits 76px above the footer on the source (16px padding + the section's 48px + 12px);
+   the listing's trailing gutter makes up the 20px the section margin lacks (#273 obs. 7) */
 .listing .listing-loadmore {
   display: flex;
   justify-content: center;
   padding-block: var(--spacing-m);
+  margin-block-end: var(--grid-gutter);
 }
 
 .listing .listing-loadmore-btn {
