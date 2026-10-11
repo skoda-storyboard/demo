@@ -84,6 +84,9 @@
     "/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon": {
       "qa": "pending",
       "note": "607 phase 1 live 2026-09-27: layout QA passed (1280/1024/768/500, 0 errors); final visual diff after SKODA-223/224/510"
+    },
+    "/en/press-kits/skoda-peaq-press-kit-2/images": {
+      "note": "SKODA-806 split: Exterior (69) → /fragments/en/press-kits/skoda-peaq-press-kit-2/images/exterior; page + fragment published 2026-10-11 (#327)"
     }
   }
 }
