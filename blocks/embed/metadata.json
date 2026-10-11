@@ -1,0 +1,28 @@
+{
+  "variantName": "embed",
+  "baseBlock": "embed",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Embed",
+  "description": "A YouTube, Vimeo, Buzzsprout or Spotify URL. A bare link on its own line also works. Settings rows: url, ratio (e.g. 16:9), title, poster (image). An .mp4 url plays as a native video with the poster.",
+  "visualCharacteristics": {
+    "purpose": "video / podcast embed"
+  },
+  "contentPattern": {
+    "structure": "config or bare url"
+  },
+  "usage": {
+    "pagesUsing": [
+      "en/emobility/enyaq-and-elroq-now-double-as-gaming-consoles-and-thats-not-all",
+      "en/press-kits/125-years-of-skoda-motorsport-press-kit/videos",
+      "en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
+      "en/press-kits/skoda-epiq-press-kit-2/videos",
+      "en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
+      "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "en/press-kits/skoda-peaq-press-kit-2/videos",
+      "en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design"
+    ],
+    "reuseCount": 8,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}

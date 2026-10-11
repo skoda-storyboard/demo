@@ -20,3 +20,5 @@ content/en/press-releases/novel-arrangement-test.plain.html
 docs/analysis/SKODA-M1-URL-BLOCK-REGISTRY.json
 templates/**/*.test.mjs
 docs/ui-specs/tools/
+blocks/*/metadata.json
+tools/library/

@@ -1,0 +1,37 @@
+{
+  "variantName": "quote",
+  "baseBlock": "quote",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Quote",
+  "description": "A quotation: the quote text, then the author (bold) and their role.",
+  "visualCharacteristics": {
+    "purpose": "pull quote"
+  },
+  "contentPattern": {
+    "structure": "quote-author single"
+  },
+  "options": [
+    {
+      "class": "left",
+      "label": "left",
+      "description": "Quote aligned left with a vertical rule (press kits)."
+    }
+  ],
+  "usage": {
+    "pagesUsing": [
+      "en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsport-success",
+      "en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
+      "en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
+      "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
+      "en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design",
+      "en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production",
+      "en/press-releases/lorena-wiebes-receives-skoda-design-trophy-after-winning-tour-de-france-femmes-avec-zwift-points-classification",
+      "en/press-releases/preparations-begin-for-the-11th-skoda-student-car-celebrating-100-years-of-vocational-education",
+      "en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq",
+      "en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026"
+    ],
+    "reuseCount": 34,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}
