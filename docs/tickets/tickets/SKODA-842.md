@@ -13,10 +13,10 @@
     `tools/importer/push/block-contracts.json` (the block contracts the library documents).
 - **Tooling:** the `excat-block-library` plugin was enabled on 2026-10-10 (user). It generates sample block documents,
   uploads them to DA and wires the Library panel. Use it, then review its output against the contracts.
-- **Status (2026-10-10):** 🟡 IN PROGRESS. PR [#322](https://github.com/skoda-storyboard/demo/pull/322) holds the generator, the
-  spec and the coverage check (`tools/library/`). The DA sheets, the config rows and the `/library/**` noindex row (preview)
-  are done, and the documents are uploaded and previewed (2026-10-11). Waiting on: the acceptance checks in the editor and the live publish of
-  the bulk metadata sheet. See "Progress".
+- **Status (2026-10-11):** 🟡 IN PROGRESS. PR [#322](https://github.com/skoda-storyboard/demo/pull/322) holds the generator, the
+  spec and the coverage check (`tools/library/`). Done: the DA sheets and the config rows. The library documents are
+  uploaded and published, and the `/library/** noindex` bulk row is live. Waiting on: the acceptance checks in the editor.
+  See "Progress".
 
 ## Problem
 - **The library is empty.** DA has no `/library`, `/blocks` or `/templates`, and the project `library` config holds one
@@ -91,9 +91,14 @@ About 2–3 days for blocks and templates; the story template alone is about hal
   - On the branch preview, all 24 documents load every block with no block errors, and they carry `robots: noindex,
     nofollow` from the bulk row. The README previews at `/library/readme`.
   - The only console errors are for `library-metadata`, a table the library panel reads, not a block.
+- **Published (2026-10-11, user):**
+  - The 25 library documents are live with `robots: noindex, nofollow`. Every block loads with no block errors.
+  - The bulk metadata sheet is live with 24 rows: the 23 that were live plus `/library/**`.
+  - The 9 language rows that were previewed but never published (cs/de/sk/sr + Epiq `alternates`) were kept off live, by
+    the user's choice. I published a copy without them, then restored DA and preview to all 33 rows. The live English
+    Epiq story has no alternate links.
+  - Publishing the sheet from DA again ships those 9 rows.
 - **Open:**
   1. Editor checks: insert each block from the Library panel, start a story and a press release from a template, and
      check they appear in their rails after publish.
-  2. Publish `/metadata.json`. This waits on the 9 previewed but never published language rows (cs/de/sk/sr) that the
-     publish would also ship.
-  3. Templates still carry origin-CDN icons (AR-01) and the newsletter card (SKODA-840).
+  2. Templates still carry origin-CDN icons (AR-01) and the newsletter card (SKODA-840).
