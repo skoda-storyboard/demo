@@ -6,7 +6,7 @@
 - **GitHub issue:** [#318](https://github.com/skoda-storyboard/demo/issues/318)
 - **Origin:** authoring review [`SKODA-AUTHORING-REVIEW-2026-10-10.md`](../../reviews/SKODA-AUTHORING-REVIEW-2026-10-10.md), AR-05 (user, 2026-10-10: "present a fix", tickets only)
 - **Related:** SKODA-823 (the `newsletter-stub (card)` variant), SKODA-904 (newsletter service, M2), SKODA-1003 (per-locale content)
-- **Status (2026-10-11):** 🟡 IN REVIEW: [PR #325](https://github.com/skoda-storyboard/demo/pull/325). The fragment `/en/fragments/newsletter-card` is in DA and previewed. Content rollout (publish the fragment, re-push 67 stories) waits for the merge and a go-ahead. See "Progress".
+- **Status (2026-10-11):** 🟢 DELIVERED, ready for QA: PR #325 (code) and #326 (push record) merged. The fragment and the 67 stories are published; edit-the-fragment check passed on preview. See "Rollout".
 
 ## Problem
 - **Every story repeats the card.** All 68 live stories carry their own 12-row `Newsletter Stub (card)` table (about
@@ -69,3 +69,19 @@ About half a day of code and tests, plus one re-push of 68 stories with QA.
   3. Push the 67 stories (after `media:apply`, conflict guard, card-only diff), preview, then publish.
   4. Edit-the-fragment QA on 3 stories.
   5. Delete `/drafts/840/*`.
+
+## Rollout (2026-10-11, user go-ahead)
+- **#325 merged:** `scripts/story-newsletter.js` is live.
+- **Fragment published:** `/en/fragments/newsletter-card`.
+- **67 stories:**
+  - Pushed, previewed and published with the conflict guard (0 conflicts).
+  - Each one differs from DA only by the removed card table (strict check, 67/67). Push record in #326.
+- **Live check:**
+  - No story source has a card table (67/67), and all 67 are in the index.
+  - Rendered, every story shows one card, from the fragment, first in the sidebar: loaded, heading "Be the first⏎to get the latest stories", 345px wide.
+  - That includes `enyaq-and-elroq-now-double-as-gaming-consoles…`, the older import, which now shows the card as on origin.
+- **Edit-the-fragment AC:**
+  - Changing the button text in DA and previewing showed "Subscribe now! (QA 840)" on the 3 stories on `.aem.page`, while `.aem.live` was unchanged.
+  - The original text is restored and previewed again; preview = live.
+- **Clean-up:** `/drafts/840/*` is deleted.
+- **Not run:** the full `npm test` (focused suites pass).
