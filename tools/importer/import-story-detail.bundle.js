@@ -1107,10 +1107,6 @@ var CustomImportScript = (() => {
     add("language", value('input[name="language"]', "value"));
     return rows.some(([k]) => k === "heading" || k === "button") ? rows : null;
   }
-  var isNewsletterTable = (table) => {
-    const cell = table.querySelector("tr > th, tr > td");
-    return !!cell && squash2(cell.textContent) === NEWSLETTER_BLOCK;
-  };
   function relatedCards(sidebar, document2) {
     const matched = [...sidebar.querySelectorAll(".related .article-teaser, .related article")];
     const teasers = matched.filter((el, i, arr) => arr.indexOf(el) === i).filter((el) => !matched.some((other) => other !== el && other.contains(el)));
@@ -1158,12 +1154,21 @@ var CustomImportScript = (() => {
     return cell.length ? [["Tags"], [cell]] : null;
   }
   function transform3(hookName, element, payload) {
-    if (hookName === "preprocess") {
+    const widgets = () => element.querySelectorAll(".sidebar .newsletter-subscribe-widget");
+    if (hookName === "newsletter-card") {
       const doc = element.ownerDocument || payload && payload.document;
-      element.querySelectorAll(".sidebar .newsletter-subscribe-widget").forEach((widget) => {
+      widgets().forEach((widget) => {
         const rows = newsletterCard(widget, doc);
         if (rows) widget.replaceWith(WebImporter.DOMUtils.createTable(rows, doc));
         else widget.remove();
+      });
+      return;
+    }
+    if (hookName === "preprocess") {
+      widgets().forEach((widget) => {
+        const sidebar2 = widget.closest(".sidebar");
+        if (sidebar2 && newsletterCard(widget, element.ownerDocument)) sidebar2.setAttribute("data-newsletter-card", "shared");
+        widget.remove();
       });
       return;
     }
@@ -1172,12 +1177,11 @@ var CustomImportScript = (() => {
     if (!sidebar) return;
     const cards = relatedCards(sidebar, document);
     const tags = tagsCell(sidebar, document);
-    const newsletter = [...sidebar.querySelectorAll("table")].find(isNewsletterTable) || null;
+    const newsletter = sidebar.getAttribute("data-newsletter-card") === "shared";
     const frag = document.createElement("div");
     const hr = document.createElement("hr");
     frag.appendChild(hr);
     const aside = document.createElement("aside");
-    if (newsletter) aside.appendChild(newsletter);
     const heading = sidebar.querySelector(".related .heading, .related h2, .related h3");
     if (heading) {
       const h = document.createElement("h2");
@@ -1193,6 +1197,19 @@ var CustomImportScript = (() => {
         aside.appendChild(h);
       }
       aside.appendChild(WebImporter.DOMUtils.createTable(tags, document));
+    }
+    if (newsletter && !cards && !tags) {
+      const source = payload && payload.params && payload.params.originalURL || "";
+      let locale = "en";
+      try {
+        const first = new URL(source).pathname.split("/")[1] || "";
+        if (/^[a-z]{2}$/.test(first)) locale = first;
+      } catch (e) {
+      }
+      const link = document.createElement("a");
+      link.setAttribute("href", `/${locale}/fragments/newsletter-card`);
+      link.textContent = link.getAttribute("href");
+      aside.appendChild(WebImporter.DOMUtils.createTable([["Fragment"], [[link]]], document));
     }
     frag.appendChild(aside);
     const metadataBlock = WebImporter.Blocks.createBlock(document, {

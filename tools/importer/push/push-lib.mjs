@@ -229,7 +229,9 @@ export function fragmentHolds(pages, fragmentsOf, isLive) {
  * unless page metadata overrides them (blocks/header/header.js, blocks/footer/footer.js).
  * Reads a `nav` / `footer` row from the importer's Metadata block, and from the bulk
  * metadata sheet (`/metadata.json`) rows whose `URL` pattern matches a page of the batch
- * (the Media Room chrome comes from bulk rows, SKODA-309).
+ * (the Media Room chrome comes from bulk rows, SKODA-309). A batch with stories also needs
+ * the shared sidebar card `/{locale}/fragments/newsletter-card` (SKODA-840): the runtime
+ * adds it to every story, so it isn't a link in the story content.
  * @param {string[]} plains the `.plain.html` bodies of the batch
  * @param {{paths?: string[], bulk?: object[]}} [opts] the batch page paths and the bulk rows
  * @returns {string[]} unique fragment paths, defaults first
@@ -259,6 +261,14 @@ export function fragmentPaths(plains, { paths = [], bulk = [] } = {}) {
       m = re.exec(text);
     }
   });
+  const story = (plains || []).some((plain) => /<div><div>template<\/div><div>story<\/div><\/div>/i.test(String(plain || '')));
+  if (story) {
+    const locales = [...new Set((paths || []).map((p) => {
+      const first = String(p || '').split('/')[1] || '';
+      return /^[a-z]{2}$/.test(first) ? first : 'en';
+    }))];
+    (locales.length ? locales : ['en']).forEach((l) => add(`/${l}/fragments/newsletter-card`));
+  }
   return out;
 }
 
