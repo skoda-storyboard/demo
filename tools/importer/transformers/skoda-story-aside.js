@@ -11,9 +11,21 @@
  * beside the body:
  *   .related  ("Explore more", 3 .article-teaser)  → Cards (overlay) block
  *   section.tags (ol.entry-tags)                    → Tags block
- *   .newsletter-subscribe-widget / .side-banner     → DROPPED (JS-service / external
- *       widgets with no static content; not editorial body — chrome, per story-detail
- *       §2 and SKODA-604/D7).
+ *   .newsletter-subscribe-widget                    → NOT in the story (SKODA-840). Every
+ *       story shows the same card, so it lives once in `/{locale}/fragments/newsletter-card`
+ *       and scripts/story-newsletter.js puts it at the top of the sidebar at runtime. The
+ *       `preprocess` hook (import-story-detail.js calls it) only marks the sidebar
+ *       (`data-newsletter-card`), so a sidebar that held nothing but the widget still gets
+ *       its section, and drops the widget.
+ *       The `newsletter-card` hook builds the Newsletter Stub (card) table from the widget
+ *       (SKODA-823, docs/ui-specs/newsletter.md §7) for that fragment (import-newsletter-card.js).
+ *       It runs before skoda-page-cleanup removes the widget and before helix preProcess drops
+ *       its empty inputs. The heading, image, placeholder, button, consent + manage links,
+ *       consent error and the list/language ids come from the source widget; the consent and
+ *       manage links stay absolute source URLs (their EDS pages 404 until migrated). UI only:
+ *       the block posts nothing (M1).
+ *   .side-banner                                    → DROPPED (external banner slot,
+ *       SKODA-903).
  * A Section Metadata block (Style: sidebar) is emitted so the section is tagged; the
  * story-scoped runtime hook (scripts.js) turns that into a `.sidebar` class because
  * the vendored decorateSections does NOT process Section Metadata (verified in-browser
@@ -30,6 +42,101 @@
  */
 
 const TransformHook = { beforeTransform: 'beforeTransform', afterTransform: 'afterTransform' };
+
+const NEWSLETTER_BLOCK = 'Newsletter Stub (card)';
+// Strings the source widget does not carry as text (its e-mail field has no label and its
+// invalid-e-mail message is set by JS); the same values as the SKODA-823 block draft.
+const NEWSLETTER_DEFAULTS = {
+  label: 'Email address',
+  message: 'Newsletter signup is not available yet',
+  error: 'Please enter a valid e-mail address.',
+  'consent-error': 'Please accept the terms before continuing.',
+};
+
+const squash = (s) => (s || '').replace(/[ \t\r\n]+/g, ' ').trim();
+
+// Inline copy of a source node (text, <br>, links) as one cell's nodes, outer whitespace
+// trimmed. Links keep only their href (no target / tracking attributes).
+function inlineNodes(source, document) {
+  const nodes = [];
+  source.childNodes.forEach((n) => {
+    if (n.nodeType === 3) {
+      const t = n.nodeValue.replace(/[ \t\r\n]+/g, ' ');
+      if (t) nodes.push(document.createTextNode(t));
+    } else if (n.nodeName === 'BR') {
+      nodes.push(document.createElement('br'));
+    } else if (n.nodeName === 'A' && n.getAttribute('href')) {
+      const a = document.createElement('a');
+      a.setAttribute('href', n.getAttribute('href'));
+      a.textContent = squash(n.textContent);
+      if (a.textContent) nodes.push(a);
+    } else if (n.nodeType === 1) {
+      const t = squash(n.textContent);
+      if (t) nodes.push(document.createTextNode(t));
+    }
+  });
+  // trim the cell's outer whitespace (the source ends the consent label with `&nbsp; `)
+  const edge = (i, re) => {
+    while (nodes.length && nodes[i()].nodeType === 3) {
+      const n = nodes[i()];
+      n.nodeValue = n.nodeValue.replace(re, '');
+      if (n.nodeValue) break;
+      nodes.splice(i(), 1);
+    }
+  };
+  edge(() => 0, /^[ \u00a0]+/);
+  edge(() => nodes.length - 1, /[ \u00a0]+$/);
+  return nodes.filter((n) => n.nodeType !== 3 || n.nodeValue);
+}
+
+// `.newsletter-subscribe-widget` → Newsletter Stub (card) key/value rows (newsletter.md §7).
+function newsletterCard(widget, document) {
+  const rows = [[NEWSLETTER_BLOCK]];
+  const add = (key, value) => {
+    if (Array.isArray(value) ? value.length : value) rows.push([key, value]);
+  };
+  const value = (sel, attr) => {
+    const el = widget.querySelector(sel);
+    if (!el) return '';
+    return squash(attr ? el.getAttribute(attr) : el.textContent);
+  };
+
+  const src = widget.querySelector('header img');
+  if (src && src.getAttribute('src')) {
+    // a decorative background ("Subscription background"): the heading says it all
+    const img = document.createElement('img');
+    img.setAttribute('src', src.getAttribute('src'));
+    img.setAttribute('alt', '');
+    add('image', [img]);
+  }
+  const heading = widget.querySelector('header h1, header h2, header h3, header h4');
+  if (heading) add('heading', inlineNodes(heading, document));
+  add('label', NEWSLETTER_DEFAULTS.label);
+  add('placeholder', value('input[type="email"], input.email', 'placeholder'));
+  add('button', value('button[type="submit"], button'));
+
+  const terms = widget.querySelector('.terms label, label[for]');
+  if (terms) {
+    const label = terms.cloneNode(true);
+    label.querySelectorAll('.manage-subscription-link').forEach((n) => n.remove());
+    add('consent', inlineNodes(label, document));
+  }
+  const manage = widget.querySelector('.manage-subscription-link a[href]');
+  if (manage && squash(manage.textContent)) {
+    const a = document.createElement('a');
+    a.setAttribute('href', manage.getAttribute('href'));
+    a.textContent = squash(manage.textContent);
+    add('manage', [a]);
+  }
+
+  add('message', NEWSLETTER_DEFAULTS.message);
+  add('error', NEWSLETTER_DEFAULTS.error);
+  add('consent-error', value('.checkbox-error') || NEWSLETTER_DEFAULTS['consent-error']);
+  add('list', value('input[name="list"]', 'value'));
+  add('language', value('input[name="language"]', 'value'));
+  // only a heading or a form makes a card worth emitting
+  return rows.some(([k]) => k === 'heading' || k === 'button') ? rows : null;
+}
 
 // Build a Cards block from the related "Explore more" teasers.
 function relatedCards(sidebar, document) {
@@ -90,6 +197,9 @@ function tagsCell(sidebar, document) {
     const href = a.getAttribute('href');
     const text = (a.textContent || '').trim();
     if (!href || !text) return;
+    // The "+N" show-more toggle (`a.show-hidden-terms href="#"`) is tag-row UI, not a tag
+    // (audit 4.11); the tags it reveals are real `hidden-term` links and are kept.
+    if (href === '#' || a.classList.contains('show-hidden-terms')) return;
     const link = document.createElement('a');
     link.setAttribute('href', href);
     link.textContent = text;
@@ -99,6 +209,27 @@ function tagsCell(sidebar, document) {
 }
 
 export default function transform(hookName, element, payload) {
+  // The sidebar widget only (a newsletter form elsewhere is site chrome).
+  const widgets = () => element.querySelectorAll('.sidebar .newsletter-subscribe-widget');
+  if (hookName === 'newsletter-card') {
+    // the fragment importer: the widget → the Newsletter Stub (card) table, in place
+    const doc = element.ownerDocument || (payload && payload.document);
+    widgets().forEach((widget) => {
+      const rows = newsletterCard(widget, doc);
+      if (rows) widget.replaceWith(WebImporter.DOMUtils.createTable(rows, doc));
+      else widget.remove();
+    });
+    return;
+  }
+  if (hookName === 'preprocess') {
+    // the story: the card comes from the shared fragment at runtime (SKODA-840)
+    widgets().forEach((widget) => {
+      const sidebar = widget.closest('.sidebar');
+      if (sidebar && newsletterCard(widget, element.ownerDocument)) sidebar.setAttribute('data-newsletter-card', 'shared');
+      widget.remove();
+    });
+    return;
+  }
   if (hookName !== TransformHook.afterTransform) return;
 
   const sidebar = element.querySelector('.sidebar');
@@ -106,6 +237,8 @@ export default function transform(hookName, element, payload) {
 
   const cards = relatedCards(sidebar, document);
   const tags = tagsCell(sidebar, document);
+  // the source sidebar opened with the newsletter widget; its card is added at runtime
+  const newsletter = sidebar.getAttribute('data-newsletter-card') === 'shared';
 
   // Rebuild the sidebar as a clean section: a leading break, an <aside> holding the
   // Cards + Tags blocks, then the Section Metadata (Style: sidebar).
@@ -133,6 +266,21 @@ export default function transform(hookName, element, payload) {
     }
     aside.appendChild(WebImporter.DOMUtils.createTable(tags, document));
   }
+  if (newsletter && !cards && !tags) {
+    // only the widget: an explicit Fragment block for the shared card, so the section has
+    // content (story-flatten's dropEmptySections drops a metadata-only section). The
+    // runtime treats this block as the card and adds no second one.
+    const source = (payload && payload.params && payload.params.originalURL) || '';
+    let locale = 'en';
+    try {
+      const first = new URL(source).pathname.split('/')[1] || '';
+      if (/^[a-z]{2}$/.test(first)) locale = first;
+    } catch (e) { /* keep en */ }
+    const link = document.createElement('a');
+    link.setAttribute('href', `/${locale}/fragments/newsletter-card`);
+    link.textContent = link.getAttribute('href');
+    aside.appendChild(WebImporter.DOMUtils.createTable([['Fragment'], [[link]]], document));
+  }
   frag.appendChild(aside);
 
   // Section Metadata: Style = sidebar (consumed by the story-scoped runtime hook).
@@ -142,8 +290,9 @@ export default function transform(hookName, element, payload) {
   });
   frag.appendChild(metadataBlock);
 
-  // If neither cards nor tags survived, don't emit an empty styled section — just drop.
-  if (!cards && !tags) {
+  // If nothing survived, don't emit an empty styled section — just drop. A sidebar that held
+  // only the newsletter widget keeps its (empty) section: the runtime card goes there.
+  if (!cards && !tags && !newsletter) {
     sidebar.remove();
     return;
   }

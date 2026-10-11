@@ -166,6 +166,11 @@ export function masterUrl(url) {
   return normalizeExtension(url).replace(DERIVATIVE_SUFFIX_RE, '');
 }
 
+/** Original fetch URL; unlike the logical identity, preserve case and double extensions. */
+export function imageOriginalUrl(url) {
+  return cleanUrl(url).replace(DERIVATIVE_SUFFIX_RE, '');
+}
+
 export function sizedRenditions(url) {
   const master = masterUrl(url);
   const ext = path.extname(cleanUrl(master));
@@ -443,7 +448,7 @@ export async function fetchBinaryToFile(url, {
       }
       // eslint-disable-next-line no-await-in-loop
       const handle = await open(filePath, 'r');
-      const header = Buffer.alloc(8);
+      const header = Buffer.alloc(12);
       try {
         // eslint-disable-next-line no-await-in-loop
         await handle.read(header, 0, header.length, 0);
@@ -521,9 +526,15 @@ export async function pickIngestUrl(sourceUrl, {
   }
 
   // Master oversized: step down the ladder (at the master's own ratio) to the first
-  // rendition under limit.
+  // rendition under limit, largest first. The page's own `-WxH` reference joins the
+  // ladder: WordPress rounds the height (`-2560x1708`), so when the master's size can't
+  // be read the named 3:2 guesses miss and the step-down fell to -768x512 (SKODA-828 F6).
   const size = await remoteImageSize(master);
-  for (const candidate of renditionCandidates(master, size)) {
+  const edge = (url) => Math.max(...Object.values(suffixSize(url) || { w: 0 }));
+  const own = sourceUrl !== master && derivativeSuffix(sourceUrl) ? [sourceUrl] : [];
+  const candidates = [...new Set([...own, ...renditionCandidates(master, size)])]
+    .sort((a, b) => edge(b) - edge(a));
+  for (const candidate of candidates) {
     if (belowMinEdge(candidate, minEdge)) continue;
     const bytes = await headBytes(candidate);
     if (bytes !== null && bytes <= oversizeBytes) {

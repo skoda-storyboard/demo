@@ -32,7 +32,8 @@
  * (the M1 "single-column stacked" behaviour). Full fidelity here means full WIDGET
  * coverage + robustness to arbitrary nesting / very large trees — which this delivers.
  * A genuine multi-column panel-grid (>1 non-empty cell) is preserved inline as a
- * Columns block (that is what the columns block is for), NOT linearized away.
+ * Columns block (that is what the columns block is for), NOT linearized away. Two unequal
+ * cells emit `Columns (split-NN[, portrait-NNN])` (contract columns-split v2, SKODA-225).
  * Exception (SKODA-824): a row with a background colour is a highlight panel and gets its
  * own `body-column, highlight-<variant>` section; see markHighlights() below.
  *
@@ -135,14 +136,16 @@ function editorNodes(panel, document) {
   return out;
 }
 
-function itemCaption(img, item) {
+// `withAlt` is for card TITLES only (a teaser needs a label). A gallery caption is never the
+// alt (often the file name or the page title, never shown on the source; SKODA-830 audit 4.4).
+function itemCaption(img, item, withAlt = true) {
   // data-caption first (~53% of Škoda captions live there), then colorbox title, then alt.
   const capSource = (img.getAttribute('data-caption') && img)
     || item.querySelector?.('[data-caption]')
     || item;
   return (capSource.getAttribute && capSource.getAttribute('data-caption'))
     || (item.querySelector?.('a[title]') && item.querySelector('a[title]').getAttribute('title'))
-    || img.getAttribute('alt') || '';
+    || (withAlt && img.getAttribute('alt')) || '';
 }
 
 // The slider's visible caption is the carousel item's optional description
@@ -151,13 +154,20 @@ function itemCaption(img, item) {
 // an alt fallback would put a caption under every Epiq image. Absent → empty cell.
 // Only the paragraphs' text is kept (the source's inline font-size/centring styles
 // are presentation, owned by the block).
-function itemDescription(item, document) {
+//
+// D5 (SKODA-830, user decision 2026-10-06 "Keep it, visible"): a lightbox-only data-caption
+// that is a regulatory consumption / CO₂ disclaimer stays, as a visible note under the
+// image (after the description, if any). Every other lightbox-only caption is dropped.
+function itemDescription(item, document, img) {
   const desc = item.querySelector?.('.search-results-item-description');
-  if (!desc || !(desc.textContent || '').trim()) return '';
-  const paras = [...desc.querySelectorAll('p')]
+  const paras = desc ? [...desc.querySelectorAll('p')]
     .map((p) => (p.textContent || '').replace(/\s+/g, ' ').trim())
-    .filter(Boolean);
-  const texts = paras.length ? paras : [desc.textContent.replace(/\s+/g, ' ').trim()];
+    .filter(Boolean) : [];
+  const descText = desc ? desc.textContent.replace(/\s+/g, ' ').trim() : '';
+  const texts = paras.length || !descText ? paras : [descText];
+  const note = regulatoryCaption(img, item);
+  if (note && !texts.some((t) => t.includes(note))) texts.push(note);
+  if (!texts.length) return '';
   return texts.map((t) => {
     const p = document.createElement('p');
     p.textContent = t;
@@ -165,11 +175,30 @@ function itemDescription(item, document) {
   });
 }
 
+// A consumption / CO₂ disclaimer, detected conservatively: a WLTP mention, or a consumption
+// figure (kWh/100 km, l/100 km) together with an emissions figure (CO₂/CO2 emissions, g/km).
+// A narrative caption that only mentions "energy consumption" or a kWh/100 km result (e.g.
+// the Peaq aerodynamics or 936 km range photos) is not one.
+const CONSUMPTION_RE = /\b(?:kWh|l)\s*\/\s*100\s*km\b/i;
+const EMISSIONS_RE = /\bCO(?:₂|2)\s+emissions?\b|\bg\s*\/\s*km\b/i;
+export function isRegulatoryCaption(text) {
+  const t = (text || '').replace(/\s+/g, ' ').trim();
+  if (!t) return false;
+  return /\bWLTP\b/.test(t) || (CONSUMPTION_RE.test(t) && EMISSIONS_RE.test(t));
+}
+
+function regulatoryCaption(img, item) {
+  const holder = (img && img.getAttribute && img.getAttribute('data-caption') && img)
+    || item.querySelector?.('[data-caption]');
+  const text = holder ? (holder.getAttribute('data-caption') || '').replace(/\s+/g, ' ').trim() : '';
+  return isRegulatoryCaption(text) ? text : '';
+}
+
 // Build a Gallery block (SKODA-203 / story-detail.md STO-D04): one row per image,
 // [img, caption]. Used for link-free image sets (sow-slider and image carousels).
 // `blockName` picks the variant: link-free carousels render as the one-image
 // slider (`Gallery (slider)`, SKODA-819) captioned by the item description;
-// sow-slider keeps the default Gallery and its data-caption → title → alt caption.
+// sow-slider keeps the default Gallery and its data-caption → title caption (no alt).
 function galleryCells(panel, document, blockName = 'Gallery') {
   const imgs = [...panel.querySelectorAll('img')];
   if (!imgs.length) return null;
@@ -177,7 +206,7 @@ function galleryCells(panel, document, blockName = 'Gallery') {
   const cells = [[blockName]];
   imgs.forEach((img) => {
     const item = img.closest('.search-results-item, .item, figure') || img;
-    cells.push([img, slider ? itemDescription(item, document) : itemCaption(img, item)]);
+    cells.push([img, slider ? itemDescription(item, document, img) : itemCaption(img, item, false)]);
   });
   return cells.length > 1 ? cells : null;
 }
@@ -387,6 +416,65 @@ export function markHighlights(document) {
   return count;
 }
 
+// ---- unequal 2-cell rows (SKODA-225, contract columns-split v2) -------------------
+// SiteOrigin sizes each cell in the page's head CSS (`#pgc-<id> { width:61.8% }`, sometimes
+// `calc(61.8% - …)`), which the cleanup transformers strip, so the importer's `preprocess`
+// calls markCellWidths() on the untouched DOM and emitMultiColumn() reads `data-cell-width`.
+const CELL_WIDTH_ATTR = 'data-cell-width';
+
+/** Tag every builder cell with its CSS width share (a % number). Returns the count. */
+export function markCellWidths(document) {
+  const css = [...document.querySelectorAll('style')].map((s) => s.textContent || '').join('\n');
+  const byId = new Map();
+  for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+    const width = (body.match(/(?:^|;)\s*width\s*:\s*(?:calc\(\s*)?([\d.]+)%/i) || [])[1];
+    if (!width) continue;
+    selectors.split(',').forEach((sel) => {
+      const m = sel.trim().match(/^#(pgc-[\w-]+)$/);
+      if (m) byId.set(m[1], parseFloat(width));
+    });
+  }
+  let count = 0;
+  document.querySelectorAll('.panel-grid-cell[id]').forEach((cell) => {
+    const width = byId.get(cell.id);
+    if (!width) return;
+    cell.setAttribute(CELL_WIDTH_ATTR, String(width));
+    count += 1;
+  });
+  return count;
+}
+
+/**
+ * The `split-NN` variant for a row's two non-empty cells: the first cell's share of the two,
+ * in %, rounded. Null when a width is unknown, the cells are (nearly) equal, or the share is
+ * outside the contract's 10–99.
+ */
+export function splitVariant(cells) {
+  if (cells.length !== 2) return null;
+  const [a, b] = cells.map((c) => parseFloat(c.getAttribute(CELL_WIDTH_ATTR)));
+  if (!(a > 0) || !(b > 0) || Math.abs(a - b) < 2) return null;
+  const share = Math.round((a / (a + b)) * 100);
+  return share >= 10 && share <= 99 ? `split-${share}` : null;
+}
+
+/**
+ * The `portrait-NNN` variant: the authored display width of a cell's single image, when it
+ * is smaller than the file (the source shows `width="235"` portraits of 500px files; DA keeps
+ * only the file's own size). An image whose width is its file width (the largest `srcset`
+ * descriptor, e.g. a sow-image) fills its cell instead: no token.
+ */
+export function portraitVariant(cells) {
+  const imgs = cells.flatMap((c) => [...c.querySelectorAll('img')]);
+  if (imgs.length !== 1) return null;
+  const img = imgs[0];
+  const width = parseInt(img.getAttribute('width'), 10);
+  if (!(width >= 10 && width <= 999)) return null;
+  const descriptors = (img.getAttribute('srcset') || '').match(/\s(\d+)w\b/g) || [];
+  const fileWidth = Math.max(0, ...descriptors.map((d) => parseInt(d, 10)));
+  if (fileWidth && width >= fileWidth) return null;
+  return `portrait-${width}`;
+}
+
 /** Whether readable content follows `node` inside `root` (avoids an empty section). */
 function hasContentAfter(node, root) {
   for (let n = node; n && n !== root; n = n.parentNode) {
@@ -486,16 +574,23 @@ function emitWidget(panel, document, out, stats) {
 // Emit a genuine multi-column grid as a Columns block: one row, one cell per column.
 // createTable takes plain-array cells (a cell = an array of nodes) — NOT an { elems }
 // object (that is the runtime buildBlock format; here it serialises to "[object Object]").
+// Two unequal cells carry their width ratio, and an authored-size image its width, as
+// variants (`Columns (split-62, portrait-235)`, contract columns-split v2, SKODA-225).
 function emitMultiColumn(cells, document, out, stats) {
   const row = [];
+  const filled = [];
   cells.forEach((cell) => {
     const cellOut = [];
     panelsOf(cell).forEach((p) => emitWidget(p, document, cellOut, stats));
-    if (cellOut.length) row.push(cellOut);
+    if (cellOut.length) { row.push(cellOut); filled.push(cell); }
   });
   if (row.length > 1) {
-    out.push(WebImporter.DOMUtils.createTable([['Columns'], row], document));
+    const split = splitVariant(filled);
+    const variants = split ? [split, portraitVariant(filled)].filter(Boolean) : [];
+    const header = variants.length ? `Columns (${variants.join(', ')})` : 'Columns';
+    out.push(WebImporter.DOMUtils.createTable([[header], row], document));
     stats.multiColumn += 1;
+    if (split) stats.split = (stats.split || 0) + 1;
   } else if (row.length === 1) {
     // Only one non-empty column after mapping — linearize (no block needed).
     row[0].forEach((n) => out.push(n));
@@ -569,6 +664,7 @@ export default function parse(element, { document }) {
     widgets: Object.values(stats.byKind).reduce((a, b) => a + b, 0),
     byKind: stats.byKind,
     multiColumn: stats.multiColumn,
+    split: stats.split || 0,
     highlights: stats.highlights,
     deferred: stats.deferred,
     unknown: stats.unknown,
@@ -582,5 +678,5 @@ export default function parse(element, { document }) {
 
 // Exposed for unit/prototype testing (harness-only; ignored by the bundle default).
 export const __test = {
-  classifyWidget, cellsOf, panelsOf, WIDGET_KINDS,
+  classifyWidget, cellsOf, panelsOf, WIDGET_KINDS, splitVariant, portraitVariant,
 };

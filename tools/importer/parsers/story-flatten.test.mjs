@@ -606,3 +606,81 @@ test('a widget inside a .panel-cell-style wrapper is not dropped (charging portr
   assert.ok(columns, 'two non-empty cells → Columns');
   assert.ok(columns.querySelector('img[src="portrait.png"]'), 'portrait kept');
 });
+
+// ---- unequal 2-cell rows (SKODA-225, contract columns-split v2) ---------------
+const { markCellWidths } = await import('./story-flatten.js');
+const { splitVariant, portraitVariant } = __test;
+
+// A SiteOrigin row with two cells sized in the head CSS, as on the live stories.
+function splitStory({ css, portrait }) {
+  return domDoc(`<html><head><style>${css}</style></head><body><div class="entry-content"><div class="panel-layout">
+    <div id="pg-1-2" class="panel-grid panel-no-style">
+      <div id="pgc-1-2-0" class="panel-grid-cell"><div class="so-panel widget widget_sow-editor"><div class="so-widget-sow-editor">
+        <div class="siteorigin-widget-tinymce textwidget"><p>Quote text.</p></div></div></div></div>
+      <div id="pgc-1-2-1" class="panel-grid-cell">
+        <div class="so-panel widget widget_skoda-offset"><div class="so-widget-skoda-offset"><div style="padding-top:1em;"></div></div></div>
+        <div class="so-panel widget widget_sow-editor"><div class="so-widget-sow-editor"><div class="siteorigin-widget-tinymce textwidget">
+          ${portrait}</div></div></div></div>
+    </div></div></div></body></html>`);
+}
+const PORTRAIT_235 = '<p style="text-align: center;"><img class="alignnone wp-image-413573 aligncenter" src="kelly.png" width="235" height="235"><strong>Meredith Kelly</strong><span>Global Head of Marketing</span></p>';
+
+test('markCellWidths: reads plain and calc() % widths from the head CSS', { skip: domSkip }, () => {
+  const d = splitStory({ css: '#pgc-1-2-0{ width:61.8% } #pgc-1-2-1 { width:calc(38.2% - ( 0 * 30px ) ) }', portrait: PORTRAIT_235 });
+  assert.equal(markCellWidths(d), 2);
+  assert.equal(d.getElementById('pgc-1-2-0').getAttribute('data-cell-width'), '61.8');
+  assert.equal(d.getElementById('pgc-1-2-1').getAttribute('data-cell-width'), '38.2');
+});
+
+test('splitVariant: the first cell share, rounded; equal, unknown or 3 cells give none', { skip: domSkip }, () => {
+  const cell = (w) => { const el = domDoc('<div></div>').querySelector('div'); if (w) el.setAttribute('data-cell-width', String(w)); return el; };
+  assert.equal(splitVariant([cell(61.8), cell(38.2)]), 'split-62');
+  assert.equal(splitVariant([cell(75), cell(25)]), 'split-75');
+  assert.equal(splitVariant([cell(50), cell(50)]), null, 'equal cells stay plain Columns');
+  assert.equal(splitVariant([cell(50.5), cell(49.5)]), null, 'nearly equal too');
+  assert.equal(splitVariant([cell(61.8), cell()]), null, 'unknown width');
+  assert.equal(splitVariant([cell(40), cell(30), cell(30)]), null, 'three cells');
+});
+
+test('portraitVariant: an authored width smaller than the file; a file-size image gives none', { skip: domSkip }, () => {
+  const cells = (html) => [domDoc(`<div>${html}</div>`).querySelector('div')];
+  assert.equal(portraitVariant(cells('<img src="a.png" width="235" height="235">')), 'portrait-235');
+  assert.equal(portraitVariant(cells('<img src="a.png" width="235" srcset="a.png 500w, a-300.png 300w">')), 'portrait-235');
+  assert.equal(portraitVariant(cells('<img src="b.png" width="1366" srcset="b.png 1366w, b-256.png 256w">')), null, 'sow-image at file size fills');
+  assert.equal(portraitVariant(cells('<img src="c.png">')), null, 'no width');
+  assert.equal(portraitVariant(cells('<img src="a.png" width="235"><img src="d.png" width="100">')), null, 'two images');
+});
+
+test('parse: an unequal row with an authored portrait → Columns (split-62, portrait-235)', { skip: domSkip }, () => {
+  const d = splitStory({ css: '#pgc-1-2-0{ width:61.8% } #pgc-1-2-1{ width:38.2% }', portrait: PORTRAIT_235 });
+  markCellWidths(d);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  const table = content.querySelector('table');
+  assert.equal(table.dataset.block, 'Columns (split-62, portrait-235)');
+  const cells = table.querySelectorAll('tr:nth-child(2) > td');
+  assert.equal(cells.length, 2, 'normal columns row, one cell per source cell');
+  assert.ok(cells[1].querySelector('img[src="kelly.png"]'), 'portrait kept');
+  assert.match(cells[1].textContent, /Meredith Kelly/);
+});
+
+test('parse: an unequal row whose image fills its cell → Columns (split-75), no portrait token', { skip: domSkip }, () => {
+  const d = splitStory({
+    css: '#pgc-1-2-0{ width:75% } #pgc-1-2-1{ width:25% }',
+    portrait: '<p><img src="charging.png" width="1366" height="2048" srcset="charging.png 1366w, charging-256.png 256w"></p>',
+  });
+  markCellWidths(d);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  assert.equal(content.querySelector('table').dataset.block, 'Columns (split-75)');
+});
+
+test('parse: equal or unmeasured rows stay plain Columns', { skip: domSkip }, () => {
+  const equal = splitStory({ css: '#pgc-1-2-0{ width:50% } #pgc-1-2-1{ width:50% }', portrait: PORTRAIT_235 });
+  markCellWidths(equal);
+  parse(equal.querySelector('.entry-content'), { document: equal });
+  assert.equal(equal.querySelector('table').dataset.block, 'Columns');
+  const none = splitStory({ css: '', portrait: PORTRAIT_235 });
+  parse(none.querySelector('.entry-content'), { document: none });
+  assert.equal(none.querySelector('table').dataset.block, 'Columns', 'without markCellWidths');
+});

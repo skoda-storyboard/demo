@@ -38,7 +38,10 @@ var CustomImportScript = (() => {
   // tools/importer/import-press-kit-default.js
   var import_press_kit_default_exports = {};
   __export(import_press_kit_default_exports, {
-    default: () => import_press_kit_default_default
+    IMAGE_LIMIT: () => IMAGE_LIMIT,
+    default: () => import_press_kit_default_default,
+    fragmentGroups: () => fragmentGroups,
+    fragmentPath: () => fragmentPath
   });
 
   // tools/importer/parsers/gallery.js
@@ -69,7 +72,7 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/tags.js
   function parse2(element, { document }) {
-    const anchors = Array.from(element.querySelectorAll("a.label[href], li a[href], a[href]")).filter((el, i, arr) => arr.indexOf(el) === i);
+    const anchors = Array.from(element.querySelectorAll("a.label[href], li a[href], a[href]")).filter((el, i, arr) => arr.indexOf(el) === i).filter((a) => !a.matches(".show-hidden-terms") && a.getAttribute("href") !== "#");
     if (anchors.length === 0) {
       element.replaceWith(...element.childNodes);
       return;
@@ -77,11 +80,11 @@ var CustomImportScript = (() => {
     const cell = [];
     anchors.forEach((a) => {
       const href = a.getAttribute("href");
-      const text5 = (a.textContent || "").trim();
-      if (!href || !text5) return;
+      const text6 = (a.textContent || "").trim();
+      if (!href || !text6) return;
       const link = document.createElement("a");
       link.setAttribute("href", href);
-      link.textContent = text5;
+      link.textContent = text6;
       cell.push(link);
     });
     if (cell.length === 0) {
@@ -93,18 +96,34 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/parsers/press-kit-hub-tiles.js
+  var ratioOf = (tile) => {
+    var _a, _b;
+    return (_b = (_a = tile.querySelector(".ratio-container")) == null ? void 0 : _a.className.match(/\bratio-(\d+x\d+)\b/)) == null ? void 0 : _b[1];
+  };
+  function rowTokens(tiles, rowIndex) {
+    const ratios = tiles.map(ratioOf);
+    const wide = ratios.filter((ratio) => ratio === "2x1").length;
+    const square = ratios.filter((ratio) => ratio === "1x1").length;
+    if (tiles.length === 1 && ["2x1", "4x1"].includes(ratios[0])) return ["press-half end"];
+    if (wide === 2 && square === 1 && tiles.length === 3) {
+      return ratios.map((ratio) => ratio === "2x1" ? "feature" : "press-square");
+    }
+    if (wide === 2 && tiles.length === 2 || wide === 1 && square === 2 && tiles.length === 3) {
+      return ratios.map((ratio) => ratio === "2x1" ? "press-half" : "press-quarter");
+    }
+    if (square === tiles.length && tiles.length === 5) return Array(5).fill("press-square");
+    if (square === tiles.length) {
+      return tiles.map((tile, index) => index === tiles.length - 1 && tiles.length % 4 ? "press-quarter end" : "press-quarter");
+    }
+    throw new Error(`Press-kit tile row ${rowIndex + 1} has an unsupported layout`);
+  }
   function parseTiles(content, document) {
-    const sourceRows = [...content.querySelectorAll(".panel-grid")].map((grid) => [...grid.querySelectorAll("article.article-teaser")]).filter((tiles) => tiles.length);
+    const sourceRows = [...content.querySelectorAll(".panel-grid")].filter((grid) => !grid.parentElement.closest(".panel-grid")).map((grid) => [...grid.querySelectorAll("article.article-teaser")]).filter((tiles) => tiles.length);
     if (!sourceRows.length) throw new Error("Press-kit hub has no chapter tiles");
     const rows = [["Cards (overlay, tiles)"]];
     sourceRows.forEach((tiles, rowIndex) => {
-      const wide = tiles.filter((tile) => tile.querySelector(".ratio-container.ratio-2x1")).length;
-      const square = tiles.filter((tile) => tile.querySelector(".ratio-container.ratio-1x1")).length;
-      const half = wide === 2 && tiles.length === 2 || wide === 1 && square === 2 && tiles.length === 3;
-      if (!(wide === 2 && square === 1 && tiles.length === 3 || half || wide === 0 && square === tiles.length && [4, 5].includes(tiles.length))) {
-        throw new Error(`Press-kit tile row ${rowIndex + 1} has an unsupported layout`);
-      }
-      tiles.forEach((tile) => {
+      const tokens = rowTokens(tiles, rowIndex);
+      tiles.forEach((tile, index) => {
         const sourceLink = tile.querySelector(":scope > a[href]");
         const sourceImage = tile.querySelector(".ratio-container img[src]");
         const heading = tile.querySelector(".heading");
@@ -119,11 +138,7 @@ var CustomImportScript = (() => {
         const link = document.createElement("a");
         link.href = sourceLink.href;
         link.textContent = title;
-        const isWide = !!tile.querySelector(".ratio-container.ratio-2x1");
-        let token = "press-square";
-        if (isWide) token = half ? "press-half" : "feature";
-        else if (tiles.length === 4 || half) token = "press-quarter";
-        rows.push([token, img, link]);
+        rows.push([tokens[index], img, link]);
       });
     });
     return WebImporter.DOMUtils.createTable(rows, document);
@@ -270,12 +285,13 @@ var CustomImportScript = (() => {
     const name = row.every(bannerCell) ? "Columns (banners)" : "Columns";
     return WebImporter.DOMUtils.createTable([[name], row], document);
   }
-  function flatten(layout, document, { nested = false } = {}) {
+  function flatten(layout, document, { nested = false, faq = false } = {}) {
     const output = [];
     let rows = [];
     let tileGrids = [];
+    const name = faq && !nested ? "Accordion (faq)" : "Accordion";
     const flush = () => {
-      if (rows.length) output.push(WebImporter.DOMUtils.createTable([["Accordion"], ...rows], document));
+      if (rows.length) output.push(WebImporter.DOMUtils.createTable([[name], ...rows], document));
       rows = [];
     };
     const flushTiles = () => {
@@ -339,10 +355,10 @@ var CustomImportScript = (() => {
     flushTiles();
     return output;
   }
-  function parse3(element, { document }) {
+  function parse3(element, { document, faq = false }) {
     const layout = element.querySelector(":scope > .panel-layout");
     if (!layout) throw new Error("Press-kit article is missing SiteOrigin body content");
-    const nodes = flatten(layout, document);
+    const nodes = flatten(layout, document, { faq });
     if (!nodes.length) throw new Error("Press-kit article body is empty");
     layout.replaceWith(...nodes);
     element.querySelectorAll(".sa-bnr, .media-cart-actions").forEach((node) => node.remove());
@@ -369,7 +385,10 @@ var CustomImportScript = (() => {
       return [link];
     });
   }
+  var REGULATORY = /\bWLTP\b|(?=.*\b\d[\d.,\s–-]*(?:kWh|l)\s*\/\s*100\s*km)(?=.*(?:CO[₂2]|g\s*\/\s*km))/i;
   function parse4(element, { document }) {
+    const gallery = element.matches(".search-results-gallery");
+    const notes = gallery ? [...new Set([...element.querySelectorAll(".article-teaser-media img[data-caption]")].map((img) => text2(Object.assign(document.createElement("div"), { innerHTML: img.getAttribute("data-caption") }))).filter((caption) => caption && REGULATORY.test(caption)))] : [];
     const items = [...element.querySelectorAll(".search-results-item")];
     if (!items.length) throw new Error("Press-kit Media Box has no assets");
     const expected = Number(element.dataset.expectedAssets);
@@ -386,13 +405,13 @@ var CustomImportScript = (() => {
       const img = item.querySelector(".article-teaser-media img");
       const title = text2(item.querySelector(".entry-title")) || (img == null ? void 0 : img.getAttribute("alt")) || "";
       if (!title) throw new Error("Press-kit Media Box asset has no title");
-      const paragraphs = links.map((link) => {
+      const paragraphs2 = links.map((link) => {
         const p = document.createElement("p");
         p.append(link);
         return p;
       });
       if (!img) {
-        rows.push(["", title, paragraphs]);
+        rows.push(["", title, paragraphs2]);
         return;
       }
       if (!((_a = img.getAttribute("alt")) == null ? void 0 : _a.trim())) img.alt = ((_b = img.getAttribute("title")) == null ? void 0 : _b.replace(/^Video\s*\|\s*/i, "")) || title;
@@ -401,10 +420,12 @@ var CustomImportScript = (() => {
         img.src = src.replace(/-d_\d+x\d+(\.[a-z]+)?(\?.*)?$/i, "-d_1280x720.jpg");
       }
       ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop", "title"].forEach((attr) => img.removeAttribute(attr));
-      rows.push([img, title, paragraphs]);
+      rows.push([img, title, paragraphs2]);
     });
-    const config = element.matches(".search-results-gallery") ? [["collapse", "auto"]] : [];
-    element.replaceWith(WebImporter.DOMUtils.createTable([["Downloads"], ...config, ...rows], document));
+    const config = gallery ? [["collapse", "auto"]] : [];
+    const name = gallery ? "Downloads (gallery)" : "Downloads";
+    const table = WebImporter.DOMUtils.createTable([[name], ...config, ...rows], document);
+    element.replaceWith(table, ...notes.map((note) => Object.assign(document.createElement("p"), { textContent: note })));
   }
 
   // tools/importer/parsers/quote.js
@@ -424,6 +445,7 @@ var CustomImportScript = (() => {
     return !!(p == null ? void 0 : p.matches("p")) && centred(p) && !!p.querySelector("strong, b") && !isQuote(p);
   }
   function markRun(hr) {
+    if (hr.closest("figure blockquote")) return false;
     const quote = hr.previousElementSibling;
     if (!isQuote(quote)) return false;
     quote.setAttribute(QUOTE, "");
@@ -440,9 +462,9 @@ var CustomImportScript = (() => {
     [...quote.childNodes].forEach((node) => {
       if (node.nodeType === 1 && node.matches("em, i")) p.append(...node.childNodes);
     });
-    const edge = (n) => n && (n.nodeType === 1 && n.matches("br") || n.nodeType === 3 && !text3(n));
-    while (edge(p.lastChild)) p.lastChild.remove();
-    while (edge(p.firstChild)) p.firstChild.remove();
+    const edge3 = (n) => n && (n.nodeType === 1 && n.matches("br") || n.nodeType === 3 && !text3(n));
+    while (edge3(p.lastChild)) p.lastChild.remove();
+    while (edge3(p.firstChild)) p.firstChild.remove();
     return p;
   }
   function attributionParagraph(by, document) {
@@ -452,6 +474,86 @@ var CustomImportScript = (() => {
     const first = (_a = p.querySelector("strong, b")) == null ? void 0 : _a.firstChild;
     if ((first == null ? void 0 : first.nodeType) === 3) first.textContent = first.textContent.replace(/^\s+/, "");
     return p;
+  }
+  var LEFT = "Quote (left)";
+  var MEDIA = "img, picture, video, audio, iframe, svg, object, embed, canvas";
+  var BLOCK = "address, article, aside, blockquote, details, div, dl, fieldset, figure, form, h1, h2, h3, h4, h5, h6, hr, ol, pre, section, table, ul";
+  var is = (node, selector) => (node == null ? void 0 : node.nodeType) === 1 && node.matches(selector);
+  function isFigureQuote(node) {
+    const quoteEl = is(node, "figure") ? node.querySelector(":scope > blockquote") : null;
+    return !!quoteEl && !node.querySelector(MEDIA) && [...quoteEl.childNodes].some((n) => !is(n, "cite") && text3(n));
+  }
+  var edge = (n) => is(n, "br") || (n == null ? void 0 : n.nodeType) === 3 && !text3(n);
+  var trim = (node, re) => {
+    if ((node == null ? void 0 : node.nodeType) === 3) node.textContent = node.textContent.replace(re, "");
+  };
+  function plainParagraph(nodes, document) {
+    const p = document.createElement("p");
+    p.append(...nodes.map((node) => node.cloneNode(true)));
+    p.querySelectorAll("em, i").forEach((it) => it.replaceWith(...it.childNodes));
+    while (edge(p.lastChild)) p.lastChild.remove();
+    while (edge(p.firstChild)) p.firstChild.remove();
+    const inner = (n, side) => is(n, "strong, b") ? n[side] : n;
+    trim(inner(p.lastChild, "lastChild"), /\s+$/);
+    trim(inner(p.firstChild, "firstChild"), /^\s+/);
+    return p;
+  }
+  function paragraphs(nodes, document) {
+    const cell = [];
+    let run = [];
+    const flush = () => {
+      if (run.length) cell.push(plainParagraph(run, document));
+      run = [];
+    };
+    nodes.forEach((node) => {
+      if (is(node, "p")) {
+        flush();
+        cell.push(...paragraphs([...node.childNodes], document));
+      } else if (is(node, BLOCK)) {
+        flush();
+        const copy = node.cloneNode(true);
+        copy.querySelectorAll("em, i").forEach((it) => it.replaceWith(...it.childNodes));
+        cell.push(copy);
+      } else {
+        run.push(node);
+      }
+    });
+    flush();
+    return cell.filter((el) => text3(el));
+  }
+  function figureRow(figure, document) {
+    const nodes = [...figure.childNodes].filter((node) => !is(node, "figcaption"));
+    const cites = nodes.filter((node) => is(node, "blockquote")).flatMap((quoteEl) => [...quoteEl.querySelectorAll(":scope > cite")]);
+    const quote = nodes.flatMap((node) => paragraphs(is(node, "blockquote") ? [...node.childNodes].filter((child) => !cites.includes(child)) : [node], document));
+    const cited = cites.flatMap((cite) => paragraphs([...cite.childNodes], document));
+    let by = [...figure.querySelectorAll(":scope > figcaption")].flatMap((caption) => paragraphs([...caption.childNodes], document));
+    if (by.length) quote.push(...cited);
+    else by = cited;
+    if (!by.length) return [quote, ""];
+    if (!by.some((el) => el.querySelector("strong, b")) && is(by[0], "p")) {
+      const strong = document.createElement("strong");
+      strong.append(...by[0].childNodes);
+      by[0].append(strong);
+    }
+    return [quote, by];
+  }
+  var isLeftTable = (node) => is(node, "table") && text3(node.querySelector("th, td")) === LEFT;
+  function leftTableBefore(figure) {
+    let node = figure.previousSibling;
+    while ((node == null ? void 0 : node.nodeType) === 3 && !text3(node)) node = node.previousSibling;
+    return isLeftTable(node) ? node : null;
+  }
+  function parseFigure(figure, { document }) {
+    if (!isFigureQuote(figure)) return;
+    const table = WebImporter.DOMUtils.createTable([[LEFT], figureRow(figure, document)], document);
+    const prev = leftTableBefore(figure);
+    if (prev) {
+      const row = [...table.rows].pop();
+      [...prev.rows].pop().after(row);
+      figure.remove();
+      return;
+    }
+    figure.replaceWith(table);
   }
   function parse5(element, { document }) {
     var _a;
@@ -465,8 +567,87 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable([["Quote"], cells], document));
   }
 
-  // tools/importer/transformers/skoda-press-kit-default-layout.js
+  // tools/importer/parsers/footnotes.js
+  var MARK = "data-skoda-footnote";
+  var NAME = "Footnotes";
+  var BODY_PX = 16;
+  var MEDIA2 = "img, picture, video, audio, iframe, svg, object, embed, canvas";
   var text4 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
+  function fontPx(el) {
+    var _a;
+    const value = (_a = el.style) == null ? void 0 : _a.fontSize;
+    if (!value) return null;
+    const match = value.match(/^([\d.]+)(px|pt)$/i);
+    if (!match) return NaN;
+    return match[2].toLowerCase() === "pt" ? Number(match[1]) * 4 / 3 : Number(match[1]);
+  }
+  var isSmall = (px) => px > 0 && px < BODY_PX;
+  function isFootnote(p) {
+    var _a;
+    if (!((_a = p == null ? void 0 : p.matches) == null ? void 0 : _a.call(p, "p")) || fontPx(p) !== null || !text4(p) || p.querySelector(MEDIA2)) return false;
+    const walker = p.ownerDocument.createTreeWalker(
+      p,
+      4
+      /* NodeFilter.SHOW_TEXT */
+    );
+    let small = false;
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (text4(node)) {
+        let el = node.parentElement;
+        let marker2 = false;
+        while (el !== p && fontPx(el) === null) {
+          if (el.matches("sup")) marker2 = true;
+          el = el.parentElement;
+        }
+        if (el !== p) {
+          if (!isSmall(fontPx(el))) return false;
+          small = true;
+        } else if (!marker2) {
+          return false;
+        }
+      }
+    }
+    return small;
+  }
+  function markFootnotes(root) {
+    const found = [...root.querySelectorAll("p")].filter(isFootnote);
+    found.forEach((p) => p.setAttribute(MARK, ""));
+    return found.length;
+  }
+  var edge2 = (n) => n && (n.nodeType === 1 && n.matches("br") || n.nodeType === 3 && !text4(n));
+  function footnoteParagraph(p, document) {
+    var _a, _b;
+    const copy = document.createElement("p");
+    copy.append(...[...p.childNodes].map((node) => node.cloneNode(true)));
+    copy.querySelectorAll("span").forEach((span) => span.replaceWith(...span.childNodes));
+    copy.querySelectorAll("[style]").forEach((el) => el.removeAttribute("style"));
+    while (edge2(copy.lastChild)) copy.lastChild.remove();
+    while (edge2(copy.firstChild)) copy.firstChild.remove();
+    if (((_a = copy.lastChild) == null ? void 0 : _a.nodeType) === 3) copy.lastChild.textContent = copy.lastChild.textContent.replace(/\s+$/, "");
+    if (((_b = copy.firstChild) == null ? void 0 : _b.nodeType) === 3) copy.firstChild.textContent = copy.firstChild.textContent.replace(/^\s+/, "");
+    return copy;
+  }
+  function tableBefore(p) {
+    let node = p.previousSibling;
+    while ((node == null ? void 0 : node.nodeType) === 3 && !text4(node)) node = node.previousSibling;
+    return (node == null ? void 0 : node.nodeType) === 1 && node.matches("table") && text4(node.querySelector("th, td")) === NAME ? node : null;
+  }
+  function parse6(p, { document }) {
+    p.removeAttribute(MARK);
+    if (p.closest("table, li, blockquote, figure") || !text4(p)) return;
+    const row = [footnoteParagraph(p, document)];
+    const table = WebImporter.DOMUtils.createTable([[NAME], row], document);
+    const prev = tableBefore(p);
+    if (prev) {
+      [...prev.rows].pop().after([...table.rows].pop());
+      p.remove();
+      return;
+    }
+    p.replaceWith(table);
+  }
+
+  // tools/importer/transformers/skoda-press-kit-default-layout.js
+  var text5 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
   var marker = (document, style) => {
     const hr = document.createElement("hr");
     hr.dataset.pressKitSection = style;
@@ -489,7 +670,7 @@ var CustomImportScript = (() => {
     list.id = "chapters-links";
     const chaptersLink = document.createElement("a");
     chaptersLink.href = "#chapters-links";
-    chaptersLink.textContent = text4(source.querySelector(".link-chapters")) || "Chapters";
+    chaptersLink.textContent = text5(source.querySelector(".link-chapters")) || "Chapters";
     const chaptersItem = document.createElement("li");
     chaptersItem.append(chaptersLink);
     list.append(chaptersItem);
@@ -497,7 +678,7 @@ var CustomImportScript = (() => {
       var _a;
       const link = document.createElement("a");
       link.href = sourceLink.getAttribute("href");
-      link.textContent = sourceLink.matches(".link-intro") && ((_a = sourceLink.getAttribute("title")) == null ? void 0 : _a.trim()) || text4(sourceLink);
+      link.textContent = sourceLink.matches(".link-intro") && ((_a = sourceLink.getAttribute("title")) == null ? void 0 : _a.trim()) || text5(sourceLink);
       const li = document.createElement("li");
       li.append(link);
       list.append(li);
@@ -510,15 +691,15 @@ var CustomImportScript = (() => {
     [...secondary.querySelectorAll(":scope > section")].forEach((section) => {
       if (section.matches(".newsletter-subscribe-widget, .side-banner")) return;
       const heading = section.querySelector("h2, h3");
-      const label = text4(heading);
+      const label = text5(heading);
       if (section.matches(".images.sa-media-kit-preview")) {
         if (heading) heading.remove();
         nodes.push(make(document, "h3", label || "Images"), section);
         const more = section.querySelector("a.more");
-        if (mediaBox && more && text4(more)) {
+        if (mediaBox && more && text5(more)) {
           const link = document.createElement("a");
           link.href = "#media-box";
-          link.textContent = text4(more);
+          link.textContent = text5(more);
           const p = document.createElement("p");
           p.append(link);
           nodes.push(p);
@@ -530,7 +711,7 @@ var CustomImportScript = (() => {
         const ul = document.createElement("ul");
         section.querySelectorAll("ul.menu > li").forEach((li) => {
           const a = li.querySelector('a[href]:not([href="#"])');
-          const title = text4(a) || text4(li);
+          const title = text5(a) || text5(li);
           if (!title || !a && !mediaBox) return;
           const link = document.createElement("a");
           link.href = (a == null ? void 0 : a.getAttribute("href")) || "#media-box";
@@ -549,10 +730,10 @@ var CustomImportScript = (() => {
     var _a;
     const rows = [...table.rows];
     const cells = rows.length === 1 ? [...rows[0].cells] : [];
-    if (cells.length !== 2 || text4(cells[0])) return null;
+    if (cells.length !== 2 || text5(cells[0])) return null;
     const imgs = cells[0].querySelectorAll("img");
     const width = Number((_a = imgs[0]) == null ? void 0 : _a.getAttribute("width"));
-    if (imgs.length !== 1 || !(width > 0 && width <= ICON_MAX_WIDTH) || !text4(cells[1])) return null;
+    if (imgs.length !== 1 || !(width > 0 && width <= ICON_MAX_WIDTH) || !text5(cells[1])) return null;
     const icon = make(document, "p", "");
     icon.append(cells[0].querySelector("a:has(img)") || imgs[0]);
     const body = make(document, "p", "");
@@ -564,10 +745,10 @@ var CustomImportScript = (() => {
     if (callout) return [callout];
     table.querySelectorAll('img[src*="whatsapp"]').forEach((img) => {
       const link = img.closest("a");
-      (link && !text4(link) ? link : img).remove();
+      (link && !text5(link) ? link : img).remove();
     });
     return [...table.querySelectorAll("td, th")].flatMap((cell) => {
-      if (!text4(cell) && !cell.querySelector("img, a[href]")) return [];
+      if (!text5(cell) && !cell.querySelector("img, a[href]")) return [];
       if (cell.querySelector("p, ul, ol, h1, h2, h3, h4, h5, h6, div")) return [...cell.childNodes];
       const p = document.createElement("p");
       p.append(...cell.childNodes);
@@ -576,13 +757,13 @@ var CustomImportScript = (() => {
   }
   function sourceTables(content, document) {
     content.querySelectorAll("table").forEach((table) => {
-      const rows = [...table.rows].filter((row) => text4(row) || row.querySelector("a[href], img"));
+      const rows = [...table.rows].filter((row) => text5(row) || row.querySelector("a[href], img"));
       if (!rows.length) {
         table.remove();
         return;
       }
       const cols = Math.max(...rows.map((row) => row.cells.length));
-      const labelled = rows.filter((row) => [...row.cells].filter((cell) => text4(cell)).length >= 2);
+      const labelled = rows.filter((row) => [...row.cells].filter((cell) => text5(cell)).length >= 2);
       if (cols > 1 && labelled.length < 2) {
         table.replaceWith(...layoutTable(table, document));
         return;
@@ -591,7 +772,7 @@ var CustomImportScript = (() => {
       if (cols === 1) {
         const [first, ...rest] = rows;
         const headed = !first.querySelector("a[href], img") && rest.length;
-        if (headed) out.push(make(document, "h3", text4(first)));
+        if (headed) out.push(make(document, "h3", text5(first)));
         const list = document.createElement("ul");
         (headed ? rest : rows).forEach((row) => {
           const li = document.createElement("li");
@@ -601,13 +782,13 @@ var CustomImportScript = (() => {
         out.push(list);
       } else {
         const [head, ...body] = rows;
-        const labels = [...head.cells].map((cell) => text4(cell));
+        const labels = [...head.cells].map((cell) => text5(cell));
         const list = document.createElement("ul");
         body.forEach((row) => {
           const cells = [...row.cells];
           const li = document.createElement("li");
-          const strong = make(document, "strong", text4(cells[0]));
-          const values = cells.slice(1).map((cell, i) => [labels[i + 1], text4(cell)].filter(Boolean).join(": "));
+          const strong = make(document, "strong", text5(cells[0]));
+          const values = cells.slice(1).map((cell, i) => [labels[i + 1], text5(cell)].filter(Boolean).join(": "));
           li.append(strong, `: ${values.join(" \xB7 ")}`);
           list.append(li);
         });
@@ -626,12 +807,12 @@ var CustomImportScript = (() => {
     const h1 = article.querySelector(".container > header h1");
     const content = article.querySelector(".column-primary .entry-content");
     const media = article.querySelector(".search-results.media-box");
-    if (!h1 || !text4(h1) || !(content == null ? void 0 : content.querySelector(":scope > .panel-layout"))) {
+    if (!h1 || !text5(h1) || !(content == null ? void 0 : content.querySelector(":scope > .panel-layout"))) {
       throw new Error("Default press-kit article requires a title and body");
     }
     sourceTables(content, document);
     const out = [];
-    const date = text4(article.querySelector(".container > header .entry-published"));
+    const date = text5(article.querySelector(".container > header .entry-published"));
     if (date) out.push(make(document, "p", date));
     const title = h1.cloneNode(true);
     title.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
@@ -639,7 +820,7 @@ var CustomImportScript = (() => {
     const chapterLinks = chapters(document);
     if (chapterLinks) out.push(marker(document, "press-kit-chapters"), chapterLinks);
     out.push(marker(document, "body-column"));
-    const lead = article.querySelector(".column-primary .article-teaser-media img");
+    const lead = [...article.querySelectorAll(".column-primary .article-teaser-media img")].find((img) => !img.closest(".search-results"));
     if (lead) {
       const img = lead.cloneNode(true);
       img.alt = (img.alt || "").replace(/<br\s*\/?>/gi, " ");
@@ -648,7 +829,7 @@ var CustomImportScript = (() => {
       p.append(img);
       out.push(p);
     }
-    const summary = text4(article.querySelector(".column-primary > .entry-summary"));
+    const summary = text5(article.querySelector(".column-primary > .entry-summary"));
     if (summary) {
       const intro = make(document, "p", "");
       intro.append(make(document, "strong", summary));
@@ -658,8 +839,8 @@ var CustomImportScript = (() => {
     const side = sidebar(document, article.querySelector(".column-secondary"), !!media);
     if (side.length) out.push(marker(document, "sidebar"), ...side);
     if (media) {
-      const heading = text4(media.querySelector(".search-results-heading")) || "Media Box";
-      const stats = text4(media.querySelector(".search-results-stats .stats"));
+      const heading = text5(media.querySelector(".search-results-heading")) || "Media Box";
+      const stats = text5(media.querySelector(".search-results-stats .stats"));
       const totals = [...stats.matchAll(/\b(\d+)\s+(?:images?|videos?|PDFs?)\b/gi)];
       if (totals.length) {
         media.dataset.expectedAssets = totals.reduce((sum, match) => sum + Number(match[1]), 0);
@@ -684,7 +865,7 @@ var CustomImportScript = (() => {
   function labelImageLinks(article) {
     article.querySelectorAll("a[href]").forEach((a) => {
       const img = a.querySelector("img");
-      if (!img || text4(a) || a.title) return;
+      if (!img || text5(a) || a.title) return;
       const alt = (img.getAttribute("alt") || "").trim();
       if (alt && !PLACEHOLDER_ALT.test(alt)) {
         a.title = alt;
@@ -702,15 +883,24 @@ var CustomImportScript = (() => {
       a.title = label;
     });
   }
+  function fixPdfTypos(article) {
+    article.querySelectorAll("a[href]").forEach((a) => {
+      const href = a.getAttribute("href");
+      if (/\.pdff(?=$|[?#])/i.test(href)) a.setAttribute("href", href.replace(/\.pdff(?=$|[?#])/i, ".pdf"));
+    });
+  }
   function finish(element, document) {
     const article = element.querySelector("article.press_kit");
-    if (article) labelImageLinks(article);
+    if (article) {
+      fixPdfTypos(article);
+      labelImageLinks(article);
+    }
     const sidebarStart = article == null ? void 0 : article.querySelector('hr[data-press-kit-section="sidebar"]');
     if (sidebarStart) {
       let node = sidebarStart.nextElementSibling;
       while (node && !node.matches("hr[data-press-kit-section]")) {
         const first = node.matches("table") && node.querySelector("tr > td, tr > th");
-        if (first && text4(first) === "Gallery") first.textContent = "Gallery (preview)";
+        if (first && text5(first) === "Gallery") first.textContent = "Gallery (preview)";
         node = node.nextElementSibling;
       }
     }
@@ -828,6 +1018,69 @@ var CustomImportScript = (() => {
     }
     return "";
   }
+  var CATEGORY_PARENTS = {
+    "120-years-of-skoda-motorsport": "motorsport",
+    adventures: "lifestyle",
+    "annual-reports": "media",
+    citigo: "models",
+    connectivity: "innovation-and-technology",
+    cycling: "sports",
+    design: "skoda-world",
+    elroq: "models",
+    enyaq: "models",
+    "enyaq-coupe-rs-iv": "models",
+    epiq: "models",
+    fabia: "models",
+    heritage: "skoda-world",
+    hockey: "sports",
+    "innovation-and-technology": "skoda-world",
+    kamiq: "models",
+    "kamiq-china": "models",
+    karoq: "models",
+    kodiaq: "models",
+    kushaq: "models",
+    kylaq: "models",
+    livestream: "media",
+    motorsport: "lifestyle",
+    octavia: "models",
+    "octavia-combi": "models",
+    "octavia-combi-greenline": "models",
+    "octavia-combi-rs": "models",
+    "octavia-greenline": "models",
+    "octavia-rs": "models",
+    "octavia-scout": "models",
+    other: "media",
+    "peaq-en": "models",
+    people: "lifestyle",
+    rapid: "models",
+    "rapid-spaceback": "models",
+    responsibility: "skoda-world",
+    scala: "models",
+    slavia: "models",
+    speeches: "media",
+    sports: "lifestyle",
+    superb: "models",
+    "superb-combi": "models",
+    "technical-data": "media",
+    technology: "innovation-and-technology",
+    yeti: "models",
+    "yeti-outdoor": "models"
+  };
+  function extractCategories(document) {
+    const cls = document.body && document.body.getAttribute("class") || "";
+    const id = cls.match(/\bpostid-(\d+)\b/);
+    const post = id && document.querySelector(`article.post-${id[1]}`);
+    const out = [];
+    String(post && post.getAttribute("class") || "").split(/\s+/).forEach((token) => {
+      const m = token.toLowerCase().match(/^category-([a-z0-9_-]+)$/);
+      let slug = m && m[1];
+      while (slug && !out.includes(slug)) {
+        out.push(slug);
+        slug = CATEGORY_PARENTS[slug];
+      }
+    });
+    return out;
+  }
   function extractTagsAndFacets(document, pageUrl = "") {
     const tags = [];
     const byFacet = {};
@@ -934,6 +1187,8 @@ var CustomImportScript = (() => {
     if (overrides.theme) meta.theme = overrides.theme;
     if (overrides.presskit) meta.presskit = overrides.presskit;
     if (category) meta.category = category;
+    const categories = template === "story" ? extractCategories(document) : [];
+    if (categories.length) meta.categories = categories.join(", ");
     const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
     if (allTags.length) meta.tags = allTags.join(", ");
     FACETS.forEach((f) => {
@@ -1064,9 +1319,12 @@ var CustomImportScript = (() => {
     "/en/category/skoda-world/responsibility",
     "/en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france",
     "/en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca",
+    "/en/emobility/a-true-czech-from-spain",
     "/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries",
+    "/en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq",
     "/en/emobility/camouflage-to-get-you-hooked",
     "/en/emobility/coffee-on-electric-wheels-elroq-and-enyaq-serving-coffee",
+    "/en/emobility/come-and-play-skoda-is-heading-to-milan",
     "/en/emobility/designers-on-the-peaq-its-modern-durable-and-practical",
     "/en/emobility/elroq-rs-in-a-robe-unveiling-the-secret-of-matte-paint",
     "/en/emobility/enyaq-and-elroq-now-double-as-gaming-consoles-and-thats-not-all",
@@ -1074,8 +1332,11 @@ var CustomImportScript = (() => {
     "/en/emobility/how-the-versatile-skoda-peaq-conquered-a-mountain-peak",
     "/en/emobility/how-was-the-elroq-made-not-in-the-usual-way",
     "/en/emobility/make-use-of-the-frunk-unlock-with-your-phone-new-enhancements-for-elroq-and-enyaq",
+    "/en/emobility/meet-peaq-safe-and-comfortable",
+    "/en/emobility/meet-the-peaq-a-large-suv-with-outstanding-aerodynamics",
     "/en/emobility/meet-the-peaq-comfort-just-like-at-home",
     "/en/emobility/meet-the-peaq-spacious-inside-and-out",
+    "/en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan",
     "/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia",
     "/en/emobility/peaq-sets-a-record-from-the-heart-of-europe-to-the-sea-without-recharging",
     "/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq",
@@ -1085,17 +1346,27 @@ var CustomImportScript = (() => {
     "/en/emobility/skoda-peaq-unparalleled-space-and-comfort",
     "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
     "/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq",
+    "/en/emobility/teaser",
+    "/en/emobility/the-skoda-peaq-will-win-you-over-fast",
+    "/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere",
+    "/en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
+    "/en/emobility/whats-behind-epiq-design",
     "/en/images",
     "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague",
     "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving",
     "/en/lifestyle/chainsaws-and-sparklers-discover-the-traditions-of-rally-fans",
+    "/en/lifestyle/feeling-the-heat-skoda-cars-keep-both-passengers-and-their-snacks-cool",
     "/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling",
     "/en/lifestyle/la-dolce-vita-explore-the-surroundings-of-lake-como",
     "/en/lifestyle/ouninpohja-finlands-roller-coaster-stage",
     "/en/lifestyle/rs-four-ways-which-one-will-you-choose",
     "/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones",
     "/en/lifestyle/what-you-learn-on-the-circuit-can-save-you-on-the-road",
+    "/en/media-cart",
+    "/en/media-room",
     "/en/models/skoda-elroq-through-designers-eyes",
+    "/en/news",
+    "/en/press-kits",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/images",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/laurin-klement-fc-from-1908-the-first-major-motor-racing-successes-of-automobiles-from-mlada-boleslav",
@@ -1170,30 +1441,59 @@ var CustomImportScript = (() => {
     "/en/press-kits/the-all-new-skoda-kodiaq-press-kit",
     "/en/press-kits/the-all-new-skoda-superb-press-kit",
     "/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models",
+    "/en/press-releases/2026-iihf-ice-hockey-world-championship-roman-josi-wins-most-valuable-player-trophy-created-by-skoda-design",
     "/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production",
     "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
+    "/en/press-releases/camp-mode-in-the-myskoda-app-comfortable-overnight-stays-in-electric-vehicles",
+    "/en/press-releases/lorena-wiebes-receives-skoda-design-trophy-after-winning-tour-de-france-femmes-avec-zwift-points-classification",
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-3-2026",
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-3-2026",
+    "/en/press-releases/preparations-begin-for-the-11th-skoda-student-car-celebrating-100-years-of-vocational-education",
     "/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq",
+    "/en/press-releases/simply-clever-for-summer-smart-skoda-features-that-make-every-trip-easier",
     "/en/press-releases/skoda-auto-achieves-strong-financial-results-record-ev-deliveries-and-second-place-in-europe-in-h1-2026",
     "/en/press-releases/skoda-auto-and-national-theatre-extend-partnership-until-at-least-2029",
     "/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management",
+    "/en/press-releases/skoda-auto-appoints-world-renowned-road-cyclist-chris-froome-as-brand-cycling-ambassador",
+    "/en/press-releases/skoda-auto-celebrates-33-years-as-official-main-sponsor-of-the-iihf-ice-hockey-world-championship-and-unveils-the-epiq",
+    "/en/press-releases/skoda-auto-celebrates-successful-milan-design-week-with-strong-visitor-interest-and-fuorisalone-award-recognition-as-highest-rated-installation",
     "/en/press-releases/skoda-auto-enters-saudi-arabian-market-strengthening-its-presence-in-the-middle-east",
     "/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company",
     "/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav",
     "/en/press-releases/skoda-auto-marks-23-years-as-tour-de-france-main-partner-new-skoda-peaq-to-serve-as-red-car",
     "/en/press-releases/skoda-auto-produces-first-units-of-updated-octavia-in-kvasiny",
+    "/en/press-releases/skoda-auto-ranks-as-europes-second-best-selling-car-brand-after-a-strong-first-quarter",
+    "/en/press-releases/skoda-auto-supports-tour-de-france-femmes-avec-zwift-as-official-main-partner-for-the-fifth-year",
+    "/en/press-releases/skoda-auto-supports-uci-mountain-bike-world-championshipsas-official-partner-for-second-year-running",
+    "/en/press-releases/skoda-auto-teams-up-with-hasbros-play-doh-brand",
+    "/en/press-releases/skoda-auto-unveils-updated-slavia-in-india",
+    "/en/press-releases/skoda-epiq-sportline-debuts-at-the-paris-motor-show",
+    "/en/press-releases/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport",
+    "/en/press-releases/skoda-kvasiny-newsletter-2-2026",
+    "/en/press-releases/skoda-launches-production-of-the-new-epiq-in-pamplona-spain",
     "/en/press-releases/skoda-octavia-combi-rs-wins-prestigious-2024-golden-steering-wheel-award-in-the-mid-sized-car-category",
+    "/en/press-releases/skoda-octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain",
     "/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
+    "/en/press-releases/skoda-offers-a-first-glimpse-of-the-interior-concept-of-its-electric-seven-seater-peaq",
     "/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions",
+    "/en/press-releases/skoda-presents-exterior-sketches-of-its-all-new-electric-seven-seater-peaq",
+    "/en/press-releases/skoda-presents-first-interior-sketches-and-announces-world-premiere-date-of-electric-epiq",
+    "/en/press-releases/skoda-receives-red-dot-award-for-its-vision-app-concept",
     "/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence",
+    "/en/press-releases/skoda-vrchlabi-newsletter-2-2026",
     "/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates",
     "/en/press-releases/skodas-voice-assistant-laura-now-enhanced-with-chatgpt-capabilities",
+    "/en/press-releases/tadej-pogacar-winner-of-the-113th-tour-de-france-receives-crystal-trophy-created-by-skoda-design",
     "/en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain",
     "/en/press-releases/the-skoda-elroq-earns-5-star-euro-ncap-safety-rating-with-the-enyaq-and-octavia-retaining-their-top-scores",
     "/en/press-releases/the-updated-octavia-now-with-all-wheel-drive",
     "/en/press-releases/when-driving-fun-meets-comfort-rally-ace-oliver-solberg-tests-the-skoda-octavia-rs",
     "/en/press-releases/world-premiere-of-the-all-new-skoda-elroq-press-materials-and-highlight-video-available",
     "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich",
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-pictures-on-the-skoda-storyboard",
     "/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france",
+    "/en/search",
+    "/en/series-2",
     "/en/series/125-years-of-motorsport",
     "/en/series/130-years",
     "/en/series/60-seconds-walkaround",
@@ -1214,6 +1514,7 @@ var CustomImportScript = (() => {
     "/en/skoda-model/elroq/elroq-rs",
     "/en/skoda-model/elroq/elroq-sportline",
     "/en/skoda-model/enyaq-iv-2",
+    "/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv",
     "/en/skoda-model/enyaq-iv-2/enyaq-rs",
     "/en/skoda-model/enyaq-iv-2/enyaq-sportline-iv",
     "/en/skoda-model/epiq",
@@ -1232,20 +1533,28 @@ var CustomImportScript = (() => {
     "/en/skoda-model/octavia/octavia-sportline",
     "/en/skoda-model/peaq",
     "/en/skoda-model/scala",
+    "/en/skoda-world/125-years-of-racing-history-in-one-place-come-visit-the-museum",
     "/en/skoda-world/2024-a-year-of-new-electric-cars-and-innovated-favourites",
     "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it",
     "/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute",
     "/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car",
     "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality",
+    "/en/skoda-world/get-your-car-ready-for-summer-with-skoda-accessories",
     "/en/skoda-world/how-the-skoda-octavia-reached-365-km-h",
+    "/en/skoda-world/king-of-space-and-long-distance-travel-skoda-superb-celebrates-25-years",
     "/en/skoda-world/legend-chris-froome-takes-you-behind-the-scenes-of-the-tour-de-france",
     "/en/skoda-world/making-driving-easier-how-cruise-control-works",
+    "/en/skoda-world/octavia-arrives-with-a-new-full-hybrid-powertrain",
     "/en/skoda-world/oliver-solberg-behind-the-wheel-of-the-new-octavia-rs",
+    "/en/skoda-world/peaq-inside-a-designblok",
     "/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details",
+    "/en/skoda-world/rally-champion-and-the-unique-skoda-fabia-motorsport-edition",
+    "/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator",
     "/en/skoda-world/sportline-models-dynamic-elegance-for-every-day",
     "/en/skoda-world/the-immortal-octavia-see-what-it-looks-like-after-one-million-kilometres",
     "/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour",
     "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too",
+    "/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion",
     "/en/tag/company/design",
     "/en/tag/company/production",
     "/en/tag/crew/electro-vehicle",
@@ -1277,7 +1586,64 @@ var CustomImportScript = (() => {
   var DEMO_ALIASES = {
     "/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality": "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality"
   };
+  var LIVE_ONLY_PATHS = [
+    "/en/emobility/a-true-czech-from-spain",
+    "/en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq",
+    "/en/emobility/come-and-play-skoda-is-heading-to-milan",
+    "/en/emobility/meet-peaq-safe-and-comfortable",
+    "/en/emobility/meet-the-peaq-a-large-suv-with-outstanding-aerodynamics",
+    "/en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan",
+    "/en/emobility/teaser",
+    "/en/emobility/the-skoda-peaq-will-win-you-over-fast",
+    "/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere",
+    "/en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
+    "/en/emobility/whats-behind-epiq-design",
+    "/en/lifestyle/feeling-the-heat-skoda-cars-keep-both-passengers-and-their-snacks-cool",
+    "/en/media-cart",
+    "/en/media-room",
+    "/en/news",
+    "/en/press-kits",
+    "/en/press-releases/2026-iihf-ice-hockey-world-championship-roman-josi-wins-most-valuable-player-trophy-created-by-skoda-design",
+    "/en/press-releases/camp-mode-in-the-myskoda-app-comfortable-overnight-stays-in-electric-vehicles",
+    "/en/press-releases/lorena-wiebes-receives-skoda-design-trophy-after-winning-tour-de-france-femmes-avec-zwift-points-classification",
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-3-2026",
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-3-2026",
+    "/en/press-releases/preparations-begin-for-the-11th-skoda-student-car-celebrating-100-years-of-vocational-education",
+    "/en/press-releases/simply-clever-for-summer-smart-skoda-features-that-make-every-trip-easier",
+    "/en/press-releases/skoda-auto-appoints-world-renowned-road-cyclist-chris-froome-as-brand-cycling-ambassador",
+    "/en/press-releases/skoda-auto-celebrates-33-years-as-official-main-sponsor-of-the-iihf-ice-hockey-world-championship-and-unveils-the-epiq",
+    "/en/press-releases/skoda-auto-celebrates-successful-milan-design-week-with-strong-visitor-interest-and-fuorisalone-award-recognition-as-highest-rated-installation",
+    "/en/press-releases/skoda-auto-ranks-as-europes-second-best-selling-car-brand-after-a-strong-first-quarter",
+    "/en/press-releases/skoda-auto-supports-tour-de-france-femmes-avec-zwift-as-official-main-partner-for-the-fifth-year",
+    "/en/press-releases/skoda-auto-supports-uci-mountain-bike-world-championshipsas-official-partner-for-second-year-running",
+    "/en/press-releases/skoda-auto-teams-up-with-hasbros-play-doh-brand",
+    "/en/press-releases/skoda-auto-unveils-updated-slavia-in-india",
+    "/en/press-releases/skoda-epiq-sportline-debuts-at-the-paris-motor-show",
+    "/en/press-releases/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport",
+    "/en/press-releases/skoda-kvasiny-newsletter-2-2026",
+    "/en/press-releases/skoda-launches-production-of-the-new-epiq-in-pamplona-spain",
+    "/en/press-releases/skoda-octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain",
+    "/en/press-releases/skoda-offers-a-first-glimpse-of-the-interior-concept-of-its-electric-seven-seater-peaq",
+    "/en/press-releases/skoda-presents-exterior-sketches-of-its-all-new-electric-seven-seater-peaq",
+    "/en/press-releases/skoda-presents-first-interior-sketches-and-announces-world-premiere-date-of-electric-epiq",
+    "/en/press-releases/skoda-receives-red-dot-award-for-its-vision-app-concept",
+    "/en/press-releases/skoda-vrchlabi-newsletter-2-2026",
+    "/en/press-releases/tadej-pogacar-winner-of-the-113th-tour-de-france-receives-crystal-trophy-created-by-skoda-design",
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-pictures-on-the-skoda-storyboard",
+    "/en/search",
+    "/en/series-2",
+    "/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv",
+    "/en/skoda-world/125-years-of-racing-history-in-one-place-come-visit-the-museum",
+    "/en/skoda-world/get-your-car-ready-for-summer-with-skoda-accessories",
+    "/en/skoda-world/king-of-space-and-long-distance-travel-skoda-superb-celebrates-25-years",
+    "/en/skoda-world/octavia-arrives-with-a-new-full-hybrid-powertrain",
+    "/en/skoda-world/peaq-inside-a-designblok",
+    "/en/skoda-world/rally-champion-and-the-unique-skoda-fabia-motorsport-edition",
+    "/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator",
+    "/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion"
+  ];
   var ALLOWED = new Set(DEMO_PATHS);
+  var LIVE_ONLY = new Set(LIVE_ONLY_PATHS);
   function edsPath(sourcePath) {
     let p = sourcePath || "/";
     try {
@@ -1297,6 +1663,9 @@ var CustomImportScript = (() => {
     if (/^\?(?:[^#]*&)?(?:p|page_id)=\d/.test(tail)) return null;
     let target = edsPath(cut === -1 ? rest : rest.slice(0, cut));
     target = DEMO_ALIASES[target] || target;
+    if (LIVE_ONLY.has(target) && /[?&]filter(?:\[|%5B)(?!search(?:\]|%5D))/i.test(tail.split("#")[0])) {
+      return null;
+    }
     return ALLOWED.has(target) ? `${target}${tail}` : null;
   }
   var TAG_FILTER = /^(?:(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com)?\/en\/news\/?\?filter(?:\[|%5B)([a-z0-9-]+)(?:\]|%5D)(?:\[\]|%5B%5D)=([^&#]+)$/i;
@@ -1320,6 +1689,24 @@ var CustomImportScript = (() => {
     });
   }
 
+  // tools/importer/transformers/skoda-nbsp.js
+  var NBSP_PLACEHOLDER = "\u{F00A0}";
+  var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
+  function transform4(hookName, element, payload) {
+    if (hookName !== "preprocess") return;
+    const doc = element.ownerDocument || payload && payload.document;
+    const walker = doc.createTreeWalker(
+      element,
+      4
+      /* NodeFilter.SHOW_TEXT */
+    );
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.nodeValue.includes("\xA0")) {
+        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER.repeat(run.length));
+      }
+    }
+  }
+
   // tools/importer/import-press-kit-default.js
   var TEMPLATE = { name: "press-kit-default", metadata: { template: "press_kit" } };
   function templateFor(document, pageUrl) {
@@ -1332,12 +1719,56 @@ var CustomImportScript = (() => {
       metadata: { template: "press_kit_chapter", theme: "press-kit", presskit: path(hubUrl) }
     });
   }
+  var IMAGE_LIMIT = 200;
+  function checkImageLimit(root, what) {
+    const count = root.querySelectorAll("img").length;
+    if (count > IMAGE_LIMIT) {
+      throw new Error(`${what} holds ${count} images; a document holds at most ${IMAGE_LIMIT}`);
+    }
+  }
+  var slugOf = (value) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  function galleryGroups(body) {
+    const seen = /* @__PURE__ */ new Map();
+    return [...body.querySelectorAll(".search-results.search-results-gallery")].map((el) => {
+      var _a, _b;
+      const titleEl = (_b = (_a = el.closest(".textwidget")) == null ? void 0 : _a.parentElement) == null ? void 0 : _b.querySelector(":scope > .widget-title");
+      const title = ((titleEl == null ? void 0 : titleEl.textContent) || "").trim();
+      const base = slugOf(title) || "images";
+      const n = (seen.get(base) || 0) + 1;
+      seen.set(base, n);
+      return {
+        el,
+        titleEl,
+        title,
+        slug: n > 1 ? `${base}-${n}` : base,
+        size: el.querySelectorAll("img").length
+      };
+    });
+  }
+  function fragmentGroups(groups, others = 0, limit = IMAGE_LIMIT) {
+    let total = others + groups.reduce((n, group) => n + group.size, 0);
+    const out = /* @__PURE__ */ new Set();
+    [...groups].sort((a, b) => b.size - a.size).forEach((group) => {
+      if (total <= limit) return;
+      if (group.size > limit) {
+        throw new Error(`Press-kit Images group "${group.title || group.slug}" has ${group.size} images; a document holds at most ${limit}`);
+      }
+      out.add(group);
+      total -= group.size;
+    });
+    return groups.filter((group) => out.has(group));
+  }
+  function fragmentPath(pagePath, slug) {
+    return `/fragments${pagePath.replace(/\/$/, "")}/${slug}`;
+  }
   var import_press_kit_default_default = {
     preprocess: ({ document }) => {
+      transform4("preprocess", document.body, { document });
       document.querySelectorAll('article.press_kit a.media-cart-action.download[href], article.press_kit a[data-action="download"][href]').forEach((a) => {
         if (!a.textContent.trim()) a.textContent = "Download";
       });
       document.querySelectorAll("article.press_kit .entry-content").forEach(markQuotes);
+      document.querySelectorAll("article.press_kit .entry-content").forEach(markFootnotes);
     },
     transform: (payload) => {
       const { document, url, params } = payload;
@@ -1346,10 +1777,50 @@ var CustomImportScript = (() => {
       transform("beforeTransform", main, payload);
       const article = main.querySelector("article.press_kit");
       const body = article.querySelector(".entry-content");
+      const pagePath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
+      const groups = galleryGroups(body);
+      const wanted = new URL(params.originalURL).searchParams.get("fragment");
+      if (wanted) {
+        const group = groups.find(({ slug }) => slug === wanted);
+        if (!group) throw new Error(`Press-kit Images chapter has no gallery group "${wanted}"`);
+        const holder = document.createElement("div");
+        if (group.title) holder.append(Object.assign(document.createElement("h2"), { textContent: group.title }));
+        holder.append(group.el);
+        parse4(group.el, payload);
+        main.replaceChildren(holder);
+        normalizeImages(main, document);
+        WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
+        transform3("afterTransform", main, payload);
+        checkImageLimit(main, `Press-kit Images fragment "${group.slug}"`);
+        return [{
+          element: main,
+          path: WebImporter.FileUtils.sanitizePath(fragmentPath(pagePath, group.slug)),
+          report: { title: group.title, template: TEMPLATE.name }
+        }];
+      }
+      const others = main.querySelectorAll("img").length - groups.reduce((n, group) => n + group.size, 0);
+      fragmentGroups(groups, others).forEach((group) => {
+        var _a;
+        const mark = document.createElement("p");
+        mark.dataset.skodaFragment = fragmentPath(pagePath, group.slug);
+        const link = Object.assign(document.createElement("a"), { href: mark.dataset.skodaFragment });
+        link.textContent = mark.dataset.skodaFragment;
+        mark.append(link);
+        group.el.replaceWith(mark);
+        (_a = group.titleEl) == null ? void 0 : _a.remove();
+      });
       body.querySelectorAll(".search-results.search-results-gallery").forEach((group) => parse4(group, payload));
       body.querySelectorAll(".search-results-items").forEach((grid) => parse4(grid, payload));
-      parse3(body, { document });
+      const faq = /\/frequently-asked-questions\/?$/.test(new URL(params.originalURL).pathname);
+      parse3(body, { document, faq });
       body.querySelectorAll("p[data-skoda-quote]").forEach((p) => parse5(p, payload));
+      body.querySelectorAll("p[data-skoda-fragment]").forEach((p) => {
+        const link = p.querySelector("a");
+        p.replaceWith(WebImporter.DOMUtils.createTable([["Fragment"], [link]], document));
+      });
+      body.querySelectorAll("figure").forEach((figure) => parseFigure(figure, payload));
+      body.querySelectorAll("p[data-skoda-footnote]").forEach((p) => parse6(p, payload));
+      main.querySelectorAll("[data-skoda-footnote]").forEach((p) => p.removeAttribute("data-skoda-footnote"));
       article.querySelectorAll("section.images.sa-media-kit-preview").forEach((section) => parse(section, payload));
       article.querySelectorAll("section.tags").forEach((section) => parse2(section, payload));
       const mediaBox = article.querySelector(".search-results.media-box");
@@ -1360,10 +1831,10 @@ var CustomImportScript = (() => {
       normalizeImages(main, document);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       transform3("afterTransform", main, payload);
-      const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
+      checkImageLimit(main, `Press-kit page ${pagePath}`);
       return [{
         element: main,
-        path: WebImporter.FileUtils.sanitizePath(rawPath || "/index"),
+        path: WebImporter.FileUtils.sanitizePath(pagePath || "/index"),
         report: { title: document.title, template: TEMPLATE.name }
       }];
     }

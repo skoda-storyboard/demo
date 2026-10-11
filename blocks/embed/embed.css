@@ -4,7 +4,8 @@
  * Fluid geometry only: video is a fixed-ratio box (default 16:9, author-overridable) with a
  * fluid width; audio is a fixed-height box. The provider iframe fills the box and renders its
  * own native player/controls (matching the live site). The media ratio is viewport-invariant,
- * so no breakpoint touches it. Without embed consent (SKODA-204a) the box shows the live
+ * so no breakpoint touches it. A YouTube box first shows the click-to-load poster
+ * (.embed-play, SKODA-702a). Without embed consent (SKODA-204a) the box shows the live
  * click-to-load placeholder instead (.embed-consent, below). Scoped to .embed;
  * -wrapper/-container are section classes.
  */
@@ -17,6 +18,18 @@
   --embed-consent-button-radius: 2em;
   --embed-consent-icon-size: 1rem;
   --embed-consent-icon-gap: 4px;
+
+  /* YouTube poster (SKODA-702a), measured on the live lite-youtube */
+  --embed-play-glyph-width: 68px;
+  --embed-play-glyph-height: 48px;
+  --embed-play-shade-height: 99px;
+  --embed-play-shade: linear-gradient(
+    rgb(0 0 0 / 67%),
+    rgb(0 0 0 / 54%) 14%,
+    rgb(0 0 0 / 15%) 54%,
+    rgb(0 0 0 / 5%) 72%,
+    rgb(0 0 0 / 0%) 94%
+  );
 
   display: block;
 }
@@ -59,6 +72,72 @@
 .embed .embed-video video {
   object-fit: contain;
   background: var(--skoda-black);
+}
+
+/* --- YouTube poster (SKODA-702a) ----------------------------------------------
+   As the live lite-youtube (Epiq story, 1280): the video's poster covers the media box on black,
+   under a 99px top shade, with the 68×48 YouTube glyph centred, grey until hover / focus. The
+   whole box is the play button. Its focus ring is drawn on the media box, whose overflow would
+   clip a ring around the button (`:has()`, Baseline widely available). Tokens: see .embed. */
+.embed .embed-play {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: var(--skoda-black);
+  cursor: pointer;
+}
+
+.embed .embed-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.embed .embed-play::before,
+.embed .embed-play::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+}
+
+/* live lite-youtube::before: the top shade */
+.embed .embed-play::before {
+  inset: 0 0 auto;
+  height: var(--embed-play-shade-height);
+  background-image: var(--embed-play-shade);
+}
+
+/* live .lty-playbtn: the glyph, grayscale at rest */
+.embed .embed-play::after {
+  inset: 50% auto auto 50%;
+  width: var(--embed-play-glyph-width);
+  height: var(--embed-play-glyph-height);
+  transform: translate(-50%, -50%);
+  background: url('../../icons/youtube-play.svg') center / contain no-repeat;
+  filter: grayscale(100%);
+  transition: filter 0.1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.embed .embed-play:hover::after,
+.embed .embed-play:focus-visible::after {
+  filter: none;
+}
+
+.embed .embed-play:focus-visible {
+  outline: none;
+}
+
+/* the section's text colour: ink on light sections, white on dark ones */
+.embed .embed-video:has(> .embed-play:focus-visible) {
+  outline: 2px solid currentcolor;
+  outline-offset: 2px;
 }
 
 /* --- consent placeholder (SKODA-204a) ----------------------------------------
@@ -157,7 +236,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .embed .embed-consent-button {
+  .embed .embed-consent-button,
+  .embed .embed-play::after {
     transition: none;
   }
 }

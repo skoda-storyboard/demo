@@ -6,7 +6,7 @@
 # (Content-Type: text/yaml). Push it with ./push-query-config.sh.
 # helix-query.yaml / fstab.yaml / paths.json are retired for this project.
 #
-# Column schema (SKODA-401): base columns + the 15 taxonomy facets + tags.
+# Column schema (SKODA-401): base columns + categories (SKODA-831) + the 15 taxonomy facets + tags.
 # (path + lastModified are emitted automatically by the indexer.)
 #
 # SELECTOR RULE (doc-confirmed 2026-09-22, aem.live /docs/special-metadata-properties):
@@ -54,6 +54,13 @@ indices:
         value: attribute(el, "content")
       category:
         select: head > meta[name="category"]
+        value: attribute(el, "content")
+      # --- categories (SKODA-831): a story's WP categories + every ancestor, one
+      #     comma-joined plain name= meta (like the facets: `value:`, not split).
+      #     Category archives scope their Stories feed by it; `category` stays the
+      #     top-level family the home / model rails / promo-box read. ---
+      categories:
+        select: head > meta[name="categories"]
         value: attribute(el, "content")
       # --- tags: reserved special prop → article:tag (multi-value, comma-joined) ---
       tags:

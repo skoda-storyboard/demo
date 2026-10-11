@@ -1,5 +1,6 @@
 import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
+import iconsReady from '../../scripts/icons-ready.js';
 import decorateFooterSections from './footer-sections.js';
 
 /**
@@ -27,4 +28,6 @@ export default async function decorate(block) {
 
   block.append(footer);
   decorateIcons(block);
+  // shown (data-block-status loaded) with its app badges and social icons, not before them
+  await iconsReady(block);
 }

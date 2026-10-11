@@ -42,12 +42,12 @@
 |---|---|---|---|:--:|:--:|---|
 | STO-H01 | Promotional / Featured Carousel | SKODA-201 | E02 | M1 | 🟩 | ✅ built; 🔴 curation manual-vs-auto (§10 Q11) |
 | STO-H02 | Latest Stories | SKODA-402 | E04 | M1 | 🟩 | ✅ built |
-| STO-H03 | Models Slider | SKODA-201 | E02 | M1 | 🟩 | ✅ built; source/order 🟡 |
-| STO-H04 | eMobility Stories Slider | SKODA-402 | E04 | M1 | 🟩 | ✅ built |
-| STO-H05 | Lifestyle Stories Slider | SKODA-402 | E04 | M1 | 🟩 | ✅ built |
-| STO-H06 | Škoda World Stories Slider | SKODA-402 | E04 | M1 | 🟩 | ✅ built |
-| STO-H07 | Series Slider | SKODA-201 | E02 | M1 | 🟩 | ✅ built; text-clickability + sort 🟡 |
-| STO-H08 | Latest News | SKODA-402 | E04 | M1 | 🟩 | ✅ built; 🔴 source + in-scope? (§10 Q12) |
+| STO-H03 | Models Slider | SKODA-201, SKODA-611b | E02 | M1 | 🟩 | ✅ built; source/order 🟡 |
+| STO-H04 | eMobility Stories Slider | SKODA-402, SKODA-611b | E04 | M1 | 🟩 | ✅ built |
+| STO-H05 | Lifestyle Stories Slider | SKODA-402, SKODA-611b | E04 | M1 | 🟩 | ✅ built |
+| STO-H06 | Škoda World Stories Slider | SKODA-402, SKODA-611b | E04 | M1 | 🟩 | ✅ built |
+| STO-H07 | Series Slider | SKODA-201, SKODA-611b | E02 | M1 | 🟩 | ✅ built; text-clickability + sort 🟡 |
+| STO-H08 | Latest News | SKODA-402, SKODA-611b | E04 | M1 | 🟩 | ✅ built; 🔴 source + in-scope? (§10 Q12) |
 | STO-H09 | Social Media | SKODA-201 | E02 | M1 | 🟩 | ✅ static built; live feed 🔴 (not live at source) |
 
 ### B. Category / Subcategory (STO-C01–05)
@@ -73,7 +73,7 @@
 | Req | Requirement | Ticket(s) | Epic | M | Build | Status |
 |---|---|---|---|:--:|:--:|---|
 | STO-M01 | Model Hero | SKODA-202 | E02 | M1 | 🟦 | ✅ hero reused |
-| STO-M02 | Featured Model | SKODA-201 | E02 | M1 | 🟦 | 🔴 editorial purpose/config to confirm |
+| STO-M02 | Featured Model | SKODA-201, SKODA-222 | E02 | M1 | 🟦 | 🟡 built on the 11 model tag archives (`stories` `feature` row, SKODA-222, in review) |
 | STO-M03 | Model-related Stories Grid | SKODA-402 | E04 | M1 | 🟦 | ✅ tag-driven; retrieval rules 🟡 |
 | STO-M04 | Story Card | SKODA-201 | E02 | M1 | 🟩 | ✅ built |
 | STO-M05 | Pagination / Load More | SKODA-402 | E04 | M1 | 🟩 | ✅ built |

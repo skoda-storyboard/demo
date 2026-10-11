@@ -136,8 +136,9 @@ plus variants of existing blocks, built against the already-published pages (no 
 
 **Octavia rail data migrated (2026-09-28), all through the import pipeline, no authored cards:**
 - News: 9 press releases (`urls-press-release-octavia.txt`); Stories: 8 stories (`urls-story-detail-octavia.txt`);
-  Press Kits: the 10 hubs through the page-base importer (`urls-page-base-octavia-press-kits.txt`) as an interim
-  until SKODA-805 rebuilds the hub. All imported, pushed, previewed and published; corpus section "OCTAVIA".
+  Press Kits: the 10 kits through the page-base importer as an interim until SKODA-805 rebuilds the hub.
+  *(2026-10-05, SKODA-832: the 9 hubs moved to press-kit-hub, `urls-press-kit-hub-octavia.txt`; the RS 245
+  press-kit article to press-kit-default, `urls-press-kit-default-octavia.txt`; the interim list is retired.)* All imported, pushed, previewed and published; corpus section "OCTAVIA".
   Images/Videos: `model=octavia` queries in the media feed (`media-items/sources.json`), feed republished.
 - Importer fixes found on the way (all importers re-bundled): page-base uses `templateDefault` so a flattened CPT page
   keeps its type (`press_kit`); `skoda-metadata` reads a single post's own `<facet>-<slug>` article classes when it

@@ -96,6 +96,11 @@ test('classifyBlock: tiles are on main; gallery slider and columns split remain 
   assert.equal(tiles.status, 'main');
   assert.equal(classifyBlock(one(block('gallery slider', row('x'))), CONTRACTS, CODE).id, 'gallery-slider');
   assert.equal(classifyBlock(one(block('columns split-62', row('a', 'b'))), CONTRACTS, CODE).id, 'columns-split');
+  // shape 2 (SKODA-225): the authored portrait width travels as a second variant
+  const portrait = classifyBlock(one(block('columns split-62 portrait-235', row('a', 'b'))), CONTRACTS, CODE);
+  assert.equal(portrait.id, 'columns-split');
+  assert.deepEqual(portrait.problems, []);
+  assert.equal(classifyBlock(one(block('columns split-62 portrait-2350', row('a', 'b'))), CONTRACTS, CODE).status, 'error', 'portrait over 999px');
 });
 
 // A pinned block with no code yet. Quote (SKODA-220) and Accordion (SKODA-805c) were the
@@ -289,18 +294,33 @@ test('sectionStyles reads each Section Metadata style row as normalised tokens',
   assert.deepEqual(sectionStyles(html), [['body-column'], ['body-column', 'highlight-dark']]);
 });
 
-test('checkPage: a highlight section style holds publish until the SKODA-824 runtime', () => {
+test('checkPage: a highlight section style is the SKODA-824 contract and publishes (runtime landed)', () => {
   const body = `<p>Intro</p>${block('section-metadata', row('style', 'body-column'))}`;
   const panel = (variant) => `<h3>Panel</h3>${block('section-metadata', row('style', `body-column, highlight-${variant}`))}`;
   const r = checkPage(page(body, panel('dark'), panel('grey')), CONTRACTS, CODE);
+  assert.deepEqual(r.pending, [{
+    id: 'highlight', ticket: 'SKODA-824', fallback: 'readable', missingCode: false,
+  }]);
+  assert.equal(r.errors.length, 0);
+  assert.equal(r.publishable, true);
+  const plain = checkPage(page(body, block('section-metadata', row('style', 'dark, full-width'))), CONTRACTS, CODE);
+  assert.deepEqual(plain.pending, [], 'unrelated section styles are not the highlight contract');
+  assert.equal(plain.publishable, true);
+});
+
+test('checkPage: a section-style contract with a broken fallback holds publish', () => {
+  // the hold mechanism the highlight contract used until its runtime landed (SKODA-824)
+  const held = {
+    ...CONTRACTS,
+    pending: CONTRACTS.pending.map((c) => (c.id === 'highlight' ? { ...c, fallback: 'broken' } : c)),
+  };
+  const panel = `<h3>Panel</h3>${block('section-metadata', row('style', 'body-column, highlight-dark'))}`;
+  const r = checkPage(page(panel), held, CODE);
   assert.deepEqual(r.pending, [{
     id: 'highlight', ticket: 'SKODA-824', fallback: 'broken', missingCode: false,
   }]);
   assert.equal(r.errors.length, 0);
   assert.equal(r.publishable, false);
-  const plain = checkPage(page(body, block('section-metadata', row('style', 'dark, full-width'))), CONTRACTS, CODE);
-  assert.deepEqual(plain.pending, [], 'unrelated section styles are not the highlight contract');
-  assert.equal(plain.publishable, true);
 });
 
 test('committed registry is self-consistent and fully documented', () => {
@@ -320,4 +340,24 @@ test('registryProblems flags duplicate ids and undocumented entries', () => {
   assert.ok(p.includes('duplicate id a'));
   assert.ok(p.some((x) => /fallback/.test(x)));
   assert.ok(registryProblems(c, '').some((x) => /no "### a"/.test(x)));
+});
+
+test('classifyBlock: the Newsletter Stub card (SKODA-823) and the footer stub are on main, config only', () => {
+  const card = classifyBlock(one(block(
+    'newsletter-stub card',
+    row('image', '<picture><img src="n.webp"></picture>'),
+    row('heading', 'Be the first<br>to get the latest stories'),
+    row('button', 'Subscribe now!'),
+    row('consent', 'Hereby I give my <a href="https://www.skoda-storyboard.com/en/documents/x/">consent</a>'),
+    row('manage', '<a href="https://www.skoda-storyboard.com/en/newsletter-settings/">Manage subscription</a>'),
+    row('error', 'Please enter a valid e-mail address.'),
+    row('consent-error', 'Please accept the terms before continuing.'),
+    row('list', '389'),
+  )), CONTRACTS, CODE);
+  assert.equal(card.status, 'main');
+  assert.deepEqual(card.problems, []);
+  const footer = classifyBlock(one(block('newsletter-stub', row('label', 'Email'), row('message', 'Not yet'))), CONTRACTS, CODE);
+  assert.equal(footer.status, 'main');
+  const bad = classifyBlock(one(block('newsletter-stub card', row('honeypot', 'x'))), CONTRACTS, CODE);
+  assert.equal(bad.status, 'error');
 });

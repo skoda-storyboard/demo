@@ -10,13 +10,16 @@
  * (the SKODA-214 feed block: card-teaser grid + Load more) whose scope is DERIVED from the
  * page canonical URL (content-driven), never hard-coded:
  *   /en/tag/<taxonomy>/<slug>/        → tag: <slug>          (index `tags` column)
- *   /en/category/<cat>[/<sub>]/       → path: /en/<cat>[/<sub>]/  (story URLs carry the
- *                                        category and sub-category; the index `category`
- *                                        column has only the top level)
- * The source archives list stories only (post type `post`), so template = story.
+ *   /en/category/<cat>[/<sub>]/       → categories: <last segment, the term slug>
+ *                                        (index `categories` column, SKODA-831: each story's
+ *                                        WP categories + every ancestor, so a parent archive
+ *                                        holds its sub-categories' stories as on the source)
+ * The source archives list stories only (post type `post`), so template = story. No `path`:
+ * a story's URL folder is not its membership (the design story lives under /en/emobility/).
  *
  * (Was a path-scoped `Listing`: `path: /en/tag/model/elroq/` matched no index row — no story
- * lives under /en/tag/ or /en/category/ — so every archive rendered empty.)
+ * lives under /en/tag/ or /en/category/ — so every archive rendered empty. Then category
+ * archives used `path: /en/<cat>[/<sub>]/`, which no sub-category story URL carries.)
  *
  * ⚠️ CONTENT-DRIVEN, NOT POSITIONAL. Requires an archive grid (.archive-results or
  * .search-results-items) inside the matched element; otherwise unwraps and bails.
@@ -27,7 +30,7 @@
  *   ['template', 'story']
  *   ['tag', 'peaq']
  *   ['columns', '3'] ['initial', '6'] ['perpage', '6'] ['excludefeatured', 'false']
- *   ['feature', <picture> + <h3>Explore the Peaq</h3> + CTA links]   // model tag archives only (pending, SKODA-222)
+ *   ['feature', <picture> + <h3>Explore the Peaq</h3> + CTA links]   // model tag archives only (SKODA-222)
  */
 // Locale-relative index path for a given page path ('/en/…' → '/en/query-index.json').
 function indexForPath(pathname) {
@@ -37,9 +40,9 @@ function indexForPath(pathname) {
 }
 
 // The source's featured model card (`.featured-model`, model tag archives only) as a `feature`
-// row. Contract `stories-feature` (pending, SKODA-222): the Stories block ignores the row until
-// 222 renders it, so the page reads as today. Placement is 222's: the source puts the card in
-// the right column spanning ~2 rows at desktop and first, full-width + collapsible, below 1024.
+// row. Contract `stories-feature` (on main since SKODA-222): the Stories block renders it as the
+// grid's first cell, in the right column across two rows from 992 and first, full width and
+// collapsible below that.
 function featureRows(element, document) {
   const card = element.querySelector('.featured-model');
   if (!card) return [];
@@ -79,9 +82,9 @@ function featureRows(element, document) {
 // Archive scope row from the archive URL, or null when the URL isn't an archive.
 function scopeFor(pathname) {
   const segs = pathname.split('/').filter(Boolean); // [en, tag|category, …]
-  const [locale, kind, ...rest] = segs;
+  const [, kind, ...rest] = segs;
   if (kind === 'tag' && rest.length) return ['tag', rest[rest.length - 1]];
-  if (kind === 'category' && rest.length) return ['path', `/${locale}/${rest.join('/')}/`];
+  if (kind === 'category' && rest.length) return ['categories', rest[rest.length - 1]];
   return null;
 }
 

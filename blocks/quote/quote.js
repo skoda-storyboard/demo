@@ -19,7 +19,7 @@ function figureFor(row) {
 /**
  * Quote (SKODA-220, contract `quote` v1): each row is the source's centred pull-quote. The
  * short rule between quote and attribution is CSS, because a bare <hr> would split the DA
- * section.
+ * section. `Quote (left)` is the press-kit chapters' left-aligned quote, without the rule.
  * @param {Element} block
  */
 export default function decorate(block) {

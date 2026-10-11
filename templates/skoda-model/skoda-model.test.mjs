@@ -83,6 +83,26 @@ test('sections get their roles and the source anchors as aliases', () => {
   assert.ok(main.querySelector('#derivatives.model-rail'));
 });
 
+test('the RS derivatives\' panel titles get the same roles, anchors and nav icons (SKODA-208a)', () => {
+  // Elroq RS: "Model introduction" + "Key Specifications"; Enyaq RS: "Key Highlights"
+  [['key-specifications', 'Key Specifications'], ['key-highlights', 'Key Highlights']].forEach(([keyId, keyTitle]) => {
+    const rs = PAGE
+      .replace('<h2 id="model-description">Model Description</h2>', '<h2 id="model-introduction">Model introduction</h2>')
+      .replace('href="#model-description"', 'href="#model-introduction"')
+      .replace('<h2 id="highlights">Highlights</h2>', `<h2 id="${keyId}">${keyTitle}</h2>`)
+      .replace('href="#highlights"', `href="#${keyId}"`);
+    const main = setup(rs);
+    decorate(main);
+    const roles = [...main.querySelectorAll(':scope > .section')].map((s) => [...s.classList].filter((c) => c.startsWith('model-')).join(' '));
+    assert.deepEqual(roles, ['', 'model-nav-section', 'model-intro', 'model-highlights', 'model-techdata', 'model-rail', 'model-rail', 'model-rail'], keyTitle);
+    assert.ok(main.querySelector('#intro.model-intro'), 'Model introduction is the intro panel (40/300 heading, 40px gap)');
+    assert.ok(main.querySelector('#keyfacts.model-highlights'), `${keyTitle} is the key-facts panel (its Cards (key-facts) block)`);
+    const item = (id) => main.querySelector(`.model-nav-list li[data-target="${id}"]`);
+    assert.ok(item('model-introduction')?.querySelector('.icon-model-description'), 'intro nav item kept, description icon');
+    assert.ok(item(keyId)?.querySelector('.icon-model-key-facts'), 'key nav item kept, key-facts icon (not the fallback)');
+  });
+});
+
 test('hero chip, tech data parts, drawings and rail lead-ins are marked', () => {
   const main = setup();
   decorate(main);

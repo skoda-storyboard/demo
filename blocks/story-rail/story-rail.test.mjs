@@ -49,7 +49,8 @@ globalThis.document = {
 };
 
 const {
-  parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail,
+  parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail, railLayout, safeViewAll,
+  TAXONOMY_TEMPLATES,
 } = await import('./story-rail.js');
 const { feedLightboxItem } = await import('../../scripts/media-lightbox.js');
 
@@ -105,6 +106,9 @@ const rows = [
 ];
 
 // --- parseConfig -----------------------------------------------------------
+
+// a script-URL scheme, assembled so no literal javascript: URL sits in the source
+const JS = ['java', 'script:'].join('');
 
 test('parseConfig reads keys and applies defaults', () => {
   const cfg = parseConfig(cfgBlock([
@@ -303,8 +307,11 @@ test('rowToCells: a media feed row gets the cart + download toolbar cell (media-
   const [cart, download] = image[2].elems.map((p) => p.children[0]);
   assert.equal(image[2].elems.every((p) => p.tagName === 'P'), true, 'p > a, the card-teaser toolbar shape');
   assert.equal(cart.className, 'media-cart-action add');
-  assert.equal(cart.dataset.id, '450812', 'carries the cart key for SKODA-505');
-  assert.equal(cart.getAttribute('aria-disabled'), 'true');
+  assert.equal(cart.dataset.id, '450812', 'carries the source key');
+  assert.equal(cart.dataset.href, 'https://cdn.example/a.jpg', 'adds the original (SKODA-505a)');
+  assert.equal(cart.dataset.title, 'A');
+  assert.equal(cart.dataset.thumb, 'https://cdn.example/a-768x512.jpg', 'the card image, for the cart page (505b)');
+  assert.equal(cart.getAttribute('aria-disabled'), 'true', 'inert until the built rail binds it');
   assert.equal(cart.getAttribute('aria-label'), 'Add to media cart');
   assert.equal(download.className, 'media-cart-action download');
   assert.equal(download.href, 'https://cdn.example/a.jpg', 'downloads the original');
@@ -314,8 +321,10 @@ test('rowToCells: a media feed row gets the cart + download toolbar cell (media-
     template: 'video', id: '410179', mp4: 'https://cdn.example/v.mp4',
   });
   assert.equal(video[2].elems[1].children[0].href, 'https://cdn.example/v.mp4', 'a video downloads its MP4');
+  assert.equal(video[2].elems[0].children[0].dataset.href, 'https://cdn.example/v.mp4', 'and adds the MP4');
   const noFile = rowToCells({ title: 'N', image: 'https://x/n.jpg', template: 'video', id: '9' });
   assert.equal(noFile[2].elems.length, 1, 'no download button without a file');
+  assert.equal(noFile[2].elems[0].children[0].dataset.href, undefined, 'nothing to add: stays inert');
   assert.equal(rowToCells({ path: '/en/s', title: 'S', image: 'https://x/s.jpg', template: 'story' }).length, 2, 'stories get no toolbar');
 });
 
@@ -490,6 +499,9 @@ test('feedLightboxItem: the source colorbox panel from a media feed row (shape 5
   assert.equal(item.full, 'https://cdn.example/a-1920x1280.jpg', 'the stage shows the 1920 rendition');
   assert.equal(item.download, 'https://cdn.example/a.jpg', 'download is the original');
   assert.equal(item.cartId, '450812');
+  assert.equal(item.cartHref, 'https://cdn.example/a.jpg', 'the add button adds the original (SKODA-505a)');
+  assert.equal(item.thumb, '', 'no listing image: the cart page shows a type tile, not the original');
+  assert.equal(feedLightboxItem({ title: 'T', image: '/media_x.jpg', original: 'https://cdn.example/x.jpg' }).thumb, '/media_x.jpg');
   const paras = item.caption.children;
   const text = (node) => (node.children.length ? node.children.map((c) => (typeof c === 'string' ? c : text(c))).join('') : node.textContent);
   assert.deepEqual(paras.map(text), [
@@ -524,4 +536,103 @@ test('feedLightboxItem: a video row plays the Vimeo player; its panel adds lengt
   assert.equal(text(item.caption.children[1]), 'File type: MP4File size: 3 GBLength: 14:05Bitrate: 29994kb/sAudio format: quicktimeDimensions: 3840 × 2160 pxPublished: 23. 6. 2025');
   const fileOnly = feedLightboxItem({ template: 'video', title: 'V', mp4: 'https://cdn.example/v.mp4' });
   assert.equal(fileOnly.video, 'https://cdn.example/v.mp4', 'no Vimeo id: the MP4 plays');
+});
+
+// --- Storyboard home bands (SKODA-611b) ---------------------------------------------------
+const home = {
+  press: false, curated: false, landing: true, homeBand: true, layout: 'standard',
+};
+
+test('railLayout: every home-band index rail is wide; Models keeps its ladder; taxonomy rails caption', () => {
+  assert.deepEqual(railLayout({ ...home, template: 'story' }).classes, ['story-rail-wide', 'story-rail-home']);
+  assert.deepEqual(railLayout({ ...home, template: 'skoda_model' }).classes, [
+    'story-rail-wide', 'story-rail-home', 'story-rail-models', 'story-rail-caption',
+  ]);
+  assert.deepEqual(railLayout({ ...home, template: 'skoda_series' }).classes, [
+    'story-rail-wide', 'story-rail-home', 'story-rail-caption',
+  ]);
+  assert.deepEqual(railLayout({ ...home, template: 'press_release', layout: 'news' }).classes, [
+    'story-rail-wide', 'story-rail-home',
+  ]);
+});
+
+test('railLayout: other rails keep their layouts (non-home bands, press band, curated, non-landing)', () => {
+  const off = { ...home, homeBand: false };
+  assert.deepEqual(railLayout({ ...off, template: 'story' }).classes, [], 'e.g. a model page rail');
+  // a landing-page news rail outside a home band (the Media Room News rail) stays wide
+  assert.deepEqual(railLayout({ ...off, template: 'press_release', layout: 'news' }).classes, ['story-rail-wide']);
+  assert.deepEqual(railLayout({ ...home, press: true, template: 'press_release' }).classes, []);
+  assert.deepEqual(railLayout({ ...home, curated: true, template: 'story' }).classes, []);
+  assert.deepEqual(railLayout({ ...home, landing: false, template: 'story' }).classes, []);
+});
+
+test('railLayout: the "All" end card is for home-band post rails with a viewall link only', () => {
+  const all = '/en/category/emobility';
+  assert.equal(railLayout({ ...home, template: 'story', viewAll: all }).endCard, true);
+  assert.equal(railLayout({ ...home, template: 'press_release', layout: 'news', viewAll: '/en/news' }).endCard, true);
+  assert.equal(railLayout({ ...home, template: 'story', viewAll: '' }).endCard, false, 'no link, no card');
+  assert.equal(railLayout({ ...home, template: 'skoda_series', viewAll: '/en/series-2' }).endCard, false, 'series shows all');
+  assert.equal(railLayout({ ...home, template: 'skoda_model', viewAll: all }).endCard, false);
+  assert.equal(railLayout({ ...home, homeBand: false, template: 'story', viewAll: all }).endCard, false);
+  assert.equal(railLayout({ ...home, press: true, template: 'story', viewAll: all }).endCard, false, 'press has its own');
+  assert.equal(railLayout({ ...home, landing: false, template: 'story', viewAll: all }).endCard, false, 'not wide, not sized');
+});
+
+test('railLayout: the Media Room Press Kits rail (compact home band) is wide with an end card, like live', () => {
+  const pk = railLayout({ ...home, template: 'press_kit', viewAll: '/en/press-kits' });
+  assert.deepEqual(pk.classes, ['story-rail-wide', 'story-rail-home']);
+  assert.equal(pk.endCard, true);
+});
+
+test('wide cells are set only on the wide layout (no unscoped --wide-cell-width)', () => {
+  const setters = cssRules.filter(({ body }) => /--wide-cell-width\s*:/.test(body));
+  assert.ok(setters.length >= 5, 'the wide + model ladders');
+  setters.forEach(({ selector }) => selectorList(selector).forEach((s) => {
+    assert.ok(/\.story-rail\.story-rail-wide/.test(s), `wide cell width set outside .story-rail-wide: ${s}`);
+  }));
+});
+
+test('rowToCells: model and series rows carry no date, so they render as caption cards', () => {
+  assert.ok(TAXONOMY_TEMPLATES.has('skoda_model') && TAXONOMY_TEMPLATES.has('skoda_series'));
+  const [, model] = rowToCells({
+    path: '/en/skoda-model/elroq', title: 'Elroq', image: 'https://x/e.jpg', template: 'skoda_model', date: '2026-05-01',
+  });
+  assert.equal(model.elems.length, 1, 'title only');
+  assert.equal(model.elems[0].tagName, 'H3');
+  const [, story] = rowToCells({
+    path: '/en/s', title: 'S', image: 'https://x/s.jpg', template: 'story', date: '2026-05-01',
+  });
+  assert.equal(story.elems.length, 2, 'stories keep their date (overlay card)');
+});
+
+// --- malformed authored / index input (SKODA-611b pre-PR review; the #231 failure class) ----
+test('safeViewAll keeps only a real http(s) link that leaves the page', () => {
+  assert.equal(safeViewAll('http://localhost/en/', 'http://localhost/en'), '', 'the page itself, trailing slash or not');
+  const base = 'http://localhost/en/';
+  assert.equal(safeViewAll('http://localhost/en/category/emobility', base), 'http://localhost/en/category/emobility');
+  assert.equal(safeViewAll('/en/news', base), 'http://localhost/en/news', 'root-relative text is a path');
+  assert.equal(safeViewAll('https://www.skoda-storyboard.com/en/series-2/', base), 'https://www.skoda-storyboard.com/en/series-2/');
+  assert.equal(safeViewAll(['http://localhost/a', 'http://localhost/b'], base), 'http://localhost/a', 'first of several links');
+  ['', undefined, 'https://', `${JS}alert(1)`, `Java${JS.slice(4)}alert(1)`, 'data:text/html,x', 'All', 'en/x', '//evil.example/x',
+    'mailto:a@b.c', 'http://localhost/en/', 'http://localhost/en/#', 'http://localhost/en/#top', '/\\evil.example/x'].forEach((v) => {
+    assert.equal(safeViewAll(v, base), '', `rejected: ${v}`);
+  });
+});
+
+test('parseConfig: a malformed "All" link gives no viewall; the template is normalised', () => {
+  assert.equal(parseConfig(cfgBlock([['viewall', `${JS}alert(1)`]])).viewAll, '');
+  assert.equal(parseConfig(cfgBlock([['viewall', 'https://']])).viewAll, '');
+  assert.equal(parseConfig(cfgBlock([['template', ' Skoda_Model ']])).template, 'skoda_model');
+  assert.equal(parseConfig(cfgBlock([['template', '  ']])).template, 'story');
+  assert.equal(parseConfig(cfgBlock([['template', ' Press_Release ']])).layout, 'news', 'layout follows the normalised template');
+});
+
+test('rowToCells: an invalid image url drops the image, not the card (the rail survives)', (t) => {
+  t.mock.method(console, 'warn', () => {});
+  ['https://', 'http:', '//'].forEach((image) => {
+    const cells = rowToCells({ path: '/en/s', title: 'S', image, template: 'story', date: '2026-05-01' });
+    assert.equal(cells.length, 1, `${image}: body only`);
+    assert.equal(cells[0].elems.at(-1).tagName, 'H3');
+  });
+  assert.equal(console.warn.mock.callCount(), 3);
 });

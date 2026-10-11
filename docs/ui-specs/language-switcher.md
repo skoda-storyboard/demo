@@ -5,6 +5,39 @@ Status: **CAPTURED** (measured 2026-09-15 via Chrome DevTools MCP; screenshot sa
 [`mobile-nav.md`](mobile-nav.md) (drawer) for the rest of the header.
 Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 
+> **Re-capture (2026-09-30, SKODA-303, Playwright computed styles on the live site).** These values override the
+> sections they name.
+>
+> **Content (§2):**
+> - **Fixed order**, not current-first: `EN, CZ, DE, SK, SR, SL`. On `/cs/` the current CZ stays second.
+> - **Per page:** the list follows the page's `<link rel="alternate" hreflang>` set.
+>   - The home page links all 6 locale homes.
+>   - An article links each *translated article* and **omits** locales without one: the Epiq story shows
+>     EN / CZ / DE / SK, the Peaq press release EN / CZ / SK.
+>   - Media Room: DE goes to the external `https://www.skoda-media.de/`; the others go to `/{locale}/media-room/`.
+>   - EDS pilot: static per-locale homes (decision, see §8).
+>
+> **Desktop topbar (≥1080):**
+> - Type: 12px / **18px** line height, uppercase, no letter-spacing, `SKODA Next`. Current `span` **700** ink;
+>   links **300** `#7c7d7e`.
+> - Spacing: `margin-left` **12px** between items; the row is 149×18, centred in the 44px bar (y 13).
+> - Right edge on the content edge: x1334 @1440, 1254 @1280, 1070 @1080. The Media Room (`#f1f1f1` bar) is identical.
+>
+> **Drawer (≤1079, same at 1079 / 1024 / 768 / 500 / 390 / 375):**
+> - Type: 16px / **24px**, **700 for all**, letter-spacing **0.32px**, `margin-left` **24px**.
+> - Box: padding `0 16px 24px 24px`, `order: 2`, `align-self: flex-end` (right edge = drawer edge),
+>   `margin-top: auto` (pinned to the bottom of the drawer column), **no border**. On a short viewport
+>   (375×667) the drawer scrolls and the row stays the last item.
+>
+> **States:**
+> - No hover change (same grey, no underline, cursor pointer); the current `span` has the default cursor.
+> - **No focus ring** (`outline: none`), an accessibility gap. EDS adds a visible `:focus-visible` ring.
+>
+> **Contrast (§6):**
+> - The live `#7c7d7e` is 3.30:1 on `#e6e6e6`, 3.65:1 on `#f1f1f1` and 4.12:1 on white, **failing AA** everywhere.
+> - EDS uses `--skoda-grey-700` `#5a5b5c`: 5.45 / 6.03 / 6.81:1. The nearest same-hue grey that passes,
+>   `#666768` (4.54:1 on `#e6e6e6`), is too close to the limit and isn't a token.
+
 ## 1. Identity
 
 - **Component:** Locale switcher, a row of **inline text links**, one per available locale, with the
@@ -131,7 +164,41 @@ current locale is plain text (bold) and the rest are links:
 - Optional: drop a locale whose translated page does not exist (per-page existence; needs a manifest or
   a HEAD check, see §8).
 
+## 8a. Click behaviour + URL patterns (live, re-checked 2026-09-30)
+Every link was clicked on the home page, a story, a press release, the Media Room, `/cs/` and a CZ story.
+- **Behaviour:**
+  - a plain same-tab navigation straight to a 200 page, with no redirect (the only extra hop is the analytics sync);
+  - no language cookie or preference is stored;
+  - the current locale is an inert `<span>`;
+  - **exception:** on the Media Room, DE opens `https://www.skoda-media.de/` in a **new tab** (`target="_blank"`).
+- **Live URL forms** (absolute, always with a trailing slash):
+  - locale home: `/{locale}/`;
+  - article: `/{locale}/{translated category}/{translated slug}/`, for example `/cs/e-mobilita-cs/…`, `/de/emobilitat-de/…`,
+    `/sk/emobilita-sk/…`, `/cs/tiskove-zpravy-archiv/…`, `/sk/tlacova-sprava/…`;
+  - Media Room: `/{locale}/media-room/`.
+- **EDS URL forms:** the locale home is the root document `{locale}.html`, served **without** a trailing slash (`/en`;
+  `/en/` is a 404), and pages sit in the `{locale}/` folder (`/en/media-room`). The nav fragments link:
+  - `/nav`: `/cs` `/de` `/sk` `/sr` `/sl`;
+  - `/media-room/nav`: `/cs/media-room`, `https://www.skoda-media.de/`, `/sk/media-room`, `/sr/media-room`, `/sl/media-room`.
+- **Header behaviour:**
+  - **switching language keeps the page:** every locale links the current path with only its locale segment
+    changed (`/en/emobility/x` → `/cs/emobility/x`, `/en/media-room` → `/cs/media-room`);
+  - an authored link to another site still wins (Media Room DE);
+  - pages outside a locale tree (`/`, `/drafts/…`) use the authored target; there the bold (unlinked) locale takes
+    its siblings' pattern (`/en`, `/en/media-room`);
+  - a link to another site opens in a new tab with `rel="noopener"` and "(opens in a new tab)" in its name.
+- **Translated article targets:** out of the pilot (SKODA-1003).
+
 ## 8. Open decisions + recommended default
+
+> **Decided (2026-09-30, SKODA-303 pilot):**
+> - **Control form:** inline links.
+> - **Current locale:** taken from the URL, not the authored `<strong>`.
+> - **Targets:** all 6 link the EDS locale homes (`/cs` …, no trailing slash; Media Room `/{locale}/media-room`, DE on
+>   `skoda-media.de`, see §8a). Only `/en` exists on EDS yet; the others 404 until
+>   the locale trees are migrated, a known gap.
+> - **Out of the pilot:** per-page translated targets and hiding locales without a translation (SKODA-1003).
+> - **Contrast:** inactive links use `--skoda-grey-700`.
 
 - **Control form:** source is **inline links**; recommend keeping **inline links** as the EDS-native
   default (lightest, no JS, matches source). A dropdown/disclosure is only worth it if the locale count

@@ -109,8 +109,9 @@ https://www.skoda-storyboard.com/en/skoda-world/quiz-can-you-recognise-skoda-mod
 # ===== OCTAVIA model page (SKODA-208, 2026-09-28) — the items the live /en/skoda-model/octavia/ News,
 # Press Kits and Stories rails show (10 each). Already listed above: skoda-octavia-turns-30 (press
 # release), quiz-can-you-recognise-skoda-models (Elroq stories); the-versatile-octavia and
-# how-the-skoda-octavia-reached-365-km-h are imported. Press kits go through the page-base importer
-# until SKODA-805 (hub rebuild); their Metadata still carries template=press_kit + the model facets.
+# how-the-skoda-octavia-reached-365-km-h are imported. Press kits: the 9 hubs go through press-kit-hub
+# (urls-press-kit-hub-octavia.txt), the RS 245 article through press-kit-default
+# (urls-press-kit-default-octavia.txt), SKODA-832; Metadata carries template=press_kit + the model facets.
 # Press releases (9)
 https://www.skoda-storyboard.com/en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain/
 https://www.skoda-storyboard.com/en/press-releases/the-skoda-elroq-earns-5-star-euro-ncap-safety-rating-with-the-enyaq-and-octavia-retaining-their-top-scores/

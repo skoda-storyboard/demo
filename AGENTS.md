@@ -23,6 +23,15 @@ See the [Chrome DevTools MCP advanced usage guide](https://github.com/ChromeDevT
 - Scope CSS to `.blockname`; `-wrapper`/`-container` are section classes.
 - `fragment/fragment.js` is the only cross-block import. Otherwise use `/scripts/`.
 
+## JavaScript Guidelines
+
+For any JavaScript story development, enhancement, or defect fix (including blocks,
+shared scripts, templates, importers, and tests):
+
+- Read and follow [`docs/guardrails/js-guidelines.md`](docs/guardrails/js-guidelines.md) **before generating or modifying code**. Treat it as a mandatory engineering constraint, alongside the ticket and relevant UI spec.
+- Preserve EDS authoring/lifecycle contracts and reuse existing helpers; keep changes scoped to the owning behavior.
+- Perform the guardrail self-check before handoff; run focused tests and `npm run lint`, and report any unverified gates. QA owns acceptance.
+
 ## CSS Guidelines
 
 For any frontend CSS, styling, responsive-layout, or UI-component work:

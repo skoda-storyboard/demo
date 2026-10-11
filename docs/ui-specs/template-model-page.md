@@ -14,9 +14,10 @@ Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 
 > **Build re-capture (2026-09-28, SKODA-208 UI half).** Measured on Octavia / Superb / Fabia / Peaq / Epiq at
 > 1920–320; these values are what the build reproduces and override §2–§5 where they differ:
-> - **Hero:** image 9:5 (<768) with the chip overlapping its bottom edge and a 24/700 ink title below; 3:1 at
->   768–1079 (24/700 ink title top-left, chip clipped); 5:2 at 1080–1439 (512 at 1280; chip + 36/700 white title at
->   a 5% inset, 50% wide); 3:1 from 1440.
+> - **Hero (corrected SKODA-828, 2026-10-05, measured at 711–720 and 1390–1398):** image 9:5 (<720) with the chip
+>   overlapping its bottom edge and a 24/700 black title below; 3:1 at 720–1079 (24/700 black title top-left, chip
+>   clipped); 5:2 at 1080–1391 (512 at 1280; chip + 36/700 white title at a 5% inset, hero top +51px); 3:1 from 1392
+>   (640 at 1920, 853 at 2560, 1280 at 3840). The title column is full width up to 1023 and 50% from 1024.
 > - **Nav:** 99px white bar, links 14/600 grey-500 with a 28px icon, hover/current = ink text, `#419468` icon and a
 >   3px bar; sticky from 768, hidden below.
 > - **Text panels:** 50px top padding, `h2` 40/300 (Tech Data 40/700 centred white), an 8/12 centred column from

@@ -5,10 +5,11 @@
 - **Phase:** A · **Milestone:** M1 (demo-visible: the first page shown) · **Tier:** Must (§11.2 cut line)
 - **GitHub issue:** [#151](https://github.com/skoda-storyboard/demo/issues/151)
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1d *(planning estimate, not a quote)*
-- **Status (2026-09-28):** 🟡 In review, branch `skoda-611a-home-sections`. Code + importer are done and verified
-  on a local render of the importer-shaped `/en`. **The DA `/en` update is pending a human author** (agent DA writes
-  need authorization): split the rails section into one section per band and add `Style: cover-box` to the light
-  ones (see *Implementation*). Apply it after the PR merges, then preview.
+- **Status (2026-10-01):** ✅ DONE.
+  - Merged in PR #205 (2026-09-29); issue #151 is closed.
+  - The re-imported `/en` (9 sections) was pushed with the combined SKODA-827 home importer (`6fa6992`), so no hand-authoring was needed.
+  - Re-checked on `main` at 1440: 9 sections in source order, Social media and Series dark, and 0 overlap between the promo and the feed.
+  - Band spacing is SKODA-611b.
 
 ## Origin
 Split from SKODA-611 (sweep-reconciliation decision D2, [`SKODA-M1-URL-BLOCK-SWEEP.md`](../../reviews/SKODA-M1-URL-BLOCK-SWEEP.md) §11).
@@ -28,11 +29,13 @@ Re-sized from 1.5 to 1 SP after the 2026-09-25 re-check on main: the promo exclu
 - Keep the authored `offset` on the stories feed in the re-import (regression guard).
 
 ## Acceptance Criteria
-- [ ] `/en` renders the 9 sections in source order; Social + Series in dark bands (`.section.dark`).
-- [ ] The social strip renders 3 profile tiles.
-- [ ] Latest Stories' first card is still Epiq / the 4th newest story, 0 overlap with the promo box (regression).
-- [ ] 0 block JS 404s and 0 console errors on `/en`.
-- [ ] Preview link on the PR: `{branch}--demo--skoda-storyboard.aem.page/en`.
+- [x] `/en` renders the 9 sections in source order; Social + Series in dark bands (`.section.dark`). *(main, 2026-10-01)*
+- [x] The social strip renders 3 profile tiles. *(220×176 each)*
+- [x] Latest Stories' first card is still Epiq / the 4th newest story, 0 overlap with the promo box (regression).
+  *(Live has since published one newer story, "King of space… Superb celebrates 25 years", which isn't migrated
+  yet. So live's promo and feed are one story ahead of ours until it is; the offset logic is unchanged.)*
+- [x] 0 block JS 404s and 0 console errors on `/en`. *(0 failed JS/CSS requests on main)*
+- [x] Preview link on the PR: `{branch}--demo--skoda-storyboard.aem.page/en`. *(PR #205)*
 
 ## Dependencies
 SKODA-213 (promo-box, #110 ✅ merged), SKODA-214 (stories), SKODA-217 (social cards), SKODA-218 (dark sections),

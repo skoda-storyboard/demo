@@ -1,0 +1,95 @@
+/* ==========================================================================
+ * Media cart, shared pieces (SKODA-505b) — loaded on use by scripts/media-cart-ui.js.
+ * Spec: docs/ui-specs/media-cart.md §3. Measured on the source (media-cart-limit plugin
+ * 1.0.4, 2026-09-30): the centred limit popup. Component-local; the cart badge (float-dock),
+ * the added state (listing, carousel, downloads, lightbox), the package-limit banner (listing,
+ * media-cart block: in their first paint, SKODA-505a review) and the cart page style themselves.
+ * ========================================================================== */
+
+/* --- notice: the source's centred limit popup, non-modal (no backdrop, no focus trap) --- */
+.media-cart-notice {
+  --media-cart-notice-width: 420px;
+  --media-cart-notice-icon: 48px;
+  --media-cart-notice-close: 32px;
+  --media-cart-notice-close-icon: 16px;
+  --media-cart-notice-close-inset: 8px;
+  --media-cart-notice-pad: 28px 20px 24px;
+  --media-cart-notice-font: var(--body-font-size-s);
+
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-cart-notice);
+  box-sizing: border-box;
+  inline-size: min(var(--media-cart-notice-width), 100% - 2 * var(--spacing-m));
+  block-size: fit-content;
+  margin: auto;
+  padding: var(--media-cart-notice-pad);
+  border-radius: var(--card-radius);
+  background: var(--background-color);
+  box-shadow: var(--cart-popup-shadow);
+  color: var(--text-color);
+  text-align: center;
+}
+
+.media-cart-notice[hidden] {
+  display: none;
+}
+
+/* the cart glyph above the text */
+.media-cart-notice::before {
+  content: "";
+  display: block;
+  inline-size: var(--media-cart-notice-icon);
+  block-size: var(--media-cart-notice-icon);
+  margin: 0 auto var(--spacing-m);
+  background-color: currentcolor;
+  mask: url("../icons/media-cart.svg") center / contain no-repeat;
+}
+
+.media-cart-notice-text {
+  max-inline-size: 34ch;
+  margin: 0 auto;
+  font-size: var(--media-cart-notice-font);
+  line-height: 1.5;
+}
+
+.media-cart-notice-close {
+  position: absolute;
+  inset-block-start: var(--media-cart-notice-close-inset);
+  inset-inline-end: var(--media-cart-notice-close-inset);
+  display: grid;
+  place-items: center;
+  inline-size: var(--media-cart-notice-close);
+  block-size: var(--media-cart-notice-close);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--skoda-grey-400);
+  cursor: pointer;
+}
+
+.media-cart-notice-close::before {
+  content: "";
+  inline-size: var(--media-cart-notice-close-icon);
+  block-size: var(--media-cart-notice-close-icon);
+  background-color: currentcolor;
+  mask: url("../icons/lightbox-close.svg") center / contain no-repeat;
+}
+
+.media-cart-notice-close:hover,
+.media-cart-notice-close:focus-visible {
+  color: var(--skoda-grey-700);
+}
+
+.media-cart-notice-close:focus-visible {
+  outline: 2px solid var(--text-color);
+  outline-offset: 2px;
+}
+
+/* the source's roomier popup (source: above 480; 520 is the nearest step on the ladder) */
+@media (width >= 520px) {
+  .media-cart-notice {
+    --media-cart-notice-pad: 36px 32px 30px;
+    --media-cart-notice-font: var(--body-font-size-m);
+  }
+}

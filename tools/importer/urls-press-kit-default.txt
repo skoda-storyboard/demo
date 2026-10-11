@@ -11,6 +11,8 @@ https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/texts/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/infographics/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/technical-data/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/images/
+# the Peaq Images chapter is past 200 images: its Exterior group is a fragment (SKODA-806)
+https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/images/?fragment=exterior
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/videos/
 https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/skoda-epiq-the-new-all-electric-entry-model-combining-accessibilitycompact-dimensions-and-everyday-practicality/
 https://www.skoda-storyboard.com/en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language/

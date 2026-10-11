@@ -8,7 +8,7 @@
  * template (templates/press-release/) lays out. Measured on the 5 M1 releases
  * (docs/ui-specs/template-press-release.md, SKODA-607 amendment 2026-09-27):
  *
- *   1. header (full width)        date <p> + h1 (a <br> in the title becomes a space)
+ *   1. header (full width)        date <p> + h1 (plain text; a <br> in the title is kept)
  *   2. Style: body-column         lead image, bullets <ul>, perex <p><strong>,
  *                                 Buzzsprout URL, body, inline Vimeo URL
  *   3. Style: sidebar             "Additional info" h3 + list, "Images" h3 +
@@ -33,6 +33,8 @@
 
 const TransformHook = { beforeTransform: 'beforeTransform', afterTransform: 'afterTransform' };
 const MARKER = 'data-pr-section';
+// skoda-nbsp.js / push-lib.mjs NBSP_PLACEHOLDER (keep in sync)
+const NBSP_PLACEHOLDER = '\u{F00A0}';
 const LAYOUT_ATTR = 'data-pr-layout';
 
 const SECTION_STYLES = {
@@ -72,11 +74,25 @@ function urlParagraph(document, url) {
   return make(document, 'p', link(document, url, url));
 }
 
-/** Title text with <br> as a space (Peaq: "range record<br>for seven-seater"). */
-function titleText(h1) {
-  const clone = h1.cloneNode(true);
-  clone.querySelectorAll('br').forEach((br) => br.replaceWith(' '));
-  return text(clone);
+/**
+ * Title as plain text, keeping an authored <br> as a line break (Peaq: "range record<br>for
+ * seven-seater" breaks there on the source at every width, SKODA-607a). The metadata Title
+ * comes from og:title, so it stays one line.
+ */
+function titleContent(document, h1) {
+  const lines = [[]];
+  const walk = (node) => node.childNodes.forEach((child) => {
+    if (child.nodeType === 1 && child.tagName === 'BR') lines.push([]);
+    else if (child.nodeType === 3) lines.at(-1).push(child.textContent);
+    else if (child.nodeType === 1) walk(child);
+  });
+  walk(h1);
+  const parts = lines.map((line) => line.join('').replace(/\s+/g, ' ').trim()).filter(Boolean);
+  // a no-break space before each <br>, so the heading's text reads "record for", not
+  // "recordfor" (the gallery lightbox title is the h1's textContent, PR #267 review). html2md
+  // trims a plain space at a line break, so it is emitted as skoda-nbsp's placeholder, which
+  // push-lib's wrapPage turns back into U+00A0 before the DA upload.
+  return parts.flatMap((line, i) => (i < parts.length - 1 ? [`${line}${NBSP_PLACEHOLDER}`, document.createElement('br')] : [line]));
 }
 
 function isEmptyParagraph(p) {
@@ -93,7 +109,18 @@ function leadImage(document, primary) {
   return make(document, 'p', img);
 }
 
-/** `.bullet-points`: one or more <p> of "›"-prefixed lines split by <br> (or real <li>). */
+const BULLET = /^\s*(?:›|&rsaquo;)/;
+
+/** The line's text starts lower-case (tags, entities and spaces skipped): a sentence continues. */
+const continues = (html) => /^\p{Ll}/u.test(html.replace(/<[^>]*>|&[a-z]+;|&#\d+;/gi, ' ').trim());
+
+/**
+ * `.bullet-points`: one or more <p> of "›"-prefixed lines split by <br> (or real <li>).
+ * When the lines carry "›" markers, a <br> before an unmarked line that carries on the
+ * sentence in lower case is a soft wrap inside one bullet (Karoq: "…and remains <br>a key
+ * model…"), so that line joins the previous one. An unmarked line that starts a new sentence
+ * (Solberg: "…in a video<br>The new Škoda Octavia RS…") stays a bullet of its own.
+ */
 function bulletList(document, primary) {
   const box = primary.querySelector('.bullet-points');
   if (!box) return null;
@@ -103,7 +130,12 @@ function bulletList(document, primary) {
     lis.forEach((li) => lines.push(li.innerHTML));
   } else {
     box.querySelectorAll('p').forEach((p) => {
-      p.innerHTML.split(/<br\s*\/?>/i).forEach((line) => lines.push(line));
+      const parts = p.innerHTML.split(/<br\s*\/?>/i).filter((line) => line.replace(/&nbsp;/g, ' ').trim());
+      const marked = parts.some((line) => BULLET.test(line));
+      parts.forEach((line, i) => {
+        if (marked && i > 0 && !BULLET.test(line) && continues(line)) lines[lines.length - 1] = `${lines[lines.length - 1].trimEnd()} ${line.trim()}`;
+        else lines.push(line);
+      });
     });
   }
   const ul = document.createElement('ul');
@@ -158,6 +190,20 @@ function bodyContent(document, primary) {
     const url = iframe && (iframe.getAttribute('data-src') || iframe.getAttribute('src'));
     wrap.replaceWith(...(url ? [urlParagraph(document, url)] : []));
   });
+
+  // <lite-youtube videoid> (Solberg Octavia RS): by import time the page script has hydrated it
+  // into a poster + "Play" links, so it becomes the bare watch URL the embed autoblock plays, as
+  // on stories (SKODA-818). Its consent shell (.page-embed.yt-embed-cookie) carries no content.
+  content.querySelectorAll('lite-youtube').forEach((el) => {
+    const id = (el.getAttribute('videoid') || '').trim();
+    const wrap = el.closest('.video-container, .ratio-container');
+    const box = wrap && wrap !== content && content.contains(wrap) ? wrap : el;
+    const p = box.closest('p');
+    const replacement = /^[\w-]{6,}$/.test(id) ? [urlParagraph(document, `https://www.youtube.com/watch?v=${id}`)] : [];
+    if (p && text(p) === text(box)) p.replaceWith(...replacement);
+    else box.replaceWith(...replacement);
+  });
+  content.querySelectorAll('.page-embed.yt-embed-cookie').forEach((n) => n.remove());
 
   // Inline video attachment (Peaq): Vimeo iframe + cart/download toolbar → bare URL.
   content.querySelectorAll('.media-cart-item.attachment, .video-container').forEach((wrap) => {
@@ -346,7 +392,7 @@ function rebuild(element, document) {
 
   const out = [];
   if (date) out.push(make(document, 'p', date));
-  if (h1) out.push(make(document, 'h1', titleText(h1)));
+  if (h1) out.push(make(document, 'h1', titleContent(document, h1)));
 
   out.push(marker(document, 'body'));
   [leadImage(document, primary), bulletList(document, primary), ...perex(document, primary),

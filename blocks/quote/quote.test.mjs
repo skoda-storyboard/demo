@@ -28,3 +28,18 @@ test('renders each row as a figure with its quote and attribution', { skip: !JSD
   assert.equal(figures[1].querySelector('figcaption'), null, 'an empty attribution cell renders no caption');
   assert.equal(block.querySelector('hr'), null);
 });
+
+test('`left` keeps one figure per row, in order, and its variant class', { skip: !JSDOM }, () => {
+  const dom = new JSDOM(`<div class="quote left">
+    <div><div><p>One.</p></div><div><p><strong>Klaus Zellmer</strong>, CEO of Škoda Auto</p></div></div>
+    <div><div><p>Two.</p></div><div><p><strong>Martin Jahn</strong></p></div></div>
+    <div><div><p>Three.</p></div></div>
+  </div>`);
+  globalThis.document = dom.window.document;
+  const block = document.querySelector('.quote');
+  decorate(block);
+  assert.equal(block.className, 'quote left');
+  assert.deepEqual([...block.children].map((f) => f.querySelector('.quote-text').textContent), ['One.', 'Two.', 'Three.']);
+  assert.deepEqual([...block.querySelectorAll('figcaption strong')].map((s) => s.textContent), ['Klaus Zellmer', 'Martin Jahn']);
+  assert.equal(block.children[2].querySelector('figcaption'), null, 'a row without an attribution cell renders no caption');
+});

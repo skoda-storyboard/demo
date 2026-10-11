@@ -8,12 +8,38 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 > (one video, three images, one PDF); the old EDS block dropped the PDF. At 1280/1024/768/500 the source
 > thumbnail widths are **292/236/236/480px**, with **4/4/3/1** columns and 20px visual gaps. The source
 > switches from one to two columns at **520px**, from two to three at 768px, and to four at 992px.
-> The source's **Show more** is count-triggered, not mobile-only: Peaq (5 tiles) has no control even
-> at 500px; the Epiq story (19 tiles) collapses after two rows at both 500 and 1280px, with Show less
+> ~~The source's **Show more** is count-triggered, not mobile-only: Peaq (5 tiles) has no control even
+> at 500px~~ **(corrected by SKODA-607a, 2026-10-06: it is row-triggered.** The source collapses a box
+> once its tiles need more than two rows at the current width: Peaq and Superb (5 tiles) collapse at 500
+> and 767 (1-up / 2-up: items wrap clipped to two rows + 58px, `overflow: hidden`, Show more over the
+> bottom) and not from 768; 3–4 tile press-kit boxes and Images groups collapse at 500 only (open at
+> 600, where the source grid is 2-up). Checked on the 5 M1 releases, 39 press-kit Media Boxes and the
+> Epiq/Motorsport Images chapters at 500/600/768/1280. **EDS applies the row rule to every
+> `collapse:auto` group:** the standard (non-media-box) grid stays one column until 768, so a
+> four-tile Images group still collapses at 600, unlike the source. That grid-ladder difference
+> remains outside SKODA-607a; no >8-tile exception is implemented.)
+> The Epiq story (19 tiles) collapses after two rows at both 500 and 1280px, with Show less
 > after expansion. SKODA-510 applies this disclosure to large Media Boxes; story rendering QA
 > remains with SKODA-801a. This overrides the older two-column-at-768 suggestion in §4/§7/§9 for
 > press-release boxes. The block shows file-only rows as PDF icon tiles and a decorative play badge on
 > MP4 posters; the MP4 action remains a direct download, not a video player.
+
+> **SKODA-830 D2 (2026-10-06, read from the source media-room.js togglebox + media-room.css):** the
+> collapse is row-triggered. With `i` = the tallest tile + its 20px margin, the grid is clipped to
+> `2i - 2 + 60` px whenever the items are taller than two rows at the current column count, with the
+> mint `.btn` pill ("Show more", 137.6×44, `#78faae`, no border, 2em radius, weight 500, 14/24
+> insets, 1px tracking, hover `#a8ffcc`) in the 60px under row 2; open, the box grows to the grid +
+> 60 and the pill reads "Show less" (127.4×44). Measured collapsed heights: 708.25 / 636.25 /
+> 669.25 / 803.11 px at 1440 / 992 / 768 / 375 on stories (release tiles are 12px shorter at ≤768:
+> 645.25 / 779.11). So 8 assets collapse at 1–3 columns but not at 4; the "above 8 assets" wording
+> in SKODA-801a is this rule at 4 columns. As on the source, the block clips the list (two measured
+> rows + 34 + 44px, `overflow: hidden`) and the pill overlaps the clip's bottom edge, so the top 58px
+> of row 3 shows behind it; the tiles past row 2 are `inert` while collapsed. The pill is a real
+> button with `aria-expanded`/`aria-controls`, and collapsing keeps it in view.
+> The note above that Peaq (5 tiles) has no control at 500px holds only after resizing a wide window
+> (the source's resize handler never shows the opener); loaded at 375 the 936 km release collapses to
+> 779.11px. An uncollapsed box keeps the grid's last 20px row margin: 80px from the last tile to the
+> band end.
 
 ## 1. Identity
 
@@ -114,8 +140,8 @@ press release above.
   width grows); no explicit per-breakpoint tile restyle in the inline press-release box.
 - **Measured press-release Media Box override:** 1 column below 520px, 2 from 520px, 3 from 768px,
   4 from 992px. Each tile has a 10px inner gutter on either side in the source; the EDS visual
-  thumbnail grid matches its 20px gap. The 1280px image tile measures 292 × 305px. Larger boxes
-  (>8 assets) disclose the first two rows; five-asset boxes show all tiles.
+  thumbnail grid matches its 20px gap. The 1280px image tile measures 292 × 305px. Boxes disclose
+  the first two rows whenever their assets exceed two rows at the current column count.
 - The dedicated image listing (`/images/`) applies the listing grid ladder: `1` col (<768) ->
   `2` (`>=768`) -> `4` (`>=992`) (· `.images .items .item` @media · source CSS). For a press-release
   Downloads block, use the measured Media Box ladder above, not the listing ladder.
@@ -152,6 +178,18 @@ row per asset (picture or empty cell + title + download links). Reuse `createOpt
 `optimizeImageInPlace` for authored ones. Reuse the card-teaser markup for each tile and the
 `gallery-lightbox` block for the enlarged view.
 
+### `Downloads (gallery)` (SKODA-806)
+
+A press-kit Images-chapter group (`parsers/press-kit-media.js`). The measured spec is in
+[`press-kit-media.md`](press-kit-media.md) §3 and §11. Same rows as the default variant:
+
+- **Grid:** the Media Box ladder (1 / 2 / 3 / 4 at 520 / 768 / 992), 20px gaps.
+- **Tile:** the thumbnail only, with the add and download discs over its lower left corner (10px inset).
+- **Group pills:** "Original" / "1920px" above the grid. "Original" is the group add toggle; "1920px" stays
+  inert, because the cart holds originals only.
+- **Collapse:** two rows by default (`collapse none` opts out), with the source's 64px fading opener bar.
+- **Spacing:** 32px to the next group.
+
 ### `Downloads` block config table (DA authoring)
 
 | key | example | meaning |
@@ -162,7 +200,7 @@ row per asset (picture or empty cell + title + download links). Reuse `createOpt
 | `lang` | `en` | language (API mode) |
 | `columns` | `4` | grid columns at `>=992` (default 4 for images) |
 | `sizes` | `Original, 1920px` | offered download sizes (labels + query) |
-| `collapse` | `auto` / `none` | optional: two visible rows for >8 items or show all; defaults to `auto` in a `media-box` section or `Downloads (media-box)` variant, `none` elsewhere. An authored `columns` count changes how many tiles fit in two rows. |
+| `collapse` | `auto` / `none` | optional: two visible rows whenever the group's tiles need more than two rows at the current width, or show all; defaults to `auto` in a `media-box` section or `Downloads (media-box)` variant, `none` elsewhere. An authored `columns` count changes how many tiles fit in two rows. |
 
 Media Box visuals are implemented in the block-scoped `.downloads-media-box` variant; an existing
 `Style: media-box` section or an explicit `Downloads (media-box)` header selects it. This keeps

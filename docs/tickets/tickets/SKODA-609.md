@@ -20,7 +20,7 @@ runs on the nav/footer fragments, again after blocks load, and on click as a cat
 |---|---|
 | Live host (`[www.]skoda-storyboard.com`) | unchanged, `target=_blank` + `rel="noopener noreferrer"` (D-3 b; SKODA-306) |
 | Live host → demo listing (`DEMO_LISTINGS`: `/en`, `/en/media-room`, `/en/news`, `/en/press-kits`, `/en/images`, `/en/videos`, `/en/series-2`, `/en/search`) | site-relative, same tab, query + hash kept (the DA Media Room nav) |
-| Site-relative → `LIVE_ONLY` (other locales, `/en/skodapedia`, `/en/feed`, `/en/press-releases/feed`, `/en/contacts`, `/en/documents/…`, `/en/newsletter-settings`, `/en/media-cart`, `/direct-download/…`) | absolute to live, new tab. The nav's `/en/category/podcast/` goes to the live `/en/category/podcast-en/` (the source slug) |
+| Site-relative → `LIVE_ONLY` (other locales, `/en/skodapedia`, `/en/feed`, `/en/press-releases/feed`, `/en/contacts`, `/en/documents/…`, `/en/newsletter-settings`, `/direct-download/…`) | absolute to live, new tab. The nav's `/en/category/podcast/` goes to the live `/en/category/podcast-en/` (the source slug) |
 | Site-relative with a trailing slash (`/en/`, `/en/media-room/`, `/en/news/?filter…`) | slash dropped (EDS 404s it); this also covers `skoda-model-tags.js` |
 
 Import side: the Elroq sustainable-interior story 404s on the source, so it is dropped from the corpus. The allow-list
@@ -75,6 +75,7 @@ Link policy is decision **D-3** in the gap review. Default until decided: **(b)*
 | Tag links | absolute to live until SKODA-209 | absolute (b). **Superseded 2026-09-26:** the 41 tag/category archives are demo pages (SKODA-209 M1 slice) and are on the SKODA-605 allow-list; all tag/category links on the site are site-relative |
 | Promo/related cards to out-of-set stories | import the target (add to corpus) or swap the card | add to corpus when it is a story; otherwise swap |
 | `/en/media-cart/`, `/en/series-2/` | point to the SKODA-505b cart UI / hide the "All series" link | hide/redirect |
+| `/en/media-cart/` (2026-10-02) | done: the demo's own cart page (SKODA-505b). `scripts/links.js` has it in `DEMO_LISTINGS` (a live-host link comes to it), not `LIVE_ONLY` | stays on the demo |
 
 - Implement the policy in one shared transformer step that runs after SKODA-605 rewriting and is driven by an
   allow-list (the URL set + corpus). Out-of-set targets follow the table.

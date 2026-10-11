@@ -4,9 +4,18 @@
  * A thumbnail grid where each tile is one downloadable asset: a 16:9 image
  * (opens the lightbox via the gallery-lightbox convention) plus a round
  * download control offering the authored size(s) (e.g. Original / 1920px).
- * This is the STATIC per-page download list — no cart, no server state, no
- * signed-URL service (that is the Media Cart, SKODA-505/902). Spec:
- * docs/ui-specs/downloads.md.
+ * No server state, no signed-URL service (SKODA-902). Spec: docs/ui-specs/downloads.md.
+ *
+ * Media cart (SKODA-505b, media-cart.md §3): every tile with a download also gets a round
+ * "add to media cart" toggle for its original (the size labelled Original, else the first),
+ * bound to /scripts/media-cart.js; in a Media Box a group toggle on the section's stats line
+ * adds (or removes) all of them at once, as on the source.
+ *
+ * `Downloads (gallery)` (SKODA-806, press-kit-media.md §3): an Images-chapter group of a press
+ * kit. Same rows; the tile shows only its thumbnail with the add and download controls over its
+ * lower left corner, the grid follows the Media Box ladder (1 / 2 / 3 / 4 at 520 / 768 / 992), and
+ * the group carries the source's "Original" / "1920px" pills above it. "Original" adds (or
+ * removes) the whole group; "1920px" stays inert, as the cart holds originals only (SKODA-505a).
  *
  * Authored as one row per asset (content-sniffed, never by position):
  *
@@ -32,6 +41,14 @@ const LABELS = {
   videoPoster: 'View video poster',
   more: 'Show more',
   less: 'Show less',
+  // aria-label for a tile's add-to-cart toggle and the Media Box group toggle (until the
+  // cart's placeholders labels replace it)
+  add: (title) => (title ? `Add to media cart: ${title}` : 'Add to media cart'),
+  addAll: 'Add all files to the media cart',
+  // the gallery group pills (visible text = the size, as on the source)
+  groupSize: (size) => size,
+  groupAdd: (size) => `Add all ${size} versions to the media cart`,
+  groupUnavailable: (size) => `${size} versions can't be added to the media cart`,
 };
 
 /**
@@ -194,6 +211,9 @@ function readAsset(row) {
 let menuSeq = 0;
 let disclosureSeq = 0;
 
+// controls a clipped tile takes out of the tab order where native `inert` is missing
+const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]';
+
 /**
  * Build the round download control for a tile. With one size it is a single
  * download <a>; with several it is a toggle button revealing a size menu, each
@@ -270,6 +290,166 @@ function buildDownload(asset) {
   return wrap;
 }
 
+/** The link the cart adds for a tile: its original (the source adds originals only). */
+export function cartSize(sizes = []) {
+  return sizes.find(({ label }) => /original/i.test(label)) || sizes[0] || null;
+}
+
+/** The tile image as the cart keeps it: root-relative on this site, else the absolute URL. */
+export function cartThumb(src = '') {
+  if (!src) return '';
+  try {
+    const u = new URL(src, window.location.href);
+    return u.origin === window.location.origin ? `${u.pathname}${u.search}` : u.href;
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * The tile's add-to-media-cart toggle: inert (`aria-disabled`) until the cart binds it, which
+ * the block does once for all tiles (bindCart).
+ * @param {{title: string, alt?: string, src?: string, sizes: Array<{label,href}>}} asset
+ * @returns {HTMLButtonElement}
+ */
+function buildAdd(asset) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'downloads-add';
+  const title = asset.title || asset.alt || '';
+  btn.setAttribute('aria-label', LABELS.add(title));
+  btn.setAttribute('aria-disabled', 'true');
+  btn.dataset.href = cartSize(asset.sizes)?.href || '';
+  if (title) btn.dataset.title = title;
+  const thumb = cartThumb(asset.src);
+  if (thumb) btn.dataset.thumb = thumb;
+  return btn;
+}
+
+/**
+ * The block's stats line ("1 video, 3 images, 1 PDF"): the last paragraph of the default content
+ * right before this block, when it is plain text (no link or image) and no other block has taken
+ * it. Intro copy elsewhere in the section, or a second block's line, is never used.
+ * @returns {HTMLParagraphElement|null}
+ */
+export function statsLine(block) {
+  const wrapper = block.parentElement?.classList.contains('downloads-wrapper') ? block.parentElement : block;
+  const before = wrapper.previousElementSibling;
+  if (!before?.classList.contains('default-content-wrapper')) return null;
+  const p = before.lastElementChild;
+  if (p?.tagName !== 'P' || !p.textContent.trim() || p.classList.contains('downloads-stats')
+    || p.querySelector('a, img, picture')) return null;
+  return p;
+}
+
+/**
+ * The Media Box group toggle (source .search-results-stats .entry-buttons): adds every tile's
+ * original that isn't in the cart yet, or removes them all once every one is in. Right-aligned
+ * on the block's stats line (statsLine) when there is one, else above the grid. Returns the
+ * button (inert until wired).
+ */
+function buildAddAll(block, gallery = false) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'downloads-add downloads-add-all';
+  btn.setAttribute('aria-label', LABELS.addAll);
+  btn.setAttribute('aria-disabled', 'true');
+  if (gallery) {
+    // the source group's pills: "Original" is the group toggle, "1920px" can't be in the cart
+    btn.classList.add('downloads-group-size');
+    btn.textContent = LABELS.groupSize('Original');
+    btn.dataset.label = LABELS.groupAdd('Original');
+    btn.setAttribute('aria-label', btn.dataset.label);
+    const giant = document.createElement('button');
+    giant.type = 'button';
+    giant.className = 'downloads-group-size';
+    giant.textContent = LABELS.groupSize('1920px');
+    giant.setAttribute('aria-label', LABELS.groupUnavailable('1920px'));
+    giant.setAttribute('aria-disabled', 'true');
+    const bar = document.createElement('div');
+    bar.className = 'downloads-toolbar downloads-group';
+    bar.append(btn, giant);
+    block.prepend(bar);
+    return btn;
+  }
+  const stats = statsLine(block);
+  if (stats) {
+    stats.classList.add('downloads-stats');
+    stats.append(btn);
+  } else {
+    const bar = document.createElement('div');
+    bar.className = 'downloads-toolbar';
+    bar.append(btn);
+    block.prepend(bar);
+  }
+  return btn;
+}
+
+/**
+ * Bind the tiles' add toggles to the media cart (loaded here, only where a tile has one) and
+ * wire the Media Box group toggle.
+ * @param {Element} block
+ * @param {HTMLButtonElement|null} addAll
+ * @param {function(): Promise<object>} [load] the cart + its UI (injectable for tests)
+ */
+export async function bindCart(block, addAll, load = () => Promise.all([
+  import('../../scripts/media-cart.js'),
+  import('../../scripts/media-cart-ui.js'),
+  import('../../scripts/placeholders.js'),
+])) {
+  const tiles = [...block.querySelectorAll('.downloads-add:not(.downloads-add-all)')];
+  if (!tiles.length) return;
+  const [cart, ui, { fetchPlaceholders }] = await load();
+  tiles.forEach((btn) => cart.bindCartControl(btn));
+  if (!addAll) return;
+  // the notice's styles before a partial add can show it (no unstyled flash)
+  const [ph] = await Promise.all([fetchPlaceholders(), ui.loadCartStyles()]);
+  const labels = ui.cartLabels(ph);
+  const live = () => tiles.filter((t) => t.getAttribute('aria-disabled') !== 'true' && t.dataset.href);
+  const sync = () => {
+    const open = live();
+    const full = open.length > 0 && open.every((t) => cart.has(t.dataset.href));
+    addAll.toggleAttribute('data-in-cart', full);
+    // a toggle keeps its name; pressed says everything is in (a click then removes it all)
+    addAll.setAttribute('aria-pressed', String(full));
+    addAll.setAttribute('aria-label', addAll.dataset.label || labels.addAll);
+    if (open.length) addAll.removeAttribute('aria-disabled');
+    else addAll.setAttribute('aria-disabled', 'true');
+  };
+  addAll.addEventListener('click', async () => {
+    if (addAll.getAttribute('aria-disabled') === 'true' || addAll.getAttribute('aria-busy') === 'true') return;
+    const open = live();
+    if (addAll.hasAttribute('data-in-cart')) {
+      open.forEach((t) => cart.remove(t.dataset.href));
+      return;
+    }
+    const entries = open.filter((t) => !cart.has(t.dataset.href)).map((t) => ({
+      href: t.dataset.href, title: t.dataset.title, thumb: t.dataset.thumb,
+    }));
+    addAll.setAttribute('aria-busy', 'true');
+    try {
+      const { added, skipped } = await cart.addMany(entries);
+      const refused = skipped.filter((s) => s.reason !== 'duplicate');
+      if (!refused.length) return;
+      // name the first reason that matters most: a full package beats a network hiccup
+      const order = ['limit-items', 'limit-bytes', 'storage', 'network', 'unresolved'];
+      const reason = order.find((r) => refused.some((s) => s.reason === r));
+      const count = refused.filter((s) => s.reason === reason).length;
+      const text = [
+        ui.format(labels.addedSome, { added: added.length, total: entries.length }),
+        ui.refusalMessage(reason, labels, undefined, count),
+      ].filter(Boolean).join(' ');
+      ui.showNotice(text, labels);
+    } finally {
+      addAll.removeAttribute('aria-busy');
+      sync();
+    }
+  });
+  cart.onChange(sync);
+  addAll.dataset.wired = '';
+  sync();
+}
+
 /**
  * Build one download tile (<li>) from a normalized asset descriptor. Shared by
  * both the authored and mediabox-API paths.
@@ -323,7 +503,13 @@ function buildTile(asset) {
   }
 
   const action = buildDownload(asset);
-  if (action) figure.append(action);
+  if (action) {
+    // add to cart, then download (source order); the size menu stays anchored to its toggle
+    const actions = document.createElement('div');
+    actions.className = 'downloads-actions';
+    actions.append(buildAdd(asset), action);
+    figure.append(actions);
+  }
 
   li.append(figure);
   return li;
@@ -337,6 +523,10 @@ export default async function decorate(block) {
   const cfg = readConfig(block);
   const mediaBox = block.classList.contains('media-box') || !!block.closest('.section.media-box');
   if (mediaBox) block.classList.add('downloads-media-box');
+  // a press-kit Images group (SKODA-806). A Media Box keeps its own presentation: the class goes,
+  // so no gallery style reaches it either (PR #287 review)
+  const gallery = !mediaBox && block.classList.contains('gallery');
+  if (mediaBox) block.classList.remove('gallery');
   if (cfg.collapse !== null && !['auto', 'none'].includes(cfg.collapse)) {
     throw new Error('downloads: collapse must be auto or none');
   }
@@ -367,7 +557,43 @@ export default async function decorate(block) {
   });
 
   block.replaceChildren(list);
-  if ((cfg.collapse === 'auto' || (cfg.collapse === null && mediaBox)) && list.children.length > 8) {
+  const addAll = (mediaBox || gallery) && list.querySelector('.downloads-add')
+    ? buildAddAll(block, gallery) : null;
+  bindCart(block, addAll).catch((e) => {
+    // eslint-disable-next-line no-console
+    console.error('downloads: media cart unavailable', e);
+  });
+  // A clipped tile is `inert`. Engines without native inert (Safari < 15.5, which already has
+  // ResizeObserver, so the clip applies there) get the same effect by hand: the tile leaves the
+  // accessibility tree and its controls leave the tab order, and both are restored on expand
+  // (an author tabindex is kept in data-dl-tabindex). Pointer clicks on the peeking row are
+  // blocked in CSS via the [inert] attribute, which those engines still match.
+  const nativeInert = 'inert' in window.HTMLElement.prototype;
+  const setClipped = (tile, clipped) => {
+    tile.toggleAttribute('inert', clipped);
+    if (nativeInert) return;
+    if (clipped) tile.setAttribute('aria-hidden', 'true');
+    else tile.removeAttribute('aria-hidden');
+    tile.querySelectorAll(FOCUSABLE).forEach((control) => {
+      const { dataset } = control;
+      if (clipped) {
+        if (!('dlTabindex' in dataset)) dataset.dlTabindex = control.getAttribute('tabindex') ?? '';
+        control.setAttribute('tabindex', '-1');
+      } else if ('dlTabindex' in dataset) {
+        if (dataset.dlTabindex) control.setAttribute('tabindex', dataset.dlTabindex);
+        else control.removeAttribute('tabindex');
+        delete dataset.dlTabindex;
+      }
+    });
+  };
+  // The source Media Box (media-room.js togglebox) clips its grid whenever the items need more
+  // than two rows at the current column count: the clip is 2 rows + 34px + the 44px pill, and
+  // the pill sits at its bottom, so the top of row 3 shows behind it ("Show less" once open).
+  // So the threshold follows the columns: 8 assets collapse at 1 / 2 / 3 columns, not at 4
+  // (SKODA-830 D2). The clipped tiles are inert (no focus, hidden from AT) until expanded.
+  // a Media Box and a gallery group collapse by default, as on the source; `collapse none` opts out
+  if ((cfg.collapse === 'auto' || (cfg.collapse === null && (mediaBox || gallery)))
+    && list.children.length > 2) {
     disclosureSeq += 1;
     list.id = `downloads-items-${disclosureSeq}`;
     const toggle = document.createElement('button');
@@ -377,27 +603,49 @@ export default async function decorate(block) {
     const compact = window.matchMedia('(min-width: 520px)');
     const medium = window.matchMedia('(min-width: 768px)');
     const wide = window.matchMedia('(min-width: 992px)');
+    // the first two rows' rendered height (tallest tile bottom, so uneven rows count too); the
+    // CSS adds the pill's gap and height to it. Unmeasured (not laid out yet) leaves it unset,
+    // which keeps the list unclipped until the tiles' ResizeObserver reports their size.
+    const measureRows = (shown) => {
+      const { top } = list.getBoundingClientRect();
+      const bottom = Math.max(...shown.map((tile) => tile.getBoundingClientRect().bottom));
+      if (bottom > top) list.style.setProperty('--dl-rows-height', `${bottom - top}px`);
+      else list.style.removeProperty('--dl-rows-height');
+    };
     const syncVisibility = () => {
+      // a gallery group shares the Media Box ladder (1 / 2 / 3 / 4)
+      const ladder = mediaBox || gallery;
       let columns = 1;
-      if (compact.matches && mediaBox) columns = 2;
-      if (medium.matches) columns = mediaBox ? 3 : 2;
+      if (compact.matches && ladder) columns = 2;
+      if (medium.matches) columns = ladder ? 3 : 2;
       if (wide.matches) columns = Number(cfg.columns) || 4;
-      const overflow = list.children.length > 2 * columns;
+      const tiles = [...list.children];
+      const overflow = tiles.length > 2 * columns;
       if (!overflow) block.classList.remove('downloads-expanded');
       const expanded = block.classList.contains('downloads-expanded');
-      [...list.children].forEach((tile, index) => {
-        tile.hidden = overflow && !expanded && index >= 2 * columns;
-      });
+      const collapsed = overflow && !expanded;
+      block.classList.toggle('downloads-collapsed', collapsed);
+      tiles.forEach((tile, index) => setClipped(tile, collapsed && index >= 2 * columns));
+      if (collapsed) measureRows(tiles.slice(0, 2 * columns));
+      else list.style.removeProperty('--dl-rows-height');
       toggle.hidden = !overflow;
       toggle.setAttribute('aria-expanded', String(expanded));
       toggle.textContent = expanded ? LABELS.less : LABELS.more;
     };
     toggle.addEventListener('click', () => {
-      block.classList.toggle('downloads-expanded');
+      const expanded = block.classList.toggle('downloads-expanded');
       syncVisibility();
+      // collapsing pulls the toggle (and its focus) up past the clipped rows: keep it in view
+      if (!expanded) toggle.scrollIntoView?.({ block: 'nearest' });
     });
     block.append(toggle);
     [compact, medium, wide].forEach((query) => query.addEventListener('change', syncVisibility));
+    // tile heights follow the width between breakpoints too (16:9 thumbs) and are 0 until the
+    // section shows: re-measure whenever a tile resizes (the clip never resizes a tile)
+    if (window.ResizeObserver) {
+      const observer = new window.ResizeObserver(syncVisibility);
+      [...list.children].forEach((tile) => observer.observe(tile));
+    }
     syncVisibility();
   }
 }

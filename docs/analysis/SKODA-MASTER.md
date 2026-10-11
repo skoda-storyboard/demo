@@ -331,6 +331,7 @@
 | **22-URL block-by-block gap analysis** (2026-09-14) — corrected §3 Series claim, refined press-kit claim, named the 5 "Page" sub-types, and surfaced decision D18 | `../.migration/plans/url-analysis-comparison.md` + `url-analysis-matrix.json` |
 | **Architecture diagrams** (integration / authoring-flow / import-pipeline; Mermaid, integration also embedded in the client decks) | `architecture/SKODA-DIAGRAMS.md` |
 | **Minimal PoC URL coverage set** (24 live URLs exercising every template/variant/functionality) + **URL × component × client-requirement matrix** | `planning/SKODA-POC-URL-SET.md` (+ `skoda-poc-urls.json`/`.txt`) · `planning/SKODA-POC-COVERAGE-MATRIX.md` |
+| **Authoring review** (2026-10-10): 14 author-facing areas vs aem.live / DA best practice, top-10 shortcomings, five author journeys, AR-01…27 reconciliation backlog, open decisions D-1…D-6 | `reviews/SKODA-AUTHORING-REVIEW-2026-10-10.md` |
 | **Measured UI spec library** (2026-09-15) — 25 component specs + 6 template specs with live-DevTools DOM+CSS at breakpoints 768/992/1080; template census → blocks → ticket; source of the template-gap tickets 607/208/209/706/813 | `ui-specs/README.md` (index + coverage matrix) · `ui-specs/_TEMPLATES.md` (page-type census) · `ui-specs/_FOUNDATIONS.md` · `ui-specs/_CAPTURE-PROTOCOL.md` |
 
 *This master is canonical going forward; source docs are retained for detail (now under `docs/` topic subfolders), not deleted.*

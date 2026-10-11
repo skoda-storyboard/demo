@@ -6,6 +6,13 @@
 - **Estimate:** 1.5 SP (was 3 SP; re-scoped 2026-09-24, see below) · AI-assisted 0.5–1d / manual 1.5–2d *(planning estimate, not a quote)*
 - **Parent:** SKODA-801 (#48) · **GitHub issue:** [#127](https://github.com/skoda-storyboard/demo/issues/127)
 - **Discovered in:** M1 gap review, 2026-09-24
+- **Status (2026-10-10):** 🟢 Done.
+  - Delivered by [SKODA-830](SKODA-830.md) (PR #269; 57 stories published 2026-10-06) and verified live, see
+    "Close-out check".
+  - The link allow-list fix (PR #312, merged) is **published** on 50 pages: 50/50 live 200, 89/89 link targets
+    relative.
+  - The 20 in-scope stories have 0 source links left to live demo pages.
+  - #127 closed. `/en` and `/en/media-room` follow with the #306 home re-push.
 
 > **Re-scoped (2026-09-24, review §15): 3 → 1.5 SP.** PR #113 merged SKODA-801 and parts of 816–818/820, so:
 > - carousel → **SKODA-819** (Gallery `slider`; the importer already emits `Gallery`)
@@ -55,19 +62,66 @@ reconstruct the media that exists in all 21 stories, and keep the rest of SKODA-
 - **Cleanup changes.** Update `skoda-story-cleanup.js` so the Media Box selectors are no longer in the drop list.
   Log only what stays deferred.
 
+## Close-out check (2026-10-10, live, the 20 unique in-scope stories + the mixed-reality alias)
+- **Media Box:**
+  - 20/20 stories have a Downloads block.
+  - The rendered tile count equals the origin Media Box count on 20/20 (6–30 assets per story).
+- **Spot-check (one per category):**
+  - Stories: Peaq comfort (eMobility), Lake Como (Lifestyle), Chris Froome (Škoda World).
+  - Asset order identical by file name (8/13/9). Alt text present and equal to the origin.
+- **Rendering:** every block `loaded`, 0 block-file 404s, no horizontal overflow on all 20.
+- **Consent residue:** 0.
+- **Links (SKODA-605):** 19 in-body links on 11 stories still pointed at the origin although the target page is live
+  on the demo.
+  - **Cause:** the allow-list (228 paths) was generated before the later imports. The live index has 280 pages.
+  - **Fix:**
+    - `build-link-allowlist.mjs` adds `docs/planning/skoda-published-url-set.txt` (279 live pages, from the live index;
+      `--refresh-published`). The allow-list is now 281 paths.
+    - Pages known only from the live index take plain links. A listing-filter link (`?filter[<taxonomy>]…`) to them
+      stays live, because each demo listing reads only its own authored facets: News has no `vip`, `bodywork` or
+      `history` facet, measured.
+    - The 18 importer bundles were rebuilt; each diff holds only the list and the rule.
+  - **Scope:**
+    - 52 live pages carry 97 rewritable links.
+    - Re-imported: 50 pages (30 stories, 19 press releases, 1 series hub). `/en` and `/en/media-room` are left for
+      the #306 home re-push.
+    - DA diff:
+      - 44 pages: links only.
+      - 2 stories: an origin related-story update.
+      - 3 releases: the #267 title `<br>`.
+      - 1 page: serialization only.
+  - **Push:** 49 updates, 0 conflicts. Preview 49/49 200, and 86/88 link targets are relative.
+    - The other 2 links are gone from the origin's related list.
+    - `a-true-czech-from-spain` was held: DA was saved after our last push (2026-10-08 09:15), but its text, images
+      and blocks equal ours. Overwritten (`--force`) on user go-ahead 2026-10-10; preview 200, 3/3 link targets
+      relative.
+  - **Media:** the origin's newsletter card image moved from `dist/26.9.2` to `dist/26.10.3` (byte-identical,
+    51,012 bytes). It now has one delivery-only manifest row (`ac2f7973__newsletter_subscribe.webp`).
+- **By design, not changed:**
+  - The Media Box "Original / 1920px" image downloads link the source `/direct-download/` files (SKODA-605 rule 2).
+  - The newsletter-settings and consent pages aren't migrated, so their links stay absolute.
+
 ## Acceptance Criteria
-- [ ] All 21 in-scope stories import with Media Box → downloads in source order. The #113 output (Gallery, embeds,
+- [x] All 21 in-scope stories import with Media Box → downloads in source order. The #113 output (Gallery, embeds,
       aside, related band) is unchanged. A per-URL checklist in the SKODA-603 tracker shows 0 unexpected drops.
-- [ ] Spot-check 3 stories (one per category) against the source: component presence and order, captions and alt
-      text, download link counts.
-- [ ] No `skoda-storyboard.com` absolute links remain (SKODA-605) and no consent residue remains (SKODA-606).
-- [ ] Importer unit or fixture tests cover the Media Box mapping. `npm run lint` is clean.
-- [ ] **Amendment (2026-09-25, sweep reconciliation):**
+      *(SKODA-830; live check 2026-10-10: 20/20 + alias, counts = origin)*
+- [x] Spot-check 3 stories (one per category) against the source: component presence and order, captions and alt
+      text, download link counts. *(2026-10-10, see "Close-out check")*
+- [x] No `skoda-storyboard.com` absolute links remain (SKODA-605) and no consent residue remains (SKODA-606).
+      *(Consent 0. Links to demo pages: published 2026-10-10 on 50 pages, 89/89 relative; 0 left on the 20
+      in-scope stories. Links to non-demo pages, listing filters on live-only hubs and file downloads stay absolute
+      by policy.)*
+- [x] Importer unit or fixture tests cover the Media Box mapping. `npm run lint` is clean.
+      *(`story-import-validity.test.mjs`; link rules `skoda-links.test.mjs` 17/17)*
+- [x] **Amendment (2026-09-25, sweep reconciliation):** *(SKODA-830: 57 stories re-imported 2026-10-06; 0 block 404s
+      on the 20 today; collapse matched in D2)*
   - Re-import every stale DA story with the #113/#133 importer, first the 3 flagged ones (plates, Peaq record,
     Octavia), and assert the slider count per page.
   - **0 block JS 404s:** the older Epiq import references a `version` block that doesn't exist.
   - The story Media Box collapses behind "Show more" above 8 assets (708px collapsed, 139×44 pill; routed here from
-    the closed 502).
+    the closed 502). *Reconciled in SKODA-830 D2 (2026-10-06):* the source rule is "more than two rows at the current
+    column count", which is "above 8" only at 4 columns; 708.25px (1440) and the 137.6×44 pill are matched, see
+    `docs/ui-specs/downloads.md`.
 
 ## Dependencies
 - Upstream: SKODA-601 (importer), SKODA-801 (#113), SKODA-819 (was 219), SKODA-818, SKODA-502 (#111), SKODA-204 (#109), SKODA-501/506.

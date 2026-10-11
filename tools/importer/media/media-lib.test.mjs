@@ -12,7 +12,7 @@ import {
 } from 'node:fs';
 import nodePath from 'node:path';
 import {
-  logicalId, masterUrl, normalizeExtension, isAspectCrop, derivativeSuffix,
+  logicalId, masterUrl, imageOriginalUrl, normalizeExtension, isAspectCrop, derivativeSuffix,
   damPathFor, pagePathFromFile, splitBuffer, imageSize, ratiosDiffer,
   uploadToDAM, publishDamBinary, publishDamImage, ensureDamFolder, resolveDamToken,
   fetchBinaryToFile,
@@ -31,6 +31,16 @@ const jpegHead = (w, h, padding) => {
   sof.writeUInt16BE(w, 7);
   return Buffer.concat([Buffer.from([0xff, 0xd8]), app2, sof]);
 };
+
+test('original image fetch URLs preserve double extensions and case without changing identity', () => {
+  const source = 'https://cdn.x.com/2026/06/photo.JPG-768x512.jpg?cache=1#caption';
+  assert.equal(imageOriginalUrl(source), 'https://cdn.x.com/2026/06/photo.JPG.jpg');
+  assert.equal(masterUrl(source), 'https://cdn.x.com/2026/06/photo.jpg');
+  assert.equal(logicalId(source), logicalId('https://cdn.x.com/2026/06/photo.jpg'));
+  assert.equal(imageOriginalUrl('https://cdn.x.com/photo-768x512.JPG'), 'https://cdn.x.com/photo.JPG');
+  assert.equal(imageOriginalUrl('https://cdn.x.com/photo.JPG.jpg'), 'https://cdn.x.com/photo.JPG.jpg');
+  assert.equal(imageOriginalUrl('https://cdn.x.com/photo-768x512.jpg'), 'https://cdn.x.com/photo.jpg');
+});
 
 test('renditionCandidates keeps a non-3:2 master at its own ratio', () => {
   const url = 'https://cdn.x.com/2026/03/wide.jpg';
@@ -301,6 +311,7 @@ test('file download retries a stalled transfer from byte zero and checks the fin
     assert.equal(requests, 2);
     assert.equal(got.bytes, 12);
     assert.equal(got.header.subarray(4, 8).toString(), 'ftyp');
+    assert.equal(got.header.subarray(8, 12).toString(), 'mock');
     assert.equal(readFileSync(filePath).toString(), '\0\0\0\0ftypmock');
   } finally {
     await new Promise((resolve) => { server.close(resolve); });
@@ -1104,4 +1115,33 @@ test('publishDamImage activates only image originals under the configured DAM fo
     }), /out-of-scope/);
   }
   assert.equal(calls.length, 1);
+});
+
+test('pickIngestUrl keeps the page\'s own large rendition when the ladder guesses miss', async () => {
+  // Real case (SKODA-828 F6): PEAQ_Record_Run-00074 is a 22 MB master whose copies are
+  // rounded to -2560x1708; the named -2560x1707 guess 403s, and so did every size to -768x512.
+  const sizes = {
+    'https://cdn.x.com/peaq.jpg': 22442113,
+    'https://cdn.x.com/peaq-2560x1708.jpg': 403065,
+    'https://cdn.x.com/peaq-768x512.jpg': 76710,
+  };
+  const previous = global.fetch;
+  global.fetch = async (url, init = {}) => {
+    if (init.method !== 'HEAD') return new Response(null, { status: 403 }); // size unreadable
+    const bytes = sizes[String(url)];
+    return bytes
+      ? new Response(null, { status: 200, headers: { 'content-length': String(bytes) } })
+      : new Response(null, { status: 403 });
+  };
+  try {
+    const pick = await pickIngestUrl('https://cdn.x.com/peaq-2560x1708.jpg');
+    assert.equal(pick.ok, true);
+    assert.equal(pick.url, 'https://cdn.x.com/peaq-2560x1708.jpg');
+    assert.equal(pick.preconditioned, true);
+    // a smaller page reference still steps to the largest copy that exists
+    const small = await pickIngestUrl('https://cdn.x.com/peaq-768x512.jpg');
+    assert.equal(small.url, 'https://cdn.x.com/peaq-768x512.jpg');
+  } finally {
+    global.fetch = previous;
+  }
 });

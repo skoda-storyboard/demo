@@ -55,7 +55,7 @@ import { conditionInlineMedia, imageLimit } from './media/condition-inline-media
 import { binaryAnchors, binaryErrors, rewriteBinaryLinks } from './media/binary-media.mjs';
 import {
   parseList, wrapPage, contentHash, decideAction, PUSHING, chunk, parseJobDetails,
-  fragmentPaths, imageCheck, summarize,
+  fragmentPaths, contentFragmentPaths, fragmentOrder, fragmentHolds, imageCheck, summarize,
 } from './push/push-lib.mjs';
 import { checkPage } from './push/block-check.mjs';
 import { loadContracts } from './validate-blocks.mjs';
@@ -454,7 +454,27 @@ export default async function main(argv = process.argv.slice(2), {
     if (!fragmentsOk) {
       log('[push] ✖ publish skipped: shared fragments are not live (see above)');
     } else if (ready.length) {
-      const res = await runBulk(a, 'live', ready, log);
+      // Content fragments (SKODA-806): a page that loads one (the press-kit Images groups)
+      // publishes only once it is live. The fragments in this run go first; a missing or
+      // failed one holds every page that loads it.
+      const plainOf = new Map(pages.map((pg) => [pg.path, pg.plain]));
+      const fragmentsOf = (p) => contentFragmentPaths(plainOf.get(p));
+      const { first, rest } = fragmentOrder(ready, fragmentsOf);
+      // a job's results count only for the paths it was given
+      const pick = (r, only) => Object.fromEntries(only.filter((p) => r[p]).map((p) => [p, r[p]]));
+      const res = first.length ? pick(await runBulk(a, 'live', first, log), first) : {};
+      const live = new Map(first.map((p) => [p, res[p]?.status === 200 && !res[p].error]));
+      for (const f of new Set(rest.flatMap(fragmentsOf))) {
+        if (!live.has(f)) live.set(f, (await adminStatus(a, f)).live === 200);
+      }
+      const held = fragmentHolds(rest, fragmentsOf, (f) => live.get(f));
+      held.forEach((missing, p) => {
+        const pg = pages.find((page) => page.path === p);
+        pg.error = `Hold publish: content fragment not live: ${missing.join(', ')}`;
+        log(`[push] ✖ ${p}: held, its fragment ${missing.join(', ')} is not live`);
+      });
+      const publish = rest.filter((p) => !held.has(p));
+      if (publish.length) Object.assign(res, pick(await runBulk(a, 'live', publish, log), publish));
       pages.forEach((pg) => {
         if (!res[pg.path]) return;
         pg.liveStatus = res[pg.path].status;

@@ -8,7 +8,7 @@
   ],
   "main": {
     "accordion": {
-      "variants": []
+      "variants": ["faq"]
     },
     "cards": {
       "variants": [
@@ -33,7 +33,8 @@
     },
     "downloads": {
       "variants": [
-        "media-box"
+        "media-box",
+        "gallery"
       ]
     },
     "embed": {
@@ -47,6 +48,9 @@
       ]
     },
     "footer": {
+      "variants": []
+    },
+    "footnotes": {
       "variants": []
     },
     "fragment": {
@@ -79,6 +83,29 @@
         "columns"
       ]
     },
+    "media-cart": {
+      "variants": []
+    },
+    "newsletter-stub": {
+      "variants": [
+        "card"
+      ],
+      "config": "only",
+      "configKeys": [
+        "label",
+        "placeholder",
+        "button",
+        "consent",
+        "manage",
+        "message",
+        "list",
+        "language",
+        "image",
+        "heading",
+        "error",
+        "consent-error"
+      ]
+    },
     "promo-box": {
       "variants": [],
       "config": "or-curated",
@@ -96,7 +123,9 @@
       ]
     },
     "quote": {
-      "variants": []
+      "variants": [
+        "left"
+      ]
     },
     "search": {
       "variants": []
@@ -114,6 +143,7 @@
         "path",
         "template",
         "category",
+        "categories",
         "tag",
         "tags",
         "heading",
@@ -122,7 +152,9 @@
         "perpage",
         "columns",
         "excludefeatured",
-        "offset"
+        "offset",
+        "exclude",
+        "feature"
       ]
     },
     "story-rail": {
@@ -180,7 +212,7 @@
       "emittedBy": [
         "parsers/hero-banner.js"
       ],
-      "resolveTo": "emit Hero Image (overlay) / Hero Image (archive); blocks/hero is an empty boilerplate stub. parsers/hero.js (model) resolved in SKODA-208: Hero Image (overlay)"
+      "resolveTo": "emit Hero Image (overlay) / Hero Image (archive); blocks/hero is an empty boilerplate stub. parsers/hero.js (model) resolved in SKODA-208: Hero Image (overlay). parsers/archive-hero.js (category/tag) resolved in SKODA-828: Hero Image (archive), row 1 the banner picture or an empty cell, row 2 the h1 with one line per label (<br>); category labels are links to their term"
     },
     {
       "id": "in-page-nav",
@@ -290,13 +322,16 @@
       "id": "columns-split",
       "block": "columns",
       "variantPatterns": [
-        "^split-[1-9][0-9]$"
+        "^split-[1-9][0-9]$",
+        "^portrait-[1-9][0-9]{1,2}$"
       ],
       "status": "pinned",
       "ticket": "SKODA-225",
       "fallback": "readable",
-      "shape": 1,
-      "emittedBy": []
+      "shape": 2,
+      "emittedBy": [
+        "parsers/story-flatten.js"
+      ]
     },
     {
       "id": "highlight",
@@ -304,7 +339,7 @@
       "form": "section-style",
       "status": "pinned",
       "ticket": "SKODA-824",
-      "fallback": "broken",
+      "fallback": "readable",
       "styles": [
         "highlight-dark",
         "highlight-grey"
@@ -372,20 +407,6 @@
       ]
     },
     {
-      "id": "stories-feature",
-      "block": "stories",
-      "addsConfigKeys": [
-        "feature"
-      ],
-      "status": "pinned",
-      "ticket": "SKODA-222",
-      "fallback": "readable",
-      "shape": 1,
-      "emittedBy": [
-        "parsers/archive-list.js"
-      ]
-    },
-    {
       "id": "gallery-preview",
       "block": "gallery",
       "variants": [
@@ -398,6 +419,18 @@
       "emittedBy": [
         "transformers/skoda-press-release-layout.js"
       ]
+    },
+    {
+      "id": "gallery-story",
+      "block": "gallery",
+      "variants": [
+        "story"
+      ],
+      "status": "pinned",
+      "ticket": "SKODA-216",
+      "fallback": "readable",
+      "shape": 1,
+      "emittedBy": []
     },
     {
       "id": "story-rail-press",

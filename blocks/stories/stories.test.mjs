@@ -61,7 +61,9 @@ globalThis.document = {
 // the shared card-teaser primitive the block renders with. Dynamic import so the
 // shim above is in place first. createOptimizedPicture (aem.js) needs richer DOM,
 // so buildCardTeaser tests use image-less rows (the #3 regression path).
-const { isFeatured, parseFeedConfig, selectFeedRows } = await import('./stories.js');
+const {
+  isFeatured, parseFeedConfig, selectFeedRows, scopeFeedRows,
+} = await import('./stories.js');
 const {
   buildCardTeaser, formatCardDate, decorateCardCells,
 } = await import('../../scripts/card-teaser.js');
@@ -294,6 +296,71 @@ test('tag filter narrows the feed (comma-token match)', () => {
 test('category AND tag combine across keys', () => {
   const out = filterRows(tagged, { category: ['models'], tags: ['octavia'] });
   assert.deepEqual(out.map((r) => r.title), ['A']);
+});
+
+// --- categories: a story's WP categories + ancestors (SKODA-831) -------------
+// Category archives scope by `categories` (index column, comma-joined like the facets):
+// a sub-category archive matches stories whose top-level `category` is something else.
+
+const archived = [
+  {
+    path: '/en/emobility/camouflage', title: 'Camo', template: 'story', date: '2024-07-17', category: 'emobility', categories: 'design, skoda-world, elroq, models, emobility, sustainability',
+  },
+  {
+    path: '/en/lifestyle/sports/cycling', title: 'Cycling', template: 'story', date: '2026-08-07', category: 'lifestyle', categories: 'cycling, sports, lifestyle',
+  },
+  {
+    path: '/en/skoda-world/heritage-x', title: 'Heritage', template: 'story', date: '2026-01-01', category: 'skoda-world', categories: 'heritage,motorsport,skoda-world',
+  },
+  // the index serialises a multi-value cell either way; an array must match too
+  {
+    path: '/en/models/kodiaq-x', title: 'Kodiaq', template: 'story', date: '2025-01-01', category: 'models', categories: ['kodiaq', 'models'],
+  },
+  {
+    path: '/en/news/pr', title: 'PR', template: 'press_release', date: '2026-02-01', category: 'news', categories: 'design',
+  },
+  { path: '/en/legacy', title: 'Legacy', template: 'story', date: '2023-01-01', category: 'skoda-world' },
+];
+
+test('parseFeedConfig reads `categories` as comma tokens; absent → empty', () => {
+  assert.deepEqual(parseFeedConfig(configBlock({ categories: 'design, heritage ,' })).categories, ['design', 'heritage']);
+  assert.deepEqual(parseFeedConfig(configBlock({})).categories, []);
+});
+
+test('categories filter: any-of within the key, comma / comma-space / array cells', () => {
+  const pick = (vals) => filterRows(archived, { categories: vals }).map((r) => r.title);
+  assert.deepEqual(pick(['design']), ['Camo', 'PR']);
+  assert.deepEqual(pick(['sports']), ['Cycling']);
+  assert.deepEqual(pick(['motorsport']), ['Heritage'], 'no-space comma cell');
+  assert.deepEqual(pick(['kodiaq']), ['Kodiaq'], 'array cell');
+  assert.deepEqual(pick(['Design']), ['Camo', 'PR'], 'case-insensitive like tags');
+  assert.deepEqual(pick(['heritage', 'cycling']), ['Cycling', 'Heritage']);
+  assert.deepEqual(pick(['skoda']), [], 'whole tokens only, no substring match');
+});
+
+test('scopeFeedRows: a categories archive config = template story AND any-of categories, no path', () => {
+  const feed = (cfg) => scopeFeedRows(archived, parseFeedConfig(configBlock(cfg))).map((r) => r.title);
+  const archive = { template: 'story', excludefeatured: 'false' };
+  // the sub-category story sits under /en/emobility/, its category is emobility
+  assert.deepEqual(feed({ ...archive, categories: 'design' }), ['Camo']);
+  // a parent archive holds every descendant (WP membership), whatever the URL folder
+  assert.deepEqual(feed({ ...archive, categories: 'skoda-world' }), ['Camo', 'Heritage']);
+  assert.deepEqual(feed({ ...archive, categories: 'lifestyle' }), ['Cycling']);
+  // the row with no categories cell only matches configs without `categories`
+  assert.deepEqual(feed({ ...archive, category: 'skoda-world' }), ['Heritage', 'Legacy']);
+  // keys still AND together
+  assert.deepEqual(feed({ ...archive, categories: 'skoda-world', category: 'emobility' }), ['Camo']);
+  assert.equal(archived.length, 6, 'the shared index rows are not mutated');
+});
+
+test('scopeFeedRows: no categories key leaves the category / tag configs unchanged', () => {
+  const rows = [...tagged, ...archived];
+  const home = parseFeedConfig(configBlock({ template: 'story' }));
+  assert.equal(scopeFeedRows(rows, home).length, 8, 'home feed: every story');
+  const rail = parseFeedConfig(configBlock({ template: 'story', category: 'models', tag: 'octavia' }));
+  assert.deepEqual(scopeFeedRows(rows, rail).map((r) => r.title), ['A']);
+  const promo = parseFeedConfig(configBlock({ template: 'story' }));
+  assert.equal(scopeFeedRows([...rows, { path: '/en/p', title: 'P', template: 'story', featured: 'true' }], promo).length, 8, 'featured rows still excluded by default');
 });
 
 // --- exclude promo/featured (stories.md §8 exclude_carousel_posts) ---------

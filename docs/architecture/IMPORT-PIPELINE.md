@@ -53,7 +53,8 @@ Archives + directories:
 
 Flatten-to-default (SiteOrigin widget tree NOT reconstructed — deferred to SKODA-801/814/604/810/210):
 - **`company-page`** — hero + `.entry-content` flattened; sub-type blocks/galleries → SKODA-810.
-- **`story-detail`** — hero + primary `.content` flattened by SKODA-801; `.sidebar` rebuilt as a separate section; in-body Media Box deferred to SKODA-801a/604.
+- **`story-detail`** — hero + primary `.content` flattened by SKODA-801; `.sidebar` rebuilt as a separate section; in-body Media Box deferred to SKODA-801a/604. The sidebar newsletter card is not in the story (SKODA-840): it is the shared fragment below, added at runtime.
+- **`newsletter-card`** — one source story's sidebar `.newsletter-subscribe-widget` → the single `Newsletter Stub (card)` table of `/{locale}/fragments/newsletter-card` (SKODA-840; the builder is skoda-story-aside's `newsletter-card` hook). Publish it before the stories.
 - **`error-404`** — `.error-message` dead-end copy + homepage link; site-root `404.html` shell.
 
 > Detection is **content-driven only** — blocks are located by the `page-templates.json` DOM selectors; parsers self-identify from the DOM (body-class token, `data-content-type`, `type-<cpt>` class), never from URL/template/section-order/position. Where a URL is read for archives, it derives the rail filter, never detection. **Series is an exception to index-driven grid output, not to DOM-based detection:** preserve the authored SiteOrigin row/order/size signals and use its canonical URL only for Metadata/links. Mixed Story/Press Kits tiles must not make a hub look like a directory.
@@ -129,6 +130,23 @@ offline gate uploads or activates Assets originals.
 
 ### `urls-<name>.txt`
 The input URL list for the run.
+
+**Group fragments (SKODA-806).** A document holds at most 200 images (helix html2md), and the bulk runner
+writes one document per URL. So a press-kit Images chapter past that budget (Peaq-2: 246 tiles) keeps its
+largest gallery groups out of the page:
+
+- the page gets a `Fragment` block where each moved group was;
+- each fragment is its own list entry, the page URL with `?fragment=<slug>`. The importer writes that one
+  group, its heading plus `Downloads (gallery)`, to `/fragments<page path>/<slug>`;
+- `push-lib` `pagePath()` maps the same URL to the same path, so `import:push` and
+  `import:validate-blocks` handle it like any page;
+- `/fragments/…` stays outside the `/en` tree, so feeds never list a fragment.
+- **Limit (PR #287 review):** the split counts every image the page keeps (lead image, inline images, sidebar), not
+  just gallery tiles. A group over 200 images on its own is refused, since it can't be a fragment either. Every emitted
+  page and fragment is checked once built, and the import fails rather than writing a document past the limit.
+- **Publish order:** `import:push` reads the content fragments a page loads (a `Fragment` block, or any `/fragments/`
+  link; `contentFragmentPaths`). The fragments in the run publish first, and a page whose fragment is missing or
+  failed is held (`Hold publish: content fragment not live: …`) while the rest publish.
 
 ---
 

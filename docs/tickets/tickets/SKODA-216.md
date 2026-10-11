@@ -4,6 +4,10 @@
 - **Type:** block variant
 - **Phase:** A  ·  **Pilot:** Yes · **Milestone:** M1 (15 Oct demo capability; story assembly via SKODA-604)
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–4d *(planning estimate, not a quote)*
+- **Status (2026-09-29):** 🟡 IN REVIEW. `Gallery (story)` is built in `blocks/gallery` (story branch
+  only) plus an opt-in `story` option on the shared `scripts/lightbox.js`; the default, `preview`,
+  `slider` and media-rail paths are unchanged. It is QA'd on
+  `/drafts/skoda-216-story-gallery` against the live Favorit gallery.
 
 ## UI Specification
 **Story reference:** [`docs/ui-specs/gallery-lightbox.md`](../../ui-specs/gallery-lightbox.md),
@@ -73,6 +77,72 @@ press-release template or a new modal implementation.
 - [ ] Browser comparison against the Favorit gallery at 1280/1024/768/500px documents
       geometry, open state and interaction differences; image-independent visual diff
       <= 2% per pixel for the agreed story variant; `npm run lint` passes.
+
+## Build notes (2026-09-29, live DevTools on the Favorit story)
+- **Corrections to the Description:**
+  - The prev/next controls are **squares** (`border-radius: 0`), not discs: 67×67, 16px padding,
+    a 35px chevron and `box-shadow: 1px 1px 6px 3px rgb(0 0 0 / 15%)`.
+  - The counter reads `1/5` (no spaces), 16/24 white, 10px from the right, 16px from the bottom.
+  - The strip holds the images **after** the lead (2–5); the lead isn't repeated, so thumb *k*
+    opens image *k + 1*. Navigation wraps (5 → 1).
+  - The lightbox title is the **story title** (source `data-title`), the same for every image.
+  - Below 768 the source shows its overview grid (removed) instead of a viewer, so the EDS mobile
+    viewer can't be pixel-compared (see the differences below).
+- **On-page, measured and matched:**
+
+  | Viewport | Lead (16:9 cover) | Thumb | Gap / strip top / block bottom | Badge |
+  |---|---|---|---|---|
+  | 1280 | 818.7×460.5 | 189.7×106.7 | 20 | 75×44 at 20/20 |
+  | 1024 | 669.3×376.5 | 152.3×85.7 | 20 | 75×44 at 20/20 |
+  | 768 | 498.7×280.5 | 109.7×61.7 | 20 | 75×44 at 20/20 |
+  | 767 | 747×420.2 | 179.3×100.8 | 10 | 57×38 at 10/10 |
+  | 500 | 480×270 | 112.5×63.3 | 10 | 57×38 at 10/10 |
+
+  The source's 25% cells with 10px padding and a −10px margin are a 4-column grid with a 20px gap
+  here. The badge is `rgb(0 0 0 / 60%)`, a 28px icon 6px before the total, 16/24 from 768 and 12/18
+  below. The 768 step is viewport-driven (the 767 column is wider than the 768 one yet keeps 10px).
+- **Lightbox, measured and matched at 1280 and 768 (900 high):**
+  - Backdrop `rgb(0 0 0 / 95%)`.
+  - Top bar 93px with a 1px `--gallery-divider` rule and 16px padding.
+  - Title 24/27.6/400 from 769 (20/23 at 768 and below).
+  - Close 60×60.
+  - Image box 1280×751 from y=93, contain-fit, leaving the 56px bottom band.
+  - Squares at x=10 / right 10, y=461.4 (source `top: calc(50% + 46.5px)`, `translateY(-50%)`, a
+    1.6px lift).
+- **Story-only lightbox behaviour** (an opt-in `{ story, title }` option on the shared
+  `scripts/lightbox.js`, which SKODA-208 moved the gallery lightbox into; without the option
+  the gallery, `preview` and media-rail lightboxes are unchanged):
+  - No media-cart actions or tag chips.
+  - The dialog is labelled by the title.
+  - Ids stay unique per overlay (the shared lightbox numbers them), so two galleries never share one.
+  - The focus trap includes authored caption links (close → link → prev → next → close).
+  - An authored caption sits at the bottom, left of the counter, on a 60% black panel (the
+    source info bar). It **wraps** upward over the image and scrolls past 40vh, so text and
+    links are never clipped (PR #212 review P1: at 320px the earlier one-line ellipsis hid the
+    caption link; now the link's two line boxes are both on screen and tappable).
+  - Changing image while focus is on a caption link or action keeps focus in the dialog, on the
+    arrow in the direction of travel (the close button when there are no arrows). This lives in
+    the shared `scripts/lightbox.js`, so the default and `preview` galleries get it too (PR #212
+    review P2).
+- **Tokens (brand.css):** `--gallery-story-backdrop`, `--gallery-story-badge`,
+  `--gallery-story-placeholder`, `--gallery-story-arrow-shadow`.
+- **Deliberate differences:**
+  - **Mobile viewer (< 768):** ink backdrop, 49px top bar (8px padding, 20px title), 32px close,
+    44px green squares (8px padding, 28px chevron) 10px from the edges. The source has no viewer to
+    match here.
+  - **1690+ inset:** the source moves the squares and counter to 30px at 1690, a step outside the
+    breakpoint allowlist; EDS keeps 10px.
+  - **Bottom bar:** "View 5 photos" is the source overview entry, removed by stakeholder decision
+    and out of scope here, so it isn't rendered (PR #212 review; a trial version was taken out
+    again). "Share gallery" is SKODA-215.
+  - **Title bar at 768:** the source title wraps to two lines (379.6 × 46 at 16,23) because its
+    overview and share controls share the bar; without them, the EDS title is one line (660 × 23
+    at 16,34.5). Title size, weight and the 93px bar match; the bar content differs by design.
+  - **Focus trap outside the story:** the default, `preview` and media-rail lightboxes keep a
+    buttons-only trap. This ticket only changes the story path; widening it for the others would
+    change SKODA-203/208/223 behaviour.
+- **Import:** the pending contract `gallery-story` is registered. Nothing emits it yet:
+  `skoda-story-cleanup.js` still drops `.sb-gallery` (SKODA-604/801).
 
 ## Dependencies
 - Upstream: SKODA-203 (shared Gallery block + accessible lightbox), SKODA-106 (design tokens).

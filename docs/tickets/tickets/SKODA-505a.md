@@ -21,6 +21,68 @@ The coherent, self-contained media-cart **download process**: device-ID collect/
 - [ ] Cart ops (add/remove/dedupe/persist/clear) and zip-manifest are covered by unit tests.
 - [ ] `npm run lint` clean.
 
+## Implementation (2026-09-30, developer-verified; QA pending)
+Design agreed with the product owner on #50 (D1–D7, R1–R3). The approach is headless: no new CSS and no new surfaces (those are 505b).
+- **`scripts/media-cart.js`** is the store.
+  - Storage: `localStorage['skoda-media-cart']` = `{ v:1, deviceId, items[], updatedAt }`. `deviceId` is `crypto.randomUUID()`, minted on the first successful add and never transmitted (reserved for SKODA-902).
+  - Items are keyed by DAM path. An item is kept only if its URL is the DAM original on the publish host. Corrupt or tampered state is reset.
+  - Blocked storage falls back to memory; a full storage refuses the add (`storage`).
+  - A `storage` event syncs other tabs.
+  - Every change fires `media-cart:change` (detail = cart) and `onChange` listeners.
+  - Caps (D2): 80 items **and** 1 GiB, re-checked after resolving, so parallel adds can't overshoot. 1 GiB also stays under fflate's non-ZIP64 limit.
+  - API for 505b / 806 (all promise-based where async):
+    - `getCart() → { deviceId, items, count, bytes, limits }`
+    - `add({ href, title }) → { ok, item?, reason? }`
+    - `addMany(entries) → { added, skipped[{ href, reason }] }`: fills in order up to the cap (the source's cart-limit behaviour) and fires one change.
+    - `remove`, `has`, `clear`, `onChange(cb) → unsubscribe`
+    - `download(opts)`, `downloadItems(items, opts)`: one item downloads directly at any size. A zip applies the caps in order, and items past them come back in `failed` with their reason.
+    - `trackView()`, `bindCartControl(el, { href, title })`
+  - Refusal reasons: `unresolved | network | duplicate | limit-items | limit-bytes | storage`. `network` means the index or the DAM couldn't be reached; the control stays usable, so the user can try again.
+- **`scripts/media-cart-resolver.js`** maps a page link to the DAM original `{ id, url, filename, bytes, mime, kind }` (D3).
+  - DAM links pass through; unindexed ones are sized with a HEAD request.
+  - `null` means no published original. A network error or 5xx/408/429 rejects instead, so the cart can tell "try again" from "unavailable".
+  - Source links (`cdn.skoda-storyboard.com/YYYY/MM/…`, `/direct-download/…`) are looked up in `scripts/media-cart-index.json`: the exact key first, then the `-WxH` / `-scaled` stripped one.
+  - The resolver never falls back to a source or WordPress URL.
+  - The index is fetched once, on the first add, hover or focus of a cart control; a failed fetch is retried.
+- **`scripts/media-cart-index.json`** is generated from `media-manifest.json` by `npm run media:cart-index` (`tools/importer/media/build-cart-index.mjs`).
+  - Size: 2,360 assets and 2,320 keys, about 84 KB gzipped.
+  - R1: the 34 keys shared by identical PDFs filed twice map to the first copy. R2: derivative keys are left out. R3: keys stay percent-encoded.
+  - D7: `npm run media:cart-index -- --check` fails when the committed index is stale. Run it after DAM publishes; it isn't an `npm test` gate.
+- **`scripts/media-cart-download.js`** is loaded only when a download starts.
+  - One item: an `<a download>` to the DAM URL, with no fetch.
+  - Two or more:
+    - Originals are fetched one at a time (CORS, no credentials) and checked against the indexed size.
+    - They are streamed into a STORE zip with the vendored **fflate 0.8.3** (`scripts/vendor/`, D1), which handles CRC32, UTF-8 names and de-duplicated names.
+    - Output: one `skoda-storyboard-media-YYYY-MM-DD.zip`.
+    - Failed files are skipped and reported; `AbortSignal` cancels without saving. Progress is `{ done, total, loaded, totalBytes }`.
+  - fflate is pinned as an exact devDependency. `npm run vendor:fflate` refreshes it, and a test asserts that the vendored copy is byte-identical to `node_modules`.
+- **Analytics (provisional, SKODA-905):**
+  - `media-cart:analytics` always fires.
+  - `{ event:'trackEvent', eventCategory:'MediaCart'|'Download', eventAction, eventLabel }` is pushed to `window.dataLayer` only if the page already has one, so there's no pre-consent queue.
+- **Bound controls (D4/D6):** the existing add controls become cart toggles.
+  - The cart module is dynamically imported only where an add control renders; until then the control stays `aria-disabled`.
+  - State shows as `aria-pressed` (buttons) or `menuitemcheckbox` + `aria-checked` (size-menu rows), plus `data-in-cart` for 505b to style.
+  - A `#` control never navigates.
+  - Links that resolve nowhere are disabled after the first hover or focus (or after a refused click), which fires `media-cart:refused` `{ href, reason }`.
+  - Those links are remembered, so a re-bind (the lightbox, on every render) keeps them disabled.
+  - Covered controls:
+    - `scripts/media-card.js` (listing `/en/images`, `/en/videos`): the image *Original* row and the video add. *1920px* stays inert (D5).
+    - `blocks/story-rail` media rails (media room, model pages): the add button (`data-href` = original / MP4).
+    - `scripts/lightbox.js`: the one add button per overlay is re-pointed at each item's `cartHref` (new item field; `media-lightbox.js` sets the original / MP4). Gallery images have no DAM original, so their add is disabled. Items with `actions: false` (content images) don't bind and don't load the cart.
+- **Tests:** `scripts/media-cart*.test.mjs`, `scripts/lightbox-cart.test.mjs` and `tools/importer/media/build-cart-index.test.mjs`. They cover cart ops, dedupe, caps, persistence, corrupt/blocked/full storage, cross-tab sync, binding, the resolver and the index generator. The zip test reconciles the manifest against the archive: it unzips with fflate and checks CRC32 against `zlib`. The media-card and story-rail tests were updated.
+- **Known limits (demo data, not code):**
+  - 33 of 51 videos in the media feed aren't published on AEM Assets yet (2026-10-02), so their add stays disabled until they are published and the index is regenerated.
+  - **Press-release and press-kit images not on the DAM:** 291 of the 1,362 images those pages reference have no published original (285 `steps.dam: n/a`, never uploaded; 6 `dam: error`), on 34 pages (2026-10-02). Their Media Box tiles show the add as unavailable; e.g. `/en/press-releases/skoda-auto-launches-production-of-the-new-peaq-in-mlada-boleslav` has 9 of 10 images disabled (its videos and PDFs are in). The fix is data: upload + publish these originals (SKODA-501/504 scope, DAM ingest on a developer machine per AGENTS.md), then `npm run media:cart-index`. **Decision needed:** whether the M1 demo ingests them.
+  - Page links that aren't in the index (the #219 WebP originals) show as unavailable.
+  - Live CORS zipping end to end is 505b's acceptance. The DAM sends `Access-Control-Allow-Origin: *`.
+  - Analytics consent (the push only checks that a `dataLayer` exists) is out of scope here: SKODA-804/905.
+- **Review fixes (2026-10-02, issue #50 review):**
+  - **Index regenerated** against main's manifest after the merge: 2,394 assets (+22 PDFs, +12 MP4s). `npm run media:cart-index -- --check` passes; rerun it after every DAM publish.
+  - **HEAD requests:** the resolver keeps one HEAD per DAM path for the page (shared by the hover sweep, a later click and other controls for the same file; a failure isn't kept, so it is retried). The hover sweep resolves `SWEEP_CONCURRENCY` (4) links at a time, each once, instead of every unindexed link at once.
+  - **Failures are reported, not swallowed:** a failed lazy import of the cart (lightbox, media card, story rail) logs a warning and leaves the control disabled; a sweep whose index doesn't load logs a warning and leaves the controls enabled (a click resolves its own link).
+  - **Zip memory:** after each file the zip output is folded into a Blob (kept by the browser outside the JS heap, and paged to disk if needed), and the zip is a Blob of those Blobs. The JS heap holds about one original at a time, not the whole package twice.
+  - **Abort:** a cancel that lands after the last file is read (or while fflate loads) saves nothing.
+
 ## Dependencies
 - Upstream: SKODA-501 + SKODA-504 (CORS-enabled AEM DAM delivery, the linchpin), SKODA-502 (mediabox data), SKODA-601 (import wires per-asset hooks).
 - Paired: SKODA-505b (presentation + live delivery wiring).

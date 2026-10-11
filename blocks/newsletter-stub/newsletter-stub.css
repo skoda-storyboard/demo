@@ -10,6 +10,9 @@
  */
 
 .newsletter-stub {
+  /* topbar variant form width (source label max-width / field + pill row) */
+  --newsletter-topbar-width: 550px;
+
   container: newsletter-stub / inline-size;
   font-size: var(--body-font-size-m);
   line-height: var(--line-height-body);
@@ -81,12 +84,14 @@
   position: relative;
 }
 
+/* source .response .success: #419468 on the white box. It is 3.71:1, below AA for 14px text;
+   kept for source parity by decision (SKODA-308, 2026-10-06) */
 .newsletter-stub .newsletter-stub-status {
   position: absolute;
   inset-inline: 0;
   top: 0;
   z-index: 1;
-  color: var(--skoda-ink);
+  color: var(--skoda-green-accent);
   font-size: var(--body-font-size-s);
   font-weight: var(--weight-regular);
 }
@@ -94,6 +99,11 @@
 .newsletter-stub .newsletter-stub-status:not(:empty) {
   padding: var(--spacing-xs) var(--spacing-s);
   background-color: var(--skoda-white);
+}
+
+/* focused after a submit only so focus isn't lost with the button: no ring on a message */
+.newsletter-stub .newsletter-stub-status:focus {
+  outline: none;
 }
 
 /* consent: custom 18px checkbox on a real (accessible) input, label offset 27px */
@@ -291,6 +301,7 @@
   min-height: 0;
   margin: 0 0 14px;
   padding: 14px var(--spacing-l);
+  font-weight: var(--weight-medium); /* the widget's "Subscribe now!" is 500 (footer: 400) */
   line-height: 1;
 }
 
@@ -352,6 +363,12 @@
   line-height: var(--footer-small-line-height);
 }
 
+/* emerald on the card, as on the source (the footer form's link is its own #419468); it
+   outranks the shared hover rule too */
+.newsletter-stub.card .newsletter-stub-manage a {
+  color: var(--skoda-green-emerald);
+}
+
 /* the source label is inline-block in a 16/24 line, which leaves 3px ((24 - 18) / 2) under
    its last line (the manage link); keep that gap under whichever consent line comes last */
 .newsletter-stub.card .newsletter-stub-form > :is(.newsletter-stub-consent, .newsletter-stub-manage):last-child {
@@ -386,8 +403,165 @@
   }
 }
 
+/* ---- topbar variant (SKODA-308): the header's "Subscribe to our stories" panel (source
+   .topbar__dropdown__newsletter, measured 1440 / 390). A visible 12.8px label; a white field
+   (392 x 41.6, no radius) and the 16px emerald pill on one 550px row; the consent 10px below
+   (14/18 #a1a1a1, emerald links, the manage link underlined). On phones the pill moves under
+   the consent (source mobile button, 12.8px, 44px tall). The panel shell is the header's. */
+.newsletter-stub.topbar {
+  max-width: var(--newsletter-topbar-width);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.newsletter-stub.topbar .newsletter-stub-row {
+  flex-wrap: wrap;
+  margin-bottom: 0;
+}
+
+.newsletter-stub.topbar .newsletter-stub-label {
+  position: static;
+  flex-basis: 100%;
+  width: auto;
+  height: auto;
+  margin: 0 0 15px;
+  overflow: visible;
+  clip-path: none;
+  color: var(--skoda-white);
+  white-space: normal;
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- a .card rule never matches .topbar */
+.newsletter-stub.topbar .newsletter-stub-email {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0 15px 0 0;
+  border: 0;
+  border-radius: 0;
+  padding: 0.875em;
+  background-color: var(--skoda-white);
+  color: var(--skoda-black);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.newsletter-stub.topbar .newsletter-stub-email:focus {
+  border-bottom-width: 0;
+  margin-bottom: 0;
+}
+
+/* the shared 1px tracking stays (source "Subscribe" pill 142.8px wide; 32px padding at both
+   sizes, so 127px with the 12.8px phone label) */
+.newsletter-stub.topbar .newsletter-stub-submit {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0 2rem;
+  border-radius: 2em;
+  font-size: var(--body-font-size-m);
+  line-height: 1;
+}
+
+.newsletter-stub.topbar .newsletter-stub-response {
+  margin-top: 10px;
+}
+
+.newsletter-stub.topbar .newsletter-stub-status:not(:empty) {
+  padding: var(--spacing-xs) var(--spacing-s);
+  background-color: var(--skoda-white);
+  font-size: var(--body-font-size-s);
+  line-height: var(--line-height-body);
+}
+
+/* sent (source): the message box starts right under the label, over the 25px gap (the label's
+   15px margin + this slot's 10px) and the consent's first line */
+.newsletter-stub.topbar .newsletter-stub-form.is-sent .newsletter-stub-status {
+  top: -25px;
+}
+
+/* block label: no inline-block strut gap under the two consent lines */
+.newsletter-stub.topbar .newsletter-stub-consent label {
+  display: block;
+}
+
+.newsletter-stub.topbar .newsletter-stub-consent a {
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+/* source .manage-subscription-link: its own line 8px under the consent text, aligned with it */
+/* stylelint-disable-next-line no-descending-specificity -- a .card rule never matches .topbar */
+.newsletter-stub.topbar .newsletter-stub-manage {
+  padding: var(--spacing-xs) 0 0 calc(var(--checkbox-size) + var(--checkbox-label-gap));
+  font-size: var(--body-font-size-s);
+  line-height: var(--footer-small-line-height);
+}
+
+.newsletter-stub.topbar .newsletter-stub-manage a {
+  color: var(--skoda-green-emerald);
+  font-weight: var(--weight-semibold);
+}
+
+.newsletter-stub.topbar .newsletter-stub-manage a:hover {
+  color: var(--skoda-green-emerald);
+}
+
+/* the source's two submit buttons, one per band: the row's beside the field from 1080, the
+   form-end one (after consent + manage) below it, so the tab order follows what is on screen.
+   The hidden one is display:none, out of the tab order. */
+.newsletter-stub.topbar .newsletter-stub-submit-end {
+  display: none;
+}
+
+/* phones / the drawer band: field full width less its 15px gap, the pill last, under the
+   consent and the manage link (the form-end button; tab order email → consent → submit) */
+@media (width < 1080px) {
+  .newsletter-stub.topbar .newsletter-stub-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .newsletter-stub.topbar .newsletter-stub-row {
+    display: contents;
+  }
+
+  .newsletter-stub.topbar .newsletter-stub-email {
+    align-self: stretch;
+    width: calc(100% - 15px);
+    flex: none;
+  }
+
+  .newsletter-stub.topbar .newsletter-stub-row .newsletter-stub-submit {
+    display: none;
+  }
+
+  .newsletter-stub.topbar .newsletter-stub-submit-end {
+    display: block;
+    min-height: 44px;
+    margin-top: var(--spacing-s);
+    font-size: 0.8rem;
+  }
+
+  /* the message slot spans the form, as the field does (its box is laid over it) */
+  .newsletter-stub.topbar .newsletter-stub-response {
+    align-self: stretch;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .newsletter-stub .newsletter-stub-submit {
     transition: none;
   }
+}
+
+/* a sent form, every variant (source): the field and the button go, the message box takes
+   their place. Last, so it wins over the variants' display rules */
+.newsletter-stub .newsletter-stub-form.is-sent .newsletter-stub-email,
+.newsletter-stub .newsletter-stub-form.is-sent .newsletter-stub-submit {
+  display: none;
+}
+
+/* the source card keeps its emptied field wrapper (0 0 16px margin) under the message */
+.newsletter-stub.card .newsletter-stub-form.is-sent .newsletter-stub-status {
+  margin-bottom: calc(2 * var(--spacing-m));
 }

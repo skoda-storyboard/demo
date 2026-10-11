@@ -16,8 +16,12 @@
  * The provider's native player renders exactly as on the live site (YouTube title / share /
  * watch-on-YouTube overlay, Vimeo controls, etc.).
  *
+ * YouTube (SKODA-702a): as the live lite-youtube, the box first shows the video's poster and
+ * the play glyph, one button. Only the poster image is requested until the click, which loads
+ * the player and plays it (the full player was ~1 MB and most of the page's long tasks).
+ *
  * Consent gate (SKODA-204a): the block asks hasEmbedConsent() (scripts/embed-consent.js)
- * first. With consent (the M1 default) nothing changes: the iframe lazy-loads on approach.
+ * first. With consent (the M1 default) the iframe lazy-loads on approach (YouTube: the poster).
  * Without it (e.g. ?consent=decline, or later SKODA-704/804), the iframe is kept out of the
  * DOM so no request reaches the provider, and the source's click-to-load placeholder
  * (.page-embed_cookie, embeds.md §3) is shown. Its button loads that one embed and focuses it;
@@ -78,16 +82,19 @@ function vimeoId(url) {
   return m ? m[1] : '';
 }
 
+// YouTube video ids are letters, digits, `-` and `_`; anything else isn't a usable id.
+const YOUTUBE_ID_RE = /^[\w-]+$/;
+
 /**
- * Extracts the YouTube video id from watch / embed / youtu.be forms.
+ * Extracts the YouTube video id from watch / embed / shorts / youtu.be forms.
  * @param {URL} url
- * @returns {string} the id, or '' if not found
+ * @returns {string} the id, or '' if not found or not a valid id
  */
 function youtubeId(url) {
-  if (url.hostname === 'youtu.be') return url.pathname.slice(1);
-  if (url.searchParams.get('v')) return url.searchParams.get('v');
-  const m = url.pathname.match(/\/(?:embed|shorts)\/([^/?]+)/);
-  return m ? m[1] : '';
+  let id = url.searchParams.get('v') || '';
+  if (url.hostname === 'youtu.be') [, id = ''] = url.pathname.split('/');
+  else if (!id) [, id = ''] = url.pathname.match(/\/(?:embed|shorts)\/([^/?]+)/) || [];
+  return YOUTUBE_ID_RE.test(id) ? id : '';
 }
 
 /**
@@ -139,7 +146,8 @@ const ALLOW = {
 
 /**
  * Builds the title'd iframe. The real URL is held in `data-src` and only promoted to `src`
- * when the embed nears the viewport (see observeLazyEmbed) — this is the source's own
+ * when the embed nears the viewport (see observeLazyEmbed), or for YouTube when the poster is
+ * clicked (renderYoutubePoster) — this is the source's own
  * data-src → src swap, rebuilt with IntersectionObserver. It defers the third-party boot so
  * N stacked embeds don't all execute up front (cuts TBT). Without embed consent the iframe is
  * held back entirely (renderConsentGate). The `allow` list is provider-specific, matching the
@@ -190,6 +198,78 @@ function buildVideo(url, title, poster) {
 }
 
 /**
+ * Loads a held-back iframe now, because the visitor asked for it, and moves focus into it.
+ * YouTube also starts playing (autoplay + playsinline, as the live lite-youtube), since that
+ * click was the play click.
+ * @param {HTMLIFrameElement} iframe The iframe, its URL still in data-src
+ * @param {string} provider Provider key
+ */
+function loadNow(iframe, provider) {
+  let { src } = iframe.dataset;
+  if (provider === 'youtube') {
+    const url = new URL(src);
+    url.searchParams.set('autoplay', '1');
+    url.searchParams.set('playsinline', '1');
+    src = url.href;
+  }
+  iframe.setAttribute('src', src);
+  delete iframe.dataset.src;
+  iframe.focus();
+}
+
+/**
+ * YouTube click-to-load poster (SKODA-702a), as the live lite-youtube: the video's poster and
+ * the YouTube play glyph in the same media box, one real button. Nothing but the poster image
+ * is requested until the click, which swaps in the player and plays it. `maxresdefault` doesn't
+ * exist for every video: YouTube then answers with a 120×90 placeholder (or an error), so the
+ * poster falls back to `hqdefault` once. If embed consent was withdrawn since the poster
+ * showed, the click shows the consent placeholder instead of loading YouTube.
+ * @param {Element} wrapper The .embed-video wrapper (empty)
+ * @param {HTMLIFrameElement} iframe The iframe, its URL in data-src
+ * @param {string} label The button's accessible name
+ * @param {() => HTMLElement} gate Shows the consent placeholder, returns its button
+ * @returns {HTMLButtonElement} the play button
+ */
+function renderYoutubePoster(wrapper, iframe, label, gate) {
+  // the id was validated (youtubeId), so it is the last segment of the /embed/{id} URL
+  const id = new URL(iframe.dataset.src).pathname.split('/').pop();
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'embed-play';
+  button.setAttribute('aria-label', label);
+
+  const img = document.createElement('img');
+  img.className = 'embed-poster';
+  img.setAttribute('alt', '');
+  img.setAttribute('loading', 'lazy');
+  img.setAttribute('decoding', 'async');
+  img.setAttribute('width', '1280');
+  img.setAttribute('height', '720');
+  let fellBack = false;
+  const fallback = () => {
+    if (fellBack) return;
+    fellBack = true;
+    img.setAttribute('src', `https://i.ytimg.com/vi/${id}/hqdefault.jpg`);
+  };
+  img.addEventListener('error', fallback);
+  img.addEventListener('load', () => { if (img.naturalWidth <= 120) fallback(); });
+  img.setAttribute('src', `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`);
+  button.append(img);
+
+  button.addEventListener('click', () => {
+    if (!hasEmbedConsent()) {
+      button.remove();
+      gate().focus();
+      return;
+    }
+    button.replaceWith(iframe);
+    loadNow(iframe, 'youtube');
+  }, { once: true });
+  wrapper.append(button);
+  return button;
+}
+
+/**
  * Promotes an embed's held data-src to src when it approaches the viewport, so the third-party
  * player only boots when needed. Loads eagerly (no observer) when IntersectionObserver is
  * unavailable, keeping the embed functional.
@@ -216,6 +296,23 @@ function observeLazyEmbed(wrapper) {
     });
   }, { rootMargin: '200px' });
   observer.observe(wrapper);
+}
+
+/**
+ * Shows a consented embed: YouTube gets the click-to-load poster, every other provider the
+ * iframe that lazy-loads on approach.
+ * @param {Element} wrapper The .embed-video / .embed-audio wrapper (empty)
+ * @param {HTMLIFrameElement} iframe The iframe, its URL in data-src
+ * @param {string} provider Provider key
+ * @param {string} playLabel The YouTube play button's accessible name
+ * @param {() => HTMLElement} gate Shows the consent placeholder (YouTube, consent withdrawn)
+ * @returns {HTMLElement} the element to focus, the play button or the iframe
+ */
+function mountEmbed(wrapper, iframe, provider, playLabel, gate) {
+  if (provider === 'youtube') return renderYoutubePoster(wrapper, iframe, playLabel, gate);
+  wrapper.append(iframe);
+  observeLazyEmbed(wrapper);
+  return iframe;
 }
 
 // Placeholder copy, as on the live site (English defaults; placeholders sheet keys
@@ -249,10 +346,15 @@ async function localiseConsentGate(text, label, host) {
  * iframe stays out of the DOM, so nothing is requested from the provider until the button
  * is activated or consent is granted. Built synchronously: the gated box has its final size
  * from the first frame, and the consent listener is live before anything can grant.
+ * A YouTube button click plays the video at once (one click, not consent then play); a grant
+ * through the hook shows the poster instead, as the visitor hasn't asked to play.
  * @param {Element} wrapper The .embed-video / .embed-audio wrapper (empty)
  * @param {HTMLIFrameElement} iframe The iframe, its URL still in data-src
+ * @param {string} provider Provider key
+ * @param {string} playLabel The YouTube play button's accessible name
+ * @returns {HTMLButtonElement} the placeholder's button
  */
-function renderConsentGate(wrapper, iframe) {
+function renderConsentGate(wrapper, iframe, provider, playLabel) {
   const host = new URL(iframe.dataset.src).hostname;
   gateCount += 1;
   wrapper.classList.add('embed-gated');
@@ -282,14 +384,12 @@ function renderConsentGate(wrapper, iframe) {
     unsubscribe();
     gate.remove();
     wrapper.classList.remove('embed-gated');
-    wrapper.append(iframe);
   };
   button.addEventListener('click', () => {
     release();
     // the visitor asked for this one embed: load it now and move focus into it
-    iframe.setAttribute('src', iframe.dataset.src);
-    delete iframe.dataset.src;
-    iframe.focus();
+    wrapper.append(iframe);
+    loadNow(iframe, provider);
   });
   unsubscribe = onEmbedConsentChange((consented) => {
     if (wrapper.isConnected === false) {
@@ -301,11 +401,14 @@ function renderConsentGate(wrapper, iframe) {
     if (!consented) return;
     const hadFocus = gate.contains(document.activeElement);
     release();
-    observeLazyEmbed(wrapper);
-    if (hadFocus) iframe.focus(); // don't drop keyboard focus to <body>
+    const shown = mountEmbed(wrapper, iframe, provider, playLabel, () => (
+      renderConsentGate(wrapper, iframe, provider, playLabel)
+    ));
+    if (hadFocus) shown.focus(); // don't drop keyboard focus to <body>
   });
 
   localiseConsentGate(text, label, host);
+  return button;
 }
 
 const HTTP_URL_RE = /^https?:\/\//i;
@@ -460,17 +563,22 @@ export default function decorate(block) {
 
   const iframe = buildIframe(src, title, isAudio, provider);
   block.classList.add(`embed-${provider}`);
+  // YouTube's play button name; a bare-URL embed only has the generic "YouTube video"
+  // label, so don't read it out twice
+  let playLabel = '';
+  if (provider === 'youtube') {
+    playLabel = title === providerLabel(provider, url) ? 'Play YouTube video' : `Play video: ${title}`;
+  }
+  const gate = () => renderConsentGate(wrapper, iframe, provider, playLabel);
+  block.append(wrapper);
 
   if (!hasEmbedConsent()) {
     // No consent: hold the iframe back and show the click-to-load placeholder (SKODA-204a).
-    block.append(wrapper);
-    renderConsentGate(wrapper, iframe);
+    gate();
     return;
   }
 
-  wrapper.append(iframe);
-  block.append(wrapper);
-
-  // Defer the third-party player until the embed nears the viewport (source parity + perf).
-  observeLazyEmbed(wrapper);
+  // YouTube: the click-to-load poster; others: the player boots when the embed nears the
+  // viewport (source parity + perf).
+  mountEmbed(wrapper, iframe, provider, playLabel, gate);
 }

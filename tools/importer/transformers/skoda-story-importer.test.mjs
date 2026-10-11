@@ -128,6 +128,21 @@ test('story hero handles omitted perex, date or category without empty rows', { 
   assert.equal(noCategory.querySelector('tr:last-child time').textContent, '15. 9. 2026');
 });
 
+test('story hero takes the largest srcset copy up to 2560w (SKODA-828 F6)', { skip }, () => {
+  const srcset = 'https://cdn.x/h-1920x1281.jpg 1920w, https://cdn.x/h-768x512.jpg 768w, '
+    + 'https://cdn.x/h-2560x1708.jpg 2560w, https://cdn.x/h-3840x2562.jpg 3840w';
+  const doc = dom(HERO.replace('src="https://cdn.x/h.png"', `src="https://cdn.x/h-768x512.jpg" srcset="${srcset}" sizes="100vw"`));
+  storyHero(doc.querySelector('.hero'), { document: doc });
+  const img = doc.querySelector('table img');
+  assert.equal(img.getAttribute('src'), 'https://cdn.x/h-2560x1708.jpg');
+  assert.equal(img.hasAttribute('srcset'), false);
+  assert.equal(img.hasAttribute('sizes'), false);
+  // no srcset: the authored src stays
+  const plain = dom(HERO);
+  storyHero(plain.querySelector('.hero'), { document: plain });
+  assert.equal(plain.querySelector('table img').getAttribute('src'), 'https://cdn.x/h.png');
+});
+
 // ---- SKODA-818 videos → bare URL --------------------------------------------
 
 test('lite-youtube + consent shell → one bare watch-URL paragraph', { skip }, () => {

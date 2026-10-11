@@ -202,7 +202,11 @@ function rebuild(element, document) {
   if (chapterLinks) out.push(marker(document, 'press-kit-chapters'), chapterLinks);
 
   out.push(marker(document, 'body-column'));
-  const lead = article.querySelector('.column-primary .article-teaser-media img');
+  // The article's own teaser (`.column-primary > .article-teaser`), not a gallery tile: on the
+  // Images children every Media Box tile is an `article.article-teaser` inside `.search-results`,
+  // so the first one used to be copied above the first section as a stray lead (SKODA-837).
+  const lead = [...article.querySelectorAll('.column-primary .article-teaser-media img')]
+    .find((img) => !img.closest('.search-results'));
   if (lead) {
     const img = lead.cloneNode(true);
     img.alt = (img.alt || '').replace(/<br\s*\/?>/gi, ' ');
@@ -278,9 +282,23 @@ function labelImageLinks(article) {
   });
 }
 
+// The source mistypes some PDF links as `.pdff` (the Peaq five-seat infographic, the Felicia
+// Kit Car chapter); that URL 404s, while the same path ending `.pdf` is the published PDF
+// (SKODA-837). Fixed before the links are named, so they read "Download PDF" and the media
+// step resolves them to their AEM Assets originals.
+function fixPdfTypos(article) {
+  article.querySelectorAll('a[href]').forEach((a) => {
+    const href = a.getAttribute('href');
+    if (/\.pdff(?=$|[?#])/i.test(href)) a.setAttribute('href', href.replace(/\.pdff(?=$|[?#])/i, '.pdf'));
+  });
+}
+
 function finish(element, document) {
   const article = element.querySelector('article.press_kit');
-  if (article) labelImageLinks(article);
+  if (article) {
+    fixPdfTypos(article);
+    labelImageLinks(article);
+  }
   const sidebarStart = article?.querySelector('hr[data-press-kit-section="sidebar"]');
   if (sidebarStart) {
     let node = sidebarStart.nextElementSibling;

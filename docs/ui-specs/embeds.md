@@ -118,6 +118,12 @@ jQuery, colorbox popups. Replace with native `loading="lazy"` iframes + a small 
   shows with an "enable" button; clicking it (and/or accepting the OneTrust category) reveals the
   iframe. Button hover/focus/active -> background `#f1f1f1`.
 - **Playback:** delegated to the provider iframe (Vimeo/YouTube native controls).
+- **YouTube poster (SKODA-702a, measured on the live `lite-youtube`, Epiq story):**
+  - **Poster:** `i.ytimg.com/vi/{id}/maxresdefault.jpg` (`hqdefault` fallback) covers the 16:9 box on black, under a 99px top shade (`linear-gradient(rgba(0,0,0,.67), … 94% transparent)`).
+  - **Glyph:** the 68×48 YouTube glyph, centred, `filter: grayscale(100%)` at rest and `none` on hover / focus (`.1s cubic-bezier(0,0,.2,1)`).
+  - **Behaviour:** the whole box is one button. Only the poster is requested until the click, which loads `…/embed/{id}?…&autoplay=1&playsinline=1`. Playback starts on the visitor's own click, so it isn't autoplay-on-load.
+  - **EDS improvements over live:** the button is named "Play video: {title}" (live says "Play"), it has a visible focus ring, and focus moves into the player.
+  - **Without consent:** the consent notice shows first, and its button loads and plays the video in one click.
 
 ## 6. Accessibility
 
@@ -193,6 +199,7 @@ WHAT / WHERE / viewport / expected / actual.
       `aspect-ratio:16/9`); iframe fills it absolutely, no letterbox gaps.
 - [ ] Audio height: `.embed-audio` / all / fixed `200px`, fluid width.
 - [ ] Lazy: iframe `src` empty on load; populated only when scrolled near viewport (or on consent).
+      YouTube: no iframe until the poster is clicked (SKODA-702a, §5).
 - [ ] Privacy: Vimeo URL keeps `?dnt=1`; YouTube matches the live source,
       `www.youtube.com/embed/{id}?feature=oembed&enablejsapi=1` (§2).
 - [ ] `loading="lazy"` present on the iframe; `title` non-empty.

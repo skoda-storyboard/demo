@@ -63,8 +63,522 @@
       "n": 24
     }
   ],
+  "libraryComment": "Types whose whole source media library is read (every year, through the listing load-more endpoint) and kept to the items whose original is published on AEM Assets (media-manifest public_url). Images only: the source video library is not in the DAM yet.",
+  "library": ["image"],
   "knownDetailGaps": {
     "_comment": "Rows the source itself has no detail for (verified with repeated live requests). The feed build fails on any other incomplete row. Re-verify and drop an entry when the source fills it.",
+    "279232": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "313272": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385886": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385887": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385888": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385889": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385890": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385891": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385892": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385893": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385894": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385895": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385896": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385898": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385899": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385900": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "385901": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "434763": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "441918": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "441962": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442259": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442261": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442263": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442272": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442274": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442276": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442278": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442658": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442661": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442672": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442673": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442674": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442675": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442679": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442680": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442681": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442682": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442687": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442690": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442691": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442693": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442694": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442695": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442704": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442706": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442707": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442805": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442806": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442810": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442811": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442812": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442814": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442818": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442820": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442821": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442822": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "442823": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "445961": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "445964": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "445966": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "445968": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "445971": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "445973": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
+    "445975": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a sequential re-request with a fresh nonce, 2026-10-01; library image (SKODA-608 library source)"
+    },
     "445970": {
       "missing": [
         "filetype",

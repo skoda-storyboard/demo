@@ -3,17 +3,26 @@
  * build-media-items.mjs - SKODA-608: generate the media feed (en/media-feed.json).
  *
  *   npm run media-items:build -- [--out <dir>] [--cache <dir>] [--offline] [--dry-run] [--push]
+ *   npm run media-items:build -- --feed <sheet.json> --push [--out <dir>]
  *
  * AEM Assets is the source of truth for images/videos (docs/architecture/
  * SKODA-MEDIA-ITEMS-OPTIONS.md, option B): no page per item. This M1 generator builds the
  * feed from the server-rendered source listings (`ajax_search_results_<type>=N` renders N
  * cards; many attachment pages 404, the cards don't), resolves `years-<termId>` classes by
  * probing each year filter, takes Vimeo posters from oEmbed and skips domain-restricted
- * videos. The M2 sync job writes the same rows from published AEM Assets. Writes:
+ * videos. `sources.json` `library` adds the source media library itself (every year, paged
+ * through the listing's "load more" endpoint), kept to the items whose original is published on
+ * AEM Assets (media manifest). The M2 sync job writes the same rows from published AEM Assets.
+ * Writes:
  *   <out>/en/media-feed.json                 the DA sheet (query-index shape, `:type: sheet`)
  *   tools/importer/media-items/items.json    committed record (id, template, title, date, source)
- * `--push` uploads the sheet to DA and previews + publishes it. The listing and story-rail
- * blocks read it via their `index: /en/media-feed.json` config row.
+ * `--push` puts the card thumbnails on the Media Bus (carrier documents under /en/fragments/,
+ * previewed + published: a sheet's images are not ingested), rewrites `image` to their
+ * `media_<hash>` paths, points `original` and `mp4` at the published AEM Assets files
+ * (media-manifest `public_url`), then uploads the sheet to DA and previews + publishes it. Without
+ * `--push` the written sheet keeps the source thumbnail URLs. `--feed` skips the source build
+ * and re-publishes an existing sheet (e.g. the DA source) with Media Bus thumbnails. The
+ * listing and story-rail blocks read it via their `index: /en/media-feed.json` config row.
  * Download URLs are stable CDN URLs (/direct-download/ redirects to a presigned S3 URL).
  */
 
@@ -27,6 +36,8 @@ import {
   SOURCE_ORIGIN, facetOptions, parseCards, mergeItems, feedSheet, yearIds, vimeoPoster,
   detailRequest, ajaxNonce, parseDetailPanel, parseAssetLinks, assetItem, requiredDetails,
   detailGaps, unknownGaps, feedCoverageGaps,
+  feedThumbnails, carrierDocs, parseCarrier, withMediaBus, withDamFiles,
+  libraryRequest, librarySlices, libraryNonce, damIndex, damFile,
 } from './media-items-lib.mjs';
 import { uploadToDA } from '../media/media-lib.mjs';
 import { readLists } from '../build-link-allowlist.mjs';
@@ -57,6 +68,7 @@ function parseArgs(argv) {
     dryRun: false,
     push: false,
     allowIncomplete: false,
+    feed: '',
   };
   for (let i = 0; i < argv.length; i += 1) {
     const k = argv[i];
@@ -67,8 +79,10 @@ function parseArgs(argv) {
     else if (k === '--dry-run') a.dryRun = true;
     else if (k === '--push') a.push = true;
     else if (k === '--allow-incomplete') a.allowIncomplete = true;
+    else if (k === '--feed') a.feed = path.resolve(v());
     else throw new Error(`unknown flag ${k}`);
   }
+  if (a.feed && !a.push) throw new Error('--feed re-publishes an existing sheet: it needs --push');
   return a;
 }
 
@@ -161,22 +175,105 @@ async function fetchDetail(JSDOM, item, ctx) {
   return last ? last.doc : null;
 }
 
+/** Detail panels fetched at a time (one is ~1 s on the source). */
+const DETAIL_WORKERS = 4;
+
 /**
  * The lightbox detail panel of every item (media-item shape 4): the source colorbox loads it
  * per item (`image-overlay-meta-data`). A related article that is a demo page links there.
  */
 async function addDetails(JSDOM, items, ctx) {
   const demo = new Set(readLists().paths);
-  for (const item of items) {
-    // eslint-disable-next-line no-await-in-loop
-    const doc = await fetchDetail(JSDOM, item, ctx);
-    if (doc) Object.assign(item, parseDetailPanel(doc));
-    if (item.related) {
-      const rel = new URL(item.related, SOURCE_ORIGIN);
-      const local = rel.pathname.toLowerCase().replace(/\/+$/, '');
-      if (demo.has(local)) item.related = local;
+  let next = 0;
+  let done = 0;
+  // DETAIL_WORKERS panels at a time (one is ~1 s on the source); cached panels return at once
+  const worker = async () => {
+    while (next < items.length) {
+      const item = items[next];
+      next += 1;
+      // eslint-disable-next-line no-await-in-loop
+      const doc = await fetchDetail(JSDOM, item, ctx);
+      if (doc) Object.assign(item, parseDetailPanel(doc));
+      if (item.related) {
+        const rel = new URL(item.related, SOURCE_ORIGIN);
+        const local = rel.pathname.toLowerCase().replace(/\/+$/, '');
+        if (demo.has(local)) item.related = local;
+      }
+      done += 1;
+      if (done % 250 === 0) console.log(`[media-items] detail panels ${done}/${items.length}`);
     }
+  };
+  await Promise.all(Array.from({ length: DETAIL_WORKERS }, worker));
+}
+
+/** The first year the source media library holds. */
+const LIBRARY_FROM = 2014;
+
+/** One library page (cached as JSON): `{ html, found, count }`. */
+async function libraryPage(q, ctx) {
+  const file = path.join(ctx.cacheDir, `library_${q.type}_${q.after}_${q.offset}_${q.perPage}.json`);
+  if (existsSync(file)) return JSON.parse(readFileSync(file, 'utf8'));
+  if (ctx.offline) throw new Error(`offline and not cached: library ${q.type} ${q.after} offset ${q.offset}`);
+  if (!ctx.libraryNonce) {
+    const res = await fetch(listingUrl({ type: q.type, n: 1 }), { headers: { 'user-agent': UA } });
+    ctx.libraryNonce = libraryNonce(await res.text());
   }
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const { url, body } = libraryRequest({ ...q, nonce: ctx.libraryNonce });
+      // eslint-disable-next-line no-await-in-loop
+      const json = JSON.parse(await postForm(url, body));
+      const d = json.data || {};
+      if (json.status !== false && typeof d.html === 'string') {
+        const page = {
+          html: d.html, found: Number(d.found_posts) || 0, count: Number(d.post_count) || 0,
+        };
+        mkdirSync(ctx.cacheDir, { recursive: true });
+        writeFileSync(file, JSON.stringify(page));
+        return page;
+      }
+    } catch (e) { /* retry */ }
+    ctx.libraryNonce = '';
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((r) => { setTimeout(r, 1500 * attempt); });
+  }
+  throw new Error(`library page failed: ${q.type} ${q.after} offset ${q.offset}`);
+}
+
+/**
+ * The source media library of a type, every card from LIBRARY_FROM to this year, newest first,
+ * kept to the items whose original is published on AEM Assets. Each year is paged to its end;
+ * a year at the 10,000-result window would be incomplete, so it fails.
+ * @returns {Promise<{cards: object[], listed: number, kept: number}>}
+ */
+async function collectLibrary(JSDOM, type, parseCtx, index, ctx) {
+  const onDam = (c) => damFile(type === 'video' ? c.mp4 : c.original, index);
+  const cards = [];
+  let listed = 0;
+  const perPage = 200;
+  for (const slice of librarySlices(LIBRARY_FROM, new Date().getFullYear())) {
+    let offset = 0;
+    let found = 0;
+    do {
+      // eslint-disable-next-line no-await-in-loop
+      const page = await libraryPage({
+        type, offset, perPage, after: slice.after, before: slice.before,
+      }, ctx);
+      found = page.found;
+      if (found >= 10000) throw new Error(`library ${type} ${slice.year}: ${found} items, over the 10,000 window; slice it finer`);
+      const dom = new JSDOM(page.html);
+      cards.push(...parseCards(dom.window.document, parseCtx).filter(onDam));
+      dom.window.close();
+      // let jsdom release the closed window (a cached run never yields otherwise)
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((r) => { setImmediate(r); });
+      if (!page.count) break;
+      offset += page.count;
+    } while (offset < found);
+    listed += found;
+    console.log(`[media-items] library ${type} ${slice.year}: ${found} listed`);
+  }
+  return { cards, listed, kept: cards.length };
 }
 
 /**
@@ -245,37 +342,113 @@ const MEDIA_MANIFEST = path.join(ROOT, 'tools/importer/media/media-manifest.json
  * 1920 rendition, original, poster, MP4) needs a media-manifest row, recorded with
  * `npm run media:build -- --feed <feed file>`. Throws with the uncovered URLs.
  */
+const manifestRows = () => (existsSync(MEDIA_MANIFEST) ? JSON.parse(readFileSync(MEDIA_MANIFEST, 'utf8')).rows : {});
+
 function assertManifestCoverage(file) {
-  const rows = existsSync(MEDIA_MANIFEST) ? JSON.parse(readFileSync(MEDIA_MANIFEST, 'utf8')).rows : {};
+  const rows = manifestRows();
   const gaps = feedCoverageGaps(JSON.parse(readFileSync(file, 'utf8')), rows);
   if (!gaps.length) return;
   gaps.slice(0, 20).forEach((g) => console.warn(`  unrecorded ${g.field} (${g.id}): ${g.url}`));
   throw new Error(`${gaps.length} feed media URL(s) have no media-manifest row; run \`npm run media:build -- --feed ${path.relative(ROOT, file)}\` before --push`);
 }
 
-/** Upload the sheet to DA, then preview + publish it (credentials are injected for DA/admin). */
+/** Preview + publish a DA document (credentials are injected for DA/admin). */
+async function previewAndPublish(docPath) {
+  for (const stage of ['preview', 'live']) {
+    // eslint-disable-next-line no-await-in-loop
+    const r = await fetch(`https://admin.hlx.page/${stage}/${ORG}/${REPO}/main/${docPath}`, { method: 'POST' });
+    // eslint-disable-next-line no-await-in-loop
+    if (!r.ok) throw new Error(`${stage} ${docPath} ${r.status} ${await r.text()}`);
+  }
+}
+
+/** Upload the sheet to DA, then preview + publish it. */
 async function pushFeed(file) {
   assertManifestCoverage(file);
   const res = await uploadToDA({
     org: ORG, repo: REPO, daPath: `/${FEED_PATH}`, buffer: readFileSync(file), contentType: 'application/json',
   });
   if (!res.ok) throw new Error(`DA upload ${res.status}: ${res.body.slice(0, 200)}`);
-  for (const stage of ['preview', 'live']) {
-    // eslint-disable-next-line no-await-in-loop
-    const r = await fetch(`https://admin.hlx.page/${stage}/${ORG}/${REPO}/main/${FEED_PATH}`, { method: 'POST' });
-    // eslint-disable-next-line no-await-in-loop
-    if (!r.ok) throw new Error(`${stage} ${r.status} ${await r.text()}`);
-  }
+  await previewAndPublish(FEED_PATH);
   console.log(`[media-items] pushed, previewed and published /${FEED_PATH}`);
+}
+
+/**
+ * Put the feed thumbnails on the Media Bus: upload, preview + publish the carrier documents,
+ * then read each carrier's previewed `.plain.html` for the `media_<hash>` paths.
+ * @returns {Promise<Map<string, string>>} source URL → Media Bus path
+ */
+async function pushCarriers(JSDOM, sheet) {
+  const map = new Map();
+  for (const doc of carrierDocs(feedThumbnails(sheet))) {
+    // eslint-disable-next-line no-await-in-loop
+    const res = await uploadToDA({
+      org: ORG, repo: REPO, daPath: `/${doc.path}.html`, buffer: Buffer.from(doc.html), contentType: 'text/html',
+    });
+    if (!res.ok) throw new Error(`DA upload ${doc.path} ${res.status}: ${res.body.slice(0, 200)}`);
+    // eslint-disable-next-line no-await-in-loop
+    await previewAndPublish(doc.path);
+    // eslint-disable-next-line no-await-in-loop
+    const plain = await fetch(`https://main--${REPO}--${ORG}.aem.page/${doc.path}.plain.html?ck=${Date.now()}`, { cache: 'no-store' });
+    if (!plain.ok) throw new Error(`${doc.path}.plain.html ${plain.status}`);
+    // eslint-disable-next-line no-await-in-loop
+    const found = parseCarrier(new JSDOM(await plain.text()).window.document, doc.path);
+    found.forEach((bus, url) => map.set(url, bus));
+    console.log(`[media-items] carrier /${doc.path}: ${found.size}/${doc.urls.length} thumbnails on the Media Bus`);
+  }
+  return map;
+}
+
+/**
+ * Publish the sheet: gate it, point `original`/`mp4` at the published AEM Assets files, put the
+ * thumbnails on the Media Bus (`image`), write it to `feedFile` and push it.
+ */
+async function publishFeed(JSDOM, sheet, feedFile) {
+  // the gate runs on the source URLs: the DAM and Media Bus copies are of the recorded binaries
+  assertManifestCoverage(feedFile);
+  const dam = withDamFiles(sheet, manifestRows());
+  const kept = (field) => dam.missing.filter((m) => m.field === field).length;
+  console.log(`[media-items] not on AEM Assets, kept on the source: ${kept('original')} original(s), ${kept('mp4')} MP4(s)`);
+  const thumbs = feedThumbnails(dam.sheet);
+  const bus = withMediaBus(dam.sheet, await pushCarriers(JSDOM, dam.sheet));
+  if (bus.missing.length === thumbs.length && thumbs.length) {
+    throw new Error('the Media Bus ingested no thumbnail; not publishing the feed');
+  }
+  bus.missing.forEach((u) => console.warn(`  not on the Media Bus, kept: ${u}`));
+  writeFileSync(feedFile, `${JSON.stringify(bus.sheet, null, 2)}\n`);
+  await pushFeed(feedFile);
+  const onDam = (field) => dam.sheet.data.filter((r) => r[field]).length - kept(field);
+  return {
+    thumbnails: thumbs.length,
+    kept: bus.missing.length,
+    originalsOnDam: onDam('original'),
+    originalsKept: kept('original'),
+    mp4OnDam: onDam('mp4'),
+    mp4Kept: kept('mp4'),
+  };
 }
 
 export async function main(argv = process.argv.slice(2)) {
   const a = parseArgs(argv);
   const JSDOM = loadJSDOM();
+  const feedFile = path.join(a.out, FEED_PATH);
+  if (a.feed) {
+    const sheet = JSON.parse(readFileSync(a.feed, 'utf8'));
+    mkdirSync(path.dirname(feedFile), { recursive: true });
+    writeFileSync(feedFile, `${JSON.stringify(sheet, null, 2)}\n`);
+    const mediaBus = await publishFeed(JSDOM, sheet, feedFile);
+    console.log(JSON.stringify({ rows: sheet.data.length, mediaBus }));
+    return { mediaBus };
+  }
   const sources = JSON.parse(readFileSync(path.join(HERE, 'sources.json'), 'utf8'));
-  const { queries, assetPages = [], knownDetailGaps = {} } = sources;
+  const {
+    queries, assetPages = [], knownDetailGaps = {}, library = [],
+  } = sources;
   const lists = [];
   const yearsById = {};
+  const libraryReport = {};
+  const index = damIndex(manifestRows());
+  const libCtx = { cacheDir: a.cache, offline: a.offline, libraryNonce: '' };
   let nonce = '';
 
   for (const type of ['image', 'video']) {
@@ -291,6 +464,12 @@ export async function main(argv = process.argv.slice(2)) {
       // eslint-disable-next-line no-await-in-loop
       const doc = new JSDOM(await fetchText(listingUrl(q), a.cache, a.offline)).window.document;
       lists.push(parseCards(doc, { options, yearsById }));
+    }
+    if (library.includes(type)) {
+      // eslint-disable-next-line no-await-in-loop
+      const lib = await collectLibrary(JSDOM, type, { options, yearsById }, index, libCtx);
+      lists.push(lib.cards);
+      libraryReport[type] = { listed: lib.listed, onAemAssets: lib.kept };
     }
   }
 
@@ -336,6 +515,7 @@ export async function main(argv = process.argv.slice(2)) {
     videos: items.filter((i) => i.type === 'video').length,
     assets: items.filter((i) => i.type === 'asset').length,
     dropped: dropped.map((i) => `${i.type} ${i.id} ${i.title} (${reason(i)})`),
+    library: libraryReport,
     yearsById,
   };
   const count = (type, tax, value) => items
@@ -350,7 +530,6 @@ export async function main(argv = process.argv.slice(2)) {
   if (a.dryRun) return summary;
 
   const sheet = feedSheet(items);
-  const feedFile = path.join(a.out, FEED_PATH);
   mkdirSync(path.dirname(feedFile), { recursive: true });
   writeFileSync(feedFile, `${JSON.stringify(sheet, null, 2)}\n`);
   const record = sheet.data.map((r) => ({
@@ -359,7 +538,7 @@ export async function main(argv = process.argv.slice(2)) {
   const generated = new Date().toISOString().slice(0, 10);
   writeFileSync(path.join(HERE, 'items.json'), `${JSON.stringify({ generated, feed: `/${FEED_PATH}`, items: record }, null, 2)}\n`);
   console.log(`[media-items] wrote ${sheet.total} rows -> ${feedFile}`);
-  if (a.push) await pushFeed(feedFile);
+  if (a.push) summary.mediaBus = await publishFeed(JSDOM, sheet, feedFile);
   return summary;
 }
 

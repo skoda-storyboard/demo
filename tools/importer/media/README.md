@@ -23,6 +23,40 @@ The feed document (`en/media-feed`) is the referencing page; the item's listing 
 (`en/images`, `en/videos`, `en/assets`) owns the DAM folder unless a page already does.
 `--push` fails while any feed URL has no manifest row (`feedCoverageGaps`).
 
+**Media Bus thumbnails.** `--push` then puts the card thumbnails (`image`) on the Media Bus through
+carrier documents, `/en/fragments/media-feed-images[-N]` (150 images each, under html2md's
+200-image limit; `/en/fragments/**` is outside the query index). One `<img>` per thumbnail with
+`alt` = its source URL; after the preview the builder reads each carrier's `.plain.html` and
+rewrites `image` to `/en/fragments/media_<hash>.<ext>` (a `media_` path resolves from any folder,
+on `.aem.page` and `.aem.live`). The cards' `createOptimizedPicture` params then resize it.
+Don't edit or unpublish the carriers: the next push regenerates them.
+
+**AEM Assets files.** `--push` also points `original` (the "Original" download, the lightbox
+download and copy link) and `mp4` (the video download) at the published AEM Assets file: the
+`public_url` of the manifest row for that master, only when `steps.dam` and `steps.publish` are
+`done` and `public_verified.url` matches; otherwise it stays on the source URL and the push logs
+the count. A master published by a page import under its `/direct-download/<yyyy>/<mm>/<file>` URL
+is the same file as the feed's CDN URL (`cdnUrl`). The publish host sends
+`content-disposition: attachment`, so a download saves the file. The 1920 rendition and video
+posters stay on the source URLs (the DAM keeps originals only). The manifest gate runs on the
+source URLs first.
+
+**Library source.** `sources.json` `library: ["image"]` adds the whole source image library to
+the feed, kept to the items whose original is published on AEM Assets (2026-10-01: 1,715 of 33,457).
+The builder pages the listing's "load more" endpoint (`ys_ajax_loader`, `query_vars[offset]`) one
+calendar year at a time, because the source search backend serves only the first 10,000 results of
+a query; a year at that window fails the build. Library pages are cached as JSON
+(`library_<type>_<year>-01-01_<offset>_200.json`); detail panels load 4 at a time. Source items whose
+detail panel is empty on every request are recorded in `knownDetailGaps`. A rendition whose file
+name defeats the master match (`X.PNG-353x768.png`) is added to its master row's `seen_urls`.
+
+To move an already-published feed onto the Media Bus and AEM Assets without re-scraping the source:
+
+```bash
+curl -s https://admin.da.live/source/skoda-storyboard/demo/en/media-feed.json -o feed.json
+npm run media-items:build -- --feed feed.json --push --out <dir>
+```
+
 ## PDF/MP4 links (SKODA-503)
 
 PDFs and self-hosted MP4s are **not images**: they are recorded as `document`
@@ -110,8 +144,8 @@ npm run import:push -- --paths /path/to/approved-page-paths.txt --dry-run
 # rewrites verified binary links if media:apply has not already done so.
 ```
 
-The Assets builder requires a public URL mapping **before** uploading any
-selected binary. After DAM upload (and metadata), it sends one
+In the default upload-and-activate mode, the Assets builder requires a public URL
+mapping **before** uploading any selected binary. After DAM upload (and metadata), it sends one
 `POST /bin/replicate.json` on author with `cmd=Activate` and the selected
 binary's exact DAM path, using the DAM token. It waits briefly for anonymous
 `HEAD` access, exact PDF/MP4 MIME, original byte length and no redirect.
@@ -126,7 +160,15 @@ link must be a stable URL without a query string; query-bearing binaries block
 ingest rather than guessing whether dropping parameters changes the file.
 Analytics hash fragments may be stripped by the existing link transformer. The source
 may return `application/octet-stream` for MP4s, so verified MP4 signatures
-are uploaded with `video/mp4` MIME. PDF/MP4 originals download into a
+are uploaded with `video/mp4` MIME.
+The Slavia Monte Carlo `.mov_….mp4` source is a QuickTime original despite its
+final extension. An `ftyp` QuickTime brand and matching source MIME are required
+before upload; its original bytes retain `video/quicktime`, recorded as
+`mime_type` and checked by public verification and the binary gate. It is
+neither converted nor mislabeled as MP4. Completed rows reuse their recorded
+`dam_asset_path`, including AEM-escaped filenames, when resuming publication;
+the public-URL map must use that actual stored path.
+PDF/MP4 originals download into a
 system temporary directory outside the served checkout, then upload as bounded
 file streams through the DAM's multipart URLs; the temporary file is removed
 on success or failure.
@@ -164,7 +206,16 @@ activation; page-based runs are scoped by their explicit `--pages` list.
 `--dry-run` never activates an asset. The user authorized a scoped live
 resume of the already uploaded Elroq PDF; it completed without re-upload.
 Obtain explicit activation approval for each new batch before running the
-non-dry command, even for already uploaded originals.
+default non-dry command, even for already uploaded originals.
+
+When only DAM upload is approved, add `--upload-only` with `--dam-base` and the
+reviewed page/ID scope. This skips activation and public delivery, and does not
+require a public-URL map. Authenticated author HEAD verifies each PDF/MP4
+original's MIME and byte count. Uploaded binaries remain `partial` with
+`steps.dam: "done"` and `steps.publish: "pending"`; a successful upload-only
+command is not permission to rewrite or publish their page links. A later
+approved run without `--upload-only`, with the public-URL map, resumes activation
+and public verification without re-uploading.
 
 Implements the media half of **SKODA-501** (masters-only ingest), **SKODA-504**
 (mapping manifest, page-mirrored DAM foldering), **SKODA-505** (media-cart
@@ -185,9 +236,26 @@ which pastes a plain image that also lands in the media bus — same delivery pa
 **B) Media-cart "download original" — DAM asset path is the join key.** The cart
 needs the *original* (not the optimized media-bus copy). The manifest records
 each image's `dam_asset_path` (`/content/dam/storyboard/<page-path>/<file>`);
-`apply` emits `content/media-index.json` — the **cart resolver seam** — mapping
-`logical_id → { dam_asset_path, original_download_url, alt }`. The `media-cart`
-block (SKODA-505) reads this to resolve "download original".
+`apply` emits `content/media-index.json`, mapping
+`logical_id → { dam_asset_path, original_download_url, alt }`. That file only lists rows
+with an `original_download_url`, which only `--da-archive` sets, so it is empty for M1.
+
+**The media cart's served index (SKODA-505a).** `npm run media:cart-index`
+(`build-cart-index.mjs`) turns the manifest's *verified* published originals
+(`public_url` + `public_verified`) into `scripts/media-cart-index.json`. That file is
+committed and served by the code bus, and loaded on the first cart action.
+- It maps every page link the manifest saw (`seen_urls`: `cdn.skoda-storyboard.com/YYYY/MM/…`,
+  `/direct-download/…`) to its DAM original's path, size and type.
+- The format is compact: `{ v, base, mimes, assets[[path, bytes, mime]], keys }`.
+- Keys stay percent-encoded. `-WxH` / `-scaled` derivative keys are left out, because
+  `scripts/media-cart-resolver.js` strips them at lookup.
+- A key claimed by two different files is dropped. The same PDF filed twice maps to the
+  first copy.
+
+**Regenerate after DAM publishes or manifest changes:**
+`npm run media:cart-index`. `npm run media:cart-index -- --check` exits non-zero when the
+committed index is stale. It isn't part of `npm test`, so manifest PRs aren't blocked.
+Links that aren't in the index (unpublished rows) show as unavailable in the cart.
 
 > **Demo-only limitation (accepted for M1):** this route surfaces DAM paths for
 > *migrated* pages only. Production authors picking **new** assets via the native
@@ -229,11 +297,14 @@ publish issue.
 Original fetches must return non-empty image bytes, and the direct-upload response
 must provide enough parts to cover every byte before any part is sent. A missing
 original is never replaced by a derivative under the original's DAM path.
+Original image fetch URLs preserve filename case and double extensions: a
+`photo.JPG-768x512.jpg` rendition resolves to `photo.JPG.jpg`. Logical IDs and
+DAM filenames keep their existing normalized `photo.jpg` identity.
 
 Then **`apply-media-manifest.mjs`** rewrites content `<img src>` →
 `delivery_url`, removes the old WordPress `srcset` ladder so EDS builds its own,
 and rewrites verified PDF/MP4 anchors to their public Assets URLs,
-and emits `content/media-index.json` (the cart resolver). A missing page or
+and emits `content/media-index.json` (see mechanism B). A missing page or
 unresolved image fails the entire requested apply before changing any page;
 the sole exception is a manifest `partial` row explicitly marked
 `no safe delivery rendition`, whose original reference stays intact and is
@@ -477,13 +548,16 @@ Candidate models for surfacing the DAM original for **new** author-picked assets
 - Content-hash reconciliation index (heavier, standard-instance).
 - Author-recorded DAM path in a block field (manual).
 
-Only the resolver seam's *source* changes; the cart block does not.
+Only the resolver seam's *source* changes (`scripts/media-cart-resolver.js` and its
+index); the cart store and controls don't.
 
 ## Files
 
 - `media-lib.mjs` — pure helpers + AEMaaCS uploader + auth loader.
 - `build-media-manifest.mjs` — ingest + manifest builder.
-- `apply-media-manifest.mjs` — content rewrite + cart resolver index.
+- `apply-media-manifest.mjs` — content rewrite + `content/media-index.json`.
+- `build-cart-index.mjs` — the media cart's served index `scripts/media-cart-index.json`
+  (`npm run media:cart-index [-- --check]`; test: `build-cart-index.test.mjs`).
 - `media-lib.test.mjs` — unit + mock-DAM integration tests (`npm run test:media`).
 - `media-manifest.json` — generated manifest (git-tracked; inspectable).
 

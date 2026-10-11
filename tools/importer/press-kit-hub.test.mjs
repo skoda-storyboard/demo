@@ -51,12 +51,13 @@ function page(count, { banners = false, intro = false, missingImage = -1 } = {})
       </a></article>`;
     },
   ).join('')}</div>`).join('');
-  const widgets = `${intro ? '<div class="widget_sow-editor"><div class="textwidget"><p>Kit introduction</p></div></div>' : ''}
-  ${banners ? '<div class="widget_sow-editor"><div class="textwidget"><p><a href="http://go.skoda.eu/whatsapp"><img src="https://cdn.skoda-storyboard.com/wa.png"></a></p></div></div><div class="widget_sow-editor"><div class="textwidget"><p><a href="https://cdn.skoda-storyboard.com/kit.zip"><img src="https://cdn.skoda-storyboard.com/zip.png"></a></p></div></div>' : ''}`;
+  // An introduction is a text widget above the tiles; text below them is the contacts row.
+  const lead = intro ? '<div class="widget_sow-editor"><div class="textwidget"><p>Kit introduction</p></div></div>' : '';
+  const widgets = `${banners ? '<div class="widget_sow-editor"><div class="textwidget"><p><a href="http://go.skoda.eu/whatsapp"><img src="https://cdn.skoda-storyboard.com/wa.png"></a></p></div></div><div class="widget_sow-editor"><div class="textwidget"><p><a href="https://cdn.skoda-storyboard.com/kit.zip"><img src="https://cdn.skoda-storyboard.com/zip.png"></a></p></div></div>' : ''}`;
   const doc = new JSDOM(`<!doctype html><title>Press Kit</title><body class="single-press_kit">
     <article class="press_kit category-press-kits ${count === 24 ? 'motorsport-motorsport' : 'model-peaq bodywork-suv'}" data-publish-date="2026-09-21T08:00:00+02:00">
       <div class="hero"><div class="hero-image"><img src="https://cdn.skoda-storyboard.com/hero.jpg" alt="Press Kit"></div><div class="hero-caption"><h1>Press Kit</h1><p class="perex">Perex</p></div></div>
-      <div class="content">${items}${widgets}</div></article></body>`, { url: root });
+      <div class="content">${lead}${items}${widgets}</div></article></body>`, { url: root });
   return doc.window.document;
 }
 
@@ -233,4 +234,161 @@ test('Threads and Spotify banners are named by their image text', () => {
     'Škoda on Threads: the latest news and updates from the world of Škoda',
     'Listen to the #ExploreŠkoda Podcast on Spotify',
   ]);
+});
+
+// Older default-template kits (Octavia 2020, IAA 2019): a nested SiteOrigin builder holds 2-up
+// tiles beside the X timeline, which the runner's browser has rendered as an iframe; the press
+// contacts sit in a row below; og:description may be the timeline's fallback text.
+function defaultKit({ perex = true, description = 'Tweets by skodaautonews' } = {}) {
+  let index = 0;
+  const tile = (ratio) => {
+    index += 1;
+    return `<div class="so-panel widget_ys-so-widget-post-teaser"><article class="article-teaser">
+      <a href="${root}octavia-kit/chapter-${index}/"><div class="ratio-container image-stretch ratio-${ratio}">
+      <img src="https://cdn.skoda-storyboard.com/t${index}.jpg" alt=""></div>
+      <h2 class="heading">Chapter ${index}</h2></a></article></div>`;
+  };
+  const cells = (...items) => items.map((item) => `<div class="panel-grid-cell">${item}</div>`).join('');
+  const grid = (...items) => `<div class="panel-grid panel-no-style">${cells(...items)}</div>`;
+  const text = (html) => `<div class="so-panel widget_sow-editor"><div class="textwidget">${html}</div></div>`;
+  const builder = () => `<div class="so-panel widget_siteorigin-panels-builder"><div class="panel-layout">
+    ${grid(tile('1x1'), tile('1x1'))}${grid(tile('1x1'), tile('1x1'))}${grid(tile('1x1'), tile('1x1'))}
+    ${grid(text('<p><a href="https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA"><img src="https://cdn.skoda-storyboard.com/2019/11/13_download_OCTAVIA_EN.jpg" alt="13_download_OCTAVIA_EN"></a></p>'))}
+  </div></div>`;
+  const timeline = text('<p><iframe class="twitter-timeline twitter-timeline-rendered" src="https://syndication.twitter.com/srv/timeline-profile/screen-name/skodaautonews"></iframe><script>jQuery(window).bind("load", function () {});</script></p>');
+  const contact = (name) => text(`<p>${name}<br> Product Communications<br> <a href="mailto:${name.toLowerCase()}@skoda-auto.cz">${name.toLowerCase()}@skoda-auto.cz</a></p>`);
+  const layout = [
+    grid(tile('4x1')),
+    grid(tile('1x1'), tile('1x1'), tile('1x1'), tile('1x1')),
+    grid(tile('1x1'), tile('1x1'), tile('1x1')),
+    grid(builder(), timeline),
+    grid(contact('Hermann'), contact('Zbynek')),
+  ].join('');
+  return new JSDOM(`<!doctype html><head><meta property="og:description" content="${description}"></head>
+    <title>Octavia Kit</title><body class="press_kit-template-default single-press_kit">
+    <article class="press_kit category-press-kits model-octavia" data-publish-date="2020-04-01T08:00:00+02:00">
+      <div class="hero"><div class="hero-image"><img src="https://cdn.skoda-storyboard.com/h.jpg" alt="Kit"></div>
+      <div class="hero-caption"><h1>Octavia Kit</h1>${perex ? '<p class="perex">Kit perex</p>' : ''}</div></div>
+      <div class="content"><div class="panel-layout">${layout}</div></div></article></body>`, { url: root }).window.document;
+}
+
+const tableNamed = (element, name) => [...element.querySelectorAll('table')]
+  .find((t) => t.rows[0].textContent.trim() === name);
+const metaRows = (element) => Object.fromEntries([...tableNamed(element, 'Metadata').rows].slice(1)
+  .map((row) => [row.cells[0].textContent.trim(), row.cells[1].textContent.trim()]));
+
+test('default-template kits: nested builder tiles count once, short rows end early', () => {
+  const { element } = output(defaultKit(), `${root}skoda-octavia-press-kit/`);
+  const cards = tableNamed(element, 'Cards (overlay, tiles)');
+  const tokens = [...cards.rows].slice(1).map((row) => row.cells[0].textContent);
+  assert.equal(tokens.length, 14, 'each source tile once');
+  assert.deepEqual(tokens, [
+    'press-half end',
+    'press-quarter', 'press-quarter', 'press-quarter', 'press-quarter',
+    'press-quarter', 'press-quarter', 'press-quarter end',
+    'press-quarter', 'press-quarter', 'press-quarter', 'press-quarter',
+    'press-quarter', 'press-quarter end',
+  ]);
+  assert.deepEqual(
+    [...cards.rows].slice(1).map((row) => row.cells[2].textContent),
+    Array.from({ length: 14 }, (_, i) => `Chapter ${i + 1}`),
+  );
+  const starts = layoutTileRows(tokens, { pressPage: true }).tiles.filter((tile) => tile.rowStart);
+  assert.equal(starts.length, 5);
+});
+
+test('default-template kits: X timeline dropped, ZIP and contacts kept in source order', () => {
+  const { element } = output(defaultKit(), `${root}skoda-octavia-press-kit/`);
+  assert.equal(element.querySelectorAll('iframe, script, a[href*="twitter.com"]').length, 0);
+  assert.equal(element.textContent.includes('jQuery'), false);
+  const zip = element.querySelector('a[href="https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA.zip"] img');
+  assert.equal(zip.alt, 'Download the press kit ZIP');
+  const article = element.querySelector('article');
+  // blocks and section breaks only (the banner paragraph sits between the 2nd HR and its metadata)
+  const order = [...article.children].filter((node) => ['TABLE', 'HR'].includes(node.tagName))
+    .map((node) => (node.tagName === 'TABLE' ? node.rows[0].textContent.trim() : 'HR'));
+  assert.deepEqual(order, [
+    'Hero Image (overlay)', 'HR', 'Cards (overlay, tiles)', 'HR', 'Section Metadata', 'HR', 'Columns',
+  ]);
+  const columns = tableNamed(element, 'Columns');
+  assert.equal(columns.rows[1].cells.length, 2);
+  assert.match(columns.rows[1].cells[0].textContent, /Hermann/);
+  assert.equal(columns.rows[1].cells[1].querySelector('a').getAttribute('href'), 'mailto:zbynek@skoda-auto.cz');
+});
+
+test('the X timeline fallback text is never the description', () => {
+  const withPerex = metaRows(output(defaultKit(), `${root}skoda-octavia-press-kit/`).element);
+  assert.equal(withPerex.Description, 'Kit perex');
+  const without = metaRows(output(defaultKit({ perex: false }), `${root}skoda-octavia-press-kit/`).element);
+  assert.equal(without.Description, undefined);
+  const real = metaRows(output(defaultKit({ description: 'The OCTAVIA is the heart of the brand.' }), `${root}skoda-octavia-press-kit/`).element);
+  assert.equal(real.Description, 'The OCTAVIA is the heart of the brand.');
+});
+
+test('the X follow banner is named by its image text', () => {
+  const document = page(13);
+  document.querySelector('.content').insertAdjacentHTML('beforeend', '<div class="widget_sow-editor"><div class="textwidget"><p><a href="https://twitter.com/skodaautonews"><img src="https://cdn.skoda-storyboard.com/ikony_sb_landscape_X_EN_E_458fd3eb.png" alt="ikony_sb_landscape_X_EN_E_458fd3eb"></a></p></div></div>');
+  assert.equal(output(document).element.querySelector('a[href*="twitter.com"] img').alt, 'Follow @skodaautonews on the X platform');
+});
+
+// SKODA-832: the banner ZIP download links, made stable inside the hub importer only.
+function bannerLink(href, { img = 'https://cdn.skoda-storyboard.com/2019/11/Download_EN.jpg', alt = '' } = {}) {
+  const document = page(13);
+  document.querySelector('.content').insertAdjacentHTML('beforeend', `<div class="widget_sow-editor"><div class="textwidget"><p><a href="${href}"><img src="${img}" alt="${alt}"></a></p></div></div>`);
+  return output(document).element.querySelector(`img[src="${img}"]`).closest('a');
+}
+
+test('a /direct-download/ banner ZIP points at the same object on the cdn', () => {
+  const iaa = 'https://cdn.skoda-storyboard.com/2019/11/IAA_FRANKFURT_2019.zip';
+  [
+    'https://www.skoda-storyboard.com/direct-download/2019/11/IAA_FRANKFURT_2019.zip',
+    'https://skoda-storyboard.com/direct-download/2019/11/IAA_FRANKFURT_2019.zip',
+    '/direct-download/2019/11/IAA_FRANKFURT_2019.zip',
+    // the rotating analytics fragment is stripped afterwards by skoda-links
+    'https://www.skoda-storyboard.com/direct-download/2019/11/IAA_FRANKFURT_2019.zip#s_aid=abc123',
+  ].forEach((href) => {
+    const link = bannerLink(href);
+    assert.equal(link.getAttribute('href'), iaa, href);
+    assert.equal(link.querySelector('img').alt, 'Download the press kit ZIP');
+  });
+  assert.equal(
+    bannerLink('https://www.skoda-storyboard.com/direct-download/2023/06/koda_Kodiaq_Covered_drive_868a3959.zip').getAttribute('href'),
+    'https://cdn.skoda-storyboard.com/2023/06/koda_Kodiaq_Covered_drive_868a3959.zip',
+  );
+});
+
+test('banner links that are not a plain /direct-download/ ZIP keep their href', () => {
+  [
+    // not a ZIP
+    ['https://www.skoda-storyboard.com/direct-download/2019/11/kit.pdf', { img: 'https://cdn.skoda-storyboard.com/pdf.png', alt: 'Download the PDF' }],
+    // a query string is not a plain object path
+    ['https://www.skoda-storyboard.com/direct-download/2019/11/kit.zip?v=2'],
+    // another host's /direct-download/
+    ['https://example.com/direct-download/2019/11/kit.zip'],
+    // already on the cdn
+    ['https://cdn.skoda-storyboard.com/2025/06/Skoda_Elroq_89d07123.zip'],
+  ].forEach(([href, options]) => {
+    assert.equal(bannerLink(href, options).getAttribute('href'), href);
+  });
+});
+
+test('the extensionless 2020 Octavia ZIP is corrected by the explicit map only', () => {
+  const img = 'https://cdn.skoda-storyboard.com/2019/11/13_download_OCTAVIA_EN.jpg';
+  const fixed = 'https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA.zip';
+  const octavia = bannerLink('https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA', { img });
+  assert.equal(octavia.getAttribute('href'), fixed);
+  assert.equal(octavia.querySelector('img').alt, 'Download the press kit ZIP');
+  assert.equal(bannerLink('https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA#s_aid=abc123', { img }).getAttribute('href'), fixed);
+  // no blind ".zip" append: another extensionless cdn link is untouched
+  const other = 'https://cdn.skoda-storyboard.com/2020/04/SKODA-KAROQ';
+  assert.equal(bannerLink(other, { img: 'https://cdn.skoda-storyboard.com/k.jpg', alt: 'Karoq' }).getAttribute('href'), other);
+});
+
+test('the ZIP corrections apply to banners only, not to text links', () => {
+  const document = page(13, { intro: true });
+  document.querySelector('.content .textwidget').insertAdjacentHTML('beforeend', '<p><a href="https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA">kit</a> <a href="https://www.skoda-storyboard.com/direct-download/2019/11/IAA_FRANKFURT_2019.zip">zip</a></p>');
+  const hrefs = [...output(document).element.querySelectorAll('a')].map((a) => a.getAttribute('href'));
+  assert.ok(hrefs.includes('https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA'));
+  assert.ok(hrefs.includes('https://www.skoda-storyboard.com/direct-download/2019/11/IAA_FRANKFURT_2019.zip'));
+  assert.equal(hrefs.some((href) => href.endsWith('SKODA-OCTAVIA.zip') || href.startsWith('https://cdn.skoda-storyboard.com/2019/')), false);
 });

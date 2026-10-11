@@ -12,8 +12,13 @@ tools/importer/*.test.mjs
 tools/importer/**/*.test.mjs
 blocks/promo-box/test/
 blocks/promo-box/promo-box.test.mjs
+blocks/**/*.test.mjs
 poc/**/test.mjs
 sync-block-collection.sh
 drafts/
 content/en/press-releases/novel-arrangement-test.plain.html
 docs/analysis/SKODA-M1-URL-BLOCK-REGISTRY.json
+templates/**/*.test.mjs
+docs/ui-specs/tools/
+blocks/*/metadata.json
+tools/library/

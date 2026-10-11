@@ -13,9 +13,17 @@
  *   full     the URL shown in the stage (default: `src` as a 2000px media-bus rendition)
  *   download the download link (default: `src` as JPEG)
  *   link     the URL "copy link" copies (default: `src`)
- *   cartId   the media-cart key on the add button (SKODA-505 binds it)
+ *   cartId   the source cart key on the add button (`data-id`)
+ *   cartHref the original the add button puts in the media cart (SKODA-505a); without it
+ *            the add button is disabled (e.g. gallery images: no DAM original)
+ *   thumb    the cart page's card image for that add (SKODA-505b; default: `src`)
  *   actions  false: no action buttons (the source's content images), spacing kept
  *   video    an embed URL (Vimeo player): the stage plays it instead of the image
+ *
+ * Options: { story, title } = the story gallery chrome (`Gallery (story)`, SKODA-216): a
+ * title bar (the dialog's name), an "N/total" counter, no action buttons, tag chips or
+ * phone details toggle (the caption shows in the bottom band), and authored caption
+ * links inside the focus trap. Without options nothing changes.
  *
  * i18n: all control text lives in LABELS (the single translation point, SKODA-1003).
  */
@@ -33,6 +41,8 @@ const LABELS = {
   video: 'Video player',
   // the visible counter reads "N / total" (the total in grey); the aria-live label is the long form
   counterLabel: (n, total) => `Image ${n} of ${total}`,
+  // story galleries (SKODA-216): "1/5", no spaces, one colour (the live .sb-gallery counter)
+  storyCounter: (n, total) => `${n}/${total}`,
   // detail-panel action buttons (Media-Room style)
   addToBox: 'Add to media box',
   download: 'Download image',
@@ -74,9 +84,10 @@ export function decorateTags(caption) {
  * Build one reusable accessible lightbox overlay for an image set.
  * @param {Element} host where the overlay is appended (a block, or document.body)
  * @param {Array} items see the file header
+ * @param {{story?: boolean, title?: string}} [options] see the file header
  * @returns {{open: Function, overlay: Element}}
  */
-export function buildLightbox(host, items) {
+export function buildLightbox(host, items, { story = false, title = '' } = {}) {
   loadCSS(`${window.hlx?.codeBasePath || ''}/styles/lightbox.css`);
   const overlay = document.createElement('div');
   overlay.className = 'gallery-overlay';
@@ -95,6 +106,13 @@ export function buildLightbox(host, items) {
   closeBtn.className = 'gallery-lightbox-close';
   closeBtn.setAttribute('aria-label', LABELS.close);
 
+  // story: the gallery title (the story title, source data-title) left of the close
+  const heading = story && title ? document.createElement('h2') : null;
+  if (heading) {
+    heading.className = 'gallery-lightbox-title';
+    heading.textContent = title;
+    topbar.append(heading);
+  }
   topbar.append(closeBtn);
 
   // phones show the image alone; this toggle (top-left, mirroring the close) opens the
@@ -130,6 +148,11 @@ export function buildLightbox(host, items) {
   const stageCaption = document.createElement('figcaption');
   stageCaption.className = 'gallery-lightbox-caption';
   stageCaption.id = `gallery-lightbox-caption-${overlayCount}`;
+  if (heading) {
+    heading.id = `gallery-lightbox-title-${overlayCount}`;
+    overlay.removeAttribute('aria-label');
+    overlay.setAttribute('aria-labelledby', heading.id);
+  }
   detailsBtn.setAttribute('aria-controls', stageCaption.id);
   figure.append(imageFrame, stageCaption);
   stage.append(figure);
@@ -154,6 +177,29 @@ export function buildLightbox(host, items) {
   linkBtn.setAttribute('aria-label', LABELS.copyLink);
   linkBtn.classList.add('link');
   actions.append(addBtn, downloadBtn, linkBtn);
+  // one add button per overlay, re-pointed at each item's original (SKODA-505a). The media
+  // cart loads on the first item that shows one; a stale (slower) bind never wins.
+  let cartSeq = 0;
+  const bindCart = (item) => {
+    cartSeq += 1;
+    const seq = cartSeq;
+    // `actions: false` hides the buttons: nothing to add, and no cart to load
+    const href = item.actions === false ? '' : item.cartHref || '';
+    if (!href && !addBtn.hasAttribute('data-cart-control')) {
+      addBtn.setAttribute('aria-disabled', 'true');
+      return;
+    }
+    if (href && !addBtn.hasAttribute('data-cart-control')) addBtn.setAttribute('aria-disabled', 'true');
+    import('./media-cart.js').then(({ bindCartControl }) => {
+      if (seq === cartSeq) {
+        bindCartControl(addBtn, { href, title: item.alt || '', thumb: item.thumb || item.src || '' });
+      }
+    }).catch((e) => {
+      // the add stays disabled (set above)
+      // eslint-disable-next-line no-console
+      console.warn('lightbox: the media cart did not load', e);
+    });
+  };
 
   const prevBtn = document.createElement('button');
   prevBtn.type = 'button';
@@ -204,6 +250,10 @@ export function buildLightbox(host, items) {
   };
 
   const render = (index) => {
+    // the caption is rebuilt below: if focus is on one of its links or actions, it would
+    // fall to <body>, outside the dialog (SKODA-216 review), so remember it and the direction
+    const captionHadFocus = stageCaption.contains(document.activeElement);
+    const forward = index >= current;
     current = (index + items.length) % items.length;
     const item = items[current];
     // request a large lightbox rendition from the authored source
@@ -243,13 +293,19 @@ export function buildLightbox(host, items) {
     // the action buttons after the description, above the file metadata block
     // (matches the live layout)
     stageCaption.textContent = '';
-    if (item.caption) {
+    if (item.caption && story) {
+      // story: the authored caption only (no actions or tag chips), always shown
+      [...item.caption.childNodes].forEach((n) => stageCaption.append(n.cloneNode(true)));
+      stageCaption.hidden = false;
+      detailsBtn.hidden = true;
+    } else if (item.caption) {
       [...item.caption.childNodes].forEach((n) => stageCaption.append(n.cloneNode(true)));
       downloadBtn.href = item.download || `${base}?format=jpg`;
       // `actions: false` (content images): the source panel keeps an empty actions row
       actions.classList.toggle('is-empty', item.actions === false);
       if (item.cartId) addBtn.dataset.id = item.cartId;
       else delete addBtn.dataset.id;
+      bindCart(item);
       // insert before the first "File type…"/metadata paragraph if present,
       // otherwise fall back to the end of the panel
       const paras = [...stageCaption.querySelectorAll('p')];
@@ -265,6 +321,17 @@ export function buildLightbox(host, items) {
       detailsBtn.hidden = true;
       setDetails(false);
     }
+    // focus stays in the dialog: on the arrow the reader is moving with (close when the
+    // single-image view has no arrows)
+    if (captionHadFocus && !overlay.contains(document.activeElement)) {
+      if (controls.hidden) closeBtn.focus();
+      else (forward ? nextBtn : prevBtn).focus();
+    }
+    if (story) {
+      counter.textContent = LABELS.storyCounter(current + 1, items.length);
+      counter.setAttribute('aria-label', LABELS.counterLabel(current + 1, items.length));
+      return;
+    }
     // "1 / 20": the total (with its separator) in grey, as the source counter
     const sep = document.createElement('span');
     sep.className = 'gallery-lightbox-sep';
@@ -276,8 +343,11 @@ export function buildLightbox(host, items) {
     counter.setAttribute('aria-label', LABELS.counterLabel(current + 1, items.length));
   };
 
-  const focusable = () => [...overlay.querySelectorAll('button:not([hidden])')]
-    .filter((el) => el.offsetParent !== null);
+  // story: authored caption links are part of the trap too (SKODA-216), and its arrows
+  // are position:fixed (no offsetParent), so visibility is read from the boxes
+  const focusSelector = story ? 'a[href], button:not([hidden])' : 'button:not([hidden])';
+  const shown = story ? (el) => el.getClientRects().length > 0 : (el) => el.offsetParent !== null;
+  const focusable = () => [...overlay.querySelectorAll(focusSelector)].filter(shown);
 
   const onKeydown = (e) => {
     if (e.key === 'Escape' && overlay.classList.contains('is-details-open')) {

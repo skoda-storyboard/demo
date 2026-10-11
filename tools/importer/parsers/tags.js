@@ -23,8 +23,11 @@
  * is the visible on-page chip row; the two are complementary, not duplicative.
  */
 export default function parse(element, { document }) {
+  // The "+N" show-more toggle (`a.show-hidden-terms href="#"`) is a UI control, not a tag;
+  // the tags it reveals (`a.label.hidden-term`) are already in the list and are kept (SKODA-833).
   const anchors = Array.from(element.querySelectorAll('a.label[href], li a[href], a[href]'))
-    .filter((el, i, arr) => arr.indexOf(el) === i);
+    .filter((el, i, arr) => arr.indexOf(el) === i)
+    .filter((a) => !a.matches('.show-hidden-terms') && a.getAttribute('href') !== '#');
 
   // Defensive: no tag links — unwrap and bail.
   if (anchors.length === 0) {

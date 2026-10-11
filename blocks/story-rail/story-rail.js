@@ -31,6 +31,7 @@ import { loadQueryIndex, defaultIndexUrl, cleanTitle } from '../../scripts/query
 import { formatCardDate } from '../../scripts/card-teaser.js';
 import { buildLightbox } from '../../scripts/lightbox.js';
 import { feedLightboxItem } from '../../scripts/media-lightbox.js';
+import { decorateLinks } from '../../scripts/links.js';
 import {
   scopeRows, filterRows, sortRows, paginate, INDEX_FACETS,
 } from '../listing/listing-logic.mjs';
@@ -38,15 +39,40 @@ import {
 // Split a comma-separated config value into trimmed tokens.
 const tokens = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Boolean);
 
+/**
+ * The rail's "All" target as an absolute http(s) URL, or '' (no pill, no end card). Authored
+ * cells may hold anything: several links (readBlockConfig then returns an array), plain text,
+ * `#`, `javascript:` or a URL the parser rejects (`https://`). Only a real link that leaves
+ * the current page counts (SKODA-611b review).
+ * @param {string|string[]} value readBlockConfig's value for the cell
+ * @param {string} [base] the page URL
+ */
+export function safeViewAll(value, base = window.location.href) {
+  const raw = String((Array.isArray(value) ? value[0] : value) || '').trim();
+  if (!/^(?:https?:\/\/|\/(?!\/))/i.test(raw) || raw.includes('\\')) return '';
+  try {
+    const url = new URL(raw, base);
+    const here = new URL(base);
+    if (!/^https?:$/.test(url.protocol) || !url.hostname) return '';
+    const path = (u) => u.pathname.replace(/\/+$/, '') || '/';
+    const samePage = url.origin === here.origin && path(url) === path(here)
+      && url.search === here.search;
+    return samePage ? '' : url.href;
+  } catch (e) {
+    return '';
+  }
+}
+
 export function parseConfig(block) {
   const cfg = readBlockConfig(block);
+  const template = String(cfg.template || 'story').trim().toLowerCase() || 'story';
   return {
     index: cfg.index || defaultIndexUrl(),
     path: cfg.path || '',
     // default to the story template so a category-only rail stays scoped to
     // stories (not press releases / other indexed content); an author widens
     // scope by setting `template` explicitly (SKODA-212 review P1).
-    template: cfg.template || 'story',
+    template,
     category: tokens(cfg.category),
     tag: tokens(cfg.tag || cfg.tags),
     // index facet columns (model, years, …) as config keys (SKODA-820): each key is
@@ -58,10 +84,10 @@ export function parseConfig(block) {
       .filter(([, vals]) => vals.length)),
     heading: cfg.heading || '',
     // header "view all" link (source a.link-all)
-    viewAll: cfg.viewall || cfg.viewAll || cfg.all || '',
+    viewAll: safeViewAll(cfg.viewall || cfg.viewAll || cfg.all),
     // 'oldest'/'publishdate' → ascending; else newest-first
     sort: (cfg.sort === 'oldest' || cfg.sort === 'publishdate') ? 'oldest' : 'newest',
-    layout: cfg.template === 'press_release' ? 'news' : 'standard',
+    layout: template === 'press_release' ? 'news' : 'standard',
     limit: Math.max(1, Number(cfg.limit) || 10),
     // comma list of path-slug fragments to exclude (already shown above)
     exclude: tokens(cfg.exclude),
@@ -134,9 +160,10 @@ export function curatedRows(block) {
 /*
  * The media card's action row (media feed rows, contract media-item): "add to media cart"
  * and "download", as the shared card-teaser toolbar cell (`<p><a>` per button). The cart
- * button carries the cart key (`data-id`) and stays inert until the media cart (SKODA-505)
- * binds it; download links the original (image) or the MP4 (video). Icon-only buttons, so
- * each gets its label from the source titles. Returns null for non-media rows.
+ * button carries the source key (`data-id`), the link to the original it adds (`data-href`:
+ * the image original / the MP4) and the card title; it is inert until the built rail binds
+ * it to the media cart (SKODA-505a). Download links the same original. Icon-only buttons,
+ * so each gets its label from the source titles. Returns null for non-media rows.
  */
 export function mediaToolbar(row) {
   if (row.template !== 'image' && row.template !== 'video') return null;
@@ -152,14 +179,20 @@ export function mediaToolbar(row) {
     return { p, a };
   };
   const elems = [];
+  const file = row.template === 'image' ? row.original : row.mp4;
   if (row.id) {
     const { p, a } = button('add', 'Add to media cart', '#');
     a.dataset.id = row.id;
+    if (file) a.dataset.href = file;
+    const title = cleanTitle(row.title || '');
+    if (title) a.dataset.title = title;
+    // the card image, shown on the cart page (SKODA-505b)
+    const thumb = row.image || row.poster;
+    if (thumb) a.dataset.thumb = thumb;
     a.setAttribute('role', 'button');
     a.setAttribute('aria-disabled', 'true');
     elems.push(p);
   }
-  const file = row.template === 'image' ? row.original : row.mp4;
   if (file) {
     const { p, a } = button('download', row.template === 'image' ? 'Download original' : 'Download video', file);
     a.setAttribute('download', '');
@@ -168,6 +201,10 @@ export function mediaToolbar(row) {
   }
   return elems.length ? { elems } : null;
 }
+
+// Taxonomy rows (models, series) show no date: the carousel then renders the source's
+// caption card, the title under the image (carousel-rails.md §2, SKODA-611b).
+export const TAXONOMY_TEMPLATES = new Set(['skoda_model', 'skoda_series']);
 
 /*
  * Synthesize one carousel row (image cell + body cell) from an index row. The
@@ -183,7 +220,8 @@ export function rowToCells(row) {
   // body cell: date paragraph (→ overlay) + title heading (link), as flat elems
   const elems = [];
   const title = cleanTitle(row.title);
-  const iso = row.date || row.publisheddate || row.publishDate;
+  const iso = TAXONOMY_TEMPLATES.has(row.template) ? ''
+    : (row.date || row.publisheddate || row.publishDate);
   const dateText = formatCardDate(iso);
   if (dateText) {
     const p = document.createElement('p');
@@ -194,6 +232,8 @@ export function rowToCells(row) {
   const link = document.createElement('a');
   link.href = row.path || '#';
   link.textContent = title;
+  // a caption card shows its title on one line (ellipsis): keep the whole title on hover
+  if (TAXONOMY_TEMPLATES.has(row.template)) link.title = title;
   h.append(link);
   elems.push(h);
   const body = { elems };
@@ -204,14 +244,20 @@ export function rowToCells(row) {
   // body, giving an overlay card two bodies + doubled 16/9 fallback height.
   // With only a body cell, decorateCardCells flags .card-teaser-no-image and the
   // single body gets the correct intrinsic height (matches buildCardTeaser).
-  const cells = row.image
-    ? [
-      createOptimizedPicture(row.image, title, false, [
+  // A row image the URL parser rejects (e.g. "https://") drops the image, not the rail: the
+  // card falls back to its image-less form (SKODA-611b review; the #231 failure class).
+  let picture = null;
+  if (row.image) {
+    try {
+      picture = createOptimizedPicture(row.image, title, false, [
         { media: '(min-width: 768px)', width: '750' }, { width: '500' },
-      ]),
-      body,
-    ]
-    : [body];
+      ]);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('story-rail: card image skipped, invalid url', row.image, e);
+    }
+  }
+  const cells = picture ? [picture, body] : [body];
   if (toolbar) cells.push(toolbar);
   return cells;
 }
@@ -271,6 +317,18 @@ export function isRailOnlySection(section, block) {
   return lead.every((el) => /^(H[1-6]|P)$/.test(el.tagName)) && paragraphs.length <= 1;
 }
 
+/* Focus that sat in a removed rail (e.g. its "All" pill, tabbable before the rail builds) moves
+   to the next visible, enabled focusable element after it instead of dropping to <body>. */
+export function keepFocusPast(removed) {
+  if (!removed?.contains?.(document.activeElement) || !document.querySelectorAll) return;
+  const focusable = 'a[href], button:not([disabled]), input:not([type="hidden"]):not([disabled]), '
+    + 'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  const next = [...document.querySelectorAll(focusable)].find((el) => !removed.contains(el)
+    && removed.compareDocumentPosition(el) === Node.DOCUMENT_POSITION_FOLLOWING
+    && el.getClientRects().length > 0 && !el.closest('[hidden], [inert]'));
+  next?.focus();
+}
+
 /*
  * Terminal empty/error state: remove the rail so no blank reserved slot or dead
  * "View all" lingers (SKODA-212 review P2, SKODA-608).
@@ -285,11 +343,13 @@ export function collapseRail(block, mount, header) {
   const relatedSection = block.closest('body.story .section.dark.story-rail-container');
   const section = relatedSection || block.closest('.section');
   if (section && (relatedSection || isRailOnlySection(section, block))) {
+    keepFocusPast(section);
     section.dispatchEvent?.(new CustomEvent('story-rail:empty', { bubbles: true }));
     section.remove();
     return;
   }
   block.dispatchEvent?.(new CustomEvent('story-rail:empty', { bubbles: true }));
+  keepFocusPast(block);
   mount.remove();
   header.remove();
 }
@@ -326,23 +386,55 @@ export function pressBandIsFull(shown, more = false) {
 }
 
 /**
- * Appends the "All" end card after the last press card (source .item-all).
+ * Appends the "All" end card after the last card (source .item-all): the press band's, and
+ * a full post rail's on the Storyboard home (SKODA-611b).
  * @param {Element} carousel the built carousel block
- * @param {HTMLAnchorElement} link the band's "All" link
+ * @param {string} href the rail's "All" target
+ * @param {string} label the visible text ("All")
+ * @param {string} [name] the accessible name, when the label alone is ambiguous
  */
-function appendPressAllCard(carousel, link) {
+function appendAllCard(carousel, href, label, name = '') {
   const track = carousel.querySelector('.carousel-track');
   if (!track) return;
   const cell = document.createElement('li');
   cell.className = 'story-rail-all';
   const a = document.createElement('a');
   a.className = 'story-rail-all-link';
-  a.href = link.getAttribute('href');
-  a.textContent = link.textContent.trim();
+  a.href = href;
+  a.textContent = label;
+  if (name) a.setAttribute('aria-label', name);
   cell.append(a);
   track.append(cell);
   // the carousel recomputes its arrows on scroll: count the new end cell right away
   track.dispatchEvent(new Event('scroll'));
+}
+
+/**
+ * The landing-page rail layout, as a pure decision (exported for tests). The wide layout is
+ * the source's full 1248px rail with 90 / 45 / 30% cells: landing-page news rails have it
+ * (SKODA-827), and so does every index rail in a home `cover-box` band (SKODA-611b: the
+ * Storyboard home's bands and the Media Room's Models band), where the Models rail keeps
+ * the source's model ladder and models + series show caption cards. A full post rail in a
+ * home band ends with the source's "All" card; models and series, which show every item,
+ * have none. An explicit `Story Rail (press)` band keeps its own layout (SKODA-224).
+ * @returns {{ classes: string[], endCard: boolean }}
+ */
+export function railLayout({
+  press, curated, landing, homeBand, layout, template, viewAll,
+}) {
+  const classes = [];
+  const indexRail = !press && !curated;
+  if (indexRail && landing && (layout === 'news' || homeBand)) {
+    classes.push('story-rail-wide');
+    // the home band's own chrome (pill, end card, caption cards) keys on this, not on the section
+    if (homeBand) classes.push('story-rail-home');
+    if (template === 'skoda_model') classes.push('story-rail-models');
+    if (TAXONOMY_TEMPLATES.has(template)) classes.push('story-rail-caption');
+  }
+  // the end card is sized by the wide layout, so only a wide home-band rail has one
+  const endCard = classes.includes('story-rail-wide') && homeBand && !!viewAll
+    && !TAXONOMY_TEMPLATES.has(template);
+  return { classes, endCard };
 }
 
 export default async function decorate(block) {
@@ -351,11 +443,16 @@ export default async function decorate(block) {
   const press = block.classList.contains('press');
   const allLabel = viewAllLabel(block);
   const variants = [...block.classList].filter((c) => !OWN_CLASSES.has(c));
-  // the home news layout (SKODA-827); an explicit `Story Rail (press)` band keeps its own
-  // related-band layout (SKODA-224), the two set different widths and insets
-  if (!press && !curated && cfg.layout === 'news' && document.body.classList.contains('page')) {
-    block.classList.add('story-rail-news');
-  }
+  const { classes, endCard } = railLayout({
+    press,
+    curated,
+    landing: document.body.classList.contains('page'),
+    homeBand: !!block.closest('.section.cover-box'),
+    layout: cfg.layout,
+    template: cfg.template,
+    viewAll: cfg.viewAll,
+  });
+  block.classList.add(...classes);
 
   // --- header (heading + optional "view all") --------------------------------
   const heading = cfg.heading || getMetadata('story-rail-heading') || '';
@@ -372,6 +469,8 @@ export default async function decorate(block) {
     a.className = 'story-rail-viewall';
     a.href = cfg.viewAll;
     a.textContent = allLabel;
+    // "All" alone repeats on every rail: name it after its rail, as the end card is
+    if (heading) a.setAttribute('aria-label', `${allLabel}: ${heading}`);
     header.append(a);
   }
 
@@ -394,7 +493,7 @@ export default async function decorate(block) {
       try {
         const all = await loadQueryIndex(cfg.index);
         // one extra row tells a full press band apart from one that just fits
-        const matches = selectRows(all, press ? { ...cfg, limit: cfg.limit + 1 } : cfg);
+        const matches = selectRows(all, press || endCard ? { ...cfg, limit: cfg.limit + 1 } : cfg);
         more = matches.length > cfg.limit;
         indexRows = matches.slice(0, cfg.limit);
         rows = indexRows.map((r) => rowToCells(r));
@@ -415,28 +514,69 @@ export default async function decorate(block) {
     if (heading) carousel.setAttribute('aria-label', heading);
     carousel.hidden = true;
     mount.append(carousel);
-    // the media cart (SKODA-505) isn't bound yet: its "#" button must not jump to the top
+    // a "#" cart button must not jump to the top, also before (or without) the media cart
     carousel.addEventListener('click', (e) => {
       if (e.target.closest('.media-cart-action[aria-disabled="true"]')) e.preventDefault();
     });
+    // Space on a cart link (role button) must not scroll the page: before the cart binds it,
+    // it does nothing; once bound, the cart's own handler has already taken the key
+    carousel.addEventListener('keydown', (e) => {
+      if (e.key !== ' ' || e.defaultPrevented) return;
+      const action = e.target.closest('a.media-cart-action[role="button"]');
+      if (!action) return;
+      e.preventDefault();
+      action.click();
+    });
+    // the add buttons become media-cart toggles (SKODA-505a); the cart loads only here
+    const cartControls = carousel.querySelectorAll('.media-cart-action.add');
+    if (cartControls.length) {
+      import('../../scripts/media-cart.js').then(({ bindCartControl }) => {
+        cartControls.forEach((a) => bindCartControl(a));
+      }).catch((e) => {
+        // the add buttons stay disabled (as rendered)
+        // eslint-disable-next-line no-console
+        console.warn('story-rail: the media cart did not load', e);
+      });
+    }
     decorateBlock(carousel);
     await loadBlock(carousel);
+    // loadBlock logs and swallows the carousel's own failures: no track means no rail
+    if (!carousel.querySelector('.carousel-track')) {
+      collapseRail(block, mount, header);
+      return;
+    }
     const allLink = press && pressBandIsFull(rows.length, more) ? pressAllLink(block) : null;
-    if (allLink) appendPressAllCard(carousel, allLink);
+    if (allLink) appendAllCard(carousel, allLink.getAttribute('href'), allLink.textContent.trim());
+    if (endCard && more) {
+      appendAllCard(carousel, cfg.viewAll, allLabel, heading ? `${allLabel}: ${heading}` : '');
+      // built after the page's link pass: apply the demo link policy (scripts/links.js) here too
+      decorateLinks(carousel.querySelector('.story-rail-all'));
+    }
     mount.classList.add('is-built');
     carousel.hidden = false;
     if (['image', 'video'].includes(cfg.template) && indexRows.length) wireMediaLightbox(carousel, indexRows);
+  }
+
+  async function buildRailSafely() {
+    try {
+      await buildRail();
+    } catch (e) {
+      // anything outside the index try (building, decorating, the end card): no stuck rail
+      // eslint-disable-next-line no-console
+      console.error('story-rail: rail build failed', e);
+      collapseRail(block, mount, header);
+    }
   }
 
   if (window.IntersectionObserver) {
     const io = new IntersectionObserver((entries, obs) => {
       if (entries.some((en) => en.isIntersecting)) {
         obs.disconnect();
-        buildRail();
+        buildRailSafely();
       }
     }, { rootMargin: '600px 0px' });
     io.observe(block);
   } else {
-    buildRail();
+    buildRailSafely();
   }
 }

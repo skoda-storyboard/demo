@@ -24,6 +24,9 @@
   `excludefeatured: false`. Scope comes from the canonical URL. Tag archives use `tag: <slug>` (index `tags`).
   Category and sub-category archives use `path: /en/<cat>[/<sub>]/`, because story URLs carry the sub-category and
   the index `category` column is top-level only.
+  - **Superseded (SKODA-831, 2026-10-05):** story URLs do not carry the sub-category (`/en/skoda-world/<slug>`), so
+    the 7 sub-category archives stayed empty. Category archives now use `categories: <term slug>`; the index
+    `categories` column holds each story's WP categories plus their ancestors (`SKODA-METADATA-SCHEMA.md`).
   - The old path-scoped `Listing` matched no row, so every archive was empty.
   - The source pager ("4 / 19", Load more) is removed.
   - The source archives list stories only (post type `post`).
@@ -93,7 +96,8 @@ Confirmed live. This ticket delivers:
 ## Acceptance Criteria
 Measurable gates live in [`template-category-archive.md` §10](../../ui-specs/template-category-archive.md); summary:
 - [ ] STO shell; single `h1` = term name (category term; tag = parent + term).
-- *(Hero banner criterion moved to SKODA-828 F3, 2026-09-28. The source measured 160px at 375, not 184px.)*
+- *(Hero banner criterion moved to SKODA-828 F3, 2026-09-28. Resolved 2026-10-05: both figures were right. The
+  band is 184px at 375 (224 at 576–767, 240 from 768); 160px is its image row, with the 24px label row under it.)*
 - [ ] Card grid flex-wrap **3-up 1280 / 2-up 768 / 1-up 500**; cards `16:9`; **no facet panel**.
 - [ ] Pagination via accessible "Load more" (or confirmed source mechanism); new results announced, focus managed.
 - [ ] Content cap `1248`, gutter `~16px`.

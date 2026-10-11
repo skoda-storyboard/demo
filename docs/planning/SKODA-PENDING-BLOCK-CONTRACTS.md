@@ -53,20 +53,23 @@ These blocks have code on `main`, with the variants and config keys that code re
 |---|---|---|
 | `cards` | `media`, `overlay`, `toolbar`, `tiles`, `series-directory`, `social` (SKODA-217: one row per profile, one cell with a link whose text is the handle; its section carries `Style: cover-box, dark`, the SKODA-218 home band) | – |
 | `carousel` | `dots` | – |
-| `accordion` | – | – (SKODA-805c; see `accordion` below) |
+| `accordion` | `faq` (SKODA-807: FAQPage JSON-LD on a kit's FAQ chapter) | – (SKODA-805c; see `accordion` below) |
 | `columns` | `banners` (SKODA-805c: a row of linked banner images at their authored 240px, the press-kit PDF/share buttons; see `columns-banners` below), `callout` (SKODA-805c: `[icon, text]`, the 50px icon in a 60px cell beside its text; the press-kit WhatsApp callout) | – |
-| `downloads` | `media-box` (SKODA-510) | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes`, `collapse` (SKODA-502/510) |
+| `downloads` | `media-box` (SKODA-510), `gallery` (SKODA-806: a press-kit Images-chapter group, emitted by `parsers/press-kit-media.js` with `collapse | auto`; an Images chapter past 200 images moves its largest groups to `Fragment` blocks, `/fragments<page>/<slug>`) | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes`, `collapse` (SKODA-502/510) |
 | `embed` | – | `url`, `ratio`, `title`, `poster` (`or-curated`: a bare Vimeo / YouTube / Buzzsprout / Spotify URL on its own line still autoblocks). A self-hosted `.mp4`/`.webm`/`.mov`/`.m4v` `url` renders a native `<video>` with the `poster` image (SKODA-801a, WordPress `[video]`) |
 | `gallery` | – | – |
 | `hero-image` | `story` (default), `overlay`, `archive` | – |
 | `listing` | – | `index`, `path`, `template`, `facets`, `facetlabels`, `sort`, `perpage`, `columns` (config only) |
+| `media-cart` | – | – (an empty block: authored cells are ignored; it renders the device's cart, the cart page `/{lang}/media-cart`, SKODA-505b) |
 | `migration-status` | – | `source` (config only; the pilot status page `/drafts/migration-status`, SKODA-603) |
-| `stories` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured`, `offset` (config only) |
+| `stories` | – | `index`, `path`, `template`, `category`, `categories`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured`, `offset`, `exclude`, `feature` (config only; `exclude` registered by SKODA-611b, `feature` since SKODA-222, `categories` since SKODA-831) |
 | `story-rail` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows |
 | `tags` | `chips` | – |
-| `quote` | – | – (SKODA-220; see `quote` below) |
+| `quote` | `left` | – (SKODA-220; see `quote` below) |
+| `footnotes` | – | – (SKODA-805d; see `footnotes` below) |
 | `promo-box` | – | curated rows **or** config (`index`, `template`, `path`, `category`, `tags`, `limit`, `sort`); never mixed (PR #110, merged) |
-| `search`, `fragment`, `header`, `footer`, `widget`, `newsletter-stub` | – | – |
+| `newsletter-stub` | `card` (SKODA-823: the story-sidebar sign-up card, emitted by `transformers/skoda-story-aside.js`) | `label`, `placeholder`, `button`, `consent`, `manage`, `message`, `list`, `language` (footer, SKODA-305) + `image`, `heading`, `error`, `consent-error` (card); config only |
+| `search`, `fragment`, `header`, `footer`, `widget` | – | – |
 
 **`Cards (series-directory)`** (SKODA-207, 2026-09-27; the M2 series directory `/en/series-2`). One row per source card, in source order: `[<picture>, <h2><a href="/en/series/…">Title</a></h2><p>excerpt</p>]`. The title sits over the image and the excerpt below it (`cards.css`). Emitted by `parsers/series-grid.js`. Replaces the index `Listing` proposal (`Cards (overlay, series-directory)` in `series.md` §7): the variant has its own layout, so it doesn't combine with `overlay`.
 
@@ -82,6 +85,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Status:** `resolve` · **Ticket:** SKODA-202 (the parser change sits with 207/208) · **Fallback:** readable
 - **Model hero resolved (SKODA-208, 2026-09-26):** `parsers/hero.js` emits `Hero Image (overlay)`: row 1 the picture, row 2 the "Models" chip `<p>` then the H1 (source order; the truncated teaser is dropped).
 - **Series hub resolved (SKODA-207, 2026-09-27):** `parsers/series-hero.js` emits `Hero Image (overlay)`: row 1 the picture, row 2 the "Series" chip `<p>`, the H1, then the standfirst `<p>`. `templates/skoda-series/` shows them as H1 → badge → standfirst. `hero-banner.js` stays unchanged (page/company still to resolve).
+- **Archive term band resolved (SKODA-828, 2026-10-05):** `parsers/archive-hero.js` emits `Hero Image (archive)` (previously default content): row 1 the banner picture, or an empty cell when the term has no banner (the source's empty band); row 2 the single H1 with **one line per source label**, separated by `<br>` (`<h1>Models<br>Peaq</h1>`; the accessible name stays "Models Peaq"). A category label is a link to its term (`<h1><a href="/en/category/lifestyle">Lifestyle</a><br><a href="/en/category/lifestyle/people">People</a></h1>`); tag labels are text, and equal labels both stay (`tag/crew/technology`: Technology, Technology). The block renders each line as a grey label chip (a link line is the chip itself) on the bottom-left of the 184/224/240px band. An H1 without `<br>` renders as one chip.
 - **Finding:** `parsers/hero.js` (model page, now resolved) and `parsers/hero-banner.js` (page / category / tag / series / listing banners) emit `Hero`, but the `hero` folder on `main` is only an **empty boilerplate stub** (`hero.js` is 0 bytes, `hero.css` is 504 bytes of boilerplate) left from #104. The project's hero is `hero-image`, so a `Hero` table renders undecorated, with boilerplate styling. *(Corrected 2026-09-25: the first inventory said there was no `hero` block at all.)*
 - **Contract:** emit the existing block, with no new `hero` block:
   - `Hero Image (overlay)` for full-bleed overlay heroes (model, series hub, press-kit hub, listings, pages);
@@ -117,6 +121,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Finding:** a raw source spec table (`<table class="version">`) leaks through the story flattener as an unknown `version` block (published Epiq story; a 404 in the demo sweep). The contract `replaces: version`, so the check fails any page that still emits it.
 - **Shape:** header `Spec Table (versions)`. The first row is `[ "", version 1 name, version 2 name, … ]`, and each following row is `[label, value 1, value 2, …]` with units kept in the value text. It's the same block as `spec-table`, and the variant adds the multi-column layout.
 - **Resolve to:** `Columns` rows or text in the story importer (801a), since `spec-table` isn't built. The shape above applies only if 208 builds `spec-table`.
+- **Resolved (SKODA-830, 2026-10-05):** `transformers/skoda-story-cleanup.js` turns every body data table into `Columns`: the source header row first (`Version | Epiq 35 | Epiq 40 | Epiq 55`), then one row per source row, a `colspan` value repeated across the columns it spans. No `version` block is emitted.
 
 ### `cards-key-facts`
 - **Status:** `pinned` · **Ticket:** SKODA-208 · **Fallback:** readable (`cards.js` renders them as plain cards)
@@ -124,13 +129,18 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Shape:** the `Highlights` heading stays as default content above the table. Header `Cards (key-facts)`, then rows `[square <picture>, <h3>title</h3><p>text</p>]` (the cards row shape). The variant only changes the styling.
 
 ### `stories-feature`
-- **Status:** `pinned` · **Ticket:** SKODA-222 · **Fallback:** **readable**. `stories` clears its authored rows
-  before rendering, so until 222 lands the card is simply absent and the page reads as it does without it.
+- **Status:** ✅ **on `main` once SKODA-222 merges** (the same PR adds `feature` to `stories`' baseline config keys above
+  and drops the pending entry; this section stays as the shape reference). **Ticket:** SKODA-222
+- **Runtime (SKODA-222):** the card is the grid's first cell. From 992 it's a grey card in the third column across
+  the first two rows; below 992 it's first and full width, collapsed behind a dark disclosure bar. With it, the first
+  page shows `initial - 2` stories (the source's archive offset is 4). The primary CTA is read from `<strong>` or, as
+  the page holds it by the time blocks run, `a.button.primary` (`decorateButtons`). External links (the configurator)
+  open in a new tab.
 - **Form:** a config key added to `stories`, not a block. Row `[feature, <cell>]`. The cell holds a `<picture>`,
   then an `<h3>` title ("Explore the Epiq"), then one `<p>` per CTA link. The primary CTA is wrapped in `<strong>`
   (source `a.btn`); secondary CTAs are plain links (source `a.btn-secondary`).
 - **Placement is not imported.** It's responsive layout (SKODA-222). The source puts the card in the right column,
-  ~2 rows tall, at 1440, and first, full-width and collapsible (`h2.toggle`) at 768/390. In the DOM it's item 1.
+  ~2 rows tall, from 992, and first, full-width and collapsible (`h2.toggle`) below 992. In the DOM it's item 1.
 - **Emitted by:** `parsers/archive-list.js` from the source `.featured-model` card. That's on 11 model tag
   archives: Elroq, Enyaq, Epiq, Fabia, Kamiq, Karoq, Kodiaq, Octavia, Peaq, Scala, Superb.
 - **CTA links** go through the SKODA-605 rewrite. The model pages (SKODA-208) and the Images/Videos listings
@@ -199,6 +209,12 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   once it merges. Rows beyond 4 stay in the lightbox behind a "+N" pill. Keep the contract pinned until the branch
   merges and QA verifies it.
 
+### `gallery-story`
+- **Status:** `pinned` (2026-09-29) · **Ticket:** SKODA-216 · **Fallback:** readable (the normal Gallery: main image + thumbnails)
+- **Emitted by:** nothing yet. `transformers/skoda-story-cleanup.js` drops `.sb-gallery` today (deferred to SKODA-604/801); emitting this shape is that work, not SKODA-216.
+- **Shape:** header `Gallery (story)`, then one row per image in the source `data-gallery` order: `[<picture>, caption paragraph or empty]`, the same rows as `Gallery`. The first row is the lead image; the strip shows rows 2–5. The lightbox title is the story `h1` (the source `data-title`), so no title row. The source `content` is empty on the measured galleries, so the caption cell is usually empty.
+- **Example** (`/en/emobility/an-icon-in-modern-form-the-electrifying-favorit/`): 5 rows. Rendered on `/drafts/skoda-216-story-gallery`.
+
 ### `story-rail-press`
 - **Status:** `pinned` (2026-09-27) · **Ticket:** SKODA-224 · **Fallback:** readable (the default carousel cards)
 - **Emitted by:** `transformers/skoda-press-release-layout.js` (the "Related Press Releases" band; replaces the default-content cards of SKODA-612).
@@ -215,7 +231,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   controls the two-row disclosure (default `auto` in a Media Box, `none` elsewhere); authored
   `columns` controls desktop columns and the number disclosed. Neither option changes the three-cell
   asset row shape. Keep the contract pinned until the branch merges and QA verifies it.
-- **Emitted by:** `parsers/downloads.js` (press-release Media Box). A row shape of the `downloads` block on `main`, so the check classifies these pages as `main`, not pending.
+- **Emitted by:** `parsers/downloads.js` (press-release Media Box; since SKODA-830 also the story Media Box, wired in `import-story-detail.js`, in a `dark, full-width, media-box` section built by `skoda-story-cleanup.js`: `h2` Media Box, the stats paragraph, `Downloads`, between the `sidebar` and the related band). A row shape of the `downloads` block on `main`, so the check classifies these pages as `main`, not pending.
 - **Shape:** header `Downloads`, then 3 cells per row: `[<picture> or empty, title text, links]`. The links cell holds one `<a>` per size, its text the size label: `Original` + `1920px` (image, `/direct-download/…` and `…-1920xH.jpg`), `MP4` (video, Vimeo poster as the picture), `PDF` (document, empty picture cell).
 - **Example** (Peaq): 5 rows, `MP4`, 3 × `Original`+`1920px`, `PDF`.
 
@@ -232,17 +248,42 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 ### `quote`
 - **Status:** ✅ **on `main`** with `blocks/quote` (SKODA-220 block, landed with SKODA-805c). It moved to the baseline table above and is no longer a pending entry; this section stays as the shape reference. **Ticket:** SKODA-220
 - **Runtime:** each row renders as `figure > blockquote + figcaption`: the quote centred 16/24 italic, a 2px black rule 10% of the column wide 20px below it and 10px above the attribution (measured on first-glimpse at 1440/1280/768/390). The rule is CSS, never an `hr`.
-- **Shape:** header `Quote`, then a single row `[<p>quote text</p>, <p><strong>Attribution</strong>, role</p>]`. An empty attribution cell is kept. The source's decorative `hr` is **never** emitted, because a bare `hr` in DA splits sections.
+- **Shape:** header `Quote`, then one row per quote `[<p>quote text</p>, <p><strong>Attribution</strong>, role</p>]`. The centred imports emit one row per table, and `Quote (left)` emits one row per consecutive quote; the block renders every row. An empty attribution cell is kept. The source's decorative `hr` is **never** emitted, because a bare `hr` in DA splits sections.
+- **`Quote (left)`** (SKODA-220, press-kit chapters): the WordPress `figure.quote > blockquote > p > em` + `figcaption > em > strong` quote. It is left-aligned with no rule. The browser's open and close marks each sit on their own 24px line, the paragraphs are italic with a 20px rhythm, and the name is 600 italic. The rows are the same `[quote, attribution]`, **one row per quote**: consecutive figures (flush on the source, 0px apart) share one block, and a paragraph between them starts a new one. Several quote paragraphs stay several `<p>`, and other blocks in the figure are kept, never inside a `<p>`. A `cite` stands in for a missing `figcaption`, and a figure holding media is left as authored. Measured against the Peaq/Epiq chapters at 1440/1080/992/768/390 (identical heights and gaps; see SKODA-220).
+- **Nested in an accordion answer:** blocks can't nest in DA, so a `Quote` / `Quote (variant)` table in an accordion answer arrives as a plain `<table>`. `blocks/accordion` rebuilds it as a quote block in its own wrapper and loads it (Elroq press kit, "Modern Solid design with Tech-Deck Face"). Other tables, a multi-cell head, a head with no rows, or a Quote inside a table cell stay as authored.
 - **Importers:** `parsers/quote.js` (SKODA-220). It detects a centred `p` with only `em` content, the `hr` right after it, and an optional centred `p > strong`. helix-importer's preProcess drops every `hr` before `transform`, so each importer's `preprocess` marks the runs (`markQuotes`) and the parser builds the table after the layouts have run.
   - `import-press-release.js`: 6 quotes on the 4 M1 releases (Zellmer 2, National Theatre 2, Superb 1, Board 1; Peaq none). They stay in the `body-column` section.
-  - `import-press-kit-default.js`: the 2 first-glimpse quotes (Zellmer, Stefani). They are built after `press-kit-content` flattening, so the layout's source-table pass never sees them.
+  - `import-press-kit-default.js`: the 2 first-glimpse quotes (Zellmer, Stefani). They are built after `press-kit-content` flattening, so the layout's source-table pass never sees them. The same importer also runs `parseFigure` for the chapters' figure quotes (`Quote (left)`). That gives 5 chapters: Peaq intro (Zellmer, Jahn, Neft in one block), Peaq exterior (Stefani), Epiq intro (Zellmer, Jahn), Epiq exterior (Stefani) and Epiq battery (Neft).
   - `story-flatten.js` `skoda-quote`: not switched yet. It still emits a default-content `<blockquote>` and loses the attribution, and W1 switches it to this table.
 - **Example:** the Zellmer press release (`/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/`).
 
+### `footnotes`
+- **Status:** ✅ on `main` with `blocks/footnotes` once SKODA-805d merges (block and importer land together). **Ticket:** SKODA-805d
+- **Why a block:** the source sets small print with an inline size (`<span style="font-size: 10pt">`). DA keeps no inline size, and its inline marks are only `strong`/`b`, `em`/`i`, `u`, `s`, `sup`, `sub`, `code` (no `small`, no `span`). It keeps classes only on block `<div>`s, so the small print has to be a block.
+- **Runtime:** each paragraph renders at 10pt (13.33px) on the body's 24px line, with the 20px paragraph gap, in ink, as the source does (measured on first-glimpse at 375/768/992/1080/1280/1440).
+  - Links are the source's accent green (`--skoda-green-accent`, `#419468`), ink on hover, no underline. They keep the global `:focus-visible` ring, which the source lacks.
+  - Only the footnote link is green (decision 2026-10-05); other body links stay `--link-color` ink.
+  - Green on white is 3.71:1, under WCAG AA's 4.5:1 for text this size; the source has the same.
+- **Shape:** header `Footnotes`, then one row per paragraph of small print, one cell: `[<p>¹ … <a href>HERE</a><br>² …</p>]`. Links, line breaks and `sup` markers stay. Consecutive small-print paragraphs share one table.
+- **Importer:** `parsers/footnotes.js`, run by `import-press-kit-default.js`. `preprocess` marks the paragraphs (`markFootnotes`) on the source as published, before helix-importer's clean-up (which keeps styled spans today); the parser builds the table after the layouts have run, whose source-table pass would flatten it.
+  - **Counts:** a `p` whose every word is set below the 16px body size by its nearest sized ancestor (a span). The size is the one CSS applies, the CSSOM's winning `font-size` declaration (`!important` beats a later one; invalid values are dropped), and it must be a plain px or pt length. A `sup` marker outside the sized span is neutral.
+  - **Doesn't count:**
+    - a few small letters inside an ordinary sentence ("1st", "7th");
+    - a paragraph set small as a whole (`<p style="font-size: 12px">`, the Peaq/Epiq chapters' 12/18 style, not handled yet);
+    - a paragraph with media (an image or a player);
+    - relative sizes (`em`, `%`, keywords) and `0px`.
+  - **Top level only:** a marked paragraph that lands in a table (an accordion answer, a Columns cell), a list, a blockquote or a figure stays text, because blocks can't nest.
+- **Examples:**
+  - first-glimpse (`/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/`): one row, the ¹ MOON POWER and ² V2H notes.
+  - The rule also matches the Epiq-2 First Edition chapter's ⁷ ⁸ ⁹ notes (same shape: 10pt lines with `sup` markers), on its next re-import.
+
 ### `columns-split`
-- **Status:** `pinned` · **Ticket:** SKODA-225 · **Fallback:** readable (equal columns, portrait stretched)
-- **Shape:** header `Columns (split-NN)`, where `NN` is the first cell's share of the row width in percent, rounded (source 518 | 320 → `split-62`). The rows are the normal `columns` rows. The check accepts `split-10` … `split-99`.
-- **Emitted by:** `story-flatten.js` for 2-cell SiteOrigin rows with unequal cells (graffiti, Kylaq, charging, Peaq comfort).
+- **Status:** `pinned` (shape 2, 2026-10-01) · **Ticket:** SKODA-225 · **Fallback:** readable (equal columns, portrait stretched)
+- **Shape:** header `Columns (split-NN)` or `Columns (split-NN, portrait-NNN)`.
+  - `split-NN` is the first cell's share of the row width in percent, rounded (source 518 | 320 → `split-62`). The rows are the normal `columns` rows. The check accepts `split-10` … `split-99`.
+  - **Shape 2 adds `portrait-NNN`:** the authored display width in px of the row's single image, when it's smaller than the file. The source shows `width="235"` portraits of 500px files; DA keeps only the file's own size, so the width travels in the variant. An image at its file size (the charging `sow-image`, `width` = its largest `srcset` entry) gets no token and fills its cell. The check accepts `portrait-10` … `portrait-999`.
+- **Emitted by:** `parsers/story-flatten.js` for 2-cell SiteOrigin rows with unequal cells (graffiti, Kylaq, Peaq comfort: `split-62, portrait-235`; charging: `split-75`). The cell widths come from the page's head CSS (`#pgc-<id>{width:61.8%}`), read in `import-story-detail.js`'s `preprocess` (`markCellWidths()`). Equal rows, unmeasured rows and 3+ cell rows stay plain `Columns`.
+- **Re-import:** the stories imported with shape 1 output (plain `Columns`) are re-imported through the push tool's `update` path.
 
 ### `columns-banners`
 - **Status:** ✅ **on `main`** (variant of `columns`, SKODA-805c). **Fallback:** readable (the banners fill their cells)
@@ -255,9 +296,14 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Status:** ✅ **on `main`** with `blocks/accordion` (SKODA-805a/805c; minimal SKODA-807). It moved to the baseline table above; this section stays as the shape reference. **Ticket:** SKODA-805c
 - **Shape:** header `Accordion`, then one row per toggle: `[summary label (text), body (rich content: paragraphs, lists, links, images)]`. Rows appear in source order and are all closed by default. Nested blocks inside a panel aren't supported: an embed inside a panel stays a bare link.
 - **Example** (`/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship/`): 8 rows.
+- **Variant `faq` (SKODA-807, on `main` with the block):**
+  - Header `Accordion (faq)`, with the same rows.
+  - `parsers/press-kit-content.js` emits it on a kit's FAQ chapter, a `…/frequently-asked-questions/` page (Peaq-2: 28 rows, Epiq-2: 5).
+  - The block behaves as the default variant and adds one schema.org `FAQPage` JSON-LD script to the head. It has one `Question` / `acceptedAnswer` per complete row; every FAQ accordion on the page shares that one script.
+  - Fallback: without the variant code the block is a plain accordion (`readable`).
 
 ### `highlight`
-- **Status:** `pinned` (decided 2026-09-25: section style; **shape 2** 2026-09-28) · **Ticket:** SKODA-824 · **Fallback:** **broken** until the runtime lands (the panel has no box or text treatment, and each extra `body-column` section moves the sidebar; see Runtime) · **Styles:** `highlight-dark`, `highlight-grey`
+- **Status:** `pinned` (decided 2026-09-25: section style; **shape 2** 2026-09-28; runtime landed 2026-10-05) · **Ticket:** SKODA-824 · **Fallback:** `readable` (it was `broken` until the runtime landed: the panel had no box or text treatment, and each extra `body-column` section moved the sidebar) · **Styles:** `highlight-dark`, `highlight-grey`
 - **Form: section style, not a block.** The dark box can contain a `Gallery (slider)` or a `Columns` row, and DA blocks can't nest (rule 5).
 - **Shape (v2):** a section holding the panel's content (h3, text, images, and any nested blocks), closed by `Section Metadata` with `Style` = `body-column, highlight-dark` (story panel) or `body-column, highlight-grey` (PR FAQ/info callout). The body resumes after it in a new `body-column` section; no resumed section is emitted when nothing follows, and none is left before a panel that opens the body (story: `dropEmptySections()` after `afterTransform`; press release: the leading body marker is dropped). Consecutive highlighted rows each become their own section with the same style; the runtime joins them.
 - **Why v2 (was `highlight, dark` / `highlight, grey`):** v1 collided with existing CSS, so its "readable" fallback wasn't true:
@@ -270,11 +316,11 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Importers:**
   - `parsers/story-flatten.js`: `import-story-detail.js`'s `preprocess` calls `markHighlights()`, because the row colour is only in the SiteOrigin head CSS (`#pg-<id>> .panel-row-style`). This gives 16 rows on 11 of the 19 M1 stories: Epiq, Octavia, Slavia, plates, graffiti, Froome, Peaq production, Peaq Tour de France, Kylaq ×3, paper Kodiaq ×3, and charging ×2 (consecutive; one is a 2-cell Columns row).
   - `transformers/skoda-press-release-layout.js`: a `div[style*=background]` direct child of `.entry-content` (the Zellmer FAQ, the last body content).
-- **Runtime (824 runtime half, still TODO):**
-  - style `.section.body-column.highlight-dark` / `.highlight-grey` (the ticket ACs);
-  - join consecutive panels;
-  - **span the sidebar across the split body.** Grid auto-placement puts `.section.sidebar` beside the *last* `body-column` section, so pages carrying a highlight section hold publish until this lands.
-- **Publish gate (enforced):** the entry lists its `styles`, so `checkPage` reports `highlight` as pending on any page whose Section Metadata carries one; with `fallback: broken` the page is `[hold publish]` in `import:validate-blocks` / `import:status`, and `import:push --stage publish` previews it but refuses to publish (`--approve-hold highlight` overrides, rule 8). When the runtime lands, set `fallback` to `readable`.
+- **Runtime (SKODA-824 runtime half, landed 2026-10-05; measured spec: [`highlight.md`](../ui-specs/highlight.md)):**
+  - **Panel styling.** The colours are global in `styles/styles.css`. The story geometry is also in `styles.css`: the panel spans the body track plus 10px, bleeds full width below 768, and keeps the source's 25px content inset. The press-release callout geometry is in `templates/press-release/press-release.css`: the text column, padded 25px.
+  - **Join.** Consecutive same-variant panels read as one band. The first drops its bottom inset, and the second keeps the 10px cell padding.
+  - **Sidebar span.** `scripts/split-body.js` `spanSidebar()` counts the `body-column` run that the `.section.sidebar` closes. It runs from `decorateStorySections` and `decorateTemplateSections`. Both grids span the sidebar from the first part, and the last part takes the slack (`grid-template-rows: repeat(n, auto) 1fr`). A page with a single body section gets no counts, so its layout is unchanged.
+- **Publish gate:** the entry lists its `styles`, so `checkPage` still reports `highlight` as pending on any page whose Section Metadata carries one. With `fallback: readable` the page publishes. The hold mechanism for a broken section-style fallback stays covered in `block-check.test.mjs`.
 
 ### `cover-box`
 - **Status:** `pinned` (2026-09-28) · **Ticket:** SKODA-218 · **Fallback:** readable (a light rail, as before)

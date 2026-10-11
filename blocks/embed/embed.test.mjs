@@ -67,11 +67,28 @@ class El {
 
   removeAttribute(k) { delete this.attributes[k]; }
 
-  addEventListener(type, fn) { (this._listeners[type] ||= []).push(fn); }
+  addEventListener(type, fn, options) {
+    const listener = options?.once
+      ? () => { this.removeEventListener(type, listener); fn(); }
+      : fn;
+    (this._listeners[type] ||= []).push(listener);
+  }
+
+  removeEventListener(type, fn) {
+    this._listeners[type] = (this._listeners[type] || []).filter((f) => f !== fn);
+  }
 
   dispatch(type) { (this._listeners[type] || []).forEach((fn) => fn()); }
 
   append(...kids) { kids.forEach((k) => { k._parent = this; this.children.push(k); }); }
+
+  replaceWith(node) {
+    const parent = this._parent;
+    if (!parent) return;
+    node._parent = parent;
+    parent.children[parent.children.indexOf(this)] = node;
+    this._parent = null;
+  }
 
   remove() {
     if (!this._parent) return;
@@ -140,6 +157,12 @@ function buildEmbed(href, { title } = {}) {
 
 const { default: decorate } = await import('./embed.js');
 
+// YouTube shows the click-to-load poster (SKODA-702a): press play and return the player.
+function play(block) {
+  block.querySelector('.embed-play').dispatch('click');
+  return block.querySelector('iframe');
+}
+
 test('Vimeo: preserves dnt=1, uses player host, video wrapper, lazy + title, direct src', () => {
   const block = buildEmbed('https://vimeo.com/1221703335', { title: 'Octavia film' });
   decorate(block);
@@ -165,26 +188,129 @@ test('Vimeo already-embed URL keeps app_id and forces dnt=1', () => {
   assert.equal(params.get('app_id'), '122963');
 });
 
-test('YouTube: matches live embed URL (youtube.com/embed + feature=oembed + enablejsapi)', () => {
+test('YouTube: the played URL is the live embed URL (feature=oembed + enablejsapi) + autoplay', () => {
   const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
   decorate(block);
-  const iframe = block.querySelector('iframe');
-  assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/9LfK-A20pgw?feature=oembed&enablejsapi=1');
-  assert.equal(iframe.dataset.src, undefined, 'no consent gate — src set directly');
+  const iframe = play(block);
+  assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/9LfK-A20pgw?feature=oembed&enablejsapi=1&autoplay=1&playsinline=1');
+  assert.equal(iframe.dataset.src, undefined);
   // allow list matches live YouTube verbatim (accelerometer/gyroscope, no fullscreen)
   assert.equal(iframe.getAttribute('allow'), 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
   assert.ok(block.querySelector('.embed-video'));
-  assert.equal(block.querySelector('.embed-facade'), null);
   assert.equal(block.querySelector('.embed-consent'), null);
 });
 
 test('YouTube: /embed/ + si token and youtu.be forms both build the live URL', () => {
   const a = buildEmbed('https://www.youtube.com/embed/B4ZafpJKk0M?si=v58s4T3awpvcBd7Y');
   decorate(a);
-  assert.equal(a.querySelector('iframe').getAttribute('src'), 'https://www.youtube.com/embed/B4ZafpJKk0M?feature=oembed&si=v58s4T3awpvcBd7Y&enablejsapi=1');
+  assert.equal(play(a).getAttribute('src'), 'https://www.youtube.com/embed/B4ZafpJKk0M?feature=oembed&si=v58s4T3awpvcBd7Y&enablejsapi=1&autoplay=1&playsinline=1');
   const b = buildEmbed('https://youtu.be/atipTWwYw5E');
   decorate(b);
-  assert.equal(b.querySelector('iframe').getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?feature=oembed&enablejsapi=1');
+  assert.equal(play(b).getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?feature=oembed&enablejsapi=1&autoplay=1&playsinline=1');
+});
+
+// --- SKODA-702a: YouTube click-to-load poster --------------------------------
+
+test('YouTube poster: no player before the click, one labelled button with the poster', () => {
+  const block = buildEmbed('https://www.youtube.com/watch?v=1Y3QHmZeLxk');
+  decorate(block);
+  assert.equal(block.querySelector('iframe'), null, 'no player: nothing but the poster reaches YouTube');
+  const wrapper = block.querySelector('.embed-video');
+  assert.equal(wrapper.style['--embed-ratio'], '16 / 9', 'the poster keeps the 16:9 box (no CLS)');
+  assert.equal(wrapper.children.length, 1);
+  const button = wrapper.children[0];
+  assert.equal(button.tagName, 'BUTTON');
+  assert.equal(button.className, 'embed-play');
+  assert.equal(button.getAttribute('type'), 'button');
+  assert.equal(button.getAttribute('aria-label'), 'Play YouTube video', 'bare URL: the generic label, not said twice');
+  const img = button.querySelector('img');
+  assert.equal(img.getAttribute('src'), 'https://i.ytimg.com/vi/1Y3QHmZeLxk/maxresdefault.jpg');
+  assert.equal(img.getAttribute('alt'), '', 'decorative: the button carries the name');
+  assert.equal(img.getAttribute('loading'), 'lazy');
+  assert.ok(block.classList.contains('embed-youtube'));
+});
+
+test('YouTube poster: a descriptive title names the button', () => {
+  const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw', { title: 'The all-new Škoda Kodiaq RS' });
+  decorate(block);
+  assert.equal(block.querySelector('.embed-play').getAttribute('aria-label'), 'Play video: The all-new Škoda Kodiaq RS');
+  assert.equal(play(block).getAttribute('title'), 'The all-new Škoda Kodiaq RS');
+});
+
+test('YouTube poster: the click swaps in the player, plays it and moves focus into it', () => {
+  const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
+  const other = buildEmbed('https://youtu.be/atipTWwYw5E');
+  decorate(block);
+  decorate(other);
+  const iframe = play(block);
+  assert.equal(block.querySelector('.embed-play'), null, 'the poster is gone');
+  assert.equal(block.querySelector('.embed-video').children[0], iframe, 'the player takes its place');
+  assert.equal(new URL(iframe.getAttribute('src')).searchParams.get('autoplay'), '1', 'one click plays');
+  assert.equal(globalThis.__focused, iframe);
+  assert.ok(other.querySelector('.embed-play'), 'another video keeps its poster');
+  assert.equal(other.querySelector('iframe'), null);
+});
+
+test('YouTube poster: maxresdefault missing (error or 120px placeholder) → hqdefault, once', () => {
+  const missing = buildEmbed('https://www.youtube.com/watch?v=abc');
+  decorate(missing);
+  const img = missing.querySelector('img');
+  img.dispatch('error');
+  assert.equal(img.getAttribute('src'), 'https://i.ytimg.com/vi/abc/hqdefault.jpg');
+  img.setAttribute('src', 'stays');
+  img.dispatch('error'); // a failing fallback doesn't loop
+  assert.equal(img.getAttribute('src'), 'stays');
+
+  const placeholder = buildEmbed('https://www.youtube.com/watch?v=def');
+  decorate(placeholder);
+  const small = placeholder.querySelector('img');
+  small.naturalWidth = 120; // YouTube's grey "no thumbnail" image
+  small.dispatch('load');
+  assert.equal(small.getAttribute('src'), 'https://i.ytimg.com/vi/def/hqdefault.jpg');
+
+  const found = buildEmbed('https://www.youtube.com/watch?v=ghi');
+  decorate(found);
+  const big = found.querySelector('img');
+  big.naturalWidth = 1280;
+  big.dispatch('load');
+  assert.equal(big.getAttribute('src'), 'https://i.ytimg.com/vi/ghi/maxresdefault.jpg');
+});
+
+test('YouTube poster: a Shorts URL takes its poster from the video id', () => {
+  const block = buildEmbed('https://www.youtube.com/shorts/Xy12_ab-Cd');
+  decorate(block);
+  assert.equal(block.querySelector('img').getAttribute('src'), 'https://i.ytimg.com/vi/Xy12_ab-Cd/maxresdefault.jpg');
+});
+
+test('YouTube poster: a second click does nothing (one player, loaded once)', () => {
+  const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
+  decorate(block);
+  const button = block.querySelector('.embed-play');
+  button.dispatch('click');
+  const iframe = block.querySelector('iframe');
+  iframe.setAttribute('src', 'marked');
+  button.dispatch('click'); // e.g. a double click
+  assert.equal(iframe.getAttribute('src'), 'marked', 'not reloaded');
+  assert.equal(block.querySelector('.embed-video').children.length, 1);
+});
+
+test('YouTube URLs: a list param keeps the video; extra youtu.be segments are ignored', () => {
+  const list = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw&list=PL123');
+  decorate(list);
+  assert.equal(list.querySelector('img').getAttribute('src'), 'https://i.ytimg.com/vi/9LfK-A20pgw/maxresdefault.jpg');
+  const extra = buildEmbed('https://youtu.be/atipTWwYw5E/extra');
+  decorate(extra);
+  assert.equal(extra.querySelector('img').getAttribute('src'), 'https://i.ytimg.com/vi/atipTWwYw5E/maxresdefault.jpg');
+  assert.equal(play(extra).getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?feature=oembed&enablejsapi=1&autoplay=1&playsinline=1');
+});
+
+test('YouTube URLs with an id that is not a video id are rejected', () => {
+  [
+    'https://www.youtube.com/watch?v=a%2F..%2F..%2Fx', // would leave /embed/
+    'https://www.youtube.com/watch?v=abc%23frag', // would move the params into a fragment
+    'https://www.youtube.com/watch?v=abc%22%3E',
+    'https://youtu.be/',
+  ].forEach((href) => assertRejected(buildEmbed(href), href));
 });
 
 test('Buzzsprout: audio wrapper (fixed height, not 16:9), iframe=true preserved', () => {
@@ -213,14 +339,19 @@ test('Vimeo carries the live Vimeo allow list (fullscreen, no gyroscope) and no 
   assert.equal(iframe.dataset.src, undefined, 'no data-src (no gate)');
 });
 
-test('no consent placeholder or facade is rendered for any provider', () => {
-  ['https://vimeo.com/1', 'https://www.youtube.com/watch?v=abc', 'https://open.spotify.com/episode/x']
-    .forEach((href) => {
-      const block = buildEmbed(href);
-      decorate(block);
-      assert.equal(block.querySelector('.embed-consent'), null, `${href}: no consent box`);
-      assert.equal(block.querySelector('.embed-facade'), null, `${href}: no facade`);
-    });
+test('with consent: no consent box for any provider; only YouTube gets the poster', () => {
+  [
+    ['https://vimeo.com/1', false],
+    ['https://www.youtube.com/watch?v=abc', true],
+    ['https://open.spotify.com/episode/x', false],
+    ['https://www.buzzsprout.com/1730804/episodes/123', false],
+  ].forEach(([href, poster]) => {
+    const block = buildEmbed(href);
+    decorate(block);
+    assert.equal(block.querySelector('.embed-consent'), null, `${href}: no consent box`);
+    assert.equal(!!block.querySelector('.embed-play'), poster, `${href}: poster ${poster}`);
+    assert.equal(!!block.querySelector('iframe'), !poster, `${href}: iframe ${!poster}`);
+  });
 });
 
 test('authored ratio override is applied', () => {
@@ -299,7 +430,8 @@ test('bare-URL autoblock: iframe title is a provider label, never the URL string
   ].forEach(([href, label]) => {
     const block = buildEmbed(href); // link text === href (the autoblock case)
     decorate(block);
-    assert.equal(block.querySelector('iframe').getAttribute('title'), label, href);
+    const iframe = block.querySelector('.embed-play') ? play(block) : block.querySelector('iframe');
+    assert.equal(iframe.getAttribute('title'), label, href);
   });
 });
 
@@ -319,7 +451,7 @@ test('descriptive link text is used as the iframe title', () => {
   a.textContent = 'The all-new Škoda Kodiaq RS';
   block.append(a);
   decorate(block);
-  assert.equal(block.querySelector('iframe').getAttribute('title'), 'The all-new Škoda Kodiaq RS');
+  assert.equal(play(block).getAttribute('title'), 'The all-new Škoda Kodiaq RS');
 });
 
 test('table form: auto-linked url cell still honours ratio + title rows', () => {
@@ -335,8 +467,8 @@ test('table form: auto-linked url cell still honours ratio + title rows', () => 
 test('table form: plain-text url cell works (no link)', () => {
   const block = buildTable([['url', 'https://youtu.be/atipTWwYw5E']]);
   decorate(block);
-  const iframe = block.querySelector('iframe');
-  assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?feature=oembed&enablejsapi=1');
+  const iframe = play(block);
+  assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?feature=oembed&enablejsapi=1&autoplay=1&playsinline=1');
   assert.equal(iframe.getAttribute('title'), 'YouTube video');
 });
 
@@ -432,17 +564,19 @@ test('embed consent: setEmbedConsent notifies subscribers with the resulting sta
 
 test('with consent (default): same markup as before 204a, no placeholders fetch', () => {
   const fetches = globalThis.__fetches;
-  const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
+  const block = buildEmbed('https://vimeo.com/1221703335');
   decorate(block);
-  assert.equal(block.className, 'embed embed-youtube');
+  assert.equal(block.className, 'embed embed-vimeo');
   assert.equal(block.children.length, 1);
   const wrapper = block.children[0];
   assert.equal(wrapper.className, 'embed-video');
   assert.equal(wrapper.children.length, 1);
   const iframe = wrapper.children[0];
   assert.deepEqual(Object.keys(iframe.attributes).sort(), ['allow', 'frameborder', 'loading', 'src', 'title']);
-  assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/9LfK-A20pgw?feature=oembed&enablejsapi=1');
+  assert.equal(iframe.getAttribute('src'), 'https://player.vimeo.com/video/1221703335?dnt=1');
   assert.equal(block.querySelector('.embed-consent'), null);
+  const youtube = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
+  decorate(youtube); // the poster path doesn't load the sheet either
   assert.equal(globalThis.__fetches, fetches, 'the consented path loads no placeholder sheet');
 });
 
@@ -492,16 +626,61 @@ test('no consent: activating the placeholder loads that one embed and focuses it
 
 test('no consent, then consent granted through the hook: waiting embeds load; focus kept', async () => {
   await withSearch('?consent=decline', async () => {
-    const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
+    const block = buildEmbed('https://vimeo.com/1221703335');
     decorate(block);
     block.querySelector('button').focus(); // a keyboard user is on the placeholder button
     window.location.search = ''; // the CMP now decides
     consent.setEmbedConsent(true);
     const iframe = block.querySelector('iframe');
     assert.ok(iframe, 'iframe back in the DOM');
-    assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/9LfK-A20pgw?feature=oembed&enablejsapi=1');
+    assert.equal(iframe.getAttribute('src'), 'https://player.vimeo.com/video/1221703335?dnt=1');
     assert.equal(block.querySelector('.embed-consent'), null);
     assert.equal(globalThis.__focused, iframe, 'focus moves from the removed button to the iframe');
+    consent.setEmbedConsent(null);
+  });
+});
+
+test('no consent, YouTube: one click on the placeholder loads and plays the video', async () => {
+  await withSearch('?consent=decline', async () => {
+    const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
+    decorate(block);
+    assert.equal(block.querySelector('.embed-play'), null, 'no poster either: nothing reaches YouTube');
+    assert.equal(block.querySelector('img'), null);
+    block.querySelector('button').dispatch('click');
+    const iframe = block.querySelector('iframe');
+    assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/9LfK-A20pgw?feature=oembed&enablejsapi=1&autoplay=1&playsinline=1');
+    assert.equal(block.querySelector('.embed-play'), null, 'consent then play would be two clicks');
+    assert.equal(globalThis.__focused, iframe);
+  });
+});
+
+test('consent withdrawn after the poster showed: the click shows the placeholder, loads nothing', async () => {
+  const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
+  decorate(block); // consented: the poster
+  await withSearch('?consent=decline', async () => {
+    block.querySelector('.embed-play').dispatch('click');
+    assert.equal(block.querySelector('iframe'), null, 'nothing reaches YouTube');
+    assert.equal(block.querySelector('.embed-play'), null);
+    const gateButton = block.querySelector('.embed-consent-button');
+    assert.ok(gateButton, 'the consent placeholder instead');
+    assert.equal(globalThis.__focused, gateButton, 'keyboard focus lands on its button');
+    gateButton.dispatch('click'); // acknowledging plays at once
+    assert.ok(block.querySelector('iframe').getAttribute('src').includes('autoplay=1'));
+  });
+});
+
+test('no consent, YouTube, then a grant through the hook: the poster shows, focus on its button', async () => {
+  await withSearch('?consent=decline', async () => {
+    const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
+    decorate(block);
+    block.querySelector('button').focus();
+    window.location.search = '';
+    consent.setEmbedConsent(true);
+    assert.equal(block.querySelector('iframe'), null, 'not asked to play: the poster, not the player');
+    const poster = block.querySelector('.embed-play');
+    assert.ok(poster);
+    assert.equal(globalThis.__focused, poster, 'focus moves from the removed button to the poster');
+    assert.ok(play(block).getAttribute('src').includes('autoplay=1'));
     consent.setEmbedConsent(null);
   });
 });

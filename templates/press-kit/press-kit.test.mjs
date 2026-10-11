@@ -121,9 +121,14 @@ test('Images chapter: each gallery group with `collapse auto` gets its own block
   const [exterior, interior] = main.querySelectorAll('.downloads');
   await decorateDownloads(exterior);
   await decorateDownloads(interior);
-  assert.equal(exterior.querySelectorAll('.downloads-items > li:not([hidden])').length, 8, 'two rows at 1280');
-  assert.equal(interior.querySelectorAll('.downloads-items > li:not([hidden])').length, 3);
-  assert.equal(main.querySelectorAll('.downloads-more').length, 1, 'only the group above 8 tiles gets a control');
+  // rows 3+ stay in the clipped list (their top peeks behind the pill) but are inert
+  assert.equal(exterior.querySelectorAll('.downloads-items > li:not([inert])').length, 8, 'two rows at 1280');
+  assert.equal(exterior.querySelectorAll('.downloads-items > li[hidden]').length, 0);
+  assert.equal(interior.querySelectorAll('.downloads-items > li:not([inert])').length, 3);
+  // the control follows the rows (SKODA-830 D2): 3 tiles fit one row at 1280, so the
+  // Interior control stays hidden there (it shows once they need a third row)
+  const shown = main.querySelectorAll('.downloads-more:not([hidden])');
+  assert.equal(shown.length, 1, 'only the group above two rows shows a control');
   assert.ok(exterior.querySelector('.downloads-more'));
   assert.equal(main.querySelectorAll('#media-box, .press-kit-show-more').length, 0);
 });

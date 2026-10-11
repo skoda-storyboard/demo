@@ -57,12 +57,12 @@
 |---|---|---|---|---|
 | STO-H01 | Promotional / Featured Carousel | **Built** — index-driven `stories` block, `variant: promo` (1 big + 2 small ≥900px; JS timed carousel on mobile). Manual-curation-vs-auto still open | SKODA-201 | ✅ Built (curation 🟠 §10 Q11) |
 | STO-H02 | Latest Stories | **Built** — `stories` block, query-index driven, newest 5, press-releases excluded, Load more | SKODA-402 | ✅ Built |
-| STO-H03 | Models Slider | **Built** — static carousel-caption rail (links to taxonomy pages). Source/order TBD | SKODA-201 | ✅ Built (source 🟡) |
-| STO-H04 | eMobility Stories Slider | **Built** — `story-rail`, tag-filtered (category=emobility), auto-populated via carousel | SKODA-402 | ✅ Built |
-| STO-H05 | Lifestyle Stories Slider | **Built** — `story-rail` (category=lifestyle) | SKODA-402 | ✅ Built |
-| STO-H06 | Škoda World Stories Slider | **Built** — `story-rail` (category=skoda-world) | SKODA-402 | ✅ Built |
-| STO-H07 | Series Slider (image-only clickable; different style; no date; sort TBD) | **Built** — static carousel-caption (undated, 16px/600 below image). Text-clickability + sort logic open | SKODA-201 | ✅ Built (sort/clickability 🟡) |
-| STO-H08 | Latest News | **Built** — `story-rail` (category=press-releases). Source/continued-requirement is a new open Q (§10 Q12) | SKODA-402 | ✅ Built (scope 🟡) |
+| STO-H03 | Models Slider | **Built** — index-driven `story-rail` (template=skoda_model) as caption cards (16:9 image + 45px title row, no date) on the source's model ladder (SKODA-611b, in review). Source/order TBD | SKODA-201, SKODA-611b | ✅ Built (source 🟡) |
+| STO-H04 | eMobility Stories Slider | **Built** — `story-rail`, tag-filtered (category=emobility), auto-populated via carousel; source card ladder, "All" pill + end card (SKODA-611b, in review) | SKODA-402, SKODA-611b | ✅ Built |
+| STO-H05 | Lifestyle Stories Slider | **Built** — `story-rail` (category=lifestyle); source card ladder, "All" pill + end card (SKODA-611b, in review) | SKODA-402, SKODA-611b | ✅ Built |
+| STO-H06 | Škoda World Stories Slider | **Built** — `story-rail` (category=skoda-world); source card ladder, "All" pill + end card (SKODA-611b, in review) | SKODA-402, SKODA-611b | ✅ Built |
+| STO-H07 | Series Slider (image-only clickable; different style; no date; sort TBD) | **Built** — index-driven `story-rail` (template=skoda_series) as caption cards (undated, 16px/600 below image) with the "All" pill (SKODA-611b, in review). Shows 10 of the indexed series (source: all 24). Text-clickability + sort logic open | SKODA-201, SKODA-611b | ✅ Built (sort/clickability 🟡) |
+| STO-H08 | Latest News | **Built** — `story-rail` (category=press-releases); "All" pill + end card (SKODA-611b, in review). Source/continued-requirement is a new open Q (§10 Q12) | SKODA-402, SKODA-611b | ✅ Built (scope 🟡) |
 | STO-H09 | Social Media (approved channels) | **Built** — `cards-media` social variant (static, dark). `ys-social-feed` confirmed *not* live today | SKODA-201 | ✅ Built (static); live feed 🔴 |
 
 ### B. Story Category / Subcategory Pages (STO-C01–C05)

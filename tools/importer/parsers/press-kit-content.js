@@ -195,12 +195,14 @@ function columnsRow(cells, document) {
   return WebImporter.DOMUtils.createTable([[name], row], document);
 }
 
-function flatten(layout, document, { nested = false } = {}) {
+function flatten(layout, document, { nested = false, faq = false } = {}) {
   const output = [];
   let rows = [];
   let tileGrids = [];
+  // A kit's FAQ chapter is `Accordion (faq)`: the block adds FAQPage data (SKODA-807)
+  const name = faq && !nested ? 'Accordion (faq)' : 'Accordion';
   const flush = () => {
-    if (rows.length) output.push(WebImporter.DOMUtils.createTable([['Accordion'], ...rows], document));
+    if (rows.length) output.push(WebImporter.DOMUtils.createTable([[name], ...rows], document));
     rows = [];
   };
   // Consecutive rows of chapter teasers (an older kit landing page in article form, e.g. the
@@ -267,10 +269,10 @@ function flatten(layout, document, { nested = false } = {}) {
   return output;
 }
 
-export default function parse(element, { document }) {
+export default function parse(element, { document, faq = false }) {
   const layout = element.querySelector(':scope > .panel-layout');
   if (!layout) throw new Error('Press-kit article is missing SiteOrigin body content');
-  const nodes = flatten(layout, document);
+  const nodes = flatten(layout, document, { faq });
   if (!nodes.length) throw new Error('Press-kit article body is empty');
   layout.replaceWith(...nodes);
   element.querySelectorAll('.sa-bnr, .media-cart-actions').forEach((node) => node.remove());
