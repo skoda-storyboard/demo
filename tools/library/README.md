@@ -35,8 +35,11 @@ both from code, so the library changes when a block does.
   Config API's POST replaces the whole config, so always GET, merge and POST.
 - **No Placeholders row:** `/en/placeholders.json` holds UI strings for the code (`Load more`, gallery labels). These
   aren't author snippets, and the project doesn't resolve DA's `{{key}}` tokens.
-- **Not indexed:** the bulk metadata sheet (`/metadata.json`) has `/library/** | robots: noindex, nofollow`. Don't
-  publish the library documents.
+- **Not indexed:** the bulk metadata sheet (`/metadata.json`) has `/library/** | robots: noindex, nofollow`. It went
+  live on 2026-10-11, together with the library documents (published at the user's request, noindex).
+- **The live bulk sheet is a subset.** DA and preview hold 9 more language rows (cs/de/sk/sr), which were kept off live.
+  Publishing the sheet from DA ships them, so ask first. To publish without them, publish a copy without those rows,
+  then restore DA and re-preview.
 
 ## Known limits
 
