@@ -11,6 +11,7 @@ export const EXCLUDED = {
   carousel: 'presentation only: the rails (Story Rail) build it; not authored on its own',
   hero: 'legacy, unused on any page: use Hero Image',
   widget: 'boilerplate widget loader, unused on any page',
+  'migration-status': 'internal: the pilot status page /drafts/migration-status only (SKODA-603)',
 };
 
 export const SPEC = {
