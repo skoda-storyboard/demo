@@ -74,3 +74,6 @@ Measured 2026-10-09 on `/en`, origin vs live:
 - [x] 11 pages published (2026-10-10, user go-ahead); the live index `image` = the card image, 11/11
 - [x] With #306's code: the Models cards show the source card images (measured on its draft home)
 - [ ] Card frame aspect matches the origin (2.55:1, uncropped); owned by #306
+
+## Status (2026-10-11, M1 ticket review)
+✅ **Done, closed** (#310). 11/11 tag pages published. The card frame aspect is tracked on #306.

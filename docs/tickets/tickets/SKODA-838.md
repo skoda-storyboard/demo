@@ -192,3 +192,6 @@ All files below are under `www.skoda-storyboard.com/direct-download/`, except th
 - [x] The 20 previously blocked pages pushed + previewed (2026-10-08, 20/20 preview 200)
 - [x] The 14 ready new pages published (2026-10-08, user go-ahead): 14/14 live 200 and indexed; the live index now leads with Peaq designblok (8 Oct), Octavia full hybrid (5 Oct), Superb 25 (29 Sep)
 - [x] The 20 blocked new pages published after ingest (2026-10-09, user go-ahead): 20/20 live 200 and indexed
+
+## Status (2026-10-11, M1 ticket review)
+✅ **Done, closed** (#300). 23/23 pages published (PR #309). The remaining public 404 of `newsletter_subscribe.webp` is the WebP delivery problem on #219 (M2, BLOCKED).

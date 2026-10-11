@@ -30,3 +30,9 @@ The source has known WCAG gaps (checkbox-hack mobile nav, auto-rotating carousel
 
 ## Risks / Flags
 - Modal focus-trap and mega-menu timing are `[RUNTIME-UNCONFIRMED]` — must be checked in a browser/AT, not assumed. (`SKODA-EDS-DA-ARCHITECTURE.md` §13, `SKODA-SYSTEM-BUILD-SPECS.md` §5/§8)
+
+## Status (2026-10-11, M1 ticket review)
+🔵 **Ready to pick up, no owner** (#43).
+- **Out of M1:** the Škodapedia glossary modal. SKODA-206 (#20) is M2, and Škodapedia links to the live site. Check it when SKODA-206 lands.
+- **Modals in scope:** the gallery / story lightbox (`scripts/lightbox.js`), the Media Box lightbox (#315), the header search and the mobile nav.
+- **Inputs already measured:** Lighthouse accessibility 92–93 on the series and press-kit hubs (#285, #275); the axe `color-contrast` / `link-in-text-block` findings that #307 and #308 report as the same as the source; the topbar "Media Room" contrast (#299). Record each as "fixed" or "as source, accepted".
