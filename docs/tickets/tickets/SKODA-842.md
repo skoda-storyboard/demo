@@ -15,7 +15,7 @@
   uploads them to DA and wires the Library panel. Use it, then review its output against the contracts.
 - **Status (2026-10-10):** 🟡 IN PROGRESS. PR [#322](https://github.com/skoda-storyboard/demo/pull/322) holds the generator, the
   spec and the coverage check (`tools/library/`). The DA sheets, the config rows and the `/library/**` noindex row (preview)
-  are done. Waiting on: the upload of the library documents, the acceptance checks in the editor, and the live publish of
+  are done, and the documents are uploaded and previewed (2026-10-11). Waiting on: the acceptance checks in the editor and the live publish of
   the bulk metadata sheet. See "Progress".
 
 ## Problem
@@ -86,9 +86,14 @@ About 2–3 days for blocks and templates; the story template alone is about hal
 - **Decisions:**
   - **No Placeholders row:** `/en/placeholders.json` holds code UI strings, and DA `{{key}}` tokens aren't resolved.
   - **Regeneration** is `npm run library:build`, documented in `tools/library/README.md`.
+- **Uploaded (2026-10-11):**
+  - 19 block documents, 5 templates, `/library/README` and the placeholder images are in DA and previewed (not published).
+  - On the branch preview, all 24 documents load every block with no block errors, and they carry `robots: noindex,
+    nofollow` from the bulk row. The README previews at `/library/readme`.
+  - The only console errors are for `library-metadata`, a table the library panel reads, not a block.
 - **Open:**
-  1. Upload `library/blocks/`, `library/templates/` and `library/README` to DA (the app's DA upload). Then check, in the
-     editor, inserting each block and starting a story and a press release from a template.
+  1. Editor checks: insert each block from the Library panel, start a story and a press release from a template, and
+     check they appear in their rails after publish.
   2. Publish `/metadata.json`. This waits on the 9 previewed but never published language rows (cs/de/sk/sr) that the
      publish would also ship.
   3. Templates still carry origin-CDN icons (AR-01) and the newsletter card (SKODA-840).
