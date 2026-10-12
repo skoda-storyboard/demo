@@ -169,6 +169,7 @@
         "sort",
         "limit",
         "exclude",
+        "order",
         "dots",
         "model",
         "derivative",
