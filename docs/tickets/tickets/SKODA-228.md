@@ -5,7 +5,7 @@
 - **Phase:** A · **Milestone:** M1 (15 Oct demo)
 - **GitHub issue:** [#323](https://github.com/skoda-storyboard/demo/issues/323)
 - **Estimate:** 0.5 SP · AI-assisted 0.25d / manual 0.5d *(planning estimate, not a quote)*
-- **Status (2026-10-11):** 🔵 TODO, ready to pick up
+- **Status (2026-10-12):** 🟡 In review, implemented on branch `fix-296-stories-qa` (the #296 Stories QA PR)
 - **Origin:** M1 ticket review, 2026-10-11. One root cause behind observations in #274, #284 and #296. #306 (#272) fixes it for the home rails only.
 
 ## Problem
@@ -41,3 +41,8 @@ Measured on `main` (live), 1280 × 900, first card of each block, colour + `text
 
 ## Dependencies
 - Related: #306 (home QA, scoped copy of this fix), #272, #274, #284, #296. CSS guardrails: `docs/guardrails/css-guidelines.md`.
+
+## Implementation notes (2026-10-12, branch `fix-296-stories-qa`)
+- `styles/card-teaser.css`: `.card-teaser-title a:hover { color: inherit; text-decoration: none; }` (0,2,1), which outranks the global `a:hover` (0,1,1). #306's home-only copy in `blocks/story-rail/story-rail.css` is removed. A story-rail CSS contract test checks both.
+- **Measured** (local dev server, branch code, first card title of every rail / card grid, colour + `text-decoration-line` at rest vs hovered): 0 changes on the model page (4 rails), press release (press band), Media Room home, Storyboard home and the Epiq story (Explore more + Related Stories), at 1440 / 1280 / 992 / 768 / 390.
+- Ordinary links keep the global hover (body / footer link: `#0e3a2f` + underline, or the band's white + underline). The card's `:focus-visible` ring is unchanged (2px solid).
