@@ -131,13 +131,14 @@ const rail = (id, type, { all = true, sub = 'Based on tags: Kodiaq, SUV', q = 'f
   ${all ? `<a class="btn-ghost-compact search-results-header-link" href="https://www.skoda-storyboard.com/en/${id}/?${q}">All</a>` : ''}</header>
   <div class="search-results-items"><div class="search-results-item"><article class="article-teaser">SSR card</article></div></div></div></div></div>`;
 
-test('tag rail → h2 + subheading as default content, facets + viewall from its All link; no heading/subheading keys', { skip }, () => {
+test('tag rail → h3 (as the source, #284) + subheading as default content, facets + viewall from its All link; no heading/subheading keys', { skip }, () => {
   const doc = page(rail('news', 'press_release'));
   storyRail(doc.querySelector('#news .search-results-container'), { document: doc });
-  const h2 = doc.querySelector('h2');
-  assert.equal(h2.textContent, 'News');
-  assert.equal(h2.getAttribute('data-model-key'), 'news');
-  assert.equal(doc.querySelector('h2 + p').textContent, 'Based on tags: Kodiaq, SUV');
+  assert.equal(doc.querySelector('h2'), null);
+  const h3 = doc.querySelector('h3');
+  assert.equal(h3.textContent, 'News');
+  assert.equal(h3.getAttribute('data-model-key'), 'news');
+  assert.equal(doc.querySelector('h3 + p').textContent, 'Based on tags: Kodiaq, SUV');
   const t = doc.querySelector('table');
   assert.equal(blockName(t), 'Story Rail');
   assert.deepEqual(rows(t), [['template', 'press_release'], ['model', 'kodiaq'], ['bodywork', 'suv'], ['viewall', 'All']]);
@@ -166,7 +167,7 @@ test('Bodywork rail: parent page → its derivatives by path; derivative page �
   let doc = page(DERIV);
   storyRail(doc.querySelector('.search-results-container'), { document: doc, params: { originalURL: 'https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/' } });
   assert.deepEqual(rows(doc.querySelector('table')), [['template', 'skoda_model'], ['path', '/en/skoda-model/new-kodiaq/']]);
-  assert.equal(doc.querySelector('h2').textContent, 'Bodywork / Derivatives');
+  assert.equal(doc.querySelector('h3').textContent, 'Bodywork / Derivatives'); // h3, as the source (#284)
   doc = page(DERIV);
   storyRail(doc.querySelector('.search-results-container'), { document: doc, params: { originalURL: 'https://www.skoda-storyboard.com/en/skoda-model/new-kodiaq/kodiaq-rs/' } });
   assert.deepEqual(rows(doc.querySelector('table')), [['template', 'skoda_model'], ['path', '/en/skoda-model/new-kodiaq']]);
@@ -215,7 +216,15 @@ test('corpus: every page emits only blocks on main, no dangling nav link, every 
     names.forEach((n) => assert.ok(ON_MAIN.has(n), `${slug}: emits ${n}`));
     assert.equal(element.querySelectorAll('[data-model-key]').length, 0, `${slug}: data-model-key leaked`);
 
-    const headingTexts = new Set([...element.querySelectorAll('h2')].map((h) => h.textContent.trim()));
+    // section headings: the h2s, and the rails' h3s (a Story Rail follows, after its
+    // "Based on tags" line); not the drawings' h3s
+    const railHeading = (h) => {
+      let next = h.nextElementSibling;
+      if (next && next.matches('p') && /^based on tags/i.test(next.textContent.trim())) next = next.nextElementSibling;
+      return !!next && next.matches('table') && blockName(next) === 'Story Rail';
+    };
+    const headingTexts = new Set([...element.querySelectorAll('h2, h3')]
+      .filter((h) => h.tagName === 'H2' || railHeading(h)).map((h) => h.textContent.trim()));
     const links = [...element.querySelectorAll('ul a[href^="#"]')];
     assert.ok(links.length >= 6, `${slug}: ${links.length} nav links`);
     assert.equal(links.length, headingTexts.size, `${slug}: one nav link per section heading`);

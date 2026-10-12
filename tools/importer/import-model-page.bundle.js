@@ -333,10 +333,10 @@ var CustomImportScript = (() => {
         rows.push(["viewall", viewAll]);
       }
     }
-    const h2 = document2.createElement("h2");
-    h2.textContent = headingText;
-    h2.setAttribute("data-model-key", railId);
-    const out = [h2];
+    const h3 = document2.createElement("h3");
+    h3.textContent = headingText;
+    h3.setAttribute("data-model-key", railId);
+    const out = [h3];
     if (subText) {
       const p = document2.createElement("p");
       p.textContent = subText;
@@ -1102,13 +1102,20 @@ var CustomImportScript = (() => {
     const bySlug = DEMO_PATHS.filter((p) => p.startsWith("/en/tag/") && p.endsWith(`/${slug}`) && p.split("/").length === 5);
     return bySlug.length === 1 ? bySlug[0] : null;
   }
+  function isRailViewAll(a) {
+    const row = a.closest("tr");
+    const table = row && row.closest("table");
+    if (!table || row.cells.length < 2 || row.cells[0].textContent.trim().toLowerCase() !== "viewall") return false;
+    const head = table.rows[0] && table.rows[0].cells[0];
+    return !!head && /^story rail\b/i.test(head.textContent.trim());
+  }
   function transform4(hookName, element, payload) {
     if (hookName !== TransformHook3.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
       let href = a.getAttribute("href");
       if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
       if (href.startsWith("/direct-download/")) href = `${SOURCE_ORIGIN}${href}`;
-      else href = tagPageHref(href) || rewriteHref(href) || href;
+      else href = !isRailViewAll(a) && tagPageHref(href) || rewriteHref(href) || href;
       if (href !== a.getAttribute("href")) a.setAttribute("href", href);
     });
   }

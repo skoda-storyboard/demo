@@ -280,6 +280,32 @@ The rails render whatever the index / media feed holds; the gap is content that 
   video count can stay below the source.
 - Person owners are not assigned in this repo yet (docs/tickets/OVERVIEW.md); the owning tickets above carry the work.
 
+## M1 QA fixes ([#284](https://github.com/skoda-storyboard/demo/issues/284), 2026-10-12)
+
+Measured against the source (Superb, Epiq) at 1440 / 1080 / 992 / 768 / 390, first card of each rail.
+
+| Observation | Source | Before | Now | Where |
+|---|---|---|---|---|
+| Rail + Bodywork / Derivatives titles | `h3` 26/32.5/600 | `h2` | `h3` 26/32.5/600, tops within 1px | `parsers/story-rail.js`; the template reads `h2` or `h3` (pages imported before #284 keep `h2`) |
+| Date → title text gap, overlay rails | 12px | 27px | 12px box gap (text 11–12px: font metrics) | `story-rail.css`, every story-rail; the press band (13px) and story related band keep theirs |
+| Date → title text gap, Images / Videos | 14px | 16px | 14px; the 44px date row is unchanged | `carousel.css` `.carousel.media` |
+| Rail arrows | 32px ink disc, white glyph disc, arrow cut out | 8px white chevron | the source glyph on every carousel arrow (as on the source's press, story, home and model rails) | `carousel.css` |
+| News "All" | `/en/news/?filter[model][]=<model>` | `/en/tag/model/<model>` | `/en/news?filter[model][]=<model>` (the runtime link policy keeps the listing on the demo) | `skoda-links.js` rule 4 skips a Story Rail `viewall` |
+
+- **Also fixed by the shared CSS:** the Media Room home's News / Latest Stories rails (27px → 12px, as the source).
+- **Re-import:** all 23 model pages re-imported. Only Epiq, Peaq and Enyaq Coupé iV pushed (preview): the other 20
+  link a Technical Data PDF that is still a pending media-manifest row, so the binary gate blocks them. They keep
+  `h2` titles and the tag-page News "All" until their PDFs are ingested to DAM (developer machine,
+  `tools/importer/media/README.md`), then re-push. The CSS fixes reach all 23 now.
+- **Not changed, by decision:** title hover (→ SKODA-228, #323); Superb video "+" (cdn MP4 not on DAM, #78 /
+  SKODA-902); video download opening in a tab (cdn URL, left as is, SKODA-902); Epiq nav without Key Facts /
+  Technical Data (no target sections, left out); Images / Videos arrow position (source parity); Epiq article
+  counts (content scope, M1 pilot set).
+- **Checks:** axe 4.10.3 and Lighthouse 12 equal to main (accessibility 92: `color-contrast`, `link-in-text-block`,
+  as the source; SEO 69 is `is-crawlable`, the non-production hosts' noindex). The footer observations already
+  match the source on main (#307): `h3` titles, "consent to the processing" not underlined on hover, "Manage
+  subscription" `#419468`.
+
 ## Dependencies
 - Upstream: SKODA-202 (hero), SKODA-201 (cards/rails), SKODA-402 (query-index retrieval), SKODA-203 (gallery-lightbox), SKODA-505 (media-cart), SKODA-601 (import infra)
 - Downstream: SKODA-1001 (per-locale trees)

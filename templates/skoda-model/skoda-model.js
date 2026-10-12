@@ -52,6 +52,14 @@ const roleFor = (section, id) => (section.querySelector('.cards.key-facts')
   ? SECTIONS.find((s) => s.role === 'model-highlights')
   : sectionFor(id));
 
+/**
+ * A section's heading: its h2, else its h3 (the rails' titles are h3 as on the source, #284;
+ * pages imported before that carry h2). A text section's h3s (drawings) follow its h2.
+ * @param {Element} section
+ */
+const sectionHeading = (section) => section.querySelector(':scope > .default-content-wrapper > h2[id]')
+  || section.querySelector(':scope > .default-content-wrapper > h3[id]');
+
 /** The `template` value of a story-rail config table (before the block decorates). */
 function railTemplate(rail) {
   const row = [...rail.children].find((r) => r.children[0]?.textContent.trim().toLowerCase() === 'template');
@@ -70,7 +78,7 @@ function decorateHero(main) {
 /** Tag each content section with its role; mark rail variants and lead-in lines. */
 function decorateSections(main) {
   main.querySelectorAll(':scope > .section').forEach((section) => {
-    const heading = section.querySelector(':scope > .default-content-wrapper > h2[id]');
+    const heading = sectionHeading(section);
     const match = roleFor(section, heading?.id);
     if (!match) return;
     section.classList.add(match.role);
@@ -138,7 +146,7 @@ function decorateNav(main) {
 
   // a rail that turns out empty removes its section; drop its link too
   main.addEventListener('story-rail:empty', (e) => {
-    const id = e.target.querySelector?.('h2[id]')?.id;
+    const id = e.target.matches?.('.section') ? sectionHeading(e.target)?.id : undefined;
     if (id) list.querySelector(`li[data-target="${CSS.escape(id)}"]`)?.remove();
   });
 

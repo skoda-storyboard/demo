@@ -127,10 +127,15 @@
   margin: 0;
 }
 
-/* source: a 44px date row (10px padding), then a two-line 15/18 title with 10px below */
+/* source: a 44px date row (10px padding), then a two-line 15/18 title with 10px below. Its 11px
+   date is an inline span on the row's 16/24 baseline, 2px under the line's centre: the row
+   stays 44px, the text sits 2px lower, 14px above the title (#284) */
 .carousel.media .card-teaser-date {
+  --media-card-date-baseline: 2px;
+
   margin: 0;
-  padding: var(--media-card-pad) 0;
+  padding: calc(var(--media-card-pad) + var(--media-card-date-baseline)) 0
+    calc(var(--media-card-pad) - var(--media-card-date-baseline));
   color: var(--skoda-grey-350);
   line-height: var(--media-card-date-row);
 }
@@ -234,7 +239,7 @@
   pointer-events: none;
 }
 
-/* --- arrows: 32px transparent button, ink icon-disc, white chevron -------- */
+/* --- arrows: 32px transparent button, ink icon-disc, the source arrow glyph --- */
 .carousel-arrow {
   position: absolute;
   top: 50%;
@@ -267,24 +272,19 @@
   transform: scale(0.95);
 }
 
-/* the white chevron (two borders of a rotated box) */
+/* the source glyph (skoda-bnr-icons \e00b / \e00c, flickity prev / next): a 90% white disc with
+   the arrow cut out over the ink disc, so the arrow reads ink on white. Every rail's arrows, the
+   home bands' (#272) and the model pages' (#284) alike */
 .carousel-arrow::after {
   content: "";
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0.5em;
-  height: 0.5em;
-  border-top: 2px solid var(--skoda-white);
-  border-right: 2px solid var(--skoda-white);
-}
-
-.carousel-prev::after {
-  transform: translate(-30%, -50%) rotate(-135deg);
+  inset: 0;
+  background-color: color-mix(in srgb, var(--skoda-white) 90%, transparent);
+  mask: url("../../icons/rail-arrow-prev.svg") center / 100% 100% no-repeat;
 }
 
 .carousel-next::after {
-  transform: translate(-70%, -50%) rotate(45deg);
+  mask-image: url("../../icons/rail-arrow-next.svg");
 }
 
 /* disabled at a track end → fade out (source :disabled{opacity:0}) */

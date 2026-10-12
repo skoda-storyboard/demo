@@ -195,3 +195,17 @@ test('single-tag news filter becomes the demo tag page (SKODA-607)', { skip }, (
   const all = `${SRC}/en/news/?filter[years]%5B0%5D=61572&amp;filter[model]%5B0%5D=61611`;
   assert.equal(one(all), `${SRC}/en/news/?filter[years]%5B0%5D=61572&filter[model]%5B0%5D=61611`);
 });
+
+test('a Story Rail viewall keeps the filtered listing, as the source rail "All" (#284)', { skip }, () => {
+  const rail = (head, key, href) => run(`<table><tr><th colspan="2">${head}</th></tr>
+    <tr><td>template</td><td>press_release</td></tr><tr><td>${key}</td><td><a href="${href}">All</a></td></tr></table>`);
+  // not the tag page: rule 1 as for any link (a filter link to the live-only /en/news stays
+  // as authored, and the runtime links policy opens it on the demo listing, scripts/links.js)
+  const news = `${SRC}/en/news/?filter[model][]=superb`;
+  assert.deepEqual(hrefs(rail('Story Rail', 'viewall', news)), [news]);
+  assert.deepEqual(hrefs(rail('Story Rail (wide)', 'viewall', news)), [news]);
+  assert.deepEqual(hrefs(rail('Story Rail', 'viewall', '/en/news?filter[model][]=superb')), ['/en/news?filter[model][]=superb']);
+  // a tag chip elsewhere (another block, another row) still becomes the tag page
+  assert.deepEqual(hrefs(rail('Tags', 'viewall', news)), ['/en/tag/model/superb']);
+  assert.deepEqual(hrefs(rail('Story Rail', 'tags', news)), ['/en/tag/model/superb']);
+});
