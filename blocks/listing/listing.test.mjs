@@ -56,6 +56,7 @@ globalThis.fetch = async (url) => {
 
 const {
   default: decorate, mediaCell, isMediaTemplate, wireMediaLightbox, valueLabel,
+  facetLabelMap, orderFacetValues,
   FILTER_SETTLE_MS, VEIL_MS, LOAD_MORE_MS,
 } = await import('./listing.js');
 
@@ -692,7 +693,7 @@ test('402a: a filtered deep link opens that facet\'s option list, like the sourc
   assert.equal(pill.querySelector('.facet-count').textContent, '1');
 });
 
-test('the index is requested alongside the placeholders (SKODA-702)', async () => {
+test('the index (and the option names, #273) are requested alongside the placeholders (SKODA-702)', async () => {
   const { clearPlaceholdersCache } = await import('../../scripts/placeholders.js');
   clearPlaceholdersCache();
   window.history.replaceState({}, '', '/en/images'); // no filters left in the URL by earlier tests
@@ -703,7 +704,8 @@ test('the index is requested alongside the placeholders (SKODA-702)', async () =
   const realFetch = globalThis.fetch;
   globalThis.fetch = async (url) => {
     const u = String(url);
-    requested.push(u.includes('placeholders') ? 'placeholders' : 'index');
+    const kind = [['placeholders', 'placeholders'], ['facet-labels', 'labels']].find(([k]) => u.includes(k));
+    requested.push(kind ? kind[1] : 'index');
     if (u.includes('placeholders')) await held; // the placeholders answer slowly
     return realFetch(url);
   };
@@ -712,7 +714,7 @@ test('the index is requested alongside the placeholders (SKODA-702)', async () =
     const done = decorate(block);
     await settle();
     // both in flight before the placeholders answer
-    assert.deepEqual([...new Set(requested)].sort(), ['index', 'placeholders']);
+    assert.deepEqual([...new Set(requested)].sort(), ['index', 'labels', 'placeholders']);
     releasePlaceholders();
     await done;
     assert.equal(block.querySelectorAll('.listing-items > li').length, 2);
@@ -728,4 +730,31 @@ test('toolbar parity (SKODA-402b, CSS guard): collapsed sort row 12px under the 
   assert.match(css, /\.listing \.listing-sort \{[^}]*margin-block: var\(--spacing-s\) 0;/, 'source .cover-box 12px top padding');
   assert.match(css, /\.listing\.facets-open \.listing-sort \{\s*margin-block-start: 0;/, 'the open panel keeps its zero start margin');
   assert.match(css, /\.listing-sort-btn\[aria-pressed="true"\] \{\s*color: var\(--skoda-black\);/, 'source span.active #000');
+});
+
+test('option names and order (#273): the source names in the source order, a Year is a year', () => {
+  const labels = facetLabelMap({
+    model: [['citigoe', 'Citigoᵉ iV'], ['epiq', 'Epiq'], ['peaq', 'Peaq']],
+    company: [['india', 'India'], ['india-2-0', 'India 2.0']],
+    broken: 'not a list',
+    years: [['2024', '2024']],
+  });
+  assert.equal(labels.get('model').get('citigoe').name, 'Citigoᵉ iV');
+  assert.equal(labels.has('broken'), false);
+  const v = (...vals) => vals.map((value) => ({ value }));
+  // known names in the source order; unknown ones after, by name
+  assert.deepEqual(orderFacetValues(v('peaq', 'zz-new', 'citigoe', 'aa-new', 'epiq'), 'model', labels).map((x) => x.value),
+    ['citigoe', 'epiq', 'peaq', 'aa-new', 'zz-new']);
+  // a stray Year tag is not an option
+  assert.deepEqual(orderFacetValues(v('x', '2025', '2024'), 'years', labels).map((x) => x.value), ['2024', '2025']);
+  // no names file: title-cased slugs by name, as before
+  assert.deepEqual(orderFacetValues(v('suv', 'combi'), 'bodywork', facetLabelMap(null)).map((x) => x.value), ['combi', 'suv']);
+});
+
+test('media card crop (#273): the feed focus anchors the image, anything else stays centred', () => {
+  const wrap = (focus) => mediaCell(imageRow(1, focus === undefined ? {} : { focus }), false).querySelector('.listing-item-image');
+  assert.equal(wrap('top').dataset.focus, 'top');
+  assert.equal(wrap(' Bottom ').dataset.focus, 'bottom');
+  assert.equal(wrap('left').dataset.focus, undefined);
+  assert.equal(wrap(undefined).dataset.focus, undefined);
 });

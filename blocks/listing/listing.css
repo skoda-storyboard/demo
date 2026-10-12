@@ -16,6 +16,7 @@
 .listing {
   /* the source sort row height: sort links and the desktop "Advanced filter" toggle */
   --listing-sort-height: 35px;
+  --listing-sort-inactive: var(--skoda-grey-250); /* the source's inactive sort link, #ccc */
 
   /* the filter panel's reveal (source jQuery show(400): height, margins, opacity); the sort
      row's margin moves with it, so both read the same timing */
@@ -354,8 +355,8 @@
 }
 
 /* live .sort-options span / a: 14/600/21 in a 35px-tall, 14px-padded box, no gap between.
-   Active is the source black (span.active #000); inactive stays --skoda-grey-500: the source
-   #ccc is 1.6:1 on white. */
+   Active is the source black (span.active #000), inactive the source #ccc (#273 obs. 10, PO:
+   match the source; 1.6:1 on white, recorded as an accessibility trade-off like #419468). */
 .listing .listing-sort-btn {
   display: inline-flex;
   align-items: center;
@@ -363,7 +364,7 @@
   padding: 0 1em;
   font-size: var(--body-font-size-s);
   font-weight: var(--weight-semibold);
-  color: var(--skoda-grey-500);
+  color: var(--listing-sort-inactive);
   background: none;
   border: 0;
   cursor: pointer;
@@ -432,13 +433,22 @@
 .listing .listing-count {
   padding-block: 0.5em;
   margin-block: calc(var(--grid-gutter) + 1em) 1em;
-  font-weight: var(--weight-semibold); /* source measured 500; SKODA Next has no 500 face → 600 per _FOUNDATIONS §weights */
+  font-weight: var(--weight-regular);
   color: var(--text-color);
   border-block-end: 1px solid var(--pagination-border);
 }
 
+/* the numbers and their "/" are the source's #aeaeae at 500, which SKODA Next (no 500 face)
+   draws regular, as on the source (#273, PO: match the source; 2.3:1 on white, recorded as an
+   accessibility trade-off). The source's markup leaves a space before the "/" only */
+.listing .listing-count-current,
+.listing .listing-count-total {
+  font-weight: var(--weight-medium);
+  color: var(--listing-count-color);
+}
+
 .listing .listing-count-total::before {
-  content: " / ";
+  content: " /";
 }
 
 /* --- status (loading / no-results) --- */
@@ -516,7 +526,7 @@
   --media-card-button: 40px;
   --media-card-ring: 2px;
   --media-card-button-gap: 8px;
-  --media-card-icon: calc(16px * 1080 / 1024); /* the faux-bold glyph's 1080-unit box around its 16px em (#275) */
+  --media-card-icon: 16px; /* the source glyph's em (skoda-bnr-icons 16/16, faux-bold 600) */
   --media-card-play: 32px;
   --media-card-menu-gap: 7px;
   --media-card-menu-pad: 12px;
@@ -538,6 +548,16 @@
 .listing.listing-media .listing-item-image img {
   height: 100%;
   border-radius: 0;
+}
+
+/* the source anchors some images in the 16:9 crop (its .image-holder snap-top / snap-bottom,
+   the feed's `focus`; #273, e.g. a portrait keeps its head); the rest stay centred */
+.listing.listing-media .listing-item-image[data-focus="top"] img {
+  object-position: 50% 0;
+}
+
+.listing.listing-media .listing-item-image[data-focus="bottom"] img {
+  object-position: 50% 100%;
 }
 
 /* video: the source's centred 32px play glyph (a ringed, outlined triangle, white) */
@@ -615,20 +635,29 @@
   cursor: pointer;
 }
 
-.listing.listing-media .media-card-button::before {
-  content: "";
-  width: var(--media-card-icon);
-  height: var(--media-card-icon);
-  background-color: currentcolor;
-  mask: var(--media-card-button-icon) center / contain no-repeat;
+/* the source glyphs, drawn as the source draws them (skoda-bnr-icons 16/16 at weight 600, which
+   the regular-only font renders faux-bold, antialiased): an SVG mask of the same shape drew them
+   8–16% lighter at 1–1.25x (#273). Decorative: the button's aria-label names it (the empty alt
+   text keeps the glyph out of it; plain content first for browsers without CSS alt text) */
+.listing.listing-media .media-card-button::before,
+.listing.listing-media .media-card-size[data-in-cart]::after {
+  content: var(--media-card-glyph);
+  content: var(--media-card-glyph) / "";
+  flex: none;
+  font-family: var(--media-card-icon-font);
+  font-size: var(--media-card-icon);
+  font-weight: var(--weight-semibold);
+  line-height: var(--media-card-icon);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .listing.listing-media .media-card-button.add {
-  --media-card-button-icon: url("../../icons/media-cart-add.svg");
+  --media-card-glyph: "\e001";
 }
 
 .listing.listing-media .media-card-button.download {
-  --media-card-button-icon: url("../../icons/media-download.svg");
+  --media-card-glyph: "\e012";
 }
 
 /* size menu, 7px below its button with rows of 16/16 medium text and 12px padding: it starts
@@ -649,6 +678,16 @@
 
 .listing.listing-media .media-card-menu[hidden] {
   display: none;
+}
+
+/* the gap above the menu is part of it, so a mouse moving from the button to the rows keeps
+   a hover-opened menu open (scripts/media-card.js) */
+.listing.listing-media .media-card-menu::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 100%;
+  height: var(--media-card-menu-gap);
 }
 
 /* rows are flush (no global li margin): 2 × 40px on the source */
@@ -700,22 +739,15 @@
 }
 
 .listing.listing-media .media-card-button.add[data-in-cart] {
-  --media-card-button-icon: url("../../icons/media-remove.svg");
+  --media-card-glyph: "\e034";
 }
 
 .listing.listing-media .media-card-size[data-in-cart] {
+  --media-card-glyph: "\e034";
+
   display: flex;
   gap: var(--media-card-button-gap);
   align-items: center;
-}
-
-.listing.listing-media .media-card-size[data-in-cart]::after {
-  content: "";
-  flex: none;
-  width: var(--media-card-icon);
-  height: var(--media-card-icon);
-  background-color: currentcolor;
-  mask: url("../../icons/media-remove.svg") center / contain no-repeat;
 }
 
 /* bound but with no published original (505a disables it): visibly unavailable */
@@ -782,12 +814,12 @@
 /* --- load-more: shared ghost pill; under the count, 16px padded like the source --- */
 
 /* Load more sits 76px above the footer on the source (16px padding + the section's 48px + 12px);
-   the listing's trailing gutter makes up the 20px the section margin lacks (#273 obs. 7) */
+   the listing's trailing gutter makes up the 20px the section's 40px margin lacks (#273 obs. 7).
+   As padding: a bottom margin here collapsed into the section's, so the button sat 56px up */
 .listing .listing-loadmore {
   display: flex;
   justify-content: center;
-  padding-block: var(--spacing-m);
-  margin-block-end: var(--grid-gutter);
+  padding-block: var(--spacing-m) calc(var(--spacing-m) + var(--grid-gutter));
 }
 
 .listing .listing-loadmore-btn {

@@ -15,7 +15,7 @@ const dom = new JSDOM('<main></main>', { url: 'https://example.com/en/images' })
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
 const {
-  mediaActions, mediaLabels, playBadge, DEFAULT_LABELS,
+  mediaActions, mediaLabels, playBadge, DEFAULT_LABELS, downloadHref,
 } = await import('./media-card.js');
 
 const image = {
@@ -128,6 +128,39 @@ test('one menu open at a time; a click outside closes it', () => {
   assert.equal(dl.getAttribute('aria-expanded'), 'false');
 });
 
+const pointer = (el, type, pointerType = 'mouse') => {
+  const e = new window.Event(type);
+  Object.defineProperty(e, 'pointerType', { value: pointerType });
+  el.dispatchEvent(e);
+};
+
+test('size menu (#273): a mouse opens it on hover and closes it on leaving; a click then keeps it open', () => {
+  const actions = mount(mediaActions(image, 'a'));
+  const wrap = actions.querySelector('.media-card-action.add');
+  const toggle = wrap.querySelector('button');
+  const menu = wrap.querySelector('.media-card-menu');
+  pointer(wrap, 'pointerenter');
+  assert.equal(menu.hidden, false);
+  assert.equal(toggle.getAttribute('aria-expanded'), 'true');
+  pointer(wrap, 'pointerleave');
+  assert.equal(menu.hidden, true, 'leaving closes a hover-opened menu');
+  // hover, then click: the menu stays open, and a mouse leaving no longer closes it
+  pointer(wrap, 'pointerenter');
+  toggle.click();
+  assert.equal(menu.hidden, false, 'the click after hover keeps it open');
+  pointer(wrap, 'pointerleave');
+  assert.equal(menu.hidden, false, 'a clicked-open menu stays until a click outside');
+  document.querySelector('main').click();
+  assert.equal(menu.hidden, true);
+  // touch and pen keep the click toggle
+  pointer(wrap, 'pointerenter', 'touch');
+  assert.equal(menu.hidden, true, 'a touch does not open on hover');
+  toggle.click();
+  assert.equal(menu.hidden, false);
+  toggle.click();
+  assert.equal(menu.hidden, true);
+});
+
 test('play badge is decorative', () => {
   const badge = playBadge();
   assert.equal(badge.className, 'media-card-play');
@@ -178,6 +211,21 @@ test('media cart (SKODA-505a): the original\'s add is a cart toggle, the 1920px 
   );
   assert.equal(orig.dataset.thumb, 'https://cdn.skoda-storyboard.com/2026/08/a-768x512.jpg', 'the card image goes with it (505b)');
   assert.equal(add.dataset.thumb, '/en/poster.jpg', 'a video without an image: its poster');
+});
+
+test('downloads (#273): a file on the source cdn goes through the source /direct-download/ route; DAM links stay', () => {
+  const cdn = 'https://cdn.skoda-storyboard.com/2026/09/hudebni-leto_ee2dfc93-1920x1280.jpg';
+  assert.equal(downloadHref(cdn), 'https://www.skoda-storyboard.com/direct-download/2026/09/hudebni-leto_ee2dfc93-1920x1280.jpg');
+  assert.equal(downloadHref('http://CDN.skoda-storyboard.com/2026/06/v.mp4'), 'https://www.skoda-storyboard.com/direct-download/2026/06/v.mp4');
+  const dam = 'https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/images/a/a.jpg';
+  assert.equal(downloadHref(dam), dam);
+  assert.equal(downloadHref(''), '');
+  // the card: the 1920px row and the video link use it, the DAM original does not
+  const row = { ...image, original: dam, 'rendition-1920': cdn };
+  const rows = [...mediaActions(row, 'x').querySelectorAll('.media-card-action.download .media-card-size')].map((a) => a.href);
+  assert.deepEqual(rows, [dam, 'https://www.skoda-storyboard.com/direct-download/2026/09/hudebni-leto_ee2dfc93-1920x1280.jpg']);
+  const v = mediaActions({ ...video, mp4: 'https://cdn.skoda-storyboard.com/2026/06/v.mp4' }, 'v').querySelector('.media-card-button.download');
+  assert.equal(v.href, 'https://www.skoda-storyboard.com/direct-download/2026/06/v.mp4');
 });
 
 test('labels: placeholders translate every control, missing keys fall back to English', () => {

@@ -70,6 +70,7 @@ let menuSeq = 0;
 function closeOpenMenu(focusToggle = false) {
   if (!openMenu) return;
   const { toggle, menu, wrap } = openMenu;
+  openMenu.byHover = false;
   menu.hidden = true;
   toggle.setAttribute('aria-expanded', 'false');
   wrap.classList.remove('is-active');
@@ -165,8 +166,26 @@ function cartAction(el, row, size, original = '', title = '') {
   return el;
 }
 
+const SOURCE_CDN = /^https?:\/\/cdn\.skoda-storyboard\.com\//i;
+
+/**
+ * The download link of a file. One still on the source's file server (cdn.skoda-storyboard.com:
+ * the 1920px renditions, the videos not yet in the DAM) goes through the source's own
+ * /direct-download/ route, as the source's buttons do: it answers with the file as an
+ * attachment, where the cdn link would only open it in a tab (#273; the cross-origin `download`
+ * attribute is ignored). DAM originals already download (Content-Disposition: attachment).
+ * Replaced when the files move to the DAM (SKODA-902).
+ * @param {string} href
+ * @returns {string}
+ */
+export function downloadHref(href) {
+  return SOURCE_CDN.test(href || '')
+    ? href.replace(SOURCE_CDN, 'https://www.skoda-storyboard.com/direct-download/')
+    : href;
+}
+
 function downloadAction(el, href) {
-  el.href = href;
+  el.href = downloadHref(href);
   el.dataset.action = 'download';
   el.setAttribute('download', '');
   el.target = '_blank';
@@ -210,15 +229,35 @@ function sizeMenu(action, label, items) {
     menu.append(li);
   });
   const rows = () => [...menu.querySelectorAll('a')];
-  const state = { toggle, menu, wrap };
-
-  toggle.addEventListener('click', () => {
-    if (openMenu === state) { closeOpenMenu(); return; }
+  const state = {
+    toggle, menu, wrap, byHover: false,
+  };
+  const open = () => {
     closeOpenMenu();
     menu.hidden = false;
     toggle.setAttribute('aria-expanded', 'true');
     wrap.classList.add('is-active');
     openMenu = state;
+  };
+
+  toggle.addEventListener('click', () => {
+    // a menu the mouse opened stays open on the click that follows (it is the same intent)
+    if (openMenu === state && state.byHover) { state.byHover = false; return; }
+    if (openMenu === state) { closeOpenMenu(); return; }
+    open();
+  });
+  // a mouse opens the menu on hover and closes it on leaving, as the source's :hover menu
+  // (#273); the menu's top bridge (CSS) keeps the pointer inside across the gap. Touch, pen
+  // and keyboard keep the click / Enter / Space toggle.
+  wrap.addEventListener('pointerenter', (e) => {
+    if (e.pointerType !== 'mouse' || openMenu === state) return;
+    open();
+    state.byHover = true;
+  });
+  wrap.addEventListener('pointerleave', (e) => {
+    if (e.pointerType !== 'mouse' || openMenu !== state || !state.byHover) return;
+    state.byHover = false;
+    closeOpenMenu();
   });
   wrap.addEventListener('keydown', (e) => {
     if (openMenu !== state) return;

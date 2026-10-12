@@ -117,6 +117,37 @@ Compared with the live pages at desktop 1440 / 1280, tablet 1024 / 768 and mobil
   `scripts/media-lightbox.js` is on `main`; the M1 stub means "consent given"). When **SKODA-204a** (#215,
   `hasEmbedConsent()`) merges, the lightbox's Vimeo load must go through the same gate before SKODA-704 / 804 flip it.
 
+## M1 QA re-open ([#273](https://github.com/skoda-storyboard/demo/issues/273), 2026-10-12)
+
+QA re-opened #273 with an updated workbook. Measured on `/en/images` and `/en/videos`, source vs `main` vs branch,
+at 1440 / 768 / 390 (icons also at 1 / 1.25 / 1.5 / 2x).
+
+| QA # (Img / Vid) | Source | `main` | Branch |
+|---|---|---|---|
+| 1 / 1 icons lighter | skoda-bnr-icons `\e001` / `\e012` / `\e034`, 16px, weight 600 (faux-bold) | SVG masks, 8–16% lighter at 1–1.25x | the same glyphs from the same font: ink area equal at every pixel ratio |
+| 2 / 2 "+" | image: Original + 1920px menu; video: one toggle | Original works, 1920px disabled; video works | unchanged: **1920px stays disabled** (PO 2026-10-12, M2): our DAM holds no 1920px rendition (original, 1280, 2048) and the source's 1920px file has no CORS for the cart zip → **SKODA-902**: add a 1920px rendition to the Assets processing profile, then enable it |
+| 3 download by size | `/direct-download/…` (attachment) | 1920px + MP4 on the cdn open in a tab | files still on the source cdn go through its `/direct-download/` route (`downloadHref`); DAM originals already download |
+| 4 Original / 1920px on "+" | the menu opens on hover and on click | click only | also on hover for a mouse (a bridge over the 7px gap); a click after hover keeps it; touch / keyboard unchanged |
+| 5 / 3 filters | 15 groups, source names, source order | 8 groups, slug names ("Suv", "India 2 0"), a Year "x" (Videos) | the 15 groups in order (empty ones hidden: Concept, Environment), names + order from `blocks/listing/facet-labels.json` (generated from the source filter forms by `node tools/importer/build-facet-labels.mjs`), a Year is a 4-digit year; options only from migrated rows (PO) |
+| 6 cropped portrait | `.image-holder snap-top` | centred | the feed's new `focus` column (`snap-top` / `snap-bottom`, 7 of 1,714 images), `object-position` |
+| 7 / 4 below Load more | 76px | 56px (the margin collapsed into the section's) | 76px on every listing (padding) |
+| 8 / 5 above the count | 56px visible | 56px | unchanged (QA: fine) |
+| 9 / 6 Newest | `#000` (QA) | `#000` | unchanged |
+| 10 / 7 Oldest | `#ccc` | `#7c7d7e` | `#ccc` (PO: match the source; 1.6:1, accessibility trade-off) |
+| — count numbers | `#aeaeae`, 500, "12 /33539" | ink, 600 | `#aeaeae`, 500 (draws regular), " /" (PO: match; 2.3:1) |
+| 11, 12 / 8, 9 search | — | fixed on `main` | — |
+| 13 / 10 footer h3 | `h3` | fixed on `main` (#307, deployed after QA's check) | — |
+
+- **Content (DA preview, 2026-10-12; publish after merge):** `/en/images` and `/en/videos` re-imported (facets row
+  only); `/en/media-feed.json` gets the `focus` column (every other cell unchanged; `tools/importer/media-items` writes
+  it on the next build). Backups: `.migration/wt273-backup/`.
+- **Checks:** axe 4.10.3: no new rule; `color-contrast` +2 nodes (the count numbers, source parity). Lighthouse on
+  the same server: performance 90 = `main`, accessibility 92 = `main`, SEO 61 (`is-crawlable` noindex,
+  `meta-description` as on `main`).
+- **Shared:** News and Press Kits get the source names too ("G-TEC", "IAA", "deliveries") and 76px under Load more
+  below 992; at ≥ 992 News keeps `main`'s 103px+ (a News-only layout; noted, not this ticket). `/en/search` lists
+  nothing on `main` either (noted).
+
 ## Dependencies
 SKODA-402 (listing), SKODA-608 (rows), SKODA-203/216 (lightbox), SKODA-502 (download menu), SKODA-505a (cart),
 SKODA-204a (embed consent gate for the video lightbox), SKODA-1003 (per-locale placeholder rows).
