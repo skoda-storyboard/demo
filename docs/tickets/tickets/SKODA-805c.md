@@ -152,3 +152,76 @@ and finishes it.
 ## Publish (2026-09-30, after PR #222)
 - 50 of the 51 `press-kit-default` pages are published and indexed; DA matched the reviewed preview on all 51.
 - The one held is Peaq Images (see Deviations).
+
+## QA #275 (2026-10-09, branch `bug-275-press-kits-qa`)
+Press kits QA observations, FG (this page). Measured origin vs branch at 1440 / 1080 / 992 / 768 / 390.
+- **Fixed:**
+  - Body links (contact emails, the accordions' "PDF download" / "JPG download", the WhatsApp row) are the source's `#419468` (`press-kit.css`, 3.7:1 on white, as the source).
+  - Sidebar: "Media contacts" ends in the source's green chevron (`\e009`, `icons/chevron-right.svg`). "Download Media Box" is the source's label plus a round + that drives the Media Box's group toggle and mirrors its state (`press-kit.js`). Same position as the source (40px at x1294 at 1440).
+  - Accordion answers: an image and the links paragraph after it form one source cell, two or more in a row side by side from 781px (396px apart by 20 at 1440), links centred 23px apart. Items 2, 4, 5 and 7 are equal to the source at 1440 / 780 / 390.
+  - Video: the "Download video" link is the source's three round controls (add to cart, download, open the clip), at the source's positions at every width. The row keeps its 36px, so nothing below moves.
+  - Media Box: `h3` tile titles, the source date above each title (all 60 tiles, contract `downloads-file-rows` v2, emitted by `parsers/press-kit-media.js`), the size menu's "Original" / "1920px" `#161718` again (the dark band's white links had overridden it), PDF tiles with the source's PDF glyph on its 30% black holder, a clip's tile showing its first frame under the play ring (loaded when it scrolls into view), and file tiles that open their file.
+  - Lead image: imported with its full-size image link, so it opens the lightbox as the source's colorbox. The answers' photos do too (`scripts/media-lightbox.js` `wireImageLinks`).
+- **Already as the source:** the accordion "+" (both 16×16 ink, 1.5px stroke; the source's 32px is the glyph box), Show more `#78FAAE`, the sidebar link colour (`#353535` vs `#363636`).
+- **Deviations:** item 1's source has an empty paragraph after its image cells (44px), which DA doesn't keep. The source's item 3 images are 399 / 393 wide (unequal cells) against 396 / 396. The video stays the native DAM player (decision above), and its "open" control links the clip, because the source's attachment page has no counterpart.
+- **Re-import (DA preview only, publish after merge):** 35 press-kit pages updated (dates, lead link) after a text/link/image diff against DA showed nothing else changed.
+  - 3 conflicts (DA changed since the last recorded push, content identical) wait for an OK: 125-years `skoda-130-rs-1975…`, `skoda-fabia-rs-rally2…`, `skoda-sport-1949…`.
+  - Not pushed: `skoda-fabia-130-special-edition…` (its PDF / 3 MP4s aren't in the DAM yet), and 7 pages whose fresh import also carries other changes not yet in DA (Images galleries `Downloads (gallery)`, `Accordion (faq)`, `Footnotes`, origin drift): 125-years `/images`, Epiq `/images`, `/frequently-asked-questions`, `first-edition…`, Peaq `/images`, `/frequently-asked-questions`, `the-skoda-peaq-skodas-new-flagship…`.
+- **Notes (not changed here):**
+  - At 768 the Media Box tiles are 285×316 against the source's 236×286 (main as well).
+  - At 768 the page sits 24px above the source from the top (main as well).
+  - The source's Media Box thumbnails now have 8px corners (`downloads.md` measured 0).
+- **Round 2 (2026-10-09), full text and box sweep against the source at 1440 / 1080 / 992 / 768 / 390.**
+  - Every text element (size, weight, line height, colour, tracking, position) and box (lead, video, callout, tags, Media Box tiles, footer) now equals the source, apart from the deviations below. Footer top, footer height and page height are equal at 1440 / 768 / 390.
+  - Fixed in this round:
+    - the header date's 1.1px tracking;
+    - the sidebar rows `#363636`;
+    - the sidebar's 64px inset only from 1080, the source's switch (it was 992, so the menu and tags were 54px narrower at 992–1079);
+    - tag chips with the source's 5px end margin, a word space apart when centred below 768, so they wrap where the source's do;
+    - the Media Box grid no longer widened by a long file name (at 768 the three columns were 285 / 258 / 290px and overflowed; now 3 × 236);
+    - Media Box thumbnails with the source's 8px corners;
+    - the WhatsApp callout text keeps its 24px end padding (it wrapped differently at 390);
+    - the newsletter Submit / consent text at the source's weight 500 (neither site has a 500 face, so it renders as 400);
+    - the press-kit footer titles at 20/25 up to 768.
+  - Deviation, confirmed: the source's empty paragraph after item 1's images (44px) can't be carried. A `<p>&nbsp;</p>` pushed to DA is dropped by the preview pipeline (tested on a draft, since removed).
+- **Round 3 (2026-10-09), PO review:**
+  - **Hero image:** the source's 8px corners and its teaser overlay (the two light scrims).
+  - **Icons:** the source's cart / download / link and accordion "+" glyphs are its icon font at weight 600, which has no bold face, so the browser faux-bolds them.
+    - The icons now carry that weight: a 56-unit stroke in a 1080-unit box (link 40 / 1064), with each icon box scaled to keep the 16px em (link 24px). Measured ink at 4×, source vs branch: + 139.0 / 139.1 px², download 100.6 / 99.9, link 102.1 / 99.0, accordion + 57.1 / 55.7 (bars 1.65px).
+    - Same in the Media Box tiles (the tile ↓ now uses the source glyph), the images listing (139.0 / 139.1), the carousel and the lightbox.
+  - **Show more:** the source's `togglebox-opener`, a strip in the band's colour (the pill plus the 20px gap, 64px) behind the collapsed pill. Row 3 no longer peeks around the pill; on white Images chapters the strip is white.
+- **Round 4 (2026-10-09), PO review:**
+  - **Accordion "+":** now the source glyph `\e027` with its faux-bold weight (`icons/accordion-plus.svg`, a 48-unit stroke) instead of two CSS bars, which the browser snapped to whole pixels. Ink at 4×, source vs branch: closed 45.2 / 45.1 px², open 44.3 / 44.3, bars 1.42 / 1.46px.
+  - **Media Box image tiles:** the + opens the source's size menu instead of adding at once.
+    - "Original" adds or removes the original. While it's in the cart, the row ends in the source's trash glyph (`\e034`, now `icons/media-remove.svg` everywhere) and the image shows the cart overlay. The + itself keeps its plus, as on the source.
+    - "1920px" stays inert: the cart holds originals only (SKODA-505a, D5). On the source it adds the 1920px rendition.
+  - **Both size menus:** the source's geometry. 47px under the button and 2px in; 40px rows of 16/16 text, weight 500, 1px tracking, 12px insets; the centred 75% hairline between rows. Measured: menu 87.2 × 80 on both, 111 with the trash glyph.
+  - PDF / MP4 tiles, the video's + and the sidebar + stay single toggles that swap to the trash glyph when added, as on the source.
+- **Round 5 (2026-10-09), PO review:**
+  - **Added card's icon:** the source's bag glyph `\e02f` (`icons/media-cart-added.svg`, white, regular weight, 48px on the 40% scrim). It fades in 0.3s after the add, and leaves at once on remove, as the source's (`--cart-added-delay`).
+  - **Flying to cart:** `scripts/media-cart-fly.js`.
+    - When a card's add goes in (new `media-cart:added` event from the cart's controls), a 70% copy of its picture flies to the dock's cart badge, fitting a 100px box (700ms easeInOutExpo), then shrinks and fades out (400ms). The badge wobbles a second after the click (8 / −6 / 4 / −2 / 1px, 0.5s).
+    - Frames match the source's (e.g. 292×165 → 100×56).
+    - Media Box tiles and the images / videos listing (the model-page media rails don't install the flight: their toolbar is the rail's own, see the #307 review note). Files and the clip toolbar don't fly, as on the source. Nothing moves under reduced motion; the copy is inert and hidden from assistive tech.
+- **Review (PR #307, Lars, 2026-10-11; addressed 2026-10-12):**
+  - **[P2] The flying copy lost the thumbnail's size and crop.**
+    - The cause: the deep clone was appended to `<body>`, outside the block, so the `.downloads`-scoped picture / image styles no longer applied. At 390 the copy drew the image at 500 × 333, `object-fit: fill`, unclipped. The thumbnail it came from is 368 × 207 cover inside a clipped 370 × 209 holder.
+    - The fix: `flyingCopy()` builds a standalone copy with everything that shapes it inlined:
+      - a fixed box the size of the thumbnail, with `overflow: hidden` and the thumbnail's corner radius;
+      - one `<img>` of the rendered source (`currentSrc`, so no other `srcset` candidate);
+      - that image at its rendered size and offset, with its `object-fit` / `object-position`.
+    - Measured at the copy's first frame:
+      - Media Box @390: holder 370 × 209 → copy 370 × 209 clipped; image 368 × 207 cover → 368 × 207 cover, same offset.
+      - @1440: 292 × 165.1 / 290 × 163.1, equal.
+      - Images listing @390 / @1440: equal.
+  - **Browser geometry coverage:** `docs/ui-specs/tools/media-cart-fly.test.mjs` (Playwright, the press-release-spacing pattern).
+    - It adds the first Media Box image on the first-glimpse page at 390 / 768 / 1440.
+    - It freezes the copy at its first frame and asserts its box, clip, corners, image rect, crop and source against the thumbnail.
+    - It fails on the old code (@390 the image's offset and size) and passes now.
+    - `scripts/media-cart-fly.test.mjs` covers the copy's structure on jsdom.
+  - **Not in scope, recorded:** the model-page media rails (`story-rail` / `carousel.media`) add to the cart but don't fly. Only Downloads and the listing's media cards install the flight, before and after this change.
+  - **#295 / SKODA-514:** Lars confirmed that this PR's collapsed Media Box strip resolves it; the PR description now says `Refs #295`.
+  - **Merge:** latest `main` merged (#328 listing cards, #308 series hubs, …). The `media-manifest.json` and `push-manifest.json` conflicts were resolved row by row:
+    - media: 47 rows from this branch, 4 from main;
+    - push: 3 press-kit pages pushed on both sides keep this branch's later push.
+

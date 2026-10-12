@@ -62,7 +62,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `listing` | – | `index`, `path`, `template`, `facets`, `facetlabels`, `sort`, `perpage`, `columns` (config only) |
 | `media-cart` | – | – (an empty block: authored cells are ignored; it renders the device's cart, the cart page `/{lang}/media-cart`, SKODA-505b) |
 | `stories` | – | `index`, `path`, `template`, `category`, `categories`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured`, `offset`, `exclude`, `feature` (config only; `exclude` registered by SKODA-611b, `feature` since SKODA-222, `categories` since SKODA-831) |
-| `story-rail` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows |
+| `story-rail` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `order`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows (`order` since #272: a comma list of page paths, shown in that order whatever their template, every one unless a `limit` is set; the Storyboard home's Models band) |
 | `tags` | `chips` | – |
 | `quote` | `left` | – (SKODA-220; see `quote` below) |
 | `footnotes` | – | – (SKODA-805d; see `footnotes` below) |
@@ -230,8 +230,8 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   controls the two-row disclosure (default `auto` in a Media Box, `none` elsewhere); authored
   `columns` controls desktop columns and the number disclosed. Neither option changes the three-cell
   asset row shape. Keep the contract pinned until the branch merges and QA verifies it.
-- **Emitted by:** `parsers/downloads.js` (press-release Media Box; since SKODA-830 also the story Media Box, wired in `import-story-detail.js`, in a `dark, full-width, media-box` section built by `skoda-story-cleanup.js`: `h2` Media Box, the stats paragraph, `Downloads`, between the `sidebar` and the related band). A row shape of the `downloads` block on `main`, so the check classifies these pages as `main`, not pending.
-- **Shape:** header `Downloads`, then 3 cells per row: `[<picture> or empty, title text, links]`. The links cell holds one `<a>` per size, its text the size label: `Original` + `1920px` (image, `/direct-download/…` and `…-1920xH.jpg`), `MP4` (video, Vimeo poster as the picture), `PDF` (document, empty picture cell).
+- **Emitted by:** `parsers/downloads.js` and `parsers/press-kit-media.js` (press-release Media Box; since SKODA-830 also the story Media Box, wired in `import-story-detail.js`, in a `dark, full-width, media-box` section built by `skoda-story-cleanup.js`: `h2` Media Box, the stats paragraph, `Downloads`, between the `sidebar` and the related band). A row shape of the `downloads` block on `main`, so the check classifies these pages as `main`, not pending.
+- **Shape (v2, #275):** header `Downloads`, then 3 cells per row: `[<picture> or empty, title text, links]`, plus, in a Media Box, the tile's source date (`23. 3. 2026`) in a cell before the title: `[<picture> or empty, date, title text, links]`. The block content-sniffs the date (shown above the tile's `h3` title); it comes first so a block that predates it still reads the last text cell as the title. v1 rows (no date) still render. Emitted so far by `parsers/press-kit-media.js` (the press-kit Media Box); `parsers/downloads.js` (releases, stories) still emits v1 rows. The links cell holds one `<a>` per size, its text the size label: `Original` + `1920px` (image, `/direct-download/…` and `…-1920xH.jpg`), `MP4` (video, Vimeo poster as the picture), `PDF` (document, empty picture cell).
 - **Example** (Peaq): 5 rows, `MP4`, 3 × `Original`+`1920px`, `PDF`.
 
 ### `press-release-sections`

@@ -75,3 +75,17 @@ fields — no App Builder. Production can swap the hardcoded lists for a governe
 environment, happening, history, sponsorship, vip` — plus model slugs (`peaq`, `elroq`, `enyaq-iv-2`,
 `epiq`, `octavia`, `scala`, `kamiq`, `karoq-6`, `new-fabia`, `new-kodiaq`, `new-superb`) used as `tags`
 values for the model-tag rails.
+
+**Press-kit hub facets (SKODA-808).** A hub has no Tags sidebar, so `import-press-kit-hub.js` reads all 15 facets from
+the article classes (`model-peaq derivative-sportline years-61572 …`). The `years` class holds the source term id, and
+the listing filters on the year, so the importer maps the id (`YEAR_TERMS`: 4781→2014, 1872→2015, 1572→2016,
+11039→2017, 17169→2018, 23835→2019, 29912→2020, 29936→2021, 42472→2022, 46476→2023, 48727→2024, 57053→2025,
+61572→2026, read from the source `/en/tag/years/<year>/` archives, body class `term-<id>`; 2013 and earlier 404). An
+unknown id, on `years` or any other facet, is never guessed or derived from the publish date: the facet is not set, the
+import warns once per page and the import report names it (`unmappedTermIds`, e.g. `years-99999`).
+
+**Re-import checklist (new year term).** When the source opens a new year archive (2027 from 02 Jan 2027, M2 go-live):
+read its id from `/en/tag/years/<year>/` (body class `term-<id>`), add it to `YEAR_TERMS`, re-bundle, and re-import
+the hubs in `urls-press-kit-hub.txt`. A hub import whose report shows `unmappedTermIds` is the signal that an id is
+missing.
+

@@ -756,6 +756,35 @@ test('every emitted document stays within 200 images: other images count, oversi
   );
 });
 
+test('a variant chapter (Peaq Sportline, SKODA-808) takes its derivative from its tags; First Edition has none', { skip: !JSDOM }, () => {
+  const peaqTag = `<li><a class="label" href="${base}?filter%5Bmodel%5D%5B%5D=peaq">Peaq</a></li>`;
+  const tag = (facet, slug, label) => `<li><a class="label" href="${base}?filter%5B${facet}%5D%5B%5D=${slug}">${label}</a></li>`;
+  const html = (tags) => fixture({ chapters: true, mediaBox: false, togglesCount: 0 })
+    .replace(peaqTag, tags);
+  const metaOf = (page) => Object.fromEntries(rows(page, 'Metadata').map((row) => [txt(row.children[0]), txt(row.children[1])]));
+
+  // the live Sportline chapter's tags: 2026, technology…, Peaq, SportLine, SUV
+  const sportline = run(
+    html(`${tag('years', '2026', '2026')}${tag('technology', 'meb-2', 'MEB+')}${tag('model', 'peaq', 'Peaq')}${tag('derivative', 'sportline', 'SportLine')}${tag('bodywork', 'suv', 'SUV')}`),
+    `${base}skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out/`,
+  );
+  const meta = metaOf(sportline);
+  assert.equal(meta.template, 'press_kit_chapter', 'a chapter of its kit, not a kit of its own');
+  assert.equal(meta.presskit, '/en/press-kits/skoda-peaq-press-kit-2');
+  assert.equal(meta.derivative, 'sportline');
+  assert.equal(meta.model, 'peaq');
+  assert.equal(meta.bodywork, 'suv');
+  assert.equal(meta.years, '2026');
+
+  // the live First Edition chapter has no derivative tag (nor class): it gets no derivative row
+  const firstEdition = run(
+    html(`${tag('years', '2026', '2026')}${tag('model', 'epiq', 'Epiq')}${tag('bodywork', 'suv', 'SUV')}`),
+    `${base}skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details/`,
+  );
+  assert.equal(metaOf(firstEdition).derivative, undefined);
+  assert.equal(metaOf(firstEdition).model, 'epiq');
+});
+
 test('generated standalone bundle matches the source importer', { skip: !JSDOM }, () => {
   const code = readFileSync(new URL('./import-press-kit-default.bundle.js', import.meta.url), 'utf8');
   const bundled = vm.runInNewContext(`${code}\nCustomImportScript.default`, {
@@ -1081,4 +1110,34 @@ test('an Images-child gallery keeps each distinct regulatory caption once, under
   assert.ok(!page.textContent.includes('quiet morning'), 'a plain lightbox caption stays dropped');
   assert.ok(!page.textContent.includes('FC model had a front engine'), 'a non-regulatory group gets no note');
   assert.equal(page.querySelectorAll('[data-caption]').length, 0, 'no data-caption leaks');
+});
+
+// #275: the Media Box tiles keep their source date, the lead keeps its full-size image link
+const LEAD_275 = '<div class="article-teaser-media"><img src="https://cdn.skoda-storyboard.com/lead.jpg" alt="Lead"></div>';
+const datedAsset = (match, i) => `<div class="entry-meta"><span class="entry-published">${Number(i) === 3 ? 'yesterday' : '23. 3. 2026'}</span></div>${match}`;
+
+test('Media Box tiles keep their source date in a cell before the title; the lead links its full image', { skip: !JSDOM }, () => {
+  const html = fixture({})
+    .replace(/<h3 class="entry-title">Asset (\d+)<\/h3>/g, datedAsset)
+    .replace(LEAD_275, LEAD_275.replace('<img', '<a class="colorbox" href="https://cdn.skoda-storyboard.com/lead-full.jpg"><img').replace('</div>', '</a></div>'));
+  const page = run(html, target);
+  const assets = rows(page, 'Downloads');
+  assert.equal(assets.length, 60);
+  const dated = assets.filter((row) => row.children.length === 4);
+  assert.equal(dated.length, 59, 'one tile has no source-form date, so it keeps the 3-cell row');
+  dated.forEach((row) => {
+    assert.equal(txt(row.children[1]), '23. 3. 2026');
+    assert.match(txt(row.children[2]), /^Asset \d+$/);
+  });
+  const undated = assets.find((row) => row.children.length === 3);
+  assert.equal(txt(undated.children[1]), 'Asset 3');
+  fileRows(page).forEach((row) => assert.equal(txt(row.children[0]), '', 'a file row keeps its empty picture cell'));
+  const lead = page.querySelector('img[src$="/lead.jpg"]');
+  assert.equal(lead.closest('a')?.getAttribute('href'), 'https://cdn.skoda-storyboard.com/lead-full.jpg');
+});
+
+test('a lead without a full-size image link stays a bare image (#275)', { skip: !JSDOM }, () => {
+  const html = fixture({}).replace(LEAD_275, LEAD_275.replace('<img', '<a href="#"><img').replace('</div>', '</a></div>'));
+  const page = run(html, target);
+  assert.equal(page.querySelector('img[src$="/lead.jpg"]').closest('a'), null);
 });

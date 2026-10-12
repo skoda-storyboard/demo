@@ -366,6 +366,11 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/press-kit-media.js
   var text2 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
+  var SOURCE_DATE = /^\d{1,2}\.\s?\d{1,2}\.\s?\d{4}$/;
+  var tileDate = (item) => {
+    const date = text2(item.querySelector(".entry-meta .entry-published, .entry-published"));
+    return SOURCE_DATE.test(date) ? date : "";
+  };
   function downloads(item, document) {
     const candidates = [...item.querySelectorAll(".media-cart-action-multi.download a[href]")];
     if (!candidates.length) {
@@ -410,8 +415,10 @@ var CustomImportScript = (() => {
         p.append(link);
         return p;
       });
+      const date = gallery ? "" : tileDate(item);
+      const named = date ? [date, title] : [title];
       if (!img) {
-        rows.push(["", title, paragraphs2]);
+        rows.push(["", ...named, paragraphs2]);
         return;
       }
       if (!((_a = img.getAttribute("alt")) == null ? void 0 : _a.trim())) img.alt = ((_b = img.getAttribute("title")) == null ? void 0 : _b.replace(/^Video\s*\|\s*/i, "")) || title;
@@ -420,7 +427,7 @@ var CustomImportScript = (() => {
         img.src = src.replace(/-d_\d+x\d+(\.[a-z]+)?(\?.*)?$/i, "-d_1280x720.jpg");
       }
       ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop", "title"].forEach((attr) => img.removeAttribute(attr));
-      rows.push([img, title, paragraphs2]);
+      rows.push([img, ...named, paragraphs2]);
     });
     const config = gallery ? [["collapse", "auto"]] : [];
     const name = gallery ? "Downloads (gallery)" : "Downloads";
@@ -799,6 +806,7 @@ var CustomImportScript = (() => {
     });
   }
   function rebuild(element, document) {
+    var _a;
     if (!/\bpress_kit-template-default\b/.test(document.body.className)) {
       throw new Error("Not a default press-kit article (body class missing)");
     }
@@ -826,7 +834,15 @@ var CustomImportScript = (() => {
       img.alt = (img.alt || "").replace(/<br\s*\/?>/gi, " ");
       ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop"].forEach((attr) => img.removeAttribute(attr));
       const p = document.createElement("p");
-      p.append(img);
+      const full = ((_a = lead.closest("a[href]")) == null ? void 0 : _a.getAttribute("href")) || "";
+      if (/^https?:\/\/[^?#]+\.(?:jpe?g|png|webp)(?:[?#]|$)/i.test(full)) {
+        const link = document.createElement("a");
+        link.setAttribute("href", full);
+        link.append(img);
+        p.append(link);
+      } else {
+        p.append(img);
+      }
       out.push(p);
     }
     const summary = text5(article.querySelector(".column-primary > .entry-summary"));

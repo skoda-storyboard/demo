@@ -22,7 +22,8 @@
  * `thumb` (SKODA-505b) is the card image the cart page shows; kept only when root-relative
  * or https.
  * Events on window: `media-cart:change` (detail = getCart()), `media-cart:analytics`.
- * A bound control that refuses an add dispatches `media-cart:refused` ({ href, reason }).
+ * A bound control that refuses an add dispatches `media-cart:refused` ({ href, reason }); one
+ * whose add went in dispatches `media-cart:added` ({ href }), both bubbling.
  */
 
 import {
@@ -410,6 +411,10 @@ export function createCart({
     el.setAttribute('aria-busy', 'true');
     try {
       const res = await add({ href, title, thumb });
+      // the add went in: page UI can follow it (the card's flight to the cart, #275)
+      if (res.ok) {
+        el.dispatchEvent(new win.CustomEvent('media-cart:added', { bubbles: true, detail: { href } }));
+      }
       if (res.ok || res.reason === REASONS.duplicate) return;
       if (res.reason === REASONS.unresolved) unavailable(href);
       el.dispatchEvent(new win.CustomEvent('media-cart:refused', {
