@@ -554,6 +554,20 @@ test('railLayout: every home-band index rail is wide; Models keeps its ladder; t
   assert.deepEqual(railLayout({ ...home, template: 'press_release', layout: 'news' }).classes, [
     'story-rail-wide', 'story-rail-home',
   ]);
+  assert.deepEqual(railLayout({ ...home, template: 'story' }).carousel, [], 'post rails keep the overlay card');
+});
+
+test('railLayout: Media Room Images / Videos bands take the model ladder and the media card', () => {
+  ['image', 'video'].forEach((template) => {
+    const { classes, carousel, endCard } = railLayout({ ...home, template, viewAll: '/en/images' });
+    assert.deepEqual(classes, ['story-rail-wide', 'story-rail-home', 'story-rail-media'], template);
+    assert.deepEqual(carousel, ['media', 'caption', template], template);
+    assert.equal(endCard, true, `${template}: the source rail ends with its "All" card`);
+  });
+  // outside a home band (a model page's Images rail) the template script owns the card
+  const modelPage = railLayout({ ...home, homeBand: false, landing: false, template: 'image' });
+  assert.deepEqual(modelPage.classes, []);
+  assert.deepEqual(modelPage.carousel, []);
 });
 
 test('railLayout: other rails keep their layouts (non-home bands, press band, curated, non-landing)', () => {

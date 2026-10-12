@@ -60,6 +60,7 @@
   --story-sidebar-heading-size-compact: 20px;
   --story-sidebar-heading-line-height: 45px;
   --card-caption-row: 45px; /* taxonomy caption card: the white title row under the image (source .entry-title) */
+  --media-card-caption-rows: 140px; /* media card under the image: 44 date + 46 two-line title + 50 toolbar (source .type-attachment) */
   --story-dark-band-max-width: var(--cover-box-max-width); /* live story .cover-box.dark cap: Media Box + Related Stories */
   --story-dark-band-gap: 2.25em; /* live .cover-box.dark top margin (36px) between stacked story bands */
 

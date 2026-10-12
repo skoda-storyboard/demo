@@ -112,7 +112,16 @@ var CustomImportScript = (() => {
     }
     return null;
   }
-  function parse2(element, { document: document2 }) {
+  function modelOrder(element) {
+    return [...element.querySelectorAll(".search-results-item .entry-title a[href]")].map((a) => {
+      try {
+        return new URL(a.getAttribute("href"), "https://www.skoda-storyboard.com").pathname.replace(/\/+$/, "");
+      } catch (e) {
+        return "";
+      }
+    }).filter((path) => path.startsWith("/"));
+  }
+  function parse2(element, { document: document2, orderModels = false }) {
     if (/\btype-social\b/.test(element.className || "") || element.closest(".socials-static")) {
       element.replaceWith(...element.childNodes);
       return;
@@ -133,6 +142,10 @@ var CustomImportScript = (() => {
         return;
       }
       cells.push(["template", template]);
+      if (orderModels && template === "skoda_model") {
+        const order = modelOrder(element);
+        if (order.length) cells.push(["order", order.join(", ")]);
+      }
     }
     if (href && /^(?:https?:\/\/|\/(?!\/))/i.test(href.trim())) {
       const link = document2.createElement("a");
@@ -1006,6 +1019,8 @@ var CustomImportScript = (() => {
     metadata: { template: "page" },
     // skoda-dark-bands: the MR home's bands sit 16px tighter at the top (live, SKODA-218)
     darkBandStyle: "cover-box, dark, compact",
+    // every light .cover-box is its own section too, as on the Storyboard home (SKODA-611a)
+    lightBandStyle: "cover-box",
     blocks: [
       { name: "promo-box", instances: ["section.promo-box"] },
       { name: "home-rail", instances: ['.cover-box .search-results[class*="type-"]'] }
@@ -1058,7 +1073,12 @@ var CustomImportScript = (() => {
         const parser = parsers[block.name];
         if (parser) {
           try {
-            parser(block.element, { document: document2, url, params });
+            parser(block.element, {
+              document: document2,
+              url,
+              params,
+              orderModels: true
+            });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
           }

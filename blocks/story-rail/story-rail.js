@@ -237,6 +237,10 @@ export function mediaToolbar(row) {
 // caption card, the title under the image (carousel-rails.md §2, SKODA-611b).
 export const TAXONOMY_TEMPLATES = new Set(['skoda_model', 'skoda_series']);
 
+// Image / video asset rows render the media card: the 16:9 image, then the date, the title and
+// the cart / download toolbar under it (carousel `media caption <template>`, as on model pages).
+export const MEDIA_TEMPLATES = new Set(['image', 'video']);
+
 /*
  * Synthesize one carousel row (image cell + body cell) from an index row. The
  * body is returned as buildBlock's `{ elems }` form so the date <p> and title
@@ -447,13 +451,16 @@ function appendAllCard(carousel, href, label, name = '') {
  * Storyboard home's bands and the Media Room's Models band), where the Models rail keeps
  * the source's model ladder and models + series show caption cards. A full post rail in a
  * home band ends with the source's "All" card; models and series, which show every item,
- * have none. An explicit `Story Rail (press)` band keeps its own layout (SKODA-224).
- * @returns {{ classes: string[], endCard: boolean }}
+ * have none. The Media Room's Images / Videos bands take the model ladder too, with the media
+ * card (`carousel`: the inner carousel's variants) and the "All" end card, as on the source.
+ * An explicit `Story Rail (press)` band keeps its own layout (SKODA-224).
+ * @returns {{ classes: string[], carousel: string[], endCard: boolean }}
  */
 export function railLayout({
   press, curated, landing, homeBand, layout, template, viewAll,
 }) {
   const classes = [];
+  const carousel = [];
   const indexRail = !press && !curated;
   if (indexRail && landing && (layout === 'news' || homeBand)) {
     classes.push('story-rail-wide');
@@ -461,11 +468,15 @@ export function railLayout({
     if (homeBand) classes.push('story-rail-home');
     if (template === 'skoda_model') classes.push('story-rail-models');
     if (TAXONOMY_TEMPLATES.has(template)) classes.push('story-rail-caption');
+    if (homeBand && MEDIA_TEMPLATES.has(template)) {
+      classes.push('story-rail-media');
+      carousel.push('media', 'caption', template);
+    }
   }
   // the end card is sized by the wide layout, so only a wide home-band rail has one
   const endCard = classes.includes('story-rail-wide') && homeBand && !!viewAll
     && !TAXONOMY_TEMPLATES.has(template);
-  return { classes, endCard };
+  return { classes, carousel, endCard };
 }
 
 /**
@@ -483,7 +494,7 @@ export default async function decorate(block) {
   const press = block.classList.contains('press');
   const allLabel = viewAllLabel(block);
   const variants = [...block.classList].filter((c) => !OWN_CLASSES.has(c));
-  const { classes, endCard } = railLayout({
+  const { classes, carousel: carouselVariants, endCard } = railLayout({
     press,
     curated,
     landing: document.body.classList.contains('page'),
@@ -548,8 +559,9 @@ export default async function decorate(block) {
     if (!rows || !rows.length) { collapseRail(block, mount, header); return; }
 
     const carousel = buildBlock('carousel', rows);
-    // the rail's own variants (e.g. `center`, `caption`, `media`) style the inner carousel
-    carousel.classList.add(...variants);
+    // the rail's own variants (e.g. `center`, `caption`, `media`) style the inner carousel, and
+    // so does a home-band media rail's card (railLayout)
+    carousel.classList.add(...variants, ...carouselVariants);
     if (cfg.dots) carousel.classList.add('dots');
     if (heading) carousel.setAttribute('aria-label', heading);
     carousel.hidden = true;
@@ -594,7 +606,9 @@ export default async function decorate(block) {
     }
     mount.classList.add('is-built');
     carousel.hidden = false;
-    if (['image', 'video'].includes(cfg.template) && indexRows.length) wireMediaLightbox(carousel, indexRows);
+    if (MEDIA_TEMPLATES.has(cfg.template) && indexRows.length) {
+      wireMediaLightbox(carousel, indexRows);
+    }
   }
 
   async function buildRailSafely() {
