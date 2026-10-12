@@ -53,12 +53,14 @@ const roleFor = (section, id) => (section.querySelector('.cards.key-facts')
   : sectionFor(id));
 
 /**
- * A section's heading: its h2, else its h3 (the rails' titles are h3 as on the source, #284;
- * pages imported before that carry h2). A text section's h3s (drawings) follow its h2.
+ * A section's heading: its h2, else, in a rail section, its h3 (the rails' titles are h3 as on
+ * the source, #284; pages imported before that carry h2). Any other h3 (a drawing title, an
+ * editor subheading) never names a section.
  * @param {Element} section
  */
 const sectionHeading = (section) => section.querySelector(':scope > .default-content-wrapper > h2[id]')
-  || section.querySelector(':scope > .default-content-wrapper > h3[id]');
+  || (section.querySelector('.story-rail')
+    ? section.querySelector(':scope > .default-content-wrapper > h3[id]') : null);
 
 /** The `template` value of a story-rail config table (before the block decorates). */
 function railTemplate(rail) {

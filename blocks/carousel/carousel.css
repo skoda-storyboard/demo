@@ -287,6 +287,17 @@
   mask-image: url("../../icons/rail-arrow-next.svg");
 }
 
+/* Windows High Contrast / forced colors: both discs paint a background colour, which forced
+   colors would reset to the canvas; keep the glyph in the button text colour so it stays
+   visible (as header.css does for its mask-drawn ✕) */
+@media (forced-colors: active) {
+  .carousel-arrow::after {
+    /* stylelint-disable-next-line scale-unlimited/declaration-strict-value -- a system colour */
+    background-color: buttontext;
+    forced-color-adjust: none;
+  }
+}
+
 /* disabled at a track end → fade out (source :disabled{opacity:0}) */
 .carousel-arrow:disabled {
   opacity: 0;

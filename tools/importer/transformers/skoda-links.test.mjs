@@ -205,6 +205,9 @@ test('a Story Rail viewall keeps the filtered listing, as the source rail "All" 
   assert.deepEqual(hrefs(rail('Story Rail', 'viewall', news)), [news]);
   assert.deepEqual(hrefs(rail('Story Rail (wide)', 'viewall', news)), [news]);
   assert.deepEqual(hrefs(rail('Story Rail', 'viewall', '/en/news?filter[model][]=superb')), ['/en/news?filter[model][]=superb']);
+  // the other "All" keys story-rail reads
+  assert.deepEqual(hrefs(rail('Story Rail', 'view-all', news)), [news]);
+  assert.deepEqual(hrefs(rail('Story Rail', 'All', news)), [news]);
   // a tag chip elsewhere (another block, another row) still becomes the tag page
   assert.deepEqual(hrefs(rail('Tags', 'viewall', news)), ['/en/tag/model/superb']);
   assert.deepEqual(hrefs(rail('Story Rail', 'tags', news)), ['/en/tag/model/superb']);

@@ -207,7 +207,7 @@ body.story .section.dark.story-rail-container .story-rail .carousel-track .card-
    then clears the arrows' band, as on the source. The press band (13px) and the story page's
    related band set their own gap below; the media rails' date row is the carousel's */
 .story-rail .card-teaser-date {
-  margin-block-end: calc(12px - var(--spacing-xs));
+  margin-block-end: calc(var(--rail-date-gap) - var(--spacing-xs));
 }
 
 /* ---- press variant only (SKODA-224; measured on the live Zellmer release) ----

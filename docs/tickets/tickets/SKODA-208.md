@@ -293,6 +293,12 @@ Measured against the source (Superb, Epiq) at 1440 / 1080 / 992 / 768 / 390, fir
 | News "All" | `/en/news/?filter[model][]=<model>` | `/en/tag/model/<model>` | `/en/news?filter[model][]=<model>` (the runtime link policy keeps the listing on the demo) | `skoda-links.js` rule 4 skips a Story Rail `viewall` |
 
 - **Also fixed by the shared CSS:** the Media Room home's News / Latest Stories rails (27px → 12px, as the source).
+  The rail date gap is the `--rail-date-gap` token; every rail it reaches (Stories + Media Room homes, model pages;
+  the press and story bands keep their own) was measured against the source. Forced colors: the arrow glyph keeps
+  the system button-text colour, so it stays visible.
+- **Code review note (out of scope, not changed):** the Images / Videos **listing** media cards (`blocks/listing`,
+  `.media-asset-date`) keep a 16px date → title gap, source 14px (date 2px high, measured at 1440). Same fix as the
+  rails' `.carousel.media` date row; #273 closed the listing observations as accepted.
 - **Re-import:** all 23 model pages re-imported. Only Epiq, Peaq and Enyaq Coupé iV pushed (preview): the other 20
   link a Technical Data PDF that is still a pending media-manifest row, so the binary gate blocks them. They keep
   `h2` titles and the tag-page News "All" until their PDFs are ingested to DAM (developer machine,

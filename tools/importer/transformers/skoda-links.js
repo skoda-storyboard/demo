@@ -426,11 +426,15 @@ function tagPageHref(href) {
   return bySlug.length === 1 ? bySlug[0] : null;
 }
 
-/** The link sits in a Story Rail block table's `viewall` row (the rail's "All"). */
+// the "All" keys story-rail reads (blocks/story-rail/story-rail.js settings)
+const RAIL_VIEWALL_KEYS = ['viewall', 'view-all', 'all'];
+
+/** The link sits in a Story Rail block table's "All" row (`viewall`, `view-all` or `all`). */
 function isRailViewAll(a) {
   const row = a.closest('tr');
   const table = row && row.closest('table');
-  if (!table || row.cells.length < 2 || row.cells[0].textContent.trim().toLowerCase() !== 'viewall') return false;
+  if (!table || row.cells.length < 2
+    || !RAIL_VIEWALL_KEYS.includes(row.cells[0].textContent.trim().toLowerCase())) return false;
   const head = table.rows[0] && table.rows[0].cells[0];
   return !!head && /^story rail\b/i.test(head.textContent.trim());
 }
