@@ -146,11 +146,16 @@ test('section model: header, body-column, sidebar, media-box, related (only when
   assert.deepEqual(importPage('superb').sections.map((s) => s.style), [null, ...expect.slice(0, 3)]);
 });
 
-test('header: date paragraph + a single h1, <br> in the title becomes a space', { skip }, () => {
+test('header: date paragraph + a single plain-text h1 that keeps the authored <br>', { skip }, () => {
   const [head] = importPage('peaq').sections;
   assert.deepEqual(head.content.map((n) => n.tagName), ['P', 'H1']);
   assert.equal(txt(head.content[0]), '2. 9. 2026');
-  assert.equal(txt(head.content[1]), '936 km without recharging: Škoda Peaq sets range record for seven-seater electric SUVs');
+  // the source breaks the Peaq title after "record" at every width (SKODA-607a)
+  assert.equal(head.content[1].innerHTML, '936 km without recharging: Škoda Peaq sets range record\u{F00A0}<br>for seven-seater electric SUVs');
+  // the word gap survives as skoda-nbsp's placeholder (wrapPage restores U+00A0), so the
+  // heading's text, which the gallery lightbox title reads, isn't "recordfor"
+  assert.equal(head.content[1].textContent.replace(/\u{F00A0}/gu, ' '), '936 km without recharging: Škoda Peaq sets range record for seven-seater electric SUVs');
+  assert.equal(importPage('superb').sections[0].content[1].querySelector('br'), null, 'no <br> invented');
   Object.keys(PAGES).forEach((k) => assert.equal(importPage(k).element.querySelectorAll('h1').length, 1, k));
 });
 

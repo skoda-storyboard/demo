@@ -68,6 +68,33 @@ const PAGE_TEMPLATE = {
   ],
 };
 
+// SKODA-839: the Storyboard home's Models rail cards are the model tag pages (#272), and the
+// card image is the index `image`. The source card shows the model's featured image (the
+// header banner), which the tag page itself doesn't carry and the source gives no og:image
+// for. Masters of the source home card renditions (/en/, measured 2026-10-10).
+const MODEL_CARD_IMAGES = {
+  elroq: 'https://cdn.skoda-storyboard.com/2024/10/elroq_header_fede6794.jpg',
+  kodiaq: 'https://cdn.skoda-storyboard.com/2023/11/Skoda_Kodiaq_header_04479753.png',
+  enyaq: 'https://cdn.skoda-storyboard.com/2025/01/enyaq_fl_header_eb9109f9.jpg',
+  karoq: 'https://cdn.skoda-storyboard.com/2017/07/33_SKODA_KAROQ.jpg',
+  kamiq: 'https://cdn.skoda-storyboard.com/2023/09/kamiq-header_d6fedb2b.jpg',
+  scala: 'https://cdn.skoda-storyboard.com/2023/09/scala_header_34ad5f38.jpg',
+  fabia: 'https://cdn.skoda-storyboard.com/2021/05/Header_New_FABIA.jpg',
+  superb: 'https://cdn.skoda-storyboard.com/2023/12/header_superb_d05c278a.jpg',
+  octavia: 'https://cdn.skoda-storyboard.com/2024/03/octaviaFL-header_e0f394a0.jpg',
+  epiq: 'https://cdn.skoda-storyboard.com/2026/05/skoda-epiq-m70-01_1135a598.jpg',
+  peaq: 'https://cdn.skoda-storyboard.com/2026/06/Navrh-bez-nazvu-21_ec34da00.png',
+};
+
+// The page template for one URL: a model tag page gets its model's card image as the page
+// image; every other archive keeps the shared template unchanged.
+function templateFor(originalURL) {
+  const slug = (new URL(originalURL).pathname.match(/^\/en\/tag\/model\/([^/]+)\/?$/) || [])[1];
+  const image = slug && MODEL_CARD_IMAGES[slug];
+  if (!image) return PAGE_TEMPLATE;
+  return { ...PAGE_TEMPLATE, metadata: { ...PAGE_TEMPLATE.metadata, image } };
+}
+
 // TRANSFORMER REGISTRY — cleanup + (sections if 2+) + shared metadata (afterTransform).
 const transformers = [
   cleanupTransformer,
@@ -77,7 +104,7 @@ const transformers = [
 ];
 
 function executeTransformers(hookName, element, payload) {
-  const enhancedPayload = { ...payload, template: PAGE_TEMPLATE };
+  const enhancedPayload = { ...payload, template: templateFor(payload.params.originalURL) };
   transformers.forEach((transformerFn) => {
     try {
       transformerFn.call(null, hookName, element, enhancedPayload);

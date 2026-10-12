@@ -1,0 +1,14 @@
+{
+  "variantName": "fragment",
+  "baseBlock": "fragment",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Fragment",
+  "description": "Inserts another document here: one cell with a link to the fragment page (e.g. /en/fragments/...). Publish the fragment, or the live page shows nothing.",
+  "visualCharacteristics": {
+    "purpose": "include a shared document"
+  },
+  "contentPattern": {
+    "structure": "single link"
+  }
+}
