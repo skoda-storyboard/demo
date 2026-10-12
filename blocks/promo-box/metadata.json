@@ -1,0 +1,22 @@
+{
+  "variantName": "promo-box",
+  "baseBlock": "promo-box",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Promo Box",
+  "description": "Home page featured stories. Either settings (template, path, category, tags, limit, sort) to pick the newest pages, or curated rows (one card per row). Never mix both.",
+  "visualCharacteristics": {
+    "purpose": "featured stories mosaic / slider"
+  },
+  "contentPattern": {
+    "structure": "config or curated rows"
+  },
+  "usage": {
+    "pagesUsing": [
+      "en",
+      "en/media-room"
+    ],
+    "reuseCount": 2,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}

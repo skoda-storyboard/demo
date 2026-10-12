@@ -17,6 +17,7 @@ import {
 } from './aem.js';
 import { decorateLinks, installLinkPolicy } from './links.js';
 import { spanSidebar } from './split-body.js';
+import { addNewsletterCard } from './story-newsletter.js';
 
 /**
  * Page templates with their own layout code: `templates/<name>/<name>.{js,css}`, selected by
@@ -275,6 +276,8 @@ function decorateStorySections(main) {
   if (!document.body.classList.contains('story')) return;
   applySectionStyles(main);
   spanSidebar(main);
+  // the shared sidebar newsletter card, unless the story authors its own (SKODA-840)
+  addNewsletterCard(main);
 }
 
 /** The page's template (or theme), if it has its own layout code (see TEMPLATES). */

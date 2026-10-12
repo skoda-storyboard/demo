@@ -29,3 +29,9 @@ Final gate for the M1 demo. Compare the imported demo pages against the source s
 ## Risks / Flags
 - Consent/analytics are stubs only for the pilot — full OneTrust + GTM + `skoda-analytics` event-layer wiring is Phase B (SKODA-804) / per-block rebuild is Phase C (SKODA-905). Do not scope-creep.
 - `skoda-analytics` is a bespoke dataLayer; full per-block re-emission is a later rebuild, not part of sign-off. (`SKODA-SYSTEM-BUILD-SPECS.md` §7)
+
+## Status (2026-10-11, M1 ticket review)
+🟡 **In progress** (QA owner, #44). The acceptance criteria are aligned with the 2026-10-05 decision on the issue:
+- **Dropped:** the OneTrust consent and GTM / `skoda-analytics` stubs, which move to SKODA-804 (M2), and "deferred services absent" (the media cart is M1 now, 505a/b).
+- **Criterion:** a coherent visual resemblance to origin per template variation (a few px allowed, not pixel-perfect). Findings are tracked as the 7 per-template QA tickets under #247. Sign-off documented.
+- **Open inputs:** #272, #275 and #285 are in review (#306, #307, #308); #273, #274, #284 and #296 are ready; the shared hover fix is #323 (SKODA-228).

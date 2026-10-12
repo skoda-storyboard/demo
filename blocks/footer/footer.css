@@ -129,12 +129,13 @@ footer .footer-nav ul ul li {
 }
 
 /* headings and sub-links share one style: source 12px / 18px / 500 with 1px tracking; 500 has
-   no real SKODA Next face (see SKODA-106), so it maps to 400 */
+   no real SKODA Next face (see SKODA-106) on either site, so it renders as 400 (#285: the
+   computed weight is the source's) */
 footer .footer-nav ul ul a,
 footer .footer-nav nav > ul > li > a,
 footer .footer-nav nav > ul > li > p > a {
   font-size: var(--body-font-size-2xs);
-  font-weight: var(--weight-regular);
+  font-weight: var(--weight-medium);
   letter-spacing: 1px;
   line-height: var(--footer-small-line-height);
 }
