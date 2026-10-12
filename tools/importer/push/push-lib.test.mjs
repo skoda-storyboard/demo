@@ -175,6 +175,18 @@ test('fragmentPaths: bulk metadata rows add the fragments of matching batch page
   assert.deepEqual(fragmentPaths([], { paths: ['/en/press-releases/x'] }), ['/nav', '/footer']);
 });
 
+test('fragmentPaths: a batch with stories needs the shared newsletter card of its locales (SKODA-840)', () => {
+  const story = '<div><div class="metadata"><div><div>template</div><div>story</div></div></div></div>';
+  const release = '<div><div class="metadata"><div><div>template</div><div>press_release</div></div></div></div>';
+  assert.deepEqual(fragmentPaths([story], { paths: ['/en/emobility/x'] }), ['/nav', '/footer', '/en/fragments/newsletter-card']);
+  assert.deepEqual(
+    fragmentPaths([story, story], { paths: ['/en/a', '/cs/b'] }),
+    ['/nav', '/footer', '/en/fragments/newsletter-card', '/cs/fragments/newsletter-card'],
+  );
+  assert.deepEqual(fragmentPaths([story]), ['/nav', '/footer', '/en/fragments/newsletter-card'], 'no paths: en');
+  assert.deepEqual(fragmentPaths([release], { paths: ['/en/press-releases/x'] }), ['/nav', '/footer'], 'not a story');
+});
+
 test('bulkPatternMatches: aem.live bulk metadata wildcards', () => {
   assert.equal(bulkPatternMatches('/en/press-releases/**', '/en/press-releases/a'), true);
   assert.equal(bulkPatternMatches('/en/press-releases/**', '/en/press-releases/a/b'), true);

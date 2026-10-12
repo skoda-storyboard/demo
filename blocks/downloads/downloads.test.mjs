@@ -173,8 +173,53 @@ test('the toggle stays a labelled button: Show less once open, focus kept in vie
   assert.equal(document.activeElement, toggle);
 });
 
-test('large media-box variant discloses two rows across widths and authored columns', async () => {
+test('media-box and standard auto groups disclose according to their responsive columns', async () => {
 
+  // five tiles (Superb, Peaq): 1 column at 500, 2 from 520, 3 from 768, 4 from 992 (SKODA-607a)
+  const five = setup();
+  for (let i = 0; i < 5; i += 1) addRow(five, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
+  await decorate(five);
+  const toggle = five.querySelector('.downloads-more');
+  const visible = () => [...five.querySelectorAll('.downloads-item')].filter((tile) => !tile.hasAttribute('inert')).length;
+  assert.equal(toggle.hidden, false);
+  assert.equal(visible(), 2);
+  window.setViewport(520);
+  assert.equal(toggle.hidden, false);
+  assert.equal(visible(), 4);
+  window.setViewport(768);
+  assert.equal(toggle.hidden, true);
+  assert.equal(visible(), 5);
+  window.setViewport(992);
+  assert.equal(toggle.hidden, true);
+  assert.equal(visible(), 5);
+  window.setViewport(500);
+  assert.equal(toggle.hidden, false);
+  assert.equal(toggle.getAttribute('aria-expanded'), 'false');
+  assert.equal(visible(), 2);
+
+  const group = setup(false);
+  addConfig(group, 'collapse', 'auto');
+  for (let i = 0; i < 4; i += 1) addRow(group, { title: `Image ${i}`, links: [['Original', `/group${i}.jpg`]] });
+  window.setViewport(600);
+  await decorate(group);
+  assert.equal(group.querySelector('.downloads-more').hidden, false);
+  assert.equal([...group.querySelectorAll('.downloads-item')].filter((tile) => tile.hasAttribute('inert')).length, 2);
+  window.setViewport(768);
+  assert.equal(group.querySelector('.downloads-more').hidden, true);
+  assert.equal([...group.querySelectorAll('.downloads-item')].filter((tile) => tile.hasAttribute('inert')).length, 0);
+  window.setViewport(500);
+
+  // eight tiles fit two 4-up rows from 992 only
+  const eight = setup();
+  for (let i = 0; i < 8; i += 1) addRow(eight, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
+  await decorate(eight);
+  assert.equal(eight.querySelector('.downloads-more').hidden, false);
+  window.setViewport(992);
+  assert.equal(eight.querySelector('.downloads-more').hidden, true);
+  window.setViewport(500);
+});
+
+test('large media-box variant discloses two rows across widths and authored columns', async () => {
   const large = setup();
   addConfig(large, 'columns', '3');
   for (let i = 0; i < 11; i += 1) addRow(large, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });

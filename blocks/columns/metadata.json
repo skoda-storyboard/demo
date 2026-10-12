@@ -1,0 +1,52 @@
+{
+  "variantName": "columns",
+  "baseBlock": "columns",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Columns",
+  "description": "One row, one cell per column (text, images, links). On phones the columns stack.",
+  "visualCharacteristics": {
+    "purpose": "two or more content cells side by side"
+  },
+  "contentPattern": {
+    "structure": "cells side by side"
+  },
+  "options": [
+    {
+      "class": "split-62 portrait-235",
+      "label": "split-62, portrait-235",
+      "description": "Unequal story row: the first cell takes 62% (split-NN = NN%); portrait-NNN is the display width in px of a portrait image in the other cell. Values are read from the class, so use the exact form split-NN / portrait-NNN."
+    },
+    {
+      "class": "banners",
+      "label": "banners",
+      "description": "Press kit: a row of linked banner images at their authored size (PDF download / share buttons)."
+    },
+    {
+      "class": "callout",
+      "label": "callout",
+      "description": "Press kit: [icon, text], a small 50px icon beside its text (the WhatsApp callout)."
+    },
+    {
+      "class": "stats",
+      "label": "stats",
+      "description": "Model page technical data: each cell is a key figure, the value in bold and its label below."
+    }
+  ],
+  "usage": {
+    "pagesUsing": [
+      "en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq",
+      "en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan",
+      "en/emobility/skoda-elroq-premiere-light-cube-camera-action",
+      "en/press-kits/press-kit-skoda-at-the-iaa-2019",
+      "en/press-kits/skoda-elroq-press-kit-2",
+      "en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
+      "en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance",
+      "en/press-kits/skoda-epiq-press-kit-2/connectivity-intuitive-digital-services-and-seamless-vehicle-access",
+      "en/press-kits/skoda-epiq-press-kit-2/exterior-the-first-skoda-production-model-to-fully-incorporatethe-modern-solid-design-language",
+      "en/press-kits/skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details"
+    ],
+    "reuseCount": 54,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}
