@@ -146,7 +146,9 @@ export function selectRows(all, cfg) {
 // "View all" → "view-all"). Used to tell a key/value config table apart from a
 // curated card rail by ROW SHAPE, not image presence (SKODA-212 review P2): a
 // curated rail whose authors omit images must still be treated as curated.
-const CONFIG_KEYS = new Set([
+// (exported for the drift test against the publication contract,
+// tools/importer/push/block-contracts.json)
+export const CONFIG_KEYS = new Set([
   'index', 'path', 'template', 'category', 'tag', 'tags', 'heading',
   'viewall', 'view-all', 'all', 'sort', 'limit', 'exclude', 'order', 'dots',
   ...INDEX_FACETS,

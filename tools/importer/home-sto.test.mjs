@@ -146,6 +146,28 @@ test('the Models band keeps the source order of its hand-picked model tag pages 
   assert.equal(rails.filter((t) => config(t).order).length, 1);
 });
 
+// PR #306 review: the publication gate (validate-blocks / import:push checkPage) reads the
+// committed registry, so the imported Models band, `order` row included, must be a clean,
+// publishable config table.
+test('the imported Models band passes the publication contract (order is a registered key)', { skip }, async () => {
+  const { readFileSync } = await import('node:fs');
+  const { checkPage } = await import('./push/block-check.mjs');
+  const contracts = JSON.parse(readFileSync(new URL('./push/block-contracts.json', import.meta.url), 'utf8'));
+  const { document } = new JSDOM(HTML, { url: SOURCE }).window;
+  globalThis.document = document;
+  const [{ element }] = importer.transform({
+    document, url: SOURCE, params: { originalURL: SOURCE },
+  });
+  const models = [...element.querySelectorAll('table')]
+    .find((t) => name(t) === 'Story Rail' && config(t).heading === 'Models');
+  // the table as the EDS markup the gate reads: a block div of row divs of cell divs
+  const rows = [...models.rows].slice(1).map((r) => `<div>${[...r.cells].map((c) => `<div>${c.innerHTML}</div>`).join('')}</div>`);
+  const result = checkPage(`<div><div class="story-rail">${rows.join('')}</div></div>`, contracts, new Set(Object.keys(contracts.main)));
+  assert.deepEqual(result.errors, []);
+  assert.deepEqual(result.pending, []);
+  assert.equal(result.publishable, true);
+});
+
 test('the Latest Stories feed keeps the authored offset (promo posts excluded)', { skip }, () => {
   const { document } = new JSDOM(HTML, { url: SOURCE }).window;
   globalThis.document = document;

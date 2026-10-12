@@ -50,7 +50,7 @@ globalThis.document = {
 
 const {
   parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail, railLayout, safeViewAll,
-  TAXONOMY_TEMPLATES, orderPaths, railHeadingTag,
+  TAXONOMY_TEMPLATES, orderPaths, railHeadingTag, CONFIG_KEYS,
 } = await import('./story-rail.js');
 const { feedLightboxItem } = await import('../../scripts/media-lightbox.js');
 
@@ -684,9 +684,24 @@ test('isConfigTable: an order row keeps the Models band a config table (not cura
 test('railHeadingTag: the home bands get the source h3, every other rail keeps h2', () => {
   assert.equal(railHeadingTag(railLayout({ ...home, template: 'story' }).classes), 'h3');
   assert.equal(railHeadingTag(railLayout({ ...home, template: 'skoda_model' }).classes), 'h3');
-  assert.equal(railHeadingTag(railLayout({ ...home, homeBand: false, template: 'press_release', layout: 'news' }).classes), 'h2', 'a news rail outside a home band');
+  const news = railLayout({
+    ...home, homeBand: false, template: 'press_release', layout: 'news',
+  });
+  assert.equal(railHeadingTag(news.classes), 'h2', 'a news rail outside a home band');
   assert.equal(railHeadingTag(railLayout({ ...home, press: true, template: 'press_release' }).classes), 'h2', 'the press band');
   assert.equal(railHeadingTag(railLayout({ ...home, landing: false, template: 'story' }).classes), 'h2', 'a model page rail');
   assert.equal(railHeadingTag(railLayout({ ...home, curated: true, template: 'story' }).classes), 'h2', 'a curated rail');
 });
 
+// The publication gate (validate-blocks / import:push checkPage) only lets a config key through
+// when the registry lists it: a key the block reads but the registry omits holds every page that
+// uses it (PR #306 review: `order` was read here but unregistered, so the home could not publish).
+test('every config key story-rail reads is registered in the publication contract, and vice versa', async () => {
+  const { readFileSync } = await import('node:fs');
+  const registry = new URL('../../tools/importer/push/block-contracts.json', import.meta.url);
+  const contracts = JSON.parse(readFileSync(registry, 'utf8'));
+  const registered = new Set(contracts.main['story-rail'].configKeys);
+  assert.deepEqual([...CONFIG_KEYS].filter((key) => !registered.has(key)), [], 'read by the block, missing from the registry');
+  assert.deepEqual([...registered].filter((key) => !CONFIG_KEYS.has(key)), [], 'registered, not read by the block');
+  assert.ok(registered.has('order'));
+});
