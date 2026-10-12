@@ -51,6 +51,72 @@ function wobble(target) {
   el.addEventListener('animationend', () => el.classList.remove('is-wobbling'), { once: true });
 }
 
+const px = (n) => `${n}px`;
+
+/**
+ * The flying copy of `picture` as it renders (#307 review): appended to <body>, it is outside
+ * the picture's block, so none of the block's scoped styles (thumbnail size, crop, corners)
+ * reach it. Everything that shapes it is inlined instead: a fixed box the picture's size that
+ * clips like the picture (its corner radius kept), holding one image at the image's rendered
+ * size and offset, with its object-fit / object-position crop, from the source it is showing
+ * (`currentSrc`, so the copy doesn't pick another `srcset` candidate). Inert and hidden from
+ * assistive tech; a picture without an image is copied as it is.
+ * @param {Element} picture the clipping thumbnail box
+ * @param {DOMRect} from its rect
+ * @returns {HTMLElement}
+ */
+export function flyingCopy(picture, from) {
+  const img = picture.querySelector('img');
+  const copy = img ? document.createElement('div') : picture.cloneNode(true);
+  copy.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
+  copy.removeAttribute('id');
+  copy.className = img ? 'media-cart-flying' : `${copy.className} media-cart-flying`.trim();
+  copy.setAttribute('aria-hidden', 'true');
+  copy.inert = true;
+  Object.assign(copy.style, {
+    position: 'fixed',
+    top: px(from.top),
+    left: px(from.left),
+    width: px(from.width),
+    height: px(from.height),
+    boxSizing: 'border-box',
+    margin: '0',
+    padding: '0',
+    overflow: 'hidden',
+    borderRadius: window.getComputedStyle(picture).borderRadius,
+    opacity: String(FLY.opacity),
+    pointerEvents: 'none',
+    transformOrigin: '0 0',
+    zIndex: 'var(--z-cart-flying)',
+  });
+  if (img) {
+    const rect = img.getBoundingClientRect();
+    const style = window.getComputedStyle(img);
+    const shot = document.createElement('img');
+    shot.alt = '';
+    shot.src = img.currentSrc || img.src;
+    // the rendered box already includes any transform (a hover zoom): drawn at that size
+    Object.assign(shot.style, {
+      position: 'absolute',
+      top: px(rect.top - from.top),
+      left: px(rect.left - from.left),
+      width: px(rect.width),
+      height: px(rect.height),
+      maxWidth: 'none',
+      maxHeight: 'none',
+      margin: '0',
+      padding: '0',
+      border: '0',
+      objectFit: style.objectFit,
+      objectPosition: style.objectPosition,
+      borderRadius: style.borderRadius,
+      transform: 'none',
+    });
+    copy.append(shot);
+  }
+  return copy;
+}
+
 /**
  * Flies a copy of `picture` to `target`'s centre. Resolves when the copy is gone (at once when
  * either is not on screen, or under reduced motion).
@@ -62,23 +128,7 @@ export async function flyToCart(picture, target = document.querySelector(TARGET)
   const from = visible(picture);
   const to = visible(target);
   if (!from || !to || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-  const copy = picture.cloneNode(true);
-  copy.classList.add('media-cart-flying');
-  copy.setAttribute('aria-hidden', 'true');
-  copy.inert = true;
-  copy.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
-  Object.assign(copy.style, {
-    position: 'fixed',
-    top: `${from.top}px`,
-    left: `${from.left}px`,
-    width: `${from.width}px`,
-    height: `${from.height}px`,
-    margin: '0',
-    opacity: String(FLY.opacity),
-    pointerEvents: 'none',
-    transformOrigin: '0 0',
-    zIndex: 'var(--z-cart-flying)',
-  });
+  const copy = flyingCopy(picture, from);
   document.body.append(copy);
   // the copy's top-left corner lands on the badge's centre, as the source's
   const dx = to.left + to.width / 2 - from.left;

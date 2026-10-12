@@ -202,4 +202,26 @@ Press kits QA observations, FG (this page). Measured origin vs branch at 1440 / 
   - **Flying to cart:** `scripts/media-cart-fly.js`.
     - When a card's add goes in (new `media-cart:added` event from the cart's controls), a 70% copy of its picture flies to the dock's cart badge, fitting a 100px box (700ms easeInOutExpo), then shrinks and fades out (400ms). The badge wobbles a second after the click (8 / −6 / 4 / −2 / 1px, 0.5s).
     - Frames match the source's (e.g. 292×165 → 100×56).
-    - Media Box tiles, the images / videos listing and the media rails. Files and the clip toolbar don't fly, as on the source. Nothing moves under reduced motion; the copy is inert and hidden from assistive tech.
+    - Media Box tiles and the images / videos listing (the model-page media rails don't install the flight: their toolbar is the rail's own, see the #307 review note). Files and the clip toolbar don't fly, as on the source. Nothing moves under reduced motion; the copy is inert and hidden from assistive tech.
+- **Review (PR #307, Lars, 2026-10-11; addressed 2026-10-12):**
+  - **[P2] The flying copy lost the thumbnail's size and crop.**
+    - The cause: the deep clone was appended to `<body>`, outside the block, so the `.downloads`-scoped picture / image styles no longer applied. At 390 the copy drew the image at 500 × 333, `object-fit: fill`, unclipped. The thumbnail it came from is 368 × 207 cover inside a clipped 370 × 209 holder.
+    - The fix: `flyingCopy()` builds a standalone copy with everything that shapes it inlined:
+      - a fixed box the size of the thumbnail, with `overflow: hidden` and the thumbnail's corner radius;
+      - one `<img>` of the rendered source (`currentSrc`, so no other `srcset` candidate);
+      - that image at its rendered size and offset, with its `object-fit` / `object-position`.
+    - Measured at the copy's first frame:
+      - Media Box @390: holder 370 × 209 → copy 370 × 209 clipped; image 368 × 207 cover → 368 × 207 cover, same offset.
+      - @1440: 292 × 165.1 / 290 × 163.1, equal.
+      - Images listing @390 / @1440: equal.
+  - **Browser geometry coverage:** `docs/ui-specs/tools/media-cart-fly.test.mjs` (Playwright, the press-release-spacing pattern).
+    - It adds the first Media Box image on the first-glimpse page at 390 / 768 / 1440.
+    - It freezes the copy at its first frame and asserts its box, clip, corners, image rect, crop and source against the thumbnail.
+    - It fails on the old code (@390 the image's offset and size) and passes now.
+    - `scripts/media-cart-fly.test.mjs` covers the copy's structure on jsdom.
+  - **Not in scope, recorded:** the model-page media rails (`story-rail` / `carousel.media`) add to the cart but don't fly. Only Downloads and the listing's media cards install the flight, before and after this change.
+  - **#295 / SKODA-514:** Lars confirmed that this PR's collapsed Media Box strip resolves it; the PR description now says `Refs #295`.
+  - **Merge:** latest `main` merged (#328 listing cards, #308 series hubs, …). The `media-manifest.json` and `push-manifest.json` conflicts were resolved row by row:
+    - media: 47 rows from this branch, 4 from main;
+    - push: 3 press-kit pages pushed on both sides keep this branch's later push.
+

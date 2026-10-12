@@ -7,7 +7,9 @@ import { JSDOM } from 'jsdom';
 const dom = new JSDOM('<main></main>', { url: 'https://example.com/en/press-kits/kit' });
 globalThis.window = dom.window;
 globalThis.document = dom.window.document;
-const { fitBox, flyToCart, installFlyToCart } = await import('./media-cart-fly.js');
+const {
+  fitBox, flyToCart, flyingCopy, installFlyToCart,
+} = await import('./media-cart-fly.js');
 
 const box = (el, left, top, width, height) => {
   el.getBoundingClientRect = () => ({
@@ -60,7 +62,9 @@ test('a flight: an inert, hidden copy at the picture lands on the badge centre, 
   assert.equal(copy.getAttribute('aria-hidden'), 'true');
   assert.equal(copy.inert, true);
   assert.equal(copy.querySelector('[id]'), null, 'no duplicate ids');
+  assert.equal(copy.id, '', 'the box is not the picture (no copied id)');
   assert.deepEqual([copy.style.position, copy.style.top, copy.style.left, copy.style.opacity], ['fixed', '300px', '106px', '0.7']);
+  assert.equal(copy.style.overflow, 'hidden', 'it clips like the thumbnail');
   await flight;
   assert.equal(document.querySelector('.media-cart-flying'), null, 'removed after the fade');
   const [move, fade] = frames;
@@ -90,5 +94,39 @@ test('installFlyToCart: an added control inside a card flies that card\'s pictur
   added(document.querySelector('.downloads-add-size'));
   added(document.querySelector('.downloads-add'));
   await new Promise((r) => { setImmediate(r); });
-  assert.deepEqual(flown, ['downloads-thumb media-cart-flying', 'downloads-thumb media-cart-flying'], 'one flight (move + fade), from the picture tile only');
+  assert.deepEqual(flown, ['downloads-thumb media-cart-flying', 'downloads-thumb media-cart-flying'], 'one flight (move + fade), from the picture tile only (no image: copied as it is)');
+});
+
+test('flyingCopy keeps the thumbnail: its box and corners, and the image\'s rendered size, offset and crop (#307 review)', () => {
+  // the first Media Box card at 390: a 370 × 209 clipped holder, its 368 × 207 cover image 1px in
+  const picture = box(document.createElement('a'), 10, 400, 370, 209);
+  picture.className = 'downloads-thumb';
+  picture.style.borderRadius = '8px';
+  picture.innerHTML = '<picture><source srcset="/a-500.webp 500w"><img id="i" src="/a-500.jpg" alt="Peaq" width="500" height="333" style="object-fit: cover; object-position: 50% 0%"></picture>';
+  const img = box(picture.querySelector('img'), 11, 401, 368, 207);
+  Object.defineProperty(img, 'currentSrc', { value: 'https://example.com/a-750.webp' });
+  document.body.append(picture);
+  const copy = flyingCopy(picture, picture.getBoundingClientRect());
+  assert.equal(copy.className, 'media-cart-flying');
+  assert.deepEqual(
+    [copy.style.position, copy.style.left, copy.style.top, copy.style.width, copy.style.height, copy.style.overflow, copy.style.borderRadius],
+    ['fixed', '10px', '400px', '370px', '209px', 'hidden', '8px'],
+    'the picture\'s box, clipped, with its corners',
+  );
+  assert.deepEqual([copy.getAttribute('aria-hidden'), copy.inert], ['true', true]);
+  const shots = copy.querySelectorAll('img');
+  assert.equal(shots.length, 1, 'one image, no <source> to pick another candidate');
+  const [shot] = shots;
+  assert.deepEqual(
+    [shot.getAttribute('src'), shot.alt, shot.id, shot.hasAttribute('srcset'), shot.hasAttribute('width')],
+    ['https://example.com/a-750.webp', '', '', false, false],
+    'the rendered source; decorative; no intrinsic size attributes',
+  );
+  assert.deepEqual(
+    [shot.style.position, shot.style.left, shot.style.top, shot.style.width, shot.style.height, shot.style.maxWidth],
+    ['absolute', '1px', '1px', '368px', '207px', 'none'],
+    'the image at its rendered size and offset, not its 500 × 333 intrinsic size',
+  );
+  assert.deepEqual([shot.style.objectFit, shot.style.objectPosition], ['cover', '50% 0%'], 'the crop is kept');
+  picture.remove();
 });
