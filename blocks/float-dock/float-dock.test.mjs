@@ -58,7 +58,9 @@ test('badge: the cart link with a count bubble, hidden when the cart is empty', 
   assert.equal(slot.firstElementChild, link);
   assert.equal(link.getAttribute('href'), '/de/media-cart');
   assert.equal(link.className, 'float-dock-button float-dock-cart');
-  assert.ok(link.querySelector('.icon.icon-media-cart'));
+  // the cart glyph is the source font glyph in CSS (#273): no icon element, the count only
+  assert.equal(link.querySelector('.icon'), null);
+  assert.deepEqual([...link.children].map((c) => c.className), ['float-dock-cart-count']);
   const count = link.querySelector('.float-dock-cart-count');
   assert.deepEqual([count.hidden, count.textContent, count.getAttribute('aria-hidden')], [true, '', 'true']);
   assert.equal(link.getAttribute('aria-label'), 'Media cart');

@@ -138,6 +138,12 @@ at 1440 / 768 / 390 (icons also at 1 / 1.25 / 1.5 / 2x).
 | 11, 12 / 8, 9 search | — | fixed on `main` | — |
 | 13 / 10 footer h3 | `h3` | fixed on `main` (#307, deployed after QA's check) | — |
 
+- **PO review round (2026-10-12):** the card date sat 2px high (image → date 15px / date → title 16px, source
+  17 / 14): the date row stays 44px, its text 2px lower, as the rails. The video "+" and download (links) took the
+  global `a:hover` underline: none now, as the source. The dock's cart button drew another bag (an SVG): now the
+  source's `\e02f` glyph (28px at 58px, 16px at 40px, line-height .8, centred by 50% + half-size negative margins),
+  pixel-identical at 1440 / 768 / 390 (the source's 40px button shows the bag partly under the count bubble; so does
+  ours).
 - **Content (DA preview, 2026-10-12; publish after merge):** `/en/images` and `/en/videos` re-imported (facets row
   only); `/en/media-feed.json` gets the `focus` column (every other cell unchanged; `tools/importer/media-items` writes
   it on the next build). Backups: `.migration/wt273-backup/`.
