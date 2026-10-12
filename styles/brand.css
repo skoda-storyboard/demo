@@ -158,6 +158,7 @@
   --pr-title-color: #0a0a0a;         /* h1.entry-title */
   --pr-date-color: #808080;          /* .entry-published */
   --pr-menu-border-color: #d2d2d2;   /* sidebar "Additional info" rows */
+  --pr-menu-link-color: #363636;     /* their links / labels (the headings are #353535, #275) */
   --pr-band-meta-color: #c4c6c7;     /* Media Box stats / "Based on tags" line */
   --pr-ghost-color: #464748;         /* "All" ghost pill on the related band */
 

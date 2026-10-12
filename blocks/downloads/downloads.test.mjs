@@ -122,7 +122,7 @@ test('image sizes remain an accessible two-link menu, and incomplete files do no
   assert.equal(block.querySelector('.downloads-play'), null);
   const toggle = block.querySelector('.downloads-download');
   assert.equal(toggle.getAttribute('aria-expanded'), 'false');
-  assert.equal(block.querySelectorAll('.downloads-size').length, 2);
+  assert.equal(block.querySelectorAll('a.downloads-size').length, 2);
   toggle.click();
   assert.equal(toggle.getAttribute('aria-expanded'), 'true');
   assert.equal(block.querySelectorAll('.downloads-size[aria-label^="Download Front view"]').length, 2);
@@ -419,7 +419,7 @@ test('mediabox API mode still renders configured images without a file tile', as
     await decorate(block);
     assert.equal(block.querySelectorAll('.downloads-item').length, 1);
     assert.equal(block.querySelector('.downloads-file'), null);
-    assert.equal(block.querySelectorAll('.downloads-size').length, 2);
+    assert.equal(block.querySelectorAll('a.downloads-size').length, 2);
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -439,7 +439,7 @@ test('cartSize picks the original, else the first size; cartThumb keeps this sit
   assert.equal(cartThumb(''), '');
 });
 
-test('each tile gets an inert add toggle for its original next to its download control', async () => {
+test('a Media Box image tile adds through the source size menu: Original toggles, 1920px stays inert (#275)', async () => {
   const block = setup();
   addRow(block, {
     src: '/media_1.jpg',
@@ -448,13 +448,41 @@ test('each tile gets an inert add toggle for its original next to its download c
   });
   await decorate(block);
   const actions = block.querySelector('.downloads-actions');
-  const add = actions.querySelector('.downloads-add');
-  assert.equal(actions.firstElementChild, add);
-  assert.ok(actions.querySelector('.downloads-action'));
-  assert.deepEqual([add.type, add.getAttribute('aria-label')], ['button', 'Add to media cart: Front view']);
-  assert.equal(add.dataset.href, 'https://www.skoda-storyboard.com/direct-download/a.jpg');
-  assert.equal(add.dataset.title, 'Front view');
-  assert.match(add.dataset.thumb, /^\/media_1\.jpg/);
+  const toggle = actions.querySelector('.downloads-add-toggle');
+  assert.equal(actions.firstElementChild, toggle.parentElement, 'the + comes before the download control');
+  assert.equal(actions.querySelector('.downloads-add'), null, 'no single add toggle on an image tile');
+  assert.deepEqual([toggle.type, toggle.getAttribute('aria-label'), toggle.getAttribute('aria-haspopup')], ['button', 'Add to media cart: Front view', 'true']);
+  const menu = document.getElementById(toggle.getAttribute('aria-controls'));
+  assert.equal(menu.hidden, true);
+  const rows = [...menu.querySelectorAll('.downloads-add-size')];
+  assert.deepEqual(rows.map((r) => r.textContent), ['1920px', 'Original']);
+  const [giant, original] = rows;
+  assert.equal(original.dataset.href, 'https://www.skoda-storyboard.com/direct-download/a.jpg');
+  assert.equal(original.dataset.title, 'Front view');
+  assert.match(original.dataset.thumb, /^\/media_1\.jpg/);
+  assert.equal(original.getAttribute('aria-label'), 'Add/remove Original version: Front view');
+  assert.equal(giant.dataset.href, undefined, 'the cart holds originals only (D5)');
+  assert.equal(giant.getAttribute('aria-disabled'), 'true');
+  assert.equal(giant.getAttribute('aria-label'), "1920px version can't be added to the media cart");
+  toggle.click();
+  assert.equal(menu.hidden, false);
+  assert.equal(toggle.getAttribute('aria-expanded'), 'true');
+  menu.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  assert.equal(menu.hidden, true);
+  assert.equal(document.activeElement, toggle, 'Escape returns focus to the +');
+});
+
+test('outside a Media Box, and for a single-size tile, the add stays one round toggle (#275)', async () => {
+  const block = setup(false);
+  addRow(block, { src: '/a.jpg', title: 'A', links: [['Original', '/a.jpg'], ['1920px', '/a-1920.jpg']] });
+  await decorate(block);
+  assert.ok(block.querySelector('.downloads-add'));
+  assert.equal(block.querySelector('.downloads-add-toggle'), null);
+  const box = setup();
+  addRow(box, { src: '/b.jpg', title: 'B', links: [['Original', '/b.jpg']] });
+  await decorate(box);
+  assert.ok(box.querySelector('.downloads-add'));
+  assert.equal(box.querySelector('.downloads-add-toggle'), null);
 });
 
 test('Media Box: the group toggle sits on the section stats line', async () => {
@@ -735,4 +763,75 @@ test('gallery CSS: Media Box ladder, overlay controls, source opener bar', async
   assert.match(css, /\.downloads:is\(\.downloads-media-box, \.gallery\) \.downloads-items \{\s+--dl-cols: 3;/);
   assert.match(css, /\.downloads\.gallery \.downloads-actions \{\s+position: absolute;\s+inset-block-end: var\(--dl-overlay-inset\);\s+inset-inline-start: var\(--dl-overlay-inset\);/);
   assert.match(css, /\.downloads\.gallery\.downloads-collapsed \.downloads-more \{\s+margin-block-start: calc\(-1 \* var\(--dl-gallery-bar\)\);/);
+});
+
+// #275: the source tile's date, h3 title and clickable file tiles in a Media Box
+function addDatedRow(block, { src = '', date = '', title = '', links = [] }) {
+  addRow(block, { src, title, links });
+  const row = block.lastElementChild;
+  if (date) {
+    const cell = document.createElement('div');
+    cell.textContent = date;
+    row.children[0].after(cell);
+  }
+}
+
+test('a Media Box tile shows its date above an h3 title; a 3-cell row still renders (#275)', async () => {
+  const block = setup();
+  addDatedRow(block, {
+    src: '/a.jpg', date: '23. 3. 2026', title: 'Škoda Peaq', links: [['Original', '/a.jpg'], ['1920px', '/a-1920.jpg']],
+  });
+  addRow(block, { src: '/b.jpg', title: 'Undated', links: [['Original', '/b.jpg']] });
+  await decorate(block);
+  const [dated, undated] = block.querySelectorAll('.downloads-item figure');
+  assert.equal(dated.querySelector('.downloads-date').textContent, '23. 3. 2026');
+  assert.equal(dated.querySelector('.downloads-date + .downloads-title').tagName, 'H3');
+  assert.equal(dated.querySelector('.downloads-title').textContent, 'Škoda Peaq', 'the date is never taken for the title');
+  assert.equal(undated.querySelector('.downloads-date'), null);
+  assert.equal(undated.querySelector('.downloads-title').tagName, 'H3');
+});
+
+test('outside a Media Box the title stays a figcaption and no date shows (#275)', async () => {
+  const block = setup(false);
+  addDatedRow(block, { src: '/a.jpg', date: '23. 3. 2026', title: 'Front', links: [['Original', '/a.jpg']] });
+  await decorate(block);
+  assert.equal(block.querySelector('.downloads-title').tagName, 'FIGCAPTION');
+  assert.equal(block.querySelector('.downloads-title').textContent, 'Front');
+  assert.equal(block.querySelector('.downloads-date'), null);
+});
+
+test('a malformed date stays the title; only the source "d. m. yyyy" form is a date (#275)', async () => {
+  const block = setup();
+  addDatedRow(block, { src: '/a.jpg', date: '2026-03-23', title: '', links: [['Original', '/a.jpg']] });
+  await decorate(block);
+  assert.equal(block.querySelector('.downloads-date'), null);
+  assert.equal(block.querySelector('.downloads-title').textContent, '2026-03-23');
+});
+
+test('a file tile opens its file in a new tab; a Media Box clip shows its frame under a play badge (#275)', async () => {
+  const block = setup();
+  addRow(block, { title: 'Family', links: [['PDF', 'https://dam.example/family.pdf']] });
+  addRow(block, { title: 'Covered Drive', links: [['MP4', 'https://dam.example/clip.mp4']] });
+  await decorate(block);
+  const [pdf, clip] = block.querySelectorAll('.downloads-file');
+  assert.equal(pdf.tagName, 'A');
+  assert.equal(pdf.getAttribute('href'), 'https://dam.example/family.pdf');
+  assert.equal(pdf.target, '_blank');
+  assert.equal(pdf.getAttribute('aria-label'), 'Open Family (PDF)');
+  assert.equal(pdf.dataset.fileType, 'pdf');
+  assert.equal(pdf.querySelector('video'), null);
+  const video = clip.querySelector('video.downloads-file-frame');
+  assert.ok(video, 'a clip without a poster shows its own frame');
+  assert.equal(video.getAttribute('aria-hidden'), 'true');
+  assert.equal(video.muted, true);
+  assert.match(video.src || video.dataset.src, /clip\.mp4#t=0\.1$/);
+  assert.equal(clip.querySelector('.downloads-play').getAttribute('aria-hidden'), 'true');
+});
+
+test('outside a Media Box a clip file tile has no video frame (#275)', async () => {
+  const block = setup(false);
+  addRow(block, { title: 'Clip', links: [['MP4', '/clip.mp4']] });
+  await decorate(block);
+  assert.equal(block.querySelector('.downloads-file video'), null);
+  assert.equal(block.querySelector('.downloads-file-type').textContent, 'MP4');
 });

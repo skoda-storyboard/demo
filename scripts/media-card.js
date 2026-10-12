@@ -132,6 +132,9 @@ function cartAction(el, row, size, original = '', title = '') {
     bound ||= loadCart()
       .then(({ bindCartControl }) => {
         bindCartControl(el, { href: original, title, thumb: row.image || row.poster || '' });
+        // an added card's picture flies to the cart badge, as on the source (#275); decorative
+        import('./media-cart-fly.js').then(({ installFlyToCart }) => installFlyToCart())
+          .catch(() => { /* no flight */ });
         // bound by a hover / focus: replay it, so the cart's link check (which starts on the
         // first hover or focus of a bound control) runs as it did when controls bound at render
         if (trigger?.type === 'pointerenter' || trigger?.type === 'focus') {

@@ -29,6 +29,12 @@
   --tile-title-backdrop: rgb(0 0 0 / 56%);
 }
 
+/* press-kit tiles keep the source's look: the white title on the image gradients only, no
+   backdrop (#275, PO decision; the series tiles keep theirs, docs/ui-specs/series.md §6) */
+.cards.tiles:has(> .tiles-press) {
+  --tile-title-backdrop: transparent;
+}
+
 .cards.tiles li {
   margin-block-end: 0;
 }

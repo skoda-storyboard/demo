@@ -2,6 +2,13 @@
 
 const text = (node) => (node?.textContent || '').replace(/\s+/g, ' ').trim();
 
+// the tile's source date ("23. 3. 2026"), or '' when it isn't one
+const SOURCE_DATE = /^\d{1,2}\.\s?\d{1,2}\.\s?\d{4}$/;
+export const tileDate = (item) => {
+  const date = text(item.querySelector('.entry-meta .entry-published, .entry-published'));
+  return SOURCE_DATE.test(date) ? date : '';
+};
+
 function downloads(item, document) {
   const candidates = [...item.querySelectorAll('.media-cart-action-multi.download a[href]')];
   if (!candidates.length) {
@@ -41,10 +48,11 @@ export default function parse(element, { document }) {
   if (expected && items.length !== expected) {
     throw new Error(`Press-kit Media Box expected ${expected} assets, found ${items.length}`);
   }
-  // One Downloads table in source order (contract `downloads`: [<picture> or empty, title,
-  // links]). File-only assets (PDF, MP4 without a poster) keep an empty picture cell, which the
-  // Downloads block renders as a file tile (SKODA-510). Used for the Media Box and for the
-  // inline asset grids of resource "Images" children (SKODA-805b).
+  // One Downloads table in source order (contract `downloads-file-rows`: [<picture> or empty,
+  // (date,) title, links]). File-only assets (PDF, MP4 without a poster) keep an empty picture
+  // cell, which the Downloads block renders as a file tile (SKODA-510). Used for the Media Box and
+  // for the inline asset grids of resource "Images" children (SKODA-805b). A Media Box tile keeps
+  // its source date in a cell before the title (#275); the gallery tiles show none.
   const rows = [];
   items.forEach((wrapper) => {
     const item = wrapper.querySelector('article.media-cart-item');
@@ -59,8 +67,10 @@ export default function parse(element, { document }) {
       p.append(link);
       return p;
     });
+    const date = gallery ? '' : tileDate(item);
+    const named = date ? [date, title] : [title];
     if (!img) {
-      rows.push(['', title, paragraphs]);
+      rows.push(['', ...named, paragraphs]);
       return;
     }
     if (!img.getAttribute('alt')?.trim()) img.alt = img.getAttribute('title')?.replace(/^Video\s*\|\s*/i, '') || title;
@@ -70,7 +80,7 @@ export default function parse(element, { document }) {
     }
     ['data-caption', 'data-video_title', 'data-video_src', 'srcset', 'sizes', 'itemprop', 'title']
       .forEach((attr) => img.removeAttribute(attr));
-    rows.push([img, title, paragraphs]);
+    rows.push([img, ...named, paragraphs]);
   });
   // A gallery group sits in the article column, where the Downloads block would show every tile;
   // the source's togglebox shows two rows first, which is the block's `collapse auto` (SKODA-510).
