@@ -121,7 +121,9 @@ test('card: image header with the authored heading, before the form', () => {
   assert.equal(header.className, 'newsletter-stub-header');
   assert.equal(header.tagName, 'DIV', 'not <header>: the global header rule would size it');
   assert.ok(header.querySelector('picture img'));
-  const heading = header.querySelector('h2');
+  const heading = header.querySelector('h3');
+  assert.ok(heading, 'h3, as the source story sidebar widget (#296)');
+  assert.equal(header.querySelector('h2'), null);
   assert.equal(heading.className, 'newsletter-stub-heading');
   assert.ok(heading.querySelector('br'), 'authored line break is kept');
   assert.equal(heading.textContent, 'Be the firstto get the latest stories');
