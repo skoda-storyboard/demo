@@ -296,6 +296,13 @@ Measured against the source (Superb, Epiq) at 1440 / 1080 / 992 / 768 / 390, fir
   The rail date gap is the `--rail-date-gap` token; every rail it reaches (Stories + Media Room homes, model pages;
   the press and story bands keep their own) was measured against the source. Forced colors: the arrow glyph keeps
   the system button-text colour, so it stays visible.
+- **Arrow focus (PO review):** the source draws a 5px `#19F` ring round the arrow on any focus, a click or tap
+  included (`.flickity-button:focus`, measured 1440 + 390). Now the same on every rail (`--carousel-focus-ring`,
+  was a 2px green square on keyboard focus only); not clipped on the model, home, Media Room, press or story
+  bands; ≥ 3:1 on white and on the dark band. Forced colors draw a system-colour outline instead.
+- **Checked, as the source (not changed):** the icon nav with 9 items (Superb) is wider than the viewport at
+  768–991 (page 788px wide at 768, the first item starts at −20px), the same on the source; at a rail's end the
+  disabled "next" drops focus to the page, the same on the source.
 - **Code review note (out of scope, not changed):** the Images / Videos **listing** media cards (`blocks/listing`,
   `.media-asset-date`) keep a 16px date → title gap, source 14px (date 2px high, measured at 1440). Same fix as the
   rails' `.carousel.media` date row; #273 closed the listing observations as accepted.

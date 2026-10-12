@@ -248,6 +248,7 @@
   height: var(--carousel-arrow-size);
   padding: 0;
   border: 0;
+  border-radius: 50%;
   background: transparent;
   transform: translateY(-50%);
   cursor: pointer;
@@ -304,9 +305,13 @@
   pointer-events: none;
 }
 
-.carousel-arrow:focus-visible {
-  outline: 2px solid var(--facet-active);
-  outline-offset: 2px;
+/* focus: the source's 5px blue ring round the button on any focus, a click or tap included, as
+   .flickity-button:focus (#284). The transparent outline is what forced colors draw instead (they
+   drop box-shadows), so keyboard focus stays visible there */
+.carousel-arrow:focus {
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  box-shadow: var(--carousel-focus-ring);
 }
 
 /* --- dots (optional `carousel (dots)` variant; default off) --------------- */
