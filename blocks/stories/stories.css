@@ -243,11 +243,50 @@
   }
 }
 
+/*
+ * --- count row "6 / 204" (SKODA-209a): the archive grid's, between the grid and Load more ---
+ * Source .search-results-pagination, measured on /en/category/emobility (2026-10-12): 36px
+ * under the last card (the grid's trailing 20px gutter + its own 16px margin), a 41px row
+ * (8px padding, 24px line, 1px underline), then 16px to the Load more wrapper.
+ */
+.stories .stories-count {
+  padding-block: var(--spacing-xs);
+  margin-block: var(--spacing-m);
+  font-size: var(--body-font-size-m);
+  font-weight: var(--weight-medium); /* the source's 500; no 500 face on either site, so it renders as 400 */
+  line-height: var(--line-height-body);
+  color: var(--pagination-count-color);
+  border-block-end: 1px solid var(--pagination-border);
+}
+
+.stories .stories-count-total::before {
+  content: " /";
+  padding-inline-end: 0.3em;
+}
+
 /* --- load-more: ghost pill (stories.md §3, measured) --- */
 .stories .stories-loadmore {
   display: flex;
   justify-content: center;
   padding-block: var(--spacing-m); /* wrapper 16px 0 */
+}
+
+/* nothing left to load: no empty 32px band above the footer */
+.stories .stories-loadmore:empty {
+  display: none;
+}
+
+/*
+ * The archive grid's section ends 16px under Load more, the source .archive-results margin
+ * (it was the 40px section margin, #330), and the footer follows the content on a short
+ * archive: no viewport min-height (SKODA-305 keeps it on every other page).
+ */
+main > .section.stories-container:last-child:has(.stories.has-count) {
+  margin-block-end: var(--spacing-m);
+}
+
+main:has(.stories.has-count) {
+  min-height: auto;
 }
 
 .stories .stories-loadmore-btn {
