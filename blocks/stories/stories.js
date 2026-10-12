@@ -104,8 +104,8 @@ function readCountFlag(count, columns) {
 }
 
 /*
- * Fill the count row: "shown / total" (CSS adds the "/"), hidden with Load more once every
- * story is shown. Exported for the tests.
+ * Fill the count row: "shown / total" (CSS adds the "/"). It stays when every story is shown
+ * ("3 / 3", as the source's) and hides only when there are no stories. Exported for the tests.
  */
 export function renderCount(countEl, shown, total) {
   const current = document.createElement('span');
@@ -115,7 +115,7 @@ export function renderCount(countEl, shown, total) {
   all.className = 'stories-count-total';
   all.textContent = String(total);
   countEl.replaceChildren(current, all);
-  countEl.hidden = shown >= total;
+  countEl.hidden = total === 0;
 }
 
 // A promo/featured entry the promo-box already shows (source `exclude_carousel_posts`).

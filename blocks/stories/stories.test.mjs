@@ -394,13 +394,15 @@ test('renderCount reads "6 / N", then "12 / N" after Load more', () => {
   assert.equal(countEl.hidden, false);
 });
 
-test('renderCount hides the row with Load more once every story is shown', () => {
+test('renderCount keeps "N / N" when every story is shown, as the source; hides it with no stories', () => {
   const countEl = document.createElement('div');
-  renderCount(countEl, 2, 2); // a short archive (Fabia tag): everything fits
-  assert.equal(countEl.hidden, true);
-  renderCount(countEl, 205, 205); // the last Load more
-  assert.equal(countEl.hidden, true);
-  renderCount(countEl, 0, 0); // no results
+  const read = () => countEl.children.map((s) => s.textContent).join(' / ');
+  renderCount(countEl, 3, 3); // a short archive: everything fits (source design-eng "3 / 3")
+  assert.equal(read(), '3 / 3');
+  assert.equal(countEl.hidden, false);
+  renderCount(countEl, 205, 205); // the last Load more: still shown, so it is announced
+  assert.equal(countEl.hidden, false);
+  renderCount(countEl, 0, 0); // no results: the status line says so instead
   assert.equal(countEl.hidden, true);
 });
 
@@ -419,7 +421,7 @@ test('archive pager: the count follows the paginated slice of the scoped feed', 
   assert.equal(shownAfter(cfg.initial + cfg.perpage), '12 / 14');
   assert.equal(countEl.hidden, false);
   assert.equal(shownAfter(cfg.initial + 2 * cfg.perpage), '14 / 14');
-  assert.equal(countEl.hidden, true);
+  assert.equal(countEl.hidden, false);
 });
 
 // --- exclude promo/featured (stories.md §8 exclude_carousel_posts) ---------
