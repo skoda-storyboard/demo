@@ -123,6 +123,14 @@ body.press-release .section.body-column .press-release-perex strong {
   font-weight: var(--weight-semibold);
 }
 
+/* Footer newsletter on a press release: "Manage subscription" is the source's 14/18 medium
+   (#274; the Media Room footer's own link stays 16/24 regular) */
+body.press-release footer .newsletter-stub .newsletter-stub-manage a {
+  font-size: var(--body-font-size-s);
+  font-weight: var(--weight-medium);
+  line-height: 18px;
+}
+
 /* Sidebar: Additional info list, Images, Tags; 16/45 headings, 15px between groups. */
 body.press-release .section.sidebar aside > div {
   margin-bottom: var(--pr-group-gap);
@@ -155,9 +163,88 @@ body.press-release .section.sidebar .default-content-wrapper > ul > li {
 body.press-release .section.sidebar .default-content-wrapper > ul a {
   display: block;
   padding: var(--spacing-xs) 0;
-  color: var(--skoda-grey-800);
+  color: var(--pr-menu-link-color);
   line-height: 45px;
   text-decoration: none;
+}
+
+/* "Media contacts": the source's green arrow (skoda-bnr-icons caret-right, 16px, #419468) at
+   the row's end, 10px in (#274; the source places it 20px inside the column) */
+body.press-release .section.sidebar .default-content-wrapper > ul a.press-release-contacts {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+body.press-release .section.sidebar .default-content-wrapper > ul a.press-release-contacts::after {
+  content: "";
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-inline-end: 10px;
+  background-color: var(--skoda-green-accent);
+  mask: url("../../icons/pr-caret-right.svg") center / contain no-repeat;
+}
+
+/* "Download Media Box": the label (the jump to the Media Box) and the source's round add
+   button at the row's end, centred on it (#274; press-release.js adds it). The button is the
+   Media Box add-all control's twin: 40px, 2px ink ring, the media-cart glyph */
+body.press-release .section.sidebar .press-release-media-box {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-s);
+}
+
+body.press-release .section.sidebar .default-content-wrapper > ul > .press-release-media-box > a {
+  flex: 1;
+  min-width: 0;
+}
+
+body.press-release .section.sidebar .press-release-add-all {
+  --pr-add-icon: url("../../icons/media-cart-add.svg");
+
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 2px solid var(--skoda-ink);
+  border-radius: var(--pill-radius);
+  background: var(--skoda-white);
+  color: var(--skoda-ink);
+  cursor: pointer;
+}
+
+body.press-release .section.sidebar .press-release-add-all::before {
+  content: "";
+
+  /* the faux-bold glyph's 1080-unit box around its 16px em, as the Media Box's */
+  width: calc(16px * 1080 / 1024);
+  height: calc(16px * 1080 / 1024);
+  background-color: currentcolor;
+  mask: var(--pr-add-icon) center / contain no-repeat;
+}
+
+body.press-release .section.sidebar .press-release-add-all[data-in-cart] {
+  --pr-add-icon: url("../../icons/media-remove.svg");
+}
+
+body.press-release .section.sidebar .press-release-add-all:hover,
+body.press-release .section.sidebar .press-release-add-all:focus-visible {
+  background: var(--dropdown-hover-bg);
+}
+
+body.press-release .section.sidebar .press-release-add-all:focus-visible {
+  outline: 2px solid var(--skoda-ink);
+  outline-offset: 2px;
+}
+
+body.press-release .section.sidebar .press-release-add-all[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Highlight callout (SKODA-824; the Zellmer FAQ, a `div[style*=background]` in the source
@@ -175,11 +262,13 @@ body.press-release main > .section.body-column:is(.highlight-grey, .highlight-da
 /* Sidebar tag rows sit 24px apart, as on the source (inline-block <li>s on a 24px line): no
    flex row gap, and not the global 8px list-item margin. */
 body.press-release .section.sidebar .tags .tags-list {
-  row-gap: 0;
+  gap: 0;
 }
 
+/* each source pill (a left float) keeps its 5px right margin, the row's last one too, so a row
+   wraps where the source's does (#274: Zellmer's four tags, 338px of pills in 342px, wrap) */
 body.press-release .section.sidebar .tags .tags-list > li {
-  margin: 0;
+  margin: 0 var(--tag-gap) 0 0;
 }
 
 /* The source columns end with their own bottom margin (60px article, 24px sidebar), after
@@ -208,7 +297,7 @@ body.press-release main > .section.media-box {
   margin-top: calc(var(--pr-band-gap) - var(--pr-gutter));
 }
 
-body.press-release .section.dark .default-content-wrapper > h2 {
+body.press-release .section.dark .default-content-wrapper > :is(h2, h3) {
   margin: 0;
   color: var(--background-color);
   font-size: var(--heading-font-size-l);
@@ -276,6 +365,28 @@ body.press-release .section.related .button-container a.button:focus-visible {
   background: var(--skoda-grey-50);
   color: var(--pr-ghost-color);
   text-decoration: none;
+}
+
+/* A press release's Media Box PDF tile is the source's bare 30% black holder: its
+   .file-caption is hidden (#274; measured on Zellmer and Superb, no glyph and no label) */
+body.press-release .section.media-box .downloads-file[data-file-type="pdf"]::after {
+  content: none;
+}
+
+/* Related Press Releases arrows: the source glyph (skoda-bnr-icons \e00b / \e00c, an ink
+   arrow cut out of a 90% white disc), as the home bands' (#272, story-rail.css) (#274) */
+body.press-release .section.related .story-rail.press .carousel-arrow::after {
+  inset: 0;
+  width: auto;
+  height: auto;
+  border: 0;
+  background-color: color-mix(in srgb, var(--skoda-white) 90%, transparent);
+  transform: none;
+  mask: url("../../icons/rail-arrow-prev.svg") center / 100% 100% no-repeat;
+}
+
+body.press-release .section.related .story-rail.press .carousel-next::after {
+  mask-image: url("../../icons/rail-arrow-next.svg");
 }
 
 /* A sidebar heading closing its default content is the label of the block after it

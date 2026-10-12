@@ -79,7 +79,20 @@ function sizeLinks(item, document) {
   return links;
 }
 
-export default function parse(element, { document }) {
+// the item's source date line ("30. 8. 2022"), or '' when it has none
+const SOURCE_DATE = /^\d{1,2}\.\s?\d{1,2}\.\s?\d{4}$/;
+function itemDate(item) {
+  const date = text(item.querySelector('.entry-meta .entry-published, .entry-published'));
+  return SOURCE_DATE.test(date) ? date : '';
+}
+
+/**
+ * @param {Element} element the source Media Box
+ * @param {{document: Document, dates?: boolean}} options `dates`: emit each item's source date
+ *   as the optional date cell before the title (contract `downloads`, #275); the press-release
+ *   Media Box shows it on every card (#274), the story Media Box keeps its rows as they are.
+ */
+export default function parse(element, { document, dates = false }) {
   let items = Array.from(element.querySelectorAll('article.media-cart-item'));
   if (items.length === 0) {
     items = Array.from(element.querySelectorAll('.search-results-item, .items > .item'));
@@ -124,7 +137,8 @@ export default function parse(element, { document }) {
       p.append(a);
       return p;
     });
-    cells.push([img || '', title, linkCell]);
+    const date = dates ? itemDate(item) : '';
+    cells.push(date ? [img || '', date, title, linkCell] : [img || '', title, linkCell]);
   });
 
   if (cells.length === 1) {

@@ -157,6 +157,43 @@ All values `getComputedStyle` on the Superb release, cited `(selector · viewpor
 
   The core PR body is static.
 - "Download Media Box" triggers the media-cart/package download path (D2 server-side reduction).
+  On EDS (#274) the label is the jump to the Media Box, and the round `+` beside it is the Media
+  Box add-all control's proxy (`press-release.js`). It adds every Media Box file to the media cart,
+  or removes them all once they are all in, and mirrors that control's `data-in-cart` /
+  `aria-pressed` / `aria-disabled` / `aria-busy`. It is inert until the Downloads block wires the
+  control. A release without a Media Box Downloads block gets no `+`.
+
+### 6a. Press-release QA (#274, measured 2026-10-12, Zellmer + Superb)
+
+Origin vs EDS, 1280, `getComputedStyle` / box geometry. The fixes are in the template
+(`templates/press-release/*`, scoped to `body.press-release`) and the importer. No block code
+changed.
+
+| Item (selector) | Source | EDS before | EDS after |
+|---|---|---|---|
+| Sidebar link colour (`aside ul a`) | `#363636` | `#353535` | `#363636` (`--pr-menu-link-color`) |
+| "Media contacts" arrow (`a.press-release-contacts::after`) | caret-right `\e009`, 16px, `#419468`, x1228 (10px in), centred on the 45px line | none | `icons/pr-caret-right.svg` mask, 16px, `#419468`, x1228 |
+| "Download Media Box" row (`li.press-release-media-box`) | flex; 40×40 round add (2px `#161718`, white, `\e001`) at x1214–1254, 11px from the li top | a plain link | flex; `button.press-release-add-all` 40×40 at x1214, 10.5px from the top; `media-remove.svg` when all in |
+| Tags (`.tags-list > li`) | floats, 5px right margin each: Zellmer's 4th tag wraps to row 2 (+24px) | flex 5px column gap: one row | 5px end margin, no gap: "Zellmer" on row 2 (+24px); Superb unchanged |
+| Media Box / Related headings | `h3` | `h2` | `h3` (importer; CSS takes both) |
+| Media Box card date (Downloads date cell) | 11px `#c4c6c7` (Zellmer 30. 8. 2022 / 21. 9. 2026) | none | importer `dates` option on the press-release Media Box |
+| FAQ opener (Zellmer) | `<strong>FAQ:<br></strong><br>`: a blank line, panel 302px | collapsed, 278px (band 24px early) | importer keeps both breaks |
+| Media Box PDF tile | the 30% black holder only (`.file-caption.pdf` hidden) | the 48px PDF glyph (#307) | glyph off on press releases (`::after { content: none }`) |
+| Related arrows (`.story-rail.press .carousel-arrow::after`) | glyph `\e00b` / `\e00c` | the old chevron | the home bands' `rail-arrow-prev/next.svg` (#272) |
+| Footer "Manage subscription" | 14 / 500 / 18, underline, `#419468` | 16 / 400 / 24 | 14 / 500 / 18 |
+
+Already at parity, so closed with evidence:
+- Superb tag rows (24px apart).
+- The centred quote rule.
+- The FAQ panel `#f3f3f3` / 25px.
+- The Media Box internals: `h3` titles, the `#161718` menu, the PDF add and link.
+- The band gaps.
+- The footer `h3`s and the consent link hover (no underline, already in the block since #275).
+
+Elsewhere:
+- Related title hover: #323 (SKODA-228).
+- Lighthouse SEO: platform noindex on `aem.page`.
+- A11y: #43 (SKODA-703).
 
 ## 7. Accessibility
 
@@ -197,7 +234,7 @@ All values `getComputedStyle` on the Superb release, cited `(selector · viewpor
 - [ ] Two-column `66.66/33.33` (`.column-primary`/`.column-secondary`) ≥768; **stacks single-column <768**.
 - [ ] Primary order: lead image → bullet-points (bold `›` list) → perex `16/24/600` → body `16/24/400`
       (`p` `mb 20`) → any podcast/video embed.
-- [ ] Secondary: Additional info (Media contacts) + Download Media Box (round `+`, `downloads.md`) + Images
+- [ ] Secondary: Additional info (Media contacts + green arrow) + Download Media Box (round `+`, `downloads.md`; #274) + Images
       preview (lightbox/cart) + Tags (grey chips, `tags.md`) + newsletter + side-banner.
 - [ ] Full-bleed dark related-media band after the article, `margin-top 32px`.
 - [ ] Content cap `1248`; gutter `10px`; a11y (single h1, `<time>`, `aside`, labeled downloads/tags).
