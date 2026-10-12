@@ -149,6 +149,13 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
     and 9 fragments.
   - **Merge:** latest `main` merged; `tools/importer/media/media-manifest.json` resolved row by row (3312 rows, 40
     from this branch, 4 from main, no row changed on both sides).
+- **Re-review (#299, Lars, 2026-10-12): self-hreflang and `x-default` without another migrated language.**
+  `migratedHreflang()` dropped the `languages.length > 1` gate: every kept entry (target migrated) is written, so a
+  page whose translations are not migrated keeps its `hreflang:en` and, when the source declares one and its target
+  is migrated, `hreflang:x-default`. The switcher is unchanged: EN alone as plain text, `x-default` skipped. Dry run
+  on preview: 282 rows (the 5 Epiq pages `en|cs|de|sk|sr` as before, 277 migrated EN pages with `hreflang:en` only),
+  no `x-default` (only the source home declares one, `/`, not a page). Authored-link overrides / new tab and
+  `/metadata` as generator-owned are accepted demo limitations (reviewer).
 
 ## Dependencies
 - Upstream: SKODA-301 (Header + nav fragment) / Downstream: SKODA-1003 (language-negotiated root routing + per-locale placeholders)

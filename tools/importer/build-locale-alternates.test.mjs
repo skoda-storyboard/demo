@@ -68,8 +68,11 @@ test('mergeSheet: curated rows untouched, earlier generated rows replaced, nativ
   // every row has every column (empty cells never overwrite in bulk metadata); no `alternates`
   const keys = Object.keys(merged.data[0]);
   assert.ok(merged.data.every((r) => JSON.stringify(Object.keys(r)) === JSON.stringify(keys)));
-  assert.deepEqual(keys, ['URL', 'nav', 'footer', 'section', 'hreflang:en', 'hreflang:cs', 'hreflang:sk'],
-    'the used hreflang columns, last, in the switcher order');
+  assert.deepEqual(
+    keys,
+    ['URL', 'nav', 'footer', 'section', 'hreflang:en', 'hreflang:cs', 'hreflang:sk'],
+    'the used hreflang columns, last, in the switcher order',
+  );
   // a curated row is never treated as generated, even with an hreflang value
   const curated = mergeSheet({ data: [{ URL: '/en/x', nav: '/nav', 'hreflang:cs': `${DEMO}/cs/x` }] }, []);
   assert.deepEqual(curated.data, [{ URL: '/en/x', nav: '/nav', 'hreflang:cs': `${DEMO}/cs/x` }]);
@@ -101,8 +104,23 @@ test('migratedHreflang: the migrated entries as absolute URLs on the origin, sel
     kept: ['en', 'cs', 'sk', 'x-default'],
     missing: ['de'],
   });
-  // only the page itself (and x-default) migrated: no translation, no row
-  assert.deepEqual(migratedHreflang(declared, (p) => p === '/en/a', DEMO).columns, {});
+  // only the page itself migrated: its self-hreflang and the authored x-default (its target is
+  // that page) are still written (#299 review); the switcher shows EN alone, no x-default
+  assert.deepEqual(migratedHreflang(declared, (p) => p === '/en/a', DEMO), {
+    columns: { 'hreflang:en': `${DEMO}/en/a`, 'hreflang:x-default': `${DEMO}/en/a` },
+    kept: ['en', 'x-default'],
+    missing: ['cs', 'de', 'sk'],
+  });
+  // Lars's case: EN + CZ + x-default → EN declared, only EN migrated
+  const enOnly = [['en', `${LIVE}/en/p/`], ['cs', `${LIVE}/cs/p/`], ['x-default', `${LIVE}/en/p/`]];
+  assert.deepEqual(migratedHreflang(enOnly, (p) => p === '/en/p', DEMO), {
+    columns: { 'hreflang:en': `${DEMO}/en/p`, 'hreflang:x-default': `${DEMO}/en/p` },
+    kept: ['en', 'x-default'],
+    missing: ['cs'],
+  });
+  // an x-default whose target is not migrated is dropped; self stays
+  const xElsewhere = [['en', `${LIVE}/en/p/`], ['x-default', `${LIVE}/en/q/`]];
+  assert.deepEqual(migratedHreflang(xElsewhere, (p) => p === '/en/p', DEMO).columns, { 'hreflang:en': `${DEMO}/en/p` });
   // the home's x-default is the site root, which is not a page: dropped
   const home = [['en', `${LIVE}/en/`], ['cs', `${LIVE}/cs/`], ['x-default', `${LIVE}/`]];
   assert.deepEqual(migratedHreflang(home, () => true, DEMO).columns, {

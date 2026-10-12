@@ -88,8 +88,9 @@ export const HREFLANG_COLUMNS = [...ALTERNATE_LOCALES, 'x-default'].map(hreflang
 
 /**
  * The hreflang metadata of one page: its declared entries (pickHreflang output) kept only where
- * `migrated(path)` holds, as absolute URLs on `origin`. Its own language stays (self-hreflang);
- * a page none of whose translations is migrated declares nothing (no columns).
+ * `migrated(path)` holds, as absolute URLs on `origin`. Every kept entry is written, so its own
+ * language (self-hreflang) and an authored `x-default` stay even when none of its translations
+ * is migrated (#299 review: SEO metadata does not depend on the switcher having a link to show).
  * @param {Array<[string, string]>} declared [code, live URL] pairs
  * @param {(edsPath: string) => boolean} migrated
  * @param {string} origin e.g. https://main--demo--skoda-storyboard.aem.live
@@ -103,10 +104,7 @@ export function migratedHreflang(declared, migrated, origin) {
     if (target && migrated(target)) kept.push([code, `${origin.replace(/\/+$/, '')}${target}`]);
     else missing.push(code);
   });
-  const languages = kept.filter(([code]) => code !== 'x-default');
-  const columns = languages.length > 1
-    ? Object.fromEntries(kept.map(([code, url]) => [hreflangColumn(code), url]))
-    : {};
+  const columns = Object.fromEntries(kept.map(([code, url]) => [hreflangColumn(code), url]));
   return { columns, kept: kept.map(([code]) => code), missing };
 }
 

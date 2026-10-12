@@ -206,7 +206,8 @@ Every link was clicked on the home page, a story, a press release, the Media Roo
     page's `<html lang>` follows its locale tree (`scripts.js`).
 - **Where the hreflang metadata comes from:** `tools/importer/build-locale-alternates.mjs` reads every EDS page's
   source hreflang (rule `skoda-metadata-extract.mjs::pickHreflang`), keeps the entries published on EDS (both
-  ways) and writes one row per page into the bulk metadata sheet `/metadata`: `URL` + `hreflang:en`, `hreflang:cs`,
+  ways) and writes one row per page into the bulk metadata sheet `/metadata`, also when only the page itself survives
+  (self-hreflang, plus a migrated `x-default`; #299 re-review): `URL` + `hreflang:en`, `hreflang:cs`,
   … (`hreflang:x-default` last), absolute URLs on `--origin` (default the demo's live host
   `https://main--demo--skoda-storyboard.aem.live`; re-run with the production domain at go-live). No page document
   is touched; the earlier custom `alternates` column is removed. `--chrome cs,de,sk,sr` adds the `/{locale}/**` rows
