@@ -1,21 +1,25 @@
 #!/usr/bin/env node
 /*
- * build-locale-alternates.mjs (SKODA-303a): the `alternates` metadata of the migrated
- * translations, for the header's language switcher (blocks/header/header-locales.js).
+ * build-locale-alternates.mjs (SKODA-303a): the native hreflang metadata of the migrated
+ * translations, for SEO and the header's language switcher (blocks/header/header-locales.js).
  *
  * For every published EDS page this reads its source on the live site, takes the
- * `<link rel="alternate" hreflang>` set (skoda-metadata-extract.mjs::pickAlternates) and keeps
- * only the translations that are pages on EDS too, as site-relative paths
- * (`cs: /cs/e-mobilita-cs/…`). A translation that isn't migrated is left out: the switcher
- * never links the live site and never falls back to a locale home, so a page without a
- * migrated translation shows only its own language. The translated pages found that way get
- * their own row (their alternates point back), so the switch works both ways.
+ * `<link rel="alternate" hreflang>` set (skoda-metadata-extract.mjs::pickHreflang) and keeps
+ * only the entries that are pages on EDS too. A translation that isn't migrated is left out: the
+ * switcher never links the live site and never falls back to a locale home, so a page without a
+ * migrated translation gets no row and shows only its own language. The translated pages found
+ * that way get their own row (their links point back), so the switch works both ways.
  *
- * The rows go into the bulk metadata sheet (`/metadata`), one `URL` + `alternates` row per page;
- * no page document is touched. Page-level metadata wins over the sheet and an empty cell never
- * overwrites (aem.live bulk metadata), so the curated rows keep their values. `--chrome cs,de`
- * also adds a `/{locale}/**` row per locale pointing `nav` / `footer` at `/{locale}/nav` and
- * `/{locale}/footer` (the translated menus).
+ * The rows go into the bulk metadata sheet (`/metadata`), one row per page: `URL` plus one
+ * native `hreflang:<code>` column per language (#299 review; aem.live special metadata
+ * properties), the page's own language included and `x-default` when the source declares it and
+ * its target is migrated. Values are absolute URLs on `--origin` (default: the demo's live host;
+ * the production domain at go-live). EDS renders each as
+ * `<link rel="alternate" hreflang="cs" href="…">` in the head; the switcher reads those. No page
+ * document is touched. Page-level metadata wins over the sheet and an empty cell never
+ * overwrites (aem.live bulk metadata), so the curated rows keep their values. The earlier custom
+ * `alternates` column is removed. `--chrome cs,de` also adds a `/{locale}/**` row per locale
+ * pointing `nav` / `footer` at `/{locale}/nav` and `/{locale}/footer` (the translated menus).
  *
  * Usage:
  *   node tools/importer/build-locale-alternates.mjs                  build + report (no DA write)
@@ -23,14 +27,15 @@
  *   … --push                              merge into DA /metadata.json, then preview it
  *   … --push --publish                    … and publish the sheet
  * Options: --paths a,b (only these EDS paths), --chrome cs,de,sk,sr, --chrome-footer cs (the
- *   locales with a translated footer; default: all --chrome ones), --concurrency N (4).
+ *   locales with a translated footer; default: all --chrome ones), --origin <url> (the host of
+ *   the hreflang URLs), --concurrency N (4).
  * Credentials: none here; admin.da.live / admin.hlx.page auth is injected by the environment.
  * Output: tools/importer/reports/locale-alternates/<stamp>.json
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { pickAlternates, ALTERNATE_LOCALES } from './transformers/skoda-metadata-extract.mjs';
+import { pickHreflang, ALTERNATE_LOCALES } from './transformers/skoda-metadata-extract.mjs';
 import { LIVE_ORIGIN } from '../../scripts/links.js';
 
 const ORG = 'skoda-storyboard';
@@ -71,30 +76,38 @@ export function edsPathOf(href) {
   }
 }
 
-/** The `code: URL` pairs of a pickAlternates value. */
-const pairsOf = (declared) => String(declared || '').split(/,\s(?=[a-z]{2}:\s)/).filter(Boolean)
-  .map((pair) => pair.split(/:\s(.+)/));
-
-/** The EDS paths a pickAlternates value names. */
-const declaredPaths = (declared) => pairsOf(declared).map(([, href]) => edsPathOf(href))
+/** The EDS paths a pickHreflang result names. */
+const declaredPaths = (declared) => (declared || []).map(([, href]) => edsPathOf(href))
   .filter(Boolean);
 
+/** The `hreflang:<code>` column of a code, as aem.live names the property. */
+export const hreflangColumn = (code) => `hreflang:${code}`;
+
+/** The hreflang columns in the switcher's order, x-default last. */
+export const HREFLANG_COLUMNS = [...ALTERNATE_LOCALES, 'x-default'].map(hreflangColumn);
+
 /**
- * The `alternates` value of one page: its declared translations (pickAlternates output) kept
- * only where `migrated(path)` holds, as EDS paths.
- * @param {string} declared `cs: https://…/, de: https://…/`
+ * The hreflang metadata of one page: its declared entries (pickHreflang output) kept only where
+ * `migrated(path)` holds, as absolute URLs on `origin`. Its own language stays (self-hreflang);
+ * a page none of whose translations is migrated declares nothing (no columns).
+ * @param {Array<[string, string]>} declared [code, live URL] pairs
  * @param {(edsPath: string) => boolean} migrated
- * @returns {{alternates: string, kept: string[], missing: string[]}}
+ * @param {string} origin e.g. https://main--demo--skoda-storyboard.aem.live
+ * @returns {{columns: Record<string, string>, kept: string[], missing: string[]}}
  */
-export function migratedAlternates(declared, migrated) {
+export function migratedHreflang(declared, migrated, origin) {
   const kept = [];
   const missing = [];
-  pairsOf(declared).forEach(([code, href]) => {
+  (declared || []).forEach(([code, href]) => {
     const target = edsPathOf(href);
-    if (target && migrated(target)) kept.push(`${code}: ${target}`);
+    if (target && migrated(target)) kept.push([code, `${origin.replace(/\/+$/, '')}${target}`]);
     else missing.push(code);
   });
-  return { alternates: kept.join(', '), kept, missing };
+  const languages = kept.filter(([code]) => code !== 'x-default');
+  const columns = languages.length > 1
+    ? Object.fromEntries(kept.map(([code, url]) => [hreflangColumn(code), url]))
+    : {};
+  return { columns, kept: kept.map(([code]) => code), missing };
 }
 
 /**
@@ -111,24 +124,32 @@ export function chromeRows(codes = [], footers = codes) {
 /** A `/{locale}/**` chrome row this tool writes (replaced on every merge). */
 const isChromeRow = (r) => /^\/([a-z]{2})\/\*\*$/.test(r.URL || '') && r.nav === `${r.URL.slice(0, 3)}/nav`;
 
+const isHreflang = (column) => /^hreflang:/i.test(column);
+// the columns this tool writes: the native hreflang ones and the earlier custom `alternates`
+const isGenerated = (column) => column === 'alternates' || isHreflang(column);
+
 /**
- * The sheet after the merge: the curated rows unchanged (an empty `alternates` cell added so
- * every row has the same columns), this tool's earlier rows (URL + alternates only, and the
- * `/{locale}/**` chrome rows) replaced by the new ones, sorted by URL.
+ * The sheet after the merge: the curated rows unchanged, this tool's earlier rows (URL + hreflang
+ * or the old `alternates` only, and the `/{locale}/**` chrome rows) replaced by the new ones,
+ * sorted by URL. The custom `alternates` column is dropped (#299 review: native hreflang only),
+ * and every row gets every column (an empty cell never overwrites in bulk metadata), the
+ * hreflang ones last in the switcher's order.
  * @param {object} sheet the DA sheet JSON ({ data: [...] })
- * @param {Array<{URL: string, alternates: string}>} rows
+ * @param {Array<object>} rows `{ URL, 'hreflang:en': …, … }`
  * @param {Array<object>} [extra] curated rows to ensure (e.g. chromeRows())
  */
 export function mergeSheet(sheet, rows, extra = []) {
   const data = Array.isArray(sheet?.data) ? sheet.data : [];
-  const columns = [...new Set(['URL', ...[...data, ...extra].flatMap((r) => Object.keys(r)), 'alternates'])];
-  const blank = Object.fromEntries(columns.map((c) => [c, '']));
-  const generated = (r) => r.alternates && columns.every((c) => ['URL', 'alternates'].includes(c) || !r[c]);
-  const curated = data.filter((r) => !generated(r) && !isChromeRow(r))
-    .map((r) => ({ ...blank, ...r }));
-  const ensured = extra.map((r) => ({ ...blank, ...r }));
-  const added = [...rows].sort((a, b) => a.URL.localeCompare(b.URL))
-    .map((r) => ({ ...blank, ...r }));
+  const all = [...data, ...extra, ...rows].flatMap((r) => Object.keys(r));
+  const hreflang = [...new Set([...HREFLANG_COLUMNS, ...all.filter(isHreflang)])]
+    .filter((c) => all.includes(c));
+  const columns = [...new Set(['URL', ...all.filter((c) => c !== 'URL' && !isGenerated(c)), ...hreflang])];
+  const shape = (r) => Object.fromEntries(columns.map((c) => [c, r[c] ?? '']));
+  const generated = (r) => Object.keys(r).some((c) => isGenerated(c) && r[c])
+    && Object.keys(r).every((c) => c === 'URL' || isGenerated(c) || !r[c]);
+  const curated = data.filter((r) => !generated(r) && !isChromeRow(r)).map(shape);
+  const ensured = extra.map(shape);
+  const added = [...rows].sort((a, b) => a.URL.localeCompare(b.URL)).map(shape);
   const merged = [...curated, ...ensured, ...added];
   return {
     ...sheet, total: merged.length, offset: 0, limit: merged.length, data: merged, ':type': 'sheet',
@@ -154,7 +175,7 @@ async function declaredFor(edsPath) {
   const own = edsPath.split('/')[1];
   const self = links.find(([lang]) => lang.toLowerCase().split('-')[0] === own);
   if (links.length && (!self || self[1] !== src)) return { skipped: `own hreflang is ${self?.[1] || 'missing'}` };
-  return { declared: pickAlternates(links, src) };
+  return { declared: pickHreflang(links) };
 }
 
 async function edsPaths(host) {
@@ -191,6 +212,8 @@ async function main() {
   const stage = value('stage') === 'preview' ? 'preview' : 'live';
   const host = HOSTS[stage];
   const concurrency = Number(value('concurrency')) || 4;
+  const origin = value('origin') || HOSTS.live;
+  if (!/^https:\/\/[^/]+$/.test(origin)) throw new Error(`--origin must be an https origin, got ${origin}`);
   const start = list('paths').length ? list('paths') : await edsPaths(host);
 
   // 1) the declared translations of every page, then of the migrated translations they name
@@ -219,6 +242,7 @@ async function main() {
   const report = {
     generated: new Date().toISOString(),
     stage,
+    origin,
     pages: declared.size,
     rows,
     skipped: [],
@@ -231,9 +255,9 @@ async function main() {
     const known = new Set(await Promise.all(
       declaredPaths(r.declared).map(async (t) => ((await isOnEds(t)) ? t : null)),
     ));
-    const result = migratedAlternates(r.declared, (t) => known.has(t));
+    const result = migratedHreflang(r.declared, (t) => known.has(t), origin);
     missing += result.missing.length;
-    if (result.alternates) rows.push({ URL: p, alternates: result.alternates });
+    if (Object.keys(result.columns).length) rows.push({ URL: p, ...result.columns });
     if (!start.includes(p)) report.translatedPages.push(p);
   }
   report.notMigratedTranslations = missing;
@@ -260,7 +284,7 @@ async function main() {
   const file = path.join(dir, `${report.generated.replace(/[:.]/g, '-')}.json`);
   fs.writeFileSync(file, `${JSON.stringify(report, null, 2)}\n`);
   console.log(`stage ${stage}: pages ${report.pages}, rows ${rows.length}, translated pages ${report.translatedPages.length}, skipped ${report.skipped.length}, not-migrated translations ${missing}, chrome rows ${extra.length}`);
-  rows.forEach((r) => console.log(`  ${r.URL} -> ${r.alternates}`));
+  rows.forEach((r) => console.log(`  ${r.URL} -> ${Object.keys(r).filter(isHreflang).map((c) => c.slice(9)).join(', ')}`));
   if (report.pushed) console.log(`pushed: ${JSON.stringify(report.pushed)}`);
   console.log(`report: ${path.relative(process.cwd(), file)}`);
 }

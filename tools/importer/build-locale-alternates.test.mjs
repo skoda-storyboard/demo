@@ -5,10 +5,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  hreflangLinks, sourceUrl, mergeSheet, edsPathOf, migratedAlternates, chromeRows,
+  hreflangLinks, sourceUrl, mergeSheet, edsPathOf, migratedHreflang, chromeRows, HREFLANG_COLUMNS,
 } from './build-locale-alternates.mjs';
 
 const LIVE = 'https://www.skoda-storyboard.com';
+const DEMO = 'https://main--demo--skoda-storyboard.aem.live';
 
 test('hreflangLinks: alternate links in any attribute order; others ignored', () => {
   const html = `<head>
@@ -31,45 +32,49 @@ test('sourceUrl: the same path on the live site, with its trailing slash', () =>
   assert.equal(sourceUrl('/en/media-room/'), `${LIVE}/en/media-room/`);
 });
 
-test('mergeSheet: curated rows untouched, earlier generated rows replaced, new rows sorted', () => {
+test('mergeSheet: curated rows untouched, earlier generated rows replaced, native hreflang columns (#299)', () => {
   const sheet = {
-    total: 3,
+    total: 4,
     offset: 0,
-    limit: 3,
+    limit: 4,
     ':type': 'sheet',
     data: [
       {
-        URL: '/en/press-releases/**', nav: '/media-room/nav', footer: '/media-room/footer', section: 'media-room',
+        URL: '/en/press-releases/**', nav: '/media-room/nav', footer: '/media-room/footer', section: 'media-room', alternates: '',
       },
+      // an earlier generated row in the old custom format: replaced
       {
-        URL: '/en/old', nav: '', footer: '', section: '', alternates: `cs: ${LIVE}/cs/old/`,
+        URL: '/en/old', nav: '', footer: '', section: '', alternates: 'cs: /cs/old',
       },
+      // an earlier generated row in the native format: replaced
+      { URL: '/en/z', 'hreflang:en': `${DEMO}/en/z`, 'hreflang:sk': `${DEMO}/sk/old-z` },
       {
-        URL: '/en/media-room', nav: '/media-room/nav', footer: '', section: 'media-room',
+        URL: '/en/media-room', nav: '/media-room/nav', footer: '', section: 'media-room', alternates: '',
       },
     ],
   };
   const merged = mergeSheet(sheet, [
-    { URL: '/en/z', alternates: `sk: ${LIVE}/sk/z/` },
-    { URL: '/en/media-room', alternates: `cs: ${LIVE}/cs/media-room/` },
+    { URL: '/en/z', 'hreflang:en': `${DEMO}/en/z`, 'hreflang:sk': `${DEMO}/sk/z` },
+    { URL: '/en/media-room', 'hreflang:cs': `${DEMO}/cs/media-room`, 'hreflang:en': `${DEMO}/en/media-room` },
   ]);
   assert.equal(merged[':type'], 'sheet');
   assert.equal(merged.total, 4);
-  assert.deepEqual(merged.data.map((r) => [r.URL, r.nav, r.alternates]), [
-    ['/en/press-releases/**', '/media-room/nav', ''],
-    ['/en/media-room', '/media-room/nav', ''],
-    ['/en/media-room', '', `cs: ${LIVE}/cs/media-room/`],
-    ['/en/z', '', `sk: ${LIVE}/sk/z/`],
+  assert.deepEqual(merged.data.map((r) => [r.URL, r.nav, r['hreflang:en'], r['hreflang:cs'], r['hreflang:sk']]), [
+    ['/en/press-releases/**', '/media-room/nav', '', '', ''],
+    ['/en/media-room', '/media-room/nav', '', '', ''],
+    ['/en/media-room', '', `${DEMO}/en/media-room`, `${DEMO}/cs/media-room`, ''],
+    ['/en/z', '', `${DEMO}/en/z`, '', `${DEMO}/sk/z`],
   ]);
-  // every row has every column (empty cells never overwrite in bulk metadata)
-  const keys = Object.keys(merged.data[0]).sort();
-  const sameColumns = (r) => JSON.stringify(Object.keys(r).sort()) === JSON.stringify(keys);
-  assert.ok(merged.data.every(sameColumns));
-  assert.deepEqual(keys, ['URL', 'alternates', 'footer', 'nav', 'section']);
-  // a curated row is never treated as generated, even with an alternates value
-  const curatedWithAlt = mergeSheet({ data: [{ URL: '/en/x', nav: '/nav', alternates: 'cs: x' }] }, []);
-  assert.equal(curatedWithAlt.data.length, 1);
+  // every row has every column (empty cells never overwrite in bulk metadata); no `alternates`
+  const keys = Object.keys(merged.data[0]);
+  assert.ok(merged.data.every((r) => JSON.stringify(Object.keys(r)) === JSON.stringify(keys)));
+  assert.deepEqual(keys, ['URL', 'nav', 'footer', 'section', 'hreflang:en', 'hreflang:cs', 'hreflang:sk'],
+    'the used hreflang columns, last, in the switcher order');
+  // a curated row is never treated as generated, even with an hreflang value
+  const curated = mergeSheet({ data: [{ URL: '/en/x', nav: '/nav', 'hreflang:cs': `${DEMO}/cs/x` }] }, []);
+  assert.deepEqual(curated.data, [{ URL: '/en/x', nav: '/nav', 'hreflang:cs': `${DEMO}/cs/x` }]);
   assert.equal(mergeSheet(undefined, []).data.length, 0);
+  assert.equal(HREFLANG_COLUMNS.at(-1), 'hreflang:x-default');
 });
 
 test('edsPathOf: a live URL → its EDS path; other hosts and junk → null', () => {
@@ -80,14 +85,31 @@ test('edsPathOf: a live URL → its EDS path; other hosts and junk → null', ()
   assert.equal(edsPathOf(`${LIVE}/`), null);
 });
 
-test('migratedAlternates: only translations migrated to EDS, as site paths; the rest reported', () => {
-  const declared = `cs: ${LIVE}/cs/a/, de: ${LIVE}/de/b/, sk: ${LIVE}/sk/c/`;
-  const onEds = new Set(['/cs/a', '/sk/c']);
-  assert.deepEqual(migratedAlternates(declared, (p) => onEds.has(p)), {
-    alternates: 'cs: /cs/a, sk: /sk/c', kept: ['cs: /cs/a', 'sk: /sk/c'], missing: ['de'],
+test('migratedHreflang: the migrated entries as absolute URLs on the origin, self kept; the rest reported', () => {
+  const declared = [
+    ['en', `${LIVE}/en/a/`], ['cs', `${LIVE}/cs/a/`], ['de', `${LIVE}/de/b/`], ['sk', `${LIVE}/sk/c/`],
+    ['x-default', `${LIVE}/en/a/`],
+  ];
+  const onEds = new Set(['/en/a', '/cs/a', '/sk/c']);
+  assert.deepEqual(migratedHreflang(declared, (p) => onEds.has(p), `${DEMO}/`), {
+    columns: {
+      'hreflang:en': `${DEMO}/en/a`,
+      'hreflang:cs': `${DEMO}/cs/a`,
+      'hreflang:sk': `${DEMO}/sk/c`,
+      'hreflang:x-default': `${DEMO}/en/a`,
+    },
+    kept: ['en', 'cs', 'sk', 'x-default'],
+    missing: ['de'],
   });
-  assert.equal(migratedAlternates(declared, () => false).alternates, '', 'nothing migrated: no row');
-  assert.equal(migratedAlternates('', () => true).alternates, '');
+  // only the page itself (and x-default) migrated: no translation, no row
+  assert.deepEqual(migratedHreflang(declared, (p) => p === '/en/a', DEMO).columns, {});
+  // the home's x-default is the site root, which is not a page: dropped
+  const home = [['en', `${LIVE}/en/`], ['cs', `${LIVE}/cs/`], ['x-default', `${LIVE}/`]];
+  assert.deepEqual(migratedHreflang(home, () => true, DEMO).columns, {
+    'hreflang:en': `${DEMO}/en`, 'hreflang:cs': `${DEMO}/cs`,
+  });
+  assert.deepEqual(migratedHreflang([], () => true, DEMO), { columns: {}, kept: [], missing: [] });
+  assert.deepEqual(migratedHreflang(undefined, () => true, DEMO).columns, {});
 });
 
 test('chromeRows: one /{locale}/** row per translated locale; en and unknown codes skipped', () => {
@@ -100,12 +122,13 @@ test('chromeRows: one /{locale}/** row per translated locale; en and unknown cod
 
 test('mergeSheet: chrome rows are added once (idempotent) and kept as curated rows', () => {
   const extra = chromeRows(['cs']);
-  const first = mergeSheet({ data: [{ URL: '/en/x/**', nav: '/media-room/nav', footer: '' }] }, [{ URL: '/en/a', alternates: 'cs: /cs/a' }], extra);
-  const second = mergeSheet(first, [{ URL: '/en/a', alternates: 'cs: /cs/a' }], extra);
-  assert.deepEqual(second.data.map((r) => [r.URL, r.nav, r.alternates]), [
+  const row = { URL: '/en/a', 'hreflang:en': `${DEMO}/en/a`, 'hreflang:cs': `${DEMO}/cs/a` };
+  const first = mergeSheet({ data: [{ URL: '/en/x/**', nav: '/media-room/nav', footer: '' }] }, [row], extra);
+  const second = mergeSheet(first, [row], extra);
+  assert.deepEqual(second.data.map((r) => [r.URL, r.nav, r['hreflang:cs']]), [
     ['/en/x/**', '/media-room/nav', ''],
     ['/cs/**', '/cs/nav', ''],
-    ['/en/a', '', 'cs: /cs/a'],
+    ['/en/a', '', `${DEMO}/cs/a`],
   ]);
   assert.equal(second.total, 3);
 });

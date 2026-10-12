@@ -291,30 +291,29 @@ export function groupTags(hrefs = []) {
 export const ALTERNATE_LOCALES = ['en', 'cs', 'de', 'sk', 'sr', 'sl'];
 
 /**
- * `alternates` (SKODA-303a): the page's declared translations from the source head's
- * `<link rel="alternate" hreflang href>`, as `cs: https://…/, de: https://…/`. Dropped:
- * x-default, the page's own locale, unsupported codes (a region subtag is ignored, `de-AT` →
- * de), non-http(s) URLs and URLs outside their locale's tree; the first per locale wins.
- * Ordered as ALTERNATE_LOCALES. Empty string when none. build-locale-alternates.mjs maps the
- * result to the migrated EDS pages for the header's language switcher.
+ * The page's hreflang set (SKODA-303a, #299 review): the source head's
+ * `<link rel="alternate" hreflang href>`, as `[code, url]` pairs in ALTERNATE_LOCALES order, the
+ * page's own language included (self-hreflang) and `x-default` last when the source declares it.
+ * Dropped: unsupported codes (a region subtag is ignored, `de-AT` → de), non-http(s) URLs, URLs
+ * outside their locale's tree (x-default may point anywhere); the first per code wins.
+ * build-locale-alternates.mjs keeps the pairs migrated to EDS and writes them as native
+ * `hreflang:<code>` metadata, which EDS renders in the head for SEO and the header's switcher.
  * @param {Array<[string, string]>} links [hreflang, href] pairs in source order
- * @param {string} pageUrl the source page URL (its first segment is its own locale)
- * @returns {string}
+ * @returns {Array<[string, string]>}
  */
-export function pickAlternates(links = [], pageUrl = '') {
-  let own = '';
-  try { own = new URL(pageUrl).pathname.split('/')[1].toLowerCase(); } catch (e) { /* no url */ }
+export function pickHreflang(links = []) {
   const found = new Map();
   links.forEach(([lang, href]) => {
-    const code = String(lang || '').trim().toLowerCase().split('-')[0];
-    if (!ALTERNATE_LOCALES.includes(code) || code === own || found.has(code)) return;
+    const tag = String(lang || '').trim().toLowerCase();
+    const code = tag === 'x-default' ? tag : tag.split('-')[0];
+    if ((code !== 'x-default' && !ALTERNATE_LOCALES.includes(code)) || found.has(code)) return;
     let url;
     try { url = new URL(href); } catch (e) { return; }
     if (!/^https?:$/.test(url.protocol)) return;
-    if ((url.pathname.split('/')[1] || '').toLowerCase() !== code) return;
+    if (code !== 'x-default' && (url.pathname.split('/')[1] || '').toLowerCase() !== code) return;
     found.set(code, url.href);
   });
-  return ALTERNATE_LOCALES.filter((c) => found.has(c)).map((c) => `${c}: ${found.get(c)}`).join(', ');
+  return [...ALTERNATE_LOCALES, 'x-default'].filter((c) => found.has(c)).map((c) => [c, found.get(c)]);
 }
 
 /** Split a comma list into trimmed non-empty tokens. */

@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import {
   pickDate, normalizeDate, templateFromBodyClass, categoryFromUrl,
   parseTagHref, groupTags, splitList, buildMetaFields, facetFromBodyClass, FACETS,
-  SITE_SUFFIX, cleanTitle, pickTemplate, facetsFromPostClass, pickAlternates, ALTERNATE_LOCALES,
+  SITE_SUFFIX, cleanTitle, pickTemplate, facetsFromPostClass, pickHreflang, ALTERNATE_LOCALES,
 } from './skoda-metadata-extract.mjs';
 import { LOCALES } from '../../../blocks/header/header-locales.js';
 
@@ -225,11 +225,11 @@ test('the transformer + runtime mirrors use the same SITE_SUFFIX rule', () => {
   });
 });
 
-// --- SKODA-303a: the page's hreflang translations → `alternates` ----------------------------
+// --- SKODA-303a: the page's hreflang set → native `hreflang:<code>` metadata (#299 review) ------
 const LIVE = 'https://www.skoda-storyboard.com';
 const EPIQ = `${LIVE}/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`;
 
-test('pickAlternates: the source hreflang set, own locale + x-default dropped, switcher order', () => {
+test('pickHreflang: the source hreflang set in switcher order, self and x-default kept', () => {
   // the Epiq story's head, in source order (no SL translation)
   const links = [
     ['cs', `${LIVE}/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/`],
@@ -238,17 +238,20 @@ test('pickAlternates: the source hreflang set, own locale + x-default dropped, s
     ['de', `${LIVE}/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`],
     ['sr', `${LIVE}/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`],
   ];
-  assert.equal(pickAlternates(links, EPIQ), [
-    `cs: ${LIVE}/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/`,
-    `de: ${LIVE}/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`,
-    `sk: ${LIVE}/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund/`,
-    `sr: ${LIVE}/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`,
-  ].join(', '));
-  // the home: x-default dropped
-  assert.equal(pickAlternates([['cs', `${LIVE}/cs/`], ['en', `${LIVE}/en/`], ['x-default', `${LIVE}/`]], `${LIVE}/en/`), `cs: ${LIVE}/cs/`);
+  assert.deepEqual(pickHreflang(links), [
+    ['en', EPIQ],
+    ['cs', `${LIVE}/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/`],
+    ['de', `${LIVE}/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`],
+    ['sk', `${LIVE}/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund/`],
+    ['sr', `${LIVE}/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds/`],
+  ]);
+  // the home: x-default kept (last), and it may point outside a locale tree
+  assert.deepEqual(pickHreflang([['x-default', `${LIVE}/`], ['cs', `${LIVE}/cs/`], ['en', `${LIVE}/en/`]]), [
+    ['en', `${LIVE}/en/`], ['cs', `${LIVE}/cs/`], ['x-default', `${LIVE}/`],
+  ]);
 });
 
-test('pickAlternates: unsupported, malformed, off-tree and repeated alternates are dropped', () => {
+test('pickHreflang: unsupported, malformed, off-tree and repeated alternates are dropped', () => {
   const links = [
     ['fr', `${LIVE}/fr/x/`],
     ['de-AT', `${LIVE}/de/at/`],
@@ -256,16 +259,15 @@ test('pickAlternates: unsupported, malformed, off-tree and repeated alternates a
     ['sk', 'javascript:alert(1)'], // eslint-disable-line no-script-url
     ['sr', 'not a url'],
     ['sl', `${LIVE}/en/wrong-tree/`],
+    ['X-Default', 'not a url'],
     ['', `${LIVE}/cs/x/`],
     [null, null],
   ];
-  assert.equal(pickAlternates(links, EPIQ), `de: ${LIVE}/de/at/`);
-  assert.equal(pickAlternates([], EPIQ), '');
-  assert.equal(pickAlternates(undefined, ''), '');
-  // a page with no locale segment keeps every locale's translation
-  assert.equal(pickAlternates([['en', `${LIVE}/en/x/`]], 'not a url'), `en: ${LIVE}/en/x/`);
+  assert.deepEqual(pickHreflang(links), [['de', `${LIVE}/de/at/`]]);
+  assert.deepEqual(pickHreflang([]), []);
+  assert.deepEqual(pickHreflang(undefined), []);
 });
 
-test('pickAlternates uses the locale list of the header switcher', () => {
+test('pickHreflang uses the locale list of the header switcher', () => {
   assert.deepEqual(LOCALES.map((l) => l.code), ALTERNATE_LOCALES);
 });

@@ -114,7 +114,7 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
   (Lars's caveat: hreflang proves availability on the source, not on EDS). For M1 one page family is migrated: the
   Epiq story in EN + CS / DE / SK / SR (live has no SL). Every other page shows only its own language.
 - **Code:** `header-locales.js` (`parseAlternates`, `permittedTranslation`: same-site pages in their own locale
-  tree only), the list is marked `data-link-policy="resolved"`, and `scripts/links.js` leaves such links alone;
+  tree only; superseded by the native hreflang links, see the #299 review below), the list is marked `data-link-policy="resolved"`, and `scripts/links.js` leaves such links alone;
   `scripts.js` sets `<html lang>` from the locale tree. The importer doesn't write `alternates` (it can't know what
   is migrated): `tools/importer/build-locale-alternates.mjs` derives them from the source hreflang for the pairs on
   EDS and writes `URL` + `alternates` rows into the bulk `/metadata` sheet (plus `/{locale}/**` → `/{locale}/nav`,
@@ -128,6 +128,27 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
 - **Known gaps:** the Subscribe panel's thank-you text stays English (no source text, the source shows its ESP
   response); the header's search scope labels are English strings (SKODA-1003); the app badges keep the English
   artwork; the translated menus' targets aren't migrated, so the link policy sends them to the live site.
+- **Review (#299, Lars, 2026-10-09; addressed 2026-10-12): native EDS hreflang metadata is the source of truth.**
+  - **Generator:** `build-locale-alternates.mjs` writes native `hreflang:<code>` columns into `/metadata` instead of
+    the custom comma-separated `alternates` column (now removed from the sheet). Each row has the page's own language
+    (self-hreflang) and its migrated translations, plus `hreflang:x-default` when the source declares it and its
+    target is migrated (today only the home has one, `/`, which is not a page, so none is written). Values are
+    absolute URLs on `--origin` (default `https://main--demo--skoda-storyboard.aem.live`; the production domain at
+    go-live). `pickHreflang` (skoda-metadata-extract.mjs) replaces `pickAlternates`. The curated rows (nav / footer /
+    section / robots) are kept as they were.
+  - **Switcher:** `header-locales.js` `pageHreflangs(document)` reads
+    `document.head.querySelectorAll('link[rel~="alternate"][hreflang][href]')` (not `getMetadata()`, which only
+    reads `<meta>`; `aem.js` untouched). `x-default`, unknown codes, alternate stylesheets and repeats are skipped;
+    the current language is plain text. A target must be this site (current host, the host of the page's own
+    hreflang link, or a branch / stage host of the same EDS site) in its own locale tree; its path opens on the
+    current host. No prefix inference, no locale-home fallback. `parseAlternates` and the `alternates` meta are gone,
+    so a stale meta can't win over the native links (the reviewer's reproduction is a test).
+  - **Content (DA preview, 2026-10-12):** `/metadata` re-generated and previewed (33 rows: the 5 Epiq pages with
+    `hreflang:en|cs|de|sk|sr`, 28 curated rows unchanged); EDS now renders the 5 head links on each Epiq page.
+    Backup: `.migration/wt303a-scratch/metadata.da.before-299-review.json`. Publish after merge, with the 4 stories
+    and 9 fragments.
+  - **Merge:** latest `main` merged; `tools/importer/media/media-manifest.json` resolved row by row (3312 rows, 40
+    from this branch, 4 from main, no row changed on both sides).
 
 ## Dependencies
 - Upstream: SKODA-301 (Header + nav fragment) / Downstream: SKODA-1003 (language-negotiated root routing + per-locale placeholders)

@@ -9,11 +9,13 @@
  * fragment serves every locale tree. Each link gets `hreflang` / `lang` and the language's own
  * name as its accessible name; the visible text stays the code.
  *
- * Targets (SKODA-303a): the page's declared translations, the `alternates` metadata built
- * from the source page's `<link rel="alternate" hreflang>` (x-default dropped) for the pairs
- * migrated to EDS (tools/importer/build-locale-alternates.mjs). A locale without one is
- * omitted: no prefix swap, no locale-home fallback, never a live-site URL. A translation must
- * be a page of this site in its own locale's tree; it opens in the same tab, as on the source.
+ * Targets (SKODA-303a, #299 review): the page's declared translations, its native hreflang links
+ * (`<link rel="alternate" hreflang href>` in the head, which EDS renders from the `hreflang:<code>`
+ * metadata that tools/importer/build-locale-alternates.mjs writes for the pairs migrated to EDS).
+ * `x-default` is not a language and is skipped. A locale without a declared translation is
+ * omitted: no prefix swap, no locale-home fallback, never a live-site URL. A translation must be
+ * a page of this site (this host, or another branch / stage host of the same EDS site) in its
+ * own locale's tree; its path opens on the current host, in the same tab, as on the source.
  * Only an authored link to another site replaces a declared translation, in a new tab (the
  * Media Room DE → skoda-media.de, as on the source). The list is marked
  * `data-link-policy="resolved"` so the site's link pass (scripts/links.js) leaves it alone.
@@ -103,39 +105,66 @@ export function isLocaleGroup(p, base) {
 }
 
 /**
- * The page's declared translations: the `alternates` metadata, `cs: https://…/, de: https://…/`
- * (one `code: URL` pair per locale, comma-separated). A region subtag is dropped (`de-AT` → de);
- * unknown codes, `x-default`, malformed pairs and repeats (the first wins) are ignored.
- * @param {string|null} value the metadata value
+ * The page's declared translations: its native hreflang links, `<link rel="alternate"
+ * hreflang="cs" href="…">` in the head (EDS renders them from `hreflang:<code>` metadata). A
+ * region subtag is dropped (`de-AT` → de); `x-default`, unknown codes, links without an href,
+ * alternate stylesheets and repeats (the first wins) are skipped.
+ * @param {Document} doc the page
  * @returns {Map<string, string>} locale code → URL as declared
  */
-export function parseAlternates(value) {
+export function pageHreflangs(doc) {
   const map = new Map();
-  String(value || '').split(/,\s*(?=[a-z]{1,8}(?:-[a-z0-9]+)*\s*:)/i).forEach((pair) => {
-    const m = pair.trim().match(/^([a-z]{2})(?:-[a-z0-9]+)*\s*:\s*(\S+)$/i);
-    const code = m?.[1].toLowerCase();
-    if (code && byCode.has(code) && !map.has(code)) map.set(code, m[2]);
+  doc.head?.querySelectorAll('link[rel~="alternate"][hreflang][href]:not([rel~="stylesheet"])').forEach((link) => {
+    const code = link.getAttribute('hreflang').trim().toLowerCase().split('-')[0];
+    const href = link.getAttribute('href').trim();
+    if (href && byCode.has(code) && !map.has(code)) map.set(code, href);
   });
   return map;
 }
 
+// The hosts of one EDS site: `<ref>--<site>--<org>.aem.page|live`, any branch or stage.
+const EDS_HOST = /^[a-z0-9-]+(--[a-z0-9-]+--[a-z0-9-]+)\.aem\.(?:page|live)$/i;
+
+/**
+ * Is `host` this site: the current host, the host the page's own hreflang link names (the site's
+ * canonical host, e.g. its live host while it is previewed or developed locally), or another
+ * branch / stage host of the same EDS site?
+ */
+function isThisSite(host, base, ownHost = '') {
+  const current = new URL(base).host;
+  if (host === current || (ownHost && host === ownHost)) return true;
+  const [, site] = current.match(EDS_HOST) || [];
+  return !!site && (host.match(EDS_HOST) || [])[1]?.toLowerCase() === site.toLowerCase();
+}
+
+/** The host of a URL, '' when it doesn't parse. */
+const hostOf = (href, base) => {
+  try {
+    return new URL(href, base).host;
+  } catch (e) {
+    return '';
+  }
+};
+
 /**
  * A declared translation as a permitted link target, else null: a page of this site (a
- * migrated EDS variant) in its own locale's tree (`/cs/…` for cs). Live-site URLs are not
- * targets: the switcher never leaves the demo (SKODA-303a, PO 2026-10-08).
+ * migrated EDS variant; the hreflang URLs are absolute on the site's live host) in its own
+ * locale's tree (`/cs/…` for cs), returned as its path, so it opens on the current host. Live-site
+ * URLs are not targets: the switcher never leaves the demo (SKODA-303a, PO 2026-10-08).
  * @param {string} code the locale
- * @param {string} href the declared URL (site-relative, as the generator writes it)
+ * @param {string} href the declared URL
  * @param {string} base the page URL
+ * @param {string} [ownHost] the host of the page's own hreflang link
  * @returns {string|null} the site-relative path (+ query / hash)
  */
-export function permittedTranslation(code, href, base) {
+export function permittedTranslation(code, href, base, ownHost = '') {
   let url;
   try {
     url = new URL(href, base);
   } catch (e) {
     return null;
   }
-  if (!/^https?:$/.test(url.protocol) || url.host !== new URL(base).host) return null;
+  if (!/^https?:$/.test(url.protocol) || !isThisSite(url.host, base, ownHost)) return null;
   if (url.pathname.split('/')[1]?.toLowerCase() !== code) return null;
   return `${url.pathname}${url.search}${url.hash}`;
 }
@@ -158,12 +187,14 @@ function isOtherSite(href, base) {
  * @param {Array<{code: string, href: string|null}>} entries from localeEntries()
  * @param {string} current the page's locale, from currentLocale()
  * @param {Document} doc the document to build in
- * @param {Map<string, string>} [alternates] from parseAlternates()
+ * @param {Map<string, string>} [translations] the declared translations, from pageHreflangs()
  * @returns {HTMLUListElement|null} null when there are no entries
  */
-export function buildLocaleList(entries, current, doc, alternates = new Map()) {
+export function buildLocaleList(entries, current, doc, translations = new Map()) {
   if (!entries.length) return null;
   const base = doc.baseURI;
+  // the page's own hreflang link names the site's host (absolute on its live host)
+  const ownHost = translations.has(current) ? hostOf(translations.get(current), base) : '';
   const ul = doc.createElement('ul');
   ul.className = 'nav-locales-list';
   ul.setAttribute('aria-label', LABELS.list);
@@ -175,8 +206,8 @@ export function buildLocaleList(entries, current, doc, alternates = new Map()) {
       item = doc.createElement('span');
       item.setAttribute('aria-current', 'true');
     } else {
-      const translation = alternates.has(code)
-        && permittedTranslation(code, alternates.get(code), base);
+      const translation = translations.has(code)
+        && permittedTranslation(code, translations.get(code), base, ownHost);
       if (!translation) return; // no declared translation: omitted, never a locale home
       const elsewhere = isOtherSite(href, base);
       item = doc.createElement('a');
