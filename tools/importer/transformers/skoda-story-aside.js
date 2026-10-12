@@ -249,8 +249,9 @@ export default function transform(hookName, element, payload) {
 
   const aside = document.createElement('aside');
   const heading = sidebar.querySelector('.related .heading, .related h2, .related h3');
+  // the sidebar headings are h3, as the source h3.sidebar-heading (#296)
   if (heading) {
-    const h = document.createElement('h2');
+    const h = document.createElement('h3');
     h.textContent = (heading.textContent || 'Explore more').trim();
     aside.appendChild(h);
   }
@@ -260,7 +261,7 @@ export default function transform(hookName, element, payload) {
     // authored text above the existing Tags block (SKODA-817).
     const tagsHeading = sidebar.querySelector('section.tags .heading, section.tags h2, section.tags h3');
     if (tagsHeading && (tagsHeading.textContent || '').trim()) {
-      const h = document.createElement('h2');
+      const h = document.createElement('h3');
       h.textContent = tagsHeading.textContent.trim();
       aside.appendChild(h);
     }
