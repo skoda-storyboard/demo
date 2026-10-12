@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="32" height="32">
+  <!-- source skoda-bnr-icons "carousel-left-arrow" (\e00b): a disc with the arrow cut out -->
+  <path transform="matrix(1 0 0 -1 0 1024)" fill-rule="evenodd" d="M513.6 4.6C231.3 4.6 3.2 231.7 3.2 512.7S231.3 1020.8 513.6 1020.8C795.8 1020.8 1024 793.7 1024 512.7S795.8 4.6 513.6 4.6zM426.8 564.8L583 713L528.6 768.5L277.5 522L528.6 270.8L583 326.4L430.3 474.5H749.7V564.8z"/>
+</svg>
