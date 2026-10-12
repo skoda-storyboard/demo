@@ -310,7 +310,13 @@ Measured against the source (Superb, Epiq) at 1440 / 1080 / 992 / 768 / 390, fir
   link a Technical Data PDF that is still a pending media-manifest row, so the binary gate blocks them. They keep
   `h2` titles and the tag-page News "All" until their PDFs are ingested to DAM (developer machine,
   `tools/importer/media/README.md`), then re-push. The CSS fixes reach all 23 now.
-- **Not changed, by decision:** title hover (→ SKODA-228, #323); Superb video "+" (cdn MP4 not on DAM, #78 /
+- **Title hover (PO re-check 2026-10-12):** on this branch the News title turns white → `#0E3A2F` + underline and
+  the Images / Videos title `#161718` → `#0E3A2F` + underline; the source keeps both, no underline. Fixed by
+  SKODA-228 in PR #336 (one `.card-teaser-title a:hover` rule in `styles/card-teaser.css`, every rail and grid),
+  checked on its preview of Superb: colour kept, no underline. Not duplicated here; the model pages get it when #336
+  merges. #336 also extends the old SVG-mask arrows to the story band: whichever merges second drops those
+  story-rail.css rules (#284 draws every arrow with the font and removes the SVGs; noted on #336).
+- **Not changed, by decision:** Superb video "+" (cdn MP4 not on DAM, #78 /
   SKODA-902); video download opening in a tab (cdn URL, left as is, SKODA-902); Epiq nav without Key Facts /
   Technical Data (no target sections, left out); Images / Videos arrow position (source parity); Epiq article
   counts (content scope, M1 pilot set).
