@@ -3,7 +3,21 @@ var CustomImportScript = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __propIsEnum = Object.prototype.propertyIsEnumerable;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __spreadValues = (a, b) => {
+    for (var prop in b || (b = {}))
+      if (__hasOwnProp.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    if (__getOwnPropSymbols)
+      for (var prop of __getOwnPropSymbols(b)) {
+        if (__propIsEnum.call(b, prop))
+          __defNormalProp(a, prop, b[prop]);
+      }
+    return a;
+  };
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
@@ -21,7 +35,10 @@ var CustomImportScript = (() => {
   // tools/importer/import-press-kit-hub.js
   var import_press_kit_hub_exports = {};
   __export(import_press_kit_hub_exports, {
-    default: () => import_press_kit_hub_default
+    YEAR_TERMS: () => YEAR_TERMS,
+    default: () => import_press_kit_hub_default,
+    facetValue: () => facetValue,
+    sourceFacets: () => sourceFacets
   });
 
   // tools/importer/parsers/press-kit-hub-hero.js
@@ -866,19 +883,62 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/import-press-kit-hub.js
-  var FACETS2 = ["model", "bodywork", "motorsport", "history", "technology"];
+  var FACETS2 = [
+    "model",
+    "bodywork",
+    "derivative",
+    "motorsport",
+    "equipment",
+    "technology",
+    "years",
+    "view",
+    "company",
+    "concept",
+    "environment",
+    "happening",
+    "history",
+    "sponsorship",
+    "vip"
+  ];
+  var YEAR_TERMS = /* @__PURE__ */ new Map([
+    ["4781", "2014"],
+    ["1872", "2015"],
+    ["1572", "2016"],
+    ["11039", "2017"],
+    ["17169", "2018"],
+    ["23835", "2019"],
+    ["29912", "2020"],
+    ["29936", "2021"],
+    ["42472", "2022"],
+    ["46476", "2023"],
+    ["48727", "2024"],
+    ["57053", "2025"],
+    ["61572", "2026"]
+  ]);
+  function facetValue(facet, value) {
+    if (!/^\d+$/.test(value)) return value;
+    return facet === "years" ? YEAR_TERMS.get(value) || "" : "";
+  }
   function sourceFacets(article) {
-    const result = { template: "press_kit", category: "press-kits" };
+    const facets = { template: "press_kit", category: "press-kits" };
     const tags = [];
+    const unmapped = [];
     FACETS2.forEach((facet) => {
-      const values = [...article.classList].filter((cls) => cls.startsWith(`${facet}-`)).map((cls) => cls.slice(facet.length + 1));
-      if (values.length) {
-        result[facet] = values.join(", ");
-        tags.push(...values);
+      const values = [];
+      [...article.classList].filter((cls) => cls.startsWith(`${facet}-`)).forEach((cls) => {
+        const raw = cls.slice(facet.length + 1);
+        const value = facetValue(facet, raw);
+        if (value) values.push(value);
+        else if (/^\d+$/.test(raw)) unmapped.push(cls);
+      });
+      const unique = [...new Set(values)];
+      if (unique.length) {
+        facets[facet] = unique.join(", ");
+        tags.push(...unique);
       }
     });
-    if (tags.length) result.tags = [...new Set(tags)].join(", ");
-    return result;
+    if (tags.length) facets.tags = [...new Set(tags)].join(", ");
+    return { facets, unmapped };
   }
   var SOURCE_HOSTNAME = /^(?:www\.)?skoda-storyboard\.com$/i;
   var DIRECT_DOWNLOAD_PREFIX = "/direct-download/";
@@ -964,7 +1024,10 @@ var CustomImportScript = (() => {
       const hero = article == null ? void 0 : article.querySelector(":scope > .hero");
       const content = article == null ? void 0 : article.querySelector(":scope > .content");
       if (!article || !hero || !content) throw new Error("Expected a press-kit tiles hub with hero and content");
-      const facets = sourceFacets(article);
+      const { facets, unmapped } = sourceFacets(article);
+      if (unmapped.length) {
+        console.warn(`press-kit hub ${params.originalURL}: unmapped term ids ${unmapped.join(", ")}, facet not set`);
+      }
       const description = leakedDescription(document, hero);
       if (description) facets.description = description;
       const heroBlock = parseHero(hero, document);
@@ -999,7 +1062,11 @@ var CustomImportScript = (() => {
       return [{
         element: main,
         path: WebImporter.FileUtils.sanitizePath(pathname || "/index"),
-        report: { title: document.title, template: "press-kit-hub", blocks: ["hero", "tiles"] }
+        report: __spreadValues({
+          title: document.title,
+          template: "press-kit-hub",
+          blocks: ["hero", "tiles"]
+        }, unmapped.length ? { unmappedTermIds: unmapped.join(", ") } : {})
       }];
     }
   };

@@ -756,6 +756,35 @@ test('every emitted document stays within 200 images: other images count, oversi
   );
 });
 
+test('a variant chapter (Peaq Sportline, SKODA-808) takes its derivative from its tags; First Edition has none', { skip: !JSDOM }, () => {
+  const peaqTag = `<li><a class="label" href="${base}?filter%5Bmodel%5D%5B%5D=peaq">Peaq</a></li>`;
+  const tag = (facet, slug, label) => `<li><a class="label" href="${base}?filter%5B${facet}%5D%5B%5D=${slug}">${label}</a></li>`;
+  const html = (tags) => fixture({ chapters: true, mediaBox: false, togglesCount: 0 })
+    .replace(peaqTag, tags);
+  const metaOf = (page) => Object.fromEntries(rows(page, 'Metadata').map((row) => [txt(row.children[0]), txt(row.children[1])]));
+
+  // the live Sportline chapter's tags: 2026, technology…, Peaq, SportLine, SUV
+  const sportline = run(
+    html(`${tag('years', '2026', '2026')}${tag('technology', 'meb-2', 'MEB+')}${tag('model', 'peaq', 'Peaq')}${tag('derivative', 'sportline', 'SportLine')}${tag('bodywork', 'suv', 'SUV')}`),
+    `${base}skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out/`,
+  );
+  const meta = metaOf(sportline);
+  assert.equal(meta.template, 'press_kit_chapter', 'a chapter of its kit, not a kit of its own');
+  assert.equal(meta.presskit, '/en/press-kits/skoda-peaq-press-kit-2');
+  assert.equal(meta.derivative, 'sportline');
+  assert.equal(meta.model, 'peaq');
+  assert.equal(meta.bodywork, 'suv');
+  assert.equal(meta.years, '2026');
+
+  // the live First Edition chapter has no derivative tag (nor class): it gets no derivative row
+  const firstEdition = run(
+    html(`${tag('years', '2026', '2026')}${tag('model', 'epiq', 'Epiq')}${tag('bodywork', 'suv', 'SUV')}`),
+    `${base}skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details/`,
+  );
+  assert.equal(metaOf(firstEdition).derivative, undefined);
+  assert.equal(metaOf(firstEdition).model, 'epiq');
+});
+
 test('generated standalone bundle matches the source importer', { skip: !JSDOM }, () => {
   const code = readFileSync(new URL('./import-press-kit-default.bundle.js', import.meta.url), 'utf8');
   const bundled = vm.runInNewContext(`${code}\nCustomImportScript.default`, {
