@@ -289,7 +289,7 @@ Measured against the source (Superb, Epiq) at 1440 / 1080 / 992 / 768 / 390, fir
 | Rail + Bodywork / Derivatives titles | `h3` 26/32.5/600 | `h2` | `h3` 26/32.5/600, tops within 1px | `parsers/story-rail.js`; the template reads `h2` or `h3` (pages imported before #284 keep `h2`) |
 | Date → title text gap, overlay rails | 12px | 27px | 12px box gap (text 11–12px: font metrics) | `story-rail.css`, every story-rail; the press band (13px) and story related band keep theirs |
 | Date → title text gap, Images / Videos | 14px | 16px | 14px; the 44px date row is unchanged | `carousel.css` `.carousel.media` |
-| Rail arrows | 32px ink disc, white glyph disc, arrow cut out | 8px white chevron | the source glyph on every carousel arrow (as on the source's press, story, home and model rails) | `carousel.css` |
+| Rail arrows | 32px ink disc, white glyph disc, arrow cut out | 8px white chevron | the source glyph on every carousel arrow (as on the source's press, story, home and model rails), drawn with the source font: arrow area within 0.1% of the source at 1 / 1.25 / 1.5 / 2 / 3x (an SVG mask of the same path drew it up to 4% heavier at 1–1.5x, PO review) | `carousel.css`, `fonts.css` (`skoda-bnr-icons.woff2`, 6.8 KB, fetched only where an arrow renders) |
 | News "All" | `/en/news/?filter[model][]=<model>` | `/en/tag/model/<model>` | `/en/news?filter[model][]=<model>` (the runtime link policy keeps the listing on the demo) | `skoda-links.js` rule 4 skips a Story Rail `viewall` |
 
 - **Also fixed by the shared CSS:** the Media Room home's News / Latest Stories rails (27px → 12px, as the source).

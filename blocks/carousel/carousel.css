@@ -273,28 +273,38 @@
   transform: scale(0.95);
 }
 
-/* the source glyph (skoda-bnr-icons \e00b / \e00c, flickity prev / next): a 90% white disc with
-   the arrow cut out over the ink disc, so the arrow reads ink on white. Every rail's arrows, the
-   home bands' (#272) and the model pages' (#284) alike */
+/* the source glyph, drawn as the source draws it (skoda-bnr-icons \e00b / \e00c at 32/32, 90%
+   white, antialiased; the font is in styles/fonts.css): a white disc with the arrow cut out
+   over the ink disc, so the arrow reads ink on white. A glyph is rasterised as text, which an
+   SVG mask is not: as a mask the arrow drew 1–4% heavier at 1–1.5x (#284). Every rail's
+   arrows, the home bands' (#272) and the model pages' (#284) alike. Decorative: the button's
+   aria-label names it (the empty alt text keeps the glyph out of the accessible name) */
 .carousel-arrow::after {
-  content: "";
+  content: "\e00b"; /* browsers without CSS alt text (Firefox < 128) keep the glyph */
+  content: "\e00b" / "";
   position: absolute;
   inset: 0;
-  background-color: color-mix(in srgb, var(--skoda-white) 90%, transparent);
-  mask: url("../../icons/rail-arrow-prev.svg") center / 100% 100% no-repeat;
+  color: color-mix(in srgb, var(--skoda-white) 90%, transparent);
+  font-family: var(--carousel-arrow-font);
+  font-size: var(--carousel-arrow-size);
+  font-weight: 400;
+  line-height: var(--carousel-arrow-size);
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .carousel-next::after {
-  mask-image: url("../../icons/rail-arrow-next.svg");
+  content: "\e00c";
+  content: "\e00c" / "";
 }
 
-/* Windows High Contrast / forced colors: both discs paint a background colour, which forced
-   colors would reset to the canvas; keep the glyph in the button text colour so it stays
-   visible (as header.css does for its mask-drawn ✕) */
+/* Windows High Contrast / forced colors: the ink disc's background is reset to the canvas;
+   the glyph keeps the button text colour, so the disc and its cut-out arrow stay visible */
 @media (forced-colors: active) {
   .carousel-arrow::after {
     /* stylelint-disable-next-line scale-unlimited/declaration-strict-value -- a system colour */
-    background-color: buttontext;
+    color: buttontext;
     forced-color-adjust: none;
   }
 }
