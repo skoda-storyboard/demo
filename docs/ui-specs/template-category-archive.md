@@ -68,9 +68,13 @@ Values `getComputedStyle` on the eMobility category, cited `(selector · viewpor
   - Count row 41: padding `8px 0`, margin `16px 0`, 24px line, `1px solid #c9cdd3` underline, full content width.
     The numbers are 16px / 500 / `#aeaeae`; `.total::before` is `"/"` with `padding-right: .3em`.
   - Count → Load more wrapper 16, wrapper padding `16px 0`.
-  - Wrapper → footer 16 (`.archive-results` margin-bottom).
-  - Totals: last card → Load more 109, Load more → footer 32.
+  - Wrapper → footer: the `.search-results` margin-bottom. It is **16 on categories and model tags** and **48 on the
+    company / crew / derivative / environment / people / years tags** (all 41 measured at 1440, 2026-10-12).
+  - Totals (16 case): last card → Load more 109, Load more → footer 32 (64 on those other tags).
+  - **When every story fits, the count row stays** ("3 / 3") with no button wrapper: last card → footer 93.
   - The footer follows the content: there is no viewport min-height on a short archive.
+  - EDS (SKODA-209a) ends every archive 16px under the pager. The 13 other tags are 32px short of the source,
+    a known M1 deviation: they need an authored setting.
 
 **Typography**
 - Hero term title = the large hero heading (reuse `hero.md` banner title scale). Body/meta = the card
@@ -86,7 +90,8 @@ Values `getComputedStyle` on the eMobility category, cited `(selector · viewpor
 ## 6. Interaction / behavior
 
 - **Pagination (confirmed 2026-10-12):** a "Load more" button appends 6 stories and updates the count row
-  ("6 / N" → "12 / N"). When every story is shown, the button and the count row go away. No infinite scroll.
+  ("6 / N" → "12 / N"). When every story is shown, the button goes and the count row stays ("34 / 34").
+  No infinite scroll.
 - **EDS (SKODA-209a):** the `stories` block's authored N-column grid (`columns 3`, every archive) turns the count row on.
   An authored `count` row overrides that. The home featured feed has no count row, as on the source. The row
   is the polite live region on Load more.
