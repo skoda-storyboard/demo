@@ -3,7 +3,9 @@
 - **Type:** block / import
 - **Phase:** B  ·  **Pilot:** No · **Milestone:** M2 (go-live)
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–6d *(planning estimate, not a quote)*
-- **Status (2026-10-08):** 🟡 IN REVIEW (Images chapters), branch `skoda-806-press-kit-media`. Draft: `/drafts/skoda-806-press-kit-images`.
+- **Status (2026-10-11):** 🟢 Images chapters delivered (PR #287 merged 2026-10-08).
+  - **Peaq-2 Images:** held since 2026-09-30 over the 200-image limit. It is now published with the split: Exterior (69 images) in `/fragments/en/press-kits/skoda-peaq-press-kit-2/images/exterior`, 177 images on the page.
+  - **Live = origin:** 10 groups, same order and counts. The hub tile and the chapter links return 200 (#327).
   The whole-kit ZIP (DAM hosting) is a follow-up PR; see Build notes. Spec: [`press-kit-media.md`](../../ui-specs/press-kit-media.md) §11.
 
 ## UI Specification

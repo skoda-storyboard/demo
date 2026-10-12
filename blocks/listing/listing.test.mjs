@@ -190,6 +190,27 @@ test('decorate: a story listing keeps the story card (picture, title, descriptio
   assert.equal(li.querySelector('.media-card-actions, time'), null);
 });
 
+for (const template of ['press_release', 'press_kit']) {
+  test(`decorate: a ${template} listing renders the overlay card-teaser (date + title, no summary)`, async () => {
+    feed = [{
+      path: '/en/x/release-a', title: 'Release A', description: 'Summary A', image: '/media_1.jpg', template, date: '2026-10-08',
+    }];
+    // own index URL: the shared index loader memoizes per URL
+    const block = listingBlock(template, `/en/query-index-${template}.json`);
+    await decorate(block);
+    const li = block.querySelector('.listing-items > li');
+    assert.ok(li.classList.contains('card-teaser'), 'the shared primitive');
+    assert.ok(li.classList.contains('overlay'), 'title over the image');
+    assert.ok(li.classList.contains('listing-item'), 'the grid still places it');
+    assert.equal(li.querySelector('a.card-teaser-link').getAttribute('href'), '/en/x/release-a');
+    assert.ok(li.querySelector('.card-teaser-image picture'));
+    assert.equal(li.querySelector('time.card-teaser-date').textContent, '8. 10. 2026');
+    assert.equal(li.querySelector('h3.card-teaser-title').textContent, 'Release A');
+    assert.equal(li.querySelector('.card-teaser-summary, p'), null, 'no summary, as the source');
+    assert.equal(block.classList.contains('listing-media'), false);
+  });
+}
+
 test('lightbox load failure: the click falls back to the thumbnail link', async () => {
   const grid = document.createElement('ul');
   document.querySelector('main').replaceChildren(grid);
@@ -669,6 +690,36 @@ test('402a: a filtered deep link opens that facet\'s option list, like the sourc
   assert.equal(block.querySelector(`#${pill.getAttribute('aria-controls')}`).hidden, false);
   assert.ok(pill.classList.contains('active'), 'has a selection → count badge');
   assert.equal(pill.querySelector('.facet-count').textContent, '1');
+});
+
+test('the index is requested alongside the placeholders (SKODA-702)', async () => {
+  const { clearPlaceholdersCache } = await import('../../scripts/placeholders.js');
+  clearPlaceholdersCache();
+  window.history.replaceState({}, '', '/en/images'); // no filters left in the URL by earlier tests
+  feed = [imageRow(1), imageRow(2)];
+  const requested = [];
+  let releasePlaceholders;
+  const held = new Promise((resolve) => { releasePlaceholders = resolve; });
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    const u = String(url);
+    requested.push(u.includes('placeholders') ? 'placeholders' : 'index');
+    if (u.includes('placeholders')) await held; // the placeholders answer slowly
+    return realFetch(url);
+  };
+  try {
+    const block = listingBlock('image', '/en/parallel-feed.json');
+    const done = decorate(block);
+    await settle();
+    // both in flight before the placeholders answer
+    assert.deepEqual([...new Set(requested)].sort(), ['index', 'placeholders']);
+    releasePlaceholders();
+    await done;
+    assert.equal(block.querySelectorAll('.listing-items > li').length, 2);
+    assert.equal(requested.filter((r) => r === 'index').length, 1, 'one index request');
+  } finally {
+    globalThis.fetch = realFetch;
+  }
 });
 
 test('toolbar parity (SKODA-402b, CSS guard): collapsed sort row 12px under the header, active sort black', async () => {

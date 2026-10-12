@@ -1,0 +1,34 @@
+{
+  "variantName": "newsletter-stub",
+  "baseBlock": "newsletter-stub",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Newsletter Stub",
+  "description": "Newsletter sign-up form (not connected to the mailing service yet). Settings: label, placeholder, button, consent (may contain a link), manage (link), message (shown after submit), list, language. Omit consent for no checkbox.",
+  "visualCharacteristics": {
+    "purpose": "newsletter sign-up form"
+  },
+  "contentPattern": {
+    "structure": "config only"
+  },
+  "options": [
+    {
+      "class": "card",
+      "label": "card",
+      "description": "Story sidebar card: adds image, heading, error and consent-error rows. Today every story carries its own copy (SKODA-840 moves it to one fragment)."
+    },
+    {
+      "class": "topbar",
+      "label": "topbar",
+      "description": "The header \"Subscribe to our stories\" panel; authored once in /nav-newsletter."
+    }
+  ],
+  "usage": {
+    "pagesUsing": [
+      "media-room/footer",
+      "nav-newsletter"
+    ],
+    "reuseCount": 2,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "variantName": "story-rail",
+  "baseBlock": "story-rail",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Story Rail",
+  "description": "A horizontal rail. Settings: heading, template (story, press_release, press_kit, skoda_model, skoda_series, image, video), category, tag(s) or any facet (model, years, …), limit, sort, view-all (link), dots. Or curated rows (one card per row). Cards show each page's own title, description and image metadata.",
+  "visualCharacteristics": {
+    "purpose": "horizontal rail of cards"
+  },
+  "contentPattern": {
+    "structure": "config or curated rows"
+  },
+  "options": [
+    {
+      "class": "press",
+      "label": "press",
+      "description": "The dark \"Related Press Releases\" band at the end of a press release."
+    }
+  ],
+  "usage": {
+    "pagesUsing": [
+      "en",
+      "en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france",
+      "en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca",
+      "en/emobility/a-true-czech-from-spain",
+      "en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries",
+      "en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq",
+      "en/emobility/camouflage-to-get-you-hooked",
+      "en/emobility/coffee-on-electric-wheels-elroq-and-enyaq-serving-coffee",
+      "en/emobility/come-and-play-skoda-is-heading-to-milan",
+      "en/emobility/designers-on-the-peaq-its-modern-durable-and-practical"
+    ],
+    "reuseCount": 91,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}

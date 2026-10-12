@@ -232,7 +232,16 @@ above plus:
 
 The footer ignores these keys. Keep
 `decorate(block)` and scope the new styling to the sidebar variant, preserving
-the footer CSS. Native email/consent validation and the status live region can
+the footer CSS.
+
+**One shared card (SKODA-840).** The story card is authored once, in
+`/{locale}/fragments/newsletter-card` (a single `Newsletter Stub (card)` table, imported by
+`tools/importer/import-newsletter-card.js` from one source story). Stories don't carry the
+table. `scripts/story-newsletter.js` adds a Fragment block for the locale's card at the top
+of `.section.sidebar` (before decorateBlocks, so it loads with the hidden sidebar section).
+A sidebar that already holds a card, or a Fragment block for it, keeps it. Editing and
+publishing the fragment changes the card on every story. Publish the fragment before stories
+that rely on it; `import:push` treats it as a dependency of every story batch. Native email/consent validation and the status live region can
 be reused. Do not send network requests or show success when nothing was
 submitted; the existing hand-off event must not be wired to an ESP in M1.
 

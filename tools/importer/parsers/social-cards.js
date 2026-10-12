@@ -50,10 +50,11 @@ export default function parse(element, { document }) {
   const out = [document.createElement('hr')];
   const headingEl = element.querySelector('.search-results-heading, .search-results-header h2, .search-results-header h3');
   const headingText = headingEl && headingEl.textContent.trim();
+  // the source band heading is an h3 like every home section heading (#272)
   if (headingText) {
-    const h2 = document.createElement('h2');
-    h2.textContent = headingText;
-    out.push(h2);
+    const h3 = document.createElement('h3');
+    h3.textContent = headingText;
+    out.push(h3);
   }
   out.push(WebImporter.DOMUtils.createTable([['Cards (social)'], ...rows], document));
   // the source band is .cover-box.dark: the section's own style, not the block's,
