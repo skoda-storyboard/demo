@@ -1,0 +1,21 @@
+{
+  "variantName": "footnotes",
+  "baseBlock": "footnotes",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Footnotes",
+  "description": "Footnotes in small type at the end of the text (e.g. \"¹ Available at a later date.\"). One cell; paragraphs and lists are kept as authored.",
+  "visualCharacteristics": {
+    "purpose": "small-print footnotes"
+  },
+  "contentPattern": {
+    "structure": "single cell text"
+  },
+  "usage": {
+    "pagesUsing": [
+      "en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship"
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}

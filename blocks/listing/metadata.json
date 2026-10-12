@@ -1,0 +1,25 @@
+{
+  "variantName": "listing",
+  "baseBlock": "listing",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Listing",
+  "description": "News / Images / Videos / Press Kits listing with filters. Settings only: template (press_release, press_kit, image, video), facets (comma list, e.g. model, years, company), facetlabels, sort (newest), perpage (6), columns (3 or 4), index, path. Pages appear after they are published.",
+  "visualCharacteristics": {
+    "purpose": "faceted listing of indexed pages"
+  },
+  "contentPattern": {
+    "structure": "config only"
+  },
+  "usage": {
+    "pagesUsing": [
+      "en/images",
+      "en/news",
+      "en/press-kits",
+      "en/test/listing-demo",
+      "en/videos"
+    ],
+    "reuseCount": 5,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}

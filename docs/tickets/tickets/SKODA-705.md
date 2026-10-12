@@ -29,3 +29,6 @@ Collision scope is **local** — `.stories .stories-load-more` (blocks/stories/s
 ## Risks / Flags
 - 🟢 Trivial local CSS once the variant is confirmed.
 - **Blocked on a design/client answer** — QA correctly flagged "confirm intended variant"; changing brand styling on assumption would violate the operating model's "don't weaken/guess acceptance criteria" rule.
+
+## Status (2026-10-11, M1 ticket review)
+✅ **Done, closed** (#46). Measured at 1440, the home "Load more" button on `main` equals origin: white, `2px solid rgb(22,23,24)`, 50px radius, weight 600, 178×44. No change is needed.

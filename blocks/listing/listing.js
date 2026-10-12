@@ -18,7 +18,7 @@ import { loadQueryIndex, defaultIndexUrl, cleanTitle } from '../../scripts/query
 import { fetchPlaceholders } from '../../scripts/placeholders.js';
 // dependency-free: the limit banner renders in the first paint without the cart (SKODA-505b)
 import { buildLimitBanner, LIMIT_BANNER_TEXT } from '../../scripts/media-cart-limits.js';
-import { formatCardDate } from '../../scripts/card-teaser.js';
+import { formatCardDate, buildCardTeaser } from '../../scripts/card-teaser.js';
 import { mediaActions, mediaLabels, playBadge } from '../../scripts/media-card.js';
 import {
   scopeRows, filterRows, sortRows, paginate, distinctFacetValues,
@@ -114,6 +114,19 @@ function cardCell(row, eager) {
   }
   a.append(body);
   li.append(a);
+  return li;
+}
+
+/**
+ * News and Press Kits render the source's overlay teaser (article-teaser on /en/news/ and
+ * /en/press-kits/): the date and the title over the 16:9 image, no summary. It is the shared
+ * card-teaser primitive, as in the Stories feed and the rails (faceted-listing.md §7).
+ */
+export const OVERLAY_TEMPLATES = new Set(['press_release', 'press_kit']);
+
+function overlayCell(row, eager) {
+  const li = buildCardTeaser(row, { eager, overlay: true });
+  li.classList.add('listing-item');
   return li;
 }
 
@@ -378,7 +391,8 @@ export default async function decorate(block) {
     const shownRows = paginate(all, state.revealed);
     currentRows = shownRows;
     grid.textContent = '';
-    const cell = media ? (row, eager) => mediaCell(row, eager, mediaText) : cardCell;
+    let cell = OVERLAY_TEMPLATES.has(cfg.template) ? overlayCell : cardCell;
+    if (media) cell = (row, eager) => mediaCell(row, eager, mediaText);
     shownRows.forEach((row, i) => grid.append(cell(row, i === 0)));
 
     status.hidden = all.length > 0;
