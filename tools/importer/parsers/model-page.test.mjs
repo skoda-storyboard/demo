@@ -230,3 +230,30 @@ test('corpus: every page emits only blocks on main, no dangling nav link, every 
   });
   assert.equal(seen.length, corpus.length);
 });
+
+// The Media Room Models rail cards are the base model pages, and the card image is the index
+// `image`: a base model page carries its header banner (the source card image), derivatives
+// keep the source og:image.
+function modelPageImage(slug) {
+  const url = `https://www.skoda-storyboard.com/en/skoda-model/${slug}/`;
+  const d = new JSDOM(`<html><head><title>M - Škoda Storyboard</title>
+    <meta property="og:image" content="https://cdn.skoda-storyboard.com/2026/01/cutout.png"></head>
+    <body class="single-skoda_model"><article class="skoda_model"><div class="entry-content"><p>Text</p></div></article></body></html>`, { url });
+  globalThis.document = d.window.document;
+  return d.window.document;
+}
+
+test('a base model page carries its header banner as the page image; derivatives keep og:image', { skip }, async () => {
+  const { default: importer } = await import('../import-model-page.js');
+  const image = (slug) => {
+    const doc = modelPageImage(slug);
+    const url = `https://www.skoda-storyboard.com/en/skoda-model/${slug}/`;
+    const [{ element }] = importer.transform({ document: doc, url, params: { originalURL: url } });
+    const meta = [...element.querySelectorAll('table')].find((t) => blockName(t) === 'Metadata');
+    const row = [...meta.querySelectorAll('tr')].find((tr) => tr.firstElementChild.textContent.trim() === 'Image');
+    return row?.children[1].querySelector('img')?.getAttribute('src') ?? null;
+  };
+  assert.equal(image('new-superb'), 'https://cdn.skoda-storyboard.com/2023/12/header_superb_d05c278a.jpg');
+  assert.equal(image('karoq-6'), 'https://cdn.skoda-storyboard.com/2017/07/33_SKODA_KAROQ.jpg');
+  assert.equal(image('enyaq-iv-2/enyaq-rs'), 'https://cdn.skoda-storyboard.com/2026/01/cutout.png', 'derivative');
+});

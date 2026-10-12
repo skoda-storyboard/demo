@@ -8,7 +8,7 @@
  * Videos / Models / Press Kits / Latest Stories), each self-classified by home-rail
  * from its heading + "All" link / type-<cpt> class. Every source `.cover-box` band
  * becomes its own section (skoda-dark-bands): the dark Models + Press Kits band
- * `Style: cover-box, dark, compact` (SKODA-218), each light band `Style: cover-box`,
+ * `Style: cover-box, dark, compact` (SKODA-218), each light band `Style: cover-box, compact`,
  * as on the Storyboard home (SKODA-611a), so its rails get the home-band layout. The
  * Models band keeps the source's hand-picked base models, in its order (home-rail).
  * Metadata template=page (body class carries `page`; MR side selects
@@ -37,8 +37,9 @@ const PAGE_TEMPLATE = {
   metadata: { template: 'page' },
   // skoda-dark-bands: the MR home's bands sit 16px tighter at the top (live, SKODA-218)
   darkBandStyle: 'cover-box, dark, compact',
-  // every light .cover-box is its own section too, as on the Storyboard home (SKODA-611a)
-  lightBandStyle: 'cover-box',
+  // every light .cover-box is its own section too, as on the Storyboard home (SKODA-611a);
+  // `compact`: its rails end 60px above the band end, not 28px (live, measured 375–1440)
+  lightBandStyle: 'cover-box, compact',
   blocks: [
     { name: 'promo-box', instances: ['section.promo-box'] },
     { name: 'home-rail', instances: ['.cover-box .search-results[class*="type-"]'] },

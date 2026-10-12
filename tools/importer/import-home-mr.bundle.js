@@ -1019,8 +1019,9 @@ var CustomImportScript = (() => {
     metadata: { template: "page" },
     // skoda-dark-bands: the MR home's bands sit 16px tighter at the top (live, SKODA-218)
     darkBandStyle: "cover-box, dark, compact",
-    // every light .cover-box is its own section too, as on the Storyboard home (SKODA-611a)
-    lightBandStyle: "cover-box",
+    // every light .cover-box is its own section too, as on the Storyboard home (SKODA-611a);
+    // `compact`: its rails end 60px above the band end, not 28px (live, measured 375–1440)
+    lightBandStyle: "cover-box, compact",
     blocks: [
       { name: "promo-box", instances: ["section.promo-box"] },
       { name: "home-rail", instances: ['.cover-box .search-results[class*="type-"]'] }
