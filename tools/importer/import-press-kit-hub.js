@@ -16,38 +16,50 @@ const FACETS = [
 
 // The `years` class holds the source term id (`years-61572`), the listing filters on the year
 // (`filter[years][]=2026`). Read from the source year archives `/en/tag/years/<year>/` (their
-// body class `term-<id>`), 2026-10-09. The publish date is no substitute: the Elroq kit is tagged
-// 2025 but was published in December 2024.
+// body class `term-<id>`): 2014 to 2026, checked 2026-10-12 (2013 and earlier, and 2027, 404).
+// The publish date is no substitute: the Elroq kit is tagged 2025 but was published in December
+// 2024. A new year term (2027 from 02 Jan 2027) needs its id here: an unmapped one is reported
+// per page (`unmappedTermIds` in the import report), see SKODA-METADATA-SCHEMA.md.
 export const YEAR_TERMS = new Map([
-  ['1572', '2016'], ['11039', '2017'], ['17169', '2018'], ['23835', '2019'], ['29912', '2020'],
-  ['29936', '2021'], ['42472', '2022'], ['46476', '2023'], ['48727', '2024'], ['57053', '2025'],
-  ['61572', '2026'],
+  ['4781', '2014'], ['1872', '2015'], ['1572', '2016'], ['11039', '2017'], ['17169', '2018'],
+  ['23835', '2019'], ['29912', '2020'], ['29936', '2021'], ['42472', '2022'], ['46476', '2023'],
+  ['48727', '2024'], ['57053', '2025'], ['61572', '2026'],
 ]);
 
-/** A facet class value as its listing slug: a years term id becomes its year, other ids go. */
-function facetValue(facet, value) {
+/**
+ * A facet class value as its listing slug: a years term id becomes its year; any other numeric
+ * id has no slug and gives '' (as skoda-metadata.js drops it). Pure.
+ */
+export function facetValue(facet, value) {
   if (!/^\d+$/.test(value)) return value;
-  if (facet === 'years' && YEAR_TERMS.has(value)) return YEAR_TERMS.get(value);
-  // eslint-disable-next-line no-console
-  console.warn(`press-kit hub: unknown ${facet} term id ${value}, not mapped`);
-  return '';
+  return facet === 'years' ? YEAR_TERMS.get(value) || '' : '';
 }
 
-function sourceFacets(article) {
-  const result = { template: 'press_kit', category: 'press-kits' };
+/**
+ * The kit's facets from its article classes, and the numeric term ids that could not be mapped
+ * (`<facet>-<id>`, in class order). Pure: the caller reports the unmapped ids.
+ * @returns {{ facets: object, unmapped: string[] }}
+ */
+export function sourceFacets(article) {
+  const facets = { template: 'press_kit', category: 'press-kits' };
   const tags = [];
+  const unmapped = [];
   FACETS.forEach((facet) => {
-    const values = [...new Set([...article.classList]
-      .filter((cls) => cls.startsWith(`${facet}-`))
-      .map((cls) => facetValue(facet, cls.slice(facet.length + 1)))
-      .filter(Boolean))];
-    if (values.length) {
-      result[facet] = values.join(', ');
-      tags.push(...values);
+    const values = [];
+    [...article.classList].filter((cls) => cls.startsWith(`${facet}-`)).forEach((cls) => {
+      const raw = cls.slice(facet.length + 1);
+      const value = facetValue(facet, raw);
+      if (value) values.push(value);
+      else if (/^\d+$/.test(raw)) unmapped.push(cls);
+    });
+    const unique = [...new Set(values)];
+    if (unique.length) {
+      facets[facet] = unique.join(', ');
+      tags.push(...unique);
     }
   });
-  if (tags.length) result.tags = [...new Set(tags)].join(', ');
-  return result;
+  if (tags.length) facets.tags = [...new Set(tags)].join(', ');
+  return { facets, unmapped };
 }
 
 // Banner ZIP download hrefs (SKODA-832). Applied to the hub banners only; every other link
@@ -173,7 +185,11 @@ export default {
     const hero = article?.querySelector(':scope > .hero');
     const content = article?.querySelector(':scope > .content');
     if (!article || !hero || !content) throw new Error('Expected a press-kit tiles hub with hero and content');
-    const facets = sourceFacets(article);
+    const { facets, unmapped } = sourceFacets(article);
+    if (unmapped.length) {
+      // eslint-disable-next-line no-console
+      console.warn(`press-kit hub ${params.originalURL}: unmapped term ids ${unmapped.join(', ')}, facet not set`);
+    }
     const description = leakedDescription(document, hero);
     if (description) facets.description = description;
     const heroBlock = parseHero(hero, document);
@@ -207,7 +223,13 @@ export default {
     return [{
       element: main,
       path: WebImporter.FileUtils.sanitizePath(pathname || '/index'),
-      report: { title: document.title, template: 'press-kit-hub', blocks: ['hero', 'tiles'] },
+      report: {
+        title: document.title,
+        template: 'press-kit-hub',
+        blocks: ['hero', 'tiles'],
+        // a new source year term (or another facet's numeric id) to map in YEAR_TERMS
+        ...(unmapped.length ? { unmappedTermIds: unmapped.join(', ') } : {}),
+      },
     }];
   },
 };

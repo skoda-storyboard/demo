@@ -219,7 +219,8 @@ renders all three (SKODA-805b). This ticket pins them with tests and closes the 
 | Elroq hub `derivative` | sportline | sportline | sportline |
 
 **Importer** (`import-press-kit-hub.js`, re-bundled): the hub's facets come from its article classes, now all 15
-facets. A `years` term id becomes its year (`YEAR_TERMS`); any other numeric id is skipped with a warning.
+facets. A `years` term id becomes its year (`YEAR_TERMS`, 2014–2026); an unmapped numeric id on any facet is not set
+and is named in the import report (`unmappedTermIds`).
 
 **Selector.** Not built: the source has no selector widget, and MR-PK03 is pending client confirmation (§8). The
 Chapters nav is the variant navigation.

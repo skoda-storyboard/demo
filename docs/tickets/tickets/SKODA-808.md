@@ -35,7 +35,10 @@ Confirmed on the live Peaq kit (§11.9): a dedicated subsection for a specific m
 - [x] A press kit renders one or more variant subsections nested after the core narrative, in source order. *(already on `main`: the variant tile and chapter page, SKODA-805b; pinned by tests)*
 - [x] The variant is reachable via the Chapters anchor-nav (in-page anchor/link), accessibly (keyboard + ARIA); this is the required navigation. *(already on `main`: `aria-current="page"` on the variant; pinned by a template test)*
 - [ ] *Conditional (only if MR-PK03 is confirmed as a requirement):* a standalone variant/bodywork selector switches between variants accessibly (keyboard + `aria-current`/`aria-selected`). Not required to close this ticket if the client does not want a net-new selector.
-- [x] Kit Metadata carries model/bodywork/derivative/category facets and the kit surfaces correctly under the relevant listing facets (MR-L03) and model-page strips (MR-M04).
+- [ ] Kit Metadata carries model/bodywork/derivative/category facets and the kit surfaces correctly under the relevant listing facets (MR-L03) and model-page strips (MR-M04).
+  - *Met in the importer output:* every hub in `urls-press-kit-hub.txt` carries all its source facets, with `years` as the year.
+  - *Closes with the post-merge `import:push`* of the 8 re-imported hubs and the reindex: until then the live index has `years` on 2 kits, against the source's 5.
+  - *Not covered:* two `filter[derivative][]=sportline` source kits that EDS lacks, a non-hub Kodiaq kit and Karoq Media Launch, which is not imported yet.
 - [ ] Output passes lint and matches source structure in local preview.
 - [ ] Variant renders as a nested sub-page + Chapters-nav anchor (per [`press-kit-variant.md`](../../ui-specs/press-kit-variant.md)); visual diff vs source ≤ 2% per-pixel.
 
@@ -48,10 +51,15 @@ Confirmed on the live Peaq kit (§11.9): a dedicated subsection for a specific m
   article classes. It read only 5 of the 15 facets and kept the class value as is, so no hub had `years`: the class
   holds the source term id (`years-61572`), not the year.
   - The importer now reads all 15 facets.
-  - It maps the `years` term id to its year (`YEAR_TERMS`, 2016–2026, read from the source year archives
+  - It maps the `years` term id to its year (`YEAR_TERMS`, 2014–2026, read from the source year archives
     `/en/tag/years/<year>/`, body class `term-<id>`).
-  - An unknown id is skipped with a warning, never guessed. The publish date is no substitute: the Elroq kit is tagged
-    2025 but was published in December 2024.
+  - An unknown id is never guessed: the facet is not set, and the import warns once per page and names the id in the
+    import report (`unmappedTermIds`). The publish date is no substitute: the Elroq kit is tagged 2025 but was
+    published in December 2024. A new year term (2027) needs its id added: see the re-import checklist in
+    `SKODA-METADATA-SCHEMA.md`.
+- **PR #305 review (2026-10-12):** `YEAR_TERMS` gains 2014 and 2015 (the source's oldest year archives); the lookup is
+  pure (`facetValue` / `sourceFacets` return the unmapped ids, the transform reports them); tests cover an unknown
+  numeric id on another facet; the MR-L03 criterion stays open until the post-merge push.
 - **Effect (measured on the live index, before → after `import:push`):** `filter[years][]=2026` among kits goes from 2
   to 5, matching the source's 5 (the Peaq-2, Epiq-2 and Motorsport hubs added). All 8 hubs in
   `urls-press-kit-hub.txt` gain `years`. Re-imported against `main`'s importer, each hub differs only by its `years` row

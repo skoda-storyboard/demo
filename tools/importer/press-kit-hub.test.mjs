@@ -31,7 +31,9 @@ globalThis.WebImporter = {
   FileUtils: { sanitizePath: (p) => p },
 };
 
-const { default: importer, YEAR_TERMS } = await import('./import-press-kit-hub.js');
+const {
+  default: importer, YEAR_TERMS, facetValue, sourceFacets,
+} = await import('./import-press-kit-hub.js');
 const root = 'https://www.skoda-storyboard.com/en/press-kits/';
 const child = `${root}skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio/`;
 
@@ -416,17 +418,53 @@ test('a kit carries every source facet: derivative, and years as the year, not t
   assert.equal(YEAR_TERMS.get('61572'), '2026');
 });
 
-test('an unknown years term id is skipped with a warning, never guessed', () => {
+test('an unknown years term id is skipped, never guessed, and reported once per page', () => {
   const { warn } = console;
   const warnings = [];
   console.warn = (...args) => warnings.push(args.join(' '));
   try {
-    const { element } = output(facetKit('model-peaq years-99999 years-61572'), `${root}skoda-peaq-press-kit-2/`);
-    assert.equal(metaRows(element).years, '2026');
-    assert.ok(warnings.some((w) => /unknown years term id 99999/.test(w)));
+    const result = output(facetKit('model-peaq years-99999 years-61572'), `${root}skoda-peaq-press-kit-2/`);
+    assert.equal(metaRows(result.element).years, '2026');
+    // the import report (the bulk runner's per-page sheet) names the id to add to YEAR_TERMS
+    assert.equal(result.report.unmappedTermIds, 'years-99999');
+    assert.equal(warnings.filter((w) => /unmapped term ids years-99999/.test(w)).length, 1);
   } finally {
     console.warn = warn;
   }
+});
+
+// PR #305 review (P3): the lookup is pure, and a numeric id on any facet is dropped and reported
+test('facetValue / sourceFacets are pure: a numeric id on another facet is dropped and reported', () => {
+  const { warn } = console;
+  let calls = 0;
+  console.warn = () => { calls += 1; };
+  try {
+    assert.equal(facetValue('model', 'peaq'), 'peaq');
+    assert.equal(facetValue('years', '61572'), '2026');
+    assert.equal(facetValue('years', '99999'), '');
+    assert.equal(facetValue('model', '12345'), '', 'no slug for a numeric model id');
+    const article = facetKit('model-12345 model-peaq bodywork-suv years-1872')
+      .querySelector('article.press_kit');
+    const { facets, unmapped } = sourceFacets(article);
+    assert.equal(facets.model, 'peaq');
+    assert.equal(facets.years, '2015');
+    assert.deepEqual(unmapped, ['model-12345']);
+    assert.equal(calls, 0, 'no console side effect in the lookup');
+  } finally {
+    console.warn = warn;
+  }
+  const { report } = output(facetKit('model-12345 model-peaq'), `${root}skoda-peaq-press-kit-2/`);
+  assert.equal(report.unmappedTermIds, 'model-12345');
+});
+
+test('YEAR_TERMS covers every source year archive, 2014 to 2026 (checked 2026-10-12)', () => {
+  const years = Array.from({ length: 13 }, (_, i) => String(2014 + i));
+  assert.deepEqual([...YEAR_TERMS.values()], years);
+  assert.equal(YEAR_TERMS.get('4781'), '2014');
+  assert.equal(YEAR_TERMS.get('1872'), '2015');
+  // a kit with only mapped ids gets no unmapped report
+  const mapped = output(facetKit('model-peaq years-61572'), `${root}skoda-peaq-press-kit-2/`);
+  assert.equal(mapped.report.unmappedTermIds, undefined);
 });
 
 test('generated standalone bundle matches the source importer (kit facets)', async () => {
