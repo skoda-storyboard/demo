@@ -152,6 +152,16 @@ test('size menu (#273): a mouse opens it on hover and closes it on leaving; a cl
   assert.equal(menu.hidden, false, 'a clicked-open menu stays until a click outside');
   document.querySelector('main').click();
   assert.equal(menu.hidden, true);
+  // a menu opened by a click stays when the mouse passes over another card's button
+  const other = mount(document.createElement('div'));
+  other.append(mediaActions(image, 'a'), mediaActions(image, 'b'));
+  const [w1, w2] = other.querySelectorAll('.media-card-action.add');
+  w1.querySelector('button').click();
+  pointer(w2, 'pointerenter');
+  assert.equal(w1.querySelector('.media-card-menu').hidden, false, 'the clicked menu stays open');
+  assert.equal(w2.querySelector('.media-card-menu').hidden, true, 'the hovered one does not take over');
+  document.querySelector('main').click();
+  mount(actions);
   // touch and pen keep the click toggle
   pointer(wrap, 'pointerenter', 'touch');
   assert.equal(menu.hidden, true, 'a touch does not open on hover');

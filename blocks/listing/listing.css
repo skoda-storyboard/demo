@@ -17,6 +17,7 @@
   /* the source sort row height: sort links and the desktop "Advanced filter" toggle */
   --listing-sort-height: 35px;
   --listing-sort-inactive: var(--skoda-grey-250); /* the source's inactive sort link, #ccc */
+  --listing-count-color: var(--skoda-grey-375); /* the source's count numbers, #aeaeae */
 
   /* the filter panel's reveal (source jQuery show(400): height, margins, opacity); the sort
      row's margin moves with it, so both read the same timing */
@@ -242,17 +243,17 @@
   opacity: 0;
 }
 
-/* source label: 14/500 (renders regular) grey; --skoda-grey-500, not the source #a1a1a1
-   (2.6:1 on white), keeps the names readable */
+/* source label: 14/500 (renders regular) #a1a1a1 (PO 2026-10-12, #273: match the source;
+   2.6:1 on white, recorded as an accessibility trade-off like the sort / count greys) */
 .listing .facet-option-label {
   position: relative;
   display: inline-block;
   padding-block: 0;
   padding-inline: calc(var(--facet-box) + 9px) 5px;
   font-size: var(--body-font-size-s);
-  font-weight: var(--weight-regular);
+  font-weight: var(--weight-medium);
   line-height: var(--facet-box);
-  color: var(--skoda-grey-500);
+  color: var(--skoda-grey-400);
 }
 
 .listing .facet-option-label::before,
@@ -541,8 +542,7 @@
   position: relative;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  background: rgb(0 0 0 / 5%);
-  border-radius: var(--media-card-radius);
+  border-radius: var(--media-card-radius); /* no placeholder tint while loading, as the source */
 }
 
 .listing.listing-media .listing-item-image img {
@@ -829,6 +829,11 @@
   padding-block: var(--spacing-m) calc(var(--spacing-m) + var(--grid-gutter));
 }
 
+/* no button (every result shown): the gutter goes with it, as on main */
+.listing .listing-loadmore:empty {
+  padding-block-end: var(--spacing-m);
+}
+
 .listing .listing-loadmore-btn {
   --listing-loader-width: 60px;
   --listing-loader-dot: 12px;
@@ -845,6 +850,14 @@
   border: 2px solid var(--skoda-ink);
   border-radius: var(--pill-radius);
   cursor: pointer;
+  transition: background-color 0.25s; /* the source's hover fade */
+}
+
+/* hover: the source's light grey (#273) */
+@media (hover: hover) {
+  .listing .listing-loadmore-btn:hover {
+    background-color: var(--skoda-grey-50);
+  }
 }
 
 .listing .listing-loadmore-btn:focus-visible {
@@ -928,6 +941,7 @@
    Default listings: 1 / 2 (768) / 3 (992). `columns 4` media listings follow the source's
    Bootstrap ladder (SKODA-402a, measured on /en/images + /en/videos): 1 / 2 (576) /
    3 (768) / 4 (992). */
+
 @media (width >= 576px) {
   .listing.columns-4 .listing-items {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -981,12 +995,9 @@
 
 /* media card buttons + menu rows: the source's light grey hover */
 @media (hover: hover) {
-  /* light grey, no underline (the global a:hover would add one to the link-based video "+"
-     and download; #273, as the source) */
   .listing.listing-media .media-card-button:hover,
   .listing.listing-media .media-card-size:hover {
     background-color: var(--skoda-grey-50);
-    text-decoration: none;
   }
 }
 

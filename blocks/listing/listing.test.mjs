@@ -745,8 +745,10 @@ test('option names and order (#273): the source names in the source order, a Yea
   // known names in the source order; unknown ones after, by name
   assert.deepEqual(orderFacetValues(v('peaq', 'zz-new', 'citigoe', 'aa-new', 'epiq'), 'model', labels).map((x) => x.value),
     ['citigoe', 'epiq', 'peaq', 'aa-new', 'zz-new']);
-  // a stray Year tag is not an option
-  assert.deepEqual(orderFacetValues(v('x', '2025', '2024'), 'years', labels).map((x) => x.value), ['2024', '2025']);
+  // a stray Year tag is not an option; Years run in number order, known or not
+  assert.deepEqual(orderFacetValues(v('x', '2025', '2013', '2024'), 'years', labels).map((x) => x.value), ['2013', '2024', '2025']);
+  // names match a mixed-case value (an index cell keeps its case)
+  assert.deepEqual(orderFacetValues(v('Peaq', 'zz', 'EPIQ'), 'model', labels).map((x) => x.value), ['EPIQ', 'Peaq', 'zz']);
   // no names file: title-cased slugs by name, as before
   assert.deepEqual(orderFacetValues(v('suv', 'combi'), 'bodywork', facetLabelMap(null)).map((x) => x.value), ['combi', 'suv']);
 });

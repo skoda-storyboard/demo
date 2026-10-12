@@ -24,14 +24,15 @@ const SOURCE = 'https://www.skoda-storyboard.com';
 const PAGES = ['/en/images/', '/en/videos/', '/en/news/', '/en/press-kits/'];
 const UA = { 'user-agent': 'Mozilla/5.0 (compatible; skoda-eds-migration/1.0)' };
 
+// entities decoded once each, `&amp;` last (so `&amp;lt;` stays the text `&lt;`)
 const decode = (s) => String(s)
   .replace(/<[^>]+>/g, '')
-  .replace(/&amp;/g, '&').replace(/&lt;/g, '<')
+  .replace(/&lt;/g, '<')
   .replace(/&gt;/g, '>')
   .replace(/&quot;/g, '"')
-  .replace(/&#0?39;|&#8217;/g, '’')
   .replace(/&#(\d+);/g, (m, n) => String.fromCodePoint(Number(n)))
   .replace(/&#x([0-9a-f]+);/gi, (m, n) => String.fromCodePoint(parseInt(n, 16)))
+  .replace(/&amp;/g, '&')
   .replace(/\s+/g, ' ')
   .trim();
 

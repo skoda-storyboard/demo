@@ -144,6 +144,14 @@ at 1440 / 768 / 390 (icons also at 1 / 1.25 / 1.5 / 2x).
   source's `\e02f` glyph (28px at 58px, 16px at 40px, line-height .8, centred by 50% + half-size negative margins),
   pixel-identical at 1440 / 768 / 390 (the source's 40px button shows the bag partly under the count bubble; so does
   ours).
+- **Code review + parity sweep (2026-10-12, PR #341):** tooltips (`title`) match the source on every card control
+  and size row; pills match at rest / hover / open. Fixed: Load more hover `#f1f1f1` (0.25s), filter option names
+  `#a1a1a1` 14/500 (PO: match the source; 2.6:1, recorded trade-off), no thumbnail placeholder tint. Review fixes: the
+  option names no longer hold the first grid (≤ 300ms wait, then renamed in place), names match mixed-case values,
+  Years sort by number, a click-opened size menu is not taken over by another card's hover, the empty Load-more
+  wrapper keeps `main`'s spacing, the generator decodes each entity once. Below 768 the source shows its mobile
+  "Advanced filter" toggle (`.soa-mobile`), as ours. **Follow-up (not in #273):** the rails, lightbox, Downloads,
+  media cart and press-kit icons still use the SVG masks; the same font glyphs would match the source there too.
 - **Content (DA preview, 2026-10-12; publish after merge):** `/en/images` and `/en/videos` re-imported (facets row
   only); `/en/media-feed.json` gets the `focus` column (every other cell unchanged; `tools/importer/media-items` writes
   it on the next build). Backups: `.migration/wt273-backup/`.

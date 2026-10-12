@@ -25,6 +25,9 @@ test('filterOptions: facet, slug and decoded name of every option inside form.se
     ['derivative', 'lk', 'L&K'],
   ]);
   assert.deepEqual(filterOptions('<p>no form</p>'), []);
+  // each entity decoded once; a numeric apostrophe stays straight
+  const once = filterOptions('<form class="search-filter"><ul><li><input name="filter[model][]" value="a"><label>R&amp;lt;S &#39;x&#39; L&amp;K</label></li></ul></form>');
+  assert.deepEqual(once, [['model', 'a', "R&lt;S 'x' L&K"]]);
 });
 
 test('mergeOptions: first-seen order across pages, no repeats', () => {

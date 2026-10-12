@@ -95,20 +95,24 @@ function loadFacetLabels() {
 
 /**
  * The options a facet offers, in the source's order (its known names first, then the rest by
- * name): a Year is a 4-digit year, so a stray tag ("x") is no option (#273).
+ * name; names match the value case-insensitively). A Year is a 4-digit year, so a stray tag
+ * ("x") is no option, and Years run in number order, as the source's (#273).
  * @param {Array<{value: string}>} values distinctFacetValues() output
  * @param {string} key the facet
  * @param {Map} labels facetLabelMap() output
  * @returns {Array<{value: string}>}
  */
 export function orderFacetValues(values, key, labels) {
+  if (key === 'years') {
+    return values.filter(({ value }) => /^\d{4}$/.test(value))
+      .sort((a, b) => Number(a.value) - Number(b.value));
+  }
   const names = labels.get(key) || new Map();
-  const name = (v) => names.get(v)?.name || valueLabel(v);
-  const rank = (v) => (names.has(v) ? names.get(v).rank : Infinity);
-  return values
-    .filter(({ value }) => key !== 'years' || /^\d{4}$/.test(value))
-    .sort((a, b) => rank(a.value) - rank(b.value)
-      || name(a.value).localeCompare(name(b.value), undefined, { numeric: true }));
+  const known = (v) => names.get(String(v).toLowerCase());
+  const name = (v) => known(v)?.name || valueLabel(v);
+  const rank = (v) => known(v)?.rank ?? Infinity;
+  return [...values].sort((a, b) => rank(a.value) - rank(b.value)
+    || name(a.value).localeCompare(name(b.value), undefined, { numeric: true }));
 }
 
 function parseListConfig(block) {
@@ -374,7 +378,15 @@ export default async function decorate(block) {
     console.error('listing: index load failed', e);
     return;
   }
-  const optionNames = await facetLabels;
+  // the option names (#273) are not worth delaying the first grid: wait for them briefly, else
+  // build the bar with the title-cased slugs and rename + reorder its options when they land
+  const NAMES_WAIT_MS = 300;
+  let optionNames = await Promise.race([
+    facetLabels,
+    new Promise((resolve) => { setTimeout(() => resolve(null), NAMES_WAIT_MS); }),
+  ]);
+  const namesLate = !optionNames;
+  if (namesLate) optionNames = facetLabelMap({});
   const optionName = (key, v) => optionNames.get(key)?.get(String(v).toLowerCase())?.name
     || valueLabel(v);
 
@@ -768,4 +780,24 @@ export default async function decorate(block) {
   refreshPillStates();
   renderChips();
   renderGrid();
+
+  // names that came after the first paint: rename and reorder the options in place (their
+  // inputs, state and listeners stay), then the chips
+  if (namesLate) {
+    facetLabels.then((names) => {
+      optionNames = names;
+      facetOptions.querySelectorAll('fieldset.facet-panel').forEach((panel) => {
+        const { facet } = panel.dataset;
+        const options = [...panel.querySelectorAll('label.facet-option')];
+        const byValue = new Map(options.map((o) => [o.querySelector('input').value, o]));
+        orderFacetValues([...byValue.keys()].map((value) => ({ value })), facet, names)
+          .forEach(({ value }) => {
+            const option = byValue.get(value);
+            option.querySelector('.facet-option-label').textContent = optionName(facet, value);
+            panel.append(option);
+          });
+      });
+      renderChips();
+    });
+  }
 }

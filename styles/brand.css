@@ -70,7 +70,7 @@
   --border-color: var(--skoda-grey-border);
 
   /* the source's listing count numbers (.search-results-pagination-status span, #273) */
-  --listing-count-color: #aeaeae;
+  --skoda-grey-375: #aeaeae;
 
   /* the source's icon font for its media card glyphs (styles/fonts.css, #273) */
   --media-card-icon-font: skoda-bnr-icons;

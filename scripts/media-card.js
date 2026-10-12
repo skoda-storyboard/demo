@@ -167,6 +167,10 @@ function cartAction(el, row, size, original = '', title = '') {
 }
 
 const SOURCE_CDN = /^https?:\/\/cdn\.skoda-storyboard\.com\//i;
+// The source WordPress site's download route. ⚠️ Go-live dependency (SKODA-902): it only works
+// while the WordPress site serves www.skoda-storyboard.com; the files must be on the DAM (and
+// this rewrite removed) before that host moves to Edge Delivery.
+export const SOURCE_DOWNLOAD = 'https://www.skoda-storyboard.com/direct-download/';
 
 /**
  * The download link of a file. One still on the source's file server (cdn.skoda-storyboard.com:
@@ -174,14 +178,11 @@ const SOURCE_CDN = /^https?:\/\/cdn\.skoda-storyboard\.com\//i;
  * /direct-download/ route, as the source's buttons do: it answers with the file as an
  * attachment, where the cdn link would only open it in a tab (#273; the cross-origin `download`
  * attribute is ignored). DAM originals already download (Content-Disposition: attachment).
- * Replaced when the files move to the DAM (SKODA-902).
  * @param {string} href
  * @returns {string}
  */
 export function downloadHref(href) {
-  return SOURCE_CDN.test(href || '')
-    ? href.replace(SOURCE_CDN, 'https://www.skoda-storyboard.com/direct-download/')
-    : href;
+  return SOURCE_CDN.test(href || '') ? href.replace(SOURCE_CDN, SOURCE_DOWNLOAD) : href;
 }
 
 function downloadAction(el, href) {
@@ -249,15 +250,23 @@ function sizeMenu(action, label, items) {
   // a mouse opens the menu on hover and closes it on leaving, as the source's :hover menu
   // (#273); the menu's top bridge (CSS) keeps the pointer inside across the gap. Touch, pen
   // and keyboard keep the click / Enter / Space toggle.
+  // A menu opened by a click or the keyboard elsewhere stays: hovering another card's button
+  // does not take it over.
   wrap.addEventListener('pointerenter', (e) => {
     if (e.pointerType !== 'mouse' || openMenu === state) return;
+    if (openMenu && !openMenu.byHover) return;
     open();
     state.byHover = true;
   });
   wrap.addEventListener('pointerleave', (e) => {
     if (e.pointerType !== 'mouse' || openMenu !== state || !state.byHover) return;
-    state.byHover = false;
-    closeOpenMenu();
+    // a keyboard user inside it keeps it (it closes as a clicked menu does); a row the mouse
+    // focused hands focus back to the toggle, never to the page
+    if (menu.contains(document.activeElement) && document.activeElement.matches(':focus-visible')) {
+      state.byHover = false;
+      return;
+    }
+    closeOpenMenu(menu.contains(document.activeElement));
   });
   wrap.addEventListener('keydown', (e) => {
     if (openMenu !== state) return;

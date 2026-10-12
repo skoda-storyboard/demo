@@ -39,3 +39,13 @@ The demo's client-side zip (SKODA-505) has real production limits: browser memor
 - **Open (D2):** reuse the existing signed-download / `media-cart/v1` service (keeps WordPress) vs rebuild — governance/ownership + how long the legacy backend lives.
 - POST/stateful contracts were described from routes/JS, not fired (non-mutating probe) — exact request bodies unconfirmed.
 - Media-cart add/large-bundle flow is `[RUNTIME-UNCONFIRMED]` — needs a browser + (for some paths) real state.
+
+## Notes from #273 (2026-10-12)
+- **Go-live dependency:** `scripts/media-card.js` `downloadHref` sends downloads of files still on the source cdn
+  (1920px renditions, MP4s not yet in the DAM) through the WordPress `SOURCE_DOWNLOAD` route
+  (`www.skoda-storyboard.com/direct-download/…`), as the source buttons do. That route stops working when
+  `www.skoda-storyboard.com` moves to Edge Delivery: before cut-over, the files must be on the DAM and the rewrite
+  removed.
+- **1920px in the media cart** stays disabled (PO, #273): the DAM holds no 1920px rendition (original, 1280, 2048) and
+  the source's 1920px file sends no CORS for the cart zip. Add a 1920px rendition to the Assets processing profile, then
+  enable the "+ 1920px" row (`scripts/media-card.js` `cartAction`).
