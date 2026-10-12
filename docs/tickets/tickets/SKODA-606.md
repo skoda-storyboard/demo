@@ -31,3 +31,6 @@ Confirmed in `content/en/index.plain.html` (1 occurrence). On the source it's a 
 ## Status (2026-09-14, agent-team cycle 1)
 - **IMPLEMENTED** in `tools/importer/transformers/skoda-cleanup.js` (`after` hook): removes consent-widget hooks (`.ot-sdk-show-settings`, `#ot-sdk-btn`, `.optanon-toggle-display`) and drops a leaf text node whose text is exactly "Manage Cookies". `node --check` passes.
 - **QA-BLOCKED — not DONE.** Same reason as SKODA-605: the validation fixture is the drifted Peaq snapshot, which lacks the stray node, so behavior on the real homepage is unverified. Needs a clean `/en/` re-import + publish to close.
+
+## Status (2026-10-11, M1 ticket review)
+✅ **Done, closed** (#40). "Manage Cookies" appears on 0 of 285 cached published pages (2026-10-10) and not on live `/en`. The cleanup transformers strip `#ot-sdk-btn`.

@@ -1,0 +1,42 @@
+{
+  "variantName": "tags",
+  "baseBlock": "tags",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Tags",
+  "description": "The page's tags as pills: one link per tag to its archive (/en/tag/<facet>/<value>) or a News filter. Left empty, it shows the page's \"tags\" metadata as labels. Rails and archives read the metadata, not this block (SKODA-841).",
+  "visualCharacteristics": {
+    "purpose": "tag pills"
+  },
+  "contentPattern": {
+    "structure": "links list"
+  },
+  "options": [
+    {
+      "class": "chips",
+      "label": "chips",
+      "description": "Green filter chips (facet contexts). A tag in bold is shown as selected."
+    },
+    {
+      "class": "chips outline",
+      "label": "chips, outline",
+      "description": "Outlined filter chips that fill green on hover or when selected."
+    }
+  ],
+  "usage": {
+    "pagesUsing": [
+      "en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france",
+      "en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca",
+      "en/emobility/a-true-czech-from-spain",
+      "en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries",
+      "en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq",
+      "en/emobility/camouflage-to-get-you-hooked",
+      "en/emobility/coffee-on-electric-wheels-elroq-and-enyaq-serving-coffee",
+      "en/emobility/come-and-play-skoda-is-heading-to-milan",
+      "en/emobility/designers-on-the-peaq-its-modern-durable-and-practical",
+      "en/emobility/elroq-rs-in-a-robe-unveiling-the-secret-of-matte-paint"
+    ],
+    "reuseCount": 173,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}

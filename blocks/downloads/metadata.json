@@ -1,0 +1,42 @@
+{
+  "variantName": "downloads",
+  "baseBlock": "downloads",
+  "version": "1.0.0",
+  "created": "2026-10-10T21:35:13.506Z",
+  "name": "Downloads",
+  "description": "One row per asset: an image cell, a title cell, and a links cell whose link texts are the sizes (Original, 1920px; PDF, MP4). Optional date cell (d. m. yyyy). Optional settings rows first: collapse (auto / none), columns (a whole number). A bad collapse or columns value stops the block.",
+  "visualCharacteristics": {
+    "purpose": "downloadable assets with sizes and add-to-media-cart"
+  },
+  "contentPattern": {
+    "structure": "image-title-links repeating"
+  },
+  "options": [
+    {
+      "class": "media-box",
+      "label": "media-box",
+      "description": "The Media Box at the end of a story, release or press-kit chapter: titles as headings, dates, size menu, \"Show more\" after two rows, lightbox on the images. Put it in a section with Style \"dark, full-width, media-box\" and an h2 \"Media Box\"."
+    },
+    {
+      "class": "gallery",
+      "label": "gallery",
+      "description": "Press-kit Images chapter group: thumbnails with add / download over the image and the \"Original / 1920px\" pills above the group."
+    }
+  ],
+  "usage": {
+    "pagesUsing": [
+      "en/emobility/a-custom-made-sunroof-walkie-talkies-and-champagne-the-skoda-peaq-at-the-tour-de-france",
+      "en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca",
+      "en/emobility/a-true-czech-from-spain",
+      "en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries",
+      "en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq",
+      "en/emobility/camouflage-to-get-you-hooked",
+      "en/emobility/coffee-on-electric-wheels-elroq-and-enyaq-serving-coffee",
+      "en/emobility/come-and-play-skoda-is-heading-to-milan",
+      "en/emobility/designers-on-the-peaq-its-modern-durable-and-practical",
+      "en/emobility/elroq-rs-in-a-robe-unveiling-the-secret-of-matte-paint"
+    ],
+    "reuseCount": 154,
+    "lastUsed": "2026-10-10T21:49:43.689Z"
+  }
+}
