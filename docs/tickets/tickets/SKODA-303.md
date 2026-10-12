@@ -156,6 +156,11 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
   on preview: 282 rows (the 5 Epiq pages `en|cs|de|sk|sr` as before, 277 migrated EN pages with `hreflang:en` only),
   no `x-default` (only the source home declares one, `/`, not a page). Authored-link overrides / new tab and
   `/metadata` as generator-owned are accepted demo limitations (reviewer).
+  - **Content (DA preview, 2026-10-12):** `/metadata` re-generated with
+    `--stage preview --chrome cs,de,sk,sr --chrome-footer cs --push`: 310 rows (28 curated rows identical, the 5 Epiq
+    rows unchanged, 277 `hreflang:en` rows). Backup: `.migration/wt303a-scratch/metadata.da.before-299-rereview.json`.
+    A first run without `--chrome` dropped the 4 `/{locale}/**` chrome rows (re-pushed at once). `mergeSheet()` now
+    replaces chrome rows only when the run brings its own, so a run without `--chrome` keeps them (tested).
 
 ## Dependencies
 - Upstream: SKODA-301 (Header + nav fragment) / Downstream: SKODA-1003 (language-negotiated root routing + per-locale placeholders)

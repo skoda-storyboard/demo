@@ -151,6 +151,24 @@ test('mergeSheet: chrome rows are added once (idempotent) and kept as curated ro
   assert.equal(second.total, 3);
 });
 
+test('mergeSheet: a run without chrome rows (no --chrome) keeps the existing ones', () => {
+  const sheet = {
+    data: [
+      { URL: '/cs/**', nav: '/cs/nav', footer: '/cs/footer' },
+      { URL: '/de/**', nav: '/de/nav', footer: '' },
+      {
+        URL: '/en/a', nav: '', footer: '', 'hreflang:en': `${DEMO}/en/old`,
+      },
+    ],
+  };
+  const merged = mergeSheet(sheet, [{ URL: '/en/a', 'hreflang:en': `${DEMO}/en/a` }]);
+  assert.deepEqual(merged.data.map((r) => [r.URL, r.nav, r.footer, r['hreflang:en']]), [
+    ['/cs/**', '/cs/nav', '/cs/footer', ''],
+    ['/de/**', '/de/nav', '', ''],
+    ['/en/a', '', '', `${DEMO}/en/a`],
+  ]);
+});
+
 test('chromeRows with --chrome-footer: locales without a translated footer keep the English /footer', () => {
   assert.deepEqual(chromeRows(['cs', 'de'], ['cs']), [
     { URL: '/cs/**', nav: '/cs/nav', footer: '/cs/footer' },

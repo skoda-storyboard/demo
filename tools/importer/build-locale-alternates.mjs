@@ -128,10 +128,10 @@ const isGenerated = (column) => column === 'alternates' || isHreflang(column);
 
 /**
  * The sheet after the merge: the curated rows unchanged, this tool's earlier rows (URL + hreflang
- * or the old `alternates` only, and the `/{locale}/**` chrome rows) replaced by the new ones,
- * sorted by URL. The custom `alternates` column is dropped (#299 review: native hreflang only),
- * and every row gets every column (an empty cell never overwrites in bulk metadata), the
- * hreflang ones last in the switcher's order.
+ * or the old `alternates` only, and the `/{locale}/**` chrome rows when `extra` brings chrome
+ * rows) replaced by the new ones, sorted by URL. The custom `alternates` column is dropped
+ * (#299 review: native hreflang only), and every row gets every column (an empty cell never
+ * overwrites in bulk metadata), the hreflang ones last in the switcher's order.
  * @param {object} sheet the DA sheet JSON ({ data: [...] })
  * @param {Array<object>} rows `{ URL, 'hreflang:en': …, … }`
  * @param {Array<object>} [extra] curated rows to ensure (e.g. chromeRows())
@@ -145,7 +145,11 @@ export function mergeSheet(sheet, rows, extra = []) {
   const shape = (r) => Object.fromEntries(columns.map((c) => [c, r[c] ?? '']));
   const generated = (r) => Object.keys(r).some((c) => isGenerated(c) && r[c])
     && Object.keys(r).every((c) => c === 'URL' || isGenerated(c) || !r[c]);
-  const curated = data.filter((r) => !generated(r) && !isChromeRow(r)).map(shape);
+  // the `/{locale}/**` chrome rows are replaced only by a run that brings its own (`--chrome`);
+  // a run without them keeps the existing ones, so it never drops the translated nav / footer
+  const replaceChrome = extra.some(isChromeRow);
+  const curated = data.filter((r) => !generated(r) && !(replaceChrome && isChromeRow(r)))
+    .map(shape);
   const ensured = extra.map(shape);
   const added = [...rows].sort((a, b) => a.URL.localeCompare(b.URL)).map(shape);
   const merged = [...curated, ...ensured, ...added];
