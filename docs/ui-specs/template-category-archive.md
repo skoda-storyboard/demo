@@ -44,8 +44,9 @@ title) → a flex-wrap grid of [`card-teaser`](card-teaser.md) (media/overlay 16
 - **Term hero:** a short (~240px) banner whose title is the taxonomy term. Category shows the term name
   ("eMobility"); tag shows parent + term ("Models Octavia").
 - **Card grid:** `.search-results-items`, `display:flex; flex-wrap:wrap`, reusing the standard card unit.
-- **Pagination:** no static control captured, confirm live whether it is a JS "Load more" button
-  (as on the homepage) or infinite scroll (see §6/§9).
+- **Pagination (confirmed live 2026-10-12, SKODA-209a):** a "6 / N" count row
+  (`.search-results-pagination`) then a JS "Load more" button (`.ajax-loader-button-wrapper`), under the grid.
+  Model tags start at "4 / N" (the featured model card takes two slots). See §5 / §6.
 
 ## 5. Measured template-level visual base
 
@@ -62,6 +63,14 @@ Values `getComputedStyle` on the eMobility category, cited `(selector · viewpor
 **Spacing / vertical rhythm**
 - Article grid sits in the `.container` directly under the hero (hero at `y=108`, grid follows). Card
   inter-row gap follows the card unit (see `card-teaser.md`); measure and lock at build.
+- **Pager (SKODA-209a; same at 1440 / 992 / 768 / 375, category and tag):**
+  - Last card → count row 36 (the grid's trailing 20px gutter + 16 margin).
+  - Count row 41: padding `8px 0`, margin `16px 0`, 24px line, `1px solid #c9cdd3` underline, full content width.
+    The numbers are 16px / 500 / `#aeaeae`; `.total::before` is `"/"` with `padding-right: .3em`.
+  - Count → Load more wrapper 16, wrapper padding `16px 0`.
+  - Wrapper → footer 16 (`.archive-results` margin-bottom).
+  - Totals: last card → Load more 109, Load more → footer 32.
+  - The footer follows the content: there is no viewport min-height on a short archive.
 
 **Typography**
 - Hero term title = the large hero heading (reuse `hero.md` banner title scale). Body/meta = the card
@@ -76,9 +85,11 @@ Values `getComputedStyle` on the eMobility category, cited `(selector · viewpor
 
 ## 6. Interaction / behavior
 
-- **Pagination unconfirmed:** no load-more/pagination element in the initial DOM. The homepage uses a
-  "Load more" button; this archive may inject one on scroll or use infinite scroll. Verify live (scroll
-  and watch the DOM / network) before locking, do not assume.
+- **Pagination (confirmed 2026-10-12):** a "Load more" button appends 6 stories and updates the count row
+  ("6 / N" → "12 / N"). When every story is shown, the button and the count row go away. No infinite scroll.
+- **EDS (SKODA-209a):** the `stories` block's authored N-column grid (`columns 3`, every archive) turns the count row on.
+  An authored `count` row overrides that. The home featured feed has no count row, as on the source. The row
+  is the polite live region on Load more.
 
 ## 7. Accessibility
 
