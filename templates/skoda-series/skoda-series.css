@@ -24,6 +24,27 @@ body.skoda-series main > .hero-image-container + .section {
   margin-top: 0;
 }
 
+/* At exactly 768 the source's hero image already takes its 16px stacked margin while the
+   caption still overlays it, so the grid starts 16px lower (#285, as the press-kit hub). The
+   caption itself isn't moved: the source's then overhangs the image onto the white page. */
+@media (width: 768px) {
+  body.skoda-series:not(.page) main > .hero-image-container {
+    margin-bottom: calc(var(--spacing-l) + var(--series-gutter) + var(--spacing-m));
+  }
+}
+
+/* A hub's tile grid ends 10px (its cell inset) above the footer, as the source's (#285: it was
+   the 40px section margin). */
+body.skoda-series:not(.page) main > .section:last-child {
+  margin-bottom: var(--series-gutter);
+}
+
+/* The hub tiles keep the source's look: the white title on the image gradients only, no
+   backdrop (#285, PO decision as for the press-kit tiles in #275; series.md §6) */
+body.skoda-series .cards.tiles {
+  --tile-title-backdrop: transparent;
+}
+
 /* Cards keep the source's 10px cell inset inside the 1248px content column. */
 body.skoda-series main > .cards-container > .cards-wrapper {
   box-sizing: border-box;
