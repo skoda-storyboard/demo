@@ -12,7 +12,10 @@ const setup = (pressRelease = true) => {
   let width = 500;
   const queries = [];
   dom.window.matchMedia = (media) => {
-    const min = Number(media.match(/\d+/)[0]);
+    // width queries match from their px value; any other query (the lightbox's
+    // prefers-reduced-motion) never matches
+    const px = media.match(/\d+/);
+    const min = px ? Number(px[0]) : Infinity;
     const listeners = [];
     const query = {
       matches: width >= min,
@@ -834,4 +837,78 @@ test('outside a Media Box a clip file tile has no video frame (#275)', async () 
   await decorate(block);
   assert.equal(block.querySelector('.downloads-file video'), null);
   assert.equal(block.querySelector('.downloads-file-type').textContent, 'MP4');
+});
+
+const click = (el, init = {}) => {
+  const e = new window.MouseEvent('click', {
+    bubbles: true, cancelable: true, button: 0, ...init,
+  });
+  el.dispatchEvent(e);
+  return e;
+};
+// the lightbox module loads on the first click
+const loaded = () => new Promise((resolve) => { setTimeout(resolve, 50); });
+
+test('Media Box: a tile image opens the shared lightbox on the whole box, as the source colorbox group (SKODA-604)', async () => {
+  const block = setup();
+  const h1 = document.createElement('h1');
+  h1.textContent = 'Peaq enters production';
+  document.body.prepend(Object.assign(document.createElement('main'), {}));
+  document.querySelector('main').append(h1);
+  addRow(block, { src: '/a.jpg', title: 'Line', links: [['Original', 'https://dam.example/a.jpg'], ['1920px', 'https://dam.example/a-1920.jpg']] });
+  addRow(block, { title: 'Release', links: [['PDF', 'https://dam.example/r.pdf']] });
+  addRow(block, { src: '/b.jpg', title: 'Body shop', links: [['Original', 'https://dam.example/b.png']] });
+  await decorate(block);
+  const thumbs = block.querySelectorAll('.downloads-thumb');
+  assert.equal(thumbs.length, 2, 'the PDF file tile has no image to open');
+  const event = click(thumbs[1]);
+  assert.equal(event.defaultPrevented, true, 'the image link is not followed');
+  await loaded();
+  const overlay = document.querySelector('.gallery-overlay');
+  assert.ok(overlay, 'the shared lightbox is built on first use');
+  assert.equal(overlay.hidden, false);
+  assert.equal(overlay.getAttribute('role'), 'dialog');
+  assert.equal(overlay.querySelector('.gallery-lightbox-count').getAttribute('aria-label'), 'Image 2 of 2');
+  const panel = overlay.querySelector('.gallery-lightbox-stage').textContent;
+  assert.match(panel, /Body shop/);
+  assert.match(panel, /File type: PNG/);
+  assert.match(panel, /Related article: Peaq enters production/);
+  assert.equal(overlay.querySelector('a.download').getAttribute('href'), 'https://dam.example/b.png');
+  // the same overlay serves every tile of the box
+  click(overlay.querySelector('.gallery-lightbox-close'));
+  assert.equal(overlay.hidden, true);
+  assert.equal(document.activeElement, thumbs[1], 'focus returns to the tile');
+  click(thumbs[0]);
+  await loaded();
+  assert.equal(document.querySelectorAll('.gallery-overlay').length, 1);
+  assert.equal(overlay.querySelector('.gallery-lightbox-count').getAttribute('aria-label'), 'Image 1 of 2');
+});
+
+test('Media Box lightbox: modifier clicks keep the image link; outside a Media Box the link is plain (SKODA-604)', async () => {
+  let block = setup();
+  addRow(block, { src: '/a.jpg', title: 'Line', links: [['Original', 'https://dam.example/a.jpg']] });
+  await decorate(block);
+  assert.equal(click(block.querySelector('.downloads-thumb'), { ctrlKey: true }).defaultPrevented, false);
+  block = setup(false);
+  addRow(block, { src: '/a.jpg', title: 'Line', links: [['Original', 'https://dam.example/a.jpg']] });
+  await decorate(block);
+  assert.equal(click(block.querySelector('.downloads-thumb')).defaultPrevented, false);
+});
+
+test('lightboxItem: the original drives download, link and cart; a clip shows its poster and downloads its MP4 (SKODA-604)', async () => {
+  setup();
+  const { lightboxItem } = await import('./downloads.js');
+  const image = lightboxItem({
+    src: '/a.jpg', title: 'Line', date: '6. 8. 2026', sizes: [{ label: '1920px', href: '/a-1920.jpg' }, { label: 'Original', href: 'https://dam.example/a.JPG' }],
+  }, { title: 'Story', href: '/en/story' });
+  assert.equal(image.download, 'https://dam.example/a.JPG');
+  assert.equal(image.cartHref, 'https://dam.example/a.JPG');
+  assert.equal(image.video, undefined);
+  assert.match(image.caption.textContent, /File type: JPG.*Published: 6\. 8\. 2026/s);
+  assert.equal(image.caption.querySelector('a').getAttribute('href'), '/en/story');
+  const clip = lightboxItem({ src: '/p.jpg', title: 'Clip', sizes: [{ label: 'MP4', href: 'https://dam.example/c.mp4' }] });
+  assert.equal(clip.video, undefined, 'the attachment MP4 never loads in a player frame');
+  assert.equal(clip.src, '/p.jpg');
+  assert.equal(clip.download, 'https://dam.example/c.mp4');
+  assert.equal(clip.caption.querySelector('a'), null, 'no related article without a page title');
 });
