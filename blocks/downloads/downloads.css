@@ -226,8 +226,8 @@
 
 /* Collapsed (SKODA-830 D2), as the source togglebox: the list is clipped to its first two rows
    (--dl-rows-height, measured from the tiles by downloads.js) plus the pill's gap and height,
-   and the pill sits over the clip's bottom edge, so the top of row 3 shows behind it (58px at
-   the 20px Media Box gap). The clipped tiles are inert. Unmeasured, the calc is invalid and the
+   and the pill sits over the clip's bottom edge, over the top 58px of row 3 (at the 20px Media
+   Box gap), which the Media Box's opener row covers (SKODA-514). The clipped tiles are inert. Unmeasured, the calc is invalid and the
    list stays unclipped.
    The clip gets --dl-focus-room on its top and sides (padding, cancelled by an equal negative
    margin so the grid doesn't move) so the edge tiles' focus ring (2px outline + 2px offset)
@@ -249,10 +249,21 @@
   pointer-events: none;
 }
 
-/* in-page layer 2 (styles.css z-index scale): above the peeking tiles' cart scrims (1) */
+/* the source's opaque togglebox-opener row (SKODA-514): band-coloured, the pill's height plus the
+   tile gap, so no clipped row-3 pixels paint around the pill; layer 2, over the cart scrims (1) */
+.downloads.downloads-media-box.downloads-collapsed .downloads-items::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  height: calc(var(--dl-toggle-height) + var(--dl-tile-gap));
+  background: var(--dark-color);
+}
+
+/* in-page layer 3 (styles.css z-index scale): above the cart scrims (1) and the opener row (2) */
 .downloads.downloads-collapsed .downloads-more {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   margin-block-start: calc(-1 * var(--dl-toggle-height));
 }
 
@@ -277,6 +288,7 @@
 
 /* The media-box variant uses the source's 20px gap and tile rhythm. */
 .downloads.downloads-media-box .downloads-items {
+  position: relative; /* holds the collapsed opener row */
   gap: var(--dl-tile-gap);
 }
 

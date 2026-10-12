@@ -736,3 +736,16 @@ test('gallery CSS: Media Box ladder, overlay controls, source opener bar', async
   assert.match(css, /\.downloads\.gallery \.downloads-actions \{\s+position: absolute;\s+inset-block-end: var\(--dl-overlay-inset\);\s+inset-inline-start: var\(--dl-overlay-inset\);/);
   assert.match(css, /\.downloads\.gallery\.downloads-collapsed \.downloads-more \{\s+margin-block-start: calc\(-1 \* var\(--dl-gallery-bar\)\);/);
 });
+
+test('Media Box CSS: an opaque band-coloured opener row covers the clipped row 3 under the pill (SKODA-514)', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = await readFile(new URL('./downloads.css', import.meta.url), 'utf8');
+  assert.match(css, /\.downloads\.downloads-media-box \.downloads-items \{\s+position: relative;/);
+  const row = css.match(/\.downloads\.downloads-media-box\.downloads-collapsed \.downloads-items::after \{([^}]+)\}/);
+  assert.ok(row, 'opener row rule');
+  assert.match(row[1], /inset: auto 0 0;/);
+  assert.match(row[1], /z-index: 2;/);
+  assert.match(row[1], /height: calc\(var\(--dl-toggle-height\) \+ var\(--dl-tile-gap\)\);/);
+  assert.match(row[1], /background: var\(--dark-color\);/);
+  assert.match(css, /\.downloads\.downloads-collapsed \.downloads-more \{\s+position: relative;\s+z-index: 3;/);
+});
