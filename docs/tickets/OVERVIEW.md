@@ -237,12 +237,10 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-805b](tickets/SKODA-805b.md) | Press-kit child pages for M1 hubs (D-1 = A: import all 49) | E08 | 5–8 | 1–2 | 3–5 | 805a,805c,502,609 | ✅ Done (#129 closed 2026-09-29). Was: M1 Could; 49 child pages in the URL-set addendum |
 | [SKODA-805c](tickets/SKODA-805c.md) | `press_kit-template-default` article + accordion (first-glimpse) | E08 | 3 | 1–2 | 3 | 607,204,205,502,506 | ✅ Done (#225, #130 closed 2026-10-06). Was: M1 Should; slice of 805/807; ready for QA 2026-09-29 (DA previewed, not published) |
 | SKODA-701 | Lint + unit tests | E07 | 2 | 1 | 1–2 | E02,E03,E04 | 🟢 |
-| SKODA-702 | Performance (Lighthouse≈100/RUM) | E07 | 3 | 1–2 | 2–3 | 603 | 🟡 M1, in review: #42, [PR #288](https://github.com/skoda-storyboard/demo/pull/288) (CLS fixes + PSI per template); 702a ✅ |
-| [SKODA-702a](tickets/SKODA-702a.md) | Epiq story performance: YouTube click-to-load facade (desktop TBT) | E07 | 2 | 0.5–1 | 1–2 | 702,204a,818 | ✅ Done (PR #258 merged 2026-10-06, #239 closed); M1; from the PR #232 PSI failure (desktop 74, TBT 570ms; `main` 64–69 locally); live uses `lite-youtube`, EDS boots the full player on load |
-| SKODA-703 | Accessibility audit | E07 | 3 | 1–2 | 2–4 | 603 | 🔵 M1, **ready to pick up, no owner** (M1 review 2026-10-11); #43; glossary modal out (SKODA-206 is M2); inputs: Lighthouse a11y 92–93 (#275, #285), axe findings in #307/#308/#299 |
-| SKODA-704 | Visual critique + consent/analytics stubs + sign-off | E07 | 3 | 1–2 | 2–3 | 702,703 | 🟡 M1, in progress (QA owner); #44; AC aligned 2026-10-11: visual parity per template variation (a few px OK), consent/analytics stubs → SKODA-804 (M2); findings are the 7 QA tickets under #247 |
-| [SKODA-705](tickets/SKODA-705.md) | Confirm "Load more" button variant vs source | E07 | 1 | 0.5 | 0.5 | 201,402 | ✅ Done (#46 closed 2026-10-11): `main` = origin at 1440 (white, 2px `rgb(22,23,24)` border, 50px radius, 600, 178×44), no change needed |
-| [SKODA-707](tickets/SKODA-707.md) | Demo assembly + dry-run + script (15 Oct) | E07 | 2 | 1 | 1–2 | 603,604,505,704 | 🔵 M1 **critical path, ready to pick up, no owner** (M1 review 2026-10-11); #53 |
+| [SKODA-702](tickets/SKODA-702.md) | Performance (Lighthouse≈100/RUM) | E07 | 3 | 1–2 | 2–3 | 603 | 🟡 M1; branch `skoda-702-performance` 2026-10-07: every AC measured; 2 CLS fixes (press-kit grid rows while loading, per-platform/weight fallback fonts): CLS ≤ 0.007 on the A/B pages (was up to 0.212); RUM beacons verified, field data needs the RUM explorer key; follow-ups: category LCP (831/209), fast-start MP4 (503/506) |
+| [SKODA-702a](tickets/SKODA-702a.md) | Epiq story performance: YouTube click-to-load facade (desktop TBT) | E07 | 2 | 0.5–1 | 1–2 | 702,204a,818 | 🔵 M1; from the PR #232 PSI failure (desktop 74, TBT 570ms; `main` 64–69 locally); live uses `lite-youtube`, EDS boots the full player on load |
+| SKODA-703 | Accessibility audit | E07 | 3 | 1–2 | 2–4 | 603 | 🟠 several `[RUNTIME-UNCONFIRMED]` |
+| SKODA-704 | Visual critique + consent/analytics stubs + sign-off | E07 | 3 | 1–2 | 2–3 | 702,703 | 🟡 |
 
 **Phases B–D (Pilot: No)**
 
