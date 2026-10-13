@@ -24,6 +24,7 @@ back-compatible; new fields (`tags`, `model`, plus new `template` values) are ad
 | `model` | slug | model items | convenience single-model tag; equals the model slug (also present in `tags`) |
 | `presskit` | site path | press-kit chapters | the parent hub of a `press_kit_chapter` page, e.g. `/en/press-kits/skoda-peaq-press-kit-2` (SKODA-805b). Not indexed |
 | `theme` | `press-kit` | press-kit chapters | loads `templates/press-kit` for chapters, whose `template` value is not a template folder |
+| `hreflang:<code>` | absolute URL, one column per language (`hreflang:en`, `hreflang:cs`, …, `hreflang:x-default`) | every migrated page whose source declares hreflang (at least its own language) | native EDS hreflang metadata (aem.live special metadata properties; #299 review replaced the custom `alternates` column): the page's translations that are on EDS, from the source head's `<link rel="alternate" hreflang>`, the page's own language included and `x-default` when its target is migrated, as absolute URLs on the site's live host (`--origin`; the production domain at go-live). EDS renders each as `<link rel="alternate" hreflang="cs" href="…">` in the head; the header's language switcher reads those and links only same-site pages, never the live site (SKODA-303a). Written into the bulk `/metadata` sheet by `tools/importer/build-locale-alternates.mjs`, not by the importer. Not indexed |
 
 ### `template` enum
 
