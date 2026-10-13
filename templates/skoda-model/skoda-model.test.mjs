@@ -141,6 +141,47 @@ test('an empty rail that removes its section also removes its nav link', () => {
   assert.ok(main.querySelector('li[data-target="news"]'));
 });
 
+// #284: re-imported pages title the rails with h3 (as the source); older imports keep h2
+const H3_PAGE = PAGE.replace(/<h2 id="(bodywork--derivatives|news|images)">([^<]*)<\/h2>/g, '<h3 id="$1">$2</h3>');
+
+test('h3 rail titles (#284) get the same roles, variants and nav links as h2 ones', () => {
+  const main = setup(H3_PAGE);
+  decorate(main);
+  const roles = [...main.querySelectorAll(':scope > .section')].map((s) => [...s.classList].filter((c) => c.startsWith('model-')).join(' '));
+  assert.deepEqual(roles, ['', 'model-nav-section', 'model-intro', 'model-highlights', 'model-techdata', 'model-rail', 'model-rail', 'model-rail']);
+  const rails = [...main.querySelectorAll('.story-rail')];
+  assert.deepEqual(rails.map((r) => [...r.classList].filter((c) => !['story-rail', 'block'].includes(c)).join(' ')), ['center caption', '', 'media caption image']);
+  assert.ok(main.querySelector('h3#news + p.model-rail-subheading'));
+  const items = [...main.querySelectorAll('nav.model-nav li')].map((li) => li.dataset.target);
+  assert.deepEqual(items, ['model-description', 'highlights', 'technical-data', 'bodywork--derivatives', 'news', 'images']);
+});
+
+test('an h2 outranks the drawings\' h3s; an h3 names only a rail section (#284)', () => {
+  const html = H3_PAGE.replace(
+    '<div class="section"><div class="default-content-wrapper"><h2 id="model-description">',
+    '<div class="section"><div class="default-content-wrapper"><h3 id="news-from-the-launch">News from the launch</h3></div></div><div class="section"><div class="default-content-wrapper"><h2 id="model-description">',
+  );
+  const main = setup(html);
+  decorate(main);
+  // the highlights section's drawing h3 (#liftback) does not override its h2
+  assert.ok(main.querySelector('h2#highlights').closest('.section').classList.contains('model-highlights'));
+  // a prose h3 whose id starts like a rail ("news-…") gets no role: there is no rail
+  const prose = main.querySelector('h3#news-from-the-launch').closest('.section');
+  assert.equal([...prose.classList].filter((c) => c.startsWith('model-')).length, 0);
+});
+
+test('an empty rail with an h3 title removes its section\'s nav link (#284)', () => {
+  const main = setup(H3_PAGE);
+  decorate(main);
+  const section = main.querySelector('h3#images').closest('.section');
+  section.dispatchEvent(new window.CustomEvent('story-rail:empty', { bubbles: true }));
+  assert.equal(main.querySelector('li[data-target="images"]'), null);
+  // an event from the block (its section stays) removes nothing
+  main.querySelector('h3#news').closest('.section').querySelector('.story-rail')
+    .dispatchEvent(new window.CustomEvent('story-rail:empty', { bubbles: true }));
+  assert.ok(main.querySelector('li[data-target="news"]'));
+});
+
 test('short pages (no Highlights / Technical Data) are flagged', () => {
   const main = setup(PAGE.replace(/<div class="section">\s*<div class="default-content-wrapper"><h2 id="highlights">[\s\S]*?<\/div>\s*<\/div>\s*(?=<div class="section">\s*<div class="default-content-wrapper"><p><picture>)/, ''));
   main.querySelector('h2#technical-data').closest('.section').remove();

@@ -105,3 +105,19 @@ color tolerance (default 0.1) separately from the overall `--threshold` %.
   short settle wait. Bump `--height` or the settle for long lazy pages.
 - The `<= 2%` number matches the spec ACs; raise `--threshold` for pages with
   unavoidable dynamic content (feeds, ad slots) or diff a stable element instead.
+
+## Media cart flight geometry (#307 review)
+
+With local AEM serving this branch and Google Chrome installed, run from the repo root:
+
+```sh
+npx -y @adobe/aem-cli up --no-open
+node --test docs/ui-specs/tools/media-cart-fly.test.mjs
+```
+
+`EDS_ORIGIN` overrides the origin (default `http://localhost:3000`); `CHROME_PATH` overrides the
+Chrome executable. On the Peaq first-glimpse press kit at 390 / 768 / 1440 it adds the first Media
+Box image (+ → Original), freezes the flying copy at its first frame and checks, without
+screenshots, that it keeps the thumbnail: the box and its clip and corners, the image's rendered
+rect, its `object-fit` / `object-position` crop and its rendered source.
+

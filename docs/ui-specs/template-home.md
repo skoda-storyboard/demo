@@ -142,7 +142,7 @@ bands (`.story-rail-home`) and the promo box, so model, press, story and other r
 | Title hover (8, 11, 16, 21, 28, 29) | colour kept, no underline | `rgb(14,58,47)` + underline | white / black kept, `none` |
 | Date → title (12, 17, 22, 30) | 12px | 28px | 12px |
 | Date vs arrow after Next (15, 20, 25, 33) | 1440: date below the arrow band | date at 101 in the 84–116 band | date at 117.2, title at 140.2, as the source. At 375 the source overlaps too (date box ends 107.4 in both) |
-| Arrow icon (9, 13, 18, 23, 26, 31) | skoda-bnr-icons `\e00b`/`\e00c`: ink arrow on a 90% white disc, 32px | white chevron on an ink disc | the source glyph (`icons/rail-arrow-prev.svg` / `rail-arrow-next.svg` as a mask) |
+| Arrow icon (9, 13, 18, 23, 26, 31) | skoda-bnr-icons `\e00b`/`\e00c`: ink arrow on a 90% white disc, 32px | white chevron on an ink disc | the source glyph: since #284 the source font itself (`fonts/skoda-bnr-icons.woff2`, `\e00b` / `\e00c` 32/32, antialiased), so the stroke matches at every pixel ratio (an SVG mask drew it 1–4% heavier at 1–1.5x) |
 | Models rail (7) | 11 base models, editors' order, → `/en/tag/model/<x>` | 10 newest model pages incl. derivatives | the source 11, in order, via `order` (card 260.8 × 191.69, as the source) |
 | Pause rotation (1) | none | visible 113 × 44 | visually hidden until keyboard focus (then 113 × 44 at the same spot; WCAG 2.2.2) |
 

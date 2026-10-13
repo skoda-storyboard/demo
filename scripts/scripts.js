@@ -371,7 +371,9 @@ function prioritizeLeadImage(main) {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'en';
+  // the page language is its locale tree (SKODA-303a: the /cs/… translations are Czech)
+  const locale = window.location.pathname.split('/')[1]?.toLowerCase();
+  document.documentElement.lang = ['cs', 'de', 'sk', 'sr', 'sl'].includes(locale) ? locale : 'en';
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {

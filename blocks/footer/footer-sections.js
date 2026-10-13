@@ -103,10 +103,17 @@ function decorateColumns(section) {
   const columns = document.createElement('div');
   columns.className = 'footer-columns';
   let column;
-  items.forEach((el) => {
+  items.forEach((item) => {
+    let el = item;
     const isHeading = /^H[2-6]$/.test(el.tagName);
     // the pipeline's auto ids ("contacts", "company") would collide with page headings
     if (isHeading) el.removeAttribute('id');
+    // the source's widget titles are h3 (#275); the fragment authors them as h2
+    if (el.tagName === 'H2') {
+      const h3 = document.createElement('h3');
+      h3.append(...el.childNodes);
+      el = h3;
+    }
     if (!column || isHeading) {
       column = document.createElement('div');
       column.className = 'footer-column';

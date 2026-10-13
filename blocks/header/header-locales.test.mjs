@@ -1,6 +1,7 @@
 /*
- * Language switcher tests (SKODA-303): the pure helper (current locale, authored entries, the
- * list markup) and the header wiring on jsdom (topbar list + drawer copy from the nav fragment).
+ * Language switcher tests (SKODA-303, SKODA-303a): the pure helper (current locale, authored
+ * entries, declared translations, the list markup) and the header wiring on jsdom (topbar list
+ * + drawer copy from the nav fragment and the page's native hreflang links, #299 review).
  * Run: node --test blocks/header/header-locales.test.mjs
  */
 /* global globalThis */
@@ -9,18 +10,40 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import {
-  LOCALES, currentLocale, localeOf, localeEntries, isLocaleGroup, buildLocaleList, siblingHref, localizedPath,
+  LOCALES, currentLocale, localeOf, localeEntries, isLocaleGroup, buildLocaleList,
+  pageHreflangs, permittedTranslation,
 } from './header-locales.js';
 
 const BASE = 'https://main--demo--skoda-storyboard.aem.page/en/emobility/x';
+const LIVE = 'https://www.skoda-storyboard.com';
 // the nav as authored for EDS: locale URLs without a trailing slash (the EN home is /en)
 const AUTHORED = '<strong>EN</strong> <a href="/cs">CZ</a> <a href="/de">DE</a> <a href="/sk">SK</a> <a href="/sr">SR</a> <a href="/sl">SL</a>';
 // the Media Room nav: /{locale}/media-room, DE on the external skoda-media.de (as the source)
 const AUTHORED_MR = '<strong>EN</strong> <a href="/cs/media-room">CZ</a> <a href="https://www.skoda-media.de/">DE</a> <a href="/sk/media-room">SK</a> <a href="/sr/media-room">SR</a> <a href="/sl/media-room">SL</a>';
 const para = (html) => {
-  const { document } = new JSDOM(`<p>${html}</p>`).window;
+  const { document } = new JSDOM(`<p>${html}</p>`, { url: BASE }).window;
   return document.querySelector('p');
 };
+const rows = (ul) => [...ul.children].map((li) => li.firstElementChild).map((el) => [
+  el.textContent, el.tagName, el.getAttribute('href'), el.getAttribute('target'), el.getAttribute('aria-label'),
+]);
+// the hreflang URLs are absolute on the site's live host (build-locale-alternates.mjs --origin)
+const DEMO = 'https://main--demo--skoda-storyboard.aem.live';
+// the Epiq story's hreflang set as EDS renders it (self included; no SL translation)
+const EPIQ = [
+  ['en', `${DEMO}/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds`],
+  ['cs', `${DEMO}/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund`],
+  ['de', `${DEMO}/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds`],
+  ['sk', `${DEMO}/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund`],
+  ['sr', `${DEMO}/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds`],
+];
+const MEDIA_ROOM = ['en', 'cs', 'de', 'sk', 'sr', 'sl'].map((c) => [c, `${DEMO}/${c}/media-room`]);
+// a page whose head carries these `<link rel="alternate" hreflang href>` (plus any extra markup)
+const pageWith = (pairs, extra = '') => {
+  const head = pairs.map(([lang, href]) => `<link rel="alternate" hreflang="${lang}" href="${href}">`).join('');
+  return new JSDOM(`<html><head>${head}${extra}</head><body></body></html>`, { url: BASE }).window.document;
+};
+const declared = (pairs, extra) => pageHreflangs(pageWith(pairs, extra));
 
 test('currentLocale: the first path segment when it is a locale, else en', () => {
   assert.equal(currentLocale('/en/emobility/x'), 'en');
@@ -35,13 +58,13 @@ test('currentLocale: the first path segment when it is a locale, else en', () =>
 
 test('localeOf: from the href segment, else the label (CZ means cs)', () => {
   assert.equal(localeOf('/cs/', 'CZ', BASE), 'cs');
-  assert.equal(localeOf('https://www.skoda-storyboard.com/de/media-room/', 'x', BASE), 'de');
+  assert.equal(localeOf('https://www.skoda-storyboard.com/de/media-room', 'x', BASE), 'de');
   assert.equal(localeOf(null, 'EN', BASE), 'en');
   assert.equal(localeOf(null, ' cz ', BASE), 'cs');
   assert.equal(localeOf(null, 'sk', BASE), 'sk');
   assert.equal(localeOf('#subscribe', 'Subscribe to our stories', BASE), null, 'a fragment link is not the page locale');
   assert.equal(localeOf('sub/page', 'x', BASE), null, 'nor a relative one');
-  assert.equal(localeOf('/en/media-room/', 'Media Room', BASE), 'en', 'a link into a locale tree counts');
+  assert.equal(localeOf('/en/media-room', 'Media Room', BASE), 'en', 'a link into a locale tree counts');
 });
 
 test('localeEntries: source order, bold without href, junk and duplicates dropped', () => {
@@ -61,96 +84,112 @@ test('isLocaleGroup: needs two known locales (Subscribe is not a locale group)',
   assert.equal(isLocaleGroup(para('<strong>EN</strong>'), BASE), false);
 });
 
-test('buildLocaleList on an EN page: current span, links with hreflang / lang / endonym', () => {
+test('pageHreflangs: the head\'s native hreflang links; region, x-default, unknown and repeats handled', () => {
+  assert.deepEqual([...declared(EPIQ).keys()], ['en', 'cs', 'de', 'sk', 'sr']);
+  assert.equal(declared(EPIQ).get('cs'), `${DEMO}/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund`);
+  const messy = declared([
+    ['x-default', `${DEMO}/en`], ['de-AT', `${DEMO}/de/a`], ['fr', `${DEMO}/fr/b`], ['de', `${DEMO}/de/second`], ['SL', `${DEMO}/sl/d`],
+  ], '<link rel="alternate" hreflang="sk" href=""><link rel="alternate stylesheet" hreflang="sr" href="/sr/s"><link rel="canonical" hreflang="cs" href="/cs/c"><link rel="alternate" href="/cs/no-lang">');
+  assert.deepEqual([...messy], [['de', `${DEMO}/de/a`], ['sl', `${DEMO}/sl/d`]],
+    'x-default, unknown codes, empty hrefs, stylesheets, non-alternate links and repeats are skipped');
+  assert.equal(declared([]).size, 0);
+  // the old custom `alternates` meta is not a source any more (#299 review)
+  assert.equal(declared([], '<meta name="alternates" content="cs: /cs/x">').size, 0);
+});
+
+test('permittedTranslation: a page of this site in its own locale tree; never the live site', () => {
+  assert.equal(permittedTranslation('cs', '/cs/x', BASE), '/cs/x', 'a migrated EDS variant');
+  assert.equal(permittedTranslation('cs', 'https://main--demo--skoda-storyboard.aem.page/cs/x?a=1#b', BASE), '/cs/x?a=1#b', 'same host, absolute');
+  assert.equal(permittedTranslation('cs', `${DEMO}/cs/x`, BASE), '/cs/x', 'the site\'s live host: opened on this host');
+  assert.equal(permittedTranslation('cs', 'https://skoda-303a-locale-links--demo--skoda-storyboard.aem.page/cs/x', BASE), '/cs/x', 'another branch of the site');
+  assert.equal(permittedTranslation('cs', 'https://main--other--skoda-storyboard.aem.live/cs/x', BASE), null, 'another EDS site');
+  assert.equal(permittedTranslation('cs', 'https://main--demo--skoda-storyboard.aem.live.evil.example/cs/x', BASE), null, 'a look-alike host');
+  assert.equal(permittedTranslation('cs', `${DEMO}/cs/x`, 'https://www.example.com/en/x'), null, 'a custom domain accepts only itself');
+  // the host the page's own hreflang link names counts as this site (local dev, a new domain)
+  assert.equal(permittedTranslation('cs', `${DEMO}/cs/x`, 'http://localhost:3000/en/x', 'main--demo--skoda-storyboard.aem.live'), '/cs/x');
+  assert.equal(permittedTranslation('cs', 'https://evil.example/cs/x', 'http://localhost:3000/en/x', 'main--demo--skoda-storyboard.aem.live'), null);
+  assert.equal(permittedTranslation('cs', `${LIVE}/cs/x/`, BASE), null, 'the live site is not a target');
+  assert.equal(permittedTranslation('cs', '/de/x', BASE), null, 'another locale\'s tree');
+  assert.equal(permittedTranslation('cs', '/', BASE), null, 'the bare root');
+  assert.equal(permittedTranslation('cs', 'https://evil.example/cs/x', BASE), null, 'another host');
+  assert.equal(permittedTranslation('cs', '//evil.example/cs/x', BASE), null);
+  // eslint-disable-next-line no-script-url
+  assert.equal(permittedTranslation('cs', 'javascript:alert(1)', BASE), null);
+  assert.equal(permittedTranslation('cs', 'http://[bad', BASE), null, 'an unparsable URL');
+});
+
+test('Epiq story: only the declared translations, same tab, named by their language; SL left out', () => {
   const p = para(AUTHORED);
-  const ul = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument);
-  assert.equal(ul.tagName, 'UL');
+  const ul = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument, declared(EPIQ));
   assert.equal(ul.className, 'nav-locales-list');
   assert.equal(ul.getAttribute('aria-label'), 'Language');
-  const items = [...ul.children].map((li) => li.firstElementChild);
-  assert.deepEqual(items.map((el) => el.textContent), ['EN', 'CZ', 'DE', 'SK', 'SR', 'SL']);
-  const [en, ...links] = items;
-  assert.deepEqual([en.tagName, en.getAttribute('aria-current'), en.getAttribute('lang'), en.hasAttribute('href')], ['SPAN', 'true', 'en', false]);
-  assert.deepEqual(links.map((a) => [a.tagName, a.getAttribute('href'), a.getAttribute('hreflang'), a.getAttribute('lang'), a.getAttribute('aria-label')]), [
-    ['A', '/cs', 'cs', 'cs', 'Čeština'],
-    ['A', '/de', 'de', 'de', 'Deutsch'],
-    ['A', '/sk', 'sk', 'sk', 'Slovenčina'],
-    ['A', '/sr', 'sr', 'sr', 'Srpski'],
-    ['A', '/sl', 'sl', 'sl', 'Slovenščina'],
+  assert.equal(ul.dataset.linkPolicy, 'resolved', 'the site link pass leaves it alone');
+  assert.deepEqual(rows(ul), [
+    ['EN', 'SPAN', null, null, null],
+    ['CZ', 'A', '/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund', null, 'Čeština'],
+    ['DE', 'A', '/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds', null, 'Deutsch'],
+    ['SK', 'A', '/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund', null, 'Slovenčina'],
+    ['SR', 'A', '/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds', null, 'Srpski'],
+  ]);
+  const en = ul.querySelector('span');
+  assert.deepEqual([en.getAttribute('aria-current'), en.getAttribute('lang')], ['true', 'en']);
+  const langs = [...ul.querySelectorAll('a')].map((a) => [a.getAttribute('hreflang'), a.getAttribute('lang')]);
+  assert.deepEqual(langs, [['cs', 'cs'], ['de', 'de'], ['sk', 'sk'], ['sr', 'sr']]);
+});
+
+test('no declared translations: only the current language, never a locale-home fallback', () => {
+  const p = para(AUTHORED);
+  [new Map(), undefined, declared([['x-default', `${DEMO}/cs/x`]]), declared([['en', `${DEMO}/en/x`]])].forEach((translations) => {
+    const ul = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument, translations);
+    assert.deepEqual(rows(ul), [['EN', 'SPAN', null, null, null]]);
+  });
+});
+
+test('a declared translation that is not permitted is left out (no fallback)', () => {
+  const p = para(AUTHORED);
+  const translations = declared([['cs', 'https://evil.example/cs/x'], ['de', `${DEMO}/sk/wrong-tree`], ['sk', `${DEMO}/sk/ok`], ['sr', `${LIVE}/sr/live-only/`]]);
+  const ul = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument, translations);
+  assert.deepEqual(rows(ul).map((r) => [r[0], r[2]]), [['EN', null], ['SK', '/sk/ok']], 'a live-site URL never shows');
+});
+
+test('Media Room: the declared Media Rooms in the tab; DE takes the authored skoda-media.de in a new tab', () => {
+  const p = para(AUTHORED_MR);
+  const ul = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument, declared(MEDIA_ROOM));
+  assert.deepEqual(rows(ul), [
+    ['EN', 'SPAN', null, null, null],
+    ['CZ', 'A', '/cs/media-room', null, 'Čeština'],
+    ['DE', 'A', 'https://www.skoda-media.de/', '_blank', 'Deutsch (opens in a new tab)'],
+    ['SK', 'A', '/sk/media-room', null, 'Slovenčina'],
+    ['SR', 'A', '/sr/media-room', null, 'Srpski'],
+    ['SL', 'A', '/sl/media-room', null, 'Slovenščina'],
+  ]);
+  assert.equal(ul.querySelector('a[target]').getAttribute('rel'), 'noopener');
+});
+
+test('Media Room nav on a press release without a DE translation: no DE (as the source)', () => {
+  const p = para(AUTHORED_MR);
+  const zellmer = [
+    ['cs', `${DEMO}/cs/tiskove-zpravy-archiv/klaus-zellmer-odchazi-ze-spolecnosti-skoda-auto`],
+    ['sk', `${DEMO}/sk/tlacova-sprava/klaus-zellmer-odchadza-zo-spolocnosti-skoda-auto`],
+    ['sr', `${DEMO}/sr/press_release/skoda-auto-klaus-zellmer-napusta-kompaniju`],
+  ];
+  const ul = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument, declared(zellmer));
+  assert.deepEqual(rows(ul).map((r) => r[0]), ['EN', 'CZ', 'SK', 'SR']);
+  assert.equal(ul.querySelector('a[target]'), null);
+});
+
+test('a CZ page: CZ is current in place, EN links its declared translation', () => {
+  const p = para(AUTHORED);
+  const ul = buildLocaleList(localeEntries(p, BASE), 'cs', p.ownerDocument, declared([['en', `${DEMO}/en/x`], ['cs', `${DEMO}/cs/x`], ['de', `${DEMO}/de/y`]]));
+  assert.deepEqual(rows(ul).map((r) => [r[0], r[1], r[2]]), [
+    ['EN', 'A', '/en/x'], ['CZ', 'SPAN', null], ['DE', 'A', '/de/y'],
   ]);
 });
 
-test('buildLocaleList on a CZ page: CZ is current in place, the authored-bold EN links /en', () => {
-  const p = para(AUTHORED);
-  const ul = buildLocaleList(localeEntries(p, BASE), 'cs', p.ownerDocument);
-  const items = [...ul.children].map((li) => li.firstElementChild);
-  assert.deepEqual(items.map((el) => el.textContent), ['EN', 'CZ', 'DE', 'SK', 'SR', 'SL'], 'source order kept');
-  assert.equal(items[1].tagName, 'SPAN');
-  assert.equal(items[1].getAttribute('aria-current'), 'true');
-  assert.deepEqual([items[0].tagName, items[0].getAttribute('href'), items[0].getAttribute('aria-label')], ['A', '/en', 'English']);
-  assert.equal(ul.querySelectorAll('[aria-current]').length, 1);
-});
-
-test('siblingHref: the unlinked locale takes its siblings\' URL pattern', () => {
-  const e = (html) => localeEntries(para(html), BASE);
-  assert.equal(siblingHref('en', e(AUTHORED)), '/en');
-  assert.equal(siblingHref('en', e(AUTHORED_MR)), '/en/media-room', 'external DE is skipped as the pattern');
-  assert.equal(siblingHref('en', e('<strong>EN</strong> <a href="/cs/">CZ</a>')), '/en/', 'the authored form is kept');
-  assert.equal(siblingHref('cs', e('<a href="/en/media-room?x=1">EN</a> <strong>CZ</strong>')), '/cs/media-room?x=1');
-  assert.equal(siblingHref('en', e('<strong>EN</strong> <a href="https://www.skoda-media.de/">DE</a>')), '/en', 'no site path: the locale home');
-  assert.equal(siblingHref('en', []), '/en');
-});
-
-test('Media Room nav: /{locale}/media-room links, DE external in a new tab, EN on a CZ page', () => {
-  const p = para(AUTHORED_MR);
-  const ul = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument);
-  const links = [...ul.querySelectorAll('a')];
-  assert.deepEqual(links.map((a) => a.getAttribute('href')), ['/cs/media-room', 'https://www.skoda-media.de/', '/sk/media-room', '/sr/media-room', '/sl/media-room']);
-  const de = links[1];
-  assert.deepEqual([de.getAttribute('target'), de.getAttribute('rel'), de.getAttribute('aria-label'), de.textContent],
-    ['_blank', 'noopener', 'Deutsch (opens in a new tab)', 'DE']);
-  assert.ok(links.filter((a) => a !== de).every((a) => !a.hasAttribute('target')), 'site links stay in the tab');
-  const cz = buildLocaleList(localeEntries(p, BASE), 'cs', p.ownerDocument);
-  assert.equal(cz.querySelector('a[hreflang="en"]').getAttribute('href'), '/en/media-room');
-});
-
-test('localizedPath: only the locale segment changes; null outside a locale tree', () => {
-  assert.equal(localizedPath('/en/emobility/skoda-epiq-x', 'cs'), '/cs/emobility/skoda-epiq-x');
-  assert.equal(localizedPath('/en/press-releases/936-km', 'sk'), '/sk/press-releases/936-km');
-  assert.equal(localizedPath('/en/media-room', 'de'), '/de/media-room');
-  assert.equal(localizedPath('/en', 'sl'), '/sl');
-  assert.equal(localizedPath('/cs/e-mobilita-cs/y/', 'en'), '/en/e-mobilita-cs/y/', 'a trailing slash is kept as is');
-  assert.equal(localizedPath('/CS/x', 'en'), '/en/x');
-  assert.equal(localizedPath('/', 'cs'), null);
-  assert.equal(localizedPath('/drafts/skoda-303', 'cs'), null);
-  assert.equal(localizedPath('/english/x', 'cs'), null, 'a segment that merely starts with a code');
-  assert.equal(localizedPath('', 'cs'), null);
-});
-
-test('buildLocaleList with the page path: every locale links this page in that locale', () => {
-  const p = para(AUTHORED);
-  const ul = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument, '/en/emobility/skoda-epiq-x');
-  assert.deepEqual([...ul.querySelectorAll('a')].map((a) => a.getAttribute('href')),
-    ['/cs/emobility/skoda-epiq-x', '/de/emobility/skoda-epiq-x', '/sk/emobility/skoda-epiq-x', '/sr/emobility/skoda-epiq-x', '/sl/emobility/skoda-epiq-x']);
-  // from a CZ page, the (authored-bold) EN keeps the path too
-  const cz = buildLocaleList(localeEntries(p, BASE), 'cs', p.ownerDocument, '/cs/emobility/skoda-epiq-x');
-  assert.equal(cz.querySelector('a[hreflang="en"]').getAttribute('href'), '/en/emobility/skoda-epiq-x');
-  // outside a locale tree the authored targets stay
-  const root = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument, '/');
-  assert.equal(root.querySelector('a[hreflang="cs"]').getAttribute('href'), '/cs');
-});
-
-test('buildLocaleList with the page path: an authored external link still wins (Media Room DE)', () => {
-  const p = para(AUTHORED_MR);
-  const ul = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument, '/en/press-releases/936-km');
-  const hrefs = [...ul.querySelectorAll('a')].map((a) => [a.textContent, a.getAttribute('href'), a.getAttribute('target')]);
-  assert.deepEqual(hrefs, [
-    ['CZ', '/cs/press-releases/936-km', null],
-    ['DE', 'https://www.skoda-media.de/', '_blank'],
-    ['SK', '/sk/press-releases/936-km', null],
-    ['SR', '/sr/press-releases/936-km', null],
-    ['SL', '/sl/press-releases/936-km', null],
-  ]);
+test('a locale the nav row does not list is not shown, even when declared', () => {
+  const p = para('<strong>EN</strong> <a href="/cs">CZ</a> <a href="/de">DE</a>');
+  const ul = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument, declared([['cs', `${DEMO}/cs/a`], ['sl', `${DEMO}/sl/b`]]));
+  assert.deepEqual(rows(ul).map((r) => r[0]), ['EN', 'CZ']);
 });
 
 test('buildLocaleList: nothing to build returns null; every LOCALES code has a label and name', () => {
@@ -160,7 +199,7 @@ test('buildLocaleList: nothing to build returns null; every LOCALES code has a l
 });
 
 // --- header wiring (real decorate on jsdom, nav fragment served by a fetch stub) -----------
-const NAV = `<div><ul><li><a href="/en/">Stories</a></li><li><a href="/en/media-room/">Media Room</a></li></ul>
+const NAV = `<div><ul><li><a href="/en/">Stories</a></li><li><a href="/en/media-room">Media Room</a></li></ul>
 <p><a href="#subscribe">Subscribe to our stories</a></p><p>${AUTHORED}</p></div>
 <div><p><a href="/en/" title="Škoda Storyboard, home">Škoda Storyboard</a></p></div>
 <div><ul><li><a href="/en/category/models">Models</a></li></ul></div>
@@ -177,18 +216,27 @@ window.matchMedia = () => ({ matches: false, addEventListener() {}, removeEventL
 window.hlx = { codeBasePath: '' };
 globalThis.fetch = async (url) => (String(url).includes('/nav.plain.html')
   ? { ok: true, status: 200, text: async () => NAV }
-  : { ok: false, status: 404, text: async () => '', json: async () => ({}) });
+  : {
+    ok: false, status: 404, text: async () => '', json: async () => ({}),
+  });
 const { default: decorateHeader } = await import('./header.js');
 
-async function renderHeader(path) {
+// the page's native hreflang links (and any other head markup), as EDS renders them
+function setHead(pairs = [], extra = '') {
+  document.head.querySelectorAll('link[rel~="alternate"], meta[name="alternates"]').forEach((el) => el.remove());
+  document.head.insertAdjacentHTML('beforeend', pairs.map(([lang, href]) => `<link rel="alternate" hreflang="${lang}" href="${href}">`).join('') + extra);
+}
+
+async function renderHeader(path, pairs = [], extra = '') {
   window.history.replaceState({}, '', path);
+  setHead(pairs, extra);
   const block = document.querySelector('.header');
   await decorateHeader(block);
   return block;
 }
 
 test('header: the topbar group becomes a <div> list and the drawer gets an identical copy', async () => {
-  const block = await renderHeader('/en/emobility/x');
+  const block = await renderHeader('/en/emobility/x', EPIQ);
   const topbar = block.querySelector('.nav-topbar .nav-topbar-locales');
   assert.ok(topbar, 'topbar locale group');
   assert.equal(topbar.tagName, 'DIV');
@@ -196,19 +244,57 @@ test('header: the topbar group becomes a <div> list and the drawer gets an ident
   assert.equal(topbar.querySelector('p, strong'), null, 'no authored markup left');
   const drawer = block.querySelector('nav .nav-locales .nav-locales-list');
   assert.ok(drawer, 'drawer copy');
-  assert.equal(drawer.outerHTML, topbar.querySelector('.nav-locales-list').outerHTML);
+  assert.equal(drawer.outerHTML, topbar.querySelector('.nav-locales-list').outerHTML, 'desktop and mobile use the same mapping');
   assert.equal(topbar.querySelector('[aria-current]').textContent, 'EN');
-  const czechLink = topbar.querySelector('a[hreflang="cs"]');
-  assert.equal(czechLink.getAttribute('href'), 'https://www.skoda-storyboard.com/cs');
-  assert.equal(czechLink.target, '_blank');
-  assert.match(czechLink.rel, /noopener/);
+  // SKODA-303a: the page's declared translation, in the same tab; no SL (none declared)
+  const cz = topbar.querySelector('a[hreflang="cs"]');
+  const czState = [cz.getAttribute('href'), cz.getAttribute('target'), cz.getAttribute('aria-label')];
+  assert.deepEqual(czState, ['/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund', null, 'Čeština']);
+  assert.equal(topbar.querySelector('a[hreflang="sl"]'), null);
   // Subscribe is untouched
   assert.ok(block.querySelector('.nav-topbar p.nav-topbar-utility a.nav-subscribe'));
 });
 
-test('header on a /cs/ page marks CZ current (the authored bold EN turns into a link)', async () => {
-  const block = await renderHeader('/cs/e-mobilita-cs/y');
+test('header: a page without hreflang links shows only the current language', async () => {
+  const block = await renderHeader('/en/emobility/untranslated');
+  const list = block.querySelector('.nav-topbar .nav-locales-list');
+  assert.deepEqual([...list.children].map((li) => li.textContent), ['EN']);
+});
+
+test('header on a /cs/ page marks CZ current; EN links its declared translation', async () => {
+  const block = await renderHeader('/cs/e-mobilita-cs/y', [['en', `${DEMO}/en/emobility/y`], ['cs', `${DEMO}/cs/e-mobilita-cs/y`]]);
   const list = block.querySelector('.nav-topbar .nav-locales-list');
   assert.equal(list.querySelector('[aria-current]').textContent, 'CZ');
-  assert.equal(list.querySelector('a[hreflang="en"]').getAttribute('href'), '/en/e-mobilita-cs/y', 'the path is kept');
+  assert.equal(list.querySelector('a[hreflang="en"]').getAttribute('href'), '/en/emobility/y');
+});
+
+test('header: a Czech hreflang link alone gives CZ; a conflicting custom alternates meta is ignored (#299)', async () => {
+  // the reviewer's reproduction: native cs hreflang only → CZ shows; the old meta must not win
+  const block = await renderHeader('/en/emobility/x', [['cs', `${DEMO}/cs/e-mobilita-cs/native`]], '<meta name="alternates" content="cs: /cs/from-the-meta, de: /de/from-the-meta">');
+  const list = block.querySelector('.nav-topbar .nav-locales-list');
+  assert.deepEqual([...list.querySelectorAll('a')].map((a) => [a.getAttribute('hreflang'), a.getAttribute('href')]), [
+    ['cs', '/cs/e-mobilita-cs/native'],
+  ]);
+});
+
+test('header: x-default is not a language; the current language stays plain text', async () => {
+  const block = await renderHeader('/en/emobility/x', [['en', `${DEMO}/en/emobility/x`], ['x-default', `${DEMO}/en/emobility/x`], ['de', `${DEMO}/de/x`]]);
+  const list = block.querySelector('.nav-topbar .nav-locales-list');
+  assert.deepEqual([...list.children].map((li) => [li.textContent, li.firstElementChild.tagName]), [['EN', 'SPAN'], ['DE', 'A']]);
+});
+
+test('locally (no EDS host): the page\'s own hreflang host makes its translations this site', () => {
+  const doc = new JSDOM(`<html><head>${EPIQ.map(([l, h]) => `<link rel="alternate" hreflang="${l}" href="${h}">`).join('')}</head><body><p>${AUTHORED}</p></body></html>`, { url: 'http://localhost:3000/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds' }).window.document;
+  const p = doc.querySelector('p');
+  const ul = buildLocaleList(localeEntries(p, doc.baseURI), 'en', doc, pageHreflangs(doc));
+  assert.deepEqual(rows(ul).map((r) => [r[0], r[2]]), [
+    ['EN', null],
+    ['CZ', '/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund'],
+    ['DE', '/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds'],
+    ['SK', '/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund'],
+    ['SR', '/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds'],
+  ]);
+  // without the self link, another host's translations are not trusted
+  const noSelf = new Map([...pageHreflangs(doc)].filter(([c]) => c !== 'en'));
+  assert.deepEqual(rows(buildLocaleList(localeEntries(p, doc.baseURI), 'en', doc, noSelf)).map((r) => r[0]), ['EN']);
 });

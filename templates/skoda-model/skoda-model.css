@@ -355,7 +355,8 @@ body.skoda-model .model-rail .default-content-wrapper {
   margin-bottom: var(--grid-gutter);
 }
 
-body.skoda-model .model-rail .default-content-wrapper > h2 {
+/* the source h3.search-results-heading (26/32.5/600): h3 since #284, h2 on older imports */
+body.skoda-model .model-rail .default-content-wrapper > :is(h2, h3) {
   margin: 0;
   font-size: var(--heading-font-size-l);
   font-weight: var(--weight-semibold);

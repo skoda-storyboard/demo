@@ -109,7 +109,7 @@
   --media-card-title-line: 18px;
   --media-card-button: 40px;
   --media-card-button-gap: 8px;
-  --media-card-icon: 16px;
+  --media-card-icon: calc(16px * 1080 / 1024); /* the faux-bold glyph's 1080-unit box around its 16px em (#275) */
 }
 
 .carousel.media .carousel-track .card-teaser {
@@ -127,10 +127,15 @@
   margin: 0;
 }
 
-/* source: a 44px date row (10px padding), then a two-line 15/18 title with 10px below */
+/* source: a 44px date row (10px padding), then a two-line 15/18 title with 10px below. Its 11px
+   date is an inline span on the row's 16/24 baseline, 2px under the line's centre: the row
+   stays 44px, the text sits 2px lower, 14px above the title (#284) */
 .carousel.media .card-teaser-date {
+  --media-card-date-baseline: 2px;
+
   margin: 0;
-  padding: var(--media-card-pad) 0;
+  padding: calc(var(--media-card-pad) + var(--media-card-date-baseline)) 0
+    calc(var(--media-card-pad) - var(--media-card-date-baseline));
   color: var(--skoda-grey-350);
   line-height: var(--media-card-date-row);
 }
@@ -199,6 +204,7 @@
 .carousel.media .card-teaser:has([data-in-cart]) .card-teaser-image::before {
   background-size: var(--cart-added-glyph);
   opacity: 1;
+  transition-delay: var(--cart-added-delay);
 }
 
 .carousel.media .card-teaser-button.add[data-in-cart] {
@@ -233,7 +239,7 @@
   pointer-events: none;
 }
 
-/* --- arrows: 32px transparent button, ink icon-disc, white chevron -------- */
+/* --- arrows: 32px transparent button, ink icon-disc, the source arrow glyph --- */
 .carousel-arrow {
   position: absolute;
   top: 50%;
@@ -242,6 +248,7 @@
   height: var(--carousel-arrow-size);
   padding: 0;
   border: 0;
+  border-radius: 50%;
   background: transparent;
   transform: translateY(-50%);
   cursor: pointer;
@@ -266,24 +273,40 @@
   transform: scale(0.95);
 }
 
-/* the white chevron (two borders of a rotated box) */
+/* the source glyph, drawn as the source draws it (skoda-bnr-icons \e00b / \e00c at 32/32, 90%
+   white, antialiased; the font is in styles/fonts.css): a white disc with the arrow cut out
+   over the ink disc, so the arrow reads ink on white. A glyph is rasterised as text, which an
+   SVG mask is not: as a mask the arrow drew 1–4% heavier at 1–1.5x (#284). Every rail's
+   arrows, the home bands' (#272) and the model pages' (#284) alike. Decorative: the button's
+   aria-label names it (the empty alt text keeps the glyph out of the accessible name) */
 .carousel-arrow::after {
-  content: "";
+  content: "\e00b"; /* browsers without CSS alt text (Firefox < 128) keep the glyph */
+  content: "\e00b" / "";
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0.5em;
-  height: 0.5em;
-  border-top: 2px solid var(--skoda-white);
-  border-right: 2px solid var(--skoda-white);
-}
-
-.carousel-prev::after {
-  transform: translate(-30%, -50%) rotate(-135deg);
+  inset: 0;
+  color: color-mix(in srgb, var(--skoda-white) 90%, transparent);
+  font-family: var(--carousel-arrow-font);
+  font-size: var(--carousel-arrow-size);
+  font-weight: 400;
+  line-height: var(--carousel-arrow-size);
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .carousel-next::after {
-  transform: translate(-70%, -50%) rotate(45deg);
+  content: "\e00c";
+  content: "\e00c" / "";
+}
+
+/* Windows High Contrast / forced colors: the ink disc's background is reset to the canvas;
+   the glyph keeps the button text colour, so the disc and its cut-out arrow stay visible */
+@media (forced-colors: active) {
+  .carousel-arrow::after {
+    /* stylelint-disable-next-line scale-unlimited/declaration-strict-value -- a system colour */
+    color: buttontext;
+    forced-color-adjust: none;
+  }
 }
 
 /* disabled at a track end → fade out (source :disabled{opacity:0}) */
@@ -292,9 +315,13 @@
   pointer-events: none;
 }
 
-.carousel-arrow:focus-visible {
-  outline: 2px solid var(--facet-active);
-  outline-offset: 2px;
+/* focus: the source's 5px blue ring round the button on any focus, a click or tap included, as
+   .flickity-button:focus (#284). The transparent outline is what forced colors draw instead (they
+   drop box-shadows), so keyboard focus stays visible there */
+.carousel-arrow:focus {
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  box-shadow: var(--carousel-focus-ring);
 }
 
 /* --- dots (optional `carousel (dots)` variant; default off) --------------- */

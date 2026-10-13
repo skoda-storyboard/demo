@@ -257,8 +257,10 @@ body.gallery-lightbox-open {
 /* the source icon-font glyphs (add, download at 16px; link at 24px), masked in ink */
 .gallery-lightbox-action::before {
   content: '';
-  width: var(--lightbox-action-icon, 16px);
-  height: var(--lightbox-action-icon, 16px);
+
+  /* the faux-bold glyphs' 1080-unit box around their 16px em (the link: 1064 around 24px, #275) */
+  width: var(--lightbox-action-icon, calc(16px * 1080 / 1024));
+  height: var(--lightbox-action-icon, calc(16px * 1080 / 1024));
   background-color: currentcolor;
   mask: var(--lightbox-glyph) center / contain no-repeat;
 }
@@ -287,7 +289,7 @@ body.gallery-lightbox-open {
 
 .gallery-lightbox-action.link {
   --lightbox-glyph: url('../icons/media-link.svg');
-  --lightbox-action-icon: var(--lightbox-icon);
+  --lightbox-action-icon: calc(var(--lightbox-icon) * 1064 / 1024);
 }
 
 /* no buttons (content images such as the model drawings): the source's empty actions row
