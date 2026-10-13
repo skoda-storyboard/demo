@@ -93,7 +93,8 @@ function buildHeader(cfg) {
   const header = el('div', 'newsletter-stub-header');
   if (picture) header.append(picture);
   if (hasHeading) {
-    const heading = el('h2', 'newsletter-stub-heading');
+    // h3, as the source widget's heading in the story sidebar (#296); styled by its class
+    const heading = el('h3', 'newsletter-stub-heading');
     moveInline(cfg.heading, heading);
     header.append(heading);
   }

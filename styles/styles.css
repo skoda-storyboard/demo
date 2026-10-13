@@ -778,7 +778,7 @@ main > .section.media-box > .default-content-wrapper {
   margin-block-end: var(--paragraph-gap);
 }
 
-main > .section.media-box > .default-content-wrapper > h2 {
+main > .section.media-box > .default-content-wrapper > :is(h2, h3) {
   margin: 0;
   color: inherit;
   font-size: var(--media-box-title-size);
@@ -940,9 +940,9 @@ main > .section.dark.cards-container:has(.cards.social) {
    content sits the source's 10px in from the edge and fills the column (no measure
    cap, as on the source). Story prose scale is measured (story-detail.md §3,
    re-measured on the live Epiq story): body p 16/24; h2 24/27 → 40/45 and h3
-   20/23 → 24/27.6 above 768px, all wt300 with a 16px gap below; prose lists use a
-   custom bullet (list-style:none, padding 1.5em). Scoped to the story body column
-   so global heading sizes stay intact. */
+   20/23 → 24/27.6 above 768px, all wt300 (bold heading text: below) with a 16px gap
+   below; prose lists use a custom bullet (list-style:none, padding 1.5em). Scoped to the
+   story body column so global heading sizes stay intact. */
 body.story main > .section.body-column > div {
   padding-inline: var(--story-inset);
 }
@@ -964,6 +964,35 @@ body.story main > .section.body-column .default-content-wrapper h3 {
   font-size: var(--heading-font-size-story-h3-mobile);
   font-weight: var(--weight-light);
   line-height: 1.15;
+}
+
+/* A heading the source sets bold (<h3><strong>, most story h3: KYL's sub-headings) keeps its
+   <strong> through the import (story-flatten markBoldHeadings / restoreBoldHeadings) and is 600,
+   the source's weight, not `bolder` (400 on a 300 heading). Unbolded ones, e.g. Slavia's
+   "Technical improvements", stay 300 (#296). */
+body.story main > .section.body-column .default-content-wrapper :is(h2, h3) strong {
+  font-weight: var(--weight-semibold);
+}
+
+/* Source widgets are 24px apart from 720px (#296, KYL measured at 375–1440):
+   - every body heading starts its own SiteOrigin widget (59 of 59 across the 21 demo
+     stories), so after a paragraph it sits 20 + 24 = 44px down ("Careful Planning",
+     "During the travels…"; 20px below 720, the collapsed margins as here);
+   - the text after a split row (Columns split-NN, the quote | portrait rows) starts below
+     the row's 10px cell padding, plus the gap from 720 ("Škoda Kylaq sets out…": 10 / 34px
+     under the row on the source, 0 here). */
+body.story main > .section.body-column .columns-wrapper:has(> .columns.split) + .default-content-wrapper > :first-child {
+  margin-block-start: var(--story-inset);
+}
+
+@media (width >= 720px) {
+  body.story main > .section.body-column .default-content-wrapper > p + :is(h2, h3) {
+    margin-block-start: calc(var(--paragraph-gap) + var(--spacing-l));
+  }
+
+  body.story main > .section.body-column .columns-wrapper:has(> .columns.split) + .default-content-wrapper > :first-child {
+    margin-block-start: calc(var(--story-inset) + var(--spacing-l));
+  }
 }
 
 /* Story intro under the hero (measured on the live Epiq story header): the perex
@@ -1045,7 +1074,7 @@ body.story main > .section.sidebar > div {
   padding-inline: var(--story-sidebar-inset);
 }
 
-body.story main > .section.sidebar .default-content-wrapper > h2 {
+body.story main > .section.sidebar .default-content-wrapper > :is(h2, h3) {
   margin: 0;
   color: var(--skoda-grey-800);
   font-size: var(--story-sidebar-heading-size-compact);
@@ -1095,6 +1124,15 @@ body.story main > .section.body-column:has(+ .section:is(.highlight-dark, .highl
 body.story main > .section:is(.highlight-dark, .highlight-grey) + .section.body-column {
   margin-block-start: 0;
   padding-block-start: var(--story-inset);
+}
+
+/* …plus the 24px between source widgets from 720px (the panel and the text after it are two
+   widgets; KYL "The Kylaq P2P Expedition in Numbers" panel → text: 34px at 768–1440, 10 below,
+   #296), as the heading gap above */
+@media (width >= 720px) {
+  body.story main > .section:is(.highlight-dark, .highlight-grey) + .section.body-column {
+    padding-block-start: calc(var(--story-inset) + var(--spacing-l));
+  }
 }
 
 body.story main > .section.highlight-dark:has(+ .section.highlight-dark),
@@ -1238,15 +1276,25 @@ body.story main > .section.media-box + .section.dark.story-rail-container {
   margin-block-start: var(--story-dark-band-gap);
 }
 
+/* A Media Box that ends the story (no Related Stories, as on the Kylaq story) keeps the source
+   band's 24px bottom margin before the footer, like the related band (#296; it touched it). */
+body.story main > .section.media-box:last-child {
+  margin-block-end: var(--spacing-l);
+}
+
 body.story main > .section.dark.story-rail-container > div {
   padding-inline: 0;
 }
 
+/* 20px from the heading block (title, and "Based on tags: …" when there is one) to the cards, as
+   the source header's margin: with no tags line the cards sat right under the title (#296). The
+   title is h3 on the source and in new imports, h2 in older ones (#296): both look the same. */
 body.story main > .section.dark.story-rail-container .default-content-wrapper {
+  margin-block-end: var(--paragraph-gap);
   padding-inline: var(--related-band-heading-inset);
 }
 
-body.story main > .section.dark.story-rail-container .default-content-wrapper h2 {
+body.story main > .section.dark.story-rail-container .default-content-wrapper :is(h2, h3) {
   margin: 0;
   color: var(--skoda-white);
   font-size: var(--related-band-heading-compact);
@@ -1255,7 +1303,7 @@ body.story main > .section.dark.story-rail-container .default-content-wrapper h2
 }
 
 body.story main > .section.dark.story-rail-container .default-content-wrapper p {
-  margin-block: 0 var(--paragraph-gap);
+  margin-block: 0;
   color: var(--related-band-subtitle-color);
   font-size: var(--body-font-size-m);
   font-weight: var(--weight-semibold);
@@ -1274,11 +1322,11 @@ body.story {
     --media-box-title-size: var(--heading-font-size-l);
   }
 
-  body.story main > .section.sidebar .default-content-wrapper > h2 {
+  body.story main > .section.sidebar .default-content-wrapper > :is(h2, h3) {
     font-size: var(--body-font-size-m);
   }
 
-  body.story main > .section.dark.story-rail-container .default-content-wrapper h2 {
+  body.story main > .section.dark.story-rail-container .default-content-wrapper :is(h2, h3) {
     font-size: var(--heading-font-size-l);
   }
 }

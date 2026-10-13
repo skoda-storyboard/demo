@@ -12,6 +12,8 @@
  *   Exception: LIVE_SAME_TAB pages (the newsletter "Manage subscription") stay in the tab, as
  *   on the source (SKODA-308).
  * - A trailing slash on any other site-relative path is dropped: EDS 404s `/en/`, serves `/en`.
+ * - Links inside `[data-link-policy="resolved"]` are left alone: their block already chose
+ *   the target and the tab (the language switcher's translations, SKODA-303a).
  */
 
 export const LIVE_ORIGIN = 'https://www.skoda-storyboard.com';
@@ -100,6 +102,7 @@ export function policyHref(href, base) {
 }
 
 function applyTo(a, base) {
+  if (a.closest('[data-link-policy="resolved"]')) return;
   const result = policyHref(a.getAttribute('href'), base);
   if (!result) return;
   if (result.href !== a.getAttribute('href')) a.setAttribute('href', result.href);

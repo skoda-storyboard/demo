@@ -287,6 +287,35 @@ export function groupTags(hrefs = []) {
   return { tags, byFacet };
 }
 
+// The site's locales, in the switcher's order (blocks/header/header-locales.js LOCALES).
+export const ALTERNATE_LOCALES = ['en', 'cs', 'de', 'sk', 'sr', 'sl'];
+
+/**
+ * The page's hreflang set (SKODA-303a, #299 review): the source head's
+ * `<link rel="alternate" hreflang href>`, as `[code, url]` pairs in ALTERNATE_LOCALES order, the
+ * page's own language included (self-hreflang) and `x-default` last when the source declares it.
+ * Dropped: unsupported codes (a region subtag is ignored, `de-AT` → de), non-http(s) URLs, URLs
+ * outside their locale's tree (x-default may point anywhere); the first per code wins.
+ * build-locale-alternates.mjs keeps the pairs migrated to EDS and writes them as native
+ * `hreflang:<code>` metadata, which EDS renders in the head for SEO and the header's switcher.
+ * @param {Array<[string, string]>} links [hreflang, href] pairs in source order
+ * @returns {Array<[string, string]>}
+ */
+export function pickHreflang(links = []) {
+  const found = new Map();
+  links.forEach(([lang, href]) => {
+    const tag = String(lang || '').trim().toLowerCase();
+    const code = tag === 'x-default' ? tag : tag.split('-')[0];
+    if ((code !== 'x-default' && !ALTERNATE_LOCALES.includes(code)) || found.has(code)) return;
+    let url;
+    try { url = new URL(href); } catch (e) { return; }
+    if (!/^https?:$/.test(url.protocol)) return;
+    if (code !== 'x-default' && (url.pathname.split('/')[1] || '').toLowerCase() !== code) return;
+    found.set(code, url.href);
+  });
+  return [...ALTERNATE_LOCALES, 'x-default'].filter((c) => found.has(c)).map((c) => [c, found.get(c)]);
+}
+
 /** Split a comma list into trimmed non-empty tokens. */
 export function splitList(value) {
   return value ? String(value).split(',').map((s) => s.trim()).filter(Boolean) : [];
