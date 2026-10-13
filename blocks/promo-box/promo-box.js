@@ -114,7 +114,7 @@ async function getCards(source) {
 /** The promo's templates: one or a comma list (the Media Room mixes press releases and kits). */
 function promoTemplates(config) {
   const list = (config.template || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
-  return list.length ? list : ['story'];
+  return list.length ? [...new Set(list)] : ['story'];
 }
 
 /**

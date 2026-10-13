@@ -381,3 +381,18 @@ test('a template list mixes press releases and press kits, newest first across b
   });
   assert.deepEqual(chosen.map((r) => r.title), ['Kit K', 'Release A', 'Release B']);
 });
+
+test('repeated template names do not duplicate cards or displace distinct posts', () => {
+  const rows = [
+    { path: '/en/a', title: 'A', template: 'press_release', date: '2026-10-12' },
+    { path: '/en/b', title: 'B', template: 'press_kit', date: '2026-10-11' },
+    { path: '/en/c', title: 'C', template: 'press_release', date: '2026-10-10' },
+  ];
+  [
+    'press_release, press_kit, press_release',
+    ' press_release, PRESS_RELEASE, press_kit, PRESS_KIT ',
+  ].forEach((template) => {
+    const chosen = selectPromoRows(rows, { template, path: '/en/', limit: 3 });
+    assert.deepEqual(chosen.map((r) => r.path), ['/en/a', '/en/b', '/en/c'], template);
+  });
+});
