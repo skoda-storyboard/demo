@@ -407,6 +407,24 @@ test('lite-youtube: the hydrated player becomes a bare YouTube watch URL (SKODA-
   assert.ok(!body.some((n) => n.querySelector('img[src*="ytimg.com"], lite-youtube, a[href*="youtube-nocookie"]')), 'no poster or player chrome');
 });
 
+test('a full-width fixed-height YouTube iframe keeps its box as Embed url + height; a sized one stays a bare URL', { skip }, () => {
+  const playDoh = 'https://www.youtube.com/embed/T9iRrU7EjD8?si=s0PTkkFFmASxwRNQ';
+  const { sections } = importPage('superb', (doc) => {
+    doc.querySelector('.column-primary .entry-content').insertAdjacentHTML('beforeend', `
+      <div class="embed-controller-wrapper"><iframe width="100%" height="448px" data-src="${playDoh}" title="YouTube video player" frameborder="0" allowfullscreen></iframe></div>
+      <p><iframe width="500" height="281" src="https://www.youtube.com/embed/m9RlQw2FGjc?feature=oembed&amp;enablejsapi=1"></iframe></p>`);
+  });
+  const body = sections[1].nodes;
+  const embed = body.find((n) => n.tagName === 'TABLE' && blockName(n) === 'Embed');
+  assert.ok(embed, 'an Embed table, not flattened as a source data table');
+  const rows = [...embed.querySelectorAll('tr')].slice(1).map((tr) => [...tr.children].map((td) => txt(td)));
+  assert.deepEqual(rows, [['url', playDoh], ['height', '448']]);
+  assert.equal(embed.querySelector('a').getAttribute('href'), playDoh);
+  assert.equal(embed.hasAttribute('data-skoda-embed'), false, 'no import marker reaches DA');
+  assert.ok(body.some((n) => n.tagName === 'P' && n.querySelector('a')?.getAttribute('href') === 'https://www.youtube.com/embed/m9RlQw2FGjc?feature=oembed&enablejsapi=1'),
+    'a 500×281 iframe is the ratio player, a bare URL');
+});
+
 test('tags: the "+N" show-more toggle is skipped and the tags it reveals are kept', { skip }, () => {
   const before = rowsOf(find(importPage('peaq').sections, 'Tags'))[0].querySelectorAll('a').length;
   const { sections } = importPage('peaq', (doc) => {

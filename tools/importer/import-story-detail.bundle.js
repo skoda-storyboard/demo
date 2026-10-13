@@ -442,6 +442,8 @@ var CustomImportScript = (() => {
       case "editor":
         nodes = editorNodes(panel, document2);
         break;
+      // carousel-widget routes by content (Cards if teasers-with-links, else Gallery (slider));
+      // sow-slider is always an image slider → Gallery.
       case "carousel":
         cells = carouselCells(panel, document2);
         break;
@@ -751,8 +753,8 @@ var CustomImportScript = (() => {
       return id ? `https://www.youtube.com/watch?v=${id}` : "";
     }
     const src = el.getAttribute("src") || el.getAttribute("data-src") || "";
-    const yt = src.match(/youtube(?:-nocookie)?\.com\/embed\/([\w-]{6,})/i);
-    if (yt) return `https://www.youtube.com/watch?v=${yt[1]}`;
+    const yt = src.match(/(youtube(?:-nocookie)?\.com)\/embed\/([\w-]{6,})(\?[^#]*)?/i);
+    if (yt) return `https://www.${yt[1].toLowerCase()}/embed/${yt[2]}${yt[3] || ""}`;
     const vimeo = src.match(/player\.vimeo\.com\/video\/(\d+)/i);
     if (vimeo) return `https://vimeo.com/${vimeo[1]}`;
     return "";

@@ -321,6 +321,14 @@ var CustomImportScript = (() => {
   function urlParagraph(document, url) {
     return make(document, "p", link(document, url, url));
   }
+  function embedFor(document, iframe, url) {
+    const video = /(?:^|\.)(?:youtube(?:-nocookie)?\.com|youtu\.be|vimeo\.com)\//i.test(url.replace(/^https?:\/\//, ""));
+    const fixed = video && (iframe.getAttribute("width") || "").trim() === "100%" && ((iframe.getAttribute("height") || "").trim().match(/^(\d+)(?:px)?$/) || [])[1];
+    if (!fixed) return urlParagraph(document, url);
+    const table = WebImporter.DOMUtils.createTable([["Embed"], ["url", link(document, url, url)], ["height", fixed]], document);
+    table.dataset.skodaEmbed = "";
+    return table;
+  }
   function titleContent(document, h1) {
     const lines = [[]];
     const walk = (node) => node.childNodes.forEach((child) => {
@@ -403,7 +411,7 @@ var CustomImportScript = (() => {
     content.querySelectorAll(".embed-controller-wrapper").forEach((wrap) => {
       const iframe = wrap.querySelector("iframe");
       const url = iframe && (iframe.getAttribute("data-src") || iframe.getAttribute("src"));
-      wrap.replaceWith(...url ? [urlParagraph(document, url)] : []);
+      wrap.replaceWith(...url ? [embedFor(document, iframe, url)] : []);
     });
     content.querySelectorAll("lite-youtube").forEach((el) => {
       const id = (el.getAttribute("videoid") || "").trim();
@@ -425,7 +433,7 @@ var CustomImportScript = (() => {
     content.querySelectorAll("iframe").forEach((iframe) => {
       const url = iframe.getAttribute("src") || iframe.getAttribute("data-src");
       const p = iframe.closest("p");
-      const replacement = url && /^https?:/.test(url) ? urlParagraph(document, url) : null;
+      const replacement = url && /^https?:/.test(url) ? embedFor(document, iframe, url) : null;
       if (p && text3(p) === "") p.replaceWith(...replacement ? [replacement] : []);
       else iframe.replaceWith(...replacement ? [replacement] : []);
     });
@@ -445,6 +453,10 @@ var CustomImportScript = (() => {
   }
   function dataTables(document, content) {
     content.querySelectorAll("table").forEach((table) => {
+      if (table.hasAttribute("data-skoda-embed")) {
+        table.removeAttribute("data-skoda-embed");
+        return;
+      }
       const rows = [...table.rows].filter((row) => text3(row));
       const filled = (row) => [...row.cells].filter((cell) => text3(cell));
       if (rows.filter((row) => filled(row).length >= 2).length < 2) return;
