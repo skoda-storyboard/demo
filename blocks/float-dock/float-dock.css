@@ -145,9 +145,24 @@
   }
 }
 
-.float-dock .float-dock-cart .icon {
-  inline-size: var(--float-dock-trigger-icon-size);
-  block-size: var(--float-dock-trigger-icon-size);
+/* the cart glyph as the source draws it (a.media-cart-icon::before: skoda-bnr-icons \e02f at the
+   trigger icon size, 400, line-height .8, its em box centred by top / left 50% and half-size
+   negative margins; #273: an SVG of another bag drew a wider, heavier shape). Decorative: the
+   link is named */
+.float-dock .float-dock-cart::before {
+  content: "\e02f";
+  content: "\e02f" / "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  margin-block-start: calc(var(--float-dock-trigger-icon-size) / -2);
+  margin-inline-start: calc(var(--float-dock-trigger-icon-size) / -2);
+  font-family: var(--media-card-icon-font);
+  font-size: var(--float-dock-trigger-icon-size);
+  font-weight: var(--weight-regular);
+  line-height: 0.8; /* the source: 22.4px at 28, 12.8px at 16 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .float-dock .float-dock-cart-count {

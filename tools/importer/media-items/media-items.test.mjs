@@ -17,7 +17,7 @@ import {
   detailRequest, parseAssetLinks, assetItem, requiredDetails, detailGaps, unknownGaps,
   feedMediaRefs, feedCoverageGaps,
   feedThumbnails, carrierDocs, parseCarrier, withMediaBus, CARRIER_MAX,
-  damIndex, damFile, withDamFiles, libraryRequest, librarySlices, libraryNonce,
+  damIndex, damFile, withDamFiles, libraryRequest, librarySlices, libraryNonce, cardFocus,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 import { logicalId } from '../media/media-lib.mjs';
@@ -427,4 +427,15 @@ test('library paging: load-more request, year slices, nonce', () => {
   ]);
   assert.equal(libraryNonce('<script>var ys_ajax_loader = {"nonce":"fb6b5f0a56"};</script>'), 'fb6b5f0a56');
   assert.equal(libraryNonce('<script>var skoda_ajax_loader = {"nonce":"x"};</script>'), '');
+});
+
+test('card crop anchor (#273): snap-top / snap-bottom from the image holder, centre is empty', { skip }, () => {
+  const card = (cls) => new JSDOM(`<article class="media-cart-item image"><div class="entry-thumbnail"><a class="colorbox"><div class="image-holder ratio-container ratio-16x9 ${cls}"><img src="a.jpg"></div></a></div></article>`).window.document.querySelector('article');
+  assert.equal(cardFocus(card('cover-width snap-top')), 'top');
+  assert.equal(cardFocus(card('cover-width snap-bottom')), 'bottom');
+  assert.equal(cardFocus(card('cover-width snap-center')), '');
+  assert.equal(cardFocus(new JSDOM('<article></article>').window.document.querySelector('article')), '');
+  // the feed row carries it (empty for a centred card)
+  assert.equal(feedRow({ id: '1', type: 'image', title: 't', terms: {}, focus: 'top' }).focus, 'top');
+  assert.equal(feedRow({ id: '2', type: 'image', title: 't', terms: {} }).focus, '');
 });

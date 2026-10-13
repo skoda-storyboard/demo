@@ -134,7 +134,8 @@ export async function buildCartBadge(slot, ph, load = () => Promise.all([
   const count = document.createElement('span');
   count.className = 'float-dock-cart-count';
   count.setAttribute('aria-hidden', 'true');
-  link.append(icon('media-cart'), count);
+  // the cart glyph is the source's font glyph, drawn by float-dock.css (#273)
+  link.append(count);
   const render = ({ count: n }) => {
     count.textContent = n ? String(n) : '';
     count.hidden = !n;
