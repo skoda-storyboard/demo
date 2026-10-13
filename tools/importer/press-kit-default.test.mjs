@@ -1182,3 +1182,14 @@ test('spacers and widths are read in answers only: body copy keeps dropping its 
   assert.equal(blocks(page, 'Spacer').length, 0);
   assert.equal(blocks(page, 'Media row').length, 0);
 });
+
+test('a blank answer row whose widget holds a blank paragraph keeps both gaps: the line and the row (#344 review)', { skip: !JSDOM }, () => {
+  const toggle = answerLayoutToggle().replace(
+    `${widget('\n\t')}`,
+    `${widget('<p>&nbsp;</p>')}`,
+  );
+  const page = run(fixture({ extra: toggle }).replace('</head>', `${PANELS_CSS}</head>`), target);
+  const answer = rows(page, 'Accordion').find((tr) => txt(tr.children[0]) === 'Spaced answer').children[1];
+  const tail = [...answer.children].slice(-2).map((el) => (el.tagName === 'TABLE' ? txt(el) : el.tagName));
+  assert.deepEqual(tail, ['Spacer', 'Spacer (row)'], 'the blank paragraph, then the empty row\'s insets');
+});

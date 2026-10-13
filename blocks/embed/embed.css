@@ -52,7 +52,7 @@
 
 /* An authored `height` (the source's `width="100%" height="448px"` iframe): that height at
    every width, no ratio. */
-.embed .embed-video.fixed-height {
+.embed .embed-video.fixed-height:not(.embed-gated) {
   aspect-ratio: auto;
   height: var(--embed-height);
 }

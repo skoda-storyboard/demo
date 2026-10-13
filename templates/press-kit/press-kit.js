@@ -102,7 +102,9 @@ const isLinksParagraph = (el) => el?.tagName === 'P' && !el.querySelector('img')
 // a table nested in an answer (blocks can't nest), named by its first cell: `Spacer`, `Media row`
 const nestedName = (el) => (el?.tagName === 'TABLE'
   ? el.rows[0]?.cells[0]?.textContent.trim().toLowerCase() || '' : '');
-const isSpacer = (el) => /^spacer\b/.test(nestedName(el));
+// the Accordion block's own rule (accordion.js): a one-cell table, `Spacer` or `Spacer (row)`
+const isSpacer = (el) => el?.tagName === 'TABLE' && el.rows.length === 1 && el.rows[0].cells.length === 1
+  && /^spacer(?:\s*\(\s*row\s*\))?$/.test(nestedName(el));
 const isMediaRow = (el) => nestedName(el) === 'media row';
 
 /**
@@ -138,11 +140,15 @@ export function mediaRuns(cell) {
   return runs;
 }
 
-// a `Media row` table's widths as fractions, one per cell (`50.4%` → 0.504)
+// a `Media row` table's widths as fractions, one per cell (`50.4%` → 0.504): only percentages
+// that add up to the row (±0.5%); anything else sizes nothing
+const PERCENT = /^(\d+(?:\.\d+)?)%$/;
 function mediaWidths(table, count) {
   const cells = [...(table?.rows[1]?.cells || [])];
-  const widths = cells.map((cell) => parseFloat(cell.textContent) / 100);
-  return widths.length === count && widths.every((w) => w > 0 && w < 1) ? widths : null;
+  const widths = cells.map((cell) => Number(cell.textContent.trim().match(PERCENT)?.[1]) / 100);
+  const sum = widths.reduce((total, w) => total + w, 0);
+  const valid = widths.length === count && widths.every((w) => w > 0 && w < 1);
+  return valid && Math.abs(sum - 1) <= 0.005 ? widths : null;
 }
 
 // An accordion answer's images are the source's two-cell rows (#275): each cell an image with
@@ -180,6 +186,7 @@ function roundAction(tag, kind, label) {
   el.className = `press-kit-action ${kind}`;
   if (tag === 'button') el.type = 'button';
   el.setAttribute('aria-label', label);
+  if (TOOLTIPS[kind]) el.title = TOOLTIPS[kind];
   return el;
 }
 
@@ -193,7 +200,6 @@ function sidebarMediaBox(main) {
   const label = document.createElement('span');
   label.append(...link.childNodes);
   const add = roundAction('button', 'add', LABELS.addAll);
-  add.title = TOOLTIPS.add;
   add.setAttribute('aria-disabled', 'true');
   const groupToggle = () => box.querySelector('.downloads-add-all');
   const sync = () => {
@@ -232,7 +238,6 @@ function videoActions(main) {
     download.setAttribute('download', '');
     const open = roundAction('a', 'link', LABELS.openVideo(title));
     open.href = file.href;
-    [add, download, open].forEach((el) => { el.title = TOOLTIPS[el.classList[1]]; });
     p.classList.add('press-kit-actions');
     p.replaceChildren(add, download, open);
     loadCart().then(({ bindCartControl }) => bindCartControl(add, { href: file.href, title }))

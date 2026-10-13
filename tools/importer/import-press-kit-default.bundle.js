@@ -679,14 +679,16 @@ var CustomImportScript = (() => {
     const document = root.ownerDocument;
     const widths = cellWidths(document);
     root.querySelectorAll(ANSWERS).forEach((answer) => {
+      const layout = answer.querySelector(".panel-layout");
+      const rows = [...(layout == null ? void 0 : layout.children) || []].filter((row) => row.matches(".panel-grid"));
+      const blankRows = new Set(rows.filter((row) => blank(row)));
       answer.querySelectorAll(".textwidget > p").forEach((p) => {
         if (blank(p)) p.replaceWith(marker(document, "skodaSpacer", "line", "Spacer"));
       });
-      const layout = answer.querySelector(".panel-layout");
-      [...(layout == null ? void 0 : layout.children) || []].filter((row) => row.matches(".panel-grid")).forEach((row) => {
+      rows.forEach((row) => {
         var _a, _b;
         const cells = [...row.querySelectorAll(":scope > .panel-grid-cell")];
-        if (blank(row)) {
+        if (blankRows.has(row)) {
           (_a = row.querySelector(".textwidget")) == null ? void 0 : _a.append(marker(document, "skodaSpacer", "row", "Spacer"));
           return;
         }

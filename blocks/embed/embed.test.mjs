@@ -212,6 +212,9 @@ test('YouTube: an /embed/ URL is the source iframe, YouTube\'s own player with i
   const kit = buildEmbed('https://www.youtube.com/embed/E2Zp83XyzDU?feature=oembed&feature=youtu.be&enablejsapi=1');
   decorate(kit);
   assert.equal(kit.querySelector('iframe').getAttribute('src'), 'https://www.youtube.com/embed/E2Zp83XyzDU?feature=oembed&feature=youtu.be&enablejsapi=1');
+  const auto = buildEmbed('https://www.youtube.com/embed/abcDEF123?autoplay=1&rel=0');
+  decorate(auto);
+  assert.equal(auto.querySelector('iframe').getAttribute('src'), 'https://www.youtube.com/embed/abcDEF123?rel=0', 'no autoplay on approach');
   const nocookie = buildEmbed('https://youtube-nocookie.com/embed/abcDEF123?rel=0');
   decorate(nocookie);
   assert.equal(nocookie.querySelector('iframe').getAttribute('src'), 'https://www.youtube-nocookie.com/embed/abcDEF123?rel=0');
@@ -727,6 +730,20 @@ test('no consent, YouTube, then a grant through the hook: the poster shows, focu
   });
 });
 
+test('no consent, a YouTube player URL, then a grant through the hook: the player, not the poster (#344 review)', async () => {
+  await withSearch('?consent=decline', async () => {
+    const block = buildEmbed('https://www.youtube.com/embed/m9RlQw2FGjc?feature=oembed&enablejsapi=1');
+    decorate(block);
+    window.location.search = '';
+    consent.setEmbedConsent(true);
+    assert.equal(block.querySelector('.embed-play'), null, 'the source shows YouTube\'s own player here');
+    const iframe = block.querySelector('iframe');
+    assert.ok(iframe);
+    assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/m9RlQw2FGjc?feature=oembed&enablejsapi=1');
+    consent.setEmbedConsent(null);
+  });
+});
+
 test('no consent: a detached placeholder stops listening and is not released', async () => {
   await withSearch('?consent=decline', async () => {
     const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
@@ -737,4 +754,11 @@ test('no consent: a detached placeholder stops listening and is not released', a
     assert.equal(block.querySelector('iframe'), null, 'no iframe appended into a detached block');
     consent.setEmbedConsent(null);
   });
+});
+
+test('CSS: a fixed-height box gives way to the consent placeholder, which sets its own height (#344 review)', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = await readFile(new URL('./embed.css', import.meta.url), 'utf8');
+  assert.match(css, /\.embed \.embed-video\.fixed-height:not\(\.embed-gated\) \{[^}]*height: var\(--embed-height\);/);
+  assert.match(css, /\.embed \.embed-gated \{[^}]*height: auto;/);
 });

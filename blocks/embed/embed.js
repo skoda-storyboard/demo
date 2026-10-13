@@ -127,7 +127,13 @@ function buildEmbedUrl(provider, url) {
     // A source iframe (an /embed/ URL) loads YouTube's player with the query it was embedded
     // with (feature=oembed, si=, enablejsapi=1 or not); a source lite-youtube (a watch /
     // youtu.be URL) loads what lite-youtube loads, enablejsapi=1 (+ autoplay on the click).
-    if (isYoutubePlayer(url)) return `https://${youtubeHost(url)}/embed/${id}${url.search}`;
+    if (isYoutubePlayer(url)) {
+      // never autoplay on approach (the lazy iframe loads unasked; the source's don't autoplay)
+      const params = new URLSearchParams(url.search);
+      params.delete('autoplay');
+      const query = params.toString();
+      return `https://${youtubeHost(url)}/embed/${id}${query ? `?${query}` : ''}`;
+    }
     return `https://www.youtube.com/embed/${id}?enablejsapi=1`;
   }
   if (provider === 'buzzsprout') {

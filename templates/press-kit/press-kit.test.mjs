@@ -222,6 +222,16 @@ test('a Media row that doesn\'t fit its run, or has no run, is dropped and sizes
   assert.equal(main.querySelectorAll('table').length, 0);
 });
 
+test('Media row widths must be percentages that add up to the row; a Spacer must be the one-cell table (#344 review)', () => {
+  const main = setup(ANSWER(`${WIDTHS('60%', '60%')}${IMG('a')}${IMG('b')}<p>Text</p>${WIDTHS('0.5', '0.5')}${IMG('c')}${IMG('d')}`
+    + `<p>More</p>${WIDTHS('50abc%', '50%')}${IMG('e')}${IMG('f')}`
+    + `<p>Last</p>${IMG('g')}${LINKS}<table><tr><td>Spacer</td></tr><tr><td>body</td></tr></table>${IMG('h')}`));
+  decorate(main);
+  assert.equal(main.querySelectorAll('.press-kit-media-row.sized, [style]').length, 0, '120%, no % and a partial number size nothing');
+  assert.equal(main.querySelectorAll('.press-kit-media table').length, 0, 'a two-row "Spacer" table is not a spacer: it stays outside every cell');
+  assert.equal(main.querySelectorAll('.accordion table').length, 1, 'and is left as authored');
+});
+
 test('a lone image, an image with text and a links paragraph with text are not media cells (#275)', () => {
   const main = setup(ANSWER(`${IMG('a')}<p>Text</p><p><a href="/x.jpg"><picture><img src="./x.jpg" alt=""></picture></a> caption</p>${IMG('b')}<p><a href="/b.pdf">PDF download</a> and more</p>`));
   decorate(main);

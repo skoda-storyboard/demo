@@ -1090,9 +1090,9 @@ body.story main > .section.sidebar .default-content-wrapper > :is(h2, h3) {
    one band: the source pulls the second row 40px up over the first's empty bottom, so the
    first drops its bottom inset and the second keeps the 10px cell padding (text 30px apart,
    32 on the source). */
-/* stylelint-disable-next-line no-descending-specificity -- the intro → body rule above must
-   keep winning on a leading panel's top margin */
-body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) {
+/* stylelint-disable-next-line no-descending-specificity -- custom properties only: no property
+   here meets the hero rules above */
+body.story main > .section:is(.highlight-dark, .highlight-grey) {
   /* A panel whose source layout sets its own row padding or widget margins carries them
      (Section Metadata `highlight-padding|margin|gallery-margin[-mobile]`, scripts.js sets the
      --hl-*-m-* / --hl-*-d-* boxes); the rest keep the theme's: no row padding, the 15px widget
@@ -1107,7 +1107,11 @@ body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) {
   --hl-margin-left: var(--hl-margin-m-left, var(--highlight-widget-inline));
   --hl-gallery-right: var(--hl-gallery-m-right, 0px);
   --hl-gallery-left: var(--hl-gallery-m-left, 0px);
+}
 
+/* stylelint-disable-next-line no-descending-specificity -- the intro → body rule above must
+   keep winning on a leading panel's top margin */
+body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) {
   margin-block-start: 0;
   padding-block:
     calc(var(--hl-pad-top) + var(--story-inset) + var(--hl-margin-top))
@@ -1264,7 +1268,7 @@ body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has
   }
 
   /* a panel's own desktop geometry (see the panel rule above) */
-  body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) {
+  body.story main > .section:is(.highlight-dark, .highlight-grey) {
     --hl-pad-top: var(--hl-pad-d-top, var(--highlight-row-top));
     --hl-pad-right: var(--hl-pad-d-right, 0px);
     --hl-pad-bottom: var(--hl-pad-d-bottom, 0px);

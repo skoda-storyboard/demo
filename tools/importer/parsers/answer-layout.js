@@ -44,13 +44,16 @@ export function markAnswerLayout(root) {
   const document = root.ownerDocument;
   const widths = cellWidths(document);
   root.querySelectorAll(ANSWERS).forEach((answer) => {
+    const layout = answer.querySelector('.panel-layout');
+    const rows = [...(layout?.children || [])].filter((row) => row.matches('.panel-grid'));
+    // a row is blank as authored, before its own blank paragraphs become (text) markers
+    const blankRows = new Set(rows.filter((row) => blank(row)));
     answer.querySelectorAll('.textwidget > p').forEach((p) => {
       if (blank(p)) p.replaceWith(marker(document, 'skodaSpacer', 'line', 'Spacer'));
     });
-    const layout = answer.querySelector('.panel-layout');
-    [...(layout?.children || [])].filter((row) => row.matches('.panel-grid')).forEach((row) => {
+    rows.forEach((row) => {
       const cells = [...row.querySelectorAll(':scope > .panel-grid-cell')];
-      if (blank(row)) {
+      if (blankRows.has(row)) {
         row.querySelector('.textwidget')?.append(marker(document, 'skodaSpacer', 'row', 'Spacer'));
         return;
       }
