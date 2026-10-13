@@ -67,3 +67,17 @@ test('Storyboard home emits only index settings, never imported teaser content',
   ]);
   assert.equal(document.querySelectorAll('table img, table a').length, 0);
 });
+
+test('Media Room promo takes the newest press releases from the index, not the source picks', () => {
+  const { document } = new JSDOM(`<section class="promo-box">
+    <div class="item"><article class="promo-box-item">
+      <img src="/kit.jpg" alt="Classic Days"><a href="/en/press-kits/classic-days">Classic Days</a>
+    </article></div></section>`).window;
+  parse(document.querySelector('.promo-box'), { document, indexDriven: true, promoTemplate: 'press_release' });
+  const rows = [...document.querySelectorAll('table tr')];
+  assert.deepEqual(rows.map((row) => [...row.querySelectorAll('td')]
+    .map((cell) => cell.textContent.trim())), [
+    ['Promo Box'], ['template', 'press_release'], ['path', '/en/'], ['limit', '3'],
+  ]);
+  assert.equal(document.querySelectorAll('table img, table a').length, 0);
+});

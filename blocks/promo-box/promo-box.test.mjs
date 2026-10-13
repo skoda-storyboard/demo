@@ -9,6 +9,7 @@ globalThis.window = {
 
 const {
   default: decorate, parseSource, selectPromoRows, validateCuratedRows, enablePromoRotation,
+  promoShowsSummary,
 } = await import('./promo-box.js');
 const { optimizeImages } = await import('../../scripts/card-teaser.js');
 
@@ -358,4 +359,10 @@ test('desktop mosaic cycles card nodes; pauses and mobile mode retain their beha
     globalThis.document = oldDocument;
     globalThis.getComputedStyle = oldComputedStyle;
   }
+});
+
+test('story promos show the excerpt; a press release promo shows only date and title', () => {
+  assert.equal(promoShowsSummary({}), true, 'the default template is story');
+  assert.equal(promoShowsSummary({ template: 'Story' }), true);
+  assert.equal(promoShowsSummary({ template: 'press_release' }), false);
 });

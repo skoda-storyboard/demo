@@ -104,11 +104,19 @@ async function getCards(source) {
   chosen.forEach((row, i) => ul.append(buildCardTeaser(row, {
     eager: i === 0,
     overlay: true,
-    summary: true,
+    summary: promoShowsSummary(config),
     desktopWidth: '1200',
     mobileWidth: '750',
   })));
   return ul;
+}
+
+/**
+ * Story promos lead with the story's excerpt (Storyboard home); the Media Room's press
+ * release promo shows only the date and title, as on the source.
+ */
+export function promoShowsSummary(config) {
+  return (config.template || 'story').toLowerCase() === 'story';
 }
 
 export function selectPromoRows(rows, config) {

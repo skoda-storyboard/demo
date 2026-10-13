@@ -99,9 +99,15 @@ export default {
       const parser = parsers[block.name];
       if (parser) {
         try {
-          // the Models band keeps the source's hand-picked order on this home too (home-rail)
+          // the Models band keeps the source's hand-picked order on this home too (home-rail);
+          // the promo shows the newest three press releases from the index, with their dates
           parser(block.element, {
-            document, url, params, orderModels: true,
+            document,
+            url,
+            params,
+            orderModels: true,
+            indexDriven: block.name === 'promo-box',
+            promoTemplate: 'press_release',
           });
         } catch (e) {
           console.error(`Failed to parse ${block.name} (${block.selector}):`, e);

@@ -7,21 +7,22 @@
  * (measured against .migration/work/samples/sto-home.html + mr-home.html;
  *  ties to docs/ui-specs/template-home.md.)
  *
- * Storyboard home uses the newest three /en/ stories from the query index;
- * Media Room keeps its independently curated items.
+ * Both homes take the newest three /en/ posts of one template from the query index
+ * (`indexDriven`): stories on the Storyboard home, press releases on the Media Room
+ * (`promoTemplate`), so the cards carry the source's date and link to migrated pages.
  *
  * ⚠️ CONTENT-DRIVEN, NOT POSITIONAL. Items are read from the matched element; bails
  * (unwrap) if none are present.
  *
- * DA table shape (one row per picked item, Media Room only): [image, linked title].
+ * DA table shape without `indexDriven` (one row per picked item): [image, linked title].
  *   ['Promo Box']
  *   [img, <a href>title</a>]
  */
-export default function parse(element, { document, indexDriven = false }) {
+export default function parse(element, { document, indexDriven = false, promoTemplate = 'story' }) {
   if (indexDriven) {
     element.replaceWith(WebImporter.DOMUtils.createTable([
       ['Promo Box'],
-      ['template', 'story'],
+      ['template', promoTemplate],
       ['path', '/en/'],
       ['limit', '3'],
     ], document));
