@@ -405,16 +405,83 @@ export function markHighlights(document) {
     });
   }
   let count = 0;
+  const geometry = highlightGeometry(css);
   document.querySelectorAll('.panel-grid').forEach((grid) => {
     const row = grid.querySelector(':scope > .panel-row-style');
     const inline = row && (row.getAttribute('style') || '').match(/background(?:-color)?\s*:\s*([^;]+)/i);
     const variant = byId.get(grid.id) || (inline && highlightVariant(inline[1]));
     if (!variant) return;
     grid.setAttribute(HIGHLIGHT_ATTR, variant);
+    Object.entries(geometry(grid)).forEach(([key, value]) => grid.setAttribute(`data-${key}`, value));
     count += 1;
   });
   return count;
 }
+
+// ---- highlight geometry (PO, 2026-10-13: the panel inset as the source) ----
+// The source panel's content sits its row padding + the 10px cell padding + each widget's
+// margin in. Most panels keep the theme's widget margin (`0 15px` from 781px, `15px` all round
+// up to 780px) and no row padding, which styles.css draws by default. A layout that sets its own
+// (`#pl-… #panel-… { margin:0px 0px 0px 20px }`, `#pg-…> .panel-row-style { padding:… }`, a
+// `@media (max-width:780px)` copy for mobile) travels as Section Metadata rows the story runtime
+// reads; a value absent on mobile is the desktop one there too, no margin at all is 0.
+const DEFAULT_TEXT_MARGIN = ['0px 15px 0px 15px', '15px 15px 15px 15px'];
+const MEDIA_780 = /@media[^{]*max-width:\s*780px[^{]*\{((?:[^{}]*\{[^{}]*\})*)[^{}]*\}/g;
+
+/** `0px 15px` / `15px` / `0` → `0px 15px 0px 15px`; null for anything but px/0 lengths. */
+function boxValue(value) {
+  const parts = String(value || '').trim().split(/\s+/).map((v) => (v === '0' ? '0px' : v));
+  if (!parts[0] || parts.length > 4 || !parts.every((v) => /^\d+(?:\.\d+)?px$/.test(v))) return null;
+  const [t, r = t, b = t, l = r] = parts;
+  return `${t} ${r} ${b} ${l}`;
+}
+
+function highlightGeometry(css) {
+  const rules = (text) => [...text.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .map(([, sel, body]) => ({ sels: sel.split(',').map((s) => s.trim()), body }));
+  const mobile = rules([...css.matchAll(MEDIA_780)].map((m) => m[1]).join('\n'));
+  const desktop = rules(css.replace(/@media[^{]*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, ''));
+  const find = (list, test, prop) => {
+    let found = null;
+    list.forEach(({ sels, body }) => {
+      if (!sels.some(test)) return;
+      const m = body.match(new RegExp(`(?:^|;)\\s*${prop}\\s*:\\s*([^;!]+)`, 'i'));
+      if (m) found = boxValue(m[1]);
+    });
+    return found;
+  };
+  const margins = (panel, fallback) => {
+    if (!panel) return null;
+    const test = (s) => s.endsWith(`#${panel.id}`);
+    const d = find(desktop, test, 'margin');
+    const m = find(mobile, test, 'margin') || d;
+    return [d || fallback, m || fallback];
+  };
+  return (grid) => {
+    const out = {};
+    // a multi-column row has a margin per cell; its Columns block keeps the default inset
+    const cells = grid.querySelectorAll(':scope > .panel-row-style > .panel-grid-cell, :scope > .panel-grid-cell');
+    if ([...cells].filter((c) => c.querySelector('.so-panel')).length > 1) return out;
+    const isRow = (s) => s.replace(/\s+/g, '') === `#${grid.id}>.panel-row-style`;
+    const padD = find(desktop, isRow, 'padding');
+    const padM = find(mobile, isRow, 'padding') || padD;
+    if (padD) out['highlight-padding'] = padD;
+    if (padM) out['highlight-padding-mobile'] = padM;
+    const panels = [...grid.querySelectorAll(':scope > .panel-row-style > .panel-grid-cell > .so-panel, :scope > .panel-grid-cell > .so-panel')];
+    const text = margins(panels.find((p) => p.matches('.widget_sow-editor, .widget_text')), '0px 0px 0px 0px');
+    if (text && (text[0] !== DEFAULT_TEXT_MARGIN[0] || text[1] !== DEFAULT_TEXT_MARGIN[1])) {
+      [out['highlight-margin'], out['highlight-margin-mobile']] = text;
+    }
+    const gallery = margins(panels.find((p) => p.matches('[class*="carousel-widget"], [class*="slider"]')), '0px 0px 0px 0px');
+    if (gallery && (gallery[0] !== '0px 0px 0px 0px' || gallery[1] !== '0px 0px 0px 0px')) {
+      [out['highlight-gallery-margin'], out['highlight-gallery-margin-mobile']] = gallery;
+    }
+    return out;
+  };
+}
+
+const GEOMETRY_KEYS = ['highlight-padding', 'highlight-padding-mobile', 'highlight-margin',
+  'highlight-margin-mobile', 'highlight-gallery-margin', 'highlight-gallery-margin-mobile'];
 
 // ---- unequal 2-cell rows (SKODA-225, contract columns-split v2) -------------------
 // SiteOrigin sizes each cell in the page's head CSS (`#pgc-<id> { width:61.8% }`, sometimes
@@ -485,8 +552,8 @@ function hasContentAfter(node, root) {
   return false;
 }
 
-function sectionMetadata(style, document) {
-  return WebImporter.DOMUtils.createTable([['Section Metadata'], ['style', style]], document);
+function sectionMetadata(style, document, rows = []) {
+  return WebImporter.DOMUtils.createTable([['Section Metadata'], ['style', style], ...rows], document);
 }
 
 const isSectionMetadata = (el) => el.tagName === 'TABLE'
@@ -634,7 +701,9 @@ export default function parse(element, { document }) {
     }
     if (!row.length) return;
     if (variant) {
-      out.push(document.createElement('hr'), ...row, sectionMetadata(`${BODY_STYLE}, highlight-${variant}`, document));
+      const geometry = GEOMETRY_KEYS.filter((key) => grid.hasAttribute(`data-${key}`))
+        .map((key) => [key, grid.getAttribute(`data-${key}`)]);
+      out.push(document.createElement('hr'), ...row, sectionMetadata(`${BODY_STYLE}, highlight-${variant}`, document, geometry));
       stats.highlights += 1;
       resume = true;
       return;

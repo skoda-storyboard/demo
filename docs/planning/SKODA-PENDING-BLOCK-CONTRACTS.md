@@ -311,6 +311,14 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - both templates (`body.story`, `body.press-release`) only keep `.body-column` sections in the reading track, so every other section spans the full grid.
 
   `body-column` keeps the panel in the text column. The single `highlight-*` class matches no existing rule.
+- **Geometry rows (story, PO 2026-10-13: the panel inset as the source):** the source panel's content sits its row padding + the 10px cell padding + each widget's margin in. Most layouts keep the theme's (no row padding; widget margin `0 15px` from 781px, `15px` up to 780px; a gallery with no margin), which `styles.css` draws by default. A layout that sets its own carries extra `Section Metadata` rows, each a 1–4 value px box:
+  - `highlight-padding` / `highlight-padding-mobile`: the row padding (`#pg-…> .panel-row-style { padding }`);
+  - `highlight-margin` / `highlight-margin-mobile`: the text widgets' margin (`#pl-… #panel-… { margin }`), `0px 0px 0px 0px` when the layout gives them none;
+  - `highlight-gallery-margin` / `highlight-gallery-margin-mobile`: the carousel widget's margin.
+  - The mobile row is the `@media (max-width:780px)` rule, or the desktop value when there's none. A multi-column row carries none (a margin per cell).
+  - `parsers/story-flatten.js` `markHighlights()` reads them in `preprocess`. Delivered pages have them as the section's `data-highlight-*` attributes; `scripts/highlight-geometry.js` turns them into the section's `--hl-*` boxes.
+  - Fallback: without the code the panel keeps the default inset (`readable`).
+  - In use: 10 panels on 8 stories (camouflage ×2, sportline, what-you-learn ×2, cruise control, the plates story, designers on the Peaq, an epic start, park your Škoda).
 - **Variant:** from the background colour's luminance, `dark` below 0.5 and `grey` above (white = no panel). All 16 M1 story rows are `#0e3a2f`; the Zellmer FAQ panel is `#f3f3f3`.
 - **Importers:**
   - `parsers/story-flatten.js`: `import-story-detail.js`'s `preprocess` calls `markHighlights()`, because the row colour is only in the SiteOrigin head CSS (`#pg-<id>> .panel-row-style`). This gives 16 rows on 11 of the 19 M1 stories: Epiq, Octavia, Slavia, plates, graffiti, Froome, Peaq production, Peaq Tour de France, Kylaq ×3, paper Kodiaq ×3, and charging ×2 (consecutive; one is a 2-cell Columns row).
