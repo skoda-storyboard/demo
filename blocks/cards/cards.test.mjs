@@ -83,7 +83,7 @@ test('tile images retain authored img nodes and use size-aware responsive source
   assert.equal(widthAt(cards[0], null), '750');
 });
 
-test('press kits use a distinct 20-column track for features, fifths and quarters', async () => {
+test('press kits use a distinct 60-column track for features, fifths and quarters', async () => {
   const block = makeBlock([
     'feature', 'feature', 'press-square',
     'press-square', 'press-square', 'press-square', 'press-square', 'press-square',
@@ -104,6 +104,25 @@ test('press kits use a distinct 20-column track for features, fifths and quarter
     const source = card.querySelector('source[media="(min-width: 781px)"]');
     assert.equal(new URL(source.srcset).searchParams.get('width'), String(width));
   });
+});
+
+test('press kits fit a short row of fifths and a row of thirds (Classic Days 2026)', async () => {
+  const block = makeBlock([
+    'press-square', 'press-square', 'press-square end',
+    'press-third', 'press-third', 'press-third',
+  ]);
+  [...block.querySelectorAll('img')].forEach((img) => {
+    img.src = 'https://example.com/media.jpg?width=750';
+  });
+  await decorate(block);
+  assert.equal(block.querySelector('ul').classList.contains('tiles-press'), true);
+  assert.deepEqual(
+    [...block.querySelectorAll('.tile-row-start')].map((li) => li.textContent.trim()),
+    ['Tile 1', 'Tile 4'],
+  );
+  assert.equal(block.querySelectorAll('li.tile-press-third').length, 3);
+  const source = block.querySelectorAll('li')[3].querySelector('source[media="(min-width: 781px)"]');
+  assert.equal(new URL(source.srcset).searchParams.get('width'), '850');
 });
 
 test('older press kits use half rows: 2 wide, or 1 wide + 2 quarters in either order', async () => {

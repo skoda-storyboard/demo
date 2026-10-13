@@ -47,7 +47,7 @@ const clean = (node) => (node ? (node.textContent || '').replace(/\s+/g, ' ').tr
 
 // `#pgc-<post>-<row>-<cell>` → width % from the SiteOrigin layout CSS (desktop rules;
 // the `@media` stack rules set every cell to 100% and are skipped).
-function siteOriginWidths(document) {
+export function siteOriginWidths(document) {
   const widths = {};
   document.querySelectorAll('style').forEach((style) => {
     const css = (style.textContent || '').replace(/@media[^{]*\{(?:[^{}]*\{[^}]*\})*\s*\}/g, '');

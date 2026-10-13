@@ -69,15 +69,38 @@ var CustomImportScript = (() => {
     ], document);
   }
 
+  // tools/importer/parsers/series-grid.js
+  function siteOriginWidths(document) {
+    const widths = {};
+    document.querySelectorAll("style").forEach((style) => {
+      const css = (style.textContent || "").replace(/@media[^{]*\{(?:[^{}]*\{[^}]*\})*\s*\}/g, "");
+      const re = /([^{}]+)\{([^}]*)\}/g;
+      let m;
+      while (m = re.exec(css)) {
+        const w = m[2].match(/(?:^|;)\s*width:\s*([\d.]+)%/);
+        if (!w) continue;
+        (m[1].match(/#pgc-[\w-]+/g) || []).forEach((sel) => {
+          widths[sel.slice(1)] = Number(w[1]);
+        });
+      }
+    });
+    return widths;
+  }
+
   // tools/importer/parsers/press-kit-hub-tiles.js
   var ratioOf = (tile) => {
     var _a, _b;
     return (_b = (_a = tile.querySelector(".ratio-container")) == null ? void 0 : _a.className.match(/\bratio-(\d+x\d+)\b/)) == null ? void 0 : _b[1];
   };
-  function rowTokens(tiles, rowIndex) {
+  var cellWidthOf = (tile, widths) => {
+    var _a;
+    return widths[(_a = tile.closest(".panel-grid-cell")) == null ? void 0 : _a.id];
+  };
+  function rowTokens(tiles, rowIndex, widths = {}) {
     const ratios = tiles.map(ratioOf);
     const wide = ratios.filter((ratio) => ratio === "2x1").length;
     const square = ratios.filter((ratio) => ratio === "1x1").length;
+    const cellWidths = tiles.map((tile) => cellWidthOf(tile, widths));
     if (tiles.length === 1 && ["2x1", "4x1"].includes(ratios[0])) return ["press-half end"];
     if (wide === 2 && square === 1 && tiles.length === 3) {
       return ratios.map((ratio) => ratio === "2x1" ? "feature" : "press-square");
@@ -85,7 +108,12 @@ var CustomImportScript = (() => {
     if (wide === 2 && tiles.length === 2 || wide === 1 && square === 2 && tiles.length === 3) {
       return ratios.map((ratio) => ratio === "2x1" ? "press-half" : "press-quarter");
     }
+    if (wide === 3 && tiles.length === 3) return Array(3).fill("press-third");
     if (square === tiles.length && tiles.length === 5) return Array(5).fill("press-square");
+    const fifths = cellWidths.every((w) => Math.round(w) === 20);
+    if (square === tiles.length && tiles.length < 5 && fifths) {
+      return tiles.map((tile, index) => index === tiles.length - 1 ? "press-square end" : "press-square");
+    }
     if (square === tiles.length) {
       return tiles.map((tile, index) => index === tiles.length - 1 && tiles.length % 4 ? "press-quarter end" : "press-quarter");
     }
@@ -94,9 +122,10 @@ var CustomImportScript = (() => {
   function parseTiles(content, document) {
     const sourceRows = [...content.querySelectorAll(".panel-grid")].filter((grid) => !grid.parentElement.closest(".panel-grid")).map((grid) => [...grid.querySelectorAll("article.article-teaser")]).filter((tiles) => tiles.length);
     if (!sourceRows.length) throw new Error("Press-kit hub has no chapter tiles");
+    const widths = siteOriginWidths(document);
     const rows = [["Cards (overlay, tiles)"]];
     sourceRows.forEach((tiles, rowIndex) => {
-      const tokens = rowTokens(tiles, rowIndex);
+      const tokens = rowTokens(tiles, rowIndex, widths);
       tiles.forEach((tile, index) => {
         const sourceLink = tile.querySelector(":scope > a[href]");
         const sourceImage = tile.querySelector(".ratio-container img[src]");
@@ -488,6 +517,37 @@ var CustomImportScript = (() => {
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos",
     "/en/press-kits/4x4-winter-experience-press-kit",
+    "/en/press-kits/classic-days-2026-press-kit",
+    "/en/press-kits/classic-days-2026-press-kit/125-years-of-skoda-motorsport",
+    "/en/press-kits/classic-days-2026-press-kit/1955-skoda-440-on-the-international-stage",
+    "/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand",
+    "/en/press-kits/classic-days-2026-press-kit/images",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-bz-1902-1904",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-slavia-type-b-1899-1904",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-voiturette-a-1905-1907",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-110-r-coupe-1970-1980",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-1100-mbx-1967-1969",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-120-gls-1976-1990",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-120-s-rallye-1972-1975",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-645-1929-1934",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsportsuccess",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-favorit-136-l-1988-1994",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-felicia-1959-1964",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-museum",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-museum-presents-only-surviving-laurin-klement-bscsports-car-from-1908",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-1959-1964",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-popular-monte-carlo-1936-1939",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-rapid-135-1987-1990",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-rapid-ldd-1984",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-superb-3000-ohv-1938-1949",
+    "/en/press-kits/classic-days-2026-press-kit/texts",
+    "/en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary",
+    "/en/press-kits/classic-days-2026-press-kit/videos",
     "/en/press-kits/lets-explore-albania-press-kit",
     "/en/press-kits/new-skoda-enyaq-press-kit-2",
     "/en/press-kits/press-kit-skoda-at-the-iaa-2019",
@@ -750,6 +810,11 @@ var CustomImportScript = (() => {
     if (!p) return "/";
     return p.split("/").map((seg) => seg.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/-+/g, "-")).join("/");
   }
+  var SCHEMELESS_SOURCE = /^(?:(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com\/(?:[^?#]*\/)?)?(?:www\.)?skoda-storyboard\.com(?=\/)/i;
+  function schemelessSource(href) {
+    const m = href.match(SCHEMELESS_SOURCE);
+    return m ? `${SOURCE_ORIGIN}${href.slice(m[0].length)}` : href;
+  }
   function rewriteHref(href) {
     const m = href.match(SOURCE_HOST);
     if (!m) return null;
@@ -787,6 +852,7 @@ var CustomImportScript = (() => {
     element.querySelectorAll("a[href]").forEach((a) => {
       let href = a.getAttribute("href");
       if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
+      href = schemelessSource(href);
       if (href.startsWith("/direct-download/")) href = `${SOURCE_ORIGIN}${href}`;
       else href = !isRailViewAll(a) && tagPageHref(href) || rewriteHref(href) || href;
       if (href !== a.getAttribute("href")) a.setAttribute("href", href);
@@ -968,6 +1034,13 @@ var CustomImportScript = (() => {
     if (!isDirectDownloadZip) return href;
     return `${CDN_ORIGIN}/${url.pathname.slice(DIRECT_DOWNLOAD_PREFIX.length)}${url.hash}`;
   }
+  var BANNER_PAGE_TITLES = {
+    "skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation": "\u0160koda Auto celebrates more than 130 years of craftsmanship and innovation",
+    "skoda-museum": "\u0160koda Museum",
+    "60-years-of-the-trekka-an-suv-from-new-zealand": "60 years of the Trekka: an SUV from New Zealand",
+    "skoda-octavia-turns-30-three-decades-of-a-brand-icon": "\u0160koda Octavia turns 30: Three decades of a brand icon",
+    "125-years-of-skoda-motorsport": "125 years of \u0160koda Motorsport"
+  };
   function bannerAlt(href, img) {
     if (/\.zip(?:$|[?#])/i.test(href) || /download/i.test(img.getAttribute("src").split("/").pop())) {
       return "Download the press kit ZIP";
@@ -981,7 +1054,14 @@ var CustomImportScript = (() => {
       return "Follow @skodaautonews on the X platform";
     }
     const alt = (img.getAttribute("alt") || img.getAttribute("title") || "").trim();
-    if (alt) return alt;
+    const fileStem = img.getAttribute("src").split("/").pop().replace(/\.[a-z0-9]+(?:[?#].*)?$/i, "");
+    if (alt && alt !== fileStem) return alt;
+    const slug = href.split(/[?#]/)[0].replace(/\/+$/, "").split("/").pop();
+    if (BANNER_PAGE_TITLES[slug]) return BANNER_PAGE_TITLES[slug];
+    if (alt && slug) {
+      const words = decodeURIComponent(slug).replace(/-+/g, " ").replace(/\bskoda\b/gi, "\u0160koda");
+      return words.charAt(0).toUpperCase() + words.slice(1);
+    }
     throw new Error(`Press-kit hub banner has no accessible name: ${href}`);
   }
   function bannerLinks(content, document) {

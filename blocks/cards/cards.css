@@ -98,7 +98,8 @@
   .cards.tiles .tile-third .card-teaser-image,
   .cards.tiles .tile-two-thirds .card-teaser-image,
   .cards.tiles .tile-feature .card-teaser-image,
-  .cards.tiles .tile-press-half .card-teaser-image {
+  .cards.tiles .tile-press-half .card-teaser-image,
+  .cards.tiles .tile-press-third .card-teaser-image {
     aspect-ratio: auto;
   }
 
@@ -107,7 +108,8 @@
   .cards.tiles .tile-third .card-teaser-image::before,
   .cards.tiles .tile-two-thirds .card-teaser-image::before,
   .cards.tiles .tile-feature .card-teaser-image::before,
-  .cards.tiles .tile-press-half .card-teaser-image::before {
+  .cards.tiles .tile-press-half .card-teaser-image::before,
+  .cards.tiles .tile-press-third .card-teaser-image::before {
     content: "";
     display: block;
     padding-block-end: calc((100% - var(--grid-gutter)) / 2);
@@ -136,8 +138,9 @@
     grid-template-columns: repeat(12, minmax(0, 1fr));
   }
 
+  /* press kits: 60 columns, so fifths (12), quarters (15) and thirds (20) all fit */
   .cards.tiles ul.tiles-press {
-    grid-template-columns: repeat(20, minmax(0, 1fr));
+    grid-template-columns: repeat(60, minmax(0, 1fr));
   }
 
   .cards.tiles .tile-sq,
@@ -151,22 +154,32 @@
   }
 
   .cards.tiles .tile-third,
-  .cards.tiles .tile-third-sq,
-  .cards.tiles .tile-press-square {
+  .cards.tiles .tile-third-sq {
     grid-column-end: span 4;
   }
 
-  .cards.tiles .tile-two-thirds,
-  .cards.tiles .tile-feature {
+  .cards.tiles .tile-two-thirds {
     grid-column-end: span 8;
   }
 
+  .cards.tiles .tile-press-square {
+    grid-column-end: span 12;
+  }
+
   .cards.tiles .tile-press-quarter {
-    grid-column-end: span 5;
+    grid-column-end: span 15;
+  }
+
+  .cards.tiles .tile-press-third {
+    grid-column-end: span 20;
+  }
+
+  .cards.tiles .tile-feature {
+    grid-column-end: span 24;
   }
 
   .cards.tiles .tile-press-half {
-    grid-column-end: span 10;
+    grid-column-end: span 30;
   }
 
   .cards.tiles .tile-banner,

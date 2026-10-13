@@ -8,12 +8,17 @@ const TILE_SIZES = {
   'two-thirds': { span: 8, mode: 'series' },
   banner: { span: 12, mode: 'series' },
   'banner-tall': { span: 12, mode: 'series' },
-  feature: { span: 8, mode: 'press' },
+  // Press kits: a 60-column track, so fifths, quarters and thirds all fit.
+  feature: { span: 24, mode: 'press' },
   // A 2:1 tile over half the row (older kits: 2 wide, or 1 wide + 2 quarters; 604px at 1280).
-  'press-half': { span: 10, mode: 'press' },
-  'press-square': { span: 4, mode: 'press' },
-  'press-quarter': { span: 5, mode: 'press' },
+  'press-half': { span: 30, mode: 'press' },
+  // A 2:1-less-gutter tile over a third of the row (Classic Days 2026: Texts / Images / Videos).
+  'press-third': { span: 20, mode: 'press' },
+  'press-square': { span: 12, mode: 'press' },
+  'press-quarter': { span: 15, mode: 'press' },
 };
+
+const ROW_COLUMNS = { series: 12, press: 60 };
 
 export class TileLayoutError extends Error {}
 
@@ -35,13 +40,13 @@ export function layoutTileRows(rawTokens, { pressPage = false } = {}) {
       throw new TileLayoutError(`Cards tiles row ${index + 1}: cannot mix series and press-kit sizes`);
     }
     mode = size.mode;
-    if (filled + size.span > (mode === 'press' ? 20 : 12)) {
+    if (filled + size.span > ROW_COLUMNS[mode]) {
       throw new TileLayoutError(`Cards tiles row ${index + 1}: tile overfills its source row`);
     }
     const tile = { token, rowStart };
     filled += size.span;
     rowStart = false;
-    if (flag === 'end' || filled === (mode === 'press' ? 20 : 12)) {
+    if (flag === 'end' || filled === ROW_COLUMNS[mode]) {
       filled = 0;
       rowStart = true;
     }

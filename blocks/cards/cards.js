@@ -34,6 +34,7 @@ const TILE_IMAGE_WIDTHS = {
   'press-square': '500',
   'press-quarter': '750',
   'press-half': '1250',
+  'press-third': '850',
 };
 
 export function parseTileRows(block) {

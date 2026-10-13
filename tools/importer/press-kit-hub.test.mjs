@@ -140,6 +140,26 @@ test('banner alt text follows the link: ZIP, WhatsApp, else the source alt', () 
   assert.throws(() => output(unlabelled), /banner has no accessible name/);
 });
 
+test('a banner whose alt is only its file name is named by the page it opens', () => {
+  const kit = `${root}classic-days-2026-press-kit/`;
+  const banner = (href, file) => `<div class="widget_sow-editor"><div class="textwidget"><p><a href="${href}">
+    <img src="https://cdn.skoda-storyboard.com/2026/10/${file}.png" alt="${file}"></a></p></div></div>`;
+  const doc = page(13);
+  doc.querySelector('.content').insertAdjacentHTML('beforeend', [
+    banner(`${kit}skoda-museum/`, 'ClassicDays-Button-1670x800-Museum-EN_3ac482ac'),
+    // authored without https:// on the source, resolved against the page by the DOM
+    banner('skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon/', 'ClassicDays-Button-1670x800-Octavia-EN_dcc4cafc'),
+    banner(`${kit}skoda-felicia-1959-1964/`, 'ClassicDays-Button-Felicia_1a2b3c4d'),
+  ].join(''));
+  const { element } = output(doc, kit);
+  const named = (stem) => element.querySelector(`img[src*="${stem}"]`)?.alt;
+  assert.equal(named('Museum-EN'), 'Škoda Museum');
+  assert.equal(named('Octavia-EN'), 'Škoda Octavia turns 30: Three decades of a brand icon');
+  assert.equal(named('Felicia'), 'Škoda felicia 1959 1964', 'no known title: the readable slug');
+  const octavia = element.querySelector('img[src*="Octavia-EN"]').closest('a');
+  assert.equal(octavia.getAttribute('href'), '/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon');
+});
+
 test('live SSR hubs retain exact chapter titles, dates, facets and banner assets', {
   skip: !process.env.SKODA_PRESS_KIT_LIVE,
 }, async () => {
@@ -214,6 +234,41 @@ test('older kits: 2-wide and 1-wide + 2-square rows become half + quarter tiles'
   assert.deepEqual(tokens.slice(8), Array(5).fill('press-square'));
   const starts = layoutTileRows(tokens, { pressPage: true }).tiles.filter((tile) => tile.rowStart);
   assert.equal(starts.length, 4, 'one row per source row');
+});
+
+// Classic Days 2026 (2026-10-13): a short square row in fifths, then three 2:1 thirds. The
+// cell widths come from the SiteOrigin head CSS, as on the source.
+function fifthsAndThirdsKit() {
+  let index = 0;
+  const tile = (ratio) => {
+    index += 1;
+    return `<article class="article-teaser"><a href="${root}classic-${index}/">
+      <div class="ratio-container ratio-${ratio}"><img src="https://cdn.skoda-storyboard.com/c${index}.jpg" alt=""></div>
+      <h2 class="heading">Chapter ${index}</h2></a></article>`;
+  };
+  const cell = (id, html) => `<div class="panel-grid-cell" id="pgc-1-${id}">${html}</div>`;
+  const css = `#pgc-1-0-3 { width:40% } #pgc-1-0-0 , #pgc-1-0-1 , #pgc-1-0-2 { width:20% }
+    #pgc-1-1-0 , #pgc-1-1-1 , #pgc-1-1-2 { width:33.3333% }
+    @media (max-width:780px){ #pgc-1-0-0 , #pgc-1-1-0 { width:100% } }`;
+  return new JSDOM(`<!doctype html><title>Kit</title><style>${css}</style><body class="single-press_kit">
+    <article class="press_kit category-press-kits" data-publish-date="2026-10-12T08:00:00+02:00">
+      <div class="hero"><div class="hero-image"><img src="https://cdn.skoda-storyboard.com/h.jpg" alt="Kit"></div><div class="hero-caption"><h1>Kit</h1></div></div>
+      <div class="content">
+        <div class="panel-grid" id="pg-1-0">${cell('0-0', tile('1x1'))}${cell('0-1', tile('1x1'))}${cell('0-2', tile('1x1'))}${cell('0-3', '')}</div>
+        <div class="panel-grid" id="pg-1-1">${cell('1-0', tile('2x1'))}${cell('1-1', tile('2x1'))}${cell('1-2', tile('2x1'))}</div>
+      </div></article></body>`, { url: root }).window.document;
+}
+
+test('a short square row in fifths ends early; three 2:1 tiles become thirds', () => {
+  const { element } = output(fifthsAndThirdsKit(), `${root}classic-days-2026-press-kit/`);
+  const cards = [...element.querySelectorAll('table')].find((t) => t.rows[0].textContent.includes('Cards'));
+  const tokens = [...cards.rows].slice(1).map((row) => row.cells[0].textContent);
+  assert.deepEqual(tokens, [
+    'press-square', 'press-square', 'press-square end',
+    'press-third', 'press-third', 'press-third',
+  ]);
+  const starts = layoutTileRows(tokens, { pressPage: true }).tiles.filter((tile) => tile.rowStart);
+  assert.equal(starts.length, 2, 'one row per source row');
 });
 
 test('older kits: an X timeline widget is dropped, not imported as intro text', () => {
