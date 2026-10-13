@@ -22,7 +22,8 @@
  *    chips, SKODA-607) becomes the demo tag page for that term: `/en/tag/<tax>/<slug>`, or
  *    the one demo tag page with that slug (the source files some terms under another
  *    taxonomy, e.g. technology `electromobility` → `/en/tag/crew/electromobility`). No
- *    unique demo page → the link stays as it is (rule 1).
+ *    unique demo page → the link stays as it is (rule 1). A Story Rail's `viewall` link is
+ *    not a tag chip: it keeps the filtered listing, as the source's rail "All" (#284).
  *
  * `cdn.skoda-storyboard.com` assets, external hosts, mailto/tel, `#…` and relative links
  * are untouched. Idempotent: a second run changes nothing.
@@ -425,6 +426,19 @@ function tagPageHref(href) {
   return bySlug.length === 1 ? bySlug[0] : null;
 }
 
+// the "All" keys story-rail reads (blocks/story-rail/story-rail.js settings)
+const RAIL_VIEWALL_KEYS = ['viewall', 'view-all', 'all'];
+
+/** The link sits in a Story Rail block table's "All" row (`viewall`, `view-all` or `all`). */
+function isRailViewAll(a) {
+  const row = a.closest('tr');
+  const table = row && row.closest('table');
+  if (!table || row.cells.length < 2
+    || !RAIL_VIEWALL_KEYS.includes(row.cells[0].textContent.trim().toLowerCase())) return false;
+  const head = table.rows[0] && table.rows[0].cells[0];
+  return !!head && /^story rail\b/i.test(head.textContent.trim());
+}
+
 export default function transform(hookName, element, payload) {
   if (hookName !== TransformHook.afterTransform) return;
 
@@ -432,7 +446,7 @@ export default function transform(hookName, element, payload) {
     let href = a.getAttribute('href');
     if (/#s_[ac]id=/.test(href)) href = href.split('#s_aid=')[0].split('#s_cid=')[0];
     if (href.startsWith('/direct-download/')) href = `${SOURCE_ORIGIN}${href}`;
-    else href = tagPageHref(href) || rewriteHref(href) || href;
+    else href = (!isRailViewAll(a) && tagPageHref(href)) || rewriteHref(href) || href;
     if (href !== a.getAttribute('href')) a.setAttribute('href', href);
   });
 }

@@ -39,3 +39,15 @@
   font-display: swap;
   src: url('../fonts/skoda-next-bold.woff2') format('woff2');
 }
+
+/* skoda-bnr-icons: the source's icon font (Škoda's own, from cdn.skoda-storyboard.com), for the
+   rail arrow glyphs only (blocks/carousel, #284). A glyph is rasterised as text, which an SVG
+   mask is not, so the arrow keeps the source's stroke at every pixel ratio. Downloaded only
+   once an arrow renders; `block` paints no fallback character meanwhile */
+@font-face {
+  font-family: skoda-bnr-icons;
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../fonts/skoda-bnr-icons.woff2') format('woff2');
+}
