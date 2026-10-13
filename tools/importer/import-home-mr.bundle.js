@@ -42,11 +42,11 @@ var CustomImportScript = (() => {
   });
 
   // tools/importer/parsers/promo-box.js
-  function parse(element, { document: document2, indexDriven = false }) {
+  function parse(element, { document: document2, indexDriven = false, promoTemplate = "story" }) {
     if (indexDriven) {
       element.replaceWith(WebImporter.DOMUtils.createTable([
         ["Promo Box"],
-        ["template", "story"],
+        ["template", promoTemplate],
         ["path", "/en/"],
         ["limit", "3"]
       ], document2));
@@ -1086,7 +1086,9 @@ var CustomImportScript = (() => {
               document: document2,
               url,
               params,
-              orderModels: true
+              orderModels: true,
+              indexDriven: block.name === "promo-box",
+              promoTemplate: "press_release, press_kit"
             });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
