@@ -136,7 +136,7 @@ const allTables = (element, name) => [...element.querySelectorAll('table')].filt
 
 // ---- F4: Media Box → Downloads (SKODA-801a) -----------------------------------------
 
-test('Media Box → its own dark media-box section: h2, stats line, Downloads; before the related band', { skip }, () => {
+test('Media Box → its own dark media-box section: h3, stats line, Downloads; before the related band', { skip }, () => {
   Object.keys(PAGES).forEach((k) => {
     const { sections } = importPage(k);
     const styles = sections.map((s) => s.style);
@@ -150,7 +150,7 @@ test('Media Box → its own dark media-box section: h2, stats line, Downloads; b
     const box = sections[i];
     assert.deepEqual(box.blocks.filter((b) => b !== 'Metadata'), ['Downloads'], k);
     const heads = box.nodes.filter((n) => n.tagName !== 'TABLE').map((n) => `${n.tagName}:${txt(n)}`);
-    assert.equal(heads[0], 'H2:Media Box', k);
+    assert.equal(heads[0], 'H3:Media Box', k); // the source level (#296)
     assert.match(heads[1], /^P:\d+ images?$/, k);
   });
 });

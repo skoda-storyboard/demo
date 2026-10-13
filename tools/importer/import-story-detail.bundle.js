@@ -171,16 +171,16 @@ var CustomImportScript = (() => {
   }
   var CONSUMPTION_RE = /\b(?:kWh|l)\s*\/\s*100\s*km\b/i;
   var EMISSIONS_RE = /\bCO(?:₂|2)\s+emissions?\b|\bg\s*\/\s*km\b/i;
-  function isRegulatoryCaption(text2) {
-    const t = (text2 || "").replace(/\s+/g, " ").trim();
+  function isRegulatoryCaption(text3) {
+    const t = (text3 || "").replace(/\s+/g, " ").trim();
     if (!t) return false;
     return /\bWLTP\b/.test(t) || CONSUMPTION_RE.test(t) && EMISSIONS_RE.test(t);
   }
   function regulatoryCaption(img, item) {
     var _a;
     const holder = img && img.getAttribute && img.getAttribute("data-caption") && img || ((_a = item.querySelector) == null ? void 0 : _a.call(item, "[data-caption]"));
-    const text2 = holder ? (holder.getAttribute("data-caption") || "").replace(/\s+/g, " ").trim() : "";
-    return isRegulatoryCaption(text2) ? text2 : "";
+    const text3 = holder ? (holder.getAttribute("data-caption") || "").replace(/\s+/g, " ").trim() : "";
+    return isRegulatoryCaption(text3) ? text3 : "";
   }
   function galleryCells(panel, document2, blockName = "Gallery") {
     const imgs = [...panel.querySelectorAll("img")];
@@ -219,11 +219,11 @@ var CustomImportScript = (() => {
     return cells.length > 1 ? cells : null;
   }
   function quoteNodes(panel, document2) {
-    const text2 = (panel.textContent || "").replace(/\s+/g, " ").trim();
-    if (!text2) return [];
+    const text3 = (panel.textContent || "").replace(/\s+/g, " ").trim();
+    if (!text3) return [];
     const bq = document2.createElement("blockquote");
     const p = document2.createElement("p");
-    p.textContent = text2;
+    p.textContent = text3;
     bq.appendChild(p);
     return [bq];
   }
@@ -251,10 +251,10 @@ var CustomImportScript = (() => {
     if (rich.length) {
       rich.forEach((n) => out.push(n));
     } else {
-      const text2 = (body.textContent || "").replace(/\s+/g, " ").trim();
-      if (text2) {
+      const text3 = (body.textContent || "").replace(/\s+/g, " ").trim();
+      if (text3) {
         const p = document2.createElement("p");
-        p.textContent = text2;
+        p.textContent = text3;
         out.push(p);
       }
     }
@@ -281,10 +281,10 @@ var CustomImportScript = (() => {
     });
     if (!out.length) {
       panel.querySelectorAll("img").forEach((img) => out.push(img));
-      const text2 = (panel.textContent || "").replace(/\s+/g, " ").trim();
-      if (text2 && !panel.querySelector("img")) {
+      const text3 = (panel.textContent || "").replace(/\s+/g, " ").trim();
+      if (text3 && !panel.querySelector("img")) {
         const p = document2.createElement("p");
-        p.textContent = text2;
+        p.textContent = text3;
         out.push(p);
       }
     }
@@ -364,6 +364,37 @@ var CustomImportScript = (() => {
     });
     return count;
   }
+  var BOLD_ATTR = "data-skoda-bold";
+  function isBoldHeading(heading) {
+    const words = (node) => (node.textContent || "").replace(/\s+/g, "");
+    if (!words(heading)) return false;
+    const walker = heading.ownerDocument.createTreeWalker(
+      heading,
+      4
+      /* NodeFilter.SHOW_TEXT */
+    );
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const bold = node.parentElement.closest("strong, b");
+      if (words(node) && !(bold && heading.contains(bold))) return false;
+    }
+    return true;
+  }
+  function markBoldHeadings(root) {
+    const bold = [...root.querySelectorAll("h1, h2, h3, h4, h5, h6")].filter(isBoldHeading);
+    bold.forEach((h) => h.setAttribute(BOLD_ATTR, ""));
+    return bold.length;
+  }
+  function restoreBoldHeadings(root) {
+    const marked = [...root.querySelectorAll(`[${BOLD_ATTR}]`)];
+    marked.forEach((h) => {
+      h.removeAttribute(BOLD_ATTR);
+      if (!/^H[1-6]$/.test(h.tagName) || !(h.textContent || "").trim()) return;
+      const strong = h.ownerDocument.createElement("strong");
+      strong.append(...h.childNodes);
+      h.append(strong);
+    });
+    return marked.length;
+  }
   function splitVariant(cells) {
     if (cells.length !== 2) return null;
     const [a, b] = cells.map((c) => parseFloat(c.getAttribute(CELL_WIDTH_ATTR)));
@@ -442,6 +473,8 @@ var CustomImportScript = (() => {
       case "editor":
         nodes = editorNodes(panel, document2);
         break;
+      // carousel-widget routes by content (Cards if teasers-with-links, else Gallery (slider));
+      // sow-slider is always an image slider → Gallery.
       case "carousel":
         cells = carouselCells(panel, document2);
         break;
@@ -636,6 +669,85 @@ var CustomImportScript = (() => {
       return;
     }
     element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
+  }
+
+  // tools/importer/parsers/footnotes.js
+  var MARK = "data-skoda-footnote";
+  var NAME = "Footnotes";
+  var BODY_PX = 16;
+  var MEDIA = "img, picture, video, audio, iframe, svg, object, embed, canvas";
+  var text2 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
+  function fontPx(el) {
+    var _a;
+    const value = (_a = el.style) == null ? void 0 : _a.fontSize;
+    if (!value) return null;
+    const match = value.match(/^([\d.]+)(px|pt)$/i);
+    if (!match) return NaN;
+    return match[2].toLowerCase() === "pt" ? Number(match[1]) * 4 / 3 : Number(match[1]);
+  }
+  var isSmall = (px) => px > 0 && px < BODY_PX;
+  function isFootnote(p) {
+    var _a;
+    if (!((_a = p == null ? void 0 : p.matches) == null ? void 0 : _a.call(p, "p")) || fontPx(p) !== null || !text2(p) || p.querySelector(MEDIA)) return false;
+    const walker = p.ownerDocument.createTreeWalker(
+      p,
+      4
+      /* NodeFilter.SHOW_TEXT */
+    );
+    let small = false;
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (text2(node)) {
+        let el = node.parentElement;
+        let marker = false;
+        while (el !== p && fontPx(el) === null) {
+          if (el.matches("sup")) marker = true;
+          el = el.parentElement;
+        }
+        if (el !== p) {
+          if (!isSmall(fontPx(el))) return false;
+          small = true;
+        } else if (!marker) {
+          return false;
+        }
+      }
+    }
+    return small;
+  }
+  function markFootnotes(root) {
+    const found = [...root.querySelectorAll("p")].filter(isFootnote);
+    found.forEach((p) => p.setAttribute(MARK, ""));
+    return found.length;
+  }
+  var edge = (n) => n && (n.nodeType === 1 && n.matches("br") || n.nodeType === 3 && !text2(n));
+  function footnoteParagraph(p, document2) {
+    var _a, _b;
+    const copy = document2.createElement("p");
+    copy.append(...[...p.childNodes].map((node) => node.cloneNode(true)));
+    copy.querySelectorAll("span").forEach((span) => span.replaceWith(...span.childNodes));
+    copy.querySelectorAll("[style]").forEach((el) => el.removeAttribute("style"));
+    while (edge(copy.lastChild)) copy.lastChild.remove();
+    while (edge(copy.firstChild)) copy.firstChild.remove();
+    if (((_a = copy.lastChild) == null ? void 0 : _a.nodeType) === 3) copy.lastChild.textContent = copy.lastChild.textContent.replace(/\s+$/, "");
+    if (((_b = copy.firstChild) == null ? void 0 : _b.nodeType) === 3) copy.firstChild.textContent = copy.firstChild.textContent.replace(/^\s+/, "");
+    return copy;
+  }
+  function tableBefore(p) {
+    let node = p.previousSibling;
+    while ((node == null ? void 0 : node.nodeType) === 3 && !text2(node)) node = node.previousSibling;
+    return (node == null ? void 0 : node.nodeType) === 1 && node.matches("table") && text2(node.querySelector("th, td")) === NAME ? node : null;
+  }
+  function parse4(p, { document: document2 }) {
+    p.removeAttribute(MARK);
+    if (p.closest("table, li, blockquote, figure") || !text2(p)) return;
+    const row = [footnoteParagraph(p, document2)];
+    const table = WebImporter.DOMUtils.createTable([[NAME], row], document2);
+    const prev = tableBefore(p);
+    if (prev) {
+      [...prev.rows].pop().after([...table.rows].pop());
+      p.remove();
+      return;
+    }
+    p.replaceWith(table);
   }
 
   // tools/importer/transformers/skoda-page-cleanup.js
@@ -840,9 +952,9 @@ var CustomImportScript = (() => {
     const self = lastSegment(originalURL);
     const rows = [["Story Rail"], ["template", "story"], ...filters, ["limit", "10"]];
     if (self) rows.push(["exclude", self]);
-    const h2 = document2.createElement("h2");
-    h2.textContent = headingText;
-    const out = [document2.createElement("hr"), h2];
+    const title = document2.createElement("h3");
+    title.textContent = headingText;
+    const out = [document2.createElement("hr"), title];
     if (subText) {
       const p = document2.createElement("p");
       p.textContent = subText;
@@ -957,9 +1069,9 @@ var CustomImportScript = (() => {
       box.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((n) => n.remove());
       const hr = document2.createElement("hr");
       hr.setAttribute(MEDIA_BOX_MARKER, "");
-      const h2 = document2.createElement("h2");
-      h2.textContent = heading;
-      const out = [hr, h2];
+      const title = document2.createElement("h3");
+      title.textContent = heading;
+      const out = [hr, title];
       if (stats) {
         const p = document2.createElement("p");
         p.textContent = stats;
@@ -1053,7 +1165,7 @@ var CustomImportScript = (() => {
         if (t) nodes.push(document2.createTextNode(t));
       }
     });
-    const edge = (i, re) => {
+    const edge2 = (i, re) => {
       while (nodes.length && nodes[i()].nodeType === 3) {
         const n = nodes[i()];
         n.nodeValue = n.nodeValue.replace(re, "");
@@ -1061,8 +1173,8 @@ var CustomImportScript = (() => {
         nodes.splice(i(), 1);
       }
     };
-    edge(() => 0, /^[ \u00a0]+/);
-    edge(() => nodes.length - 1, /[ \u00a0]+$/);
+    edge2(() => 0, /^[ \u00a0]+/);
+    edge2(() => nodes.length - 1, /[ \u00a0]+$/);
     return nodes.filter((n) => n.nodeType !== 3 || n.nodeValue);
   }
   function newsletterCard(widget, document2) {
@@ -1143,12 +1255,12 @@ var CustomImportScript = (() => {
     const cell = [];
     anchors.forEach((a) => {
       const href = a.getAttribute("href");
-      const text2 = (a.textContent || "").trim();
-      if (!href || !text2) return;
+      const text3 = (a.textContent || "").trim();
+      if (!href || !text3) return;
       if (href === "#" || a.classList.contains("show-hidden-terms")) return;
       const link = document2.createElement("a");
       link.setAttribute("href", href);
-      link.textContent = text2;
+      link.textContent = text3;
       cell.push(link);
     });
     return cell.length ? [["Tags"], [cell]] : null;
@@ -1184,7 +1296,7 @@ var CustomImportScript = (() => {
     const aside = document.createElement("aside");
     const heading = sidebar.querySelector(".related .heading, .related h2, .related h3");
     if (heading) {
-      const h = document.createElement("h2");
+      const h = document.createElement("h3");
       h.textContent = (heading.textContent || "Explore more").trim();
       aside.appendChild(h);
     }
@@ -1192,7 +1304,7 @@ var CustomImportScript = (() => {
     if (tags) {
       const tagsHeading = sidebar.querySelector("section.tags .heading, section.tags h2, section.tags h3");
       if (tagsHeading && (tagsHeading.textContent || "").trim()) {
-        const h = document.createElement("h2");
+        const h = document.createElement("h3");
         h.textContent = tagsHeading.textContent.trim();
         aside.appendChild(h);
       }
@@ -1925,13 +2037,21 @@ var CustomImportScript = (() => {
     const bySlug = DEMO_PATHS.filter((p) => p.startsWith("/en/tag/") && p.endsWith(`/${slug}`) && p.split("/").length === 5);
     return bySlug.length === 1 ? bySlug[0] : null;
   }
+  var RAIL_VIEWALL_KEYS = ["viewall", "view-all", "all"];
+  function isRailViewAll(a) {
+    const row = a.closest("tr");
+    const table = row && row.closest("table");
+    if (!table || row.cells.length < 2 || !RAIL_VIEWALL_KEYS.includes(row.cells[0].textContent.trim().toLowerCase())) return false;
+    const head = table.rows[0] && table.rows[0].cells[0];
+    return !!head && /^story rail\b/i.test(head.textContent.trim());
+  }
   function transform6(hookName, element, payload) {
     if (hookName !== TransformHook5.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
       let href = a.getAttribute("href");
       if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
       if (href.startsWith("/direct-download/")) href = `${SOURCE_ORIGIN}${href}`;
-      else href = tagPageHref(href) || rewriteHref(href) || href;
+      else href = !isRailViewAll(a) && tagPageHref(href) || rewriteHref(href) || href;
       if (href !== a.getAttribute("href")) a.setAttribute("href", href);
     });
   }
@@ -2150,6 +2270,10 @@ var CustomImportScript = (() => {
     preprocess: ({ document: document2 }) => {
       markHighlights(document2);
       markCellWidths(document2);
+      document2.querySelectorAll("article .entry-content, article .content").forEach((body) => {
+        markFootnotes(body);
+        markBoldHeadings(body);
+      });
       transform7("preprocess", document2.body, { document: document2 });
       transform3("preprocess", document2.body, { document: document2 });
       document2.querySelectorAll(".search-results.media-box a.media-cart-action.download[href]").forEach((a) => {
@@ -2175,6 +2299,9 @@ var CustomImportScript = (() => {
         }
       });
       executeTransformers("afterTransform", main, payload);
+      main.querySelectorAll("p[data-skoda-footnote]").forEach((p) => parse4(p, payload));
+      main.querySelectorAll("[data-skoda-footnote]").forEach((p) => p.removeAttribute("data-skoda-footnote"));
+      restoreBoldHeadings(main);
       dropEmptySections(main);
       WebImporter.rules.transformBackgroundImages(main, document2);
       normalizeImages(main, document2);

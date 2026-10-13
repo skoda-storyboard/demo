@@ -264,7 +264,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - Only the footnote link is green (decision 2026-10-05); other body links stay `--link-color` ink.
   - Green on white is 3.71:1, under WCAG AA's 4.5:1 for text this size; the source has the same.
 - **Shape:** header `Footnotes`, then one row per paragraph of small print, one cell: `[<p>¹ … <a href>HERE</a><br>² …</p>]`. Links, line breaks and `sup` markers stay. Consecutive small-print paragraphs share one table.
-- **Importer:** `parsers/footnotes.js`, run by `import-press-kit-default.js`. `preprocess` marks the paragraphs (`markFootnotes`) on the source as published, before helix-importer's clean-up (which keeps styled spans today); the parser builds the table after the layouts have run, whose source-table pass would flatten it.
+- **Importer:** `parsers/footnotes.js`, run by `import-press-kit-default.js` and, for the story body's small print (Epiq "¹ Available at a later date.", #296), `import-story-detail.js`. `preprocess` marks the paragraphs (`markFootnotes`) on the source as published, before helix-importer's clean-up (which keeps styled spans today); the parser builds the table after the layouts have run, whose source-table pass would flatten it.
   - **Counts:** a `p` whose every word is set below the 16px body size by its nearest sized ancestor (a span). The size is the one CSS applies, the CSSOM's winning `font-size` declaration (`!important` beats a later one; invalid values are dropped), and it must be a plain px or pt length. A `sup` marker outside the sized span is neutral.
   - **Doesn't count:**
     - a few small letters inside an ordinary sentence ("1st", "7th");

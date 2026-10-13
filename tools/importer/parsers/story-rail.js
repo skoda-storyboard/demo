@@ -8,7 +8,7 @@
  * block reads the config rows and pulls its items from the query-index.
  *
  * Output (the skoda-story-cleanup.js related-band pattern), in order:
- *   <h2 data-model-key="<rail id>">News</h2>   default content (rail heading)
+ *   <h3 data-model-key="<rail id>">News</h3>   default content (rail heading, h3 as the source)
  *   <p>Based on tags: Kodiaq, SUV</p>           default content (source .subheading)
  *   Story Rail | template | press_release |
  *              | model    | kodiaq        |      facets from the page's "All" filter links
@@ -131,10 +131,12 @@ export default function parse(element, { document, url, params }) {
     }
   }
 
-  const h2 = document.createElement('h2');
-  h2.textContent = headingText;
-  h2.setAttribute('data-model-key', railId);
-  const out = [h2];
+  // the source rail heading is an h3 (h3.search-results-heading), under Technical Data's
+  // or Model Description's h2 (#284)
+  const h3 = document.createElement('h3');
+  h3.textContent = headingText;
+  h3.setAttribute('data-model-key', railId);
+  const out = [h3];
   if (subText) {
     const p = document.createElement('p');
     p.textContent = subText;

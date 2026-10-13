@@ -470,7 +470,9 @@ export function railLayout({
 
 /**
  * The rail heading's element: the home bands' section headings are h3 on the source
- * (.search-results-heading on both homes, #272); every other rail keeps its h2.
+ * (.search-results-heading on both homes, #272); every other rail keeps its h2. Only for a
+ * heading the block builds itself: the model pages' rail titles are authored section headings
+ * (h3 since #284, from the importer).
  * @param {string[]} classes the rail's layout classes (railLayout)
  */
 export function railHeadingTag(classes) {
