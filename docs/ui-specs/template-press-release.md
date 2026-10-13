@@ -180,7 +180,6 @@ changed.
 | FAQ opener (Zellmer) | `<strong>FAQ:<br></strong><br>`: a blank line, panel 302px | collapsed, 278px (band 24px early) | importer keeps both breaks |
 | Media Box PDF tile | the 30% black holder only (`.file-caption.pdf` hidden) | the 48px PDF glyph (#307) | glyph off on press releases (`::after { content: none }`) |
 | Related arrows (`.story-rail.press .carousel-arrow::after`) | glyph `\e00b` / `\e00c` | the old chevron | the home bands' `rail-arrow-prev/next.svg` (#272) |
-| Footer "Manage subscription" | 14 / 500 / 18, underline, `#419468` | 16 / 400 / 24 | 14 / 500 / 18 |
 
 Already at parity, so closed with evidence:
 - Superb tag rows (24px apart).
@@ -189,6 +188,9 @@ Already at parity, so closed with evidence:
 - The Media Box internals: `h3` titles, the `#161718` menu, the PDF add and link.
 - The band gaps.
 - The footer `h3`s and the consent link hover (no underline, already in the block since #275).
+- The footer "Manage subscription" link: 16 / 400 / 24, `#419468`, underlined on the source and on
+  EDS (`footer .manage-subscription-link a` vs `footer .newsletter-stub-manage a`, 390–1280,
+  re-measured 2026-10-13 in the PR #337 review). No press-release override.
 
 Elsewhere:
 - Related title hover: #323 (SKODA-228).

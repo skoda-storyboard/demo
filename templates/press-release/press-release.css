@@ -123,14 +123,6 @@ body.press-release .section.body-column .press-release-perex strong {
   font-weight: var(--weight-semibold);
 }
 
-/* Footer newsletter on a press release: "Manage subscription" is the source's 14/18 medium
-   (#274; the Media Room footer's own link stays 16/24 regular) */
-body.press-release footer .newsletter-stub .newsletter-stub-manage a {
-  font-size: var(--body-font-size-s);
-  font-weight: var(--weight-medium);
-  line-height: 18px;
-}
-
 /* Sidebar: Additional info list, Images, Tags; 16/45 headings, 15px between groups. */
 body.press-release .section.sidebar aside > div {
   margin-bottom: var(--pr-group-gap);
