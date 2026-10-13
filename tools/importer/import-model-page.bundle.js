@@ -1298,6 +1298,23 @@ var CustomImportScript = (() => {
     });
     return out;
   }
+  var MODEL_CARD_IMAGES = {
+    "new-superb": "https://cdn.skoda-storyboard.com/2023/12/header_superb_d05c278a.jpg",
+    octavia: "https://cdn.skoda-storyboard.com/2024/03/octaviaFL-header_e0f394a0.jpg",
+    epiq: "https://cdn.skoda-storyboard.com/2026/05/skoda-epiq-m70-01_1135a598.jpg",
+    peaq: "https://cdn.skoda-storyboard.com/2026/06/Navrh-bez-nazvu-21_ec34da00.png",
+    "new-fabia": "https://cdn.skoda-storyboard.com/2021/05/Header_New_FABIA.jpg",
+    scala: "https://cdn.skoda-storyboard.com/2023/09/scala_header_34ad5f38.jpg",
+    kamiq: "https://cdn.skoda-storyboard.com/2023/09/kamiq-header_d6fedb2b.jpg",
+    "karoq-6": "https://cdn.skoda-storyboard.com/2017/07/33_SKODA_KAROQ.jpg",
+    "enyaq-iv-2": "https://cdn.skoda-storyboard.com/2025/01/enyaq_fl_header_eb9109f9.jpg",
+    "new-kodiaq": "https://cdn.skoda-storyboard.com/2023/11/Skoda_Kodiaq_header_04479753.png",
+    elroq: "https://cdn.skoda-storyboard.com/2024/10/elroq_header_fede6794.jpg"
+  };
+  function modelCardImage(originalURL) {
+    const slug = (new URL(originalURL).pathname.match(/^\/en\/skoda-model\/([^/]+)\/?$/) || [])[1];
+    return slug && MODEL_CARD_IMAGES[slug] || null;
+  }
   function metadataOverrides(facets) {
     const meta = { template: "skoda_model" };
     const tags = [];
@@ -1341,7 +1358,10 @@ var CustomImportScript = (() => {
     transform: (payload) => {
       const { document: document2, url, params } = payload;
       const main = document2.body;
-      const template = __spreadProps(__spreadValues({}, PAGE_TEMPLATE), { metadata: metadataOverrides(pageFacets(document2)) });
+      const metadata = metadataOverrides(pageFacets(document2));
+      const cardImage = modelCardImage(params.originalURL);
+      if (cardImage) metadata.image = cardImage;
+      const template = __spreadProps(__spreadValues({}, PAGE_TEMPLATE), { metadata });
       const transformers = [transform, transform2, transform3, transform4];
       executeTransformers(transformers, "beforeTransform", main, payload, template);
       const pageBlocks = findBlocksOnPage(document2, template);
