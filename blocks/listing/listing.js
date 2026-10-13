@@ -432,12 +432,17 @@ export default async function decorate(block) {
   }
 
   function renderChips() {
+    // a rebuild keeps keyboard focus on the same filter's chip, if it is still there (#341 review)
+    const focused = chipsRow.contains(document.activeElement) ? document.activeElement : null;
+    const focusKey = focused && `${focused.dataset.facet}\n${focused.dataset.value}`;
     chipsRow.textContent = '';
     Object.entries(state.active).forEach(([key, vals]) => {
       vals.forEach((val) => {
         const chip = document.createElement('button');
         chip.type = 'button';
         chip.className = 'listing-chip';
+        chip.dataset.facet = key;
+        chip.dataset.value = val;
         chip.textContent = `${labelFor(key, cfg.facetLabels)}: ${optionName(key, val)}`;
         chip.setAttribute('aria-label', `${STRINGS.removeFilter}: ${labelFor(key, cfg.facetLabels)} — ${optionName(key, val)}`);
         // removing a filter veils, updates and collapses like a pick, but at once (live: the
@@ -449,6 +454,7 @@ export default async function decorate(block) {
           applyFilterChange(0);
         });
         chipsRow.append(chip);
+        if (focusKey === `${key}\n${val}`) chip.focus({ preventScroll: true });
       });
     });
   }
@@ -782,10 +788,12 @@ export default async function decorate(block) {
   renderGrid();
 
   // names that came after the first paint: rename and reorder the options in place (their
-  // inputs, state and listeners stay), then the chips
+  // inputs, state and listeners stay), then the chips. Moving a focused option drops focus to
+  // <body>, so the control a keyboard user is on gets it back (#341 review).
   if (namesLate) {
     facetLabels.then((names) => {
       optionNames = names;
+      const focused = facetOptions.contains(document.activeElement) ? document.activeElement : null;
       facetOptions.querySelectorAll('fieldset.facet-panel').forEach((panel) => {
         const { facet } = panel.dataset;
         const options = [...panel.querySelectorAll('label.facet-option')];
@@ -797,6 +805,9 @@ export default async function decorate(block) {
             panel.append(option);
           });
       });
+      if (focused?.isConnected && document.activeElement !== focused) {
+        focused.focus({ preventScroll: true });
+      }
       renderChips();
     });
   }

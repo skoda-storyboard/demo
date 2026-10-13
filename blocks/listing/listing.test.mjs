@@ -760,3 +760,49 @@ test('media card crop (#273): the feed focus anchors the image, anything else st
   assert.equal(wrap('left').dataset.focus, undefined);
   assert.equal(wrap(undefined).dataset.focus, undefined);
 });
+
+// #341 review: names that arrive after the fallback reorder the options and rebuild the chips;
+// a keyboard user's control keeps focus (moving or replacing it would drop focus to <body>)
+async function lateNamesListing(index) {
+  const realFetch = globalThis.fetch;
+  let release;
+  const held = new Promise((resolve) => { release = resolve; });
+  globalThis.fetch = async (url) => {
+    if (!String(url).includes('facet-labels')) return realFetch(url);
+    await held;
+    return { ok: true, status: 200, json: async () => ({ model: [['elroq', 'Elroq'], ['epiq', 'Epiq'], ['peaq', 'Peaq']] }) };
+  };
+  try {
+    const listing = await facetListing(index, '?filter[model][]=Peaq&filter[model][]=Epiq',
+      [storyRow(1, 'Peaq'), storyRow(2, 'Epiq'), storyRow(3, 'Elroq')]);
+    return { ...listing, release: async () => { release(); await settle(); await settle(); } };
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+
+test('late option names (#341 review): the focused option keeps focus through the reorder', async () => {
+  const { block, release } = await lateNamesListing('/en/late-names-option-index.json');
+  click(block.querySelector('.facet-pill[data-facet="model"]'));
+  const input = block.querySelector('.facet-panel[data-facet="model"] input[value="Epiq"]');
+  input.focus();
+  assert.equal(document.activeElement, input);
+  await release();
+  const names = [...block.querySelectorAll('.facet-panel[data-facet="model"] .facet-option-label')].map((l) => l.textContent);
+  assert.deepEqual(names, ['Elroq', 'Epiq', 'Peaq'], 'the late names applied');
+  assert.equal(document.activeElement, input, 'the same checkbox, not <body>');
+  assert.equal(input.checked, true, 'its state kept');
+});
+
+test('late option names (#341 review): a focused chip keeps focus when the chips are rebuilt', async () => {
+  const { block, release } = await lateNamesListing('/en/late-names-chip-index.json');
+  const chip = [...block.querySelectorAll('.listing-chip')].find((c) => c.dataset.value === 'Epiq');
+  chip.focus();
+  await release();
+  const now = document.activeElement;
+  assert.ok(now.classList.contains('listing-chip'), 'focus is on a chip, not <body>');
+  assert.notEqual(now, chip, 'the chips were rebuilt');
+  assert.equal(now.dataset.facet, 'model');
+  assert.equal(now.dataset.value, 'Epiq', 'the same filter\'s chip');
+  assert.match(now.textContent, /Epiq/);
+});
