@@ -18,7 +18,8 @@
  * scrim, date + title in white over the bottom-left.
  *
  * Model tag archives add a `feature` row: the featured model card (SKODA-222), rendered as
- * the grid's first cell, see readFeature / buildFeature.
+ * the grid's first cell, see readFeature / buildFeature. The archives' N-column grid also
+ * shows the source's "6 / 204" count row above Load more (SKODA-209a), see renderCount.
  */
 // Render helpers are hoisted function declarations invoked only from deferred
 // event handlers, so forward references between them are safe.
@@ -87,7 +88,34 @@ export function parseFeedConfig(block) {
     columns: cfg.columns || 'featured',
     // Use either the authored skip or flagged promo rows by default, not both.
     excludeFeatured: String(cfg.excludefeatured ?? (offset || exclude.length ? 'false' : 'true')) !== 'false',
+    count: readCountFlag(cfg.count, cfg.columns),
   };
+}
+
+/*
+ * The source pager's "6 / 204" count row (SKODA-209a) comes with the archive grid: an authored
+ * number of columns turns it on, the home's featured feed has none (stories.md §2). An authored
+ * `count` row (true / false) overrides that default.
+ */
+function readCountFlag(count, columns) {
+  const authored = String(count ?? '').trim().toLowerCase();
+  if (!authored) return Number(columns) > 0;
+  return authored !== 'false';
+}
+
+/*
+ * Fill the count row: "shown / total" (CSS adds the "/"). It stays when every story is shown
+ * ("3 / 3", as the source's) and hides only when there are no stories. Exported for the tests.
+ */
+export function renderCount(countEl, shown, total) {
+  const current = document.createElement('span');
+  current.className = 'stories-count-current';
+  current.textContent = String(shown);
+  const all = document.createElement('span');
+  all.className = 'stories-count-total';
+  all.textContent = String(total);
+  countEl.replaceChildren(current, all);
+  countEl.hidden = total === 0;
 }
 
 // A promo/featured entry the promo-box already shows (source `exclude_carousel_posts`).
@@ -328,7 +356,19 @@ export default async function decorate(block) {
   loadMoreWrap.className = 'stories-loadmore';
   // the card is authored content: it paints now, before (and without) the index
   if (featureCell) grid.append(featureCell);
-  block.append(grid, status, loadMoreWrap);
+  block.append(grid, status);
+  // the count row sits between the grid and Load more, as the source's, and announces the
+  // new count on Load more (as the listing's does)
+  let countEl = null;
+  if (cfg.count) {
+    block.classList.add('has-count');
+    countEl = document.createElement('div');
+    countEl.className = 'stories-count';
+    countEl.setAttribute('aria-live', 'polite');
+    countEl.hidden = true;
+    block.append(countEl);
+  }
+  block.append(loadMoreWrap);
 
   // Load + filter the index (self-contained; degrades to empty/error state).
   let scoped = [];
@@ -369,6 +409,7 @@ export default async function decorate(block) {
 
     status.hidden = all.length > 0;
     if (!all.length) status.textContent = STRINGS.noResults;
+    if (countEl) renderCount(countEl, shownRows.length, all.length);
 
     // Load-more: dropped (not disabled) when the slice is exhausted (stories.md §5).
     loadMoreWrap.textContent = '';
@@ -382,10 +423,13 @@ export default async function decorate(block) {
         state.revealed += cfg.perpage; // append the next batch of `perpage` (6)
         updateUrl(); // load-more pushes a history entry (source offset paging)
         renderGrid();
-        // Announce + move focus to the first newly-added cell (a11y).
-        const nowShown = Math.min(state.revealed, all.length);
-        status.hidden = false;
-        status.textContent = `${nowShown} ${STRINGS.resultsShown}`;
+        // Announce + move focus to the first newly-added cell (a11y). The count row, when
+        // there is one, is the announcement: the source shows no status line under it.
+        if (!countEl) {
+          const nowShown = Math.min(state.revealed, all.length);
+          status.hidden = false;
+          status.textContent = `${nowShown} ${STRINGS.resultsShown}`;
+        }
         grid.children[prev]?.querySelector('a')?.focus();
       });
       loadMoreWrap.append(btn);

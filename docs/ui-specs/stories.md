@@ -46,6 +46,10 @@ div.cover-box                                        light section band (white b
             └── button.ajax-loader-button            "Load more" (ghost pill)
 ```
 
+The home feed has **no** "N / total" count row. The category / tag archives have one
+(`.search-results-pagination` between the grid and the button). In EDS it comes with the authored N-column
+grid, or with an authored `count` row (SKODA-209a; measured in `template-category-archive.md` §5).
+
 **Libraries to retire:** Search & Filter Pro + ElasticPress AJAX (`ys_ajax_loader` POST). Replaced by the
 EDS `stories` block over `scripts/query-index.js` (chunk-aware memoized loader) + `listing-logic.mjs`
 `paginate`/`sortRows`. No jQuery, no second index fetcher.
