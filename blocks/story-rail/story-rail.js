@@ -315,11 +315,11 @@ export function viewAllLabel(block) {
  * Image and video rails open the shared lightbox (the source colorbox; videos play in it)
  * instead of the bare file / vimeo.com: a click anywhere on a card except its toolbar opens
  * it at that card. Modifier clicks keep
- * the link (new tab). The overlay lives on <body>: a fixed layer inside the carousel
- * would be clipped by its transforms.
+ * the link (new tab), and the "All" end card is not an asset: it keeps its link. The overlay
+ * lives on <body>: a fixed layer inside the carousel would be clipped by its transforms.
  */
-function wireMediaLightbox(carousel, rows) {
-  const cards = [...carousel.querySelectorAll('.carousel-track > *')];
+export function wireMediaLightbox(carousel, rows) {
+  const cards = [...carousel.querySelectorAll('.carousel-track > :not(.story-rail-all)')];
   if (!cards.length) return;
   const lightbox = buildLightbox(document.body, rows.slice(0, cards.length).map(feedLightboxItem));
   carousel.addEventListener('click', (e) => {

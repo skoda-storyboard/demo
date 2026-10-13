@@ -415,6 +415,12 @@ body.story .section.dark.story-rail-container .story-rail .carousel-track .card-
   --wide-caption-title: var(--media-card-caption-rows);
 }
 
+/* the end card stays image-sized (16:9 at the top of the row, source .item-all .ratio-container),
+   not stretched over the media cards' date, title and toolbar rows */
+.story-rail.story-rail-media .carousel-track .story-rail-all {
+  align-self: flex-start;
+}
+
 /* the media card's date row carries its own 10px padding (carousel.css): no home-band date gap */
 .story-rail.story-rail-home.story-rail-media .card-teaser-date {
   margin-block-end: 0;
