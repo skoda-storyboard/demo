@@ -81,6 +81,7 @@
   --related-band-heading-inset: 10px;
   --related-band-card-title-compact: 20px;
   --related-band-date-gap: 6px;
+  --rail-date-gap: 12px; /* source .entry-published → title, every rail (#272, #284) */
 
   /* hero titles (hero.md §3/§4; SKODA-202): story 40->28; overlay 48/300 white */
   --heading-font-size-hero: 48px;
