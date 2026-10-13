@@ -62,10 +62,36 @@ const sectionHeading = (section) => section.querySelector(':scope > .default-con
   || (section.querySelector('.story-rail')
     ? section.querySelector(':scope > .default-content-wrapper > h3[id]') : null);
 
+/** A story-rail config row's value cell by key (before the block decorates). */
+const railRow = (rail, key) => [...rail.children]
+  .find((r) => r.children[0]?.textContent.trim().toLowerCase() === key)?.children[1] || null;
+
 /** The `template` value of a story-rail config table (before the block decorates). */
 function railTemplate(rail) {
-  const row = [...rail.children].find((r) => r.children[0]?.textContent.trim().toLowerCase() === 'template');
-  return row?.children[1]?.textContent.trim().toLowerCase() || '';
+  return railRow(rail, 'template')?.textContent.trim().toLowerCase() || '';
+}
+
+/*
+ * Pages imported before #284 (20 of 23 wait for their Technical Data PDF to reach the DAM)
+ * still carry the old rail shape. Until they're re-imported, the runtime gives them the new one:
+ * the rail title as the source's h3 (its id, and so the nav anchor, kept), and the News "All" as
+ * the news listing filtered by the model, as the source's, not the model's tag page.
+ */
+function asSourceHeading(heading) {
+  if (heading.tagName !== 'H2') return heading;
+  const h3 = document.createElement('h3');
+  [...heading.attributes].forEach(({ name, value }) => h3.setAttribute(name, value));
+  h3.append(...heading.childNodes);
+  heading.replaceWith(h3);
+  return h3;
+}
+
+const TAG_PAGE = /^\/en\/tag\/model\/([a-z0-9-]+)\/?$/;
+
+function newsViewAll(rail) {
+  const link = railRow(rail, 'viewall')?.querySelector('a[href]');
+  const model = link && new URL(link.getAttribute('href'), window.location.href).pathname.match(TAG_PAGE)?.[1];
+  if (model) link.setAttribute('href', `/en/news?filter%5Bmodel%5D%5B%5D=${model}`);
 }
 
 function decorateHero(main) {
@@ -80,7 +106,7 @@ function decorateHero(main) {
 /** Tag each content section with its role; mark rail variants and lead-in lines. */
 function decorateSections(main) {
   main.querySelectorAll(':scope > .section').forEach((section) => {
-    const heading = sectionHeading(section);
+    let heading = sectionHeading(section);
     const match = roleFor(section, heading?.id);
     if (!match) return;
     section.classList.add(match.role);
@@ -106,12 +132,14 @@ function decorateSections(main) {
     }
 
     if (match.role === 'model-rail') {
+      if (section.querySelector('.story-rail')) heading = asSourceHeading(heading);
       const lead = heading.nextElementSibling;
       if (lead?.matches('p') && /^based on tags/i.test(lead.textContent.trim())) {
         lead.classList.add('model-rail-subheading');
       }
       const rail = section.querySelector('.story-rail');
       const template = rail ? railTemplate(rail) : '';
+      if (template === 'press_release') newsViewAll(rail);
       if (template === 'skoda_model') rail.classList.add('center', 'caption');
       if (template === 'image' || template === 'video') rail.classList.add('media', 'caption', template);
     }

@@ -325,6 +325,14 @@ Measured against the source (Superb, Epiq) at 1440 / 1080 / 992 / 768 / 390, fir
   match the source on main (#307): `h3` titles, "consent to the processing" not underlined on hover, "Manage
   subscription" `#419468`.
 
+- **QA re-test on `main` (2026-10-13):** Epiq passes every fixed row. Superb (QA's first page) still showed `h2` rail
+  and Bodywork / Derivatives titles and the tag-page News "All". It's one of the 20 model pages not re-pushed: the
+  binary gate holds each until its Technical Data PDF (`TD-<model>-en_….pdf`) is in the DAM. Runtime fallback (PO
+  decision): `templates/skoda-model/skoda-model.js` turns a rail section's `h2` into the source's `h3` (id, nav
+  anchor and lead-in kept) and a News rail's `/en/tag/model/<model>` "All" into `/en/news?filter[model][]=<model>`.
+  Re-imported pages are untouched. Measured on Superb at 1440 / 768 / 390: 6 × `h3` 26/32.5/600 as the source, the
+  same positions, the news listing link. The card-title hover row waits on #336 (SKODA-228), as decided.
+
 ## Dependencies
 - Upstream: SKODA-202 (hero), SKODA-201 (cards/rails), SKODA-402 (query-index retrieval), SKODA-203 (gallery-lightbox), SKODA-505 (media-cart), SKODA-601 (import infra)
 - Downstream: SKODA-1001 (per-locale trees)

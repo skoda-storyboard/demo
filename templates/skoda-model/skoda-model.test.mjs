@@ -135,7 +135,7 @@ test('the link list becomes a labelled nav with icons; links without a target ar
 test('an empty rail that removes its section also removes its nav link', () => {
   const main = setup();
   decorate(main);
-  const section = main.querySelector('h2#images').closest('.section');
+  const section = main.querySelector('#images').closest('.section');
   section.dispatchEvent(new window.CustomEvent('story-rail:empty', { bubbles: true }));
   assert.equal(main.querySelector('li[data-target="images"]'), null);
   assert.ok(main.querySelector('li[data-target="news"]'));
@@ -168,6 +168,32 @@ test('an h2 outranks the drawings\' h3s; an h3 names only a rail section (#284)'
   // a prose h3 whose id starts like a rail ("news-…") gets no role: there is no rail
   const prose = main.querySelector('h3#news-from-the-launch').closest('.section');
   assert.equal([...prose.classList].filter((c) => c.startsWith('model-')).length, 0);
+});
+
+test('a page imported before #284: its rail h2s become h3s, its News "All" the news listing (#284 QA)', () => {
+  const main = setup();
+  decorate(main);
+  assert.deepEqual(['bodywork--derivatives', 'news', 'images'].map((id) => main.querySelector(`#${id}`).tagName), ['H3', 'H3', 'H3'],
+    'the source\'s heading level, id (nav anchor) kept');
+  assert.deepEqual(['model-description', 'highlights', 'technical-data'].map((id) => main.querySelector(`#${id}`).tagName), ['H2', 'H2', 'H2'],
+    'only rail titles change');
+  assert.equal(main.querySelector('#news').textContent, 'News');
+  assert.ok(main.querySelector('h3#news + p.model-rail-subheading'), 'the lead-in still follows it');
+  const all = main.querySelector('h3#news').closest('.section').querySelector('.story-rail a');
+  assert.equal(all.getAttribute('href'), '/en/news?filter%5Bmodel%5D%5B%5D=octavia', 'as a re-imported page: the news listing');
+  const items = [...main.querySelectorAll('nav.model-nav li')].map((li) => li.dataset.target);
+  assert.deepEqual(items, ['model-description', 'highlights', 'technical-data', 'bodywork--derivatives', 'news', 'images']);
+});
+
+test('only a News rail\'s tag-page "All" is rewritten; other rails and other links stay', () => {
+  const html = PAGE
+    .replace('<a href="/en/tag/model/octavia">All</a>', '<a href="https://www.skoda-storyboard.com/en/news/?filter%5Bmodel%5D%5B%5D=octavia">All</a>')
+    .replace('<div><div>template</div><div>image</div></div>', '<div><div>template</div><div>image</div></div><div><div>viewall</div><div><a href="/en/tag/model/octavia">All</a></div></div>');
+  const main = setup(html);
+  decorate(main);
+  assert.equal(main.querySelector('h3#news').closest('.section').querySelector('.story-rail a').getAttribute('href'),
+    'https://www.skoda-storyboard.com/en/news/?filter%5Bmodel%5D%5B%5D=octavia', 'a re-imported News link is left to the link policy');
+  assert.equal(main.querySelector('h3#images').closest('.section').querySelector('.story-rail a').getAttribute('href'), '/en/tag/model/octavia');
 });
 
 test('an empty rail with an h3 title removes its section\'s nav link (#284)', () => {
