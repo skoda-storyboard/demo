@@ -1088,7 +1088,7 @@ var CustomImportScript = (() => {
               params,
               orderModels: true,
               indexDriven: block.name === "promo-box",
-              promoTemplate: "press_release"
+              promoTemplate: "press_release, press_kit"
             });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);

@@ -111,16 +111,23 @@ async function getCards(source) {
   return ul;
 }
 
+/** The promo's templates: one or a comma list (the Media Room mixes press releases and kits). */
+function promoTemplates(config) {
+  const list = (config.template || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
+  return list.length ? list : ['story'];
+}
+
 /**
  * Story promos lead with the story's excerpt (Storyboard home); the Media Room's press
- * release promo shows only the date and title, as on the source.
+ * release / press kit promo shows only the date and title, as on the source.
  */
 export function promoShowsSummary(config) {
-  return (config.template || 'story').toLowerCase() === 'story';
+  return promoTemplates(config).every((t) => t === 'story');
 }
 
 export function selectPromoRows(rows, config) {
-  const scoped = scopeRows(rows, { template: config.template || 'story', path: config.path || '' });
+  const scoped = promoTemplates(config)
+    .flatMap((template) => scopeRows(rows, { template, path: config.path || '' }));
   const filtered = filterRows(scoped, { category: config.category, tags: config.tags })
     .filter((row) => typeof row.path === 'string' && /^\/(?!\/)/.test(row.path) && row.title);
   return paginate(sortRows(filtered, config.sort || 'newest'), config.limit);

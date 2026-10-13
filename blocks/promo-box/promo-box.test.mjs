@@ -365,4 +365,19 @@ test('story promos show the excerpt; a press release promo shows only date and t
   assert.equal(promoShowsSummary({}), true, 'the default template is story');
   assert.equal(promoShowsSummary({ template: 'Story' }), true);
   assert.equal(promoShowsSummary({ template: 'press_release' }), false);
+  assert.equal(promoShowsSummary({ template: 'press_release, press_kit' }), false);
+});
+
+test('a template list mixes press releases and press kits, newest first across both', () => {
+  const rows = [
+    { path: '/en/press-releases/a', title: 'Release A', template: 'press_release', date: '2026-10-08' },
+    { path: '/en/press-kits/k', title: 'Kit K', template: 'press_kit', date: '2026-10-12' },
+    { path: '/en/press-kits/k/chapter', title: 'Chapter', template: 'press_kit_chapter', date: '2026-10-13' },
+    { path: '/en/press-releases/b', title: 'Release B', template: 'press_release', date: '2026-10-05' },
+    { path: '/en/stories/s', title: 'Story S', template: 'story', date: '2026-10-11' },
+  ];
+  const chosen = selectPromoRows(rows, {
+    template: 'press_release, press_kit', path: '/en/', category: [], tags: [], limit: 3,
+  });
+  assert.deepEqual(chosen.map((r) => r.title), ['Kit K', 'Release A', 'Release B']);
 });

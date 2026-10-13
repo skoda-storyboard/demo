@@ -7,9 +7,9 @@
  * (measured against .migration/work/samples/sto-home.html + mr-home.html;
  *  ties to docs/ui-specs/template-home.md.)
  *
- * Both homes take the newest three /en/ posts of one template from the query index
- * (`indexDriven`): stories on the Storyboard home, press releases on the Media Room
- * (`promoTemplate`), so the cards carry the source's date and link to migrated pages.
+ * Both homes take the newest three /en/ posts from the query index (`indexDriven`): stories
+ * on the Storyboard home, press releases and press kits on the Media Room (`promoTemplate`,
+ * a comma list), so the cards carry the source's date and link to migrated pages.
  *
  * ⚠️ CONTENT-DRIVEN, NOT POSITIONAL. Items are read from the matched element; bails
  * (unwrap) if none are present.
