@@ -112,7 +112,16 @@ var CustomImportScript = (() => {
     }
     return null;
   }
-  function parse2(element, { document: document2 }) {
+  function modelOrder(element) {
+    return [...element.querySelectorAll(".search-results-item .entry-title a[href]")].map((a) => {
+      try {
+        return new URL(a.getAttribute("href"), "https://www.skoda-storyboard.com").pathname.replace(/\/+$/, "");
+      } catch (e) {
+        return "";
+      }
+    }).filter((path) => path.startsWith("/"));
+  }
+  function parse2(element, { document: document2, orderModels = false }) {
     if (/\btype-social\b/.test(element.className || "") || element.closest(".socials-static")) {
       element.replaceWith(...element.childNodes);
       return;
@@ -133,6 +142,10 @@ var CustomImportScript = (() => {
         return;
       }
       cells.push(["template", template]);
+      if (orderModels && template === "skoda_model") {
+        const order = modelOrder(element);
+        if (order.length) cells.push(["order", order.join(", ")]);
+      }
     }
     if (href && /^(?:https?:\/\/|\/(?!\/))/i.test(href.trim())) {
       const link = document2.createElement("a");
@@ -965,13 +978,21 @@ var CustomImportScript = (() => {
     const bySlug = DEMO_PATHS.filter((p) => p.startsWith("/en/tag/") && p.endsWith(`/${slug}`) && p.split("/").length === 5);
     return bySlug.length === 1 ? bySlug[0] : null;
   }
+  var RAIL_VIEWALL_KEYS = ["viewall", "view-all", "all"];
+  function isRailViewAll(a) {
+    const row = a.closest("tr");
+    const table = row && row.closest("table");
+    if (!table || row.cells.length < 2 || !RAIL_VIEWALL_KEYS.includes(row.cells[0].textContent.trim().toLowerCase())) return false;
+    const head = table.rows[0] && table.rows[0].cells[0];
+    return !!head && /^story rail\b/i.test(head.textContent.trim());
+  }
   function transform5(hookName, element, payload) {
     if (hookName !== TransformHook3.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
       let href = a.getAttribute("href");
       if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
       if (href.startsWith("/direct-download/")) href = `${SOURCE_ORIGIN}${href}`;
-      else href = tagPageHref(href) || rewriteHref(href) || href;
+      else href = !isRailViewAll(a) && tagPageHref(href) || rewriteHref(href) || href;
       if (href !== a.getAttribute("href")) a.setAttribute("href", href);
     });
   }
