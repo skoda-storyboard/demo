@@ -444,6 +444,48 @@ export function markCellWidths(document) {
   return count;
 }
 
+/*
+ * Bold headings (#296 review). The source bolds most story h3 text (`<h3><strong>…</strong></h3>`,
+ * 17 of the 18 body h3 in the 21 demo stories) but not every one (Slavia "Technical
+ * improvements"), and helix-importer's preProcess strips a heading's <strong>
+ * (DOMUtils.reviewHeadings). So `preprocess` marks the headings whose every word is bold, and
+ * `transform`, which runs after that clean-up, wraps their content in <strong> again: it reaches
+ * DA as `### **…**`.
+ */
+const BOLD_ATTR = 'data-skoda-bold';
+
+/** Whether every word of the heading sits inside a <strong> / <b> of its own. */
+export function isBoldHeading(heading) {
+  const words = (node) => (node.textContent || '').replace(/\s+/g, '');
+  if (!words(heading)) return false;
+  const walker = heading.ownerDocument.createTreeWalker(heading, 4 /* NodeFilter.SHOW_TEXT */);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const bold = node.parentElement.closest('strong, b');
+    if (words(node) && !(bold && heading.contains(bold))) return false;
+  }
+  return true;
+}
+
+/** Mark the root's wholly bold headings, on the source as published. Returns the count. */
+export function markBoldHeadings(root) {
+  const bold = [...root.querySelectorAll('h1, h2, h3, h4, h5, h6')].filter(isBoldHeading);
+  bold.forEach((h) => h.setAttribute(BOLD_ATTR, ''));
+  return bold.length;
+}
+
+/** Wrap each marked heading's content in one <strong> again, and drop the mark. Returns the count. */
+export function restoreBoldHeadings(root) {
+  const marked = [...root.querySelectorAll(`[${BOLD_ATTR}]`)];
+  marked.forEach((h) => {
+    h.removeAttribute(BOLD_ATTR);
+    if (!/^H[1-6]$/.test(h.tagName) || !(h.textContent || '').trim()) return;
+    const strong = h.ownerDocument.createElement('strong');
+    strong.append(...h.childNodes);
+    h.append(strong);
+  });
+  return marked.length;
+}
+
 /**
  * The `split-NN` variant for a row's two non-empty cells: the first cell's share of the two,
  * in %, rounded. Null when a width is unknown, the cells are (nearly) equal, or the share is

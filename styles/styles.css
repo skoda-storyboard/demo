@@ -936,10 +936,9 @@ main > .section.dark.cards-container:has(.cards.social) {
    content sits the source's 10px in from the edge and fills the column (no measure
    cap, as on the source). Story prose scale is measured (story-detail.md §3,
    re-measured on the live Epiq story): body p 16/24; h2 24/27 → 40/45 and h3
-   20/23 → 24/27.6 above 768px, h2 wt300 and h3 wt600 (the source bolds its h3 text,
-   below), with a 16px gap below; prose lists use a custom bullet (list-style:none,
-   padding 1.5em). Scoped to the story body column
-   so global heading sizes stay intact. */
+   20/23 → 24/27.6 above 768px, all wt300 (bold heading text: below) with a 16px gap
+   below; prose lists use a custom bullet (list-style:none, padding 1.5em). Scoped to the
+   story body column so global heading sizes stay intact. */
 body.story main > .section.body-column > div {
   padding-inline: var(--story-inset);
 }
@@ -956,14 +955,19 @@ body.story main > .section.body-column .default-content-wrapper h2 {
   line-height: 1.125;
 }
 
-/* The source h3 is 300 but its text is bold (<h3><strong>) on 17 of the 18 body h3 in the 21
-   demo stories; no h2 is. The importer always strips a heading's <strong> (helix-importer
-   reviewHeadings), so the weight is set here (#296, KYL sub-headings). */
 body.story main > .section.body-column .default-content-wrapper h3 {
   margin-bottom: var(--spacing-m);
   font-size: var(--heading-font-size-story-h3-mobile);
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-light);
   line-height: 1.15;
+}
+
+/* A heading the source sets bold (<h3><strong>, most story h3: KYL's sub-headings) keeps its
+   <strong> through the import (story-flatten markBoldHeadings / restoreBoldHeadings) and is 600,
+   the source's weight, not `bolder` (400 on a 300 heading). Unbolded ones, e.g. Slavia's
+   "Technical improvements", stay 300 (#296). */
+body.story main > .section.body-column .default-content-wrapper :is(h2, h3) strong {
+  font-weight: var(--weight-semibold);
 }
 
 /* Source widgets are 24px apart from 720px (#296, KYL measured at 375–1440):

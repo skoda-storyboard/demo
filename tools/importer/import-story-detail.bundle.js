@@ -364,6 +364,37 @@ var CustomImportScript = (() => {
     });
     return count;
   }
+  var BOLD_ATTR = "data-skoda-bold";
+  function isBoldHeading(heading) {
+    const words = (node) => (node.textContent || "").replace(/\s+/g, "");
+    if (!words(heading)) return false;
+    const walker = heading.ownerDocument.createTreeWalker(
+      heading,
+      4
+      /* NodeFilter.SHOW_TEXT */
+    );
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const bold = node.parentElement.closest("strong, b");
+      if (words(node) && !(bold && heading.contains(bold))) return false;
+    }
+    return true;
+  }
+  function markBoldHeadings(root) {
+    const bold = [...root.querySelectorAll("h1, h2, h3, h4, h5, h6")].filter(isBoldHeading);
+    bold.forEach((h) => h.setAttribute(BOLD_ATTR, ""));
+    return bold.length;
+  }
+  function restoreBoldHeadings(root) {
+    const marked = [...root.querySelectorAll(`[${BOLD_ATTR}]`)];
+    marked.forEach((h) => {
+      h.removeAttribute(BOLD_ATTR);
+      if (!/^H[1-6]$/.test(h.tagName) || !(h.textContent || "").trim()) return;
+      const strong = h.ownerDocument.createElement("strong");
+      strong.append(...h.childNodes);
+      h.append(strong);
+    });
+    return marked.length;
+  }
   function splitVariant(cells) {
     if (cells.length !== 2) return null;
     const [a, b] = cells.map((c) => parseFloat(c.getAttribute(CELL_WIDTH_ATTR)));
@@ -2231,7 +2262,10 @@ var CustomImportScript = (() => {
     preprocess: ({ document: document2 }) => {
       markHighlights(document2);
       markCellWidths(document2);
-      document2.querySelectorAll("article .entry-content, article .content").forEach(markFootnotes);
+      document2.querySelectorAll("article .entry-content, article .content").forEach((body) => {
+        markFootnotes(body);
+        markBoldHeadings(body);
+      });
       transform7("preprocess", document2.body, { document: document2 });
       transform3("preprocess", document2.body, { document: document2 });
       document2.querySelectorAll(".search-results.media-box a.media-cart-action.download[href]").forEach((a) => {
@@ -2259,6 +2293,7 @@ var CustomImportScript = (() => {
       executeTransformers("afterTransform", main, payload);
       main.querySelectorAll("p[data-skoda-footnote]").forEach((p) => parse4(p, payload));
       main.querySelectorAll("[data-skoda-footnote]").forEach((p) => p.removeAttribute("data-skoda-footnote"));
+      restoreBoldHeadings(main);
       dropEmptySections(main);
       WebImporter.rules.transformBackgroundImages(main, document2);
       normalizeImages(main, document2);
