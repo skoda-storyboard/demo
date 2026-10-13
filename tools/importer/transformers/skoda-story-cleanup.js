@@ -179,9 +179,10 @@ function relatedBand(element, document, payload) {
   const rows = [['Story Rail'], ['template', 'story'], ...filters, ['limit', '10']];
   if (self) rows.push(['exclude', self]);
 
-  const h2 = document.createElement('h2');
-  h2.textContent = headingText;
-  const out = [document.createElement('hr'), h2];
+  // h3, as the source .search-results-heading (#296)
+  const title = document.createElement('h3');
+  title.textContent = headingText;
+  const out = [document.createElement('hr'), title];
   if (subText) {
     const p = document.createElement('p');
     p.textContent = subText;
@@ -306,8 +307,9 @@ function seriesNavCards(element, document) {
 }
 
 // Media Box band (`.cover-box.dark > .search-results.media-box`, SKODA-801a, audit 4.1/F4)
-// → its own section, as on press releases: `h2` heading, the stats line ("13 images"),
-// then the Media Box element itself, which the downloads parser turns into the Downloads
+// → its own section, as on press releases: the heading (h3 here, the source level), the
+// stats line ("13 images"), then the Media Box element itself, which the downloads parser
+// turns into the Downloads
 // table between the hooks. The band is unwrapped out of `.cover-box.dark` (still dropped
 // below) and opened with a marker <hr>; finishMediaBox() closes it with Section Metadata.
 function mediaBoxBand(element, document) {
@@ -319,9 +321,10 @@ function mediaBoxBand(element, document) {
     box.querySelectorAll('.search-results-header, .search-results-stats, .togglebox-opener').forEach((n) => n.remove());
     const hr = document.createElement('hr');
     hr.setAttribute(MEDIA_BOX_MARKER, '');
-    const h2 = document.createElement('h2');
-    h2.textContent = heading;
-    const out = [hr, h2];
+    // h3, as the source .search-results-heading (#296)
+    const title = document.createElement('h3');
+    title.textContent = heading;
+    const out = [hr, title];
     if (stats) {
       const p = document.createElement('p');
       p.textContent = stats;

@@ -454,6 +454,29 @@ test('press variant: default rails keep the carousel ladder (no unscoped cell wi
     }));
 });
 
+// --- story Related band arrows + card title hover (#296, SKODA-228) -------------------------
+const ruleFor = (rules, sel) => rules.find(({ selector }) => selectorList(selector).includes(sel));
+
+test('story Related band: the arrows are the source glyph, as on the home bands (#296)', () => {
+  const prev = ruleFor(cssRules, `${STORY_BAND} .carousel-arrow::after`);
+  const next = ruleFor(cssRules, `${STORY_BAND} .carousel-next::after`);
+  assert.ok(prev?.body.includes('rail-arrow-prev.svg'), 'prev glyph mask');
+  assert.ok(next?.body.includes('rail-arrow-next.svg'), 'next glyph mask');
+  // the same rules as the home bands, not a copy that can drift
+  assert.equal(ruleFor(cssRules, '.story-rail.story-rail-home .carousel-arrow::after'), prev);
+  assert.equal(ruleFor(cssRules, '.story-rail.story-rail-home .carousel-next::after'), next);
+});
+
+test('card titles keep their colour on hover: one rule in the shared card primitive (SKODA-228)', async () => {
+  const teaserCss = await readFile(new URL('../../styles/card-teaser.css', import.meta.url), 'utf8');
+  const shared = teaserCss.replace(/\/\*[\s\S]*?\*\//g, '').match(/\.card-teaser-title a:hover\s*\{([^}]*)\}/);
+  assert.ok(shared, 'the shared rule exists');
+  assert.match(shared[1], /color:\s*inherit/);
+  assert.match(shared[1], /text-decoration:\s*none/);
+  // #306's home-only copy is gone: the shared rule covers every rail and card grid
+  assert.equal(cssRules.filter(({ selector }) => selector.includes('card-teaser-title a:hover')).length, 0);
+});
+
 // --- press "All" end card (SKODA-224): only a full band gets it ----------------------
 const { PRESS_BAND_SIZE, pressBandIsFull, pressAllLink } = await import('./story-rail.js');
 
