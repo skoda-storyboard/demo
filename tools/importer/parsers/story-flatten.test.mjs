@@ -684,3 +684,32 @@ test('parse: equal or unmeasured rows stay plain Columns', { skip: domSkip }, ()
   parse(none.querySelector('.entry-content'), { document: none });
   assert.equal(none.querySelector('table').dataset.block, 'Columns', 'without markCellWidths');
 });
+
+// --- bold headings (#296 review: Slavia's "Technical improvements" is not bold on origin) ---------
+const { markBoldHeadings, restoreBoldHeadings, isBoldHeading } = await import('./story-flatten.js');
+
+test('bold headings: only wholly bold source headings get their <strong> back', { skip: domSkip }, () => {
+  const d = domDoc(`<article><div class="entry-content">
+    <h3><strong>Škoda Kylaq sets out on its journey from its home country of India</strong></h3>
+    <h3>Technical improvements</h3>
+    <h3><b>During the travels</b>, <strong>Kylaq</strong> also visited Nepal</h3>
+    <h3> <strong>Careful</strong> <strong>Planning</strong> </h3>
+    <h2>Completely Different Traffic Conditions</h2>
+  </div></article>`);
+  const [kylaq, slavia, partly, split] = d.querySelectorAll('h3');
+  const h2 = d.querySelector('h2');
+  assert.equal(isBoldHeading(kylaq), true);
+  assert.equal(isBoldHeading(slavia), false, 'Slavia: unbolded on origin');
+  assert.equal(isBoldHeading(partly), false, 'a partly bold heading is not a bold heading');
+  assert.equal(isBoldHeading(split), true, 'every word bold, in two runs');
+  assert.equal(isBoldHeading(h2), false);
+  assert.equal(markBoldHeadings(d.querySelector('.entry-content')), 2);
+  // helix-importer's preProcess (DOMUtils.reviewHeadings) then strips the headings' bold tags
+  d.querySelectorAll('strong, b').forEach((el) => el.replaceWith(...el.childNodes));
+  assert.equal(restoreBoldHeadings(d.body), 2);
+  assert.equal(kylaq.innerHTML, '<strong>Škoda Kylaq sets out on its journey from its home country of India</strong>');
+  assert.equal(slavia.querySelector('strong'), null, 'Slavia stays plain (300)');
+  assert.equal(partly.querySelector('strong'), null);
+  assert.equal(split.querySelector('strong').textContent.trim(), 'Careful Planning');
+  assert.equal(d.querySelectorAll('[data-skoda-bold]').length, 0, 'no mark reaches DA');
+});

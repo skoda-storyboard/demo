@@ -218,13 +218,15 @@ const PAYLOAD = { params: { originalURL: 'https://www.skoda-storyboard.com/en/em
 const bandTeaser = (n) => `<div class="search-results-item"><article class="article-teaser">
   <img src="r${n}.jpg" alt="R${n}"><h3 class="entry-title"><a href="/en/emobility/r${n}/">Related ${n}</a></h3></article></div>`;
 
-test('related band → hr + h2 + subheading + index Story Rail (model AND years, self excluded) + Style dark', { skip }, () => {
+test('related band → hr + h3 + subheading + index Story Rail (model AND years, self excluded) + Style dark', { skip }, () => {
   const doc = dom(RELATED);
   storyCleanup('afterTransform', doc.body, PAYLOAD);
-  const h2 = doc.querySelector('h2');
-  assert.equal(h2.textContent, 'Related Stories');
-  assert.equal(h2.previousElementSibling.tagName, 'HR', 'own section');
-  assert.equal(h2.nextElementSibling.textContent, 'Based on tags: 2026, Epiq');
+  // h3, as the source .search-results-heading (#296)
+  assert.equal(doc.querySelector('h2'), null);
+  const title = [...doc.querySelectorAll('h3')].find((h) => h.textContent === 'Related Stories');
+  assert.ok(title, 'the band title is an h3');
+  assert.equal(title.previousElementSibling.tagName, 'HR', 'own section');
+  assert.equal(title.nextElementSibling.textContent, 'Based on tags: 2026, Epiq');
   const tables = [...doc.querySelectorAll('table')];
   const rail = tables.find((t) => blockName(t) === 'Story Rail');
   assert.deepEqual(rowsOf(rail), [
@@ -296,8 +298,10 @@ test('nested div.article-teaser > article yields ONE card per teaser, each with 
 test('aside emits the "Tags" heading before the existing Tags block', { skip }, () => {
   const doc = dom(ASIDE);
   storyAside('afterTransform', doc.body, {});
-  const headings = [...doc.querySelectorAll('h2')].map((h) => h.textContent);
-  assert.deepEqual(headings, ['Explore more', 'Tags']);
+  // h3, as the source h3.sidebar-heading (#296); the cards' titles are inside the Cards table
+  const asideHeadings = [...doc.querySelectorAll('h3')].filter((h) => !h.closest('table'));
+  assert.deepEqual(asideHeadings.map((h) => h.textContent), ['Explore more', 'Tags']);
+  assert.equal(doc.querySelectorAll('h2').length, 0);
   const tagsTable = [...doc.querySelectorAll('table')].find((t) => blockName(t) === 'Tags');
-  assert.equal(doc.querySelectorAll('h2')[1].nextElementSibling, tagsTable);
+  assert.equal(asideHeadings[1].nextElementSibling, tagsTable);
 });
