@@ -300,6 +300,12 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - `parsers/press-kit-content.js` emits it on a kit's FAQ chapter, a `…/frequently-asked-questions/` page (Peaq-2: 28 rows, Epiq-2: 5).
   - The block behaves as the default variant and adds one schema.org `FAQPage` JSON-LD script to the head. It has one `Question` / `acceptedAnswer` per complete row; every FAQ accordion on the page shares that one script.
   - Fallback: without the variant code the block is a plain accordion (`readable`).
+- **Answer layout tables (#275, 2026-10-13):** DA keeps neither the source's empty paragraphs (a pushed `<p>&nbsp;</p>` is dropped on preview) nor its SiteOrigin cell widths. So `parsers/answer-layout.js` carries them as small tables nested in the answer, as a nested Quote is carried:
+  - `Spacer`, a one-cell table: the source's blank line, drawn as one body line plus the paragraph gap (44px).
+  - `Spacer (row)`: an empty builder row, its two 10px cell insets (20px).
+  - `Media row`, a head plus one row of widths (`50.4%` | `49.6%`), placed before the first image of a side-by-side image row. Only rows whose cells aren't equal carry one; `templates/press-kit` sizes the cells from it (≥ 781px) and removes it.
+  - `blocks/accordion` draws the spacers. A Spacer with more cells or rows, another name, or one inside a table cell stays as authored. Fallback: without the code the tables show as one-word tables (`readable`).
+  - In use, across all 56 press kits: first glimpse (2 × `Spacer` in item 1, `Media row` in item 3, `Spacer (row)` in item 8), Peaq-2 Connectivity, Epiq-2 intro and the Elroq covered drive (one `Media row` each), and Fabia 130 (three; not pushed until its PDF / MP4 links are in the DAM).
 
 ### `highlight`
 - **Status:** `pinned` (decided 2026-09-25: section style; **shape 2** 2026-09-28; runtime landed 2026-10-05) · **Ticket:** SKODA-824 · **Fallback:** `readable` (it was `broken` until the runtime landed: the panel had no box or text treatment, and each extra `body-column` section moved the sidebar) · **Styles:** `highlight-dark`, `highlight-grey`

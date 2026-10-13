@@ -1141,3 +1141,44 @@ test('a lead without a full-size image link stays a bare image (#275)', { skip: 
   const page = run(html, target);
   assert.equal(page.querySelector('img[src$="/lead.jpg"]').closest('a'), null);
 });
+
+// #275: an answer's empty paragraphs and rows, and its unequal image cells (live markup 2026-10-12;
+// SiteOrigin writes the cell widths in a head <style>, the mobile @media rule stacks them)
+const PANELS_CSS = `<style>#pgc-w1-1-0 { width:50.4%;width:calc(50.4% - ( 0.496 * 0px ) ) } #pgc-w1-1-1 { width:49.6% }
+  #pgc-w2-1-0 , #pgc-w2-1-1 { width:50% } @media (max-width:780px){ #pgc-w1-1-0 , #pgc-w1-1-1 { width:100% } }</style>`;
+function answerLayoutToggle() {
+  const cell = (id, img) => `<div id="${id}" class="panel-grid-cell">${widget(`<p><a href="https://cdn.skoda-storyboard.com/${img}.jpg"><img src="https://cdn.skoda-storyboard.com/${img}.jpg" alt="${img}"></a></p>`
+    + `<p style="text-align: center;"><a href="/direct-download/${img}.pdf">PDF download</a>&nbsp; &nbsp; <a href="/direct-download/${img}.jpg">JPG download</a></p><p>&nbsp;</p>`)}</div>`;
+  const row = (id, cells) => `<div id="pg-${id}" class="panel-grid">${cells}</div>`;
+  return grid(`<div class="so-panel widget_ys-row-toggle"><h2 class="row-title"><span>Spaced answer</span></h2></div>
+    <div class="so-panel widget_siteorigin-panels-builder"><div class="panel-layout">
+      ${grid(widget('<p>Answer copy.</p>'))}
+      ${row('w1-1', cell('pgc-w1-1-0', 'wide') + cell('pgc-w1-1-1', 'narrow'))}
+      ${row('w2-1', cell('pgc-w2-1-0', 'left') + cell('pgc-w2-1-1', 'right'))}
+      ${row('w3-1', `<div class="panel-grid-cell">${widget('\n\t')}</div>`)}
+    </div></div>`);
+}
+
+test('an answer keeps the source spacers and unequal cell widths as nested tables, in order (#275)', { skip: !JSDOM }, () => {
+  const page = run(fixture({ extra: answerLayoutToggle() }).replace('</head>', `${PANELS_CSS}</head>`), target);
+  const row = rows(page, 'Accordion').find((tr) => txt(tr.children[0]) === 'Spaced answer');
+  const answer = row.children[1];
+  const shape = [...answer.children].map((el) => {
+    if (el.tagName === 'TABLE') return `[${[...el.querySelectorAll('tr')].map((tr) => [...tr.children].map(txt).join('|')).join(' / ')}]`;
+    return el.querySelector('img') ? `img ${el.querySelector('img').alt}` : txt(el).slice(0, 12);
+  });
+  assert.deepEqual(shape, [
+    'Answer copy.',
+    '[Media row / 50.4%|49.6%]', 'img wide', 'PDF download', '[Spacer]', 'img narrow', 'PDF download', '[Spacer]',
+    'img left', 'PDF download', '[Spacer]', 'img right', 'PDF download', '[Spacer]',
+    '[Spacer (row)]',
+  ], 'equal (50/50) cells carry no Media row; the mobile 100% rule is not read');
+  assert.equal(page.querySelectorAll('[data-skoda-spacer], [data-skoda-media-row]').length, 0, 'no marker reaches DA');
+  assert.equal(blocks(page, 'Spacer').filter((t) => !t.closest('table table, td table')).length, 0, 'spacers only inside an answer');
+});
+
+test('spacers and widths are read in answers only: body copy keeps dropping its empty paragraphs (#275)', { skip: !JSDOM }, () => {
+  const page = run(fixture({ extra: grid(widget('<p>Body copy.</p><p>&nbsp;</p><p>More copy.</p>')) }), target);
+  assert.equal(blocks(page, 'Spacer').length, 0);
+  assert.equal(blocks(page, 'Media row').length, 0);
+});

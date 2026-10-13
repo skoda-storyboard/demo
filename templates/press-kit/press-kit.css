@@ -435,8 +435,8 @@ body.press-kit .section.body-column :is(.default-content-wrapper, .columns, .acc
 
 /* An accordion answer's image cells (press-kit.js): the source's two-cell rows, side by side
    from its 781px stack width with 20px between the images, each cell 10px inset with its
-   centred download links under the image. (The first answer's source also has an empty
-   paragraph after its cells, 44px; DA keeps no empty paragraphs.) */
+   centred download links under the image (and a `Spacer` where the source has a blank line,
+   accordion.css). */
 body.press-kit .section.body-column .press-kit-media-row {
   display: grid;
   gap: var(--page-gutter) var(--pk-columns-gap);
@@ -481,6 +481,17 @@ body.press-kit .section.body-column .press-kit-media-links > :any-link {
 @media (width >= 781px) {
   body.press-kit .section.body-column .press-kit-media-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* a row the source sizes unequally (a `Media row`, press-kit.js): each cell its source share
+     of the row and the gap, less the gap (50.4% → 399.33 of 812 beside 392.67) */
+  body.press-kit .section.body-column .press-kit-media-row.sized {
+    display: flex;
+  }
+
+  body.press-kit .section.body-column .press-kit-media-row.sized > .press-kit-media {
+    flex: 0 1 calc(var(--pk-media-width) * (100% + var(--pk-columns-gap)) - var(--pk-columns-gap));
+    min-width: 0;
   }
 }
 
@@ -568,8 +579,9 @@ body.press-kit .section.body-column .embed-wrapper + .default-content-wrapper > 
 }
 
 /* ...drawn as the source's three round controls at the row's end, 12px apart (#275). They are
-   40px high and hang 4px out of the row's 36px, as on the source, so nothing after it moves. */
-body.press-kit .section.body-column .default-content-wrapper > p.press-kit-actions {
+   40px high and hang 4px out of the row's 36px, as on the source, so nothing after it moves
+   (8px under the player; specific enough to override the link row's centring above). */
+body.press-kit .section.body-column .embed-wrapper + .default-content-wrapper > p.press-kit-actions:first-child:has(> .press-kit-action) {
   align-items: flex-start;
   justify-content: flex-end;
   gap: var(--spacing-s);

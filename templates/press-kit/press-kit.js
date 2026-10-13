@@ -89,6 +89,9 @@ const LABELS = {
   openVideo: (title) => (title ? `Open ${title}` : 'Open video'),
 };
 
+// the source toolbar's tooltips (its `title`s); the accessible names stay the labels above
+const TOOLTIPS = { add: 'Add/remove this', download: 'Download this', link: 'Link to page' };
+
 const isImageParagraph = (el) => el?.tagName === 'P' && !!el.querySelector('img') && !el.textContent.trim();
 
 // a paragraph of links only ("PDF download   JPG download"), no image or other text
@@ -96,9 +99,16 @@ const isLinksParagraph = (el) => el?.tagName === 'P' && !el.querySelector('img')
   && !!el.querySelector('a[href]')
   && [...el.childNodes].every((node) => node.nodeName === 'A' || !node.textContent.trim());
 
+// a table nested in an answer (blocks can't nest), named by its first cell: `Spacer`, `Media row`
+const nestedName = (el) => (el?.tagName === 'TABLE'
+  ? el.rows[0]?.cells[0]?.textContent.trim().toLowerCase() || '' : '');
+const isSpacer = (el) => /^spacer\b/.test(nestedName(el));
+const isMediaRow = (el) => nestedName(el) === 'media row';
+
 /**
- * The runs of two or more media units in a cell, in order. A unit is an image paragraph and the
- * links paragraph right after it, if any.
+ * The runs of two or more media units in a cell, in order. A unit is an image paragraph, the
+ * links paragraph right after it and then a `Spacer`, if any. A `Media row` table right before
+ * a run is its cells' source widths (`run.widths`).
  * @param {Element} cell
  * @returns {Element[][][]}
  */
@@ -113,34 +123,52 @@ export function mediaRuns(cell) {
         i += 1;
         unit.push(children[i]);
       }
+      if (isSpacer(children[i + 1])) {
+        i += 1;
+        unit.push(children[i]);
+      }
       run.push(unit);
     } else {
       if (run.length > 1) runs.push(run);
       run = [];
+      if (isMediaRow(children[i])) run.widths = children[i];
     }
   }
   if (run.length > 1) runs.push(run);
   return runs;
 }
 
+// a `Media row` table's widths as fractions, one per cell (`50.4%` → 0.504)
+function mediaWidths(table, count) {
+  const cells = [...(table?.rows[1]?.cells || [])];
+  const widths = cells.map((cell) => parseFloat(cell.textContent) / 100);
+  return widths.length === count && widths.every((w) => w > 0 && w < 1) ? widths : null;
+}
+
 // An accordion answer's images are the source's two-cell rows (#275): each cell an image with
-// its centred "PDF download / JPG download" links under it. Grouped before the Accordion block
-// decorates, so its panel takes the groups with the rest of the answer.
+// its centred "PDF download / JPG download" links under it (and the source's blank line after
+// them, a `Spacer`). A row the source sizes unequally keeps its cell widths. Grouped before the
+// Accordion block decorates, so its panel takes the groups with the rest of the answer.
 function accordionMedia(main) {
   main.querySelectorAll('.section.body-column .accordion > div > div:nth-child(2)').forEach((cell) => {
     mediaRuns(cell).forEach((run) => {
       const row = document.createElement('div');
       row.className = 'press-kit-media-row';
       run[0][0].before(row);
-      run.forEach(([image, links]) => {
+      const widths = mediaWidths(run.widths, run.length);
+      if (widths) row.classList.add('sized');
+      run.forEach((unit, i) => {
         const media = document.createElement('div');
         media.className = 'press-kit-media';
-        image.classList.add('press-kit-media-image');
-        links?.classList.add('press-kit-media-links');
-        media.append(...[image, links].filter(Boolean));
+        unit[0].classList.add('press-kit-media-image');
+        unit.filter(isLinksParagraph).forEach((links) => links.classList.add('press-kit-media-links'));
+        if (widths) media.style.setProperty('--pk-media-width', widths[i]);
+        media.append(...unit);
         row.append(media);
       });
     });
+    // a `Media row` is layout only: it never shows, even without its run
+    cell.querySelectorAll(':scope > table').forEach((table) => { if (isMediaRow(table)) table.remove(); });
   });
 }
 
@@ -165,6 +193,7 @@ function sidebarMediaBox(main) {
   const label = document.createElement('span');
   label.append(...link.childNodes);
   const add = roundAction('button', 'add', LABELS.addAll);
+  add.title = TOOLTIPS.add;
   add.setAttribute('aria-disabled', 'true');
   const groupToggle = () => box.querySelector('.downloads-add-all');
   const sync = () => {
@@ -203,6 +232,7 @@ function videoActions(main) {
     download.setAttribute('download', '');
     const open = roundAction('a', 'link', LABELS.openVideo(title));
     open.href = file.href;
+    [add, download, open].forEach((el) => { el.title = TOOLTIPS[el.classList[1]]; });
     p.classList.add('press-kit-actions');
     p.replaceChildren(add, download, open);
     loadCart().then(({ bindCartControl }) => bindCartControl(add, { href: file.href, title }))

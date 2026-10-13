@@ -134,6 +134,30 @@ test('a Quote table in an answer (blocks can’t nest in DA) becomes a quote blo
   delete globalThis.window;
 });
 
+test('a one-cell Spacer table in an answer becomes the source gap; other tables stay (#275)', { skip: !JSDOM }, () => {
+  const dom = new JSDOM(`<div class="accordion">
+    <div><div><h2>Largest model</h2></div><div>
+      <p>Text.</p>
+      <table><thead><tr><th>Spacer</th></tr></thead></table>
+      <table><tr><td> spacer (Row) </td></tr></table>
+      <table><tr><td>Spacer</td></tr><tr><td>has a body</td></tr></table>
+      <table><tr><td>Spacer</td><td>two cells</td></tr></table>
+      <table><tr><td>Spacers</td></tr></table>
+      <table><tr><td>Data</td></tr><tr><td><table><tr><td>Spacer</td></tr></table></td></tr></table>
+      <p>After.</p>
+    </div></div>
+  </div>`, { url: 'https://example.com/' });
+  globalThis.document = dom.window.document;
+  const block = document.querySelector('.accordion');
+  decorate(block);
+  const panel = block.querySelector('.accordion-panel');
+  assert.deepEqual([...panel.querySelectorAll('.accordion-spacer')].map((s) => s.className), ['accordion-spacer', 'accordion-spacer row']);
+  assert.ok([...panel.querySelectorAll('.accordion-spacer')].every((s) => !s.textContent && !s.children.length), 'no text to read out');
+  assert.equal(panel.querySelectorAll(':scope > table').length, 4, 'a Spacer with a body, two cells, another name, or in a cell stays');
+  assert.equal(panel.querySelectorAll('table table').length, 1);
+  assert.equal(panel.firstElementChild.nextElementSibling.className, 'accordion-spacer', 'in place');
+});
+
 // --- FAQ variant (SKODA-807): FAQPage structured data -------------------------------------
 const faqDom = (html) => {
   const dom = new JSDOM(`<!DOCTYPE html><html><head></head><body><main>${html}</main></body></html>`, { url: 'https://example.com/en/press-kits/kit/frequently-asked-questions' });
@@ -246,5 +270,8 @@ test('CSS: answer starts 10px under its question at full width; the plus sits in
   assert.match(rule('.accordion .accordion-panel ul > li'), /margin-block-end: var\(--accordion-list-item-gap\);/);
   assert.match(rule('.accordion'), /--accordion-list-item-gap: var\(--spacing-m\);/);
   assert.match(rule('.accordion .accordion-panel ul > li::before'), /border-block-end: var\(--accordion-bullet-weight\) solid var\(--skoda-black\);/);
+  // the source's gaps (#275): a blank line and its paragraph gap (44px), an empty row's two insets (20px)
+  assert.match(rule('.accordion .accordion-spacer'), /block-size: calc\(var\(--body-font-size-m\) \* var\(--line-height-body\)\);[\s\S]*margin-block-end: var\(--paragraph-gap\);/);
+  assert.match(rule('.accordion .accordion-spacer.row'), /block-size: calc\(2 \* var\(--accordion-panel-inset\)\);[\s\S]*margin-block-end: 0;/);
 });
 

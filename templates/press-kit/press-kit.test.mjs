@@ -196,6 +196,32 @@ test('accordion images pair with their download links, two or more in a row beco
   assert.equal(cell.lastElementChild.textContent, 'After text', 'text after the row stays where it was');
 });
 
+const SPACER = '<table><thead><tr><th>Spacer</th></tr></thead></table>';
+const WIDTHS = (...w) => `<table><thead><tr><th colspan="${w.length}">Media row</th></tr></thead><tbody><tr>${w.map((x) => `<td>${x}</td>`).join('')}</tr></tbody></table>`;
+
+test('a cell keeps the source\'s blank line after its links; a Media row sizes its cells and never shows (#275)', () => {
+  const main = setup(ANSWER(`<p>Intro</p>${IMG('a')}${LINKS}${SPACER}${IMG('b')}${LINKS}${SPACER}`
+    + `<p>Between</p>${WIDTHS('50.4%', '49.6%')}${IMG('c')}${IMG('d')}`));
+  decorate(main);
+  const [spaced, sized] = main.querySelectorAll('.press-kit-media-row');
+  assert.deepEqual([...spaced.children].map((media) => [...media.children].map((el) => el.className || el.tagName)), [
+    ['press-kit-media-image', 'press-kit-media-links', 'TABLE'], ['press-kit-media-image', 'press-kit-media-links', 'TABLE']],
+  'each cell ends with its Spacer, for the Accordion block to draw');
+  assert.equal(spaced.classList.contains('sized'), false, 'equal cells carry no widths');
+  assert.ok(sized.classList.contains('sized'));
+  assert.deepEqual([...sized.children].map((media) => media.style.getPropertyValue('--pk-media-width')), ['0.504', '0.496']);
+  assert.equal(main.querySelectorAll('.accordion table').length, 2, 'the Media row table is gone, the Spacers stay');
+});
+
+test('a Media row that doesn\'t fit its run, or has no run, is dropped and sizes nothing (#275)', () => {
+  const main = setup(ANSWER(`${WIDTHS('40%', '30%', '30%')}${IMG('a')}${IMG('b')}<p>Text</p>${WIDTHS('60%', 'x')}${IMG('c')}${IMG('d')}`
+    + `<p>More</p>${WIDTHS('60%', '40%')}<p>No images</p>`));
+  decorate(main);
+  assert.equal(main.querySelectorAll('.press-kit-media-row').length, 2);
+  assert.equal(main.querySelectorAll('.press-kit-media-row.sized, [style]').length, 0);
+  assert.equal(main.querySelectorAll('table').length, 0);
+});
+
 test('a lone image, an image with text and a links paragraph with text are not media cells (#275)', () => {
   const main = setup(ANSWER(`${IMG('a')}<p>Text</p><p><a href="/x.jpg"><picture><img src="./x.jpg" alt=""></picture></a> caption</p>${IMG('b')}<p><a href="/b.pdf">PDF download</a> and more</p>`));
   decorate(main);
@@ -216,6 +242,7 @@ test('the sidebar "Download Media Box" row is the label and a + that drives the 
   assert.equal(row.querySelector('span').textContent, 'Download Media Box');
   const add = row.querySelector('button.press-kit-action.add');
   assert.equal(add.getAttribute('aria-label'), 'Add all files to the media cart');
+  assert.equal(add.title, 'Add/remove this', 'the source tooltip');
   assert.equal(add.getAttribute('aria-disabled'), 'true', 'inert until the Media Box toggle exists');
   add.click(); // no toggle yet: nothing happens, nothing throws
   // the Downloads block adds its group toggle later; the + follows its state and clicks it
@@ -255,6 +282,7 @@ test('a clip\'s "Download video" link becomes add / download / open controls; ot
   assert.deepEqual(controls.map((el) => `${el.tagName} ${el.classList[1]}`), ['BUTTON add', 'A download', 'A link']);
   assert.deepEqual(controls.map((el) => el.getAttribute('aria-label')), [
     'Add to media cart: Covered Drive', 'Download Covered Drive', 'Open Covered Drive']);
+  assert.deepEqual(controls.map((el) => el.title), ['Add/remove this', 'Download this', 'Link to page'], 'the source tooltips');
   assert.equal(controls[0].getAttribute('aria-disabled'), 'true', 'disabled until the cart binds it');
   assert.equal(controls[1].getAttribute('href'), clip);
   assert.equal(controls[1].getAttribute('download'), '');

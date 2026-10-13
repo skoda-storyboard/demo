@@ -88,6 +88,7 @@ test('PDF with no picture renders a labelled file tile and a direct download', a
   assert.equal(link.getAttribute('href'), 'https://example.com/release.pdf?download=1');
   assert.equal(link.getAttribute('download'), '');
   assert.equal(link.getAttribute('aria-label'), 'Download Release PDF (PDF)');
+  assert.equal(link.title, 'Download this', 'the source tooltip (#275)');
 });
 
 test('MP4 poster has a decorative play badge but the round control downloads the video', async () => {
@@ -129,6 +130,9 @@ test('image sizes remain an accessible two-link menu, and incomplete files do no
   toggle.click();
   assert.equal(toggle.getAttribute('aria-expanded'), 'true');
   assert.equal(block.querySelectorAll('.downloads-size[aria-label^="Download Front view"]').length, 2);
+  assert.deepEqual([...block.querySelectorAll('a.downloads-size')].map((a) => a.title),
+    ['Download Original version', 'Download 1920px version'], 'the source tooltips (#275)');
+  assert.equal(toggle.title, '', 'the toggle has none, as the source\'s');
 });
 
 test('media-box collapses whenever the items need more than two rows (source togglebox, SKODA-830 D2)', async () => {
@@ -467,6 +471,8 @@ test('a Media Box image tile adds through the source size menu: Original toggles
   assert.equal(giant.dataset.href, undefined, 'the cart holds originals only (D5)');
   assert.equal(giant.getAttribute('aria-disabled'), 'true');
   assert.equal(giant.getAttribute('aria-label'), "1920px version can't be added to the media cart");
+  assert.deepEqual(rows.map((r) => r.title), ['Add/remove 1920px version', 'Add/remove Original version'], 'the source tooltips');
+  assert.equal(toggle.title, '');
   toggle.click();
   assert.equal(menu.hidden, false);
   assert.equal(toggle.getAttribute('aria-expanded'), 'true');
@@ -486,6 +492,7 @@ test('outside a Media Box, and for a single-size tile, the add stays one round t
   await decorate(box);
   assert.ok(box.querySelector('.downloads-add'));
   assert.equal(box.querySelector('.downloads-add-toggle'), null);
+  assert.equal(box.querySelector('.downloads-item .downloads-add').title, 'Add/remove this', 'the source tooltip');
 });
 
 test('Media Box: the group toggle sits on the section stats line', async () => {
