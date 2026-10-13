@@ -1093,14 +1093,38 @@ body.story main > .section.sidebar .default-content-wrapper > :is(h2, h3) {
 /* stylelint-disable-next-line no-descending-specificity -- the intro → body rule above must
    keep winning on a leading panel's top margin */
 body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) {
+  /* A panel whose source layout sets its own row padding or widget margins carries them
+     (Section Metadata `highlight-padding|margin|gallery-margin[-mobile]`, scripts.js sets the
+     --hl-*-m-* / --hl-*-d-* boxes); the rest keep the theme's: no row padding, the 15px widget
+     margin, a gallery flush with the 10px cell padding. Up to 780px the mobile boxes apply. */
+  --hl-pad-top: var(--hl-pad-m-top, var(--highlight-row-top));
+  --hl-pad-right: var(--hl-pad-m-right, 0px);
+  --hl-pad-bottom: var(--hl-pad-m-bottom, 0px);
+  --hl-pad-left: var(--hl-pad-m-left, 0px);
+  --hl-margin-top: var(--hl-margin-m-top, var(--highlight-widget-block));
+  --hl-margin-right: var(--hl-margin-m-right, var(--highlight-widget-inline));
+  --hl-margin-bottom: var(--hl-margin-m-bottom, var(--highlight-widget-block));
+  --hl-margin-left: var(--hl-margin-m-left, var(--highlight-widget-inline));
+  --hl-gallery-right: var(--hl-gallery-m-right, 0px);
+  --hl-gallery-left: var(--hl-gallery-m-left, 0px);
+
   margin-block-start: 0;
   padding-block:
-    calc(var(--highlight-row-top) + var(--story-inset) + var(--highlight-widget-block))
-    calc(var(--story-inset) + var(--highlight-widget-block));
+    calc(var(--hl-pad-top) + var(--story-inset) + var(--hl-margin-top))
+    calc(var(--hl-pad-bottom) + var(--story-inset) + var(--hl-margin-bottom));
 }
 
 body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) > div {
-  padding-inline: calc(var(--story-inset) + var(--highlight-widget-inline));
+  padding-inline:
+    calc(var(--hl-pad-left) + var(--story-inset) + var(--hl-margin-left))
+    calc(var(--hl-pad-right) + var(--story-inset) + var(--hl-margin-right));
+}
+
+/* a gallery sits its own source margin in, not the text's */
+body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) .gallery.slider {
+  margin-inline:
+    calc(var(--hl-gallery-left) - var(--hl-margin-left))
+    calc(var(--hl-gallery-right) - var(--hl-margin-right));
 }
 
 /* panel images are block-level, as on the source: an inline image leaves the paragraph's
@@ -1112,8 +1136,7 @@ body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) .def
 /* A leading panel keeps the intro → body gap but its own top inset (after the intro → body
    rule, which has the same specificity). */
 body.story main > .section:first-of-type + .section:is(.highlight-dark, .highlight-grey) {
-  padding-block-start:
-    calc(var(--highlight-row-top) + var(--story-inset) + var(--highlight-widget-block));
+  padding-block-start: calc(var(--hl-pad-top) + var(--story-inset) + var(--hl-margin-top));
 }
 
 body.story main > .section:is(.highlight-dark, .highlight-grey):has(+ .section.body-column),
@@ -1238,6 +1261,20 @@ body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has
 @media (width >= 781px) {
   body.story {
     --highlight-widget-block: 0px;
+  }
+
+  /* a panel's own desktop geometry (see the panel rule above) */
+  body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) {
+    --hl-pad-top: var(--hl-pad-d-top, var(--highlight-row-top));
+    --hl-pad-right: var(--hl-pad-d-right, 0px);
+    --hl-pad-bottom: var(--hl-pad-d-bottom, 0px);
+    --hl-pad-left: var(--hl-pad-d-left, 0px);
+    --hl-margin-top: var(--hl-margin-d-top, var(--highlight-widget-block));
+    --hl-margin-right: var(--hl-margin-d-right, var(--highlight-widget-inline));
+    --hl-margin-bottom: var(--hl-margin-d-bottom, var(--highlight-widget-block));
+    --hl-margin-left: var(--hl-margin-d-left, var(--highlight-widget-inline));
+    --hl-gallery-right: var(--hl-gallery-d-right, 0px);
+    --hl-gallery-left: var(--hl-gallery-d-left, 0px);
   }
 }
 

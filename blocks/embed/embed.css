@@ -50,6 +50,13 @@
   overflow: hidden;
 }
 
+/* An authored `height` (the source's `width="100%" height="448px"` iframe): that height at
+   every width, no ratio. */
+.embed .embed-video.fixed-height {
+  aspect-ratio: auto;
+  height: var(--embed-height);
+}
+
 /* Audio (Buzzsprout / Spotify): fixed height, fluid width — NOT 16:9. */
 .embed .embed-audio {
   position: relative;

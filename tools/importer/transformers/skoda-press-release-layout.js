@@ -75,6 +75,22 @@ function urlParagraph(document, url) {
 }
 
 /**
+ * An embedded player: its bare URL, which the embed block autoblocks. A full-width video iframe of
+ * a fixed pixel height (Play-Doh: `width="100%" height="448px"`) keeps that box instead: an `Embed`
+ * table with a `height` row, marked so dataTables leaves it.
+ */
+function embedFor(document, iframe, url) {
+  // audio players (Buzzsprout, Spotify) have the block's own fixed height
+  const video = /(?:^|\.)(?:youtube(?:-nocookie)?\.com|youtu\.be|vimeo\.com)\//i.test(url.replace(/^https?:\/\//, ''));
+  const fixed = video && (iframe.getAttribute('width') || '').trim() === '100%'
+    && ((iframe.getAttribute('height') || '').trim().match(/^(\d+)(?:px)?$/) || [])[1];
+  if (!fixed) return urlParagraph(document, url);
+  const table = WebImporter.DOMUtils.createTable([['Embed'], ['url', link(document, url, url)], ['height', fixed]], document);
+  table.dataset.skodaEmbed = '';
+  return table;
+}
+
+/**
  * Title as plain text, keeping an authored <br> as a line break (Peaq: "range record<br>for
  * seven-seater" breaks there on the source at every width, SKODA-607a). The metadata Title
  * comes from og:title, so it stays one line.
@@ -185,10 +201,11 @@ function bodyContent(document, primary) {
   content.querySelectorAll('.sa-bnr').forEach((n) => n.remove());
 
   // Buzzsprout AI-audio player (lazy: the URL is in data-src until scrolled into view).
+  // The Play-Doh YouTube player sits in the same lazy wrapper.
   content.querySelectorAll('.embed-controller-wrapper').forEach((wrap) => {
     const iframe = wrap.querySelector('iframe');
     const url = iframe && (iframe.getAttribute('data-src') || iframe.getAttribute('src'));
-    wrap.replaceWith(...(url ? [urlParagraph(document, url)] : []));
+    wrap.replaceWith(...(url ? [embedFor(document, iframe, url)] : []));
   });
 
   // <lite-youtube videoid> (Solberg Octavia RS): by import time the page script has hydrated it
@@ -214,11 +231,11 @@ function bodyContent(document, primary) {
   });
   content.querySelectorAll('.media-cart-actions').forEach((n) => n.remove());
 
-  // Any other iframe with a provider URL → bare URL; the rest is dropped.
+  // Any other iframe with a provider URL → bare URL (embedFor); the rest is dropped.
   content.querySelectorAll('iframe').forEach((iframe) => {
     const url = iframe.getAttribute('src') || iframe.getAttribute('data-src');
     const p = iframe.closest('p');
-    const replacement = url && /^https?:/.test(url) ? urlParagraph(document, url) : null;
+    const replacement = url && /^https?:/.test(url) ? embedFor(document, iframe, url) : null;
     if (p && text(p) === '') p.replaceWith(...(replacement ? [replacement] : []));
     else iframe.replaceWith(...(replacement ? [replacement] : []));
   });
@@ -250,6 +267,10 @@ function bodyContent(document, primary) {
  */
 function dataTables(document, content) {
   content.querySelectorAll('table').forEach((table) => {
+    if (table.hasAttribute('data-skoda-embed')) {
+      table.removeAttribute('data-skoda-embed');
+      return;
+    }
     const rows = [...table.rows].filter((row) => text(row));
     const filled = (row) => [...row.cells].filter((cell) => text(cell));
     if (rows.filter((row) => filled(row).length >= 2).length < 2) return;
