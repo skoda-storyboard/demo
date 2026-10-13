@@ -161,6 +161,34 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
     rows unchanged, 277 `hreflang:en` rows). Backup: `.migration/wt303a-scratch/metadata.da.before-299-rereview.json`.
     A first run without `--chrome` dropped the 4 `/{locale}/**` chrome rows (re-pushed at once). `mergeSheet()` now
     replaces chrome rows only when the run brings its own, so a run without `--chrome` keeps them (tested).
+- **QA re-test (#243, Kondalu, 2026-10-13; fixed 2026-10-13, branch `bug-243-locale-qa`).** Measured on the Epiq
+  family against the source at 1440 / 1080 / 992 / 768 / 390:
+  1. **Language link colour:** EDS `--skoda-grey-700` `#5a5b5c`, the source `#7c7d7e`. **PO decision (2026-10-13):
+     match the source**, accepting that it is below AA (3.30:1 on the `#e6e6e6` topbar, 3.65 on `#f1f1f1`, 4.12 on
+     white). The inactive links use `--skoda-grey-500` in the topbar and the drawer. This supersedes the contrast AC
+     above. The Subscribe CTA keeps `--skoda-grey-700` (not reported). axe now lists the 4 inactive links under
+     `color-contrast`, as on the source (SKODA-703: "as source, accepted").
+  2. **"Show more" untranslated:** the Media Box pill read the Downloads block's English label. It now reads
+     `Show More` / `Show Less` from `/{locale}/placeholders` (English without a sheet or key). The sheets hold the
+     source's togglebox words: CS "Zobrazit více / méně", DE "Mehr / Weniger anzeigen", SK "Zobraziť viac / menej",
+     SR "Prikaži više / manje" (DA preview; `/cs/placeholders` already had 8 rows, kept). Publish with the pages.
+  3. **Related Stories missing:** the CS / SK pages had an index rail that stays empty (no `/{locale}/query-index`,
+     SKODA-1001, and their related stories aren't migrated); DE had none (its source rail story was published on
+     13 Oct, after the import); SR has none on the source either. **PO decision: curated rail from the source** on
+     translated stories only. The story importer keeps the source cards (image, date, title linking the source story
+     in a new tab), CS 10 / SK 7 / DE 1, the same order and card box as the source at every width. The source clips
+     titles in the browser (`data-dotdotdot`), so the importer restores the full title from the image `alt` and the
+     rail's CSS clamps it, as for index cards. EN keeps its index rail.
+  4. **DE Media Box missing:** the source DE page has no Media Box either. No change.
+  - **Re-import (DA preview):** CS, DE, SK re-imported with today's importer. Besides the rail they pick up `main`'s
+    h3 band headings (#296) and the Footnotes block, as the EN page. The CS page's inline newsletter card is gone
+    (SKODA-840): `/cs/fragments/newsletter-card` was imported from the CS source story and pushed to preview.
+  - **Found and fixed on the way:** `scripts/links.js` sent a Fragment block's `/cs/fragments/…` reference to the
+    live site (the locale rule), so a translated story's shared newsletter card never loaded. Fragment references
+    are now left alone.
+  - **Not changed (notes):** DE / SK / SR have no newsletter widget on the source and no fragment, so the runtime's
+    empty Fragment link stays in their sidebar (axe `link-name` 1, the same as `main`). The source shows the DE
+    rail's one title on 2 lines at ≥ 992; the rail clamps it to 1, as for every index card.
 
 ## Dependencies
 - Upstream: SKODA-301 (Header + nav fragment) / Downstream: SKODA-1003 (language-negotiated root routing + per-locale placeholders)

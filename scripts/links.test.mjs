@@ -114,3 +114,24 @@ test('links inside [data-link-policy="resolved"] keep the target and tab their b
   assert.deepEqual([kept.getAttribute('target'), kept.getAttribute('rel')], [null, null]);
   assert.equal(policed.getAttribute('target'), '_blank', 'other live links keep the policy');
 });
+
+test('Fragment block references are left alone: a locale fragment loads from this site (#243)', async () => {
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  const { JSDOM } = await import('jsdom');
+  const { window } = new JSDOM(`<main>
+    <div class="fragment"><div><div><a id="frag" href="/cs/fragments/newsletter-card"></a></div></div></div>
+    <p><a id="page" href="/cs/e-mobilita-cs/x">CZ</a></p></main>`, { url: 'https://main--demo--skoda-storyboard.aem.page/cs/e-mobilita-cs/story' });
+  const { decorateLinks } = await import('./links.js');
+  globalThis.window = window;
+  try {
+    decorateLinks(window.document.querySelector('main'));
+  } finally {
+    delete globalThis.window;
+  }
+  const frag = window.document.getElementById('frag');
+  assert.equal(frag.getAttribute('href'), '/cs/fragments/newsletter-card');
+  assert.equal(frag.getAttribute('target'), null);
+  const page = window.document.getElementById('page');
+  assert.equal(page.getAttribute('href'), `${LIVE_ORIGIN}/cs/e-mobilita-cs/x`, 'other locale links keep the policy');
+  assert.equal(page.getAttribute('target'), '_blank');
+});

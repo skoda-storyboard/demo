@@ -4,9 +4,9 @@ import { JSDOM } from 'jsdom';
 
 /* eslint-disable import/no-extraneous-dependencies, no-undef */
 
-const setup = (pressRelease = true) => {
+const setup = (pressRelease = true, url = 'https://example.com/en/press-releases/sample') => {
   const dom = new JSDOM(`<body>${pressRelease ? '<div class="section media-box">' : ''}<div class="downloads"></div>${pressRelease ? '</div>' : ''}</body>`, {
-    url: 'https://example.com/en/press-releases/sample',
+    url,
   });
   if (pressRelease) dom.window.document.body.className = 'press-release';
   let width = 500;
@@ -174,6 +174,60 @@ test('the toggle stays a labelled button: Show less once open, focus kept in vie
   assert.equal(toggle.textContent, 'Show more');
   assert.equal(scrolled, 1, 'collapsing keeps the button in view');
   assert.equal(document.activeElement, toggle);
+});
+
+// the placeholders chain settles after decorate (dynamic import + fetch)
+const settleLabels = async (done) => {
+  for (let i = 0; i < 50 && !done(); i += 1) await new Promise((resolve) => { setTimeout(resolve, 0); });
+};
+
+test('the toggle uses the locale placeholders sheet: Show More / Show Less, English without it (#243)', async () => {
+  const originalFetch = globalThis.fetch;
+  const asked = [];
+  const sheet = (rows) => async (url) => {
+    asked.push(String(url));
+    return rows ? { ok: true, json: async () => ({ data: rows }) } : { ok: false, status: 404 };
+  };
+  const fiveFiles = (block) => {
+    for (let i = 0; i < 5; i += 1) addRow(block, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
+  };
+  try {
+    globalThis.fetch = sheet([{ Key: 'Show More', Text: 'Zobrazit více' }, { Key: 'Show Less', Text: 'Zobrazit méně' }]);
+    const cs = setup(true, 'https://example.com/cs/e-mobilita-cs/story');
+    fiveFiles(cs);
+    await decorate(cs);
+    const toggle = cs.querySelector('.downloads-more');
+    await settleLabels(() => toggle.textContent === 'Zobrazit více');
+    assert.equal(toggle.textContent, 'Zobrazit více');
+    assert.ok(asked.includes('/cs/placeholders.json'), 'the page locale sheet');
+    toggle.click();
+    assert.equal(toggle.textContent, 'Zobrazit méně');
+    toggle.click();
+    assert.equal(toggle.textContent, 'Zobrazit více');
+
+    // no sheet for the locale (404): English stays
+    globalThis.fetch = sheet(null);
+    const sk = setup(true, 'https://example.com/sk/emobilita-sk/story');
+    fiveFiles(sk);
+    await decorate(sk);
+    await settleLabels(() => asked.includes('/sk/placeholders.json'));
+    await settleLabels(() => false);
+    assert.equal(sk.querySelector('.downloads-more').textContent, 'Show more');
+
+    // a sheet without the keys, or with blank texts: English stays
+    globalThis.fetch = sheet([{ Key: 'Search', Text: 'Pretraga' }, { Key: 'Show Less', Text: '' }]);
+    const sr = setup(true, 'https://example.com/sr/emobilnost-sr/story');
+    fiveFiles(sr);
+    await decorate(sr);
+    await settleLabels(() => asked.includes('/sr/placeholders.json'));
+    await settleLabels(() => false);
+    const srToggle = sr.querySelector('.downloads-more');
+    assert.equal(srToggle.textContent, 'Show more');
+    srToggle.click();
+    assert.equal(srToggle.textContent, 'Show less');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test('media-box and standard auto groups disclose according to their responsive columns', async () => {
