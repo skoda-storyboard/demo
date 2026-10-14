@@ -135467,12 +135467,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/laurin-klement-slavia-type-b-1899-1904"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/laurin-klement-slavia-type-b-1899-1904/LaurinKlement_B_1901_d1b188ba.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/10/LaurinKlement_B_1901_d1b188ba.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/laurin-klement-slavia-type-b-1899-1904/LaurinKlement_B_1901_d1b188ba.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/laurin-klement-slavia-type-b-1899-1904/LaurinKlement_B_1901_d1b188ba.pdf",
+        "mime": "application/pdf",
+        "bytes": 133121
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135480,15 +135484,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/10/LaurinKlement_B_1901_d1b188ba.pdf"
       ],
-      "bytes": null,
+      "bytes": 133121,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:05.628Z"
     },
     "1d6b46b5__LaurinKlement_BZ_1903_e4d5d5e0.pdf": {
       "kind": "document",
@@ -135499,12 +135508,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/laurin-klement-bz-1902-1904"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/laurin-klement-bz-1902-1904/LaurinKlement_BZ_1903_e4d5d5e0.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/10/LaurinKlement_BZ_1903_e4d5d5e0.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/laurin-klement-bz-1902-1904/LaurinKlement_BZ_1903_e4d5d5e0.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/laurin-klement-bz-1902-1904/LaurinKlement_BZ_1903_e4d5d5e0.pdf",
+        "mime": "application/pdf",
+        "bytes": 132041
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135512,15 +135525,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/10/LaurinKlement_BZ_1903_e4d5d5e0.pdf"
       ],
-      "bytes": null,
+      "bytes": 132041,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:11.698Z"
     },
     "2ba8cd9d__Laurin_and_Klement_Voiturette_A_ce4cb07c.pdf": {
       "kind": "document",
@@ -135531,12 +135549,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/laurin-klement-voiturette-a-1905-1907"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/laurin-klement-voiturette-a-1905-1907/Laurin_and_Klement_Voiturette_A_ce4cb07c.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Laurin_and_Klement_Voiturette_A_ce4cb07c.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/laurin-klement-voiturette-a-1905-1907/Laurin_and_Klement_Voiturette_A_ce4cb07c.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/laurin-klement-voiturette-a-1905-1907/Laurin_and_Klement_Voiturette_A_ce4cb07c.pdf",
+        "mime": "application/pdf",
+        "bytes": 111299
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135544,15 +135566,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Laurin_and_Klement_Voiturette_A_ce4cb07c.pdf"
       ],
-      "bytes": null,
+      "bytes": 111299,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:15.443Z"
     },
     "2ba8cd9d__Laurin_and_Klement_BSC_0cc8b83f.pdf": {
       "kind": "document",
@@ -135563,12 +135590,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-museum-presents-only-surviving-laurin-klement-bscsports-car-from-1908"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-museum-presents-only-surviving-laurin-klement-bscsports-car-from-1908/Laurin_and_Klement_BSC_0cc8b83f.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Laurin_and_Klement_BSC_0cc8b83f.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-museum-presents-only-surviving-laurin-klement-bscsports-car-from-1908/Laurin_and_Klement_BSC_0cc8b83f.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-museum-presents-only-surviving-laurin-klement-bscsports-car-from-1908/Laurin_and_Klement_BSC_0cc8b83f.pdf",
+        "mime": "application/pdf",
+        "bytes": 122290
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135576,15 +135607,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Laurin_and_Klement_BSC_0cc8b83f.pdf"
       ],
-      "bytes": null,
+      "bytes": 122290,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:18.781Z"
     },
     "2ba8cd9d__Skoda_645_d24aa51b.pdf": {
       "kind": "document",
@@ -135595,12 +135631,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-645-1929-1934"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-645-1929-1934/Skoda_645_d24aa51b.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_645_d24aa51b.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-645-1929-1934/Skoda_645_d24aa51b.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-645-1929-1934/Skoda_645_d24aa51b.pdf",
+        "mime": "application/pdf",
+        "bytes": 92428
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135608,15 +135648,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_645_d24aa51b.pdf"
       ],
-      "bytes": null,
+      "bytes": 92428,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:21.423Z"
     },
     "2ba8cd9d__Skoda_Popular_Sport_0b133adb.pdf": {
       "kind": "document",
@@ -135627,12 +135672,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally/Skoda_Popular_Sport_0b133adb.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Popular_Sport_0b133adb.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally/Skoda_Popular_Sport_0b133adb.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally/Skoda_Popular_Sport_0b133adb.pdf",
+        "mime": "application/pdf",
+        "bytes": 125866
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135640,15 +135689,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Popular_Sport_0b133adb.pdf"
       ],
-      "bytes": null,
+      "bytes": 125866,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:24.778Z"
     },
     "2ba8cd9d__Skoda_Popular_Monte_Carlo_e8d39c9b.pdf": {
       "kind": "document",
@@ -135659,12 +135713,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-popular-monte-carlo-1936-1939"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-popular-monte-carlo-1936-1939/Skoda_Popular_Monte_Carlo_e8d39c9b.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Popular_Monte_Carlo_e8d39c9b.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-popular-monte-carlo-1936-1939/Skoda_Popular_Monte_Carlo_e8d39c9b.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-popular-monte-carlo-1936-1939/Skoda_Popular_Monte_Carlo_e8d39c9b.pdf",
+        "mime": "application/pdf",
+        "bytes": 92970
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135672,15 +135730,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Popular_Monte_Carlo_e8d39c9b.pdf"
       ],
-      "bytes": null,
+      "bytes": 92970,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:27.641Z"
     },
     "2ba8cd9d__Skoda_Superb_3000_OHV_889b0143.pdf": {
       "kind": "document",
@@ -135691,12 +135754,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-superb-3000-ohv-1938-1949"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-superb-3000-ohv-1938-1949/Skoda_Superb_3000_OHV_889b0143.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Superb_3000_OHV_889b0143.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-superb-3000-ohv-1938-1949/Skoda_Superb_3000_OHV_889b0143.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-superb-3000-ohv-1938-1949/Skoda_Superb_3000_OHV_889b0143.pdf",
+        "mime": "application/pdf",
+        "bytes": 98710
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135704,15 +135771,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Superb_3000_OHV_889b0143.pdf"
       ],
-      "bytes": null,
+      "bytes": 98710,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:30.526Z"
     },
     "2ba8cd9d__Skoda_1101_Tudor_cabrio_5acb825e.pdf": {
       "kind": "document",
@@ -135723,12 +135795,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary/Skoda_1101_Tudor_cabrio_5acb825e.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_1101_Tudor_cabrio_5acb825e.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary/Skoda_1101_Tudor_cabrio_5acb825e.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary/Skoda_1101_Tudor_cabrio_5acb825e.pdf",
+        "mime": "application/pdf",
+        "bytes": 136950
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135736,15 +135812,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_1101_Tudor_cabrio_5acb825e.pdf"
       ],
-      "bytes": null,
+      "bytes": 136950,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:35.859Z"
     },
     "2ba8cd9d__Skoda_440_469d33ab.pdf": {
       "kind": "document",
@@ -135755,12 +135836,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/1955-skoda-440-on-the-international-stage"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/1955-skoda-440-on-the-international-stage/Skoda_440_469d33ab.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_440_469d33ab.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/1955-skoda-440-on-the-international-stage/Skoda_440_469d33ab.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/1955-skoda-440-on-the-international-stage/Skoda_440_469d33ab.pdf",
+        "mime": "application/pdf",
+        "bytes": 116277
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135768,15 +135853,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_440_469d33ab.pdf"
       ],
-      "bytes": null,
+      "bytes": 116277,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:42.183Z"
     },
     "1d6b46b5__Skoda_Octavia_1960_ea4ea4f6.pdf": {
       "kind": "document",
@@ -135787,12 +135877,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-octavia-1959-1964"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-octavia-1959-1964/Skoda_Octavia_1960_ea4ea4f6.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_Octavia_1960_ea4ea4f6.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-octavia-1959-1964/Skoda_Octavia_1960_ea4ea4f6.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-octavia-1959-1964/Skoda_Octavia_1960_ea4ea4f6.pdf",
+        "mime": "application/pdf",
+        "bytes": 146693
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135800,15 +135894,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_Octavia_1960_ea4ea4f6.pdf"
       ],
-      "bytes": null,
+      "bytes": 146693,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:45.128Z"
     },
     "2ba8cd9d__Skoda_Felicia_63e5d6ff.pdf": {
       "kind": "document",
@@ -135819,12 +135918,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-felicia-1959-1964"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-felicia-1959-1964/Skoda_Felicia_63e5d6ff.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Felicia_63e5d6ff.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-felicia-1959-1964/Skoda_Felicia_63e5d6ff.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-felicia-1959-1964/Skoda_Felicia_63e5d6ff.pdf",
+        "mime": "application/pdf",
+        "bytes": 112668
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135832,15 +135935,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Felicia_63e5d6ff.pdf"
       ],
-      "bytes": null,
+      "bytes": 112668,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:48.087Z"
     },
     "1d6b46b5__60_years_Trekka_b153bc2a.pdf": {
       "kind": "document",
@@ -135851,12 +135959,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand/60_years_Trekka_b153bc2a.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/10/60_years_Trekka_b153bc2a.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand/60_years_Trekka_b153bc2a.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand/60_years_Trekka_b153bc2a.pdf",
+        "mime": "application/pdf",
+        "bytes": 139268
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135864,15 +135976,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/10/60_years_Trekka_b153bc2a.pdf"
       ],
-      "bytes": null,
+      "bytes": 139268,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:50.944Z"
     },
     "1d6b46b5__Skoda_1100_MBX_47845713.pdf": {
       "kind": "document",
@@ -135883,12 +136000,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-1100-mbx-1967-1969"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-1100-mbx-1967-1969/Skoda_1100_MBX_47845713.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_1100_MBX_47845713.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-1100-mbx-1967-1969/Skoda_1100_MBX_47845713.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-1100-mbx-1967-1969/Skoda_1100_MBX_47845713.pdf",
+        "mime": "application/pdf",
+        "bytes": 133852
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135896,15 +136017,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_1100_MBX_47845713.pdf"
       ],
-      "bytes": null,
+      "bytes": 133852,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:55.851Z"
     },
     "2ba8cd9d__Skoda_110_R_Coupe_563568b2.pdf": {
       "kind": "document",
@@ -135915,12 +136041,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-110-r-coupe-1970-1980"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-110-r-coupe-1970-1980/Skoda_110_R_Coupe_563568b2.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_110_R_Coupe_563568b2.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-110-r-coupe-1970-1980/Skoda_110_R_Coupe_563568b2.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-110-r-coupe-1970-1980/Skoda_110_R_Coupe_563568b2.pdf",
+        "mime": "application/pdf",
+        "bytes": 108210
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135928,15 +136058,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_110_R_Coupe_563568b2.pdf"
       ],
-      "bytes": null,
+      "bytes": 108210,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:54:58.857Z"
     },
     "1d6b46b5__Skoda_120_S_1973_11f4ff00.pdf": {
       "kind": "document",
@@ -135947,12 +136082,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-120-s-rallye-1972-1975"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-120-s-rallye-1972-1975/Skoda_120_S_1973_11f4ff00.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_120_S_1973_11f4ff00.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-120-s-rallye-1972-1975/Skoda_120_S_1973_11f4ff00.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-120-s-rallye-1972-1975/Skoda_120_S_1973_11f4ff00.pdf",
+        "mime": "application/pdf",
+        "bytes": 134002
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135960,15 +136099,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_120_S_1973_11f4ff00.pdf"
       ],
-      "bytes": null,
+      "bytes": 134002,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:04.364Z"
     },
     "1d6b46b5__Skoda_120_GLS_5499e531.pdf": {
       "kind": "document",
@@ -135979,12 +136123,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-120-gls-1976-1990"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-120-gls-1976-1990/Skoda_120_GLS_5499e531.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_120_GLS_5499e531.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-120-gls-1976-1990/Skoda_120_GLS_5499e531.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-120-gls-1976-1990/Skoda_120_GLS_5499e531.pdf",
+        "mime": "application/pdf",
+        "bytes": 125100
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -135992,15 +136140,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_120_GLS_5499e531.pdf"
       ],
-      "bytes": null,
+      "bytes": 125100,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:08.333Z"
     },
     "1d6b46b5__Skoda_Rapid_LDD_1984_24ec9cff.pdf": {
       "kind": "document",
@@ -136011,12 +136164,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-rapid-ldd-1984"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-rapid-ldd-1984/Skoda_Rapid_LDD_1984_24ec9cff.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_Rapid_LDD_1984_24ec9cff.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-rapid-ldd-1984/Skoda_Rapid_LDD_1984_24ec9cff.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-rapid-ldd-1984/Skoda_Rapid_LDD_1984_24ec9cff.pdf",
+        "mime": "application/pdf",
+        "bytes": 132636
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -136024,15 +136181,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/10/Skoda_Rapid_LDD_1984_24ec9cff.pdf"
       ],
-      "bytes": null,
+      "bytes": 132636,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:11.254Z"
     },
     "2ba8cd9d__Skoda_Rapid_135_7f2fe3e5.pdf": {
       "kind": "document",
@@ -136043,12 +136205,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-rapid-135-1987-1990"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-rapid-135-1987-1990/Skoda_Rapid_135_7f2fe3e5.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Rapid_135_7f2fe3e5.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-rapid-135-1987-1990/Skoda_Rapid_135_7f2fe3e5.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-rapid-135-1987-1990/Skoda_Rapid_135_7f2fe3e5.pdf",
+        "mime": "application/pdf",
+        "bytes": 99100
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -136056,15 +136222,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Rapid_135_7f2fe3e5.pdf"
       ],
-      "bytes": null,
+      "bytes": 99100,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:14.321Z"
     },
     "2ba8cd9d__Skoda_Favorit_1bf84359.pdf": {
       "kind": "document",
@@ -136075,12 +136246,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-favorit-136-l-1988-1994"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-favorit-136-l-1988-1994/Skoda_Favorit_1bf84359.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Favorit_1bf84359.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-favorit-136-l-1988-1994/Skoda_Favorit_1bf84359.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-favorit-136-l-1988-1994/Skoda_Favorit_1bf84359.pdf",
+        "mime": "application/pdf",
+        "bytes": 96969
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -136088,15 +136263,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Favorit_1bf84359.pdf"
       ],
-      "bytes": null,
+      "bytes": 96969,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:16.942Z"
     },
     "2ba8cd9d__Skoda_Octavia_turns_30_1080246e.pdf": {
       "kind": "document",
@@ -136107,12 +136287,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon/Skoda_Octavia_turns_30_1080246e.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Octavia_turns_30_1080246e.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon/Skoda_Octavia_turns_30_1080246e.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon/Skoda_Octavia_turns_30_1080246e.pdf",
+        "mime": "application/pdf",
+        "bytes": 117620
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -136120,15 +136304,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Octavia_turns_30_1080246e.pdf"
       ],
-      "bytes": null,
+      "bytes": 117620,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:19.787Z"
     },
     "1d6b46b5__125_years_Skoda_Motorsport_25b49995.pdf": {
       "kind": "document",
@@ -136139,12 +136328,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/125-years-of-skoda-motorsport"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/125-years-of-skoda-motorsport/125_years_Skoda_Motorsport_25b49995.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/10/125_years_Skoda_Motorsport_25b49995.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/125-years-of-skoda-motorsport/125_years_Skoda_Motorsport_25b49995.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/125-years-of-skoda-motorsport/125_years_Skoda_Motorsport_25b49995.pdf",
+        "mime": "application/pdf",
+        "bytes": 148588
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -136152,15 +136345,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/10/125_years_Skoda_Motorsport_25b49995.pdf"
       ],
-      "bytes": null,
+      "bytes": 148588,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:22.384Z"
     },
     "971e68b7__Classic_Days_2026_EN_d16071ce.pdf": {
       "kind": "document",
@@ -136171,12 +136369,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Classic_Days_2026_EN_d16071ce.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/10/Classic_Days_2026_EN_d16071ce.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Classic_Days_2026_EN_d16071ce.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Classic_Days_2026_EN_d16071ce.pdf",
+        "mime": "application/pdf",
+        "bytes": 361684
+      },
       "da_path": "",
       "title": "Classic Days 2026 – Press Kit",
       "alt": "",
@@ -136184,15 +136386,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/10/Classic_Days_2026_EN_d16071ce.pdf"
       ],
-      "bytes": null,
+      "bytes": 361684,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:27.179Z"
     },
     "b5e98464__Classic_Days_introduction_19e47493.pdf": {
       "kind": "document",
@@ -136203,12 +136410,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Classic_Days_introduction_19e47493.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Classic_Days_introduction_19e47493.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Classic_Days_introduction_19e47493.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Classic_Days_introduction_19e47493.pdf",
+        "mime": "application/pdf",
+        "bytes": 121223
+      },
       "da_path": "",
       "title": "01 Introduction",
       "alt": "",
@@ -136216,15 +136427,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Classic_Days_introduction_19e47493.pdf"
       ],
-      "bytes": null,
+      "bytes": 121223,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:28.737Z"
     },
     "b5e98464__Skoda_Museum_284cc53a.pdf": {
       "kind": "document",
@@ -136235,12 +136451,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Museum_284cc53a.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_Museum_284cc53a.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Museum_284cc53a.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Museum_284cc53a.pdf",
+        "mime": "application/pdf",
+        "bytes": 94796
+      },
       "da_path": "",
       "title": "02 Škoda Museum",
       "alt": "",
@@ -136248,15 +136468,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_Museum_284cc53a.pdf"
       ],
-      "bytes": null,
+      "bytes": 94796,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:30.390Z"
     },
     "971e68b7__LaurinKlement_B_1901_d1b188ba.pdf": {
       "kind": "document",
@@ -136267,12 +136492,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/LaurinKlement_B_1901_d1b188ba.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/10/LaurinKlement_B_1901_d1b188ba.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/LaurinKlement_B_1901_d1b188ba.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/LaurinKlement_B_1901_d1b188ba.pdf",
+        "mime": "application/pdf",
+        "bytes": 133121
+      },
       "da_path": "",
       "title": "03 Laurin & Klement B",
       "alt": "",
@@ -136280,15 +136509,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/10/LaurinKlement_B_1901_d1b188ba.pdf"
       ],
-      "bytes": null,
+      "bytes": 133121,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:34.796Z"
     },
     "971e68b7__LaurinKlement_BZ_1903_e4d5d5e0.pdf": {
       "kind": "document",
@@ -136299,12 +136533,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/LaurinKlement_BZ_1903_e4d5d5e0.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/10/LaurinKlement_BZ_1903_e4d5d5e0.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/LaurinKlement_BZ_1903_e4d5d5e0.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/LaurinKlement_BZ_1903_e4d5d5e0.pdf",
+        "mime": "application/pdf",
+        "bytes": 132041
+      },
       "da_path": "",
       "title": "04 Laurin & Klement BZ",
       "alt": "",
@@ -136312,15 +136550,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/10/LaurinKlement_BZ_1903_e4d5d5e0.pdf"
       ],
-      "bytes": null,
+      "bytes": 132041,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:36.321Z"
     },
     "b5e98464__Laurin_and_Klement_Voiturette_A_ce4cb07c.pdf": {
       "kind": "document",
@@ -136331,12 +136574,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Laurin_and_Klement_Voiturette_A_ce4cb07c.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Laurin_and_Klement_Voiturette_A_ce4cb07c.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Laurin_and_Klement_Voiturette_A_ce4cb07c.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Laurin_and_Klement_Voiturette_A_ce4cb07c.pdf",
+        "mime": "application/pdf",
+        "bytes": 111299
+      },
       "da_path": "",
       "title": "05 Laurin & Klement Voiturette A",
       "alt": "",
@@ -136344,15 +136591,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Laurin_and_Klement_Voiturette_A_ce4cb07c.pdf"
       ],
-      "bytes": null,
+      "bytes": 111299,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:38.272Z"
     },
     "b5e98464__Laurin_and_Klement_BSC_0cc8b83f.pdf": {
       "kind": "document",
@@ -136363,12 +136615,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Laurin_and_Klement_BSC_0cc8b83f.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Laurin_and_Klement_BSC_0cc8b83f.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Laurin_and_Klement_BSC_0cc8b83f.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Laurin_and_Klement_BSC_0cc8b83f.pdf",
+        "mime": "application/pdf",
+        "bytes": 122290
+      },
       "da_path": "",
       "title": "06 Laurin & Klement BSC",
       "alt": "",
@@ -136376,15 +136632,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Laurin_and_Klement_BSC_0cc8b83f.pdf"
       ],
-      "bytes": null,
+      "bytes": 122290,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:39.731Z"
     },
     "b5e98464__Skoda_645_d24aa51b.pdf": {
       "kind": "document",
@@ -136395,12 +136656,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_645_d24aa51b.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_645_d24aa51b.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_645_d24aa51b.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_645_d24aa51b.pdf",
+        "mime": "application/pdf",
+        "bytes": 92428
+      },
       "da_path": "",
       "title": "07 Škoda 645",
       "alt": "",
@@ -136408,15 +136673,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_645_d24aa51b.pdf"
       ],
-      "bytes": null,
+      "bytes": 92428,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:41.112Z"
     },
     "b5e98464__Skoda_Popular_Sport_0b133adb.pdf": {
       "kind": "document",
@@ -136427,12 +136697,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Popular_Sport_0b133adb.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_Popular_Sport_0b133adb.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Popular_Sport_0b133adb.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Popular_Sport_0b133adb.pdf",
+        "mime": "application/pdf",
+        "bytes": 125866
+      },
       "da_path": "",
       "title": "08 Škoda Popular Sport Coupé",
       "alt": "",
@@ -136440,15 +136714,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_Popular_Sport_0b133adb.pdf"
       ],
-      "bytes": null,
+      "bytes": 125866,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:43.661Z"
     },
     "b5e98464__Skoda_Popular_Monte_Carlo_e8d39c9b.pdf": {
       "kind": "document",
@@ -136459,12 +136738,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Popular_Monte_Carlo_e8d39c9b.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_Popular_Monte_Carlo_e8d39c9b.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Popular_Monte_Carlo_e8d39c9b.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Popular_Monte_Carlo_e8d39c9b.pdf",
+        "mime": "application/pdf",
+        "bytes": 92970
+      },
       "da_path": "",
       "title": "09 Škoda Popular Monte Carlo",
       "alt": "",
@@ -136472,15 +136755,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_Popular_Monte_Carlo_e8d39c9b.pdf"
       ],
-      "bytes": null,
+      "bytes": 92970,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:45.255Z"
     },
     "b5e98464__Skoda_Superb_3000_OHV_889b0143.pdf": {
       "kind": "document",
@@ -136491,12 +136779,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Superb_3000_OHV_889b0143.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_Superb_3000_OHV_889b0143.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Superb_3000_OHV_889b0143.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Superb_3000_OHV_889b0143.pdf",
+        "mime": "application/pdf",
+        "bytes": 98710
+      },
       "da_path": "",
       "title": "10 Škoda Superb 3000 OHV",
       "alt": "",
@@ -136504,15 +136796,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_Superb_3000_OHV_889b0143.pdf"
       ],
-      "bytes": null,
+      "bytes": 98710,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:46.539Z"
     },
     "b5e98464__Skoda_1101_Tudor_cabrio_5acb825e.pdf": {
       "kind": "document",
@@ -136523,12 +136820,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_1101_Tudor_cabrio_5acb825e.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_1101_Tudor_cabrio_5acb825e.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_1101_Tudor_cabrio_5acb825e.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_1101_Tudor_cabrio_5acb825e.pdf",
+        "mime": "application/pdf",
+        "bytes": 136950
+      },
       "da_path": "",
       "title": "11 Škoda 1101 „Tudor“",
       "alt": "",
@@ -136536,15 +136837,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_1101_Tudor_cabrio_5acb825e.pdf"
       ],
-      "bytes": null,
+      "bytes": 136950,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:48.021Z"
     },
     "b5e98464__Skoda_Sport_1d69baf7.pdf": {
       "kind": "document",
@@ -136555,12 +136861,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Sport_1d69baf7.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_Sport_1d69baf7.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Sport_1d69baf7.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Sport_1d69baf7.pdf",
+        "mime": "application/pdf",
+        "bytes": 128486
+      },
       "da_path": "",
       "title": "12 Škoda Sport",
       "alt": "",
@@ -136568,15 +136878,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_Sport_1d69baf7.pdf"
       ],
-      "bytes": null,
+      "bytes": 128486,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:51.285Z"
     },
     "b5e98464__Skoda_Felicia_63e5d6ff.pdf": {
       "kind": "document",
@@ -136587,12 +136902,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Felicia_63e5d6ff.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_Felicia_63e5d6ff.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Felicia_63e5d6ff.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Felicia_63e5d6ff.pdf",
+        "mime": "application/pdf",
+        "bytes": 112668
+      },
       "da_path": "",
       "title": "15 Škoda Felicia",
       "alt": "",
@@ -136600,15 +136919,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_Felicia_63e5d6ff.pdf"
       ],
-      "bytes": null,
+      "bytes": 112668,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:52.571Z"
     },
     "971e68b7__60_years_Trekka_b153bc2a.pdf": {
       "kind": "document",
@@ -136619,12 +136943,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/60_years_Trekka_b153bc2a.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/10/60_years_Trekka_b153bc2a.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/60_years_Trekka_b153bc2a.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/60_years_Trekka_b153bc2a.pdf",
+        "mime": "application/pdf",
+        "bytes": 139268
+      },
       "da_path": "",
       "title": "16 Trekka",
       "alt": "",
@@ -136632,15 +136960,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/10/60_years_Trekka_b153bc2a.pdf"
       ],
-      "bytes": null,
+      "bytes": 139268,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:53.911Z"
     },
     "b5e98464__Skoda_110_R_Coupe_563568b2.pdf": {
       "kind": "document",
@@ -136651,12 +136984,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_110_R_Coupe_563568b2.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_110_R_Coupe_563568b2.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_110_R_Coupe_563568b2.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_110_R_Coupe_563568b2.pdf",
+        "mime": "application/pdf",
+        "bytes": 108210
+      },
       "da_path": "",
       "title": "18 Škoda 110 R",
       "alt": "",
@@ -136664,15 +137001,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_110_R_Coupe_563568b2.pdf"
       ],
-      "bytes": null,
+      "bytes": 108210,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:55.566Z"
     },
     "971e68b7__Skoda_120_S_1973_11f4ff00.pdf": {
       "kind": "document",
@@ -136683,12 +137025,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_120_S_1973_11f4ff00.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/10/Skoda_120_S_1973_11f4ff00.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_120_S_1973_11f4ff00.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_120_S_1973_11f4ff00.pdf",
+        "mime": "application/pdf",
+        "bytes": 134002
+      },
       "da_path": "",
       "title": "19 Škoda 120 S",
       "alt": "",
@@ -136696,15 +137042,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/10/Skoda_120_S_1973_11f4ff00.pdf"
       ],
-      "bytes": null,
+      "bytes": 134002,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:57.043Z"
     },
     "b5e98464__Skoda_130_RS_c70f7919.pdf": {
       "kind": "document",
@@ -136715,12 +137066,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_130_RS_c70f7919.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_130_RS_c70f7919.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_130_RS_c70f7919.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_130_RS_c70f7919.pdf",
+        "mime": "application/pdf",
+        "bytes": 128606
+      },
       "da_path": "",
       "title": "20 Škoda 130 RS",
       "alt": "",
@@ -136728,15 +137083,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_130_RS_c70f7919.pdf"
       ],
-      "bytes": null,
+      "bytes": 128606,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:58.580Z"
     },
     "971e68b7__Skoda_120_GLS_5499e531.pdf": {
       "kind": "document",
@@ -136747,12 +137107,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_120_GLS_5499e531.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/10/Skoda_120_GLS_5499e531.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_120_GLS_5499e531.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_120_GLS_5499e531.pdf",
+        "mime": "application/pdf",
+        "bytes": 125100
+      },
       "da_path": "",
       "title": "21 Škoda 120 GLS",
       "alt": "",
@@ -136760,15 +137124,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/10/Skoda_120_GLS_5499e531.pdf"
       ],
-      "bytes": null,
+      "bytes": 125100,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:55:59.807Z"
     },
     "971e68b7__Skoda_Rapid_LDD_1984_24ec9cff.pdf": {
       "kind": "document",
@@ -136779,12 +137148,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Rapid_LDD_1984_24ec9cff.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/10/Skoda_Rapid_LDD_1984_24ec9cff.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Rapid_LDD_1984_24ec9cff.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Rapid_LDD_1984_24ec9cff.pdf",
+        "mime": "application/pdf",
+        "bytes": 132636
+      },
       "da_path": "",
       "title": "22 Škoda Garde/Rapid LDD",
       "alt": "",
@@ -136792,15 +137165,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/10/Skoda_Rapid_LDD_1984_24ec9cff.pdf"
       ],
-      "bytes": null,
+      "bytes": 132636,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:56:01.486Z"
     },
     "b5e98464__Skoda_Rapid_135_7f2fe3e5.pdf": {
       "kind": "document",
@@ -136811,12 +137189,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Rapid_135_7f2fe3e5.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_Rapid_135_7f2fe3e5.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Rapid_135_7f2fe3e5.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Rapid_135_7f2fe3e5.pdf",
+        "mime": "application/pdf",
+        "bytes": 99100
+      },
       "da_path": "",
       "title": "23 Škoda Rapid 135",
       "alt": "",
@@ -136824,15 +137206,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_Rapid_135_7f2fe3e5.pdf"
       ],
-      "bytes": null,
+      "bytes": 99100,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:56:03.068Z"
     },
     "b5e98464__Skoda_Favorit_1bf84359.pdf": {
       "kind": "document",
@@ -136843,12 +137230,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Favorit_1bf84359.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_Favorit_1bf84359.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Favorit_1bf84359.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Favorit_1bf84359.pdf",
+        "mime": "application/pdf",
+        "bytes": 96969
+      },
       "da_path": "",
       "title": "24 Škoda Favorit 136 L",
       "alt": "",
@@ -136856,15 +137247,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_Favorit_1bf84359.pdf"
       ],
-      "bytes": null,
+      "bytes": 96969,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:56:04.848Z"
     },
     "b5e98464__Skoda_Fabia_RS_c8336ee5.pdf": {
       "kind": "document",
@@ -136875,12 +137271,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Fabia_RS_c8336ee5.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_Fabia_RS_c8336ee5.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Fabia_RS_c8336ee5.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Fabia_RS_c8336ee5.pdf",
+        "mime": "application/pdf",
+        "bytes": 139667
+      },
       "da_path": "",
       "title": "25 Škoda Fabia RS Rally2",
       "alt": "",
@@ -136888,15 +137288,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_Fabia_RS_c8336ee5.pdf"
       ],
-      "bytes": null,
+      "bytes": 139667,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:56:06.210Z"
     },
     "b5e98464__Skoda_Octavia_turns_30_1080246e.pdf": {
       "kind": "document",
@@ -136907,12 +137312,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Octavia_turns_30_1080246e.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/09/Skoda_Octavia_turns_30_1080246e.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Octavia_turns_30_1080246e.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/Skoda_Octavia_turns_30_1080246e.pdf",
+        "mime": "application/pdf",
+        "bytes": 117620
+      },
       "da_path": "",
       "title": "27 30 years of the Octavia",
       "alt": "",
@@ -136920,15 +137329,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/09/Skoda_Octavia_turns_30_1080246e.pdf"
       ],
-      "bytes": null,
+      "bytes": 117620,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:56:07.466Z"
     },
     "971e68b7__125_years_Skoda_Motorsport_25b49995.pdf": {
       "kind": "document",
@@ -136939,12 +137353,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/texts"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/125_years_Skoda_Motorsport_25b49995.pdf",
+      "dam_original_url": "https://cdn.skoda-storyboard.com/2026/10/125_years_Skoda_Motorsport_25b49995.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/125_years_Skoda_Motorsport_25b49995.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/texts/125_years_Skoda_Motorsport_25b49995.pdf",
+        "mime": "application/pdf",
+        "bytes": 148588
+      },
       "da_path": "",
       "title": "28 125 years of Škoda Motorsport",
       "alt": "",
@@ -136952,15 +137370,20 @@
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/10/125_years_Skoda_Motorsport_25b49995.pdf"
       ],
-      "bytes": null,
+      "bytes": 148588,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/pdf",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T08:56:10.815Z"
     },
     "1d6b46b5__Classic_Days_2026_b-roll_footage-2_5019000a.mp4": {
       "kind": "video",
@@ -136971,12 +137394,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/Classic_Days_2026_b-roll_footage-2_5019000a.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/10/Classic_Days_2026_b-roll_footage-2_5019000a.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/Classic_Days_2026_b-roll_footage-2_5019000a.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/Classic_Days_2026_b-roll_footage-2_5019000a.mp4",
+        "mime": "video/mp4",
+        "bytes": 345043157
+      },
       "da_path": "",
       "title": "Classic Days 2026",
       "alt": "",
@@ -136984,15 +137411,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/10/Classic_Days_2026_b-roll_footage-2_5019000a.mp4"
       ],
-      "bytes": null,
+      "bytes": 345043157,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "video/mp4",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T09:00:04.884Z"
     },
     "e6abe74f__02-MOTORCYCLE-LK-B.mp4": {
       "kind": "video",
@@ -137003,12 +137435,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/02-MOTORCYCLE-LK-B.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2020/08/02-MOTORCYCLE-LK-B.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/02-MOTORCYCLE-LK-B.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/02-MOTORCYCLE-LK-B.mp4",
+        "mime": "video/mp4",
+        "bytes": 167915652
+      },
       "da_path": "",
       "title": "Laurin & Klement B",
       "alt": "",
@@ -137016,15 +137452,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2020/08/02-MOTORCYCLE-LK-B.mp4"
       ],
-      "bytes": null,
+      "bytes": 167915652,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "video/mp4",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T09:02:05.552Z"
     },
     "e6abe74f__03-LK-Voiturette-A-1905.mp4": {
       "kind": "video",
@@ -137035,12 +137476,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/03-LK-Voiturette-A-1905.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2020/08/03-LK-Voiturette-A-1905.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/03-LK-Voiturette-A-1905.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/03-LK-Voiturette-A-1905.mp4",
+        "mime": "video/mp4",
+        "bytes": 259646604
+      },
       "da_path": "",
       "title": "Laurin & Klement Voiturette A (1905-1907)",
       "alt": "",
@@ -137048,15 +137493,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2020/08/03-LK-Voiturette-A-1905.mp4"
       ],
-      "bytes": null,
+      "bytes": 259646604,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "video/mp4",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T09:04:32.423Z"
     },
     "e6abe74f__05-POPULAR-MONTE-CARLO.mp4": {
       "kind": "video",
@@ -137067,12 +137517,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/05-POPULAR-MONTE-CARLO.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2020/08/05-POPULAR-MONTE-CARLO.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/05-POPULAR-MONTE-CARLO.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/05-POPULAR-MONTE-CARLO.mp4",
+        "mime": "video/mp4",
+        "bytes": 267541687
+      },
       "da_path": "",
       "title": "Škoda Popular Monte Carlo (1936-1939)",
       "alt": "",
@@ -137080,15 +137534,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2020/08/05-POPULAR-MONTE-CARLO.mp4"
       ],
-      "bytes": null,
+      "bytes": 267541687,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "video/mp4",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T09:06:54.497Z"
     },
     "e6abe74f__06-SUPERB-3000-OHV.mp4": {
       "kind": "video",
@@ -137099,12 +137558,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/06-SUPERB-3000-OHV.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2020/08/06-SUPERB-3000-OHV.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/06-SUPERB-3000-OHV.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/06-SUPERB-3000-OHV.mp4",
+        "mime": "video/mp4",
+        "bytes": 278660057
+      },
       "da_path": "",
       "title": "Škoda Superb 3000 OHV (1938-1949)",
       "alt": "",
@@ -137112,15 +137575,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2020/08/06-SUPERB-3000-OHV.mp4"
       ],
-      "bytes": null,
+      "bytes": 278660057,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "video/mp4",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T09:10:13.572Z"
     },
     "fa3d17dc__Skoda_sport___le_mans_final_ver.-1440p.mp4": {
       "kind": "video",
@@ -137131,12 +137599,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/Skoda_sport___le_mans_final_ver.-1440p.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2022/07/Skoda_sport___le_mans_final_ver.-1440p.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/Skoda_sport___le_mans_final_ver.-1440p.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/Skoda_sport___le_mans_final_ver.-1440p.mp4",
+        "mime": "video/mp4",
+        "bytes": 169170081
+      },
       "da_path": "",
       "title": "Download video",
       "alt": "",
@@ -137144,15 +137616,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2022/07/Skoda_sport___le_mans_final_ver.-1440p.mp4"
       ],
-      "bytes": null,
+      "bytes": 169170081,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "video/mp4",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T09:11:53.415Z"
     },
     "e6abe74f__07-SKODA-FELICIA.mp4": {
       "kind": "video",
@@ -137163,12 +137640,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/07-SKODA-FELICIA.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2020/08/07-SKODA-FELICIA.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/07-SKODA-FELICIA.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/07-SKODA-FELICIA.mp4",
+        "mime": "video/mp4",
+        "bytes": 243090582
+      },
       "da_path": "",
       "title": "Škoda Felicia (1959-1964)",
       "alt": "",
@@ -137176,15 +137657,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2020/08/07-SKODA-FELICIA.mp4"
       ],
-      "bytes": null,
+      "bytes": 243090582,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "video/mp4",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T09:14:08.171Z"
     },
     "e6abe74f__09-TREKKA.mp4": {
       "kind": "video",
@@ -137195,12 +137681,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/09-TREKKA.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2020/08/09-TREKKA.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/09-TREKKA.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/09-TREKKA.mp4",
+        "mime": "video/mp4",
+        "bytes": 230361629
+      },
       "da_path": "",
       "title": "Trekka (1966-1972)",
       "alt": "",
@@ -137208,15 +137698,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2020/08/09-TREKKA.mp4"
       ],
-      "bytes": null,
+      "bytes": 230361629,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "video/mp4",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T09:16:18.970Z"
     },
     "e6abe74f__08-SKODA-1000-MB.mp4": {
       "kind": "video",
@@ -137227,12 +137722,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/08-SKODA-1000-MB.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2020/08/08-SKODA-1000-MB.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/08-SKODA-1000-MB.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/08-SKODA-1000-MB.mp4",
+        "mime": "video/mp4",
+        "bytes": 204502958
+      },
       "da_path": "",
       "title": "Škoda 1000 MBX (1964-1969)",
       "alt": "",
@@ -137240,15 +137739,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2020/08/08-SKODA-1000-MB.mp4"
       ],
-      "bytes": null,
+      "bytes": 204502958,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "video/mp4",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T09:18:07.632Z"
     },
     "e6abe74f__10-SKODA-110-R.mp4": {
       "kind": "video",
@@ -137259,12 +137763,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/10-SKODA-110-R.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2020/08/10-SKODA-110-R.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/10-SKODA-110-R.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/10-SKODA-110-R.mp4",
+        "mime": "video/mp4",
+        "bytes": 181742793
+      },
       "da_path": "",
       "title": "Škoda 110 R Coupé (1970-1980)",
       "alt": "",
@@ -137272,15 +137780,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2020/08/10-SKODA-110-R.mp4"
       ],
-      "bytes": null,
+      "bytes": 181742793,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "video/mp4",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T09:20:33.247Z"
     },
     "146f7630__celebrating_50_years_of_the_Skoda_130_rs__a_legendary_coupe_that_defined_an_era-1440p_a144d23d.mp4": {
       "kind": "video",
@@ -137291,12 +137804,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/videos"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/celebrating_50_years_of_the_Skoda_130_rs__a_legendary_coupe_that_defined_an_era-1440p_a144d23d.mp4",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2025/03/celebrating_50_years_of_the_Skoda_130_rs__a_legendary_coupe_that_defined_an_era-1440p_a144d23d.mp4",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/celebrating_50_years_of_the_Skoda_130_rs__a_legendary_coupe_that_defined_an_era-1440p_a144d23d.mp4",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/videos/celebrating_50_years_of_the_Skoda_130_rs__a_legendary_coupe_that_defined_an_era-1440p_a144d23d.mp4",
+        "mime": "video/mp4",
+        "bytes": 35878206
+      },
       "da_path": "",
       "title": "Škoda 130 RS",
       "alt": "",
@@ -137304,15 +137821,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2025/03/celebrating_50_years_of_the_Skoda_130_rs__a_legendary_coupe_that_defined_an_era-1440p_a144d23d.mp4"
       ],
-      "bytes": null,
+      "bytes": 35878206,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "video/mp4",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T09:20:59.836Z"
     },
     "2ba8cd9d__Classic_Days_introduction_19e47493.pdf": {
       "kind": "document",
@@ -137323,12 +137845,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation/Classic_Days_introduction_19e47493.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Classic_Days_introduction_19e47493.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation/Classic_Days_introduction_19e47493.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation/Classic_Days_introduction_19e47493.pdf",
+        "mime": "application/pdf",
+        "bytes": 121223
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -137336,15 +137862,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Classic_Days_introduction_19e47493.pdf"
       ],
-      "bytes": null,
+      "bytes": 121223,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T09:21:03.553Z"
     },
     "2ba8cd9d__Skoda_Museum_284cc53a.pdf": {
       "kind": "document",
@@ -137355,12 +137886,16 @@
       "page_refs": [
         "en/press-kits/classic-days-2026-press-kit/skoda-museum"
       ],
-      "dam_asset_path": "",
-      "dam_original_url": "",
+      "dam_asset_path": "/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-museum/Skoda_Museum_284cc53a.pdf",
+      "dam_original_url": "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Museum_284cc53a.pdf",
       "original_download_url": "",
       "delivery_url": "",
-      "public_url": "",
-      "public_verified": null,
+      "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-museum/Skoda_Museum_284cc53a.pdf",
+      "public_verified": {
+        "url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/press-kits/classic-days-2026-press-kit/skoda-museum/Skoda_Museum_284cc53a.pdf",
+        "mime": "application/pdf",
+        "bytes": 94796
+      },
       "da_path": "",
       "title": "Download PDF",
       "alt": "",
@@ -137368,15 +137903,20 @@
       "seen_urls": [
         "https://www.skoda-storyboard.com/direct-download/2026/09/Skoda_Museum_284cc53a.pdf"
       ],
-      "bytes": null,
+      "bytes": 94796,
       "steps": {
         "deliver": "n/a",
-        "dam": "n/a",
-        "publish": "pending",
+        "dam": "done",
+        "publish": "done",
         "da": "n/a"
       },
-      "status": "partial",
-      "note": ""
+      "status": "done",
+      "note": "",
+      "mime_type": "application/pdf",
+      "source_content_type": "application/octet-stream",
+      "dam_status": 200,
+      "publish_status": 200,
+      "published_at": "2026-10-14T09:21:06.347Z"
     }
   }
 }
