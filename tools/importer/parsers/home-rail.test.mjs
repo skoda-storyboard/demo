@@ -82,12 +82,13 @@ test('only a real source "All" link becomes a viewall row (not #, javascript:, r
   assert.equal(run('post', 'eMobility', '  https://www.skoda-storyboard.com/en/category/emobility/  ').viewall, 'All', 'padded href');
 });
 
-// The Storyboard home's Models band (#272): the source cards' tag-page links, in source order.
-function models(options) {
+// The homes' Models bands (#272): the source cards' links, in source order. The Storyboard home
+// links the model tag pages, the Media Room the model pages.
+function models(options, base = '/en/tag/model/', slugs = ['elroq', 'kodiaq', 'peaq']) {
   const { document } = new JSDOM(`<div class="cover-box"><div class="search-results type-skoda_model">
     <h3 class="search-results-heading">Models</h3><div class="search-results-items">
-    ${['elroq', 'kodiaq', 'peaq'].map((m) => `<div class="search-results-item"><article>
-      <h3 class="entry-title"><a href="https://www.skoda-storyboard.com/en/tag/model/${m}/">${m}</a></h3>
+    ${slugs.map((m) => `<div class="search-results-item"><article>
+      <h3 class="entry-title"><a href="https://www.skoda-storyboard.com${base}${m}/">${m}</a></h3>
     </article></div>`).join('')}</div></div></div>`).window;
   homeRail(document.querySelector('.search-results'), { document, ...options });
   return Object.fromEntries([...document.querySelectorAll('tr')].slice(1)
@@ -102,7 +103,15 @@ test('the Storyboard home Models band keeps the source order as an order row (#2
   });
 });
 
-test('without orderModels (the Media Room home) the Models band stays index-sorted', { skip }, () => {
+test('the Media Room Models band keeps its own source order, linking the model pages', { skip }, () => {
+  assert.deepEqual(models({ orderModels: true }, '/en/skoda-model/', ['new-superb', 'octavia', 'karoq-6']), {
+    heading: 'Models',
+    template: 'skoda_model',
+    order: '/en/skoda-model/new-superb, /en/skoda-model/octavia, /en/skoda-model/karoq-6',
+  });
+});
+
+test('without orderModels the Models band stays index-sorted', { skip }, () => {
   assert.deepEqual(models(), { heading: 'Models', template: 'skoda_model' });
   // and a non-model rail never gets an order, even on the Storyboard home
   const { document } = new JSDOM(`<div class="search-results type-post">

@@ -53,6 +53,12 @@
   overflow: hidden;
 }
 
+/* the source date sits in a 24px .entry-meta line: its glyphs start 25px above the title on
+   both homes (1080), 5px more than the body gap gives */
+.promo-box .card-teaser.overlay .card-teaser-date {
+  margin-block-end: calc(13px - var(--spacing-xs));
+}
+
 .promo-box .card-teaser:not(:has(.card-teaser-image)) {
   background-color: var(--dark-color);
 }
