@@ -226,6 +226,8 @@
   }
 }
 
+/* the source video glyph (.image-holder::after, #284): a 32px white 2px ring around an outline
+   play triangle, centred on the image; the same icon as the Videos listing cards */
 .carousel.video .card-teaser-image::after {
   content: "";
   position: absolute;
@@ -234,7 +236,7 @@
   width: var(--carousel-arrow-size);
   height: var(--carousel-arrow-size);
   background: var(--skoda-white);
-  clip-path: polygon(25% 15%, 85% 50%, 25% 85%);
+  mask: url("../../icons/media-play.svg") center / contain no-repeat;
   transform: translate(-50%, -50%);
   pointer-events: none;
 }

@@ -36,3 +36,5 @@ The source has known WCAG gaps (checkbox-hack mobile nav, auto-rotating carousel
 - **Out of M1:** the Škodapedia glossary modal. SKODA-206 (#20) is M2, and Škodapedia links to the live site. Check it when SKODA-206 lands.
 - **Modals in scope:** the gallery / story lightbox (`scripts/lightbox.js`), the Media Box lightbox (#315), the header search and the mobile nav.
 - **Inputs already measured:** Lighthouse accessibility 92–93 on the series and press-kit hubs (#285, #275); the axe `color-contrast` / `link-in-text-block` findings that #307 and #308 report as the same as the source; the topbar "Media Room" contrast (#299). Record each as "fixed" or "as source, accepted".
+- **As source, accepted (PO, 2026-10-13, #243):** the inactive language links use the source grey `#7c7d7e`
+  (3.30:1 on the topbar, 4.12:1 on white), no longer the AA-passing `#5a5b5c`. See SKODA-303.

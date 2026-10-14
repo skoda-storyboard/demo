@@ -929,6 +929,53 @@ var CustomImportScript = (() => {
     if (plain.length) rows.push(["tags", plain.join(", ")]);
     return rows;
   }
+  function sourceLocale(url) {
+    try {
+      const m = new URL(url, "https://www.skoda-storyboard.com").pathname.match(/^\/([a-z]{2})(?:\/|$)/i);
+      return m ? m[1].toLowerCase() : "en";
+    } catch (e) {
+      return "en";
+    }
+  }
+  var plainAlt = (alt) => (alt || "").replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim();
+  function fullTitle(title, alt) {
+    const clipped = title.match(/^(.*?)\s*(?:…|\.\.\.)$/);
+    const prefix = clipped ? clipped[1] : "";
+    const whole = plainAlt(alt);
+    if (prefix.split(" ").length < 2 || !whole.startsWith(prefix)) return title;
+    if (whole.length > prefix.length && !/^[\s,.:;!?–-]/.test(whole.slice(prefix.length))) return title;
+    return whole;
+  }
+  function curatedCards(band, document2) {
+    const squashed = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
+    const rows = [];
+    band.querySelectorAll("article.article-teaser").forEach((card) => {
+      const titleLink = card.querySelector(".entry-title a[href]");
+      const href = titleLink && titleLink.getAttribute("href");
+      const img = card.querySelector(".article-teaser-media img");
+      const title = fullTitle(squashed(titleLink), img && img.getAttribute("alt"));
+      if (!href || !title) return;
+      if (img) {
+        ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop", "loading", "decoding"].forEach((a2) => img.removeAttribute(a2));
+        if (img.hasAttribute("alt")) img.setAttribute("alt", plainAlt(img.getAttribute("alt")));
+      }
+      const body = [];
+      const date = squashed(card.querySelector(".entry-published"));
+      if (date) {
+        const p = document2.createElement("p");
+        p.textContent = date;
+        body.push(p);
+      }
+      const h3 = document2.createElement("h3");
+      const a = document2.createElement("a");
+      a.setAttribute("href", href);
+      a.textContent = title;
+      h3.append(a);
+      body.push(h3);
+      rows.push(img ? [img, body] : [body]);
+    });
+    return rows;
+  }
   function relatedBand(element, document2, payload) {
     const band = element.querySelector(".cover-box .related-stories");
     if (!band) return;
@@ -942,16 +989,26 @@ var CustomImportScript = (() => {
       clone.querySelectorAll(".subheading").forEach((s) => s.remove());
       headingText = (clone.textContent || "").trim() || headingText;
     }
-    const filters = facetRows(element);
-    if (!filters.length) {
-      console.warn("[story-cleanup] related band: story has no tags to match; dropped");
-      cover.remove();
-      return;
-    }
     const originalURL = payload && payload.params && payload.params.originalURL || "";
-    const self = lastSegment(originalURL);
-    const rows = [["Story Rail"], ["template", "story"], ...filters, ["limit", "10"]];
-    if (self) rows.push(["exclude", self]);
+    let rows;
+    if (sourceLocale(originalURL) !== "en") {
+      rows = [["Story Rail"], ...curatedCards(band, document2)];
+      if (rows.length === 1) {
+        console.warn("[story-cleanup] related band: no source cards; dropped");
+        cover.remove();
+        return;
+      }
+    } else {
+      const filters = facetRows(element);
+      if (!filters.length) {
+        console.warn("[story-cleanup] related band: story has no tags to match; dropped");
+        cover.remove();
+        return;
+      }
+      const self = lastSegment(originalURL);
+      rows = [["Story Rail"], ["template", "story"], ...filters, ["limit", "10"]];
+      if (self) rows.push(["exclude", self]);
+    }
     const title = document2.createElement("h3");
     title.textContent = headingText;
     const out = [document2.createElement("hr"), title];
