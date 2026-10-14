@@ -138,9 +138,11 @@ body.press-release .section.related.story-rail-container .story-rail {
   flex-basis: var(--wide-cell-width);
 }
 
-/* source .type-skoda_model rails: 90% → 45% (576) → 30% (768) → 22.5% (992) */
+/* source .type-skoda_model rails, and the Media Room's .type-attachment (Images / Videos) rails:
+   90% → 45% (576) → 30% (768) → 22.5% (992), measured 375–1440 */
 @media (width >= 576px) {
-  .story-rail.story-rail-wide.story-rail-models {
+  .story-rail.story-rail-wide.story-rail-models,
+  .story-rail.story-rail-wide.story-rail-media {
     --wide-cell-width: calc(45cqw - var(--carousel-gap));
   }
 }
@@ -150,7 +152,8 @@ body.press-release .section.related.story-rail-container .story-rail {
     --wide-cell-width: calc(45cqw - var(--carousel-gap));
   }
 
-  .story-rail.story-rail-wide.story-rail-models {
+  .story-rail.story-rail-wide.story-rail-models,
+  .story-rail.story-rail-wide.story-rail-media {
     --wide-cell-width: calc(30cqw - var(--carousel-gap));
   }
 }
@@ -160,7 +163,8 @@ body.press-release .section.related.story-rail-container .story-rail {
     --wide-cell-width: calc(30cqw - var(--carousel-gap));
   }
 
-  .story-rail.story-rail-wide.story-rail-models {
+  .story-rail.story-rail-wide.story-rail-models,
+  .story-rail.story-rail-wide.story-rail-media {
     --wide-cell-width: calc(22.5cqw - var(--carousel-gap));
   }
 }
@@ -404,6 +408,24 @@ body.story .section.dark.story-rail-container .story-rail .carousel-arrow::after
 .story-rail.story-rail-home .carousel-next::after,
 body.story .section.dark.story-rail-container .story-rail .carousel-next::after {
   mask-image: url("../../icons/rail-arrow-next.svg");
+}
+
+/* media cards (Media Room Images / Videos, carousel.css `.carousel.media`): reserve the rows under
+   the 16:9 image until the rail builds, the 44px date row, the two-line 46px title and the 50px
+   cart / download toolbar (source .type-attachment, 287px cell at 1280) */
+.story-rail.story-rail-media {
+  --wide-caption-title: var(--media-card-caption-rows);
+}
+
+/* the end card stays image-sized (16:9 at the top of the row, source .item-all .ratio-container),
+   not stretched over the media cards' date, title and toolbar rows */
+.story-rail.story-rail-media .carousel-track .story-rail-all {
+  align-self: flex-start;
+}
+
+/* the media card's date row carries its own 10px padding (carousel.css): no home-band date gap */
+.story-rail.story-rail-home.story-rail-media .card-teaser-date {
+  margin-block-end: 0;
 }
 
 /* caption cards (Models, Series): a 16:9 image with 8px corners, then the title centred on a

@@ -6,9 +6,12 @@
  *
  * Featured promo-box (curated cards) + index-driven Story Rails (News / Images /
  * Videos / Models / Press Kits / Latest Stories), each self-classified by home-rail
- * from its heading + "All" link / type-<cpt> class. The dark `.cover-box.dark`
- * Models band becomes its own `Style: cover-box, dark` section (skoda-dark-bands,
- * SKODA-218). Metadata template=page (body class carries `page`; MR side selects
+ * from its heading + "All" link / type-<cpt> class. Every source `.cover-box` band
+ * becomes its own section (skoda-dark-bands): the dark Models + Press Kits band
+ * `Style: cover-box, dark, compact` (SKODA-218), each light band `Style: cover-box, compact`,
+ * as on the Storyboard home (SKODA-611a), so its rails get the home-band layout. The
+ * Models band keeps the source's hand-picked base models, in its order (home-rail).
+ * Metadata template=page (body class carries `page`; MR side selects
  * chrome at runtime). Content-driven detection.
  */
 
@@ -34,6 +37,9 @@ const PAGE_TEMPLATE = {
   metadata: { template: 'page' },
   // skoda-dark-bands: the MR home's bands sit 16px tighter at the top (live, SKODA-218)
   darkBandStyle: 'cover-box, dark, compact',
+  // every light .cover-box is its own section too, as on the Storyboard home (SKODA-611a);
+  // `compact`: its rails end 60px above the band end, not 28px (live, measured 375–1440)
+  lightBandStyle: 'cover-box, compact',
   blocks: [
     { name: 'promo-box', instances: ['section.promo-box'] },
     { name: 'home-rail', instances: ['.cover-box .search-results[class*="type-"]'] },
@@ -93,7 +99,16 @@ export default {
       const parser = parsers[block.name];
       if (parser) {
         try {
-          parser(block.element, { document, url, params });
+          // the Models band keeps the source's hand-picked order on this home too (home-rail);
+          // the promo shows the newest three press releases and press kits from the index, with their dates
+          parser(block.element, {
+            document,
+            url,
+            params,
+            orderModels: true,
+            indexDriven: block.name === 'promo-box',
+            promoTemplate: 'press_release, press_kit',
+          });
         } catch (e) {
           console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
         }

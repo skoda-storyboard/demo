@@ -60,6 +60,7 @@
   --story-sidebar-heading-size-compact: 20px;
   --story-sidebar-heading-line-height: 45px;
   --card-caption-row: 45px; /* taxonomy caption card: the white title row under the image (source .entry-title) */
+  --media-card-caption-rows: 140px; /* media card under the image: 44 date + 46 two-line title + 50 toolbar (source .type-attachment) */
   --story-dark-band-max-width: var(--cover-box-max-width); /* live story .cover-box.dark cap: Media Box + Related Stories */
   --story-dark-band-gap: 2.25em; /* live .cover-box.dark top margin (36px) between stacked story bands */
 
@@ -209,6 +210,7 @@
   --cover-box-light-padding-top: calc(var(--spacing-s) + var(--spacing-l)); /* 12px band + 24px above the rail header */
   --cover-box-light-padding-bottom: calc(var(--spacing-m) + var(--spacing-s)); /* 16px below the rail + 12px band */
   --cover-box-feed-padding-bottom: var(--spacing-s); /* Latest Stories: no margin under Load more */
+  --cover-box-compact-light-padding-bottom: calc(var(--spacing-s) + var(--cover-box-rail-gap)); /* Media Room light band: 12px band + live's 48px .search-results margin */
   --nav-height: 108px;
   --nav-main-height: 64px;
   --nav-topbar-height: 44px;
@@ -903,6 +905,12 @@ main > .section.cover-box:where(.dark) + .section {
 main > .section.cover-box.dark.compact {
   margin: var(--cover-box-compact-margin);
   padding-block-start: var(--cover-box-compact-padding-top);
+}
+
+/* the Media Room home's light bands (`compact`): live's .search-results there keep a 48px bottom
+   margin (16px on the Storyboard home), so the last rail cards sit 60px above the band end */
+main > .section.cover-box.compact:not(.dark) {
+  padding-block-end: var(--cover-box-compact-light-padding-bottom);
 }
 
 /* a band sets its own rhythm: no stray list margin under the rail cards (light bands too,

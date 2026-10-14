@@ -54,9 +54,9 @@ function templateFromTypeClass(element, headingText) {
   return null;
 }
 
-// The Storyboard home's Models band is hand-picked on the source (#272): the base models in the
-// editors' order, each linking to its model tag page, not the newest model pages with their
-// derivatives. Their paths, in source order, for the rail's `order` row (story-rail picks those
+// The homes' Models bands are hand-picked on the source (#272): the base models in the editors'
+// order, not the newest model pages with their derivatives. The Storyboard home links each to its
+// model tag page, the Media Room to its model page. Their paths, in source order, for the rail's `order` row (story-rail picks those
 // index pages in that order).
 function modelOrder(element) {
   return [...element.querySelectorAll('.search-results-item .entry-title a[href]')].map((a) => {
@@ -98,7 +98,8 @@ export default function parse(element, { document, orderModels = false }) {
       return;
     }
     cells.push(['template', template]);
-    // the Storyboard home's Models band (home-sto only; the Media Room's stays index-sorted)
+    // both homes' Models bands are hand-picked on the source: the Storyboard home lists the
+    // model tag pages, the Media Room the model pages, each in its own order
     if (orderModels && template === 'skoda_model') {
       const order = modelOrder(element);
       if (order.length) cells.push(['order', order.join(', ')]);

@@ -2,6 +2,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { JSDOM } from 'jsdom';
 
 const boot = new JSDOM('', { url: 'https://example.com/en/' });
@@ -180,4 +181,16 @@ test('ordinary overlay cards still use the shared card-teaser decorator', async 
   assert.equal(block.querySelector('.card-teaser-body').textContent.trim(), 'sq');
   const sources = [...block.querySelectorAll('source[type="image/webp"]')];
   assert.deepEqual(sources.map((source) => new URL(source.srcset).searchParams.get('width')), ['750', '500']);
+});
+
+test('series directory cards do not zoom on hover or keyboard focus; other cards keep the zoom (SKODA-229)', async () => {
+  const strip = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '');
+  const cards = strip(await readFile(new URL('./cards.css', import.meta.url), 'utf8'));
+  const teaser = strip(await readFile(new URL('../../styles/card-teaser.css', import.meta.url), 'utf8'));
+  const rule = cards.match(/([^{}]*\.cards\.series-directory \.card-teaser:hover[^{}]*)\{([^}]*)\}/);
+  assert.ok(rule, 'the series directory has its own hover rule');
+  assert.match(rule[1], /\.cards\.series-directory \.card-teaser:has\(:focus-visible\) \.card-teaser-image img/);
+  assert.match(rule[2], /scale:\s*none/);
+  // the shared zoom is untouched
+  assert.match(teaser, /\.card-teaser:hover \.card-teaser-image img,\s*\.card-teaser:has\(:focus-visible\) \.card-teaser-image img\s*\{\s*scale:\s*1\.02/);
 });
