@@ -270,7 +270,8 @@ their template; the `template` still picks the card style. Every listed page sho
   `updateArrows` via `scroll` + `ResizeObserver`; `optimizeImageInPlace`.
 - `story-rail.js`: `readConfig` (index/category/limit/exclude) -> `loadQueryIndex` (memoized) ->
   filter by template=story + category, drop slugs already shown above (featured promo + `stories`
-  grid), sort by `publisheddate` desc, slice; **defer** the `buildBlock('carousel', rows)` +
+  grid; the Media Room News rail skips the promo box's pages once it has loaded, #332), sort by
+  `publisheddate` desc, slice; **defer** the `buildBlock('carousel', rows)` +
   `decorateBlock` + `loadBlock` behind an `IntersectionObserver` (`rootMargin:'600px 0px'`) so the
   4+ rails don't all build on load; handle empty/error states by collapsing the rail.
   Reserve fluid card geometry to avoid CLS until built, and keep the inserted carousel hidden
