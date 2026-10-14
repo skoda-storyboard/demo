@@ -113,6 +113,10 @@ their x-position and size, not just a guessed image ratio. Map design values to 
 - **Card:** one usable link per card to the authored hub or Story/Press Kits destination. Preserve
   the href and source order; use the existing `card-teaser` keyboard/focus contract, with no cart,
   load-more, facets, or sort UI. Out-of-scope URLs must follow SKODA-609 rather than become EDS 404s.
+- **Card hover / keyboard focus (SKODA-229, measured 2026-10-13 at 1440 / 768 / 375):** the
+  directory card has **no hover effect** on the source. The image keeps `scale: none` (no generic
+  1.02 card zoom), and the title stays white with no underline (the shared SKODA-228 rule). Keyboard
+  focus doesn't zoom either. The EDS `:focus-visible` ring stays, though the source shows none.
 - **Hero:** non-interactive (no CTA), per `hero.md` §5. Do not turn the SERIES label into a
   broken archive link.
 
