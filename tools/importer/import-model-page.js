@@ -103,6 +103,30 @@ function pageFacets(document) {
   return out;
 }
 
+// The Media Room home's Models rail lists the 11 base model pages, and the card image is the
+// index `image`. The source card shows the model's header banner (the same files as the
+// Storyboard home's tag-page cards, SKODA-839), not the page's og:image cut-out. Base model
+// pages only, keyed by their source slug; derivatives keep their og:image.
+const MODEL_CARD_IMAGES = {
+  'new-superb': 'https://cdn.skoda-storyboard.com/2023/12/header_superb_d05c278a.jpg',
+  octavia: 'https://cdn.skoda-storyboard.com/2024/03/octaviaFL-header_e0f394a0.jpg',
+  epiq: 'https://cdn.skoda-storyboard.com/2026/05/skoda-epiq-m70-01_1135a598.jpg',
+  peaq: 'https://cdn.skoda-storyboard.com/2026/06/Navrh-bez-nazvu-21_ec34da00.png',
+  'new-fabia': 'https://cdn.skoda-storyboard.com/2021/05/Header_New_FABIA.jpg',
+  scala: 'https://cdn.skoda-storyboard.com/2023/09/scala_header_34ad5f38.jpg',
+  kamiq: 'https://cdn.skoda-storyboard.com/2023/09/kamiq-header_d6fedb2b.jpg',
+  'karoq-6': 'https://cdn.skoda-storyboard.com/2017/07/33_SKODA_KAROQ.jpg',
+  'enyaq-iv-2': 'https://cdn.skoda-storyboard.com/2025/01/enyaq_fl_header_eb9109f9.jpg',
+  'new-kodiaq': 'https://cdn.skoda-storyboard.com/2023/11/Skoda_Kodiaq_header_04479753.png',
+  elroq: 'https://cdn.skoda-storyboard.com/2024/10/elroq_header_fede6794.jpg',
+};
+
+// a base model page's card image, null for derivatives and unknown models
+function modelCardImage(originalURL) {
+  const slug = (new URL(originalURL).pathname.match(/^\/en\/skoda-model\/([^/]+)\/?$/) || [])[1];
+  return (slug && MODEL_CARD_IMAGES[slug]) || null;
+}
+
 function metadataOverrides(facets) {
   const meta = { template: 'skoda_model' };
   const tags = [];
@@ -152,7 +176,10 @@ export default {
     const main = document.body;
 
     // Read the page facets before the rails (which carry the filter links) are parsed.
-    const template = { ...PAGE_TEMPLATE, metadata: metadataOverrides(pageFacets(document)) };
+    const metadata = metadataOverrides(pageFacets(document));
+    const cardImage = modelCardImage(params.originalURL);
+    if (cardImage) metadata.image = cardImage;
+    const template = { ...PAGE_TEMPLATE, metadata };
     const transformers = [cleanupTransformer, sectionsTransformer, metadataTransformer, linksTransformer];
 
     executeTransformers(transformers, 'beforeTransform', main, payload, template);

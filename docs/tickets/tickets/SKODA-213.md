@@ -56,6 +56,8 @@ Measurable gates in [`carousel-rails.md`](../../ui-specs/carousel-rails.md) §3/
 
 Optional index mode uses **only** key/value rows (do not combine with curated rows). `template` defaults to `story`, `index` to `/{locale}/query-index.json`, `sort` to `newest`, and `limit` to 3. `category` and `tags` accept comma-separated slugs (OR within each field; AND across fields); optional `path` scopes to a prefix. Indexed rows use the shared query-index loader and listing selection functions. Missing results, invalid settings, and index failures show an error with technical detail on local/preview hosts; published hosts hide the block and log the error without exposing raw settings or diagnostics to visitors.
 
+`template` also accepts a comma-separated list, such as `press_release, press_kit`. Names are trimmed, matched case-insensitively, and deduplicated before selection, so repeating a template cannot repeat its cards or consume extra slots. Matching rows from all listed templates are sorted together before applying `limit`.
+
 | Promo box | |
 | --- | --- |
 | template | story |

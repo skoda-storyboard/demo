@@ -1,0 +1,1184 @@
+{
+ "model": [
+  [
+   "citigoe",
+   "Citigoᵉ iV"
+  ],
+  [
+   "elroq",
+   "Elroq"
+  ],
+  [
+   "enyaq",
+   "Enyaq"
+  ],
+  [
+   "epiq",
+   "Epiq"
+  ],
+  [
+   "fabia",
+   "Fabia"
+  ],
+  [
+   "kamiq",
+   "Kamiq"
+  ],
+  [
+   "karoq",
+   "Karoq"
+  ],
+  [
+   "kodiaq",
+   "Kodiaq"
+  ],
+  [
+   "kushaq",
+   "Kushaq"
+  ],
+  [
+   "kylaq",
+   "Kylaq"
+  ],
+  [
+   "octavia",
+   "Octavia"
+  ],
+  [
+   "peaq",
+   "Peaq"
+  ],
+  [
+   "rapid",
+   "Rapid"
+  ],
+  [
+   "scala",
+   "Scala"
+  ],
+  [
+   "slavia",
+   "Slavia"
+  ],
+  [
+   "superb",
+   "Superb"
+  ]
+ ],
+ "derivative": [
+  [
+   "e-tec",
+   "e-TEC"
+  ],
+  [
+   "g-tec",
+   "G-TEC"
+  ],
+  [
+   "greenline",
+   "GreenLine"
+  ],
+  [
+   "iv",
+   "iV"
+  ],
+  [
+   "lk",
+   "L&K"
+  ],
+  [
+   "monte-carlo",
+   "Monte Carlo"
+  ],
+  [
+   "pro",
+   "PRO"
+  ],
+  [
+   "r5",
+   "R5"
+  ],
+  [
+   "r5-evo",
+   "R5 evo"
+  ],
+  [
+   "rally2-en",
+   "Rally2"
+  ],
+  [
+   "rally2-evo",
+   "Rally2 evo"
+  ],
+  [
+   "rs",
+   "RS"
+  ],
+  [
+   "rs-230",
+   "RS 230"
+  ],
+  [
+   "rs-245",
+   "RS 245"
+  ],
+  [
+   "scout",
+   "Scout"
+  ],
+  [
+   "scoutline",
+   "ScoutLine"
+  ],
+  [
+   "sportline",
+   "SportLine"
+  ]
+ ],
+ "concept": [
+  [
+   "afriq",
+   "Afriq"
+  ],
+  [
+   "atero",
+   "Atero"
+  ],
+  [
+   "citijet",
+   "Citijet"
+  ],
+  [
+   "fabia-r5",
+   "Concept Fabia R5"
+  ],
+  [
+   "fabia-r5-combi",
+   "Concept Fabia R5 Combi"
+  ],
+  [
+   "element",
+   "Element"
+  ],
+  [
+   "funstar",
+   "FUNstar"
+  ],
+  [
+   "joyster",
+   "Joyster"
+  ],
+  [
+   "klement",
+   "Klement"
+  ],
+  [
+   "lk-130",
+   "L&K 130"
+  ],
+  [
+   "mountiaq",
+   "Mountiaq"
+  ],
+  [
+   "roadiaq",
+   "Roadiaq"
+  ],
+  [
+   "skoda-re-x1-kreisel",
+   "Škoda RE-X1 Kreisel"
+  ],
+  [
+   "slavia",
+   "Slavia"
+  ],
+  [
+   "students-car",
+   "Students Car"
+  ],
+  [
+   "sunroq",
+   "Sunroq"
+  ],
+  [
+   "vision-7s",
+   "Vision 7S"
+  ],
+  [
+   "vision-c",
+   "Vision C"
+  ],
+  [
+   "vision-d",
+   "Vision D"
+  ],
+  [
+   "vision-e",
+   "Vision E"
+  ],
+  [
+   "vision-gt",
+   "Vision GT"
+  ],
+  [
+   "vision-in",
+   "Vision IN"
+  ],
+  [
+   "vision-iv",
+   "Vision iV"
+  ],
+  [
+   "vision-o",
+   "Vision O"
+  ],
+  [
+   "vision-rs",
+   "Vision RS"
+  ],
+  [
+   "vision-s",
+   "Vision S"
+  ],
+  [
+   "vision-x",
+   "Vision X"
+  ]
+ ],
+ "bodywork": [
+  [
+   "combi",
+   "Combi"
+  ],
+  [
+   "coupe-en",
+   "Coupé"
+  ],
+  [
+   "hatch",
+   "Hatch"
+  ],
+  [
+   "hatchback",
+   "Hatchback"
+  ],
+  [
+   "spaceback",
+   "Spaceback"
+  ],
+  [
+   "suv",
+   "SUV"
+  ],
+  [
+   "saloon",
+   "Saloon"
+  ]
+ ],
+ "equipment": [
+  [
+   "4x4-all-wheel-drive",
+   "4x4 – all wheel drive"
+  ],
+  [
+   "columbus",
+   "Columbus"
+  ],
+  [
+   "dq-200",
+   "DQ 200"
+  ],
+  [
+   "dsg",
+   "DSG"
+  ],
+  [
+   "engine",
+   "Engine"
+  ],
+  [
+   "mq-200",
+   "MQ 200"
+  ],
+  [
+   "tdi",
+   "TDI"
+  ],
+  [
+   "transmission",
+   "Transmission"
+  ],
+  [
+   "tsi",
+   "TSI"
+  ],
+  [
+   "climatronic-air-care",
+   "Climatronic Air Care"
+  ],
+  [
+   "dcc",
+   "DCC"
+  ]
+ ],
+ "years": [
+  [
+   "2014",
+   "2014"
+  ],
+  [
+   "2015",
+   "2015"
+  ],
+  [
+   "2016",
+   "2016"
+  ],
+  [
+   "2017",
+   "2017"
+  ],
+  [
+   "2018",
+   "2018"
+  ],
+  [
+   "2019",
+   "2019"
+  ],
+  [
+   "2020",
+   "2020"
+  ],
+  [
+   "2021",
+   "2021"
+  ],
+  [
+   "2022",
+   "2022"
+  ],
+  [
+   "2023",
+   "2023"
+  ],
+  [
+   "2024",
+   "2024"
+  ],
+  [
+   "2025",
+   "2025"
+  ],
+  [
+   "2026",
+   "2026"
+  ],
+  [
+   "x",
+   "X"
+  ]
+ ],
+ "company": [
+  [
+   "deliveries",
+   "deliveries"
+  ],
+  [
+   "design",
+   "design"
+  ],
+  [
+   "development",
+   "development"
+  ],
+  [
+   "euro-ncap",
+   "Euro NCAP"
+  ],
+  [
+   "europe",
+   "Europe"
+  ],
+  [
+   "foundation",
+   "foundation"
+  ],
+  [
+   "india",
+   "India"
+  ],
+  [
+   "india-2-0",
+   "India 2.0"
+  ],
+  [
+   "investment",
+   "investment"
+  ],
+  [
+   "kvasiny",
+   "Kvasiny"
+  ],
+  [
+   "logistics",
+   "logistics"
+  ],
+  [
+   "logo",
+   "logo"
+  ],
+  [
+   "mlada-boleslav",
+   "Mladá Boleslav"
+  ],
+  [
+   "mobile-application",
+   "mobile application"
+  ],
+  [
+   "next-level",
+   "NEXT LEVEL"
+  ],
+  [
+   "other",
+   "other"
+  ],
+  [
+   "people",
+   "people"
+  ],
+  [
+   "production",
+   "production"
+  ],
+  [
+   "safety",
+   "safety"
+  ],
+  [
+   "sales",
+   "sales"
+  ],
+  [
+   "service",
+   "service"
+  ],
+  [
+   "skoda-academy",
+   "Škoda Academy"
+  ],
+  [
+   "sponsorship",
+   "sponsorship"
+  ],
+  [
+   "student",
+   "student"
+  ],
+  [
+   "supervisory-board",
+   "Supervisory Board"
+  ],
+  [
+   "vietnam",
+   "Vietnam"
+  ],
+  [
+   "volkswagen-group",
+   "Volkswagen Group"
+  ],
+  [
+   "vrchlabi",
+   "Vrchlabí"
+  ],
+  [
+   "strategy-2030",
+   "Strategy 2030"
+  ],
+  [
+   "ukraine",
+   "Ukraine"
+  ]
+ ],
+ "happening": [
+  [
+   "award",
+   "award"
+  ],
+  [
+   "designblok",
+   "Designblok"
+  ],
+  [
+   "hackathon",
+   "Hackathon"
+  ],
+  [
+   "iaa",
+   "IAA"
+  ],
+  [
+   "motorshow",
+   "motorshow"
+  ],
+  [
+   "police-cars",
+   "police cars"
+  ],
+  [
+   "premiere",
+   "premiere"
+  ],
+  [
+   "red-dot",
+   "Red Dot"
+  ],
+  [
+   "start-of-production",
+   "start of production"
+  ],
+  [
+   "car-of-the-year",
+   "Car of the year"
+  ],
+  [
+   "other",
+   "other"
+  ]
+ ],
+ "history": [
+  [
+   "1896-1905",
+   "1896-1905"
+  ],
+  [
+   "1906-1915",
+   "1906-1915"
+  ],
+  [
+   "1916-1925",
+   "1916-1925"
+  ],
+  [
+   "1926-1935",
+   "1926-1935"
+  ],
+  [
+   "1946-1955",
+   "1946-1955"
+  ],
+  [
+   "1936-1945",
+   "1936-1945"
+  ],
+  [
+   "1956-1965",
+   "1956-1965"
+  ],
+  [
+   "1966-1975",
+   "1966-1975"
+  ],
+  [
+   "1986-1995",
+   "1986-1995"
+  ],
+  [
+   "1976-1985",
+   "1976-1985"
+  ],
+  [
+   "1996-2005",
+   "1996-2005"
+  ],
+  [
+   "2006-2015",
+   "2006-2015"
+  ],
+  [
+   "100",
+   "100"
+  ],
+  [
+   "1000-mb",
+   "1000 MB"
+  ],
+  [
+   "1000-mb-type-990",
+   "1000 MB (type 990)"
+  ],
+  [
+   "1000-mr-rallye",
+   "1000 MR Rallye"
+  ],
+  [
+   "105",
+   "105"
+  ],
+  [
+   "110",
+   "110"
+  ],
+  [
+   "110-r-coupe-type-718-k",
+   "110 R Coupé (type 718 K)"
+  ],
+  [
+   "1100-mbx",
+   "1100 MBX"
+  ],
+  [
+   "1100-ohc",
+   "1100 OHC"
+  ],
+  [
+   "1101",
+   "1101"
+  ],
+  [
+   "120",
+   "120"
+  ],
+  [
+   "1200",
+   "1200"
+  ],
+  [
+   "1203",
+   "1203"
+  ],
+  [
+   "130",
+   "130"
+  ],
+  [
+   "130-lr",
+   "130 LR"
+  ],
+  [
+   "130-rs",
+   "130 RS"
+  ],
+  [
+   "440",
+   "440"
+  ],
+  [
+   "440-typ-970",
+   "440 (typ 970)"
+  ],
+  [
+   "445",
+   "445"
+  ],
+  [
+   "645",
+   "645"
+  ],
+  [
+   "fabia-s2000",
+   "Fabia S2000"
+  ],
+  [
+   "fabia-wrc",
+   "Fabia WRC"
+  ],
+  [
+   "favorit",
+   "Favorit"
+  ],
+  [
+   "felicia",
+   "Felicia"
+  ],
+  [
+   "felicia-fun",
+   "Felicia FUN"
+  ],
+  [
+   "ferat",
+   "Ferat"
+  ],
+  [
+   "forman",
+   "Forman"
+  ],
+  [
+   "formula-f3",
+   "Formula F3"
+  ],
+  [
+   "heritage",
+   "Heritage"
+  ],
+  [
+   "hispano-suiza",
+   "Hispano Suiza"
+  ],
+  [
+   "klement",
+   "Klement"
+  ],
+  [
+   "lamp",
+   "L&amp"
+  ],
+  [
+   "lk-bsc",
+   "L&K BSC"
+  ],
+  [
+   "lk-fc",
+   "L&K FC"
+  ],
+  [
+   "lk-motorcycle",
+   "L&K motorcycle"
+  ],
+  [
+   "lk-rkm",
+   "L&K RKM"
+  ],
+  [
+   "lk-s-series",
+   "L&K S series"
+  ],
+  [
+   "lk-slavia",
+   "L&K Slavia"
+  ],
+  [
+   "lk-voiturette-typ-a",
+   "L&K Voiturette (typ A)"
+  ],
+  [
+   "laurin",
+   "Laurin"
+  ],
+  [
+   "motorsport-history",
+   "motorsport - history"
+  ],
+  [
+   "museum",
+   "museum"
+  ],
+  [
+   "octavia",
+   "Octavia"
+  ],
+  [
+   "octavia-prototype-1964",
+   "Octavia (prototype 1964)"
+  ],
+  [
+   "octavia-ts",
+   "Octavia TS"
+  ],
+  [
+   "octavia-wrc",
+   "Octavia WRC"
+  ],
+  [
+   "pick-up",
+   "Pick-up"
+  ],
+  [
+   "popular",
+   "Popular"
+  ],
+  [
+   "popular-1100",
+   "Popular (type 1100)"
+  ],
+  [
+   "popular-monte-carlo",
+   "Popular Monte Carlo"
+  ],
+  [
+   "popular-sport-coupe",
+   "Popular Sport Coupé"
+  ],
+  [
+   "rapid",
+   "Rapid"
+  ],
+  [
+   "rapid-135",
+   "Rapid 135"
+  ],
+  [
+   "rapid-ohv-type-914",
+   "Rapid OHV (type 914)"
+  ],
+  [
+   "sagitta",
+   "Sagitta"
+  ],
+  [
+   "skoda-120-en",
+   "ŠKODA 120"
+  ],
+  [
+   "skoda-1203",
+   "Škoda 1203"
+  ],
+  [
+   "skoda-200-rs",
+   "Škoda 200 RS"
+  ],
+  [
+   "skoda-450",
+   "Škoda 450"
+  ],
+  [
+   "skoda-860",
+   "Škoda 860"
+  ],
+  [
+   "skoda-935",
+   "Škoda 935"
+  ],
+  [
+   "skoda-sport",
+   "Škoda Sport"
+  ],
+  [
+   "spartak",
+   "Spartak"
+  ],
+  [
+   "spider",
+   "Spider"
+  ],
+  [
+   "superb-type-902",
+   "Superb (type 902)"
+  ],
+  [
+   "superb-3000",
+   "Superb 3000"
+  ],
+  [
+   "superb-4000-type-919",
+   "Superb 4000 (type 919)"
+  ],
+  [
+   "superb-ohv",
+   "Superb OHV"
+  ],
+  [
+   "trekka",
+   "Trekka"
+  ],
+  [
+   "tudor",
+   "Tudor"
+  ],
+  [
+   "vaclav-klement",
+   "Vaclav Klement"
+  ],
+  [
+   "vaclav-laurin",
+   "Vaclav Laurin"
+  ],
+  [
+   "vintage",
+   "vintage"
+  ],
+  [
+   "yeti",
+   "Yeti"
+  ],
+  [
+   "125-years-en",
+   "125 Years"
+  ],
+  [
+   "1895",
+   "1895"
+  ],
+  [
+   "laurin-klement",
+   "Laurin & Klement"
+  ],
+  [
+   "lesser-known-models-series",
+   "Lesser-known models series"
+  ]
+ ],
+ "motorsport": [
+  [
+   "motorsport",
+   "Motorsport"
+  ]
+ ],
+ "sponsorship": [
+  [
+   "cycling",
+   "Cycling"
+  ],
+  [
+   "health-clown",
+   "Health clown"
+  ],
+  [
+   "icehockey",
+   "Icehockey"
+  ],
+  [
+   "iihf",
+   "IIHF"
+  ],
+  [
+   "teribear",
+   "TERIBEAR"
+  ],
+  [
+   "tour-de-france",
+   "Tour de France"
+  ],
+  [
+   "we-love-cycling",
+   "We love cycling"
+  ]
+ ],
+ "vip": [
+  [
+   "board-members",
+   "board members"
+  ],
+  [
+   "dick",
+   "Dick"
+  ],
+  [
+   "drabek",
+   "Drabek"
+  ],
+  [
+   "graf-en",
+   "Gräf"
+  ],
+  [
+   "jahn",
+   "Jahn"
+  ],
+  [
+   "jancak",
+   "Jancák"
+  ],
+  [
+   "kadera",
+   "Kadera"
+  ],
+  [
+   "neft",
+   "Neft"
+  ],
+  [
+   "peters-en",
+   "Peters"
+  ],
+  [
+   "povsik",
+   "Povšík"
+  ],
+  [
+   "schaefer-de",
+   "Schäfer"
+  ],
+  [
+   "schnake",
+   "Schnake"
+  ],
+  [
+   "stefani",
+   "Stefani"
+  ],
+  [
+   "villinger",
+   "Villinger"
+  ],
+  [
+   "zellmer-en",
+   "Zellmer"
+  ]
+ ],
+ "view": [
+  [
+   "exterior",
+   "exterior"
+  ],
+  [
+   "interior",
+   "interior"
+  ]
+ ],
+ "technology": [
+  [
+   "android-auto",
+   "Android Auto"
+  ],
+  [
+   "apple-car-play",
+   "Apple Car Play"
+  ],
+  [
+   "assistance-systems",
+   "assistance systems"
+  ],
+  [
+   "bev-en",
+   "BEV"
+  ],
+  [
+   "charging-point",
+   "charging point"
+  ],
+  [
+   "connectivity",
+   "Connectivity"
+  ],
+  [
+   "electro-vehicle",
+   "electro vehicle"
+  ],
+  [
+   "electromobility",
+   "electromobility"
+  ],
+  [
+   "emobility",
+   "eMobility"
+  ],
+  [
+   "hybrid",
+   "hybrid"
+  ],
+  [
+   "innovations",
+   "Innovations"
+  ],
+  [
+   "ios",
+   "iOS"
+  ],
+  [
+   "laura",
+   "Laura"
+  ],
+  [
+   "led-lights",
+   "LED lights"
+  ],
+  [
+   "meb",
+   "MEB"
+  ],
+  [
+   "meb-2",
+   "MEB+"
+  ],
+  [
+   "mqb",
+   "MQB"
+  ],
+  [
+   "mqb-a0",
+   "MQB-A0"
+  ],
+  [
+   "mqb-a0-in",
+   "MQB-A0-IN"
+  ],
+  [
+   "myskoda-app",
+   "MyŠKODA App"
+  ],
+  [
+   "phev-en",
+   "PHEV"
+  ],
+  [
+   "plug-in-hybrid-en",
+   "plug-in hybrid"
+  ],
+  [
+   "powerpass",
+   "Powerpass"
+  ],
+  [
+   "skoda-connect",
+   "ŠKODA Connect"
+  ],
+  [
+   "smart-dials___en",
+   "Smart Dials"
+  ],
+  [
+   "smartlink",
+   "SmartLink"
+  ],
+  [
+   "smartphone",
+   "Smartphone"
+  ],
+  [
+   "technology",
+   "Technology"
+  ],
+  [
+   "citymove",
+   "Citymove"
+  ],
+  [
+   "matrix-lights-en",
+   "Matrix Lights"
+  ],
+  [
+   "skodamarketplace",
+   "ŠKODA Marketplace"
+  ]
+ ],
+ "environment": [
+  [
+   "cng",
+   "CNG"
+  ],
+  [
+   "ecology",
+   "ecology"
+  ],
+  [
+   "emission",
+   "Emission"
+  ],
+  [
+   "greenfactory",
+   "GreenFactory"
+  ],
+  [
+   "greenfuture",
+   "GreenFuture"
+  ],
+  [
+   "greenproduct",
+   "GreenProduct"
+  ],
+  [
+   "greenretail",
+   "GreenRetail"
+  ],
+  [
+   "low-consumption",
+   "low consumption"
+  ],
+  [
+   "sustainability",
+   "Sustainability"
+  ]
+ ]
+}

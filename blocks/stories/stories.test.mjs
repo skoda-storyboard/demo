@@ -35,6 +35,7 @@ function el() {
     setAttribute(k, v) { this.attributes[k] = String(v); },
     getAttribute(k) { return this.attributes[k] ?? null; },
     append(...kids) { this.children.push(...kids); },
+    replaceChildren(...kids) { this.children = kids; },
     querySelector() { return null; },
     set textContent(v) { this._text = String(v); },
     get textContent() { return this._text; },
@@ -62,7 +63,7 @@ globalThis.document = {
 // shim above is in place first. createOptimizedPicture (aem.js) needs richer DOM,
 // so buildCardTeaser tests use image-less rows (the #3 regression path).
 const {
-  isFeatured, parseFeedConfig, selectFeedRows, scopeFeedRows,
+  isFeatured, parseFeedConfig, selectFeedRows, scopeFeedRows, renderCount,
 } = await import('./stories.js');
 const {
   buildCardTeaser, formatCardDate, decorateCardCells,
@@ -361,6 +362,66 @@ test('scopeFeedRows: no categories key leaves the category / tag configs unchang
   assert.deepEqual(scopeFeedRows(rows, rail).map((r) => r.title), ['A']);
   const promo = parseFeedConfig(configBlock({ template: 'story' }));
   assert.equal(scopeFeedRows([...rows, { path: '/en/p', title: 'P', template: 'story', featured: 'true' }], promo).length, 8, 'featured rows still excluded by default');
+});
+
+// --- archive count row "6 / 204" (SKODA-209a) -------------------------------
+// The importer's archive config (archive-list.js) and the home feed's (home-stories.js).
+const archiveCfg = { template: 'story', categories: 'emobility', columns: '3', initial: '6', perpage: '6' };
+const homeCfg = { heading: 'Latest Stories', template: 'story', path: '/en/', offset: '3' };
+
+test('count row: on with the archive N-column grid, off on the home featured feed', () => {
+  assert.equal(parseFeedConfig(configBlock(archiveCfg)).count, true);
+  assert.equal(parseFeedConfig(configBlock(homeCfg)).count, false);
+  assert.equal(parseFeedConfig(configBlock({ ...homeCfg, columns: 'featured' })).count, false);
+  assert.equal(parseFeedConfig(configBlock({ ...homeCfg, columns: '' })).count, false, 'blank columns');
+});
+
+test('count row: an authored `count` row overrides the grid default', () => {
+  assert.equal(parseFeedConfig(configBlock({ ...archiveCfg, count: 'false' })).count, false);
+  assert.equal(parseFeedConfig(configBlock({ ...archiveCfg, count: ' FALSE ' })).count, false);
+  assert.equal(parseFeedConfig(configBlock({ ...homeCfg, count: 'true' })).count, true);
+  assert.equal(parseFeedConfig(configBlock({ ...archiveCfg, count: '' })).count, true, 'blank cell keeps the default');
+});
+
+test('renderCount reads "6 / N", then "12 / N" after Load more', () => {
+  const countEl = document.createElement('div');
+  const read = () => countEl.children.map((s) => `${s.className}=${s.textContent}`);
+  renderCount(countEl, 6, 205);
+  assert.deepEqual(read(), ['stories-count-current=6', 'stories-count-total=205']);
+  assert.equal(countEl.hidden, false);
+  renderCount(countEl, 12, 205);
+  assert.deepEqual(read(), ['stories-count-current=12', 'stories-count-total=205'], 'replaced, not appended');
+  assert.equal(countEl.hidden, false);
+});
+
+test('renderCount keeps "N / N" when every story is shown, as the source; hides it with no stories', () => {
+  const countEl = document.createElement('div');
+  const read = () => countEl.children.map((s) => s.textContent).join(' / ');
+  renderCount(countEl, 3, 3); // a short archive: everything fits (source design-eng "3 / 3")
+  assert.equal(read(), '3 / 3');
+  assert.equal(countEl.hidden, false);
+  renderCount(countEl, 205, 205); // the last Load more: still shown, so it is announced
+  assert.equal(countEl.hidden, false);
+  renderCount(countEl, 0, 0); // no results: the status line says so instead
+  assert.equal(countEl.hidden, true);
+});
+
+test('archive pager: the count follows the paginated slice of the scoped feed', () => {
+  const index = Array.from({ length: 14 }, (_, i) => ({
+    path: `/en/s${i}`, title: `S${i}`, template: 'story', date: `2026-01-${String(i + 1).padStart(2, '0')}`, categories: 'emobility',
+  }));
+  const cfg = parseFeedConfig(configBlock(archiveCfg));
+  const all = selectFeedRows(scopeFeedRows(index, cfg), cfg.sort, cfg.offset, cfg.exclude);
+  const countEl = document.createElement('div');
+  const shownAfter = (revealed) => {
+    renderCount(countEl, paginate(all, revealed).length, all.length);
+    return countEl.children.map((s) => s.textContent).join(' / ');
+  };
+  assert.equal(shownAfter(cfg.initial), '6 / 14');
+  assert.equal(shownAfter(cfg.initial + cfg.perpage), '12 / 14');
+  assert.equal(countEl.hidden, false);
+  assert.equal(shownAfter(cfg.initial + 2 * cfg.perpage), '14 / 14');
+  assert.equal(countEl.hidden, false);
 });
 
 // --- exclude promo/featured (stories.md §8 exclude_carousel_posts) ---------
