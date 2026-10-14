@@ -132,9 +132,9 @@ All rows: `measured (selector · viewport) -> token`. Source URL:
   announce the language, not "CZ".
 - The visible label stays the uppercase code (brand style); the accessible name carries the full
   language name.
-- If kept as inline links: ensure sufficient contrast, `#7c7d7e` on `#e6e6e6` (topbar) is ~2.9:1,
-  **below 4.5:1** for the 12px text. **Contrast defect to fix**: darken the inactive locale link (e.g.
-  `--skoda-ink` at reduced opacity, or a darker grey) to reach AA.
+- Contrast: `#7c7d7e` on `#e6e6e6` (topbar) is 3.30:1, **below 4.5:1** for the 12px text. It was
+  darkened to `--skoda-grey-700` (SKODA-303); **since 2026-10-13 (PO, #243) the source `#7c7d7e` is kept**
+  for source parity, accepted as below AA (SKODA-703).
 
 ## 7. EDS target
 
@@ -241,8 +241,7 @@ Every link was clicked on the home page, a story, a press release, the Media Roo
   grows well beyond 6, assumption to confirm with the client (COM-05).
 - **Per-page existence:** source hides locales lacking a translation. **Decided (SKODA-303a):** EDS hides them
   too, and also the ones not migrated yet, from the page's native hreflang links (§8a); no locale-home fallback.
-- **Contrast:** darken the inactive locale link to meet AA (assumption: `#7c7d7e` fails on the grey
-  topbar; confirm final color).
+- **Contrast:** decided (PO, 2026-10-13, #243): the source `#7c7d7e`, below AA, accepted (SKODA-703).
 - **New tokens** (assumption to confirm): `--body-font-size-2xs: 12px`, define `--skoda-grey-500:
   #7c7d7e`, `--weight-light: 300`.
 
@@ -253,7 +252,7 @@ Format: WHAT / WHERE / viewport / expected / actual.
 - [ ] Count/order: `.lang-links` / all / 6 locales, current first (`en`), then cs(CZ)/de/sk/sr/sl.
 - [ ] Current locale: `.lang-links span` / desktop / non-link, `#161718`, weight `700`, `12px`,
       uppercase, `aria-current="true"`.
-- [ ] Other locales: `.lang-links a` / desktop / `#7c7d7e` (AA-corrected), weight `300`, `12px`,
+- [ ] Other locales: `.lang-links a` / desktop / `#7c7d7e` (the source colour, PO 2026-10-13), weight `300`, `12px`,
       uppercase, correct `/{locale}/` href, `hreflang`+`lang` set.
 - [ ] Placement desktop: flush right in the topbar (`margin-left:auto`), gap `1em` between items.
 - [ ] Placement mobile: hidden in topbar, shown at drawer bottom, `16px`, gap `1.5em`.

@@ -157,14 +157,22 @@ function sourceLocale(url) {
   }
 }
 
-// The source shortens a card title in the browser to fit its box (`data-dotdotdot`): the
-// importer, running after that script, reads e.g. "Škoda Epiq nově obléká efektní…". The
-// card image's alt carries the whole title, so a clipped title that the alt continues
-// becomes the alt; the rail's CSS clamps it, as for index cards.
+// A source teaser alt as plain text: it can hold a literal `<br>` (as the press-release lead
+// image's, leadImage() in skoda-press-release-layout.js).
+const plainAlt = (alt) => (alt || '').replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim();
+
+// The source shortens a card title in the browser to fit its box (`data-dotdotdot`, at a word
+// boundary): the importer, running after that script, reads e.g. "Škoda Epiq nově obléká
+// efektní…". The card image's alt carries the whole title, so a clipped title becomes the alt
+// when the alt continues it word for word: at least 2 clipped words, then a word boundary.
+// Anything else (a one-word clip, an alt that is a caption) keeps the clipped title. The rail's
+// CSS clamps the whole title, as for index cards.
 function fullTitle(title, alt) {
   const clipped = title.match(/^(.*?)\s*(?:…|\.\.\.)$/);
-  const whole = (alt || '').replace(/\s+/g, ' ').trim();
-  if (!clipped || !clipped[1] || !whole.startsWith(clipped[1])) return title;
+  const prefix = clipped ? clipped[1] : '';
+  const whole = plainAlt(alt);
+  if (prefix.split(' ').length < 2 || !whole.startsWith(prefix)) return title;
+  if (whole.length > prefix.length && !/^[\s,.:;!?–-]/.test(whole.slice(prefix.length))) return title;
   return whole;
 }
 
@@ -183,6 +191,7 @@ function curatedCards(band, document) {
     if (img) {
       ['data-caption', 'data-video_title', 'data-video_src', 'srcset', 'sizes', 'itemprop', 'loading', 'decoding']
         .forEach((a) => img.removeAttribute(a));
+      if (img.hasAttribute('alt')) img.setAttribute('alt', plainAlt(img.getAttribute('alt')));
     }
     const body = [];
     const date = squashed(card.querySelector('.entry-published'));

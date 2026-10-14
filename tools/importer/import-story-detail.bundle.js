@@ -937,10 +937,13 @@ var CustomImportScript = (() => {
       return "en";
     }
   }
+  var plainAlt = (alt) => (alt || "").replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim();
   function fullTitle(title, alt) {
     const clipped = title.match(/^(.*?)\s*(?:…|\.\.\.)$/);
-    const whole = (alt || "").replace(/\s+/g, " ").trim();
-    if (!clipped || !clipped[1] || !whole.startsWith(clipped[1])) return title;
+    const prefix = clipped ? clipped[1] : "";
+    const whole = plainAlt(alt);
+    if (prefix.split(" ").length < 2 || !whole.startsWith(prefix)) return title;
+    if (whole.length > prefix.length && !/^[\s,.:;!?–-]/.test(whole.slice(prefix.length))) return title;
     return whole;
   }
   function curatedCards(band, document2) {
@@ -954,6 +957,7 @@ var CustomImportScript = (() => {
       if (!href || !title) return;
       if (img) {
         ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop", "loading", "decoding"].forEach((a2) => img.removeAttribute(a2));
+        if (img.hasAttribute("alt")) img.setAttribute("alt", plainAlt(img.getAttribute("alt")));
       }
       const body = [];
       const date = squashed(card.querySelector(".entry-published"));

@@ -298,6 +298,28 @@ test('translated story: the related band keeps the source cards as a curated Sto
   assert.ok(!doc.querySelector('.related-stories, .cover-box'), 'band removed');
 });
 
+test('translated story: a clipped title is restored only from an alt that continues it word for word (#348 review)', { skip }, () => {
+  const card = (n, title, alt) => `<article class="article-teaser">
+    <div class="article-teaser-media"><a class="colorbox" href=""><img src="https://cdn.skoda-storyboard.com/c${n}.png" alt="${alt}"></a></div>
+    <h3 class="entry-title"><a href="https://www.skoda-storyboard.com/cs/e-mobilita-cs/c${n}/">${title}</a></h3></article>`;
+  const doc = dom(RELATED.replace('<article><a class="colorbox" href=""><img src="t.jpg"></a></article>', [
+    card(1, 'Škoda Epiq nově…', 'Škoda Epiq nově&lt;br&gt;obléká efektní soupravu'), // a literal <br> in the source alt
+    card(2, 'Škoda…', 'Škoda Epiq at the Milan premiere'), // a one-word clip: the alt may be a caption
+    card(3, 'Epiq a design…', 'Epiq a designérský tým v Miláně'), // the alt doesn't continue at a word boundary
+    card(4, 'Rekordní rok…', 'Rekordní rok, i díky elektromobilům'), // punctuation is a word boundary
+  ].join('')));
+  storyCleanup('afterTransform', doc.body, CS_PAYLOAD);
+  const rail = [...doc.querySelectorAll('table')].find((t) => blockName(t) === 'Story Rail');
+  const cards = [...rail.querySelectorAll('tr')].slice(1);
+  assert.deepEqual(cards.map((tr) => tr.querySelector('h3 a').textContent), [
+    'Škoda Epiq nově obléká efektní soupravu',
+    'Škoda…',
+    'Epiq a design…',
+    'Rekordní rok, i díky elektromobilům',
+  ]);
+  assert.equal(cards[0].querySelector('img').getAttribute('alt'), 'Škoda Epiq nově obléká efektní soupravu', 'the moved image alt is plain text too');
+});
+
 test('translated story: a related band without source cards is dropped (#243)', { skip }, () => {
   const doc = dom(RELATED.replace('<article><a class="colorbox" href=""><img src="t.jpg"></a></article>', ''));
   storyCleanup('afterTransform', doc.body, CS_PAYLOAD);

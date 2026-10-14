@@ -1,46 +1,6 @@
 {
   "version": 1,
   "pages": {
-    "/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund": {
-      "hash": "d442448934c46b1b1201c75ecb0f0b9c066ae11db4110630a507c313978fd6a2",
-      "pushedAt": "2026-10-13T12:30:39.939Z",
-      "previewedHash": "d442448934c46b1b1201c75ecb0f0b9c066ae11db4110630a507c313978fd6a2"
-    },
-    "/cs/footer": {
-      "hash": "a08c6a2294044491e18212598a32c1f88166b1e47b3240a3062ccfb3df749004",
-      "pushedAt": "2026-10-08T10:40:43.763Z",
-      "previewedHash": "a08c6a2294044491e18212598a32c1f88166b1e47b3240a3062ccfb3df749004"
-    },
-    "/cs/fragments/newsletter-card": {
-      "hash": "74338e7042a1fe328efcca16f1b1f7a855f69952e7f4f506e2e9d6b31bc4b62f",
-      "pushedAt": "2026-10-13T12:23:58.263Z",
-      "previewedHash": "74338e7042a1fe328efcca16f1b1f7a855f69952e7f4f506e2e9d6b31bc4b62f"
-    },
-    "/cs/nav": {
-      "hash": "2dd490f96badf3c95169a4b901a51d14d790d24fde63b87380ae5de833097edf",
-      "pushedAt": "2026-10-08T10:40:43.763Z",
-      "previewedHash": "2dd490f96badf3c95169a4b901a51d14d790d24fde63b87380ae5de833097edf"
-    },
-    "/cs/nav-newsletter": {
-      "hash": "e3e4bf09b22dec3e79f0c95a3cfb459796eb9137706e425d5b1ff875404a4b13",
-      "pushedAt": "2026-10-08T10:40:43.763Z",
-      "previewedHash": "e3e4bf09b22dec3e79f0c95a3cfb459796eb9137706e425d5b1ff875404a4b13"
-    },
-    "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds": {
-      "hash": "f17d31008d690ac033756997ba771ba266b421c9dcb0e076d345a1e643aa05be",
-      "pushedAt": "2026-10-13T12:23:58.263Z",
-      "previewedHash": "f17d31008d690ac033756997ba771ba266b421c9dcb0e076d345a1e643aa05be"
-    },
-    "/de/nav": {
-      "hash": "7c1e014900b2b99ae9bbe7df73fb1d00b45bd827cd31a5b7d878bb08f8bc299e",
-      "pushedAt": "2026-10-08T10:57:31.472Z",
-      "previewedHash": "7c1e014900b2b99ae9bbe7df73fb1d00b45bd827cd31a5b7d878bb08f8bc299e"
-    },
-    "/de/nav-newsletter": {
-      "hash": "e879cf9ae3dd44b5807e64af0239f598998660a2eafdba492d600031b8c96818",
-      "pushedAt": "2026-10-08T10:40:43.763Z",
-      "previewedHash": "e879cf9ae3dd44b5807e64af0239f598998660a2eafdba492d600031b8c96818"
-    },
     "/en": {
       "hash": "dddb62e8723aa7222df866b691c02c0e7a07b2464028954db041d07e8aeaac43",
       "pushedAt": "2026-10-12T14:31:57.718Z",
@@ -289,11 +249,6 @@
       "hash": "11057ea080c08ca6f7d14b43ca05e1121bb9a7071c8418ae1f90bb7fd2ed6fa8",
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "11057ea080c08ca6f7d14b43ca05e1121bb9a7071c8418ae1f90bb7fd2ed6fa8"
-    },
-    "/en/fragments/newsletter-card": {
-      "hash": "d38fe19a4ba14b37e615a24250b642a29fc3c8c5bafb178c249ca73072a90e79",
-      "pushedAt": "2026-10-11T18:51:32.544Z",
-      "previewedHash": "d38fe19a4ba14b37e615a24250b642a29fc3c8c5bafb178c249ca73072a90e79"
     },
     "/en/images": {
       "hash": "71ea9ff623ab90eb2348e717272cd091114b446220e7016ba56bded4f16403eb",
@@ -740,11 +695,6 @@
       "pushedAt": "2026-10-09T06:44:03.159Z",
       "previewedHash": "4f59e205245593248799836a5a662c4fcba0905ffec351cda553b836c0cf1563"
     },
-    "/en/press-releases/2026-iihf-ice-hockey-world-championship-roman-josi-wins-most-valuable-player-trophy-created-by-skoda-design": {
-      "hash": "e35230aea56cbc501d9fa5825a44bf428f9e74a147dc7b2b122a1ca7fa14d9f0",
-      "pushedAt": "2026-10-08T22:31:44.145Z",
-      "previewedHash": "e35230aea56cbc501d9fa5825a44bf428f9e74a147dc7b2b122a1ca7fa14d9f0"
-    },
     "/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production": {
       "hash": "52c5e496f1ae992aab99465a9b13c92bdac1a048e05adadf79a128157d3e86ee",
       "pushedAt": "2026-10-06T12:23:54.957Z",
@@ -755,16 +705,6 @@
       "pushedAt": "2026-10-10T16:59:57.991Z",
       "previewedHash": "8d3b7e3d6787ca5ecea98efdeb11659c95ca32ba526125b602bfb4c8b607676f"
     },
-    "/en/press-releases/camp-mode-in-the-myskoda-app-comfortable-overnight-stays-in-electric-vehicles": {
-      "hash": "7a4d58a5e757233ffe6def5aac8bd69c091e15e8e1cc35253e3a93acad0dd686",
-      "pushedAt": "2026-10-10T16:59:57.991Z",
-      "previewedHash": "7a4d58a5e757233ffe6def5aac8bd69c091e15e8e1cc35253e3a93acad0dd686"
-    },
-    "/en/press-releases/lorena-wiebes-receives-skoda-design-trophy-after-winning-tour-de-france-femmes-avec-zwift-points-classification": {
-      "hash": "cd6adeb56d6a5fc2f5a0ffcbb4d5e8a4b1517258a09131ae9badd1e28eb91463",
-      "pushedAt": "2026-10-08T22:31:44.145Z",
-      "previewedHash": "cd6adeb56d6a5fc2f5a0ffcbb4d5e8a4b1517258a09131ae9badd1e28eb91463"
-    },
     "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-3-2026": {
       "hash": "a911916c77dbda9fbfe2be097ad0513f86e0bac738d6c70db92ce110e8623e47",
       "pushedAt": "2026-10-10T16:59:57.991Z",
@@ -774,11 +714,6 @@
       "hash": "298da36f8cd93c3c3e253ad1ed76b3eecfde1d7b903bafe18aa68c1fbe787d2e",
       "pushedAt": "2026-10-10T16:59:57.991Z",
       "previewedHash": "298da36f8cd93c3c3e253ad1ed76b3eecfde1d7b903bafe18aa68c1fbe787d2e"
-    },
-    "/en/press-releases/preparations-begin-for-the-11th-skoda-student-car-celebrating-100-years-of-vocational-education": {
-      "hash": "655b02a37fbe38e00c47fa53ab4aade829cc7847eb771f9e69b4d15f147de496",
-      "pushedAt": "2026-10-08T22:31:44.145Z",
-      "previewedHash": "655b02a37fbe38e00c47fa53ab4aade829cc7847eb771f9e69b4d15f147de496"
     },
     "/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq": {
       "hash": "9e47a53eb2487770d931683a4299024089ed6f051741d5749ab57d9408949162",
@@ -805,21 +740,6 @@
       "pushedAt": "2026-10-06T12:23:54.957Z",
       "previewedHash": "592cc6804582397e4928ae73bc7fc762797544512ca724f0e6fb9bb9c508f020"
     },
-    "/en/press-releases/skoda-auto-appoints-world-renowned-road-cyclist-chris-froome-as-brand-cycling-ambassador": {
-      "hash": "960883bacb6736b0c73a4bde39eb042497f1f58db29e674744b2b8c895090eb4",
-      "pushedAt": "2026-10-10T16:59:57.991Z",
-      "previewedHash": "960883bacb6736b0c73a4bde39eb042497f1f58db29e674744b2b8c895090eb4"
-    },
-    "/en/press-releases/skoda-auto-celebrates-33-years-as-official-main-sponsor-of-the-iihf-ice-hockey-world-championship-and-unveils-the-epiq": {
-      "hash": "19e6b5de621e873fabf791e6c8624429074f73f4fd5485dc572718e1167f385f",
-      "pushedAt": "2026-10-08T22:31:44.145Z",
-      "previewedHash": "19e6b5de621e873fabf791e6c8624429074f73f4fd5485dc572718e1167f385f"
-    },
-    "/en/press-releases/skoda-auto-celebrates-successful-milan-design-week-with-strong-visitor-interest-and-fuorisalone-award-recognition-as-highest-rated-installation": {
-      "hash": "1ef096c119cf3c8fd6863d3ef30ef5fb274a7df005b48eb0585caeb38a4cef57",
-      "pushedAt": "2026-10-08T22:31:44.145Z",
-      "previewedHash": "1ef096c119cf3c8fd6863d3ef30ef5fb274a7df005b48eb0585caeb38a4cef57"
-    },
     "/en/press-releases/skoda-auto-enters-saudi-arabian-market-strengthening-its-presence-in-the-middle-east": {
       "hash": "0f9e62a6befe10b46fac9a99bff47bda179600f8155faf5897f728179fb59fbd",
       "pushedAt": "2026-10-06T12:23:54.957Z",
@@ -845,85 +765,35 @@
       "pushedAt": "2026-10-06T12:23:54.957Z",
       "previewedHash": "de735354cdc2509db7853e5c11b22e706776250c7284f3438a554a1339e09b7e"
     },
-    "/en/press-releases/skoda-auto-ranks-as-europes-second-best-selling-car-brand-after-a-strong-first-quarter": {
-      "hash": "6a23a1c4dba403f7a7e92409df703d5bcf6125c77758b265badec5f50ecae482",
-      "pushedAt": "2026-10-10T16:59:57.991Z",
-      "previewedHash": "6a23a1c4dba403f7a7e92409df703d5bcf6125c77758b265badec5f50ecae482"
-    },
-    "/en/press-releases/skoda-auto-supports-tour-de-france-femmes-avec-zwift-as-official-main-partner-for-the-fifth-year": {
-      "hash": "9db7206d1b4ca91cb3e9267652a17d57278826cdff5f4cff51f90233e2444414",
-      "pushedAt": "2026-10-08T22:31:44.145Z",
-      "previewedHash": "9db7206d1b4ca91cb3e9267652a17d57278826cdff5f4cff51f90233e2444414"
-    },
     "/en/press-releases/skoda-auto-supports-uci-mountain-bike-world-championshipsas-official-partner-for-second-year-running": {
       "hash": "6f04ff3a20bb7deadb355310dfe300cb98762dc65d97616ad76af5559cde2a29",
       "pushedAt": "2026-10-10T16:59:57.991Z",
       "previewedHash": "6f04ff3a20bb7deadb355310dfe300cb98762dc65d97616ad76af5559cde2a29"
-    },
-    "/en/press-releases/skoda-auto-teams-up-with-hasbros-play-doh-brand": {
-      "hash": "36bd527c9ef35529d16cf7cfa463a8f7456b146a02bd62f0f480463d1e5c1066",
-      "pushedAt": "2026-10-10T16:59:57.991Z",
-      "previewedHash": "36bd527c9ef35529d16cf7cfa463a8f7456b146a02bd62f0f480463d1e5c1066"
     },
     "/en/press-releases/skoda-auto-unveils-updated-slavia-in-india": {
       "hash": "8ef782807f04878daf0ed6972ea7a45db049ecf9a38b05af9dd594a44c85bcef",
       "pushedAt": "2026-10-06T12:23:54.957Z",
       "previewedHash": "8ef782807f04878daf0ed6972ea7a45db049ecf9a38b05af9dd594a44c85bcef"
     },
-    "/en/press-releases/skoda-epiq-sportline-debuts-at-the-paris-motor-show": {
-      "hash": "a4db5dfeb57649d5075928a998e0930be1fed7d98b23a8ff4720672900f4eca3",
-      "pushedAt": "2026-10-08T22:31:44.145Z",
-      "previewedHash": "a4db5dfeb57649d5075928a998e0930be1fed7d98b23a8ff4720672900f4eca3"
-    },
-    "/en/press-releases/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport": {
-      "hash": "45cb0c0636f36ed0022295a70842af965c69f174dcaa6acbb5dbfcf953ff3b3e",
-      "pushedAt": "2026-10-08T22:31:44.145Z",
-      "previewedHash": "45cb0c0636f36ed0022295a70842af965c69f174dcaa6acbb5dbfcf953ff3b3e"
-    },
     "/en/press-releases/skoda-kvasiny-newsletter-2-2026": {
       "hash": "165e779c193b32e1e5c656e727074aff7d18a7ef765f08633869bd82fd17fca1",
       "pushedAt": "2026-10-10T16:59:57.991Z",
       "previewedHash": "165e779c193b32e1e5c656e727074aff7d18a7ef765f08633869bd82fd17fca1"
-    },
-    "/en/press-releases/skoda-launches-production-of-the-new-epiq-in-pamplona-spain": {
-      "hash": "0cb16a027aea61210b0e8400556dad51c1bd2a64fe68f2d04d88d2a6fbd41205",
-      "pushedAt": "2026-10-08T22:31:44.145Z",
-      "previewedHash": "0cb16a027aea61210b0e8400556dad51c1bd2a64fe68f2d04d88d2a6fbd41205"
     },
     "/en/press-releases/skoda-octavia-combi-rs-wins-prestigious-2024-golden-steering-wheel-award-in-the-mid-sized-car-category": {
       "hash": "0ca09bd5738ad22c59693509824bf8c0bb6268ed3cf173e9f13c5142d9fbe871",
       "pushedAt": "2026-10-06T12:23:54.957Z",
       "previewedHash": "0ca09bd5738ad22c59693509824bf8c0bb6268ed3cf173e9f13c5142d9fbe871"
     },
-    "/en/press-releases/skoda-octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain": {
-      "hash": "4e07fc84ced36df88ec9aacad17572e59abd1a396479f26da154738a466d16f8",
-      "pushedAt": "2026-10-08T22:31:44.145Z",
-      "previewedHash": "4e07fc84ced36df88ec9aacad17572e59abd1a396479f26da154738a466d16f8"
-    },
     "/en/press-releases/skoda-octavia-turns-30-three-decades-of-a-brand-icon": {
       "hash": "4cef0c4cd8df1808f0fe6d660b64b36e26651f4ca87e71d5916793c20d020abe",
       "pushedAt": "2026-10-06T12:23:54.957Z",
       "previewedHash": "4cef0c4cd8df1808f0fe6d660b64b36e26651f4ca87e71d5916793c20d020abe"
     },
-    "/en/press-releases/skoda-offers-a-first-glimpse-of-the-interior-concept-of-its-electric-seven-seater-peaq": {
-      "hash": "4689303bb2ba4a3db77dcbf6fc54c27b7e458a733570adf7c0b4e83d92db0368",
-      "pushedAt": "2026-10-10T16:59:57.991Z",
-      "previewedHash": "4689303bb2ba4a3db77dcbf6fc54c27b7e458a733570adf7c0b4e83d92db0368"
-    },
     "/en/press-releases/skoda-peaq-comprehensive-testing-in-extreme-conditions": {
       "hash": "cae9b964461631555be1dace632c21983f875b79f116793c7eeceede62f796ac",
       "pushedAt": "2026-09-30T12:19:22.211Z",
       "previewedHash": "cae9b964461631555be1dace632c21983f875b79f116793c7eeceede62f796ac"
-    },
-    "/en/press-releases/skoda-presents-exterior-sketches-of-its-all-new-electric-seven-seater-peaq": {
-      "hash": "1108574be9b108536917e20b6076df454a3c3a4e3f676dec08bd66ec53fbaab6",
-      "pushedAt": "2026-10-08T22:31:44.145Z",
-      "previewedHash": "1108574be9b108536917e20b6076df454a3c3a4e3f676dec08bd66ec53fbaab6"
-    },
-    "/en/press-releases/skoda-presents-first-interior-sketches-and-announces-world-premiere-date-of-electric-epiq": {
-      "hash": "5c92ca2054b758bf40cc32b142771a491f9dcd862ed8330d7233e60f61425a6a",
-      "pushedAt": "2026-10-10T16:59:57.991Z",
-      "previewedHash": "5c92ca2054b758bf40cc32b142771a491f9dcd862ed8330d7233e60f61425a6a"
     },
     "/en/press-releases/skoda-receives-red-dot-award-for-its-vision-app-concept": {
       "hash": "f06f0f7220af03dd21178ef5a604306e2b347e4b0d999917826a4c96dae4e04f",
@@ -949,11 +819,6 @@
       "hash": "767a2483e8047d1d9697368a6b0a0ab7d91e4f207aae9e1aa05a490b42878a63",
       "pushedAt": "2026-10-06T12:23:54.957Z",
       "previewedHash": "767a2483e8047d1d9697368a6b0a0ab7d91e4f207aae9e1aa05a490b42878a63"
-    },
-    "/en/press-releases/tadej-pogacar-winner-of-the-113th-tour-de-france-receives-crystal-trophy-created-by-skoda-design": {
-      "hash": "ccaab61432986f4999bea8e8930377ef036adfe860307665abb6b341b13878fb",
-      "pushedAt": "2026-10-08T22:31:44.145Z",
-      "previewedHash": "ccaab61432986f4999bea8e8930377ef036adfe860307665abb6b341b13878fb"
     },
     "/en/press-releases/the-skoda-4x4-model-range-safe-driving-in-all-weather-and-challenging-terrain": {
       "hash": "f6624cea81181443d4769375568837734546091e8b3c933f46d2ce7dba0b709b",
@@ -984,11 +849,6 @@
       "hash": "da492aa58948df22393b65958b5f1e3202941c786fe98a1b1964112f3667c0e8",
       "pushedAt": "2026-10-10T16:59:57.991Z",
       "previewedHash": "da492aa58948df22393b65958b5f1e3202941c786fe98a1b1964112f3667c0e8"
-    },
-    "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-pictures-on-the-skoda-storyboard": {
-      "hash": "087bb04124dbdd2ced692949d593ea21cb5afe8080cae1c2de2db4bd42093b26",
-      "pushedAt": "2026-10-10T16:59:57.991Z",
-      "previewedHash": "087bb04124dbdd2ced692949d593ea21cb5afe8080cae1c2de2db4bd42093b26"
     },
     "/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france": {
       "hash": "c032bfdc060fb646a10c060108586dc07095618ffed3eb8a0fb296b0f8a20d4a",
@@ -1100,11 +960,6 @@
       "hash": "59085197d0526575e2e88db44511001779b7539e27f46dceb7aca76081cbe5c0",
       "pushedAt": "2026-09-27T19:49:07.302Z",
       "previewedHash": "59085197d0526575e2e88db44511001779b7539e27f46dceb7aca76081cbe5c0"
-    },
-    "/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv": {
-      "hash": "8f8cbac13e75cb3d8ed94be73c60916c5ef5acc941b041ac00a8cf783f936517",
-      "pushedAt": "2026-10-12T09:41:49.349Z",
-      "previewedHash": "8f8cbac13e75cb3d8ed94be73c60916c5ef5acc941b041ac00a8cf783f936517"
     },
     "/en/skoda-model/enyaq-iv-2/enyaq-rs": {
       "hash": "f4bd2c1340100e5aa2293a0e2e9d4cacb364c4c3c0b9d1232ad2b1356a6b1cff",
@@ -1444,15 +1299,155 @@
       "pushedAt": "2026-09-26T06:56:28.280Z",
       "adopted": true
     },
+    "/nav": {
+      "hash": "9be605a50d052fa90c8975e14242c75b2e47f00b271b59660567723536056bbc",
+      "pushedAt": "2026-09-26T06:56:28.280Z",
+      "adopted": true
+    },
+    "/en/fragments/newsletter-card": {
+      "hash": "d38fe19a4ba14b37e615a24250b642a29fc3c8c5bafb178c249ca73072a90e79",
+      "pushedAt": "2026-10-11T18:51:32.544Z",
+      "previewedHash": "d38fe19a4ba14b37e615a24250b642a29fc3c8c5bafb178c249ca73072a90e79"
+    },
+    "/en/press-releases/2026-iihf-ice-hockey-world-championship-roman-josi-wins-most-valuable-player-trophy-created-by-skoda-design": {
+      "hash": "e35230aea56cbc501d9fa5825a44bf428f9e74a147dc7b2b122a1ca7fa14d9f0",
+      "pushedAt": "2026-10-08T22:31:44.145Z",
+      "previewedHash": "e35230aea56cbc501d9fa5825a44bf428f9e74a147dc7b2b122a1ca7fa14d9f0"
+    },
+    "/en/press-releases/camp-mode-in-the-myskoda-app-comfortable-overnight-stays-in-electric-vehicles": {
+      "hash": "7a4d58a5e757233ffe6def5aac8bd69c091e15e8e1cc35253e3a93acad0dd686",
+      "pushedAt": "2026-10-10T16:59:57.991Z",
+      "previewedHash": "7a4d58a5e757233ffe6def5aac8bd69c091e15e8e1cc35253e3a93acad0dd686"
+    },
+    "/en/press-releases/lorena-wiebes-receives-skoda-design-trophy-after-winning-tour-de-france-femmes-avec-zwift-points-classification": {
+      "hash": "cd6adeb56d6a5fc2f5a0ffcbb4d5e8a4b1517258a09131ae9badd1e28eb91463",
+      "pushedAt": "2026-10-08T22:31:44.145Z",
+      "previewedHash": "cd6adeb56d6a5fc2f5a0ffcbb4d5e8a4b1517258a09131ae9badd1e28eb91463"
+    },
+    "/en/press-releases/preparations-begin-for-the-11th-skoda-student-car-celebrating-100-years-of-vocational-education": {
+      "hash": "655b02a37fbe38e00c47fa53ab4aade829cc7847eb771f9e69b4d15f147de496",
+      "pushedAt": "2026-10-08T22:31:44.145Z",
+      "previewedHash": "655b02a37fbe38e00c47fa53ab4aade829cc7847eb771f9e69b4d15f147de496"
+    },
+    "/en/press-releases/skoda-auto-appoints-world-renowned-road-cyclist-chris-froome-as-brand-cycling-ambassador": {
+      "hash": "960883bacb6736b0c73a4bde39eb042497f1f58db29e674744b2b8c895090eb4",
+      "pushedAt": "2026-10-10T16:59:57.991Z",
+      "previewedHash": "960883bacb6736b0c73a4bde39eb042497f1f58db29e674744b2b8c895090eb4"
+    },
+    "/en/press-releases/skoda-auto-celebrates-33-years-as-official-main-sponsor-of-the-iihf-ice-hockey-world-championship-and-unveils-the-epiq": {
+      "hash": "19e6b5de621e873fabf791e6c8624429074f73f4fd5485dc572718e1167f385f",
+      "pushedAt": "2026-10-08T22:31:44.145Z",
+      "previewedHash": "19e6b5de621e873fabf791e6c8624429074f73f4fd5485dc572718e1167f385f"
+    },
+    "/en/press-releases/skoda-auto-celebrates-successful-milan-design-week-with-strong-visitor-interest-and-fuorisalone-award-recognition-as-highest-rated-installation": {
+      "hash": "1ef096c119cf3c8fd6863d3ef30ef5fb274a7df005b48eb0585caeb38a4cef57",
+      "pushedAt": "2026-10-08T22:31:44.145Z",
+      "previewedHash": "1ef096c119cf3c8fd6863d3ef30ef5fb274a7df005b48eb0585caeb38a4cef57"
+    },
+    "/en/press-releases/skoda-auto-ranks-as-europes-second-best-selling-car-brand-after-a-strong-first-quarter": {
+      "hash": "6a23a1c4dba403f7a7e92409df703d5bcf6125c77758b265badec5f50ecae482",
+      "pushedAt": "2026-10-10T16:59:57.991Z",
+      "previewedHash": "6a23a1c4dba403f7a7e92409df703d5bcf6125c77758b265badec5f50ecae482"
+    },
+    "/en/press-releases/skoda-auto-supports-tour-de-france-femmes-avec-zwift-as-official-main-partner-for-the-fifth-year": {
+      "hash": "9db7206d1b4ca91cb3e9267652a17d57278826cdff5f4cff51f90233e2444414",
+      "pushedAt": "2026-10-08T22:31:44.145Z",
+      "previewedHash": "9db7206d1b4ca91cb3e9267652a17d57278826cdff5f4cff51f90233e2444414"
+    },
+    "/en/press-releases/skoda-auto-teams-up-with-hasbros-play-doh-brand": {
+      "hash": "36bd527c9ef35529d16cf7cfa463a8f7456b146a02bd62f0f480463d1e5c1066",
+      "pushedAt": "2026-10-10T16:59:57.991Z",
+      "previewedHash": "36bd527c9ef35529d16cf7cfa463a8f7456b146a02bd62f0f480463d1e5c1066"
+    },
+    "/en/press-releases/skoda-epiq-sportline-debuts-at-the-paris-motor-show": {
+      "hash": "a4db5dfeb57649d5075928a998e0930be1fed7d98b23a8ff4720672900f4eca3",
+      "pushedAt": "2026-10-08T22:31:44.145Z",
+      "previewedHash": "a4db5dfeb57649d5075928a998e0930be1fed7d98b23a8ff4720672900f4eca3"
+    },
+    "/en/press-releases/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport": {
+      "hash": "45cb0c0636f36ed0022295a70842af965c69f174dcaa6acbb5dbfcf953ff3b3e",
+      "pushedAt": "2026-10-08T22:31:44.145Z",
+      "previewedHash": "45cb0c0636f36ed0022295a70842af965c69f174dcaa6acbb5dbfcf953ff3b3e"
+    },
+    "/en/press-releases/skoda-launches-production-of-the-new-epiq-in-pamplona-spain": {
+      "hash": "0cb16a027aea61210b0e8400556dad51c1bd2a64fe68f2d04d88d2a6fbd41205",
+      "pushedAt": "2026-10-08T22:31:44.145Z",
+      "previewedHash": "0cb16a027aea61210b0e8400556dad51c1bd2a64fe68f2d04d88d2a6fbd41205"
+    },
+    "/en/press-releases/skoda-octavia-is-the-brands-first-model-with-a-full-hybrid-powertrain": {
+      "hash": "4e07fc84ced36df88ec9aacad17572e59abd1a396479f26da154738a466d16f8",
+      "pushedAt": "2026-10-08T22:31:44.145Z",
+      "previewedHash": "4e07fc84ced36df88ec9aacad17572e59abd1a396479f26da154738a466d16f8"
+    },
+    "/en/press-releases/skoda-offers-a-first-glimpse-of-the-interior-concept-of-its-electric-seven-seater-peaq": {
+      "hash": "4689303bb2ba4a3db77dcbf6fc54c27b7e458a733570adf7c0b4e83d92db0368",
+      "pushedAt": "2026-10-10T16:59:57.991Z",
+      "previewedHash": "4689303bb2ba4a3db77dcbf6fc54c27b7e458a733570adf7c0b4e83d92db0368"
+    },
+    "/en/press-releases/skoda-presents-exterior-sketches-of-its-all-new-electric-seven-seater-peaq": {
+      "hash": "1108574be9b108536917e20b6076df454a3c3a4e3f676dec08bd66ec53fbaab6",
+      "pushedAt": "2026-10-08T22:31:44.145Z",
+      "previewedHash": "1108574be9b108536917e20b6076df454a3c3a4e3f676dec08bd66ec53fbaab6"
+    },
+    "/en/press-releases/skoda-presents-first-interior-sketches-and-announces-world-premiere-date-of-electric-epiq": {
+      "hash": "5c92ca2054b758bf40cc32b142771a491f9dcd862ed8330d7233e60f61425a6a",
+      "pushedAt": "2026-10-10T16:59:57.991Z",
+      "previewedHash": "5c92ca2054b758bf40cc32b142771a491f9dcd862ed8330d7233e60f61425a6a"
+    },
+    "/en/press-releases/tadej-pogacar-winner-of-the-113th-tour-de-france-receives-crystal-trophy-created-by-skoda-design": {
+      "hash": "ccaab61432986f4999bea8e8930377ef036adfe860307665abb6b341b13878fb",
+      "pushedAt": "2026-10-08T22:31:44.145Z",
+      "previewedHash": "ccaab61432986f4999bea8e8930377ef036adfe860307665abb6b341b13878fb"
+    },
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-pictures-on-the-skoda-storyboard": {
+      "hash": "087bb04124dbdd2ced692949d593ea21cb5afe8080cae1c2de2db4bd42093b26",
+      "pushedAt": "2026-10-10T16:59:57.991Z",
+      "previewedHash": "087bb04124dbdd2ced692949d593ea21cb5afe8080cae1c2de2db4bd42093b26"
+    },
+    "/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv": {
+      "hash": "8f8cbac13e75cb3d8ed94be73c60916c5ef5acc941b041ac00a8cf783f936517",
+      "pushedAt": "2026-10-12T09:41:49.349Z",
+      "previewedHash": "8f8cbac13e75cb3d8ed94be73c60916c5ef5acc941b041ac00a8cf783f936517"
+    },
     "/fragments/en/press-kits/skoda-peaq-press-kit-2/images/exterior": {
       "hash": "d5b9ce34f6de4a937c9034dd10240b5eef7c8648ce28cd49d73d8ebac1b5970b",
       "pushedAt": "2026-10-11T20:05:15.583Z",
       "previewedHash": "d5b9ce34f6de4a937c9034dd10240b5eef7c8648ce28cd49d73d8ebac1b5970b"
     },
-    "/nav": {
-      "hash": "9be605a50d052fa90c8975e14242c75b2e47f00b271b59660567723536056bbc",
-      "pushedAt": "2026-09-26T06:56:28.280Z",
-      "adopted": true
+    "/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund": {
+      "hash": "d442448934c46b1b1201c75ecb0f0b9c066ae11db4110630a507c313978fd6a2",
+      "pushedAt": "2026-10-13T12:30:39.939Z",
+      "previewedHash": "d442448934c46b1b1201c75ecb0f0b9c066ae11db4110630a507c313978fd6a2"
+    },
+    "/cs/footer": {
+      "hash": "a08c6a2294044491e18212598a32c1f88166b1e47b3240a3062ccfb3df749004",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "a08c6a2294044491e18212598a32c1f88166b1e47b3240a3062ccfb3df749004"
+    },
+    "/cs/nav": {
+      "hash": "2dd490f96badf3c95169a4b901a51d14d790d24fde63b87380ae5de833097edf",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "2dd490f96badf3c95169a4b901a51d14d790d24fde63b87380ae5de833097edf"
+    },
+    "/cs/nav-newsletter": {
+      "hash": "e3e4bf09b22dec3e79f0c95a3cfb459796eb9137706e425d5b1ff875404a4b13",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "e3e4bf09b22dec3e79f0c95a3cfb459796eb9137706e425d5b1ff875404a4b13"
+    },
+    "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds": {
+      "hash": "f17d31008d690ac033756997ba771ba266b421c9dcb0e076d345a1e643aa05be",
+      "pushedAt": "2026-10-13T12:23:58.263Z",
+      "previewedHash": "f17d31008d690ac033756997ba771ba266b421c9dcb0e076d345a1e643aa05be"
+    },
+    "/de/nav": {
+      "hash": "7c1e014900b2b99ae9bbe7df73fb1d00b45bd827cd31a5b7d878bb08f8bc299e",
+      "pushedAt": "2026-10-08T10:57:31.472Z",
+      "previewedHash": "7c1e014900b2b99ae9bbe7df73fb1d00b45bd827cd31a5b7d878bb08f8bc299e"
+    },
+    "/de/nav-newsletter": {
+      "hash": "e879cf9ae3dd44b5807e64af0239f598998660a2eafdba492d600031b8c96818",
+      "pushedAt": "2026-10-08T10:40:43.763Z",
+      "previewedHash": "e879cf9ae3dd44b5807e64af0239f598998660a2eafdba492d600031b8c96818"
     },
     "/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund": {
       "hash": "056e9e61f1ef5c832f6bc3ab2c0cb07219e7ef1c0c4585015b690417b150fe54",
@@ -1483,6 +1478,11 @@
       "hash": "87639631bc04aecac80cdc7033f9e8935d5c5f7c9c7c7cac800911a4c9033fa1",
       "pushedAt": "2026-10-08T10:40:43.763Z",
       "previewedHash": "87639631bc04aecac80cdc7033f9e8935d5c5f7c9c7c7cac800911a4c9033fa1"
+    },
+    "/cs/fragments/newsletter-card": {
+      "hash": "74338e7042a1fe328efcca16f1b1f7a855f69952e7f4f506e2e9d6b31bc4b62f",
+      "pushedAt": "2026-10-13T12:23:58.263Z",
+      "previewedHash": "74338e7042a1fe328efcca16f1b1f7a855f69952e7f4f506e2e9d6b31bc4b62f"
     }
   }
 }

@@ -141,8 +141,9 @@ header .nav-topbar-utility {
   font-size: var(--body-font-size-2xs);
 }
 
-/* --skoda-grey-700, as the language links (SKODA-303): 5.45:1 on the #e6e6e6 bar; the source
-   #7c7d7e is 3.3:1 there, failing AA for this 12px text (SKODA-308) */
+/* --skoda-grey-700: 5.45:1 on the #e6e6e6 bar; the source #7c7d7e is 3.3:1 there, failing AA
+   for this 12px text (SKODA-308). The language links use the source grey since #243 (PO);
+   this CTA was not part of that decision and keeps the AA colour. */
 header .nav-topbar .nav-topbar-utility a {
   color: var(--skoda-grey-700);
   text-decoration: none;

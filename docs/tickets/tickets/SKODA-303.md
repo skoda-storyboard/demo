@@ -34,7 +34,9 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
 - [x] 6 locales (en/cs/de/sk/sr/sl) render as **inline text links** in the tools region (topbar-right desktop `12px`, drawer-bottom mobile `16px`).
 - [x] Each locale links to its per-locale tree; current = bold ink, others links.
       *The trees `/cs` … `/sl` don't exist on EDS yet (404, only `/en`); links kept by decision (2026-09-30).*
-- [x] Inactive-locale contrast ≥ 4.5:1 (darken source `#7c7d7e`): `--skoda-grey-700`, 5.45 / 6.03 / 6.81:1.
+- [ ] ~~Inactive-locale contrast ≥ 4.5:1 (darken source `#7c7d7e`): `--skoda-grey-700`, 5.45 / 6.03 / 6.81:1.~~
+      **Superseded (PO, 2026-10-13, #243):** the inactive links use the source `#7c7d7e` (`--skoda-grey-500`),
+      3.30 / 3.65 / 4.12:1, below AA by decision (SKODA-703: "as source, accepted"). See the #243 notes below.
 - [x] Keyboard-accessible with an accessible name; `npm run lint` passes.
 
 ## Implementation (2026-09-30, developer-verified; QA pending)

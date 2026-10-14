@@ -10,7 +10,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { logicalId } from './media-lib.mjs';
-import build from './build-media-manifest.mjs';
+import build, { pageLocale } from './build-media-manifest.mjs';
 
 const exec = promisify(execFile);
 const script = fileURLToPath(new URL('./build-media-manifest.mjs', import.meta.url));
@@ -905,6 +905,54 @@ test('failed complete marks manifest uncertain before any subsequent automatic r
     if (previousToken === undefined) delete process.env.AEM_DAM_TOKEN;
     else process.env.AEM_DAM_TOKEN = previousToken;
     await dam.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('an asset keeps its own locale\'s alt and caption: another locale\'s page never fills them (#348 review)', async () => {
+  assert.deepEqual(['cs/e-mobilita-cs/x', '/de/x', 'en', 'en/story', '', 'english/x'].map(pageLocale), ['cs', 'de', 'en', 'en', 'en', 'en']);
+  const dir = mkdtempSync(path.join(tmpdir(), 'media-locale-'));
+  try {
+    const source = 'https://cdn.skoda-storyboard.com/2026/10/shared.png';
+    const id = logicalId(source);
+    const manifest = path.join(dir, 'media-manifest.json');
+    writeFileSync(manifest, JSON.stringify({
+      rows: {
+        [id]: {
+          logical_id: id,
+          source_url: source,
+          delivery_url: source,
+          bytes: 4,
+          preconditioned: true,
+          status: 'done',
+          seen_urls: [source],
+          dam_page_path: 'en',
+          page_refs: ['en'],
+          alt: '',
+          caption: '',
+          steps: { deliver: 'done', dam: 'n/a', da: 'n/a' },
+        },
+      },
+    }));
+    const page = (rel, alt, caption) => {
+      const file = path.join(dir, 'content', `${rel}.plain.html`);
+      mkdirSync(path.dirname(file), { recursive: true });
+      writeFileSync(file, `<div><img src="${source}" alt="${alt}" data-caption="${caption}"></div>`);
+      return file;
+    };
+    const options = { cwd: dir, env: { ...process.env } };
+    // a Czech page reuses the EN-owned asset: its page ref is added, its alt / caption are not
+    await exec(process.execPath, [script, '--pages', page('cs/e-mobilita-cs/story', 'Škoda Epiq nově', 'Titulek'), '--manifest', manifest], options);
+    let row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.deepEqual(row.page_refs, ['en', 'cs/e-mobilita-cs/story']);
+    assert.equal(row.alt, '');
+    assert.equal(row.caption, '', 'a caption stays a string');
+    // an English page fills them
+    await exec(process.execPath, [script, '--pages', page('en/emobility/story', 'Škoda Epiq Sportline', 'Caption'), '--manifest', manifest], options);
+    row = JSON.parse(readFileSync(manifest, 'utf8')).rows[id];
+    assert.equal(row.alt, 'Škoda Epiq Sportline');
+    assert.equal(row.caption, 'Caption');
+  } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 });

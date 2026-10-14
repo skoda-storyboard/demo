@@ -176,12 +176,7 @@ test('the toggle stays a labelled button: Show less once open, focus kept in vie
   assert.equal(document.activeElement, toggle);
 });
 
-// the placeholders chain settles after decorate (dynamic import + fetch)
-const settleLabels = async (done) => {
-  for (let i = 0; i < 50 && !done(); i += 1) await new Promise((resolve) => { setTimeout(resolve, 0); });
-};
-
-test('the toggle uses the locale placeholders sheet: Show More / Show Less, English without it (#243)', async () => {
+test('the toggle uses the locale placeholders sheet from its first label: Show More / Show Less, English without it (#243, #348 review)', async () => {
   const originalFetch = globalThis.fetch;
   const asked = [];
   const sheet = (rows) => async (url) => {
@@ -197,7 +192,7 @@ test('the toggle uses the locale placeholders sheet: Show More / Show Less, Engl
     fiveFiles(cs);
     await decorate(cs);
     const toggle = cs.querySelector('.downloads-more');
-    await settleLabels(() => toggle.textContent === 'Zobrazit více');
+    // no English first: the label is the locale's as soon as decorate resolves
     assert.equal(toggle.textContent, 'Zobrazit více');
     assert.ok(asked.includes('/cs/placeholders.json'), 'the page locale sheet');
     toggle.click();
@@ -210,8 +205,7 @@ test('the toggle uses the locale placeholders sheet: Show More / Show Less, Engl
     const sk = setup(true, 'https://example.com/sk/emobilita-sk/story');
     fiveFiles(sk);
     await decorate(sk);
-    await settleLabels(() => asked.includes('/sk/placeholders.json'));
-    await settleLabels(() => false);
+    assert.ok(asked.includes('/sk/placeholders.json'));
     assert.equal(sk.querySelector('.downloads-more').textContent, 'Show more');
 
     // a sheet without the keys, or with blank texts: English stays
@@ -219,8 +213,7 @@ test('the toggle uses the locale placeholders sheet: Show More / Show Less, Engl
     const sr = setup(true, 'https://example.com/sr/emobilnost-sr/story');
     fiveFiles(sr);
     await decorate(sr);
-    await settleLabels(() => asked.includes('/sr/placeholders.json'));
-    await settleLabels(() => false);
+    assert.ok(asked.includes('/sr/placeholders.json'));
     const srToggle = sr.querySelector('.downloads-more');
     assert.equal(srToggle.textContent, 'Show more');
     srToggle.click();
