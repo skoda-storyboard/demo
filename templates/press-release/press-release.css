@@ -26,6 +26,14 @@ body.press-release {
   /* the source sidebar ends with an empty side-banner slot (15px) and its group gap; the
      banner itself is out of scope (SKODA-903), its blank space is kept */
   --pr-side-banner-slot: calc(2 * var(--pr-group-gap));
+
+  /* sidebar "Additional info" controls (#274): the source's 16px link icons (the Media
+     contacts caret, the add glyph's em), set 10px in from the row end; the round add control
+     beside "Download Media Box", the Media Box add-all's twin (40px, 2px ink ring) */
+  --pr-menu-icon-size: 16px;
+  --pr-menu-icon-inset: 10px;
+  --pr-add-size: 40px;
+  --pr-add-ring: 2px;
 }
 
 /* Layer 1 — fluid. Mobile first: every section stacks in source order with the
@@ -171,9 +179,9 @@ body.press-release .section.sidebar .default-content-wrapper > ul a.press-releas
 body.press-release .section.sidebar .default-content-wrapper > ul a.press-release-contacts::after {
   content: "";
   flex: none;
-  width: 16px;
-  height: 16px;
-  margin-inline-end: 10px;
+  width: var(--pr-menu-icon-size);
+  height: var(--pr-menu-icon-size);
+  margin-inline-end: var(--pr-menu-icon-inset);
   background-color: var(--skoda-green-accent);
   mask: url("../../icons/pr-caret-right.svg") center / contain no-repeat;
 }
@@ -200,10 +208,10 @@ body.press-release .section.sidebar .press-release-add-all {
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: 40px;
-  height: 40px;
+  width: var(--pr-add-size);
+  height: var(--pr-add-size);
   padding: 0;
-  border: 2px solid var(--skoda-ink);
+  border: var(--pr-add-ring) solid var(--skoda-ink);
   border-radius: var(--pill-radius);
   background: var(--skoda-white);
   color: var(--skoda-ink);
@@ -213,9 +221,11 @@ body.press-release .section.sidebar .press-release-add-all {
 body.press-release .section.sidebar .press-release-add-all::before {
   content: "";
 
-  /* the faux-bold glyph's 1080-unit box around its 16px em, as the Media Box's */
-  width: calc(16px * 1080 / 1024);
-  height: calc(16px * 1080 / 1024);
+  /* the faux-bold glyph's 1080-unit box around its icon-size em, as the Media Box's */
+  --pr-add-glyph: calc(var(--pr-menu-icon-size) * 1080 / 1024);
+
+  width: var(--pr-add-glyph);
+  height: var(--pr-add-glyph);
   background-color: currentcolor;
   mask: var(--pr-add-icon) center / contain no-repeat;
 }
@@ -230,8 +240,8 @@ body.press-release .section.sidebar .press-release-add-all:focus-visible {
 }
 
 body.press-release .section.sidebar .press-release-add-all:focus-visible {
-  outline: 2px solid var(--skoda-ink);
-  outline-offset: 2px;
+  outline: var(--pr-add-ring) solid var(--skoda-ink);
+  outline-offset: var(--pr-add-ring);
 }
 
 body.press-release .section.sidebar .press-release-add-all[aria-disabled="true"] {
