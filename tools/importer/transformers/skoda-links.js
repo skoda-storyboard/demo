@@ -28,6 +28,7 @@
  *    the Classic Days 2026 hub's Octavia banner) is the source page WordPress redirects it
  *    to, also once the DOM has resolved it against the page path
  *    (`…/<page>/skoda-storyboard.com/en/…`). It is normalised first, then rules 1–4 apply.
+ * 6. A trailing space (raw or `%20`) is trimmed from every href first.
  *
  * `cdn.skoda-storyboard.com` assets, external hosts, mailto/tel, `#…` and relative links
  * are untouched. Idempotent: a second run changes nothing.
@@ -487,7 +488,9 @@ export default function transform(hookName, element, payload) {
   if (hookName !== TransformHook.afterTransform) return;
 
   element.querySelectorAll('a[href]').forEach((a) => {
-    let href = a.getAttribute('href');
+    // rule 6: a trailing (encoded) space is authoring noise, and 403s on the cdn (Classic Days
+    // 2026 Texts: `…_469d33ab.pdf `); it also hid the PDF from the binary rewrite
+    let href = a.getAttribute('href').replace(/(?:\s|%20)+$/i, '');
     if (/#s_[ac]id=/.test(href)) href = href.split('#s_aid=')[0].split('#s_cid=')[0];
     href = schemelessSource(href);
     if (href.startsWith('/direct-download/')) href = `${SOURCE_ORIGIN}${href}`;

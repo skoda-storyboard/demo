@@ -2084,7 +2084,7 @@ var CustomImportScript = (() => {
   function transform6(hookName, element, payload) {
     if (hookName !== TransformHook5.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
-      let href = a.getAttribute("href");
+      let href = a.getAttribute("href").replace(/(?:\s|%20)+$/i, "");
       if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
       href = schemelessSource(href);
       if (href.startsWith("/direct-download/")) href = `${SOURCE_ORIGIN}${href}`;

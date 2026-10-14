@@ -128,6 +128,14 @@ test('a scheme-less source link is the source page, raw or resolved against the 
   ].forEach((href) => assert.equal(one(href), href));
 });
 
+test('a trailing space, raw or encoded, is trimmed from the href (rule 6)', { skip }, () => {
+  const PDF = 'https://cdn.skoda-storyboard.com/2026/09/Skoda_440_469d33ab.pdf';
+  assert.equal(one(`${PDF} `), PDF);
+  assert.equal(one(`${PDF}%20`), PDF);
+  assert.equal(one(`${SRC}${STORY}/%20`), STORY);
+  assert.equal(one('https://example.org/a%20b'), 'https://example.org/a%20b', 'an inner space stays');
+});
+
 test('links inside block tables are rewritten too', { skip }, () => {
   const el = run(`<table><tr><th>Tags</th></tr><tr><td><a href="${SRC}/en/tag/model/yeti/">Yeti</a></td></tr>
     <tr><td><a href="${SRC}${STORY}/">Epiq</a></td></tr></table>`);
