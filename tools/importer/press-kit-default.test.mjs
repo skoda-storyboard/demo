@@ -1177,6 +1177,17 @@ test('an answer keeps the source spacers and unequal cell widths as nested table
   assert.equal(blocks(page, 'Spacer').filter((t) => !t.closest('table table, td table')).length, 0, 'spacers only inside an answer');
 });
 
+test('importer to template: the weighted row and the equal row after it stay two media rows (#344 review)', { skip: !JSDOM }, async () => {
+  const { mediaRuns } = await import('../../templates/press-kit/press-kit.js');
+  const page = run(fixture({ extra: answerLayoutToggle() }).replace('</head>', `${PANELS_CSS}</head>`), target);
+  const answer = rows(page, 'Accordion').find((tr) => txt(tr.children[0]) === 'Spaced answer').children[1];
+  const runs = mediaRuns(answer);
+  assert.deepEqual(runs.map((r) => r.map((unit) => unit[0].querySelector('img').alt)), [['wide', 'narrow'], ['left', 'right']]);
+  assert.ok(runs[0].widths, 'the 50.4 / 49.6 row keeps its Media row');
+  assert.equal([...runs[0].widths.querySelectorAll('tr')][1].children.length, 2);
+  assert.equal(runs[1].widths, undefined, 'the equal row has none');
+});
+
 test('spacers and widths are read in answers only: body copy keeps dropping its empty paragraphs (#275)', { skip: !JSDOM }, () => {
   const page = run(fixture({ extra: grid(widget('<p>Body copy.</p><p>&nbsp;</p><p>More copy.</p>')) }), target);
   assert.equal(blocks(page, 'Spacer').length, 0);

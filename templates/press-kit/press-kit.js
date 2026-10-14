@@ -107,10 +107,15 @@ const isSpacer = (el) => el?.tagName === 'TABLE' && el.rows.length === 1 && el.r
   && /^spacer(?:\s*\(\s*row\s*\))?$/.test(nestedName(el));
 const isMediaRow = (el) => nestedName(el) === 'media row';
 
+// the number of cells a `Media row` table declares (its widths row)
+const declaredCells = (table) => table?.rows[1]?.cells.length || 0;
+
 /**
  * The runs of two or more media units in a cell, in order. A unit is an image paragraph, the
  * links paragraph right after it and then a `Spacer`, if any. A `Media row` table right before
- * a run is its cells' source widths (`run.widths`).
+ * a run is its cells' source widths (`run.widths`), and the run ends after that many cells: an
+ * equal source row right after it has no `Media row` of its own (#344 review), so it starts the
+ * next run instead of joining the weighted one.
  * @param {Element} cell
  * @returns {Element[][][]}
  */
@@ -130,6 +135,11 @@ export function mediaRuns(cell) {
         unit.push(children[i]);
       }
       run.push(unit);
+      const declared = declaredCells(run.widths);
+      if (declared > 1 && run.length === declared) {
+        runs.push(run);
+        run = [];
+      }
     } else {
       if (run.length > 1) runs.push(run);
       run = [];

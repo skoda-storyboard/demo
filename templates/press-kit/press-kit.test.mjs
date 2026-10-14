@@ -213,6 +213,24 @@ test('a cell keeps the source\'s blank line after its links; a Media row sizes i
   assert.equal(main.querySelectorAll('.accordion table').length, 2, 'the Media row table is gone, the Spacers stay');
 });
 
+test('a weighted row followed by an equal row stays two rows: the Media row bounds its own cells (#344 review)', () => {
+  // the importer's answer shape (press-kit-default.test.mjs, answerLayoutToggle): a 50.4 / 49.6 row,
+  // then an equal row, which carries no Media row; every cell ends with its Spacer
+  const unit = (name) => `${IMG(name)}${LINKS}${SPACER}`;
+  const main = setup(ANSWER(`<p>Answer copy.</p>${WIDTHS('50.4%', '49.6%')}${unit('wide')}${unit('narrow')}${unit('left')}${unit('right')}`));
+  decorate(main);
+  const rows = [...main.querySelectorAll('.press-kit-media-row')];
+  assert.equal(rows.length, 2, 'the weighted pair and the equal pair');
+  const alts = (row) => [...row.querySelectorAll('img')].map((img) => img.alt);
+  assert.deepEqual(rows.map(alts), [['wide', 'narrow'], ['left', 'right']]);
+  assert.ok(rows[0].classList.contains('sized'));
+  assert.deepEqual([...rows[0].children].map((m) => m.style.getPropertyValue('--pk-media-width')), ['0.504', '0.496']);
+  assert.equal(rows[1].classList.contains('sized'), false, 'the equal row takes no widths');
+  assert.deepEqual([...rows[1].children].map((m) => m.style.getPropertyValue('--pk-media-width')), ['', '']);
+  assert.equal(main.querySelectorAll('.press-kit-media table').length, 4, 'each cell keeps its Spacer');
+  assert.equal(main.querySelectorAll('.accordion table').length, 4, 'the Media row table is gone');
+});
+
 test('a Media row that doesn\'t fit its run, or has no run, is dropped and sizes nothing (#275)', () => {
   const main = setup(ANSWER(`${WIDTHS('40%', '30%', '30%')}${IMG('a')}${IMG('b')}<p>Text</p>${WIDTHS('60%', 'x')}${IMG('c')}${IMG('d')}`
     + `<p>More</p>${WIDTHS('60%', '40%')}<p>No images</p>`));
