@@ -253,6 +253,81 @@ test('related band never copies the SSR teasers (index-driven only)', { skip }, 
   assert.deepEqual(rowsOf(rail).map((r) => r[0]), ['template', 'model', 'years', 'limit', 'exclude']);
 });
 
+// the source related-band card (cs Epiq story, 2026-10-13)
+const sourceCard = (n, { img = true, date = true, title = true } = {}) => `<article class="article-teaser">
+  <div class="article-teaser-media"><div class="entry-thumbnail"><a class="colorbox" href="">${img ? `<img src="https://cdn.skoda-storyboard.com/r${n}-768x432.png" alt="${n === 2 ? 'Jiný text' : `Příběh ${n} celý název`}" srcset="x 768w" sizes="100vw" data-caption="c" loading="eager">` : ''}</a></div></div>
+  <div class="article-teaser-overlay"><div class="article-teaser-container">
+    ${date ? `<div class="entry-meta"><span class="entry-published">1${n}. 10. 2026</span></div>` : ''}
+    <h3 class="entry-title">${title ? `<a href="https://www.skoda-storyboard.com/cs/e-mobilita-cs/r${n}/">Příběh ${n}…</a>` : '<a href="">'}</a></h3>
+  </div></div></article>`;
+const CS_PAYLOAD = { params: { originalURL: 'https://www.skoda-storyboard.com/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/' } };
+
+test('translated story: the related band keeps the source cards as a curated Story Rail (#243)', { skip }, () => {
+  const doc = dom(RELATED
+    .replace('Related Stories <span class="subheading">Based on tags: 2026, Epiq</span>', 'Související články <span class="subheading">Na základě štítků: 2026, Epiq</span>')
+    .replace('<article><a class="colorbox" href=""><img src="t.jpg"></a></article>', sourceCard(1) + sourceCard(2, { date: false }) + sourceCard(3, { img: false }) + sourceCard(4, { title: false })));
+  storyCleanup('afterTransform', doc.body, CS_PAYLOAD);
+  const title = [...doc.querySelectorAll('h3')].find((h) => h.textContent === 'Související články');
+  assert.ok(title, 'the source heading, as an h3');
+  assert.equal(title.nextElementSibling.textContent, 'Na základě štítků: 2026, Epiq');
+  const tables = [...doc.querySelectorAll('table')];
+  const rail = tables.find((t) => blockName(t) === 'Story Rail');
+  // card rows only: no config rows next to them (block contract `or-curated`)
+  const cards = [...rail.querySelectorAll('tr')].slice(1);
+  assert.equal(cards.length, 3, 'the untitled card is skipped');
+  // card 1: image (source attributes stripped), date, linked title
+  const img = cards[0].children[0].querySelector('img');
+  assert.equal(img.getAttribute('src'), 'https://cdn.skoda-storyboard.com/r1-768x432.png');
+  assert.equal(img.getAttribute('alt'), 'Příběh 1 celý název');
+  ['srcset', 'sizes', 'data-caption', 'loading'].forEach((a) => assert.equal(img.hasAttribute(a), false, a));
+  assert.equal(cards[0].children[1].querySelector('p').textContent, '11. 10. 2026');
+  const link = cards[0].children[1].querySelector('h3 a');
+  assert.equal(link.getAttribute('href'), 'https://www.skoda-storyboard.com/cs/e-mobilita-cs/r1/');
+  // the browser-clipped title ("Příběh 1…") is restored from the alt, which continues it
+  assert.equal(link.textContent, 'Příběh 1 celý název');
+  // card 2: no date paragraph, and an alt that doesn't continue the title keeps the title;
+  // card 3: body only (no image cell, no alt), the clipped title kept
+  assert.equal(cards[1].children[1].querySelector('p'), null);
+  assert.equal(cards[1].children[1].querySelector('h3 a').textContent, 'Příběh 2…');
+  assert.equal(cards[2].children[0].querySelector('h3 a').textContent, 'Příběh 3…');
+  assert.equal(cards[2].children.length, 1);
+  assert.ok(cards[2].children[0].querySelector('h3 a'));
+  // no index config on a translated story
+  assert.ok(!rowsOf(rail).some((r) => ['template', 'model', 'years', 'limit', 'exclude'].includes(r[0])));
+  assert.deepEqual(rowsOf(tables.find((t) => blockName(t) === 'Section Metadata')), [['Style', 'dark']]);
+  assert.ok(!doc.querySelector('.related-stories, .cover-box'), 'band removed');
+});
+
+test('translated story: a clipped title is restored only from an alt that continues it word for word (#348 review)', { skip }, () => {
+  const card = (n, title, alt) => `<article class="article-teaser">
+    <div class="article-teaser-media"><a class="colorbox" href=""><img src="https://cdn.skoda-storyboard.com/c${n}.png" alt="${alt}"></a></div>
+    <h3 class="entry-title"><a href="https://www.skoda-storyboard.com/cs/e-mobilita-cs/c${n}/">${title}</a></h3></article>`;
+  const doc = dom(RELATED.replace('<article><a class="colorbox" href=""><img src="t.jpg"></a></article>', [
+    card(1, 'Škoda Epiq nově…', 'Škoda Epiq nově&lt;br&gt;obléká efektní soupravu'), // a literal <br> in the source alt
+    card(2, 'Škoda…', 'Škoda Epiq at the Milan premiere'), // a one-word clip: the alt may be a caption
+    card(3, 'Epiq a design…', 'Epiq a designérský tým v Miláně'), // the alt doesn't continue at a word boundary
+    card(4, 'Rekordní rok…', 'Rekordní rok, i díky elektromobilům'), // punctuation is a word boundary
+  ].join('')));
+  storyCleanup('afterTransform', doc.body, CS_PAYLOAD);
+  const rail = [...doc.querySelectorAll('table')].find((t) => blockName(t) === 'Story Rail');
+  const cards = [...rail.querySelectorAll('tr')].slice(1);
+  assert.deepEqual(cards.map((tr) => tr.querySelector('h3 a').textContent), [
+    'Škoda Epiq nově obléká efektní soupravu',
+    'Škoda…',
+    'Epiq a design…',
+    'Rekordní rok, i díky elektromobilům',
+  ]);
+  assert.equal(cards[0].querySelector('img').getAttribute('alt'), 'Škoda Epiq nově obléká efektní soupravu', 'the moved image alt is plain text too');
+});
+
+test('translated story: a related band without source cards is dropped (#243)', { skip }, () => {
+  const doc = dom(RELATED.replace('<article><a class="colorbox" href=""><img src="t.jpg"></a></article>', ''));
+  storyCleanup('afterTransform', doc.body, CS_PAYLOAD);
+  assert.ok(![...doc.querySelectorAll('table')].some((t) => blockName(t) === 'Story Rail'));
+  assert.ok(![...doc.querySelectorAll('h3')].some((h) => h.textContent === 'Related Stories'));
+  assert.ok(!doc.querySelector('.cover-box'));
+});
+
 test('related band: values of one taxonomy share a key; non-facet tags use `tags`', { skip }, () => {
   const doc = dom(RELATED.replace(
     '</ol>',
