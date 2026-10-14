@@ -777,7 +777,8 @@
         "cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
         "de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
         "sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
-        "sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
+        "sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
       ],
       "dam_status": 200,
       "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/Navrh-bez-nazvu-198_f752b9f5.png",
@@ -7314,7 +7315,8 @@
       "page_refs": [
         "en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality",
         "en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too",
-        "en/skoda-world/explore-the-new-skoda-models-in-mixed-reality"
+        "en/skoda-world/explore-the-new-skoda-models-in-mixed-reality",
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
       ],
       "dam_status": 200,
       "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality/1_hero_80b0e947.png",
@@ -7707,7 +7709,8 @@
         "cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
         "de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
         "sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
-        "sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
+        "sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
       ],
       "dam_status": 200,
       "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq/EPIQ_Praha-00032_1c32679e.jpg",
@@ -129130,17 +129133,19 @@
       "master_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-20_d5af9028.png",
       "dam_page_path": "en",
       "page_refs": [
-        "en"
+        "en",
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-20_d5af9028.png",
       "da_path": "",
-      "alt": "",
+      "alt": "Škoda Epiq Now Dresses Up in Striking Sportline Trim",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-20_d5af9028.png"
+        "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-20_d5af9028.png",
+        "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-20_d5af9028-768x432.png"
       ],
       "aspect_crop_source": false,
       "bytes": 2054281,
@@ -137923,6 +137928,325 @@
       "dam_status": 200,
       "publish_status": 200,
       "published_at": "2026-10-14T09:21:06.347Z"
+    },
+    "971e68b7__Navrh-bez-nazvu-18_86dd087f.png": {
+      "logical_id": "971e68b7__Navrh-bez-nazvu-18_86dd087f.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-18_86dd087f-768x432.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-18_86dd087f.png",
+      "dam_page_path": "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
+      "page_refs": [
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-18_86dd087f.png",
+      "da_path": "",
+      "alt": "Škoda Epiq Now Dresses Up in Striking Sportline Trim",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-18_86dd087f-768x432.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 2532641,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__Navrh-bez-nazvu-22_5d05a491.png": {
+      "logical_id": "971e68b7__Navrh-bez-nazvu-22_5d05a491.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-22_5d05a491-768x432.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-22_5d05a491.png",
+      "dam_page_path": "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
+      "page_refs": [
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-22_5d05a491.png",
+      "da_path": "",
+      "alt": "Škoda Epiq Now Dresses Up in Striking Sportline Trim",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-22_5d05a491-768x432.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 2714062,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__Navrh-bez-nazvu-21_49a502ff.png": {
+      "logical_id": "971e68b7__Navrh-bez-nazvu-21_49a502ff.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-21_49a502ff-768x432.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-21_49a502ff.png",
+      "dam_page_path": "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
+      "page_refs": [
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-21_49a502ff.png",
+      "da_path": "",
+      "alt": "Škoda Epiq Now Dresses Up in Striking Sportline Trim",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-21_49a502ff-768x432.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 2052679,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__Snimek-obrazovky-2026-10-08-v-10.48.30_2e452fe2.png": {
+      "logical_id": "971e68b7__Snimek-obrazovky-2026-10-08-v-10.48.30_2e452fe2.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.48.30_2e452fe2-768x575.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.48.30_2e452fe2.png",
+      "dam_page_path": "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
+      "page_refs": [
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.48.30_2e452fe2.png",
+      "da_path": "",
+      "alt": "Škoda Epiq Now Dresses Up in Striking Sportline Trim",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.48.30_2e452fe2-768x575.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 3283159,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__Snimek-obrazovky-2026-10-08-v-10.48.45_954e2562.png": {
+      "logical_id": "971e68b7__Snimek-obrazovky-2026-10-08-v-10.48.45_954e2562.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.48.45_954e2562-768x489.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.48.45_954e2562.png",
+      "dam_page_path": "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
+      "page_refs": [
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.48.45_954e2562.png",
+      "da_path": "",
+      "alt": "Škoda Epiq Now Dresses Up in Striking Sportline Trim",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.48.45_954e2562-768x489.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 4034700,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__Snimek-obrazovky-2026-10-08-v-10.49.05_bc2d6871.png": {
+      "logical_id": "971e68b7__Snimek-obrazovky-2026-10-08-v-10.49.05_bc2d6871.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.49.05_bc2d6871-768x555.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.49.05_bc2d6871.png",
+      "dam_page_path": "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
+      "page_refs": [
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.49.05_bc2d6871.png",
+      "da_path": "",
+      "alt": "Škoda Epiq Now Dresses Up in Striking Sportline Trim",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.49.05_bc2d6871-768x555.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 3144839,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__Navrh-bez-nazvu-23_54cdee75.png": {
+      "logical_id": "971e68b7__Navrh-bez-nazvu-23_54cdee75.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-23_54cdee75-768x432.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-23_54cdee75.png",
+      "dam_page_path": "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
+      "page_refs": [
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-23_54cdee75.png",
+      "da_path": "",
+      "alt": "Škoda Epiq Now Dresses Up in Striking Sportline Trim",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-23_54cdee75-768x432.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 2815669,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__Navrh-bez-nazvu-25_3583b548.png": {
+      "logical_id": "971e68b7__Navrh-bez-nazvu-25_3583b548.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-25_3583b548-768x432.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-25_3583b548.png",
+      "dam_page_path": "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
+      "page_refs": [
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-25_3583b548.png",
+      "da_path": "",
+      "alt": "Škoda Epiq Now Dresses Up in Striking Sportline Trim",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-25_3583b548-768x432.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 1666208,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__Snimek-obrazovky-2026-10-08-v-10.52.41_075ab993.png": {
+      "logical_id": "971e68b7__Snimek-obrazovky-2026-10-08-v-10.52.41_075ab993.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.52.41_075ab993-768x367.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.52.41_075ab993.png",
+      "dam_page_path": "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
+      "page_refs": [
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.52.41_075ab993.png",
+      "da_path": "",
+      "alt": "Škoda Epiq Now Dresses Up in Striking Sportline Trim",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.52.41_075ab993-768x367.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 4004856,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__Snimek-obrazovky-2026-10-08-v-10.53.02_1e69c0ff.png": {
+      "logical_id": "971e68b7__Snimek-obrazovky-2026-10-08-v-10.53.02_1e69c0ff.png",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.53.02_1e69c0ff-768x380.png",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.53.02_1e69c0ff.png",
+      "dam_page_path": "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
+      "page_refs": [
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.53.02_1e69c0ff.png",
+      "da_path": "",
+      "alt": "Škoda Epiq Now Dresses Up in Striking Sportline Trim",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Snimek-obrazovky-2026-10-08-v-10.53.02_1e69c0ff-768x380.png"
+      ],
+      "aspect_crop_source": true,
+      "bytes": 4456560,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
+    },
+    "971e68b7__Epiq_Sportline_00efd047.gif": {
+      "logical_id": "971e68b7__Epiq_Sportline_00efd047.gif",
+      "source_url": "https://cdn.skoda-storyboard.com/2026/10/Epiq_Sportline_00efd047.gif",
+      "master_url": "https://cdn.skoda-storyboard.com/2026/10/Epiq_Sportline_00efd047.gif",
+      "dam_page_path": "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
+      "page_refs": [
+        "en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim"
+      ],
+      "dam_asset_path": "",
+      "dam_original_url": "",
+      "original_download_url": "",
+      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/Epiq_Sportline_00efd047.gif",
+      "da_path": "",
+      "alt": "Epiq_Sportline_00efd047",
+      "caption": "",
+      "seen_urls": [
+        "https://cdn.skoda-storyboard.com/2026/10/Epiq_Sportline_00efd047.gif"
+      ],
+      "aspect_crop_source": false,
+      "bytes": 1410911,
+      "preconditioned": false,
+      "steps": {
+        "deliver": "done",
+        "dam": "n/a",
+        "da": "n/a"
+      },
+      "status": "done",
+      "note": ""
     }
   }
 }
