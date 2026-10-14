@@ -196,6 +196,39 @@ test('only a News rail\'s tag-page "All" is rewritten; other rails and other lin
   assert.equal(main.querySelector('h3#images').closest('.section').querySelector('.story-rail a').getAttribute('href'), '/en/tag/model/octavia');
 });
 
+test('a malformed News "All" link is left alone and the rest of the template still decorates (#349 review)', () => {
+  // an author's `https://`: story-rail safeViewAll() drops it; the template must not throw on it
+  const videos = `<div class="section">
+    <div class="default-content-wrapper"><h2 id="videos">Videos</h2><p>Based on tags: Octavia</p></div>
+    <div class="story-rail-wrapper"><div class="story-rail block"><div><div>template</div><div>video</div></div></div></div>
+  </div>`;
+  const html = PAGE
+    .replace('<a href="/en/tag/model/octavia">All</a>', '<a href="https://">All</a>')
+    .replace('<li><a href="#missing">Missing</a></li>', '<li><a href="#videos">Videos</a></li><li><a href="#missing">Missing</a></li>')
+    .replace('</main>', `${videos}</main>`);
+  const main = setup(html);
+  assert.doesNotThrow(() => decorate(main));
+  assert.equal(main.querySelector('h3#news').closest('.section').querySelector('.story-rail a').getAttribute('href'), 'https://', 'not rewritten');
+  const nav = main.querySelector('nav.model-nav');
+  assert.ok(nav, 'the icon nav is built');
+  assert.deepEqual([...nav.querySelectorAll('li')].map((li) => li.dataset.target),
+    ['model-description', 'highlights', 'technical-data', 'bodywork--derivatives', 'news', 'images', 'videos']);
+  assert.ok(nav.querySelector('li[data-target="videos"] .icon-model-videos'));
+  const videoSection = main.querySelector('#videos').closest('.section');
+  assert.ok(videoSection.classList.contains('model-rail'), 'the later video rail gets its role');
+  assert.deepEqual([...videoSection.querySelector('.story-rail').classList].filter((c) => !['story-rail', 'block'].includes(c)), ['media', 'caption', 'video']);
+  assert.equal(main.querySelector('#videos').tagName, 'H3');
+});
+
+test('a nav item with a broken anchor escape, or without a link, is dropped; the nav still builds (#349 review)', () => {
+  const html = PAGE.replace('<li><a href="#missing">Missing</a></li>',
+    '<li><a href="#%E0%A4%A">Broken</a></li><li>No link</li><li><a href="#missing">Missing</a></li>');
+  const main = setup(html);
+  assert.doesNotThrow(() => decorate(main));
+  assert.deepEqual([...main.querySelectorAll('nav.model-nav li')].map((li) => li.dataset.target),
+    ['model-description', 'highlights', 'technical-data', 'bodywork--derivatives', 'news', 'images']);
+});
+
 test('an empty rail with an h3 title removes its section\'s nav link (#284)', () => {
   const main = setup(H3_PAGE);
   decorate(main);

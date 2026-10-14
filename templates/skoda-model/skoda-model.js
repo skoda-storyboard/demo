@@ -88,9 +88,30 @@ function asSourceHeading(heading) {
 
 const TAG_PAGE = /^\/en\/tag\/model\/([a-z0-9-]+)\/?$/;
 
+// An authored link's path, or '' when its href doesn't parse (e.g. an author's `https://`): the
+// rail drops such a link itself (story-rail safeViewAll), and the rest of the template still
+// decorates (#349 review).
+function hrefPath(href) {
+  try {
+    return new URL(href, window.location.href).pathname;
+  } catch (e) {
+    return '';
+  }
+}
+
+// A nav link's target id (`#news` → news); '' for a malformed escape (`#%E0%A4%A`), which would
+// otherwise stop the nav from being built (#349 review)
+function anchorId(href) {
+  try {
+    return decodeURIComponent(href.slice(1));
+  } catch (e) {
+    return '';
+  }
+}
+
 function newsViewAll(rail) {
   const link = railRow(rail, 'viewall')?.querySelector('a[href]');
-  const model = link && new URL(link.getAttribute('href'), window.location.href).pathname.match(TAG_PAGE)?.[1];
+  const model = link && hrefPath(link.getAttribute('href')).match(TAG_PAGE)?.[1];
   if (model) link.setAttribute('href', `/en/news?filter%5Bmodel%5D%5B%5D=${model}`);
 }
 
@@ -158,10 +179,11 @@ function decorateNav(main) {
   list.className = 'model-nav-list';
 
   [...list.querySelectorAll(':scope > li')].forEach((li) => {
-    const a = li.querySelector('a');
-    const id = decodeURIComponent(a.getAttribute('href').slice(1));
-    const target = document.getElementById(id);
-    if (!target) { li.remove(); return; } // never a dangling link (source bug)
+    const a = li.querySelector('a[href]');
+    const id = a ? anchorId(a.getAttribute('href')) : '';
+    const target = id && document.getElementById(id);
+    // never a dangling link (source bug), nor an item without one or with a broken anchor
+    if (!target) { li.remove(); return; }
     const icon = document.createElement('span');
     const role = target.closest('.section')?.dataset.modelIcon || sectionFor(id)?.icon;
     icon.className = `model-nav-icon icon-${role || 'model-description'}`;
