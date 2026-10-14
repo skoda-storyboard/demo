@@ -168,3 +168,5 @@ https://www.skoda-storyboard.com/en/lifestyle/la-dolce-vita-explore-the-surround
 https://www.skoda-storyboard.com/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague/
 https://www.skoda-storyboard.com/en/lifestyle/chainsaws-and-sparklers-discover-the-traditions-of-rally-fans/
 https://www.skoda-storyboard.com/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones/
+# added 2026-10-14 on request: the newest Epiq story (12 Oct 2026), first card of the source /en promo
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim/
