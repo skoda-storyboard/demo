@@ -10,7 +10,7 @@
  * and config tables may only use the keys the block (or its contract) reads.
  */
 
-import { layoutTileRows, TileLayoutError } from '../../../scripts/cards-tiles.js';
+import { layoutTileRows, TileLayoutError, isBannerToken } from '../../../scripts/cards-tiles.js';
 
 const TAG = /<(\/?)div\b([^>]*)>/gi;
 
@@ -24,20 +24,35 @@ export function textOf(html) {
     .trim();
 }
 
-function validTileTitle(cell) {
-  if (!cell) return false;
+// The cell's single link as { href, inner }, or null (none, or more than one).
+function onlyLink(cell) {
+  if (!cell) return null;
   const links = [...cell.html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a\s*>/gi)];
-  if (links.length !== 1 || (cell.html.match(/<a\b/gi) || []).length !== 1) return false;
+  if (links.length !== 1 || (cell.html.match(/<a\b/gi) || []).length !== 1) return null;
   const href = links[0][1].match(/(?:^|\s)href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i);
-  const linkText = textOf(links[0][2]);
   const hrefValue = (href?.[1] ?? href?.[2] ?? href?.[3] ?? '')
     .replace(/&#(?:x([0-9a-f]+)|([0-9]+));?/gi, (entity, hex, decimal) => {
       const code = Number.parseInt(hex || decimal, hex ? 16 : 10);
       return code <= 0x10ffff ? String.fromCodePoint(code) : entity;
     })
     .replace(/&(?:nbsp|ensp|emsp|thinsp|Tab|NewLine);/gi, ' ');
-  return !!(hrefValue.trim()
-    && linkText && cell.text === linkText);
+  return { href: hrefValue.trim(), inner: links[0][2] };
+}
+
+function validTileTitle(cell) {
+  const link = onlyLink(cell);
+  const linkText = link && textOf(link.inner);
+  return !!(link?.href && linkText && cell.text === linkText);
+}
+
+// A press mosaic banner cell (shape 4, blocks/cards bannerLink): one link that wraps an image
+// with alt text (the link's name) and has no text of its own.
+function validTileBanner(cell) {
+  const link = onlyLink(cell);
+  if (!link?.href || cell.text || textOf(link.inner)) return false;
+  const img = link.inner.match(/<img\b[^>]*>/i);
+  const alt = img?.[0].match(/\salt\s*=\s*(?:"([^"]*)"|'([^']*)')/i);
+  return !!(alt?.[1] ?? alt?.[2] ?? '').trim();
 }
 
 /** Config-key normalisation, mirroring aem.js toClassName ("View all" → "view-all"). */
@@ -265,12 +280,25 @@ export function checkPage(html, contracts, codeBlocks, path = '') {
       if (b.name === 'cards' && b.variants.includes('tiles')) {
         if (!b.variants.includes('overlay')) result.problems.push('tiles requires the overlay variant');
         const tokens = b.rows.map((row, index) => {
+          // shape 4: [size, linked picture], a banner of a press mosaic
+          const bannerRow = row.cells.length === 2 && !row.cells[0].media && row.cells[1].media;
+          const sizeName = (cell) => (cell?.text || '').split(/\s+/)[0];
+          if (bannerRow) {
+            if (!isBannerToken(sizeName(row.cells[0]))) {
+              result.problems.push(`row ${index + 1}: a banner needs a banner size`);
+            } else if (!validTileBanner(row.cells[1])) {
+              result.problems.push(`row ${index + 1}: expected [size, linked picture] with the image's alt text`);
+            }
+            return row.cells[0].text || '';
+          }
           const omitted = row.cells.length === 2 && row.cells[0].media;
           const [size, image, title] = omitted
             ? [{ text: '' }, ...row.cells] : row.cells;
           if (row.cells.length !== (omitted ? 2 : 3) || !image?.media
             || !validTileTitle(title)) {
             result.problems.push(`row ${index + 1}: expected [size, picture, linked title]`);
+          } else if (isBannerToken(sizeName(size))) {
+            result.problems.push(`row ${index + 1}: "${size.text}" is a banner size: author [size, linked picture]`);
           }
           return size?.text || '';
         });
