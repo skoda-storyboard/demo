@@ -86,6 +86,12 @@ Measurable gates live in [`faceted-listing.md` §9](../../ui-specs/faceted-listi
     "×" + 4px gap): chip 205 × 35 with its text 37px in, equal to the source.
   - Measured equal to the source in every case: toggle position on load (y120; y155 at 375), header to first pill
     28, first card position, and the chip box and glyph (the toggle weight aside, above).
+- **PO re-test 2 (2026-10-14): selection feedback as live** (measured every 30ms on /en/news + /en/images, live vs EDS):
+  the source's veil (`rgba(247 247 247 / 50%)` over the listing) fades in **at once** on a pick (0.2s), holds while it
+  loads, then the results show, the panel **and its option list go in the same instant** (no collapse animation) and
+  the veil fades out (0.2s). EDS did it the other way round (no veil for 0.9s, a 0.2s veil, then a 0.4s shrink with
+  the options still showing). Now: veil at once, results at 1.1s (live Images 1.14s, News 2.6s on its server), the
+  panel hidden in one step, then the fade-out. The toggle still animates the panel open / closed (0.4s).
 - **Noted, not changed:** after a selection the source also hides groups with no option left in the filtered
   results; every EDS listing keeps the scoped set.
 

@@ -599,10 +599,12 @@ export default async function decorate(block) {
     renderGrid();
   }
 
-  // A filter change, as on the source: settle, veil the listing, show the new results and
-  // collapse the panel (focus goes to the toggle if it was in the panel), then unveil.
-  // A checkbox ticks at once and settles (a later change, even under the veil, restarts it);
-  // a chip removal or a sort change passes settleMs 0 and veils at once.
+  // A filter change, as on the source (measured 2026-10-14 on /en/news + /en/images, #333): the
+  // veil fades in at once and holds while the results "load", then the new results show, the
+  // panel and its open option list go in the same instant (no collapse animation) and the veil
+  // fades out. Focus goes to the toggle if it was in the panel. A checkbox ticks at once and
+  // waits settleMs (a later change, under the veil, restarts the wait); a chip removal or a
+  // sort change passes settleMs 0: the update follows the veil's 0.2s fade-in.
   let settleTimer = 0;
   let veilTimer = 0;
   function cancelPendingFilter() {
@@ -625,21 +627,30 @@ export default async function decorate(block) {
   }
   function applyFilterChange(settleMs = FILTER_SETTLE_MS) {
     cancelPendingFilter();
+    block.classList.add('is-loading');
+    block.setAttribute('aria-busy', 'true');
     settleTimer = setTimeout(() => {
       settleTimer = 0;
-      block.classList.add('is-loading');
-      block.setAttribute('aria-busy', 'true');
       veilTimer = setTimeout(() => {
         veilTimer = 0;
         // before the render: it removes a clicked chip, which would drop focus to <body>
         const hadFocus = facetBar.contains(document.activeElement);
         rerender();
-        setFacetsOpen(false);
+        collapseFacetsNow();
         if (hadFocus) filterToggle.focus();
         block.classList.remove('is-loading');
         block.removeAttribute('aria-busy');
       }, reducedMotion() ? 0 : VEIL_MS);
     }, settleMs);
+  }
+
+  // After a filter change the source hides the panel and its option list in one step; only the
+  // toggle animates it (open and close, 0.4s)
+  function collapseFacetsNow() {
+    block.classList.add('facets-instant');
+    setFacetsOpen(false);
+    block.getBoundingClientRect(); // apply the closed state without its transition
+    block.classList.remove('facets-instant');
   }
 
   // Open or close one pill's option list (panels are looked up by pill, not by id).

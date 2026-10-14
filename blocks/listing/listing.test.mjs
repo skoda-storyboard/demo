@@ -281,7 +281,7 @@ test('402a: collapsed by default; the toggle always shows the count, "(0)" inclu
   assert.ok(block.classList.contains('facets-open'));
 });
 
-test('402a: a selection settles, veils the listing, updates and collapses the panel (like live)', async (t) => {
+test('a selection veils the listing at once, then updates and hides the panel with its list in one step (like live, #333)', async (t) => {
   const { block, toggle } = await facetListing('/en/filter-index.json');
   t.mock.timers.enable({ apis: ['setTimeout'] });
   click(toggle);
@@ -293,28 +293,37 @@ test('402a: a selection settles, veils the listing, updates and collapses the pa
     cb.dispatchEvent(new window.Event('change', { bubbles: true }));
   };
   change('Peaq');
-  // the checkbox ticks at once; results wait for the settle time
+  // the checkbox ticks and the veil fades in at once; the results wait (live: its request)
+  assert.ok(block.classList.contains('is-loading'), 'veil at once');
+  assert.equal(block.getAttribute('aria-busy'), 'true');
   assert.equal(toggle.textContent, 'Advanced filter (0)');
   t.mock.timers.tick(FILTER_SETTLE_MS - 100);
-  change('Epiq'); // a second quick pick restarts the settle (batched)
-  t.mock.timers.tick(FILTER_SETTLE_MS - 1);
-  assert.equal(block.classList.contains('is-loading'), false);
-  t.mock.timers.tick(1);
-  assert.ok(block.classList.contains('is-loading'), 'veil fades in');
-  assert.equal(block.getAttribute('aria-busy'), 'true');
+  change('Epiq'); // a second quick pick restarts the wait (batched), the veil stays
+  assert.ok(block.classList.contains('is-loading'), 'no veil flash on the second pick');
+  t.mock.timers.tick(FILTER_SETTLE_MS); // the wait, then the veil's fade-in time
+  t.mock.timers.tick(VEIL_MS - 1);
+  assert.ok(block.classList.contains('is-loading'));
   assert.ok(block.classList.contains('facets-open'), 'still open under the veil');
-  t.mock.timers.tick(VEIL_MS);
+  t.mock.timers.tick(1);
   assert.equal(block.classList.contains('is-loading'), false, 'veil fades out');
   assert.equal(block.hasAttribute('aria-busy'), false);
   assert.equal(toggle.textContent, 'Advanced filter (2)');
   assert.equal(block.querySelectorAll('.listing-chip').length, 2);
-  assert.equal(block.classList.contains('facets-open'), false, 'panel collapsed');
+  assert.equal(block.classList.contains('facets-open'), false, 'panel hidden');
+  assert.equal(block.classList.contains('facets-instant'), false, 'in one step: the no-transition state is not left behind');
   assert.equal(toggle.getAttribute('aria-expanded'), 'false');
   assert.equal(document.activeElement, toggle, 'focus moves from the hidden checkbox to the toggle');
-  // the list collapses inside the panel and is still open when the panel is expanded again
+  // the list goes with the panel and is still open when the panel is expanded again (as live)
   click(toggle);
   assert.equal(block.querySelector('.facet-pill[aria-expanded="true"]')?.dataset.facet, 'model', 'Model list open again');
   assert.ok(block.querySelector('.listing-facets .listing-chips .listing-chip'), 'chips are inside the panel');
+});
+
+test('the panel hides without its transition after a selection; the toggle still animates it (#333)', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = (await readFile(new URL('./listing.css', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.match(css, /\.listing\.facets-instant \.listing-facets\s*\{\s*transition:\s*none;/);
+  assert.match(css, /\.listing \.listing-facets\s*\{[^}]*transition:/, 'the toggle keeps the animated open / close');
 });
 
 const pick = (block, value) => {
@@ -563,7 +572,7 @@ test('402a: reduced motion — no veil wait and no Load more wait', async (t) =>
   }
 });
 
-test('402a: a second pick under the veil restarts once — a single collapse, no double veil', async (t) => {
+test('a second pick under the veil restarts the wait once — one veil, a single collapse (#333)', async (t) => {
   const { block, toggle } = await facetListing('/en/veil-index.json');
   t.mock.timers.enable({ apis: ['setTimeout'] });
   click(toggle);
@@ -571,14 +580,16 @@ test('402a: a second pick under the veil restarts once — a single collapse, no
   t.mock.timers.tick(FILTER_SETTLE_MS);
   assert.ok(block.classList.contains('is-loading'));
   pick(block, 'Epiq'); // keyboard Space under the veil
-  assert.equal(block.classList.contains('is-loading'), false, 'the first veil is dropped');
+  assert.ok(block.classList.contains('is-loading'), 'the veil stays (one veil for both picks)');
   t.mock.timers.tick(VEIL_MS);
   assert.ok(block.classList.contains('facets-open'), 'no collapse from the first pick');
-  t.mock.timers.tick(FILTER_SETTLE_MS - VEIL_MS); // the restarted settle ends
-  assert.ok(block.classList.contains('is-loading'), 'one veil, for both picks');
-  t.mock.timers.tick(VEIL_MS);
+  t.mock.timers.tick(FILTER_SETTLE_MS - VEIL_MS); // the restarted wait ends
+  t.mock.timers.tick(VEIL_MS - 1);
+  assert.ok(block.classList.contains('is-loading'));
+  t.mock.timers.tick(1);
   assert.equal(toggle.textContent, 'Advanced filter (2)');
   assert.equal(block.classList.contains('facets-open'), false);
+  assert.equal(block.classList.contains('is-loading'), false);
 });
 
 test('402a: collapse + expand keeps the open pill list, like live (only Esc or its pill closes it)', async (t) => {

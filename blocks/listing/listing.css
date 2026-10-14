@@ -95,6 +95,11 @@
     visibility 0s linear var(--facet-reveal-time);
 }
 
+/* after a filter change the panel goes in one step, as live (the toggle still animates it) */
+.listing.facets-instant .listing-facets {
+  transition: none;
+}
+
 /* open: the first pills 28px below the header, as live (measured 2026-10-14 on all four
    listings at 1440 / 768 / 375); the options area's 24px bottom margin (then the chips, if
    any) sets the gap to the sort row */

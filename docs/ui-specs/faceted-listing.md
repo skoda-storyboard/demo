@@ -30,6 +30,8 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 > - **"Advanced filter (n)"** shows at every width, and its caret flips up when open. It is an inline disclosure, not a mobile drawer, so there is no focus trap.
 > - **Motion:** the panel opens and closes over 400ms (height, margins, opacity); an option list fades in over 0.2s.
 > - **After a selection:** ~0.9s later, a `rgb(247 247 247 / 50%)` veil fades over the listing (0.2s). The new results then show and the panel collapses.
+>   **Superseded (re-measured 2026-10-14, #333):** the veil fades in **at once** on the pick and holds while the results
+>   load; the panel and its option list then go in one step (no animation), and the veil fades out.
 > - **The result count** sits under the grid, 16px below it and 32px above Load more.
 
 ## 1. Identity
