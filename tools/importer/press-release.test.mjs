@@ -366,6 +366,29 @@ test('data tables become one line per row, never an unknown block named after th
   assert.ok([...element.querySelectorAll('p')].some((p) => txt(p) === 'Škoda Elroq'), 'the header label leads the list');
 });
 
+test('a self-hosted [video] player becomes an Embed of its MP4, without the player chrome', { skip }, () => {
+  // as the importer sees it in the browser: MediaElement.js has wrapped the <video> in its chrome
+  const MP4 = 'https://cdn.skoda-storyboard.com/2026/10/Skoda-Epiq-Sportline-colour-animation_b059a4d0.mp4';
+  const player = `<div style="width: 1920px;" class="wp-video"><span class="mejs-offscreen">Video Player</span>
+    <div class="mejs-container wp-video-shortcode mejs-video" role="application"><div class="mejs-inner">
+      <div class="mejs-mediaelement"><video class="wp-video-shortcode" width="1920" height="1080" preload="metadata" controls>
+        <source type="video/mp4" src="${MP4}?_=1"><a href="${MP4}">${MP4}</a></video></div>
+      <div class="mejs-layers"><div class="mejs-overlay-play"><img src="https://www.skoda-storyboard.com/wp/wp-includes/js/mediaelement/mejs-controls.svg" alt=""></div></div>
+      <div class="mejs-controls"><span class="mejs-currenttime">00:00</span><span class="mejs-duration">00:18</span>
+        <a class="mejs-volume-slider" href="javascript:void(0);">Use Up/Down Arrow keys to increase or decrease volume.</a></div>
+    </div></div></div>`;
+  const { element } = importPage('peaq', (doc) => {
+    doc.querySelector('.column-primary .entry-content').insertAdjacentHTML('beforeend', player);
+  });
+  const embed = [...element.querySelectorAll('table')].find((t) => blockName(t) === 'Embed'
+    && t.textContent.includes('colour-animation'));
+  assert.ok(embed, 'an Embed block for the MP4');
+  assert.equal(embed.querySelector('a').getAttribute('href'), MP4, 'no ?_= cache-buster');
+  const text = element.textContent;
+  ['Video Player', '00:18', 'Use Up/Down Arrow keys'].forEach((s) => assert.equal(text.includes(s), false, s));
+  assert.equal(element.querySelector('img[src*="mejs-controls"], a[href^="javascript:"]'), null, 'no player sprite or script link');
+});
+
 // SKODA-833 (import validity audit, F5)
 
 test('4x4 Media Box: all 15 items in one Downloads block, MP4 hrefs URL-serialised', { skip }, () => {
