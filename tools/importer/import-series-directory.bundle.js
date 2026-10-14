@@ -655,6 +655,7 @@ var CustomImportScript = (() => {
     "/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq",
     "/en/emobility/skoda-elroq-and-a-happy-family",
     "/en/emobility/skoda-elroq-premiere-light-cube-camera-action",
+    "/en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
     "/en/emobility/skoda-peaq-unparalleled-space-and-comfort",
     "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
