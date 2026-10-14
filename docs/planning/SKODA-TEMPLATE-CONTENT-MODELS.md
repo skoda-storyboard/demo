@@ -64,7 +64,7 @@ Meta: `template=page`.
 ## TIER 2 — differentiators (after Tier-1 green)
 
 ### T9 · Faceted listing — News (`/en/news/`) — Shell C `listing`
-`| listing |` · `template=press_release` · `facets=model,derivative,year,company,event,technology` ·
+`| listing |` · `template=press_release` · `facets=model,derivative,concept,bodywork,years,company,happening,history,sponsorship,vip,view,technology,environment` (the source's 13 shown groups, SKODA-402d) ·
 `sort=newest` · `perpage=6` · `columns=3`. Meta: `template=page`.
 
 ### T10 · Images listing (`/en/images/`) — `listing` `columns=4` + `gallery-lightbox` + `media-cart`

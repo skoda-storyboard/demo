@@ -68,28 +68,58 @@ export const valueLabel = (v) => titleCase(String(v).replace(/-/g, ' '));
  * The source's option names and order per facet (#273): blocks/listing/facet-labels.json,
  * generated from the source's filter forms (tools/importer/build-facet-labels.mjs), as
  * `{ facet: [[slug, name], …] }`. A missing or broken file leaves the title-cased slugs.
+ * Its `_pages` key (SKODA-402d) holds each listing page's own options, in its order:
+ * `{ "/en/news": { facet: [slug, …] } }`. The source orders and offers options per page, so on
+ * a page with a list for a facet its options rank by that list and only they are `offered`;
+ * other facets keep the shared order and offer every value.
  * @param {object} json the file's content
- * @returns {Map<string, Map<string, {name: string, rank: number}>>}
+ * @param {string} [page] the listing page path
+ * @returns {Map<string, Map<string, {name: string, rank: number, offered: boolean}>>} with a
+ *   `pageFacets` Set of the facets the page has its own list for
  */
-export function facetLabelMap(json) {
+const PAGES_KEY = '_pages';
+
+export function facetLabelMap(json, page = '') {
+  const data = json && typeof json === 'object' ? json : {};
+  const pages = data[PAGES_KEY] && typeof data[PAGES_KEY] === 'object' ? data[PAGES_KEY] : {};
+  const own = pages[String(page).replace(/\/+$/, '').toLowerCase() || '/'] || {};
   const out = new Map();
-  Object.entries(json && typeof json === 'object' ? json : {}).forEach(([facet, pairs]) => {
-    if (!Array.isArray(pairs)) return;
+  out.pageFacets = new Set();
+  Object.entries(data).forEach(([facet, pairs]) => {
+    if (facet === PAGES_KEY || !Array.isArray(pairs)) return;
+    const order = Array.isArray(own[facet]) ? own[facet].map((v) => String(v).toLowerCase()) : null;
+    if (order) out.pageFacets.add(facet);
     const names = new Map();
-    pairs.forEach((pair, rank) => {
+    pairs.forEach((pair, i) => {
       if (!Array.isArray(pair) || !pair[0] || !pair[1]) return;
-      names.set(String(pair[0]).toLowerCase(), { name: String(pair[1]), rank });
+      const slug = String(pair[0]).toLowerCase();
+      const pageRank = order ? order.indexOf(slug) : i;
+      const rank = pageRank < 0 ? Infinity : pageRank;
+      names.set(slug, { name: String(pair[1]), rank, offered: pageRank >= 0 });
     });
     out.set(facet, names);
   });
   return out;
 }
 
+/**
+ * Does the source offer this option on the page? Only a facet with the page's own list says
+ * no; anything else (no list, no names yet) offers every value.
+ * @param {Map} labels facetLabelMap() output
+ * @param {string} key the facet
+ * @param {string} value the option's index value
+ * @returns {boolean}
+ */
+export function isOffered(labels, key, value) {
+  if (!labels.pageFacets?.has(key)) return true;
+  return !!labels.get(key)?.get(String(value).toLowerCase())?.offered;
+}
+
 function loadFacetLabels() {
   const base = window.hlx?.codeBasePath || '';
   return fetch(`${base}/blocks/listing/facet-labels.json`)
     .then((res) => (res.ok ? res.json() : {}))
-    .then(facetLabelMap)
+    .then((json) => facetLabelMap(json, window.location.pathname))
     .catch(() => facetLabelMap({}));
 }
 
@@ -627,9 +657,18 @@ export default async function decorate(block) {
 
   // --- facet bar ---------------------------------------------------------
   cfg.facets.forEach((key) => {
-    // options in the source order (its names), filled column by column like the source
-    const values = orderFacetValues(distinctFacetValues(scoped, key), key, optionNames);
-    if (!values.length) return; // no data for this facet in scope → skip pill
+    // options in the source order (its names), filled column by column like the source. A
+    // deep-linked value no row in scope carries keeps its option, checked, and so its pill: the
+    // visitor sees the filter that empties the list and can clear it there (#333 review)
+    // only the options the source offers on this page (SKODA-402d: e.g. no Company "other" on
+    // Press Kits, though two kits carry it)
+    const inScope = distinctFacetValues(scoped, key)
+      .filter(({ value }) => isOffered(optionNames, key, value));
+    const seen = new Set(inScope.map(({ value }) => String(value).toLowerCase()));
+    const linked = (state.active[key] || []).filter((v) => !seen.has(String(v).toLowerCase()))
+      .map((value) => ({ value }));
+    const values = orderFacetValues([...inScope, ...linked], key, optionNames);
+    if (!values.length) return; // no data for this facet in scope, nothing selected → no pill
 
     const pill = document.createElement('button');
     pill.type = 'button';
@@ -796,7 +835,17 @@ export default async function decorate(block) {
       const focused = facetOptions.contains(document.activeElement) ? document.activeElement : null;
       facetOptions.querySelectorAll('fieldset.facet-panel').forEach((panel) => {
         const { facet } = panel.dataset;
+        // an option the source doesn't offer on this page goes, unless it's selected (SKODA-402d)
+        panel.querySelectorAll('label.facet-option').forEach((option) => {
+          const input = option.querySelector('input');
+          if (!input.checked && !isOffered(names, facet, input.value)) option.remove();
+        });
         const options = [...panel.querySelectorAll('label.facet-option')];
+        if (!options.length) {
+          [...facetPills.querySelectorAll('.facet-pill')].find((pill) => pill.dataset.facet === facet)?.remove();
+          panel.remove();
+          return;
+        }
         const byValue = new Map(options.map((o) => [o.querySelector('input').value, o]));
         orderFacetValues([...byValue.keys()].map((value) => ({ value })), facet, names)
           .forEach(({ value }) => {

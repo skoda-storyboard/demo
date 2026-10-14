@@ -38,7 +38,7 @@
 // `equipment` and `motorsport`, but hides their pills (`display: none`) and ignores a deep link
 // to them, so they stay out: the listing reads only its configured facets from the URL. A
 // group with no option in the scoped rows shows no pill, as on the media listings.
-const FACETS_DEFAULT = 'model, derivative, concept, bodywork, years, company, happening, history, '
+const FACETS_NEWS = 'model, derivative, concept, bodywork, years, company, happening, history, '
   + 'sponsorship, vip, view, technology, environment';
 // Media listings: the source's 15 filter groups, in its order (#273; facet keys as in
 // listing-logic INDEX_FACETS). A group with no option in the feed shows no pill. Their rows
@@ -55,7 +55,7 @@ const VARIANTS = {
     ['index', '/en/query-index.json'],
     ['path', '/en/press-releases/'],
     ['template', 'press_release'],
-    ['facets', FACETS_DEFAULT],
+    ['facets', FACETS_NEWS],
     ['sort', 'newest'],
     ['perpage', '6'],
     ['columns', '3'],
@@ -66,7 +66,7 @@ const VARIANTS = {
     ['index', '/en/query-index.json'],
     ['path', '/en/press-kits/'],
     ['template', 'press_kit'],
-    ['facets', FACETS_DEFAULT],
+    ['facets', FACETS_NEWS],
     ['sort', 'newest'],
     ['perpage', '6'],
     ['columns', '3'],

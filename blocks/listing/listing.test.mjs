@@ -613,6 +613,25 @@ test('402a: a deep link matches index values case-insensitively (Peaq → peaq, 
   assert.equal(block.querySelector('.listing-chip').textContent, 'Model: Peaq');
 });
 
+test('a deep link to a facet no row in scope carries keeps its pill and a checked option to clear it (#333 review)', async () => {
+  const { block, toggle } = await facetListing('/en/linked-index.json', '?filter[sponsorship][]=icehockey');
+  assert.equal(toggle.textContent, 'Advanced filter (1)');
+  const pill = block.querySelector('.facet-pill[data-facet="sponsorship"]');
+  assert.ok(pill, 'the active facet has its pill');
+  assert.equal(pill.querySelector('.facet-count').textContent, '1');
+  const cb = block.querySelector('.facet-panel[data-facet="sponsorship"] input[value="icehockey"]');
+  assert.equal(cb.checked, true);
+  assert.equal(block.querySelectorAll('.listing-item').length, 0, 'no migrated row matches');
+  // facets with no rows and nothing selected still show no pill
+  assert.equal(block.querySelector('.facet-pill[data-facet="history"]'), null);
+  // clearing it there brings the rows back
+  cb.checked = false;
+  cb.dispatchEvent(new window.Event('change', { bubbles: true }));
+  await new Promise((r) => { setTimeout(r, 1500); });
+  assert.ok(block.querySelectorAll('.listing-item').length > 0);
+  assert.equal(toggle.textContent, 'Advanced filter (0)');
+});
+
 test('402a: a filtered deep link opens the panel showing "(1)"', async () => {
   const { block, toggle } = await facetListing('/en/deeplink-index.json', '?filter[model][]=Peaq');
   assert.equal(toggle.getAttribute('aria-expanded'), 'true');
@@ -805,4 +824,65 @@ test('late option names (#341 review): a focused chip keeps focus when the chips
   assert.equal(now.dataset.facet, 'model');
   assert.equal(now.dataset.value, 'Epiq', 'the same filter\'s chip');
   assert.match(now.textContent, /Epiq/);
+});
+
+// SKODA-402d (#333 review): the source orders and offers options per listing page
+const PAGE_LABELS = {
+  bodywork: [['combi', 'Combi'], ['suv', 'SUV'], ['saloon', 'Saloon']],
+  company: [['design', 'design'], ['other', 'other']],
+  _pages: { '/en/news': { bodywork: ['combi', 'saloon', 'suv'], company: ['design'] } },
+};
+
+test('facetLabelMap: a page with its own list ranks and offers by it; other pages keep the shared order (SKODA-402d)', async () => {
+  const { facetLabelMap, isOffered, orderFacetValues } = await import('./listing.js');
+  const news = facetLabelMap(PAGE_LABELS, '/en/news/');
+  const values = ['suv', 'saloon', 'combi'].map((value) => ({ value }));
+  assert.deepEqual(orderFacetValues(values, 'bodywork', news).map((v) => v.value), ['combi', 'saloon', 'suv'], 'News: saloon before suv');
+  assert.equal(isOffered(news, 'company', 'other'), false, 'not on the source News form');
+  assert.equal(isOffered(news, 'company', 'design'), true);
+  assert.equal(isOffered(news, 'model', 'peaq'), true, 'no page list for the facet: everything offered');
+  const other = facetLabelMap(PAGE_LABELS, '/en/images');
+  assert.deepEqual(orderFacetValues(values, 'bodywork', other).map((v) => v.value), ['combi', 'suv', 'saloon'], 'the shared order');
+  assert.equal(isOffered(other, 'company', 'other'), true);
+  assert.equal(facetLabelMap({}).pageFacets.size, 0);
+});
+
+async function pageLabelsListing(index, search, rows, { hold = false } = {}) {
+  const realFetch = globalThis.fetch;
+  let release = () => {};
+  const held = new Promise((resolve) => { release = resolve; });
+  globalThis.fetch = async (url) => {
+    if (!String(url).includes('facet-labels')) return realFetch(url);
+    if (hold) await held;
+    return { ok: true, status: 200, json: async () => PAGE_LABELS };
+  };
+  try {
+    const listing = await facetListing(index, search, rows);
+    return { ...listing, release: async () => { release(); await settle(); await settle(); } };
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+const companyRow = (n, company, bodywork) => ({ ...storyRow(n, 'Peaq', bodywork), company });
+
+test('on a page with the source\'s own options, the bar offers only those, in its order; a deep-linked one stays (SKODA-402d)', async () => {
+  const rows = [companyRow(1, 'design, other', 'suv'), companyRow(2, 'other', 'saloon'), companyRow(3, 'design', 'combi')];
+  const { block } = await pageLabelsListing('/en/page-labels-index.json', '', rows);
+  const opts = (facet) => [...block.querySelectorAll(`.facet-panel[data-facet="${facet}"] input`)].map((i) => i.value);
+  assert.deepEqual(opts('bodywork'), ['combi', 'saloon', 'suv'], 'the page order');
+  assert.deepEqual(opts('company'), ['design'], 'no "other": the source does not offer it here');
+  // a deep link to the value keeps it, checked, so it can be cleared
+  const linked = await pageLabelsListing('/en/page-labels-linked-index.json', '?filter[company][]=other', rows);
+  const cb = linked.block.querySelector('.facet-panel[data-facet="company"] input[value="other"]');
+  assert.ok(cb?.checked);
+});
+
+test('late names on such a page drop the options the source does not offer, and an emptied pill (SKODA-402d)', async () => {
+  const rows = [companyRow(1, 'other', 'suv'), companyRow(2, 'other', 'saloon')];
+  const { block, release } = await pageLabelsListing('/en/page-labels-late-index.json', '', rows, { hold: true });
+  assert.ok(block.querySelector('.facet-pill[data-facet="company"]'), 'built with the slugs first');
+  await release();
+  assert.equal(block.querySelector('.facet-pill[data-facet="company"]'), null, 'its only option is not offered: the pill goes');
+  assert.equal(block.querySelector('.facet-panel[data-facet="company"]'), null);
+  assert.deepEqual([...block.querySelectorAll('.facet-panel[data-facet="bodywork"] input')].map((i) => i.value), ['saloon', 'suv']);
 });

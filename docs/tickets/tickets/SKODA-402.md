@@ -35,7 +35,7 @@ The source listings use ElasticPress + an `admin-ajax` load-more (`query_vars` i
 ## Acceptance Criteria
 Measurable gates live in [`faceted-listing.md` §9](../../ui-specs/faceted-listing.md); summary:
 - [ ] Block fetches `/{locale}/query-index.json` and renders results as cards; grid 1/2/3 cols at <768/≥768/≥992 (4 for image listings), gutter `20px`, capped `1248px`.
-- [ ] Facet bar = top full-width pills (15, in source order); selected pill = green `#419468` + white + ✓ + count badge; pill opens a `160px` checkbox column panel.
+- [ ] Facet bar = top full-width pills (15, in source order; **News / Press Kits: the 13 the source shows, SKODA-402d**); selected pill = green `#419468` + white + ✓ + count badge; pill opens a `160px` checkbox column panel.
 - [ ] Default page size 6; ghost-pill "Load more" appends next 6 with no server round-trip; count renders `"N / total"`.
 - [ ] Changing facets re-filters client-side + updates URL params; `history.pushState` offset; deep-linked URL restores state.
 - [ ] Mobile: facet bar hidden, opened via "Advanced filter (N)" drawer in the sort row.
@@ -50,7 +50,7 @@ Measurable gates live in [`faceted-listing.md` §9](../../ui-specs/faceted-listi
 - **Source (measured):** both pages show 13 groups, in the order Model, Derivative, Concept, Bodywork, Year, Company,
   Event, History, Sponsorship, People, Interior/Exterior, Technology, Environment. `equipment` and `motorsport` are
   in the form but hidden, and a deep link to them is ignored. So the 15-pill AC above holds for Images / Videos only.
-- **Fix (config + importer, no runtime change):** `FACETS_DEFAULT` in `tools/importer/parsers/listing.js` is those 13
+- **Fix (config + importer):** `FACETS_NEWS` in `tools/importer/parsers/listing.js` is those 13
   keys in source order (the 4 listing bundles rebuilt). `/en/news` and `/en/press-kits` were re-imported. The diff
   against DA is the `facets` row only (the Metadata block matches the delivered head). Both pushed to DA preview.
   `urls-pr-listing.txt` now also lists `/en/press-kits/`.
@@ -61,6 +61,21 @@ Measurable gates live in [`faceted-listing.md` §9](../../ui-specs/faceted-listi
   Sponsorship, Interior/Exterior) and stay hidden. Deep links: sponsorship=icehockey → "Advanced filter (1)",
   Sponsorship (1), 1 / 1 (the source has 21; the other 20 aren't migrated, out of scope). bodywork=suv → 6 / 7
   (News), 6 / 11 (Press Kits); vip=jahn → 6 / 11. The first result matches the source in each case.
+- **Review fix (runtime, `blocks/listing/listing.js`):** a deep-linked value that no row in scope carries keeps its
+  option (checked) and so its pill, e.g. `/en/press-kits?filter[sponsorship][]=icehockey` (no migrated kit has a
+  sponsorship). The visitor sees the filter that empties the list and can clear it there; before, the list emptied
+  with no pill for it (every listing).
+- **Review fix (per-page options, `facet-labels.json` `_pages`):** the source orders and offers a group's options per
+  page. News lists Bodywork `saloon` before `spaceback`; Press Kits list Event `other` between `motorshow` and
+  `premiere`, and offer no Company `other`, though two kits carry it. `tools/importer/build-facet-labels.mjs` now also
+  writes each listing page's own option lists (`_pages`; the shared names are unchanged). On a page with a list for a
+  group, the listing ranks by it and offers only those options; a deep-linked value keeps its option. Measured
+  against the source: every shown group on News, Press Kits, Images and Videos has the source's names and order,
+  and no option the source lacks on that page.
+- **Review checks (2026-10-14, 1440 / 768 / 375):** pill 100.9 × 35, radius 5, padding 21, 14 / 600, gaps 14 / 7,
+  and the open active pill 141px green with its badge hidden: all equal to the source. Wrapping differs only
+  where the shown pills differ. axe: `color-contrast` only, ≤ live `main` (#273's source greys). Keyboard: toggle
+  → first pill → option (Space) → collapse to the toggle, with a ring at every step.
 - **Noted, not changed:** after a selection the source also hides groups with no option left in the filtered
   results; every EDS listing keeps the scoped set.
 

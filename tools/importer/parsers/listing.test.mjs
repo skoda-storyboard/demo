@@ -71,7 +71,6 @@ const SOURCE_SHOWN = ['model', 'derivative', 'concept', 'bodywork', 'years', 'co
 test('News and Press Kits offer the source\'s 13 shown filter groups, in its order (SKODA-402d)', { skip }, async () => {
   const split = (v) => v.split(',').map((k) => k.trim());
   ['news', 'press-kits'].forEach((token) => assert.deepEqual(split(run(token).facets), SOURCE_SHOWN, token));
-  assert.ok(!split(run('news').facets).some((k) => ['equipment', 'motorsport'].includes(k)), 'the source hides these two');
   // every key is an index facet column with option names (blocks/listing/facet-labels.json)
   const { INDEX_FACETS } = await import('../../../blocks/listing/listing-logic.mjs');
   const { readFile } = await import('node:fs/promises');
