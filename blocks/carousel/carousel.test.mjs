@@ -321,3 +321,16 @@ test('bindDrag: right-click never starts a gesture', () => {
   assert.equal(track.scrollLeft, 0);
   assert.equal(track.captured.size, 0);
 });
+
+test('video cards: the source play glyph, ring + outline triangle (#284)', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const raw = await readFile(new URL('./carousel.css', import.meta.url), 'utf8');
+  const css = raw.replace(/\/\*[\s\S]*?\*\//g, '');
+  const rule = css.match(/\.carousel\.video \.card-teaser-image::after\s*\{([^}]*)\}/);
+  assert.ok(rule, 'the video glyph rule');
+  assert.match(rule[1], /mask:\s*url\("\.\.\/\.\.\/icons\/media-play\.svg"\)/);
+  assert.doesNotMatch(rule[1], /clip-path/);
+  const icon = await readFile(new URL('../../icons/media-play.svg', import.meta.url), 'utf8');
+  assert.match(icon, /<circle cx="16" cy="16" r="15"/, 'the 2px ring');
+  assert.match(icon, /fill="none"/, 'an outline triangle');
+});

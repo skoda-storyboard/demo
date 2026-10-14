@@ -13648,7 +13648,7 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/06/Navrh-bez-nazvu-83_949f564e.png",
       "da_path": "",
       "alt": "A True Czech from Spain",
-      "caption": null,
+      "caption": "",
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/06/Navrh-bez-nazvu-83_949f564e-768x432.png",
         "https://cdn.skoda-storyboard.com/2026/06/Navrh-bez-nazvu-83_949f564e.png",
@@ -13667,7 +13667,9 @@
       "note": "",
       "page_refs": [
         "en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
-        "en/emobility/a-true-czech-from-spain"
+        "en/emobility/a-true-czech-from-spain",
+        "cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+        "sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund"
       ],
       "dam_status": 200,
       "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/Navrh-bez-nazvu-83_949f564e.png",
@@ -13689,7 +13691,7 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/04/Navrh-bez-nazvu-99_f44593c5.png",
       "da_path": "",
       "alt": "Modelling clay, yoga, simply Epiq! Škoda returns to Milan",
-      "caption": null,
+      "caption": "",
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/04/Navrh-bez-nazvu-99_f44593c5-768x432.png",
         "https://cdn.skoda-storyboard.com/2026/04/Navrh-bez-nazvu-99_f44593c5-1440x810.png",
@@ -13710,7 +13712,8 @@
         "en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
         "en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere",
         "en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan",
-        "en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live"
+        "en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
+        "cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund"
       ],
       "dam_status": 200,
       "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/Navrh-bez-nazvu-99_f44593c5.png",
@@ -13755,7 +13758,9 @@
         "en/emobility/a-true-czech-from-spain",
         "en/emobility/whats-behind-epiq-design",
         "en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere",
-        "en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car"
+        "en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car",
+        "cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+        "sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund"
       ],
       "dam_status": 200,
       "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/Navrh-bez-nazvu-154_1340a7cb.png",
@@ -13777,7 +13782,7 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/04/Navrh-bez-nazvu-56_87073ad7.png",
       "da_path": "",
       "alt": "Come and play! Škoda is heading to Milan",
-      "caption": null,
+      "caption": "",
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/04/Navrh-bez-nazvu-56_87073ad7-768x432.png",
         "https://cdn.skoda-storyboard.com/2026/04/Navrh-bez-nazvu-56_87073ad7.png",
@@ -13796,7 +13801,8 @@
       "note": "",
       "page_refs": [
         "en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
-        "en/emobility/come-and-play-skoda-is-heading-to-milan"
+        "en/emobility/come-and-play-skoda-is-heading-to-milan",
+        "cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund"
       ],
       "dam_status": 200,
       "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/Navrh-bez-nazvu-56_87073ad7.png",
@@ -13818,7 +13824,7 @@
       "delivery_url": "https://cdn.skoda-storyboard.com/2026/03/Navrh-bez-nazvu-14_26cd5168.png",
       "da_path": "",
       "alt": "A record year for Škoda. Electrified models also contribute",
-      "caption": null,
+      "caption": "",
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/03/Navrh-bez-nazvu-14_26cd5168-768x432.png",
         "https://cdn.skoda-storyboard.com/2026/03/Navrh-bez-nazvu-14_26cd5168.png",
@@ -13838,7 +13844,8 @@
       "page_refs": [
         "en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
         "en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute",
-        "en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live"
+        "en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
+        "cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund"
       ],
       "dam_status": 200,
       "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/Navrh-bez-nazvu-14_26cd5168.png",
@@ -13929,7 +13936,9 @@
         "en/skoda-world/legend-chris-froome-takes-you-behind-the-scenes-of-the-tour-de-france",
         "en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling",
         "en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones",
-        "en/emobility/designers-on-the-peaq-its-modern-durable-and-practical"
+        "en/emobility/designers-on-the-peaq-its-modern-durable-and-practical",
+        "cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+        "sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund"
       ],
       "dam_status": 200,
       "public_url": "https://publish-p220607-e2281243.adobeaemcloud.com/content/dam/storyboard/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/Y7A2693_581ce238.jpg",
@@ -129101,7 +129110,8 @@
       "master_url": "https://cdn.skoda-storyboard.com/dist/26.10.3/plugins/skoda-mailguide/newsletter_subscribe.webp",
       "dam_page_path": "en/emobility/teaser",
       "page_refs": [
-        "en/emobility/teaser"
+        "en/emobility/teaser",
+        "cs/fragments/newsletter-card"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -129130,7 +129140,10 @@
       "master_url": "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-20_d5af9028.png",
       "dam_page_path": "en",
       "page_refs": [
-        "en"
+        "en",
+        "cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+        "de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
+        "sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund"
       ],
       "dam_asset_path": "",
       "dam_original_url": "",
@@ -129140,7 +129153,8 @@
       "alt": "",
       "caption": "",
       "seen_urls": [
-        "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-20_d5af9028.png"
+        "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-20_d5af9028.png",
+        "https://cdn.skoda-storyboard.com/2026/10/Navrh-bez-nazvu-20_d5af9028-768x432.png"
       ],
       "aspect_crop_source": false,
       "bytes": 2054281,
