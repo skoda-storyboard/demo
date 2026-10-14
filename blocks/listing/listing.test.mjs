@@ -367,7 +367,9 @@ test('402a: a sort change during the settle runs one flow; back/forward drops a 
 test('402a: removing a chip veils at once (no settle), updates and collapses the panel, like live', async (t) => {
   const { block, toggle } = await facetListing('/en/chip-index.json', '?filter[model][]=Peaq&filter[model][]=Epiq');
   t.mock.timers.enable({ apis: ['setTimeout'] });
-  assert.ok(block.classList.contains('facets-open'), 'deep link opens the panel');
+  assert.equal(block.classList.contains('facets-open'), false, 'a deep link keeps the panel closed, as live (#333)');
+  click(toggle); // the visitor opens it to reach the chips
+  assert.ok(block.classList.contains('facets-open'));
   const chip = block.querySelector('.listing-chip');
   chip.focus();
   click(chip);
@@ -469,10 +471,10 @@ test('402a: reopening with an option list still open focuses that list\'s pill',
   assert.equal(document.activeElement, pills[1]);
 });
 
-test('402a: a filtered deep link opens the panel without moving focus on load', async () => {
+test('a filtered deep link keeps the panel closed and does not move focus on load (#333, as live)', async () => {
   document.activeElement?.blur();
   const { block } = await facetListing('/en/focus-deeplink-index.json', '?filter[model][]=Peaq');
-  assert.equal(block.classList.contains('facets-open'), true);
+  assert.equal(block.classList.contains('facets-open'), false);
   assert.equal(document.activeElement, document.body, 'the page load does not steal focus');
 });
 
@@ -632,11 +634,20 @@ test('a deep link to a facet no row in scope carries keeps its pill and a checke
   assert.equal(toggle.textContent, 'Advanced filter (0)');
 });
 
-test('402a: a filtered deep link opens the panel showing "(1)"', async () => {
+test('a filtered deep link shows a closed panel and a bold "Advanced filter (1)"; opening it shows the filtered list (#333, as live)', async () => {
   const { block, toggle } = await facetListing('/en/deeplink-index.json', '?filter[model][]=Peaq');
-  assert.equal(toggle.getAttribute('aria-expanded'), 'true');
-  assert.ok(block.classList.contains('facets-open'));
+  assert.equal(toggle.getAttribute('aria-expanded'), 'false');
+  assert.equal(block.classList.contains('facets-open'), false);
   assert.equal(toggle.textContent, 'Advanced filter (1)');
+  assert.ok(toggle.classList.contains('has-filters'), 'bold while a filter is on');
+  click(toggle);
+  assert.ok(block.classList.contains('facets-open'));
+  assert.equal(block.querySelector('.facet-pill[data-facet="model"]').getAttribute('aria-expanded'), 'true', 'its options open, as live');
+});
+
+test('"Advanced filter (0)" is regular; the bold goes with the last filter (#333, as live)', async () => {
+  const { toggle } = await facetListing('/en/regular-toggle-index.json');
+  assert.equal(toggle.classList.contains('has-filters'), false);
 });
 
 test('402a: Esc closes an option list, then the panel; Esc elsewhere in the block is ignored', async () => {
