@@ -43,6 +43,27 @@ Measurable gates live in [`faceted-listing.md` §9](../../ui-specs/faceted-listi
 - [ ] Facet controls labelled + keyboard-operable; `npm run lint` passes.
 - [ ] Visual diff vs source at 1280/1024/768/mobile ≤ 2% per-pixel (bar closed + open, mobile drawer).
 
+## SKODA-402d follow-up (#333, 2026-10-14, branch `skoda-402d-listing-facets`)
+- **Problem:** News and Press Kits listed only 6 facets (`model, derivative, years, company, happening, technology`,
+  the importer default), and `decodeState` reads only configured facets, so a deep link such as
+  `/en/news?filter[sponsorship][]=icehockey` was dropped.
+- **Source (measured):** both pages show 13 groups, in the order Model, Derivative, Concept, Bodywork, Year, Company,
+  Event, History, Sponsorship, People, Interior/Exterior, Technology, Environment. `equipment` and `motorsport` are
+  in the form but hidden, and a deep link to them is ignored. So the 15-pill AC above holds for Images / Videos only.
+- **Fix (config + importer, no runtime change):** `FACETS_DEFAULT` in `tools/importer/parsers/listing.js` is those 13
+  keys in source order (the 4 listing bundles rebuilt). `/en/news` and `/en/press-kits` were re-imported. The diff
+  against DA is the `facets` row only (the Metadata block matches the delivered head). Both pushed to DA preview.
+  `urls-pr-listing.txt` now also lists `/en/press-kits/`.
+- **Decision (ticket's recommendation):** a URL facet the listing doesn't show doesn't filter, as on the source
+  (`filter[equipment][]=rs` stays unfiltered on both).
+- **Measured on `main` with the new content (1440 / 768 / 375):** News shows 10 pills and Press Kits 11, in source
+  order. The rest have no option in the migrated rows (News: History, Interior/Exterior, Environment; Press Kits:
+  Sponsorship, Interior/Exterior) and stay hidden. Deep links: sponsorship=icehockey → "Advanced filter (1)",
+  Sponsorship (1), 1 / 1 (the source has 21; the other 20 aren't migrated, out of scope). bodywork=suv → 6 / 7
+  (News), 6 / 11 (Press Kits); vip=jahn → 6 / 11. The first result matches the source in each case.
+- **Noted, not changed:** after a selection the source also hides groups with no option left in the filtered
+  results; every EDS listing keeps the scoped set.
+
 ## Dependencies
 - Upstream: SKODA-401 (query-index schema), SKODA-201 (Cards/Teaser block) / Downstream: SKODA-603 (pilot page set, PR listing), SKODA-702 (performance)
 

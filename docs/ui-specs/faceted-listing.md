@@ -9,6 +9,13 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 > - Grid is **1 / 3 / 4 / 4 columns at 375 / 768 / 992 / 1280** (not 1/2/3). The Videos DA document asks for 3 desktop columns, but the source shows 4.
 > - The facet form (15 groups) is **collapsed by default even at 1280** and revealed by "Advanced filter"; DA authored only six facets.
 >
+> **SKODA-402d (#333, measured 2026-10-14, /en/news/ + /en/press-kits/):** the form holds all 15 groups, but the
+> source **shows 13** on both pages, in this order: Model, Derivative, Concept, Bodywork, Year, Company, Event,
+> History, Sponsorship, People, Interior/Exterior, Technology, Environment. `equipment` and `motorsport` pills are
+> `display: none`, and a deep link to them is ignored ("Advanced filter (0)", unfiltered). EDS lists those 13 in the
+> News / Press Kits `facets` row; a group with no option in the migrated rows shows no pill. After a selection the
+> source also drops groups with no option left in the filtered results; EDS keeps the scoped set (all listings).
+>
 > **SKODA-402a re-measure (2026-09-30, /en/images + /en/news; overrides §3, §5, §6 and §9 where they differ):**
 > - The panel is a row of pills (`.filter-labels`); the open pill's option list sits full width under the whole row (`.filter-options`, 160px columns). It is not a dropdown under the pill.
 > - **Open pill:** green `#419468`, white text, caret up. A pill with selections stays grey with a green 24px count badge. There is no ✓ glyph and the pill does not turn green.

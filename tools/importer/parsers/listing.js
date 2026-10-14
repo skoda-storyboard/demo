@@ -33,7 +33,13 @@
 // Facet keys are the index COLUMN names (query-index-config.yaml), not the display labels:
 // `years` (label "Year"), `happening` ("Event"). SKODA-608 fixed `year`/`event`, which match
 // no column, so those pills never rendered.
-const FACETS_DEFAULT = 'model, derivative, years, company, happening, technology';
+// News and Press Kits: the 13 filter groups the source SHOWS, in its order (SKODA-402d, #333,
+// measured 2026-10-14 on /en/news/ and /en/press-kits/). The source form also holds
+// `equipment` and `motorsport`, but hides their pills (`display: none`) and ignores a deep link
+// to them, so they stay out: the listing reads only its configured facets from the URL. A
+// group with no option in the scoped rows shows no pill, as on the media listings.
+const FACETS_DEFAULT = 'model, derivative, concept, bodywork, years, company, happening, history, '
+  + 'sponsorship, vip, view, technology, environment';
 // Media listings: the source's 15 filter groups, in its order (#273; facet keys as in
 // listing-logic INDEX_FACETS). A group with no option in the feed shows no pill. Their rows
 // come from the generated media feed (/en/media-feed.json, SKODA-608), which only holds
