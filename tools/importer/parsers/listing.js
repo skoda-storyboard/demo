@@ -34,12 +34,14 @@
 // `years` (label "Year"), `happening` ("Event"). SKODA-608 fixed `year`/`event`, which match
 // no column, so those pills never rendered.
 const FACETS_DEFAULT = 'model, derivative, years, company, happening, technology';
-// Media listings: the source's 15 filter groups, in its order (#273; facet keys as in
-// listing-logic INDEX_FACETS). A group with no option in the feed shows no pill. Their rows
-// come from the generated media feed (/en/media-feed.json, SKODA-608), which only holds
-// image/video rows, so no `path` scope is needed.
-const FACETS_MEDIA = 'model, derivative, concept, bodywork, equipment, years, company, happening, '
-  + 'history, motorsport, sponsorship, vip, view, technology, environment';
+// Media listings: the 13 filter groups the source SHOWS on /en/images/ and /en/videos/, in its
+// order (#273 re-test, measured 2026-10-14). The source form also holds `equipment` and
+// `motorsport`, but hides their pills (`display: none`) and ignores a deep link to them, so they
+// stay out (as News / Press Kits, SKODA-402d). A group with no option in the feed shows no
+// pill. Their rows come from the generated media feed (/en/media-feed.json, SKODA-608), which
+// only holds image/video rows, so no `path` scope is needed.
+const FACETS_MEDIA = 'model, derivative, concept, bodywork, years, company, happening, history, '
+  + 'sponsorship, vip, view, technology, environment';
 
 // Variant config keyed by the <body> class token the source page carries.
 // Each value is the authored Listing contract (faceted-listing.md §7). Order-preserving.

@@ -62,3 +62,9 @@ test('media and search variants are unchanged', { skip }, () => {
   assert.equal(run('videos').template, 'video');
   assert.equal(run('search').search, 'true');
 });
+
+test('Images and Videos offer the 13 filter groups the source shows, in its order (#273)', { skip }, () => {
+  const shown = ['model', 'derivative', 'concept', 'bodywork', 'years', 'company', 'happening',
+    'history', 'sponsorship', 'vip', 'view', 'technology', 'environment'];
+  ['images', 'videos'].forEach((token) => assert.deepEqual(run(token).facets.split(',').map((k) => k.trim()), shown, token));
+});

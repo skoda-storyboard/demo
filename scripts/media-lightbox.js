@@ -8,6 +8,7 @@
 import { buildLightbox } from './lightbox.js';
 import { loadQueryIndex, cleanTitle, currentLocale } from './query-index.js';
 import { formatCardDate } from './card-teaser.js';
+import { downloadHref } from './media-card.js';
 
 /*
  * One shared-lightbox item from a media feed row (contract media-item shape 5): the stage
@@ -54,7 +55,12 @@ export function feedLightboxItem(row) {
       caption,
       // the source colorbox player: autoplay, muted (the browser allows muted autoplay)
       video: vimeo ? `https://player.vimeo.com/video/${vimeo}?dnt=1&autoplay=1&muted=1` : row.mp4,
-      download: row.mp4 || '',
+      // the MP4 through the source's download route, as the card's button and the source's
+      // player (an MP4 still on the source CDN only plays in a tab, #273); a new tab, as live
+      download: downloadHref(row.mp4 || ''),
+      downloadTarget: '_blank',
+      // the source player's action names (its colorbox media-cart-actions titles)
+      labels: { addToBox: 'Add/remove this', download: 'Download this', copyLink: 'Link to page' },
       link: vimeo ? `https://vimeo.com/${vimeo}` : row.mp4,
       cartId: row.id || '',
       cartHref: row.mp4 || '',

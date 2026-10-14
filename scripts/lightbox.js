@@ -301,6 +301,13 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
     } else if (item.caption) {
       [...item.caption.childNodes].forEach((n) => stageCaption.append(n.cloneNode(true)));
       downloadBtn.href = item.download || `${base}?format=jpg`;
+      // per-item names (a video's are the source player's) and tab, else the image defaults
+      const names = { ...LABELS, ...(item.labels || {}) };
+      addBtn.setAttribute('aria-label', names.addToBox);
+      downloadBtn.setAttribute('aria-label', names.download);
+      linkBtn.setAttribute('aria-label', names.copyLink);
+      if (item.downloadTarget) downloadBtn.target = item.downloadTarget;
+      else downloadBtn.removeAttribute('target');
       // `actions: false` (content images): the source panel keeps an empty actions row
       actions.classList.toggle('is-empty', item.actions === false);
       if (item.cartId) addBtn.dataset.id = item.cartId;

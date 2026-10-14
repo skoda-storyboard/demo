@@ -107,3 +107,24 @@ test('a slower bind for an earlier item never wins over the current one', async 
   assert.equal(add.getAttribute('aria-disabled'), 'true');
   assert.equal(add.dataset.href, undefined);
 });
+
+test('a video item names its actions as the source player and downloads the MP4 in a new tab; an image keeps its own (#273)', async () => {
+  const { feedLightboxItem } = await import('./media-lightbox.js');
+  const video = feedLightboxItem({
+    template: 'video', id: '9', title: 'Clip', mp4: 'https://cdn.skoda-storyboard.com/2026/09/clip.mp4', poster: 'https://example.com/p.jpg', 'vimeo-id': '123',
+  });
+  assert.equal(video.download, 'https://www.skoda-storyboard.com/direct-download/2026/09/clip.mp4', 'the source download route, as the card button');
+  assert.equal(video.downloadTarget, '_blank');
+  const host = document.createElement('div');
+  document.querySelector('main').replaceChildren(host);
+  const { open, overlay } = buildLightbox(host, [{ ...video, caption: caption('Clip') }, items[0]]);
+  open(0);
+  const action = (kind) => overlay.querySelector(`.gallery-lightbox-action.${kind}`);
+  assert.deepEqual(['add', 'download', 'link'].map((k) => action(k).getAttribute('aria-label')), ['Add/remove this', 'Download this', 'Link to page']);
+  assert.equal(action('download').getAttribute('href'), video.download);
+  assert.equal(action('download').target, '_blank');
+  open(1); // the next item, an image, gets the image names back and no new tab
+  assert.deepEqual(['add', 'download', 'link'].map((k) => action(k).getAttribute('aria-label')), ['Add to media box', 'Download image', 'Copy image link']);
+  assert.equal(action('download').hasAttribute('target'), false);
+  await settle();
+});
