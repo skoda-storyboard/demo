@@ -35,8 +35,9 @@ const TILE_IMAGE_WIDTHS = {
   'press-quarter': '750',
   'press-half': '1250',
   'press-third': '850',
-  'press-banner-wide': '1250',
-  'press-banner-narrow': '850',
+  // SKODA-221: at least 2x the 1440 width (728.8 / 479.2px on the 1228px mosaic track)
+  'press-banner-wide': '1500',
+  'press-banner-narrow': '1000',
   'press-banner-half': '1250',
 };
 

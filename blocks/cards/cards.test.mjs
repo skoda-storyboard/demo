@@ -137,8 +137,15 @@ test('a press mosaic with thirds and banners runs on 30 columns, one row per sou
     assert.equal(li.classList.contains('card-teaser'), false);
   });
   assert.equal(banners[0].querySelector('a').getAttribute('href'), '/en/banner-1');
-  const source = banners[0].querySelector('source[media="(min-width: 781px)"]');
-  assert.equal(new URL(source.srcset).searchParams.get('width'), '1250');
+  // SKODA-221: requests at least 2x the 1440 widths (wide 728.8, narrow 479.2, half 604,
+  // third 396px on the 1228px track)
+  const desktopWidth = (li) => new URL(li.querySelector('source[media="(min-width: 781px)"]').srcset)
+    .searchParams.get('width');
+  const byToken = (token) => block.querySelector(`li.tile-${token}`);
+  assert.deepEqual(
+    ['press-banner-wide', 'press-banner-narrow', 'press-banner-half', 'press-third'].map((t) => desktopWidth(byToken(t))),
+    ['1500', '1000', '1250', '850'],
+  );
   assert.equal(block.querySelectorAll('li.tile-press-third.card-teaser h2 a').length, 3);
 });
 

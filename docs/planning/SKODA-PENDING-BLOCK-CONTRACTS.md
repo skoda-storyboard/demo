@@ -164,9 +164,9 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Still to do:** the importer header change (`Cards (promo)` → `Promo Box`). The check keeps failing `Cards (promo)` and points at `promo-box`.
 
 ### `cards-tiles`
-- **Status:** implemented by SKODA-221 (shape 3; historical pending entry retained for version tracking) · **Ticket:** SKODA-221 (importers: 207 series hub, 805a press-kit hub). Series pages using shape 2 need rendered QA; press-kit pages need re-import with shape 3 before QA and publication.
+- **Status:** implemented by SKODA-221 (shape 4 since 2026-10-14, the press mosaic; historical pending entry retained for version tracking) · **Ticket:** SKODA-221 (importers: 207 series hub, 805a press-kit hub). Series pages using shape 2 need rendered QA; press-kit pages need re-import with shape 3 before QA and publication.
 - **Emitted by:** `parsers/series-grid.js` (207) and `parsers/press-kit-hub-tiles.js` (805a). The existing press-kit DA previews still have ambiguous old `feature`/`sq` rows, including Motorsport's all-`sq` grid; the runtime and `import:validate-blocks` both reject these on `/en/press-kits/`. Re-import and push the shape 3 output before tile QA/publish.
-- **Shape:** header `Cards (overlay, tiles)`, then one row per tile: `[size token, <picture>, <a href="/en/…">Title</a>]`.
+- **Shape:** header `Cards (overlay, tiles)`, then one row per tile: `[size token, <picture>, <a href="/en/…">Title</a>]`. A press-mosaic banner (shape 4) is `[banner size token, <a href="…"><picture> with alt text</a>]`; `import:validate-blocks` / the publish gate check both forms (`push/block-check.mjs`).
   - The size token names the tile's share of its source row and its image ratio. Series uses twelfths; press kits use twentieths:
 
     | Token | Row share | Ratio | Token | Row share | Ratio |
