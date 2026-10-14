@@ -129705,24 +129705,25 @@
       "dam_asset_path": "",
       "dam_original_url": "",
       "original_download_url": "",
-      "delivery_url": "https://cdn.skoda-storyboard.com/2026/10/ClassicDays-Header-2560x1120_e380a012.jpg",
+      "delivery_url": "https://main--demo--skoda-storyboard.aem.live/media_1035f002c42f9a4f17e403d425288ba75138b3473.jpg",
       "da_path": "",
       "alt": "Classic Days 2026 - Press Kit",
       "caption": "",
       "seen_urls": [
         "https://cdn.skoda-storyboard.com/2026/10/ClassicDays-Header-2560x1120_e380a012-1920x840.jpg",
-        "https://cdn.skoda-storyboard.com/2026/10/ClassicDays-Header-2560x1120_e380a012-1440x630.jpg"
+        "https://cdn.skoda-storyboard.com/2026/10/ClassicDays-Header-2560x1120_e380a012-1440x630.jpg",
+        "https://cdn.skoda-storyboard.com/2026/10/ClassicDays-Header-2560x1120_e380a012.jpg"
       ],
       "aspect_crop_source": true,
       "bytes": 2283535,
-      "preconditioned": false,
+      "preconditioned": true,
       "steps": {
         "deliver": "done",
         "dam": "n/a",
         "da": "n/a"
       },
       "status": "done",
-      "note": ""
+      "note": "pre-conditioned 2026-10-14: the source master (Photoshop, q99) and its WordPress 1920 rendition make Fastly IO emit 260-300 KB webply renditions at 500-1000px (750: 299 KB); a q82 4:2:0 re-encode of the same 2560x1120 pixels (delivered from the media bus, uploaded once via a /drafts preview) gives 36 KB at 750 (PSI mobile LCP)"
     },
     "971e68b7__ClassicDays-Button-800x800-A3_eab1b960.jpg": {
       "logical_id": "971e68b7__ClassicDays-Button-800x800-A3_eab1b960.jpg",
