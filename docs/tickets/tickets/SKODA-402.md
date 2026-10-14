@@ -79,12 +79,13 @@ Measurable gates live in [`faceted-listing.md` §9](../../ui-specs/faceted-listi
 - **PO re-test (2026-10-14), fixed as live on all four listings at 1440 / 768 / 375:**
   - A filtered deep link keeps the panel **closed**, as the source (it opened since the 2026-09-29 decision). Opening
     it shows the filtered pill's options, as the source.
-  - "Advanced filter (n)" is **bold (700) while a filter is on**, regular at "(0)", as the source (it was always 400).
+  - "Advanced filter (n)" stays **regular (400) in every state** (PO decision, 2026-10-14). The source sets it 700
+    while a filter is on; that is the one recorded deviation here.
   - The open panel's first pills sit **28px** under the header (was 32).
   - The chip's remove cross is the source's icon-font glyph (skoda-bnr-icons `\e010`, 21px box, no gap; was a 14px
     "×" + 4px gap): chip 205 × 35 with its text 37px in, equal to the source.
-  - Measured equal to the source in every case: toggle position on load (y120; y155 at 375), its weight, header to
-    first pill 28, first card position, and the chip box and glyph.
+  - Measured equal to the source in every case: toggle position on load (y120; y155 at 375), header to first pill
+    28, first card position, and the chip box and glyph (the toggle weight aside, above).
 - **Noted, not changed:** after a selection the source also hides groups with no option left in the filtered
   results; every EDS listing keeps the scoped set.
 

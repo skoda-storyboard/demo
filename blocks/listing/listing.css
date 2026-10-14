@@ -427,11 +427,6 @@
   padding-inline-start: var(--listing-toggle-gap);
 }
 
-/* bold while a filter is on, regular at "(0)", as live */
-.listing .listing-filter-toggle.has-filters {
-  font-weight: var(--weight-bold);
-}
-
 .listing .listing-filter-toggle:focus-visible {
   outline: 2px solid var(--facet-active);
   outline-offset: 2px;

@@ -634,20 +634,24 @@ test('a deep link to a facet no row in scope carries keeps its pill and a checke
   assert.equal(toggle.textContent, 'Advanced filter (0)');
 });
 
-test('a filtered deep link shows a closed panel and a bold "Advanced filter (1)"; opening it shows the filtered list (#333, as live)', async () => {
+test('a filtered deep link shows a closed panel and "Advanced filter (1)"; opening it shows the filtered list (#333, as live)', async () => {
   const { block, toggle } = await facetListing('/en/deeplink-index.json', '?filter[model][]=Peaq');
   assert.equal(toggle.getAttribute('aria-expanded'), 'false');
   assert.equal(block.classList.contains('facets-open'), false);
   assert.equal(toggle.textContent, 'Advanced filter (1)');
-  assert.ok(toggle.classList.contains('has-filters'), 'bold while a filter is on');
   click(toggle);
   assert.ok(block.classList.contains('facets-open'));
   assert.equal(block.querySelector('.facet-pill[data-facet="model"]').getAttribute('aria-expanded'), 'true', 'its options open, as live');
 });
 
-test('"Advanced filter (0)" is regular; the bold goes with the last filter (#333, as live)', async () => {
-  const { toggle } = await facetListing('/en/regular-toggle-index.json');
-  assert.equal(toggle.classList.contains('has-filters'), false);
+test('"Advanced filter (n)" stays regular weight with a filter on (PO decision, #333)', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = (await readFile(new URL('./listing.css', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  const toggleRules = [...css.matchAll(/([^{}]*listing-filter-toggle[^{}]*)\{([^}]*)\}/g)];
+  assert.ok(toggleRules.some(([, sel, body]) => /\.listing \.listing-filter-toggle\s*$/.test(sel.trim()) && /font-weight:\s*var\(--weight-regular\)/.test(body)));
+  assert.ok(!toggleRules.some(([, , body]) => /font-weight:\s*var\(--weight-bold\)/.test(body)), 'no bold state');
+  const { toggle } = await facetListing('/en/regular-toggle-index.json', '?filter[model][]=Peaq');
+  assert.equal(toggle.className, 'listing-filter-toggle', 'no state class that could set a weight');
 });
 
 test('402a: Esc closes an option list, then the panel; Esc elsewhere in the block is ignored', async () => {

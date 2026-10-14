@@ -17,7 +17,7 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 > News / Press Kits `facets` row; a group with no option in the migrated rows shows no pill. After a selection the
 > source also drops groups with no option left in the filtered results; EDS keeps the scoped set (all listings).
 > **Deep link, toggle, chip (PO re-test 2026-10-14, every listing):** a filtered deep link loads with the panel closed;
-> "Advanced filter (n)" is 700 while n > 0 and 400 at (0); the open panel's first pills sit 28px under the header; the
+> "Advanced filter (n)" stays 400 (PO; the source sets 700 while n > 0); the open panel's first pills sit 28px under the header; the
 > chip cross is skoda-bnr-icons `\e010` in a 21px box, flush with the label.
 > **Options are per page on the source** (order and set): `blocks/listing/facet-labels.json` holds each listing page's
 > own lists under `_pages`; on that page the block ranks by them and offers only those options (a deep-linked value

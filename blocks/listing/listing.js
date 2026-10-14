@@ -569,9 +569,9 @@ export default async function decorate(block) {
       pill.classList.toggle('active', n > 0);
       pill.querySelector('.facet-count').textContent = n ? String(n) : '';
     });
-    // the source always shows the count, "(0)" included, and sets it bold while a filter is on
+    // the source always shows the count, "(0)" included; regular weight in every state (PO,
+    // 2026-10-14, #333: the source turns it 700 while a filter is on)
     filterToggle.textContent = '';
-    filterToggle.classList.toggle('has-filters', activeFilterCount() > 0);
     const count = document.createElement('span');
     count.className = 'listing-filter-count';
     count.textContent = `(${activeFilterCount()})`;
@@ -816,7 +816,7 @@ export default async function decorate(block) {
   });
 
   // Initial paint (no pushState — respect the incoming URL). A deep link that already
-  // filters keeps the panel closed, as the source: only the bold "Advanced filter (n)" shows
+  // filters keeps the panel closed, as the source: only "Advanced filter (n)" shows
   // (PO, 2026-10-14, #333; it opened on 2026-09-29). The first filtered facet's options are
   // open, as the source shows them once its panel is opened.
   setFacetsOpen(false);
