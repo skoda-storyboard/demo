@@ -18,7 +18,7 @@
 import {
   decorateCardCells, isImageCell, optimizeImages, wireCardLink,
 } from '../../scripts/card-teaser.js';
-import { layoutTileRows } from '../../scripts/cards-tiles.js';
+import { layoutTileRows, isBannerToken } from '../../scripts/cards-tiles.js';
 
 const TILE_IMAGE_WIDTHS = {
   sq: '1250',
@@ -35,7 +35,19 @@ const TILE_IMAGE_WIDTHS = {
   'press-quarter': '750',
   'press-half': '1250',
   'press-third': '850',
+  'press-banner-wide': '1250',
+  'press-banner-narrow': '850',
+  'press-banner-half': '1250',
 };
+
+// An image-only banner tile (press mosaics): [size, linked picture], the image names the link.
+function bannerLink(cells) {
+  if (cells.length !== 2 || isImageCell(cells[0]) || !isImageCell(cells[1])) return null;
+  const link = cells[1].querySelector('a[href]');
+  const img = link?.querySelector('img');
+  if (!img || link.textContent.trim() || !link.getAttribute('href').trim()) return null;
+  return link;
+}
 
 export function parseTileRows(block) {
   if (!block.classList.contains('overlay')) {
@@ -47,6 +59,19 @@ export function parseTileRows(block) {
   const rows = [...block.children].map((row, index) => {
     const cells = [...row.children];
     if (!cells.length) throw new Error(`Cards tiles row ${index + 1}: missing cells`);
+    const banner = bannerLink(cells);
+    if (banner) {
+      if (!banner.querySelector('img').getAttribute('alt')?.trim()) {
+        throw new Error(`Cards tiles row ${index + 1}: a banner image needs alt text (its link's name)`);
+      }
+      const raw = cells[0].textContent.trim();
+      if (!isBannerToken(raw.split(/\s+/)[0])) {
+        throw new Error(`Cards tiles row ${index + 1}: a banner needs a banner size`);
+      }
+      return {
+        row, raw, link: banner, banner: true,
+      };
+    }
     const hasToken = !isImageCell(cells[0]) && cells.length !== 2;
     const raw = hasToken ? cells[0]?.textContent.trim() || '' : '';
     const image = cells[hasToken ? 1 : 0];
@@ -58,13 +83,26 @@ export function parseTileRows(block) {
       || title.textContent.trim() !== link.textContent.trim()) {
       throw new Error(`Cards tiles row ${index + 1}: expected [size, picture, linked title]`);
     }
+    if (isBannerToken(raw.split(/\s+/)[0])) {
+      throw new Error(`Cards tiles row ${index + 1}: "${raw}" is a banner size: author [size, linked picture]`);
+    }
     return {
       row, raw, title, link, hasToken,
     };
   });
-  const { tiles: layout, mode } = layoutTileRows(rows.map(({ raw }) => raw), { pressPage });
+  const tokens = rows.map(({ raw }) => raw);
+  const { tiles: layout, mode, columns } = layoutTileRows(tokens, { pressPage });
   const tiles = rows.map((row, index) => ({ ...row, ...layout[index] }));
-  return { tiles, mode };
+  return { tiles, mode, columns };
+}
+
+function bannerTile(link, token, rowStart) {
+  const li = document.createElement('li');
+  li.className = `tile-image-only tile-${token}`;
+  if (rowStart) li.classList.add('tile-row-start');
+  link.classList.add('tile-image-link');
+  li.append(link);
+  return li;
 }
 
 export default async function decorate(block) {
@@ -80,9 +118,14 @@ export default async function decorate(block) {
   const parsed = isTiles ? parseTileRows(block) : null;
   const ul = document.createElement('ul');
   if (parsed?.mode === 'press') ul.classList.add('tiles-press');
+  if (parsed?.columns === 30) ul.classList.add('tiles-press-mosaic');
   (parsed?.tiles || [...block.children].map((row) => ({ row }))).forEach(({
-    row, token, rowStart, title, link, hasToken,
+    row, token, rowStart, title, link, hasToken, banner,
   }) => {
+    if (banner) {
+      ul.append(bannerTile(link, token, rowStart));
+      return;
+    }
     const li = document.createElement('li');
     li.className = 'card-teaser';
     if (isTiles) {
@@ -110,11 +153,14 @@ export default async function decorate(block) {
         { media: '(min-width: 395px)', width: '1000' },
         { width: '750' },
       ],
+      // a banner's picture sits in its link, not in a card image
+      selector: parsed.tiles[index].banner ? '.tile-image-link img' : undefined,
     }));
   } else {
     optimizeImages(ul);
   }
-  [...ul.children].forEach((li) => wireCardLink(li));
+  [...ul.children].filter((li) => !li.classList.contains('tile-image-only'))
+    .forEach((li) => wireCardLink(li));
 
   block.replaceChildren(ul);
 }

@@ -142,19 +142,25 @@ function bannerAlt(href, img) {
   throw new Error(`Press-kit hub banner has no accessible name: ${href}`);
 }
 
+// A source banner (an image-only link) as our linked picture, named by bannerAlt.
+function bannerLink(source, document) {
+  const link = document.createElement('a');
+  link.href = bannerHref(source.href);
+  const img = source.querySelector('img').cloneNode(true);
+  img.removeAttribute('srcset');
+  img.removeAttribute('sizes');
+  img.alt = bannerAlt(link.href, source.querySelector('img'));
+  link.append(img);
+  return link;
+}
+
+// The banners after the tiles; a mosaic hub's banners are tiles already (`data-pk-mosaic`).
 function bannerLinks(content, document) {
-  return [...content.querySelectorAll('.widget_sow-editor .textwidget a[href]')]
+  return [...content.querySelectorAll('.widget_sow-editor .textwidget a[href]:not([data-pk-mosaic])')]
     .filter((a) => a.querySelector('img[src]'))
     .map((source) => {
-      const link = document.createElement('a');
-      link.href = bannerHref(source.href);
-      const img = source.querySelector('img').cloneNode(true);
-      img.removeAttribute('srcset');
-      img.removeAttribute('sizes');
-      img.alt = bannerAlt(link.href, source.querySelector('img'));
-      link.append(img);
       const p = document.createElement('p');
-      p.append(link);
+      p.append(bannerLink(source, document));
       return p;
     });
 }
@@ -214,7 +220,7 @@ export default {
     const description = leakedDescription(document, hero);
     if (description) facets.description = description;
     const heroBlock = parseHero(hero, document);
-    const tilesBlock = parseTiles(content, document);
+    const tilesBlock = parseTiles(content, document, { banner: (a) => bannerLink(a, document) });
     const banners = bannerLinks(content, document);
     const { intro, outro } = textWidgets(content, document);
 

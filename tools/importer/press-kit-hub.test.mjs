@@ -236,9 +236,9 @@ test('older kits: 2-wide and 1-wide + 2-square rows become half + quarter tiles'
   assert.equal(starts.length, 4, 'one row per source row');
 });
 
-// Classic Days 2026 (2026-10-13): a short square row in fifths, then three 2:1 thirds. The
-// cell widths come from the SiteOrigin head CSS, as on the source.
-function fifthsAndThirdsKit() {
+// Classic Days 2026 (2026-10-13): banners share rows with the tiles, so the hub is one mosaic.
+// Cell widths come from the SiteOrigin head CSS, as on the source.
+function mosaicKit() {
   let index = 0;
   const tile = (ratio) => {
     index += 1;
@@ -246,29 +246,51 @@ function fifthsAndThirdsKit() {
       <div class="ratio-container ratio-${ratio}"><img src="https://cdn.skoda-storyboard.com/c${index}.jpg" alt=""></div>
       <h2 class="heading">Chapter ${index}</h2></a></article>`;
   };
+  const banner = (slug, file) => `<div class="so-panel widget widget_sow-editor"><div class="textwidget"><p>
+    <a href="${root}classic-days-2026-press-kit/${slug}/"><img src="https://cdn.skoda-storyboard.com/2026/10/${file}.png" alt="${file}"></a></p></div></div>`;
   const cell = (id, html) => `<div class="panel-grid-cell" id="pgc-1-${id}">${html}</div>`;
-  const css = `#pgc-1-0-3 { width:40% } #pgc-1-0-0 , #pgc-1-0-1 , #pgc-1-0-2 { width:20% }
-    #pgc-1-1-0 , #pgc-1-1-1 , #pgc-1-1-2 { width:33.3333% }
+  const grid = (row, cells) => `<div class="panel-grid" id="pg-1-${row}">${cells.map((html, i) => cell(`${row}-${i}`, html)).join('')}</div>`;
+  const css = `#pgc-1-0-0 , #pgc-1-2-1 { width:60% } #pgc-1-0-1 , #pgc-1-1-3 , #pgc-1-2-0 { width:40% }
+    #pgc-1-1-0 , #pgc-1-1-1 , #pgc-1-1-2 { width:20% } #pgc-1-3-0 , #pgc-1-3-1 , #pgc-1-3-2 { width:33.3333% }
     @media (max-width:780px){ #pgc-1-0-0 , #pgc-1-1-0 { width:100% } }`;
   return new JSDOM(`<!doctype html><title>Kit</title><style>${css}</style><body class="single-press_kit">
     <article class="press_kit category-press-kits" data-publish-date="2026-10-12T08:00:00+02:00">
       <div class="hero"><div class="hero-image"><img src="https://cdn.skoda-storyboard.com/h.jpg" alt="Kit"></div><div class="hero-caption"><h1>Kit</h1></div></div>
       <div class="content">
-        <div class="panel-grid" id="pg-1-0">${cell('0-0', tile('1x1'))}${cell('0-1', tile('1x1'))}${cell('0-2', tile('1x1'))}${cell('0-3', '')}</div>
-        <div class="panel-grid" id="pg-1-1">${cell('1-0', tile('2x1'))}${cell('1-1', tile('2x1'))}${cell('1-2', tile('2x1'))}</div>
+        ${grid(0, [banner('skoda-museum', 'ClassicDays-Button-2540x800-Museum-EN_3ac482ac'), banner('skoda-museum', 'ClassicDays-Button-1670x800-Museum-EN_1a2b3c4d')])}
+        ${grid(1, [tile('1x1'), tile('1x1'), tile('1x1'), banner('60-years-of-the-trekka-an-suv-from-new-zealand', 'ClassicDays-Button-1670x800-Trekka-EN_07dc61cb')])}
+        ${grid(2, [banner('125-years-of-skoda-motorsport', 'ClassicDays-Button-1670x800-Octavia-EN_dcc4cafc'), banner('125-years-of-skoda-motorsport', 'ClassicDays-Button-2540x800-Motorsport-EN_957a831f')])}
+        ${grid(3, [tile('2x1'), tile('2x1'), tile('2x1')])}
       </div></article></body>`, { url: root }).window.document;
 }
 
-test('a short square row in fifths ends early; three 2:1 tiles become thirds', () => {
-  const { element } = output(fifthsAndThirdsKit(), `${root}classic-days-2026-press-kit/`);
+test('a hub whose banners share rows with its tiles is one mosaic, in source rows', () => {
+  const { element } = output(mosaicKit(), `${root}classic-days-2026-press-kit/`);
   const cards = [...element.querySelectorAll('table')].find((t) => t.rows[0].textContent.includes('Cards'));
-  const tokens = [...cards.rows].slice(1).map((row) => row.cells[0].textContent);
+  const rowsOut = [...cards.rows].slice(1);
+  const tokens = rowsOut.map((row) => row.cells[0].textContent);
   assert.deepEqual(tokens, [
-    'press-square', 'press-square', 'press-square end',
+    'press-banner-wide', 'press-banner-narrow',
+    'press-square', 'press-square', 'press-square', 'press-banner-narrow',
+    'press-banner-narrow', 'press-banner-wide',
     'press-third', 'press-third', 'press-third',
   ]);
-  const starts = layoutTileRows(tokens, { pressPage: true }).tiles.filter((tile) => tile.rowStart);
-  assert.equal(starts.length, 2, 'one row per source row');
+  const banners = rowsOut.filter((row) => row.cells.length === 2);
+  assert.equal(banners.length, 5, 'a banner is [size, linked picture]');
+  const trekka = banners[2].cells[1].querySelector('a');
+  assert.equal(trekka.getAttribute('href'), '/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand');
+  assert.equal(trekka.querySelector('img').alt, '60 years of the Trekka: an SUV from New Zealand');
+  assert.equal(element.querySelectorAll('img[src*="Trekka"]').length, 1, 'no repeat in a banner section');
+  assert.equal(element.textContent.includes('press-kit-banners'), false);
+  const starts = layoutTileRows(tokens, { pressPage: true }).tiles.filter((t) => t.rowStart);
+  assert.equal(starts.length, 4, 'one row per source row');
+});
+
+test('a mosaic cell of an unknown width fails instead of guessing a size', () => {
+  const doc = mosaicKit();
+  doc.querySelector('style').textContent = doc.querySelector('style').textContent.replace('#pgc-1-1-3 , ', '');
+  doc.querySelector('style').textContent += ' #pgc-1-1-3 { width:25% }';
+  assert.throws(() => output(doc, `${root}classic-days-2026-press-kit/`), /unsupported cell \(banner:25\)/);
 });
 
 test('older kits: an X timeline widget is dropped, not imported as intro text', () => {

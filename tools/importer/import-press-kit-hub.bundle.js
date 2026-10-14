@@ -92,15 +92,10 @@ var CustomImportScript = (() => {
     var _a, _b;
     return (_b = (_a = tile.querySelector(".ratio-container")) == null ? void 0 : _a.className.match(/\bratio-(\d+x\d+)\b/)) == null ? void 0 : _b[1];
   };
-  var cellWidthOf = (tile, widths) => {
-    var _a;
-    return widths[(_a = tile.closest(".panel-grid-cell")) == null ? void 0 : _a.id];
-  };
-  function rowTokens(tiles, rowIndex, widths = {}) {
+  function rowTokens(tiles, rowIndex) {
     const ratios = tiles.map(ratioOf);
     const wide = ratios.filter((ratio) => ratio === "2x1").length;
     const square = ratios.filter((ratio) => ratio === "1x1").length;
-    const cellWidths = tiles.map((tile) => cellWidthOf(tile, widths));
     if (tiles.length === 1 && ["2x1", "4x1"].includes(ratios[0])) return ["press-half end"];
     if (wide === 2 && square === 1 && tiles.length === 3) {
       return ratios.map((ratio) => ratio === "2x1" ? "feature" : "press-square");
@@ -108,41 +103,83 @@ var CustomImportScript = (() => {
     if (wide === 2 && tiles.length === 2 || wide === 1 && square === 2 && tiles.length === 3) {
       return ratios.map((ratio) => ratio === "2x1" ? "press-half" : "press-quarter");
     }
-    if (wide === 3 && tiles.length === 3) return Array(3).fill("press-third");
     if (square === tiles.length && tiles.length === 5) return Array(5).fill("press-square");
-    const fifths = cellWidths.every((w) => Math.round(w) === 20);
-    if (square === tiles.length && tiles.length < 5 && fifths) {
-      return tiles.map((tile, index) => index === tiles.length - 1 ? "press-square end" : "press-square");
-    }
     if (square === tiles.length) {
       return tiles.map((tile, index) => index === tiles.length - 1 && tiles.length % 4 ? "press-quarter end" : "press-quarter");
     }
     throw new Error(`Press-kit tile row ${rowIndex + 1} has an unsupported layout`);
   }
-  function parseTiles(content, document) {
-    const sourceRows = [...content.querySelectorAll(".panel-grid")].filter((grid) => !grid.parentElement.closest(".panel-grid")).map((grid) => [...grid.querySelectorAll("article.article-teaser")]).filter((tiles) => tiles.length);
-    if (!sourceRows.length) throw new Error("Press-kit hub has no chapter tiles");
-    const widths = siteOriginWidths(document);
-    const rows = [["Cards (overlay, tiles)"]];
-    sourceRows.forEach((tiles, rowIndex) => {
-      const tokens = rowTokens(tiles, rowIndex, widths);
-      tiles.forEach((tile, index) => {
-        const sourceLink = tile.querySelector(":scope > a[href]");
-        const sourceImage = tile.querySelector(".ratio-container img[src]");
-        const heading = tile.querySelector(".heading");
-        if (!sourceLink || !sourceImage || !(heading == null ? void 0 : heading.textContent.trim())) {
-          throw new Error(`Press-kit tile ${rows.length} needs a link, image and title`);
+  function tileRow(tile, token, rowNumber, document) {
+    const sourceLink = tile.querySelector(":scope > a[href]");
+    const sourceImage = tile.querySelector(".ratio-container img[src]");
+    const heading = tile.querySelector(".heading");
+    if (!sourceLink || !sourceImage || !(heading == null ? void 0 : heading.textContent.trim())) {
+      throw new Error(`Press-kit tile ${rowNumber} needs a link, image and title`);
+    }
+    const title = heading.textContent.replace(/\s+/g, " ").trim();
+    const img = sourceImage.cloneNode(true);
+    img.setAttribute("alt", title);
+    img.removeAttribute("srcset");
+    img.removeAttribute("sizes");
+    const link = document.createElement("a");
+    link.href = sourceLink.href;
+    link.textContent = title;
+    return [token, img, link];
+  }
+  var bannersIn = (cell) => [...cell.querySelectorAll(".widget_sow-editor .textwidget a[href]")].filter((a) => a.querySelector("img[src]"));
+  var cellsOf = (grid) => [...grid.querySelectorAll(
+    ":scope > .panel-grid-cell, :scope > .panel-row-style > .panel-grid-cell"
+  )];
+  var MOSAIC_TOKENS = {
+    "tile:1x1:20": "press-square",
+    "tile:2x1:33": "press-third",
+    "banner:60": "press-banner-wide",
+    "banner:40": "press-banner-narrow",
+    "banner:50": "press-banner-half"
+  };
+  function mosaicRows(grids, widths, banner, document) {
+    const rows = [];
+    grids.forEach((grid, rowIndex) => {
+      cellsOf(grid).forEach((cell) => {
+        const tiles = [...cell.querySelectorAll("article.article-teaser")];
+        const banners = bannersIn(cell);
+        if (!tiles.length && !banners.length) return;
+        const width = Math.round(widths[cell.id]);
+        if (tiles.length + banners.length !== 1) {
+          throw new Error(`Press-kit mosaic row ${rowIndex + 1}: one tile or banner per cell`);
         }
-        const title = heading.textContent.replace(/\s+/g, " ").trim();
-        const img = sourceImage.cloneNode(true);
-        img.setAttribute("alt", title);
-        img.removeAttribute("srcset");
-        img.removeAttribute("sizes");
-        const link = document.createElement("a");
-        link.href = sourceLink.href;
-        link.textContent = title;
-        rows.push([tokens[index], img, link]);
+        const key = tiles.length ? `tile:${ratioOf(tiles[0])}:${width}` : `banner:${width}`;
+        const token = MOSAIC_TOKENS[key];
+        if (!token) throw new Error(`Press-kit mosaic row ${rowIndex + 1}: unsupported cell (${key})`);
+        if (tiles.length) {
+          rows.push(tileRow(tiles[0], token, rows.length + 1, document));
+          return;
+        }
+        banners[0].setAttribute("data-pk-mosaic", "");
+        rows.push([token, banner(banners[0])]);
       });
+    });
+    return rows;
+  }
+  function parseTiles(content, document, { banner } = {}) {
+    const grids = [...content.querySelectorAll(".panel-grid")].filter((grid) => !grid.parentElement.closest(".panel-grid"));
+    const sourceRows = grids.map((grid) => [...grid.querySelectorAll("article.article-teaser")]).filter((tiles) => tiles.length);
+    if (!sourceRows.length) throw new Error("Press-kit hub has no chapter tiles");
+    const header = [["Cards (overlay, tiles)"]];
+    const mixed = grids.some((grid) => grid.querySelector("article.article-teaser") && cellsOf(grid).some((cell) => !cell.querySelector("article.article-teaser") && bannersIn(cell).length));
+    if (mixed) {
+      if (!banner) throw new Error("Press-kit tiles share rows with banners: not supported here");
+      const widths = siteOriginWidths(document);
+      const live = grids.filter((grid) => grid.querySelector("article.article-teaser") || bannersIn(grid).length);
+      return WebImporter.DOMUtils.createTable(
+        [...header, ...mosaicRows(live, widths, banner, document)],
+        document
+      );
+    }
+    const rows = [...header];
+    sourceRows.forEach((tiles, rowIndex) => {
+      const tokens = rowTokens(tiles, rowIndex);
+      tiles.forEach((tile, index) => rows.push(tileRow(tile, tokens[index], rows.length, document)));
     });
     return WebImporter.DOMUtils.createTable(rows, document);
   }
@@ -1064,17 +1101,20 @@ var CustomImportScript = (() => {
     }
     throw new Error(`Press-kit hub banner has no accessible name: ${href}`);
   }
+  function bannerLink(source, document) {
+    const link = document.createElement("a");
+    link.href = bannerHref(source.href);
+    const img = source.querySelector("img").cloneNode(true);
+    img.removeAttribute("srcset");
+    img.removeAttribute("sizes");
+    img.alt = bannerAlt(link.href, source.querySelector("img"));
+    link.append(img);
+    return link;
+  }
   function bannerLinks(content, document) {
-    return [...content.querySelectorAll(".widget_sow-editor .textwidget a[href]")].filter((a) => a.querySelector("img[src]")).map((source) => {
-      const link = document.createElement("a");
-      link.href = bannerHref(source.href);
-      const img = source.querySelector("img").cloneNode(true);
-      img.removeAttribute("srcset");
-      img.removeAttribute("sizes");
-      img.alt = bannerAlt(link.href, source.querySelector("img"));
-      link.append(img);
+    return [...content.querySelectorAll(".widget_sow-editor .textwidget a[href]:not([data-pk-mosaic])")].filter((a) => a.querySelector("img[src]")).map((source) => {
       const p = document.createElement("p");
-      p.append(link);
+      p.append(bannerLink(source, document));
       return p;
     });
   }
@@ -1119,7 +1159,7 @@ var CustomImportScript = (() => {
       const description = leakedDescription(document, hero);
       if (description) facets.description = description;
       const heroBlock = parseHero(hero, document);
-      const tilesBlock = parseTiles(content, document);
+      const tilesBlock = parseTiles(content, document, { banner: (a) => bannerLink(a, document) });
       const banners = bannerLinks(content, document);
       const { intro, outro } = textWidgets(content, document);
       const main = document.body;
