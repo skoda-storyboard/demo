@@ -127,7 +127,7 @@ var CustomImportScript = (() => {
   var DEFERRED = /* @__PURE__ */ new Set(["defer-charge-map", "defer-calculator"]);
   var DROPPED = /* @__PURE__ */ new Set(["offset", "newsletter", "share", "highlights"]);
   function classifyWidget(panel) {
-    if (/\bwidget_siteorigin-panels-builder\b/.test(panel.className || "")) return "nested-builder";
+    if (/siteorigin-panels-builder/.test(panel.className || "")) return "nested-builder";
     const inner = panel.querySelector('[class*="so-widget-"]');
     const signal = `${panel.className || ""} ${inner && inner.className || ""}`;
     for (const [re, kind] of WIDGET_KINDS) {
@@ -598,23 +598,42 @@ var CustomImportScript = (() => {
       row[0].forEach((n) => out.push(n));
     }
   }
+  function gridRow(grid, document2, stats, { inBlock = false } = {}) {
+    const row = [];
+    const cells = cellsOf(grid);
+    const nonEmpty = cells.filter((c) => panelsOf(c).length > 0);
+    if (nonEmpty.length > 1 && !inBlock) {
+      emitMultiColumn(nonEmpty, document2, row, stats);
+    } else {
+      cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document2, row, stats, { inBlock })));
+    }
+    return row;
+  }
+  function nestedGrids(panel) {
+    const layout = panel.querySelector(".panel-layout") || panel;
+    return [...layout.children].filter((grid) => grid.matches(".panel-grid"));
+  }
   function emitNestedRows(panel, document2, out, stats, { inBlock = false } = {}) {
-    const layout = panel.querySelector(".panel-layout");
-    if (!layout) return;
-    [...layout.children].filter((grid) => grid.matches(".panel-grid")).forEach((grid) => {
-      const cells = cellsOf(grid);
-      const nonEmpty = cells.filter((c) => panelsOf(c).length > 0);
-      if (nonEmpty.length > 1 && !inBlock) {
-        emitMultiColumn(nonEmpty, document2, out, stats);
-        return;
-      }
-      cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document2, out, stats, { inBlock })));
+    const grids = nestedGrids(panel);
+    if (!grids.length) {
+      stats.unknown.push(`nested builder without rows: ${panel.className || "(no class)"}`);
+      return;
+    }
+    grids.forEach((grid) => out.push(...gridRow(grid, document2, stats, { inBlock })));
+  }
+  function expandGrids(grids) {
+    return grids.flatMap((grid) => {
+      if (grid.hasAttribute(HIGHLIGHT_ATTR)) return [grid];
+      const panels = cellsOf(grid).flatMap(panelsOf);
+      if (panels.length !== 1 || classifyWidget(panels[0]) !== "nested-builder") return [grid];
+      const inner = nestedGrids(panels[0]);
+      return inner.length ? expandGrids(inner) : [grid];
     });
   }
   function parse2(element, { document: document2 }) {
     const layout = element.querySelector(".panel-layout, .panel-grid");
     if (!layout) return;
-    const grids = [...element.querySelectorAll(".panel-grid")].filter((g) => !g.parentElement.closest(".so-panel"));
+    const grids = expandGrids([...element.querySelectorAll(".panel-grid")].filter((g) => !g.parentElement.closest('.so-panel, [class*="widget_"]')));
     const out = [];
     const stats = {
       grids: grids.length,
@@ -627,14 +646,7 @@ var CustomImportScript = (() => {
     let resume = false;
     grids.forEach((grid) => {
       const variant = grid.getAttribute(HIGHLIGHT_ATTR);
-      const row = [];
-      const cells = cellsOf(grid);
-      const nonEmpty = cells.filter((c) => panelsOf(c).length > 0);
-      if (nonEmpty.length > 1) {
-        emitMultiColumn(nonEmpty, document2, row, stats);
-      } else {
-        cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document2, row, stats)));
-      }
+      const row = gridRow(grid, document2, stats);
       if (!row.length) return;
       if (variant) {
         const geometry = GEOMETRY_KEYS.filter((key) => grid.hasAttribute(`data-${key}`)).map((key) => [key, grid.getAttribute(`data-${key}`)]);

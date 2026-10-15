@@ -18,7 +18,7 @@ import {
   feedMediaRefs, feedCoverageGaps,
   feedThumbnails, carrierDocs, parseCarrier, withMediaBus, CARRIER_MAX,
   damIndex, damFile, withDamFiles, libraryRequest, librarySlices, libraryNonce, cardFocus,
-  normalizePosters,
+  normalizePosters, mergeQueries, matchesFilter,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 import { logicalId } from '../media/media-lib.mjs';
@@ -484,4 +484,29 @@ test('normalizePosters: a re-published sheet\'s video posters take the 1280×720
   assert.equal(out.data[2].image, 'https://i.vimeocdn.com/video/2-cd-d_640', 'only video rows');
   assert.equal(out.total, 3);
   assert.equal(sheet.data[0].image, 'https://i.vimeocdn.com/video/1-ab-d_640', 'the input is not changed');
+});
+
+test('mergeQueries: one query per type + filter (facet order aside), the largest n, first-seen order', () => {
+  const merged = mergeQueries([
+    { type: 'image', filter: { model: 'peaq' }, n: 30 },
+    { type: 'image', n: 24 },
+    { type: 'video', filter: { model: 'peaq' }, n: 24 },
+    { type: 'image', filter: { model: 'peaq' }, n: 20 },
+    { type: 'image', filter: { bodywork: 'suv', model: 'kodiaq' }, n: 20 },
+    { type: 'image', filter: { model: 'kodiaq', bodywork: 'suv' }, n: 40 },
+  ]);
+  assert.deepEqual(merged.map((q) => [q.type, JSON.stringify(q.filter || {}), q.n]), [
+    ['image', '{"model":"peaq"}', 30],
+    ['image', '{}', 24],
+    ['video', '{"model":"peaq"}', 24],
+    ['image', '{"bodywork":"suv","model":"kodiaq"}', 40],
+  ]);
+});
+
+test('matchesFilter: every facet value of the filter, AND across facets', () => {
+  const item = { terms: { model: ['kodiaq', 'enyaq'], derivative: ['rs'] } };
+  assert.equal(matchesFilter(item, { model: 'kodiaq', derivative: 'rs' }), true);
+  assert.equal(matchesFilter(item, { model: 'kodiaq', bodywork: 'suv' }), false);
+  assert.equal(matchesFilter(item, {}), true);
+  assert.equal(matchesFilter({ terms: {} }, { model: 'kodiaq' }), false);
 });

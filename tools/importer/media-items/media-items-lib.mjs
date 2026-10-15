@@ -191,6 +191,29 @@ export function vimeoPoster(src) {
 }
 
 /**
+ * Listing queries with one per type + filter, in first-seen order, keeping the largest `n`
+ * (a model rail's 20 is a slice of a listing query's 30 on the same filter).
+ * @param {Array<{type: string, filter?: object, n: number}>} queries
+ * @returns {Array<{type: string, filter?: object, n: number}>}
+ */
+export function mergeQueries(queries) {
+  const byKey = new Map();
+  queries.forEach((q) => {
+    const filter = Object.fromEntries(Object.entries(q.filter || {})
+      .sort(([a], [b]) => a.localeCompare(b)));
+    const key = JSON.stringify([q.type, filter]);
+    const prev = byKey.get(key);
+    if (!prev) byKey.set(key, { ...q });
+    else prev.n = Math.max(prev.n || 0, q.n || 0);
+  });
+  return [...byKey.values()];
+}
+
+/** Does an item carry every facet value of a filter (`{ model: 'kodiaq', derivative: 'rs' }`)? */
+export const matchesFilter = (item, filter = {}) => Object.entries(filter)
+  .every(([tax, value]) => (item.terms[tax] || []).includes(value));
+
+/**
  * A feed sheet with its Vimeo posters in the one 1280×720 JPEG form (`vimeoPoster`), so a
  * re-published sheet built before a form was known still has recordable image URLs.
  * @param {{data: object[]}} sheet

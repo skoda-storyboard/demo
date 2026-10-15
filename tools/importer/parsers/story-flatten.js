@@ -107,9 +107,10 @@ const DEFERRED = new Set(['defer-charge-map', 'defer-calculator']);
 const DROPPED = new Set(['offset', 'newsletter', 'share', 'highlights']);
 
 function classifyWidget(panel) {
-  // a nested layout's own class wins: its first inner widget (often a text editor) would
-  // otherwise name the whole layout, and only that widget would survive (SKODA-516)
-  if (/\bwidget_siteorigin-panels-builder\b/.test(panel.className || '')) return 'nested-builder';
+  // a nested layout's own class wins (bare or `widget_`): its first inner widget (often a
+  // text editor) would otherwise name the whole layout, and only that widget would survive
+  // (SKODA-516)
+  if (/siteorigin-panels-builder/.test(panel.className || '')) return 'nested-builder';
   const inner = panel.querySelector('[class*="so-widget-"]');
   const signal = `${panel.className || ''} ${(inner && inner.className) || ''}`;
   for (const [re, kind] of WIDGET_KINDS) {
@@ -714,20 +715,51 @@ function emitMultiColumn(cells, document, out, stats) {
   }
 }
 
-// A nested layout builder's own rows, in order: a single-column row linearizes and a genuine
-// multi-column row becomes Columns, as at the top level; inside a Columns cell every row
-// linearizes (blocks don't nest).
+// One grid row → its nodes: a genuine multi-column row becomes Columns, a single column
+// linearizes its widgets in order. `inBlock` (the row sits in a Columns cell): it linearizes
+// too, so no Columns opens inside a Columns (a widget's own block, e.g. a slider, is kept
+// there as at the top level).
+function gridRow(grid, document, stats, { inBlock = false } = {}) {
+  const row = [];
+  const cells = cellsOf(grid);
+  const nonEmpty = cells.filter((c) => panelsOf(c).length > 0);
+  if (nonEmpty.length > 1 && !inBlock) {
+    emitMultiColumn(nonEmpty, document, row, stats);
+  } else {
+    cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document, row, stats, { inBlock })));
+  }
+  return row;
+}
+
+// A nested layout builder's own rows: those of its `.panel-layout`, or rows set straight
+// in the widget.
+function nestedGrids(panel) {
+  const layout = panel.querySelector('.panel-layout') || panel;
+  return [...layout.children].filter((grid) => grid.matches('.panel-grid'));
+}
+
+// A nested builder beside other widgets: its rows flatten in place (no highlight sections
+// there; a row holding nothing but the builder is unwrapped by expandGrids instead). A
+// builder with no rows is logged, never dropped silently.
 function emitNestedRows(panel, document, out, stats, { inBlock = false } = {}) {
-  const layout = panel.querySelector('.panel-layout');
-  if (!layout) return;
-  [...layout.children].filter((grid) => grid.matches('.panel-grid')).forEach((grid) => {
-    const cells = cellsOf(grid);
-    const nonEmpty = cells.filter((c) => panelsOf(c).length > 0);
-    if (nonEmpty.length > 1 && !inBlock) {
-      emitMultiColumn(nonEmpty, document, out, stats);
-      return;
-    }
-    cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document, out, stats, { inBlock })));
+  const grids = nestedGrids(panel);
+  if (!grids.length) {
+    stats.unknown.push(`nested builder without rows: ${panel.className || '(no class)'}`);
+    return;
+  }
+  grids.forEach((grid) => out.push(...gridRow(grid, document, stats, { inBlock })));
+}
+
+// Older stories keep their whole body in one nested builder (the Miss Peaches series): a
+// plain row whose only widget is a builder stands for that builder's rows, so they take
+// part in the body as top-level rows (highlight sections and their geometry included).
+function expandGrids(grids) {
+  return grids.flatMap((grid) => {
+    if (grid.hasAttribute(HIGHLIGHT_ATTR)) return [grid];
+    const panels = cellsOf(grid).flatMap(panelsOf);
+    if (panels.length !== 1 || classifyWidget(panels[0]) !== 'nested-builder') return [grid];
+    const inner = nestedGrids(panels[0]);
+    return inner.length ? expandGrids(inner) : [grid];
   });
 }
 
@@ -737,10 +769,10 @@ export default function parse(element, { document }) {
   // the template's default-content selection handles the plain-post body.
   if (!layout) return;
 
-  const grids = [...element.querySelectorAll('.panel-grid')]
-    // only top-level grids (a nested-builder grid lives inside a widget; the
-    // defer-nested-builder path handles those — don't double-walk).
-    .filter((g) => !g.parentElement.closest('.so-panel'));
+  const grids = expandGrids([...element.querySelectorAll('.panel-grid')]
+    // only top-level grids: a nested builder's grids live inside its widget (`.so-panel`, or
+    // a bare `widget_…` panel) and are walked through it, never twice
+    .filter((g) => !g.parentElement.closest('.so-panel, [class*="widget_"]')));
 
   const out = [];
   const stats = {
@@ -757,15 +789,7 @@ export default function parse(element, { document }) {
   let resume = false; // a highlight section was closed and the body hasn't resumed yet
   grids.forEach((grid) => {
     const variant = grid.getAttribute(HIGHLIGHT_ATTR);
-    const row = [];
-    const cells = cellsOf(grid);
-    const nonEmpty = cells.filter((c) => panelsOf(c).length > 0);
-    if (nonEmpty.length > 1) {
-      emitMultiColumn(nonEmpty, document, row, stats);
-    } else {
-      // Single column (the common case): linearize widgets in order.
-      cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document, row, stats)));
-    }
+    const row = gridRow(grid, document, stats);
     if (!row.length) return;
     if (variant) {
       const geometry = GEOMETRY_KEYS.filter((key) => grid.hasAttribute(`data-${key}`))

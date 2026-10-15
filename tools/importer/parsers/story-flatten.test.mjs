@@ -800,3 +800,52 @@ test('classifyWidget: a nested builder whose first widget is a text editor is st
   </div></div></div></div>`);
   assert.equal(classifyWidget(d.querySelector('.so-panel')), 'nested-builder');
 });
+
+// #516 review: a row holding only a nested builder stands for that builder's rows
+const builderRow = (id, inner) => `<div id="${id}" class="panel-grid panel-no-style"><div class="panel-grid-cell">
+  <div class="so-panel widget widget_siteorigin-panels-builder"><div class="panel-layout">${inner.join('')}</div></div></div></div>`;
+
+test('a highlight row inside a body-only nested builder keeps its highlight section (#516 review)', { skip: domSkip }, () => {
+  const d = storyDoc('#pg-3-1> .panel-row-style { background-color:#0e3a2f }', [
+    builderRow('pg-1-0', [
+      editorRow('pg-3-0', '<p>Intro</p>'),
+      editorRow('pg-3-1', '<h3>Panel title</h3><p>Panel</p>'),
+      editorRow('pg-3-2', '<p>Outro</p>'),
+    ]),
+  ]);
+  markHighlights(d);
+  assert.deepEqual(flow(d), [
+    ['p', 'Intro'],
+    ['hr'], ['h3', 'Panel title'], ['p', 'Panel'], ['meta', 'body-column, highlight-dark'],
+    ['hr'], ['meta', 'body-column'], ['p', 'Outro'],
+  ]);
+});
+
+test('a builder without the so-panel class is walked once, not twice (#516 review)', { skip: domSkip }, () => {
+  const d = domDoc(`<div class="entry-content"><div class="panel-layout">
+    ${row(cell(editor('Lead')), cell(`<div class="widget widget_siteorigin-panels-builder"><div class="panel-layout">${row(cell(editor('Inside')))}</div></div>`))}
+  </div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  assert.equal(content.textContent.match(/Inside/g)?.length, 1);
+});
+
+test('a builder with its rows set straight in the widget flattens them; one with no rows is logged (#516 review)', { skip: domSkip }, () => {
+  const d = domDoc(`<div class="entry-content"><div class="panel-layout">
+    ${row(cell(editor('Before') + `<div class="so-panel widget widget_siteorigin-panels-builder">${row(cell(editor('Direct row')))}</div>`))}
+    ${row(cell(editor('After') + '<div class="so-panel widget widget_siteorigin-panels-builder"><p>no rows</p></div>'))}
+  </div></div>`);
+  const content = d.querySelector('.entry-content');
+  const warned = [];
+  const realWarn = console.warn;
+  console.warn = (...args) => warned.push(args.join(' '));
+  try { parse(content, { document: d }); } finally { console.warn = realWarn; }
+  assert.deepEqual([...content.querySelectorAll(':scope > p')].map((p) => p.textContent), ['Before', 'Direct row', 'After']);
+  assert.match(warned.join('\n'), /deferred\/unknown widgets: .*"unknown":\["nested builder without rows: so-panel widget widget_siteorigin-panels-builder"\]/);
+});
+
+test('classifyWidget: the bare siteorigin-panels-builder class wins over its first editor too (#516 review)', { skip: domSkip }, () => {
+  const d = domDoc(`<div class="so-panel siteorigin-panels-builder"><div class="panel-layout"><div class="panel-grid"><div class="panel-grid-cell">
+    <div class="so-panel widget widget_sow-editor"><div class="so-widget-sow-editor"><p>x</p></div></div></div></div></div></div>`);
+  assert.equal(classifyWidget(d.querySelector('.so-panel')), 'nested-builder');
+});
