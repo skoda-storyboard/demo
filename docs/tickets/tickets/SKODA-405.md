@@ -17,3 +17,7 @@ Generate an RSS 2.0 feed from the per-locale query-index (footer link continuity
 
 ## Agent handoff
 agent-fit + first agent-eval pick (handoff candidate A1): success == a green validator run.
+
+## M2 readiness review (2026-10-15)
+- **Output paths to keep:** the source footer links **`/en/feed/`** (RSS) and **`/en/press-releases/feed/`**, which 302s to `/en/feed/?post_type=press_release`. Both are on every page. The EDS feeds need these URLs, or redirect rows from them, so existing subscribers keep working.
+- Census: [coverage matrix](../../planning/SKODA-PAGE-COVERAGE-MATRIX.md) §3.

@@ -38,8 +38,9 @@ Measurable gates live in [`template-page-base.md` §10](../../ui-specs/template-
 - [ ] Visual diff vs source at 1280/500 ≤ 2% per-pixel (hero + body).
 
 ## Dependencies
-- Upstream: SKODA-202 (hero), SKODA-802 (remaining-templates import), SKODA-304/305 (footers)
-- Downstream: SKODA-810 (company sub-type blocks fill the MR variant), SKODA-1001 (per-locale trees)
+- Upstream: SKODA-202 (hero), SKODA-304/305 (footers), SKODA-309 (MR side chrome), SKODA-814 (SiteOrigin body contract)
+- Downstream: SKODA-810 (company sub-type blocks fill the MR variant), SKODA-802 (remaining-templates import), SKODA-843 / 844 / 845 (generic, featured-image and newsletter pages), SKODA-1001 (per-locale trees)
+- *(2026-10-15: 802 moved from upstream to downstream. The shell doesn't need the remaining-templates import; that import needs the shell. OVERVIEW listed 202, 801.)*
 
 ## Risks / Flags
 - **Mobile heading scale (🟡):** source keeps 48px/40px on mobile; default add a modest mobile step (confirm vs source-faithful).

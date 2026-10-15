@@ -41,3 +41,8 @@ Measurable gates live in [`custom-microsite.md` §9](../../ui-specs/custom-micro
 - **Migrate / fold / drop decision (🔴 blocking scope):** 201 mostly-dated campaign pages, needs a client call + cutoff date before build. Estimate assumes the "fold into generic Page + drop expired" path; a bespoke template would be larger.
 - **Gallery volume (🟡):** 264 tiles on one page, lazy-load + performance budget matter.
 - `featured-image` micro-posts (~30 pages, recount §2) are a related minor long-tail, fold into the same decision.
+
+## M2 readiness review (2026-10-15)
+- **Volume (EN):** 201 `template-custom-full-width` pages. About 111 are event-gallery pages: day pages have 60+ colorbox images (e.g. Classic Days 2025, day one: 63). About 36 are legacy press kits authored as pages; some 302 to `/en/press-kits/…`. About 54 are other: campaign pages with Czech slugs, several with ~4 words, plus Company Logo (→ 810).
+- Event-gallery hubs also sit on `template-tiles` (~23) and `page-template-default` (~17). The migrate / fold / drop decision should cover all three.
+- Census: [coverage matrix](../../planning/SKODA-PAGE-COVERAGE-MATRIX.md) §2.
