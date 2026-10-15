@@ -59,7 +59,9 @@
  *   skoda-newsletter-widget   0.01%  → dropped (chrome/service)
  *   k2tools-charge-map         0.1%  → DEFERRED: skip + log (interactive external app)
  *   k2tools-charging-calc     0.01%  → DEFERRED: skip + log
- *   siteorigin-panels-builder 0.02%  → DEFERRED: skip + log (nested-builder safety net)
+ *   siteorigin-panels-builder 0.02%  → its rows, flattened as the top-level ones (older stories
+ *                                       keep their whole body in one: the Miss Peaches series,
+ *                                       SKODA-516); inside a Columns cell they linearize
  *   inline <img> in sow-editor        → lifted to direct child; alt + data-caption kept
  *
  * GROUPING IS FAITHFUL — ONE WIDGET, ONE BLOCK (confirmed 2026-09-24). Image grouping
@@ -98,13 +100,16 @@ const WIDGET_KINDS = [
   // Deferred interactive widgets (census §7): skip + log, confirm render-vs-drop.
   [/k2tools-charge-map/, 'defer-charge-map'],
   [/k2tools-charging-calculator/, 'defer-calculator'],
-  [/siteorigin-panels-builder/, 'defer-nested-builder'],
+  [/siteorigin-panels-builder/, 'nested-builder'],
 ];
 
-const DEFERRED = new Set(['defer-charge-map', 'defer-calculator', 'defer-nested-builder']);
+const DEFERRED = new Set(['defer-charge-map', 'defer-calculator']);
 const DROPPED = new Set(['offset', 'newsletter', 'share', 'highlights']);
 
 function classifyWidget(panel) {
+  // a nested layout's own class wins: its first inner widget (often a text editor) would
+  // otherwise name the whole layout, and only that widget would survive (SKODA-516)
+  if (/\bwidget_siteorigin-panels-builder\b/.test(panel.className || '')) return 'nested-builder';
   const inner = panel.querySelector('[class*="so-widget-"]');
   const signal = `${panel.className || ''} ${(inner && inner.className) || ''}`;
   for (const [re, kind] of WIDGET_KINDS) {
@@ -646,12 +651,15 @@ function panelsOf(cell) {
 }
 
 // Flatten one widget → nodes / block table appended to `out`. Returns a stats delta.
-function emitWidget(panel, document, out, stats) {
+// `inBlock`: the widget sits in a Columns cell, where a nested layout can't open another block.
+function emitWidget(panel, document, out, stats, { inBlock = false } = {}) {
   const kind = classifyWidget(panel);
   stats.byKind[kind] = (stats.byKind[kind] || 0) + 1;
 
   if (DEFERRED.has(kind)) { stats.deferred.push(kind); return; }
   if (DROPPED.has(kind)) return;
+  // eslint-disable-next-line no-use-before-define
+  if (kind === 'nested-builder') { emitNestedRows(panel, document, out, stats, { inBlock }); return; }
 
   let cells = null;
   let nodes = null;
@@ -690,7 +698,7 @@ function emitMultiColumn(cells, document, out, stats) {
   const filled = [];
   cells.forEach((cell) => {
     const cellOut = [];
-    panelsOf(cell).forEach((p) => emitWidget(p, document, cellOut, stats));
+    panelsOf(cell).forEach((p) => emitWidget(p, document, cellOut, stats, { inBlock: true }));
     if (cellOut.length) { row.push(cellOut); filled.push(cell); }
   });
   if (row.length > 1) {
@@ -704,6 +712,23 @@ function emitMultiColumn(cells, document, out, stats) {
     // Only one non-empty column after mapping — linearize (no block needed).
     row[0].forEach((n) => out.push(n));
   }
+}
+
+// A nested layout builder's own rows, in order: a single-column row linearizes and a genuine
+// multi-column row becomes Columns, as at the top level; inside a Columns cell every row
+// linearizes (blocks don't nest).
+function emitNestedRows(panel, document, out, stats, { inBlock = false } = {}) {
+  const layout = panel.querySelector('.panel-layout');
+  if (!layout) return;
+  [...layout.children].filter((grid) => grid.matches('.panel-grid')).forEach((grid) => {
+    const cells = cellsOf(grid);
+    const nonEmpty = cells.filter((c) => panelsOf(c).length > 0);
+    if (nonEmpty.length > 1 && !inBlock) {
+      emitMultiColumn(nonEmpty, document, out, stats);
+      return;
+    }
+    cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document, out, stats, { inBlock })));
+  });
 }
 
 export default function parse(element, { document }) {

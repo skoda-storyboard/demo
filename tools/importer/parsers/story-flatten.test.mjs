@@ -100,7 +100,7 @@ const CASES = [
   ['so-panel ys-so-widget-highlights', 'highlights'],
   ['so-panel so-widget-k2tools-charge-map', 'defer-charge-map'],
   ['so-panel so-widget-k2tools-charging-calculator', 'defer-calculator'],
-  ['so-panel siteorigin-panels-builder', 'defer-nested-builder'],
+  ['so-panel siteorigin-panels-builder', 'nested-builder'],
   ['so-panel widget widget_totally-unknown-xyz', 'unknown'],
 ];
 
@@ -761,4 +761,42 @@ test('bold headings: only wholly bold source headings get their <strong> back', 
   assert.equal(partly.querySelector('strong'), null);
   assert.equal(split.querySelector('strong').textContent.trim(), 'Careful Planning');
   assert.equal(d.querySelectorAll('[data-skoda-bold]').length, 0, 'no mark reaches DA');
+});
+
+// ---- nested layout builder (SKODA-516: the Miss Peaches stories keep their body in one) ----
+const editor = (text) => `<div class="so-panel widget widget_sow-editor"><div class="siteorigin-widget-tinymce textwidget"><p>${text}</p></div></div>`;
+const cell = (inner) => `<div class="panel-grid-cell">${inner}</div>`;
+const row = (...cells) => `<div class="panel-grid">${cells.join('')}</div>`;
+const builder = (...rows) => `<div class="so-panel widget widget_siteorigin-panels-builder"><div class="panel-layout">${rows.join('')}</div></div>`;
+
+test('a nested layout builder flattens its rows in order; a 2-cell row inside it → Columns', { skip: domSkip }, () => {
+  const d = domDoc(`<div class="entry-content"><div class="panel-layout">
+    ${row(cell(builder(row(cell(editor('First'))), row(cell(editor('Second') + editor('Third'))), row(cell(editor('Left')), cell(editor('Right'))), row(cell(editor('Last'))))))}
+  </div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  const paras = [...content.querySelectorAll(':scope > p')].map((p) => p.textContent);
+  assert.deepEqual(paras, ['First', 'Second', 'Third', 'Last'], 'every row, in order (was: none, deferred)');
+  const columns = content.querySelector('table[data-block="Columns"]');
+  assert.ok(columns, 'the genuine 2-cell row');
+  assert.deepEqual([...columns.querySelectorAll('td')].map((td) => td.textContent), ['Left', 'Right']);
+});
+
+test('a nested builder inside a Columns cell linearizes (blocks do not nest)', { skip: domSkip }, () => {
+  const d = domDoc(`<div class="entry-content"><div class="panel-layout">
+    ${row(cell(editor('Side')), cell(builder(row(cell(editor('A')), cell(editor('B'))))))}
+  </div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  const tables = content.querySelectorAll('table');
+  assert.equal(tables.length, 1, 'one Columns, no table inside it');
+  assert.equal(tables[0].querySelectorAll('table').length, 0);
+  assert.match(tables[0].textContent, /Side[\s\S]*A[\s\S]*B/);
+});
+
+test('classifyWidget: a nested builder whose first widget is a text editor is still a nested builder', { skip: domSkip }, () => {
+  const d = domDoc(`<div class="so-panel widget widget_siteorigin-panels-builder"><div class="panel-layout"><div class="panel-grid"><div class="panel-grid-cell">
+    <div class="so-panel widget widget_sow-editor"><div class="so-widget-sow-editor"><div class="siteorigin-widget-tinymce textwidget"><p>First</p></div></div></div>
+  </div></div></div></div>`);
+  assert.equal(classifyWidget(d.querySelector('.so-panel')), 'nested-builder');
 });

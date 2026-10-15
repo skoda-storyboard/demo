@@ -122,11 +122,12 @@ var CustomImportScript = (() => {
     // Deferred interactive widgets (census §7): skip + log, confirm render-vs-drop.
     [/k2tools-charge-map/, "defer-charge-map"],
     [/k2tools-charging-calculator/, "defer-calculator"],
-    [/siteorigin-panels-builder/, "defer-nested-builder"]
+    [/siteorigin-panels-builder/, "nested-builder"]
   ];
-  var DEFERRED = /* @__PURE__ */ new Set(["defer-charge-map", "defer-calculator", "defer-nested-builder"]);
+  var DEFERRED = /* @__PURE__ */ new Set(["defer-charge-map", "defer-calculator"]);
   var DROPPED = /* @__PURE__ */ new Set(["offset", "newsletter", "share", "highlights"]);
   function classifyWidget(panel) {
+    if (/\bwidget_siteorigin-panels-builder\b/.test(panel.className || "")) return "nested-builder";
     const inner = panel.querySelector('[class*="so-widget-"]');
     const signal = `${panel.className || ""} ${inner && inner.className || ""}`;
     for (const [re, kind] of WIDGET_KINDS) {
@@ -518,7 +519,7 @@ var CustomImportScript = (() => {
       ':scope > .panel-cell-style > [class*="widget_"]'
     ].join(", "))];
   }
-  function emitWidget(panel, document2, out, stats) {
+  function emitWidget(panel, document2, out, stats, { inBlock = false } = {}) {
     const kind = classifyWidget(panel);
     stats.byKind[kind] = (stats.byKind[kind] || 0) + 1;
     if (DEFERRED.has(kind)) {
@@ -526,6 +527,10 @@ var CustomImportScript = (() => {
       return;
     }
     if (DROPPED.has(kind)) return;
+    if (kind === "nested-builder") {
+      emitNestedRows(panel, document2, out, stats, { inBlock });
+      return;
+    }
     let cells = null;
     let nodes = null;
     switch (kind) {
@@ -576,7 +581,7 @@ var CustomImportScript = (() => {
     const filled = [];
     cells.forEach((cell) => {
       const cellOut = [];
-      panelsOf(cell).forEach((p) => emitWidget(p, document2, cellOut, stats));
+      panelsOf(cell).forEach((p) => emitWidget(p, document2, cellOut, stats, { inBlock: true }));
       if (cellOut.length) {
         row.push(cellOut);
         filled.push(cell);
@@ -592,6 +597,19 @@ var CustomImportScript = (() => {
     } else if (row.length === 1) {
       row[0].forEach((n) => out.push(n));
     }
+  }
+  function emitNestedRows(panel, document2, out, stats, { inBlock = false } = {}) {
+    const layout = panel.querySelector(".panel-layout");
+    if (!layout) return;
+    [...layout.children].filter((grid) => grid.matches(".panel-grid")).forEach((grid) => {
+      const cells = cellsOf(grid);
+      const nonEmpty = cells.filter((c) => panelsOf(c).length > 0);
+      if (nonEmpty.length > 1 && !inBlock) {
+        emitMultiColumn(nonEmpty, document2, out, stats);
+        return;
+      }
+      cells.forEach((cell) => panelsOf(cell).forEach((p) => emitWidget(p, document2, out, stats, { inBlock })));
+    });
   }
   function parse2(element, { document: document2 }) {
     const layout = element.querySelector(".panel-layout, .panel-grid");
