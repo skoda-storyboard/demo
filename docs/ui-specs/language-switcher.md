@@ -35,10 +35,13 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 >
 > **Contrast (§6):**
 > - The live `#7c7d7e` is 3.30:1 on `#e6e6e6`, 3.65:1 on `#f1f1f1` and 4.12:1 on white, **failing AA** everywhere.
-> - EDS uses `--skoda-grey-700` `#5a5b5c`: 5.45 / 6.03 / 6.81:1. The nearest same-hue grey that passes,
+> - EDS used `--skoda-grey-700` `#5a5b5c`: 5.45 / 6.03 / 6.81:1. The nearest same-hue grey that passes,
 >   `#666768` (4.54:1 on `#e6e6e6`), is too close to the limit and isn't a token.
 > - **Superseded (PO, 2026-10-13, #243 QA):** EDS matches the source `#7c7d7e` (`--skoda-grey-500`), accepting
 >   the AA shortfall above (SKODA-703: "as source, accepted").
+> - **The topbar "Subscribe to our stories" CTA follows (#272 QA, PR #352, approved 2026-10-14):** the same
+>   source `#7c7d7e`, under the same exception (3.30:1 on the topbar). It is "as source, accepted", not an
+>   AA pass.
 
 ## 1. Identity
 
@@ -234,7 +237,8 @@ Every link was clicked on the home page, a story, a press release, the Media Roo
 >   without one are hidden. The fragments' locale row keeps the order and the Media Room DE → `skoda-media.de`
 >   override.
 > - **Out of the pilot:** language-negotiated root routing and per-locale placeholders (SKODA-1003).
-> - **Contrast:** inactive links use the source `--skoda-grey-500` `#7c7d7e` (PO, 2026-10-13, #243), below AA.
+> - **Contrast:** inactive links use the source `--skoda-grey-500` `#7c7d7e` (PO, 2026-10-13, #243), below AA;
+>   the topbar "Subscribe" CTA too (#272, PR #352). Both are "as source, accepted" (SKODA-703).
 
 - **Control form:** source is **inline links**; recommend keeping **inline links** as the EDS-native
   default (lightest, no JS, matches source). A dropdown/disclosure is only worth it if the locale count
