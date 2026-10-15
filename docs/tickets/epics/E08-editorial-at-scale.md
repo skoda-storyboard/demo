@@ -21,8 +21,22 @@
 - **SKODA-813 — Generic Page base shell** (2SP) — shared hero + single-column SiteOrigin shell for legal/utility pages (STO `page-template-default`) and the MR `media-room-page` variant that hosts the company blocks. Added 2026-09-15 (ui-specs). Spec `ui-specs/template-page-base.md`.
 - **SKODA-814 — SiteOrigin body-flatten contract** (5SP) — the flatten machinery for the SiteOrigin Page-Builder body region (**1,614 pages**; feeds SKODA-801/208/813). Structure + core type measured live. Added 2026-09-15 (block recount). Spec `ui-specs/siteorigin-body.md`.
 
+### Added after 2026-09-15 (M2 readiness review, 2026-10-15)
+- **Done in M1:** 801a, 805a–d, 806 / 807 / 808 (#67 / #68 / #69), 816–824, 827 (#191; the ID was reused for the home regression after the float-dock draft was folded into 215), 829–835, 837–839. They are in the [OVERVIEW register](../OVERVIEW.md).
+- **Open M2:** 815 (#114, timeline, decision-gated), 836 (#280, `template-press-release` press-kit importer), 840 (#318, delivered, QA → close), 841 (#319), 842 (#320).
+- **Draft follow-ups (2026-10-15, no issue yet):**
+  - 801b story corpus run (3–5);
+  - 806a whole-kit ZIP in DAM (2);
+  - 808a variant selector (1–2, MR-PK03);
+  - 843 generic / legal pages + BGC (2–3);
+  - 844 featured-image mini-pages (1–2);
+  - 845 Media Room Newsletter page (1–2);
+  - 847 press-kit corpus (3–5).
+- **810 re-scope:** annual reports is gone from the source (404); company logo moved to the microsite shell; BGC and Newsletter move to 843 / 845. See the [M2 review](../../reviews/SKODA-M2-READINESS-REVIEW-2026-10-15.md) §4.
+
 ## Effort roll-up
 - **Total: 71 SP** · AI-assisted ~26.5–46d / manual ~53–91d *(planning estimates, not a quote)* — SKODA-801 re-pointed 13→8 SP after the flattener POC + census (`SKODA-FLATTENER-POC-FINDINGS.md`); Press Kit detail broken out of SKODA-802 into SKODA-805–808 (+15 SP net) after the requirements doc (§11) confirmed it is a structured template, not a reuse-only import (2026-09-11); SKODA-810 (company/Page family, +8 SP) added 2026-09-14 per D18; the governance-layer tickets SKODA-809/811/812 (+10 SP) added 2026-09-14 to close traceability gaps G2/G3/G5 (§6.4/6.5/6.7); **SKODA-607 (press-release detail, +5), SKODA-813 (Page base shell, +2) added 2026-09-15 (ui-specs); SKODA-814 (SiteOrigin body-flatten, +5) added 2026-09-15 (block recount)** → 59→71 SP.
+- **2026-10-15:** the roll-up above stops at 814. The draft follow-ups add 13–21 SP (801b 3–5, 806a 2, 808a 1–2, 843 2–3, 844 1–2, 845 1–2, 847 3–5); 836 / 840–842 are sized in days on their issues. Re-sum once the drafts are accepted.
 - Critical path: SKODA-801 (blocks 802 and 803); SKODA-805 (blocks 806/807/808). Governance layer (809→811/812) gated on D15.
 
 ## Source-doc traceability

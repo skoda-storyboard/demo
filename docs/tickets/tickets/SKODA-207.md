@@ -5,6 +5,7 @@
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–4d *(planning estimate, not a quote)*
 - **GitHub issue:** [#21](https://github.com/skoda-storyboard/demo/issues/21)
 - **Scope split:** five curated hubs in M1; the 25-card `/en/series-2/` directory in M2
+- **Status (2026-10-15):** ✅ Done (#21 closed 2026-09-28). The directory and 15 hubs are live. The other 9 EN hubs (e.g. `number-of-the-month`, `120-years-of-skoda-motorsport`) aren't imported; they go with the corpus run (803).
 - **Status (2026-09-27):** 🟡 **Importer + hero template done, preview-only.** All 15 tracker hubs (5 M1 set + 10 rail corpus) are imported, pushed to DA and previewed. Publishing is held on SKODA-221.
   - **Importer:** `parsers/series-hero.js` emits `Hero Image (overlay)` (badge, H1, standfirst). `parsers/series-grid.js` emits the authored `Cards (overlay, tiles)` mosaic: every source tile in DOM order, with Story and Press Kits tiles kept.
   - **Contract `cards-tiles` shape 2:** the corpus hubs needed new tokens (`quarter`, `third-sq`, `two-thirds`, `banner`, `banner-tall`) and an `end` flag for short rows. The tile fallback is corrected to `broken`, because `cards.js` prints the token.
