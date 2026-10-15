@@ -32,6 +32,9 @@ const LABELS = {
   slider: 'Image slider',
   slideOf: (n, total) => `${n} of ${total}`,
   goTo: (n) => `Go to image ${n}`,
+  // the autoplay control (WCAG 2.2.2, SKODA-703)
+  pause: 'Pause slideshow',
+  resume: 'Resume slideshow',
   // preview variant (SKODA-223): per-thumb name + the "+N" pill
   openNamed: (n, alt) => (alt ? `${LABELS.open} ${n}: ${alt}` : `${LABELS.open} ${n}`),
   more: (n) => `+${n}`,
@@ -382,7 +385,32 @@ function buildSlider(block) {
     timer = window.setTimeout(() => { goTo(current + 1); schedule(); }, SLIDER_AUTOPLAY_MS);
   };
   const setPaused = (key, value) => { paused[key] = value; schedule(); };
-  const stop = () => { stopped = true; window.clearTimeout(timer); };
+
+  // Pause / resume (WCAG 2.2.2 Pause, Stop, Hide, SKODA-703): the source has no such control, and
+  // hover / focus only pause while they last. It comes first in the carousel, visually hidden
+  // until it has keyboard focus (as the promo box's, #306); none under reduced motion, where
+  // autoplay never starts.
+  let toggle = null;
+  const showToggle = () => {
+    if (!toggle) return;
+    toggle.textContent = stopped ? LABELS.resume : LABELS.pause;
+    toggle.setAttribute('aria-pressed', stopped ? 'true' : 'false');
+  };
+  const stop = () => { stopped = true; window.clearTimeout(timer); showToggle(); };
+  if (!REDUCED_MOTION) {
+    toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'gallery-slider-pause';
+    block.prepend(toggle);
+    showToggle();
+    toggle.addEventListener('click', () => {
+      if (stopped) {
+        stopped = false;
+        showToggle();
+        schedule();
+      } else stop();
+    });
+  }
 
   block.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') setPaused('hover', true); });
   block.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') setPaused('hover', false); });

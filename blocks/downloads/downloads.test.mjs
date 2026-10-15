@@ -528,6 +528,40 @@ test('a Media Box image tile adds through the source size menu: Original toggles
   assert.equal(document.activeElement, toggle, 'Escape returns focus to the +');
 });
 
+test('the size menu is keyboard-operable as its role=menu promises: arrows, Home / End, Escape (SKODA-703)', async () => {
+  const block = setup();
+  addRow(block, {
+    src: '/media_1.jpg',
+    title: 'Front view',
+    links: [['1920px', 'https://www.skoda-storyboard.com/direct-download/a-1920x1080.jpg'], ['Original', 'https://www.skoda-storyboard.com/direct-download/a.jpg']],
+  });
+  await decorate(block);
+  const toggle = block.querySelector('.downloads-add-toggle');
+  const menu = document.getElementById(toggle.getAttribute('aria-controls'));
+  const [first, last] = [...menu.querySelectorAll('[role="menuitem"]')];
+  const key = (el, k) => el.dispatchEvent(new window.KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+  toggle.focus();
+  key(toggle, 'ArrowDown');
+  assert.equal(document.activeElement, toggle, 'closed: the arrows do nothing');
+  toggle.click();
+  key(toggle, 'ArrowDown');
+  assert.equal(document.activeElement, first, 'from the toggle, ArrowDown goes to the first row');
+  key(first, 'ArrowDown');
+  assert.equal(document.activeElement, last);
+  key(last, 'ArrowDown');
+  assert.equal(document.activeElement, first, 'it wraps');
+  key(first, 'ArrowUp');
+  assert.equal(document.activeElement, last);
+  key(last, 'Home');
+  assert.equal(document.activeElement, first);
+  key(first, 'End');
+  assert.equal(document.activeElement, last);
+  key(last, 'Escape');
+  assert.equal(menu.hidden, true);
+  assert.equal(toggle.getAttribute('aria-expanded'), 'false');
+  assert.equal(document.activeElement, toggle, 'Escape returns focus to the toggle');
+});
+
 test('outside a Media Box, and for a single-size tile, the add stays one round toggle (#275)', async () => {
   const block = setup(false);
   addRow(block, { src: '/a.jpg', title: 'A', links: [['Original', '/a.jpg'], ['1920px', '/a-1920.jpg']] });

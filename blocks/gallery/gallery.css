@@ -204,6 +204,7 @@
      (the paragraph's 20px margin + 24), dot row → next heading 48px (<768).
      Padding, not margin, so it adds to the paragraph margin instead of
      collapsing into it. */
+  position: relative; /* holds the pause control (SKODA-703) */
   padding-block: var(--spacing-l) var(--spacing-m);
 }
 
@@ -372,6 +373,40 @@
 .gallery.slider .gallery-slider-prev:active,
 .gallery.slider .gallery-slider-next:active {
   opacity: 0.6;
+}
+
+/* Pause / resume slideshow (gallery.js, WCAG 2.2.2, SKODA-703): the source shows no such control,
+   so it stays visually hidden until it has keyboard focus, then appears as an ink pill in the
+   slide's top-left corner, as the promo box's (#306) */
+.gallery.slider .gallery-slider-pause {
+  position: absolute;
+  top: var(--slider-arrow-inset);
+  left: var(--slider-arrow-inset);
+  z-index: 2;
+  border: 0;
+  border-radius: var(--pill-radius);
+  padding: var(--spacing-xs) var(--spacing-m);
+  background: var(--skoda-ink);
+  color: var(--skoda-white);
+  font: inherit;
+  font-size: var(--body-font-size-s);
+  cursor: pointer;
+}
+
+.gallery.slider .gallery-slider-pause:not(:focus-visible) {
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.gallery.slider .gallery-slider-pause:focus-visible {
+  outline: 2px solid var(--skoda-white);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--skoda-ink);
 }
 
 /* story body: as on the source, the slider bleeds the column's 10px inset past

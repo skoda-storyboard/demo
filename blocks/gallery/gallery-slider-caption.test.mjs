@@ -73,3 +73,25 @@ test('the wrap-around clones carry the same caption as their slide', { skip }, (
   assert.equal(clones.length, 2);
   assert.deepEqual(clones.map((c) => c.querySelector('.gallery-slide-caption')?.textContent.trim()), ['Last', 'First']);
 });
+
+// --- autoplay pause control (WCAG 2.2.2, SKODA-703) -------------------------------------------
+test('a looping slider starts with a pause / resume control for its autoplay', { skip }, () => {
+  const block = slider([row('a.jpg'), row('b.jpg'), row('c.jpg')]);
+  const toggle = block.firstElementChild;
+  assert.ok(toggle.classList.contains('gallery-slider-pause'), 'the first control in the carousel');
+  assert.equal(toggle.tagName, 'BUTTON');
+  assert.equal(toggle.type, 'button');
+  assert.deepEqual([toggle.textContent, toggle.getAttribute('aria-pressed')], ['Pause slideshow', 'false']);
+  toggle.click();
+  assert.deepEqual([toggle.textContent, toggle.getAttribute('aria-pressed')], ['Resume slideshow', 'true']);
+  toggle.click();
+  assert.deepEqual([toggle.textContent, toggle.getAttribute('aria-pressed')], ['Pause slideshow', 'false'], 'it resumes');
+  // any navigation stops autoplay for good (as on the source): the control then offers Resume
+  block.querySelector('.gallery-slider-next').click();
+  assert.equal(toggle.textContent, 'Resume slideshow');
+});
+
+test('a single-image slider has no autoplay and no pause control', { skip }, () => {
+  const block = slider([row('a.jpg')]);
+  assert.equal(block.querySelector('.gallery-slider-pause'), null);
+});

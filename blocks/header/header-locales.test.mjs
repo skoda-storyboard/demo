@@ -126,10 +126,10 @@ test('Epiq story: only the declared translations, same tab, named by their langu
   assert.equal(ul.dataset.linkPolicy, 'resolved', 'the site link pass leaves it alone');
   assert.deepEqual(rows(ul), [
     ['EN', 'SPAN', null, null, null],
-    ['CZ', 'A', '/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund', null, 'Čeština'],
-    ['DE', 'A', '/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds', null, 'Deutsch'],
-    ['SK', 'A', '/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund', null, 'Slovenčina'],
-    ['SR', 'A', '/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds', null, 'Srpski'],
+    ['CZ', 'A', '/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund', null, 'CZ – Čeština'],
+    ['DE', 'A', '/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds', null, 'DE – Deutsch'],
+    ['SK', 'A', '/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund', null, 'SK – Slovenčina'],
+    ['SR', 'A', '/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds', null, 'SR – Srpski'],
   ]);
   const en = ul.querySelector('span');
   assert.deepEqual([en.getAttribute('aria-current'), en.getAttribute('lang')], ['true', 'en']);
@@ -157,11 +157,11 @@ test('Media Room: the declared Media Rooms in the tab; DE takes the authored sko
   const ul = buildLocaleList(localeEntries(p, BASE), 'en', p.ownerDocument, declared(MEDIA_ROOM));
   assert.deepEqual(rows(ul), [
     ['EN', 'SPAN', null, null, null],
-    ['CZ', 'A', '/cs/media-room', null, 'Čeština'],
-    ['DE', 'A', 'https://www.skoda-media.de/', '_blank', 'Deutsch (opens in a new tab)'],
-    ['SK', 'A', '/sk/media-room', null, 'Slovenčina'],
-    ['SR', 'A', '/sr/media-room', null, 'Srpski'],
-    ['SL', 'A', '/sl/media-room', null, 'Slovenščina'],
+    ['CZ', 'A', '/cs/media-room', null, 'CZ – Čeština'],
+    ['DE', 'A', 'https://www.skoda-media.de/', '_blank', 'DE – Deutsch (opens in a new tab)'],
+    ['SK', 'A', '/sk/media-room', null, 'SK – Slovenčina'],
+    ['SR', 'A', '/sr/media-room', null, 'SR – Srpski'],
+    ['SL', 'A', '/sl/media-room', null, 'SL – Slovenščina'],
   ]);
   assert.equal(ul.querySelector('a[target]').getAttribute('rel'), 'noopener');
 });
@@ -249,7 +249,7 @@ test('header: the topbar group becomes a <div> list and the drawer gets an ident
   // SKODA-303a: the page's declared translation, in the same tab; no SL (none declared)
   const cz = topbar.querySelector('a[hreflang="cs"]');
   const czState = [cz.getAttribute('href'), cz.getAttribute('target'), cz.getAttribute('aria-label')];
-  assert.deepEqual(czState, ['/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund', null, 'Čeština']);
+  assert.deepEqual(czState, ['/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund', null, 'CZ – Čeština']);
   assert.equal(topbar.querySelector('a[hreflang="sl"]'), null);
   // Subscribe is untouched
   assert.ok(block.querySelector('.nav-topbar p.nav-topbar-utility a.nav-subscribe'));
