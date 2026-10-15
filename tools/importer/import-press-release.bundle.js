@@ -129,7 +129,12 @@ var CustomImportScript = (() => {
     if (single) add(single.getAttribute("href"), fileLabel(single.getAttribute("href")));
     return links;
   }
-  function parse3(element, { document }) {
+  var SOURCE_DATE = /^\d{1,2}\.\s?\d{1,2}\.\s?\d{4}$/;
+  function itemDate(item) {
+    const date = text(item.querySelector(".entry-meta .entry-published, .entry-published"));
+    return SOURCE_DATE.test(date) ? date : "";
+  }
+  function parse3(element, { document, dates = false }) {
     let items = Array.from(element.querySelectorAll("article.media-cart-item"));
     if (items.length === 0) {
       items = Array.from(element.querySelectorAll(".search-results-item, .items > .item"));
@@ -160,7 +165,8 @@ var CustomImportScript = (() => {
         p.append(a);
         return p;
       });
-      cells.push([img || "", title, linkCell]);
+      const date = dates ? itemDate(item) : "";
+      cells.push(date ? [img || "", date, title, linkCell] : [img || "", title, linkCell]);
     });
     if (cells.length === 1) {
       element.replaceWith(...element.childNodes);
@@ -437,6 +443,12 @@ var CustomImportScript = (() => {
       }
     });
     content.querySelectorAll("div[style]").forEach((div) => div.replaceWith(...div.childNodes));
+    content.querySelectorAll("strong > br:last-child, b > br:last-child").forEach((br) => {
+      const bold = br.parentElement;
+      let after = br.nextSibling;
+      while (after && after.nodeType === 3 && !after.textContent.trim()) after = after.nextSibling;
+      if (!after && bold.nextSibling) bold.after(br);
+    });
     content.querySelectorAll("p").forEach((p) => {
       if (isEmptyParagraph(p)) p.remove();
     });
@@ -512,7 +524,7 @@ var CustomImportScript = (() => {
     const heading = text3(box.querySelector(".search-results-heading")) || "Media Box";
     const stats = text3(box.querySelector(".search-results-stats .stats, .stats"));
     box.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((n) => n.remove());
-    const out = [make(document, "h2", heading)];
+    const out = [make(document, "h3", heading)];
     if (stats) out.push(make(document, "p", stats));
     out.push(box);
     return out;
@@ -542,7 +554,7 @@ var CustomImportScript = (() => {
       clone.querySelectorAll(".subheading").forEach((s) => s.remove());
       heading = text3(clone) || heading;
     }
-    const out = [make(document, "h2", heading)];
+    const out = [make(document, "h3", heading)];
     if (sub) out.push(make(document, "p", sub));
     const all = results.querySelector("a.search-results-header-link[href], .search-results-header a[href]");
     if (all && all.getAttribute("href")) out.push(make(document, "p", link(document, all.getAttribute("href"), text3(all) || "All")));
@@ -1541,7 +1553,12 @@ var CustomImportScript = (() => {
         const parser = parsers[block.name];
         if (parser) {
           try {
-            parser(block.element, { document, url, params });
+            parser(block.element, {
+              document,
+              url,
+              params,
+              dates: block.name === "downloads"
+            });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
           }
