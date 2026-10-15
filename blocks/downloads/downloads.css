@@ -337,8 +337,8 @@
 /* Collapsed (SKODA-830 D2), as the source togglebox: the list is clipped to its first two rows
    (--dl-rows-height, measured from the tiles by downloads.js) plus the pill's gap and height,
    and the pill sits over the clip's bottom edge, over the top 58px of row 3 (at the 20px Media
-   Box gap), which the Media Box's opener row covers (SKODA-514). The clipped tiles are inert. Unmeasured, the calc is invalid and the
-   list stays unclipped.
+   Box gap), which the opener strip below covers (#275, SKODA-514). The clipped tiles are inert.
+   Unmeasured, the calc is invalid and the list stays unclipped.
    The clip gets --dl-focus-room on its top and sides (padding, cancelled by an equal negative
    margin so the grid doesn't move) so the edge tiles' focus ring (2px outline + 2px offset)
    isn't cut off (WCAG 2.4.7). The bottom gets none: the clip edge stays at the pill's bottom,
@@ -375,23 +375,12 @@
   pointer-events: none;
 }
 
-/* the source's opaque togglebox-opener row (SKODA-514): band-coloured, the pill's height plus the
-   tile gap, so no clipped row-3 pixels paint around the pill; layer 2, over the cart scrims (1) */
-.downloads.downloads-media-box.downloads-collapsed .downloads-items::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  z-index: 2;
-  height: calc(var(--dl-toggle-height) + var(--dl-tile-gap));
-  background: var(--dark-color);
-}
-
-/* in-page layer 3 (styles.css z-index scale): above the cart scrims (1) and the opener row (2) */
-/* in-page layer 3 (styles.css z-index scale): above the peeking tiles' cart scrims (1) and the
-   strip that covers them (2) */
+/* in-page layer 2 (styles.css z-index scale): above the peeking tiles' cart scrims (1), and over
+   the opener strip (2) as it comes later. It stays under an open gallery tile (3), so that tile's
+   size menu can be clicked over the bar (PR #335 review). */
 .downloads.downloads-collapsed .downloads-more {
   position: relative;
-  z-index: 3;
+  z-index: 2;
   margin-block-start: calc(-1 * var(--dl-toggle-height));
 }
 
@@ -410,13 +399,18 @@
   outline-color: var(--skoda-white);
 }
 
+/* the Media Box pill is layer 3, clearly above its band-coloured opener strip (2, SKODA-514); its
+   tiles open their menu (15) without a stacking context of their own, so it stays above the pill */
+.downloads.downloads-media-box.downloads-collapsed .downloads-more {
+  z-index: 3;
+}
+
 .downloads .downloads-more[hidden] {
   display: none;
 }
 
 /* The media-box variant uses the source's 20px gap and tile rhythm. */
 .downloads.downloads-media-box .downloads-items {
-  position: relative; /* holds the collapsed opener row */
   gap: var(--dl-tile-gap);
 }
 

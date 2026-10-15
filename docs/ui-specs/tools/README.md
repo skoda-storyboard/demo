@@ -121,3 +121,18 @@ Box image (+ → Original), freezes the flying copy at its first frame and check
 screenshots, that it keeps the thumbnail: the box and its clip and corners, the image's rendered
 rect, its `object-fit` / `object-position` crop and its rendered source.
 
+
+## Downloads rendition menu over Show more (PR #335 review)
+
+With local AEM serving this branch, run from the repo root:
+
+```sh
+npx -y @adobe/aem-cli up --no-open
+node --test docs/ui-specs/tools/downloads-menu-hit.test.mjs
+```
+
+`EDS_ORIGIN` and `CHROME_PATH` as above. In the first collapsed gallery (Peaq press kit Images) and
+Media Box (wireless charging story), at 375 / 768, it opens the size menu of the last visible
+row-2 tile once the lazy images have settled the rows, and checks that the centres of "Original"
+and "1920px" hit the links, not the Show more bar (layers: gallery bar 2 under the open tile 3;
+Media Box pill 3 under the tile's menu 15).
