@@ -81,6 +81,17 @@ test('decodeState reads the SOURCE scheme (filter[facet][] array + sortby + offs
   assert.equal(s.revealed, 12);
 });
 
+test('a deep link filters only by the facets the listing shows: sponsorship yes, a hidden equipment no (SKODA-402d)', () => {
+  const news = ['model', 'derivative', 'concept', 'bodywork', 'years', 'company', 'happening',
+    'history', 'sponsorship', 'vip', 'view', 'technology', 'environment'];
+  assert.deepEqual(decodeState('?filter[sponsorship][]=icehockey', news, 6).active, { sponsorship: ['icehockey'] });
+  assert.deepEqual(decodeState('?filter[vip][]=jahn&filter[bodywork][]=suv', news, 6).active, { vip: ['jahn'], bodywork: ['suv'] });
+  // the source hides equipment / motorsport on News and ignores a link to them
+  assert.deepEqual(decodeState('?filter[equipment][]=rs&filter[motorsport][]=rally', news, 6).active, {});
+  const both = decodeState('?filter[sponsorship][]=icehockey&filter[equipment][]=rs', news, 6).active;
+  assert.equal(news.reduce((n, key) => n + selectedCount(both, key), 0), 1, 'Advanced filter (1)');
+});
+
 test('decodeState also accepts a comma-joined single facet value', () => {
   const s = decodeState('?filter[model][]=elroq,octavia', ['model'], 6);
   assert.deepEqual(s.active, { model: ['elroq', 'octavia'] });

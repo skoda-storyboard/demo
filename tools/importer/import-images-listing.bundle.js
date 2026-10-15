@@ -42,7 +42,7 @@ var CustomImportScript = (() => {
   });
 
   // tools/importer/parsers/listing.js
-  var FACETS_DEFAULT = "model, derivative, years, company, happening, technology";
+  var FACETS_NEWS = "model, derivative, concept, bodywork, years, company, happening, history, sponsorship, vip, view, technology, environment";
   var FACETS_MEDIA = "model, derivative, concept, bodywork, equipment, years, company, happening, history, motorsport, sponsorship, vip, view, technology, environment";
   var VARIANTS = {
     // News (press releases) — the baseline.
@@ -50,7 +50,7 @@ var CustomImportScript = (() => {
       ["index", "/en/query-index.json"],
       ["path", "/en/press-releases/"],
       ["template", "press_release"],
-      ["facets", FACETS_DEFAULT],
+      ["facets", FACETS_NEWS],
       ["sort", "newest"],
       ["perpage", "6"],
       ["columns", "3"]
@@ -61,7 +61,7 @@ var CustomImportScript = (() => {
       ["index", "/en/query-index.json"],
       ["path", "/en/press-kits/"],
       ["template", "press_kit"],
-      ["facets", FACETS_DEFAULT],
+      ["facets", FACETS_NEWS],
       ["sort", "newest"],
       ["perpage", "6"],
       ["columns", "3"]

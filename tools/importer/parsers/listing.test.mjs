@@ -62,3 +62,21 @@ test('media and search variants are unchanged', { skip }, () => {
   assert.equal(run('videos').template, 'video');
   assert.equal(run('search').search, 'true');
 });
+
+// SKODA-402d (#333): the filter groups the source SHOWS on /en/news/ and /en/press-kits/, in its
+// order (measured 2026-10-14). Its form also holds equipment + motorsport, with hidden pills.
+const SOURCE_SHOWN = ['model', 'derivative', 'concept', 'bodywork', 'years', 'company', 'happening',
+  'history', 'sponsorship', 'vip', 'view', 'technology', 'environment'];
+
+test('News and Press Kits offer the source\'s 13 shown filter groups, in its order (SKODA-402d)', { skip }, async () => {
+  const split = (v) => v.split(',').map((k) => k.trim());
+  ['news', 'press-kits'].forEach((token) => assert.deepEqual(split(run(token).facets), SOURCE_SHOWN, token));
+  // every key is an index facet column with option names (blocks/listing/facet-labels.json)
+  const { INDEX_FACETS } = await import('../../../blocks/listing/listing-logic.mjs');
+  const { readFile } = await import('node:fs/promises');
+  const names = JSON.parse(await readFile(new URL('../../../blocks/listing/facet-labels.json', import.meta.url), 'utf8'));
+  SOURCE_SHOWN.forEach((k) => {
+    assert.ok(INDEX_FACETS.includes(k), `${k} is an index facet`);
+    assert.ok(names[k], `${k} has option names`);
+  });
+});
