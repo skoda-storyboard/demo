@@ -17,7 +17,7 @@
   /* the source sort row height: sort links and the desktop "Advanced filter" toggle */
   --listing-sort-height: 35px;
   --listing-sort-inactive: var(--skoda-grey-250); /* the source's inactive sort link, #ccc */
-  --listing-count-color: var(--skoda-grey-375); /* the source's count numbers, #aeaeae */
+  --listing-count-color: var(--skoda-grey-600); /* the source's count numbers #aeaeae are 2.21:1; AA (SKODA-703) */
 
   /* the filter panel's reveal (source jQuery show(400): height, margins, opacity); the sort
      row's margin moves with it, so both read the same timing */
@@ -590,7 +590,9 @@
   font-weight: var(--weight-semibold);
   line-height: var(--media-card-date-row);
   letter-spacing: var(--card-meta-letter-spacing);
-  color: var(--skoda-grey-350);
+
+  /* the source #c4c6c7 is 1.71:1 on the white card; the closest AA grey (SKODA-703) */
+  color: var(--skoda-grey-600);
 }
 
 .listing.listing-media .media-asset-title {

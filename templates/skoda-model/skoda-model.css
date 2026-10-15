@@ -109,7 +109,7 @@ body.skoda-model .hero-image.overlay .hero-image-content .hero-image-badge {
   margin: 0 0 15px;
   padding: var(--tag-padding);
   border-radius: var(--tag-radius);
-  background-color: var(--skoda-grey-500);
+  background-color: var(--skoda-grey-600); /* SKODA-703: white on the source #7c7d7e is 4.12:1, below AA; the closest AA grey */
   color: var(--skoda-white);
   font-size: var(--tag-font-size);
   font-weight: var(--weight-semibold);
@@ -177,7 +177,7 @@ body.skoda-model .model-nav-list a {
   flex-direction: column;
   align-items: center;
   padding: 30px 20px 15px;
-  color: var(--skoda-grey-500);
+  color: var(--skoda-grey-600); /* SKODA-703: the source #7c7d7e is 4.12:1 on white, below AA; the closest AA grey */
   font-size: var(--body-font-size-s);
   font-weight: var(--weight-semibold);
   line-height: 1.5;
@@ -365,7 +365,7 @@ body.skoda-model .model-rail .default-content-wrapper > :is(h2, h3) {
 
 body.skoda-model .model-rail-subheading {
   margin: 0;
-  color: var(--skoda-grey-350);
+  color: var(--skoda-grey-600); /* SKODA-703: the source #c4c6c7 (1.71:1) fails AA on white; the closest AA grey */
   font-size: var(--body-font-size-m);
   font-weight: var(--weight-semibold);
   line-height: 2;
