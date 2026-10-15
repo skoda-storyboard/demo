@@ -128,3 +128,20 @@ test('a video item names its actions as the source player and downloads the MP4 
   assert.equal(action('download').hasAttribute('target'), false);
   await settle();
 });
+
+test('the actions show the source colorbox tooltips: a clip\'s player titles, an image\'s Original ones', async () => {
+  const host = document.createElement('div');
+  document.querySelector('main').replaceChildren(host);
+  const clip = { ...items[0], clip: true, caption: caption('Clip') };
+  const video = { ...items[0], video: 'https://player.vimeo.com/video/1', caption: caption('Video') };
+  const { open, overlay } = buildLightbox(host, [clip, { ...items[0], caption: caption('Image') }, video]);
+  const tips = () => ['add', 'download', 'link'].map((k) => overlay.querySelector(`.gallery-lightbox-action.${k}`).title);
+  open(0);
+  assert.deepEqual(tips(), ['Add/remove this', 'Download this', 'Link to page'], 'a clip shown as its poster');
+  assert.equal(overlay.querySelector('.gallery-lightbox-action.download').getAttribute('aria-label'), 'Download this');
+  open(1);
+  assert.deepEqual(tips(), ['Add/remove Original version', 'Download Original version', 'Link to page'], 'an image: what the button acts on');
+  open(2);
+  assert.deepEqual(tips(), ['Add/remove this', 'Download this', 'Link to page'], 'a playing video');
+  await settle();
+});

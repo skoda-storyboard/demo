@@ -681,6 +681,8 @@ export function lightboxItem(asset, related = {}) {
   // a clip shows its poster: the MP4 is the download action, never the stage, because the
   // AEM Assets original is served as an attachment (a player frame would download it)
   if (href) Object.assign(item, { download: href, link: href });
+  // its actions take the source player's names and tooltips ("Download this")
+  if (/\.mp4(?:[?#]|$)/i.test(href)) item.clip = true;
   return item;
 }
 

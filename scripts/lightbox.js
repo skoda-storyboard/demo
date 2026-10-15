@@ -19,6 +19,9 @@
  *   thumb    the cart page's card image for that add (SKODA-505b; default: `src`)
  *   actions  false: no action buttons (the source's content images), spacing kept
  *   video    an embed URL (Vimeo player): the stage plays it instead of the image
+ *   clip     true: a clip shown as its poster; with `video`, its actions take the source
+ *            player's names and tooltips, an image's take the colorbox's (LABELS)
+ *   labels   per-item overrides of those names (LABELS keys)
  *
  * Options: { story, title } = the story gallery chrome (`Gallery (story)`, SKODA-216): a
  * title bar (the dialog's name), an "N/total" counter, no action buttons, tag chips or
@@ -47,6 +50,21 @@ const LABELS = {
   addToBox: 'Add to media box',
   download: 'Download image',
   copyLink: 'Copy image link',
+  // their hover tooltips: the source colorbox's titles for what they act on (the Original)
+  addTip: 'Add/remove Original version',
+  downloadTip: 'Download Original version',
+  linkTip: 'Link to page',
+};
+
+// a clip's names and tooltips (a `video` item, or a `clip` shown as its poster): the source
+// video player's titles
+const VIDEO_LABELS = {
+  addToBox: 'Add/remove this',
+  download: 'Download this',
+  copyLink: 'Link to page',
+  addTip: 'Add/remove this',
+  downloadTip: 'Download this',
+  linkTip: 'Link to page',
 };
 
 const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -301,11 +319,15 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
     } else if (item.caption) {
       [...item.caption.childNodes].forEach((n) => stageCaption.append(n.cloneNode(true)));
       downloadBtn.href = item.download || `${base}?format=jpg`;
-      // per-item names (a video's are the source player's) and tab, else the image defaults
-      const names = { ...LABELS, ...(item.labels || {}) };
+      // per-item names and tooltips (a clip's are the source player's) and tab, else the image's
+      const clipNames = item.video || item.clip ? VIDEO_LABELS : {};
+      const names = { ...LABELS, ...clipNames, ...(item.labels || {}) };
       addBtn.setAttribute('aria-label', names.addToBox);
       downloadBtn.setAttribute('aria-label', names.download);
       linkBtn.setAttribute('aria-label', names.copyLink);
+      addBtn.title = names.addTip;
+      downloadBtn.title = names.downloadTip;
+      linkBtn.title = names.linkTip;
       if (item.downloadTarget) downloadBtn.target = item.downloadTarget;
       else downloadBtn.removeAttribute('target');
       // `actions: false` (content images): the source panel keeps an empty actions row
