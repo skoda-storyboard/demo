@@ -1,9 +1,9 @@
 # SKODA-504a, AEM Assets scale-out: the full media set, with rights, dedup and approval (follow-up to SKODA-504)
 - **Epic:** E05, Media Pipeline (follow-up to SKODA-504, #49, closed 2026-09-22)
 - **Type:** media / integration · **Phase:** B · **Milestone:** M2 (go-live 02 Jan 2027)
-- **GitHub issue:** none yet (draft from the M2 readiness review, 2026-10-15)
+- **GitHub issue:** [#371](https://github.com/skoda-storyboard/demo/issues/371) (created 2026-10-15 from the M2 readiness review)
 - **Estimate:** 3–5 SP *(planning estimate, not a quote)*
-- **Status (2026-10-15):** 📝 Draft, proposed. Gated on decisions.
+- **Status (2026-10-15):** 🔵 TODO (M2), no owner. Gated on decisions.
 
 ## Why
 SKODA-504 mapped the **demo subset** of S3 images to AEM Assets. Go-live needs the media behind every migrated page:

@@ -1,7 +1,7 @@
 # SKODA-808a, Press kit: model-variant selector (follow-up to SKODA-808, decision-gated)
 - **Epic:** E08, Editorial at Scale (follow-up to SKODA-808, #69, closed 2026-10-12)
 - **Type:** block · **Phase:** B · **Milestone:** M2 (go-live 02 Jan 2027)
-- **GitHub issue:** none yet (draft from the M2 readiness review, 2026-10-15)
+- **GitHub issue:** [#370](https://github.com/skoda-storyboard/demo/issues/370) (created 2026-10-15 from the M2 readiness review)
 - **Estimate:** 1–2 SP *(planning estimate, not a quote)*
 - **Status (2026-10-15):** ⏸ Blocked on requirement **MR-PK03**.
 

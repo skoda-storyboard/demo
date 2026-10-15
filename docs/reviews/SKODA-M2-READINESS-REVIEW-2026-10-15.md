@@ -23,8 +23,8 @@ comes from the issues, PRs and ticket files.
 
 | Milestone | Open | Closed | Due |
 |---|--:|--:|---|
-| M1: 15 Oct demo | **10** | 118 | 2026-10-15 |
-| M2: go-live 02 Jan | **37** | 2 (806, 808) | 2027-01-02 |
+| M1: 15 Oct demo | **10** (9 after #334 moved) | 118 | 2026-10-15 |
+| M2: go-live 02 Jan | **37** (48 after this review: +9 created, +#334, +#342) | 2 (806, 808) | 2027-01-02 |
 | No milestone | #342 (SKODA-608a) + 9 epic issues | – | – |
 
 - **Open PRs:** #360 (SKODA-703 a11y), #358 (#274 re-test), #356 (#273 re-test), #235 (draft, don't merge).
@@ -52,14 +52,14 @@ comes from the issues, PRs and ticket files.
 | #273 Media listings QA | PR #356 open; the 1920px cart add was kept as M2 by the developer | Merge after QA, then close. The 1920px point goes to M2 (with 515 / 902) |
 | #274 Press releases QA | PR #358 open (re-test fixes) | Merge after QA, then close |
 | #275 Press kits QA | PR #344 merged 10-15, re-test pending | Re-test, then close |
-| #334 SKODA-516 model-page media rails empty | open; data gap, needs a DAM ingest | **Move to M2**, together with 511 / 608a |
+| #334 SKODA-516 model-page media rails empty | data gap, needs a DAM ingest | **Moved to M2** (2026-10-15), with 511 / 608a |
 | #43 SKODA-703 a11y | PR #360 open (audit + fixes) | Review and merge; move the remainder to M2 (e.g. the Škodapedia modal with 206) |
 | #44 SKODA-704 sign-off, #247 E2E QA | human gates (jkondalu) | Sign off after the demo, then close |
-| #342 SKODA-608a media feed refresh | **no milestone** | Set milestone M2 (with 511) |
+| #342 SKODA-608a media feed refresh | had no milestone | **Set to M2** (2026-10-15), with 511 |
 
 ## 3. M2 tickets the team can work on now
 
-All 37 open M2 issues are classified below, along with the proposed follow-ups (📝 = draft ticket on disk, no issue yet).
+All 37 open M2 issues are classified below, along with the follow-ups this review created (📝, all M2 on 2026-10-15): 843 #363, 844 #364, 845 #365, 847 #366, 848 #367, 801b #368, 806a #369, 808a #370, 504a #371.
 
 ### A. Ready now: no client decision, dependencies done
 
@@ -202,15 +202,14 @@ The ones that change the go-live volume most:
   - M2 remainders noted on 801, 806, 808, 504 and 507;
   - 811 re-milestoned to M2, 608a flagged as unmilestoned.
 - **Ticket files mirrored from GitHub:** 226, 227, 303a, 402d, 513, 514, 515, 516.
-- **Draft tickets (no GitHub issue yet):** 801b, 806a, 808a, 504a, 843, 844, 845, 847, 848.
+- **Follow-up tickets:** 801b, 806a, 808a, 504a, 843, 844, 845, 847, 848; created on GitHub as #363–#371 (M2) after the go-ahead.
 - **Census amendments:** 209, 210, 405, 803, 810, 1001.
 - **New documents:** the coverage matrix and the decision register.
 
-**Not done; each needs your go-ahead:**
+**Done on GitHub after the go-ahead (2026-10-15):** created #363–#371; #342 → M2; #334 → M2; the 810 re-scope posted on #71.
 
-- creating the issues for the draft tickets;
+**Still open, needs a go-ahead:**
+
 - closing #318;
-- setting #342's milestone;
-- moving #334 to M2;
 - assigning lane owners;
-- splitting #71 into 810a / 810b.
+- splitting #71 into two issues.

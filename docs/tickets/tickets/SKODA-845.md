@@ -1,9 +1,9 @@
 # SKODA-845, Media Room Newsletter page: press-release carousels by plant (`template-carousel-listing`)
 - **Epic:** E08, Editorial at Scale
 - **Type:** template / import · **Phase:** B · **Milestone:** M2 (go-live 02 Jan 2027)
-- **GitHub issue:** none yet (draft from the M2 readiness review, 2026-10-15)
+- **GitHub issue:** [#365](https://github.com/skoda-storyboard/demo/issues/365) (created 2026-10-15 from the M2 readiness review)
 - **Estimate:** 1–2 SP *(planning estimate, not a quote)*
-- **Status (2026-10-15):** 📝 Draft, proposed.
+- **Status (2026-10-15):** 🔵 TODO (M2), no owner.
 
 ## Why
 `/en/newsletter/` is linked from the Media Room nav **Company** menu. It is the only page on

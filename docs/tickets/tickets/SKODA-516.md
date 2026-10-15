@@ -6,7 +6,7 @@
 - **Estimate:** 2 SP · AI-assisted 1d / manual 2d *(planning estimate, not a quote)*
 - **Split (hybrid):**
 - **GitHub issue:** [#334](https://github.com/skoda-storyboard/demo/issues/334)
-- **Status (2026-10-15, from GitHub):** 🟡 M1, open (saran-adobe). Data gap in the media feed; the full fix needs a DAM ingest. Proposed: move to M2 with SKODA-511.
+- **Status (2026-10-15, from GitHub):** 🔵 M2 (moved from M1 on 2026-10-15). Data gap in the media feed; the full fix needs a DAM ingest; goes with 608a / 511.
   - **Agent half:** the rail sweep, the feed rebuild logic (`media-items-lib.mjs` keeps `bodywork-*` / `derivative-*`) and the fallback, if chosen, with tests.
   - **Human half:** the DAM ingest on a developer machine (credentials), the PO decision on the fallback, and publishing the rebuilt feed.
 - **Origin:** reported in manual review on 2026-10-11 (`/en/skoda-model/new-fabia` "missing images, videos").

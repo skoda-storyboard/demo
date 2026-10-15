@@ -1,9 +1,9 @@
 # SKODA-806a, Press kit: whole-kit ZIP as a DAM-hosted package (follow-up to SKODA-806)
 - **Epic:** E08, Editorial at Scale (follow-up to SKODA-806, #67, closed 2026-10-12)
 - **Type:** media / integration · **Phase:** B · **Milestone:** M2 (go-live 02 Jan 2027)
-- **GitHub issue:** none yet (draft from the M2 readiness review, 2026-10-15)
+- **GitHub issue:** [#369](https://github.com/skoda-storyboard/demo/issues/369) (created 2026-10-15 from the M2 readiness review)
 - **Estimate:** 2 SP *(planning estimate, not a quote)*
-- **Status (2026-10-15):** 📝 Draft, proposed.
+- **Status (2026-10-15):** 🔵 TODO (M2), no owner.
 
 ## Why
 SKODA-806 shipped the grouped media and download areas. The source's whole-kit ZIP is a pre-built static `.zip` on the

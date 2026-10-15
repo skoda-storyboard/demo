@@ -1,9 +1,9 @@
 # SKODA-844, Featured-image mini-pages: Road to Christmas + classic-car pages (29)
 - **Epic:** E08, Editorial at Scale
 - **Type:** import / template · **Phase:** B · **Milestone:** M2 (go-live 02 Jan 2027)
-- **GitHub issue:** none yet (draft from the M2 readiness review, 2026-10-15)
+- **GitHub issue:** [#364](https://github.com/skoda-storyboard/demo/issues/364) (created 2026-10-15 from the M2 readiness review)
 - **Estimate:** 1–2 SP *(planning estimate, not a quote)*
-- **Status (2026-10-15):** 📝 Draft, proposed. Needs a keep / drop answer first.
+- **Status (2026-10-15):** 🔵 TODO (M2), no owner. Needs a keep / drop answer first.
 
 ## Why
 29 EN pages use `template-featured-image`. No ticket covered them: the 15 Sep recount saw the family but nothing was

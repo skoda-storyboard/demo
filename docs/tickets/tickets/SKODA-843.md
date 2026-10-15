@@ -1,9 +1,9 @@
 # SKODA-843, Generic pages: legal set, BGC, sustainability page, and the keep / drop list for the rest
 - **Epic:** E08, Editorial at Scale
 - **Type:** import / template · **Phase:** B · **Milestone:** M2 (go-live 02 Jan 2027)
-- **GitHub issue:** none yet (draft from the M2 readiness review, 2026-10-15)
+- **GitHub issue:** [#363](https://github.com/skoda-storyboard/demo/issues/363) (created 2026-10-15 from the M2 readiness review)
 - **Estimate:** 2–3 SP *(planning estimate, not a quote)*
-- **Status (2026-10-15):** 📝 Draft, proposed. Rides on the SKODA-813 page base shell.
+- **Status (2026-10-15):** 🔵 TODO (M2), no owner. Rides on the SKODA-813 page base shell.
 
 ## Why
 The census ([coverage matrix](../../planning/SKODA-PAGE-COVERAGE-MATRIX.md) §2) found 41 EN `page-template-default` pages

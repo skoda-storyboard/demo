@@ -1,9 +1,9 @@
 # SKODA-801b, Story corpus run: every EN story through the flatten, REST-enumerated (follow-up to SKODA-801)
 - **Epic:** E08, Editorial at Scale (follow-up to SKODA-801, #48, closed 2026-09-24)
 - **Type:** import · **Phase:** B · **Milestone:** M2 (go-live 02 Jan 2027)
-- **GitHub issue:** none yet (draft from the M2 readiness review, 2026-10-15)
+- **GitHub issue:** [#368](https://github.com/skoda-storyboard/demo/issues/368) (created 2026-10-15 from the M2 readiness review)
 - **Estimate:** 3–5 SP *(planning estimate, not a quote)*
-- **Status (2026-10-15):** 📝 Draft, proposed.
+- **Status (2026-10-15):** 🔵 TODO (M2), no owner.
 
 ## Why
 SKODA-801 shipped the flatten (17-widget map, two-column body + aside) and closed on M1 scope. The M2 work it left is the

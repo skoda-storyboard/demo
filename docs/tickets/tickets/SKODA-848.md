@@ -1,9 +1,9 @@
 # SKODA-848, Taxonomy archives at scale: which of the 378 EN tag / category archives exist at go-live
 - **Epic:** E02, Core Blocks (scale-out of SKODA-209)
 - **Type:** import / decision · **Phase:** B · **Milestone:** M2 (go-live 02 Jan 2027)
-- **GitHub issue:** none yet (draft from the M2 readiness review, 2026-10-15)
+- **GitHub issue:** [#367](https://github.com/skoda-storyboard/demo/issues/367) (created 2026-10-15 from the M2 readiness review)
 - **Estimate:** 2 SP *(planning estimate, not a quote)*
-- **Status (2026-10-15):** 📝 Draft, proposed.
+- **Status (2026-10-15):** 🔵 TODO (M2), no owner.
 
 ## Why
 The source serves **378 EN taxonomy archives**: 77 categories, 90 `history` tags, 33 `company`, 33 `technology`,

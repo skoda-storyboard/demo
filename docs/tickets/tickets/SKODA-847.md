@@ -1,9 +1,9 @@
 # SKODA-847, Press-kit corpus: enumerate every EN kit and run the three importers
 - **Epic:** E08, Editorial at Scale
 - **Type:** import · **Phase:** B · **Milestone:** M2 (go-live 02 Jan 2027)
-- **GitHub issue:** none yet (draft from the M2 readiness review, 2026-10-15)
+- **GitHub issue:** [#366](https://github.com/skoda-storyboard/demo/issues/366) (created 2026-10-15 from the M2 readiness review)
 - **Estimate:** 3–5 SP *(planning estimate, not a quote)*
-- **Status (2026-10-15):** 📝 Draft, proposed.
+- **Status (2026-10-15):** 🔵 TODO (M2), no owner.
 
 ## Why
 104 EN press-kit URLs are live (25 hubs). The source has at least **80 hubs and 617 chapter / resource pages** in its
