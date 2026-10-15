@@ -729,6 +729,10 @@ export default async function decorate(block) {
   // so no gallery style reaches it either (PR #287 review)
   const gallery = !mediaBox && block.classList.contains('gallery');
   if (mediaBox) block.classList.remove('gallery');
+  // a story's photo grid (the same source group in a story's text): photos only. A 3-wide one
+  // (`columns 3`) is a step narrower than the Media Box ladder: 1 / 2 / 3 at 768 / 992
+  const narrow = gallery && block.classList.contains('story') && Number(cfg.columns) === 3;
+  if (narrow) block.classList.add('downloads-narrow');
   if (cfg.collapse !== null && !['auto', 'none'].includes(cfg.collapse)) {
     throw new Error('downloads: collapse must be auto or none');
   }
@@ -825,8 +829,8 @@ export default async function decorate(block) {
       else list.style.removeProperty('--dl-rows-height');
     };
     const syncVisibility = () => {
-      // a gallery group shares the Media Box ladder (1 / 2 / 3 / 4)
-      const ladder = mediaBox || gallery;
+      // a gallery group shares the Media Box ladder (1 / 2 / 3 / 4); a narrow story grid: 1 / 2 / 3
+      const ladder = (mediaBox || gallery) && !narrow;
       let columns = 1;
       if (compact.matches && ladder) columns = 2;
       if (medium.matches) columns = ladder ? 3 : 2;

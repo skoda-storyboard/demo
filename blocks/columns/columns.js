@@ -30,17 +30,23 @@ const PORTRAIT_RE = /^portrait-([1-9]\d{1,2})$/;
  * `split-NN` variant (SKODA-225, contract columns-split v2): an unequal 2-cell story row, the
  * first cell NN% of the row. An optional `portrait-NNN` is the authored display width of the
  * row's image (DA keeps only the file's own size); without it the image fills its cell.
+ * `centered`: an equal story row of centred image cards (the Miss Peaches profiles), the
+ * images at their own size; `portrait-NNN` there is each card's first image (`captioned`,
+ * its caption under it, is CSS only).
  * Values are read from the authored classes, so malformed ones (`split-5`, `split-x`) are
  * ignored and the block keeps the default rendering.
  * @param {Element} block
- * @returns {boolean} whether the block is a split row
+ * @returns {boolean} whether the block is a split or centered row
  */
 export function decorateSplit(block) {
   const value = (re) => [...block.classList].map((c) => re.exec(c)).find(Boolean)?.[1];
   const split = value(SPLIT_RE);
-  if (!split) return false;
-  block.classList.add('split');
-  block.style.setProperty('--columns-split', `${split}%`);
+  const centered = block.classList.contains('centered');
+  if (!split && !centered) return false;
+  if (split) {
+    block.classList.add('split');
+    block.style.setProperty('--columns-split', `${split}%`);
+  }
   const portrait = value(PORTRAIT_RE);
   if (portrait) {
     block.classList.add('portrait');
@@ -48,7 +54,10 @@ export function decorateSplit(block) {
   }
   // the image cell (a portrait card: the picture, with a name and role, or a picture alone)
   block.querySelectorAll(':scope > div > div').forEach((cell) => {
-    if (cell.querySelector('picture, img')) cell.classList.add('columns-portrait');
+    const img = cell.querySelector('img');
+    if (!img) return;
+    cell.classList.add('columns-portrait');
+    img.classList.add('columns-portrait-img');
   });
   return true;
 }

@@ -21,6 +21,11 @@
       "class": "gallery",
       "label": "gallery",
       "description": "Press-kit Images chapter group: thumbnails with add / download over the image and the \"Original / 1920px\" pills above the group."
+    },
+    {
+      "class": "gallery story",
+      "label": "gallery, story",
+      "description": "A photo grid in a story's text: photos only (1 / 2 / 3 across), each opening the lightbox with its download sizes. Add rows collapse | auto for the \"Show more\" of a long set, and columns | 3."
     }
   ],
   "usage": {

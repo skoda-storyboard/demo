@@ -76,3 +76,30 @@ SKODA-801 (flatten), SKODA-824 (rows inside the highlight panel).
 
 ## Import contract (SKODA-603)
 Contract(s) `columns-split` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Pinned shape: `Columns (split-NN)`, where NN is the first cell's width share in % (518 | 320 → `split-62`). If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.
+
+## Follow-up: centred image rows (2026-10-15, branch `skoda-516-model-media-rails`)
+The PO asked for the story image alignment and profile size to match live. Contract `columns-split` is now **shape 3**
+(spec §6):
+- `Columns (centered[, portrait-NNN][, captioned])` for equal rows of centred images: 26 rows in 15 stories;
+- the body style `centered-images`: 6 stories.
+
+Importer: `markCentredImages()` runs in `preprocess`; `centredVariants()` and `applyCentredImages()` live in
+`story-flatten.js`.
+
+Known differences are in spec §6: later card images at their file size, the enduro row's own padding, and body images
+shown narrower than their file.
+
+**Same PO round, other story fixes on this branch (measured against live):**
+- The story body's drop cap: 22 stories, spec story-detail.md §3.
+- The in-text photo grid: 7 stories, previously stray "Original1920px" text; spec story-detail.md §3.
+- A horizontal scroll of 8px at 1280–1440 with a desktop scrollbar: the dark bands' `100vw`.
+  `body.story` now clips sideways overflow from 768. It also happens on `main`.
+- The Related Stories and home-band rail arrows showed as bare ink discs. A Story Rail override
+  outlived #284 and still masked the glyph with the deleted `icons/rail-arrow-*.svg` (404).
+  It is removed, so the carousel's icon-font glyph shows. It also happens on `main`.
+
+**Noted, not changed:** story prose links are green on live (`rgb(65,148,104)`, measured on the skatepark and
+millionth-SUV stories). Here they're ink, per the story-detail spec's brand default. This is a PO decision.
+The rail card overlay: live has only the source's two light gradients at rest, and the shared card
+also had a darker bottom scrim (`--scrim-text`, for 4.5:1 white text on bright photos). The PO chose
+to match live (2026-10-15), so the scrim is removed site-wide; the text shadow stays.

@@ -138,6 +138,10 @@ var CustomImportScript = (() => {
   function editorNodes(panel, document2) {
     const tiny = panel.querySelector(".siteorigin-widget-tinymce, .textwidget") || panel.querySelector('[class*="so-widget-sow-editor"]');
     if (!tiny) return [];
+    tiny.querySelectorAll(":is(strong, b, em, i, span) > br:last-child").forEach((br) => {
+      var _a;
+      if (!(((_a = br.nextSibling) == null ? void 0 : _a.textContent) || "").trim()) br.parentElement.after(br);
+    });
     const nodes = [...tiny.childNodes];
     const out = [];
     nodes.forEach((n) => {
@@ -172,16 +176,16 @@ var CustomImportScript = (() => {
   }
   var CONSUMPTION_RE = /\b(?:kWh|l)\s*\/\s*100\s*km\b/i;
   var EMISSIONS_RE = /\bCO(?:₂|2)\s+emissions?\b|\bg\s*\/\s*km\b/i;
-  function isRegulatoryCaption(text3) {
-    const t = (text3 || "").replace(/\s+/g, " ").trim();
+  function isRegulatoryCaption(text4) {
+    const t = (text4 || "").replace(/\s+/g, " ").trim();
     if (!t) return false;
     return /\bWLTP\b/.test(t) || CONSUMPTION_RE.test(t) && EMISSIONS_RE.test(t);
   }
   function regulatoryCaption(img, item) {
     var _a;
     const holder = img && img.getAttribute && img.getAttribute("data-caption") && img || ((_a = item.querySelector) == null ? void 0 : _a.call(item, "[data-caption]"));
-    const text3 = holder ? (holder.getAttribute("data-caption") || "").replace(/\s+/g, " ").trim() : "";
-    return isRegulatoryCaption(text3) ? text3 : "";
+    const text4 = holder ? (holder.getAttribute("data-caption") || "").replace(/\s+/g, " ").trim() : "";
+    return isRegulatoryCaption(text4) ? text4 : "";
   }
   function galleryCells(panel, document2, blockName = "Gallery") {
     const imgs = [...panel.querySelectorAll("img")];
@@ -220,11 +224,11 @@ var CustomImportScript = (() => {
     return cells.length > 1 ? cells : null;
   }
   function quoteNodes(panel, document2) {
-    const text3 = (panel.textContent || "").replace(/\s+/g, " ").trim();
-    if (!text3) return [];
+    const text4 = (panel.textContent || "").replace(/\s+/g, " ").trim();
+    if (!text4) return [];
     const bq = document2.createElement("blockquote");
     const p = document2.createElement("p");
-    p.textContent = text3;
+    p.textContent = text4;
     bq.appendChild(p);
     return [bq];
   }
@@ -252,10 +256,10 @@ var CustomImportScript = (() => {
     if (rich.length) {
       rich.forEach((n) => out.push(n));
     } else {
-      const text3 = (body.textContent || "").replace(/\s+/g, " ").trim();
-      if (text3) {
+      const text4 = (body.textContent || "").replace(/\s+/g, " ").trim();
+      if (text4) {
         const p = document2.createElement("p");
-        p.textContent = text3;
+        p.textContent = text4;
         out.push(p);
       }
     }
@@ -282,10 +286,10 @@ var CustomImportScript = (() => {
     });
     if (!out.length) {
       panel.querySelectorAll("img").forEach((img) => out.push(img));
-      const text3 = (panel.textContent || "").replace(/\s+/g, " ").trim();
-      if (text3 && !panel.querySelector("img")) {
+      const text4 = (panel.textContent || "").replace(/\s+/g, " ").trim();
+      if (text4 && !panel.querySelector("img")) {
         const p = document2.createElement("p");
-        p.textContent = text3;
+        p.textContent = text4;
         out.push(p);
       }
     }
@@ -337,8 +341,8 @@ var CustomImportScript = (() => {
     const geometry = highlightGeometry(css);
     document2.querySelectorAll(".panel-grid").forEach((grid) => {
       const row = grid.querySelector(":scope > .panel-row-style");
-      const inline = row && (row.getAttribute("style") || "").match(/background(?:-color)?\s*:\s*([^;]+)/i);
-      const variant = byId.get(grid.id) || inline && highlightVariant(inline[1]);
+      const inline2 = row && (row.getAttribute("style") || "").match(/background(?:-color)?\s*:\s*([^;]+)/i);
+      const variant = byId.get(grid.id) || inline2 && highlightVariant(inline2[1]);
       if (!variant) return;
       grid.setAttribute(HIGHLIGHT_ATTR, variant);
       Object.entries(geometry(grid)).forEach(([key, value]) => grid.setAttribute(`data-${key}`, value));
@@ -355,7 +359,7 @@ var CustomImportScript = (() => {
     return `${t} ${r} ${b} ${l}`;
   }
   function highlightGeometry(css) {
-    const rules = (text3) => [...text3.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, sel, body]) => ({ sels: sel.split(",").map((s) => s.trim()), body }));
+    const rules = (text4) => [...text4.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, sel, body]) => ({ sels: sel.split(",").map((s) => s.trim()), body }));
     const mobile = rules([...css.matchAll(MEDIA_780)].map((m) => m[1]).join("\n"));
     const desktop = rules(css.replace(/@media[^{]*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, ""));
     const find = (list, test, prop) => {
@@ -384,9 +388,9 @@ var CustomImportScript = (() => {
       if (padD) out["highlight-padding"] = padD;
       if (padM) out["highlight-padding-mobile"] = padM;
       const panels = [...grid.querySelectorAll(":scope > .panel-row-style > .panel-grid-cell > .so-panel, :scope > .panel-grid-cell > .so-panel")];
-      const text3 = margins(panels.find((p) => p.matches(".widget_sow-editor, .widget_text")), "0px 0px 0px 0px");
-      if (text3 && (text3[0] !== DEFAULT_TEXT_MARGIN[0] || text3[1] !== DEFAULT_TEXT_MARGIN[1])) {
-        [out["highlight-margin"], out["highlight-margin-mobile"]] = text3;
+      const text4 = margins(panels.find((p) => p.matches(".widget_sow-editor, .widget_text")), "0px 0px 0px 0px");
+      if (text4 && (text4[0] !== DEFAULT_TEXT_MARGIN[0] || text4[1] !== DEFAULT_TEXT_MARGIN[1])) {
+        [out["highlight-margin"], out["highlight-margin-mobile"]] = text4;
       }
       const gallery = margins(panels.find((p) => p.matches('[class*="carousel-widget"], [class*="slider"]')), "0px 0px 0px 0px");
       if (gallery && (gallery[0] !== "0px 0px 0px 0px" || gallery[1] !== "0px 0px 0px 0px")) {
@@ -464,14 +468,47 @@ var CustomImportScript = (() => {
   }
   function portraitVariant(cells) {
     const imgs = cells.flatMap((c) => [...c.querySelectorAll("img")]);
-    if (imgs.length !== 1) return null;
-    const img = imgs[0];
+    const width = imgs.length === 1 && shownWidth(imgs[0]);
+    return width ? `portrait-${width}` : null;
+  }
+  function shownWidth(img) {
     const width = parseInt(img.getAttribute("width"), 10);
     if (!(width >= 10 && width <= 999)) return null;
     const descriptors = (img.getAttribute("srcset") || "").match(/\s(\d+)w\b/g) || [];
     const fileWidth = Math.max(0, ...descriptors.map((d) => parseInt(d, 10)));
-    if (fileWidth && width >= fileWidth) return null;
-    return `portrait-${width}`;
+    return fileWidth && width >= fileWidth ? null : width;
+  }
+  var ALIGN_ATTR = "data-skoda-align";
+  var CENTRED_IMAGES_ATTR = "data-skoda-centred-images";
+  var CENTRED_IMAGES_STYLE = "centered-images";
+  var COLUMN_WIDTH = 819;
+  function markCentredImages(document2) {
+    let count = 0;
+    document2.querySelectorAll(".textwidget img").forEach((img) => {
+      if (img.closest(".search-results, .sb-gallery")) return;
+      const centred = !!img.closest('.aligncenter, [style*="text-align: center"], [style*="text-align:center"]');
+      img.setAttribute(ALIGN_ATTR, centred ? "center" : "left");
+      count += centred ? 1 : 0;
+    });
+    return count;
+  }
+  var isCentred = (img) => img.getAttribute(ALIGN_ATTR) === "center";
+  function centredVariants(cells) {
+    const cellWidths = cells.map((c) => parseFloat(c.getAttribute(CELL_WIDTH_ATTR)));
+    if (cells.length < 2 || !cellWidths.every((w) => w > 0) || Math.max(...cellWidths) - Math.min(...cellWidths) >= 2) return [];
+    const imgs = cells.flatMap((c) => [...c.querySelectorAll("img")]);
+    if (!imgs.length || !imgs.every(isCentred)) return [];
+    const firsts = cells.map((c) => c.querySelector("img")).filter(Boolean);
+    const widths = firsts.map(shownWidth);
+    const portrait = widths.every((w) => w && w === widths[0]) ? `portrait-${widths[0]}` : null;
+    const captioned = firsts.every((img) => {
+      var _a;
+      return (_a = img.closest("figure")) == null ? void 0 : _a.querySelector("figcaption");
+    });
+    return ["centered", portrait, captioned && "captioned"].filter(Boolean);
+  }
+  function narrowBodyImages(nodes) {
+    return nodes.filter((n) => n.nodeType === 1 && n.tagName !== "TABLE").flatMap((n) => n.tagName === "IMG" ? [n] : [...n.querySelectorAll("img")]).filter((img) => img.hasAttribute(ALIGN_ATTR) && !img.closest("table") && parseInt(img.getAttribute("width"), 10) < COLUMN_WIDTH);
   }
   function hasContentAfter(node, root) {
     for (let n = node; n && n !== root; n = n.parentNode) {
@@ -503,6 +540,22 @@ var CustomImportScript = (() => {
     }).filter(Boolean);
     empty.forEach((nodes) => nodes.forEach((n) => n.remove()));
     return empty.length;
+  }
+  function applyCentredImages(root) {
+    root.querySelectorAll(`[${ALIGN_ATTR}]`).forEach((img) => img.removeAttribute(ALIGN_ATTR));
+    const html = root.ownerDocument.documentElement;
+    if (!html.hasAttribute(CENTRED_IMAGES_ATTR)) return 0;
+    html.removeAttribute(CENTRED_IMAGES_ATTR);
+    let count = 0;
+    [...root.querySelectorAll("table")].filter(isSectionMetadata).forEach((table) => {
+      const style = [...table.querySelectorAll("tr")].map((tr) => [...tr.children]).find((cells) => cells.length > 1 && /^style$/i.test(cells[0].textContent.trim()));
+      if (!style) return;
+      const tokens = style[1].textContent.split(",").map((t) => t.trim()).filter(Boolean);
+      if (!tokens.includes(BODY_STYLE) || tokens.includes(CENTRED_IMAGES_STYLE)) return;
+      style[1].textContent = [...tokens, CENTRED_IMAGES_STYLE].join(", ");
+      count += 1;
+    });
+    return count;
   }
   function cellsOf(grid) {
     const direct = [...grid.children].flatMap((c) => {
@@ -589,11 +642,12 @@ var CustomImportScript = (() => {
     });
     if (row.length > 1) {
       const split = splitVariant(filled);
-      const variants = split ? [split, portraitVariant(filled)].filter(Boolean) : [];
+      const variants = split ? [split, portraitVariant(filled)].filter(Boolean) : centredVariants(filled);
       const header = variants.length ? `Columns (${variants.join(", ")})` : "Columns";
       out.push(WebImporter.DOMUtils.createTable([[header], row], document2));
       stats.multiColumn += 1;
       if (split) stats.split = (stats.split || 0) + 1;
+      if (variants.includes("centered")) stats.centered = (stats.centered || 0) + 1;
     } else if (row.length === 1) {
       row[0].forEach((n) => out.push(n));
     }
@@ -662,6 +716,9 @@ var CustomImportScript = (() => {
     if (resume && hasContentAfter(layout, element)) {
       out.push(document2.createElement("hr"), sectionMetadata(BODY_STYLE, document2));
     }
+    const narrow = narrowBodyImages(out);
+    const centred = narrow.filter(isCentred).length;
+    if (narrow.length && centred === narrow.length) document2.documentElement.setAttribute(CENTRED_IMAGES_ATTR, "");
     const container = layout.closest(".entry-content") || layout.parentElement;
     const holder = document2.createElement("div");
     out.forEach((n) => holder.appendChild(n));
@@ -673,6 +730,8 @@ var CustomImportScript = (() => {
       byKind: stats.byKind,
       multiColumn: stats.multiColumn,
       split: stats.split || 0,
+      centered: stats.centered || 0,
+      images: { narrow: narrow.length, centred },
       highlights: stats.highlights,
       deferred: stats.deferred,
       unknown: stats.unknown
@@ -767,12 +826,148 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
 
+  // tools/importer/parsers/press-kit-media.js
+  var text2 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
+  var SOURCE_DATE2 = /^\d{1,2}\.\s?\d{1,2}\.\s?\d{4}$/;
+  var tileDate = (item) => {
+    const date = text2(item.querySelector(".entry-meta .entry-published, .entry-published"));
+    return SOURCE_DATE2.test(date) ? date : "";
+  };
+  function downloads(item, document2) {
+    const candidates = [...item.querySelectorAll(".media-cart-action-multi.download a[href]")];
+    if (!candidates.length) {
+      const single = item.querySelector('a.media-cart-action.download[href], a[data-action="download"][href]') || item.querySelector('a[href*="direct-download"]');
+      if (single) candidates.push(single);
+    }
+    const seen = /* @__PURE__ */ new Set();
+    return candidates.flatMap((a) => {
+      const href = a.getAttribute("href");
+      if (!href || href === "#" || seen.has(href)) return [];
+      seen.add(href);
+      const ext = href.split(/[?#]/)[0].split(".").pop().toUpperCase();
+      const label = text2(a) && text2(a) !== "Download" ? text2(a) : ext;
+      const link = document2.createElement("a");
+      link.href = href;
+      link.textContent = label;
+      return [link];
+    });
+  }
+  var REGULATORY = /\bWLTP\b|(?=.*\b\d[\d.,\s–-]*(?:kWh|l)\s*\/\s*100\s*km)(?=.*(?:CO[₂2]|g\s*\/\s*km))/i;
+  function parse4(element, { document: document2 }, { story = false } = {}) {
+    const gallery = element.matches(".search-results-gallery");
+    const notes = gallery ? [...new Set([...element.querySelectorAll(".article-teaser-media img[data-caption]")].map((img) => text2(Object.assign(document2.createElement("div"), { innerHTML: img.getAttribute("data-caption") }))).filter((caption) => caption && REGULATORY.test(caption)))] : [];
+    const items = [...element.querySelectorAll(".search-results-item")];
+    if (!items.length) throw new Error("Press-kit Media Box has no assets");
+    const expected = Number(element.dataset.expectedAssets);
+    if (expected && items.length !== expected) {
+      throw new Error(`Press-kit Media Box expected ${expected} assets, found ${items.length}`);
+    }
+    const rows = [];
+    items.forEach((wrapper) => {
+      var _a, _b;
+      const item = wrapper.querySelector("article.media-cart-item");
+      if (!item) throw new Error("Malformed press-kit Media Box asset");
+      const links = downloads(item, document2);
+      if (!links.length) throw new Error(`Press-kit asset has no download URL: ${text2(item.querySelector(".entry-title"))}`);
+      const img = item.querySelector(".article-teaser-media img");
+      const title = text2(item.querySelector(".entry-title")) || (img == null ? void 0 : img.getAttribute("alt")) || "";
+      if (!title) throw new Error("Press-kit Media Box asset has no title");
+      const paragraphs = links.map((link) => {
+        const p = document2.createElement("p");
+        p.append(link);
+        return p;
+      });
+      const date = gallery ? "" : tileDate(item);
+      const named = date ? [date, title] : [title];
+      if (!img) {
+        rows.push(["", ...named, paragraphs]);
+        return;
+      }
+      if (!((_a = img.getAttribute("alt")) == null ? void 0 : _a.trim())) img.alt = ((_b = img.getAttribute("title")) == null ? void 0 : _b.replace(/^Video\s*\|\s*/i, "")) || title;
+      const src = img.getAttribute("src") || "";
+      if (/^https:\/\/i\.vimeocdn\.com\//.test(src)) {
+        img.src = src.replace(/-d_\d+x\d+(\.[a-z]+)?(\?.*)?$/i, "-d_1280x720.jpg");
+      }
+      ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop", "title"].forEach((attr) => img.removeAttribute(attr));
+      rows.push([img, ...named, paragraphs]);
+    });
+    let config = gallery ? [["collapse", "auto"]] : [];
+    if (gallery && story) {
+      const toggled = !!element.querySelector(".search-results-items[data-togglebox]");
+      config = [["collapse", toggled ? "auto" : "none"], ["columns", toggled ? "4" : "3"]];
+    }
+    let name = gallery ? "Downloads (gallery)" : "Downloads";
+    if (gallery && story) name = "Downloads (gallery, story)";
+    const table = WebImporter.DOMUtils.createTable([[name], ...config, ...rows], document2);
+    element.replaceWith(table, ...notes.map((note) => Object.assign(document2.createElement("p"), { textContent: note })));
+  }
+
+  // tools/importer/transformers/skoda-drop-cap.js
+  var ATTR = "data-skoda-drop-cap";
+  var ROWS = [
+    ["text", "drop-cap-text"],
+    ["color", "drop-cap-color"],
+    ["background", "drop-cap-background"],
+    ["marginBottom", "drop-cap-margin-bottom"]
+  ];
+  var inline = (style, name) => {
+    const decl = style.split(";").map((d) => d.split(":")).find(([prop]) => (prop == null ? void 0 : prop.trim().toLowerCase()) === name);
+    return decl ? decl.slice(1).join(":").trim() : "";
+  };
+  function markDropCap(document2) {
+    const cap = document2.querySelector("article .entry-content .drop-cap, article .content .drop-cap");
+    const text4 = ((cap == null ? void 0 : cap.textContent) || "").trim();
+    if (!text4) return null;
+    const style = cap.getAttribute("style") || "";
+    const data = {
+      text: text4,
+      color: inline(style, "color"),
+      background: inline(style, "background-color"),
+      marginBottom: inline(style, "margin-bottom")
+    };
+    document2.documentElement.setAttribute(ATTR, JSON.stringify(data));
+    return data;
+  }
+  var isSectionMetadata2 = (el) => el.tagName === "TABLE" && /^section metadata$/i.test(((el.querySelector("tr > th, tr > td") || {}).textContent || "").trim());
+  var after = (a, b) => !!(a.compareDocumentPosition(b) & 4);
+  function applyDropCap(root) {
+    const html = root.ownerDocument.documentElement;
+    const raw = html.getAttribute(ATTR);
+    html.removeAttribute(ATTR);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    const doc = root.ownerDocument;
+    const breaks = [...root.querySelectorAll("hr")].filter((hr) => !hr.closest("table"));
+    const metas = [...root.querySelectorAll("table")].filter(isSectionMetadata2);
+    const styleRow = (table) => [...table.querySelectorAll("tr")].find((tr) => tr.children.length > 1 && /^style$/i.test(tr.children[0].textContent.trim()));
+    const meta = metas.find((t) => {
+      var _a;
+      return /\bbody-column\b/.test(((_a = styleRow(t)) == null ? void 0 : _a.children[1].textContent) || "");
+    });
+    if (!meta) return false;
+    const start = [...breaks].reverse().find((hr) => after(hr, meta));
+    const end = breaks.find((hr) => after(meta, hr));
+    const first = [...root.querySelectorAll("p")].find((p) => !p.closest("table") && p.textContent.trim() && (!start || after(start, p)) && (!end || after(p, end)));
+    if (!first || !first.textContent.trim().startsWith(data.text)) return false;
+    const cell = styleRow(meta).children[1];
+    cell.textContent = `${cell.textContent.trim()}, drop-cap`;
+    ROWS.forEach(([field, key]) => {
+      if (!data[field]) return;
+      const tr = doc.createElement("tr");
+      [key, data[field]].forEach((value) => {
+        tr.appendChild(doc.createElement("td")).textContent = value;
+      });
+      (meta.querySelector("tbody") || meta).appendChild(tr);
+    });
+    return true;
+  }
+
   // tools/importer/parsers/footnotes.js
   var MARK = "data-skoda-footnote";
   var NAME = "Footnotes";
   var BODY_PX = 16;
   var MEDIA = "img, picture, video, audio, iframe, svg, object, embed, canvas";
-  var text2 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
+  var text3 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
   function fontPx(el) {
     var _a;
     const value = (_a = el.style) == null ? void 0 : _a.fontSize;
@@ -784,7 +979,7 @@ var CustomImportScript = (() => {
   var isSmall = (px) => px > 0 && px < BODY_PX;
   function isFootnote(p) {
     var _a;
-    if (!((_a = p == null ? void 0 : p.matches) == null ? void 0 : _a.call(p, "p")) || fontPx(p) !== null || !text2(p) || p.querySelector(MEDIA)) return false;
+    if (!((_a = p == null ? void 0 : p.matches) == null ? void 0 : _a.call(p, "p")) || fontPx(p) !== null || !text3(p) || p.querySelector(MEDIA)) return false;
     const walker = p.ownerDocument.createTreeWalker(
       p,
       4
@@ -792,7 +987,7 @@ var CustomImportScript = (() => {
     );
     let small = false;
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-      if (text2(node)) {
+      if (text3(node)) {
         let el = node.parentElement;
         let marker = false;
         while (el !== p && fontPx(el) === null) {
@@ -814,7 +1009,7 @@ var CustomImportScript = (() => {
     found.forEach((p) => p.setAttribute(MARK, ""));
     return found.length;
   }
-  var edge = (n) => n && (n.nodeType === 1 && n.matches("br") || n.nodeType === 3 && !text2(n));
+  var edge = (n) => n && (n.nodeType === 1 && n.matches("br") || n.nodeType === 3 && !text3(n));
   function footnoteParagraph(p, document2) {
     var _a, _b;
     const copy = document2.createElement("p");
@@ -829,12 +1024,12 @@ var CustomImportScript = (() => {
   }
   function tableBefore(p) {
     let node = p.previousSibling;
-    while ((node == null ? void 0 : node.nodeType) === 3 && !text2(node)) node = node.previousSibling;
-    return (node == null ? void 0 : node.nodeType) === 1 && node.matches("table") && text2(node.querySelector("th, td")) === NAME ? node : null;
+    while ((node == null ? void 0 : node.nodeType) === 3 && !text3(node)) node = node.previousSibling;
+    return (node == null ? void 0 : node.nodeType) === 1 && node.matches("table") && text3(node.querySelector("th, td")) === NAME ? node : null;
   }
-  function parse4(p, { document: document2 }) {
+  function parse5(p, { document: document2 }) {
     p.removeAttribute(MARK);
-    if (p.closest("table, li, blockquote, figure") || !text2(p)) return;
+    if (p.closest("table, li, blockquote, figure") || !text3(p)) return;
     const row = [footnoteParagraph(p, document2)];
     const table = WebImporter.DOMUtils.createTable([[NAME], row], document2);
     const prev = tableBefore(p);
@@ -1151,6 +1346,7 @@ var CustomImportScript = (() => {
     bodies.forEach((body) => body.querySelectorAll("table").forEach((t) => tables.add(t)));
     tables.forEach((table) => {
       if (table.parentElement && table.parentElement.closest("table")) return;
+      if (table.hasAttribute("data-skoda-block")) return;
       const rows = [...table.querySelectorAll(":scope > tbody > tr, :scope > thead > tr, :scope > tr")].map((tr) => {
         const cells = [];
         [...tr.children].filter((c) => /^(td|th)$/i.test(c.tagName)).forEach((c) => {
@@ -1408,12 +1604,12 @@ var CustomImportScript = (() => {
     const cell = [];
     anchors.forEach((a) => {
       const href = a.getAttribute("href");
-      const text3 = (a.textContent || "").trim();
-      if (!href || !text3) return;
+      const text4 = (a.textContent || "").trim();
+      if (!href || !text4) return;
       if (href === "#" || a.classList.contains("show-hidden-terms")) return;
       const link = document2.createElement("a");
       link.setAttribute("href", href);
-      link.textContent = text3;
+      link.textContent = text4;
       cell.push(link);
     });
     return cell.length ? [["Tags"], [cell]] : null;
@@ -2311,8 +2507,8 @@ var CustomImportScript = (() => {
     const afterRange = document2.createRange();
     afterRange.setStartAfter(target);
     afterRange.setEnd(paragraph, paragraph.childNodes.length);
-    const after = paragraph.cloneNode(false);
-    after.append(afterRange.extractContents());
+    const after2 = paragraph.cloneNode(false);
+    after2.append(afterRange.extractContents());
     const beforeRange = document2.createRange();
     beforeRange.selectNodeContents(paragraph);
     beforeRange.setEndBefore(target);
@@ -2320,7 +2516,7 @@ var CustomImportScript = (() => {
     before.append(beforeRange.extractContents());
     const imageNode = imageContainer(img, document2, linkedImage ? link : null);
     const image = withCaption(imageNode, caption, document2);
-    paragraph.replaceWith(...[before, image, after].filter(hasContent));
+    paragraph.replaceWith(...[before, image, after2].filter(hasContent));
   }
   function normalizeImages(root, document2 = root.ownerDocument) {
     root.querySelectorAll("img").forEach((img) => {
@@ -2469,12 +2665,15 @@ var CustomImportScript = (() => {
      * Runs on the untouched DOM, before helix-importer's preProcess and the cleanup
      * transformers. The highlight rows' background colour (SKODA-824) is only in the
      * SiteOrigin head CSS, so the rows are marked here for story-flatten, and so are the cell
-     * widths of unequal 2-cell rows (SKODA-225, Columns (split-NN)). Also keeps the
+     * widths of unequal 2-cell rows (SKODA-225, Columns (split-NN)), and the images the source
+     * centres (`aligncenter`: Columns (centered), the body's `centered-images`). Also keeps the
      * source's glued non-breaking spaces (html2md would turn them into spaces).
      */
     preprocess: ({ document: document2 }) => {
       markHighlights(document2);
       markCellWidths(document2);
+      markCentredImages(document2);
+      markDropCap(document2);
       document2.querySelectorAll("article .entry-content, article .content").forEach((body) => {
         markFootnotes(body);
         markBoldHeadings(body);
@@ -2488,6 +2687,14 @@ var CustomImportScript = (() => {
     transform: (payload) => {
       const { document: document2, url, params } = payload;
       const main = document2.body;
+      main.querySelectorAll(".textwidget .search-results.search-results-gallery").forEach((group) => {
+        var _a;
+        const anchor = document2.createComment("gallery");
+        group.before(anchor);
+        parse4(group, payload, { story: true });
+        (_a = anchor.nextElementSibling) == null ? void 0 : _a.setAttribute("data-skoda-block", "");
+        anchor.remove();
+      });
       executeTransformers("beforeTransform", main, payload);
       const pageBlocks = findBlocksOnPage(document2, PAGE_TEMPLATE);
       pageBlocks.forEach((block) => {
@@ -2504,9 +2711,12 @@ var CustomImportScript = (() => {
         }
       });
       executeTransformers("afterTransform", main, payload);
-      main.querySelectorAll("p[data-skoda-footnote]").forEach((p) => parse4(p, payload));
+      main.querySelectorAll("p[data-skoda-footnote]").forEach((p) => parse5(p, payload));
       main.querySelectorAll("[data-skoda-footnote]").forEach((p) => p.removeAttribute("data-skoda-footnote"));
       restoreBoldHeadings(main);
+      applyCentredImages(main);
+      applyDropCap(main);
+      main.querySelectorAll("[data-skoda-block]").forEach((el) => el.removeAttribute("data-skoda-block"));
       dropEmptySections(main);
       WebImporter.rules.transformBackgroundImages(main, document2);
       normalizeImages(main, document2);

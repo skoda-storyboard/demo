@@ -103,6 +103,26 @@ All rows: `measured (source-url · selector · viewport) → token`. Source = th
   defaults; no per-article override found).
 - `figure` / caption: figure = full content width; caption `.wp-caption-text` `font-weight:300`,
   `text-align:center` when `.aligncenter` (· source CSS) → weight `--weight-light`, muted.
+- **Drop cap** (`span.drop-cap` opening the first body paragraph, 22 of the 82 migrated stories,
+  measured 2026-10-15 at 1440 / 768 / 390):
+  - a 100×100 block floated left with a 20px gap, so the text starts 120px in;
+  - the letter is 68/100, weight 300, uppercase and centred;
+  - green `#419468` on black unless the story's inline style sets its own colours (19 do), and
+    two stories add a 20px gap below.
+  - EDS: Section Metadata style `drop-cap` plus rows `drop-cap-text` / `-color` /
+    `-background` / `-margin-bottom` (importer `transformers/skoda-drop-cap.js`), drawn by
+    `scripts/drop-cap.js`. The visible letter is aria-hidden, and a hidden inline copy keeps
+    the word whole for screen readers.
+- **Photo grid in the text** (`.textwidget .search-results-gallery`, 7 stories, the same
+  source group as a press-kit Images gallery):
+  - photos only, 16:9, 20px apart, 72px below the group's top (its empty toolbar);
+  - a click opens the media lightbox with the download sizes;
+  - plain groups are 3 wide (1 / 2 / 3 at 768 / 992, every photo shown);
+  - groups with the source's togglebox (`data-togglebox`: the 4×4 and surfing stories) use the
+    Media Box grid (1 / 2 / 3 / 4 at 520 / 768 / 992) and collapse with "Show more".
+  - EDS: `Downloads (gallery, story)` with `collapse none|auto` and `columns 3|4`
+    (`parsers/press-kit-media.js` `{ story: true }`). Before this, the group's size labels
+    reached the body as stray "Original1920px" lines and no photos.
 
 ### Sidebar (`.sidebar`)
 - static two-thirds-down column of 4 stacked sections (subscribe / related / tags / promo banner);

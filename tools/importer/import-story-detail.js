@@ -19,8 +19,11 @@
 import storyHeroParser from './parsers/story-hero.js';
 import storyFlattenParser, {
   markHighlights, markCellWidths, markBoldHeadings, restoreBoldHeadings, dropEmptySections,
+  markCentredImages, applyCentredImages,
 } from './parsers/story-flatten.js';
 import downloadsParser from './parsers/downloads.js';
+import mediaParser from './parsers/press-kit-media.js';
+import { markDropCap, applyDropCap } from './transformers/skoda-drop-cap.js';
 import footnotesParser, { markFootnotes } from './parsers/footnotes.js';
 import pageCleanupTransformer from './transformers/skoda-page-cleanup.js';
 import storyCleanupTransformer from './transformers/skoda-story-cleanup.js';
@@ -132,12 +135,16 @@ export default {
    * Runs on the untouched DOM, before helix-importer's preProcess and the cleanup
    * transformers. The highlight rows' background colour (SKODA-824) is only in the
    * SiteOrigin head CSS, so the rows are marked here for story-flatten, and so are the cell
-   * widths of unequal 2-cell rows (SKODA-225, Columns (split-NN)). Also keeps the
+   * widths of unequal 2-cell rows (SKODA-225, Columns (split-NN)), and the images the source
+   * centres (`aligncenter`: Columns (centered), the body's `centered-images`). Also keeps the
    * source's glued non-breaking spaces (html2md would turn them into spaces).
    */
   preprocess: ({ document }) => {
     markHighlights(document);
     markCellWidths(document);
+    markCentredImages(document);
+    // the source's drop cap and its inline colours (DA keeps neither)
+    markDropCap(document);
     // #296: the body's 10pt small print (Epiq "¹ Available at a later date.") → Footnotes, as on
     // press kits (SKODA-805d); its size lives only in inline spans, which DA drops
     document.querySelectorAll('article .entry-content, article .content').forEach((body) => {
@@ -159,6 +166,18 @@ export default {
   transform: (payload) => {
     const { document, url, params } = payload;
     const main = document.body;
+
+    // A gallery a story's text widget holds (`.search-results-gallery`, the Miss Peaches photo
+    // grids) → Downloads (gallery, story), before the cleanup strips its download sizes (whose
+    // labels otherwise read "Original1920px" in the body)
+    // (marked, so the cleanup's source-table pass keeps it a Downloads block, not a Columns)
+    main.querySelectorAll('.textwidget .search-results.search-results-gallery').forEach((group) => {
+      const anchor = document.createComment('gallery');
+      group.before(anchor);
+      mediaParser(group, payload, { story: true });
+      anchor.nextElementSibling?.setAttribute('data-skoda-block', '');
+      anchor.remove();
+    });
 
     executeTransformers('beforeTransform', main, payload);
 
@@ -182,6 +201,11 @@ export default {
     main.querySelectorAll('p[data-skoda-footnote]').forEach((p) => footnotesParser(p, payload));
     main.querySelectorAll('[data-skoda-footnote]').forEach((p) => p.removeAttribute('data-skoda-footnote'));
     restoreBoldHeadings(main);
+    // the body's centred images (story-flatten) → its sections' `centered-images` style
+    applyCentredImages(main);
+    // the drop cap → its body section's Section Metadata
+    applyDropCap(main);
+    main.querySelectorAll('[data-skoda-block]').forEach((el) => el.removeAttribute('data-skoda-block'));
     // A leading highlight row (SKODA-824) leaves the body section with only its metadata.
     dropEmptySections(main);
 

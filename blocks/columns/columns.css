@@ -229,3 +229,72 @@
     flex: 0 0 var(--columns-split);
   }
 }
+
+/* ==========================================================================
+   `centered` variant: an equal story row of centred image cards, measured on the live
+   Miss Peaches enduro story (2026-10-15, 1440/768/390):
+   - the split row's geometry: 10px cell padding, the row 10px past the text column, equal
+     cells side by side from 781px, stacked at 780 and below;
+   - every image cell centred, text included; its images at their own size capped at the
+     cell (the 384px portraits, the Instagram icons), `portrait-NNN` → the card's first image
+     (the 300px portraits of 384px files);
+   - `captioned` (the first image is a caption figure, `.wp-caption-text`): its caption, the
+     paragraphs up to the next image, directly under it and light (300; the name's <strong>
+     stays 600), then the usual 20px paragraph gaps.
+   ========================================================================== */
+.columns.centered {
+  --columns-split-gutter: 10px; /* SiteOrigin cell padding */
+
+  margin-inline: calc(-1 * var(--columns-split-gutter));
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- centered and callout never combine on one block */
+.columns.centered > div {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- centered and callout never combine on one block */
+.columns.centered > div > div {
+  box-sizing: border-box;
+  order: unset;
+  min-width: 0;
+  padding: var(--columns-split-gutter);
+}
+
+.columns.centered .columns-portrait {
+  text-align: center;
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- centered and split never combine on one block */
+.columns.centered .columns-portrait img {
+  display: block;
+  width: auto;
+  height: auto;
+  margin-inline: auto;
+}
+
+.columns.centered.portrait .columns-portrait .columns-portrait-img {
+  width: min(var(--columns-portrait), 100%);
+}
+
+.columns.centered.captioned .columns-portrait > p:first-child:has(> picture) {
+  margin-block-end: 0;
+}
+
+.columns.centered.captioned .columns-portrait > p:first-child:has(> picture)
+  ~ p:not(:has(> picture), p:has(> picture) ~ p:has(> picture) ~ p) {
+  font-weight: var(--weight-light);
+}
+
+@media (width >= 781px) {
+  .columns.centered > div {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .columns.centered > div > div {
+    flex: 1 1 0;
+  }
+}

@@ -168,10 +168,6 @@
   --scrim-h: linear-gradient(270deg, transparent, rgb(0 0 0 / 25%));
   --scrim-v: linear-gradient(180deg, transparent, rgb(0 0 0 / 10%));
 
-  /* bottom-anchored legibility scrim under the overlay caption text — guarantees the
-     white title/date/summary stay >= 4.5:1 even on bright images (the source dual scrim
-     alone is too weak on light photos). Ramps from opaque-ish at the base to clear ~55% up. */
-  --scrim-text: linear-gradient(0deg, rgb(0 0 0 / 70%), rgb(0 0 0 / 40%) 25%, transparent 55%);
 
   /* card-teaser metadata + overlay typography (source .entry-published / overlay text) */
   --card-meta-font-size: 11px;
@@ -982,6 +978,48 @@ body.story main > .section.body-column .default-content-wrapper :is(h2, h3) stro
   font-weight: var(--weight-semibold);
 }
 
+/* The story's drop cap (scripts/drop-cap.js; Section Metadata style `drop-cap`), measured on the
+   live enduro / electric-car stories at 1440 / 768 / 390: a 100×100 block floated left, 20px
+   from the text (which starts 120px in), the letter 68/100 light, uppercase and centred; a green
+   letter on black unless the story sets its own colours (and, on two stories, a 20px gap below). */
+body.story main > .section.drop-cap .drop-cap-letter {
+  --drop-cap-size: 100px;
+  --drop-cap-font-size: 68px;
+  --drop-cap-gap: 20px;
+
+  float: inline-start;
+  box-sizing: border-box;
+  inline-size: var(--drop-cap-size);
+  block-size: var(--drop-cap-size);
+  margin: 0 var(--drop-cap-gap) var(--drop-cap-margin-bottom, 0) 0;
+  background: var(--drop-cap-background, var(--skoda-black));
+  color: var(--drop-cap-color, var(--skoda-green-accent));
+  font-size: var(--drop-cap-font-size);
+  font-weight: var(--weight-light);
+  line-height: var(--drop-cap-size);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* the letter as read out: inline with the rest of the word, not shown */
+body.story main > .section.drop-cap .drop-cap-spoken {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* `centered-images` (Section Metadata style, set by the story importer when the source centres
+   every narrower body image, `img.aligncenter`): such an image sits in the middle of the
+   column, e.g. the 800px photos of the 819px Miss Peaches column, 9.5px in at 1440. Wider
+   images fill the column either way. */
+body.story main > .section.centered-images .default-content-wrapper picture > img {
+  display: block;
+  margin-inline: auto;
+}
+
 /* Source widgets are 24px apart from 720px (#296, KYL measured at 375–1440):
    - every body heading starts its own SiteOrigin widget (59 of 59 across the 21 demo
      stories), so after a paragraph it sits 20 + 24 = 44px down ("Careful Planning",
@@ -1186,9 +1224,14 @@ body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has
    body track is the 10px inset + 2/3 of the inset content box, so the text lands on
    the source's 819px at 1248 (707 at 1080, 499 at 768); the aside takes the rest. */
 @media (width >= 768px) {
+  /* overflow-x: the dark bands (`.section.dark::before`, below) are 100vw wide, which takes in
+     a desktop's classic scrollbar (15px), so the page scrolled 8px sideways at 1280–1440 (the
+     Media Box, Related Stories). `clip` hides that and makes no scroll container (sticky works). */
   body.story {
     --story-body-gap: 32px;
     --highlight-row-top: 32px;
+
+    overflow-x: clip;
   }
 
   body.story main {

@@ -34,7 +34,8 @@
     "downloads": {
       "variants": [
         "media-box",
-        "gallery"
+        "gallery",
+        "story"
       ]
     },
     "embed": {
@@ -320,12 +321,14 @@
       "block": "columns",
       "variantPatterns": [
         "^split-[1-9][0-9]$",
-        "^portrait-[1-9][0-9]{1,2}$"
+        "^portrait-[1-9][0-9]{1,2}$",
+        "^centered$",
+        "^captioned$"
       ],
       "status": "pinned",
       "ticket": "SKODA-225",
       "fallback": "readable",
-      "shape": 2,
+      "shape": 3,
       "emittedBy": [
         "parsers/story-flatten.js"
       ]

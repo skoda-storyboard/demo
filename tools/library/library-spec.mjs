@@ -42,6 +42,7 @@ export const SPEC = {
     description: 'One row, one cell per column (text, images, links). On phones the columns stack.',
     variants: [
       { class: 'split-62 portrait-235', label: 'split-62, portrait-235', description: 'Unequal story row: the first cell takes 62% (split-NN = NN%); portrait-NNN is the display width in px of a portrait image in the other cell. Values are read from the class, so use the exact form split-NN / portrait-NNN.' },
+      { class: 'centered portrait-300 captioned', label: 'centered, portrait-300, captioned', description: "Equal story row of centred image cards (rider profiles): each image cell centred, its images at their own size. Optional: portrait-NNN, the display width in px of each card's first image; captioned, the paragraphs after that image are its caption (directly under it, light)." },
       { class: 'banners', label: 'banners', description: 'Press kit: a row of linked banner images at their authored size (PDF download / share buttons).' },
       { class: 'callout', label: 'callout', description: 'Press kit: [icon, text], a small 50px icon beside its text (the WhatsApp callout).' },
       { class: 'stats', label: 'stats', description: 'Model page technical data: each cell is a key figure, the value in bold and its label below.' },
@@ -54,6 +55,7 @@ export const SPEC = {
     variants: [
       { class: 'media-box', label: 'media-box', description: 'The Media Box at the end of a story, release or press-kit chapter: titles as headings, dates, size menu, "Show more" after two rows, lightbox on the images. Put it in a section with Style "dark, full-width, media-box" and an h2 "Media Box".' },
       { class: 'gallery', label: 'gallery', description: 'Press-kit Images chapter group: thumbnails with add / download over the image and the "Original / 1920px" pills above the group.' },
+      { class: 'gallery story', label: 'gallery, story', description: "A photo grid in a story's text: photos only (1 / 2 / 3 across), each opening the lightbox with its download sizes. Add rows collapse | auto for the \"Show more\" of a long set, and columns | 3." },
     ],
   },
   embed: {
@@ -167,6 +169,8 @@ export const SECTION_STYLES = [
   ['sidebar', 'Story / release sidebar: newsletter card, Explore more, Tags.'],
   ['body-column, highlight-dark', 'Dark highlight box inside the article ("What has changed" lists).'],
   ['body-column, highlight-grey', 'Grey highlight box inside a press release (FAQ callout).'],
+  ['body-column, centered-images', 'Story article column whose narrower images sit centred (the source centres them).'],
+  ['body-column, drop-cap', 'Story article column opening with a drop cap; optional rows drop-cap-text, drop-cap-color, drop-cap-background, drop-cap-margin-bottom.'],
   ['dark, full-width, media-box', 'The Media Box band (holds the Media Box Downloads block).'],
   ['dark, full-width, related', 'The dark related band at the end of a press release.'],
   ['dark', 'Dark band (e.g. the Related Stories rail).'],

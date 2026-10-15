@@ -734,6 +734,102 @@ test('parse: equal or unmeasured rows stay plain Columns', { skip: domSkip }, ()
   assert.equal(none.querySelector('table').dataset.block, 'Columns', 'without markCellWidths');
 });
 
+// ---- centred images (the source's aligncenter: Columns (centered), centered-images) ----------
+const { markCentredImages, applyCentredImages } = await import('./story-flatten.js');
+const { centredVariants } = __test;
+
+// the Miss Peaches rider profiles: an equal row, each cell a caption figure + an Instagram icon
+const profileCell = (id, portrait, icon) => `<div id="${id}" class="panel-grid-cell">
+  <div class="so-panel widget widget_sow-editor"><div class="so-widget-sow-editor"><div class="siteorigin-widget-tinymce textwidget">
+    <figure style="width: ${portrait.width}px" class="wp-caption aligncenter"><img class="size-medium" src="${portrait.src}" alt="" width="${portrait.width}" height="${portrait.width}" srcset="${portrait.src} 384w, small.png 150w"><figcaption class="wp-caption-text"><strong>Name</strong></figcaption></figure>
+    <p><img class="aligncenter" src="instagram.png" alt="Instagram-icon" width="${icon}" height="${icon}" srcset="instagram.png 150w"></p>
+    <p style="text-align: center;"><strong>instagram:</strong></p></div></div></div></div>`;
+function profileStory({ css = '#pgc-1-4-0 , #pgc-1-4-1 { width:50%;width:calc(50% - ( 0.5 * 30px ) ) }', portrait = 384, body = '' } = {}) {
+  return domDoc(`<html><head><style>${css}</style></head><body><div class="entry-content"><div class="panel-layout">
+    <div id="pg-1-3" class="panel-grid panel-no-style"><div id="pgc-1-3-0" class="panel-grid-cell"><div class="so-panel widget widget_sow-editor"><div class="so-widget-sow-editor"><div class="siteorigin-widget-tinymce textwidget">
+      <p>Body text.</p>${body}</div></div></div></div></div>
+    <div id="pg-1-4" class="panel-grid panel-has-style"><div class="panel-row-style">
+      ${profileCell('pgc-1-4-0', { src: 'laura.png', width: portrait }, 116)}${profileCell('pgc-1-4-1', { src: 'nina.png', width: portrait }, 122)}
+    </div></div></div></div></body></html>`);
+}
+const importStory = (d) => {
+  markCellWidths(d);
+  markCentredImages(d);
+  const main = d.body;
+  const content = d.querySelector('.entry-content');
+  content.before(createTable([['Section Metadata'], ['style', 'body-column']], d));
+  parse(content, { document: d });
+  applyCentredImages(main);
+  return main;
+};
+const bodyStyle = (main) => [...main.querySelectorAll('table')]
+  .filter((t) => t.querySelector('tr').textContent.trim() === 'Section Metadata')
+  .map((t) => t.querySelectorAll('tr')[1].children[1].textContent);
+
+test('markCentredImages: aligncenter, a centred caption figure or paragraph; not a plain image', { skip: domSkip }, () => {
+  const d = domDoc(`<div class="textwidget"><p><img id="a" class="aligncenter" src="a.png"></p>
+    <figure class="wp-caption aligncenter"><img id="b" src="b.png"></figure><p style="text-align: center;"><img id="c" src="c.png"></p>
+    <p><img id="d" class="alignnone" src="d.png"></p><p style="text-align: left;"><img id="e" src="e.png"></p>
+    <div class="search-results search-results-gallery"><img id="g" class="media-cart-image" src="g.jpg"></div><div class="sb-gallery"><img id="h" src="h.jpg"></div></div>
+    <p><img id="f" class="aligncenter" src="f.png"></p>`);
+  assert.equal(markCentredImages(d), 3);
+  const marks = [...d.querySelectorAll('img')].map((img) => `${img.id}:${img.getAttribute('data-skoda-align')}`);
+  assert.deepEqual(marks, ['a:center', 'b:center', 'c:center', 'd:left', 'e:left', 'g:null', 'h:null', 'f:null'], 'only the editor text images');
+});
+
+test('centredVariants: an equal row of centred images; the shared first-image width as portrait-NNN', { skip: domSkip }, () => {
+  const cellsOfStory = (d) => [...d.querySelectorAll('#pg-1-4 .panel-grid-cell')];
+  const d = profileStory();
+  markCellWidths(d); markCentredImages(d);
+  assert.deepEqual(centredVariants(cellsOfStory(d)), ['centered', 'captioned'], '384px portraits are their file size');
+  const small = profileStory({ portrait: 300 });
+  markCellWidths(small); markCentredImages(small);
+  assert.deepEqual(centredVariants(cellsOfStory(small)), ['centered', 'portrait-300', 'captioned'], '300px of a 384px file');
+  const plain = profileStory();
+  plain.querySelectorAll('figcaption').forEach((fc) => fc.remove());
+  markCellWidths(plain); markCentredImages(plain);
+  assert.deepEqual(centredVariants(cellsOfStory(plain)), ['centered'], 'a portrait without a caption');
+  const unequal = profileStory({ css: '#pgc-1-4-0 { width:61.8% } #pgc-1-4-1 { width:38.2% }' });
+  markCellWidths(unequal); markCentredImages(unequal);
+  assert.deepEqual(centredVariants(cellsOfStory(unequal)), [], 'an unequal row is split-NN');
+  const left = profileStory();
+  left.querySelector('img.aligncenter').classList.remove('aligncenter');
+  markCellWidths(left); markCentredImages(left);
+  assert.deepEqual(centredVariants(cellsOfStory(left)), [], 'one left image → default Columns');
+  const unmeasured = profileStory({ css: '' });
+  markCentredImages(unmeasured);
+  assert.deepEqual(centredVariants(cellsOfStory(unmeasured)), [], 'unknown widths');
+});
+
+test('import: the profile row → Columns (centered, …); the marks never reach the output', { skip: domSkip }, () => {
+  const main = importStory(profileStory({ portrait: 300 }));
+  const blocks = [...main.querySelectorAll('table')].map((t) => t.dataset.block);
+  assert.deepEqual(blocks, ['Section Metadata', 'Columns (centered, portrait-300, captioned)']);
+  assert.equal(main.querySelector('[data-skoda-align]'), null);
+  assert.equal(main.ownerDocument.documentElement.hasAttribute('data-skoda-centred-images'), false);
+});
+
+test('import: the body centres images only when every narrower one is centred', { skip: domSkip }, () => {
+  const centred = importStory(profileStory({ body: '<p><img class="aligncenter" src="p.jpg" width="800" height="500"></p><p><img class="alignnone" src="w.jpg" width="1400" height="126"></p>' }));
+  assert.deepEqual(bodyStyle(centred), ['body-column, centered-images'], 'the 1400px image fills the column either way');
+  const mixed = importStory(profileStory({ body: '<p><img class="aligncenter" src="p.jpg" width="800"></p><p><img src="q.jpg" width="600"></p>' }));
+  assert.deepEqual(bodyStyle(mixed), ['body-column'], 'a left image keeps the default');
+  const none = importStory(profileStory());
+  assert.deepEqual(bodyStyle(none), ['body-column'], 'images in a Columns row do not count');
+  const media = importStory(profileStory({ body: '<p><img class="aligncenter" src="p.jpg" width="800"></p><div class="search-results search-results-gallery"><img src="m.jpg" width="768"></div>' }));
+  assert.deepEqual(bodyStyle(media), ['body-column, centered-images'], 'nor does a gallery shortcode in the editor (the media box)');
+});
+
+test('applyCentredImages: every body section, once; other sections untouched', { skip: domSkip }, () => {
+  const d = domDoc('<body></body>');
+  const meta = (style) => createTable([['Section Metadata'], ['style', style]], d);
+  d.body.append(meta('body-column'), meta('body-column, highlight-dark'), meta('story-intro'), meta('body-column, centered-images'));
+  d.documentElement.setAttribute('data-skoda-centred-images', '');
+  assert.equal(applyCentredImages(d.body), 2);
+  assert.deepEqual(bodyStyle(d.body), ['body-column, centered-images', 'body-column, highlight-dark, centered-images', 'story-intro', 'body-column, centered-images']);
+  assert.equal(applyCentredImages(d.body), 0, 'the flag is cleared');
+});
+
 // --- bold headings (#296 review: Slavia's "Technical improvements" is not bold on origin) ---------
 const { markBoldHeadings, restoreBoldHeadings, isBoldHeading } = await import('./story-flatten.js');
 
@@ -848,4 +944,12 @@ test('classifyWidget: the bare siteorigin-panels-builder class wins over its fir
   const d = domDoc(`<div class="so-panel siteorigin-panels-builder"><div class="panel-layout"><div class="panel-grid"><div class="panel-grid-cell">
     <div class="so-panel widget widget_sow-editor"><div class="so-widget-sow-editor"><p>x</p></div></div></div></div></div></div>`);
   assert.equal(classifyWidget(d.querySelector('.so-panel')), 'nested-builder');
+});
+
+test('a line break closing a bold run moves after it (Miss Peaches "instagram:<br>")', { skip: domSkip }, () => {
+  const d = domDoc(`<div class="entry-content"><div class="panel-layout"><div class="panel-grid"><div class="panel-grid-cell">
+    ${editor('<strong>instagram:<br /></strong><a href="https://www.instagram.com/x/">@x</a><br />followers')}</div></div></div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  assert.equal(content.querySelector('p').innerHTML, '<strong>instagram:</strong><br><a href="https://www.instagram.com/x/">@x</a><br>followers');
 });

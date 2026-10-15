@@ -129,6 +129,11 @@ function editorNodes(panel, document) {
   const tiny = panel.querySelector('.siteorigin-widget-tinymce, .textwidget')
     || panel.querySelector('[class*="so-widget-sow-editor"]');
   if (!tiny) return [];
+  // a line break closing an inline (`<strong>instagram:<br></strong>`, the Miss Peaches
+  // profiles) is lost in DA; after the inline it breaks the line as on the source
+  tiny.querySelectorAll(':is(strong, b, em, i, span) > br:last-child').forEach((br) => {
+    if (!(br.nextSibling?.textContent || '').trim()) br.parentElement.after(br);
+  });
   const nodes = [...tiny.childNodes];
   const out = [];
   nodes.forEach((n) => {
@@ -580,14 +585,78 @@ export function splitVariant(cells) {
  */
 export function portraitVariant(cells) {
   const imgs = cells.flatMap((c) => [...c.querySelectorAll('img')]);
-  if (imgs.length !== 1) return null;
-  const img = imgs[0];
+  const width = imgs.length === 1 && shownWidth(imgs[0]);
+  return width ? `portrait-${width}` : null;
+}
+
+/** An image's authored display width (10–999px) when smaller than its file, else null. */
+function shownWidth(img) {
   const width = parseInt(img.getAttribute('width'), 10);
   if (!(width >= 10 && width <= 999)) return null;
   const descriptors = (img.getAttribute('srcset') || '').match(/\s(\d+)w\b/g) || [];
   const fileWidth = Math.max(0, ...descriptors.map((d) => parseInt(d, 10)));
-  if (fileWidth && width >= fileWidth) return null;
-  return `portrait-${width}`;
+  return fileWidth && width >= fileWidth ? null : width;
+}
+
+// ---- centred images (the source's `aligncenter`) -------------------------------------
+// DA keeps neither an image's class nor its paragraph's inline style, so the importer's
+// `preprocess` calls markCentredImages() on the untouched DOM, and the flatten turns the marks
+// into a Columns variant (an equal row) or a body Section Metadata style (the column).
+const ALIGN_ATTR = 'data-skoda-align'; // an editor image: `center` or `left`
+const CENTRED_IMAGES_ATTR = 'data-skoda-centred-images'; // on <html>: the body's images are centred
+const CENTRED_IMAGES_STYLE = 'centered-images';
+const COLUMN_WIDTH = 819; // the story text column at 1440 (an image this wide fills it)
+
+/**
+ * Mark every editor image with its alignment: `center` for `img.aligncenter`, an image in a
+ * centred caption figure (`figure.wp-caption.aligncenter`) or a centred paragraph, else
+ * `left`. Images outside the editor's own text stay unmarked: a slider, and the gallery or
+ * media box a shortcode renders inside the editor (`.search-results`, `.sb-gallery`), which
+ * become blocks. Returns the number of centred images.
+ */
+export function markCentredImages(document) {
+  let count = 0;
+  document.querySelectorAll('.textwidget img').forEach((img) => {
+    if (img.closest('.search-results, .sb-gallery')) return;
+    const centred = !!img.closest('.aligncenter, [style*="text-align: center"], [style*="text-align:center"]');
+    img.setAttribute(ALIGN_ATTR, centred ? 'center' : 'left');
+    count += centred ? 1 : 0;
+  });
+  return count;
+}
+const isCentred = (img) => img.getAttribute(ALIGN_ATTR) === 'center';
+
+/**
+ * The variants of an equal-width row whose every image the source centres (the Miss Peaches
+ * profile cards: a 384px portrait, a name and role, an Instagram icon, all centred):
+ * `centered`, plus `portrait-NNN` when each image cell's first image is shown at the same width
+ * NNN, smaller than its file (the 300px portraits of 384px files), and `captioned` when each
+ * is a caption figure (`figure.wp-caption`: DA keeps its caption as the paragraphs after the
+ * image). Empty for any other row. Later images in a cell keep their file size (DA keeps no
+ * per-image width).
+ */
+export function centredVariants(cells) {
+  const cellWidths = cells.map((c) => parseFloat(c.getAttribute(CELL_WIDTH_ATTR)));
+  if (cells.length < 2 || !cellWidths.every((w) => w > 0)
+    || Math.max(...cellWidths) - Math.min(...cellWidths) >= 2) return [];
+  const imgs = cells.flatMap((c) => [...c.querySelectorAll('img')]);
+  if (!imgs.length || !imgs.every(isCentred)) return [];
+  const firsts = cells.map((c) => c.querySelector('img')).filter(Boolean);
+  const widths = firsts.map(shownWidth);
+  const portrait = widths.every((w) => w && w === widths[0]) ? `portrait-${widths[0]}` : null;
+  const captioned = firsts.every((img) => img.closest('figure')?.querySelector('figcaption'));
+  return ['centered', portrait, captioned && 'captioned'].filter(Boolean);
+}
+
+/**
+ * The body's editor images narrower than the column, outside a block (a Columns row): wider
+ * ones fill the column, centred or not. `nodes` is the flattened body.
+ */
+function narrowBodyImages(nodes) {
+  return nodes.filter((n) => n.nodeType === 1 && n.tagName !== 'TABLE')
+    .flatMap((n) => (n.tagName === 'IMG' ? [n] : [...n.querySelectorAll('img')]))
+    .filter((img) => img.hasAttribute(ALIGN_ATTR) && !img.closest('table')
+      && parseInt(img.getAttribute('width'), 10) < COLUMN_WIDTH);
 }
 
 /** Whether readable content follows `node` inside `root` (avoids an empty section). */
@@ -630,6 +699,30 @@ export function dropEmptySections(root) {
   }).filter(Boolean);
   empty.forEach((nodes) => nodes.forEach((n) => n.remove()));
   return empty.length;
+}
+
+/**
+ * Add `centered-images` to every body Section Metadata (`body-column`, and the highlight
+ * sections, `body-column, highlight-…`) when the flatten found the body's images centred.
+ * Call after afterTransform, once skoda-model-sections has written the body's own metadata;
+ * it also clears the images' marks. Returns the number of sections styled.
+ */
+export function applyCentredImages(root) {
+  root.querySelectorAll(`[${ALIGN_ATTR}]`).forEach((img) => img.removeAttribute(ALIGN_ATTR));
+  const html = root.ownerDocument.documentElement;
+  if (!html.hasAttribute(CENTRED_IMAGES_ATTR)) return 0;
+  html.removeAttribute(CENTRED_IMAGES_ATTR);
+  let count = 0;
+  [...root.querySelectorAll('table')].filter(isSectionMetadata).forEach((table) => {
+    const style = [...table.querySelectorAll('tr')].map((tr) => [...tr.children])
+      .find((cells) => cells.length > 1 && /^style$/i.test(cells[0].textContent.trim()));
+    if (!style) return;
+    const tokens = style[1].textContent.split(',').map((t) => t.trim()).filter(Boolean);
+    if (!tokens.includes(BODY_STYLE) || tokens.includes(CENTRED_IMAGES_STYLE)) return;
+    style[1].textContent = [...tokens, CENTRED_IMAGES_STYLE].join(', ');
+    count += 1;
+  });
+  return count;
 }
 
 // ---- tree walk ------------------------------------------------------------
@@ -693,7 +786,8 @@ function emitWidget(panel, document, out, stats, { inBlock = false } = {}) {
 // createTable takes plain-array cells (a cell = an array of nodes) — NOT an { elems }
 // object (that is the runtime buildBlock format; here it serialises to "[object Object]").
 // Two unequal cells carry their width ratio, and an authored-size image its width, as
-// variants (`Columns (split-62, portrait-235)`, contract columns-split v2, SKODA-225).
+// variants (`Columns (split-62, portrait-235)`, contract columns-split v2, SKODA-225); an
+// equal row of centred images is `Columns (centered[, portrait-NNN])` (centredVariants).
 function emitMultiColumn(cells, document, out, stats) {
   const row = [];
   const filled = [];
@@ -704,11 +798,12 @@ function emitMultiColumn(cells, document, out, stats) {
   });
   if (row.length > 1) {
     const split = splitVariant(filled);
-    const variants = split ? [split, portraitVariant(filled)].filter(Boolean) : [];
+    const variants = split ? [split, portraitVariant(filled)].filter(Boolean) : centredVariants(filled);
     const header = variants.length ? `Columns (${variants.join(', ')})` : 'Columns';
     out.push(WebImporter.DOMUtils.createTable([[header], row], document));
     stats.multiColumn += 1;
     if (split) stats.split = (stats.split || 0) + 1;
+    if (variants.includes('centered')) stats.centered = (stats.centered || 0) + 1;
   } else if (row.length === 1) {
     // Only one non-empty column after mapping — linearize (no block needed).
     row[0].forEach((n) => out.push(n));
@@ -806,6 +901,11 @@ export default function parse(element, { document }) {
   if (resume && hasContentAfter(layout, element)) {
     out.push(document.createElement('hr'), sectionMetadata(BODY_STYLE, document));
   }
+  // the body's narrower images: all centred on the source → its sections centre them
+  // (applyCentredImages, once the body's own Section Metadata exists)
+  const narrow = narrowBodyImages(out);
+  const centred = narrow.filter(isCentred).length;
+  if (narrow.length && centred === narrow.length) document.documentElement.setAttribute(CENTRED_IMAGES_ATTR, '');
 
   // Replace the whole builder subtree with the flat sequence. Wrap in a plain <div>
   // so the parser's element (.content) keeps its shell; markdown conversion drops the
@@ -825,6 +925,8 @@ export default function parse(element, { document }) {
     byKind: stats.byKind,
     multiColumn: stats.multiColumn,
     split: stats.split || 0,
+    centered: stats.centered || 0,
+    images: { narrow: narrow.length, centred },
     highlights: stats.highlights,
     deferred: stats.deferred,
     unknown: stats.unknown,
@@ -838,5 +940,5 @@ export default function parse(element, { document }) {
 
 // Exposed for unit/prototype testing (harness-only; ignored by the bundle default).
 export const __test = {
-  classifyWidget, cellsOf, panelsOf, WIDGET_KINDS, splitVariant, portraitVariant,
+  classifyWidget, cellsOf, panelsOf, WIDGET_KINDS, splitVariant, portraitVariant, centredVariants,
 };

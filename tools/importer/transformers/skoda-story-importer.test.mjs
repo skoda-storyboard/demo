@@ -383,3 +383,86 @@ test('aside emits the "Tags" heading before the existing Tags block', { skip }, 
   const tagsTable = [...doc.querySelectorAll('table')].find((t) => blockName(t) === 'Tags');
   assert.equal(asideHeadings[1].nextElementSibling, tagsTable);
 });
+
+// --- story drop cap + photo grid (#516 PO: "below that images are not there as per live") -------
+const { markDropCap, applyDropCap } = await import('./skoda-drop-cap.js');
+const { default: mediaParser } = await import('../parsers/press-kit-media.js');
+
+const meta = (doc, style) => createTable([['Section Metadata'], ['style', style]], doc);
+const metaRows = (table) => [...table.querySelectorAll('tr')].slice(1).map((tr) => [...tr.children].map((td) => td.textContent));
+
+test('drop cap: the source letters and inline colours → the opening body section\'s metadata', { skip }, () => {
+  const { document } = new JSDOM(`<article><div class="entry-content"><div class="textwidget">
+    <p><span class="drop-cap" style="background-color: #df8029; color: #ffffff;margin-bottom:20px">M</span>any years</p></div></div></article>`).window;
+  assert.deepEqual(markDropCap(document), {
+    text: 'M', color: '#ffffff', background: '#df8029', marginBottom: '20px',
+  });
+  // the transformed page: the intro section, then the body with its own metadata
+  const main = document.body;
+  main.innerHTML = '<p>Perex</p><hr><p>Many years</p><p>More</p>';
+  const intro = meta(document, 'story-intro');
+  const body = meta(document, 'body-column');
+  main.prepend(intro);
+  main.querySelector('hr').after(body);
+  assert.equal(applyDropCap(main), true);
+  assert.deepEqual(metaRows(intro), [['style', 'story-intro']], 'the intro is untouched');
+  assert.deepEqual(metaRows(body), [['style', 'body-column, drop-cap'], ['drop-cap-text', 'M'],
+    ['drop-cap-color', '#ffffff'], ['drop-cap-background', '#df8029'], ['drop-cap-margin-bottom', '20px']]);
+  assert.equal(document.documentElement.hasAttribute('data-skoda-drop-cap'), false, 'the mark is cleared');
+});
+
+test('drop cap: only colour rows the source sets; none when the body does not open with the letters', { skip }, () => {
+  const { document } = new JSDOM('<article><div class="entry-content"><p><span class="drop-cap">I</span>n the snow</p></div></article>').window;
+  markDropCap(document);
+  const main = document.body;
+  main.innerHTML = '<hr><p>In the snow</p>';
+  const body = meta(document, 'body-column');
+  main.querySelector('hr').after(body);
+  applyDropCap(main);
+  assert.deepEqual(metaRows(body), [['style', 'body-column, drop-cap'], ['drop-cap-text', 'I']]);
+
+  markDropCap(document);
+  main.innerHTML = '<hr><h2>Heading</h2><p>Other text</p>';
+  const other = meta(document, 'body-column');
+  main.querySelector('hr').after(other);
+  assert.equal(applyDropCap(main), false, 'never guess');
+  assert.deepEqual(metaRows(other), [['style', 'body-column']]);
+  const none = new JSDOM('<article><div class="entry-content"><p>Plain</p></div></article>').window.document;
+  assert.equal(markDropCap(none), null);
+});
+
+const galleryItem = (name, toggle = '') => `<div class="search-results-item"><article class="article-teaser gallery-item media-cart-item">
+  <div class="article-teaser-media"><a class="colorbox" href="https://cdn.example/${name}.jpg"><img src="https://cdn.example/${name}-768x512.jpg" alt="Story title"></a></div>
+  <h3 class="entry-title">Story title</h3>
+  <div class="media-cart-action-multi download"><a href="https://example/direct-download/${name}.jpg">Original</a><a href="https://example/direct-download/${name}-1920x1280.jpg">1920px</a></div>
+</article></div>${toggle}`;
+
+test('story photo grid: Downloads (gallery, story), collapsed only where the source has its togglebox', { skip }, () => {
+  const { document } = new JSDOM(`<div class="textwidget"><div class="search-results search-results-gallery"><div class="search-results-container">
+    <div class="search-results-items">${galleryItem('a')}${galleryItem('b')}</div></div></div></div>`).window;
+  mediaParser(document.querySelector('.search-results-gallery'), { document }, { story: true });
+  const table = document.querySelector('table');
+  const rows = [...table.querySelectorAll('tr')].map((tr) => [...tr.children].map((td) => td.textContent.trim()));
+  assert.deepEqual(rows.slice(0, 3), [['Downloads (gallery, story)'], ['collapse', 'none'], ['columns', '3']], '3 wide, every photo shown');
+  assert.equal(rows.length, 5, 'one row per photo');
+  assert.equal(table.querySelectorAll('a[href*="direct-download"]').length, 4, 'the lightbox keeps the download sizes');
+
+  const long = new JSDOM(`<div class="textwidget"><div class="search-results search-results-gallery"><div class="search-results-items" data-togglebox="">
+    ${galleryItem('a')}${galleryItem('b')}</div></div></div>`).window.document;
+  mediaParser(long.querySelector('.search-results-gallery'), { document: long }, { story: true });
+  const cfg = [...long.querySelectorAll('table tr')].slice(1, 3).map((tr) => tr.textContent.replace(/\s+/g, ''));
+  assert.deepEqual(cfg, ['collapseauto', 'columns4'], 'the source togglebox: the Media Box grid, collapsed');
+
+  const kit = new JSDOM(`<div class="search-results search-results-gallery"><div class="search-results-items">${galleryItem('a')}</div></div>`).window.document;
+  mediaParser(kit.querySelector('.search-results-gallery'), { document: kit });
+  assert.equal(kit.querySelector('table tr').textContent.trim(), 'Downloads (gallery)', 'press kits unchanged');
+});
+
+test('the story cleanup keeps an importer-built block table (data-skoda-block) as it is', { skip }, async () => {
+  const { default: storyCleanup } = await import('./skoda-story-cleanup.js');
+  const { document } = new JSDOM('<article><div class="entry-content"><table data-skoda-block><tr><td>Downloads (gallery, story)</td></tr></table><table><tr><td>a</td><td>b</td></tr></table></div></article>').window;
+  storyCleanup('beforeTransform', document.body, { document });
+  const tables = [...document.querySelectorAll('table')];
+  assert.equal(tables[0].textContent.trim(), 'Downloads (gallery, story)', 'kept');
+  assert.equal(tables[1].querySelector('tr').textContent.trim(), 'Columns', 'a source table still becomes Columns');
+});
