@@ -68,13 +68,23 @@ export const valueLabel = (v) => titleCase(String(v).replace(/-/g, ' '));
  * The source's option names and order per facet (#273): blocks/listing/facet-labels.json,
  * generated from the source's filter forms (tools/importer/build-facet-labels.mjs), as
  * `{ facet: [[slug, name], …] }`. A missing or broken file leaves the title-cased slugs.
+ * Its `_hidden` key lists the value parts the source's CSS hides on every listing
+ * (`.search-filter li:has([value*="citigoe"])`, #273 review): `["citigoe"]`.
  * @param {object} json the file's content
- * @returns {Map<string, Map<string, {name: string, rank: number}>>}
+ * @returns {Map<string, Map<string, {name: string, rank: number}>>} with a `hiddenValues`
+ *   array of those parts (lower case)
  */
+const HIDDEN_KEY = '_hidden';
+
 export function facetLabelMap(json) {
+  const data = json && typeof json === 'object' ? json : {};
   const out = new Map();
-  Object.entries(json && typeof json === 'object' ? json : {}).forEach(([facet, pairs]) => {
-    if (!Array.isArray(pairs)) return;
+  // a blank part would match every value, so it is dropped
+  out.hiddenValues = (Array.isArray(data[HIDDEN_KEY]) ? data[HIDDEN_KEY] : [])
+    .filter((part) => typeof part === 'string' && part.trim())
+    .map((part) => part.trim().toLowerCase());
+  Object.entries(data).forEach(([facet, pairs]) => {
+    if (facet === HIDDEN_KEY || !Array.isArray(pairs)) return;
     const names = new Map();
     pairs.forEach((pair, rank) => {
       if (!Array.isArray(pair) || !pair[0] || !pair[1]) return;
@@ -83,6 +93,18 @@ export function facetLabelMap(json) {
     out.set(facet, names);
   });
   return out;
+}
+
+/**
+ * Does the source hide this option? Its rule matches part of the value (`value*=`), in any
+ * facet, checked or not; a deep-linked hidden value still filters (and shows its chip).
+ * @param {Map} labels facetLabelMap() output
+ * @param {string} value the option's index value
+ * @returns {boolean}
+ */
+export function isSourceHidden(labels, value) {
+  const v = String(value).toLowerCase();
+  return (labels.hiddenValues || []).some((part) => v.includes(part));
 }
 
 function loadFacetLabels() {
@@ -627,8 +649,10 @@ export default async function decorate(block) {
 
   // --- facet bar ---------------------------------------------------------
   cfg.facets.forEach((key) => {
-    // options in the source order (its names), filled column by column like the source
-    const values = orderFacetValues(distinctFacetValues(scoped, key), key, optionNames);
+    // options in the source order (its names), filled column by column like the source, less
+    // the ones the source hides (#273 review: Model "Citigoᵉ iV" on Videos)
+    const values = orderFacetValues(distinctFacetValues(scoped, key), key, optionNames)
+      .filter(({ value }) => !isSourceHidden(optionNames, value));
     if (!values.length) return; // no data for this facet in scope → skip pill
 
     const pill = document.createElement('button');
@@ -794,9 +818,23 @@ export default async function decorate(block) {
     facetLabels.then((names) => {
       optionNames = names;
       const focused = facetOptions.contains(document.activeElement) ? document.activeElement : null;
+      const pillOf = (facet) => [...facetPills.querySelectorAll('.facet-pill')]
+        .find((pill) => pill.dataset.facet === facet);
+      const focusedPill = pillOf(focused?.closest('fieldset.facet-panel')?.dataset.facet);
       facetOptions.querySelectorAll('fieldset.facet-panel').forEach((panel) => {
         const { facet } = panel.dataset;
+        // an option the source hides goes (#273 review); a pill left with none goes too
+        panel.querySelectorAll('label.facet-option').forEach((option) => {
+          if (isSourceHidden(names, option.querySelector('input').value)) option.remove();
+        });
         const options = [...panel.querySelectorAll('label.facet-option')];
+        if (!options.length) {
+          const pill = pillOf(facet);
+          panelFor.delete(pill);
+          pill?.remove();
+          panel.remove();
+          return;
+        }
         const byValue = new Map(options.map((o) => [o.querySelector('input').value, o]));
         orderFacetValues([...byValue.keys()].map((value) => ({ value })), facet, names)
           .forEach(({ value }) => {
@@ -807,6 +845,9 @@ export default async function decorate(block) {
       });
       if (focused?.isConnected && document.activeElement !== focused) {
         focused.focus({ preventScroll: true });
+      } else if (focused) {
+        // the focused option was a hidden one: its pill, or the toggle if that went too
+        (focusedPill?.isConnected ? focusedPill : filterToggle).focus({ preventScroll: true });
       }
       renderChips();
     });

@@ -56,7 +56,7 @@ globalThis.fetch = async (url) => {
 
 const {
   default: decorate, mediaCell, isMediaTemplate, wireMediaLightbox, valueLabel,
-  facetLabelMap, orderFacetValues,
+  facetLabelMap, orderFacetValues, isSourceHidden,
   FILTER_SETTLE_MS, VEIL_MS, LOAD_MORE_MS,
 } = await import('./listing.js');
 
@@ -805,4 +805,79 @@ test('late option names (#341 review): a focused chip keeps focus when the chips
   assert.equal(now.dataset.facet, 'model');
   assert.equal(now.dataset.value, 'Epiq', 'the same filter\'s chip');
   assert.match(now.textContent, /Epiq/);
+});
+
+// #273 review: the source's CSS hides Model "Citigoᵉ iV" on every listing
+// (`.search-filter li:has([value*="citigoe"])`); facet-labels.json lists it under `_hidden`
+test('hidden options (#273 review): `_hidden` value parts, matched in part and in any case', () => {
+  const labels = facetLabelMap({ model: [['citigoe', 'Citigoᵉ iV']], _hidden: ['CitigoE ', '', '  ', 7, null] });
+  assert.deepEqual(labels.hiddenValues, ['citigoe'], 'trimmed, lower case; a blank part would hide everything');
+  assert.equal(labels.has('_hidden'), false, 'not a facet');
+  assert.equal(labels.get('model').get('citigoe').name, 'Citigoᵉ iV', 'its name still names a chip');
+  assert.equal(isSourceHidden(labels, 'citigoe'), true);
+  assert.equal(isSourceHidden(labels, 'Citigoe'), true, 'an index cell keeps its case');
+  assert.equal(isSourceHidden(labels, 'citigoe-iv'), true, 'the source matches part of the value (*=)');
+  assert.equal(isSourceHidden(labels, 'citigo'), false);
+  assert.equal(isSourceHidden(labels, 'peaq'), false);
+  // a missing or broken list hides nothing
+  [{}, { _hidden: 'citigoe' }, { _hidden: { 0: 'citigoe' } }, null].forEach((json) => {
+    assert.equal(isSourceHidden(facetLabelMap(json), 'citigoe'), false, JSON.stringify(json));
+  });
+  assert.equal(isSourceHidden(new Map(), 'citigoe'), false, 'no names yet');
+});
+
+const HIDDEN_LABELS = {
+  model: [['citigoe', 'Citigoᵉ iV'], ['peaq', 'Peaq']], _hidden: ['citigoe'],
+};
+async function hiddenListing(index, search = '', { late = false } = {}) {
+  const realFetch = globalThis.fetch;
+  let release = () => {};
+  const held = late ? new Promise((resolve) => { release = resolve; }) : Promise.resolve();
+  globalThis.fetch = async (url) => {
+    if (!String(url).includes('facet-labels')) return realFetch(url);
+    await held;
+    return { ok: true, status: 200, json: async () => HIDDEN_LABELS };
+  };
+  try {
+    // Videos-like: one Citigo item; bodywork "Citigoe" only on it, so that pill offers nothing
+    const listing = await facetListing(index, search, [
+      storyRow(1, 'citigoe', 'Citigoe'), storyRow(2, 'peaq', 'SUV'), storyRow(3, 'peaq', 'SUV'),
+    ]);
+    return { ...listing, release: async () => { release(); await settle(); await settle(); } };
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
+const optionValues = (block, facet) => [...block.querySelectorAll(`.facet-panel[data-facet="${facet}"] input`)].map((i) => i.value);
+const pillFacets = (block) => [...block.querySelectorAll('.facet-pill')].map((p) => p.dataset.facet);
+
+test('hidden options (#273 review): the offered options leave out what the source hides', async () => {
+  const { block } = await hiddenListing('/en/hidden-index.json');
+  assert.deepEqual(optionValues(block, 'model'), ['peaq'], 'Model offers Peaq, not Citigoᵉ iV');
+  assert.deepEqual(optionValues(block, 'bodywork'), ['SUV']);
+  assert.deepEqual(pillFacets(block), ['model', 'bodywork']);
+  assert.equal(block.querySelectorAll('.listing-items > *').length, 2, 'the Citigo item still lists');
+});
+
+test('hidden options (#273 review): a deep link to one still filters, with its chip, as on the source', async () => {
+  const { block, toggle } = await hiddenListing('/en/hidden-deeplink-index.json', '?filter[model][]=citigoe');
+  assert.deepEqual(optionValues(block, 'model'), ['peaq'], 'the source hides it even when ticked');
+  assert.equal(block.querySelector('.listing-count-total').textContent, '1', 'the Citigo item only');
+  assert.equal(block.querySelectorAll('.listing-items > *').length, 1);
+  assert.equal(block.querySelector('.listing-chip').textContent, 'Model: Citigoᵉ iV', 'its chip clears it');
+  assert.equal(toggle.textContent, 'Advanced filter (1)');
+});
+
+test('hidden options (#273 review): late names drop them, and a pill left empty; focus moves to the pill', async () => {
+  const { block, release } = await hiddenListing('/en/hidden-late-index.json', '', { late: true });
+  assert.deepEqual(optionValues(block, 'model'), ['citigoe', 'peaq'], 'before the names: every value');
+  click(block.querySelector('.facet-pill[data-facet="model"]'));
+  const hidden = block.querySelector('.facet-panel[data-facet="model"] input[value="citigoe"]');
+  hidden.focus();
+  await release();
+  assert.deepEqual(optionValues(block, 'model'), ['peaq']);
+  assert.equal(hidden.isConnected, false);
+  assert.equal(document.activeElement, block.querySelector('.facet-pill[data-facet="model"]'), 'not <body>');
+  // bodywork "Citigoe" is a value part the source hides too: its only option goes, with the pill
+  assert.deepEqual(optionValues(block, 'bodywork'), ['SUV']);
 });

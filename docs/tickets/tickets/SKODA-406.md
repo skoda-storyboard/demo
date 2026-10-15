@@ -176,6 +176,15 @@ at 1440 / 768 / 390 (icons also at 1 / 1.25 / 1.5 / 2x).
    `download` is ignored). It now goes through the source's `/direct-download/` route in a new tab, as the card button
    and the source player, with the source player's names ("Add/remove this", "Download this", "Link to page"). Image
    items keep theirs. Measured: the click downloads the MP4.
+4. **PR #356 review (Lars, 2026-10-15): options the source hides.** Live's own CSS hides Model "Citigoᵉ iV" on all
+   four listings (`.search-filter li:has([value*="citigoe"]) { display: none; }`); Videos offered it (its one Citigo
+   item, "Lane Assist"). `build-facet-labels.mjs` now reads those rules from the source pages into
+   `facet-labels.json` `_hidden` (`["citigoe"]`, the only one today), and the listing drops any option whose value
+   contains one (`isSourceHidden`, the source's `*=`), on time or with late names (a pill left empty goes). A deep
+   link to it still filters and shows its chip, as on live (its checkbox is ticked but hidden there). Measured at
+   390 / 768 / 992 / 1080 on Images and Videos: every option the branch offers is one live shows; `main` still offers
+   Citigo. Code only, no re-import. PR #355 edits the same late-names code (`isOffered`): whichever merges second
+   keeps both checks.
 
 ## Dependencies
 SKODA-402 (listing), SKODA-608 (rows), SKODA-203/216 (lightbox), SKODA-502 (download menu), SKODA-505a (cart),
