@@ -375,22 +375,6 @@ body.press-release .section.media-box .downloads-file[data-file-type="pdf"]::aft
   content: none;
 }
 
-/* Related Press Releases arrows: the source glyph (skoda-bnr-icons \e00b / \e00c, an ink
-   arrow cut out of a 90% white disc), as the home bands' (#272, story-rail.css) (#274) */
-body.press-release .section.related .story-rail.press .carousel-arrow::after {
-  inset: 0;
-  width: auto;
-  height: auto;
-  border: 0;
-  background-color: color-mix(in srgb, var(--skoda-white) 90%, transparent);
-  transform: none;
-  mask: url("../../icons/rail-arrow-prev.svg") center / 100% 100% no-repeat;
-}
-
-body.press-release .section.related .story-rail.press .carousel-next::after {
-  mask-image: url("../../icons/rail-arrow-next.svg");
-}
-
 /* A sidebar heading closing its default content is the label of the block after it
    ("Images" → Gallery preview, "Tags" → Tags): the source puts no gap between them,
    the 15px group gap follows the block (SKODA-223). */
