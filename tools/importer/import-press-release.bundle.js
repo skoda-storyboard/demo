@@ -129,7 +129,12 @@ var CustomImportScript = (() => {
     if (single) add(single.getAttribute("href"), fileLabel(single.getAttribute("href")));
     return links;
   }
-  function parse3(element, { document: document2 }) {
+  var SOURCE_DATE = /^\d{1,2}\.\s?\d{1,2}\.\s?\d{4}$/;
+  function itemDate(item) {
+    const date = text(item.querySelector(".entry-meta .entry-published, .entry-published"));
+    return SOURCE_DATE.test(date) ? date : "";
+  }
+  function parse3(element, { document: document2, dates = false }) {
     let items = Array.from(element.querySelectorAll("article.media-cart-item"));
     if (items.length === 0) {
       items = Array.from(element.querySelectorAll(".search-results-item, .items > .item"));
@@ -160,7 +165,8 @@ var CustomImportScript = (() => {
         p.append(a);
         return p;
       });
-      cells.push([img || "", title, linkCell]);
+      const date = dates ? itemDate(item) : "";
+      cells.push(date ? [img || "", date, title, linkCell] : [img || "", title, linkCell]);
     });
     if (cells.length === 1) {
       element.replaceWith(...element.childNodes);
@@ -397,6 +403,14 @@ var CustomImportScript = (() => {
   function urlParagraph(document2, url) {
     return make(document2, "p", link(document2, url, url));
   }
+  function embedFor(document2, iframe, url) {
+    const video = /(?:^|\.)(?:youtube(?:-nocookie)?\.com|youtu\.be|vimeo\.com)\//i.test(url.replace(/^https?:\/\//, ""));
+    const fixed = video && (iframe.getAttribute("width") || "").trim() === "100%" && ((iframe.getAttribute("height") || "").trim().match(/^(\d+)(?:px)?$/) || [])[1];
+    if (!fixed) return urlParagraph(document2, url);
+    const table = WebImporter.DOMUtils.createTable([["Embed"], ["url", link(document2, url, url)], ["height", fixed]], document2);
+    table.dataset.skodaEmbed = "";
+    return table;
+  }
   function titleContent(document2, h1) {
     const lines = [[]];
     const walk = (node) => node.childNodes.forEach((child) => {
@@ -479,7 +493,7 @@ var CustomImportScript = (() => {
     content.querySelectorAll(".embed-controller-wrapper").forEach((wrap) => {
       const iframe = wrap.querySelector("iframe");
       const url = iframe && (iframe.getAttribute("data-src") || iframe.getAttribute("src"));
-      wrap.replaceWith(...url ? [urlParagraph(document2, url)] : []);
+      wrap.replaceWith(...url ? [embedFor(document2, iframe, url)] : []);
     });
     content.querySelectorAll("lite-youtube").forEach((el) => {
       const id = (el.getAttribute("videoid") || "").trim();
@@ -501,7 +515,7 @@ var CustomImportScript = (() => {
     content.querySelectorAll("iframe").forEach((iframe) => {
       const url = iframe.getAttribute("src") || iframe.getAttribute("data-src");
       const p = iframe.closest("p");
-      const replacement = url && /^https?:/.test(url) ? urlParagraph(document2, url) : null;
+      const replacement = url && /^https?:/.test(url) ? embedFor(document2, iframe, url) : null;
       if (p && text3(p) === "") p.replaceWith(...replacement ? [replacement] : []);
       else iframe.replaceWith(...replacement ? [replacement] : []);
     });
@@ -513,6 +527,12 @@ var CustomImportScript = (() => {
       }
     });
     content.querySelectorAll("div[style]").forEach((div) => div.replaceWith(...div.childNodes));
+    content.querySelectorAll("strong > br:last-child, b > br:last-child").forEach((br) => {
+      const bold = br.parentElement;
+      let after = br.nextSibling;
+      while (after && after.nodeType === 3 && !after.textContent.trim()) after = after.nextSibling;
+      if (!after && bold.nextSibling) bold.after(br);
+    });
     content.querySelectorAll("p").forEach((p) => {
       if (isEmptyParagraph(p)) p.remove();
     });
@@ -522,6 +542,10 @@ var CustomImportScript = (() => {
   function dataTables(document2, content) {
     content.querySelectorAll("table").forEach((table) => {
       var _a;
+      if (table.hasAttribute("data-skoda-embed")) {
+        table.removeAttribute("data-skoda-embed");
+        return;
+      }
       if (((_a = table.rows[0]) == null ? void 0 : _a.cells.length) === 1) return;
       const rows = [...table.rows].filter((row) => text3(row));
       const filled = (row) => [...row.cells].filter((cell) => text3(cell));
@@ -590,7 +614,7 @@ var CustomImportScript = (() => {
     const heading = text3(box.querySelector(".search-results-heading")) || "Media Box";
     const stats = text3(box.querySelector(".search-results-stats .stats, .stats"));
     box.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((n) => n.remove());
-    const out = [make(document2, "h2", heading)];
+    const out = [make(document2, "h3", heading)];
     if (stats) out.push(make(document2, "p", stats));
     out.push(box);
     return out;
@@ -620,7 +644,7 @@ var CustomImportScript = (() => {
       clone.querySelectorAll(".subheading").forEach((s) => s.remove());
       heading = text3(clone) || heading;
     }
-    const out = [make(document2, "h2", heading)];
+    const out = [make(document2, "h3", heading)];
     if (sub) out.push(make(document2, "p", sub));
     const all = results.querySelector("a.search-results-header-link[href], .search-results-header a[href]");
     if (all && all.getAttribute("href")) out.push(make(document2, "p", link(document2, all.getAttribute("href"), text3(all) || "All")));
@@ -1633,7 +1657,12 @@ var CustomImportScript = (() => {
         const parser = parsers[block.name];
         if (parser) {
           try {
-            parser(block.element, { document: document2, url, params });
+            parser(block.element, {
+              document: document2,
+              url,
+              params,
+              dates: block.name === "downloads"
+            });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
           }

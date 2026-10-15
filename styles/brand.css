@@ -75,6 +75,9 @@
   /* the source's icon font for its media card glyphs (styles/fonts.css, #273) */
   --media-card-icon-font: skoda-bnr-icons;
 
+  /* the same font for the accordion's + (\e027, #275) */
+  --accordion-icon-font: skoda-bnr-icons;
+
   /* header/nav-specific (candidate tokens, _FOUNDATIONS.md §8; SKODA-301) */
   --dropdown-shadow: 0 3px 8px rgb(0 0 0 / 15%);
   --dropdown-hover-bg: #f1f1f1;

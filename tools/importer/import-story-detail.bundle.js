@@ -333,16 +333,75 @@ var CustomImportScript = (() => {
       });
     }
     let count = 0;
+    const geometry = highlightGeometry(css);
     document2.querySelectorAll(".panel-grid").forEach((grid) => {
       const row = grid.querySelector(":scope > .panel-row-style");
       const inline = row && (row.getAttribute("style") || "").match(/background(?:-color)?\s*:\s*([^;]+)/i);
       const variant = byId.get(grid.id) || inline && highlightVariant(inline[1]);
       if (!variant) return;
       grid.setAttribute(HIGHLIGHT_ATTR, variant);
+      Object.entries(geometry(grid)).forEach(([key, value]) => grid.setAttribute(`data-${key}`, value));
       count += 1;
     });
     return count;
   }
+  var DEFAULT_TEXT_MARGIN = ["0px 15px 0px 15px", "15px 15px 15px 15px"];
+  var MEDIA_780 = /@media[^{]*max-width:\s*780px[^{]*\{((?:[^{}]*\{[^{}]*\})*)[^{}]*\}/g;
+  function boxValue(value) {
+    const parts = String(value || "").trim().split(/\s+/).map((v) => v === "0" ? "0px" : v);
+    if (!parts[0] || parts.length > 4 || !parts.every((v) => /^\d+(?:\.\d+)?px$/.test(v))) return null;
+    const [t, r = t, b = t, l = r] = parts;
+    return `${t} ${r} ${b} ${l}`;
+  }
+  function highlightGeometry(css) {
+    const rules = (text3) => [...text3.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, sel, body]) => ({ sels: sel.split(",").map((s) => s.trim()), body }));
+    const mobile = rules([...css.matchAll(MEDIA_780)].map((m) => m[1]).join("\n"));
+    const desktop = rules(css.replace(/@media[^{]*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, ""));
+    const find = (list, test, prop) => {
+      let found = null;
+      list.forEach(({ sels, body }) => {
+        if (!sels.some(test)) return;
+        const m = body.match(new RegExp(`(?:^|;)\\s*${prop}\\s*:\\s*([^;!]+)`, "i"));
+        if (m) found = boxValue(m[1]);
+      });
+      return found;
+    };
+    const margins = (panel, fallback) => {
+      if (!panel) return null;
+      const test = (s) => s.endsWith(`#${panel.id}`);
+      const d = find(desktop, test, "margin");
+      const m = find(mobile, test, "margin") || d;
+      return [d || fallback, m || fallback];
+    };
+    return (grid) => {
+      const out = {};
+      const cells = grid.querySelectorAll(":scope > .panel-row-style > .panel-grid-cell, :scope > .panel-grid-cell");
+      if ([...cells].filter((c) => c.querySelector(".so-panel")).length > 1) return out;
+      const isRow = (s) => s.replace(/\s+/g, "") === `#${grid.id}>.panel-row-style`;
+      const padD = find(desktop, isRow, "padding");
+      const padM = find(mobile, isRow, "padding") || padD;
+      if (padD) out["highlight-padding"] = padD;
+      if (padM) out["highlight-padding-mobile"] = padM;
+      const panels = [...grid.querySelectorAll(":scope > .panel-row-style > .panel-grid-cell > .so-panel, :scope > .panel-grid-cell > .so-panel")];
+      const text3 = margins(panels.find((p) => p.matches(".widget_sow-editor, .widget_text")), "0px 0px 0px 0px");
+      if (text3 && (text3[0] !== DEFAULT_TEXT_MARGIN[0] || text3[1] !== DEFAULT_TEXT_MARGIN[1])) {
+        [out["highlight-margin"], out["highlight-margin-mobile"]] = text3;
+      }
+      const gallery = margins(panels.find((p) => p.matches('[class*="carousel-widget"], [class*="slider"]')), "0px 0px 0px 0px");
+      if (gallery && (gallery[0] !== "0px 0px 0px 0px" || gallery[1] !== "0px 0px 0px 0px")) {
+        [out["highlight-gallery-margin"], out["highlight-gallery-margin-mobile"]] = gallery;
+      }
+      return out;
+    };
+  }
+  var GEOMETRY_KEYS = [
+    "highlight-padding",
+    "highlight-padding-mobile",
+    "highlight-margin",
+    "highlight-margin-mobile",
+    "highlight-gallery-margin",
+    "highlight-gallery-margin-mobile"
+  ];
   var CELL_WIDTH_ATTR = "data-cell-width";
   function markCellWidths(document2) {
     const css = [...document2.querySelectorAll("style")].map((s) => s.textContent || "").join("\n");
@@ -421,8 +480,8 @@ var CustomImportScript = (() => {
     }
     return false;
   }
-  function sectionMetadata(style, document2) {
-    return WebImporter.DOMUtils.createTable([["Section Metadata"], ["style", style]], document2);
+  function sectionMetadata(style, document2, rows = []) {
+    return WebImporter.DOMUtils.createTable([["Section Metadata"], ["style", style], ...rows], document2);
   }
   var isSectionMetadata = (el) => el.tagName === "TABLE" && /^section metadata$/i.test(((el.querySelector("tr > th, tr > td") || {}).textContent || "").trim());
   function dropEmptySections(root) {
@@ -560,7 +619,8 @@ var CustomImportScript = (() => {
       }
       if (!row.length) return;
       if (variant) {
-        out.push(document2.createElement("hr"), ...row, sectionMetadata(`${BODY_STYLE}, highlight-${variant}`, document2));
+        const geometry = GEOMETRY_KEYS.filter((key) => grid.hasAttribute(`data-${key}`)).map((key) => [key, grid.getAttribute(`data-${key}`)]);
+        out.push(document2.createElement("hr"), ...row, sectionMetadata(`${BODY_STYLE}, highlight-${variant}`, document2, geometry));
         stats.highlights += 1;
         resume = true;
         return;
@@ -631,7 +691,12 @@ var CustomImportScript = (() => {
     if (single) add(single.getAttribute("href"), fileLabel(single.getAttribute("href")));
     return links;
   }
-  function parse3(element, { document: document2 }) {
+  var SOURCE_DATE = /^\d{1,2}\.\s?\d{1,2}\.\s?\d{4}$/;
+  function itemDate(item) {
+    const date = text(item.querySelector(".entry-meta .entry-published, .entry-published"));
+    return SOURCE_DATE.test(date) ? date : "";
+  }
+  function parse3(element, { document: document2, dates = false }) {
     let items = Array.from(element.querySelectorAll("article.media-cart-item"));
     if (items.length === 0) {
       items = Array.from(element.querySelectorAll(".search-results-item, .items > .item"));
@@ -662,7 +727,8 @@ var CustomImportScript = (() => {
         p.append(a);
         return p;
       });
-      cells.push([img || "", title, linkCell]);
+      const date = dates ? itemDate(item) : "";
+      cells.push(date ? [img || "", date, title, linkCell] : [img || "", title, linkCell]);
     });
     if (cells.length === 1) {
       element.replaceWith(...element.childNodes);
@@ -863,8 +929,8 @@ var CustomImportScript = (() => {
       return id ? `https://www.youtube.com/watch?v=${id}` : "";
     }
     const src = el.getAttribute("src") || el.getAttribute("data-src") || "";
-    const yt = src.match(/youtube(?:-nocookie)?\.com\/embed\/([\w-]{6,})/i);
-    if (yt) return `https://www.youtube.com/watch?v=${yt[1]}`;
+    const yt = src.match(/(youtube(?:-nocookie)?\.com)\/embed\/([\w-]{6,})(\?[^#]*)?/i);
+    if (yt) return `https://www.${yt[1].toLowerCase()}/embed/${yt[2]}${yt[3] || ""}`;
     const vimeo = src.match(/player\.vimeo\.com\/video\/(\d+)/i);
     if (vimeo) return `https://vimeo.com/${vimeo[1]}`;
     return "";

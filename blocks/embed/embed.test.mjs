@@ -188,11 +188,11 @@ test('Vimeo already-embed URL keeps app_id and forces dnt=1', () => {
   assert.equal(params.get('app_id'), '122963');
 });
 
-test('YouTube: the played URL is the live embed URL (feature=oembed + enablejsapi) + autoplay', () => {
+test('YouTube: the played URL is the live lite-youtube URL (enablejsapi) + autoplay', () => {
   const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
   decorate(block);
   const iframe = play(block);
-  assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/9LfK-A20pgw?feature=oembed&enablejsapi=1&autoplay=1&playsinline=1');
+  assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/9LfK-A20pgw?enablejsapi=1&autoplay=1&playsinline=1');
   assert.equal(iframe.dataset.src, undefined);
   // allow list matches live YouTube verbatim (accelerometer/gyroscope, no fullscreen)
   assert.equal(iframe.getAttribute('allow'), 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
@@ -200,13 +200,27 @@ test('YouTube: the played URL is the live embed URL (feature=oembed + enablejsap
   assert.equal(block.querySelector('.embed-consent'), null);
 });
 
-test('YouTube: /embed/ + si token and youtu.be forms both build the live URL', () => {
+test('YouTube: an /embed/ URL is the source iframe, YouTube\'s own player with its query; youtu.be is the poster', () => {
   const a = buildEmbed('https://www.youtube.com/embed/B4ZafpJKk0M?si=v58s4T3awpvcBd7Y');
   decorate(a);
-  assert.equal(play(a).getAttribute('src'), 'https://www.youtube.com/embed/B4ZafpJKk0M?feature=oembed&si=v58s4T3awpvcBd7Y&enablejsapi=1&autoplay=1&playsinline=1');
+  assert.equal(a.querySelector('.embed-play'), null, 'no poster: the player shows from the start, as on the source');
+  const player = a.querySelector('iframe');
+  assert.equal(player.getAttribute('src'), 'https://www.youtube.com/embed/B4ZafpJKk0M?si=v58s4T3awpvcBd7Y', 'the source query, no autoplay');
+  assert.equal(player.getAttribute('loading'), 'lazy');
+  assert.equal(player.getAttribute('allow'), 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+  assert.ok(a.classList.contains('embed-youtube'));
+  const kit = buildEmbed('https://www.youtube.com/embed/E2Zp83XyzDU?feature=oembed&feature=youtu.be&enablejsapi=1');
+  decorate(kit);
+  assert.equal(kit.querySelector('iframe').getAttribute('src'), 'https://www.youtube.com/embed/E2Zp83XyzDU?feature=oembed&feature=youtu.be&enablejsapi=1');
+  const auto = buildEmbed('https://www.youtube.com/embed/abcDEF123?autoplay=1&rel=0');
+  decorate(auto);
+  assert.equal(auto.querySelector('iframe').getAttribute('src'), 'https://www.youtube.com/embed/abcDEF123?rel=0', 'no autoplay on approach');
+  const nocookie = buildEmbed('https://youtube-nocookie.com/embed/abcDEF123?rel=0');
+  decorate(nocookie);
+  assert.equal(nocookie.querySelector('iframe').getAttribute('src'), 'https://www.youtube-nocookie.com/embed/abcDEF123?rel=0');
   const b = buildEmbed('https://youtu.be/atipTWwYw5E');
   decorate(b);
-  assert.equal(play(b).getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?feature=oembed&enablejsapi=1&autoplay=1&playsinline=1');
+  assert.equal(play(b).getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?enablejsapi=1&autoplay=1&playsinline=1');
 });
 
 // --- SKODA-702a: YouTube click-to-load poster --------------------------------
@@ -301,7 +315,7 @@ test('YouTube URLs: a list param keeps the video; extra youtu.be segments are ig
   const extra = buildEmbed('https://youtu.be/atipTWwYw5E/extra');
   decorate(extra);
   assert.equal(extra.querySelector('img').getAttribute('src'), 'https://i.ytimg.com/vi/atipTWwYw5E/maxresdefault.jpg');
-  assert.equal(play(extra).getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?feature=oembed&enablejsapi=1&autoplay=1&playsinline=1');
+  assert.equal(play(extra).getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?enablejsapi=1&autoplay=1&playsinline=1');
 });
 
 test('YouTube URLs with an id that is not a video id are rejected', () => {
@@ -464,11 +478,30 @@ test('table form: auto-linked url cell still honours ratio + title rows', () => 
   assert.equal(block.querySelector('iframe').getAttribute('title'), 'Škoda Superb Sportline');
 });
 
+test('table form: a height row is the source\'s fixed-height box at every width; a ratio-less bad height is ignored', () => {
+  const link = new El('a');
+  link.setAttribute('href', 'https://www.youtube.com/embed/T9iRrU7EjD8?si=s0PTkkFFmASxwRNQ');
+  link.textContent = link.getAttribute('href');
+  const block = buildTable([['url', link], ['height', '448']]);
+  decorate(block);
+  const box = block.querySelector('.embed-video');
+  assert.ok(box.classList.contains('fixed-height'));
+  assert.equal(box.style['--embed-height'], '448px');
+  assert.equal(block.querySelector('iframe').getAttribute('src'), 'https://www.youtube.com/embed/T9iRrU7EjD8?si=s0PTkkFFmASxwRNQ');
+  const px = buildTable([['url', 'https://vimeo.com/1'], ['height', '300px']]);
+  decorate(px);
+  assert.equal(px.querySelector('.embed-video').style['--embed-height'], '300px');
+  const bad = buildTable([['url', 'https://vimeo.com/1'], ['height', 'tall']]);
+  decorate(bad);
+  assert.equal(bad.querySelector('.embed-video').classList.contains('fixed-height'), false);
+  assert.equal(bad.querySelector('.embed-video').style['--embed-ratio'], '16 / 9');
+});
+
 test('table form: plain-text url cell works (no link)', () => {
   const block = buildTable([['url', 'https://youtu.be/atipTWwYw5E']]);
   decorate(block);
   const iframe = play(block);
-  assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?feature=oembed&enablejsapi=1&autoplay=1&playsinline=1');
+  assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/atipTWwYw5E?enablejsapi=1&autoplay=1&playsinline=1');
   assert.equal(iframe.getAttribute('title'), 'YouTube video');
 });
 
@@ -640,6 +673,18 @@ test('no consent, then consent granted through the hook: waiting embeds load; fo
   });
 });
 
+test('no consent, a YouTube player URL: the placeholder click shows the player, not autoplaying', async () => {
+  await withSearch('?consent=decline', async () => {
+    const block = buildEmbed('https://www.youtube.com/embed/m9RlQw2FGjc?feature=oembed&enablejsapi=1');
+    decorate(block);
+    assert.equal(block.querySelector('iframe'), null, 'nothing reaches YouTube');
+    block.querySelector('button').dispatch('click');
+    const iframe = block.querySelector('iframe');
+    assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/m9RlQw2FGjc?feature=oembed&enablejsapi=1');
+    assert.equal(block.querySelector('.embed-play'), null);
+  });
+});
+
 test('no consent, YouTube: one click on the placeholder loads and plays the video', async () => {
   await withSearch('?consent=decline', async () => {
     const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
@@ -648,7 +693,7 @@ test('no consent, YouTube: one click on the placeholder loads and plays the vide
     assert.equal(block.querySelector('img'), null);
     block.querySelector('button').dispatch('click');
     const iframe = block.querySelector('iframe');
-    assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/9LfK-A20pgw?feature=oembed&enablejsapi=1&autoplay=1&playsinline=1');
+    assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/9LfK-A20pgw?enablejsapi=1&autoplay=1&playsinline=1');
     assert.equal(block.querySelector('.embed-play'), null, 'consent then play would be two clicks');
     assert.equal(globalThis.__focused, iframe);
   });
@@ -685,6 +730,20 @@ test('no consent, YouTube, then a grant through the hook: the poster shows, focu
   });
 });
 
+test('no consent, a YouTube player URL, then a grant through the hook: the player, not the poster (#344 review)', async () => {
+  await withSearch('?consent=decline', async () => {
+    const block = buildEmbed('https://www.youtube.com/embed/m9RlQw2FGjc?feature=oembed&enablejsapi=1');
+    decorate(block);
+    window.location.search = '';
+    consent.setEmbedConsent(true);
+    assert.equal(block.querySelector('.embed-play'), null, 'the source shows YouTube\'s own player here');
+    const iframe = block.querySelector('iframe');
+    assert.ok(iframe);
+    assert.equal(iframe.getAttribute('src'), 'https://www.youtube.com/embed/m9RlQw2FGjc?feature=oembed&enablejsapi=1');
+    consent.setEmbedConsent(null);
+  });
+});
+
 test('no consent: a detached placeholder stops listening and is not released', async () => {
   await withSearch('?consent=decline', async () => {
     const block = buildEmbed('https://www.youtube.com/watch?v=9LfK-A20pgw');
@@ -695,4 +754,11 @@ test('no consent: a detached placeholder stops listening and is not released', a
     assert.equal(block.querySelector('iframe'), null, 'no iframe appended into a detached block');
     consent.setEmbedConsent(null);
   });
+});
+
+test('CSS: a fixed-height box gives way to the consent placeholder, which sets its own height (#344 review)', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = await readFile(new URL('./embed.css', import.meta.url), 'utf8');
+  assert.match(css, /\.embed \.embed-video\.fixed-height:not\(\.embed-gated\) \{[^}]*height: var\(--embed-height\);/);
+  assert.match(css, /\.embed \.embed-gated \{[^}]*height: auto;/);
 });

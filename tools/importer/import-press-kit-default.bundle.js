@@ -80,11 +80,11 @@ var CustomImportScript = (() => {
     const cell = [];
     anchors.forEach((a) => {
       const href = a.getAttribute("href");
-      const text6 = (a.textContent || "").trim();
-      if (!href || !text6) return;
+      const text7 = (a.textContent || "").trim();
+      if (!href || !text7) return;
       const link = document.createElement("a");
       link.setAttribute("href", href);
-      link.textContent = text6;
+      link.textContent = text7;
       cell.push(link);
     });
     if (cell.length === 0) {
@@ -664,15 +664,15 @@ var CustomImportScript = (() => {
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
       if (text4(node)) {
         let el = node.parentElement;
-        let marker2 = false;
+        let marker3 = false;
         while (el !== p && fontPx(el) === null) {
-          if (el.matches("sup")) marker2 = true;
+          if (el.matches("sup")) marker3 = true;
           el = el.parentElement;
         }
         if (el !== p) {
           if (!isSmall(fontPx(el))) return false;
           small = true;
-        } else if (!marker2) {
+        } else if (!marker3) {
           return false;
         }
       }
@@ -716,9 +716,67 @@ var CustomImportScript = (() => {
     p.replaceWith(table);
   }
 
-  // tools/importer/transformers/skoda-press-kit-default-layout.js
+  // tools/importer/parsers/answer-layout.js
+  var ANSWERS = ".widget_ys-row-toggle + .widget_siteorigin-panels-builder";
   var text5 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
-  var marker = (document, style) => {
+  var blank = (node) => !text5(node) && !node.querySelector("img, picture, iframe, video, a[href]");
+  function cellWidths(document) {
+    const css = [...document.querySelectorAll("style")].map((style) => style.textContent).join("\n").replace(/@media[^{]*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, "");
+    const widths = /* @__PURE__ */ new Map();
+    [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].forEach(([, selectors, body]) => {
+      const width = body.match(/(?:^|;)\s*width:\s*([\d.]+)%/);
+      if (!width) return;
+      selectors.split(",").map((s) => s.trim()).filter((s) => /^#pgc-[\w-]+$/.test(s)).forEach((s) => {
+        if (!widths.has(s.slice(1))) widths.set(s.slice(1), Number(width[1]));
+      });
+    });
+    return widths;
+  }
+  function marker(document, data, value, label) {
+    const p = document.createElement("p");
+    p.dataset[data] = value;
+    p.textContent = label;
+    return p;
+  }
+  function markAnswerLayout(root) {
+    const document = root.ownerDocument;
+    const widths = cellWidths(document);
+    root.querySelectorAll(ANSWERS).forEach((answer) => {
+      const layout = answer.querySelector(".panel-layout");
+      const rows = [...(layout == null ? void 0 : layout.children) || []].filter((row) => row.matches(".panel-grid"));
+      const blankRows = new Set(rows.filter((row) => blank(row)));
+      answer.querySelectorAll(".textwidget > p").forEach((p) => {
+        if (blank(p)) p.replaceWith(marker(document, "skodaSpacer", "line", "Spacer"));
+      });
+      rows.forEach((row) => {
+        var _a, _b;
+        const cells = [...row.querySelectorAll(":scope > .panel-grid-cell")];
+        if (blankRows.has(row)) {
+          (_a = row.querySelector(".textwidget")) == null ? void 0 : _a.append(marker(document, "skodaSpacer", "row", "Spacer"));
+          return;
+        }
+        if (cells.length < 2 || !cells.every((cell) => cell.querySelectorAll("img").length === 1)) return;
+        const cellWidth = cells.map((cell) => widths.get(cell.id));
+        const equal = cellWidth.every((w) => Math.abs(w - 100 / cells.length) < 0.01);
+        if (equal || cellWidth.some((w) => !(w > 0))) return;
+        (_b = cells[0].querySelector(".textwidget")) == null ? void 0 : _b.prepend(marker(document, "skodaMediaRow", cellWidth.join(" "), "Media row"));
+      });
+    });
+  }
+  function answerLayout(root, { document }) {
+    root.querySelectorAll("p[data-skoda-spacer]").forEach((p) => {
+      const name = p.dataset.skodaSpacer === "row" ? "Spacer (row)" : "Spacer";
+      p.replaceWith(WebImporter.DOMUtils.createTable([[name]], document));
+    });
+    root.querySelectorAll("p[data-skoda-media-row]").forEach((p) => {
+      const cells = p.dataset.skodaMediaRow.split(" ").map((w) => `${w}%`);
+      p.replaceWith(WebImporter.DOMUtils.createTable([["Media row"], cells], document));
+    });
+  }
+
+  // tools/importer/transformers/skoda-press-kit-default-layout.js
+  var text6 = (node) => ((node == null ? void 0 : node.textContent) || "").replace(/\s+/g, " ").trim();
+  var marker2 = (document, style) => {
     const hr = document.createElement("hr");
     hr.dataset.pressKitSection = style;
     return hr;
@@ -740,7 +798,7 @@ var CustomImportScript = (() => {
     list.id = "chapters-links";
     const chaptersLink = document.createElement("a");
     chaptersLink.href = "#chapters-links";
-    chaptersLink.textContent = text5(source.querySelector(".link-chapters")) || "Chapters";
+    chaptersLink.textContent = text6(source.querySelector(".link-chapters")) || "Chapters";
     const chaptersItem = document.createElement("li");
     chaptersItem.append(chaptersLink);
     list.append(chaptersItem);
@@ -748,7 +806,7 @@ var CustomImportScript = (() => {
       var _a;
       const link = document.createElement("a");
       link.href = sourceLink.getAttribute("href");
-      link.textContent = sourceLink.matches(".link-intro") && ((_a = sourceLink.getAttribute("title")) == null ? void 0 : _a.trim()) || text5(sourceLink);
+      link.textContent = sourceLink.matches(".link-intro") && ((_a = sourceLink.getAttribute("title")) == null ? void 0 : _a.trim()) || text6(sourceLink);
       const li = document.createElement("li");
       li.append(link);
       list.append(li);
@@ -761,15 +819,15 @@ var CustomImportScript = (() => {
     [...secondary.querySelectorAll(":scope > section")].forEach((section) => {
       if (section.matches(".newsletter-subscribe-widget, .side-banner")) return;
       const heading = section.querySelector("h2, h3");
-      const label = text5(heading);
+      const label = text6(heading);
       if (section.matches(".images.sa-media-kit-preview")) {
         if (heading) heading.remove();
         nodes.push(make(document, "h3", label || "Images"), section);
         const more = section.querySelector("a.more");
-        if (mediaBox && more && text5(more)) {
+        if (mediaBox && more && text6(more)) {
           const link = document.createElement("a");
           link.href = "#media-box";
-          link.textContent = text5(more);
+          link.textContent = text6(more);
           const p = document.createElement("p");
           p.append(link);
           nodes.push(p);
@@ -781,7 +839,7 @@ var CustomImportScript = (() => {
         const ul = document.createElement("ul");
         section.querySelectorAll("ul.menu > li").forEach((li) => {
           const a = li.querySelector('a[href]:not([href="#"])');
-          const title = text5(a) || text5(li);
+          const title = text6(a) || text6(li);
           if (!title || !a && !mediaBox) return;
           const link = document.createElement("a");
           link.href = (a == null ? void 0 : a.getAttribute("href")) || "#media-box";
@@ -800,10 +858,10 @@ var CustomImportScript = (() => {
     var _a;
     const rows = [...table.rows];
     const cells = rows.length === 1 ? [...rows[0].cells] : [];
-    if (cells.length !== 2 || text5(cells[0])) return null;
+    if (cells.length !== 2 || text6(cells[0])) return null;
     const imgs = cells[0].querySelectorAll("img");
     const width = Number((_a = imgs[0]) == null ? void 0 : _a.getAttribute("width"));
-    if (imgs.length !== 1 || !(width > 0 && width <= ICON_MAX_WIDTH) || !text5(cells[1])) return null;
+    if (imgs.length !== 1 || !(width > 0 && width <= ICON_MAX_WIDTH) || !text6(cells[1])) return null;
     const icon = make(document, "p", "");
     icon.append(cells[0].querySelector("a:has(img)") || imgs[0]);
     const body = make(document, "p", "");
@@ -815,10 +873,10 @@ var CustomImportScript = (() => {
     if (callout) return [callout];
     table.querySelectorAll('img[src*="whatsapp"]').forEach((img) => {
       const link = img.closest("a");
-      (link && !text5(link) ? link : img).remove();
+      (link && !text6(link) ? link : img).remove();
     });
     return [...table.querySelectorAll("td, th")].flatMap((cell) => {
-      if (!text5(cell) && !cell.querySelector("img, a[href]")) return [];
+      if (!text6(cell) && !cell.querySelector("img, a[href]")) return [];
       if (cell.querySelector("p, ul, ol, h1, h2, h3, h4, h5, h6, div")) return [...cell.childNodes];
       const p = document.createElement("p");
       p.append(...cell.childNodes);
@@ -827,13 +885,13 @@ var CustomImportScript = (() => {
   }
   function sourceTables(content, document) {
     content.querySelectorAll("table").forEach((table) => {
-      const rows = [...table.rows].filter((row) => text5(row) || row.querySelector("a[href], img"));
+      const rows = [...table.rows].filter((row) => text6(row) || row.querySelector("a[href], img"));
       if (!rows.length) {
         table.remove();
         return;
       }
       const cols = Math.max(...rows.map((row) => row.cells.length));
-      const labelled = rows.filter((row) => [...row.cells].filter((cell) => text5(cell)).length >= 2);
+      const labelled = rows.filter((row) => [...row.cells].filter((cell) => text6(cell)).length >= 2);
       if (cols > 1 && labelled.length < 2) {
         table.replaceWith(...layoutTable(table, document));
         return;
@@ -842,7 +900,7 @@ var CustomImportScript = (() => {
       if (cols === 1) {
         const [first, ...rest] = rows;
         const headed = !first.querySelector("a[href], img") && rest.length;
-        if (headed) out.push(make(document, "h3", text5(first)));
+        if (headed) out.push(make(document, "h3", text6(first)));
         const list = document.createElement("ul");
         (headed ? rest : rows).forEach((row) => {
           const li = document.createElement("li");
@@ -852,13 +910,13 @@ var CustomImportScript = (() => {
         out.push(list);
       } else {
         const [head, ...body] = rows;
-        const labels = [...head.cells].map((cell) => text5(cell));
+        const labels = [...head.cells].map((cell) => text6(cell));
         const list = document.createElement("ul");
         body.forEach((row) => {
           const cells = [...row.cells];
           const li = document.createElement("li");
-          const strong = make(document, "strong", text5(cells[0]));
-          const values = cells.slice(1).map((cell, i) => [labels[i + 1], text5(cell)].filter(Boolean).join(": "));
+          const strong = make(document, "strong", text6(cells[0]));
+          const values = cells.slice(1).map((cell, i) => [labels[i + 1], text6(cell)].filter(Boolean).join(": "));
           li.append(strong, `: ${values.join(" \xB7 ")}`);
           list.append(li);
         });
@@ -878,19 +936,19 @@ var CustomImportScript = (() => {
     const h1 = article.querySelector(".container > header h1");
     const content = article.querySelector(".column-primary .entry-content");
     const media = article.querySelector(".search-results.media-box");
-    if (!h1 || !text5(h1) || !(content == null ? void 0 : content.querySelector(":scope > .panel-layout"))) {
+    if (!h1 || !text6(h1) || !(content == null ? void 0 : content.querySelector(":scope > .panel-layout"))) {
       throw new Error("Default press-kit article requires a title and body");
     }
     sourceTables(content, document);
     const out = [];
-    const date = text5(article.querySelector(".container > header .entry-published"));
+    const date = text6(article.querySelector(".container > header .entry-published"));
     if (date) out.push(make(document, "p", date));
     const title = h1.cloneNode(true);
     title.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
     out.push(title);
     const chapterLinks = chapters(document);
-    if (chapterLinks) out.push(marker(document, "press-kit-chapters"), chapterLinks);
-    out.push(marker(document, "body-column"));
+    if (chapterLinks) out.push(marker2(document, "press-kit-chapters"), chapterLinks);
+    out.push(marker2(document, "body-column"));
     const lead = [...article.querySelectorAll(".column-primary .article-teaser-media img")].find((img) => !img.closest(".search-results"));
     if (lead) {
       const img = lead.cloneNode(true);
@@ -908,7 +966,7 @@ var CustomImportScript = (() => {
       }
       out.push(p);
     }
-    const summary = text5(article.querySelector(".column-primary > .entry-summary"));
+    const summary = text6(article.querySelector(".column-primary > .entry-summary"));
     if (summary) {
       const intro = make(document, "p", "");
       intro.append(make(document, "strong", summary));
@@ -916,15 +974,15 @@ var CustomImportScript = (() => {
     }
     out.push(content);
     const side = sidebar(document, article.querySelector(".column-secondary"), !!media);
-    if (side.length) out.push(marker(document, "sidebar"), ...side);
+    if (side.length) out.push(marker2(document, "sidebar"), ...side);
     if (media) {
-      const heading = text5(media.querySelector(".search-results-heading")) || "Media Box";
-      const stats = text5(media.querySelector(".search-results-stats .stats"));
+      const heading = text6(media.querySelector(".search-results-heading")) || "Media Box";
+      const stats = text6(media.querySelector(".search-results-stats .stats"));
       const totals = [...stats.matchAll(/\b(\d+)\s+(?:images?|videos?|PDFs?)\b/gi)];
       if (totals.length) {
         media.dataset.expectedAssets = totals.reduce((sum, match) => sum + Number(match[1]), 0);
       }
-      out.push(marker(document, "media-box, dark, full-width"), make(document, "h2", heading));
+      out.push(marker2(document, "media-box, dark, full-width"), make(document, "h2", heading));
       if (stats) out.push(make(document, "p", stats));
       media.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((node) => node.remove());
       out.push(media);
@@ -944,7 +1002,7 @@ var CustomImportScript = (() => {
   function labelImageLinks(article) {
     article.querySelectorAll("a[href]").forEach((a) => {
       const img = a.querySelector("img");
-      if (!img || text5(a) || a.title) return;
+      if (!img || text6(a) || a.title) return;
       const alt = (img.getAttribute("alt") || "").trim();
       if (alt && !PLACEHOLDER_ALT.test(alt)) {
         a.title = alt;
@@ -979,7 +1037,7 @@ var CustomImportScript = (() => {
       let node = sidebarStart.nextElementSibling;
       while (node && !node.matches("hr[data-press-kit-section]")) {
         const first = node.matches("table") && node.querySelector("tr > td, tr > th");
-        if (first && text5(first) === "Gallery") first.textContent = "Gallery (preview)";
+        if (first && text6(first) === "Gallery") first.textContent = "Gallery (preview)";
         node = node.nextElementSibling;
       }
     }
@@ -1367,13 +1425,13 @@ var CustomImportScript = (() => {
         if (caption) {
           const div = img.parentElement;
           if (div.childElementCount === 1 && !(div.textContent || "").trim()) {
-            const marker3 = document.createComment("image");
-            div.replaceWith(marker3);
-            marker3.replaceWith(withCaption(div, caption, document));
+            const marker4 = document.createComment("image");
+            div.replaceWith(marker4);
+            marker4.replaceWith(withCaption(div, caption, document));
           } else {
-            const marker3 = document.createComment("image");
-            img.replaceWith(marker3);
-            marker3.replaceWith(withCaption(imageContainer(img, document), caption, document));
+            const marker4 = document.createComment("image");
+            img.replaceWith(marker4);
+            marker4.replaceWith(withCaption(imageContainer(img, document), caption, document));
           }
         }
         return;
@@ -1381,10 +1439,10 @@ var CustomImportScript = (() => {
       const link = img.closest("a");
       const linkedImage = link && link.querySelectorAll("img").length === 1 && !(link.textContent || "").trim();
       const target = linkedImage ? link : img;
-      const marker2 = document.createComment("image");
-      target.replaceWith(marker2);
+      const marker3 = document.createComment("image");
+      target.replaceWith(marker3);
       const imageNode = imageContainer(img, document, linkedImage ? link : null);
-      marker2.replaceWith(withCaption(imageNode, caption, document));
+      marker3.replaceWith(withCaption(imageNode, caption, document));
     });
   }
 
@@ -1908,6 +1966,7 @@ var CustomImportScript = (() => {
       });
       document.querySelectorAll("article.press_kit .entry-content").forEach(markQuotes);
       document.querySelectorAll("article.press_kit .entry-content").forEach(markFootnotes);
+      document.querySelectorAll("article.press_kit .entry-content").forEach(markAnswerLayout);
     },
     transform: (payload) => {
       const { document, url, params } = payload;
@@ -1952,6 +2011,7 @@ var CustomImportScript = (() => {
       body.querySelectorAll(".search-results-items").forEach((grid) => parse4(grid, payload));
       const faq = /\/frequently-asked-questions\/?$/.test(new URL(params.originalURL).pathname);
       parse3(body, { document, faq });
+      answerLayout(body, payload);
       body.querySelectorAll("p[data-skoda-quote]").forEach((p) => parse5(p, payload));
       body.querySelectorAll("p[data-skoda-fragment]").forEach((p) => {
         const link = p.querySelector("a");

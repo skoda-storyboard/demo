@@ -63,6 +63,8 @@ no underline (also on hover), `li` gap 8px. Subscribe intro + Company blurb 12px
   `#419468` fill + white tick); label `inline-block`, padding `0 5px 0 27px`, 14px/18px, `#a1a1a1`; link
   emerald, no underline.
 - "Manage subscription" (`/en/newsletter-settings/`): `padding-top .5rem`, 16px/24px, `#419468`, underlined.
+  Press releases use the same 16px / 400 / 24px (re-measured 2026-10-13 at 390–1280, PR #337 review),
+  so no page-type override applies.
 - Response: white box (`padding .5rem .75rem`, 14px) laid over the consent row; hidden while empty.
 - Hidden fields: `language=en_GB`, `lang=en`, `list=339`; form code `NewsletterFormWidgetV2`.
 - **Below 320px (deliberate deviation):** the source page has a 320px minimum width and scrolls horizontally

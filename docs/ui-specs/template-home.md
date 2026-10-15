@@ -151,3 +151,20 @@ Stories, which the source has too (8 vs 10 at 768, 104 vs 106 at 1440) (2); the 
 (34); search results (35, 43 results for "peaq"); the outside-click close (37); Skoda Next renders, the fallback face is
 the CLS guard (6). Header items (36, 38, 39) and Lighthouse (40) are tracked in SKODA-308, PR #299 and PR #288.
 
+
+## 13. Media Room home rails (issue #332 / SKODA-230, 2026-10-14)
+
+Measured with Chrome DevTools against the live `/en/media-room/` at 1440 / 992 / 768 / 375 (no screenshots). Card
+boxes are `[x, y, w, h]`, text positions are card-relative text boxes (`Range`).
+
+| Row | Source | EDS before (`main`) | EDS after |
+|---|---|---|---|
+| News rail content | the promo shows the newest 3 press releases / kits; the News rail (press releases) starts with the first one **not** in the promo | repeated the promo's 3 press releases | skips them: `story-rail` waits for the page's promo box (`data-block-status="loaded"`, 3s cap) and drops its card pages by whole path, then fills its 10 cards + "All" as before (`skipsPromo`: index `press_release` rails only; not press bands, curated or `order` rails) |
+| Images / Videos card | 260.8 × 286.7, image 146.7 (8px corners), date 163.7, title 190.7 15/400/18 `#161718` (992: 203.2 × 254.3; 768: 210.4 × 258.3; 375: 317.5 × 318.6) | same | same |
+| Latest Stories | 3 visible, 354.4 × 199.3 (2 at 768, 1 at 375) | same | same |
+| News / Press Kits date → title | title text at 140.2 / 161.8 (1440) | same; date text 1px lower (116.2 vs 115.2), inside the 1px tolerance | same |
+| Page height | footer top 2771.3 / 2448.5 / 2457.7 / 2565 | same | same |
+| Image titles | the attachment's own WordPress title, which for some uploads is the file name (`…/attachment/hudebni-leto_ee2dfc93/` h1 "hudebni-leto_ee2dfc93") | the feed's titles, from the source cards (`media-items-lib.mjs`) | unchanged: not a defect. The live rail shows newer items (12. 10. 2026) because the committed feed is from 2026-10-01; a feed rebuild (SKODA-608, `npm run media-items:build`) refreshes it |
+
+The Storyboard home's "Latest News" rail is a `press_release` rail too; its promo shows stories, so nothing is skipped
+there (measured: same cards as before).

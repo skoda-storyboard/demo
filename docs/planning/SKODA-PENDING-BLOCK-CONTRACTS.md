@@ -56,7 +56,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `accordion` | `faq` (SKODA-807: FAQPage JSON-LD on a kit's FAQ chapter) | – (SKODA-805c; see `accordion` below) |
 | `columns` | `banners` (SKODA-805c: a row of linked banner images at their authored 240px, the press-kit PDF/share buttons; see `columns-banners` below), `callout` (SKODA-805c: `[icon, text]`, the 50px icon in a 60px cell beside its text; the press-kit WhatsApp callout) | – |
 | `downloads` | `media-box` (SKODA-510), `gallery` (SKODA-806: a press-kit Images-chapter group, emitted by `parsers/press-kit-media.js` with `collapse | auto`; an Images chapter past 200 images moves its largest groups to `Fragment` blocks, `/fragments<page>/<slug>`) | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes`, `collapse` (SKODA-502/510) |
-| `embed` | – | `url`, `ratio`, `title`, `poster` (`or-curated`: a bare Vimeo / YouTube / Buzzsprout / Spotify URL on its own line still autoblocks). A self-hosted `.mp4`/`.webm`/`.mov`/`.m4v` `url` renders a native `<video>` with the `poster` image (SKODA-801a, WordPress `[video]`) |
+| `embed` | – | `url`, `ratio`, `title`, `poster`, `height` (`or-curated`: a bare Vimeo / YouTube / Buzzsprout / Spotify URL on its own line still autoblocks). A self-hosted `.mp4`/`.webm`/`.mov`/`.m4v` `url` renders a native `<video>` with the `poster` image (SKODA-801a, WordPress `[video]`). YouTube as on the source: a `youtube.com/embed/…` URL is the source's iframe, YouTube's own player (lazy-loaded, its query kept); a `watch` / `youtu.be` URL is the source's lite-youtube, the poster until clicked (SKODA-702a). `height` (px) is a fixed-height player box at full width, as the source's `width="100%" height="448px"` iframe |
 | `gallery` | – | – |
 | `hero-image` | `story` (default), `overlay`, `archive` | – |
 | `listing` | – | `index`, `path`, `template`, `facets`, `facetlabels`, `sort`, `perpage`, `columns` (config only) |
@@ -311,6 +311,12 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - `parsers/press-kit-content.js` emits it on a kit's FAQ chapter, a `…/frequently-asked-questions/` page (Peaq-2: 28 rows, Epiq-2: 5).
   - The block behaves as the default variant and adds one schema.org `FAQPage` JSON-LD script to the head. It has one `Question` / `acceptedAnswer` per complete row; every FAQ accordion on the page shares that one script.
   - Fallback: without the variant code the block is a plain accordion (`readable`).
+- **Answer layout tables (#275, 2026-10-13):** DA keeps neither the source's empty paragraphs (a pushed `<p>&nbsp;</p>` is dropped on preview) nor its SiteOrigin cell widths. So `parsers/answer-layout.js` carries them as small tables nested in the answer, as a nested Quote is carried:
+  - `Spacer`, a one-cell table: the source's blank line, drawn as one body line plus the paragraph gap (44px).
+  - `Spacer (row)`: an empty builder row, its two 10px cell insets (20px).
+  - `Media row`, a head plus one row of widths (`50.4%` | `49.6%`), placed before the first image of a side-by-side image row. Only rows whose cells aren't equal carry one; `templates/press-kit` sizes the cells from it (≥ 781px) and removes it.
+  - `blocks/accordion` draws the spacers. A Spacer with more cells or rows, another name, or one inside a table cell stays as authored. Fallback: without the code the tables show as one-word tables (`readable`).
+  - In use, across all 56 press kits: first glimpse (2 × `Spacer` in item 1, `Media row` in item 3, `Spacer (row)` in item 8), Peaq-2 Connectivity, Epiq-2 intro and the Elroq covered drive (one `Media row` each), and Fabia 130 (three; not pushed until its PDF / MP4 links are in the DAM).
 
 ### `highlight`
 - **Status:** `pinned` (decided 2026-09-25: section style; **shape 2** 2026-09-28; runtime landed 2026-10-05) · **Ticket:** SKODA-824 · **Fallback:** `readable` (it was `broken` until the runtime landed: the panel had no box or text treatment, and each extra `body-column` section moved the sidebar) · **Styles:** `highlight-dark`, `highlight-grey`
@@ -322,6 +328,14 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - both templates (`body.story`, `body.press-release`) only keep `.body-column` sections in the reading track, so every other section spans the full grid.
 
   `body-column` keeps the panel in the text column. The single `highlight-*` class matches no existing rule.
+- **Geometry rows (story, PO 2026-10-13: the panel inset as the source):** the source panel's content sits its row padding + the 10px cell padding + each widget's margin in. Most layouts keep the theme's (no row padding; widget margin `0 15px` from 781px, `15px` up to 780px; a gallery with no margin), which `styles.css` draws by default. A layout that sets its own carries extra `Section Metadata` rows, each a 1–4 value px box:
+  - `highlight-padding` / `highlight-padding-mobile`: the row padding (`#pg-…> .panel-row-style { padding }`);
+  - `highlight-margin` / `highlight-margin-mobile`: the text widgets' margin (`#pl-… #panel-… { margin }`), `0px 0px 0px 0px` when the layout gives them none;
+  - `highlight-gallery-margin` / `highlight-gallery-margin-mobile`: the carousel widget's margin.
+  - The mobile row is the `@media (max-width:780px)` rule, or the desktop value when there's none. A multi-column row carries none (a margin per cell).
+  - `parsers/story-flatten.js` `markHighlights()` reads them in `preprocess`. Delivered pages have them as the section's `data-highlight-*` attributes; `scripts/highlight-geometry.js` turns them into the section's `--hl-*` boxes.
+  - Fallback: without the code the panel keeps the default inset (`readable`).
+  - In use: 10 panels on 8 stories (camouflage ×2, sportline, what-you-learn ×2, cruise control, the plates story, designers on the Peaq, an epic start, park your Škoda).
 - **Variant:** from the background colour's luminance, `dark` below 0.5 and `grey` above (white = no panel). All 16 M1 story rows are `#0e3a2f`; the Zellmer FAQ panel is `#f3f3f3`.
 - **Importers:**
   - `parsers/story-flatten.js`: `import-story-detail.js`'s `preprocess` calls `markHighlights()`, because the row colour is only in the SiteOrigin head CSS (`#pg-<id>> .panel-row-style`). This gives 16 rows on 11 of the 19 M1 stories: Epiq, Octavia, Slavia, plates, graffiti, Froome, Peaq production, Peaq Tour de France, Kylaq ×3, paper Kodiaq ×3, and charging ×2 (consecutive; one is a 2-cell Columns row).

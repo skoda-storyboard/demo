@@ -141,11 +141,12 @@ header .nav-topbar-utility {
   font-size: var(--body-font-size-2xs);
 }
 
-/* --skoda-grey-700: 5.45:1 on the #e6e6e6 bar; the source #7c7d7e is 3.3:1 there, failing AA
-   for this 12px text (SKODA-308). The language links use the source grey since #243 (PO);
-   this CTA was not part of that decision and keeps the AA colour. */
+/* the source grey #7c7d7e (--skoda-grey-500), as the language links (#243): #272 QA asks for
+   the source colour on this CTA too. Accepted by review as source parity (PR #352): 3.3:1 on
+   the #e6e6e6 bar, below AA's 4.5:1 for this 12px text (SKODA-308; SKODA-703 "as source,
+   accepted"; it was --skoda-grey-700, 5.45:1) */
 header .nav-topbar .nav-topbar-utility a {
-  color: var(--skoda-grey-700);
+  color: var(--skoda-grey-500);
   text-decoration: none;
 }
 
@@ -176,7 +177,8 @@ header .nav-topbar .nav-subscribe .icon-mail img {
 /* --- Language switcher (SKODA-303, language-switcher.md): inline locale links, the page's
    locale as bold ink text; the same list in the topbar (>= 1080) and the drawer footer.
    Links use the source --skoda-grey-500 #7c7d7e (#243): 3.30:1 on the #e6e6e6 bar, 3.65 on the
-   Media Room #f1f1f1, 4.12 on the white drawer, below AA, accepted by the PO for source parity.
+   Media Room #f1f1f1, 4.12 on the white drawer, below AA, accepted by the PO for source parity
+   (SKODA-703 "as source, accepted"; the topbar Subscribe CTA follows since #272, PR #352).
    Topbar: 12/18, links 300, 12px apart (source .topbar .lang-links). ---------------- */
 header .nav-locales-list {
   --nav-locale-gap: 12px;
@@ -1202,10 +1204,10 @@ header nav button.nav-mail {
   cursor: pointer;
 }
 
-/* after the reset's `font: inherit`: the CTA's 600 and 18px line, as the link */
+/* after the reset's `font: inherit`: the CTA's 600 and 18px line and the source grey, as the link */
 header .nav-topbar button.nav-subscribe {
   position: relative;
-  color: var(--skoda-grey-700);
+  color: var(--skoda-grey-500);
   font-weight: var(--weight-semibold);
   line-height: var(--nav-topbar-line);
 }

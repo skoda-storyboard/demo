@@ -89,6 +89,9 @@ const LABELS = {
   openVideo: (title) => (title ? `Open ${title}` : 'Open video'),
 };
 
+// the source toolbar's tooltips (its `title`s); the accessible names stay the labels above
+const TOOLTIPS = { add: 'Add/remove this', download: 'Download this', link: 'Link to page' };
+
 const isImageParagraph = (el) => el?.tagName === 'P' && !!el.querySelector('img') && !el.textContent.trim();
 
 // a paragraph of links only ("PDF download   JPG download"), no image or other text
@@ -96,9 +99,23 @@ const isLinksParagraph = (el) => el?.tagName === 'P' && !el.querySelector('img')
   && !!el.querySelector('a[href]')
   && [...el.childNodes].every((node) => node.nodeName === 'A' || !node.textContent.trim());
 
+// a table nested in an answer (blocks can't nest), named by its first cell: `Spacer`, `Media row`
+const nestedName = (el) => (el?.tagName === 'TABLE'
+  ? el.rows[0]?.cells[0]?.textContent.trim().toLowerCase() || '' : '');
+// the Accordion block's own rule (accordion.js): a one-cell table, `Spacer` or `Spacer (row)`
+const isSpacer = (el) => el?.tagName === 'TABLE' && el.rows.length === 1 && el.rows[0].cells.length === 1
+  && /^spacer(?:\s*\(\s*row\s*\))?$/.test(nestedName(el));
+const isMediaRow = (el) => nestedName(el) === 'media row';
+
+// the number of cells a `Media row` table declares (its widths row)
+const declaredCells = (table) => table?.rows[1]?.cells.length || 0;
+
 /**
- * The runs of two or more media units in a cell, in order. A unit is an image paragraph and the
- * links paragraph right after it, if any.
+ * The runs of two or more media units in a cell, in order. A unit is an image paragraph, the
+ * links paragraph right after it and then a `Spacer`, if any. A `Media row` table right before
+ * a run is its cells' source widths (`run.widths`), and the run ends after that many cells: an
+ * equal source row right after it has no `Media row` of its own (#344 review), so it starts the
+ * next run instead of joining the weighted one.
  * @param {Element} cell
  * @returns {Element[][][]}
  */
@@ -113,34 +130,61 @@ export function mediaRuns(cell) {
         i += 1;
         unit.push(children[i]);
       }
+      if (isSpacer(children[i + 1])) {
+        i += 1;
+        unit.push(children[i]);
+      }
       run.push(unit);
+      const declared = declaredCells(run.widths);
+      if (declared > 1 && run.length === declared) {
+        runs.push(run);
+        run = [];
+      }
     } else {
       if (run.length > 1) runs.push(run);
       run = [];
+      if (isMediaRow(children[i])) run.widths = children[i];
     }
   }
   if (run.length > 1) runs.push(run);
   return runs;
 }
 
+// a `Media row` table's widths as fractions, one per cell (`50.4%` → 0.504): only percentages
+// that add up to the row (±0.5%); anything else sizes nothing
+const PERCENT = /^(\d+(?:\.\d+)?)%$/;
+function mediaWidths(table, count) {
+  const cells = [...(table?.rows[1]?.cells || [])];
+  const widths = cells.map((cell) => Number(cell.textContent.trim().match(PERCENT)?.[1]) / 100);
+  const sum = widths.reduce((total, w) => total + w, 0);
+  const valid = widths.length === count && widths.every((w) => w > 0 && w < 1);
+  return valid && Math.abs(sum - 1) <= 0.005 ? widths : null;
+}
+
 // An accordion answer's images are the source's two-cell rows (#275): each cell an image with
-// its centred "PDF download / JPG download" links under it. Grouped before the Accordion block
-// decorates, so its panel takes the groups with the rest of the answer.
+// its centred "PDF download / JPG download" links under it (and the source's blank line after
+// them, a `Spacer`). A row the source sizes unequally keeps its cell widths. Grouped before the
+// Accordion block decorates, so its panel takes the groups with the rest of the answer.
 function accordionMedia(main) {
   main.querySelectorAll('.section.body-column .accordion > div > div:nth-child(2)').forEach((cell) => {
     mediaRuns(cell).forEach((run) => {
       const row = document.createElement('div');
       row.className = 'press-kit-media-row';
       run[0][0].before(row);
-      run.forEach(([image, links]) => {
+      const widths = mediaWidths(run.widths, run.length);
+      if (widths) row.classList.add('sized');
+      run.forEach((unit, i) => {
         const media = document.createElement('div');
         media.className = 'press-kit-media';
-        image.classList.add('press-kit-media-image');
-        links?.classList.add('press-kit-media-links');
-        media.append(...[image, links].filter(Boolean));
+        unit[0].classList.add('press-kit-media-image');
+        unit.filter(isLinksParagraph).forEach((links) => links.classList.add('press-kit-media-links'));
+        if (widths) media.style.setProperty('--pk-media-width', widths[i]);
+        media.append(...unit);
         row.append(media);
       });
     });
+    // a `Media row` is layout only: it never shows, even without its run
+    cell.querySelectorAll(':scope > table').forEach((table) => { if (isMediaRow(table)) table.remove(); });
   });
 }
 
@@ -152,6 +196,7 @@ function roundAction(tag, kind, label) {
   el.className = `press-kit-action ${kind}`;
   if (tag === 'button') el.type = 'button';
   el.setAttribute('aria-label', label);
+  if (TOOLTIPS[kind]) el.title = TOOLTIPS[kind];
   return el;
 }
 
