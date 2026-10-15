@@ -361,6 +361,12 @@
   margin-block-start: 0;
 }
 
+/* ...and the sort row with it: its 12px comes back at once, so the results don't move while
+   the veil fades (#355 review); the toggle still animates it */
+.listing.facets-instant .listing-sort {
+  transition: none;
+}
+
 .listing .listing-sort-options {
   display: flex;
 }

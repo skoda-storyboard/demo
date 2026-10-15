@@ -912,3 +912,37 @@ test('late names on such a page drop the options the source does not offer, and 
   assert.equal(block.querySelector('.facet-panel[data-facet="company"]'), null);
   assert.deepEqual([...block.querySelectorAll('.facet-panel[data-facet="bodywork"] input')].map((i) => i.value), ['saloon', 'suv']);
 });
+
+// #355 review: late names that remove the focused option must not drop focus to <body>
+test('late names removing the focused option: focus moves to the first option left in its list (#355 review)', async () => {
+  const rows = [companyRow(1, 'design, other', 'suv'), companyRow(2, 'other', 'saloon')];
+  const { block, toggle, release } = await pageLabelsListing('/en/page-labels-focus-index.json', '', rows, { hold: true });
+  click(toggle);
+  click(block.querySelector('.facet-pill[data-facet="company"]'));
+  const other = block.querySelector('.facet-panel[data-facet="company"] input[value="other"]');
+  other.focus();
+  assert.equal(document.activeElement, other);
+  await release();
+  assert.equal(other.isConnected, false, 'the source does not offer it here');
+  const design = block.querySelector('.facet-panel[data-facet="company"] input[value="design"]');
+  assert.equal(document.activeElement, design, 'the surviving option, not <body>');
+  assert.equal(block.querySelector('.facet-pill[data-facet="company"]').getAttribute('aria-expanded'), 'true', 'its list stays open');
+});
+
+test('late names removing the focused option\'s whole list: focus moves to the Advanced filter toggle (#355 review)', async () => {
+  const rows = [companyRow(1, 'other', 'suv'), companyRow(2, 'other', 'saloon')];
+  const { block, toggle, release } = await pageLabelsListing('/en/page-labels-focus-gone-index.json', '', rows, { hold: true });
+  click(toggle);
+  click(block.querySelector('.facet-pill[data-facet="company"]'));
+  block.querySelector('.facet-panel[data-facet="company"] input[value="other"]').focus();
+  await release();
+  assert.equal(block.querySelector('.facet-pill[data-facet="company"]'), null, 'the pill went with its only option');
+  assert.equal(document.activeElement, toggle, 'the toggle, not <body>');
+});
+
+test('sort row (#355 review): the one-step collapse after a pick drops its margin transition too; the toggle keeps it', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = (await readFile(new URL('./listing.css', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.match(css, /\.listing\.facets-instant \.listing-sort \{\s*transition: none;/);
+  assert.match(css, /\.listing \.listing-sort \{[^}]*transition: margin-block-start var\(--facet-reveal\)/);
+});

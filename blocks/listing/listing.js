@@ -840,11 +840,14 @@ export default async function decorate(block) {
 
   // names that came after the first paint: rename and reorder the options in place (their
   // inputs, state and listeners stay), then the chips. Moving a focused option drops focus to
-  // <body>, so the control a keyboard user is on gets it back (#341 review).
+  // <body>, so the control a keyboard user is on gets it back (#341 review); if that option is
+  // one that goes, focus moves to the first option left in its list, or to the toggle when the
+  // whole list goes (#355 review).
   if (namesLate) {
     facetLabels.then((names) => {
       optionNames = names;
       const focused = facetOptions.contains(document.activeElement) ? document.activeElement : null;
+      const focusedPanel = focused?.closest('fieldset.facet-panel') || null;
       facetOptions.querySelectorAll('fieldset.facet-panel').forEach((panel) => {
         const { facet } = panel.dataset;
         // an option the source doesn't offer on this page goes, unless it's selected (SKODA-402d)
@@ -854,7 +857,9 @@ export default async function decorate(block) {
         });
         const options = [...panel.querySelectorAll('label.facet-option')];
         if (!options.length) {
-          [...facetPills.querySelectorAll('.facet-pill')].find((pill) => pill.dataset.facet === facet)?.remove();
+          const pill = [...facetPills.querySelectorAll('.facet-pill')].find((p) => p.dataset.facet === facet);
+          panelFor.delete(pill);
+          pill?.remove();
           panel.remove();
           return;
         }
@@ -866,8 +871,11 @@ export default async function decorate(block) {
             panel.append(option);
           });
       });
-      if (focused?.isConnected && document.activeElement !== focused) {
-        focused.focus({ preventScroll: true });
+      if (focused?.isConnected) {
+        if (document.activeElement !== focused) focused.focus({ preventScroll: true });
+      } else if (focused) {
+        const fallback = (focusedPanel?.isConnected && focusedPanel.querySelector('input')) || filterToggle;
+        fallback.focus({ preventScroll: true });
       }
       renderChips();
     });
