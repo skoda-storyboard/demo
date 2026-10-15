@@ -13,7 +13,7 @@
  *                                 Buzzsprout URL, body, inline Vimeo URL
  *   3. Style: sidebar             "Additional info" h3 + list, "Images" h3 +
  *                                 Gallery (preview), "Tags" h3 + Tags
- *   4. Style: dark, full-width, media-box   "Media Box" h2 + stats line + Downloads
+ *   4. Style: dark, full-width, media-box   "Media Box" h3 + stats line + Downloads
  *   5. Style: dark, full-width, related     only when the source has the band:
  *                                 h2 + "Based on tags" line + "All" link + Story Rail (press)
  *
@@ -254,6 +254,16 @@ function bodyContent(document, primary) {
   });
   content.querySelectorAll('div[style]').forEach((div) => div.replaceWith(...div.childNodes));
 
+  // A line break closing a bold run (`<strong>FAQ:<br></strong><br>`, the Zellmer FAQ) is the
+  // first of two: the source shows a blank line there (#274). The import drops a trailing <br>
+  // inside the <strong>, so it moves after it, where both breaks are kept.
+  content.querySelectorAll('strong > br:last-child, b > br:last-child').forEach((br) => {
+    const bold = br.parentElement;
+    let after = br.nextSibling;
+    while (after && after.nodeType === 3 && !after.textContent.trim()) after = after.nextSibling;
+    if (!after && bold.nextSibling) bold.after(br);
+  });
+
   content.querySelectorAll('p').forEach((p) => { if (isEmptyParagraph(p)) p.remove(); });
   dataTables(document, content);
   return [...content.childNodes].filter((n) => n.nodeType === 1 || text(n));
@@ -352,7 +362,8 @@ function mediaBoxContent(document, band) {
   const heading = text(box.querySelector('.search-results-heading')) || 'Media Box';
   const stats = text(box.querySelector('.search-results-stats .stats, .stats'));
   box.querySelectorAll('.search-results-header, .search-results-stats, .togglebox-opener').forEach((n) => n.remove());
-  const out = [make(document, 'h2', heading)];
+  // the source band heading is an h3 (.search-results-heading, #274)
+  const out = [make(document, 'h3', heading)];
   if (stats) out.push(make(document, 'p', stats));
   out.push(box);
   return out;
@@ -386,7 +397,8 @@ function relatedContent(document, band) {
     clone.querySelectorAll('.subheading').forEach((s) => s.remove());
     heading = text(clone) || heading;
   }
-  const out = [make(document, 'h2', heading)];
+  // the source band heading is an h3 (.search-results-heading, #274)
+  const out = [make(document, 'h3', heading)];
   if (sub) out.push(make(document, 'p', sub));
   const all = results.querySelector('a.search-results-header-link[href], .search-results-header a[href]');
   if (all && all.getAttribute('href')) out.push(make(document, 'p', link(document, all.getAttribute('href'), text(all) || 'All')));

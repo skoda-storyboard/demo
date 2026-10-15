@@ -614,6 +614,21 @@ test('malformed mandatory article, toggle and asset fail rather than silently lo
   );
 });
 
+test('a layout builder without a toggle is shown content: it follows in place (Classic Days 2026)', { skip: !JSDOM }, () => {
+  const extra = `<div class="panel-grid"><div class="panel-grid-cell">
+    <div class="so-panel widget widget_sow-editor"><div class="textwidget"><p>Museum lead paragraph</p></div></div>
+    <div class="so-panel widget widget_siteorigin-panels-builder"><div class="panel-layout">
+      <div class="panel-grid"><div class="panel-grid-cell"><div class="so-panel widget widget_sow-editor">
+        <div class="textwidget"><p>Films, photographs and documents</p></div></div></div></div>
+    </div></div></div></div>`;
+  const page = run(fixture({ togglesCount: 0, extra }), target);
+  const paras = [...page.querySelectorAll('p')].map(txt);
+  const lead = paras.indexOf('Museum lead paragraph');
+  assert.ok(lead >= 0, 'the lead paragraph is kept');
+  assert.equal(paras[lead + 1], 'Films, photographs and documents', 'the builder text follows it in place');
+  assert.equal(rows(page, 'Accordion').length, 0, 'no accordion is made up');
+});
+
 test('a kit FAQ chapter emits Accordion (faq), which the block turns into FAQPage data (SKODA-807)', { skip: !JSDOM }, () => {
   const faqUrl = `${base}skoda-peaq-press-kit-2/frequently-asked-questions/`;
   const page = run(fixture({

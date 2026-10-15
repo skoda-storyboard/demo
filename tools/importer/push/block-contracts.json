@@ -297,7 +297,7 @@
       "status": "pinned",
       "ticket": "SKODA-221",
       "fallback": "broken",
-      "shape": 3,
+      "shape": 4,
       "emittedBy": [
         "parsers/series-grid.js",
         "parsers/press-kit-hub-tiles.js"

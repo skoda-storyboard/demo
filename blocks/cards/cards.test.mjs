@@ -11,13 +11,17 @@ globalThis.document = boot.window.document;
 const { default: decorate, parseTileRows } = await import('./cards.js');
 
 function makeBlock(tokens, { tiles = true } = {}) {
-  const markup = tokens.map((token, i) => `
+  const markup = tokens.map((token, i) => (/^press-banner-/.test(token) ? `
+    <div>
+      <div>${token}</div>
+      <div><a href="/en/banner-${i + 1}"><picture><img src="data:image/png;base64,a" alt="Banner ${i + 1}"></picture></a></div>
+    </div>` : `
     <div>
       <div>${token}</div>
       <div><picture><img src="data:image/png;base64,a" alt="Tile ${i + 1}"></picture></div>
       <div><a href="/en/item-${i + 1}">Tile ${i + 1}</a></div>
     </div>
-  `).join('');
+  `)).join('');
   const dom = new JSDOM(`<div class="cards overlay ${tiles ? 'tiles' : ''}">${markup}</div>`, {
     url: 'https://example.com/en/',
   });
@@ -105,6 +109,63 @@ test('press kits use a distinct 20-column track for features, fifths and quarter
     const source = card.querySelector('source[media="(min-width: 781px)"]');
     assert.equal(new URL(source.srcset).searchParams.get('width'), String(width));
   });
+});
+
+// Classic Days 2026, in source rows: banners 3/5 + 2/5, four rows of fifths, three fifths +
+// a 2/5 banner, banners 2/5 + 3/5, three thirds, two half banners.
+const MOSAIC = [
+  'press-banner-wide', 'press-banner-narrow',
+  ...Array(20).fill('press-square'),
+  'press-square', 'press-square', 'press-square', 'press-banner-narrow',
+  'press-banner-narrow', 'press-banner-wide',
+  'press-third', 'press-third', 'press-third',
+  'press-banner-half', 'press-banner-half',
+];
+
+test('a press mosaic with thirds and banners runs on 30 columns, one row per source row', async () => {
+  const block = makeBlock(MOSAIC);
+  block.querySelectorAll('img').forEach((img) => { img.src = 'https://example.com/media.jpg?width=750'; });
+  await decorate(block);
+  const ul = block.querySelector('ul');
+  assert.deepEqual([...ul.classList], ['tiles-press', 'tiles-press-mosaic']);
+  assert.equal(block.querySelectorAll('.tile-row-start').length, 9);
+  const banners = [...block.querySelectorAll('li.tile-image-only')];
+  assert.equal(banners.length, 7);
+  banners.forEach((li) => {
+    assert.equal(li.querySelector(':scope > a.tile-image-link > picture > img')?.alt.startsWith('Banner'), true);
+    assert.equal(li.querySelector('h2, .card-teaser-body'), null, 'no title overlay on a banner');
+    assert.equal(li.classList.contains('card-teaser'), false);
+  });
+  assert.equal(banners[0].querySelector('a').getAttribute('href'), '/en/banner-1');
+  // SKODA-221: requests at least 2x the 1440 widths (wide 728.8, narrow 479.2, half 604,
+  // third 396px on the 1228px track)
+  const desktopWidth = (li) => new URL(li.querySelector('source[media="(min-width: 781px)"]').srcset)
+    .searchParams.get('width');
+  const byToken = (token) => block.querySelector(`li.tile-${token}`);
+  assert.deepEqual(
+    ['press-banner-wide', 'press-banner-narrow', 'press-banner-half', 'press-third'].map((t) => desktopWidth(byToken(t))),
+    ['1500', '1000', '1250', '850'],
+  );
+  assert.equal(block.querySelectorAll('li.tile-press-third.card-teaser h2 a').length, 3);
+});
+
+test('mosaic rules: no quarters beside thirds or banners; banner rows and banner sizes go together', async () => {
+  await assert.rejects(
+    decorate(makeBlock(['press-quarter', 'press-quarter', 'press-quarter', 'press-quarter', 'press-third', 'press-third', 'press-third'])),
+    /cannot share a mosaic with thirds or banners/,
+  );
+  const titled = makeBlock(['press-third', 'press-third', 'press-third']);
+  titled.firstElementChild.firstElementChild.textContent = 'press-banner-wide';
+  await assert.rejects(decorate(titled), /is a banner size/);
+  const unsized = makeBlock(['press-banner-half', 'press-banner-half']);
+  unsized.firstElementChild.firstElementChild.textContent = 'press-half';
+  await assert.rejects(decorate(unsized), /a banner needs a banner size/);
+  const unnamed = makeBlock(['press-banner-half', 'press-banner-half']);
+  unnamed.querySelector('img').setAttribute('alt', '');
+  await assert.rejects(decorate(unnamed), /needs alt text/);
+  const plain = makeBlock(Array(5).fill('press-square'));
+  await decorate(plain);
+  assert.equal(plain.querySelector('ul').classList.contains('tiles-press-mosaic'), false, 'other kits keep 20 columns');
 });
 
 test('older press kits use half rows: 2 wide, or 1 wide + 2 quarters in either order', async () => {

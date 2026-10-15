@@ -3,6 +3,13 @@
 Status: **CAPTURED** (measured 2026-09-15 via Chrome DevTools MCP; source CSS `media-room-515d2d102b.css`).
 Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
 
+> **#274 update (2026-10-12):** every press-release Media Box card shows its source date: 11px
+> `#c4c6c7`, e.g. Zellmer 30. 8. 2022 / 21. 9. 2026. The press-release importer now emits the
+> optional date cell (`parsers/downloads.js` `dates`). The story Media Box rows are unchanged.
+> On press releases the source PDF tile is the bare 30% black holder: `.file-caption.pdf` is
+> `display:none` on releases and press kits. So the press-release template hides the 48px PDF
+> glyph there. Story and press-kit Media Boxes keep the block's glyph.
+
 > **SKODA-510 update (2026-09-27, measured without screenshots):** Press-release Media Boxes include
 > image rows, MP4 poster rows and a PDF row with an empty image cell. The source Peaq box has five tiles
 > (one video, three images, one PDF); the old EDS block dropped the PDF. At 1280/1024/768/500 the source

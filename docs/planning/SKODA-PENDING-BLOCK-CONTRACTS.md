@@ -164,9 +164,9 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Still to do:** the importer header change (`Cards (promo)` → `Promo Box`). The check keeps failing `Cards (promo)` and points at `promo-box`.
 
 ### `cards-tiles`
-- **Status:** implemented by SKODA-221 (shape 3; historical pending entry retained for version tracking) · **Ticket:** SKODA-221 (importers: 207 series hub, 805a press-kit hub). Series pages using shape 2 need rendered QA; press-kit pages need re-import with shape 3 before QA and publication.
+- **Status:** implemented by SKODA-221 (shape 4 since 2026-10-14, the press mosaic; historical pending entry retained for version tracking) · **Ticket:** SKODA-221 (importers: 207 series hub, 805a press-kit hub). Series pages using shape 2 need rendered QA; press-kit pages need re-import with shape 3 before QA and publication.
 - **Emitted by:** `parsers/series-grid.js` (207) and `parsers/press-kit-hub-tiles.js` (805a). The existing press-kit DA previews still have ambiguous old `feature`/`sq` rows, including Motorsport's all-`sq` grid; the runtime and `import:validate-blocks` both reject these on `/en/press-kits/`. Re-import and push the shape 3 output before tile QA/publish.
-- **Shape:** header `Cards (overlay, tiles)`, then one row per tile: `[size token, <picture>, <a href="/en/…">Title</a>]`.
+- **Shape:** header `Cards (overlay, tiles)`, then one row per tile: `[size token, <picture>, <a href="/en/…">Title</a>]`. A press-mosaic banner (shape 4) is `[banner size token, <a href="…"><picture> with alt text</a>]`; `import:validate-blocks` / the publish gate check both forms (`push/block-check.mjs`).
   - The size token names the tile's share of its source row and its image ratio. Series uses twelfths; press kits use twentieths:
 
     | Token | Row share | Ratio | Token | Row share | Ratio |
@@ -190,6 +190,17 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - short rows (road-trip row 2, sustainable-mobility row 22).
 
   v1 tokens keep their meaning, so v1 rows are valid v2 and v3 rows. **Shape 3** adds the 20-column press-kit track: `feature` = 8/20, `press-square` = 4/20, `press-quarter` = 5/20. Peaq/Epiq open with `feature feature press-square` and then five `press-square` tiles per row; Motorsport has four `press-quarter` tiles in its last row. This addition does not change any series token or require a series re-import.
+
+  **Shape 4 (2026-10-13, Classic Days 2026)** adds the press **mosaic**: a hub whose image banners share rows with its tiles. Any of these tokens switches the block to a 30-column track, which fits fifths, thirds, halves, 3/5 and 2/5. The 20-column track can't split in three, and 60 columns would need more gaps than the row is wide.
+
+    | Token | Row share | Shape |
+    |---|---|---|
+    | `press-third` | 10/30 | 2:1 less the gutter, a titled tile |
+    | `press-banner-wide` | 18/30 | image-only banner, its own ratio |
+    | `press-banner-narrow` | 12/30 | image-only banner, its own ratio |
+    | `press-banner-half` | 15/30 | image-only banner, its own ratio |
+
+  On the mosaic track `press-square` = 6/30, `feature` = 12/30 and `press-half` = 15/30. `press-quarter` has no 30-column span, so a mosaic with quarters is an error. A banner row is **two cells**, `[size, linked picture]`: the image's alt names the link. Banner sizes need banner rows and vice versa. The hub importer emits the mosaic only when a source tile row also holds a banner cell; on 2026-10-13 only Classic Days does, and the other 17 hubs keep shape 3. The banners are then not repeated in the `press-kit-banners` section.
 - **Proof** (all 15 hubs, `test/fixtures/series/`, `tools/importer/series-hub.test.mjs`): replaying the tokens with "close at 12/12 or on `end`" recovers every source row. Tiles per hub: 125-years 8, 130-years 14, roads-places 10, unexpected-jobs 5, minutes 12, road-trip 3, winter-tips 4, back-to-the-past 22, unknown-parts 3, hidden-helpers 19, czech-footprint 5, sustainable-mobility 93, my-life-my-car 11, evolution-of-parts 8, 60-seconds-walkaround 17.
 - **Example** (`/en/series/125-years-of-motorsport/`): `sq sq` / `sq-small wide sq-small` / `third third third`, the curated mosaic in source order. It's **not** index-driven (sweep report §5: series hubs are curated), so it replaces the `series-grid` `Listing`.
 
