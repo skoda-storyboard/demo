@@ -807,6 +807,11 @@ export default async function decorate(block) {
     toggle.type = 'button';
     toggle.className = 'downloads-more';
     toggle.setAttribute('aria-controls', list.id);
+    // the pill's words: the locale's placeholders sheet, else English (#243)
+    const words = { more: LABELS.more, less: LABELS.less };
+    const syncLabel = () => {
+      toggle.textContent = block.classList.contains('downloads-expanded') ? words.less : words.more;
+    };
     const compact = window.matchMedia('(min-width: 520px)');
     const medium = window.matchMedia('(min-width: 768px)');
     const wide = window.matchMedia('(min-width: 992px)');
@@ -837,7 +842,7 @@ export default async function decorate(block) {
       else list.style.removeProperty('--dl-rows-height');
       toggle.hidden = !overflow;
       toggle.setAttribute('aria-expanded', String(expanded));
-      toggle.textContent = expanded ? LABELS.less : LABELS.more;
+      syncLabel();
     };
     toggle.addEventListener('click', () => {
       const expanded = block.classList.toggle('downloads-expanded');
@@ -852,6 +857,18 @@ export default async function decorate(block) {
     if (window.ResizeObserver) {
       const observer = new window.ResizeObserver(syncVisibility);
       [...list.children].forEach((tile) => observer.observe(tile));
+    }
+    // `Show More` / `Show Less` rows of /{locale}/placeholders (the source's togglebox words,
+    // e.g. CS "Zobrazit více" / "Zobrazit méně"); a missing sheet or key keeps English. Awaited
+    // before the first label, so a translated page never shows the English pill first (#348
+    // review); the sheet is memoized (the Media Box cart reads the same one).
+    try {
+      const { fetchPlaceholders } = await import('../../scripts/placeholders.js');
+      const ph = await fetchPlaceholders();
+      words.more = ph.showMore || LABELS.more;
+      words.less = ph.showLess || LABELS.less;
+    } catch (e) {
+      // the English words stay
     }
     syncVisibility();
   }

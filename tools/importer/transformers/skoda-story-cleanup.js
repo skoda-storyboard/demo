@@ -149,12 +149,78 @@ function facetRows(element) {
   return rows;
 }
 
+// The source page's locale (`/cs/…` → cs); English when the URL has no locale segment.
+function sourceLocale(url) {
+  try {
+    const m = new URL(url, 'https://www.skoda-storyboard.com').pathname.match(/^\/([a-z]{2})(?:\/|$)/i);
+    return m ? m[1].toLowerCase() : 'en';
+  } catch (e) {
+    return 'en';
+  }
+}
+
+// A source teaser alt as plain text: it can hold a literal `<br>` (as the press-release lead
+// image's, leadImage() in skoda-press-release-layout.js).
+const plainAlt = (alt) => (alt || '').replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim();
+
+// The source shortens a card title in the browser to fit its box (`data-dotdotdot`, at a word
+// boundary): the importer, running after that script, reads e.g. "Škoda Epiq nově obléká
+// efektní…". The card image's alt carries the whole title, so a clipped title becomes the alt
+// when the alt continues it word for word: at least 2 clipped words, then a word boundary.
+// Anything else (a one-word clip, an alt that is a caption) keeps the clipped title. The rail's
+// CSS clamps the whole title, as for index cards.
+function fullTitle(title, alt) {
+  const clipped = title.match(/^(.*?)\s*(?:…|\.\.\.)$/);
+  const prefix = clipped ? clipped[1] : '';
+  const whole = plainAlt(alt);
+  if (prefix.split(' ').length < 2 || !whole.startsWith(prefix)) return title;
+  if (whole.length > prefix.length && !/^[\s,.:;!?–-]/.test(whole.slice(prefix.length))) return title;
+  return whole;
+}
+
+// The related band's source cards as curated Story Rail rows (the press-release related band
+// shape, SKODA-503): [image, date <p> + <h3><a>title</a></h3>]. A card without a titled link is
+// skipped; one without an image keeps its body only.
+function curatedCards(band, document) {
+  const squashed = (el) => (el ? (el.textContent || '').replace(/\s+/g, ' ').trim() : '');
+  const rows = [];
+  band.querySelectorAll('article.article-teaser').forEach((card) => {
+    const titleLink = card.querySelector('.entry-title a[href]');
+    const href = titleLink && titleLink.getAttribute('href');
+    const img = card.querySelector('.article-teaser-media img');
+    const title = fullTitle(squashed(titleLink), img && img.getAttribute('alt'));
+    if (!href || !title) return;
+    if (img) {
+      ['data-caption', 'data-video_title', 'data-video_src', 'srcset', 'sizes', 'itemprop', 'loading', 'decoding']
+        .forEach((a) => img.removeAttribute(a));
+      if (img.hasAttribute('alt')) img.setAttribute('alt', plainAlt(img.getAttribute('alt')));
+    }
+    const body = [];
+    const date = squashed(card.querySelector('.entry-published'));
+    if (date) {
+      const p = document.createElement('p');
+      p.textContent = date;
+      body.push(p);
+    }
+    const h3 = document.createElement('h3');
+    const a = document.createElement('a');
+    a.setAttribute('href', href);
+    a.textContent = title;
+    h3.append(a);
+    body.push(h3);
+    rows.push(img ? [img, body] : [body]);
+  });
+  return rows;
+}
+
 // Rebuild the full-width bottom "Related Stories" band (SKODA-820). It is NOT a duplicate
 // of the sidebar "Explore more" (3 hand-picked vs 10 tag-matched stories). Emit it as its
 // own `Style: dark` section: the heading + "Based on tags" subheading as default content,
 // then an INDEX-DRIVEN Story Rail (SKODA-212): stories matching ALL of this story's tags,
 // newest first, 10 items, the story itself excluded. Nothing is copied from the SSR
-// teasers; the list stays current as stories are published.
+// teasers; the list stays current as stories are published. Translated stories (non-EN
+// source URL) are the exception: they keep the source cards as a curated rail (#243) until
+// per-locale indexes and their related stories exist (SKODA-1001).
 function relatedBand(element, document, payload) {
   const band = element.querySelector('.cover-box .related-stories');
   if (!band) return;
@@ -170,16 +236,31 @@ function relatedBand(element, document, payload) {
     headingText = (clone.textContent || '').trim() || headingText;
   }
 
-  const filters = facetRows(element);
-  if (!filters.length) {
-    console.warn('[story-cleanup] related band: story has no tags to match; dropped');
-    cover.remove();
-    return;
-  }
   const originalURL = (payload && payload.params && payload.params.originalURL) || '';
-  const self = lastSegment(originalURL);
-  const rows = [['Story Rail'], ['template', 'story'], ...filters, ['limit', '10']];
-  if (self) rows.push(['exclude', self]);
+  let rows;
+  if (sourceLocale(originalURL) !== 'en') {
+    // A translated story (#243): no per-locale index yet (SKODA-1001) and its related stories
+    // aren't migrated, so an index rail would stay empty. Keep the source's cards as a curated
+    // rail (image, date, title linking the source story), in the source order. Card rows
+    // only: the rail's template defaults to story, and the block contract rejects config
+    // rows next to curated ones.
+    rows = [['Story Rail'], ...curatedCards(band, document)];
+    if (rows.length === 1) {
+      console.warn('[story-cleanup] related band: no source cards; dropped');
+      cover.remove();
+      return;
+    }
+  } else {
+    const filters = facetRows(element);
+    if (!filters.length) {
+      console.warn('[story-cleanup] related band: story has no tags to match; dropped');
+      cover.remove();
+      return;
+    }
+    const self = lastSegment(originalURL);
+    rows = [['Story Rail'], ['template', 'story'], ...filters, ['limit', '10']];
+    if (self) rows.push(['exclude', self]);
+  }
 
   // h3, as the source .search-results-heading (#296)
   const title = document.createElement('h3');

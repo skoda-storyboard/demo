@@ -141,8 +141,9 @@ header .nav-topbar-utility {
   font-size: var(--body-font-size-2xs);
 }
 
-/* --skoda-grey-700, as the language links (SKODA-303): 5.45:1 on the #e6e6e6 bar; the source
-   #7c7d7e is 3.3:1 there, failing AA for this 12px text (SKODA-308) */
+/* --skoda-grey-700: 5.45:1 on the #e6e6e6 bar; the source #7c7d7e is 3.3:1 there, failing AA
+   for this 12px text (SKODA-308). The language links use the source grey since #243 (PO);
+   this CTA was not part of that decision and keeps the AA colour. */
 header .nav-topbar .nav-topbar-utility a {
   color: var(--skoda-grey-700);
   text-decoration: none;
@@ -174,8 +175,8 @@ header .nav-topbar .nav-subscribe .icon-mail img {
 
 /* --- Language switcher (SKODA-303, language-switcher.md): inline locale links, the page's
    locale as bold ink text; the same list in the topbar (>= 1080) and the drawer footer.
-   Links use --skoda-grey-700: 5.45:1 on the #e6e6e6 bar, 6.03 on the Media Room #f1f1f1,
-   6.81 on the white drawer. The source #7c7d7e is 3.3:1 there, failing AA.
+   Links use the source --skoda-grey-500 #7c7d7e (#243): 3.30:1 on the #e6e6e6 bar, 3.65 on the
+   Media Room #f1f1f1, 4.12 on the white drawer, below AA, accepted by the PO for source parity.
    Topbar: 12/18, links 300, 12px apart (source .topbar .lang-links). ---------------- */
 header .nav-locales-list {
   --nav-locale-gap: 12px;
@@ -203,9 +204,11 @@ header .nav-locales-list li + li {
   margin-left: var(--nav-locale-gap);
 }
 
-/* :is() matches the Subscribe rule's specificity above, so these win by order */
+/* :is() matches the Subscribe rule's specificity above, so these win by order. Inactive
+   locales use the source grey #7c7d7e (PO, #243 QA, 2026-10-13), although it is below AA
+   (3.30:1 on the grey topbar, 4.12:1 on white; recorded in SKODA-303 and SKODA-703) */
 header :is(.nav-topbar-locales, .nav-locales) .nav-locales-list a {
-  color: var(--skoda-grey-700);
+  color: var(--skoda-grey-500);
   font-weight: var(--weight-light);
   text-decoration: none;
 }
