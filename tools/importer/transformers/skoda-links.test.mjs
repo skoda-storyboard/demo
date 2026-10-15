@@ -112,6 +112,30 @@ test('#s_aid / #s_cid fragments are stripped, then the link is rewritten', { ski
   assert.equal(one(`${SRC}${STORY}/#s_cid=xyz`), STORY);
 });
 
+test('a scheme-less source link is the source page, raw or resolved against the page (rule 5)', { skip }, () => {
+  const KIT = '/en/press-kits/classic-days-2026-press-kit';
+  const OCTAVIA = `${KIT}/skoda-octavia-turns-30-three-decades-of-a-brand-icon`;
+  assert.equal(one(`skoda-storyboard.com${OCTAVIA}/`), OCTAVIA);
+  assert.equal(one(`www.skoda-storyboard.com${OCTAVIA}/`), OCTAVIA);
+  assert.equal(one(`${SRC}${KIT}/skoda-storyboard.com${OCTAVIA}/`), OCTAVIA);
+  // not on the demo: the source URL, absolute
+  assert.equal(one('skoda-storyboard.com/en/lifestyle/explore-albania/'), `${SRC}/en/lifestyle/explore-albania/`);
+  // a query that merely mentions the host, the cdn and another host are not rule 5
+  [
+    `${SRC}/en/lifestyle/explore-albania/?q=skoda-storyboard.com/x`,
+    'https://cdn.skoda-storyboard.com/2026/10/a_1a2b3c4d.jpg',
+    'https://example.org/skoda-storyboard.com/en/',
+  ].forEach((href) => assert.equal(one(href), href));
+});
+
+test('a trailing space, raw or encoded, is trimmed from the href (rule 6)', { skip }, () => {
+  const PDF = 'https://cdn.skoda-storyboard.com/2026/09/Skoda_440_469d33ab.pdf';
+  assert.equal(one(`${PDF} `), PDF);
+  assert.equal(one(`${PDF}%20`), PDF);
+  assert.equal(one(`${SRC}${STORY}/%20`), STORY);
+  assert.equal(one('https://example.org/a%20b'), 'https://example.org/a%20b', 'an inner space stays');
+});
+
 test('links inside block tables are rewritten too', { skip }, () => {
   const el = run(`<table><tr><th>Tags</th></tr><tr><td><a href="${SRC}/en/tag/model/yeti/">Yeti</a></td></tr>
     <tr><td><a href="${SRC}${STORY}/">Epiq</a></td></tr></table>`);

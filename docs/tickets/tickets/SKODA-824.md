@@ -64,3 +64,37 @@ SKODA-801 (flatten), SKODA-814 (M2 generic SiteOrigin rule, related), SKODA-218 
 
 ## Import contract (SKODA-603)
 Contract(s) `highlight` (**pinned 2026-09-25: section style; shape 2 on 2026-09-28: `Style` = `body-column, highlight-dark` / `body-column, highlight-grey`**) in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). Form (v1, superseded): a **section** with Section Metadata `Style` = `highlight, dark` / `highlight, grey` (it can contain nested sliders/columns, which a block can't), plus the `scripts.js` section hook. Until the importer emits it, pages keep the default-content fallback and are flagged `re-import on SKODA-824`. If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.
+
+## Panel inset as the source (PO, 2026-10-13; branch `bug-highlight-panel-inset`, stacked on #345)
+PO: "fix the highlight panel inset too, same as live" (found on the cruise-control story in the YouTube parity round).
+- **Source model:** a panel's content sits row padding + the 10px cell padding + each widget's margin in.
+  - Theme defaults: no row padding, the widget margin `0 15px` from 781px and `15px` all round up to 780px (25px in), and a carousel with no margin (10px in).
+  - Of 49 panels on 34 stories, 10 on 8 stories set their own in the layout CSS:
+
+| Story | Source | Content inset (left / right) |
+|---|---|---|
+| Camouflage ×2, Sportline | text widget margin: none | 10 / 10 |
+| What you learn on the circuit ×2 | `0 10px` (mobile: none / `0`) | 20 / 20 |
+| Cruise control | `0 0 0 20px` | 30 / 10 |
+| Park your Škoda | default, but no mobile rule | 25 / 25, top 9 on mobile |
+| Licence plates | row `0 15px` / `15px`, widget `15px 0` | 25 / 25, top 24; mobile 40 / 40 |
+| Designers on the Peaq | row `15px` | gallery 40 / 40 |
+| An epic start | carousel `0 15px` | gallery 25 / 25 |
+
+  - Every gallery inside a panel was 15px in on `main`; the source's is 10 (no margin), or its own margin.
+- **How:**
+  - `parsers/story-flatten.js` `markHighlights()` reads each panel's row padding, text-widget margin and gallery margin, desktop and `@media (max-width:780px)`. Non-default values go out as Section Metadata rows `highlight-padding|margin|gallery-margin[-mobile]`.
+  - The pipeline delivers them as the section's `data-highlight-*` attributes. `scripts/highlight-geometry.js` sets the `--hl-*` boxes, and `styles.css` composes the panel padding from them, with the theme defaults otherwise.
+  - Multi-column rows (Wireless charging) carry none: a margin per cell.
+  - Contract: `SKODA-PENDING-BLOCK-CONTRACTS.md` → highlight.
+- **Measured** against the source with each panel's content inset, every story at 1440 / 390 and the 8 changed ones at 1080 / 768:
+  - text insets equal on every single-cell panel, all 4 sides where the content is the same;
+  - gallery box insets equal on all 9 gallery panels (10 / 25 / 40);
+  - by the panel-wide text measure, 52 → 63 of 98 panel widths equal at 1440 / 390. The rest are galleries (the measure counts our slide images but not the source carousel's; the gallery boxes are equal) and the content notes below.
+- **Content:** the 8 stories re-imported; only the geometry rows change. The plates story also picks up a related-article teaser the source has since changed. The cruise-control import includes #345's player URL (this branch is stacked on it).
+- **Notes (not changed here):**
+  - Wireless charging's 2-cell panel lays out differently from the source (heading 80 vs 41 from the top at 1440).
+  - Inside a panel the slider sits about 24px higher and is about 36px taller than the source's (slide sizes, SKODA-819).
+  - Even-opening's first panel paragraph is styled larger on the source (36px line vs 24).
+  - A one-line difference in height on 5 panels at 390 (text wrap).
+  - Cruise control: the source shows the cart toolbar (+, download MP4, link) under the YouTube clip; the story import drops it.

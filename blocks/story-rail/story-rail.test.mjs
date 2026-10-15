@@ -742,3 +742,89 @@ test('every config key story-rail reads is registered in the publication contrac
   assert.deepEqual([...registered].filter((key) => !CONFIG_KEYS.has(key)), [], 'registered, not read by the block');
   assert.ok(registered.has('order'));
 });
+
+// --- #332: the Media Room News rail skips what the promo box shows --------------------------------
+
+const {
+  shownPaths, promoShownPaths, skipsPromo, PROMO_WAIT_MS,
+} = await import('./story-rail.js');
+
+// a promo-box block as the rail sees it: its status and its cards' stretched links
+function fakePromo(hrefs, status = 'loaded') {
+  return {
+    dataset: { blockStatus: status },
+    querySelectorAll: (sel) => (sel === '.card-teaser-link[href]'
+      ? hrefs.map((href) => ({ getAttribute: (k) => (k === 'href' ? href : null) })) : []),
+  };
+}
+const pageWith = (promo) => ({ querySelector: (sel) => (sel === 'main .promo-box' ? promo : null) });
+
+test('#332: shownPaths reads the promo cards as index paths, in order, without repeats', () => {
+  const promo = fakePromo([
+    'https://main--demo--skoda-storyboard.aem.page/en/press-releases/elroq',
+    '/en/press-releases/enyaq/',
+    '/en/press-kits/peaq.html',
+    '/en/press-releases/elroq',
+  ]);
+  assert.deepEqual(shownPaths(promo), ['/en/press-releases/elroq', '/en/press-releases/enyaq', '/en/press-kits/peaq']);
+  assert.deepEqual(shownPaths(null), []);
+});
+
+test('#332: selectRows skips the shown pages by whole path, then fills the limit', () => {
+  const cfg = parseConfig(cfgBlock([['template', 'press_release'], ['limit', '2']]));
+  assert.deepEqual(selectRows(rows, cfg).map((r) => r.title), ['Elroq', 'Enyaq'], 'without a promo');
+  const out = selectRows(rows, { ...cfg, shown: ['/en/press-releases/elroq'] });
+  // the newest is in the promo: the rail starts with the next one and still shows two
+  assert.deepEqual(out.map((r) => r.title), ['Enyaq', 'Octavia']);
+  // a path that only contains a shown one is not shown
+  const partial = selectRows(rows, { ...cfg, shown: ['/en/press-releases/elr'] });
+  assert.deepEqual(partial.map((r) => r.title), ['Elroq', 'Enyaq']);
+});
+
+test('#332: only an index News rail skips the promo', () => {
+  const news = parseConfig(cfgBlock([['template', 'press_release']]));
+  assert.equal(skipsPromo(news), true);
+  assert.equal(skipsPromo(news, { press: true }), false, 'a Related Press Releases band');
+  assert.equal(skipsPromo(news, { curated: true }), false, 'a hand-picked rail');
+  assert.equal(skipsPromo({ ...news, order: ['/en/press-releases/elroq'] }), false, 'an ordered rail');
+  ['story', 'press_kit', 'image', 'video', 'skoda_model'].forEach((template) => {
+    assert.equal(skipsPromo(parseConfig(cfgBlock([['template', template]]))), false, template);
+  });
+});
+
+test('#332: promoShownPaths reads a loaded promo, and shows nothing without one', async () => {
+  assert.deepEqual(await promoShownPaths(pageWith(null)), []);
+  const promo = fakePromo(['/en/press-releases/elroq']);
+  assert.deepEqual(await promoShownPaths(pageWith(promo)), ['/en/press-releases/elroq']);
+  assert.ok(PROMO_WAIT_MS > 0);
+});
+
+test('#332: promoShownPaths waits for the promo to load, and gives up after the timeout', async () => {
+  const observers = [];
+  class FakeObserver {
+    constructor(cb) { this.cb = cb; this.connected = false; observers.push(this); }
+
+    observe() { this.connected = true; }
+
+    disconnect() { this.connected = false; }
+  }
+  const saved = { global: globalThis.MutationObserver, window: globalThis.window.MutationObserver };
+  globalThis.MutationObserver = FakeObserver;
+  globalThis.window.MutationObserver = FakeObserver;
+  try {
+    const promo = fakePromo(['/en/press-releases/enyaq'], 'loading');
+    const pending = promoShownPaths(pageWith(promo), 1000);
+    promo.dataset.blockStatus = 'loaded';
+    observers[0].cb();
+    assert.deepEqual(await pending, ['/en/press-releases/enyaq']);
+    assert.equal(observers[0].connected, false, 'stops watching once loaded');
+
+    // a promo that never loads: the rail builds with nothing skipped
+    const stuck = fakePromo(['/en/press-releases/enyaq'], 'loading');
+    assert.deepEqual(await promoShownPaths(pageWith(stuck), 5), []);
+    assert.equal(observers[1].connected, false, 'stops watching on timeout');
+  } finally {
+    globalThis.MutationObserver = saved.global;
+    globalThis.window.MutationObserver = saved.window;
+  }
+});

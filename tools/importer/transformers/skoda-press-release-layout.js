@@ -13,7 +13,7 @@
  *                                 Buzzsprout URL, body, inline Vimeo URL
  *   3. Style: sidebar             "Additional info" h3 + list, "Images" h3 +
  *                                 Gallery (preview), "Tags" h3 + Tags
- *   4. Style: dark, full-width, media-box   "Media Box" h2 + stats line + Downloads
+ *   4. Style: dark, full-width, media-box   "Media Box" h3 + stats line + Downloads
  *   5. Style: dark, full-width, related     only when the source has the band:
  *                                 h2 + "Based on tags" line + "All" link + Story Rail (press)
  *
@@ -72,6 +72,22 @@ function link(document, href, label) {
 /** A paragraph holding one bare URL (the embed autoblock "URL on its own line"). */
 function urlParagraph(document, url) {
   return make(document, 'p', link(document, url, url));
+}
+
+/**
+ * An embedded player: its bare URL, which the embed block autoblocks. A full-width video iframe of
+ * a fixed pixel height (Play-Doh: `width="100%" height="448px"`) keeps that box instead: an `Embed`
+ * table with a `height` row, marked so dataTables leaves it.
+ */
+function embedFor(document, iframe, url) {
+  // audio players (Buzzsprout, Spotify) have the block's own fixed height
+  const video = /(?:^|\.)(?:youtube(?:-nocookie)?\.com|youtu\.be|vimeo\.com)\//i.test(url.replace(/^https?:\/\//, ''));
+  const fixed = video && (iframe.getAttribute('width') || '').trim() === '100%'
+    && ((iframe.getAttribute('height') || '').trim().match(/^(\d+)(?:px)?$/) || [])[1];
+  if (!fixed) return urlParagraph(document, url);
+  const table = WebImporter.DOMUtils.createTable([['Embed'], ['url', link(document, url, url)], ['height', fixed]], document);
+  table.dataset.skodaEmbed = '';
+  return table;
 }
 
 /**
@@ -185,10 +201,11 @@ function bodyContent(document, primary) {
   content.querySelectorAll('.sa-bnr').forEach((n) => n.remove());
 
   // Buzzsprout AI-audio player (lazy: the URL is in data-src until scrolled into view).
+  // The Play-Doh YouTube player sits in the same lazy wrapper.
   content.querySelectorAll('.embed-controller-wrapper').forEach((wrap) => {
     const iframe = wrap.querySelector('iframe');
     const url = iframe && (iframe.getAttribute('data-src') || iframe.getAttribute('src'));
-    wrap.replaceWith(...(url ? [urlParagraph(document, url)] : []));
+    wrap.replaceWith(...(url ? [embedFor(document, iframe, url)] : []));
   });
 
   // <lite-youtube videoid> (Solberg Octavia RS): by import time the page script has hydrated it
@@ -214,11 +231,11 @@ function bodyContent(document, primary) {
   });
   content.querySelectorAll('.media-cart-actions').forEach((n) => n.remove());
 
-  // Any other iframe with a provider URL → bare URL; the rest is dropped.
+  // Any other iframe with a provider URL → bare URL (embedFor); the rest is dropped.
   content.querySelectorAll('iframe').forEach((iframe) => {
     const url = iframe.getAttribute('src') || iframe.getAttribute('data-src');
     const p = iframe.closest('p');
-    const replacement = url && /^https?:/.test(url) ? urlParagraph(document, url) : null;
+    const replacement = url && /^https?:/.test(url) ? embedFor(document, iframe, url) : null;
     if (p && text(p) === '') p.replaceWith(...(replacement ? [replacement] : []));
     else iframe.replaceWith(...(replacement ? [replacement] : []));
   });
@@ -237,6 +254,16 @@ function bodyContent(document, primary) {
   });
   content.querySelectorAll('div[style]').forEach((div) => div.replaceWith(...div.childNodes));
 
+  // A line break closing a bold run (`<strong>FAQ:<br></strong><br>`, the Zellmer FAQ) is the
+  // first of two: the source shows a blank line there (#274). The import drops a trailing <br>
+  // inside the <strong>, so it moves after it, where both breaks are kept.
+  content.querySelectorAll('strong > br:last-child, b > br:last-child').forEach((br) => {
+    const bold = br.parentElement;
+    let after = br.nextSibling;
+    while (after && after.nodeType === 3 && !after.textContent.trim()) after = after.nextSibling;
+    if (!after && bold.nextSibling) bold.after(br);
+  });
+
   content.querySelectorAll('p').forEach((p) => { if (isEmptyParagraph(p)) p.remove(); });
   dataTables(document, content);
   return [...content.childNodes].filter((n) => n.nodeType === 1 || text(n));
@@ -250,6 +277,10 @@ function bodyContent(document, primary) {
  */
 function dataTables(document, content) {
   content.querySelectorAll('table').forEach((table) => {
+    if (table.hasAttribute('data-skoda-embed')) {
+      table.removeAttribute('data-skoda-embed');
+      return;
+    }
     const rows = [...table.rows].filter((row) => text(row));
     const filled = (row) => [...row.cells].filter((cell) => text(cell));
     if (rows.filter((row) => filled(row).length >= 2).length < 2) return;
@@ -331,7 +362,8 @@ function mediaBoxContent(document, band) {
   const heading = text(box.querySelector('.search-results-heading')) || 'Media Box';
   const stats = text(box.querySelector('.search-results-stats .stats, .stats'));
   box.querySelectorAll('.search-results-header, .search-results-stats, .togglebox-opener').forEach((n) => n.remove());
-  const out = [make(document, 'h2', heading)];
+  // the source band heading is an h3 (.search-results-heading, #274)
+  const out = [make(document, 'h3', heading)];
   if (stats) out.push(make(document, 'p', stats));
   out.push(box);
   return out;
@@ -365,7 +397,8 @@ function relatedContent(document, band) {
     clone.querySelectorAll('.subheading').forEach((s) => s.remove());
     heading = text(clone) || heading;
   }
-  const out = [make(document, 'h2', heading)];
+  // the source band heading is an h3 (.search-results-heading, #274)
+  const out = [make(document, 'h3', heading)];
   if (sub) out.push(make(document, 'p', sub));
   const all = results.querySelector('a.search-results-header-link[href], .search-results-header a[href]');
   if (all && all.getAttribute('href')) out.push(make(document, 'p', link(document, all.getAttribute('href'), text(all) || 'All')));

@@ -19,6 +19,7 @@ import {
 import { decorateLinks, installLinkPolicy } from './links.js';
 import { spanSidebar } from './split-body.js';
 import { addNewsletterCard } from './story-newsletter.js';
+import { applyHighlightGeometry, applyHighlightDataset } from './highlight-geometry.js';
 
 /**
  * Page templates with their own layout code: `templates/<name>/<name>.{js,css}`, selected by
@@ -227,6 +228,7 @@ function applySectionStyles(main) {
       if (key === 'style' && val) {
         val.split(',').forEach((c) => section.classList.add(toClassName(c.trim())));
       }
+      applyHighlightGeometry(section, key, val);
     });
     // Remove the whole wrapper so decorateBlocks (div.section > div > div) never sees
     // it as an unknown block (which would 404 on its missing block JS/CSS).
@@ -275,6 +277,8 @@ function decorateStoryIntro(main) {
  */
 function decorateStorySections(main) {
   if (!document.body.classList.contains('story')) return;
+  // delivered pages carry a panel's geometry rows as the section's data attributes
+  main.querySelectorAll(':scope > div').forEach(applyHighlightDataset);
   applySectionStyles(main);
   spanSidebar(main);
   // the shared sidebar newsletter card, unless the story authors its own (SKODA-840)

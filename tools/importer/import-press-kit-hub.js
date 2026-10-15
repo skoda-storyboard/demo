@@ -100,6 +100,17 @@ function bannerHref(href) {
   return `${CDN_ORIGIN}/${url.pathname.slice(DIRECT_DOWNLOAD_PREFIX.length)}${url.hash}`;
 }
 
+// Banners whose source alt is only the image file name, by the slug of the page they open:
+// that page's source title (h1, checked 2026-10-13).
+const BANNER_PAGE_TITLES = {
+  'skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation':
+    'Škoda Auto celebrates more than 130 years of craftsmanship and innovation',
+  'skoda-museum': 'Škoda Museum',
+  '60-years-of-the-trekka-an-suv-from-new-zealand': '60 years of the Trekka: an SUV from New Zealand',
+  'skoda-octavia-turns-30-three-decades-of-a-brand-icon': 'Škoda Octavia turns 30: Three decades of a brand icon',
+  '125-years-of-skoda-motorsport': '125 years of Škoda Motorsport',
+};
+
 // The source banner images carry no useful alt; name them by what the link does.
 function bannerAlt(href, img) {
   // A ZIP is also recognised by its banner image name, for a source link that lacks the
@@ -117,23 +128,39 @@ function bannerAlt(href, img) {
     return 'Follow @skodaautonews on the X platform';
   }
   const alt = (img.getAttribute('alt') || img.getAttribute('title') || '').trim();
-  if (alt) return alt;
+  // WordPress fills an unset alt with the file name (Classic Days 2026:
+  // `ClassicDays-Button-1670x800-Museum-EN_3ac482ac`): not a name. The banner is named by
+  // the page it opens: its source title where known, else its readable slug.
+  const fileStem = img.getAttribute('src').split('/').pop().replace(/\.[a-z0-9]+(?:[?#].*)?$/i, '');
+  if (alt && alt !== fileStem) return alt;
+  const slug = href.split(/[?#]/)[0].replace(/\/+$/, '').split('/').pop();
+  if (BANNER_PAGE_TITLES[slug]) return BANNER_PAGE_TITLES[slug];
+  if (alt && slug) {
+    const words = decodeURIComponent(slug).replace(/-+/g, ' ').replace(/\bskoda\b/gi, 'Škoda');
+    return words.charAt(0).toUpperCase() + words.slice(1);
+  }
   throw new Error(`Press-kit hub banner has no accessible name: ${href}`);
 }
 
+// A source banner (an image-only link) as our linked picture, named by bannerAlt.
+function bannerLink(source, document) {
+  const link = document.createElement('a');
+  link.href = bannerHref(source.href);
+  const img = source.querySelector('img').cloneNode(true);
+  img.removeAttribute('srcset');
+  img.removeAttribute('sizes');
+  img.alt = bannerAlt(link.href, source.querySelector('img'));
+  link.append(img);
+  return link;
+}
+
+// The banners after the tiles; a mosaic hub's banners are tiles already (`data-pk-mosaic`).
 function bannerLinks(content, document) {
-  return [...content.querySelectorAll('.widget_sow-editor .textwidget a[href]')]
+  return [...content.querySelectorAll('.widget_sow-editor .textwidget a[href]:not([data-pk-mosaic])')]
     .filter((a) => a.querySelector('img[src]'))
     .map((source) => {
-      const link = document.createElement('a');
-      link.href = bannerHref(source.href);
-      const img = source.querySelector('img').cloneNode(true);
-      img.removeAttribute('srcset');
-      img.removeAttribute('sizes');
-      img.alt = bannerAlt(link.href, source.querySelector('img'));
-      link.append(img);
       const p = document.createElement('p');
-      p.append(link);
+      p.append(bannerLink(source, document));
       return p;
     });
 }
@@ -193,7 +220,7 @@ export default {
     const description = leakedDescription(document, hero);
     if (description) facets.description = description;
     const heroBlock = parseHero(hero, document);
-    const tilesBlock = parseTiles(content, document);
+    const tilesBlock = parseTiles(content, document, { banner: (a) => bannerLink(a, document) });
     const banners = bannerLinks(content, document);
     const { intro, outro } = textWidgets(content, document);
 

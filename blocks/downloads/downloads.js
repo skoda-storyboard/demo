@@ -59,6 +59,11 @@ const LABELS = {
   groupSize: (size) => size,
   groupAdd: (size) => `Add all ${size} versions to the media cart`,
   groupUnavailable: (size) => `${size} versions can't be added to the media cart`,
+  // the source tiles' tooltips (their link titles, #275); the accessible names stay the above
+  tipAdd: 'Add/remove this',
+  tipDownload: 'Download this',
+  tipAddSize: (size) => `Add/remove ${size} version`,
+  tipDownloadSize: (size) => `Download ${size} version`,
 };
 
 function fileIcon() {
@@ -249,6 +254,7 @@ function buildDownload(asset) {
     a.href = href;
     a.setAttribute('download', '');
     a.setAttribute('aria-label', LABELS.download(title, label));
+    a.title = LABELS.tipDownload;
     wrap.append(a);
     return wrap;
   }
@@ -278,6 +284,7 @@ function buildDownload(asset) {
     a.setAttribute('role', 'menuitem');
     a.setAttribute('download', '');
     a.setAttribute('aria-label', LABELS.download(title, label));
+    a.title = LABELS.tipDownloadSize(label);
     a.textContent = label;
     li.append(a);
     menu.append(li);
@@ -315,6 +322,7 @@ function buildAdd(asset) {
   btn.className = 'downloads-add';
   const title = asset.title || asset.alt || '';
   btn.setAttribute('aria-label', LABELS.add(title));
+  btn.title = LABELS.tipAdd;
   btn.setAttribute('aria-disabled', 'true');
   btn.dataset.href = cartSize(asset.sizes)?.href || '';
   if (title) btn.dataset.title = title;
@@ -357,6 +365,7 @@ function buildAddMenu(asset) {
     row.className = 'downloads-size downloads-add-size';
     row.setAttribute('role', 'menuitem');
     row.setAttribute('aria-disabled', 'true');
+    row.title = LABELS.tipAddSize(label);
     row.textContent = label;
     if (href === original?.href) {
       row.setAttribute('aria-label', LABELS.addSize(label, title));

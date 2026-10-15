@@ -20,7 +20,7 @@
     {
       "class": "overlay tiles",
       "label": "overlay, tiles",
-      "description": "Mosaic of tiles for series hubs and press-kit hubs. Each row starts with a size cell, then the image and the linked title. Every mosaic row must fill up exactly, or its last tile gets \"end\" (e.g. \"press-square end\"). Press-kit hubs, rows of 20: feature 8 (the first two chapters), press-half 10, press-quarter 5, press-square 4. Series hubs, rows of 12: banner / banner-tall 12, two-thirds 8, sq / wide 6, third / third-sq 4, quarter / sq-small 3."
+      "description": "Mosaic of tiles for series hubs and press-kit hubs. Each row starts with a size cell, then the image and the linked title. Every mosaic row must fill up exactly, or its last tile gets \"end\" (e.g. \"press-square end\"). Press-kit hubs, rows of 20: feature 8 (the first two chapters), press-half 10, press-quarter 5, press-square 4. A press-kit hub with banners among its tiles, rows of 30: press-banner-wide 18, press-banner-half 15, press-banner-narrow 12, press-third 10, press-square 6; a banner row is just the size and the linked banner image (its alt text names the link). Series hubs, rows of 12: banner / banner-tall 12, two-thirds 8, sq / wide 6, third / third-sq 4, quarter / sq-small 3."
     },
     {
       "class": "key-facts",

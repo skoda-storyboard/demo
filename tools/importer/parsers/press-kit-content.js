@@ -253,10 +253,11 @@ function flatten(layout, document, { nested = false, faq = false } = {}) {
           rows.push([heading.cloneNode(true), body]);
           return;
         }
-        if (panel.matches('.widget_siteorigin-panels-builder')) {
-          if (!panels[index - 1]?.matches('.widget_ys-row-toggle')) {
-            throw new Error('Unpaired press-kit answer panel');
-          }
+        // A toggle's answer was taken with its toggle. A builder without one is plain nested
+        // layout, shown as is on the source (Classic Days 2026 Museum and intro pages): its
+        // content follows in place.
+        if (panel.matches('.widget_siteorigin-panels-builder')
+          && panels[index - 1]?.matches('.widget_ys-row-toggle')) {
           return;
         }
         flush();
