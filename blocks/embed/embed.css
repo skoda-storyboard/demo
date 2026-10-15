@@ -248,3 +248,280 @@
     transition: none;
   }
 }
+
+/* --- the source Vimeo player's controls on a native clip (`Embed (vimeo)`, clip-player.js) ---
+   The source's Vimeo account is domain-locked, so its clips play their MP4 master here
+   (SKODA-805c). Measured on the first-glimpse press kit's player (812×457): a bar 8px in from
+   the sides and the bottom, 32px high; a 56×32 play button and, 8px on, a panel with the
+   progress track (4px, its played part Škoda emerald, a white time pill over the playhead)
+   and 24px volume / settings / PiP / fullscreen buttons (20px glyphs, 4px apart). Black at 90%,
+   4px corners; hovered, the play button turns emerald and the glyphs emerald. Each control's
+   name shows above it, as the source's tooltip. Below 520px the settings and PiP go (the
+   source folds them away there). */
+.embed.vimeo {
+  --clip-inset: var(--spacing-xs);
+  --clip-bar-height: 32px;
+  --clip-play-width: 56px;
+  --clip-gap: var(--spacing-xs);
+  --clip-radius: 4px;
+  --clip-panel-pad: 4px;
+  --clip-track-pad: var(--spacing-xs);
+  --clip-track-height: 4px;
+  --clip-button-size: 24px;
+  --clip-glyph-size: 20px;
+  --clip-play-glyph-size: 24px;
+  --clip-button-gap: 4px;
+  --clip-surface: rgb(0 0 0 / 90%);
+  --clip-ink: var(--skoda-white);
+  --clip-accent: var(--skoda-green-emerald);
+  --clip-accent-ink: var(--skoda-black);
+  --clip-track: rgb(255 255 255 / 20%);
+  --clip-time-ink: var(--skoda-black);
+  --clip-time-surface: var(--skoda-white);
+  --clip-time-size: 10px;
+  --clip-time-line: 16px;
+  --clip-time-pad: 2px 4px;
+  --clip-time-lift: 14px;
+  --clip-tip-size: 12px;
+  --clip-tip-line: 15px;
+  --clip-tip-pad: var(--spacing-xs) 12px;
+  --clip-tip-gap: 4px;
+}
+
+.embed.vimeo .clip {
+  container-type: inline-size;
+}
+
+.embed.vimeo .clip-bar {
+  position: absolute;
+  inset-inline: var(--clip-inset);
+  inset-block-end: var(--clip-inset);
+  display: flex;
+  gap: var(--clip-gap);
+  block-size: var(--clip-bar-height);
+  font-family: var(--clip-player-font);
+  color: var(--clip-ink);
+}
+
+.embed.vimeo .clip-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: var(--clip-button-size);
+  block-size: var(--clip-button-size);
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: var(--clip-radius);
+  background-color: transparent;
+  color: var(--clip-ink);
+  cursor: pointer;
+}
+
+.embed.vimeo .clip-button[hidden] {
+  display: none;
+}
+
+.embed.vimeo .clip-button svg {
+  inline-size: var(--clip-glyph-size);
+  block-size: var(--clip-glyph-size);
+  fill: currentcolor;
+}
+
+.embed.vimeo .clip-play {
+  inline-size: var(--clip-play-width);
+  block-size: var(--clip-bar-height);
+  background-color: var(--clip-surface);
+}
+
+.embed.vimeo .clip-play svg {
+  inline-size: var(--clip-play-glyph-size);
+  block-size: var(--clip-play-glyph-size);
+}
+
+.embed.vimeo .clip-button:focus-visible {
+  outline: 2px solid var(--clip-accent);
+  outline-offset: 0;
+}
+
+.embed.vimeo .clip-play:hover {
+  background-color: var(--clip-accent);
+  color: var(--clip-accent-ink);
+}
+
+.embed.vimeo .clip-buttons .clip-button:hover {
+  color: var(--clip-accent);
+}
+
+/* the name above the control, as the source's tooltip; kept inside the player at its ends */
+.embed.vimeo .clip-button::after {
+  position: absolute;
+  inset-block-end: calc(100% + var(--clip-tip-gap) + (var(--clip-bar-height) - 100%) / 2);
+  inset-inline-start: 50%;
+  box-sizing: border-box;
+  min-block-size: var(--clip-bar-height);
+  padding: var(--clip-tip-pad);
+  border-radius: var(--clip-radius);
+  background-color: var(--clip-surface);
+  color: var(--clip-ink);
+  font-size: var(--clip-tip-size);
+  font-weight: var(--weight-bold);
+  line-height: var(--clip-tip-line);
+  white-space: nowrap;
+  content: attr(data-tip);
+  opacity: 0;
+  pointer-events: none;
+  translate: -50% 0;
+}
+
+.embed.vimeo .clip-button:hover::after,
+.embed.vimeo .clip-button:focus-visible::after {
+  opacity: 1;
+}
+
+.embed.vimeo .clip-settings[aria-expanded="true"]::after {
+  opacity: 0;
+}
+
+.embed.vimeo .clip-buttons .clip-button:last-of-type::after {
+  inset-inline: auto calc(-1 * (var(--clip-panel-pad) * 2));
+  translate: none;
+}
+
+.embed.vimeo .clip-panel {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-inline-size: 0;
+  padding-inline: var(--clip-panel-pad);
+  border-radius: var(--clip-radius);
+  background-color: var(--clip-surface);
+}
+
+.embed.vimeo .clip-progress {
+  position: relative;
+  flex: 1;
+  align-self: stretch;
+  min-inline-size: 0;
+  padding-inline: var(--clip-track-pad);
+}
+
+.embed.vimeo .clip-track {
+  position: absolute;
+  inset-inline: var(--clip-track-pad);
+  inset-block-start: calc(50% - var(--clip-track-height) / 2);
+  block-size: var(--clip-track-height);
+  overflow: hidden;
+  border-radius: 100px;
+  background-color: var(--clip-track);
+}
+
+.embed.vimeo .clip-loaded,
+.embed.vimeo .clip-played {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 0;
+  border-radius: inherit;
+}
+
+.embed.vimeo .clip-loaded {
+  background-color: var(--clip-track);
+}
+
+.embed.vimeo .clip-played {
+  background-color: var(--clip-accent);
+}
+
+/* over the playhead: the length before the first play, then the time played */
+.embed.vimeo .clip-time {
+  position: absolute;
+  inset-block-start: calc(-1 * var(--clip-time-lift));
+  inset-inline-start: calc(var(--clip-track-pad) + var(--clip-share, 0) * (100% - 2 * var(--clip-track-pad)));
+  padding: var(--clip-time-pad);
+  border-radius: var(--clip-radius);
+  background-color: var(--clip-time-surface);
+  color: var(--clip-time-ink);
+  font-size: var(--clip-time-size);
+  font-weight: var(--weight-medium);
+  line-height: var(--clip-time-line);
+  pointer-events: none;
+  translate: -50% 0;
+}
+
+/* the range seeks and carries the name, value and keys; the track above is its look */
+.embed.vimeo .clip-seek {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.embed.vimeo .clip-progress:has(.clip-seek:focus-visible) .clip-track {
+  outline: 2px solid var(--clip-accent);
+  outline-offset: 2px;
+}
+
+.embed.vimeo .clip-buttons {
+  display: flex;
+  gap: var(--clip-button-gap);
+  padding: var(--clip-panel-pad);
+
+  /* the track runs under the group's inset, as the source's (596px of 732 at 812) */
+  margin-inline-start: calc(-1 * var(--clip-panel-pad));
+}
+
+.embed.vimeo .clip-menu {
+  position: absolute;
+  inset-block-end: calc(100% + var(--clip-tip-gap));
+  inset-inline-end: 0;
+  display: grid;
+  min-inline-size: 7em;
+  padding: var(--clip-panel-pad);
+  border-radius: var(--clip-radius);
+  background-color: var(--clip-surface);
+  font-size: var(--clip-tip-size);
+}
+
+.embed.vimeo .clip-menu[hidden] {
+  display: none;
+}
+
+.embed.vimeo .clip-menu-title {
+  margin: 0;
+  padding: var(--clip-tip-pad);
+  font-weight: var(--weight-bold);
+}
+
+.embed.vimeo .clip-menu-option {
+  padding: var(--clip-tip-pad);
+  border: 0;
+  border-radius: var(--clip-radius);
+  background-color: transparent;
+  color: var(--clip-ink);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.embed.vimeo .clip-menu-option:hover,
+.embed.vimeo .clip-menu-option[aria-pressed="true"] {
+  color: var(--clip-accent);
+}
+
+.embed.vimeo .clip-menu-option:focus-visible {
+  outline: 2px solid var(--clip-accent);
+  outline-offset: 0;
+}
+
+@container (width < 520px) {
+  .embed.vimeo .clip-settings,
+  .embed.vimeo .clip-pip {
+    display: none;
+  }
+}

@@ -330,7 +330,7 @@ test('resource Videos child: each clip plays its MP4 master natively, with a lab
     ['Download video', 'https://www.skoda-storyboard.com/direct-download/2026/08/peaq-sportline-1440p.mp4'],
   ]);
   // The domain-locked Vimeo player errors on the demo, so the Embed plays the master (SKODA-805c).
-  const embeds = blocks(page, 'Embed');
+  const embeds = blocks(page, 'Embed (vimeo)');
   assert.deepEqual(embeds.map((t) => txt(t.querySelector('tr:nth-child(2) a'))), [
     'Škoda Peaq | Footage', 'Škoda Peaq | Footage',
   ], 'named by the heading before each clip');
@@ -571,7 +571,7 @@ test('Videos chapter plays each master natively and keeps its icon-only download
     chapters: true, mediaBox: false, togglesCount: 0, extra: grid(widget(`${clip(11)}${clip(22)}`)),
   }), `${base}skoda-peaq-press-kit-2/videos/`);
   const body = page.querySelector('.entry-content');
-  const embeds = blocks(page, 'Embed');
+  const embeds = blocks(page, 'Embed (vimeo)');
   [11, 22].forEach((id, i) => {
     const embed = embeds[i];
     assert.match(embed?.querySelector('tr:nth-child(2) a')?.getAttribute('href') || '', new RegExp(`clip-${id}\\.mp4$`));
@@ -591,7 +591,7 @@ test('only a top-level Vimeo clip plays its master; nested and YouTube clips sta
   const youtube = clip.replace(/77/g, '99').replace('https://player.vimeo.com/video/99?dnt=1', 'https://www.youtube.com/embed/abc99');
   const extra = grid(widget(clip.replace(/77/g, '88'))) + grid(widget(youtube)) + answer;
   const page = run(fixture({ togglesCount: 0, extra }), target);
-  const embeds = blocks(page, 'Embed');
+  const embeds = blocks(page, 'Embed (vimeo)');
   assert.equal(embeds.length, 1, 'only the top-level Vimeo clip');
   assert.ok(page.querySelector('a[href="https://www.youtube.com/embed/abc99"]'));
   const master = embeds[0].querySelector('tr:nth-child(2) a');
@@ -979,7 +979,7 @@ test('a WordPress video widget plays its MP4 master natively, named by its Media
     .replace('</article>', `<div class="search-results media-box"><div class="search-results-item"><article class="media-cart-item">
       <h3 class="entry-title">Škoda Fabia 130: Special edition</h3><a class="media-cart-action download" href="${file}">Download</a></article></div></div></article>`);
   const page = run(html, `${base}skoda-fabia-130/`);
-  const [embed] = blocks(page, 'Embed');
+  const [embed] = blocks(page, 'Embed (vimeo)');
   assert.ok(embed, 'the clip is an Embed');
   const link = embed.querySelector('tr:nth-child(2) a');
   assert.equal(link.getAttribute('href').split('/').pop(), 'FABIA-SE-HIGHLIGHTS_H264UHD_ENG_e91b6d28.mp4');

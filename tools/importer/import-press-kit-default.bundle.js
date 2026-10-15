@@ -225,7 +225,7 @@ var CustomImportScript = (() => {
   function videoEmbed(document, file, attachment) {
     const title = clipTitle(document, file, attachment);
     const link = Object.assign(document.createElement("a"), { href: file, textContent: title || "Video" });
-    const rows = [["Embed"], ["url", link]];
+    const rows = [["Embed (vimeo)"], ["url", link]];
     if (title) rows.push(["title", title]);
     return WebImporter.DOMUtils.createTable(rows, document);
   }

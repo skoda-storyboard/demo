@@ -569,9 +569,20 @@ export default function decorate(block) {
   }
 
   if (provider === 'file') {
-    wrapper.append(buildVideo(url, title, poster));
+    const video = buildVideo(url, title, poster);
+    wrapper.append(video);
     block.classList.add('embed-file');
     block.append(wrapper);
+    // `Embed (vimeo)`: a source Vimeo clip played from its MP4 master (SKODA-805c) gets the
+    // source player's controls; the native ones stay if that module doesn't load
+    if (block.classList.contains('vimeo')) {
+      import('./clip-player.js')
+        .then(({ default: clipPlayer }) => clipPlayer(wrapper, video))
+        .catch((e) => {
+          // eslint-disable-next-line no-console
+          console.warn('embed: the clip controls did not load', e);
+        });
+    }
     return;
   }
 

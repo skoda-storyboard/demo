@@ -78,6 +78,9 @@
   /* the same font for the accordion's + (\e027, #275) */
   --accordion-icon-font: skoda-bnr-icons;
 
+  /* the source Vimeo player's face, for its controls on a native clip (embed `vimeo`) */
+  --clip-player-font: "Helvetica Neue", helvetica, arial, sans-serif;
+
   /* header/nav-specific (candidate tokens, _FOUNDATIONS.md §8; SKODA-301) */
   --dropdown-shadow: 0 3px 8px rgb(0 0 0 / 15%);
   --dropdown-hover-bg: #f1f1f1;

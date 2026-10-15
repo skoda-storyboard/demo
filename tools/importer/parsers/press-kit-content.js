@@ -22,14 +22,15 @@ function clipTitle(document, file, attachment) {
 
 // The source's Vimeo account is domain-locked, so its player errors on the demo (SKODA-805c
 // decision, 2026-09-29): a Vimeo clip that carries its MP4 master plays that natively instead, an
-// `Embed` table whose url is the master. Inside an accordion or Columns cell a block can't
-// nest, so there it stays the bare provider link.
+// `Embed (vimeo)` table whose url is the master; the variant draws the source player's controls
+// on it. Inside an accordion or Columns cell a block can't nest, so there it stays the bare
+// provider link.
 function videoEmbed(document, file, attachment) {
   const title = clipTitle(document, file, attachment);
   // The link text becomes the player's accessible name (decorateButtons copies it into the
   // link title, which the embed block reads first), so it is the clip title, never the path.
   const link = Object.assign(document.createElement('a'), { href: file, textContent: title || 'Video' });
-  const rows = [['Embed'], ['url', link]];
+  const rows = [['Embed (vimeo)'], ['url', link]];
   if (title) rows.push(['title', title]);
   return WebImporter.DOMUtils.createTable(rows, document);
 }
