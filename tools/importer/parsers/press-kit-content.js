@@ -20,17 +20,20 @@ function clipTitle(document, file, attachment) {
   return text(item?.querySelector('.entry-title'));
 }
 
-// The source's Vimeo account is domain-locked, so its player errors on the demo (SKODA-805c
-// decision, 2026-09-29): a Vimeo clip that carries its MP4 master plays that natively instead, an
-// `Embed (vimeo)` table whose url is the master; the variant draws the source player's controls
-// on it. Inside an accordion or Columns cell a block can't nest, so there it stays the bare
-// provider link.
-function videoEmbed(document, file, attachment) {
+// The source's Vimeo account locks some clips to its own domain, where its player errors on the
+// demo (SKODA-805c decision, 2026-09-29; 10 of the 52 press-kit clips). A Vimeo clip that carries
+// its MP4 master becomes an `Embed (vimeo)` table with both: the Vimeo URL, which the block plays
+// when Vimeo allows this domain, and the master (`file`), which it plays with the source player's
+// controls when not. Inside an accordion or Columns cell a block can't nest, so there it stays
+// the bare provider link.
+function videoEmbed(document, file, attachment, url) {
   const title = clipTitle(document, file, attachment);
   // The link text becomes the player's accessible name (decorateButtons copies it into the
   // link title, which the embed block reads first), so it is the clip title, never the path.
-  const link = Object.assign(document.createElement('a'), { href: file, textContent: title || 'Video' });
-  const rows = [['Embed (vimeo)'], ['url', link]];
+  const name = title || 'Video';
+  const link = Object.assign(document.createElement('a'), { href: url, textContent: name });
+  const master = Object.assign(document.createElement('a'), { href: file, textContent: name });
+  const rows = [['Embed (vimeo)'], ['url', link], ['file', master]];
   if (title) rows.push(['title', title]);
   return WebImporter.DOMUtils.createTable(rows, document);
 }
@@ -60,7 +63,7 @@ function embedUrls(root, document, { nested = false } = {}) {
         .map((link) => link.getAttribute('href')).find((href) => /\.mp4(?:[?#]|$)/i.test(href || ''));
       // Only Vimeo is domain-locked; YouTube clips (Motorsport Videos) play and stay embeds.
       const locked = /(^|\.)vimeo\.com$/i.test(new URL(url).hostname);
-      const out = [file && locked && !nested ? videoEmbed(document, file, attachment) : p];
+      const out = [file && locked && !nested ? videoEmbed(document, file, attachment, url) : p];
       if (file) {
         const dp = document.createElement('p');
         const link = document.createElement('a');
@@ -79,10 +82,46 @@ function embedUrls(root, document, { nested = false } = {}) {
   });
 }
 
-// An in-body Storyboard gallery shows five thumbnails of the Media Box set and opens it in a
-// lightbox. Keep its lead image and caption and link the "+N" count to the imported Media Box.
-function inlineGalleries(root, document) {
+// The source gallery's own image set: its `data-gallery` JSON, one entry per image (`url` the
+// 1920px rendition, `title`, `content` the caption). [] when missing or broken.
+function galleryEntries(gallery) {
+  let list;
+  try {
+    list = JSON.parse(gallery.getAttribute('data-gallery') || '[]');
+  } catch {
+    return [];
+  }
+  return Array.isArray(list)
+    ? list.filter((entry) => entry && /^https?:\/\//.test(entry.url || '')) : [];
+}
+
+// An in-body Storyboard gallery (`.sb-gallery`: a lead image with the count, four thumbnails,
+// the set in a lightbox) becomes `Gallery (story)`, the block built for it (SKODA-216), with the
+// whole set: one row per image, its caption beside it. Its "View N photos" stays out (SKODA-216
+// decision), and its share menu is SKODA-215's. Where a block can't nest (an accordion answer,
+// a Columns cell) or the set is missing, keep its lead image and caption and link the "+N"
+// count to the imported Media Box.
+function storyGallery(gallery, document) {
+  const entries = galleryEntries(gallery);
+  if (!entries.length) return null;
+  const rows = [['Gallery (story)']];
+  entries.forEach((entry) => {
+    const img = document.createElement('img');
+    img.src = entry.url;
+    img.alt = text(Object.assign(document.createElement('span'), { innerHTML: entry.title || '' }));
+    const caption = text(Object.assign(document.createElement('span'), { innerHTML: entry.content || '' }));
+    rows.push([img, caption]);
+  });
+  return WebImporter.DOMUtils.createTable(rows, document);
+}
+
+function inlineGalleries(root, document, { nested = false } = {}) {
   root.querySelectorAll('.sb-gallery').forEach((gallery) => {
+    const block = nested ? null : storyGallery(gallery, document);
+    if (block) {
+      gallery.replaceWith(block);
+      return;
+    }
     const img = gallery.querySelector('.sb-gallery-image-main img') || gallery.querySelector('img');
     if (!img) throw new Error('Press-kit in-body gallery has no image');
     const nodes = [];
@@ -148,7 +187,7 @@ function contents(panel, document, { nested: inBlock = false } = {}) {
       const title = text(widget.parentElement?.querySelector(':scope > .widget-title'));
       const heading = title ? [Object.assign(document.createElement('h2'), { textContent: title })] : [];
       embedUrls(widget, document, { nested: inBlock });
-      inlineGalleries(widget, document);
+      inlineGalleries(widget, document, { nested: inBlock });
       // Blocks can't nest: inside an accordion answer or a Columns cell the icon stays inline.
       if (!inBlock) floatCallouts(widget, document);
       // Stray rules would split the DA section; pull-quote rules are consumed in `preprocess`.
