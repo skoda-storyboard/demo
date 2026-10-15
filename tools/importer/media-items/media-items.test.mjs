@@ -18,6 +18,7 @@ import {
   feedMediaRefs, feedCoverageGaps,
   feedThumbnails, carrierDocs, parseCarrier, withMediaBus, CARRIER_MAX,
   damIndex, damFile, withDamFiles, libraryRequest, librarySlices, libraryNonce, cardFocus,
+  normalizePosters,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 import { logicalId } from '../media/media-lib.mjs';
@@ -49,6 +50,9 @@ test('pure helpers: slug, date, CDN URL, Vimeo poster, listing URL', () => {
   assert.equal(cdnUrl('#'), '');
   assert.equal(vimeoPoster('https://i.vimeocdn.com/video/2196437413-81d8-d_295x166?region=us'), 'https://i.vimeocdn.com/video/2196437413-81d8-d_1280x720.jpg');
   assert.equal(vimeoPoster('https://example.com/x.jpg'), '');
+  // oEmbed's width-only thumbnail (SKODA-516: 11 feed posters were left unrecordable)
+  assert.equal(vimeoPoster('https://i.vimeocdn.com/video/647041470-0ae297c4-d_640'), 'https://i.vimeocdn.com/video/647041470-0ae297c4-d_1280x720.jpg');
+  assert.equal(vimeoPoster('https://i.vimeocdn.com/video/647041470-0ae297c4-d_640?region=us'), 'https://i.vimeocdn.com/video/647041470-0ae297c4-d_1280x720.jpg');
   assert.equal(itemSlug('https://www.skoda-storyboard.com/?attachment_id=451237', 'https://cdn.skoda-storyboard.com/2026/08/013_Skoda_Peaq.jpg'), '013-skoda-peaq');
   assert.equal(itemSlug('https://www.skoda-storyboard.com/en/press-kits/x/videos/attachment/klip_epiq_peaq_uhd_201c18c6/', ''), 'klip-epiq-peaq-uhd-201c18c6');
   assert.equal(
@@ -462,4 +466,22 @@ test('sources.json modelRails: one well-formed query per model-page rail, with t
     const url = new URL(listingUrl(q));
     Object.entries(q.filter).forEach(([tax, value]) => assert.equal(url.searchParams.get(`filter[${tax}][]`), value));
   });
+});
+
+test('normalizePosters: a re-published sheet\'s video posters take the 1280×720 form; images and others stay', () => {
+  const sheet = {
+    total: 3,
+    data: [
+      { template: 'video', image: 'https://i.vimeocdn.com/video/1-ab-d_640', poster: 'https://i.vimeocdn.com/video/1-ab-d_640' },
+      { template: 'video', image: '/en/fragments/media_1.jpg' },
+      { template: 'image', image: 'https://i.vimeocdn.com/video/2-cd-d_640' },
+    ],
+  };
+  const out = normalizePosters(sheet);
+  assert.equal(out.data[0].image, 'https://i.vimeocdn.com/video/1-ab-d_1280x720.jpg');
+  assert.equal(out.data[0].poster, 'https://i.vimeocdn.com/video/1-ab-d_1280x720.jpg');
+  assert.equal(out.data[1].image, '/en/fragments/media_1.jpg', 'a Media Bus path stays');
+  assert.equal(out.data[2].image, 'https://i.vimeocdn.com/video/2-cd-d_640', 'only video rows');
+  assert.equal(out.total, 3);
+  assert.equal(sheet.data[0].image, 'https://i.vimeocdn.com/video/1-ab-d_640', 'the input is not changed');
 });

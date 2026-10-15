@@ -36,7 +36,7 @@ import {
   SOURCE_ORIGIN, facetOptions, parseCards, mergeItems, feedSheet, yearIds, vimeoPoster,
   detailRequest, ajaxNonce, parseDetailPanel, parseAssetLinks, assetItem, requiredDetails,
   detailGaps, unknownGaps, feedCoverageGaps,
-  feedThumbnails, carrierDocs, parseCarrier, withMediaBus, withDamFiles,
+  feedThumbnails, carrierDocs, parseCarrier, withMediaBus, withDamFiles, normalizePosters,
   libraryRequest, librarySlices, libraryNonce, damIndex, damFile,
 } from './media-items-lib.mjs';
 import { uploadToDA } from '../media/media-lib.mjs';
@@ -433,7 +433,7 @@ export async function main(argv = process.argv.slice(2)) {
   const JSDOM = loadJSDOM();
   const feedFile = path.join(a.out, FEED_PATH);
   if (a.feed) {
-    const sheet = JSON.parse(readFileSync(a.feed, 'utf8'));
+    const sheet = normalizePosters(JSON.parse(readFileSync(a.feed, 'utf8')));
     mkdirSync(path.dirname(feedFile), { recursive: true });
     writeFileSync(feedFile, `${JSON.stringify(sheet, null, 2)}\n`);
     const mediaBus = await publishFeed(JSDOM, sheet, feedFile);

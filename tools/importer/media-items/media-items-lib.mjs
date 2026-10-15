@@ -185,8 +185,27 @@ export function cdnUrl(href) {
 /** Vimeo poster in its ingestible form: `…-d_295x166?region=us` → `…-d_1280x720.jpg`. */
 export function vimeoPoster(src) {
   if (!/^https:\/\/i\.vimeocdn\.com\/video\//.test(src || '')) return '';
-  return src.replace(/(-d)?_\d+x\d+(\.[a-z]+)?(\?.*)?$/i, '-d_1280x720.jpg')
+  // a card's `_295x166?region=us` and oEmbed's width-only `-d_640` (SKODA-516) alike
+  return src.replace(/(-d)?_\d+(x\d+)?(\.[a-z]+)?(\?.*)?$/i, '-d_1280x720.jpg')
     .replace(/(\?.*)$/, '');
+}
+
+/**
+ * A feed sheet with its Vimeo posters in the one 1280×720 JPEG form (`vimeoPoster`), so a
+ * re-published sheet built before a form was known still has recordable image URLs.
+ * @param {{data: object[]}} sheet
+ * @returns {{data: object[]}} a copy; other rows and columns unchanged
+ */
+export function normalizePosters(sheet) {
+  const fix = (url) => vimeoPoster(url) || url;
+  return {
+    ...sheet,
+    data: (sheet.data || []).map((row) => (row.template !== 'video' ? row : {
+      ...row,
+      ...(row.image ? { image: fix(row.image) } : {}),
+      ...(row.poster ? { poster: fix(row.poster) } : {}),
+    })),
+  };
 }
 
 /**
