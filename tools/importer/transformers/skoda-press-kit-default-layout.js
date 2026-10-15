@@ -194,8 +194,13 @@ function rebuild(element, document) {
   const out = [];
   const date = text(article.querySelector('.container > header .entry-published'));
   if (date) out.push(make(document, 'p', date));
+  // the source's own line break stays (the Elroq covered-design kit breaks before "segment");
+  // a break with no space beside it keeps its words apart in the heading's text
   const title = h1.cloneNode(true);
-  title.querySelectorAll('br').forEach((br) => br.replaceWith(' '));
+  title.querySelectorAll('br').forEach((br) => {
+    const before = br.previousSibling?.textContent || '';
+    if (before && !/\s$/.test(before)) br.before(' ');
+  });
   out.push(title);
 
   const chapterLinks = chapters(document);

@@ -145,3 +145,14 @@ test('the actions show the source colorbox tooltips: a clip\'s player titles, an
   assert.deepEqual(tips(), ['Add/remove this', 'Download this', 'Link to page'], 'a playing video');
   await settle();
 });
+
+test('pageHeading: the page title with its authored line breaks read as spaces', async () => {
+  const { pageHeading } = await import('./lightbox.js');
+  const main = document.querySelector('main');
+  const before = main.innerHTML;
+  main.innerHTML = '<h1>The all-electric Škoda Elroq: Breaking new ground in the compact SUV<br>segment  with a<br>\ncovered design</h1>';
+  assert.equal(pageHeading(), 'The all-electric Škoda Elroq: Breaking new ground in the compact SUV segment with a covered design');
+  main.innerHTML = '<p>No title</p>';
+  assert.equal(pageHeading(), '');
+  main.innerHTML = before;
+});

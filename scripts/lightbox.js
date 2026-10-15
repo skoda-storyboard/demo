@@ -69,6 +69,20 @@ const VIDEO_LABELS = {
 
 const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
+/**
+ * The page title as text: the main h1's words, its authored line breaks read as spaces (the
+ * source breaks some titles, "the compact SUV<br>segment"), for a lightbox title or caption.
+ * @param {Document} [doc]
+ * @returns {string} '' without an h1
+ */
+export function pageHeading(doc = document) {
+  const h1 = doc.querySelector('main h1');
+  if (!h1) return '';
+  const copy = h1.cloneNode(true);
+  copy.querySelectorAll('br').forEach((br) => br.replaceWith(' '));
+  return copy.textContent.replace(/\s+/g, ' ').trim();
+}
+
 // a page can hold several overlays (gallery, image and video rails, drawings): unique ids
 let overlayCount = 0;
 

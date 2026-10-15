@@ -222,10 +222,12 @@ var CustomImportScript = (() => {
     const item = [...document.querySelectorAll(".search-results-item")].find((el) => [...el.querySelectorAll("a[href]")].some((a) => a.getAttribute("href") === file));
     return text(item == null ? void 0 : item.querySelector(".entry-title"));
   }
-  function videoEmbed(document, file, attachment) {
+  function videoEmbed(document, file, attachment, url) {
     const title = clipTitle(document, file, attachment);
-    const link = Object.assign(document.createElement("a"), { href: file, textContent: title || "Video" });
-    const rows = [["Embed (vimeo)"], ["url", link]];
+    const name = title || "Video";
+    const link = Object.assign(document.createElement("a"), { href: url, textContent: name });
+    const master = Object.assign(document.createElement("a"), { href: file, textContent: name });
+    const rows = [["Embed (vimeo)"], ["url", link], ["file", master]];
     if (title) rows.push(["title", title]);
     return WebImporter.DOMUtils.createTable(rows, document);
   }
@@ -247,7 +249,7 @@ var CustomImportScript = (() => {
       if (attachment && root.contains(attachment) && !text(bare) && attachment.querySelectorAll("iframe").length === 1 && !attachment.querySelector("img, video")) {
         const file = [...attachment.querySelectorAll('a.media-cart-action.download[href], a[data-action="download"][href]')].map((link) => link.getAttribute("href")).find((href) => /\.mp4(?:[?#]|$)/i.test(href || ""));
         const locked = /(^|\.)vimeo\.com$/i.test(new URL(url).hostname);
-        const out = [file && locked && !nested ? videoEmbed(document, file, attachment) : p];
+        const out = [file && locked && !nested ? videoEmbed(document, file, attachment, url) : p];
         if (file) {
           const dp = document.createElement("p");
           const link = document.createElement("a");
@@ -264,9 +266,36 @@ var CustomImportScript = (() => {
       }
     });
   }
-  function inlineGalleries(root, document) {
+  function galleryEntries(gallery) {
+    let list;
+    try {
+      list = JSON.parse(gallery.getAttribute("data-gallery") || "[]");
+    } catch (e) {
+      return [];
+    }
+    return Array.isArray(list) ? list.filter((entry) => entry && /^https?:\/\//.test(entry.url || "")) : [];
+  }
+  function storyGallery(gallery, document) {
+    const entries = galleryEntries(gallery);
+    if (!entries.length) return null;
+    const rows = [["Gallery (story)"]];
+    entries.forEach((entry) => {
+      const img = document.createElement("img");
+      img.src = entry.url;
+      img.alt = text(Object.assign(document.createElement("span"), { innerHTML: entry.title || "" }));
+      const caption = text(Object.assign(document.createElement("span"), { innerHTML: entry.content || "" }));
+      rows.push([img, caption]);
+    });
+    return WebImporter.DOMUtils.createTable(rows, document);
+  }
+  function inlineGalleries(root, document, { nested = false } = {}) {
     root.querySelectorAll(".sb-gallery").forEach((gallery) => {
       var _a;
+      const block = nested ? null : storyGallery(gallery, document);
+      if (block) {
+        gallery.replaceWith(block);
+        return;
+      }
       const img = gallery.querySelector(".sb-gallery-image-main img") || gallery.querySelector("img");
       if (!img) throw new Error("Press-kit in-body gallery has no image");
       const nodes = [];
@@ -319,7 +348,7 @@ var CustomImportScript = (() => {
         const title = text((_a2 = widget.parentElement) == null ? void 0 : _a2.querySelector(":scope > .widget-title"));
         const heading = title ? [Object.assign(document.createElement("h2"), { textContent: title })] : [];
         embedUrls(widget, document, { nested: inBlock });
-        inlineGalleries(widget, document);
+        inlineGalleries(widget, document, { nested: inBlock });
         if (!inBlock) floatCallouts(widget, document);
         widget.querySelectorAll("hr").forEach((rule) => rule.remove());
         const items = widget.childNodes;
@@ -944,7 +973,11 @@ var CustomImportScript = (() => {
     const date = text6(article.querySelector(".container > header .entry-published"));
     if (date) out.push(make(document, "p", date));
     const title = h1.cloneNode(true);
-    title.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
+    title.querySelectorAll("br").forEach((br) => {
+      var _a2;
+      const before = ((_a2 = br.previousSibling) == null ? void 0 : _a2.textContent) || "";
+      if (before && !/\s$/.test(before)) br.before(" ");
+    });
     out.push(title);
     const chapterLinks = chapters(document);
     if (chapterLinks) out.push(marker2(document, "press-kit-chapters"), chapterLinks);
