@@ -86,15 +86,18 @@ body.press-kit .section.body-column .columns > div > div > :last-child {
 }
 
 /* Hub hero → tiles, as the source at every width (#275: it was the 40px section margin). At
-   exactly 768 the source's hero image already takes its 16px stacked margin while the caption
-   still overlays it, so the tiles start 16px lower there. */
+   exactly 768 the source's hero box is 16px taller (its image already takes the 16px stacked
+   margin while the caption still overlays it): the caption and the tiles both sit 16px lower.
+   The box gets the 16px, so the bottom-anchored caption moves with it (measured 2026-10-15:
+   h1 bottom 596.2, first tile 714.2, as the source; the margin alone left the caption 16px
+   high). */
 body.press-kit main > .section.hero-image-container {
   margin-block-end: var(--pk-hub-hero-gap);
 }
 
 @media (width: 768px) {
-  body.press-kit main > .section.hero-image-container {
-    margin-block-end: calc(var(--pk-hub-hero-gap) + var(--spacing-m));
+  body.press-kit main > .section.hero-image-container .hero-image {
+    padding-block-end: var(--spacing-m);
   }
 }
 
