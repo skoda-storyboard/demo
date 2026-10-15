@@ -439,3 +439,27 @@ test('card crop anchor (#273): snap-top / snap-bottom from the image holder, cen
   assert.equal(feedRow({ id: '1', type: 'image', title: 't', terms: {}, focus: 'top' }).focus, 'top');
   assert.equal(feedRow({ id: '2', type: 'image', title: 't', terms: {} }).focus, '');
 });
+
+// SKODA-516: the model pages' Images / Videos rails, one listing query each
+test('sources.json modelRails: one well-formed query per model-page rail, with the rail\'s own filter and limit', () => {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const sources = JSON.parse(readFileSync(path.join(here, 'sources.json'), 'utf8'));
+  const rails = sources.modelRails;
+  assert.ok(Array.isArray(rails) && rails.length >= 46, 'a query for each Images / Videos rail of the 23 model pages');
+  const keys = new Set();
+  rails.forEach((q) => {
+    assert.ok(['image', 'video'].includes(q.type), JSON.stringify(q));
+    assert.ok(q.filter?.model, `a rail is always for a model: ${JSON.stringify(q)}`);
+    Object.entries(q.filter).forEach(([tax, value]) => {
+      assert.ok(FACETS.includes(tax), `known facet ${tax}`);
+      assert.match(value, /^[a-z0-9-]+$/, `one source slug per facet: ${tax}=${value}`);
+    });
+    assert.ok(Number.isInteger(q.n) && q.n > 0 && q.n <= 50, `limit ${q.n}`);
+    const key = JSON.stringify([q.type, q.filter]);
+    assert.ok(!keys.has(key), `no duplicate ${key}`);
+    keys.add(key);
+    // the source listing URL carries every filter row, so it ANDs them as the rail does
+    const url = new URL(listingUrl(q));
+    Object.entries(q.filter).forEach(([tax, value]) => assert.equal(url.searchParams.get(`filter[${tax}][]`), value));
+  });
+});

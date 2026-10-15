@@ -442,8 +442,10 @@ export async function main(argv = process.argv.slice(2)) {
   }
   const sources = JSON.parse(readFileSync(path.join(HERE, 'sources.json'), 'utf8'));
   const {
-    queries, assetPages = [], knownDetailGaps = {}, library = [],
+    queries: listingQueries, modelRails = [], assetPages = [], knownDetailGaps = {}, library = [],
   } = sources;
+  // the model pages' Images / Videos rails (SKODA-516) are listing queries like the others
+  const queries = [...listingQueries, ...modelRails];
   const lists = [];
   const yearsById = {};
   const libraryReport = {};
@@ -526,6 +528,12 @@ export async function main(argv = process.argv.slice(2)) {
     'videos model=peaq': count('video', 'model', 'peaq'),
     'videos model=epiq': count('video', 'model', 'epiq'),
   };
+  // each model-page rail: the feed rows its filter matches (it shows the newest `n`)
+  summary.modelRails = Object.fromEntries(modelRails.map((q) => [
+    `${q.type} ${Object.entries(q.filter || {}).map(([k, v]) => `${k}=${v}`).join(' ')}`,
+    items.filter((i) => i.type === q.type && Object.entries(q.filter || {})
+      .every(([tax, v]) => (i.terms[tax] || []).includes(v))).length,
+  ]));
   console.log(JSON.stringify(summary, null, 1));
   if (a.dryRun) return summary;
 
