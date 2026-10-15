@@ -251,6 +251,57 @@ test('checkPage: tiles reject unknown sizes, overfilled rows and missing overlay
   assert.match(checkPage(missingImage, CONTRACTS, CODE).errors.join(' '), /expected \[size, picture, linked title\]/);
 });
 
+// ---- press mosaic banners (shape 4, Classic Days 2026) ----------------------------
+const banner = (size, alt = 'Škoda Museum', href = '/en/press-kits/kit/skoda-museum') => row(
+  size,
+  `<a href="${href}"><picture><img src="m.png" alt="${alt}"></picture></a>`,
+);
+const tile = (size, n) => row(size, `<picture><img src="${n}.jpg"></picture>`, `<a href="/en/${n}">${n}</a>`);
+const KIT = '/en/press-kits/classic-days-2026-press-kit';
+
+test('checkPage: a press mosaic of banners, fifths and thirds is publishable', () => {
+  const mosaic = page(block(
+    'cards overlay tiles',
+    banner('press-banner-wide'),
+    banner('press-banner-narrow'),
+    tile('press-square', 'a'),
+    tile('press-square', 'b'),
+    tile('press-square', 'c'),
+    banner('press-banner-narrow'),
+    tile('press-third', 'd'),
+    tile('press-third', 'e'),
+    tile('press-third', 'f'),
+    banner('press-banner-half'),
+    banner('press-banner-half'),
+  ));
+  const result = checkPage(mosaic, CONTRACTS, CODE, KIT);
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.publishable, true);
+  // the earlier shapes still pass beside it (shape 3 press rows)
+  const shape3 = page(block('cards overlay tiles', ...['a', 'b', 'c', 'd', 'e'].map((n) => tile('press-square', n))));
+  assert.equal(checkPage(shape3, CONTRACTS, CODE, KIT).publishable, true);
+});
+
+test('checkPage: malformed mosaic banners block publication', () => {
+  const fill = [tile('press-square', 'a'), tile('press-square', 'b'), tile('press-square', 'c')];
+  const cases = [
+    [banner('press-banner-narrow', ''), /expected \[size, linked picture\] with the image's alt text/],
+    [row('press-banner-narrow', '<a href="/en/m"><picture><img src="m.png" alt="M"></picture> Museum</a>'), /expected \[size, linked picture\]/],
+    [row('press-banner-narrow', '<a href=""><picture><img src="m.png" alt="M"></picture></a>'), /expected \[size, linked picture\]/],
+    [row('press-banner-narrow', '<picture><img src="m.png" alt="M"></picture>'), /expected \[size, linked picture\]/],
+    [row('press-banner-narrow', '<a href="/en/m"><img src="m.png" alt="M"></a><a href="/en/n">N</a>'), /expected \[size, linked picture\]/],
+    [banner('press-square'), /a banner needs a banner size/],
+    [row('press-banner-narrow', '<picture><img src="m.png"></picture>', '<a href="/en/m">M</a>'), /is a banner size: author \[size, linked picture\]/],
+  ];
+  cases.forEach(([last, message]) => {
+    const result = checkPage(page(block('cards overlay tiles', ...fill, last)), CONTRACTS, CODE, KIT);
+    assert.equal(result.publishable, false, String(message));
+    assert.match(result.errors.join(' '), message);
+  });
+  const quarters = page(block('cards overlay tiles', ...['a', 'b', 'c', 'd'].map((n) => tile('press-quarter', n)), ...['e', 'f', 'g'].map((n) => tile('press-third', n))));
+  assert.match(checkPage(quarters, CONTRACTS, CODE, KIT).errors.join(' '), /cannot share a mosaic with thirds or banners/);
+});
+
 test('checkPage: tiles reject titles that the renderer cannot decorate', () => {
   const invalidTitles = [
     '<a href="/en/a"></a>',

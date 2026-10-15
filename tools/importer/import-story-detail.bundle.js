@@ -929,6 +929,53 @@ var CustomImportScript = (() => {
     if (plain.length) rows.push(["tags", plain.join(", ")]);
     return rows;
   }
+  function sourceLocale(url) {
+    try {
+      const m = new URL(url, "https://www.skoda-storyboard.com").pathname.match(/^\/([a-z]{2})(?:\/|$)/i);
+      return m ? m[1].toLowerCase() : "en";
+    } catch (e) {
+      return "en";
+    }
+  }
+  var plainAlt = (alt) => (alt || "").replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim();
+  function fullTitle(title, alt) {
+    const clipped = title.match(/^(.*?)\s*(?:…|\.\.\.)$/);
+    const prefix = clipped ? clipped[1] : "";
+    const whole = plainAlt(alt);
+    if (prefix.split(" ").length < 2 || !whole.startsWith(prefix)) return title;
+    if (whole.length > prefix.length && !/^[\s,.:;!?–-]/.test(whole.slice(prefix.length))) return title;
+    return whole;
+  }
+  function curatedCards(band, document2) {
+    const squashed = (el) => el ? (el.textContent || "").replace(/\s+/g, " ").trim() : "";
+    const rows = [];
+    band.querySelectorAll("article.article-teaser").forEach((card) => {
+      const titleLink = card.querySelector(".entry-title a[href]");
+      const href = titleLink && titleLink.getAttribute("href");
+      const img = card.querySelector(".article-teaser-media img");
+      const title = fullTitle(squashed(titleLink), img && img.getAttribute("alt"));
+      if (!href || !title) return;
+      if (img) {
+        ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop", "loading", "decoding"].forEach((a2) => img.removeAttribute(a2));
+        if (img.hasAttribute("alt")) img.setAttribute("alt", plainAlt(img.getAttribute("alt")));
+      }
+      const body = [];
+      const date = squashed(card.querySelector(".entry-published"));
+      if (date) {
+        const p = document2.createElement("p");
+        p.textContent = date;
+        body.push(p);
+      }
+      const h3 = document2.createElement("h3");
+      const a = document2.createElement("a");
+      a.setAttribute("href", href);
+      a.textContent = title;
+      h3.append(a);
+      body.push(h3);
+      rows.push(img ? [img, body] : [body]);
+    });
+    return rows;
+  }
   function relatedBand(element, document2, payload) {
     const band = element.querySelector(".cover-box .related-stories");
     if (!band) return;
@@ -942,16 +989,26 @@ var CustomImportScript = (() => {
       clone.querySelectorAll(".subheading").forEach((s) => s.remove());
       headingText = (clone.textContent || "").trim() || headingText;
     }
-    const filters = facetRows(element);
-    if (!filters.length) {
-      console.warn("[story-cleanup] related band: story has no tags to match; dropped");
-      cover.remove();
-      return;
-    }
     const originalURL = payload && payload.params && payload.params.originalURL || "";
-    const self = lastSegment(originalURL);
-    const rows = [["Story Rail"], ["template", "story"], ...filters, ["limit", "10"]];
-    if (self) rows.push(["exclude", self]);
+    let rows;
+    if (sourceLocale(originalURL) !== "en") {
+      rows = [["Story Rail"], ...curatedCards(band, document2)];
+      if (rows.length === 1) {
+        console.warn("[story-cleanup] related band: no source cards; dropped");
+        cover.remove();
+        return;
+      }
+    } else {
+      const filters = facetRows(element);
+      if (!filters.length) {
+        console.warn("[story-cleanup] related band: story has no tags to match; dropped");
+        cover.remove();
+        return;
+      }
+      const self = lastSegment(originalURL);
+      rows = [["Story Rail"], ["template", "story"], ...filters, ["limit", "10"]];
+      if (self) rows.push(["exclude", self]);
+    }
     const title = document2.createElement("h3");
     title.textContent = headingText;
     const out = [document2.createElement("hr"), title];
@@ -1701,6 +1758,7 @@ var CustomImportScript = (() => {
     "/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq",
     "/en/emobility/skoda-elroq-and-a-happy-family",
     "/en/emobility/skoda-elroq-premiere-light-cube-camera-action",
+    "/en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
     "/en/emobility/skoda-peaq-unparalleled-space-and-comfort",
     "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
@@ -1751,6 +1809,37 @@ var CustomImportScript = (() => {
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos",
     "/en/press-kits/4x4-winter-experience-press-kit",
+    "/en/press-kits/classic-days-2026-press-kit",
+    "/en/press-kits/classic-days-2026-press-kit/125-years-of-skoda-motorsport",
+    "/en/press-kits/classic-days-2026-press-kit/1955-skoda-440-on-the-international-stage",
+    "/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand",
+    "/en/press-kits/classic-days-2026-press-kit/images",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-bz-1902-1904",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-slavia-type-b-1899-1904",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-voiturette-a-1905-1907",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-110-r-coupe-1970-1980",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-1100-mbx-1967-1969",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-120-gls-1976-1990",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-120-s-rallye-1972-1975",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-645-1929-1934",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsportsuccess",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-favorit-136-l-1988-1994",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-felicia-1959-1964",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-museum",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-museum-presents-only-surviving-laurin-klement-bscsports-car-from-1908",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-1959-1964",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-popular-monte-carlo-1936-1939",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-rapid-135-1987-1990",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-rapid-ldd-1984",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-superb-3000-ohv-1938-1949",
+    "/en/press-kits/classic-days-2026-press-kit/texts",
+    "/en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary",
+    "/en/press-kits/classic-days-2026-press-kit/videos",
     "/en/press-kits/lets-explore-albania-press-kit",
     "/en/press-kits/new-skoda-enyaq-press-kit-2",
     "/en/press-kits/press-kit-skoda-at-the-iaa-2019",
@@ -2013,6 +2102,11 @@ var CustomImportScript = (() => {
     if (!p) return "/";
     return p.split("/").map((seg) => seg.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/-+/g, "-")).join("/");
   }
+  var SCHEMELESS_SOURCE = /^(?:(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com\/(?:[^?#]*\/)?)?(?:www\.)?skoda-storyboard\.com(?=\/)/i;
+  function schemelessSource(href) {
+    const m = href.match(SCHEMELESS_SOURCE);
+    return m ? `${SOURCE_ORIGIN}${href.slice(m[0].length)}` : href;
+  }
   function rewriteHref(href) {
     const m = href.match(SOURCE_HOST);
     if (!m) return null;
@@ -2048,8 +2142,9 @@ var CustomImportScript = (() => {
   function transform6(hookName, element, payload) {
     if (hookName !== TransformHook5.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
-      let href = a.getAttribute("href");
+      let href = a.getAttribute("href").replace(/(?:\s|%20)+$/i, "");
       if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
+      href = schemelessSource(href);
       if (href.startsWith("/direct-download/")) href = `${SOURCE_ORIGIN}${href}`;
       else href = !isRailViewAll(a) && tagPageHref(href) || rewriteHref(href) || href;
       if (href !== a.getAttribute("href")) a.setAttribute("href", href);

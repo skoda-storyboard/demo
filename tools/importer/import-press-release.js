@@ -144,7 +144,10 @@ export default {
       const parser = parsers[block.name];
       if (parser) {
         try {
-          parser(block.element, { document, url, params });
+          // the press-release Media Box shows each item's date (#274; downloads `dates`)
+          parser(block.element, {
+            document, url, params, dates: block.name === 'downloads',
+          });
         } catch (e) {
           console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
         }

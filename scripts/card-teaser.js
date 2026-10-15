@@ -50,12 +50,14 @@ export function isToolbarCell(cell) {
 /**
  * Optimize authored images without replacing their <img> node, preserving DA
  * Layout-mode editability. Replace EDS's default 2000px sources with card-sized
- * ones as well as optimizing images that have no <source> elements yet.
+ * ones as well as optimizing images that have no <source> elements yet. `selector` picks the
+ * images (default: the card image; the cards tiles' image-only banners pass their own).
  */
 export function optimizeImages(scope, {
   eager = false, desktopWidth = '750', mobileWidth = '500', breakpoints,
+  selector = '.card-teaser-image img',
 } = {}) {
-  scope.querySelectorAll('.card-teaser-image img').forEach((img) => {
+  scope.querySelectorAll(selector).forEach((img) => {
     let picture = img.closest('picture');
     if (!picture) {
       picture = document.createElement('picture');
