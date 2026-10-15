@@ -44,7 +44,8 @@
         "url",
         "ratio",
         "title",
-        "poster"
+        "poster",
+        "height"
       ]
     },
     "footer": {
@@ -296,7 +297,7 @@
       "status": "pinned",
       "ticket": "SKODA-221",
       "fallback": "broken",
-      "shape": 3,
+      "shape": 4,
       "emittedBy": [
         "parsers/series-grid.js",
         "parsers/press-kit-hub-tiles.js"
@@ -449,9 +450,10 @@
       "status": "pinned",
       "ticket": "SKODA-510",
       "fallback": "readable",
-      "shape": 1,
+      "shape": 2,
       "emittedBy": [
-        "parsers/downloads.js"
+        "parsers/downloads.js",
+        "parsers/press-kit-media.js"
       ]
     },
     {

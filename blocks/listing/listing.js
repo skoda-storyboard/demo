@@ -64,6 +64,57 @@ const labelFor = (key, labels) => labels[key] || FACET_LABELS[key] || titleCase(
 // Facet values are index slugs ("peaq", "enyaq-coupe"); the source shows names ("Peaq").
 export const valueLabel = (v) => titleCase(String(v).replace(/-/g, ' '));
 
+/**
+ * The source's option names and order per facet (#273): blocks/listing/facet-labels.json,
+ * generated from the source's filter forms (tools/importer/build-facet-labels.mjs), as
+ * `{ facet: [[slug, name], …] }`. A missing or broken file leaves the title-cased slugs.
+ * @param {object} json the file's content
+ * @returns {Map<string, Map<string, {name: string, rank: number}>>}
+ */
+export function facetLabelMap(json) {
+  const out = new Map();
+  Object.entries(json && typeof json === 'object' ? json : {}).forEach(([facet, pairs]) => {
+    if (!Array.isArray(pairs)) return;
+    const names = new Map();
+    pairs.forEach((pair, rank) => {
+      if (!Array.isArray(pair) || !pair[0] || !pair[1]) return;
+      names.set(String(pair[0]).toLowerCase(), { name: String(pair[1]), rank });
+    });
+    out.set(facet, names);
+  });
+  return out;
+}
+
+function loadFacetLabels() {
+  const base = window.hlx?.codeBasePath || '';
+  return fetch(`${base}/blocks/listing/facet-labels.json`)
+    .then((res) => (res.ok ? res.json() : {}))
+    .then(facetLabelMap)
+    .catch(() => facetLabelMap({}));
+}
+
+/**
+ * The options a facet offers, in the source's order (its known names first, then the rest by
+ * name; names match the value case-insensitively). A Year is a 4-digit year, so a stray tag
+ * ("x") is no option, and Years run in number order, as the source's (#273).
+ * @param {Array<{value: string}>} values distinctFacetValues() output
+ * @param {string} key the facet
+ * @param {Map} labels facetLabelMap() output
+ * @returns {Array<{value: string}>}
+ */
+export function orderFacetValues(values, key, labels) {
+  if (key === 'years') {
+    return values.filter(({ value }) => /^\d{4}$/.test(value))
+      .sort((a, b) => Number(a.value) - Number(b.value));
+  }
+  const names = labels.get(key) || new Map();
+  const known = (v) => names.get(String(v).toLowerCase());
+  const name = (v) => known(v)?.name || valueLabel(v);
+  const rank = (v) => known(v)?.rank ?? Infinity;
+  return [...values].sort((a, b) => rank(a.value) - rank(b.value)
+    || name(a.value).localeCompare(name(b.value), undefined, { numeric: true }));
+}
+
 function parseListConfig(block) {
   const cfg = readBlockConfig(block);
   const list = (v, fallback = []) => (v ? String(v).split(',').map((s) => s.trim()).filter(Boolean) : fallback);
@@ -150,6 +201,9 @@ export function mediaCell(row, eager, labels = undefined) {
   a.href = row.path || row.original || row.mp4 || '#';
   const imgWrap = document.createElement('div');
   imgWrap.className = 'listing-item-image';
+  // the source's crop anchor of this image (#273: its snap-top / snap-bottom; feed `focus`)
+  const focus = String(row.focus || '').trim().toLowerCase();
+  if (focus === 'top' || focus === 'bottom') imgWrap.dataset.focus = focus;
   const src = row.image || row.poster;
   if (src) {
     const pic = createOptimizedPicture(src, title, eager, [
@@ -247,6 +301,8 @@ export default async function decorate(block) {
   // first paint and LCP wait for it (SKODA-702). Its failure is handled where it's awaited.
   const indexRows = loadQueryIndex(cfg.index);
   indexRows.catch(() => {});
+  // the source's option names (#273), alongside: only the facet bar needs them
+  const facetLabels = cfg.facets.length ? loadFacetLabels() : Promise.resolve(facetLabelMap({}));
   // media listings show the cart's package-limit notice (SKODA-505b) in the skeleton, styled
   // by listing.css (no shift above the grid). The cart itself loads after first paint
   // (media-card.js), so nothing of it is on this eager path (SKODA-505a review).
@@ -322,6 +378,17 @@ export default async function decorate(block) {
     console.error('listing: index load failed', e);
     return;
   }
+  // the option names (#273) are not worth delaying the first grid: wait for them briefly, else
+  // build the bar with the title-cased slugs and rename + reorder its options when they land
+  const NAMES_WAIT_MS = 300;
+  let optionNames = await Promise.race([
+    facetLabels,
+    new Promise((resolve) => { setTimeout(() => resolve(null), NAMES_WAIT_MS); }),
+  ]);
+  const namesLate = !optionNames;
+  if (namesLate) optionNames = facetLabelMap({});
+  const optionName = (key, v) => optionNames.get(key)?.get(String(v).toLowerCase())?.name
+    || valueLabel(v);
 
   // Deep-link values match the index value case-insensitively (`filter[model][]=Peaq` →
   // "peaq"), so the checkbox shows as ticked and a second pick doesn't duplicate it.
@@ -365,14 +432,19 @@ export default async function decorate(block) {
   }
 
   function renderChips() {
+    // a rebuild keeps keyboard focus on the same filter's chip, if it is still there (#341 review)
+    const focused = chipsRow.contains(document.activeElement) ? document.activeElement : null;
+    const focusKey = focused && `${focused.dataset.facet}\n${focused.dataset.value}`;
     chipsRow.textContent = '';
     Object.entries(state.active).forEach(([key, vals]) => {
       vals.forEach((val) => {
         const chip = document.createElement('button');
         chip.type = 'button';
         chip.className = 'listing-chip';
-        chip.textContent = `${labelFor(key, cfg.facetLabels)}: ${valueLabel(val)}`;
-        chip.setAttribute('aria-label', `${STRINGS.removeFilter}: ${labelFor(key, cfg.facetLabels)} — ${valueLabel(val)}`);
+        chip.dataset.facet = key;
+        chip.dataset.value = val;
+        chip.textContent = `${labelFor(key, cfg.facetLabels)}: ${optionName(key, val)}`;
+        chip.setAttribute('aria-label', `${STRINGS.removeFilter}: ${labelFor(key, cfg.facetLabels)} — ${optionName(key, val)}`);
         // removing a filter veils, updates and collapses like a pick, but at once (live: the
         // chip is a link, so there is no settle time)
         chip.addEventListener('click', () => {
@@ -382,6 +454,7 @@ export default async function decorate(block) {
           applyFilterChange(0);
         });
         chipsRow.append(chip);
+        if (focusKey === `${key}\n${val}`) chip.focus({ preventScroll: true });
       });
     });
   }
@@ -554,10 +627,8 @@ export default async function decorate(block) {
 
   // --- facet bar ---------------------------------------------------------
   cfg.facets.forEach((key) => {
-    // options in name order, filled column by column like the source
-    const byName = (a, b) => valueLabel(a.value)
-      .localeCompare(valueLabel(b.value), undefined, { numeric: true });
-    const values = distinctFacetValues(scoped, key).sort(byName);
+    // options in the source order (its names), filled column by column like the source
+    const values = orderFacetValues(distinctFacetValues(scoped, key), key, optionNames);
     if (!values.length) return; // no data for this facet in scope → skip pill
 
     const pill = document.createElement('button');
@@ -604,7 +675,7 @@ export default async function decorate(block) {
       // name only, like the source ("Peaq"); the box is drawn on the text span in CSS
       const txt = document.createElement('span');
       txt.className = 'facet-option-label';
-      txt.textContent = valueLabel(value);
+      txt.textContent = optionName(key, value);
       wrap.append(cb, txt);
       panel.append(wrap);
     });
@@ -715,4 +786,29 @@ export default async function decorate(block) {
   refreshPillStates();
   renderChips();
   renderGrid();
+
+  // names that came after the first paint: rename and reorder the options in place (their
+  // inputs, state and listeners stay), then the chips. Moving a focused option drops focus to
+  // <body>, so the control a keyboard user is on gets it back (#341 review).
+  if (namesLate) {
+    facetLabels.then((names) => {
+      optionNames = names;
+      const focused = facetOptions.contains(document.activeElement) ? document.activeElement : null;
+      facetOptions.querySelectorAll('fieldset.facet-panel').forEach((panel) => {
+        const { facet } = panel.dataset;
+        const options = [...panel.querySelectorAll('label.facet-option')];
+        const byValue = new Map(options.map((o) => [o.querySelector('input').value, o]));
+        orderFacetValues([...byValue.keys()].map((value) => ({ value })), facet, names)
+          .forEach(({ value }) => {
+            const option = byValue.get(value);
+            option.querySelector('.facet-option-label').textContent = optionName(facet, value);
+            panel.append(option);
+          });
+      });
+      if (focused?.isConnected && document.activeElement !== focused) {
+        focused.focus({ preventScroll: true });
+      }
+      renderChips();
+    });
+  }
 }

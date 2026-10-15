@@ -280,6 +280,59 @@ The rails render whatever the index / media feed holds; the gap is content that 
   video count can stay below the source.
 - Person owners are not assigned in this repo yet (docs/tickets/OVERVIEW.md); the owning tickets above carry the work.
 
+## M1 QA fixes ([#284](https://github.com/skoda-storyboard/demo/issues/284), 2026-10-12)
+
+Measured against the source (Superb, Epiq) at 1440 / 1080 / 992 / 768 / 390, first card of each rail.
+
+| Observation | Source | Before | Now | Where |
+|---|---|---|---|---|
+| Rail + Bodywork / Derivatives titles | `h3` 26/32.5/600 | `h2` | `h3` 26/32.5/600, tops within 1px | `parsers/story-rail.js`; the template reads `h2` or `h3` (pages imported before #284 keep `h2`) |
+| Date → title text gap, overlay rails | 12px | 27px | 12px box gap (text 11–12px: font metrics) | `story-rail.css`, every story-rail; the press band (13px) and story related band keep theirs |
+| Date → title text gap, Images / Videos | 14px | 16px | 14px; the 44px date row is unchanged | `carousel.css` `.carousel.media` |
+| Rail arrows | 32px ink disc, white glyph disc, arrow cut out | 8px white chevron | the source glyph on every carousel arrow (as on the source's press, story, home and model rails), drawn with the source font: arrow area within 0.1% of the source at 1 / 1.25 / 1.5 / 2 / 3x (an SVG mask of the same path drew it up to 4% heavier at 1–1.5x, PO review) | `carousel.css`, `fonts.css` (`skoda-bnr-icons.woff2`, 6.8 KB, fetched only where an arrow renders) |
+| News "All" | `/en/news/?filter[model][]=<model>` | `/en/tag/model/<model>` | `/en/news?filter[model][]=<model>` (the runtime link policy keeps the listing on the demo) | `skoda-links.js` rule 4 skips a Story Rail `viewall` |
+
+- **Also fixed by the shared CSS:** the Media Room home's News / Latest Stories rails (27px → 12px, as the source).
+  The rail date gap is the `--rail-date-gap` token; every rail it reaches (Stories + Media Room homes, model pages;
+  the press and story bands keep their own) was measured against the source. Forced colors: the arrow glyph keeps
+  the system button-text colour, so it stays visible.
+- **Arrow focus (PO review):** the source draws a 5px `#19F` ring round the arrow on any focus, a click or tap
+  included (`.flickity-button:focus`, measured 1440 + 390). Now the same on every rail (`--carousel-focus-ring`,
+  was a 2px green square on keyboard focus only); not clipped on the model, home, Media Room, press or story
+  bands; ≥ 3:1 on white and on the dark band. Forced colors draw a system-colour outline instead.
+- **Checked, as the source (not changed):** the icon nav with 9 items (Superb) is wider than the viewport at
+  768–991 (page 788px wide at 768, the first item starts at −20px), the same on the source; at a rail's end the
+  disabled "next" drops focus to the page, the same on the source.
+- **Code review note (out of scope, not changed):** the Images / Videos **listing** media cards (`blocks/listing`,
+  `.media-asset-date`) keep a 16px date → title gap, source 14px (date 2px high, measured at 1440). Same fix as the
+  rails' `.carousel.media` date row; #273 closed the listing observations as accepted.
+- **Re-import:** all 23 model pages re-imported. Only Epiq, Peaq and Enyaq Coupé iV pushed (preview): the other 20
+  link a Technical Data PDF that is still a pending media-manifest row, so the binary gate blocks them. They keep
+  `h2` titles and the tag-page News "All" until their PDFs are ingested to DAM (developer machine,
+  `tools/importer/media/README.md`), then re-push. The CSS fixes reach all 23 now.
+- **Title hover (PO re-check 2026-10-12):** on this branch the News title turns white → `#0E3A2F` + underline and
+  the Images / Videos title `#161718` → `#0E3A2F` + underline; the source keeps both, no underline. Fixed by
+  SKODA-228 in PR #336 (one `.card-teaser-title a:hover` rule in `styles/card-teaser.css`, every rail and grid),
+  checked on its preview of Superb: colour kept, no underline. Not duplicated here; the model pages get it when #336
+  merges. #336 also extends the old SVG-mask arrows to the story band: whichever merges second drops those
+  story-rail.css rules (#284 draws every arrow with the font and removes the SVGs; noted on #336).
+- **Not changed, by decision:** Superb video "+" (cdn MP4 not on DAM, #78 /
+  SKODA-902); video download opening in a tab (cdn URL, left as is, SKODA-902); Epiq nav without Key Facts /
+  Technical Data (no target sections, left out); Images / Videos arrow position (source parity); Epiq article
+  counts (content scope, M1 pilot set).
+- **Checks:** axe 4.10.3 and Lighthouse 12 equal to main (accessibility 92: `color-contrast`, `link-in-text-block`,
+  as the source; SEO 69 is `is-crawlable`, the non-production hosts' noindex). The footer observations already
+  match the source on main (#307): `h3` titles, "consent to the processing" not underlined on hover, "Manage
+  subscription" `#419468`.
+
+- **QA re-test on `main` (2026-10-13):** Epiq passes every fixed row. Superb (QA's first page) still showed `h2` rail
+  and Bodywork / Derivatives titles and the tag-page News "All". It's one of the 20 model pages not re-pushed: the
+  binary gate holds each until its Technical Data PDF (`TD-<model>-en_….pdf`) is in the DAM. Runtime fallback (PO
+  decision): `templates/skoda-model/skoda-model.js` turns a rail section's `h2` into the source's `h3` (id, nav
+  anchor and lead-in kept) and a News rail's `/en/tag/model/<model>` "All" into `/en/news?filter[model][]=<model>`.
+  Re-imported pages are untouched. Measured on Superb at 1440 / 768 / 390: 6 × `h3` 26/32.5/600 as the source, the
+  same positions, the news listing link. The card-title hover row waits on #336 (SKODA-228), as decided.
+
 ## Dependencies
 - Upstream: SKODA-202 (hero), SKODA-201 (cards/rails), SKODA-402 (query-index retrieval), SKODA-203 (gallery-lightbox), SKODA-505 (media-cart), SKODA-601 (import infra)
 - Downstream: SKODA-1001 (per-locale trees)

@@ -3,7 +3,21 @@ var CustomImportScript = (() => {
   var __defProp = Object.defineProperty;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __propIsEnum = Object.prototype.propertyIsEnumerable;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __spreadValues = (a, b) => {
+    for (var prop in b || (b = {}))
+      if (__hasOwnProp.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    if (__getOwnPropSymbols)
+      for (var prop of __getOwnPropSymbols(b)) {
+        if (__propIsEnum.call(b, prop))
+          __defNormalProp(a, prop, b[prop]);
+      }
+    return a;
+  };
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
@@ -21,7 +35,10 @@ var CustomImportScript = (() => {
   // tools/importer/import-press-kit-hub.js
   var import_press_kit_hub_exports = {};
   __export(import_press_kit_hub_exports, {
-    default: () => import_press_kit_hub_default
+    YEAR_TERMS: () => YEAR_TERMS,
+    default: () => import_press_kit_hub_default,
+    facetValue: () => facetValue,
+    sourceFacets: () => sourceFacets
   });
 
   // tools/importer/parsers/press-kit-hub-hero.js
@@ -52,6 +69,24 @@ var CustomImportScript = (() => {
     ], document);
   }
 
+  // tools/importer/parsers/series-grid.js
+  function siteOriginWidths(document) {
+    const widths = {};
+    document.querySelectorAll("style").forEach((style) => {
+      const css = (style.textContent || "").replace(/@media[^{]*\{(?:[^{}]*\{[^}]*\})*\s*\}/g, "");
+      const re = /([^{}]+)\{([^}]*)\}/g;
+      let m;
+      while (m = re.exec(css)) {
+        const w = m[2].match(/(?:^|;)\s*width:\s*([\d.]+)%/);
+        if (!w) continue;
+        (m[1].match(/#pgc-[\w-]+/g) || []).forEach((sel) => {
+          widths[sel.slice(1)] = Number(w[1]);
+        });
+      }
+    });
+    return widths;
+  }
+
   // tools/importer/parsers/press-kit-hub-tiles.js
   var ratioOf = (tile) => {
     var _a, _b;
@@ -74,29 +109,77 @@ var CustomImportScript = (() => {
     }
     throw new Error(`Press-kit tile row ${rowIndex + 1} has an unsupported layout`);
   }
-  function parseTiles(content, document) {
-    const sourceRows = [...content.querySelectorAll(".panel-grid")].filter((grid) => !grid.parentElement.closest(".panel-grid")).map((grid) => [...grid.querySelectorAll("article.article-teaser")]).filter((tiles) => tiles.length);
+  function tileRow(tile, token, rowNumber, document) {
+    const sourceLink = tile.querySelector(":scope > a[href]");
+    const sourceImage = tile.querySelector(".ratio-container img[src]");
+    const heading = tile.querySelector(".heading");
+    if (!sourceLink || !sourceImage || !(heading == null ? void 0 : heading.textContent.trim())) {
+      throw new Error(`Press-kit tile ${rowNumber} needs a link, image and title`);
+    }
+    const title = heading.textContent.replace(/\s+/g, " ").trim();
+    const img = sourceImage.cloneNode(true);
+    img.setAttribute("alt", title);
+    img.removeAttribute("srcset");
+    img.removeAttribute("sizes");
+    const link = document.createElement("a");
+    link.href = sourceLink.href;
+    link.textContent = title;
+    return [token, img, link];
+  }
+  var bannersIn = (cell) => [...cell.querySelectorAll(".widget_sow-editor .textwidget a[href]")].filter((a) => a.querySelector("img[src]"));
+  var cellsOf = (grid) => [...grid.querySelectorAll(
+    ":scope > .panel-grid-cell, :scope > .panel-row-style > .panel-grid-cell"
+  )];
+  var MOSAIC_TOKENS = {
+    "tile:1x1:20": "press-square",
+    "tile:2x1:33": "press-third",
+    "banner:60": "press-banner-wide",
+    "banner:40": "press-banner-narrow",
+    "banner:50": "press-banner-half"
+  };
+  function mosaicRows(grids, widths, banner, document) {
+    const rows = [];
+    grids.forEach((grid, rowIndex) => {
+      cellsOf(grid).forEach((cell) => {
+        const tiles = [...cell.querySelectorAll("article.article-teaser")];
+        const banners = bannersIn(cell);
+        if (!tiles.length && !banners.length) return;
+        const width = Math.round(widths[cell.id]);
+        if (tiles.length + banners.length !== 1) {
+          throw new Error(`Press-kit mosaic row ${rowIndex + 1}: one tile or banner per cell`);
+        }
+        const key = tiles.length ? `tile:${ratioOf(tiles[0])}:${width}` : `banner:${width}`;
+        const token = MOSAIC_TOKENS[key];
+        if (!token) throw new Error(`Press-kit mosaic row ${rowIndex + 1}: unsupported cell (${key})`);
+        if (tiles.length) {
+          rows.push(tileRow(tiles[0], token, rows.length + 1, document));
+          return;
+        }
+        banners[0].setAttribute("data-pk-mosaic", "");
+        rows.push([token, banner(banners[0])]);
+      });
+    });
+    return rows;
+  }
+  function parseTiles(content, document, { banner } = {}) {
+    const grids = [...content.querySelectorAll(".panel-grid")].filter((grid) => !grid.parentElement.closest(".panel-grid"));
+    const sourceRows = grids.map((grid) => [...grid.querySelectorAll("article.article-teaser")]).filter((tiles) => tiles.length);
     if (!sourceRows.length) throw new Error("Press-kit hub has no chapter tiles");
-    const rows = [["Cards (overlay, tiles)"]];
+    const header = [["Cards (overlay, tiles)"]];
+    const mixed = grids.some((grid) => grid.querySelector("article.article-teaser") && cellsOf(grid).some((cell) => !cell.querySelector("article.article-teaser") && bannersIn(cell).length));
+    if (mixed) {
+      if (!banner) throw new Error("Press-kit tiles share rows with banners: not supported here");
+      const widths = siteOriginWidths(document);
+      const live = grids.filter((grid) => grid.querySelector("article.article-teaser") || bannersIn(grid).length);
+      return WebImporter.DOMUtils.createTable(
+        [...header, ...mosaicRows(live, widths, banner, document)],
+        document
+      );
+    }
+    const rows = [...header];
     sourceRows.forEach((tiles, rowIndex) => {
       const tokens = rowTokens(tiles, rowIndex);
-      tiles.forEach((tile, index) => {
-        const sourceLink = tile.querySelector(":scope > a[href]");
-        const sourceImage = tile.querySelector(".ratio-container img[src]");
-        const heading = tile.querySelector(".heading");
-        if (!sourceLink || !sourceImage || !(heading == null ? void 0 : heading.textContent.trim())) {
-          throw new Error(`Press-kit tile ${rows.length} needs a link, image and title`);
-        }
-        const title = heading.textContent.replace(/\s+/g, " ").trim();
-        const img = sourceImage.cloneNode(true);
-        img.setAttribute("alt", title);
-        img.removeAttribute("srcset");
-        img.removeAttribute("sizes");
-        const link = document.createElement("a");
-        link.href = sourceLink.href;
-        link.textContent = title;
-        rows.push([tokens[index], img, link]);
-      });
+      tiles.forEach((tile, index) => rows.push(tileRow(tile, tokens[index], rows.length, document)));
     });
     return WebImporter.DOMUtils.createTable(rows, document);
   }
@@ -421,6 +504,7 @@ var CustomImportScript = (() => {
     "/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq",
     "/en/emobility/skoda-elroq-and-a-happy-family",
     "/en/emobility/skoda-elroq-premiere-light-cube-camera-action",
+    "/en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
     "/en/emobility/skoda-peaq-unparalleled-space-and-comfort",
     "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
@@ -471,6 +555,37 @@ var CustomImportScript = (() => {
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos",
     "/en/press-kits/4x4-winter-experience-press-kit",
+    "/en/press-kits/classic-days-2026-press-kit",
+    "/en/press-kits/classic-days-2026-press-kit/125-years-of-skoda-motorsport",
+    "/en/press-kits/classic-days-2026-press-kit/1955-skoda-440-on-the-international-stage",
+    "/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand",
+    "/en/press-kits/classic-days-2026-press-kit/images",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-bz-1902-1904",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-slavia-type-b-1899-1904",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-voiturette-a-1905-1907",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-110-r-coupe-1970-1980",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-1100-mbx-1967-1969",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-120-gls-1976-1990",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-120-s-rallye-1972-1975",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-645-1929-1934",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsportsuccess",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-favorit-136-l-1988-1994",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-felicia-1959-1964",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-museum",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-museum-presents-only-surviving-laurin-klement-bscsports-car-from-1908",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-1959-1964",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-popular-monte-carlo-1936-1939",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-rapid-135-1987-1990",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-rapid-ldd-1984",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-superb-3000-ohv-1938-1949",
+    "/en/press-kits/classic-days-2026-press-kit/texts",
+    "/en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary",
+    "/en/press-kits/classic-days-2026-press-kit/videos",
     "/en/press-kits/lets-explore-albania-press-kit",
     "/en/press-kits/new-skoda-enyaq-press-kit-2",
     "/en/press-kits/press-kit-skoda-at-the-iaa-2019",
@@ -733,6 +848,11 @@ var CustomImportScript = (() => {
     if (!p) return "/";
     return p.split("/").map((seg) => seg.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/-+/g, "-")).join("/");
   }
+  var SCHEMELESS_SOURCE = /^(?:(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com\/(?:[^?#]*\/)?)?(?:www\.)?skoda-storyboard\.com(?=\/)/i;
+  function schemelessSource(href) {
+    const m = href.match(SCHEMELESS_SOURCE);
+    return m ? `${SOURCE_ORIGIN}${href.slice(m[0].length)}` : href;
+  }
   function rewriteHref(href) {
     const m = href.match(SOURCE_HOST);
     if (!m) return null;
@@ -757,13 +877,22 @@ var CustomImportScript = (() => {
     const bySlug = DEMO_PATHS.filter((p) => p.startsWith("/en/tag/") && p.endsWith(`/${slug}`) && p.split("/").length === 5);
     return bySlug.length === 1 ? bySlug[0] : null;
   }
+  var RAIL_VIEWALL_KEYS = ["viewall", "view-all", "all"];
+  function isRailViewAll(a) {
+    const row = a.closest("tr");
+    const table = row && row.closest("table");
+    if (!table || row.cells.length < 2 || !RAIL_VIEWALL_KEYS.includes(row.cells[0].textContent.trim().toLowerCase())) return false;
+    const head = table.rows[0] && table.rows[0].cells[0];
+    return !!head && /^story rail\b/i.test(head.textContent.trim());
+  }
   function transform2(hookName, element, payload) {
     if (hookName !== TransformHook2.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
-      let href = a.getAttribute("href");
+      let href = a.getAttribute("href").replace(/(?:\s|%20)+$/i, "");
       if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
+      href = schemelessSource(href);
       if (href.startsWith("/direct-download/")) href = `${SOURCE_ORIGIN}${href}`;
-      else href = tagPageHref(href) || rewriteHref(href) || href;
+      else href = !isRailViewAll(a) && tagPageHref(href) || rewriteHref(href) || href;
       if (href !== a.getAttribute("href")) a.setAttribute("href", href);
     });
   }
@@ -866,19 +995,62 @@ var CustomImportScript = (() => {
   }
 
   // tools/importer/import-press-kit-hub.js
-  var FACETS2 = ["model", "bodywork", "motorsport", "history", "technology"];
+  var FACETS2 = [
+    "model",
+    "bodywork",
+    "derivative",
+    "motorsport",
+    "equipment",
+    "technology",
+    "years",
+    "view",
+    "company",
+    "concept",
+    "environment",
+    "happening",
+    "history",
+    "sponsorship",
+    "vip"
+  ];
+  var YEAR_TERMS = /* @__PURE__ */ new Map([
+    ["4781", "2014"],
+    ["1872", "2015"],
+    ["1572", "2016"],
+    ["11039", "2017"],
+    ["17169", "2018"],
+    ["23835", "2019"],
+    ["29912", "2020"],
+    ["29936", "2021"],
+    ["42472", "2022"],
+    ["46476", "2023"],
+    ["48727", "2024"],
+    ["57053", "2025"],
+    ["61572", "2026"]
+  ]);
+  function facetValue(facet, value) {
+    if (!/^\d+$/.test(value)) return value;
+    return facet === "years" ? YEAR_TERMS.get(value) || "" : "";
+  }
   function sourceFacets(article) {
-    const result = { template: "press_kit", category: "press-kits" };
+    const facets = { template: "press_kit", category: "press-kits" };
     const tags = [];
+    const unmapped = [];
     FACETS2.forEach((facet) => {
-      const values = [...article.classList].filter((cls) => cls.startsWith(`${facet}-`)).map((cls) => cls.slice(facet.length + 1));
-      if (values.length) {
-        result[facet] = values.join(", ");
-        tags.push(...values);
+      const values = [];
+      [...article.classList].filter((cls) => cls.startsWith(`${facet}-`)).forEach((cls) => {
+        const raw = cls.slice(facet.length + 1);
+        const value = facetValue(facet, raw);
+        if (value) values.push(value);
+        else if (/^\d+$/.test(raw)) unmapped.push(cls);
+      });
+      const unique = [...new Set(values)];
+      if (unique.length) {
+        facets[facet] = unique.join(", ");
+        tags.push(...unique);
       }
     });
-    if (tags.length) result.tags = [...new Set(tags)].join(", ");
-    return result;
+    if (tags.length) facets.tags = [...new Set(tags)].join(", ");
+    return { facets, unmapped };
   }
   var SOURCE_HOSTNAME = /^(?:www\.)?skoda-storyboard\.com$/i;
   var DIRECT_DOWNLOAD_PREFIX = "/direct-download/";
@@ -900,6 +1072,13 @@ var CustomImportScript = (() => {
     if (!isDirectDownloadZip) return href;
     return `${CDN_ORIGIN}/${url.pathname.slice(DIRECT_DOWNLOAD_PREFIX.length)}${url.hash}`;
   }
+  var BANNER_PAGE_TITLES = {
+    "skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation": "\u0160koda Auto celebrates more than 130 years of craftsmanship and innovation",
+    "skoda-museum": "\u0160koda Museum",
+    "60-years-of-the-trekka-an-suv-from-new-zealand": "60 years of the Trekka: an SUV from New Zealand",
+    "skoda-octavia-turns-30-three-decades-of-a-brand-icon": "\u0160koda Octavia turns 30: Three decades of a brand icon",
+    "125-years-of-skoda-motorsport": "125 years of \u0160koda Motorsport"
+  };
   function bannerAlt(href, img) {
     if (/\.zip(?:$|[?#])/i.test(href) || /download/i.test(img.getAttribute("src").split("/").pop())) {
       return "Download the press kit ZIP";
@@ -913,20 +1092,30 @@ var CustomImportScript = (() => {
       return "Follow @skodaautonews on the X platform";
     }
     const alt = (img.getAttribute("alt") || img.getAttribute("title") || "").trim();
-    if (alt) return alt;
+    const fileStem = img.getAttribute("src").split("/").pop().replace(/\.[a-z0-9]+(?:[?#].*)?$/i, "");
+    if (alt && alt !== fileStem) return alt;
+    const slug = href.split(/[?#]/)[0].replace(/\/+$/, "").split("/").pop();
+    if (BANNER_PAGE_TITLES[slug]) return BANNER_PAGE_TITLES[slug];
+    if (alt && slug) {
+      const words = decodeURIComponent(slug).replace(/-+/g, " ").replace(/\bskoda\b/gi, "\u0160koda");
+      return words.charAt(0).toUpperCase() + words.slice(1);
+    }
     throw new Error(`Press-kit hub banner has no accessible name: ${href}`);
   }
+  function bannerLink(source, document) {
+    const link = document.createElement("a");
+    link.href = bannerHref(source.href);
+    const img = source.querySelector("img").cloneNode(true);
+    img.removeAttribute("srcset");
+    img.removeAttribute("sizes");
+    img.alt = bannerAlt(link.href, source.querySelector("img"));
+    link.append(img);
+    return link;
+  }
   function bannerLinks(content, document) {
-    return [...content.querySelectorAll(".widget_sow-editor .textwidget a[href]")].filter((a) => a.querySelector("img[src]")).map((source) => {
-      const link = document.createElement("a");
-      link.href = bannerHref(source.href);
-      const img = source.querySelector("img").cloneNode(true);
-      img.removeAttribute("srcset");
-      img.removeAttribute("sizes");
-      img.alt = bannerAlt(link.href, source.querySelector("img"));
-      link.append(img);
+    return [...content.querySelectorAll(".widget_sow-editor .textwidget a[href]:not([data-pk-mosaic])")].filter((a) => a.querySelector("img[src]")).map((source) => {
       const p = document.createElement("p");
-      p.append(link);
+      p.append(bannerLink(source, document));
       return p;
     });
   }
@@ -964,11 +1153,14 @@ var CustomImportScript = (() => {
       const hero = article == null ? void 0 : article.querySelector(":scope > .hero");
       const content = article == null ? void 0 : article.querySelector(":scope > .content");
       if (!article || !hero || !content) throw new Error("Expected a press-kit tiles hub with hero and content");
-      const facets = sourceFacets(article);
+      const { facets, unmapped } = sourceFacets(article);
+      if (unmapped.length) {
+        console.warn(`press-kit hub ${params.originalURL}: unmapped term ids ${unmapped.join(", ")}, facet not set`);
+      }
       const description = leakedDescription(document, hero);
       if (description) facets.description = description;
       const heroBlock = parseHero(hero, document);
-      const tilesBlock = parseTiles(content, document);
+      const tilesBlock = parseTiles(content, document, { banner: (a) => bannerLink(a, document) });
       const banners = bannerLinks(content, document);
       const { intro, outro } = textWidgets(content, document);
       const main = document.body;
@@ -999,7 +1191,11 @@ var CustomImportScript = (() => {
       return [{
         element: main,
         path: WebImporter.FileUtils.sanitizePath(pathname || "/index"),
-        report: { title: document.title, template: "press-kit-hub", blocks: ["hero", "tiles"] }
+        report: __spreadValues({
+          title: document.title,
+          template: "press-kit-hub",
+          blocks: ["hero", "tiles"]
+        }, unmapped.length ? { unmappedTermIds: unmapped.join(", ") } : {})
       }];
     }
   };

@@ -1,9 +1,10 @@
 /*
  * Downloads block (SKODA-502) — the static "Media Box" download grid.
  *
- * A thumbnail grid where each tile is one downloadable asset: a 16:9 image
- * (opens the lightbox via the gallery-lightbox convention) plus a round
- * download control offering the authored size(s) (e.g. Original / 1920px).
+ * A thumbnail grid where each tile is one downloadable asset: a 16:9 image plus a round
+ * download control offering the authored size(s) (e.g. Original / 1920px). In a Media Box and a
+ * gallery group the image opens the shared lightbox (scripts/lightbox.js) on that block's
+ * images, as the source colorbox group does (SKODA-604 / #38); elsewhere it links the image.
  * No server state, no signed-URL service (SKODA-902). Spec: docs/ui-specs/downloads.md.
  *
  * Media cart (SKODA-505b, media-cart.md §3): every tile with a download also gets a round
@@ -24,7 +25,11 @@
  *
  *   - image cell = a cell whose only child wraps a <picture>
  *   - links cell = a cell whose links are the download sizes (link text = size label)
+ *   - date cell (optional, #275) = a text cell that is a source date ("23. 3. 2026")
  *   - any remaining text cell = the tile title
+ *
+ * In a Media Box the title is the source's h3 with its date above it, and a file tile (PDF / MP4
+ * without a poster) opens its file: a PDF shows the source's PDF glyph, a clip its first frame.
  *
  * i18n: user-facing control text lives in LABELS (single translation point).
  * Decoration is defensive: authors omit/add cells, so every lookup is guarded.
@@ -39,45 +44,27 @@ const LABELS = {
   sizes: (title) => `Download sizes for ${title}`,
   open: 'View image',
   videoPoster: 'View video poster',
+  // a file tile's own link (#275): it opens the file, as the source's tile does
+  openFile: (title, type) => `Open ${title || 'file'}${type ? ` (${type})` : ''}`,
   more: 'Show more',
   less: 'Show less',
   // aria-label for a tile's add-to-cart toggle and the Media Box group toggle (until the
   // cart's placeholders labels replace it)
   add: (title) => (title ? `Add to media cart: ${title}` : 'Add to media cart'),
+  // a Media Box tile's add menu rows (the source's link titles)
+  addSize: (size, title) => `Add/remove ${size} version${title ? `: ${title}` : ''}`,
+  sizeUnavailable: (size) => `${size} version can't be added to the media cart`,
   addAll: 'Add all files to the media cart',
   // the gallery group pills (visible text = the size, as on the source)
   groupSize: (size) => size,
   groupAdd: (size) => `Add all ${size} versions to the media cart`,
   groupUnavailable: (size) => `${size} versions can't be added to the media cart`,
+  // the source tiles' tooltips (their link titles, #275); the accessible names stay the above
+  tipAdd: 'Add/remove this',
+  tipDownload: 'Download this',
+  tipAddSize: (size) => `Add/remove ${size} version`,
+  tipDownloadSize: (size) => `Download ${size} version`,
 };
-
-/**
- * Inline SVG download icon (Trusted-Types safe: createElementNS, no innerHTML).
- * Reproduces the source icon-font glyph (\e012, `skoda-bnr-icons`): a thin
- * line-style down arrow (vertical stem + chevron head) over a separate tray
- * baseline. Stroked (not filled) to match the source weight; currentColor.
- * @returns {SVGElement}
- */
-function downloadIcon() {
-  const NS = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(NS, 'svg');
-  svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('width', '16');
-  svg.setAttribute('height', '16');
-  svg.setAttribute('fill', 'none');
-  svg.setAttribute('stroke', 'currentColor');
-  svg.setAttribute('stroke-width', '2');
-  svg.setAttribute('stroke-linecap', 'square');
-  svg.setAttribute('stroke-linejoin', 'miter');
-  svg.setAttribute('aria-hidden', 'true');
-  // vertical stem + chevron arrowhead, then a detached tray baseline underneath
-  const arrow = document.createElementNS(NS, 'path');
-  arrow.setAttribute('d', 'M12 3 V15 M6.5 10 L12 15.5 L17.5 10');
-  const base = document.createElementNS(NS, 'path');
-  base.setAttribute('d', 'M4 20 H20');
-  svg.append(arrow, base);
-  return svg;
-}
 
 function fileIcon() {
   const NS = 'http://www.w3.org/2000/svg';
@@ -175,6 +162,10 @@ function isLinksCell(cell) {
   return links.length > 0 && !cell.querySelector('img');
 }
 
+// the source's date line ("23. 3. 2026"); an optional cell before the title (#275)
+const DATE = /^\d{1,2}\.\s?\d{1,2}\.\s?\d{4}$/;
+export const isDate = (text = '') => DATE.test(text);
+
 /**
  * Read one authored row into an asset descriptor by content-sniffing its cells.
  * @param {Element} row
@@ -187,7 +178,9 @@ function readAsset(row) {
   let title = '';
   const sizes = [];
 
+  let date = '';
   cells.forEach((cell) => {
+    const text = cell.textContent.trim();
     if (isImageCell(cell)) {
       const img = cell.querySelector('img');
       src = img.src;
@@ -196,13 +189,15 @@ function readAsset(row) {
       cell.querySelectorAll('a[href]').forEach((a) => {
         sizes.push({ label: a.textContent.trim(), href: a.getAttribute('href') });
       });
-    } else if (cell.textContent.trim()) {
-      title = cell.textContent.trim();
+    } else if (isDate(text) && !date) {
+      date = text;
+    } else if (text) {
+      title = text;
     }
   });
 
   return {
-    src, alt, title, sizes,
+    src, alt, title, date, sizes,
   };
 }
 
@@ -213,6 +208,29 @@ let disclosureSeq = 0;
 
 // controls a clipped tile takes out of the tab order where native `inert` is missing
 const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]';
+
+/**
+ * Opens and closes a tile's size menu from its toggle: click toggles it, Escape closes it
+ * (from the menu, focus goes back to the toggle), a click outside the control closes it.
+ * @param {HTMLElement} wrap the control (toggle + menu)
+ * @param {HTMLButtonElement} toggle
+ * @param {HTMLUListElement} menu
+ */
+function wireMenu(wrap, toggle, menu) {
+  const setOpen = (on) => {
+    menu.hidden = !on;
+    toggle.setAttribute('aria-expanded', on ? 'true' : 'false');
+  };
+  toggle.addEventListener('click', () => setOpen(menu.hidden));
+  toggle.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+  menu.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { setOpen(false); toggle.focus(); }
+  });
+  document.addEventListener('click', (e) => {
+    if (!wrap.contains(e.target)) setOpen(false);
+  });
+  wrap.append(toggle, menu);
+}
 
 /**
  * Build the round download control for a tile. With one size it is a single
@@ -236,7 +254,7 @@ function buildDownload(asset) {
     a.href = href;
     a.setAttribute('download', '');
     a.setAttribute('aria-label', LABELS.download(title, label));
-    a.append(downloadIcon());
+    a.title = LABELS.tipDownload;
     wrap.append(a);
     return wrap;
   }
@@ -251,7 +269,6 @@ function buildDownload(asset) {
   toggle.setAttribute('aria-expanded', 'false');
   toggle.setAttribute('aria-haspopup', 'true');
   toggle.setAttribute('aria-controls', menuId);
-  toggle.append(downloadIcon());
 
   const menu = document.createElement('ul');
   menu.className = 'downloads-sizes';
@@ -267,26 +284,13 @@ function buildDownload(asset) {
     a.setAttribute('role', 'menuitem');
     a.setAttribute('download', '');
     a.setAttribute('aria-label', LABELS.download(title, label));
+    a.title = LABELS.tipDownloadSize(label);
     a.textContent = label;
     li.append(a);
     menu.append(li);
   });
 
-  const setOpen = (on) => {
-    menu.hidden = !on;
-    toggle.setAttribute('aria-expanded', on ? 'true' : 'false');
-  };
-  toggle.addEventListener('click', () => setOpen(menu.hidden));
-  // close on outside click / Escape
-  toggle.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
-  menu.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { setOpen(false); toggle.focus(); }
-  });
-  document.addEventListener('click', (e) => {
-    if (!wrap.contains(e.target)) setOpen(false);
-  });
-
-  wrap.append(toggle, menu);
+  wireMenu(wrap, toggle, menu);
   return wrap;
 }
 
@@ -318,12 +322,65 @@ function buildAdd(asset) {
   btn.className = 'downloads-add';
   const title = asset.title || asset.alt || '';
   btn.setAttribute('aria-label', LABELS.add(title));
+  btn.title = LABELS.tipAdd;
   btn.setAttribute('aria-disabled', 'true');
   btn.dataset.href = cartSize(asset.sizes)?.href || '';
   if (title) btn.dataset.title = title;
   const thumb = cartThumb(asset.src);
   if (thumb) btn.dataset.thumb = thumb;
   return btn;
+}
+
+/**
+ * A Media Box image tile's add control, as the source's (#275): a round + opening the tile's
+ * size menu. "Original" toggles the original in the media cart (the menu row shows the source's
+ * trash glyph while it is in, the + keeps its plus); the other sizes stay inert, as the cart
+ * holds originals only (SKODA-505a, D5). Bound by bindCart with the tiles' single toggles.
+ * @param {{title: string, alt?: string, src?: string, sizes: Array<{label,href}>}} asset
+ * @returns {HTMLDivElement}
+ */
+function buildAddMenu(asset) {
+  const title = asset.title || asset.alt || '';
+  const original = cartSize(asset.sizes);
+  menuSeq += 1;
+  const wrap = document.createElement('div');
+  wrap.className = 'downloads-action downloads-add-action';
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'downloads-add-toggle';
+  toggle.setAttribute('aria-label', LABELS.add(title));
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.setAttribute('aria-haspopup', 'true');
+  const menu = document.createElement('ul');
+  menu.className = 'downloads-sizes';
+  menu.id = `downloads-sizes-${menuSeq}`;
+  menu.setAttribute('role', 'menu');
+  menu.hidden = true;
+  toggle.setAttribute('aria-controls', menu.id);
+  asset.sizes.forEach(({ label, href }) => {
+    const li = document.createElement('li');
+    li.setAttribute('role', 'none');
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'downloads-size downloads-add-size';
+    row.setAttribute('role', 'menuitem');
+    row.setAttribute('aria-disabled', 'true');
+    row.title = LABELS.tipAddSize(label);
+    row.textContent = label;
+    if (href === original?.href) {
+      row.setAttribute('aria-label', LABELS.addSize(label, title));
+      row.dataset.href = href;
+      if (title) row.dataset.title = title;
+      const thumb = cartThumb(asset.src);
+      if (thumb) row.dataset.thumb = thumb;
+    } else {
+      row.setAttribute('aria-label', LABELS.sizeUnavailable(label));
+    }
+    li.append(row);
+    menu.append(li);
+  });
+  wireMenu(wrap, toggle, menu);
+  return wrap;
 }
 
 /**
@@ -397,10 +454,14 @@ export async function bindCart(block, addAll, load = () => Promise.all([
   import('../../scripts/media-cart-ui.js'),
   import('../../scripts/placeholders.js'),
 ])) {
-  const tiles = [...block.querySelectorAll('.downloads-add:not(.downloads-add-all)')];
+  // each tile's cart control: its round toggle, or the "Original" row of its add menu
+  const tiles = [...block.querySelectorAll('.downloads-add:not(.downloads-add-all), .downloads-add-size[data-href]')];
   if (!tiles.length) return;
   const [cart, ui, { fetchPlaceholders }] = await load();
   tiles.forEach((btn) => cart.bindCartControl(btn));
+  // an added tile's picture flies to the cart badge, as on the source (#275); decorative
+  import('../../scripts/media-cart-fly.js').then(({ installFlyToCart }) => installFlyToCart())
+    .catch(() => { /* no flight */ });
   if (!addAll) return;
   // the notice's styles before a partial add can show it (no unstyled flash)
   const [ph] = await Promise.all([fetchPlaceholders(), ui.loadCartStyles()]);
@@ -450,13 +511,72 @@ export async function bindCart(block, addAll, load = () => Promise.all([
   sync();
 }
 
+let frameObserver;
+
+/** Sets a video's src once it scrolls into view (at once without IntersectionObserver). */
+function showWhenVisible(video, src) {
+  if (!window.IntersectionObserver) {
+    video.src = src;
+    return;
+  }
+  frameObserver ??= new window.IntersectionObserver((entries) => {
+    entries.filter((entry) => entry.isIntersecting).forEach(({ target }) => {
+      frameObserver.unobserve(target);
+      target.src = target.dataset.src;
+    });
+  }, { rootMargin: '200px' });
+  video.dataset.src = src;
+  frameObserver.observe(video);
+}
+
+/**
+ * A file tile (no poster): the file-type icon and label, as a link that opens the file in a new
+ * tab. In a Media Box an MP4 shows its first frame (metadata only until then) under a play badge.
+ * @param {{title: string, sizes: Array<{label,href}>}} asset
+ * @param {boolean} mediaBox
+ * @returns {HTMLAnchorElement}
+ */
+function buildFile(asset, mediaBox) {
+  const [{ label, href }] = asset.sizes;
+  const type = (label || 'File').trim();
+  const file = document.createElement('a');
+  file.className = 'downloads-file';
+  file.href = href;
+  file.target = '_blank';
+  file.rel = 'noopener';
+  file.dataset.fileType = type.toLowerCase();
+  file.setAttribute('aria-label', LABELS.openFile(asset.title, type));
+  file.append(fileIcon());
+  const typeLabel = document.createElement('span');
+  typeLabel.className = 'downloads-file-type';
+  typeLabel.textContent = type;
+  file.append(typeLabel);
+  if (mediaBox && /\.mp4(?:[?#]|$)/i.test(href)) {
+    const video = document.createElement('video');
+    video.className = 'downloads-file-frame';
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'metadata';
+    video.setAttribute('aria-hidden', 'true');
+    video.tabIndex = -1;
+    // the first frame, not the black one before it; fetched once the tile is in view (a clipped
+    // Media Box row isn't), as the clip may be a large master
+    showWhenVisible(video, `${href.split('#')[0]}#t=0.1`);
+    const badge = document.createElement('span');
+    badge.className = 'downloads-play';
+    badge.setAttribute('aria-hidden', 'true');
+    file.append(video, badge);
+  }
+  return file;
+}
+
 /**
  * Build one download tile (<li>) from a normalized asset descriptor. Shared by
  * both the authored and mediabox-API paths.
  * @param {{src: string, alt?: string, title: string, sizes: Array<{label,href}>}} asset
  * @returns {HTMLLIElement|null} null if the asset has neither image nor download
  */
-function buildTile(asset) {
+function buildTile(asset, { mediaBox = false } = {}) {
   if (!asset.src && !asset.sizes.length) return null;
 
   const li = document.createElement('li');
@@ -485,18 +605,18 @@ function buildTile(asset) {
     }
     figure.append(thumb);
   } else {
-    const file = document.createElement('div');
-    file.className = 'downloads-file';
-    file.append(fileIcon());
-    const type = document.createElement('span');
-    type.className = 'downloads-file-type';
-    type.textContent = asset.sizes[0].label || 'File';
-    file.append(type);
-    figure.append(file);
+    figure.append(buildFile(asset, mediaBox));
+  }
+
+  if (mediaBox && asset.date) {
+    const date = document.createElement('p');
+    date.className = 'downloads-date';
+    date.textContent = asset.date;
+    figure.append(date);
   }
 
   if (asset.title) {
-    const cap = document.createElement('figcaption');
+    const cap = document.createElement(mediaBox ? 'h3' : 'figcaption');
     cap.className = 'downloads-title';
     cap.textContent = asset.title;
     figure.append(cap);
@@ -507,12 +627,94 @@ function buildTile(asset) {
     // add to cart, then download (source order); the size menu stays anchored to its toggle
     const actions = document.createElement('div');
     actions.className = 'downloads-actions';
-    actions.append(buildAdd(asset), action);
+    const sizeMenu = mediaBox && asset.src && asset.sizes.length > 1;
+    const add = sizeMenu ? buildAddMenu(asset) : buildAdd(asset);
+    actions.append(add, action);
     figure.append(actions);
   }
 
   li.append(figure);
   return li;
+}
+
+const fileType = (href = '') => ((href.split(/[?#]/)[0].match(/\.([a-z0-9]+)$/i) || [])[1] || '')
+  .toUpperCase();
+
+/**
+ * One shared-lightbox item for a tile, as the source colorbox panel: the title, the add /
+ * download / link actions on the original, the file metadata the row carries (type, date) and
+ * the page as the related article. A clip shows its poster, with the MP4 as the download.
+ * @param {{src: string, alt?: string, title: string, date?: string, sizes: Array}} asset a tile
+ * @param {{title?: string, href?: string}} [related] the related article (this page)
+ * @returns {object} a lightbox item (scripts/lightbox.js)
+ */
+export function lightboxItem(asset, related = {}) {
+  const href = cartSize(asset.sizes)?.href || '';
+  const title = asset.title || asset.alt || '';
+  const caption = document.createElement('div');
+  const para = (...nodes) => {
+    const p = document.createElement('p');
+    p.append(...nodes);
+    caption.append(p);
+    return p;
+  };
+  if (title) para(title);
+  const meta = [['File type', fileType(href)], ['Published', asset.date]].filter(([, v]) => v);
+  if (meta.length) {
+    const p = para();
+    meta.forEach(([label, value], i) => {
+      if (i) p.append(document.createElement('br'));
+      const strong = document.createElement('strong');
+      strong.textContent = value;
+      p.append(`${label}: `, strong);
+    });
+  }
+  if (related.title && related.href) {
+    const a = document.createElement('a');
+    a.href = related.href;
+    a.textContent = related.title;
+    para('Related article: ', a);
+  }
+  const item = {
+    src: asset.src, alt: title, caption, cartHref: href, thumb: cartThumb(asset.src),
+  };
+  // a clip shows its poster: the MP4 is the download action, never the stage, because the
+  // AEM Assets original is served as an attachment (a player frame would download it)
+  if (href) Object.assign(item, { download: href, link: href });
+  return item;
+}
+
+/**
+ * Open the shared lightbox from the tile images, on the block's whole image set (the source
+ * colorbox `rel` group). Modifier clicks keep the image link; the lightbox code loads on the
+ * first click, and if it fails to load the link is followed.
+ * @param {Array<{asset: object, thumb: HTMLAnchorElement}>} entries tiles in grid order
+ */
+function wireLightbox(entries) {
+  if (!entries.length) return;
+  const related = {
+    title: document.querySelector('main h1')?.textContent.trim() || '',
+    href: window.location.pathname,
+  };
+  let pending = null;
+  const lightbox = () => {
+    pending = pending || import('../../scripts/lightbox.js').then(({ buildLightbox }) => (
+      buildLightbox(document.body, entries.map(({ asset }) => lightboxItem(asset, related)))));
+    return pending;
+  };
+  entries.forEach(({ thumb }, index) => {
+    thumb.addEventListener('click', async (e) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      try {
+        (await lightbox()).open(index, thumb);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.warn('downloads: the lightbox did not load', error);
+        window.location.assign(thumb.href);
+      }
+    });
+  });
 }
 
 /**
@@ -551,13 +753,18 @@ export default async function decorate(block) {
     assets = [...block.children].map(readAsset);
   }
 
+  const lightboxEntries = [];
   assets.forEach((asset) => {
-    const tile = buildTile(asset);
-    if (tile) list.append(tile);
+    const tile = buildTile(asset, { mediaBox });
+    if (!tile) return;
+    list.append(tile);
+    const thumb = tile.querySelector('.downloads-thumb');
+    if (thumb) lightboxEntries.push({ asset, thumb });
   });
 
   block.replaceChildren(list);
-  const addAll = (mediaBox || gallery) && list.querySelector('.downloads-add')
+  if (mediaBox || gallery) wireLightbox(lightboxEntries);
+  const addAll = (mediaBox || gallery) && list.querySelector('.downloads-add, .downloads-add-size[data-href]')
     ? buildAddAll(block, gallery) : null;
   bindCart(block, addAll).catch((e) => {
     // eslint-disable-next-line no-console
@@ -600,6 +807,11 @@ export default async function decorate(block) {
     toggle.type = 'button';
     toggle.className = 'downloads-more';
     toggle.setAttribute('aria-controls', list.id);
+    // the pill's words: the locale's placeholders sheet, else English (#243)
+    const words = { more: LABELS.more, less: LABELS.less };
+    const syncLabel = () => {
+      toggle.textContent = block.classList.contains('downloads-expanded') ? words.less : words.more;
+    };
     const compact = window.matchMedia('(min-width: 520px)');
     const medium = window.matchMedia('(min-width: 768px)');
     const wide = window.matchMedia('(min-width: 992px)');
@@ -630,7 +842,7 @@ export default async function decorate(block) {
       else list.style.removeProperty('--dl-rows-height');
       toggle.hidden = !overflow;
       toggle.setAttribute('aria-expanded', String(expanded));
-      toggle.textContent = expanded ? LABELS.less : LABELS.more;
+      syncLabel();
     };
     toggle.addEventListener('click', () => {
       const expanded = block.classList.toggle('downloads-expanded');
@@ -645,6 +857,18 @@ export default async function decorate(block) {
     if (window.ResizeObserver) {
       const observer = new window.ResizeObserver(syncVisibility);
       [...list.children].forEach((tile) => observer.observe(tile));
+    }
+    // `Show More` / `Show Less` rows of /{locale}/placeholders (the source's togglebox words,
+    // e.g. CS "Zobrazit více" / "Zobrazit méně"); a missing sheet or key keeps English. Awaited
+    // before the first label, so a translated page never shows the English pill first (#348
+    // review); the sheet is memoized (the Media Box cart reads the same one).
+    try {
+      const { fetchPlaceholders } = await import('../../scripts/placeholders.js');
+      const ph = await fetchPlaceholders();
+      words.more = ph.showMore || LABELS.more;
+      words.less = ph.showLess || LABELS.less;
+    } catch (e) {
+      // the English words stay
     }
     syncVisibility();
   }

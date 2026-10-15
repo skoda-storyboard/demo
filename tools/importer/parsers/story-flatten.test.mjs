@@ -506,6 +506,55 @@ test('nested blocks stay inside the highlight section (2-cell row → Columns, c
   ]);
 });
 
+// PO 2026-10-13: the panel inset as the source. Live shape: the cruise-control layout gives its
+// text widgets `margin:0px 0px 0px 20px` (30 / 10px in); the theme default is `0 15px`, and
+// `15px` all round up to 780px.
+const panelRow = (id, widgets, cells = 1) => `<div id="${id}" class="panel-grid panel-has-style"><div class="panel-row-style">
+  ${Array.from({ length: cells }, (_, c) => `<div class="panel-grid-cell">${widgets.map(([kind, n, html]) => `<div id="panel-${id.slice(3)}-${c}-${n}" class="so-panel widget widget_${kind}">
+    <div class="panel-widget-style"><div class="so-widget-${kind}"><div class="siteorigin-widget-tinymce textwidget">${html}</div></div></div></div>`).join('')}</div>`).join('')}
+  </div></div>`;
+const geometryRows = (table) => [...table.querySelectorAll('tr')].slice(2).map((tr) => [...tr.children].map((td) => td.textContent));
+
+test('a panel with its own layout geometry carries it as Section Metadata rows; the theme default carries none', { skip: domSkip }, () => {
+  const css = '#pg-7-1> .panel-row-style, #pg-7-2> .panel-row-style, #pg-7-3> .panel-row-style, #pg-7-4> .panel-row-style, #pg-7-5> .panel-row-style { background-color:#0e3a2f }'
+    + ' #pl-7 #panel-7-1-0-0 , #pl-7 #panel-7-1-0-1 { margin:0px 0px 0px 20px }'
+    + ' #pl-7 #panel-7-2-0-0 { margin:0px 15px 0px 15px }'
+    + ' #pg-7-3> .panel-row-style { padding:0px 15px 0px 15px } #pl-7 #panel-7-3-0-0 { margin:15px 0px 15px 0px }'
+    + ' #pl-7 #panel-7-4-0-0 { margin:0px 15px 0px 15px } #pl-7 #panel-7-4-0-1 { margin:0px 15px 0px 15px }'
+    + ' #pl-7 #panel-7-5-0-0 { margin:0px 0px 0px 15px }'
+    + ' @media (max-width:780px){ #pl-7 #panel-7-2-0-0 { margin:15px 15px 15px 15px } #pg-7-3> .panel-row-style { padding:15px } #pl-7 #panel-7-3-0-0 { margin:15px 15px 15px 15px } #pl-7 #panel-7-4-0-0 { margin:15px 15px 15px 15px } #pl-7 #panel-7-4-0-1 { margin:15px 15px 15px 15px } }';
+  const d = storyDoc(css, [
+    editorRow('pg-7-0', '<p>Intro</p>'),
+    panelRow('pg-7-1', [['sow-editor', 0, '<h3>Cruise control</h3>'], ['sow-editor', 1, '<p>Stop and Go</p>']]),
+    panelRow('pg-7-2', [['sow-editor', 0, '<p>Default</p>']]),
+    panelRow('pg-7-3', [['sow-editor', 0, '<p>Padded</p>']]),
+    panelRow('pg-7-4', [['sow-editor', 0, '<p>With a gallery</p>'], ['skoda-carousel-widget', 1, carouselItem('a.jpg', 'A') + carouselItem('b.jpg', 'B')]]),
+    panelRow('pg-7-5', [['sow-editor', 0, '<p>Two cells</p>']], 2),
+  ]);
+  markHighlights(d);
+  const marked = (id) => [...d.querySelector(`#${id}`).attributes].filter((a) => a.name.startsWith('data-highlight-')).length;
+  assert.deepEqual(['pg-7-1', 'pg-7-2', 'pg-7-3', 'pg-7-4', 'pg-7-5'].map(marked), [2, 0, 4, 2, 0]);
+  const content = d.querySelector('.content');
+  parse(content, { document: d });
+  const metas = [...content.children].filter((n) => n.dataset.block === 'Section Metadata' && /highlight/.test(n.textContent));
+  assert.equal(metas.length, 5);
+  assert.deepEqual(metas.map(geometryRows), [
+    [['highlight-margin', '0px 0px 0px 20px'], ['highlight-margin-mobile', '0px 0px 0px 20px']],
+    [],
+    [['highlight-padding', '0px 15px 0px 15px'], ['highlight-padding-mobile', '15px 15px 15px 15px'],
+      ['highlight-margin', '15px 0px 15px 0px'], ['highlight-margin-mobile', '15px 15px 15px 15px']],
+    [['highlight-gallery-margin', '0px 15px 0px 15px'], ['highlight-gallery-margin-mobile', '15px 15px 15px 15px']],
+    [],
+  ], 'cruise (no mobile rule: the desktop one), default, row padding, a gallery with a margin, a 2-cell row (per-cell margins: none)');
+});
+
+test('a panel whose text widget has no margin at all is 0, desktop and mobile', { skip: domSkip }, () => {
+  const d = storyDoc('#pg-8-1> .panel-row-style { background-color:#0e3a2f }', [panelRow('pg-8-1', [['sow-editor', 0, '<p>Camouflage</p>']])]);
+  markHighlights(d);
+  assert.equal(d.querySelector('#pg-8-1').getAttribute('data-highlight-margin'), '0px 0px 0px 0px');
+  assert.equal(d.querySelector('#pg-8-1').getAttribute('data-highlight-margin-mobile'), '0px 0px 0px 0px');
+});
+
 test('without markHighlights (no preprocess) rows still linearize into the one body section', { skip: domSkip }, () => {
   const d = storyDoc('#pg-6-1> .panel-row-style { background-color:#0e3a2f }', [
     editorRow('pg-6-0', '<p>Intro</p>'), editorRow('pg-6-1', '<p>Panel</p>'),
@@ -683,4 +732,33 @@ test('parse: equal or unmeasured rows stay plain Columns', { skip: domSkip }, ()
   const none = splitStory({ css: '', portrait: PORTRAIT_235 });
   parse(none.querySelector('.entry-content'), { document: none });
   assert.equal(none.querySelector('table').dataset.block, 'Columns', 'without markCellWidths');
+});
+
+// --- bold headings (#296 review: Slavia's "Technical improvements" is not bold on origin) ---------
+const { markBoldHeadings, restoreBoldHeadings, isBoldHeading } = await import('./story-flatten.js');
+
+test('bold headings: only wholly bold source headings get their <strong> back', { skip: domSkip }, () => {
+  const d = domDoc(`<article><div class="entry-content">
+    <h3><strong>Škoda Kylaq sets out on its journey from its home country of India</strong></h3>
+    <h3>Technical improvements</h3>
+    <h3><b>During the travels</b>, <strong>Kylaq</strong> also visited Nepal</h3>
+    <h3> <strong>Careful</strong> <strong>Planning</strong> </h3>
+    <h2>Completely Different Traffic Conditions</h2>
+  </div></article>`);
+  const [kylaq, slavia, partly, split] = d.querySelectorAll('h3');
+  const h2 = d.querySelector('h2');
+  assert.equal(isBoldHeading(kylaq), true);
+  assert.equal(isBoldHeading(slavia), false, 'Slavia: unbolded on origin');
+  assert.equal(isBoldHeading(partly), false, 'a partly bold heading is not a bold heading');
+  assert.equal(isBoldHeading(split), true, 'every word bold, in two runs');
+  assert.equal(isBoldHeading(h2), false);
+  assert.equal(markBoldHeadings(d.querySelector('.entry-content')), 2);
+  // helix-importer's preProcess (DOMUtils.reviewHeadings) then strips the headings' bold tags
+  d.querySelectorAll('strong, b').forEach((el) => el.replaceWith(...el.childNodes));
+  assert.equal(restoreBoldHeadings(d.body), 2);
+  assert.equal(kylaq.innerHTML, '<strong>Škoda Kylaq sets out on its journey from its home country of India</strong>');
+  assert.equal(slavia.querySelector('strong'), null, 'Slavia stays plain (300)');
+  assert.equal(partly.querySelector('strong'), null);
+  assert.equal(split.querySelector('strong').textContent.trim(), 'Careful Planning');
+  assert.equal(d.querySelectorAll('[data-skoda-bold]').length, 0, 'no mark reaches DA');
 });

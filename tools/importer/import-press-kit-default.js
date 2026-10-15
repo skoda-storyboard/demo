@@ -6,6 +6,7 @@ import content from './parsers/press-kit-content.js';
 import media from './parsers/press-kit-media.js';
 import quote, { markQuotes, parseFigure } from './parsers/quote.js';
 import footnotes, { markFootnotes } from './parsers/footnotes.js';
+import answerLayout, { markAnswerLayout } from './parsers/answer-layout.js';
 import layout from './transformers/skoda-press-kit-default-layout.js';
 import metadata from './transformers/skoda-metadata.js';
 import normalizeImages from './transformers/skoda-images.js';
@@ -106,6 +107,9 @@ export default {
     // Small print, read from the source as published, before helix-importer's clean-up
     // (SKODA-805d).
     document.querySelectorAll('article.press_kit .entry-content').forEach(markFootnotes);
+    // An answer's empty paragraphs and rows and its unequal image cells, while the panels CSS is
+    // still in the document (#275).
+    document.querySelectorAll('article.press_kit .entry-content').forEach(markAnswerLayout);
   },
   transform: (payload) => {
     const { document, url, params } = payload;
@@ -158,6 +162,7 @@ export default {
     // the kit's FAQ chapter (`…/frequently-asked-questions/`) emits `Accordion (faq)` (SKODA-807)
     const faq = /\/frequently-asked-questions\/?$/.test(new URL(params.originalURL).pathname);
     content(body, { document, faq });
+    answerLayout(body, payload);
     // After the layout, whose source-table pass would flatten a Quote table.
     body.querySelectorAll('p[data-skoda-quote]').forEach((p) => quote(p, payload));
     body.querySelectorAll('p[data-skoda-fragment]').forEach((p) => {

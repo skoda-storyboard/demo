@@ -28,7 +28,8 @@
     the 7 sub-category archives stayed empty. Category archives now use `categories: <term slug>`; the index
     `categories` column holds each story's WP categories plus their ancestors (`SKODA-METADATA-SCHEMA.md`).
   - The old path-scoped `Listing` matched no row, so every archive was empty.
-  - The source pager ("4 / 19", Load more) is removed.
+  - The source pager ("4 / 19", Load more) is removed. The `stories` block rebuilds the count row
+    and the Load more spacing: SKODA-209a (#330).
   - The source archives list stories only (post type `post`).
 - `archive-hero` (new) replaces `hero-banner` here: the banner picture + `<h1>` from the source labels
   ("Models Peaq", as in the spec) as default content, because the `Hero` block is an empty stub on main. Title = the term.

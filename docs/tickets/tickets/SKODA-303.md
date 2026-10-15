@@ -34,7 +34,9 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
 - [x] 6 locales (en/cs/de/sk/sr/sl) render as **inline text links** in the tools region (topbar-right desktop `12px`, drawer-bottom mobile `16px`).
 - [x] Each locale links to its per-locale tree; current = bold ink, others links.
       *The trees `/cs` … `/sl` don't exist on EDS yet (404, only `/en`); links kept by decision (2026-09-30).*
-- [x] Inactive-locale contrast ≥ 4.5:1 (darken source `#7c7d7e`): `--skoda-grey-700`, 5.45 / 6.03 / 6.81:1.
+- [ ] ~~Inactive-locale contrast ≥ 4.5:1 (darken source `#7c7d7e`): `--skoda-grey-700`, 5.45 / 6.03 / 6.81:1.~~
+      **Superseded (PO, 2026-10-13, #243):** the inactive links use the source `#7c7d7e` (`--skoda-grey-500`),
+      3.30 / 3.65 / 4.12:1, below AA by decision (SKODA-703: "as source, accepted"). See the #243 notes below.
 - [x] Keyboard-accessible with an accessible name; `npm run lint` passes.
 
 ## Implementation (2026-09-30, developer-verified; QA pending)
@@ -86,7 +88,7 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
   - the drawer is `min-width: min(375px, 100%)`, so it no longer runs 55px off a 320px screen and cuts off the locale row.
 - **Result:** the switcher's values are identical to live at every width, and both visual diffs are 0% at the same
   absolute position.
-- **Review follow-up:** switching language keeps the page path, as live. Each locale links the current path with only
+- **Review follow-up (superseded by SKODA-303a, below):** switching language keeps the page path, as live. Each locale links the current path with only
   the locale segment swapped (`/en/emobility/x` → `/cs/emobility/x`); an authored external link still wins, and pages
   outside a locale tree use the authored target. The live site also translates the category and slug segments
   (`/cs/e-mobilita-cs/…`); EDS keeps them as they are, so a translated tree has to mirror the EN paths for these
@@ -100,6 +102,95 @@ Measurable gates live in [`language-switcher.md` §9](../../ui-specs/language-sw
   On the Media Room, DE links `https://www.skoda-media.de/`. The pilot links the locale homes.
 - **`/en/` is a 404 on EDS** (the home is `/en`), and so is the authored Stories tab link `/en/` in `/nav` (SKODA-301 / 308).
   When the locale trees are migrated, check that `/cs/` … resolve, or author them as `/cs` …
+
+**SKODA-303a follow-up (#243, decided 2026-10-08, branch `skoda-303a-locale-links`):**
+- **Conflict:** SKODA-609's link pass already sent the locale links to the live site in a new tab, so the "keep the
+  page path" rule above never applied on `main`, and `header-locales.test.mjs` failed.
+- **Rule (Lars on #243, adopted by the PO; supersedes the first "live locale home" pass):** the switcher is generated
+  from the page's **hreflang alternates** (`alternates` metadata). Each locale links its declared translated URL;
+  nothing is inferred from the locale prefix (`localizedPath` removed); locales without a translation are omitted;
+  `x-default` is ignored; the current locale is plain text; desktop and the drawer share one list; there is no
+  locale-home fallback. Links open in the same tab, as the source. Media Room DE keeps the visible source behaviour
+  (`skoda-media.de`, new tab) through the nav row's authored link.
+- **PO, 2026-10-08: the switch never navigates to the live site.** Only translations migrated to EDS are linked
+  (Lars's caveat: hreflang proves availability on the source, not on EDS). For M1 one page family is migrated: the
+  Epiq story in EN + CS / DE / SK / SR (live has no SL). Every other page shows only its own language.
+- **Code:** `header-locales.js` (`parseAlternates`, `permittedTranslation`: same-site pages in their own locale
+  tree only; superseded by the native hreflang links, see the #299 review below), the list is marked `data-link-policy="resolved"`, and `scripts/links.js` leaves such links alone;
+  `scripts.js` sets `<html lang>` from the locale tree. The importer doesn't write `alternates` (it can't know what
+  is migrated): `tools/importer/build-locale-alternates.mjs` derives them from the source hreflang for the pairs on
+  EDS and writes `URL` + `alternates` rows into the bulk `/metadata` sheet (plus `/{locale}/**` → `/{locale}/nav`,
+  `/{locale}/footer` with `--chrome`).
+- **Content (DA preview, 2026-10-08):** the 4 translated stories (story importer, `urls-story-detail-locales.txt`;
+  metadata + block gates pass, images on the media bus) and the translated chrome per locale (`/{locale}/nav`,
+  `/{locale}/nav-newsletter`, `/{locale}/footer`, `import-locale-*.js`, `urls-locale-chrome.txt`). The DE / SK / SR
+  pages keep the English `/footer` (PO, M1): their source footer links the cookie-policy PDF on
+  `assets.cookies.skoda-auto.com`, which the binary gate holds (not in DAM).
+  `/media-room/nav` was published (it still had the locale homes and `/de/`).
+- **Known gaps:** the Subscribe panel's thank-you text stays English (no source text, the source shows its ESP
+  response); the header's search scope labels are English strings (SKODA-1003); the app badges keep the English
+  artwork; the translated menus' targets aren't migrated, so the link policy sends them to the live site.
+- **Review (#299, Lars, 2026-10-09; addressed 2026-10-12): native EDS hreflang metadata is the source of truth.**
+  - **Generator:** `build-locale-alternates.mjs` writes native `hreflang:<code>` columns into `/metadata` instead of
+    the custom comma-separated `alternates` column (now removed from the sheet). Each row has the page's own language
+    (self-hreflang) and its migrated translations, plus `hreflang:x-default` when the source declares it and its
+    target is migrated (today only the home has one, `/`, which is not a page, so none is written). Values are
+    absolute URLs on `--origin` (default `https://main--demo--skoda-storyboard.aem.live`; the production domain at
+    go-live). `pickHreflang` (skoda-metadata-extract.mjs) replaces `pickAlternates`. The curated rows (nav / footer /
+    section / robots) are kept as they were.
+  - **Switcher:** `header-locales.js` `pageHreflangs(document)` reads
+    `document.head.querySelectorAll('link[rel~="alternate"][hreflang][href]')` (not `getMetadata()`, which only
+    reads `<meta>`; `aem.js` untouched). `x-default`, unknown codes, alternate stylesheets and repeats are skipped;
+    the current language is plain text. A target must be this site (current host, the host of the page's own
+    hreflang link, or a branch / stage host of the same EDS site) in its own locale tree; its path opens on the
+    current host. No prefix inference, no locale-home fallback. `parseAlternates` and the `alternates` meta are gone,
+    so a stale meta can't win over the native links (the reviewer's reproduction is a test).
+  - **Content (DA preview, 2026-10-12):** `/metadata` re-generated and previewed (33 rows: the 5 Epiq pages with
+    `hreflang:en|cs|de|sk|sr`, 28 curated rows unchanged); EDS now renders the 5 head links on each Epiq page.
+    Backup: `.migration/wt303a-scratch/metadata.da.before-299-review.json`. Publish after merge, with the 4 stories
+    and 9 fragments.
+  - **Merge:** latest `main` merged; `tools/importer/media/media-manifest.json` resolved row by row (3312 rows, 40
+    from this branch, 4 from main, no row changed on both sides).
+- **Re-review (#299, Lars, 2026-10-12): self-hreflang and `x-default` without another migrated language.**
+  `migratedHreflang()` dropped the `languages.length > 1` gate: every kept entry (target migrated) is written, so a
+  page whose translations are not migrated keeps its `hreflang:en` and, when the source declares one and its target
+  is migrated, `hreflang:x-default`. The switcher is unchanged: EN alone as plain text, `x-default` skipped. Dry run
+  on preview: 282 rows (the 5 Epiq pages `en|cs|de|sk|sr` as before, 277 migrated EN pages with `hreflang:en` only),
+  no `x-default` (only the source home declares one, `/`, not a page). Authored-link overrides / new tab and
+  `/metadata` as generator-owned are accepted demo limitations (reviewer).
+  - **Content (DA preview, 2026-10-12):** `/metadata` re-generated with
+    `--stage preview --chrome cs,de,sk,sr --chrome-footer cs --push`: 310 rows (28 curated rows identical, the 5 Epiq
+    rows unchanged, 277 `hreflang:en` rows). Backup: `.migration/wt303a-scratch/metadata.da.before-299-rereview.json`.
+    A first run without `--chrome` dropped the 4 `/{locale}/**` chrome rows (re-pushed at once). `mergeSheet()` now
+    replaces chrome rows only when the run brings its own, so a run without `--chrome` keeps them (tested).
+- **QA re-test (#243, Kondalu, 2026-10-13; fixed 2026-10-13, branch `bug-243-locale-qa`).** Measured on the Epiq
+  family against the source at 1440 / 1080 / 992 / 768 / 390:
+  1. **Language link colour:** EDS `--skoda-grey-700` `#5a5b5c`, the source `#7c7d7e`. **PO decision (2026-10-13):
+     match the source**, accepting that it is below AA (3.30:1 on the `#e6e6e6` topbar, 3.65 on `#f1f1f1`, 4.12 on
+     white). The inactive links use `--skoda-grey-500` in the topbar and the drawer. This supersedes the contrast AC
+     above. The Subscribe CTA keeps `--skoda-grey-700` (not reported). axe now lists the 4 inactive links under
+     `color-contrast`, as on the source (SKODA-703: "as source, accepted").
+  2. **"Show more" untranslated:** the Media Box pill read the Downloads block's English label. It now reads
+     `Show More` / `Show Less` from `/{locale}/placeholders` (English without a sheet or key). The sheets hold the
+     source's togglebox words: CS "Zobrazit více / méně", DE "Mehr / Weniger anzeigen", SK "Zobraziť viac / menej",
+     SR "Prikaži više / manje" (DA preview; `/cs/placeholders` already had 8 rows, kept). Publish with the pages.
+  3. **Related Stories missing:** the CS / SK pages had an index rail that stays empty (no `/{locale}/query-index`,
+     SKODA-1001, and their related stories aren't migrated); DE had none (its source rail story was published on
+     13 Oct, after the import); SR has none on the source either. **PO decision: curated rail from the source** on
+     translated stories only. The story importer keeps the source cards (image, date, title linking the source story
+     in a new tab), CS 10 / SK 7 / DE 1, the same order and card box as the source at every width. The source clips
+     titles in the browser (`data-dotdotdot`), so the importer restores the full title from the image `alt` and the
+     rail's CSS clamps it, as for index cards. EN keeps its index rail.
+  4. **DE Media Box missing:** the source DE page has no Media Box either. No change.
+  - **Re-import (DA preview):** CS, DE, SK re-imported with today's importer. Besides the rail they pick up `main`'s
+    h3 band headings (#296) and the Footnotes block, as the EN page. The CS page's inline newsletter card is gone
+    (SKODA-840): `/cs/fragments/newsletter-card` was imported from the CS source story and pushed to preview.
+  - **Found and fixed on the way:** `scripts/links.js` sent a Fragment block's `/cs/fragments/…` reference to the
+    live site (the locale rule), so a translated story's shared newsletter card never loaded. Fragment references
+    are now left alone.
+  - **Not changed (notes):** DE / SK / SR have no newsletter widget on the source and no fragment, so the runtime's
+    empty Fragment link stays in their sidebar (axe `link-name` 1, the same as `main`). The source shows the DE
+    rail's one title on 2 lines at ≥ 992; the rail clamps it to 1, as for every index card.
 
 ## Dependencies
 - Upstream: SKODA-301 (Header + nav fragment) / Downstream: SKODA-1003 (language-negotiated root routing + per-locale placeholders)

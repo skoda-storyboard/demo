@@ -11,7 +11,8 @@
  *   - blocks/listing/listing-logic.mjs — scopeRows/filterRows/sortRows/paginate.
  *   - scripts/card-teaser.js  — synthesizes the card cells the carousel expects.
  * A rail-specific need (drop already-shown slugs) is met with `exclude`/config
- * here, not by forking the shared logic.
+ * here, not by forking the shared logic; the Media Room News rail also skips the
+ * pages the promo box above it shows, as the source does (#332, skipsPromo).
  *
  * Deferred build (carousel-rails.md §7): the 4+ home rails must not all build on
  * load, so we build + decorate + load the inner carousel behind an
@@ -119,8 +120,9 @@ export function parseConfig(block) {
 
 /*
  * Pure row selection for the rail: scope → facet filter → exclude already-shown
- * slugs → sort → slice. Exported so tests exercise the production pipeline (the
- * reuse gate: it must delegate to listing-logic, not a fork). Returns index rows.
+ * slugs and pages (`cfg.shown`, whole paths) → sort → slice. Exported so tests
+ * exercise the production pipeline (the reuse gate: it must delegate to
+ * listing-logic, not a fork). Returns index rows.
  */
 export function selectRows(all, cfg) {
   // an `order` picks the rows itself: those pages in that order, whatever their template (the
@@ -138,8 +140,64 @@ export function selectRows(all, cfg) {
   if (cfg.exclude.length) {
     scoped = scoped.filter((r) => !cfg.exclude.some((s) => String(r.path || '').includes(s)));
   }
+  // pages a block above already shows (the promo box's, #332), matched by whole path
+  if (cfg.shown?.length) {
+    const shown = new Set(cfg.shown);
+    scoped = scoped.filter((r) => !shown.has(orderPaths([r.path || ''])[0]));
+  }
   scoped = sortRows(scoped, cfg.sort);
   return paginate(scoped, cfg.limit);
+}
+
+/**
+ * The pages a promo box shows, as index paths (no host, trailing slash or `.html`), in card
+ * order and without repeats (#332).
+ * @param {Element|null} promo the promo-box block
+ * @returns {string[]}
+ */
+export function shownPaths(promo) {
+  const hrefs = [...(promo?.querySelectorAll('.card-teaser-link[href]') || [])]
+    .map((a) => a.getAttribute('href'));
+  return [...new Set(orderPaths(hrefs))];
+}
+
+// How long a News rail waits for the promo box above it before it builds anyway (#332).
+export const PROMO_WAIT_MS = 3000;
+
+/**
+ * The pages the page's promo box shows, once it has loaded (its cards are built before the
+ * block is marked loaded). The source's Media Room News rail never repeats them (#332). No
+ * promo box, or one that does not load in time, shows nothing to skip.
+ * @param {Document|Element} root where to look for the promo box
+ * @param {number} [timeout]
+ * @returns {Promise<string[]>}
+ */
+export function promoShownPaths(root, timeout = PROMO_WAIT_MS) {
+  const promo = root.querySelector?.('main .promo-box');
+  if (!promo) return Promise.resolve([]);
+  const loaded = () => promo.dataset.blockStatus === 'loaded';
+  if (loaded()) return Promise.resolve(shownPaths(promo));
+  if (!window.MutationObserver) return Promise.resolve([]);
+  return new Promise((resolve) => {
+    let timer;
+    const observer = new MutationObserver(() => {
+      if (!loaded()) return;
+      observer.disconnect();
+      clearTimeout(timer);
+      resolve(shownPaths(promo));
+    });
+    observer.observe(promo, { attributes: true, attributeFilter: ['data-block-status'] });
+    timer = setTimeout(() => { observer.disconnect(); resolve([]); }, timeout);
+  });
+}
+
+/**
+ * Whether an index rail skips what the promo box shows: the Media Room's News rail (a
+ * `press_release` rail), as the source does (#332). Press bands, curated and hand-picked
+ * (`order`) rails, and every other rail keep their rows.
+ */
+export function skipsPromo(cfg, { press = false, curated = false } = {}) {
+  return cfg.layout === 'news' && !press && !curated && !cfg.order?.length;
 }
 
 // The config keys parseConfig understands (normalized via toClassName, so
@@ -237,6 +295,10 @@ export function mediaToolbar(row) {
 // caption card, the title under the image (carousel-rails.md §2, SKODA-611b).
 export const TAXONOMY_TEMPLATES = new Set(['skoda_model', 'skoda_series']);
 
+// Image / video asset rows render the media card: the 16:9 image, then the date, the title and
+// the cart / download toolbar under it (carousel `media caption <template>`, as on model pages).
+export const MEDIA_TEMPLATES = new Set(['image', 'video']);
+
 /*
  * Synthesize one carousel row (image cell + body cell) from an index row. The
  * body is returned as buildBlock's `{ elems }` form so the date <p> and title
@@ -311,11 +373,11 @@ export function viewAllLabel(block) {
  * Image and video rails open the shared lightbox (the source colorbox; videos play in it)
  * instead of the bare file / vimeo.com: a click anywhere on a card except its toolbar opens
  * it at that card. Modifier clicks keep
- * the link (new tab). The overlay lives on <body>: a fixed layer inside the carousel
- * would be clipped by its transforms.
+ * the link (new tab), and the "All" end card is not an asset: it keeps its link. The overlay
+ * lives on <body>: a fixed layer inside the carousel would be clipped by its transforms.
  */
-function wireMediaLightbox(carousel, rows) {
-  const cards = [...carousel.querySelectorAll('.carousel-track > *')];
+export function wireMediaLightbox(carousel, rows) {
+  const cards = [...carousel.querySelectorAll('.carousel-track > :not(.story-rail-all)')];
   if (!cards.length) return;
   const lightbox = buildLightbox(document.body, rows.slice(0, cards.length).map(feedLightboxItem));
   carousel.addEventListener('click', (e) => {
@@ -447,13 +509,16 @@ function appendAllCard(carousel, href, label, name = '') {
  * Storyboard home's bands and the Media Room's Models band), where the Models rail keeps
  * the source's model ladder and models + series show caption cards. A full post rail in a
  * home band ends with the source's "All" card; models and series, which show every item,
- * have none. An explicit `Story Rail (press)` band keeps its own layout (SKODA-224).
- * @returns {{ classes: string[], endCard: boolean }}
+ * have none. The Media Room's Images / Videos bands take the model ladder too, with the media
+ * card (`carousel`: the inner carousel's variants) and the "All" end card, as on the source.
+ * An explicit `Story Rail (press)` band keeps its own layout (SKODA-224).
+ * @returns {{ classes: string[], carousel: string[], endCard: boolean }}
  */
 export function railLayout({
   press, curated, landing, homeBand, layout, template, viewAll,
 }) {
   const classes = [];
+  const carousel = [];
   const indexRail = !press && !curated;
   if (indexRail && landing && (layout === 'news' || homeBand)) {
     classes.push('story-rail-wide');
@@ -461,16 +526,22 @@ export function railLayout({
     if (homeBand) classes.push('story-rail-home');
     if (template === 'skoda_model') classes.push('story-rail-models');
     if (TAXONOMY_TEMPLATES.has(template)) classes.push('story-rail-caption');
+    if (homeBand && MEDIA_TEMPLATES.has(template)) {
+      classes.push('story-rail-media');
+      carousel.push('media', 'caption', template);
+    }
   }
   // the end card is sized by the wide layout, so only a wide home-band rail has one
   const endCard = classes.includes('story-rail-wide') && homeBand && !!viewAll
     && !TAXONOMY_TEMPLATES.has(template);
-  return { classes, endCard };
+  return { classes, carousel, endCard };
 }
 
 /**
  * The rail heading's element: the home bands' section headings are h3 on the source
- * (.search-results-heading on both homes, #272); every other rail keeps its h2.
+ * (.search-results-heading on both homes, #272); every other rail keeps its h2. Only for a
+ * heading the block builds itself: the model pages' rail titles are authored section headings
+ * (h3 since #284, from the importer).
  * @param {string[]} classes the rail's layout classes (railLayout)
  */
 export function railHeadingTag(classes) {
@@ -483,7 +554,7 @@ export default async function decorate(block) {
   const press = block.classList.contains('press');
   const allLabel = viewAllLabel(block);
   const variants = [...block.classList].filter((c) => !OWN_CLASSES.has(c));
-  const { classes, endCard } = railLayout({
+  const { classes, carousel: carouselVariants, endCard } = railLayout({
     press,
     curated,
     landing: document.body.classList.contains('page'),
@@ -531,9 +602,14 @@ export default async function decorate(block) {
     let indexRows = [];
     if (!curated) {
       try {
-        const all = await loadQueryIndex(cfg.index);
+        const [all, shown] = await Promise.all([
+          loadQueryIndex(cfg.index),
+          skipsPromo(cfg, { press, curated }) ? promoShownPaths(document) : [],
+        ]);
         // one extra row tells a full press band apart from one that just fits
-        const matches = selectRows(all, press || endCard ? { ...cfg, limit: cfg.limit + 1 } : cfg);
+        const matches = selectRows(all, {
+          ...cfg, shown, limit: press || endCard ? cfg.limit + 1 : cfg.limit,
+        });
         more = matches.length > cfg.limit;
         indexRows = matches.slice(0, cfg.limit);
         rows = indexRows.map((r) => rowToCells(r));
@@ -548,8 +624,9 @@ export default async function decorate(block) {
     if (!rows || !rows.length) { collapseRail(block, mount, header); return; }
 
     const carousel = buildBlock('carousel', rows);
-    // the rail's own variants (e.g. `center`, `caption`, `media`) style the inner carousel
-    carousel.classList.add(...variants);
+    // the rail's own variants (e.g. `center`, `caption`, `media`) style the inner carousel, and
+    // so does a home-band media rail's card (railLayout)
+    carousel.classList.add(...variants, ...carouselVariants);
     if (cfg.dots) carousel.classList.add('dots');
     if (heading) carousel.setAttribute('aria-label', heading);
     carousel.hidden = true;
@@ -594,7 +671,9 @@ export default async function decorate(block) {
     }
     mount.classList.add('is-built');
     carousel.hidden = false;
-    if (['image', 'video'].includes(cfg.template) && indexRows.length) wireMediaLightbox(carousel, indexRows);
+    if (MEDIA_TEMPLATES.has(cfg.template) && indexRows.length) {
+      wireMediaLightbox(carousel, indexRows);
+    }
   }
 
   async function buildRailSafely() {

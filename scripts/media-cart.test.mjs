@@ -620,3 +620,21 @@ test('announcement: inside an open lightbox (aria-modal), it is read from a regi
   await announced();
   assert.equal(w.document.querySelector('body > .media-cart-live').textContent, '0 in cart', 'closed: the page region');
 });
+
+test('a control whose add goes in dispatches a bubbling media-cart:added; a refused one does not (#275)', async () => {
+  const { cart } = make();
+  const [ok, gone] = mount(link(), link());
+  cart.bind(ok, { href: src('a.jpg') });
+  cart.bind(gone, { href: src('unpublished.mp4') });
+  const added = [];
+  const on = (e) => added.push([e.target, e.detail.href]);
+  document.addEventListener('media-cart:added', on);
+  click(ok);
+  await settle();
+  click(gone);
+  await settle();
+  click(ok); // a second click removes it: no event
+  await settle();
+  document.removeEventListener('media-cart:added', on);
+  assert.deepEqual(added, [[ok, src('a.jpg')]]);
+});

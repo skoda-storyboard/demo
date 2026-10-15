@@ -31,7 +31,9 @@ globalThis.WebImporter = {
   FileUtils: { sanitizePath: (p) => p },
 };
 
-const { default: importer } = await import('./import-press-kit-hub.js');
+const {
+  default: importer, YEAR_TERMS, facetValue, sourceFacets,
+} = await import('./import-press-kit-hub.js');
 const root = 'https://www.skoda-storyboard.com/en/press-kits/';
 const child = `${root}skoda-peaq-press-kit-2/the-skoda-peaq-skodas-new-flagship-expands-the-brands-electric-portfolio/`;
 
@@ -138,6 +140,26 @@ test('banner alt text follows the link: ZIP, WhatsApp, else the source alt', () 
   assert.throws(() => output(unlabelled), /banner has no accessible name/);
 });
 
+test('a banner whose alt is only its file name is named by the page it opens', () => {
+  const kit = `${root}classic-days-2026-press-kit/`;
+  const banner = (href, file) => `<div class="widget_sow-editor"><div class="textwidget"><p><a href="${href}">
+    <img src="https://cdn.skoda-storyboard.com/2026/10/${file}.png" alt="${file}"></a></p></div></div>`;
+  const doc = page(13);
+  doc.querySelector('.content').insertAdjacentHTML('beforeend', [
+    banner(`${kit}skoda-museum/`, 'ClassicDays-Button-1670x800-Museum-EN_3ac482ac'),
+    // authored without https:// on the source, resolved against the page by the DOM
+    banner('skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon/', 'ClassicDays-Button-1670x800-Octavia-EN_dcc4cafc'),
+    banner(`${kit}skoda-felicia-1959-1964/`, 'ClassicDays-Button-Felicia_1a2b3c4d'),
+  ].join(''));
+  const { element } = output(doc, kit);
+  const named = (stem) => element.querySelector(`img[src*="${stem}"]`)?.alt;
+  assert.equal(named('Museum-EN'), 'Škoda Museum');
+  assert.equal(named('Octavia-EN'), 'Škoda Octavia turns 30: Three decades of a brand icon');
+  assert.equal(named('Felicia'), 'Škoda felicia 1959 1964', 'no known title: the readable slug');
+  const octavia = element.querySelector('img[src*="Octavia-EN"]').closest('a');
+  assert.equal(octavia.getAttribute('href'), '/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon');
+});
+
 test('live SSR hubs retain exact chapter titles, dates, facets and banner assets', {
   skip: !process.env.SKODA_PRESS_KIT_LIVE,
 }, async () => {
@@ -212,6 +234,63 @@ test('older kits: 2-wide and 1-wide + 2-square rows become half + quarter tiles'
   assert.deepEqual(tokens.slice(8), Array(5).fill('press-square'));
   const starts = layoutTileRows(tokens, { pressPage: true }).tiles.filter((tile) => tile.rowStart);
   assert.equal(starts.length, 4, 'one row per source row');
+});
+
+// Classic Days 2026 (2026-10-13): banners share rows with the tiles, so the hub is one mosaic.
+// Cell widths come from the SiteOrigin head CSS, as on the source.
+function mosaicKit() {
+  let index = 0;
+  const tile = (ratio) => {
+    index += 1;
+    return `<article class="article-teaser"><a href="${root}classic-${index}/">
+      <div class="ratio-container ratio-${ratio}"><img src="https://cdn.skoda-storyboard.com/c${index}.jpg" alt=""></div>
+      <h2 class="heading">Chapter ${index}</h2></a></article>`;
+  };
+  const banner = (slug, file) => `<div class="so-panel widget widget_sow-editor"><div class="textwidget"><p>
+    <a href="${root}classic-days-2026-press-kit/${slug}/"><img src="https://cdn.skoda-storyboard.com/2026/10/${file}.png" alt="${file}"></a></p></div></div>`;
+  const cell = (id, html) => `<div class="panel-grid-cell" id="pgc-1-${id}">${html}</div>`;
+  const grid = (row, cells) => `<div class="panel-grid" id="pg-1-${row}">${cells.map((html, i) => cell(`${row}-${i}`, html)).join('')}</div>`;
+  const css = `#pgc-1-0-0 , #pgc-1-2-1 { width:60% } #pgc-1-0-1 , #pgc-1-1-3 , #pgc-1-2-0 { width:40% }
+    #pgc-1-1-0 , #pgc-1-1-1 , #pgc-1-1-2 { width:20% } #pgc-1-3-0 , #pgc-1-3-1 , #pgc-1-3-2 { width:33.3333% }
+    @media (max-width:780px){ #pgc-1-0-0 , #pgc-1-1-0 { width:100% } }`;
+  return new JSDOM(`<!doctype html><title>Kit</title><style>${css}</style><body class="single-press_kit">
+    <article class="press_kit category-press-kits" data-publish-date="2026-10-12T08:00:00+02:00">
+      <div class="hero"><div class="hero-image"><img src="https://cdn.skoda-storyboard.com/h.jpg" alt="Kit"></div><div class="hero-caption"><h1>Kit</h1></div></div>
+      <div class="content">
+        ${grid(0, [banner('skoda-museum', 'ClassicDays-Button-2540x800-Museum-EN_3ac482ac'), banner('skoda-museum', 'ClassicDays-Button-1670x800-Museum-EN_1a2b3c4d')])}
+        ${grid(1, [tile('1x1'), tile('1x1'), tile('1x1'), banner('60-years-of-the-trekka-an-suv-from-new-zealand', 'ClassicDays-Button-1670x800-Trekka-EN_07dc61cb')])}
+        ${grid(2, [banner('125-years-of-skoda-motorsport', 'ClassicDays-Button-1670x800-Octavia-EN_dcc4cafc'), banner('125-years-of-skoda-motorsport', 'ClassicDays-Button-2540x800-Motorsport-EN_957a831f')])}
+        ${grid(3, [tile('2x1'), tile('2x1'), tile('2x1')])}
+      </div></article></body>`, { url: root }).window.document;
+}
+
+test('a hub whose banners share rows with its tiles is one mosaic, in source rows', () => {
+  const { element } = output(mosaicKit(), `${root}classic-days-2026-press-kit/`);
+  const cards = [...element.querySelectorAll('table')].find((t) => t.rows[0].textContent.includes('Cards'));
+  const rowsOut = [...cards.rows].slice(1);
+  const tokens = rowsOut.map((row) => row.cells[0].textContent);
+  assert.deepEqual(tokens, [
+    'press-banner-wide', 'press-banner-narrow',
+    'press-square', 'press-square', 'press-square', 'press-banner-narrow',
+    'press-banner-narrow', 'press-banner-wide',
+    'press-third', 'press-third', 'press-third',
+  ]);
+  const banners = rowsOut.filter((row) => row.cells.length === 2);
+  assert.equal(banners.length, 5, 'a banner is [size, linked picture]');
+  const trekka = banners[2].cells[1].querySelector('a');
+  assert.equal(trekka.getAttribute('href'), '/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand');
+  assert.equal(trekka.querySelector('img').alt, '60 years of the Trekka: an SUV from New Zealand');
+  assert.equal(element.querySelectorAll('img[src*="Trekka"]').length, 1, 'no repeat in a banner section');
+  assert.equal(element.textContent.includes('press-kit-banners'), false);
+  const starts = layoutTileRows(tokens, { pressPage: true }).tiles.filter((t) => t.rowStart);
+  assert.equal(starts.length, 4, 'one row per source row');
+});
+
+test('a mosaic cell of an unknown width fails instead of guessing a size', () => {
+  const doc = mosaicKit();
+  doc.querySelector('style').textContent = doc.querySelector('style').textContent.replace('#pgc-1-1-3 , ', '');
+  doc.querySelector('style').textContent += ' #pgc-1-1-3 { width:25% }';
+  assert.throws(() => output(doc, `${root}classic-days-2026-press-kit/`), /unsupported cell \(banner:25\)/);
 });
 
 test('older kits: an X timeline widget is dropped, not imported as intro text', () => {
@@ -391,4 +470,91 @@ test('the ZIP corrections apply to banners only, not to text links', () => {
   assert.ok(hrefs.includes('https://cdn.skoda-storyboard.com/2020/04/SKODA-OCTAVIA'));
   assert.ok(hrefs.includes('https://www.skoda-storyboard.com/direct-download/2019/11/IAA_FRANKFURT_2019.zip'));
   assert.equal(hrefs.some((href) => href.endsWith('SKODA-OCTAVIA.zip') || href.startsWith('https://cdn.skoda-storyboard.com/2019/')), false);
+});
+
+// --- kit facets (SKODA-808): every facet class, years term ids as their year -----------------
+function facetKit(classes) {
+  return new JSDOM(`<!doctype html><title>Press Kit</title><body class="single-press_kit">
+    <article class="press_kit category-press-kits ${classes}" data-publish-date="2024-12-03T08:00:00+01:00">
+      <div class="hero"><div class="hero-image"><img src="https://cdn.skoda-storyboard.com/hero.jpg" alt="Kit"></div>
+      <div class="hero-caption"><h1>Kit</h1><p class="perex">Perex</p></div></div>
+      <div class="content"><div class="panel-grid"><article class="article-teaser"><a href="${root}skoda-elroq-press-kit/intro/">
+        <div class="ratio-container ratio-1x1"><img src="https://cdn.skoda-storyboard.com/1.jpg" alt=""></div>
+        <h2 class="heading">Introduction</h2></a></article></div></div></article></body>`, { url: root }).window.document;
+}
+
+test('a kit carries every source facet: derivative, and years as the year, not the term id', () => {
+  const { element } = output(facetKit('model-elroq derivative-sportline bodywork-suv technology-meb years-57053'), `${root}skoda-elroq-press-kit/`);
+  const meta = metaRows(element);
+  assert.equal(meta.model, 'elroq');
+  assert.equal(meta.derivative, 'sportline');
+  assert.equal(meta.bodywork, 'suv');
+  assert.equal(meta.years, '2025', 'tagged 2025 although published in December 2024');
+  assert.match(meta.tags, /\bsportline\b/);
+  assert.match(meta.tags, /\b2025\b/);
+  assert.equal(YEAR_TERMS.get('61572'), '2026');
+});
+
+test('an unknown years term id is skipped, never guessed, and reported once per page', () => {
+  const { warn } = console;
+  const warnings = [];
+  console.warn = (...args) => warnings.push(args.join(' '));
+  try {
+    const result = output(facetKit('model-peaq years-99999 years-61572'), `${root}skoda-peaq-press-kit-2/`);
+    assert.equal(metaRows(result.element).years, '2026');
+    // the import report (the bulk runner's per-page sheet) names the id to add to YEAR_TERMS
+    assert.equal(result.report.unmappedTermIds, 'years-99999');
+    assert.equal(warnings.filter((w) => /unmapped term ids years-99999/.test(w)).length, 1);
+  } finally {
+    console.warn = warn;
+  }
+});
+
+// PR #305 review (P3): the lookup is pure, and a numeric id on any facet is dropped and reported
+test('facetValue / sourceFacets are pure: a numeric id on another facet is dropped and reported', () => {
+  const { warn } = console;
+  let calls = 0;
+  console.warn = () => { calls += 1; };
+  try {
+    assert.equal(facetValue('model', 'peaq'), 'peaq');
+    assert.equal(facetValue('years', '61572'), '2026');
+    assert.equal(facetValue('years', '99999'), '');
+    assert.equal(facetValue('model', '12345'), '', 'no slug for a numeric model id');
+    const article = facetKit('model-12345 model-peaq bodywork-suv years-1872')
+      .querySelector('article.press_kit');
+    const { facets, unmapped } = sourceFacets(article);
+    assert.equal(facets.model, 'peaq');
+    assert.equal(facets.years, '2015');
+    assert.deepEqual(unmapped, ['model-12345']);
+    assert.equal(calls, 0, 'no console side effect in the lookup');
+  } finally {
+    console.warn = warn;
+  }
+  const { report } = output(facetKit('model-12345 model-peaq'), `${root}skoda-peaq-press-kit-2/`);
+  assert.equal(report.unmappedTermIds, 'model-12345');
+});
+
+test('YEAR_TERMS covers every source year archive, 2014 to 2026 (checked 2026-10-12)', () => {
+  const years = Array.from({ length: 13 }, (_, i) => String(2014 + i));
+  assert.deepEqual([...YEAR_TERMS.values()], years);
+  assert.equal(YEAR_TERMS.get('4781'), '2014');
+  assert.equal(YEAR_TERMS.get('1872'), '2015');
+  // a kit with only mapped ids gets no unmapped report
+  const mapped = output(facetKit('model-peaq years-61572'), `${root}skoda-peaq-press-kit-2/`);
+  assert.equal(mapped.report.unmappedTermIds, undefined);
+});
+
+test('generated standalone bundle matches the source importer (kit facets)', async () => {
+  const { readFileSync } = await import('node:fs');
+  const vm = await import('node:vm');
+  const code = readFileSync(new URL('./import-press-kit-hub.bundle.js', import.meta.url), 'utf8');
+  const bundled = vm.runInNewContext(`${code}\nCustomImportScript.default`, {
+    WebImporter: globalThis.WebImporter, console, URL,
+  });
+  const url = `${root}skoda-elroq-press-kit/`;
+  const classes = 'model-elroq derivative-sportline bodywork-suv years-57053';
+  const run = (script) => script.transform({
+    document: facetKit(classes), url, params: { originalURL: url },
+  })[0].element.outerHTML;
+  assert.equal(run(bundled), run(importer));
 });

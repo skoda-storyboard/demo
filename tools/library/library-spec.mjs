@@ -172,6 +172,7 @@ export const SECTION_STYLES = [
   ['dark', 'Dark band (e.g. the Related Stories rail).'],
   ['cover-box', 'Home page light band.'],
   ['cover-box, dark', 'Home page dark band (Social media).'],
+  ['cover-box, compact', 'Media Room home light band (News, Images, Videos; Latest Stories).'],
   ['cover-box, compact, dark', 'Media Room home dark band.'],
   ['press-kit-chapters', 'Press-kit chapter navigation section.'],
   ['press-kit-banners', 'Press-kit download banners section.'],

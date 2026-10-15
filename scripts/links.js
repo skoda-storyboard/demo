@@ -12,6 +12,13 @@
  *   Exception: LIVE_SAME_TAB pages (the newsletter "Manage subscription") stay in the tab, as
  *   on the source (SKODA-308).
  * - A trailing slash on any other site-relative path is dropped: EDS 404s `/en/`, serves `/en`.
+ * - Links inside `[data-link-policy="resolved"]` are left alone: their block already chose
+ *   the target and the tab (the language switcher's translations, SKODA-303a).
+ * - Fragment block references skip the live redirect (LIVE_ONLY): the link names content this
+ *   site serves (the shared `/{locale}/fragments/newsletter-card`, SKODA-840), not a page to
+ *   navigate to, and the locale rule would send `/cs/fragments/…` to the live site, so the card
+ *   would never load (#243). They keep the trailing-slash rule: `loadFragment()` appends
+ *   `.plain.html`, and `/x/.plain.html` 404s (#348 review).
  */
 
 export const LIVE_ORIGIN = 'https://www.skoda-storyboard.com';
@@ -66,9 +73,10 @@ export const DEMO_LISTINGS = new Set([
  * Policy result for an authored href on a demo page.
  * @param {string|null} href The authored href
  * @param {string} base The page URL (its origin is the demo origin)
+ * @param {{fragment?: boolean}} [options] fragment: a Fragment block reference (no live redirect)
  * @returns {{href: string, newTab: boolean}|null} null = leave the link as it is
  */
-export function policyHref(href, base) {
+export function policyHref(href, base, { fragment = false } = {}) {
   if (!href || /^(?:#|mailto:|tel:|javascript:|data:)/i.test(href)) return null;
   let url;
   let origin;
@@ -87,7 +95,7 @@ export function policyHref(href, base) {
   }
   if (url.origin !== origin) return null;
 
-  if (LIVE_ONLY.some((re) => re.test(url.pathname))) {
+  if (!fragment && LIVE_ONLY.some((re) => re.test(url.pathname))) {
     const livePath = LIVE_ALIASES[trimmed.toLowerCase()];
     const path = livePath ? `${livePath}/` : url.pathname;
     return { href: `${LIVE_ORIGIN}${path}${tail}`, newTab: !opensInSameTab(path) };
@@ -100,7 +108,8 @@ export function policyHref(href, base) {
 }
 
 function applyTo(a, base) {
-  const result = policyHref(a.getAttribute('href'), base);
+  if (a.closest('[data-link-policy="resolved"]')) return;
+  const result = policyHref(a.getAttribute('href'), base, { fragment: !!a.closest('.fragment') });
   if (!result) return;
   if (result.href !== a.getAttribute('href')) a.setAttribute('href', result.href);
   if (result.newTab) {

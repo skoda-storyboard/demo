@@ -614,6 +614,21 @@ test('malformed mandatory article, toggle and asset fail rather than silently lo
   );
 });
 
+test('a layout builder without a toggle is shown content: it follows in place (Classic Days 2026)', { skip: !JSDOM }, () => {
+  const extra = `<div class="panel-grid"><div class="panel-grid-cell">
+    <div class="so-panel widget widget_sow-editor"><div class="textwidget"><p>Museum lead paragraph</p></div></div>
+    <div class="so-panel widget widget_siteorigin-panels-builder"><div class="panel-layout">
+      <div class="panel-grid"><div class="panel-grid-cell"><div class="so-panel widget widget_sow-editor">
+        <div class="textwidget"><p>Films, photographs and documents</p></div></div></div></div>
+    </div></div></div></div>`;
+  const page = run(fixture({ togglesCount: 0, extra }), target);
+  const paras = [...page.querySelectorAll('p')].map(txt);
+  const lead = paras.indexOf('Museum lead paragraph');
+  assert.ok(lead >= 0, 'the lead paragraph is kept');
+  assert.equal(paras[lead + 1], 'Films, photographs and documents', 'the builder text follows it in place');
+  assert.equal(rows(page, 'Accordion').length, 0, 'no accordion is made up');
+});
+
 test('a kit FAQ chapter emits Accordion (faq), which the block turns into FAQPage data (SKODA-807)', { skip: !JSDOM }, () => {
   const faqUrl = `${base}skoda-peaq-press-kit-2/frequently-asked-questions/`;
   const page = run(fixture({
@@ -754,6 +769,35 @@ test('every emitted document stays within 200 images: other images count, oversi
     () => importer.transform({ document, url: hugeUrl, params: { originalURL: hugeUrl } }),
     /fragment "huge" holds 201 images; a document holds at most 200/,
   );
+});
+
+test('a variant chapter (Peaq Sportline, SKODA-808) takes its derivative from its tags; First Edition has none', { skip: !JSDOM }, () => {
+  const peaqTag = `<li><a class="label" href="${base}?filter%5Bmodel%5D%5B%5D=peaq">Peaq</a></li>`;
+  const tag = (facet, slug, label) => `<li><a class="label" href="${base}?filter%5B${facet}%5D%5B%5D=${slug}">${label}</a></li>`;
+  const html = (tags) => fixture({ chapters: true, mediaBox: false, togglesCount: 0 })
+    .replace(peaqTag, tags);
+  const metaOf = (page) => Object.fromEntries(rows(page, 'Metadata').map((row) => [txt(row.children[0]), txt(row.children[1])]));
+
+  // the live Sportline chapter's tags: 2026, technology…, Peaq, SportLine, SUV
+  const sportline = run(
+    html(`${tag('years', '2026', '2026')}${tag('technology', 'meb-2', 'MEB+')}${tag('model', 'peaq', 'Peaq')}${tag('derivative', 'sportline', 'SportLine')}${tag('bodywork', 'suv', 'SUV')}`),
+    `${base}skoda-peaq-press-kit-2/the-peaq-sportline-dynamic-inside-and-out/`,
+  );
+  const meta = metaOf(sportline);
+  assert.equal(meta.template, 'press_kit_chapter', 'a chapter of its kit, not a kit of its own');
+  assert.equal(meta.presskit, '/en/press-kits/skoda-peaq-press-kit-2');
+  assert.equal(meta.derivative, 'sportline');
+  assert.equal(meta.model, 'peaq');
+  assert.equal(meta.bodywork, 'suv');
+  assert.equal(meta.years, '2026');
+
+  // the live First Edition chapter has no derivative tag (nor class): it gets no derivative row
+  const firstEdition = run(
+    html(`${tag('years', '2026', '2026')}${tag('model', 'epiq', 'Epiq')}${tag('bodywork', 'suv', 'SUV')}`),
+    `${base}skoda-epiq-press-kit-2/first-edition-launch-version-with-exclusive-design-details/`,
+  );
+  assert.equal(metaOf(firstEdition).derivative, undefined);
+  assert.equal(metaOf(firstEdition).model, 'epiq');
 });
 
 test('generated standalone bundle matches the source importer', { skip: !JSDOM }, () => {
@@ -1081,4 +1125,97 @@ test('an Images-child gallery keeps each distinct regulatory caption once, under
   assert.ok(!page.textContent.includes('quiet morning'), 'a plain lightbox caption stays dropped');
   assert.ok(!page.textContent.includes('FC model had a front engine'), 'a non-regulatory group gets no note');
   assert.equal(page.querySelectorAll('[data-caption]').length, 0, 'no data-caption leaks');
+});
+
+// #275: the Media Box tiles keep their source date, the lead keeps its full-size image link
+const LEAD_275 = '<div class="article-teaser-media"><img src="https://cdn.skoda-storyboard.com/lead.jpg" alt="Lead"></div>';
+const datedAsset = (match, i) => `<div class="entry-meta"><span class="entry-published">${Number(i) === 3 ? 'yesterday' : '23. 3. 2026'}</span></div>${match}`;
+
+test('Media Box tiles keep their source date in a cell before the title; the lead links its full image', { skip: !JSDOM }, () => {
+  const html = fixture({})
+    .replace(/<h3 class="entry-title">Asset (\d+)<\/h3>/g, datedAsset)
+    .replace(LEAD_275, LEAD_275.replace('<img', '<a class="colorbox" href="https://cdn.skoda-storyboard.com/lead-full.jpg"><img').replace('</div>', '</a></div>'));
+  const page = run(html, target);
+  const assets = rows(page, 'Downloads');
+  assert.equal(assets.length, 60);
+  const dated = assets.filter((row) => row.children.length === 4);
+  assert.equal(dated.length, 59, 'one tile has no source-form date, so it keeps the 3-cell row');
+  dated.forEach((row) => {
+    assert.equal(txt(row.children[1]), '23. 3. 2026');
+    assert.match(txt(row.children[2]), /^Asset \d+$/);
+  });
+  const undated = assets.find((row) => row.children.length === 3);
+  assert.equal(txt(undated.children[1]), 'Asset 3');
+  fileRows(page).forEach((row) => assert.equal(txt(row.children[0]), '', 'a file row keeps its empty picture cell'));
+  const lead = page.querySelector('img[src$="/lead.jpg"]');
+  assert.equal(lead.closest('a')?.getAttribute('href'), 'https://cdn.skoda-storyboard.com/lead-full.jpg');
+});
+
+test('a lead without a full-size image link stays a bare image (#275)', { skip: !JSDOM }, () => {
+  const html = fixture({}).replace(LEAD_275, LEAD_275.replace('<img', '<a href="#"><img').replace('</div>', '</a></div>'));
+  const page = run(html, target);
+  assert.equal(page.querySelector('img[src$="/lead.jpg"]').closest('a'), null);
+});
+
+// #275: an answer's empty paragraphs and rows, and its unequal image cells (live markup 2026-10-12;
+// SiteOrigin writes the cell widths in a head <style>, the mobile @media rule stacks them)
+const PANELS_CSS = `<style>#pgc-w1-1-0 { width:50.4%;width:calc(50.4% - ( 0.496 * 0px ) ) } #pgc-w1-1-1 { width:49.6% }
+  #pgc-w2-1-0 , #pgc-w2-1-1 { width:50% } @media (max-width:780px){ #pgc-w1-1-0 , #pgc-w1-1-1 { width:100% } }</style>`;
+function answerLayoutToggle() {
+  const cell = (id, img) => `<div id="${id}" class="panel-grid-cell">${widget(`<p><a href="https://cdn.skoda-storyboard.com/${img}.jpg"><img src="https://cdn.skoda-storyboard.com/${img}.jpg" alt="${img}"></a></p>`
+    + `<p style="text-align: center;"><a href="/direct-download/${img}.pdf">PDF download</a>&nbsp; &nbsp; <a href="/direct-download/${img}.jpg">JPG download</a></p><p>&nbsp;</p>`)}</div>`;
+  const row = (id, cells) => `<div id="pg-${id}" class="panel-grid">${cells}</div>`;
+  return grid(`<div class="so-panel widget_ys-row-toggle"><h2 class="row-title"><span>Spaced answer</span></h2></div>
+    <div class="so-panel widget_siteorigin-panels-builder"><div class="panel-layout">
+      ${grid(widget('<p>Answer copy.</p>'))}
+      ${row('w1-1', cell('pgc-w1-1-0', 'wide') + cell('pgc-w1-1-1', 'narrow'))}
+      ${row('w2-1', cell('pgc-w2-1-0', 'left') + cell('pgc-w2-1-1', 'right'))}
+      ${row('w3-1', `<div class="panel-grid-cell">${widget('\n\t')}</div>`)}
+    </div></div>`);
+}
+
+test('an answer keeps the source spacers and unequal cell widths as nested tables, in order (#275)', { skip: !JSDOM }, () => {
+  const page = run(fixture({ extra: answerLayoutToggle() }).replace('</head>', `${PANELS_CSS}</head>`), target);
+  const row = rows(page, 'Accordion').find((tr) => txt(tr.children[0]) === 'Spaced answer');
+  const answer = row.children[1];
+  const shape = [...answer.children].map((el) => {
+    if (el.tagName === 'TABLE') return `[${[...el.querySelectorAll('tr')].map((tr) => [...tr.children].map(txt).join('|')).join(' / ')}]`;
+    return el.querySelector('img') ? `img ${el.querySelector('img').alt}` : txt(el).slice(0, 12);
+  });
+  assert.deepEqual(shape, [
+    'Answer copy.',
+    '[Media row / 50.4%|49.6%]', 'img wide', 'PDF download', '[Spacer]', 'img narrow', 'PDF download', '[Spacer]',
+    'img left', 'PDF download', '[Spacer]', 'img right', 'PDF download', '[Spacer]',
+    '[Spacer (row)]',
+  ], 'equal (50/50) cells carry no Media row; the mobile 100% rule is not read');
+  assert.equal(page.querySelectorAll('[data-skoda-spacer], [data-skoda-media-row]').length, 0, 'no marker reaches DA');
+  assert.equal(blocks(page, 'Spacer').filter((t) => !t.closest('table table, td table')).length, 0, 'spacers only inside an answer');
+});
+
+test('importer to template: the weighted row and the equal row after it stay two media rows (#344 review)', { skip: !JSDOM }, async () => {
+  const { mediaRuns } = await import('../../templates/press-kit/press-kit.js');
+  const page = run(fixture({ extra: answerLayoutToggle() }).replace('</head>', `${PANELS_CSS}</head>`), target);
+  const answer = rows(page, 'Accordion').find((tr) => txt(tr.children[0]) === 'Spaced answer').children[1];
+  const runs = mediaRuns(answer);
+  assert.deepEqual(runs.map((r) => r.map((unit) => unit[0].querySelector('img').alt)), [['wide', 'narrow'], ['left', 'right']]);
+  assert.ok(runs[0].widths, 'the 50.4 / 49.6 row keeps its Media row');
+  assert.equal([...runs[0].widths.querySelectorAll('tr')][1].children.length, 2);
+  assert.equal(runs[1].widths, undefined, 'the equal row has none');
+});
+
+test('spacers and widths are read in answers only: body copy keeps dropping its empty paragraphs (#275)', { skip: !JSDOM }, () => {
+  const page = run(fixture({ extra: grid(widget('<p>Body copy.</p><p>&nbsp;</p><p>More copy.</p>')) }), target);
+  assert.equal(blocks(page, 'Spacer').length, 0);
+  assert.equal(blocks(page, 'Media row').length, 0);
+});
+
+test('a blank answer row whose widget holds a blank paragraph keeps both gaps: the line and the row (#344 review)', { skip: !JSDOM }, () => {
+  const toggle = answerLayoutToggle().replace(
+    `${widget('\n\t')}`,
+    `${widget('<p>&nbsp;</p>')}`,
+  );
+  const page = run(fixture({ extra: toggle }).replace('</head>', `${PANELS_CSS}</head>`), target);
+  const answer = rows(page, 'Accordion').find((tr) => txt(tr.children[0]) === 'Spaced answer').children[1];
+  const tail = [...answer.children].slice(-2).map((el) => (el.tagName === 'TABLE' ? txt(el) : el.tagName));
+  assert.deepEqual(tail, ['Spacer', 'Spacer (row)'], 'the blank paragraph, then the empty row\'s insets');
 });

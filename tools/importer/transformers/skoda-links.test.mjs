@@ -112,6 +112,30 @@ test('#s_aid / #s_cid fragments are stripped, then the link is rewritten', { ski
   assert.equal(one(`${SRC}${STORY}/#s_cid=xyz`), STORY);
 });
 
+test('a scheme-less source link is the source page, raw or resolved against the page (rule 5)', { skip }, () => {
+  const KIT = '/en/press-kits/classic-days-2026-press-kit';
+  const OCTAVIA = `${KIT}/skoda-octavia-turns-30-three-decades-of-a-brand-icon`;
+  assert.equal(one(`skoda-storyboard.com${OCTAVIA}/`), OCTAVIA);
+  assert.equal(one(`www.skoda-storyboard.com${OCTAVIA}/`), OCTAVIA);
+  assert.equal(one(`${SRC}${KIT}/skoda-storyboard.com${OCTAVIA}/`), OCTAVIA);
+  // not on the demo: the source URL, absolute
+  assert.equal(one('skoda-storyboard.com/en/lifestyle/explore-albania/'), `${SRC}/en/lifestyle/explore-albania/`);
+  // a query that merely mentions the host, the cdn and another host are not rule 5
+  [
+    `${SRC}/en/lifestyle/explore-albania/?q=skoda-storyboard.com/x`,
+    'https://cdn.skoda-storyboard.com/2026/10/a_1a2b3c4d.jpg',
+    'https://example.org/skoda-storyboard.com/en/',
+  ].forEach((href) => assert.equal(one(href), href));
+});
+
+test('a trailing space, raw or encoded, is trimmed from the href (rule 6)', { skip }, () => {
+  const PDF = 'https://cdn.skoda-storyboard.com/2026/09/Skoda_440_469d33ab.pdf';
+  assert.equal(one(`${PDF} `), PDF);
+  assert.equal(one(`${PDF}%20`), PDF);
+  assert.equal(one(`${SRC}${STORY}/%20`), STORY);
+  assert.equal(one('https://example.org/a%20b'), 'https://example.org/a%20b', 'an inner space stays');
+});
+
 test('links inside block tables are rewritten too', { skip }, () => {
   const el = run(`<table><tr><th>Tags</th></tr><tr><td><a href="${SRC}/en/tag/model/yeti/">Yeti</a></td></tr>
     <tr><td><a href="${SRC}${STORY}/">Epiq</a></td></tr></table>`);
@@ -194,4 +218,21 @@ test('single-tag news filter becomes the demo tag page (SKODA-607)', { skip }, (
   // multi-filter "All" links are not tag links
   const all = `${SRC}/en/news/?filter[years]%5B0%5D=61572&amp;filter[model]%5B0%5D=61611`;
   assert.equal(one(all), `${SRC}/en/news/?filter[years]%5B0%5D=61572&filter[model]%5B0%5D=61611`);
+});
+
+test('a Story Rail viewall keeps the filtered listing, as the source rail "All" (#284)', { skip }, () => {
+  const rail = (head, key, href) => run(`<table><tr><th colspan="2">${head}</th></tr>
+    <tr><td>template</td><td>press_release</td></tr><tr><td>${key}</td><td><a href="${href}">All</a></td></tr></table>`);
+  // not the tag page: rule 1 as for any link (a filter link to the live-only /en/news stays
+  // as authored, and the runtime links policy opens it on the demo listing, scripts/links.js)
+  const news = `${SRC}/en/news/?filter[model][]=superb`;
+  assert.deepEqual(hrefs(rail('Story Rail', 'viewall', news)), [news]);
+  assert.deepEqual(hrefs(rail('Story Rail (wide)', 'viewall', news)), [news]);
+  assert.deepEqual(hrefs(rail('Story Rail', 'viewall', '/en/news?filter[model][]=superb')), ['/en/news?filter[model][]=superb']);
+  // the other "All" keys story-rail reads
+  assert.deepEqual(hrefs(rail('Story Rail', 'view-all', news)), [news]);
+  assert.deepEqual(hrefs(rail('Story Rail', 'All', news)), [news]);
+  // a tag chip elsewhere (another block, another row) still becomes the tag page
+  assert.deepEqual(hrefs(rail('Tags', 'viewall', news)), ['/en/tag/model/superb']);
+  assert.deepEqual(hrefs(rail('Story Rail', 'tags', news)), ['/en/tag/model/superb']);
 });

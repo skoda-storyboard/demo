@@ -42,11 +42,11 @@ var CustomImportScript = (() => {
   });
 
   // tools/importer/parsers/promo-box.js
-  function parse(element, { document: document2, indexDriven = false }) {
+  function parse(element, { document: document2, indexDriven = false, promoTemplate = "story" }) {
     if (indexDriven) {
       element.replaceWith(WebImporter.DOMUtils.createTable([
         ["Promo Box"],
-        ["template", "story"],
+        ["template", promoTemplate],
         ["path", "/en/"],
         ["limit", "3"]
       ], document2));
@@ -112,7 +112,16 @@ var CustomImportScript = (() => {
     }
     return null;
   }
-  function parse2(element, { document: document2 }) {
+  function modelOrder(element) {
+    return [...element.querySelectorAll(".search-results-item .entry-title a[href]")].map((a) => {
+      try {
+        return new URL(a.getAttribute("href"), "https://www.skoda-storyboard.com").pathname.replace(/\/+$/, "");
+      } catch (e) {
+        return "";
+      }
+    }).filter((path) => path.startsWith("/"));
+  }
+  function parse2(element, { document: document2, orderModels = false }) {
     if (/\btype-social\b/.test(element.className || "") || element.closest(".socials-static")) {
       element.replaceWith(...element.childNodes);
       return;
@@ -133,6 +142,10 @@ var CustomImportScript = (() => {
         return;
       }
       cells.push(["template", template]);
+      if (orderModels && template === "skoda_model") {
+        const order = modelOrder(element);
+        if (order.length) cells.push(["order", order.join(", ")]);
+      }
     }
     if (href && /^(?:https?:\/\/|\/(?!\/))/i.test(href.trim())) {
       const link = document2.createElement("a");
@@ -629,6 +642,7 @@ var CustomImportScript = (() => {
     "/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq",
     "/en/emobility/skoda-elroq-and-a-happy-family",
     "/en/emobility/skoda-elroq-premiere-light-cube-camera-action",
+    "/en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
     "/en/emobility/skoda-peaq-unparalleled-space-and-comfort",
     "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
@@ -679,6 +693,37 @@ var CustomImportScript = (() => {
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos",
     "/en/press-kits/4x4-winter-experience-press-kit",
+    "/en/press-kits/classic-days-2026-press-kit",
+    "/en/press-kits/classic-days-2026-press-kit/125-years-of-skoda-motorsport",
+    "/en/press-kits/classic-days-2026-press-kit/1955-skoda-440-on-the-international-stage",
+    "/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand",
+    "/en/press-kits/classic-days-2026-press-kit/images",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-bz-1902-1904",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-slavia-type-b-1899-1904",
+    "/en/press-kits/classic-days-2026-press-kit/laurin-klement-voiturette-a-1905-1907",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-110-r-coupe-1970-1980",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-1100-mbx-1967-1969",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-120-gls-1976-1990",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-120-s-rallye-1972-1975",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-645-1929-1934",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsportsuccess",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-favorit-136-l-1988-1994",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-felicia-1959-1964",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-museum",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-museum-presents-only-surviving-laurin-klement-bscsports-car-from-1908",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-1959-1964",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-popular-monte-carlo-1936-1939",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-rapid-135-1987-1990",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-rapid-ldd-1984",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain",
+    "/en/press-kits/classic-days-2026-press-kit/skoda-superb-3000-ohv-1938-1949",
+    "/en/press-kits/classic-days-2026-press-kit/texts",
+    "/en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary",
+    "/en/press-kits/classic-days-2026-press-kit/videos",
     "/en/press-kits/lets-explore-albania-press-kit",
     "/en/press-kits/new-skoda-enyaq-press-kit-2",
     "/en/press-kits/press-kit-skoda-at-the-iaa-2019",
@@ -941,6 +986,11 @@ var CustomImportScript = (() => {
     if (!p) return "/";
     return p.split("/").map((seg) => seg.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/-+/g, "-")).join("/");
   }
+  var SCHEMELESS_SOURCE = /^(?:(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com\/(?:[^?#]*\/)?)?(?:www\.)?skoda-storyboard\.com(?=\/)/i;
+  function schemelessSource(href) {
+    const m = href.match(SCHEMELESS_SOURCE);
+    return m ? `${SOURCE_ORIGIN}${href.slice(m[0].length)}` : href;
+  }
   function rewriteHref(href) {
     const m = href.match(SOURCE_HOST);
     if (!m) return null;
@@ -965,13 +1015,22 @@ var CustomImportScript = (() => {
     const bySlug = DEMO_PATHS.filter((p) => p.startsWith("/en/tag/") && p.endsWith(`/${slug}`) && p.split("/").length === 5);
     return bySlug.length === 1 ? bySlug[0] : null;
   }
+  var RAIL_VIEWALL_KEYS = ["viewall", "view-all", "all"];
+  function isRailViewAll(a) {
+    const row = a.closest("tr");
+    const table = row && row.closest("table");
+    if (!table || row.cells.length < 2 || !RAIL_VIEWALL_KEYS.includes(row.cells[0].textContent.trim().toLowerCase())) return false;
+    const head = table.rows[0] && table.rows[0].cells[0];
+    return !!head && /^story rail\b/i.test(head.textContent.trim());
+  }
   function transform5(hookName, element, payload) {
     if (hookName !== TransformHook3.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
-      let href = a.getAttribute("href");
+      let href = a.getAttribute("href").replace(/(?:\s|%20)+$/i, "");
       if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
+      href = schemelessSource(href);
       if (href.startsWith("/direct-download/")) href = `${SOURCE_ORIGIN}${href}`;
-      else href = tagPageHref(href) || rewriteHref(href) || href;
+      else href = !isRailViewAll(a) && tagPageHref(href) || rewriteHref(href) || href;
       if (href !== a.getAttribute("href")) a.setAttribute("href", href);
     });
   }
@@ -1006,6 +1065,9 @@ var CustomImportScript = (() => {
     metadata: { template: "page" },
     // skoda-dark-bands: the MR home's bands sit 16px tighter at the top (live, SKODA-218)
     darkBandStyle: "cover-box, dark, compact",
+    // every light .cover-box is its own section too, as on the Storyboard home (SKODA-611a);
+    // `compact`: its rails end 60px above the band end, not 28px (live, measured 375–1440)
+    lightBandStyle: "cover-box, compact",
     blocks: [
       { name: "promo-box", instances: ["section.promo-box"] },
       { name: "home-rail", instances: ['.cover-box .search-results[class*="type-"]'] }
@@ -1058,7 +1120,14 @@ var CustomImportScript = (() => {
         const parser = parsers[block.name];
         if (parser) {
           try {
-            parser(block.element, { document: document2, url, params });
+            parser(block.element, {
+              document: document2,
+              url,
+              params,
+              orderModels: true,
+              indexDriven: block.name === "promo-box",
+              promoTemplate: "press_release, press_kit"
+            });
           } catch (e) {
             console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
           }

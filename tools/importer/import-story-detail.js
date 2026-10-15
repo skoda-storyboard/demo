@@ -17,8 +17,11 @@
  */
 
 import storyHeroParser from './parsers/story-hero.js';
-import storyFlattenParser, { markHighlights, markCellWidths, dropEmptySections } from './parsers/story-flatten.js';
+import storyFlattenParser, {
+  markHighlights, markCellWidths, markBoldHeadings, restoreBoldHeadings, dropEmptySections,
+} from './parsers/story-flatten.js';
 import downloadsParser from './parsers/downloads.js';
+import footnotesParser, { markFootnotes } from './parsers/footnotes.js';
 import pageCleanupTransformer from './transformers/skoda-page-cleanup.js';
 import storyCleanupTransformer from './transformers/skoda-story-cleanup.js';
 import storyAsideTransformer from './transformers/skoda-story-aside.js';
@@ -135,6 +138,13 @@ export default {
   preprocess: ({ document }) => {
     markHighlights(document);
     markCellWidths(document);
+    // #296: the body's 10pt small print (Epiq "¹ Available at a later date.") → Footnotes, as on
+    // press kits (SKODA-805d); its size lives only in inline spans, which DA drops
+    document.querySelectorAll('article .entry-content, article .content').forEach((body) => {
+      markFootnotes(body);
+      // #296 review: which headings are bold on the source (helix preProcess strips their <strong>)
+      markBoldHeadings(body);
+    });
     nbspTransformer('preprocess', document.body, { document });
     // SKODA-823: the sidebar newsletter widget → Newsletter Stub (card), before the shared
     // page cleanup removes the widget and helix preProcess drops its empty inputs.
@@ -168,6 +178,10 @@ export default {
     });
 
     executeTransformers('afterTransform', main, payload);
+    // after the layout, whose source-table pass would flatten the Footnotes table
+    main.querySelectorAll('p[data-skoda-footnote]').forEach((p) => footnotesParser(p, payload));
+    main.querySelectorAll('[data-skoda-footnote]').forEach((p) => p.removeAttribute('data-skoda-footnote'));
+    restoreBoldHeadings(main);
     // A leading highlight row (SKODA-824) leaves the body section with only its metadata.
     dropEmptySections(main);
 

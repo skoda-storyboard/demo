@@ -4,15 +4,18 @@ import { JSDOM } from 'jsdom';
 
 /* eslint-disable import/no-extraneous-dependencies, no-undef */
 
-const setup = (pressRelease = true) => {
+const setup = (pressRelease = true, url = 'https://example.com/en/press-releases/sample') => {
   const dom = new JSDOM(`<body>${pressRelease ? '<div class="section media-box">' : ''}<div class="downloads"></div>${pressRelease ? '</div>' : ''}</body>`, {
-    url: 'https://example.com/en/press-releases/sample',
+    url,
   });
   if (pressRelease) dom.window.document.body.className = 'press-release';
   let width = 500;
   const queries = [];
   dom.window.matchMedia = (media) => {
-    const min = Number(media.match(/\d+/)[0]);
+    // width queries match from their px value; any other query (the lightbox's
+    // prefers-reduced-motion) never matches
+    const px = media.match(/\d+/);
+    const min = px ? Number(px[0]) : Infinity;
     const listeners = [];
     const query = {
       matches: width >= min,
@@ -85,6 +88,7 @@ test('PDF with no picture renders a labelled file tile and a direct download', a
   assert.equal(link.getAttribute('href'), 'https://example.com/release.pdf?download=1');
   assert.equal(link.getAttribute('download'), '');
   assert.equal(link.getAttribute('aria-label'), 'Download Release PDF (PDF)');
+  assert.equal(link.title, 'Download this', 'the source tooltip (#275)');
 });
 
 test('MP4 poster has a decorative play badge but the round control downloads the video', async () => {
@@ -122,10 +126,13 @@ test('image sizes remain an accessible two-link menu, and incomplete files do no
   assert.equal(block.querySelector('.downloads-play'), null);
   const toggle = block.querySelector('.downloads-download');
   assert.equal(toggle.getAttribute('aria-expanded'), 'false');
-  assert.equal(block.querySelectorAll('.downloads-size').length, 2);
+  assert.equal(block.querySelectorAll('a.downloads-size').length, 2);
   toggle.click();
   assert.equal(toggle.getAttribute('aria-expanded'), 'true');
   assert.equal(block.querySelectorAll('.downloads-size[aria-label^="Download Front view"]').length, 2);
+  assert.deepEqual([...block.querySelectorAll('a.downloads-size')].map((a) => a.title),
+    ['Download Original version', 'Download 1920px version'], 'the source tooltips (#275)');
+  assert.equal(toggle.title, '', 'the toggle has none, as the source\'s');
 });
 
 test('media-box collapses whenever the items need more than two rows (source togglebox, SKODA-830 D2)', async () => {
@@ -171,6 +178,53 @@ test('the toggle stays a labelled button: Show less once open, focus kept in vie
   assert.equal(toggle.textContent, 'Show more');
   assert.equal(scrolled, 1, 'collapsing keeps the button in view');
   assert.equal(document.activeElement, toggle);
+});
+
+test('the toggle uses the locale placeholders sheet from its first label: Show More / Show Less, English without it (#243, #348 review)', async () => {
+  const originalFetch = globalThis.fetch;
+  const asked = [];
+  const sheet = (rows) => async (url) => {
+    asked.push(String(url));
+    return rows ? { ok: true, json: async () => ({ data: rows }) } : { ok: false, status: 404 };
+  };
+  const fiveFiles = (block) => {
+    for (let i = 0; i < 5; i += 1) addRow(block, { title: `PDF ${i}`, links: [['PDF', `/file${i}.pdf`]] });
+  };
+  try {
+    globalThis.fetch = sheet([{ Key: 'Show More', Text: 'Zobrazit více' }, { Key: 'Show Less', Text: 'Zobrazit méně' }]);
+    const cs = setup(true, 'https://example.com/cs/e-mobilita-cs/story');
+    fiveFiles(cs);
+    await decorate(cs);
+    const toggle = cs.querySelector('.downloads-more');
+    // no English first: the label is the locale's as soon as decorate resolves
+    assert.equal(toggle.textContent, 'Zobrazit více');
+    assert.ok(asked.includes('/cs/placeholders.json'), 'the page locale sheet');
+    toggle.click();
+    assert.equal(toggle.textContent, 'Zobrazit méně');
+    toggle.click();
+    assert.equal(toggle.textContent, 'Zobrazit více');
+
+    // no sheet for the locale (404): English stays
+    globalThis.fetch = sheet(null);
+    const sk = setup(true, 'https://example.com/sk/emobilita-sk/story');
+    fiveFiles(sk);
+    await decorate(sk);
+    assert.ok(asked.includes('/sk/placeholders.json'));
+    assert.equal(sk.querySelector('.downloads-more').textContent, 'Show more');
+
+    // a sheet without the keys, or with blank texts: English stays
+    globalThis.fetch = sheet([{ Key: 'Search', Text: 'Pretraga' }, { Key: 'Show Less', Text: '' }]);
+    const sr = setup(true, 'https://example.com/sr/emobilnost-sr/story');
+    fiveFiles(sr);
+    await decorate(sr);
+    assert.ok(asked.includes('/sr/placeholders.json'));
+    const srToggle = sr.querySelector('.downloads-more');
+    assert.equal(srToggle.textContent, 'Show more');
+    srToggle.click();
+    assert.equal(srToggle.textContent, 'Show less');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test('media-box and standard auto groups disclose according to their responsive columns', async () => {
@@ -419,7 +473,7 @@ test('mediabox API mode still renders configured images without a file tile', as
     await decorate(block);
     assert.equal(block.querySelectorAll('.downloads-item').length, 1);
     assert.equal(block.querySelector('.downloads-file'), null);
-    assert.equal(block.querySelectorAll('.downloads-size').length, 2);
+    assert.equal(block.querySelectorAll('a.downloads-size').length, 2);
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -439,7 +493,7 @@ test('cartSize picks the original, else the first size; cartThumb keeps this sit
   assert.equal(cartThumb(''), '');
 });
 
-test('each tile gets an inert add toggle for its original next to its download control', async () => {
+test('a Media Box image tile adds through the source size menu: Original toggles, 1920px stays inert (#275)', async () => {
   const block = setup();
   addRow(block, {
     src: '/media_1.jpg',
@@ -448,13 +502,44 @@ test('each tile gets an inert add toggle for its original next to its download c
   });
   await decorate(block);
   const actions = block.querySelector('.downloads-actions');
-  const add = actions.querySelector('.downloads-add');
-  assert.equal(actions.firstElementChild, add);
-  assert.ok(actions.querySelector('.downloads-action'));
-  assert.deepEqual([add.type, add.getAttribute('aria-label')], ['button', 'Add to media cart: Front view']);
-  assert.equal(add.dataset.href, 'https://www.skoda-storyboard.com/direct-download/a.jpg');
-  assert.equal(add.dataset.title, 'Front view');
-  assert.match(add.dataset.thumb, /^\/media_1\.jpg/);
+  const toggle = actions.querySelector('.downloads-add-toggle');
+  assert.equal(actions.firstElementChild, toggle.parentElement, 'the + comes before the download control');
+  assert.equal(actions.querySelector('.downloads-add'), null, 'no single add toggle on an image tile');
+  assert.deepEqual([toggle.type, toggle.getAttribute('aria-label'), toggle.getAttribute('aria-haspopup')], ['button', 'Add to media cart: Front view', 'true']);
+  const menu = document.getElementById(toggle.getAttribute('aria-controls'));
+  assert.equal(menu.hidden, true);
+  const rows = [...menu.querySelectorAll('.downloads-add-size')];
+  assert.deepEqual(rows.map((r) => r.textContent), ['1920px', 'Original']);
+  const [giant, original] = rows;
+  assert.equal(original.dataset.href, 'https://www.skoda-storyboard.com/direct-download/a.jpg');
+  assert.equal(original.dataset.title, 'Front view');
+  assert.match(original.dataset.thumb, /^\/media_1\.jpg/);
+  assert.equal(original.getAttribute('aria-label'), 'Add/remove Original version: Front view');
+  assert.equal(giant.dataset.href, undefined, 'the cart holds originals only (D5)');
+  assert.equal(giant.getAttribute('aria-disabled'), 'true');
+  assert.equal(giant.getAttribute('aria-label'), "1920px version can't be added to the media cart");
+  assert.deepEqual(rows.map((r) => r.title), ['Add/remove 1920px version', 'Add/remove Original version'], 'the source tooltips');
+  assert.equal(toggle.title, '');
+  toggle.click();
+  assert.equal(menu.hidden, false);
+  assert.equal(toggle.getAttribute('aria-expanded'), 'true');
+  menu.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  assert.equal(menu.hidden, true);
+  assert.equal(document.activeElement, toggle, 'Escape returns focus to the +');
+});
+
+test('outside a Media Box, and for a single-size tile, the add stays one round toggle (#275)', async () => {
+  const block = setup(false);
+  addRow(block, { src: '/a.jpg', title: 'A', links: [['Original', '/a.jpg'], ['1920px', '/a-1920.jpg']] });
+  await decorate(block);
+  assert.ok(block.querySelector('.downloads-add'));
+  assert.equal(block.querySelector('.downloads-add-toggle'), null);
+  const box = setup();
+  addRow(box, { src: '/b.jpg', title: 'B', links: [['Original', '/b.jpg']] });
+  await decorate(box);
+  assert.ok(box.querySelector('.downloads-add'));
+  assert.equal(box.querySelector('.downloads-add-toggle'), null);
+  assert.equal(box.querySelector('.downloads-item .downloads-add').title, 'Add/remove this', 'the source tooltip');
 });
 
 test('Media Box: the group toggle sits on the section stats line', async () => {
@@ -737,15 +822,147 @@ test('gallery CSS: Media Box ladder, overlay controls, source opener bar', async
   assert.match(css, /\.downloads\.gallery\.downloads-collapsed \.downloads-more \{\s+margin-block-start: calc\(-1 \* var\(--dl-gallery-bar\)\);/);
 });
 
-test('Media Box CSS: an opaque band-coloured opener row covers the clipped row 3 under the pill (SKODA-514)', async () => {
-  const { readFile } = await import('node:fs/promises');
-  const css = await readFile(new URL('./downloads.css', import.meta.url), 'utf8');
-  assert.match(css, /\.downloads\.downloads-media-box \.downloads-items \{\s+position: relative;/);
-  const row = css.match(/\.downloads\.downloads-media-box\.downloads-collapsed \.downloads-items::after \{([^}]+)\}/);
-  assert.ok(row, 'opener row rule');
-  assert.match(row[1], /inset: auto 0 0;/);
-  assert.match(row[1], /z-index: 2;/);
-  assert.match(row[1], /height: calc\(var\(--dl-toggle-height\) \+ var\(--dl-tile-gap\)\);/);
-  assert.match(row[1], /background: var\(--dark-color\);/);
-  assert.match(css, /\.downloads\.downloads-collapsed \.downloads-more \{\s+position: relative;\s+z-index: 3;/);
+// #275: the source tile's date, h3 title and clickable file tiles in a Media Box
+function addDatedRow(block, { src = '', date = '', title = '', links = [] }) {
+  addRow(block, { src, title, links });
+  const row = block.lastElementChild;
+  if (date) {
+    const cell = document.createElement('div');
+    cell.textContent = date;
+    row.children[0].after(cell);
+  }
+}
+
+test('a Media Box tile shows its date above an h3 title; a 3-cell row still renders (#275)', async () => {
+  const block = setup();
+  addDatedRow(block, {
+    src: '/a.jpg', date: '23. 3. 2026', title: 'Škoda Peaq', links: [['Original', '/a.jpg'], ['1920px', '/a-1920.jpg']],
+  });
+  addRow(block, { src: '/b.jpg', title: 'Undated', links: [['Original', '/b.jpg']] });
+  await decorate(block);
+  const [dated, undated] = block.querySelectorAll('.downloads-item figure');
+  assert.equal(dated.querySelector('.downloads-date').textContent, '23. 3. 2026');
+  assert.equal(dated.querySelector('.downloads-date + .downloads-title').tagName, 'H3');
+  assert.equal(dated.querySelector('.downloads-title').textContent, 'Škoda Peaq', 'the date is never taken for the title');
+  assert.equal(undated.querySelector('.downloads-date'), null);
+  assert.equal(undated.querySelector('.downloads-title').tagName, 'H3');
+});
+
+test('outside a Media Box the title stays a figcaption and no date shows (#275)', async () => {
+  const block = setup(false);
+  addDatedRow(block, { src: '/a.jpg', date: '23. 3. 2026', title: 'Front', links: [['Original', '/a.jpg']] });
+  await decorate(block);
+  assert.equal(block.querySelector('.downloads-title').tagName, 'FIGCAPTION');
+  assert.equal(block.querySelector('.downloads-title').textContent, 'Front');
+  assert.equal(block.querySelector('.downloads-date'), null);
+});
+
+test('a malformed date stays the title; only the source "d. m. yyyy" form is a date (#275)', async () => {
+  const block = setup();
+  addDatedRow(block, { src: '/a.jpg', date: '2026-03-23', title: '', links: [['Original', '/a.jpg']] });
+  await decorate(block);
+  assert.equal(block.querySelector('.downloads-date'), null);
+  assert.equal(block.querySelector('.downloads-title').textContent, '2026-03-23');
+});
+
+test('a file tile opens its file in a new tab; a Media Box clip shows its frame under a play badge (#275)', async () => {
+  const block = setup();
+  addRow(block, { title: 'Family', links: [['PDF', 'https://dam.example/family.pdf']] });
+  addRow(block, { title: 'Covered Drive', links: [['MP4', 'https://dam.example/clip.mp4']] });
+  await decorate(block);
+  const [pdf, clip] = block.querySelectorAll('.downloads-file');
+  assert.equal(pdf.tagName, 'A');
+  assert.equal(pdf.getAttribute('href'), 'https://dam.example/family.pdf');
+  assert.equal(pdf.target, '_blank');
+  assert.equal(pdf.getAttribute('aria-label'), 'Open Family (PDF)');
+  assert.equal(pdf.dataset.fileType, 'pdf');
+  assert.equal(pdf.querySelector('video'), null);
+  const video = clip.querySelector('video.downloads-file-frame');
+  assert.ok(video, 'a clip without a poster shows its own frame');
+  assert.equal(video.getAttribute('aria-hidden'), 'true');
+  assert.equal(video.muted, true);
+  assert.match(video.src || video.dataset.src, /clip\.mp4#t=0\.1$/);
+  assert.equal(clip.querySelector('.downloads-play').getAttribute('aria-hidden'), 'true');
+});
+
+test('outside a Media Box a clip file tile has no video frame (#275)', async () => {
+  const block = setup(false);
+  addRow(block, { title: 'Clip', links: [['MP4', '/clip.mp4']] });
+  await decorate(block);
+  assert.equal(block.querySelector('.downloads-file video'), null);
+  assert.equal(block.querySelector('.downloads-file-type').textContent, 'MP4');
+});
+
+const click = (el, init = {}) => {
+  const e = new window.MouseEvent('click', {
+    bubbles: true, cancelable: true, button: 0, ...init,
+  });
+  el.dispatchEvent(e);
+  return e;
+};
+// the lightbox module loads on the first click
+const loaded = () => new Promise((resolve) => { setTimeout(resolve, 50); });
+
+test('Media Box: a tile image opens the shared lightbox on the whole box, as the source colorbox group (SKODA-604)', async () => {
+  const block = setup();
+  const h1 = document.createElement('h1');
+  h1.textContent = 'Peaq enters production';
+  document.body.prepend(Object.assign(document.createElement('main'), {}));
+  document.querySelector('main').append(h1);
+  addRow(block, { src: '/a.jpg', title: 'Line', links: [['Original', 'https://dam.example/a.jpg'], ['1920px', 'https://dam.example/a-1920.jpg']] });
+  addRow(block, { title: 'Release', links: [['PDF', 'https://dam.example/r.pdf']] });
+  addRow(block, { src: '/b.jpg', title: 'Body shop', links: [['Original', 'https://dam.example/b.png']] });
+  await decorate(block);
+  const thumbs = block.querySelectorAll('.downloads-thumb');
+  assert.equal(thumbs.length, 2, 'the PDF file tile has no image to open');
+  const event = click(thumbs[1]);
+  assert.equal(event.defaultPrevented, true, 'the image link is not followed');
+  await loaded();
+  const overlay = document.querySelector('.gallery-overlay');
+  assert.ok(overlay, 'the shared lightbox is built on first use');
+  assert.equal(overlay.hidden, false);
+  assert.equal(overlay.getAttribute('role'), 'dialog');
+  assert.equal(overlay.querySelector('.gallery-lightbox-count').getAttribute('aria-label'), 'Image 2 of 2');
+  const panel = overlay.querySelector('.gallery-lightbox-stage').textContent;
+  assert.match(panel, /Body shop/);
+  assert.match(panel, /File type: PNG/);
+  assert.match(panel, /Related article: Peaq enters production/);
+  assert.equal(overlay.querySelector('a.download').getAttribute('href'), 'https://dam.example/b.png');
+  // the same overlay serves every tile of the box
+  click(overlay.querySelector('.gallery-lightbox-close'));
+  assert.equal(overlay.hidden, true);
+  assert.equal(document.activeElement, thumbs[1], 'focus returns to the tile');
+  click(thumbs[0]);
+  await loaded();
+  assert.equal(document.querySelectorAll('.gallery-overlay').length, 1);
+  assert.equal(overlay.querySelector('.gallery-lightbox-count').getAttribute('aria-label'), 'Image 1 of 2');
+});
+
+test('Media Box lightbox: modifier clicks keep the image link; outside a Media Box the link is plain (SKODA-604)', async () => {
+  let block = setup();
+  addRow(block, { src: '/a.jpg', title: 'Line', links: [['Original', 'https://dam.example/a.jpg']] });
+  await decorate(block);
+  assert.equal(click(block.querySelector('.downloads-thumb'), { ctrlKey: true }).defaultPrevented, false);
+  block = setup(false);
+  addRow(block, { src: '/a.jpg', title: 'Line', links: [['Original', 'https://dam.example/a.jpg']] });
+  await decorate(block);
+  assert.equal(click(block.querySelector('.downloads-thumb')).defaultPrevented, false);
+});
+
+test('lightboxItem: the original drives download, link and cart; a clip shows its poster and downloads its MP4 (SKODA-604)', async () => {
+  setup();
+  const { lightboxItem } = await import('./downloads.js');
+  const image = lightboxItem({
+    src: '/a.jpg', title: 'Line', date: '6. 8. 2026', sizes: [{ label: '1920px', href: '/a-1920.jpg' }, { label: 'Original', href: 'https://dam.example/a.JPG' }],
+  }, { title: 'Story', href: '/en/story' });
+  assert.equal(image.download, 'https://dam.example/a.JPG');
+  assert.equal(image.cartHref, 'https://dam.example/a.JPG');
+  assert.equal(image.video, undefined);
+  assert.match(image.caption.textContent, /File type: JPG.*Published: 6\. 8\. 2026/s);
+  assert.equal(image.caption.querySelector('a').getAttribute('href'), '/en/story');
+  const clip = lightboxItem({ src: '/p.jpg', title: 'Clip', sizes: [{ label: 'MP4', href: 'https://dam.example/c.mp4' }] });
+  assert.equal(clip.video, undefined, 'the attachment MP4 never loads in a player frame');
+  assert.equal(clip.src, '/p.jpg');
+  assert.equal(clip.download, 'https://dam.example/c.mp4');
+  assert.equal(clip.caption.querySelector('a'), null, 'no related article without a page title');
 });

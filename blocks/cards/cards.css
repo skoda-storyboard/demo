@@ -29,8 +29,35 @@
   --tile-title-backdrop: rgb(0 0 0 / 56%);
 }
 
+/* press-kit tiles keep the source's look: the white title on the image gradients only, no
+   backdrop (#275, PO decision; the series tiles keep theirs, docs/ui-specs/series.md §6) */
+.cards.tiles:has(> .tiles-press) {
+  --tile-title-backdrop: transparent;
+}
+
 .cards.tiles li {
   margin-block-end: 0;
+}
+
+/* image-only banner tiles of a press mosaic: the source's linked banner image at its own
+   aspect ratio (628 x 198, 412 x 197, 520 x 260 at 1080), top-aligned in its row. The source
+   banner sits in a <p> with a 20px bottom margin, so a row with a banner is 20px taller. */
+.cards.tiles .tile-image-only {
+  align-self: start;
+  margin-block-end: var(--grid-gutter);
+}
+
+.cards.tiles .tile-image-link,
+.cards.tiles .tile-image-link picture,
+.cards.tiles .tile-image-link img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.cards.tiles .tile-image-link:focus-visible {
+  outline: 2px solid var(--link-color);
+  outline-offset: 2px;
 }
 
 .cards.tiles .card-teaser-image {
@@ -92,7 +119,8 @@
   .cards.tiles .tile-third .card-teaser-image,
   .cards.tiles .tile-two-thirds .card-teaser-image,
   .cards.tiles .tile-feature .card-teaser-image,
-  .cards.tiles .tile-press-half .card-teaser-image {
+  .cards.tiles .tile-press-half .card-teaser-image,
+  .cards.tiles .tile-press-third .card-teaser-image {
     aspect-ratio: auto;
   }
 
@@ -101,7 +129,8 @@
   .cards.tiles .tile-third .card-teaser-image::before,
   .cards.tiles .tile-two-thirds .card-teaser-image::before,
   .cards.tiles .tile-feature .card-teaser-image::before,
-  .cards.tiles .tile-press-half .card-teaser-image::before {
+  .cards.tiles .tile-press-half .card-teaser-image::before,
+  .cards.tiles .tile-press-third .card-teaser-image::before {
     content: "";
     display: block;
     padding-block-end: calc((100% - var(--grid-gutter)) / 2);
@@ -161,6 +190,38 @@
 
   .cards.tiles .tile-press-half {
     grid-column-end: span 10;
+  }
+
+  /* a press mosaic with thirds or banners (Classic Days 2026): 30 columns, so fifths, thirds,
+     halves, 3/5 and 2/5 all fit (scripts/cards-tiles.js MOSAIC_SPANS; the 20-column track
+     can't split in three, 60 columns would have more gaps than the row is wide) */
+  .cards.tiles ul.tiles-press-mosaic {
+    grid-template-columns: repeat(30, minmax(0, 1fr));
+  }
+
+  .cards.tiles .tiles-press-mosaic .tile-press-square {
+    grid-column-end: span 6;
+  }
+
+  .cards.tiles .tiles-press-mosaic .tile-press-third {
+    grid-column-end: span 10;
+  }
+
+  .cards.tiles .tiles-press-mosaic .tile-feature {
+    grid-column-end: span 12;
+  }
+
+  .cards.tiles .tiles-press-mosaic .tile-press-banner-narrow {
+    grid-column-end: span 12;
+  }
+
+  .cards.tiles .tiles-press-mosaic .tile-press-half,
+  .cards.tiles .tiles-press-mosaic .tile-press-banner-half {
+    grid-column-end: span 15;
+  }
+
+  .cards.tiles .tiles-press-mosaic .tile-press-banner-wide {
+    grid-column-end: span 18;
   }
 
   .cards.tiles .tile-banner,
@@ -271,6 +332,13 @@
   font-size: var(--body-font-size-m);
   font-weight: var(--weight-medium);
   line-height: var(--series-directory-title-line-height);
+}
+
+/* no zoom on hover or keyboard focus, as the source directory card (SKODA-229, #331);
+   the focus ring stays */
+.cards.series-directory .card-teaser:hover .card-teaser-image img,
+.cards.series-directory .card-teaser:has(:focus-visible) .card-teaser-image img {
+  scale: none;
 }
 
 .cards.series-directory .card-teaser-summary {

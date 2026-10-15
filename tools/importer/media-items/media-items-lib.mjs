@@ -304,6 +304,20 @@ export function assetItem(link, panelDoc) {
 }
 
 /**
+ * Where the source anchors a card image in its 16:9 crop (#273): its `.image-holder` carries
+ * `snap-top` / `snap-bottom` (`snap-center` is the default). 'top' | 'bottom' | ''.
+ * @param {Element} article
+ * @returns {string}
+ */
+export function cardFocus(article) {
+  const holder = article.querySelector('.image-holder');
+  if (!holder) return '';
+  if (holder.classList.contains('snap-top')) return 'top';
+  if (holder.classList.contains('snap-bottom')) return 'bottom';
+  return '';
+}
+
+/**
  * Parse the media cards of a source listing page into item descriptors.
  * @param {Document} doc
  * @param {{options?: Map, yearsById?: object}} ctx
@@ -326,6 +340,7 @@ export function parseCards(doc, { options, yearsById } = {}) {
       caption: ((img && img.getAttribute('data-caption')) || '').replace(/\s+/g, ' ').trim(),
       alt: ((img && img.getAttribute('alt')) || '').trim(),
       thumbnail: cdnUrl(img && img.getAttribute('src')),
+      focus: cardFocus(article),
       terms: cardTerms(article, opts, yearsById),
     };
 
@@ -441,6 +456,8 @@ export function feedRow(item) {
   FACETS.forEach((tax) => { row[tax] = (item.terms[tax] || []).join(', '); });
   DOWNLOAD_FIELDS.forEach((field) => { row[field] = item[field] || ''; });
   DETAIL_FIELDS.forEach((field) => { row[field] = item[field] || ''; });
+  // the card's crop anchor (#273): 'top' | 'bottom', empty = centred
+  row.focus = item.focus || '';
   row.id = item.id;
   row.source = item.source;
   return row;

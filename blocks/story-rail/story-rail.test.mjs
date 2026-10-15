@@ -454,6 +454,29 @@ test('press variant: default rails keep the carousel ladder (no unscoped cell wi
     }));
 });
 
+// --- story Related band arrows + card title hover (#296, SKODA-228) -------------------------
+const ruleFor = (rules, sel) => rules.find(({ selector }) => selectorList(selector).includes(sel));
+
+test('story Related band: the arrows are the source glyph, as on the home bands (#296)', () => {
+  const prev = ruleFor(cssRules, `${STORY_BAND} .carousel-arrow::after`);
+  const next = ruleFor(cssRules, `${STORY_BAND} .carousel-next::after`);
+  assert.ok(prev?.body.includes('rail-arrow-prev.svg'), 'prev glyph mask');
+  assert.ok(next?.body.includes('rail-arrow-next.svg'), 'next glyph mask');
+  // the same rules as the home bands, not a copy that can drift
+  assert.equal(ruleFor(cssRules, '.story-rail.story-rail-home .carousel-arrow::after'), prev);
+  assert.equal(ruleFor(cssRules, '.story-rail.story-rail-home .carousel-next::after'), next);
+});
+
+test('card titles keep their colour on hover: one rule in the shared card primitive (SKODA-228)', async () => {
+  const teaserCss = await readFile(new URL('../../styles/card-teaser.css', import.meta.url), 'utf8');
+  const shared = teaserCss.replace(/\/\*[\s\S]*?\*\//g, '').match(/\.card-teaser-title a:hover\s*\{([^}]*)\}/);
+  assert.ok(shared, 'the shared rule exists');
+  assert.match(shared[1], /color:\s*inherit/);
+  assert.match(shared[1], /text-decoration:\s*none/);
+  // #306's home-only copy is gone: the shared rule covers every rail and card grid
+  assert.equal(cssRules.filter(({ selector }) => selector.includes('card-teaser-title a:hover')).length, 0);
+});
+
 // --- press "All" end card (SKODA-224): only a full band gets it ----------------------
 const { PRESS_BAND_SIZE, pressBandIsFull, pressAllLink } = await import('./story-rail.js');
 
@@ -554,6 +577,20 @@ test('railLayout: every home-band index rail is wide; Models keeps its ladder; t
   assert.deepEqual(railLayout({ ...home, template: 'press_release', layout: 'news' }).classes, [
     'story-rail-wide', 'story-rail-home',
   ]);
+  assert.deepEqual(railLayout({ ...home, template: 'story' }).carousel, [], 'post rails keep the overlay card');
+});
+
+test('railLayout: Media Room Images / Videos bands take the model ladder and the media card', () => {
+  ['image', 'video'].forEach((template) => {
+    const { classes, carousel, endCard } = railLayout({ ...home, template, viewAll: '/en/images' });
+    assert.deepEqual(classes, ['story-rail-wide', 'story-rail-home', 'story-rail-media'], template);
+    assert.deepEqual(carousel, ['media', 'caption', template], template);
+    assert.equal(endCard, true, `${template}: the source rail ends with its "All" card`);
+  });
+  // outside a home band (a model page's Images rail) the template script owns the card
+  const modelPage = railLayout({ ...home, homeBand: false, landing: false, template: 'image' });
+  assert.deepEqual(modelPage.classes, []);
+  assert.deepEqual(modelPage.carousel, []);
 });
 
 test('railLayout: other rails keep their layouts (non-home bands, press band, curated, non-landing)', () => {
@@ -704,4 +741,90 @@ test('every config key story-rail reads is registered in the publication contrac
   assert.deepEqual([...CONFIG_KEYS].filter((key) => !registered.has(key)), [], 'read by the block, missing from the registry');
   assert.deepEqual([...registered].filter((key) => !CONFIG_KEYS.has(key)), [], 'registered, not read by the block');
   assert.ok(registered.has('order'));
+});
+
+// --- #332: the Media Room News rail skips what the promo box shows --------------------------------
+
+const {
+  shownPaths, promoShownPaths, skipsPromo, PROMO_WAIT_MS,
+} = await import('./story-rail.js');
+
+// a promo-box block as the rail sees it: its status and its cards' stretched links
+function fakePromo(hrefs, status = 'loaded') {
+  return {
+    dataset: { blockStatus: status },
+    querySelectorAll: (sel) => (sel === '.card-teaser-link[href]'
+      ? hrefs.map((href) => ({ getAttribute: (k) => (k === 'href' ? href : null) })) : []),
+  };
+}
+const pageWith = (promo) => ({ querySelector: (sel) => (sel === 'main .promo-box' ? promo : null) });
+
+test('#332: shownPaths reads the promo cards as index paths, in order, without repeats', () => {
+  const promo = fakePromo([
+    'https://main--demo--skoda-storyboard.aem.page/en/press-releases/elroq',
+    '/en/press-releases/enyaq/',
+    '/en/press-kits/peaq.html',
+    '/en/press-releases/elroq',
+  ]);
+  assert.deepEqual(shownPaths(promo), ['/en/press-releases/elroq', '/en/press-releases/enyaq', '/en/press-kits/peaq']);
+  assert.deepEqual(shownPaths(null), []);
+});
+
+test('#332: selectRows skips the shown pages by whole path, then fills the limit', () => {
+  const cfg = parseConfig(cfgBlock([['template', 'press_release'], ['limit', '2']]));
+  assert.deepEqual(selectRows(rows, cfg).map((r) => r.title), ['Elroq', 'Enyaq'], 'without a promo');
+  const out = selectRows(rows, { ...cfg, shown: ['/en/press-releases/elroq'] });
+  // the newest is in the promo: the rail starts with the next one and still shows two
+  assert.deepEqual(out.map((r) => r.title), ['Enyaq', 'Octavia']);
+  // a path that only contains a shown one is not shown
+  const partial = selectRows(rows, { ...cfg, shown: ['/en/press-releases/elr'] });
+  assert.deepEqual(partial.map((r) => r.title), ['Elroq', 'Enyaq']);
+});
+
+test('#332: only an index News rail skips the promo', () => {
+  const news = parseConfig(cfgBlock([['template', 'press_release']]));
+  assert.equal(skipsPromo(news), true);
+  assert.equal(skipsPromo(news, { press: true }), false, 'a Related Press Releases band');
+  assert.equal(skipsPromo(news, { curated: true }), false, 'a hand-picked rail');
+  assert.equal(skipsPromo({ ...news, order: ['/en/press-releases/elroq'] }), false, 'an ordered rail');
+  ['story', 'press_kit', 'image', 'video', 'skoda_model'].forEach((template) => {
+    assert.equal(skipsPromo(parseConfig(cfgBlock([['template', template]]))), false, template);
+  });
+});
+
+test('#332: promoShownPaths reads a loaded promo, and shows nothing without one', async () => {
+  assert.deepEqual(await promoShownPaths(pageWith(null)), []);
+  const promo = fakePromo(['/en/press-releases/elroq']);
+  assert.deepEqual(await promoShownPaths(pageWith(promo)), ['/en/press-releases/elroq']);
+  assert.ok(PROMO_WAIT_MS > 0);
+});
+
+test('#332: promoShownPaths waits for the promo to load, and gives up after the timeout', async () => {
+  const observers = [];
+  class FakeObserver {
+    constructor(cb) { this.cb = cb; this.connected = false; observers.push(this); }
+
+    observe() { this.connected = true; }
+
+    disconnect() { this.connected = false; }
+  }
+  const saved = { global: globalThis.MutationObserver, window: globalThis.window.MutationObserver };
+  globalThis.MutationObserver = FakeObserver;
+  globalThis.window.MutationObserver = FakeObserver;
+  try {
+    const promo = fakePromo(['/en/press-releases/enyaq'], 'loading');
+    const pending = promoShownPaths(pageWith(promo), 1000);
+    promo.dataset.blockStatus = 'loaded';
+    observers[0].cb();
+    assert.deepEqual(await pending, ['/en/press-releases/enyaq']);
+    assert.equal(observers[0].connected, false, 'stops watching once loaded');
+
+    // a promo that never loads: the rail builds with nothing skipped
+    const stuck = fakePromo(['/en/press-releases/enyaq'], 'loading');
+    assert.deepEqual(await promoShownPaths(pageWith(stuck), 5), []);
+    assert.equal(observers[1].connected, false, 'stops watching on timeout');
+  } finally {
+    globalThis.MutationObserver = saved.global;
+    globalThis.window.MutationObserver = saved.window;
+  }
 });

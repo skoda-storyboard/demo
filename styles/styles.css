@@ -60,6 +60,7 @@
   --story-sidebar-heading-size-compact: 20px;
   --story-sidebar-heading-line-height: 45px;
   --card-caption-row: 45px; /* taxonomy caption card: the white title row under the image (source .entry-title) */
+  --media-card-caption-rows: 140px; /* media card under the image: 44 date + 46 two-line title + 50 toolbar (source .type-attachment) */
   --story-dark-band-max-width: var(--cover-box-max-width); /* live story .cover-box.dark cap: Media Box + Related Stories */
   --story-dark-band-gap: 2.25em; /* live .cover-box.dark top margin (36px) between stacked story bands */
 
@@ -81,6 +82,7 @@
   --related-band-heading-inset: 10px;
   --related-band-card-title-compact: 20px;
   --related-band-date-gap: 6px;
+  --rail-date-gap: 12px; /* source .entry-published → title, every rail (#272, #284) */
 
   /* hero titles (hero.md §3/§4; SKODA-202): story 40->28; overlay 48/300 white */
   --heading-font-size-hero: 48px;
@@ -208,6 +210,7 @@
   --cover-box-light-padding-top: calc(var(--spacing-s) + var(--spacing-l)); /* 12px band + 24px above the rail header */
   --cover-box-light-padding-bottom: calc(var(--spacing-m) + var(--spacing-s)); /* 16px below the rail + 12px band */
   --cover-box-feed-padding-bottom: var(--spacing-s); /* Latest Stories: no margin under Load more */
+  --cover-box-compact-light-padding-bottom: calc(var(--spacing-s) + var(--cover-box-rail-gap)); /* Media Room light band: 12px band + live's 48px .search-results margin */
   --nav-height: 108px;
   --nav-main-height: 64px;
   --nav-topbar-height: 44px;
@@ -285,12 +288,15 @@
   --cart-limit-accent: var(--skoda-green);
   --cart-popup-shadow: 0 18px 50px rgb(0 0 0 / 25%);
 
-  /* the added card's glyph shrinks into place (64 → 48px) and fades in with the source's
-     spring, 0.3s after the click */
+  /* the added card's glyph (the source's \e02f bag, icons/media-cart-added.svg) shrinks into
+     place (64 → 48px) and fades in with the source's spring, 0.3s after the click; it goes
+     at once when the file leaves the cart (#275) */
   --cart-added-glyph: 48px;
   --cart-added-glyph-from: 64px;
-  --cart-added-motion: 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) 0.3s;
+  --cart-added-motion: 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  --cart-added-delay: 0.3s;
   --z-cart-notice: 19;
+  --z-cart-flying: 20; /* the card's copy flying to the cart badge, over the dock (scripts/media-cart-fly.js) */
 }
 
 /* The global element defaults below (body, headings, paragraphs, lists, strong/em, hr, line
@@ -774,7 +780,7 @@ main > .section.media-box > .default-content-wrapper {
   margin-block-end: var(--paragraph-gap);
 }
 
-main > .section.media-box > .default-content-wrapper > h2 {
+main > .section.media-box > .default-content-wrapper > :is(h2, h3) {
   margin: 0;
   color: inherit;
   font-size: var(--media-box-title-size);
@@ -901,6 +907,12 @@ main > .section.cover-box.dark.compact {
   padding-block-start: var(--cover-box-compact-padding-top);
 }
 
+/* the Media Room home's light bands (`compact`): live's .search-results there keep a 48px bottom
+   margin (16px on the Storyboard home), so the last rail cards sit 60px above the band end */
+main > .section.cover-box.compact:not(.dark) {
+  padding-block-end: var(--cover-box-compact-light-padding-bottom);
+}
+
 /* a band sets its own rhythm: no stray list margin under the rail cards (light bands too,
    SKODA-611b: the global li margin made a light rail 8px taller than live and its reserve) */
 main > .section.cover-box .carousel-track .card-teaser {
@@ -936,9 +948,9 @@ main > .section.dark.cards-container:has(.cards.social) {
    content sits the source's 10px in from the edge and fills the column (no measure
    cap, as on the source). Story prose scale is measured (story-detail.md §3,
    re-measured on the live Epiq story): body p 16/24; h2 24/27 → 40/45 and h3
-   20/23 → 24/27.6 above 768px, all wt300 with a 16px gap below; prose lists use a
-   custom bullet (list-style:none, padding 1.5em). Scoped to the story body column
-   so global heading sizes stay intact. */
+   20/23 → 24/27.6 above 768px, all wt300 (bold heading text: below) with a 16px gap
+   below; prose lists use a custom bullet (list-style:none, padding 1.5em). Scoped to the
+   story body column so global heading sizes stay intact. */
 body.story main > .section.body-column > div {
   padding-inline: var(--story-inset);
 }
@@ -960,6 +972,35 @@ body.story main > .section.body-column .default-content-wrapper h3 {
   font-size: var(--heading-font-size-story-h3-mobile);
   font-weight: var(--weight-light);
   line-height: 1.15;
+}
+
+/* A heading the source sets bold (<h3><strong>, most story h3: KYL's sub-headings) keeps its
+   <strong> through the import (story-flatten markBoldHeadings / restoreBoldHeadings) and is 600,
+   the source's weight, not `bolder` (400 on a 300 heading). Unbolded ones, e.g. Slavia's
+   "Technical improvements", stay 300 (#296). */
+body.story main > .section.body-column .default-content-wrapper :is(h2, h3) strong {
+  font-weight: var(--weight-semibold);
+}
+
+/* Source widgets are 24px apart from 720px (#296, KYL measured at 375–1440):
+   - every body heading starts its own SiteOrigin widget (59 of 59 across the 21 demo
+     stories), so after a paragraph it sits 20 + 24 = 44px down ("Careful Planning",
+     "During the travels…"; 20px below 720, the collapsed margins as here);
+   - the text after a split row (Columns split-NN, the quote | portrait rows) starts below
+     the row's 10px cell padding, plus the gap from 720 ("Škoda Kylaq sets out…": 10 / 34px
+     under the row on the source, 0 here). */
+body.story main > .section.body-column .columns-wrapper:has(> .columns.split) + .default-content-wrapper > :first-child {
+  margin-block-start: var(--story-inset);
+}
+
+@media (width >= 720px) {
+  body.story main > .section.body-column .default-content-wrapper > p + :is(h2, h3) {
+    margin-block-start: calc(var(--paragraph-gap) + var(--spacing-l));
+  }
+
+  body.story main > .section.body-column .columns-wrapper:has(> .columns.split) + .default-content-wrapper > :first-child {
+    margin-block-start: calc(var(--story-inset) + var(--spacing-l));
+  }
 }
 
 /* Story intro under the hero (measured on the live Epiq story header): the perex
@@ -1041,7 +1082,7 @@ body.story main > .section.sidebar > div {
   padding-inline: var(--story-sidebar-inset);
 }
 
-body.story main > .section.sidebar .default-content-wrapper > h2 {
+body.story main > .section.sidebar .default-content-wrapper > :is(h2, h3) {
   margin: 0;
   color: var(--skoda-grey-800);
   font-size: var(--story-sidebar-heading-size-compact);
@@ -1057,17 +1098,45 @@ body.story main > .section.sidebar .default-content-wrapper > h2 {
    one band: the source pulls the second row 40px up over the first's empty bottom, so the
    first drops its bottom inset and the second keeps the 10px cell padding (text 30px apart,
    32 on the source). */
+/* stylelint-disable-next-line no-descending-specificity -- custom properties only: no property
+   here meets the hero rules above */
+body.story main > .section:is(.highlight-dark, .highlight-grey) {
+  /* A panel whose source layout sets its own row padding or widget margins carries them
+     (Section Metadata `highlight-padding|margin|gallery-margin[-mobile]`, scripts.js sets the
+     --hl-*-m-* / --hl-*-d-* boxes); the rest keep the theme's: no row padding, the 15px widget
+     margin, a gallery flush with the 10px cell padding. Up to 780px the mobile boxes apply. */
+  --hl-pad-top: var(--hl-pad-m-top, var(--highlight-row-top));
+  --hl-pad-right: var(--hl-pad-m-right, 0px);
+  --hl-pad-bottom: var(--hl-pad-m-bottom, 0px);
+  --hl-pad-left: var(--hl-pad-m-left, 0px);
+  --hl-margin-top: var(--hl-margin-m-top, var(--highlight-widget-block));
+  --hl-margin-right: var(--hl-margin-m-right, var(--highlight-widget-inline));
+  --hl-margin-bottom: var(--hl-margin-m-bottom, var(--highlight-widget-block));
+  --hl-margin-left: var(--hl-margin-m-left, var(--highlight-widget-inline));
+  --hl-gallery-right: var(--hl-gallery-m-right, 0px);
+  --hl-gallery-left: var(--hl-gallery-m-left, 0px);
+}
+
 /* stylelint-disable-next-line no-descending-specificity -- the intro → body rule above must
    keep winning on a leading panel's top margin */
 body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) {
   margin-block-start: 0;
   padding-block:
-    calc(var(--highlight-row-top) + var(--story-inset) + var(--highlight-widget-block))
-    calc(var(--story-inset) + var(--highlight-widget-block));
+    calc(var(--hl-pad-top) + var(--story-inset) + var(--hl-margin-top))
+    calc(var(--hl-pad-bottom) + var(--story-inset) + var(--hl-margin-bottom));
 }
 
 body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) > div {
-  padding-inline: calc(var(--story-inset) + var(--highlight-widget-inline));
+  padding-inline:
+    calc(var(--hl-pad-left) + var(--story-inset) + var(--hl-margin-left))
+    calc(var(--hl-pad-right) + var(--story-inset) + var(--hl-margin-right));
+}
+
+/* a gallery sits its own source margin in, not the text's */
+body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) .gallery.slider {
+  margin-inline:
+    calc(var(--hl-gallery-left) - var(--hl-margin-left))
+    calc(var(--hl-gallery-right) - var(--hl-margin-right));
 }
 
 /* panel images are block-level, as on the source: an inline image leaves the paragraph's
@@ -1079,8 +1148,7 @@ body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) .def
 /* A leading panel keeps the intro → body gap but its own top inset (after the intro → body
    rule, which has the same specificity). */
 body.story main > .section:first-of-type + .section:is(.highlight-dark, .highlight-grey) {
-  padding-block-start:
-    calc(var(--highlight-row-top) + var(--story-inset) + var(--highlight-widget-block));
+  padding-block-start: calc(var(--hl-pad-top) + var(--story-inset) + var(--hl-margin-top));
 }
 
 body.story main > .section:is(.highlight-dark, .highlight-grey):has(+ .section.body-column),
@@ -1091,6 +1159,15 @@ body.story main > .section.body-column:has(+ .section:is(.highlight-dark, .highl
 body.story main > .section:is(.highlight-dark, .highlight-grey) + .section.body-column {
   margin-block-start: 0;
   padding-block-start: var(--story-inset);
+}
+
+/* …plus the 24px between source widgets from 720px (the panel and the text after it are two
+   widgets; KYL "The Kylaq P2P Expedition in Numbers" panel → text: 34px at 768–1440, 10 below,
+   #296), as the heading gap above */
+@media (width >= 720px) {
+  body.story main > .section:is(.highlight-dark, .highlight-grey) + .section.body-column {
+    padding-block-start: calc(var(--story-inset) + var(--spacing-l));
+  }
 }
 
 body.story main > .section.highlight-dark:has(+ .section.highlight-dark),
@@ -1197,6 +1274,20 @@ body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has
   body.story {
     --highlight-widget-block: 0px;
   }
+
+  /* a panel's own desktop geometry (see the panel rule above) */
+  body.story main > .section:is(.highlight-dark, .highlight-grey) {
+    --hl-pad-top: var(--hl-pad-d-top, var(--highlight-row-top));
+    --hl-pad-right: var(--hl-pad-d-right, 0px);
+    --hl-pad-bottom: var(--hl-pad-d-bottom, 0px);
+    --hl-pad-left: var(--hl-pad-d-left, 0px);
+    --hl-margin-top: var(--hl-margin-d-top, var(--highlight-widget-block));
+    --hl-margin-right: var(--hl-margin-d-right, var(--highlight-widget-inline));
+    --hl-margin-bottom: var(--hl-margin-d-bottom, var(--highlight-widget-block));
+    --hl-margin-left: var(--hl-margin-d-left, var(--highlight-widget-inline));
+    --hl-gallery-right: var(--hl-gallery-d-right, 0px);
+    --hl-gallery-left: var(--hl-gallery-d-left, 0px);
+  }
 }
 
 /* From 1080 the hero title moves above its image (hero-image block), so the intro
@@ -1234,15 +1325,25 @@ body.story main > .section.media-box + .section.dark.story-rail-container {
   margin-block-start: var(--story-dark-band-gap);
 }
 
+/* A Media Box that ends the story (no Related Stories, as on the Kylaq story) keeps the source
+   band's 24px bottom margin before the footer, like the related band (#296; it touched it). */
+body.story main > .section.media-box:last-child {
+  margin-block-end: var(--spacing-l);
+}
+
 body.story main > .section.dark.story-rail-container > div {
   padding-inline: 0;
 }
 
+/* 20px from the heading block (title, and "Based on tags: …" when there is one) to the cards, as
+   the source header's margin: with no tags line the cards sat right under the title (#296). The
+   title is h3 on the source and in new imports, h2 in older ones (#296): both look the same. */
 body.story main > .section.dark.story-rail-container .default-content-wrapper {
+  margin-block-end: var(--paragraph-gap);
   padding-inline: var(--related-band-heading-inset);
 }
 
-body.story main > .section.dark.story-rail-container .default-content-wrapper h2 {
+body.story main > .section.dark.story-rail-container .default-content-wrapper :is(h2, h3) {
   margin: 0;
   color: var(--skoda-white);
   font-size: var(--related-band-heading-compact);
@@ -1251,7 +1352,7 @@ body.story main > .section.dark.story-rail-container .default-content-wrapper h2
 }
 
 body.story main > .section.dark.story-rail-container .default-content-wrapper p {
-  margin-block: 0 var(--paragraph-gap);
+  margin-block: 0;
   color: var(--related-band-subtitle-color);
   font-size: var(--body-font-size-m);
   font-weight: var(--weight-semibold);
@@ -1270,11 +1371,11 @@ body.story {
     --media-box-title-size: var(--heading-font-size-l);
   }
 
-  body.story main > .section.sidebar .default-content-wrapper > h2 {
+  body.story main > .section.sidebar .default-content-wrapper > :is(h2, h3) {
     font-size: var(--body-font-size-m);
   }
 
-  body.story main > .section.dark.story-rail-container .default-content-wrapper h2 {
+  body.story main > .section.dark.story-rail-container .default-content-wrapper :is(h2, h3) {
     font-size: var(--heading-font-size-l);
   }
 }

@@ -68,6 +68,64 @@ function decorateSidebar(section) {
   section.append(aside);
 }
 
+// the Media Box add-all control's state, mirrored on the sidebar's add button
+const ADD_ALL_STATE = ['data-in-cart', 'aria-pressed', 'aria-disabled', 'aria-busy'];
+
+/**
+ * Mirrors the Media Box add-all control's state on the sidebar button. The Downloads block
+ * builds and wires its control later (lazy, after the cart loads), so the Media Box is watched
+ * until then and on every cart change after.
+ * @param {HTMLButtonElement} button The sidebar add button
+ * @param {Element} mediaBox The Media Box section
+ */
+function mirrorAddAll(button, mediaBox) {
+  const sync = () => {
+    const addAll = mediaBox.querySelector('.downloads-add-all');
+    ADD_ALL_STATE.forEach((name) => {
+      const value = addAll?.getAttribute(name);
+      if (value === null || value === undefined) button.removeAttribute(name);
+      else button.setAttribute(name, value);
+    });
+    // until the Media Box control is wired, a click has nothing to do
+    if (!addAll?.hasAttribute('data-wired')) button.setAttribute('aria-disabled', 'true');
+  };
+  new MutationObserver(sync).observe(mediaBox, {
+    subtree: true, childList: true, attributes: true, attributeFilter: [...ADD_ALL_STATE, 'data-wired'],
+  });
+  sync();
+}
+
+/**
+ * Sidebar "Additional info" links (#274): "Media contacts" gets the source's arrow, and
+ * "Download Media Box" the source's round add button beside it, which adds (or, once all are
+ * in, removes) every Media Box file, as the Media Box's own add-all control does.
+ * @param {Element} section The sidebar section
+ * @param {Element|null} mediaBox The Media Box section
+ */
+function decorateSidebarLinks(section, mediaBox) {
+  if (!section) return;
+  section.querySelectorAll('.default-content-wrapper > ul > li > a[href]').forEach((a) => {
+    const href = a.getAttribute('href');
+    if (/\/contacts\/?$/.test(new URL(href, window.location.href).pathname)) {
+      a.classList.add('press-release-contacts');
+      return;
+    }
+    if (href !== '#media-box' || !mediaBox?.querySelector('.downloads')) return;
+    const li = a.parentElement;
+    li.classList.add('press-release-media-box');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'press-release-add-all';
+    button.setAttribute('aria-label', 'Add all Media Box files to the media cart');
+    button.addEventListener('click', () => {
+      const addAll = mediaBox.querySelector('.downloads-add-all[data-wired]');
+      if (addAll && button.getAttribute('aria-disabled') !== 'true') addAll.click();
+    });
+    li.append(button);
+    mirrorAddAll(button, mediaBox);
+  });
+}
+
 /**
  * Related bands: the "All" link authored after the heading + "Based on tags" line is a
  * plain link (the importer emits `<p><a>All</a></p>`), which decorateButtons skips because
@@ -95,8 +153,10 @@ export default function decorate(main) {
   const sections = [...main.querySelectorAll(':scope > .section')];
   decorateHeader(sections.find((s) => s.querySelector('h1')) || sections[0]);
   decorateBody(main.querySelector(':scope > .section.body-column'));
-  decorateSidebar(main.querySelector(':scope > .section.sidebar'));
+  const sidebar = main.querySelector(':scope > .section.sidebar');
+  decorateSidebar(sidebar);
   decorateRelatedLinks(main);
   const mediaBox = main.querySelector(':scope > .section.media-box');
   if (mediaBox && !document.getElementById('media-box')) mediaBox.id = 'media-box';
+  decorateSidebarLinks(sidebar, mediaBox);
 }

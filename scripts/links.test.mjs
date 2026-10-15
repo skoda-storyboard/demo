@@ -1,3 +1,4 @@
+/* global globalThis */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { policyHref, opensInSameTab, LIVE_ORIGIN } from './links.js';
@@ -93,4 +94,59 @@ test('the en locale and look-alike paths are not caught by the locale rule', () 
   ['/en', '/en/tag/model/elroq', '/nav', '/footer', '/media-room/nav'].forEach((href) => {
     assert.equal(policyHref(href, PAGE), null, href);
   });
+});
+
+test('links inside [data-link-policy="resolved"] keep the target and tab their block chose (SKODA-303a)', async () => {
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  const { JSDOM } = await import('jsdom');
+  const { window } = new JSDOM(`<main>
+    <ul data-link-policy="resolved"><li><a id="kept" href="${LIVE_ORIGIN}/cs/e-mobilita-cs/x/">CZ</a></li></ul>
+    <p><a id="policed" href="${LIVE_ORIGIN}/cs/e-mobilita-cs/x/">CZ</a></p></main>`, { url: PAGE });
+  const { decorateLinks } = await import('./links.js');
+  globalThis.window = window;
+  try {
+    decorateLinks(window.document.querySelector('main'));
+  } finally {
+    delete globalThis.window;
+  }
+  const kept = window.document.getElementById('kept');
+  const policed = window.document.getElementById('policed');
+  assert.deepEqual([kept.getAttribute('target'), kept.getAttribute('rel')], [null, null]);
+  assert.equal(policed.getAttribute('target'), '_blank', 'other live links keep the policy');
+});
+
+test('Fragment block references skip the live redirect: a locale fragment loads from this site (#243)', async () => {
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  const { JSDOM } = await import('jsdom');
+  const { window } = new JSDOM(`<main>
+    <div class="fragment"><div><div><a id="frag" href="/cs/fragments/newsletter-card"></a></div></div></div>
+    <div class="fragment"><div><div><a id="frag-slash" href="/cs/fragments/newsletter-card/"></a></div></div></div>
+    <div class="fragment"><div><div><a id="en-slash" href="/en/fragments/newsletter-card/"></a></div></div></div>
+    <p><a id="page" href="/cs/e-mobilita-cs/x">CZ</a></p></main>`, { url: 'https://main--demo--skoda-storyboard.aem.page/cs/e-mobilita-cs/story' });
+  const { decorateLinks } = await import('./links.js');
+  globalThis.window = window;
+  try {
+    decorateLinks(window.document.querySelector('main'));
+  } finally {
+    delete globalThis.window;
+  }
+  const frag = window.document.getElementById('frag');
+  assert.equal(frag.getAttribute('href'), '/cs/fragments/newsletter-card');
+  assert.equal(frag.getAttribute('target'), null);
+  // the trailing-slash rule still applies, so loadFragment() fetches `<path>.plain.html` (#348 review)
+  const slashed = ['frag-slash', 'en-slash'].map((id) => window.document.getElementById(id));
+  assert.deepEqual(slashed.map((a) => a.getAttribute('href')), ['/cs/fragments/newsletter-card', '/en/fragments/newsletter-card']);
+  assert.deepEqual(slashed.map((a) => a.getAttribute('target')), [null, null]);
+  const page = window.document.getElementById('page');
+  assert.equal(page.getAttribute('href'), `${LIVE_ORIGIN}/cs/e-mobilita-cs/x`, 'other locale links keep the policy');
+  assert.equal(page.getAttribute('target'), '_blank');
+});
+
+test('policyHref fragment option: no live redirect, the trailing-slash rule kept (#348 review)', () => {
+  const page = 'https://main--demo--skoda-storyboard.aem.page/cs/e-mobilita-cs/story';
+  assert.equal(policyHref('/cs/fragments/newsletter-card', page, { fragment: true }), null);
+  assert.deepEqual(policyHref('/cs/fragments/newsletter-card/', page, { fragment: true }), { href: '/cs/fragments/newsletter-card', newTab: false });
+  assert.deepEqual(policyHref('/en/fragments/newsletter-card/?x=1', page, { fragment: true }), { href: '/en/fragments/newsletter-card?x=1', newTab: false });
+  // without the option a locale path still goes to the live site (the nav / footer rule)
+  assert.deepEqual(policyHref('/cs/fragments/newsletter-card', page), { href: `${LIVE_ORIGIN}/cs/fragments/newsletter-card`, newTab: true });
 });

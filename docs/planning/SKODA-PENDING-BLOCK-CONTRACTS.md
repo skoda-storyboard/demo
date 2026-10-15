@@ -56,7 +56,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `accordion` | `faq` (SKODA-807: FAQPage JSON-LD on a kit's FAQ chapter) | – (SKODA-805c; see `accordion` below) |
 | `columns` | `banners` (SKODA-805c: a row of linked banner images at their authored 240px, the press-kit PDF/share buttons; see `columns-banners` below), `callout` (SKODA-805c: `[icon, text]`, the 50px icon in a 60px cell beside its text; the press-kit WhatsApp callout) | – |
 | `downloads` | `media-box` (SKODA-510), `gallery` (SKODA-806: a press-kit Images-chapter group, emitted by `parsers/press-kit-media.js` with `collapse | auto`; an Images chapter past 200 images moves its largest groups to `Fragment` blocks, `/fragments<page>/<slug>`) | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes`, `collapse` (SKODA-502/510) |
-| `embed` | – | `url`, `ratio`, `title`, `poster` (`or-curated`: a bare Vimeo / YouTube / Buzzsprout / Spotify URL on its own line still autoblocks). A self-hosted `.mp4`/`.webm`/`.mov`/`.m4v` `url` renders a native `<video>` with the `poster` image (SKODA-801a, WordPress `[video]`) |
+| `embed` | – | `url`, `ratio`, `title`, `poster`, `height` (`or-curated`: a bare Vimeo / YouTube / Buzzsprout / Spotify URL on its own line still autoblocks). A self-hosted `.mp4`/`.webm`/`.mov`/`.m4v` `url` renders a native `<video>` with the `poster` image (SKODA-801a, WordPress `[video]`). YouTube as on the source: a `youtube.com/embed/…` URL is the source's iframe, YouTube's own player (lazy-loaded, its query kept); a `watch` / `youtu.be` URL is the source's lite-youtube, the poster until clicked (SKODA-702a). `height` (px) is a fixed-height player box at full width, as the source's `width="100%" height="448px"` iframe |
 | `gallery` | – | – |
 | `hero-image` | `story` (default), `overlay`, `archive` | – |
 | `listing` | – | `index`, `path`, `template`, `facets`, `facetlabels`, `sort`, `perpage`, `columns` (config only) |
@@ -164,9 +164,9 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Still to do:** the importer header change (`Cards (promo)` → `Promo Box`). The check keeps failing `Cards (promo)` and points at `promo-box`.
 
 ### `cards-tiles`
-- **Status:** implemented by SKODA-221 (shape 3; historical pending entry retained for version tracking) · **Ticket:** SKODA-221 (importers: 207 series hub, 805a press-kit hub). Series pages using shape 2 need rendered QA; press-kit pages need re-import with shape 3 before QA and publication.
+- **Status:** implemented by SKODA-221 (shape 4 since 2026-10-14, the press mosaic; historical pending entry retained for version tracking) · **Ticket:** SKODA-221 (importers: 207 series hub, 805a press-kit hub). Series pages using shape 2 need rendered QA; press-kit pages need re-import with shape 3 before QA and publication.
 - **Emitted by:** `parsers/series-grid.js` (207) and `parsers/press-kit-hub-tiles.js` (805a). The existing press-kit DA previews still have ambiguous old `feature`/`sq` rows, including Motorsport's all-`sq` grid; the runtime and `import:validate-blocks` both reject these on `/en/press-kits/`. Re-import and push the shape 3 output before tile QA/publish.
-- **Shape:** header `Cards (overlay, tiles)`, then one row per tile: `[size token, <picture>, <a href="/en/…">Title</a>]`.
+- **Shape:** header `Cards (overlay, tiles)`, then one row per tile: `[size token, <picture>, <a href="/en/…">Title</a>]`. A press-mosaic banner (shape 4) is `[banner size token, <a href="…"><picture> with alt text</a>]`; `import:validate-blocks` / the publish gate check both forms (`push/block-check.mjs`).
   - The size token names the tile's share of its source row and its image ratio. Series uses twelfths; press kits use twentieths:
 
     | Token | Row share | Ratio | Token | Row share | Ratio |
@@ -190,6 +190,17 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - short rows (road-trip row 2, sustainable-mobility row 22).
 
   v1 tokens keep their meaning, so v1 rows are valid v2 and v3 rows. **Shape 3** adds the 20-column press-kit track: `feature` = 8/20, `press-square` = 4/20, `press-quarter` = 5/20. Peaq/Epiq open with `feature feature press-square` and then five `press-square` tiles per row; Motorsport has four `press-quarter` tiles in its last row. This addition does not change any series token or require a series re-import.
+
+  **Shape 4 (2026-10-13, Classic Days 2026)** adds the press **mosaic**: a hub whose image banners share rows with its tiles. Any of these tokens switches the block to a 30-column track, which fits fifths, thirds, halves, 3/5 and 2/5. The 20-column track can't split in three, and 60 columns would need more gaps than the row is wide.
+
+    | Token | Row share | Shape |
+    |---|---|---|
+    | `press-third` | 10/30 | 2:1 less the gutter, a titled tile |
+    | `press-banner-wide` | 18/30 | image-only banner, its own ratio |
+    | `press-banner-narrow` | 12/30 | image-only banner, its own ratio |
+    | `press-banner-half` | 15/30 | image-only banner, its own ratio |
+
+  On the mosaic track `press-square` = 6/30, `feature` = 12/30 and `press-half` = 15/30. `press-quarter` has no 30-column span, so a mosaic with quarters is an error. A banner row is **two cells**, `[size, linked picture]`: the image's alt names the link. Banner sizes need banner rows and vice versa. The hub importer emits the mosaic only when a source tile row also holds a banner cell; on 2026-10-13 only Classic Days does, and the other 17 hubs keep shape 3. The banners are then not repeated in the `press-kit-banners` section.
 - **Proof** (all 15 hubs, `test/fixtures/series/`, `tools/importer/series-hub.test.mjs`): replaying the tokens with "close at 12/12 or on `end`" recovers every source row. Tiles per hub: 125-years 8, 130-years 14, roads-places 10, unexpected-jobs 5, minutes 12, road-trip 3, winter-tips 4, back-to-the-past 22, unknown-parts 3, hidden-helpers 19, czech-footprint 5, sustainable-mobility 93, my-life-my-car 11, evolution-of-parts 8, 60-seconds-walkaround 17.
 - **Example** (`/en/series/125-years-of-motorsport/`): `sq sq` / `sq-small wide sq-small` / `third third third`, the curated mosaic in source order. It's **not** index-driven (sweep report §5: series hubs are curated), so it replaces the `series-grid` `Listing`.
 
@@ -230,8 +241,8 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   controls the two-row disclosure (default `auto` in a Media Box, `none` elsewhere); authored
   `columns` controls desktop columns and the number disclosed. Neither option changes the three-cell
   asset row shape. Keep the contract pinned until the branch merges and QA verifies it.
-- **Emitted by:** `parsers/downloads.js` (press-release Media Box; since SKODA-830 also the story Media Box, wired in `import-story-detail.js`, in a `dark, full-width, media-box` section built by `skoda-story-cleanup.js`: `h2` Media Box, the stats paragraph, `Downloads`, between the `sidebar` and the related band). A row shape of the `downloads` block on `main`, so the check classifies these pages as `main`, not pending.
-- **Shape:** header `Downloads`, then 3 cells per row: `[<picture> or empty, title text, links]`. The links cell holds one `<a>` per size, its text the size label: `Original` + `1920px` (image, `/direct-download/…` and `…-1920xH.jpg`), `MP4` (video, Vimeo poster as the picture), `PDF` (document, empty picture cell).
+- **Emitted by:** `parsers/downloads.js` and `parsers/press-kit-media.js` (press-release Media Box; since SKODA-830 also the story Media Box, wired in `import-story-detail.js`, in a `dark, full-width, media-box` section built by `skoda-story-cleanup.js`: `h2` Media Box, the stats paragraph, `Downloads`, between the `sidebar` and the related band). A row shape of the `downloads` block on `main`, so the check classifies these pages as `main`, not pending.
+- **Shape (v2, #275):** header `Downloads`, then 3 cells per row: `[<picture> or empty, title text, links]`, plus, in a Media Box, the tile's source date (`23. 3. 2026`) in a cell before the title: `[<picture> or empty, date, title text, links]`. The block content-sniffs the date (shown above the tile's `h3` title); it comes first so a block that predates it still reads the last text cell as the title. v1 rows (no date) still render. Emitted so far by `parsers/press-kit-media.js` (the press-kit Media Box); `parsers/downloads.js` (releases, stories) still emits v1 rows. The links cell holds one `<a>` per size, its text the size label: `Original` + `1920px` (image, `/direct-download/…` and `…-1920xH.jpg`), `MP4` (video, Vimeo poster as the picture), `PDF` (document, empty picture cell).
 - **Example** (Peaq): 5 rows, `MP4`, 3 × `Original`+`1920px`, `PDF`.
 
 ### `press-release-sections`
@@ -264,7 +275,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - Only the footnote link is green (decision 2026-10-05); other body links stay `--link-color` ink.
   - Green on white is 3.71:1, under WCAG AA's 4.5:1 for text this size; the source has the same.
 - **Shape:** header `Footnotes`, then one row per paragraph of small print, one cell: `[<p>¹ … <a href>HERE</a><br>² …</p>]`. Links, line breaks and `sup` markers stay. Consecutive small-print paragraphs share one table.
-- **Importer:** `parsers/footnotes.js`, run by `import-press-kit-default.js`. `preprocess` marks the paragraphs (`markFootnotes`) on the source as published, before helix-importer's clean-up (which keeps styled spans today); the parser builds the table after the layouts have run, whose source-table pass would flatten it.
+- **Importer:** `parsers/footnotes.js`, run by `import-press-kit-default.js` and, for the story body's small print (Epiq "¹ Available at a later date.", #296), `import-story-detail.js`. `preprocess` marks the paragraphs (`markFootnotes`) on the source as published, before helix-importer's clean-up (which keeps styled spans today); the parser builds the table after the layouts have run, whose source-table pass would flatten it.
   - **Counts:** a `p` whose every word is set below the 16px body size by its nearest sized ancestor (a span). The size is the one CSS applies, the CSSOM's winning `font-size` declaration (`!important` beats a later one; invalid values are dropped), and it must be a plain px or pt length. A `sup` marker outside the sized span is neutral.
   - **Doesn't count:**
     - a few small letters inside an ordinary sentence ("1st", "7th");
@@ -300,6 +311,12 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - `parsers/press-kit-content.js` emits it on a kit's FAQ chapter, a `…/frequently-asked-questions/` page (Peaq-2: 28 rows, Epiq-2: 5).
   - The block behaves as the default variant and adds one schema.org `FAQPage` JSON-LD script to the head. It has one `Question` / `acceptedAnswer` per complete row; every FAQ accordion on the page shares that one script.
   - Fallback: without the variant code the block is a plain accordion (`readable`).
+- **Answer layout tables (#275, 2026-10-13):** DA keeps neither the source's empty paragraphs (a pushed `<p>&nbsp;</p>` is dropped on preview) nor its SiteOrigin cell widths. So `parsers/answer-layout.js` carries them as small tables nested in the answer, as a nested Quote is carried:
+  - `Spacer`, a one-cell table: the source's blank line, drawn as one body line plus the paragraph gap (44px).
+  - `Spacer (row)`: an empty builder row, its two 10px cell insets (20px).
+  - `Media row`, a head plus one row of widths (`50.4%` | `49.6%`), placed before the first image of a side-by-side image row. Only rows whose cells aren't equal carry one; `templates/press-kit` sizes the cells from it (≥ 781px) and removes it.
+  - `blocks/accordion` draws the spacers. A Spacer with more cells or rows, another name, or one inside a table cell stays as authored. Fallback: without the code the tables show as one-word tables (`readable`).
+  - In use, across all 56 press kits: first glimpse (2 × `Spacer` in item 1, `Media row` in item 3, `Spacer (row)` in item 8), Peaq-2 Connectivity, Epiq-2 intro and the Elroq covered drive (one `Media row` each), and Fabia 130 (three; not pushed until its PDF / MP4 links are in the DAM).
 
 ### `highlight`
 - **Status:** `pinned` (decided 2026-09-25: section style; **shape 2** 2026-09-28; runtime landed 2026-10-05) · **Ticket:** SKODA-824 · **Fallback:** `readable` (it was `broken` until the runtime landed: the panel had no box or text treatment, and each extra `body-column` section moved the sidebar) · **Styles:** `highlight-dark`, `highlight-grey`
@@ -311,6 +328,14 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - both templates (`body.story`, `body.press-release`) only keep `.body-column` sections in the reading track, so every other section spans the full grid.
 
   `body-column` keeps the panel in the text column. The single `highlight-*` class matches no existing rule.
+- **Geometry rows (story, PO 2026-10-13: the panel inset as the source):** the source panel's content sits its row padding + the 10px cell padding + each widget's margin in. Most layouts keep the theme's (no row padding; widget margin `0 15px` from 781px, `15px` up to 780px; a gallery with no margin), which `styles.css` draws by default. A layout that sets its own carries extra `Section Metadata` rows, each a 1–4 value px box:
+  - `highlight-padding` / `highlight-padding-mobile`: the row padding (`#pg-…> .panel-row-style { padding }`);
+  - `highlight-margin` / `highlight-margin-mobile`: the text widgets' margin (`#pl-… #panel-… { margin }`), `0px 0px 0px 0px` when the layout gives them none;
+  - `highlight-gallery-margin` / `highlight-gallery-margin-mobile`: the carousel widget's margin.
+  - The mobile row is the `@media (max-width:780px)` rule, or the desktop value when there's none. A multi-column row carries none (a margin per cell).
+  - `parsers/story-flatten.js` `markHighlights()` reads them in `preprocess`. Delivered pages have them as the section's `data-highlight-*` attributes; `scripts/highlight-geometry.js` turns them into the section's `--hl-*` boxes.
+  - Fallback: without the code the panel keeps the default inset (`readable`).
+  - In use: 10 panels on 8 stories (camouflage ×2, sportline, what-you-learn ×2, cruise control, the plates story, designers on the Peaq, an epic start, park your Škoda).
 - **Variant:** from the background colour's luminance, `dark` below 0.5 and `grey` above (white = no panel). All 16 M1 story rows are `#0e3a2f`; the Zellmer FAQ panel is `#f3f3f3`.
 - **Importers:**
   - `parsers/story-flatten.js`: `import-story-detail.js`'s `preprocess` calls `markHighlights()`, because the row colour is only in the SiteOrigin head CSS (`#pg-<id>> .panel-row-style`). This gives 16 rows on 11 of the 19 M1 stories: Epiq, Octavia, Slavia, plates, graffiti, Froome, Peaq production, Peaq Tour de France, Kylaq ×3, paper Kodiaq ×3, and charging ×2 (consecutive; one is a 2-cell Columns row).

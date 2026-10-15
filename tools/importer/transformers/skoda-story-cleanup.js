@@ -51,16 +51,18 @@ function parseTagHref(href) {
   return m ? { taxonomy: m[1].toLowerCase(), slug: m[2].toLowerCase() } : null;
 }
 
-// Canonical watch URL for an in-body video (SKODA-818), or '' if not a video embed.
+// Canonical URL for an in-body video (SKODA-818), or '' if not a video embed.
 // The SKODA-204 embed block (PR #109) autoblocks a bare YouTube/Vimeo URL on its own line.
+// A lite-youtube (the poster) is the watch URL; a YouTube iframe (YouTube's own player on the
+// source) keeps its /embed/ URL and query, which the embed block plays as that player.
 function videoUrl(el) {
   const id = el.getAttribute('videoid');
   if (el.tagName.toLowerCase() === 'lite-youtube') {
     return id ? `https://www.youtube.com/watch?v=${id}` : '';
   }
   const src = el.getAttribute('src') || el.getAttribute('data-src') || '';
-  const yt = src.match(/youtube(?:-nocookie)?\.com\/embed\/([\w-]{6,})/i);
-  if (yt) return `https://www.youtube.com/watch?v=${yt[1]}`;
+  const yt = src.match(/(youtube(?:-nocookie)?\.com)\/embed\/([\w-]{6,})(\?[^#]*)?/i);
+  if (yt) return `https://www.${yt[1].toLowerCase()}/embed/${yt[2]}${yt[3] || ''}`;
   const vimeo = src.match(/player\.vimeo\.com\/video\/(\d+)/i);
   if (vimeo) return `https://vimeo.com/${vimeo[1]}`;
   return '';
@@ -147,12 +149,78 @@ function facetRows(element) {
   return rows;
 }
 
+// The source page's locale (`/cs/…` → cs); English when the URL has no locale segment.
+function sourceLocale(url) {
+  try {
+    const m = new URL(url, 'https://www.skoda-storyboard.com').pathname.match(/^\/([a-z]{2})(?:\/|$)/i);
+    return m ? m[1].toLowerCase() : 'en';
+  } catch (e) {
+    return 'en';
+  }
+}
+
+// A source teaser alt as plain text: it can hold a literal `<br>` (as the press-release lead
+// image's, leadImage() in skoda-press-release-layout.js).
+const plainAlt = (alt) => (alt || '').replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim();
+
+// The source shortens a card title in the browser to fit its box (`data-dotdotdot`, at a word
+// boundary): the importer, running after that script, reads e.g. "Škoda Epiq nově obléká
+// efektní…". The card image's alt carries the whole title, so a clipped title becomes the alt
+// when the alt continues it word for word: at least 2 clipped words, then a word boundary.
+// Anything else (a one-word clip, an alt that is a caption) keeps the clipped title. The rail's
+// CSS clamps the whole title, as for index cards.
+function fullTitle(title, alt) {
+  const clipped = title.match(/^(.*?)\s*(?:…|\.\.\.)$/);
+  const prefix = clipped ? clipped[1] : '';
+  const whole = plainAlt(alt);
+  if (prefix.split(' ').length < 2 || !whole.startsWith(prefix)) return title;
+  if (whole.length > prefix.length && !/^[\s,.:;!?–-]/.test(whole.slice(prefix.length))) return title;
+  return whole;
+}
+
+// The related band's source cards as curated Story Rail rows (the press-release related band
+// shape, SKODA-503): [image, date <p> + <h3><a>title</a></h3>]. A card without a titled link is
+// skipped; one without an image keeps its body only.
+function curatedCards(band, document) {
+  const squashed = (el) => (el ? (el.textContent || '').replace(/\s+/g, ' ').trim() : '');
+  const rows = [];
+  band.querySelectorAll('article.article-teaser').forEach((card) => {
+    const titleLink = card.querySelector('.entry-title a[href]');
+    const href = titleLink && titleLink.getAttribute('href');
+    const img = card.querySelector('.article-teaser-media img');
+    const title = fullTitle(squashed(titleLink), img && img.getAttribute('alt'));
+    if (!href || !title) return;
+    if (img) {
+      ['data-caption', 'data-video_title', 'data-video_src', 'srcset', 'sizes', 'itemprop', 'loading', 'decoding']
+        .forEach((a) => img.removeAttribute(a));
+      if (img.hasAttribute('alt')) img.setAttribute('alt', plainAlt(img.getAttribute('alt')));
+    }
+    const body = [];
+    const date = squashed(card.querySelector('.entry-published'));
+    if (date) {
+      const p = document.createElement('p');
+      p.textContent = date;
+      body.push(p);
+    }
+    const h3 = document.createElement('h3');
+    const a = document.createElement('a');
+    a.setAttribute('href', href);
+    a.textContent = title;
+    h3.append(a);
+    body.push(h3);
+    rows.push(img ? [img, body] : [body]);
+  });
+  return rows;
+}
+
 // Rebuild the full-width bottom "Related Stories" band (SKODA-820). It is NOT a duplicate
 // of the sidebar "Explore more" (3 hand-picked vs 10 tag-matched stories). Emit it as its
 // own `Style: dark` section: the heading + "Based on tags" subheading as default content,
 // then an INDEX-DRIVEN Story Rail (SKODA-212): stories matching ALL of this story's tags,
 // newest first, 10 items, the story itself excluded. Nothing is copied from the SSR
-// teasers; the list stays current as stories are published.
+// teasers; the list stays current as stories are published. Translated stories (non-EN
+// source URL) are the exception: they keep the source cards as a curated rail (#243) until
+// per-locale indexes and their related stories exist (SKODA-1001).
 function relatedBand(element, document, payload) {
   const band = element.querySelector('.cover-box .related-stories');
   if (!band) return;
@@ -168,20 +236,36 @@ function relatedBand(element, document, payload) {
     headingText = (clone.textContent || '').trim() || headingText;
   }
 
-  const filters = facetRows(element);
-  if (!filters.length) {
-    console.warn('[story-cleanup] related band: story has no tags to match; dropped');
-    cover.remove();
-    return;
-  }
   const originalURL = (payload && payload.params && payload.params.originalURL) || '';
-  const self = lastSegment(originalURL);
-  const rows = [['Story Rail'], ['template', 'story'], ...filters, ['limit', '10']];
-  if (self) rows.push(['exclude', self]);
+  let rows;
+  if (sourceLocale(originalURL) !== 'en') {
+    // A translated story (#243): no per-locale index yet (SKODA-1001) and its related stories
+    // aren't migrated, so an index rail would stay empty. Keep the source's cards as a curated
+    // rail (image, date, title linking the source story), in the source order. Card rows
+    // only: the rail's template defaults to story, and the block contract rejects config
+    // rows next to curated ones.
+    rows = [['Story Rail'], ...curatedCards(band, document)];
+    if (rows.length === 1) {
+      console.warn('[story-cleanup] related band: no source cards; dropped');
+      cover.remove();
+      return;
+    }
+  } else {
+    const filters = facetRows(element);
+    if (!filters.length) {
+      console.warn('[story-cleanup] related band: story has no tags to match; dropped');
+      cover.remove();
+      return;
+    }
+    const self = lastSegment(originalURL);
+    rows = [['Story Rail'], ['template', 'story'], ...filters, ['limit', '10']];
+    if (self) rows.push(['exclude', self]);
+  }
 
-  const h2 = document.createElement('h2');
-  h2.textContent = headingText;
-  const out = [document.createElement('hr'), h2];
+  // h3, as the source .search-results-heading (#296)
+  const title = document.createElement('h3');
+  title.textContent = headingText;
+  const out = [document.createElement('hr'), title];
   if (subText) {
     const p = document.createElement('p');
     p.textContent = subText;
@@ -306,8 +390,9 @@ function seriesNavCards(element, document) {
 }
 
 // Media Box band (`.cover-box.dark > .search-results.media-box`, SKODA-801a, audit 4.1/F4)
-// → its own section, as on press releases: `h2` heading, the stats line ("13 images"),
-// then the Media Box element itself, which the downloads parser turns into the Downloads
+// → its own section, as on press releases: the heading (h3 here, the source level), the
+// stats line ("13 images"), then the Media Box element itself, which the downloads parser
+// turns into the Downloads
 // table between the hooks. The band is unwrapped out of `.cover-box.dark` (still dropped
 // below) and opened with a marker <hr>; finishMediaBox() closes it with Section Metadata.
 function mediaBoxBand(element, document) {
@@ -319,9 +404,10 @@ function mediaBoxBand(element, document) {
     box.querySelectorAll('.search-results-header, .search-results-stats, .togglebox-opener').forEach((n) => n.remove());
     const hr = document.createElement('hr');
     hr.setAttribute(MEDIA_BOX_MARKER, '');
-    const h2 = document.createElement('h2');
-    h2.textContent = heading;
-    const out = [hr, h2];
+    // h3, as the source .search-results-heading (#296)
+    const title = document.createElement('h3');
+    title.textContent = heading;
+    const out = [hr, title];
     if (stats) {
       const p = document.createElement('p');
       p.textContent = stats;

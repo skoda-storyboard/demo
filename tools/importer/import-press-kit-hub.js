@@ -6,22 +6,60 @@ import metadata from './transformers/skoda-metadata.js';
 import links from './transformers/skoda-links.js';
 import normalizeImages from './transformers/skoda-images.js';
 
-const FACETS = ['model', 'bodywork', 'motorsport', 'history', 'technology'];
+// The kit's facets live only in its article classes (a hub has no Tags sidebar): every facet
+// of the shared 15-facet set (SKODA-401; skoda-metadata.js FACETS), so a kit is found under any
+// listing filter its source is (SKODA-808: derivative, years, …).
+const FACETS = [
+  'model', 'bodywork', 'derivative', 'motorsport', 'equipment', 'technology', 'years', 'view',
+  'company', 'concept', 'environment', 'happening', 'history', 'sponsorship', 'vip',
+];
 
-function sourceFacets(article) {
-  const result = { template: 'press_kit', category: 'press-kits' };
+// The `years` class holds the source term id (`years-61572`), the listing filters on the year
+// (`filter[years][]=2026`). Read from the source year archives `/en/tag/years/<year>/` (their
+// body class `term-<id>`): 2014 to 2026, checked 2026-10-12 (2013 and earlier, and 2027, 404).
+// The publish date is no substitute: the Elroq kit is tagged 2025 but was published in December
+// 2024. A new year term (2027 from 02 Jan 2027) needs its id here: an unmapped one is reported
+// per page (`unmappedTermIds` in the import report), see SKODA-METADATA-SCHEMA.md.
+export const YEAR_TERMS = new Map([
+  ['4781', '2014'], ['1872', '2015'], ['1572', '2016'], ['11039', '2017'], ['17169', '2018'],
+  ['23835', '2019'], ['29912', '2020'], ['29936', '2021'], ['42472', '2022'], ['46476', '2023'],
+  ['48727', '2024'], ['57053', '2025'], ['61572', '2026'],
+]);
+
+/**
+ * A facet class value as its listing slug: a years term id becomes its year; any other numeric
+ * id has no slug and gives '' (as skoda-metadata.js drops it). Pure.
+ */
+export function facetValue(facet, value) {
+  if (!/^\d+$/.test(value)) return value;
+  return facet === 'years' ? YEAR_TERMS.get(value) || '' : '';
+}
+
+/**
+ * The kit's facets from its article classes, and the numeric term ids that could not be mapped
+ * (`<facet>-<id>`, in class order). Pure: the caller reports the unmapped ids.
+ * @returns {{ facets: object, unmapped: string[] }}
+ */
+export function sourceFacets(article) {
+  const facets = { template: 'press_kit', category: 'press-kits' };
   const tags = [];
+  const unmapped = [];
   FACETS.forEach((facet) => {
-    const values = [...article.classList]
-      .filter((cls) => cls.startsWith(`${facet}-`))
-      .map((cls) => cls.slice(facet.length + 1));
-    if (values.length) {
-      result[facet] = values.join(', ');
-      tags.push(...values);
+    const values = [];
+    [...article.classList].filter((cls) => cls.startsWith(`${facet}-`)).forEach((cls) => {
+      const raw = cls.slice(facet.length + 1);
+      const value = facetValue(facet, raw);
+      if (value) values.push(value);
+      else if (/^\d+$/.test(raw)) unmapped.push(cls);
+    });
+    const unique = [...new Set(values)];
+    if (unique.length) {
+      facets[facet] = unique.join(', ');
+      tags.push(...unique);
     }
   });
-  if (tags.length) result.tags = [...new Set(tags)].join(', ');
-  return result;
+  if (tags.length) facets.tags = [...new Set(tags)].join(', ');
+  return { facets, unmapped };
 }
 
 // Banner ZIP download hrefs (SKODA-832). Applied to the hub banners only; every other link
@@ -62,6 +100,17 @@ function bannerHref(href) {
   return `${CDN_ORIGIN}/${url.pathname.slice(DIRECT_DOWNLOAD_PREFIX.length)}${url.hash}`;
 }
 
+// Banners whose source alt is only the image file name, by the slug of the page they open:
+// that page's source title (h1, checked 2026-10-13).
+const BANNER_PAGE_TITLES = {
+  'skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation':
+    'Škoda Auto celebrates more than 130 years of craftsmanship and innovation',
+  'skoda-museum': 'Škoda Museum',
+  '60-years-of-the-trekka-an-suv-from-new-zealand': '60 years of the Trekka: an SUV from New Zealand',
+  'skoda-octavia-turns-30-three-decades-of-a-brand-icon': 'Škoda Octavia turns 30: Three decades of a brand icon',
+  '125-years-of-skoda-motorsport': '125 years of Škoda Motorsport',
+};
+
 // The source banner images carry no useful alt; name them by what the link does.
 function bannerAlt(href, img) {
   // A ZIP is also recognised by its banner image name, for a source link that lacks the
@@ -79,23 +128,39 @@ function bannerAlt(href, img) {
     return 'Follow @skodaautonews on the X platform';
   }
   const alt = (img.getAttribute('alt') || img.getAttribute('title') || '').trim();
-  if (alt) return alt;
+  // WordPress fills an unset alt with the file name (Classic Days 2026:
+  // `ClassicDays-Button-1670x800-Museum-EN_3ac482ac`): not a name. The banner is named by
+  // the page it opens: its source title where known, else its readable slug.
+  const fileStem = img.getAttribute('src').split('/').pop().replace(/\.[a-z0-9]+(?:[?#].*)?$/i, '');
+  if (alt && alt !== fileStem) return alt;
+  const slug = href.split(/[?#]/)[0].replace(/\/+$/, '').split('/').pop();
+  if (BANNER_PAGE_TITLES[slug]) return BANNER_PAGE_TITLES[slug];
+  if (alt && slug) {
+    const words = decodeURIComponent(slug).replace(/-+/g, ' ').replace(/\bskoda\b/gi, 'Škoda');
+    return words.charAt(0).toUpperCase() + words.slice(1);
+  }
   throw new Error(`Press-kit hub banner has no accessible name: ${href}`);
 }
 
+// A source banner (an image-only link) as our linked picture, named by bannerAlt.
+function bannerLink(source, document) {
+  const link = document.createElement('a');
+  link.href = bannerHref(source.href);
+  const img = source.querySelector('img').cloneNode(true);
+  img.removeAttribute('srcset');
+  img.removeAttribute('sizes');
+  img.alt = bannerAlt(link.href, source.querySelector('img'));
+  link.append(img);
+  return link;
+}
+
+// The banners after the tiles; a mosaic hub's banners are tiles already (`data-pk-mosaic`).
 function bannerLinks(content, document) {
-  return [...content.querySelectorAll('.widget_sow-editor .textwidget a[href]')]
+  return [...content.querySelectorAll('.widget_sow-editor .textwidget a[href]:not([data-pk-mosaic])')]
     .filter((a) => a.querySelector('img[src]'))
     .map((source) => {
-      const link = document.createElement('a');
-      link.href = bannerHref(source.href);
-      const img = source.querySelector('img').cloneNode(true);
-      img.removeAttribute('srcset');
-      img.removeAttribute('sizes');
-      img.alt = bannerAlt(link.href, source.querySelector('img'));
-      link.append(img);
       const p = document.createElement('p');
-      p.append(link);
+      p.append(bannerLink(source, document));
       return p;
     });
 }
@@ -147,11 +212,15 @@ export default {
     const hero = article?.querySelector(':scope > .hero');
     const content = article?.querySelector(':scope > .content');
     if (!article || !hero || !content) throw new Error('Expected a press-kit tiles hub with hero and content');
-    const facets = sourceFacets(article);
+    const { facets, unmapped } = sourceFacets(article);
+    if (unmapped.length) {
+      // eslint-disable-next-line no-console
+      console.warn(`press-kit hub ${params.originalURL}: unmapped term ids ${unmapped.join(', ')}, facet not set`);
+    }
     const description = leakedDescription(document, hero);
     if (description) facets.description = description;
     const heroBlock = parseHero(hero, document);
-    const tilesBlock = parseTiles(content, document);
+    const tilesBlock = parseTiles(content, document, { banner: (a) => bannerLink(a, document) });
     const banners = bannerLinks(content, document);
     const { intro, outro } = textWidgets(content, document);
 
@@ -181,7 +250,13 @@ export default {
     return [{
       element: main,
       path: WebImporter.FileUtils.sanitizePath(pathname || '/index'),
-      report: { title: document.title, template: 'press-kit-hub', blocks: ['hero', 'tiles'] },
+      report: {
+        title: document.title,
+        template: 'press-kit-hub',
+        blocks: ['hero', 'tiles'],
+        // a new source year term (or another facet's numeric id) to map in YEAR_TERMS
+        ...(unmapped.length ? { unmappedTermIds: unmapped.join(', ') } : {}),
+      },
     }];
   },
 };

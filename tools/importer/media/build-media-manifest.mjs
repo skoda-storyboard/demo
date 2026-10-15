@@ -189,6 +189,14 @@ async function mapPool(items, limit, worker) {
   return results;
 }
 
+// The locale tree of a manifest page path (`cs/e-mobilita-cs/x` → cs; `en`, `` → en): alt text
+// and captions are written in their page's language.
+export function pageLocale(pagePath) {
+  const m = String(pagePath || '').replace(/^\/+/, '').match(/^([a-z]{2})(?:\/|$)/i);
+  return m ? m[1].toLowerCase() : 'en';
+}
+const sameLocale = (a, b) => pageLocale(a) === pageLocale(b);
+
 export default async function main(args = process.argv.slice(2)) {
   const cfg = parseArgs(args);
   const damConfig = cfg.damBase ? { baseUrl: cfg.damBase, folder: cfg.damFolder } : null;
@@ -249,8 +257,10 @@ export default async function main(args = process.argv.slice(2)) {
         if (existing) {
           existing.seenUrls.add(ref.url);
           existing.pageRefs.add(pagePath);
-          if (!existing.alt && ref.alt) existing.alt = ref.alt;
-          if (!existing.caption && ref.caption) existing.caption = ref.caption;
+          // alt and caption are in their page's language: only the owner's locale fills them
+          const ownLocale = sameLocale(existing.ownerPage, pagePath);
+          if (!existing.alt && ref.alt && ownLocale) existing.alt = ref.alt;
+          if (!existing.caption && ref.caption && ownLocale) existing.caption = ref.caption;
         } else {
           byLogical.set(id, {
             kind: 'image',
@@ -588,8 +598,10 @@ export default async function main(args = process.argv.slice(2)) {
           ...prior,
           page_refs: pageRefs,
           seen_urls: seenUrls,
-          alt: prior.alt || info.alt,
-          caption: prior.caption || info.caption,
+          // an existing row's empty alt / caption is filled only from a page in its own locale
+          // (an EN-owned asset never takes a Czech alt, #348 review); captions stay strings
+          alt: prior.alt || (sameLocale(prior.dam_page_path, info.ownerPage) ? info.alt : '') || '',
+          caption: prior.caption || (sameLocale(prior.dam_page_path, info.ownerPage) ? info.caption : '') || '',
         };
         flush();
       }
