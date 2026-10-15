@@ -64,6 +64,23 @@ function nestedQuotes(panel) {
 }
 
 /*
+ * An authored gap in an answer, a one-cell `Spacer` table (#275): DA keeps no empty paragraph,
+ * so the source's blank line (`Spacer`) or empty builder row (`Spacer (row)`) travels as one.
+ */
+const NESTED_SPACER = /^spacer(?:\s*\(\s*(row)\s*\))?$/i;
+
+function nestedSpacers(panel) {
+  [...panel.querySelectorAll('table')].forEach((table) => {
+    if (table.parentElement.closest('table') || table.rows.length !== 1 || table.rows[0].cells.length !== 1) return;
+    const match = table.rows[0].cells[0].textContent.trim().match(NESTED_SPACER);
+    if (!match) return;
+    const spacer = document.createElement('div');
+    spacer.className = match[1] ? 'accordion-spacer row' : 'accordion-spacer';
+    table.replaceWith(spacer);
+  });
+}
+
+/*
  * `Accordion (faq)` (SKODA-807): the press-kit FAQ chapters also describe their Q/A pairs as
  * schema.org FAQPage structured data, which the source lacks. Every FAQ accordion on the page
  * feeds one JSON-LD script in the head. Its text is set through textContent, a Trusted Types
@@ -157,6 +174,7 @@ export default function decorate(block) {
     panel.hidden = true;
     panel.append(...extra, ...answer.childNodes);
     nestedQuotes(panel);
+    nestedSpacers(panel);
     button.addEventListener('click', () => {
       panel.hidden = !panel.hidden;
       button.setAttribute('aria-expanded', String(!panel.hidden));

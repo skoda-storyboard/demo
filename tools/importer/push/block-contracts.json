@@ -44,7 +44,8 @@
         "url",
         "ratio",
         "title",
-        "poster"
+        "poster",
+        "height"
       ]
     },
     "footer": {

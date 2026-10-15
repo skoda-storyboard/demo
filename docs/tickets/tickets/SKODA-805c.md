@@ -225,3 +225,27 @@ Press kits QA observations, FG (this page). Measured origin vs branch at 1440 / 
     - media: 47 rows from this branch, 4 from main;
     - push: 3 press-kit pages pushed on both sides keep this branch's later push.
 
+
+## QA #275 reopened (2026-10-12, Kondalu; branch `bug-275-press-kits-reopen`)
+Re-tested on first glimpse, origin vs `main` and the branch at 1440 / 1080 / 992 / 768 / 390.
+- **Already fixed on `main`** (PR #307, merged 2026-10-12 09:01 UTC; the re-test was probably before it reached the browser):
+  - Hero image: opens the lightbox at every width (image, details, +, download and link controls).
+  - Media Box: all 60 tiles (55 images, 4 PDFs, 1 MP4) have an `h3` title with the date above it, at every width.
+- **Fixed here:**
+  - **Accordion spacing.** The source's gaps are authored spacers: an empty paragraph after each of item 1's image cells, and an empty builder row at the end of item 8. They now travel as nested `Spacer` / `Spacer (row)` tables (PO decision: carry them, as on the source). See the accordion contract in `SKODA-PENDING-BLOCK-CONTRACTS.md`.
+    - Item 1 links → item 2: 97 / 97 at every width (`main` 53); stacked below 781, links → the second image: 87 / 87.
+    - Item 8's text → the footnote: 77 / 77 (`main` 57). With all items closed: 24 / 24, as before.
+  - **Accordion images.** The source sizes some image rows unequally (SiteOrigin cell weights), so each row whose cells aren't equal carries a `Media row` with its widths.
+    - Item 3 at 1440: 399.31 × 266.14 / 392.67 × 266.42, against the source's 399.31 × 266.17 / 392.67 × 266.45 (`main` 396 / 396). Equal at 1080 / 992 too; 768 / 390 stack, as before.
+    - A survey of all 56 press kits found 50 two-image rows in answers. 42 have equal cells and images of the same shape. Of the other 8, 7 are weighted and 1 (first glimpse) is an exact 50/50 with differently shaped images. That's why the source's widths are carried rather than derived from the images.
+    - The same fix applies on Peaq-2 Connectivity (362.7 / 429.3), Epiq-2 intro (391.8 / 400.2) and the Elroq covered drive (433.4 / 358.5), all equal to the source at 1440 / 992.
+  - **Tooltips.** The source's link titles, shown on hover:
+    - the video controls: "Add/remove this", "Download this", "Link to page";
+    - the sidebar "Download Media Box" +: "Add/remove this";
+    - the Media Box tiles: "Add/remove Original / 1920px version" and "Download Original / 1920px version" (55 each), and "Add/remove this" / "Download this" on the 5 file tiles.
+    - Same counts as the source. The accessible names stay the descriptive labels; the size-menu toggles have no title, as on the source.
+  - **Video controls position.** They sit 8px under the player again (were 6). The link row's centring rule outranked the controls' own rule. The content after them is unchanged (+84 at 1440, +91 at 390, as the source).
+- **Confirmed, not changed:** the player's controls are the browser's native ones. The source's Vimeo account is domain-locked, so the clip plays its DAM master (review decision 2026-09-29, above), and Vimeo's control bar can't be matched.
+- **Content:** re-imported first glimpse, Peaq-2 Connectivity, Epiq-2 intro and the Elroq covered drive. A diff against DA shows only the new tables. Pushed to DA preview on 2026-10-13 with the PO's OK; the previewed pages keep every nested table. They publish after the merge; until then `main`'s preview shows the tables as small text tables in those answers. Fabia 130 (three `Media row`s) waits for its PDF / MP4 DAM ingest (binary gate).
+- **Accessibility:** axe on the page with every answer open finds the same violations as `main` (the source's colour contrast, the footer consent link) and nothing new. The spacers are empty, unfocusable boxes.
+- **Note (not changed here):** the Epiq-2 intro's "First Edition" answer shows 12 image pairs at the source's 3:2 (295.8 × 197.9 at 1440), but at 16:9 on `main` and the branch (290 × 163.1).

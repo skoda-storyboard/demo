@@ -51,16 +51,18 @@ function parseTagHref(href) {
   return m ? { taxonomy: m[1].toLowerCase(), slug: m[2].toLowerCase() } : null;
 }
 
-// Canonical watch URL for an in-body video (SKODA-818), or '' if not a video embed.
+// Canonical URL for an in-body video (SKODA-818), or '' if not a video embed.
 // The SKODA-204 embed block (PR #109) autoblocks a bare YouTube/Vimeo URL on its own line.
+// A lite-youtube (the poster) is the watch URL; a YouTube iframe (YouTube's own player on the
+// source) keeps its /embed/ URL and query, which the embed block plays as that player.
 function videoUrl(el) {
   const id = el.getAttribute('videoid');
   if (el.tagName.toLowerCase() === 'lite-youtube') {
     return id ? `https://www.youtube.com/watch?v=${id}` : '';
   }
   const src = el.getAttribute('src') || el.getAttribute('data-src') || '';
-  const yt = src.match(/youtube(?:-nocookie)?\.com\/embed\/([\w-]{6,})/i);
-  if (yt) return `https://www.youtube.com/watch?v=${yt[1]}`;
+  const yt = src.match(/(youtube(?:-nocookie)?\.com)\/embed\/([\w-]{6,})(\?[^#]*)?/i);
+  if (yt) return `https://www.${yt[1].toLowerCase()}/embed/${yt[2]}${yt[3] || ''}`;
   const vimeo = src.match(/player\.vimeo\.com\/video\/(\d+)/i);
   if (vimeo) return `https://vimeo.com/${vimeo[1]}`;
   return '';

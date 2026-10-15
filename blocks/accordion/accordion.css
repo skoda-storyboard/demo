@@ -9,10 +9,8 @@
   --accordion-icon-pad: var(--spacing-xs);
   --accordion-icon-box: calc(var(--accordion-icon-size) + 2 * var(--accordion-icon-pad));
 
-  /* the source's + is its icon font's \e027 at weight 600 (faux bold, no bold face): the glyph
-     in icons/accordion-plus.svg with that stroke, in a 1072-unit box round its 1024 em, so the
-     box overhangs the em by 24 units each side (16.5px of ink, 1.42px bars, #275) */
-  --accordion-icon-bleed: calc(var(--accordion-icon-size) * 24 / 1024);
+  /* the source's + is its icon font's \e027 at 16px / 600 (faux bold, no bold face); drawn as
+     that glyph (#275 re-test: the SVG copy read smaller and thinner than the source's) */
   --accordion-label-reserve: 1.45em;
   --accordion-line-height: 1.125;
   --accordion-motion: 0.2s ease-in;
@@ -78,12 +76,14 @@
 
 .accordion .accordion-icon::before {
   display: block;
-  width: calc(100% + 2 * var(--accordion-icon-bleed));
-  height: calc(100% + 2 * var(--accordion-icon-bleed));
-  margin: calc(-1 * var(--accordion-icon-bleed));
-  background-color: currentcolor;
-  mask: url("../../icons/accordion-plus.svg") center / contain no-repeat;
-  content: '';
+  width: 100%;
+  height: 100%;
+  font-family: var(--accordion-icon-font);
+  font-size: var(--accordion-icon-size);
+  font-weight: var(--weight-semibold);
+  line-height: var(--accordion-icon-size);
+  text-align: center;
+  content: '\e027';
 }
 
 .accordion .accordion-heading button:hover .accordion-icon {
@@ -116,6 +116,18 @@
   width: var(--accordion-bullet-width);
   border-block-end: var(--accordion-bullet-weight) solid var(--skoda-black);
   content: '';
+}
+
+/* an authored `Spacer` (accordion.js): the source's blank line, one body line and its paragraph
+   gap (44px); `Spacer (row)` is an empty builder row, its two cell insets (20px) */
+.accordion .accordion-spacer {
+  block-size: calc(var(--body-font-size-m) * var(--line-height-body));
+  margin-block-end: var(--paragraph-gap);
+}
+
+.accordion .accordion-spacer.row {
+  block-size: calc(2 * var(--accordion-panel-inset));
+  margin-block-end: 0;
 }
 
 .accordion .accordion-panel[hidden] {
