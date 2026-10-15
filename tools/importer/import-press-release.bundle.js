@@ -232,11 +232,9 @@ var CustomImportScript = (() => {
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function wpVideosToEmbeds(element, document2) {
     element.querySelectorAll(".wp-video").forEach((wrapper) => {
-      var _a, _b;
       const video = wrapper.querySelector("video");
-      const src = video && (((_a = video.querySelector("source[src]")) == null ? void 0 : _a.getAttribute("src")) || video.getAttribute("src") || ((_b = wrapper.querySelector("a[href]")) == null ? void 0 : _b.getAttribute("href")) || "");
-      if (!src || !/\.(mp4|webm|mov|m4v)(\?|$)/i.test(src)) return;
-      const url = src.replace(/\?_=\d+$/, "");
+      const url = wpVideoUrl(wrapper);
+      if (!url) return;
       const link2 = document2.createElement("a");
       link2.setAttribute("href", url);
       link2.textContent = url;
@@ -251,8 +249,64 @@ var CustomImportScript = (() => {
       wrapper.replaceWith(WebImporter.DOMUtils.createTable(rows, document2));
     });
   }
+  function wpVideoUrl(wrapper) {
+    var _a, _b;
+    const video = wrapper.querySelector("video");
+    const src = video && (((_a = video.querySelector("source[src]")) == null ? void 0 : _a.getAttribute("src")) || video.getAttribute("src") || ((_b = wrapper.querySelector("a[href]")) == null ? void 0 : _b.getAttribute("href")) || "");
+    return src && /\.(mp4|webm|mov|m4v)(\?|$)/i.test(src) ? src.replace(/\?_=\d+$/, "") : "";
+  }
+  function rowTogglesToAccordion(element, document2) {
+    const content = element.querySelector(".entry-content") || element;
+    const topPanels = (grid) => [...grid.querySelectorAll(".so-panel")].filter((panel) => !panel.parentElement.closest(".so-panel"));
+    const isToggleRow = (grid) => {
+      const panels = topPanels(grid);
+      return panels.length === 2 && panels[0].matches(".widget_ys-row-toggle") && panels[1].matches(".widget_siteorigin-panels-builder");
+    };
+    const rowOf = (grid) => {
+      const [toggle, answer] = topPanels(grid);
+      const heading = toggle.querySelector("h1.row-title, h2.row-title, h3.row-title, h4.row-title");
+      if (!heading || !heading.textContent.trim()) return null;
+      answer.querySelectorAll(".wp-video").forEach((wrapper) => {
+        const url = wpVideoUrl(wrapper);
+        if (!url) return;
+        const p = document2.createElement("p");
+        const a = document2.createElement("a");
+        a.setAttribute("href", url);
+        const file = decodeURIComponent(url.split("/").pop()).replace(/\.[a-z0-9]+$/i, "").replace(/_[0-9a-f]{8}$/i, "").replace(/[-_]+/g, " ").trim();
+        a.textContent = `Video: ${file}`;
+        p.append(a);
+        wrapper.replaceWith(p);
+      });
+      answer.querySelectorAll("hr").forEach((rule) => rule.remove());
+      const body = [...answer.querySelectorAll(".textwidget")].flatMap((widget) => [...widget.children]).filter((node) => node.textContent.trim() || node.querySelector("img, a[href]"));
+      if (!body.length) return null;
+      const title = document2.createElement("h2");
+      title.textContent = heading.textContent.replace(/\s+/g, " ").trim();
+      return [title, body];
+    };
+    const grids = [...content.querySelectorAll(".panel-grid")].filter((grid) => !grid.parentElement.closest(".panel-grid"));
+    let group = [];
+    const flush = () => {
+      const rows = group.map(rowOf);
+      if (group.length && rows.every(Boolean)) {
+        group[0].replaceWith(WebImporter.DOMUtils.createTable([["Accordion"], ...rows], document2));
+        group.slice(1).forEach((grid) => grid.remove());
+      }
+      group = [];
+    };
+    grids.forEach((grid) => {
+      if (!isToggleRow(grid)) {
+        flush();
+        return;
+      }
+      if (group.length && group[group.length - 1].nextElementSibling !== grid) flush();
+      group.push(grid);
+    });
+    flush();
+  }
   function transform(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
+      rowTogglesToAccordion(element, element.ownerDocument || document);
       wpVideosToEmbeds(element, element.ownerDocument || document);
       WebImporter.DOMUtils.remove(element, [
         // Site header / nav / mega-menu / language switcher / search overlay chrome
@@ -467,6 +521,8 @@ var CustomImportScript = (() => {
   }
   function dataTables(document2, content) {
     content.querySelectorAll("table").forEach((table) => {
+      var _a;
+      if (((_a = table.rows[0]) == null ? void 0 : _a.cells.length) === 1) return;
       const rows = [...table.rows].filter((row) => text3(row));
       const filled = (row) => [...row.cells].filter((cell) => text3(cell));
       if (rows.filter((row) => filled(row).length >= 2).length < 2) return;

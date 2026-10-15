@@ -250,6 +250,9 @@ function bodyContent(document, primary) {
  */
 function dataTables(document, content) {
   content.querySelectorAll('table').forEach((table) => {
+    // A block table built upstream (cleanup's Accordion / Embed) opens with its one-cell name
+    // row; source data tables have a multi-cell header.
+    if (table.rows[0]?.cells.length === 1) return;
     const rows = [...table.rows].filter((row) => text(row));
     const filled = (row) => [...row.cells].filter((cell) => text(cell));
     if (rows.filter((row) => filled(row).length >= 2).length < 2) return;
