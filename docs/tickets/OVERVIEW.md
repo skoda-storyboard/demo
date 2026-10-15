@@ -240,7 +240,8 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-701 | Lint + unit tests | E07 | 2 | 1 | 1–2 | E02,E03,E04 | 🟢 |
 | [SKODA-702](tickets/SKODA-702.md) | Performance (Lighthouse≈100/RUM) | E07 | 3 | 1–2 | 2–3 | 603 | 🟡 M1; branch `skoda-702-performance` 2026-10-07: every AC measured; 2 CLS fixes (press-kit grid rows while loading, per-platform/weight fallback fonts): CLS ≤ 0.007 on the A/B pages (was up to 0.212); RUM beacons verified, field data needs the RUM explorer key; follow-ups: category LCP (831/209), fast-start MP4 (503/506) |
 | [SKODA-702a](tickets/SKODA-702a.md) | Epiq story performance: YouTube click-to-load facade (desktop TBT) | E07 | 2 | 0.5–1 | 1–2 | 702,204a,818 | 🔵 M1; from the PR #232 PSI failure (desktop 74, TBT 570ms; `main` 64–69 locally); live uses `lite-youtube`, EDS boots the full player on load |
-| SKODA-703 | Accessibility audit | E07 | 3 | 1–2 | 2–4 | 603 | 🟠 several `[RUNTIME-UNCONFIRMED]` |
+| [SKODA-703](tickets/SKODA-703.md) | Accessibility audit | E07 | 3 | 1–2 | 2–4 | 603 | 🟡 M1; audit + fixes 2026-10-15 (branch `skoda-703-a11y`): axe on the 134 M1 pages, keyboard / modal pass on 9 templates, contrast to AA (PO-accepted greys kept), skip link, slider pause, size-menu keys, linked-image alts; [audit](../reviews/SKODA-703-A11Y-AUDIT-2026-10-15.md) |
+| [SKODA-703a](tickets/SKODA-703a.md) | Desktop mega-menu triggers as disclosure buttons (screen-reader semantics) | E07 | 2 | 0.5–1 | 1–2 | 703,301,302 | 🔵 M2; deferred from SKODA-703 (no header refactor on demo day) |
 | SKODA-704 | Visual critique + consent/analytics stubs + sign-off | E07 | 3 | 1–2 | 2–3 | 702,703 | 🟡 |
 
 **Phases B–D (Pilot: No)**
