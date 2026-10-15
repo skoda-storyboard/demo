@@ -158,13 +158,16 @@ test('lite-youtube + consent shell → one bare watch-URL paragraph', { skip }, 
   assert.ok(!doc.querySelector('.page-embed, lite-youtube, img'), 'shell + poster gone');
 });
 
-test('YouTube/Vimeo iframes (src or data-src, in a wrapper) → bare URL', { skip }, () => {
+test('YouTube/Vimeo iframes (src or data-src, in a wrapper) → bare URL; a YouTube iframe keeps its player URL', { skip }, () => {
   const doc = dom(`<div class="video-container"><iframe src="https://www.youtube-nocookie.com/embed/abcDEF123?rel=0"></iframe></div>
     <div class="embed-controller-wrapper"><iframe data-src="https://player.vimeo.com/video/1221703335?dnt=1"></iframe></div>
+    <p><iframe src="https://www.youtube.com/embed/m9RlQw2FGjc?feature=oembed&amp;enablejsapi=1"></iframe></p>
     <div class="embed-controller-wrapper"><iframe data-src="https://www.buzzsprout.com/1/2?iframe=true"></iframe></div>`);
   storyCleanup('beforeTransform', doc.body, {});
   const hrefs = [...doc.querySelectorAll('p > a')].map((a) => a.getAttribute('href'));
-  assert.deepEqual(hrefs, ['https://www.youtube.com/watch?v=abcDEF123', 'https://vimeo.com/1221703335']);
+  // the source shows YouTube's own player for an iframe, the poster for a lite-youtube (#youtube parity)
+  assert.deepEqual(hrefs, ['https://www.youtube-nocookie.com/embed/abcDEF123?rel=0', 'https://vimeo.com/1221703335',
+    'https://www.youtube.com/embed/m9RlQw2FGjc?feature=oembed&enablejsapi=1']);
   assert.ok(doc.querySelector('iframe[data-src*="buzzsprout"]'), 'non-video embeds untouched (SKODA-604)');
 });
 

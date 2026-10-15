@@ -5,7 +5,7 @@
  * (ys-embed-controller / jQuery / colorbox are retired):
  *   - Video (Vimeo / YouTube): fluid 16:9 wrapper, native loading="lazy" iframe.
  *     Vimeo keeps ?dnt=1 (do-not-track); YouTube uses the standard youtube.com/embed host
- *     with feature=oembed&enablejsapi=1, as measured on the live source (embeds.md §2).
+ *     with the source's query (an iframe's as embedded, lite-youtube's enablejsapi=1).
  *   - Audio (Buzzsprout / Spotify): fixed-height wrapper (--embed-audio-height: 200px),
  *     NOT 16:9.
  *   - Self-hosted video file (.mp4 / .webm / .mov / .m4v, e.g. a WordPress `[video]`): a native
@@ -19,6 +19,8 @@
  * YouTube (SKODA-702a): as the live lite-youtube, the box first shows the video's poster and
  * the play glyph, one button. Only the poster image is requested until the click, which loads
  * the player and plays it (the full player was ~1 MB and most of the page's long tasks).
+ * A youtube.com/embed/ URL is a clip the source embeds as a plain iframe: YouTube's own player
+ * from the start, lazy-loaded like Vimeo, with the source's query (see isYoutubePlayer).
  *
  * Consent gate (SKODA-204a): the block asks hasEmbedConsent() (scripts/embed-consent.js)
  * first. With consent (the M1 default) the iframe lazy-loads on approach (YouTube: the poster).
@@ -97,6 +99,15 @@ function youtubeId(url) {
   return YOUTUBE_ID_RE.test(id) ? id : '';
 }
 
+/*
+ * The source embeds YouTube two ways, and the URL form says which: its iframes (YouTube's own
+ * player from the start: title and channel bar, red play button, "Watch on YouTube") import as
+ * the /embed/ URL, its lite-youtube clips (the poster) as the watch URL.
+ */
+const isYoutubePlayer = (url) => /^\/embed\//.test(url.pathname);
+const youtubeHost = (url) => (url.hostname.endsWith('youtube-nocookie.com')
+  ? 'www.youtube-nocookie.com' : 'www.youtube.com');
+
 /**
  * Builds the normalised embed URL for a provider, preserving privacy flags.
  * @param {string} provider
@@ -113,14 +124,17 @@ function buildEmbedUrl(provider, url) {
   }
   if (provider === 'youtube') {
     const id = youtubeId(url);
-    // Match the live Škoda embed exactly: standard youtube.com host, /embed/{id}, with
-    // feature=oembed + enablejsapi=1 (and the si= share token when the author URL carries one).
-    const params = new URLSearchParams();
-    params.set('feature', 'oembed');
-    const si = url.searchParams.get('si');
-    if (si) params.set('si', si);
-    params.set('enablejsapi', '1');
-    return `https://www.youtube.com/embed/${id}?${params.toString()}`;
+    // A source iframe (an /embed/ URL) loads YouTube's player with the query it was embedded
+    // with (feature=oembed, si=, enablejsapi=1 or not); a source lite-youtube (a watch /
+    // youtu.be URL) loads what lite-youtube loads, enablejsapi=1 (+ autoplay on the click).
+    if (isYoutubePlayer(url)) {
+      // never autoplay on approach (the lazy iframe loads unasked; the source's don't autoplay)
+      const params = new URLSearchParams(url.search);
+      params.delete('autoplay');
+      const query = params.toString();
+      return `https://${youtubeHost(url)}/embed/${id}${query ? `?${query}` : ''}`;
+    }
+    return `https://www.youtube.com/embed/${id}?enablejsapi=1`;
   }
   if (provider === 'buzzsprout') {
     // Keep the player query (?iframe=true etc.); ensure iframe mode.
@@ -561,15 +575,24 @@ export default function decorate(block) {
     return;
   }
 
+  // the source's fixed-height iframe box (`width="100%" height="448px"`, Play-Doh release)
+  const height = Number((cfg.height?.textContent.trim() || '').match(/^(\d+)(?:px)?$/)?.[1]);
+  if (!isAudio && height > 0) {
+    wrapper.classList.add('fixed-height');
+    wrapper.style.setProperty('--embed-height', `${height}px`);
+  }
+
   const iframe = buildIframe(src, title, isAudio, provider);
   block.classList.add(`embed-${provider}`);
+  // a YouTube player URL loads like the other providers' players, not behind the poster
+  const mode = provider === 'youtube' && isYoutubePlayer(url) ? 'youtube-player' : provider;
   // YouTube's play button name; a bare-URL embed only has the generic "YouTube video"
   // label, so don't read it out twice
   let playLabel = '';
-  if (provider === 'youtube') {
+  if (mode === 'youtube') {
     playLabel = title === providerLabel(provider, url) ? 'Play YouTube video' : `Play video: ${title}`;
   }
-  const gate = () => renderConsentGate(wrapper, iframe, provider, playLabel);
+  const gate = () => renderConsentGate(wrapper, iframe, mode, playLabel);
   block.append(wrapper);
 
   if (!hasEmbedConsent()) {
@@ -578,7 +601,7 @@ export default function decorate(block) {
     return;
   }
 
-  // YouTube: the click-to-load poster; others: the player boots when the embed nears the
-  // viewport (source parity + perf).
-  mountEmbed(wrapper, iframe, provider, playLabel, gate);
+  // A YouTube watch URL: the click-to-load poster; others (a YouTube player URL too): the
+  // player boots when the embed nears the viewport (source parity + perf).
+  mountEmbed(wrapper, iframe, mode, playLabel, gate);
 }

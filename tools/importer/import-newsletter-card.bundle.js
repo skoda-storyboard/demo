@@ -183,7 +183,7 @@ var CustomImportScript = (() => {
     const aside = document.createElement("aside");
     const heading = sidebar.querySelector(".related .heading, .related h2, .related h3");
     if (heading) {
-      const h = document.createElement("h2");
+      const h = document.createElement("h3");
       h.textContent = (heading.textContent || "Explore more").trim();
       aside.appendChild(h);
     }
@@ -191,7 +191,7 @@ var CustomImportScript = (() => {
     if (tags) {
       const tagsHeading = sidebar.querySelector("section.tags .heading, section.tags h2, section.tags h3");
       if (tagsHeading && (tagsHeading.textContent || "").trim()) {
-        const h = document.createElement("h2");
+        const h = document.createElement("h3");
         h.textContent = tagsHeading.textContent.trim();
         aside.appendChild(h);
       }

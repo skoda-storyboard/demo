@@ -11,7 +11,8 @@
  *   - blocks/listing/listing-logic.mjs — scopeRows/filterRows/sortRows/paginate.
  *   - scripts/card-teaser.js  — synthesizes the card cells the carousel expects.
  * A rail-specific need (drop already-shown slugs) is met with `exclude`/config
- * here, not by forking the shared logic.
+ * here, not by forking the shared logic; the Media Room News rail also skips the
+ * pages the promo box above it shows, as the source does (#332, skipsPromo).
  *
  * Deferred build (carousel-rails.md §7): the 4+ home rails must not all build on
  * load, so we build + decorate + load the inner carousel behind an
@@ -119,8 +120,9 @@ export function parseConfig(block) {
 
 /*
  * Pure row selection for the rail: scope → facet filter → exclude already-shown
- * slugs → sort → slice. Exported so tests exercise the production pipeline (the
- * reuse gate: it must delegate to listing-logic, not a fork). Returns index rows.
+ * slugs and pages (`cfg.shown`, whole paths) → sort → slice. Exported so tests
+ * exercise the production pipeline (the reuse gate: it must delegate to
+ * listing-logic, not a fork). Returns index rows.
  */
 export function selectRows(all, cfg) {
   // an `order` picks the rows itself: those pages in that order, whatever their template (the
@@ -138,8 +140,64 @@ export function selectRows(all, cfg) {
   if (cfg.exclude.length) {
     scoped = scoped.filter((r) => !cfg.exclude.some((s) => String(r.path || '').includes(s)));
   }
+  // pages a block above already shows (the promo box's, #332), matched by whole path
+  if (cfg.shown?.length) {
+    const shown = new Set(cfg.shown);
+    scoped = scoped.filter((r) => !shown.has(orderPaths([r.path || ''])[0]));
+  }
   scoped = sortRows(scoped, cfg.sort);
   return paginate(scoped, cfg.limit);
+}
+
+/**
+ * The pages a promo box shows, as index paths (no host, trailing slash or `.html`), in card
+ * order and without repeats (#332).
+ * @param {Element|null} promo the promo-box block
+ * @returns {string[]}
+ */
+export function shownPaths(promo) {
+  const hrefs = [...(promo?.querySelectorAll('.card-teaser-link[href]') || [])]
+    .map((a) => a.getAttribute('href'));
+  return [...new Set(orderPaths(hrefs))];
+}
+
+// How long a News rail waits for the promo box above it before it builds anyway (#332).
+export const PROMO_WAIT_MS = 3000;
+
+/**
+ * The pages the page's promo box shows, once it has loaded (its cards are built before the
+ * block is marked loaded). The source's Media Room News rail never repeats them (#332). No
+ * promo box, or one that does not load in time, shows nothing to skip.
+ * @param {Document|Element} root where to look for the promo box
+ * @param {number} [timeout]
+ * @returns {Promise<string[]>}
+ */
+export function promoShownPaths(root, timeout = PROMO_WAIT_MS) {
+  const promo = root.querySelector?.('main .promo-box');
+  if (!promo) return Promise.resolve([]);
+  const loaded = () => promo.dataset.blockStatus === 'loaded';
+  if (loaded()) return Promise.resolve(shownPaths(promo));
+  if (!window.MutationObserver) return Promise.resolve([]);
+  return new Promise((resolve) => {
+    let timer;
+    const observer = new MutationObserver(() => {
+      if (!loaded()) return;
+      observer.disconnect();
+      clearTimeout(timer);
+      resolve(shownPaths(promo));
+    });
+    observer.observe(promo, { attributes: true, attributeFilter: ['data-block-status'] });
+    timer = setTimeout(() => { observer.disconnect(); resolve([]); }, timeout);
+  });
+}
+
+/**
+ * Whether an index rail skips what the promo box shows: the Media Room's News rail (a
+ * `press_release` rail), as the source does (#332). Press bands, curated and hand-picked
+ * (`order`) rails, and every other rail keep their rows.
+ */
+export function skipsPromo(cfg, { press = false, curated = false } = {}) {
+  return cfg.layout === 'news' && !press && !curated && !cfg.order?.length;
 }
 
 // The config keys parseConfig understands (normalized via toClassName, so
@@ -544,9 +602,14 @@ export default async function decorate(block) {
     let indexRows = [];
     if (!curated) {
       try {
-        const all = await loadQueryIndex(cfg.index);
+        const [all, shown] = await Promise.all([
+          loadQueryIndex(cfg.index),
+          skipsPromo(cfg, { press, curated }) ? promoShownPaths(document) : [],
+        ]);
         // one extra row tells a full press band apart from one that just fits
-        const matches = selectRows(all, press || endCard ? { ...cfg, limit: cfg.limit + 1 } : cfg);
+        const matches = selectRows(all, {
+          ...cfg, shown, limit: press || endCard ? cfg.limit + 1 : cfg.limit,
+        });
         more = matches.length > cfg.limit;
         indexRows = matches.slice(0, cfg.limit);
         rows = indexRows.map((r) => rowToCells(r));

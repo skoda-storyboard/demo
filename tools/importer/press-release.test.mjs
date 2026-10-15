@@ -279,9 +279,11 @@ test('media box: heading + stats, image rows carry Original + 1920px, PDF and vi
   assert.equal(txt(band.content[1]), '1 video, 3 images, 1 PDF');
   const rows = rowsOf(find(importPage('peaq').sections, 'Downloads'));
   assert.equal(rows.length, 5);
-  const labels = rows.map((r) => [...r.children[2].querySelectorAll('a')].map(txt).join('+'));
+  const labels = rows.map((r) => [...r.lastElementChild.querySelectorAll('a')].map(txt).join('+'));
   assert.deepEqual(labels, ['MP4', 'Original+1920px', 'Original+1920px', 'Original+1920px', 'PDF']);
-  rows.forEach((r) => assert.equal(r.children.length, 3, 'three cells per row'));
+  // [image, date, title, links]: every source item carries its date line (#274)
+  rows.forEach((r) => assert.equal(r.children.length, 4, 'four cells per row'));
+  rows.forEach((r) => assert.match(txt(r.children[1]), /^\d{1,2}\. \d{1,2}\. \d{4}$/));
   assert.ok(!rows[4].querySelector('img'), 'PDF row has no image');
   // the Vimeo poster in its ingestible .jpg form (the source src has no extension)
   assert.match(rows[0].querySelector('img').getAttribute('src'), /^https:\/\/i\.vimeocdn\.com\/video\/.+-d_1280x720\.jpg$/);
@@ -375,9 +377,9 @@ test('4x4 Media Box: all 15 items in one Downloads block, MP4 hrefs URL-serialis
   assert.equal(txt(band.content[1]), '9 videos, 3 images, 3 PDFs');
   const rows = rowsOf(find(sections, 'Downloads'));
   assert.equal(rows.length, 15);
-  const titles = rows.map((r) => txt(r.children[1]));
+  const titles = rows.map((r) => txt(r.children[r.children.length - 2]));
   assert.ok(titles.includes('Video | Škoda Elroq'), titles.join('\n'));
-  const links = rows.flatMap((r) => [...r.children[2].querySelectorAll('a')]);
+  const links = rows.flatMap((r) => [...r.lastElementChild.querySelectorAll('a')]);
   const mp4 = links.filter((a) => a.getAttribute('href').endsWith('.mp4'));
   assert.equal(mp4.length, 9);
   // helix-importer rewrites .mp4 links in the markdown to `new URL(href).href` after the grid
@@ -405,6 +407,24 @@ test('lite-youtube: the hydrated player becomes a bare YouTube watch URL (SKODA-
   assert.ok(urls.includes('https://www.youtube.com/watch?v=abcdef12345'), 'an unhydrated player too');
   assert.ok(!body.some((n) => /\bPlay\b|third party/.test(txt(n))), 'no Play links or consent text');
   assert.ok(!body.some((n) => n.querySelector('img[src*="ytimg.com"], lite-youtube, a[href*="youtube-nocookie"]')), 'no poster or player chrome');
+});
+
+test('a full-width fixed-height YouTube iframe keeps its box as Embed url + height; a sized one stays a bare URL', { skip }, () => {
+  const playDoh = 'https://www.youtube.com/embed/T9iRrU7EjD8?si=s0PTkkFFmASxwRNQ';
+  const { sections } = importPage('superb', (doc) => {
+    doc.querySelector('.column-primary .entry-content').insertAdjacentHTML('beforeend', `
+      <div class="embed-controller-wrapper"><iframe width="100%" height="448px" data-src="${playDoh}" title="YouTube video player" frameborder="0" allowfullscreen></iframe></div>
+      <p><iframe width="500" height="281" src="https://www.youtube.com/embed/m9RlQw2FGjc?feature=oembed&amp;enablejsapi=1"></iframe></p>`);
+  });
+  const body = sections[1].nodes;
+  const embed = body.find((n) => n.tagName === 'TABLE' && blockName(n) === 'Embed');
+  assert.ok(embed, 'an Embed table, not flattened as a source data table');
+  const rows = [...embed.querySelectorAll('tr')].slice(1).map((tr) => [...tr.children].map((td) => txt(td)));
+  assert.deepEqual(rows, [['url', playDoh], ['height', '448']]);
+  assert.equal(embed.querySelector('a').getAttribute('href'), playDoh);
+  assert.equal(embed.hasAttribute('data-skoda-embed'), false, 'no import marker reaches DA');
+  assert.ok(body.some((n) => n.tagName === 'P' && n.querySelector('a')?.getAttribute('href') === 'https://www.youtube.com/embed/m9RlQw2FGjc?feature=oembed&enablejsapi=1'),
+    'a 500×281 iframe is the ratio player, a bare URL');
 });
 
 test('tags: the "+N" show-more toggle is skipped and the tags it reveals are kept', { skip }, () => {
@@ -451,3 +471,35 @@ The new Škoda Octavia RS offers a 195 kW (265 PS) petrol engine<br />
   }).sections[1].content.find((n) => n.tagName === 'UL');
   assert.equal(plain.children.length, 2);
 });
+
+// --- #274: press-release QA -------------------------------------------------------------------
+
+test('#274: the Media Box and Related Press Releases headings are h3, as the source band headings', { skip }, () => {
+  const { sections } = importPage('zellmer');
+  const box = sections.find((s) => s.style === 'dark, full-width, media-box');
+  const related = sections.find((s) => /related/.test(s.style || ''));
+  assert.equal(box.content[0].tagName, 'H3');
+  assert.equal(txt(box.content[0]), 'Media Box');
+  assert.equal(related.content[0].tagName, 'H3');
+  assert.equal(txt(related.content[0]), 'Related Press Releases');
+});
+
+test('#274: every Media Box card carries its source date (Zellmer: image 30. 8. 2022, PDF 21. 9. 2026)', { skip }, () => {
+  const zellmer = rowsOf(find(importPage('zellmer').sections, 'Downloads'));
+  assert.deepEqual(zellmer.map((r) => txt(r.children[1])), ['30. 8. 2022', '21. 9. 2026']);
+  const superb = rowsOf(find(importPage('superb').sections, 'Downloads'));
+  assert.deepEqual(superb.map((r) => txt(r.children[1])), ['11. 9. 2026', '11. 9. 2026', '11. 9. 2026', '11. 9. 2026', '10. 9. 2026']);
+});
+
+test('#274: the FAQ keeps the blank line after its bold opener (a <br> closing the <strong>)', { skip }, () => {
+  const { sections } = importPage('zellmer');
+  const faq = sections.find((s) => /highlight-grey/.test(s.style || ''));
+  const first = faq.content.find((n) => n.tagName === 'P');
+  const strong = first.querySelector('strong');
+  assert.equal(txt(strong), 'Frequently Asked Questions:');
+  assert.equal(strong.querySelector('br'), null, 'no break left inside the bold run');
+  // the moved break and the source's own: a blank line before the first question
+  assert.equal(strong.nextSibling?.nodeName, 'BR');
+  assert.equal(strong.nextSibling?.nextSibling?.nodeName, 'BR');
+});
+

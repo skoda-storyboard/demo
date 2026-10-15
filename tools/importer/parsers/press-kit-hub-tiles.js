@@ -1,4 +1,5 @@
 /* global WebImporter */
+import { siteOriginWidths } from './series-grid.js';
 
 const ratioOf = (tile) => tile.querySelector('.ratio-container')
   ?.className.match(/\bratio-(\d+x\d+)\b/)?.[1];
@@ -29,34 +30,102 @@ function rowTokens(tiles, rowIndex) {
   throw new Error(`Press-kit tile row ${rowIndex + 1} has an unsupported layout`);
 }
 
-export default function parseTiles(content, document) {
+function tileRow(tile, token, rowNumber, document) {
+  const sourceLink = tile.querySelector(':scope > a[href]');
+  const sourceImage = tile.querySelector('.ratio-container img[src]');
+  const heading = tile.querySelector('.heading');
+  if (!sourceLink || !sourceImage || !heading?.textContent.trim()) {
+    throw new Error(`Press-kit tile ${rowNumber} needs a link, image and title`);
+  }
+  const title = heading.textContent.replace(/\s+/g, ' ').trim();
+  const img = sourceImage.cloneNode(true);
+  img.setAttribute('alt', title);
+  img.removeAttribute('srcset');
+  img.removeAttribute('sizes');
+  const link = document.createElement('a');
+  link.href = sourceLink.href;
+  link.textContent = title;
+  return [token, img, link];
+}
+
+// A cell's linked banner images (the hub's image-only `sow-editor` links).
+const bannersIn = (cell) => [...cell.querySelectorAll('.widget_sow-editor .textwidget a[href]')]
+  .filter((a) => a.querySelector('img[src]'));
+const cellsOf = (grid) => [...grid.querySelectorAll(
+  ':scope > .panel-grid-cell, :scope > .panel-row-style > .panel-grid-cell',
+)];
+
+// Mosaic tokens by kind and SiteOrigin cell width (scripts/cards-tiles.js MOSAIC_SPANS).
+const MOSAIC_TOKENS = {
+  'tile:1x1:20': 'press-square',
+  'tile:2x1:33': 'press-third',
+  'banner:60': 'press-banner-wide',
+  'banner:40': 'press-banner-narrow',
+  'banner:50': 'press-banner-half',
+};
+
+/*
+ * A hub whose banners share rows with its tiles (Classic Days 2026: Intro + Museum on top, Trekka
+ * beside the last fifths, …) is one mosaic: every top-level row with tiles or banners, in source
+ * order, each cell sized by its SiteOrigin width. Banners become [size, linked picture] rows, and
+ * their source links are marked so the hub's banner section doesn't repeat them.
+ */
+function mosaicRows(grids, widths, banner, document) {
+  const rows = [];
+  grids.forEach((grid, rowIndex) => {
+    cellsOf(grid).forEach((cell) => {
+      const tiles = [...cell.querySelectorAll('article.article-teaser')];
+      const banners = bannersIn(cell);
+      if (!tiles.length && !banners.length) return;
+      const width = Math.round(widths[cell.id]);
+      if (tiles.length + banners.length !== 1) {
+        throw new Error(`Press-kit mosaic row ${rowIndex + 1}: one tile or banner per cell`);
+      }
+      const key = tiles.length ? `tile:${ratioOf(tiles[0])}:${width}` : `banner:${width}`;
+      const token = MOSAIC_TOKENS[key];
+      if (!token) throw new Error(`Press-kit mosaic row ${rowIndex + 1}: unsupported cell (${key})`);
+      if (tiles.length) {
+        rows.push(tileRow(tiles[0], token, rows.length + 1, document));
+        return;
+      }
+      banners[0].setAttribute('data-pk-mosaic', '');
+      rows.push([token, banner(banners[0])]);
+    });
+  });
+  return rows;
+}
+
+/**
+ * @param {Element} content the hub's `.content`
+ * @param {Document} document
+ * @param {{ banner?: (source: HTMLAnchorElement) => HTMLAnchorElement }} [options] builds a
+ *   banner's linked picture; without it a hub with mosaic banners is refused
+ */
+export default function parseTiles(content, document, { banner } = {}) {
   // Top-level grids only: a nested SiteOrigin builder (older default-template kits) is a grid
   // inside a cell, and its tiles belong to the outer row, in source order.
-  const sourceRows = [...content.querySelectorAll('.panel-grid')]
-    .filter((grid) => !grid.parentElement.closest('.panel-grid'))
+  const grids = [...content.querySelectorAll('.panel-grid')]
+    .filter((grid) => !grid.parentElement.closest('.panel-grid'));
+  const sourceRows = grids
     .map((grid) => [...grid.querySelectorAll('article.article-teaser')])
     .filter((tiles) => tiles.length);
   if (!sourceRows.length) throw new Error('Press-kit hub has no chapter tiles');
-  const rows = [['Cards (overlay, tiles)']];
+  const header = [['Cards (overlay, tiles)']];
+  const mixed = grids.some((grid) => grid.querySelector('article.article-teaser')
+    && cellsOf(grid).some((cell) => !cell.querySelector('article.article-teaser') && bannersIn(cell).length));
+  if (mixed) {
+    if (!banner) throw new Error('Press-kit tiles share rows with banners: not supported here');
+    const widths = siteOriginWidths(document);
+    const live = grids.filter((grid) => grid.querySelector('article.article-teaser') || bannersIn(grid).length);
+    return WebImporter.DOMUtils.createTable(
+      [...header, ...mosaicRows(live, widths, banner, document)],
+      document,
+    );
+  }
+  const rows = [...header];
   sourceRows.forEach((tiles, rowIndex) => {
     const tokens = rowTokens(tiles, rowIndex);
-    tiles.forEach((tile, index) => {
-      const sourceLink = tile.querySelector(':scope > a[href]');
-      const sourceImage = tile.querySelector('.ratio-container img[src]');
-      const heading = tile.querySelector('.heading');
-      if (!sourceLink || !sourceImage || !heading?.textContent.trim()) {
-        throw new Error(`Press-kit tile ${rows.length} needs a link, image and title`);
-      }
-      const title = heading.textContent.replace(/\s+/g, ' ').trim();
-      const img = sourceImage.cloneNode(true);
-      img.setAttribute('alt', title);
-      img.removeAttribute('srcset');
-      img.removeAttribute('sizes');
-      const link = document.createElement('a');
-      link.href = sourceLink.href;
-      link.textContent = title;
-      rows.push([tokens[index], img, link]);
-    });
+    tiles.forEach((tile, index) => rows.push(tileRow(tile, tokens[index], rows.length, document)));
   });
   return WebImporter.DOMUtils.createTable(rows, document);
 }

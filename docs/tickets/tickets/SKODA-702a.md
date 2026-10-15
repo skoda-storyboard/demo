@@ -163,3 +163,22 @@ The `aem-psi-check` failed on PR #232 (SKODA-303) with **Lighthouse 74** on the 
 - YouTube `maxresdefault.jpg` doesn't exist for every video. Use the `hqdefault` fallback on poster load error.
 - The facade adds a click before playback on iOS. Pass `autoplay=1` on the iframe created by the click (the same
   trade-off as the source).
+
+## Live parity: poster or player per clip (PO, 2026-10-13; branch `bug-youtube-controls-check`)
+PO report: "check all YouTube video controllers in live and us, it's not same".
+- **Survey:** 33 pages carry YouTube. The source embeds a clip in one of two ways:
+  - lite-youtube (25 story / press-release pages): poster, top shade and grey glyph until the click, as our poster;
+  - a plain YouTube iframe, YouTube's own player from the start (title and channel bar, red play button, "Watch on YouTube"). That's the Elroq "through its designers' eyes", the 125 years Motorsport Videos chapter (6), the Play-Doh release, the "2024 a year of…" story (9 of 11) and the cruise-control story.
+  - Ours showed the poster for all of them.
+- **Decision (PO):** match the source per clip. A player clip shows YouTube's player, lazy-loaded as it nears the viewport like Vimeo; a lite clip keeps the poster. The speed gain stays on the 28 lite pages.
+- **How:**
+  - The URL form carries the kind: `/embed/…` is a source iframe, `watch?v=` / `youtu.be` is a lite-youtube.
+    - `blocks/embed` plays an `/embed/` URL as the player, with its source query kept (`feature=oembed`, `si=`, `enablejsapi=1` as each clip was embedded).
+    - The poster's click now loads lite-youtube's own URL (`enablejsapi=1&autoplay=1&playsinline=1`, without our former `feature=oembed`).
+  - `skoda-story-cleanup.js` keeps a YouTube iframe's `/embed/` URL and query (it made every clip a watch URL). The press-kit and press-release importers already kept it.
+  - New `Embed` row `height`: Play-Doh's source iframe is `width="100%" height="448px"`, 812 × 448 at 1440 and 370 × 448 at 390 (16:9 here before). `skoda-press-release-layout.js` emits `Embed` url + height for a full-width, fixed-height video iframe; audio players are excluded.
+- **Measured against the source** (1440 / 390, cookies accepted): every clip on the 5 pages plus the Epiq lite story matches in kind, order, box and player URL.
+  - YouTube's own player answers "Sign in to confirm you're not a bot" to the test browser on both sites, so its inner controls are YouTube's and weren't compared.
+- **Re-import:** Elroq designers, 2024 year and cruise control (only the 11 player links change), and Play-Doh (the `Embed` table). The press kit needs code only.
+  - Play-Doh's fresh import also carries an origin change in a related-article teaser (date and headline).
+- **Note (not changed here):** on the cruise-control story the video sits in the dark highlight panel. The source insets that panel's content 30px left and 10px right; ours insets it 25 / 25, so the panel's text and the video (789 × 444 vs 799 × 449 at 1440) are 5px off. That's the highlight section (SKODA-824), and every dark panel has the same inset.
