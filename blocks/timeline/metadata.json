@@ -1,0 +1,29 @@
+{
+  "variantName": "timeline",
+  "baseBlock": "timeline",
+  "version": "1.0.0",
+  "created": "2026-10-16T08:00:00.000Z",
+  "name": "Timeline",
+  "description": "A dated timeline (the source's ys-milestones widget): per milestone a year pill, a title, a square image and a description, on a vertical line.",
+  "visualCharacteristics": {
+    "purpose": "story milestones timeline"
+  },
+  "contentPattern": {
+    "structure": "year | title | image | description, one row per milestone"
+  },
+  "options": [
+    {
+      "class": "black",
+      "label": "black",
+      "description": "Black year pills and dots instead of the default green (#9c0)."
+    }
+  ],
+  "usage": {
+    "pagesUsing": [
+      "en/skoda-world/steering-wheel-decades-of-changes",
+      "en/125-let-skode/125-years-of-skoda-iconic-cars"
+    ],
+    "reuseCount": 9,
+    "lastUsed": "2026-10-16T08:00:00.000Z"
+  }
+}

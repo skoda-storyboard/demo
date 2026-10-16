@@ -264,29 +264,53 @@ var CustomImportScript = (() => {
     const img = panel.querySelector("img");
     return img ? [img] : [];
   }
-  function milestonesNodes(panel, document2) {
-    const items = [...panel.querySelectorAll("li")].filter((li) => li.querySelector(".year, .title, img"));
-    const out = [];
+  var MILESTONE_KEEP = /* @__PURE__ */ new Set(["P", "BR", "STRONG", "B", "EM", "I", "A", "UL", "OL", "LI"]);
+  function milestoneRich(source, document2) {
+    const clean = (node) => {
+      if (node.nodeType === 3) return [document2.createTextNode(node.textContent)];
+      if (node.nodeType !== 1) return [];
+      const kids = [...node.childNodes].flatMap(clean);
+      if (!MILESTONE_KEEP.has(node.tagName)) return kids;
+      const el = document2.createElement(node.tagName.toLowerCase());
+      if (node.tagName === "A" && node.getAttribute("href")) el.setAttribute("href", node.getAttribute("href"));
+      const trailing = [];
+      while (/^(STRONG|B|EM|I)$/.test(node.tagName) && kids.length) {
+        const last = kids[kids.length - 1];
+        if (last.nodeType === 1 && last.tagName === "BR") trailing.unshift(kids.pop());
+        else if (last.nodeType === 3 && !last.textContent.trim()) kids.pop();
+        else break;
+      }
+      el.append(...kids);
+      return [el, ...trailing];
+    };
+    const nodes = [...(source == null ? void 0 : source.childNodes) || []].flatMap(clean).filter((n) => !(n.nodeType === 3 && !n.textContent.trim()));
+    return nodes.filter((n) => !(n.tagName === "P" && !n.textContent.trim() && !n.querySelector("br, a")));
+  }
+  var MILESTONE_BLACK = /background(?:-color)?\s*:\s*(?:#0{3}(?:0{3})?\b|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\)|black\b)/i;
+  function milestonesCells(panel, document2) {
+    var _a;
+    const items = [...panel.querySelectorAll("li")].filter((li) => li.querySelector(".year, .title, .description, img"));
+    if (!items.length) return null;
+    const black = MILESTONE_BLACK.test(((_a = items[0].querySelector(".year")) == null ? void 0 : _a.getAttribute("style")) || "");
+    const cells = [[black ? "Timeline (black)" : "Timeline"]];
     items.forEach((li) => {
-      var _a, _b;
-      const year = (((_a = li.querySelector(".year")) == null ? void 0 : _a.textContent) || "").replace(/\s+/g, " ").trim();
-      const title = (((_b = li.querySelector(".title")) == null ? void 0 : _b.textContent) || "").replace(/\s+/g, " ").trim();
-      if (year || title) {
-        const h = document2.createElement("h3");
-        h.textContent = [year, title].filter(Boolean).join(" \u2014 ");
-        out.push(h);
-      }
-      const img = li.querySelector("img");
-      if (img) out.push(img);
+      var _a2;
+      const year = (((_a2 = li.querySelector(".year")) == null ? void 0 : _a2.textContent) || "").replace(/\s+/g, " ").trim();
+      const title = milestoneRich(li.querySelector(".title"), document2);
+      const img = li.querySelector(".thumbnail img, img");
+      const description = li.querySelector(".description");
+      description == null ? void 0 : description.querySelectorAll(".dot").forEach((dot) => dot.remove());
+      cells.push([year, title, img ? [img] : "", milestoneRich(description, document2)]);
     });
-    if (!out.length) {
-      panel.querySelectorAll("img").forEach((img) => out.push(img));
-      const text3 = (panel.textContent || "").replace(/\s+/g, " ").trim();
-      if (text3 && !panel.querySelector("img")) {
-        const p = document2.createElement("p");
-        p.textContent = text3;
-        out.push(p);
-      }
+    return cells;
+  }
+  function milestonesFallback(panel, document2) {
+    const out = [...panel.querySelectorAll("img")];
+    const text3 = (panel.textContent || "").replace(/\s+/g, " ").trim();
+    if (text3 && !out.length) {
+      const p = document2.createElement("p");
+      p.textContent = text3;
+      out.push(p);
     }
     return out;
   }
@@ -532,8 +556,6 @@ var CustomImportScript = (() => {
       case "editor":
         nodes = editorNodes(panel, document2);
         break;
-      // carousel-widget routes by content (Cards if teasers-with-links, else Gallery (slider));
-      // sow-slider is always an image slider → Gallery.
       case "carousel":
         cells = carouselCells(panel, document2);
         break;
@@ -556,7 +578,8 @@ var CustomImportScript = (() => {
         nodes = buttonNodes(panel, document2);
         break;
       case "milestones":
-        nodes = milestonesNodes(panel, document2);
+        cells = milestonesCells(panel, document2);
+        if (!cells) nodes = milestonesFallback(panel, document2);
         break;
       default:
         nodes = editorNodes(panel, document2);

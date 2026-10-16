@@ -194,6 +194,11 @@
         "chips"
       ]
     },
+    "timeline": {
+      "variants": [
+        "black"
+      ]
+    },
     "widget": {
       "variants": []
     }

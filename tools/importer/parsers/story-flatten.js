@@ -51,8 +51,9 @@
  *   skoda-image-box            0.2%  → infobox/definition callout: text (+ image) as
  *                                       default content — NOT a plain image (D2)
  *   sow-image                  0.1%  → image (lifted to direct child)
- *   ys-milestones              0.1%  → timeline flattened to content: per entry an
- *                                       <h3> "YEAR — Title" + its image (SKODA-815/D1)
+ *   ys-milestones              0.1%  → Timeline block: one row per entry, year | title |
+ *                                       image | description (SKODA-815/D1; was an
+ *                                       <h3> + image, which lost every description)
  *   ys-embed-share             0.1%  → dropped (social share chrome, not body)
  *   iframe-embed              0.01%  → embed block (preserve dnt=1)
  *   highlights                0.02%  → dropped + logged
@@ -315,36 +316,71 @@ function imageNodes(panel, document) {
   return img ? [img] : [];
 }
 
+// The rich text of a milestone part as clean nodes: the source's styling spans (inline
+// font sizes, the Škodapedia `term-explain` tooltip, SKODA-206) give way to their text;
+// paragraphs, line breaks, bold/italic and links stay (links keep only their href).
+const MILESTONE_KEEP = new Set(['P', 'BR', 'STRONG', 'B', 'EM', 'I', 'A', 'UL', 'OL', 'LI']);
+function milestoneRich(source, document) {
+  const clean = (node) => {
+    if (node.nodeType === 3) return [document.createTextNode(node.textContent)];
+    if (node.nodeType !== 1) return [];
+    const kids = [...node.childNodes].flatMap(clean);
+    if (!MILESTONE_KEEP.has(node.tagName)) return kids;
+    const el = document.createElement(node.tagName.toLowerCase());
+    if (node.tagName === 'A' && node.getAttribute('href')) el.setAttribute('href', node.getAttribute('href'));
+    // a line break closing a bold/italic run (the title's `<strong>VOITURETTE A<br></strong>`)
+    // moves after it: the conversion drops a trailing <br> inside inline formatting
+    const trailing = [];
+    while (/^(STRONG|B|EM|I)$/.test(node.tagName) && kids.length) {
+      const last = kids[kids.length - 1];
+      if (last.nodeType === 1 && last.tagName === 'BR') trailing.unshift(kids.pop());
+      else if (last.nodeType === 3 && !last.textContent.trim()) kids.pop();
+      else break;
+    }
+    el.append(...kids);
+    return [el, ...trailing];
+  };
+  const nodes = [...(source?.childNodes || [])].flatMap(clean)
+    .filter((n) => !(n.nodeType === 3 && !n.textContent.trim()));
+  // a paragraph left empty by the unwrap (a spacer <p>&nbsp;</p>) is not content
+  return nodes.filter((n) => !(n.tagName === 'P' && !n.textContent.trim() && !n.querySelector('br, a')));
+}
+
+// The year pill's colour is authored per widget (`.year` inline background): green
+// (#99cc00, the default) on most, black on "125 years of Škoda: iconic cars".
+const MILESTONE_BLACK = /background(?:-color)?\s*:\s*(?:#0{3}(?:0{3})?\b|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\)|black\b)/i;
+
 // ys-milestones = a dated timeline (SKODA-815 / D1). Source shape:
-// `section.milestones > ul > li` where each <li> holds `.year`, `.title` (rich text)
-// and an `<img>`. Reduced-fidelity flatten (M1): each milestone → an <h3> "YEAR — Title"
-// heading + its image lifted to a direct child (EDS wraps it in <picture>), in order.
-// No content is dropped; the source's timeline visual is not reproduced (see SKODA-815
-// for the optional dedicated timeline block). Falls back gracefully if the DOM differs.
-function milestonesNodes(panel, document) {
-  const items = [...panel.querySelectorAll('li')].filter((li) => li.querySelector('.year, .title, img'));
-  const out = [];
+// `section.milestones > ul > li`, each <li> holding `.line > .year`, `.title` (rich: the
+// maker, the bold model, "(vehicle on display: …)"), `.thumbnail > img` (square) and
+// `.description` (rich text with links, after a decorative `.dot`). Each entry becomes
+// one Timeline row: year | title | image | description, in source order; the block
+// renders the source's vertical timeline (blocks/timeline, docs/ui-specs/timeline.md).
+// Unexpected DOM (no entries) → its images + text as default content, never dropped.
+function milestonesCells(panel, document) {
+  const items = [...panel.querySelectorAll('li')]
+    .filter((li) => li.querySelector('.year, .title, .description, img'));
+  if (!items.length) return null;
+  const black = MILESTONE_BLACK.test(items[0].querySelector('.year')?.getAttribute('style') || '');
+  const cells = [[black ? 'Timeline (black)' : 'Timeline']];
   items.forEach((li) => {
     const year = (li.querySelector('.year')?.textContent || '').replace(/\s+/g, ' ').trim();
-    const title = (li.querySelector('.title')?.textContent || '').replace(/\s+/g, ' ').trim();
-    if (year || title) {
-      const h = document.createElement('h3');
-      h.textContent = [year, title].filter(Boolean).join(' — ');
-      out.push(h);
-    }
-    const img = li.querySelector('img');
-    if (img) out.push(img);
+    const title = milestoneRich(li.querySelector('.title'), document);
+    const img = li.querySelector('.thumbnail img, img');
+    const description = li.querySelector('.description');
+    description?.querySelectorAll('.dot').forEach((dot) => dot.remove());
+    cells.push([year, title, img ? [img] : '', milestoneRich(description, document)]);
   });
-  // Defensive: unexpected DOM (no <li> entries) → salvage any images + text so nothing
-  // is silently lost, rather than emitting an empty block.
-  if (!out.length) {
-    panel.querySelectorAll('img').forEach((img) => out.push(img));
-    const text = (panel.textContent || '').replace(/\s+/g, ' ').trim();
-    if (text && !panel.querySelector('img')) {
-      const p = document.createElement('p');
-      p.textContent = text;
-      out.push(p);
-    }
+  return cells;
+}
+
+function milestonesFallback(panel, document) {
+  const out = [...panel.querySelectorAll('img')];
+  const text = (panel.textContent || '').replace(/\s+/g, ' ').trim();
+  if (text && !out.length) {
+    const p = document.createElement('p');
+    p.textContent = text;
+    out.push(p);
   }
   return out;
 }
@@ -666,7 +702,10 @@ function emitWidget(panel, document, out, stats) {
     case 'image-box': nodes = infoboxNodes(panel, document); break;
     case 'image': nodes = imageNodes(panel, document); break;
     case 'button': nodes = buttonNodes(panel, document); break;
-    case 'milestones': nodes = milestonesNodes(panel, document); break;
+    case 'milestones':
+      cells = milestonesCells(panel, document);
+      if (!cells) nodes = milestonesFallback(panel, document);
+      break;
     default:
       // unknown: try to salvage rich text, else skip + log.
       nodes = editorNodes(panel, document);
@@ -789,5 +828,5 @@ export default function parse(element, { document }) {
 
 // Exposed for unit/prototype testing (harness-only; ignored by the bundle default).
 export const __test = {
-  classifyWidget, cellsOf, panelsOf, WIDGET_KINDS, splitVariant, portraitVariant,
+  classifyWidget, cellsOf, panelsOf, WIDGET_KINDS, splitVariant, portraitVariant, milestonesCells,
 };
