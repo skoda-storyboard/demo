@@ -483,7 +483,7 @@ var CustomImportScript = (() => {
     });
   }
   var REGULATORY = /\bWLTP\b|(?=.*\b\d[\d.,\s–-]*(?:kWh|l)\s*\/\s*100\s*km)(?=.*(?:CO[₂2]|g\s*\/\s*km))/i;
-  function parse4(element, { document }) {
+  function parse4(element, { document }, { story = false } = {}) {
     const gallery = element.matches(".search-results-gallery");
     const notes = gallery ? [...new Set([...element.querySelectorAll(".article-teaser-media img[data-caption]")].map((img) => text2(Object.assign(document.createElement("div"), { innerHTML: img.getAttribute("data-caption") }))).filter((caption) => caption && REGULATORY.test(caption)))] : [];
     const items = [...element.querySelectorAll(".search-results-item")];
@@ -521,8 +521,13 @@ var CustomImportScript = (() => {
       ["data-caption", "data-video_title", "data-video_src", "srcset", "sizes", "itemprop", "title"].forEach((attr) => img.removeAttribute(attr));
       rows.push([img, ...named, paragraphs2]);
     });
-    const config = gallery ? [["collapse", "auto"]] : [];
-    const name = gallery ? "Downloads (gallery)" : "Downloads";
+    let config = gallery ? [["collapse", "auto"]] : [];
+    if (gallery && story) {
+      const toggled = !!element.querySelector(".search-results-items[data-togglebox]");
+      config = [["collapse", toggled ? "auto" : "none"], ["columns", toggled ? "4" : "3"]];
+    }
+    let name = gallery ? "Downloads (gallery)" : "Downloads";
+    if (gallery && story) name = "Downloads (gallery, story)";
     const table = WebImporter.DOMUtils.createTable([[name], ...config, ...rows], document);
     element.replaceWith(table, ...notes.map((note) => Object.assign(document.createElement("p"), { textContent: note })));
   }
@@ -1015,7 +1020,7 @@ var CustomImportScript = (() => {
       if (totals.length) {
         media.dataset.expectedAssets = totals.reduce((sum, match) => sum + Number(match[1]), 0);
       }
-      out.push(marker2(document, "media-box, dark, full-width"), make(document, "h2", heading));
+      out.push(marker2(document, "media-box, dark, full-width"), make(document, "h3", heading));
       if (stats) out.push(make(document, "p", stats));
       media.querySelectorAll(".search-results-header, .search-results-stats, .togglebox-opener").forEach((node) => node.remove());
       out.push(media);

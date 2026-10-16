@@ -264,6 +264,7 @@
 .embed.vimeo {
   --clip-inset: var(--spacing-xs);
   --clip-bar-height: 32px;
+  --clip-fade: 300ms; /* the source bar's fade in and out */
   --clip-play-width: 56px;
   --clip-gap: var(--spacing-xs);
   --clip-radius: 4px;
@@ -311,6 +312,20 @@
   block-size: var(--clip-bar-height);
   font-family: var(--clip-player-font);
   color: var(--clip-ink);
+  transition: opacity var(--clip-fade) ease-in-out;
+}
+
+/* playing and idle (clip-player.js): the controls fade out, as the source's; a move, tap or
+   focus brings them back, so the hidden bar takes no pointer input meanwhile */
+.embed.vimeo .clip.is-playing.is-idle .clip-bar {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .embed.vimeo .clip-bar {
+    transition: none;
+  }
 }
 
 .embed.vimeo .clip-button {

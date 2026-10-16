@@ -4,7 +4,7 @@
  * Run: node --test blocks/embed/clip-player.test.mjs
  */
 /* global globalThis */
-import { test } from 'node:test';
+import { test, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 
@@ -222,4 +222,47 @@ test('Settings and Picture-in-Picture stay at every width (no narrow-player rule
   const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
   const hiding = rules.filter(([, sel, body]) => /clip-(settings|pip)/.test(sel) && /display:\s*none/.test(body));
   assert.deepEqual(hiding.map(([, sel]) => sel.trim()), []);
+});
+
+test('while playing the controls hide 2s after the last move, 3s after the pointer left; held while paused, over the bar, in the menu or focused', { skip: !JSDOM }, () => {
+  mock.timers.enable({ apis: ['setTimeout'] });
+  try {
+    const {
+      window, wrapper, video, q,
+    } = setup();
+    const idle = () => wrapper.classList.contains('is-idle');
+    const pointer = (el, type) => el.dispatchEvent(new window.Event(type, { bubbles: type !== 'pointerenter' && type !== 'pointerleave' }));
+    mock.timers.tick(5000);
+    assert.equal(idle(), false, 'paused: always shown');
+    video.play();
+    mock.timers.tick(1999);
+    assert.equal(idle(), false);
+    mock.timers.tick(1);
+    assert.equal(idle(), true, 'playing, 2s without a move');
+    pointer(wrapper, 'pointermove');
+    assert.equal(idle(), false, 'a move brings them back');
+    pointer(wrapper, 'pointerleave');
+    mock.timers.tick(2999);
+    assert.equal(idle(), false);
+    mock.timers.tick(1);
+    assert.equal(idle(), true, '3s after the pointer left');
+    pointer(q('.clip-bar'), 'pointerenter');
+    mock.timers.tick(5000);
+    assert.equal(idle(), false, 'resting on the bar keeps them');
+    pointer(q('.clip-bar'), 'pointerleave');
+    q('.clip-settings').click();
+    mock.timers.tick(5000);
+    assert.equal(idle(), false, 'the speed menu is open');
+    q('.clip-settings').click();
+    q('.clip-seek').focus();
+    mock.timers.tick(5000);
+    assert.equal(idle(), false, 'keyboard focus in the bar');
+    q('.clip-seek').blur();
+    mock.timers.tick(2000);
+    assert.equal(idle(), true);
+    video.pause();
+    assert.equal(idle(), false, 'paused again: shown');
+  } finally {
+    mock.timers.reset();
+  }
 });

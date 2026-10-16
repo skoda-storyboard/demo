@@ -5,8 +5,11 @@
  * a 56×32 play button and a bar holding the progress track, its time pill and the volume,
  * settings (speed), picture-in-picture and fullscreen buttons, each with its name as a tooltip.
  * Over the volume button, a 32×96 vertical slider shows on hover and on keyboard focus (the
- * next Tab stop after Mute; arrow keys 5%, as the source's). The controls stay shown, at every
- * width, as the source's do. Styles: embed.css (`.embed.vimeo`).
+ * next Tab stop after Mute; arrow keys 5%, as the source's). The controls show at every width.
+ * While the clip plays they fade out, as the source's: 2s after the pointer last moved over it,
+ * or 3s after it left (measured on the live first-glimpse clip); a move, a tap or keyboard focus
+ * brings them back, and they stay while paused, while the pointer rests on the bar and while the
+ * speed menu is open. Styles: embed.css (`.embed.vimeo`).
  */
 
 const LABELS = {
@@ -32,6 +35,10 @@ const SEEK_STEP_S = 5;
 // the volume slider's keys: arrows step 5% (the source's), Page Up / Down 10%, Home / End the ends
 const VOLUME_STEP = 5;
 const VOLUME_PAGE = 10;
+// while playing, the controls hide this long after the pointer's last move over the clip / after
+// it left the clip (the source Vimeo player's, measured 2026-10-16)
+export const IDLE_MS = 2000;
+export const LEAVE_MS = 3000;
 
 const SVG = 'http://www.w3.org/2000/svg';
 // 24×24 glyphs drawn for this player (play, pause, speaker, speaker off, gear, PiP, fullscreen)
@@ -211,10 +218,22 @@ export default function clipPlayer(wrapper, video) {
     seek.setAttribute('aria-valuetext', LABELS.timeOf(timecode(now), timecode(total)));
   };
 
+  // the controls' auto-hide (`is-idle`), only while playing and nothing holds them
+  let idleTimer = 0;
+  let overBar = false;
+  const held = () => video.paused || video.ended || overBar || !menu.hidden
+    || bar.contains(document.activeElement);
+  const show = (hideAfter = IDLE_MS) => {
+    wrapper.classList.remove('is-idle');
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => { if (!held()) wrapper.classList.add('is-idle'); }, hideAfter);
+  };
+
   const syncPlay = () => {
     const paused = video.paused || video.ended;
     setControl(play, paused ? LABELS.play : LABELS.pause, paused ? 'play' : 'pause');
     wrapper.classList.toggle('is-playing', !paused);
+    show();
   };
   // the slider shows the level heard: 0 while muted
   const level = () => (video.muted ? 0 : Math.round((video.volume ?? 1) * 100));
@@ -243,6 +262,7 @@ export default function clipPlayer(wrapper, video) {
     menu.hidden = true;
     settings.setAttribute('aria-expanded', 'false');
     if (focusSettings) settings.focus();
+    show();
   }
 
   play.addEventListener('click', toggle);
@@ -345,6 +365,13 @@ export default function clipPlayer(wrapper, video) {
     video.addEventListener(type, render);
   });
   ['play', 'pause', 'ended'].forEach((type) => video.addEventListener(type, syncPlay));
+  wrapper.addEventListener('pointermove', () => show());
+  wrapper.addEventListener('pointerdown', () => show());
+  wrapper.addEventListener('pointerleave', () => { overBar = false; show(LEAVE_MS); });
+  bar.addEventListener('pointerenter', () => { overBar = true; show(); });
+  bar.addEventListener('pointerleave', () => { overBar = false; show(); });
+  wrapper.addEventListener('focusin', () => show());
+  wrapper.addEventListener('focusout', () => show());
   video.addEventListener('volumechange', syncVolume);
   render();
   syncPlay();
