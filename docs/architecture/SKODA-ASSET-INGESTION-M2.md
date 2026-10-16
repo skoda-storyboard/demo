@@ -1,7 +1,15 @@
 # Asset ingestion at M2 scale: how the mapping is exposed, where it breaks, what to change
 
-*Review note, 2026-10-16. Status: **proposal**. The target design below is not built. Open decisions are listed in
-the last section. Tickets: SKODA-504a, 511, 513 (updated), 517, 518, 519 (new).*
+*Review note, 2026-10-16. Status: **proposal, direction decided** (§0). The target design below is not built.
+Tickets: SKODA-504a, 511, 513 (updated), 517, 518, 519, 520 (new).*
+
+## 0. Decisions (2026-10-16)
+
+| Topic | Decision | Consequence |
+|---|---|---|
+| Rendition scheme (D5) | **Media Bus** for every display size and the 1920 download. No Dynamic Media | AEM Assets holds the originals. Masters over 10 MiB get one DAM rendition from a processing profile as Media Bus input (§3B) |
+| Sync job runtime (D14 / SKODA-511) | **App Builder** (Adobe I/O Runtime), event-driven, with a scheduled reconcile (§3F) | Needs the App Builder entitlement and a Developer Console project with OAuth server-to-server on the client org |
+| Source CDN | **Remove it as soon as possible**, before the rest of M2 | New P1 ticket SKODA-520, phased from the census in §6. It now leads the order of work (§4) |
 
 ## Summary
 
@@ -12,7 +20,8 @@ volume (~28,300 logical images in use, ~34,400 library items, ~34 GB of masters)
    downloads all of it, even to show 20 cards or one title.
 2. **Page content still points at the source CDN.** DA stores `cdn.skoda-storyboard.com` image URLs. Only the
    delivered HTML is on the Media Bus. When the source site retires, the editor shows broken images, and a re-preview
-   has to fetch from a host that no longer answers.
+   has to fetch from a host that no longer answers. Delivered pages also still link 7,369 source files
+   (`/direct-download/` and cdn) for open and download (census, §6).
 
 The proposal: make AEM Assets the system of record for identity, put DAM URLs into DA source, split the feed by how it
 is read, retire the code-bus cart index, and turn the manifest into a sharded ledger.
@@ -76,8 +85,13 @@ The projections scale the per-row sizes measured today. They are not load tests.
 - `media:apply` writes the **AEM publish URL** of the original into the DA `<img src>` once the row's
   `steps.publish` is `done` with public proof. Today it writes the source-CDN master. The Media Bus still ingests and
   optimizes it, so delivered HTML doesn't change.
-- Oversized masters (SKODA-506) keep a conditioned `delivery_url`. Prefer a DAM-hosted rendition over a source-CDN
-  ladder file, so that no source host remains.
+- Oversized masters (SKODA-506; 350 rows are `preconditioned` today) can't be Media Bus input. Their DA `src` is a
+  DAM rendition from an AEM Assets **processing profile** (e.g. a 3840 px JPEG, ≤10 MiB; no Dynamic Media). Never a
+  source-CDN ladder file. **To verify:** anonymous delivery of the rendition path on publish.
+- **One Media Bus input per image, the full-size one.** The card thumbnail, the 1920 lightbox preview and the 1920
+  download all derive from it (`?width=…`). The feed's carrier fragments therefore ingest the original, not the
+  source's `-WxH` thumbnail. That is also the SKODA-513 fix: today the carrier input is 768 px wide, so
+  `?width=1920` can't add pixels.
 - This should match what the DA Assets picker (#62) inserts, so that migrated and newly authored images have one shape.
   **To verify** on one picker-authored page before the bulk rewrite.
 - Acceptance stays 504a's: 0 source-CDN references in DA source. A sweep counts them per page.
@@ -117,39 +131,107 @@ The projections scale the per-row sizes measured today. They are not load tests.
 - Every batch ends with a dry-run of `apply` and reads its "blocked" lines.
 - #219 (WebP publish 404) is a prerequisite for WebP masters.
 
-### F. Sync job (SKODA-511)
+### F. Sync job (SKODA-511), on App Builder
 
-- **Source:** author QueryBuilder over published assets under `/content/dam/storyboard`, with
-  `cq:lastReplicated > since` for incremental runs.
+**Fit.** App Builder runs the job without edge functions; it is serverless compute, not CDN compute.
+- **Events:** AEM Assets author events can trigger a Runtime action directly: `aem.assets.asset.published`,
+  `.unpublished`, `.deleted` and `.metadata_updated`.
+- **Runtime limits** (Adobe I/O Runtime system settings, read 2026-10-16):
+  - web / blocking actions 60 s, non-blocking 3 h;
+  - 1 MB for a request payload and for an action result;
+  - 100 concurrent activations per namespace;
+  - 600 trigger firings per minute.
+
+**Design.**
+1. **Event action** (small, fast). Event payloads carry an `assetId`, not a path. The action records the id and
+   event type in App Builder State as a dirty set, and returns.
+2. **Alarm action**, every few minutes, non-blocking:
+   - resolves the dirty ids on author;
+   - rebuilds only the SKODA-517 shards those assets touch (their facet slices, year/type detail shard, keyed shard,
+     head shard, facet index);
+   - writes them to DA, previews and publishes them;
+   - publishes the registry last.
+
+   A bulk 504a publish of thousands of assets then becomes a few batched runs rather than thousands of concurrent
+   activations.
+3. **Nightly reconcile:** a full rebuild from author QueryBuilder, swapped in atomically.
+   - It is **required**, not optional: `metadata_updated` fires only for Assets View and Assets OpenAPI edits, not
+     for Touch UI or other AEM APIs (including the `/api/assets` call the importer uses). Tag changes made there
+     would otherwise never reach the feed.
+   - Shards and their contents go to DA directly. Nothing passes through the 1 MB result limit.
+
+**Credentials.**
+- An OAuth server-to-server technical account with read access to AEM author.
+- The same identity needs write access to DA and preview / publish on admin.hlx.page. **To verify:** that DA's
+  permission sheet and the admin API accept that technical account.
+- No tokens in the repo; the App Builder project holds the secrets.
+
+**Same as before:**
+- **Source:** author QueryBuilder over published assets under `/content/dam/storyboard` (the reconcile, and id
+  resolution).
 - **Output:** the shapes in C, written to DA, then previewed and published.
 - **Atomic:**
   - write new shards under the build id;
   - publish the registry last;
   - a failed run leaves the previous registry live (511's "no partial feed" criterion).
-- **Runtime:** a scheduled GitHub Action needs no edge functions, so it fits D14 as it stands. AEM Assets events are
-  the upgrade path if App Builder is approved.
+- **Runtime:** App Builder, as above. A scheduled GitHub Action running the same reconcile is the fallback if the
+  entitlement is late.
 - **Freshness:** the registry is the only file that must revalidate. Check whether a config-service custom header can
   shorten its `max-age`.
 
 ## 4. Order of work
 
-1. **518** (ledger + DAM provenance) and **#219**: both unblock everything else and need no client decision.
-2. **517** (feed shapes + loader), built against today's generator output, so it can ship before 511.
-3. **504a** bulk ingest (dedup, rights filter) and the **B** rewrite, page batch by page batch.
-4. **511** switches the feed source from the source listing to AEM Assets, writing 517's shapes.
-5. **519** cart index retirement, once the source-CDN sweep is near 0.
-6. **513** lightbox previews read DAM or Media Bus URLs from 517's keyed shards.
+Source CDN removal leads (decision 2026-10-16).
+
+1. **520 phase 1, now:**
+   - rewrite DA source and the feed for masters that are already published: 5,222 page images, 4,581 page links,
+     1,966 carrier images; 178 pages need nothing else;
+   - drop the `/direct-download/` rewrite for those files.
+
+   No client dependency; DA push needs its usual approval.
+2. **520 phase 2 + #219:** publish the recorded-but-unpublished originals (developer machine, DAM token).
+3. **518** (ledger + DAM provenance) in parallel. It is needed before phase 3 runs at scale.
+4. **520 phase 3 with 504a:** ingest unrecorded masters (dedup, rights filter). Then the census gate goes to 0.
+5. **517** (feed shapes + loader), against the generator's output.
+6. **511** on App Builder writes 517's shapes from AEM Assets. Once entitled, it replaces the source-listing
+   generator.
+7. **519:** with no source links left, the cart index retires.
+8. **513** closes with 520's carrier change and 517's shards.
 
 ## 5. Decisions and checks needed
 
 | Item | Owner | Blocks |
 |---|---|---|
-| D5: rendition scheme (Media Bus only vs Dynamic Media; no DM licence today), rights / approval rule | Client | 504a scope, B for oversized masters |
-| D14: runtime for the sync job | Client | 511 trigger (schedule vs events) |
-| Source CDN retirement date | Client | Deadline for B |
+| D5 rights / approval rule (rendition scheme decided: Media Bus) | Client | 504a scope for unrecorded masters |
+| App Builder entitlement, Developer Console project, technical account with AEM author + DA + admin access | Client | 511 on App Builder |
+| Processing-profile rendition for >10 MiB masters, and its anonymous delivery on publish | Team + client AEM admin | 520 for 350 oversized masters |
+| Source CDN retirement date | Client | Hard deadline for 520 (we start now regardless) |
 | DA Assets picker: what URL it writes into DA source | Team (check) | B matches newly authored content |
 | Media Bus behaviour on re-preview of an ingested URL whose host is gone | Team (check) | Severity of the CDN risk before B lands |
 | Load test: `/en/images` and a model page at 10k / 30k synthetic rows, mobile | Team | Confirms the projections in §2 |
+
+## 6. Source-host census (2026-10-16)
+
+- **Scope:** DA source and delivered `.plain.html` for the 408 indexed `/en` pages, 22 fragments and the media feed.
+- **Matching:** each reference is matched to the manifest by its master key. "Published" means `steps.publish: done`
+  with public proof.
+- **Script:** `.migration/m2-assets/census.mjs` (to be committed as `media:source-census` in SKODA-520).
+
+| Where | References | Master published | Recorded, not published | Not in the manifest |
+|---|---:|---:|---:|---:|
+| Page images (DA) | 8,179 | 5,222 | 1,292 | 1,665 |
+| Page links (DA = delivered: 6,886 `/direct-download/`, 483 cdn) | 7,369 | 4,581 | 1,234 | 1,554 |
+| Carrier fragment images (DA) | 2,285 | 1,966 | 3 | 316 |
+| Feed `path` | 2,284 | 1,967 | 2 | 315 |
+| Feed `original` | 317 | 0 | 2 | 315 |
+| Feed `rendition-1920` | 1,993 | 1,680 | 0 | 313 |
+| Feed `mp4` | 162 | 0 | 25 | 137 |
+
+- Delivered HTML has no source **image** URLs (all `media_<hash>`). It does have every source **link**.
+- Of 408 pages, 178 reference only published masters.
+- 2,148 distinct masters behind pages and fragments are not yet published.
+- `/metadata.json` and `/en/placeholders.json` have no source references.
+- Not counted: 2,750 links to source **pages** (not yet migrated; the SKODA-605 allow-list).
 
 ## Sources
 

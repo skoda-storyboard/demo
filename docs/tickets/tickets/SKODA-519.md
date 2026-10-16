@@ -35,4 +35,4 @@
       failure.
 
 ## Dependencies
-SKODA-505a ✅, SKODA-517, SKODA-511, SKODA-504a.
+SKODA-505a ✅, SKODA-517, SKODA-511, SKODA-504a, SKODA-520 (no source links left).

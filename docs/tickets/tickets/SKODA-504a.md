@@ -24,8 +24,9 @@ unmatched items and an approval filter.
   - the local import store has 8,683 source-CDN references vs 439 DAM links in 358 pages;
   - only the delivered HTML is on the Media Bus.
 
-  Once a row is published with public proof, write its AEM publish URL instead. Oversized masters (SKODA-506) keep a
-  conditioned `delivery_url`, preferably a DAM-hosted rendition rather than a source-CDN ladder file.
+  Once a row is published with public proof, write its AEM publish URL instead. Oversized masters (SKODA-506) point
+  at a DAM processing-profile rendition (Media Bus input ≤10 MiB; renditions are Media Bus, D5 2026-10-16), never a
+  source-CDN ladder file. The cutover itself is tracked, phased and gated in **SKODA-520** (P1).
 - **Check first:**
   - what the DA Assets picker (#62) writes into DA source, so that migrated and new images share one shape;
   - whether the Media Bus keeps serving an already-ingested hash on re-preview once its source host is gone.

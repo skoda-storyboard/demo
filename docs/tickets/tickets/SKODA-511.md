@@ -35,7 +35,17 @@ The M1 demo feed is generated from the source listing; this ticket replaces that
 - **Cart keys:** write the legacy source keys and `bytes` / `mime` that SKODA-519 needs.
 - Upload to DA, preview and publish the sheet(s) (the `--push` path of the M1 generator is the reference).
 - **Open (after the demo, answer 4):** trigger (AEM Assets events vs a schedule), runtime (App Builder action vs
-  GitHub Action) and owner. Under D14 as it stands (no edge functions assumed), the default is a scheduled GitHub
+  GitHub Action) and owner. **Decided 2026-10-16: App Builder**, see
+  [`SKODA-ASSET-INGESTION-M2.md`](../../architecture/SKODA-ASSET-INGESTION-M2.md) §3F:
+  - an event action on `aem.assets.asset.published` / `.unpublished` / `.deleted` / `.metadata_updated` records
+    asset ids in App Builder State;
+  - an alarm action rebuilds the touched shards (non-blocking, ≤3 h);
+  - a nightly full reconcile runs from author QueryBuilder. It is required because `metadata_updated` doesn't fire
+    for Touch UI or `/api/assets` edits;
+  - limits to design for: 1 MB payload/result, 100 concurrent activations per namespace.
+
+  Needs the App Builder entitlement and an OAuth S2S technical account with AEM author read, DA write and admin
+  preview/publish (to verify for DA). Fallback if the entitlement is late: the same reconcile as a scheduled GitHub
   Action. Check whether a config-service custom header can shorten the registry's `max-age` (today 7200).
 
 ## Acceptance Criteria
@@ -44,6 +54,9 @@ The M1 demo feed is generated from the source listing; this ticket replaces that
 - [ ] Rows validate against contract `media-item` shape 3; the listings and rails render unchanged.
 - [ ] Thumbnails load resized on the card (no full-size masters).
 - [ ] Runs idempotently; failures don't publish a partial feed.
+- [ ] A bulk publish of 1,000 assets is absorbed in batched alarm runs (no throttled activations), and a retag made
+      in the Touch UI reaches the feed by the next reconcile.
+- [ ] No source-CDN URL in any column it writes (SKODA-520 census gate).
 
 ## Dependencies
 SKODA-504 (DAM ingest / mapping), SKODA-504a, SKODA-512 (taxonomy), SKODA-517 (output shapes), SKODA-518 (identity
