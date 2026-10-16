@@ -48,6 +48,9 @@
   --timeline-title-end: 20px;
   --timeline-media-gap: 30px;
 
+  /* between images stacked in one milestone (the source's second img padding-top) */
+  --timeline-media-stack: 16px;
+
   /* the description paragraphs' own 20px bottom margin */
   --timeline-text-end: 20px;
 
@@ -135,6 +138,10 @@
   display: block;
   width: 100%;
   height: auto;
+}
+
+.timeline .timeline-media > * + * {
+  margin-block-start: var(--timeline-media-stack);
 }
 
 .timeline .timeline-text {
