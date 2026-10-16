@@ -15,10 +15,11 @@ try {
 
 const player = JSDOM ? await import('./clip-player.js') : null;
 
-function setup({ duration = 368, pip = true } = {}) {
+function setup({ duration = 368, pip = true, touch = false } = {}) {
   const dom = new JSDOM('<main><div class="embed vimeo"><div class="embed-video"><video controls></video></div></div></main>', { url: 'https://example.com/' });
   const { window } = dom;
   globalThis.window = window;
+  if (touch) window.matchMedia = (q) => ({ matches: !q.includes('hover'), addEventListener() {} });
   globalThis.document = window.document;
   const video = window.document.querySelector('video');
   const state = { paused: true, currentTime: 0, duration, muted: false, volume: 1, playbackRate: 1 };
@@ -224,17 +225,27 @@ test('Settings and Picture-in-Picture stay at every width (no narrow-player rule
   assert.deepEqual(hiding.map(([, sel]) => sel.trim()), []);
 });
 
-test('while playing the controls hide 2s after the last move, 3s after the pointer left; held while paused, over the bar, in the menu or focused', { skip: !JSDOM }, () => {
+test('with a mouse the controls show only over the clip, and fade 2s after the last move while playing', { skip: !JSDOM }, () => {
   mock.timers.enable({ apis: ['setTimeout'] });
   try {
     const {
       window, wrapper, video, q,
     } = setup();
     const idle = () => wrapper.classList.contains('is-idle');
-    const pointer = (el, type) => el.dispatchEvent(new window.Event(type, { bubbles: type !== 'pointerenter' && type !== 'pointerleave' }));
+    const pointer = (el, type, pointerType = 'mouse') => {
+      const e = new window.Event(type, { bubbles: type !== 'pointerenter' && type !== 'pointerleave' });
+      Object.defineProperty(e, 'pointerType', { value: pointerType });
+      el.dispatchEvent(e);
+    };
+    assert.equal(idle(), true, 'loaded, the pointer elsewhere: hidden');
+    pointer(wrapper, 'pointerenter');
+    assert.equal(idle(), false, 'hovered: shown');
     mock.timers.tick(5000);
-    assert.equal(idle(), false, 'paused: always shown');
-    video.play();
+    assert.equal(idle(), false, 'paused and hovered: stays');
+    pointer(wrapper, 'pointerleave');
+    assert.equal(idle(), true, 'paused, the pointer left: hidden at once');
+    pointer(wrapper, 'pointerenter');
+    q('.clip-play').click();
     mock.timers.tick(1999);
     assert.equal(idle(), false);
     mock.timers.tick(1);
@@ -242,26 +253,62 @@ test('while playing the controls hide 2s after the last move, 3s after the point
     pointer(wrapper, 'pointermove');
     assert.equal(idle(), false, 'a move brings them back');
     pointer(wrapper, 'pointerleave');
-    mock.timers.tick(2999);
-    assert.equal(idle(), false);
-    mock.timers.tick(1);
-    assert.equal(idle(), true, '3s after the pointer left');
+    assert.equal(idle(), true, 'playing, the pointer left: hidden at once');
+    pointer(wrapper, 'pointerenter');
     pointer(q('.clip-bar'), 'pointerenter');
     mock.timers.tick(5000);
     assert.equal(idle(), false, 'resting on the bar keeps them');
     pointer(q('.clip-bar'), 'pointerleave');
     q('.clip-settings').click();
-    mock.timers.tick(5000);
+    pointer(wrapper, 'pointerleave');
     assert.equal(idle(), false, 'the speed menu is open');
     q('.clip-settings').click();
-    q('.clip-seek').focus();
-    mock.timers.tick(5000);
-    assert.equal(idle(), false, 'keyboard focus in the bar');
-    q('.clip-seek').blur();
-    mock.timers.tick(2000);
     assert.equal(idle(), true);
     video.pause();
-    assert.equal(idle(), false, 'paused again: shown');
+    assert.equal(idle(), true, 'paused, the pointer away: still hidden');
+  } finally {
+    mock.timers.reset();
+  }
+});
+
+test('keyboard focus in the bar holds the controls; the focus a mouse click leaves does not', { skip: !JSDOM }, () => {
+  mock.timers.enable({ apis: ['setTimeout'] });
+  try {
+    const { wrapper, q, window } = setup();
+    const idle = () => wrapper.classList.contains('is-idle');
+    const seek = q('.clip-seek');
+    seek.matches = (sel) => (sel === ':focus-visible' ? true : window.Element.prototype.matches.call(seek, sel));
+    seek.focus();
+    assert.equal(idle(), false, 'tabbed to the progress bar: shown');
+    seek.blur();
+    assert.equal(idle(), true, 'focus left the clip: hidden again');
+    const play = q('.clip-play');
+    play.matches = (sel) => (sel === ':focus-visible' ? false : window.Element.prototype.matches.call(play, sel));
+    play.focus();
+    assert.equal(idle(), true, 'a clicked (not keyboard-focused) Play button does not hold them');
+  } finally {
+    mock.timers.reset();
+  }
+});
+
+test('without hover (touch) the controls stay while paused and fade 2s after the last tap while playing', { skip: !JSDOM }, () => {
+  mock.timers.enable({ apis: ['setTimeout'] });
+  try {
+    const { window, wrapper, video } = setup({ touch: true });
+    const idle = () => wrapper.classList.contains('is-idle');
+    const tap = () => {
+      const e = new window.Event('pointerdown', { bubbles: true });
+      Object.defineProperty(e, 'pointerType', { value: 'touch' });
+      wrapper.dispatchEvent(e);
+    };
+    mock.timers.tick(5000);
+    assert.equal(idle(), false, 'paused: shown');
+    tap();
+    video.play();
+    mock.timers.tick(2000);
+    assert.equal(idle(), true, 'playing, 2s after the tap');
+    tap();
+    assert.equal(idle(), false, 'a tap brings them back');
   } finally {
     mock.timers.reset();
   }

@@ -5,11 +5,12 @@
  * a 56×32 play button and a bar holding the progress track, its time pill and the volume,
  * settings (speed), picture-in-picture and fullscreen buttons, each with its name as a tooltip.
  * Over the volume button, a 32×96 vertical slider shows on hover and on keyboard focus (the
- * next Tab stop after Mute; arrow keys 5%, as the source's). The controls show at every width.
- * While the clip plays they fade out, as the source's: 2s after the pointer last moved over it,
- * or 3s after it left (measured on the live first-glimpse clip); a move, a tap or keyboard focus
- * brings them back, and they stay while paused, while the pointer rests on the bar and while the
- * speed menu is open. Styles: embed.css (`.embed.vimeo`).
+ * next Tab stop after Mute; arrow keys 5%, as the source's). With a mouse the controls show
+ * only while the pointer is over the clip (PO, 2026-10-16), and while it plays they also fade 2s
+ * after the pointer last moved (the source Vimeo player's). Keyboard focus in the bar, the open
+ * speed menu and the pointer resting on the bar keep them; a mouse click doesn't. Without hover
+ * (touch) they stay while paused and fade 2s after the last tap while playing.
+ * Styles: embed.css (`.embed.vimeo`).
  */
 
 const LABELS = {
@@ -35,10 +36,9 @@ const SEEK_STEP_S = 5;
 // the volume slider's keys: arrows step 5% (the source's), Page Up / Down 10%, Home / End the ends
 const VOLUME_STEP = 5;
 const VOLUME_PAGE = 10;
-// while playing, the controls hide this long after the pointer's last move over the clip / after
-// it left the clip (the source Vimeo player's, measured 2026-10-16)
+// while playing, the controls hide this long after the pointer's last move over the clip (the
+// source Vimeo player's, measured 2026-10-16)
 export const IDLE_MS = 2000;
-export const LEAVE_MS = 3000;
 
 const SVG = 'http://www.w3.org/2000/svg';
 // 24×24 glyphs drawn for this player (play, pause, speaker, speaker off, gear, PiP, fullscreen)
@@ -218,22 +218,38 @@ export default function clipPlayer(wrapper, video) {
     seek.setAttribute('aria-valuetext', LABELS.timeOf(timecode(now), timecode(total)));
   };
 
-  // the controls' auto-hide (`is-idle`), only while playing and nothing holds them
+  // the controls' hiding (`is-idle`): with a mouse whenever the pointer is off the clip, and
+  // while playing 2s after its last move; without hover only that idle fade
+  const canHover = window.matchMedia?.('(hover: hover)')?.matches ?? true;
   let idleTimer = 0;
+  let idle = false;
+  let inside = false;
   let overBar = false;
-  const held = () => video.paused || video.ended || overBar || !menu.hidden
-    || bar.contains(document.activeElement);
-  const show = (hideAfter = IDLE_MS) => {
-    wrapper.classList.remove('is-idle');
+  // keyboard focus holds the controls; the focus a mouse click leaves on a button doesn't
+  const keyboardFocus = () => {
+    const el = document.activeElement;
+    if (!el || !bar.contains(el)) return false;
+    try { return el.matches(':focus-visible'); } catch { return true; }
+  };
+  const sync = () => {
+    const playing = !(video.paused || video.ended);
+    const held = overBar || !menu.hidden || keyboardFocus();
+    wrapper.classList.toggle('is-idle', !held && ((canHover && !inside) || (playing && idle)));
+  };
+  const show = () => {
+    idle = false;
     clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => { if (!held()) wrapper.classList.add('is-idle'); }, hideAfter);
+    idleTimer = setTimeout(() => { idle = true; sync(); }, IDLE_MS);
+    sync();
   };
 
   const syncPlay = () => {
     const paused = video.paused || video.ended;
     setControl(play, paused ? LABELS.play : LABELS.pause, paused ? 'play' : 'pause');
     wrapper.classList.toggle('is-playing', !paused);
-    show();
+    // the pointer restarts the idle fade (a click on Play does); the play event, which may come
+    // a while later once the clip has buffered, doesn't
+    sync();
   };
   // the slider shows the level heard: 0 while muted
   const level = () => (video.muted ? 0 : Math.round((video.volume ?? 1) * 100));
@@ -312,6 +328,7 @@ export default function clipPlayer(wrapper, video) {
     menu.hidden = !open;
     settings.setAttribute('aria-expanded', String(open));
     if (open) speedButtons.find((b) => b.getAttribute('aria-pressed') === 'true')?.focus();
+    sync();
   });
   menu.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
@@ -365,17 +382,22 @@ export default function clipPlayer(wrapper, video) {
     video.addEventListener(type, render);
   });
   ['play', 'pause', 'ended'].forEach((type) => video.addEventListener(type, syncPlay));
-  wrapper.addEventListener('pointermove', () => show());
+  // a touch pointer is never "over" the clip: it only restarts the idle fade
+  const enter = (e) => { if (e.pointerType !== 'touch') inside = true; show(); };
+  wrapper.addEventListener('pointerenter', enter);
+  wrapper.addEventListener('pointermove', enter);
   wrapper.addEventListener('pointerdown', () => show());
-  wrapper.addEventListener('pointerleave', () => { overBar = false; show(LEAVE_MS); });
-  bar.addEventListener('pointerenter', () => { overBar = true; show(); });
+  wrapper.addEventListener('pointerleave', () => { inside = false; overBar = false; sync(); });
+  bar.addEventListener('pointerenter', () => { overBar = true; sync(); });
   bar.addEventListener('pointerleave', () => { overBar = false; show(); });
-  wrapper.addEventListener('focusin', () => show());
-  wrapper.addEventListener('focusout', () => show());
+  // focusout runs once the focus has left (moving to the next control fires focusin after it)
+  wrapper.addEventListener('focusin', sync);
+  wrapper.addEventListener('focusout', sync);
   video.addEventListener('volumechange', syncVolume);
   render();
   syncPlay();
   syncVolume();
+  show();
 }
 
 export { LABELS as CLIP_LABELS };
