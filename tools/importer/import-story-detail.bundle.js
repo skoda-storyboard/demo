@@ -125,7 +125,29 @@ var CustomImportScript = (() => {
     [/siteorigin-panels-builder/, "nested-builder"]
   ];
   var DEFERRED = /* @__PURE__ */ new Set(["defer-charge-map", "defer-calculator"]);
-  var DROPPED = /* @__PURE__ */ new Set(["offset", "newsletter", "share", "highlights"]);
+  var DROPPED = /* @__PURE__ */ new Set(["newsletter", "share", "highlights"]);
+  var SPACER_EM_PX = 24;
+  var BLANK_LINE_PX = 44;
+  var BLANK_ATTR = "data-skoda-blank";
+  var isBlank = (n) => n.nodeType === 1 && n.tagName === "P" && !n.querySelector("img, picture, iframe, video, table") && !n.textContent.replace(/[\s\u00a0]/g, "");
+  var isBlankParagraph = (n) => n.nodeType === 1 && n.tagName === "P" && n.hasAttribute(BLANK_ATTR);
+  function leadingBlankHeight(panel) {
+    const tiny = panel.querySelector(".siteorigin-widget-tinymce, .textwidget");
+    if (!tiny) return 0;
+    let height = 0;
+    for (const el of tiny.children) {
+      if (!isBlankParagraph(el) && !isBlank(el)) break;
+      height += BLANK_LINE_PX;
+    }
+    return height;
+  }
+  function spacerHeight(panel) {
+    var _a;
+    const value = (((_a = panel.querySelector('[style*="padding-top"]')) == null ? void 0 : _a.getAttribute("style")) || "").match(/padding-top:\s*([\d.]+)(em|px)/i);
+    if (!value) return 0;
+    const n = parseFloat(value[1]);
+    return Math.round(value[2].toLowerCase() === "em" ? n * SPACER_EM_PX : n);
+  }
   function classifyWidget(panel) {
     if (/siteorigin-panels-builder/.test(panel.className || "")) return "nested-builder";
     const inner = panel.querySelector('[class*="so-widget-"]');
@@ -325,16 +347,58 @@ var CustomImportScript = (() => {
     if (luminance > 0.98) return null;
     return luminance < 0.5 ? "dark" : "grey";
   }
+  var PANEL_DEFAULTS = { dark: { background: "#0e3a2f", color: "#ffffff" }, grey: { background: "", color: "" } };
+  var hexColour = (value) => {
+    const v = String(value || "").trim().toLowerCase();
+    const hex = v.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+    if (hex) return `#${hex[1].length === 3 ? hex[1].replace(/./g, "/** Mark every background-styled builder row (head CSS or inline). Returns the count. *//** Mark every background-styled builder row (head CSS or inline). Returns the count. */") : hex[1]}`;
+    const fn = v.match(/^rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/);
+    return fn ? `#${fn.slice(1, 4).map((n) => Number(n).toString(16).padStart(2, "0")).join("")}` : "";
+  };
+  function panelColours(row, { variant, color }) {
+    const out = {};
+    const background = hexColour(color);
+    if (background && background !== PANEL_DEFAULTS[variant].background) out["highlight-background"] = background;
+    const text4 = /* @__PURE__ */ new Map();
+    const links = /* @__PURE__ */ new Map();
+    const walker = row.ownerDocument.createTreeWalker(
+      row,
+      4
+      /* SHOW_TEXT */
+    );
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      const length = n.textContent.trim().length;
+      if (length && n.parentElement.closest(".textwidget")) {
+        let colour = "";
+        for (let p = n.parentElement; p && p !== row && !colour; p = p.parentElement) {
+          const decl = (p.getAttribute("style") || "").match(/(?:^|;)\s*color\s*:\s*([^;]+)/i);
+          if (decl) colour = hexColour(decl[1]);
+        }
+        const bucket = n.parentElement.closest("a") ? links : text4;
+        bucket.set(colour, (bucket.get(colour) || 0) + length);
+      }
+    }
+    const top = (m) => {
+      var _a;
+      return ((_a = [...m.entries()].sort((a, b) => b[1] - a[1])[0]) == null ? void 0 : _a[0]) || "";
+    };
+    const textColour = top(text4);
+    if (textColour && textColour !== PANEL_DEFAULTS[variant].color) out["highlight-color"] = textColour;
+    const linkColour = top(links);
+    if (linkColour) out["highlight-link"] = linkColour;
+    return out;
+  }
   function markHighlights(document2) {
     const css = [...document2.querySelectorAll("style")].map((s) => s.textContent || "").join("\n");
     const byId = /* @__PURE__ */ new Map();
     for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
       const color = (body.match(/background(?:-color)?\s*:\s*([^;]+)/i) || [])[1];
-      const variant = highlightVariant(color && color.replace(/!important/i, ""));
+      const value = color && color.replace(/!important/i, "").trim();
+      const variant = highlightVariant(value);
       if (!variant) continue;
       selectors.split(",").forEach((sel) => {
         const m = sel.trim().match(/^#(pg-[\w-]+)\s*>\s*\.panel-row-style$/);
-        if (m) byId.set(m[1], variant);
+        if (m) byId.set(m[1], { variant, color: value });
       });
     }
     let count = 0;
@@ -342,10 +406,12 @@ var CustomImportScript = (() => {
     document2.querySelectorAll(".panel-grid").forEach((grid) => {
       const row = grid.querySelector(":scope > .panel-row-style");
       const inline2 = row && (row.getAttribute("style") || "").match(/background(?:-color)?\s*:\s*([^;]+)/i);
-      const variant = byId.get(grid.id) || inline2 && highlightVariant(inline2[1]);
-      if (!variant) return;
+      const panel = byId.get(grid.id) || inline2 && highlightVariant(inline2[1]) && { variant: highlightVariant(inline2[1]), color: inline2[1].trim() };
+      if (!panel) return;
+      const { variant } = panel;
       grid.setAttribute(HIGHLIGHT_ATTR, variant);
       Object.entries(geometry(grid)).forEach(([key, value]) => grid.setAttribute(`data-${key}`, value));
+      Object.entries(panelColours(row || grid, panel)).forEach(([key, value]) => grid.setAttribute(`data-${key}`, value));
       count += 1;
     });
     return count;
@@ -405,7 +471,10 @@ var CustomImportScript = (() => {
     "highlight-margin",
     "highlight-margin-mobile",
     "highlight-gallery-margin",
-    "highlight-gallery-margin-mobile"
+    "highlight-gallery-margin-mobile",
+    "highlight-background",
+    "highlight-color",
+    "highlight-link"
   ];
   var CELL_WIDTH_ATTR = "data-cell-width";
   function markCellWidths(document2) {
@@ -505,7 +574,134 @@ var CustomImportScript = (() => {
       var _a;
       return (_a = img.closest("figure")) == null ? void 0 : _a.querySelector("figcaption");
     });
-    return ["centered", portrait, captioned && "captioned"].filter(Boolean);
+    const texts = cells.flatMap((c) => [...c.querySelectorAll(`[${TEXT_ATTR}]`)]).filter((el) => !el.querySelector("img") && el.textContent.trim());
+    const textCenter = texts.length && texts.every((el) => textTokens(el).includes("center"));
+    const captions = cells.filter((c) => c.querySelector("img")).flatMap((c) => [...c.querySelectorAll(`[${TEXT_ATTR}], .textwidget > p`)]).filter((el) => el.textContent.trim());
+    const textSmall = captions.length && captions.every((el) => textTokens(el).includes("text-small"));
+    return ["centered", portrait, captioned && "captioned", textCenter && "text-center", textSmall && "text-small"].filter(Boolean);
+  }
+  var TEXT_ATTR = "data-skoda-text";
+  var BOX_ATTR = "data-skoda-box";
+  var SIZE_TOKENS = { "10pt": "text-small", "14pt": "text-medium", "16pt": "text-large", "18pt": "text-xlarge" };
+  var textTokens = (el) => (el.getAttribute(TEXT_ATTR) || "").split(" ").filter(Boolean);
+  var styleOf = (el, prop) => {
+    const decl = (el.getAttribute("style") || "").split(";").map((d) => d.split(":")).find(([p]) => (p == null ? void 0 : p.trim().toLowerCase()) === prop);
+    return decl ? decl.slice(1).join(":").trim() : "";
+  };
+  function uniformSize(el) {
+    const sizes = /* @__PURE__ */ new Set();
+    const walker = el.ownerDocument.createTreeWalker(
+      el,
+      4
+      /* SHOW_TEXT */
+    );
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (n.textContent.trim()) {
+        let size = "";
+        for (let p = n.parentElement; p && p !== el.parentElement; p = p.parentElement) {
+          size = styleOf(p, "font-size");
+          if (size) break;
+        }
+        sizes.add(size.toLowerCase());
+      }
+    }
+    return sizes.size === 1 ? [...sizes][0] : "";
+  }
+  function markTextStyles(document2) {
+    let count = 0;
+    document2.querySelectorAll(".panel-layout .textwidget > p").forEach((p) => {
+      if (!isBlank(p) || p.closest(".search-results, .sb-gallery")) return;
+      p.setAttribute(BLANK_ATTR, "");
+      p.textContent = "blank line";
+    });
+    document2.querySelectorAll(".panel-layout .textwidget > :is(p, h2, h3, h4, div)").forEach((el) => {
+      if (el.closest(".search-results, .sb-gallery") || el.matches(".search-results, .sb-gallery")) return;
+      const tokens = [];
+      if (/^center$/i.test(styleOf(el, "text-align"))) tokens.push("center");
+      const size = SIZE_TOKENS[uniformSize(el)];
+      if (size) tokens.push(size);
+      const background = styleOf(el, "background-color") || styleOf(el, "background");
+      if (/^(#[0-9a-f]{3}(?:[0-9a-f]{3})?|[a-z]+)$/i.test(background) && background.toLowerCase() !== "transparent") {
+        const colours = [...el.querySelectorAll('[style*="color"]')].map((c) => styleOf(c, "color")).filter(Boolean);
+        el.setAttribute(BOX_ATTR, JSON.stringify({
+          background,
+          padding: styleOf(el, "padding"),
+          shadow: styleOf(el, "box-shadow"),
+          color: colours.length && colours.every((c) => c === colours[0]) ? colours[0] : ""
+        }));
+        tokens.push("box");
+      }
+      if (!tokens.length) return;
+      el.setAttribute(TEXT_ATTR, tokens.join(" "));
+      count += 1;
+    });
+    return count;
+  }
+  var BOX_ROWS = [["background", "box-background"], ["padding", "box-padding"], ["shadow", "box-shadow"], ["color", "box-color"]];
+  function captionCard(node, document2) {
+    if (node.nodeType !== 1 || !node.matches("figure.wp-caption") || !node.querySelector("figcaption")) return null;
+    const img = node.querySelector("img");
+    const width = img && img.getAttribute(ALIGN_ATTR) === "center" && shownWidth(img);
+    if (!width) return null;
+    return WebImporter.DOMUtils.createTable([[`Columns (centered, portrait-${width}, captioned)`], [[node]]], document2);
+  }
+  function splitTextRuns(nodes, document2) {
+    const out = [];
+    let run = [];
+    let runKey = "";
+    const flush = () => {
+      if (!run.length) return;
+      const [first] = run;
+      const tokens = textTokens(first).filter((t) => t !== "box").map((t) => t === "center" ? "text-center" : t);
+      const box = first.getAttribute(BOX_ATTR);
+      const rows = [];
+      if (box) {
+        tokens.push("text-box");
+        const data = JSON.parse(box);
+        BOX_ROWS.forEach(([field, key]) => {
+          if (data[field]) rows.push([key, data[field]]);
+        });
+      }
+      const content = run.flatMap((el) => {
+        el.removeAttribute(TEXT_ATTR);
+        el.removeAttribute(BOX_ATTR);
+        if (el.tagName !== "DIV") return [el];
+        const p = document2.createElement("p");
+        p.append(...el.childNodes);
+        return [p];
+      });
+      out.push(
+        document2.createElement("hr"),
+        ...content,
+        sectionMetadata([BODY_STYLE, ...tokens].join(", "), document2, rows),
+        document2.createElement("hr"),
+        sectionMetadata(BODY_STYLE, document2)
+      );
+      run = [];
+      runKey = "";
+    };
+    nodes.forEach((node) => {
+      const card = captionCard(node, document2);
+      if (card) {
+        flush();
+        out.push(card);
+        return;
+      }
+      const key = node.nodeType === 1 && node.hasAttribute(TEXT_ATTR) ? `${node.getAttribute(TEXT_ATTR)}|${node.getAttribute(BOX_ATTR) || ""}` : "";
+      if (key && key === runKey) {
+        run.push(node);
+        return;
+      }
+      flush();
+      if (key) {
+        run = [node];
+        runKey = key;
+        return;
+      }
+      out.push(node);
+    });
+    flush();
+    return out;
   }
   function narrowBodyImages(nodes) {
     return nodes.filter((n) => n.nodeType === 1 && n.tagName !== "TABLE").flatMap((n) => n.tagName === "IMG" ? [n] : [...n.querySelectorAll("img")]).filter((img) => img.hasAttribute(ALIGN_ATTR) && !img.closest("table") && parseInt(img.getAttribute("width"), 10) < COLUMN_WIDTH);
@@ -543,6 +739,10 @@ var CustomImportScript = (() => {
   }
   function applyCentredImages(root) {
     root.querySelectorAll(`[${ALIGN_ATTR}]`).forEach((img) => img.removeAttribute(ALIGN_ATTR));
+    root.querySelectorAll(`[${TEXT_ATTR}], [${BOX_ATTR}]`).forEach((el) => {
+      el.removeAttribute(TEXT_ATTR);
+      el.removeAttribute(BOX_ATTR);
+    });
     const html = root.ownerDocument.documentElement;
     if (!html.hasAttribute(CENTRED_IMAGES_ATTR)) return 0;
     html.removeAttribute(CENTRED_IMAGES_ATTR);
@@ -580,6 +780,11 @@ var CustomImportScript = (() => {
       return;
     }
     if (DROPPED.has(kind)) return;
+    if (kind === "offset") {
+      const height = spacerHeight(panel);
+      if (!inBlock && height) out.push(WebImporter.DOMUtils.createTable([["Spacer"], [`${height}px`]], document2));
+      return;
+    }
     if (kind === "nested-builder") {
       emitNestedRows(panel, document2, out, stats, { inBlock });
       return;
@@ -626,23 +831,35 @@ var CustomImportScript = (() => {
     if (cells) {
       out.push(WebImporter.DOMUtils.createTable(cells, document2));
     } else if (nodes && nodes.length) {
-      nodes.forEach((n) => out.push(n));
+      nodes.forEach((n) => {
+        if (!isBlankParagraph(n)) {
+          out.push(n);
+          return;
+        }
+        if (!inBlock) out.push(WebImporter.DOMUtils.createTable([["Spacer (line)"], [`${BLANK_LINE_PX}px`]], document2));
+      });
     }
   }
   function emitMultiColumn(cells, document2, out, stats) {
     const row = [];
     const filled = [];
+    const offsets = [];
     cells.forEach((cell) => {
       const cellOut = [];
-      panelsOf(cell).forEach((p) => emitWidget(p, document2, cellOut, stats, { inBlock: true }));
+      const panels = panelsOf(cell);
+      panels.forEach((p) => emitWidget(p, document2, cellOut, stats, { inBlock: true }));
       if (cellOut.length) {
         row.push(cellOut);
         filled.push(cell);
+        const first = panels.findIndex((p) => classifyWidget(p) !== "offset");
+        const lead = panels.slice(0, first);
+        offsets.push(lead.reduce((sum, p) => sum + spacerHeight(p), 0) + (first >= 0 ? leadingBlankHeight(panels[first]) : 0));
       }
     });
     if (row.length > 1) {
       const split = splitVariant(filled);
       const variants = split ? [split, portraitVariant(filled)].filter(Boolean) : centredVariants(filled);
+      if (offsets.some((v) => v > 0) && offsets.every((v) => v <= 999)) variants.push(`offset-${offsets.join("-")}`);
       const header = variants.length ? `Columns (${variants.join(", ")})` : "Columns";
       out.push(WebImporter.DOMUtils.createTable([[header], row], document2));
       stats.multiColumn += 1;
@@ -698,10 +915,17 @@ var CustomImportScript = (() => {
       highlights: 0
     };
     let resume = false;
+    let held = [];
+    const isSpacer = (n) => n.tagName === "TABLE" && /^spacer(\s*\(line\))?$/i.test(((n.querySelector("tr > th, tr > td") || {}).textContent || "").trim());
     grids.forEach((grid) => {
       const variant = grid.getAttribute(HIGHLIGHT_ATTR);
       const row = gridRow(grid, document2, stats);
       if (!row.length) return;
+      if (resume && !variant && row.every(isSpacer)) {
+        held.push(...row);
+        return;
+      }
+      if (variant) held = [];
       if (variant) {
         const geometry = GEOMETRY_KEYS.filter((key) => grid.hasAttribute(`data-${key}`)).map((key) => [key, grid.getAttribute(`data-${key}`)]);
         out.push(document2.createElement("hr"), ...row, sectionMetadata(`${BODY_STYLE}, highlight-${variant}`, document2, geometry));
@@ -711,7 +935,8 @@ var CustomImportScript = (() => {
       }
       if (resume) out.push(document2.createElement("hr"), sectionMetadata(BODY_STYLE, document2));
       resume = false;
-      out.push(...row);
+      out.push(...held, ...splitTextRuns(row, document2));
+      held = [];
     });
     if (resume && hasContentAfter(layout, element)) {
       out.push(document2.createElement("hr"), sectionMetadata(BODY_STYLE, document2));
@@ -2673,6 +2898,7 @@ var CustomImportScript = (() => {
       markHighlights(document2);
       markCellWidths(document2);
       markCentredImages(document2);
+      markTextStyles(document2);
       markDropCap(document2);
       document2.querySelectorAll("article .entry-content, article .content").forEach((body) => {
         markFootnotes(body);

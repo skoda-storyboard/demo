@@ -21,6 +21,7 @@ import { spanSidebar } from './split-body.js';
 import { addNewsletterCard } from './story-newsletter.js';
 import { applyHighlightGeometry, applyHighlightDataset } from './highlight-geometry.js';
 import { readDropCapRow, decorateDropCap } from './drop-cap.js';
+import { readBoxRow, decorateBox } from './section-box.js';
 
 /**
  * Page templates with their own layout code: `templates/<name>/<name>.{js,css}`, selected by
@@ -231,6 +232,7 @@ function applySectionStyles(main) {
       }
       applyHighlightGeometry(section, key, val);
       readDropCapRow(section, key, val);
+      readBoxRow(section, key, val);
     });
     // Remove the whole wrapper so decorateBlocks (div.section > div > div) never sees
     // it as an unknown block (which would 404 on its missing block JS/CSS).
@@ -283,6 +285,7 @@ function decorateStorySections(main) {
   main.querySelectorAll(':scope > div').forEach(applyHighlightDataset);
   applySectionStyles(main);
   main.querySelectorAll(':scope > .section.drop-cap').forEach(decorateDropCap);
+  main.querySelectorAll(':scope > .section.text-box').forEach(decorateBox);
   spanSidebar(main);
   // the shared sidebar newsletter card, unless the story authors its own (SKODA-840)
   addNewsletterCard(main);

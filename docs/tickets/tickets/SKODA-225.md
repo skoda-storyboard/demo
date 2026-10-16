@@ -98,8 +98,21 @@ shown narrower than their file.
   outlived #284 and still masked the glyph with the deleted `icons/rail-arrow-*.svg` (404).
   It is removed, so the carousel's icon-font glyph shows. It also happens on `main`.
 
-**Noted, not changed:** story prose links are green on live (`rgb(65,148,104)`, measured on the skatepark and
-millionth-SUV stories). Here they're ink, per the story-detail spec's brand default. This is a PO decision.
+**PO round 3 (2026-10-16, 4×4 and electric-car QA, "check all screens"):**
+- The editor text's centred / resized runs, padded boxes and portrait captions.
+- Spacer widgets and blank lines.
+- Panel colours, prose links, and photo, video and slider gaps.
+- The 4×4 grid's pills and discs, and the "Show more" slide.
+
+All are in story-detail.md §3. Re-measured over all 82 stories at 1440 and 390 by pairing text blocks: identical
+blocks rose from 440 to 526 at 1440, and 568 at 390. What remains:
+- the two quiz stories (flattened by decision);
+- pure black inline text against ink;
+- a few panel insets: the cruise-control panel's text sits 24px further in.
+
+**Links:** story prose links are green on live (`rgb(65,148,104)`, measured on the skatepark and millionth-SUV
+stories). They were ink per the story-detail spec's brand default; since round 3 (2026-10-16) they are green as live,
+at the PO's request. The green is 3.7:1 on white, below WCAG AA.
 The rail card overlay: live has only the source's two light gradients at rest, and the shared card
 also had a darker bottom scrim (`--scrim-text`, for 4.5:1 white text on bright photos). The PO chose
 to match live (2026-10-15), so the scrim is removed site-wide; the text shadow stays.

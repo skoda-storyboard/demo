@@ -181,7 +181,11 @@
   padding: var(--columns-split-gutter);
 }
 
+/* the caption is the cell's own text when DA keeps it inline (`<picture> <strong>Name</strong><br>
+   role`, no paragraph: the electric-car and Sportline portraits, 10pt on the source) */
 .columns.split .columns-portrait {
+  font-size: var(--columns-caption-role-size);
+  line-height: var(--columns-caption-line);
   text-align: center;
 }
 
@@ -240,7 +244,8 @@
      (the 300px portraits of 384px files);
    - `captioned` (the first image is a caption figure, `.wp-caption-text`): its caption, the
      paragraphs up to the next image, directly under it and light (300; the name's <strong>
-     stays 600), then the usual 20px paragraph gaps.
+     stays 600), no wider than the portrait, then the usual 20px paragraph gaps;
+   - `text-center`: the text cells centred too. A body caption figure alone is a one-card row.
    ========================================================================== */
 .columns.centered {
   --columns-split-gutter: 10px; /* SiteOrigin cell padding */
@@ -288,6 +293,26 @@
   font-weight: var(--weight-light);
 }
 
+/* …and as wide as the portrait at most, as the source's figure: the 4×4 spokesperson's role
+   wraps in her 200px caption */
+.columns.centered.captioned.portrait .columns-portrait > p:first-child:has(> picture)
+  ~ p:not(:has(> picture), p:has(> picture) ~ p:has(> picture) ~ p) {
+  max-inline-size: var(--columns-portrait);
+  margin-inline: auto;
+}
+
+/* `text-small`: the portraits' text is 10pt on the source, on the paragraph's 24px line (often
+   the cell's own inline text in DA: `<picture> <strong>Name</strong><br> role`) */
+.columns.centered.text-small .columns-portrait {
+  font-size: var(--story-text-small, 13.3333px);
+  line-height: var(--story-text-small-line, 24px);
+}
+
+/* `text-center`: the row's text cells are centred on the source too (the 4×4 interview quotes) */
+.columns.centered.text-center > div > div {
+  text-align: center;
+}
+
 @media (width >= 781px) {
   .columns.centered > div {
     flex-direction: row;
@@ -297,4 +322,18 @@
   .columns.centered > div > div {
     flex: 1 1 0;
   }
+}
+
+/* `offset-A-B…` (story rows, columns.js decorateOffsets): the source's spacer widgets leading
+   each cell, shown from 720px as the source shows them (none below) */
+@media (width >= 720px) {
+  .columns.offset > div > div {
+    margin-block-start: var(--columns-offset, 0);
+  }
+}
+
+/* a centred card alone (a body caption figure, the 4×4 spokesperson): the source figure has no
+   cell inset above or below it */
+.columns.centered > div > div:only-child {
+  padding-block: 0;
 }

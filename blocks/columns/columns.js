@@ -62,11 +62,33 @@ export function decorateSplit(block) {
   return true;
 }
 
+const OFFSET_RE = /^offset((?:-\d{1,3}){1,6})$/;
+
+/**
+ * `offset-A-B…` (story rows): the source's spacer widgets leading each cell (`skoda-offset`), in
+ * px per cell, in order (`offset-48-24`: the 4×4 quote 48px down, the portrait 24px). Each cell
+ * gets its `--columns-offset`; columns.css applies it from 720px, as the source shows them.
+ * @param {Element} block
+ * @returns {boolean} whether the block has offsets
+ */
+export function decorateOffsets(block) {
+  const token = [...block.classList].map((c) => OFFSET_RE.exec(c)).find(Boolean);
+  if (!token) return false;
+  const values = token[1].slice(1).split('-').map(Number);
+  const cells = [...block.querySelectorAll(':scope > div:first-child > div')];
+  block.classList.add('offset');
+  cells.forEach((cell, i) => {
+    if (values[i] > 0) cell.style.setProperty('--columns-offset', `${values[i]}px`);
+  });
+  return true;
+}
+
 export default function decorate(block) {
   const cols = [...block.firstElementChild.children];
   block.classList.add(`columns-${cols.length}-cols`);
   if (block.classList.contains('stats')) decorateStats(block);
   decorateSplit(block);
+  decorateOffsets(block);
 
   // setup image columns
   [...block.children].forEach((row) => {

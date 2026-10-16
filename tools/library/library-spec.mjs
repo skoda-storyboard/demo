@@ -64,6 +64,12 @@ export const SPEC = {
     description: 'A YouTube, Vimeo, Buzzsprout or Spotify URL. A bare link on its own line also works. Settings rows: url, ratio (e.g. 16:9), title, poster (image). An .mp4 url plays as a native video with the poster.',
     variants: [],
   },
+  spacer: {
+    structure: 'single cell height',
+    purpose: 'authored vertical gap',
+    description: 'A vertical gap between parts of a story: one cell with its height in px (e.g. 24px). Shown from 720px wide, none on phones.',
+    variants: [],
+  },
   footnotes: {
     structure: 'single cell text',
     purpose: 'small-print footnotes',

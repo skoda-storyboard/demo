@@ -119,3 +119,20 @@ test('two split blocks on one page stay independent', () => {
   assert.equal(b.style.getPropertyValue('--columns-split'), '75%');
   assert.equal(b.classList.contains('portrait'), false);
 });
+
+test('offset-A-B: each cell gets its leading spacer offset; a 0 sets none; malformed tokens are ignored', () => {
+  const el = block('centered offset-48-24', PROFILE_ROW);
+  decorate(el);
+  const [a, b] = el.querySelectorAll(':scope > div > div');
+  assert.ok(el.classList.contains('offset'));
+  assert.equal(a.style.getPropertyValue('--columns-offset'), '48px');
+  assert.equal(b.style.getPropertyValue('--columns-offset'), '24px');
+  const zero = block('split-62 offset-0-24');
+  decorate(zero);
+  assert.equal(zero.querySelector(':scope > div > div').style.getPropertyValue('--columns-offset'), '');
+  ['offset-', 'offset-x-2', 'offset-1000-2'].forEach((cls) => {
+    const bad = block(cls);
+    decorate(bad);
+    assert.equal(bad.classList.contains('offset'), false, cls);
+  });
+});

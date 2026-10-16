@@ -104,7 +104,38 @@ const WIDGET_KINDS = [
 ];
 
 const DEFERRED = new Set(['defer-charge-map', 'defer-calculator']);
-const DROPPED = new Set(['offset', 'newsletter', 'share', 'highlights']);
+const DROPPED = new Set(['newsletter', 'share', 'highlights']);
+
+// The spacer widget (`skoda-offset`: `<div style="padding-top:1em">` at the widget's 24px font,
+// shown from 720px): its height in px, 0 when unreadable.
+const SPACER_EM_PX = 24;
+// a blank editor paragraph (`<p>&nbsp;</p>`, 23 in 14 stories): one body line and its gap, at
+// every width (it is text, not a spacer widget)
+const BLANK_LINE_PX = 44;
+// helix-importer's preProcess drops an empty paragraph, so `preprocess` (markTextStyles) marks
+// each blank one and gives it a placeholder text to survive until the flatten
+const BLANK_ATTR = 'data-skoda-blank';
+const isBlank = (n) => n.nodeType === 1 && n.tagName === 'P'
+  && !n.querySelector('img, picture, iframe, video, table') && !n.textContent.replace(/[\s\u00a0]/g, '');
+const isBlankParagraph = (n) => n.nodeType === 1 && n.tagName === 'P' && n.hasAttribute(BLANK_ATTR);
+/** The blank paragraphs leading an editor widget, in px (they push its text down). */
+function leadingBlankHeight(panel) {
+  const tiny = panel.querySelector('.siteorigin-widget-tinymce, .textwidget');
+  if (!tiny) return 0;
+  let height = 0;
+  for (const el of tiny.children) {
+    if (!isBlankParagraph(el) && !isBlank(el)) break;
+    height += BLANK_LINE_PX;
+  }
+  return height;
+}
+export function spacerHeight(panel) {
+  const value = (panel.querySelector('[style*="padding-top"]')?.getAttribute('style') || '')
+    .match(/padding-top:\s*([\d.]+)(em|px)/i);
+  if (!value) return 0;
+  const n = parseFloat(value[1]);
+  return Math.round(value[2].toLowerCase() === 'em' ? n * SPACER_EM_PX : n);
+}
 
 function classifyWidget(panel) {
   // a nested layout's own class wins (bare or `widget_`): its first inner widget (often a
@@ -402,17 +433,58 @@ function highlightVariant(color) {
   return luminance < 0.5 ? 'dark' : 'grey';
 }
 
+// A panel's own colours (#516 PO, measured on the live stories 2026-10-16): the source's panels
+// come in 12 colours (#0e3a2f on 36 of 59, then cyan #1ed4df, green #4ba82e, blue #325880, …),
+// their text and link colours set inline (`<a style="color: #ffffff">`, which DA drops). Each
+// differing from its variant's default travels as a row: `highlight-background`,
+// `highlight-color` (the colour most of the text is set in), `highlight-link`.
+const PANEL_DEFAULTS = { dark: { background: '#0e3a2f', color: '#ffffff' }, grey: { background: '', color: '' } };
+const hexColour = (value) => {
+  const v = String(value || '').trim().toLowerCase();
+  const hex = v.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+  if (hex) return `#${hex[1].length === 3 ? hex[1].replace(/./g, '/** Mark every background-styled builder row (head CSS or inline). Returns the count. *//** Mark every background-styled builder row (head CSS or inline). Returns the count. */') : hex[1]}`;
+  const fn = v.match(/^rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/);
+  return fn ? `#${fn.slice(1, 4).map((n) => Number(n).toString(16).padStart(2, '0')).join('')}` : '';
+};
+function panelColours(row, { variant, color }) {
+  const out = {};
+  const background = hexColour(color);
+  if (background && background !== PANEL_DEFAULTS[variant].background) out['highlight-background'] = background;
+  // the colour the most text (outside links) / link text is set in inline, by text length
+  const text = new Map(); const links = new Map();
+  const walker = row.ownerDocument.createTreeWalker(row, 4 /* SHOW_TEXT */);
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    const length = n.textContent.trim().length;
+    if (length && n.parentElement.closest('.textwidget')) {
+      let colour = '';
+      for (let p = n.parentElement; p && p !== row && !colour; p = p.parentElement) {
+        const decl = (p.getAttribute('style') || '').match(/(?:^|;)\s*color\s*:\s*([^;]+)/i);
+        if (decl) colour = hexColour(decl[1]);
+      }
+      const bucket = n.parentElement.closest('a') ? links : text;
+      bucket.set(colour, (bucket.get(colour) || 0) + length);
+    }
+  }
+  const top = (m) => [...m.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+  const textColour = top(text);
+  if (textColour && textColour !== PANEL_DEFAULTS[variant].color) out['highlight-color'] = textColour;
+  const linkColour = top(links);
+  if (linkColour) out['highlight-link'] = linkColour;
+  return out;
+}
+
 /** Mark every background-styled builder row (head CSS or inline). Returns the count. */
 export function markHighlights(document) {
   const css = [...document.querySelectorAll('style')].map((s) => s.textContent || '').join('\n');
   const byId = new Map();
   for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
     const color = (body.match(/background(?:-color)?\s*:\s*([^;]+)/i) || [])[1];
-    const variant = highlightVariant(color && color.replace(/!important/i, ''));
+    const value = color && color.replace(/!important/i, '').trim();
+    const variant = highlightVariant(value);
     if (!variant) continue;
     selectors.split(',').forEach((sel) => {
       const m = sel.trim().match(/^#(pg-[\w-]+)\s*>\s*\.panel-row-style$/);
-      if (m) byId.set(m[1], variant);
+      if (m) byId.set(m[1], { variant, color: value });
     });
   }
   let count = 0;
@@ -420,10 +492,13 @@ export function markHighlights(document) {
   document.querySelectorAll('.panel-grid').forEach((grid) => {
     const row = grid.querySelector(':scope > .panel-row-style');
     const inline = row && (row.getAttribute('style') || '').match(/background(?:-color)?\s*:\s*([^;]+)/i);
-    const variant = byId.get(grid.id) || (inline && highlightVariant(inline[1]));
-    if (!variant) return;
+    const panel = byId.get(grid.id)
+      || (inline && highlightVariant(inline[1]) && { variant: highlightVariant(inline[1]), color: inline[1].trim() });
+    if (!panel) return;
+    const { variant } = panel;
     grid.setAttribute(HIGHLIGHT_ATTR, variant);
     Object.entries(geometry(grid)).forEach(([key, value]) => grid.setAttribute(`data-${key}`, value));
+    Object.entries(panelColours(row || grid, panel)).forEach(([key, value]) => grid.setAttribute(`data-${key}`, value));
     count += 1;
   });
   return count;
@@ -492,7 +567,8 @@ function highlightGeometry(css) {
 }
 
 const GEOMETRY_KEYS = ['highlight-padding', 'highlight-padding-mobile', 'highlight-margin',
-  'highlight-margin-mobile', 'highlight-gallery-margin', 'highlight-gallery-margin-mobile'];
+  'highlight-margin-mobile', 'highlight-gallery-margin', 'highlight-gallery-margin-mobile',
+  'highlight-background', 'highlight-color', 'highlight-link'];
 
 // ---- unequal 2-cell rows (SKODA-225, contract columns-split v2) -------------------
 // SiteOrigin sizes each cell in the page's head CSS (`#pgc-<id> { width:61.8% }`, sometimes
@@ -645,7 +721,149 @@ export function centredVariants(cells) {
   const widths = firsts.map(shownWidth);
   const portrait = widths.every((w) => w && w === widths[0]) ? `portrait-${widths[0]}` : null;
   const captioned = firsts.every((img) => img.closest('figure')?.querySelector('figcaption'));
-  return ['centered', portrait, captioned && 'captioned'].filter(Boolean);
+  // the row's text (not its captions) all centred on the source too: the 4×4 interview quotes
+  const texts = cells.flatMap((c) => [...c.querySelectorAll(`[${TEXT_ATTR}]`)])
+    .filter((el) => !el.querySelector('img') && el.textContent.trim());
+  const textCenter = texts.length && texts.every((el) => textTokens(el).includes('center'));
+  // the portraits' own text all 10pt on the source (`<img><strong>Name</strong><br>role` in one
+  // 10pt paragraph: the electric-car and Coca-Cola interviewees)
+  const captions = cells.filter((c) => c.querySelector('img')).flatMap((c) => [...c.querySelectorAll(`[${TEXT_ATTR}], .textwidget > p`)])
+    .filter((el) => el.textContent.trim());
+  const textSmall = captions.length && captions.every((el) => textTokens(el).includes('text-small'));
+  return ['centered', portrait, captioned && 'captioned', textCenter && 'text-center', textSmall && 'text-small'].filter(Boolean);
+}
+
+// ---- the editor text's inline styles -------------------------------------------------
+// The source's editor text centres paragraphs (`<p style="text-align: center">`, 172 in 54
+// stories, mostly a photo with its 10pt caption), sets runs in 10 / 14 / 16 / 18pt and boxes some
+// text (`<div style="background: #cccccc; padding: 50px">`). DA keeps none of it, so
+// `preprocess` marks each editor paragraph (markTextStyles) and the flatten sets each run of
+// marked body paragraphs as its own body section, styled `text-center`, `text-small` … (a
+// Columns cell can't hold a section: there the row gets `text-center`, centredVariants).
+const TEXT_ATTR = 'data-skoda-text';
+const BOX_ATTR = 'data-skoda-box';
+const SIZE_TOKENS = { '10pt': 'text-small', '14pt': 'text-medium', '16pt': 'text-large', '18pt': 'text-xlarge' };
+const textTokens = (el) => (el.getAttribute(TEXT_ATTR) || '').split(' ').filter(Boolean);
+const styleOf = (el, prop) => {
+  const decl = (el.getAttribute('style') || '').split(';').map((d) => d.split(':'))
+    .find(([p]) => p?.trim().toLowerCase() === prop);
+  return decl ? decl.slice(1).join(':').trim() : '';
+};
+
+/** The font size every text of `el` is set in by an inline style, or '' (mixed / none). */
+function uniformSize(el) {
+  const sizes = new Set();
+  const walker = el.ownerDocument.createTreeWalker(el, 4 /* SHOW_TEXT */);
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    if (n.textContent.trim()) {
+      let size = '';
+      for (let p = n.parentElement; p && p !== el.parentElement; p = p.parentElement) {
+        size = styleOf(p, 'font-size');
+        if (size) break;
+      }
+      sizes.add(size.toLowerCase());
+    }
+  }
+  return sizes.size === 1 ? [...sizes][0] : '';
+}
+
+/**
+ * Mark each top-level editor paragraph (and padded box) with the styles DA drops: `center`, a
+ * size token, and for a box its background / padding / shadow / text colour. Returns the count.
+ */
+export function markTextStyles(document) {
+  let count = 0;
+  document.querySelectorAll('.panel-layout .textwidget > p').forEach((p) => {
+    if (!isBlank(p) || p.closest('.search-results, .sb-gallery')) return;
+    p.setAttribute(BLANK_ATTR, '');
+    p.textContent = 'blank line';
+  });
+  document.querySelectorAll('.panel-layout .textwidget > :is(p, h2, h3, h4, div)').forEach((el) => {
+    if (el.closest('.search-results, .sb-gallery') || el.matches('.search-results, .sb-gallery')) return;
+    const tokens = [];
+    if (/^center$/i.test(styleOf(el, 'text-align'))) tokens.push('center');
+    const size = SIZE_TOKENS[uniformSize(el)];
+    if (size) tokens.push(size);
+    const background = styleOf(el, 'background-color') || styleOf(el, 'background');
+    if (/^(#[0-9a-f]{3}(?:[0-9a-f]{3})?|[a-z]+)$/i.test(background) && background.toLowerCase() !== 'transparent') {
+      const colours = [...el.querySelectorAll('[style*="color"]')].map((c) => styleOf(c, 'color')).filter(Boolean);
+      el.setAttribute(BOX_ATTR, JSON.stringify({
+        background,
+        padding: styleOf(el, 'padding'),
+        shadow: styleOf(el, 'box-shadow'),
+        color: colours.length && colours.every((c) => c === colours[0]) ? colours[0] : '',
+      }));
+      tokens.push('box');
+    }
+    if (!tokens.length) return;
+    el.setAttribute(TEXT_ATTR, tokens.join(' '));
+    count += 1;
+  });
+  return count;
+}
+
+const BOX_ROWS = [['background', 'box-background'], ['padding', 'box-padding'], ['shadow', 'box-shadow'], ['color', 'box-color']];
+
+/**
+ * A body caption figure shown narrower than its file (the 4×4 spokesperson, 200px of 384): the
+ * profile card of a centred row, alone: `Columns (centered, portrait-NNN, captioned)`.
+ */
+function captionCard(node, document) {
+  if (node.nodeType !== 1 || !node.matches('figure.wp-caption') || !node.querySelector('figcaption')) return null;
+  const img = node.querySelector('img');
+  const width = img && img.getAttribute(ALIGN_ATTR) === 'center' && shownWidth(img);
+  if (!width) return null;
+  return WebImporter.DOMUtils.createTable([[`Columns (centered, portrait-${width}, captioned)`], [[node]]], document);
+}
+
+/**
+ * A body row's nodes with each run of styled paragraphs set as its own body section: `<hr>`, the
+ * run, its Section Metadata (`body-column, text-center, text-small`; a box adds `text-box` and its
+ * rows), then `<hr>` and a plain `body-column` Section Metadata, so the body resumes. An empty
+ * resumed section (a run at the end) is dropped later (dropEmptySections).
+ */
+export function splitTextRuns(nodes, document) {
+  const out = [];
+  let run = [];
+  let runKey = '';
+  const flush = () => {
+    if (!run.length) return;
+    const [first] = run;
+    const tokens = textTokens(first).filter((t) => t !== 'box').map((t) => (t === 'center' ? 'text-center' : t));
+    const box = first.getAttribute(BOX_ATTR);
+    const rows = [];
+    if (box) {
+      tokens.push('text-box');
+      const data = JSON.parse(box);
+      BOX_ROWS.forEach(([field, key]) => { if (data[field]) rows.push([key, data[field]]); });
+    }
+    const content = run.flatMap((el) => {
+      el.removeAttribute(TEXT_ATTR);
+      el.removeAttribute(BOX_ATTR);
+      if (el.tagName !== 'DIV') return [el];
+      // a box's inline content (text, <br>, a linked image) as a paragraph
+      const p = document.createElement('p');
+      p.append(...el.childNodes);
+      return [p];
+    });
+    out.push(document.createElement('hr'), ...content,
+      sectionMetadata([BODY_STYLE, ...tokens].join(', '), document, rows),
+      document.createElement('hr'), sectionMetadata(BODY_STYLE, document));
+    run = [];
+    runKey = '';
+  };
+  nodes.forEach((node) => {
+    const card = captionCard(node, document);
+    if (card) { flush(); out.push(card); return; }
+    const key = node.nodeType === 1 && node.hasAttribute(TEXT_ATTR)
+      ? `${node.getAttribute(TEXT_ATTR)}|${node.getAttribute(BOX_ATTR) || ''}` : '';
+    if (key && key === runKey) { run.push(node); return; }
+    flush();
+    if (key) { run = [node]; runKey = key; return; }
+    out.push(node);
+  });
+  flush();
+  return out;
 }
 
 /**
@@ -709,6 +927,7 @@ export function dropEmptySections(root) {
  */
 export function applyCentredImages(root) {
   root.querySelectorAll(`[${ALIGN_ATTR}]`).forEach((img) => img.removeAttribute(ALIGN_ATTR));
+  root.querySelectorAll(`[${TEXT_ATTR}], [${BOX_ATTR}]`).forEach((el) => { el.removeAttribute(TEXT_ATTR); el.removeAttribute(BOX_ATTR); });
   const html = root.ownerDocument.documentElement;
   if (!html.hasAttribute(CENTRED_IMAGES_ATTR)) return 0;
   html.removeAttribute(CENTRED_IMAGES_ATTR);
@@ -752,6 +971,13 @@ function emitWidget(panel, document, out, stats, { inBlock = false } = {}) {
 
   if (DEFERRED.has(kind)) { stats.deferred.push(kind); return; }
   if (DROPPED.has(kind)) return;
+  // a spacer: its own block in the body; in a Columns cell the row's `offset-…` carries the
+  // ones that lead a cell (emitMultiColumn), the others go
+  if (kind === 'offset') {
+    const height = spacerHeight(panel);
+    if (!inBlock && height) out.push(WebImporter.DOMUtils.createTable([['Spacer'], [`${height}px`]], document));
+    return;
+  }
   // eslint-disable-next-line no-use-before-define
   if (kind === 'nested-builder') { emitNestedRows(panel, document, out, stats, { inBlock }); return; }
 
@@ -778,7 +1004,12 @@ function emitWidget(panel, document, out, stats, { inBlock = false } = {}) {
   if (cells) {
     out.push(WebImporter.DOMUtils.createTable(cells, document));
   } else if (nodes && nodes.length) {
-    nodes.forEach((n) => out.push(n));
+    nodes.forEach((n) => {
+      if (!isBlankParagraph(n)) { out.push(n); return; }
+      // a blank line: a Spacer (line) in the body; in a cell the row's offset carries the
+      // leading ones (emitMultiColumn), the others go
+      if (!inBlock) out.push(WebImporter.DOMUtils.createTable([['Spacer (line)'], [`${BLANK_LINE_PX}px`]], document));
+    });
   }
 }
 
@@ -791,14 +1022,26 @@ function emitWidget(panel, document, out, stats, { inBlock = false } = {}) {
 function emitMultiColumn(cells, document, out, stats) {
   const row = [];
   const filled = [];
+  const offsets = [];
   cells.forEach((cell) => {
     const cellOut = [];
-    panelsOf(cell).forEach((p) => emitWidget(p, document, cellOut, stats, { inBlock: true }));
-    if (cellOut.length) { row.push(cellOut); filled.push(cell); }
+    const panels = panelsOf(cell);
+    panels.forEach((p) => emitWidget(p, document, cellOut, stats, { inBlock: true }));
+    if (cellOut.length) {
+      row.push(cellOut);
+      filled.push(cell);
+      // the spacers leading the cell, before its first content widget, and that widget's own
+      // leading blank lines
+      const first = panels.findIndex((p) => classifyWidget(p) !== 'offset');
+      const lead = panels.slice(0, first);
+      offsets.push(lead.reduce((sum, p) => sum + spacerHeight(p), 0)
+        + (first >= 0 ? leadingBlankHeight(panels[first]) : 0));
+    }
   });
   if (row.length > 1) {
     const split = splitVariant(filled);
     const variants = split ? [split, portraitVariant(filled)].filter(Boolean) : centredVariants(filled);
+    if (offsets.some((v) => v > 0) && offsets.every((v) => v <= 999)) variants.push(`offset-${offsets.join('-')}`);
     const header = variants.length ? `Columns (${variants.join(', ')})` : 'Columns';
     out.push(WebImporter.DOMUtils.createTable([[header], row], document));
     stats.multiColumn += 1;
@@ -882,10 +1125,17 @@ export default function parse(element, { document }) {
   // it (the body section's own `body-column` metadata comes from skoda-model-sections);
   // if nothing precedes it, the importer's dropEmptySections() removes that empty section.
   let resume = false; // a highlight section was closed and the body hasn't resumed yet
+  // spacer-only rows after a highlight wait for the body to resume (with nothing after them,
+  // or a highlight next, they would only open an empty-looking section, so they go)
+  let held = [];
+  const isSpacer = (n) => n.tagName === 'TABLE'
+    && /^spacer(\s*\(line\))?$/i.test(((n.querySelector('tr > th, tr > td') || {}).textContent || '').trim());
   grids.forEach((grid) => {
     const variant = grid.getAttribute(HIGHLIGHT_ATTR);
     const row = gridRow(grid, document, stats);
     if (!row.length) return;
+    if (resume && !variant && row.every(isSpacer)) { held.push(...row); return; }
+    if (variant) held = [];
     if (variant) {
       const geometry = GEOMETRY_KEYS.filter((key) => grid.hasAttribute(`data-${key}`))
         .map((key) => [key, grid.getAttribute(`data-${key}`)]);
@@ -896,7 +1146,8 @@ export default function parse(element, { document }) {
     }
     if (resume) out.push(document.createElement('hr'), sectionMetadata(BODY_STYLE, document));
     resume = false;
-    out.push(...row);
+    out.push(...held, ...splitTextRuns(row, document));
+    held = [];
   });
   if (resume && hasContentAfter(layout, element)) {
     out.push(document.createElement('hr'), sectionMetadata(BODY_STYLE, document));

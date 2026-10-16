@@ -19,7 +19,7 @@
 import storyHeroParser from './parsers/story-hero.js';
 import storyFlattenParser, {
   markHighlights, markCellWidths, markBoldHeadings, restoreBoldHeadings, dropEmptySections,
-  markCentredImages, applyCentredImages,
+  markCentredImages, applyCentredImages, markTextStyles,
 } from './parsers/story-flatten.js';
 import downloadsParser from './parsers/downloads.js';
 import mediaParser from './parsers/press-kit-media.js';
@@ -143,6 +143,8 @@ export default {
     markHighlights(document);
     markCellWidths(document);
     markCentredImages(document);
+    // the editor text's centred paragraphs, 10–18pt runs and boxes (DA keeps none of them)
+    markTextStyles(document);
     // the source's drop cap and its inline colours (DA keeps neither)
     markDropCap(document);
     // #296: the body's 10pt small print (Epiq "¹ Available at a later date.") → Footnotes, as on

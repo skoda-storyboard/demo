@@ -142,7 +142,7 @@ test('sow-editor rich text flattens to default content, builder stripped', { ski
 });
 
 // ---- spacer dropped --------------------------------------------------------
-test('skoda-offset spacer is dropped', { skip: domSkip }, () => {
+test('skoda-offset spacer → a Spacer block with its height (1em = 24px at the widget\'s 24px font)', { skip: domSkip }, () => {
   const d = domDoc(`
     <div class="entry-content"><div class="panel-layout">
       <div class="panel-grid"><div class="panel-grid-cell">
@@ -151,7 +151,9 @@ test('skoda-offset spacer is dropped', { skip: domSkip }, () => {
     </div></div>`);
   const content = d.querySelector('.entry-content');
   parse(content, { document: d });
-  assert.equal(content.textContent.trim(), '', 'offset produced no output');
+  const table = content.querySelector('table');
+  assert.equal(table?.dataset.block, 'Spacer');
+  assert.equal(table.querySelector('tr:nth-child(2) td').textContent, '24px');
 });
 
 // ---- carousel routed BY CONTENT: link-free images → Gallery (slider) --------
@@ -706,7 +708,7 @@ test('parse: an unequal row with an authored portrait → Columns (split-62, por
   const content = d.querySelector('.entry-content');
   parse(content, { document: d });
   const table = content.querySelector('table');
-  assert.equal(table.dataset.block, 'Columns (split-62, portrait-235)');
+  assert.equal(table.dataset.block, 'Columns (split-62, portrait-235, offset-0-24)', 'the portrait cell\'s leading 1em spacer as offset-0-24');
   const cells = table.querySelectorAll('tr:nth-child(2) > td');
   assert.equal(cells.length, 2, 'normal columns row, one cell per source cell');
   assert.ok(cells[1].querySelector('img[src="kelly.png"]'), 'portrait kept');
@@ -721,17 +723,17 @@ test('parse: an unequal row whose image fills its cell → Columns (split-75), n
   markCellWidths(d);
   const content = d.querySelector('.entry-content');
   parse(content, { document: d });
-  assert.equal(content.querySelector('table').dataset.block, 'Columns (split-75)');
+  assert.equal(content.querySelector('table').dataset.block, 'Columns (split-75, offset-0-24)');
 });
 
 test('parse: equal or unmeasured rows stay plain Columns', { skip: domSkip }, () => {
   const equal = splitStory({ css: '#pgc-1-2-0{ width:50% } #pgc-1-2-1{ width:50% }', portrait: PORTRAIT_235 });
   markCellWidths(equal);
   parse(equal.querySelector('.entry-content'), { document: equal });
-  assert.equal(equal.querySelector('table').dataset.block, 'Columns');
+  assert.equal(equal.querySelector('table').dataset.block, 'Columns (offset-0-24)', 'no split / centred token; the spacer offset stays');
   const none = splitStory({ css: '', portrait: PORTRAIT_235 });
   parse(none.querySelector('.entry-content'), { document: none });
-  assert.equal(none.querySelector('table').dataset.block, 'Columns', 'without markCellWidths');
+  assert.equal(none.querySelector('table').dataset.block, 'Columns (offset-0-24)', 'without markCellWidths');
 });
 
 // ---- centred images (the source's aligncenter: Columns (centered), centered-images) ----------
@@ -952,4 +954,127 @@ test('a line break closing a bold run moves after it (Miss Peaches "instagram:<b
   const content = d.querySelector('.entry-content');
   parse(content, { document: d });
   assert.equal(content.querySelector('p').innerHTML, '<strong>instagram:</strong><br><a href="https://www.instagram.com/x/">@x</a><br>followers');
+});
+
+// --- the editor text's inline styles (#516 PO: centred captions, 10pt text, the 4×4 box) ------
+const { markTextStyles, splitTextRuns } = await import('./story-flatten.js');
+
+// a one-cell body row holding the given editor html (no Columns), with the cell widths marked
+const textStory = (html) => domDoc(`<html><head><style></style></head><body><div class="entry-content"><div class="panel-layout">
+  <div id="pg-9-0" class="panel-grid panel-no-style"><div id="pgc-9-0-0" class="panel-grid-cell"><div class="so-panel widget widget_sow-editor"><div class="so-widget-sow-editor">
+  <div class="siteorigin-widget-tinymce textwidget">${html}</div></div></div></div></div></div></div></body></html>`);
+const sections = (main) => {
+  // the body as [style, text …] per section, split at the top-level <hr>s
+  const out = [{ style: '(first)', text: [] }];
+  [...main.querySelectorAll('.entry-content > *')].forEach((n) => {
+    if (n.tagName === 'HR') { out.push({ style: '', text: [] }); return; }
+    if (n.tagName === 'TABLE' && n.dataset.block === 'Section Metadata') { out[out.length - 1].style = n.querySelectorAll('tr')[1].children[1].textContent; return; }
+    out[out.length - 1].text.push(n.tagName === 'TABLE' ? `[${n.dataset.block}]` : n.textContent.trim().slice(0, 12));
+  });
+  return out.filter((s) => s.text.length).map((s) => `${s.style}: ${s.text.join(' | ')}`);
+};
+const importText = (html) => {
+  const d = textStory(html);
+  markCellWidths(d); markCentredImages(d); markTextStyles(d);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  applyCentredImages(d.body);
+  return d;
+};
+
+test('markTextStyles: centred, a uniform 10 / 14 / 16 / 18pt size, a box; mixed sizes give none', { skip: domSkip }, () => {
+  const d = textStory(`<p id="a" style="text-align: center;"><img class="aligncenter" src="a.jpg" width="800"><br><span style="font-size: 10pt;">Caption</span></p>
+    <p id="b"><span style="font-size: 16pt;"><strong>Big</strong> title</span></p>
+    <p id="c">Plain <span style="font-size: 10pt;">and small</span></p>
+    <div id="d" style="text-align: center; padding: 50px; background: #cccccc;"><span style="font-size: 14pt; color: #000000;">Box</span></div>
+    <p id="e" style="text-align: left;">Left</p>`);
+  assert.equal(markTextStyles(d), 3);
+  const marks = ['a', 'b', 'c', 'd', 'e'].map((id) => d.getElementById(id).getAttribute('data-skoda-text'));
+  assert.deepEqual(marks, ['center text-small', 'text-large', null, 'center text-medium box', null]);
+  assert.deepEqual(JSON.parse(d.getElementById('d').getAttribute('data-skoda-box')), {
+    background: '#cccccc', padding: '50px', shadow: '', color: '#000000',
+  });
+});
+
+test('a run of centred / small paragraphs is its own body section; the body resumes after it', { skip: domSkip }, () => {
+  const d = importText(`<p>Intro text</p>
+    <p style="text-align: center;"><img class="aligncenter" src="a.jpg" width="800"><br><span style="font-size: 10pt;">First caption</span></p>
+    <p style="text-align: center;"><img class="aligncenter" src="b.jpg" width="800"><br><span style="font-size: 10pt;">Second caption</span></p>
+    <p style="text-align: center;"><strong>A centred quote</strong></p>
+    <p>More text</p>`);
+  assert.deepEqual(sections(d), [
+    '(first): Intro text',
+    'body-column, text-center, text-small, centered-images: First captio | Second capti',
+    'body-column, text-center, centered-images: A centred qu',
+    'body-column, centered-images: More text',
+  ], 'every body section also centres its narrower photos (centered-images)');
+  assert.equal(d.querySelector('[data-skoda-text], [data-skoda-box]'), null, 'no marks in the output');
+});
+
+test('a padded box: its own section, `text-box` with its rows; its inline content as a paragraph', { skip: domSkip }, () => {
+  const d = importText(`<p>Before</p><div style="text-align: center; padding: 50px; background: #cccccc;"><span style="font-size: 14pt;"><strong>Press releases are in the <a href="https://x.test/kit">press kit</a>.</strong></span><br><img class="aligncenter" src="kit.jpg" width="2000"></div>`);
+  const meta = [...d.querySelectorAll('table')].find((t) => /text-box/.test(t.textContent));
+  const rows = [...meta.querySelectorAll('tr')].slice(1).map((tr) => [...tr.children].map((td) => td.textContent));
+  assert.deepEqual(rows, [['style', 'body-column, text-center, text-medium, text-box'], ['box-background', '#cccccc'], ['box-padding', '50px']]);
+  const p = meta.previousElementSibling;
+  assert.equal(p.tagName, 'P');
+  assert.ok(p.querySelector('a[href="https://x.test/kit"]') && p.querySelector('img'), 'the text, its link and the image');
+});
+
+test('a body caption figure shown narrower than its file → a one-card Columns (centered, portrait-NNN, captioned)', { skip: domSkip }, () => {
+  const d = importText(`<p>Text</p><figure style="width: 200px" class="wp-caption aligncenter"><img src="a-384x384.png" width="200" height="200" srcset="a-384x384.png 384w, a-150.png 150w"><figcaption class="wp-caption-text"><strong>Alžběta Šťastná</strong><p>Spokesperson</p></figcaption></figure>`);
+  const table = [...d.querySelectorAll('table')].find((t) => /^Columns/.test(t.dataset.block));
+  assert.equal(table?.dataset.block, 'Columns (centered, portrait-200, captioned)');
+  assert.match(table.textContent, /Alžběta Šťastná/);
+  // a file-size figure stays as it is
+  const plain = importText('<figure class="wp-caption aligncenter"><img src="b.png" width="384" srcset="b.png 384w"><figcaption>Name</figcaption></figure>');
+  assert.equal([...plain.querySelectorAll('table')].some((t) => /^Columns/.test(t.dataset.block)), false);
+});
+
+test('centredVariants: a centred row whose text is centred too gets text-center', { skip: domSkip }, () => {
+  const d = profileStory({ portrait: 300 });
+  d.querySelectorAll('#pg-1-4 .textwidget > p').forEach((p) => p.setAttribute('style', 'text-align: center;'));
+  markCellWidths(d); markCentredImages(d); markTextStyles(d);
+  assert.deepEqual(centredVariants([...d.querySelectorAll('#pg-1-4 .panel-grid-cell')]), ['centered', 'portrait-300', 'captioned', 'text-center']);
+  const left = profileStory({ portrait: 300 });
+  left.querySelectorAll('#pg-1-4 .textwidget > p[style]').forEach((p) => p.removeAttribute('style'));
+  markCellWidths(left); markCentredImages(left); markTextStyles(left);
+  assert.deepEqual(centredVariants([...left.querySelectorAll('#pg-1-4 .panel-grid-cell')]), ['centered', 'portrait-300', 'captioned'], 'left text: no token');
+});
+
+test('splitTextRuns leaves unstyled nodes as they are', { skip: domSkip }, () => {
+  const d = domDoc('<div><p>a</p><h2>b</h2></div>');
+  const nodes = [...d.querySelector('div').children];
+  assert.deepEqual(splitTextRuns(nodes, d), nodes);
+});
+
+// --- blank lines and panel colours (#516 PO) -----------------------------------------------
+test('a blank editor line → Spacer (line) 44px in the body; leading a row cell it adds to the offset', { skip: domSkip }, () => {
+  const d = importText('<p>Before</p><p>&nbsp;</p><p>After</p>');
+  const table = [...d.querySelectorAll('table')].find((t) => t.dataset.block.startsWith('Spacer'));
+  assert.equal(table?.dataset.block, 'Spacer (line)');
+  assert.equal(table.querySelector('tr:nth-child(2) td').textContent, '44px');
+  const row = splitStory({
+    css: '#pgc-1-2-0{ width:61.8% } #pgc-1-2-1{ width:38.2% }',
+    portrait: PORTRAIT_235,
+  });
+  row.querySelector('#pgc-1-2-0 .textwidget').insertAdjacentHTML('afterbegin', '<p>&nbsp;</p><p>&nbsp;</p>');
+  markCellWidths(row);
+  parse(row.querySelector('.entry-content'), { document: row });
+  assert.equal(row.querySelector('table').dataset.block, 'Columns (split-62, portrait-235, offset-88-24)', 'two blank lines: 88px');
+});
+
+test('markHighlights: a panel\'s own colours as rows; the default dark panel needs none', { skip: domSkip }, () => {
+  const d = storyDoc('#pg-7-1> .panel-row-style { background-color:#1ed4df } #pg-7-2> .panel-row-style { background-color:#0e3a2f }', [
+    editorRow('pg-7-1', '<p><span style="color: #333333;">Dip or swim?</span> <a style="color: #333333;" href="/x">partner</a></p>'),
+    editorRow('pg-7-2', '<p>White text</p>'),
+  ]);
+  markHighlights(d);
+  const g1 = d.getElementById('pg-7-1'); const g2 = d.getElementById('pg-7-2');
+  assert.equal(g1.getAttribute('data-highlight'), 'grey');
+  assert.equal(g1.getAttribute('data-highlight-background'), '#1ed4df');
+  assert.equal(g1.getAttribute('data-highlight-color'), '#333333');
+  assert.equal(g1.getAttribute('data-highlight-link'), '#333333');
+  assert.equal(g2.getAttribute('data-highlight'), 'dark');
+  ['background', 'color', 'link'].forEach((k) => assert.equal(g2.hasAttribute(`data-highlight-${k}`), false, k));
 });

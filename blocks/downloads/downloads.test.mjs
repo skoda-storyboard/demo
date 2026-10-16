@@ -1004,3 +1004,28 @@ test('lightboxItem: the original drives download, link and cart; a clip shows it
   assert.equal(clip.download, 'https://dam.example/c.mp4');
   assert.equal(clip.caption.querySelector('a'), null, 'no related article without a page title');
 });
+
+// --- "Show more" / "Show less" slide (#516 PO: smooth as the source's togglebox) ---------------
+test('slideList: animates height and max-height from the old to the new height, 400ms swing', async () => {
+  const { slideList } = await import('./downloads.js');
+  const list = document.createElement('ul');
+  const heights = [639];
+  list.getBoundingClientRect = () => ({ height: heights[0] });
+  let call = null;
+  list.animate = (frames, opts) => { call = { frames, opts }; return { finished: Promise.resolve() }; };
+  slideList(list, 383);
+  assert.deepEqual(call.frames, [
+    { height: '383px', maxHeight: '383px', overflow: 'hidden' },
+    { height: '639px', maxHeight: '639px', overflow: 'hidden' },
+  ]);
+  assert.equal(call.opts.duration, 400);
+  assert.equal(call.opts.easing, 'cubic-bezier(0.37, 0, 0.63, 1)');
+  call = null;
+  slideList(list, 639);
+  assert.equal(call, null, 'no change: no animation');
+  const saved = window.matchMedia;
+  window.matchMedia = (q) => ({ matches: q.includes('reduce'), addEventListener() {} });
+  slideList(list, 100);
+  assert.equal(call, null, 'reduced motion: none');
+  window.matchMedia = saved;
+});

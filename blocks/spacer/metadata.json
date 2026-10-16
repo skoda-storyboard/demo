@@ -1,0 +1,19 @@
+{
+  "variantName": "spacer",
+  "baseBlock": "spacer",
+  "version": "1.0.0",
+  "created": "2026-10-16T12:00:00.000Z",
+  "name": "Spacer",
+  "description": "A vertical gap between parts of a story: one cell with its height in px (e.g. 24px). Shown from 720px wide, none on phones.",
+  "visualCharacteristics": {
+    "purpose": "authored vertical gap"
+  },
+  "contentPattern": {
+    "structure": "single cell height"
+  },
+  "usage": {
+    "pagesUsing": [],
+    "reuseCount": 0,
+    "lastUsed": "2026-10-16T12:00:00.000Z"
+  }
+}

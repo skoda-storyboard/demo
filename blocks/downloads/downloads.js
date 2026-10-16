@@ -717,6 +717,26 @@ function wireLightbox(entries) {
   });
 }
 
+// "Show more" / "Show less" slide the list to its new height as the source's togglebox does
+// (jQuery's default 400ms "swing", measured on the live 4×4 story: 383 → 639px and 805 → 2107px
+// over ~400ms). max-height is animated too, so a collapse runs before the clip applies.
+const SLIDE_MS = 400;
+const SLIDE_EASING = 'cubic-bezier(0.37, 0, 0.63, 1)'; // jQuery swing
+
+/**
+ * @param {HTMLElement} list the tile list, already in its new state
+ * @param {number} from its height before the change
+ */
+export function slideList(list, from) {
+  const to = list.getBoundingClientRect().height;
+  if (!list.animate || Math.abs(to - from) < 1
+    || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return null;
+  return list.animate([
+    { height: `${from}px`, maxHeight: `${from}px`, overflow: 'hidden' },
+    { height: `${to}px`, maxHeight: `${to}px`, overflow: 'hidden' },
+  ], { duration: SLIDE_MS, easing: SLIDE_EASING });
+}
+
 /**
  * @param {Element} block the downloads block element
  */
@@ -849,8 +869,13 @@ export default async function decorate(block) {
       syncLabel();
     };
     toggle.addEventListener('click', () => {
+      const blockFrom = block.getBoundingClientRect().height;
       const expanded = block.classList.toggle('downloads-expanded');
       syncVisibility();
+      // the list starts where the whole group keeps its old height: the "Show more" bar moves
+      // under the list (or back over it) at once, and the list's slide takes that up
+      const blockTo = block.getBoundingClientRect().height;
+      slideList(list, list.getBoundingClientRect().height - (blockTo - blockFrom));
       // collapsing pulls the toggle (and its focus) up past the clipped rows: keep it in view
       if (!expanded) toggle.scrollIntoView?.({ block: 'nearest' });
     });
