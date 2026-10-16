@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-15",
+  "generated": "2026-10-16",
   "feed": "/en/media-feed.json",
   "items": [
     {
@@ -6681,11 +6681,32 @@
       "source": "https://www.skoda-storyboard.com/?attachment_id=445988"
     },
     {
+      "id": "446003",
+      "template": "video",
+      "title": "Škoda Peaq Sportline | Footage II",
+      "date": "2026-06-23",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=446003"
+    },
+    {
+      "id": "445991",
+      "template": "video",
+      "title": "Škoda Peaq Sportline | Footage I",
+      "date": "2026-06-23",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=445991"
+    },
+    {
       "id": "446042",
       "template": "image",
       "title": "World premiere of the all-new Škoda Peaq: livestream from Monnetier-Mornex, France",
       "date": "2026-06-22",
       "source": "https://www.skoda-storyboard.com/?attachment_id=446042"
+    },
+    {
+      "id": "446051",
+      "template": "video",
+      "title": "World premiere of the all-new Škoda Peaq: livestream from France",
+      "date": "2026-06-22",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=446051"
     },
     {
       "id": "445615",
@@ -6835,6 +6856,13 @@
       "source": "https://www.skoda-storyboard.com/?attachment_id=445524"
     },
     {
+      "id": "445565",
+      "template": "video",
+      "title": "Škoda Auto appoints world-renowned road cyclist Chris Froome as Brand Cycling Ambassador",
+      "date": "2026-06-17",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=445565"
+    },
+    {
       "id": "445457",
       "template": "image",
       "title": "Meet Peaq: safe and comfortable",
@@ -6910,6 +6938,13 @@
       "title": "Škoda Peaq: Comprehensive testing in extreme conditions",
       "date": "2026-06-15",
       "source": "https://www.skoda-storyboard.com/?attachment_id=445431"
+    },
+    {
+      "id": "445414",
+      "template": "video",
+      "title": "Škoda Peaq: Comprehensive testing in extreme conditions",
+      "date": "2026-06-15",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=445414"
     },
     {
       "id": "445258",
@@ -7211,6 +7246,20 @@
       "title": "A True Czech from Spain",
       "date": "2026-06-08",
       "source": "https://www.skoda-storyboard.com/en/emobility/a-true-czech-from-spain/attachment/skoda-epiq-vyroba-3/"
+    },
+    {
+      "id": "445076",
+      "template": "video",
+      "title": "Video: Production of the all-electric entry-level Škoda Epiq SUV begins in Pamplona, Spain",
+      "date": "2026-06-08",
+      "source": "https://www.skoda-storyboard.com/en/production_of_the_all-electric_entry-level_skoda_epiq_suv_begins_in_pamplona_spain-1080p-1_5dd86313/"
+    },
+    {
+      "id": "445072",
+      "template": "video",
+      "title": "Video: Production of the all-electric entry-level Škoda Epiq SUV begins in Pamplona, Spain",
+      "date": "2026-06-08",
+      "source": "https://www.skoda-storyboard.com/en/production_of_the_all-electric_entry-level_skoda_epiq_suv_begins_in_pamplona_spain-1080p_a78bbd65/"
     },
     {
       "id": "444850",
@@ -8032,6 +8081,13 @@
       "source": "https://www.skoda-storyboard.com/?attachment_id=441152"
     },
     {
+      "id": "441370",
+      "template": "video",
+      "title": "Škoda Auto celebrates 33 years as Official Main Sponsor of the IIHF Ice Hockey World Championship and unveils the Epiq",
+      "date": "2026-05-14",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=441370"
+    },
+    {
       "id": "440489",
       "template": "image",
       "title": "The evolution of hockey gear alongside automobiles",
@@ -8303,6 +8359,20 @@
       "title": "World premiere of the all-new Škoda Epiq: livestream from Zurich",
       "date": "2026-05-11",
       "source": "https://www.skoda-storyboard.com/en/260511_world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich_90cd8504/"
+    },
+    {
+      "id": "440278",
+      "template": "video",
+      "title": "World premiere of the all-new Škoda Epiq: livestream from Zurich",
+      "date": "2026-05-11",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=440278"
+    },
+    {
+      "id": "440210",
+      "template": "video",
+      "title": "Anniversary – 125 Years of Škoda Motorsport",
+      "date": "2026-05-09",
+      "source": "https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/attachment/anniversary_125_years_2026_4k_1-13_clean_cf3be498/"
     },
     {
       "id": "439933",
@@ -9684,6 +9754,27 @@
       "source": "https://www.skoda-storyboard.com/?attachment_id=434352"
     },
     {
+      "id": "434407",
+      "template": "video",
+      "title": "Video | Škoda Kodiaq RS",
+      "date": "2026-02-24",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=434407"
+    },
+    {
+      "id": "434409",
+      "template": "video",
+      "title": "Video | Škoda Enyaq",
+      "date": "2026-02-24",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=434409"
+    },
+    {
+      "id": "434412",
+      "template": "video",
+      "title": "Video | Škoda Enyaq RS",
+      "date": "2026-02-24",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=434412"
+    },
+    {
       "id": "434413",
       "template": "video",
       "title": "Video | Škoda Elroq",
@@ -9698,18 +9789,25 @@
       "source": "https://www.skoda-storyboard.com/?attachment_id=434415"
     },
     {
-      "id": "434412",
+      "id": "434416",
       "template": "video",
-      "title": "Video | Škoda Enyaq RS",
+      "title": "Video | Škoda Superb Combi",
       "date": "2026-02-24",
-      "source": "https://www.skoda-storyboard.com/?attachment_id=434412"
+      "source": "https://www.skoda-storyboard.com/?attachment_id=434416"
     },
     {
-      "id": "434407",
+      "id": "434417",
       "template": "video",
-      "title": "Video | Škoda Kodiaq RS",
+      "title": "Video | Škoda Octavia Combi",
       "date": "2026-02-24",
-      "source": "https://www.skoda-storyboard.com/?attachment_id=434407"
+      "source": "https://www.skoda-storyboard.com/?attachment_id=434417"
+    },
+    {
+      "id": "434418",
+      "template": "video",
+      "title": "Video | Škoda Kodiaq",
+      "date": "2026-02-24",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=434418"
     },
     {
       "id": "434254",
@@ -9922,6 +10020,13 @@
       "source": "https://www.skoda-storyboard.com/en/models/superb/a-journey-you-will-never-forget-the-monumental-route-napoleon/attachment/dsc_3433_9eac2841/"
     },
     {
+      "id": "429384",
+      "template": "video",
+      "title": "Video | Škoda Fabia 130",
+      "date": "2025-12-01",
+      "source": "https://www.skoda-storyboard.com/en/driving-experience-fabia-130/attachment/skoda_valencie_fabia130_5821259d/"
+    },
+    {
       "id": "427917",
       "template": "image",
       "title": "Škoda Elroq hits 100,000 units within just one year of production",
@@ -10025,6 +10130,20 @@
       "title": "Faster and more exciting: The new Škoda Fabia 130 thrives in corners",
       "date": "2025-10-07",
       "source": "https://www.skoda-storyboard.com/?attachment_id=423380"
+    },
+    {
+      "id": "423360",
+      "template": "video",
+      "title": "Škoda Fabia 130: Special edition celebrates Škoda Auto’s anniversary and motorsport heritage",
+      "date": "2025-10-07",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=423360"
+    },
+    {
+      "id": "423354",
+      "template": "video",
+      "title": "Škoda Fabia 130: Special edition celebrates Škoda Auto’s anniversary and motorsport heritage",
+      "date": "2025-10-07",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=423354"
     },
     {
       "id": "421635",
@@ -11054,6 +11173,13 @@
       "title": "Sea views alternate with mountain ranges.",
       "date": "2025-03-06",
       "source": "https://www.skoda-storyboard.com/en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca/attachment/dsc_8793_9c00824d/"
+    },
+    {
+      "id": "399192",
+      "template": "video",
+      "title": "Video | Celebrating 50 years of the Škoda 130 RS: A legendary coupé that defined an era",
+      "date": "2025-03-04",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=399192"
     },
     {
       "id": "399051",
@@ -12951,6 +13077,13 @@
       "title": "When driving fun meets comfort: Rally ace Oliver Solberg tests the Škoda Octavia RS",
       "date": "2024-07-04",
       "source": "https://www.skoda-storyboard.com/?attachment_id=376046"
+    },
+    {
+      "id": "374699",
+      "template": "video",
+      "title": "Video | Škoda’s voice assistant Laura now enhanced with ChatGPT capabilities",
+      "date": "2024-06-26",
+      "source": "https://www.skoda-storyboard.com/en/press-releases/skodas-voice-assistant-laura-now-enhanced-with-chatgpt-capabilities/attachment/skoda_auto_enhances_user_experience_by_integrating_chatgpt_into_its_vehicles-1080p_1c5c05d9/"
     },
     {
       "id": "374645",
@@ -15760,6 +15893,13 @@
       "source": "https://www.skoda-storyboard.com/en/models/the-new-skoda-kodiaq-will-get-you-in-60-seconds/attachment/dsc_2388-copy/"
     },
     {
+      "id": "219997",
+      "template": "video",
+      "title": "Concept car ŠKODA RE-X1 Kreisel (Copyright Harald Illmer)",
+      "date": "2021-07-01",
+      "source": "https://www.skoda-storyboard.com/en/scd2021/videos/attachment/kreisel-re-x1/"
+    },
+    {
       "id": "216579",
       "template": "video",
       "title": "ŠKODA KODIAQ FAMILY - TEASER",
@@ -15884,6 +16024,13 @@
       "title": "OVER A HUNDRED YEARS OF eMOBILITY",
       "date": "2021-06-03",
       "source": "https://www.skoda-storyboard.com/en/emobility/over-a-hundred-years-of-emobility/attachment/745_21_skoda_header_kolaz_enyaq_iii/"
+    },
+    {
+      "id": "213646",
+      "template": "video",
+      "title": "Video: Škoda Popular Sport (1936)",
+      "date": "2021-05-31",
+      "source": "https://www.skoda-storyboard.com/?attachment_id=213646"
     },
     {
       "id": "213606",
@@ -16621,6 +16768,13 @@
       "source": "https://www.skoda-storyboard.com/en/skoda-world/heritage/how-the-popular-avoided-an-elephant-at-the-monte-carlo-rally/attachment/741_20_skoda__skoda_vyroci_1936-1/"
     },
     {
+      "id": "189296",
+      "template": "video",
+      "title": "ŠKODA Motorsport at Rallye Monte-Carlo",
+      "date": "2021-01-24",
+      "source": "https://www.skoda-storyboard.com/en/press-releases/rallye-monte-carlo-skoda-motorsport-supported-andreas-mikkelsen-wins-wrc2/attachment/monte_2021_h264_20mb/"
+    },
+    {
       "id": "188172",
       "template": "image",
       "title": "OCTAVIA iV FIRST-HAND EXPERIENCE: I DROVE BETTER THAN USUAL",
@@ -16640,6 +16794,13 @@
       "title": "ŠKODA ENYAQ iV and OCTAVIA on the same line",
       "date": "2020-12-10",
       "source": "https://www.skoda-storyboard.com/en/skoda-world/innovation-and-technology/skoda-enyaq-iv-and-octavia-on-the-same-line/attachment/752_20_header_mqb_meb_2000x760_i-1/"
+    },
+    {
+      "id": "184821",
+      "template": "video",
+      "title": "ŠKODA Motorsport at ACI Rally Monza",
+      "date": "2020-12-06",
+      "source": "https://www.skoda-storyboard.com/en/press-releases/aci-rally-monza-skoda-ends-2020-world-championship-season-with-wrc3-double-victory/attachment/rally_monza_2020/"
     },
     {
       "id": "182858",
@@ -16710,6 +16871,62 @@
       "title": "ŠKODA OCTAVIA iV / RS iV / e-TEC / G-TEC | Driving footage teaser",
       "date": "2020-09-14",
       "source": "https://www.skoda-storyboard.com/en/koda-octavia-footage-teaser/"
+    },
+    {
+      "id": "167222",
+      "template": "video",
+      "title": "10-SKODA-110-R",
+      "date": "2020-08-05",
+      "source": "https://www.skoda-storyboard.com/en/press-releases/skoda-110-r-1970-1980-elegant-coupe-and-basis-for-many-sporting-successes/attachment/10-skoda-110-r/"
+    },
+    {
+      "id": "167221",
+      "template": "video",
+      "title": "09-TREKKA",
+      "date": "2020-08-05",
+      "source": "https://www.skoda-storyboard.com/en/press-releases/skoda-trekka-1966-1972-tailor-made-for-customers-in-faraway-markets/attachment/09-trekka-2/"
+    },
+    {
+      "id": "167220",
+      "template": "video",
+      "title": "08-SKODA-1000-MB",
+      "date": "2020-08-05",
+      "source": "https://www.skoda-storyboard.com/en/press-releases/skoda-1000-mb-1964-1969-the-revolutionary-change-of-concept/attachment/08-skoda-1000-mb/"
+    },
+    {
+      "id": "167219",
+      "template": "video",
+      "title": "07-SKODA-FELICIA",
+      "date": "2020-08-05",
+      "source": "https://www.skoda-storyboard.com/en/press-releases/skoda-felicia-1959-1964-the-convertible-with-the-rhythm-of-the-1960s/attachment/07-skoda-felicia-4/"
+    },
+    {
+      "id": "167218",
+      "template": "video",
+      "title": "06-SUPERB-3000-OHV",
+      "date": "2020-08-05",
+      "source": "https://www.skoda-storyboard.com/en/06-superb-3000-ohv/"
+    },
+    {
+      "id": "167217",
+      "template": "video",
+      "title": "05-POPULAR-MONTE-CARLO",
+      "date": "2020-08-05",
+      "source": "https://www.skoda-storyboard.com/en/press-releases/skoda-popular-monte-carlo-1936-1939-the-elegant-model-with-rally-dna/attachment/05-popular-monte-carlo/"
+    },
+    {
+      "id": "167215",
+      "template": "video",
+      "title": "03-LK-Voiturette-A-1905",
+      "date": "2020-08-05",
+      "source": "https://www.skoda-storyboard.com/en/press-releases/lk-voiturette-a-1905-1907-the-first-automobile-made-in-mlada-boleslav/attachment/03-lk-voiturette-a-1905/"
+    },
+    {
+      "id": "167214",
+      "template": "video",
+      "title": "02-MOTORCYCLE-LK-B",
+      "date": "2020-08-05",
+      "source": "https://www.skoda-storyboard.com/en/02-motorcycle-lk-b/"
     },
     {
       "id": "164907",

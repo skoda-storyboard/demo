@@ -12,10 +12,11 @@ const { window } = new JSDOM('<main></main>');
 const { document } = window;
 const { readDropCapRow, decorateDropCap } = await import('./drop-cap.js');
 
+// a decorated section: its own text in a default-content-wrapper, as decorateSections leaves it
 const section = (html, classes = 'section body-column drop-cap') => {
   const el = document.createElement('div');
   el.className = classes;
-  el.innerHTML = html;
+  el.innerHTML = html.startsWith('<div') ? html : `<div class="default-content-wrapper">${html}</div>`;
   document.querySelector('main').replaceChildren(el);
   return el;
 };
@@ -63,7 +64,29 @@ test('malformed rows are ignored: the CSS defaults stay; letters that do not ope
 test('no drop-cap class, or no text: nothing changes', () => {
   const plain = section('<p>Sitting</p>', 'section body-column');
   assert.equal(decorateDropCap(plain), null);
-  assert.equal(plain.innerHTML, '<p>Sitting</p>');
+  assert.equal(plain.innerHTML, '<div class="default-content-wrapper"><p>Sitting</p></div>');
   const empty = section('<p><picture><img src="a.jpg" alt=""></picture></p>');
   assert.equal(decorateDropCap(empty), null);
+});
+
+test('a colour word the browser does not know is ignored, so the default colours stay', () => {
+  const saved = globalThis.CSS;
+  globalThis.CSS = { supports: (property, value) => property === 'color' && ['black', '#fff'].includes(value) };
+  try {
+    const el = section('<p>Sitting</p>');
+    readDropCapRow(el, 'drop-cap-color', 'abc');
+    readDropCapRow(el, 'drop-cap-background', 'black');
+    decorateDropCap(el);
+    assert.equal(el.style.getPropertyValue('--drop-cap-color'), '', 'abc is not a colour');
+    assert.equal(el.style.getPropertyValue('--drop-cap-background'), 'black');
+  } finally {
+    globalThis.CSS = saved;
+  }
+});
+
+test('a section opening with a block: the cap goes on its own text, never into a block cell', () => {
+  const el = section('<div class="columns-wrapper"><div class="columns"><div><div><p>Cell text</p></div></div></div></div><div class="default-content-wrapper"><p>Body text</p></div>');
+  decorateDropCap(el);
+  assert.equal(el.querySelector('.columns .drop-cap-letter'), null);
+  assert.equal(el.querySelector('.default-content-wrapper .drop-cap-letter').textContent, 'B');
 });

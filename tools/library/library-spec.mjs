@@ -43,6 +43,8 @@ export const SPEC = {
     variants: [
       { class: 'split-62 portrait-235', label: 'split-62, portrait-235', description: 'Unequal story row: the first cell takes 62% (split-NN = NN%); portrait-NNN is the display width in px of a portrait image in the other cell. Values are read from the class, so use the exact form split-NN / portrait-NNN.' },
       { class: 'centered portrait-300 captioned', label: 'centered, portrait-300, captioned', description: "Equal story row of centred image cards (rider profiles): each image cell centred, its images at their own size. Optional: portrait-NNN, the display width in px of each card's first image; captioned, the paragraphs after that image are its caption (directly under it, light)." },
+      { class: 'centered text-center text-small', label: 'centered, text-center, text-small', description: 'Add to a centred story row: text-center centres the caption text, text-small sets it in 10pt.' },
+      { class: 'offset-48-24', label: 'offset-48-24', description: 'Story row whose cells start lower, from 720px wide: one number per cell, in px, in cell order (offset-48-24: the first cell 48px down, the second 24px). Use 0 for a cell that stays at the top.' },
       { class: 'banners', label: 'banners', description: 'Press kit: a row of linked banner images at their authored size (PDF download / share buttons).' },
       { class: 'callout', label: 'callout', description: 'Press kit: [icon, text], a small 50px icon beside its text (the WhatsApp callout).' },
       { class: 'stats', label: 'stats', description: 'Model page technical data: each cell is a key figure, the value in bold and its label below.' },
@@ -69,8 +71,10 @@ export const SPEC = {
   spacer: {
     structure: 'single cell height',
     purpose: 'authored vertical gap',
-    description: 'A vertical gap between parts of a story: one cell with its height in px (e.g. 24px). Shown from 720px wide, none on phones.',
-    variants: [],
+    description: 'A vertical gap between parts of a story: one cell with its height in px (e.g. 24px), up to 999px. Shown from 720px wide, none on phones. A missing or malformed height takes no space.',
+    variants: [
+      { class: 'line', label: 'line', description: 'A blank line in the text (44px: one line and its paragraph gap), shown at every width.' },
+    ],
   },
   footnotes: {
     structure: 'single cell text',
@@ -179,6 +183,10 @@ export const SECTION_STYLES = [
   ['body-column, highlight-grey', 'Grey highlight box inside a press release (FAQ callout).'],
   ['body-column, centered-images', 'Story article column whose narrower images sit centred (the source centres them).'],
   ['body-column, drop-cap', 'Story article column opening with a drop cap; optional rows drop-cap-text, drop-cap-color, drop-cap-background, drop-cap-margin-bottom.'],
+  ['body-column, text-center', 'A run of centred story text (the paragraphs between two section breaks).'],
+  ['body-column, text-small', 'A run of story text in 10pt; text-medium is 14pt, text-large 16pt, text-xlarge 18pt. Combine with text-center.'],
+  ['body-column, text-box', 'Story text in a padded, coloured box; optional rows box-background (colour), box-padding (1–4 px values), box-color (text colour), box-shadow (e.g. 0px 2px 6px #999999).'],
+  ['body-column, highlight-dark / highlight-grey: colours', 'Optional rows on a highlight box: highlight-background, highlight-color, highlight-link (a hex colour each, e.g. #f1f1f1).'],
   ['dark, full-width, media-box', 'The Media Box band (holds the Media Box Downloads block).'],
   ['dark, full-width, related', 'The dark related band at the end of a press release.'],
   ['dark', 'Dark band (e.g. the Related Stories rail).'],

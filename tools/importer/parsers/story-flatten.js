@@ -442,40 +442,59 @@ const PANEL_DEFAULTS = { dark: { background: '#0e3a2f', color: '#ffffff' }, grey
 const hexColour = (value) => {
   const v = String(value || '').trim().toLowerCase();
   const hex = v.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
-  if (hex) return `#${hex[1].length === 3 ? hex[1].replace(/./g, '/** Mark every background-styled builder row (head CSS or inline). Returns the count. *//** Mark every background-styled builder row (head CSS or inline). Returns the count. */') : hex[1]}`;
+  if (hex) return `#${hex[1].length === 3 ? hex[1].replace(/./g, '$&$&') : hex[1]}`;
   const fn = v.match(/^rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/);
   return fn ? `#${fn.slice(1, 4).map((n) => Number(n).toString(16).padStart(2, '0')).join('')}` : '';
 };
+/**
+ * The colours the most text (outside links) and the most link text in `roots` are set in inline,
+ * by text length ('' when that text has none). `within` limits it to text inside a matching
+ * ancestor (the row's editor widgets).
+ */
+function inlineColours(roots, within = '') {
+  const text = new Map(); const links = new Map();
+  roots.filter((root) => root.nodeType === 1).forEach((root) => {
+    const walker = root.ownerDocument.createTreeWalker(root, 4 /* SHOW_TEXT */);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      const length = n.textContent.trim().length;
+      if (length && (!within || n.parentElement.closest(within))) {
+        let colour = '';
+        for (let p = n.parentElement; p && p !== root.parentElement && !colour; p = p.parentElement) {
+          const decl = (p.getAttribute('style') || '').match(/(?:^|;)\s*color\s*:\s*([^;]+)/i);
+          if (decl) colour = hexColour(decl[1]);
+        }
+        const bucket = n.parentElement.closest('a') ? links : text;
+        bucket.set(colour, (bucket.get(colour) || 0) + length);
+      }
+    }
+  });
+  const top = (m) => [...m.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+  return { text: top(text), link: top(links) };
+}
+
 function panelColours(row, { variant, color }) {
   const out = {};
   const background = hexColour(color);
   if (background && background !== PANEL_DEFAULTS[variant].background) out['highlight-background'] = background;
-  // the colour the most text (outside links) / link text is set in inline, by text length
-  const text = new Map(); const links = new Map();
-  const walker = row.ownerDocument.createTreeWalker(row, 4 /* SHOW_TEXT */);
-  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-    const length = n.textContent.trim().length;
-    if (length && n.parentElement.closest('.textwidget')) {
-      let colour = '';
-      for (let p = n.parentElement; p && p !== row && !colour; p = p.parentElement) {
-        const decl = (p.getAttribute('style') || '').match(/(?:^|;)\s*color\s*:\s*([^;]+)/i);
-        if (decl) colour = hexColour(decl[1]);
-      }
-      const bucket = n.parentElement.closest('a') ? links : text;
-      bucket.set(colour, (bucket.get(colour) || 0) + length);
-    }
-  }
-  const top = (m) => [...m.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || '';
-  const textColour = top(text);
+  const { text: textColour, link: linkColour } = inlineColours([row], '.textwidget');
   if (textColour && textColour !== PANEL_DEFAULTS[variant].color) out['highlight-color'] = textColour;
-  const linkColour = top(links);
   if (linkColour) out['highlight-link'] = linkColour;
   return out;
 }
 
+/**
+ * The page's style sheets as one text, without comments: SiteOrigin opens each layout with one
+ * ("Layout 398956", right before `#pgc-398956-0-0 { width:59.98% }`), which would otherwise read
+ * as part of the first rule's selector (the olive-oil portrait row lost its 60 | 40 split).
+ */
+function headCss(document) {
+  return [...document.querySelectorAll('style')].map((s) => s.textContent || '').join('\n')
+    .replace(/\/\*[\s\S]*?\*\//g, '');
+}
+
 /** Mark every background-styled builder row (head CSS or inline). Returns the count. */
 export function markHighlights(document) {
-  const css = [...document.querySelectorAll('style')].map((s) => s.textContent || '').join('\n');
+  const css = headCss(document);
   const byId = new Map();
   for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
     const color = (body.match(/background(?:-color)?\s*:\s*([^;]+)/i) || [])[1];
@@ -578,7 +597,7 @@ const CELL_WIDTH_ATTR = 'data-cell-width';
 
 /** Tag every builder cell with its CSS width share (a % number). Returns the count. */
 export function markCellWidths(document) {
-  const css = [...document.querySelectorAll('style')].map((s) => s.textContent || '').join('\n');
+  const css = headCss(document);
   const byId = new Map();
   for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
     const width = (body.match(/(?:^|;)\s*width\s*:\s*(?:calc\(\s*)?([\d.]+)%/i) || [])[1];
@@ -778,12 +797,16 @@ export function markTextStyles(document) {
     p.setAttribute(BLANK_ATTR, '');
     p.textContent = 'blank line';
   });
-  document.querySelectorAll('.panel-layout .textwidget > :is(p, h2, h3, h4, div)').forEach((el) => {
-    if (el.closest('.search-results, .sb-gallery') || el.matches('.search-results, .sb-gallery')) return;
+  const alignAndSize = (el) => {
     const tokens = [];
     if (/^center$/i.test(styleOf(el, 'text-align'))) tokens.push('center');
     const size = SIZE_TOKENS[uniformSize(el)];
     if (size) tokens.push(size);
+    return tokens;
+  };
+  document.querySelectorAll('.panel-layout .textwidget > :is(p, h2, h3, h4, div)').forEach((el) => {
+    if (el.closest('.search-results, .sb-gallery') || el.matches('.search-results, .sb-gallery')) return;
+    const tokens = alignAndSize(el);
     const background = styleOf(el, 'background-color') || styleOf(el, 'background');
     if (/^(#[0-9a-f]{3}(?:[0-9a-f]{3})?|[a-z]+)$/i.test(background) && background.toLowerCase() !== 'transparent') {
       const colours = [...el.querySelectorAll('[style*="color"]')].map((c) => styleOf(c, 'color')).filter(Boolean);
@@ -794,6 +817,12 @@ export function markTextStyles(document) {
         color: colours.length && colours.every((c) => c === colours[0]) ? colours[0] : '',
       }));
       tokens.push('box');
+      // the box's own paragraphs keep theirs (the first-glimpse MQB box: a 14pt centred title,
+      // then centred text)
+      el.querySelectorAll(':scope > :is(p, h2, h3, h4)').forEach((child) => {
+        const own = alignAndSize(child);
+        if (own.length) child.setAttribute(TEXT_ATTR, own.join(' '));
+      });
     }
     if (!tokens.length) return;
     el.setAttribute(TEXT_ATTR, tokens.join(' '));
@@ -816,11 +845,70 @@ function captionCard(node, document) {
   return WebImporter.DOMUtils.createTable([[`Columns (centered, portrait-${width}, captioned)`], [[node]]], document);
 }
 
+// a part of a panel or box that follows on from the part before it (the runtime joins them)
+const CONTINUED = 'continued';
+const sectionTokens = (key) => key.split(' ').filter((t) => t && t !== 'box')
+  .map((t) => (t === 'center' ? 'text-center' : t));
+
+/**
+ * `nodes` cut where the text style changes: consecutive nodes with the same text tokens are one
+ * part (unstyled nodes, images and blocks included, are parts of their own). Whitespace stays
+ * with the part before it. Clears the marks.
+ * @returns {{ tokens: string[], nodes: Node[] }[]}
+ */
+function textParts(nodes) {
+  const parts = [];
+  let leading = [];
+  const isEmpty = (node) => (node.nodeType === 1 && isSpacer(node)) || (!(node.textContent || '').trim()
+    && !(node.nodeType === 1 && (node.matches('img, picture, video, iframe, table')
+      || node.querySelector('img, picture, video, iframe, table'))));
+  nodes.forEach((node) => {
+    const last = parts[parts.length - 1];
+    // whitespace, empty elements and gaps (a blank line's Spacer) open no part of their own
+    if (isEmpty(node)) {
+      if (last) last.nodes.push(node); else leading.push(node);
+      return;
+    }
+    const key = node.nodeType === 1 ? node.getAttribute(TEXT_ATTR) || '' : '';
+    if (node.nodeType === 1) node.removeAttribute(TEXT_ATTR);
+    if (last && last.key === key) last.nodes.push(node);
+    else {
+      parts.push({ key, tokens: sectionTokens(key), nodes: [...leading, node] });
+      leading = [];
+    }
+  });
+  if (!parts.length && leading.length) parts.push({ key: '', tokens: [], nodes: leading });
+  return parts;
+}
+
+/**
+ * A panel's or box's content as one section per part (textParts), each with the same style and
+ * rows plus the part's text tokens; every part after the first is `continued`, so the runtime
+ * draws them as one panel. One part (the usual case) is one section, as before.
+ */
+function partSections(nodes, style, rows, document, variant = '') {
+  const base = style.split(',').map((t) => t.trim());
+  const parts = textParts(nodes);
+  // a panel cut in parts: each part's text colour is its own (the Millionth SUV title has none,
+  // so it keeps the variant's ink among the panel's white paragraphs; the RS 200 caption's #333)
+  const partRows = (part) => {
+    if (!variant || parts.length < 2) return rows;
+    const { text } = inlineColours(part.nodes);
+    const own = text && text !== PANEL_DEFAULTS[variant].color ? [['highlight-color', text]] : [];
+    return [...rows.filter(([key]) => key !== 'highlight-color'), ...own];
+  };
+  return parts.flatMap((part, i) => [
+    document.createElement('hr'), ...part.nodes,
+    sectionMetadata([...new Set([...base, ...part.tokens, ...(i ? [CONTINUED] : [])])].join(', '), document, partRows(part)),
+  ]);
+}
+
 /**
  * A body row's nodes with each run of styled paragraphs set as its own body section: `<hr>`, the
  * run, its Section Metadata (`body-column, text-center, text-small`; a box adds `text-box` and its
  * rows), then `<hr>` and a plain `body-column` Section Metadata, so the body resumes. An empty
- * resumed section (a run at the end) is dropped later (dropEmptySections).
+ * resumed section (a run at the end) is dropped later (dropEmptySections). A box whose own
+ * paragraphs differ in style is split in parts (partSections).
  */
 export function splitTextRuns(nodes, document) {
   const out = [];
@@ -841,13 +929,14 @@ export function splitTextRuns(nodes, document) {
       el.removeAttribute(TEXT_ATTR);
       el.removeAttribute(BOX_ATTR);
       if (el.tagName !== 'DIV') return [el];
-      // a box's inline content (text, <br>, a linked image) as a paragraph
+      // a box's own paragraphs stay paragraphs; its inline content (text, <br>, a linked image)
+      // becomes one
+      if (el.querySelector(':scope > :is(p, h2, h3, h4, ul, ol)')) return [...el.childNodes];
       const p = document.createElement('p');
       p.append(...el.childNodes);
       return [p];
     });
-    out.push(document.createElement('hr'), ...content,
-      sectionMetadata([BODY_STYLE, ...tokens].join(', '), document, rows),
+    out.push(...partSections(content, [BODY_STYLE, ...tokens].join(', '), rows, document),
       document.createElement('hr'), sectionMetadata(BODY_STYLE, document));
     run = [];
     runKey = '';
@@ -891,13 +980,17 @@ function sectionMetadata(style, document, rows = []) {
   return WebImporter.DOMUtils.createTable([['Section Metadata'], ['style', style], ...rows], document);
 }
 
-const isSectionMetadata = (el) => el.tagName === 'TABLE'
-  && /^section metadata$/i.test(((el.querySelector('tr > th, tr > td') || {}).textContent || '').trim());
+const tableName = (el) => ((el.querySelector('tr > th, tr > td') || {}).textContent || '').trim();
+const isSectionMetadata = (el) => el.tagName === 'TABLE' && /^section metadata$/i.test(tableName(el));
+// a gap alone is no content: a section left with only a Spacer (its row's gallery moved to the
+// Media Box, the Iceman story between two panels) would only add space
+const isSpacer = (el) => el.tagName === 'TABLE' && /^spacer(?:\s*\(line\))?$/i.test(tableName(el));
+const isFiller = (el) => isSectionMetadata(el) || isSpacer(el);
 
 /**
- * Drop every section that holds nothing but Section Metadata, e.g. the `body-column`
- * section skoda-model-sections opens when the first builder row is a highlight panel.
- * Call after afterTransform, once every break and Section Metadata is in place. Returns
+ * Drop every section that holds nothing but Section Metadata and Spacers, e.g. the
+ * `body-column` section skoda-model-sections opens when the first builder row is a highlight
+ * panel. Call after afterTransform, once every break and Section Metadata is in place. Returns
  * the number of sections dropped.
  */
 export function dropEmptySections(root) {
@@ -911,9 +1004,9 @@ export function dropEmptySections(root) {
     if (breaks[i + 1]) range.setEndBefore(breaks[i + 1]);
     else range.setEnd(root, root.childNodes.length);
     const rest = range.cloneContents();
-    rest.querySelectorAll('table').forEach((t) => { if (isSectionMetadata(t)) t.remove(); });
+    rest.querySelectorAll('table').forEach((t) => { if (isFiller(t)) t.remove(); });
     const isEmpty = !(rest.textContent || '').trim() && !rest.querySelector('img, picture, video, iframe, table');
-    return isEmpty && [hr, ...[...root.querySelectorAll('table')].filter((t) => isSectionMetadata(t) && between(hr, i, t))];
+    return isEmpty && [hr, ...[...root.querySelectorAll('table')].filter((t) => isFiller(t) && between(hr, i, t))];
   }).filter(Boolean);
   empty.forEach((nodes) => nodes.forEach((n) => n.remove()));
   return empty.length;
@@ -1128,8 +1221,6 @@ export default function parse(element, { document }) {
   // spacer-only rows after a highlight wait for the body to resume (with nothing after them,
   // or a highlight next, they would only open an empty-looking section, so they go)
   let held = [];
-  const isSpacer = (n) => n.tagName === 'TABLE'
-    && /^spacer(\s*\(line\))?$/i.test(((n.querySelector('tr > th, tr > td') || {}).textContent || '').trim());
   grids.forEach((grid) => {
     const variant = grid.getAttribute(HIGHLIGHT_ATTR);
     const row = gridRow(grid, document, stats);
@@ -1139,7 +1230,8 @@ export default function parse(element, { document }) {
     if (variant) {
       const geometry = GEOMETRY_KEYS.filter((key) => grid.hasAttribute(`data-${key}`))
         .map((key) => [key, grid.getAttribute(`data-${key}`)]);
-      out.push(document.createElement('hr'), ...row, sectionMetadata(`${BODY_STYLE}, highlight-${variant}`, document, geometry));
+      // a centred caption or a larger title in the panel: the panel in joined parts
+      out.push(...partSections(row, `${BODY_STYLE}, highlight-${variant}`, geometry, document, variant));
       stats.highlights += 1;
       resume = true;
       return;

@@ -6,6 +6,8 @@
  * property (`--box-background` …) that styles.css draws; anything else is ignored.
  */
 
+import { cssAccepts } from './drop-cap.js';
+
 const ROWS = {
   'box-background': 'boxBackground',
   'box-padding': 'boxPadding',
@@ -13,13 +15,17 @@ const ROWS = {
   'box-color': 'boxColor',
 };
 const COLOR = /^(?:#[\da-f]{3}(?:[\da-f]{3})?|[a-z]{3,20})$/i;
-const LENGTHS = /^(?:(?:0|\d{1,3}(?:\.\d+)?px)\s*){1,4}$/;
+const LENGTHS = /^(?:0|\d{1,3}(?:\.\d+)?px)(?:\s+(?:0|\d{1,3}(?:\.\d+)?px)){0,3}$/;
 const SHADOW = /^(?:(?:-?(?:0|\d{1,2}(?:\.\d+)?px))\s+){2,4}(?:#[\da-f]{3}(?:[\da-f]{3})?|[a-z]{3,20})$/i;
 const VALID = {
   boxBackground: COLOR, boxPadding: LENGTHS, boxShadow: SHADOW, boxColor: COLOR,
 };
 const PROPS = {
   boxBackground: '--box-background', boxPadding: '--box-padding', boxShadow: '--box-shadow', boxColor: '--box-color',
+};
+// the property each value is drawn with, for the browser's own check
+const DRAWN_AS = {
+  boxBackground: 'background-color', boxPadding: 'padding', boxShadow: 'box-shadow', boxColor: 'color',
 };
 
 /**
@@ -46,7 +52,7 @@ export function decorateBox(section) {
   let set = 0;
   Object.entries(PROPS).forEach(([name, prop]) => {
     const value = (section.dataset[name] || '').trim();
-    if (!value || !VALID[name].test(value)) return;
+    if (!value || !VALID[name].test(value) || !cssAccepts(DRAWN_AS[name], value)) return;
     section.style.setProperty(prop, value);
     set += 1;
   });

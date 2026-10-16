@@ -809,8 +809,15 @@ main > .section.highlight-grey {
   color: var(--hl-color, var(--highlight-grey-color));
 }
 
-main > .section:is(.highlight-dark, .highlight-grey) :is(h1, h2, h3, h4, h5, h6) {
-  color: inherit;
+/* a panel's own text colour is its text's (the source sets it inline on the text): its headings
+   keep the variant's, as the source's ink headings on the coloured Iceman and Millionth SUV
+   panels */
+main > .section.highlight-dark :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--highlight-dark-color);
+}
+
+main > .section.highlight-grey :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--highlight-grey-color);
 }
 
 main > .section.highlight-dark a:any-link {
@@ -1101,6 +1108,8 @@ body.story main > .section.text-xlarge .default-content-wrapper :is(p, li) {
    keeps the column's inset, so it is the text column's width (819px at 1440) as the source's,
    its own padding replacing the wrapper's */
 body.story main > .section.text-box .default-content-wrapper {
+  --box-shadow-room: -20px; /* the clip's reach past the box, more than any source shadow */
+
   margin-block-end: var(--paragraph-gap);
   margin-inline: var(--story-inset);
   padding: var(--box-padding, var(--spacing-m));
@@ -1111,6 +1120,26 @@ body.story main > .section.text-box .default-content-wrapper {
 
 body.story main > .section.text-box .default-content-wrapper > :last-child {
   margin-block-end: 0;
+}
+
+/* a box the importer cut where its text changes style (the MQB box's 14pt title, then its
+   text): the parts read as one box, the paragraph gap kept inside it at each join and the
+   shadow not drawn across it */
+body.story main > .section.text-box:where(:has(+ .section.text-box.continued)) .default-content-wrapper {
+  display: flow-root;
+  margin-block-end: 0;
+  padding-block-end: 0;
+  clip-path: inset(var(--box-shadow-room) var(--box-shadow-room) 0);
+}
+
+body.story main > .section.text-box:where(:has(+ .section.text-box.continued)) .default-content-wrapper > :last-child {
+  margin-block-end: var(--paragraph-gap);
+}
+
+body.story main > .section.text-box.continued .default-content-wrapper {
+  display: flow-root;
+  padding-block-start: 0;
+  clip-path: inset(0 var(--box-shadow-room) var(--box-shadow-room));
 }
 
 /* `centered-images` (Section Metadata style, set by the story importer when the source centres
@@ -1320,6 +1349,18 @@ body.story main > .section:is(.highlight-dark, .highlight-grey) + .section.body-
 body.story main > .section.highlight-dark:has(+ .section.highlight-dark),
 body.story main > .section.highlight-grey:has(+ .section.highlight-grey) {
   padding-block-end: 0;
+}
+
+/* a panel the importer cut where its text changes style (a centred 10pt caption among its
+   paragraphs): its parts read as one panel, with no inset at the joins; each part holds its
+   children's margins, so the paragraph gap stays inside the panel's colour */
+body.story main > .section:is(.highlight-dark, .highlight-grey):has(+ .section.continued) {
+  display: flow-root;
+}
+
+body.story main > .section.body-column:is(.highlight-dark, .highlight-grey).continued {
+  display: flow-root;
+  padding-block-start: 0;
 }
 
 body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has(+ .section:is(.highlight-dark, .highlight-grey)) {

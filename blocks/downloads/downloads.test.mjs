@@ -176,6 +176,8 @@ test('the toggle stays a labelled button: Show less once open, focus kept in vie
   assert.equal(scrolled, 0, 'expanding leaves the scroll position alone');
   toggle.click();
   assert.equal(toggle.textContent, 'Show more');
+  // once the slide has arrived (none here: no animation API)
+  await new Promise((resolve) => { setTimeout(resolve, 0); });
   assert.equal(scrolled, 1, 'collapsing keeps the button in view');
   assert.equal(document.activeElement, toggle);
 });
@@ -1008,26 +1010,37 @@ test('lightboxItem: the original drives download, link and cart; a clip shows it
 });
 
 // --- "Show more" / "Show less" slide (#516 PO: smooth as the source's togglebox) ---------------
-test('slideList: animates height and max-height from the old to the new height, 400ms swing', async () => {
+test('slideList: the list slides from its old height, the pill from its old place, 400ms swing', async () => {
   const { slideList } = await import('./downloads.js');
   const list = document.createElement('ul');
-  const heights = [639];
-  list.getBoundingClientRect = () => ({ height: heights[0] });
-  let call = null;
+  const toggle = document.createElement('button');
+  toggle.style.marginBlockStart = '16px';
+  document.body.append(list, toggle);
+  // the 4x4 grid opening: list 315 → 487px; the pill was at 319 (over the clipped list's bottom),
+  // now at 575 under the open list
+  list.getBoundingClientRect = () => ({ height: 487, top: 72 });
+  toggle.getBoundingClientRect = () => ({ top: 575 });
+  let call = null; let pill = null;
   list.animate = (frames, opts) => { call = { frames, opts }; return { finished: Promise.resolve() }; };
-  slideList(list, 383);
+  toggle.animate = (frames, opts) => { pill = { frames, opts }; };
+  slideList(list, toggle, { listHeight: 315, toggleTop: 319 });
   assert.deepEqual(call.frames, [
-    { height: '383px', maxHeight: '383px', overflow: 'hidden' },
-    { height: '639px', maxHeight: '639px', overflow: 'hidden' },
+    { height: '315px', maxHeight: '315px', overflow: 'hidden' },
+    { height: '487px', maxHeight: '487px', overflow: 'hidden' },
   ]);
   assert.equal(call.opts.duration, 400);
   assert.equal(call.opts.easing, 'cubic-bezier(0.37, 0, 0.63, 1)');
-  call = null;
-  slideList(list, 639);
+  // first frame: the pill stays at 319 (575 - 172 = 403 with the list at 315, so 84px up)
+  assert.deepEqual(pill.frames, [{ marginBlockStart: '-68px' }, { marginBlockStart: '16px' }]);
+  assert.equal(pill.opts, call.opts);
+  call = null; pill = null;
+  slideList(list, toggle, { listHeight: 487, toggleTop: 575 });
   assert.equal(call, null, 'no change: no animation');
+  assert.equal(pill, null);
   const saved = window.matchMedia;
   window.matchMedia = (q) => ({ matches: q.includes('reduce'), addEventListener() {} });
-  slideList(list, 100);
+  slideList(list, toggle, { listHeight: 100, toggleTop: 0 });
   assert.equal(call, null, 'reduced motion: none');
   window.matchMedia = saved;
+  list.remove(); toggle.remove();
 });

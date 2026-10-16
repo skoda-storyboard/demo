@@ -62,11 +62,13 @@ published.
 - 1440: Press Kits 6 / 6, Images 20 / 20, Videos 20 / 20; first cards 354×199 and 261×287 on both.
 - 375: the same counts; first cards 318×179 and 318×319 on both.
 
-**Feed** (`media-items/items.json`, `main` → branch, the branch feed being the published one):
-- images 1,714 → 2,280, videos 51 → 191, assets 4 → 4 (total 1,769 → 2,475).
-- 4 items left the feed, all corrections:
-  - two no longer exist on the source (404);
-  - two were story pages the old build took for videos with no playable source.
+**Feed** (`media-items/items.json`, `main` → branch):
+- images 1,714 → 2,280, videos 51 → 222, assets 4 → 4 (total 1,769 → 2,506). No item of `main`'s feed is lost.
+- #380 review (2026-10-16): the first rebuild (2,475 rows, the one published on 15 Oct) had lost 4 videos
+  of `main`'s feed: the Peaq Sportline footage I / II, the Peaq world-premiere livestream and the Chris
+  Froome clip. Videos came only from the newest-N queries, and the source has published newer ones since.
+  The source video library is now read too (`sources.json` `library`: image, video), kept to the videos
+  whose MP4 is on AEM Assets: the 4 are back, with 27 more. The rebuilt feed is published with #380.
 
 **Still needs a person:**
 - the DAM ingest on a developer machine, then pushing the 69 held releases and kits plus Kamiq and Scala;

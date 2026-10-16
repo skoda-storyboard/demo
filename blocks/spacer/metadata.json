@@ -4,13 +4,20 @@
   "version": "1.0.0",
   "created": "2026-10-16T12:00:00.000Z",
   "name": "Spacer",
-  "description": "A vertical gap between parts of a story: one cell with its height in px (e.g. 24px). Shown from 720px wide, none on phones.",
+  "description": "A vertical gap between parts of a story: one cell with its height in px (e.g. 24px), up to 999px. Shown from 720px wide, none on phones. A missing or malformed height takes no space.",
   "visualCharacteristics": {
     "purpose": "authored vertical gap"
   },
   "contentPattern": {
     "structure": "single cell height"
   },
+  "options": [
+    {
+      "class": "line",
+      "label": "line",
+      "description": "A blank line in the text (44px: one line and its paragraph gap), shown at every width."
+    }
+  ],
   "usage": {
     "pagesUsing": [],
     "reuseCount": 0,

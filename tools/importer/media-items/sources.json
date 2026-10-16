@@ -432,8 +432,8 @@
       "n": 20
     }
   ],
-  "libraryComment": "Types whose whole source media library is read (every year, through the listing load-more endpoint) and kept to the items whose original is published on AEM Assets (media-manifest public_url). Images only: the source video library is not in the DAM yet.",
-  "library": ["image"],
+  "libraryComment": "Types whose whole source media library is read (every year, through the listing load-more endpoint) and kept to the items whose original is published on AEM Assets (media-manifest public_url). Videos too since #380: the newest-N queries above lose a video once the source publishes newer ones (the Peaq world-premiere livestream, the Chris Froome clip), though its MP4 is on AEM Assets.",
+  "library": ["image", "video"],
   "knownDetailGaps": {
     "_comment": "Rows the source itself has no detail for (verified with repeated live requests). The feed build fails on any other incomplete row. Re-verify and drop an entry when the source fills it.",
     "279232": {

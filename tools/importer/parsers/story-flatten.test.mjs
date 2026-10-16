@@ -611,6 +611,24 @@ function pipeline(css, rows, before = '') {
   };
 }
 
+test('dropEmptySections: a section left with only a Spacer goes, with its Spacer; text keeps its own', { skip: domSkip }, () => {
+  const d = domDoc('<html><body></body></html>');
+  const meta = (style) => createTable([['Section Metadata'], ['style', style]], d);
+  const p = (text) => Object.assign(d.createElement('p'), { textContent: text });
+  // panel | (its gallery moved to the Media Box) a lone Spacer | panel | text with a Spacer line
+  d.body.append(
+    d.createElement('hr'), p('Panel one'), meta('body-column, highlight-grey'),
+    d.createElement('hr'), createTable([['Spacer'], ['24px']], d), meta('body-column'),
+    d.createElement('hr'), p('Panel two'), meta('body-column, highlight-grey'),
+    d.createElement('hr'), p('Before'), createTable([['Spacer (line)'], ['44px']], d), p('After'), meta('body-column'),
+  );
+  assert.equal(dropEmptySections(d.body), 1);
+  assert.equal(d.body.querySelectorAll('hr').length, 3);
+  assert.deepEqual([...d.body.querySelectorAll('table')].map((t) => t.dataset.block), [
+    'Section Metadata', 'Section Metadata', 'Spacer (line)', 'Section Metadata',
+  ]);
+});
+
 test('a leading highlight row leaves no empty body section before the panel', { skip: domSkip }, () => {
   const { dropped, flow: out } = pipeline('#pg-8-0> .panel-row-style { background-color:#0e3a2f }', [
     editorRow('pg-8-0', '<p>Panel</p>'), editorRow('pg-8-1', '<p>Outro</p>'),
@@ -1077,4 +1095,74 @@ test('markHighlights: a panel\'s own colours as rows; the default dark panel nee
   assert.equal(g1.getAttribute('data-highlight-link'), '#333333');
   assert.equal(g2.getAttribute('data-highlight'), 'dark');
   ['background', 'color', 'link'].forEach((k) => assert.equal(g2.hasAttribute(`data-highlight-${k}`), false, k));
+});
+
+test('markHighlights: short hex and rgb() colours become 6-digit hex rows', { skip: domSkip }, () => {
+  const d = storyDoc('#pg-8-1> .panel-row-style { background-color:#ccc }', [
+    editorRow('pg-8-1', '<p><span style="color: #fff;">Light text</span> <a style="color: rgb(65, 148, 104);" href="/x">link</a></p>'),
+  ]);
+  markHighlights(d);
+  const g = d.getElementById('pg-8-1');
+  assert.equal(g.getAttribute('data-highlight-background'), '#cccccc');
+  assert.equal(g.getAttribute('data-highlight-color'), '#ffffff');
+  assert.equal(g.getAttribute('data-highlight-link'), '#419468');
+});
+
+
+// --- styled text inside a panel or a box (#380 review) -------------------------------------
+test('a panel whose text changes style is cut in joined parts: its caption centred and 10pt', { skip: domSkip }, () => {
+  const d = storyDoc('#pg-5-1> .panel-row-style { background-color:#f1f1f1 }', [
+    editorRow('pg-5-1', '<h3>Roots in motorsport</h3><p>The current RS models.</p>'
+      + '<p style="text-align: center;"><span style="font-size: 10pt;">Škoda 200 RS (1974)</span></p><p>In modern history.</p>'),
+  ]);
+  markHighlights(d); markTextStyles(d);
+  assert.deepEqual(flow(d), [
+    ['hr'], ['h3', 'Roots in motorsport'], ['p', 'The current RS models.'], ['meta', 'body-column, highlight-grey'],
+    ['hr'], ['p', 'Škoda 200 RS (1974)'], ['meta', 'body-column, highlight-grey, text-center, text-small, continued'],
+    ['hr'], ['p', 'In modern history.'], ['meta', 'body-column, highlight-grey, continued'],
+  ]);
+  assert.equal(d.querySelector('[data-skoda-text]'), null, 'no marks left');
+});
+
+test('a panel in one style stays one section', { skip: domSkip }, () => {
+  const d = storyDoc('#pg-5-2> .panel-row-style { background-color:#f1f1f1 }', [
+    editorRow('pg-5-2', '<h3>Five stars</h3><p>Škoda takes great pride.</p>'),
+  ]);
+  markHighlights(d); markTextStyles(d);
+  assert.deepEqual(flow(d).filter(([k]) => k === 'meta'), [['meta', 'body-column, highlight-grey']]);
+});
+
+test('a box keeps its own paragraphs and their styles: a 14pt centred title, then centred text', { skip: domSkip }, () => {
+  const d = importText('<p>Before</p><div style="box-shadow: 0 0 5px 3px #000000; padding:10px 15px; background-color: #cfcfcf;">'
+    + '<p style="text-align: center;"><span style="font-size: 14pt;"><strong>MQB modular architecture</strong></span></p>'
+    + '<p style="text-align: center;">The abbreviation MQB stands for</p></div><p>After</p>');
+  assert.deepEqual(sections(d), [
+    '(first): Before',
+    'body-column, text-box, text-center, text-medium: MQB modular ',
+    'body-column, text-box, text-center, continued: The abbrevia',
+    'body-column: After',
+  ]);
+  assert.equal(d.querySelector('p p'), null, 'no paragraph inside a paragraph');
+  const metas = [...d.querySelectorAll('table')].filter((t) => t.dataset.block === 'Section Metadata');
+  const rows = (t) => [...t.querySelectorAll('tr')].slice(2).map((tr) => tr.children[0].textContent);
+  assert.deepEqual(rows(metas[0]), ['box-background', 'box-padding', 'box-shadow'], 'each part keeps the box rows');
+  assert.deepEqual(rows(metas[1]), ['box-background', 'box-padding', 'box-shadow']);
+});
+
+test('a panel in parts: each part has its own text colour; an empty lead opens no part', { skip: domSkip }, () => {
+  const d = storyDoc('#pg-5-3> .panel-row-style { background-color:#4ba82e }', [
+    editorRow('pg-5-3', '<p> </p><p style="text-align: center;"><span style="font-size: 18pt;">Millionth SUV headed for Spain</span></p>'
+      + '<p><span style="color: #ffffff;">The millionth SUV is a green KAROQ, and a long white paragraph.</span></p>'),
+  ]);
+  markHighlights(d); markTextStyles(d);
+  const content = d.querySelector('.content');
+  parse(content, { document: d });
+  const metas = [...content.children].filter((n) => n.dataset.block === 'Section Metadata')
+    .map((t) => [...t.querySelectorAll('tr')].slice(1).map((tr) => `${tr.children[0].textContent}=${tr.children[1].textContent}`).join(' | '));
+  const geometry = 'highlight-margin=0px 0px 0px 0px | highlight-margin-mobile=0px 0px 0px 0px';
+  assert.deepEqual(metas, [
+    `style=body-column, highlight-grey, text-center, text-xlarge | ${geometry} | highlight-background=#4ba82e`,
+    `style=body-column, highlight-grey, continued | ${geometry} | highlight-background=#4ba82e | highlight-color=#ffffff`,
+  ]);
+  assert.equal(content.querySelector('table').dataset.block, 'Spacer (line)', 'the blank line stays, in the first part');
 });

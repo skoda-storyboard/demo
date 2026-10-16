@@ -110,6 +110,31 @@ blocks rose from 440 to 526 at 1440, and 568 at 390. What remains:
 - pure black inline text against ink;
 - a few panel insets: the cruise-control panel's text sits 24px further in.
 
+**#380 review fixes (2026-10-16), measured against live at 1440 / 768 / 390:**
+- `Spacer (line)` is in the block contracts (13 stories were held from publishing).
+- Slider galleries keep 40px under their dots, 16px only when a Spacer follows: the 42 stories
+  imported elsewhere were 24px short.
+- A panel or text box whose text changes style is cut in parts, each later part styled
+  `continued`, which the runtime joins into one panel or box (no inset, gap or shadow edge at the
+  joins). Each part keeps its text tokens and its own text colour: the Millionth SUV title (24px,
+  centred, ink), the MQB box title (14pt, centred), and the centred 10pt captions in six panels. Panel
+  headings keep the variant's colour (the Iceman h3 is ink).
+- The importer drops SiteOrigin's CSS comments: one in front of a layout's first rule hid that
+  row's cell widths (the olive-oil portrait row is now `split-60, portrait-179`, as live).
+- Short hex colours (`#fff`) expand correctly; a body section left with only a Spacer is dropped;
+  drop-cap and box values the browser can't parse are ignored; the drop cap goes on the section's
+  own text, never into a block cell.
+- The 4×4 grid's "Show more" slides smoothly from the first frame (block 383 → 639px, as live); a
+  second click mid-slide turns it around, and the button stays in view after "Show less".
+
+Known differences after this round:
+- the olive-oil portrait caption is 16px on live, 13px here (the split row's caption style);
+- the olive-oil text after the portrait row sits 20px further in on live (the source's widget
+  margins on a plain row; only highlight panels carry them);
+- the MQB box is 20px shorter (332 vs 352px);
+- story links are green as live (PO): 3.7:1 on white and 2.3:1 on the 4×4 grey box, with no hover
+  underline, as live.
+
 **Links:** story prose links are green on live (`rgb(65,148,104)`, measured on the skatepark and millionth-SUV
 stories). They were ink per the story-detail spec's brand default; since round 3 (2026-10-16) they are green as live,
 at the PO's request. The green is 3.7:1 on white, below WCAG AA.

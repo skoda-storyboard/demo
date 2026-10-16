@@ -42,3 +42,20 @@ test('delivered pages: the data attributes; broken values and other sections are
   plain.dataset.boxBackground = '#cccccc';
   assert.equal(decorateBox(plain), 0);
 });
+
+test('run-together or unknown values are ignored, so the box keeps its default padding and colours', () => {
+  const saved = globalThis.CSS;
+  globalThis.CSS = { supports: (property, value) => !(property === 'background-color' && value === 'abc') };
+  try {
+    const el = section();
+    el.dataset.boxPadding = '10px10px';
+    el.dataset.boxBackground = 'abc';
+    el.dataset.boxColor = '#ffffff';
+    assert.equal(decorateBox(el), 1);
+    assert.equal(el.style.getPropertyValue('--box-padding'), '');
+    assert.equal(el.style.getPropertyValue('--box-background'), '');
+    assert.equal(el.style.getPropertyValue('--box-color'), '#ffffff');
+  } finally {
+    globalThis.CSS = saved;
+  }
+});
