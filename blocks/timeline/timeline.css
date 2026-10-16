@@ -1,0 +1,217 @@
+/* ==========================================================================
+   Timeline (SKODA-815): the source's `ys-milestones` dated timeline, measured on
+   /en/skoda-world/steering-wheel-decades-of-changes/ (docs/ui-specs/timeline.md).
+   Three layers (css-guidelines.md): L1 fluid, the left rail (phones and tablets);
+   L2 intrinsic, the block is its own container; L3 the source's 1080 switch to the
+   two-sided line (a viewport switch on the source, so a viewport breakpoint here, held
+   back by the container when the block sits in a narrow column).
+   ========================================================================== */
+
+.timeline {
+  /* source section.milestones: a grey panel; the year pills and dots are the widget's
+     authored colour, green by default (`Timeline (black)` for the black ones) */
+  --timeline-panel-bg: var(--skoda-grey-225);
+  --timeline-accent: var(--skoda-lime);
+  --timeline-line-color: var(--skoda-white);
+  --timeline-text-color: var(--skoda-ink);
+
+  /* the panel sits 40px below the paragraph before it (its own 20px margin + 20) and 42px
+     above the next heading, as the source widget */
+  --timeline-space-above: 20px;
+  --timeline-space-below: 42px;
+
+  /* panel padding; the left rail column on the one-sided layout */
+  --timeline-pad-block: 64px;
+  --timeline-pad-inline: 30px;
+  --timeline-rail: 120px;
+
+  /* the line (12px), centred 70px left of the content on the rail */
+  --timeline-line-width: 12px;
+  --timeline-rail-x: 70px;
+
+  /* the year pill: 32/48 semibold, 15/10 padding, its top 45px above the entry */
+  --timeline-year-size: 32px;
+  --timeline-year-line: 48px;
+  --timeline-year-pad-block: 15px;
+  --timeline-year-pad-inline: 10px;
+  --timeline-year-rise: 45px;
+
+  /* the 24px dot on the line, level with the description */
+  --timeline-dot-size: 24px;
+
+  /* the title: the source's 14pt spans on a 28px line */
+  --timeline-title-size: 18.6667px;
+  --timeline-title-line: 28px;
+  --timeline-title-gap: 30px;
+
+  /* the source title paragraph's own 20px bottom margin, below the gap */
+  --timeline-title-end: 20px;
+  --timeline-media-gap: 30px;
+
+  /* between images stacked in one milestone (the source's second img padding-top) */
+  --timeline-media-stack: 16px;
+
+  /* the description paragraphs' own 20px bottom margin */
+  --timeline-text-end: 20px;
+
+  /* the space below an entry's description (and image, two-sided); 50px on the last */
+  --timeline-entry-gap: 100px;
+  --timeline-last-gap: 50px;
+
+  /* two-sided: the title keeps to the left 45%, the halves 26px off the line */
+  --timeline-title-inset: 55%;
+  --timeline-gutter: 26px;
+
+  container: timeline / inline-size;
+  margin-block: var(--timeline-space-above) var(--timeline-space-below);
+  background: var(--timeline-panel-bg);
+  color: var(--timeline-text-color);
+}
+
+.timeline.black {
+  --timeline-accent: var(--skoda-black);
+}
+
+/* the widgets authored with 18pt titles (24px on a 36px line) */
+.timeline.large {
+  --timeline-title-size: 24px;
+  --timeline-title-line: 36px;
+}
+
+/* L1 fluid: the left rail */
+.timeline .timeline-list {
+  margin: 0;
+  padding: var(--timeline-pad-block) var(--timeline-pad-inline) var(--timeline-pad-block) var(--timeline-rail);
+  list-style: none;
+}
+
+.timeline .timeline-entry {
+  position: relative;
+  margin: 0;
+}
+
+/* the line, the entry's full height (consecutive entries join into one line) */
+.timeline .timeline-entry::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(-1 * var(--timeline-rail-x) - var(--timeline-line-width) / 2);
+  width: var(--timeline-line-width);
+  background: var(--timeline-line-color);
+}
+
+.timeline .timeline-year {
+  position: absolute;
+  inset-block-start: calc(-1 * var(--timeline-year-rise));
+  inset-inline-start: calc(-1 * var(--timeline-rail-x));
+  margin: 0;
+  padding: var(--timeline-year-pad-block) var(--timeline-year-pad-inline);
+  background: var(--timeline-accent);
+  color: var(--skoda-white);
+  font-size: var(--timeline-year-size);
+  font-weight: var(--weight-semibold);
+  line-height: var(--timeline-year-line);
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.timeline .timeline-title {
+  margin: 0;
+  padding-block-end: calc(var(--timeline-title-gap) + var(--timeline-title-end));
+  color: inherit;
+  font-size: var(--timeline-title-size);
+  font-weight: var(--weight-regular);
+  line-height: var(--timeline-title-line);
+}
+
+.timeline .timeline-title strong {
+  font-weight: var(--weight-semibold);
+}
+
+.timeline .timeline-media {
+  padding-block-end: var(--timeline-media-gap);
+}
+
+/* the image at its own ratio, the full column wide (square on most stories) */
+.timeline .timeline-media picture,
+.timeline .timeline-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.timeline .timeline-media > :is(picture, img) + :is(picture, img) {
+  margin-block-start: var(--timeline-media-stack);
+}
+
+.timeline .timeline-text {
+  position: relative;
+  padding-block-end: var(--timeline-entry-gap);
+}
+
+/* the dot, centred on the line at the description's top */
+.timeline .timeline-text::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: calc(-1 * var(--timeline-rail-x) - var(--timeline-dot-size) / 2);
+  width: var(--timeline-dot-size);
+  height: var(--timeline-dot-size);
+  border-radius: 50%;
+  background: var(--timeline-accent);
+}
+
+.timeline .timeline-text p {
+  margin: 0 0 var(--timeline-text-end);
+}
+
+/* the source's last entry closes on half the gap, below its image as well */
+.timeline .timeline-entry:last-child .timeline-media,
+.timeline .timeline-entry:last-child .timeline-text {
+  padding-block-end: var(--timeline-last-gap);
+}
+
+/* L3: two-sided from the source's 1080 switch, the line in the middle; only while the
+   block has the room (a narrow Columns cell keeps the rail) */
+@media (width >= 1080px) {
+  @container timeline (width >= 600px) {
+    .timeline .timeline-list {
+      padding-inline: var(--timeline-pad-inline);
+    }
+
+    .timeline .timeline-entry {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+
+    .timeline .timeline-entry::before {
+      inset-inline-start: calc(50% - var(--timeline-line-width) / 2);
+    }
+
+    .timeline .timeline-year {
+      inset-inline-start: 50%;
+    }
+
+    .timeline .timeline-title {
+      grid-column: 1 / -1;
+      padding-block-end: calc(2 * var(--timeline-title-gap) + var(--timeline-title-end));
+      padding-inline-end: var(--timeline-title-inset);
+    }
+
+    .timeline .timeline-media {
+      grid-column: 1;
+      padding-block-end: var(--timeline-entry-gap);
+      padding-inline-end: var(--timeline-gutter);
+    }
+
+    .timeline .timeline-text {
+      grid-column: 2;
+      padding-inline-start: var(--timeline-gutter);
+    }
+
+    .timeline .timeline-text::before {
+      inset-inline-start: calc(-1 * var(--timeline-dot-size) / 2);
+    }
+  }
+}

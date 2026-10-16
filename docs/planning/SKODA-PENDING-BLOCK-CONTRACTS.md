@@ -64,6 +64,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `stories` | – | `index`, `path`, `template`, `category`, `categories`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured`, `offset`, `exclude`, `feature` (config only; `exclude` registered by SKODA-611b, `feature` since SKODA-222, `categories` since SKODA-831) |
 | `story-rail` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `order`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows (`order` since #272: a comma list of page paths, shown in that order whatever their template, every one unless a `limit` is set; the Storyboard home's Models band) |
 | `tags` | `chips` | – |
+| `timeline` | `black` (the black year pills), `large` (18pt titles) | – (SKODA-815; see `timeline` below) |
 | `quote` | `left` | – (SKODA-220; see `quote` below) |
 | `footnotes` | – | – (SKODA-805d; see `footnotes` below) |
 | `promo-box` | – | curated rows **or** config (`index`, `template`, `path`, `category`, `tags`, `limit`, `sort`); never mixed (PR #110, merged) |
@@ -266,6 +267,21 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - `import-press-kit-default.js`: the 2 first-glimpse quotes (Zellmer, Stefani). They are built after `press-kit-content` flattening, so the layout's source-table pass never sees them. The same importer also runs `parseFigure` for the chapters' figure quotes (`Quote (left)`). That gives 5 chapters: Peaq intro (Zellmer, Jahn, Neft in one block), Peaq exterior (Stefani), Epiq intro (Zellmer, Jahn), Epiq exterior (Stefani) and Epiq battery (Neft).
   - `story-flatten.js` `skoda-quote`: not switched yet. It still emits a default-content `<blockquote>` and loses the attribution, and W1 switches it to this table.
 - **Example:** the Zellmer press release (`/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/`).
+
+### `timeline`
+- **Status:** ✅ **built** in `blocks/timeline` (SKODA-815, on `main` once its PR merges). It is a baseline block (table above), so there is no pending entry; this section is the shape reference. **Ticket:** SKODA-815. **Spec:** [`timeline.md`](../ui-specs/timeline.md)
+- **Source:** the story `ys-milestones` widget (`section.milestones > ul > li`, each holding `.line > .year`, `.title`, `.thumbnail > img` and `.description` after a decorative `.dot`). It appears on 9 EN stories and their 9 CS counterparts (census `ys-milestones`).
+- **Shape:** header `Timeline`, then one row per milestone, in source order: `[year, title, <picture>, description]`.
+  - `year` is plain text (`1905`).
+  - `title` is a `<p>` with the source's lines as `<br>` and the model in `<strong>` (`Laurin & Klement<br><strong>VOITURETTE A</strong><br>(vehicle on display: 1905)`).
+  - The image cell holds the image at its own ratio (square on 8 of the 9 stories), alt as authored (empty on the source). A milestone with stacked images keeps them all, in order (iconic cars, 1970).
+  - `description` holds the `<p>` text with its links, href only.
+  - The source's inline font-size spans and the Škodapedia `term-explain` tooltip markup are unwrapped to their text (glossary tooltips are SKODA-206).
+- **`Timeline (black)`:** a widget whose year pills are `#000000` (125 years of Škoda: iconic cars); the default is the green `#9c0`.
+- **`Timeline (large)`:** a widget whose titles are authored at 18pt or larger (the dominant inline title size; 4 of the 9 EN stories at 18pt, 2 with a 24pt model line): titles 24px on a 36px line instead of 18.67 / 28. The variants combine (`Timeline (black, large)`).
+- **Runtime:** an `<ol>` of entries (year pill, `h3` title, image, description; the line and dots are CSS). It is a left rail up to 1079px and two-sided from 1080 (the source's switch), and it keeps the rail inside a column narrower than 600px.
+- **Defensive:** the image cell is found by content; a row without a year (its first text cell longer than a label) renders without a pill; an empty row is dropped.
+- **Importer:** `parsers/story-flatten.js` `milestonesCells`. A widget without list entries falls back to its images and text as default content, never dropped.
 
 ### `footnotes`
 - **Status:** ✅ on `main` with `blocks/footnotes` once SKODA-805d merges (block and importer land together). **Ticket:** SKODA-805d
