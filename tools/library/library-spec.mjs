@@ -159,6 +159,15 @@ export const SPEC = {
       { class: 'chips outline', label: 'chips, outline', description: 'Outlined filter chips that fill green on hover or when selected.' },
     ],
   },
+  timeline: {
+    structure: 'year-title-image-description repeating',
+    purpose: 'dated story timeline (milestones)',
+    description: 'One row per milestone: year | title | image | description. Title lines are separate lines in the cell, the model in bold. Any cell may be left out: no image, no image box; no year, no year pill; an empty row is skipped. A left line on phones and tablets, two-sided from 1080px wide.',
+    variants: [
+      { class: 'black', label: 'black', description: 'Black year pills and dots instead of the green default (125 years of Škoda: iconic cars).' },
+      { class: 'large', label: 'large', description: 'Larger titles (24px), for timelines whose source titles are 18pt.' },
+    ],
+  },
 };
 
 // Section Metadata Style tokens used on the site (section styles, not blocks)

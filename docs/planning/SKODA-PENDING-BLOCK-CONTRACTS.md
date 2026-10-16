@@ -269,12 +269,12 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Example:** the Zellmer press release (`/en/press-releases/skoda-auto-klaus-zellmer-to-leave-the-company/`).
 
 ### `timeline`
-- **Status:** ✅ **on `main`** with `blocks/timeline` (SKODA-815). It is a baseline block (table above), so there is no pending entry; this section is the shape reference. **Ticket:** SKODA-815. **Spec:** [`timeline.md`](../ui-specs/timeline.md)
+- **Status:** ✅ **built** in `blocks/timeline` (SKODA-815, on `main` once its PR merges). It is a baseline block (table above), so there is no pending entry; this section is the shape reference. **Ticket:** SKODA-815. **Spec:** [`timeline.md`](../ui-specs/timeline.md)
 - **Source:** the story `ys-milestones` widget (`section.milestones > ul > li`, each holding `.line > .year`, `.title`, `.thumbnail > img` and `.description` after a decorative `.dot`). It appears on 9 EN stories and their 9 CS counterparts (census `ys-milestones`).
 - **Shape:** header `Timeline`, then one row per milestone, in source order: `[year, title, <picture>, description]`.
   - `year` is plain text (`1905`).
   - `title` is a `<p>` with the source's lines as `<br>` and the model in `<strong>` (`Laurin & Klement<br><strong>VOITURETTE A</strong><br>(vehicle on display: 1905)`).
-  - The image cell holds the square image, alt as authored (empty on the source).
+  - The image cell holds the image at its own ratio (square on 8 of the 9 stories), alt as authored (empty on the source). A milestone with stacked images keeps them all, in order (iconic cars, 1970).
   - `description` holds the `<p>` text with its links, href only.
   - The source's inline font-size spans and the Škodapedia `term-explain` tooltip markup are unwrapped to their text (glossary tooltips are SKODA-206).
 - **`Timeline (black)`:** a widget whose year pills are `#000000` (125 years of Škoda: iconic cars); the default is the green `#9c0`.

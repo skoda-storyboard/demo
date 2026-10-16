@@ -4,31 +4,23 @@
   "version": "1.0.0",
   "created": "2026-10-16T08:00:00.000Z",
   "name": "Timeline",
-  "description": "A dated timeline (the source's ys-milestones widget): per milestone a year pill, a title, a square image and a description, on a vertical line.",
+  "description": "One row per milestone: year | title | image | description. Title lines are separate lines in the cell, the model in bold. Any cell may be left out: no image, no image box; no year, no year pill; an empty row is skipped. A left line on phones and tablets, two-sided from 1080px wide.",
   "visualCharacteristics": {
-    "purpose": "story milestones timeline"
+    "purpose": "dated story timeline (milestones)"
   },
   "contentPattern": {
-    "structure": "year | title | image | description, one row per milestone"
+    "structure": "year-title-image-description repeating"
   },
   "options": [
     {
       "class": "black",
       "label": "black",
-      "description": "Black year pills and dots instead of the default green (#9c0)."
+      "description": "Black year pills and dots instead of the green default (125 years of Škoda: iconic cars)."
     },
     {
       "class": "large",
       "label": "large",
-      "description": "18pt (24px / 36px) titles instead of 14pt (18.67px / 28px)."
+      "description": "Larger titles (24px), for timelines whose source titles are 18pt."
     }
-  ],
-  "usage": {
-    "pagesUsing": [
-      "en/skoda-world/steering-wheel-decades-of-changes",
-      "en/125-let-skode/125-years-of-skoda-iconic-cars"
-    ],
-    "reuseCount": 9,
-    "lastUsed": "2026-10-16T08:00:00.000Z"
-  }
+  ]
 }
