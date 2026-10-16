@@ -140,7 +140,7 @@
   height: auto;
 }
 
-.timeline .timeline-media > * + * {
+.timeline .timeline-media > :is(picture, img) + :is(picture, img) {
   margin-block-start: var(--timeline-media-stack);
 }
 
