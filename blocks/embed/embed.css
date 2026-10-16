@@ -315,7 +315,7 @@
   transition: opacity var(--clip-fade) ease-in-out;
 }
 
-/* playing with the pointer off the clip, or idle (clip-player.js): the controls fade out; the
+/* played, with the pointer off the clip, or idle while playing (clip-player.js): the controls fade out; the
    pointer, a tap or keyboard focus brings them back, so the hidden bar takes no input meanwhile */
 .embed.vimeo .clip.is-idle .clip-bar {
   opacity: 0;

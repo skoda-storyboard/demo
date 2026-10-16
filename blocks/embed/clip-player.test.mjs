@@ -225,7 +225,7 @@ test('Settings and Picture-in-Picture stay at every width (no narrow-player rule
   assert.deepEqual(hiding.map(([, sel]) => sel.trim()), []);
 });
 
-test('until the clip plays and while paused the controls stay; playing, they show only over the clip and fade 2s after the last move', { skip: !JSDOM }, () => {
+test('until the clip first plays the controls stay; then, playing or paused, they show only over the clip, and fade 2s after the last move while playing', { skip: !JSDOM }, () => {
   mock.timers.enable({ apis: ['setTimeout'] });
   try {
     const {
@@ -265,7 +265,10 @@ test('until the clip plays and while paused the controls stay; playing, they sho
     q('.clip-settings').click();
     assert.equal(idle(), true);
     video.pause();
-    assert.equal(idle(), false, 'paused again, the pointer away: shown');
+    assert.equal(idle(), true, 'paused after playing, the pointer away: hidden');
+    pointer(wrapper, 'pointerenter');
+    mock.timers.tick(5000);
+    assert.equal(idle(), false, 'paused after playing, hovered: shown, no idle fade');
   } finally {
     mock.timers.reset();
   }
