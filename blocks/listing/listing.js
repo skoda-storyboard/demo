@@ -68,28 +68,58 @@ export const valueLabel = (v) => titleCase(String(v).replace(/-/g, ' '));
  * The source's option names and order per facet (#273): blocks/listing/facet-labels.json,
  * generated from the source's filter forms (tools/importer/build-facet-labels.mjs), as
  * `{ facet: [[slug, name], …] }`. A missing or broken file leaves the title-cased slugs.
+ * Its `_pages` key (SKODA-402d) holds each listing page's own options, in its order:
+ * `{ "/en/news": { facet: [slug, …] } }`. The source orders and offers options per page, so on
+ * a page with a list for a facet its options rank by that list and only they are `offered`;
+ * other facets keep the shared order and offer every value.
  * @param {object} json the file's content
- * @returns {Map<string, Map<string, {name: string, rank: number}>>}
+ * @param {string} [page] the listing page path
+ * @returns {Map<string, Map<string, {name: string, rank: number, offered: boolean}>>} with a
+ *   `pageFacets` Set of the facets the page has its own list for
  */
-export function facetLabelMap(json) {
+const PAGES_KEY = '_pages';
+
+export function facetLabelMap(json, page = '') {
+  const data = json && typeof json === 'object' ? json : {};
+  const pages = data[PAGES_KEY] && typeof data[PAGES_KEY] === 'object' ? data[PAGES_KEY] : {};
+  const own = pages[String(page).replace(/\/+$/, '').toLowerCase() || '/'] || {};
   const out = new Map();
-  Object.entries(json && typeof json === 'object' ? json : {}).forEach(([facet, pairs]) => {
-    if (!Array.isArray(pairs)) return;
+  out.pageFacets = new Set();
+  Object.entries(data).forEach(([facet, pairs]) => {
+    if (facet === PAGES_KEY || !Array.isArray(pairs)) return;
+    const order = Array.isArray(own[facet]) ? own[facet].map((v) => String(v).toLowerCase()) : null;
+    if (order) out.pageFacets.add(facet);
     const names = new Map();
-    pairs.forEach((pair, rank) => {
+    pairs.forEach((pair, i) => {
       if (!Array.isArray(pair) || !pair[0] || !pair[1]) return;
-      names.set(String(pair[0]).toLowerCase(), { name: String(pair[1]), rank });
+      const slug = String(pair[0]).toLowerCase();
+      const pageRank = order ? order.indexOf(slug) : i;
+      const rank = pageRank < 0 ? Infinity : pageRank;
+      names.set(slug, { name: String(pair[1]), rank, offered: pageRank >= 0 });
     });
     out.set(facet, names);
   });
   return out;
 }
 
+/**
+ * Does the source offer this option on the page? Only a facet with the page's own list says
+ * no; anything else (no list, no names yet) offers every value.
+ * @param {Map} labels facetLabelMap() output
+ * @param {string} key the facet
+ * @param {string} value the option's index value
+ * @returns {boolean}
+ */
+export function isOffered(labels, key, value) {
+  if (!labels.pageFacets?.has(key)) return true;
+  return !!labels.get(key)?.get(String(value).toLowerCase())?.offered;
+}
+
 function loadFacetLabels() {
   const base = window.hlx?.codeBasePath || '';
   return fetch(`${base}/blocks/listing/facet-labels.json`)
     .then((res) => (res.ok ? res.json() : {}))
-    .then(facetLabelMap)
+    .then((json) => facetLabelMap(json, window.location.pathname))
     .catch(() => facetLabelMap({}));
 }
 
@@ -539,7 +569,8 @@ export default async function decorate(block) {
       pill.classList.toggle('active', n > 0);
       pill.querySelector('.facet-count').textContent = n ? String(n) : '';
     });
-    // the source always shows the count, "(0)" included
+    // the source always shows the count, "(0)" included; regular weight in every state (PO,
+    // 2026-10-14, #333: the source turns it 700 while a filter is on)
     filterToggle.textContent = '';
     const count = document.createElement('span');
     count.className = 'listing-filter-count';
@@ -568,10 +599,12 @@ export default async function decorate(block) {
     renderGrid();
   }
 
-  // A filter change, as on the source: settle, veil the listing, show the new results and
-  // collapse the panel (focus goes to the toggle if it was in the panel), then unveil.
-  // A checkbox ticks at once and settles (a later change, even under the veil, restarts it);
-  // a chip removal or a sort change passes settleMs 0 and veils at once.
+  // A filter change, as on the source (measured 2026-10-14 on /en/news + /en/images, #333): the
+  // veil fades in at once and holds while the results "load", then the new results show, the
+  // panel and its open option list go in the same instant (no collapse animation) and the veil
+  // fades out. Focus goes to the toggle if it was in the panel. A checkbox ticks at once and
+  // waits settleMs (a later change, under the veil, restarts the wait); a chip removal or a
+  // sort change passes settleMs 0: the update follows the veil's 0.2s fade-in.
   let settleTimer = 0;
   let veilTimer = 0;
   function cancelPendingFilter() {
@@ -594,21 +627,30 @@ export default async function decorate(block) {
   }
   function applyFilterChange(settleMs = FILTER_SETTLE_MS) {
     cancelPendingFilter();
+    block.classList.add('is-loading');
+    block.setAttribute('aria-busy', 'true');
     settleTimer = setTimeout(() => {
       settleTimer = 0;
-      block.classList.add('is-loading');
-      block.setAttribute('aria-busy', 'true');
       veilTimer = setTimeout(() => {
         veilTimer = 0;
         // before the render: it removes a clicked chip, which would drop focus to <body>
         const hadFocus = facetBar.contains(document.activeElement);
         rerender();
-        setFacetsOpen(false);
+        collapseFacetsNow();
         if (hadFocus) filterToggle.focus();
         block.classList.remove('is-loading');
         block.removeAttribute('aria-busy');
       }, reducedMotion() ? 0 : VEIL_MS);
     }, settleMs);
+  }
+
+  // After a filter change the source hides the panel and its option list in one step; only the
+  // toggle animates it (open and close, 0.4s)
+  function collapseFacetsNow() {
+    block.classList.add('facets-instant');
+    setFacetsOpen(false);
+    block.getBoundingClientRect(); // apply the closed state without its transition
+    block.classList.remove('facets-instant');
   }
 
   // Open or close one pill's option list (panels are looked up by pill, not by id).
@@ -627,9 +669,18 @@ export default async function decorate(block) {
 
   // --- facet bar ---------------------------------------------------------
   cfg.facets.forEach((key) => {
-    // options in the source order (its names), filled column by column like the source
-    const values = orderFacetValues(distinctFacetValues(scoped, key), key, optionNames);
-    if (!values.length) return; // no data for this facet in scope → skip pill
+    // options in the source order (its names), filled column by column like the source. A
+    // deep-linked value no row in scope carries keeps its option, checked, and so its pill: the
+    // visitor sees the filter that empties the list and can clear it there (#333 review)
+    // only the options the source offers on this page (SKODA-402d: e.g. no Company "other" on
+    // Press Kits, though two kits carry it)
+    const inScope = distinctFacetValues(scoped, key)
+      .filter(({ value }) => isOffered(optionNames, key, value));
+    const seen = new Set(inScope.map(({ value }) => String(value).toLowerCase()));
+    const linked = (state.active[key] || []).filter((v) => !seen.has(String(v).toLowerCase()))
+      .map((value) => ({ value }));
+    const values = orderFacetValues([...inScope, ...linked], key, optionNames);
+    if (!values.length) return; // no data for this facet in scope, nothing selected → no pill
 
     const pill = document.createElement('button');
     pill.type = 'button';
@@ -776,10 +827,10 @@ export default async function decorate(block) {
   });
 
   // Initial paint (no pushState — respect the incoming URL). A deep link that already
-  // filters opens the panel, so the active filters are visible (product decision
-  // 2026-09-29; the source keeps it closed and only shows the count), with the first
-  // filtered facet's options open, as the source shows them once its panel is opened.
-  setFacetsOpen(activeFilterCount() > 0);
+  // filters keeps the panel closed, as the source: only "Advanced filter (n)" shows
+  // (PO, 2026-10-14, #333; it opened on 2026-09-29). The first filtered facet's options are
+  // open, as the source shows them once its panel is opened.
+  setFacetsOpen(false);
   const filteredPill = [...facetPills.querySelectorAll('.facet-pill')]
     .find((p) => selectedCount(state.active, p.dataset.facet) > 0);
   if (filteredPill) setOptionsOpen(filteredPill, true);
@@ -789,14 +840,29 @@ export default async function decorate(block) {
 
   // names that came after the first paint: rename and reorder the options in place (their
   // inputs, state and listeners stay), then the chips. Moving a focused option drops focus to
-  // <body>, so the control a keyboard user is on gets it back (#341 review).
+  // <body>, so the control a keyboard user is on gets it back (#341 review); if that option is
+  // one that goes, focus moves to the first option left in its list, or to the toggle when the
+  // whole list goes (#355 review).
   if (namesLate) {
     facetLabels.then((names) => {
       optionNames = names;
       const focused = facetOptions.contains(document.activeElement) ? document.activeElement : null;
+      const focusedPanel = focused?.closest('fieldset.facet-panel') || null;
       facetOptions.querySelectorAll('fieldset.facet-panel').forEach((panel) => {
         const { facet } = panel.dataset;
+        // an option the source doesn't offer on this page goes, unless it's selected (SKODA-402d)
+        panel.querySelectorAll('label.facet-option').forEach((option) => {
+          const input = option.querySelector('input');
+          if (!input.checked && !isOffered(names, facet, input.value)) option.remove();
+        });
         const options = [...panel.querySelectorAll('label.facet-option')];
+        if (!options.length) {
+          const pill = [...facetPills.querySelectorAll('.facet-pill')].find((p) => p.dataset.facet === facet);
+          panelFor.delete(pill);
+          pill?.remove();
+          panel.remove();
+          return;
+        }
         const byValue = new Map(options.map((o) => [o.querySelector('input').value, o]));
         orderFacetValues([...byValue.keys()].map((value) => ({ value })), facet, names)
           .forEach(({ value }) => {
@@ -805,8 +871,11 @@ export default async function decorate(block) {
             panel.append(option);
           });
       });
-      if (focused?.isConnected && document.activeElement !== focused) {
-        focused.focus({ preventScroll: true });
+      if (focused?.isConnected) {
+        if (document.activeElement !== focused) focused.focus({ preventScroll: true });
+      } else if (focused) {
+        const fallback = (focusedPanel?.isConnected && focusedPanel.querySelector('input')) || filterToggle;
+        fallback.focus({ preventScroll: true });
       }
       renderChips();
     });

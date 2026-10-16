@@ -7,7 +7,21 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 >
 > - Images / Videos: **initial page size 12, Load more +12** (not 6/+6).
 > - Grid is **1 / 3 / 4 / 4 columns at 375 / 768 / 992 / 1280** (not 1/2/3). The Videos DA document asks for 3 desktop columns, but the source shows 4.
-> - The facet form (15 groups) is **collapsed by default even at 1280** and revealed by "Advanced filter"; DA authored only six facets.
+> - The facet form (15 groups) is **collapsed by default even at 1280** and revealed by "Advanced filter"; DA authored only six facets
+>   (since SKODA-402d News / Press Kits author the source's 13 shown groups; Images / Videos all 15, #273).
+>
+> **SKODA-402d (#333, measured 2026-10-14, /en/news/ + /en/press-kits/):** the form holds all 15 groups, but the
+> source **shows 13** on both pages, in this order: Model, Derivative, Concept, Bodywork, Year, Company, Event,
+> History, Sponsorship, People, Interior/Exterior, Technology, Environment. `equipment` and `motorsport` pills are
+> `display: none`, and a deep link to them is ignored ("Advanced filter (0)", unfiltered). EDS lists those 13 in the
+> News / Press Kits `facets` row; a group with no option in the migrated rows shows no pill. After a selection the
+> source also drops groups with no option left in the filtered results; EDS keeps the scoped set (all listings).
+> **Deep link, toggle, chip (PO re-test 2026-10-14, every listing):** a filtered deep link loads with the panel closed;
+> "Advanced filter (n)" stays 400 (PO; the source sets 700 while n > 0); the open panel's first pills sit 28px under the header; the
+> chip cross is skoda-bnr-icons `\e010` in a 21px box, flush with the label.
+> **Options are per page on the source** (order and set): `blocks/listing/facet-labels.json` holds each listing page's
+> own lists under `_pages`; on that page the block ranks by them and offers only those options (a deep-linked value
+> keeps its option).
 >
 > **SKODA-402a re-measure (2026-09-30, /en/images + /en/news; overrides §3, §5, §6 and §9 where they differ):**
 > - The panel is a row of pills (`.filter-labels`); the open pill's option list sits full width under the whole row (`.filter-options`, 160px columns). It is not a dropdown under the pill.
@@ -16,6 +30,8 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 > - **"Advanced filter (n)"** shows at every width, and its caret flips up when open. It is an inline disclosure, not a mobile drawer, so there is no focus trap.
 > - **Motion:** the panel opens and closes over 400ms (height, margins, opacity); an option list fades in over 0.2s.
 > - **After a selection:** ~0.9s later, a `rgb(247 247 247 / 50%)` veil fades over the listing (0.2s). The new results then show and the panel collapses.
+>   **Superseded (re-measured 2026-10-14, #333):** the veil fades in **at once** on the pick and holds while the results
+>   load; the panel and its option list then go in one step (no animation), and the veil fades out.
 > - **The result count** sits under the grid, 16px below it and 32px above Load more.
 
 ## 1. Identity
@@ -215,8 +231,8 @@ authored facet map. Paging = slice the filtered array in batches (default 6) beh
 | `index` | `/en/query-index.json` | index URL (shared loader) |
 | `path` | `/en/press-releases/` | path scope (else `template`) |
 | `template` | `press_release` | index `template`/`type` filter |
-| `facets` | `model, derivative, year, company, event, technology` | ordered facet keys shown as pills |
-| `facetlabels` | `Model, Derivative, Year, Company, Event, Technology` | display labels (optional) |
+| `facets` | `model, derivative, concept, bodywork, years, company, happening, history, sponsorship, vip, view, technology, environment` (News / Press Kits, SKODA-402d) | ordered facet keys (index columns) shown as pills; a group with no option in scope shows none |
+| `facetlabels` | (optional; group names default to the source's, e.g. `years` → Year, `vip` → People) | display labels (optional) |
 | `sort` | `newest` | default sort (`newest`\|`oldest`) |
 | `perpage` | `6` | batch size (load-more) |
 | `columns` | `3` | desktop column count (default 3; images 4) |

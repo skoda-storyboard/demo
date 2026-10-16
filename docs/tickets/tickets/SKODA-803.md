@@ -34,3 +34,9 @@ Also handles the media bulk-load coordination (masters-only ingest, `<img>` rewr
 - Scale/throughput and DA source-API rate limits at ~3,500 docs — batch sizing and retry needed.
 - Per-language totals are inferred, not enumerated for all 6 (adversarial C8/downgrade) — EN scope here is confirmed; locale scale is Phase D.
 - No-CORS legacy CDN limits reference-in-place for cross-origin canvas use — a reason to ingest media into the pipeline for production.
+
+## M2 readiness review (2026-10-15)
+- **Don't enumerate from the sitemaps.** `post-sitemap[1-4]` is capped at 4 × 1,000 URLs (newest `lastmod` 2025-08-12) and misses **193** EN stories. `press_release-sitemap[1-6]` misses **72** releases (newest `lastmod` 2026-01-15). The press-kit sitemaps miss ≥ 95 pages. Use REST for posts / press releases / pages / Škodapedia, and the `/en/press-kits/` listing for press kits.
+- **EN volume to plan for:** 1,303 stories, 1,580 press releases, ≥ 790 press-kit pages, 333 pages, 190 Škodapedia, 378 taxonomy archives. 313 are live today.
+- The corpus runs are split out: SKODA-801b (stories) and SKODA-847 (press kits).
+- Census: [coverage matrix](../../planning/SKODA-PAGE-COVERAGE-MATRIX.md) §1–2.
