@@ -99,10 +99,59 @@ All rows: `measured (source-url · selector · viewport) → token`. Source = th
   `li` inherits the `16px/24px` body scale.
 - `blockquote`: no strong source styling (only a `quotes` rule for non-EN); renders near default →
   recommend an EDS quote style (left rule + italic) as an upgrade (see §8).
-- inline links in prose: `--link-color` (ink) with underline, hover `--link-hover-color` (green) (brand
-  defaults; no per-article override found).
+- inline links in prose: the source's green `#419468`, no underline, ink when hovered (measured 2026-10-16
+  on the electric-car / 4×4 stories; the earlier "ink, brand default" reading missed the source's link colour).
 - `figure` / caption: figure = full content width; caption `.wp-caption-text` `font-weight:300`,
   `text-align:center` when `.aligncenter` (· source CSS) → weight `--weight-light`, muted.
+- **Drop cap** (`span.drop-cap` opening the first body paragraph, 22 of the 82 migrated stories,
+  measured 2026-10-15 at 1440 / 768 / 390):
+  - a 100×100 block floated left with a 20px gap, so the text starts 120px in;
+  - the letter is 68/100, weight 300, uppercase and centred;
+  - green `#419468` on black unless the story's inline style sets its own colours (19 do), and
+    two stories add a 20px gap below.
+  - EDS: Section Metadata style `drop-cap` plus rows `drop-cap-text` / `-color` /
+    `-background` / `-margin-bottom` (importer `transformers/skoda-drop-cap.js`), drawn by
+    `scripts/drop-cap.js`. The visible letter is aria-hidden, and a hidden inline copy keeps
+    the word whole for screen readers.
+- **The editor text's inline styles** (measured 2026-10-16 across the 82 stories; DA keeps none):
+  - **Centred and resized runs:** 172 centred paragraphs in 54 stories (117 are a photo with its 10pt caption) and runs in
+    10 / 14 / 16 / 18pt. Each run of styled body paragraphs is its own body section, `text-center`,
+    `text-small` (13.33 on the 24px line), `text-medium` (18.67/28), `text-large` (21.33/32) or `text-xlarge`
+    (24/36). A photo's caption starts at its foot. A centred row whose text is centred too is
+    `Columns (… text-center)`; one whose portrait text is 10pt is `Columns (… text-small)`.
+  - **Padded boxes** (`<div style="background: #cccccc; padding: 50px">`, 4 stories): `text-box` with rows
+    `box-background` / `box-padding` / `box-shadow` / `box-color` (scripts/section-box.js). The box is the text
+    column's width.
+  - **A body caption figure shown narrower than its file** (the 4×4 spokesperson, 200px): a one-card
+    `Columns (centered, portrait-NNN, captioned)`.
+- **Spacer widgets** (`skoda-offset`, 122 in 41 stories): 24px per em, shown from 720px (none below).
+  - In the body: a `Spacer` block with the height.
+  - Leading a row's cell: the row's `offset-A-B` (px per cell).
+  - **Blank editor lines** (`<p>&nbsp;</p>`, 23 in 14 stories, 44px each, at every width): `Spacer (line)`, or
+    the row's offset when they lead a cell.
+- **Highlight panels' own colours** (12 on the source: #0e3a2f on 36 of 59, then cyan, green, blue, olive, red, …):
+  - rows `highlight-background`, `highlight-color` and `highlight-link`, from the source's inline colours;
+  - a light panel's text is ink and its links green unless the panel sets its own.
+- **Prose and layout:**
+  - **Prose links:** green `#419468`, no underline, ink on hover; the focus ring stays.
+  - **Contrast:** `#419468` is 3.7:1 on white, below WCAG AA's 4.5:1 for text; kept as live by PO request
+    (2026-10-16).
+  - **Photos:** a photo alone in its paragraph is a block (no descender gap).
+  - **Videos:** a story video is followed by the paragraph gap.
+  - **Sliders:** an in-body slider ends 16px under its dots at every width.
+  - **Headings in Columns cells:** they take the story heading sizes.
+- **Photo grid in the text** (`.textwidget .search-results-gallery`, 7 stories, the same
+  source group as a press-kit Images gallery):
+  - photos only, 16:9, 20px apart, 72px below the group's top (its empty toolbar);
+  - a click opens the media lightbox with the download sizes;
+  - plain groups are 3 wide (1 / 2 / 3 at 768 / 992, every photo shown);
+  - groups with the source's togglebox (`data-togglebox`: the 4×4 and surfing stories) use the
+    Media Box grid (1 / 2 / 3 / 4 at 520 / 768 / 992) and collapse with "Show more".
+  - EDS: `Downloads (gallery, story)` with `collapse none|auto` and `columns 3|4`; a 4-wide
+    one shows the source's "Original" / "1920px" pills and each photo's add / download discs.
+    "Show more" / "Show less" slide over 400ms, as the source's togglebox (every Downloads list).
+    (`parsers/press-kit-media.js` `{ story: true }`). Before this, the group's size labels
+    reached the body as stray "Original1920px" lines and no photos.
 
 ### Sidebar (`.sidebar`)
 - static two-thirds-down column of 4 stacked sections (subscribe / related / tags / promo banner);

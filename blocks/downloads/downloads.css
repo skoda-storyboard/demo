@@ -748,10 +748,42 @@
   background: linear-gradient(0deg, var(--skoda-white) 30%, transparent);
 }
 
+/* --- story variant (`Downloads (gallery, story)`): the same source group set in a story's text,
+   the Miss Peaches photo grids, measured on the live enduro / 4×4 stories (2026-10-15 / 16):
+   - a 3-wide grid (`columns 3`, `.downloads-narrow`): photos only (the source's toolbar row is
+     there but empty, so no size pills and no add / download discs; the lightbox keeps the
+     downloads); 1 column up to 767, 2 to 991, 3 from 992, 16:9, 20px apart (260×146 at 1440);
+     the grid starts 72px into the group (the empty 52px toolbar + its 20px margin);
+   - a 4-wide one (the source's togglebox, `collapse auto`, the 4×4 story) is the press-kit
+     gallery as the source shows it there: the "Original" / "1920px" pills 4px into the group,
+     right-aligned, the add / download discs on each photo, the Media Box ladder (1 / 2 / 3 / 4,
+     190×107 at 1440), the grid 72px in;
+   - the group's 24px top margin follows the text. ----------------------------------------- */
+.downloads.gallery.story {
+  --dl-story-top: 4px;
+  --dl-story-top-narrow: 72px;
+  --dl-story-margin-top: 24px;
+
+  margin-block-start: var(--dl-story-margin-top);
+  padding-block-start: var(--dl-story-top);
+}
+
+.downloads.gallery.story.downloads-narrow {
+  padding-block-start: var(--dl-story-top-narrow);
+}
+
+.downloads.gallery.story.downloads-narrow :is(.downloads-group, .downloads-actions) {
+  display: none;
+}
+
 /* --- responsive column ladder: media-box and gallery 1 / 2 / 3 / 4, default 1 / 2 / 4 --- */
 @media (width >= 520px) {
   .downloads:is(.downloads-media-box, .gallery) .downloads-items {
     --dl-cols: 2;
+  }
+
+  .downloads.gallery.story.downloads-narrow .downloads-items {
+    --dl-cols: 1;
   }
 }
 
@@ -763,6 +795,10 @@
   .downloads:is(.downloads-media-box, .gallery) .downloads-items {
     --dl-cols: 3;
   }
+
+  .downloads.gallery.story.downloads-narrow .downloads-items {
+    --dl-cols: 2;
+  }
 }
 
 @media (width >= 992px) {
@@ -772,6 +808,10 @@
 
   .downloads:is(.downloads-media-box, .gallery) .downloads-items {
     --dl-cols: var(--dl-cols-lg, 4);
+  }
+
+  .downloads.gallery.story.downloads-narrow .downloads-items {
+    --dl-cols: var(--dl-cols-lg, 3);
   }
 }
 

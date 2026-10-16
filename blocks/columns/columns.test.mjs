@@ -50,6 +50,29 @@ test('split-75 without a portrait token: the image fills its cell (no portrait c
   assert.ok(el.querySelector(':scope > div > div:last-child').classList.contains('columns-portrait'));
 });
 
+// the imported Miss Peaches profile row: two cards (portrait, name, role, Instagram icon, handle)
+const PROFILE_CELL = (name) => `<div><p><picture><img src="${name}.png" alt="" width="384" height="384"></picture></p>
+  <p><strong>${name}</strong></p><p>biker</p><p><picture><img src="instagram.png" alt="Instagram-icon" width="150" height="150"></picture></p>
+  <p><strong>instagram:</strong> <a href="https://www.instagram.com/x/">@x</a></p></div>`;
+const PROFILE_ROW = `<div>${PROFILE_CELL('laura')}${PROFILE_CELL('nina')}</div>`;
+
+test('centered: both image cards centred, no split; portrait-NNN marks each card\'s first image', () => {
+  const el = block('centered portrait-300', PROFILE_ROW);
+  decorate(el);
+  assert.equal(el.classList.contains('split'), false);
+  assert.equal(el.style.getPropertyValue('--columns-split'), '');
+  assert.ok(el.classList.contains('portrait'));
+  assert.equal(el.style.getPropertyValue('--columns-portrait'), '300px');
+  const cards = el.querySelectorAll(':scope > div > div');
+  assert.equal([...cards].filter((c) => c.classList.contains('columns-portrait')).length, 2);
+  assert.deepEqual([...el.querySelectorAll('.columns-portrait-img')].map((img) => img.getAttribute('src')), ['laura.png', 'nina.png'], 'not the icons');
+
+  const own = block('centered', PROFILE_ROW);
+  decorate(own);
+  assert.equal(own.classList.contains('portrait'), false, 'images at their own size');
+  assert.equal(own.querySelectorAll('.columns-portrait').length, 2);
+});
+
 test('malformed or missing split values keep the default rendering', () => {
   ['split-5', 'split-100', 'split-x', 'portrait-235', ''].forEach((cls) => {
     const el = block(cls);
@@ -95,4 +118,21 @@ test('two split blocks on one page stay independent', () => {
   assert.equal(a.style.getPropertyValue('--columns-split'), '62%');
   assert.equal(b.style.getPropertyValue('--columns-split'), '75%');
   assert.equal(b.classList.contains('portrait'), false);
+});
+
+test('offset-A-B: each cell gets its leading spacer offset; a 0 sets none; malformed tokens are ignored', () => {
+  const el = block('centered offset-48-24', PROFILE_ROW);
+  decorate(el);
+  const [a, b] = el.querySelectorAll(':scope > div > div');
+  assert.ok(el.classList.contains('offset'));
+  assert.equal(a.style.getPropertyValue('--columns-offset'), '48px');
+  assert.equal(b.style.getPropertyValue('--columns-offset'), '24px');
+  const zero = block('split-62 offset-0-24');
+  decorate(zero);
+  assert.equal(zero.querySelector(':scope > div > div').style.getPropertyValue('--columns-offset'), '');
+  ['offset-', 'offset-x-2', 'offset-1000-2'].forEach((cls) => {
+    const bad = block(cls);
+    decorate(bad);
+    assert.equal(bad.classList.contains('offset'), false, cls);
+  });
 });

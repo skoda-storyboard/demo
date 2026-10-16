@@ -457,14 +457,16 @@ test('press variant: default rails keep the carousel ladder (no unscoped cell wi
 // --- story Related band arrows + card title hover (#296, SKODA-228) -------------------------
 const ruleFor = (rules, sel) => rules.find(({ selector }) => selectorList(selector).includes(sel));
 
-test('story Related band: the arrows are the source glyph, as on the home bands (#296)', () => {
-  const prev = ruleFor(cssRules, `${STORY_BAND} .carousel-arrow::after`);
-  const next = ruleFor(cssRules, `${STORY_BAND} .carousel-next::after`);
-  assert.ok(prev?.body.includes('rail-arrow-prev.svg'), 'prev glyph mask');
-  assert.ok(next?.body.includes('rail-arrow-next.svg'), 'next glyph mask');
-  // the same rules as the home bands, not a copy that can drift
-  assert.equal(ruleFor(cssRules, '.story-rail.story-rail-home .carousel-arrow::after'), prev);
-  assert.equal(ruleFor(cssRules, '.story-rail.story-rail-home .carousel-next::after'), next);
+test('story Related band and home bands: the arrows keep the carousel glyph, no mask override (#296, #284)', async () => {
+  // carousel.css draws the source glyph for every rail; an override here once masked it with
+  // the removed icons/rail-arrow-*.svg (404), leaving bare ink discs
+  ['.carousel-arrow::after', '.carousel-next::after'].forEach((arrow) => {
+    assert.equal(ruleFor(cssRules, `${STORY_BAND} ${arrow}`), undefined, `no story band ${arrow} override`);
+    assert.equal(ruleFor(cssRules, `.story-rail.story-rail-home ${arrow}`), undefined, `no home band ${arrow} override`);
+  });
+  assert.ok(!cssRules.some(({ body }) => body.includes('rail-arrow-')), 'no rule points at the removed SVGs');
+  const carouselCss = await readFile(new URL('../carousel/carousel.css', import.meta.url), 'utf8');
+  assert.ok(carouselCss.includes('content: "\\e00b" / "";'), 'the shared glyph rule');
 });
 
 test('card titles keep their colour on hover: one rule in the shared card primitive (SKODA-228)', async () => {

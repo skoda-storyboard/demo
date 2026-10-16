@@ -46,3 +46,18 @@ test('a delivered section: its data-highlight-* attributes (the pipeline\'s form
   assert.deepEqual(box(el, 'margin-m'), ['0px', '0px', '0px', '0px']);
   assert.equal(el.style.length, 8, 'only the two geometry rows');
 });
+
+test('panel colours (#516): highlight-background / -color / -link as --hl-bg / --hl-color / --hl-link; only hex', () => {
+  const el = section();
+  assert.equal(applyHighlightGeometry(el, 'highlight-background', '#1ed4df'), true);
+  assert.equal(applyHighlightGeometry(el, 'highlight-color', '#333'), true);
+  assert.equal(applyHighlightGeometry(el, 'highlight-link', 'red; background: url(x)'), false);
+  assert.equal(el.style.getPropertyValue('--hl-bg'), '#1ed4df');
+  assert.equal(el.style.getPropertyValue('--hl-color'), '#333');
+  assert.equal(el.style.getPropertyValue('--hl-link'), '');
+  // delivered pages: the data attributes
+  const delivered = section('data-highlight-background="#4ba82e" data-highlight-link="#ffffff"');
+  applyHighlightDataset(delivered);
+  assert.equal(delivered.style.getPropertyValue('--hl-bg'), '#4ba82e');
+  assert.equal(delivered.style.getPropertyValue('--hl-link'), '#ffffff');
+});

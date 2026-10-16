@@ -381,9 +381,17 @@ body.story .section.body-column .gallery.slider {
 }
 
 @media (width >= 768px) {
-  /* two-column story: image → next heading is 72px on the source */
+  /* two-column story: image → next heading or paragraph is 72px on the source (40px under the
+     dots) */
   .gallery.slider {
     padding-block-end: var(--spacing-xl);
+  }
+
+  /* … of which 24px is the source's spacer widget when the story has one there: with its
+     Spacer block (#516 imports) the slider keeps 16px under its dots, as below 768px, so the
+     text isn't 24px low (Epiq Sportline) */
+  .gallery-wrapper:has(+ .spacer-wrapper) .gallery.slider {
+    padding-block-end: var(--spacing-m);
   }
 }
 
