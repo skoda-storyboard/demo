@@ -82,7 +82,8 @@ function entryOf(row) {
  * Timeline (SKODA-815, contract `timeline` v1): the source's dated `ys-milestones`
  * timeline. Each row is one milestone, year | title | image | description, rendered as an
  * ordered list on the source's line: a left rail on phones and tablets, two-sided (title
- * and image left, description right) from 1080. `Timeline (black)` is the black year pill.
+ * and image left, description right) from 1080. `Timeline (black)` is the black year pill,
+ * `Timeline (large)` the widgets authored with 18pt (24px) titles.
  * @param {Element} block
  */
 export default function decorate(block) {

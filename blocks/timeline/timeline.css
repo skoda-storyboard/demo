@@ -65,6 +65,12 @@
   --timeline-accent: var(--skoda-black);
 }
 
+/* the widgets authored with 18pt titles (24px on a 36px line) */
+.timeline.large {
+  --timeline-title-size: 24px;
+  --timeline-title-line: 36px;
+}
+
 /* L1 fluid: the left rail */
 .timeline .timeline-list {
   margin: 0;
@@ -119,12 +125,12 @@
   padding-block-end: var(--timeline-media-gap);
 }
 
+/* the image at its own ratio, the full column wide (square on most stories) */
 .timeline .timeline-media picture,
 .timeline .timeline-media img {
   display: block;
   width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
+  height: auto;
 }
 
 .timeline .timeline-text {

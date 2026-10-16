@@ -350,6 +350,23 @@ function milestoneRich(source, document) {
 // (#99cc00, the default) on most, black on "125 years of Škoda: iconic cars".
 const MILESTONE_BLACK = /background(?:-color)?\s*:\s*(?:#0{3}(?:0{3})?\b|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\)|black\b)/i;
 
+// The widget's title size, authored as inline font-size spans: 14pt (18.67px) on most,
+// 18pt (24px) on four stories, with a 24pt model line on two. 18pt and up → `large`.
+function milestoneTitleSize(items) {
+  const px = (value) => {
+    const m = String(value).match(/^([\d.]+)(pt|px)$/);
+    if (!m) return 0;
+    return m[2] === 'pt' ? (Number(m[1]) * 4) / 3 : Number(m[1]);
+  };
+  const sizes = items.flatMap((li) => [...li.querySelectorAll('.title [style*="font-size"]')]
+    .map((span) => px(span.style.fontSize.trim())).filter(Boolean));
+  if (!sizes.length) return '';
+  const counts = new Map();
+  sizes.forEach((size) => counts.set(size, (counts.get(size) || 0) + 1));
+  const [dominant] = [...counts.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0])[0];
+  return dominant >= 24 ? 'large' : '';
+}
+
 // ys-milestones = a dated timeline (SKODA-815 / D1). Source shape:
 // `section.milestones > ul > li`, each <li> holding `.line > .year`, `.title` (rich: the
 // maker, the bold model, "(vehicle on display: …)"), `.thumbnail > img` (square) and
@@ -361,8 +378,11 @@ function milestonesCells(panel, document) {
   const items = [...panel.querySelectorAll('li')]
     .filter((li) => li.querySelector('.year, .title, .description, img'));
   if (!items.length) return null;
-  const black = MILESTONE_BLACK.test(items[0].querySelector('.year')?.getAttribute('style') || '');
-  const cells = [[black ? 'Timeline (black)' : 'Timeline']];
+  const variants = [
+    MILESTONE_BLACK.test(items[0].querySelector('.year')?.getAttribute('style') || '') ? 'black' : '',
+    milestoneTitleSize(items),
+  ].filter(Boolean);
+  const cells = [[variants.length ? `Timeline (${variants.join(', ')})` : 'Timeline']];
   items.forEach((li) => {
     const year = (li.querySelector('.year')?.textContent || '').replace(/\s+/g, ' ').trim();
     const title = milestoneRich(li.querySelector('.title'), document);

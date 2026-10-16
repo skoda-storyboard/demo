@@ -287,12 +287,28 @@ var CustomImportScript = (() => {
     return nodes.filter((n) => !(n.tagName === "P" && !n.textContent.trim() && !n.querySelector("br, a")));
   }
   var MILESTONE_BLACK = /background(?:-color)?\s*:\s*(?:#0{3}(?:0{3})?\b|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\)|black\b)/i;
+  function milestoneTitleSize(items) {
+    const px = (value) => {
+      const m = String(value).match(/^([\d.]+)(pt|px)$/);
+      if (!m) return 0;
+      return m[2] === "pt" ? Number(m[1]) * 4 / 3 : Number(m[1]);
+    };
+    const sizes = items.flatMap((li) => [...li.querySelectorAll('.title [style*="font-size"]')].map((span) => px(span.style.fontSize.trim())).filter(Boolean));
+    if (!sizes.length) return "";
+    const counts = /* @__PURE__ */ new Map();
+    sizes.forEach((size) => counts.set(size, (counts.get(size) || 0) + 1));
+    const [dominant] = [...counts.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0])[0];
+    return dominant >= 24 ? "large" : "";
+  }
   function milestonesCells(panel, document2) {
     var _a;
     const items = [...panel.querySelectorAll("li")].filter((li) => li.querySelector(".year, .title, .description, img"));
     if (!items.length) return null;
-    const black = MILESTONE_BLACK.test(((_a = items[0].querySelector(".year")) == null ? void 0 : _a.getAttribute("style")) || "");
-    const cells = [[black ? "Timeline (black)" : "Timeline"]];
+    const variants = [
+      MILESTONE_BLACK.test(((_a = items[0].querySelector(".year")) == null ? void 0 : _a.getAttribute("style")) || "") ? "black" : "",
+      milestoneTitleSize(items)
+    ].filter(Boolean);
+    const cells = [[variants.length ? `Timeline (${variants.join(", ")})` : "Timeline"]];
     items.forEach((li) => {
       var _a2;
       const year = (((_a2 = li.querySelector(".year")) == null ? void 0 : _a2.textContent) || "").replace(/\s+/g, " ").trim();

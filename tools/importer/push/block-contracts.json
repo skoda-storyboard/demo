@@ -196,7 +196,8 @@
     },
     "timeline": {
       "variants": [
-        "black"
+        "black",
+        "large"
       ]
     },
     "widget": {

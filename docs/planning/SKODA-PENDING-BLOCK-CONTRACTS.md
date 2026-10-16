@@ -64,7 +64,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `stories` | – | `index`, `path`, `template`, `category`, `categories`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured`, `offset`, `exclude`, `feature` (config only; `exclude` registered by SKODA-611b, `feature` since SKODA-222, `categories` since SKODA-831) |
 | `story-rail` | – | `index`, `path`, `template`, `category`, `tag(s)`, `heading`, `view-all`, `sort`, `limit`, `exclude`, `order`, `dots` + the index facets (`model`, `years`, …); config **or** curated rows (`order` since #272: a comma list of page paths, shown in that order whatever their template, every one unless a `limit` is set; the Storyboard home's Models band) |
 | `tags` | `chips` | – |
-| `timeline` | `black` (the black year pills) | – (SKODA-815; see `timeline` below) |
+| `timeline` | `black` (the black year pills), `large` (18pt titles) | – (SKODA-815; see `timeline` below) |
 | `quote` | `left` | – (SKODA-220; see `quote` below) |
 | `footnotes` | – | – (SKODA-805d; see `footnotes` below) |
 | `promo-box` | – | curated rows **or** config (`index`, `template`, `path`, `category`, `tags`, `limit`, `sort`); never mixed (PR #110, merged) |
@@ -278,6 +278,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   - `description` holds the `<p>` text with its links, href only.
   - The source's inline font-size spans and the Škodapedia `term-explain` tooltip markup are unwrapped to their text (glossary tooltips are SKODA-206).
 - **`Timeline (black)`:** a widget whose year pills are `#000000` (125 years of Škoda: iconic cars); the default is the green `#9c0`.
+- **`Timeline (large)`:** a widget whose titles are authored at 18pt or larger (the dominant inline title size; 4 of the 9 EN stories at 18pt, 2 with a 24pt model line): titles 24px on a 36px line instead of 18.67 / 28. The variants combine (`Timeline (black, large)`).
 - **Runtime:** an `<ol>` of entries (year pill, `h3` title, image, description; the line and dots are CSS). It is a left rail up to 1079px and two-sided from 1080 (the source's switch), and it keeps the rail inside a column narrower than 600px.
 - **Defensive:** the image cell is found by content; a row without a year (its first text cell longer than a label) renders without a pill; an empty row is dropped.
 - **Importer:** `parsers/story-flatten.js` `milestonesCells`. A widget without list entries falls back to its images and text as default content, never dropped.

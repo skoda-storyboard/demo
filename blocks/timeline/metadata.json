@@ -16,6 +16,11 @@
       "class": "black",
       "label": "black",
       "description": "Black year pills and dots instead of the default green (#9c0)."
+    },
+    {
+      "class": "large",
+      "label": "large",
+      "description": "18pt (24px / 36px) titles instead of 14pt (18.67px / 28px)."
     }
   ],
   "usage": {

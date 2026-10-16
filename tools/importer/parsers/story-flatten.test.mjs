@@ -390,10 +390,11 @@ test('SKODA-815: the steering-wheel timeline keeps all 11 years, titles, images 
     ['FAVORIT', 'to control']);
 });
 
-test('SKODA-815: a black year pill maps to Timeline (black); glossary tooltips become their text', { skip: domSkip }, () => {
+test('SKODA-815: a black year pill and 18pt titles map to Timeline (black, large); glossary tooltips become their text', { skip: domSkip }, () => {
   const content = milestonesStory('milestones-iconic-cars');
-  const table = content.querySelector('table[data-block="Timeline (black)"]');
-  assert.ok(table, 'the black pill (#000000) is the variant');
+  // black pills, and 18pt titles (the steering wheel's are 14pt) → `large`
+  const table = content.querySelector('table[data-block="Timeline (black, large)"]');
+  assert.ok(table, 'the black pill (#000000) and the 18pt titles are the variants');
   const rows = [...table.querySelectorAll('tr')].slice(1);
   assert.equal(rows.length, 16);
   assert.ok(rows.filter((r) => r.children[3].querySelector('a[href]')).length >= 12, 'description links kept');
