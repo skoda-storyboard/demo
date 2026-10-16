@@ -2,7 +2,7 @@
 
 - **Epic:** E05, Media Pipeline
 - **Type:** setup / integration (no product code)
-- **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02). **Blocks SKODA-511**; the long pole is the client's entitlement.
+- **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02). **Blocks SKODA-511a** (and SKODA-511's runs against author); the long pole is the client's entitlement.
 - **Estimate:** 2 SP team time · AI-assisted 1d / manual 2d, excluding client lead time *(planning estimate, not a quote)*
 - **GitHub issue:** [#381](https://github.com/skoda-storyboard/demo/issues/381) (created 2026-10-16)
 - **Status (2026-10-16):** 🔵 TODO (M2), no owner. Review done:
@@ -63,4 +63,4 @@ The sync logic itself (SKODA-511), the feed shapes (SKODA-517) and the ledger (S
 - [ ] CI deploys the skeleton to Stage; deploying to Production requires a manual approval.
 
 ## Dependencies
-Client Adobe org admins (System Admin, AEM admin, Cloud Manager). Blocks SKODA-511. Informs SKODA-902 and SKODA-906.
+Client Adobe org admins (System Admin, AEM admin, Cloud Manager). Blocks SKODA-511a; SKODA-511 needs its AEM credential; SKODA-511b needs its credentials for the expiry register. Informs SKODA-902 and SKODA-906.
