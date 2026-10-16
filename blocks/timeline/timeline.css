@@ -38,6 +38,9 @@
   --timeline-title-size: 18.6667px;
   --timeline-title-line: 28px;
   --timeline-title-gap: 30px;
+
+  /* the source title paragraph's own 20px bottom margin, below the gap */
+  --timeline-title-end: 20px;
   --timeline-media-gap: 30px;
 
   /* the space below an entry's description (and image, two-sided) */
@@ -95,7 +98,7 @@
 
 .timeline .timeline-title {
   margin: 0;
-  padding-block-end: var(--timeline-title-gap);
+  padding-block-end: calc(var(--timeline-title-gap) + var(--timeline-title-end));
   color: inherit;
   font-size: var(--timeline-title-size);
   font-weight: var(--weight-regular);
@@ -167,7 +170,7 @@
 
     .timeline .timeline-title {
       grid-column: 1 / -1;
-      padding-block-end: calc(2 * var(--timeline-title-gap));
+      padding-block-end: calc(2 * var(--timeline-title-gap) + var(--timeline-title-end));
       padding-inline-end: var(--timeline-title-inset);
     }
 
