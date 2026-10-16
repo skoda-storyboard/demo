@@ -49,3 +49,5 @@ The demo's client-side zip (SKODA-505) has real production limits: browser memor
 - **1920px in the media cart** stays disabled (PO, #273): the DAM holds no 1920px rendition (original, 1280, 2048) and
   the source's 1920px file sends no CORS for the cart zip. Add a 1920px rendition to the Assets processing profile, then
   enable the "+ 1920px" row (`scripts/media-card.js` `cartAction`).
+
+> **Note (2026-10-16):** if the zip endpoint runs on App Builder, it uses the project and credentials set up by [SKODA-521](SKODA-521.md).

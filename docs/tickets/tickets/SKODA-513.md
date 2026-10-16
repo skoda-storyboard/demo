@@ -98,6 +98,10 @@ It does not reopen #176, implement the authoring picker in #62, resolve #219's d
 ## Dependencies and collision scope
 
 Coordinate native preview generation with **#178 / SKODA-511**.
+**Added 2026-10-16:** read the preview reference from SKODA-517's keyed or detail shards, not the whole feed. The
+asset-ingestion review ([`SKODA-ASSET-INGESTION-M2.md`](../../architecture/SKODA-ASSET-INGESTION-M2.md)) orders this
+after 517 and 511. With the Media Bus decision (D5, 2026-10-16), the carrier fragments ingest the full-size original
+(SKODA-520 phase 1). The 1920 preview is then `?width=1920` on the same Media Bus image, and `rendition-1920` retires.
 Quality-capable, anonymously delivered references are a prerequisite to removing the working legacy preview.
 Check whether #219 affects chosen native sources; successful JPEG thumbnail delivery is not proof that WebP-original publishing is fixed.
 Closed #49 / SKODA-504, #30 / SKODA-501 and #176 / SKODA-406 are mapping/ingest/renderer references, not inferred open blockers.

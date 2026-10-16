@@ -38,3 +38,5 @@ No end-user auth exists on the site today. Until the model is defined, this is a
 - 🔴 **Blocked on D17** — model fully undefined; SP is provisional and will re-point once scoped.
 - No native EDS end-user gating — introduces delivery-side auth the platform doesn't do by default; treat as an M2+ investigation, not a demo item.
 - Keep distinct from the author-side embargo (SKODA-811).
+
+> **Note (2026-10-16):** if the access gate runs on App Builder, it uses the project set up by [SKODA-521](SKODA-521.md).
