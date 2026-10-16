@@ -5,7 +5,7 @@
 - **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02). **Priority: P1, start now** (decision 2026-10-16: get rid
   of the source CDN as soon as possible).
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–6d, excluding the DAM ingest runtime *(planning estimate, not a quote)*
-- **GitHub issue:** not created yet
+- **GitHub issue:** [#378](https://github.com/skoda-storyboard/demo/issues/378) (created 2026-10-16)
 - **Status (2026-10-16):** 🔵 TODO (M2), no owner. Census done. Design in
   [`SKODA-ASSET-INGESTION-M2.md`](../../architecture/SKODA-ASSET-INGESTION-M2.md) §3B and §6.
 

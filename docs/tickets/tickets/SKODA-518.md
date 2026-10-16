@@ -4,7 +4,7 @@
 - **Type:** tooling / data
 - **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02)
 - **Estimate:** 2 SP · AI-assisted 1–1.5d / manual 2–3d *(planning estimate, not a quote)*
-- **GitHub issue:** not created yet
+- **GitHub issue:** [#376](https://github.com/skoda-storyboard/demo/issues/376) (created 2026-10-16)
 - **Status (2026-10-16):** 🔵 TODO (M2), no owner. Prerequisite for the SKODA-504a bulk ingest. Proposed in
   [`SKODA-ASSET-INGESTION-M2.md`](../../architecture/SKODA-ASSET-INGESTION-M2.md) §3A.
 

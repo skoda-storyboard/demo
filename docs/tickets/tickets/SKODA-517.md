@@ -4,7 +4,7 @@
 - **Type:** data contract / shared loader
 - **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02)
 - **Estimate:** 3 SP · AI-assisted 1.5–2d / manual 3–4d *(planning estimate, not a quote)*
-- **GitHub issue:** not created yet
+- **GitHub issue:** [#375](https://github.com/skoda-storyboard/demo/issues/375) (created 2026-10-16)
 - **Status (2026-10-16):** 🔵 TODO (M2), no owner. Proposed in
   [`SKODA-ASSET-INGESTION-M2.md`](../../architecture/SKODA-ASSET-INGESTION-M2.md) §3C.
 

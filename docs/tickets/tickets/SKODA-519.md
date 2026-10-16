@@ -4,7 +4,7 @@
 - **Type:** integration / shared script
 - **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02)
 - **Estimate:** 1.5 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
-- **GitHub issue:** not created yet
+- **GitHub issue:** [#377](https://github.com/skoda-storyboard/demo/issues/377) (created 2026-10-16)
 - **Status (2026-10-16):** 🔵 TODO (M2), no owner. Starts once SKODA-517's keyed shards exist and the SKODA-504a
   source-CDN sweep is near 0. Proposed in [`SKODA-ASSET-INGESTION-M2.md`](../../architecture/SKODA-ASSET-INGESTION-M2.md) §3D.
 
