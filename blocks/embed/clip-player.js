@@ -4,7 +4,9 @@
  * draws the player's controls on it. Measured on the first-glimpse press kit (812×457):
  * a 56×32 play button and a bar holding the progress track, its time pill and the volume,
  * settings (speed), picture-in-picture and fullscreen buttons, each with its name as a tooltip.
- * The controls stay shown, as the source's do. Styles: embed.css (`.embed.vimeo`).
+ * Over the volume button, a 32×96 vertical slider shows on hover and on keyboard focus (the
+ * next Tab stop after Mute; arrow keys 5%, as the source's). The controls stay shown, at every
+ * width, as the source's do. Styles: embed.css (`.embed.vimeo`).
  */
 
 const LABELS = {
@@ -19,12 +21,17 @@ const LABELS = {
   fullscreen: 'Fullscreen',
   exitFullscreen: 'Exit full screen',
   progress: 'Progress Bar',
+  volume: 'Volume (use up/down arrow keys to change)',
+  volumeLevel: (pct) => `${pct}% volume`,
   timeOf: (now, total) => `${now} of ${total}`,
 };
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 // the progress bar's keys: arrows step 5s, Page Up / Down a tenth, Home / End the ends
 const SEEK_STEP_S = 5;
+// the volume slider's keys: arrows step 5% (the source's), Page Up / Down 10%, Home / End the ends
+const VOLUME_STEP = 5;
+const VOLUME_PAGE = 10;
 
 const SVG = 'http://www.w3.org/2000/svg';
 // 24×24 glyphs drawn for this player (play, pause, speaker, speaker off, gear, PiP, fullscreen)
@@ -127,6 +134,28 @@ export default function clipPlayer(wrapper, video) {
   const buttons = document.createElement('div');
   buttons.className = 'clip-buttons';
   const volume = control('clip-volume', LABELS.mute, 'volume');
+  // the source's vertical volume slider over the button: a role=slider, as the source's (a
+  // vertical native range is still uneven across browsers), drawn as a 4×72 track with its
+  // fill and an 8px handle
+  const volumeControl = document.createElement('div');
+  volumeControl.className = 'clip-volume-control';
+  const slider = document.createElement('div');
+  slider.className = 'clip-volume-slider';
+  slider.tabIndex = 0;
+  slider.setAttribute('role', 'slider');
+  slider.setAttribute('aria-label', LABELS.volume);
+  slider.setAttribute('aria-orientation', 'vertical');
+  slider.setAttribute('aria-valuemin', '0');
+  slider.setAttribute('aria-valuemax', '100');
+  const sliderBar = document.createElement('div');
+  sliderBar.className = 'clip-volume-bar';
+  const sliderFill = document.createElement('div');
+  sliderFill.className = 'clip-volume-fill';
+  const sliderHandle = document.createElement('div');
+  sliderHandle.className = 'clip-volume-handle';
+  sliderBar.append(sliderFill, sliderHandle);
+  slider.append(sliderBar);
+  volumeControl.append(volume, slider);
   const settings = control('clip-settings', LABELS.settings, 'settings');
   settings.setAttribute('aria-haspopup', 'true');
   settings.setAttribute('aria-expanded', 'false');
@@ -135,7 +164,7 @@ export default function clipPlayer(wrapper, video) {
   // only what the browser can do
   pip.hidden = !(document.pictureInPictureEnabled && video.requestPictureInPicture);
   full.hidden = !(wrapper.requestFullscreen || video.webkitEnterFullscreen);
-  buttons.append(volume, settings, pip, full);
+  buttons.append(volumeControl, settings, pip, full);
 
   // settings: the playback speed (the MP4 master has one quality)
   const menu = document.createElement('div');
@@ -187,9 +216,20 @@ export default function clipPlayer(wrapper, video) {
     setControl(play, paused ? LABELS.play : LABELS.pause, paused ? 'play' : 'pause');
     wrapper.classList.toggle('is-playing', !paused);
   };
+  // the slider shows the level heard: 0 while muted
+  const level = () => (video.muted ? 0 : Math.round((video.volume ?? 1) * 100));
+  const setLevel = (pct) => {
+    const to = Math.min(Math.max(Math.round(pct), 0), 100);
+    video.volume = to / 100;
+    video.muted = to === 0;
+  };
   const syncVolume = () => {
     const off = video.muted || video.volume === 0;
     setControl(volume, off ? LABELS.unmute : LABELS.mute, off ? 'muted' : 'volume');
+    const now = level();
+    slider.setAttribute('aria-valuenow', String(now));
+    slider.setAttribute('aria-valuetext', LABELS.volumeLevel(now));
+    slider.style.setProperty('--clip-volume', String(now / 100));
   };
 
   const toggle = () => {
@@ -210,6 +250,42 @@ export default function clipPlayer(wrapper, video) {
   volume.addEventListener('click', () => {
     video.muted = !(video.muted || video.volume === 0);
     if (!video.muted && video.volume === 0) video.volume = 1;
+  });
+  slider.addEventListener('keydown', (e) => {
+    const steps = {
+      ArrowUp: VOLUME_STEP,
+      ArrowRight: VOLUME_STEP,
+      ArrowDown: -VOLUME_STEP,
+      ArrowLeft: -VOLUME_STEP,
+      PageUp: VOLUME_PAGE,
+      PageDown: -VOLUME_PAGE,
+    };
+    let to = null;
+    if (e.key in steps) to = level() + steps[e.key];
+    else if (e.key === 'Home') to = 0;
+    else if (e.key === 'End') to = 100;
+    if (to === null) return;
+    e.preventDefault();
+    setLevel(to);
+    syncVolume();
+  });
+  // pointer: the level at the pointer on the track (its foot is 0), pressed or dragged
+  const levelAt = (clientY) => {
+    const { top, bottom } = sliderBar.getBoundingClientRect();
+    return bottom > top ? ((bottom - clientY) / (bottom - top)) * 100 : level();
+  };
+  slider.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    slider.focus({ preventScroll: true });
+    slider.setPointerCapture?.(e.pointerId);
+    setLevel(levelAt(e.clientY));
+    syncVolume();
+  });
+  slider.addEventListener('pointermove', (e) => {
+    if (!slider.hasPointerCapture?.(e.pointerId)) return;
+    setLevel(levelAt(e.clientY));
+    syncVolume();
   });
   settings.addEventListener('click', () => {
     const open = menu.hidden;

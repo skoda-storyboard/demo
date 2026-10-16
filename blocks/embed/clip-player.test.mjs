@@ -165,3 +165,61 @@ test('a refused play (autoplay policy, a load error) leaves the Play button as i
   await new Promise((r) => { setTimeout(r, 0); });
   assert.equal(q('.clip-play').getAttribute('aria-label'), 'Play');
 });
+
+// --- #356 review (745f15f): the source's volume slider; Settings / PiP at every width ----------
+test('volume slider: the source\'s vertical slider, the Tab stop after Mute, named and valued', { skip: !JSDOM }, () => {
+  const { q, wrapper } = setup();
+  const slider = q('.clip-volume-slider');
+  assert.equal(slider.getAttribute('role'), 'slider');
+  assert.equal(slider.tabIndex, 0);
+  assert.equal(slider.getAttribute('aria-label'), 'Volume (use up/down arrow keys to change)');
+  assert.equal(slider.getAttribute('aria-orientation'), 'vertical');
+  assert.deepEqual(['aria-valuemin', 'aria-valuemax', 'aria-valuenow'].map((a) => slider.getAttribute(a)), ['0', '100', '100']);
+  assert.equal(slider.getAttribute('aria-valuetext'), '100% volume');
+  const focusable = [...wrapper.querySelectorAll('.clip-bar button:not(.clip-menu-option), .clip-seek, [role="slider"]')]
+    .filter((el) => !el.hidden).map((el) => el.getAttribute('aria-label'));
+  assert.deepEqual(focusable.slice(2, 4), ['Mute', 'Volume (use up/down arrow keys to change)'], 'right after Mute, as the source');
+});
+
+test('volume slider keys: arrows 5%, Page keys 10%, Home mutes, End is full; clamped; the fill follows', { skip: !JSDOM }, () => {
+  const { q, state, key } = setup();
+  const slider = q('.clip-volume-slider');
+  const now = () => slider.getAttribute('aria-valuenow');
+  key(slider, 'ArrowDown');
+  assert.equal(now(), '95');
+  assert.equal(slider.getAttribute('aria-valuetext'), '95% volume');
+  assert.equal(slider.style.getPropertyValue('--clip-volume'), '0.95');
+  key(slider, 'PageDown');
+  assert.equal(now(), '85');
+  ['ArrowUp', 'ArrowRight', 'PageUp', 'PageUp'].forEach((k) => key(slider, k));
+  assert.equal(now(), '100', 'clamped at full');
+  key(slider, 'Home');
+  assert.equal(now(), '0');
+  assert.equal(state.muted, true, 'zero is muted');
+  assert.equal(q('.clip-volume').getAttribute('aria-label'), 'Unmute');
+  key(slider, 'ArrowUp');
+  assert.equal(state.muted, false);
+  assert.equal(now(), '5');
+  key(slider, 'End');
+  assert.equal(state.volume, 1);
+  key(slider, 'Tab');
+  assert.equal(now(), '100', 'other keys leave it');
+});
+
+test('volume slider follows the Mute button: 0 while muted, the level again after', { skip: !JSDOM }, () => {
+  const { q, key } = setup();
+  const slider = q('.clip-volume-slider');
+  key(slider, 'PageDown');
+  q('.clip-volume').click();
+  assert.equal(slider.getAttribute('aria-valuenow'), '0');
+  q('.clip-volume').click();
+  assert.equal(slider.getAttribute('aria-valuenow'), '90');
+});
+
+test('Settings and Picture-in-Picture stay at every width (no narrow-player rule hides them)', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = (await readFile(new URL('./embed.css', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
+  const hiding = rules.filter(([, sel, body]) => /clip-(settings|pip)/.test(sel) && /display:\s*none/.test(body));
+  assert.deepEqual(hiding.map(([, sel]) => sel.trim()), []);
+});

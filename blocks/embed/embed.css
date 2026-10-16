@@ -256,8 +256,11 @@
    progress track (4px, its played part Škoda emerald, a white time pill over the playhead)
    and 24px volume / settings / PiP / fullscreen buttons (20px glyphs, 4px apart). Black at 90%,
    4px corners; hovered, the play button turns emerald and the glyphs emerald. Each control's
-   name shows above it, as the source's tooltip. Below 520px the settings and PiP go (the
-   source folds them away there). */
+   name shows above it, as the source's tooltip. Every control stays at every width (the
+   source's settings and PiP are 24×24 at 390 and 768 too). Over the volume button, the source's
+   vertical volume slider (#356 review): a 32×96 box 8px above it, black at 90%, 4px corners,
+   with a 4×72 track (white at 40%), its emerald fill and an 8px white handle; shown on hover
+   and on keyboard focus. */
 .embed.vimeo {
   --clip-inset: var(--spacing-xs);
   --clip-bar-height: 32px;
@@ -286,6 +289,13 @@
   --clip-tip-line: 15px;
   --clip-tip-pad: var(--spacing-xs) 12px;
   --clip-tip-gap: 4px;
+  --clip-volume-width: 32px;
+  --clip-volume-height: 96px;
+  --clip-volume-gap: var(--spacing-xs);
+  --clip-volume-bar-width: 4px;
+  --clip-volume-bar-height: 72px;
+  --clip-volume-bar: rgb(255 255 255 / 40%);
+  --clip-volume-handle: 8px;
 }
 
 .embed.vimeo .clip {
@@ -384,7 +394,7 @@
   opacity: 0;
 }
 
-.embed.vimeo .clip-buttons .clip-button:last-of-type::after {
+.embed.vimeo .clip-buttons > .clip-button:last-child::after {
   inset-inline: auto calc(-1 * (var(--clip-panel-pad) * 2));
   translate: none;
 }
@@ -519,9 +529,85 @@
   outline-offset: 0;
 }
 
-@container (width < 520px) {
-  .embed.vimeo .clip-settings,
-  .embed.vimeo .clip-pip {
-    display: none;
-  }
+/* the volume slider over its button */
+.embed.vimeo .clip-volume-control {
+  position: relative;
+  display: flex;
+}
+
+.embed.vimeo .clip-volume-slider {
+  position: absolute;
+  inset-block-end: calc(100% + var(--clip-volume-gap));
+  inset-inline-start: 50%;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  inline-size: var(--clip-volume-width);
+  block-size: var(--clip-volume-height);
+  border-radius: var(--clip-radius);
+  background-color: var(--clip-surface);
+  cursor: pointer;
+
+  /* not shown, but still the Tab stop after Mute, as the source's (so no visibility: hidden) */
+  opacity: 0;
+  pointer-events: none;
+  touch-action: none;
+  translate: -50% 0;
+}
+
+/* the 8px between the slider and its button, so the pointer can cross it */
+.embed.vimeo .clip-volume-slider::after {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline: 0;
+  block-size: var(--clip-volume-gap);
+  content: "";
+}
+
+.embed.vimeo .clip-volume-slider:focus {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.embed.vimeo .clip-volume-slider:focus-visible {
+  outline: 2px solid var(--clip-accent);
+  outline-offset: 2px;
+}
+
+.embed.vimeo .clip-volume-control:hover .clip-volume-slider {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* the slider stands where the button's name would */
+.embed.vimeo .clip-volume-control:hover .clip-volume::after {
+  opacity: 0;
+}
+
+.embed.vimeo .clip-volume-bar {
+  position: relative;
+  inline-size: var(--clip-volume-bar-width);
+  block-size: var(--clip-volume-bar-height);
+  border-radius: 100px;
+  background-color: var(--clip-volume-bar);
+}
+
+.embed.vimeo .clip-volume-fill {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: calc(var(--clip-volume, 1) * 100%);
+  border-radius: inherit;
+  background-color: var(--clip-accent);
+}
+
+.embed.vimeo .clip-volume-handle {
+  position: absolute;
+  inset-block-end: calc(var(--clip-volume, 1) * 100% - var(--clip-volume-handle) / 2);
+  inset-inline-start: 50%;
+  inline-size: var(--clip-volume-handle);
+  block-size: var(--clip-volume-handle);
+  border-radius: 50%;
+  background-color: var(--clip-ink);
+  translate: -50% 0;
 }
