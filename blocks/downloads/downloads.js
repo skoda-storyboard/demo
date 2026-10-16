@@ -681,6 +681,8 @@ export function lightboxItem(asset, related = {}) {
   // a clip shows its poster: the MP4 is the download action, never the stage, because the
   // AEM Assets original is served as an attachment (a player frame would download it)
   if (href) Object.assign(item, { download: href, link: href });
+  // its actions take the source player's names and tooltips ("Download this")
+  if (/\.mp4(?:[?#]|$)/i.test(href)) item.clip = true;
   return item;
 }
 
@@ -692,14 +694,13 @@ export function lightboxItem(asset, related = {}) {
  */
 function wireLightbox(entries) {
   if (!entries.length) return;
-  const related = {
-    title: document.querySelector('main h1')?.textContent.trim() || '',
-    href: window.location.pathname,
-  };
+  const related = { title: '', href: window.location.pathname };
   let pending = null;
   const lightbox = () => {
-    pending = pending || import('../../scripts/lightbox.js').then(({ buildLightbox }) => (
-      buildLightbox(document.body, entries.map(({ asset }) => lightboxItem(asset, related)))));
+    pending = pending || import('../../scripts/lightbox.js').then(({ buildLightbox, pageHeading }) => {
+      related.title = pageHeading();
+      return buildLightbox(document.body, entries.map(({ asset }) => lightboxItem(asset, related)));
+    });
     return pending;
   };
   entries.forEach(({ thumb }, index) => {

@@ -72,12 +72,16 @@ export const valueLabel = (v) => titleCase(String(v).replace(/-/g, ' '));
  * `{ "/en/news": { facet: [slug, …] } }`. The source orders and offers options per page, so on
  * a page with a list for a facet its options rank by that list and only they are `offered`;
  * other facets keep the shared order and offer every value.
+ * Its `_hidden` key lists the value parts the source's CSS hides on every listing
+ * (`.search-filter li:has([value*="citigoe"])`, #273 review): `["citigoe"]`.
  * @param {object} json the file's content
  * @param {string} [page] the listing page path
  * @returns {Map<string, Map<string, {name: string, rank: number, offered: boolean}>>} with a
- *   `pageFacets` Set of the facets the page has its own list for
+ *   `pageFacets` Set of the facets the page has its own list for, and a `hiddenValues`
+ *   array of the hidden parts (lower case)
  */
 const PAGES_KEY = '_pages';
+const HIDDEN_KEY = '_hidden';
 
 export function facetLabelMap(json, page = '') {
   const data = json && typeof json === 'object' ? json : {};
@@ -85,8 +89,12 @@ export function facetLabelMap(json, page = '') {
   const own = pages[String(page).replace(/\/+$/, '').toLowerCase() || '/'] || {};
   const out = new Map();
   out.pageFacets = new Set();
+  // a blank part would match every value, so it is dropped
+  out.hiddenValues = (Array.isArray(data[HIDDEN_KEY]) ? data[HIDDEN_KEY] : [])
+    .filter((part) => typeof part === 'string' && part.trim())
+    .map((part) => part.trim().toLowerCase());
   Object.entries(data).forEach(([facet, pairs]) => {
-    if (facet === PAGES_KEY || !Array.isArray(pairs)) return;
+    if (facet === PAGES_KEY || facet === HIDDEN_KEY || !Array.isArray(pairs)) return;
     const order = Array.isArray(own[facet]) ? own[facet].map((v) => String(v).toLowerCase()) : null;
     if (order) out.pageFacets.add(facet);
     const names = new Map();
@@ -113,6 +121,18 @@ export function facetLabelMap(json, page = '') {
 export function isOffered(labels, key, value) {
   if (!labels.pageFacets?.has(key)) return true;
   return !!labels.get(key)?.get(String(value).toLowerCase())?.offered;
+}
+
+/**
+ * Does the source hide this option? Its rule matches part of the value (`value*=`), in any
+ * facet, checked or not; a deep-linked hidden value still filters (and shows its chip).
+ * @param {Map} labels facetLabelMap() output
+ * @param {string} value the option's index value
+ * @returns {boolean}
+ */
+export function isSourceHidden(labels, value) {
+  const v = String(value).toLowerCase();
+  return (labels.hiddenValues || []).some((part) => v.includes(part));
 }
 
 function loadFacetLabels() {
@@ -673,13 +693,15 @@ export default async function decorate(block) {
     // deep-linked value no row in scope carries keeps its option, checked, and so its pill: the
     // visitor sees the filter that empties the list and can clear it there (#333 review)
     // only the options the source offers on this page (SKODA-402d: e.g. no Company "other" on
-    // Press Kits, though two kits carry it)
+    // Press Kits, though two kits carry it), less the ones it hides everywhere (#273 review:
+    // Model "Citigoᵉ iV"; a deep link to one still filters and shows its chip, as on the source)
     const inScope = distinctFacetValues(scoped, key)
       .filter(({ value }) => isOffered(optionNames, key, value));
     const seen = new Set(inScope.map(({ value }) => String(value).toLowerCase()));
     const linked = (state.active[key] || []).filter((v) => !seen.has(String(v).toLowerCase()))
       .map((value) => ({ value }));
-    const values = orderFacetValues([...inScope, ...linked], key, optionNames);
+    const values = orderFacetValues([...inScope, ...linked], key, optionNames)
+      .filter(({ value }) => !isSourceHidden(optionNames, value));
     if (!values.length) return; // no data for this facet in scope, nothing selected → no pill
 
     const pill = document.createElement('button');
@@ -850,10 +872,12 @@ export default async function decorate(block) {
       const focusedPanel = focused?.closest('fieldset.facet-panel') || null;
       facetOptions.querySelectorAll('fieldset.facet-panel').forEach((panel) => {
         const { facet } = panel.dataset;
-        // an option the source doesn't offer on this page goes, unless it's selected (SKODA-402d)
+        // an option the source hides goes (#273 review); one it doesn't offer on this page goes
+        // unless it's selected (SKODA-402d); a pill left with none goes too
         panel.querySelectorAll('label.facet-option').forEach((option) => {
           const input = option.querySelector('input');
-          if (!input.checked && !isOffered(names, facet, input.value)) option.remove();
+          if (isSourceHidden(names, input.value)
+            || (!input.checked && !isOffered(names, facet, input.value))) option.remove();
         });
         const options = [...panel.querySelectorAll('label.facet-option')];
         if (!options.length) {

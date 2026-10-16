@@ -524,6 +524,53 @@ function readConfigRows(block) {
   return cfg;
 }
 
+/**
+ * A self-hosted clip: the native player; `Embed (vimeo)` (a source Vimeo clip's master) also
+ * gets the source player's controls, and keeps the native ones if that module doesn't load.
+ * @param {Element} block
+ * @param {Element} wrapper the .embed-video box
+ * @param {URL} url the video file
+ * @param {string} title
+ * @param {string} poster
+ */
+function mountFile(block, wrapper, url, title, poster) {
+  const video = buildVideo(url, title, poster);
+  wrapper.append(video);
+  block.classList.add('embed-file');
+  if (!block.classList.contains('vimeo')) return;
+  import('./clip-player.js')
+    .then(({ default: clipPlayer }) => clipPlayer(wrapper, video))
+    .catch((e) => {
+      // eslint-disable-next-line no-console
+      console.warn('embed: the clip controls did not load', e);
+    });
+}
+
+// Vimeo's oEmbed answers `domain_status_code: 403` for a clip locked away from the asking
+// page's domain; one question per clip per page, given up after a few seconds
+const PLAYS_HERE_TIMEOUT_MS = 4000;
+const playsHereCache = new Map();
+
+/**
+ * Does Vimeo play this clip on this page's domain?
+ * @param {string} id the Vimeo video id
+ * @returns {Promise<boolean>} false when locked, unknown or unanswered
+ */
+export function playsHere(id) {
+  if (!/^\d+$/.test(id || '')) return Promise.resolve(false);
+  if (!playsHereCache.has(id)) {
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), PLAYS_HERE_TIMEOUT_MS);
+    const oembed = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(`https://vimeo.com/${id}`)}`;
+    playsHereCache.set(id, fetch(oembed, { signal: abort.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => !!json && json.domain_status_code !== 403)
+      .catch(() => false)
+      .finally(() => clearTimeout(timer)));
+  }
+  return playsHereCache.get(id);
+}
+
 export default function decorate(block) {
   // Read the authored source: a link href, else the `url` row / a bare URL cell (table form).
   const cfg = readConfigRows(block);
@@ -569,9 +616,32 @@ export default function decorate(block) {
   }
 
   if (provider === 'file') {
-    wrapper.append(buildVideo(url, title, poster));
-    block.classList.add('embed-file');
+    mountFile(block, wrapper, url, title, poster);
     block.append(wrapper);
+    return;
+  }
+
+  // `Embed (vimeo)` with the clip's MP4 master (`file` row, SKODA-805c): the source's Vimeo
+  // account locks some clips to its own domain. Vimeo says whether this one plays here: if so
+  // its player, as the source; if not (or it doesn't answer) the master with the player's
+  // controls. Without embed consent nothing asks Vimeo: the master plays.
+  const file = provider === 'vimeo' && block.classList.contains('vimeo')
+    ? parseEmbedUrl(cfg.file?.querySelector('a[href]')?.getAttribute('href') || cfg.file?.textContent.trim())
+    : null;
+  if (file && VIDEO_FILE_RE.test(file.pathname)) {
+    block.append(wrapper);
+    if (!hasEmbedConsent()) {
+      mountFile(block, wrapper, file, title, poster);
+      return;
+    }
+    playsHere(vimeoId(url)).then((plays) => {
+      if (!plays) {
+        mountFile(block, wrapper, file, title, poster);
+        return;
+      }
+      block.classList.add('embed-vimeo');
+      mountEmbed(wrapper, buildIframe(src, title, false, provider), provider, '', () => {});
+    });
     return;
   }
 

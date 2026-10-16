@@ -132,6 +132,50 @@ function addFaq(block, items) {
   });
 }
 
+/*
+ * The source slides an answer open and shut: jQuery slideToggle, 400ms, its "swing" easing,
+ * the height only, clipped (measured on the first-glimpse press kit). Ours slides the panel's
+ * height and its 10px insets together, from wherever a slide in progress has got to. Reduced
+ * motion, or a browser without Web Animations, toggles at once.
+ */
+const SLIDE_MS = 400;
+const SWING = 'cubic-bezier(0.37, 0, 0.63, 1)'; // jQuery's swing: 0.5 - cos(pπ) / 2
+const reducedMotion = (view) => !!view?.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+function slide(panel, open) {
+  const from = panel.hidden ? 0 : panel.getBoundingClientRect().height;
+  panel.getAnimations?.().forEach((animation) => animation.cancel());
+  panel.hidden = false;
+  const full = panel.getBoundingClientRect().height;
+  const to = open ? full : 0;
+  const view = panel.ownerDocument.defaultView;
+  if (typeof panel.animate !== 'function' || reducedMotion(view) || !full || from === to) {
+    panel.hidden = !open;
+    return;
+  }
+  const { paddingTop, paddingBottom } = view.getComputedStyle(panel);
+  const frame = (height) => {
+    const share = height / full;
+    return {
+      boxSizing: 'border-box',
+      overflow: 'hidden',
+      height: `${height}px`,
+      paddingTop: `${parseFloat(paddingTop) * share}px`,
+      paddingBottom: `${parseFloat(paddingBottom) * share}px`,
+    };
+  };
+  const animation = panel.animate([frame(from), frame(to)], {
+    duration: SLIDE_MS * (Math.abs(to - from) / full),
+    easing: SWING,
+  });
+  // timed from the click, as the source's timer is: the first frame of a newly shown answer
+  // (its layout and images) costs time, which the slide makes up rather than starting late
+  const now = panel.ownerDocument.timeline?.currentTime;
+  if (Number.isFinite(now)) animation.startTime = now;
+  // a cancelled slide (the next toggle took over) leaves the panel to that one
+  if (!open) animation.onfinish = () => { panel.hidden = true; };
+}
+
 export default function decorate(block) {
   const items = [];
   [...block.children].forEach((row) => {
@@ -176,8 +220,9 @@ export default function decorate(block) {
     nestedQuotes(panel);
     nestedSpacers(panel);
     button.addEventListener('click', () => {
-      panel.hidden = !panel.hidden;
-      button.setAttribute('aria-expanded', String(!panel.hidden));
+      const open = button.getAttribute('aria-expanded') !== 'true';
+      button.setAttribute('aria-expanded', String(open));
+      slide(panel, open);
     });
     const item = document.createElement('div');
     item.className = 'accordion-item';
