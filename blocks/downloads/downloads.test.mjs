@@ -856,6 +856,44 @@ test('gallery CSS: Media Box ladder, overlay controls, source opener bar', async
   assert.match(css, /\.downloads\.gallery\.downloads-collapsed \.downloads-more \{\s+margin-block-start: calc\(-1 \* var\(--dl-gallery-bar\)\);/);
 });
 
+// The collapsed disclosure's layers (SKODA-514, PR #335 review): every rule as { selectors, body }.
+async function cssRules() {
+  const { readFile } = await import('node:fs/promises');
+  const css = (await readFile(new URL('./downloads.css', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  return css.split('}').map((chunk) => chunk.split('{')).filter((parts) => parts.length >= 2)
+    .map((parts) => ({
+      selectors: parts[parts.length - 2].trim().split(/,(?![^(]*\))/).map((s) => s.trim()),
+      body: parts[parts.length - 1],
+    }));
+}
+const zIndexOf = (rule) => Number((rule?.body.match(/z-index:\s*(\d+)/) || [])[1]);
+const ruleFor = (rules, selector) => rules.find((r) => r.selectors.includes(selector));
+
+test('Media Box CSS: a band-coloured opener strip covers the clipped row 3, the pill above it (SKODA-514)', async () => {
+  const rules = await cssRules();
+  const strip = ruleFor(rules, '.downloads.downloads-collapsed .downloads-items::after');
+  assert.match(strip.body, /inset: auto 0 0;/);
+  assert.match(strip.body, /height: calc\(var\(--dl-toggle-height\) \+ var\(--dl-tile-gap\)\);/);
+  assert.match(strip.body, /background: var\(--dl-collapse-cover, var\(--background-color\)\);/);
+  assert.match(ruleFor(rules, '.downloads.downloads-media-box').body, /--dl-collapse-cover: var\(--dark-color\);/, 'the band colour');
+  assert.equal(zIndexOf(strip), 2);
+  assert.equal(zIndexOf(ruleFor(rules, '.downloads.downloads-media-box.downloads-collapsed .downloads-more')), 3, 'Media Box pill over its strip');
+  assert.equal(zIndexOf(ruleFor(rules, '.downloads.downloads-collapsed .downloads-more')), 2, 'the shared pill layer');
+});
+
+test('gallery: an open tile and its rendition menu stay above the collapsed bar (PR #335 review)', async () => {
+  const rules = await cssRules();
+  const openTile = zIndexOf(ruleFor(rules, '.downloads.gallery .downloads-item:has(.downloads-sizes:not([hidden]))'));
+  assert.equal(openTile, 3, 'the open tile is a layer-3 stacking context (its menu, 15, is inside it)');
+  // every z-index that can reach a gallery's Show more bar: rules on .downloads-more that a
+  // gallery matches (not Media Box only)
+  const barLayers = rules
+    .filter((r) => r.selectors.some((s) => /\.downloads-more(?![\w-])/.test(s) && !s.includes('downloads-media-box')))
+    .map(zIndexOf).filter((z) => !Number.isNaN(z));
+  assert.ok(barLayers.length > 0, 'the bar has a layer');
+  barLayers.forEach((z) => assert.ok(z < openTile, `a gallery bar layer (${z}) would paint over the open tile and its menu`));
+});
+
 // #275: the source tile's date, h3 title and clickable file tiles in a Media Box
 function addDatedRow(block, { src = '', date = '', title = '', links = [] }) {
   addRow(block, { src, title, links });

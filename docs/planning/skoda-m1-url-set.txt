@@ -19,6 +19,8 @@ https://www.skoda-storyboard.com/en/press-releases/skoda-auto-and-national-theat
 https://www.skoda-storyboard.com/en/press-releases/skoda-superb-25-years-of-comfort-space-and-technical-excellence/
 https://www.skoda-storyboard.com/en/press-releases/skoda-auto-announces-changes-to-its-board-of-management/
 https://www.skoda-storyboard.com/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs/
+# added 2026-10-14 on request: the Epiq Sportline release (12 Oct 2026), a card of the source Media Room promo
+https://www.skoda-storyboard.com/en/press-releases/skoda-expands-electric-portfolio-the-new-epiq-sportlinedebuts-with-dynamic-exterior-styling/
 
 # ===== PRESS KITS (4), tiles hubs SKODA-805a; default template SKODA-805c =====
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/

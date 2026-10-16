@@ -78,8 +78,8 @@
   --facet-option-column: 160px;
   --chip-pad-inline: 14px;
   --chip-gap: 7px;
-  --chip-icon: 14px;
-  --chip-icon-gap: 4px;
+  --chip-icon: 21px;
+  --facet-panel-top: 28px; /* live: header to the first pill, every listing and width */
   --facet-focus-room: 4px; /* focus ring + pill shadow stay visible inside the clip */
 
   /* collapsed: no height, no margins, invisible (and so unfocusable) */
@@ -95,11 +95,17 @@
     visibility 0s linear var(--facet-reveal-time);
 }
 
-/* open: 16px below where the sort row sits when closed (its own 1em top margin + 16px); the
-   options area's 24px bottom margin (then the chips, if any) sets the gap to the sort row */
+/* after a filter change the panel goes in one step, as live (the toggle still animates it) */
+.listing.facets-instant .listing-facets {
+  transition: none;
+}
+
+/* open: the first pills 28px below the header, as live (measured 2026-10-14 on all four
+   listings at 1440 / 768 / 375); the options area's 24px bottom margin (then the chips, if
+   any) sets the gap to the sort row */
 .listing.facets-open .listing-facets {
   grid-template-rows: 1fr;
-  margin-block: calc(2 * var(--spacing-m)) 0;
+  margin-block: var(--facet-panel-top) 0;
   opacity: 1;
   visibility: visible;
   transition:
@@ -301,7 +307,6 @@
 
 .listing .listing-chip {
   display: inline-flex;
-  gap: var(--chip-icon-gap);
   align-items: center;
   height: var(--facet-pill-height);
   padding: 0 var(--chip-pad-inline);
@@ -317,11 +322,16 @@
   cursor: pointer;
 }
 
-/* the remove glyph gets the source icon's 14px box (live chip "Model: Peaq" 131px wide) */
+/* the remove glyph: the source's icon-font cross (skoda-bnr-icons \e010) centred in its 21px
+   box, flush with the label, at the chip's 14px / 600 (live chip "Sponsorship: Icehockey" 205px
+   wide, its text 37px in) */
 .listing .listing-chip::before {
-  content: "\00d7"; /* × */
+  content: "\e010";
+  display: block;
   inline-size: var(--chip-icon);
-  font-size: 1.1em;
+  block-size: var(--chip-icon);
+  font-family: var(--facet-chip-icon-font);
+  line-height: var(--chip-icon);
   text-align: center;
   color: var(--facet-active);
 }
@@ -349,6 +359,12 @@
    directly): the options' 24px, or the chips' 7px, is the gap */
 .listing.facets-open .listing-sort {
   margin-block-start: 0;
+}
+
+/* ...and the sort row with it: its 12px comes back at once, so the results don't move while
+   the veil fades (#355 review); the toggle still animates it */
+.listing.facets-instant .listing-sort {
+  transition: none;
 }
 
 .listing .listing-sort-options {

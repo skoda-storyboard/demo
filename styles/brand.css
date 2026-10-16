@@ -80,6 +80,9 @@
   /* the source's icon font for its media card glyphs (styles/fonts.css, #273) */
   --media-card-icon-font: skoda-bnr-icons;
 
+  /* the same font for the listing chip's remove cross (\e010, #333) */
+  --facet-chip-icon-font: skoda-bnr-icons;
+
   /* the same font for the accordion's + (\e027, #275) */
   --accordion-icon-font: skoda-bnr-icons;
 

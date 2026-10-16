@@ -61,6 +61,26 @@ function cleanTitle(raw) {
   return t.replace(SITE_SUFFIX, '').trim() || t;
 }
 
+// A heading's text with its line breaks and (placeholder) non-breaking spaces as plain spaces.
+// U+F00A0 is skoda-nbsp's placeholder for U+00A0.
+const SOFT_BREAK = /[\u00A0\u{F00A0}]/gu;
+function spacedText(h1) {
+  const copy = h1.cloneNode(true);
+  copy.querySelectorAll('br').forEach((br) => br.replaceWith(' '));
+  return copy.textContent.replace(SOFT_BREAK, ' ').replace(/\s+/g, ' ').trim();
+}
+
+// The source SEO title sometimes drops the space where the H1 has a line break (the Epiq
+// Sportline release: og:title "…Epiq Sportlinedebuts with…", H1 "…Epiq Sportline<br>debuts
+// with…"). Same characters, fewer word breaks: the H1's spacing is the title.
+function respacedTitle(title, h1) {
+  if (!title || !h1) return title;
+  const spaced = spacedText(h1);
+  const bare = (s) => s.replace(SOFT_BREAK, '').replace(/\s+/g, '');
+  const words = (s) => s.split(' ').length;
+  return bare(spaced) === bare(title) && words(spaced) > words(title) ? spaced : title;
+}
+
 function metaContent(document, selector) {
   const el = document.querySelector(selector);
   const val = el && el.getAttribute('content');
@@ -331,10 +351,10 @@ export default function transform(hookName, element, payload) {
   const overrides = (payload.template && payload.template.metadata) || {};
 
   const h1 = document.querySelector('h1');
-  const title = cleanTitle(overrides.title
+  const title = respacedTitle(cleanTitle(overrides.title
     || metaContent(document, 'meta[property="og:title"]')
     || (document.querySelector('title') ? document.querySelector('title').textContent.trim() : '')
-    || (h1 ? h1.textContent.trim() : ''));
+    || (h1 ? h1.textContent.trim() : '')), h1);
   const description = overrides.description
     || metaContent(document, 'meta[property="og:description"]')
     || metaContent(document, 'meta[name="description"]') || '';

@@ -1,8 +1,8 @@
 # Škoda Demo — every page live on the demo (SKODA-801a), generated; do not edit by hand.
-# From the live query index (2026-10-10) via npm run import:allowlist -- --refresh-published.
+# From the live query index (2026-10-15) via npm run import:allowlist -- --refresh-published.
 # Feeds the SKODA-605 link allow-list, so imports rewrite links to these pages site-relative.
 
-# ===== PUBLISHED (279) =====
+# ===== PUBLISHED (313) =====
 https://www.skoda-storyboard.com/en/
 https://www.skoda-storyboard.com/en/category/classic-cars/
 https://www.skoda-storyboard.com/en/category/concepts/
@@ -44,6 +44,7 @@ https://www.skoda-storyboard.com/en/emobility/peaq-sets-a-record-from-the-heart-
 https://www.skoda-storyboard.com/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq/
 https://www.skoda-storyboard.com/en/emobility/skoda-elroq-and-a-happy-family/
 https://www.skoda-storyboard.com/en/emobility/skoda-elroq-premiere-light-cube-camera-action/
+https://www.skoda-storyboard.com/en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim/
 https://www.skoda-storyboard.com/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
 https://www.skoda-storyboard.com/en/emobility/skoda-peaq-unparalleled-space-and-comfort/
 https://www.skoda-storyboard.com/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq/
@@ -94,6 +95,37 @@ https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-pre
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/texts/
 https://www.skoda-storyboard.com/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos/
 https://www.skoda-storyboard.com/en/press-kits/4x4-winter-experience-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/125-years-of-skoda-motorsport/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/1955-skoda-440-on-the-international-stage/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/images/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/laurin-klement-bz-1902-1904/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/laurin-klement-slavia-type-b-1899-1904/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/laurin-klement-voiturette-a-1905-1907/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-110-r-coupe-1970-1980/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-1100-mbx-1967-1969/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-120-gls-1976-1990/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-120-s-rallye-1972-1975/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-645-1929-1934/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsportsuccess/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-favorit-136-l-1988-1994/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-felicia-1959-1964/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-museum/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-museum-presents-only-surviving-laurin-klement-bscsports-car-from-1908/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-octavia-1959-1964/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-popular-monte-carlo-1936-1939/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-rapid-135-1987-1990/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-rapid-ldd-1984/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/skoda-superb-3000-ohv-1938-1949/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/texts/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary/
+https://www.skoda-storyboard.com/en/press-kits/classic-days-2026-press-kit/videos/
 https://www.skoda-storyboard.com/en/press-kits/lets-explore-albania-press-kit/
 https://www.skoda-storyboard.com/en/press-kits/new-skoda-enyaq-press-kit-2/
 https://www.skoda-storyboard.com/en/press-kits/press-kit-skoda-at-the-iaa-2019/
@@ -126,6 +158,7 @@ https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/battery-an
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/connectivity-vertical-infotainment-display-and-sonos-premiumsound-system-set-the-peaq-apart/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/exterior-skodas-largest-suv-with-the-modern-solid-design/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/frequently-asked-questions/
+https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/images/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/infographics/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/interior-a-relaxing-lounge-with-seven-seats-and-the-largest-boot/
 https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/safety-a-comprehensive-suite-of-active-and-passive-safety-systems/
@@ -168,6 +201,7 @@ https://www.skoda-storyboard.com/en/press-releases/skoda-auto-supports-uci-mount
 https://www.skoda-storyboard.com/en/press-releases/skoda-auto-teams-up-with-hasbros-play-doh-brand/
 https://www.skoda-storyboard.com/en/press-releases/skoda-auto-unveils-updated-slavia-in-india/
 https://www.skoda-storyboard.com/en/press-releases/skoda-epiq-sportline-debuts-at-the-paris-motor-show/
+https://www.skoda-storyboard.com/en/press-releases/skoda-expands-electric-portfolio-the-new-epiq-sportlinedebuts-with-dynamic-exterior-styling/
 https://www.skoda-storyboard.com/en/press-releases/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport/
 https://www.skoda-storyboard.com/en/press-releases/skoda-kvasiny-newsletter-2-2026/
 https://www.skoda-storyboard.com/en/press-releases/skoda-launches-production-of-the-new-epiq-in-pamplona-spain/

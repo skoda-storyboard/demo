@@ -3,6 +3,7 @@
 - **Type:** data (media feed) · **Milestone:** M1 (15 Oct demo)
 - **GitHub issue:** [#342](https://github.com/skoda-storyboard/demo/issues/342)
 - **Estimate:** 1 SP *(planning estimate)*
+- **Status (2026-10-15):** 🔵 M2 (milestone set on #342), with SKODA-511.
 - **Status (2026-10-12):** 🔵 TODO. Found while fixing the Media Room home rails (PR on `mr-rails-parity`).
 
 ## Problem (measured 2026-10-12)

@@ -240,6 +240,7 @@ const DEMO_PATHS = [
   "/en/press-releases/skoda-auto-teams-up-with-hasbros-play-doh-brand",
   "/en/press-releases/skoda-auto-unveils-updated-slavia-in-india",
   "/en/press-releases/skoda-epiq-sportline-debuts-at-the-paris-motor-show",
+  "/en/press-releases/skoda-expands-electric-portfolio-the-new-epiq-sportlinedebuts-with-dynamic-exterior-styling",
   "/en/press-releases/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport",
   "/en/press-releases/skoda-kvasiny-newsletter-2-2026",
   "/en/press-releases/skoda-launches-production-of-the-new-epiq-in-pamplona-spain",

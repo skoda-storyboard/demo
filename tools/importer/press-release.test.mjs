@@ -368,6 +368,54 @@ test('data tables become one line per row, never an unknown block named after th
   assert.ok([...element.querySelectorAll('p')].some((p) => txt(p) === 'Škoda Elroq'), 'the header label leads the list');
 });
 
+test('a self-hosted [video] player becomes an Embed of its MP4, without the player chrome', { skip }, () => {
+  // as the importer sees it in the browser: MediaElement.js has wrapped the <video> in its chrome
+  const MP4 = 'https://cdn.skoda-storyboard.com/2026/10/Skoda-Epiq-Sportline-colour-animation_b059a4d0.mp4';
+  const player = `<div style="width: 1920px;" class="wp-video"><span class="mejs-offscreen">Video Player</span>
+    <div class="mejs-container wp-video-shortcode mejs-video" role="application"><div class="mejs-inner">
+      <div class="mejs-mediaelement"><video class="wp-video-shortcode" width="1920" height="1080" preload="metadata" controls>
+        <source type="video/mp4" src="${MP4}?_=1"><a href="${MP4}">${MP4}</a></video></div>
+      <div class="mejs-layers"><div class="mejs-overlay-play"><img src="https://www.skoda-storyboard.com/wp/wp-includes/js/mediaelement/mejs-controls.svg" alt=""></div></div>
+      <div class="mejs-controls"><span class="mejs-currenttime">00:00</span><span class="mejs-duration">00:18</span>
+        <a class="mejs-volume-slider" href="javascript:void(0);">Use Up/Down Arrow keys to increase or decrease volume.</a></div>
+    </div></div></div>`;
+  const { element } = importPage('peaq', (doc) => {
+    doc.querySelector('.column-primary .entry-content').insertAdjacentHTML('beforeend', player);
+  });
+  const embed = [...element.querySelectorAll('table')].find((t) => blockName(t) === 'Embed'
+    && t.textContent.includes('colour-animation'));
+  assert.ok(embed, 'an Embed block for the MP4');
+  assert.equal(embed.querySelector('a').getAttribute('href'), MP4, 'no ?_= cache-buster');
+  const text = element.textContent;
+  ['Video Player', '00:18', 'Use Up/Down Arrow keys'].forEach((s) => assert.equal(text.includes(s), false, s));
+  assert.equal(element.querySelector('img[src*="mejs-controls"], a[href^="javascript:"]'), null, 'no player sprite or script link');
+});
+
+test('collapsed row toggles become one Accordion; a video inside an answer stays a link', { skip }, () => {
+  const MP4 = 'https://cdn.skoda-storyboard.com/2026/10/Skoda-Epiq-Sportline-colour-animation_b059a4d0.mp4';
+  const row = (title, answer) => `<div class="panel-grid"><div class="panel-grid-cell">
+    <div class="so-panel widget widget_ys-row-toggle"><div class="so-widget-ys-row-toggle"><h2 class="row-title">${title}</h2></div></div>
+    <div class="so-panel widget widget_siteorigin-panels-builder"><div class="panel-layout"><div class="panel-grid"><div class="panel-grid-cell">
+      <div class="so-panel widget widget_sow-editor"><div class="textwidget">${answer}</div></div></div></div></div></div></div></div>`;
+  const toggles = row('Sharply sculpted exterior', `<p>Glossy black accents.</p>
+      <div class="wp-video"><video><source type="video/mp4" src="${MP4}?_=1"></video></div>`)
+    + row('Advanced lighting as standard', '<p>The Light Band.</p><p><img src="https://cdn.skoda-storyboard.com/l.jpg" alt="Light"></p>');
+  const { element } = importPage('peaq', (doc) => {
+    doc.querySelector('.column-primary .entry-content').insertAdjacentHTML('beforeend', `<div class="panel-layout">${toggles}</div>`);
+  });
+  const accordions = [...element.querySelectorAll('table')].filter((t) => blockName(t) === 'Accordion');
+  assert.equal(accordions.length, 1, 'consecutive toggles form one Accordion');
+  const items = rowsOf(accordions[0]);
+  assert.deepEqual(items.map((r) => txt(r.children[0])), ['Sharply sculpted exterior', 'Advanced lighting as standard']);
+  const first = items[0].children[1];
+  assert.equal(first.querySelector('a').getAttribute('href'), MP4, 'the video is a link to its MP4');
+  assert.equal(txt(first.querySelector('a')), 'Video: Skoda Epiq Sportline colour animation', 'named by its file');
+  assert.equal(first.querySelector('table, video'), null, 'no nested block or player');
+  assert.ok(items[1].children[1].querySelector('img[alt="Light"]'), 'answer images are kept');
+  assert.equal([...element.querySelectorAll('h2')].some((h) => txt(h) === 'Advanced lighting as standard'
+    && !h.closest('table')), false, 'no loose heading left behind');
+});
+
 // SKODA-833 (import validity audit, F5)
 
 test('4x4 Media Box: all 15 items in one Downloads block, MP4 hrefs URL-serialised', { skip }, () => {

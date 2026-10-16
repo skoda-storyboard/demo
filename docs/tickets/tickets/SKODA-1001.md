@@ -30,3 +30,7 @@ Translation coverage is **uneven per-item** — a story living in 4 of 6 languag
 ## Risks / Flags
 - Per-language content totals were never enumerated for all 6 (adversarial C8 / downgrade) — scope per locale is an estimate until content-ops maps actual coverage.
 - Which locales are actively maintained vs. stale is unconfirmed — confirm before full rollout.
+
+## M2 readiness review (2026-10-15)
+- **Items with no English version** (REST, Polylang `translations`): stories CS 162 / DE 527 / SK 286 / SR 45 / SL 157; press releases CS **894** / DE 1 / SK 354 / SR 50 / SL 2. That is **2,478** in total, 1,056 of them in CS. They never come out of an EN import, so the per-locale trees need their own enumeration.
+- Census: [coverage matrix](../../planning/SKODA-PAGE-COVERAGE-MATRIX.md) §4.

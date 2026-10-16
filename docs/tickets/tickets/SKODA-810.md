@@ -55,3 +55,11 @@ Each is content-driven and static (no runtime services). The download/asset page
 - Five net-new blocks in one ticket, if effort runs hot, split per sub-type (contacts + board are the lowest-effort static pairs; downloads/logo/app can follow).
 - Exec-bio expandable galleries + accordion focus/ARIA is `[RUNTIME-UNCONFIRMED]`, verify in a browser.
 - Source pages carry dynamic bits (save-heart / newsletter) that are demo-stubbed elsewhere; render static per the as-is-fidelity scope.
+
+## M2 readiness review (2026-10-15)
+Checked against the live source:
+- **Annual reports:** `/en/annual-reports/` now returns **404** and is not in the page sitemap, so the `download-list` sub-type has no source page. Drop it, or the client confirms where the reports live now.
+- **Company logo** is now on `template-custom-full-width` (STO shell), not `template-media-room-page`. It has **18** assets and 18 PDF links, not 36. The brand-asset grid ACs need re-measuring.
+- **Not covered here:** the MR nav **Company** menu also links **Brand Group CORE (BGC)** (`/en/brand-group-core-bgc/`, `page-template-default`), which moves to SKODA-843, and **Newsletter** (`/en/newsletter/`, `template-carousel-listing`), which moves to SKODA-845.
+- **Proposed split:** 810a contacts + board (exec-bio reuses the 807 accordion), then 810b app promo + company logo. The ticket is now 4 sub-types, not 5.
+- Census: [coverage matrix](../../planning/SKODA-PAGE-COVERAGE-MATRIX.md) §3.
