@@ -62,5 +62,5 @@ The M1 demo feed is generated from the source listing; this ticket replaces that
 - [ ] No source-CDN URL in any column it writes (SKODA-520 census gate).
 
 ## Dependencies
-SKODA-504 (DAM ingest / mapping), SKODA-504a, SKODA-512 (taxonomy), SKODA-517 (output shapes), SKODA-518 (identity
+**SKODA-521 (App Builder set-up, blocking)**, SKODA-504 (DAM ingest / mapping), SKODA-504a, SKODA-512 (taxonomy), SKODA-517 (output shapes), SKODA-518 (identity
 metadata), SKODA-608 (feed contract), SKODA-505a (cart key).
