@@ -62,7 +62,9 @@ export const SPEC = {
     structure: 'config or bare url',
     purpose: 'video / podcast embed',
     description: 'A YouTube, Vimeo, Buzzsprout or Spotify URL. A bare link on its own line also works. Settings rows: url, ratio (e.g. 16:9), title, poster (image). An .mp4 url plays as a native video with the poster.',
-    variants: [],
+    variants: [
+      { class: 'vimeo', label: 'vimeo', description: "A source Vimeo clip: rows url (the vimeo.com link), file (the clip's MP4 master) and title. It plays in the Vimeo player where Vimeo allows this site, else the MP4 with the same Vimeo-style controls (play, progress, volume, speed, picture-in-picture, fullscreen)." },
+    ],
   },
   spacer: {
     structure: 'single cell height',

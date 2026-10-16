@@ -996,12 +996,14 @@ test('lightboxItem: the original drives download, link and cart; a clip shows it
   assert.equal(image.download, 'https://dam.example/a.JPG');
   assert.equal(image.cartHref, 'https://dam.example/a.JPG');
   assert.equal(image.video, undefined);
+  assert.equal(image.clip, undefined, 'an image keeps the image names');
   assert.match(image.caption.textContent, /File type: JPG.*Published: 6\. 8\. 2026/s);
   assert.equal(image.caption.querySelector('a').getAttribute('href'), '/en/story');
   const clip = lightboxItem({ src: '/p.jpg', title: 'Clip', sizes: [{ label: 'MP4', href: 'https://dam.example/c.mp4' }] });
   assert.equal(clip.video, undefined, 'the attachment MP4 never loads in a player frame');
   assert.equal(clip.src, '/p.jpg');
   assert.equal(clip.download, 'https://dam.example/c.mp4');
+  assert.equal(clip.clip, true, 'its actions take the source player names');
   assert.equal(clip.caption.querySelector('a'), null, 'no related article without a page title');
 });
 

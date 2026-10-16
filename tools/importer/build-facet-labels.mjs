@@ -9,7 +9,8 @@
  * source's order to blocks/listing/facet-labels.json (committed, served with the block), and
  * each page's own option order under `_pages` (SKODA-402d).
  * The listing shows only the options its rows have (PO, #273); a slug the source does not
- * list keeps the title-cased slug.
+ * list keeps the title-cased slug. The value parts the source's CSS hides from its filter go
+ * to the `_hidden` key (#273 review: Model "Citigoᵉ iV").
  *
  * Usage: node tools/importer/build-facet-labels.mjs [--check]
  *   --check  exit 1 if the committed file differs from the source (no write)
@@ -23,6 +24,8 @@ const TARGET = path.resolve(here, '../../blocks/listing/facet-labels.json');
 const SOURCE = 'https://www.skoda-storyboard.com';
 // the media listings first: their order wins for the facets they share with the others
 const PAGES = ['/en/images/', '/en/videos/', '/en/news/', '/en/press-kits/'];
+// the value parts the source's CSS hides from its filter (#273 review)
+const HIDDEN_KEY = '_hidden';
 const UA = { 'user-agent': 'Mozilla/5.0 (compatible; skoda-eds-migration/1.0)' };
 
 // entities decoded once each, `&amp;` last (so `&amp;lt;` stays the text `&lt;`)
@@ -56,6 +59,34 @@ export function filterOptions(html) {
     const name = decode(m[1].match(/<label\b[^>]*>([\s\S]*?)<\/label>/i)?.[1] || '');
     if (facet && slug && name) out.push([facet.toLowerCase(), decode(slug).toLowerCase(), name]);
   }
+  return out;
+}
+
+/**
+ * The value parts the source's own CSS hides from its filter, on every listing
+ * (`.search-filter li:has([value*="citigoe"]) { display: none; }`, #273 review): the option
+ * stays in the form (a deep link still ticks it) but is not offered.
+ * @param {string} html
+ * @returns {string[]} lower case, in document order
+ */
+export function hiddenOptions(html) {
+  const out = [];
+  const styles = String(html).match(/<style\b[^>]*>[\s\S]*?<\/style>/gi) || [];
+  const rule = /([^{}]+)\{([^{}]*)\}/g;
+  const hides = /^\.search-filter\s+li:has\(\s*\[value\*="([^"]+)"\]\s*\)$/i;
+  styles.forEach((style) => {
+    const css = style.replace(/<\/?style\b[^>]*>/gi, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    let m;
+    // eslint-disable-next-line no-cond-assign
+    while ((m = rule.exec(css))) {
+      if (/(^|;)\s*display\s*:\s*none\s*(!important\s*)?(;|$)/i.test(m[2].trim())) {
+        m[1].split(',').forEach((selector) => {
+          const part = selector.trim().match(hides)?.[1].trim().toLowerCase();
+          if (part && !out.includes(part)) out.push(part);
+        });
+      }
+    }
+  });
   return out;
 }
 
@@ -104,17 +135,23 @@ export const render = (labels) => `${JSON.stringify(labels, null, 1)}\n`;
 async function main() {
   const check = process.argv.includes('--check');
   const pages = [];
+  const hidden = [];
   for (const p of PAGES) {
     // eslint-disable-next-line no-await-in-loop
     const res = await fetch(`${SOURCE}${p}`, { headers: UA });
     if (!res.ok) throw new Error(`${p}: ${res.status}`);
     // eslint-disable-next-line no-await-in-loop
-    const options = filterOptions(await res.text());
+    const html = await res.text();
+    const options = filterOptions(html);
     if (!options.length) throw new Error(`${p}: no filter options found`);
-    console.log(`${p}: ${options.length} options`);
+    const hides = hiddenOptions(html);
+    hides.forEach((part) => { if (!hidden.includes(part)) hidden.push(part); });
+    console.log(`${p}: ${options.length} options${hides.length ? `, hides ${hides.join(', ')}` : ''}`);
     pages.push(options);
   }
-  const text = render({ ...mergeOptions(pages), _pages: pageOptions(pages, PAGES) });
+  const labels = mergeOptions(pages);
+  if (hidden.length) labels[HIDDEN_KEY] = hidden;
+  const text = render({ ...labels, _pages: pageOptions(pages, PAGES) });
   if (check) {
     const current = fs.existsSync(TARGET) ? fs.readFileSync(TARGET, 'utf8') : '';
     if (current !== text) {
@@ -125,8 +162,8 @@ async function main() {
     return;
   }
   fs.writeFileSync(TARGET, text);
-  const { _pages: perPage, ...labels } = JSON.parse(text);
-  console.log(`wrote ${path.relative(process.cwd(), TARGET)}: ${Object.entries(labels).map(([f, v]) => `${f} ${v.length}`).join(', ')}; pages ${Object.keys(perPage).join(', ')}`);
+  const { _pages: perPage, ...written } = JSON.parse(text);
+  console.log(`wrote ${path.relative(process.cwd(), TARGET)}: ${Object.entries(written).map(([f, v]) => `${f} ${v.length}`).join(', ')}; pages ${Object.keys(perPage).join(', ')}`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

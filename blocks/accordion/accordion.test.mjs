@@ -275,3 +275,77 @@ test('CSS: answer starts 10px under its question at full width; the plus sits in
   assert.match(rule('.accordion .accordion-spacer.row'), /block-size: calc\(2 \* var\(--accordion-panel-inset\)\);[\s\S]*margin-block-end: 0;/);
 });
 
+
+// #275: the source slides an answer open and shut (jQuery slideToggle, 400ms swing, height only)
+function slideDom({ reduce = false } = {}) {
+  const dom = new JSDOM(`<div class="accordion">
+    <div><div><h2>One</h2></div><div><p>Answer one</p></div></div>
+  </div>`, { url: 'https://example.com/' });
+  const { window } = dom;
+  window.matchMedia = (q) => ({ matches: reduce && /reduce/.test(q) });
+  const runs = [];
+  // jsdom has no layout or Web Animations: a 300px panel with 10px insets, and recorded slides
+  window.HTMLElement.prototype.getBoundingClientRect = function rect() {
+    // mid-slide: the height a running slide has reached
+    const sliding = this.dataset.midSlide && this.getAnimations().length;
+    const full = sliding ? Number(this.dataset.midSlide) : 300;
+    const h = this.hidden ? 0 : full;
+    return { height: h, width: 800, top: 0, bottom: h };
+  };
+  window.HTMLElement.prototype.getAnimations = function animations() { return runs.filter((r) => r.el === this && !r.done); };
+  window.HTMLElement.prototype.animate = function animate(frames, options) {
+    const run = { el: this, frames, options, done: false, cancel() { run.done = true; }, finish() { run.done = true; run.onfinish?.(); } };
+    runs.push(run);
+    return run;
+  };
+  const style = window.document.createElement('style');
+  style.textContent = '.accordion-panel { padding: 10px 0; }';
+  window.document.head.append(style);
+  globalThis.document = window.document;
+  const block = window.document.querySelector('.accordion');
+  decorate(block);
+  return { block, runs, button: block.querySelector('button'), panel: block.querySelector('.accordion-panel') };
+}
+
+test('slide (#275): opens and closes over 400ms with the source swing, height and insets together', { skip: !JSDOM }, () => {
+  const { button, panel, runs } = slideDom();
+  button.click();
+  assert.equal(button.getAttribute('aria-expanded'), 'true');
+  assert.equal(panel.hidden, false, 'shown at once, then slides');
+  assert.equal(runs.length, 1);
+  assert.deepEqual(runs[0].options, { duration: 400, easing: 'cubic-bezier(0.37, 0, 0.63, 1)' });
+  const [start, end] = runs[0].frames;
+  assert.deepEqual([start.height, start.paddingTop, start.overflow], ['0px', '0px', 'hidden']);
+  assert.deepEqual([end.height, end.paddingTop, end.paddingBottom], ['300px', '10px', '10px']);
+  runs[0].finish();
+  button.click();
+  assert.equal(button.getAttribute('aria-expanded'), 'false', 'the state flips at once');
+  assert.equal(panel.hidden, false, 'still showing while it slides shut');
+  assert.deepEqual([runs[1].frames[0].height, runs[1].frames[1].height], ['300px', '0px']);
+  runs[1].finish();
+  assert.equal(panel.hidden, true, 'hidden once shut');
+});
+
+test('slide (#275): a toggle mid-slide reverses from where it got to, and the old slide never hides it', { skip: !JSDOM }, () => {
+  const { button, panel, runs } = slideDom();
+  button.click();
+  runs[0].finish();
+  button.click(); // closing…
+  panel.dataset.midSlide = '120';
+  button.click(); // …reopened at 120px
+  delete panel.dataset.midSlide;
+  assert.equal(runs[1].done, true, 'the closing slide was cancelled');
+  assert.deepEqual([runs[2].frames[0].height, runs[2].frames[1].height], ['120px', '300px']);
+  assert.equal(runs[2].options.duration, 400 * (180 / 300), 'the rest of the way, at the same speed');
+  assert.equal(panel.hidden, false);
+  assert.equal(button.getAttribute('aria-expanded'), 'true');
+});
+
+test('slide (#275): reduced motion toggles at once, with no animation', { skip: !JSDOM }, () => {
+  const { button, panel, runs } = slideDom({ reduce: true });
+  button.click();
+  assert.equal(panel.hidden, false);
+  button.click();
+  assert.equal(panel.hidden, true);
+  assert.equal(runs.length, 0);
+});

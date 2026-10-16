@@ -39,14 +39,17 @@
       ]
     },
     "embed": {
-      "variants": [],
+      "variants": [
+        "vimeo"
+      ],
       "config": "or-curated",
       "configKeys": [
         "url",
         "ratio",
         "title",
         "poster",
-        "height"
+        "height",
+        "file"
       ]
     },
     "footer": {
@@ -436,7 +439,9 @@
       "ticket": "SKODA-216",
       "fallback": "readable",
       "shape": 1,
-      "emittedBy": []
+      "emittedBy": [
+        "parsers/press-kit-content.js"
+      ]
     },
     {
       "id": "story-rail-press",

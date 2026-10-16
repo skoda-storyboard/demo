@@ -318,7 +318,7 @@ test('resource Images child: inline asset grids become Downloads tables, no Medi
   assert.ok(!/Related Press Releases/.test(page.textContent), 'related band dropped, as on chapter pages');
 });
 
-test('resource Videos child: each clip plays its MP4 master natively, with a labelled download after it', { skip: !JSDOM }, () => {
+test('resource Videos child: each clip keeps its Vimeo URL and its MP4 master, with a labelled download after it', { skip: !JSDOM }, () => {
   const video = (id, file) => `<h2>Škoda Peaq | Footage</h2><div class="media-cart-item attachment"><div class="video-container">
     <iframe src="https://player.vimeo.com/video/${id}?dnt=1"></iframe></div><div class="media-cart-actions">
     <a class="media-cart-action add" href="#" data-action="add"><i class="icon"></i></a>
@@ -329,15 +329,19 @@ test('resource Videos child: each clip plays its MP4 master natively, with a lab
     ['Download video', 'https://www.skoda-storyboard.com/direct-download/2026/08/peaq-footage-1440p.mp4'],
     ['Download video', 'https://www.skoda-storyboard.com/direct-download/2026/08/peaq-sportline-1440p.mp4'],
   ]);
-  // The domain-locked Vimeo player errors on the demo, so the Embed plays the master (SKODA-805c).
-  const embeds = blocks(page, 'Embed');
+  // Each Embed carries the Vimeo clip and its master: the block plays Vimeo where it is allowed,
+  // else the master (some clips are locked to the source's domain, SKODA-805c).
+  const embeds = blocks(page, 'Embed (vimeo)');
   assert.deepEqual(embeds.map((t) => txt(t.querySelector('tr:nth-child(2) a'))), [
     'Škoda Peaq | Footage', 'Škoda Peaq | Footage',
   ], 'named by the heading before each clip');
-  assert.deepEqual(embeds.map((t) => t.querySelector('tr:nth-child(2) a').getAttribute('href').split('/').pop()), [
-    'peaq-footage-1440p.mp4', 'peaq-sportline-1440p.mp4',
-  ]);
-  assert.equal(page.querySelectorAll('a[href^="https://player.vimeo.com/video/"]').length, 0);
+  assert.deepEqual(embeds.map((t) => t.querySelector('tr:nth-child(2) a').getAttribute('href')), [
+    'https://player.vimeo.com/video/111?dnt=1', 'https://player.vimeo.com/video/222?dnt=1',
+  ], 'the url row: the Vimeo clip');
+  assert.deepEqual(embeds.map((t) => [txt(t.querySelector('tr:nth-child(3) td')), t.querySelector('tr:nth-child(3) a').getAttribute('href').split('/').pop()]), [
+    ['file', 'peaq-footage-1440p.mp4'], ['file', 'peaq-sportline-1440p.mp4'],
+  ], 'the file row: the master');
+  assert.equal([...page.querySelectorAll('a[href^="https://player.vimeo.com/video/"]')].filter((a) => !a.closest('table')).length, 0);
   assert.equal(page.querySelectorAll('iframe, .media-cart-item').length, 0);
 });
 
@@ -475,7 +479,7 @@ test('resource child without a Media Box: grouped galleries in source order, no 
   assert.equal(meta.presskit, '/en/press-kits/skoda-peaq-press-kit-2');
 });
 
-test('in-body Storyboard gallery keeps its lead image and caption and links the rest to the Media Box', {
+test('without its image set, an in-body Storyboard gallery keeps its lead image and caption and links the rest to the Media Box', {
   skip: !JSDOM,
 }, () => {
   const thumb = (i) => `<div class="sb-gallery-image"><a class="sb-gallery-link" href="#"><div class="image-holder ratio-container">
@@ -560,7 +564,7 @@ test('a PDF thumbnail link with a real alt keeps the alt, which is also the titl
   assert.equal(link.querySelector('img').alt, 'Škoda Peaq');
 });
 
-test('Videos chapter plays each master natively and keeps its icon-only download as a named link', { skip: !JSDOM }, () => {
+test('Videos chapter carries each clip\'s master and keeps its icon-only download as a named link', { skip: !JSDOM }, () => {
   // The add-to-cart action comes first and some clips give it a `download` class too: the MP4
   // master is picked by its file type, never by position (#189; PR #202 took the first action).
   const clip = (id) => `<h2>Clip ${id}</h2><div class="media-cart-item attachment"><div class="video-container"><iframe src="https://player.vimeo.com/video/${id}?dnt=1"></iframe></div><div class="media-cart-actions">
@@ -571,10 +575,10 @@ test('Videos chapter plays each master natively and keeps its icon-only download
     chapters: true, mediaBox: false, togglesCount: 0, extra: grid(widget(`${clip(11)}${clip(22)}`)),
   }), `${base}skoda-peaq-press-kit-2/videos/`);
   const body = page.querySelector('.entry-content');
-  const embeds = blocks(page, 'Embed');
+  const embeds = blocks(page, 'Embed (vimeo)');
   [11, 22].forEach((id, i) => {
     const embed = embeds[i];
-    assert.match(embed?.querySelector('tr:nth-child(2) a')?.getAttribute('href') || '', new RegExp(`clip-${id}\\.mp4$`));
+    assert.match(embed?.querySelector('tr:nth-child(3) a')?.getAttribute('href') || '', new RegExp(`clip-${id}\\.mp4$`));
     const download = embed.nextElementSibling?.querySelector('a');
     assert.match(download?.getAttribute('href') || '', new RegExp(`/direct-download/2026/06/clip-${id}\\.mp4$`));
     assert.equal(txt(download), 'Download video');
@@ -582,7 +586,7 @@ test('Videos chapter plays each master natively and keeps its icon-only download
   assert.equal(body.querySelectorAll('a[href*="attachment_id"], .media-cart-actions').length, 0);
 });
 
-test('only a top-level Vimeo clip plays its master; nested and YouTube clips stay provider links', { skip: !JSDOM }, () => {
+test('only a top-level Vimeo clip becomes an Embed (vimeo) with its master; nested and YouTube clips stay provider links', { skip: !JSDOM }, () => {
   const clip = `<div class="media-cart-item attachment"><div class="video-container"><iframe src="https://player.vimeo.com/video/77?dnt=1"></iframe></div>
     <div class="media-cart-actions"><a class="media-cart-action download" href="/direct-download/2026/03/clip-77.mp4" data-action="download"><i class="icon"></i></a></div></div>`;
   const answer = grid(`<div class="so-panel widget_ys-row-toggle"><h2 class="row-title">With a clip</h2></div>
@@ -591,10 +595,11 @@ test('only a top-level Vimeo clip plays its master; nested and YouTube clips sta
   const youtube = clip.replace(/77/g, '99').replace('https://player.vimeo.com/video/99?dnt=1', 'https://www.youtube.com/embed/abc99');
   const extra = grid(widget(clip.replace(/77/g, '88'))) + grid(widget(youtube)) + answer;
   const page = run(fixture({ togglesCount: 0, extra }), target);
-  const embeds = blocks(page, 'Embed');
+  const embeds = blocks(page, 'Embed (vimeo)');
   assert.equal(embeds.length, 1, 'only the top-level Vimeo clip');
   assert.ok(page.querySelector('a[href="https://www.youtube.com/embed/abc99"]'));
-  const master = embeds[0].querySelector('tr:nth-child(2) a');
+  assert.equal(embeds[0].querySelector('tr:nth-child(2) a').getAttribute('href'), 'https://player.vimeo.com/video/88?dnt=1');
+  const master = embeds[0].querySelector('tr:nth-child(3) a');
   assert.match(master.getAttribute('href'), /clip-88\.mp4$/);
   assert.doesNotMatch(txt(master), /\//, 'the link text is the accessible name, never the file path');
   const body = rows(page, 'Accordion')[0].children[1];
@@ -970,7 +975,7 @@ test('floated 50px X / WhatsApp icons become Columns (callout), never full-width
   assert.ok(page.querySelector('img[alt="Body"]'), 'ordinary body images are untouched');
 });
 
-test('a WordPress video widget plays its MP4 master natively, named by its Media Box item', { skip: !JSDOM }, () => {
+test('a WordPress video widget carries its MP4 master, named by its Media Box item', { skip: !JSDOM }, () => {
   const file = '/direct-download/2025/10/FABIA-SE-HIGHLIGHTS_H264UHD_ENG_e91b6d28.mp4';
   const videoWidget = `<div class="so-panel widget_media_video"><div class="media-cart-item attachment"><div class="video-container">
     <iframe title="FABIA SE HIGHLIGHTS_H264UHD_ENG" src="https://player.vimeo.com/video/1124833374?dnt=1"></iframe></div>
@@ -979,12 +984,13 @@ test('a WordPress video widget plays its MP4 master natively, named by its Media
     .replace('</article>', `<div class="search-results media-box"><div class="search-results-item"><article class="media-cart-item">
       <h3 class="entry-title">Škoda Fabia 130: Special edition</h3><a class="media-cart-action download" href="${file}">Download</a></article></div></div></article>`);
   const page = run(html, `${base}skoda-fabia-130/`);
-  const [embed] = blocks(page, 'Embed');
+  const [embed] = blocks(page, 'Embed (vimeo)');
   assert.ok(embed, 'the clip is an Embed');
-  const link = embed.querySelector('tr:nth-child(2) a');
+  const link = embed.querySelector('tr:nth-child(3) a');
   assert.equal(link.getAttribute('href').split('/').pop(), 'FABIA-SE-HIGHLIGHTS_H264UHD_ENG_e91b6d28.mp4');
   assert.equal(txt(link), 'Škoda Fabia 130: Special edition');
-  assert.equal(page.querySelectorAll('iframe, a[href^="https://player.vimeo.com"]').length, 0);
+  assert.equal(embed.querySelector('tr:nth-child(2) a').getAttribute('href'), 'https://player.vimeo.com/video/1124833374?dnt=1');
+  assert.equal(page.querySelectorAll('iframe').length, 0);
 });
 
 test('first-glimpse small print becomes Footnotes; small letters in a sentence, 12px paragraphs and answers stay text', { skip: !JSDOM }, () => {
@@ -1218,4 +1224,56 @@ test('a blank answer row whose widget holds a blank paragraph keeps both gaps: t
   const answer = rows(page, 'Accordion').find((tr) => txt(tr.children[0]) === 'Spaced answer').children[1];
   const tail = [...answer.children].slice(-2).map((el) => (el.tagName === 'TABLE' ? txt(el) : el.tagName));
   assert.deepEqual(tail, ['Spacer', 'Spacer (row)'], 'the blank paragraph, then the empty row\'s insets');
+});
+
+test('the title keeps the source line break, and its words stay apart', { skip: !JSDOM }, () => {
+  const target = 'https://www.skoda-storyboard.com/en/press-kits/skoda-peaq-press-kit-2/';
+  const html = fixture({}).replace('<h1>Peaq headline</h1>', '<h1>Breaking new ground in the compact SUV <br/>segment with a<br>covered design</h1>');
+  const h1 = run(html, target).querySelector('h1');
+  assert.equal(h1.querySelectorAll('br').length, 2, 'both breaks, as on the source');
+  assert.equal(txt(h1), 'Breaking new ground in the compact SUV segment with a covered design');
+});
+
+// the source gallery's own set (Epiq preview kit, 63 images): `data-gallery` on .sb-gallery
+const sbSet = (n, extra = '') => {
+  const entries = Array.from({ length: n }, (_, i) => ({
+    content: i ? `Caption ${i} &amp; more` : 'Near production vehicle',
+    url: `https://cdn.skoda-storyboard.com/2026/01/sb-${i}-1920x1280.jpg`,
+    urlThumbnail: `https://cdn.skoda-storyboard.com/2026/01/sb-${i}-768x512.jpg`,
+    title: 'Škoda Epiq',
+  }));
+  const json = JSON.stringify(entries).replace(/"/g, '&quot;');
+  return `<div class="sb-gallery" data-id="gallery-1" data-gallery="${json}"${extra}>
+    <div class="sb-gallery-image sb-gallery-image-main"><a class="sb-gallery-link" href="#"><img src="https://cdn.skoda-storyboard.com/2026/01/sb-0-1440x960.jpg" alt="Škoda Epiq">
+    <div class="sb-gallery-show-more"><svg></svg><span>${n}</span></div></a></div>
+    <div class="sb-gallery-bottom"><div class="sb-gallery-thumbnails"></div>
+    <div class="sb-gallery-show-more"><svg></svg><span>View ${n} photos</span></div>
+    <div class="sb-gallery-share"><span>Share gallery</span><svg></svg><div class="sb-gallery-share-dropdown"><a href="https://www.facebook.com/x">facebook</a></div></div></div></div>`;
+};
+
+test('an in-body Storyboard gallery becomes Gallery (story) with its whole set and captions', { skip: !JSDOM }, () => {
+  const page = run(fixture({ chapters: true, togglesCount: 0, extra: grid(widget(sbSet(63))) }), `${base}skoda-epiq-preview/`);
+  const [gallery] = blocks(page, 'Gallery (story)');
+  assert.ok(gallery, 'the story gallery block');
+  const galleryRows = [...gallery.querySelectorAll('tr')].slice(1);
+  assert.equal(galleryRows.length, 63, 'the whole set, not the five shown');
+  assert.equal(galleryRows[0].querySelector('img').getAttribute('src'), 'https://cdn.skoda-storyboard.com/2026/01/sb-0-1920x1280.jpg');
+  assert.equal(galleryRows[0].querySelector('img').getAttribute('alt'), 'Škoda Epiq');
+  assert.equal(txt(galleryRows[0].children[1]), 'Near production vehicle');
+  assert.equal(txt(galleryRows[1].children[1]), 'Caption 1 & more', 'entities decoded once');
+  const body = page.querySelector('.entry-content');
+  assert.equal(body.querySelectorAll('[class*="sb-gallery"]').length, 0);
+  assert.doesNotMatch(body.textContent, /View 63 photos|Share gallery/, 'no source footer text');
+  assert.equal(body.querySelector('a[href="#media-box"]'), null);
+});
+
+test('a gallery in an accordion answer, or with a broken set, keeps the flat lead image', { skip: !JSDOM }, () => {
+  const answer = grid(`<div class="so-panel widget_ys-row-toggle"><h2 class="row-title">With a gallery</h2></div>
+    <div class="so-panel widget_siteorigin-panels-builder"><div class="panel-layout">${grid(widget(`<p>Answer</p>${sbSet(5)}`))}</div></div>`);
+  const broken = sbSet(5).replace(/data-gallery="[^"]*"/, 'data-gallery="[{oops"');
+  const page = run(fixture({ togglesCount: 0, extra: answer + grid(widget(broken)) }), target);
+  assert.equal(blocks(page, 'Gallery (story)').length, 0);
+  const answerCell = rows(page, 'Accordion')[0].children[1];
+  assert.equal(answerCell.querySelectorAll('table').length, 0, 'blocks do not nest');
+  assert.ok(answerCell.querySelector('img[src*="sb-0-1440x960"]'), 'the lead image stays');
 });

@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  filterOptions, mergeOptions, pageOptions, render,
+  filterOptions, hiddenOptions, mergeOptions, pageOptions, render,
 } from './build-facet-labels.mjs';
 
 const FORM = `<form class="search-filter" method="get"><div class="filter-options">
@@ -48,7 +48,9 @@ test('the committed facet-labels.json is well-formed: every facet a list of [slu
   const text = fs.readFileSync(file, 'utf8');
   const json = JSON.parse(text);
   assert.equal(render(json), text, 'generator format');
-  const { _pages: perPage, ...facets } = json;
+  const { _hidden: hidden, _pages: perPage, ...facets } = json;
+  // the source's CSS hides Model "Citigoᵉ iV" on every listing (#273 review)
+  assert.deepEqual(hidden, ['citigoe'], '_hidden: value parts, not [slug, name] pairs');
   Object.entries(facets).forEach(([facet, pairs]) => {
     assert.ok(Array.isArray(pairs) && pairs.length, facet);
     pairs.forEach(([slug, name]) => assert.ok(slug && name, `${facet}: ${slug}`));
@@ -71,4 +73,21 @@ test('pageOptions: each page\'s own options per facet, in its order, keyed by pa
     '/en/images': { bodywork: ['combi', 'spaceback', 'suv'] },
     '/en/news': { bodywork: ['combi', 'saloon', 'spaceback'], happening: ['other'] },
   });
+});
+
+test('hiddenOptions (#273 review): the value parts the source\'s CSS hides from its filter', () => {
+  const html = `<style>
+.search-results-item:has( .type-attachment .entry-title > a[href=""] ) { display: none; }
+.search-filter li:has([value*="citigoe"]) {
+\tdisplay: none;
+}
+/* .search-filter li:has([value*="commented"]) { display: none; } */
+.search-filter li:has([value*="shown"]) { color: red; }
+.x, .search-filter li:has([value*="Kamiq-GT"]) { display:none !important }
+.search-filter li:has([value*="citigoe"]) { display: none; }
+</style>`;
+  // display:none rules only (not comments or other properties), once each, lower case
+  assert.deepEqual(hiddenOptions(html), ['citigoe', 'kamiq-gt']);
+  assert.deepEqual(hiddenOptions('<p>no style</p>'), []);
+  assert.deepEqual(hiddenOptions('<style>.search-filter li:has([value*=""]) { display: none; }</style>'), [], 'no blank part');
 });

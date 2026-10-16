@@ -1,5 +1,5 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
-import { buildLightbox } from '../../scripts/lightbox.js';
+import { buildLightbox, pageHeading } from '../../scripts/lightbox.js';
 
 /*
  * Gallery block + accessible lightbox — SKODA-203.
@@ -575,7 +575,7 @@ function buildStory(block) {
   block.textContent = '';
   if (!items.length) return;
 
-  const title = document.querySelector('main h1')?.textContent.trim() || items[0].alt;
+  const title = pageHeading() || items[0].alt;
 
   const lead = document.createElement('button');
   lead.type = 'button';

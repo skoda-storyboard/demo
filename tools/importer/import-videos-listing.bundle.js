@@ -43,7 +43,7 @@ var CustomImportScript = (() => {
 
   // tools/importer/parsers/listing.js
   var FACETS_NEWS = "model, derivative, concept, bodywork, years, company, happening, history, sponsorship, vip, view, technology, environment";
-  var FACETS_MEDIA = "model, derivative, concept, bodywork, equipment, years, company, happening, history, motorsport, sponsorship, vip, view, technology, environment";
+  var FACETS_MEDIA = FACETS_NEWS;
   var VARIANTS = {
     // News (press releases) — the baseline.
     news: [
