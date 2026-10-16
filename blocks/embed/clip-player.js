@@ -5,11 +5,11 @@
  * a 56×32 play button and a bar holding the progress track, its time pill and the volume,
  * settings (speed), picture-in-picture and fullscreen buttons, each with its name as a tooltip.
  * Over the volume button, a 32×96 vertical slider shows on hover and on keyboard focus (the
- * next Tab stop after Mute; arrow keys 5%, as the source's). With a mouse the controls show
- * only while the pointer is over the clip (PO, 2026-10-16), and while it plays they also fade 2s
- * after the pointer last moved (the source Vimeo player's). Keyboard focus in the bar, the open
- * speed menu and the pointer resting on the bar keep them; a mouse click doesn't. Without hover
- * (touch) they stay while paused and fade 2s after the last tap while playing.
+ * next Tab stop after Mute; arrow keys 5%, as the source's). As the source Vimeo player's, the
+ * controls stay shown until the clip plays and whenever it is paused. While it plays they show
+ * only while the pointer is over the clip and fade 2s after its last move there. Keyboard focus
+ * in the bar, the open speed menu and the pointer resting on the bar keep them; the focus a
+ * mouse click leaves doesn't. Without hover (touch) they fade 2s after the last tap.
  * Styles: embed.css (`.embed.vimeo`).
  */
 
@@ -218,8 +218,8 @@ export default function clipPlayer(wrapper, video) {
     seek.setAttribute('aria-valuetext', LABELS.timeOf(timecode(now), timecode(total)));
   };
 
-  // the controls' hiding (`is-idle`): with a mouse whenever the pointer is off the clip, and
-  // while playing 2s after its last move; without hover only that idle fade
+  // the controls' hiding (`is-idle`), only while playing: with a mouse whenever the pointer is
+  // off the clip, and 2s after its last move; without hover only that idle fade
   const canHover = window.matchMedia?.('(hover: hover)')?.matches ?? true;
   let idleTimer = 0;
   let idle = false;
@@ -234,7 +234,7 @@ export default function clipPlayer(wrapper, video) {
   const sync = () => {
     const playing = !(video.paused || video.ended);
     const held = overBar || !menu.hidden || keyboardFocus();
-    wrapper.classList.toggle('is-idle', !held && ((canHover && !inside) || (playing && idle)));
+    wrapper.classList.toggle('is-idle', !held && playing && ((canHover && !inside) || idle));
   };
   const show = () => {
     idle = false;

@@ -225,7 +225,7 @@ test('Settings and Picture-in-Picture stay at every width (no narrow-player rule
   assert.deepEqual(hiding.map(([, sel]) => sel.trim()), []);
 });
 
-test('with a mouse the controls show only over the clip, and fade 2s after the last move while playing', { skip: !JSDOM }, () => {
+test('until the clip plays and while paused the controls stay; playing, they show only over the clip and fade 2s after the last move', { skip: !JSDOM }, () => {
   mock.timers.enable({ apis: ['setTimeout'] });
   try {
     const {
@@ -237,13 +237,13 @@ test('with a mouse the controls show only over the clip, and fade 2s after the l
       Object.defineProperty(e, 'pointerType', { value: pointerType });
       el.dispatchEvent(e);
     };
-    assert.equal(idle(), true, 'loaded, the pointer elsewhere: hidden');
+    mock.timers.tick(5000);
+    assert.equal(idle(), false, 'loaded, not played, the pointer elsewhere: shown');
     pointer(wrapper, 'pointerenter');
-    assert.equal(idle(), false, 'hovered: shown');
     mock.timers.tick(5000);
     assert.equal(idle(), false, 'paused and hovered: stays');
     pointer(wrapper, 'pointerleave');
-    assert.equal(idle(), true, 'paused, the pointer left: hidden at once');
+    assert.equal(idle(), false, 'paused, the pointer left: still shown');
     pointer(wrapper, 'pointerenter');
     q('.clip-play').click();
     mock.timers.tick(1999);
@@ -265,7 +265,7 @@ test('with a mouse the controls show only over the clip, and fade 2s after the l
     q('.clip-settings').click();
     assert.equal(idle(), true);
     video.pause();
-    assert.equal(idle(), true, 'paused, the pointer away: still hidden');
+    assert.equal(idle(), false, 'paused again, the pointer away: shown');
   } finally {
     mock.timers.reset();
   }
@@ -274,14 +274,15 @@ test('with a mouse the controls show only over the clip, and fade 2s after the l
 test('keyboard focus in the bar holds the controls; the focus a mouse click leaves does not', { skip: !JSDOM }, () => {
   mock.timers.enable({ apis: ['setTimeout'] });
   try {
-    const { wrapper, q, window } = setup();
+    const { wrapper, q, window, video } = setup();
     const idle = () => wrapper.classList.contains('is-idle');
+    video.play();
     const seek = q('.clip-seek');
     seek.matches = (sel) => (sel === ':focus-visible' ? true : window.Element.prototype.matches.call(seek, sel));
     seek.focus();
     assert.equal(idle(), false, 'tabbed to the progress bar: shown');
     seek.blur();
-    assert.equal(idle(), true, 'focus left the clip: hidden again');
+    assert.equal(idle(), true, 'playing, focus left the clip: hidden again');
     const play = q('.clip-play');
     play.matches = (sel) => (sel === ':focus-visible' ? false : window.Element.prototype.matches.call(play, sel));
     play.focus();
