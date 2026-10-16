@@ -33,15 +33,19 @@
 // Facet keys are the index COLUMN names (query-index-config.yaml), not the display labels:
 // `years` (label "Year"), `happening` ("Event"). SKODA-608 fixed `year`/`event`, which match
 // no column, so those pills never rendered.
-const FACETS_DEFAULT = 'model, derivative, years, company, happening, technology';
-// Media listings: the 13 filter groups the source SHOWS on /en/images/ and /en/videos/, in its
-// order (#273 re-test, measured 2026-10-14). The source form also holds `equipment` and
-// `motorsport`, but hides their pills (`display: none`) and ignores a deep link to them, so they
-// stay out (as News / Press Kits, SKODA-402d). A group with no option in the feed shows no
-// pill. Their rows come from the generated media feed (/en/media-feed.json, SKODA-608), which
-// only holds image/video rows, so no `path` scope is needed.
-const FACETS_MEDIA = 'model, derivative, concept, bodywork, years, company, happening, history, '
+// News and Press Kits: the 13 filter groups the source SHOWS, in its order (SKODA-402d, #333,
+// measured 2026-10-14 on /en/news/ and /en/press-kits/). The source form also holds
+// `equipment` and `motorsport`, but hides their pills (`display: none`) and ignores a deep link
+// to them, so they stay out: the listing reads only its configured facets from the URL. A
+// group with no option in the scoped rows shows no pill, as on the media listings.
+const FACETS_NEWS = 'model, derivative, concept, bodywork, years, company, happening, history, '
   + 'sponsorship, vip, view, technology, environment';
+// Media listings: the same 13 groups the source SHOWS on /en/images/ and /en/videos/, in its
+// order (#273 re-test, measured 2026-10-14): `equipment` and `motorsport` are hidden there
+// too. A group with no option in the feed shows no pill. Their rows come from the generated
+// media feed (/en/media-feed.json, SKODA-608), which only holds image/video rows, so no `path`
+// scope is needed.
+const FACETS_MEDIA = FACETS_NEWS;
 
 // Variant config keyed by the <body> class token the source page carries.
 // Each value is the authored Listing contract (faceted-listing.md §7). Order-preserving.
@@ -51,7 +55,7 @@ const VARIANTS = {
     ['index', '/en/query-index.json'],
     ['path', '/en/press-releases/'],
     ['template', 'press_release'],
-    ['facets', FACETS_DEFAULT],
+    ['facets', FACETS_NEWS],
     ['sort', 'newest'],
     ['perpage', '6'],
     ['columns', '3'],
@@ -62,7 +66,7 @@ const VARIANTS = {
     ['index', '/en/query-index.json'],
     ['path', '/en/press-kits/'],
     ['template', 'press_kit'],
-    ['facets', FACETS_DEFAULT],
+    ['facets', FACETS_NEWS],
     ['sort', 'newest'],
     ['perpage', '6'],
     ['columns', '3'],

@@ -2,6 +2,8 @@
 
 **Purpose:** track which parts of the migration can be handed to an autonomous agentic implementation team (AI agents driving a framework we want to evaluate). Living document — add/re-tier as decisions resolve.
 
+> **Update 2026-10-15 (M2 readiness review):** RSS now has a ticket, **SKODA-405** (#52, labelled `agent-fit` + `agent-eval`). Keep the source's `/en/feed/` and `/en/press-releases/feed/` URLs. Other agent-fit M2 candidates with deterministic oracles: SKODA-509 (hook signature, unit test), the 801b / 847 corpus enumeration (count reconciliation against REST and the listing), and the SKODA-848 archive keep / redirect list (link integrity). See [`../reviews/SKODA-M2-READINESS-REVIEW-2026-10-15.md`](../reviews/SKODA-M2-READINESS-REVIEW-2026-10-15.md). The decision log this doc cites (`SKODA-DELIVERY-PLAN.md` §8) is not in the repo; use [`SKODA-DECISION-REGISTER.md`](SKODA-DECISION-REGISTER.md).
+
 **Date:** 2026-09-11 · **Related:** `SKODA-CLIENT-REQUIREMENTS-MAPPING.md`, `docs/tickets/OVERVIEW.md`, `SKODA-DELIVERY-PLAN.md` §8 (decision log).
 
 ---

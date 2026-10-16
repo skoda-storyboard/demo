@@ -371,14 +371,14 @@
       "previewedHash": "9bae2e5be815923bc4a21a2c0ae1ef8dc39322ba77f22d6ac8a8cfda1e418b6f"
     },
     "/en/news": {
-      "hash": "deae8f359eac1497edd828b329f91ca79fea93a28423593898adf892637db9eb",
-      "pushedAt": "2026-09-29T22:46:38.907Z",
-      "previewedHash": "deae8f359eac1497edd828b329f91ca79fea93a28423593898adf892637db9eb"
+      "hash": "852756bfae68cf95d59de6d67307191136227cc4f4c0483dfcc6c9a0ed9d4fa6",
+      "pushedAt": "2026-10-14T06:34:18.981Z",
+      "previewedHash": "852756bfae68cf95d59de6d67307191136227cc4f4c0483dfcc6c9a0ed9d4fa6"
     },
     "/en/press-kits": {
-      "hash": "4ce984ff53a48f916fc0971cb375e32e92d6d08ba867707afed40cc389a54195",
-      "pushedAt": "2026-09-29T22:46:38.907Z",
-      "previewedHash": "4ce984ff53a48f916fc0971cb375e32e92d6d08ba867707afed40cc389a54195"
+      "hash": "407e03a79a7f9413da1b3ad49ffd23f2050f4591cd2a60b9eb9b82729ce7e4ad",
+      "pushedAt": "2026-10-14T06:34:18.981Z",
+      "previewedHash": "407e03a79a7f9413da1b3ad49ffd23f2050f4591cd2a60b9eb9b82729ce7e4ad"
     },
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit": {
       "hash": "dcecb1564ff72ec659fff6ae865ac33d6896a0cb42df0eca6f4e028b9c39b4d5",
@@ -1034,6 +1034,11 @@
       "hash": "a4db5dfeb57649d5075928a998e0930be1fed7d98b23a8ff4720672900f4eca3",
       "pushedAt": "2026-10-08T22:31:44.145Z",
       "previewedHash": "a4db5dfeb57649d5075928a998e0930be1fed7d98b23a8ff4720672900f4eca3"
+    },
+    "/en/press-releases/skoda-expands-electric-portfolio-the-new-epiq-sportlinedebuts-with-dynamic-exterior-styling": {
+      "hash": "e7b946681387d3155558b42a6587ae3121fb656142572cab53f26ba070000118",
+      "pushedAt": "2026-10-15T07:37:24.573Z",
+      "previewedHash": "e7b946681387d3155558b42a6587ae3121fb656142572cab53f26ba070000118"
     },
     "/en/press-releases/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport": {
       "hash": "45cb0c0636f36ed0022295a70842af965c69f174dcaa6acbb5dbfcf953ff3b3e",

@@ -281,7 +281,7 @@ test('402a: collapsed by default; the toggle always shows the count, "(0)" inclu
   assert.ok(block.classList.contains('facets-open'));
 });
 
-test('402a: a selection settles, veils the listing, updates and collapses the panel (like live)', async (t) => {
+test('a selection veils the listing at once, then updates and hides the panel with its list in one step (like live, #333)', async (t) => {
   const { block, toggle } = await facetListing('/en/filter-index.json');
   t.mock.timers.enable({ apis: ['setTimeout'] });
   click(toggle);
@@ -293,28 +293,37 @@ test('402a: a selection settles, veils the listing, updates and collapses the pa
     cb.dispatchEvent(new window.Event('change', { bubbles: true }));
   };
   change('Peaq');
-  // the checkbox ticks at once; results wait for the settle time
+  // the checkbox ticks and the veil fades in at once; the results wait (live: its request)
+  assert.ok(block.classList.contains('is-loading'), 'veil at once');
+  assert.equal(block.getAttribute('aria-busy'), 'true');
   assert.equal(toggle.textContent, 'Advanced filter (0)');
   t.mock.timers.tick(FILTER_SETTLE_MS - 100);
-  change('Epiq'); // a second quick pick restarts the settle (batched)
-  t.mock.timers.tick(FILTER_SETTLE_MS - 1);
-  assert.equal(block.classList.contains('is-loading'), false);
-  t.mock.timers.tick(1);
-  assert.ok(block.classList.contains('is-loading'), 'veil fades in');
-  assert.equal(block.getAttribute('aria-busy'), 'true');
+  change('Epiq'); // a second quick pick restarts the wait (batched), the veil stays
+  assert.ok(block.classList.contains('is-loading'), 'no veil flash on the second pick');
+  t.mock.timers.tick(FILTER_SETTLE_MS); // the wait, then the veil's fade-in time
+  t.mock.timers.tick(VEIL_MS - 1);
+  assert.ok(block.classList.contains('is-loading'));
   assert.ok(block.classList.contains('facets-open'), 'still open under the veil');
-  t.mock.timers.tick(VEIL_MS);
+  t.mock.timers.tick(1);
   assert.equal(block.classList.contains('is-loading'), false, 'veil fades out');
   assert.equal(block.hasAttribute('aria-busy'), false);
   assert.equal(toggle.textContent, 'Advanced filter (2)');
   assert.equal(block.querySelectorAll('.listing-chip').length, 2);
-  assert.equal(block.classList.contains('facets-open'), false, 'panel collapsed');
+  assert.equal(block.classList.contains('facets-open'), false, 'panel hidden');
+  assert.equal(block.classList.contains('facets-instant'), false, 'in one step: the no-transition state is not left behind');
   assert.equal(toggle.getAttribute('aria-expanded'), 'false');
   assert.equal(document.activeElement, toggle, 'focus moves from the hidden checkbox to the toggle');
-  // the list collapses inside the panel and is still open when the panel is expanded again
+  // the list goes with the panel and is still open when the panel is expanded again (as live)
   click(toggle);
   assert.equal(block.querySelector('.facet-pill[aria-expanded="true"]')?.dataset.facet, 'model', 'Model list open again');
   assert.ok(block.querySelector('.listing-facets .listing-chips .listing-chip'), 'chips are inside the panel');
+});
+
+test('the panel hides without its transition after a selection; the toggle still animates it (#333)', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = (await readFile(new URL('./listing.css', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.match(css, /\.listing\.facets-instant \.listing-facets\s*\{\s*transition:\s*none;/);
+  assert.match(css, /\.listing \.listing-facets\s*\{[^}]*transition:/, 'the toggle keeps the animated open / close');
 });
 
 const pick = (block, value) => {
@@ -367,7 +376,9 @@ test('402a: a sort change during the settle runs one flow; back/forward drops a 
 test('402a: removing a chip veils at once (no settle), updates and collapses the panel, like live', async (t) => {
   const { block, toggle } = await facetListing('/en/chip-index.json', '?filter[model][]=Peaq&filter[model][]=Epiq');
   t.mock.timers.enable({ apis: ['setTimeout'] });
-  assert.ok(block.classList.contains('facets-open'), 'deep link opens the panel');
+  assert.equal(block.classList.contains('facets-open'), false, 'a deep link keeps the panel closed, as live (#333)');
+  click(toggle); // the visitor opens it to reach the chips
+  assert.ok(block.classList.contains('facets-open'));
   const chip = block.querySelector('.listing-chip');
   chip.focus();
   click(chip);
@@ -469,10 +480,10 @@ test('402a: reopening with an option list still open focuses that list\'s pill',
   assert.equal(document.activeElement, pills[1]);
 });
 
-test('402a: a filtered deep link opens the panel without moving focus on load', async () => {
+test('a filtered deep link keeps the panel closed and does not move focus on load (#333, as live)', async () => {
   document.activeElement?.blur();
   const { block } = await facetListing('/en/focus-deeplink-index.json', '?filter[model][]=Peaq');
-  assert.equal(block.classList.contains('facets-open'), true);
+  assert.equal(block.classList.contains('facets-open'), false);
   assert.equal(document.activeElement, document.body, 'the page load does not steal focus');
 });
 
@@ -561,7 +572,7 @@ test('402a: reduced motion — no veil wait and no Load more wait', async (t) =>
   }
 });
 
-test('402a: a second pick under the veil restarts once — a single collapse, no double veil', async (t) => {
+test('a second pick under the veil restarts the wait once — one veil, a single collapse (#333)', async (t) => {
   const { block, toggle } = await facetListing('/en/veil-index.json');
   t.mock.timers.enable({ apis: ['setTimeout'] });
   click(toggle);
@@ -569,14 +580,16 @@ test('402a: a second pick under the veil restarts once — a single collapse, no
   t.mock.timers.tick(FILTER_SETTLE_MS);
   assert.ok(block.classList.contains('is-loading'));
   pick(block, 'Epiq'); // keyboard Space under the veil
-  assert.equal(block.classList.contains('is-loading'), false, 'the first veil is dropped');
+  assert.ok(block.classList.contains('is-loading'), 'the veil stays (one veil for both picks)');
   t.mock.timers.tick(VEIL_MS);
   assert.ok(block.classList.contains('facets-open'), 'no collapse from the first pick');
-  t.mock.timers.tick(FILTER_SETTLE_MS - VEIL_MS); // the restarted settle ends
-  assert.ok(block.classList.contains('is-loading'), 'one veil, for both picks');
-  t.mock.timers.tick(VEIL_MS);
+  t.mock.timers.tick(FILTER_SETTLE_MS - VEIL_MS); // the restarted wait ends
+  t.mock.timers.tick(VEIL_MS - 1);
+  assert.ok(block.classList.contains('is-loading'));
+  t.mock.timers.tick(1);
   assert.equal(toggle.textContent, 'Advanced filter (2)');
   assert.equal(block.classList.contains('facets-open'), false);
+  assert.equal(block.classList.contains('is-loading'), false);
 });
 
 test('402a: collapse + expand keeps the open pill list, like live (only Esc or its pill closes it)', async (t) => {
@@ -613,11 +626,43 @@ test('402a: a deep link matches index values case-insensitively (Peaq → peaq, 
   assert.equal(block.querySelector('.listing-chip').textContent, 'Model: Peaq');
 });
 
-test('402a: a filtered deep link opens the panel showing "(1)"', async () => {
-  const { block, toggle } = await facetListing('/en/deeplink-index.json', '?filter[model][]=Peaq');
-  assert.equal(toggle.getAttribute('aria-expanded'), 'true');
-  assert.ok(block.classList.contains('facets-open'));
+test('a deep link to a facet no row in scope carries keeps its pill and a checked option to clear it (#333 review)', async () => {
+  const { block, toggle } = await facetListing('/en/linked-index.json', '?filter[sponsorship][]=icehockey');
   assert.equal(toggle.textContent, 'Advanced filter (1)');
+  const pill = block.querySelector('.facet-pill[data-facet="sponsorship"]');
+  assert.ok(pill, 'the active facet has its pill');
+  assert.equal(pill.querySelector('.facet-count').textContent, '1');
+  const cb = block.querySelector('.facet-panel[data-facet="sponsorship"] input[value="icehockey"]');
+  assert.equal(cb.checked, true);
+  assert.equal(block.querySelectorAll('.listing-item').length, 0, 'no migrated row matches');
+  // facets with no rows and nothing selected still show no pill
+  assert.equal(block.querySelector('.facet-pill[data-facet="history"]'), null);
+  // clearing it there brings the rows back
+  cb.checked = false;
+  cb.dispatchEvent(new window.Event('change', { bubbles: true }));
+  await new Promise((r) => { setTimeout(r, 1500); });
+  assert.ok(block.querySelectorAll('.listing-item').length > 0);
+  assert.equal(toggle.textContent, 'Advanced filter (0)');
+});
+
+test('a filtered deep link shows a closed panel and "Advanced filter (1)"; opening it shows the filtered list (#333, as live)', async () => {
+  const { block, toggle } = await facetListing('/en/deeplink-index.json', '?filter[model][]=Peaq');
+  assert.equal(toggle.getAttribute('aria-expanded'), 'false');
+  assert.equal(block.classList.contains('facets-open'), false);
+  assert.equal(toggle.textContent, 'Advanced filter (1)');
+  click(toggle);
+  assert.ok(block.classList.contains('facets-open'));
+  assert.equal(block.querySelector('.facet-pill[data-facet="model"]').getAttribute('aria-expanded'), 'true', 'its options open, as live');
+});
+
+test('"Advanced filter (n)" stays regular weight with a filter on (PO decision, #333)', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = (await readFile(new URL('./listing.css', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  const toggleRules = [...css.matchAll(/([^{}]*listing-filter-toggle[^{}]*)\{([^}]*)\}/g)];
+  assert.ok(toggleRules.some(([, sel, body]) => /\.listing \.listing-filter-toggle\s*$/.test(sel.trim()) && /font-weight:\s*var\(--weight-regular\)/.test(body)));
+  assert.ok(!toggleRules.some(([, , body]) => /font-weight:\s*var\(--weight-bold\)/.test(body)), 'no bold state');
+  const { toggle } = await facetListing('/en/regular-toggle-index.json', '?filter[model][]=Peaq');
+  assert.equal(toggle.className, 'listing-filter-toggle', 'no state class that could set a weight');
 });
 
 test('402a: Esc closes an option list, then the panel; Esc elsewhere in the block is ignored', async () => {
@@ -848,6 +893,44 @@ async function hiddenListing(index, search = '', { late = false } = {}) {
     globalThis.fetch = realFetch;
   }
 }
+
+// SKODA-402d (#333 review): the source orders and offers options per listing page
+const PAGE_LABELS = {
+  bodywork: [['combi', 'Combi'], ['suv', 'SUV'], ['saloon', 'Saloon']],
+  company: [['design', 'design'], ['other', 'other']],
+  _pages: { '/en/news': { bodywork: ['combi', 'saloon', 'suv'], company: ['design'] } },
+};
+
+test('facetLabelMap: a page with its own list ranks and offers by it; other pages keep the shared order (SKODA-402d)', async () => {
+  const { facetLabelMap, isOffered, orderFacetValues } = await import('./listing.js');
+  const news = facetLabelMap(PAGE_LABELS, '/en/news/');
+  const values = ['suv', 'saloon', 'combi'].map((value) => ({ value }));
+  assert.deepEqual(orderFacetValues(values, 'bodywork', news).map((v) => v.value), ['combi', 'saloon', 'suv'], 'News: saloon before suv');
+  assert.equal(isOffered(news, 'company', 'other'), false, 'not on the source News form');
+  assert.equal(isOffered(news, 'company', 'design'), true);
+  assert.equal(isOffered(news, 'model', 'peaq'), true, 'no page list for the facet: everything offered');
+  const other = facetLabelMap(PAGE_LABELS, '/en/images');
+  assert.deepEqual(orderFacetValues(values, 'bodywork', other).map((v) => v.value), ['combi', 'suv', 'saloon'], 'the shared order');
+  assert.equal(isOffered(other, 'company', 'other'), true);
+  assert.equal(facetLabelMap({}).pageFacets.size, 0);
+});
+
+async function pageLabelsListing(index, search, rows, { hold = false } = {}) {
+  const realFetch = globalThis.fetch;
+  let release = () => {};
+  const held = new Promise((resolve) => { release = resolve; });
+  globalThis.fetch = async (url) => {
+    if (!String(url).includes('facet-labels')) return realFetch(url);
+    if (hold) await held;
+    return { ok: true, status: 200, json: async () => PAGE_LABELS };
+  };
+  try {
+    const listing = await facetListing(index, search, rows);
+    return { ...listing, release: async () => { release(); await settle(); await settle(); } };
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
 const optionValues = (block, facet) => [...block.querySelectorAll(`.facet-panel[data-facet="${facet}"] input`)].map((i) => i.value);
 const pillFacets = (block) => [...block.querySelectorAll('.facet-pill')].map((p) => p.dataset.facet);
 
@@ -868,7 +951,7 @@ test('hidden options (#273 review): a deep link to one still filters, with its c
   assert.equal(toggle.textContent, 'Advanced filter (1)');
 });
 
-test('hidden options (#273 review): late names drop them, and a pill left empty; focus moves to the pill', async () => {
+test('hidden options (#273 review): late names drop them, and a pill left empty; focus moves to the first option left', async () => {
   const { block, release } = await hiddenListing('/en/hidden-late-index.json', '', { late: true });
   assert.deepEqual(optionValues(block, 'model'), ['citigoe', 'peaq'], 'before the names: every value');
   click(block.querySelector('.facet-pill[data-facet="model"]'));
@@ -877,7 +960,66 @@ test('hidden options (#273 review): late names drop them, and a pill left empty;
   await release();
   assert.deepEqual(optionValues(block, 'model'), ['peaq']);
   assert.equal(hidden.isConnected, false);
-  assert.equal(document.activeElement, block.querySelector('.facet-pill[data-facet="model"]'), 'not <body>');
+  // as any removed focused option (#355 review): the first option left in its list, not <body>
+  assert.equal(document.activeElement, block.querySelector('.facet-panel[data-facet="model"] input[value="peaq"]'));
   // bodywork "Citigoe" is a value part the source hides too: its only option goes, with the pill
   assert.deepEqual(optionValues(block, 'bodywork'), ['SUV']);
+});
+
+const companyRow = (n, company, bodywork) => ({ ...storyRow(n, 'Peaq', bodywork), company });
+
+test('on a page with the source\'s own options, the bar offers only those, in its order; a deep-linked one stays (SKODA-402d)', async () => {
+  const rows = [companyRow(1, 'design, other', 'suv'), companyRow(2, 'other', 'saloon'), companyRow(3, 'design', 'combi')];
+  const { block } = await pageLabelsListing('/en/page-labels-index.json', '', rows);
+  const opts = (facet) => [...block.querySelectorAll(`.facet-panel[data-facet="${facet}"] input`)].map((i) => i.value);
+  assert.deepEqual(opts('bodywork'), ['combi', 'saloon', 'suv'], 'the page order');
+  assert.deepEqual(opts('company'), ['design'], 'no "other": the source does not offer it here');
+  // a deep link to the value keeps it, checked, so it can be cleared
+  const linked = await pageLabelsListing('/en/page-labels-linked-index.json', '?filter[company][]=other', rows);
+  const cb = linked.block.querySelector('.facet-panel[data-facet="company"] input[value="other"]');
+  assert.ok(cb?.checked);
+});
+
+test('late names on such a page drop the options the source does not offer, and an emptied pill (SKODA-402d)', async () => {
+  const rows = [companyRow(1, 'other', 'suv'), companyRow(2, 'other', 'saloon')];
+  const { block, release } = await pageLabelsListing('/en/page-labels-late-index.json', '', rows, { hold: true });
+  assert.ok(block.querySelector('.facet-pill[data-facet="company"]'), 'built with the slugs first');
+  await release();
+  assert.equal(block.querySelector('.facet-pill[data-facet="company"]'), null, 'its only option is not offered: the pill goes');
+  assert.equal(block.querySelector('.facet-panel[data-facet="company"]'), null);
+  assert.deepEqual([...block.querySelectorAll('.facet-panel[data-facet="bodywork"] input')].map((i) => i.value), ['saloon', 'suv']);
+});
+
+// #355 review: late names that remove the focused option must not drop focus to <body>
+test('late names removing the focused option: focus moves to the first option left in its list (#355 review)', async () => {
+  const rows = [companyRow(1, 'design, other', 'suv'), companyRow(2, 'other', 'saloon')];
+  const { block, toggle, release } = await pageLabelsListing('/en/page-labels-focus-index.json', '', rows, { hold: true });
+  click(toggle);
+  click(block.querySelector('.facet-pill[data-facet="company"]'));
+  const other = block.querySelector('.facet-panel[data-facet="company"] input[value="other"]');
+  other.focus();
+  assert.equal(document.activeElement, other);
+  await release();
+  assert.equal(other.isConnected, false, 'the source does not offer it here');
+  const design = block.querySelector('.facet-panel[data-facet="company"] input[value="design"]');
+  assert.equal(document.activeElement, design, 'the surviving option, not <body>');
+  assert.equal(block.querySelector('.facet-pill[data-facet="company"]').getAttribute('aria-expanded'), 'true', 'its list stays open');
+});
+
+test('late names removing the focused option\'s whole list: focus moves to the Advanced filter toggle (#355 review)', async () => {
+  const rows = [companyRow(1, 'other', 'suv'), companyRow(2, 'other', 'saloon')];
+  const { block, toggle, release } = await pageLabelsListing('/en/page-labels-focus-gone-index.json', '', rows, { hold: true });
+  click(toggle);
+  click(block.querySelector('.facet-pill[data-facet="company"]'));
+  block.querySelector('.facet-panel[data-facet="company"] input[value="other"]').focus();
+  await release();
+  assert.equal(block.querySelector('.facet-pill[data-facet="company"]'), null, 'the pill went with its only option');
+  assert.equal(document.activeElement, toggle, 'the toggle, not <body>');
+});
+
+test('sort row (#355 review): the one-step collapse after a pick drops its margin transition too; the toggle keeps it', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = (await readFile(new URL('./listing.css', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.match(css, /\.listing\.facets-instant \.listing-sort \{\s*transition: none;/);
+  assert.match(css, /\.listing \.listing-sort \{[^}]*transition: margin-block-start var\(--facet-reveal\)/);
 });

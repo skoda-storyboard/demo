@@ -6,7 +6,8 @@
  * filter shows names (`Citigoᵉ iV`, `India 2.0`, `RS`) in its own order. This reads the
  * source's filter forms (form.search-filter: `<input name="filter[<facet>][]" value="<slug>">`
  * + its `<label>`) on the listing pages and writes, per facet, the [slug, name] pairs in the
- * source's order to blocks/listing/facet-labels.json (committed, served with the block).
+ * source's order to blocks/listing/facet-labels.json (committed, served with the block), and
+ * each page's own option order under `_pages` (SKODA-402d).
  * The listing shows only the options its rows have (PO, #273); a slug the source does not
  * list keeps the title-cased slug. The value parts the source's CSS hides from its filter go
  * to the `_hidden` key (#273 review: Model "Citigoᵉ iV").
@@ -105,6 +106,30 @@ export function mergeOptions(pages) {
   return out;
 }
 
+/**
+ * Each listing page's own options, per facet, in its order (SKODA-402d, #333 review). The
+ * source orders and offers options per page: `saloon` is a News option the media pages lack,
+ * and Press Kits list `other` between `motorshow` and `premiere`, Images last. The listing
+ * block ranks and offers a page's options by this, under the top-level `_pages` key, which
+ * older readers skip (not a list).
+ * @param {Array<Array<[string, string, string]>>} pages filterOptions() per page
+ * @param {string[]} paths the pages' paths, in the same order
+ * @returns {Record<string, Record<string, string[]>>} path (no trailing slash) → facet → slugs
+ */
+export function pageOptions(pages, paths) {
+  const out = {};
+  pages.forEach((options, i) => {
+    const key = paths[i].replace(/\/+$/, '') || '/';
+    const facets = {};
+    options.forEach(([facet, slug]) => {
+      if (!facets[facet]) facets[facet] = [];
+      if (!facets[facet].includes(slug)) facets[facet].push(slug);
+    });
+    out[key] = facets;
+  });
+  return out;
+}
+
 export const render = (labels) => `${JSON.stringify(labels, null, 1)}\n`;
 
 async function main() {
@@ -126,7 +151,7 @@ async function main() {
   }
   const labels = mergeOptions(pages);
   if (hidden.length) labels[HIDDEN_KEY] = hidden;
-  const text = render(labels);
+  const text = render({ ...labels, _pages: pageOptions(pages, PAGES) });
   if (check) {
     const current = fs.existsSync(TARGET) ? fs.readFileSync(TARGET, 'utf8') : '';
     if (current !== text) {
@@ -137,7 +162,8 @@ async function main() {
     return;
   }
   fs.writeFileSync(TARGET, text);
-  console.log(`wrote ${path.relative(process.cwd(), TARGET)}: ${Object.entries(labels).map(([f, v]) => `${f} ${v.length}`).join(', ')}`);
+  const { _pages: perPage, ...written } = JSON.parse(text);
+  console.log(`wrote ${path.relative(process.cwd(), TARGET)}: ${Object.entries(written).map(([f, v]) => `${f} ${v.length}`).join(', ')}; pages ${Object.keys(perPage).join(', ')}`);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

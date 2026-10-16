@@ -482,6 +482,19 @@ var CustomImportScript = (() => {
     const t = String(raw || "").replace(/\s+/g, " ").trim();
     return t.replace(SITE_SUFFIX, "").trim() || t;
   }
+  var SOFT_BREAK = /[\u00A0\u{F00A0}]/gu;
+  function spacedText(h1) {
+    const copy = h1.cloneNode(true);
+    copy.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
+    return copy.textContent.replace(SOFT_BREAK, " ").replace(/\s+/g, " ").trim();
+  }
+  function respacedTitle(title, h1) {
+    if (!title || !h1) return title;
+    const spaced = spacedText(h1);
+    const bare = (s) => s.replace(SOFT_BREAK, "").replace(/\s+/g, "");
+    const words = (s) => s.split(" ").length;
+    return bare(spaced) === bare(title) && words(spaced) > words(title) ? spaced : title;
+  }
   function metaContent(document2, selector) {
     const el = document2.querySelector(selector);
     const val = el && el.getAttribute("content");
@@ -688,7 +701,7 @@ var CustomImportScript = (() => {
     const pageUrl = params && params.originalURL || url || canonical && canonical.href || "";
     const overrides = payload.template && payload.template.metadata || {};
     const h1 = document2.querySelector("h1");
-    const title = cleanTitle(overrides.title || metaContent(document2, 'meta[property="og:title"]') || (document2.querySelector("title") ? document2.querySelector("title").textContent.trim() : "") || (h1 ? h1.textContent.trim() : ""));
+    const title = respacedTitle(cleanTitle(overrides.title || metaContent(document2, 'meta[property="og:title"]') || (document2.querySelector("title") ? document2.querySelector("title").textContent.trim() : "") || (h1 ? h1.textContent.trim() : "")), h1);
     const description = overrides.description || metaContent(document2, 'meta[property="og:description"]') || metaContent(document2, 'meta[name="description"]') || "";
     const imageSrc = overrides.image || metaContent(document2, 'meta[property="og:image"]') || "";
     const publisheddate = overrides.publisheddate || extractDate(document2);
@@ -924,6 +937,7 @@ var CustomImportScript = (() => {
     "/en/press-releases/skoda-auto-teams-up-with-hasbros-play-doh-brand",
     "/en/press-releases/skoda-auto-unveils-updated-slavia-in-india",
     "/en/press-releases/skoda-epiq-sportline-debuts-at-the-paris-motor-show",
+    "/en/press-releases/skoda-expands-electric-portfolio-the-new-epiq-sportlinedebuts-with-dynamic-exterior-styling",
     "/en/press-releases/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport",
     "/en/press-releases/skoda-kvasiny-newsletter-2-2026",
     "/en/press-releases/skoda-launches-production-of-the-new-epiq-in-pamplona-spain",

@@ -113,3 +113,6 @@ Measurable gates live in [`template-category-archive.md` §10](../../ui-specs/te
 - **Pagination mechanism (🟡):** no static control; verify Load more vs infinite scroll live before locking.
 - **Grid columns (🟡):** category rendered 3-up while the tag archive rendered 2-up at the same width, confirm whether tag archives use a narrower grid.
 - Ordering (newest-first assumed) to confirm.
+
+## M2 readiness review (2026-10-15)
+- The template is done for M1. The **volume** (378 EN archives, 41 live) and the keep / redirect rule move to SKODA-848.
