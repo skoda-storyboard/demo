@@ -21,8 +21,12 @@ const row = (year, title, image, description) => `<div>
 const picture = (src) => `<picture><source srcset="${src}"><img src="${src}" alt=""></picture>`;
 
 test('each row becomes one entry: year pill, title heading, image and description, in order', { skip: !JSDOM }, () => {
-  const block = blockFrom(row('1905', '<p>Laurin &amp; Klement<br><strong>VOITURETTE A</strong><br>(vehicle on display: 1905)</p>',
-    picture('a.jpg'), '<p>The first car, with a <a href="/en/x">link</a>.</p>')
+  const block = blockFrom(row(
+    '1905',
+    '<p>Laurin &amp; Klement<br><strong>VOITURETTE A</strong><br>(vehicle on display: 1905)</p>',
+    picture('a.jpg'),
+    '<p>The first car, with a <a href="/en/x">link</a>.</p>',
+  )
     + row('1925', '<p><strong>ŠKODA 110</strong></p>', picture('b.jpg'), '<p>A third pedal.</p>'));
   decorate(block);
   const list = block.querySelector(':scope > ol.timeline-list');
@@ -30,8 +34,10 @@ test('each row becomes one entry: year pill, title heading, image and descriptio
   const entries = [...list.children];
   assert.equal(entries.length, 2);
   const [first] = entries;
-  assert.deepEqual([...first.children].map((c) => c.className),
-    ['timeline-year', 'timeline-title', 'timeline-media', 'timeline-text']);
+  assert.deepEqual(
+    [...first.children].map((c) => c.className),
+    ['timeline-year', 'timeline-title', 'timeline-media', 'timeline-text'],
+  );
   assert.equal(first.querySelector('.timeline-year').textContent, '1905');
   const title = first.querySelector('h3.timeline-title');
   assert.equal(title.querySelector('strong').textContent, 'VOITURETTE A');
@@ -72,4 +78,20 @@ test('the image cell is found by content wherever it sits', { skip: !JSDOM }, ()
   assert.equal(entry.querySelector('.timeline-media img').getAttribute('src'), 'c.jpg');
   assert.equal(entry.querySelector('.timeline-title').textContent, 'ŠKODA 450');
   assert.equal(entry.querySelector('.timeline-text').textContent, 'The horn again.');
+});
+
+test('a media cell of several images keeps them all, in order', { skip: !JSDOM }, () => {
+  const block = blockFrom(row(
+    '1970',
+    '<p><strong>ŠKODA 110 R + ŠKODA 130 RS</strong></p>',
+    `<p>${picture('r.jpg')}</p><p>${picture('rs.jpg')}</p>`,
+    '<p>The coupé and the rally car.</p>',
+  ));
+  decorate(block);
+  const media = block.querySelector('.timeline-media');
+  assert.equal(media.querySelectorAll(':scope > picture').length, 2, 'both pictures, nothing nested twice');
+  assert.deepEqual(
+    [...media.querySelectorAll('img')].map((img) => [img.getAttribute('src'), img.getAttribute('loading')]),
+    [['r.jpg', 'lazy'], ['rs.jpg', 'lazy']],
+  );
 });

@@ -386,10 +386,12 @@ function milestonesCells(panel, document) {
   items.forEach((li) => {
     const year = (li.querySelector('.year')?.textContent || '').replace(/\s+/g, ' ').trim();
     const title = milestoneRich(li.querySelector('.title'), document);
-    const img = li.querySelector('.thumbnail img, img');
+    // a thumbnail may stack more than one image (iconic cars, 1970: the 110 R and the 130 RS)
+    const thumbs = [...li.querySelectorAll('.thumbnail img')];
+    const imgs = thumbs.length ? thumbs : [...li.querySelectorAll('img')].slice(0, 1);
     const description = li.querySelector('.description');
     description?.querySelectorAll('.dot').forEach((dot) => dot.remove());
-    cells.push([year, title, img ? [img] : '', milestoneRich(description, document)]);
+    cells.push([year, title, imgs.length ? imgs : '', milestoneRich(description, document)]);
   });
   return cells;
 }

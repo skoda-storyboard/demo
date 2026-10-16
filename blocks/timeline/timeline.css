@@ -48,8 +48,12 @@
   --timeline-title-end: 20px;
   --timeline-media-gap: 30px;
 
-  /* the space below an entry's description (and image, two-sided) */
+  /* the description paragraphs' own 20px bottom margin */
+  --timeline-text-end: 20px;
+
+  /* the space below an entry's description (and image, two-sided); 50px on the last */
   --timeline-entry-gap: 100px;
+  --timeline-last-gap: 50px;
 
   /* two-sided: the title keeps to the left 45%, the halves 26px off the line */
   --timeline-title-inset: 55%;
@@ -151,11 +155,13 @@
 }
 
 .timeline .timeline-text p {
-  margin: 0;
+  margin: 0 0 var(--timeline-text-end);
 }
 
-.timeline .timeline-text p + p {
-  margin-block-start: var(--timeline-title-line);
+/* the source's last entry closes on half the gap, below its image as well */
+.timeline .timeline-entry:last-child .timeline-media,
+.timeline .timeline-entry:last-child .timeline-text {
+  padding-block-end: var(--timeline-last-gap);
 }
 
 /* L3: two-sided from the source's 1080 switch, the line in the middle; only while the

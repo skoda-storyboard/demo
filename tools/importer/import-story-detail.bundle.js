@@ -313,10 +313,11 @@ var CustomImportScript = (() => {
       var _a2;
       const year = (((_a2 = li.querySelector(".year")) == null ? void 0 : _a2.textContent) || "").replace(/\s+/g, " ").trim();
       const title = milestoneRich(li.querySelector(".title"), document2);
-      const img = li.querySelector(".thumbnail img, img");
+      const thumbs = [...li.querySelectorAll(".thumbnail img")];
+      const imgs = thumbs.length ? thumbs : [...li.querySelectorAll("img")].slice(0, 1);
       const description = li.querySelector(".description");
       description == null ? void 0 : description.querySelectorAll(".dot").forEach((dot) => dot.remove());
-      cells.push([year, title, img ? [img] : "", milestoneRich(description, document2)]);
+      cells.push([year, title, imgs.length ? imgs : "", milestoneRich(description, document2)]);
     });
     return cells;
   }

@@ -59,14 +59,15 @@ function entryOf(row) {
     li.append(label);
   }
   if (title?.textContent.trim()) li.append(titleOf(title));
-  const picture = media?.querySelector('picture') || media?.querySelector('img');
-  if (picture) {
+  // a milestone may stack more than one image; a bare img counts when it has no picture
+  const pictures = media ? [...media.querySelectorAll('picture, img')]
+    .filter((el) => !el.closest('picture') || el.matches('picture')) : [];
+  if (pictures.length) {
     const figure = document.createElement('div');
     figure.className = 'timeline-media';
     // below the story's lead: every timeline image loads lazily
-    [picture, ...picture.querySelectorAll('img')].filter((img) => img.matches('img'))
-      .forEach((img) => img.setAttribute('loading', 'lazy'));
-    figure.append(picture);
+    figure.append(...pictures);
+    figure.querySelectorAll('img').forEach((img) => img.setAttribute('loading', 'lazy'));
     li.append(figure);
   }
   if (description?.textContent.trim()) {

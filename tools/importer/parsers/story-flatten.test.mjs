@@ -368,8 +368,10 @@ test('SKODA-815: the steering-wheel timeline keeps all 11 years, titles, images 
   const table = content.querySelector('table[data-block="Timeline"]');
   assert.ok(table, 'the green default: no variant');
   const rows = [...table.querySelectorAll('tr')].slice(1);
-  assert.deepEqual(rows.map((r) => r.children[0].textContent),
-    ['1905', '1925', '1932', '1940', '1952', '1959', '1966', '1984', '1989', '1996', '2017']);
+  assert.deepEqual(
+    rows.map((r) => r.children[0].textContent),
+    ['1905', '1925', '1932', '1940', '1952', '1959', '1966', '1984', '1989', '1996', '2017'],
+  );
   rows.forEach((r) => assert.equal(r.children.length, 4, 'year | title | image | description'));
   // the title keeps its lines and the bold model, without the source's font-size spans
   const title = rows[0].children[1];
@@ -386,8 +388,10 @@ test('SKODA-815: the steering-wheel timeline keeps all 11 years, titles, images 
   assert.match(rows[0].children[3].textContent.replace(/\s+/g, ' '), /The first car produced by Messrs Laurin and Klement/);
   assert.equal(content.querySelectorAll('.dot, .line, .thumbnail').length, 0, 'decorative scaffolding gone');
   // the description links survive with their href
-  assert.deepEqual(rows.flatMap((r) => [...r.children[3].querySelectorAll('a')].map((a) => a.textContent)),
-    ['FAVORIT', 'to control']);
+  assert.deepEqual(
+    rows.flatMap((r) => [...r.children[3].querySelectorAll('a')].map((a) => a.textContent)),
+    ['FAVORIT', 'to control'],
+  );
 });
 
 test('SKODA-815: a black year pill and 18pt titles map to Timeline (black, large); glossary tooltips become their text', { skip: domSkip }, () => {
@@ -402,6 +406,9 @@ test('SKODA-815: a black year pill and 18pt titles map to Timeline (black, large
   assert.match(text, /concern’s modular electromobility platform \(MEB\)/, 'the term-explain text kept');
   assert.equal(table.querySelectorAll('.term-explain, [data-explain]').length, 0, 'the tooltip markup unwrapped');
   [...table.querySelectorAll('a')].forEach((a) => assert.deepEqual(a.getAttributeNames(), ['href'], 'links keep only href'));
+  const y1970 = rows.find((r) => r.children[0].textContent.trim() === '1970');
+  assert.equal(y1970.children[2].querySelectorAll('img').length, 2, 'the 1970 thumbnail stacks both cars');
+  assert.equal(rows.filter((r) => r.children[2].querySelector('img')).length, 16, 'every milestone keeps its image');
 });
 
 test('SKODA-815: a milestones widget without entries keeps its images and text', { skip: domSkip }, () => {
