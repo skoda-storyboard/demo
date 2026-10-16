@@ -38,14 +38,17 @@ The M1 demo feed is generated from the source listing; this ticket replaces that
   GitHub Action) and owner. **Decided 2026-10-16: App Builder**, see
   [`SKODA-ASSET-INGESTION-M2.md`](../../architecture/SKODA-ASSET-INGESTION-M2.md) §3F:
   - an event action on `aem.assets.asset.published` / `.unpublished` / `.deleted` / `.metadata_updated` records
-    asset ids in App Builder State;
-  - an alarm action rebuilds the touched shards (non-blocking, ≤3 h);
-  - a nightly full reconcile runs from author QueryBuilder. It is required because `metadata_updated` doesn't fire
-    for Touch UI or `/api/assets` edits;
+    asset ids and paths in App Builder State;
+  - a sweep action every 15 min rebuilds the touched shards: the dirty set plus assets modified or replicated since
+    the watermark (non-blocking, ≤3 h). The watermark catches Touch UI edits, which send no event;
+  - a nightly full reconcile runs from author QueryBuilder and drops rows for removed or unpublished assets. It is
+    required because `metadata_updated` and `deleted` don't fire for Touch UI or `/api/assets` actions, and AEM
+    events have no SLA;
   - limits to design for: 1 MB payload/result, 100 concurrent activations per namespace.
 
-  Needs the App Builder entitlement and an OAuth S2S technical account with AEM author read, DA write and admin
-  preview/publish (to verify for DA). Fallback if the entitlement is late: the same reconcile as a scheduled GitHub
+  Needs the App Builder entitlement, the workspace OAuth S2S credential (events), AEM service credentials (JWT,
+  QueryBuilder read), a site admin API key (`publish`) and DA write for a machine identity (**to verify**). Set-up
+  and checks: [`SKODA-APP-BUILDER-INTEGRATION.md`](../../architecture/SKODA-APP-BUILDER-INTEGRATION.md). Fallback if the entitlement is late: the same reconcile as a scheduled GitHub
   Action. Check whether a config-service custom header can shorten the registry's `max-age` (today 7200).
 
 ## Acceptance Criteria

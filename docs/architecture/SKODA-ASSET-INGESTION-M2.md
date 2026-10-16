@@ -143,10 +143,13 @@ The projections scale the per-row sizes measured today. They are not load tests.
   - 600 trigger firings per minute.
 
 **Design.**
-1. **Event action** (small, fast). Event payloads carry an `assetId`, not a path. The action records the id and
-   event type in App Builder State as a dirty set, and returns.
-2. **Alarm action**, every few minutes, non-blocking:
-   - resolves the dirty ids on author;
+1. **Event action** (small, fast). Event payloads carry the `assetId` **and** the DAM path
+   (`data.repositoryMetadata["repo:path"]`). The action records both and the event type in App Builder State as a
+   dirty set, and returns.
+2. **Sweep action**, every 15 minutes, non-blocking:
+   - takes the dirty set, plus every asset whose `jcr:lastModified` or `cq:lastReplicated` is after the stored
+     watermark (author QueryBuilder). The watermark part is what catches Touch UI edits and publishes, which send no
+     `metadata_updated` (see 3);
    - rebuilds only the SKODA-517 shards those assets touch (their facet slices, year/type detail shard, keyed shard,
      head shard, facet index);
    - writes them to DA, previews and publishes them;
@@ -155,15 +158,22 @@ The projections scale the per-row sizes measured today. They are not load tests.
    A bulk 504a publish of thousands of assets then becomes a few batched runs rather than thousands of concurrent
    activations.
 3. **Nightly reconcile:** a full rebuild from author QueryBuilder, swapped in atomically.
-   - It is **required**, not optional: `metadata_updated` fires only for Assets View and Assets OpenAPI edits, not
-     for Touch UI or other AEM APIs (including the `/api/assets` call the importer uses). Tag changes made there
-     would otherwise never reach the feed.
+   - It is **required**, not optional. `metadata_updated` **and `deleted`** fire only for Assets View and Assets
+     OpenAPI actions, not for the Touch UI or other AEM APIs (including the `/api/assets` call the importer uses).
+     Touch UI moves and deletes send no `unpublished` either. Removals made there reach the feed only through the
+     reconcile, which drops rows for assets that are gone or unpublished.
+   - AEM events have no SLA: delivery is at least once, unordered, may duplicate, and is retried on 429/5xx for 24 h
+     only. Events shorten the delay; the sweep and the reconcile are what make the feed correct.
    - Shards and their contents go to DA directly. Nothing passes through the 1 MB result limit.
 
-**Credentials.**
-- An OAuth server-to-server technical account with read access to AEM author.
-- The same identity needs write access to DA and preview / publish on admin.hlx.page. **To verify:** that DA's
-  permission sheet and the admin API accept that technical account.
+**Credentials** (detail in [`SKODA-APP-BUILDER-INTEGRATION.md`](SKODA-APP-BUILDER-INTEGRATION.md)):
+- **Events:** the workspace's OAuth server-to-server credential, subscribed by an admin of an AEM product profile.
+- **AEM author (QueryBuilder):** AEM **service credentials** (JWT technical account from the AEM Developer
+  Console), read on `/content/dam/storyboard`. Classic endpoints don't take S2S tokens. The Assets OpenAPI would, but
+  its search is experimental and our custom metadata there is unverified.
+- **admin.hlx.page:** a site admin API key with the `publish` role.
+- **DA:** **to verify** whether `admin.da.live` accepts an S2S token and which `permissions` entry grants it; the
+  docs show only user IMS tokens.
 - No tokens in the repo; the App Builder project holds the secrets.
 
 **Same as before:**
