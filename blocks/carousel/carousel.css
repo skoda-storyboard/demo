@@ -136,7 +136,7 @@
   margin: 0;
   padding: calc(var(--media-card-pad) + var(--media-card-date-baseline)) 0
     calc(var(--media-card-pad) - var(--media-card-date-baseline));
-  color: var(--skoda-grey-350);
+  color: var(--skoda-grey-600); /* SKODA-703: the source #c4c6c7 (1.71:1) fails AA on white; the closest AA grey */
   line-height: var(--media-card-date-row);
 }
 

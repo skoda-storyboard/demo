@@ -141,6 +141,10 @@
 .newsletter-stub .newsletter-stub-consent a {
   color: var(--skoda-green-emerald);
   font-weight: var(--weight-medium);
+
+  /* mint inside the consent text is 1.97:1 apart from it, so colour alone doesn't mark the link
+     (WCAG 1.4.1 link-in-text-block, SKODA-703); the card variant already underlines it */
+  text-decoration: underline;
 }
 
 .newsletter-stub .newsletter-stub-manage {

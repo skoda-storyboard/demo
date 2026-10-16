@@ -19,7 +19,7 @@
    (measured on first-glimpse). The source shows no focus outline; ours keeps the global
    :focus-visible ring. Plain `.footnotes a`, as styles.css asks blocks to override. */
 .footnotes a {
-  color: var(--skoda-green-accent);
+  color: var(--skoda-green-accent-text); /* the source #419468 is 3.7:1; darkened to AA (SKODA-703) */
 }
 
 .footnotes a:hover {

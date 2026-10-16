@@ -139,7 +139,7 @@
   margin-block: -1px -2px;
   padding: var(--tag-padding);
   border-radius: var(--tag-radius);
-  background-color: var(--skoda-grey-500);
+  background-color: var(--skoda-grey-600); /* SKODA-703: white on the source #7c7d7e is 4.12:1, below AA; the closest AA grey */
   color: var(--skoda-white);
   font-size: var(--tag-font-size);
   font-weight: var(--weight-semibold);
@@ -273,7 +273,7 @@
 .hero-image.archive .hero-image-label {
   padding: var(--tag-padding);
   border-radius: var(--tag-radius);
-  background-color: var(--skoda-grey-500);
+  background-color: var(--skoda-grey-600); /* SKODA-703: white on the source #7c7d7e is 4.12:1, below AA; the closest AA grey */
   color: var(--skoda-white);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--tag-letter-spacing);

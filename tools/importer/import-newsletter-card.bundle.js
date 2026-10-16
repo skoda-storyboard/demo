@@ -18,13 +18,13 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // tools/importer/import-newsletter-card.js
+  // import-newsletter-card.js
   var import_newsletter_card_exports = {};
   __export(import_newsletter_card_exports, {
     default: () => import_newsletter_card_default
   });
 
-  // tools/importer/transformers/skoda-story-aside.js
+  // transformers/skoda-story-aside.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var NEWSLETTER_BLOCK = "Newsletter Stub (card)";
   var NEWSLETTER_DEFAULTS = {
@@ -142,12 +142,12 @@ var CustomImportScript = (() => {
     const cell = [];
     anchors.forEach((a) => {
       const href = a.getAttribute("href");
-      const text = (a.textContent || "").trim();
-      if (!href || !text) return;
+      const text2 = (a.textContent || "").trim();
+      if (!href || !text2) return;
       if (href === "#" || a.classList.contains("show-hidden-terms")) return;
       const link = document2.createElement("a");
       link.setAttribute("href", href);
-      link.textContent = text;
+      link.textContent = text2;
       cell.push(link);
     });
     return cell.length ? [["Tags"], [cell]] : null;
@@ -223,7 +223,7 @@ var CustomImportScript = (() => {
     sidebar.replaceWith(...frag.childNodes);
   }
 
-  // tools/importer/transformers/skoda-nbsp.js
+  // transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform2(hookName, element, payload) {
@@ -241,7 +241,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // tools/importer/transformers/skoda-images.js
+  // transformers/skoda-images.js
   function hasContent(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
@@ -284,11 +284,29 @@ var CustomImportScript = (() => {
     const image = withCaption(imageNode, caption, document2);
     paragraph.replaceWith(...[before, image, after].filter(hasContent));
   }
+  var text = (value) => (value || "").replace(/\s+/g, " ").trim();
+  function linkedImageAlt(img, root) {
+    var _a;
+    const link = img.closest("a");
+    if (!link || link.querySelectorAll("img").length !== 1 || text(link.textContent)) return "";
+    const caption = editorialCaption(img) || editorialCaption(img.closest("[data-caption]"));
+    const titled = [link.getAttribute("title"), img.getAttribute("title")].map(text).find(Boolean);
+    const heading = [...root.querySelectorAll("h1, h2, h3, h4, h5, h6")].filter(
+      (h) => h.compareDocumentPosition(img) & 4
+      /* Node.DOCUMENT_POSITION_FOLLOWING */
+    ).map((h) => text(h.textContent)).filter(Boolean).pop();
+    return text(caption) || titled || heading || text((_a = root.ownerDocument.querySelector("h1")) == null ? void 0 : _a.textContent);
+  }
   function normalizeImages(root, document2 = root.ownerDocument) {
     root.querySelectorAll("img").forEach((img) => {
       if (!img.hasAttribute("alt") || !img.getAttribute("alt").trim()) {
-        const type = img.hasAttribute("alt") ? "empty" : "missing";
-        console.warn(`[image-import] ${type} alt: ${img.getAttribute("src") || "(no src)"}`);
+        const backfill = linkedImageAlt(img, root);
+        if (backfill) {
+          img.setAttribute("alt", backfill);
+        } else {
+          const type = img.hasAttribute("alt") ? "empty" : "missing";
+          console.warn(`[image-import] ${type} alt: ${img.getAttribute("src") || "(no src)"}`);
+        }
       }
       if (img.closest("table, picture")) return;
       const figure = img.closest("figure");
@@ -338,7 +356,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // tools/importer/import-newsletter-card.js
+  // import-newsletter-card.js
   var NEWSLETTER_BLOCK2 = "Newsletter Stub (card)";
   var PAGE_TEMPLATE = {
     name: "newsletter-card",

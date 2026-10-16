@@ -35,13 +35,13 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // tools/importer/import-model-page.js
+  // import-model-page.js
   var import_model_page_exports = {};
   __export(import_model_page_exports, {
     default: () => import_model_page_default
   });
 
-  // tools/importer/parsers/hero.js
+  // parsers/hero.js
   function parse(element, { document: document2 }) {
     const img = element.querySelector(".item.active .image-wrapper img, .image-wrapper img, img");
     const heading = element.querySelector("h1.entry-title, h1");
@@ -68,8 +68,8 @@ var CustomImportScript = (() => {
     element.replaceWith(WebImporter.DOMUtils.createTable(cells, document2));
   }
 
-  // tools/importer/parsers/in-page-nav.js
-  var clean = (text) => String(text || "").replace(/\s+/g, " ").trim();
+  // parsers/in-page-nav.js
+  var clean = (text2) => String(text2 || "").replace(/\s+/g, " ").trim();
   var STRIP = /[^\p{L}\p{M}\p{N}\p{Pc} -]/gu;
   function headingIds(document2) {
     const ids = /* @__PURE__ */ new Map();
@@ -123,7 +123,7 @@ var CustomImportScript = (() => {
     element.replaceWith(ul);
   }
 
-  // tools/importer/parsers/key-facts.js
+  // parsers/key-facts.js
   function parse3(element, { document: document2 }) {
     const items = Array.from(element.querySelectorAll(".items > .item"));
     if (items.length === 0) {
@@ -161,7 +161,7 @@ var CustomImportScript = (() => {
     element.replaceWith(...out);
   }
 
-  // tools/importer/parsers/spec-table.js
+  // parsers/spec-table.js
   var PER_ROW = 3;
   function parse4(element, { document: document2 }) {
     const items = Array.from(element.querySelectorAll(".items > .item"));
@@ -223,7 +223,7 @@ var CustomImportScript = (() => {
     element.replaceWith(...out);
   }
 
-  // tools/importer/parsers/story-rail.js
+  // parsers/story-rail.js
   var RAILS = {
     derivatives: { template: "skoda_model", heading: "Bodywork / Derivatives" },
     news: { template: "press_release", heading: "News" },
@@ -245,7 +245,7 @@ var CustomImportScript = (() => {
     }
   };
   var FACET_KEYS = ["model", "bodywork", "derivative"];
-  var clean2 = (text) => String(text || "").replace(/\s+/g, " ").trim();
+  var clean2 = (text2) => String(text2 || "").replace(/\s+/g, " ").trim();
   function facetsFromHref(href) {
     const out = {};
     let query = "";
@@ -346,7 +346,7 @@ var CustomImportScript = (() => {
     element.replaceWith(...out);
   }
 
-  // tools/importer/transformers/skoda-model-cleanup.js
+  // transformers/skoda-model-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
@@ -401,7 +401,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // tools/importer/transformers/skoda-model-sections.js
+  // transformers/skoda-model-sections.js
   var SECTION_MARKER_ATTR = "data-excat-section-id";
   function querySection(root, selectors) {
     const list = Array.isArray(selectors) ? selectors : [selectors];
@@ -446,7 +446,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // tools/importer/transformers/skoda-metadata.js
+  // transformers/skoda-metadata.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -733,7 +733,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // tools/importer/transformers/skoda-links.js
+  // transformers/skoda-links.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -1173,7 +1173,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // tools/importer/transformers/skoda-nbsp.js
+  // transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform5(hookName, element, payload) {
@@ -1191,7 +1191,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // tools/importer/transformers/skoda-images.js
+  // transformers/skoda-images.js
   function hasContent(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
@@ -1234,11 +1234,29 @@ var CustomImportScript = (() => {
     const image = withCaption(imageNode, caption, document2);
     paragraph.replaceWith(...[before, image, after].filter(hasContent));
   }
+  var text = (value) => (value || "").replace(/\s+/g, " ").trim();
+  function linkedImageAlt(img, root) {
+    var _a;
+    const link = img.closest("a");
+    if (!link || link.querySelectorAll("img").length !== 1 || text(link.textContent)) return "";
+    const caption = editorialCaption(img) || editorialCaption(img.closest("[data-caption]"));
+    const titled = [link.getAttribute("title"), img.getAttribute("title")].map(text).find(Boolean);
+    const heading = [...root.querySelectorAll("h1, h2, h3, h4, h5, h6")].filter(
+      (h) => h.compareDocumentPosition(img) & 4
+      /* Node.DOCUMENT_POSITION_FOLLOWING */
+    ).map((h) => text(h.textContent)).filter(Boolean).pop();
+    return text(caption) || titled || heading || text((_a = root.ownerDocument.querySelector("h1")) == null ? void 0 : _a.textContent);
+  }
   function normalizeImages(root, document2 = root.ownerDocument) {
     root.querySelectorAll("img").forEach((img) => {
       if (!img.hasAttribute("alt") || !img.getAttribute("alt").trim()) {
-        const type = img.hasAttribute("alt") ? "empty" : "missing";
-        console.warn(`[image-import] ${type} alt: ${img.getAttribute("src") || "(no src)"}`);
+        const backfill = linkedImageAlt(img, root);
+        if (backfill) {
+          img.setAttribute("alt", backfill);
+        } else {
+          const type = img.hasAttribute("alt") ? "empty" : "missing";
+          console.warn(`[image-import] ${type} alt: ${img.getAttribute("src") || "(no src)"}`);
+        }
       }
       if (img.closest("table, picture")) return;
       const figure = img.closest("figure");
@@ -1288,7 +1306,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // tools/importer/import-model-page.js
+  // import-model-page.js
   var parsers = {
     hero: parse,
     "key-facts": parse3,
