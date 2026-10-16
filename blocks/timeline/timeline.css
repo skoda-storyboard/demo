@@ -15,6 +15,11 @@
   --timeline-line-color: var(--skoda-white);
   --timeline-text-color: var(--skoda-ink);
 
+  /* the panel sits 40px below the paragraph before it (its own 20px margin + 20) and 42px
+     above the next heading, as the source widget */
+  --timeline-space-above: 20px;
+  --timeline-space-below: 42px;
+
   /* panel padding; the left rail column on the one-sided layout */
   --timeline-pad-block: 64px;
   --timeline-pad-inline: 30px;
@@ -51,6 +56,7 @@
   --timeline-gutter: 26px;
 
   container: timeline / inline-size;
+  margin-block: var(--timeline-space-above) var(--timeline-space-below);
   background: var(--timeline-panel-bg);
   color: var(--timeline-text-color);
 }
