@@ -9,3 +9,6 @@ Test URLs:
 PSI (PageSpeed Insights) — always include both, before and after, for the same path:
 - Before: https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fmain--demo--skoda-storyboard.aem.page%2F<path>&form_factor=mobile
 - After: https://pagespeed.web.dev/analysis?url=https%3A%2F%2F<branch>--demo--skoda-storyboard.aem.page%2F<path>&form_factor=mobile
+
+Deviations from origin (intended differences from the live source, each needs human approval; write "None" if there are none):
+- 
