@@ -268,7 +268,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-704 | Visual critique + consent/analytics stubs + sign-off | E07 | 3 | 1–2 | 2–3 | 702,703 | 🟡 M1, human gate: #44 (jkondalu); criterion = coherent visual resemblance (2026-10-05), findings under #247 |
 | [SKODA-705](tickets/SKODA-705.md) | Confirm "Load more" button variant vs source | E07 | – | – | – | 402,214 | ✅ Done (#46 closed 2026-10-11) |
 | [SKODA-707](tickets/SKODA-707.md) | Demo assembly + dry-run + script (15 Oct) | E07 | 2 | – | – | 603,704 | ✅ Done (#53 closed 2026-10-14) |
-| [SKODA-708](tickets/SKODA-708.md) | Review protocol: click, heading-outline, outside-the-diff, deviation checks (from M1 manual-QA gap analysis) | E07 | 1 | <1 | 1–2 | 704 | 🟢 M2, #384 |
+| [SKODA-708](tickets/SKODA-708.md) | Review protocol: click, heading-outline, side-effect, deviation checks (from M1 manual-QA gap analysis) | E07 | 1 | <1 | 1–2 | 704 | 🟢 M2, #384 |
 
 **Phases B–D (Pilot: No)**
 
