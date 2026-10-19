@@ -107,6 +107,12 @@ body.error-404 .not-found-message a:any-link:hover {
   color: var(--not-found-color);
 }
 
+/* the source draws no focus ring; the site's 2px ring takes the message colour, so it shows
+   on the dark car-park photo too */
+body.error-404 .not-found-message a:any-link:focus-visible {
+  outline-color: var(--not-found-color);
+}
+
 /* L3: the source's .message-desktop from 720: its type, 70px down, half the band */
 @container not-found (width >= 720px) {
   body.error-404 main > .section.not-found > .default-content-wrapper {
