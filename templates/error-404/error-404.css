@@ -1,0 +1,146 @@
+/* ==========================================================================
+   Branded 404 (SKODA-706): the source's template-404 page, measured on
+   /en/youve-reached-a-dead-end/ and /en/welcome-to-our-remote-car-park/
+   (docs/ui-specs/template-404.md). A full-bleed photo band, at least 900px tall, with the
+   message over it; the footer overlaps the band's last 5.263% of the width, as the source.
+   Three layers (css-guidelines.md): L1 fluid, the mobile message (the source's
+   .message-mobile); L2 intrinsic, the band is the container and the message follows its
+   width; L3 the source's switches, as container queries on the full-bleed band: 720 (the
+   .message-desktop copy, its type and the desktop photo), 781 (the two-cell row) and 1080
+   (the 120px top offset).
+   ========================================================================== */
+
+body.error-404 {
+  --not-found-min-height: 900px;
+
+  /* the source article's negative bottom margin: the footer covers the band's last 1/19 */
+  --not-found-overlap: 5.2632%;
+
+  /* mobile: the message 20px in from the band's top and sides */
+  --not-found-inset: 20px;
+  --not-found-message-width: calc(100cqi - 2 * var(--not-found-inset));
+  --not-found-color: var(--skoda-ink);
+  --not-found-link-color: var(--skoda-green-accent);
+
+  /* mobile type: label 25.6/38.4 light, heading 32/36.8 bold, copy 16/24 */
+  --not-found-label-size: 25.6px;
+  --not-found-label-line: 38.4px;
+  --not-found-label-gap: 16px;
+  --not-found-heading-size: 32px;
+  --not-found-heading-line: 36.8px;
+  --not-found-heading-gap: 16px;
+  --not-found-copy-size: 16px;
+  --not-found-copy-line: 24px;
+  --not-found-copy-gap: 20px;
+}
+
+/* the band is the page: no min-height from the viewport, so the footer lands where the
+   source's does */
+body.error-404 main {
+  min-height: 0;
+}
+
+body.error-404 main > .section.not-found {
+  container: not-found / inline-size;
+  position: relative;
+  min-height: var(--not-found-min-height);
+  margin: 0 0 calc(-1 * var(--not-found-overlap));
+  color: var(--not-found-color);
+}
+
+body.error-404 main > .section.not-found-white {
+  --not-found-color: var(--skoda-white);
+}
+
+body.error-404 main > .section.not-found > .default-content-wrapper {
+  max-width: none;
+  padding: var(--not-found-inset);
+}
+
+/* the photo fills the band behind the message; z-index -1 keeps it under the footer, which
+   overlaps the band's bottom */
+body.error-404 .not-found-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+body.error-404 .not-found-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+
+body.error-404 .not-found-message {
+  width: var(--not-found-message-width);
+}
+
+body.error-404 .not-found-message > :is(h1, h2, h3) {
+  margin: 0 0 var(--not-found-heading-gap);
+  color: inherit;
+  font-size: var(--not-found-heading-size);
+  font-weight: var(--weight-bold);
+  line-height: var(--not-found-heading-line);
+}
+
+body.error-404 .not-found-message > p {
+  margin: 0 0 var(--not-found-copy-gap);
+  font-size: var(--not-found-copy-size);
+  line-height: var(--not-found-copy-line);
+}
+
+body.error-404 .not-found-message > p.not-found-label {
+  margin-block-end: var(--not-found-label-gap);
+  font-size: var(--not-found-label-size);
+  font-weight: var(--weight-light);
+  line-height: var(--not-found-label-line);
+}
+
+body.error-404 .not-found-message a:any-link {
+  color: var(--not-found-link-color);
+  text-decoration: none;
+}
+
+body.error-404 .not-found-message a:any-link:hover {
+  color: var(--not-found-color);
+}
+
+/* L3: the source's .message-desktop from 720: its type, 70px down, half the band */
+@container not-found (width >= 720px) {
+  body.error-404 main > .section.not-found > .default-content-wrapper {
+    padding-block-start: 70px;
+  }
+
+  body.error-404 .not-found-message {
+    --not-found-label-size: 28.8px;
+    --not-found-label-line: 43.2px;
+    --not-found-heading-size: 56px;
+    --not-found-heading-line: 61.6px;
+    --not-found-heading-gap: 24px;
+    --not-found-copy-size: 19.2px;
+    --not-found-copy-line: 28.8px;
+    --not-found-copy-gap: 32px;
+
+    width: 50cqi;
+  }
+}
+
+/* from 781 the source's row has two cells: the message keeps to the left one, 40px in on
+   narrow screens and 20px inside the centred 1248px container on wide ones */
+@container not-found (width >= 781px) {
+  body.error-404 main > .section.not-found > .default-content-wrapper {
+    padding-inline-start: max(40px, 50cqi - 604px);
+  }
+
+  body.error-404 .not-found-message {
+    width: min(50cqi - 60px, 584px);
+  }
+}
+
+@container not-found (width >= 1080px) {
+  body.error-404 main > .section.not-found > .default-content-wrapper {
+    padding-block-start: 120px;
+  }
+}

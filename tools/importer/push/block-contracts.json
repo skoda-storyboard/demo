@@ -472,6 +472,22 @@
       "emittedBy": [
         "transformers/skoda-press-release-layout.js"
       ]
+    },
+    {
+      "id": "not-found",
+      "block": null,
+      "form": "section-style",
+      "status": "pinned",
+      "ticket": "SKODA-706",
+      "fallback": "readable",
+      "styles": [
+        "not-found",
+        "not-found-white"
+      ],
+      "shape": 1,
+      "emittedBy": [
+        "import-404.js"
+      ]
     }
   ]
 }
