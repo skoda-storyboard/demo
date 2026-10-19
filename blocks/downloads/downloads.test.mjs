@@ -104,6 +104,28 @@ test('MP4 poster has a decorative play badge but the round control downloads the
   assert.equal(block.querySelector('.downloads-download').getAttribute('aria-label'), 'Download Launch video (MP4)');
 });
 
+test('a Media Box PDF row shows the PDF file tile even when it carries an image', async () => {
+  const block = setup();
+  addRow(block, { src: 'https://example.com/media_1.png', title: 'Logo', links: [['Original', '/logo.png'], ['1920px', '/logo-1920.png']] });
+  addRow(block, { src: 'https://example.com/media_1.png', title: 'Release', links: [['PDF', 'https://example.com/release.pdf']] });
+  await decorate(block);
+  const [image, pdf] = block.querySelectorAll('.downloads-item');
+  assert.ok(image.querySelector('.downloads-thumb picture'), 'the image row keeps its picture');
+  const file = pdf.querySelector('.downloads-file');
+  assert.equal(file?.dataset.fileType, 'pdf', 'the PDF row is a PDF file tile');
+  assert.equal(file.getAttribute('href'), 'https://example.com/release.pdf');
+  assert.equal(pdf.querySelector('.downloads-thumb, picture, img'), null, 'no image on the PDF tile');
+  assert.equal(pdf.querySelector('.downloads-title').textContent, 'Release');
+});
+
+test('outside a Media Box a PDF row with an image keeps its image', async () => {
+  const block = setup(false);
+  addRow(block, { src: 'https://example.com/media_1.png', title: 'Release', links: [['PDF', 'https://example.com/release.pdf']] });
+  await decorate(block);
+  assert.ok(block.querySelector('.downloads-thumb picture'));
+  assert.equal(block.querySelector('.downloads-file'), null);
+});
+
 test('untitled PDF shows a single file-type label and an accessible download', async () => {
   const block = setup();
   addRow(block, { links: [['PDF', '/release.pdf']] });
