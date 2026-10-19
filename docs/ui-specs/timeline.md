@@ -32,12 +32,14 @@ Contract: `timeline` (baseline block, variants `black`, `large`) in
 
 ## 3. Measured visual spec (live)
 - **Panel:** background `rgb(228,228,228)` (`#e4e4e4`), padding 64 top/bottom; inline 30 two-sided, 120 left / 30
-  right one-sided. It sits 40px below the paragraph before it and 42px above the next heading.
+  right one-sided. It sits 40px below the paragraph before it and 42px above the next heading. The block's
+  `margin-top` collapses with that paragraph's 20px margin, so it is 40px itself.
 - **Line:** 12px white. One-sided, its centre is 70px left of the content; two-sided, it is centred
   (`calc(50% - 6px)`).
 - **Year pill:** 32px / 48px, weight 600, white, padding 15/10, its top 45px above the entry. It is centred on the line
   (90×78 for 4 digits on steering wheel, 79×78 on iconic cars).
-- **Dot:** 24px, the pill colour, level with the description top and centred on the line.
+- **Dot:** a 24px `border-box` circle in the pill colour with a 6px `rgb(228,228,228)` (panel grey) border, so a 12px
+  dot in a grey ring that cuts it out of the line. It is level with the description top and centred on the line.
 - **Title:** the `p` is 16/24 with 18.6667px (14pt) or 24px (18pt) spans. Its line box is 28px (14pt) or 36px
   (18pt), with a 20px bottom margin.
   - **One-sided:** padding-bottom 30.
@@ -48,6 +50,8 @@ Contract: `timeline` (baseline block, variants `black`, `large`) in
   - **Stacked images:** the second has a 16px top padding.
 - **Description:** `p` 16/24, `rgb(22,23,24)`, margin-bottom 20; padding-bottom 100. Two-sided, it takes the right
   half with padding-left 26.
+- **Description links:** `rgb(65,148,104)` (`--skoda-green-accent`) at rest, `rgb(22,23,24)` on hover, no
+  underline. They are styled in the block until the body-link fix (#386) lands globally.
 - **Last entry:** the image and the description pad 50 instead of 100. The title keeps its own padding.
 - **Switch:** one-sided up to 1079px viewport, two-sided from 1080, a viewport switch on the source.
 
@@ -71,6 +75,14 @@ every width:
 
 Entry heights, source minus EDS: 0 for every entry at every width, except the deviations in §7.
 
+Between blocks and the dot's border (PR #373 review), source and EDS at 1440 / 1080 / 992 / 768 / 375, both stories:
+
+| Measure | Source | EDS |
+|---|---|---|
+| last `p` before the widget → panel top | 40 | 40 |
+| dot | 24×24 `border-box`, 6px solid `rgb(228,228,228)` | same |
+| description link at rest / hover | `rgb(65,148,104)` / `rgb(22,23,24)`, no underline | same |
+
 ## 4. EDS implementation
 - **Block:** `blocks/timeline`.
   - `timeline.js` renders an `ol.timeline-list` of `li.timeline-entry`. Each entry has a `p.timeline-year`, an
@@ -83,7 +95,8 @@ Entry heights, source minus EDS: 0 for every entry at every width, except the de
   - **L1:** the left rail.
   - **L2:** the block is its own `inline-size` container.
   - **L3:** `@media (width >= 1080px)` (the source's viewport switch), held back by `@container timeline (width >=
-    600px)`, so a timeline inside a narrow Columns cell keeps the rail.
+    600px)`, so a timeline inside a narrow Columns cell keeps the rail (checked on the draft at 1440: a 400 or 599px
+    wide block stays one-sided, 600px turns two-sided).
 - **Variants:**
   - `Timeline (black)`: the black pill and dot.
   - `Timeline (large)`: 24px / 36px titles.
@@ -106,16 +119,24 @@ Entry heights, source minus EDS: 0 for every entry at every width, except the de
 
 ## 6. Accessibility
 - **Order:** an ordered list in source order.
-- **Headings:** each title is an `h3` (a styled `p` on the source), so the milestones can be reached by heading navigation.
+- **Headings:** each title is an `h3` (a styled `p` on the source), so the milestones can be reached by heading
+  navigation (a deviation, §7.5). A space before each `<br>` keeps the title's lines apart in the accessible name.
 - **Decoration:** the line and the dots are decorative pseudo-elements. The year is real text.
 
-## 7. Known deviations (accepted)
-- **Inline title margin (steering wheel, entries 1, 4, 7, 10):** the source title `p` carries an inline
-  `margin-top: 15px`. The importer drops inline styles, so these entries are 15px shorter at every width.
-- **Empty title paragraph (iconic cars, 1970):** the source title starts with an empty `<p>&nbsp;</p>`. The importer
-  drops empty paragraphs, so the entry is 44px shorter (its 24px line + 20px margin).
-- **Text wrap:** at 375 (steering wheel, 1905), 992 (iconic cars, 2019) and 768 (iconic cars, 1936) one description
-  wraps one line differently (±24px). The text and width are identical; the likely cause is the font stack (`SKODA Next` vs the
-  EDS fallback chain).
-- **24pt model line (wheels, gear-stick):** the source sets the model line at 24pt (32px). `Timeline (large)`
-  renders the whole title at 24px, so the model line is smaller than on the source.
+## 7. Deviations from origin (open, pending human approval)
+None of these is accepted until a human reviewer approves it (AGENTS.md code review, step 8).
+
+1. **Inline title margin (steering wheel, entries 1, 4, 7, 10):** the source title `p` carries an inline
+   `margin-top: 15px`. The importer drops inline styles, so these entries are 15px shorter at every width.
+2. **Empty title paragraph (iconic cars, 1970):** the source title starts with an empty `<p>&nbsp;</p>`. The importer
+   drops empty paragraphs, so the entry is 44px shorter (its 24px line + 20px margin), and at 1080 the title rises
+   into the pill's vertical band.
+3. **Text wrap:** at 375 (steering wheel, 1905), 992 (iconic cars, 2019) and 768 (iconic cars, 1936) one description
+   wraps one line differently (±24px). The text and width are identical; the likely cause is the font stack
+   (`SKODA Next` vs the EDS fallback chain).
+4. **24pt model line (wheels, gear-stick):** the source sets the model line at 24pt (32px). `Timeline (large)`
+   renders the whole title at 24px, so the model line is smaller than on the source.
+5. **Titles are `h3`, not `p`:** this adds 11 (steering wheel) and 16 (iconic cars) headings to the page outline
+   (§6). The title lines keep a space before each `<br>`, so the accessible name reads "Laurin & Klement VOITURETTE
+   A (vehicle on display: 1905)" instead of running the lines together.
+6. **Link `rel`:** `noopener noreferrer` (the site-wide `scripts/links.js`) vs the origin's `noopener`.

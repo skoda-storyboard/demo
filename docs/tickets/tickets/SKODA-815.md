@@ -62,7 +62,9 @@ Recommend **(1) for correctness now**, upgrade to (2) if the timeline visual is 
 - [x] `npm run lint` + `npm test` green (152 tests); re-imported the milestones story and diffed vs source.
 - [x] `blocks/timeline` + `docs/ui-specs/timeline.md` (2026-10-16). Every measured box (panel, line, pill,
       dot, image, description) matches the source at 375 / 768 / 992 / 1079 / 1080 / 1440, including
-      the 1079 → 1080 switch to the two-sided line. Accepted deviations are listed in the spec §7.
+      the 1079 → 1080 switch to the two-sided line, the 40px gap above the panel, the dot's 6px ring and
+      the link colours (PR #373 review). The deviations from origin are listed in the spec §7, open until a
+      human reviewer approves them.
 - [x] Every milestone **description** kept, with its links (the Option 1 flatten dropped them).
 - [x] Variants from the source markup: `black` (black pills, iconic cars), `large` (18pt titles).
 - [x] Unit tests: `story-flatten.test.mjs` (both live widget fixtures, the fallback, the Columns case) and
