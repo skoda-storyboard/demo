@@ -15,9 +15,13 @@
   --timeline-line-color: var(--skoda-white);
   --timeline-text-color: var(--skoda-ink);
 
-  /* the panel sits 40px below the paragraph before it (its own 20px margin + 20) and 42px
-     above the next heading, as the source widget */
-  --timeline-space-above: 20px;
+  /* description links: the source's accent green at rest, ink on hover, no underline */
+  --timeline-link-color: var(--skoda-green-accent);
+  --timeline-link-hover-color: var(--timeline-text-color);
+
+  /* the panel sits 40px below the paragraph before it and 42px above the next heading, as
+     the source widget; the margins collapse with the paragraph's own 20px, so 40 is the gap */
+  --timeline-space-above: 40px;
   --timeline-space-below: 42px;
 
   /* panel padding; the left rail column on the one-sided layout */
@@ -36,8 +40,10 @@
   --timeline-year-pad-inline: 10px;
   --timeline-year-rise: 45px;
 
-  /* the 24px dot on the line, level with the description */
+  /* the 24px dot on the line, level with the description: a 12px dot in a 6px panel-grey ring
+     that cuts it out of the line */
   --timeline-dot-size: 24px;
+  --timeline-dot-ring: 6px;
 
   /* the title: the source's 14pt spans on a 28px line */
   --timeline-title-size: 18.6667px;
@@ -155,14 +161,25 @@
   position: absolute;
   inset-block-start: 0;
   inset-inline-start: calc(-1 * var(--timeline-rail-x) - var(--timeline-dot-size) / 2);
+  box-sizing: border-box;
   width: var(--timeline-dot-size);
   height: var(--timeline-dot-size);
+  border: var(--timeline-dot-ring) solid var(--timeline-panel-bg);
   border-radius: 50%;
   background: var(--timeline-accent);
 }
 
 .timeline .timeline-text p {
   margin: 0 0 var(--timeline-text-end);
+}
+
+.timeline .timeline-text a {
+  color: var(--timeline-link-color);
+  text-decoration: none;
+}
+
+.timeline .timeline-text a:hover {
+  color: var(--timeline-link-hover-color);
 }
 
 /* the source's last entry closes on half the gap, below its image as well */

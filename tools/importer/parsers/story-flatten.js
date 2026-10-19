@@ -396,10 +396,11 @@ function milestonesCells(panel, document) {
   return cells;
 }
 
+// the images, then the text, so a widget with both keeps both
 function milestonesFallback(panel, document) {
   const out = [...panel.querySelectorAll('img')];
   const text = (panel.textContent || '').replace(/\s+/g, ' ').trim();
-  if (text && !out.length) {
+  if (text) {
     const p = document.createElement('p');
     p.textContent = text;
     out.push(p);
@@ -726,7 +727,10 @@ function emitWidget(panel, document, out, stats) {
     case 'button': nodes = buttonNodes(panel, document); break;
     case 'milestones':
       cells = milestonesCells(panel, document);
-      if (!cells) nodes = milestonesFallback(panel, document);
+      if (!cells) {
+        nodes = milestonesFallback(panel, document);
+        stats.fallback.push(kind);
+      }
       break;
     default:
       // unknown: try to salvage rich text, else skip + log.
@@ -780,7 +784,8 @@ export default function parse(element, { document }) {
 
   const out = [];
   const stats = {
-    grids: grids.length, byKind: {}, deferred: [], unknown: [], multiColumn: 0, highlights: 0,
+    grids: grids.length, byKind: {}, deferred: [], unknown: [], fallback: [], multiColumn: 0,
+    highlights: 0,
   };
 
   // Highlight rows split the body: <hr> + row content + its Section Metadata, then the
@@ -840,9 +845,10 @@ export default function parse(element, { document }) {
     highlights: stats.highlights,
     deferred: stats.deferred,
     unknown: stats.unknown,
+    fallback: stats.fallback,
   };
-  if (stats.deferred.length || stats.unknown.length) {
-    console.warn(`[story-flatten] deferred/unknown widgets: ${JSON.stringify(summary)}`);
+  if (stats.deferred.length || stats.unknown.length || stats.fallback.length) {
+    console.warn(`[story-flatten] deferred/unknown/fallback widgets: ${JSON.stringify(summary)}`);
   } else {
     console.log(`[story-flatten] flattened: ${JSON.stringify(summary)}`);
   }

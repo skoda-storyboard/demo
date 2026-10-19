@@ -41,6 +41,20 @@ function titleOf(cell) {
 }
 
 /**
+ * A `<br>` adds no separator to the accessible name ("Laurin & KlementVOITURETTE A"): a space
+ * before each line break keeps the words apart, and collapses on screen.
+ * @param {Element} heading
+ */
+function spaceLines(heading) {
+  heading.querySelectorAll('br').forEach((br) => {
+    const before = br.previousSibling;
+    if (before?.nodeName === '#text' && /\s$/.test(before.textContent)) return;
+    br.before(' ');
+  });
+  return heading;
+}
+
+/**
  * One milestone: the year pill, the title, the image and the description; the line and the
  * dot are CSS (decorative).
  * @param {Element} row
@@ -58,7 +72,7 @@ function entryOf(row) {
     label.textContent = year.textContent.trim();
     li.append(label);
   }
-  if (title?.textContent.trim()) li.append(titleOf(title));
+  if (title?.textContent.trim()) li.append(spaceLines(titleOf(title)));
   // a milestone may stack more than one image; a bare img counts when it has no picture
   const pictures = media ? [...media.querySelectorAll('picture, img')]
     .filter((el) => !el.closest('picture') || el.matches('picture')) : [];

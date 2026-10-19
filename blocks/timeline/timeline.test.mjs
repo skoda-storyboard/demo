@@ -53,7 +53,7 @@ test('a title of several paragraphs is one heading, its paragraphs as lines', { 
   const title = block.querySelector('.timeline-title');
   assert.equal(title.querySelectorAll('p').length, 0);
   assert.equal(title.querySelectorAll('br').length, 1);
-  assert.equal(title.textContent, 'Handsfree(2000)');
+  assert.equal(title.textContent, 'Handsfree (2000)', 'the lines apart in the accessible name');
 });
 
 test('authors may omit cells: no image, no year, an empty row', { skip: !JSDOM }, () => {
@@ -94,4 +94,13 @@ test('a media cell of several images keeps them all, in order', { skip: !JSDOM }
     [...media.querySelectorAll('img')].map((img) => [img.getAttribute('src'), img.getAttribute('loading')]),
     [['r.jpg', 'lazy'], ['rs.jpg', 'lazy']],
   );
+});
+
+test('the title lines keep a space before each break, for the accessible name', { skip: !JSDOM }, () => {
+  const block = blockFrom(row('1905', '<p>Laurin &amp; Klement<br><strong>VOITURETTE A</strong><br>(vehicle on display: 1905)</p>', '', '<p>Text.</p>'));
+  decorate(block);
+  const title = block.querySelector('.timeline-title');
+  assert.equal(title.textContent.replace(/\s+/g, ' '), 'Laurin & Klement VOITURETTE A (vehicle on display: 1905)');
+  assert.equal(title.querySelectorAll('br').length, 2, 'the breaks stay');
+  assert.equal(title.querySelector('strong').textContent, 'VOITURETTE A', 'the model stays bold');
 });

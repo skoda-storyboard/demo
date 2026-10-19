@@ -422,6 +422,22 @@ test('SKODA-815: a milestones widget without entries keeps its images and text',
   assert.match(content.textContent, /1905 Voiturette A/, 'the text salvaged');
 });
 
+test('SKODA-815: a milestones fallback keeps the text beside its images, and logs', { skip: domSkip }, (t) => {
+  const warn = t.mock.method(console, 'warn', () => {});
+  t.mock.method(console, 'log', () => {});
+  const d = domDoc(`<div class="entry-content"><div class="panel-layout"><div class="panel-grid"><div class="panel-grid-cell">
+    <div class="so-panel widget widget_ys-milestones"><div class="so-widget-ys-milestones">
+      <section class="milestones"><img src="https://cdn.example/a.jpg" alt=""><p>1905 Voiturette A</p></section></div></div>
+  </div></div></div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  assert.equal(content.querySelector('table'), null, 'no empty block');
+  assert.ok(content.querySelector('img'), 'the image kept');
+  assert.match(content.textContent, /1905 Voiturette A/, 'the text kept as well');
+  const logged = warn.mock.calls.map((c) => String(c.arguments[0])).join('\n');
+  assert.match(logged, /"fallback":\["milestones"\]/, 'the fallback is logged');
+});
+
 test('SKODA-815: a milestones widget in a multi-column row lands in its Columns cell', { skip: domSkip }, () => {
   const panel = readFileSync(new URL('../../../test/fixtures/story-flatten/milestones-steering-wheel.html', import.meta.url), 'utf8');
   const d = domDoc(`<div class="entry-content"><div class="panel-layout"><div class="panel-grid">

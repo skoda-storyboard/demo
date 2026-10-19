@@ -324,7 +324,7 @@ var CustomImportScript = (() => {
   function milestonesFallback(panel, document2) {
     const out = [...panel.querySelectorAll("img")];
     const text3 = (panel.textContent || "").replace(/\s+/g, " ").trim();
-    if (text3 && !out.length) {
+    if (text3) {
       const p = document2.createElement("p");
       p.textContent = text3;
       out.push(p);
@@ -596,7 +596,10 @@ var CustomImportScript = (() => {
         break;
       case "milestones":
         cells = milestonesCells(panel, document2);
-        if (!cells) nodes = milestonesFallback(panel, document2);
+        if (!cells) {
+          nodes = milestonesFallback(panel, document2);
+          stats.fallback.push(kind);
+        }
         break;
       default:
         nodes = editorNodes(panel, document2);
@@ -643,6 +646,7 @@ var CustomImportScript = (() => {
       byKind: {},
       deferred: [],
       unknown: [],
+      fallback: [],
       multiColumn: 0,
       highlights: 0
     };
@@ -685,10 +689,11 @@ var CustomImportScript = (() => {
       split: stats.split || 0,
       highlights: stats.highlights,
       deferred: stats.deferred,
-      unknown: stats.unknown
+      unknown: stats.unknown,
+      fallback: stats.fallback
     };
-    if (stats.deferred.length || stats.unknown.length) {
-      console.warn(`[story-flatten] deferred/unknown widgets: ${JSON.stringify(summary)}`);
+    if (stats.deferred.length || stats.unknown.length || stats.fallback.length) {
+      console.warn(`[story-flatten] deferred/unknown/fallback widgets: ${JSON.stringify(summary)}`);
     } else {
       console.log(`[story-flatten] flattened: ${JSON.stringify(summary)}`);
     }
