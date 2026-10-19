@@ -81,8 +81,13 @@ Contract: `columns-split` v2 in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../planning
 - **Known differences:**
   - DA keeps no per-image width, so a card's later images come out at their file size. The Miss Peaches Instagram
     icons are 150 against the source's 116 / 122 (no smaller file exists), so the handle line sits 32px lower.
-  - The enduro profile row's own padding (32px top from 781, 15px around at 780 and below) isn't carried. At 390 the
-    portrait is 370 against 340.
+  - A centred or unequal row's own padding is carried since the #380 review (2026-10-19): `pad-T-R-B-L` from 781px
+    and `pad-m-T-R-B-L` up to 780px, from the layout's `#pg-…> .panel-row-style` rules plus the theme's 32px top
+    on a styled row from 781px (none after a highlight panel, whose runtime gap is that space; a stretched row keeps
+    only its top / bottom, as SiteOrigin sets its sides). The Miss Peaches profile rows match live at 390 / 768 /
+    1440: Enduro 340 at x25 on a phone, Skatepark / Whitewater / Downhill 300 at x45; the Millionth SUV rows stay
+    370 at x10, as live. The gap above the row is still 10px less than live at every width (Millionth SUV 12px
+    more at 1440).
 - **Body images:** a story whose narrower body images are all centred gets the body Section Metadata style
   `centered-images`, and `styles.css` centres them. Example: the enduro 800px photos at x115 in the 819px column at
   1440, matching live. A body image shown narrower than its file still comes out at its file size: the 4×4 story's

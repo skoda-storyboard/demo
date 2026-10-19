@@ -136,3 +136,19 @@ test('offset-A-B: each cell gets its leading spacer offset; a 0 sets none; malfo
     assert.equal(bad.classList.contains('offset'), false, cls);
   });
 });
+
+test('pad-… / pad-m-…: the row\'s own padding as custom properties; malformed or absent, none', () => {
+  const el = block('columns centered pad-m-15-15-15-15', PROFILE_ROW);
+  decorate(el);
+  assert.ok(el.classList.contains('padded'));
+  assert.equal(el.style.getPropertyValue('--columns-pad-m'), '15px 15px 15px 15px');
+  assert.equal(el.style.getPropertyValue('--columns-pad-d'), '', 'no desktop padding authored');
+  const both = block('columns split-60 pad-32-0-0-0 pad-m-15-15-15-15');
+  decorate(both);
+  assert.equal(both.style.getPropertyValue('--columns-pad-d'), '32px 0px 0px 0px');
+  ['pad-15', 'pad-m-1-2-3', 'pad-1000-0-0-0', 'pad-a-b-c-d'].forEach((token) => {
+    const bad = block(`columns centered ${token}`, PROFILE_ROW);
+    decorate(bad);
+    assert.equal(bad.classList.contains('padded'), false, token);
+  });
+});

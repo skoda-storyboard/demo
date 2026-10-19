@@ -1166,3 +1166,37 @@ test('a panel in parts: each part has its own text colour; an empty lead opens n
   ]);
   assert.equal(content.querySelector('table').dataset.block, 'Spacer (line)', 'the blank line stays, in the first part');
 });
+
+// --- a centred / unequal row's own padding (#380 review) -----------------------------------
+const { markRowPadding } = await import('./story-flatten.js');
+test('a centred or unequal row keeps its own SiteOrigin padding as pad / pad-m tokens; plain rows stay as they are', { skip: domSkip }, () => {
+  const css = '#pgc-1-2-0{ width:61.8% } #pgc-1-2-1{ width:38.2% } '
+    + '@media (max-width:780px){ #pg-1-2> .panel-row-style { padding:15px 15px 15px 15px } } '
+    + '#pg-1-2> .panel-row-style { padding:32px 0px 0px 0px }';
+  const row = splitStory({ css, portrait: PORTRAIT_235 });
+  markCellWidths(row); markRowPadding(row);
+  parse(row.querySelector('.entry-content'), { document: row });
+  assert.equal(row.querySelector('table').dataset.block, 'Columns (split-62, portrait-235, offset-0-24, pad-32-0-0-0, pad-m-15-15-15-15)');
+  // the same row with equal, un-styled cells: plain Columns, no padding token
+  const plain = splitStory({ css: '@media (max-width:780px){ #pg-1-2> .panel-row-style { padding:15px } }', portrait: '<p>Text</p>' });
+  markCellWidths(plain); markRowPadding(plain);
+  parse(plain.querySelector('.entry-content'), { document: plain });
+  assert.doesNotMatch(plain.querySelector('table').dataset.block, /pad/);
+});
+
+test('a stretched row keeps only its top / bottom padding: SiteOrigin sets its sides', { skip: domSkip }, () => {
+  const css = '#pgc-1-2-0{ width:61.8% } #pgc-1-2-1{ width:38.2% } '
+    + '@media (max-width:780px){ #pg-1-2> .panel-row-style { padding:15px 15px 15px 15px } }';
+  const row = splitStory({ css, portrait: PORTRAIT_235 });
+  // the same row as a SiteOrigin full-width stretched row (the Millionth SUV rows)
+  const grid = row.getElementById('pg-1-2');
+  const style = row.createElement('div');
+  style.className = 'panel-row-style panel-row-style-for-1-2';
+  style.setAttribute('data-stretch-type', 'full');
+  style.append(...grid.childNodes);
+  grid.append(style);
+  grid.className = 'panel-grid panel-has-style';
+  markCellWidths(row); markRowPadding(row);
+  parse(row.querySelector('.entry-content'), { document: row });
+  assert.match(row.querySelector('table').dataset.block, /pad-32-0-0-0, pad-m-15-0-15-0\)$/, 'the theme 32px top from 781px; the sides SiteOrigin sets');
+});

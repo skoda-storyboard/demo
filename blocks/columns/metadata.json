@@ -33,6 +33,11 @@
       "description": "Story row whose cells start lower, from 720px wide: one number per cell, in px, in cell order (offset-48-24: the first cell 48px down, the second 24px). Use 0 for a cell that stays at the top."
     },
     {
+      "class": "centered pad-m-15-15-15-15",
+      "label": "centered, pad-m-15-15-15-15",
+      "description": "Story row with its own padding inside the row, in px (top-right-bottom-left): pad-… from 781px wide, pad-m-… up to 780px (the Miss Peaches profile rows: 15px round on phones)."
+    },
+    {
       "class": "banners",
       "label": "banners",
       "description": "Press kit: a row of linked banner images at their authored size (PDF download / share buttons)."

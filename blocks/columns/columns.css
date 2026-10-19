@@ -332,6 +332,19 @@
   }
 }
 
+/* `pad-…` / `pad-m-…` (story rows, columns.js decorateRowPadding): the source row's own padding,
+   inside the row, up to 780px and from 781px (SiteOrigin's mobile switch); none where unset */
+.columns.padded {
+  box-sizing: border-box;
+  padding: var(--columns-pad-m, 0);
+}
+
+@media (width >= 781px) {
+  .columns.padded {
+    padding: var(--columns-pad-d, 0);
+  }
+}
+
 /* a centred card alone (a body caption figure, the 4×4 spokesperson): the source figure has no
    cell inset above or below it */
 .columns.centered > div > div:only-child {

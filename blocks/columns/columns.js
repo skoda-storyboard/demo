@@ -83,12 +83,35 @@ export function decorateOffsets(block) {
   return true;
 }
 
+const PAD_RE = /^pad(-m)?-(\d{1,3})-(\d{1,3})-(\d{1,3})-(\d{1,3})$/;
+
+/**
+ * `pad-T-R-B-L` / `pad-m-T-R-B-L` (story rows, #380 review): the source row's own padding, in px,
+ * on desktop / up to 780px (the Miss Peaches profile rows: `pad-m-15-15-15-15`, so the
+ * portraits sit 25px in on a phone, as the source's). A missing one is no padding there.
+ * @param {Element} block
+ * @returns {boolean} whether the block has a row padding
+ */
+export function decorateRowPadding(block) {
+  let found = false;
+  [...block.classList].forEach((c) => {
+    const m = PAD_RE.exec(c);
+    if (!m) return;
+    const [, mobile, ...box] = m;
+    block.style.setProperty(mobile ? '--columns-pad-m' : '--columns-pad-d', box.map((v) => `${Number(v)}px`).join(' '));
+    found = true;
+  });
+  if (found) block.classList.add('padded');
+  return found;
+}
+
 export default function decorate(block) {
   const cols = [...block.firstElementChild.children];
   block.classList.add(`columns-${cols.length}-cols`);
   if (block.classList.contains('stats')) decorateStats(block);
   decorateSplit(block);
   decorateOffsets(block);
+  decorateRowPadding(block);
 
   // setup image columns
   [...block.children].forEach((row) => {

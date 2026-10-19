@@ -18,7 +18,7 @@
 
 import storyHeroParser from './parsers/story-hero.js';
 import storyFlattenParser, {
-  markHighlights, markCellWidths, markBoldHeadings, restoreBoldHeadings, dropEmptySections,
+  markHighlights, markCellWidths, markRowPadding, markBoldHeadings, restoreBoldHeadings, dropEmptySections,
   markCentredImages, applyCentredImages, markTextStyles,
 } from './parsers/story-flatten.js';
 import downloadsParser from './parsers/downloads.js';
@@ -142,6 +142,7 @@ export default {
   preprocess: ({ document }) => {
     markHighlights(document);
     markCellWidths(document);
+    markRowPadding(document);
     markCentredImages(document);
     // the editor text's centred paragraphs, 10–18pt runs and boxes (DA keeps none of them)
     markTextStyles(document);

@@ -541,7 +541,8 @@ function boxValue(value) {
   return `${t} ${r} ${b} ${l}`;
 }
 
-function highlightGeometry(css) {
+/** The page's rules, desktop and `max-width:780px`, and a finder for one box property. */
+function layoutRules(css) {
   const rules = (text) => [...text.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
     .map(([, sel, body]) => ({ sels: sel.split(',').map((s) => s.trim()), body }));
   const mobile = rules([...css.matchAll(MEDIA_780)].map((m) => m[1]).join('\n'));
@@ -555,6 +556,21 @@ function highlightGeometry(css) {
     });
     return found;
   };
+  // a row's own padding (`#pg-…> .panel-row-style`), desktop and mobile (absent: the desktop one)
+  const rowPadding = (grid) => {
+    const isRow = (s) => s.replace(/\s+/g, '') === `#${grid.id}>.panel-row-style`;
+    const padD = find(desktop, isRow, 'padding');
+    return { padD, padM: find(mobile, isRow, 'padding') || padD };
+  };
+  return {
+    mobile, desktop, find, rowPadding,
+  };
+}
+
+function highlightGeometry(css) {
+  const {
+    mobile, desktop, find, rowPadding,
+  } = layoutRules(css);
   const margins = (panel, fallback) => {
     if (!panel) return null;
     const test = (s) => s.endsWith(`#${panel.id}`);
@@ -567,9 +583,7 @@ function highlightGeometry(css) {
     // a multi-column row has a margin per cell; its Columns block keeps the default inset
     const cells = grid.querySelectorAll(':scope > .panel-row-style > .panel-grid-cell, :scope > .panel-grid-cell');
     if ([...cells].filter((c) => c.querySelector('.so-panel')).length > 1) return out;
-    const isRow = (s) => s.replace(/\s+/g, '') === `#${grid.id}>.panel-row-style`;
-    const padD = find(desktop, isRow, 'padding');
-    const padM = find(mobile, isRow, 'padding') || padD;
+    const { padD, padM } = rowPadding(grid);
     if (padD) out['highlight-padding'] = padD;
     if (padM) out['highlight-padding-mobile'] = padM;
     const panels = [...grid.querySelectorAll(':scope > .panel-row-style > .panel-grid-cell > .so-panel, :scope > .panel-grid-cell > .so-panel')];
@@ -583,6 +597,64 @@ function highlightGeometry(css) {
     }
     return out;
   };
+}
+
+// ---- a plain multi-column row's own padding (#380 review) ----------------------------
+// A builder row can set its own padding (`#pg-…> .panel-row-style { padding:32px 0 0 0 }`, `15px`
+// round in its `max-width:780px` copy: the Enduro profile row, its portraits 340px at x 25 on a
+// 390px phone). DA keeps no row styles, so a centred or unequal story row carries it as Columns
+// tokens `pad-T-R-B-L` / `pad-m-T-R-B-L` (px), which blocks/columns draws. Highlight panels carry
+// theirs as Section Metadata (highlightGeometry).
+const THEME_ROW_TOP = '32px 0px 0px 0px';
+const ROW_PAD_ATTR = 'data-row-padding';
+const ROW_PAD_MOBILE_ATTR = 'data-row-padding-mobile';
+
+/** Mark each plain builder row's own padding (desktop / mobile). Returns the count. */
+export function markRowPadding(document) {
+  const { rowPadding } = layoutRules(headCss(document));
+  let count = 0;
+  // a stretched row (`data-stretch-type`): SiteOrigin's script sets its side padding itself (0 in
+  // the story column; the Millionth SUV rows are 15px 0 on live), so only top / bottom carry
+  const unstretched = (box, stretched) => {
+    if (!box || !stretched) return box;
+    const [t, , b] = box.split(' ');
+    return `${t} 0px ${b} 0px`;
+  };
+  document.querySelectorAll('.panel-grid').forEach((grid) => {
+    if (grid.hasAttribute(HIGHLIGHT_ATTR)) return;
+    const style = grid.querySelector(':scope > .panel-row-style');
+    const stretched = !!style?.hasAttribute('data-stretch-type');
+    const pads = rowPadding(grid);
+    // from 781px the theme gives a styled row (one with a `.panel-row-style`) 32px on top unless
+    // the layout sets its own (live: every Enduro / Millionth SUV row); up to 780px only the
+    // layout's own rules count, not that desktop default
+    // (after a highlight panel the story runtime's panel → body gap is that space already: the
+    // Millionth SUV rows)
+    const prev = grid.previousElementSibling;
+    const afterPanel = !!prev?.matches('.panel-grid') && prev.hasAttribute(HIGHLIGHT_ATTR);
+    const padD = unstretched(pads.padD || (style && !afterPanel ? THEME_ROW_TOP : null), stretched);
+    const padM = unstretched(pads.padM, stretched);
+    if (!padD && !padM) return;
+    if (padD) grid.setAttribute(ROW_PAD_ATTR, padD);
+    if (padM) grid.setAttribute(ROW_PAD_MOBILE_ATTR, padM);
+    count += 1;
+  });
+  return count;
+}
+
+/** `32px 0px 0px 0px` → `32-0-0-0`; null for none, all zero or a value past 999px. */
+function padToken(value) {
+  const parts = String(value || '').split(/\s+/).filter(Boolean).map((v) => Math.round(parseFloat(v)));
+  if (parts.length !== 4 || parts.some((n) => !(n >= 0) || n > 999) || parts.every((n) => n === 0)) return null;
+  return parts.join('-');
+}
+
+/** The row's padding tokens for its Columns block: `pad-…` (desktop), `pad-m-…` (mobile). */
+export function rowPaddingVariants(grid) {
+  if (!grid) return [];
+  const d = padToken(grid.getAttribute(ROW_PAD_ATTR));
+  const m = padToken(grid.getAttribute(ROW_PAD_MOBILE_ATTR));
+  return [d && `pad-${d}`, m && `pad-m-${m}`].filter(Boolean);
 }
 
 const GEOMETRY_KEYS = ['highlight-padding', 'highlight-padding-mobile', 'highlight-margin',
@@ -1135,6 +1207,10 @@ function emitMultiColumn(cells, document, out, stats) {
     const split = splitVariant(filled);
     const variants = split ? [split, portraitVariant(filled)].filter(Boolean) : centredVariants(filled);
     if (offsets.some((v) => v > 0) && offsets.every((v) => v <= 999)) variants.push(`offset-${offsets.join('-')}`);
+    // a centred or unequal story row keeps its own padding (#380 review); plain rows stay as they are
+    if (variants.some((v) => v === 'centered' || v.startsWith('split-'))) {
+      variants.push(...rowPaddingVariants(cells[0]?.closest('.panel-grid')));
+    }
     const header = variants.length ? `Columns (${variants.join(', ')})` : 'Columns';
     out.push(WebImporter.DOMUtils.createTable([[header], row], document));
     stats.multiColumn += 1;
