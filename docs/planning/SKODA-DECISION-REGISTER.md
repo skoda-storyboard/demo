@@ -18,7 +18,7 @@ Status: 🟢 resolved · 🟡 open, a default is proposed · 🔴 open and block
 | D2 | Media cart | 🟢 demo: device-ID, no login, client-side ZIP · 🟡 production approach | 902, 806a | Keep the client-side ZIP; add a serverless ZIP only above the item limit |
 | D3 | Banners: keep, rebuild or drop | 🔴 | 903 | Drop the ad server; use an authored featured-promo block if the client wants promos |
 | D4 | Newsletter service (ESP) | 🔴 | 904, `/en/newsletter-settings/` | Keep mailguide.cz behind a form block (double opt-in); need ESP API access |
-| D5 | Media / DAM | 🟢 AEM Assets · 🟡 instance, rendition scheme, rights rule | 504a, 511, 512, 513, #219 | Masters-only in Assets, renditions from Dynamic Media / Media Bus; publish only approved assets |
+| D5 | Media / DAM | 🟢 AEM Assets · 🟢 renditions: **Media Bus** (2026-10-16) · 🟡 rights rule | 504a, 511, 512, 513, 520, #219 | Masters-only in Assets; every display size + the 1920 download from the Media Bus, no Dynamic Media; >10 MiB masters get one processing-profile rendition as Media Bus input; source CDN removed first (520). See [asset-ingestion review](../architecture/SKODA-ASSET-INGESTION-M2.md) |
 | D6 | Search: index-only or hosted | 🟡 index-only today | 901 | Index-only at go-live; hosted search as a post-go-live project |
 | D7 | Content cutoff / archive scope | 🔴 | 801b, 803, 847, 210, 844, 848 | Migrate everything EN from 2015 on (≈ 4,620 pages); drop empty pages with a redirect |
 | D8 | Owners for Škodapedia and press kits | 🟡 commerce closed; owners open | 206, 802 | Škodapedia stays in Storyboard (pre-baked terms) unless the client moves it out |
@@ -27,7 +27,7 @@ Status: 🟢 resolved · 🟡 open, a default is proposed · 🔴 open and block
 | D11 | Figma-to-AEM showcase | 🟡 (demo item) | – | Close after the demo |
 | D12 | Facet subset (which of the 15 facets are normalised and shown) | 🟡 | 401, 808a, 512, 848 | All 15 as on the source (402d already ships them on News / Press Kits) |
 | D13 | DA or Universal Editor | 🟢 DA; the Assets picker is live (#62, 12 Oct) | 507 ✅, 805, 802 | DA / Experience Workspace |
-| D14 | Adobe CDN / App Builder edge functions available | 🔴 | 906, 511 runtime, 902 | Not assumed; design without edge functions |
+| D14 | Adobe CDN / App Builder edge functions available | 🔴 | 906, 511 runtime, 902 | Not assumed; design without edge functions. **2026-10-16:** the 511 sync job runs on **App Builder** (serverless, not edge): needs the entitlement + an OAuth S2S technical account |
 | D15 | Editorial RACI / roles | 🔴 | 809, 811 (group gate), 812, 843 (legal owner) | 7 groups as in the requirements §6.4 |
 | D16 | NFRs / logging | 🔴 | 812 | DA version history as the audit trail; confirm whether it is enough |
 | D17 | QR-code restricted access | 🔴 | 906 | Out of go-live scope until the access model is defined |

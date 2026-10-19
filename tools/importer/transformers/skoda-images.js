@@ -57,12 +57,39 @@ function splitParagraph(img, paragraph, caption, document) {
   paragraph.replaceWith(...[before, image, after].filter(hasContent));
 }
 
+const text = (value) => (value || '').replace(/\s+/g, ' ').trim();
+
+/**
+ * The text alternative of an image that is a link's only content. An empty alt there leaves the
+ * link with no accessible name (WCAG 1.1.1 / 2.4.4, axe link-name; SKODA-703, the source's own
+ * Classic Days chapters), so it is backfilled from what the source shows: the image's editorial
+ * caption, a non-blank link or image title, then the nearest heading before it, then the page h1.
+ * Never the file name. Other empty alts stay empty (a decorative image next to its own text).
+ * @returns {string} the alt, or '' when the image isn't a lone linked image or nothing fits
+ */
+export function linkedImageAlt(img, root) {
+  const link = img.closest('a');
+  if (!link || link.querySelectorAll('img').length !== 1 || text(link.textContent)) return '';
+  const caption = editorialCaption(img) || editorialCaption(img.closest('[data-caption]'));
+  const titled = [link.getAttribute('title'), img.getAttribute('title')].map(text).find(Boolean);
+  const heading = [...root.querySelectorAll('h1, h2, h3, h4, h5, h6')]
+    // eslint-disable-next-line no-bitwise
+    .filter((h) => h.compareDocumentPosition(img) & 4 /* Node.DOCUMENT_POSITION_FOLLOWING */)
+    .map((h) => text(h.textContent)).filter(Boolean).pop();
+  return text(caption) || titled || heading || text(root.ownerDocument.querySelector('h1')?.textContent);
+}
+
 export default function normalizeImages(root, document = root.ownerDocument) {
   root.querySelectorAll('img').forEach((img) => {
     if (!img.hasAttribute('alt') || !img.getAttribute('alt').trim()) {
-      const type = img.hasAttribute('alt') ? 'empty' : 'missing';
-      // eslint-disable-next-line no-console
-      console.warn(`[image-import] ${type} alt: ${img.getAttribute('src') || '(no src)'}`);
+      const backfill = linkedImageAlt(img, root);
+      if (backfill) {
+        img.setAttribute('alt', backfill);
+      } else {
+        const type = img.hasAttribute('alt') ? 'empty' : 'missing';
+        // eslint-disable-next-line no-console
+        console.warn(`[image-import] ${type} alt: ${img.getAttribute('src') || '(no src)'}`);
+      }
     }
 
     // A block cell is serialized as a div by DA; its parser owns the caption

@@ -376,6 +376,33 @@ function prioritizeLeadImage(main) {
   lead.setAttribute('fetchpriority', 'high');
 }
 
+// "Skip to content" per locale tree (the html lang set in loadEager)
+const SKIP_LINK_LABELS = {
+  en: 'Skip to content',
+  cs: 'Přeskočit na obsah',
+  de: 'Zum Inhalt springen',
+  sk: 'Preskočiť na obsah',
+  sr: 'Preskoči na sadržaj',
+  sl: 'Preskoči na vsebino',
+};
+
+/**
+ * The first focusable element: a link past the header's ~30 tab stops to the page content (WCAG
+ * 2.4.1 Bypass Blocks, SKODA-703; the source has none). Shown only while focused (styles.css).
+ * <main> takes tabindex -1 so the jump moves focus, not just the scroll position.
+ * @param {Element} main The main element
+ */
+function addSkipLink(main) {
+  if (document.querySelector('.skip-link')) return;
+  main.id = main.id || 'main';
+  main.setAttribute('tabindex', '-1');
+  const link = document.createElement('a');
+  link.className = 'skip-link';
+  link.href = `#${main.id}`;
+  link.textContent = SKIP_LINK_LABELS[document.documentElement.lang] || SKIP_LINK_LABELS.en;
+  document.body.prepend(link);
+}
+
 /**
  * Loads everything needed to get to LCP.
  * @param {Element} doc The container element
@@ -387,6 +414,7 @@ async function loadEager(doc) {
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
+    addSkipLink(main);
     decorateMain(main);
     startListingIndex(main);
     await loadTemplate(main);

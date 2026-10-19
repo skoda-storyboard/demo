@@ -18,10 +18,9 @@
   padding: var(--tag-padding);
   border-radius: var(--tag-radius);
 
-  /* Default matches the source per-article tag exactly: grey #7c7d7e on white. NOTE: this is a
-     known borderline AA contrast (~3.9:1 at 11px); pixel-parity with the source was chosen over
-     the contrast bump (SKODA-205 decision). --skoda-ink remains available as an accessible opt-in. */
-  background-color: var(--skoda-grey-500);
+  /* The source per-article tag is white on grey #7c7d7e, 4.12:1 at 11px, below AA. SKODA-703 (WCAG
+     AA) replaces the SKODA-205 parity choice with the closest AA grey, 4.54:1. */
+  background-color: var(--skoda-grey-600);
   color: var(--skoda-white);
   font-size: var(--tag-font-size);
   font-weight: var(--weight-semibold);

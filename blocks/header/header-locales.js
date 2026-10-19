@@ -210,15 +210,17 @@ export function buildLocaleList(entries, current, doc, translations = new Map())
         && permittedTranslation(code, translations.get(code), base, ownHost);
       if (!translation) return; // no declared translation: omitted, never a locale home
       const elsewhere = isOtherSite(href, base);
+      // the name starts with the visible label (WCAG 2.5.3 Label in Name, SKODA-703): CZ – Čeština
+      const named = `${label} – ${name}`;
       item = doc.createElement('a');
       item.setAttribute('href', elsewhere ? href : translation);
       item.setAttribute('hreflang', code);
       if (elsewhere) {
         item.setAttribute('target', '_blank');
         item.setAttribute('rel', 'noopener');
-        item.setAttribute('aria-label', LABELS.newTab(name));
+        item.setAttribute('aria-label', LABELS.newTab(named));
       } else {
-        item.setAttribute('aria-label', name);
+        item.setAttribute('aria-label', named);
       }
     }
     item.setAttribute('lang', code);

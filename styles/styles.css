@@ -257,10 +257,10 @@
   --checkbox-label-gap: 9px;
   --consent-color: var(--skoda-grey-400);
 
-  /* Media Room footer "Manage subscription" link: the source #419468. It is 3.4:1 on the footer
-     green, below AA for 16px text; kept for source parity by decision (SKODA-308, 2026-10-06),
-     replacing the earlier emerald a11y deviation (9.7:1) */
-  --newsletter-manage-color: var(--skoda-green-accent);
+  /* Media Room footer "Manage subscription" link: the source #419468 is 3.4:1 on the footer green,
+     below AA for 16px text. SKODA-703 (WCAG AA) replaces the SKODA-308 parity choice with the same
+     green lightened to 4.6:1, as the dark highlight panel's links */
+  --newsletter-manage-color: var(--highlight-dark-link-color);
 
   /* breakpoint tokens — for JS / container-query reuse ONLY. CSS custom properties cannot be
      used inside @media conditions, so the literals 768/992/1080 below remain the source of
@@ -272,9 +272,10 @@
   /* stacking order for page-level fixed UI (SKODA-215), lowest → highest:
      in-page layers (carousel/cards ≤ 2, downloads size menu 15) < floating action bar 18
      < media-cart notice 19 < header + open mobile nav drawer and its backdrop (header .nav-wrapper, 20)
-     < gallery lightbox (99999) < consent banner (OneTrust ships its own ~2147483645, SKODA-704).
+     < the focused skip link 21 < gallery lightbox (99999) < consent banner (OneTrust ships its own ~2147483645, SKODA-704).
      The bar stays under the drawer, lightbox and consent banner so they always cover it. */
   --z-float-dock: 18;
+  --z-skip-link: 21;
 
   /* media cart (SKODA-505b; media-cart.md §3, measured on the source 2026-09-30): the red
      count bubble on the cart badge, the dark scrim over an added card, the limit notice's
@@ -566,6 +567,31 @@ main[tabindex='-1']:focus {
   outline: none;
 }
 
+/* "Skip to content" (scripts.js, SKODA-703): off screen until it has keyboard focus, then an ink
+   pill over the header's top-left corner (WCAG 2.4.1) */
+.skip-link {
+  position: absolute;
+  top: var(--spacing-xs);
+  left: var(--spacing-xs);
+  z-index: var(--z-skip-link);
+  padding: var(--spacing-xs) var(--spacing-m);
+  border-radius: var(--pill-radius);
+  background: var(--skoda-ink);
+  color: var(--skoda-white);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  transform: translateY(calc(-100% - 2 * var(--spacing-xs)));
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+.skip-link:focus-visible {
+  outline: 2px solid var(--skoda-white);
+  outline-offset: 2px;
+}
+
 /* buttons */
 p.button-wrapper {
   margin: var(--spacing-s) 0;
@@ -822,6 +848,10 @@ main > .section.highlight-grey :is(h1, h2, h3, h4, h5, h6) {
 
 main > .section.highlight-dark a:any-link {
   color: var(--hl-link, var(--highlight-dark-link-color));
+
+  /* the green link among white text is 2.73:1 apart, so colour alone doesn't mark it (WCAG 1.4.1
+     link-in-text-block, SKODA-703); the source shows no underline */
+  text-decoration: underline;
 }
 
 /* a story's light panel: the source's ink text and green links unless the panel sets its own */
