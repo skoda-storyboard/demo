@@ -19,11 +19,14 @@ The source has known WCAG gaps (checkbox-hack mobile nav, auto-rotating carousel
 - Clear the `[RUNTIME-UNCONFIRMED]` items in a browser (modal focus behavior, mega-menu hover/keyboard timing).
 
 ## Acceptance Criteria
-- [ ] Nav ARIA verified (mobile toggle state + mega-menu keyboard operable).
-- [ ] Gallery + glossary modals trap focus, close on Escape, and return focus to the trigger.
-- [ ] Contrast passes WCAG 2.1 AA on pilot pages.
-- [ ] All interactive controls are fully keyboard-operable.
-- [ ] Empty alts flagged/backfilled; `[RUNTIME-UNCONFIRMED]` a11y items confirmed in-browser.
+- [x] Nav ARIA verified (mobile toggle state + mega-menu keyboard operable). The desktop dropdowns' screen-reader
+      semantics are a follow-up: [SKODA-703a](SKODA-703a.md).
+- [x] Gallery modals (gallery / story lightbox, Media Box lightbox) trap focus, close on Escape, and return focus to the
+      trigger. The glossary modal is out of M1 (SKODA-206).
+- [x] Contrast passes WCAG 2.1 AA on the M1 pages, apart from the PO-accepted source greys (audit §3).
+- [x] All interactive controls are fully keyboard-operable (skip link, slider pause and size-menu keys added).
+- [x] Empty alts flagged / backfilled; `[RUNTIME-UNCONFIRMED]` a11y items confirmed in-browser. The human NVDA /
+      VoiceOver pass (audit §6) is still open.
 
 ## Dependencies
 - Upstream: SKODA-603 (imported pilot); relies on SKODA-302 (nav ARIA fix), SKODA-203 (gallery lightbox modal), SKODA-206 (Škodapedia glossary modal). / Downstream: SKODA-704 (pilot sign-off).
@@ -42,3 +45,15 @@ The source has known WCAG gaps (checkbox-hack mobile nav, auto-rotating carousel
   stories" CTA (`button.nav-subscribe` and its link form `.nav-topbar-utility a`) uses the same source grey
   `#7c7d7e`, 12px / 600: 3.30:1 on the Storyboard `#e6e6e6` topbar, below AA's 4.5:1. This is **not an AA pass**;
   to restore AA, set both back to `--skoda-grey-700` (`#5a5b5c`, 5.45:1).
+
+## Status (2026-10-15): 🟡 In review (branch `skoda-703-a11y`)
+Audit and fixes: [`docs/reviews/SKODA-703-A11Y-AUDIT-2026-10-15.md`](../../reviews/SKODA-703-A11Y-AUDIT-2026-10-15.md).
+- **Method:** axe-core 4.14 (WCAG 2.0 / 2.1 A + AA) at 375 / 1280: baseline on all 134 M1 pages (`main` vs the
+  source); fixes verified on an 18-page coverage set holding every template, block, block variant and section style
+  (390 → 15 nodes, all PO-accepted); scripted keyboard / focus / ARIA pass on the 9 template URLs.
+- **Fixed:** contrast to AA (two new tokens; the PO-accepted greys kept), underlines where links were colour-only, the
+  locale links' label in name (EDS-introduced), a skip link, a pause control for the story slider's autoplay, arrow keys
+  in the Media Box / gallery size menu, alts for the 9 linked images that had none (5 Classic Days chapters re-pushed).
+- **Reverses for AA (PO to confirm):** SKODA-205 (tag chip grey) and SKODA-308 (footer "Manage subscription" green).
+- **Open:** the human screen-reader pass (audit §6); SKODA-703a (mega-menu semantics, M2); one DA-edited Classic Days
+  chapter needs its image alt set by an author.

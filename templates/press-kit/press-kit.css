@@ -43,7 +43,7 @@ body.press-kit {
   --pk-hub-banners-end: calc(var(--grid-gutter) + var(--page-gutter));
 
   /* article (#275), measured on the source's first-glimpse at 1440 */
-  --pk-link-color: var(--skoda-green-accent); /* .entry-content a */
+  --pk-link-color: var(--skoda-green-accent-text); /* .entry-content a: the source #419468 darkened to AA (SKODA-703) */
   --pk-side-link-color: var(--pr-menu-link-color);
   --pk-tag-gap: 5px;
   --pk-tag-space: 3.8px; /* below 768 the source's chips are centred inline-blocks: a word space apart */
