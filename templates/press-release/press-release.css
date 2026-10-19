@@ -369,8 +369,9 @@ body.press-release .section.related .button-container a.button:focus-visible {
   text-decoration: none;
 }
 
-/* A press release's Media Box PDF tile is the source's bare 30% black holder: its
-   .file-caption is hidden (#274; measured on Zellmer and Superb, no glyph and no label). The
+/* A press release's Media Box PDF tile is the source's 30% black holder with its 48px PDF
+   glyph (the block's ::after; the source's a.file-type::before, U+E023 of skoda-bnr-icons,
+   measured on Zellmer and Superb); only its .file-caption label is hidden (#274). The
    holder is the 16:9 panel inside the tile's hairline, as the image tile's picture (290 x 163.1
    in a 292 x 165.1 frame @1280), so the 16:9 sizes the content box, not the bordered one, and
    the 30% black stays inside the hairline (#274 re-test: the tile was 164.3 tall) */
@@ -378,10 +379,6 @@ body.press-release .section.media-box .downloads-file[data-file-type="pdf"] {
   box-sizing: content-box;
   width: auto;
   background-clip: padding-box;
-}
-
-body.press-release .section.media-box .downloads-file[data-file-type="pdf"]::after {
-  content: none;
 }
 
 /* A sidebar heading closing its default content is the label of the block after it
