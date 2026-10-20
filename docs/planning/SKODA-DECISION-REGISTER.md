@@ -1,4 +1,4 @@
-# Decision register (M2), D1–D19 + new questions
+# Decision register (M2), D1–D20 + new questions
 
 The repo had no single decision log:
 
@@ -7,7 +7,7 @@ The repo had no single decision log:
   [`SKODA-CLIENT-REQUIREMENTS-MAPPING.md`](SKODA-CLIENT-REQUIREMENTS-MAPPING.md) §7 lists D17–D19.
 - D12–D16 were only referenced inside tickets.
 
-This register collects all of them as of **2026-10-15**, with what each one blocks and the default we propose if
+This register collects all of them as of **2026-10-15** (D20 added 2026-10-19), with what each one blocks and the default we propose if
 the client doesn't answer. It is the input for finalising the M2 requirements.
 
 Status: 🟢 resolved · 🟡 open, a default is proposed · 🔴 open and blocking.
@@ -18,7 +18,7 @@ Status: 🟢 resolved · 🟡 open, a default is proposed · 🔴 open and block
 | D2 | Media cart | 🟢 demo: device-ID, no login, client-side ZIP · 🟡 production approach | 902, 806a | Keep the client-side ZIP; add a serverless ZIP only above the item limit |
 | D3 | Banners: keep, rebuild or drop | 🔴 | 903 | Drop the ad server; use an authored featured-promo block if the client wants promos |
 | D4 | Newsletter service (ESP) | 🔴 | 904, `/en/newsletter-settings/` | Keep mailguide.cz behind a form block (double opt-in); need ESP API access |
-| D5 | Media / DAM | 🟢 AEM Assets · 🟢 renditions: **Media Bus** (2026-10-16) · 🟡 rights rule | 504a, 511, 512, 513, 520, #219 | Masters-only in Assets; every display size + the 1920 download from the Media Bus, no Dynamic Media; >10 MiB masters get one processing-profile rendition as Media Bus input; source CDN removed first (520). See [asset-ingestion review](../architecture/SKODA-ASSET-INGESTION-M2.md) |
+| D5 | Media / DAM | 🟢 AEM Assets · 🟢 renditions: **Media Bus** (2026-10-16) · 🟡 rights rule | 504a, 511, 512, 513, 520, #219 | Masters-only in Assets; every display size + the 1920 download from the Media Bus, no Dynamic Media; >10 MiB masters get one processing-profile rendition as Media Bus input; source CDN removed first (520). See [asset-ingestion review](../architecture/SKODA-ASSET-INGESTION-M2.md). Asset changes don't reach pages on their own with Media Bus copies: see **D20** |
 | D6 | Search: index-only or hosted | 🟡 index-only today | 901 | Index-only at go-live; hosted search as a post-go-live project |
 | D7 | Content cutoff / archive scope | 🔴 | 801b, 803, 847, 210, 844, 848 | Migrate everything EN from 2015 on (≈ 4,620 pages); drop empty pages with a redirect |
 | D8 | Owners for Škodapedia and press kits | 🟡 commerce closed; owners open | 206, 802 | Škodapedia stays in Storyboard (pre-baked terms) unless the client moves it out |
@@ -33,6 +33,7 @@ Status: 🟢 resolved · 🟡 open, a default is proposed · 🔴 open and block
 | D17 | QR-code restricted access | 🔴 | 906 | Out of go-live scope until the access model is defined |
 | D18 | Page-type split | 🟢 resolved 2026-09-14 | – | – |
 | D19 | AI-tool usage reporting | 🟡 compliance notice owed | – | Lars sends the notification |
+| D20 | Asset lifecycle on pages: how AEM updates, unpublish and expiry reach the images inside pages | 🔴 | 522, 507, D5 | With Media Bus delivery a page image is a copy, and its alt text is copied into the document. A new version shows only after the page is re-published; an unpublished, deleted or expired asset **keeps showing**. Proposed: keep Media Bus (D5) and add SKODA-522, which re-publishes pages using an updated asset and reports pages using unpublished, deleted or soon-expiring ones to authors, who remove them. Alternative: **Dynamic Media with OpenAPI** references (needs the DM licence and reopens D5), the only documented automatic propagation of updates, expiry and deletion. Client to answer: must expiry or rights withdrawal take an image off the site automatically, and within what time? |
 | MR-PK03 | Press-kit variant selector | 🔴 | 808a | Not built (the source has none) unless the client asks for it |
 | §11.10 | FAQ: per-kit or a shared pool | 🟡 | 807 ✅ | Per kit (as built) |
 | **Q-1** (new) | Which company and legal pages exist at go-live | 🔴 | 810, 843 | 4 company sub-types + BGC + the footer-linked legal set; drop `impressum` (empty), `server-status`, `soon-also-in-german` |
