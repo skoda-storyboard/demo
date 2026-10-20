@@ -144,7 +144,9 @@ The MR nav **Company** menu has 6 entries. Against the 15 Sep spec:
 - **Taxonomy archives (378):** 41 live, and no keep rule. Goes to 848.
 - **Custom full-width (201):** mostly event galleries; the decision is 210 / Q-5.
 - **Other languages:** 2,478 stories and press releases have no EN version, 1,056 of them in CS. That is input for D1
-  and SKODA-1001.
+  and SKODA-1001. The follow-up pass over all five non-EN locales,
+  [`SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20`](SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md), puts the non-EN
+  corpus at ≈ 12,000 docs (CS ≈ 5,100) with no import ticket.
 
 ### Confirmed
 

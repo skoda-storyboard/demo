@@ -340,6 +340,15 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-1001 | Per-locale trees + per-locale query-index | E10 | D | 5 | 2–3 | 4–6 | 401,603 | 🟡 |
 | SKODA-1002 | EW Translation rollout (DE/CS/SK/SR/SL) | E10 | D | 8 | 3–5 | content-ops | 1001 | 🟠 volume |
 | SKODA-1003 | Language-negotiated routing + placeholders | E10 | D | 3 | 1–2 | 2–3 | 303,1001 | 🟡 |
+| [SKODA-1004](tickets/SKODA-1004.md) | Non-EN corpus import: shared tooling + per-locale runs (#394) | E10 | D | 3 | 1–2 | 3–4 | 803,1001,1006,103a,843 | 🔵 M2; **Q-7**; ≈ 12,000 non-EN docs have no other import path |
+| [SKODA-1004a](tickets/SKODA-1004a.md) | CS corpus import (≈ 5,100 docs) (#395) | E10 | D | 5 | 2–3 | 5–8 | 1004,1006,843,904 | 🔵 M2 **go-live gate** (D1 partner) |
+| [SKODA-1004b](tickets/SKODA-1004b.md) | DE corpus import (Škoda Auto Deutschland) (#396) | E10 | D | 3 | 1–2 | 3–5 | 1004,Q-7,Q-8,Q-9 | 🔵 M2; timing per Q-7; DE releases per Q-8 |
+| [SKODA-1004c](tickets/SKODA-1004c.md) | SK corpus import (own Media Room) (#397) | E10 | D | 3 | 1–2 | 3–5 | 1004,Q-7,Q-11 | 🔵 M2; timing per Q-7 |
+| [SKODA-1004d](tickets/SKODA-1004d.md) | SR corpus import (Serbian Latin) (#398) | E10 | D | 3 | 1–2 | 3–4 | 1004,Q-7,Q-14 | 🔵 M2; timing per Q-7 |
+| [SKODA-1004e](tickets/SKODA-1004e.md) | SL corpus import (Media Room shell) (#399) | E10 | D | 1 | 0.5 | 1–2 | 1004,Q-7 | 🔵 M2; timing per Q-7 |
+| [SKODA-1005](tickets/SKODA-1005.md) | Translation pairs after go-live: group id, author "link a translation", reciprocity check (#400) | E10 | D | 3 | 1–2 | 3–4 | Q-10,1001,303a,1004 | 🔵 M2; approach per **Q-10** |
+| [SKODA-1006](tickets/SKODA-1006.md) | Per-locale chrome: nav, footer, Media Room nav/footer (#401) | E10 | D | 2 | 1 | 2–3 | 1001,1003,302,304 | 🔵 M2; CS for go-live |
+| [SKODA-103a](tickets/SKODA-103a.md) | Inbound trailing-slash rule (301 `/{path}/` → `/{path}`, all locales) (#402) | E01 | D | 2 | 1 | 1–2 | D14,103,1003 | 🔵 M2; **before DNS**; ≈ 15,000 slashed legacy URLs |
 
 ---
 
