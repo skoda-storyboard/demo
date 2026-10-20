@@ -4,7 +4,7 @@
 - **Type:** import
 - **Phase:** D · **Milestone:** M2; timing per **Q-7**
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3–5d *(planning estimate, not a quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#397](https://github.com/skoda-storyboard/demo/issues/397) (created 2026-10-20) (sub-issue of #394)
 - **Status (2026-10-20):** 🔵 TODO (M2), no owner. Source:
   [locale review](../../reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md) L-SK-01 … L-SK-17.
 

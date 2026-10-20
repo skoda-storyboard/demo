@@ -4,7 +4,7 @@
 - **Type:** import
 - **Phase:** D · **Milestone:** M2 (go-live, 2027-01-02). **Go-live gate:** CS is the D1 partner of EN.
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 5–8d, mostly run and QA time *(planning estimate, not a quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#395](https://github.com/skoda-storyboard/demo/issues/395) (created 2026-10-20) (sub-issue of #394)
 - **Status (2026-10-20):** 🔵 TODO (M2), no owner. Source:
   [locale review](../../reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md) L-CS-01 … L-CS-14.
 

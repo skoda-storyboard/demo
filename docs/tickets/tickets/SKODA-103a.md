@@ -4,7 +4,7 @@
 - **Type:** infrastructure (CDN config)
 - **Phase:** D · **Milestone:** M2 (go-live, 2027-01-02). Must be live **before the DNS switch**.
 - **Estimate:** 2 SP · AI-assisted 1d / manual 1–2d, excluding client CDN lead time *(planning estimate, not a quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#402](https://github.com/skoda-storyboard/demo/issues/402) (created 2026-10-20)
 - **Status (2026-10-20):** 🔵 TODO (M2), no owner. Source:
   [locale review](../../reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md) L-X-01, L-X-06.
 

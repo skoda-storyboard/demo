@@ -247,15 +247,17 @@ individually verified ("not required"), except where the verifier checked them a
 | L-SR-12 | Low | NEW | not required | 14 SR items keep the EN slug under a Serbian title, and SR-only items have no hreflang at all | SKODA-1001, SKODA-103, 8.1 | note: keep source slugs; x-default only on locale homes |
 | L-X-10 | Low | NEW | not required | Demo: no locale serves on live; preview hreflang points at live URLs that 404, and the sheet has no sl/x-default columns | SKODA-303a, SKODA-1001, COM05 | note for SKODA-1001: publish order is translations first, then the sheet; add hreflang:sl and hreflang:x-default columns when SL/home rows arrive; decide the html lang form (region or bare) |
 
-## 5. Proposed changes (for approval; nothing has been changed yet)
+## 5. Proposed changes
+
+**Applied 2026-10-20:** the new tickets (5.1) and the register rows (5.3), with GitHub issues #394–#402. **Not applied yet:** the ticket amendments (5.2) and the client questions (5.4).
 
 ### 5.1 New tickets
 | # | Ticket | Covers | Rough size |
 |---|---|---|---|
-| N1 | **Non-EN corpus import**, one sub-ticket per locale (CS first): enumerate REST + listings, run the EN importers with locale chrome, media manifest rows, hreflang columns, redirects | L-X-03, L-CS-01, L-SK-01, L-SR-01, L-SL-01, L-DE-02, L-CS-07, L-SR-13, L-SK-02 | CS 5 SP; DE/SK/SR 3 SP each; SL 1 SP (volume runs on the 803 tooling) |
-| N2 | **Inbound trailing-slash rule** on the production CDN: `/{path}/` → `/{path}` in every locale, before DNS | L-X-01, L-X-06 | 1–2 SP |
-| N3 | **Translation pairs after go-live**: where pairs live + the author "link a translation" step in DA/EW + a check that pairs stay reciprocal | L-X-02, L-X-07, L-CS-03, L-CS-09 | 3 SP, after decision Q-10 |
-| N4 | **Per-locale chrome**: `/{loc}/nav`, `/{loc}/footer`, `/{loc}/media-room/nav` and `/footer` from the source menus; a check that no chrome link goes to another locale except the switcher | L-X-05, L-CS-06, L-DE-07, L-SK-06/07, L-SR-05/06, L-SL-03/04 | 2 SP |
+| N1 | **[SKODA-1004](../tickets/tickets/SKODA-1004.md) (#394) Non-EN corpus import**, one sub-ticket per locale: 1004a CS (#395), 1004b DE (#396), 1004c SK (#397), 1004d SR (#398), 1004e SL (#399): enumerate REST + listings, run the EN importers with locale chrome, media manifest rows, hreflang columns, redirects | L-X-03, L-CS-01, L-SK-01, L-SR-01, L-SL-01, L-DE-02, L-CS-07, L-SR-13, L-SK-02 | CS 5 SP; DE/SK/SR 3 SP each; SL 1 SP (volume runs on the 803 tooling) |
+| N2 | **[SKODA-103a](../tickets/tickets/SKODA-103a.md) (#402) Inbound trailing-slash rule** on the production CDN: `/{path}/` → `/{path}` in every locale, before DNS | L-X-01, L-X-06 | 1–2 SP |
+| N3 | **[SKODA-1005](../tickets/tickets/SKODA-1005.md) (#400) Translation pairs after go-live**: where pairs live + the author "link a translation" step in DA/EW + a check that pairs stay reciprocal | L-X-02, L-X-07, L-CS-03, L-CS-09 | 3 SP, after decision Q-10 |
+| N4 | **[SKODA-1006](../tickets/tickets/SKODA-1006.md) (#401) Per-locale chrome**: `/{loc}/nav`, `/{loc}/footer`, `/{loc}/media-room/nav` and `/footer` from the source menus; a check that no chrome link goes to another locale except the switcher | L-X-05, L-CS-06, L-DE-07, L-SK-06/07, L-SR-05/06, L-SL-03/04 | 2 SP |
 
 ### 5.2 Ticket amendments
 | Ticket | Amendment | From |
@@ -273,7 +275,7 @@ individually verified ("not required"), except where the verifier checked them a
 | SKODA-804 | Per-locale analytics values (language code, importerBid, localised page types) | L-SR-10 |
 | Coverage matrix §1/§4 | Add `press_kit-sitemap4.xml` (+158 EN); per-locale rows for press kits, Škodapedia, models, series; recount "no EN" against published targets | L-SK-02, L-X-07, verifier note |
 
-### 5.3 Decision register (new rows)
+### 5.3 Decision register (new rows, added to the [register](../planning/SKODA-DECISION-REGISTER.md); Q-1 and Q-6 amended)
 | # | Question | Proposed default | From |
 |---|---|---|---|
 | Q-7 | What happens to each locale's WordPress tree at the 02 Jan cutover if it doesn't go live with EN + CS? | Freeze + import DE/SK/SR/SL before DNS (import is cheap on the 803 tooling); open for authoring per local office | L-X-03, L-DE-02 |

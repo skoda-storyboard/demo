@@ -4,7 +4,7 @@
 - **Type:** import
 - **Phase:** D · **Milestone:** M2; timing per **Q-7** (freeze and import before DNS, or keep WordPress behind a path route)
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3–5d *(planning estimate, not a quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#396](https://github.com/skoda-storyboard/demo/issues/396) (created 2026-10-20) (sub-issue of #394)
 - **Status (2026-10-20):** 🔵 TODO (M2), no owner, blocked on Q-7 and Q-8. Source:
   [locale review](../../reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md) L-DE-01 … L-DE-18.
 
