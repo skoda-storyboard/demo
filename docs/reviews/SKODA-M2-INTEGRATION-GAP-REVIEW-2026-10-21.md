@@ -46,11 +46,14 @@ here.
 
 ## 1. Summary
 
-**113 findings: 1 Critical, 29 High, 58 Medium, 25 Low.**
+**107 findings: 1 Critical, 23 High, 58 Medium, 25 Low.**
 - **Verification:**
-  - the refuters checked 36 High, Critical and CONTRADICTED findings: 32 confirmed, 3 plausible, 1 rejected;
-  - 5 were merged into others;
-  - the 44 critic and top-up findings were not re-verified, apart from the hand spot-check of G-KO-02 (see §6).
+  - the refuters checked 36 High, Critical and CONTRADICTED findings from the areas: 32 confirmed, 3 plausible, 1
+    rejected;
+  - a second round checked the 12 High findings from the critics and top-ups: all 12 confirmed, 2 downgraded to
+    Medium;
+  - 11 findings were merged into others;
+  - the 32 Medium and Low critic and top-up findings were not re-verified (see §6).
 - **80 third-party touchpoints** are listed in §3.
 - **Coverage:** 99 of 117 inventory items are covered. The 18 left are social links, one-off body links, Google CSP
   hosts covered through the GTM findings, and the known charging-calculator widget.
@@ -120,7 +123,8 @@ here.
    - takedown and rename leave copies behind (G-KJ-07, G-T1-06);
    - DA templates are EN-only and carry source-CDN images (G-T1-08, G-T2-03).
 7. **Data scraped from the source freezes at decommission.** Facet vocabularies (no 2027 year), category parents and
-   the link allow-list can only be regenerated from WordPress (G-T2-01, G-T2-02, G-KT-03).
+   other generator outputs can only be regenerated from WordPress (G-T2-01, G-T2-02, G-KT-03). The link allow-list
+   is the exception: it reads the EDS live index and retires at the freeze, and its runtime side is in SKODA-710.
 8. **SEO and security drop at the switch:**
    - no production sitemap or robots file (G-F-02);
    - no JSON-LD (G-F-03);
@@ -152,13 +156,13 @@ findings and, in brackets, the highest severity (C, H, M or L).
 | F | 5 (C) | 3 (H) | – | – | 2 (H) | 10 |
 | G | 2 (H) | 7 (M) | – | – | 3 (H) | 12 |
 | H | 1 (M) | 2 (M) | 2 (M) | 1 (M) | 5 (H) | 11 |
-| critics | 6 (H) | 13 (H) | 2 (H) | 1 (M) | 4 (H) | 26 |
-| top-up | 3 (H) | 10 (H) | 1 (H) | – | 4 (M) | 18 |
+| critics | 4 (H) | 12 (H) | 2 (H) | 1 (M) | 4 (H) | 23 |
+| top-up | 2 (M) | 9 (H) | – | – | 4 (M) | 15 |
 
 | Severity | Kept | CONFIRMED | Go-live blockers |
 |---|--:|--:|--:|
 | Critical | 1 | 1 | 1 |
-| High | 29 | 16 | 9 |
+| High | 23 | 22 | 8 |
 | Medium | 58 | 10 | 1 |
 | Low | 25 | 2 | 0 |
 
@@ -267,8 +271,8 @@ One row per system the source depends on or that depends on the source, merged f
 
 ## 5. All findings
 
-Sorted by severity. "Verdict": CONFIRMED or PLAUSIBLE come from the refuters or the browser follow-up; "UNVERIFIED"
-marks High findings from the critics and top-ups (see §6); "not required" marks Medium and Low findings.
+Sorted by severity. "Verdict": CONFIRMED or PLAUSIBLE come from the refuters (both rounds) or the browser follow-up;
+"not required" marks Medium and Low findings that no refuter checked.
 
 | Id | Sev | Class | Verdict | Blocker | Title | Tickets | Proposed action |
 |---|---|---|---|---|---|---|---|
@@ -290,18 +294,12 @@ marks High findings from the critics and top-ups (see §6); "not required" marks
 | G-G-03 | High | NO-OWNER | CONFIRMED |  | WordPress decommission has no ticket: archive copy, database with PII (subscribers, cart history, authors), plugin licences and hosting end are nobody's scope |  | new ticket (M2 + post-go-live): WordPress decommission and archive: read-only snapshot (static crawl or DB dump) with retention period and owner, export of subscriber/consent data to the ESP, deletion of DBs/backups on all 3 environments with a dated record, plugin licence and hosting termination; client question: 'Must a read-only copy of the WordPress site be kept after 02 Jan 2027, for how long, and who signs off deleting its database?' |
 | G-G-07 | High | NO-OWNER | CONFIRMED |  | The post-go-live operating model has no ticket: support/hypercare, author training, technical ownership hand-over (GitHub org, Code Sync, config service, DA org) and a licence register | D15, SKODA-101a, SKODA-511b | new ticket (E07, M2): operating model and hand-over: support tiers + hypercare window with named contacts, author training per group (HQ, Media Room agency, local offices) with an M2 author-guide update, transfer of GitHub org/repo + Code Sync + config-service admin + DA org, a licence and cost register with owners; client question: 'Who operates Storyboard after 02 Jan 2027 (code, content, accounts), and for how long do you want Adobe hypercare?' |
 | G-H-05 | High | NO-OWNER | CONFIRMED |  | Decision register has no client owner, due date or 'asked on' for any of its 18 red and 16 amber decisions, 73 days before go-live |  | new decision: add 'client owner', 'asked on', 'answer due' and 'fallback applies on' columns; agree with the client that each default applies automatically if unanswered by a date (e.g. 2026-11-13 for the volume-setting D7/Q-6/Q-7); close D11 |
-| G-KI-01 | High | CONTRADICTED | UNVERIFIED |  | The 'ys-embed-share' widget is self-hosted interactive HTML (360 tours, before/after sliders, animations), not share chrome; the story importer drops it, and its files sit on the CDN and S3 bucket that 520 retires | SKODA-801, SKODA-204, SKODA-204a, SKODA-520, SKODA-504a, SKODA-803 | Amend SKODA-801 and the story importer: ys-embed-share becomes an Embed of the iframe URL (keep the aspect ratio), plus a warning log line for every dropped iframe. New decision: where the ~22 HTML packages live after 520. Options: (a) copy them into the code repo under /iframes/ (served by the code bus, same origin, no consent), (b) a static bucket Škoda keeps, or (c) replace them with a video or still image and drop the interactivity. Add the packages and the S3 /Assets/ prefix to the 520/504a inventory. Amend SKODA-204 with a first-party generic-iframe branch. Re-check the 801 flatten review's 'correct' verdict. |
-| G-KI-04 | High | NEW | UNVERIFIED |  | 11 legacy and alias hostnames (old newsroom and Media Room domains, .cz, storyboard.skoda-auto.com) redirect from the WordPress nginx; no doc lists them, and they die with the WordPress hosting | SKODA-103a, SKODA-103, D14 | Amend the production-launch ticket (G-F-01/G-G-01): an alias-domain inventory with an owner per zone, then a per-host decision (301 at the production CDN with path preserved and mapped per locale, or a registrar/Škoda IT redirect, or retire). Add certificates for the kept aliases, and add them to the redirect test harness (G-F-06) and the WordPress decommission order (aliases move before the server goes). Client question to Škoda IT: 'Which of these 11 hostnames must keep working after 02 Jan 2027, and who changes media.skoda-auto.com and storyboard.skoda-auto.com in the skoda-auto.com zone?' |
-| G-KJ-01 | High | UNDER-SCOPED | UNVERIFIED |  | Timed publication is the normal HQ workflow, but no ticket builds or configures scheduled publish on EDS | SKODA-811, SKODA-602, SKODA-809, SKODA-405, SKODA-511a, D9 | New ticket (E08, M2): scheduled publish. Configure the crontab or snapshot schedule through the config service. Give authors a DA plugin that writes schedule rows (as a 'process' sheet), not raw crontab edits. Handle CET/CEST to UTC and the 5-minute granularity. Restrict who may schedule (809). Order the follow-on tasks: publish-index, CDN purge via http, RSS and media-feed refresh, app notification. Amend 811 to depend on it. Add 6.3 to G-H-01's list of requirement IDs with only closed tickets. |
-| G-KJ-02 | High | NEW | UNVERIFIED | yes | After go-live, authors can't add downloadable originals (PDF, MP4, image originals, kit ZIPs) without a developer | SKODA-503, SKODA-505, SKODA-806a, SKODA-517, SKODA-518, SKODA-519, SKODA-842, D5 | Add D-4 to the decision register, with option (c) DAM-folder-driven as the default. Then a new ticket (E05/E08, M2): author asset flow. The DA Assets picker (or a plugin) inserts AEM Assets delivery URLs for originals, PDFs and MP4s into Downloads rows, or the Media Box is generated from an AEM Assets folder. New kits get their ZIP through a DAM upload. Acceptance: an HQ author and an SK author, both without repo access, publish a release with a Media Box, a PDF and an MP4, and the cart adds them. |
-| G-KJ-03 | High | UNDER-SCOPED | UNVERIFIED |  | Embargoed launch assets leak: the public media feed lists every published AEM asset, and preview images live immutably on the public host | SKODA-811, SKODA-511a, SKODA-517, SKODA-522, D9, D20 | Amend 811 and 511a/517: add an embargo marker (an asset 'embargo-until' field or a restricted folder) that the feed sync skips until the date. The release preview uses author-side or signed renditions, not published delivery URLs. Document that preview images on the Media Bus are public by URL. Client question to the DAM team: 'How do launch assets stay hidden in AEM Assets until the release time, and who flips them?' |
-| G-KO-01 | High | UNDER-SCOPED | UNVERIFIED |  | Press-release PDFs, including the copies we move into AEM Assets, hard-link cdn.skoda-storyboard.com photos/MP4s and slashed Storyboard pages; 520's zero-reference gate can't see them, and 'drop the source CDN ASAP' breaks them | SKODA-520, SKODA-504a, SKODA-103a | amend SKODA-520: (1) the census also extracts /URI links from every document row (a script like KO-scratch/pdfurls.py over the manifest), (2) change the decision from hard sunset to keeping cdn.skoda-storyboard.com as a redirect-only host (cdn path to DAM delivery URL via the manifest; misses go to a search 404) for an agreed period. This is the new-decision half of G-B-08; merge the two. Client question to Communications: 'Will you update the Master Press Release template at go-live (slashless URLs, DAM photo links, no file:// links)?' |
-| G-KT-01 | High | NEW | UNVERIFIED |  | Go-live lands on Saturday 2 Jan 2027, straight after the Czech Christmas/New Year shutdown; no plan sets the calendar for the last three weeks | SKODA-803, SKODA-1004, D7, AR-06 | new decision 'cutover calendar' (with the G-G-02 runbook): the content-freeze date, the date of Škoda IT's DNS change request against their year-end change freeze, a staffed switch day (e.g. Tue 5 Jan, or before the holidays with WordPress read-only), and a named hypercare rota for 4-15 Jan. Client question: 'Does Škoda IT accept a DNS change between 21 Dec and 4 Jan, and who is on call?' |
-| G-KT-02 | High | NO-OWNER | UNVERIFIED | yes | links.js still sends LIVE_ONLY paths to 'the live site', which is EDS itself from the DNS switch on; AR-19 maps only to closed M1 tickets | SKODA-605, SKODA-609, SKODA-520, SKODA-103a | new M2 ticket (or add it to the launch ticket G-F-01): a 'cutover link release' merged at the DNS switch. It shrinks LIVE_ONLY to what is really absent, drops the new-tab rule for the own host, and makes own-host links site-relative (AR-19). Add a post-import relink pass over DA, plus a crawl that shows 0 internal 404s before go/no-go. |
-| G-T1-01 | High | UNDER-SCOPED | UNVERIFIED | yes | After go-live an author can't build a Media Box with an MP4, a kit ZIP or a cart-able download without a developer; every available path fails a different gate | SKODA-101a, SKODA-503, SKODA-505, SKODA-806a, SKODA-902, SKODA-511 | new ticket 'Day-2 asset authoring' (E05/E08): an AEM Assets editor group with upload + publish rights per tree (amend 101a I4), a folder and naming convention (/content/dam/storyboard/{loc}/{type}/{slug}/), the picker settings (link mode or a DA plugin) that write a Downloads row with Original + 1920px DAM links, the 1920px rendition in the processing profile (902), and D-4 decided (Media Box from a DAM folder vs authored rows). Author guide: replace 'ask the project team'. |
-| G-T1-02 | High | CONTRADICTED | UNVERIFIED |  | Embargo: the DA Assets picker only inserts published assets, and the AEM publish tier is anonymous, so authoring an embargoed launch page publishes its assets before release | SKODA-811, SKODA-511, SKODA-522, D9 | amend SKODA-811: add an asset half — (a) embargoed assets stay unpublished in AEM and the launch page uses author-side previews with DM delivery switched on at release, or (b) AEM scheduled activation of a launch folder set to the same minute as the EDS schedule, with the media feed sync (511a) skipping an 'embargo' metadata flag; plus a test that a pre-release asset URL returns 404 anonymously. Re-open D9 (green today). |
-| G-T1-03 | High | NEW | UNVERIFIED |  | The native scheduling, launch and review tools (Schedule Publish, Snapshots, Request Publish) are not recorded anywhere, and each needs an enablement step no ticket owns | SKODA-811, SKODA-809, SKODA-602 | new ticket 'Editorial workflow enablement' (E08): enable Schedule Publish (prepare tab + registration), decide between per-page schedules and Snapshots for launches and ask Adobe for snapshot scheduling, onboard Request Publish (client question: 'Which email service and sender may Adobe's worker use for approval mails, and which agency domains are allowed?'), and add an author-guide page. Map 6.3 to it. |
-| G-T1-04 | High | UNDER-SCOPED | UNVERIFIED |  | Publish rights in Edge Delivery can't be limited by path: any CS publisher or agency publisher can publish or unpublish every EN, Media Room and Storyboard page | SKODA-809, SKODA-101a, SKODA-812, D15 | amend SKODA-809 and 101a T2: state the limit, and decide (D15) between (a) few HQ/MR publishers plus Request Publish approvers per /{loc}/* and /en/press-* pattern, or (b) site-wide publish for local offices with 812 audit as the control. Add an AC: a CS author can't publish /en/x without approval. |
+| G-KI-01 | High | CONTRADICTED | CONFIRMED |  | The 'ys-embed-share' widget is self-hosted interactive HTML (360 tours, before/after sliders, animations), not share chrome; the story importer drops it, and its files sit on the CDN and S3 bucket that 520 retires | SKODA-801, SKODA-204, SKODA-204a, SKODA-520, SKODA-504a, SKODA-803 | Amend SKODA-801 and the story importer: ys-embed-share becomes an Embed of the iframe URL (keep the aspect ratio), plus a warning log line for every dropped iframe. New decision: where the ~22 HTML packages live after 520. Options: (a) copy them into the code repo under /iframes/ (served by the code bus, same origin, no consent), (b) a static bucket Škoda keeps, or (c) replace them with a video or still image and drop the interactivity. Add the packages and the S3 /Assets/ prefix to the 520/504a inventory. Amend SKODA-204 with a first-party generic-iframe branch. Re-check the 801 flatten review's 'correct' verdict. |
+| G-KJ-01 | High | UNDER-SCOPED | CONFIRMED |  | Timed publication is the normal HQ workflow, but no ticket builds or configures scheduled publish on EDS | SKODA-811, SKODA-602, SKODA-809, SKODA-405, SKODA-511a, D9 | New ticket (E08, M2): scheduled publish. Configure the crontab or snapshot schedule through the config service. Give authors a DA plugin that writes schedule rows (as a 'process' sheet), not raw crontab edits. Handle CET/CEST to UTC and the 5-minute granularity. Restrict who may schedule (809). Order the follow-on tasks: publish-index, CDN purge via http, RSS and media-feed refresh, app notification. Amend 811 to depend on it. Add 6.3 to G-H-01's list of requirement IDs with only closed tickets. |
+| G-KJ-02 | High | NEW | CONFIRMED | yes | After go-live, authors can't add downloadable originals (PDF, MP4, image originals, kit ZIPs) without a developer | SKODA-503, SKODA-505, SKODA-806a, SKODA-517, SKODA-518, SKODA-519, SKODA-842, D5 | Add D-4 to the decision register, with option (c) DAM-folder-driven as the default. Then a new ticket (E05/E08, M2): author asset flow. The DA Assets picker (or a plugin) inserts AEM Assets delivery URLs for originals, PDFs and MP4s into Downloads rows, or the Media Box is generated from an AEM Assets folder. New kits get their ZIP through a DAM upload. Acceptance: an HQ author and an SK author, both without repo access, publish a release with a Media Box, a PDF and an MP4, and the cart adds them. |
+| G-KJ-03 | High | UNDER-SCOPED | CONFIRMED |  | Embargoed launch assets leak: the public media feed lists every published AEM asset, and preview images live immutably on the public host | SKODA-811, SKODA-511a, SKODA-517, SKODA-522, D9, D20 | Amend 811 and 511a/517: add an embargo marker (an asset 'embargo-until' field or a restricted folder) that the feed sync skips until the date. The release preview uses author-side or signed renditions, not published delivery URLs. Document that preview images on the Media Bus are public by URL. Client question to the DAM team: 'How do launch assets stay hidden in AEM Assets until the release time, and who flips them?' |
+| G-KT-02 | High | NO-OWNER | CONFIRMED | yes | links.js still sends LIVE_ONLY paths to 'the live site', which is EDS itself from the DNS switch on; AR-19 maps only to closed M1 tickets | SKODA-605, SKODA-609, SKODA-520, SKODA-103a | new M2 ticket (or add it to the launch ticket G-F-01): a 'cutover link release' merged at the DNS switch. It shrinks LIVE_ONLY to what is really absent, drops the new-tab rule for the own host, and makes own-host links site-relative (AR-19). Add a post-import relink pass over DA, plus a crawl that shows 0 internal 404s before go/no-go. |
+| G-T1-04 | High | UNDER-SCOPED | CONFIRMED |  | Publish rights in Edge Delivery can't be limited by path: any CS publisher or agency publisher can publish or unpublish every EN, Media Room and Storyboard page | SKODA-809, SKODA-101a, SKODA-812, D15 | amend SKODA-809 and 101a T2: state the limit, and decide (D15) between (a) few HQ/MR publishers plus Request Publish approvers per /{loc}/* and /en/press-* pattern, or (b) site-wide publish for local offices with 812 audit as the control. Add an AC: a CS author can't publish /en/x without approval. |
 | G-A-03 | Medium (was High) | CONTRADICTED | CONFIRMED |  | D10's proposal 'GA4 + FB pixel via GTM, no bespoke dataLayer' won't work with the live container: tags route on Škoda dataLayer keys | SKODA-804, SKODA-905, D10 | amend D10: the proposal must keep the skoda-analytics page.* + importer.BID + matrixId dataLayer contract (905's schema), because the existing container keys on it; or Škoda rebuilds the container. Fix 804's server-side endpoint to sgtm-hq-prod-...run.app. Client question: 'Please export GTM-M5GMBWF (or give us read access) and confirm the GA4 property per locale.' |
 | G-A-04 | Medium | ESTIMATE-RISK | not required |  | First-visit redirect bounce and 2 render-blocking head scripts from sDrive: a CWV cost no performance ticket accounts for | SKODA-804, SKODA-701, SKODA-707 | amend SKODA-804/707: measure Lighthouse/CWV with the sDrive scripts in head.html; ask Škoda whether endpoint.js can be async/deferred and whether the sync bounce can be skipped for Storyboard |
 | G-A-05 | Medium | NEW | not required |  | Slovenian locale has no consent manager at all (legal entity 298 excluded from the Škoda CCM) | SKODA-804, SKODA-1004 | client question: 'Slovenia (LEID 298) is excluded from the Škoda cookie manager and shows no consent banner on Storyboard. Which CMP should /sl/ use on the new site, and who owns it?' |
@@ -434,8 +432,24 @@ scope:
 | Outside | Distributed documents (PDFs, kits, technical data) | **Not run**: partly covered by G-KO-01/02 |
 | Time | Year-one run calendar | **Not run**: folded into N4 |
 
-**Not verified:** the 44 critic and top-up findings were not passed through a refuter. One was spot-checked by hand
-(G-KO-02, which holds). Their High findings are marked UNVERIFIED in §5 and should be checked before ticketing.
+**Second verification round (before ticketing).** Three refuters re-checked the 12 High findings from the critics and
+top-ups: **all 12 confirmed**.
+- **Merged:**
+  - G-KI-04 → G-F-01 (alias domains in the launch scope);
+  - G-KT-01 → G-G-02 (calendar as a runbook criterion);
+  - G-KO-01 → G-B-08 (PDF links are inbound links);
+  - G-T1-01 → G-KJ-02;
+  - G-T1-02 → G-KJ-03;
+  - G-T1-03 → G-KJ-01.
+- **Downgraded to Medium:** G-KO-01 and G-T1-03.
+- **Refined:**
+  - G-KJ-01: the native Experience Workspace Schedule Publish plugin replaces a custom scheduler (≈ 1–2 SP).
+  - G-KJ-02: not a go-live blocker. Press-office authors can paste DAM publish URLs.
+  - G-KT-02 is worse than stated: on the production host, `links.js` opens every internal link in a new tab with
+    `noreferrer`.
+  
+The 32 Medium and Low critic and top-up findings were not re-verified. One was spot-checked by hand (G-KO-02, which
+holds).
 
 **Hand spot-checks:**
 - **G-B-01:** the app exists, published by ŠKODA AUTO a.s., v7.1.37. The docs mention only its badges and promo page.
@@ -463,7 +477,7 @@ All three hold.
 | N10 | **Media beyond images:** the MP4 library (0.4–0.6 TB), annual reports and release PDFs, non-EN CDN references, captions and transcripts, Vimeo allow-list owner | G-D-01, G-KO-01, G-KO-02, G-B-07, G-D-02, G-KO-04 | 5 SP |
 | N11 | **In-body widget census and handling:** Škodapedia glossary spans, `ys-embed-share` HTML, Spotify/Instagram/LinkedIn, `skoda_iframe`, quizzes; plus a "dropped" count in the import gate | G-C-01, G-KI-01, G-KI-02, G-KI-03, G-KI-05 | 5 SP |
 | N12 | **Day-2 authoring:** Schedule Publish, Snapshots and Request Publish enablement, downloadable originals, the embargo asset gate, path-limited publishing, shared root docs, takedown and rename runbooks, new press kits, locale-aware DA templates | G-KJ-01 … 03, G-KJ-07, G-T1-01 … 08, G-KT-08, G-KT-09, G-T2-03 | 8 SP |
-| N13 | **Source-generated data after the freeze:** move facet vocabularies, category parents and the allow-list to DA sheets or the index; a register of generators with owners | G-T2-01, G-T2-02, G-T2-04, G-KT-03 | 3 SP |
+| N13 | **Source-generated data after the freeze:** move facet vocabularies and category parents to DA sheets or the index; a register of all generators with owners | G-T2-01, G-T2-02, G-T2-04, G-KT-03 | 3 SP |
 
 ### 7.2 Ticket amendments
 | Ticket | Amendment | From |
