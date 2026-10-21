@@ -7,7 +7,7 @@
 - **Source:** supplemental user observation `WIRELESS-04`, measured 2026-10-07; not a #266 workbook record.
 - **Implementation reference:** closed #123 / SKODA-820, reference only.
 - **GitHub issue:** [#293](https://github.com/skoda-storyboard/demo/issues/293)
-- **Status (2026-10-19):** 🟡 Verified fixed on `main`, ready for QA. No code change: #296 (`c770d4d`, merged
+- **Status (2026-10-21):** 🟡 Related gap verified fixed on `main` (#388, #296). Page-wide charging-story parity built on branch `skoda-227-charging-parity`; see the last section. Earlier: no code change for the gap: #296 (`c770d4d`, merged
   2026-10-13) gave the related band's heading block the 20px bottom margin. See "Verification (2026-10-19)".
 
 ## Summary and M2 boundary
@@ -92,3 +92,33 @@ The aside's "Explore more" cards keep their size, position and 32px pitch (no ch
 older ones still have `h2`: **46 stories and 23 press releases** on preview (e.g. the charging story, the 936 km
 release). Same look (both levels are styled), so only the heading outline differs. The fix is a re-import of
 those pages, best after #380 merges (the 46 stories would also take its importer changes).
+
+## Charging story, page-wide parity (2026-10-21, after #380 merged)
+The PO asked for the whole charging story to match origin, not only the related band. Measured at 375 / 768 /
+992 / 1080 / 1280 against origin, on the new `main` code:
+
+| Area | Before | After |
+|---|---|---|
+| "Five questions for Michal Zajíc" dark panel | outer section padding only; h2 had a top margin; portrait column too wide | origin's per-cell padding / margin as Section Metadata (`highlight-cell-*`); a cell's first heading has no top margin. Panel box, padding, h2 type and place, column widths, portrait size, bottom inset: equal at 375 / 768 / 1280 |
+| Panel after it | 40px lower than origin | pulled up 40px (`--highlight-pull-up`), as origin's next row: equal |
+| Gaps above / below headings, 16 paired body blocks | 8 to 27px extra over a cell's first heading | equal |
+| Media Box | no dates | the date above each title (11/11 wt600 rgb 196,198,199; 17px under the image, 14px over the title), 7 of 7 cards, as origin |
+| Body images | some imported as thumbnails (e.g. 768px) | the largest source file (≥ 1600px kept; slider slides always upgraded) |
+| Horizontal scroll | page scrolled sideways | none (#380's `overflow-x: clip`) |
+
+The hero is equal too: origin shows a 3:2 picture centred in a 16:9 frame (970 × 546 at 1280, clipped), ours
+the same 16:9 centred crop at the same 1.02 scale.
+
+**Re-import (131 stories, `main`'s importer vs this one):** 4 identical; 127 differ only by the intended changes
+(127 Media Box dates, 65 of them also full-size images, 1 the panel's cell rows). Media manifest unchanged.
+Pushed to preview (not published): 125. Left: `rs-four-ways-which-one-will-you-choose` (edited in DA since the
+last push, not overwritten) and `enyaq-and-elroq-…-gaming-consoles…` (its video isn't on AEM Assets yet).
+
+**Band titles h2 → h3 (as origin):** the re-import also writes origin's h3 for the Related band (and the Media Box
+heading) on the older pages: stories 44 → 2 with h2, press releases 23 → 1 (22 re-imported and pushed with the
+unchanged press-release importer; text, images and blocks otherwise as before, the related releases as origin
+lists them today). The 3 left are the DA-edited and held pages above, and
+`30-years-since-the-foundation-stone-was-laid-…` (edited in DA).
+
+**Pre-existing, not fixed here:** slider caption line height 24 vs origin 20 (museum, King of space, Clever
+luggage); the 40px intro line of "King of space" renders at 16px.
