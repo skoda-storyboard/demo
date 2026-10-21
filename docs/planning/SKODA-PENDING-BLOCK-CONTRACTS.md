@@ -280,7 +280,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **`Timeline (black)`:** a widget whose year pills are `#000000` (125 years of Škoda: iconic cars); the default is the green `#9c0`.
 - **`Timeline (large)`:** a widget whose titles are authored at 18pt or larger (the dominant inline title size; 4 of the 9 EN stories at 18pt, 2 with a 24pt model line): titles 24px on a 36px line instead of 18.67 / 28. The variants combine (`Timeline (black, large)`).
 - **Runtime:** an `<ol>` of entries (year pill, `h3` title, image, description; the line and dots are CSS). It is a left rail up to 1079px and two-sided from 1080 (the source's switch), and it keeps the rail inside a column narrower than 600px.
-- **Defensive:** the image cell is found by content; a row without a year (its first text cell longer than a label) renders without a pill; an empty row is dropped.
+- **Defensive:** a full four-cell row keeps its columns, so a blank year or image cell is a blank value and the description stays (PR #373 review). A shorter row is read by content: the image cell by its picture, and a row without a year (its first text cell longer than a label) renders without a pill. An empty row is dropped. Every link opens in a new tab with `noopener`, as the source widget's (DA keeps only the href).
 - **Importer:** `parsers/story-flatten.js` `milestonesCells`. A widget without list entries falls back to its images and text as default content, never dropped.
 
 ### `footnotes`

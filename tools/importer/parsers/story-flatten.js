@@ -327,6 +327,8 @@ function milestoneRich(source, document) {
     const kids = [...node.childNodes].flatMap(clean);
     if (!MILESTONE_KEEP.has(node.tagName)) return kids;
     const el = document.createElement(node.tagName.toLowerCase());
+    // links keep only their href: DA drops target/rel, so the Timeline block opens every
+    // milestone link in a new tab at runtime, as the source widget's target="_blank"
     if (node.tagName === 'A' && node.getAttribute('href')) el.setAttribute('href', node.getAttribute('href'));
     // a line break closing a bold/italic run (the title's `<strong>VOITURETTE A<br></strong>`)
     // moves after it: the conversion drops a trailing <br> inside inline formatting

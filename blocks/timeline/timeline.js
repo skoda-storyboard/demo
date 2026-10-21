@@ -2,14 +2,27 @@
 // whose author left the year out.
 const LABEL = /^\S{1,12}$/;
 
+// year | title | image | description: the importer always writes the four columns
+const COLUMNS = 4;
+
 /**
- * The parts of one authored row: year | title | image | description. The image cell is
- * found by content, the text cells by order, so a row may omit any cell.
+ * The parts of one authored row: year | title | image | description. In a full four-cell
+ * row the columns hold their places, so a blank year or image cell is a blank value (the
+ * image may sit in any cell, the text cells keep their order). A shorter row, whose author
+ * removed cells, is read by content: the image cell by its picture, the text cells by order.
  * @param {Element} row
  */
 function partsOf(row) {
   const cells = [...row.children];
   const media = cells.find((cell) => cell.querySelector('picture, img')) || null;
+  if (cells.length >= COLUMNS) {
+    const [year, title, description] = media
+      ? cells.filter((cell) => cell !== media)
+      : [cells[0], cells[1], cells[3]];
+    return {
+      year, title, media, description,
+    };
+  }
   let [year, title, description] = cells.filter((cell) => cell !== media);
   if (year && !LABEL.test(year.textContent.trim())) {
     [title, description] = [year, title];
@@ -105,5 +118,12 @@ export default function decorate(block) {
   const list = document.createElement('ol');
   list.className = 'timeline-list';
   [...block.children].map(entryOf).filter(Boolean).forEach((li) => list.append(li));
+  // the source widget opens every milestone link in a new tab (DA keeps only the href)
+  list.querySelectorAll('a[href]').forEach((a) => {
+    a.target = '_blank';
+    const rel = new Set((a.getAttribute('rel') || '').split(/\s+/).filter(Boolean));
+    rel.add('noopener');
+    a.setAttribute('rel', [...rel].join(' '));
+  });
   block.replaceChildren(list);
 }

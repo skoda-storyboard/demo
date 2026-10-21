@@ -112,10 +112,14 @@ Between blocks and the dot's border (PR #373 review), source and EDS at 1440 / 1
 |---|---|---|---|
 | 1905 | Laurin & Klement / **VOITURETTE A** / (vehicle on display: 1905) | (image) | The first car produced by … |
 
-- Any cell may be omitted.
-  - **Image:** found by content.
+- **A full four-cell row keeps its columns:** a blank year cell means no pill, a blank image cell no image, and the
+  title and description stay in their columns (the importer always writes four cells). The image may sit in any cell.
+- **A shorter row** (an author removed cells) is read by content.
+  - **Image:** found by its picture.
   - **No year:** a first text cell longer than a 12-character label is the title, and the entry has no pill.
-  - **Empty rows:** dropped.
+- **Empty rows:** dropped.
+- **Links:** every timeline link opens in a new tab (`target="_blank"`, `rel` + `noopener`), as the source widget's.
+  DA keeps only the `href`, so the block sets it.
 
 ## 6. Accessibility
 - **Order:** an ordered list in source order.
@@ -139,4 +143,5 @@ None of these is accepted until a human reviewer approves it (AGENTS.md code rev
 5. **Titles are `h3`, not `p`:** this adds 11 (steering wheel) and 16 (iconic cars) headings to the page outline
    (§6). The title lines keep a space before each `<br>`, so the accessible name reads "Laurin & Klement VOITURETTE
    A (vehicle on display: 1905)" instead of running the lines together.
-6. **Link `rel`:** `noopener noreferrer` (the site-wide `scripts/links.js`) vs the origin's `noopener`.
+6. **Link `rel`:** every timeline link opens in a new tab, as origin's. Its `rel` is `noopener`, as origin's, except
+   links to the live host, which `scripts/links.js` gives `noopener noreferrer`.

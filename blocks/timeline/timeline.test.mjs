@@ -104,3 +104,37 @@ test('the title lines keep a space before each break, for the accessible name', 
   assert.equal(title.querySelectorAll('br').length, 2, 'the breaks stay');
   assert.equal(title.querySelector('strong').textContent, 'VOITURETTE A', 'the model stays bold');
 });
+
+test('a full four-cell row keeps its columns: a blank image or year cell is a blank value', { skip: !JSDOM }, () => {
+  const block = blockFrom(`
+    <div><div>1905</div><div><p><strong>VOITURETTE A</strong></p></div><div></div><div><p>The first car, with a <a href="https://goo.gl/G1gxYm">link</a>.</p></div></div>
+    <div><div> </div><div><p><strong>ŠKODA 110</strong></p></div><div>${picture('b.jpg')}</div><div><p>A third pedal, <a href="/en/x">more</a>.</p></div></div>
+    <div><div></div><div><p>Only a title</p></div><div></div><div></div></div>`);
+  decorate(block);
+  const [blankImage, blankYear, titleOnly] = block.querySelectorAll('.timeline-entry');
+  assert.equal(blankImage.querySelector('.timeline-media'), null, 'no image, no media');
+  assert.match(blankImage.querySelector('.timeline-text').textContent, /The first car/, 'the description kept');
+  assert.equal(blankImage.querySelector('.timeline-text a').getAttribute('href'), 'https://goo.gl/G1gxYm');
+  assert.equal(blankImage.querySelector('.timeline-title').textContent.trim(), 'VOITURETTE A');
+  assert.equal(blankYear.querySelector('.timeline-year'), null, 'a blank year, no pill');
+  assert.equal(blankYear.querySelector('.timeline-title').textContent.trim(), 'ŠKODA 110', 'the title stays the title');
+  assert.ok(blankYear.querySelector('.timeline-media img'));
+  assert.match(blankYear.querySelector('.timeline-text').textContent, /A third pedal/, 'the description kept');
+  assert.equal(titleOnly.querySelector('.timeline-text'), null);
+  assert.equal(titleOnly.querySelector('.timeline-title').textContent, 'Only a title');
+});
+
+test('every timeline link opens in a new tab, as the source widget', { skip: !JSDOM }, () => {
+  const block = blockFrom(row(
+    '1905',
+    '<p>Laurin &amp; Klement</p>',
+    picture('a.jpg'),
+    '<p><a href="https://goo.gl/G1gxYm">FAVORIT</a> and <a href="/en/x" rel="noreferrer">more</a></p>',
+  ));
+  decorate(block);
+  const links = [...block.querySelectorAll('.timeline-text a')];
+  assert.equal(links.length, 2);
+  links.forEach((a) => assert.equal(a.getAttribute('target'), '_blank'));
+  assert.equal(links[0].getAttribute('rel'), 'noopener', 'a non-source-host link');
+  assert.deepEqual(links[1].getAttribute('rel').split(' ').sort(), ['noopener', 'noreferrer'], 'existing rel kept');
+});
