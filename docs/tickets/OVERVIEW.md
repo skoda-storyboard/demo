@@ -159,6 +159,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-101 | DA/EW site + repo + Code Sync | E01 | 3 | 1–2 | 2–4 |, | ✅ Done (#2 closed 2026-09-21). Was: 🟢 |
 | SKODA-102 | Boilerplate scaffold | E01 | 3 | 1–2 | 3–5 | 101 | ✅ Done (#10 closed 2026-09-21). Was: 🟢 |
 | SKODA-103 | Config sheets (placeholders/metadata/redirects) | E01 | 2 | 0.5–1 | 1–2 | 102 | ✅ Done (#11 closed 2026-09-21). Was: 🟢 |
+| [SKODA-101a](tickets/SKODA-101a.md) | Author identity: Škoda IdP federation, DA permissions, Edge Delivery roles, preview protection | E01 | 3 | 1–2 | 2–3 | client IdP/Admin Console, D15, Q-15 | 🔵 M2; **blocks 809, 812, 811 group gate**; preview is public today |
 | SKODA-104 | helix-query.yaml skeleton (per-locale) | E01 | 3 | 1–2 | 2–3 | 102 | ✅ Done (#12 closed 2026-09-21). Was: 🟡 index critical path |
 | SKODA-105 | Sidekick v7 + preview/publish | E01 | 1 | 0.5 | 1 | 101 | ✅ Done (#13 closed 2026-09-21). Was: 🟢 |
 | SKODA-106 | Design tokens + global CSS (re-derived) | E01 | 3 | 1–2 | 3–5 | 102 | ✅ Done (#14 closed 2026-09-22). Was: 🟢 |

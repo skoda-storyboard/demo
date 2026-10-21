@@ -16,7 +16,7 @@ This is the DA/Experience-Workspace access model: which groups can author/previe
 - Map the 7 expected user groups to DA/EW permission roles + content-tree scopes.
 - Separate Storyboard vs Media Room editorial access; per-market editor scoping (ties to SKODA-1001 locale trees).
 - Approver/administrator roles for the publish workflow (SKODA-602 lifecycle).
-- Author auth via Škoda IDP (per client §3 / SKODA-101 setup).
+- Author auth via Škoda IDP (per client §3), set up in SKODA-101a.
 
 ## Acceptance Criteria
 - [ ] Role model documented and mapped to DA/EW capabilities per group.
@@ -25,7 +25,7 @@ This is the DA/Experience-Workspace access model: which groups can author/previe
 - [ ] Consistent with the embargo (811) and audit (812) requirements.
 
 ## Dependencies
-- Upstream: SKODA-101 (site/IDP setup), SKODA-602 (publish lifecycle), **D15 governance/RACI** (blocking — role ownership must be agreed first)
+- Upstream: SKODA-101a (author identity: Škoda IdP federation, DA permissions, Edge Delivery roles), SKODA-602 (publish lifecycle), **D15 governance/RACI** (blocking — role ownership must be agreed first)
 - Downstream: SKODA-811 (embargo group access), SKODA-1001 (per-market trees)
 
 ## Risks / Flags
