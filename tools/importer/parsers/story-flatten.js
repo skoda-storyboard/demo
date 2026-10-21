@@ -389,6 +389,26 @@ function milestoneSpace(title) {
   return Math.round(space + (margin ? Number(margin[1]) : 0));
 }
 
+const SPACE_ATTR = 'data-title-space';
+
+/**
+ * Records each milestone's title space before helix-importer's preProcess, which drops the
+ * empty spacer paragraphs it is measured from (import-story-detail.js preprocess).
+ * @param {Element} root
+ */
+export function markMilestoneSpaces(root) {
+  root.querySelectorAll('.so-widget-ys-milestones li').forEach((li) => {
+    const space = milestoneSpace(li.querySelector('.title'));
+    if (space) li.setAttribute(SPACE_ATTR, String(space));
+  });
+}
+
+/** A milestone's title space: as marked in preprocess, else read from its title now. */
+function titleSpaceOf(li) {
+  if (li.hasAttribute(SPACE_ATTR)) return Number(li.getAttribute(SPACE_ATTR)) || 0;
+  return milestoneSpace(li.querySelector('.title'));
+}
+
 // ys-milestones = a dated timeline (SKODA-815 / D1). Source shape:
 // `section.milestones > ul > li`, each <li> holding `.line > .year`, `.title` (rich: the
 // maker, the bold model, "(vehicle on display: …)"), `.thumbnail > img` (square) and
@@ -407,7 +427,7 @@ function milestonesCells(panel, document) {
   ].filter(Boolean);
   const cells = [[variants.length ? `Timeline (${variants.join(', ')})` : 'Timeline']];
   // the fifth column only when an entry has extra space above its title, then on every row
-  const spaces = items.map((li) => milestoneSpace(li.querySelector('.title')));
+  const spaces = items.map(titleSpaceOf);
   const spaced = spaces.some(Boolean);
   items.forEach((li, i) => {
     const year = (li.querySelector('.year')?.textContent || '').replace(/\s+/g, ' ').trim();
@@ -885,4 +905,5 @@ export default function parse(element, { document }) {
 // Exposed for unit/prototype testing (harness-only; ignored by the bundle default).
 export const __test = {
   classifyWidget, cellsOf, panelsOf, WIDGET_KINDS, splitVariant, portraitVariant, milestonesCells,
+  markMilestoneSpaces,
 };

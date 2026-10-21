@@ -19,6 +19,7 @@
 import storyHeroParser from './parsers/story-hero.js';
 import storyFlattenParser, {
   markHighlights, markCellWidths, markBoldHeadings, restoreBoldHeadings, dropEmptySections,
+  markMilestoneSpaces,
 } from './parsers/story-flatten.js';
 import downloadsParser from './parsers/downloads.js';
 import footnotesParser, { markFootnotes } from './parsers/footnotes.js';
@@ -138,6 +139,8 @@ export default {
   preprocess: ({ document }) => {
     markHighlights(document);
     markCellWidths(document);
+    // SKODA-815 (PR #373): the timeline title spaces, before preProcess drops the spacer <p>
+    markMilestoneSpaces(document.body);
     // #296: the body's 10pt small print (Epiq "¹ Available at a later date.") → Footnotes, as on
     // press kits (SKODA-805d); its size lives only in inline spans, which DA drops
     document.querySelectorAll('article .entry-content, article .content').forEach((body) => {

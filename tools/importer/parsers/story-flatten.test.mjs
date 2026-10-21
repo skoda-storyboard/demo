@@ -417,6 +417,19 @@ test('SKODA-815: a black year pill and 18pt titles map to Timeline (black, large
   assert.equal(rows.filter((r) => r.children[2].querySelector('img')).length, 16, 'every milestone keeps its image');
 });
 
+test('SKODA-815: the title spaces survive the importer dropping empty paragraphs (marked in preprocess)', { skip: domSkip }, () => {
+  const panel = readFileSync(new URL('../../../test/fixtures/story-flatten/milestones-iconic-cars.html', import.meta.url), 'utf8');
+  const d = domDoc(`<div class="entry-content"><div class="panel-layout"><div class="panel-grid"><div class="panel-grid-cell">${panel}</div></div></div></div>`);
+  __test.markMilestoneSpaces(d.body);
+  // helix-importer's preProcess drops the empty spacer paragraph
+  d.querySelectorAll('.title p').forEach((p) => { if (!p.textContent.trim()) p.remove(); });
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  const rows = [...content.querySelector('table[data-block^="Timeline"]').querySelectorAll('tr')].slice(1);
+  const y1970 = rows.find((r) => r.children[0].textContent.trim() === '1970');
+  assert.equal(y1970.children[4].textContent, '44', 'the marked space, not the (now missing) spacer');
+});
+
 test('SKODA-815: the wheels timeline (24pt model lines) is Timeline (xl), its title paragraphs kept', { skip: domSkip }, () => {
   const content = milestonesStory('milestones-wheels');
   const table = content.querySelector('table[data-block="Timeline (xl)"]');

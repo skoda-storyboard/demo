@@ -314,6 +314,17 @@ var CustomImportScript = (() => {
     const margin = (first.getAttribute("style") || "").match(/margin-top\s*:\s*(\d+(?:\.\d+)?)px/i);
     return Math.round(space + (margin ? Number(margin[1]) : 0));
   }
+  var SPACE_ATTR = "data-title-space";
+  function markMilestoneSpaces(root) {
+    root.querySelectorAll(".so-widget-ys-milestones li").forEach((li) => {
+      const space = milestoneSpace(li.querySelector(".title"));
+      if (space) li.setAttribute(SPACE_ATTR, String(space));
+    });
+  }
+  function titleSpaceOf(li) {
+    if (li.hasAttribute(SPACE_ATTR)) return Number(li.getAttribute(SPACE_ATTR)) || 0;
+    return milestoneSpace(li.querySelector(".title"));
+  }
   function milestonesCells(panel, document2) {
     var _a;
     const items = [...panel.querySelectorAll("li")].filter((li) => li.querySelector(".year, .title, .description, img"));
@@ -323,7 +334,7 @@ var CustomImportScript = (() => {
       milestoneTitleSize(items)
     ].filter(Boolean);
     const cells = [[variants.length ? `Timeline (${variants.join(", ")})` : "Timeline"]];
-    const spaces = items.map((li) => milestoneSpace(li.querySelector(".title")));
+    const spaces = items.map(titleSpaceOf);
     const spaced = spaces.some(Boolean);
     items.forEach((li, i) => {
       var _a2;
@@ -2526,6 +2537,7 @@ var CustomImportScript = (() => {
     preprocess: ({ document: document2 }) => {
       markHighlights(document2);
       markCellWidths(document2);
+      markMilestoneSpaces(document2.body);
       document2.querySelectorAll("article .entry-content, article .content").forEach((body) => {
         markFootnotes(body);
         markBoldHeadings(body);
