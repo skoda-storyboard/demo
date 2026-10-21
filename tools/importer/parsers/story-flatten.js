@@ -353,7 +353,8 @@ function milestoneRich(source, document) {
 const MILESTONE_BLACK = /background(?:-color)?\s*:\s*(?:#0{3}(?:0{3})?\b|rgb\(\s*0\s*,\s*0\s*,\s*0\s*\)|black\b)/i;
 
 // The widget's title size, authored as inline font-size spans: 14pt (18.67px) on most,
-// 18pt (24px) on four stories, with a 24pt model line on two. 18pt and up → `large`.
+// 18pt (24px) on four stories → `large`, and a 24pt (32px) model line under an 18pt maker on
+// two (wheels, gear stick) → `xl`, whose title lines the block sizes by role.
 function milestoneTitleSize(items) {
   const px = (value) => {
     const m = String(value).match(/^([\d.]+)(pt|px)$/);
@@ -366,15 +367,35 @@ function milestoneTitleSize(items) {
   const counts = new Map();
   sizes.forEach((size) => counts.set(size, (counts.get(size) || 0) + 1));
   const [dominant] = [...counts.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0])[0];
+  if (dominant >= 32) return 'xl';
   return dominant >= 24 ? 'large' : '';
+}
+
+// The space the source adds above a title (PR #373 review): a spacer paragraph (an empty
+// <p>&nbsp;</p>: its 24px line + 20px margin, 44px; iconic cars, 1970) or an inline margin-top
+// on the first title paragraph (15px on four steering-wheel entries). Only these two patterns
+// are read, as whole pixels for the row's optional fifth cell; 0 = none.
+const MILESTONE_SPACER = 44;
+function milestoneSpace(title) {
+  let space = 0;
+  const paragraphs = title ? [...title.querySelectorAll(':scope > p')] : [];
+  const first = paragraphs.find((p) => {
+    if ((p.textContent || '').trim() || p.querySelector('img, a')) return true;
+    space += MILESTONE_SPACER;
+    return false;
+  });
+  if (!first) return 0;
+  const margin = (first.getAttribute('style') || '').match(/margin-top\s*:\s*(\d+(?:\.\d+)?)px/i);
+  return Math.round(space + (margin ? Number(margin[1]) : 0));
 }
 
 // ys-milestones = a dated timeline (SKODA-815 / D1). Source shape:
 // `section.milestones > ul > li`, each <li> holding `.line > .year`, `.title` (rich: the
 // maker, the bold model, "(vehicle on display: …)"), `.thumbnail > img` (square) and
 // `.description` (rich text with links, after a decorative `.dot`). Each entry becomes
-// one Timeline row: year | title | image | description, in source order; the block
-// renders the source's vertical timeline (blocks/timeline, docs/ui-specs/timeline.md).
+// one Timeline row: year | title | image | description [| space above the title, px], in
+// source order; the block renders the source's vertical timeline (blocks/timeline,
+// docs/ui-specs/timeline.md).
 // Unexpected DOM (no entries) → its images + text as default content, never dropped.
 function milestonesCells(panel, document) {
   const items = [...panel.querySelectorAll('li')]
@@ -385,7 +406,10 @@ function milestonesCells(panel, document) {
     milestoneTitleSize(items),
   ].filter(Boolean);
   const cells = [[variants.length ? `Timeline (${variants.join(', ')})` : 'Timeline']];
-  items.forEach((li) => {
+  // the fifth column only when an entry has extra space above its title, then on every row
+  const spaces = items.map((li) => milestoneSpace(li.querySelector('.title')));
+  const spaced = spaces.some(Boolean);
+  items.forEach((li, i) => {
     const year = (li.querySelector('.year')?.textContent || '').replace(/\s+/g, ' ').trim();
     const title = milestoneRich(li.querySelector('.title'), document);
     // a thumbnail may stack more than one image (iconic cars, 1970: the 110 R and the 130 RS)
@@ -393,7 +417,9 @@ function milestonesCells(panel, document) {
     const imgs = thumbs.length ? thumbs : [...li.querySelectorAll('img')].slice(0, 1);
     const description = li.querySelector('.description');
     description?.querySelectorAll('.dot').forEach((dot) => dot.remove());
-    cells.push([year, title, imgs.length ? imgs : '', milestoneRich(description, document)]);
+    const row = [year, title, imgs.length ? imgs : '', milestoneRich(description, document)];
+    if (spaced) row.push(spaces[i] ? String(spaces[i]) : '');
+    cells.push(row);
   });
   return cells;
 }

@@ -50,8 +50,18 @@
   --timeline-title-line: 28px;
   --timeline-title-gap: 30px;
 
-  /* the source title paragraph's own 20px bottom margin, below the gap */
+  /* the source title paragraphs' own 20px bottom margin, above the gap */
   --timeline-title-end: 20px;
+
+  /* the authored space above a title (the row's fifth cell: the source's 15px inline margin
+     or 44px spacer paragraph), set per entry by the block */
+  --timeline-title-space: 0px;
+
+  /* `xl`: the 24pt (32px) model line and the 16px "(vehicle on display: …)" note */
+  --timeline-model-size: 32px;
+  --timeline-model-line: 48px;
+  --timeline-note-size: 16px;
+  --timeline-note-line: 24px;
   --timeline-media-gap: 30px;
 
   /* between images stacked in one milestone (the source's second img padding-top) */
@@ -78,8 +88,9 @@
   --timeline-accent: var(--skoda-black);
 }
 
-/* the widgets authored with 18pt titles (24px on a 36px line) */
-.timeline.large {
+/* the widgets authored with 18pt titles (24px on a 36px line); `xl` keeps the 18pt maker line
+   and sizes its model and note lines below */
+.timeline:is(.large, .xl) {
   --timeline-title-size: 24px;
   --timeline-title-line: 36px;
 }
@@ -122,16 +133,27 @@
 }
 
 .timeline .timeline-title {
-  margin: 0;
-  padding-block-end: calc(var(--timeline-title-gap) + var(--timeline-title-end));
-  color: inherit;
+  padding-block: var(--timeline-title-space) var(--timeline-title-gap);
   font-size: var(--timeline-title-size);
-  font-weight: var(--weight-regular);
   line-height: var(--timeline-title-line);
+}
+
+.timeline .timeline-title p {
+  margin: 0 0 var(--timeline-title-end);
 }
 
 .timeline .timeline-title strong {
   font-weight: var(--weight-semibold);
+}
+
+.timeline.xl .timeline-title-model {
+  font-size: var(--timeline-model-size);
+  line-height: var(--timeline-model-line);
+}
+
+.timeline.xl .timeline-title-note {
+  font-size: var(--timeline-note-size);
+  line-height: var(--timeline-note-line);
 }
 
 .timeline .timeline-media {
@@ -212,7 +234,7 @@
 
     .timeline .timeline-title {
       grid-column: 1 / -1;
-      padding-block-end: calc(2 * var(--timeline-title-gap) + var(--timeline-title-end));
+      padding-block-end: calc(2 * var(--timeline-title-gap));
       padding-inline-end: var(--timeline-title-inset);
     }
 

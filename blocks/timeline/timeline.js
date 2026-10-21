@@ -2,27 +2,33 @@
 // whose author left the year out.
 const LABEL = /^\S{1,12}$/;
 
-// year | title | image | description: the importer always writes the four columns
+// year | title | image | description: the importer always writes the four columns, and a
+// fifth, the space above the title in px, when the source adds some (PR #373 review)
 const COLUMNS = 4;
+const SPACE = /^(\d{1,3})\s*(?:px)?$/i;
+const MAX_SPACE = 200;
 
 /**
- * The parts of one authored row: year | title | image | description. In a full four-cell
- * row the columns hold their places, so a blank year or image cell is a blank value (the
- * image may sit in any cell, the text cells keep their order). A shorter row, whose author
- * removed cells, is read by content: the image cell by its picture, the text cells by order.
+ * The parts of one authored row: year | title | image | description [| space]. In a full
+ * four-cell row the columns hold their places, so a blank year or image cell is a blank value
+ * (the image may sit in any of the four, the text cells keep their order). A shorter row,
+ * whose author removed cells, is read by content: the image cell by its picture, the text
+ * cells by order.
  * @param {Element} row
  */
 function partsOf(row) {
   const cells = [...row.children];
-  const media = cells.find((cell) => cell.querySelector('picture, img')) || null;
   if (cells.length >= COLUMNS) {
+    const columns = cells.slice(0, COLUMNS);
+    const media = columns.find((cell) => cell.querySelector('picture, img')) || null;
     const [year, title, description] = media
-      ? cells.filter((cell) => cell !== media)
-      : [cells[0], cells[1], cells[3]];
+      ? columns.filter((cell) => cell !== media)
+      : [columns[0], columns[1], columns[3]];
     return {
-      year, title, media, description,
+      year, title, media, description, space: cells[COLUMNS] || null,
     };
   }
+  const media = cells.find((cell) => cell.querySelector('picture, img')) || null;
   let [year, title, description] = cells.filter((cell) => cell !== media);
   if (year && !LABEL.test(year.textContent.trim())) {
     [title, description] = [year, title];
@@ -33,38 +39,43 @@ function partsOf(row) {
   };
 }
 
+/** A paragraph that is all bold: the model line ("VOITURETTE A"). */
+const isModel = (p) => !!p.textContent.trim()
+  && [...p.childNodes].every((n) => (n.nodeType === 3 ? !n.textContent.trim() : n.matches('strong, b, br')));
+
 /**
- * The title as one heading: the cell's paragraphs (the maker, the bold model, "(vehicle on
- * display: …)") become lines of the heading.
+ * The title as the source's paragraphs (not a heading: the source widget's titles are
+ * paragraphs, PR #373 review). Each keeps its role for the `xl` scheme: the all-bold model
+ * line, the "(vehicle on display: …)" note, else the maker line.
  * @param {Element} cell
  */
 function titleOf(cell) {
-  const heading = document.createElement('h3');
-  heading.className = 'timeline-title';
-  const paragraphs = cell.querySelectorAll(':scope > p');
+  const title = document.createElement('div');
+  title.className = 'timeline-title';
+  const paragraphs = [...cell.querySelectorAll(':scope > p')];
   if (!paragraphs.length) {
-    heading.append(...cell.childNodes);
-    return heading;
+    const p = document.createElement('p');
+    p.append(...cell.childNodes);
+    paragraphs.push(p);
   }
-  paragraphs.forEach((p, i) => {
-    if (i) heading.append(document.createElement('br'));
-    heading.append(...p.childNodes);
+  paragraphs.filter((p) => p.textContent.trim()).forEach((p) => {
+    if (isModel(p)) p.classList.add('timeline-title-model');
+    else if (/^\(/.test(p.textContent.trim())) p.classList.add('timeline-title-note');
+    title.append(p);
   });
-  return heading;
+  return title;
 }
 
 /**
- * A `<br>` adds no separator to the accessible name ("Laurin & KlementVOITURETTE A"): a space
- * before each line break keeps the words apart, and collapses on screen.
- * @param {Element} heading
+ * The authored space above the title (the source's spacer paragraph or inline margin), as a
+ * custom property on the entry; anything but a plain pixel count is ignored.
+ * @param {HTMLLIElement} li
+ * @param {Element|null} cell
  */
-function spaceLines(heading) {
-  heading.querySelectorAll('br').forEach((br) => {
-    const before = br.previousSibling;
-    if (before?.nodeName === '#text' && /\s$/.test(before.textContent)) return;
-    br.before(' ');
-  });
-  return heading;
+function applySpace(li, cell) {
+  const match = (cell?.textContent || '').trim().match(SPACE);
+  const px = match ? Math.min(Number(match[1]), MAX_SPACE) : 0;
+  if (px) li.style.setProperty('--timeline-title-space', `${px}px`);
 }
 
 /**
@@ -75,7 +86,7 @@ function spaceLines(heading) {
  */
 function entryOf(row) {
   const {
-    year, title, media, description,
+    year, title, media, description, space,
   } = partsOf(row);
   const li = document.createElement('li');
   li.className = 'timeline-entry';
@@ -85,7 +96,10 @@ function entryOf(row) {
     label.textContent = year.textContent.trim();
     li.append(label);
   }
-  if (title?.textContent.trim()) li.append(spaceLines(titleOf(title)));
+  if (title?.textContent.trim()) {
+    li.append(titleOf(title));
+    applySpace(li, space);
+  }
   // a milestone may stack more than one image; a bare img counts when it has no picture
   const pictures = media ? [...media.querySelectorAll('picture, img')]
     .filter((el) => !el.closest('picture') || el.matches('picture')) : [];
@@ -107,11 +121,12 @@ function entryOf(row) {
 }
 
 /**
- * Timeline (SKODA-815, contract `timeline` v1): the source's dated `ys-milestones`
- * timeline. Each row is one milestone, year | title | image | description, rendered as an
- * ordered list on the source's line: a left rail on phones and tablets, two-sided (title
- * and image left, description right) from 1080. `Timeline (black)` is the black year pill,
- * `Timeline (large)` the widgets authored with 18pt (24px) titles.
+ * Timeline (SKODA-815, contract `timeline` v2): the source's dated `ys-milestones`
+ * timeline. Each row is one milestone, year | title | image | description [| space above the
+ * title, px], rendered as an ordered list on the source's line: a left rail on phones and
+ * tablets, two-sided (title and image left, description right) from 1080.
+ * `Timeline (black)` is the black year pill, `Timeline (large)` the widgets authored with
+ * 18pt (24px) titles, `Timeline (xl)` those with a 24pt (32px) model line under an 18pt maker.
  * @param {Element} block
  */
 export default function decorate(block) {

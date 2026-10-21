@@ -298,7 +298,21 @@ var CustomImportScript = (() => {
     const counts = /* @__PURE__ */ new Map();
     sizes.forEach((size) => counts.set(size, (counts.get(size) || 0) + 1));
     const [dominant] = [...counts.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0])[0];
+    if (dominant >= 32) return "xl";
     return dominant >= 24 ? "large" : "";
+  }
+  var MILESTONE_SPACER = 44;
+  function milestoneSpace(title) {
+    let space = 0;
+    const paragraphs = title ? [...title.querySelectorAll(":scope > p")] : [];
+    const first = paragraphs.find((p) => {
+      if ((p.textContent || "").trim() || p.querySelector("img, a")) return true;
+      space += MILESTONE_SPACER;
+      return false;
+    });
+    if (!first) return 0;
+    const margin = (first.getAttribute("style") || "").match(/margin-top\s*:\s*(\d+(?:\.\d+)?)px/i);
+    return Math.round(space + (margin ? Number(margin[1]) : 0));
   }
   function milestonesCells(panel, document2) {
     var _a;
@@ -309,7 +323,9 @@ var CustomImportScript = (() => {
       milestoneTitleSize(items)
     ].filter(Boolean);
     const cells = [[variants.length ? `Timeline (${variants.join(", ")})` : "Timeline"]];
-    items.forEach((li) => {
+    const spaces = items.map((li) => milestoneSpace(li.querySelector(".title")));
+    const spaced = spaces.some(Boolean);
+    items.forEach((li, i) => {
       var _a2;
       const year = (((_a2 = li.querySelector(".year")) == null ? void 0 : _a2.textContent) || "").replace(/\s+/g, " ").trim();
       const title = milestoneRich(li.querySelector(".title"), document2);
@@ -317,7 +333,9 @@ var CustomImportScript = (() => {
       const imgs = thumbs.length ? thumbs : [...li.querySelectorAll("img")].slice(0, 1);
       const description = li.querySelector(".description");
       description == null ? void 0 : description.querySelectorAll(".dot").forEach((dot) => dot.remove());
-      cells.push([year, title, imgs.length ? imgs : "", milestoneRich(description, document2)]);
+      const row = [year, title, imgs.length ? imgs : "", milestoneRich(description, document2)];
+      if (spaced) row.push(spaces[i] ? String(spaces[i]) : "");
+      cells.push(row);
     });
     return cells;
   }

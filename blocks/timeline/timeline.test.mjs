@@ -20,7 +20,7 @@ const row = (year, title, image, description) => `<div>
   <div>${year}</div><div>${title}</div><div>${image}</div><div>${description}</div></div>`;
 const picture = (src) => `<picture><source srcset="${src}"><img src="${src}" alt=""></picture>`;
 
-test('each row becomes one entry: year pill, title heading, image and description, in order', { skip: !JSDOM }, () => {
+test('each row becomes one entry: year pill, title, image and description, in order', { skip: !JSDOM }, () => {
   const block = blockFrom(row(
     '1905',
     '<p>Laurin &amp; Klement<br><strong>VOITURETTE A</strong><br>(vehicle on display: 1905)</p>',
@@ -39,7 +39,9 @@ test('each row becomes one entry: year pill, title heading, image and descriptio
     ['timeline-year', 'timeline-title', 'timeline-media', 'timeline-text'],
   );
   assert.equal(first.querySelector('.timeline-year').textContent, '1905');
-  const title = first.querySelector('h3.timeline-title');
+  const title = first.querySelector('div.timeline-title');
+  assert.equal(block.querySelectorAll('h1, h2, h3, h4, h5, h6').length, 0, 'titles are paragraphs, as the source widget');
+  assert.equal(title.querySelectorAll(':scope > p').length, 1);
   assert.equal(title.querySelector('strong').textContent, 'VOITURETTE A');
   assert.equal(title.querySelectorAll('br').length, 2, 'the title lines kept');
   assert.equal(first.querySelector('.timeline-media img').getAttribute('loading'), 'lazy');
@@ -47,13 +49,13 @@ test('each row becomes one entry: year pill, title heading, image and descriptio
   assert.equal(entries[1].querySelector('.timeline-year').textContent, '1925');
 });
 
-test('a title of several paragraphs is one heading, its paragraphs as lines', { skip: !JSDOM }, () => {
-  const block = blockFrom(row('2000', '<p>Handsfree</p><p>(2000)</p>', '', '<p>Text.</p>'));
+test('a title of several paragraphs keeps them, each with its role (maker, model, note)', { skip: !JSDOM }, () => {
+  const block = blockFrom(row('1905', '<p>LAURIN &amp; KLEMENT</p><p><strong>VOITURETTE A</strong></p><p>(vehicle on display: 1905)</p>', '', '<p>Text.</p>'));
   decorate(block);
-  const title = block.querySelector('.timeline-title');
-  assert.equal(title.querySelectorAll('p').length, 0);
-  assert.equal(title.querySelectorAll('br').length, 1);
-  assert.equal(title.textContent, 'Handsfree (2000)', 'the lines apart in the accessible name');
+  const paragraphs = [...block.querySelectorAll('.timeline-title > p')];
+  assert.deepEqual(paragraphs.map((p) => p.textContent), ['LAURIN & KLEMENT', 'VOITURETTE A', '(vehicle on display: 1905)']);
+  assert.deepEqual(paragraphs.map((p) => p.className), ['', 'timeline-title-model', 'timeline-title-note']);
+  assert.equal(block.querySelector('h3'), null);
 });
 
 test('authors may omit cells: no image, no year, an empty row', { skip: !JSDOM }, () => {
@@ -96,13 +98,22 @@ test('a media cell of several images keeps them all, in order', { skip: !JSDOM }
   );
 });
 
-test('the title lines keep a space before each break, for the accessible name', { skip: !JSDOM }, () => {
+test('a one-paragraph title keeps its line breaks and bold model; it is neither model nor note', { skip: !JSDOM }, () => {
   const block = blockFrom(row('1905', '<p>Laurin &amp; Klement<br><strong>VOITURETTE A</strong><br>(vehicle on display: 1905)</p>', '', '<p>Text.</p>'));
   decorate(block);
-  const title = block.querySelector('.timeline-title');
-  assert.equal(title.textContent.replace(/\s+/g, ' '), 'Laurin & Klement VOITURETTE A (vehicle on display: 1905)');
-  assert.equal(title.querySelectorAll('br').length, 2, 'the breaks stay');
-  assert.equal(title.querySelector('strong').textContent, 'VOITURETTE A', 'the model stays bold');
+  const [p] = block.querySelectorAll('.timeline-title > p');
+  assert.equal(p.querySelectorAll('br').length, 2, 'the breaks stay');
+  assert.equal(p.querySelector('strong').textContent, 'VOITURETTE A', 'the model stays bold');
+  assert.equal(p.className, '', 'a mixed line is the maker line');
+});
+
+test('the fifth cell is the space above the title, in px; anything else is ignored', { skip: !JSDOM }, () => {
+  const spaced = (space) => `<div><div>1905</div><div><p>Title</p></div><div></div><div><p>Text.</p></div><div>${space}</div></div>`;
+  const block = blockFrom(spaced('15') + spaced('44px') + spaced('') + spaced('a lot') + spaced('999'));
+  decorate(block);
+  const values = [...block.querySelectorAll('.timeline-entry')].map((li) => li.style.getPropertyValue('--timeline-title-space'));
+  assert.deepEqual(values, ['15px', '44px', '', '', '200px'], 'clamped to 200px');
+  assert.match(block.querySelector('.timeline-text').textContent, /Text\./, 'the fifth cell is not the description');
 });
 
 test('a full four-cell row keeps its columns: a blank image or year cell is a blank value', { skip: !JSDOM }, () => {

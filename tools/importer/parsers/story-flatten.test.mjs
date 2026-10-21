@@ -372,7 +372,9 @@ test('SKODA-815: the steering-wheel timeline keeps all 11 years, titles, images 
     rows.map((r) => r.children[0].textContent),
     ['1905', '1925', '1932', '1940', '1952', '1959', '1966', '1984', '1989', '1996', '2017'],
   );
-  rows.forEach((r) => assert.equal(r.children.length, 4, 'year | title | image | description'));
+  rows.forEach((r) => assert.equal(r.children.length, 5, 'year | title | image | description | space'));
+  // the source's inline margin-top: 15px on four titles → the space column (PR #373 review)
+  assert.deepEqual(rows.map((r) => r.children[4].textContent), ['15', '', '', '15', '', '', '15', '', '', '15', '']);
   // the title keeps its lines and the bold model, without the source's font-size spans
   const title = rows[0].children[1];
   assert.equal(title.querySelector('strong').textContent.replace(/\s+/g, ' ').trim(), 'VOITURETTE A');
@@ -408,7 +410,25 @@ test('SKODA-815: a black year pill and 18pt titles map to Timeline (black, large
   [...table.querySelectorAll('a')].forEach((a) => assert.deepEqual(a.getAttributeNames(), ['href'], 'links keep only href'));
   const y1970 = rows.find((r) => r.children[0].textContent.trim() === '1970');
   assert.equal(y1970.children[2].querySelectorAll('img').length, 2, 'the 1970 thumbnail stacks both cars');
+  // the 1970 title's spacer paragraph → 44px of space, and no empty paragraph in the title
+  assert.equal(y1970.children[4].textContent, '44');
+  assert.equal([...y1970.children[1].querySelectorAll('p')].filter((p) => !p.textContent.trim()).length, 0);
+  assert.equal(rows.filter((r) => r.children[4].textContent).length, 1, 'only 1970 is spaced');
   assert.equal(rows.filter((r) => r.children[2].querySelector('img')).length, 16, 'every milestone keeps its image');
+});
+
+test('SKODA-815: the wheels timeline (24pt model lines) is Timeline (xl), its title paragraphs kept', { skip: domSkip }, () => {
+  const content = milestonesStory('milestones-wheels');
+  const table = content.querySelector('table[data-block="Timeline (xl)"]');
+  assert.ok(table, 'the 24pt model line under an 18pt maker → xl');
+  const rows = [...table.querySelectorAll('tr')].slice(1);
+  assert.equal(rows.length, 10);
+  rows.forEach((r) => assert.equal(r.children.length, 4, 'no space column: no entry adds space'));
+  const first = [...rows[0].children[1].querySelectorAll(':scope > p')];
+  assert.deepEqual(first.map((p) => p.textContent.replace(/\s+/g, ' ').trim()),
+    ['LAURIN & KLEMENT', 'VOITURETTE A', '(vehicle on display: 1905)'], 'maker, model, note as paragraphs');
+  assert.ok(first[1].querySelector('strong'), 'the model stays bold');
+  assert.equal(rows[0].children[1].querySelectorAll('span, [style]').length, 0, 'no size spans');
 });
 
 test('SKODA-815: a milestones widget without entries keeps its images and text', { skip: domSkip }, () => {

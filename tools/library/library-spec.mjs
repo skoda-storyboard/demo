@@ -164,10 +164,11 @@ export const SPEC = {
   timeline: {
     structure: 'year-title-image-description repeating',
     purpose: 'dated story timeline (milestones)',
-    description: 'One row per milestone: year | title | image | description. Title lines are separate lines in the cell, the model in bold. Any cell may be left out: no image, no image box; no year, no year pill; an empty row is skipped. A left line on phones and tablets, two-sided from 1080px wide.',
+    description: 'One row per milestone: year | title | image | description, and an optional fifth cell: the space above the title in px (e.g. 15). Title lines are separate lines or paragraphs in the cell, the model in bold. A blank cell is a blank value: no image, no image box; no year, no year pill; an empty row is skipped. Links open in a new tab. A left line on phones and tablets, two-sided from 1080px wide.',
     variants: [
       { class: 'black', label: 'black', description: 'Black year pills and dots instead of the green default (125 years of Škoda: iconic cars).' },
       { class: 'large', label: 'large', description: 'Larger titles (24px), for timelines whose source titles are 18pt.' },
+      { class: 'xl', label: 'xl', description: 'Title paragraphs sized by role: the maker line 24px, the all-bold model line 32px, the "(vehicle on display: …)" line 16px (wheels, gear stick).' },
     ],
   },
 };
