@@ -137,6 +137,30 @@ test('offset-A-B: each cell gets its leading spacer offset; a 0 sets none; malfo
   });
 });
 
+test('lead-A-B (#380 review): each cell its leading blank lines, beside an offset; malformed ignored', () => {
+  const el = block('split-62 offset-0-24 lead-44-0');
+  decorate(el);
+  const [a, b] = el.querySelectorAll(':scope > div > div');
+  assert.ok(el.classList.contains('lead') && el.classList.contains('offset'));
+  assert.equal(a.style.getPropertyValue('--columns-lead'), '44px');
+  assert.equal(b.style.getPropertyValue('--columns-lead'), '');
+  assert.equal(b.style.getPropertyValue('--columns-offset'), '24px');
+  ['lead-', 'lead-x', 'lead-1000-0', 'leading-44'].forEach((cls) => {
+    const bad = block(cls);
+    decorate(bad);
+    assert.equal(bad.classList.contains('lead'), false, cls);
+  });
+});
+
+test('lead applies at every width, offset only from 720px (columns.css, #380 review)', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = (await readFile(new URL('./columns.css', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  const lead = css.indexOf('.columns.lead > div > div');
+  assert.ok(lead > 0, 'the lead rule');
+  assert.equal(css.lastIndexOf('@media', lead) > css.lastIndexOf('}\n}', lead), false, 'not inside a media query');
+  assert.match(css, /@media \(width >= 720px\) \{\s*\.columns\.offset > div > div/);
+});
+
 test('pad-… / pad-m-…: the row\'s own padding as custom properties; malformed or absent, none', () => {
   const el = block('columns centered pad-m-15-15-15-15', PROFILE_ROW);
   decorate(el);

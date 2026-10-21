@@ -332,6 +332,13 @@
   }
 }
 
+/* `lead-A-B…` (story rows, columns.js decorateLeads): the blank lines leading a cell's text, at
+   every width as the source shows them (inside the cell, so they add to an offset) */
+/* stylelint-disable-next-line no-descending-specificity -- lead (story rows) and callout never combine on one block */
+.columns.lead > div > div {
+  padding-block-start: var(--columns-lead, 0);
+}
+
 /* `pad-…` / `pad-m-…` (story rows, columns.js decorateRowPadding): the source row's own padding,
    inside the row, up to 780px and from 781px (SiteOrigin's mobile switch); none where unset */
 .columns.padded {

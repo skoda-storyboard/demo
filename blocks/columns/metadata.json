@@ -33,6 +33,11 @@
       "description": "Story row whose cells start lower, from 720px wide: one number per cell, in px, in cell order (offset-48-24: the first cell 48px down, the second 24px). Use 0 for a cell that stays at the top."
     },
     {
+      "class": "split-62 lead-44-0",
+      "label": "split-62, lead-44-0",
+      "description": "Story row whose cell text starts lower at every width: one number per cell, in px (lead-44-0: the first cell one 44px blank line down). Unlike offset, it applies on phones too."
+    },
+    {
       "class": "centered pad-m-15-15-15-15",
       "label": "centered, pad-m-15-15-15-15",
       "description": "Story row with its own padding inside the row, in px (top-right-bottom-left): pad-… from 781px wide, pad-m-… up to 780px (the Miss Peaches profile rows: 15px round on phones)."

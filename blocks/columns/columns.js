@@ -62,7 +62,23 @@ export function decorateSplit(block) {
   return true;
 }
 
-const OFFSET_RE = /^offset((?:-\d{1,3}){1,6})$/;
+/**
+ * A per-cell px token (`<name>-A-B…`, one number per cell, in order): each cell with a value
+ * gets `--columns-<name>`, the block the `<name>` class.
+ * @returns {boolean} whether the block has the token
+ */
+function decorateCellToken(block, name) {
+  const re = new RegExp(`^${name}((?:-\\d{1,3}){1,6})$`);
+  const token = [...block.classList].map((c) => re.exec(c)).find(Boolean);
+  if (!token) return false;
+  const values = token[1].slice(1).split('-').map(Number);
+  const cells = [...block.querySelectorAll(':scope > div:first-child > div')];
+  block.classList.add(name);
+  cells.forEach((cell, i) => {
+    if (values[i] > 0) cell.style.setProperty(`--columns-${name}`, `${values[i]}px`);
+  });
+  return true;
+}
 
 /**
  * `offset-A-B…` (story rows): the source's spacer widgets leading each cell (`skoda-offset`), in
@@ -71,17 +87,16 @@ const OFFSET_RE = /^offset((?:-\d{1,3}){1,6})$/;
  * @param {Element} block
  * @returns {boolean} whether the block has offsets
  */
-export function decorateOffsets(block) {
-  const token = [...block.classList].map((c) => OFFSET_RE.exec(c)).find(Boolean);
-  if (!token) return false;
-  const values = token[1].slice(1).split('-').map(Number);
-  const cells = [...block.querySelectorAll(':scope > div:first-child > div')];
-  block.classList.add('offset');
-  cells.forEach((cell, i) => {
-    if (values[i] > 0) cell.style.setProperty('--columns-offset', `${values[i]}px`);
-  });
-  return true;
-}
+export const decorateOffsets = (block) => decorateCellToken(block, 'offset');
+
+/**
+ * `lead-A-B…` (story rows, #380 review): the blank editor lines leading each cell's text, in px
+ * per cell (`lead-44-0`: the Peaq comfort quote one 44px line down). Unlike `offset`, the source
+ * shows them at every width.
+ * @param {Element} block
+ * @returns {boolean} whether the block has leading lines
+ */
+export const decorateLeads = (block) => decorateCellToken(block, 'lead');
 
 const PAD_RE = /^pad(-m)?-(\d{1,3})-(\d{1,3})-(\d{1,3})-(\d{1,3})$/;
 
@@ -111,6 +126,7 @@ export default function decorate(block) {
   if (block.classList.contains('stats')) decorateStats(block);
   decorateSplit(block);
   decorateOffsets(block);
+  decorateLeads(block);
   decorateRowPadding(block);
 
   // setup image columns

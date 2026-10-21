@@ -1067,7 +1067,7 @@ test('splitTextRuns leaves unstyled nodes as they are', { skip: domSkip }, () =>
 });
 
 // --- blank lines and panel colours (#516 PO) -----------------------------------------------
-test('a blank editor line → Spacer (line) 44px in the body; leading a row cell it adds to the offset', { skip: domSkip }, () => {
+test('a blank editor line → Spacer (line) 44px in the body; leading a row cell it is the row\'s lead, apart from the spacer offset (#380 review)', { skip: domSkip }, () => {
   const d = importText('<p>Before</p><p>&nbsp;</p><p>After</p>');
   const table = [...d.querySelectorAll('table')].find((t) => t.dataset.block.startsWith('Spacer'));
   assert.equal(table?.dataset.block, 'Spacer (line)');
@@ -1079,7 +1079,7 @@ test('a blank editor line → Spacer (line) 44px in the body; leading a row cell
   row.querySelector('#pgc-1-2-0 .textwidget').insertAdjacentHTML('afterbegin', '<p>&nbsp;</p><p>&nbsp;</p>');
   markCellWidths(row);
   parse(row.querySelector('.entry-content'), { document: row });
-  assert.equal(row.querySelector('table').dataset.block, 'Columns (split-62, portrait-235, offset-88-24)', 'two blank lines: 88px');
+  assert.equal(row.querySelector('table').dataset.block, 'Columns (split-62, portrait-235, offset-0-24, lead-88-0)', 'two blank lines: 88px at every width; the spacer from 720px');
 });
 
 test('markHighlights: a panel\'s own colours as rows; the default dark panel needs none', { skip: domSkip }, () => {

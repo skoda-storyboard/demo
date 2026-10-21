@@ -1171,7 +1171,7 @@ function emitWidget(panel, document, out, stats, { inBlock = false } = {}) {
   } else if (nodes && nodes.length) {
     nodes.forEach((n) => {
       if (!isBlankParagraph(n)) { out.push(n); return; }
-      // a blank line: a Spacer (line) in the body; in a cell the row's offset carries the
+      // a blank line: a Spacer (line) in the body; in a cell the row's `lead-…` carries the
       // leading ones (emitMultiColumn), the others go
       if (!inBlock) out.push(WebImporter.DOMUtils.createTable([['Spacer (line)'], [`${BLANK_LINE_PX}px`]], document));
     });
@@ -1188,6 +1188,7 @@ function emitMultiColumn(cells, document, out, stats) {
   const row = [];
   const filled = [];
   const offsets = [];
+  const leads = [];
   cells.forEach((cell) => {
     const cellOut = [];
     const panels = panelsOf(cell);
@@ -1195,18 +1196,19 @@ function emitMultiColumn(cells, document, out, stats) {
     if (cellOut.length) {
       row.push(cellOut);
       filled.push(cell);
-      // the spacers leading the cell, before its first content widget, and that widget's own
-      // leading blank lines
+      // the spacers leading the cell, before its first content widget (the source shows them
+      // from 720px), and that widget's own leading blank lines (at every width, #380 review)
       const first = panels.findIndex((p) => classifyWidget(p) !== 'offset');
-      const lead = panels.slice(0, first);
-      offsets.push(lead.reduce((sum, p) => sum + spacerHeight(p), 0)
-        + (first >= 0 ? leadingBlankHeight(panels[first]) : 0));
+      offsets.push(panels.slice(0, first).reduce((sum, p) => sum + spacerHeight(p), 0));
+      leads.push(first >= 0 ? leadingBlankHeight(panels[first]) : 0);
     }
   });
   if (row.length > 1) {
     const split = splitVariant(filled);
     const variants = split ? [split, portraitVariant(filled)].filter(Boolean) : centredVariants(filled);
-    if (offsets.some((v) => v > 0) && offsets.every((v) => v <= 999)) variants.push(`offset-${offsets.join('-')}`);
+    const token = (name, values) => (values.some((v) => v > 0) && values.every((v) => v <= 999)
+      ? [`${name}-${values.join('-')}`] : []);
+    variants.push(...token('offset', offsets), ...token('lead', leads));
     // a centred or unequal story row keeps its own padding (#380 review); plain rows stay as they are
     if (variants.some((v) => v === 'centered' || v.startsWith('split-'))) {
       variants.push(...rowPaddingVariants(cells[0]?.closest('.panel-grid')));

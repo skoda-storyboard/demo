@@ -956,6 +956,7 @@ var CustomImportScript = (() => {
     const row = [];
     const filled = [];
     const offsets = [];
+    const leads = [];
     cells.forEach((cell) => {
       const cellOut = [];
       const panels = panelsOf(cell);
@@ -964,14 +965,15 @@ var CustomImportScript = (() => {
         row.push(cellOut);
         filled.push(cell);
         const first = panels.findIndex((p) => classifyWidget(p) !== "offset");
-        const lead = panels.slice(0, first);
-        offsets.push(lead.reduce((sum, p) => sum + spacerHeight(p), 0) + (first >= 0 ? leadingBlankHeight(panels[first]) : 0));
+        offsets.push(panels.slice(0, first).reduce((sum, p) => sum + spacerHeight(p), 0));
+        leads.push(first >= 0 ? leadingBlankHeight(panels[first]) : 0);
       }
     });
     if (row.length > 1) {
       const split = splitVariant(filled);
       const variants = split ? [split, portraitVariant(filled)].filter(Boolean) : centredVariants(filled);
-      if (offsets.some((v) => v > 0) && offsets.every((v) => v <= 999)) variants.push(`offset-${offsets.join("-")}`);
+      const token = (name, values) => values.some((v) => v > 0) && values.every((v) => v <= 999) ? [`${name}-${values.join("-")}`] : [];
+      variants.push(...token("offset", offsets), ...token("lead", leads));
       if (variants.some((v) => v === "centered" || v.startsWith("split-"))) {
         variants.push(...rowPaddingVariants((_a = cells[0]) == null ? void 0 : _a.closest(".panel-grid")));
       }

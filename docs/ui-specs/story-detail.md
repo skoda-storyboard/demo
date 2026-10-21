@@ -128,7 +128,8 @@ All rows: `measured (source-url · selector · viewport) → token`. Source = th
   - In the body: a `Spacer` block with the height.
   - Leading a row's cell: the row's `offset-A-B` (px per cell).
   - **Blank editor lines** (`<p>&nbsp;</p>`, 23 in 14 stories, 44px each, at every width): `Spacer (line)`, or
-    the row's offset when they lead a cell.
+    the row's `lead-A-B` (px per cell, every width) when they lead a cell. They don't join the offset: that
+    applies only from 720px (Peaq comfort: the quote starts 54px into its cell at 390 as at 1440).
 - **Highlight panels' own colours** (12 on the source: #0e3a2f on 36 of 59, then cyan, green, blue, olive, red, …):
   - rows `highlight-background`, `highlight-color` and `highlight-link`, from the source's inline colours;
   - a light panel's text is ink and its links green unless the panel sets its own.
@@ -142,13 +143,14 @@ All rows: `measured (source-url · selector · viewport) → token`. Source = th
   - **Headings in Columns cells:** they take the story heading sizes.
 - **Photo grid in the text** (`.textwidget .search-results-gallery`, 7 stories, the same
   source group as a press-kit Images gallery):
-  - photos only, 16:9, 20px apart, 72px below the group's top (its empty toolbar);
+  - the group's "Original" / "1920px" pills (117 / 110 × 48, 4px in, right-aligned, 8px apart),
+    then the photos 72px below the group's top: 16:9, 20px apart, no add / download discs;
   - a click opens the media lightbox with the download sizes;
   - plain groups are 3 wide (1 / 2 / 3 at 768 / 992, every photo shown);
   - groups with the source's togglebox (`data-togglebox`: the 4×4 and surfing stories) use the
     Media Box grid (1 / 2 / 3 / 4 at 520 / 768 / 992) and collapse with "Show more".
   - EDS: `Downloads (gallery, story)` with `collapse none|auto` and `columns 3|4`; a 4-wide
-    one shows the source's "Original" / "1920px" pills and each photo's add / download discs.
+    one also shows each photo's add / download discs (both widths show the pills).
     "Show more" / "Show less" slide over 400ms, as the source's togglebox (every Downloads list).
     (`parsers/press-kit-media.js` `{ story: true }`). Before this, the group's size labels
     reached the body as stray "Original1920px" lines and no photos.

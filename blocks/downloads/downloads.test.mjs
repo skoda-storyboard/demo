@@ -1078,3 +1078,13 @@ test('slideList: the list slides from its old height, the pill from its old plac
   window.matchMedia = saved;
   list.remove(); toggle.remove();
 });
+
+test('a 3-wide story gallery keeps the group\'s size pills; only the per-photo discs go (#380 review)', async () => {
+  const rules = await cssRules();
+  const narrow = '.downloads.gallery.story.downloads-narrow';
+  const hidden = rules.filter((r) => r.body.includes('display: none'))
+    .flatMap((r) => r.selectors).filter((s) => s.includes(narrow));
+  assert.deepEqual(hidden, [`${narrow} .downloads-actions`]);
+  // no narrow-only top padding: the group sits 4px in, like the 4-wide one, and the grid 72px in
+  assert.equal(ruleFor(rules, narrow), undefined);
+});
