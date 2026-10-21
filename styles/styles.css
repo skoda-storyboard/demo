@@ -94,6 +94,17 @@
   --heading-font-size-story-h2-mobile: 24px;
   --heading-font-size-story-h3-mobile: 20px;
   --heading-font-size-story-h3: 24px;
+
+  /* generic page body (SKODA-813, measured on the live /en/copyright, 390–1440): h2 40/45 and
+     h3 24/27.6, wt300 with a 16px bottom margin, at every width (the source doesn't scale them
+     down); the text 20px inside the column, 30px from 781 (SiteOrigin's switch), where a row's
+     half-width cell is half the column less its 40px gutter */
+  --heading-font-size-page-h2: 40px;
+  --heading-font-size-page-h3: 24px;
+  --page-body-inset: 20px;
+  --page-body-inset-wide: 30px;
+  --page-body-half-gutter: 40px;
+  --page-body-top: 10px; /* the band, or the row before, → a row's first text */
   --story-meta-gap: 11px; /* published date → category tag, same row (live) */
 
   /* intro (hero caption: perex, date, tag) → article, measured on the live Epiq story from
@@ -744,7 +755,7 @@ main > .section > div {
 /* Full-bleed heroes (SKODA-828): the overlay hero (series hub, press kit, model) and the
    archive band span the viewport, so their wrapper leaves the column. Content after the hero
    in the same section keeps the column. */
-main > .section > .hero-image-wrapper:has(> .hero-image:is(.overlay, .archive)) {
+main > .section > .hero-image-wrapper:has(> .hero-image:is(.overlay, .archive, .page)) {
   max-width: none;
   padding: 0;
 }
@@ -1085,6 +1096,78 @@ main > .section:has(> .hero-image-wrapper > .hero-image.archive) {
 main > .section:has(> .hero-image-wrapper > .hero-image.archive) + .section {
   margin-top: 0;
 }
+
+/* stylelint-disable no-descending-specificity -- the page-body sections never meet the story
+   column, the Media Box band or the archive band rules above (other templates' sections) */
+
+/* Generic page (SKODA-813; Section Metadata `Style: page-body`, `page-body, half`): the body
+   under the 240px title band, measured on the live /en/copyright (390–1440). Each section is a
+   source row: it starts 10px under the band or the row before, and the last runs on to the
+   footer (its last paragraph's 20px margin is the gap). A row the source sets in the left half
+   of a two-cell row (`half`) keeps that measure from 781px; below, every row is full width. */
+main > .section:has(> .hero-image-wrapper > .hero-image.page) {
+  margin-bottom: 0;
+}
+
+main > .section.page-body {
+  margin-block: 0;
+  padding-block-start: var(--page-body-top);
+}
+
+main > .section.page-body > div {
+  padding-inline: var(--page-body-inset);
+}
+
+main > .section.page-body :is(h2, h3) {
+  margin: 0 0 var(--spacing-m);
+  font-weight: var(--weight-light);
+}
+
+main > .section.page-body h2 {
+  font-size: var(--heading-font-size-page-h2);
+  line-height: 1.125;
+}
+
+main > .section.page-body h3 {
+  font-size: var(--heading-font-size-page-h3);
+  line-height: 1.15;
+}
+
+main > .section.page-body p:not(.button-container) {
+  margin: 0 0 var(--paragraph-gap);
+}
+
+/* the source's green text link, ink on hover (no underline); the keyboard focus keeps the
+   site's ring, which the source drops (css-guidelines §8). A link the decoration made a button
+   keeps the button's look */
+main > .section.page-body a:any-link:not(.button) {
+  color: var(--skoda-green-accent);
+}
+
+main > .section.page-body a:any-link:not(.button):hover {
+  color: var(--skoda-ink);
+  text-decoration: none;
+}
+
+/* a half row whose right cell holds an empty widget (`empty-cell`): the source stacks it under
+   the text on phones, 10px tall */
+@media (width < 781px) {
+  main > .section.page-body.empty-cell {
+    padding-block-end: var(--page-body-top);
+  }
+}
+
+@media (width >= 781px) {
+  main > .section.page-body > div {
+    padding-inline: var(--page-body-inset-wide);
+  }
+
+  main > .section.page-body.half > .default-content-wrapper > :is(h2, h3, h4, h5, h6, p, ul, ol, blockquote, table) {
+    max-inline-size: calc((100% - var(--page-body-half-gutter)) / 2);
+  }
+}
+
+/* stylelint-enable no-descending-specificity */
 
 body.story main > .section.body-column .default-content-wrapper ul {
   list-style: none;

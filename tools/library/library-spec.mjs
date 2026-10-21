@@ -95,6 +95,7 @@ export const SPEC = {
     variants: [
       { class: 'overlay', label: 'overlay', description: 'Model, series and press-kit hubs: title (and an optional label line) over the image.' },
       { class: 'archive', label: 'archive', description: 'Category and tag archive pages: a banner image row (may stay empty) and the h1 with one line per label.' },
+      { class: 'page', label: 'page', description: 'Generic pages (copyright, legal, contacts): a 240px title band with an optional image row and the page title (h1).' },
     ],
   },
   listing: {
@@ -166,6 +167,9 @@ export const SPEC = {
 // Section Metadata Style tokens used on the site (section styles, not blocks)
 export const SECTION_STYLES = [
   ['body-column', 'Story / release article column (two-column layout with the sidebar).'],
+  ['page-body', 'Generic page body (copyright, legal, utility pages): the text under the page title band.'],
+  ['page-body, half', 'Generic page body rows set in the left half of the column from 781px wide (the copyright page).'],
+  ['page-body, half, empty-cell', 'A half row whose empty right cell still takes 10px under the text on phones (the source widget).'],
   ['sidebar', 'Story / release sidebar: newsletter card, Explore more, Tags.'],
   ['body-column, highlight-dark', 'Dark highlight box inside the article ("What has changed" lists).'],
   ['body-column, highlight-grey', 'Grey highlight box inside a press release (FAQ callout).'],

@@ -144,3 +144,38 @@ test('archive without a banner keeps an empty band; an h1 without breaks is one 
   decorate(imageOnly);
   assert.deepEqual([...imageOnly.children].map((el) => el.className), ['hero-image-media']);
 });
+
+test('page (SKODA-813): the band, then the title; an image is the eager LCP picture', () => {
+  const hero = block('page', `
+    <div><div><picture><img src="/contacts.png" alt="Contacts" width="1920" height="576"></picture></div></div>
+    <div><div><h1>Contacts</h1></div></div>`);
+  decorate(hero);
+  assert.deepEqual([...hero.children].map((el) => el.className), ['hero-image-media', 'hero-image-content']);
+  assert.equal(hero.querySelector('.hero-image-content h1').textContent, 'Contacts');
+  assert.equal(hero.querySelector('.hero-image-media img').getAttribute('fetchpriority'), 'high');
+  assert.equal(hero.querySelector('.hero-image-caption'), null, 'no story caption');
+});
+
+test('page without an image keeps its empty 240px band (the source\'s copyright banner)', () => {
+  const hero = block('page', '<div><div></div></div><div><div><h1>Copyright</h1></div></div>');
+  decorate(hero);
+  const media = hero.querySelector('.hero-image-media');
+  assert.ok(media, 'the band');
+  assert.equal(media.children.length, 0);
+  assert.equal(hero.querySelector('h1').textContent, 'Copyright');
+});
+
+test('page CSS (SKODA-813): 240px band at every width, the 5% ink base, the white 48px light title', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const css = (await readFile(new URL('./hero-image.css', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  const rule = (sel) => (css.match(new RegExp(`${sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\{([^}]*)\\}`)) || [])[1] || '';
+  assert.match(rule('.hero-image.page'), /--hero-page-h:\s*240px/);
+  assert.match(rule('.hero-image.page'), /--hero-page-empty:\s*rgb\(0 0 0 \/ 5%\)/);
+  assert.match(rule('.hero-image.page .hero-image-media'), /height:\s*var\(--hero-page-h\)/);
+  const h1 = rule('.hero-image.page .hero-image-content h1');
+  assert.match(h1, /font-size:\s*var\(--heading-font-size-hero\)/);
+  assert.match(h1, /font-weight:\s*var\(--weight-light\)/);
+  assert.match(h1, /color:\s*var\(--skoda-white\)/);
+  // the story-only rules stay off the page band
+  assert.equal(css.includes(':not(.overlay, .archive)'), false);
+});
