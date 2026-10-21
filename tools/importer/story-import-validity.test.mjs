@@ -463,3 +463,32 @@ test('Gallery (slider): a regulatory data-caption becomes a visible note, other 
     [WLTP_EPIQ], // already visible → not repeated
   ]);
 });
+
+test('a story photo grid the media parser rejects is logged and skipped; the story still imports (#380 review)', { skip }, () => {
+  const slug = PAGES.como;
+  const url = `${SRC}/${slug}/`;
+  const dom = new JSDOM(readFileSync(path.join(FIXTURES, `${slug.split('/').pop()}.html`), 'utf8'), { url });
+  const doc = dom.window.document;
+  // a grid whose only asset has no download link (the parser throws "no download URL")
+  doc.querySelector('.textwidget').insertAdjacentHTML('beforeend', `<div class="search-results search-results-gallery">
+    <div class="search-results-item"><article class="media-cart-item"><div class="article-teaser-media">
+    <img src="https://cdn.skoda-storyboard.com/x/broken.jpg" alt="broken"></div>
+    <h3 class="entry-title">Broken asset</h3></article></div></div>`);
+  globalThis.document = doc;
+  globalThis.window = dom.window;
+  const errors = [];
+  const realError = console.error;
+  console.error = (...args) => errors.push(args.join(' '));
+  let element;
+  try {
+    importer.preprocess({ document: doc });
+    helixPreProcess(doc);
+    [{ element }] = importer.transform({ document: doc, url, params: { originalURL: url } });
+  } finally {
+    console.error = realError;
+  }
+  assert.ok(errors.some((m) => m.includes('story gallery') && m.includes('no download URL')), 'logged');
+  assert.equal(allTables(element, 'Downloads (gallery, story)').length, 0, 'no half-built block');
+  const lead = importPage('como').text.slice(0, 200);
+  assert.ok(txt(element).includes(lead), 'the rest of the story is there');
+});

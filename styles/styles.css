@@ -168,10 +168,6 @@
   --scrim-h: linear-gradient(270deg, transparent, rgb(0 0 0 / 25%));
   --scrim-v: linear-gradient(180deg, transparent, rgb(0 0 0 / 10%));
 
-  /* bottom-anchored legibility scrim under the overlay caption text — guarantees the
-     white title/date/summary stay >= 4.5:1 even on bright images (the source dual scrim
-     alone is too weak on light photos). Ramps from opaque-ish at the base to clear ~55% up. */
-  --scrim-text: linear-gradient(0deg, rgb(0 0 0 / 70%), rgb(0 0 0 / 40%) 25%, transparent 55%);
 
   /* card-teaser metadata + overlay typography (source .entry-published / overlay text) */
   --card-meta-font-size: 11px;
@@ -826,27 +822,45 @@ main > .section.media-box > .default-content-wrapper > p {
 /* In-column highlight panel colours (SKODA-824; Section Metadata `Style: body-column,
    highlight-dark|grey`). Geometry is per template: the story rules below, the press
    release in its template CSS. Everything in the panel, nested Columns included, takes
-   its text colour. */
+   its text colour. A story panel's own colours (its rows highlight-background / -color /
+   -link, scripts/highlight-geometry.js: the source's 12 panel colours, #516) win over the
+   variant's. */
 main > .section.highlight-dark {
-  background-color: var(--highlight-dark-bg);
-  color: var(--highlight-dark-color);
+  background-color: var(--hl-bg, var(--highlight-dark-bg));
+  color: var(--hl-color, var(--highlight-dark-color));
 }
 
 main > .section.highlight-grey {
-  background-color: var(--highlight-grey-bg);
+  background-color: var(--hl-bg, var(--highlight-grey-bg));
+  color: var(--hl-color, var(--highlight-grey-color));
+}
+
+/* a panel's own text colour is its text's (the source sets it inline on the text): its headings
+   keep the variant's, as the source's ink headings on the coloured Iceman and Millionth SUV
+   panels */
+main > .section.highlight-dark :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--highlight-dark-color);
+}
+
+main > .section.highlight-grey :is(h1, h2, h3, h4, h5, h6) {
   color: var(--highlight-grey-color);
 }
 
-main > .section:is(.highlight-dark, .highlight-grey) :is(h1, h2, h3, h4, h5, h6) {
-  color: inherit;
-}
-
 main > .section.highlight-dark a:any-link {
-  color: var(--highlight-dark-link-color);
+  color: var(--hl-link, var(--highlight-dark-link-color));
 
   /* the green link among white text is 2.73:1 apart, so colour alone doesn't mark it (WCAG 1.4.1
      link-in-text-block, SKODA-703); the source shows no underline */
   text-decoration: underline;
+}
+
+/* a story's light panel: the source's ink text and green links unless the panel sets its own */
+body.story main > .section.highlight-grey {
+  --highlight-grey-color: var(--skoda-ink);
+}
+
+body.story main > .section.highlight-grey a:any-link {
+  color: var(--hl-link, var(--skoda-green-accent));
 }
 
 /* page-header: the source's title band (WordPress `.page-header`, measured on /en/media-cart/
@@ -990,26 +1004,188 @@ body.story main > .section.body-column .default-content-wrapper {
   line-height: 1.5;
 }
 
-body.story main > .section.body-column .default-content-wrapper h2 {
+body.story main > .section.body-column :is(.default-content-wrapper, .columns) h2 {
   margin-bottom: var(--spacing-m);
   font-size: var(--heading-font-size-story-h2-mobile);
   font-weight: var(--weight-light);
   line-height: 1.125;
 }
 
-body.story main > .section.body-column .default-content-wrapper h3 {
+body.story main > .section.body-column :is(.default-content-wrapper, .columns) h3 {
   margin-bottom: var(--spacing-m);
   font-size: var(--heading-font-size-story-h3-mobile);
   font-weight: var(--weight-light);
   line-height: 1.15;
 }
 
-/* A heading the source sets bold (<h3><strong>, most story h3: KYL's sub-headings) keeps its
+/* (a Columns cell's headings too: the photographer's "Amy Shore" was the global 34px / 600, #516)
+   A heading the source sets bold (<h3><strong>, most story h3: KYL's sub-headings) keeps its
    <strong> through the import (story-flatten markBoldHeadings / restoreBoldHeadings) and is 600,
    the source's weight, not `bolder` (400 on a 300 heading). Unbolded ones, e.g. Slavia's
    "Technical improvements", stay 300 (#296). */
-body.story main > .section.body-column .default-content-wrapper :is(h2, h3) strong {
+body.story main > .section.body-column :is(.default-content-wrapper, .columns) :is(h2, h3) strong {
   font-weight: var(--weight-semibold);
+}
+
+/* The story's drop cap (scripts/drop-cap.js; Section Metadata style `drop-cap`), measured on the
+   live enduro / electric-car stories at 1440 / 768 / 390: a 100×100 block floated left, 20px
+   from the text (which starts 120px in), the letter 68/100 light, uppercase and centred; a green
+   letter on black unless the story sets its own colours (and, on two stories, a 20px gap below). */
+body.story main > .section.drop-cap .drop-cap-letter {
+  --drop-cap-size: 100px;
+  --drop-cap-font-size: 68px;
+  --drop-cap-gap: 20px;
+
+  float: inline-start;
+  box-sizing: border-box;
+  inline-size: var(--drop-cap-size);
+  block-size: var(--drop-cap-size);
+  margin: 0 var(--drop-cap-gap) var(--drop-cap-margin-bottom, 0) 0;
+  background: var(--drop-cap-background, var(--skoda-black));
+  color: var(--drop-cap-color, var(--skoda-green-accent));
+  font-size: var(--drop-cap-font-size);
+  font-weight: var(--weight-light);
+  line-height: var(--drop-cap-size);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* the letter as read out: inline with the rest of the word, not shown */
+body.story main > .section.drop-cap .drop-cap-spoken {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Story prose links (live .content .textwidget a, measured 2026-10-16 on the electric-car and
+   4×4 stories): the source's green, no underline, ink when hovered. The focus ring stays (the
+   source has none). The highlight panels keep their own link colour, and buttons theirs. */
+body.story main > .section.body-column:not(.highlight-dark, .highlight-grey) :is(.default-content-wrapper, .columns) a:any-link:not(.button) {
+  color: var(--skoda-green-accent);
+  text-decoration: none;
+}
+
+body.story main > .section.body-column:not(.highlight-dark, .highlight-grey) :is(.default-content-wrapper, .columns) a:any-link:not(.button):hover {
+  color: var(--skoda-ink);
+  text-decoration: none;
+}
+
+/* A story video sits in an editor paragraph on the source, so the text (or row) after it starts
+   the paragraph gap below it (28px to the next row's text at 1440 and 390, with its 10px
+   cell padding; ours had none) */
+body.story main > .section.body-column .embed-wrapper:not(:last-child) {
+  margin-block-end: var(--paragraph-gap);
+}
+
+/* The editor text's own styles (story importer, splitTextRuns): a run of centred or resized
+   source paragraphs is a body section of its own, styled `text-center`, `text-small` (10pt),
+   `text-medium` (14pt), `text-large` (16pt) or `text-xlarge` (18pt), measured on the live
+   electric-car, 4×4, first-glimpse and Kamiq stories (each size's line is 1.5×; 10pt keeps the
+   paragraph's 24px line, as its spans sit in a 16/24 paragraph). Next to other body sections it
+   joins the column with no gap of its own: the paragraphs' 20px gaps carry on. */
+body.story main {
+  --story-text-small: 13.3333px;
+  --story-text-small-line: 24px;
+  --story-text-medium: 18.6667px;
+  --story-text-medium-line: 28px;
+  --story-text-large: 21.3333px;
+  --story-text-large-line: 32px;
+  --story-text-xlarge: 24px;
+  --story-text-xlarge-line: 36px;
+}
+
+body.story main > .section.text-center .default-content-wrapper {
+  text-align: center;
+}
+
+/* a centred photo with its caption under it: the caption's line starts at the photo's foot
+   (its text 4px down), as the source's photo + <br> + caption paragraph */
+body.story main > .section:is(.text-center, .text-small) .default-content-wrapper picture > img {
+  display: block;
+  margin-inline: auto;
+}
+
+/* (from the caption's side: :has() can't nest, so the photo's 20px gap is taken back by the
+   caption that follows it, the two margins collapsing to none) */
+body.story main > .section:is(.text-center, .text-small) .default-content-wrapper > p:has(> picture) + p:not(:has(> picture)) {
+  margin-block-start: calc(-1 * var(--paragraph-gap));
+}
+
+body.story main > .section.text-small .default-content-wrapper :is(p, li) {
+  font-size: var(--story-text-small);
+  line-height: var(--story-text-small-line);
+}
+
+body.story main > .section.text-medium .default-content-wrapper :is(p, li) {
+  font-size: var(--story-text-medium);
+  line-height: var(--story-text-medium-line);
+}
+
+body.story main > .section.text-large .default-content-wrapper :is(p, li) {
+  font-size: var(--story-text-large);
+  line-height: var(--story-text-large-line);
+}
+
+body.story main > .section.text-xlarge .default-content-wrapper :is(p, li) {
+  font-size: var(--story-text-xlarge);
+  line-height: var(--story-text-xlarge-line);
+}
+
+/* the source's padded box (scripts/section-box.js sets its colours, padding and shadow); it
+   keeps the column's inset, so it is the text column's width (819px at 1440) as the source's,
+   its own padding replacing the wrapper's */
+body.story main > .section.text-box .default-content-wrapper {
+  --box-shadow-room: -20px; /* the clip's reach past the box, more than any source shadow */
+
+  margin-block-end: var(--paragraph-gap);
+  margin-inline: var(--story-inset);
+  padding: var(--box-padding, var(--spacing-m));
+  background-color: var(--box-background, transparent);
+  box-shadow: var(--box-shadow, none);
+  color: var(--box-color, inherit);
+}
+
+body.story main > .section.text-box .default-content-wrapper > :last-child {
+  margin-block-end: 0;
+}
+
+/* a box the importer cut where its text changes style (the MQB box's 14pt title, then its
+   text): the parts read as one box, the paragraph gap kept inside it at each join and the
+   shadow not drawn across it */
+body.story main > .section.text-box:where(:has(+ .section.text-box.continued)) .default-content-wrapper {
+  display: flow-root;
+  margin-block-end: 0;
+  padding-block-end: 0;
+  clip-path: inset(var(--box-shadow-room) var(--box-shadow-room) 0);
+}
+
+body.story main > .section.text-box:where(:has(+ .section.text-box.continued)) .default-content-wrapper > :last-child {
+  margin-block-end: var(--paragraph-gap);
+}
+
+body.story main > .section.text-box.continued .default-content-wrapper {
+  display: flow-root;
+  padding-block-start: 0;
+  clip-path: inset(0 var(--box-shadow-room) var(--box-shadow-room));
+}
+
+/* `centered-images` (Section Metadata style, set by the story importer when the source centres
+   every narrower body image, `img.aligncenter`): such an image sits in the middle of the
+   column, e.g. the 800px photos of the 819px Miss Peaches column, 9.5px in at 1440. Wider
+   images fill the column either way. */
+body.story main > .section.centered-images .default-content-wrapper picture > img {
+  display: block;
+  margin-inline: auto;
+}
+
+/* A photo alone in its paragraph is a block, as on the source (WordPress aligns it as one: the
+   paragraph is the photo's 460px, not 467 with the text line's descender, which put every
+   paragraph after a photo 7px low, Immortal Octavia #516) */
+body.story main > .section.body-column .default-content-wrapper p > picture:only-child > img {
+  display: block;
 }
 
 /* Source widgets are 24px apart from 720px (#296, KYL measured at 375–1440):
@@ -1205,8 +1381,30 @@ body.story main > .section.highlight-grey:has(+ .section.highlight-grey) {
   padding-block-end: 0;
 }
 
+/* a panel the importer cut where its text changes style (a centred 10pt caption among its
+   paragraphs): its parts read as one panel, with no inset at the joins; each part holds its
+   children's margins, so the paragraph gap stays inside the panel's colour */
+body.story main > .section:is(.highlight-dark, .highlight-grey):has(+ .section.continued) {
+  display: flow-root;
+}
+
+body.story main > .section.body-column:is(.highlight-dark, .highlight-grey).continued {
+  display: flow-root;
+  padding-block-start: 0;
+}
+
 body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has(+ .section:is(.highlight-dark, .highlight-grey)) {
   padding-block-end: var(--story-inset);
+}
+
+/* a body section next to another (the editor text's styled runs, text-center …) joins the
+   column with no gap of its own: the paragraphs' 20px gaps carry on */
+body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has(+ .section.body-column:not(.highlight-dark, .highlight-grey)) {
+  margin-block-end: 0;
+}
+
+body.story main > .section.body-column:not(.highlight-dark, .highlight-grey) + .section.body-column:not(.highlight-dark, .highlight-grey) {
+  margin-block-start: 0;
 }
 
 /* Layer 2 / Layer 3 — at ≥768 the article becomes a real two-column grid. This is a
@@ -1216,9 +1414,14 @@ body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has
    body track is the 10px inset + 2/3 of the inset content box, so the text lands on
    the source's 819px at 1248 (707 at 1080, 499 at 768); the aside takes the rest. */
 @media (width >= 768px) {
+  /* overflow-x: the dark bands (`.section.dark::before`, below) are 100vw wide, which takes in
+     a desktop's classic scrollbar (15px), so the page scrolled 8px sideways at 1280–1440 (the
+     Media Box, Related Stories). `clip` hides that and makes no scroll container (sticky works). */
   body.story {
     --story-body-gap: 32px;
     --highlight-row-top: 32px;
+
+    overflow-x: clip;
   }
 
   body.story main {
@@ -1237,6 +1440,10 @@ body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has
   /* the text ends where the aside track starts (the aside owns the 64px gap) */
   body.story main > .section.body-column > div {
     padding-inline: var(--story-inset) 0;
+  }
+
+  body.story main > .section.text-box .default-content-wrapper {
+    margin-inline: var(--story-inset) 0;
   }
 
   /* Full-bleed sections (hero) opt out of the grid and span both tracks. */
@@ -1331,11 +1538,11 @@ body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has
 /* The source steps the prose headings up just past 768px (24px h2 at 768, 40px at
    769), one pixel after the grid breakpoint above, so it gets its own query. */
 @media (width > 768px) {
-  body.story main > .section.body-column .default-content-wrapper h2 {
+  body.story main > .section.body-column :is(.default-content-wrapper, .columns) h2 {
     font-size: var(--heading-font-size-hero-story); /* 40px */
   }
 
-  body.story main > .section.body-column .default-content-wrapper h3 {
+  body.story main > .section.body-column :is(.default-content-wrapper, .columns) h3 {
     font-size: var(--heading-font-size-story-h3);
   }
 }
