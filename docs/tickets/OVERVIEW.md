@@ -159,7 +159,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-101 | DA/EW site + repo + Code Sync | E01 | 3 | 1–2 | 2–4 |, | ✅ Done (#2 closed 2026-09-21). Was: 🟢 |
 | SKODA-102 | Boilerplate scaffold | E01 | 3 | 1–2 | 3–5 | 101 | ✅ Done (#10 closed 2026-09-21). Was: 🟢 |
 | SKODA-103 | Config sheets (placeholders/metadata/redirects) | E01 | 2 | 0.5–1 | 1–2 | 102 | ✅ Done (#11 closed 2026-09-21). Was: 🟢 |
-| [SKODA-101a](tickets/SKODA-101a.md) | Author identity: Škoda IdP federation, DA permissions, Edge Delivery roles, preview protection (#407) | E01 | 3 | 1–2 | 2–3 | client IdP/Admin Console, D15, Q-15 | 🔵 M2; **blocks 809, 812, 811 group gate**; preview is public today |
+| [SKODA-101a](tickets/SKODA-101a.md) | Author identity: Škoda IdP federation, DA permissions, Edge Delivery roles, preview protection (#407) | E01 | 3.5 | 1–2 | 2–3 | client IdP/Admin Console, D15, Q-15 | 🔵 M2; **blocks 809, 812, 811 group gate**; preview is public today · amended 2026-10-21 (gap review) |
 | SKODA-104 | helix-query.yaml skeleton (per-locale) | E01 | 3 | 1–2 | 2–3 | 102 | ✅ Done (#12 closed 2026-09-21). Was: 🟡 index critical path |
 | SKODA-105 | Sidekick v7 + preview/publish | E01 | 1 | 0.5 | 1 | 101 | ✅ Done (#13 closed 2026-09-21). Was: 🟢 |
 | SKODA-106 | Design tokens + global CSS (re-derived) | E01 | 3 | 1–2 | 3–5 | 102 | ✅ Done (#14 closed 2026-09-22). Was: 🟢 |
@@ -201,7 +201,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-302 | Mobile nav toggle + ARIA (a11y fix) | E03 | 2 | 1 | 1–2 | 301 | ✅ Done (#23 closed 2026-10-07). Was: 🟡 fixes source gap |
 | [SKODA-303](tickets/SKODA-303.md) | Language switcher (6 locales) (#24) | E03 | 2 | 1 | 1–2 | 301 | ✅ Done (#24 closed 2026-10-01). Was: 🟡 ready for QA 2026-09-30: matches live at every width, AA links, current from the URL; locale trees not on EDS yet |
 | [SKODA-303a](tickets/SKODA-303a.md) | Language switcher vs link containment: the locale-link rule | E03 | 0.5 | 0.25 | 0.5 | 303,609 | ✅ Done (#243 closed 2026-10-14). Was: 🟡 M1, in review: #243, [PR #299](https://github.com/skoda-storyboard/demo/pull/299); rule decided 2026-10-08 (page `hreflang` alternates); ticket text on the issue (its file was in PR #270, closed unmerged) |
-| SKODA-304 | Footer fragment | E03 | 3 | 1–2 | 2–4 | 102,106 | ✅ Done (#25 closed 2026-09-24). Was: 🟢 |
+| SKODA-304 | Footer fragment | E03 | 3 | 1–2 | 2–4 | 102,106 | ✅ Done (#25 closed 2026-09-24). Was: 🟢 · amended 2026-10-21 (gap review) |
 | SKODA-305 | Media Room footer variant | E03 | 2 | 1 | 1–2 | 304,301 | ✅ Done (PR #134, issue #26); closes gap G1 (COM18); unify-vs-distinct 🟡 |
 | [SKODA-306](tickets/SKODA-306.md) | Footer outbound-link browsing-context parity (`target=_blank`) | E03 | 1 | 0.5 | 1 | 304 | ✅ Done (#102 closed 2026-10-06). Was: M1; issue #102; file added 2026-09-24 |
 | [SKODA-307](tickets/SKODA-307.md) | Header/footer survive a missing nav/footer fragment (null guard) | E03 | 0.5 | 0.25 | 0.5 | 301,304 | ✅ Done (#143 closed 2026-09-28). Was: M1; from the 2026-09-25 live-footer incident |
@@ -213,7 +213,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-402b | Media-listing toolbar spacing and active-sort color parity | E04 | – | – | – | 402a | ✅ Done (#248 closed 2026-10-07) |
 | [SKODA-402d](tickets/SKODA-402d.md) | News and Press Kits listings: every source facet, so deep links like `filter[sponsorship][]` work (#333) | E04 | 1 | 0.5 | 1 | 402,808 | 🟡 M1, in QA: PR #355 merged 2026-10-15 |
 | SKODA-403 | Search block (index-only) | E04 | 3 | 1–2 | 2–4 | 401 | ✅ Done (#29 closed 2026-09-25). Was: 🟡 body-search deferred |
-| SKODA-405 | RSS feed generation (query-index → RSS 2.0) | E04 | 2 | 0.5–1 | 1–2 | 401 | 🟢 **M2** (aligned to board 2026-09-25; was M1 stretch); agent-fit |
+| SKODA-405 | RSS feed generation (query-index → RSS 2.0) | E04 | 4 | 0.5–1 | 1–2 | 401 | 🟢 **M2** (aligned to board 2026-09-25; was M1 stretch); agent-fit · amended 2026-10-21 (gap review) |
 | [SKODA-406](tickets/SKODA-406.md) | Listing media-card cell (image/video: date, filename, download toolbar, video badge, lightbox) (#176) | E04 | 2 | 1 | 1.5–2 | 402,608,203,216,502,505a | ✅ Done (#176 closed 2026-09-29). Was: M1; ready for QA 2026-09-29 (matches the source on DA test pages; 768 columns wait on 402a); from the 608 phase split |
 | SKODA-501 | Masters-only image ingest (img-out-of-`<p>`, alt/caption) | E05 | 3 | 1–2 | 2–3 | 102 | ✅ Done (#30 closed 2026-09-25). Was: 🟢 |
 | SKODA-502 | Static Downloads block (mediabox) | E05 | 3 | 1–2 | 2–3 | 102 | ✅ Done (#31 closed 2026-09-25). Was: 🟢 |
@@ -254,7 +254,10 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-520](tickets/SKODA-520.md) | Source CDN cutover: no page, fragment, feed or code path depends on skoda-storyboard.com files (#378) | E05 | 5 | 2–3 | 4–6 | 504,503,506,518,#219 | 🔵 M2 **P1, start now** (decided 2026-10-16); census: 5,222 of 8,179 page images + 4,581 of 7,369 links already rewritable · #378 |
 | [SKODA-521](tickets/SKODA-521.md) | App Builder platform set-up: entitlement, project, credentials, connection checks (#381) | E05 | 2 | 1 | 2 | client org admins | 🔵 M2; **blocks 511a** (511 needs its AEM credential); client asks C1–C7 first (entitlement is the long pole); review in `SKODA-APP-BUILDER-INTEGRATION.md` |
 | [SKODA-522](tickets/SKODA-522.md) | Asset changes reach pages: re-publish on update, report on unpublish and expiry (#389) | E05 | 3 | 1–2 | 2–4 | D20,520,521,511a,511b,518 | 🔵 M2; approach depends on **D20** |
-| [SKODA-523](tickets/SKODA-523.md) | Media beyond images: MP4 library, annual reports and PDFs, non-EN CDN refs, captions, Vimeo allow-list (#425) | E05 | 5 | 2–3 | 4–6 | 520,504,608,Q-18 | 🔵 M2; MP4 library ≈ 0.4–0.6 TB |
+| [SKODA-523](tickets/SKODA-523.md) | Media beyond images: MP4 library, annual reports and PDFs, non-EN CDN refs, captions, Vimeo allow-list (#425) | E05 | 1 | 2–3 | 4–6 | 520,504,608,Q-18 | 🔵 M2; MP4 library ≈ 0.4–0.6 TB · split 2026-10-21: 3 sub-tickets, 11 SP in total |
+| [SKODA-523a](tickets/SKODA-523a.md) | MP4 library: per-file list, sizing, batch plan and delivery of files over 1 GB (#441) | E05 | 4 | 2 | 4–5 | SKODA-523 | 🔵 M2; sub-ticket of SKODA-523 |
+| [SKODA-523b](tickets/SKODA-523b.md) | Source references in every locale: census, rewrite and a zero-reference gate that sees drops (#442) | E05 | 3 | 1–2 | 3–4 | SKODA-523 | 🔵 M2; sub-ticket of SKODA-523 |
+| [SKODA-523c](tickets/SKODA-523c.md) | Documents: Word, ZIP, PowerPoint and audio kinds, the REST-sourced PDF link census, orphan documents (#443) | E05 | 3 | 1–2 | 3 | SKODA-523 | 🔵 M2; sub-ticket of SKODA-523 |
 | [SKODA-611](tickets/SKODA-611.md) | Storyboard home composition (/en cover-box stack, promo exclusion) | E06 | 2.5 | 1 | 2–2.5 | 212,213,214,217,218,603 | ✅ Done (#153, #151, #147 closed 2026-10-05). Was: M1; Demo sweep 2026-09-25; **parent** of 611a/611b (D2); 611a ✅ (#205), 611b in review (PR #238); closes with 611b |
 | [SKODA-611a](tickets/SKODA-611a.md) | Home section structure: 9 cover-box sections, dark bands, social strip (Must slice) | E06 | 1 | 0.5 | 1 | 213,214,217,218,603 | ✅ Done: merged (#205, 2026-09-29), `/en` re-imported and pushed with SKODA-827; issue #151 closed |
 | [SKODA-611b](tickets/SKODA-611b.md) | Home band spacing: light-band padding + gaps to live, + home rails (Should slice) | E06 | 1.5 | 0.5 | 1–1.5 | 611a,218,212,224,827 | ✅ Done (#153 closed 2026-10-05). Was: M1 Should; in review (PR #238, branch `skoda-611b-home-spacing`): band spacing + home rails (card ladder, caption cards, "All" pill + end card); every band within 1px of live after merging main (2026-10-01); /en re-import pending DA push |
@@ -278,12 +281,20 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-705](tickets/SKODA-705.md) | Confirm "Load more" button variant vs source | E07 | – | – | – | 402,214 | ✅ Done (#46 closed 2026-10-11) |
 | [SKODA-707](tickets/SKODA-707.md) | Demo assembly + dry-run + script (15 Oct) | E07 | 2 | – | – | 603,704 | ✅ Done (#53 closed 2026-10-14) |
 | [SKODA-708](tickets/SKODA-708.md) | Review protocol: click, heading-outline, side-effect, deviation checks (from M1 manual-QA gap analysis) | E07 | 1 | <1 | 1–2 | 704 | 🟢 M2, #384 |
-| [SKODA-709](tickets/SKODA-709.md) | Production launch: CDN, DNS (www, bare domain, 11 alias hosts), TLS, production host (#416) | E07 | 3 | 1–2 | 2–3 | D14,Q-20,Škoda IT | 🔵 M2; **Critical**: no owner today; TLS cert expires 2026-11-30 |
-| [SKODA-710](tickets/SKODA-710.md) | Cutover runbook and calendar: freeze, delta import, go/no-go, rollback, links.js switch (#417) | E07 | 3 | 1–2 | 2–3 | 709,803,1004,Q-20 | 🔵 M2; go-live is a Saturday after the holidays |
+| [SKODA-709](tickets/SKODA-709.md) | Production launch: CDN, DNS (www, bare domain, 11 alias hosts), TLS, production host (#416) | E07 | 3 | 1–2 | 2–3 | D14,Q-20,Škoda IT | 🔵 M2; **Critical**: no owner today; TLS cert expires 2026-11-30 · split 2026-10-21: 2 sub-tickets, 6 SP in total |
+| [SKODA-709a](tickets/SKODA-709a.md) | Alias hosts: which follow the switch, certificates, redirect rules per family, keep or retire (#437) | E07 | 2 | 1 | 2 | SKODA-709 | 🔵 M2; sub-ticket of SKODA-709 |
+| [SKODA-709b](tickets/SKODA-709b.md) | Document host: deliver PDFs, MP4s and originals from a Škoda host, not the raw AEM publish host (Q-21) (#438) | E07 | 1 | 0.5 | 1 | SKODA-709 | 🔵 M2; sub-ticket of SKODA-709 |
+| [SKODA-710](tickets/SKODA-710.md) | Cutover runbook and calendar: freeze, delta import, go/no-go, rollback, links.js switch (#417) | E07 | 3 | 1–2 | 2–3 | 709,803,1004,Q-20 | 🔵 M2; go-live is a Saturday after the holidays · split 2026-10-21: 2 sub-tickets, 7 SP in total |
+| [SKODA-710a](tickets/SKODA-710a.md) | Link release at the switch: scripts/links.js on the own host, and the DA relink (#439) | E07 | 3 | 1–2 | 2–3 | SKODA-710 | 🔵 M2; sub-ticket of SKODA-710 |
+| [SKODA-710b](tickets/SKODA-710b.md) | Publish side-effect register and one EN and one CS test release on the production host (#440) | E07 | 1 | 0.5–1 | 1–2 | SKODA-710 | 🔵 M2; sub-ticket of SKODA-710 |
 | [SKODA-711](tickets/SKODA-711.md) | WordPress decommission and archive: personal data, licences, hosting, shared motorsport site (#418) | E07 | 3 | 1 | 2–3 | 710,D15 | 🔵 M2; skoda-motorsport.com shares the hosting |
-| [SKODA-712](tickets/SKODA-712.md) | Operating model and year-one run calendar: hypercare, hand-over, renewals, monitoring (#419) | E07 | 3 | 1–2 | 2–3 | 709,D15,101a | 🔵 M2 |
-| [SKODA-713](tickets/SKODA-713.md) | SEO migration: sitemap/robots per locale, JSON-LD, noindex fragments, SEO owner, monitoring (#420) | E07 | 5 | 2–3 | 4–6 | 709,103b,1001 | 🔵 M2; Google News indexes the site |
-| [SKODA-714](tickets/SKODA-714.md) | Security headers and CSP on the production CDN (#421) | E07 | 2 | 1 | 1–2 | 709,907 | 🔵 M2; headers drop at the switch today |
+| [SKODA-712](tickets/SKODA-712.md) | Operating model and year-one run calendar: hypercare, hand-over, renewals, monitoring (#419) | E07 | 4 | 1–2 | 2–3 | 709,D15,101a | 🔵 M2 |
+| [SKODA-713](tickets/SKODA-713.md) | SEO migration: sitemap/robots per locale, JSON-LD, noindex fragments, SEO owner, monitoring (#420) | E07 | 2 | 2–3 | 4–6 | 709,103b,1001 | 🔵 M2; Google News indexes the site · split 2026-10-21: 4 sub-tickets, 13 SP in total |
+| [SKODA-713a](tickets/SKODA-713a.md) | Per-locale sitemaps, production robots.txt, noindex for chrome, document index policy (#430) | E07 | 3 | 1–2 | 2–4 | SKODA-713 | 🔵 M2; sub-ticket of SKODA-713 |
+| [SKODA-713b](tickets/SKODA-713b.md) | Structured data and article meta: JSON-LD helper, og and article tags, image preview (#431) | E07 | 3 | 1–2 | 2–4 | SKODA-713 | 🔵 M2; sub-ticket of SKODA-713 |
+| [SKODA-713c](tickets/SKODA-713c.md) | Legacy URL inventory and pre-DNS redirect harness (#432) | E07 | 3 | 1–2 | 3–4 | SKODA-713 | 🔵 M2; sub-ticket of SKODA-713 |
+| [SKODA-713d](tickets/SKODA-713d.md) | Analytics continuity across the cutover: baseline, path mapping, download KPI (#433) | E07 | 2 | 1 | 2–3 | SKODA-713 | 🔵 M2; sub-ticket of SKODA-713 |
+| [SKODA-714](tickets/SKODA-714.md) | Security headers and CSP on the production CDN (#421) | E07 | 2.5 | 1 | 1–2 | 709,907 | 🔵 M2; headers drop at the switch today |
 
 **Phases B–D (Pilot: No)**
 
@@ -294,8 +305,8 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-209 | Category / Tag archive template (hero + card grid, no facets) | E02 | B | 3 | 1–2 | 2–4 | 202,201,402 | 🟢 M2; spec `ui-specs/template-category-archive.md` |
 | [SKODA-209a](tickets/SKODA-209a.md) | Archive pager: the source's "6 / N" count row and Load more spacing (follow-up to 209) (#330) | E02 | 1 | 0.5 | 1 | 209,214,402c | ✅ Done (#330 closed 2026-10-13). Was: 🟡 M1; built on `skoda-209a-archive-pager`, PR #339 open; code only (count row keyed to the authored archive grid). Known M1 deviation: 13 non-model tag archives 32px short of the source's 48px bottom margin |
 | SKODA-210 | Custom microsite (full-width event-gallery/campaign) scope + template | E02 | B | 3 | 1–2 | 2–4 | 203,813,814,601 | 🟡 M2; 201 pages, migrate/fold/drop decision; spec `ui-specs/custom-microsite.md` (recount §2/§8) |
-| SKODA-706 | Branded 404 (keeps chrome, real HTTP 404) | E07 | B | 1 | 0.5 | 0.5–1 | 301,304 | 🟢 M2; spec `ui-specs/template-404.md` |
-| SKODA-801 | Story template, SiteOrigin Page-Builder flatten | E08 | B | 8 | 3–5 | 6–10 | 601,603 | ✅ Done (#48 closed 2026-09-24). **M2 review 2026-10-15:** Full-corpus run + the rare-layout stories → proposed follow-up **SKODA-801b** (M2). Was: 🟢 built (2026-09-24): `story-flatten.js` 17-widget map + two-column body+aside (grid-on-main); carousel routed by content (Gallery/Cards); linear + large-tree paths verified. M2: full-corpus run. Blocks it emits: 203 (Gallery), 201 (Cards) |
+| SKODA-706 | Branded 404 (keeps chrome, real HTTP 404) | E07 | B | 3 | 0.5 | 0.5–1 | 301,304 | 🟢 M2; spec `ui-specs/template-404.md` · amended 2026-10-21 (gap review) |
+| SKODA-801 | Story template, SiteOrigin Page-Builder flatten | E08 | B | 8 | 3–5 | 6–10 | 601,603 | ✅ Done (#48 closed 2026-09-24). **M2 review 2026-10-15:** Full-corpus run + the rare-layout stories → proposed follow-up **SKODA-801b** (M2). Was: 🟢 built (2026-09-24): `story-flatten.js` 17-widget map + two-column body+aside (grid-on-main); carousel routed by content (Gallery/Cards); linear + large-tree paths verified. M2: full-corpus run. Blocks it emits: 203 (Gallery), 201 (Cards) · amended 2026-10-21 (gap review) |
 | [SKODA-801b](tickets/SKODA-801b.md) | Story corpus run: every EN story through the flatten, REST-enumerated (#368) | E08 | B | 3–5 | 1.5–2.5 | 3–5 | 801,814,803 | 🔵 M2 (#368, created 2026-10-15); 1,303 EN stories, 69 live; the sitemaps miss 193 |
 | SKODA-802 | Remaining templates (Škodapedia pre-baked, pages) | E08 | B | 5 | 2–3 | 4–7 | 801 | 🟡 (press-kits split to 805–808) |
 | SKODA-803 | Bulk import automation (at scale) | E08 | B | 8 | 3–5 | 6–10 | 602,801 | 🟠 scale |
@@ -325,12 +336,20 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-842](tickets/SKODA-842.md) | DA block library + page templates for authors (authoring review AR-02/03) | E08 | A | – | – | – | 211,841,840 | 🟡 M2; #320; PR #322 (library + templates live, noindex; editor checks open) |
 | [SKODA-843](tickets/SKODA-843.md) | Generic pages: legal set, BGC, sustainability page, keep / drop list (#363) | E08 | A | – | – | – | 813,609 | 🔵 M2 (#363, created 2026-10-15); 41 default + 1 sustainability page, none live |
 | [SKODA-844](tickets/SKODA-844.md) | Featured-image mini-pages: Road to Christmas + classic-car pages (29) (#364) | E08 | A | – | – | – | 813,220 | 🔵 M2 (#364, created 2026-10-15); keep / drop first (Q-3) |
-| [SKODA-845](tickets/SKODA-845.md) | Media Room Newsletter page: press-release carousels by plant (#365) | E08 | A | – | – | – | 813,224 | 🔵 M2 (#365, created 2026-10-15); MR nav Company menu |
+| [SKODA-845](tickets/SKODA-845.md) | Media Room Newsletter page: press-release carousels by plant (#365) | E08 | A | 2 | – | – | 813,224 | 🔵 M2 (#365, created 2026-10-15); MR nav Company menu · amended 2026-10-21 (gap review) |
 | [SKODA-847](tickets/SKODA-847.md) | Press-kit corpus: enumerate every EN kit and run the three importers (#366) | E08 | A | – | – | – | 805,836,803 | 🔵 M2 (#366, created 2026-10-15); ≥ 790 EN pages, 104 live; 12 `layout-article` hubs have no importer |
 | [SKODA-848](tickets/SKODA-848.md) | Taxonomy archives at scale: keep / redirect rule for 378 EN archives (#367) | E02 | A | – | – | – | 209,402d,841 | 🔵 M2 (#367, created 2026-10-15); 41 live (Q-4) |
-| [SKODA-849](tickets/SKODA-849.md) | In-body widget census: Škodapedia glossary, ys-embed-share HTML, social embeds, skoda_iframe, quizzes (#426) | E06 | B | 5 | 2–3 | 4–6 | 801b,803,802,Q-19 | 🔵 M2; importer drops them silently today |
-| [SKODA-850](tickets/SKODA-850.md) | Day-2 authoring: scheduling, downloadable originals, embargo asset gate, path-limited publish, takedown (#427) | E08 | B | 6 | 2–3 | 4–6 | 809,811,842,101a | 🔵 M2; half of HQ releases go live on a quarter hour |
-| [SKODA-851](tickets/SKODA-851.md) | Source-generated data after the freeze: facets, category parents, allow-list to DA sheets or the index (#428) | E04 | B | 3 | 1–2 | 2–3 | 402d,605,609 | 🔵 M2; no 2027 year in listing filters |
+| [SKODA-849](tickets/SKODA-849.md) | In-body widget census: Škodapedia glossary, ys-embed-share HTML, social embeds, skoda_iframe, quizzes (#426) | E06 | B | 2 | 2–3 | 4–6 | 801b,803,802,Q-19 | 🔵 M2; importer drops them silently today · split 2026-10-21: 3 sub-tickets, 12 SP in total |
+| [SKODA-849a](tickets/SKODA-849a.md) | Škodapedia glossary spans: links to the term page per locale, and an optional accessible teaser (#444) | E06 | B | 3 | 1–2 | 3–4 | SKODA-849 | 🔵 M2; sub-ticket of SKODA-849 |
+| [SKODA-849b](tickets/SKODA-849b.md) | Interactive HTML packages (ys-embed-share): inventory, a separate origin, resize contract, audit (#445) | E06 | B | 3 | 1–2 | 3–4 | SKODA-849 | 🔵 M2; sub-ticket of SKODA-849 |
+| [SKODA-849c](tickets/SKODA-849c.md) | Third-party embeds and unmapped widgets: a verdict per host, new widget kinds, image maps, charge map (#446) | E06 | B | 4 | 2 | 4–5 | SKODA-849 | 🔵 M2; sub-ticket of SKODA-849 |
+| [SKODA-850](tickets/SKODA-850.md) | Day-2 authoring: scheduling, downloadable originals, embargo asset gate, path-limited publish, takedown (#427) | E08 | B | 1 | 2–3 | 4–6 | 809,811,842,101a | 🔵 M2; half of HQ releases go live on a quarter hour · split 2026-10-21: 5 sub-tickets, 17 SP in total |
+| [SKODA-850a](tickets/SKODA-850a.md) | Timed releases: Schedule Publish, Snapshots, Request Publish, listing freshness, AI-audio step (#447) | E08 | B | 3.5 | 1.5–2 | 3–4 | SKODA-850 | 🔵 M2; sub-ticket of SKODA-850 |
+| [SKODA-850b](tickets/SKODA-850b.md) | Downloadable originals after go-live: AEM Assets editor group, folders, picker renditions, kit ZIPs (#448) | E08 | B | 3 | 1–2 | 2–3 | SKODA-850 | 🔵 M2; sub-ticket of SKODA-850 |
+| [SKODA-850c](tickets/SKODA-850c.md) | Embargo asset gate: a marker, a feed-sync skip and a launch preview without published URLs (#449) | E08 | B | 3 | 1–2 | 2–3 | SKODA-850 | 🔵 M2; sub-ticket of SKODA-850 |
+| [SKODA-850d](tickets/SKODA-850d.md) | Publish rights per path, shared root documents, takedown and rename runbooks (#450) | E08 | B | 3.5 | 1.5–2 | 3–4 | SKODA-850 | 🔵 M2; sub-ticket of SKODA-850 |
+| [SKODA-850e](tickets/SKODA-850e.md) | New press kits and locale-aware DA templates after go-live (#451) | E08 | B | 3 | 1–2 | 2–3 | SKODA-850 | 🔵 M2; sub-ticket of SKODA-850 |
+| [SKODA-851](tickets/SKODA-851.md) | Source-generated data after the freeze: facets, category parents, allow-list to DA sheets or the index (#428) | E04 | B | 4 | 1–2 | 2–3 | 402d,605,609 | 🔵 M2; no 2027 year in listing filters |
 | [SKODA-841](tickets/SKODA-841.md) | Tags entered once: facet pick lists (EW options), derived visible tags, archive matching on facets (AR-04/15) | E08 | A | – | – | – | 205,211,401,842 | 🔵 M2; #319 |
 | [SKODA-840](tickets/SKODA-840.md) | Story newsletter card as one shared fragment, auto-inserted in the story sidebar (AR-05) | E08 | A | – | – | – | 823,904 | 🔵 M2; #318 |
 | [SKODA-839](tickets/SKODA-839.md) | Home Models rail: model tag pages carry the source home card image (featured header banner) as page image | E08 | A | – | – | – | – | ✅ Done (#310 closed 2026-10-11). Was: M1; #310, PR #311; 11 tag pages published 2026-10-10; card frame aspect open on #306 |
@@ -339,7 +358,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-822 | Ship SKODA-801 two-column story layout to `main` | E08 | A | 1 | — | — | 801 | ✅ merged as PR #113 (2026-09-24 21:35) |
 | SKODA-823 | Story sidebar newsletter sign-up widget (UI stub) | E08 | A | 2 | 0.5–1 | 1–2 | 904,801 | ✅ Done (#126 closed 2026-09-29). Was: extend footer `newsletter-stub` for the sidebar; no ESP, no false success; side banner → 903; **M1 Could** (review §15) |
 | [SKODA-824](tickets/SKODA-824.md) | In-column highlight panel (story dark box + PR grey callout) | E08 | A | 3 | 1 | 2–3 | 801,814,218,819,225 | ✅ Done (#148 closed 2026-10-07). Was: M1; Demo sweep 2026-09-25; 12 stories + 1 PR; importer done 2026-09-28 (contract shape 2); runtime in review 2026-10-05 |
-| SKODA-809 | Roles & permissions (7 editorial groups) | E08 | B | 5 | 2–3 | 4–8 | 101,602 | 🟠 gap G2 (§6.4); blocked on D15 RACI |
+| SKODA-809 | Roles & permissions (7 editorial groups) | E08 | B | 5 | 2–3 | 4–8 | 101,602 | 🟠 gap G2 (§6.4); blocked on D15 RACI · amended 2026-10-21 (gap review) |
 | SKODA-811 | Content embargo (staged-publish, group access) | E08 | B | 3 | 1–2 | 2–4 | 602,809 | 🔵 M2 (#72; GitHub milestone M2): gap G3 (§6.5/D9) approach agreed; ungated version can start, the group gate needs 809/D15 |
 | SKODA-812 | Auditability (author change-history) | E08 | B | 2 | 0.5–1 | 1–3 | 101,602,809 | 🟡 gap G5 (§6.7); validate DA/EW capability |
 | SKODA-901 | Hosted body-relevance search (decision-gated) | E09 | C | 8 | 3–5 | 6–10 | 401 | 🟠 |
@@ -348,8 +367,11 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-904 | Newsletter/subscriber (ESP + consent + opt-in) | E09 | C | 8 | 3–5 | 6–10 | 304 | 🔴 10-route account |
 | SKODA-905 | skoda-analytics rebuild (dataLayer + per-block wiring) | E09 | C | 8 | 3–5 | 6–10 | 804,E02,E04 | 🔴 hidden cross-cutting |
 | SKODA-906 | Restricted end-user access (QR-code journey) | E09 | C | 5 | 2–3 | 4–8 | 101 | 🔴 gap G4 (§6.6); blocked on D17; SP provisional |
-| [SKODA-907](tickets/SKODA-907.md) | Škoda consent and group tracking: sDrive/CCM, legal-entity-id, OneTrust per locale, embed consent (#423) | E09 | C | 3 | 1–2 | 2–4 | 804,905,D10,Q-16 | 🔵 M2; pings before consent on every page |
-| [SKODA-908](tickets/SKODA-908.md) | External consumers at cutover: mobile app, newsletter manage pages, RSS delivery, podcasts (#424) | E09 | C | 5 | 2 | 3–5 | 904,405,iComVision,mailguide | 🔵 M2; 356 feed subscribers; app source undocumented |
+| [SKODA-907](tickets/SKODA-907.md) | Škoda consent and group tracking: sDrive/CCM, legal-entity-id, OneTrust per locale, embed consent (#423) | E09 | C | 4.5 | 1–2 | 2–4 | 804,905,D10,Q-16 | 🔵 M2; pings before consent on every page |
+| [SKODA-908](tickets/SKODA-908.md) | External consumers at cutover: mobile app, newsletter manage pages, RSS delivery, podcasts (#424) | E09 | C | 1 | 2 | 3–5 | 904,405,iComVision,mailguide | 🔵 M2; 356 feed subscribers; app source undocumented · split 2026-10-21: 3 sub-tickets, 12 SP in total |
+| [SKODA-908a](tickets/SKODA-908a.md) | Mobile app at cutover: content contract and new-article notification with de-duplication (#452) | E09 | C | 4 | 2 | 3–4 | SKODA-908 | 🔵 M2; sub-ticket of SKODA-908 |
+| [SKODA-908b](tickets/SKODA-908b.md) | RSS delivery at cutover: mechanism, content type, refresh on publish, slash rule, feed decisions (#453) | E09 | C | 3 | 1–2 | 2–3 | SKODA-908 | 🔵 M2; sub-ticket of SKODA-908 |
+| [SKODA-908c](tickets/SKODA-908c.md) | Newsletter at cutover: manage and landing pages, consent renewal, mailguide send triggers (#454) | E09 | C | 4 | 2 | 3–4 | SKODA-908 | 🔵 M2; sub-ticket of SKODA-908 |
 | SKODA-1001 | Per-locale trees + per-locale query-index | E10 | D | 5 | 2–3 | 4–6 | 401,603 | 🟡 |
 | SKODA-1002 | EW Translation rollout (DE/CS/SK/SR/SL) | E10 | D | 8 | 3–5 | content-ops | 1001 | 🟠 volume |
 | SKODA-1003 | Language-negotiated routing + placeholders | E10 | D | 3 | 1–2 | 2–3 | 303,1001 | 🟡 |
@@ -361,8 +383,11 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-1004e](tickets/SKODA-1004e.md) | SL corpus import (Media Room shell) (#399) | E10 | D | 1 | 0.5 | 1–2 | 1004,Q-7 | 🔵 M2; timing per Q-7 |
 | [SKODA-1005](tickets/SKODA-1005.md) | Translation pairs after go-live: group id, author "link a translation", reciprocity check (#400) | E10 | D | 3 | 1–2 | 3–4 | Q-10,1001,303a,1004 | 🔵 M2; approach per **Q-10** |
 | [SKODA-1006](tickets/SKODA-1006.md) | Per-locale chrome: nav, footer, Media Room nav/footer (#401) | E10 | D | 2 | 1 | 2–3 | 1001,1003,302,304 | 🔵 M2; CS for go-live |
-| [SKODA-103a](tickets/SKODA-103a.md) | Inbound trailing-slash rule (301 `/{path}/` → `/{path}`, all locales) (#402) | E01 | D | 2 | 1 | 1–2 | D14,103,1003 | 🔵 M2; **before DNS**; ≈ 15,000 slashed legacy URLs |
-| [SKODA-103b](tickets/SKODA-103b.md) | Legacy URL resolution beyond the sheet: attachments, query routes, old slugs, inbound CDN/download links (#422) | E01 | D | 5 | 2–3 | 4–6 | 103a,709,Q-17 | 🔵 M2; 42,275 indexed attachment pages |
+| [SKODA-103a](tickets/SKODA-103a.md) | Inbound trailing-slash rule (301 `/{path}/` → `/{path}`, all locales) (#402) | E01 | D | 2.5 | 1 | 1–2 | D14,103,1003 | 🔵 M2; **before DNS**; ≈ 15,000 slashed legacy URLs · amended 2026-10-21 (gap review) |
+| [SKODA-103b](tickets/SKODA-103b.md) | Legacy URL resolution beyond the sheet: attachments, query routes, old slugs, inbound CDN/download links (#422) | E01 | D | 2 | 2–3 | 4–6 | 103a,709,Q-17 | 🔵 M2; 42,275 indexed attachment pages · split 2026-10-21: 3 sub-tickets, 12 SP in total |
+| [SKODA-103c](tickets/SKODA-103c.md) | Attachment pages and WordPress archive routes: pattern rules and rows (#434) | E01 | D | 3 | 1–2 | 3–4 | SKODA-103b | 🔵 M2; sub-ticket of SKODA-103b |
+| [SKODA-103d](tickets/SKODA-103d.md) | Query routes, old slugs and the slim slug map for near-miss URLs (#435) | E01 | D | 4 | 2 | 3–5 | SKODA-103b | 🔵 M2; sub-ticket of SKODA-103b |
+| [SKODA-103e](tickets/SKODA-103e.md) | Inbound file links: /direct-download/, a permanent redirect-only CDN host, wp-json (#436) | E01 | D | 3 | 1–2 | 3–4 | SKODA-103b | 🔵 M2; sub-ticket of SKODA-103b |
 
 ---
 

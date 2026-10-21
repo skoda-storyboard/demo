@@ -4,13 +4,15 @@
 - **Type:** integration (head scripts, bulk metadata, consent wiring) plus client decisions. Amends SKODA-804 and 905.
 - **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02). **Go-live blocker:** without the sDrive hook there is no
   consent layer at all (G-A-01). The long pole is Škoda privacy and analytics (**Q-16**, D10).
-- **Estimate:** 3 SP team time · AI-assisted 1–2d / manual 2–3d, excluding Škoda lead time *(planning estimate, not
-  a quote)*. The source findings sum to ≈ 3.5–5 SP (2–3 on 804, 0.5 embeds, 0.5 SL, 0.5–1 performance), so 3 SP is
-  tight; the 905 event work stays inside 905's 8 SP.
+- **Estimate:** 4.5 SP team time · AI-assisted 2–3d / manual 3–4d, excluding Škoda lead time *(planning estimate,
+  not a quote)*. The source findings sum to ≈ 3.5–5 SP (2–3 on 804, 0.5 embeds, 0.5 SL, 0.5–1 performance); round 2
+  adds ≈ 0.25–0.5 SP (the sGTM host decision, consent rows for up to 5 more embed hosts, the storage-key hand-over
+  at ≈ 0.1 SP). The first draft's 3 SP was tight; the 905 event work stays inside 905's 8 SP.
 - **GitHub issue:** [#423](https://github.com/skoda-storyboard/demo/issues/423) (created 2026-10-21, sub-issue of epic #95)
-- **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
+- **Status (2026-10-21, amended after round 2):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-A-01 (High, CONFIRMED; G-B-04 merged),
   G-A-02 (High, CONFIRMED), G-A-03 (Medium, CONFIRMED, was High), G-A-04, G-A-05, G-A-06 (Medium, not re-verified).
+  Round 2: G-T5-06, G-T4-02 (Medium), G-T9-06 (Low; absorbs G-G-12), not re-verified.
 
 ## Why
 SKODA-804 plans "OneTrust + geolocation in the delayed phase" and "zero cookies, no vendor calls before consent".
@@ -38,6 +40,8 @@ The source runs Škoda's central stack instead (measured 2026-10-21):
   (`sgtm-hq-prod-…run.app`, 0 refs to 804's `cloudfunctions` host) and routes on lookup tables keyed `BID,language`
   (15 values). SR emits `page.LanguageVersion` `sr-latn-cs` and EN `en-com`, neither in the table as read, so the
   per-locale routing needs the container export. D10 was updated on 2026-10-21; 905 already plans the 1:1 dataLayer.
+  A first-party host also exists (G-T5-06): `sgtm.skoda-storyboard.com` answers `/healthy` 200 from Google Cloud
+  (136.110.149.253), the same IP as `sgtm.skoda-motorsport.com`. Which host EDS sends to is undecided.
 - **Performance (G-A-04, not re-verified).** On a new session `endpoint.js` sends the top-level page to
   `cross.skoda-auto.com/sdrive/sync.html` and back (`#s_state=NEW&s_aid=…`): 4 of the first 5 navigations, each a
   full reload. The 2 head scripts are render-blocking (213 ms and 119 ms on a warm story). 804's "Lighthouse
@@ -46,7 +50,13 @@ The source runs Škoda's central stack instead (measured 2026-10-21):
   and the zero-tracking ping still run. On EDS no consent could ever be given there.
 - **Embeds (G-A-06, not re-verified).** The origin gates only YouTube, and still loads the `i.ytimg.com` poster.
   Vimeo (5 iframes on the Media Room, listed under C0003 in Škoda's OneTrust config) and Buzzsprout load ungated.
-  204a gates all four providers on one boolean, and withdrawal doesn't unload a loaded player.
+  204a gates all four providers on one boolean, and withdrawal doesn't unload a loaded player. The corpus has 17
+  iframe hosts, not 8 (G-T4-02): koala360 (4 docs), Roundme (2), Matterport, Slido and Livebox PPV (1 each), among
+  others, are in neither 849 nor `EMBED_HOSTS`. Each one kept is a third party that needs a consent group.
+- **Cookie inventory (G-T9-06, G-G-12).** The OneTrust EN script the CCM assigns (6b4f906c…, Domain=skoda-auto.com)
+  lists 97 cookies on 19 skoda-auto.com hosts and 0 on skoda-storyboard.com. EDS adds the `skoda-media-cart`
+  localStorage key (a device ID with no expiry, `scripts/media-cart.js:38`) and the `fonts-loaded` sessionStorage
+  key. The gap exists on WordPress too, so it is a recurring chore, not a regression.
 
 ## Scope
 **Client (Škoda privacy office, analytics, sDrive owner):**
@@ -54,10 +64,14 @@ The source runs Škoda's central stack instead (measured 2026-10-21):
   first-visit sync hop be skipped for Storyboard?
 - **C2 Q-16:** are the zero-tracking ping, `opt_sync` / `__uid` and the post-refusal `aid` "necessary" for this site?
 - **C3** Is sdrive a required reporting feed, and under which consent group?
-- **C4** The `GTM-M5GMBWF` export (or read access) and the GA4 property and `BID,language` values per locale.
+- **C4** The `GTM-M5GMBWF` export (or read access) and the GA4 property and `BID,language` values per locale; the
+  GCP project and owner behind `sgtm.skoda-storyboard.com`, and whether EDS uses it or the `run.app` host (G-T5-06).
 - **C5** Which CMP `/sl/` uses on the new site, and who owns it (Porsche Slovenija is the SL controller, Q-9).
 - **C6** The OneTrust group for Buzzsprout and Spotify, and for Instagram, LinkedIn and `stream.skoda.vwgroup.com`
-  embeds (the inventory challenge in §6).
+  embeds (the inventory challenge in §6); for koala360, Matterport, Roundme, Slido and Livebox if 849 keeps them
+  (G-T4-02).
+- **C7 CCM owner (G-T9-06):** is skoda-storyboard.com in any OneTrust scan, on what schedule, and who receives the
+  EDS storage-key list?
 
 **Team:**
 - **T1 Head integration (amends 804).** `legal-entity-id` per locale from the table, written as bulk metadata rows;
@@ -66,10 +80,12 @@ The source runs Škoda's central stack instead (measured 2026-10-21):
   (SKODA-714 T3).
 - **T2 804 text.** Replace "OneTrust tag + geolocation" with the CCM contract; rewrite AC 1 to the Q-16 answer
   (e.g. "only Škoda-classified necessary cookies and the zero-tracking ping before consent"); the server-side
-  host becomes the Cloud Run sGTM; drop Hotjar and the `cloudfunctions` host (G-A-07, Low, confirmed).
+  host becomes the sGTM host C4 names (`run.app` or `sgtm.skoda-storyboard.com`); drop Hotjar and the
+  `cloudfunctions` host (G-A-07, Low, confirmed).
 - **T3 905 amendment.** If C3 keeps sdrive, 905 emits the `sdrive.track*` calls next to the dataLayer events; the
   `page.*`, `importer.BID`, `matrixId` and `trackEcEvent` contract follows the C4 export.
-- **T4 Embed map (amends 804 and 204a).** One row per provider: YouTube C0004, Vimeo C0003, the rest per C6.
+- **T4 Embed map (amends 804 and 204a).** One row per provider: YouTube C0004, Vimeo C0003, the rest per C6,
+  including each G-T4-02 host that 849's verdict table keeps.
   `setEmbedConsent` per provider on `OneTrustGroupsUpdated`; withdrawal unloads that provider's players; posters
   are served first-party, so nothing loads from a provider before its group is granted.
 - **T5 SL.** Wire the C5 answer. Until then `/sl/` keeps the click-to-load placeholders and loads no analytics.
@@ -77,6 +93,9 @@ The source runs Škoda's central stack instead (measured 2026-10-21):
   against the 702 baseline. Share and copy-link controls drop `#s_state` / `#s_aid` fragments.
 - **T7 Docs.** Correct SKODA-MASTER l.144 and SKODA-STORYBOARD-DISCOVERY l.156; document the LEID table and the
   consent contract.
+- **T8 Storage keys (G-T9-06).** Hand the CCM owner the EDS storage-key list (`skoda-media-cart`, `fonts-loaded`)
+  at cutover, classified (likely strictly necessary); SKODA-712's calendar resends it with each release that adds a
+  key, plus the annual cookie-notice check.
 
 ## Not in scope
 - CSP, Trusted Types and the vendor run under the header set: SKODA-714. Per-block event wiring: SKODA-905.
@@ -90,16 +109,18 @@ The source runs Škoda's central stack instead (measured 2026-10-21):
 - [ ] EN, CS, DE, SK and SR load the OneTrust script the CCM table assigns, and the banner shows on a first visit.
 - [ ] A fresh-context network log (3 templates × 5 locales) lists the cookies and hosts set before consent; they
       match the Q-16 decision and are compared with the origin.
-- [ ] After Accept All, GA4 reaches the Cloud Run sGTM with the C4 values per locale; after Reject All no GA4 or
-      Meta request fires.
+- [ ] After Accept All, GA4 reaches the sGTM host C4 names with the C4 values per locale; after Reject All no GA4
+      or Meta request fires.
 - [ ] Granting one group loads only its providers; withdrawing it unloads them; 0 `i.ytimg.com` requests before
-      consent.
+      consent. Every embed host 849 keeps has a row in the map.
 - [ ] `/sl/` behaves as C5 decides, and the decision is recorded.
 - [ ] Lighthouse and CWV with the sDrive stack are recorded; any drop below the 702 targets is fixed or accepted by a
       human with the reason.
+- [ ] The CCM owner has the storage-key list and the C7 answer is recorded; SKODA-712 has the resend line.
 - [ ] 804 and 905 carry the amendments; MASTER and DISCOVERY are corrected.
 
 ## Dependencies
-- **Q-16**, D10, Q-9 (SL controller); client C1–C6.
+- **Q-16**, D10, Q-9 (SL controller); client C1–C7.
 - SKODA-804 and 905 (amended), 204a (consent hook), 714 (nonce, vendor test), 702 (performance baseline), 713 T8,
-  849 (embeds it converts), 1004a–e (locale metadata rows, SL timing per Q-7).
+  849 (embeds it converts, G-T4-02 verdicts), 1004a–e (locale metadata rows, SL timing per Q-7), 711 (sGTM shared
+  with skoda-motorsport.com), 712 (storage-key calendar line).

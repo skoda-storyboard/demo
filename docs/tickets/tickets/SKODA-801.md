@@ -138,3 +138,21 @@ Body…
 - **Large-tree outliers (new):** up to 208 widgets / 293 panel-grids → perf/recursion robustness required.
 - **3 interactive widgets** (`charge-map`, `charging-calculator`, nested `panels-builder`) → defer/embed; confirm render-vs-drop with Škoda.
 - Rendered SiteOrigin DOM (post-JS) may differ from raw panel markup, **the common story/rails shape is now browser-confirmed (2026-09-10)**; the residual `[RUNTIME-UNCONFIRMED]` is scoped to the **full-corpus long tail** (multi-column layouts, the 36 specials, 208-widget outliers), validated during the M2 at-scale run.
+
+## Amendment (2026-10-21, M2 gap review)
+Source: [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-T4-08, G-T4-07 (Low, not
+re-verified). This ticket closed on M1 scope; the added work runs with the M2 corpus runs (801b EN, 1004a–e).
+- **Estimate:** +0.5 SP · AI-assisted 0.5d / manual 0.5–1d for this amendment; the estimate above is unchanged
+  *(planning estimate, not a quote)*.
+- **Placeholder report (G-T4-08):** the leftover-text check also reports bracketed author placeholders such as
+  `[LINK …]` to the locale editor, next to the 7 DE `[youtube URL]` shortcodes already filed as L-DE-06. A live DE
+  roadtrip story shows "[LINK little explorers Landingpage]" as text; no EN, CS, SK, SR or SL body in the scan has one.
+  The importer reports them; it doesn't copy them silently or guess the link.
+- **Count correction (G-T4-07):** `k2tools-charge-map` loads in 41 stories (EN 17, SK 12, CS 5, SL 3, DE 2, SR 2),
+  not 30, and the calculator in 2 (EN, SK). The replacement verdict per locale is in SKODA-849c.
+- **Widget map (G-KI-01, G-KI-05, G-T4-01):** the `ys-embed-share` row above ("chrome/omit") is wrong; it is content,
+  handled in SKODA-849b. New widget kinds (`skoda_iframe`, core `text` / `media_video` / `media_image`, story
+  `ys-row-toggle`) are added in SKODA-849c.
+- [ ] The run report lists every bracketed placeholder and leftover shortcode with locale, page and text, and the
+      list goes to the locale editor; the DE roadtrip story is on it (G-T4-08).
+- [ ] The charge-map count in the run report matches 41 + 2 across the 6 locales (G-T4-07).

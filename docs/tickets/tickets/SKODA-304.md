@@ -50,3 +50,29 @@ Measurable gates live in [`footer.md` §9](../../ui-specs/footer.md); summary:
 - Icon-font → inline SVG conversion is a small but required conversion.
 - Preserve the press-specific Škoda Media Room app + WhatsApp channel links (brand/press assets to retain).
 - **Media Room footer is DIFFERENT from the Storyboard footer** *(client walkthrough 2026-09-14, provisional pending transcript)*, this ticket delivers the **Storyboard** footer only. A **distinct MR footer variant** (a second `footer` fragment + block variant) is net-new scope; the exact deltas (links/legal/app-badge set) are unconfirmed until the transcript is reviewed. **Likely a separate ticket**, hold for transcript before scoping/estimating. Cross-ref COM18.
+
+## Amendment (2026-10-21, M2 gap review)
+Source: [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.2 and §7.6. The M1 delivery
+(#25) stands; this is new M2 scope, due before go-live (2027-01-02).
+
+**Why:** the copyright year is hard-coded `© Škoda Auto a.s. 2026` in the authored footers (`/footer` and
+`/media-room/footer`), so it is stale on launch day (G-KT-10, Low). With the locale footers (SKODA-1003) it becomes up
+to 12 fragments to edit every 1 January (G-T9-04, Medium, not re-verified).
+
+**Added scope:**
+- The footer block replaces a 4-digit year in `.copyright-notice` (set in `blocks/footer/footer-sections.js`) with
+  the current year at render time, so no fragment needs a yearly edit (G-KT-10).
+- If the client prefers an authored year, the 1 January edit of every footer fragment goes on SKODA-712's calendar
+  instead (G-T9-04). Record which.
+
+**Added acceptance criteria:**
+- [ ] With the clock set to 2027-01-02, the Storyboard and Media Room footers show `© Škoda Auto a.s. 2027` without
+      an edit to either fragment (G-KT-10).
+- [ ] A footer whose notice has no year renders unchanged; a unit test in `blocks/footer/footer.test.mjs` covers
+      both cases; `npm run lint` passes (G-KT-10).
+- [ ] Or: the 1 January step is on SKODA-712's calendar with an owner and the list of footer fragments (G-T9-04).
+
+**Estimate for this amendment:** 0.5 SP · AI-assisted 0.5d / manual 0.5d *(planning estimate, not a quote)*. The
+review sizes it at ≈0.25 SP. The original 3 SP is delivered.
+
+**Added dependencies:** SKODA-1003 (locale footers), SKODA-712 (run calendar).

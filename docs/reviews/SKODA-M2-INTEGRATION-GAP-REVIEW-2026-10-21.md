@@ -180,8 +180,9 @@ here.
    - **Year one:** on go-live day authors can't tag 2027, because the DA tag picker and the facets stop at 2026
      (G-T9-03).
 
-**Rough unticketed effort:** the new tickets proposed in §7 add about **55–65 SP**, against 203–214 SP of open M2 work.
-Several items depend on client lead time (DNS, CDN, vendors), not team time.
+**Effort:** the first estimate for the new tickets in §7 was about 55–65 SP. **Re-sized after round 2 (2026-10-21): the
+13 tickets and their 25 sub-tickets come to ≈ 114 SP**, and the amendments to older tickets add ≈ 6.5 SP. Open M2 work
+was 203–214 SP before this. Several items depend on client lead time (DNS, CDN, vendors), not team time.
 
 ## 2. Matrix
 
@@ -598,7 +599,15 @@ All three hold.
 - 7.1, all 13 new tickets: issues #416–#428, each a sub-issue of its epic issue.
 - 7.3, the register rows: Q-16 to Q-20, D10 and D14 updated, and owner, asked-on and due columns.
 
-**Not applied yet:** the amendments (7.2), the client questions (7.4) and the backlog hygiene (7.5). Each new ticket names the existing tickets it amends.
+**Applied later on 2026-10-21 (follow-up PR):**
+- the round-2 amendments (7.6), and those §7.2 amendments that touch the same files, worked into the 13 tickets plus an
+  "Amendment" section on 103a, 304, 405, 706, 801, 809, 845 and 101a;
+- re-sizing, with every ticket over 5 SP split into sub-tickets of ≤ 5 SP: 709 → 709a/b, 710 → 710a/b, 713 → 713a–d,
+  103b → 103c–e, 523 → 523a–c, 849 → 849a–c, 850 → 850a–e, 908 → 908a–c;
+- Q-21 in the register.
+
+**Not applied yet:** the rest of 7.2 (210, 802/206, 204, 848, 608/511, 401/402), the client questions (7.4), the
+backlog hygiene (7.5) and the data requests (7.7).
 
 ### 7.1 New tickets
 
