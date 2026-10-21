@@ -61,3 +61,34 @@ Contract: `columns-split` v2 in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../planning
     panel inset can't reproduce. The image is 182 wide against 149.7 at 1440.
   - The cell's h2 takes the global 34/42.5 weight 600 with a 27px top margin, not the story prose 40/45 weight 300 with
     no top margin. The story heading rules cover default content only.
+
+## 6. `centered` (equal rows of centred images, 2026-10-15)
+- **Source:** an equal SiteOrigin row (50 | 50) whose every editor image is centred (`aligncenter`, a
+  `figure.wp-caption.aligncenter` or a centred paragraph). Two kinds:
+  - rider / interviewee cards (`/en/lifestyle/sports/cycling/miss-peaches-on-the-road-enduro-in-barcelona/`, `pg-…-4`):
+    a caption figure (384px portrait, its `.wp-caption-text` name 600 and role 300, centred), then an Instagram icon
+    and a centred handle line;
+  - text | portrait rows (Sportline, Coca-Cola): a 200px portrait of an 800–1000px file, centred in its cell.
+- **Measured live** (enduro, 1440 / 768 / 390): the split row's geometry (10px cell padding, the row 10px past the
+  column, stacked at 780). Portraits 384 at x114 / x533 (1440) and x67 (768). The name sits directly under the portrait
+  (+384) and the role 20px lower (+428). The icon is 20px further down, and the handle 20px after it.
+- **EDS:** `Columns (centered[, portrait-NNN][, captioned])`. Each image cell is centred, its images at their own size
+  capped at the cell. `portrait-NNN` sizes each card's first image. `captioned` puts the caption paragraphs right
+  under it at weight 300.
+- **Verified** against live via local code with the re-imported content (2026-10-15):
+  - Enduro: portraits, names and roles match at 1440 / 768.
+  - Sportline, Coca-Cola ×3, Karoq ×2: the images match at 1440 / 768 / 390.
+- **Known differences:**
+  - DA keeps no per-image width, so a card's later images come out at their file size. The Miss Peaches Instagram
+    icons are 150 against the source's 116 / 122 (no smaller file exists), so the handle line sits 32px lower.
+  - A centred or unequal row's own padding is carried since the #380 review (2026-10-19): `pad-T-R-B-L` from 781px
+    and `pad-m-T-R-B-L` up to 780px, from the layout's `#pg-…> .panel-row-style` rules plus the theme's 32px top
+    on a styled row from 781px (none after a highlight panel, whose runtime gap is that space; a stretched row keeps
+    only its top / bottom, as SiteOrigin sets its sides). The Miss Peaches profile rows match live at 390 / 768 /
+    1440: Enduro 340 at x25 on a phone, Skatepark / Whitewater / Downhill 300 at x45; the Millionth SUV rows stay
+    370 at x10, as live. The gap above the row is still 10px less than live at every width (Millionth SUV 12px
+    more at 1440).
+- **Body images:** a story whose narrower body images are all centred gets the body Section Metadata style
+  `centered-images`, and `styles.css` centres them. Example: the enduro 800px photos at x115 in the 819px column at
+  1440, matching live. A body image shown narrower than its file still comes out at its file size: the 4×4 story's
+  200px caption figure (384) and 719px image (819).

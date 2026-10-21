@@ -740,6 +740,43 @@ function wireLightbox(entries) {
   });
 }
 
+// "Show more" / "Show less" slide the list to its new height as the source's togglebox does
+// (jQuery's default 400ms "swing", measured on the live 4×4 story: 383 → 639px and 805 → 2107px
+// over ~400ms). max-height is animated too, so a collapse runs before the clip applies.
+const SLIDE_MS = 400;
+const SLIDE_EASING = 'cubic-bezier(0.37, 0, 0.63, 1)'; // jQuery swing
+
+/**
+ * Slides the list from its old height to its new one. The pill moves with it from its old place
+ * (over the clipped list's bottom edge when collapsed, under the list when open): its top margin
+ * starts where it puts the pill at its old top, so the whole group grows or shrinks smoothly
+ * from the first frame and the peeking row stays until the list passes it, as on the source.
+ * @param {HTMLElement} list the tile list, already in its new state
+ * @param {HTMLElement} toggle the "Show more" pill after it, already in its new state
+ * @param {{ listHeight: number, toggleTop: number }} before the list's height and the pill's
+ *   viewport top before the change (mid-slide: where the running slide had them)
+ * @returns {Animation|null} the list's slide, or null when nothing moves
+ */
+export function slideList(list, toggle, before) {
+  const to = list.getBoundingClientRect().height;
+  if (!list.animate || Math.abs(to - before.listHeight) < 1
+    || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return null;
+  const options = { duration: SLIDE_MS, easing: SLIDE_EASING };
+  if (toggle?.animate) {
+    const margin = parseFloat(window.getComputedStyle(toggle).marginBlockStart) || 0;
+    // with the list still at its old height the pill would sit (to - from) higher
+    const startTop = toggle.getBoundingClientRect().top - (to - before.listHeight);
+    toggle.animate([
+      { marginBlockStart: `${margin + before.toggleTop - startTop}px` },
+      { marginBlockStart: `${margin}px` },
+    ], options);
+  }
+  return list.animate([
+    { height: `${before.listHeight}px`, maxHeight: `${before.listHeight}px`, overflow: 'hidden' },
+    { height: `${to}px`, maxHeight: `${to}px`, overflow: 'hidden' },
+  ], options);
+}
+
 /**
  * @param {Element} block the downloads block element
  */
@@ -752,6 +789,10 @@ export default async function decorate(block) {
   // so no gallery style reaches it either (PR #287 review)
   const gallery = !mediaBox && block.classList.contains('gallery');
   if (mediaBox) block.classList.remove('gallery');
+  // a story's photo grid (the same source group in a story's text): photos only. A 3-wide one
+  // (`columns 3`) is a step narrower than the Media Box ladder: 1 / 2 / 3 at 768 / 992
+  const narrow = gallery && block.classList.contains('story') && Number(cfg.columns) === 3;
+  if (narrow) block.classList.add('downloads-narrow');
   if (cfg.collapse !== null && !['auto', 'none'].includes(cfg.collapse)) {
     throw new Error('downloads: collapse must be auto or none');
   }
@@ -848,8 +889,8 @@ export default async function decorate(block) {
       else list.style.removeProperty('--dl-rows-height');
     };
     const syncVisibility = () => {
-      // a gallery group shares the Media Box ladder (1 / 2 / 3 / 4)
-      const ladder = mediaBox || gallery;
+      // a gallery group shares the Media Box ladder (1 / 2 / 3 / 4); a narrow story grid: 1 / 2 / 3
+      const ladder = (mediaBox || gallery) && !narrow;
       let columns = 1;
       if (compact.matches && ladder) columns = 2;
       if (medium.matches) columns = ladder ? 3 : 2;
@@ -868,10 +909,23 @@ export default async function decorate(block) {
       syncLabel();
     };
     toggle.addEventListener('click', () => {
+      // read where things are now (mid-slide too), then stop a running slide, so a second click
+      // turns it around from there instead of finishing the first one
+      const before = {
+        listHeight: list.getBoundingClientRect().height,
+        toggleTop: toggle.getBoundingClientRect().top,
+      };
+      [list, toggle].forEach((el) => el.getAnimations?.().forEach((anim) => anim.cancel()));
       const expanded = block.classList.toggle('downloads-expanded');
       syncVisibility();
-      // collapsing pulls the toggle (and its focus) up past the clipped rows: keep it in view
-      if (!expanded) toggle.scrollIntoView?.({ block: 'nearest' });
+      const slide = slideList(list, toggle, before);
+      // collapsing pulls the toggle (and its focus) up past the clipped rows: keep it in view once
+      // it has arrived (a slide cancelled by another click doesn't scroll)
+      if (!expanded) {
+        (slide ? slide.finished : Promise.resolve())
+          .then(() => toggle.scrollIntoView?.({ block: 'nearest' }))
+          .catch(() => {});
+      }
     });
     block.append(toggle);
     [compact, medium, wide].forEach((query) => query.addEventListener('change', syncVisibility));

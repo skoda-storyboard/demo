@@ -193,6 +193,9 @@ test('first glimpse: eight paired rich accordions, 60 unique media assets and ac
     rows(page, 'Section Metadata').map((row) => txt(row.children[1])),
     ['body-column', 'sidebar', 'media-box, dark, full-width'],
   );
+  // the Media Box heading is an h3, as the source's (and the stories' and releases')
+  const boxHeading = [...page.querySelectorAll('h2, h3')].find((h) => h.textContent.trim() === 'Media Box');
+  assert.equal(boxHeading?.tagName, 'H3');
 });
 
 test('first glimpse preserves six inline downloads, two linked banners and both contact cards', {

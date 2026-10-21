@@ -35,9 +35,44 @@
 3. Report the remaining empty rails per page after the rebuild.
 
 ## Acceptance criteria
-- [ ] On every model page, each rail either shows items, or has a recorded reason (PO-accepted scope gap). The sweep is re-run and attached.
-- [ ] `/en/skoda-model/new-fabia` shows Images and Videos rails with items, or the agreed fallback. Measured at 1440 / 375.
-- [ ] The media manifest and feed are rebuilt with no regressions on the Images / Videos listings (counts before and after).
+- [x] On every model page, each rail either shows items, or has a recorded reason (PO-accepted scope gap). The sweep is re-run and attached.
+  - Attachment: [SKODA-516-RAIL-SWEEP-2026-10-16.md](../../analysis/SKODA-516-RAIL-SWEEP-2026-10-16.md).
+  - The PO's acceptance of the remaining gaps is still open.
+- [x] `/en/skoda-model/new-fabia` shows Images and Videos rails with items, or the agreed fallback. Measured at 1440 / 375.
+- [x] The media manifest and feed are rebuilt with no regressions on the Images / Videos listings (counts before and after).
+
+## Status (2026-10-16, branch `skoda-516-model-media-rails`)
+No fallback was needed: the feed is rebuilt with the source's card classes, so `bodywork-*` and `derivative-*` are
+kept, plus the rail queries the model pages need. The rail pages were imported and pushed, and the feed is
+published.
+
+**Sweep** (107 rails on the 23 model pages, published site):
+- 64 rails show as many cards as live, 32 show fewer, and 11 are hidden.
+- 203 live cards are missing in all. Every one has a cause in the attachment:
+  - 112 are releases and kits that are imported but held at the push gate, because their PDF / MP4 links await
+    the DAM ingest (the human half).
+  - 58 are on Kamiq and Scala: their live versions predate the media-feed rails, and the re-imports are held at
+    the gate by their Technical Data PDFs. Evaluated against the published feed, the re-imports show as many
+    Images / Videos cards as live.
+  - 29 are videos the feed leaves out: 15 Vimeo-restricted to skoda-storyboard.com, 14 with no thumbnail.
+  - 2 are cards in another locale, 1 is a kit outside the import lists, and 1 is a Peaq video the source Videos
+    library does not list.
+
+**Fabia** (`/en/skoda-model/new-fabia`, ours vs live):
+- 1440: Press Kits 6 / 6, Images 20 / 20, Videos 20 / 20; first cards 354×199 and 261×287 on both.
+- 375: the same counts; first cards 318×179 and 318×319 on both.
+
+**Feed** (`media-items/items.json`, `main` → branch):
+- images 1,714 → 2,280, videos 51 → 222, assets 4 → 4 (total 1,769 → 2,506). No item of `main`'s feed is lost.
+- #380 review (2026-10-16): the first rebuild (2,475 rows, the one published on 15 Oct) had lost 4 videos
+  of `main`'s feed: the Peaq Sportline footage I / II, the Peaq world-premiere livestream and the Chris
+  Froome clip. Videos came only from the newest-N queries, and the source has published newer ones since.
+  The source video library is now read too (`sources.json` `library`: image, video), kept to the videos
+  whose MP4 is on AEM Assets: the 4 are back, with 27 more. The rebuilt feed is published with #380.
+
+**Still needs a person:**
+- the DAM ingest on a developer machine, then pushing the 69 held releases and kits plus Kamiq and Scala;
+- the PO's acceptance of the remaining gaps above.
 
 ## Dependencies
 - Related: #178 (SKODA-511 Assets → media feed sync), #179 (SKODA-512 taxonomy), #219 (WebP publish, BLOCKED), #284 (model page QA).
