@@ -459,25 +459,31 @@ holds).
 
 All three hold.
 
-## 7. Proposed changes (pending approval; nothing has been changed)
+## 7. Proposed changes
+
+**Applied 2026-10-21, after the go-ahead:**
+- 7.1, all 13 new tickets: issues #416–#428, each a sub-issue of its epic issue.
+- 7.3, the register rows: Q-16 to Q-20, D10 and D14 updated, and owner, asked-on and due columns.
+
+**Not applied yet:** the amendments (7.2), the client questions (7.4) and the backlog hygiene (7.5). Each new ticket names the existing tickets it amends.
 
 ### 7.1 New tickets
 
 | # | Ticket | Covers | Rough size |
 |---|---|---|---|
-| N1 | **Production launch:** CDN choice (D14), DNS for www, bare domain and 11 alias hosts, TLS, the config-service production host, push invalidation, legacy-origin route | G-F-01, G-KI-04, G-KT-06 (certificates) | 3 SP + Škoda IT lead time |
-| N2 | **Cutover runbook and calendar:** freeze, delta import on `modified_gmt`, go/no-go, rollback window, holiday calendar, `links.js` LIVE_ONLY switch | G-G-02, G-KT-01, G-KT-02 | 3 SP |
-| N3 | **WordPress decommission and archive:** read-only archive, personal data in 3 environments, licences, hosting end, the skoda-motorsport.com dependency, stage and test environments | G-G-03, G-B-13, inventory challenge | 3 SP |
-| N4 | **Operating model and year-one run calendar:** hypercare, training, hand-over (GitHub, Code Sync, config, DA), licence and renewal register with dates, RUM and 404 monitoring | G-G-07, G-G-04, G-KT-06 | 3 SP |
-| N5 | **SEO migration:** production sitemap and robots per locale, JSON-LD and article meta (Google News), noindex for fragments, SEO owner, baseline and post-launch monitoring | G-F-02, G-F-03, G-F-06, G-F-07, G-KT-07 | 5 SP |
-| N6 | **Legacy URL resolution beyond the sheet:** attachment pages (3 shapes), query routes, old slugs (a 404 lookup against the index), inbound `/direct-download/`, CDN and `wp-json` paths | G-F-04, G-KJ-04, G-B-08, G-T3-02, G-T3-05 | 5 SP |
-| N7 | **Security headers and CSP** on the production CDN, tested against GTM, OneTrust and the CCM | G-F-05 | 2 SP |
-| N8 | **Škoda consent and group tracking:** sDrive and CCM, `legal-entity-id` per locale, OneTrust ids, SL banner, embed-to-consent-group map; amends 804 and 905 | G-A-01, G-A-02, G-A-05, G-A-06 | 3 SP |
-| N9 | **External consumers:** the mobile app's content source and vendor contact, newsletter manage pages (EN, CS, SK, motorsport), RSS delivery (5 feeds), podcast channel links and owner, referrer outreach | G-B-01, G-B-06, G-KJ-05, G-KJ-06, G-B-03, G-T3-03, G-D-04, G-T3-04 | 5 SP + vendor time |
-| N10 | **Media beyond images:** the MP4 library (0.4–0.6 TB), annual reports and release PDFs, non-EN CDN references, captions and transcripts, Vimeo allow-list owner | G-D-01, G-KO-01, G-KO-02, G-B-07, G-D-02, G-KO-04 | 5 SP |
-| N11 | **In-body widget census and handling:** Škodapedia glossary spans, `ys-embed-share` HTML, Spotify/Instagram/LinkedIn, `skoda_iframe`, quizzes; plus a "dropped" count in the import gate | G-C-01, G-KI-01, G-KI-02, G-KI-03, G-KI-05 | 5 SP |
-| N12 | **Day-2 authoring:** Schedule Publish, Snapshots and Request Publish enablement, downloadable originals, the embargo asset gate, path-limited publishing, shared root docs, takedown and rename runbooks, new press kits, locale-aware DA templates | G-KJ-01 … 03, G-KJ-07, G-T1-01 … 08, G-KT-08, G-KT-09, G-T2-03 | 8 SP |
-| N13 | **Source-generated data after the freeze:** move facet vocabularies and category parents to DA sheets or the index; a register of all generators with owners | G-T2-01, G-T2-02, G-T2-04, G-KT-03 | 3 SP |
+| N1: [SKODA-709](../tickets/tickets/SKODA-709.md) (#416) | **Production launch:** CDN choice (D14), DNS for www, bare domain and 11 alias hosts, TLS, the config-service production host, push invalidation, legacy-origin route | G-F-01, G-KI-04, G-KT-06 (certificates) | 3 SP + Škoda IT lead time |
+| N2: [SKODA-710](../tickets/tickets/SKODA-710.md) (#417) | **Cutover runbook and calendar:** freeze, delta import on `modified_gmt`, go/no-go, rollback window, holiday calendar, `links.js` LIVE_ONLY switch | G-G-02, G-KT-01, G-KT-02 | 3 SP |
+| N3: [SKODA-711](../tickets/tickets/SKODA-711.md) (#418) | **WordPress decommission and archive:** read-only archive, personal data in 3 environments, licences, hosting end, the skoda-motorsport.com dependency, stage and test environments | G-G-03, G-B-13, inventory challenge | 3 SP |
+| N4: [SKODA-712](../tickets/tickets/SKODA-712.md) (#419) | **Operating model and year-one run calendar:** hypercare, training, hand-over (GitHub, Code Sync, config, DA), licence and renewal register with dates, RUM and 404 monitoring | G-G-07, G-G-04, G-KT-06 | 3 SP |
+| N5: [SKODA-713](../tickets/tickets/SKODA-713.md) (#420) | **SEO migration:** production sitemap and robots per locale, JSON-LD and article meta (Google News), noindex for fragments, SEO owner, baseline and post-launch monitoring | G-F-02, G-F-03, G-F-06, G-F-07, G-KT-07 | 5 SP |
+| N6: [SKODA-103b](../tickets/tickets/SKODA-103b.md) (#422) | **Legacy URL resolution beyond the sheet:** attachment pages (3 shapes), query routes, old slugs (a 404 lookup against the index), inbound `/direct-download/`, CDN and `wp-json` paths | G-F-04, G-KJ-04, G-B-08, G-T3-02, G-T3-05 | 5 SP |
+| N7: [SKODA-714](../tickets/tickets/SKODA-714.md) (#421) | **Security headers and CSP** on the production CDN, tested against GTM, OneTrust and the CCM | G-F-05 | 2 SP |
+| N8: [SKODA-907](../tickets/tickets/SKODA-907.md) (#423) | **Škoda consent and group tracking:** sDrive and CCM, `legal-entity-id` per locale, OneTrust ids, SL banner, embed-to-consent-group map; amends 804 and 905 | G-A-01, G-A-02, G-A-05, G-A-06 | 3 SP |
+| N9: [SKODA-908](../tickets/tickets/SKODA-908.md) (#424) | **External consumers:** the mobile app's content source and vendor contact, newsletter manage pages (EN, CS, SK, motorsport), RSS delivery (5 feeds), podcast channel links and owner, referrer outreach | G-B-01, G-B-06, G-KJ-05, G-KJ-06, G-B-03, G-T3-03, G-D-04, G-T3-04 | 5 SP + vendor time |
+| N10: [SKODA-523](../tickets/tickets/SKODA-523.md) (#425) | **Media beyond images:** the MP4 library (0.4–0.6 TB), annual reports and release PDFs, non-EN CDN references, captions and transcripts, Vimeo allow-list owner | G-D-01, G-KO-01, G-KO-02, G-B-07, G-D-02, G-KO-04 | 5 SP |
+| N11: [SKODA-849](../tickets/tickets/SKODA-849.md) (#426) | **In-body widget census and handling:** Škodapedia glossary spans, `ys-embed-share` HTML, Spotify/Instagram/LinkedIn, `skoda_iframe`, quizzes; plus a "dropped" count in the import gate | G-C-01, G-KI-01, G-KI-02, G-KI-03, G-KI-05 | 5 SP |
+| N12: [SKODA-850](../tickets/tickets/SKODA-850.md) (#427) | **Day-2 authoring:** Schedule Publish, Snapshots and Request Publish enablement, downloadable originals, the embargo asset gate, path-limited publishing, shared root docs, takedown and rename runbooks, new press kits, locale-aware DA templates | G-KJ-01 … 03, G-KJ-07, G-T1-01 … 08, G-KT-08, G-KT-09, G-T2-03 | 8 SP |
+| N13: [SKODA-851](../tickets/tickets/SKODA-851.md) (#428) | **Source-generated data after the freeze:** move facet vocabularies and category parents to DA sheets or the index; a register of all generators with owners | G-T2-01, G-T2-02, G-T2-04, G-KT-03 | 3 SP |
 
 ### 7.2 Ticket amendments
 | Ticket | Amendment | From |

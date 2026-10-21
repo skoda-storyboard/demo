@@ -7,7 +7,7 @@
 - **Estimate:** 5 SP team time · AI-assisted 2–3d / manual 4–6d, excluding the MP4 transfer runtime and client
   decisions *(planning estimate, not a quote)*. The source findings sum to ≈ 6.5–10 SP (MP4 ingest and ops +3–5,
   non-EN census +2–3, PDF link census +1, orphans < 1, Vimeo < 0.5), so 5 SP holds only with an in-use-only Q-18.
-- **GitHub issue:** to create
+- **GitHub issue:** [#425](https://github.com/skoda-storyboard/demo/issues/425) (created 2026-10-21, sub-issue of epic #6)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-D-01 (High, CONFIRMED), G-B-07 (High,
   CONFIRMED), G-D-02 (Medium, CONFIRMED), G-KO-02 (Medium, not re-verified; spot-checked by hand), G-KO-04 (Low,

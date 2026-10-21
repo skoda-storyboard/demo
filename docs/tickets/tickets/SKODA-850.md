@@ -7,7 +7,7 @@
 - **Estimate:** 6 SP · AI-assisted 2–3d / manual 4–6d, excluding Adobe onboarding and client AEM admin time *(planning
   estimate, not a quote)*. Assumes the native tools cover the author UX. A custom Downloads-row plugin (3–5 SP in
   the finding) would be a sub-ticket.
-- **GitHub issue:** to create
+- **GitHub issue:** [#427](https://github.com/skoda-storyboard/demo/issues/427) (created 2026-10-21, sub-issue of epic #9)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-KJ-01 (+ G-T1-03, G-KT-08), G-KJ-02
   (+ G-T1-01), G-KJ-03 (+ G-T1-02), G-T1-04 (all High, CONFIRMED); G-T1-05, G-KJ-07, G-T1-06, G-T1-07, G-T1-08, G-T2-03,

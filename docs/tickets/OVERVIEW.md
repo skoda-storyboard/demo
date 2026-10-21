@@ -254,7 +254,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-520](tickets/SKODA-520.md) | Source CDN cutover: no page, fragment, feed or code path depends on skoda-storyboard.com files (#378) | E05 | 5 | 2–3 | 4–6 | 504,503,506,518,#219 | 🔵 M2 **P1, start now** (decided 2026-10-16); census: 5,222 of 8,179 page images + 4,581 of 7,369 links already rewritable · #378 |
 | [SKODA-521](tickets/SKODA-521.md) | App Builder platform set-up: entitlement, project, credentials, connection checks (#381) | E05 | 2 | 1 | 2 | client org admins | 🔵 M2; **blocks 511a** (511 needs its AEM credential); client asks C1–C7 first (entitlement is the long pole); review in `SKODA-APP-BUILDER-INTEGRATION.md` |
 | [SKODA-522](tickets/SKODA-522.md) | Asset changes reach pages: re-publish on update, report on unpublish and expiry (#389) | E05 | 3 | 1–2 | 2–4 | D20,520,521,511a,511b,518 | 🔵 M2; approach depends on **D20** |
-| [SKODA-523](tickets/SKODA-523.md) | Media beyond images: MP4 library, annual reports and PDFs, non-EN CDN refs, captions, Vimeo allow-list | E05 | 5 | 2–3 | 4–6 | 520,504,608,Q-18 | 🔵 M2; MP4 library ≈ 0.4–0.6 TB |
+| [SKODA-523](tickets/SKODA-523.md) | Media beyond images: MP4 library, annual reports and PDFs, non-EN CDN refs, captions, Vimeo allow-list (#425) | E05 | 5 | 2–3 | 4–6 | 520,504,608,Q-18 | 🔵 M2; MP4 library ≈ 0.4–0.6 TB |
 | [SKODA-611](tickets/SKODA-611.md) | Storyboard home composition (/en cover-box stack, promo exclusion) | E06 | 2.5 | 1 | 2–2.5 | 212,213,214,217,218,603 | ✅ Done (#153, #151, #147 closed 2026-10-05). Was: M1; Demo sweep 2026-09-25; **parent** of 611a/611b (D2); 611a ✅ (#205), 611b in review (PR #238); closes with 611b |
 | [SKODA-611a](tickets/SKODA-611a.md) | Home section structure: 9 cover-box sections, dark bands, social strip (Must slice) | E06 | 1 | 0.5 | 1 | 213,214,217,218,603 | ✅ Done: merged (#205, 2026-09-29), `/en` re-imported and pushed with SKODA-827; issue #151 closed |
 | [SKODA-611b](tickets/SKODA-611b.md) | Home band spacing: light-band padding + gaps to live, + home rails (Should slice) | E06 | 1.5 | 0.5 | 1–1.5 | 611a,218,212,224,827 | ✅ Done (#153 closed 2026-10-05). Was: M1 Should; in review (PR #238, branch `skoda-611b-home-spacing`): band spacing + home rails (card ladder, caption cards, "All" pill + end card); every band within 1px of live after merging main (2026-10-01); /en re-import pending DA push |
@@ -278,12 +278,12 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-705](tickets/SKODA-705.md) | Confirm "Load more" button variant vs source | E07 | – | – | – | 402,214 | ✅ Done (#46 closed 2026-10-11) |
 | [SKODA-707](tickets/SKODA-707.md) | Demo assembly + dry-run + script (15 Oct) | E07 | 2 | – | – | 603,704 | ✅ Done (#53 closed 2026-10-14) |
 | [SKODA-708](tickets/SKODA-708.md) | Review protocol: click, heading-outline, side-effect, deviation checks (from M1 manual-QA gap analysis) | E07 | 1 | <1 | 1–2 | 704 | 🟢 M2, #384 |
-| [SKODA-709](tickets/SKODA-709.md) | Production launch: CDN, DNS (www, bare domain, 11 alias hosts), TLS, production host | E07 | 3 | 1–2 | 2–3 | D14,Q-20,Škoda IT | 🔵 M2; **Critical**: no owner today; TLS cert expires 2026-11-30 |
-| [SKODA-710](tickets/SKODA-710.md) | Cutover runbook and calendar: freeze, delta import, go/no-go, rollback, links.js switch | E07 | 3 | 1–2 | 2–3 | 709,803,1004,Q-20 | 🔵 M2; go-live is a Saturday after the holidays |
-| [SKODA-711](tickets/SKODA-711.md) | WordPress decommission and archive: personal data, licences, hosting, shared motorsport site | E07 | 3 | 1 | 2–3 | 710,D15 | 🔵 M2; skoda-motorsport.com shares the hosting |
-| [SKODA-712](tickets/SKODA-712.md) | Operating model and year-one run calendar: hypercare, hand-over, renewals, monitoring | E07 | 3 | 1–2 | 2–3 | 709,D15,101a | 🔵 M2 |
-| [SKODA-713](tickets/SKODA-713.md) | SEO migration: sitemap/robots per locale, JSON-LD, noindex fragments, SEO owner, monitoring | E07 | 5 | 2–3 | 4–6 | 709,103b,1001 | 🔵 M2; Google News indexes the site |
-| [SKODA-714](tickets/SKODA-714.md) | Security headers and CSP on the production CDN | E07 | 2 | 1 | 1–2 | 709,907 | 🔵 M2; headers drop at the switch today |
+| [SKODA-709](tickets/SKODA-709.md) | Production launch: CDN, DNS (www, bare domain, 11 alias hosts), TLS, production host (#416) | E07 | 3 | 1–2 | 2–3 | D14,Q-20,Škoda IT | 🔵 M2; **Critical**: no owner today; TLS cert expires 2026-11-30 |
+| [SKODA-710](tickets/SKODA-710.md) | Cutover runbook and calendar: freeze, delta import, go/no-go, rollback, links.js switch (#417) | E07 | 3 | 1–2 | 2–3 | 709,803,1004,Q-20 | 🔵 M2; go-live is a Saturday after the holidays |
+| [SKODA-711](tickets/SKODA-711.md) | WordPress decommission and archive: personal data, licences, hosting, shared motorsport site (#418) | E07 | 3 | 1 | 2–3 | 710,D15 | 🔵 M2; skoda-motorsport.com shares the hosting |
+| [SKODA-712](tickets/SKODA-712.md) | Operating model and year-one run calendar: hypercare, hand-over, renewals, monitoring (#419) | E07 | 3 | 1–2 | 2–3 | 709,D15,101a | 🔵 M2 |
+| [SKODA-713](tickets/SKODA-713.md) | SEO migration: sitemap/robots per locale, JSON-LD, noindex fragments, SEO owner, monitoring (#420) | E07 | 5 | 2–3 | 4–6 | 709,103b,1001 | 🔵 M2; Google News indexes the site |
+| [SKODA-714](tickets/SKODA-714.md) | Security headers and CSP on the production CDN (#421) | E07 | 2 | 1 | 1–2 | 709,907 | 🔵 M2; headers drop at the switch today |
 
 **Phases B–D (Pilot: No)**
 
@@ -328,9 +328,9 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-845](tickets/SKODA-845.md) | Media Room Newsletter page: press-release carousels by plant (#365) | E08 | A | – | – | – | 813,224 | 🔵 M2 (#365, created 2026-10-15); MR nav Company menu |
 | [SKODA-847](tickets/SKODA-847.md) | Press-kit corpus: enumerate every EN kit and run the three importers (#366) | E08 | A | – | – | – | 805,836,803 | 🔵 M2 (#366, created 2026-10-15); ≥ 790 EN pages, 104 live; 12 `layout-article` hubs have no importer |
 | [SKODA-848](tickets/SKODA-848.md) | Taxonomy archives at scale: keep / redirect rule for 378 EN archives (#367) | E02 | A | – | – | – | 209,402d,841 | 🔵 M2 (#367, created 2026-10-15); 41 live (Q-4) |
-| [SKODA-849](tickets/SKODA-849.md) | In-body widget census: Škodapedia glossary, ys-embed-share HTML, social embeds, skoda_iframe, quizzes | E06 | B | 5 | 2–3 | 4–6 | 801b,803,802,Q-19 | 🔵 M2; importer drops them silently today |
-| [SKODA-850](tickets/SKODA-850.md) | Day-2 authoring: scheduling, downloadable originals, embargo asset gate, path-limited publish, takedown | E08 | B | 6 | 2–3 | 4–6 | 809,811,842,101a | 🔵 M2; half of HQ releases go live on a quarter hour |
-| [SKODA-851](tickets/SKODA-851.md) | Source-generated data after the freeze: facets, category parents, allow-list to DA sheets or the index | E04 | B | 3 | 1–2 | 2–3 | 402d,605,609 | 🔵 M2; no 2027 year in listing filters |
+| [SKODA-849](tickets/SKODA-849.md) | In-body widget census: Škodapedia glossary, ys-embed-share HTML, social embeds, skoda_iframe, quizzes (#426) | E06 | B | 5 | 2–3 | 4–6 | 801b,803,802,Q-19 | 🔵 M2; importer drops them silently today |
+| [SKODA-850](tickets/SKODA-850.md) | Day-2 authoring: scheduling, downloadable originals, embargo asset gate, path-limited publish, takedown (#427) | E08 | B | 6 | 2–3 | 4–6 | 809,811,842,101a | 🔵 M2; half of HQ releases go live on a quarter hour |
+| [SKODA-851](tickets/SKODA-851.md) | Source-generated data after the freeze: facets, category parents, allow-list to DA sheets or the index (#428) | E04 | B | 3 | 1–2 | 2–3 | 402d,605,609 | 🔵 M2; no 2027 year in listing filters |
 | [SKODA-841](tickets/SKODA-841.md) | Tags entered once: facet pick lists (EW options), derived visible tags, archive matching on facets (AR-04/15) | E08 | A | – | – | – | 205,211,401,842 | 🔵 M2; #319 |
 | [SKODA-840](tickets/SKODA-840.md) | Story newsletter card as one shared fragment, auto-inserted in the story sidebar (AR-05) | E08 | A | – | – | – | 823,904 | 🔵 M2; #318 |
 | [SKODA-839](tickets/SKODA-839.md) | Home Models rail: model tag pages carry the source home card image (featured header banner) as page image | E08 | A | – | – | – | – | ✅ Done (#310 closed 2026-10-11). Was: M1; #310, PR #311; 11 tag pages published 2026-10-10; card frame aspect open on #306 |
@@ -348,8 +348,8 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-904 | Newsletter/subscriber (ESP + consent + opt-in) | E09 | C | 8 | 3–5 | 6–10 | 304 | 🔴 10-route account |
 | SKODA-905 | skoda-analytics rebuild (dataLayer + per-block wiring) | E09 | C | 8 | 3–5 | 6–10 | 804,E02,E04 | 🔴 hidden cross-cutting |
 | SKODA-906 | Restricted end-user access (QR-code journey) | E09 | C | 5 | 2–3 | 4–8 | 101 | 🔴 gap G4 (§6.6); blocked on D17; SP provisional |
-| [SKODA-907](tickets/SKODA-907.md) | Škoda consent and group tracking: sDrive/CCM, legal-entity-id, OneTrust per locale, embed consent | E09 | C | 3 | 1–2 | 2–4 | 804,905,D10,Q-16 | 🔵 M2; pings before consent on every page |
-| [SKODA-908](tickets/SKODA-908.md) | External consumers at cutover: mobile app, newsletter manage pages, RSS delivery, podcasts | E09 | C | 5 | 2 | 3–5 | 904,405,iComVision,mailguide | 🔵 M2; 356 feed subscribers; app source undocumented |
+| [SKODA-907](tickets/SKODA-907.md) | Škoda consent and group tracking: sDrive/CCM, legal-entity-id, OneTrust per locale, embed consent (#423) | E09 | C | 3 | 1–2 | 2–4 | 804,905,D10,Q-16 | 🔵 M2; pings before consent on every page |
+| [SKODA-908](tickets/SKODA-908.md) | External consumers at cutover: mobile app, newsletter manage pages, RSS delivery, podcasts (#424) | E09 | C | 5 | 2 | 3–5 | 904,405,iComVision,mailguide | 🔵 M2; 356 feed subscribers; app source undocumented |
 | SKODA-1001 | Per-locale trees + per-locale query-index | E10 | D | 5 | 2–3 | 4–6 | 401,603 | 🟡 |
 | SKODA-1002 | EW Translation rollout (DE/CS/SK/SR/SL) | E10 | D | 8 | 3–5 | content-ops | 1001 | 🟠 volume |
 | SKODA-1003 | Language-negotiated routing + placeholders | E10 | D | 3 | 1–2 | 2–3 | 303,1001 | 🟡 |
@@ -362,7 +362,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-1005](tickets/SKODA-1005.md) | Translation pairs after go-live: group id, author "link a translation", reciprocity check (#400) | E10 | D | 3 | 1–2 | 3–4 | Q-10,1001,303a,1004 | 🔵 M2; approach per **Q-10** |
 | [SKODA-1006](tickets/SKODA-1006.md) | Per-locale chrome: nav, footer, Media Room nav/footer (#401) | E10 | D | 2 | 1 | 2–3 | 1001,1003,302,304 | 🔵 M2; CS for go-live |
 | [SKODA-103a](tickets/SKODA-103a.md) | Inbound trailing-slash rule (301 `/{path}/` → `/{path}`, all locales) (#402) | E01 | D | 2 | 1 | 1–2 | D14,103,1003 | 🔵 M2; **before DNS**; ≈ 15,000 slashed legacy URLs |
-| [SKODA-103b](tickets/SKODA-103b.md) | Legacy URL resolution beyond the sheet: attachments, query routes, old slugs, inbound CDN/download links | E01 | D | 5 | 2–3 | 4–6 | 103a,709,Q-17 | 🔵 M2; 42,275 indexed attachment pages |
+| [SKODA-103b](tickets/SKODA-103b.md) | Legacy URL resolution beyond the sheet: attachments, query routes, old slugs, inbound CDN/download links (#422) | E01 | D | 5 | 2–3 | 4–6 | 103a,709,Q-17 | 🔵 M2; 42,275 indexed attachment pages |
 
 ---
 

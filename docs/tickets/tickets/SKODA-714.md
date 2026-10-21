@@ -6,7 +6,7 @@
   switch**.
 - **Estimate:** 2 SP · AI-assisted 1d / manual 1–2d, excluding the client's security sign-off and CDN lead time
   *(planning estimate, not a quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#421](https://github.com/skoda-storyboard/demo/issues/421) (created 2026-10-21, sub-issue of epic #8)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-F-05.
 

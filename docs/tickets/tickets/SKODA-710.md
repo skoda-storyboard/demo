@@ -7,7 +7,7 @@
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–3d *(planning estimate, not a quote)*. The review sized the
   runbook at 3 SP and the link release at 2–3 SP separately, so 3 SP is tight. The SKODA-803 delta mode (1–2 SP) is
   an amendment to 803, not counted here.
-- **GitHub issue:** to create
+- **GitHub issue:** [#417](https://github.com/skoda-storyboard/demo/issues/417) (created 2026-10-21, sub-issue of epic #8)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-G-02 (High, CONFIRMED), with G-KT-01
   merged (High, CONFIRMED); G-KT-02 (High, CONFIRMED, go-live blocker).

@@ -6,7 +6,7 @@
   300 docs need a re-import for the glossary alone.
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–5d, excluding the package copy (size unmeasured) *(planning
   estimate, not a quote)*. A client-side quiz block (Q-19 option b, 3–5 SP in the finding) is not included.
-- **GitHub issue:** to create
+- **GitHub issue:** [#426](https://github.com/skoda-storyboard/demo/issues/426) (created 2026-10-21, sub-issue of epic #7)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-C-01 (High, CONFIRMED, browser-checked),
   G-KI-01 (High, CONFIRMED), G-KI-02, G-KI-03, G-KI-05 (Medium, not re-verified), the inventory challenge to G-B-07.

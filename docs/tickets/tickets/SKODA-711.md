@@ -6,7 +6,7 @@
   before go-live; the switch-off follows the rollback window (SKODA-710).
 - **Estimate:** 3 SP team time · AI-assisted 1–2d / manual 2–3d, excluding client-side hosting work *(planning
   estimate, not a quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#418](https://github.com/skoda-storyboard/demo/issues/418) (created 2026-10-21, sub-issue of epic #8)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-G-03 (High, CONFIRMED), with G-B-13
   merged; G-B-10, G-B-09; the inventory and time challenges in §6.

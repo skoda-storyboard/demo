@@ -7,7 +7,7 @@
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–6d, excluding the client's database export, logs and CDN lead
   time *(planning estimate, not a quote)*. The source findings sum to ≈ 7–10 SP plus the `?p=` id map
   (≈ 16.4k rows).
-- **GitHub issue:** to create
+- **GitHub issue:** [#422](https://github.com/skoda-storyboard/demo/issues/422) (created 2026-10-21, sub-issue of epic #1)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-F-04 (G-E-02 merged), G-T3-02,
   G-KJ-04, G-B-08 (G-KO-01 merged), G-T3-01, G-T3-04, G-T3-05, G-T3-06.

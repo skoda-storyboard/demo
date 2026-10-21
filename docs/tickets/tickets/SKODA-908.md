@@ -7,7 +7,7 @@
 - **Estimate:** 5 SP team time · AI-assisted 2–3d / manual 4–6d, excluding vendor time *(planning estimate, not a
   quote)*. The source findings sum to more (app 3–8 SP depending on the contract, RSS delivery +2–3, feed variants
   +1–2, manage pages and renewal 2–4). 5 SP holds only if the app can read an index-shaped JSON or the RSS feed.
-- **GitHub issue:** to create
+- **GitHub issue:** [#424](https://github.com/skoda-storyboard/demo/issues/424) (created 2026-10-21, sub-issue of epic #95)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-B-01 (High, PLAUSIBLE), G-B-06
   (Medium, CONFIRMED, was High), G-KJ-05, G-KJ-06, G-B-03, G-T3-03, G-KT-04 (Medium), G-D-04 (Low); the last six

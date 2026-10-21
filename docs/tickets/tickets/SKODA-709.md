@@ -6,7 +6,7 @@
   long pole is Škoda IT: the zone, the CDN choice and the change window.
 - **Estimate:** 3 SP team time · AI-assisted 1–2d / manual 2–3d, excluding Škoda IT lead time (the review notes 2–4
   weeks is common in corporate IT; not confirmed by Škoda IT) *(planning estimate, not a quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#416](https://github.com/skoda-storyboard/demo/issues/416) (created 2026-10-21, sub-issue of epic #8)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-F-01 (Critical, CONFIRMED), with G-G-01
   and G-KI-04 merged; G-F-08.

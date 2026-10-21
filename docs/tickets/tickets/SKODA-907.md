@@ -7,7 +7,7 @@
 - **Estimate:** 3 SP team time · AI-assisted 1–2d / manual 2–3d, excluding Škoda lead time *(planning estimate, not
   a quote)*. The source findings sum to ≈ 3.5–5 SP (2–3 on 804, 0.5 embeds, 0.5 SL, 0.5–1 performance), so 3 SP is
   tight; the 905 event work stays inside 905's 8 SP.
-- **GitHub issue:** to create
+- **GitHub issue:** [#423](https://github.com/skoda-storyboard/demo/issues/423) (created 2026-10-21, sub-issue of epic #95)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-A-01 (High, CONFIRMED; G-B-04 merged),
   G-A-02 (High, CONFIRMED), G-A-03 (Medium, CONFIRMED, was High), G-A-04, G-A-05, G-A-06 (Medium, not re-verified).

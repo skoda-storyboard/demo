@@ -7,7 +7,7 @@
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–6d, excluding client SEO and analytics time *(planning estimate,
   not a quote)*. The source findings size the parts at ≈ 10–12 SP; 5 SP holds only if the analytics amendments land
   in SKODA-905/907 and the RUM 404 review in SKODA-712.
-- **GitHub issue:** to create
+- **GitHub issue:** [#420](https://github.com/skoda-storyboard/demo/issues/420) (created 2026-10-21, sub-issue of epic #8)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-F-02, G-F-03, G-F-06, G-F-07, G-KT-07,
   G-KO-03.

@@ -6,7 +6,7 @@
   the first renewal dates follow it (March–April 2027).
 - **Estimate:** 3 SP team time · AI-assisted 1–2d / manual 2–3d, excluding training days *(planning estimate, not a
   quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#419](https://github.com/skoda-storyboard/demo/issues/419) (created 2026-10-21, sub-issue of epic #8)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-G-07 (High, CONFIRMED), G-G-04,
   G-KT-06, G-G-08 (Medium, not re-verified), the time challenge to G-G-07 in §6.

@@ -5,7 +5,7 @@
 - **Phase:** D · **Milestone:** M2 (go-live, 2027-01-02). Must be done **before the content freeze** (SKODA-710): after
   WordPress is switched off, the scrapers can't regenerate anything.
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–3d *(planning estimate, not a quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#428](https://github.com/skoda-storyboard/demo/issues/428) (created 2026-10-21, sub-issue of epic #5)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-T2-01, G-T2-02, G-KT-03 (Medium),
   G-T2-04 (Low). None was re-verified by a refuter; the code facts below were re-read on 2026-10-21.
