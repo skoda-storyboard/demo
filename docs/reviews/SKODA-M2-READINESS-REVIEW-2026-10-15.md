@@ -147,6 +147,10 @@ The MR nav **Company** menu has 6 entries. Against the 15 Sep spec:
   and SKODA-1001. The follow-up pass over all five non-EN locales,
   [`SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20`](SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md), puts the non-EN
   corpus at ≈ 12,000 docs (CS ≈ 5,100) with no import ticket.
+- **Integrations and untouched areas:** the gap review
+  [`SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21`](SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) covers third-party
+  touchpoints, Škodapedia, podcasts, video, attachment pages, the launch and operations. 113 findings; the production
+  launch (CDN, DNS, TLS) has no owner.
 
 ### Confirmed
 
