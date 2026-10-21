@@ -249,7 +249,7 @@ function rebuild(element, document) {
     if (totals.length) {
       media.dataset.expectedAssets = totals.reduce((sum, match) => sum + Number(match[1]), 0);
     }
-    out.push(marker(document, 'media-box, dark, full-width'), make(document, 'h2', heading));
+    out.push(marker(document, 'media-box, dark, full-width'), make(document, 'h3', heading));
     if (stats) out.push(make(document, 'p', stats));
     media.querySelectorAll('.search-results-header, .search-results-stats, .togglebox-opener')
       .forEach((node) => node.remove());

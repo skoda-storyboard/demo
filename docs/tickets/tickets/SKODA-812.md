@@ -24,7 +24,7 @@ The requirements doc *assumes* this is provided by the selected AEM/EDS authorin
 - [ ] Any gap vs §6.7 (or restricted-content activity) is flagged with a recommended approach.
 
 ## Dependencies
-- Upstream: SKODA-101 (site/IDP setup — user identity), SKODA-602 (publish lifecycle), SKODA-809 (roles), **D16** (NFR/logging)
+- Upstream: SKODA-101a (author identity: Škoda IdP federation), SKODA-602 (publish lifecycle), SKODA-809 (roles), **D16** (NFR/logging)
 - Related: SKODA-811 (restricted-content activity)
 
 ## Risks / Flags

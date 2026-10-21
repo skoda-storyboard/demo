@@ -181,7 +181,11 @@
   padding: var(--columns-split-gutter);
 }
 
+/* the caption is the cell's own text when DA keeps it inline (`<picture> <strong>Name</strong><br>
+   role`, no paragraph: the electric-car and Sportline portraits, 10pt on the source) */
 .columns.split .columns-portrait {
+  font-size: var(--columns-caption-role-size);
+  line-height: var(--columns-caption-line);
   text-align: center;
 }
 
@@ -228,4 +232,129 @@
   .columns.split > div > div:first-child {
     flex: 0 0 var(--columns-split);
   }
+}
+
+/* ==========================================================================
+   `centered` variant: an equal story row of centred image cards, measured on the live
+   Miss Peaches enduro story (2026-10-15, 1440/768/390):
+   - the split row's geometry: 10px cell padding, the row 10px past the text column, equal
+     cells side by side from 781px, stacked at 780 and below;
+   - every image cell centred, text included; its images at their own size capped at the
+     cell (the 384px portraits, the Instagram icons), `portrait-NNN` → the card's first image
+     (the 300px portraits of 384px files);
+   - `captioned` (the first image is a caption figure, `.wp-caption-text`): its caption, the
+     paragraphs up to the next image, directly under it and light (300; the name's <strong>
+     stays 600), no wider than the portrait, then the usual 20px paragraph gaps;
+   - `text-center`: the text cells centred too. A body caption figure alone is a one-card row.
+   ========================================================================== */
+.columns.centered {
+  --columns-split-gutter: 10px; /* SiteOrigin cell padding */
+
+  margin-inline: calc(-1 * var(--columns-split-gutter));
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- centered and callout never combine on one block */
+.columns.centered > div {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- centered and callout never combine on one block */
+.columns.centered > div > div {
+  box-sizing: border-box;
+  order: unset;
+  min-width: 0;
+  padding: var(--columns-split-gutter);
+}
+
+.columns.centered .columns-portrait {
+  text-align: center;
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- centered and split never combine on one block */
+.columns.centered .columns-portrait img {
+  display: block;
+  width: auto;
+  height: auto;
+  margin-inline: auto;
+}
+
+.columns.centered.portrait .columns-portrait .columns-portrait-img {
+  width: min(var(--columns-portrait), 100%);
+}
+
+.columns.centered.captioned .columns-portrait > p:first-child:has(> picture) {
+  margin-block-end: 0;
+}
+
+.columns.centered.captioned .columns-portrait > p:first-child:has(> picture)
+  ~ p:not(:has(> picture), p:has(> picture) ~ p:has(> picture) ~ p) {
+  font-weight: var(--weight-light);
+}
+
+/* …and as wide as the portrait at most, as the source's figure: the 4×4 spokesperson's role
+   wraps in her 200px caption */
+.columns.centered.captioned.portrait .columns-portrait > p:first-child:has(> picture)
+  ~ p:not(:has(> picture), p:has(> picture) ~ p:has(> picture) ~ p) {
+  max-inline-size: var(--columns-portrait);
+  margin-inline: auto;
+}
+
+/* `text-small`: the portraits' text is 10pt on the source, on the paragraph's 24px line (often
+   the cell's own inline text in DA: `<picture> <strong>Name</strong><br> role`) */
+.columns.centered.text-small .columns-portrait {
+  font-size: var(--story-text-small, 13.3333px);
+  line-height: var(--story-text-small-line, 24px);
+}
+
+/* `text-center`: the row's text cells are centred on the source too (the 4×4 interview quotes) */
+.columns.centered.text-center > div > div {
+  text-align: center;
+}
+
+@media (width >= 781px) {
+  .columns.centered > div {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .columns.centered > div > div {
+    flex: 1 1 0;
+  }
+}
+
+/* `offset-A-B…` (story rows, columns.js decorateOffsets): the source's spacer widgets leading
+   each cell, shown from 720px as the source shows them (none below) */
+@media (width >= 720px) {
+  .columns.offset > div > div {
+    margin-block-start: var(--columns-offset, 0);
+  }
+}
+
+/* `lead-A-B…` (story rows, columns.js decorateLeads): the blank lines leading a cell's text, at
+   every width as the source shows them. They sit inside the cell, under its own 10px top padding
+   (a split or centred row's gutter), and add to an offset */
+/* stylelint-disable-next-line no-descending-specificity -- lead (story rows) and callout never combine on one block */
+.columns.lead > div > div {
+  padding-block-start: calc(var(--columns-split-gutter, 0px) + var(--columns-lead, 0px));
+}
+
+/* `pad-…` / `pad-m-…` (story rows, columns.js decorateRowPadding): the source row's own padding,
+   inside the row, up to 780px and from 781px (SiteOrigin's mobile switch); none where unset */
+.columns.padded {
+  box-sizing: border-box;
+  padding: var(--columns-pad-m, 0);
+}
+
+@media (width >= 781px) {
+  .columns.padded {
+    padding: var(--columns-pad-d, 0);
+  }
+}
+
+/* a centred card alone (a body caption figure, the 4×4 spokesperson): the source figure has no
+   cell inset above or below it */
+.columns.centered > div > div:only-child {
+  padding-block: 0;
 }
