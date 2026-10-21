@@ -149,7 +149,7 @@ The MR nav **Company** menu has 6 entries. Against the 15 Sep spec:
   corpus at ≈ 12,000 docs (CS ≈ 5,100) with no import ticket.
 - **Integrations and untouched areas:** the gap review
   [`SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21`](SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) covers third-party
-  touchpoints, Škodapedia, podcasts, video, attachment pages, the launch and operations. 107 findings; the production
+  touchpoints, Škodapedia, podcasts, video, attachment pages, the launch and operations. 152 findings (two top-up rounds); the production
   launch (CDN, DNS, TLS) has no owner.
 
 ### Confirmed
