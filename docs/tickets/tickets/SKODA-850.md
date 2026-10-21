@@ -1,90 +1,80 @@
 # SKODA-850, Day-2 authoring: scheduling, originals, embargo assets, path-limited publish, takedown, kits, templates
 
 - **Epic:** E08, Editorial at Scale
-- **Type:** setup / configuration + runbooks, with small template and check changes
+- **Type:** coordination ticket with sub-tickets (setup / configuration + runbooks, small template and check changes)
 - **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02). Not a go-live blocker: each item has a manual fallback, but
   without it HQ publishes by hand at the release minute and new downloads need a developer.
-- **Estimate:** 6 SP · AI-assisted 2–3d / manual 4–6d, excluding Adobe onboarding and client AEM admin time *(planning
-  estimate, not a quote)*. Assumes the native tools cover the author UX. A custom Downloads-row plugin (3–5 SP in
-  the finding) would be a sub-ticket.
+- **Estimate:** 1 SP for this ticket (client questions, D-4, requirement 6.3, guide and register hand-off) ·
+  AI-assisted 0.5d / manual 1d, excluding Adobe onboarding and client AEM admin time *(planning estimate, not a
+  quote)*. The first draft said 6 SP and the review's §7.1 8 SP, but the findings sum to more: G-KJ-01 3–5,
+  G-KJ-02 5–8 (of which a plugin 3–5), G-KJ-03 2–3 (+3–5 on 811 in G-T1-02), G-T1-04 1–2, G-T1-05 1, G-KJ-07 1,
+  G-T1-06 0.5–1, G-T1-07 2–3, G-T1-08 1, G-KT-09 0.5, G-T2-03 0.5; round 2 G-T6-05 0.5 and G-T6-06 0.5. Total
+  17 SP, mostly at the low end: 850a 3.5, 850b 3, 850c 3, 850d 3.5, 850e 3. A custom Downloads-row plugin (3–5 SP)
+  is not counted; it becomes a new sub-ticket only if 850b's native path fails its criteria.
 - **GitHub issue:** [#427](https://github.com/skoda-storyboard/demo/issues/427) (created 2026-10-21, sub-issue of epic #9)
-- **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
+- **Status (2026-10-21, amended after round 2):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-KJ-01 (+ G-T1-03, G-KT-08), G-KJ-02
   (+ G-T1-01), G-KJ-03 (+ G-T1-02), G-T1-04 (all High, CONFIRMED); G-T1-05, G-KJ-07, G-T1-06, G-T1-07, G-T1-08, G-T2-03,
-  G-KT-09 (Medium/Low, not re-verified).
+  G-KT-09 (Medium/Low, not re-verified). Round 2: G-T6-05, G-T6-06 (Medium, not re-verified).
 
 ## Why
-- **HQ schedules.** In the last 12 months about half of EN stories (53 of 103) and EN releases (31 of 66) went live on
-  an exact quarter hour, against about 7% by chance; CS 33–37%, SK/SR/DE 6–12%. EN releases cluster at 10:00 (14)
-  and 09:00 (8). Requirement 6.3 "schedule" maps only to closed SKODA-602; SKODA-811 lists scheduling as "Related".
-  The native tools are recorded nowhere: EW **Schedule Publish** (one document at a time; needs a prepare-tab row and
-  registration at `da.live/apps/scheduler`), **Snapshots** (scheduling is early access) and **Request Publish** (Adobe
-  onboarding, an email-sending API, allowed domains). The crontab sheet suits ops jobs only: `basic_author` can
-  write it.
-- **Downloads need a developer.** The 2026-10-19 EN release has 22 download links (20 images, 1 MP4, 1 PDF); 13 of the
-  last 30 EN releases have body downloads. Each author path fails a gate:
-  - DA upload caps MP4 at 36 MB and PDF at 20 MB and refuses ZIP; 71 of 91 migrated MP4s exceed 36 MB (median
-    188 MB) and the Epiq kit ZIP is 728 MB. (The limits page says limits can be raised per customer.)
-  - `media-cart-resolver.js` accepts only the DAM host or the source host, so Media Bus files aren't cart-able.
-  - SKODA-101a I4 gives authors read access to AEM Assets. The author guide says "ask the project team".
-  
-  The refuters' workaround: a press group with AEM write + publish pastes DAM publish URLs into Downloads rows.
-- **Embargoed assets leak.** The DA Assets picker needs a *published* asset, the AEM publish tier answers anonymously
-  (HEAD 200, `access-control-allow-origin: *`), and the 511a feed sync lists published assets. Building a launch page
-  ahead of time makes its assets public. D9 is green, but it has no asset mechanism. Preview-only images are also
-  served on `.aem.live` (2 of 2); low impact alone, as hashes can't be enumerated.
-- **Publish has no path.** The Edge Delivery `publish` role is site-wide (`live:write`, `live:delete`), and DA write
-  implies delete. Any CS or agency publisher can publish or unpublish EN pages. 101a tests only DA edit scope.
-- **Shared root docs** (`/redirects`, `/metadata`, `/nav`, `/footer`, `/media-room/*`) have no permission row, so a
-  locale editor can't add a redirect. `/cs/nav` and `/sk/nav` are 200 on `.aem.page`, 404 on `.aem.live`.
-- **Takedown and rename leave copies.** Unpublish needs the source deleted first; Media Bus copies stay reachable; RSS,
-  media feed, app, carts and CDN keep theirs. The guide's rename steps never unpublish the old path, and a page leaves
-  the index only on unpublish (409 EN index rows today). Whether a DA move unpublishes was not tested.
-- **New press kits by hand.** The chapter bar is authored in every chapter (22 links × 14 Epiq docs). A chapter over
-  200 images returns 409 at preview (Peaq 2 Images: 247); only the SKODA-806 importer splits it. 806a is migration-only.
-- **Templates are EN-only.** `templates-spec.mjs` has 9 literal `/en…` values, 6 source-CDN images and 5 `www` links;
-  SKODA-520's census leaves `/library/**` out.
+After go-live, the authors' everyday release work has no configured path on EDS (detail in each sub-ticket):
+- **HQ schedules** (850a). About half of EN stories (53 of 103) and EN releases (31 of 66) went live on an exact
+  quarter hour in the last 12 months. Requirement 6.3 "schedule" maps only to closed SKODA-602. Schedule Publish,
+  Snapshots and Request Publish are recorded nowhere, and each needs an enablement step.
+- **Listings lag a timed release** (850a, G-T6-06). `query-index.json` and `media-feed.json` are served
+  `max-age=7200`, so a returning visitor may not see a 10:00 release on the listings until about 11:00.
+- **The AI audio is a step after publish** (850a, G-T6-05). Its Buzzsprout episode is dated on the release hour
+  (88/88 EN, 89/89 CS), the producer adds it with a re-publish, and no ticket or role names that producer.
+- **Downloads need a developer** (850b). DA upload caps MP4 at 36 MB and PDF at 20 MB and refuses ZIP; the cart
+  resolver accepts only the DAM or source host; authors have read access to AEM Assets only.
+- **Embargoed assets leak** (850c). The DA Assets picker needs a *published* asset, the AEM publish tier answers
+  anonymously, and the 511a feed sync lists published assets.
+- **Publish has no path** (850d). The Edge Delivery `publish` role is site-wide; the shared root docs have no
+  permission row; takedown and rename leave copies in the index, feeds and Media Bus.
+- **New press kits and templates** (850e). The chapter bar is authored in every chapter, a chapter over 200 images
+  fails at preview, and the DA templates carry `/en` paths and source-CDN images.
 
 ## Scope
 **Client:**
-- DAM team: how do launch assets stay hidden in AEM Assets until release, and who releases them?
-- Request Publish: which email service and sender, which agency domains? Legal: the required takedown time.
-- **D-4** (authoring review, not yet in the register): Media Box from a DAM folder (recommended) or authored rows.
+- DAM team: how do launch assets stay hidden in AEM Assets until release, and who releases them? (850c)
+- Request Publish: which email service and sender, which agency domains? (850a) Legal: the required takedown time
+  (850d).
+- **D-4** (authoring review, not yet in the register): Media Box from a DAM folder (recommended) or authored rows
+  (850b).
+- Škoda Communications (G-T6-05): who produces the AI audio, with which TTS tool, from which text (the pre-release
+  draft or the published page), and will they keep doing it on EDS? (850a, 850d)
+- AEM / Cloud Manager admin: the document host (**Q-21**), which the originals' links use (850b, with 709b).
 
-**Team:**
-- **Scheduling:** enable Schedule Publish; rules for who may schedule, CET/CEST in the UI vs UTC, the 5-minute grain,
-  the refresh order (index, RSS, media feed, CDN purge, app). Snapshots for multi-locale launches; ask Adobe for
-  snapshot scheduling. Onboard Request Publish. Map 6.3 here; amend 811 to depend on it.
-- **Originals:** an AEM Assets editor group with upload + publish per tree (amends 101a I4); a folder convention
-  (`/content/dam/storyboard/{loc}/{type}/{slug}/`); picker settings (`aem.asset.mime.renditions`) that link originals;
-  the 1920px rendition with SKODA-902; new kit ZIPs as a DAM upload (amends 806a).
-- **Embargo asset gate** (amends 811, 511a): an embargo marker (field or restricted folder) the feed sync skips until
-  the date; the launch preview avoids published delivery URLs; document that Media Bus preview images are public by URL.
-- **Path-limited publish** (amends 809, 101a T2, with D15): few HQ/MR publishers plus Request Publish approvers per
-  `/{loc}/*` pattern, or site-wide publish with SKODA-812 audit. Per-document rows for the shared root docs (amends
-  101a T1), and a redirect-request step for locale editors. Publishing the locale chrome is a go-live step (1006).
-- **Runbooks** for SKODA-712's guide: takedown (unpublish order, 410 vs redirect, CDN purge, feed refresh, Media Bus
-  removal via Adobe support); rename (slashless redirect row → publish → move → publish new → unpublish old →
-  dead-link check → re-link the translation pair, 1005).
-- **Press kits and templates** (amends 805, 842): the chapter bar from one per-kit source; a "press-kit image group as
-  fragment" library entry, an image count in the pre-publish check (AR-17); per-locale templates or a `[locale]`
-  prompt the check rejects; DAM/Media Bus URLs and site-relative links in `templates-spec.mjs`; `/library/**` in 520.
+**Team (this ticket):**
+- Map requirement 6.3 to 850a in the requirements mapping; amend SKODA-811 to depend on 850a.
+- Hand the runbooks to SKODA-712's guide and training as one Day-2 chapter.
+- Enter the timed-release, AI-audio and takedown rows in SKODA-710b's publish side-effect register, each with an
+  owner.
+- Keep the amendments the sub-tickets make to other tickets consistent: 101a (I4, T1, T2), 809, 811, 511a, 805, 806a,
+  842, 520.
+
+## Sub-tickets
+| Ticket | Covers | SP |
+|---|---|--:|
+| [SKODA-850a](SKODA-850a.md) | Timed releases: Schedule and Request Publish, Snapshots, listing lag, AI audio | 3.5 |
+| [SKODA-850b](SKODA-850b.md) | Downloadable originals: AEM Assets editor group, folders, picker, kit ZIPs | 3 |
+| [SKODA-850c](SKODA-850c.md) | Embargo asset gate: marker, feed-sync skip, launch preview without published URLs | 3 |
+| [SKODA-850d](SKODA-850d.md) | Publish rights per path, shared root documents, takedown and rename runbooks | 3.5 |
+| [SKODA-850e](SKODA-850e.md) | New press kits and locale-aware DA templates | 3 |
 
 ## Not in scope
 - Sign-in, IdP and preview protection (SKODA-101a). Asset-to-page lifecycle (SKODA-522, D20). Translation (1005).
-- Feed variants and delivery (SKODA-405). Ops cron jobs in the crontab sheet. A serverless cart ZIP (SKODA-902).
+- Feed variants and delivery (SKODA-405, 908b). Ops cron jobs in the crontab sheet. A serverless cart ZIP (SKODA-902).
+- The app's new-article notification (SKODA-908a).
 
 ## Acceptance criteria
-- [ ] A release scheduled for 10:00 CET goes live within 5 minutes of 09:00 UTC; an EN + CS timed release was
-      rehearsed, index and feeds included.
-- [ ] An HQ and an SK author, without repo access, publish a release with a Media Box, a PDF and an MP4; the cart
-      adds them.
-- [ ] Before release, an embargoed asset is in no media feed and its delivery URL isn't linked from any public page.
-- [ ] A CS author can't publish `/en/x` without approval, or the D15 decision records site-wide publish plus audit.
-- [ ] A CS editor gets a redirect live without write on `/metadata`; after a rename the old path is in no query index.
-- [ ] Renaming a kit chapter edits one document; a 201-image chapter is flagged before preview.
-- [ ] A CS page from each template has 0 `/en` values and 0 source-CDN references; the runbooks are in the guide.
+- [ ] The client answers above are recorded in the decision register or in the sub-tickets.
+- [ ] Requirement 6.3 maps to SKODA-850a; SKODA-811 lists 850a as a dependency.
+- [ ] SKODA-710b's register has the timed-release, AI-audio and takedown rows, each with an owner and a test.
+- [ ] The criteria of 850a–850e are met, and their runbooks are one chapter of the SKODA-712 guide.
 
 ## Dependencies
-D9, **D15**, D-4, D20; Adobe onboarding (Request Publish, snapshot scheduling); client AEM admins. SKODA-101a, 809,
-811, 812, 511a, 517, 522, 805, 806, 806a, 842, 902, 1005, 1006, 103, 103a, 520, 712 (guide, training).
+D9, **D15**, D-4, D20, **Q-21**; Adobe onboarding (Request Publish, snapshot scheduling); client AEM admins.
+Sub-tickets SKODA-850a–e. SKODA-101a, 809, 811, 812, 511a, 517, 522, 805, 806, 806a, 842, 902, 1005, 1006, 103, 103a,
+520, 709b, 710b, 712 (guide, training), 908a.

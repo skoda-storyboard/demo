@@ -42,3 +42,36 @@ SKODA-609 removed the slash from links *inside* our content; nothing handles inb
 ## Dependencies
 D14 (which CDN), SKODA-103 (redirects sheet), SKODA-1003 (root routing), SKODA-609 (internal links). Needed by
 SKODA-1004a–e QA.
+
+## Amendment (2026-10-21, M2 gap review)
+Source: [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.6, round 2.
+
+**Why (G-T7-02, Medium, not re-verified):** WordPress matches slugs case-insensitively, and Polylang adds the default
+`/en/`. On the source, `/EN/EMOBILITY/MEET-THE-PEAQ-INTUITIVE-AND-COMFORTABLE-CONTROLS/` and
+`/emobility/meet-the-peaq-intuitive-and-comfortable-controls/` both 301 to the lowercase `/en/…` page; on the demo the
+uppercase, a mixed-case and the locale-less path all 404 (3 of 3). Uppercase links come from print, PDFs and social
+posts: 3 of the 161 archived EN release 301 URLs are all-caps. No ticket has a case rule.
+
+**Added scope:**
+- **Lowercase rule** (G-T7-02): any `GET`/`HEAD` page path containing `[A-Z]` gets a 301 to the lowercase path,
+  query string kept. It runs before the slash rule and in the same hop, so a slashed uppercase URL still reaches its
+  final target in at most 2 hops.
+- **Exclusions** (G-T7-02): `/media_*`, `/direct-download/*` and paths with a file extension (CDN file names are
+  case-sensitive), plus the existing API and asset exclusions.
+- **Locale-less paths** (G-T7-02): the rule that treats a non-locale first segment as `en` is SKODA-103b T4; this
+  ticket's test list covers the chain end to end.
+- **Test list** (G-T7-02): add uppercase cases (the 3 all-caps archived release URLs and a mixed-case path) and
+  locale-less cases to the 50 URLs.
+
+**Added acceptance criteria:**
+- [ ] `/EN/EMOBILITY/MEET-THE-PEAQ-INTUITIVE-AND-COMFORTABLE-CONTROLS/` and a mixed-case variant end on
+      `/en/emobility/meet-the-peaq-intuitive-and-comfortable-controls` with a 200 in at most 2 hops (G-T7-02).
+- [ ] `/emobility/meet-the-peaq-intuitive-and-comfortable-controls/` ends on the same page in at most 2 hops, once
+      SKODA-103b's locale-less rule is live (G-T7-02).
+- [ ] A `/media_*` path and a `/direct-download/` path with uppercase letters, and a file with an uppercase name, are
+      not rewritten (G-T7-02).
+
+**Estimate after this amendment:** 2.5 SP · AI-assisted 1–1.5d / manual 2d, excluding client CDN lead time
+*(planning estimate, not a quote)*. The review adds +0.5 SP for the case rule.
+
+**Added dependencies:** SKODA-103b T4 (locale-less lookup), SKODA-713 (harness), SKODA-709 (production CDN).
