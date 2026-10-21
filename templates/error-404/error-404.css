@@ -19,8 +19,8 @@ body.error-404 {
   --not-found-overlap: 5.2632%;
 
   /* mobile: the message 20px in from the band's top and sides, centred, and 120px of band
-     below it (the source cell's 100px padding + its widget's 20); 350px below the desktop
-     message (its 250px margin + the cell's 100) */
+     below its box (the source cell's 100px padding + the collapsed 20px paragraph margin);
+     350px below the desktop message box (its 250px margin + the cell's 100) */
   --not-found-inset: 20px;
   --not-found-end: 120px;
   --not-found-end-desktop: 350px;
@@ -97,6 +97,12 @@ body.error-404 .not-found-message > p {
   margin: 0 0 var(--not-found-copy-gap);
   font-size: var(--not-found-copy-size);
   line-height: var(--not-found-copy-line);
+}
+
+/* the band's end spacing is measured from the message box: the source's last paragraph
+   margin collapses into it, so it adds nothing here */
+body.error-404 .not-found-message > :last-child {
+  margin-block-end: 0;
 }
 
 body.error-404 .not-found-message > p.not-found-label {
