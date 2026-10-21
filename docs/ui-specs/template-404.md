@@ -32,9 +32,9 @@ Contract: `not-found` (section style) in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](..
 ```
 header (STO)
 article.error-404 (margin-bottom −5.263% of the width: the footer overlaps the band)
-├── .message-mobile   (≤ 719)  full-bleed row, min-height 900, the 1125px photo (background, cover, 50% 50%)
+├── .message-mobile   (≤ 719)  full-bleed row, min-height 100vh, the 1125px photo (background, cover, 50% 50%)
 │   └── .error-message: [div.subheading "404"] h3 p p
-└── .message-desktop  (≥ 720)  full-bleed row, min-height 900, the 3000px photo (background, cover, 50% 50%)
+└── .message-desktop  (≥ 720)  full-bleed row, min-height 100vh, the 3000px photo (background, cover, 50% 50%)
     └── SiteOrigin row: two 50% cells from 781 (one cell ≤ 780), the message in the left one
         └── .error-message: [div.subheading "404"] h1 p p
 footer (STO)
@@ -44,9 +44,28 @@ The photos are SiteOrigin row background images (`#pg-<id>> .panel-row-style { b
 
 ## 3. Measured visual spec
 
-**Band:** min-height 900 at every width. The photo is `cover`, centred, the desktop photo from 720. The footer's top
-is 900 − 5.263% of the width below the band's top: 799 @1920, 824 @1440, 833 @1280, 843 @1080, 848 @992, 859 @780,
-862 @720, 880 @375.
+**Band:** `min-height: 100vh` at every width (the 2026-10-19 capture's "900" was its 900px viewport). On a short
+viewport the message sets the height instead: the message box plus **120px** below it on mobile (the cell's 100px
+padding plus the collapsed 20px paragraph margin) and **350px** on desktop (the message's 250px margin plus the cell's
+100px). The photo is `cover`, centred, the desktop photo from 720. The footer's top is the band's height − 5.263% of
+the width below the band's top.
+
+| Viewport | Band, dead end / car park | Footer offset, dead end / car park |
+|---|---|---|
+| 375×812 | 812 / 812 | 792 / 792 |
+| 375×500 | 500 / 500 | 480 / 480 |
+| 375×300 | 376 / 346 | 356 / 326 |
+| 719×300 | 315 / 300 | 277 / 262 |
+| 720×600 | 835 / 776 | 797 / 738 |
+| 992×600 | 745 / 714 | 693 / 662 |
+| 1080×1000 | 1000 / 1000 | 943 / 943 |
+| 1440×600 | 795 / 736 | 719 / 660 |
+| 1440×1300 | 1300 / 1300 | 1224 / 1224 |
+| 1920×1080 | 1080 / 1080 | 979 / 979 |
+
+Source and EDS are identical in every row (2026-10-21, PR #392 review). At a 900px viewport the band is 900 at every
+width in the table below, with the footer at 799 @1920, 824 @1440, 833 @1280, 843 @1080, 848 @992, 859 @780,
+862 @720 and 880 @375.
 
 **Message box** (x and y from the band's top-left; source and EDS identical):
 
@@ -68,6 +87,7 @@ is 900 − 5.263% of the width below the band's top: 799 @1920, 824 @1440, 833 @
   - x is `max(40, 50% − 604)` from 781, 20 below.
   - The width is `min(50% − 60, 584)` from 781, 50% for 720–780, and 100% − 40 below 720.
   - y is 120 from 1080, 70 for 720–1079, 20 below 720.
+  - **Alignment:** the mobile message (≤ 719) and all its lines are `text-align: center`; from 720, `start`.
 
 **Type** (`getComputedStyle`; source and EDS identical):
 
@@ -83,11 +103,22 @@ is 900 − 5.263% of the width below the band's top: 799 @1920, 824 @1440, 833 @
 
 ## 4. EDS implementation
 
-- **Content:** `tools/importer/import-404.js` on the two stable URLs writes `/en/fragments/404/<slug>`. Each holds one
-  section:
+- **Content:** `tools/importer/import-404.js` on the two stable URLs (`tools/importer/urls-404.txt`) writes
+  `/en/fragments/404/<slug>` (`fragmentPath`). Each holds one section:
   - the desktop photo `<p><img></p>` and the mobile photo `<p><img></p>` (read from the row style rules, `alt=""`);
   - the label `<p>404</p>` (dead end only), the `h1`, the copy (`term-explain` unwrapped) and the homepage `<p>`;
   - Section Metadata `Style: not-found` (+ `not-found-white`).
+- **Reproduce and publish** (`$IMPORT` is the excat-content-import skill's `scripts/` folder):
+  ```bash
+  bash $IMPORT/aem-import-bundle.sh --importjs tools/importer/import-404.js
+  node $IMPORT/run-bulk-import.js --import-script tools/importer/import-404.bundle.js \
+    --urls tools/importer/urls-404.txt --force          # writes content/en/fragments/404/<slug>.plain.html
+  npm run import:push -- --paths tools/importer/paths-404.txt                    # push + preview
+  npm run import:push -- --paths tools/importer/paths-404.txt --stage publish    # with (or before) the merge
+  ```
+  The push input is the fragment paths (`paths-404.txt`), not the source URLs: `push-lib.pagePath()` maps a source URL
+  to its own path (`/en/<slug>`). `tools/importer/error-404.test.mjs` ties `urls-404.txt` → `fragmentPath` →
+  `paths-404.txt` → the template's `VARIANTS`.
 - **Template:** `templates/error-404/error-404.{js,css}`; `404.html` carries `<meta name="template" content="error-404">`.
   - **Load:** `decorate(main)` picks a variant at random, loads its fragment and replaces 404.html's fallback message.
     A QA draft that already carries the section is laid out in place.
@@ -129,7 +160,8 @@ is 900 − 5.263% of the width below the band's top: 799 @1920, 824 @1440, 833 @
 
 - [x] HTTP 404 with the branded page; STO header and footer present.
 - [x] Both variants, picked at random; each matches the source's band, message box, type, colours and footer overlap
-      at 1920 / 1440 / 1280 / 1080 / 1079 / 992 / 781 / 780 / 720 / 719 / 375 (except §7.4).
+      at 1920 / 1440 / 1280 / 1080 / 1079 / 992 / 781 / 780 / 720 / 719 / 375 (except §7.4), and the band height at
+      short, standard and tall viewports (100vh, or the message's own height).
 - [x] Desktop photo from 720, mobile photo below; one decorative LCP `<picture>`, eager.
 - [x] Homepage link → `/`, green, ink or white on hover, visible focus ring.
 - [ ] Publish `/en/fragments/404/*` with (or before) the merge: a separate content step.
