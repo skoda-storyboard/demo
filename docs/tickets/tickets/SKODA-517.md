@@ -6,7 +6,7 @@
 - **Estimate:** 3 SP · AI-assisted 1.5–2d / manual 3–4d *(planning estimate, not a quote)*
 - **GitHub issue:** [#375](https://github.com/skoda-storyboard/demo/issues/375) (created 2026-10-16)
 - **Status (2026-10-21):** 🟡 Part 1 (the loader, PR #406) in review. Part 2 (the generator) built on branch
-  `skoda-517-part2`, stacked on #406; the shards are not published yet. See "Part 1 (2026-10-19)" and
+  `skoda-517-part2`, stacked on #406; the shards are published (build `b-b8b032bbe7`). See "Part 1 (2026-10-19)" and
   "Part 2 (2026-10-21)".
   [`SKODA-ASSET-INGESTION-M2.md`](../../architecture/SKODA-ASSET-INGESTION-M2.md) §3C.
 
@@ -84,6 +84,8 @@ Split by the PO (2026-10-19): the reader side now, the generator after #380 merg
   - a rail with an `order` list reads every row (`order` ignores facets).
 - Tests: `scripts/media-feed.test.mjs` (13: contract, malformed registries, both paths, failures and fallbacks)
   and five listing tests of the sharded path (head paint, failed head, kept focus, failed shard, veil).
+- 2026-10-21: the reader also takes the generator's compact facet index (one `f` column, `key:value|…`,
+  `expandFacets()`), so this branch works with the published shards (build `b-b8b032bbe7`). Test added.
 
 **Measured** (local dev server, 1280 × 900 unless noted, the published feed, 2,475 rows). The "shards" run used a
 local test split of today's feed (not committed; the generator is part 2). Same = same cards, count, Load more
@@ -147,5 +149,7 @@ cards, count, Load more count, facet options and lightbox.
 | Octavia rails (2 / 10 / 10 / 10 / 20 / 20 cards) | 3,362 KB | 263 KB | same cards |
 | Image links (asset, image, a file not in the feed) | 3,442 KB | 174 KB (3 keyed) | same captions |
 
-**Still open:** publishing the shards (`--push`, needs the PO's go-ahead), then the Fabia / Enyaq bytes and
-the `/en/images` mobile LCP by PSI on a preview.
+**Published** (2026-10-21): the 112 shards, then the registry, on preview and live. #406 reads the compact
+facet index too (`expandFacets()`), so its preview works with the published build.
+
+**Still open:** the Fabia / Enyaq bytes and the `/en/images` mobile LCP by PSI on this branch's preview.

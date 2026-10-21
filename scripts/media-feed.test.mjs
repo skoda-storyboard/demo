@@ -283,7 +283,7 @@ test('the fallback fails too: the reader rejects (its caller shows its own error
   await assert.rejects(loadAllRows('/en/media-feed.json'), /404/);
 });
 
-test('expandFacets: the compact `f` column as facet columns; other rows untouched (part 2)', async () => {
+test('expandFacets: the compact `f` column as facet columns; other rows untouched (the generator\'s compact form)', async () => {
   const { expandFacets } = await import('./media-feed.js');
   const compact = { id: '1', template: 'image', f: 'model:fabia|bodywork:hatchback|bodywork:combi|bad|:x|id:9' };
   const out = expandFacets(compact);
