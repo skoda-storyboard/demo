@@ -84,6 +84,8 @@ Split by the PO (2026-10-19): the reader side now, the generator after #380 merg
   - a rail with an `order` list reads every row (`order` ignores facets).
 - Tests: `scripts/media-feed.test.mjs` (13: contract, malformed registries, both paths, failures and fallbacks)
   and five listing tests of the sharded path (head paint, failed head, kept focus, failed shard, veil).
+- 2026-10-21: the reader also takes the generator's compact facet index (one `f` column, `key:value|…`,
+  `expandFacets()`), so this branch works with the published shards (build `b-b8b032bbe7`). Test added.
 
 **Measured** (local dev server, 1280 × 900 unless noted, the published feed, 2,475 rows). The "shards" run used a
 local test split of today's feed (not committed; the generator is part 2). Same = same cards, count, Load more
