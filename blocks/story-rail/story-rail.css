@@ -390,11 +390,6 @@ body.story .section.dark.story-rail-container .story-rail .carousel-track .card-
   margin-block-end: calc(12px - var(--spacing-xs));
 }
 
-/* arrows: the home bands (#272) and the story's Related Stories band (#296) draw the carousel's
-   own source glyph (carousel.css, skoda-bnr-icons \e00b / \e00c, #284), with no override here.
-   An SVG-mask override outlived #284 and masked the glyph with the removed
-   icons/rail-arrow-*.svg, so those arrows showed as bare ink discs. */
-
 /* media cards (Media Room Images / Videos, carousel.css `.carousel.media`): reserve the rows under
    the 16:9 image until the rail builds, the 44px date row, the two-line 46px title and the 50px
    cart / download toolbar (source .type-attachment, 287px cell at 1280) */

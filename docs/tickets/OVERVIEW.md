@@ -252,6 +252,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-519](tickets/SKODA-519.md) | Retire the code-bus media cart index: resolve from DAM URLs, legacy keys in content shards (#377) | E05 | 1.5 | 0.5–1 | 1–2 | 505a,517,511,504a | 🔵 M2 (proposed 2026-10-16) · #377 |
 | [SKODA-520](tickets/SKODA-520.md) | Source CDN cutover: no page, fragment, feed or code path depends on skoda-storyboard.com files (#378) | E05 | 5 | 2–3 | 4–6 | 504,503,506,518,#219 | 🔵 M2 **P1, start now** (decided 2026-10-16); census: 5,222 of 8,179 page images + 4,581 of 7,369 links already rewritable · #378 |
 | [SKODA-521](tickets/SKODA-521.md) | App Builder platform set-up: entitlement, project, credentials, connection checks (#381) | E05 | 2 | 1 | 2 | client org admins | 🔵 M2; **blocks 511a** (511 needs its AEM credential); client asks C1–C7 first (entitlement is the long pole); review in `SKODA-APP-BUILDER-INTEGRATION.md` |
+| [SKODA-522](tickets/SKODA-522.md) | Asset changes reach pages: re-publish on update, report on unpublish and expiry (#389) | E05 | 3 | 1–2 | 2–4 | D20,520,521,511a,511b,518 | 🔵 M2; approach depends on **D20** |
 | [SKODA-611](tickets/SKODA-611.md) | Storyboard home composition (/en cover-box stack, promo exclusion) | E06 | 2.5 | 1 | 2–2.5 | 212,213,214,217,218,603 | ✅ Done (#153, #151, #147 closed 2026-10-05). Was: M1; Demo sweep 2026-09-25; **parent** of 611a/611b (D2); 611a ✅ (#205), 611b in review (PR #238); closes with 611b |
 | [SKODA-611a](tickets/SKODA-611a.md) | Home section structure: 9 cover-box sections, dark bands, social strip (Must slice) | E06 | 1 | 0.5 | 1 | 213,214,217,218,603 | ✅ Done: merged (#205, 2026-09-29), `/en` re-imported and pushed with SKODA-827; issue #151 closed |
 | [SKODA-611b](tickets/SKODA-611b.md) | Home band spacing: light-band padding + gaps to live, + home rails (Should slice) | E06 | 1.5 | 0.5 | 1–1.5 | 611a,218,212,224,827 | ✅ Done (#153 closed 2026-10-05). Was: M1 Should; in review (PR #238, branch `skoda-611b-home-spacing`): band spacing + home rails (card ladder, caption cards, "All" pill + end card); every band within 1px of live after merging main (2026-10-01); /en re-import pending DA push |
@@ -339,6 +340,15 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-1001 | Per-locale trees + per-locale query-index | E10 | D | 5 | 2–3 | 4–6 | 401,603 | 🟡 |
 | SKODA-1002 | EW Translation rollout (DE/CS/SK/SR/SL) | E10 | D | 8 | 3–5 | content-ops | 1001 | 🟠 volume |
 | SKODA-1003 | Language-negotiated routing + placeholders | E10 | D | 3 | 1–2 | 2–3 | 303,1001 | 🟡 |
+| [SKODA-1004](tickets/SKODA-1004.md) | Non-EN corpus import: shared tooling + per-locale runs (#394) | E10 | D | 3 | 1–2 | 3–4 | 803,1001,1006,103a,843 | 🔵 M2; **Q-7**; ≈ 12,000 non-EN docs have no other import path |
+| [SKODA-1004a](tickets/SKODA-1004a.md) | CS corpus import (≈ 5,100 docs) (#395) | E10 | D | 5 | 2–3 | 5–8 | 1004,1006,843,904 | 🔵 M2 **go-live gate** (D1 partner) |
+| [SKODA-1004b](tickets/SKODA-1004b.md) | DE corpus import (Škoda Auto Deutschland) (#396) | E10 | D | 3 | 1–2 | 3–5 | 1004,Q-7,Q-8,Q-9 | 🔵 M2; timing per Q-7; DE releases per Q-8 |
+| [SKODA-1004c](tickets/SKODA-1004c.md) | SK corpus import (own Media Room) (#397) | E10 | D | 3 | 1–2 | 3–5 | 1004,Q-7,Q-11 | 🔵 M2; timing per Q-7 |
+| [SKODA-1004d](tickets/SKODA-1004d.md) | SR corpus import (Serbian Latin) (#398) | E10 | D | 3 | 1–2 | 3–4 | 1004,Q-7,Q-14 | 🔵 M2; timing per Q-7 |
+| [SKODA-1004e](tickets/SKODA-1004e.md) | SL corpus import (Media Room shell) (#399) | E10 | D | 1 | 0.5 | 1–2 | 1004,Q-7 | 🔵 M2; timing per Q-7 |
+| [SKODA-1005](tickets/SKODA-1005.md) | Translation pairs after go-live: group id, author "link a translation", reciprocity check (#400) | E10 | D | 3 | 1–2 | 3–4 | Q-10,1001,303a,1004 | 🔵 M2; approach per **Q-10** |
+| [SKODA-1006](tickets/SKODA-1006.md) | Per-locale chrome: nav, footer, Media Room nav/footer (#401) | E10 | D | 2 | 1 | 2–3 | 1001,1003,302,304 | 🔵 M2; CS for go-live |
+| [SKODA-103a](tickets/SKODA-103a.md) | Inbound trailing-slash rule (301 `/{path}/` → `/{path}`, all locales) (#402) | E01 | D | 2 | 1 | 1–2 | D14,103,1003 | 🔵 M2; **before DNS**; ≈ 15,000 slashed legacy URLs |
 
 ---
 
