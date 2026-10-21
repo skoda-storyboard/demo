@@ -317,3 +317,58 @@ test('without hover (touch) the controls stay while paused and fade 2s after the
     mock.timers.reset();
   }
 });
+
+// a finger's tap: pointerenter + pointerdown (touch), then its click on the video
+function tapper(window, wrapper, video) {
+  const pointer = (type) => {
+    const e = new window.Event(type, { bubbles: type !== 'pointerenter' });
+    Object.defineProperty(e, 'pointerType', { value: 'touch' });
+    wrapper.dispatchEvent(e);
+  };
+  return () => {
+    pointer('pointerenter');
+    pointer('pointerdown');
+    video.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+  };
+}
+
+test('touch on a device with a mouse too: a tap brings the hidden controls back, then they fade (#380 review)', { skip: !JSDOM }, () => {
+  mock.timers.enable({ apis: ['setTimeout'] });
+  try {
+    const {
+      window, wrapper, video, q, state,
+    } = setup(); // hover-capable (a laptop with a touch screen)
+    const idle = () => wrapper.classList.contains('is-idle');
+    q('.clip-play').click();
+    wrapper.dispatchEvent(new window.Event('pointerleave'));
+    assert.equal(idle(), true, 'playing, the mouse away: hidden');
+    tapper(window, wrapper, video)();
+    assert.equal(idle(), false, 'a tap shows them: a touch is never "away"');
+    assert.equal(state.paused, false, 'the revealing tap does not pause');
+    mock.timers.tick(2000);
+    assert.equal(idle(), true, 'and they fade 2s later, as without hover');
+  } finally {
+    mock.timers.reset();
+  }
+});
+
+test('touch: a tap on hidden controls only reveals them; a tap on shown ones plays / pauses (#380 review)', { skip: !JSDOM }, () => {
+  mock.timers.enable({ apis: ['setTimeout'] });
+  try {
+    const {
+      window, wrapper, video, state,
+    } = setup({ touch: true });
+    const idle = () => wrapper.classList.contains('is-idle');
+    const tap = tapper(window, wrapper, video);
+    tap();
+    assert.equal(state.paused, false, 'shown before the first play: the tap plays');
+    mock.timers.tick(2000);
+    assert.equal(idle(), true);
+    tap();
+    assert.equal([idle(), state.paused].join(), 'false,false', 'revealed, still playing');
+    tap();
+    assert.equal(state.paused, true, 'shown: the next tap pauses');
+  } finally {
+    mock.timers.reset();
+  }
+});

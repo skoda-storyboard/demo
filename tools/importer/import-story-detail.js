@@ -174,11 +174,17 @@ export default {
     // grids) → Downloads (gallery, story), before the cleanup strips its download sizes (whose
     // labels otherwise read "Original1920px" in the body)
     // (marked, so the cleanup's source-table pass keeps it a Downloads block, not a Columns)
+    // A group that can't be parsed (e.g. an asset without a download URL) is logged and left to
+    // the cleanup, as a failing block parser below: it never fails the whole story (#380 review)
     main.querySelectorAll('.textwidget .search-results.search-results-gallery').forEach((group) => {
       const anchor = document.createComment('gallery');
       group.before(anchor);
-      mediaParser(group, payload, { story: true });
-      anchor.nextElementSibling?.setAttribute('data-skoda-block', '');
+      try {
+        mediaParser(group, payload, { story: true });
+        anchor.nextElementSibling?.setAttribute('data-skoda-block', '');
+      } catch (e) {
+        console.error('Failed to parse a story gallery (.search-results-gallery):', e);
+      }
       anchor.remove();
     });
 

@@ -159,6 +159,9 @@ test('lead applies at every width, offset only from 720px (columns.css, #380 rev
   assert.ok(lead > 0, 'the lead rule');
   assert.equal(css.lastIndexOf('@media', lead) > css.lastIndexOf('}\n}', lead), false, 'not inside a media query');
   assert.match(css, /@media \(width >= 720px\) \{\s*\.columns\.offset > div > div/);
+  // the lead adds to the cell's own top padding (split / centred gutter), never replaces it
+  const body = css.slice(lead, css.indexOf('}', lead));
+  assert.match(body, /padding-block-start:\s*calc\(var\(--columns-split-gutter, 0px\) \+ var\(--columns-lead, 0px\)\)/);
 });
 
 test('pad-… / pad-m-…: the row\'s own padding as custom properties; malformed or absent, none', () => {

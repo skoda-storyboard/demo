@@ -1278,6 +1278,10 @@ var CustomImportScript = (() => {
     if (!raw) return false;
     const data = JSON.parse(raw);
     const doc = root.ownerDocument;
+    const missed = (why) => {
+      console.warn(`drop cap "${data.text}" not applied: ${why}`);
+      return false;
+    };
     const breaks = [...root.querySelectorAll("hr")].filter((hr) => !hr.closest("table"));
     const metas = [...root.querySelectorAll("table")].filter(isSectionMetadata2);
     const styleRow = (table) => [...table.querySelectorAll("tr")].find((tr) => tr.children.length > 1 && /^style$/i.test(tr.children[0].textContent.trim()));
@@ -1285,11 +1289,13 @@ var CustomImportScript = (() => {
       var _a;
       return /\bbody-column\b/.test(((_a = styleRow(t)) == null ? void 0 : _a.children[1].textContent) || "");
     });
-    if (!meta) return false;
+    if (!meta) return missed("no body section");
     const start = [...breaks].reverse().find((hr) => after(hr, meta));
     const end = breaks.find((hr) => after(meta, hr));
     const first = [...root.querySelectorAll("p")].find((p) => !p.closest("table") && p.textContent.trim() && (!start || after(start, p)) && (!end || after(p, end)));
-    if (!first || !first.textContent.trim().startsWith(data.text)) return false;
+    if (!first || !first.textContent.trim().startsWith(data.text)) {
+      return missed("the first body section does not open with it");
+    }
     const cell = styleRow(meta).children[1];
     cell.textContent = `${cell.textContent.trim()}, drop-cap`;
     ROWS.forEach(([field, key]) => {
@@ -3052,8 +3058,12 @@ var CustomImportScript = (() => {
         var _a;
         const anchor = document2.createComment("gallery");
         group.before(anchor);
-        parse4(group, payload, { story: true });
-        (_a = anchor.nextElementSibling) == null ? void 0 : _a.setAttribute("data-skoda-block", "");
+        try {
+          parse4(group, payload, { story: true });
+          (_a = anchor.nextElementSibling) == null ? void 0 : _a.setAttribute("data-skoda-block", "");
+        } catch (e) {
+          console.error("Failed to parse a story gallery (.search-results-gallery):", e);
+        }
         anchor.remove();
       });
       executeTransformers("beforeTransform", main, payload);

@@ -421,12 +421,24 @@ test('drop cap: only colour rows the source sets; none when the body does not op
   applyDropCap(main);
   assert.deepEqual(metaRows(body), [['style', 'body-column, drop-cap'], ['drop-cap-text', 'I']]);
 
-  markDropCap(document);
-  main.innerHTML = '<hr><h2>Heading</h2><p>Other text</p>';
-  const other = meta(document, 'body-column');
-  main.querySelector('hr').after(other);
-  assert.equal(applyDropCap(main), false, 'never guess');
+  // a fresh source page: the body above replaced the first one's article
+  const { document: second } = new JSDOM('<article><div class="entry-content"><p><span class="drop-cap">I</span>n the snow</p></div></article>').window;
+  assert.ok(markDropCap(second), 'recorded');
+  const main2 = second.body;
+  main2.innerHTML = '<hr><h2>Heading</h2><p>Other text</p>';
+  const other = meta(second, 'body-column');
+  main2.querySelector('hr').after(other);
+  const warnings = [];
+  const realWarn = console.warn;
+  console.warn = (m) => warnings.push(m);
+  try {
+    assert.equal(applyDropCap(main2), false, 'never guess');
+  } finally {
+    console.warn = realWarn;
+  }
   assert.deepEqual(metaRows(other), [['style', 'body-column']]);
+  // the source's drop cap is reported, not dropped silently (#380 review)
+  assert.deepEqual(warnings, ['drop cap "I" not applied: the first body section does not open with it']);
   const none = new JSDOM('<article><div class="entry-content"><p>Plain</p></div></article>').window.document;
   assert.equal(markDropCap(none), null);
 });

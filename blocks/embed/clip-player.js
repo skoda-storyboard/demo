@@ -40,6 +40,9 @@ const VOLUME_PAGE = 10;
 // while playing, the controls hide this long after the pointer's last move over the clip (the
 // source Vimeo player's, measured 2026-10-16)
 export const IDLE_MS = 2000;
+// a tap's click follows its pointerdown well within this: the click of a tap that only revealed
+// the hidden controls doesn't play / pause
+export const REVEAL_TAP_MS = 600;
 
 const SVG = 'http://www.w3.org/2000/svg';
 // 24×24 glyphs drawn for this player (play, pause, speaker, speaker off, gear, PiP, fullscreen)
@@ -220,12 +223,17 @@ export default function clipPlayer(wrapper, video) {
   };
 
   // the controls' hiding (`is-idle`), once the clip has played: with a mouse whenever the
-  // pointer is off the clip, and while playing 2s after its last move; without hover only that
-  // idle fade
+  // pointer is off the clip, and while playing 2s after its last move; without hover, or after a
+  // touch on a device that also has a mouse (a touch is never "over" the clip), only that idle fade
   const canHover = window.matchMedia?.('(hover: hover)')?.matches ?? true;
   let idleTimer = 0;
   let idle = false;
   let inside = false;
+  let touched = false;
+  // a tap on hidden controls only brings them back: the click it then makes on the video doesn't
+  // also play or pause it. That click takes the mark; an unclicked one lapses
+  let revealTap = false;
+  let revealTimer = 0;
   let overBar = false;
   let hasPlayed = false;
   // keyboard focus holds the controls; the focus a mouse click leaves on a button doesn't
@@ -238,7 +246,7 @@ export default function clipPlayer(wrapper, video) {
     const playing = !(video.paused || video.ended);
     const held = overBar || !menu.hidden || keyboardFocus();
     if (playing) hasPlayed = true;
-    const away = canHover && !inside;
+    const away = canHover && !inside && !touched;
     wrapper.classList.toggle('is-idle', !held && hasPlayed && (away || (playing && idle)));
   };
   const show = () => {
@@ -287,7 +295,13 @@ export default function clipPlayer(wrapper, video) {
   }
 
   play.addEventListener('click', toggle);
-  video.addEventListener('click', toggle);
+  video.addEventListener('click', () => {
+    if (revealTap) {
+      revealTap = false;
+      return;
+    }
+    toggle();
+  });
   volume.addEventListener('click', () => {
     video.muted = !(video.muted || video.volume === 0);
     if (!video.muted && video.volume === 0) video.volume = 1;
@@ -387,11 +401,21 @@ export default function clipPlayer(wrapper, video) {
     video.addEventListener(type, render);
   });
   ['play', 'pause', 'ended'].forEach((type) => video.addEventListener(type, syncPlay));
-  // a touch pointer is never "over" the clip: it only restarts the idle fade
-  const enter = (e) => { if (e.pointerType !== 'touch') inside = true; show(); };
+  // a touch pointer is never "over" the clip: it only restarts the idle fade. A touch comes with
+  // pointerenter then pointerdown, so the first of them sees whether the controls were hidden
+  const enter = (e) => {
+    touched = e.pointerType === 'touch';
+    if (touched && wrapper.classList.contains('is-idle')) {
+      revealTap = true;
+      clearTimeout(revealTimer);
+      revealTimer = setTimeout(() => { revealTap = false; }, REVEAL_TAP_MS);
+    }
+    if (!touched) inside = true;
+    show();
+  };
   wrapper.addEventListener('pointerenter', enter);
   wrapper.addEventListener('pointermove', enter);
-  wrapper.addEventListener('pointerdown', () => show());
+  wrapper.addEventListener('pointerdown', enter);
   wrapper.addEventListener('pointerleave', () => { inside = false; overBar = false; sync(); });
   bar.addEventListener('pointerenter', () => { overBar = true; sync(); });
   bar.addEventListener('pointerleave', () => { overBar = false; show(); });

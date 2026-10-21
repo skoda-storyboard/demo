@@ -54,18 +54,27 @@ export function applyDropCap(root) {
   if (!raw) return false;
   const data = JSON.parse(raw);
   const doc = root.ownerDocument;
+  // the source had one, but the first body section doesn't open with it (a leading panel, or a
+  // styled first paragraph cut into its own section): said, not lost silently (#380 review)
+  const missed = (why) => {
+    // eslint-disable-next-line no-console
+    console.warn(`drop cap "${data.text}" not applied: ${why}`);
+    return false;
+  };
   const breaks = [...root.querySelectorAll('hr')].filter((hr) => !hr.closest('table'));
   const metas = [...root.querySelectorAll('table')].filter(isSectionMetadata);
   const styleRow = (table) => [...table.querySelectorAll('tr')]
     .find((tr) => tr.children.length > 1 && /^style$/i.test(tr.children[0].textContent.trim()));
   // the first body section: its Section Metadata, and the section's bounds
   const meta = metas.find((t) => /\bbody-column\b/.test(styleRow(t)?.children[1].textContent || ''));
-  if (!meta) return false;
+  if (!meta) return missed('no body section');
   const start = [...breaks].reverse().find((hr) => after(hr, meta));
   const end = breaks.find((hr) => after(meta, hr));
   const first = [...root.querySelectorAll('p')].find((p) => !p.closest('table') && p.textContent.trim()
     && (!start || after(start, p)) && (!end || after(p, end)));
-  if (!first || !first.textContent.trim().startsWith(data.text)) return false;
+  if (!first || !first.textContent.trim().startsWith(data.text)) {
+    return missed('the first body section does not open with it');
+  }
 
   const cell = styleRow(meta).children[1];
   cell.textContent = `${cell.textContent.trim()}, drop-cap`;
@@ -85,7 +94,9 @@ export function applyDropCap(root) {
  * applyDropCap() itself, after the sections transformer has written the body's metadata).
  * @param {string} hookName
  * @param {Element} element
+ * @param {object} [payload] the importer payload (its document's body when no element is given)
  */
-export default function transform(hookName, element) {
-  if (hookName === 'afterTransform') applyDropCap(element);
+export default function transform(hookName, element, payload) {
+  const root = element || payload?.document?.body;
+  if (hookName === 'afterTransform' && root) applyDropCap(root);
 }

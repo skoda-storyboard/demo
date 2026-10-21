@@ -333,10 +333,11 @@
 }
 
 /* `lead-A-B…` (story rows, columns.js decorateLeads): the blank lines leading a cell's text, at
-   every width as the source shows them (inside the cell, so they add to an offset) */
+   every width as the source shows them. They sit inside the cell, under its own 10px top padding
+   (a split or centred row's gutter), and add to an offset */
 /* stylelint-disable-next-line no-descending-specificity -- lead (story rows) and callout never combine on one block */
 .columns.lead > div > div {
-  padding-block-start: var(--columns-lead, 0);
+  padding-block-start: calc(var(--columns-split-gutter, 0px) + var(--columns-lead, 0px));
 }
 
 /* `pad-…` / `pad-m-…` (story rows, columns.js decorateRowPadding): the source row's own padding,
