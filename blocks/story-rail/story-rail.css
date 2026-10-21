@@ -390,26 +390,6 @@ body.story .section.dark.story-rail-container .story-rail .carousel-track .card-
   margin-block-end: calc(12px - var(--spacing-xs));
 }
 
-/* arrows: the source glyph (skoda-bnr-icons \e00b / \e00c, #272), a 90% white disc with the
-   arrow cut out over the ink disc, so the arrow reads ink on white. The story's Related Stories
-   band has the same flickity arrows on the source (#296). Size, position, disabled fade and
-   focus ring stay the carousel's */
-.story-rail.story-rail-home .carousel-arrow::after,
-body.story .section.dark.story-rail-container .story-rail .carousel-arrow::after {
-  inset: 0;
-  width: auto;
-  height: auto;
-  border: 0;
-  background-color: color-mix(in srgb, var(--skoda-white) 90%, transparent);
-  transform: none;
-  mask: url("../../icons/rail-arrow-prev.svg") center / 100% 100% no-repeat;
-}
-
-.story-rail.story-rail-home .carousel-next::after,
-body.story .section.dark.story-rail-container .story-rail .carousel-next::after {
-  mask-image: url("../../icons/rail-arrow-next.svg");
-}
-
 /* media cards (Media Room Images / Videos, carousel.css `.carousel.media`): reserve the rows under
    the 16:9 image until the rail builds, the 44px date row, the two-line 46px title and the 50px
    cart / download toolbar (source .type-attachment, 287px cell at 1280) */
