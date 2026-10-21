@@ -6,7 +6,7 @@
   is the client's Admin Console and IdP work.
 - **Estimate:** 3 SP team time · AI-assisted 1–2d / manual 2–3d, excluding client lead time *(planning estimate, not a
   quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#407](https://github.com/skoda-storyboard/demo/issues/407) (created 2026-10-21, sub-issue of #1)
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner.
 
 ## Why
