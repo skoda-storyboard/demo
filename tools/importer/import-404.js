@@ -62,6 +62,15 @@ function slugOf(url) {
   return new URL(url).pathname.replace(/\/$/, '').split('/').pop();
 }
 
+/**
+ * The fragment a source variant page becomes: `/{locale}/fragments/404/<slug>`. These are the
+ * paths templates/error-404 requests (VARIANTS) and paths-404.txt publishes (error-404.test.mjs).
+ * @param {string} url the source page URL
+ */
+export function fragmentPath(url) {
+  return `/${localeOf(url)}/fragments/404/${slugOf(url)}`;
+}
+
 function photo(row, document) {
   const src = row?.getAttribute(BG_ATTR);
   if (!src) return null;
@@ -124,7 +133,7 @@ export default {
 
     return [{
       element: main,
-      path: `/${localeOf(params.originalURL)}/fragments/404/${slugOf(params.originalURL)}`,
+      path: fragmentPath(params.originalURL),
       report: {
         title: (source.querySelector('h1, h2, h3')?.textContent || '').trim(),
         template: PAGE_TEMPLATE.name,

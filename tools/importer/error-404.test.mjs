@@ -8,6 +8,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { JSDOM } from 'jsdom';
+import { readFileSync } from 'node:fs';
 
 function table(rows, document) {
   const t = document.createElement('table');
@@ -28,7 +29,9 @@ globalThis.WebImporter = {
   rules: { adjustImageUrls() {} },
 };
 
-const { default: importer } = await import('./import-404.js');
+const { default: importer, fragmentPath } = await import('./import-404.js');
+const { parseList } = await import('./push/push-lib.mjs');
+const { VARIANTS } = await import('../../templates/error-404/error-404.js');
 
 const CDN = 'https://cdn.skoda-storyboard.com/2023/01';
 const message = (heading, white, label) => `<div class="error-message"${white ? ' style="color: #ffffff;"' : ''}>
@@ -86,4 +89,14 @@ test('a white message gets the not-found-white style; no label, no label paragra
 test('a page without the message fails loudly', () => {
   const { document } = new JSDOM('<body><p>Nothing here</p></body>').window;
   assert.throws(() => run(document, 'https://www.skoda-storyboard.com/en/x/'), /no \.error-message/);
+});
+
+test('the path contract: urls-404.txt imports, paths-404.txt publishes, the template requests', () => {
+  const read = (name) => readFileSync(new URL(name, import.meta.url), 'utf8');
+  const sources = read('./urls-404.txt').split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));
+  const imported = sources.map(fragmentPath);
+  const published = parseList(read('./paths-404.txt'));
+  const requested = VARIANTS.map((slug) => `/en/fragments/404/${slug}`);
+  assert.deepEqual(imported, requested, 'each source variant page imports to a fragment the 404 requests');
+  assert.deepEqual(published, requested, 'push/publish takes exactly those paths (push-lib parseList)');
 });

@@ -1,8 +1,9 @@
 /* ==========================================================================
    Branded 404 (SKODA-706): the source's template-404 page, measured on
    /en/youve-reached-a-dead-end/ and /en/welcome-to-our-remote-car-park/
-   (docs/ui-specs/template-404.md). A full-bleed photo band, at least 900px tall, with the
-   message over it; the footer overlaps the band's last 5.263% of the width, as the source.
+   (docs/ui-specs/template-404.md). A full-bleed photo band, at least the viewport tall
+   (100vh, as the source's rows), with the message over it; the footer overlaps the band's
+   last 5.263% of the width, as the source.
    Three layers (css-guidelines.md): L1 fluid, the mobile message (the source's
    .message-mobile); L2 intrinsic, the band is the container and the message follows its
    width; L3 the source's switches, as container queries on the full-bleed band: 720 (the
@@ -11,13 +12,19 @@
    ========================================================================== */
 
 body.error-404 {
-  --not-found-min-height: 900px;
+  /* the source rows are min-height 100vh; a short viewport lets the message set the height */
+  --not-found-min-height: 100vh;
 
   /* the source article's negative bottom margin: the footer covers the band's last 1/19 */
   --not-found-overlap: 5.2632%;
 
-  /* mobile: the message 20px in from the band's top and sides */
+  /* mobile: the message 20px in from the band's top and sides, centred, and 120px of band
+     below it (the source cell's 100px padding + its widget's 20); 350px below the desktop
+     message (its 250px margin + the cell's 100) */
   --not-found-inset: 20px;
+  --not-found-end: 120px;
+  --not-found-end-desktop: 350px;
+  --not-found-align: center;
   --not-found-message-width: calc(100cqi - 2 * var(--not-found-inset));
   --not-found-color: var(--skoda-ink);
   --not-found-link-color: var(--skoda-green-accent);
@@ -54,7 +61,7 @@ body.error-404 main > .section.not-found-white {
 
 body.error-404 main > .section.not-found > .default-content-wrapper {
   max-width: none;
-  padding: var(--not-found-inset);
+  padding: var(--not-found-inset) var(--not-found-inset) var(--not-found-end);
 }
 
 /* the photo fills the band behind the message; z-index -1 keeps it under the footer, which
@@ -75,6 +82,7 @@ body.error-404 .not-found-photo img {
 
 body.error-404 .not-found-message {
   width: var(--not-found-message-width);
+  text-align: var(--not-found-align);
 }
 
 body.error-404 .not-found-message > :is(h1, h2, h3) {
@@ -113,13 +121,14 @@ body.error-404 .not-found-message a:any-link:focus-visible {
   outline-color: var(--not-found-color);
 }
 
-/* L3: the source's .message-desktop from 720: its type, 70px down, half the band */
+/* L3: the source's .message-desktop from 720: its type, start-aligned, 70px down, half the band */
 @container not-found (width >= 720px) {
   body.error-404 main > .section.not-found > .default-content-wrapper {
-    padding-block-start: 70px;
+    padding-block: 70px var(--not-found-end-desktop);
   }
 
   body.error-404 .not-found-message {
+    --not-found-align: start;
     --not-found-label-size: 28.8px;
     --not-found-label-line: 43.2px;
     --not-found-heading-size: 56px;

@@ -38,7 +38,8 @@ var CustomImportScript = (() => {
   // tools/importer/import-404.js
   var import_404_exports = {};
   __export(import_404_exports, {
-    default: () => import_404_default
+    default: () => import_404_default,
+    fragmentPath: () => fragmentPath
   });
 
   // tools/importer/transformers/skoda-nbsp.js
@@ -529,6 +530,9 @@ var CustomImportScript = (() => {
   function slugOf(url) {
     return new URL(url).pathname.replace(/\/$/, "").split("/").pop();
   }
+  function fragmentPath(url) {
+    return `/${localeOf(url)}/fragments/404/${slugOf(url)}`;
+  }
   function photo(row, document) {
     const src = row == null ? void 0 : row.getAttribute(BG_ATTR);
     if (!src) return null;
@@ -583,7 +587,7 @@ var CustomImportScript = (() => {
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       return [{
         element: main,
-        path: `/${localeOf(params.originalURL)}/fragments/404/${slugOf(params.originalURL)}`,
+        path: fragmentPath(params.originalURL),
         report: {
           title: (((_b = source.querySelector("h1, h2, h3")) == null ? void 0 : _b.textContent) || "").trim(),
           template: PAGE_TEMPLATE.name,
