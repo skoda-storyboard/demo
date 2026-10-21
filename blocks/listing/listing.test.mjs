@@ -1251,3 +1251,25 @@ test('sharded feed (#406 review): a row neither its detail shard nor the whole f
     assert.equal(f.block.querySelector('.listing-status').hidden, true);
   } finally { f.restore(); }
 });
+
+test('sharded feed (part 2): a filtered or oldest-first deep link never requests the head shard', async () => {
+  for (const [locale, search] of [['cs', '?filter[model][]=fabia'], ['sk', '?sortby=oldest']]) {
+    const f = shardedFeed(locale);
+    const requested = [];
+    const seen = globalThis.fetch;
+    globalThis.fetch = async (url) => { requested.push(new URL(String(url), 'https://example.com').pathname); return seen(url); };
+    try {
+      window.history.replaceState({}, '', `/${locale}/images${search}`);
+      // eslint-disable-next-line no-await-in-loop
+      await decorate(f.block);
+      // eslint-disable-next-line no-await-in-loop
+      await until(() => f.block.querySelector('.facet-pill') && f.titles().length);
+      assert.equal(requested.some((p) => p.endsWith('/head-image.json')), false, search);
+      assert.ok(requested.some((p) => p.endsWith('/facets.json')), `${search}: the facet index`);
+      assert.ok(f.titles().length > 0, `${search}: cards`);
+    } finally {
+      globalThis.fetch = seen;
+      f.restore();
+    }
+  }
+});

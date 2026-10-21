@@ -282,3 +282,18 @@ test('the fallback fails too: the reader rejects (its caller shows its own error
   files['/en/media-feed/index.json'] = [reg('detail', 'image:2026', '/en/media-feed/gone-detail.json')];
   await assert.rejects(loadAllRows('/en/media-feed.json'), /404/);
 });
+
+test('expandFacets: the compact `f` column as facet columns; other rows untouched (part 2)', async () => {
+  const { expandFacets } = await import('./media-feed.js');
+  const compact = { id: '1', template: 'image', f: 'model:fabia|bodywork:hatchback|bodywork:combi|bad|:x|id:9' };
+  const out = expandFacets(compact);
+  assert.deepEqual(out, { id: '1', template: 'image', model: 'fabia', bodywork: 'hatchback, combi' });
+  assert.equal(compact.f, 'model:fabia|bodywork:hatchback|bodywork:combi|bad|:x|id:9', 'input unchanged');
+  const plain = { id: '2', model: 'scala' };
+  assert.equal(expandFacets(plain), plain);
+  // the listing reads the expanded columns
+  files['/en/media-feed/index.json'] = [reg('facets', '', '/en/media-feed/facets.json'), reg('detail', 'image:2026', '/en/media-feed/d.json')];
+  files['/en/media-feed/facets.json'] = [{ id: '1', template: 'image', detail: 'image:2026', f: 'model:fabia' }];
+  const feed = await openListingFeed('/en/media-feed.json');
+  assert.deepEqual(await feed.rows(), [{ id: '1', template: 'image', detail: 'image:2026', model: 'fabia' }]);
+});

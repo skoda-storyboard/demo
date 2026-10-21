@@ -13,8 +13,9 @@
  *
  * - head: the newest rows of one template (`total` = all its rows), a listing's first page;
  * - facets: every row, in the whole feed's order, with only `id`, `template`, `date`, the
- *   facet columns and `detail` (the key of the detail shard that has the full row);
- * - detail: the full rows of one template and year;
+ *   facet columns and `detail` (the key of the detail shard that has the full row); the facet
+ *   columns may come compact as one `f` column, `key:value|key:value` (expandFacets());
+ * - detail: the full rows of one template and year (or a part of a large year);
  * - slice: the full rows that carry one facet value (rails);
  * - keyed: the full rows whose file name (`original`) hashes to that shard (keyShard()).
  *
@@ -221,6 +222,28 @@ export async function findRowsByFile(url, files) {
 }
 
 /**
+ * A facet-index row with its facet values in one compact `f` column
+ * (`model:fabia|bodywork:combi|bodywork:hatchback`, the generator's form) as the facet columns
+ * the listing filters on (`model: 'fabia'`, `bodywork: 'combi, hatchback'`). A row without
+ * `f` is returned as it is. The input row is not changed.
+ * @param {object} row a facet-index row
+ */
+export function expandFacets(row) {
+  const compact = row && typeof row.f === 'string' ? row.f : null;
+  if (compact === null) return row;
+  const { f, ...out } = row;
+  compact.split('|').forEach((pair) => {
+    const at = pair.indexOf(':');
+    if (at < 1) return;
+    const key = pair.slice(0, at).trim();
+    const value = pair.slice(at + 1).trim();
+    if (!key || !value || key === 'id' || key === 'detail' || key === 'template' || key === 'date') return;
+    out[key] = out[key] ? `${out[key]}, ${value}` : value;
+  });
+  return out;
+}
+
+/**
  * A listing's view of the feed. `head()` is the template's head shard for the first paint
  * ({ rows, total }) or null; `rows()` the rows the listing scopes, filters, sorts and pages:
  * the facet index when the registry has one with its detail shards (and the listing isn't
@@ -249,6 +272,8 @@ export async function openListingFeed(url, { template = '', path = '' } = {}) {
   const wholeFeed = () => loadQueryIndex(url);
   return {
     get lazy() { return lazy; },
+    // how many rows the head shard holds (null: unknown), so a deep link past it can skip it
+    headRows: headEntry ? headEntry.rows : null,
     head: headEntry && (async () => {
       const rows = await loadQueryIndex(headEntry.url);
       remember(rows);
@@ -256,7 +281,7 @@ export async function openListingFeed(url, { template = '', path = '' } = {}) {
     }),
     rows: () => {
       if (!lazy) return loadAllRows(url);
-      return loadQueryIndex(registry.facets.url).catch(() => {
+      return loadQueryIndex(registry.facets.url).then((index) => index.map(expandFacets), () => {
         lazy = false; // full rows from here on
         return loadAllRows(url).catch(wholeFeed);
       });
