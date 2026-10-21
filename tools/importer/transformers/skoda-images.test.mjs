@@ -22,6 +22,29 @@ test('lifts an inline image without losing adjacent formatted prose', () => {
   assert.equal(root.querySelector('p:last-child em').textContent, 'After');
 });
 
+// SKODA-703: a lone linked image with an empty alt leaves its link unnamed (the Classic Days
+// chapters' Columns cells and body photos, also on the source)
+test('backfills the alt of a lone linked image: caption, title, nearest heading, page h1; never the file name', () => {
+  const titled = normalize('<p><a href="/a.jpg" title="Škoda 110 R Coupé"><img src="12_skoda-110-r.jpg" alt=""></a></p>');
+  assert.equal(titled.querySelector('img').getAttribute('alt'), 'Škoda 110 R Coupé', 'a non-blank link title');
+  const captioned = normalize('<p><a href="/a.jpg" title=" "><img src="a.jpg" alt="" data-caption="The 110 R at Classic Days"></a></p>');
+  assert.equal(captioned.querySelector('img').getAttribute('alt'), 'The 110 R at Classic Days', 'the editorial caption first');
+  const underHeading = normalize('<h2>Škoda Felicia (1959–1964)</h2><p>Text.</p><table><tr><td><a href="/b.jpg" title=" "><img src="19_felicia.jpg" alt=""></a></td></tr></table>');
+  assert.equal(underHeading.querySelector('img').getAttribute('alt'), 'Škoda Felicia (1959–1964)', 'the nearest heading before it, also in a block cell');
+  const pageOnly = normalize('<h1>Classic Days 2026</h1><div><a href="/c.jpg"><img src="koda-rapid_yellow.jpg" alt=""></a></div>');
+  assert.equal(pageOnly.querySelector('img').getAttribute('alt'), 'Classic Days 2026');
+  [titled, captioned, underHeading, pageOnly].forEach((root) => assert.doesNotMatch(root.querySelector('img').getAttribute('alt'), /\.jpe?g|_/, 'never the file name'));
+});
+
+test('leaves a decorative empty alt alone when the image is not a lone linked image', () => {
+  const card = normalize('<h2>Peaq</h2><p><a href="/en/peaq"><img src="p.jpg" alt=""> Peaq first glimpse</a></p>');
+  assert.equal(card.querySelector('img').getAttribute('alt'), '', 'the link has its own text');
+  const plain = normalize('<h2>Peaq</h2><p><img src="p.jpg" alt=""></p>');
+  assert.equal(plain.querySelector('img').getAttribute('alt'), '', 'not a link: decorative stays decorative');
+  const authored = normalize('<h2>Peaq</h2><p><a href="/p.jpg"><img src="p.jpg" alt="Authored"></a></p>');
+  assert.equal(authored.querySelector('img').getAttribute('alt'), 'Authored');
+});
+
 test('preserves an image-only link when lifting it from a paragraph', () => {
   const root = normalize('<p>Intro <a href="/en/details"><img src="a.jpg" alt="A"></a> more</p>');
   assert.equal(root.querySelector('a[href="/en/details"] > div > img').getAttribute('alt'), 'A');

@@ -80,3 +80,7 @@ test('News and Press Kits offer the source\'s 13 shown filter groups, in its ord
     assert.ok(names[k], `${k} has option names`);
   });
 });
+
+test('Images and Videos offer the same 13 filter groups the source shows, in its order (#273)', { skip }, () => {
+  ['images', 'videos'].forEach((token) => assert.deepEqual(run(token).facets.split(',').map((k) => k.trim()), SOURCE_SHOWN, token));
+});

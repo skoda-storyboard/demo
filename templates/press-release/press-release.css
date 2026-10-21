@@ -370,25 +370,18 @@ body.press-release .section.related .button-container a.button:focus-visible {
 }
 
 /* A press release's Media Box PDF tile is the source's bare 30% black holder: its
-   .file-caption is hidden (#274; measured on Zellmer and Superb, no glyph and no label) */
+   .file-caption is hidden (#274; measured on Zellmer and Superb, no glyph and no label). The
+   holder is the 16:9 panel inside the tile's hairline, as the image tile's picture (290 x 163.1
+   in a 292 x 165.1 frame @1280), so the 16:9 sizes the content box, not the bordered one, and
+   the 30% black stays inside the hairline (#274 re-test: the tile was 164.3 tall) */
+body.press-release .section.media-box .downloads-file[data-file-type="pdf"] {
+  box-sizing: content-box;
+  width: auto;
+  background-clip: padding-box;
+}
+
 body.press-release .section.media-box .downloads-file[data-file-type="pdf"]::after {
   content: none;
-}
-
-/* Related Press Releases arrows: the source glyph (skoda-bnr-icons \e00b / \e00c, an ink
-   arrow cut out of a 90% white disc), as the home bands' (#272, story-rail.css) (#274) */
-body.press-release .section.related .story-rail.press .carousel-arrow::after {
-  inset: 0;
-  width: auto;
-  height: auto;
-  border: 0;
-  background-color: color-mix(in srgb, var(--skoda-white) 90%, transparent);
-  transform: none;
-  mask: url("../../icons/rail-arrow-prev.svg") center / 100% 100% no-repeat;
-}
-
-body.press-release .section.related .story-rail.press .carousel-next::after {
-  mask-image: url("../../icons/rail-arrow-next.svg");
 }
 
 /* A sidebar heading closing its default content is the label of the block after it

@@ -49,8 +49,18 @@ Any agent reviewing a PR must, before giving a verdict:
 
 1. **Read the ticket.** Open the `SKODA-*` ticket(s) the PR addresses under `docs/tickets/` and review against its scope + acceptance criteria, not just the diff.
 2. **Read the supporting docs under `docs/`** for that ticket: the relevant `docs/ui-specs/` spec (via `_TEMPLATES.md`), `docs/planning/` data models/requirement mapping, `docs/analysis/SKODA-MASTER.md` sections, and `docs/guardrails/css-guidelines.md` for CSS changes.
-3. **UI-affecting PRs: measure against origin with Chrome DevTools MCP.** Load the origin (live source) page and the PR's `{branch}--demo--skoda-storyboard.aem.page/{path}` preview, and compare **measured** values (computed styles, box geometry, typography, spacing, colors, DOM structure) at the spec's viewport bands (768/992/1080 plus mobile). **No screenshots**: evidence is measured numbers, not images. Follow the MCP isolation rules above.
-4. Report deviations as origin-vs-PR values with the selector and viewport; a UI review without measurements is incomplete.
+3. **UI-affecting PRs: measure against origin with Chrome DevTools MCP.** Load the origin (live source) page and the PR's `{branch}--demo--skoda-storyboard.aem.page/{path}` preview, and compare **measured** values (computed styles, box geometry, typography, spacing, colors, DOM structure) at the spec's viewport bands (768/992/1080 plus mobile). Measured numbers are the evidence; a screenshot never replaces one. Follow the MCP isolation rules above.
+4. **Click it.** On the preview, use real clicks and keys (`click`, `press_key`, `wait_for`) on every interaction the changed block or template has: the media cart "+", each download size (videos also while playing), card and PDF links, rail Prev/Next (re-check the layout after the click), filter/sort/Load more, search, the language switcher, menus. Report what happened, not what the code implies.
+5. **Compare the heading outline.** With `evaluate_script`, list the h1–h6 sequence (level + text) on origin and preview. A level mismatch is a defect unless the ticket records an accepted exception. Run `lighthouse_audit` (accessibility) on the preview and report new failures.
+6. **Check what else the change can break.**
+   - **Deleted or renamed files:** `git grep` each old path and file name across the repo. Every remaining reference (CSS `url()`/`mask-image`, JS imports, `/icons/` names) must be updated in the same PR, or the PR fails.
+   - **Shared code:** if the PR touches anything more than one template uses (a block, `styles/`, `scripts/`, the header/footer fragments), look up every template that uses it in `docs/ui-specs/_TEMPLATES.md` and repeat steps 3–5 on one page of each. A change confined to one template's own CSS needs only the ticket's page.
+7. **Then look.** After measuring, compare origin and preview side by side at the same band (`take_screenshot`, kept out of the repo) for what numbers accept: spacing rhythm, crops, missing icons, empty elements.
+8. **Deviations need a human.** Any intended difference from origin, including "matches the spec but not the source", goes in the PR body under **Deviations from origin** with its reason. An agent never accepts a deviation on its own; it stays open until a human approves it.
+9. **Found means filed.** A defect outside the PR's scope becomes a GitHub issue before the verdict, not a line in a review doc.
+10. Report deviations as origin-vs-PR values with the selector and viewport. A UI review without measurements, click results and the heading outline is incomplete.
+
+Steps 4–9 exist because M1 manual QA found 57 of 94 defects that agent reviews missed: broken clicks (#273, #274, #284), h2 for h3 nine times, a fix that deleted the rail-arrow icons site-wide (#361), and deviations agents had accepted (#275, #296). See SKODA-708.
 
 ## Outdated
 - `fstab.yaml`, `helix-query.yaml`, `paths.json` are retired. Config lives at tools.aem.live.

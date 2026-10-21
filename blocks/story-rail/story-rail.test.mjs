@@ -454,17 +454,24 @@ test('press variant: default rails keep the carousel ladder (no unscoped cell wi
     }));
 });
 
-// --- story Related band arrows + card title hover (#296, SKODA-228) -------------------------
-const ruleFor = (rules, sel) => rules.find(({ selector }) => selectorList(selector).includes(sel));
+// --- rail arrows + card title hover (#296, #361, SKODA-228) ---------------------------------
+const rulesOf = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '').split('}')
+  .map((chunk) => chunk.split('{')).filter((parts) => parts.length >= 2)
+  .map((parts) => ({ selector: parts[parts.length - 2].trim(), body: parts[parts.length - 1] }));
 
-test('story Related band: the arrows are the source glyph, as on the home bands (#296)', () => {
-  const prev = ruleFor(cssRules, `${STORY_BAND} .carousel-arrow::after`);
-  const next = ruleFor(cssRules, `${STORY_BAND} .carousel-next::after`);
-  assert.ok(prev?.body.includes('rail-arrow-prev.svg'), 'prev glyph mask');
-  assert.ok(next?.body.includes('rail-arrow-next.svg'), 'next glyph mask');
-  // the same rules as the home bands, not a copy that can drift
-  assert.equal(ruleFor(cssRules, '.story-rail.story-rail-home .carousel-arrow::after'), prev);
-  assert.equal(ruleFor(cssRules, '.story-rail.story-rail-home .carousel-next::after'), next);
+test('every rail draws the carousel\'s source arrow glyph: no rail or template overrides it (#361)', async () => {
+  const carousel = rulesOf(await readFile(new URL('../carousel/carousel.css', import.meta.url), 'utf8'));
+  const glyph = (sel) => carousel.find(({ selector }) => selector === sel)?.body || '';
+  assert.match(glyph('.carousel-arrow::after'), /content:\s*"\\e00b"\s*\/\s*""/, 'prev glyph');
+  assert.match(glyph('.carousel-arrow::after'), /font-family:\s*var\(--carousel-arrow-font\)/);
+  assert.match(glyph('.carousel-next::after'), /content:\s*"\\e00c"\s*\/\s*""/, 'next glyph');
+  // the home / story bands (story-rail.css) and the press-release Related band (#274) once laid an
+  // SVG mask over it; the files went with #284, so the arrow layer stopped painting (404)
+  const prUrl = new URL('../../templates/press-release/press-release.css', import.meta.url);
+  const pressRelease = rulesOf(await readFile(prUrl, 'utf8'));
+  [...cssRules, ...pressRelease].forEach(({ selector }) => selectorList(selector).forEach((s) => {
+    assert.doesNotMatch(s, /\.carousel-(arrow|prev|next)::(after|before)$/, `arrow layer overridden: ${s}`);
+  }));
 });
 
 test('card titles keep their colour on hover: one rule in the shared card primitive (SKODA-228)', async () => {

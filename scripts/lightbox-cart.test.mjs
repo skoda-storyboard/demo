@@ -107,3 +107,52 @@ test('a slower bind for an earlier item never wins over the current one', async 
   assert.equal(add.getAttribute('aria-disabled'), 'true');
   assert.equal(add.dataset.href, undefined);
 });
+
+test('a video item names its actions as the source player and downloads the MP4 in a new tab; an image keeps its own (#273)', async () => {
+  const { feedLightboxItem } = await import('./media-lightbox.js');
+  const video = feedLightboxItem({
+    template: 'video', id: '9', title: 'Clip', mp4: 'https://cdn.skoda-storyboard.com/2026/09/clip.mp4', poster: 'https://example.com/p.jpg', 'vimeo-id': '123',
+  });
+  assert.equal(video.download, 'https://www.skoda-storyboard.com/direct-download/2026/09/clip.mp4', 'the source download route, as the card button');
+  assert.equal(video.downloadTarget, '_blank');
+  const host = document.createElement('div');
+  document.querySelector('main').replaceChildren(host);
+  const { open, overlay } = buildLightbox(host, [{ ...video, caption: caption('Clip') }, items[0]]);
+  open(0);
+  const action = (kind) => overlay.querySelector(`.gallery-lightbox-action.${kind}`);
+  assert.deepEqual(['add', 'download', 'link'].map((k) => action(k).getAttribute('aria-label')), ['Add/remove this', 'Download this', 'Link to page']);
+  assert.equal(action('download').getAttribute('href'), video.download);
+  assert.equal(action('download').target, '_blank');
+  open(1); // the next item, an image, gets the image names back and no new tab
+  assert.deepEqual(['add', 'download', 'link'].map((k) => action(k).getAttribute('aria-label')), ['Add to media box', 'Download image', 'Copy image link']);
+  assert.equal(action('download').hasAttribute('target'), false);
+  await settle();
+});
+
+test('the actions show the source colorbox tooltips: a clip\'s player titles, an image\'s Original ones', async () => {
+  const host = document.createElement('div');
+  document.querySelector('main').replaceChildren(host);
+  const clip = { ...items[0], clip: true, caption: caption('Clip') };
+  const video = { ...items[0], video: 'https://player.vimeo.com/video/1', caption: caption('Video') };
+  const { open, overlay } = buildLightbox(host, [clip, { ...items[0], caption: caption('Image') }, video]);
+  const tips = () => ['add', 'download', 'link'].map((k) => overlay.querySelector(`.gallery-lightbox-action.${k}`).title);
+  open(0);
+  assert.deepEqual(tips(), ['Add/remove this', 'Download this', 'Link to page'], 'a clip shown as its poster');
+  assert.equal(overlay.querySelector('.gallery-lightbox-action.download').getAttribute('aria-label'), 'Download this');
+  open(1);
+  assert.deepEqual(tips(), ['Add/remove Original version', 'Download Original version', 'Link to page'], 'an image: what the button acts on');
+  open(2);
+  assert.deepEqual(tips(), ['Add/remove this', 'Download this', 'Link to page'], 'a playing video');
+  await settle();
+});
+
+test('pageHeading: the page title with its authored line breaks read as spaces', async () => {
+  const { pageHeading } = await import('./lightbox.js');
+  const main = document.querySelector('main');
+  const before = main.innerHTML;
+  main.innerHTML = '<h1>The all-electric Škoda Elroq: Breaking new ground in the compact SUV<br>segment  with a<br>\ncovered design</h1>';
+  assert.equal(pageHeading(), 'The all-electric Škoda Elroq: Breaking new ground in the compact SUV segment with a covered design');
+  main.innerHTML = '<p>No title</p>';
+  assert.equal(pageHeading(), '');
+  main.innerHTML = before;
+});

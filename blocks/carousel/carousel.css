@@ -136,7 +136,7 @@
   margin: 0;
   padding: calc(var(--media-card-pad) + var(--media-card-date-baseline)) 0
     calc(var(--media-card-pad) - var(--media-card-date-baseline));
-  color: var(--skoda-grey-350);
+  color: var(--skoda-grey-600); /* SKODA-703: the source #c4c6c7 (1.71:1) fails AA on white; the closest AA grey */
   line-height: var(--media-card-date-row);
 }
 
@@ -279,8 +279,10 @@
    white, antialiased; the font is in styles/fonts.css): a white disc with the arrow cut out
    over the ink disc, so the arrow reads ink on white. A glyph is rasterised as text, which an
    SVG mask is not: as a mask the arrow drew 1–4% heavier at 1–1.5x (#284). Every rail's
-   arrows, the home bands' (#272) and the model pages' (#284) alike. Decorative: the button's
-   aria-label names it (the empty alt text keeps the glyph out of the accessible name) */
+   arrows, the home bands' (#272), the story and press-release Related bands' (#296, #274) and
+   the model pages' (#284) alike: rails don't override this glyph (a leftover mask hid it, #361).
+   Decorative: the button's aria-label names it (the empty alt text keeps the glyph out of the
+   accessible name) */
 .carousel-arrow::after {
   content: "\e00b"; /* browsers without CSS alt text (Firefox < 128) keep the glyph */
   content: "\e00b" / "";

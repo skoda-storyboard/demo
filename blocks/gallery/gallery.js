@@ -1,5 +1,5 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
-import { buildLightbox } from '../../scripts/lightbox.js';
+import { buildLightbox, pageHeading } from '../../scripts/lightbox.js';
 
 /*
  * Gallery block + accessible lightbox — SKODA-203.
@@ -32,6 +32,9 @@ const LABELS = {
   slider: 'Image slider',
   slideOf: (n, total) => `${n} of ${total}`,
   goTo: (n) => `Go to image ${n}`,
+  // the autoplay control (WCAG 2.2.2, SKODA-703)
+  pause: 'Pause slideshow',
+  resume: 'Resume slideshow',
   // preview variant (SKODA-223): per-thumb name + the "+N" pill
   openNamed: (n, alt) => (alt ? `${LABELS.open} ${n}: ${alt}` : `${LABELS.open} ${n}`),
   more: (n) => `+${n}`,
@@ -213,6 +216,9 @@ const SLIDER_DRAG_THRESHOLD = 40; // px a mouse drag must travel to change slide
 // hidden), traced into a 32×32 box: a left arrow with 45° arms, drawn in ink on
 // a light disc. The next button mirrors it in CSS.
 const SLIDER_ARROW_PATH = 'M8.55 16 16.5 8.05l1.66 1.66-4.94 4.94H23.4v2.7H13.22l4.94 4.94-1.66 1.66z';
+// the pause / resume control's glyphs, drawn on the same disc (SKODA-703)
+const SLIDER_PAUSE_PATH = 'M11.5 10h3v12h-3zm6 0h3v12h-3z';
+const SLIDER_PLAY_PATH = 'M13 10v12l9.5-6z';
 
 /**
  * Map a track scroll offset to a slide. With `looped`, physical position 0 is
@@ -246,11 +252,11 @@ export function dragTarget(start, dx) {
   return start;
 }
 
-function sliderArrow(dir) {
+function sliderButton(className, label, d) {
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = `gallery-slider-${dir}`;
-  btn.setAttribute('aria-label', dir === 'prev' ? LABELS.prev : LABELS.next);
+  btn.className = className;
+  btn.setAttribute('aria-label', label);
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('viewBox', '0 0 32 32');
@@ -265,11 +271,17 @@ function sliderArrow(dir) {
     svg.append(circle);
   });
   const path = document.createElementNS(NS, 'path');
-  path.setAttribute('d', SLIDER_ARROW_PATH);
+  path.setAttribute('d', d);
   svg.append(path);
   btn.append(svg);
   return btn;
 }
+
+const sliderArrow = (dir) => sliderButton(
+  `gallery-slider-${dir}`,
+  dir === 'prev' ? LABELS.prev : LABELS.next,
+  SLIDER_ARROW_PATH,
+);
 
 function buildSlider(block) {
   const items = readItems(block);
@@ -382,12 +394,38 @@ function buildSlider(block) {
     timer = window.setTimeout(() => { goTo(current + 1); schedule(); }, SLIDER_AUTOPLAY_MS);
   };
   const setPaused = (key, value) => { paused[key] = value; schedule(); };
-  const stop = () => { stopped = true; window.clearTimeout(timer); };
+
+  // Pause / resume (WCAG 2.2.2 Pause, Stop, Hide, SKODA-703): the source has no such control, and
+  // hover / focus only pause while they last. A visible disc in the image's top corner, like the
+  // arrows, so touch and mouse users reach it too (PR #360 review); the carousel's first control.
+  // Its name and glyph follow the state (the WAI carousel rotation control: no aria-pressed).
+  // None under reduced motion, where autoplay never starts.
+  let toggle = null;
+  const showToggle = () => {
+    if (!toggle) return;
+    toggle.setAttribute('aria-label', stopped ? LABELS.resume : LABELS.pause);
+    toggle.querySelector('path').setAttribute('d', stopped ? SLIDER_PLAY_PATH : SLIDER_PAUSE_PATH);
+  };
+  const stop = () => { stopped = true; window.clearTimeout(timer); showToggle(); };
+  if (!REDUCED_MOTION) {
+    toggle = sliderButton('gallery-slider-pause', LABELS.pause, SLIDER_PAUSE_PATH);
+    viewport.prepend(toggle);
+    showToggle();
+    toggle.addEventListener('click', () => {
+      if (stopped) {
+        stopped = false;
+        showToggle();
+        schedule();
+      } else stop();
+    });
+  }
 
   block.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') setPaused('hover', true); });
   block.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') setPaused('hover', false); });
-  block.addEventListener('focusin', () => setPaused('focus', true));
-  block.addEventListener('focusout', (e) => { if (!block.contains(e.relatedTarget)) setPaused('focus', false); });
+  // focus on the pause control itself doesn't pause: "Resume" restarts the slideshow at once
+  const holdsFocus = (el) => block.contains(el) && el !== toggle;
+  block.addEventListener('focusin', (e) => setPaused('focus', holdsFocus(e.target)));
+  block.addEventListener('focusout', (e) => setPaused('focus', holdsFocus(e.relatedTarget)));
   document.addEventListener('visibilitychange', () => setPaused('hidden', document.hidden));
   new IntersectionObserver(([entry]) => setPaused('offscreen', !entry.isIntersecting), { threshold: 0.5 })
     .observe(viewport);
@@ -575,7 +613,7 @@ function buildStory(block) {
   block.textContent = '';
   if (!items.length) return;
 
-  const title = document.querySelector('main h1')?.textContent.trim() || items[0].alt;
+  const title = pageHeading() || items[0].alt;
 
   const lead = document.createElement('button');
   lead.type = 'button';

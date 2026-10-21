@@ -19,6 +19,9 @@
  *   thumb    the cart page's card image for that add (SKODA-505b; default: `src`)
  *   actions  false: no action buttons (the source's content images), spacing kept
  *   video    an embed URL (Vimeo player): the stage plays it instead of the image
+ *   clip     true: a clip shown as its poster; with `video`, its actions take the source
+ *            player's names and tooltips, an image's take the colorbox's (LABELS)
+ *   labels   per-item overrides of those names (LABELS keys)
  *
  * Options: { story, title } = the story gallery chrome (`Gallery (story)`, SKODA-216): a
  * title bar (the dialog's name), an "N/total" counter, no action buttons, tag chips or
@@ -47,9 +50,38 @@ const LABELS = {
   addToBox: 'Add to media box',
   download: 'Download image',
   copyLink: 'Copy image link',
+  // their hover tooltips: the source colorbox's titles for what they act on (the Original)
+  addTip: 'Add/remove Original version',
+  downloadTip: 'Download Original version',
+  linkTip: 'Link to page',
+};
+
+// a clip's names and tooltips (a `video` item, or a `clip` shown as its poster): the source
+// video player's titles
+const VIDEO_LABELS = {
+  addToBox: 'Add/remove this',
+  download: 'Download this',
+  copyLink: 'Link to page',
+  addTip: 'Add/remove this',
+  downloadTip: 'Download this',
+  linkTip: 'Link to page',
 };
 
 const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+/**
+ * The page title as text: the main h1's words, its authored line breaks read as spaces (the
+ * source breaks some titles, "the compact SUV<br>segment"), for a lightbox title or caption.
+ * @param {Document} [doc]
+ * @returns {string} '' without an h1
+ */
+export function pageHeading(doc = document) {
+  const h1 = doc.querySelector('main h1');
+  if (!h1) return '';
+  const copy = h1.cloneNode(true);
+  copy.querySelectorAll('br').forEach((br) => br.replaceWith(' '));
+  return copy.textContent.replace(/\s+/g, ' ').trim();
+}
 
 // a page can hold several overlays (gallery, image and video rails, drawings): unique ids
 let overlayCount = 0;
@@ -301,6 +333,17 @@ export function buildLightbox(host, items, { story = false, title = '' } = {}) {
     } else if (item.caption) {
       [...item.caption.childNodes].forEach((n) => stageCaption.append(n.cloneNode(true)));
       downloadBtn.href = item.download || `${base}?format=jpg`;
+      // per-item names and tooltips (a clip's are the source player's) and tab, else the image's
+      const clipNames = item.video || item.clip ? VIDEO_LABELS : {};
+      const names = { ...LABELS, ...clipNames, ...(item.labels || {}) };
+      addBtn.setAttribute('aria-label', names.addToBox);
+      downloadBtn.setAttribute('aria-label', names.download);
+      linkBtn.setAttribute('aria-label', names.copyLink);
+      addBtn.title = names.addTip;
+      downloadBtn.title = names.downloadTip;
+      linkBtn.title = names.linkTip;
+      if (item.downloadTarget) downloadBtn.target = item.downloadTarget;
+      else downloadBtn.removeAttribute('target');
       // `actions: false` (content images): the source panel keeps an empty actions row
       actions.classList.toggle('is-empty', item.actions === false);
       if (item.cartId) addBtn.dataset.id = item.cartId;

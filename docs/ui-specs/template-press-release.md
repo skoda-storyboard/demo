@@ -179,7 +179,7 @@ changed.
 | Media Box card date (Downloads date cell) | 11px `#c4c6c7` (Zellmer 30. 8. 2022 / 21. 9. 2026) | none | importer `dates` option on the press-release Media Box |
 | FAQ opener (Zellmer) | `<strong>FAQ:<br></strong><br>`: a blank line, panel 302px | collapsed, 278px (band 24px early) | importer keeps both breaks |
 | Media Box PDF tile | the 30% black holder only (`.file-caption.pdf` hidden) | the 48px PDF glyph (#307) | glyph off on press releases (`::after { content: none }`) |
-| Related arrows (`.story-rail.press .carousel-arrow::after`) | glyph `\e00b` / `\e00c` | the old chevron | the home bands' `rail-arrow-prev/next.svg` (#272) |
+| Related arrows (`.story-rail.press .carousel-arrow::after`) | glyph `\e00b` / `\e00c` | the old chevron | the carousel's glyph `\e00b` / `\e00c` (`carousel.css`, #284 / #361; the `rail-arrow-*.svg` mask is gone) |
 
 Already at parity, so closed with evidence:
 - Superb tag rows (24px apart).

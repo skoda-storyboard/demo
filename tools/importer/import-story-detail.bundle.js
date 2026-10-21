@@ -171,16 +171,16 @@ var CustomImportScript = (() => {
   }
   var CONSUMPTION_RE = /\b(?:kWh|l)\s*\/\s*100\s*km\b/i;
   var EMISSIONS_RE = /\bCO(?:₂|2)\s+emissions?\b|\bg\s*\/\s*km\b/i;
-  function isRegulatoryCaption(text3) {
-    const t = (text3 || "").replace(/\s+/g, " ").trim();
+  function isRegulatoryCaption(text4) {
+    const t = (text4 || "").replace(/\s+/g, " ").trim();
     if (!t) return false;
     return /\bWLTP\b/.test(t) || CONSUMPTION_RE.test(t) && EMISSIONS_RE.test(t);
   }
   function regulatoryCaption(img, item) {
     var _a;
     const holder = img && img.getAttribute && img.getAttribute("data-caption") && img || ((_a = item.querySelector) == null ? void 0 : _a.call(item, "[data-caption]"));
-    const text3 = holder ? (holder.getAttribute("data-caption") || "").replace(/\s+/g, " ").trim() : "";
-    return isRegulatoryCaption(text3) ? text3 : "";
+    const text4 = holder ? (holder.getAttribute("data-caption") || "").replace(/\s+/g, " ").trim() : "";
+    return isRegulatoryCaption(text4) ? text4 : "";
   }
   function galleryCells(panel, document2, blockName = "Gallery") {
     const imgs = [...panel.querySelectorAll("img")];
@@ -219,11 +219,11 @@ var CustomImportScript = (() => {
     return cells.length > 1 ? cells : null;
   }
   function quoteNodes(panel, document2) {
-    const text3 = (panel.textContent || "").replace(/\s+/g, " ").trim();
-    if (!text3) return [];
+    const text4 = (panel.textContent || "").replace(/\s+/g, " ").trim();
+    if (!text4) return [];
     const bq = document2.createElement("blockquote");
     const p = document2.createElement("p");
-    p.textContent = text3;
+    p.textContent = text4;
     bq.appendChild(p);
     return [bq];
   }
@@ -251,10 +251,10 @@ var CustomImportScript = (() => {
     if (rich.length) {
       rich.forEach((n) => out.push(n));
     } else {
-      const text3 = (body.textContent || "").replace(/\s+/g, " ").trim();
-      if (text3) {
+      const text4 = (body.textContent || "").replace(/\s+/g, " ").trim();
+      if (text4) {
         const p = document2.createElement("p");
-        p.textContent = text3;
+        p.textContent = text4;
         out.push(p);
       }
     }
@@ -323,10 +323,10 @@ var CustomImportScript = (() => {
   }
   function milestonesFallback(panel, document2) {
     const out = [...panel.querySelectorAll("img")];
-    const text3 = (panel.textContent || "").replace(/\s+/g, " ").trim();
-    if (text3) {
+    const text4 = (panel.textContent || "").replace(/\s+/g, " ").trim();
+    if (text4) {
       const p = document2.createElement("p");
-      p.textContent = text3;
+      p.textContent = text4;
       out.push(p);
     }
     return out;
@@ -395,7 +395,7 @@ var CustomImportScript = (() => {
     return `${t} ${r} ${b} ${l}`;
   }
   function highlightGeometry(css) {
-    const rules = (text3) => [...text3.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, sel, body]) => ({ sels: sel.split(",").map((s) => s.trim()), body }));
+    const rules = (text4) => [...text4.matchAll(/([^{}]+)\{([^{}]*)\}/g)].map(([, sel, body]) => ({ sels: sel.split(",").map((s) => s.trim()), body }));
     const mobile = rules([...css.matchAll(MEDIA_780)].map((m) => m[1]).join("\n"));
     const desktop = rules(css.replace(/@media[^{]*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, ""));
     const find = (list, test, prop) => {
@@ -424,9 +424,9 @@ var CustomImportScript = (() => {
       if (padD) out["highlight-padding"] = padD;
       if (padM) out["highlight-padding-mobile"] = padM;
       const panels = [...grid.querySelectorAll(":scope > .panel-row-style > .panel-grid-cell > .so-panel, :scope > .panel-grid-cell > .so-panel")];
-      const text3 = margins(panels.find((p) => p.matches(".widget_sow-editor, .widget_text")), "0px 0px 0px 0px");
-      if (text3 && (text3[0] !== DEFAULT_TEXT_MARGIN[0] || text3[1] !== DEFAULT_TEXT_MARGIN[1])) {
-        [out["highlight-margin"], out["highlight-margin-mobile"]] = text3;
+      const text4 = margins(panels.find((p) => p.matches(".widget_sow-editor, .widget_text")), "0px 0px 0px 0px");
+      if (text4 && (text4[0] !== DEFAULT_TEXT_MARGIN[0] || text4[1] !== DEFAULT_TEXT_MARGIN[1])) {
+        [out["highlight-margin"], out["highlight-margin-mobile"]] = text4;
       }
       const gallery = margins(panels.find((p) => p.matches('[class*="carousel-widget"], [class*="slider"]')), "0px 0px 0px 0px");
       if (gallery && (gallery[0] !== "0px 0px 0px 0px" || gallery[1] !== "0px 0px 0px 0px")) {
@@ -1423,12 +1423,12 @@ var CustomImportScript = (() => {
     const cell = [];
     anchors.forEach((a) => {
       const href = a.getAttribute("href");
-      const text3 = (a.textContent || "").trim();
-      if (!href || !text3) return;
+      const text4 = (a.textContent || "").trim();
+      if (!href || !text4) return;
       if (href === "#" || a.classList.contains("show-hidden-terms")) return;
       const link = document2.createElement("a");
       link.setAttribute("href", href);
-      link.textContent = text3;
+      link.textContent = text4;
       cell.push(link);
     });
     return cell.length ? [["Tags"], [cell]] : null;
@@ -2337,11 +2337,29 @@ var CustomImportScript = (() => {
     const image = withCaption(imageNode, caption, document2);
     paragraph.replaceWith(...[before, image, after].filter(hasContent));
   }
+  var text3 = (value) => (value || "").replace(/\s+/g, " ").trim();
+  function linkedImageAlt(img, root) {
+    var _a;
+    const link = img.closest("a");
+    if (!link || link.querySelectorAll("img").length !== 1 || text3(link.textContent)) return "";
+    const caption = editorialCaption(img) || editorialCaption(img.closest("[data-caption]"));
+    const titled = [link.getAttribute("title"), img.getAttribute("title")].map(text3).find(Boolean);
+    const heading = [...root.querySelectorAll("h1, h2, h3, h4, h5, h6")].filter(
+      (h) => h.compareDocumentPosition(img) & 4
+      /* Node.DOCUMENT_POSITION_FOLLOWING */
+    ).map((h) => text3(h.textContent)).filter(Boolean).pop();
+    return text3(caption) || titled || heading || text3((_a = root.ownerDocument.querySelector("h1")) == null ? void 0 : _a.textContent);
+  }
   function normalizeImages(root, document2 = root.ownerDocument) {
     root.querySelectorAll("img").forEach((img) => {
       if (!img.hasAttribute("alt") || !img.getAttribute("alt").trim()) {
-        const type = img.hasAttribute("alt") ? "empty" : "missing";
-        console.warn(`[image-import] ${type} alt: ${img.getAttribute("src") || "(no src)"}`);
+        const backfill = linkedImageAlt(img, root);
+        if (backfill) {
+          img.setAttribute("alt", backfill);
+        } else {
+          const type = img.hasAttribute("alt") ? "empty" : "missing";
+          console.warn(`[image-import] ${type} alt: ${img.getAttribute("src") || "(no src)"}`);
+        }
       }
       if (img.closest("table, picture")) return;
       const figure = img.closest("figure");

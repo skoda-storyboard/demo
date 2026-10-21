@@ -36,6 +36,11 @@
   --skoda-grey-400: #a1a1a1;
   --skoda-grey-700: #5a5b5c;
 
+  /* AA text colours (SKODA-703, WCAG 2.1 AA 1.4.3; deliberate deviations from the source, which
+     fails these): the lightest grey and the accent green darkened just enough for 4.5:1 on white */
+  --skoda-grey-600: #767676; /* 4.54:1 on white (the source dates #808080 3.95, media dates #c4c6c7 1.71) */
+  --skoda-green-accent-text: #3a835c; /* 4.58:1 on white (the source body links #419468 3.71) */
+
   /* rail header greys (SKODA-208; measured on the live model pages, same values as the
      press-release related band): "Based on tags" line + media-card dates, "All" ghost pill */
   --skoda-grey-350: #c4c6c7;
@@ -85,6 +90,9 @@
 
   /* the same font for the accordion's + (\e027, #275) */
   --accordion-icon-font: skoda-bnr-icons;
+
+  /* the source Vimeo player's face, for its controls on a native clip (embed `vimeo`) */
+  --clip-player-font: "Helvetica Neue", helvetica, arial, sans-serif;
 
   /* header/nav-specific (candidate tokens, _FOUNDATIONS.md §8; SKODA-301) */
   --dropdown-shadow: 0 3px 8px rgb(0 0 0 / 15%);
@@ -138,7 +146,7 @@
   --facet-shadow: 0 2px 1px -1px rgb(0 0 0 / 10%), 0 1px 1px 0 rgb(0 0 0 / 5%), 0 1px 3px 0 rgb(0 0 0 / 5%);
   --chip-border: #d4d4d4;            /* applied-filter chip border */
   --pagination-border: #c9cdd3;      /* result-count underline */
-  --pagination-count-color: #aeaeae; /* archive result-count numbers (source .search-results-pagination span) */
+  --pagination-count-color: var(--skoda-grey-600); /* archive result-count numbers: the source .search-results-pagination #aeaeae is 2.21:1; AA (SKODA-703) */
   --grid-gutter: 20px;               /* listing cell margin-bottom / padding base */
   --pill-radius: 50px;               /* shared ghost-pill (load-more) */
 
@@ -176,7 +184,7 @@
 
   /* press release (SKODA-607; measured on the 5 M1 releases, template-press-release.md) */
   --pr-title-color: #0a0a0a;         /* h1.entry-title */
-  --pr-date-color: #808080;          /* .entry-published */
+  --pr-date-color: var(--skoda-grey-600); /* .entry-published: the source #808080 is 3.95:1 (SKODA-703) */
   --pr-menu-border-color: #d2d2d2;   /* sidebar "Additional info" rows */
   --pr-menu-link-color: #363636;     /* their links / labels (the headings are #353535, #275) */
   --pr-band-meta-color: #c4c6c7;     /* Media Box stats / "Based on tags" line */

@@ -374,6 +374,44 @@
   opacity: 0.6;
 }
 
+/* Pause / resume slideshow (gallery.js, WCAG 2.2.2, SKODA-703): the source shows no such control.
+   Visible and tappable for touch and mouse users too (PR #360 review): the arrows' 32px disc with
+   an ink pause / play glyph, inset 10px in the image's top end corner, clear of the mid-height
+   arrows. Shares their focus ring, pressed fade and forced-colors outline. */
+.gallery.slider .gallery-slider-pause {
+  position: absolute;
+  top: var(--slider-arrow-inset);
+  inset-inline-end: var(--slider-arrow-inset);
+  z-index: 1;
+  display: block;
+  width: var(--slider-arrow-size);
+  height: var(--slider-arrow-size);
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background: transparent;
+  color: var(--skoda-ink);
+  cursor: pointer;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.gallery.slider .gallery-slider-pause svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: currentcolor;
+}
+
+.gallery.slider .gallery-slider-pause:focus {
+  outline: 2px solid transparent;
+  box-shadow: 0 0 0 5px var(--slider-focus-ring);
+}
+
+.gallery.slider .gallery-slider-pause:active {
+  opacity: 0.6;
+}
+
 /* story body: as on the source, the slider bleeds the column's 10px inset past
    both text edges (839px against 819px of text at 1248; full width on mobile) */
 body.story .section.body-column .gallery.slider {

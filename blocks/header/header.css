@@ -263,7 +263,11 @@ header .nav-section-switcher li a {
   justify-content: center;
   padding: 13px var(--nav-tab-padding) 0;
   line-height: 20px;
-  color: var(--skoda-grey-500);
+
+  /* the inactive tab: the source grey #7c7d7e is 3.30:1 on the #e6e6e6 bar, 3.65 on #f1f1f1;
+     --skoda-grey-700 is 5.45 / 6.03 (SKODA-703, WCAG AA; the locales and Subscribe CTA keep the
+     PO-accepted source grey) */
+  color: var(--skoda-grey-700);
   font-size: var(--body-font-size-s);
   font-weight: var(--weight-semibold);
   letter-spacing: 0.02em;

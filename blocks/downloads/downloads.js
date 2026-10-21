@@ -221,10 +221,32 @@ function wireMenu(wrap, toggle, menu) {
     menu.hidden = !on;
     toggle.setAttribute('aria-expanded', on ? 'true' : 'false');
   };
+  // the menu button pattern its role=menu promises (WCAG 4.1.2, SKODA-703), as the media card's:
+  // while open, ArrowDown / ArrowUp move through the rows (from the toggle, to the first / last),
+  // Home / End to either end; Escape closes and returns focus; focus leaving closes it
+  const rows = () => [...menu.querySelectorAll('[role^="menuitem"]')];
   toggle.addEventListener('click', () => setOpen(menu.hidden));
-  toggle.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
-  menu.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { setOpen(false); toggle.focus(); }
+  wrap.addEventListener('keydown', (e) => {
+    if (menu.hidden) return;
+    const all = rows();
+    const at = all.indexOf(document.activeElement);
+    let target = null;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      setOpen(false);
+      toggle.focus();
+      return;
+    }
+    if (e.key === 'ArrowDown') target = all[at < 0 ? 0 : (at + 1) % all.length];
+    else if (e.key === 'ArrowUp') target = all[at < 0 ? all.length - 1 : (at - 1 + all.length) % all.length];
+    else if (e.key === 'Home') [target] = all;
+    else if (e.key === 'End') target = all[all.length - 1];
+    if (!target) return;
+    e.preventDefault();
+    target.focus();
+  });
+  wrap.addEventListener('focusout', (e) => {
+    if (!menu.hidden && e.relatedTarget && !wrap.contains(e.relatedTarget)) setOpen(false);
   });
   document.addEventListener('click', (e) => {
     if (!wrap.contains(e.target)) setOpen(false);
@@ -681,6 +703,8 @@ export function lightboxItem(asset, related = {}) {
   // a clip shows its poster: the MP4 is the download action, never the stage, because the
   // AEM Assets original is served as an attachment (a player frame would download it)
   if (href) Object.assign(item, { download: href, link: href });
+  // its actions take the source player's names and tooltips ("Download this")
+  if (/\.mp4(?:[?#]|$)/i.test(href)) item.clip = true;
   return item;
 }
 
@@ -692,14 +716,13 @@ export function lightboxItem(asset, related = {}) {
  */
 function wireLightbox(entries) {
   if (!entries.length) return;
-  const related = {
-    title: document.querySelector('main h1')?.textContent.trim() || '',
-    href: window.location.pathname,
-  };
+  const related = { title: '', href: window.location.pathname };
   let pending = null;
   const lightbox = () => {
-    pending = pending || import('../../scripts/lightbox.js').then(({ buildLightbox }) => (
-      buildLightbox(document.body, entries.map(({ asset }) => lightboxItem(asset, related)))));
+    pending = pending || import('../../scripts/lightbox.js').then(({ buildLightbox, pageHeading }) => {
+      related.title = pageHeading();
+      return buildLightbox(document.body, entries.map(({ asset }) => lightboxItem(asset, related)));
+    });
     return pending;
   };
   entries.forEach(({ thumb }, index) => {

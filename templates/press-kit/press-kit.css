@@ -26,6 +26,14 @@ body.press-kit {
 
   /* the source's 40px cart toolbar under a video, less the 4px its row gap overlaps */
   --pk-video-toolbar: 36px;
+
+  /* a Videos chapter's clip title (the source's centred h2 with an 18pt span): its box 64px
+     under the clip before, 16px over its own, in the source h2's 27px line (45px above 768) */
+  --pk-clip-title-offset: 64px;
+  --pk-clip-title-line: 27px;
+
+  /* ...or a bold line, centred at 14pt (125 Years of Motorsport Videos) */
+  --pk-clip-label-size: 14pt;
   --pk-columns-gap: var(--grid-gutter);
   --pk-columns-stack-gap: var(--spacing-xl);
 
@@ -35,7 +43,7 @@ body.press-kit {
   --pk-hub-banners-end: calc(var(--grid-gutter) + var(--page-gutter));
 
   /* article (#275), measured on the source's first-glimpse at 1440 */
-  --pk-link-color: var(--skoda-green-accent); /* .entry-content a */
+  --pk-link-color: var(--skoda-green-accent-text); /* .entry-content a: the source #419468 darkened to AA (SKODA-703) */
   --pk-side-link-color: var(--pr-menu-link-color);
   --pk-tag-gap: 5px;
   --pk-tag-space: 3.8px; /* below 768 the source's chips are centred inline-blocks: a word space apart */
@@ -395,6 +403,22 @@ body.press-kit main > .section.media-box {
   margin-block: var(--pk-band-gap) var(--spacing-m);
 }
 
+/* A Videos chapter's clip title, right before its clip: the source authors each one centred at
+   18pt (24px) in its light h2 (Peaq, Epiq and Classic Days Videos). The box starts 64px under
+   the clip before (past its 8px + 36px toolbar), and its clip follows 16px on. */
+body.press-kit .section.body-column .default-content-wrapper:has(+ .embed-wrapper) > h2:last-child {
+  margin-block: calc(var(--pk-clip-title-offset) - var(--spacing-xs) - var(--pk-video-toolbar)) var(--spacing-m);
+  font-size: var(--heading-font-size-story-h3);
+  font-weight: var(--weight-light);
+  line-height: var(--pk-clip-title-line);
+  text-align: center;
+}
+
+/* the first title has no clip above: only the source cell's 10px inset under the page title */
+body.press-kit .section.body-column .default-content-wrapper:first-child:has(+ .embed-wrapper) > h2:only-child {
+  margin-block-start: var(--page-gutter);
+}
+
 /* An Images chapter's group heading (SKODA-806): the source widget title, 20/23 weight 300 up to
    768 and 24/27.6 above, with the group's "Original" / "1920px" pills right under it. It stays an
    h2 (the source skips from the h1 to an h3). */
@@ -408,6 +432,7 @@ body.press-kit .section.body-column .default-content-wrapper:has(+ .downloads-wr
 @media (width > 768px) {
   body.press-kit {
     --media-box-title-size: var(--heading-font-size-l);
+    --pk-clip-title-line: 45px;
   }
 
   body.press-kit .section.sidebar h3 {
@@ -417,6 +442,7 @@ body.press-kit .section.body-column .default-content-wrapper:has(+ .downloads-wr
   body.press-kit .section.body-column .default-content-wrapper:has(+ .downloads-wrapper > .downloads.gallery) > h2:last-child {
     font-size: var(--heading-font-size-story-h3);
   }
+
 }
 
 body.press-kit .section.body-column .default-content-wrapper {
@@ -550,6 +576,16 @@ body.press-kit .section.body-column .default-content-wrapper:first-child > p:fir
   pointer-events: none;
 }
 
+/* A clip titled by a bold line instead (`<p style="text-align: center"><span 14pt><strong>`, the
+   125 Years of Motorsport Videos): centred, 14pt on a 28px line, 20px over its clip. */
+body.press-kit .section.body-column .default-content-wrapper:has(+ .embed-wrapper) > p:last-child:has(> strong:only-child) {
+  /* the cell's 10px inset over the first one (later ones fold it into the toolbar's margin) */
+  margin-block: var(--page-gutter) var(--paragraph-gap);
+  font-size: var(--pk-clip-label-size);
+  line-height: 1.5;
+  text-align: center;
+}
+
 /* Row toggles are the source's 20px rows apart (the block's own gap is 24), and the text after
    them keeps its 20px; a clip starts 56px after the text before it: the row gap plus the
    attachment's 16px margin (SKODA-805c review). */
@@ -570,6 +606,11 @@ body.press-kit .section.body-column > .accordion-wrapper:first-child .accordion 
 
 body.press-kit .section.body-column .embed {
   margin-block-start: calc(var(--pk-columns-stack-gap) + var(--spacing-m));
+}
+
+/* ...but 16px under its title (the clip title rule above) */
+body.press-kit .section.body-column .default-content-wrapper:has(> h2:last-child, > p:last-child > strong:only-child) + .embed-wrapper .embed {
+  margin-block-start: 0;
 }
 
 /* A clip's "Download video" link sits where the source's cart toolbar is: 8px under the
