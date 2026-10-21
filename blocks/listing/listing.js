@@ -343,7 +343,7 @@ export function wireMediaLightbox(grid, getRows, {
   });
 }
 
-export default async function decorate(block) {
+async function buildListing(block, onFirstPaint) {
   const cfg = parseListConfig(block);
   instanceSeq += 1;
   const uid = `l${instanceSeq}`; // unique id prefix for this block instance
@@ -485,6 +485,7 @@ export default async function decorate(block) {
       && (headRows.length >= state.revealed || headRows.length >= head.total)) {
       paintGrid(paginate(headRows, state.revealed), head.total);
       paintedTotal = head.total;
+      onFirstPaint(); // the section can show now: the facet index and the bar follow
     }
     // with a head shard (loaded or failed) the rows were left for now: request them here
     const rows = await (feed.head ? feed.rows() : rowsReady);
@@ -588,9 +589,16 @@ export default async function decorate(block) {
   const rowKey = (row) => String(row?.id || row?.path || '');
   const unchanged = (rows, total) => total === paintedTotal && rows.length === currentRows.length
     && rows.every((row, i) => rowKey(row) && rowKey(row) === rowKey(currentRows[i]));
+  const settleLoadMore = () => {
+    const btn = loadMoreWrap.querySelector('.listing-loadmore-btn');
+    btn?.classList.remove('is-loading');
+    btn?.removeAttribute('aria-busy');
+  };
   const paint = (rows, total) => {
-    if (unchanged(rows, total)) status.hidden = total > 0; // e.g. a load error shown meanwhile
-    else paintGrid(rows, total);
+    if (unchanged(rows, total)) {
+      status.hidden = total > 0; // e.g. a load error shown meanwhile
+      settleLoadMore(); // a Load more that brought nothing new doesn't keep spinning
+    } else paintGrid(rows, total);
     paintedTotal = total;
   };
   function renderGrid(onPainted = () => {}) {
@@ -606,6 +614,15 @@ export default async function decorate(block) {
     const seq = renderSeq;
     feed.hydrate(page).then((full) => {
       if (seq !== renderSeq) return;
+      // a facet row that neither its detail shard nor the whole feed has can't show: it leaves
+      // the listing (count, pages, Load more), and the page is drawn again without it
+      if (full.length < page.length) {
+        const found = new Set(full.map(rowKey));
+        const gone = new Set(page.map(rowKey).filter((key) => !found.has(key)));
+        scoped = scoped.filter((row) => !gone.has(rowKey(row)));
+        renderGrid(onPainted);
+        return;
+      }
       paint(full, all.length);
       onPainted();
     }, (e) => {
@@ -613,9 +630,7 @@ export default async function decorate(block) {
       // the shown cards stay; the listing says it couldn't load more, and nothing keeps spinning
       status.textContent = STRINGS.loadError;
       status.hidden = false;
-      const btn = loadMoreWrap.querySelector('.listing-loadmore-btn');
-      btn?.classList.remove('is-loading');
-      btn?.removeAttribute('aria-busy');
+      settleLoadMore();
       block.classList.remove('is-loading');
       block.removeAttribute('aria-busy');
       // eslint-disable-next-line no-console
@@ -984,4 +999,23 @@ export default async function decorate(block) {
       renderChips();
     });
   }
+}
+
+/**
+ * EDS keeps a section hidden until its blocks are decorated (loadSection awaits this), so a
+ * listing whose first page came from the media feed's head shard ends its decoration there:
+ * the cards show while the facet index loads, and the facet bar, the count and Load more follow
+ * (SKODA-517 review). Without a head the decoration waits for the rows, as before.
+ * @param {Element} block the listing block
+ */
+export default async function decorate(block) {
+  let shown = false;
+  let showNow;
+  const firstPaint = new Promise((resolve) => { showNow = resolve; });
+  const built = buildListing(block, () => { shown = true; showNow(); });
+  built.catch((e) => {
+    // eslint-disable-next-line no-console
+    if (shown) console.error('listing: setup failed after the first paint', e);
+  });
+  await Promise.race([firstPaint, built]);
 }

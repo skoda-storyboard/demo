@@ -19,8 +19,9 @@
  * - keyed: the full rows whose file name (`original`) hashes to that shard (keyShard()).
  *
  * Blocks keep their `index` config: only a media feed URL looks for a registry. Without one
- * (or with a malformed one) every reader gets today's whole-feed read. The generator
- * (tools/importer/media-items) writes the shards and publishes the registry last.
+ * (or with a malformed one) every reader gets today's whole-feed read, and a shard that fails
+ * to load falls back to it in every reader. The generator (tools/importer/media-items) writes
+ * the shards and publishes the registry last.
  */
 
 import { loadQueryIndex } from './query-index.js';
@@ -172,7 +173,8 @@ function uniqueRows(rows) {
 export async function loadAllRows(url) {
   const registry = await loadRegistry(url);
   if (!registry?.details.size) return loadQueryIndex(url);
-  return loadShards([...registry.details.values()]);
+  // a shard that fails: the whole feed, still published beside them (SKODA-517 review)
+  return loadShards([...registry.details.values()]).catch(() => loadQueryIndex(url));
 }
 
 /**
@@ -194,7 +196,8 @@ export async function loadRailRows(url, facets = {}) {
     return { entries, size: entries.reduce((n, e) => n + (e.rows ?? Infinity), 0) };
   }).filter(Boolean).sort((a, b) => a.size - b.size);
   if (!options.length) return loadAllRows(url);
-  return uniqueRows(await loadShards(options[0].entries));
+  // a slice that fails: every row (the detail shards, else the whole feed)
+  return loadShards(options[0].entries).then(uniqueRows, () => loadAllRows(url));
 }
 
 /**
@@ -207,8 +210,10 @@ export async function findRowsByFile(url, files) {
   const keys = [...new Set(files.map(fileKey).filter(Boolean))];
   const registry = await loadRegistry(url);
   const shards = registry?.keyed || [];
+  // a keyed shard that fails: every row (the detail shards, else the whole feed)
   const rows = shards.length
     ? await loadShards([...new Set(keys.map((k) => shards[keyShard(k, shards.length)]))])
+      .catch(() => loadAllRows(url))
     : await loadAllRows(url);
   // a file in two rows: the later row wins, as the whole-feed lookup always did
   const byFile = new Map(rows.map((row) => [fileKey(row.original), row]));
@@ -267,7 +272,7 @@ export async function openListingFeed(url, { template = '', path = '' } = {}) {
         remember(await loadShards(needed));
       } catch (e) { /* the whole feed below */ }
       if (!fill().every(Boolean)) remember(await wholeFeed());
-      // a row not even the whole feed has is left out rather than shown half empty
+      // a row not even the whole feed has is left out (the listing then drops it from its rows)
       return fill().filter(Boolean);
     },
   };

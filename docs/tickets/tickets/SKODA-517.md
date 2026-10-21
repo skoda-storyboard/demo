@@ -70,6 +70,13 @@ Split by the PO (2026-10-19): the reader side now, the generator after #380 merg
   - a facet index that fails: full rows (the detail shards, else the whole feed);
   - a detail shard that fails or lacks a row: the whole feed;
   - if that fails too: the shown cards stay, with the load error, and nothing keeps spinning.
+- **#406 review (2026-10-21):**
+  - a first page from the head shard ends the listing's decoration, so EDS shows the section while the facet
+    index loads (it stayed `display: none` until then); the facet bar, the count and Load more follow;
+  - a failed slice, keyed or detail shard falls back to the whole feed in every reader (rails, image links,
+    full reads), not only in the listing;
+  - a facet row that neither its detail shard nor the whole feed has leaves the listing (count, pages), and a
+    Load more that brings nothing new never stays busy.
 - Also from the code review:
   - a filter's veil stays until its page has its detail shard;
   - the full rows landing after the head paint don't rebuild an unchanged grid (keyboard focus stays);

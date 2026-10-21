@@ -65,6 +65,16 @@ const click = (el, init = {}) => el.dispatchEvent(new window.MouseEvent('click',
 }));
 const openOverlay = () => [...document.querySelectorAll('.gallery-overlay')].find((o) => !o.hidden);
 const settle = () => new Promise((r) => { setTimeout(r, 50); });
+// wait (up to 3s) until the condition holds: the sharded listing finishes its setup after
+// decorate() resolves (the head shard's first paint ends the decoration, SKODA-517 review)
+const until = async (cond, ms = 3000) => {
+  const end = Date.now() + ms;
+  while (!cond() && Date.now() < end) {
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((r) => { setTimeout(r, 20); });
+  }
+  return cond();
+};
 
 test('isMediaTemplate: only image and video listings get the media card', () => {
   assert.equal(isMediaTemplate('image'), true);
@@ -1076,7 +1086,7 @@ test('a sharded media feed (SKODA-517): head first, then the facet index; pages 
     click(block.querySelector('.listing-loadmore-btn'));
     releaseIndex();
     await done;
-    assert.ok(block.querySelector('.facet-pill[data-facet="model"]'), 'facets from the index');
+    assert.ok(await until(() => block.querySelector('.facet-pill[data-facet="model"]')), 'facets from the index');
     await new Promise((r) => { setTimeout(r, LOAD_MORE_MS + 100); });
     assert.deepEqual(titles(), ['img-5', 'img-4', 'img-3', 'img-2'], 'the next page, filled from its detail shard');
     assert.equal(block.querySelector('.listing-count').textContent, '45');
@@ -1158,6 +1168,7 @@ test('sharded feed (code review): the full rows landing after the head paint kee
     link.focus();
     f.release('/facets.json');
     await done;
+    assert.ok(await until(() => f.block.querySelector('.facet-pill')), 'the full rows are in');
     assert.equal(f.block.querySelector('.listing-items li a'), link, 'the same card, not rebuilt');
     assert.equal(document.activeElement, link);
   } finally { f.restore(); }
@@ -1183,6 +1194,7 @@ test('sharded feed (code review): a filter\'s veil holds until its page has its 
   const f = shardedFeed('nl', { hold: ['/image-2026.json'] });
   try {
     await decorate(f.block);
+    await until(() => f.block.querySelector('.facet-option input'));
     // fabia: rows 5, 3, 1; only 5 is in the head, so the page needs the detail shard
     const box = [...f.block.querySelectorAll('.facet-option input')].find((i) => i.value === 'fabia');
     box.checked = true;
@@ -1193,5 +1205,49 @@ test('sharded feed (code review): a filter\'s veil holds until its page has its 
     await settle();
     assert.equal(f.block.classList.contains('is-loading'), false);
     assert.deepEqual(f.titles(), ['img-5', 'img-3']);
+  } finally { f.restore(); }
+});
+
+test('sharded feed (#406 review): decoration ends at the head paint, so EDS can show the section; the facet bar follows', async () => {
+  const f = shardedFeed('pt', { hold: ['/facets.json'] });
+  try {
+    // loadSection keeps the section hidden until decorate() settles: it must settle while the
+    // facet index is still held
+    const settled = await Promise.race([
+      decorate(f.block).then(() => true),
+      new Promise((r) => { setTimeout(() => r(false), 1000); }),
+    ]);
+    assert.equal(settled, true, 'decorate() settles before the facet index');
+    assert.deepEqual(f.titles(), ['img-5', 'img-4'], 'the head cards are there');
+    assert.equal(f.block.querySelector('.facet-pill'), null, 'the bar is not yet');
+    f.release('/facets.json');
+    assert.ok(await until(() => f.block.querySelector('.facet-pill')), 'then the bar');
+  } finally { f.restore(); }
+});
+
+test('sharded feed (#406 review): a row neither its detail shard nor the whole feed has leaves the listing', async () => {
+  const extra = {
+    id: '9999', template: 'image', date: '2026-09-14', model: 'fabia', detail: 'image:2026',
+  };
+  const rows = [1, 2, 3, 4, 5].map((n) => imageRow(n, { model: n % 2 ? 'fabia' : 'scala' }));
+  const f = shardedFeed('pl', {
+    files: {
+      '/facets.json': [...rows.map((r) => ({
+        id: r.id, template: 'image', date: r.date, model: r.model, detail: 'image:2026',
+      })), extra],
+      '.json': rows, // the whole feed: it doesn't have 9999 either
+    },
+  });
+  try {
+    await decorate(f.block);
+    await until(() => f.block.querySelector('.facet-pill'));
+    click(f.block.querySelector('.listing-loadmore-btn'));
+    await new Promise((r) => { setTimeout(r, LOAD_MORE_MS + 300); });
+    assert.deepEqual(f.titles(), ['img-5', 'img-4', 'img-3', 'img-2'], 'the next rows fill the page');
+    assert.equal(f.block.querySelector('.listing-count').textContent, '45', '4 of 5: the missing row left the total');
+    const btn = f.block.querySelector('.listing-loadmore-btn');
+    assert.ok(btn, 'one more to load');
+    assert.equal(btn.classList.contains('is-loading') || btn.hasAttribute('aria-busy'), false, 'not busy');
+    assert.equal(f.block.querySelector('.listing-status').hidden, true);
   } finally { f.restore(); }
 });

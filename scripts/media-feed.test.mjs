@@ -259,3 +259,26 @@ test('openListingFeed: a facet index that fails to load gives full rows (detail 
   assert.equal(feed.lazy, false);
   assert.equal(feed.hydrated(rows), rows, 'nothing to fill in');
 });
+
+test('a failed shard falls back to the whole feed in every reader (#406 review)', async () => {
+  const whole = [row(1), row(2), row(3, { model: 'fabia' })];
+  files['/en/media-feed/index.json'] = [
+    reg('detail', 'image:2026', '/en/media-feed/gone-detail.json'),
+    reg('slice', 'model:fabia', '/en/media-feed/gone-slice.json', 1),
+    reg('keyed', '0', '/en/media-feed/gone-key.json'),
+  ];
+  files['/en/media-feed.json'] = whole;
+  // detail shards → the whole feed
+  assert.deepEqual((await loadAllRows('/en/media-feed.json')).map((r) => r.id), ['1', '2', '3']);
+  // a rail's slice → every row (detail shards, then the whole feed); the rail filters them
+  assert.deepEqual((await loadRailRows('/en/media-feed.json', { model: ['fabia'] })).map((r) => r.id), ['1', '2', '3']);
+  // a keyed shard → every row
+  const found = await findRowsByFile('/en/media-feed.json', [whole[1].original]);
+  assert.equal(found.get('file-2.jpg').id, '2');
+  assert.ok(requests.includes('/en/media-feed.json'));
+});
+
+test('the fallback fails too: the reader rejects (its caller shows its own error)', async () => {
+  files['/en/media-feed/index.json'] = [reg('detail', 'image:2026', '/en/media-feed/gone-detail.json')];
+  await assert.rejects(loadAllRows('/en/media-feed.json'), /404/);
+});
