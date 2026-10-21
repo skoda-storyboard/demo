@@ -66,7 +66,12 @@ Recommend **(1) for correctness now**, upgrade to (2) if the timeline visual is 
       the link colours (PR #373 review). The deviations from origin are listed in the spec §7, open until a
       human reviewer approves them.
 - [x] Every milestone **description** kept, with its links (the Option 1 flatten dropped them).
-- [x] Variants from the source markup: `black` (black pills, iconic cars), `large` (18pt titles).
+- [x] Variants from the source markup: `black` (black pills, iconic cars), `large` (18pt titles), `xl` (24pt model
+      lines: wheels, gear stick).
+- [x] Human review (PR #373, 2026-10-21) fixed: the title spacing (steering wheel 15px ×4, iconic cars 1970 44px) via
+      the row's optional space cell, the 24pt model line (`xl`), and paragraph titles (no h3). All entry heights match
+      the source on the steering-wheel, iconic-cars, wheels and gear-stick drafts at 1440 / 1080 / 1079 / 992 / 768 /
+      375, except two iconic-cars description wraps (spec §7.3).
 - [x] Unit tests: `story-flatten.test.mjs` (both live widget fixtures, the fallback, the Columns case) and
       `blocks/timeline/timeline.test.mjs`.
 

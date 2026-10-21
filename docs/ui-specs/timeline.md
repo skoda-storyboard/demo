@@ -2,7 +2,7 @@
 
 Status: **CAPTURED + BUILT** (2026-10-16, Playwright computed boxes on the live site and on the branch draft pages;
 SKODA-815).
-Contract: `timeline` (baseline block, variants `black`, `large`) in
+Contract: `timeline` (baseline block, variants `black`, `large`, `xl`; shape v2 with the optional space cell) in
 [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../planning/SKODA-PENDING-BLOCK-CONTRACTS.md).
 
 ## 1. Identity
@@ -10,13 +10,16 @@ Contract: `timeline` (baseline block, variants `black`, `large`) in
   description, on a white line across a grey panel.
 - **Source:** the SiteOrigin `ys-milestones` widget. It appears on 9 EN stories and their 9 CS counterparts (census
   `ys-milestones`, 36 instances).
-- **EDS:** the `Timeline` block, one row per milestone: `year | title | image | description`.
+- **EDS:** the `Timeline` block, one row per milestone: `year | title | image | description [| space]`.
 - **Source references:**
   - steering wheel: `/en/skoda-world/steering-wheel-decades-of-changes/` (11 entries, green, 14pt titles);
   - iconic cars: `/en/125-let-skode/125-years-of-skoda-iconic-cars/` (16 entries, black pills, 18pt titles, 4:3
-    images, one entry with two stacked images).
+    images, one entry with two stacked images);
+  - wheels: `/en/skoda-world/wheels-decades-of-transformation/` and gear stick:
+    `/en/skoda-world/innovation-and-technology/gear-stick-decades-of-transformation/` (an 18pt maker, a 24pt model
+    line and a 16px note as separate paragraphs).
 - **Draft QA pages:** `/drafts/skoda-815-steering-wheel` (`Timeline`), `/drafts/skoda-815-iconic-cars`
-  (`Timeline (black, large)`).
+  (`Timeline (black, large)`), `/drafts/skoda-815-wheels` and `/drafts/skoda-815-gear-stick` (`Timeline (xl)`).
 
 ## 2. Structure (source)
 - `section.milestones > ul > li`, each holding:
@@ -40,8 +43,13 @@ Contract: `timeline` (baseline block, variants `black`, `large`) in
   (90×78 for 4 digits on steering wheel, 79×78 on iconic cars).
 - **Dot:** a 24px `border-box` circle in the pill colour with a 6px `rgb(228,228,228)` (panel grey) border, so a 12px
   dot in a grey ring that cuts it out of the line. It is level with the description top and centred on the line.
-- **Title:** the `p` is 16/24 with 18.6667px (14pt) or 24px (18pt) spans. Its line box is 28px (14pt) or 36px
-  (18pt), with a 20px bottom margin.
+- **Title:** one or more paragraphs, each with a 20px bottom margin.
+  - **14pt and 18pt widgets:** one `p` (lines split by `<br>`), 16/24 with 18.6667px (14pt) or 24px (18pt) spans: a
+    28px or 36px line box.
+  - **Wheels and gear stick:** separate paragraphs. The maker (18pt spans) is 24 / 36, the all-bold model (24pt spans)
+    32 / 48 weight 600, and the "(vehicle on display: …)" note is plain 16 / 24.
+  - **Extra space above:** an inline `margin-top: 15px` on the first title paragraph (steering wheel, entries 1, 4, 7,
+    10) or a leading spacer `<p>&nbsp;</p>` (24px line + 20px margin = 44px; iconic cars, 1970).
   - **One-sided:** padding-bottom 30.
   - **Two-sided:** the title keeps to the left 45% (padding-right 55%) with padding-bottom 60.
 - **Image:** the full column width at its own ratio.
@@ -85,9 +93,11 @@ Between blocks and the dot's border (PR #373 review), source and EDS at 1440 / 1
 
 ## 4. EDS implementation
 - **Block:** `blocks/timeline`.
-  - `timeline.js` renders an `ol.timeline-list` of `li.timeline-entry`. Each entry has a `p.timeline-year`, an
-    `h3.timeline-title` (the title paragraphs joined by `<br>`), a `div.timeline-media` (every picture, lazy) and a
-    `div.timeline-text`.
+  - `timeline.js` renders an `ol.timeline-list` of `li.timeline-entry`. Each entry has a `p.timeline-year`, a
+    `div.timeline-title` (the title's paragraphs, as the source's: an all-bold one is `.timeline-title-model`, one
+    starting with "(" `.timeline-title-note`), a `div.timeline-media` (every picture, lazy) and a `div.timeline-text`.
+  - The optional fifth cell, a pixel count, becomes the entry's `--timeline-title-space` (clamped to 200px), the
+    title's top padding.
   - The line (`li::before`) and the dot (`.timeline-text::before`) are CSS.
 - **CSS:** `timeline.css`; every measured value is a `--timeline-*` token on `.timeline`. The colours come from
   `styles/brand.css`: `--skoda-grey-225` (`#e4e4e4`) and `--skoda-lime` (`#9c0`), both added for this block.
@@ -100,17 +110,23 @@ Between blocks and the dot's border (PR #373 review), source and EDS at 1440 / 1
 - **Variants:**
   - `Timeline (black)`: the black pill and dot.
   - `Timeline (large)`: 24px / 36px titles.
+  - `Timeline (xl)`: the maker 24 / 36, the model 32 / 48, the note 16 / 24.
   - They combine (`Timeline (black, large)`).
 - **Importer:** `tools/importer/parsers/story-flatten.js` `milestonesCells`.
-  - **Variants:** `black` comes from the first pill's inline background; `large` from the dominant inline title size
-    (18pt or larger).
+  - **Variants:** `black` comes from the first pill's inline background; `large` from a dominant inline title size of
+    18pt, `xl` of 24pt.
+  - **Space:** the fifth cell comes only from the two source patterns above, marked in `import-story-detail.js`
+    preprocess (`markMilestoneSpaces`), because helix-importer's preProcess drops the empty spacer paragraph. The rows
+    keep four cells when no entry has space.
   - **Title:** keeps `p`, `br`, `strong`/`em` and links (href only). The font-size spans and the `term-explain`
     markup are unwrapped, and a `<br>` that closes the bold model is moved after the `<strong>`.
 
 ## 5. Authoring
-| Year | Title | Image | Description |
-|---|---|---|---|
-| 1905 | Laurin & Klement / **VOITURETTE A** / (vehicle on display: 1905) | (image) | The first car produced by … |
+| Year | Title | Image | Description | Space (optional) |
+|---|---|---|---|---|
+| 1905 | Laurin & Klement / **VOITURETTE A** / (vehicle on display: 1905) | (image) | The first car produced by … | 15 |
+
+- **Space:** a plain pixel count above the title (`15`, `44`); anything else is ignored.
 
 - **A full four-cell row keeps its columns:** a blank year cell means no pill, a blank image cell no image, and the
   title and description stay in their columns (the importer always writes four cells). The image may sit in any cell.
@@ -123,25 +139,24 @@ Between blocks and the dot's border (PR #373 review), source and EDS at 1440 / 1
 
 ## 6. Accessibility
 - **Order:** an ordered list in source order.
-- **Headings:** each title is an `h3` (a styled `p` on the source), so the milestones can be reached by heading
-  navigation (a deviation, §7.5). A space before each `<br>` keeps the title's lines apart in the accessible name.
+- **No headings:** the titles are paragraphs, as the source's. The page outline is the source's: the timeline adds no
+  headings, and Lighthouse's `heading-order` no longer points at the timeline (PR #373 review).
 - **Decoration:** the line and the dots are decorative pseudo-elements. The year is real text.
 
-## 7. Deviations from origin (open, pending human approval)
+## 7. Deviations from origin
 None of these is accepted until a human reviewer approves it (AGENTS.md code review, step 8).
 
-1. **Inline title margin (steering wheel, entries 1, 4, 7, 10):** the source title `p` carries an inline
-   `margin-top: 15px`. The importer drops inline styles, so these entries are 15px shorter at every width.
-2. **Empty title paragraph (iconic cars, 1970):** the source title starts with an empty `<p>&nbsp;</p>`. The importer
-   drops empty paragraphs, so the entry is 44px shorter (its 24px line + 20px margin), and at 1080 the title rises
-   into the pill's vertical band.
-3. **Text wrap:** at 375 (steering wheel, 1905), 992 (iconic cars, 2019) and 768 (iconic cars, 1936) one description
-   wraps one line differently (±24px). The text and width are identical; the likely cause is the font stack
-   (`SKODA Next` vs the EDS fallback chain).
-4. **24pt model line (wheels, gear-stick):** the source sets the model line at 24pt (32px). `Timeline (large)`
-   renders the whole title at 24px, so the model line is smaller than on the source.
-5. **Titles are `h3`, not `p`:** this adds 11 (steering wheel) and 16 (iconic cars) headings to the page outline
-   (§6). The title lines keep a space before each `<br>`, so the accessible name reads "Laurin & Klement VOITURETTE
-   A (vehicle on display: 1905)" instead of running the lines together.
+**Fixed at the human reviewer's request (PR #373, 2026-10-21), no longer deviations:**
+- **Title spacing:** steering-wheel entries 1, 4, 7 and 10 (inline `margin-top: 15px`) and iconic cars 1970 (spacer
+  paragraph, 44px). They now carry the row's fifth cell (§5); entry heights match at every width.
+- **24pt model line (wheels, gear stick):** `Timeline (xl)` sizes the model line 32 / 48, the maker 24 / 36 and the note
+  16 / 24.
+- **Title semantics:** the titles are paragraphs, as the source's. The timeline adds no headings.
+
+**Open:**
+3. **Text wrap:** at 992 (iconic cars, 2019) and 768 (iconic cars, 1936) one description wraps one line differently
+   (±24px). The text and width are identical; the likely cause is the font stack (`SKODA Next` vs the EDS fallback
+   chain). The 375 steering-wheel and gear-stick wraps came from the QA drafts losing the source's non-breaking spaces,
+   and are gone.
 6. **Link `rel`:** every timeline link opens in a new tab, as origin's. Its `rel` is `noopener`, as origin's, except
    links to the live host, which `scripts/links.js` gives `noopener noreferrer`.
