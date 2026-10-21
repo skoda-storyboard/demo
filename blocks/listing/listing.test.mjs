@@ -1023,3 +1023,175 @@ test('sort row (#355 review): the one-step collapse after a pick drops its margi
   assert.match(css, /\.listing\.facets-instant \.listing-sort \{\s*transition: none;/);
   assert.match(css, /\.listing \.listing-sort \{[^}]*transition: margin-block-start var\(--facet-reveal\)/);
 });
+
+test('a sharded media feed (SKODA-517): head first, then the facet index; pages fill from detail shards', async () => {
+  window.history.replaceState({}, '', '/de/images');
+  const full = [1, 2, 3, 4, 5].map((n) => imageRow(n, { model: n % 2 ? 'fabia' : 'scala' }));
+  const indexRow = (r) => ({
+    id: r.id, template: 'image', date: r.date, model: r.model, detail: 'image:2026',
+  });
+  const newest = [...full].reverse();
+  const reg = (kind, key, url, extra = {}) => ({
+    kind, key, url, rows: '', total: '', build: 'b1', ...extra,
+  });
+  const files = {
+    '/de/media-feed/index.json': [
+      reg('head', 'image', '/de/media-feed/head-image.json', { total: '5' }),
+      reg('facets', '', '/de/media-feed/facets.json'),
+      reg('detail', 'image:2026', '/de/media-feed/image-2026.json'),
+    ],
+    '/de/media-feed/head-image.json': newest.slice(0, 2),
+    '/de/media-feed/facets.json': full.map(indexRow),
+    '/de/media-feed/image-2026.json': full,
+  };
+  const requested = [];
+  let releaseIndex;
+  const held = new Promise((resolve) => { releaseIndex = resolve; });
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    const { pathname } = new URL(String(url), 'https://example.com');
+    if (!files[pathname]) return realFetch(url);
+    requested.push(pathname);
+    if (pathname.endsWith('/facets.json')) await held;
+    const data = files[pathname];
+    const body = {
+      total: data.length, offset: 0, limit: data.length, data,
+    };
+    return { ok: true, status: 200, json: async () => body };
+  };
+  try {
+    const block = listingBlock('image', '/de/media-feed.json');
+    const [perpageRow] = [...block.children].filter((r) => r.textContent.startsWith('perpage'));
+    perpageRow.insertAdjacentHTML('afterend', '<div><div>facets</div><div>model</div></div>');
+    const done = decorate(block);
+    await settle();
+    const titles = () => [...block.querySelectorAll('.listing-items h3')].map((h) => h.textContent);
+    // first paint from the head shard: the first page, its count, no facet bar yet
+    assert.deepEqual(titles(), ['img-5', 'img-4']);
+    assert.equal(block.querySelector('.listing-count').textContent, '25');
+    assert.equal(block.querySelector('.facet-pill'), null);
+    assert.equal(requested.includes('/de/media-feed/image-2026.json'), false);
+    assert.equal(requested.includes('/de/media-feed.json'), false, 'never the whole feed');
+    // Load more before the rows are in: it runs once they are
+    click(block.querySelector('.listing-loadmore-btn'));
+    releaseIndex();
+    await done;
+    assert.ok(block.querySelector('.facet-pill[data-facet="model"]'), 'facets from the index');
+    await new Promise((r) => { setTimeout(r, LOAD_MORE_MS + 100); });
+    assert.deepEqual(titles(), ['img-5', 'img-4', 'img-3', 'img-2'], 'the next page, filled from its detail shard');
+    assert.equal(block.querySelector('.listing-count').textContent, '45');
+  } finally {
+    globalThis.fetch = realFetch;
+    window.history.replaceState({}, '', '/en/images');
+  }
+});
+
+// A sharded media feed under its own locale (the loaders memoize per URL). `files` overrides
+// paths (null: a 404); `hold` delays the listed paths until `release(path)`.
+function shardedFeed(locale, { files: over = {}, hold = [] } = {}) {
+  const full = [1, 2, 3, 4, 5].map((n) => imageRow(n, { model: n % 2 ? 'fabia' : 'scala' }));
+  const reg = (kind, key, url, extra = {}) => ({
+    kind, key, url, rows: '', total: '', build: 'b1', ...extra,
+  });
+  const base = `/${locale}/media-feed`;
+  const files = {
+    [`${base}/index.json`]: [
+      reg('head', 'image', `${base}/head-image.json`, { total: '5' }),
+      reg('facets', '', `${base}/facets.json`),
+      reg('detail', 'image:2026', `${base}/image-2026.json`),
+    ],
+    [`${base}/head-image.json`]: [...full].reverse().slice(0, 2),
+    [`${base}/facets.json`]: full.map((r) => ({
+      id: r.id, template: 'image', date: r.date, model: r.model, detail: 'image:2026',
+    })),
+    [`${base}/image-2026.json`]: full,
+    ...Object.fromEntries(Object.entries(over).map(([k, v]) => [`${base}${k}`, v])),
+  };
+  const gates = new Map(hold.map((p) => {
+    let open;
+    const gate = new Promise((resolve) => { open = resolve; });
+    return [`${base}${p}`, { gate, open }];
+  }));
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    const { pathname } = new URL(String(url), 'https://example.com');
+    if (!(pathname in files) && !pathname.startsWith(base)) return realFetch(url);
+    await gates.get(pathname)?.gate;
+    const data = files[pathname];
+    if (!data) return { ok: false, status: 404, json: async () => ({}) };
+    const body = {
+      total: data.length, offset: 0, limit: data.length, data,
+    };
+    return { ok: true, status: 200, json: async () => body };
+  };
+  window.history.replaceState({}, '', `/${locale}/images`);
+  const block = listingBlock('image', `${base}.json`);
+  const [perpageRow] = [...block.children].filter((r) => r.textContent.startsWith('perpage'));
+  perpageRow.insertAdjacentHTML('afterend', '<div><div>facets</div><div>model</div></div>');
+  return {
+    block,
+    release: (p) => gates.get(`${base}${p}`).open(),
+    titles: () => [...block.querySelectorAll('.listing-items h3')].map((h) => h.textContent),
+    restore: () => {
+      globalThis.fetch = realFetch;
+      window.history.replaceState({}, '', '/en/images');
+    },
+  };
+}
+
+test('sharded feed (code review): a head shard that fails still lists the rows (facet index + detail)', async () => {
+  const f = shardedFeed('fr', { files: { '/head-image.json': null } });
+  try {
+    await decorate(f.block);
+    await settle(); // no head row at hand: the page waits for its detail shard
+    assert.deepEqual(f.titles(), ['img-5', 'img-4']);
+    assert.equal(f.block.querySelector('.listing-status').hidden, true, 'no load error');
+  } finally { f.restore(); }
+});
+
+test('sharded feed (code review): the full rows landing after the head paint keep the grid and its focus', async () => {
+  const f = shardedFeed('it', { hold: ['/facets.json'] });
+  try {
+    const done = decorate(f.block);
+    await settle();
+    const link = f.block.querySelector('.listing-items li a');
+    link.focus();
+    f.release('/facets.json');
+    await done;
+    assert.equal(f.block.querySelector('.listing-items li a'), link, 'the same card, not rebuilt');
+    assert.equal(document.activeElement, link);
+  } finally { f.restore(); }
+});
+
+test('sharded feed (code review): a page whose detail shard and whole feed fail says so; nothing keeps spinning', async () => {
+  const f = shardedFeed('es', { files: { '/image-2026.json': null } });
+  try {
+    await decorate(f.block);
+    assert.deepEqual(f.titles(), ['img-5', 'img-4'], 'the head page');
+    click(f.block.querySelector('.listing-loadmore-btn'));
+    await new Promise((r) => { setTimeout(r, LOAD_MORE_MS + 100); });
+    const status = f.block.querySelector('.listing-status');
+    assert.equal(status.hidden, false);
+    assert.ok(status.textContent.length > 0, 'the load error');
+    const btn = f.block.querySelector('.listing-loadmore-btn');
+    assert.equal(btn.classList.contains('is-loading') || btn.hasAttribute('aria-busy'), false);
+    assert.deepEqual(f.titles(), ['img-5', 'img-4'], 'the shown cards stay');
+  } finally { f.restore(); }
+});
+
+test('sharded feed (code review): a filter\'s veil holds until its page has its detail shard', async () => {
+  const f = shardedFeed('nl', { hold: ['/image-2026.json'] });
+  try {
+    await decorate(f.block);
+    // fabia: rows 5, 3, 1; only 5 is in the head, so the page needs the detail shard
+    const box = [...f.block.querySelectorAll('.facet-option input')].find((i) => i.value === 'fabia');
+    box.checked = true;
+    box.dispatchEvent(new window.Event('change', { bubbles: true }));
+    await new Promise((r) => { setTimeout(r, FILTER_SETTLE_MS + VEIL_MS + 100); });
+    assert.equal(f.block.classList.contains('is-loading'), true, 'still veiled');
+    f.release('/image-2026.json');
+    await settle();
+    assert.equal(f.block.classList.contains('is-loading'), false);
+    assert.deepEqual(f.titles(), ['img-5', 'img-3']);
+  } finally { f.restore(); }
+});
