@@ -277,7 +277,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Status:** ✅ on `main` with `blocks/footnotes` once SKODA-805d merges (block and importer land together). **Ticket:** SKODA-805d
 - **Why a block:** the source sets small print with an inline size (`<span style="font-size: 10pt">`). DA keeps no inline size, and its inline marks are only `strong`/`b`, `em`/`i`, `u`, `s`, `sup`, `sub`, `code` (no `small`, no `span`). It keeps classes only on block `<div>`s, so the small print has to be a block.
 - **Runtime:** each paragraph renders at 10pt (13.33px) on the body's 24px line, with the 20px paragraph gap, in ink, as the source does (measured on first-glimpse at 375/768/992/1080/1280/1440).
-  - Links are the source's accent green (`--skoda-green-accent`, `#419468`), ink on hover, no underline. They keep the global `:focus-visible` ring, which the source lacks.
+  - Links are the source's accent green (`--skoda-green-accent`, `#419468`), ink on hover, no underline. Like the source's, they show no focus ring (PO, 2026-10-21: an accepted exception to css-guidelines §8).
   - Only the footnote link is green (decision 2026-10-05); other body links stay `--link-color` ink.
   - Green on white is 3.71:1, under WCAG AA's 4.5:1 for text this size; the source has the same.
 - **Shape:** header `Footnotes`, then one row per paragraph of small print, one cell: `[<p>¹ … <a href>HERE</a><br>² …</p>]`. Links, line breaks and `sup` markers stay. Consecutive small-print paragraphs share one table.

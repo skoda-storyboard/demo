@@ -111,6 +111,9 @@ Values `getComputedStyle` on the Copyright page, cited `(selector · viewport)`.
   text. Kept as on the live page (PO, 2026-10-21). A banner image (Contacts) sits under the same scrim as the
   source's.
 - **Body link colour:** the source's #419468 (3.71:1 on white), kept (PO, 2026-10-21).
+- **Body link focus:** no ring, as on the source (PO, 2026-10-21, "match live"): an accepted exception to
+  css-guidelines §8 and WCAG 2.4.7. Header and footer links keep the site's ring.
+- **Text rendering:** `auto`, as the source (the site-wide `optimizespeed` dropped, PO 2026-10-21).
 - **Long titles:** the band stays 240px; a title that needs more lines rises out of it, under the header at
   narrow widths, as on the source (PO, 2026-10-21).
 
@@ -122,8 +125,11 @@ Values `getComputedStyle` on the Copyright page, cited `(selector · viewport)`.
       body `16/24/400`, `p mb 20`.
 - [ ] MR variant hosts the company sub-type blocks (SKODA-810); STO variant = plain rich text.
 - [x] Mobile: single column; heading scale source-faithful (§9).
-- [x] Measured equal to the source at 390 / 768 / 780 / 781 / 992 / 1440 (every body text box, the band's
-      pixels, the footer gap) instead of a per-pixel diff.
+- [x] Visual diff vs source at 1280/500 ≤ 2% per-pixel (hero + body): Copyright 0.00% / 0.00%; Contacts' hero
+      0.01% / 0.16% (its body, the contact directory, is SKODA-810). The method and results are in SKODA-813
+      ("Pixel gate").
+- [x] Also measured equal to the source at 390 / 768 / 780 / 781 / 992 / 1440 (every body text box, the band's
+      pixels, the footer gap).
 
 ## 11. Reference screenshots
 

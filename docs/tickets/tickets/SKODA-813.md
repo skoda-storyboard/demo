@@ -3,8 +3,9 @@
 - **Type:** template / import
 - **Phase:** B  ·  **Pilot:** No · **Milestone:** M2 (go-live)
 - **Estimate:** 2 SP · AI-assisted 0.5–1d / manual 1–2d *(planning estimate, not a quote)*
-- **Status (2026-10-21):** 🟡 Built on branch `skoda-813-page-shell`, measured equal to the source on Copyright
-  (STO) and the Contacts band (MR). See "Implementation (2026-10-21)".
+- **Status (2026-10-21):** 🟡 Built on branch `skoda-813-page-shell` (PR #409), measured equal to the source on
+  Copyright (STO) and the Contacts band (MR); the 1280/500 pixel gate passes. `/en/contacts` is on preview (not
+  live). See "Implementation (2026-10-21)" and "Pixel gate".
 
 ## UI Specification
 **Build-ready measured spec: [`docs/ui-specs/template-page-base.md`](../../ui-specs/template-page-base.md)** (captured via Chrome DevTools on the live Copyright page + Contacts). Read it before implementing. Template map: [`docs/ui-specs/_TEMPLATES.md`](../../ui-specs/_TEMPLATES.md).
@@ -37,7 +38,8 @@ Measurable gates live in [`template-page-base.md` §10](../../ui-specs/template-
 - [ ] Single-column `article` (no sidebar); cap `1248`, gutter `~16px`; `h2 40px/45/300`, body `16/24/400`, `p mb 20`.
 - [ ] MR variant hosts the company sub-type blocks (SKODA-810); STO variant = plain rich text.
 - [ ] Mobile: single column; heading scale per the confirmed decision.
-- [ ] Visual diff vs source at 1280/500 ≤ 2% per-pixel (hero + body).
+- [x] Visual diff vs source at 1280/500 ≤ 2% per-pixel (hero + body). Copyright passes; Contacts' hero passes,
+      its body is SKODA-810 (see "Pixel gate").
 
 ## Dependencies
 - Upstream: SKODA-202 (hero), SKODA-304/305 (footers), SKODA-309 (MR side chrome), SKODA-814 (SiteOrigin body contract)
@@ -79,8 +81,40 @@ used the site's default type (h2 34/42.5/600). The committed bundle no longer ma
 
 `import:validate-blocks`: both pages pass. Heading outline equal (H1, H2, 3 × H3).
 
-**Deviations from origin (need PO approval)**
-- The body link's keyboard focus keeps the site's 2px ring; the source shows none (css-guidelines §8).
+**Pixel gate, 1280 / 500 ≤ 2% (2026-10-21, after the #409 review)**
+- Method: each page captured full-page at the width, fonts loaded, the cookie layer and the fixed widgets
+  hidden (the source's cookie-settings and share buttons, our float dock). The hero is the title band; the body
+  runs from the band's bottom to the footer's top. Each region is aligned at its own top (the header above is
+  not part of the gate) and compared pixel by pixel with pixelmatch's colour metric (YIQ, threshold 0.1, no
+  anti-alias allowance). Rows that only one side has count as differing.
+- Copyright (branch preview vs the source):
+
+  | | 1280, first build (c19379f) | 1280 | 500, first build | 500 |
+  |---|---|---|---|---|
+  | Hero (240px band) | 0.00% | 0.00% | 0.00% | 0.00% |
+  | Body | 0.29% | 0.00% | 0.60% | 0.00% |
+  | Hero + body | 0.23% | **0.00%** | 0.50% | **0.00%** |
+
+  The first build's body difference was the global `text-rendering: optimizespeed` (`styles/styles.css` `body`,
+  from SKODA-106): Chrome then draws no ligatures or kerning, so a line shifts after each "fi" / "ff". The source
+  computes `auto` on every page type checked (home, Media Room, news, contacts, images, a model page, a story).
+  The rule is gone (PO, 2026-10-21, "fix it in #409"), so the body text renders as the source's.
+- Contacts (this branch's import): hero **0.01% / 0.16%** (the banner photo's scaling). Its body is the contact
+  directory, unstyled until SKODA-810 (80% / 62%), so not this ticket's gate.
+
+**The text-rendering change on every template** (shared `styles.css`; one page per template, 1280 and 390, the
+local server with this branch's code and the previewed content). Every text block in the header, main and footer
+was matched to the source's by tag and text and its height compared, before the change and after it:
+- home, Media Room home, a story, a press release, a model page (New Fabia), a category, Images, News,
+  Contacts, Copyright, a series hub, a press kit and a press-kit chapter, the 404;
+- no block that had the source's height lost it (0 of 28 page × width runs); one gained it (the story at 390,
+  page 24px closer to the source). Every other page height is unchanged.
+
+**Deviations from origin:** none.
+
+**Accepted exception (PO, 2026-10-21, "match live")**
+- The body links show no keyboard focus ring, as on the source. This departs from css-guidelines §8 and WCAG
+  2.4.7 (focus visible); the header and footer links keep the site's 2px ring.
 
 **Kept as the source (PO decisions 2026-10-21, "same as live")**
 - The 48px title and 40px h2 on phones (no mobile step).
@@ -93,8 +127,8 @@ used the site's default type (h2 34/42.5/600). The committed bundle no longer ma
 - The source: 3 rule types at 390, 5 at 1440 (contrast, link-in-text-block, link-name, button-name, an unnamed
   input). Ours: only `color-contrast`, on the two colours above (the title, the green link) and the shared
   header's subscribe link (SKODA-703 scope).
-- Heading outline equal to the source (H1 → H2 → H3); the band title is the page's single h1. Link focus keeps
-  the 2px ring (the one deviation).
+- Heading outline equal to the source (H1 → H2 → H3); the band title is the page's single h1. Body links show
+  no focus ring, as on the source (the accepted exception above).
 
 **Found, not in this ticket**
 - At exactly 1080–1128 the source header wraps to 172px; ours keeps one row (decided in SKODA-308).
