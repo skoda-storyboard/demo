@@ -6,7 +6,7 @@
 - **Estimate:** 4 SP · AI-assisted 2d / manual 4–5d *(planning estimate, not a quote)*. Parts: other embeds 1, new
   widget kinds 1, core widgets 0.5–1, the 17-host verdict table 0.5, image maps and art direction < 0.5 each, the
   charge-map verdict ≈ 0.
-- **GitHub issue:** to create
+- **GitHub issue:** [#446](https://github.com/skoda-storyboard/demo/issues/446) (created 2026-10-21, sub-issue of #426)
 - Parent: SKODA-849 ([#426](https://github.com/skoda-storyboard/demo/issues/426))
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-KI-02, G-KI-05 (Medium), G-T4-01,

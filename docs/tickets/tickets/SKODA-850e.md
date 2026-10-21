@@ -6,7 +6,7 @@
   developer and every new CS or SK page starts with EN values.
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–3d *(planning estimate, not a quote)*. From the review: G-T1-07
   2–3 SP (its kit-ZIP part is in 850b), G-T1-08 1 SP, G-KT-09 0.5 SP, G-T2-03 0.5 SP.
-- **GitHub issue:** to create
+- **GitHub issue:** [#451](https://github.com/skoda-storyboard/demo/issues/451) (created 2026-10-21, sub-issue of #427)
 - **Parent:** SKODA-850
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-T1-07, G-T1-08, G-KT-09, G-T2-03

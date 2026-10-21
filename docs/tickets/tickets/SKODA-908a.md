@@ -8,7 +8,7 @@
   the review: 3–8 SP depending on the contract (G-B-01), +1–2 SP for an App Builder poller or 0 if the vendor polls
   (G-T6-02). 4 SP assumes the app can read an index-shaped JSON or the RSS feed and the trigger is a vendor poll or
   a crontab `http` task. An App Builder adapter raises it to about 6–8 SP: re-estimate and split when C1 is answered.
-- **GitHub issue:** to create
+- **GitHub issue:** [#452](https://github.com/skoda-storyboard/demo/issues/452) (created 2026-10-21, sub-issue of #424)
 - **Parent:** SKODA-908
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-B-01 (High, PLAUSIBLE), G-T6-02

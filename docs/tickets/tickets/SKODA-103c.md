@@ -5,7 +5,7 @@
 - **Phase:** D · **Milestone:** M2 (go-live, 2027-01-02). Live **before the DNS switch**, in the 103a CDN layer.
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3–4d, excluding the C1 export and CDN lead time *(planning
   estimate, not a quote)*. Round 2 adds ≈ 0.25 SP for the archive routes.
-- **GitHub issue:** to create
+- **GitHub issue:** [#434](https://github.com/skoda-storyboard/demo/issues/434) (created 2026-10-21, sub-issue of #422)
 - Parent: SKODA-103b ([#422](https://github.com/skoda-storyboard/demo/issues/422))
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-F-04 (G-E-02 merged), G-T3-02,

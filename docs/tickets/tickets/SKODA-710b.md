@@ -5,7 +5,7 @@
 - **Phase:** D · **Milestone:** M2 (go-live, 2027-01-02). The test releases run **before the DNS change**.
 - **Estimate:** 1 SP · AI-assisted 0.5–1d / manual 1–2d, excluding client and agency time *(planning estimate, not a
   quote)*. From the review: +1 SP (register and rehearsal).
-- **GitHub issue:** to create
+- **GitHub issue:** [#440](https://github.com/skoda-storyboard/demo/issues/440) (created 2026-10-21, sub-issue of #417)
 - **Parent:** SKODA-710
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-T6-01 (Medium, not re-verified).

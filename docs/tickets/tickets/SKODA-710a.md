@@ -6,7 +6,7 @@
   switch, as one runbook step (SKODA-710).
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–3d *(planning estimate, not a quote)*. The review sized the link
   release at 2–3 SP; the relink pass over 2,750 links (or the runtime rewrite) puts it at the top of that range.
-- **GitHub issue:** to create
+- **GitHub issue:** [#439](https://github.com/skoda-storyboard/demo/issues/439) (created 2026-10-21, sub-issue of #417)
 - **Parent:** SKODA-710
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-KT-02 (High, CONFIRMED, go-live

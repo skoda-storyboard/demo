@@ -6,7 +6,7 @@
 - **Estimate:** 3.5 SP · AI-assisted 1.5–2d / manual 3–4d, excluding D15 and client admin time *(planning estimate,
   not a quote)*. From the review: G-T1-04 1–2 SP (decision + config), G-T1-05 1 SP, G-KJ-07 1 SP plus an Adobe
   support path, G-T1-06 0.5–1 SP; the AI-audio producer row is part of G-T6-05's 0.5 SP (shared with 850a).
-- **GitHub issue:** to create
+- **GitHub issue:** [#450](https://github.com/skoda-storyboard/demo/issues/450) (created 2026-10-21, sub-issue of #427)
 - **Parent:** SKODA-850
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-T1-04 (High, CONFIRMED); G-T1-05,

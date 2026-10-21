@@ -7,7 +7,7 @@
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–3d, excluding the D14 decision *(planning estimate, not a quote)*.
   From the review: G-KJ-06 +2–3 SP; G-T3-03 is inside delivery (+0 SP, a 1 h test). Feed generation, the feed set,
   full text and guids are sized in SKODA-405 (amended 2026-10-21).
-- **GitHub issue:** to create
+- **GitHub issue:** [#453](https://github.com/skoda-storyboard/demo/issues/453) (created 2026-10-21, sub-issue of #424)
 - **Parent:** SKODA-908
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-KJ-06, G-B-03, G-T3-03 (Medium, not

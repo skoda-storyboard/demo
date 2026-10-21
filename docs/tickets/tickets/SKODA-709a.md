@@ -7,7 +7,7 @@
 - **Estimate:** 2 SP · AI-assisted 1d / manual 2d, excluding Škoda IT lead time *(planning estimate, not a quote)*.
   From the review: the switch-day hosts +0.5 SP, the rule spec and tests +0.5–1 SP, on top of the alias inventory
   already in SKODA-709.
-- **GitHub issue:** to create
+- **GitHub issue:** [#437](https://github.com/skoda-storyboard/demo/issues/437) (created 2026-10-21, sub-issue of #416)
 - **Parent:** SKODA-709
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-KI-04 (CONFIRMED), G-T5-01 (Medium,

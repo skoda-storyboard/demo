@@ -7,7 +7,7 @@
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–3d, excluding the client DAM process decision *(planning
   estimate, not a quote)*. From the review: G-KJ-03 2–3 SP on 511a/811, with G-T1-02 merged (+3–5 SP on 811 in that
   finding). Planned at the low end, assuming the DAM team answers with a restricted folder or a field.
-- **GitHub issue:** to create
+- **GitHub issue:** [#449](https://github.com/skoda-storyboard/demo/issues/449) (created 2026-10-21, sub-issue of #427)
 - **Parent:** SKODA-850
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-KJ-03 (High, CONFIRMED; + G-T1-02).

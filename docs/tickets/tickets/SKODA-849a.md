@@ -6,7 +6,7 @@
   300 docs need a re-import.
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3–4d *(planning estimate, not a quote)*. The finding sizes it at 3–5
   SP (transformer, popover, tests); plain links only are about 2 SP.
-- **GitHub issue:** to create
+- **GitHub issue:** [#444](https://github.com/skoda-storyboard/demo/issues/444) (created 2026-10-21, sub-issue of #426)
 - Parent: SKODA-849 ([#426](https://github.com/skoda-storyboard/demo/issues/426))
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-C-01 (High, CONFIRMED, browser-checked).

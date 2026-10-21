@@ -5,7 +5,7 @@
 - **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02). The baseline exists **before the freeze** (Q-20).
 - **Estimate:** 2 SP · AI-assisted 1d / manual 2–3d, excluding client analytics time *(planning estimate, not a
   quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#433](https://github.com/skoda-storyboard/demo/issues/433) (created 2026-10-21, sub-issue of #420)
 - Parent: SKODA-713 ([#420](https://github.com/skoda-storyboard/demo/issues/420))
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-KT-07, G-KO-03.

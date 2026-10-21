@@ -6,7 +6,7 @@
 - **Estimate:** 4 SP · AI-assisted 2d / manual 4–5d, excluding the MP4 transfer runtime and the Q-18 decision
   *(planning estimate, not a quote)*. The finding sizes MP4 ingest and ops at +3–5 SP; an in-use-only Q-18 brings this
   to about 3 SP.
-- **GitHub issue:** to create
+- **GitHub issue:** [#441](https://github.com/skoda-storyboard/demo/issues/441) (created 2026-10-21, sub-issue of #425)
 - Parent: SKODA-523 ([#425](https://github.com/skoda-storyboard/demo/issues/425))
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-D-01 (High, CONFIRMED), with G-T1-01

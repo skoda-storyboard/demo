@@ -7,7 +7,7 @@
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3d, excluding the census download runtime (≈ 11k PDFs, ≈ 7.5 GB at
   the manifest mean of 0.67 MB) *(planning estimate, not a quote)*. Parts: PDF link census +1, REST sourcing +0.5,
   document kinds +0.5–1, orphan documents < 1.
-- **GitHub issue:** to create
+- **GitHub issue:** [#443](https://github.com/skoda-storyboard/demo/issues/443) (created 2026-10-21, sub-issue of #425)
 - Parent: SKODA-523 ([#425](https://github.com/skoda-storyboard/demo/issues/425))
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-T8-02, G-T8-05 (Medium), G-KO-02

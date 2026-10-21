@@ -7,7 +7,7 @@
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1d, excluding Škoda AEM / Cloud Manager time *(planning estimate,
   not a quote)*. The review sizes G-T8-01 at 1–2 SP across tickets; the `public_url` base (503/520), the 103b target
   and the robots rule (713) are counted there.
-- **GitHub issue:** to create
+- **GitHub issue:** [#438](https://github.com/skoda-storyboard/demo/issues/438) (created 2026-10-21, sub-issue of #416)
 - **Parent:** SKODA-709
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-T8-01 (High, CONFIRMED), G-T8-04;

@@ -8,7 +8,7 @@
   the review: G-B-06 1–2 SP, G-KJ-05 1–2 SP, G-KT-04 1–2 SP once the contract is known; G-T6-04 0 SP if sends are
   manual. If a WordPress hook starts the sends and must be rebuilt (+1–2 SP, an App Builder poller), that is a new
   sub-ticket of SKODA-908.
-- **GitHub issue:** to create
+- **GitHub issue:** [#454](https://github.com/skoda-storyboard/demo/issues/454) (created 2026-10-21, sub-issue of #424)
 - **Parent:** SKODA-908
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-B-06 (Medium, CONFIRMED, was High),

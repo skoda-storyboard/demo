@@ -6,7 +6,7 @@
   source CDN goes (520).
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3–4d, excluding Škoda IT and Cloud Manager time *(planning
   estimate, not a quote)*. Round 2 adds the document-host target and the rendition strip (≈ 0.5 SP).
-- **GitHub issue:** to create
+- **GitHub issue:** [#436](https://github.com/skoda-storyboard/demo/issues/436) (created 2026-10-21, sub-issue of #422)
 - Parent: SKODA-103b ([#422](https://github.com/skoda-storyboard/demo/issues/422))
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-B-08 (G-KO-01 merged), G-T3-05,

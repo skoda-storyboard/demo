@@ -5,7 +5,7 @@
 - **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02). Live **before the DNS switch**.
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–4d, excluding the Q-21 decision and CDN lead time *(planning
   estimate, not a quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#430](https://github.com/skoda-storyboard/demo/issues/430) (created 2026-10-21, sub-issue of #420)
 - Parent: SKODA-713 ([#420](https://github.com/skoda-storyboard/demo/issues/420))
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-F-02, G-F-07, G-T8-06 (with G-T8-01).

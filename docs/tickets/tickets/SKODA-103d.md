@@ -6,7 +6,7 @@
 - **Estimate:** 4 SP · AI-assisted 2d / manual 3–5d, excluding the C1 export and CDN lead time *(planning estimate,
   not a quote)*. The id map (≈ 16.4k post rows plus 541 page ids) and the slug map are generated; round 2 adds
   ≈ 1.5 SP (more query routes, normalisation, prefix match, slim map).
-- **GitHub issue:** to create
+- **GitHub issue:** [#435](https://github.com/skoda-storyboard/demo/issues/435) (created 2026-10-21, sub-issue of #422)
 - Parent: SKODA-103b ([#422](https://github.com/skoda-storyboard/demo/issues/422))
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-F-04, G-KJ-04, G-T7-01, G-T7-02,

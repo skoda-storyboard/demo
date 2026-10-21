@@ -7,7 +7,7 @@
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3–4d, excluding the package copy (size unmeasured) and the Q-19
   decision *(planning estimate, not a quote)*. Parts: importer 1, generic iframe branch 1–2, inventory, resize
   contract and dependency audit +1.
-- **GitHub issue:** to create
+- **GitHub issue:** [#445](https://github.com/skoda-storyboard/demo/issues/445) (created 2026-10-21, sub-issue of #426)
 - Parent: SKODA-849 ([#426](https://github.com/skoda-storyboard/demo/issues/426))
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-KI-01 (High, CONFIRMED), G-T4-03

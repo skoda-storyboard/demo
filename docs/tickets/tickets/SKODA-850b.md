@@ -8,7 +8,7 @@
   quote)*. From the review: G-KJ-02 5–8 SP with G-T1-01 merged (a plugin 3–5, config and permissions 1–2, guide 1).
   This ticket plans the native path only; a custom Downloads-row plugin becomes a new sub-ticket of SKODA-850 if
   the native path fails the criteria below.
-- **GitHub issue:** to create
+- **GitHub issue:** [#448](https://github.com/skoda-storyboard/demo/issues/448) (created 2026-10-21, sub-issue of #427)
 - **Parent:** SKODA-850
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-KJ-02 (High, CONFIRMED; + G-T1-01).

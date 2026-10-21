@@ -7,7 +7,7 @@
 - **Estimate:** 3.5 SP · AI-assisted 1.5–2d / manual 3–4d, excluding Adobe onboarding *(planning estimate, not a
   quote)*. From the review: G-KJ-01 3–5 SP (G-T1-03 2–3 and G-KT-08 1–2 merged into it), planned at the low end;
   +0.5 SP listing freshness (G-T6-06); the AI-audio runbook step is part of G-T6-05's 0.5 SP (shared with 850d).
-- **GitHub issue:** to create
+- **GitHub issue:** [#447](https://github.com/skoda-storyboard/demo/issues/447) (created 2026-10-21, sub-issue of #427)
 - **Parent:** SKODA-850
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-KJ-01 (High, CONFIRMED; + G-T1-03,

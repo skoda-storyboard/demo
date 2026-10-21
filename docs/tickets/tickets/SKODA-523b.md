@@ -6,7 +6,7 @@
   publish (D1).
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3–4d, excluding the per-locale run time *(planning estimate, not a
   quote)*. The finding sizes the non-EN census at +2–3 SP; the extra kinds and origins from round 2 fit inside it.
-- **GitHub issue:** to create
+- **GitHub issue:** [#442](https://github.com/skoda-storyboard/demo/issues/442) (created 2026-10-21, sub-issue of #425)
 - Parent: SKODA-523 ([#425](https://github.com/skoda-storyboard/demo/issues/425))
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-B-07 (High, CONFIRMED), with G-T8-02

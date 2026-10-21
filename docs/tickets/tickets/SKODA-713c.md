@@ -6,7 +6,7 @@
   DNS switch**.
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3–4d, excluding the client exports *(planning estimate, not a
   quote)*. Round 2 adds ≈ 0.5 SP (archive classes, near-miss set, alias set, PDF links).
-- **GitHub issue:** to create
+- **GitHub issue:** [#432](https://github.com/skoda-storyboard/demo/issues/432) (created 2026-10-21, sub-issue of #420)
 - Parent: SKODA-713 ([#420](https://github.com/skoda-storyboard/demo/issues/420))
 - **Status (2026-10-21):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-F-06, G-T7-06, G-T7-07, G-T5-05,
