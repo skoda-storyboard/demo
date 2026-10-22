@@ -64,8 +64,15 @@ used the site's default type (h2 34/42.5/600). The committed bundle no longer ma
   phones). The cell widths are read in `preprocess`, before the importer drops `<style>`.
 - `styles.css` `page-body` sections: 10px per row, 20px text inset (30px from 781), h2 40/45 and h3 24/27.6
   wt300, p 20px apart, half rows (W − 60 − 40) / 2 from 781, green links (ink on hover), 20px to the footer.
-- Side: the bulk metadata sheet already gives `/en/contacts` the Media Room nav, footer and section. Nothing
-  to add.
+- Side: the bulk metadata sheet already gives `/en/contacts` the Media Room nav, footer and section.
+- Links to the two pages (#457 re-review, 2026-10-22): the header's Company → Contacts, the Media Room footer's
+  Contacts sections and the Storyboard footer's Copyright went to the live site in a new tab (`/en/contacts`
+  was LIVE_ONLY from SKODA-609, before the page existed; Copyright is authored as the live URL). `scripts/links.js`
+  now keeps both on the demo (`DEMO_LISTINGS`), and `HASH_ALIASES` maps the footer's source anchors
+  `#corporate` / `#product` to the page's heading ids (SKODA-810 rebuilds that body: keep them in step).
+  `scripts.js` decodes the hash before it scrolls to it, so an id with a diacritic (`#škoda-…`) is found.
+  Clicked at 1280 and 390: each opens the demo page in the same tab, the sections scrolled to.
+  The Contacts body stays unstyled until SKODA-810 (PO decision 2026-10-22: link it now).
 - Contract (`hero-image` `page`, `page-body`), library entries, spec §8–10, tests (hero page variant, the
   transformer on a trimmed copyright fixture).
 
@@ -151,6 +158,8 @@ was matched to the source's by tag and text and its height compared, before the 
   templates can't be checked until they are imported (#20 / #63, #59).
 
 **Found, not in this ticket**
+- An anchored heading lands 40px under the top of the window (the boilerplate heading `scroll-margin: var(--spacing-xl)`, 40px,
+  site-wide); live puts it at the top (0px). Deviation, for a human decision.
 - At exactly 1080–1128 the source header wraps to 172px; ours keeps one row (decided in SKODA-308).
 - The Media Room footer's social row (Facebook, Instagram, …) starts the source footer; ours doesn't. This is
   the same on `main`'s /en/news (SKODA-305 scope).

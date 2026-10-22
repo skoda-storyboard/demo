@@ -31,7 +31,6 @@ export const LIVE_ONLY = [
   /^\/en\/skodapedia(?:\/|$)/i,
   /^\/en\/category\/podcast(?:-en)?(?:\/|$)/i,
   /^\/en\/(?:press-releases\/)?feed(?:\/|$)/i,
-  /^\/en\/contacts(?:\/|$)/i,
   /^\/en\/documents\//i,
   /^\/en\/newsletter-settings(?:\/|$)/i,
 ];
@@ -64,11 +63,30 @@ export const LIVE_ALIASES = {
 // Demo listing/entry pages that DA chrome (the Media Room nav) and tag chips link to on the
 // live host: they stay on the demo, site-relative, query + hash kept (listing filters).
 // `/en/media-cart` is the demo's own cart page (SKODA-505b): the cart badge links there.
+// `/en/contacts` and `/en/copyright` are the migrated page-shell pages (SKODA-813): the header's
+// Contacts and the footers' contact and Copyright links.
 // `/en/newsletter` is the migrated plant newsletter page (SKODA-845): Company → Newsletter.
 export const DEMO_LISTINGS = new Set([
   '/en', '/en/media-room', '/en/news', '/en/press-kits', '/en/images', '/en/videos',
-  '/en/series-2', '/en/search', '/en/media-cart', '/en/newsletter',
+  '/en/series-2', '/en/search', '/en/media-cart', '/en/contacts', '/en/copyright',
+  '/en/newsletter',
 ]);
+
+// Source anchors a demo page has under another id: the Media Room footer links to the source's
+// `/en/contacts/#corporate` and `#product` sections, which are the demo page's headings (ids from
+// their text). SKODA-810 rebuilds that body; keep these in step with its headings.
+export const HASH_ALIASES = {
+  '/en/contacts': {
+    '#corporate': '#škoda-corporate-communications',
+    '#product': '#škoda-productcommunications',
+  },
+};
+
+/** A demo path with its query and hash, the hash mapped through HASH_ALIASES. */
+function demoHref(path, url) {
+  const hash = HASH_ALIASES[path]?.[url.hash.toLowerCase()] || url.hash;
+  return `${path}${url.search}${hash}`;
+}
 
 /**
  * Policy result for an authored href on a demo page.
@@ -91,10 +109,13 @@ export function policyHref(href, base, { fragment = false } = {}) {
   const tail = `${url.search}${url.hash}`;
   const trimmed = url.pathname.replace(/\/+$/, '') || '/';
   if (LIVE_HOST.test(url.hostname)) {
-    if (DEMO_LISTINGS.has(trimmed.toLowerCase())) return { href: `${trimmed.toLowerCase()}${tail}`, newTab: false };
+    const demoPath = trimmed.toLowerCase();
+    if (DEMO_LISTINGS.has(demoPath)) return { href: demoHref(demoPath, url), newTab: false };
     return { href, newTab: !opensInSameTab(href) };
   }
   if (url.origin !== origin) return null;
+  const aliased = HASH_ALIASES[trimmed.toLowerCase()]?.[url.hash.toLowerCase()];
+  if (aliased) return { href: demoHref(trimmed.toLowerCase(), url), newTab: false };
 
   if (!fragment && LIVE_ONLY.some((re) => re.test(url.pathname))) {
     const livePath = LIVE_ALIASES[trimmed.toLowerCase()];
