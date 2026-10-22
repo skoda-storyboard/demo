@@ -50,7 +50,7 @@ globalThis.document = {
 
 const {
   parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail, railLayout, safeViewAll,
-  TAXONOMY_TEMPLATES, orderPaths, railHeadingTag, CONFIG_KEYS, blockStylesReady,
+  TAXONOMY_TEMPLATES, orderPaths, railHeadingTag, CONFIG_KEYS, blockStylesReady, sectionHeadingText,
 } = await import('./story-rail.js');
 const { feedLightboxItem } = await import('../../scripts/media-lightbox.js');
 
@@ -901,4 +901,42 @@ test('blockStylesReady: waits for a sheet still loading, and a failed sheet coun
     await ready;
     assert.equal(done, true, `ready after ${event}`);
   }
+});
+
+// --- sectionHeadingText: a rail without its own heading is named after its section's (SKODA-845) ---
+
+// a tiny element stand-in: tag, text, children, and the previous sibling
+function fakeEl(tag, { text = '', kids = [], cls = '' } = {}) {
+  const node = {
+    tag, text, kids, previousElementSibling: null, parentElement: null,
+    classList: { contains: (c) => cls.split(' ').includes(c) },
+    textContent: text || kids.map((k) => k.textContent).join(''),
+    matches: (sel) => sel.split(',').map((x) => x.trim()).includes(tag),
+    querySelectorAll: (sel) => kids.flatMap((k) => [...(k.matches(sel) ? [k] : []), ...k.querySelectorAll(sel)]),
+  };
+  return node;
+}
+function section(...children) {
+  children.forEach((c, i) => { c.previousElementSibling = children[i - 1] || null; });
+  return children;
+}
+
+test('sectionHeadingText: the last heading before the rail in its section', () => {
+  const railA = fakeEl('div', { cls: 'story-rail' });
+  const wrapA = fakeEl('div', { cls: 'story-rail-wrapper', kids: [railA] });
+  railA.parentElement = wrapA;
+  section(fakeEl('div', { kids: [fakeEl('h3', { text: 'Kvasiny' })] }), wrapA);
+  assert.equal(sectionHeadingText(railA), 'Kvasiny');
+
+  const railB = fakeEl('div', { cls: 'story-rail' });
+  const wrapB = fakeEl('div', { cls: 'story-rail-wrapper', kids: [railB] });
+  railB.parentElement = wrapB;
+  section(fakeEl('div', { kids: [fakeEl('h3', { text: 'Press Kits' }), fakeEl('p', { text: 'Based on tags: Fabia' })] }), wrapB);
+  assert.equal(sectionHeadingText(railB), 'Press Kits');
+
+  const railC = fakeEl('div', { cls: 'story-rail' });
+  const wrapC = fakeEl('div', { cls: 'story-rail-wrapper', kids: [railC] });
+  railC.parentElement = wrapC;
+  section(wrapC);
+  assert.equal(sectionHeadingText(railC), '', 'no heading: the generic name stays');
 });

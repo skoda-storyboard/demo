@@ -542,6 +542,22 @@ export function railLayout({
 }
 
 /**
+ * The heading a rail sits under when it builds none itself: the last h2–h6 before the rail in its
+ * section (the model pages' "Press Kits", the Newsletter page's "Kvasiny"), so each carousel is
+ * named after it rather than the generic "Content carousel" (SKODA-845). '' when there is none.
+ * @param {Element} block the story-rail block
+ */
+export function sectionHeadingText(block) {
+  const wrapper = block.parentElement?.classList.contains('story-rail-wrapper') ? block.parentElement : block;
+  for (let el = wrapper.previousElementSibling; el; el = el.previousElementSibling) {
+    const hs = el.matches('h2, h3, h4, h5, h6') ? [el] : [...el.querySelectorAll('h2, h3, h4, h5, h6')];
+    const text = hs.length ? hs[hs.length - 1].textContent.trim() : '';
+    if (text) return text;
+  }
+  return '';
+}
+
+/**
  * The rail heading's element: the home bands' section headings are h3 on the source
  * (.search-results-heading on both homes, #272); every other rail keeps its h2. Only for a
  * heading the block builds itself: the model pages' rail titles are authored section headings
@@ -663,7 +679,8 @@ export default async function decorate(block) {
     // so does a home-band media rail's card (railLayout)
     carousel.classList.add(...variants, ...carouselVariants);
     if (cfg.dots) carousel.classList.add('dots');
-    if (heading) carousel.setAttribute('aria-label', heading);
+    const name = heading || sectionHeadingText(block);
+    if (name) carousel.setAttribute('aria-label', name);
     carousel.hidden = true;
     mount.append(carousel);
     // a "#" cart button must not jump to the top, also before (or without) the media cart

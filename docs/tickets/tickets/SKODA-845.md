@@ -96,5 +96,16 @@ publish, so it has no `categories` for the newsletters and not the 2 new ones.
 their plant, and the branch preview (the real index) is equal to the source at 390 / 768 / 992 / 1280 / 1440, the
 same as above; Next / Previous at 390 move one card; a card opens our press release.
 
+**PR review (2026-10-22), fixed in shared rail code:**
+- A desktop layout shift (CLS 0.19 in about 1 load in 10): the second rail showed before `carousel.css` and the
+  `card-teaser.css` it imports were applied (aem.js resolves a second loadCSS at once). story-rail waits for both
+  (3s at most): 10 of 10 loads 0.000.
+- Keyboard focus on a card only partly in view (390: the second card) left its ring off-screen; the carousel now
+  scrolls a keyboard-focused card fully in (not on a mouse press). The same on the model pages.
+- Each rail is named after its section heading ("Kvasiny", "Vrchlabí"; the model pages' "Press Kits", "Images",
+  "Videos") instead of "Content carousel".
+- Checked unchanged: the Media Room and Storyboard homes, New Fabia, a press release's related band, a category
+  archive, at 1280 and 390.
+
 **Still open:** the PR review, then `/en/newsletter` goes live after merge. Until 845 merges, `main`'s preview renders the page's rail settings as cards (`main`'s
 story-rail doesn't know `categories`).
