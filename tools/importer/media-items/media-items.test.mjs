@@ -18,6 +18,7 @@ import {
   feedMediaRefs, feedCoverageGaps,
   feedThumbnails, carrierDocs, parseCarrier, withMediaBus, CARRIER_MAX,
   damIndex, damFile, withDamFiles, libraryRequest, librarySlices, libraryNonce, cardFocus,
+  normalizePosters, mergeQueries, matchesFilter,
 } from './media-items-lib.mjs';
 import { listingUrl } from './build-media-items.mjs';
 import { logicalId } from '../media/media-lib.mjs';
@@ -49,6 +50,9 @@ test('pure helpers: slug, date, CDN URL, Vimeo poster, listing URL', () => {
   assert.equal(cdnUrl('#'), '');
   assert.equal(vimeoPoster('https://i.vimeocdn.com/video/2196437413-81d8-d_295x166?region=us'), 'https://i.vimeocdn.com/video/2196437413-81d8-d_1280x720.jpg');
   assert.equal(vimeoPoster('https://example.com/x.jpg'), '');
+  // oEmbed's width-only thumbnail (SKODA-516: 11 feed posters were left unrecordable)
+  assert.equal(vimeoPoster('https://i.vimeocdn.com/video/647041470-0ae297c4-d_640'), 'https://i.vimeocdn.com/video/647041470-0ae297c4-d_1280x720.jpg');
+  assert.equal(vimeoPoster('https://i.vimeocdn.com/video/647041470-0ae297c4-d_640?region=us'), 'https://i.vimeocdn.com/video/647041470-0ae297c4-d_1280x720.jpg');
   assert.equal(itemSlug('https://www.skoda-storyboard.com/?attachment_id=451237', 'https://cdn.skoda-storyboard.com/2026/08/013_Skoda_Peaq.jpg'), '013-skoda-peaq');
   assert.equal(itemSlug('https://www.skoda-storyboard.com/en/press-kits/x/videos/attachment/klip_epiq_peaq_uhd_201c18c6/', ''), 'klip-epiq-peaq-uhd-201c18c6');
   assert.equal(
@@ -438,4 +442,71 @@ test('card crop anchor (#273): snap-top / snap-bottom from the image holder, cen
   // the feed row carries it (empty for a centred card)
   assert.equal(feedRow({ id: '1', type: 'image', title: 't', terms: {}, focus: 'top' }).focus, 'top');
   assert.equal(feedRow({ id: '2', type: 'image', title: 't', terms: {} }).focus, '');
+});
+
+// SKODA-516: the model pages' Images / Videos rails, one listing query each
+test('sources.json modelRails: one well-formed query per model-page rail, with the rail\'s own filter and limit', () => {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const sources = JSON.parse(readFileSync(path.join(here, 'sources.json'), 'utf8'));
+  const rails = sources.modelRails;
+  assert.ok(Array.isArray(rails) && rails.length >= 46, 'a query for each Images / Videos rail of the 23 model pages');
+  const keys = new Set();
+  rails.forEach((q) => {
+    assert.ok(['image', 'video'].includes(q.type), JSON.stringify(q));
+    assert.ok(q.filter?.model, `a rail is always for a model: ${JSON.stringify(q)}`);
+    Object.entries(q.filter).forEach(([tax, value]) => {
+      assert.ok(FACETS.includes(tax), `known facet ${tax}`);
+      assert.match(value, /^[a-z0-9-]+$/, `one source slug per facet: ${tax}=${value}`);
+    });
+    assert.ok(Number.isInteger(q.n) && q.n > 0 && q.n <= 50, `limit ${q.n}`);
+    const key = JSON.stringify([q.type, q.filter]);
+    assert.ok(!keys.has(key), `no duplicate ${key}`);
+    keys.add(key);
+    // the source listing URL carries every filter row, so it ANDs them as the rail does
+    const url = new URL(listingUrl(q));
+    Object.entries(q.filter).forEach(([tax, value]) => assert.equal(url.searchParams.get(`filter[${tax}][]`), value));
+  });
+});
+
+test('normalizePosters: a re-published sheet\'s video posters take the 1280×720 form; images and others stay', () => {
+  const sheet = {
+    total: 3,
+    data: [
+      { template: 'video', image: 'https://i.vimeocdn.com/video/1-ab-d_640', poster: 'https://i.vimeocdn.com/video/1-ab-d_640' },
+      { template: 'video', image: '/en/fragments/media_1.jpg' },
+      { template: 'image', image: 'https://i.vimeocdn.com/video/2-cd-d_640' },
+    ],
+  };
+  const out = normalizePosters(sheet);
+  assert.equal(out.data[0].image, 'https://i.vimeocdn.com/video/1-ab-d_1280x720.jpg');
+  assert.equal(out.data[0].poster, 'https://i.vimeocdn.com/video/1-ab-d_1280x720.jpg');
+  assert.equal(out.data[1].image, '/en/fragments/media_1.jpg', 'a Media Bus path stays');
+  assert.equal(out.data[2].image, 'https://i.vimeocdn.com/video/2-cd-d_640', 'only video rows');
+  assert.equal(out.total, 3);
+  assert.equal(sheet.data[0].image, 'https://i.vimeocdn.com/video/1-ab-d_640', 'the input is not changed');
+});
+
+test('mergeQueries: one query per type + filter (facet order aside), the largest n, first-seen order', () => {
+  const merged = mergeQueries([
+    { type: 'image', filter: { model: 'peaq' }, n: 30 },
+    { type: 'image', n: 24 },
+    { type: 'video', filter: { model: 'peaq' }, n: 24 },
+    { type: 'image', filter: { model: 'peaq' }, n: 20 },
+    { type: 'image', filter: { bodywork: 'suv', model: 'kodiaq' }, n: 20 },
+    { type: 'image', filter: { model: 'kodiaq', bodywork: 'suv' }, n: 40 },
+  ]);
+  assert.deepEqual(merged.map((q) => [q.type, JSON.stringify(q.filter || {}), q.n]), [
+    ['image', '{"model":"peaq"}', 30],
+    ['image', '{}', 24],
+    ['video', '{"model":"peaq"}', 24],
+    ['image', '{"bodywork":"suv","model":"kodiaq"}', 40],
+  ]);
+});
+
+test('matchesFilter: every facet value of the filter, AND across facets', () => {
+  const item = { terms: { model: ['kodiaq', 'enyaq'], derivative: ['rs'] } };
+  assert.equal(matchesFilter(item, { model: 'kodiaq', derivative: 'rs' }), true);
+  assert.equal(matchesFilter(item, { model: 'kodiaq', bodywork: 'suv' }), false);
+  assert.equal(matchesFilter(item, {}), true);
+  assert.equal(matchesFilter({ terms: {} }, { model: 'kodiaq' }), false);
 });
