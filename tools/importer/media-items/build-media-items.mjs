@@ -36,7 +36,8 @@ import {
   SOURCE_ORIGIN, facetOptions, parseCards, mergeItems, feedSheet, yearIds, vimeoPoster,
   detailRequest, ajaxNonce, parseDetailPanel, parseAssetLinks, assetItem, requiredDetails,
   detailGaps, unknownGaps, feedCoverageGaps,
-  feedThumbnails, carrierDocs, parseCarrier, withMediaBus, withDamFiles,
+  feedThumbnails, carrierDocs, parseCarrier, withMediaBus, withDamFiles, normalizePosters,
+  mergeQueries, matchesFilter,
   libraryRequest, librarySlices, libraryNonce, damIndex, damFile,
 } from './media-items-lib.mjs';
 import { uploadToDA } from '../media/media-lib.mjs';
@@ -433,7 +434,7 @@ export async function main(argv = process.argv.slice(2)) {
   const JSDOM = loadJSDOM();
   const feedFile = path.join(a.out, FEED_PATH);
   if (a.feed) {
-    const sheet = JSON.parse(readFileSync(a.feed, 'utf8'));
+    const sheet = normalizePosters(JSON.parse(readFileSync(a.feed, 'utf8')));
     mkdirSync(path.dirname(feedFile), { recursive: true });
     writeFileSync(feedFile, `${JSON.stringify(sheet, null, 2)}\n`);
     const mediaBus = await publishFeed(JSDOM, sheet, feedFile);
@@ -442,8 +443,11 @@ export async function main(argv = process.argv.slice(2)) {
   }
   const sources = JSON.parse(readFileSync(path.join(HERE, 'sources.json'), 'utf8'));
   const {
-    queries, assetPages = [], knownDetailGaps = {}, library = [],
+    queries: listingQueries, modelRails = [], assetPages = [], knownDetailGaps = {}, library = [],
   } = sources;
+  // the model pages' Images / Videos rails (SKODA-516) are listing queries like the others; a
+  // rail on a filter a listing query already has is that query (one request, its larger n)
+  const queries = mergeQueries([...listingQueries, ...modelRails]);
   const lists = [];
   const yearsById = {};
   const libraryReport = {};
@@ -518,14 +522,11 @@ export async function main(argv = process.argv.slice(2)) {
     library: libraryReport,
     yearsById,
   };
-  const count = (type, tax, value) => items
-    .filter((i) => i.type === type && (i.terms[tax] || []).includes(value)).length;
-  summary.rails = {
-    'images model=peaq': count('image', 'model', 'peaq'),
-    'images model=epiq': count('image', 'model', 'epiq'),
-    'videos model=peaq': count('video', 'model', 'peaq'),
-    'videos model=epiq': count('video', 'model', 'epiq'),
-  };
+  // each filtered query (the model-page rails among them): the feed rows its filter matches
+  summary.rails = Object.fromEntries(queries.filter((q) => q.filter).map((q) => [
+    `${q.type} ${Object.entries(q.filter).map(([k, v]) => `${k}=${v}`).join(' ')}`,
+    items.filter((i) => i.type === q.type && matchesFilter(i, q.filter)).length,
+  ]));
   console.log(JSON.stringify(summary, null, 1));
   if (a.dryRun) return summary;
 

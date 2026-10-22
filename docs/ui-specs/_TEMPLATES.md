@@ -70,7 +70,7 @@ footer present; an earlier note here saying it drops the chrome was wrong):
 | `single-skoda_series` | Series hub (5 in M1) | STO | `hero-image` (SERIES label + perex), `cards` (overlay, tiles) curated mosaic including a Press Kits tile | `series.md` | SKODA-207, 221 |
 | Škodapedia directory + term | Škodapedia (`post-type-archive`) | MR | `skodapedia` (A-Z nav `.sp__list-nav` 26 letters + term modal `.sp__term-detail`) | `skodapedia.md` | SKODA-206, 802 |
 | `press_kit-template-default` + sub-pages | Press kit (hub + chapter + gallery) | MR | `hero`, chapter-nav, `press-kit-media`, `press-kit-variant`, `faq-accordion`, `downloads` | `press-kit-template.md` | SKODA-805–808 |
-| `error404` | Branded 404 | global | minimal shell + "dead end" copy + homepage link | `template-404.md` | **SKODA-706** |
+| `error404` | Branded 404 | global | one of two random variants (DA fragments `/en/fragments/404/*`): full-bleed photo band + message + homepage link (`templates/error-404`) | `template-404.md` | **SKODA-706** |
 
 Bold tickets are new gap tickets created by this initiative. **`press_kit` nuance (verified live):** the
 rendered pages ARE a `press_kit` post type (`single-press_kit`, hub `press_kit-template-template-tiles`,

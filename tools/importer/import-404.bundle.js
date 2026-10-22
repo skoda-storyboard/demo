@@ -38,383 +38,30 @@ var CustomImportScript = (() => {
   // tools/importer/import-404.js
   var import_404_exports = {};
   __export(import_404_exports, {
-    default: () => import_404_default
+    default: () => import_404_default,
+    fragmentPath: () => fragmentPath
   });
 
-  // tools/importer/transformers/skoda-page-cleanup.js
-  var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  // tools/importer/transformers/skoda-nbsp.js
+  var NBSP_PLACEHOLDER = "\u{F00A0}";
+  var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform(hookName, element, payload) {
-    if (hookName === TransformHook.beforeTransform) {
-      WebImporter.DOMUtils.remove(element, [
-        // Site header / nav / language switcher / search overlay chrome
-        "header.header",
-        ".site-header",
-        ".mega-menu",
-        ".megamenu",
-        ".menu-toggle",
-        ".language-switcher",
-        ".lang-switch",
-        ".search-form-wrap",
-        ".search-form",
-        // Footer chrome (also carries the .social strip)
-        "footer.footer",
-        ".site-footer",
-        ".footer-mediaroom",
-        // Secondary widgets / banners. The representative pages carry a standalone
-        // newsletter surface as <section id="newsletter-popups"> / .newsletter-popup
-        // (form.mailguide-subscribe) OUTSIDE header.header, so removing the header
-        // alone leaves it as leading default content — remove those too.
-        ".newsletter-subscribe-widget",
-        "#newsletter-popups",
-        ".newsletter-popup",
-        ".mailguide-subscribe",
-        ".mailguide-form",
-        ".side-banner",
-        ".sa-bnr",
-        // Cookie / consent (defensive)
-        "#onetrust-consent-sdk",
-        "#onetrust-banner-sdk",
-        "#onetrust-pc-sdk",
-        ".onetrust-pc-dark-filter",
-        ".ot-sdk-container",
-        "#ot-sdk-btn",
-        ".ot-sdk-show-settings",
-        '[id*="cookie" i]',
-        '[class*="cookie" i]',
-        '[class*="consent" i]',
-        // Floating affordances
-        ".scroll-top",
-        ".social-share",
-        ".media-cart-flyout",
-        ".share-bar",
-        // Homepage live-Instagram social strip (not index-driven, external links).
-        ".socials-static",
-        // Chrome resource elements. Scripts carry per-request nonces / random
-        // container-id hashes (ys_ajax_loader) that would break byte-identical
-        // re-runs (SKODA-602 idempotency) if they survived into default content.
-        "script",
-        "noscript",
-        "style",
-        'link[rel="stylesheet"]',
-        "link"
-      ]);
-    }
-    if (hookName === TransformHook.afterTransform) {
-      element.querySelectorAll('a[href*="#s_aid="], a[href*="#s_cid="]').forEach((a) => {
-        a.setAttribute("href", a.getAttribute("href").split("#s_aid=")[0].split("#s_cid=")[0]);
-      });
-      element.querySelectorAll('a[href*="%25"]').forEach((a) => {
-        const href = a.getAttribute("href") || "";
-        let decoded = href;
-        for (let i = 0; i < 8; i += 1) {
-          let next;
-          try {
-            next = decodeURIComponent(decoded);
-          } catch (e) {
-            break;
-          }
-          if (next === decoded) break;
-          decoded = next;
-        }
-        if (decoded !== href) a.setAttribute("href", encodeURI(decoded));
-      });
-      element.querySelectorAll('img[src^="https://i.vimeocdn.com/"]').forEach((img) => {
-        const src = img.getAttribute("src");
-        img.setAttribute("src", src.replace(/-d_\d+(?:x\d+)?(\.[a-z]+)?(\?.*)?$/i, "-d_1280x720.jpg"));
-      });
-    }
-  }
-
-  // tools/importer/transformers/skoda-metadata.js
-  var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
-  var FACETS = [
-    "model",
-    "bodywork",
-    "derivative",
-    "motorsport",
-    "equipment",
-    "technology",
-    "years",
-    "view",
-    "company",
-    "concept",
-    "environment",
-    "happening",
-    "history",
-    "sponsorship",
-    "vip"
-  ];
-  var TEMPLATE_SIGNALS = [
-    [/\bsingle-skoda_model\b|\bskoda_model-template\b/, "skoda_model"],
-    [/\bsingle-skoda_series\b|\bskoda_series-template\b/, "skoda_series"],
-    [/\bsingle-press_release\b|\bpress_release-template\b/, "press_release"],
-    [/\bsingle-press_kit\b|\bpress_kit-template\b/, "press_kit"],
-    [/\bsingle-post\b|\bpost-template\b/, "story"],
-    // Škodapedia archive + branded 404 aren't rail CPTs and aren't in the template
-    // enum — map them to the valid `page` value (nav/direct only, not rail-indexed).
-    [/\bpost-type-archive-skodapedia\b/, "page"],
-    [/\berror404\b/, "page"],
-    [/\bpage-template\b|\btemplate-media-room-page\b/, "page"]
-  ];
-  var SITE_SUFFIX = /\s+[-–|]\s+Škoda Storyboard\s*$/;
-  function cleanTitle(raw) {
-    const t = String(raw || "").replace(/\s+/g, " ").trim();
-    return t.replace(SITE_SUFFIX, "").trim() || t;
-  }
-  var SOFT_BREAK = /[\u00A0\u{F00A0}]/gu;
-  function spacedText(h1) {
-    const copy = h1.cloneNode(true);
-    copy.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
-    return copy.textContent.replace(SOFT_BREAK, " ").replace(/\s+/g, " ").trim();
-  }
-  function respacedTitle(title, h1) {
-    if (!title || !h1) return title;
-    const spaced = spacedText(h1);
-    const bare = (s) => s.replace(SOFT_BREAK, "").replace(/\s+/g, "");
-    const words = (s) => s.split(" ").length;
-    return bare(spaced) === bare(title) && words(spaced) > words(title) ? spaced : title;
-  }
-  function metaContent(document, selector) {
-    const el = document.querySelector(selector);
-    const val = el && el.getAttribute("content");
-    return val && val.trim() ? val.trim() : null;
-  }
-  function normalizeDate(value) {
-    if (!value) return "";
-    const m = String(value).match(/\d{4}-\d{2}-\d{2}/);
-    return m ? m[0] : "";
-  }
-  function extractDate(document) {
-    const meta = metaContent(document, 'meta[property="article:published_time"]');
-    if (normalizeDate(meta)) return normalizeDate(meta);
-    const attrEl = document.querySelector("[data-publish-date]");
-    const attr = attrEl && attrEl.getAttribute("data-publish-date");
-    if (normalizeDate(attr)) return normalizeDate(attr);
-    const scripts = document.querySelectorAll('script[type="application/ld+json"]');
-    for (const s of scripts) {
-      try {
-        const data = JSON.parse(s.textContent);
-        const graph = data["@graph"] || (Array.isArray(data) ? data : [data]);
-        for (const node of graph) {
-          if (node && node.datePublished) {
-            const d = normalizeDate(node.datePublished);
-            if (d) return d;
-          }
-        }
-      } catch (e) {
+    if (hookName !== "preprocess") return;
+    const doc = element.ownerDocument || payload && payload.document;
+    const walker = doc.createTreeWalker(
+      element,
+      4
+      /* NodeFilter.SHOW_TEXT */
+    );
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.nodeValue.includes("\xA0")) {
+        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER.repeat(run.length));
       }
     }
-    const span = document.querySelector(".entry-published, time[datetime]");
-    if (span) {
-      const d = normalizeDate(span.getAttribute("datetime") || span.textContent);
-      if (d) return d;
-    }
-    const modified = metaContent(document, 'meta[property="article:modified_time"]');
-    if (normalizeDate(modified)) return normalizeDate(modified);
-    return "";
-  }
-  function extractTemplate(document) {
-    const cls = document.body && document.body.getAttribute("class") || "";
-    for (const [re, value] of TEMPLATE_SIGNALS) {
-      if (re.test(cls)) return value;
-    }
-    return "";
-  }
-  function extractCategory(url) {
-    try {
-      const segs = new URL(url).pathname.split("/").filter(Boolean);
-      if (segs.length < 2) return "";
-      if (segs[1] === "category") return segs[2] || "";
-      if (segs[1] === "tag") return segs[segs.length - 1] || "";
-      return segs[1];
-    } catch (e) {
-    }
-    return "";
-  }
-  var CATEGORY_PARENTS = {
-    "120-years-of-skoda-motorsport": "motorsport",
-    adventures: "lifestyle",
-    "annual-reports": "media",
-    citigo: "models",
-    connectivity: "innovation-and-technology",
-    cycling: "sports",
-    design: "skoda-world",
-    elroq: "models",
-    enyaq: "models",
-    "enyaq-coupe-rs-iv": "models",
-    epiq: "models",
-    fabia: "models",
-    heritage: "skoda-world",
-    hockey: "sports",
-    "innovation-and-technology": "skoda-world",
-    kamiq: "models",
-    "kamiq-china": "models",
-    karoq: "models",
-    kodiaq: "models",
-    kushaq: "models",
-    kylaq: "models",
-    livestream: "media",
-    motorsport: "lifestyle",
-    octavia: "models",
-    "octavia-combi": "models",
-    "octavia-combi-greenline": "models",
-    "octavia-combi-rs": "models",
-    "octavia-greenline": "models",
-    "octavia-rs": "models",
-    "octavia-scout": "models",
-    other: "media",
-    "peaq-en": "models",
-    people: "lifestyle",
-    rapid: "models",
-    "rapid-spaceback": "models",
-    responsibility: "skoda-world",
-    scala: "models",
-    slavia: "models",
-    speeches: "media",
-    sports: "lifestyle",
-    superb: "models",
-    "superb-combi": "models",
-    "technical-data": "media",
-    technology: "innovation-and-technology",
-    yeti: "models",
-    "yeti-outdoor": "models"
-  };
-  var CATEGORY_TEMPLATES = /* @__PURE__ */ new Set(["story", "press_release"]);
-  function extractCategories(document) {
-    const cls = document.body && document.body.getAttribute("class") || "";
-    const id = cls.match(/\bpostid-(\d+)\b/);
-    const post = id && document.querySelector(`article.post-${id[1]}`);
-    const out = [];
-    String(post && post.getAttribute("class") || "").split(/\s+/).forEach((token) => {
-      const m = token.toLowerCase().match(/^category-([a-z0-9_-]+)$/);
-      let slug = m && m[1];
-      while (slug && !out.includes(slug)) {
-        out.push(slug);
-        slug = CATEGORY_PARENTS[slug];
-      }
-    });
-    return out;
-  }
-  function extractTagsAndFacets(document, pageUrl = "") {
-    const tags = [];
-    const byFacet = {};
-    const seen = /* @__PURE__ */ new Set();
-    const add = (taxonomy, slug) => {
-      if (!taxonomy || !slug) return;
-      const key = `${taxonomy}:${slug}`;
-      if (seen.has(key)) return;
-      seen.add(key);
-      (byFacet[taxonomy] = byFacet[taxonomy] || []).push(slug);
-      tags.push(slug);
-    };
-    const scopes = document.querySelectorAll("ol.entry-tags, ul.entry-tags, .entry-tags, .tag-list");
-    const roots = scopes.length ? scopes : [document];
-    for (const root of roots) {
-      root.querySelectorAll("a[href]").forEach((a) => {
-        const href = a.getAttribute("href") || "";
-        let m = href.match(/\/tag\/([a-z0-9-]+)\/([a-z0-9-]+)\/?/i);
-        if (m) {
-          add(m[1].toLowerCase(), m[2].toLowerCase());
-          return;
-        }
-        m = href.match(/filter(?:\[|%5B)([a-z0-9-]+)(?:\]|%5D)(?:\[\]|%5B%5D)=([^&"]+)/i);
-        if (m) {
-          let slug;
-          try {
-            slug = decodeURIComponent(m[2]);
-          } catch (e) {
-            slug = m[2];
-          }
-          add(m[1].toLowerCase(), slug.toLowerCase());
-        }
-      });
-    }
-    if (tags.length === 0) {
-      const cls = document.body && document.body.getAttribute("class") || "";
-      const tax = cls.match(/\btax-([a-z0-9_-]+)\b/i);
-      const term = cls.match(/\bterm-([a-z0-9-]+)\b/i);
-      if (tax && term) {
-        const taxonomy = tax[1].toLowerCase().replace(/_/g, "-");
-        const slug = term[1].toLowerCase();
-        if (FACETS.includes(taxonomy) && slug && !/^\d+$/.test(slug)) add(taxonomy, slug);
-      }
-    }
-    if (tags.length === 0) {
-      const cls = document.body && document.body.getAttribute("class") || "";
-      const canonical = document.querySelector('link[rel="canonical"]');
-      const href = pageUrl || canonical && canonical.getAttribute("href") || "";
-      if (/\bsingle-skoda_series\b|\bskoda_series-template\b/.test(cls)) {
-        const m = href.match(/\/series\/([a-z0-9-]+)\/?/i);
-        if (m) add("series", m[1].toLowerCase());
-      } else if (/\bsingle-skoda_model\b|\bskoda_model-template\b/.test(cls)) {
-        const m = href.match(/\/skoda-model\/([a-z0-9-]+)\/?/i);
-        if (m) add("model", m[1].toLowerCase());
-      }
-    }
-    if (tags.length === 0) {
-      const cls = document.body && document.body.getAttribute("class") || "";
-      const id = cls.match(/\bpostid-(\d+)\b/);
-      const post = id && document.querySelector(`article[data-post-id="${id[1]}"]`);
-      String(post && post.getAttribute("class") || "").split(/\s+/).forEach((token) => {
-        const m = token.toLowerCase().match(/^([a-z]+)-([a-z0-9-]+)$/);
-        if (m && FACETS.includes(m[1]) && !/^\d+$/.test(m[2])) add(m[1], m[2]);
-      });
-    }
-    return { tags, byFacet };
-  }
-  function splitList(value) {
-    return value ? String(value).split(",").map((s) => s.trim()).filter(Boolean) : [];
-  }
-  function hasMetadataBlock(element) {
-    const tables = element.querySelectorAll("table");
-    for (const t of tables) {
-      const firstCell = t.querySelector("tr th, tr td");
-      if (firstCell && firstCell.textContent.trim().toLowerCase() === "metadata") return true;
-    }
-    return false;
-  }
-  function transform2(hookName, element, payload) {
-    if (hookName !== TransformHook2.afterTransform) return;
-    if (hasMetadataBlock(element)) return;
-    const { document, url, params } = payload;
-    const canonical = document.querySelector('link[rel="canonical"]');
-    const pageUrl = params && params.originalURL || url || canonical && canonical.href || "";
-    const overrides = payload.template && payload.template.metadata || {};
-    const h1 = document.querySelector("h1");
-    const title = respacedTitle(cleanTitle(overrides.title || metaContent(document, 'meta[property="og:title"]') || (document.querySelector("title") ? document.querySelector("title").textContent.trim() : "") || (h1 ? h1.textContent.trim() : "")), h1);
-    const description = overrides.description || metaContent(document, 'meta[property="og:description"]') || metaContent(document, 'meta[name="description"]') || "";
-    const imageSrc = overrides.image || metaContent(document, 'meta[property="og:image"]') || "";
-    const publisheddate = overrides.publisheddate || extractDate(document);
-    const template = overrides.template || extractTemplate(document) || overrides.templateDefault || "";
-    const category = overrides.category || extractCategory(pageUrl);
-    const { tags: derivedTags, byFacet } = extractTagsAndFacets(document, pageUrl);
-    const meta = {};
-    if (title) meta.Title = title;
-    if (description) meta.Description = description;
-    if (imageSrc) {
-      const img = document.createElement("img");
-      img.src = imageSrc;
-      meta.Image = img;
-    }
-    if (publisheddate) meta.publisheddate = publisheddate;
-    if (template) meta.template = template;
-    if (overrides.theme) meta.theme = overrides.theme;
-    if (overrides.presskit) meta.presskit = overrides.presskit;
-    if (category) meta.category = category;
-    const categories = CATEGORY_TEMPLATES.has(template) ? extractCategories(document) : [];
-    if (categories.length) meta.categories = categories.join(", ");
-    const allTags = [.../* @__PURE__ */ new Set([...derivedTags, ...splitList(overrides.tags)])];
-    if (allTags.length) meta.tags = allTags.join(", ");
-    FACETS.forEach((f) => {
-      const merged = [.../* @__PURE__ */ new Set([...byFacet[f] || [], ...splitList(overrides[f])])];
-      if (merged.length) meta[f] = merged.join(", ");
-    });
-    const block = WebImporter.Blocks.getMetadataBlock(document, meta);
-    element.append(block);
   }
 
   // tools/importer/transformers/skoda-links.js
-  var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
   var DEMO_PATHS = [
@@ -841,8 +488,8 @@ var CustomImportScript = (() => {
     const head = table.rows[0] && table.rows[0].cells[0];
     return !!head && /^story rail\b/i.test(head.textContent.trim());
   }
-  function transform3(hookName, element, payload) {
-    if (hookName !== TransformHook3.afterTransform) return;
+  function transform2(hookName, element, payload) {
+    if (hookName !== TransformHook.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
       let href = a.getAttribute("href").replace(/(?:\s|%20)+$/i, "");
       if (/#s_[ac]id=/.test(href)) href = href.split("#s_aid=")[0].split("#s_cid=")[0];
@@ -853,93 +500,99 @@ var CustomImportScript = (() => {
     });
   }
 
-  // tools/importer/transformers/skoda-nbsp.js
-  var NBSP_PLACEHOLDER = "\u{F00A0}";
-  var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
-  function transform4(hookName, element, payload) {
-    if (hookName !== "preprocess") return;
-    const doc = element.ownerDocument || payload && payload.document;
-    const walker = doc.createTreeWalker(
-      element,
-      4
-      /* NodeFilter.SHOW_TEXT */
-    );
-    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-      if (node.nodeValue.includes("\xA0")) {
-        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER.repeat(run.length));
-      }
-    }
-  }
-
   // tools/importer/import-404.js
-  var parsers = {};
   var PAGE_TEMPLATE = {
     name: "error-404",
-    description: "\u0160koda branded 404 (error404). Keeps the .error-message dead-end copy + homepage link as default content; chrome dropped. Metadata template=page. Site-root 404.html shell. Content-driven detection only.",
-    urls: ["https://www.skoda-storyboard.com/en/this-page-does-not-exist-zzz/"],
-    metadata: { template: "page" },
+    description: "\u0160koda branded 404 (error404). Each source template-404 variant page \u2192 the fragment /{locale}/fragments/404/<slug>: desktop + mobile photo, the .error-message copy (h1, homepage link), Section Metadata Style not-found (+ not-found-white). The site-root 404.html loads one at random (templates/error-404). Content-driven detection only.",
+    urls: [
+      "https://www.skoda-storyboard.com/en/youve-reached-a-dead-end/",
+      "https://www.skoda-storyboard.com/en/welcome-to-our-remote-car-park/"
+    ],
     blocks: [],
     sections: []
   };
-  var transformers = [
-    transform,
-    transform2,
-    transform3
-  ];
-  function executeTransformers(hookName, element, payload) {
-    const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE });
-    transformers.forEach((transformerFn) => {
-      try {
-        transformerFn.call(null, hookName, element, enhancedPayload);
-      } catch (e) {
-        console.error(`Transformer failed at ${hookName}:`, e);
+  var BG_ATTR = "data-not-found-photo";
+  var WHITE = /color\s*:\s*(?:#fff(?:fff)?\b|white\b|rgb\(\s*255\s*,\s*255\s*,\s*255\s*\))/i;
+  function markPhotos(document) {
+    const css = [...document.querySelectorAll("style")].map((s) => s.textContent).join("\n");
+    document.querySelectorAll(".message-desktop, .message-mobile").forEach((row) => {
+      var _a;
+      const id = (_a = row.parentElement) == null ? void 0 : _a.id;
+      const rule = id && css.split("}").find((r) => r.includes(`#${id}`) && /background-image/.test(r));
+      const url = rule && (rule.match(/background-image\s*:\s*url\(\s*["']?([^"')]+)/) || [])[1];
+      if (url) row.setAttribute(BG_ATTR, url.trim());
+    });
+  }
+  function localeOf(url) {
+    const first = new URL(url).pathname.split("/")[1] || "";
+    return /^[a-z]{2}$/.test(first) ? first : "en";
+  }
+  function slugOf(url) {
+    return new URL(url).pathname.replace(/\/$/, "").split("/").pop();
+  }
+  function fragmentPath(url) {
+    return `/${localeOf(url)}/fragments/404/${slugOf(url)}`;
+  }
+  function photo(row, document) {
+    const src = row == null ? void 0 : row.getAttribute(BG_ATTR);
+    if (!src) return null;
+    const p = document.createElement("p");
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = "";
+    p.append(img);
+    return p;
+  }
+  function message(source, document) {
+    const out = [];
+    [...source.children].forEach((child) => {
+      child.querySelectorAll(".term-explain").forEach((term) => term.replaceWith(...term.childNodes));
+      const text = (child.textContent || "").trim();
+      if (!text) return;
+      if (/^H[1-6]$/.test(child.tagName)) {
+        const h1 = document.createElement("h1");
+        h1.append(...child.childNodes);
+        out.push(h1);
+      } else if (child.tagName === "P") {
+        out.push(child);
+      } else {
+        const p = document.createElement("p");
+        p.textContent = text;
+        out.push(p);
       }
     });
-  }
-  function findBlocksOnPage(document, template) {
-    const pageBlocks = [];
-    template.blocks.forEach((blockDef) => {
-      blockDef.instances.forEach((selector) => {
-        const elements = document.querySelectorAll(selector);
-        elements.forEach((element) => {
-          pageBlocks.push({ name: blockDef.name, selector, element });
-        });
-      });
-    });
-    console.log(`Found ${pageBlocks.length} block instances on page`);
-    return pageBlocks;
+    return out;
   }
   var import_404_default = {
-    // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
-    preprocess: ({ document }) => transform4("preprocess", document.body, { document }),
+    preprocess: ({ document }) => {
+      transform("preprocess", document.body, { document });
+      markPhotos(document);
+    },
     transform: (payload) => {
+      var _a, _b;
       const { document, url, params } = payload;
-      const main = document.body;
-      executeTransformers("beforeTransform", main, payload);
-      const pageBlocks = findBlocksOnPage(document, PAGE_TEMPLATE);
-      pageBlocks.forEach((block) => {
-        if (!block.element.parentNode) return;
-        const parser = parsers[block.name];
-        if (parser) {
-          try {
-            parser(block.element, { document, url, params });
-          } catch (e) {
-            console.error(`Failed to parse ${block.name} (${block.selector}):`, e);
-          }
-        }
-      });
-      executeTransformers("afterTransform", main, payload);
-      WebImporter.rules.transformBackgroundImages(main, document);
+      const desktop = document.querySelector(".message-desktop");
+      const mobile = document.querySelector(".message-mobile");
+      const source = (_a = desktop || mobile) == null ? void 0 : _a.querySelector(".error-message");
+      if (!source) throw new Error(`no .error-message on ${params.originalURL}`);
+      const white = WHITE.test(source.getAttribute("style") || "");
+      const main = document.createElement("div");
+      [photo(desktop, document), photo(mobile, document)].filter(Boolean).forEach((p) => main.append(p));
+      main.append(...message(source, document));
+      main.append(WebImporter.DOMUtils.createTable([
+        ["Section Metadata"],
+        ["Style", white ? "not-found, not-found-white" : "not-found"]
+      ], document));
+      transform2("afterTransform", main, __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE }));
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
-      const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
-      const path = WebImporter.FileUtils.sanitizePath(rawPath === "" ? "/index" : rawPath);
       return [{
         element: main,
-        path,
+        path: fragmentPath(params.originalURL),
         report: {
-          title: document.title,
+          title: (((_b = source.querySelector("h1, h2, h3")) == null ? void 0 : _b.textContent) || "").trim(),
           template: PAGE_TEMPLATE.name,
-          blocks: pageBlocks.map((b) => b.name)
+          blocks: [],
+          white
         }
       }];
     }

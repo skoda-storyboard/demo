@@ -90,3 +90,32 @@ levels, and two of them use different identity types:
 Client Admin Console and IdP admins; **D15** (RACI, who owns which group); **Q-15** (external authors). Blocks
 SKODA-809, SKODA-812 and SKODA-811 (group gate, preview protection). Needed before local authors start on
 SKODA-1004b–e. Shares the IMS org with SKODA-521.
+
+## Amendment (2026-10-21, M2 gap review)
+Source: [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.2 and §7.6.
+- **Estimate (amended):** 3.5 SP team time · AI-assisted 1.5–2d / manual 2.5–3.5d, excluding client lead time
+  *(planning estimate, not a quote)*. +0.5 SP for MFA (G-G-06). The AI-audio producer row is part of G-T6-05's
+  0.5 SP, sized in SKODA-850a/850d. The publish model and the shared root-doc rows are sized in SKODA-850d.
+
+**Added scope:**
+- **MFA (G-G-06, Medium).** WordPress authors sign in with a second factor today (`wp-2fa-methods/v1`,
+  `wp-2fa-passkeys/v1` with passkey registration); this ticket had no MFA rule. With federation, MFA follows the
+  Škoda IdP policy, but Q-15's alternative (separate Adobe accounts added by email) depends on Adobe ID settings and
+  could drop it for agency and local-office authors. State the MFA rule for every sign-in path (IdP conditional
+  access or IMS org policy) and check it in T5. Extend Q-15: must agency and local-office authors use MFA, and does
+  the guest-account route in the Škoda IdP enforce it?
+- **AI-audio producer (G-T6-05, Medium).** The producer who adds the Buzzsprout episode to each release after
+  publish has no role. Add a group row in T1 and T2: edit + publish on the EN and CS release paths, or edit +
+  Request Publish, as SKODA-850d decides.
+- **Publish model and shared root docs (G-T1-04 High, G-T1-05 Medium; decided in SKODA-850d).** The Edge Delivery
+  `publish` role has no path field, so T2 applies the 850d / D15 choice (per-path Request Publish approvers, or
+  site-wide publish with SKODA-812 audit). T1 adds per-document rows for `/redirects`, `/metadata`, `/nav`,
+  `/footer` and `/media-room/*`.
+
+**Added acceptance criteria:**
+- [ ] Every author sign-in path (Škoda IdP, guest accounts, separate Adobe accounts if Q-15 allows them) enforces
+      MFA; a test sign-in without a second factor fails (G-G-06).
+- [ ] The producer's test account can publish (or request publish) an EN and a CS release and has no write outside
+      the release paths (G-T6-05).
+- [ ] T1 and T2 carry the rows and the publish model SKODA-850d records (G-T1-04, G-T1-05).
+- **Dependencies (added):** Q-15 (MFA wording), SKODA-850a (Request Publish), 850d (publish model, producer row).

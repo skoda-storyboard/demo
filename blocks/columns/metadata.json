@@ -18,6 +18,31 @@
       "description": "Unequal story row: the first cell takes 62% (split-NN = NN%); portrait-NNN is the display width in px of a portrait image in the other cell. Values are read from the class, so use the exact form split-NN / portrait-NNN."
     },
     {
+      "class": "centered portrait-300 captioned",
+      "label": "centered, portrait-300, captioned",
+      "description": "Equal story row of centred image cards (rider profiles): each image cell centred, its images at their own size. Optional: portrait-NNN, the display width in px of each card's first image; captioned, the paragraphs after that image are its caption (directly under it, light)."
+    },
+    {
+      "class": "centered text-center text-small",
+      "label": "centered, text-center, text-small",
+      "description": "Add to a centred story row: text-center centres the caption text, text-small sets it in 10pt."
+    },
+    {
+      "class": "offset-48-24",
+      "label": "offset-48-24",
+      "description": "Story row whose cells start lower, from 720px wide: one number per cell, in px, in cell order (offset-48-24: the first cell 48px down, the second 24px). Use 0 for a cell that stays at the top."
+    },
+    {
+      "class": "split-62 lead-44-0",
+      "label": "split-62, lead-44-0",
+      "description": "Story row whose cell text starts lower at every width: one number per cell, in px (lead-44-0: the first cell one 44px blank line down). Unlike offset, it applies on phones too."
+    },
+    {
+      "class": "centered pad-m-15-15-15-15",
+      "label": "centered, pad-m-15-15-15-15",
+      "description": "Story row with its own padding inside the row, in px (top-right-bottom-left): pad-… from 781px wide, pad-m-… up to 780px (the Miss Peaches profile rows: 15px round on phones)."
+    },
+    {
       "class": "banners",
       "label": "banners",
       "description": "Press kit: a row of linked banner images at their authored size (PDF download / share buttons)."

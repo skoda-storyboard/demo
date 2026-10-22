@@ -104,6 +104,28 @@ test('MP4 poster has a decorative play badge but the round control downloads the
   assert.equal(block.querySelector('.downloads-download').getAttribute('aria-label'), 'Download Launch video (MP4)');
 });
 
+test('a Media Box PDF row shows the PDF file tile even when it carries an image', async () => {
+  const block = setup();
+  addRow(block, { src: 'https://example.com/media_1.png', title: 'Logo', links: [['Original', '/logo.png'], ['1920px', '/logo-1920.png']] });
+  addRow(block, { src: 'https://example.com/media_1.png', title: 'Release', links: [['PDF', 'https://example.com/release.pdf']] });
+  await decorate(block);
+  const [image, pdf] = block.querySelectorAll('.downloads-item');
+  assert.ok(image.querySelector('.downloads-thumb picture'), 'the image row keeps its picture');
+  const file = pdf.querySelector('.downloads-file');
+  assert.equal(file?.dataset.fileType, 'pdf', 'the PDF row is a PDF file tile');
+  assert.equal(file.getAttribute('href'), 'https://example.com/release.pdf');
+  assert.equal(pdf.querySelector('.downloads-thumb, picture, img'), null, 'no image on the PDF tile');
+  assert.equal(pdf.querySelector('.downloads-title').textContent, 'Release');
+});
+
+test('outside a Media Box a PDF row with an image keeps its image', async () => {
+  const block = setup(false);
+  addRow(block, { src: 'https://example.com/media_1.png', title: 'Release', links: [['PDF', 'https://example.com/release.pdf']] });
+  await decorate(block);
+  assert.ok(block.querySelector('.downloads-thumb picture'));
+  assert.equal(block.querySelector('.downloads-file'), null);
+});
+
 test('untitled PDF shows a single file-type label and an accessible download', async () => {
   const block = setup();
   addRow(block, { links: [['PDF', '/release.pdf']] });
@@ -176,6 +198,8 @@ test('the toggle stays a labelled button: Show less once open, focus kept in vie
   assert.equal(scrolled, 0, 'expanding leaves the scroll position alone');
   toggle.click();
   assert.equal(toggle.textContent, 'Show more');
+  // once the slide has arrived (none here: no animation API)
+  await new Promise((resolve) => { setTimeout(resolve, 0); });
   assert.equal(scrolled, 1, 'collapsing keeps the button in view');
   assert.equal(document.activeElement, toggle);
 });
@@ -1039,4 +1063,50 @@ test('lightboxItem: the original drives download, link and cart; a clip shows it
   assert.equal(clip.download, 'https://dam.example/c.mp4');
   assert.equal(clip.clip, true, 'its actions take the source player names');
   assert.equal(clip.caption.querySelector('a'), null, 'no related article without a page title');
+});
+
+// --- "Show more" / "Show less" slide (#516 PO: smooth as the source's togglebox) ---------------
+test('slideList: the list slides from its old height, the pill from its old place, 400ms swing', async () => {
+  const { slideList } = await import('./downloads.js');
+  const list = document.createElement('ul');
+  const toggle = document.createElement('button');
+  toggle.style.marginBlockStart = '16px';
+  document.body.append(list, toggle);
+  // the 4x4 grid opening: list 315 → 487px; the pill was at 319 (over the clipped list's bottom),
+  // now at 575 under the open list
+  list.getBoundingClientRect = () => ({ height: 487, top: 72 });
+  toggle.getBoundingClientRect = () => ({ top: 575 });
+  let call = null; let pill = null;
+  list.animate = (frames, opts) => { call = { frames, opts }; return { finished: Promise.resolve() }; };
+  toggle.animate = (frames, opts) => { pill = { frames, opts }; };
+  slideList(list, toggle, { listHeight: 315, toggleTop: 319 });
+  assert.deepEqual(call.frames, [
+    { height: '315px', maxHeight: '315px', overflow: 'hidden' },
+    { height: '487px', maxHeight: '487px', overflow: 'hidden' },
+  ]);
+  assert.equal(call.opts.duration, 400);
+  assert.equal(call.opts.easing, 'cubic-bezier(0.37, 0, 0.63, 1)');
+  // first frame: the pill stays at 319 (575 - 172 = 403 with the list at 315, so 84px up)
+  assert.deepEqual(pill.frames, [{ marginBlockStart: '-68px' }, { marginBlockStart: '16px' }]);
+  assert.equal(pill.opts, call.opts);
+  call = null; pill = null;
+  slideList(list, toggle, { listHeight: 487, toggleTop: 575 });
+  assert.equal(call, null, 'no change: no animation');
+  assert.equal(pill, null);
+  const saved = window.matchMedia;
+  window.matchMedia = (q) => ({ matches: q.includes('reduce'), addEventListener() {} });
+  slideList(list, toggle, { listHeight: 100, toggleTop: 0 });
+  assert.equal(call, null, 'reduced motion: none');
+  window.matchMedia = saved;
+  list.remove(); toggle.remove();
+});
+
+test('a 3-wide story gallery keeps the group\'s size pills; only the per-photo discs go (#380 review)', async () => {
+  const rules = await cssRules();
+  const narrow = '.downloads.gallery.story.downloads-narrow';
+  const hidden = rules.filter((r) => r.body.includes('display: none'))
+    .flatMap((r) => r.selectors).filter((s) => s.includes(narrow));
+  assert.deepEqual(hidden, [`${narrow} .downloads-actions`]);
+  // no narrow-only top padding: the group sits 4px in, like the 4-wide one, and the grid 72px in
+  assert.equal(ruleFor(rules, narrow), undefined);
 });

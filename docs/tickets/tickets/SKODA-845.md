@@ -5,7 +5,8 @@
 - **Estimate:** 1–2 SP *(planning estimate, not a quote)*
 - **Status (2026-10-22):** 🟡 Built on branch `skoda-845-newsletter`, stacked on `skoda-813-page-shell` (#409: the
   page band). The 6 plant newsletters are published (live); `/en/newsletter` is on preview, live after merge.
-  See "Implementation (2026-10-22)".
+  See "Implementation (2026-10-22)". The amendment's `/cs/newsletter/` (2026-10-21) is not built yet: it needs the
+  CS index (SKODA-1001) and the CS page list (1004a).
 
 ## Why
 `/en/newsletter/` is linked from the Media Room nav **Company** menu. It is the only page on
@@ -26,6 +27,29 @@ The 24 Sep import plan routed it to page base, which would lose the carousels.
 
 ## Dependencies
 224 ✅, 401 ✅, 309 ✅. Find out how the source groups the items (tag vs title) before building.
+
+## Amendment (2026-10-21, M2 gap review)
+Source: [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-T6-07 (Low, not re-verified).
+- **Estimate:** 2 SP · AI-assisted 1d / manual 2d for the whole ticket, was 1–2 SP; the CS page adds ≈ 0.5 SP
+  (G-T6-07) *(planning estimate, not a quote)*.
+
+**Added scope:**
+- `/en/newsletter/` is not the only page on the template: `/cs/newsletter/` has used it since 2018. It links 85 CS
+  plant-newsletter releases, and new issues come out quarterly (the last Kvasiny issue on 25 Sep 2026). Build it the
+  same way, with the Story Rail `press` rails fed from the CS index (G-T6-07).
+- Add `/cs/newsletter/` to the SKODA-1004 / 1004a CS page list as a page to rebuild, not import (G-T6-07).
+- The source carousels update themselves on publish; both pages 404 on the demo today (G-T6-07).
+- Check the grouping (tag vs title) on the CS page as well as the EN page before building (G-T6-07).
+- Not in scope here: the newsletter manage pages, the motorsport cross-site lists and the consent renewal flow that
+  the review's §7.2 lists under "904 / 845". They concern the subscription pages, so they stay with SKODA-904
+  (G-B-06, G-KJ-05, G-KT-04).
+
+**Added acceptance criteria:**
+- [ ] `/cs/newsletter/` shows the same rails, in the same order, with the same newest items as the source at QA time,
+      and each card links to a live CS press release or to the source (G-T6-07).
+- [ ] A new CS plant newsletter appears on `/cs/newsletter/` without editing the page (G-T6-07).
+
+**Added dependencies:** SKODA-1001 (CS index), 1004a (CS page list), 103a (no trailing slash) (G-T6-07).
 
 ## Implementation (2026-10-22)
 **How the source groups the items** (the ticket's open question): by WordPress taxonomy, not title. Each teaser

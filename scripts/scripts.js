@@ -20,6 +20,8 @@ import { decorateLinks, installLinkPolicy } from './links.js';
 import { spanSidebar } from './split-body.js';
 import { addNewsletterCard } from './story-newsletter.js';
 import { applyHighlightGeometry, applyHighlightDataset } from './highlight-geometry.js';
+import { readDropCapRow, decorateDropCap } from './drop-cap.js';
+import { readBoxRow, decorateBox } from './section-box.js';
 
 /**
  * Page templates with their own layout code: `templates/<name>/<name>.{js,css}`, selected by
@@ -27,7 +29,7 @@ import { applyHighlightGeometry, applyHighlightDataset } from './highlight-geome
  * (a `template: page` page that shares a layout, e.g. the series directory → `skoda-series`).
  * Only listed templates load, so an unknown value never requests a missing file.
  */
-const TEMPLATES = ['press-release', 'skoda-series', 'press-kit', 'skoda-model'];
+const TEMPLATES = ['press-release', 'skoda-series', 'press-kit', 'skoda-model', 'error-404'];
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
   const innerTT = window.trustedTypes.createPolicy('tt-inner', {
@@ -229,6 +231,8 @@ function applySectionStyles(main) {
         val.split(',').forEach((c) => section.classList.add(toClassName(c.trim())));
       }
       applyHighlightGeometry(section, key, val);
+      readDropCapRow(section, key, val);
+      readBoxRow(section, key, val);
     });
     // Remove the whole wrapper so decorateBlocks (div.section > div > div) never sees
     // it as an unknown block (which would 404 on its missing block JS/CSS).
@@ -280,6 +284,8 @@ function decorateStorySections(main) {
   // delivered pages carry a panel's geometry rows as the section's data attributes
   main.querySelectorAll(':scope > div').forEach(applyHighlightDataset);
   applySectionStyles(main);
+  main.querySelectorAll(':scope > .section.drop-cap').forEach(decorateDropCap);
+  main.querySelectorAll(':scope > .section.text-box').forEach(decorateBox);
   spanSidebar(main);
   // the shared sidebar newsletter card, unless the story authors its own (SKODA-840)
   addNewsletterCard(main);
