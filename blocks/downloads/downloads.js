@@ -28,8 +28,9 @@
  *   - date cell (optional, #275) = a text cell that is a source date ("23. 3. 2026")
  *   - any remaining text cell = the tile title
  *
- * In a Media Box the title is the source's h3 with its date above it, and a file tile (PDF / MP4
- * without a poster) opens its file: a PDF shows the source's PDF glyph, a clip its first frame.
+ * In a Media Box the title is the source's h3 with its date above it, and a file tile (a PDF, or
+ * an MP4 without a poster) opens its file: a PDF shows the source's PDF glyph (even when its row
+ * carries an image), a clip its first frame.
  *
  * i18n: user-facing control text lives in LABELS (single translation point).
  * Decoration is defensive: authors omit/add cells, so every lookup is guarded.
@@ -607,7 +608,10 @@ function buildTile(asset, { mediaBox = false } = {}) {
   const figure = document.createElement('figure');
   figure.className = 'downloads-figure';
 
-  if (asset.src) {
+  // a Media Box PDF shows the source's PDF glyph, even when the row carries an image (the
+  // source lists a PDF as a file tile, never as its poster)
+  const pdf = mediaBox && asset.sizes.length === 1 && /\.pdf(?:[?#]|$)/i.test(asset.sizes[0].href);
+  if (asset.src && !pdf) {
     // Keep the existing image link and size-menu behavior for image and video rows.
     const thumb = document.createElement('a');
     thumb.className = 'downloads-thumb';
