@@ -84,6 +84,12 @@
   color: var(--timeline-text-color);
 }
 
+/* leading the reading column (nothing before it): the source panel starts at the column's
+   top, 10px in, with no prose gap above */
+.timeline[data-position="leading"] {
+  margin-block-start: 0;
+}
+
 .timeline.black {
   --timeline-accent: var(--skoda-black);
 }

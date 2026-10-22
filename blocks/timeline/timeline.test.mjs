@@ -149,3 +149,16 @@ test('every timeline link opens in a new tab, as the source widget', { skip: !JS
   assert.equal(links[0].getAttribute('rel'), 'noopener', 'a non-source-host link');
   assert.deepEqual(links[1].getAttribute('rel').split(' ').sort(), ['noopener', 'noreferrer'], 'existing rel kept');
 });
+
+test('a timeline leading its section drops the prose gap above; one after content keeps it', { skip: !JSDOM }, () => {
+  const dom = new JSDOM(`<main>
+    <div class="section"><div class="timeline-wrapper"><div class="timeline"><div><div>1905</div><div><p>A</p></div><div></div><div><p>Text.</p></div></div></div></div></div>
+    <div class="section"><div class="default-content-wrapper"><p>Prose.</p></div><div class="timeline-wrapper"><div class="timeline"><div><div>1905</div><div><p>A</p></div><div></div><div><p>Text.</p></div></div></div></div></div>
+  </main>`);
+  globalThis.document = dom.window.document;
+  const [leading, following] = dom.window.document.querySelectorAll('.timeline');
+  decorate(leading);
+  decorate(following);
+  assert.equal(leading.dataset.position, 'leading');
+  assert.equal(following.dataset.position, undefined);
+});

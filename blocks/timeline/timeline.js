@@ -141,4 +141,8 @@ export default function decorate(block) {
     a.setAttribute('rel', [...rel].join(' '));
   });
   block.replaceChildren(list);
+  // the source panel sits 40px below the prose before it, but at the top of the reading
+  // column when it leads it (wheels, gear stick): no prose gap then (PR #373 review)
+  const host = block.closest('.timeline-wrapper') || block;
+  if (!host.previousElementSibling) block.dataset.position = 'leading';
 }
