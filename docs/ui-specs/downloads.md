@@ -6,9 +6,16 @@ Foundations: [`_FOUNDATIONS.md`](_FOUNDATIONS.md). Method: [`_CAPTURE-PROTOCOL.m
 > **#274 update (2026-10-12):** every press-release Media Box card shows its source date: 11px
 > `#c4c6c7`, e.g. Zellmer 30. 8. 2022 / 21. 9. 2026. The press-release importer now emits the
 > optional date cell (`parsers/downloads.js` `dates`). The story Media Box rows are unchanged.
-> On press releases the source PDF tile is the bare 30% black holder: `.file-caption.pdf` is
-> `display:none` on releases and press kits. So the press-release template hides the 48px PDF
-> glyph there. Story and press-kit Media Boxes keep the block's glyph.
+> On press releases the source PDF tile is the 30% black holder; its `.file-caption.pdf` label is
+> `display:none` on releases and press kits.
+>
+> **PR #391 (2026-10-21), superseding the #274 note:** the source's 48px PDF glyph
+> (`a.file-type[href$=".pdf"]::before`, U+E023 of `skoda-bnr-icons`, 48px `rgb(196,198,199)`) shows
+> only until analytics consent. After "Accept All" its analytics appends `#s_aid=…` to the PDF
+> href, the `$=".pdf"` selector stops matching, and the tile settles as the bare holder (Zellmer,
+> Superb, at 375 / 768 / 992 / 1080). EDS shows the block's 48px glyph on every Media Box,
+> releases included: a **deviation from origin accepted by the product owner on 2026-10-21**. A
+> Media Box row whose only download is a PDF is a PDF file tile even when its row carries an image.
 
 > **SKODA-510 update (2026-09-27, measured without screenshots):** Press-release Media Boxes include
 > image rows, MP4 poster rows and a PDF row with an empty image cell. The source Peaq box has five tiles
