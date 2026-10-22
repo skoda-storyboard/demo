@@ -4,7 +4,7 @@
 - **Type:** content / config
 - **Phase:** D · **Milestone:** M2. CS for go-live; the others with their 1004 run.
 - **Estimate:** 2 SP · AI-assisted 1d / manual 2–3d *(planning estimate, not a quote)*
-- **GitHub issue:** [#401](https://github.com/skoda-storyboard/demo/issues/401) (created 2026-10-20) (sub-issue of #83)
+- **GitHub issue:** [#401](https://github.com/skoda-storyboard/demo/issues/401) (created 2026-10-20) (sub-issue of the E10 epic #96; moved from #83 on 2026-10-22)
 - **Status (2026-10-20):** 🔵 TODO (M2), no owner. Source:
   [locale review](../../reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md) L-X-05, L-CS-06, L-DE-07, L-SK-06/07,
   L-SR-05/06, L-SL-03/04.

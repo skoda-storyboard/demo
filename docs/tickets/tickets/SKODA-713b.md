@@ -31,6 +31,8 @@
 - **T3 Title suffix.** Apply the parent's C4 decision; SKODA-610 keeps the suffix off index titles only.
 - **T4 Tests.** Unit tests for the helper per template; a Rich Results run per template and locale.
 
+- **Meta descriptions on the media listings** ([#412](https://github.com/skoda-storyboard/demo/issues/412)): the Images and Videos listings have no meta description, which is a baseline SEO defect. Added 2026-10-22; #412 is a sub-issue of this ticket.
+
 ## Not in scope
 - hreflang and `og:locale:alternate` pairs: 1001, 1004, 1005. Document metadata (PDF Title, Lang, Author): the
   Master template checklist in SKODA-103b C4.

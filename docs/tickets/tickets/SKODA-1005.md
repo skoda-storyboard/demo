@@ -4,7 +4,7 @@
 - **Type:** feature / authoring workflow
 - **Phase:** D · **Milestone:** M2 (go-live, 2027-01-02)
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3–4d *(planning estimate, not a quote)*. The approach depends on **Q-10**.
-- **GitHub issue:** [#400](https://github.com/skoda-storyboard/demo/issues/400) (created 2026-10-20) (sub-issue of #83)
+- **GitHub issue:** [#400](https://github.com/skoda-storyboard/demo/issues/400) (created 2026-10-20) (sub-issue of the E10 epic #96; moved from #83 on 2026-10-22)
 - **Status (2026-10-20):** 🔵 TODO (M2), no owner. Source:
   [locale review](../../reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md) L-X-02, L-X-07, L-CS-03, L-CS-09.
 

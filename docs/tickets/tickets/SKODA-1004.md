@@ -5,7 +5,7 @@
 - **Phase:** D · **Milestone:** M2 (go-live, 2027-01-02). CS is a go-live gate; DE/SK/SR/SL timing per **Q-7**.
 - **Estimate:** 3 SP for the shared tooling · AI-assisted 1–2d / manual 3–4d *(planning estimate, not a quote)*.
   Per-locale runs are sub-tickets: 1004a CS 5 SP, 1004b DE 3 SP, 1004c SK 3 SP, 1004d SR 3 SP, 1004e SL 1 SP.
-- **GitHub issue:** [#394](https://github.com/skoda-storyboard/demo/issues/394) (created 2026-10-20) (sub-issue of #83)
+- **GitHub issue:** [#394](https://github.com/skoda-storyboard/demo/issues/394) (created 2026-10-20) (sub-issue of the E10 epic #96; moved from #83 on 2026-10-22)
 - **Status (2026-10-20):** 🔵 TODO (M2), no owner. Source:
   [locale review](../../reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md) L-X-03, L-CS-01, L-SK-01, L-SR-01.
 

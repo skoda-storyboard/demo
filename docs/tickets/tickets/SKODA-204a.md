@@ -85,3 +85,36 @@
 
 ## Dependencies
 204 (#18, merged in #109). 704 wires the stub; 804 (M2) wires OneTrust.
+
+## Amendment (2026-10-22, M2 gap review §7.2)
+Source: [M2 integration gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.2, findings
+G-G-09 and G-D-05 (both Medium). This ticket is done on M1 scope (#152 closed 2026-09-29); the amendment is new
+M2 work.
+
+**Added scope**
+- Disclosure outside the iframe (G-G-09). On the source the release page has no AI wording; "This article was read
+  by AI-generated voice." appears only in the Buzzsprout episode description inside the player. On EDS the
+  Buzzsprout embed is consent-gated (`scripts/embed-consent.js`), so a visitor without consent sees the
+  placeholder and no disclosure at all.
+- The EU AI Act transparency duties (Art. 50) apply from 2 August 2026. Whether and where AI-voiced readings must
+  be labelled is a legal question for Škoda before go-live (G-G-09). Client question: "Must AI-voiced readings
+  carry a visible label on the page, also before consent?"
+- If the answer is yes: the Buzzsprout placeholder shows an authored "read by an AI-generated voice" line, kept
+  outside the iframe so it is also visible after consent (G-G-09). It reuses the placeholder-sheet wording
+  mechanism, so the line can be set per locale; the box is on EN and CS releases only (G-D-05).
+- Already covered here: the gate applies to all four providers, including Buzzsprout and Spotify. The review's
+  browser check found Spotify loading ungated before consent on the source, which this gate already prevents on
+  EDS (G-D-03 browser note). No change.
+- D19 (add AI-generated site content to its scope) is a register item, not part of this ticket (G-G-09).
+
+**Added acceptance criteria**
+- [ ] The legal answer to the label question is recorded (date, decision) before go-live (G-G-09).
+- [ ] If a label is required: on an EN and a CS release with the AI audio box, the authored AI-voice line is
+      visible with `?consent=decline` (placeholder) and with consent (loaded iframe), outside the iframe (G-G-09).
+- [ ] If a label is required: releases without a Buzzsprout embed show no label, and the line is not hard-coded
+      in English (G-G-09, G-D-05).
+- [ ] Unit tests cover the labelled placeholder and the loaded state; `npm run lint` is clean (G-G-09).
+
+**Estimate**
+- Estimate after the amendment: 0.5 SP (M1, done) + 0.5 SP new M2 work, only if a label is required ·
+  AI-assisted 0.25d / manual 0.5d *(planning estimate, not a quote)*.

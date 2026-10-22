@@ -6,7 +6,7 @@
   of the source CDN as soon as possible).
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–6d, excluding the DAM ingest runtime *(planning estimate, not a quote)*
 - **GitHub issue:** [#378](https://github.com/skoda-storyboard/demo/issues/378) (created 2026-10-16)
-- **Status (2026-10-16):** 🔵 TODO (M2), no owner. Census done. Design in
+- **Status (2026-10-22):** 🔵 TODO (M2), no owner. Census done; phase 1 dry run done (see below). Design in
   [`SKODA-ASSET-INGESTION-M2.md`](../../architecture/SKODA-ASSET-INGESTION-M2.md) §3B and §6.
 
 ## Why
@@ -79,6 +79,35 @@ Oversized masters (350 rows `preconditioned`, the SKODA-506 rule): the Media Bus
 - [ ] Delivered images keep their dimensions and stay within the SKODA-506 byte gate. The 1920 download returns
       1920 px where the master has them.
 - [ ] No author edit in DA is overwritten (push conflict report attached per batch).
+
+## Phase 1 dry run (2026-10-22)
+Read-only. The run read the current DA source of every page in the 16 Oct census with a source-host asset reference
+(392 pages, 0 errors), mapped each reference to a published AEM original in the media manifest, and ran the
+`import:push` decision against the push manifest. Nothing was written. The script and the per-page report are in
+`.migration/m2-assets/phase1-dryrun.mjs` and `phase1-dryrun/` (not committed).
+
+| Class | Pages | Rewritable now |
+|---|--:|---|
+| Full (every reference has a published original) | 173 | the whole page: 9,119 references (5,618 images, 3,501 file links, 122 srcset) |
+| Partial | 178 | the 4,631 covered references only |
+| None | 41 | nothing until phases 2–3 |
+
+All pages: 13,750 of 20,148 references are covered today.
+
+**Two constraints before the real run:**
+- **Author edits.** Of the 173 full pages, 108 are unchanged in DA
+  since our last push, 57 were edited in DA, and
+  8 have no push record. `import:push` refuses the edited ones as
+  conflicts, so phase 1 needs an **in-place rewrite of the current DA source** (read, rewrite only the source URLs, write
+  back) rather than a push of the local import, or the authors' edits are lost.
+- **File links and Q-21.** The 4,581 covered file links (PDF, MP4, ZIP) would point at the raw AEM
+  publish host, which has `robots.txt: Disallow: /` and sends attachments (gap review G-T8-01). Images are copied into
+  the Media Bus at preview, so their target host doesn't matter. **Rewrite images now; rewrite file links once Q-21 picks
+  the document host**, so they move once.
+
+**Proposed real run (needs the go-ahead):** images on the 108 unchanged full pages
+first, in place, with a preview of each and a source-census re-check; then the edited pages after a diff review; file
+links after Q-21.
 
 ## Dependencies
 SKODA-504 ✅, 503 ✅, 506 ✅, #219, SKODA-518 (for phase 3 at scale), SKODA-504a (rights / approval for unrecorded
