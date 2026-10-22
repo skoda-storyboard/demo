@@ -552,6 +552,37 @@ export function railHeadingTag(classes) {
   return classes.includes('story-rail-home') ? 'h3' : 'h2';
 }
 
+// the longest a rail waits for its carousel's styles before it shows anyway
+const STYLES_WAIT_MS = 3000;
+
+/** Whether a stylesheet and every sheet it `@import`s (carousel.css → card-teaser.css) loaded. */
+function sheetLoaded(sheet) {
+  if (!sheet) return false;
+  let rules;
+  try { rules = [...sheet.cssRules]; } catch (e) { return true; } // cross-origin: can't tell
+  return rules.every((rule) => !rule.href || (rule.styleSheet && rule.styleSheet.cssRules.length
+    && sheetLoaded(rule.styleSheet)));
+}
+
+/**
+ * Resolves once a block stylesheet already in the head has loaded, with its imports. Two rails can
+ * build at once: aem.js's loadCSS resolves the second request as soon as the first one added the
+ * <link>, before the sheet (and the card-teaser.css it imports) is applied, so the second rail's
+ * carousel would show unstyled for a frame: a layout shift above the fold (the Newsletter page's
+ * two rails, SKODA-845). A sheet that fails, or takes longer than STYLES_WAIT_MS, counts as ready
+ * (the rail shows, as it would after loadCSS rejected).
+ * @param {string} name the block name (`carousel`)
+ */
+export function blockStylesReady(name, doc = document, waitMs = STYLES_WAIT_MS) {
+  const link = doc.querySelector(`head > link[rel="stylesheet"][href$="/blocks/${name}/${name}.css"]`);
+  if (!link || sheetLoaded(link.sheet)) return Promise.resolve();
+  return new Promise((resolve) => {
+    link.addEventListener('load', resolve, { once: true });
+    link.addEventListener('error', resolve, { once: true });
+    setTimeout(resolve, waitMs);
+  });
+}
+
 export default async function decorate(block) {
   const cfg = parseConfig(block);
   const curated = !isConfigTable(block);
@@ -661,6 +692,7 @@ export default async function decorate(block) {
     }
     decorateBlock(carousel);
     await loadBlock(carousel);
+    await blockStylesReady('carousel');
     // loadBlock logs and swallows the carousel's own failures: no track means no rail
     if (!carousel.querySelector('.carousel-track')) {
       collapseRail(block, mount, header);

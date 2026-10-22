@@ -50,7 +50,7 @@ globalThis.document = {
 
 const {
   parseConfig, selectRows, rowToCells, isConfigTable, curatedRows, collapseRail, railLayout, safeViewAll,
-  TAXONOMY_TEMPLATES, orderPaths, railHeadingTag, CONFIG_KEYS,
+  TAXONOMY_TEMPLATES, orderPaths, railHeadingTag, CONFIG_KEYS, blockStylesReady,
 } = await import('./story-rail.js');
 const { feedLightboxItem } = await import('../../scripts/media-lightbox.js');
 
@@ -848,5 +848,57 @@ test('#332: promoShownPaths waits for the promo to load, and gives up after the 
   } finally {
     globalThis.MutationObserver = saved.global;
     globalThis.window.MutationObserver = saved.window;
+  }
+});
+
+// --- blockStylesReady: a second rail waits for the carousel sheet (SKODA-845 layout shift) ---
+
+function fakeDoc(link) {
+  return { querySelector: (sel) => (sel.includes('/blocks/carousel/carousel.css') ? link : null) };
+}
+
+function fakeLink(sheet) {
+  const handlers = {};
+  return {
+    sheet,
+    addEventListener: (type, fn) => { handlers[type] = fn; },
+    fire: (type) => handlers[type] && handlers[type](),
+  };
+}
+
+const sheet = (rules) => ({ cssRules: rules });
+const importRule = (child) => ({ href: '../../styles/card-teaser.css', styleSheet: child });
+
+test('blockStylesReady: resolves now when the sheet and its imports are applied, or no link exists', async () => {
+  await blockStylesReady('carousel', fakeDoc(null));
+  await blockStylesReady('carousel', fakeDoc(fakeLink(sheet([{}]))));
+  await blockStylesReady('carousel', fakeDoc(fakeLink(sheet([importRule(sheet([{}])), {}]))));
+});
+
+test('blockStylesReady: the sheet is in but its @import is not: waits for the link load', async () => {
+  const link = fakeLink(sheet([importRule(sheet([])), {}]));
+  let done = false;
+  const ready = blockStylesReady('carousel', fakeDoc(link)).then(() => { done = true; });
+  await Promise.resolve();
+  assert.equal(done, false);
+  link.fire('load');
+  await ready;
+  assert.equal(done, true);
+});
+
+test('blockStylesReady: never waits past its limit', async () => {
+  await blockStylesReady('carousel', fakeDoc(fakeLink(null)), 5);
+});
+
+test('blockStylesReady: waits for a sheet still loading, and a failed sheet counts as ready', async () => {
+  for (const event of ['load', 'error']) {
+    const link = fakeLink(null);
+    let done = false;
+    const ready = blockStylesReady('carousel', fakeDoc(link)).then(() => { done = true; });
+    await Promise.resolve();
+    assert.equal(done, false, `still waiting before ${event}`);
+    link.fire(event);
+    await ready;
+    assert.equal(done, true, `ready after ${event}`);
   }
 });
