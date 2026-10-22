@@ -255,6 +255,11 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   4. `Style: dark, full-width, media-box`: `h2` Media Box, the stats paragraph, `Downloads`;
   5. `Style: dark, full-width, related` (optional): see `story-rail-press`.
 
+### `not-found`
+- **Status:** `pinned` (2026-10-19) · **Ticket:** SKODA-706 · **Fallback:** readable (without the template the photos, the heading and the copy stack as default content)
+- **Emitted by:** `import-404.js`, one fragment per source `template-404` variant page (`/en/youve-reached-a-dead-end/`, `/en/welcome-to-our-remote-car-park/`) at `/{locale}/fragments/404/<slug>`. Laid out by `templates/error-404/` (selected by `template: error-404`: the site-root `404.html`, or a QA draft that carries the section itself). Spec: [`template-404.md`](../ui-specs/template-404.md).
+- **Shape:** one section: the desktop photo `<p><img></p>`, the mobile photo `<p><img></p>` (both `alt=""`), the optional label `<p>404</p>`, the `h1`, the copy `<p>`, the homepage `<p>` with its link, and Section Metadata `Style: not-found`; a white message adds `not-found-white` (the global `light` style is a grey band, so it isn't reused). Škodapedia `term-explain` tooltips are plain text until SKODA-206.
+
 ### `quote`
 - **Status:** ✅ **on `main`** with `blocks/quote` (SKODA-220 block, landed with SKODA-805c). It moved to the baseline table above and is no longer a pending entry; this section stays as the shape reference. **Ticket:** SKODA-220
 - **Runtime:** each row renders as `figure > blockquote + figcaption`: the quote centred 16/24 italic, a 2px black rule 10% of the column wide 20px below it and 10px above the attribution (measured on first-glimpse at 1440/1280/768/390). The rule is CSS, never an `hr`.

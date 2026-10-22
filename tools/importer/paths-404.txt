@@ -1,0 +1,4 @@
+# SKODA-706: the fragments import-404.js writes from urls-404.txt, the paths templates/error-404
+# requests at random (VARIANTS). Push and publish input: npm run import:push -- --paths tools/importer/paths-404.txt
+/en/fragments/404/youve-reached-a-dead-end
+/en/fragments/404/welcome-to-our-remote-car-park
