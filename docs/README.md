@@ -9,6 +9,27 @@ documents are **not served** by EDS; they are project knowledge only.
 **Analysis start point:** [`analysis/SKODA-MASTER.md`](analysis/SKODA-MASTER.md) is the canonical findings doc;
 its §16 Document Map indexes every source report with its current path.
 
+**Latest requirements review (M2, 2026-10-15 → 2026-10-22):** start here for M2 requirements, scope and gaps. The four
+documents build on each other; read them in order:
+1. [`reviews/SKODA-M2-READINESS-REVIEW-2026-10-15.md`](reviews/SKODA-M2-READINESS-REVIEW-2026-10-15.md): EN census,
+   ticket readiness, the decision register.
+2. [`reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md`](reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md):
+   the five non-EN locales (90 findings).
+3. [`reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md`](reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md):
+   third-party integrations, untouched areas, launch and operations (152 findings, two top-up rounds, adversarially
+   verified).
+4. [`planning/SKODA-M2-SCOPE-AND-CAPACITY-2026-10-22.md`](planning/SKODA-M2-SCOPE-AND-CAPACITY-2026-10-22.md): open M2
+   work against the time left, and the scope levers.
+
+The **current state** lives in four documents, which these reviews updated:
+- the [decision register](planning/SKODA-DECISION-REGISTER.md) (D1–D20, Q-1–Q-21);
+- the [ticket backlog](tickets/OVERVIEW.md);
+- the [traceability matrix](planning/SKODA-REQUIREMENTS-TRACEABILITY.md);
+- the [client requirements mapping](planning/SKODA-CLIENT-REQUIREMENTS-MAPPING.md).
+
+Older reviews (`reviews/SKODA-ADVERSARIAL-REVIEW*.md`, `M1-*`, `SKODA-M1-GAP-REVIEW.md`) are background; where they
+disagree, the newer review wins.
+
 ## Folders
 
 | Folder | What's in it |
