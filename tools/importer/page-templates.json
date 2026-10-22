@@ -1003,12 +1003,10 @@
     {
       "name": "error-404",
       "urls": [
-        "https://www.skoda-storyboard.com/en/this-page-does-not-exist-zzz/"
+        "https://www.skoda-storyboard.com/en/youve-reached-a-dead-end/",
+        "https://www.skoda-storyboard.com/en/welcome-to-our-remote-car-park/"
       ],
-      "description": "Škoda branded 404 (error404). Keeps .error-message dead-end copy + homepage link; chrome dropped. Site-root 404.html shell. Metadata template=page. Spec: docs/ui-specs/template-404.md; SKODA-706.",
-      "metadata": {
-        "template": "page"
-      },
+      "description": "Škoda branded 404 (error404). The source serves its template-404 pages at random; each stable variant page → the fragment /{locale}/fragments/404/<slug> (desktop + mobile photo, the .error-message copy, Section Metadata Style not-found (+ not-found-white)). The site-root 404.html loads one at random (templates/error-404). Spec: docs/ui-specs/template-404.md; SKODA-706.",
       "blocks": [],
       "sections": []
     }

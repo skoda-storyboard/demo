@@ -198,4 +198,6 @@ export const SECTION_STYLES = [
   ['cover-box, compact, dark', 'Media Room home dark band.'],
   ['press-kit-chapters', 'Press-kit chapter navigation section.'],
   ['press-kit-banners', 'Press-kit download banners section.'],
+  ['not-found', 'A 404 variant (/en/fragments/404/*): its desktop and mobile photos, then the optional "404" label, the heading, the copy and the homepage link, laid out over the photo.'],
+  ['not-found, not-found-white', 'A 404 variant with white text, for a dark photo.'],
 ];

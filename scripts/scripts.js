@@ -29,7 +29,7 @@ import { readBoxRow, decorateBox } from './section-box.js';
  * (a `template: page` page that shares a layout, e.g. the series directory → `skoda-series`).
  * Only listed templates load, so an unknown value never requests a missing file.
  */
-const TEMPLATES = ['press-release', 'skoda-series', 'press-kit', 'skoda-model'];
+const TEMPLATES = ['press-release', 'skoda-series', 'press-kit', 'skoda-model', 'error-404'];
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
   const innerTT = window.trustedTypes.createPolicy('tt-inner', {
