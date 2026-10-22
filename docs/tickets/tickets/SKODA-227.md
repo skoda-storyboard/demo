@@ -120,5 +120,12 @@ unchanged press-release importer; text, images and blocks otherwise as before, t
 lists them today). The 3 left are the DA-edited and held pages above, and
 `30-years-since-the-foundation-stone-was-laid-…` (edited in DA).
 
+**Press-release Tags (2026-10-22, found in SKODA-845):** the press-release importer bundle had been hand-edited in
+412396c (2026-10-15): its Tags parser declared `text4` and read `text5`, so it threw on every page, and the 22 press
+releases above went to preview without their sidebar Tags (live still had them). The bundle now equals a fresh
+build of its sources (a 2-line change). 18 of the 22 are re-imported and re-pushed to preview: each differs from the
+previous push only by its Tags block. The other 4, the plant newsletters, are re-pushed from SKODA-845, which also
+gives them the `newsletter` category its rails read.
+
 **Pre-existing, not fixed here:** slider caption line height 24 vs origin 20 (museum, King of space, Clever
 luggage); the 40px intro line of "King of space" renders at 16px.
