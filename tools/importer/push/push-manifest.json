@@ -1,45 +1,95 @@
 {
   "version": 1,
   "pages": {
+    "/cs/category/e-mobilita-cs": {
+      "hash": "ed61d285d6354d1902a38e037031767316f40013fb244b425cc1a074dfb8de81",
+      "pushedAt": "2026-10-22T12:11:17.429Z",
+      "previewedHash": "ed61d285d6354d1902a38e037031767316f40013fb244b425cc1a074dfb8de81"
+    },
+    "/cs/e-mobilita-cs/poznejte-peaq-snadne-a-pohodlne-ovladani": {
+      "hash": "5eda8868842951d1cebe611b4d33991b11dbaa2249e384cce131e28b729b7aa6",
+      "pushedAt": "2026-10-22T12:11:17.429Z",
+      "previewedHash": "5eda8868842951d1cebe611b4d33991b11dbaa2249e384cce131e28b729b7aa6"
+    },
+    "/cs/e-mobilita-cs/skoda-epiq-nove-obleka-efektni-soupravu-sportline": {
+      "hash": "4f5a03dab52bdf90f3cff3b0cc2d9db31b154b1b15c9a41295cb3eb862b6c57c",
+      "pushedAt": "2026-10-22T12:11:17.429Z",
+      "previewedHash": "4f5a03dab52bdf90f3cff3b0cc2d9db31b154b1b15c9a41295cb3eb862b6c57c"
+    },
     "/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund": {
       "hash": "d442448934c46b1b1201c75ecb0f0b9c066ae11db4110630a507c313978fd6a2",
       "pushedAt": "2026-10-13T12:30:39.939Z",
       "previewedHash": "d442448934c46b1b1201c75ecb0f0b9c066ae11db4110630a507c313978fd6a2"
     },
+    "/cs/e-mobilita-cs/skoda-peaq-si-vas-ziska-behem-chvilky": {
+      "hash": "e95763e3d70d896226d4cb5feec08d7492d7466960686bba3b650f76d975315d",
+      "pushedAt": "2026-10-22T12:11:17.429Z",
+      "previewedHash": "e95763e3d70d896226d4cb5feec08d7492d7466960686bba3b650f76d975315d"
+    },
     "/cs/footer": {
-      "hash": "a08c6a2294044491e18212598a32c1f88166b1e47b3240a3062ccfb3df749004",
-      "pushedAt": "2026-10-08T10:40:43.763Z",
-      "previewedHash": "a08c6a2294044491e18212598a32c1f88166b1e47b3240a3062ccfb3df749004"
+      "hash": "b63b95d1eb41dba77864e14f8534bd129ef15b00de4adbb5e577b00081590e03",
+      "pushedAt": "2026-10-22T11:39:45.708Z",
+      "previewedHash": "b63b95d1eb41dba77864e14f8534bd129ef15b00de4adbb5e577b00081590e03"
     },
     "/cs/fragments/newsletter-card": {
       "hash": "74338e7042a1fe328efcca16f1b1f7a855f69952e7f4f506e2e9d6b31bc4b62f",
       "pushedAt": "2026-10-13T12:23:58.263Z",
       "previewedHash": "74338e7042a1fe328efcca16f1b1f7a855f69952e7f4f506e2e9d6b31bc4b62f"
     },
+    "/cs/media-room/footer": {
+      "hash": "bb525f53cb4f2b9d9c28b3123213014b7086c8e85bcf96e112aeec11147d2f0f",
+      "pushedAt": "2026-10-22T12:23:56.315Z",
+      "previewedHash": "bb525f53cb4f2b9d9c28b3123213014b7086c8e85bcf96e112aeec11147d2f0f"
+    },
+    "/cs/media-room/nav": {
+      "hash": "074720a9daf08dfcc9dc7b7d0d12a1b0cead2a7072aa5c46d16ee14da7b0f9b8",
+      "pushedAt": "2026-10-22T12:23:56.315Z",
+      "previewedHash": "074720a9daf08dfcc9dc7b7d0d12a1b0cead2a7072aa5c46d16ee14da7b0f9b8"
+    },
     "/cs/nav": {
-      "hash": "2dd490f96badf3c95169a4b901a51d14d790d24fde63b87380ae5de833097edf",
-      "pushedAt": "2026-10-08T10:40:43.763Z",
-      "previewedHash": "2dd490f96badf3c95169a4b901a51d14d790d24fde63b87380ae5de833097edf"
+      "hash": "6e62915f13e1344ae4d82e49f303e9dd697b93a5b0203ce15786ba92bdffa1ca",
+      "pushedAt": "2026-10-22T11:39:45.708Z",
+      "previewedHash": "6e62915f13e1344ae4d82e49f303e9dd697b93a5b0203ce15786ba92bdffa1ca"
     },
     "/cs/nav-newsletter": {
-      "hash": "e3e4bf09b22dec3e79f0c95a3cfb459796eb9137706e425d5b1ff875404a4b13",
-      "pushedAt": "2026-10-08T10:40:43.763Z",
-      "previewedHash": "e3e4bf09b22dec3e79f0c95a3cfb459796eb9137706e425d5b1ff875404a4b13"
+      "hash": "d0067de689523a8a9f732abd6518b9a7ef66c9be5f8be96bed18505d78791664",
+      "pushedAt": "2026-10-22T11:39:45.708Z",
+      "previewedHash": "d0067de689523a8a9f732abd6518b9a7ef66c9be5f8be96bed18505d78791664"
+    },
+    "/cs/tiskove-zpravy": {
+      "hash": "c159208d52f8261f8f56e506f2cfc726329d0c47ab65627858a465b4dc7b625b",
+      "pushedAt": "2026-10-22T12:33:40.209Z",
+      "previewedHash": "c159208d52f8261f8f56e506f2cfc726329d0c47ab65627858a465b4dc7b625b"
     },
     "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds": {
       "hash": "f17d31008d690ac033756997ba771ba266b421c9dcb0e076d345a1e643aa05be",
       "pushedAt": "2026-10-13T12:23:58.263Z",
       "previewedHash": "f17d31008d690ac033756997ba771ba266b421c9dcb0e076d345a1e643aa05be"
     },
+    "/de/footer": {
+      "hash": "0aeb1d6a191f4abd4cf84250276bbdc4083a5d937fcd4a196fb19b91074fe2ed",
+      "pushedAt": "2026-10-22T12:01:34.800Z",
+      "previewedHash": "0aeb1d6a191f4abd4cf84250276bbdc4083a5d937fcd4a196fb19b91074fe2ed"
+    },
+    "/de/media-room/footer": {
+      "hash": "bff3a45940d02742c058c562e2b65c94c9ebf9749e25a543e2c097e5d1610afc",
+      "pushedAt": "2026-10-22T12:23:56.315Z",
+      "previewedHash": "bff3a45940d02742c058c562e2b65c94c9ebf9749e25a543e2c097e5d1610afc"
+    },
+    "/de/media-room/nav": {
+      "hash": "14789956a0c155ea86c63ae1e223ffffe68ed608668863428ff433bdd03eaeae",
+      "pushedAt": "2026-10-22T12:23:56.315Z",
+      "previewedHash": "14789956a0c155ea86c63ae1e223ffffe68ed608668863428ff433bdd03eaeae"
+    },
     "/de/nav": {
-      "hash": "7c1e014900b2b99ae9bbe7df73fb1d00b45bd827cd31a5b7d878bb08f8bc299e",
-      "pushedAt": "2026-10-08T10:57:31.472Z",
-      "previewedHash": "7c1e014900b2b99ae9bbe7df73fb1d00b45bd827cd31a5b7d878bb08f8bc299e"
+      "hash": "05a0d30ca23f1a538e06c3a836b1f67251668c7988def445bfdc6c38a0db9e39",
+      "pushedAt": "2026-10-22T11:39:45.708Z",
+      "previewedHash": "05a0d30ca23f1a538e06c3a836b1f67251668c7988def445bfdc6c38a0db9e39"
     },
     "/de/nav-newsletter": {
-      "hash": "e879cf9ae3dd44b5807e64af0239f598998660a2eafdba492d600031b8c96818",
-      "pushedAt": "2026-10-08T10:40:43.763Z",
-      "previewedHash": "e879cf9ae3dd44b5807e64af0239f598998660a2eafdba492d600031b8c96818"
+      "hash": "6dc017c880dbc8db370f6c9176fa28d33349a2a6459132a065709078e5a8453f",
+      "pushedAt": "2026-10-22T11:39:45.708Z",
+      "previewedHash": "6dc017c880dbc8db370f6c9176fa28d33349a2a6459132a065709078e5a8453f"
     },
     "/en": {
       "hash": "dddb62e8723aa7222df866b691c02c0e7a07b2464028954db041d07e8aeaac43",
@@ -2099,30 +2149,85 @@
       "pushedAt": "2026-10-13T12:30:39.939Z",
       "previewedHash": "056e9e61f1ef5c832f6bc3ab2c0cb07219e7ef1c0c4585015b690417b150fe54"
     },
+    "/sk/footer": {
+      "hash": "3f73fac73a4f34494ab3a10c63bcdcb49818f8814ae014411d016ba134207591",
+      "pushedAt": "2026-10-22T12:01:34.800Z",
+      "previewedHash": "3f73fac73a4f34494ab3a10c63bcdcb49818f8814ae014411d016ba134207591"
+    },
+    "/sk/media-room/footer": {
+      "hash": "8a3344d9106e49135c11d6762a590a18492126bcf616302446de495914f01e32",
+      "pushedAt": "2026-10-22T12:23:56.315Z",
+      "previewedHash": "8a3344d9106e49135c11d6762a590a18492126bcf616302446de495914f01e32"
+    },
+    "/sk/media-room/nav": {
+      "hash": "85514eb0250c4ba50467a53a16e69e9e52ccbfcace24b984d818887b5631d425",
+      "pushedAt": "2026-10-22T12:23:56.315Z",
+      "previewedHash": "85514eb0250c4ba50467a53a16e69e9e52ccbfcace24b984d818887b5631d425"
+    },
     "/sk/nav": {
-      "hash": "55eea3e17c9a2d16f8c432ffdfe44aa7f59c5b11155a1bc0c4f03fa70ee384cd",
-      "pushedAt": "2026-10-08T10:57:31.472Z",
-      "previewedHash": "55eea3e17c9a2d16f8c432ffdfe44aa7f59c5b11155a1bc0c4f03fa70ee384cd"
+      "hash": "b6070e446312e7a6debd7ebe21faf838452a26e093c636646038e1a9cc316103",
+      "pushedAt": "2026-10-22T11:39:45.708Z",
+      "previewedHash": "b6070e446312e7a6debd7ebe21faf838452a26e093c636646038e1a9cc316103"
     },
     "/sk/nav-newsletter": {
-      "hash": "105521d4e50af9eab107723c2b2fe9f6caf7ee402f2d4023e8aab7d4363643b4",
-      "pushedAt": "2026-10-08T10:40:43.763Z",
-      "previewedHash": "105521d4e50af9eab107723c2b2fe9f6caf7ee402f2d4023e8aab7d4363643b4"
+      "hash": "c7c243d31df9f868a458a82a726e0472494a44da68cba2ec5ad3fe6b9700038d",
+      "pushedAt": "2026-10-22T11:39:45.708Z",
+      "previewedHash": "c7c243d31df9f868a458a82a726e0472494a44da68cba2ec5ad3fe6b9700038d"
+    },
+    "/sl/footer": {
+      "hash": "a67dd8c0ee91f35db76408dd393509dabf424446e0f167664676c29eeb166181",
+      "pushedAt": "2026-10-22T11:39:45.708Z",
+      "previewedHash": "a67dd8c0ee91f35db76408dd393509dabf424446e0f167664676c29eeb166181"
+    },
+    "/sl/media-room/footer": {
+      "hash": "da895b8324c6b1907f15f27732be5ad377cc493287cf11dd03db2eb1d858f012",
+      "pushedAt": "2026-10-22T12:23:56.315Z",
+      "previewedHash": "da895b8324c6b1907f15f27732be5ad377cc493287cf11dd03db2eb1d858f012"
+    },
+    "/sl/media-room/nav": {
+      "hash": "61485884654fc8e9885a3d226ac8d2a590ace452b5a9c4be6f38a19321f938c7",
+      "pushedAt": "2026-10-22T12:23:56.315Z",
+      "previewedHash": "61485884654fc8e9885a3d226ac8d2a590ace452b5a9c4be6f38a19321f938c7"
+    },
+    "/sl/nav": {
+      "hash": "0855c2c849c32ca2bb05a581f57fc46e5c4029805bb51c02bcfc8d76d9d5fe69",
+      "pushedAt": "2026-10-22T11:39:45.708Z",
+      "previewedHash": "0855c2c849c32ca2bb05a581f57fc46e5c4029805bb51c02bcfc8d76d9d5fe69"
+    },
+    "/sl/nav-newsletter": {
+      "hash": "4649a9e821a1d5a60523929c8e150e1c33c42d01db93c507d16f9a37e8fcd317",
+      "pushedAt": "2026-10-22T11:39:45.708Z",
+      "previewedHash": "4649a9e821a1d5a60523929c8e150e1c33c42d01db93c507d16f9a37e8fcd317"
     },
     "/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds": {
       "hash": "8b5ef0374288f31833852fb9d473ed66a252afa42e4f86f62b6b93d680f2a507",
       "pushedAt": "2026-10-08T10:40:43.763Z",
       "previewedHash": "8b5ef0374288f31833852fb9d473ed66a252afa42e4f86f62b6b93d680f2a507"
     },
+    "/sr/footer": {
+      "hash": "d93e2cfce9e1bd4b1be9481fc133aaf3f736baa15b8432c72b75a053de364388",
+      "pushedAt": "2026-10-22T12:01:34.800Z",
+      "previewedHash": "d93e2cfce9e1bd4b1be9481fc133aaf3f736baa15b8432c72b75a053de364388"
+    },
+    "/sr/media-room/footer": {
+      "hash": "cf609ab98f7133056e4bf9bf29ceb5c5ab14bb2cbf2e13c2d106c854f165247b",
+      "pushedAt": "2026-10-22T12:23:56.315Z",
+      "previewedHash": "cf609ab98f7133056e4bf9bf29ceb5c5ab14bb2cbf2e13c2d106c854f165247b"
+    },
+    "/sr/media-room/nav": {
+      "hash": "07a5e0ce6e96c6a493b245144425c172bfb2b892371fc0105f70fcb6e8d0165a",
+      "pushedAt": "2026-10-22T12:23:56.315Z",
+      "previewedHash": "07a5e0ce6e96c6a493b245144425c172bfb2b892371fc0105f70fcb6e8d0165a"
+    },
     "/sr/nav": {
-      "hash": "ca6499c196c493ad8499ad2ad42c1d74ec853dec385f74610869ead22bcf0523",
-      "pushedAt": "2026-10-08T10:57:31.472Z",
-      "previewedHash": "ca6499c196c493ad8499ad2ad42c1d74ec853dec385f74610869ead22bcf0523"
+      "hash": "60945030f96a3817590b23a990be8b689aea35eeadc3d9b430e10eb4898e2ba9",
+      "pushedAt": "2026-10-22T11:39:45.708Z",
+      "previewedHash": "60945030f96a3817590b23a990be8b689aea35eeadc3d9b430e10eb4898e2ba9"
     },
     "/sr/nav-newsletter": {
-      "hash": "87639631bc04aecac80cdc7033f9e8935d5c5f7c9c7c7cac800911a4c9033fa1",
-      "pushedAt": "2026-10-08T10:40:43.763Z",
-      "previewedHash": "87639631bc04aecac80cdc7033f9e8935d5c5f7c9c7c7cac800911a4c9033fa1"
+      "hash": "f50141fa1d549bc180d0379cbbbb9d9b9959ea903dcdfe0b9860f6543c0f4412",
+      "pushedAt": "2026-10-22T11:39:45.708Z",
+      "previewedHash": "f50141fa1d549bc180d0379cbbbb9d9b9959ea903dcdfe0b9860f6543c0f4412"
     }
   }
 }

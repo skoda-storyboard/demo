@@ -27,7 +27,9 @@
  *   … --push                              merge into DA /metadata.json, then preview it
  *   … --push --publish                    … and publish the sheet
  * Options: --paths a,b (only these EDS paths), --chrome cs,de,sk,sr, --chrome-footer cs (the
- *   locales with a translated footer; default: all --chrome ones), --origin <url> (the host of
+ *   locales with a translated footer; default: all --chrome ones), --chrome-media-room cs (the
+ *   locales with a Media Room nav / footer, SKODA-1001; default: all --chrome ones; their rows per
+ *   Media Room section and content prefix come after `/{locale}/**`), --origin <url> (the host of
  *   the hreflang URLs), --concurrency N (4).
  * Credentials: none here; admin.da.live / admin.hlx.page auth is injected by the environment.
  * Output: tools/importer/reports/locale-alternates/<stamp>.json
@@ -37,6 +39,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pickHreflang, ALTERNATE_LOCALES } from './transformers/skoda-metadata-extract.mjs';
 import { LIVE_ORIGIN } from '../../scripts/links.js';
+import { LOCALE_PATHS, CONTENT_PREFIXES } from '../../scripts/locale-paths.js';
 
 const ORG = 'skoda-storyboard';
 const SITE = 'demo';
@@ -119,8 +122,37 @@ export function chromeRows(codes = [], footers = codes) {
     .map((c) => ({ URL: `/${c}/**`, nav: `/${c}/nav`, footer: footers.includes(c) ? `/${c}/footer` : '' }));
 }
 
-/** A `/{locale}/**` chrome row this tool writes (replaced on every merge). */
-const isChromeRow = (r) => /^\/([a-z]{2})\/\*\*$/.test(r.URL || '') && r.nav === `${r.URL.slice(0, 3)}/nav`;
+// a locale's Media Room sections and content (scripts/locale-paths.js), as the English rows of
+// /media-room/nav: listings, cart, contacts, search, newsletter; press releases, kits, models
+const MEDIA_ROOM_SECTIONS = ['mediaRoom', 'news', 'pressKits', 'images', 'videos', 'mediaCart', 'contacts', 'search', 'newsletter'];
+const MEDIA_ROOM_CONTENT = ['press_release', 'press_kit', 'skoda_model'];
+
+/**
+ * A locale's Media Room chrome rows (SKODA-1001): each of its Media Room paths, and everything
+ * under it, takes `/{locale}/media-room/nav` and `/footer` and the `media-room` section. They come
+ * after the `/{locale}/**` row, so they override it. A section the locale lacks (its path falls
+ * back to English) gets no row.
+ * @param {string[]} codes the locales (not `en`)
+ */
+export function mediaRoomRows(codes = []) {
+  return codes.filter((c) => ALTERNATE_LOCALES.includes(c) && c !== 'en').flatMap((c) => {
+    const own = (p) => p && p.startsWith(`/${c}/`);
+    const paths = [
+      ...MEDIA_ROOM_SECTIONS.map((k) => LOCALE_PATHS[c]?.[k]),
+      ...MEDIA_ROOM_CONTENT.map((t) => CONTENT_PREFIXES[t]?.[c]),
+    ].filter(own);
+    return [...new Set(paths)].flatMap((p) => [p, `${p}/**`].map((URL) => ({
+      URL, nav: `/${c}/media-room/nav`, footer: `/${c}/media-room/footer`, section: 'media-room',
+    })));
+  });
+}
+
+/** A chrome row this tool writes (replaced on every merge): `/{locale}/**`, or a Media Room one. */
+const isChromeRow = (r) => {
+  const m = String(r.URL || '').match(/^\/([a-z]{2})(?:\/|$)/);
+  if (!m) return false;
+  return (r.URL === `/${m[1]}/**` && r.nav === `/${m[1]}/nav`) || r.nav === `/${m[1]}/media-room/nav`;
+};
 
 const isHreflang = (column) => /^hreflang:/i.test(column);
 // the columns this tool writes: the native hreflang ones and the earlier custom `alternates`
@@ -263,7 +295,11 @@ async function main() {
     if (!start.includes(p)) report.translatedPages.push(p);
   }
   report.notMigratedTranslations = missing;
-  const extra = chromeRows(list('chrome'), value('chrome-footer') === null ? list('chrome') : list('chrome-footer'));
+  const extra = [
+    ...chromeRows(list('chrome'), value('chrome-footer') === null ? list('chrome') : list('chrome-footer')),
+    // after the `/{locale}/**` rows, so a Media Room page takes the Media Room chrome
+    ...mediaRoomRows(value('chrome-media-room') === null ? list('chrome') : list('chrome-media-room')),
+  ];
   report.chrome = extra;
 
   if (flag('push')) {

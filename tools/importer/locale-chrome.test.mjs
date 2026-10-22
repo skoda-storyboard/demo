@@ -60,9 +60,10 @@ const sections = (root) => {
 };
 const links = (el) => [...el.querySelectorAll('a')].map((a) => `${a.textContent}=${a.getAttribute('href')}`);
 
-test('localeOfUrl / authoredHref: the locale segment; live links become site paths, #… and others stay', () => {
+test('localeOfUrl / authoredHref: the locale segment; live links stay absolute (the link rule decides), #… and others stay', () => {
   assert.equal(localeOfUrl(`${LIVE}/cs/e-mobilita-cs/x/`), 'cs');
-  assert.equal(authoredHref(`${LIVE}/cs/category/modely-cs/`), '/cs/category/modely-cs/');
+  assert.equal(authoredHref(`${LIVE}/cs/category/modely-cs/`), `${LIVE}/cs/category/modely-cs/`);
+  assert.equal(authoredHref('/cs/foto/'), `${LIVE}/cs/foto/`, 'a root-relative source link too');
   assert.equal(authoredHref('#subscribe'), '#subscribe');
   assert.equal(authoredHref('https://www.facebook.com/skoda.cz/'), 'https://www.facebook.com/skoda.cz/');
   assert.equal(authoredHref(''), '');
@@ -72,15 +73,16 @@ test('buildNav: the 4 sections of /nav (topbar, brand, menu, search), in the loc
   const s = sections(buildNav(doc(), 'cs'));
   assert.equal(s.length, 4);
   const [topbar, brand, menu, search] = s;
-  assert.deepEqual(links(topbar[0]), ['Stories=/cs/', 'Media Room=/cs/media-room/']);
+  assert.deepEqual(links(topbar[0]), ['Stories=https://www.skoda-storyboard.com/cs/', 'Media Room=https://www.skoda-storyboard.com/cs/media-room/']);
   assert.deepEqual(links(topbar[1]), ['Odebírat články=#subscribe']);
-  assert.equal(topbar[2].innerHTML, '<a href="/en/">EN</a> <strong>CZ</strong> <a href="/de/">DE</a> <a href="/sk/">SK</a> <a href="/sr/">SR</a> <a href="/sl/">SL</a>');
-  assert.deepEqual(links(brand[0]), ['Škoda Storyboard=/cs/']);
+  // the source's own language link (en), else each locale's home
+  assert.equal(topbar[2].innerHTML, '<a href="https://www.skoda-storyboard.com/en/x/">EN</a> <strong>CZ</strong> <a href="https://www.skoda-storyboard.com/de/">DE</a> <a href="https://www.skoda-storyboard.com/sk/">SK</a> <a href="https://www.skoda-storyboard.com/sr/">SR</a> <a href="https://www.skoda-storyboard.com/sl/">SL</a>');
+  assert.deepEqual(links(brand[0]), ['Škoda Storyboard=https://www.skoda-storyboard.com/cs/']);
   const items = [...menu[0].children];
-  assert.deepEqual(links(items[0]), ['Modely=/cs/category/modely-cs/', 'Modely=/cs/category/modely-cs/', 'Fabia=/cs/tag/model/fabia-cs/'], 'the heading kept once, as /nav');
-  assert.deepEqual(links(items[1]), ['eMobilita=/cs/category/e-mobilita-cs/'], 'a lone heading is no sub-list');
+  assert.deepEqual(links(items[0]), ['Modely=https://www.skoda-storyboard.com/cs/category/modely-cs/', 'Modely=https://www.skoda-storyboard.com/cs/category/modely-cs/', 'Fabia=https://www.skoda-storyboard.com/cs/tag/model/fabia-cs/'], 'the heading kept once, as /nav');
+  assert.deepEqual(links(items[1]), ['eMobilita=https://www.skoda-storyboard.com/cs/category/e-mobilita-cs/'], 'a lone heading is no sub-list');
   assert.deepEqual(links(items[2]), ['Newsletter=#newsletter']);
-  assert.deepEqual(links(search[0]), ['Vyhledat=/cs/hledat/']);
+  assert.deepEqual(links(search[0]), ['Vyhledat=https://www.skoda-storyboard.com/cs/hledat/']);
 });
 
 test('buildNewsletter: the Newsletter Stub (topbar) rows of /nav-newsletter', () => {
@@ -109,8 +111,8 @@ test('buildNewsletter: the Newsletter Stub (topbar) rows of /nav-newsletter', ()
       ['label', 'Odebírejte naše články, ať vám už nic neunikne:'],
       ['placeholder', 'Zadejte svůj e-mail'],
       ['button', 'Přihlásit'],
-      ['consent', '<div>Tímto uděluji <a href="/cs/souhlas/">souhlas se zpracováním</a> svých údajů.</div>'],
-      ['manage', '<a href="/cs/sprava-newsletteru/">Správa newsletteru</a>'],
+      ['consent', '<div>Tímto uděluji <a href="https://www.skoda-storyboard.com/cs/souhlas/">souhlas se zpracováním</a> svých údajů.</div>'],
+      ['manage', '<a href="https://www.skoda-storyboard.com/cs/sprava-newsletteru/">Správa newsletteru</a>'],
       ['message', 'Thanks'],
       ['list', '386'],
       ['language', 'cs_CZ'],
@@ -126,10 +128,10 @@ test('buildFooter: the 3 sections of /footer; headings and Newsletter dropped; i
     ':appstore:=https://apps.apple.com/cz/app/x', ':googleplay:=https://play.google.com/store/x',
   ]);
   assert.deepEqual(links(icons[1]), [':facebook:=https://www.facebook.com/skoda.cz/']);
-  assert.deepEqual(links(menu[0]), ['Modely=/cs/category/modely-cs/', 'Fabia=/cs/tag/model/fabia-cs/']);
-  assert.equal(legal[0].innerHTML, 'Více na <a href="https://www.skoda-auto.cz/ochrana/">Ochrana&nbsp;údajů</a>, <a href="/cs/copyright/">Copyright</a>.');
+  assert.deepEqual(links(menu[0]), ['Modely=https://www.skoda-storyboard.com/cs/category/modely-cs/', 'Fabia=https://www.skoda-storyboard.com/cs/tag/model/fabia-cs/']);
+  assert.equal(legal[0].innerHTML, 'Více na <a href="https://www.skoda-auto.cz/ochrana/">Ochrana&nbsp;údajů</a>, <a href="https://www.skoda-storyboard.com/cs/copyright/">Copyright</a>.');
   assert.equal(legal[1].textContent, '© Škoda Auto a.s. 2026');
-  assert.deepEqual(links(legal[2]), ['RSS=/cs/feed/']);
+  assert.deepEqual(links(legal[2]), ['RSS=https://www.skoda-storyboard.com/cs/feed/']);
 });
 
 test('a page without the chrome: empty fragments, no throw', () => {
@@ -146,4 +148,23 @@ test('buildNav: a topbar without Subscribe (DE / SK / SR on the source) authors 
   assert.equal(topbar.length, 2, 'switcher + locale row');
   assert.equal(topbar[1].querySelector('strong').textContent, 'DE');
   assert.equal(topbar.some((el) => el.querySelector('a[href="#subscribe"]')), false);
+});
+
+test('a language menu link stays on the site only when its target is migrated (SKODA-1001)', async () => {
+  const { default: links } = await import('./transformers/skoda-links.js');
+  const { document } = new JSDOM('<!DOCTYPE html><html><body></body></html>', { url: `${LIVE}/cs/x/` }).window;
+  const nav = document.createElement('div');
+  [
+    '/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/', // a published Czech page
+    '/cs/category/modely-cs/', // not migrated
+    '/en/', // the English home
+    '#subscribe',
+  ].forEach((href) => nav.append(Object.assign(document.createElement('a'), { href: authoredHref(href) })));
+  links('afterTransform', nav, { document });
+  assert.deepEqual([...nav.querySelectorAll('a')].map((a) => a.getAttribute('href')), [
+    '/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund',
+    `${LIVE}/cs/category/modely-cs/`,
+    '/en',
+    '#subscribe',
+  ]);
 });

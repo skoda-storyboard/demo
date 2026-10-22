@@ -35,64 +35,207 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // import-videos-listing.js
+  // tools/importer/import-videos-listing.js
   var import_videos_listing_exports = {};
   __export(import_videos_listing_exports, {
     default: () => import_videos_listing_default
   });
 
+  // scripts/locale-paths.js
+  var LOCALE_PATHS = {
+    en: {
+      home: "/en",
+      mediaRoom: "/en/media-room",
+      news: "/en/news",
+      pressKits: "/en/press-kits",
+      images: "/en/images",
+      videos: "/en/videos",
+      search: "/en/search",
+      mediaCart: "/en/media-cart",
+      series: "/en/series-2",
+      contacts: "/en/contacts",
+      newsletter: "/en/newsletter"
+    },
+    cs: {
+      home: "/cs",
+      mediaRoom: "/cs/media-room",
+      news: "/cs/tiskove-zpravy",
+      pressKits: "/cs/tiskove-mapy",
+      images: "/cs/foto",
+      videos: "/cs/video",
+      search: "/cs/hledat",
+      mediaCart: "/cs/kontakty/kosik",
+      series: "/cs/serialy",
+      contacts: "/cs/kontakty",
+      newsletter: "/cs/newsletter"
+    },
+    de: {
+      home: "/de",
+      mediaRoom: "/de/media-room",
+      news: "/de/pressemitteilungen",
+      pressKits: "/de/pressemappen",
+      images: "/de/fotos",
+      videos: "/de/videos",
+      search: "/de/suche",
+      mediaCart: "/de/media-kart",
+      contacts: "/de/kontakte"
+    },
+    sk: {
+      home: "/sk",
+      mediaRoom: "/sk/media-room",
+      news: "/sk/tlacove-spravy",
+      pressKits: "/sk/tlacove-mapy",
+      images: "/sk/fotografie",
+      videos: "/sk/video",
+      search: "/sk/hladat",
+      mediaCart: "/sk/kosik",
+      series: "/sk/serialy",
+      contacts: "/sk/kontakty"
+    },
+    sr: {
+      home: "/sr",
+      mediaRoom: "/sr/media-room",
+      news: "/sr/news",
+      pressKits: "/sr/press-kits",
+      images: "/sr/fotografije",
+      videos: "/sr/video",
+      search: "/sr/pretraga",
+      mediaCart: "/sr/media-package",
+      series: "/sr/serije",
+      contacts: "/sr/kontakti"
+    },
+    sl: {
+      home: "/sl",
+      mediaRoom: "/sl/media-room",
+      images: "/sl/slike",
+      videos: "/sl/videoposnetki",
+      search: "/sl/isci",
+      mediaCart: "/sl/medijski-paket",
+      series: "/sl/serije",
+      contacts: "/sl/kontakti"
+    }
+  };
+  var CONTENT_PREFIXES = {
+    press_release: {
+      en: "/en/press-releases",
+      cs: "/cs/tiskove-zpravy-archiv",
+      de: "/de/pressemitteilungen-archive",
+      sk: "/sk/tlacova-sprava",
+      sr: "/sr/press-release",
+      sl: "/sl/press-release"
+    },
+    press_kit: {
+      en: "/en/press-kits",
+      cs: "/cs/tiskove-mapy",
+      de: "/de/pressemappe",
+      sk: "/sk/press-kit",
+      sr: "/sr/press-kit"
+    },
+    skoda_model: {
+      en: "/en/skoda-model",
+      cs: "/cs/skoda-model",
+      de: "/de/skoda-model",
+      sk: "/sk/skoda-model"
+    }
+  };
+  var BUILT = {
+    mediaFeed: ["en"],
+    fragments404: ["en"]
+  };
+  function contentPrefix(template, locale) {
+    const prefixes = CONTENT_PREFIXES[template];
+    return (prefixes == null ? void 0 : prefixes[locale]) || (prefixes == null ? void 0 : prefixes.en);
+  }
+
+  // tools/importer/locale.js
+  function sourceLocale(url) {
+    let pathname = String(url || "");
+    try {
+      pathname = new URL(pathname, "https://www.skoda-storyboard.com").pathname;
+    } catch (e) {
+    }
+    const m = pathname.match(/^\/([a-z]{2})(?:\/|$)/i);
+    const locale = m ? m[1].toLowerCase() : "en";
+    return Object.prototype.hasOwnProperty.call(LOCALE_PATHS, locale) ? locale : "en";
+  }
+  var indexUrl = (locale) => `/${locale}/query-index.json`;
+  var mediaFeedUrl = (locale) => `/${BUILT.mediaFeed.includes(locale) ? locale : "en"}/media-feed.json`;
+  var contentPath = (template, locale) => `${contentPrefix(template, locale)}/`;
+
   // tools/importer/parsers/listing.js
   var FACETS_NEWS = "model, derivative, concept, bodywork, years, company, happening, history, sponsorship, vip, view, technology, environment";
   var FACETS_MEDIA = FACETS_NEWS;
-  var VARIANTS = {
-    // News (press releases) — the baseline.
-    news: [
-      ["index", "/en/query-index.json"],
-      ["path", "/en/press-releases/"],
-      ["template", "press_release"],
-      ["facets", FACETS_NEWS],
-      ["sort", "newest"],
-      ["perpage", "6"],
-      ["columns", "3"]
-    ],
-    // Press Kits: the same engine and facets as News, over the kit hubs. `template` matches
-    // exactly, so chapter pages (`press_kit_chapter`) stay out, as on the source.
-    "press-kits": [
-      ["index", "/en/query-index.json"],
-      ["path", "/en/press-kits/"],
-      ["template", "press_kit"],
-      ["facets", FACETS_NEWS],
-      ["sort", "newest"],
-      ["perpage", "6"],
-      ["columns", "3"]
-    ],
-    images: [
-      ["index", "/en/media-feed.json"],
-      ["template", "image"],
-      ["facets", FACETS_MEDIA],
-      ["sort", "newest"],
-      ["perpage", "12"],
-      ["columns", "4"]
-    ],
-    videos: [
-      ["index", "/en/media-feed.json"],
-      ["template", "video"],
-      ["facets", FACETS_MEDIA],
-      ["sort", "newest"],
-      ["perpage", "12"],
-      ["columns", "4"]
-      // the source videos grid is 4-up at ≥992, like images
-    ],
-    // Site-wide free-text search: no path/template filter (cross-type), search box on.
-    search: [
-      ["index", "/en/query-index.json"],
-      ["facets", "model"],
-      ["search", "true"],
-      ["sort", "newest"],
-      ["perpage", "12"],
-      ["columns", "3"]
-    ]
+  function variantRows(variant, locale) {
+    const VARIANTS = {
+      // News (press releases) — the baseline.
+      news: [
+        ["index", indexUrl(locale)],
+        ["path", contentPath("press_release", locale)],
+        ["template", "press_release"],
+        ["facets", FACETS_NEWS],
+        ["sort", "newest"],
+        ["perpage", "6"],
+        ["columns", "3"]
+      ],
+      // Press Kits: the same engine and facets as News, over the kit hubs. `template` matches
+      // exactly, so chapter pages (`press_kit_chapter`) stay out, as on the source.
+      "press-kits": [
+        ["index", indexUrl(locale)],
+        ["path", contentPath("press_kit", locale)],
+        ["template", "press_kit"],
+        ["facets", FACETS_NEWS],
+        ["sort", "newest"],
+        ["perpage", "6"],
+        ["columns", "3"]
+      ],
+      images: [
+        ["index", mediaFeedUrl(locale)],
+        ["template", "image"],
+        ["facets", FACETS_MEDIA],
+        ["sort", "newest"],
+        ["perpage", "12"],
+        ["columns", "4"]
+      ],
+      videos: [
+        ["index", mediaFeedUrl(locale)],
+        ["template", "video"],
+        ["facets", FACETS_MEDIA],
+        ["sort", "newest"],
+        ["perpage", "12"],
+        ["columns", "4"]
+        // the source videos grid is 4-up at ≥992, like images
+      ],
+      // Site-wide free-text search: no path/template filter (cross-type), search box on.
+      search: [
+        ["index", indexUrl(locale)],
+        ["facets", "model"],
+        ["search", "true"],
+        ["sort", "newest"],
+        ["perpage", "12"],
+        ["columns", "3"]
+      ]
+    };
+    return VARIANTS[variant];
+  }
+  var KIND_BY_SECTION = {
+    images: "images",
+    videos: "videos",
+    search: "search",
+    pressKits: "press-kits",
+    news: "news"
   };
+  function variantFromPath(url, locale) {
+    let pathname = "";
+    try {
+      pathname = new URL(url, "https://www.skoda-storyboard.com").pathname;
+    } catch (e) {
+      return null;
+    }
+    const path = pathname.replace(/\/+$/, "").toLowerCase();
+    const paths = LOCALE_PATHS[locale] || {};
+    const key = Object.keys(KIND_BY_SECTION).find((k) => paths[k] === path);
+    return key ? KIND_BY_SECTION[key] : null;
+  }
   function variantFromBody(document2) {
     const tokens = (document2.body && document2.body.getAttribute("class") || "").split(/\s+/);
     if (tokens.includes("images")) return "images";
@@ -101,18 +244,21 @@ var CustomImportScript = (() => {
     if (tokens.includes("press-kits")) return "press-kits";
     return "news";
   }
-  function parse(element, { document: document2 }) {
+  function parse(element, { document: document2, url, params }) {
     const isListing = element.matches("#search-filter-results, .search-filter, .search-results-items") || element.querySelector(".search-filter, .search-results-items, .ajax-loader-button");
     if (!isListing) {
       element.replaceWith(...element.childNodes);
       return;
     }
-    const cells = [["Listing"], ...VARIANTS[variantFromBody(document2)]];
+    const source = params && params.originalURL || url || "";
+    const locale = sourceLocale(source);
+    const variant = variantFromPath(source, locale) || variantFromBody(document2);
+    const cells = [["Listing"], ...variantRows(variant, locale)];
     const table = WebImporter.DOMUtils.createTable(cells, document2);
     element.replaceWith(table);
   }
 
-  // transformers/skoda-listing-cleanup.js
+  // tools/importer/transformers/skoda-listing-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
@@ -160,7 +306,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-model-sections.js
+  // tools/importer/transformers/skoda-model-sections.js
   var SECTION_MARKER_ATTR = "data-excat-section-id";
   function querySection(root, selectors) {
     const list = Array.isArray(selectors) ? selectors : [selectors];
@@ -205,7 +351,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-metadata.js
+  // tools/importer/transformers/skoda-metadata.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -492,11 +638,13 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // transformers/skoda-links.js
+  // tools/importer/transformers/skoda-links.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
   var DEMO_PATHS = [
+    "/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+    "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
     "/en",
     "/en/category/classic-cars",
     "/en/category/concepts",
@@ -517,13 +665,18 @@ var CustomImportScript = (() => {
     "/en/emobility/a-stunning-drive-to-the-northernmost-tip-of-mallorca",
     "/en/emobility/a-true-czech-from-spain",
     "/en/emobility/an-electric-car-approaching-says-the-license-plate-but-only-in-some-countries",
+    "/en/emobility/before-an-electric-car-starts-up-for-the-first-time",
     "/en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq",
     "/en/emobility/camouflage-to-get-you-hooked",
     "/en/emobility/coffee-on-electric-wheels-elroq-and-enyaq-serving-coffee",
     "/en/emobility/come-and-play-skoda-is-heading-to-milan",
     "/en/emobility/designers-on-the-peaq-its-modern-durable-and-practical",
+    "/en/emobility/discover-the-countryside-around-zell-am-see",
+    "/en/emobility/electrifying-the-bear-driving-the-skoda-kodiaq-iv",
     "/en/emobility/elroq-rs-in-a-robe-unveiling-the-secret-of-matte-paint",
     "/en/emobility/enyaq-and-elroq-now-double-as-gaming-consoles-and-thats-not-all",
+    "/en/emobility/enyaq-coupe-respectline-a-celebration-of-uniqueness",
+    "/en/emobility/enyaq-rs-race-rally-technology-plus-sustainability",
     "/en/emobility/even-opening-the-door-is-an-experience-says-the-designer-of-the-peaq-suv",
     "/en/emobility/how-the-versatile-skoda-peaq-conquered-a-mountain-peak",
     "/en/emobility/how-was-the-elroq-made-not-in-the-usual-way",
@@ -531,6 +684,7 @@ var CustomImportScript = (() => {
     "/en/emobility/meet-peaq-safe-and-comfortable",
     "/en/emobility/meet-the-peaq-a-large-suv-with-outstanding-aerodynamics",
     "/en/emobility/meet-the-peaq-comfort-just-like-at-home",
+    "/en/emobility/meet-the-peaq-intuitive-and-comfortable-controls",
     "/en/emobility/meet-the-peaq-spacious-inside-and-out",
     "/en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan",
     "/en/emobility/peaq-enters-production-sharing-the-line-with-the-octavia",
@@ -538,30 +692,62 @@ var CustomImportScript = (() => {
     "/en/emobility/practical-fun-stylish-5-reasons-to-choose-the-epiq",
     "/en/emobility/skoda-elroq-and-a-happy-family",
     "/en/emobility/skoda-elroq-premiere-light-cube-camera-action",
+    "/en/emobility/skoda-enyaq-coupe-iv-will-get-you-in-60-seconds",
     "/en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim",
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
     "/en/emobility/skoda-peaq-unparalleled-space-and-comfort",
     "/en/emobility/spacious-comfortable-and-striking-five-reasons-to-want-the-skoda-peaq",
     "/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq",
     "/en/emobility/teaser",
+    "/en/emobility/the-little-prince-van-gogh-and-lavender-scent",
     "/en/emobility/the-skoda-peaq-will-win-you-over-fast",
     "/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere",
     "/en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
     "/en/emobility/whats-behind-epiq-design",
     "/en/images",
     "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague",
+    "/en/lifestyle/a-journey-you-will-never-forget-the-monumental-route-napoleon",
     "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving",
     "/en/lifestyle/chainsaws-and-sparklers-discover-the-traditions-of-rally-fans",
+    "/en/lifestyle/exploring-the-magnificent-alps-in-rs-models",
     "/en/lifestyle/feeling-the-heat-skoda-cars-keep-both-passengers-and-their-snacks-cool",
     "/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling",
+    "/en/lifestyle/how-to-take-the-best-picture-of-a-car-follow-a-pros-advice",
+    "/en/lifestyle/into-the-freezing-water-with-the-iceman",
     "/en/lifestyle/la-dolce-vita-explore-the-surroundings-of-lake-como",
     "/en/lifestyle/ouninpohja-finlands-roller-coaster-stage",
+    "/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic",
+    "/en/lifestyle/road-trip-in-asturias-from-beaches-to-high-peaks",
     "/en/lifestyle/rs-four-ways-which-one-will-you-choose",
     "/en/lifestyle/skodas-smarter-wireless-charging-goes-beyond-phones",
+    "/en/lifestyle/sports/cycling/miss-peaches-on-the-road-enduro-in-barcelona",
+    "/en/lifestyle/sports/cycling/miss-peaches-on-the-road-skatepark-tricks-in-marseille",
+    "/en/lifestyle/sports/cycling/miss-peaches-on-the-road-whitewater-in-switzerland",
+    "/en/lifestyle/sports/hockey/this-years-skoda-ice-hockey-team-line-up",
+    "/en/lifestyle/sports/miss-peaches-on-the-road-downhill-biking-in-champery-switzerland",
+    "/en/lifestyle/sports/miss-peaches-on-the-road-surfing-in-san-sebastian",
+    "/en/lifestyle/the-best-of-storyboard-pucks-wheels-seconds",
+    "/en/lifestyle/this-years-skoda-auto-hockey-team-line-up",
     "/en/lifestyle/what-you-learn-on-the-circuit-can-save-you-on-the-road",
     "/en/media-cart",
     "/en/media-room",
+    "/en/models/discovering-the-full-power-of-a-skoda-4x4",
+    "/en/models/enyaq-rs-race-an-electric-coupe-on-steroids",
+    "/en/models/first-glimpse-of-skodas-new-suv",
+    "/en/models/kamiq/first-sketches-of-the-skoda-kamiq",
+    "/en/models/kamiq/skodas-new-suv-christened-the-kamiq",
+    "/en/models/kamiq/the-skoda-kamiq-your-travel-buddy-for-urban-adventuring",
+    "/en/models/karoq/first-sketches-of-the-new-skoda-karoq",
+    "/en/models/meet-the-skoda-kodiaq-sportline",
+    "/en/models/millionth-skoda-suv",
+    "/en/models/number-of-the-month-140",
+    "/en/models/scala/number-of-the-month-40",
+    "/en/models/scala/welcome-the-skoda-scala",
+    "/en/models/skoda-4x4-your-best-bet-in-the-snow",
     "/en/models/skoda-elroq-through-designers-eyes",
+    "/en/models/skoda-world-premieres-in-geneva",
+    "/en/models/sporty-and-stylish-the-kodiaq-gets-the-rs-treatment",
+    "/en/models/superb/sporty-flair-for-every-day-the-superb-sportline-will-get-you",
     "/en/news",
     "/en/press-kits",
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit",
@@ -620,11 +806,18 @@ var CustomImportScript = (() => {
     "/en/press-kits/classic-days-2026-press-kit/texts",
     "/en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary",
     "/en/press-kits/classic-days-2026-press-kit/videos",
+    "/en/press-kits/design-and-technology-update-for-the-skoda-fabia",
+    "/en/press-kits/enyaq-world-premiere",
     "/en/press-kits/lets-explore-albania-press-kit",
     "/en/press-kits/new-skoda-enyaq-press-kit-2",
     "/en/press-kits/press-kit-skoda-at-the-iaa-2019",
+    "/en/press-kits/skoda-at-the-2018-geneva-motor-show",
+    "/en/press-kits/skoda-at-the-2018-paris-motor-show",
+    "/en/press-kits/skoda-auto-at-auto-shanghai-2019-press-kit",
+    "/en/press-kits/skoda-citigo-iv-skoda-superb-iv-press-kit",
     "/en/press-kits/skoda-elroq-press-kit",
     "/en/press-kits/skoda-elroq-press-kit-2",
+    "/en/press-kits/skoda-enyaq-iv-press-kit-2",
     "/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car",
     "/en/press-kits/skoda-epiq-press-kit-2",
     "/en/press-kits/skoda-epiq-press-kit-2/battery-and-powertrain-variants-front-wheel-drive-architectureand-efficient-electric-performance",
@@ -641,11 +834,21 @@ var CustomImportScript = (() => {
     "/en/press-kits/skoda-epiq-press-kit-2/texts",
     "/en/press-kits/skoda-epiq-press-kit-2/videos",
     "/en/press-kits/skoda-fabia-130-special-edition-celebrates-skoda-autos-anniversary-and-motorsport-heritage",
+    "/en/press-kits/skoda-fabia-covered-drive-press-kit",
+    "/en/press-kits/skoda-fabia-monte-carlo-press-kit",
+    "/en/press-kits/skoda-fabia-press-kit",
+    "/en/press-kits/skoda-iv-press-kit",
+    "/en/press-kits/skoda-kamiq-gt-press-kit",
+    "/en/press-kits/skoda-kamiq-press-kit",
+    "/en/press-kits/skoda-karoq-media-launch-press-kit",
+    "/en/press-kits/skoda-kodiaq-press-kit",
+    "/en/press-kits/skoda-kodiaq-rs-press-kit",
     "/en/press-kits/skoda-octavia-media-launch-press-kit",
     "/en/press-kits/skoda-octavia-press-kit",
     "/en/press-kits/skoda-octavia-press-kit-2",
     "/en/press-kits/skoda-octavia-rs-245-sporty-spacious-practical-family-sportster-delivers-245-ps",
     "/en/press-kits/skoda-octavia-rs-and-octavia-scout-press-kit",
+    "/en/press-kits/skoda-octavia-rs-skoda-octavia-combi-rs-press-kit",
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship",
     "/en/press-kits/skoda-peaq-press-kit",
     "/en/press-kits/skoda-peaq-press-kit-2",
@@ -664,18 +867,34 @@ var CustomImportScript = (() => {
     "/en/press-kits/skoda-peaq-press-kit-2/videos",
     "/en/press-kits/skoda-rs-driving-experience-press-kit",
     "/en/press-kits/skoda-rs-experience-press-kit",
+    "/en/press-kits/skoda-scala",
+    "/en/press-kits/skoda-scala-and-skoda-kamiq-media-launch-press-kit",
+    "/en/press-kits/skoda-scala-and-skoda-kamiq-press-kit",
+    "/en/press-kits/skoda-superb-press-kit",
     "/en/press-kits/skoda-vision-o-press-kit",
     "/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design",
     "/en/press-kits/the-all-new-skoda-kodiaq-press-kit",
     "/en/press-kits/the-all-new-skoda-superb-press-kit",
+    "/en/press-kits/the-all-skoda-superb-press-kit-2",
     "/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models",
+    "/en/press-kits/the-new-skoda-enyaq-coupe-iv-covered-drive-press-kit",
+    "/en/press-kits/the-new-skoda-enyaq-coupe-iv-media-launch-press-kit",
+    "/en/press-kits/the-new-skoda-enyaq-coupe-iv-world-premiere-press-kit",
+    "/en/press-kits/the-new-skoda-enyaq-rs-iv-media-launch-press-kit",
+    "/en/press-kits/the-new-skoda-fabia-media-launch-press-kit",
+    "/en/press-kits/the-new-skoda-karoq-world-premiere-press-kit",
+    "/en/press-kits/the-new-skoda-kodiaq-dynamic-press-launch-press-kit",
+    "/en/press-kits/the-new-skoda-kodiaq-press-kit",
     "/en/press-releases/2026-iihf-ice-hockey-world-championship-roman-josi-wins-most-valuable-player-trophy-created-by-skoda-design",
     "/en/press-releases/30-years-since-the-foundation-stone-was-laid-m13-a-key-pillar-of-skodas-production",
     "/en/press-releases/936-km-without-recharging-skoda-peaq-sets-range-record-for-seven-seater-electric-suvs",
     "/en/press-releases/camp-mode-in-the-myskoda-app-comfortable-overnight-stays-in-electric-vehicles",
     "/en/press-releases/lorena-wiebes-receives-skoda-design-trophy-after-winning-tour-de-france-femmes-avec-zwift-points-classification",
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-1-2026",
     "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-3-2026",
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-1-2026",
     "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-3-2026",
+    "/en/press-releases/paris-motor-show-2018-two-skoda-presentations-live-online",
     "/en/press-releases/preparations-begin-for-the-11th-skoda-student-car-celebrating-100-years-of-vocational-education",
     "/en/press-releases/production-milestone-skoda-auto-builds-its-one-millionth-karoq",
     "/en/press-releases/simply-clever-for-summer-smart-skoda-features-that-make-every-trip-easier",
@@ -721,6 +940,7 @@ var CustomImportScript = (() => {
     "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-livestream-from-zurich",
     "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-pictures-on-the-skoda-storyboard",
     "/en/press-releases/world-premiere-of-the-all-new-skoda-peaq-livestream-from-france",
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-superb-pictures-on-the-skoda-storyboard",
     "/en/search",
     "/en/series-2",
     "/en/series/125-years-of-motorsport",
@@ -738,6 +958,7 @@ var CustomImportScript = (() => {
     "/en/series/unexpected-jobs",
     "/en/series/unknown-parts",
     "/en/series/winter-tips",
+    "/en/simply-clever/do-you-have-a-qr-code-in-your-boot-it-will-show-you-all-the-smart-features",
     "/en/simply-clever/park-your-skoda-using-your-mobile-phone-well-show-you-how-how",
     "/en/skoda-model/elroq",
     "/en/skoda-model/elroq/elroq-rs",
@@ -766,22 +987,46 @@ var CustomImportScript = (() => {
     "/en/skoda-world/2024-a-year-of-new-electric-cars-and-innovated-favourites",
     "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it",
     "/en/skoda-world/a-record-year-for-skoda-electrified-models-also-contribute",
+    "/en/skoda-world/can-you-recognise-skoda-models-from-their-silhouettes",
+    "/en/skoda-world/cars-that-are-safe-for-pedestrians-as-well",
+    "/en/skoda-world/children-painted-cars-for-medical-clowns",
+    "/en/skoda-world/clever-luggage-solutions-for-your-boot",
+    "/en/skoda-world/coca-cola-and-skoda-more-than-30-years-together",
     "/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car",
+    "/en/skoda-world/drive-like-a-champion-on-tarmac-gravel-or-snow",
+    "/en/skoda-world/enhanced-superb-iv-delivers-200-kw-of-power",
+    "/en/skoda-world/enter-the-world-of-skoda-in-frankfurt",
     "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality",
+    "/en/skoda-world/first-sketches-of-the-new-kodiaq",
     "/en/skoda-world/get-your-car-ready-for-summer-with-skoda-accessories",
+    "/en/skoda-world/here-it-comes-the-skoda-elroq-a-compact-electric-suv",
     "/en/skoda-world/how-the-skoda-octavia-reached-365-km-h",
+    "/en/skoda-world/how-to-get-a-kodiaq-into-a-metro-station",
+    "/en/skoda-world/innovation-and-technology/enyaq-rs-race-an-electric-drive-with-motorsport-dna",
+    "/en/skoda-world/kamiq-karoq-kodiaq-great-choices-for-the-city-and-countryside",
     "/en/skoda-world/king-of-space-and-long-distance-travel-skoda-superb-celebrates-25-years",
+    "/en/skoda-world/klaus-drives-on-the-ice-with-a-rally-champion",
     "/en/skoda-world/legend-chris-froome-takes-you-behind-the-scenes-of-the-tour-de-france",
+    "/en/skoda-world/life-with-a-plug-in-hybrid-a-versatile-companion",
     "/en/skoda-world/making-driving-easier-how-cruise-control-works",
     "/en/skoda-world/octavia-arrives-with-a-new-full-hybrid-powertrain",
     "/en/skoda-world/oliver-solberg-behind-the-wheel-of-the-new-octavia-rs",
     "/en/skoda-world/peaq-inside-a-designblok",
     "/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details",
     "/en/skoda-world/rally-champion-and-the-unique-skoda-fabia-motorsport-edition",
+    "/en/skoda-world/rally-champion-fuel-efficiency-record-holder",
+    "/en/skoda-world/rally-champion-presents-the-rs-family",
+    "/en/skoda-world/rs-models-skodas-true-sporting-spirit",
     "/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator",
+    "/en/skoda-world/skoda-kodiaq-will-get-you-in-60-seconds",
+    "/en/skoda-world/skoda-octavia-rs-how-it-has-evolved",
+    "/en/skoda-world/sliding-into-the-record-books",
     "/en/skoda-world/sportline-models-dynamic-elegance-for-every-day",
+    "/en/skoda-world/the-approach-of-the-keyless-age",
     "/en/skoda-world/the-immortal-octavia-see-what-it-looks-like-after-one-million-kilometres",
+    "/en/skoda-world/the-new-skoda-octavia-seen-through-its-designers-eyes",
     "/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour",
+    "/en/skoda-world/the-skoda-stand-in-paris-360-tour",
     "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too",
     "/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion",
     "/en/tag/company/design",
@@ -810,33 +1055,108 @@ var CustomImportScript = (() => {
     "/en/tag/years/2024",
     "/en/tag/years/2025",
     "/en/tag/years/2026",
-    "/en/videos"
+    "/en/videos",
+    "/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
+    "/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
   ];
   var DEMO_ALIASES = {
     "/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality": "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality"
   };
   var LIVE_ONLY_PATHS = [
+    "/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+    "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
     "/en/emobility/a-true-czech-from-spain",
+    "/en/emobility/before-an-electric-car-starts-up-for-the-first-time",
     "/en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq",
     "/en/emobility/come-and-play-skoda-is-heading-to-milan",
+    "/en/emobility/discover-the-countryside-around-zell-am-see",
+    "/en/emobility/electrifying-the-bear-driving-the-skoda-kodiaq-iv",
+    "/en/emobility/enyaq-coupe-respectline-a-celebration-of-uniqueness",
+    "/en/emobility/enyaq-rs-race-rally-technology-plus-sustainability",
     "/en/emobility/meet-peaq-safe-and-comfortable",
     "/en/emobility/meet-the-peaq-a-large-suv-with-outstanding-aerodynamics",
+    "/en/emobility/meet-the-peaq-intuitive-and-comfortable-controls",
     "/en/emobility/modelling-clay-yoga-simply-epiq-skoda-returns-to-milan",
+    "/en/emobility/skoda-enyaq-coupe-iv-will-get-you-in-60-seconds",
     "/en/emobility/teaser",
+    "/en/emobility/the-little-prince-van-gogh-and-lavender-scent",
     "/en/emobility/the-skoda-peaq-will-win-you-over-fast",
     "/en/emobility/this-is-epiq-a-behind-the-scenes-look-at-the-premiere",
     "/en/emobility/watch-the-world-premiere-of-the-skoda-epiq-ev-live",
     "/en/emobility/whats-behind-epiq-design",
+    "/en/lifestyle/a-journey-you-will-never-forget-the-monumental-route-napoleon",
+    "/en/lifestyle/exploring-the-magnificent-alps-in-rs-models",
     "/en/lifestyle/feeling-the-heat-skoda-cars-keep-both-passengers-and-their-snacks-cool",
+    "/en/lifestyle/how-to-take-the-best-picture-of-a-car-follow-a-pros-advice",
+    "/en/lifestyle/into-the-freezing-water-with-the-iceman",
+    "/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic",
+    "/en/lifestyle/road-trip-in-asturias-from-beaches-to-high-peaks",
+    "/en/lifestyle/sports/cycling/miss-peaches-on-the-road-enduro-in-barcelona",
+    "/en/lifestyle/sports/cycling/miss-peaches-on-the-road-skatepark-tricks-in-marseille",
+    "/en/lifestyle/sports/cycling/miss-peaches-on-the-road-whitewater-in-switzerland",
+    "/en/lifestyle/sports/hockey/this-years-skoda-ice-hockey-team-line-up",
+    "/en/lifestyle/sports/miss-peaches-on-the-road-downhill-biking-in-champery-switzerland",
+    "/en/lifestyle/sports/miss-peaches-on-the-road-surfing-in-san-sebastian",
+    "/en/lifestyle/the-best-of-storyboard-pucks-wheels-seconds",
+    "/en/lifestyle/this-years-skoda-auto-hockey-team-line-up",
     "/en/media-cart",
     "/en/media-room",
+    "/en/models/discovering-the-full-power-of-a-skoda-4x4",
+    "/en/models/enyaq-rs-race-an-electric-coupe-on-steroids",
+    "/en/models/first-glimpse-of-skodas-new-suv",
+    "/en/models/kamiq/first-sketches-of-the-skoda-kamiq",
+    "/en/models/kamiq/skodas-new-suv-christened-the-kamiq",
+    "/en/models/kamiq/the-skoda-kamiq-your-travel-buddy-for-urban-adventuring",
+    "/en/models/karoq/first-sketches-of-the-new-skoda-karoq",
+    "/en/models/meet-the-skoda-kodiaq-sportline",
+    "/en/models/millionth-skoda-suv",
+    "/en/models/number-of-the-month-140",
+    "/en/models/scala/number-of-the-month-40",
+    "/en/models/scala/welcome-the-skoda-scala",
+    "/en/models/skoda-4x4-your-best-bet-in-the-snow",
+    "/en/models/skoda-world-premieres-in-geneva",
+    "/en/models/sporty-and-stylish-the-kodiaq-gets-the-rs-treatment",
+    "/en/models/superb/sporty-flair-for-every-day-the-superb-sportline-will-get-you",
     "/en/news",
     "/en/press-kits",
+    "/en/press-kits/design-and-technology-update-for-the-skoda-fabia",
+    "/en/press-kits/enyaq-world-premiere",
+    "/en/press-kits/skoda-at-the-2018-geneva-motor-show",
+    "/en/press-kits/skoda-at-the-2018-paris-motor-show",
+    "/en/press-kits/skoda-auto-at-auto-shanghai-2019-press-kit",
+    "/en/press-kits/skoda-citigo-iv-skoda-superb-iv-press-kit",
+    "/en/press-kits/skoda-enyaq-iv-press-kit-2",
+    "/en/press-kits/skoda-fabia-covered-drive-press-kit",
+    "/en/press-kits/skoda-fabia-monte-carlo-press-kit",
+    "/en/press-kits/skoda-fabia-press-kit",
+    "/en/press-kits/skoda-iv-press-kit",
+    "/en/press-kits/skoda-kamiq-gt-press-kit",
+    "/en/press-kits/skoda-kamiq-press-kit",
+    "/en/press-kits/skoda-karoq-media-launch-press-kit",
+    "/en/press-kits/skoda-kodiaq-press-kit",
+    "/en/press-kits/skoda-kodiaq-rs-press-kit",
+    "/en/press-kits/skoda-octavia-rs-skoda-octavia-combi-rs-press-kit",
+    "/en/press-kits/skoda-scala",
+    "/en/press-kits/skoda-scala-and-skoda-kamiq-media-launch-press-kit",
+    "/en/press-kits/skoda-scala-and-skoda-kamiq-press-kit",
+    "/en/press-kits/skoda-superb-press-kit",
+    "/en/press-kits/the-all-skoda-superb-press-kit-2",
+    "/en/press-kits/the-new-skoda-enyaq-coupe-iv-covered-drive-press-kit",
+    "/en/press-kits/the-new-skoda-enyaq-coupe-iv-media-launch-press-kit",
+    "/en/press-kits/the-new-skoda-enyaq-coupe-iv-world-premiere-press-kit",
+    "/en/press-kits/the-new-skoda-enyaq-rs-iv-media-launch-press-kit",
+    "/en/press-kits/the-new-skoda-fabia-media-launch-press-kit",
+    "/en/press-kits/the-new-skoda-karoq-world-premiere-press-kit",
+    "/en/press-kits/the-new-skoda-kodiaq-dynamic-press-launch-press-kit",
+    "/en/press-kits/the-new-skoda-kodiaq-press-kit",
     "/en/press-releases/2026-iihf-ice-hockey-world-championship-roman-josi-wins-most-valuable-player-trophy-created-by-skoda-design",
     "/en/press-releases/camp-mode-in-the-myskoda-app-comfortable-overnight-stays-in-electric-vehicles",
     "/en/press-releases/lorena-wiebes-receives-skoda-design-trophy-after-winning-tour-de-france-femmes-avec-zwift-points-classification",
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-1-2026",
     "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-3-2026",
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-1-2026",
     "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-3-2026",
+    "/en/press-releases/paris-motor-show-2018-two-skoda-presentations-live-online",
     "/en/press-releases/preparations-begin-for-the-11th-skoda-student-car-celebrating-100-years-of-vocational-education",
     "/en/press-releases/simply-clever-for-summer-smart-skoda-features-that-make-every-trip-easier",
     "/en/press-releases/skoda-auto-appoints-world-renowned-road-cyclist-chris-froome-as-brand-cycling-ambassador",
@@ -859,17 +1179,45 @@ var CustomImportScript = (() => {
     "/en/press-releases/skoda-vrchlabi-newsletter-2-2026",
     "/en/press-releases/tadej-pogacar-winner-of-the-113th-tour-de-france-receives-crystal-trophy-created-by-skoda-design",
     "/en/press-releases/world-premiere-of-the-all-new-skoda-epiq-pictures-on-the-skoda-storyboard",
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-superb-pictures-on-the-skoda-storyboard",
     "/en/search",
     "/en/series-2",
+    "/en/simply-clever/do-you-have-a-qr-code-in-your-boot-it-will-show-you-all-the-smart-features",
     "/en/skoda-model/enyaq-iv-2/enyaq-coupe-iv",
     "/en/skoda-world/125-years-of-racing-history-in-one-place-come-visit-the-museum",
+    "/en/skoda-world/can-you-recognise-skoda-models-from-their-silhouettes",
+    "/en/skoda-world/cars-that-are-safe-for-pedestrians-as-well",
+    "/en/skoda-world/children-painted-cars-for-medical-clowns",
+    "/en/skoda-world/clever-luggage-solutions-for-your-boot",
+    "/en/skoda-world/coca-cola-and-skoda-more-than-30-years-together",
+    "/en/skoda-world/drive-like-a-champion-on-tarmac-gravel-or-snow",
+    "/en/skoda-world/enhanced-superb-iv-delivers-200-kw-of-power",
+    "/en/skoda-world/enter-the-world-of-skoda-in-frankfurt",
+    "/en/skoda-world/first-sketches-of-the-new-kodiaq",
     "/en/skoda-world/get-your-car-ready-for-summer-with-skoda-accessories",
+    "/en/skoda-world/here-it-comes-the-skoda-elroq-a-compact-electric-suv",
+    "/en/skoda-world/how-to-get-a-kodiaq-into-a-metro-station",
+    "/en/skoda-world/innovation-and-technology/enyaq-rs-race-an-electric-drive-with-motorsport-dna",
+    "/en/skoda-world/kamiq-karoq-kodiaq-great-choices-for-the-city-and-countryside",
     "/en/skoda-world/king-of-space-and-long-distance-travel-skoda-superb-celebrates-25-years",
+    "/en/skoda-world/klaus-drives-on-the-ice-with-a-rally-champion",
+    "/en/skoda-world/life-with-a-plug-in-hybrid-a-versatile-companion",
     "/en/skoda-world/octavia-arrives-with-a-new-full-hybrid-powertrain",
     "/en/skoda-world/peaq-inside-a-designblok",
     "/en/skoda-world/rally-champion-and-the-unique-skoda-fabia-motorsport-edition",
+    "/en/skoda-world/rally-champion-fuel-efficiency-record-holder",
+    "/en/skoda-world/rally-champion-presents-the-rs-family",
+    "/en/skoda-world/rs-models-skodas-true-sporting-spirit",
     "/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator",
-    "/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion"
+    "/en/skoda-world/skoda-kodiaq-will-get-you-in-60-seconds",
+    "/en/skoda-world/skoda-octavia-rs-how-it-has-evolved",
+    "/en/skoda-world/sliding-into-the-record-books",
+    "/en/skoda-world/the-approach-of-the-keyless-age",
+    "/en/skoda-world/the-new-skoda-octavia-seen-through-its-designers-eyes",
+    "/en/skoda-world/the-skoda-stand-in-paris-360-tour",
+    "/en/skoda-world/what-was-racing-like-half-a-century-ago-skoda-120-s-rallye-delights-a-champion",
+    "/sk/emobilita-sk/skoda-epiq-si-vas-ziska-za-par-sekund",
+    "/sr/emobilnost-sr/skoda-epiq-will-win-you-over-in-just-a-few-seconds"
   ];
   var ALLOWED = new Set(DEMO_PATHS);
   var LIVE_ONLY = new Set(LIVE_ONLY_PATHS);
@@ -902,14 +1250,23 @@ var CustomImportScript = (() => {
     }
     return ALLOWED.has(target) ? `${target}${tail}` : null;
   }
-  var TAG_FILTER = /^(?:(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com)?\/en\/news\/?\?filter(?:\[|%5B)([a-z0-9-]+)(?:\]|%5D)(?:\[\]|%5B%5D)=([^&#]+)$/i;
+  var NEWS_LISTINGS = {
+    en: "news",
+    cs: "tiskove-zpravy",
+    de: "pressemitteilungen",
+    sk: "tlacove-spravy",
+    sr: "news"
+  };
+  var TAG_FILTER = new RegExp("^(?:(?:https?:)?//(?:www\\.)?skoda-storyboard\\.com)?/([a-z]{2})/([a-z0-9-]+)/?\\?filter(?:\\[|%5B)([a-z0-9-]+)(?:\\]|%5D)(?:\\[\\]|%5B%5D)=([^&#]+)$", "i");
   function tagPageHref(href) {
     const m = href.match(TAG_FILTER);
     if (!m) return null;
-    const slug = edsPath(`/${m[2]}`).slice(1);
-    const exact = `/en/tag/${m[1].toLowerCase()}/${slug}`;
+    const locale = m[1].toLowerCase();
+    if (NEWS_LISTINGS[locale] !== m[2].toLowerCase()) return null;
+    const slug = edsPath(`/${m[4]}`).slice(1);
+    const exact = `/${locale}/tag/${m[3].toLowerCase()}/${slug}`;
     if (ALLOWED.has(exact)) return exact;
-    const bySlug = DEMO_PATHS.filter((p) => p.startsWith("/en/tag/") && p.endsWith(`/${slug}`) && p.split("/").length === 5);
+    const bySlug = DEMO_PATHS.filter((p) => p.startsWith(`/${locale}/tag/`) && p.endsWith(`/${slug}`) && p.split("/").length === 5);
     return bySlug.length === 1 ? bySlug[0] : null;
   }
   var RAIL_VIEWALL_KEYS = ["viewall", "view-all", "all"];
@@ -932,7 +1289,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-nbsp.js
+  // tools/importer/transformers/skoda-nbsp.js
   var NBSP_PLACEHOLDER = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
   function transform5(hookName, element, payload) {
@@ -950,7 +1307,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-images.js
+  // tools/importer/transformers/skoda-images.js
   function hasContent(node) {
     return [...node.childNodes].some((child) => child.nodeType === 1 || (child.textContent || "").trim());
   }
@@ -1065,7 +1422,7 @@ var CustomImportScript = (() => {
     });
   }
 
-  // import-videos-listing.js
+  // tools/importer/import-videos-listing.js
   var parsers = {
     listing: parse
   };

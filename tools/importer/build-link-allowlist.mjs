@@ -17,13 +17,14 @@
  *
  * Usage: npm run import:allowlist   (then re-bundle the importers)
  *        npm run import:allowlist -- --refresh-published   (first rewrite the published list
- *        from the live query index; run it after publishing new pages)
+ *        from every locale's live query index, SKODA-1001; run it after publishing new pages)
  * skoda-links.test.mjs fails if the committed list drifts from the text files.
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { LOCALE_PATHS } from '../../scripts/locale-paths.js';
 import { parseSectionedList, mergeLists } from './push/m1-status-lib.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -31,7 +32,10 @@ export const SET = 'docs/planning/skoda-m1-url-set.txt';
 export const CORPUS = 'docs/planning/skoda-rail-feed-corpus.txt';
 export const ARCHIVES = 'docs/planning/skoda-archive-url-set.txt';
 export const PUBLISHED = 'docs/planning/skoda-published-url-set.txt';
-const LIVE_INDEX = 'https://main--demo--skoda-storyboard.aem.live/en/query-index.json?limit=10000';
+// every locale's live index (SKODA-1001): a translated page is a demo page too, so links to it
+// become site-relative; a locale without an index yet (404) is skipped
+const LIVE_INDEXES = Object.keys(LOCALE_PATHS)
+  .map((locale) => `https://main--demo--skoda-storyboard.aem.live/${locale}/query-index.json?limit=10000`);
 const SOURCE_ORIGIN = 'https://www.skoda-storyboard.com';
 // live demo-only pages that are not source pages (QA fixtures), never link targets
 const NOT_SOURCE = /^\/(?:drafts|en\/test)(?:\/|$)/;
@@ -91,11 +95,18 @@ export function renderPublished(indexPaths, date) {
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   if (process.argv.includes('--refresh-published')) {
-    const response = await fetch(LIVE_INDEX);
-    if (!response.ok) throw new Error(`${LIVE_INDEX}: HTTP ${response.status}`);
-    const { data } = await response.json();
+    const paths = [];
+    for (const index of LIVE_INDEXES) {
+      // eslint-disable-next-line no-await-in-loop
+      const response = await fetch(index);
+      if (response.status === 404) { console.log(`${index}: no index yet, skipped`); continue; }
+      if (!response.ok) throw new Error(`${index}: HTTP ${response.status}`);
+      // eslint-disable-next-line no-await-in-loop
+      const { data } = await response.json();
+      paths.push(...data.map((row) => row.path));
+    }
     const today = new Date().toISOString().slice(0, 10);
-    const text = renderPublished(data.map((row) => row.path), today);
+    const text = renderPublished(paths, today);
     writeFileSync(path.join(ROOT, PUBLISHED), text);
     console.log(`${PUBLISHED}: ${text.match(/^https:/gm).length} pages`);
   }

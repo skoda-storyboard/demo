@@ -9,8 +9,8 @@
  * `{total}` are replaced by `format`; a `…One` key is the singular of a counted text (`plural`).
  */
 
+import { localePath } from './locale-paths.js';
 import { loadCSS } from './aem.js';
-import { currentLocale } from './query-index.js';
 // not the store: the UI and the listing banner must not pull it in (SKODA-505a review)
 import {
   LIMITS, LIMIT_BANNER_TEXT, buildLimitBanner, format, formatBytes,
@@ -87,8 +87,8 @@ export const plural = (labels, key, n, values = {}) => format(
   { ...values, n },
 );
 
-/** The cart page for the current locale (the source `/en/media-cart/`). */
-export const cartHref = (pathname = window.location.pathname) => `/${currentLocale(pathname)}/media-cart`;
+/** The cart page for the current locale (the source's `/en/media-cart/`, `/cs/kontakty/kosik/`). */
+export const cartHref = (pathname = window.location.pathname) => localePath('mediaCart', pathname);
 
 // one load for the page: loadCSS resolves at once for a sheet that is already linked but
 // still loading, so callers share this promise to wait for the real load
