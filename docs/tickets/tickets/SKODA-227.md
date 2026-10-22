@@ -120,6 +120,15 @@ unchanged press-release importer; text, images and blocks otherwise as before, t
 lists them today). The 3 left are the DA-edited and held pages above, and
 `30-years-since-the-foundation-stone-was-laid-…` (edited in DA).
 
+**Panel join paint (2026-10-22, #414 review):** after a two-column panel (`hl-cells`), the next panel is pulled up
+40px as on the source. Because `main` is a grid, each section paints whole, so the pulled panel's background covered the
+lower 7px of the previous panel's last line ("…the charging compartment.") from 781px. The previous panel's content now
+sits on its own layer (`position: relative; z-index: var(--z-panel-content)`), and its background stays under the next
+panel, as the source's plain blocks paint.
+- The painted line: on top in every hit test at 375–1440. Pixel-equal to the source at 781 / 992 / 1080 (0.00%) and 1280
+  (0.04%); before the fix, 0.5–1.4%.
+- The section boxes on the charging and Epiq stories: unchanged.
+
 **Press-release Tags (2026-10-22, found in SKODA-845):** the press-release importer bundle had been hand-edited in
 412396c (2026-10-15): its Tags parser declared `text4` and read `text5`, so it threw on every page, and the 22 press
 releases above went to preview without their sidebar Tags (live still had them). The bundle now equals a fresh

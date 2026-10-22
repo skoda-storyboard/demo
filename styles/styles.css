@@ -277,6 +277,7 @@
      The bar stays under the drawer, lightbox and consent banner so they always cover it. */
   --z-float-dock: 18;
   --z-skip-link: 21;
+  --z-panel-content: 1; /* in-page: a story panel's text over the panel pulled up onto it (SKODA-227) */
 
   /* media cart (SKODA-505b; media-cart.md §3, measured on the source 2026-09-30): the red
      count bubble on the cart badge, the dark scrim over an added card, the limit notice's
@@ -1432,6 +1433,16 @@ body.story main > .section.highlight-grey:has(+ .section.highlight-grey) {
 body.story main > .section.hl-cells:is(.highlight-dark, .highlight-grey) + .section.body-column:is(.highlight-dark, .highlight-grey) {
   margin-block-start: calc(-1 * var(--highlight-pull-up));
   padding-block-start: calc(var(--hl-pad-top) + var(--story-inset) + var(--hl-margin-top));
+}
+
+/* main is a grid, so each section paints whole (background, then text) after the one before it:
+   the pulled-up panel's background covered the last 7px of the previous panel's text from 781px
+   (#414 review). On the source both are plain blocks, whose backgrounds all paint before any text.
+   The previous panel's content goes on its own layer over the next panel; its background stays
+   under it, so the next panel still covers that */
+body.story main > .section.hl-cells:is(.highlight-dark, .highlight-grey):has(+ .section.body-column:is(.highlight-dark, .highlight-grey)) > div {
+  position: relative;
+  z-index: var(--z-panel-content);
 }
 
 /* a panel the importer cut where its text changes style (a centred 10pt caption among its
