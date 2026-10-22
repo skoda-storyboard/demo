@@ -545,11 +545,13 @@ export function railLayout({
  * The heading a rail sits under when it builds none itself: the last h2–h6 before the rail in its
  * section (the model pages' "Press Kits", the Newsletter page's "Kvasiny"), so each carousel is
  * named after it rather than the generic "Content carousel" (SKODA-845). '' when there is none.
+ * Another block before it ends the search: a rail's or gallery's card titles never name this one.
  * @param {Element} block the story-rail block
  */
 export function sectionHeadingText(block) {
   const wrapper = block.parentElement?.classList.contains('story-rail-wrapper') ? block.parentElement : block;
   for (let el = wrapper.previousElementSibling; el; el = el.previousElementSibling) {
+    if (/(?:^|\s)(?!default-content-wrapper)[\w-]+-wrapper(?:\s|$)/.test(el.className || '')) return '';
     const hs = el.matches('h2, h3, h4, h5, h6') ? [el] : [...el.querySelectorAll('h2, h3, h4, h5, h6')];
     const text = hs.length ? hs[hs.length - 1].textContent.trim() : '';
     if (text) return text;

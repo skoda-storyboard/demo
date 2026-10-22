@@ -19,7 +19,7 @@
  * and so is one whose teasers all carry a taxonomy but share no usable slug (a term-id class
  * like `company-61572`): a weaker filter would mix plants. Term-id classes are skipped. A
  * container with no teasers, no heading or no shared term is dropped (a rail without a filter
- * would list every press release).
+ * would list every press release), and so is one where a taxonomy is on only some teasers.
  *
  * Output, in order (each plant its own section, as on the source):
  *   <hr>                                   section break
@@ -71,7 +71,9 @@ export default function parse(element, { document }) {
     const shared = terms[0].slugs.filter((slug) => terms.every((t) => t.slugs.includes(slug)));
     if (shared.length > 1) ambiguous = `${taxonomy}: ${shared.join(', ')}`;
     else if (shared.length === 1) rows.push([key, shared[0]]);
-    else if (terms.every((t) => t.any)) ambiguous = `${taxonomy}: no shared slug`;
+    // a taxonomy on only some teasers is ambiguous too: dropping its filter would broaden the
+    // rail (categories alone mixes the plants, company alone lists non-newsletters; #457 review)
+    else if (terms.some((t) => t.any)) ambiguous = `${taxonomy}: no shared slug`;
   });
   if (ambiguous) {
     console.warn(`[carousel-listing] "${heading}": not one shared ${ambiguous}; dropped`);

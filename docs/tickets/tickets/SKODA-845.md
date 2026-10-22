@@ -67,13 +67,16 @@ production release.
 - `parsers/carousel-listing.js` + `import-carousel-listing.js`: the band (`Hero Image (page)`, SKODA-813), then
   per source carousel a section with its h3 and a `Story Rail` (`template: press_release`, `categories`,
   `company`: the one term per key every teaser shares, read from their classes; a carousel with two, or with
-  term ids only, is dropped rather than ORed), `Style: carousel-listing`. New plant newsletters appear without
+  term ids only, or with a taxonomy on only some teasers, is dropped rather than ORed or broadened; #457
+  review), `Style: carousel-listing`. New plant newsletters appear without
   editing the page.
 - `styles.css` `carousel-listing`: h3 24px under the band, 48px between rails and before the footer, cards
   20px under the h3, no list-item margin under the cards. The rail itself is the existing wide news rail.
-- The Media Room nav / footer: the bulk metadata sheet already has `/en/newsletter`. Nothing to add.
+- The Media Room nav / footer: the bulk metadata sheet already has `/en/newsletter`. Its Company → Newsletter
+  link is authored as the live URL, so `scripts/links.js` `DEMO_LISTINGS` now has `/en/newsletter`: the link opens
+  the migrated page in the same tab (#457 review; `Manage subscription`, `/en/newsletter-settings`, still goes to live).
 - Library entry, contract (`carousel-listing`, `story-rail` `categories`), metadata schema, template map,
-  tests (the parser: 3; story-rail `categories`; the categories gate).
+  tests (the parser: 6; story-rail `categories`; the categories gate).
 
 **Imported and pushed to preview** (2026-10-22, not live): `/en/newsletter` and the 6 newsletters, 2 of them new
 (`…-plant-1-2026`, both plants). The 4 others were last pushed by #414 (DA matched that push exactly, so they

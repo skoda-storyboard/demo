@@ -108,7 +108,7 @@ var CustomImportScript = (() => {
       const shared = terms[0].slugs.filter((slug) => terms.every((t) => t.slugs.includes(slug)));
       if (shared.length > 1) ambiguous = `${taxonomy}: ${shared.join(", ")}`;
       else if (shared.length === 1) rows.push([key, shared[0]]);
-      else if (terms.every((t) => t.any)) ambiguous = `${taxonomy}: no shared slug`;
+      else if (terms.some((t) => t.any)) ambiguous = `${taxonomy}: no shared slug`;
     });
     if (ambiguous) {
       console.warn(`[carousel-listing] "${heading}": not one shared ${ambiguous}; dropped`);

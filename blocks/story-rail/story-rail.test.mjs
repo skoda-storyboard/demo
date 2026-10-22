@@ -908,7 +908,7 @@ test('blockStylesReady: waits for a sheet still loading, and a failed sheet coun
 // a tiny element stand-in: tag, text, children, and the previous sibling
 function fakeEl(tag, { text = '', kids = [], cls = '' } = {}) {
   const node = {
-    tag, text, kids, previousElementSibling: null, parentElement: null,
+    tag, text, kids, previousElementSibling: null, parentElement: null, className: cls,
     classList: { contains: (c) => cls.split(' ').includes(c) },
     textContent: text || kids.map((k) => k.textContent).join(''),
     matches: (sel) => sel.split(',').map((x) => x.trim()).includes(tag),
@@ -939,4 +939,14 @@ test('sectionHeadingText: the last heading before the rail in its section', () =
   railC.parentElement = wrapC;
   section(wrapC);
   assert.equal(sectionHeadingText(railC), '', 'no heading: the generic name stays');
+
+  // re-review: a heading-less rail right after another rail is not named after that rail's last card
+  const railD = fakeEl('div', { cls: 'story-rail' });
+  const wrapD = fakeEl('div', { cls: 'story-rail-wrapper', kids: [railD] });
+  railD.parentElement = wrapD;
+  const before = fakeEl('div', { cls: 'story-rail-wrapper', kids: [fakeEl('h3', { text: 'A card title' })] });
+  section(fakeEl('div', { cls: 'default-content-wrapper', kids: [fakeEl('h2', { text: 'Images' })] }), before, wrapD);
+  assert.equal(sectionHeadingText(railD), '', 'another block ends the search');
+  section(fakeEl('div', { cls: 'default-content-wrapper', kids: [fakeEl('h2', { text: 'Videos' })] }), wrapD);
+  assert.equal(sectionHeadingText(railD), 'Videos', 'default content is read');
 });

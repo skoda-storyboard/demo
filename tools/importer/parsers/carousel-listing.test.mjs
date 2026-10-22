@@ -114,6 +114,23 @@ test('two shared terms of one key, or a term id only: dropped, never an OR of pl
   assert.equal(main.querySelectorAll('table').length, 0);
 });
 
+test('a taxonomy missing on some teasers: dropped, never the broader rail without it (#457 review)', { skip }, () => {
+  const main = run([
+    // `categories: newsletter` alone would list both plants (6 results instead of 3)
+    container('No company', [
+      teaser(1, 'category-newsletter company-kvasiny', 'a'),
+      teaser(2, 'category-newsletter', 'b'),
+    ]),
+    // `company: kvasiny` alone would list Kvasiny's production releases too
+    container('No category', [
+      teaser(3, 'category-newsletter company-kvasiny', 'c'),
+      teaser(4, 'company-kvasiny', 'd'),
+    ]),
+  ].join(''));
+  assert.equal(main.querySelectorAll('table').length, 0);
+  assert.equal(main.querySelectorAll('h3').length, 0);
+});
+
 test('a slug with an underscore is kept; the heading is the header\'s, never a card title', { skip }, () => {
   const { document } = new JSDOM(`<main><div class="search-results"><div class="search-results-container">
     <div class="search-results-items">${teaser(1, 'category-newsletter company-mlada_boleslav', 'a')}</div></div></div></main>`).window;

@@ -64,9 +64,10 @@ export const LIVE_ALIASES = {
 // Demo listing/entry pages that DA chrome (the Media Room nav) and tag chips link to on the
 // live host: they stay on the demo, site-relative, query + hash kept (listing filters).
 // `/en/media-cart` is the demo's own cart page (SKODA-505b): the cart badge links there.
+// `/en/newsletter` is the migrated plant newsletter page (SKODA-845): Company → Newsletter.
 export const DEMO_LISTINGS = new Set([
   '/en', '/en/media-room', '/en/news', '/en/press-kits', '/en/images', '/en/videos',
-  '/en/series-2', '/en/search', '/en/media-cart',
+  '/en/series-2', '/en/search', '/en/media-cart', '/en/newsletter',
 ]);
 
 /**
