@@ -413,6 +413,10 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Form: bulk metadata, not importer output** (309 amendment). The 16 MR-side URLs (5 press releases, **5 model pages**, 4 press kits, Images, Videos) get `nav` / `footer` from `metadata.json` rows for the MR path globs. Those rows are activated only once both MR fragments return 200 on preview and live. The importers emit nothing, and the push tool's fragment check requires the fragments to be live before publishing.
 - **Rows** (SKODA-309, 2026-09-28): every row sets `nav: /media-room/nav`, `footer: /media-room/footer` and `section: media-room`. `header-switcher.js` uses `section` to activate the Media Room tab; the Media Room header also gets a lighter topbar.
   - Patterns: `/en/press-releases/**`, `/en/press-kits/**`, `/en/skoda-model/**`, `/en/skodapedia/**`, plus an exact row and a `/**` row each for `/en/news`, `/en/images`, `/en/videos`, `/en/media-room`, `/en/contacts`, `/en/search` and `/en/newsletter` (the SKODA-305 footer list).
+  - **Tag archives (SKODA-209, 2026-10-22):** an exact row and a `/**` row each for `/en/tag/company`, `/en/tag/crew`,
+    `/en/tag/derivative`, `/en/tag/environment`, `/en/tag/people` and `/en/tag/years`. On the source these taxonomies'
+    archives are Media Room pages (`body.media-room`, MR nav and footer); model tags and categories are Storyboard.
+    The Stories grid ends 48px under its pager on a `section: media-room` page (16 elsewhere), as the source does.
   - The rows don't overlap each other and none matches a Storyboard page. Page-level metadata still wins over the bulk rows (aem.live bulk metadata).
 - **Fragment check:** `fragmentPaths()` reads the preview and live `/metadata.json` rows whose pattern matches a pushed page (`bulkPatternMatches`). So an MR batch requires `/media-room/nav` and `/media-room/footer` to be live, and Storyboard batches don't.
 

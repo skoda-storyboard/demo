@@ -285,6 +285,12 @@ main > .section.stories-container:last-child:has(.stories.has-count) {
   margin-block-end: var(--spacing-m);
 }
 
+/* …and 48px on a Media Room page: the source's company / crew / derivative / environment / people /
+   years tag archives are Media Room pages, whose .search-results margin-bottom is 48 (SKODA-209) */
+main > .section.stories-container:last-child:has(.stories.has-count.stories-media-room) {
+  margin-block-end: calc(var(--spacing-xl) + var(--spacing-xs));
+}
+
 main:has(.stories.has-count) {
   min-height: auto;
 }

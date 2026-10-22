@@ -11,7 +11,9 @@ Method: [`_CAPTURE-PROTOCOL.md`](_CAPTURE-PROTOCOL.md).
   `/en/category/<x>/` and `/en/tag/<taxonomy>/<x>/`.
 - **WP body class:** `archive category category-<slug>` (category) / `archive` + tag classes (tag). No
   custom `page-template-*`, it is the WordPress archive template.
-- **Side:** Storyboard (switcher = Stories; STO header + footer).
+- **Side:** Storyboard (switcher = Stories; STO header + footer) for categories and model tags. **The company / crew /
+  derivative / environment / people / years tag archives are Media Room pages** (`body.media-room`, MR nav + 688px
+  footer, "Media Room" tab active; measured on all 41, 2026-10-22). EDS: bulk metadata rows (SKODA-209).
 - **Source URLs:** `https://www.skoda-storyboard.com/en/category/emobility/`,
   `https://www.skoda-storyboard.com/en/tag/model/octavia/`.
 - **Ticket:** SKODA-209 (new).
@@ -74,7 +76,8 @@ Values `getComputedStyle` on the eMobility category, cited `(selector · viewpor
   - **When every story fits, the count row stays** ("3 / 3") with no button wrapper: last card → footer 93.
   - The footer follows the content: there is no viewport min-height on a short archive.
   - EDS (SKODA-209a) ends every archive 16px under the pager. The 13 other tags are 32px short of the source,
-    a known M1 deviation: they need an authored setting.
+    a known M1 deviation: they need an authored setting. **Fixed (SKODA-209, 2026-10-22):** those tags are Media Room
+    pages (§1); the Stories grid ends 48px under the pager on a `section: media-room` page.
 
 **Typography**
 - Hero term title = the large hero heading (reuse `hero.md` banner title scale). Body/meta = the card
@@ -84,8 +87,9 @@ Values `getComputedStyle` on the eMobility category, cited `(selector · viewpor
 - Grid columns **3 → 2 → 1**: 3-up at 1280, 2-up at 768, 1-up at 500 (break points align to the
   768/992-1080 ladder; confirm the 3→2 step precisely at build).
 - Hero shrinks `240 → 224 → 184px` at 768 / 576 (SKODA-828).
-- **Open:** the category rendered 3-up at 1280 while the tag archive rendered 2-up at the same width,
-  confirm whether tag archives use a narrower grid or it was a content-count artifact.
+- **Resolved (2026-10-22):** category and tag archives are both 3-up at 1280. The "2-up" tag archive was a model
+  tag: the featured model card takes column 3 (§10a). Visible frames 396 × 222.8 / 364 × 204.8 / 480 × 270 at
+  1280 / 768 / 500, equal to the source. The source rests each card image at 102% in that frame (card-wide, SKODA-201).
 
 ## 6. Interaction / behavior
 
@@ -111,22 +115,24 @@ Values `getComputedStyle` on the eMobility category, cited `(selector · viewpor
 
 ## 9. Open decisions + recommended default
 
-- **Pagination** (🟡): **default = a "Load more" button** over the query-index (matches the homepage
-  pattern, accessible, avoids infinite-scroll focus issues). Confirm against the live archive's actual
-  mechanism.
-- **Grid columns** (🟡): default 3/2/1 responsive (confirm the category-vs-tag column difference).
-- **Ordering:** newest-first assumed; confirm.
+- **Pagination:** ✅ "6 / N" count row + "Load more" (SKODA-209a, confirmed live).
+- **Grid columns:** ✅ 3 / 2 / 1 on category and tag archives alike (§5).
+- **Ordering:** ✅ newest-first (the EDS cards are the source's, in the same order, on all 41).
+- **Chrome:** ✅ Storyboard, or Media Room for the six tag taxonomies in §1.
 
 ## 10. Pixel-perfect acceptance criteria
 
-- [ ] Shell: STO header + footer; single `h1` = term name (category term; tag = parent + term).
-- [ ] Hero banner `240 / 224 / 184px` (≥768 / 576–767 / <576), label chips bottom-left; owned by SKODA-828 F3.
-- [ ] Card grid `.search-results-items` flex-wrap; **3-up 1280 / 2-up 768 / 1-up 500**; cards `16:9`.
-- [ ] **No facet panel** (this is the plain archive, not the MR faceted listing).
-- [ ] Content cap `1248`, gutter `~16px`.
-- [ ] Pagination via an accessible "Load more" (or the confirmed source mechanism); focus/aria-live on
+- [x] Shell: the source's side (§1: STO, or MR for six tag taxonomies); single `h1` = term name (category term; tag =
+      parent + term). The source has no `h1` there: EDS adds it.
+- [x] Hero banner `240 / 224 / 184px` (≥768 / 576–767 / <576), label chips bottom-left; owned by SKODA-828 F3.
+- [x] Card grid `.search-results-items` flex-wrap; **3-up 1280 / 2-up 768 / 1-up 500**; cards `16:9`.
+- [x] **No facet panel** (this is the plain archive, not the MR faceted listing).
+- [x] Content cap `1248`, gutter `~16px`.
+- [x] Pagination via an accessible "Load more" (or the confirmed source mechanism); focus/aria-live on
       new results.
-- [ ] Visual diff vs source at 1280/768/500 ≤ 2% per-pixel (hero + grid).
+- [x] ~~Visual diff vs source at 1280/768/500 ≤ 2% per-pixel (hero + grid).~~ Measured geometry instead (2026-10-22,
+      review evidence is measured values): frames, ratio, order, cap, count row and every gap to the footer equal
+      to the source (SKODA-209 close-out).
 
 ## 10a. Featured model card (model tag archives; measured 2026-09-30, SKODA-222)
 

@@ -25,7 +25,7 @@
 // event handlers, so forward references between them are safe.
 /* eslint-disable no-use-before-define */
 
-import { readBlockConfig, createOptimizedPicture } from '../../scripts/aem.js';
+import { readBlockConfig, createOptimizedPicture, getMetadata } from '../../scripts/aem.js';
 import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
 import { fetchPlaceholders } from '../../scripts/placeholders.js';
 import { buildCardTeaser } from '../../scripts/card-teaser.js';
@@ -328,6 +328,9 @@ export default async function decorate(block) {
   // Skeleton.
   block.textContent = '';
   block.classList.add(Number(cfg.columns) ? `stories-cols-${Number(cfg.columns)}` : 'stories-featured');
+  // Media Room pages (the authored `section` metadata, as the header reads it) end the archive
+  // grid 48px under its pager, as the source's Media Room archives do (SKODA-209)
+  if (getMetadata('section') === 'media-room') block.classList.add('stories-media-room');
   // the card is optional, authored content: whatever goes wrong building it, the feed still renders
   let featureCell = null;
   try {

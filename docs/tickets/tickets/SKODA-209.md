@@ -3,6 +3,9 @@
 - **Type:** template / import
 - **Phase:** B  ·  **Pilot:** No · **Milestone:** M2 (go-live)
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2–4d *(planning estimate, not a quote)*
+- **Status (2026-10-22):** 🟡 **In review** (branch `skoda-209-archive-closeout`): every acceptance criterion
+  measured against the source on all 41 archives; the 13 company / crew / derivative / environment / people /
+  years tag archives moved to the Media Room chrome, as on the source (see "Close-out" below).
 - **Status (2026-09-26):** 🟡 **M1 slice done** (pulled forward from M2 by stakeholder request): 41 archive pages live,
   and every tag / category link on the site points at them. The styled term hero (240px banner) **moved to
   [SKODA-828](SKODA-828.md) ([#196](https://github.com/skoda-storyboard/demo/issues/196)) F3** on 2026-09-28, including the `archive-hero` → `Hero Image (archive)` re-import.
@@ -62,7 +65,8 @@
 
 **Open:**
 - ~~The styled 240px term hero and the label chips (this ticket).~~ Moved to SKODA-828 F3 (2026-09-28).
-- Nav/footer Series + Podcast targets: a series hub (SKODA-207) or removal.
+- Nav/footer Series + Podcast targets: a series hub (SKODA-207) or removal. *(2026-10-22: Series now goes to the
+  SKODA-207 hub `/en/series-2`; Podcast still links the source's `category/podcast-en/`, out of this close-out.)*
 - Kushaq tag: only the held quiz story links it (no archive page).
 - New archives get added to `skoda-archive-url-set.txt` as their stories arrive.
 - **Featured model card** ("Explore the Epiq", 11 model tag archives): the **import is done here**. `archive-list`
@@ -95,14 +99,24 @@ Confirmed live. This ticket delivers:
 - Pagination = Load more button (or the confirmed source mechanism) with focus/aria-live on new results.
 
 ## Acceptance Criteria
-Measurable gates live in [`template-category-archive.md` §10](../../ui-specs/template-category-archive.md); summary:
-- [ ] STO shell; single `h1` = term name (category term; tag = parent + term).
+Measurable gates live in [`template-category-archive.md` §10](../../ui-specs/template-category-archive.md); summary
+(measured 2026-10-22 on all 41 archives, source vs EDS, 1280 / 768 / 500 plus 1440 / 992 / 375 for the ending):
+- [x] Chrome as the source: Storyboard for the 15 categories and 13 model tags, **Media Room for the 13
+      company / crew / derivative / environment / people / years tags** (corrected 2026-10-22, see below). Single
+      `h1` = the term (category term; tag = parent + term, e.g. "Models Octavia") on 41 / 41. The source has no
+      `h1` there (its term title isn't a heading): a deliberate accessibility gain.
 - *(Hero banner criterion moved to SKODA-828 F3, 2026-09-28. Resolved 2026-10-05: both figures were right. The
   band is 184px at 375 (224 at 576–767, 240 from 768); 160px is its image row, with the 24px label row under it.)*
-- [ ] Card grid flex-wrap **3-up 1280 / 2-up 768 / 1-up 500**; cards `16:9`; **no facet panel**.
-- [ ] Pagination via accessible "Load more" (or confirmed source mechanism); new results announced, focus managed.
-- [ ] Content cap `1248`, gutter `~16px`.
-- [ ] Visual diff vs source at 1280/768/500 ≤ 2% per-pixel (grid; the hero diff is SKODA-828).
+- [x] Card grid **3-up 1280 / 2-up 768 / 1-up 500**, the same on category and tag archives; visible 16:9 frame
+      396 × 222.8 / 364 × 204.8 / 480 × 270 at x 26 / 10 / 10, equal to the source on 118 / 120 page × widths;
+      **no facet panel** (41 / 41). The 2 others are the source's Kylaq / Slavia quirk (no featured card, yet the
+      model-tag layout leaves column 3 / full width), not copied.
+- [x] Pagination via the accessible "Load more" and the "6 / N" count row (SKODA-209a): the count row is the
+      polite live region, focus moves to the first new card.
+- [x] Content right edge equal to the source (cap `1248`, gutter `~16px`) on 123 / 123.
+- [x] **Measured geometry replaces the ≤ 2% pixel diff** (decision 2026-10-22: review evidence is measured values,
+      no screenshots): frames, ratio, order, cap, count row and every gap to the footer as above. Load more →
+      footer equal on 81 / 81 (32, and 64 on the Media Room tags); last card → footer equal where everything fits.
 
 ## Dependencies
 - Upstream: SKODA-201 (cards), SKODA-202 (hero), SKODA-402 (query-index retrieval), SKODA-601 (import infra)
@@ -110,9 +124,36 @@ Measurable gates live in [`template-category-archive.md` §10](../../ui-specs/te
 - Related: SKODA-828 (term banner UI and the archive-hero re-import, moved out 2026-09-28)
 
 ## Risks / Flags
-- **Pagination mechanism (🟡):** no static control; verify Load more vs infinite scroll live before locking.
-- **Grid columns (🟡):** category rendered 3-up while the tag archive rendered 2-up at the same width, confirm whether tag archives use a narrower grid.
-- Ordering (newest-first assumed) to confirm.
+- ~~**Pagination mechanism (🟡)**~~ Resolved (SKODA-209a, 2026-10-12): a "6 / N" count row + a JS "Load more"
+  (+6), no infinite scroll.
+- ~~**Grid columns (🟡)**~~ Resolved (2026-10-22): category and tag archives are both 3-up at 1280. The "2-up"
+  tag archive in the capture was a model tag, where the featured model card takes column 3 (SKODA-222).
+- ~~Ordering~~ Resolved (2026-10-22): newest-first. On all 41, the EDS cards are the source's in the same order
+  (EDS holds only the migrated stories).
+- ~~Metadata `template=category|tag`~~ Superseded (SKODA-209a decision): the archives carry `template: page`;
+  the archive grid is authored (`columns 3`), and the chrome comes from the bulk metadata.
+
+## Close-out (2026-10-22, branch `skoda-209-archive-closeout`)
+**Finding: 13 tag archives are Media Room pages on the source.** The company / crew / derivative / environment /
+people / years tag archives have `body.media-room`, the Media Room nav (News, Press Kits, …), the 688px
+Media Room footer and the "Media Room" tab active; categories and model tags are Storyboard (830px footer).
+The 48px under their pager (SKODA-209a's known deviation) is that Media Room page style.
+- **Content (published 2026-10-22, user-approved):** 12 bulk-metadata rows in DA `/metadata.json` (310 → 322 rows,
+  every other row kept; backup in `.migration/skoda-209/`): an exact row and a `/**` row each for
+  `/en/tag/{company,crew,derivative,environment,people,years}` → `nav: /media-room/nav`,
+  `footer: /media-room/footer`, `section: media-room`, the SKODA-309 mechanism. No re-import.
+- **Code:** the Stories block reads the authored `section` metadata (as the header does): on a Media Room page
+  the archive grid's section ends 48px under the pager (`stories-media-room`,
+  `calc(var(--spacing-xl) + var(--spacing-xs))`), 16 elsewhere. CSS contract test in `stories.test.mjs`.
+- **Verified** (local code + published sheet, source vs EDS): the 13 have the Media Room nav, footer (688px) and
+  tab; the 28 others are unchanged; Load more → footer 64 (125 when every story fits) on the 13, 32 / 93 on the
+  controls; the home "Latest Stories" feed is unchanged (featured layout, no count row).
+- **Follow-up (card-wide, not this ticket):** the source rests every card image at 102% inside its 16:9 frame
+  (`transform: scale(1.02)`); EDS card images rest at 100%. The frame is identical. It affects every card
+  (rails, home, listings), so it belongs with the card primitive (SKODA-201), like SKODA-828's hero zoom.
+- **Content, not code:** 8 archives hold fewer migrated stories than one source row (company/production,
+  environment/greenfuture, people/stefani, model/slavia, concepts, corporate-life, design-eng, skoda-world/heritage),
+  and classic-cars has none yet. The volume is SKODA-848 / SKODA-801b.
 
 ## M2 readiness review (2026-10-15)
 - The template is done for M1. The **volume** (378 EN archives, 41 live) and the keep / redirect rule move to SKODA-848.
