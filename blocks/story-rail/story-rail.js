@@ -96,6 +96,9 @@ export function parseConfig(block) {
     // scope by setting `template` explicitly (SKODA-212 review P1).
     template,
     category: tokens(cfg.category),
+    // every WP category of the page plus its ancestors (index `categories`, SKODA-831), as the
+    // stories block reads it: the newsletter page's rails take `categories: newsletter` (SKODA-845)
+    categories: tokens(cfg.categories),
     tag: tokens(cfg.tag || cfg.tags),
     // index facet columns (model, years, …) as config keys (SKODA-820): each key is
     // its own facet, so `model: epiq` + `years: 2026` must BOTH match (the story's
@@ -135,6 +138,7 @@ export function selectRows(all, cfg) {
   let scoped = scopeRows(all, { template: cfg.template, path: cfg.path });
   const active = { ...(cfg.facets || {}) };
   if (cfg.category.length) active.category = cfg.category;
+  if (cfg.categories?.length) active.categories = cfg.categories;
   if (cfg.tag.length) active.tags = cfg.tag;
   if (Object.keys(active).length) scoped = filterRows(scoped, active);
   if (cfg.exclude.length) {
@@ -207,7 +211,7 @@ export function skipsPromo(cfg, { press = false, curated = false } = {}) {
 // (exported for the drift test against the publication contract,
 // tools/importer/push/block-contracts.json)
 export const CONFIG_KEYS = new Set([
-  'index', 'path', 'template', 'category', 'tag', 'tags', 'heading',
+  'index', 'path', 'template', 'category', 'categories', 'tag', 'tags', 'heading',
   'viewall', 'view-all', 'all', 'sort', 'limit', 'exclude', 'order', 'dots',
   ...INDEX_FACETS,
 ]);
