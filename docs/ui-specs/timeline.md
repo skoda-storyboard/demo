@@ -37,6 +37,9 @@ Contract: `timeline` (baseline block, variants `black`, `large`, `xl`; shape v2 
 - **Panel:** background `rgb(228,228,228)` (`#e4e4e4`), padding 64 top/bottom; inline 30 two-sided, 120 left / 30
   right one-sided. It sits 40px below the paragraph before it and 42px above the next heading. The block's
   `margin-top` collapses with that paragraph's 20px margin, so it is 40px itself.
+  - **Leading the reading column** (wheels, gear stick: no prose before it): the panel starts at the column's top,
+    10px in, with no prose gap. The block marks itself `data-position="leading"` when nothing precedes its wrapper,
+    and drops its top margin (PR #373 review: 10 / 10 at 375 to 1440).
 - **Line:** 12px white. One-sided, its centre is 70px left of the content; two-sided, it is centred
   (`calc(50% - 6px)`).
 - **Year pill:** 32px / 48px, weight 600, white, padding 15/10, its top 45px above the entry. It is centred on the line
@@ -144,7 +147,7 @@ Between blocks and the dot's border (PR #373 review), source and EDS at 1440 / 1
 - **Decoration:** the line and the dots are decorative pseudo-elements. The year is real text.
 
 ## 7. Deviations from origin
-None of these is accepted until a human reviewer approves it (AGENTS.md code review, step 8).
+Deviations are accepted only by a human reviewer (AGENTS.md code review, step 8).
 
 **Fixed at the human reviewer's request (PR #373, 2026-10-21), no longer deviations:**
 - **Title spacing:** steering-wheel entries 1, 4, 7 and 10 (inline `margin-top: 15px`) and iconic cars 1970 (spacer
@@ -153,10 +156,13 @@ None of these is accepted until a human reviewer approves it (AGENTS.md code rev
   16 / 24.
 - **Title semantics:** the titles are paragraphs, as the source's. The timeline adds no headings.
 
-**Open:**
-3. **Text wrap:** at 992 (iconic cars, 2019) and 768 (iconic cars, 1936) one description wraps one line differently
+**Approved by the human reviewer (PR #373, 2026-10-22):**
+3. **Text wrap (approved):** at 992 (iconic cars, 2019) and 768 (iconic cars, 1936) one description wraps one line differently
    (±24px). The text and width are identical; the likely cause is the font stack (`SKODA Next` vs the EDS fallback
    chain). The 375 steering-wheel and gear-stick wraps came from the QA drafts losing the source's non-breaking spaces,
    and are gone.
-6. **Link `rel`:** every timeline link opens in a new tab, as origin's. Its `rel` is `noopener`, as origin's, except
-   links to the live host, which `scripts/links.js` gives `noopener noreferrer`.
+   Measured: 1936 @768 is 288px on origin and 264 on EDS, 2019 @992 216 vs 192 (one 24px line shorter each).
+6. **Link `rel` (approved, with a note):** every timeline link opens in a new tab, as origin's. Its `rel` is
+   `noopener`, as origin's, except links to the live host, which `scripts/links.js` gives `noopener noreferrer`.
+   `noreferrer` suppresses the HTTP `Referer` header, which can affect the destination's referral analytics; the
+   visible and new-tab behaviour is unchanged.
