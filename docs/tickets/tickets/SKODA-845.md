@@ -79,6 +79,9 @@ were overwritten with `--force`); they now carry their Tags and `categories: new
   space on the right; ours stops with it at the right edge (x49).
 - **Short pages:** at 992 × 900 the page is shorter than the window; our footer sits at the window's bottom
   (900), the source's right after the content (885).
+- **Title cut-off:** the source trims a 2-line title after its last whole word with JS (`dotdotdot`, "…Kvasiny…");
+  our CSS clamp cuts mid-word ("…Kvasiny plan…"). Kept: the analysis retired the JS truncation for CSS line-clamp
+  (SKODA-MASTER, SKODA-BLOCK-IMPLEMENTATION-REVIEW); PO, 2026-10-22: keep CSS, list it as a deviation.
 - **The press-release importer bundle drops the Tags block** (since 412396c, 2026-10-15, on `main`): the bundle
   was edited by hand and declares `text4` but reads `text5`, so the Tags parser throws on every press release.
   The 22 press releases re-imported for #414 are on preview without their sidebar Tags (live still has them).
