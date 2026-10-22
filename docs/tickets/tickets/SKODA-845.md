@@ -4,8 +4,8 @@
 - **GitHub issue:** [#365](https://github.com/skoda-storyboard/demo/issues/365) (created 2026-10-15 from the M2 readiness review)
 - **Estimate:** 1–2 SP *(planning estimate, not a quote)*
 - **Status (2026-10-22):** 🟡 Built on branch `skoda-845-newsletter`, stacked on `skoda-813-page-shell` (#409: the
-  page band). `/en/newsletter` and the 6 plant newsletters are on preview (not live); the rails fill once the
-  newsletters are published (the index is built on publish). See "Implementation (2026-10-22)".
+  page band). The 6 plant newsletters are published (live); `/en/newsletter` is on preview, live after merge.
+  See "Implementation (2026-10-22)".
 
 ## Why
 `/en/newsletter/` is linked from the Media Room nav **Company** menu. It is the only page on
@@ -92,6 +92,9 @@ equal to the source at 390 / 768 / 992 / 1280 / 1440 like the local check; the M
 today's index the two plant sections are empty and collapse (only the band shows): the index is built on
 publish, so it has no `categories` for the newsletters and not the 2 new ones.
 
-**Still open:** publish the 6 newsletters (then the rails fill on every preview), the PR, then `/en/newsletter`
-goes live after merge. Until 845 merges, `main`'s preview renders the page's rail settings as cards (`main`'s
+**Published** (2026-10-22, PO): the 6 newsletters; the index then lists all 6 with `categories: newsletter` and
+their plant, and the branch preview (the real index) is equal to the source at 390 / 768 / 992 / 1280 / 1440, the
+same as above; Next / Previous at 390 move one card; a card opens our press release.
+
+**Still open:** the PR review, then `/en/newsletter` goes live after merge. Until 845 merges, `main`'s preview renders the page's rail settings as cards (`main`'s
 story-rail doesn't know `categories`).
