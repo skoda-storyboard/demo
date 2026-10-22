@@ -40,3 +40,24 @@ DA does **not** support spreadsheet-based indexing, so listings and search are b
 - Selectors depend on stable published-HTML structure; **and several key fields aren't in the HTML as clean meta at all** — treat category/date/facets as a normalization layer, prefer semantic/class-based extraction, and keep the "derive from URL / fallback chain" pattern for missing fields.
 - Config is an **admin config-service `query.yaml` PUT**, not a repo `helix-query.yaml` (retired) — update any runbook that still references the repo file.
 - Scope note: consider building only the **demo-critical facet subset first** (open decision D12) since each facet carries real normalization cost.
+
+## Amendment (2026-10-22, M2 gap review §7.2)
+Source: [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.2, row "401 / 402": G-KT-05
+(Medium, ESTIMATE-RISK, not re-verified). This ticket is done on M1 scope (#27 closed 2026-09-22): what follows is new
+M2 work, carried with the listing side (SKODA-402's amendment) in SKODA-401a.
+
+**Why (G-KT-05):**
+- Moved to SKODA-401a.
+
+**Added scope:**
+- Moved to SKODA-401a.
+
+**Added acceptance criteria:**
+- Moved to SKODA-401a.
+
+**Estimate after the amendment:** 8 SP done on M1 (unchanged); no open M2 work remains on this ticket. The new M2
+work (2 SP · AI-assisted 1d / manual 2d *(planning estimate, not a quote)*) is in
+**[SKODA-401a](SKODA-401a.md)** "Index payload at full corpus" (2.5 SP with 402's part) rather than reopening this
+ticket.
+
+**Added dependencies:** Moved to SKODA-401a.

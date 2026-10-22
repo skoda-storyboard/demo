@@ -74,3 +74,35 @@ schema or required fields on the Media Room folders.
 SKODA-517 (output shapes + shard writer), SKODA-518 (identity metadata), SKODA-512 (taxonomy), SKODA-504 / 504a (DAM
 ingest), SKODA-608 (feed contract), SKODA-505a (cart key). AEM service credentials from **SKODA-521** for runs
 against author. Used by SKODA-511a; monitored by SKODA-511b.
+
+## Amendment (2026-10-22, M2 gap review §7.2)
+Source: [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.2, row "608 / 511": G-KO-04
+(Low, not re-verified; measured in the browser follow-up) and the browser note on stale feed items
+(`browser-impact.md`, area D). The client question (C4) and the team task (T6) are in SKODA-523; this ticket builds
+T6's switch in the row builder. SKODA-608's amendment records the M1 side.
+
+**Added scope:**
+- **Restricted Vimeo ids** (G-KO-04). 6 of 30 distinct media-library Vimeo ids play only on skoda-storyboard.com
+  (403 on aem.live): 1234323108, 1222100797, 1222101957, 1222101958, 1222103279 and 1175982542. The M1 generator
+  drops them (oEmbed `domain_status_code: 403`), which would drop them from production too. The row builder writes
+  them on the production build and leaves them out on QA builds, with the reason in the run report; once C4
+  allow-lists `*.aem.page` and `*.aem.live`, it writes them everywhere.
+- **Parity mode** (G-KO-04). The diff against the M1 generator explains the 6 ids as an expected difference.
+- **Stale feed items** (browser note). The M1 feed misses source items 460448 (Vimeo 1237158593, plays on EDS),
+  459429 (restricted) and 459448 (a card whose link is a logo PNG, with no video). `full()` reads every published
+  asset, so the first two appear once their assets are published in AEM Assets. 459448 has no video, so it goes to
+  the run report as missing required metadata, not into the feed as a broken video row.
+
+**Added acceptance criteria:**
+- [ ] A production-build run writes rows for the 6 restricted ids; a QA-build run lists them in the run report as
+      skipped (domain-restricted), or writes them after C4 (G-KO-04).
+- [ ] The parity diff lists the 6 restricted ids and 460448, 459429 and 459448, each with its reason (G-KO-04,
+      browser note).
+- [ ] After `full()` + `rebuildAll()`, once their assets are published, 460448 has a row and 459429 has one on the
+      production build; 459448 is in the run report with no row (browser note).
+
+**Estimate after the amendment:** 3 SP (unchanged) · AI-assisted 1–2d / manual 2–4d *(planning estimate, not a
+quote)*. The production switch (under 0.5 SP in the review) is counted in SKODA-523's shared scope (T6); the stale
+items are test cases for the existing parity criterion.
+
+**Added dependencies:** SKODA-523 (C4, T6).

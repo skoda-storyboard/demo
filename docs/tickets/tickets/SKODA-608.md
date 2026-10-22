@@ -93,3 +93,39 @@ attachment pages, HTTP-verified.
 
 ## Import contract (SKODA-603)
 Contract(s) `media-item` in [`SKODA-PENDING-BLOCK-CONTRACTS.md`](../../planning/SKODA-PENDING-BLOCK-CONTRACTS.md). An index-row contract, not a block (`template` = image/video + title, description, image, date, tags, model, facets, download fields). `?attachment_id=` corpus URLs need a path mapping (the tracker lists them as unmapped). If this ticket needs a different DA shape, change the contract (and bump `shape`) in the same PR.
+
+## Amendment (2026-10-22, M2 gap review §7.2)
+Source: [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.2, row "608 / 511": G-KO-04
+(Low, not re-verified; measured in the browser follow-up) and the browser note on stale feed items
+(`browser-impact.md`, area D). This ticket is done on M1 scope (#117 closed 2026-09-27): what follows is new M2 work.
+It is already owned by SKODA-523 (client question C4, team task T6, "amends 608, with 511") and built in the
+SKODA-511 row builder (511's amendment), so it is recorded here, not duplicated.
+
+**Added scope:**
+- **Domain-locked Vimeo ids** (G-KO-04). 6 of 30 distinct media-library Vimeo ids (20%) play only on
+  skoda-storyboard.com: 403 on aem.live for the config and the player, 200 on the source. Five are the videos this
+  ticket left out (451655 → 1222100797, 451657 → 1222101957, 451658 → 1222101958, 452405 → 1222103279,
+  436546 → 1175982542), plus 459429 → 1234323108.
+- **The rule drops them from production too** (G-KO-04). `build-media-items.mjs` skips a video whose Vimeo oEmbed
+  reports `domain_status_code: 403`, and contract `media-item` says restricted videos "are not emitted". After cutover
+  they should play on www.skoda-storyboard.com, but they can't be QA'd on aem.page or aem.live.
+- **Who does what:** SKODA-523 C4 asks Škoda's Vimeo account owner to add `*.aem.page` and `*.aem.live` to the
+  allow-list for QA, or to confirm production-only playback. SKODA-523 T6 emits the ids on the production build, or
+  everywhere after C4. If this ticket's generator still builds the feed at cutover, it gets the same production switch.
+- **Rail counts** (G-KO-04). The amended rail AC above (Peaq 8 / Epiq 6 videos, "every playable") holds on the demo
+  hosts. On the production host the restricted videos count again, as on the source rails (13 / 9 including them).
+- **Stale feed** (browser note). The demo `/en/media-feed.json` misses source items 460448 (Vimeo 1237158593, plays
+  on EDS), 459429 (restricted) and 459448 (a card with a logo-PNG link and no video). The feed was built once from the
+  source listing; keeping it current is SKODA-511's sync (see its amendment).
+
+**Added acceptance criteria:**
+- [ ] Contract `media-item` in `SKODA-PENDING-BLOCK-CONTRACTS.md` states the rule per build: restricted ids left out
+      on QA builds and emitted on the production build, or C4's answer (G-KO-04).
+- [ ] On the production host, the Peaq and Epiq Videos rails include the restricted videos, or C4's answer is
+      recorded (G-KO-04; checked under SKODA-523's AC "The 6 restricted Vimeo ids play on the production host").
+
+**Estimate after the amendment:** 3 SP (done on M1, unchanged) · AI-assisted 1–1.5d / manual 2–3d *(planning
+estimate, not a quote)*. The new M2 work (under 0.5 SP in the review) is counted in SKODA-523's shared scope (T6) and
+built in SKODA-511; no SP is added here.
+
+**Added dependencies:** SKODA-523 (C4, T6), SKODA-511 (row builder).

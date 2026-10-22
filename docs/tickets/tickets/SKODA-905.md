@@ -1,7 +1,7 @@
 # SKODA-905 — skoda-analytics rebuild: dataLayer event schema + per-block wiring
 - **Epic:** E09 — Dynamic Services
 - **Type:** integration
-- **Phase:** C  ·  **Pilot:** No · **Milestone:** M2 (go-live)
+- **Phase:** C  ·  **Pilot:** No · **Milestone:** M2 (go-live). **Kept on M2 (decision 2026-10-22):** re-scoped to the dataLayer contract the live GTM container routes on (importer.BID, page.* keys), which SKODA-907 needs for go-live (gap review G-A-03, CONFIRMED)
 - **Estimate:** 8 SP · AI-assisted 3–5d / manual 6–10d *(planning estimate, not a quote)*
 
 ## Summary
