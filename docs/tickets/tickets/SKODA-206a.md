@@ -5,7 +5,7 @@
 - **Phase:** A · **Milestone:** M2 (go-live, 2027-01-02)
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 2.5–3.5d, half of the 206 amendment's 6 SP *(planning estimate,
   not a quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#472](https://github.com/skoda-storyboard/demo/issues/472) (created 2026-10-22, sub-issue of #20)
 - **Parent:** SKODA-206
 - **Status (2026-10-22):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.2 row "802 / 206": G-C-03 (Medium,

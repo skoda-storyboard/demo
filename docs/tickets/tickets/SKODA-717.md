@@ -6,7 +6,7 @@
   before the freeze.
 - **Estimate:** 1 SP · AI-assisted 0.5d / manual 1d, excluding client time *(planning estimate, not a quote)*. From the
   review: G-H-01 0.5 SP doc work; each answer that changes a default may add 0.5–2 SP to an M2 ticket.
-- **GitHub issue:** to create
+- **GitHub issue:** [#469](https://github.com/skoda-storyboard/demo/issues/469) (created 2026-10-22, sub-issue of #8)
 - **Status (2026-10-22):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-H-01 (Medium, PLAUSIBLE).
 

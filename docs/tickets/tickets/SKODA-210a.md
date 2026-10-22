@@ -5,7 +5,7 @@
 - **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02)
 - **Estimate:** 2–3 SP · AI-assisted 1d / manual 2d, the 210 amendment's 5–6 SP less SKODA-210's 3 SP; the image
   ingestion stays in 517 / 520 *(planning estimate, not a quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#470](https://github.com/skoda-storyboard/demo/issues/470) (created 2026-10-22, sub-issue of #59)
 - **Parent:** SKODA-210
 - **Status (2026-10-22):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-E-01 (High, confirmed).

@@ -175,7 +175,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-831](tickets/SKODA-831.md) | Category archives scope stories by WordPress category membership (`categories` index column) | E02 | – | – | – | 209,214,830 | ✅ Done (#260 closed 2026-10-07). Was: M1; #260, audit F2; rollout steps 1–2 done 2026-10-06 (index column + 57 stories), archives wait for the code on main |
 | SKODA-205 | Tags / metadata | E02 | 1 | 0.5 | 1 | 102 | ✅ Done (#19 closed 2026-09-23). Was: 🟢 |
 | SKODA-206 | Škodapedia glossary block (directory + A–Z filter + modal) | E02 | 3 | 2–3 | 4–6 | 102,106 | 🟡 modal a11y `[RUNTIME-UNCONFIRMED]`; **M2** on the board (aligned 2026-09-25) · amended 2026-10-22 (gap review §7.2) |
-| [SKODA-206a](tickets/SKODA-206a.md) | Škodapedia term modal + standalone term page at the public path | E02 | 3 | 1–2 | 2.5–3.5 | SKODA-206,802a | 🔵 M2; sub-ticket of SKODA-206 |
+| [SKODA-206a](tickets/SKODA-206a.md) | Škodapedia term modal + standalone term page at the public path (#472) | E02 | 3 | 1–2 | 2.5–3.5 | SKODA-206,802a | 🔵 M2; sub-ticket of SKODA-206 |
 | SKODA-207 | Series template (2-level: directory + hub) | E02 | 3 | 1–2 | 2–4 | 201,202,402,601 | ✅ Done (#21 closed 2026-09-28). Was: M1 (D18); reuses cards/hero/grid |
 | SKODA-211 | DA tag-management library plugin (DA_SDK multi-select) | E02 | 3 | 1–2 | 2–3 | 102,205,401 | ✅ Done (#54 closed 2026-09-22). Was: M1; CLOSED (done); build-confirmed 2026-09-16 (PR #60, issue #54) |
 | SKODA-212 | Horizontal rails block (story-rail + carousel) | E02 | 3 | 1–2 | 3–5 | 201,402,401,106 | ✅ Done (#98); watchCSS + a11y; spec `ui-specs/carousel-rails.md` |
@@ -209,7 +209,7 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-308](tickets/SKODA-308.md) | Chrome parity pass (header, search, mobile nav, footer legal links, topbar newsletter) | E03 | 3 | 1 | 2–3 | 301,302,303,304,307,403,823 | ✅ Done (#144 closed 2026-10-07). Was: M1; Demo sweep 2026-09-25; every page |
 | [SKODA-309](tickets/SKODA-309.md) | Media Room side chrome (MR nav, active tab, nav/footer metadata) | E03 | 2 | 0.5–1 | 1–2 | 301,305,307,607,805a,602 | ✅ Done (#145 closed 2026-09-28). Was: M1; Demo sweep 2026-09-25; **16** MR URLs incl. 5 model pages; draft 825 folded in; unblocked (#134 merged); MR nav fragment still 404 |
 | SKODA-401 | Query-index schema + selectors + metadata-normalization (15 facets) | E04 | 8 | 3–5 | 5–8 | 104 | ✅ Done (#27 closed 2026-09-22). Was: 🟠 build-confirmed: admin-service `query.yaml` (not repo); fields need normalization layer, not clean selectors · amended 2026-10-22 (gap review §7.2) |
-| [SKODA-401a](tickets/SKODA-401a.md) | Index payload at full corpus: slim index for rails and cards, budget per page type | E04 | 2.5 | 1.5 | 3 | SKODA-401,402 | 🔵 M2; M2 part of 401/402 (done on M1) |
+| [SKODA-401a](tickets/SKODA-401a.md) | Index payload at full corpus: slim index for rails and cards, budget per page type (#473) | E04 | 2.5 | 1.5 | 3 | SKODA-401,402 | 🔵 M2; M2 part of 401/402 (done on M1) |
 | SKODA-402 | Faceted listing + load-more (deep-link) | E04 | 8 | 3–5 | 6–9 | 401,201 | ✅ Done (#28 closed 2026-09-23). Was: 🟠 hardest pilot block · amended 2026-10-22 (gap review §7.2) |
 | [SKODA-402a](tickets/SKODA-402a.md) | Listing layout QA fix: 1/3/4/4 grid + facets collapsed behind "Advanced filter (n)" (follow-up to 402) (#175) | E04 | 1 | 0.5 | 1 | 402,608 | ✅ Done (#175 closed 2026-09-30). Was: M1; from the 608 phase split (sweep V10) |
 | SKODA-402b | Media-listing toolbar spacing and active-sort color parity | E04 | – | – | – | 402a | ✅ Done (#248 closed 2026-10-07) |
@@ -297,9 +297,9 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | [SKODA-713c](tickets/SKODA-713c.md) | Legacy URL inventory and pre-DNS redirect harness (#432) | E07 | 3 | 1–2 | 3–4 | SKODA-713 | 🔵 M2; sub-ticket of SKODA-713 |
 | [SKODA-713d](tickets/SKODA-713d.md) | Analytics continuity across the cutover: baseline, path mapping, download KPI (#433) | E07 | 2 | 1 | 2–3 | SKODA-713 | 🔵 M2; sub-ticket of SKODA-713 |
 | [SKODA-714](tickets/SKODA-714.md) | Security headers and CSP on the production CDN (#421) | E07 | 2.5 | 1 | 1–2 | 709,907 | 🔵 M2; headers drop at the switch today |
-| [SKODA-715](tickets/SKODA-715.md) | Go-live performance gate: CWV budget per template, measured with the production stack | E07 | 2 | 1 | 2 | 702,709,401a | 🔵 M2; requirement 8.5 |
-| [SKODA-716](tickets/SKODA-716.md) | Go-live accessibility gate: WCAG target, axe on the M2 templates, screen-reader pass | E07 | 3 | 1–1.5 | 2–3 | 703,703a | 🔵 M2; requirement 8.6 |
-| [SKODA-717](tickets/SKODA-717.md) | Client confirmation of five as-built requirement defaults (COM04, STO-H01, STO-H08, MR-H10, MR-L05) | E07 | 1 | 0.5 | 1 | client | 🔵 M2; client questions |
+| [SKODA-715](tickets/SKODA-715.md) | Go-live performance gate: CWV budget per template, measured with the production stack (#467) | E07 | 2 | 1 | 2 | 702,709,401a | 🔵 M2; requirement 8.5 |
+| [SKODA-716](tickets/SKODA-716.md) | Go-live accessibility gate: WCAG target, axe on the M2 templates, screen-reader pass (#468) | E07 | 3 | 1–1.5 | 2–3 | 703,703a | 🔵 M2; requirement 8.6 |
+| [SKODA-717](tickets/SKODA-717.md) | Client confirmation of five as-built requirement defaults (COM04, STO-H01, STO-H08, MR-H10, MR-L05) (#469) | E07 | 1 | 0.5 | 1 | client | 🔵 M2; client questions |
 
 **Phases B–D (Pilot: No)**
 
@@ -310,12 +310,12 @@ Four phases, mapped from `SKODA-EDS-DA-ARCHITECTURE.md` §12:
 | SKODA-209 | Category / Tag archive template (hero + card grid, no facets) | E02 | B | 3 | 1–2 | 2–4 | 202,201,402 | 🟢 M2; spec `ui-specs/template-category-archive.md` |
 | [SKODA-209a](tickets/SKODA-209a.md) | Archive pager: the source's "6 / N" count row and Load more spacing (follow-up to 209) (#330) | E02 | 1 | 0.5 | 1 | 209,214,402c | ✅ Done (#330 closed 2026-10-13). Was: 🟡 M1; built on `skoda-209a-archive-pager`, PR #339 open; code only (count row keyed to the authored archive grid). Known M1 deviation: 13 non-model tag archives 32px short of the source's 48px bottom margin |
 | SKODA-210 | Custom microsite (full-width event-gallery/campaign) scope + template | E02 | B | 3 | 1–2 | 2–4 | 203,813,814,601 | 🟡 M2; 201 pages, migrate/fold/drop decision; spec `ui-specs/custom-microsite.md` (recount §2/§8) · amended 2026-10-22 (gap review §7.2) |
-| [SKODA-210a](tickets/SKODA-210a.md) | Event-gallery download tiles (media-card tiles with cart add + download) | E02 | B | 2.5 | 1 | 2 | SKODA-210,505 | 🔵 M2; sub-ticket of SKODA-210 |
+| [SKODA-210a](tickets/SKODA-210a.md) | Event-gallery download tiles (media-card tiles with cart add + download) (#470) | E02 | B | 2.5 | 1 | 2 | SKODA-210,505 | 🔵 M2; sub-ticket of SKODA-210 |
 | SKODA-706 | Branded 404 (keeps chrome, real HTTP 404) | E07 | B | 3 | 0.5 | 0.5–1 | 301,304 | 🔵 M2, in PR #392 (branch `skoda-706-404`): both random source variants from DA fragments, measured parity; spec `ui-specs/template-404.md` · amended 2026-10-21 (gap review): the redirect rows, slug lookup and prefilled search stay open (103 / 103d) |
 | SKODA-801 | Story template, SiteOrigin Page-Builder flatten | E08 | B | 8 | 3–5 | 6–10 | 601,603 | ✅ Done (#48 closed 2026-09-24). **M2 review 2026-10-15:** Full-corpus run + the rare-layout stories → proposed follow-up **SKODA-801b** (M2). Was: 🟢 built (2026-09-24): `story-flatten.js` 17-widget map + two-column body+aside (grid-on-main); carousel routed by content (Gallery/Cards); linear + large-tree paths verified. M2: full-corpus run. Blocks it emits: 203 (Gallery), 201 (Cards) · amended 2026-10-21 (gap review) |
 | [SKODA-801b](tickets/SKODA-801b.md) | Story corpus run: every EN story through the flatten, REST-enumerated (#368) | E08 | B | 3–5 | 1.5–2.5 | 3–5 | 801,814,803 | 🔵 M2 (#368, created 2026-10-15); 1,303 EN stories, 69 live; the sitemaps miss 193 |
 | SKODA-802 | Remaining templates (Škodapedia pre-baked, pages) | E08 | B | 2 | 2–3 | 4–7 | 801 | 🟡 (press-kits split to 805–808) · amended 2026-10-22 (gap review §7.2) |
-| [SKODA-802a](tickets/SKODA-802a.md) | Škodapedia import: parser facets, index sheet, term docs at public paths, archives, per-locale | E08 | B | 5 | 2–3 | 4–6 | SKODA-802,849a | 🔵 M2; sub-ticket of SKODA-802 |
+| [SKODA-802a](tickets/SKODA-802a.md) | Škodapedia import: parser facets, index sheet, term docs at public paths, archives, per-locale (#471) | E08 | B | 5 | 2–3 | 4–6 | SKODA-802,849a | 🔵 M2; sub-ticket of SKODA-802 |
 | SKODA-803 | Bulk import automation (at scale) | E08 | B | 8 | 3–5 | 6–10 | 602,801 | 🟠 scale |
 | SKODA-804 | Consent + analytics wiring (OneTrust, GTM, skoda-analytics) | E08 | B | 5 | 2–3 | 4–6 | 603 | 🟠 consent OUT of Adobe scope (D10) |
 | SKODA-805 | Press Kit template + structured narrative sections | E08 | B | 5 | 2–3 | 4–6 | 801,202,402 | 🟡 fixed-vs-conditional sections (§11.8) |

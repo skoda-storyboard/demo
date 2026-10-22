@@ -5,7 +5,7 @@
 - **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02)
 - **Estimate:** 2.5 SP · AI-assisted 1.5d / manual 3d: 401's part 2 SP (1d / 2d) and 402's part 0.5 SP (0.5d / 1d)
   *(planning estimate, not a quote)*. The review sizes G-KT-05 at 2–3 SP for both tickets.
-- **GitHub issue:** to create
+- **GitHub issue:** [#473](https://github.com/skoda-storyboard/demo/issues/473) (created 2026-10-22, sub-issue of #5)
 - **Parent:** SKODA-401 (with SKODA-402's M2 part). Both parents are done on M1 scope (#27, #28 closed).
 - **Status (2026-10-22):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.2 row "401 / 402": G-KT-05 (Medium,

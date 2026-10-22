@@ -5,7 +5,7 @@
 - **Phase:** D · **Milestone:** M2 (go-live, 2027-01-02). The audit is done before the DNS switch.
 - **Estimate:** 3 SP · AI-assisted 1–1.5d / manual 2–3d, excluding fixes *(planning estimate, not a quote)*. From
   the review: G-H-02 3–5 SP for both NFRs plus a fix tail. The performance half is SKODA-715.
-- **GitHub issue:** to create
+- **GitHub issue:** [#468](https://github.com/skoda-storyboard/demo/issues/468) (created 2026-10-22, sub-issue of #8)
 - **Status (2026-10-22):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) G-H-01 (Medium, PLAUSIBLE), G-H-02,
   G-G-10 (Medium, not re-verified). Requirement **8.6**.

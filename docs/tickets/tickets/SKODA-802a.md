@@ -5,7 +5,7 @@
 - **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02). The generator is what the 1004a–c locale runs use.
 - **Estimate:** 5 SP · AI-assisted 2–3d / manual 4–6d, the 802 amendment's 7 SP less SKODA-802's 2 SP (generic
   pages) *(planning estimate, not a quote)*
-- **GitHub issue:** to create
+- **GitHub issue:** [#471](https://github.com/skoda-storyboard/demo/issues/471) (created 2026-10-22, sub-issue of #63)
 - **Parent:** SKODA-802
 - **Status (2026-10-22):** 🔵 TODO (M2), no owner. Source:
   [gap review](../../reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md) §7.2 row "802 / 206": G-C-02 (Medium,
