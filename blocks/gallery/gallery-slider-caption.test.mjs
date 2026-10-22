@@ -74,26 +74,12 @@ test('the wrap-around clones carry the same caption as their slide', { skip }, (
   assert.deepEqual(clones.map((c) => c.querySelector('.gallery-slide-caption')?.textContent.trim()), ['Last', 'First']);
 });
 
-// --- autoplay pause control (WCAG 2.2.2, SKODA-703) -------------------------------------------
-test('a looping slider starts with a pause / resume control for its autoplay', { skip }, () => {
+// --- controls: as the source, arrows and dots only (#361 QA, PO 2026-10-22) -----------------
+test('a looping slider has the source\'s arrows and dots and no pause / play button', { skip }, () => {
   const block = slider([row('a.jpg'), row('b.jpg'), row('c.jpg')]);
-  const toggle = block.querySelector('button');
-  assert.ok(toggle.classList.contains('gallery-slider-pause'), 'the first control in the carousel');
-  assert.equal(toggle.type, 'button');
-  // a visible disc over the image (PR #360 review: reachable by touch / mouse), not a hidden pill
-  assert.ok(toggle.parentElement.classList.contains('gallery-slider-viewport'), 'sits on the image');
-  const state = () => [toggle.getAttribute('aria-label'), toggle.querySelector('path').getAttribute('d')];
-  const [, pauseGlyph] = state();
-  assert.equal(state()[0], 'Pause slideshow');
-  assert.equal(toggle.hasAttribute('aria-pressed'), false, 'the name carries the state (WAI rotation control)');
-  toggle.click();
-  assert.equal(state()[0], 'Resume slideshow');
-  assert.notEqual(state()[1], pauseGlyph, 'the glyph turns to play');
-  toggle.click();
-  assert.deepEqual(state(), ['Pause slideshow', pauseGlyph], 'it resumes');
-  // any navigation stops autoplay for good (as on the source): the control then offers Resume
-  block.querySelector('.gallery-slider-next').click();
-  assert.equal(state()[0], 'Resume slideshow');
+  assert.equal(block.querySelector('.gallery-slider-pause'), null, 'no pause control (PO: as the live slider)');
+  const controls = [...block.querySelectorAll('button')].map((b) => b.getAttribute('aria-label'));
+  assert.deepEqual(controls, ['Previous image', 'Next image', 'Go to image 1', 'Go to image 2', 'Go to image 3']);
 });
 
 test('a single-image slider has no autoplay and no pause control', { skip }, () => {

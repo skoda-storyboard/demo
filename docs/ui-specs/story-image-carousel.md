@@ -30,8 +30,9 @@ fallback caption.
 The source uses one image per view, drag/swipe, wrap-around, two 32px transparent
 chevron buttons inset 10px, and 10px dots below the image (selected `#333`,
 others `rgb(51 51 51 / 25%)`). Its Flickity config autoplays every 3000ms.
-For EDS, provide a **visible pause/resume control** if autoplay is enabled
-(WCAG 2.2.2), stop on hover/focus, and disable autoplay under reduced motion.
+EDS keeps the source's controls: **no pause/resume button** (PO decision, #361 QA,
+2026-10-22, reversing the SKODA-703 control; recorded as accepted in the SKODA-703 audit §3).
+Autoplay pauses on hover/focus, stops once the user navigates, and is off under reduced motion.
 Native scroll-snap and labelled buttons should remain keyboard operable.
 
 ## EDS target
