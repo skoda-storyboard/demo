@@ -42,6 +42,11 @@ export const SPEC = {
     description: 'One row, one cell per column (text, images, links). On phones the columns stack.',
     variants: [
       { class: 'split-62 portrait-235', label: 'split-62, portrait-235', description: 'Unequal story row: the first cell takes 62% (split-NN = NN%); portrait-NNN is the display width in px of a portrait image in the other cell. Values are read from the class, so use the exact form split-NN / portrait-NNN.' },
+      { class: 'centered portrait-300 captioned', label: 'centered, portrait-300, captioned', description: "Equal story row of centred image cards (rider profiles): each image cell centred, its images at their own size. Optional: portrait-NNN, the display width in px of each card's first image; captioned, the paragraphs after that image are its caption (directly under it, light)." },
+      { class: 'centered text-center text-small', label: 'centered, text-center, text-small', description: 'Add to a centred story row: text-center centres the caption text, text-small sets it in 10pt.' },
+      { class: 'offset-48-24', label: 'offset-48-24', description: 'Story row whose cells start lower, from 720px wide: one number per cell, in px, in cell order (offset-48-24: the first cell 48px down, the second 24px). Use 0 for a cell that stays at the top.' },
+      { class: 'split-62 lead-44-0', label: 'split-62, lead-44-0', description: 'Story row whose cell text starts lower at every width: one number per cell, in px (lead-44-0: the first cell one 44px blank line down). Unlike offset, it applies on phones too.' },
+      { class: 'centered pad-m-15-15-15-15', label: 'centered, pad-m-15-15-15-15', description: 'Story row with its own padding inside the row, in px (top-right-bottom-left): pad-… from 781px wide, pad-m-… up to 780px (the Miss Peaches profile rows: 15px round on phones).' },
       { class: 'banners', label: 'banners', description: 'Press kit: a row of linked banner images at their authored size (PDF download / share buttons).' },
       { class: 'callout', label: 'callout', description: 'Press kit: [icon, text], a small 50px icon beside its text (the WhatsApp callout).' },
       { class: 'stats', label: 'stats', description: 'Model page technical data: each cell is a key figure, the value in bold and its label below.' },
@@ -54,6 +59,7 @@ export const SPEC = {
     variants: [
       { class: 'media-box', label: 'media-box', description: 'The Media Box at the end of a story, release or press-kit chapter: titles as headings, dates, size menu, "Show more" after two rows, lightbox on the images. Put it in a section with Style "dark, full-width, media-box" and an h2 "Media Box".' },
       { class: 'gallery', label: 'gallery', description: 'Press-kit Images chapter group: thumbnails with add / download over the image and the "Original / 1920px" pills above the group.' },
+      { class: 'gallery story', label: 'gallery, story', description: "A photo grid in a story's text: photos only (1 / 2 / 3 across), each opening the lightbox with its download sizes. Add rows collapse | auto for the \"Show more\" of a long set, and columns | 3." },
     ],
   },
   embed: {
@@ -62,6 +68,14 @@ export const SPEC = {
     description: 'A YouTube, Vimeo, Buzzsprout or Spotify URL. A bare link on its own line also works. Settings rows: url, ratio (e.g. 16:9), title, poster (image). An .mp4 url plays as a native video with the poster.',
     variants: [
       { class: 'vimeo', label: 'vimeo', description: "A source Vimeo clip: rows url (the vimeo.com link), file (the clip's MP4 master) and title. It plays in the Vimeo player where Vimeo allows this site, else the MP4 with the same Vimeo-style controls (play, progress, volume, speed, picture-in-picture, fullscreen)." },
+    ],
+  },
+  spacer: {
+    structure: 'single cell height',
+    purpose: 'authored vertical gap',
+    description: 'A vertical gap between parts of a story: one cell with its height in px (e.g. 24px), up to 999px. Shown from 720px wide, none on phones. A missing or malformed height takes no space.',
+    variants: [
+      { class: 'line', label: 'line', description: 'A blank line in the text (44px: one line and its paragraph gap), shown at every width.' },
     ],
   },
   footnotes: {
@@ -173,6 +187,12 @@ export const SECTION_STYLES = [
   ['sidebar', 'Story / release sidebar: newsletter card, Explore more, Tags.'],
   ['body-column, highlight-dark', 'Dark highlight box inside the article ("What has changed" lists).'],
   ['body-column, highlight-grey', 'Grey highlight box inside a press release (FAQ callout).'],
+  ['body-column, centered-images', 'Story article column whose narrower images sit centred (the source centres them).'],
+  ['body-column, drop-cap', 'Story article column opening with a drop cap; optional rows drop-cap-text, drop-cap-color, drop-cap-background, drop-cap-margin-bottom.'],
+  ['body-column, text-center', 'A run of centred story text (the paragraphs between two section breaks).'],
+  ['body-column, text-small', 'A run of story text in 10pt; text-medium is 14pt, text-large 16pt, text-xlarge 18pt. Combine with text-center.'],
+  ['body-column, text-box', 'Story text in a padded, coloured box; optional rows box-background (colour), box-padding (1–4 px values), box-color (text colour), box-shadow (e.g. 0px 2px 6px #999999).'],
+  ['body-column, highlight-dark / highlight-grey: colours', 'Optional rows on a highlight box: highlight-background, highlight-color, highlight-link (a hex colour each, e.g. #f1f1f1).'],
   ['dark, full-width, media-box', 'The Media Box band (holds the Media Box Downloads block).'],
   ['dark, full-width, related', 'The dark related band at the end of a press release.'],
   ['dark', 'Dark band (e.g. the Related Stories rail).'],
@@ -182,4 +202,6 @@ export const SECTION_STYLES = [
   ['cover-box, compact, dark', 'Media Room home dark band.'],
   ['press-kit-chapters', 'Press-kit chapter navigation section.'],
   ['press-kit-banners', 'Press-kit download banners section.'],
+  ['not-found', 'A 404 variant (/en/fragments/404/*): its desktop and mobile photos, then the optional "404" label, the heading, the copy and the homepage link, laid out over the photo.'],
+  ['not-found, not-found-white', 'A 404 variant with white text, for a dark photo.'],
 ];

@@ -171,9 +171,9 @@ body.homepage .card-teaser-button.media-cart-action {
   padding: var(--spacing-m);
   color: var(--skoda-white);
 
-  /* source dual scrim + a stronger bottom legibility scrim so the white caption
-     stays legible on bright images */
-  background-image: var(--scrim-text), var(--scrim-h), var(--scrim-v);
+  /* the source's dual scrim only, as on live (PO 2026-10-15: match live). The white caption
+     keeps the source's text shadow; the extra bottom scrim this card had is gone */
+  background-image: var(--scrim-h), var(--scrim-v);
 }
 
 /* caption text is white over the image (order/date sizing from the base rules) */

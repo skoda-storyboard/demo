@@ -1,0 +1,17 @@
+/* Spacer: the source's spacer widget (`skoda-offset`), measured on the live 4×4 story
+   (2026-10-16): its height from 720px (24px per em of the widget's 24px font), none below,
+   where the source collapses it. `Spacer (line)`, a blank editor line (one 24px line and its
+   20px gap, the Immortal Octavia quote), keeps its height at every width. */
+.spacer {
+  block-size: 0;
+}
+
+.spacer.line {
+  block-size: var(--spacer-height, 0);
+}
+
+@media (width >= 720px) {
+  .spacer {
+    block-size: var(--spacer-height, 0);
+  }
+}

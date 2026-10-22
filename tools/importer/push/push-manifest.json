@@ -151,6 +151,11 @@
       "pushedAt": "2026-10-13T08:41:08.824Z",
       "previewedHash": "57c4fa915272eb040a1a41a0d76a40e44146797b82c0f3f3f41b8b72f41261f7"
     },
+    "/en/emobility/before-an-electric-car-starts-up-for-the-first-time": {
+      "hash": "51573b72e62530dfdd03cb1b4e56e1f61e44b08530715e0216453b1124014d6c",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "51573b72e62530dfdd03cb1b4e56e1f61e44b08530715e0216453b1124014d6c"
+    },
     "/en/emobility/big-possibilities-in-a-small-package-the-new-skoda-epiq": {
       "hash": "602476e1e63595d1dabd8325ace60a49e1a07bf8d3920152565b2dff1b7aef7a",
       "pushedAt": "2026-10-11T19:22:16.957Z",
@@ -176,6 +181,16 @@
       "pushedAt": "2026-10-13T08:41:08.824Z",
       "previewedHash": "31adbf04bc6b4960b59ce10948c37d6eedfbe57f9a2c1ae4504a99477e84db3c"
     },
+    "/en/emobility/discover-the-countryside-around-zell-am-see": {
+      "hash": "7bd8eb63fd06107e532a93b3feefe00f146c64d968ea0cd8bb8812965ea5dc26",
+      "pushedAt": "2026-10-16T13:58:45.274Z",
+      "previewedHash": "7bd8eb63fd06107e532a93b3feefe00f146c64d968ea0cd8bb8812965ea5dc26"
+    },
+    "/en/emobility/electrifying-the-bear-driving-the-skoda-kodiaq-iv": {
+      "hash": "00c9ee368e09d45403155503cfdf510f221c07bff49e0e7f122bd01d75d5f32f",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "00c9ee368e09d45403155503cfdf510f221c07bff49e0e7f122bd01d75d5f32f"
+    },
     "/en/emobility/elroq-rs-in-a-robe-unveiling-the-secret-of-matte-paint": {
       "hash": "23a46a80d8b3c59f344e2501a117de7613dd67eca5d2f17b8e93a9789dd6ba57",
       "pushedAt": "2026-10-11T19:22:16.957Z",
@@ -185,15 +200,25 @@
       "hash": "5b00d473a0c8284391a964c1740d1bfd4b881841193e86c7204e8d0c23a26b71",
       "pushedAt": "2026-09-26T06:46:02.390Z"
     },
+    "/en/emobility/enyaq-coupe-respectline-a-celebration-of-uniqueness": {
+      "hash": "7a95617cc34d64c6eb1fa535f6d52949de77c1b1d98689b78ffabc49c25c5e59",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "7a95617cc34d64c6eb1fa535f6d52949de77c1b1d98689b78ffabc49c25c5e59"
+    },
+    "/en/emobility/enyaq-rs-race-rally-technology-plus-sustainability": {
+      "hash": "5db16929a310647ed97d4d7bf79c8cb4b707f89613786dbd73dce0c3e29afd2d",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "5db16929a310647ed97d4d7bf79c8cb4b707f89613786dbd73dce0c3e29afd2d"
+    },
     "/en/emobility/even-opening-the-door-is-an-experience-says-the-designer-of-the-peaq-suv": {
       "hash": "26346a101d48d66702faa300dfe84abc9062aa0ae21a326ae9f2aa010ee61fb5",
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "26346a101d48d66702faa300dfe84abc9062aa0ae21a326ae9f2aa010ee61fb5"
     },
     "/en/emobility/how-the-versatile-skoda-peaq-conquered-a-mountain-peak": {
-      "hash": "f0f0e1e194e603eb2bed3c4ae2d0e9909f4c908e796410a27d3dd6e3c52a836a",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "f0f0e1e194e603eb2bed3c4ae2d0e9909f4c908e796410a27d3dd6e3c52a836a"
+      "hash": "ead22d40cc28e4aa8a7ad29ab9abe274da5a481397599f95a1f3f5d691bdb55f",
+      "pushedAt": "2026-10-21T05:15:25.868Z",
+      "previewedHash": "ead22d40cc28e4aa8a7ad29ab9abe274da5a481397599f95a1f3f5d691bdb55f"
     },
     "/en/emobility/how-was-the-elroq-made-not-in-the-usual-way": {
       "hash": "49ba95f52928cbeea2c5ecaca6ac134ad339db6501b3f53700dbe6eebfd93f4b",
@@ -206,19 +231,24 @@
       "previewedHash": "f34ae2312637f64fcae1745debc498eccc6457f484aca1c39ce1b714371c435e"
     },
     "/en/emobility/meet-peaq-safe-and-comfortable": {
-      "hash": "4010228488ba940697c568a272388eb1f70caad8bf3aa8ba5d946ed1abf23c20",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "4010228488ba940697c568a272388eb1f70caad8bf3aa8ba5d946ed1abf23c20"
+      "hash": "4eca62b1a28ce091b0ede64b5e3eafbaaea9c35b16e035a586a6c83b5821de99",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "4eca62b1a28ce091b0ede64b5e3eafbaaea9c35b16e035a586a6c83b5821de99"
     },
     "/en/emobility/meet-the-peaq-a-large-suv-with-outstanding-aerodynamics": {
-      "hash": "b4ec7ef1f1e167a125cbbf78da9f6e2988777fab811741fa6a015912b390cb3a",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "b4ec7ef1f1e167a125cbbf78da9f6e2988777fab811741fa6a015912b390cb3a"
+      "hash": "952d7e08037affcfef7e52a5000165d7e426d2aed8ecdbe8dd42acc4c0522ebd",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "952d7e08037affcfef7e52a5000165d7e426d2aed8ecdbe8dd42acc4c0522ebd"
     },
     "/en/emobility/meet-the-peaq-comfort-just-like-at-home": {
-      "hash": "4f63d7602ea8214a53eb3de5969a36ace658494ac8fc51adbe8b24b76fa363d7",
-      "pushedAt": "2026-10-12T09:04:02.247Z",
-      "previewedHash": "4f63d7602ea8214a53eb3de5969a36ace658494ac8fc51adbe8b24b76fa363d7"
+      "hash": "6f7fc94d51cfaeedd982a9a4ab33a4304da8e590f69351f0a64d94b64a797271",
+      "pushedAt": "2026-10-21T05:15:25.868Z",
+      "previewedHash": "6f7fc94d51cfaeedd982a9a4ab33a4304da8e590f69351f0a64d94b64a797271"
+    },
+    "/en/emobility/meet-the-peaq-intuitive-and-comfortable-controls": {
+      "hash": "dd005310baa2996939774bc5474791fd2d5b6afe6fdc46bb99e30ce28d385e1f",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "dd005310baa2996939774bc5474791fd2d5b6afe6fdc46bb99e30ce28d385e1f"
     },
     "/en/emobility/meet-the-peaq-spacious-inside-and-out": {
       "hash": "00e00c6a5100668ee6b2ea416f82e07e60965afec955828adab6acc7f7c33346",
@@ -255,10 +285,15 @@
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "35976b16f0e8238f32508a18c4e330f980ebaf2f70d73b57242791e6fd5688e7"
     },
+    "/en/emobility/skoda-enyaq-coupe-iv-will-get-you-in-60-seconds": {
+      "hash": "bf316d43960b8b52ead79d1cb04db284d72c96ed8e155f00adf5fcc513e2e1ac",
+      "pushedAt": "2026-10-15T10:41:43.566Z",
+      "previewedHash": "bf316d43960b8b52ead79d1cb04db284d72c96ed8e155f00adf5fcc513e2e1ac"
+    },
     "/en/emobility/skoda-epiq-now-dresses-up-in-striking-sportline-trim": {
-      "hash": "3bb8dba5298f00c8765c8506ce8f82713252383264edd5937f36adbe9053d615",
-      "pushedAt": "2026-10-14T10:02:37.196Z",
-      "previewedHash": "3bb8dba5298f00c8765c8506ce8f82713252383264edd5937f36adbe9053d615"
+      "hash": "52974b6a0981879900c8001aa458ce8b01f6dd8bce6b55b3f2970957c98f38d4",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "52974b6a0981879900c8001aa458ce8b01f6dd8bce6b55b3f2970957c98f38d4"
     },
     "/en/emobility/skoda-epiq-will-win-you-over-in-just-a-few-seconds": {
       "hash": "e4dea3af0e20d49eb9e11a35a76ed7ab6e1cb86efa50068aaca8c4991e900e86",
@@ -276,14 +311,19 @@
       "previewedHash": "ca4226be6e272c494a5d5f3c7c872c0512108fba6fe050770659bc0f0aa4d6a2"
     },
     "/en/emobility/sunset-over-the-mountains-the-story-behind-the-camouflage-for-the-skoda-peaq": {
-      "hash": "9787fd36207f17958e9476204ac7c81df1ff736779b51fea1e62f4636fe4e3af",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "9787fd36207f17958e9476204ac7c81df1ff736779b51fea1e62f4636fe4e3af"
+      "hash": "fbf15485decc9823d107afe0843b5ec3d0cd5a8eb92b9bf22b41aace8200d07b",
+      "pushedAt": "2026-10-21T05:15:25.868Z",
+      "previewedHash": "fbf15485decc9823d107afe0843b5ec3d0cd5a8eb92b9bf22b41aace8200d07b"
     },
     "/en/emobility/teaser": {
-      "hash": "6fba5e3bcfea312447df08e13cd7d8b898b72d860fc4449d6baf050f333eed9e",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "6fba5e3bcfea312447df08e13cd7d8b898b72d860fc4449d6baf050f333eed9e"
+      "hash": "1ac2d8b61cabb1e6d0ab33c2e131c3ef98278e8123d3af02b43dc42a66283137",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "1ac2d8b61cabb1e6d0ab33c2e131c3ef98278e8123d3af02b43dc42a66283137"
+    },
+    "/en/emobility/the-little-prince-van-gogh-and-lavender-scent": {
+      "hash": "86f8bcc04c0db52943e30cf583fa2c8a830b04b745fa7690910ace9c709197d5",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "86f8bcc04c0db52943e30cf583fa2c8a830b04b745fa7690910ace9c709197d5"
     },
     "/en/emobility/the-skoda-peaq-will-win-you-over-fast": {
       "hash": "96af349a6be98ecbbf7a53a070e0778585eebc69dddd70103d3f15b0f35f3911",
@@ -316,9 +356,14 @@
       "previewedHash": "87922472b62e16720d051040a09941cca3e4df6c7d669ee0ce28e4d10913aacb"
     },
     "/en/lifestyle/13-countries-over-19000-kilometers-the-kylaq-traveled-from-pune-to-prague": {
-      "hash": "470f5b7ac7783886206bb1975a34dc29323496d20df3deed633d9c9c1bfaeaa7",
-      "pushedAt": "2026-10-13T05:29:58.270Z",
-      "previewedHash": "470f5b7ac7783886206bb1975a34dc29323496d20df3deed633d9c9c1bfaeaa7"
+      "hash": "3e58637b23bbbcb2b11d443ec93ccfd19b763576063c2d75e92ce9b9eb210f3e",
+      "pushedAt": "2026-10-21T05:15:25.868Z",
+      "previewedHash": "3e58637b23bbbcb2b11d443ec93ccfd19b763576063c2d75e92ce9b9eb210f3e"
+    },
+    "/en/lifestyle/a-journey-you-will-never-forget-the-monumental-route-napoleon": {
+      "hash": "a381a67123229ac3389d25eea22c8d17d6b2c8839d7b26a410f6aa249f1e6c5c",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "a381a67123229ac3389d25eea22c8d17d6b2c8839d7b26a410f6aa249f1e6c5c"
     },
     "/en/lifestyle/an-epic-start-to-the-tour-de-france-skoda-got-barcelona-moving": {
       "hash": "0a490fcbe76f281e598f202dc7efbcb047e4d91fa085acf04533b2d3b34909b3",
@@ -330,15 +375,30 @@
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "f7ecf579b37d67432cfb841723887c0de1448ccdd7c41517baa8ef3f65b79887"
     },
+    "/en/lifestyle/exploring-the-magnificent-alps-in-rs-models": {
+      "hash": "b864d3cbc6fe5652d6f2aebfc7ea21b642adb9859bcdd9b705ec35debaec8c8b",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "b864d3cbc6fe5652d6f2aebfc7ea21b642adb9859bcdd9b705ec35debaec8c8b"
+    },
     "/en/lifestyle/feeling-the-heat-skoda-cars-keep-both-passengers-and-their-snacks-cool": {
-      "hash": "9ce890288820beccc1e986328443ff3e866d94394728abb8d56d58a97b839cb4",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "9ce890288820beccc1e986328443ff3e866d94394728abb8d56d58a97b839cb4"
+      "hash": "517943e824006fd4a97bd3ee089081ad461619f561be1fbc26d0468373a98cb1",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "517943e824006fd4a97bd3ee089081ad461619f561be1fbc26d0468373a98cb1"
     },
     "/en/lifestyle/from-unwanted-graffiti-to-bold-support-for-womens-cycling": {
       "hash": "88aa10a39faa501da9be37060861c2859b654b2919626a97cc0d4a30f4a5ffd4",
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "88aa10a39faa501da9be37060861c2859b654b2919626a97cc0d4a30f4a5ffd4"
+    },
+    "/en/lifestyle/how-to-take-the-best-picture-of-a-car-follow-a-pros-advice": {
+      "hash": "8225a4937de80afdab9e2373dece392e64790b0fa46ea1946cbd21b606f010d4",
+      "pushedAt": "2026-10-16T13:58:45.274Z",
+      "previewedHash": "8225a4937de80afdab9e2373dece392e64790b0fa46ea1946cbd21b606f010d4"
+    },
+    "/en/lifestyle/into-the-freezing-water-with-the-iceman": {
+      "hash": "35a22c9e26e1acabbb22af14009fe37c0976b71bb29b31749ec1ca2232284d6f",
+      "pushedAt": "2026-10-16T13:58:45.274Z",
+      "previewedHash": "35a22c9e26e1acabbb22af14009fe37c0976b71bb29b31749ec1ca2232284d6f"
     },
     "/en/lifestyle/la-dolce-vita-explore-the-surroundings-of-lake-como": {
       "hash": "550b8de08cf477e9843258cc164503ab18803d385030f8268841f1e678443f1e",
@@ -350,6 +410,16 @@
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "4da655b2fe5a5977fc2eeb006c68218e6f3898c61b7fbd74d1ac8ea6965be1d2"
     },
+    "/en/lifestyle/people/the-story-of-olive-oil-from-andalusia-to-the-czech-republic": {
+      "hash": "7225dcb75d623b13c48ebc7748a7735a94657f3762975aa1f29de23befa4e445",
+      "pushedAt": "2026-10-16T13:58:45.274Z",
+      "previewedHash": "7225dcb75d623b13c48ebc7748a7735a94657f3762975aa1f29de23befa4e445"
+    },
+    "/en/lifestyle/road-trip-in-asturias-from-beaches-to-high-peaks": {
+      "hash": "03d46bc5dd239ad650ee61b2e89a114d85272ef313cf76e352c435059598a149",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "03d46bc5dd239ad650ee61b2e89a114d85272ef313cf76e352c435059598a149"
+    },
     "/en/lifestyle/rs-four-ways-which-one-will-you-choose": {
       "hash": "2829a64c7d5e4c9f5e29fd19435adc3ec739917c76af0c7b5643e2eba89a2b2f",
       "pushedAt": "2026-10-11T19:22:16.957Z",
@@ -360,10 +430,50 @@
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "029d4679a476d9ebacc7b0392722da97792a97c8bb95205c5a4cefb70f8a3cf5"
     },
+    "/en/lifestyle/sports/cycling/miss-peaches-on-the-road-enduro-in-barcelona": {
+      "hash": "56d29fc1c3d2aa6ee09e7eb3eed579e0279e0f689ea613e3bfc4647179835bfa",
+      "pushedAt": "2026-10-19T07:06:27.374Z",
+      "previewedHash": "56d29fc1c3d2aa6ee09e7eb3eed579e0279e0f689ea613e3bfc4647179835bfa"
+    },
+    "/en/lifestyle/sports/cycling/miss-peaches-on-the-road-skatepark-tricks-in-marseille": {
+      "hash": "508c7b8d987f33f5f469ac2538b6b44b26962dfdad886e111020078aa41e5804",
+      "pushedAt": "2026-10-19T07:06:27.374Z",
+      "previewedHash": "508c7b8d987f33f5f469ac2538b6b44b26962dfdad886e111020078aa41e5804"
+    },
+    "/en/lifestyle/sports/cycling/miss-peaches-on-the-road-whitewater-in-switzerland": {
+      "hash": "44c99feb828fbf8ee4927217692cc1bce15d11b825544e9ff96881c3045d3dec",
+      "pushedAt": "2026-10-19T07:06:27.374Z",
+      "previewedHash": "44c99feb828fbf8ee4927217692cc1bce15d11b825544e9ff96881c3045d3dec"
+    },
+    "/en/lifestyle/sports/hockey/this-years-skoda-ice-hockey-team-line-up": {
+      "hash": "23925033f58ece7f0dab1e6498156c3a8b24c63a33a220f426d76ab245999641",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "23925033f58ece7f0dab1e6498156c3a8b24c63a33a220f426d76ab245999641"
+    },
+    "/en/lifestyle/sports/miss-peaches-on-the-road-downhill-biking-in-champery-switzerland": {
+      "hash": "994b44999fa2a3f42f4e5c24d3a3d19ebed8bdac21b89ed981e64cc9d42bc48a",
+      "pushedAt": "2026-10-19T07:06:27.374Z",
+      "previewedHash": "994b44999fa2a3f42f4e5c24d3a3d19ebed8bdac21b89ed981e64cc9d42bc48a"
+    },
+    "/en/lifestyle/sports/miss-peaches-on-the-road-surfing-in-san-sebastian": {
+      "hash": "053e4f9e12c77853b7c673edfa6ee26cc19fb7ca2ae6bb828f1793c24cf275bc",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "053e4f9e12c77853b7c673edfa6ee26cc19fb7ca2ae6bb828f1793c24cf275bc"
+    },
+    "/en/lifestyle/the-best-of-storyboard-pucks-wheels-seconds": {
+      "hash": "f70214f172c0e20f652106c7eda29626389fbb033863240fc835666e9cc40f18",
+      "pushedAt": "2026-10-15T16:54:17.764Z",
+      "previewedHash": "f70214f172c0e20f652106c7eda29626389fbb033863240fc835666e9cc40f18"
+    },
+    "/en/lifestyle/this-years-skoda-auto-hockey-team-line-up": {
+      "hash": "1404f7da029db8d4b2d48e3af23cffacbd7f71753aff5de4176c390812853d09",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "1404f7da029db8d4b2d48e3af23cffacbd7f71753aff5de4176c390812853d09"
+    },
     "/en/lifestyle/what-you-learn-on-the-circuit-can-save-you-on-the-road": {
-      "hash": "8b3fe900a5baf27ea3e6c7c85d4bb745946248c37c03e08854f279ef8aea0da5",
-      "pushedAt": "2026-10-13T08:41:08.824Z",
-      "previewedHash": "8b3fe900a5baf27ea3e6c7c85d4bb745946248c37c03e08854f279ef8aea0da5"
+      "hash": "5d8aeffea79444a214aab21c91e1e92f16b9f393598f13afdcbf45e75e8cab9b",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "5d8aeffea79444a214aab21c91e1e92f16b9f393598f13afdcbf45e75e8cab9b"
     },
     "/en/media-cart": {
       "hash": "38438976c38bf5979ebad7e3e208f82a5121d929f4217fd4d3d77b8b54597e81",
@@ -375,10 +485,90 @@
       "pushedAt": "2026-10-12T20:22:12.708Z",
       "previewedHash": "12d6367f8b8b6b40acde47e15bd9f8f9e1cbdeca090b7ce3da52a78e3b35b29b"
     },
+    "/en/models/discovering-the-full-power-of-a-skoda-4x4": {
+      "hash": "255451e6fa8c9a18acf0d04972781493cfabeceb88bb2acf63e9054def4cdc56",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "255451e6fa8c9a18acf0d04972781493cfabeceb88bb2acf63e9054def4cdc56"
+    },
+    "/en/models/enyaq-rs-race-an-electric-coupe-on-steroids": {
+      "hash": "c1ec4b9e86504e130742d24cdbd8fdd34a64038dce15f47debd92f7a6d2f9f7d",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "c1ec4b9e86504e130742d24cdbd8fdd34a64038dce15f47debd92f7a6d2f9f7d"
+    },
+    "/en/models/first-glimpse-of-skodas-new-suv": {
+      "hash": "ce813dc1d8315aae5ed9a88515eaa5cb7f9d4746657b63825d906506c2c5a763",
+      "pushedAt": "2026-10-16T13:58:45.274Z",
+      "previewedHash": "ce813dc1d8315aae5ed9a88515eaa5cb7f9d4746657b63825d906506c2c5a763"
+    },
+    "/en/models/kamiq/first-sketches-of-the-skoda-kamiq": {
+      "hash": "a2c7e092bd52880c91288a922e15e89a24182568a42dc666f84573d5b128bbd6",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "a2c7e092bd52880c91288a922e15e89a24182568a42dc666f84573d5b128bbd6"
+    },
+    "/en/models/kamiq/skodas-new-suv-christened-the-kamiq": {
+      "hash": "6bcd34af5efabf4688e63210bf077c0ecb1800cbd4e5ef2c3f55a9db3f96dc19",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "6bcd34af5efabf4688e63210bf077c0ecb1800cbd4e5ef2c3f55a9db3f96dc19"
+    },
+    "/en/models/kamiq/the-skoda-kamiq-your-travel-buddy-for-urban-adventuring": {
+      "hash": "e233990b7b110a97cb6b1d381aea9f0befbec103c0040d9250a4ab54a483c574",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "e233990b7b110a97cb6b1d381aea9f0befbec103c0040d9250a4ab54a483c574"
+    },
+    "/en/models/karoq/first-sketches-of-the-new-skoda-karoq": {
+      "hash": "7554f09fd75735d0283302047f27998cb8235e8946cea4a34d8c30bd8688995a",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "7554f09fd75735d0283302047f27998cb8235e8946cea4a34d8c30bd8688995a"
+    },
+    "/en/models/meet-the-skoda-kodiaq-sportline": {
+      "hash": "eb46df24f7146ff0e7923cd8ddc0cc9ba2aa2a3c1bed41355ed36844da25bf30",
+      "pushedAt": "2026-10-16T13:58:45.274Z",
+      "previewedHash": "eb46df24f7146ff0e7923cd8ddc0cc9ba2aa2a3c1bed41355ed36844da25bf30"
+    },
+    "/en/models/millionth-skoda-suv": {
+      "hash": "580415910e9e71e86c5e917a69d5bfe57dd924f1176a040f4b426b5584c34e30",
+      "pushedAt": "2026-10-19T07:06:27.374Z",
+      "previewedHash": "580415910e9e71e86c5e917a69d5bfe57dd924f1176a040f4b426b5584c34e30"
+    },
+    "/en/models/number-of-the-month-140": {
+      "hash": "f1a4877f8e8bfdfd515bbd1b569c315a20e1c89ffa0cf1dfe9511912822cf377",
+      "pushedAt": "2026-10-15T16:54:17.764Z",
+      "previewedHash": "f1a4877f8e8bfdfd515bbd1b569c315a20e1c89ffa0cf1dfe9511912822cf377"
+    },
+    "/en/models/scala/number-of-the-month-40": {
+      "hash": "fbc4157ee505e3734e17dac0327c33afd1f7706cb7dae2c7d7ad57fadcff342f",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "fbc4157ee505e3734e17dac0327c33afd1f7706cb7dae2c7d7ad57fadcff342f"
+    },
+    "/en/models/scala/welcome-the-skoda-scala": {
+      "hash": "96c1dfdad9411e419f243f6c674d8b51cc6273614cd0feff8e7f55dedbdcd58b",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "96c1dfdad9411e419f243f6c674d8b51cc6273614cd0feff8e7f55dedbdcd58b"
+    },
+    "/en/models/skoda-4x4-your-best-bet-in-the-snow": {
+      "hash": "b3d2c0c62a1320a073a756f71bae18624a240b0c6dab9eb0e5b03b7878b84509",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "b3d2c0c62a1320a073a756f71bae18624a240b0c6dab9eb0e5b03b7878b84509"
+    },
     "/en/models/skoda-elroq-through-designers-eyes": {
       "hash": "9bae2e5be815923bc4a21a2c0ae1ef8dc39322ba77f22d6ac8a8cfda1e418b6f",
       "pushedAt": "2026-10-13T06:13:46.476Z",
       "previewedHash": "9bae2e5be815923bc4a21a2c0ae1ef8dc39322ba77f22d6ac8a8cfda1e418b6f"
+    },
+    "/en/models/skoda-world-premieres-in-geneva": {
+      "hash": "d3151f4ef02431f170fc934cae95eb80f069783249ca4699c7801e4960b7480e",
+      "pushedAt": "2026-10-15T16:54:17.764Z",
+      "previewedHash": "d3151f4ef02431f170fc934cae95eb80f069783249ca4699c7801e4960b7480e"
+    },
+    "/en/models/sporty-and-stylish-the-kodiaq-gets-the-rs-treatment": {
+      "hash": "1cfcb1f92f04917fe5f95c4bd2f53cb3f8b4084f340a25c38f4baa8b720af261",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "1cfcb1f92f04917fe5f95c4bd2f53cb3f8b4084f340a25c38f4baa8b720af261"
+    },
+    "/en/models/superb/sporty-flair-for-every-day-the-superb-sportline-will-get-you": {
+      "hash": "3319769deb722ef285a836ea09f100dd836edda627338e86b1dea3bdc3c2b77f",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "3319769deb722ef285a836ea09f100dd836edda627338e86b1dea3bdc3c2b77f"
     },
     "/en/news": {
       "hash": "852756bfae68cf95d59de6d67307191136227cc4f4c0483dfcc6c9a0ed9d4fa6",
@@ -431,9 +621,9 @@
       "previewedHash": "11d9403dd829e565ca3af645790e4a2d15764ce82cbb7e9389a45e80448830db"
     },
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain": {
-      "hash": "9e680e61375e75c26a4a5218edd00d240b7dad7e25778aee56593249afed1729",
-      "pushedAt": "2026-10-15T08:29:44.059Z",
-      "previewedHash": "9e680e61375e75c26a4a5218edd00d240b7dad7e25778aee56593249afed1729"
+      "hash": "6cc36312916d58e15f0630765f750ba886c1219bd617856f42060bedc9b1ea34",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "6cc36312916d58e15f0630765f750ba886c1219bd617856f42060bedc9b1ea34"
     },
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-180-rs-and-200-rs-1974-rally-cars-from-another-league": {
       "hash": "9e15f8fa721a17c681fd2e5978aebb48097d825180bf6c7656ba6b4409489ec3",
@@ -446,9 +636,9 @@
       "previewedHash": "1d7b2c700975880385d1c32336e6ae02bfae9241302806a2ddc29c25b07b5034"
     },
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-motorsport-edition-limited-edition-celebrates-the-125th-anniversary-of-skoda-motorsport": {
-      "hash": "33369d4cf46a8ef19e6d93c0a79d47bdd934fde42c675eabb2f085d639d5ded4",
-      "pushedAt": "2026-10-15T08:29:44.059Z",
-      "previewedHash": "33369d4cf46a8ef19e6d93c0a79d47bdd934fde42c675eabb2f085d639d5ded4"
+      "hash": "adc17e1ee3936b079cf5ab8a13909fa16336e14082ae6eda8d5cfe22267fc14e",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "adc17e1ee3936b079cf5ab8a13909fa16336e14082ae6eda8d5cfe22267fc14e"
     },
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-fabia-r5-rally2-rally2-evo-successful-in-the-hands-of-factory-drivers-and-privateers-alike": {
       "hash": "1b09a76200429ae347ebc064802896ac1ddd0cfa2b6261e776522464639e1065",
@@ -491,9 +681,9 @@
       "previewedHash": "96deddfaffce5af7452210070bae5a45036966e048471c1a53f6f0ff2807b30b"
     },
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-spider-b5-1972-and-skoda-spider-ii-1975-prototypes-for-the-racetrack": {
-      "hash": "3c7bbad8bee4681ff83e32d037bb84f2caac23da4962ada35f4047febe6cc392",
-      "pushedAt": "2026-10-15T08:29:44.059Z",
-      "previewedHash": "3c7bbad8bee4681ff83e32d037bb84f2caac23da4962ada35f4047febe6cc392"
+      "hash": "5d0596df17ff113f35f97fd8270e35032518df17b1d6e5ebaf9335d6019ded44",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "5d0596df17ff113f35f97fd8270e35032518df17b1d6e5ebaf9335d6019ded44"
     },
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/skoda-sport-1949-the-long-distance-runner-from-the-other-side-of-the-iron-curtain": {
       "hash": "dac69f58b32395f1b38e9e9f7cc2266e3ee730db210ef82c63c6f117ba4bbfb7",
@@ -506,9 +696,9 @@
       "previewedHash": "341d9a7c31583582cd1738b5f3de866c8540e8a898a65c3fbdac26bffab7ef88"
     },
     "/en/press-kits/125-years-of-skoda-motorsport-press-kit/videos": {
-      "hash": "d086e347339aa610dc54f0a311dc975a029d8401687cbf2cac7b2fb976917ab6",
-      "pushedAt": "2026-10-15T08:29:44.059Z",
-      "previewedHash": "d086e347339aa610dc54f0a311dc975a029d8401687cbf2cac7b2fb976917ab6"
+      "hash": "412289ff9a00c74777393f1edb0dfcde193fe5193ee543a62f010965ac3fa735",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "412289ff9a00c74777393f1edb0dfcde193fe5193ee543a62f010965ac3fa735"
     },
     "/en/press-kits/4x4-winter-experience-press-kit": {
       "hash": "6c1f0283a14ad583066eb21a3b1ff0886022027dd5a3be7b6b3080e65e1d30cd",
@@ -521,19 +711,19 @@
       "previewedHash": "7cb1ddcad7e62e355c01f38a34197f6d9d1a44744e0d7210a668333894e2663f"
     },
     "/en/press-kits/classic-days-2026-press-kit/125-years-of-skoda-motorsport": {
-      "hash": "8c5943d66ddf5bdb841f87712670c11acdc084893159618bfe9b2b4d5f21fb2b",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "8c5943d66ddf5bdb841f87712670c11acdc084893159618bfe9b2b4d5f21fb2b"
+      "hash": "a401852dca1ec75a16ccc0a1d370f95377e257567e51a5a120af72cd4ef29490",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "a401852dca1ec75a16ccc0a1d370f95377e257567e51a5a120af72cd4ef29490"
     },
     "/en/press-kits/classic-days-2026-press-kit/1955-skoda-440-on-the-international-stage": {
-      "hash": "079fc1921ca3c8b1754115718d4370b0c8c185789911c52b50f4ca201a2d6e35",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "079fc1921ca3c8b1754115718d4370b0c8c185789911c52b50f4ca201a2d6e35"
+      "hash": "65e30e1f1d2794247ef1bd5d24e3b8fa842855338ddb0da14cfc93194f27c6ef",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "65e30e1f1d2794247ef1bd5d24e3b8fa842855338ddb0da14cfc93194f27c6ef"
     },
     "/en/press-kits/classic-days-2026-press-kit/60-years-of-the-trekka-an-suv-from-new-zealand": {
-      "hash": "df3ccfc5c0f976631ce3281214309c0f37adc641f72eac9df2f6ccab580d3df1",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "df3ccfc5c0f976631ce3281214309c0f37adc641f72eac9df2f6ccab580d3df1"
+      "hash": "31ee2e12e1028172c704091bd42cc8a9b5e0f8f051dd3bc84f054ee9e445ccdf",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "31ee2e12e1028172c704091bd42cc8a9b5e0f8f051dd3bc84f054ee9e445ccdf"
     },
     "/en/press-kits/classic-days-2026-press-kit/images": {
       "hash": "4aa89c404263841311fdcbc829b9954b6169e920a1098977adac81a99af2f3f7",
@@ -541,19 +731,19 @@
       "previewedHash": "4aa89c404263841311fdcbc829b9954b6169e920a1098977adac81a99af2f3f7"
     },
     "/en/press-kits/classic-days-2026-press-kit/laurin-klement-bz-1902-1904": {
-      "hash": "8750a7e656ceea8d3328b057916b41637dc5a347bc5d44cb364da4769846b6d2",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "8750a7e656ceea8d3328b057916b41637dc5a347bc5d44cb364da4769846b6d2"
+      "hash": "866b90007ddd76afab9701021d6bad006accccc9302a7ab45ba4f3d2b4829af3",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "866b90007ddd76afab9701021d6bad006accccc9302a7ab45ba4f3d2b4829af3"
     },
     "/en/press-kits/classic-days-2026-press-kit/laurin-klement-slavia-type-b-1899-1904": {
-      "hash": "279b57817d0b61cf1189ebec8eb428cdda9c7393501e50f41e3396b63fdddcec",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "279b57817d0b61cf1189ebec8eb428cdda9c7393501e50f41e3396b63fdddcec"
+      "hash": "84538503ed44d6104d33818644cc87afc0a710aab3a27d9f214caf8002033e4e",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "84538503ed44d6104d33818644cc87afc0a710aab3a27d9f214caf8002033e4e"
     },
     "/en/press-kits/classic-days-2026-press-kit/laurin-klement-voiturette-a-1905-1907": {
-      "hash": "5395b93b95f4611b3703e1acbdb602667b8cdee609072d382cf09b41b81e5cfc",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "5395b93b95f4611b3703e1acbdb602667b8cdee609072d382cf09b41b81e5cfc"
+      "hash": "5fec2aadad4ce0bf28989477e877368e8627e9672353514c82d69c0ad8ca19ed",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "5fec2aadad4ce0bf28989477e877368e8627e9672353514c82d69c0ad8ca19ed"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-110-r-coupe-1970-1980": {
       "hash": "da07b35c385579ef99d041516be541662d8b9b8b1a3a09a22e3de7dadd222495",
@@ -561,9 +751,9 @@
       "previewedHash": "da07b35c385579ef99d041516be541662d8b9b8b1a3a09a22e3de7dadd222495"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-1100-mbx-1967-1969": {
-      "hash": "44727f67d110e93a682d944cf21be864db5819c3404879a130df1100f22e90d3",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "44727f67d110e93a682d944cf21be864db5819c3404879a130df1100f22e90d3"
+      "hash": "e39b2f6cb123d4225fbace8c5df83c2eb0a66744fa90c8311bbe935aa093f6ce",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "e39b2f6cb123d4225fbace8c5df83c2eb0a66744fa90c8311bbe935aa093f6ce"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-120-gls-1976-1990": {
       "hash": "c2d7f64a48070405506a50d5e8d11cb663ad267ace758ac6cc88d987a21d4e31",
@@ -571,24 +761,24 @@
       "previewedHash": "c2d7f64a48070405506a50d5e8d11cb663ad267ace758ac6cc88d987a21d4e31"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-120-s-rallye-1972-1975": {
-      "hash": "fef593f76e52fa16b11a02804e3d2c0576138239c0a979bf7eaa8ca4fd036d16",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "fef593f76e52fa16b11a02804e3d2c0576138239c0a979bf7eaa8ca4fd036d16"
+      "hash": "90238079911ba478382ee66b709bbceb832246bdfbcd8fd6cf4a02e0011b02ea",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "90238079911ba478382ee66b709bbceb832246bdfbcd8fd6cf4a02e0011b02ea"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-130-rs-1975-a-star-on-both-sides-of-the-iron-curtain": {
-      "hash": "dd7f4badddcf1a2f9c5e115d9330dc807c6c3df032ee6f43d0df7e8892266419",
-      "pushedAt": "2026-10-15T08:29:44.059Z",
-      "previewedHash": "dd7f4badddcf1a2f9c5e115d9330dc807c6c3df032ee6f43d0df7e8892266419"
+      "hash": "d914d20379c1d20b99197280aa1ac87e972f3c37bdffc917c5150efdbc2a6c41",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "d914d20379c1d20b99197280aa1ac87e972f3c37bdffc917c5150efdbc2a6c41"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-645-1929-1934": {
-      "hash": "47f22c1d938cfac96dc2121fefeed1ea67db2f17a832d254732650f3276e9110",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "47f22c1d938cfac96dc2121fefeed1ea67db2f17a832d254732650f3276e9110"
+      "hash": "09ac4f0ea8b0cd37eac3bb98d7df9a6de8d512bd11ddc34cc3847258e251b77c",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "09ac4f0ea8b0cd37eac3bb98d7df9a6de8d512bd11ddc34cc3847258e251b77c"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-auto-celebrates-more-than-130-years-of-craftsmanship-and-innovation": {
-      "hash": "eb06dc8b386a50e7b4e709ea99b7c007645e982694fd559620f1d16ec907ff01",
-      "pushedAt": "2026-10-15T08:29:44.059Z",
-      "previewedHash": "eb06dc8b386a50e7b4e709ea99b7c007645e982694fd559620f1d16ec907ff01"
+      "hash": "dc39543e6095a7e8cf36478c16cf70b52151ee42ee01fd0daeb7929fec307c06",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "dc39543e6095a7e8cf36478c16cf70b52151ee42ee01fd0daeb7929fec307c06"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-fabia-rs-rally2-celebrates-125-years-of-skoda-motorsportsuccess": {
       "hash": "b61499b4e7541ab7a923988a717ababce584060bb021b3b7355ef2265310ea38",
@@ -606,9 +796,9 @@
       "previewedHash": "92670f9f85e0195480ae725e2a2d356ac2ddbbecd3eb09ba209c46b87d502bbc"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-museum": {
-      "hash": "aeea2ac7837879782101b72b7bb8c03b758838c3bae279c2136654b33aa30891",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "aeea2ac7837879782101b72b7bb8c03b758838c3bae279c2136654b33aa30891"
+      "hash": "18305cc6333cab5b3a72b4b6a9fafe51bd514c8f1ee00237282b41af117c1e87",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "18305cc6333cab5b3a72b4b6a9fafe51bd514c8f1ee00237282b41af117c1e87"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-museum-presents-only-surviving-laurin-klement-bscsports-car-from-1908": {
       "hash": "c5f944be57a9254349a24f0e64268431619027bf8aa3ad3fe2c4eedb697fd5c2",
@@ -616,24 +806,24 @@
       "previewedHash": "c5f944be57a9254349a24f0e64268431619027bf8aa3ad3fe2c4eedb697fd5c2"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-1959-1964": {
-      "hash": "323cf0b9bfca636e3887335ff1241747f718c569c64eabaef31eaf275ad08334",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "323cf0b9bfca636e3887335ff1241747f718c569c64eabaef31eaf275ad08334"
+      "hash": "37b4fdcfda99abe53666657d520a44dba1be7de99d5c3f044bb83905b6185b5a",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "37b4fdcfda99abe53666657d520a44dba1be7de99d5c3f044bb83905b6185b5a"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-octavia-turns-30-three-decades-of-a-brand-icon": {
-      "hash": "da5075bc9aa08f5a5298c69ef9e1d3133a7449b42f10b69009aa7191d0b314b6",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "da5075bc9aa08f5a5298c69ef9e1d3133a7449b42f10b69009aa7191d0b314b6"
+      "hash": "aa5ad623ea5da7da4c7a26844fa726ccd8da9056ab8413850aa3b2de37dcb206",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "aa5ad623ea5da7da4c7a26844fa726ccd8da9056ab8413850aa3b2de37dcb206"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-popular-monte-carlo-1936-1939": {
-      "hash": "d24b54eb6e9494aa1a37d92a16fe927a20b57471993536baa84672095b1b34b2",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "d24b54eb6e9494aa1a37d92a16fe927a20b57471993536baa84672095b1b34b2"
+      "hash": "b950c134e504f162aabf82d6f30827d6d345d83053719937e1cd4f8bf2faf0df",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "b950c134e504f162aabf82d6f30827d6d345d83053719937e1cd4f8bf2faf0df"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-popular-sport-1936-outstanding-success-at-the-monte-carlo-rally": {
-      "hash": "22a077a25a692fda065f1bde1a1fed735beba84bb21949cd506c45100b9e7903",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "22a077a25a692fda065f1bde1a1fed735beba84bb21949cd506c45100b9e7903"
+      "hash": "f5d0aa49dce52da9ade7fcb8437c5932859fc1675385f2b8506fb5495e612324",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "f5d0aa49dce52da9ade7fcb8437c5932859fc1675385f2b8506fb5495e612324"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-rapid-135-1987-1990": {
       "hash": "98faeb1055aac8598c41459f053028a20a7ff1cc8f5f0ca945a3c257f7ec9a6b",
@@ -651,9 +841,9 @@
       "previewedHash": "15e3d49cb9680b649c5514d51b7b7eb62f9b6aae199a6de50d69f5e9d1175810"
     },
     "/en/press-kits/classic-days-2026-press-kit/skoda-superb-3000-ohv-1938-1949": {
-      "hash": "f27cd08440e3d8a0dc4a60b760f68f90b26b3be186f91085ebc832bdbb7282d6",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "f27cd08440e3d8a0dc4a60b760f68f90b26b3be186f91085ebc832bdbb7282d6"
+      "hash": "fdfec71abac995fc371ecd0b43590459ae823142b9368a4cb56576a624af03fb",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "fdfec71abac995fc371ecd0b43590459ae823142b9368a4cb56576a624af03fb"
     },
     "/en/press-kits/classic-days-2026-press-kit/texts": {
       "hash": "064877ba8a3084cf8b92bfebac01e8ba349674dbcc39cee5d649899dc730a872",
@@ -661,14 +851,24 @@
       "previewedHash": "064877ba8a3084cf8b92bfebac01e8ba349674dbcc39cee5d649899dc730a872"
     },
     "/en/press-kits/classic-days-2026-press-kit/the-skoda-1101-tudor-celebrates-its-80th-anniversary": {
-      "hash": "942b000453a02cf1fd498326ff3efcebe51b21df295b401c07e67849e47d6728",
-      "pushedAt": "2026-10-14T09:44:30.368Z",
-      "previewedHash": "942b000453a02cf1fd498326ff3efcebe51b21df295b401c07e67849e47d6728"
+      "hash": "813c4c39bd488650736605f34d17e26c1825aaa0636e520431476a7046e02eac",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "813c4c39bd488650736605f34d17e26c1825aaa0636e520431476a7046e02eac"
     },
     "/en/press-kits/classic-days-2026-press-kit/videos": {
       "hash": "d5b6380e127720fe028b1fae1bb6c48d9011912fa98adec7ba88e0451663d0df",
       "pushedAt": "2026-10-15T08:29:44.059Z",
       "previewedHash": "d5b6380e127720fe028b1fae1bb6c48d9011912fa98adec7ba88e0451663d0df"
+    },
+    "/en/press-kits/design-and-technology-update-for-the-skoda-fabia": {
+      "hash": "ec078d65bc20766c5e2ab5bcad47ff128f1d9793555655bcea10a12fb110ab50",
+      "pushedAt": "2026-10-15T10:41:43.566Z",
+      "previewedHash": "ec078d65bc20766c5e2ab5bcad47ff128f1d9793555655bcea10a12fb110ab50"
+    },
+    "/en/press-kits/enyaq-world-premiere": {
+      "hash": "100e12ac53f44a1fcf82a459848cf8ef01b6a804db07186e8d0a42442e612979",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "100e12ac53f44a1fcf82a459848cf8ef01b6a804db07186e8d0a42442e612979"
     },
     "/en/press-kits/lets-explore-albania-press-kit": {
       "hash": "d627527e5fb446fd58b2a2e6b0b18d37975e35f50870d5cac0d16030b0417be9",
@@ -685,6 +885,26 @@
       "pushedAt": "2026-10-08T08:52:11.243Z",
       "previewedHash": "b07ff8742fb8c9b2a59567bcfbef3c5acfb401f0696d3b44705da9e7b2842ab2"
     },
+    "/en/press-kits/skoda-at-the-2018-geneva-motor-show": {
+      "hash": "8a115a7c28ed5779666ce2c5e5cd374cbbb52ea7741bb2a93d497ff54a1c69df",
+      "pushedAt": "2026-10-15T10:41:43.566Z",
+      "previewedHash": "8a115a7c28ed5779666ce2c5e5cd374cbbb52ea7741bb2a93d497ff54a1c69df"
+    },
+    "/en/press-kits/skoda-at-the-2018-paris-motor-show": {
+      "hash": "7bd71bfa482bb7ec0c384ac40500662ecda67077e48ff3b8fd8e4e5542d87e4b",
+      "pushedAt": "2026-10-15T10:41:43.566Z",
+      "previewedHash": "7bd71bfa482bb7ec0c384ac40500662ecda67077e48ff3b8fd8e4e5542d87e4b"
+    },
+    "/en/press-kits/skoda-auto-at-auto-shanghai-2019-press-kit": {
+      "hash": "7442b4aee27a7a3467e9606b26c6388cd2bbed5ca60404a029cfc9c4b9c34fc7",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "7442b4aee27a7a3467e9606b26c6388cd2bbed5ca60404a029cfc9c4b9c34fc7"
+    },
+    "/en/press-kits/skoda-citigo-iv-skoda-superb-iv-press-kit": {
+      "hash": "ef88e641e5452b4d79ba0e9190b4c1887fa39ca3fc3dc647e53879fd9aa76560",
+      "pushedAt": "2026-10-15T10:41:43.566Z",
+      "previewedHash": "ef88e641e5452b4d79ba0e9190b4c1887fa39ca3fc3dc647e53879fd9aa76560"
+    },
     "/en/press-kits/skoda-elroq-press-kit": {
       "hash": "eada06c598e0953d26d537e19c3dd248ac701c6cd8ac756c84cfd4dbaa363980",
       "pushedAt": "2026-09-30T09:05:08.718Z",
@@ -695,10 +915,15 @@
       "pushedAt": "2026-10-09T06:44:03.159Z",
       "previewedHash": "4fe19302a2e44465bef1a5717868c3d060106ba600cde7ffc533f804924d8aa5"
     },
+    "/en/press-kits/skoda-enyaq-iv-press-kit-2": {
+      "hash": "6eb8a6acff432bd67a7d8b12b33dcb9d86b504912f7a5b505fb80e925f8f6bed",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "6eb8a6acff432bd67a7d8b12b33dcb9d86b504912f7a5b505fb80e925f8f6bed"
+    },
     "/en/press-kits/skoda-epiq-city-suv-crossover-preview-of-skodas-most-affordable-all-electric-car": {
-      "hash": "ad49427b3456c927d90790965feed56a4392ea98321dcd2b20af567b3ca49162",
-      "pushedAt": "2026-10-15T08:29:44.059Z",
-      "previewedHash": "ad49427b3456c927d90790965feed56a4392ea98321dcd2b20af567b3ca49162"
+      "hash": "c8c0a529c53130b2a867d0f00b966d907120452fe8255b77949789307db21db2",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "c8c0a529c53130b2a867d0f00b966d907120452fe8255b77949789307db21db2"
     },
     "/en/press-kits/skoda-epiq-press-kit-2": {
       "hash": "2fad3a89054b558c2e4e568ee22bd378b952a99bdbf9c355a16755a00243b5cb",
@@ -775,6 +1000,51 @@
       "pushedAt": "2026-09-30T12:19:22.211Z",
       "previewedHash": "f9f44d0cfcfe64515657047470c1ce852c980f4233ddddd376ed9d7418e0ea29"
     },
+    "/en/press-kits/skoda-fabia-covered-drive-press-kit": {
+      "hash": "82306009878e51b1d4d0a400ccd98a1a1506b9c7300bc9a53b168ad750bcbf85",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "82306009878e51b1d4d0a400ccd98a1a1506b9c7300bc9a53b168ad750bcbf85"
+    },
+    "/en/press-kits/skoda-fabia-monte-carlo-press-kit": {
+      "hash": "e05401660f7c8a60f51a2037cfcbd14349448a660ed5abb25878c013a68fe607",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "e05401660f7c8a60f51a2037cfcbd14349448a660ed5abb25878c013a68fe607"
+    },
+    "/en/press-kits/skoda-fabia-press-kit": {
+      "hash": "2401cb9fc358873f0dd4e71ff31fc1551b68b1d4c03b4268dd7c11129e5f6ad8",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "2401cb9fc358873f0dd4e71ff31fc1551b68b1d4c03b4268dd7c11129e5f6ad8"
+    },
+    "/en/press-kits/skoda-iv-press-kit": {
+      "hash": "f4d84d3d258c4f0e9bdad6e77506f1fe046115710dd2cabb2c1e349e7d8affe6",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "f4d84d3d258c4f0e9bdad6e77506f1fe046115710dd2cabb2c1e349e7d8affe6"
+    },
+    "/en/press-kits/skoda-kamiq-gt-press-kit": {
+      "hash": "8a8622e12af68d3bf1b0d5597bec20cc850ee43ffb1fe6b84dee080709d597f9",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "8a8622e12af68d3bf1b0d5597bec20cc850ee43ffb1fe6b84dee080709d597f9"
+    },
+    "/en/press-kits/skoda-kamiq-press-kit": {
+      "hash": "93a070e63b184970b657c4df010e5aad7b587c442e2c04549d3ce8b0280fa6c1",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "93a070e63b184970b657c4df010e5aad7b587c442e2c04549d3ce8b0280fa6c1"
+    },
+    "/en/press-kits/skoda-karoq-media-launch-press-kit": {
+      "hash": "8d53f89ed2e5405026f2f486b7a651c7cc86c25d69326a8e8b15917f2972a696",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "8d53f89ed2e5405026f2f486b7a651c7cc86c25d69326a8e8b15917f2972a696"
+    },
+    "/en/press-kits/skoda-kodiaq-press-kit": {
+      "hash": "9a6c987e09ba50d930843ed8602bbecd07994b7c463d3c020ec610afe0f50918",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "9a6c987e09ba50d930843ed8602bbecd07994b7c463d3c020ec610afe0f50918"
+    },
+    "/en/press-kits/skoda-kodiaq-rs-press-kit": {
+      "hash": "298f2c78da7d962fe2f1aa3dcb1a2e738a42b679d40ce00e80edcc74d2f985d9",
+      "pushedAt": "2026-10-15T10:41:43.566Z",
+      "previewedHash": "298f2c78da7d962fe2f1aa3dcb1a2e738a42b679d40ce00e80edcc74d2f985d9"
+    },
     "/en/press-kits/skoda-octavia-media-launch-press-kit": {
       "hash": "b5d491dc38ea31af9e49cad0f6c07482b8c6ef021dbd13a0978aad0e7e497c08",
       "pushedAt": "2026-10-07T09:42:19.987Z",
@@ -800,10 +1070,15 @@
       "pushedAt": "2026-10-07T09:42:19.987Z",
       "previewedHash": "348d67dad7dd869b0d74a1def6eadba9038e9573a56360075b2f41f686af0c09"
     },
+    "/en/press-kits/skoda-octavia-rs-skoda-octavia-combi-rs-press-kit": {
+      "hash": "fb7e3ee5d4c89e534799f07008d47c4a8b5c523d5c20085c124c15fd5f9087a0",
+      "pushedAt": "2026-10-15T10:41:43.566Z",
+      "previewedHash": "fb7e3ee5d4c89e534799f07008d47c4a8b5c523d5c20085c124c15fd5f9087a0"
+    },
     "/en/press-kits/skoda-peaq-first-glimpse-of-skodas-new-electric-flagship": {
-      "hash": "527626a1781c5aca2bf7533569925723c99235101f13112e4d7b1b4375801246",
-      "pushedAt": "2026-10-15T08:29:44.059Z",
-      "previewedHash": "527626a1781c5aca2bf7533569925723c99235101f13112e4d7b1b4375801246"
+      "hash": "3c89a7c604141974240df501b10d2d45c1627afb3da3f5b0d0250da4211f5d9b",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "3c89a7c604141974240df501b10d2d45c1627afb3da3f5b0d0250da4211f5d9b"
     },
     "/en/press-kits/skoda-peaq-press-kit-2": {
       "hash": "19fae5910cb967fc3e969447228c688fb7b6a1dcabd25ee73514e9f46b8ae00c",
@@ -885,15 +1160,35 @@
       "pushedAt": "2026-10-07T09:42:19.987Z",
       "previewedHash": "9dfd5080341669d0fc85f67387f7da661658d1cab1e579860017858b9599b6c9"
     },
+    "/en/press-kits/skoda-scala": {
+      "hash": "125d8074874cafa145cf1485f3af1d0eba90273ba6a685fd061563c6ad7fe871",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "125d8074874cafa145cf1485f3af1d0eba90273ba6a685fd061563c6ad7fe871"
+    },
+    "/en/press-kits/skoda-scala-and-skoda-kamiq-media-launch-press-kit": {
+      "hash": "0c390f49fd6586d61b2824f78b2bae88b88c007760b40b045f7e2a1f35603d1f",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "0c390f49fd6586d61b2824f78b2bae88b88c007760b40b045f7e2a1f35603d1f"
+    },
+    "/en/press-kits/skoda-scala-and-skoda-kamiq-press-kit": {
+      "hash": "3ee18d3bb18d1c8f07ffa972604b18ae87111706be90db1f0687fb5a6a031409",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "3ee18d3bb18d1c8f07ffa972604b18ae87111706be90db1f0687fb5a6a031409"
+    },
+    "/en/press-kits/skoda-superb-press-kit": {
+      "hash": "b7ff55c48f1ffaf135bc7b0b761cebcb11b0bd9ba394091b36e800fd65caae05",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "b7ff55c48f1ffaf135bc7b0b761cebcb11b0bd9ba394091b36e800fd65caae05"
+    },
     "/en/press-kits/skoda-vision-o-press-kit": {
       "hash": "0d2ff02e2d93ad2194aca1941ca1508df80a1dbf262a8208bea0247e2bc9bc8d",
       "pushedAt": "2026-09-30T09:05:08.718Z",
       "previewedHash": "0d2ff02e2d93ad2194aca1941ca1508df80a1dbf262a8208bea0247e2bc9bc8d"
     },
     "/en/press-kits/the-all-electric-skoda-elroq-breaking-new-ground-in-the-compactsuv-segment-with-a-covered-design": {
-      "hash": "06747f430137a99519114f10b9aae4bb75515adec595291e06ba640e283ce509",
-      "pushedAt": "2026-10-15T08:29:44.059Z",
-      "previewedHash": "06747f430137a99519114f10b9aae4bb75515adec595291e06ba640e283ce509"
+      "hash": "1106b627dae391b68425894a524b1bd9f5b06f7db49571de3b492cfe3099e7f2",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "1106b627dae391b68425894a524b1bd9f5b06f7db49571de3b492cfe3099e7f2"
     },
     "/en/press-kits/the-all-new-skoda-kodiaq-press-kit": {
       "hash": "1562174739f36e193d0f159fa513bafbf323bb8dc1dd038101fb7a9be756c0d4",
@@ -905,10 +1200,55 @@
       "pushedAt": "2026-10-08T08:52:11.243Z",
       "previewedHash": "4bebe57167174fa9d2b8b6521f50683842ca22eb0fb5b6cfd395c623f6fb3199"
     },
+    "/en/press-kits/the-all-skoda-superb-press-kit-2": {
+      "hash": "b58c40cf568ab6dfb7433b3bbf018574dbf880a3341f07a64a466d17bfbc7e4f",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "b58c40cf568ab6dfb7433b3bbf018574dbf880a3341f07a64a466d17bfbc7e4f"
+    },
     "/en/press-kits/the-enyaq-rs-race-a-new-motorsport-concept-with-sustainable-ideas-for-production-models": {
-      "hash": "f9bd488b9792419d6602704ec52ba8858d804936f5dc5bae7df719fa7bcdc371",
-      "pushedAt": "2026-10-15T08:29:44.059Z",
-      "previewedHash": "f9bd488b9792419d6602704ec52ba8858d804936f5dc5bae7df719fa7bcdc371"
+      "hash": "cc840e49c7915e37ba311edb889dcee9759dd0d466d6bfd8b1cfd0280f6444f8",
+      "pushedAt": "2026-10-16T14:51:43.106Z",
+      "previewedHash": "cc840e49c7915e37ba311edb889dcee9759dd0d466d6bfd8b1cfd0280f6444f8"
+    },
+    "/en/press-kits/the-new-skoda-enyaq-coupe-iv-covered-drive-press-kit": {
+      "hash": "deec21786161793ce8e98546a686d4daeea926d8f7b7c110b1fc708e7598f214",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "deec21786161793ce8e98546a686d4daeea926d8f7b7c110b1fc708e7598f214"
+    },
+    "/en/press-kits/the-new-skoda-enyaq-coupe-iv-media-launch-press-kit": {
+      "hash": "e5189f4cd0f8b9dce38ab4c09ab84ba070ea12bff9f4c19e545d52fefea79f24",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "e5189f4cd0f8b9dce38ab4c09ab84ba070ea12bff9f4c19e545d52fefea79f24"
+    },
+    "/en/press-kits/the-new-skoda-enyaq-coupe-iv-world-premiere-press-kit": {
+      "hash": "71789cf673c487c3ffa9999a7ac01159ae1773bda1ed88315c225d7633b2d0a9",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "71789cf673c487c3ffa9999a7ac01159ae1773bda1ed88315c225d7633b2d0a9"
+    },
+    "/en/press-kits/the-new-skoda-enyaq-rs-iv-media-launch-press-kit": {
+      "hash": "8027e1ef93a1fa7933971a53b045996af1f7e53a69085d987eec62911dbf771a",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "8027e1ef93a1fa7933971a53b045996af1f7e53a69085d987eec62911dbf771a"
+    },
+    "/en/press-kits/the-new-skoda-fabia-media-launch-press-kit": {
+      "hash": "de29af956da43404823a26bacb1a94bbb06e3d019c8aece6611bf0d7d4b3152c",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "de29af956da43404823a26bacb1a94bbb06e3d019c8aece6611bf0d7d4b3152c"
+    },
+    "/en/press-kits/the-new-skoda-karoq-world-premiere-press-kit": {
+      "hash": "db97f337b9c4ec57f51e1f1da3853b47b5bdeac6c2114011eb509e3463880d77",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "db97f337b9c4ec57f51e1f1da3853b47b5bdeac6c2114011eb509e3463880d77"
+    },
+    "/en/press-kits/the-new-skoda-kodiaq-dynamic-press-launch-press-kit": {
+      "hash": "e8810645780442f8122dea92d6ff0ba09e43a790e403c8ded06166aee98cc89b",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "e8810645780442f8122dea92d6ff0ba09e43a790e403c8ded06166aee98cc89b"
+    },
+    "/en/press-kits/the-new-skoda-kodiaq-press-kit": {
+      "hash": "c5fe27ca46f8aee8b6221bc9a92540db443a6c32dbf7383024db6b7ebde0e783",
+      "pushedAt": "2026-10-15T12:50:11.101Z",
+      "previewedHash": "c5fe27ca46f8aee8b6221bc9a92540db443a6c32dbf7383024db6b7ebde0e783"
     },
     "/en/press-releases/2026-iihf-ice-hockey-world-championship-roman-josi-wins-most-valuable-player-trophy-created-by-skoda-design": {
       "hash": "e35230aea56cbc501d9fa5825a44bf428f9e74a147dc7b2b122a1ca7fa14d9f0",
@@ -944,6 +1284,11 @@
       "hash": "298da36f8cd93c3c3e253ad1ed76b3eecfde1d7b903bafe18aa68c1fbe787d2e",
       "pushedAt": "2026-10-10T16:59:57.991Z",
       "previewedHash": "298da36f8cd93c3c3e253ad1ed76b3eecfde1d7b903bafe18aa68c1fbe787d2e"
+    },
+    "/en/press-releases/paris-motor-show-2018-two-skoda-presentations-live-online": {
+      "hash": "fcf84b7776652ab0c3eedd2f7b66ee1139dc9b2f49b0d572c43b7cc7c5263653",
+      "pushedAt": "2026-10-15T10:41:43.566Z",
+      "previewedHash": "fcf84b7776652ab0c3eedd2f7b66ee1139dc9b2f49b0d572c43b7cc7c5263653"
     },
     "/en/press-releases/preparations-begin-for-the-11th-skoda-student-car-celebrating-100-years-of-vocational-education": {
       "hash": "655b02a37fbe38e00c47fa53ab4aade829cc7847eb771f9e69b4d15f147de496",
@@ -1170,6 +1515,11 @@
       "pushedAt": "2026-10-10T16:59:57.991Z",
       "previewedHash": "c032bfdc060fb646a10c060108586dc07095618ffed3eb8a0fb296b0f8a20d4a"
     },
+    "/en/press-releases/world-premiere-of-the-all-new-skoda-superb-pictures-on-the-skoda-storyboard": {
+      "hash": "6003e68a09649fe0ac18426e167809723d4e15dc93881ede1651adc87ae845ba",
+      "pushedAt": "2026-10-15T10:41:43.566Z",
+      "previewedHash": "6003e68a09649fe0ac18426e167809723d4e15dc93881ede1651adc87ae845ba"
+    },
     "/en/series-2": {
       "hash": "aa16702ac1231d5f81c441eff31b19215a8a6d67aee6b167ef3802bcad864eb1",
       "pushedAt": "2026-09-28T06:48:28.927Z",
@@ -1250,10 +1600,15 @@
       "pushedAt": "2026-09-27T21:14:15.709Z",
       "previewedHash": "2fd951c05b22e787f444af9055cf6c579ca719c0798c5850ef396e2a6160adbe"
     },
+    "/en/simply-clever/do-you-have-a-qr-code-in-your-boot-it-will-show-you-all-the-smart-features": {
+      "hash": "a93c7f519cf3c73e7368f95c3e821b7d12a55e131e6b36f6298a48bce27b5a4a",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "a93c7f519cf3c73e7368f95c3e821b7d12a55e131e6b36f6298a48bce27b5a4a"
+    },
     "/en/simply-clever/park-your-skoda-using-your-mobile-phone-well-show-you-how-how": {
-      "hash": "192fb4519b1153ee9c98a83648cff3dae16ef7a8517bf3c43885aa9deb3fbf6d",
-      "pushedAt": "2026-10-13T08:41:08.824Z",
-      "previewedHash": "192fb4519b1153ee9c98a83648cff3dae16ef7a8517bf3c43885aa9deb3fbf6d"
+      "hash": "c925f8628d1ac9229a1af3037ab25918c60682a5451273db5afcc041cfbdb1c8",
+      "pushedAt": "2026-10-16T13:58:45.274Z",
+      "previewedHash": "c925f8628d1ac9229a1af3037ab25918c60682a5451273db5afcc041cfbdb1c8"
     },
     "/en/skoda-model/elroq": {
       "hash": "0247bc7421886a6972886f1a43bc85b7598ec9bb40a3c8db555e1170cebab367",
@@ -1370,14 +1725,14 @@
       "pushedAt": "2026-09-26T20:11:52.717Z"
     },
     "/en/skoda-world/125-years-of-racing-history-in-one-place-come-visit-the-museum": {
-      "hash": "b544b8e4314a72b628d58b9ad9eda58650eea7c541876ef6ea7fa11df12be87a",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "b544b8e4314a72b628d58b9ad9eda58650eea7c541876ef6ea7fa11df12be87a"
+      "hash": "b91ebf3ed91f1e68bda6a312f822e9923814e2bac72e03bb9d2494322f13d47e",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "b91ebf3ed91f1e68bda6a312f822e9923814e2bac72e03bb9d2494322f13d47e"
     },
     "/en/skoda-world/2024-a-year-of-new-electric-cars-and-innovated-favourites": {
-      "hash": "41364c241cb4bc2bf1b7dd4de10b33afa33a8e84fc7d373261e66dba492e479e",
-      "pushedAt": "2026-10-13T06:13:46.476Z",
-      "previewedHash": "41364c241cb4bc2bf1b7dd4de10b33afa33a8e84fc7d373261e66dba492e479e"
+      "hash": "b4ae115d9792737365da4c168569ada8258016cc5a674c9e29c20ed380654da4",
+      "pushedAt": "2026-10-16T13:58:45.274Z",
+      "previewedHash": "b4ae115d9792737365da4c168569ada8258016cc5a674c9e29c20ed380654da4"
     },
     "/en/skoda-world/a-kodiaq-made-of-paper-the-modeler-spent-700-hours-developing-and-building-it": {
       "hash": "b3ed033288927240bab6571f91caf8856c543746a538f9d40df6fce76df90dec",
@@ -1389,85 +1744,205 @@
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "e0013ed3836ee231ffced6cab4298072303545c46c9642063552dd0bfb07e8d1"
     },
+    "/en/skoda-world/can-you-recognise-skoda-models-from-their-silhouettes": {
+      "hash": "737cdcbb8baca327951a75bda4211d91fbbb64456ff62fb33767e663904d13ec",
+      "pushedAt": "2026-10-15T10:41:43.566Z",
+      "previewedHash": "737cdcbb8baca327951a75bda4211d91fbbb64456ff62fb33767e663904d13ec"
+    },
+    "/en/skoda-world/cars-that-are-safe-for-pedestrians-as-well": {
+      "hash": "e5cbf8ff9f6659a58cfc69b2e09f2ff0bfcf0b1957518a4f1689a26369a0aace",
+      "pushedAt": "2026-10-16T13:58:45.274Z",
+      "previewedHash": "e5cbf8ff9f6659a58cfc69b2e09f2ff0bfcf0b1957518a4f1689a26369a0aace"
+    },
+    "/en/skoda-world/children-painted-cars-for-medical-clowns": {
+      "hash": "fac299e93b04b075f9cb44fc7f9fead6b54e9fbd1eac71ee2ec0b0e62c5fcc6d",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "fac299e93b04b075f9cb44fc7f9fead6b54e9fbd1eac71ee2ec0b0e62c5fcc6d"
+    },
+    "/en/skoda-world/clever-luggage-solutions-for-your-boot": {
+      "hash": "bca13cb210059ad2db1ace24cec5f2df0adb205e94a07cd5bcdc67db31bda762",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "bca13cb210059ad2db1ace24cec5f2df0adb205e94a07cd5bcdc67db31bda762"
+    },
+    "/en/skoda-world/coca-cola-and-skoda-more-than-30-years-together": {
+      "hash": "22680f8695039f2384201ab1c2ac440702f14f334596b290422b01cff88f9c73",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "22680f8695039f2384201ab1c2ac440702f14f334596b290422b01cff88f9c73"
+    },
     "/en/skoda-world/come-cheer-and-sing-along-meet-the-karaoke-car": {
       "hash": "04afb57084c6bd9d562e64c323ac23ecc2c5e50fadbcb0bf7a6a199a1168b146",
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "04afb57084c6bd9d562e64c323ac23ecc2c5e50fadbcb0bf7a6a199a1168b146"
+    },
+    "/en/skoda-world/drive-like-a-champion-on-tarmac-gravel-or-snow": {
+      "hash": "2c4d2eaf084591e1a6889a67d6764161ca7e4cc21642badc9bc5aa9f56aa2ced",
+      "pushedAt": "2026-10-16T13:58:45.274Z",
+      "previewedHash": "2c4d2eaf084591e1a6889a67d6764161ca7e4cc21642badc9bc5aa9f56aa2ced"
+    },
+    "/en/skoda-world/enhanced-superb-iv-delivers-200-kw-of-power": {
+      "hash": "cb094296debb5ea329c40caa8a58259881a7f0a96a18e8025cfe709df8620842",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "cb094296debb5ea329c40caa8a58259881a7f0a96a18e8025cfe709df8620842"
+    },
+    "/en/skoda-world/enter-the-world-of-skoda-in-frankfurt": {
+      "hash": "fb7a8669617840a61fed642b752f433bd8770f45c38f7d4f67c91298d581d9be",
+      "pushedAt": "2026-10-15T16:54:17.764Z",
+      "previewedHash": "fb7a8669617840a61fed642b752f433bd8770f45c38f7d4f67c91298d581d9be"
     },
     "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality": {
       "hash": "3012f7628061b9a91d49eafa0538588148c688e96e677106770765609c42290d",
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "3012f7628061b9a91d49eafa0538588148c688e96e677106770765609c42290d"
     },
+    "/en/skoda-world/first-sketches-of-the-new-kodiaq": {
+      "hash": "f6a5d25f6fd84e803db5bceb54640a50afc2ed8c6cd32ab48c42c515e323f62f",
+      "pushedAt": "2026-10-16T13:58:45.274Z",
+      "previewedHash": "f6a5d25f6fd84e803db5bceb54640a50afc2ed8c6cd32ab48c42c515e323f62f"
+    },
     "/en/skoda-world/get-your-car-ready-for-summer-with-skoda-accessories": {
-      "hash": "b2537ffd90993d36c261a455d398f52fa24afbf91dcb26bab52943eadaaee4f7",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "b2537ffd90993d36c261a455d398f52fa24afbf91dcb26bab52943eadaaee4f7"
+      "hash": "94205c1edcf644abce222b97e24bae1bf9d164e902929c2d399f42134bc5b291",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "94205c1edcf644abce222b97e24bae1bf9d164e902929c2d399f42134bc5b291"
+    },
+    "/en/skoda-world/here-it-comes-the-skoda-elroq-a-compact-electric-suv": {
+      "hash": "b87162fed6a0d1883f04c843ec004597cfa0abbc447a616a55c10fe5bd11e713",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "b87162fed6a0d1883f04c843ec004597cfa0abbc447a616a55c10fe5bd11e713"
     },
     "/en/skoda-world/how-the-skoda-octavia-reached-365-km-h": {
       "hash": "9baee56d855bd295a5e3265e7ede1fba59d4873a6d2454606112fbcd36f11bfc",
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "9baee56d855bd295a5e3265e7ede1fba59d4873a6d2454606112fbcd36f11bfc"
     },
+    "/en/skoda-world/how-to-get-a-kodiaq-into-a-metro-station": {
+      "hash": "d434cd7d70c71fce26ed5b827400380506b5da5817f9042971c29c276033ab7e",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "d434cd7d70c71fce26ed5b827400380506b5da5817f9042971c29c276033ab7e"
+    },
+    "/en/skoda-world/innovation-and-technology/enyaq-rs-race-an-electric-drive-with-motorsport-dna": {
+      "hash": "649ec2a67588d85fe21ee22f453fd22fd92917d8b26229d7846bf2bb158f2618",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "649ec2a67588d85fe21ee22f453fd22fd92917d8b26229d7846bf2bb158f2618"
+    },
+    "/en/skoda-world/kamiq-karoq-kodiaq-great-choices-for-the-city-and-countryside": {
+      "hash": "47d415f2ab0edad9ac856c5b49e3155c695a92f4e8010e95afd5076d4a9979ce",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "47d415f2ab0edad9ac856c5b49e3155c695a92f4e8010e95afd5076d4a9979ce"
+    },
     "/en/skoda-world/king-of-space-and-long-distance-travel-skoda-superb-celebrates-25-years": {
-      "hash": "66974da7bfde6600d14598e7ed6eb64e076515789595fb87175fdd2cc096bd4f",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "66974da7bfde6600d14598e7ed6eb64e076515789595fb87175fdd2cc096bd4f"
+      "hash": "6b73a504d0ac49b87bc18dfe06816548d0f1a9cd0707d8a1a7f2bf70ddfbd74f",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "6b73a504d0ac49b87bc18dfe06816548d0f1a9cd0707d8a1a7f2bf70ddfbd74f"
+    },
+    "/en/skoda-world/klaus-drives-on-the-ice-with-a-rally-champion": {
+      "hash": "5171298fe36a8a52918f4864560821f3c60f39438fab6ea74464fd49715ac106",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "5171298fe36a8a52918f4864560821f3c60f39438fab6ea74464fd49715ac106"
     },
     "/en/skoda-world/legend-chris-froome-takes-you-behind-the-scenes-of-the-tour-de-france": {
       "hash": "fda68fb2715f1abe364d97490bca976a626784f77e0c4f8e57ab073c49f37f67",
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "fda68fb2715f1abe364d97490bca976a626784f77e0c4f8e57ab073c49f37f67"
     },
+    "/en/skoda-world/life-with-a-plug-in-hybrid-a-versatile-companion": {
+      "hash": "1451550606fa2213d5613f56f8af38d10294148e287f2bf0f71bc58a0b541d41",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "1451550606fa2213d5613f56f8af38d10294148e287f2bf0f71bc58a0b541d41"
+    },
     "/en/skoda-world/making-driving-easier-how-cruise-control-works": {
-      "hash": "1025d2f725c00919ea775328a83e5ac5c600fbce21338ec182db04516355cea9",
-      "pushedAt": "2026-10-13T08:41:08.824Z",
-      "previewedHash": "1025d2f725c00919ea775328a83e5ac5c600fbce21338ec182db04516355cea9"
+      "hash": "6342d4eab1335ac81975e656296788123f97d0e0740f3817efa8c713b4d7a5e8",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "6342d4eab1335ac81975e656296788123f97d0e0740f3817efa8c713b4d7a5e8"
     },
     "/en/skoda-world/octavia-arrives-with-a-new-full-hybrid-powertrain": {
-      "hash": "11d63e68b864c2ec8f28184ff3f2ddc0b4268b98f4cd1c948fbecf2431956202",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "11d63e68b864c2ec8f28184ff3f2ddc0b4268b98f4cd1c948fbecf2431956202"
+      "hash": "8c8e3d1c03ae226dafc974d9256ea0fdd559e39b355133ae65d66c93930d5e4b",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "8c8e3d1c03ae226dafc974d9256ea0fdd559e39b355133ae65d66c93930d5e4b"
     },
     "/en/skoda-world/oliver-solberg-behind-the-wheel-of-the-new-octavia-rs": {
-      "hash": "d573ea227ec99d24b8a5857972b983ae20f54b76fd37f1c4a202652a89f8d3a9",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "d573ea227ec99d24b8a5857972b983ae20f54b76fd37f1c4a202652a89f8d3a9"
+      "hash": "6e22ad89aba08199958ee04946a7053a008adb6b27005dc7c0d266f1cef731f5",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "6e22ad89aba08199958ee04946a7053a008adb6b27005dc7c0d266f1cef731f5"
     },
     "/en/skoda-world/peaq-inside-a-designblok": {
-      "hash": "1a82562260d2a128fb7aad19e7921e7176b499b195dbbe821eedc6812b667a95",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "1a82562260d2a128fb7aad19e7921e7176b499b195dbbe821eedc6812b667a95"
+      "hash": "d6e290eda46fcacc8ec0f0aad4db03f2f65cd2901f89790411c10b2df65c5a3e",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "d6e290eda46fcacc8ec0f0aad4db03f2f65cd2901f89790411c10b2df65c5a3e"
     },
     "/en/skoda-world/quiz-can-you-recognise-skoda-models-by-their-details": {
-      "hash": "ea7d297ecd47b6715d3f5a441518678fdb867514a1cd2df5f8f6d58061f888ee",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "ea7d297ecd47b6715d3f5a441518678fdb867514a1cd2df5f8f6d58061f888ee"
+      "hash": "add11999d13b1ad835477647edbd07a804ce5b7956c4ebb51ab1bdb93991104d",
+      "pushedAt": "2026-10-16T13:58:45.274Z",
+      "previewedHash": "add11999d13b1ad835477647edbd07a804ce5b7956c4ebb51ab1bdb93991104d"
     },
     "/en/skoda-world/rally-champion-and-the-unique-skoda-fabia-motorsport-edition": {
-      "hash": "015ada69370751aab043c0326232ddd2aaa34df0f80e6a8b02d3eda691b1dd07",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "015ada69370751aab043c0326232ddd2aaa34df0f80e6a8b02d3eda691b1dd07"
+      "hash": "f7869553e2ec87f0424cd742152ce3d8c8d9ac164313606656ededa0c111e04d",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "f7869553e2ec87f0424cd742152ce3d8c8d9ac164313606656ededa0c111e04d"
+    },
+    "/en/skoda-world/rally-champion-fuel-efficiency-record-holder": {
+      "hash": "d648073d70c072807709dd0953dbf496aabf41e5d89f4fcd5a4fb1fe33808e6e",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "d648073d70c072807709dd0953dbf496aabf41e5d89f4fcd5a4fb1fe33808e6e"
+    },
+    "/en/skoda-world/rally-champion-presents-the-rs-family": {
+      "hash": "734a15ef7700a5dcb58b4b48d9f9bbe4215701061e8ebd21653bfc6f70f3c4d1",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "734a15ef7700a5dcb58b4b48d9f9bbe4215701061e8ebd21653bfc6f70f3c4d1"
+    },
+    "/en/skoda-world/rs-models-skodas-true-sporting-spirit": {
+      "hash": "167f8c40260caae79cc52b1cddf172d1a0d82bd6484b8a2e76c1e9c2ca606916",
+      "pushedAt": "2026-10-16T13:58:45.274Z",
+      "previewedHash": "167f8c40260caae79cc52b1cddf172d1a0d82bd6484b8a2e76c1e9c2ca606916"
     },
     "/en/skoda-world/skoda-classic-tour-through-the-eyes-of-a-spectator": {
       "hash": "64c9520a66fb6d3df24cbddebd2a4318e95263880dd51a2371beb9344f7ac0a2",
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "64c9520a66fb6d3df24cbddebd2a4318e95263880dd51a2371beb9344f7ac0a2"
     },
+    "/en/skoda-world/skoda-kodiaq-will-get-you-in-60-seconds": {
+      "hash": "4d98cd23020f77413513ef8a342664bcf6697a42d2c596f589cf20e19353d3c5",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "4d98cd23020f77413513ef8a342664bcf6697a42d2c596f589cf20e19353d3c5"
+    },
+    "/en/skoda-world/skoda-octavia-rs-how-it-has-evolved": {
+      "hash": "191be59c3bc372b6f9b19ddf6a658b6c5cbb961733f8fca65ef0868a6cda2843",
+      "pushedAt": "2026-10-15T10:41:43.566Z",
+      "previewedHash": "191be59c3bc372b6f9b19ddf6a658b6c5cbb961733f8fca65ef0868a6cda2843"
+    },
+    "/en/skoda-world/sliding-into-the-record-books": {
+      "hash": "81a3c303bc98a1aa784f4fc2dff1676a335f9e72d25be85dad7ec9259a300942",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "81a3c303bc98a1aa784f4fc2dff1676a335f9e72d25be85dad7ec9259a300942"
+    },
     "/en/skoda-world/sportline-models-dynamic-elegance-for-every-day": {
-      "hash": "7dfa649a6fc1a98b71b98a7c704fca28cdc5690704342e2019fa101575510e47",
-      "pushedAt": "2026-10-13T08:41:08.824Z",
-      "previewedHash": "7dfa649a6fc1a98b71b98a7c704fca28cdc5690704342e2019fa101575510e47"
+      "hash": "4691287b7875e24d627f9d82b5cd93b3646deab89da4b32f87a986b1354b762e",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "4691287b7875e24d627f9d82b5cd93b3646deab89da4b32f87a986b1354b762e"
+    },
+    "/en/skoda-world/the-approach-of-the-keyless-age": {
+      "hash": "5f2bf0e4c35e737848b08ea5f13986f3ec30160ee4d4cca617ef6fd21e5b97ec",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "5f2bf0e4c35e737848b08ea5f13986f3ec30160ee4d4cca617ef6fd21e5b97ec"
     },
     "/en/skoda-world/the-immortal-octavia-see-what-it-looks-like-after-one-million-kilometres": {
-      "hash": "acba018a88221afbad72aacd7c5ba9042ca9a45661fa908ba1f2b02ae7a7f9be",
-      "pushedAt": "2026-10-11T19:22:16.957Z",
-      "previewedHash": "acba018a88221afbad72aacd7c5ba9042ca9a45661fa908ba1f2b02ae7a7f9be"
+      "hash": "6c78d876a7c99360995de2f8ecd3e87675410cdc5b60367320f1e34c566a9ac5",
+      "pushedAt": "2026-10-21T05:15:25.868Z",
+      "previewedHash": "6c78d876a7c99360995de2f8ecd3e87675410cdc5b60367320f1e34c566a9ac5"
+    },
+    "/en/skoda-world/the-new-skoda-octavia-seen-through-its-designers-eyes": {
+      "hash": "2abd37d09ab39f5033e7266b3286187fd5ad273c3aa483d4a7836ec70cd749fc",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "2abd37d09ab39f5033e7266b3286187fd5ad273c3aa483d4a7836ec70cd749fc"
     },
     "/en/skoda-world/the-new-skoda-slavia-features-a-refreshed-look-and-an-exclusive-colour": {
       "hash": "5627e26ce181b041dc5da98eeb854154ba3cae4ad85afcc4c74f45005cd969c9",
       "pushedAt": "2026-10-11T19:22:16.957Z",
       "previewedHash": "5627e26ce181b041dc5da98eeb854154ba3cae4ad85afcc4c74f45005cd969c9"
+    },
+    "/en/skoda-world/the-skoda-stand-in-paris-360-tour": {
+      "hash": "07c5bd19738964bd5ab73b8b7622fbb195c242f4f98f878c9c12e6d195e060bd",
+      "pushedAt": "2026-10-16T10:43:53.852Z",
+      "previewedHash": "07c5bd19738964bd5ab73b8b7622fbb195c242f4f98f878c9c12e6d195e060bd"
     },
     "/en/skoda-world/the-versatile-octavia-do-you-know-these-ones-too": {
       "hash": "d0829413d25956c8207bb11ac3aeaeb68f3a9be808875cba82b99ce3877b8401",

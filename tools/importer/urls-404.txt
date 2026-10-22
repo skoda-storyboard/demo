@@ -1,1 +1,4 @@
-https://www.skoda-storyboard.com/en/this-page-does-not-exist-zzz/
+# SKODA-706: the source's two template-404 variant pages (import input: import-404.js writes
+# /en/fragments/404/<slug> for each; publish those paths with paths-404.txt)
+https://www.skoda-storyboard.com/en/youve-reached-a-dead-end/
+https://www.skoda-storyboard.com/en/welcome-to-our-remote-car-park/

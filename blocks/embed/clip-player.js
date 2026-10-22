@@ -5,8 +5,13 @@
  * a 56×32 play button and a bar holding the progress track, its time pill and the volume,
  * settings (speed), picture-in-picture and fullscreen buttons, each with its name as a tooltip.
  * Over the volume button, a 32×96 vertical slider shows on hover and on keyboard focus (the
- * next Tab stop after Mute; arrow keys 5%, as the source's). The controls stay shown, at every
- * width, as the source's do. Styles: embed.css (`.embed.vimeo`).
+ * next Tab stop after Mute; arrow keys 5%, as the source's). As the source Vimeo player's, the
+ * controls stay shown until the clip first plays. From then on, playing or paused, they show
+ * only while the pointer is over the clip, and while it plays they also fade 2s after its last
+ * move there. Keyboard focus in the bar, the open speed menu and the pointer resting on the bar
+ * keep them; the focus a mouse click leaves doesn't. Without hover (touch) they stay while
+ * paused and fade 2s after the last tap while playing.
+ * Styles: embed.css (`.embed.vimeo`).
  */
 
 const LABELS = {
@@ -32,6 +37,12 @@ const SEEK_STEP_S = 5;
 // the volume slider's keys: arrows step 5% (the source's), Page Up / Down 10%, Home / End the ends
 const VOLUME_STEP = 5;
 const VOLUME_PAGE = 10;
+// while playing, the controls hide this long after the pointer's last move over the clip (the
+// source Vimeo player's, measured 2026-10-16)
+export const IDLE_MS = 2000;
+// a tap's click follows its pointerdown well within this: the click of a tap that only revealed
+// the hidden controls doesn't play / pause
+export const REVEAL_TAP_MS = 600;
 
 const SVG = 'http://www.w3.org/2000/svg';
 // 24×24 glyphs drawn for this player (play, pause, speaker, speaker off, gear, PiP, fullscreen)
@@ -211,10 +222,47 @@ export default function clipPlayer(wrapper, video) {
     seek.setAttribute('aria-valuetext', LABELS.timeOf(timecode(now), timecode(total)));
   };
 
+  // the controls' hiding (`is-idle`), once the clip has played: with a mouse whenever the
+  // pointer is off the clip, and while playing 2s after its last move; without hover, or after a
+  // touch on a device that also has a mouse (a touch is never "over" the clip), only that idle fade
+  const canHover = window.matchMedia?.('(hover: hover)')?.matches ?? true;
+  let idleTimer = 0;
+  let idle = false;
+  let inside = false;
+  let touched = false;
+  // a tap on hidden controls only brings them back: the click it then makes on the video doesn't
+  // also play or pause it. That click takes the mark; an unclicked one lapses
+  let revealTap = false;
+  let revealTimer = 0;
+  let overBar = false;
+  let hasPlayed = false;
+  // keyboard focus holds the controls; the focus a mouse click leaves on a button doesn't
+  const keyboardFocus = () => {
+    const el = document.activeElement;
+    if (!el || !bar.contains(el)) return false;
+    try { return el.matches(':focus-visible'); } catch { return true; }
+  };
+  const sync = () => {
+    const playing = !(video.paused || video.ended);
+    const held = overBar || !menu.hidden || keyboardFocus();
+    if (playing) hasPlayed = true;
+    const away = canHover && !inside && !touched;
+    wrapper.classList.toggle('is-idle', !held && hasPlayed && (away || (playing && idle)));
+  };
+  const show = () => {
+    idle = false;
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => { idle = true; sync(); }, IDLE_MS);
+    sync();
+  };
+
   const syncPlay = () => {
     const paused = video.paused || video.ended;
     setControl(play, paused ? LABELS.play : LABELS.pause, paused ? 'play' : 'pause');
     wrapper.classList.toggle('is-playing', !paused);
+    // the pointer restarts the idle fade (a click on Play does); the play event, which may come
+    // a while later once the clip has buffered, doesn't
+    sync();
   };
   // the slider shows the level heard: 0 while muted
   const level = () => (video.muted ? 0 : Math.round((video.volume ?? 1) * 100));
@@ -243,10 +291,17 @@ export default function clipPlayer(wrapper, video) {
     menu.hidden = true;
     settings.setAttribute('aria-expanded', 'false');
     if (focusSettings) settings.focus();
+    show();
   }
 
   play.addEventListener('click', toggle);
-  video.addEventListener('click', toggle);
+  video.addEventListener('click', () => {
+    if (revealTap) {
+      revealTap = false;
+      return;
+    }
+    toggle();
+  });
   volume.addEventListener('click', () => {
     video.muted = !(video.muted || video.volume === 0);
     if (!video.muted && video.volume === 0) video.volume = 1;
@@ -292,6 +347,7 @@ export default function clipPlayer(wrapper, video) {
     menu.hidden = !open;
     settings.setAttribute('aria-expanded', String(open));
     if (open) speedButtons.find((b) => b.getAttribute('aria-pressed') === 'true')?.focus();
+    sync();
   });
   menu.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
@@ -345,10 +401,32 @@ export default function clipPlayer(wrapper, video) {
     video.addEventListener(type, render);
   });
   ['play', 'pause', 'ended'].forEach((type) => video.addEventListener(type, syncPlay));
+  // a touch pointer is never "over" the clip: it only restarts the idle fade. A touch comes with
+  // pointerenter then pointerdown, so the first of them sees whether the controls were hidden
+  const enter = (e) => {
+    touched = e.pointerType === 'touch';
+    if (touched && wrapper.classList.contains('is-idle')) {
+      revealTap = true;
+      clearTimeout(revealTimer);
+      revealTimer = setTimeout(() => { revealTap = false; }, REVEAL_TAP_MS);
+    }
+    if (!touched) inside = true;
+    show();
+  };
+  wrapper.addEventListener('pointerenter', enter);
+  wrapper.addEventListener('pointermove', enter);
+  wrapper.addEventListener('pointerdown', enter);
+  wrapper.addEventListener('pointerleave', () => { inside = false; overBar = false; sync(); });
+  bar.addEventListener('pointerenter', () => { overBar = true; sync(); });
+  bar.addEventListener('pointerleave', () => { overBar = false; show(); });
+  // focusout runs once the focus has left (moving to the next control fires focusin after it)
+  wrapper.addEventListener('focusin', sync);
+  wrapper.addEventListener('focusout', sync);
   video.addEventListener('volumechange', syncVolume);
   render();
   syncPlay();
   syncVolume();
+  show();
 }
 
 export { LABELS as CLIP_LABELS };

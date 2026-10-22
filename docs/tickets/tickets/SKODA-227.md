@@ -7,7 +7,8 @@
 - **Source:** supplemental user observation `WIRELESS-04`, measured 2026-10-07; not a #266 workbook record.
 - **Implementation reference:** closed #123 / SKODA-820, reference only.
 - **GitHub issue:** [#293](https://github.com/skoda-storyboard/demo/issues/293)
-- **Status (2026-10-15, from GitHub):** 🔵 TODO (M2), no owner.
+- **Status (2026-10-19):** 🟡 Verified fixed on `main`, ready for QA. No code change: #296 (`c770d4d`, merged
+  2026-10-13) gave the related band's heading block the 20px bottom margin. See "Verification (2026-10-19)".
 
 ## Summary and M2 boundary
 
@@ -66,3 +67,28 @@ The original workbook rows and their M1/M2 allocations remain unchanged.
 - [Card teaser geometry](https://github.com/skoda-storyboard/demo/blob/main/docs/ui-specs/card-teaser.md)
 - [CSS guardrails](https://github.com/skoda-storyboard/demo/blob/main/docs/guardrails/css-guidelines.md)
 - [Team operating model](https://github.com/skoda-storyboard/demo/blob/main/AGENTS-TEAM.md)
+
+## Verification (2026-10-19, `main` preview vs origin, live DOM geometry, no screenshots)
+**Fixed by #296** (`c770d4d`, `styles/styles.css`): the shared story related band's
+`.default-content-wrapper` (title, plus "Based on tags: …" when there is one) carries the
+`--paragraph-gap` bottom margin, as origin's `.search-results-header` 20px margin. Shared story-band ownership,
+no spacer, no page-specific CSS. Nothing in this ticket needed a further change.
+
+| Measurement | Origin | `main` | Bands |
+|---|---:|---:|---|
+| Heading block bottom → first visible thumbnail (`.article-teaser-media` / `.card-teaser-image`) | 20px | 20px | 375 / 768 / 992 / 1080 / 1280 |
+| Media Box bottom → Related Stories band top | 36px | 36px | all five |
+| Related Stories band height (charging story) | 347.6 / 352.1 / 332.6 / 347.5 / 375.8 | the same | 375 → 1280 |
+| Drawn green band (pixels) | full width ≤ 1440, 1440 centred above | the same (`::before`, 100vw capped 1440) | 1280 / 1440 / 1920 |
+| Title type | 20/25 600 white ≤ 768, 26/32.5 above | the same | all five |
+| "Based on tags" line | 16/32 600 `rgb(196,198,199)`, 25 / 33px under the title top | the same | 375 / 1280 |
+| First card | 318×179 … 354×199, same x | the same | all five |
+
+Pages: the charging story (no tags line), the Peaq "win you over" story and Epiq Sportline (tags line), and the
+Related Press Releases band of two releases (20px gap, 16px separator, equal band heights at all five bands).
+The aside's "Explore more" cards keep their size, position and 32px pitch (no change in this ticket).
+
+**Found, not in this ticket's scope (heading outline):** the band title is `h3` on origin. New imports write `h3`;
+older ones still have `h2`: **46 stories and 23 press releases** on preview (e.g. the charging story, the 936 km
+release). Same look (both levels are styled), so only the heading outline differs. The fix is a re-import of
+those pages, best after #380 merges (the 46 stories would also take its importer changes).

@@ -320,6 +320,8 @@ function tablesToColumns(element, document) {
   bodies.forEach((body) => body.querySelectorAll('table').forEach((t) => tables.add(t)));
   tables.forEach((table) => {
     if (table.parentElement && table.parentElement.closest('table')) return;
+    // a block the importer has already built (`data-skoda-block`, e.g. a story's photo grid)
+    if (table.hasAttribute('data-skoda-block')) return;
     const rows = [...table.querySelectorAll(':scope > tbody > tr, :scope > thead > tr, :scope > tr')]
       .map((tr) => {
         const cells = [];

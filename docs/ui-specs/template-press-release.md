@@ -178,7 +178,7 @@ changed.
 | Media Box / Related headings | `h3` | `h2` | `h3` (importer; CSS takes both) |
 | Media Box card date (Downloads date cell) | 11px `#c4c6c7` (Zellmer 30. 8. 2022 / 21. 9. 2026) | none | importer `dates` option on the press-release Media Box |
 | FAQ opener (Zellmer) | `<strong>FAQ:<br></strong><br>`: a blank line, panel 302px | collapsed, 278px (band 24px early) | importer keeps both breaks |
-| Media Box PDF tile | the 30% black holder only (`.file-caption.pdf` hidden) | the 48px PDF glyph (#307) | glyph off on press releases (`::after { content: none }`) |
+| Media Box PDF tile | the 30% black holder; the 48px glyph (`a.file-type[href$=".pdf"]::before`) shows until analytics consent appends `#s_aid` to the href, then the bare holder; `.file-caption.pdf` hidden | the 48px PDF glyph (#307) | the 48px glyph at all times (PR #391: deviation from origin accepted by the product owner, 2026-10-21); a PDF-only row with an image is a PDF tile too |
 | Related arrows (`.story-rail.press .carousel-arrow::after`) | glyph `\e00b` / `\e00c` | the old chevron | the carousel's glyph `\e00b` / `\e00c` (`carousel.css`, #284 / #361; the `rail-arrow-*.svg` mask is gone) |
 
 Already at parity, so closed with evidence:

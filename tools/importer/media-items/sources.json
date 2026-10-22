@@ -63,8 +63,377 @@
       "n": 24
     }
   ],
-  "libraryComment": "Types whose whole source media library is read (every year, through the listing load-more endpoint) and kept to the items whose original is published on AEM Assets (media-manifest public_url). Images only: the source video library is not in the DAM yet.",
-  "library": ["image"],
+  "modelRailsComment": "SKODA-516: one query per model-page Images / Videos rail, with the rail's own filter (model + bodywork / derivative, as its DA config) and its limit, so the feed holds the items the source rail shows. Like `queries`, they keep their items when AEM Assets lacks the file (the source CDN file stays, PO 2026-10-15); the M2 sync replaces them from AEM Assets.",
+  "modelRails": [
+    {
+      "type": "image",
+      "filter": {
+        "model": "elroq"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "elroq"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "enyaq",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "enyaq",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "epiq"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "epiq"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "kamiq",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "kamiq",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "karoq",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "karoq",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "fabia",
+        "bodywork": "hatchback"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "fabia",
+        "bodywork": "hatchback"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "kodiaq",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "kodiaq",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "superb"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "superb"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "octavia"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "octavia"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "peaq"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "peaq"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "scala",
+        "bodywork": "hatchback"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "scala",
+        "bodywork": "hatchback"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "elroq",
+        "derivative": "rs"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "elroq",
+        "derivative": "rs"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "elroq",
+        "derivative": "sportline"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "elroq",
+        "derivative": "sportline"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "enyaq",
+        "derivative": "rs"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "enyaq",
+        "derivative": "rs"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "enyaq",
+        "derivative": "sportline",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "enyaq",
+        "derivative": "sportline",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "karoq",
+        "derivative": "sportline",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "karoq",
+        "derivative": "sportline",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "kodiaq",
+        "derivative": "rs"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "kodiaq",
+        "derivative": "rs"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "kodiaq",
+        "derivative": "iv",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "kodiaq",
+        "derivative": "iv",
+        "bodywork": "suv"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "kodiaq",
+        "derivative": "sportline"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "kodiaq",
+        "derivative": "sportline"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "superb",
+        "derivative": "iv",
+        "bodywork": "combi"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "superb",
+        "derivative": "iv",
+        "bodywork": "combi"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "octavia",
+        "derivative": "rs"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "octavia",
+        "derivative": "rs"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "octavia",
+        "derivative": "sportline"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "octavia",
+        "derivative": "sportline"
+      },
+      "n": 20
+    },
+    {
+      "type": "image",
+      "filter": {
+        "model": "enyaq",
+        "bodywork": "coupe-en"
+      },
+      "n": 20
+    },
+    {
+      "type": "video",
+      "filter": {
+        "model": "enyaq",
+        "bodywork": "coupe-en"
+      },
+      "n": 20
+    }
+  ],
+  "libraryComment": "Types whose whole source media library is read (every year, through the listing load-more endpoint) and kept to the items whose original is published on AEM Assets (media-manifest public_url). Videos too since #380: the newest-N queries above lose a video once the source publishes newer ones (the Peaq world-premiere livestream, the Chris Froome clip), though its MP4 is on AEM Assets.",
+  "library": ["image", "video"],
   "knownDetailGaps": {
     "_comment": "Rows the source itself has no detail for (verified with repeated live requests). The feed build fails on any other incomplete row. Re-verify and drop an entry when the source fills it.",
     "279232": {
@@ -624,6 +993,108 @@
         "dimensions"
       ],
       "reason": "source panel has file type, size and date but no dimensions line, 2026-09-29"
+    },
+    "404275": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a re-request with a fresh nonce, 2026-10-15; image of a model-page rail (SKODA-516)"
+    },
+    "404295": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a re-request with a fresh nonce, 2026-10-15; video of a model-page rail (SKODA-516)"
+    },
+    "404312": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a re-request with a fresh nonce, 2026-10-15; video of a model-page rail (SKODA-516)"
+    },
+    "396288": {
+      "missing": [
+        "dimensions"
+      ],
+      "reason": "source panel lacks dimensions on a re-request with a fresh nonce, 2026-10-15; video of a model-page rail (SKODA-516)"
+    },
+    "392409": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a re-request with a fresh nonce, 2026-10-15; image of a model-page rail (SKODA-516)"
+    },
+    "392414": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a re-request with a fresh nonce, 2026-10-15; image of a model-page rail (SKODA-516)"
+    },
+    "392408": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a re-request with a fresh nonce, 2026-10-15; image of a model-page rail (SKODA-516)"
+    },
+    "392434": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a re-request with a fresh nonce, 2026-10-15; image of a model-page rail (SKODA-516)"
+    },
+    "392343": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a re-request with a fresh nonce, 2026-10-15; video of a model-page rail (SKODA-516)"
+    },
+    "392344": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a re-request with a fresh nonce, 2026-10-15; video of a model-page rail (SKODA-516)"
+    },
+    "392345": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a re-request with a fresh nonce, 2026-10-15; video of a model-page rail (SKODA-516)"
+    },
+    "392346": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a re-request with a fresh nonce, 2026-10-15; video of a model-page rail (SKODA-516)"
+    },
+    "384686": {
+      "missing": [
+        "filetype",
+        "filesize",
+        "dimensions"
+      ],
+      "reason": "source detail panel empty (items_current 0) on a re-request with a fresh nonce, 2026-10-15; video of a model-page rail (SKODA-516)"
     }
   }
 }
