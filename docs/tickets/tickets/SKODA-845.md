@@ -4,7 +4,8 @@
 - **GitHub issue:** [#365](https://github.com/skoda-storyboard/demo/issues/365) (created 2026-10-15 from the M2 readiness review)
 - **Estimate:** 1–2 SP *(planning estimate, not a quote)*
 - **Status (2026-10-22):** 🟡 Built on branch `skoda-845-newsletter`, stacked on `skoda-813-page-shell` (#409: the
-  page band). Local only: nothing committed, pushed or previewed yet. See "Implementation (2026-10-22)".
+  page band). `/en/newsletter` and the 6 plant newsletters are on preview (not live); the rails fill once the
+  newsletters are published (the index is built on publish). See "Implementation (2026-10-22)".
 
 ## Why
 `/en/newsletter/` is linked from the Media Room nav **Company** menu. It is the only page on
@@ -50,8 +51,9 @@ production release.
 - Library entry, contract (`carousel-listing`, `story-rail` `categories`), metadata schema, template map,
   tests (the parser: 3; story-rail `categories`; the categories gate).
 
-**Imported locally** (not pushed): `/en/newsletter` and the 6 newsletters; 2 of them (`…-plant-1-2026`, both
-plants) are not on preview yet, and the 4 that are have no `categories` there until re-pushed.
+**Imported and pushed to preview** (2026-10-22, not live): `/en/newsletter` and the 6 newsletters, 2 of them new
+(`…-plant-1-2026`, both plants). The 4 others were last pushed by #414 (DA matched that push exactly, so they
+were overwritten with `--force`); they now carry their Tags and `categories: newsletter`.
 
 **Measured, the source vs the local import** (local code, the import rendered as delivered, the index with the
 6 local newsletter rows; 390 / 768 / 992 / 1280 / 1440)
@@ -85,5 +87,11 @@ plants) are not on preview yet, and the 4 that are have no `categories` there un
   source-path comments differ from a fresh build; `import-images-listing` also keeps one unused variable). Only this
   ticket's lines were changed in them.
 
-**Still open:** push the 6 newsletters (2 new) and `/en/newsletter` to preview, check the branch preview against
-the source, then the PR.
+**Branch preview** (2026-10-22): with the index as it will be after publishing (the 6 rows added in the browser),
+equal to the source at 390 / 768 / 992 / 1280 / 1440 like the local check; the Media Room nav and footer. With
+today's index the two plant sections are empty and collapse (only the band shows): the index is built on
+publish, so it has no `categories` for the newsletters and not the 2 new ones.
+
+**Still open:** publish the 6 newsletters (then the rails fill on every preview), the PR, then `/en/newsletter`
+goes live after merge. Until 845 merges, `main`'s preview renders the page's rail settings as cards (`main`'s
+story-rail doesn't know `categories`).
