@@ -715,10 +715,12 @@ button.button.accent:disabled:focus-visible {
   color: var(--dark-color);
 }
 
-/* media — reserve space to keep CLS low (source ships width/height) */
+/* media: reserve space to keep CLS low. The pipeline gives every image its width / height
+   attributes; no `width: auto` here, which would override them and leave an image 0 × 0 until
+   it loads (the Contacts photos pushed the page down: CLS 0.19, SKODA-813). Capped at the
+   column, the height follows the attributes' ratio, so a loaded image keeps its size */
 main img {
   max-width: 100%;
-  width: auto;
   height: auto;
 }
 

@@ -130,6 +130,26 @@ was matched to the source's by tag and text and its height compared, before the 
 - Heading outline equal to the source (H1 → H2 → H3); the band title is the page's single h1. Body links show
   no focus ring, as on the source (the accepted exception above).
 
+**Second #409 review (2026-10-22)**
+- PSI: Contacts mobile scored 89, from a layout shift (CLS 0.19; 0.16–0.41 in cold loads). The shared `main img`
+  rule set `width: auto` (from the project boilerplate), which overrides every image's width / height attributes,
+  so an image stays 0 × 0 until it loads. The Contacts photos then pushed the page down. The rule now keeps the
+  attributes (`max-width: 100%; height: auto`).
+  - Contacts: 3 of 3 cold loads at CLS 0.001.
+  - The story, the press release, the press-kit chapter and Copyright: their CLS is unchanged.
+  - The loaded layout on 17 templates at 1280 and 390, with and without `width: auto`: every image box, section
+    height and page height is equal. The exceptions are a 0.1px rounding on one Epiq story image and the 404's
+    random photo variant.
+- `main` merged (51 commits, no conflicts). The Copyright test fixture lost its trailing whitespace
+  (`git diff --check`).
+- On this branch's preview:
+  - downloads arrived as real files: images Original + 1920px, videos MP4, including one while the video plays
+    (12 of 12);
+  - 480 card / download / PDF links on 15 templates, each fetched: 0 failures;
+  - the Epiq story's language links open its 4 translations.
+- No Škodapedia or custom-microsite page exists on any preview (`main` included) or in the index, so those
+  templates can't be checked until they are imported (#20 / #63, #59).
+
 **Found, not in this ticket**
 - At exactly 1080–1128 the source header wraps to 172px; ours keeps one row (decided in SKODA-308).
 - The Media Room footer's social row (Facebook, Instagram, …) starts the source footer; ours doesn't. This is
