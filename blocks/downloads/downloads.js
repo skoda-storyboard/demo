@@ -32,40 +32,91 @@
  * an MP4 without a poster) opens its file: a PDF shows the source's PDF glyph (even when its row
  * carries an image), a clip its first frame.
  *
- * i18n: user-facing control text lives in LABELS (single translation point).
+ * i18n: user-facing control text lives in DOWNLOADS_LABELS (SKODA-1003), read per locale.
  * Decoration is defensive: authors omit/add cells, so every lookup is guarded.
  */
 
 import { createOptimizedPicture } from '../../scripts/aem.js';
+import { fetchPlaceholders, localize, fillText } from '../../scripts/placeholders.js';
+import { buildMediaPanel } from '../../scripts/media-panel.js';
 
-const LABELS = {
-  // aria-label for a download link, e.g. "Download Škoda Octavia front (Original)"
-  download: (title, size) => `Download ${title || size || 'file'}${title && size ? ` (${size})` : ''}`,
-  // aria-label for the size-menu toggle
-  sizes: (title) => `Download sizes for ${title}`,
+// UI text (SKODA-1003): English templates, read from the page locale's placeholders sheet as
+// `downloads…` ({title}, {size}, {name}, {type} filled in). `showMore` / `showLess` are the
+// shared togglebox words (the source's, e.g. CS "Zobrazit více").
+export const DOWNLOADS_LABELS = {
+  // a download link's name, e.g. "Download Škoda Octavia front (Original)"
+  download: 'Download {name}',
+  downloadSized: 'Download {title} ({size})',
+  file: 'file',
+  // the size-menu toggle
+  sizes: 'Download sizes for {title}',
   open: 'View image',
   videoPoster: 'View video poster',
   // a file tile's own link (#275): it opens the file, as the source's tile does
-  openFile: (title, type) => `Open ${title || 'file'}${type ? ` (${type})` : ''}`,
-  more: 'Show more',
-  less: 'Show less',
-  // aria-label for a tile's add-to-cart toggle and the Media Box group toggle (until the
-  // cart's placeholders labels replace it)
-  add: (title) => (title ? `Add to media cart: ${title}` : 'Add to media cart'),
+  openFile: 'Open {name}',
+  openFileTyped: 'Open {name} ({type})',
+  // a file tile's type label when the source names none
+  fileType: 'File',
+  // a tile's add-to-cart toggle and the Media Box group toggle
+  add: 'Add to media cart',
+  addNamed: 'Add to media cart: {title}',
   // a Media Box tile's add menu rows (the source's link titles)
-  addSize: (size, title) => `Add/remove ${size} version${title ? `: ${title}` : ''}`,
-  sizeUnavailable: (size) => `${size} version can't be added to the media cart`,
+  addSize: 'Add/remove {size} version',
+  addSizeNamed: 'Add/remove {size} version: {title}',
+  sizeUnavailable: '{size} version can\'t be added to the media cart',
   addAll: 'Add all files to the media cart',
   // the gallery group pills (visible text = the size, as on the source)
-  groupSize: (size) => size,
-  groupAdd: (size) => `Add all ${size} versions to the media cart`,
-  groupUnavailable: (size) => `${size} versions can't be added to the media cart`,
+  sizeOriginal: 'Original',
+  size1920: '1920px',
+  groupAdd: 'Add all {size} versions to the media cart',
+  groupUnavailable: '{size} versions can\'t be added to the media cart',
   // the source tiles' tooltips (their link titles, #275); the accessible names stay the above
   tipAdd: 'Add/remove this',
   tipDownload: 'Download this',
-  tipAddSize: (size) => `Add/remove ${size} version`,
-  tipDownloadSize: (size) => `Download ${size} version`,
+  tipAddSize: 'Add/remove {size} version',
+  tipDownloadSize: 'Download {size} version',
 };
+export const TOGGLE_LABELS = { showMore: 'Show more', showLess: 'Show less' };
+
+/**
+ * The block's control text in the page locale (English per missing key), as the small label
+ * functions the builders call.
+ * @param {Record<string,string>} [ph] from fetchPlaceholders()
+ */
+export function downloadsText(ph = {}) {
+  const t = localize(DOWNLOADS_LABELS, ph, 'downloads');
+  const words = localize(TOGGLE_LABELS, ph);
+  return {
+    download: (title, size) => (title && size
+      ? fillText(t.downloadSized, { title, size })
+      : fillText(t.download, { name: title || size || t.file })),
+    sizes: (title) => fillText(t.sizes, { title }),
+    open: t.open,
+    videoPoster: t.videoPoster,
+    openFile: (title, type) => fillText(
+      type ? t.openFileTyped : t.openFile,
+      { name: title || t.file, type },
+    ),
+    fileType: t.fileType,
+    more: words.showMore,
+    less: words.showLess,
+    add: (title) => (title ? fillText(t.addNamed, { title }) : t.add),
+    addSize: (size, title) => fillText(title ? t.addSizeNamed : t.addSize, { size, title }),
+    sizeUnavailable: (size) => fillText(t.sizeUnavailable, { size }),
+    addAll: t.addAll,
+    sizeOriginal: t.sizeOriginal,
+    size1920: t.size1920,
+    groupAdd: (size) => fillText(t.groupAdd, { size }),
+    groupUnavailable: (size) => fillText(t.groupUnavailable, { size }),
+    tipAdd: t.tipAdd,
+    tipDownload: t.tipDownload,
+    tipAddSize: (size) => fillText(t.tipAddSize, { size }),
+    tipDownloadSize: (size) => fillText(t.tipDownloadSize, { size }),
+  };
+}
+
+// the English text, the builders' default
+const ENGLISH = downloadsText();
 
 function fileIcon() {
   const NS = 'http://www.w3.org/2000/svg';
@@ -262,7 +313,7 @@ function wireMenu(wrap, toggle, menu) {
  * @param {{title: string, sizes: Array<{label,href}>}} asset
  * @returns {Element|null}
  */
-function buildDownload(asset) {
+function buildDownload(asset, text = ENGLISH) {
   const { title, sizes } = asset;
   if (!sizes.length) return null;
 
@@ -276,8 +327,8 @@ function buildDownload(asset) {
     a.className = 'downloads-download';
     a.href = href;
     a.setAttribute('download', '');
-    a.setAttribute('aria-label', LABELS.download(title, label));
-    a.title = LABELS.tipDownload;
+    a.setAttribute('aria-label', text.download(title, label));
+    a.title = text.tipDownload;
     wrap.append(a);
     return wrap;
   }
@@ -288,7 +339,7 @@ function buildDownload(asset) {
   const toggle = document.createElement('button');
   toggle.type = 'button';
   toggle.className = 'downloads-download';
-  toggle.setAttribute('aria-label', LABELS.sizes(title));
+  toggle.setAttribute('aria-label', text.sizes(title));
   toggle.setAttribute('aria-expanded', 'false');
   toggle.setAttribute('aria-haspopup', 'true');
   toggle.setAttribute('aria-controls', menuId);
@@ -306,8 +357,8 @@ function buildDownload(asset) {
     a.href = href;
     a.setAttribute('role', 'menuitem');
     a.setAttribute('download', '');
-    a.setAttribute('aria-label', LABELS.download(title, label));
-    a.title = LABELS.tipDownloadSize(label);
+    a.setAttribute('aria-label', text.download(title, label));
+    a.title = text.tipDownloadSize(label);
     a.textContent = label;
     li.append(a);
     menu.append(li);
@@ -339,13 +390,13 @@ export function cartThumb(src = '') {
  * @param {{title: string, alt?: string, src?: string, sizes: Array<{label,href}>}} asset
  * @returns {HTMLButtonElement}
  */
-function buildAdd(asset) {
+function buildAdd(asset, text = ENGLISH) {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'downloads-add';
   const title = asset.title || asset.alt || '';
-  btn.setAttribute('aria-label', LABELS.add(title));
-  btn.title = LABELS.tipAdd;
+  btn.setAttribute('aria-label', text.add(title));
+  btn.title = text.tipAdd;
   btn.setAttribute('aria-disabled', 'true');
   btn.dataset.href = cartSize(asset.sizes)?.href || '';
   if (title) btn.dataset.title = title;
@@ -362,7 +413,7 @@ function buildAdd(asset) {
  * @param {{title: string, alt?: string, src?: string, sizes: Array<{label,href}>}} asset
  * @returns {HTMLDivElement}
  */
-function buildAddMenu(asset) {
+function buildAddMenu(asset, text = ENGLISH) {
   const title = asset.title || asset.alt || '';
   const original = cartSize(asset.sizes);
   menuSeq += 1;
@@ -371,7 +422,7 @@ function buildAddMenu(asset) {
   const toggle = document.createElement('button');
   toggle.type = 'button';
   toggle.className = 'downloads-add-toggle';
-  toggle.setAttribute('aria-label', LABELS.add(title));
+  toggle.setAttribute('aria-label', text.add(title));
   toggle.setAttribute('aria-expanded', 'false');
   toggle.setAttribute('aria-haspopup', 'true');
   const menu = document.createElement('ul');
@@ -388,16 +439,16 @@ function buildAddMenu(asset) {
     row.className = 'downloads-size downloads-add-size';
     row.setAttribute('role', 'menuitem');
     row.setAttribute('aria-disabled', 'true');
-    row.title = LABELS.tipAddSize(label);
+    row.title = text.tipAddSize(label);
     row.textContent = label;
     if (href === original?.href) {
-      row.setAttribute('aria-label', LABELS.addSize(label, title));
+      row.setAttribute('aria-label', text.addSize(label, title));
       row.dataset.href = href;
       if (title) row.dataset.title = title;
       const thumb = cartThumb(asset.src);
       if (thumb) row.dataset.thumb = thumb;
     } else {
-      row.setAttribute('aria-label', LABELS.sizeUnavailable(label));
+      row.setAttribute('aria-label', text.sizeUnavailable(label));
     }
     li.append(row);
     menu.append(li);
@@ -428,23 +479,23 @@ export function statsLine(block) {
  * on the block's stats line (statsLine) when there is one, else above the grid. Returns the
  * button (inert until wired).
  */
-function buildAddAll(block, gallery = false) {
+function buildAddAll(block, gallery = false, text = ENGLISH) {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'downloads-add downloads-add-all';
-  btn.setAttribute('aria-label', LABELS.addAll);
+  btn.setAttribute('aria-label', text.addAll);
   btn.setAttribute('aria-disabled', 'true');
   if (gallery) {
     // the source group's pills: "Original" is the group toggle, "1920px" can't be in the cart
     btn.classList.add('downloads-group-size');
-    btn.textContent = LABELS.groupSize('Original');
-    btn.dataset.label = LABELS.groupAdd('Original');
+    btn.textContent = text.sizeOriginal;
+    btn.dataset.label = text.groupAdd(text.sizeOriginal);
     btn.setAttribute('aria-label', btn.dataset.label);
     const giant = document.createElement('button');
     giant.type = 'button';
     giant.className = 'downloads-group-size';
-    giant.textContent = LABELS.groupSize('1920px');
-    giant.setAttribute('aria-label', LABELS.groupUnavailable('1920px'));
+    giant.textContent = text.size1920;
+    giant.setAttribute('aria-label', text.groupUnavailable(text.size1920));
     giant.setAttribute('aria-disabled', 'true');
     const bar = document.createElement('div');
     bar.className = 'downloads-toolbar downloads-group';
@@ -480,14 +531,14 @@ export async function bindCart(block, addAll, load = () => Promise.all([
   // each tile's cart control: its round toggle, or the "Original" row of its add menu
   const tiles = [...block.querySelectorAll('.downloads-add:not(.downloads-add-all), .downloads-add-size[data-href]')];
   if (!tiles.length) return;
-  const [cart, ui, { fetchPlaceholders }] = await load();
+  const [cart, ui, { fetchPlaceholders: loadPlaceholders }] = await load();
   tiles.forEach((btn) => cart.bindCartControl(btn));
   // an added tile's picture flies to the cart badge, as on the source (#275); decorative
   import('../../scripts/media-cart-fly.js').then(({ installFlyToCart }) => installFlyToCart())
     .catch(() => { /* no flight */ });
   if (!addAll) return;
   // the notice's styles before a partial add can show it (no unstyled flash)
-  const [ph] = await Promise.all([fetchPlaceholders(), ui.loadCartStyles()]);
+  const [ph] = await Promise.all([loadPlaceholders(), ui.loadCartStyles()]);
   const labels = ui.cartLabels(ph);
   const live = () => tiles.filter((t) => t.getAttribute('aria-disabled') !== 'true' && t.dataset.href);
   const sync = () => {
@@ -559,16 +610,16 @@ function showWhenVisible(video, src) {
  * @param {boolean} mediaBox
  * @returns {HTMLAnchorElement}
  */
-function buildFile(asset, mediaBox) {
+function buildFile(asset, mediaBox, text = ENGLISH) {
   const [{ label, href }] = asset.sizes;
-  const type = (label || 'File').trim();
+  const type = (label || text.fileType).trim();
   const file = document.createElement('a');
   file.className = 'downloads-file';
   file.href = href;
   file.target = '_blank';
   file.rel = 'noopener';
   file.dataset.fileType = type.toLowerCase();
-  file.setAttribute('aria-label', LABELS.openFile(asset.title, type));
+  file.setAttribute('aria-label', text.openFile(asset.title, type));
   file.append(fileIcon());
   const typeLabel = document.createElement('span');
   typeLabel.className = 'downloads-file-type';
@@ -599,7 +650,7 @@ function buildFile(asset, mediaBox) {
  * @param {{src: string, alt?: string, title: string, sizes: Array<{label,href}>}} asset
  * @returns {HTMLLIElement|null} null if the asset has neither image nor download
  */
-function buildTile(asset, { mediaBox = false } = {}) {
+function buildTile(asset, { mediaBox = false, text = ENGLISH } = {}) {
   if (!asset.src && !asset.sizes.length) return null;
 
   const li = document.createElement('li');
@@ -617,7 +668,7 @@ function buildTile(asset, { mediaBox = false } = {}) {
     thumb.className = 'downloads-thumb';
     [thumb.href] = asset.src.split('?');
     const isVideo = asset.sizes.length === 1 && /\.mp4(?:[?#]|$)/i.test(asset.sizes[0].href);
-    thumb.setAttribute('aria-label', `${isVideo ? LABELS.videoPoster : LABELS.open} ${asset.title}`.trim());
+    thumb.setAttribute('aria-label', `${isVideo ? text.videoPoster : text.open} ${asset.title}`.trim());
     thumb.append(createOptimizedPicture(asset.src, asset.alt || asset.title, false, [
       { media: '(min-width: 768px)', width: '750' },
       { width: '500' },
@@ -631,7 +682,7 @@ function buildTile(asset, { mediaBox = false } = {}) {
     }
     figure.append(thumb);
   } else {
-    figure.append(buildFile(asset, mediaBox));
+    figure.append(buildFile(asset, mediaBox, text));
   }
 
   if (mediaBox && asset.date) {
@@ -648,13 +699,13 @@ function buildTile(asset, { mediaBox = false } = {}) {
     figure.append(cap);
   }
 
-  const action = buildDownload(asset);
+  const action = buildDownload(asset, text);
   if (action) {
     // add to cart, then download (source order); the size menu stays anchored to its toggle
     const actions = document.createElement('div');
     actions.className = 'downloads-actions';
     const sizeMenu = mediaBox && asset.src && asset.sizes.length > 1;
-    const add = sizeMenu ? buildAddMenu(asset) : buildAdd(asset);
+    const add = sizeMenu ? buildAddMenu(asset, text) : buildAdd(asset, text);
     actions.append(add, action);
     figure.append(actions);
   }
@@ -677,30 +728,11 @@ const fileType = (href = '') => ((href.split(/[?#]/)[0].match(/\.([a-z0-9]+)$/i)
 export function lightboxItem(asset, related = {}) {
   const href = cartSize(asset.sizes)?.href || '';
   const title = asset.title || asset.alt || '';
-  const caption = document.createElement('div');
-  const para = (...nodes) => {
-    const p = document.createElement('p');
-    p.append(...nodes);
-    caption.append(p);
-    return p;
-  };
-  if (title) para(title);
-  const meta = [['File type', fileType(href)], ['Published', asset.date]].filter(([, v]) => v);
-  if (meta.length) {
-    const p = para();
-    meta.forEach(([label, value], i) => {
-      if (i) p.append(document.createElement('br'));
-      const strong = document.createElement('strong');
-      strong.textContent = value;
-      p.append(`${label}: `, strong);
-    });
-  }
-  if (related.title && related.href) {
-    const a = document.createElement('a');
-    a.href = related.href;
-    a.textContent = related.title;
-    para('Related article: ', a);
-  }
+  const caption = buildMediaPanel({
+    title,
+    meta: [['fileType', fileType(href)], ['published', asset.date]],
+    related: related.title && related.href ? related : {},
+  });
   const item = {
     src: asset.src, alt: title, caption, cartHref: href, thumb: cartThumb(asset.src),
   };
@@ -787,6 +819,9 @@ export function slideList(list, toggle, before) {
 export default async function decorate(block) {
   // read + consume any leading config rows
   const cfg = readConfig(block);
+  // the control text in the page locale (SKODA-1003), before the first label: a translated page
+  // never shows the English words first (#348 review); the sheet is memoized
+  const text = downloadsText(await fetchPlaceholders());
   const mediaBox = block.classList.contains('media-box') || !!block.closest('.section.media-box');
   if (mediaBox) block.classList.add('downloads-media-box');
   // a press-kit Images group (SKODA-806). A Media Box keeps its own presentation: the class goes,
@@ -823,7 +858,7 @@ export default async function decorate(block) {
 
   const lightboxEntries = [];
   assets.forEach((asset) => {
-    const tile = buildTile(asset, { mediaBox });
+    const tile = buildTile(asset, { mediaBox, text });
     if (!tile) return;
     list.append(tile);
     const thumb = tile.querySelector('.downloads-thumb');
@@ -833,7 +868,7 @@ export default async function decorate(block) {
   block.replaceChildren(list);
   if (mediaBox || gallery) wireLightbox(lightboxEntries);
   const addAll = (mediaBox || gallery) && list.querySelector('.downloads-add, .downloads-add-size[data-href]')
-    ? buildAddAll(block, gallery) : null;
+    ? buildAddAll(block, gallery, text) : null;
   bindCart(block, addAll).catch((e) => {
     // eslint-disable-next-line no-console
     console.error('downloads: media cart unavailable', e);
@@ -876,7 +911,7 @@ export default async function decorate(block) {
     toggle.className = 'downloads-more';
     toggle.setAttribute('aria-controls', list.id);
     // the pill's words: the locale's placeholders sheet, else English (#243)
-    const words = { more: LABELS.more, less: LABELS.less };
+    const words = { more: text.more, less: text.less };
     const syncLabel = () => {
       toggle.textContent = block.classList.contains('downloads-expanded') ? words.less : words.more;
     };
@@ -938,18 +973,6 @@ export default async function decorate(block) {
     if (window.ResizeObserver) {
       const observer = new window.ResizeObserver(syncVisibility);
       [...list.children].forEach((tile) => observer.observe(tile));
-    }
-    // `Show More` / `Show Less` rows of /{locale}/placeholders (the source's togglebox words,
-    // e.g. CS "Zobrazit více" / "Zobrazit méně"); a missing sheet or key keeps English. Awaited
-    // before the first label, so a translated page never shows the English pill first (#348
-    // review); the sheet is memoized (the Media Box cart reads the same one).
-    try {
-      const { fetchPlaceholders } = await import('../../scripts/placeholders.js');
-      const ph = await fetchPlaceholders();
-      words.more = ph.showMore || LABELS.more;
-      words.less = ph.showLess || LABELS.less;
-    } catch (e) {
-      // the English words stay
     }
     syncVisibility();
   }

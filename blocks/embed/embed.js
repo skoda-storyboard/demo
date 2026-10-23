@@ -329,12 +329,36 @@ function mountEmbed(wrapper, iframe, provider, playLabel, gate) {
   return iframe;
 }
 
-// Placeholder copy, as on the live site (English defaults; placeholders sheet keys
-// `Embed Consent Text` with a {host} token, and `Embed Consent Button`).
-const CONSENT_TEXT = 'This content is hosted by a third party ({host}). By accessing and viewing this external '
-  + 'content, you acknowledge personal data processing may occur by the relevant external provider and you '
-  + 'confirm that you are acquainted with the terms and conditions as well as relevant privacy notice of {host}.';
-const CONSENT_BUTTON = 'I acknowledge and confirm';
+// UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet as
+// `embed…`: the consent placeholder's copy as on the live site (`embedConsentText`, a {host}
+// token; `embedConsentButton`), the frames' fallback names and the YouTube play button's name.
+// Shown in English first, then swapped once the lazily loaded sheet resolves (localiseEmbed),
+// so the sheet can't delay or reshape the embed.
+export const EMBED_LABELS = {
+  consentText: 'This content is hosted by a third party ({host}). By accessing and viewing this external '
+    + 'content, you acknowledge personal data processing may occur by the relevant external provider and you '
+    + 'confirm that you are acquainted with the terms and conditions as well as relevant privacy notice of {host}.',
+  consentButton: 'I acknowledge and confirm',
+  youtube: 'YouTube video',
+  vimeo: 'Vimeo video',
+  buzzsprout: 'Buzzsprout podcast episode',
+  spotifyEpisode: 'Spotify podcast episode',
+  spotifyShow: 'Spotify podcast',
+  spotifyTrack: 'Spotify track',
+  spotifyAlbum: 'Spotify album',
+  spotifyPlaylist: 'Spotify playlist',
+  spotify: 'Spotify player',
+  file: 'Video',
+  other: 'Embedded content from {host}',
+  playYoutube: 'Play YouTube video',
+  playVideo: 'Play video: {title}',
+};
+
+/** The embed's text in the page locale, from the lazily imported (memoized) sheet. */
+async function embedText() {
+  const { fetchPlaceholders, localize } = await import('../../scripts/placeholders.js');
+  return localize(EMBED_LABELS, await fetchPlaceholders(), 'embed');
+}
 let gateCount = 0;
 
 /**
@@ -346,10 +370,9 @@ let gateCount = 0;
  */
 async function localiseConsentGate(text, label, host) {
   try {
-    const { fetchPlaceholders } = await import('../../scripts/placeholders.js');
-    const ph = await fetchPlaceholders();
-    if (ph.embedConsentText) text.textContent = ph.embedConsentText.replaceAll('{host}', host);
-    if (ph.embedConsentButton) label.textContent = ph.embedConsentButton;
+    const labels = await embedText();
+    text.textContent = labels.consentText.replaceAll('{host}', host);
+    label.textContent = labels.consentButton;
   } catch {
     // keep the English defaults
   }
@@ -380,12 +403,12 @@ function renderConsentGate(wrapper, iframe, provider, playLabel) {
   const text = document.createElement('p');
   text.className = 'embed-consent-text';
   text.id = `embed-consent-text-${gateCount}`;
-  text.textContent = CONSENT_TEXT.replaceAll('{host}', host);
+  text.textContent = EMBED_LABELS.consentText.replaceAll('{host}', host);
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'embed-consent-button';
   const label = document.createElement('span');
-  label.textContent = CONSENT_BUTTON;
+  label.textContent = EMBED_LABELS.consentButton;
   button.append(label);
   // name = the visible label; the text naming the provider host is its description
   button.setAttribute('aria-describedby', text.id);
@@ -457,32 +480,23 @@ function hasMediaId(provider, url) {
   return true;
 }
 
-// Spotify URL type segment -> readable label (open.spotify.com/{type}/{id}).
-const SPOTIFY_LABELS = {
-  episode: 'Spotify podcast episode',
-  show: 'Spotify podcast',
-  track: 'Spotify track',
-  album: 'Spotify album',
-  playlist: 'Spotify playlist',
-};
-
 /**
  * Human-readable iframe title used when the author gave no descriptive text, so screen-reader
  * users never hear a raw URL as the frame name.
  * @param {string} provider
  * @param {URL} url
+ * @param {typeof EMBED_LABELS} [labels] the page locale's (English by default)
  * @returns {string}
  */
-function providerLabel(provider, url) {
-  if (provider === 'youtube') return 'YouTube video';
-  if (provider === 'vimeo') return 'Vimeo video';
-  if (provider === 'buzzsprout') return 'Buzzsprout podcast episode';
+function providerLabel(provider, url, labels = EMBED_LABELS) {
+  if (['youtube', 'vimeo', 'buzzsprout', 'file'].includes(provider)) return labels[provider];
   if (provider === 'spotify') {
-    const type = url.pathname.replace(/^\/embed/, '').split('/')[1];
-    return SPOTIFY_LABELS[type] || 'Spotify player';
+    // the URL type segment (open.spotify.com/{type}/{id}) → its name
+    const type = url.pathname.replace(/^\/embed/, '').split('/')[1] || '';
+    const key = `spotify${type.charAt(0).toUpperCase()}${type.slice(1)}`;
+    return Object.prototype.hasOwnProperty.call(labels, key) ? labels[key] : labels.spotify;
   }
-  if (provider === 'file') return 'Video';
-  return `Embedded content from ${url.hostname.replace(/^www\./, '')}`;
+  return labels.other.replace('{host}', url.hostname.replace(/^www\./, ''));
 }
 
 // A candidate title is descriptive only if it is non-empty and not itself a URL.
@@ -660,8 +674,19 @@ export default function decorate(block) {
   // label, so don't read it out twice
   let playLabel = '';
   if (mode === 'youtube') {
-    playLabel = title === providerLabel(provider, url) ? 'Play YouTube video' : `Play video: ${title}`;
+    playLabel = title === providerLabel(provider, url)
+      ? EMBED_LABELS.playYoutube : EMBED_LABELS.playVideo.replace('{title}', title);
   }
+  // the page locale's names once the lazily loaded sheet resolves (SKODA-1003): a fallback frame
+  // name and the play button's; an authored title is content and stays. `gate` reads playLabel
+  // when it runs, so a poster rendered later takes the translated name too.
+  const fallbackTitle = title === providerLabel(provider, url);
+  embedText().then((labels) => {
+    if (fallbackTitle) iframe.title = providerLabel(provider, url, labels);
+    if (mode !== 'youtube') return;
+    playLabel = fallbackTitle ? labels.playYoutube : labels.playVideo.replace('{title}', title);
+    wrapper.querySelector('.embed-play')?.setAttribute('aria-label', playLabel);
+  }).catch(() => { /* the English names stay */ });
   const gate = () => renderConsentGate(wrapper, iframe, mode, playLabel);
   block.append(wrapper);
 

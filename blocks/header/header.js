@@ -1,10 +1,11 @@
 import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
+import { fetchPlaceholders, localize } from '../../scripts/placeholders.js';
 import attachSuggest from '../../scripts/search-suggest.js';
 import iconsReady from '../../scripts/icons-ready.js';
 import { hrefPath, pickActiveTab } from './header-switcher.js';
 import {
-  buildLocaleList, currentLocale, isLocaleGroup, localeEntries, pageHreflangs,
+  buildLocaleList, currentLocale, isLocaleGroup, localeEntries, pageHreflangs, LOCALE_LIST_LABELS,
 } from './header-locales.js';
 
 // desktop >= 1080px per source ladder (SKODA-301); below is the drawer band (SKODA-302)
@@ -248,6 +249,31 @@ export const SEARCH_SCOPES = [
   ['video', 'Videos'],
 ];
 
+// UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet as
+// `header…`; the scope options as `headerScope…` (the source's: CS "Vše", DE "Alles", …)
+export const HEADER_LABELS = {
+  searchIn: 'Search in',
+  search: 'Search',
+  closeSearch: 'Close search',
+  openNav: 'Open navigation',
+  closeNav: 'Close navigation',
+  closeNewsletter: 'Close newsletter subscription',
+  subscribe: 'Subscribe to our stories',
+  scopeAll: 'All',
+  scopePost: 'Stories',
+  scopePressRelease: 'News',
+  scopePressKit: 'Press Kits',
+  scopeImage: 'Images',
+  scopeVideo: 'Videos',
+  // the language list (header-locales.js)
+  languages: LOCALE_LIST_LABELS.languages,
+  newTab: LOCALE_LIST_LABELS.newTab,
+};
+// a scope value → its HEADER_LABELS key
+const SCOPE_KEYS = {
+  '': 'scopeAll', post: 'scopePost', press_release: 'scopePressRelease', press_kit: 'scopePressKit', image: 'scopeImage', video: 'scopeVideo',
+};
+
 // the source icons as inline SVG, [viewBox, path]: the icon-font glyphs (skoda-bnr-icons search
 // U+E02D, caret-down U+E007, menu U+E01F, close U+E010, in their 16-unit em box) and the
 // phone mail symbol (#mail-thick). A CSS mask or background image snaps to whole pixels (a
@@ -285,17 +311,18 @@ function glyph(name, className) {
  * The search scope select (source custom select: All / Stories / News / Press Kits / Images /
  * Videos). A native select, styled as the source's, inside a wrapper that draws its chevron.
  * @param {string} selected The pre-selected scope value
+ * @param {typeof HEADER_LABELS} [labels] the page locale's text (English by default)
  * @returns {{ wrapper: HTMLElement, select: HTMLSelectElement }}
  */
-export function buildSearchScope(selected) {
+export function buildSearchScope(selected, labels = HEADER_LABELS) {
   const select = document.createElement('select');
   select.className = 'nav-search-type';
-  select.setAttribute('aria-label', 'Search in');
+  select.setAttribute('aria-label', labels.searchIn);
   select.tabIndex = -1;
   SEARCH_SCOPES.forEach(([value, text]) => {
     const option = document.createElement('option');
     option.value = value;
-    option.textContent = text;
+    option.textContent = labels[SCOPE_KEYS[value]] || text;
     if (value === selected) option.selected = true;
     select.append(option);
   });
@@ -352,7 +379,10 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   // always collapse the accordion sub-menus when opening/closing the drawer
   // (mobile accordions start collapsed; user taps a parent to expand)
   toggleAllNavSections(navSections, 'false');
-  button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
+  // the names in the page locale, kept on the nav by decorate (English before that)
+  button.setAttribute('aria-label', expanded
+    ? (nav.dataset.openLabel || HEADER_LABELS.openNav)
+    : (nav.dataset.closeLabel || HEADER_LABELS.closeNav));
   // the hamburger reports the drawer state itself (SKODA-302 AC), not only the <nav>
   button.setAttribute('aria-expanded', drawerOpen ? 'true' : 'false');
   // the drawer shows the search field, so it must be tabbable while open
@@ -425,7 +455,7 @@ function preloadHeaderAssets() {
  * @param {Element|null} fragment The loaded companion fragment
  * @returns {HTMLElement|null}
  */
-export function takeNewsletterPanel(fragment) {
+export function takeNewsletterPanel(fragment, labels = HEADER_LABELS) {
   const stub = fragment?.querySelector('.newsletter-stub');
   if (!stub) return null;
   stub.remove();
@@ -436,7 +466,7 @@ export function takeNewsletterPanel(fragment) {
   const close = document.createElement('button');
   close.type = 'button';
   close.className = 'nav-newsletter-close';
-  close.setAttribute('aria-label', 'Close newsletter subscription');
+  close.setAttribute('aria-label', labels.closeNewsletter);
   panel.append(close, stub);
   return panel;
 }
@@ -543,7 +573,9 @@ export default async function decorate(block) {
   // load nav as fragment
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
-  const fragment = await loadFragment(navPath);
+  // the nav fragment and the UI text sheet (memoized, already loading since the eager phase)
+  const [fragment, placeholders] = await Promise.all([loadFragment(navPath), fetchPlaceholders()]);
+  const text = localize(HEADER_LABELS, placeholders, 'header');
 
   // decorate nav DOM
   block.textContent = '';
@@ -558,6 +590,8 @@ export default async function decorate(block) {
   if (siteSection) block.dataset.section = siteSection;
   const nav = document.createElement('nav');
   nav.id = 'nav';
+  nav.dataset.openLabel = text.openNav;
+  nav.dataset.closeLabel = text.closeNav;
   while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
 
   // 4-row fragment (topbar + brand + sections + tools) vs 3-row (brand + sections + tools)
@@ -611,6 +645,7 @@ export default async function decorate(block) {
       currentLocale(window.location.pathname),
       document,
       pageHreflangs(document),
+      { languages: text.languages, newTab: text.newTab },
     );
     if (locales) {
       // a list can't live in a <p>: the group becomes a <div> in the same place
@@ -724,7 +759,7 @@ export default async function decorate(block) {
   if (navTools) {
     const searchLink = navTools.querySelector('a[href*="#search"], a');
     if (searchLink) {
-      const label = searchLink.textContent.trim() || 'Search';
+      const label = searchLink.textContent.trim() || text.search;
       const toggle = document.createElement('button');
       toggle.type = 'button';
       toggle.className = 'nav-search-toggle';
@@ -741,7 +776,7 @@ export default async function decorate(block) {
       input.setAttribute('autocomplete', 'off');
       input.tabIndex = -1;
       // the scope select; Storyboard pages default to Stories, the Media Room to All (source)
-      const scope = buildSearchScope(siteSection === 'media-room' ? '' : 'post');
+      const scope = buildSearchScope(siteSection === 'media-room' ? '' : 'post', text);
 
       // pill field: decorative leading icon + input
       const field = document.createElement('div');
@@ -761,7 +796,7 @@ export default async function decorate(block) {
       // open, the button is the source's submit: it searches with a query, closes without one
       const syncToggleLabel = () => {
         const open = searchBar.classList.contains('nav-search-open');
-        toggle.setAttribute('aria-label', open && !input.value.trim() ? 'Close search' : label);
+        toggle.setAttribute('aria-label', open && !input.value.trim() ? text.closeSearch : label);
       };
       const setOpen = (open) => {
         searchBar.classList.toggle('nav-search-open', open);
@@ -847,7 +882,7 @@ export default async function decorate(block) {
     mail = document.createElement('a');
     mail.className = 'nav-mail';
     mail.href = '#subscribe';
-    mail.setAttribute('aria-label', 'Subscribe to our stories');
+    mail.setAttribute('aria-label', text.subscribe);
     mail.append(glyph('mail', 'nav-mail-glyph'));
   }
 
@@ -895,7 +930,7 @@ export default async function decorate(block) {
   if (panelTriggers.length) {
     const newsletterPath = `${navPath}-newsletter`;
     loadFragment(newsletterPath).then((newsletter) => {
-      const panel = takeNewsletterPanel(newsletter);
+      const panel = takeNewsletterPanel(newsletter, text);
       if (!panel) return;
       // in the DOM right after the topbar CTA, so Tab moves from it into the panel (the panel
       // is positioned on .nav-wrapper wherever it sits)

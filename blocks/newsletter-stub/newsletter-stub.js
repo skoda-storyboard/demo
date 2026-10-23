@@ -31,7 +31,12 @@
  *   consent-error  unchecked consent message
  */
 
-const DEFAULTS = {
+import { localize, placeholdersNow } from '../../scripts/placeholders.js';
+
+// UI text (SKODA-1003): the fallbacks under the authored rows, read from the page locale's
+// placeholders sheet as `newsletter…` once it has loaded (placeholdersNow: the block stays
+// synchronous; the imported fragments author these rows per locale anyway)
+export const NEWSLETTER_LABELS = {
   label: 'Email address',
   placeholder: 'Enter your e-mail',
   button: 'Submit',
@@ -39,6 +44,9 @@ const DEFAULTS = {
   error: 'Please enter a valid e-mail address.',
   consentError: 'Please accept the terms before continuing.',
 };
+
+/** The fallbacks in the page locale, from the sheet when it has loaded (else English). */
+const labels = () => localize(NEWSLETTER_LABELS, placeholdersNow(), 'newsletter');
 
 // the WHATWG `type=email` rule, so the check matches the browser's own
 const EMAIL = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
@@ -158,9 +166,9 @@ function cardValidation(cfg, form, input, id) {
     clear();
     // never leave the required consent hidden behind a failed submit
     form.classList.add('is-expanded');
-    if (!EMAIL.test(input.value.trim())) return fail(input, text(cfg.error, DEFAULTS.error));
+    if (!EMAIL.test(input.value.trim())) return fail(input, text(cfg.error, labels().error));
     if (checkbox && !checkbox.checked) {
-      return fail(checkbox, text(cfg['consent-error'], DEFAULTS.consentError));
+      return fail(checkbox, text(cfg['consent-error'], labels().consentError));
     }
     return true;
   };
@@ -186,17 +194,17 @@ export default function decorate(block) {
   // email + submit row
   const row = el('div', 'newsletter-stub-row');
   const label = el('label', 'newsletter-stub-label', { for: `${id}-email` });
-  label.textContent = text(cfg.label, DEFAULTS.label);
+  label.textContent = text(cfg.label, labels().label);
   const input = el('input', 'newsletter-stub-email', {
     id: `${id}-email`,
     name: 'email',
     type: 'email',
     autocomplete: 'email',
-    placeholder: text(cfg.placeholder, DEFAULTS.placeholder),
+    placeholder: text(cfg.placeholder, labels().placeholder),
     required: '',
   });
   const button = el('button', 'newsletter-stub-submit', { type: 'submit' });
-  button.textContent = text(cfg.button, DEFAULTS.button);
+  button.textContent = text(cfg.button, labels().button);
   row.append(label, input, button);
 
   // live region: always in the DOM so the announcement is reliable; empty until submit
@@ -252,7 +260,7 @@ export default function decorate(block) {
     });
   }
 
-  const message = text(cfg.message, DEFAULTS.message);
+  const message = text(cfg.message, labels().message);
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (!validate()) {

@@ -27,7 +27,7 @@
 
 import { readBlockConfig, createOptimizedPicture } from '../../scripts/aem.js';
 import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
-import { fetchPlaceholders } from '../../scripts/placeholders.js';
+import { fetchPlaceholders, localize } from '../../scripts/placeholders.js';
 import { buildCardTeaser } from '../../scripts/card-teaser.js';
 import {
   scopeRows, filterRows, sortRows, paginate, decodeState, encodeState,
@@ -37,18 +37,20 @@ import {
 // on `offset`/`sortby` only (and preserve everything else).
 const NO_FACETS = [];
 
-// UI strings resolve from the per-locale placeholders sheet, English defaults so
-// the block works before any sheet is authored (same source as the listing).
-function buildStrings(ph) {
-  return {
-    loadMore: ph.loadMore || 'Load more',
-    loading: ph.loading || 'Loading…',
-    loadError: ph.listingLoadError || 'Could not load results.',
-    noResults: ph.listingNoResults || 'Nothing to show yet.',
-    // "N shown" — announced on load-more for screen readers.
-    resultsShown: ph.storiesResultsShown || 'stories shown',
-    newTab: ph.newTab || 'opens in a new tab',
-  };
+// UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet.
+// `loadMore` and `loading` are the listing's shared keys; the rest are `stories…`.
+export const SHARED_LABELS = { loadMore: 'Load more', loading: 'Loading…' };
+export const STORIES_LABELS = {
+  loadError: 'Could not load results.',
+  noResults: 'Nothing to show yet.',
+  // "N shown": announced on Load more for screen readers
+  resultsShown: 'stories shown',
+  newTab: 'opens in a new tab',
+};
+
+/** The block's text in the page locale (English per missing key). */
+export function buildStrings(ph = {}) {
+  return { ...localize(SHARED_LABELS, ph), ...localize(STORIES_LABELS, ph, 'stories') };
 }
 
 // Split a comma-separated config value into trimmed tokens.

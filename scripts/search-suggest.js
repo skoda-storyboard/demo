@@ -15,28 +15,49 @@
  */
 
 import { loadQueryIndex, defaultIndexUrl } from './query-index.js';
+import { formatDate, localize, placeholdersNow } from './placeholders.js';
 
 const MATCH_FIELDS = ['title', 'description', 'tags'];
 const MAX_SUGGESTIONS = 5; // live cap (measured on the source)
 const MIN_CHARS = 1; // live triggers from the first character
 
-/** Rows whose title/description/tags contain every term (AND, case-insensitive). */
-function matchRows(rows, query) {
-  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+/**
+ * Text for matching: lower case, accents and other combining marks removed, so "pogacar" finds
+ * "Pogačar" and "skoda" finds "Škoda" (L-SK-10, L-SL-13, SKODA-1003). `đ` has no decomposition
+ * (it is its own letter), so it folds to `d` explicitly, as Serbian Latin readers type it.
+ * @param {string} text
+ * @returns {string}
+ */
+export function foldText(text) {
+  return String(text || '')
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .replace(/[đĐ]/g, 'd')
+    .toLowerCase();
+}
+
+/** Rows whose title/description/tags contain every term (AND, case- and accent-insensitive). */
+export function matchRows(rows, query) {
+  const terms = foldText(query.trim()).split(/\s+/).filter(Boolean);
   if (!terms.length) return [];
   return rows.filter((row) => {
-    const hay = MATCH_FIELDS.map((f) => String(row[f] || '')).join(' ').toLowerCase();
+    const hay = foldText(MATCH_FIELDS.map((f) => String(row[f] || '')).join(' '));
     return terms.every((t) => hay.includes(t));
   });
 }
 
-// Public content-type label per index `template` — the source's search-type
-// names (its Stories / News / Press Kits filter), not the URL section.
-const TYPE_LABELS = {
+// UI text (SKODA-1003): the public content-type label per index `template` (the source's
+// search-type names, its Stories / News / Press Kits filter, not the URL section), read from the
+// page locale's placeholders sheet as `suggest…` at render time (the sheet has loaded by then)
+export const SUGGEST_LABELS = {
   story: 'Stories',
-  press_release: 'News',
-  press_kit: 'Press Kits',
-  press_kit_chapter: 'Press Kits',
+  pressRelease: 'News',
+  pressKit: 'Press Kits',
+  // the row's date, as the source's suggestions: zero-padded "DD. MM. YYYY"
+  dateFormat: '{dd}. {mm}. {yyyy}',
+};
+const TYPE_KEYS = {
+  story: 'story', press_release: 'pressRelease', press_kit: 'pressKit', press_kit_chapter: 'pressKit',
 };
 
 /** Display title (loadQueryIndex already strips the SEO site suffix, SKODA-610). */
@@ -44,18 +65,18 @@ function displayTitle(row) {
   return String(row.title || '').trim() || row.path;
 }
 
-/** Index ISO date (YYYY-MM-DD) → the source's "DD. MM. YYYY"; other values pass through. */
-function displayDate(value) {
-  const m = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
-  return m ? `${m[3]}. ${m[2]}. ${m[1]}` : String(value || '');
+/** Index ISO date (YYYY-MM-DD) in the locale's suggestion pattern; other values pass through. */
+function displayDate(value, pattern = SUGGEST_LABELS.dateFormat) {
+  if (!/^\d{4}-\d{2}-\d{2}/.test(String(value || ''))) return String(value || '');
+  return formatDate(String(value).slice(0, 10), pattern);
 }
 
 /** Build the "date | type" meta line for a row (either part optional). */
-function metaLine(row) {
+function metaLine(row, labels = SUGGEST_LABELS) {
   const parts = [];
-  const date = displayDate(row.date);
+  const date = displayDate(row.date, labels.dateFormat);
   if (date) parts.push(date);
-  const type = TYPE_LABELS[String(row.template || '').toLowerCase().replace(/-/g, '_')];
+  const type = labels[TYPE_KEYS[String(row.template || '').toLowerCase().replace(/-/g, '_')]];
   if (type) parts.push(type);
   return parts.join(' | ');
 }
@@ -168,7 +189,7 @@ export default function attachSuggest(input, opts = {}) {
       title.className = 'search-suggest-title';
       title.textContent = displayTitle(row);
       text.append(title);
-      const meta = metaLine(row);
+      const meta = metaLine(row, localize(SUGGEST_LABELS, placeholdersNow(), 'suggest'));
       if (meta) {
         const m = document.createElement('span');
         m.className = 'search-suggest-meta';

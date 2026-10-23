@@ -32,18 +32,18 @@ if (JSDOM) {
 }
 
 const row = (src, caption = '') => `<div><div><picture><img src="${src}" alt="Alt ${src}"></picture></div><div>${caption}</div></div>`;
-const slider = (rows) => {
+const slider = async (rows) => {
   const block = document.createElement('div');
   block.className = 'gallery slider';
   block.innerHTML = rows.join('');
   document.querySelector('main').append(block);
-  decorate(block);
+  await decorate(block);
   return block;
 };
 const realSlides = (block) => [...block.querySelectorAll('.gallery-slide:not(.is-clone)')];
 
-test('an authored description renders under the image, inside its slide', { skip }, () => {
-  const block = slider([
+test('an authored description renders under the image, inside its slide', { skip }, async () => {
+  const block = await slider([
     row('a.jpg', '<p>Škoda Octavia Combi Laurin &amp; Klement</p>'),
     row('b.jpg', '<p>Škoda Octavia Long</p>'),
   ]);
@@ -59,24 +59,24 @@ test('an authored description renders under the image, inside its slide', { skip
   ]);
 });
 
-test('an empty caption cell adds no caption element (no gap on Epiq)', { skip }, () => {
-  const block = slider([row('a.jpg'), row('b.jpg', '   '), row('c.jpg', '<p>Only this one</p>')]);
+test('an empty caption cell adds no caption element (no gap on Epiq)', { skip }, async () => {
+  const block = await slider([row('a.jpg'), row('b.jpg', '   '), row('c.jpg', '<p>Only this one</p>')]);
   const captions = realSlides(block).map((s) => s.querySelector('.gallery-slide-caption'));
   assert.equal(captions[0], null);
   assert.equal(captions[1], null);
   assert.equal(captions[2].textContent.trim(), 'Only this one');
 });
 
-test('the wrap-around clones carry the same caption as their slide', { skip }, () => {
-  const block = slider([row('a.jpg', '<p>First</p>'), row('b.jpg', '<p>Last</p>')]);
+test('the wrap-around clones carry the same caption as their slide', { skip }, async () => {
+  const block = await slider([row('a.jpg', '<p>First</p>'), row('b.jpg', '<p>Last</p>')]);
   const clones = [...block.querySelectorAll('.gallery-slide.is-clone')];
   assert.equal(clones.length, 2);
   assert.deepEqual(clones.map((c) => c.querySelector('.gallery-slide-caption')?.textContent.trim()), ['Last', 'First']);
 });
 
 // --- autoplay pause control (WCAG 2.2.2, SKODA-703) -------------------------------------------
-test('a looping slider starts with a pause / resume control for its autoplay', { skip }, () => {
-  const block = slider([row('a.jpg'), row('b.jpg'), row('c.jpg')]);
+test('a looping slider starts with a pause / resume control for its autoplay', { skip }, async () => {
+  const block = await slider([row('a.jpg'), row('b.jpg'), row('c.jpg')]);
   const toggle = block.querySelector('button');
   assert.ok(toggle.classList.contains('gallery-slider-pause'), 'the first control in the carousel');
   assert.equal(toggle.type, 'button');
@@ -96,7 +96,7 @@ test('a looping slider starts with a pause / resume control for its autoplay', {
   assert.equal(state()[0], 'Resume slideshow');
 });
 
-test('a single-image slider has no autoplay and no pause control', { skip }, () => {
-  const block = slider([row('a.jpg')]);
+test('a single-image slider has no autoplay and no pause control', { skip }, async () => {
+  const block = await slider([row('a.jpg')]);
   assert.equal(block.querySelector('.gallery-slider-pause'), null);
 });

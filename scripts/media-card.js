@@ -32,8 +32,9 @@ export const DEFAULT_LABELS = {
   size1920: '1920px',
 };
 
-// placeholders sheet keys (camelCased by fetchPlaceholders) → label keys
-const PLACEHOLDER_KEYS = {
+// placeholders sheet keys (camelCased by fetchPlaceholders) → label keys (the English master
+// list reads them too, tools/i18n/ui-text.mjs)
+export const PLACEHOLDER_KEYS = {
   add: 'mediaAddToCart',
   download: 'mediaDownload',
   addSize: 'mediaAddSize',

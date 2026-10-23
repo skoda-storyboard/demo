@@ -13,11 +13,16 @@ const SOCIAL_LABELS = {
   whatsapp: 'WhatsApp',
 };
 
-// app-store badge → accessible label, keyed by icon token name
-const APP_BADGE_LABELS = {
-  appstore: 'Škoda Media Room on the App Store',
-  googleplay: 'Škoda Media Room on Google Play',
+// UI text (SKODA-1003): English names, read from the page locale's placeholders sheet as
+// `footer…` (footer.js passes them in); the networks' names above are brand names
+export const FOOTER_LABELS = {
+  nav: 'Footer',
+  appStore: 'Škoda Media Room on the App Store',
+  googlePlay: 'Škoda Media Room on Google Play',
 };
+
+// app-store badge → its FOOTER_LABELS key, keyed by icon token name
+const APP_BADGE_KEYS = { appstore: 'appStore', googleplay: 'googlePlay' };
 
 /**
  * Returns the icon token name (e.g. "facebook") for a link whose only content is
@@ -36,7 +41,7 @@ function iconNameOf(a) {
  * accessible labels + per-network hover classes.
  * @param {Element} section
  */
-function decorateSocial(section) {
+function decorateSocial(section, labels = FOOTER_LABELS) {
   const anchors = [...section.querySelectorAll('a')];
   const socialIcons = [];
   const appBadges = [];
@@ -47,9 +52,9 @@ function decorateSocial(section) {
       a.classList.add('social-link', `social-${name}`);
       a.setAttribute('aria-label', SOCIAL_LABELS[name]);
       socialIcons.push(a);
-    } else if (name && APP_BADGE_LABELS[name]) {
+    } else if (name && APP_BADGE_KEYS[name]) {
       a.classList.add('app-badge');
-      a.setAttribute('aria-label', APP_BADGE_LABELS[name]);
+      a.setAttribute('aria-label', labels[APP_BADGE_KEYS[name]]);
       appBadges.push(a);
     }
   });
@@ -81,10 +86,10 @@ function decorateSocial(section) {
  * wrapper and wraps it in a navigation landmark.
  * @param {Element} section
  */
-function decorateNav(section) {
+function decorateNav(section, labels = FOOTER_LABELS) {
   const list = section.querySelector('ul');
   const navEl = document.createElement('nav');
-  navEl.setAttribute('aria-label', 'Footer');
+  navEl.setAttribute('aria-label', labels.nav);
   if (list) navEl.append(list);
   section.textContent = '';
   section.append(navEl);
@@ -126,11 +131,42 @@ function decorateColumns(section) {
 }
 
 /**
+ * The © notice's year as the current one (the authored footers say "2026"; G-KT-10,
+ * SKODA-1003): the last 4-digit year after the ©, in the notice's own text, never an earlier or
+ * later one the author set on purpose for a range ("2019–2026" keeps its start).
+ * @param {Element} notice the copyright notice paragraph
+ * @param {number} year the current year
+ */
+export function updateCopyrightYear(notice, year) {
+  if (!Number.isInteger(year)) return;
+  const texts = [];
+  const collect = (node) => node.childNodes.forEach((child) => {
+    if (child.nodeType === 3) texts.push(child);
+    else if (child.nodeType === 1) collect(child);
+  });
+  collect(notice);
+  const seen = texts.findIndex((t) => t.textContent.includes('©'));
+  if (seen < 0) return;
+  // the last year in the text after the ©
+  for (let i = texts.length - 1; i >= seen; i -= 1) {
+    const value = texts[i].textContent;
+    const from = i === seen ? value.indexOf('©') : 0;
+    const match = [...value.slice(from).matchAll(/\b(19|20)\d{2}\b/g)].pop();
+    if (match) {
+      const at = from + match.index;
+      if (Number(match[0]) < year) texts[i].textContent = `${value.slice(0, at)}${year}${value.slice(at + 4)}`;
+      return;
+    }
+  }
+}
+
+/**
  * Marks the legal section parts (copyright text / notice / feed links) so CSS can style
  * and position them, and wraps the notice + feeds in a flex row.
  * @param {Element} section
+ * @param {number} [year] the current year, for the © notice
  */
-function decorateLegal(section) {
+function decorateLegal(section, year = new Date().getFullYear()) {
   const paras = [...section.querySelectorAll('p')];
   paras.forEach((p) => {
     const links = p.querySelectorAll('a');
@@ -139,6 +175,7 @@ function decorateLegal(section) {
       p.classList.add('feed-links');
     } else if (/©/.test(p.textContent)) {
       p.classList.add('copyright-notice');
+      updateCopyrightYear(p, year);
     } else if (p.textContent.trim()) {
       p.classList.add('copyright-text');
     }
@@ -188,16 +225,19 @@ export function openOutboundLinks(footer, origin) {
  * widget columns.
  * @param {Element} footer container whose children are the fragment sections
  * @param {string} [origin] the page origin, for the outbound-link rule
+ * @param {{labels?: typeof FOOTER_LABELS, year?: number}} [options] the locale's names (English
+ *   by default) and the current year (for the © notice)
  */
 export default function decorateFooterSections(
   footer,
   origin = typeof window !== 'undefined' ? window.location?.origin : '',
+  { labels = FOOTER_LABELS, year = new Date().getFullYear() } = {},
 ) {
   const [social, middle, legal] = footer.children;
 
   if (social) {
     social.classList.add('footer-social');
-    decorateSocial(social);
+    decorateSocial(social, labels);
   }
 
   if (middle?.querySelector('h2, h3, h4, h5, h6')) {
@@ -205,12 +245,12 @@ export default function decorateFooterSections(
     decorateColumns(middle);
   } else if (middle) {
     middle.classList.add('footer-nav');
-    decorateNav(middle);
+    decorateNav(middle, labels);
   }
 
   if (legal) {
     legal.classList.add('footer-legal');
-    decorateLegal(legal);
+    decorateLegal(legal, year);
   }
 
   if (origin) openOutboundLinks(footer, origin);

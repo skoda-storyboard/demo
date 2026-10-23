@@ -24,20 +24,21 @@
 
 import { readBlockConfig } from '../../scripts/aem.js';
 import { loadQueryIndex, defaultIndexUrl } from '../../scripts/query-index.js';
-import { fetchPlaceholders } from '../../scripts/placeholders.js';
+import { fetchPlaceholders, localize } from '../../scripts/placeholders.js';
+import { foldText } from '../../scripts/search-suggest.js';
 
-// UI strings resolve from the per-locale placeholders sheet (i18n architecture),
-// with English defaults so the block works before any sheet is authored.
-function buildStrings(ph) {
-  return {
-    // aria-live result summaries (%d / %q are substituted)
-    resultsCount: ph.searchResultsCount || '%d results for “%q”',
-    resultsOne: ph.searchResultsOne || '1 result for “%q”',
-    noResults: ph.searchNoResults || 'No results for “%q”.',
-    prompt: ph.searchPrompt || 'Type to search.',
-    loadError: ph.searchLoadError || 'Could not load the search index.',
-  };
-}
+// UI text (SKODA-1003): English defaults, read from the page locale's placeholders sheet as
+// `search…`. The aria-live result summaries substitute %d (count) and %q (query).
+export const SEARCH_LABELS = {
+  resultsCount: '%d results for “%q”',
+  resultsOne: '1 result for “%q”',
+  noResults: 'No results for “%q”.',
+  prompt: 'Type to search.',
+  loadError: 'Could not load the search index.',
+};
+
+/** The block's text in the page locale (English per missing key). */
+export const buildStrings = (ph = {}) => localize(SEARCH_LABELS, ph, 'search');
 
 let instanceSeq = 0; // per-page counter → unique element ids when >1 search on a page
 
@@ -69,10 +70,11 @@ function readConfig(block) {
  * @returns {Array<object>} matching rows (index order preserved)
  */
 export function matchRows(rows, query) {
-  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  // case- and accent-insensitive, as the header's suggestions (SKODA-1003)
+  const terms = foldText(query.trim()).split(/\s+/).filter(Boolean);
   if (!terms.length) return [];
   return rows.filter((row) => {
-    const hay = MATCH_FIELDS.map((f) => String(row[f] || '')).join(' ').toLowerCase();
+    const hay = foldText(MATCH_FIELDS.map((f) => String(row[f] || '')).join(' '));
     return terms.every((t) => hay.includes(t));
   });
 }

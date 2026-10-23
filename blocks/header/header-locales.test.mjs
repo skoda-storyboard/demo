@@ -134,7 +134,8 @@ test('Epiq story: only the declared translations, same tab, named by their langu
   const en = ul.querySelector('span');
   assert.deepEqual([en.getAttribute('aria-current'), en.getAttribute('lang')], ['true', 'en']);
   const langs = [...ul.querySelectorAll('a')].map((a) => [a.getAttribute('hreflang'), a.getAttribute('lang')]);
-  assert.deepEqual(langs, [['cs', 'cs'], ['de', 'de'], ['sk', 'sk'], ['sr', 'sr']]);
+  // Serbian's `lang` names its Latin script (`sr` alone reads as Cyrillic, SKODA-1003); hreflang stays
+  assert.deepEqual(langs, [['cs', 'cs'], ['de', 'de'], ['sk', 'sk'], ['sr', 'sr-Latn']]);
 });
 
 test('no declared translations: only the current language, never a locale-home fallback', () => {
@@ -297,4 +298,13 @@ test('locally (no EDS host): the page\'s own hreflang host makes its translation
   // without the self link, another host's translations are not trusted
   const noSelf = new Map([...pageHreflangs(doc)].filter(([c]) => c !== 'en'));
   assert.deepEqual(rows(buildLocaleList(localeEntries(p, doc.baseURI), 'en', doc, noSelf)).map((r) => r[0]), ['EN']);
+});
+
+test('buildLocaleList: the list and new-tab names from the labels passed (the page locale)', async () => {
+  const { buildLocaleList } = await import('./header-locales.js');
+  const { document: doc } = new JSDOM('<!DOCTYPE html><html><head><link rel="alternate" hreflang="cs" href="/cs/x"><link rel="alternate" hreflang="de" href="/de/x"></head><body></body></html>', { url: 'https://demo.example/cs/x' }).window;
+  const entries = [{ code: 'cs', href: '/cs/' }, { code: 'de', href: 'https://www.skoda-media.de/' }];
+  const ul = buildLocaleList(entries, 'cs', doc, new Map([['cs', '/cs/x'], ['de', '/de/x']]), { languages: 'Jazyk', newTab: '{name} (otevře se v nové kartě)' });
+  assert.equal(ul.getAttribute('aria-label'), 'Jazyk');
+  assert.equal(ul.querySelector('a[hreflang="de"]').getAttribute('aria-label'), 'DE – Deutsch (otevře se v nové kartě)');
 });

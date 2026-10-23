@@ -20,17 +20,20 @@
  * Media Room DE → skoda-media.de, as on the source). The list is marked
  * `data-link-policy="resolved"` so the site's link pass (scripts/links.js) leaves it alone.
  *
- * i18n: the list's name lives in LABELS (English, the header's other control text is too;
- * per-locale placeholders are SKODA-1003). The language names are endonyms, locale-neutral.
+ * i18n: the list's names are LOCALE_LIST_LABELS, the header passes the page locale's (SKODA-1003).
+ * The language names are endonyms, locale-neutral.
  */
 
 import { LIVE_ORIGIN } from '../../scripts/links.js';
+import htmlLang from '../../scripts/locale-tags.js';
 
 const LIVE_HOST = new URL(LIVE_ORIGIN).host;
 
-const LABELS = {
-  list: 'Language',
-  newTab: (name) => `${name} (opens in a new tab)`,
+// the list's name and a new-tab link's name; the header passes the page locale's
+// (`headerLanguages`, `headerNewTab`, SKODA-1003)
+export const LOCALE_LIST_LABELS = {
+  languages: 'Language',
+  newTab: '{name} (opens in a new tab)',
 };
 
 /** The site's locales: code (URL segment), the visible label, the language's own name. */
@@ -188,16 +191,23 @@ function isOtherSite(href, base) {
  * @param {string} current the page's locale, from currentLocale()
  * @param {Document} doc the document to build in
  * @param {Map<string, string>} [translations] the declared translations, from pageHreflangs()
+ * @param {typeof LOCALE_LIST_LABELS} [labels] the page locale's names (English by default)
  * @returns {HTMLUListElement|null} null when there are no entries
  */
-export function buildLocaleList(entries, current, doc, translations = new Map()) {
+export function buildLocaleList(
+  entries,
+  current,
+  doc,
+  translations = new Map(),
+  labels = LOCALE_LIST_LABELS,
+) {
   if (!entries.length) return null;
   const base = doc.baseURI;
   // the page's own hreflang link names the site's host (absolute on its live host)
   const ownHost = translations.has(current) ? hostOf(translations.get(current), base) : '';
   const ul = doc.createElement('ul');
   ul.className = 'nav-locales-list';
-  ul.setAttribute('aria-label', LABELS.list);
+  ul.setAttribute('aria-label', labels.languages);
   ul.dataset.linkPolicy = 'resolved';
   entries.forEach(({ code, href }) => {
     const { label, name } = byCode.get(code);
@@ -218,12 +228,12 @@ export function buildLocaleList(entries, current, doc, translations = new Map())
       if (elsewhere) {
         item.setAttribute('target', '_blank');
         item.setAttribute('rel', 'noopener');
-        item.setAttribute('aria-label', LABELS.newTab(named));
+        item.setAttribute('aria-label', labels.newTab.replace('{name}', named));
       } else {
         item.setAttribute('aria-label', named);
       }
     }
-    item.setAttribute('lang', code);
+    item.setAttribute('lang', htmlLang(code));
     item.textContent = label;
     const li = doc.createElement('li');
     li.append(item);

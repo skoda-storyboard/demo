@@ -1,5 +1,8 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
 import { buildLightbox, pageHeading } from '../../scripts/lightbox.js';
+import {
+  fetchPlaceholders, localize, fillText, pluralText,
+} from '../../scripts/placeholders.js';
 
 /*
  * Gallery block + accessible lightbox — SKODA-203.
@@ -17,31 +20,68 @@ import { buildLightbox, pageHeading } from '../../scripts/lightbox.js';
  * sb-gallery split). A11y is a hard gate: role=dialog, focus-trap, Escape,
  * arrow-key nav, aria-live counter, focus-return to the invoking thumbnail.
  *
- * i18n: all user-facing control text lives in LABELS below — the single
- * translation point (SKODA-1003 can wire this to a placeholders lookup later).
+ * i18n: all user-facing control text lives in GALLERY_LABELS below, read per locale from the
+ * placeholders sheet (SKODA-1003).
  * Captions come from authored content, so they are locale-safe already.
  */
 
-const LABELS = {
+// UI text (SKODA-1003): English templates, read from the page locale's placeholders sheet as
+// `gallery…` ({n}, {total}, {alt} filled in). A counted text has its English singular as
+// `…One`; a sheet may add the locale's other forms (`…Few`, `…Many`, pluralText).
+export const GALLERY_LABELS = {
   open: 'Open image',
+  openNumbered: 'Open image {n}',
+  openNamed: 'Open image {n}: {alt}',
   prev: 'Previous image',
   next: 'Next image',
   // heading above the thumbnail rail
   imagesHeading: 'Images',
-  // slider variant (SKODA-819): region name fallback, per-slide + per-dot names
+  // slider variant (SKODA-819): region name fallback, its role, per-slide + per-dot names
   slider: 'Image slider',
-  slideOf: (n, total) => `${n} of ${total}`,
-  goTo: (n) => `Go to image ${n}`,
+  carousel: 'carousel',
+  slide: 'slide',
+  slideOf: '{n} of {total}',
+  goTo: 'Go to image {n}',
   // the autoplay control (WCAG 2.2.2, SKODA-703)
   pause: 'Pause slideshow',
   resume: 'Resume slideshow',
-  // preview variant (SKODA-223): per-thumb name + the "+N" pill
-  openNamed: (n, alt) => (alt ? `${LABELS.open} ${n}: ${alt}` : `${LABELS.open} ${n}`),
-  more: (n) => `+${n}`,
-  moreLabel: (n) => `Show ${n} more ${n === 1 ? 'image' : 'images'}`,
+  // preview variant (SKODA-223): the "+N" pill and its name
+  more: '+{n}',
+  moreLabel: 'Show {n} more images',
+  moreLabelOne: 'Show {n} more image',
   // story variant (SKODA-216): the lead button name
-  openGallery: (total) => `Open gallery, ${total} ${total === 1 ? 'image' : 'images'}`,
+  openGallery: 'Open gallery, {n} images',
+  openGalleryOne: 'Open gallery, {n} image',
 };
+
+/**
+ * The block's control text in the page locale (English per missing key), as the label
+ * functions the builders call.
+ * @param {Record<string,string>} [ph] from fetchPlaceholders()
+ */
+export function galleryText(ph = {}) {
+  const t = localize(GALLERY_LABELS, ph, 'gallery');
+  return {
+    open: (n) => fillText(t.openNumbered, { n }),
+    openNamed: (n, alt) => fillText(alt ? t.openNamed : t.openNumbered, { n, alt }),
+    prev: t.prev,
+    next: t.next,
+    imagesHeading: t.imagesHeading,
+    slider: t.slider,
+    carousel: t.carousel,
+    slide: t.slide,
+    slideOf: (n, total) => fillText(t.slideOf, { n, total }),
+    goTo: (n) => fillText(t.goTo, { n }),
+    pause: t.pause,
+    resume: t.resume,
+    more: (n) => fillText(t.more, { n }),
+    moreLabel: (n) => pluralText(t, 'moreLabel', n),
+    openGallery: (total) => pluralText(t, 'openGallery', total),
+  };
+}
+
+// the English text, the builders' default
+const ENGLISH = galleryText();
 
 /**
  * Build an inline SVG icon (Trusted-Types safe: namespaced elements, no innerHTML).
@@ -113,7 +153,7 @@ function readItems(block) {
  * @param {Element} block
  * @returns {{items: Array, main: Element, mainHeading: Element}}
  */
-function buildGallery(block) {
+function buildGallery(block, text = ENGLISH) {
   // read authored rows into items first
   const items = readItems(block);
 
@@ -134,7 +174,7 @@ function buildGallery(block) {
   const main = document.createElement('button');
   main.type = 'button';
   main.className = 'gallery-main';
-  main.setAttribute('aria-label', `${LABELS.open} 1`);
+  main.setAttribute('aria-label', text.open(1));
   const mainPic = createOptimizedPicture(items[0].src, items[0].alt, true, [{ width: '2000' }]);
   main.append(mainPic);
   mainCol.append(mainHeading, main);
@@ -145,7 +185,7 @@ function buildGallery(block) {
 
   const thumbsHeading = document.createElement('h3');
   thumbsHeading.className = 'gallery-thumbs-heading';
-  thumbsHeading.textContent = LABELS.imagesHeading;
+  thumbsHeading.textContent = text.imagesHeading;
 
   const thumbs = document.createElement('ul');
   thumbs.className = 'gallery-thumbs';
@@ -157,7 +197,7 @@ function buildGallery(block) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'gallery-thumb';
-    btn.setAttribute('aria-label', `${LABELS.open} ${i + 1}`);
+    btn.setAttribute('aria-label', text.open(i + 1));
     btn.dataset.index = String(i);
     btn.append(createOptimizedPicture(item.src, item.alt, false, [{ width: '750' }]));
     li.append(btn);
@@ -277,13 +317,13 @@ function sliderButton(className, label, d) {
   return btn;
 }
 
-const sliderArrow = (dir) => sliderButton(
+const sliderArrow = (dir, text = ENGLISH) => sliderButton(
   `gallery-slider-${dir}`,
-  dir === 'prev' ? LABELS.prev : LABELS.next,
+  dir === 'prev' ? text.prev : text.next,
   SLIDER_ARROW_PATH,
 );
 
-function buildSlider(block) {
+function buildSlider(block, text = ENGLISH) {
   const items = readItems(block);
   block.textContent = '';
   if (!items.length) return;
@@ -293,8 +333,8 @@ function buildSlider(block) {
   // WAI carousel pattern: a named group (not a region landmark — a story can hold
   // several sliders sharing one title, which would give duplicate landmarks)
   block.setAttribute('role', 'group');
-  block.setAttribute('aria-roledescription', 'carousel');
-  block.setAttribute('aria-label', items[0].alt || LABELS.slider);
+  block.setAttribute('aria-roledescription', text.carousel);
+  block.setAttribute('aria-label', items[0].alt || text.slider);
 
   const viewport = document.createElement('div');
   viewport.className = 'gallery-slider-viewport';
@@ -308,8 +348,8 @@ function buildSlider(block) {
     const slide = document.createElement('div');
     slide.className = 'gallery-slide';
     slide.setAttribute('role', 'group');
-    slide.setAttribute('aria-roledescription', 'slide');
-    slide.setAttribute('aria-label', LABELS.slideOf(i + 1, count));
+    slide.setAttribute('aria-roledescription', text.slide);
+    slide.setAttribute('aria-label', text.slideOf(i + 1, count));
     const pic = createOptimizedPicture(item.src, item.alt, false, [
       { media: '(min-width: 768px)', width: '1600' },
       { width: '1000' },
@@ -347,8 +387,8 @@ function buildSlider(block) {
   block.append(viewport);
   if (!looped) return; // a single image: no controls, no autoplay
 
-  const prev = sliderArrow('prev');
-  const next = sliderArrow('next');
+  const prev = sliderArrow('prev', text);
+  const next = sliderArrow('next', text);
   viewport.append(prev, next);
 
   const dotsNav = document.createElement('div');
@@ -357,7 +397,7 @@ function buildSlider(block) {
     const dot = document.createElement('button');
     dot.type = 'button';
     dot.className = 'gallery-slider-dot';
-    dot.setAttribute('aria-label', LABELS.goTo(i + 1));
+    dot.setAttribute('aria-label', text.goTo(i + 1));
     dotsNav.append(dot);
     return dot;
   });
@@ -403,12 +443,12 @@ function buildSlider(block) {
   let toggle = null;
   const showToggle = () => {
     if (!toggle) return;
-    toggle.setAttribute('aria-label', stopped ? LABELS.resume : LABELS.pause);
+    toggle.setAttribute('aria-label', stopped ? text.resume : text.pause);
     toggle.querySelector('path').setAttribute('d', stopped ? SLIDER_PLAY_PATH : SLIDER_PAUSE_PATH);
   };
   const stop = () => { stopped = true; window.clearTimeout(timer); showToggle(); };
   if (!REDUCED_MOTION) {
-    toggle = sliderButton('gallery-slider-pause', LABELS.pause, SLIDER_PAUSE_PATH);
+    toggle = sliderButton('gallery-slider-pause', text.pause, SLIDER_PAUSE_PATH);
     viewport.prepend(toggle);
     showToggle();
     toggle.addEventListener('click', () => {
@@ -526,7 +566,7 @@ export function previewPlan(count, max = PREVIEW_MAX) {
   return { shown, more, moreIndex: more ? shown : -1 };
 }
 
-function buildPreview(block) {
+function buildPreview(block, text = ENGLISH) {
   const items = readItems(block);
   block.textContent = '';
   if (!items.length) return;
@@ -540,7 +580,7 @@ function buildPreview(block) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'gallery-preview-thumb';
-    btn.setAttribute('aria-label', LABELS.openNamed(i + 1, item.alt));
+    btn.setAttribute('aria-label', text.openNamed(i + 1, item.alt));
     btn.append(createOptimizedPicture(item.src, item.alt, false, [{ width: '750' }]));
     li.append(btn);
     grid.append(li);
@@ -554,16 +594,16 @@ function buildPreview(block) {
     const pill = document.createElement('button');
     pill.type = 'button';
     pill.className = 'gallery-preview-more';
-    pill.setAttribute('aria-label', LABELS.moreLabel(more));
-    pill.textContent = LABELS.more(more);
+    pill.setAttribute('aria-label', text.moreLabel(more));
+    pill.textContent = text.more(more);
     grid.lastElementChild.append(pill);
     triggers.push([pill, moreIndex]);
   } else if (outside > 0 && block.dataset.moreHref) {
     const pill = document.createElement('a');
     pill.className = 'gallery-preview-more';
     pill.href = block.dataset.moreHref;
-    pill.setAttribute('aria-label', LABELS.moreLabel(outside));
-    pill.textContent = LABELS.more(outside);
+    pill.setAttribute('aria-label', text.moreLabel(outside));
+    pill.textContent = text.more(outside);
     grid.lastElementChild.append(pill);
   }
   block.append(grid);
@@ -608,7 +648,7 @@ function storyPicture(item) {
   return pic;
 }
 
-function buildStory(block) {
+function buildStory(block, text = ENGLISH) {
   const items = readItems(block);
   block.textContent = '';
   if (!items.length) return;
@@ -618,7 +658,7 @@ function buildStory(block) {
   const lead = document.createElement('button');
   lead.type = 'button';
   lead.className = 'gallery-story-lead';
-  lead.setAttribute('aria-label', LABELS.openGallery(items.length));
+  lead.setAttribute('aria-label', text.openGallery(items.length));
   // count badge (source .sb-gallery-show-more): icon + total, decorative
   const badge = document.createElement('span');
   badge.className = 'gallery-story-count';
@@ -640,7 +680,7 @@ function buildStory(block) {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'gallery-story-thumb';
-      btn.setAttribute('aria-label', LABELS.openNamed(index + 1, items[index].alt));
+      btn.setAttribute('aria-label', text.openNamed(index + 1, items[index].alt));
       btn.append(createOptimizedPicture(items[index].src, items[index].alt, false, [{ width: '750' }]));
       li.append(btn);
       list.append(li);
@@ -662,21 +702,24 @@ function buildStory(block) {
 /**
  * @param {Element} block the gallery block element
  */
-export default function decorate(block) {
+export default async function decorate(block) {
+  // the control text in the page locale (SKODA-1003); the sheet is memoized and starts loading
+  // with the page (scripts.js), so a gallery rarely waits for it
+  const text = galleryText(await fetchPlaceholders());
   if (block.classList.contains('story')) {
-    buildStory(block);
+    buildStory(block, text);
     return;
   }
   if (block.classList.contains('slider')) {
-    buildSlider(block);
+    buildSlider(block, text);
     return;
   }
   if (block.classList.contains('preview')) {
-    buildPreview(block);
+    buildPreview(block, text);
     return;
   }
 
-  const { items, main, mainHeading } = buildGallery(block);
+  const { items, main, mainHeading } = buildGallery(block, text);
   if (!items.length) return;
 
   const lightbox = buildLightbox(block, items);
@@ -697,7 +740,7 @@ export default function decorate(block) {
       mainImg.addEventListener('load', done, { once: true });
       mainImg.addEventListener('error', done, { once: true });
     }
-    main.setAttribute('aria-label', `${LABELS.open} ${i + 1}`);
+    main.setAttribute('aria-label', text.open(i + 1));
     // update the heading above the main image to the active image's title
     mainHeading.textContent = items[i].alt;
     items.forEach((it, j) => it.thumbButton.setAttribute('aria-current', j === i ? 'true' : 'false'));

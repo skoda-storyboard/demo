@@ -24,6 +24,7 @@
 import {
   decorateCardCells, optimizeImages, wireCardLink,
 } from '../../scripts/card-teaser.js';
+import { applyLocalized, fillText } from '../../scripts/placeholders.js';
 
 // A pointer must travel this far (px) before we treat the gesture as a drag and
 // suppress the post-drag click (so a small wobble on a tap still navigates).
@@ -224,21 +225,31 @@ function makeArrow(dir, label) {
   return btn;
 }
 
+// UI text (SKODA-1003): English names, read from the page locale's placeholders sheet as
+// `carousel…`. All of them are names (no visible words), so they are applied once the memoized
+// sheet resolves (applyLocalized) and the block stays synchronous.
+export const CAROUSEL_LABELS = {
+  // a standalone authored carousel's region name (story-rail passes its heading)
+  region: 'Content carousel',
+  carousel: 'carousel',
+  prev: 'Previous',
+  next: 'Next',
+  goTo: 'Go to slide {n}',
+};
+
 export default function decorate(block) {
   const hasDots = block.classList.contains('dots');
   const track = buildCards(block);
 
   // region semantics: name the rail from the label story-rail passes (or a
   // generic fallback for a standalone authored carousel).
-  const label = block.getAttribute('aria-label') || 'Content carousel';
+  const ownLabel = block.getAttribute('aria-label');
   block.setAttribute('role', 'region');
-  block.setAttribute('aria-roledescription', 'carousel');
-  block.setAttribute('aria-label', label);
 
   const viewport = document.createElement('div');
   viewport.className = 'carousel-viewport';
-  const prev = makeArrow('prev', 'Previous');
-  const next = makeArrow('next', 'Next');
+  const prev = makeArrow('prev', CAROUSEL_LABELS.prev);
+  const next = makeArrow('next', CAROUSEL_LABELS.next);
   viewport.append(prev, track, next);
 
   const dotsNav = document.createElement('div');
@@ -247,6 +258,16 @@ export default function decorate(block) {
 
   block.replaceChildren(viewport);
   if (hasDots) block.append(dotsNav);
+
+  let labels = CAROUSEL_LABELS;
+  applyLocalized(CAROUSEL_LABELS, 'carousel', (text) => {
+    labels = text;
+    block.setAttribute('aria-roledescription', text.carousel);
+    block.setAttribute('aria-label', ownLabel || text.region);
+    prev.setAttribute('aria-label', text.prev);
+    next.setAttribute('aria-label', text.next);
+    [...dotsNav.children].forEach((dot, i) => dot.setAttribute('aria-label', fillText(text.goTo, { n: i + 1 })));
+  });
 
   // ---- arrow / dot state (rAF-gated; recomputed on scroll + resize) ----------
   let rafId = 0;
@@ -272,7 +293,7 @@ export default function decorate(block) {
           const dot = document.createElement('button');
           dot.type = 'button';
           dot.className = 'carousel-dot';
-          dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+          dot.setAttribute('aria-label', fillText(labels.goTo, { n: i + 1 }));
           // last dot targets the reachable maximum so it can actually select;
           // interior dots page by clientWidth.
           dot.addEventListener('click', () => track.scrollTo({

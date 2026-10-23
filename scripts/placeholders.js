@@ -6,7 +6,12 @@
  *
  * Keys are normalized to camelCase (`Load More` → `loadMore`). A missing sheet or a
  * missing key degrades silently to {} / undefined, so callers keep English defaults
- * (`ph.loadMore || 'Load more'`) and the block still works before any sheet exists.
+ * and the block still works before any sheet exists.
+ *
+ * A module's UI text (SKODA-1003): an object of English defaults, its keys read from the sheet
+ * under the module's prefix (`localize(LABELS, ph, 'gallery')` reads `galleryPrevious` for
+ * `previous`). Those objects are the English master list: tools/i18n/ui-text.mjs collects them,
+ * writes the English sheet and checks every locale's sheet for missing keys.
  */
 
 import { currentLocale } from './query-index.js';
@@ -51,6 +56,135 @@ export async function fetchPlaceholders(prefix = `/${currentLocale()}`) {
   const map = await promise;
   cache.set(prefix, map); // replace the in-flight promise with the resolved map
   return map;
+}
+
+/**
+ * Replace `{name}` tokens; unknown tokens stay as they are. The same rule as media-cart-limits.js
+ * `format`, which must import nothing (its eager-path test), so it keeps its own copy.
+ */
+export const fillText = (text, values = {}) => String(text)
+  .replace(/\{(\w+)\}/g, (m, name) => (Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : m));
+
+/**
+ * The sheet key of a module label: the prefix and the key in camelCase (`gallery` + `previous` →
+ * `galleryPrevious`), or the key itself without a prefix.
+ * @param {string} prefix the module's prefix ('' for shared keys such as `loadMore`)
+ * @param {string} key the label key
+ */
+export function sheetKey(prefix, key) {
+  return prefix ? `${prefix}${key[0].toUpperCase()}${key.slice(1)}` : key;
+}
+
+/**
+ * A module's labels in the page's locale: each English default replaced by its sheet text
+ * (`sheetKey(prefix, key)`) when that is a non-empty string. The defaults are not changed.
+ * @template {Record<string,string>} T
+ * @param {T} defaults the module's English labels
+ * @param {Record<string,string>} [ph] from fetchPlaceholders()
+ * @param {string} [prefix] the module's sheet-key prefix
+ * @returns {T}
+ */
+export function localize(defaults, ph = {}, prefix = '') {
+  const own = (key) => {
+    const value = ph ? ph[sheetKey(prefix, key)] : undefined;
+    return typeof value === 'string' && value.trim() ? value : '';
+  };
+  const out = Object.fromEntries(Object.entries(defaults).map(([key, text]) => {
+    if (own(key)) return [key, own(key)];
+    // a plural form (`moreLabelOne`) the sheet lacks while it translates the general text:
+    // empty, so pluralText uses the translation, never the English form
+    const base = key.replace(/(Zero|One|Two|Few|Many)$/, '');
+    if (base !== key && Object.prototype.hasOwnProperty.call(defaults, base) && own(base)) return [key, ''];
+    return [key, text];
+  }));
+  // the locale's other plural forms of a counted text (English has `…One`; Czech adds `…Few`)
+  Object.keys(defaults).filter((key) => key.endsWith('One')).forEach((one) => {
+    const base = one.slice(0, -3);
+    ['Zero', 'Two', 'Few', 'Many'].forEach((form) => {
+      if (own(`${base}${form}`)) out[`${base}${form}`] = own(`${base}${form}`);
+    });
+  });
+  return out;
+}
+
+/**
+ * For a synchronous builder whose text is only names and tooltips (no visible words): apply
+ * the English labels now, then the page locale's when the memoized sheet resolves.
+ * @template {Record<string,string>} T
+ * @param {T} defaults the module's English labels
+ * @param {string} prefix the module's sheet-key prefix
+ * @param {(labels: T) => void} apply sets the labels on the module's elements
+ * @returns {Promise<void>} settles once the locale's labels are applied (or the sheet failed)
+ */
+export function applyLocalized(defaults, prefix, apply) {
+  apply(localize(defaults, {}, prefix));
+  return fetchPlaceholders()
+    .then((ph) => apply(localize(defaults, ph, prefix)))
+    .catch(() => { /* the English labels stay */ });
+}
+
+/**
+ * A date in a sheet pattern (SKODA-1003: the date format is per locale, `dateFormat`): `{d}` /
+ * `{m}` the day / month, `{dd}` / `{mm}` zero-padded, `{yyyy}` the year, in UTC (the index's ISO
+ * dates are days). '' for an unparseable date.
+ * @param {string|number|Date} value an ISO date or a timestamp
+ * @param {string} pattern e.g. `{d}. {m}. {yyyy}`
+ */
+export function formatDate(value, pattern) {
+  const t = value instanceof Date ? value.getTime() : Date.parse(value);
+  if (!Number.isFinite(t)) return '';
+  const d = new Date(t);
+  const pad = (n) => String(n).padStart(2, '0');
+  return fillText(pattern, {
+    d: d.getUTCDate(),
+    dd: pad(d.getUTCDate()),
+    m: d.getUTCMonth() + 1,
+    mm: pad(d.getUTCMonth() + 1),
+    yyyy: d.getUTCFullYear(),
+  });
+}
+
+const PLURAL_SUFFIX = {
+  zero: 'Zero', one: 'One', two: 'Two', few: 'Few', many: 'Many',
+};
+
+/**
+ * A counted text in the locale's plural form (Czech, Slovak and Serbian have three): the
+ * label `{base}{One|Few|Many|…}` for the count's CLDR category when the labels have it, else
+ * `{base}`, with `{n}` and the other values filled in.
+ * @param {Record<string,string>} labels localized labels (`moreLabel`, `moreLabelOne`, …)
+ * @param {string} base the label key for the general form
+ * @param {number} n the count
+ * @param {Record<string,string|number>} [values] other tokens
+ * @param {string} [locale] a BCP 47 code (default: the page's)
+ */
+export function pluralText(labels, base, n, values = {}, locale = currentLocale()) {
+  let category = 'other';
+  try {
+    category = new Intl.PluralRules(locale).select(n);
+  } catch (e) {
+    // an unknown locale: the general form
+  }
+  const own = PLURAL_SUFFIX[category] && labels[`${base}${PLURAL_SUFFIX[category]}`];
+  return fillText(own || labels[base], { ...values, n });
+}
+
+/**
+ * The placeholders map if it has already loaded (it starts with the page), else {}: for a
+ * synchronous builder whose text is a fallback under authored text, or shown later (an error
+ * message). Never waits and never fetches.
+ * @param {string} [prefix] e.g. `/cs` (default: current locale)
+ * @returns {Record<string,string>}
+ */
+export function placeholdersNow(prefix) {
+  let key = prefix;
+  if (key === undefined) {
+    // no page (a test, a worker): nothing has loaded
+    if (typeof window === 'undefined' || !window.location) return {};
+    key = `/${currentLocale()}`;
+  }
+  const map = cache.get(key);
+  return map && typeof map.then !== 'function' ? map : {};
 }
 
 /** Test/hot-reload helper: clear the memo. */
