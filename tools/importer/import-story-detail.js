@@ -219,7 +219,7 @@ export default {
     dropEmptySections(main);
 
     WebImporter.rules.transformBackgroundImages(main, document);
-    normalizeImages(main, document);
+    normalizeImages('afterTransform', main, payload);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     const rawPath = new URL(params.originalURL).pathname

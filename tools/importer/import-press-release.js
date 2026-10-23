@@ -166,7 +166,7 @@ export default {
     // tags + facets). The built-in only produces a thinner Title/Description/Image
     // duplicate, so calling it here would append a second, competing Metadata table.
     WebImporter.rules.transformBackgroundImages(main, document);
-    normalizeImages(main, document);
+    normalizeImages('afterTransform', main, payload);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     // 6. Sanitized output path (map root '/' → '/index' to avoid the cwd crash).

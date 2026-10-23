@@ -355,6 +355,10 @@ var CustomImportScript = (() => {
       marker.replaceWith(withCaption(imageNode, caption, document2));
     });
   }
+  function transform3(hookName, element, payload) {
+    if (hookName !== "afterTransform") return;
+    normalizeImages(element, (payload == null ? void 0 : payload.document) || element.ownerDocument);
+  }
 
   // import-newsletter-card.js
   var NEWSLETTER_BLOCK2 = "Newsletter Stub (card)";
@@ -385,7 +389,7 @@ var CustomImportScript = (() => {
       if (!card) throw new Error(`no sidebar newsletter widget on ${params.originalURL}`);
       const main = document2.createElement("div");
       main.append(card);
-      normalizeImages(main, document2);
+      transform3("afterTransform", main, payload);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       return [{
         element: main,

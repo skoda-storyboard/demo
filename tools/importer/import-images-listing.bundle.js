@@ -42,8 +42,6 @@ var CustomImportScript = (() => {
   });
 
   // parsers/listing.js
-  var FACETS_DEFAULT = "model, derivative, years, company, happening, technology";
-  // tools/importer/parsers/listing.js
   var FACETS_NEWS = "model, derivative, concept, bodywork, years, company, happening, history, sponsorship, vip, view, technology, environment";
   var FACETS_MEDIA = FACETS_NEWS;
   var VARIANTS = {
@@ -1066,6 +1064,10 @@ var CustomImportScript = (() => {
       marker.replaceWith(withCaption(imageNode, caption, document2));
     });
   }
+  function transform6(hookName, element, payload) {
+    if (hookName !== "afterTransform") return;
+    normalizeImages(element, (payload == null ? void 0 : payload.document) || element.ownerDocument);
+  }
 
   // import-images-listing.js
   var parsers = {
@@ -1145,7 +1147,7 @@ var CustomImportScript = (() => {
       });
       executeTransformers("afterTransform", main, payload);
       WebImporter.rules.transformBackgroundImages(main, document2);
-      normalizeImages(main, document2);
+      transform6("afterTransform", main, payload);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const rawPath = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
       const path = WebImporter.FileUtils.sanitizePath(rawPath === "" ? "/index" : rawPath);

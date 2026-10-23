@@ -243,7 +243,7 @@ export default {
     metadata('afterTransform', main, payload);
     links('afterTransform', main, payload);
     WebImporter.rules.transformBackgroundImages(main, document);
-    normalizeImages(main, document);
+    normalizeImages('afterTransform', main, payload);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     const pathname = new URL(params.originalURL).pathname.replace(/\/$/, '').replace(/\.html?$/, '');

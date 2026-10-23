@@ -130,7 +130,7 @@ export default {
     executeTransformers('afterTransform', main, payload);
 
     WebImporter.rules.transformBackgroundImages(main, document);
-    normalizeImages(main, document);
+    normalizeImages('afterTransform', main, payload);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     const rawPath = new URL(params.originalURL).pathname

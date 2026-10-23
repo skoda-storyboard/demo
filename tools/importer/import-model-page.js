@@ -206,7 +206,7 @@ export default {
     // Shared skoda-metadata.js already emitted the canonical Metadata block; do NOT
     // call WebImporter.rules.createMetadata (it would append a thinner duplicate).
     WebImporter.rules.transformBackgroundImages(main, document);
-    normalizeImages(main, document);
+    normalizeImages('afterTransform', main, payload);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     const rawPath = new URL(params.originalURL).pathname
