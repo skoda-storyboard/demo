@@ -303,6 +303,7 @@
 
 | Topic | Source doc |
 |---|---|
+| **Latest requirements review (M2, 2026-10-15 → 10-22)**: readiness, the non-EN locales, integrations and untouched areas, scope and capacity. Start here for M2 scope; it supersedes older figures where they differ | **`reviews/SKODA-M2-READINESS-REVIEW-2026-10-15.md`**, **`reviews/SKODA-M2-LOCALE-ADVERSARIAL-REVIEW-2026-10-20.md`**, **`reviews/SKODA-M2-INTEGRATION-GAP-REVIEW-2026-10-21.md`**, **`planning/SKODA-M2-SCOPE-AND-CAPACITY-2026-10-22.md`**; current state in `planning/SKODA-DECISION-REGISTER.md` + `tickets/OVERVIEW.md` |
 | Site shape, backend, scale, first risks | `analysis/SKODA-STORYBOARD-DISCOVERY.md` |
 | Search feasibility, EN scope, template gaps | `analysis/SKODA-STORYBOARD-DRILLDOWN.md` |
 | Full block audit + variants + matrix + responsive | `analysis/SKODA-EN-BLOCK-INVENTORY.md` (+ `analysis/SKODA-EN-BLOCK-DATASET.csv`/`-AGGREGATE.json`) |
