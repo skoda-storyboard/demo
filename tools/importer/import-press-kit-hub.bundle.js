@@ -1025,6 +1025,10 @@ var CustomImportScript = (() => {
       marker.replaceWith(withCaption(imageNode, caption, document));
     });
   }
+  function transform3(hookName, element, payload) {
+    if (hookName !== "afterTransform") return;
+    normalizeImages(element, (payload == null ? void 0 : payload.document) || element.ownerDocument);
+  }
 
   // import-press-kit-hub.js
   var FACETS2 = [
@@ -1217,7 +1221,7 @@ var CustomImportScript = (() => {
       transform("afterTransform", main, payload);
       transform2("afterTransform", main, payload);
       WebImporter.rules.transformBackgroundImages(main, document);
-      normalizeImages(main, document);
+      transform3("afterTransform", main, payload);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       const pathname = new URL(params.originalURL).pathname.replace(/\/$/, "").replace(/\.html?$/, "");
       return [{

@@ -130,7 +130,7 @@ export default {
       holder.append(group.el);
       media(group.el, payload);
       main.replaceChildren(holder);
-      normalizeImages(main, document);
+      normalizeImages('afterTransform', main, payload);
       WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
       links('afterTransform', main, payload);
       checkImageLimit(main, `Press-kit Images fragment "${group.slug}"`);
@@ -185,7 +185,7 @@ export default {
     metadata('afterTransform', main, { ...payload, template });
 
     WebImporter.rules.transformBackgroundImages(main, document);
-    normalizeImages(main, document);
+    normalizeImages('afterTransform', main, payload);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
     links('afterTransform', main, payload);
 

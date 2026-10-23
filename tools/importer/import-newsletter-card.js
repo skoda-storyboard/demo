@@ -53,7 +53,7 @@ export default {
 
     const main = document.createElement('div');
     main.append(card);
-    normalizeImages(main, document);
+    normalizeImages('afterTransform', main, payload);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);
 
     return [{
