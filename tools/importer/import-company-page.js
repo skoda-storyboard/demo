@@ -2,19 +2,25 @@
 /* global WebImporter */
 
 /**
- * Import orchestrator: Škoda company / utility page (template-media-room-page).
- * e.g. /en/contacts/, /en/board-of-management/, /en/annual-reports/.
+ * Import orchestrator: Škoda company / utility page (template-media-room-page, and the
+ * company logo's template-custom-full-width): /en/contacts/, /en/board-of-management/,
+ * /en/company-logo/, /en/skoda-media-services-application/.
  *
  * Hero banner + the SiteOrigin body, one `page-body` section per row (skoda-page-rows, the
  * SKODA-813 shell). The people pages' card rows become blocks (skoda-company-people,
  * SKODA-810a): `Contact Directory` (/en/contacts/) and `Exec Bio` with its "show more" photo
- * set (/en/board-of-management/); their spacer widgets become `Spacer` sections. Any other
- * row stays default content. Metadata template=page. Content-driven detection only.
+ * set (/en/board-of-management/); their spacer widgets become `Spacer` sections. The asset
+ * layouts (skoda-company-assets, SKODA-810b): logo tiles → `brand-assets` sections with
+ * `Brand Asset` blocks (/en/company-logo/), an app-store body → one `App Promo` block
+ * (/en/skoda-media-services-application/). Any other row stays default content. Metadata
+ * template=page. Content-driven detection only.
  */
 
 import heroBannerParser from './parsers/hero-banner.js';
+import { markBoldHeadings, restoreBoldHeadings } from './parsers/story-flatten.js';
 import pageRowsTransformer from './transformers/skoda-page-rows.js';
 import companyPeopleTransformer from './transformers/skoda-company-people.js';
+import companyAssetsTransformer from './transformers/skoda-company-assets.js';
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
@@ -28,8 +34,13 @@ const parsers = {
 const PAGE_TEMPLATE = {
   name: 'company-page',
   description:
-    'Škoda company/utility page (template-media-room-page). Hero banner + the SiteOrigin body as page-body rows; person-card rows → Contact Directory / Exec Bio, spacer widgets → Spacer (SKODA-810a). Metadata template=page. Content-driven detection only.',
-  urls: ['https://www.skoda-storyboard.com/en/contacts/', 'https://www.skoda-storyboard.com/en/board-of-management/'],
+    'Škoda company/utility page (template-media-room-page, custom-full-width). Hero banner + the SiteOrigin body as page-body rows; person-card rows → Contact Directory / Exec Bio, spacer widgets → Spacer (SKODA-810a); logo tiles → Brand Asset, an app-store body → App Promo (SKODA-810b). Metadata template=page. Content-driven detection only.',
+  urls: [
+    'https://www.skoda-storyboard.com/en/contacts/',
+    'https://www.skoda-storyboard.com/en/board-of-management/',
+    'https://www.skoda-storyboard.com/en/company-logo/',
+    'https://www.skoda-storyboard.com/en/skoda-media-services-application/',
+  ],
   metadata: { template: 'page' },
   blocks: [
     { name: 'hero-banner', instances: ['div.hero'] },
@@ -61,6 +72,7 @@ const PAGE_TEMPLATE = {
 // the cleanup drops their toggle and spacer widgets)
 const transformers = [
   pageRowsTransformer,
+  companyAssetsTransformer,
   companyPeopleTransformer,
   cleanupTransformer,
   ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
@@ -104,6 +116,11 @@ export default {
     pageRowsTransformer('preprocess', document.body, { document });
     // keep a person's trailing blank line (`<br>&nbsp;`) before html2md drops it (SKODA-810a)
     companyPeopleTransformer('preprocess', document.body, { document });
+    // the logo page's framed row, while the layout CSS is there (SKODA-810b)
+    companyAssetsTransformer('preprocess', document.body, { document });
+    // wholly bold headings (the logo page's `<h3><strong>`): helix strips their <strong>
+    // before the transform, which puts it back (story-flatten, #296)
+    markBoldHeadings(document.body);
   },
 
   transform: (payload) => {
@@ -128,6 +145,7 @@ export default {
     });
 
     executeTransformers('afterTransform', main, payload);
+    restoreBoldHeadings(main);
 
     WebImporter.rules.transformBackgroundImages(main, document);
     WebImporter.rules.adjustImageUrls(main, url, params.originalURL);

@@ -68,6 +68,8 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `footnotes` | – | – (SKODA-805d; see `footnotes` below) |
 | `promo-box` | – | curated rows **or** config (`index`, `template`, `path`, `category`, `tags`, `limit`, `sort`); never mixed (PR #110, merged) |
 | `newsletter-stub` | `card` (SKODA-823: the story-sidebar sign-up card, emitted by `transformers/skoda-story-aside.js`) | `label`, `placeholder`, `button`, `consent`, `manage`, `message`, `list`, `language` (footer, SKODA-305) + `image`, `heading`, `error`, `consent-error` (card); config only |
+| `app-promo` | – | – (SKODA-810b: one row per source row, its part read from its shape: `[icon, text]` intro, `[picture]` mockup, `[cell, cell]` columns, `[text]` download heading, `[QR, badge link, badge link]` store strip; emitted by `transformers/skoda-company-assets.js`) |
+| `brand-asset` | – | – (SKODA-810b: one row per logo tile, one cell `[image (optionally linked), PDF / PNG download links]`, in a `brand-assets` section; emitted by `transformers/skoda-company-assets.js`) |
 | `contact-directory` | – | – (SKODA-810a: one row per person, one cell `[name + title in bold, portrait, e-mail (+ phone as text), LinkedIn icon + link]`, the source editor widget as is; emitted by `transformers/skoda-company-people.js`) |
 | `exec-bio` | – | – (SKODA-810a: one row per member, `[card, panel]`: the card as `contact-directory`'s (name + roles, portrait), the panel `[label, one picture paragraph per photo, the links]`; emitted by `transformers/skoda-company-people.js`) |
 | `search`, `fragment`, `header`, `footer`, `widget` | – | – |
@@ -429,6 +431,18 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
   30px from 781px; h2 40/45 and h3 24/27.6, wt300, 16px under; paragraphs 20px apart; green links, ink on hover.
 - **Example** (`/en/copyright/`): `page-body` (the h2 row), `page-body, half, empty-cell`, then 3 × `page-body,
   half`. Equal to the source at 390 / 768 / 780 / 781 / 992 / 1440 (every text box, the band, the footer gap).
+
+### `brand-assets`
+- **Status:** `pinned` (2026-10-23) · **Ticket:** SKODA-810b · **Fallback:** readable (unstyled tiles under
+  the headings) · **Styles:** `brand-assets`, `brand-assets, framed`
+- **Emitted by:** `transformers/skoda-company-assets.js` (company importer), for a body of logo tiles (an editor
+  widget with an image and a "download" link). One section per SiteOrigin row: a heading row its h3 (bold, as
+  the source's `<h3><strong>`), a tile row a `Brand Asset` block. A row the source pads on all four sides adds
+  `framed`.
+- **Runtime (styles.css):** the section spans the page (no 1248px cap); a heading section 100px under the row
+  before (50 at the top), its h3 in the middle half from 781px, 20px in (10 below), 24/27.6 light with its bold
+  text; `framed` 70px in on every side. The tiles are blocks/brand-asset's.
+- **Example** (`/en/company-logo/`): 3 heading sections, 6 tile sections (18 assets), the last `framed`.
 
 ### `floating-action-bar`
 - **Status:** `pinned` · **Ticket:** SKODA-215 · **Fallback:** readable (absent)

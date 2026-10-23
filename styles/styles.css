@@ -106,6 +106,14 @@
   --page-body-half-gutter: 40px;
   --page-body-top: 10px; /* the band, or the row before, → a row's first text */
   --page-body-pull-up: 20px; /* a `pull-up` row overlaps the row before (from 768px, Contacts) */
+
+  /* company logo (SKODA-810b, measured on the live /en/company-logo, 390–1440): full-width rows,
+     a group heading 100px under the row before (50 the page's first), the heading in the
+     middle half from 781px, a framed row 70px in on every side */
+  --brand-assets-heading-top: 100px;
+  --brand-assets-first-top: 50px;
+  --brand-assets-heading-share: 25%;
+  --brand-assets-frame: 70px;
   --story-meta-gap: 11px; /* published date → category tag, same row (live) */
 
   /* intro (hero caption: perex, date, tag) → article, measured on the live Epiq story from
@@ -1355,6 +1363,50 @@ main > .section.page-body a:any-link:not(.button):focus-visible {
 @media (width >= 768px) {
   main > .section.page-body.pull-up {
     margin-block-start: calc(-1 * var(--page-body-pull-up));
+  }
+}
+
+/* Company logo rows (SKODA-810b; Section Metadata `Style: brand-assets`, `brand-assets, framed`):
+   each section is a source row across the whole page, its tiles a Brand Asset block (shares of
+   the page width, blocks/brand-asset). A heading row's h3 sits in its editor widget, 10px down and
+   20px in (10 below 781), in the middle half from 781px: 24/27.6, light, its text bold
+   (`<h3><strong>`, as the source's), 16px under it. */
+main > .section.brand-assets {
+  margin: 0;
+}
+
+main > .section.brand-assets > div {
+  max-width: none;
+  padding: 0;
+}
+
+main > .section.brand-assets:has(> .default-content-wrapper) {
+  padding-block-start: var(--brand-assets-heading-top);
+}
+
+main > .section.brand-assets:first-child {
+  padding-block-start: var(--brand-assets-first-top);
+}
+
+main > .section.brand-assets.framed {
+  padding: var(--brand-assets-frame);
+}
+
+main > .section.brand-assets > .default-content-wrapper {
+  padding: var(--page-gutter) var(--page-gutter) 0;
+}
+
+main > .section.brand-assets h3 {
+  margin: 0 0 var(--spacing-m);
+  font-size: var(--heading-font-size-page-h3);
+  font-weight: var(--weight-light);
+  line-height: 1.15;
+}
+
+@media (width >= 781px) {
+  main > .section.brand-assets > .default-content-wrapper {
+    margin-inline: var(--brand-assets-heading-share);
+    padding-inline: var(--paragraph-gap);
   }
 }
 

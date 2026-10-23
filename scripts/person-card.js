@@ -9,7 +9,8 @@
  * a text paragraph and ends its line (`<picture><br>e: …`, Contacts) is a portrait too and
  * gets a paragraph of its own; any other picture inside a text line is that line's icon
  * (the source's LinkedIn mark, 25px, left of the link). Web links open in a new tab, as
- * most of the source's do; mail and phone links stay in it.
+ * most of the source's do; mail and phone links stay in it. A phone the source writes as
+ * text (`t: +420 730 863 027`) becomes a `tel:` link (SKODA-810: the source's a11y gap).
  */
 
 const NEW_TAB = /^https?:$/;
@@ -18,6 +19,33 @@ const NEW_TAB = /^https?:$/;
 const isPictureOnly = (p) => !!p.querySelector('picture, img') && !p.textContent.trim();
 
 const isBlank = (node) => node.nodeType === 3 && !node.textContent.trim();
+
+// a phone line: `t:` then the number (digits, spaces, an optional leading +)
+const PHONE = /(\bt:[\s\u00a0]*)(\+?\d[\d\s\u00a0]{5,}\d)/;
+
+/**
+ * Link the text phone numbers under `root` (`t: +420 730 863 027` → `tel:+420730863027`).
+ * Numbers already inside a link are left alone.
+ * @param {Element} root
+ */
+export function linkPhones(root) {
+  const doc = root.ownerDocument;
+  const walker = doc.createTreeWalker(root, 4 /* NodeFilter.SHOW_TEXT */);
+  const hits = [];
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (!node.parentElement.closest('a') && PHONE.test(node.nodeValue)) hits.push(node);
+  }
+  hits.forEach((node) => {
+    const match = PHONE.exec(node.nodeValue);
+    const start = match.index + match[1].length;
+    const number = node.splitText(start);
+    number.splitText(match[2].length);
+    const a = doc.createElement('a');
+    a.href = `tel:${match[2].replace(/[\s\u00a0]/g, '')}`;
+    number.replaceWith(a);
+    a.append(number);
+  });
+}
 
 /**
  * A paragraph that opens with a picture on a line of its own (`<picture><br>text`): the
@@ -98,6 +126,7 @@ export default function decoratePersonCard(card, prefix) {
   paragraphs.filter((p) => p !== portrait).forEach((p) => {
     p.querySelectorAll('picture').forEach((pic) => pic.classList.add(`${prefix}-icon`));
   });
+  linkPhones(card);
   decorateCardLinks(card);
   return { portrait, identity };
 }

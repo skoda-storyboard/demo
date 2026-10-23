@@ -49,10 +49,15 @@ const isToggle = (widget) => widget.matches('.widget_ys-row-toggle');
 const isBuilder = (widget) => widget.matches('.widget_siteorigin-panels-builder');
 const isEditor = (widget) => widget.matches('.widget_sow-editor');
 
-/** A cell is a person card when its first editor widget holds an image and bold text. */
+/**
+ * A cell is a person card when its first editor widget holds an image and bold text, and the
+ * card a contact's e-mail or a board member's "show more" toggle (not a logo tile's bold
+ * download links, SKODA-810b).
+ */
 function isCard(cell) {
   const editor = widgetsOf(cell).find(isEditor);
-  return !!editor?.querySelector('img') && !!editor.querySelector('strong, b');
+  if (!editor?.querySelector('img') || !editor.querySelector('strong, b')) return false;
+  return !!editor.querySelector('a[href^="mailto:"]') || widgetsOf(cell).some(isToggle);
 }
 
 /** Clean copies of an editor's blocks: paragraphs, bold, breaks, links (href, target), images. */
@@ -151,16 +156,19 @@ function splitSpacers(row, document) {
 }
 
 /**
- * Preprocess: a paragraph that ends on a blank line (`…<br>&nbsp;</p>`, Martina Biene's card)
- * keeps it. html2md drops a whitespace-only run, so its non-breaking space becomes
- * skoda-nbsp's placeholder (U+00A0 again in DA), and the card stays as tall as the source's.
+ * Preprocess: a paragraph that ends or starts on a blank line (`…<br>&nbsp;</p>`, Martina
+ * Biene's card; `<p>&nbsp;<br>Download…`, the app page's panel heading) keeps it. html2md
+ * drops a whitespace-only run, so its non-breaking space becomes skoda-nbsp's placeholder
+ * (U+00A0 again in DA), and the text stays as tall as the source's.
  */
 function keepBlankLines(element) {
   element.querySelectorAll('article .widget_sow-editor p').forEach((p) => {
-    const tail = [...p.childNodes].filter((n) => !(n.nodeType === 3 && !n.nodeValue.trim() && !n.nodeValue.includes('\u00a0')));
-    const [br, text] = tail.slice(-2);
-    if (br?.nodeName !== 'BR' || text?.nodeType !== 3 || !NBSP_ONLY.test(text.nodeValue)) return;
-    text.nodeValue = NBSP_PLACEHOLDER;
+    const nodes = [...p.childNodes].filter((n) => !(n.nodeType === 3 && !n.nodeValue.trim() && !n.nodeValue.includes('\u00a0')));
+    const blank = (n) => n?.nodeType === 3 && NBSP_ONLY.test(n.nodeValue);
+    const [br, tail] = nodes.slice(-2);
+    if (br?.nodeName === 'BR' && blank(tail)) tail.nodeValue = NBSP_PLACEHOLDER;
+    const [head, next] = nodes;
+    if (next?.nodeName === 'BR' && blank(head) && nodes.length > 2) head.nodeValue = NBSP_PLACEHOLDER;
   });
 }
 

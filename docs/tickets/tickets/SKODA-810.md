@@ -70,8 +70,27 @@ Checked against the live source:
   `transformers/skoda-company-people.js` (in `import-company-page.js`), and the section style `page-body, pull-up`.
 - **Spec corrections** (re-measured, `company-pages.md` §11): the two-up switch is at 781px, not 768; Contacts
   names are 24px like the board's; 6 board members (3 + 3); the photo grid is 1 / 2 / 3 across at 768 / 992;
-  phones stay plain text, as on the source.
+  the source's text phones become `tel:` links (this ticket's AC).
 - **Not reused:** the `accordion` block (SKODA-807). Blocks can't import each other (AGENTS.md), and its heading,
   spacing and panel insets differ from the board's. `exec-bio` builds the same h2 + button + region pattern and
   the same 400ms slide itself. The photo lightbox is the shared `scripts/lightbox.js`.
-- **810b** (app promo, company logo) remains open.
+- **810b** (app promo, company logo): built in the same PR, see below.
+
+## SKODA-810b: company logo + media-services app (2026-10-23)
+- **Built** on the same branch: `brand-asset` (logo tiles) with the section style `brand-assets` / `brand-assets,
+  framed`, and `app-promo` (the app page's rows, read from their shape), from `transformers/skoda-company-assets.js`
+  in the company importer. Measured against the source: `company-pages.md` §11.
+- **Annual reports:** `/en/annual-reports/` still 404s (2026-10-23). No `download-list` is built: there is no
+  source page to import or measure. It needs the client to say where the reports live now.
+
+## Acceptance criteria: status (2026-10-23)
+| AC | Status |
+|---|---|
+| Each page from its reusable block, no page-specific code | ✅ contacts, board, company logo, app page: `contact-directory`, `exec-bio`, `brand-asset` (+ `brand-assets` sections), `app-promo`; content-driven importer. Annual reports: no source (404). |
+| Board: cards expand to galleries; CV/photo/press/LinkedIn links resolve | ✅ h2 + button toggles (mouse, Enter, Space), photo grid + shared lightbox, links in new tabs. |
+| Annual reports: reverse-chron list + PDF links | ⛔ blocked: the source page is gone (404). |
+| Company logo: 36 assets with PDF + PNG | ✅ with the source's current **18** assets (3 groups × 6), each PDF + PNG, new tab. |
+| Media-services app: hero + screenshots + QR + badges | ✅ |
+| Contacts: department groups with email/phone/photo/LinkedIn | ✅ phones as `tel:` links. |
+| Lint, local preview parity, accessible accordions | ✅ lint clean; measured parity in `company-pages.md` §11; toggles are buttons with `aria-expanded` / `aria-controls`. |
+| Per-sub-type gates; `tel:` phones; ≤2% visual diff | ✅ grids, portrait ratios, badge sizes measured; `tel:` done. A4 covers: annual reports only (blocked). The pixel diff is not run (measured boxes instead). Names stay bold paragraphs, not `<h3>` (decision 2026-10-23, the source's outline). |

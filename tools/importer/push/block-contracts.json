@@ -10,6 +10,12 @@
     "accordion": {
       "variants": ["faq"]
     },
+    "app-promo": {
+      "variants": []
+    },
+    "brand-asset": {
+      "variants": []
+    },
     "cards": {
       "variants": [
         "media",

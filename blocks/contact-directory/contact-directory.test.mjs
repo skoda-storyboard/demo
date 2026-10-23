@@ -46,7 +46,11 @@ test('one list item per authored row, its content kept; the name line, portrait 
   assert.equal(card.querySelector('.contact-directory-name').textContent, 'Tom Drechsler');
   assert.equal(card.querySelector('.contact-directory-identity strong:not(.contact-directory-name strong)').textContent, 'Head of Communications');
   assert.equal(card.querySelector('.contact-directory-icon img').alt, 'linkedin');
-  assert.match(card.textContent, /t: \+420 730 863 027/, 'the phone stays text, as on the source');
+  const phone = card.querySelector('a[href^="tel:"]');
+  assert.equal(phone.getAttribute('href'), 'tel:+420730863027', 'the text phone is a tel: link');
+  assert.equal(phone.textContent, '+420 730 863 027');
+  assert.match(phone.parentElement.textContent, /t: \+420 730 863 027/, 'its text unchanged');
+  assert.equal(phone.target, '', 'phone links stay in the tab');
 });
 
 test('a portrait on the e-mail line gets its own paragraph; a bold run shared with the title is split', { skip }, () => {
@@ -61,6 +65,13 @@ test('a portrait on the e-mail line gets its own paragraph; a bold run shared wi
   assert.equal(portrait.querySelector('img').alt, 'Michaela');
   assert.equal(mail.firstChild.nodeName, '#text', 'the line break before the e-mail is gone');
   assert.equal(card.querySelector('.contact-directory-icon'), null, 'no icon');
+});
+
+test('a phone with non-breaking spaces links too; a number already linked is left alone', { skip }, () => {
+  const el = block('<p><strong>A</strong></p><p>t: +420\u00a0730\u00a0865\u00a0258<br>t: <a href="tel:+1">+1 555 0100 22</a></p>');
+  decorate(el);
+  const phones = [...el.querySelectorAll('a[href^="tel:"]')].map((a) => a.getAttribute('href'));
+  assert.deepEqual(phones, ['tel:+420730865258', 'tel:+1']);
 });
 
 test('web links open in a new tab with noopener; mail links stay in the tab', { skip }, () => {
