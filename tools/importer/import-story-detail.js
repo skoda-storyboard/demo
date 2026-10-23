@@ -19,7 +19,7 @@
 import storyHeroParser from './parsers/story-hero.js';
 import storyFlattenParser, {
   markHighlights, markCellWidths, markRowPadding, markBoldHeadings, restoreBoldHeadings, dropEmptySections,
-  markCentredImages, applyCentredImages, markTextStyles,
+  markCentredImages, applyCentredImages, markTextStyles, markMilestoneSpaces,
 } from './parsers/story-flatten.js';
 import downloadsParser from './parsers/downloads.js';
 import mediaParser from './parsers/press-kit-media.js';
@@ -148,6 +148,8 @@ export default {
     markTextStyles(document);
     // the source's drop cap and its inline colours (DA keeps neither)
     markDropCap(document);
+    // SKODA-815 (PR #373): the timeline title spaces, before preProcess drops the spacer <p>
+    markMilestoneSpaces(document.body);
     // #296: the body's 10pt small print (Epiq "¹ Available at a later date.") → Footnotes, as on
     // press kits (SKODA-805d); its size lives only in inline spans, which DA drops
     document.querySelectorAll('article .entry-content, article .content').forEach((body) => {

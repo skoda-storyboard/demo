@@ -327,9 +327,10 @@ test('skoda-image-box with an image keeps both image and text', { skip: domSkip 
   assert.match(content.textContent, /Recharging/, 'text kept');
 });
 
-// D1 (SKODA-815): ys-milestones is a dated timeline — its entries + images must
-// survive (previously it was in the DROPPED set → silent content loss).
-test('ys-milestones flattens each entry to an h3 + image (not dropped)', { skip: domSkip }, () => {
+// D1 (SKODA-815): ys-milestones is a dated timeline — every entry (year, title, image and
+// its description) survives as one Timeline row (it was once DROPPED, then flattened to an
+// h3 + image, which still lost every description).
+test('ys-milestones becomes a Timeline block, one row per entry (not dropped)', { skip: domSkip }, () => {
   const d = domDoc(`
     <div class="entry-content"><div class="panel-layout">
       <div class="panel-grid"><div class="panel-grid-cell">
@@ -344,12 +345,148 @@ test('ys-milestones flattens each entry to an h3 + image (not dropped)', { skip:
     </div></div>`);
   const content = d.querySelector('.entry-content');
   parse(content, { document: d });
-  const h3 = [...content.querySelectorAll('h3')].map((h) => h.textContent);
-  assert.equal(h3.length, 3, 'one h3 per milestone');
-  assert.match(h3[0], /1905/); assert.match(h3[0], /Voiturette A/);
-  assert.match(h3[2], /2017/);
+  const table = content.querySelector('table[data-block="Timeline"]');
+  assert.ok(table, 'a Timeline block');
+  const rows = [...table.querySelectorAll('tr')].slice(1);
+  assert.equal(rows.length, 3, 'one row per milestone');
+  assert.deepEqual(rows.map((r) => r.children[0].textContent), ['1905', '1925', '2017']);
+  assert.match(rows[0].children[1].textContent, /Voiturette A/);
   assert.equal(content.querySelectorAll('img').length, 3, 'each milestone image kept');
   assert.equal(content.querySelectorAll('.milestones, section').length, 0, 'timeline scaffolding stripped');
+});
+
+// The real widgets, captured from the live stories (test/fixtures/story-flatten).
+function milestonesStory(fixture) {
+  const panel = readFileSync(new URL(`../../../test/fixtures/story-flatten/${fixture}.html`, import.meta.url), 'utf8');
+  const d = domDoc(`<div class="entry-content"><div class="panel-layout"><div class="panel-grid">
+    <div class="panel-grid-cell">${panel}</div></div></div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  return content;
+}
+
+test('SKODA-815: the steering-wheel timeline keeps all 11 years, titles, images and descriptions', { skip: domSkip }, () => {
+  const content = milestonesStory('milestones-steering-wheel');
+  const table = content.querySelector('table[data-block="Timeline"]');
+  assert.ok(table, 'the green default: no variant');
+  const rows = [...table.querySelectorAll('tr')].slice(1);
+  assert.deepEqual(
+    rows.map((r) => r.children[0].textContent),
+    ['1905', '1925', '1932', '1940', '1952', '1959', '1966', '1984', '1989', '1996', '2017'],
+  );
+  rows.forEach((r) => assert.equal(r.children.length, 5, 'year | title | image | description | space'));
+  // the source's inline margin-top: 15px on four titles → the space column (PR #373 review)
+  assert.deepEqual(rows.map((r) => r.children[4].textContent), ['15', '', '', '15', '', '', '15', '', '', '15', '']);
+  // the title keeps its lines and the bold model, without the source's font-size spans
+  const title = rows[0].children[1];
+  assert.equal(title.querySelector('strong').textContent.replace(/\s+/g, ' ').trim(), 'VOITURETTE A');
+  assert.ok(title.querySelector('br'), 'the maker / model / display lines');
+  // the break that closes the bold model sits after it (a <br> inside <strong> is lost)
+  assert.equal(title.querySelector('strong br'), null);
+  assert.equal(title.querySelector('strong').nextElementSibling?.tagName, 'BR');
+  assert.equal(title.querySelectorAll('span, [style]').length, 0, 'no styling spans or inline styles');
+  // every image, and every description (the content #114 lost)
+  assert.equal(rows.filter((r) => r.children[2].querySelector('img')).length, 11);
+  rows.forEach((r) => assert.ok(r.children[3].textContent.trim().length > 80, 'a description per entry'));
+  // (the source text carries non-breaking spaces)
+  assert.match(rows[0].children[3].textContent.replace(/\s+/g, ' '), /The first car produced by Messrs Laurin and Klement/);
+  assert.equal(content.querySelectorAll('.dot, .line, .thumbnail').length, 0, 'decorative scaffolding gone');
+  // the description links survive with their href
+  assert.deepEqual(
+    rows.flatMap((r) => [...r.children[3].querySelectorAll('a')].map((a) => a.textContent)),
+    ['FAVORIT', 'to control'],
+  );
+});
+
+test('SKODA-815: a black year pill and 18pt titles map to Timeline (black, large); glossary tooltips become their text', { skip: domSkip }, () => {
+  const content = milestonesStory('milestones-iconic-cars');
+  // black pills, and 18pt titles (the steering wheel's are 14pt) → `large`
+  const table = content.querySelector('table[data-block="Timeline (black, large)"]');
+  assert.ok(table, 'the black pill (#000000) and the 18pt titles are the variants');
+  const rows = [...table.querySelectorAll('tr')].slice(1);
+  assert.equal(rows.length, 16);
+  assert.ok(rows.filter((r) => r.children[3].querySelector('a[href]')).length >= 12, 'description links kept');
+  const text = table.textContent;
+  assert.match(text, /concern’s modular electromobility platform \(MEB\)/, 'the term-explain text kept');
+  assert.equal(table.querySelectorAll('.term-explain, [data-explain]').length, 0, 'the tooltip markup unwrapped');
+  [...table.querySelectorAll('a')].forEach((a) => assert.deepEqual(a.getAttributeNames(), ['href'], 'links keep only href'));
+  const y1970 = rows.find((r) => r.children[0].textContent.trim() === '1970');
+  assert.equal(y1970.children[2].querySelectorAll('img').length, 2, 'the 1970 thumbnail stacks both cars');
+  // the 1970 title's spacer paragraph → 44px of space, and no empty paragraph in the title
+  assert.equal(y1970.children[4].textContent, '44');
+  assert.equal([...y1970.children[1].querySelectorAll('p')].filter((p) => !p.textContent.trim()).length, 0);
+  assert.equal(rows.filter((r) => r.children[4].textContent).length, 1, 'only 1970 is spaced');
+  assert.equal(rows.filter((r) => r.children[2].querySelector('img')).length, 16, 'every milestone keeps its image');
+});
+
+test('SKODA-815: the title spaces survive the importer dropping empty paragraphs (marked in preprocess)', { skip: domSkip }, () => {
+  const panel = readFileSync(new URL('../../../test/fixtures/story-flatten/milestones-iconic-cars.html', import.meta.url), 'utf8');
+  const d = domDoc(`<div class="entry-content"><div class="panel-layout"><div class="panel-grid"><div class="panel-grid-cell">${panel}</div></div></div></div>`);
+  __test.markMilestoneSpaces(d.body);
+  // helix-importer's preProcess drops the empty spacer paragraph
+  d.querySelectorAll('.title p').forEach((p) => { if (!p.textContent.trim()) p.remove(); });
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  const rows = [...content.querySelector('table[data-block^="Timeline"]').querySelectorAll('tr')].slice(1);
+  const y1970 = rows.find((r) => r.children[0].textContent.trim() === '1970');
+  assert.equal(y1970.children[4].textContent, '44', 'the marked space, not the (now missing) spacer');
+});
+
+test('SKODA-815: the wheels timeline (24pt model lines) is Timeline (xl), its title paragraphs kept', { skip: domSkip }, () => {
+  const content = milestonesStory('milestones-wheels');
+  const table = content.querySelector('table[data-block="Timeline (xl)"]');
+  assert.ok(table, 'the 24pt model line under an 18pt maker → xl');
+  const rows = [...table.querySelectorAll('tr')].slice(1);
+  assert.equal(rows.length, 10);
+  rows.forEach((r) => assert.equal(r.children.length, 4, 'no space column: no entry adds space'));
+  const first = [...rows[0].children[1].querySelectorAll(':scope > p')];
+  assert.deepEqual(first.map((p) => p.textContent.replace(/\s+/g, ' ').trim()),
+    ['LAURIN & KLEMENT', 'VOITURETTE A', '(vehicle on display: 1905)'], 'maker, model, note as paragraphs');
+  assert.ok(first[1].querySelector('strong'), 'the model stays bold');
+  assert.equal(rows[0].children[1].querySelectorAll('span, [style]').length, 0, 'no size spans');
+});
+
+test('SKODA-815: a milestones widget without entries keeps its images and text', { skip: domSkip }, () => {
+  const d = domDoc(`<div class="entry-content"><div class="panel-layout"><div class="panel-grid"><div class="panel-grid-cell">
+    <div class="so-panel widget widget_ys-milestones"><div class="so-widget-ys-milestones">
+      <section class="milestones"><p>1905 Voiturette A</p></section></div></div>
+  </div></div></div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  assert.equal(content.querySelector('table'), null, 'no empty block');
+  assert.match(content.textContent, /1905 Voiturette A/, 'the text salvaged');
+});
+
+test('SKODA-815: a milestones fallback keeps the text beside its images, and logs', { skip: domSkip }, (t) => {
+  const warn = t.mock.method(console, 'warn', () => {});
+  t.mock.method(console, 'log', () => {});
+  const d = domDoc(`<div class="entry-content"><div class="panel-layout"><div class="panel-grid"><div class="panel-grid-cell">
+    <div class="so-panel widget widget_ys-milestones"><div class="so-widget-ys-milestones">
+      <section class="milestones"><img src="https://cdn.example/a.jpg" alt=""><p>1905 Voiturette A</p></section></div></div>
+  </div></div></div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  assert.equal(content.querySelector('table'), null, 'no empty block');
+  assert.ok(content.querySelector('img'), 'the image kept');
+  assert.match(content.textContent, /1905 Voiturette A/, 'the text kept as well');
+  const logged = warn.mock.calls.map((c) => String(c.arguments[0])).join('\n');
+  assert.match(logged, /"fallback":\["milestones"\]/, 'the fallback is logged');
+});
+
+test('SKODA-815: a milestones widget in a multi-column row lands in its Columns cell', { skip: domSkip }, () => {
+  const panel = readFileSync(new URL('../../../test/fixtures/story-flatten/milestones-steering-wheel.html', import.meta.url), 'utf8');
+  const d = domDoc(`<div class="entry-content"><div class="panel-layout"><div class="panel-grid">
+    <div class="panel-grid-cell">${panel}</div>
+    <div class="panel-grid-cell"><div class="so-panel widget widget_sow-editor"><div class="so-widget-sow-editor">
+      <div class="siteorigin-widget-tinymce textwidget"><p>Beside the timeline.</p></div></div></div></div>
+  </div></div></div>`);
+  const content = d.querySelector('.entry-content');
+  parse(content, { document: d });
+  const columns = content.querySelector('table[data-block^="Columns"]');
+  assert.ok(columns, 'a Columns block');
+  const timeline = columns.querySelector('table[data-block="Timeline"]');
+  assert.ok(timeline, 'the Timeline nested in its cell');
+  assert.equal(timeline.querySelectorAll('tr').length - 1, 11);
 });
 
 // ---- deferred widgets skipped + never crash -------------------------------

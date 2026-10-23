@@ -3,11 +3,20 @@
 - **Type:** block / import
 - **Phase:** B · **Milestone:** M2 (go-live) — *content-loss, prioritise within M2*
 - **Estimate:** 3 SP · AI-assisted 1–2d / manual 3–5d *(planning estimate, not a quote)*
-- **Status (2026-09-24):** 🟢 **Option 1 (flatten-to-content) SHIPPED** in SKODA-801
-  (`milestonesNodes`) — `ys-milestones` no longer dropped; each entry → `<h3>` "YEAR — Title"
-  + its image. Verified on the steering-wheel story: **0 → 11 dated entries, +11 images**.
-  Remaining (optional, M2): the dedicated **timeline block (Option 2)** if the client wants the
-  source timeline visual — otherwise this ticket can close.
+- **Status (2026-10-16):** 🔵 **Option 2 (the `Timeline` block) in PR** (branch `skoda-815-timeline`).
+  The 2026-09-24 Option 1 flatten kept each entry's year, title and image but **dropped every
+  description** (the milestone text and its links): the steering-wheel story still lost 11
+  paragraphs. `ys-milestones` now imports as a `Timeline` block, one row per entry
+  (year | title | image | description), measured against the source in
+  [`timeline.md`](../../ui-specs/timeline.md).
+  - **Content:** steering wheel 11 entries, 11 images, 11 descriptions; iconic cars 16 entries,
+    17 images (1970 stacks two), 16 descriptions, all links kept.
+  - **Drafts:** `/drafts/skoda-815-steering-wheel`, `/drafts/skoda-815-iconic-cars`.
+  - The 9 EN stories (and their CS counterparts) pick the block up when they are pushed with the
+    M2 story waves.
+- **Status (2026-09-24):** Option 1 (flatten-to-content) shipped in SKODA-801 (`milestonesNodes`):
+  each entry → `<h3>` "YEAR — Title" + its image; 0 → 11 dated entries, +11 images. Superseded by
+  Option 2 above.
 
 ## Origin
 Surfaced by the SKODA-801 flatten coverage review (`docs/reviews/SKODA-801-FLATTEN-COVERAGE-REVIEW.md`,
@@ -51,7 +60,20 @@ Recommend **(1) for correctness now**, upgrade to (2) if the timeline visual is 
 - [x] Content-driven detection only (no URL/positional assumptions).
 - [x] Unit test in `story-flatten.test.mjs`: a synthetic milestones widget → N dated entries + N images.
 - [x] `npm run lint` + `npm test` green (152 tests); re-imported the milestones story and diffed vs source.
-- [ ] **(Optional, M2, only if timeline visual wanted)** `blocks/timeline` + `docs/ui-specs/timeline.md` + pixel-perfect ACs.
+- [x] `blocks/timeline` + `docs/ui-specs/timeline.md` (2026-10-16). Every measured box (panel, line, pill,
+      dot, image, description) matches the source at 375 / 768 / 992 / 1079 / 1080 / 1440, including
+      the 1079 → 1080 switch to the two-sided line, the 40px gap above the panel, the dot's 6px ring and
+      the link colours (PR #373 review). The deviations from origin are listed in the spec §7, open until a
+      human reviewer approves them.
+- [x] Every milestone **description** kept, with its links (the Option 1 flatten dropped them).
+- [x] Variants from the source markup: `black` (black pills, iconic cars), `large` (18pt titles), `xl` (24pt model
+      lines: wheels, gear stick).
+- [x] Human review (PR #373, 2026-10-21) fixed: the title spacing (steering wheel 15px ×4, iconic cars 1970 44px) via
+      the row's optional space cell, the 24pt model line (`xl`), and paragraph titles (no h3). All entry heights match
+      the source on the steering-wheel, iconic-cars, wheels and gear-stick drafts at 1440 / 1080 / 1079 / 992 / 768 /
+      375, except two iconic-cars description wraps (spec §7.3).
+- [x] Unit tests: `story-flatten.test.mjs` (both live widget fixtures, the fallback, the Columns case) and
+      `blocks/timeline/timeline.test.mjs`.
 
 ## Dependencies
 - Upstream: SKODA-801 (the flatten parser this extends). Related review: D2 (figure/infobox,
@@ -70,5 +92,5 @@ Recommend **(1) for correctness now**, upgrade to (2) if the timeline visual is 
   (only the synthetic 293-grid unit test covers it today).
 
 ## Risks / Flags
-- `ys-milestones` DOM shape `[RUNTIME-UNCONFIRMED]` beyond the one inspected story — confirm
-  selectors on 2–3 of the 9 stories before finalising.
+- ~~`ys-milestones` DOM shape `[RUNTIME-UNCONFIRMED]` beyond the one inspected story~~: confirmed
+  2026-10-16 on all 9 EN stories (the same shape; title sizes and pill colours vary, see the spec §2).
