@@ -90,7 +90,7 @@ function itemDate(item) {
  * @param {Element} element the source Media Box
  * @param {{document: Document, dates?: boolean}} options `dates`: emit each item's source date
  *   as the optional date cell before the title (contract `downloads`, #275); the press-release
- *   Media Box shows it on every card (#274), the story Media Box keeps its rows as they are.
+ *   and story Media Boxes show it on every card (#274; stories since SKODA-227).
  */
 export default function parse(element, { document, dates = false }) {
   let items = Array.from(element.querySelectorAll('article.media-cart-item'));

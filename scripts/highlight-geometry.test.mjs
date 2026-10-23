@@ -61,3 +61,22 @@ test('panel colours (#516): highlight-background / -color / -link as --hl-bg / -
   assert.equal(delivered.style.getPropertyValue('--hl-bg'), '#4ba82e');
   assert.equal(delivered.style.getPropertyValue('--hl-link'), '#ffffff');
 });
+
+test('cell rows: one box per Columns cell becomes its custom properties; the section gets hl-cells; malformed boxes are skipped', () => {
+  const { document } = new JSDOM('<main></main>').window;
+  const section = document.createElement('div');
+  section.innerHTML = '<div class="columns-wrapper"><div class="columns split-75"><div><div>text</div><div>image</div></div></div></div>';
+  const [text, image] = section.querySelectorAll('.columns > div > div');
+  assert.equal(applyHighlightGeometry(section, 'highlight-cell-margin', '0px 0px 0px 15px | 0px 10px 0px 0px'), true);
+  assert.equal(text.style.getPropertyValue('--hl-cell-margin-d-left'), '15px');
+  assert.equal(image.style.getPropertyValue('--hl-cell-margin-d-right'), '10px');
+  assert.equal(applyHighlightGeometry(section, 'highlight-cell-padding-mobile', '0 | 15px'), true);
+  assert.equal(image.style.getPropertyValue('--hl-cell-padding-m-top'), '15px');
+  assert.equal(text.style.getPropertyValue('--hl-cell-padding-m-top'), '0px');
+  assert.ok(section.classList.contains('hl-cells'));
+  const other = document.createElement('div');
+  other.innerHTML = '<div class="columns"><div><div>a</div></div></div>';
+  assert.equal(applyHighlightGeometry(other, 'highlight-cell-margin', 'red | 10em'), false);
+  assert.equal(other.classList.contains('hl-cells'), false);
+  assert.equal(applyHighlightGeometry(document.createElement('div'), 'highlight-cell-margin', '0 15px'), false, 'no Columns cells');
+});

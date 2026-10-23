@@ -535,7 +535,7 @@ test('a panel with its own layout geometry carries it as Section Metadata rows; 
   ]);
   markHighlights(d);
   const marked = (id) => [...d.querySelector(`#${id}`).attributes].filter((a) => a.name.startsWith('data-highlight-')).length;
-  assert.deepEqual(['pg-7-1', 'pg-7-2', 'pg-7-3', 'pg-7-4', 'pg-7-5'].map(marked), [2, 0, 4, 2, 0]);
+  assert.deepEqual(['pg-7-1', 'pg-7-2', 'pg-7-3', 'pg-7-4', 'pg-7-5'].map(marked), [2, 0, 4, 2, 4]);
   const content = d.querySelector('.content');
   parse(content, { document: d });
   const metas = [...content.children].filter((n) => n.dataset.block === 'Section Metadata' && /highlight/.test(n.textContent));
@@ -546,8 +546,9 @@ test('a panel with its own layout geometry carries it as Section Metadata rows; 
     [['highlight-padding', '0px 15px 0px 15px'], ['highlight-padding-mobile', '15px 15px 15px 15px'],
       ['highlight-margin', '15px 0px 15px 0px'], ['highlight-margin-mobile', '15px 15px 15px 15px']],
     [['highlight-gallery-margin', '0px 15px 0px 15px'], ['highlight-gallery-margin-mobile', '15px 15px 15px 15px']],
-    [],
-  ], 'cruise (no mobile rule: the desktop one), default, row padding, a gallery with a margin, a 2-cell row (per-cell margins: none)');
+    [['highlight-cell-margin', '0px 0px 0px 15px | 0px 15px 0px 15px'], ['highlight-cell-margin-mobile', '0px 0px 0px 15px | 15px 15px 15px 15px'],
+      ['highlight-cell-padding', '0px 0px 0px 0px | 0px 0px 0px 0px'], ['highlight-cell-padding-mobile', '0px 0px 0px 0px | 0px 0px 0px 0px']],
+  ], 'cruise (no mobile rule: the desktop one), default, row padding, a gallery with a margin, a 2-cell row with its own first-cell margin (SKODA-227: per cell, the other cell the theme default)');
 });
 
 test('a panel whose text widget has no margin at all is 0, desktop and mobile', { skip: domSkip }, () => {
@@ -1199,4 +1200,43 @@ test('a stretched row keeps only its top / bottom padding: SiteOrigin sets its s
   markCellWidths(row); markRowPadding(row);
   parse(row.querySelector('.entry-content'), { document: row });
   assert.match(row.querySelector('table').dataset.block, /pad-32-0-0-0, pad-m-15-0-15-0\)$/, 'the theme 32px top from 781px; the sides SiteOrigin sets');
+});
+
+// --- SKODA-227: the charging story's photos and "Five questions" panel -----------------------
+const { useLargestSources } = await import('./story-flatten.js');
+test('useLargestSources: a body image shown wider than its thumbnail src takes its largest srcset file', { skip: domSkip }, () => {
+  const d = domDoc(`<html><body><div class="panel-layout">
+    <p><img id="a" src="/p-384x216.jpg" width="1976" srcset="/p-384x216.jpg 384w, /p-768x433.jpg 768w, /p.jpg 1136w"></p>
+    <p><img id="b" src="/t-384x216.jpg" width="384" srcset="/t-384x216.jpg 384w, /t.jpg 1136w"></p>
+    <div class="search-results media-box"><img id="c" src="/m-768x433.jpg" srcset="/m-768x433.jpg 768w, /m.jpg 1136w"></div>
+    <div class="search-results carousel-widget"><img id="d" src="/s-768x433.jpg" width="768" srcset="/s-768x433.jpg 768w, /s-2560x1442.jpg 2560w"></div>
+    <p><img id="e" src="/f-2560x1707.jpg" width="6000" srcset="/f-2560x1707.jpg 2560w, /f.jpg 6000w"></p>
+  </div></body></html>`);
+  assert.equal(useLargestSources(d), 2);
+  assert.equal(d.getElementById('a').getAttribute('src'), '/p.jpg', 'authored 1976 > the 384 file');
+  assert.equal(d.getElementById('b').getAttribute('src'), '/t-384x216.jpg', 'authored at the thumbnail size: kept');
+  assert.equal(d.getElementById('c').getAttribute('src'), '/m-768x433.jpg', 'Media Box cards: their parser picks');
+  assert.equal(d.getElementById('d').getAttribute('src'), '/s-2560x1442.jpg', 'a slider slide: shown at the slide width, whatever its width attribute');
+  assert.equal(d.getElementById('e').getAttribute('src'), '/f-2560x1707.jpg', 'a 2560 file is enough: no swap for the 6000px original');
+});
+
+test('markHighlights: a two-cell panel with its own cell margins / padding carries them, one box per cell', { skip: domSkip }, () => {
+  const css = '#pg-447920-1> .panel-row-style { background-color:#0e3a2f } '
+    + '#pl-447920 #panel-447920-1-0-0 { margin:0px 0px 0px 15px } #pl-447920 #panel-447920-1-1-0 { margin:0px 10px 0px 0px } '
+    + '#pgc-447920-1-1> .panel-cell-style { padding:15px 15px 15px 15px } '
+    + '@media (max-width:780px){ #pl-447920 #panel-447920-1-0-0 { margin:15px 0px 15px 15px } }';
+  const html = `<div id="pg-447920-1" class="panel-grid panel-has-style"><div class="panel-row-style">
+    <div id="pgc-447920-1-0" class="panel-grid-cell"><div id="panel-447920-1-0-0" class="so-panel widget widget_sow-editor"><div class="textwidget"><h2>Five questions</h2></div></div></div>
+    <div id="pgc-447920-1-1" class="panel-grid-cell"><div class="panel-cell-style"><div id="panel-447920-1-1-0" class="so-panel widget widget_sow-image"><img src="x.png"></div></div></div>
+  </div></div>`;
+  const d = domDoc(`<html><head><style>${css}</style></head><body><div class="panel-layout">${html}</div></body></html>`);
+  markHighlights(d);
+  const g = d.getElementById('pg-447920-1');
+  assert.equal(g.getAttribute('data-highlight-cell-margin'), '0px 0px 0px 15px | 0px 10px 0px 0px');
+  assert.equal(g.getAttribute('data-highlight-cell-margin-mobile'), '15px 0px 15px 15px | 0px 10px 0px 0px');
+  assert.equal(g.getAttribute('data-highlight-cell-padding'), '0px 0px 0px 0px | 15px 15px 15px 15px');
+  // the same two cells with the theme's margins: no cell rows
+  const plain = domDoc(`<html><head><style>#pg-447920-1> .panel-row-style { background-color:#0e3a2f }</style></head><body><div class="panel-layout">${html}</div></body></html>`);
+  markHighlights(plain);
+  assert.equal(plain.getElementById('pg-447920-1').hasAttribute('data-highlight-cell-margin'), false);
 });

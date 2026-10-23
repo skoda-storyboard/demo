@@ -111,6 +111,7 @@
      a SiteOrigin row: 32px top padding (>=768), a 10px cell padding (= --story-inset) and
      the widget's 15px margin, on all sides up to 780px and inline only from 781px. */
   --highlight-row-top: 0px;
+  --highlight-pull-up: 40px; /* the source pulls a panel row after another 40px up (row-style margin-top) */
   --highlight-widget-block: 15px;
   --highlight-widget-inline: 15px;
   --highlight-callout-padding: 25px; /* Zellmer FAQ callout (inline style on the source) */
@@ -276,6 +277,7 @@
      The bar stays under the drawer, lightbox and consent banner so they always cover it. */
   --z-float-dock: 18;
   --z-skip-link: 21;
+  --z-panel-content: 1; /* in-page: a story panel's text over the panel pulled up onto it (SKODA-227) */
 
   /* media cart (SKODA-505b; media-cart.md §3, measured on the source 2026-09-30): the red
      count bubble on the cart badge, the dark scrim over an added card, the limit notice's
@@ -1011,6 +1013,12 @@ body.story main > .section.body-column :is(.default-content-wrapper, .columns) h
   line-height: 1.125;
 }
 
+/* a heading that opens a Columns cell starts at the cell's padding, as the source's (its widget
+   adds no top margin: the charging story's "Five questions" sat 29 / 42px low, SKODA-227) */
+body.story main > .section.body-column .columns > div > div > :is(h2, h3, h4):first-child {
+  margin-block-start: 0;
+}
+
 body.story main > .section.body-column :is(.default-content-wrapper, .columns) h3 {
   margin-bottom: var(--spacing-m);
   font-size: var(--heading-font-size-story-h3-mobile);
@@ -1338,6 +1346,43 @@ body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) > di
     calc(var(--hl-pad-right) + var(--story-inset) + var(--hl-margin-right));
 }
 
+/* a two-column panel with its own cell geometry (`hl-cells`, scripts/highlight-geometry.js,
+   SKODA-227: the charging story's "Five questions"): as the source, the panel keeps only its row
+   padding, and each Columns cell has the 10px cell padding plus its own .panel-cell-style
+   padding and widget margin, so the 75 | 25 cells span the panel and the portrait sits
+   10 + 15px into its cell. Up to 780px the mobile boxes apply (SiteOrigin's switch). */
+/* stylelint-disable-next-line no-descending-specificity -- a panel's own box; the intro → body
+   rule above targets a different section (the first body column after the hero) */
+body.story main > .section.body-column:where(.hl-cells):is(.highlight-dark, .highlight-grey) {
+  padding-block: var(--hl-pad-top) var(--hl-pad-bottom);
+}
+
+body.story main > .section.body-column:where(.hl-cells):is(.highlight-dark, .highlight-grey) > div {
+  padding-inline: var(--hl-pad-left) var(--hl-pad-right);
+}
+
+body.story main > .section.hl-cells .columns.split {
+  margin-inline: 0;
+}
+
+body.story main > .section.hl-cells .columns > div > div {
+  padding:
+    calc(var(--story-inset) + var(--hl-cell-padding-m-top, 0px) + var(--hl-cell-margin-m-top, 0px))
+    calc(var(--story-inset) + var(--hl-cell-padding-m-right, 0px) + var(--hl-cell-margin-m-right, 0px))
+    calc(var(--story-inset) + var(--hl-cell-padding-m-bottom, 0px) + var(--hl-cell-margin-m-bottom, 0px))
+    calc(var(--story-inset) + var(--hl-cell-padding-m-left, 0px) + var(--hl-cell-margin-m-left, 0px));
+}
+
+@media (width >= 781px) {
+  body.story main > .section.hl-cells .columns > div > div {
+    padding:
+      calc(var(--story-inset) + var(--hl-cell-padding-d-top, 0px) + var(--hl-cell-margin-d-top, 0px))
+      calc(var(--story-inset) + var(--hl-cell-padding-d-right, 0px) + var(--hl-cell-margin-d-right, 0px))
+      calc(var(--story-inset) + var(--hl-cell-padding-d-bottom, 0px) + var(--hl-cell-margin-d-bottom, 0px))
+      calc(var(--story-inset) + var(--hl-cell-padding-d-left, 0px) + var(--hl-cell-margin-d-left, 0px));
+  }
+}
+
 /* a gallery sits its own source margin in, not the text's */
 body.story main > .section.body-column:is(.highlight-dark, .highlight-grey) .gallery.slider {
   margin-inline:
@@ -1381,6 +1426,25 @@ body.story main > .section.highlight-grey:has(+ .section.highlight-grey) {
   padding-block-end: 0;
 }
 
+/* after a two-column panel (`hl-cells`), whose bottom inset sits in its cells, the next panel is
+   pulled up as the source's row (`margin-top: -40px`) over that inset and keeps its own top:
+   the charging story's "Do you test Qi2…" starts 2px under the first panel at 1280, 15px over
+   it on a phone (SKODA-227) */
+body.story main > .section.hl-cells:is(.highlight-dark, .highlight-grey) + .section.body-column:is(.highlight-dark, .highlight-grey) {
+  margin-block-start: calc(-1 * var(--highlight-pull-up));
+  padding-block-start: calc(var(--hl-pad-top) + var(--story-inset) + var(--hl-margin-top));
+}
+
+/* main is a grid, so each section paints whole (background, then text) after the one before it:
+   the pulled-up panel's background covered the last 7px of the previous panel's text from 781px
+   (#414 review). On the source both are plain blocks, whose backgrounds all paint before any text.
+   The previous panel's content goes on its own layer over the next panel; its background stays
+   under it, so the next panel still covers that */
+body.story main > .section.hl-cells:is(.highlight-dark, .highlight-grey):has(+ .section.body-column:is(.highlight-dark, .highlight-grey)) > div {
+  position: relative;
+  z-index: var(--z-panel-content);
+}
+
 /* a panel the importer cut where its text changes style (a centred 10pt caption among its
    paragraphs): its parts read as one panel, with no inset at the joins; each part holds its
    children's margins, so the paragraph gap stays inside the panel's colour */
@@ -1393,6 +1457,8 @@ body.story main > .section.body-column:is(.highlight-dark, .highlight-grey).cont
   padding-block-start: 0;
 }
 
+/* stylelint-disable-next-line no-descending-specificity -- a body section before a panel; the
+   pull-up rule above targets the panel after a two-column panel */
 body.story main > .section.body-column:not(.highlight-dark, .highlight-grey):has(+ .section:is(.highlight-dark, .highlight-grey)) {
   padding-block-end: var(--story-inset);
 }
@@ -1568,6 +1634,8 @@ body.story main > .section.media-box:last-child {
   margin-block-end: var(--spacing-l);
 }
 
+/* stylelint-disable-next-line no-descending-specificity -- the rail band's wrapper, not a panel's
+   Columns cell (.hl-cells) */
 body.story main > .section.dark.story-rail-container > div {
   padding-inline: 0;
 }
