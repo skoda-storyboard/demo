@@ -16,7 +16,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  buildAllowlist, readLists, renderInto, renderPublished, TARGET,
+  buildAllowlist, readLists, renderInto, renderPublished, previewedPaths, TARGET,
 } from '../build-link-allowlist.mjs';
 
 let JSDOM = null;
@@ -264,4 +264,22 @@ test('NEWS_LISTINGS mirrors the runtime per-locale News paths (scripts/locale-pa
   const runtime = Object.fromEntries(Object.entries(LOCALE_PATHS)
     .filter(([, p]) => p.news).map(([l, p]) => [l, p.news.split('/')[2]]));
   assert.deepEqual(mirrored, runtime);
+});
+
+test('previewedPaths: the pages import:push previewed count as demo pages; chrome and fragments do not (SKODA-1001)', () => {
+  const manifest = {
+    pages: {
+      '/cs/tiskove-zpravy': { hash: 'a', previewedHash: 'a' },
+      '/cs/e-mobilita-cs/x': { hash: 'b', previewedHash: 'b' },
+      '/cs/pushed-not-previewed': { hash: 'c' },
+      '/cs/nav': { hash: 'd', previewedHash: 'd' },
+      '/cs/media-room/footer': { hash: 'e', previewedHash: 'e' },
+      '/cs/nav-newsletter': { hash: 'f', previewedHash: 'f' },
+      '/en/fragments/newsletter-card': { hash: 'g', previewedHash: 'g' },
+      '/drafts/y': { hash: 'h', previewedHash: 'h' },
+    },
+  };
+  assert.deepEqual(previewedPaths(manifest), ['/cs/tiskove-zpravy', '/cs/e-mobilita-cs/x']);
+  assert.deepEqual(previewedPaths({}), []);
+  assert.deepEqual(previewedPaths(null), []);
 });

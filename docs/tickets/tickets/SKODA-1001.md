@@ -92,6 +92,11 @@ Translation coverage is **uneven per-item** — a story living in 4 of 6 languag
   - **The listing's status text** ("No results…", shown by an empty locale listing) was 4.1:1; grey-600 now.
   - Header interactions (desktop dropdown by hover and keyboard, Escape, the mobile drawer and its language
     list, resize after closing) behave as on the English pages.
+  - **Links to previewed pages:** the allow-list counted only published pages, so the Czech chrome and stories
+    linked the previewed `/cs/tiskove-zpravy`, `/cs/category/e-mobilita-cs` and the Sportline story on live.
+    `--refresh-published` now also reads the push manifest's previewed pages (PO decision 2026-10-23; they
+    publish together with the chrome). A link audit of the 6 test pages finds no live link to a demo page;
+    the remaining live links name pages not migrated yet (SKODA-1002) and the source's `/direct-download/` files.
 - **Known, not changed here:** the language row's contrast at desktop (#403, EN too); the listing's "oldest" sort
   button and the footer's "Manage subscription" link contrast (EN too); the footer social row missing on the
   Media Room footers (SKODA-305, EN too); the header shows only a page's migrated translations (SKODA-303a), where

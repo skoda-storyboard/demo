@@ -1,9 +1,15 @@
-# Škoda Demo — every page live on the demo (SKODA-801a), generated; do not edit by hand.
-# From the live query index (2026-10-22) via npm run import:allowlist -- --refresh-published.
+# Škoda Demo — every page live or previewed on the demo (SKODA-801a), generated; do not edit by hand.
+# From every locale's live query index and the push manifest's previewed pages (2026-10-23),
+# via npm run import:allowlist -- --refresh-published.
 # Feeds the SKODA-605 link allow-list, so imports rewrite links to these pages site-relative.
 
-# ===== PUBLISHED (414) =====
+# ===== PUBLISHED (419) =====
+https://www.skoda-storyboard.com/cs/category/e-mobilita-cs/
+https://www.skoda-storyboard.com/cs/e-mobilita-cs/poznejte-peaq-snadne-a-pohodlne-ovladani/
+https://www.skoda-storyboard.com/cs/e-mobilita-cs/skoda-epiq-nove-obleka-efektni-soupravu-sportline/
 https://www.skoda-storyboard.com/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund/
+https://www.skoda-storyboard.com/cs/e-mobilita-cs/skoda-peaq-si-vas-ziska-behem-chvilky/
+https://www.skoda-storyboard.com/cs/tiskove-zpravy/
 https://www.skoda-storyboard.com/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds/
 https://www.skoda-storyboard.com/en/
 https://www.skoda-storyboard.com/en/category/classic-cars/

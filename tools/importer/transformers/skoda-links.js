@@ -41,7 +41,12 @@ const SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)
 
 // BEGIN GENERATED ALLOWLIST (npm run import:allowlist → build-link-allowlist.mjs; do not edit by hand)
 const DEMO_PATHS = [
+  "/cs/category/e-mobilita-cs",
+  "/cs/e-mobilita-cs/poznejte-peaq-snadne-a-pohodlne-ovladani",
+  "/cs/e-mobilita-cs/skoda-epiq-nove-obleka-efektni-soupravu-sportline",
   "/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+  "/cs/e-mobilita-cs/skoda-peaq-si-vas-ziska-behem-chvilky",
+  "/cs/tiskove-zpravy",
   "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
   "/en",
   "/en/category/classic-cars",
@@ -461,7 +466,12 @@ const DEMO_ALIASES = {
   "/en/skoda-world/innovation-and-technology/explore-the-new-skoda-models-in-mixed-reality": "/en/skoda-world/explore-the-new-skoda-models-in-mixed-reality"
 };
 const LIVE_ONLY_PATHS = [
+  "/cs/category/e-mobilita-cs",
+  "/cs/e-mobilita-cs/poznejte-peaq-snadne-a-pohodlne-ovladani",
+  "/cs/e-mobilita-cs/skoda-epiq-nove-obleka-efektni-soupravu-sportline",
   "/cs/e-mobilita-cs/skoda-epiq-si-vas-ziska-za-par-sekund",
+  "/cs/e-mobilita-cs/skoda-peaq-si-vas-ziska-behem-chvilky",
+  "/cs/tiskove-zpravy",
   "/de/emobilitat-de/skoda-epiq-will-win-you-over-in-just-a-few-seconds",
   "/en/emobility/a-true-czech-from-spain",
   "/en/emobility/before-an-electric-car-starts-up-for-the-first-time",
