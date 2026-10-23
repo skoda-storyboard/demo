@@ -140,7 +140,8 @@ var CustomImportScript = (() => {
   };
   var BUILT = {
     mediaFeed: ["en"],
-    fragments404: ["en"]
+    fragments404: ["en"],
+    mediaCart: ["en"]
   };
   function contentPrefix(template, locale) {
     const prefixes = CONTENT_PREFIXES[template];

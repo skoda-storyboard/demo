@@ -56,6 +56,22 @@ test('the locale comes from the page path', () => {
   assert.equal(el.querySelector('.fragment a').getAttribute('href'), '/cs/fragments/newsletter-card');
 });
 
+test('a locale whose stories have no card (German, Slovak, Serbian on the source): nothing is added (SKODA-1001 review)', () => {
+  ['/de/emobilitat-de/x', '/sk/emobilita-sk/x', '/sr/emobilnost-sr/x', '/sl/x'].forEach((path) => {
+    const el = main(['sidebar', SIDEBAR]);
+    assert.equal(addNewsletterCard(el, path), null, path);
+    assert.equal(el.querySelector('.fragment'), null, path);
+  });
+});
+
+test('the placeholder link is out of the tab order and the accessibility tree until the card loads', () => {
+  const el = main(['sidebar', SIDEBAR]);
+  addNewsletterCard(el, '/en/x');
+  const link = el.querySelector('.fragment a');
+  assert.equal(link.getAttribute('aria-hidden'), 'true');
+  assert.equal(link.getAttribute('tabindex'), '-1');
+});
+
 test('an authored card wins: nothing is added', () => {
   const el = main(['sidebar', CARD + SIDEBAR]);
   assert.equal(addNewsletterCard(el, '/en/x'), null);

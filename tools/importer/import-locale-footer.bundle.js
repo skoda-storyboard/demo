@@ -71,7 +71,6 @@ var CustomImportScript = (() => {
         ul.append(item);
         return;
       }
-      item.append(para(document, /^#?$/.test(href) ? text(top) : link(document, href, text(top))));
       const subs = [];
       li.querySelectorAll(":scope > ul > li > a, :scope > div ul > li > a").forEach((a) => {
         const sub = { href: authoredHref(a.getAttribute("href")), label: text(a), heading: a.parentElement.classList.contains("heading") };
@@ -79,6 +78,9 @@ var CustomImportScript = (() => {
         if (prev && prev.href === sub.href && prev.label === sub.label) return;
         subs.push(sub);
       });
+      if (!/^#?$/.test(href)) item.append(para(document, link(document, href, text(top))));
+      else if (!keepHeading && subs.length) item.append(para(document, link(document, subs[0].href, text(top))));
+      else item.append(para(document, text(top)));
       const kept = subs.filter((s, i) => keepHeading || !(s.heading || i === 0 && s.href === authoredHref(href)));
       if (subs.length > 1 && kept.length) {
         const subList = document.createElement("ul");
@@ -89,7 +91,7 @@ var CustomImportScript = (() => {
         });
         item.append(subList);
       }
-      ul.append(item);
+      if (item.children.length) ul.append(item);
     });
     return ul;
   }

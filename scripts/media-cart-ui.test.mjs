@@ -55,11 +55,12 @@ test('formatBytes', () => {
   );
 });
 
-test('cartHref follows the locale of the page', () => {
-  // the source's own cart slug per locale (SKODA-1001), not the English one under another prefix
-  assert.equal(ui.cartHref('/de/press-releases/x'), '/de/media-kart');
+test('cartHref: the demo\'s cart page, the locale\'s own once built (SKODA-1001)', () => {
+  // only the English cart page is built: a German or Czech page opens it, never the source's
+  // unmigrated `/de/media-kart` or `/cs/kontakty/kosik` (a 404 on the demo)
+  assert.equal(ui.cartHref('/de/press-releases/x'), '/en/media-cart');
   assert.equal(ui.cartHref('/'), '/en/media-cart');
-  assert.equal(ui.cartHref(), '/cs/kontakty/kosik');
+  assert.equal(ui.cartHref(), '/en/media-cart');
 });
 
 test('limitBanner states both caps and needs no shared stylesheet (the blocks style it)', () => {

@@ -11,9 +11,10 @@
  *   newsletter: one Newsletter Stub (topbar) block (label … language rows)
  *   footer:     app badges + social icons --- menu --- notice, ©, feeds
  *
- * Links keep their source targets as site paths (`/cs/category/modely-cs/`); the site's link
- * policy (scripts/links.js) sends the ones the demo doesn't carry to the live site. Sections
- * are separated by <hr> (DA section breaks). Used by import-locale-nav / -newsletter / -footer.
+ * Links keep their source targets as absolute live URLs (authoredHref); the importers' link rule
+ * (transformers/skoda-links.js) makes the ones whose target is a demo page site-relative
+ * (SKODA-1001). Sections are separated by <hr> (DA section breaks). Used by import-locale-nav /
+ * -newsletter / -footer.
  */
 
 const LIVE_HOST = /^(?:www\.)?skoda-storyboard\.com$/i;
@@ -43,6 +44,22 @@ export function authoredHref(href) {
     return url.href;
   } catch (e) {
     return href;
+  }
+}
+
+/**
+ * A source language link fit for a nav every page of the locale shares, else '': a locale's home
+ * or Media Room home (`/cs/`, `/cs/media-room/`), or another site (the German Media Room,
+ * skoda-media.de). A story's language links name that story's translations, not the locale.
+ */
+export function siteWideLocaleHref(href) {
+  try {
+    const url = new URL(href, 'https://www.skoda-storyboard.com');
+    if (!/^https?:$/.test(url.protocol)) return '';
+    if (!LIVE_HOST.test(url.hostname)) return url.href;
+    return /^\/[a-z]{2}\/(?:media-room\/?)?$/i.test(url.pathname) ? href : '';
+  } catch (e) {
+    return '';
   }
 }
 
@@ -80,7 +97,6 @@ function menuList(document, source, { keepHeading, newsletter }) {
       ul.append(item);
       return;
     }
-    item.append(para(document, /^#?$/.test(href) ? text(top) : link(document, href, text(top))));
     const subs = [];
     li.querySelectorAll(':scope > ul > li > a, :scope > div ul > li > a').forEach((a) => {
       const sub = { href: authoredHref(a.getAttribute('href')), label: text(a), heading: a.parentElement.classList.contains('heading') };
@@ -88,6 +104,12 @@ function menuList(document, source, { keepHeading, newsletter }) {
       if (prev && prev.href === sub.href && prev.label === sub.label) return; // desktop + mobile copies
       subs.push(sub);
     });
+    // a `#` parent (the German Modelle / Lifestyle) is a text heading in the nav. In the footer it
+    // links to its first link, as the source's phone footer does; the footer block hides it once
+    // the columns open, where that link shows first (footer-sections.js, SKODA-1001)
+    if (!/^#?$/.test(href)) item.append(para(document, link(document, href, text(top))));
+    else if (!keepHeading && subs.length) item.append(para(document, link(document, subs[0].href, text(top))));
+    else item.append(para(document, text(top)));
     const kept = subs.filter((s, i) => keepHeading || !(s.heading || (i === 0 && s.href === authoredHref(href))));
     if (subs.length > 1 && kept.length) {
       const subList = document.createElement('ul');
@@ -98,7 +120,7 @@ function menuList(document, source, { keepHeading, newsletter }) {
       });
       item.append(subList);
     }
-    ul.append(item);
+    if (item.children.length) ul.append(item); // a footer `#` parent with no links adds nothing
   });
   return ul;
 }
@@ -122,7 +144,8 @@ export function buildNav(document, locale) {
   // the source's own locale links when it has them (the Media Room's point at each locale's Media
   // Room, German at skoda-media.de), else each locale's home (SKODA-1001)
   const sourceLocale = new Map([...(topbar ? topbar.querySelectorAll('.lang-links a[href]') : [])]
-    .map((a) => [text(a).toLowerCase(), a.getAttribute('href')]));
+    .map((a) => [text(a).toLowerCase(), siteWideLocaleHref(a.getAttribute('href'))])
+    .filter(([, href]) => href));
   LOCALE_ROW.forEach(([code, label], i) => {
     if (i) locales.append(' ');
     if (code === locale) {

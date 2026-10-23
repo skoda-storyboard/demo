@@ -71,4 +71,29 @@ Translation coverage is **uneven per-item** — a story living in 4 of 6 languag
 - The per-locale media feeds (`BUILT.mediaFeed`) and the translated 404 fragments: SKODA-1002.
 - Live's Slovak newsletter page is in English; imported as is.
 - `/en/contacts` is still a LIVE_ONLY entry in `scripts/links.js`; #409 migrates the page and owns the entry.
+- **Review (2026-10-23):** the locale chrome was measured against live at 390, 768, 992 and 1280 on the
+  translated Epiq stories (CS, DE, SK, SR) and `/cs/tiskove-zpravy`. Header and footer heights, the menu type
+  and the footer headings (h3) are equal on all of them after these fixes:
+  - **German nav and footer** (and Slovenian): the preview copies predated the `#` parent fix, so "Modelle" and
+    "Lifestyle" were Subscribe links with no sub-items (14 of live's 25 header links). Re-imported. In the
+    footer, a `#` parent's label links to its first link, as the source's phone footer; from 992px
+    `footer-sections.js` hides a label that repeats its column's first link (same page and name; the Slovak
+    "Škoda svet" shares a page with its first link under another name, and keeps its label, as live).
+  - **The nav's language row** used the source page's own language links, so a nav built from a story linked
+    "EN" to that story's English translation. Only a locale or Media Room home, or another site
+    (skoda-media.de), is kept now (`siteWideLocaleHref`).
+  - **The footer's social row**: TikTok and LinkedIn (the German footer) were not known icons, so they stayed
+    an unnamed paragraph (30px, two unnamed links). They join the row, named; `icons/tiktok.svg` added.
+  - **The media cart badge** linked a Czech page to the source's `/cs/kontakty/kosik`, not a demo page (404).
+    The cart page is built for English only (`BUILT.mediaCart`), and it keeps every locale's cart.
+  - **The story newsletter card** was added to every locale's story sidebar; live has it in EN and CS only, and
+    only those fragments exist, so DE / SK / SR stories showed an empty, unnamed link (axe `link-name`). Only
+    EN and CS get it now, and the placeholder link is hidden from the tab order and the accessibility tree.
+  - **The listing's status text** ("No results…", shown by an empty locale listing) was 4.1:1; grey-600 now.
+  - Header interactions (desktop dropdown by hover and keyboard, Escape, the mobile drawer and its language
+    list, resize after closing) behave as on the English pages.
+- **Known, not changed here:** the language row's contrast at desktop (#403, EN too); the listing's "oldest" sort
+  button and the footer's "Manage subscription" link contrast (EN too); the footer social row missing on the
+  Media Room footers (SKODA-305, EN too); the header shows only a page's migrated translations (SKODA-303a), where
+  live always lists every locale; `lang="cs"` where live has `cs-CZ`.
 - **Merge note:** merging this code removes the runtime locale rule, so the chrome fragments and the sheet above must be published together with it. Otherwise the relative `/cs/…` links in the published chrome, which the rule sent to live, become unmigrated EDS paths (404).

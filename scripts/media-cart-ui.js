@@ -9,7 +9,7 @@
  * `{total}` are replaced by `format`; a `…One` key is the singular of a counted text (`plural`).
  */
 
-import { localePath } from './locale-paths.js';
+import { LOCALE_PATHS, builtLocale } from './locale-paths.js';
 import { loadCSS } from './aem.js';
 // not the store: the UI and the listing banner must not pull it in (SKODA-505a review)
 import {
@@ -87,8 +87,14 @@ export const plural = (labels, key, n, values = {}) => format(
   { ...values, n },
 );
 
-/** The cart page for the current locale (the source's `/en/media-cart/`, `/cs/kontakty/kosik/`). */
-export const cartHref = (pathname = window.location.pathname) => localePath('mediaCart', pathname);
+/**
+ * The cart page for the current locale once that locale's is built (BUILT.mediaCart), else the
+ * English one, which keeps the cart of every locale (the source's Czech `/cs/kontakty/kosik/` is
+ * not a demo page yet: a link there would 404, 1001 review).
+ */
+export const cartHref = (pathname = window.location.pathname) => (
+  LOCALE_PATHS[builtLocale('mediaCart', pathname)].mediaCart
+);
 
 // one load for the page: loadCSS resolves at once for a sheet that is already linked but
 // still loading, so callers share this promise to wait for the real load

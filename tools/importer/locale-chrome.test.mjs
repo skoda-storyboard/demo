@@ -9,7 +9,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import {
-  localeOfUrl, authoredHref, buildNav, buildNewsletter, buildFooter,
+  localeOfUrl, authoredHref, buildNav, buildNewsletter, buildFooter, siteWideLocaleHref,
 } from './locale-chrome.js';
 
 const LIVE = 'https://www.skoda-storyboard.com';
@@ -75,8 +75,9 @@ test('buildNav: the 4 sections of /nav (topbar, brand, menu, search), in the loc
   const [topbar, brand, menu, search] = s;
   assert.deepEqual(links(topbar[0]), ['Stories=https://www.skoda-storyboard.com/cs/', 'Media Room=https://www.skoda-storyboard.com/cs/media-room/']);
   assert.deepEqual(links(topbar[1]), ['Odebírat články=#subscribe']);
-  // the source's own language link (en), else each locale's home
-  assert.equal(topbar[2].innerHTML, '<a href="https://www.skoda-storyboard.com/en/x/">EN</a> <strong>CZ</strong> <a href="https://www.skoda-storyboard.com/de/">DE</a> <a href="https://www.skoda-storyboard.com/sk/">SK</a> <a href="https://www.skoda-storyboard.com/sr/">SR</a> <a href="https://www.skoda-storyboard.com/sl/">SL</a>');
+  // the source story's own `en` link names its translation (`/en/x/`), not the locale: the row
+  // a whole locale shares keeps each locale's home (1001 review)
+  assert.equal(topbar[2].innerHTML, '<a href="https://www.skoda-storyboard.com/en/">EN</a> <strong>CZ</strong> <a href="https://www.skoda-storyboard.com/de/">DE</a> <a href="https://www.skoda-storyboard.com/sk/">SK</a> <a href="https://www.skoda-storyboard.com/sr/">SR</a> <a href="https://www.skoda-storyboard.com/sl/">SL</a>');
   assert.deepEqual(links(brand[0]), ['Škoda Storyboard=https://www.skoda-storyboard.com/cs/']);
   const items = [...menu[0].children];
   assert.deepEqual(links(items[0]), ['Modely=https://www.skoda-storyboard.com/cs/category/modely-cs/', 'Modely=https://www.skoda-storyboard.com/cs/category/modely-cs/', 'Fabia=https://www.skoda-storyboard.com/cs/tag/model/fabia-cs/'], 'the heading kept once, as /nav');
@@ -134,11 +135,58 @@ test('buildFooter: the 3 sections of /footer; headings and Newsletter dropped; i
   assert.deepEqual(links(legal[2]), ['RSS=https://www.skoda-storyboard.com/cs/feed/']);
 });
 
+test('buildFooter: a `#` parent column\'s label links to its first link, then its links (the German Modelle, 1001 review)', () => {
+  const d = doc();
+  d.querySelector('.footer-nav ul.menu').insertAdjacentHTML('afterbegin', `<li><a href="#">Modelle</a><ul class="sub-menu">
+    <li><a href="${LIVE}/de/category/modelle-de/">Modelle</a></li><li><a href="${LIVE}/de/tag/model/fabia-de/">Fabia</a></li></ul></li>
+    <li><a href="#">Leer</a><ul class="sub-menu"><li><a href="${LIVE}/de/x/">Nur einer</a></li></ul></li>`);
+  const [, menu] = sections(buildFooter(d));
+  const [first, second] = [...menu[0].children];
+  // the source's phone footer: the label opens the category; from 992px the footer block hides it
+  assert.deepEqual(links(first.querySelector(':scope > p')), [`Modelle=${LIVE}/de/category/modelle-de/`]);
+  assert.deepEqual(links(first.querySelector(':scope > ul')), [`Modelle=${LIVE}/de/category/modelle-de/`, `Fabia=${LIVE}/de/tag/model/fabia-de/`]);
+  assert.deepEqual(links(second), [`Leer=${LIVE}/de/x/`], 'a `#` parent with a single link: its label, no sub-list');
+});
+
 test('a page without the chrome: empty fragments, no throw', () => {
   const bare = new JSDOM('<!DOCTYPE html><html><body><p>x</p></body></html>', { url: `${LIVE}/cs/x/` }).window.document;
   assert.equal(buildFooter(bare).children.length, 0);
   assert.equal(buildNewsletter(bare, 'cs').children.length, 0);
   assert.equal(sections(buildNav(bare, 'cs')).length, 4, 'the nav keeps its 4 sections');
+});
+
+test('siteWideLocaleHref: a locale or Media Room home, or another site; never one page\'s translation', () => {
+  [
+    [`${LIVE}/en/`, `${LIVE}/en/`],
+    [`${LIVE}/cs/media-room/`, `${LIVE}/cs/media-room/`],
+    ['/sk/', '/sk/'],
+    ['https://www.skoda-media.de/', 'https://www.skoda-media.de/'],
+    [`${LIVE}/en/emobility/skoda-epiq-will-win-you-over/`, ''],
+    [`${LIVE}/cs/tiskove-zpravy/`, ''],
+    ['javascript:alert(1)', ''],
+    ['', ''],
+  ].forEach(([href, want]) => assert.equal(siteWideLocaleHref(href), want, href));
+});
+
+test('buildNav: the Media Room row keeps the source\'s locale Media Room links and another site', () => {
+  const d = doc();
+  d.querySelector('.lang-links').innerHTML = `<span>cs</span><a href="${LIVE}/en/media-room/">en</a><a href="https://www.skoda-media.de/">de</a>`;
+  const [topbar] = sections(buildNav(d, 'cs'));
+  const row = topbar[topbar.length - 1];
+  assert.deepEqual(links(row).slice(0, 2), [`EN=${LIVE}/en/media-room/`, 'DE=https://www.skoda-media.de/']);
+});
+
+test('buildNav: a `#` parent with sub-items is a menu heading, not Subscribe (the German Modelle, 1001 review)', () => {
+  const d = doc();
+  d.querySelector('nav.topnav > ul').insertAdjacentHTML('afterbegin', `<li><a href="#">Modelle</a><ul class="sub-menu">
+    <li><a href="${LIVE}/de/category/modelle-de/">Modelle</a></li>
+    <li><a href="${LIVE}/de/tag/model/fabia-de/">Fabia</a></li><li><a href="${LIVE}/de/tag/model/scala-de/">Scala</a></li></ul></li>`);
+  const [, , menu] = sections(buildNav(d, 'de'));
+  const first = menu[0].children[0];
+  assert.equal(first.querySelector(':scope > p').textContent, 'Modelle', 'a text heading');
+  assert.equal(first.querySelector(':scope > p a'), null, 'not a link, not #newsletter');
+  // its sub-items, the category first (live shows "Modelle" again as the dropdown's first link)
+  assert.deepEqual(links(first.querySelector('ul')), [`Modelle=${LIVE}/de/category/modelle-de/`, `Fabia=${LIVE}/de/tag/model/fabia-de/`, `Scala=${LIVE}/de/tag/model/scala-de/`]);
 });
 
 test('buildNav: a topbar without Subscribe (DE / SK / SR on the source) authors none', () => {

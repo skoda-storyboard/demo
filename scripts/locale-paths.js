@@ -117,10 +117,15 @@ export const CONTENT_PREFIXES = {
   },
 };
 
-/** Per-locale content this site builds itself; a locale not listed reads the English one. */
+/**
+ * Per-locale content this site builds itself; a locale not listed reads the English one. The
+ * media cart is the demo's own page (SKODA-505b) and keeps the cart of every locale: until a
+ * locale's cart page (`/cs/kontakty/kosik`) is built, its badge opens the English one, not a 404.
+ */
 export const BUILT = {
   mediaFeed: ['en'],
   fragments404: ['en'],
+  mediaCart: ['en'],
 };
 
 /**

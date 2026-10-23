@@ -56,7 +56,7 @@ test('badge: the cart link with a count bubble, hidden when the cart is empty', 
   const cart = fakeCart(0);
   const link = await buildCartBadge(slot, {}, load(cart));
   assert.equal(slot.firstElementChild, link);
-  assert.equal(link.getAttribute('href'), '/de/media-kart');
+  assert.equal(link.getAttribute('href'), '/en/media-cart', 'the built cart page (SKODA-1001)');
   assert.equal(link.className, 'float-dock-button float-dock-cart');
   // the cart glyph is the source font glyph in CSS (#273): no icon element, the count only
   assert.equal(link.querySelector('.icon'), null);
@@ -88,7 +88,7 @@ test('badge: flagged empty (no badge shown, as on the source) until something is
 });
 
 test('badge: labels from the placeholders sheet; aria-current on the cart page', async () => {
-  window.history.replaceState({}, '', '/de/media-kart/');
+  window.history.replaceState({}, '', '/en/media-cart/');
   const slot = document.createElement('div');
   const link = await buildCartBadge(slot, {
     mediaCartBadge: 'Medienkorb', mediaCartBadgeCount: 'Medienkorb, {n} Dateien',

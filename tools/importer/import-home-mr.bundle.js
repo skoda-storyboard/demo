@@ -117,7 +117,8 @@ var CustomImportScript = (() => {
   };
   var BUILT = {
     mediaFeed: ["en"],
-    fragments404: ["en"]
+    fragments404: ["en"],
+    mediaCart: ["en"]
   };
 
   // tools/importer/locale.js

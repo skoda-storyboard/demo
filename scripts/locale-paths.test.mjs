@@ -53,5 +53,12 @@ test('builtLocale: the page locale only when that content is built, else English
   assert.equal(builtLocale('mediaFeed', '/en/images'), 'en');
   assert.equal(builtLocale('mediaFeed', '/cs/foto'), 'en', 'no Czech feed yet');
   assert.equal(builtLocale('fragments404', '/de/missing'), 'en');
+  assert.equal(builtLocale('mediaCart', '/cs/tiskove-zpravy-archiv/x'), 'en', 'one cart page, English');
   assert.equal(builtLocale('unknown', '/cs/x'), 'en');
+  // odd paths: upper case, a bare locale, an unknown two-letter segment, the root
+  assert.equal(localePath('news', '/CS/foto'), '/cs/tiskove-zpravy');
+  assert.equal(localePath('news', '/cs'), '/cs/tiskove-zpravy');
+  assert.equal(localePath('news', '/xx/page'), '/en/news', 'an unknown locale reads English');
+  assert.equal(localePath('news', '/'), '/en/news');
+  assert.equal(localePath('nosuchkey', '/cs/x'), undefined);
 });
