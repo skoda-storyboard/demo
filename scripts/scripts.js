@@ -464,8 +464,12 @@ async function loadLazy(doc) {
   // blocks build links while loading (downloads, tags, cards): apply the link policy to them too
   decorateLinks(main);
 
+  // the hash is percent-encoded: a heading id with a diacritic (`#škoda-corporate-communications`,
+  // the footer's Contacts sections) is only found decoded
   const { hash } = window.location;
-  const element = hash ? doc.getElementById(hash.substring(1)) : false;
+  let id = hash.substring(1);
+  try { id = decodeURIComponent(id); } catch (e) { /* a malformed escape: the raw hash */ }
+  const element = id ? doc.getElementById(id) : false;
   if (hash && element) element.scrollIntoView();
 
   loadFooter(doc.querySelector('body > footer'));

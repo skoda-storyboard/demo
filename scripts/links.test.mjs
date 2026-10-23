@@ -50,7 +50,7 @@ test('a trailing slash on a demo path is dropped, query + hash kept, relative st
 test('LIVE_ONLY chrome targets go to the live site in a new tab', () => {
   [
     '/cs/', '/de/', '/sk/', '/sl/', '/sr/', '/de/some/page/',
-    '/en/skodapedia/', '/en/feed/', '/en/press-releases/feed/', '/en/contacts/',
+    '/en/skodapedia/', '/en/feed/', '/en/press-releases/feed/',
     '/en/documents/consent-to-personal-data-processing-information-on-personal-data-processing/',
   ].forEach((href) => assert.deepEqual(policyHref(href, PAGE), { href: `${LIVE_ORIGIN}${href}`, newTab: true }, href));
 });
@@ -62,6 +62,21 @@ test('"Manage subscription" goes to the live page in the same tab, as on the sou
   assert.equal(opensInSameTab(live), true);
   assert.equal(opensInSameTab('https://example.com/en/newsletter-settings/'), false, 'only the live host');
   assert.equal(opensInSameTab(`${LIVE_ORIGIN}/en/documents/x/`), false, 'the consent document keeps its new tab');
+});
+
+test('Contacts and Copyright open the migrated pages in the same tab (SKODA-813, #457 re-review)', () => {
+  [
+    [`${LIVE_ORIGIN}/en/contacts/`, '/en/contacts'],
+    [`${LIVE_ORIGIN}/en/copyright/`, '/en/copyright'],
+    ['/en/contacts/', '/en/contacts'],
+    // the footer's source anchors land on the demo page's headings
+    [`${LIVE_ORIGIN}/en/contacts/#corporate`, '/en/contacts#škoda-corporate-communications'],
+    [`${LIVE_ORIGIN}/en/contacts/#product`, '/en/contacts#škoda-productcommunications'],
+    ['/en/contacts#corporate', '/en/contacts#škoda-corporate-communications'],
+    // any other anchor is kept as it is
+    [`${LIVE_ORIGIN}/en/contacts/#press`, '/en/contacts#press'],
+  ].forEach(([href, to]) => assert.deepEqual(policyHref(href, PAGE), { href: to, newTab: false }, href));
+  assert.equal(policyHref('/en/contacts', PAGE), null, 'a demo link is left as it is');
 });
 
 test('the media cart page is the demo\'s own (SKODA-505b): it stays in the tab', () => {

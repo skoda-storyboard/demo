@@ -58,7 +58,7 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `downloads` | `media-box` (SKODA-510), `gallery` (SKODA-806: a press-kit Images-chapter group, emitted by `parsers/press-kit-media.js` with `collapse | auto`; an Images chapter past 200 images moves its largest groups to `Fragment` blocks, `/fragments<page>/<slug>`) | Media Box rows: `source`, `postid`, `lang`, `columns`, `sizes`, `collapse` (SKODA-502/510) |
 | `embed` | – | `url`, `ratio`, `title`, `poster`, `height` (`or-curated`: a bare Vimeo / YouTube / Buzzsprout / Spotify URL on its own line still autoblocks). A self-hosted `.mp4`/`.webm`/`.mov`/`.m4v` `url` renders a native `<video>` with the `poster` image (SKODA-801a, WordPress `[video]`). YouTube as on the source: a `youtube.com/embed/…` URL is the source's iframe, YouTube's own player (lazy-loaded, its query kept); a `watch` / `youtu.be` URL is the source's lite-youtube, the poster until clicked (SKODA-702a). `height` (px) is a fixed-height player box at full width, as the source's `width="100%" height="448px"` iframe |
 | `gallery` | – | – |
-| `hero-image` | `story` (default), `overlay`, `archive` | – |
+| `hero-image` | `story` (default), `overlay`, `archive`, `page` | – |
 | `listing` | – | `index`, `path`, `template`, `facets`, `facetlabels`, `sort`, `perpage`, `columns` (config only) |
 | `media-cart` | – | – (an empty block: authored cells are ignored; it renders the device's cart, the cart page `/{lang}/media-cart`, SKODA-505b) |
 | `stories` | – | `index`, `path`, `template`, `category`, `categories`, `tag(s)`, `heading`, `sort`, `initial`, `perpage`, `columns`, `excludefeatured`, `offset`, `exclude`, `feature` (config only; `exclude` registered by SKODA-611b, `feature` since SKODA-222, `categories` since SKODA-831) |
@@ -86,9 +86,15 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Series hub resolved (SKODA-207, 2026-09-27):** `parsers/series-hero.js` emits `Hero Image (overlay)`: row 1 the picture, row 2 the "Series" chip `<p>`, the H1, then the standfirst `<p>`. `templates/skoda-series/` shows them as H1 → badge → standfirst. `hero-banner.js` stays unchanged (page/company still to resolve).
 - **Archive term band resolved (SKODA-828, 2026-10-05):** `parsers/archive-hero.js` emits `Hero Image (archive)` (previously default content): row 1 the banner picture, or an empty cell when the term has no banner (the source's empty band); row 2 the single H1 with **one line per source label**, separated by `<br>` (`<h1>Models<br>Peaq</h1>`; the accessible name stays "Models Peaq"). A category label is a link to its term (`<h1><a href="/en/category/lifestyle">Lifestyle</a><br><a href="/en/category/lifestyle/people">People</a></h1>`); tag labels are text, and equal labels both stay (`tag/crew/technology`: Technology, Technology). The block renders each line as a grey label chip (a link line is the chip itself) on the bottom-left of the 184/224/240px band. An H1 without `<br>` renders as one chip.
 - **Finding:** `parsers/hero.js` (model page, now resolved) and `parsers/hero-banner.js` (page / category / tag / series / listing banners) emit `Hero`, but the `hero` folder on `main` is only an **empty boilerplate stub** (`hero.js` is 0 bytes, `hero.css` is 504 bytes of boilerplate) left from #104. The project's hero is `hero-image`, so a `Hero` table renders undecorated, with boilerplate styling. *(Corrected 2026-09-25: the first inventory said there was no `hero` block at all.)*
+- **Generic page band resolved (SKODA-813, 2026-10-21):** `parsers/hero-banner.js` (page-base and company
+  pages) emits `Hero Image (page)`: row 1 the banner picture, or an empty cell when the page has none (the
+  source's grey band, e.g. `/en/copyright`); row 2 the H1. The block draws a 240px full-bleed band at every
+  width, the image covering it under the shared scrim (else 5% ink under it), and the white 48/52.8 wt300
+  title on its bottom-left, 16px up.
 - **Contract:** emit the existing block, with no new `hero` block:
-  - `Hero Image (overlay)` for full-bleed overlay heroes (model, series hub, press-kit hub, listings, pages);
-  - `Hero Image (archive)` for the image-only category/tag band.
+  - `Hero Image (overlay)` for full-bleed overlay heroes (model, series hub, press-kit hub, listings);
+  - `Hero Image (archive)` for the image-only category/tag band;
+  - `Hero Image (page)` for the generic page's title band (page-base, company pages).
 - **Rows** (hero-image's shape):
   1. a masters-only `<picture>`;
   2. the heading (H1), then optional perex/caption paragraphs and optional chip text.
@@ -276,7 +282,7 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Status:** ✅ on `main` with `blocks/footnotes` once SKODA-805d merges (block and importer land together). **Ticket:** SKODA-805d
 - **Why a block:** the source sets small print with an inline size (`<span style="font-size: 10pt">`). DA keeps no inline size, and its inline marks are only `strong`/`b`, `em`/`i`, `u`, `s`, `sup`, `sub`, `code` (no `small`, no `span`). It keeps classes only on block `<div>`s, so the small print has to be a block.
 - **Runtime:** each paragraph renders at 10pt (13.33px) on the body's 24px line, with the 20px paragraph gap, in ink, as the source does (measured on first-glimpse at 375/768/992/1080/1280/1440).
-  - Links are the source's accent green (`--skoda-green-accent`, `#419468`), ink on hover, no underline. They keep the global `:focus-visible` ring, which the source lacks.
+  - Links are the source's accent green (`--skoda-green-accent`, `#419468`), ink on hover, no underline. Like the source's, they show no focus ring (PO, 2026-10-21: an accepted exception to css-guidelines §8).
   - Only the footnote link is green (decision 2026-10-05); other body links stay `--link-color` ink.
   - Green on white is 3.71:1, under WCAG AA's 4.5:1 for text this size; the source has the same.
 - **Shape:** header `Footnotes`, then one row per paragraph of small print, one cell: `[<p>¹ … <a href>HERE</a><br>² …</p>]`. Links, line breaks and `sup` markers stay. Consecutive small-print paragraphs share one table.
@@ -427,6 +433,20 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
     shard without a row the facet index names, falls back to the whole feed, so publish it until the shards
     replace it.
 - Domain-restricted Vimeo videos (oEmbed `domain_status_code: 403`) can't play on the demo and are not emitted.
+
+### `page-body`
+- **Status:** `pinned` (2026-10-21) · **Ticket:** SKODA-813 · **Fallback:** readable (unstyled default content
+  under the band) · **Styles:** `page-body`, `page-body, half`, `page-body, half, empty-cell`
+- **Emitted by:** `transformers/skoda-page-rows.js` (page-base importer). One section per SiteOrigin row of the
+  generic page's body, each closed by its `Section Metadata`; a body without rows is one `page-body` section.
+- **Shape:** `page-body`: the row's flattened default content (h2/h3/p/lists/links). `half`: the row held its
+  text in the left cell of a 50/50 row, the right cell empty: from 781px the text keeps half the column less a
+  40px gutter. `empty-cell`: that right cell held an empty widget rather than none, so on phones the source
+  stacks it under the text, 10px tall.
+- **Runtime (styles.css):** every row 10px under the band or the row before; text 20px inside the column,
+  30px from 781px; h2 40/45 and h3 24/27.6, wt300, 16px under; paragraphs 20px apart; green links, ink on hover.
+- **Example** (`/en/copyright/`): `page-body` (the h2 row), `page-body, half, empty-cell`, then 3 × `page-body,
+  half`. Equal to the source at 390 / 768 / 780 / 781 / 992 / 1440 (every text box, the band, the footer gap).
 
 ### `floating-action-bar`
 - **Status:** `pinned` · **Ticket:** SKODA-215 · **Fallback:** readable (absent)

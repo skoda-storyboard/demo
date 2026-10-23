@@ -71,7 +71,8 @@
       "variants": [
         "story",
         "overlay",
-        "archive"
+        "archive",
+        "page"
       ]
     },
     "listing": {

@@ -14,6 +14,7 @@
  *   .overlay       → 16:9 image with an ink caption below; from 768 a full-bleed
  *                    61.8vh image with the white caption overlaid (SKODA-828)
  *   .archive       → full-bleed 184/224/240 band, the h1 as grey label chips
+ *   .page          → the generic page's 240px title band, image or empty (SKODA-813)
  * Mobile-first. The section wrapper's full bleed is in styles.css.
  * ========================================================================== */
 
@@ -28,7 +29,7 @@
   width: 100%;
 }
 
-.hero-image:not(.overlay, .archive) {
+.hero-image:not(.overlay, .archive, .page) {
   --hero-story-media-max-width: 970px;
   --hero-story-date-size: 12px;
   --hero-story-title-gap: 32px;
@@ -43,7 +44,7 @@
   overflow: hidden;
 }
 
-.hero-image:not(.overlay, .archive) .hero-image-media {
+.hero-image:not(.overlay, .archive, .page) .hero-image-media {
   max-width: var(--hero-story-media-max-width);
 }
 
@@ -80,7 +81,7 @@
   text-align: left;
 }
 
-.hero-image:not(.overlay, .archive) .hero-image-caption {
+.hero-image:not(.overlay, .archive, .page) .hero-image-caption {
   order: 3;
   display: flex;
   flex-direction: column;
@@ -100,8 +101,8 @@
    the drop to 28px is at <=768). Decoupled from the 1080 order/align swap so
    the 768-1079 band renders 40px, left-aligned, image-above-title. */
 @media (width > 768px) {
-  .hero-image:not(.overlay, .archive) .hero-image-content h1,
-  .hero-image:not(.overlay, .archive) .hero-image-content h2 {
+  .hero-image:not(.overlay, .archive, .page) .hero-image-content h1,
+  .hero-image:not(.overlay, .archive, .page) .hero-image-content h2 {
     font-size: var(--heading-font-size-hero-story);
   }
 }
@@ -292,6 +293,51 @@
   outline-offset: 2px;
 }
 
+/* ==========================================================================
+ * PAGE VARIANT (SKODA-813) — the generic page's title band, measured on the live
+ * /en/copyright (no image) and /en/contacts (image), 390–1440: full bleed, 240px at
+ * every width. The image covers it, centred, under the shared scrim; without one the
+ * source's empty band, 5% ink under the same scrim. The white light page title sits
+ * on its bottom-left, in the content column, 16px above the band's edge (the source
+ * keeps 48px on phones too).
+ * ========================================================================== */
+.hero-image.page {
+  --hero-page-h: 240px;
+  --hero-page-empty: rgb(0 0 0 / 5%);
+
+  gap: 0;
+}
+
+.hero-image.page .hero-image-media {
+  height: var(--hero-page-h);
+  background-color: var(--hero-page-empty);
+}
+
+.hero-image.page .hero-image-media picture,
+.hero-image.page .hero-image-media img {
+  aspect-ratio: auto;
+  height: 100%;
+}
+
+.hero-image.page .hero-image-content {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  box-sizing: border-box;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--page-gutter);
+  color: var(--skoda-white); /* any line under the title stays readable on the band */
+}
+
+.hero-image.page .hero-image-content h1 {
+  margin: 0 0 var(--spacing-m);
+  color: var(--skoda-white);
+  font-size: var(--heading-font-size-hero);
+  font-weight: var(--weight-light);
+  line-height: 1.1;
+}
+
 /* the band steps up at 576 / 768 */
 @media (width >= 576px) {
   .hero-image.archive .hero-image-media {
@@ -310,18 +356,18 @@
  * ========================================================================== */
 @media (width >= 1080px) {
   /* story: title first (above image), centered; image width-capped ~970px */
-  .hero-image:not(.overlay, .archive) .hero-image-content {
+  .hero-image:not(.overlay, .archive, .page) .hero-image-content {
     order: 1;
     text-align: center;
   }
 
   /* Source title has 16px above / 32px below; the block has no extra flex gap. */
-  .hero-image:not(.overlay, .archive) .hero-image-content h1,
-  .hero-image:not(.overlay, .archive) .hero-image-content h2 {
+  .hero-image:not(.overlay, .archive, .page) .hero-image-content h1,
+  .hero-image:not(.overlay, .archive, .page) .hero-image-content h2 {
     margin: var(--spacing-m) 0 var(--hero-story-title-gap);
   }
 
-  .hero-image:not(.overlay, .archive) .hero-image-media {
+  .hero-image:not(.overlay, .archive, .page) .hero-image-media {
     order: 2;
   }
 }
