@@ -184,6 +184,7 @@ export const SECTION_STYLES = [
   ['page-body', 'Generic page body (copyright, legal, utility pages): the text under the page title band.'],
   ['page-body, half', 'Generic page body rows set in the left half of the column from 781px wide (the copyright page).'],
   ['page-body, half, empty-cell', 'A half row whose empty right cell still takes 10px under the text on phones (the source widget).'],
+  ['carousel-listing', 'One plant rail of the Media Room Newsletter page: its heading and an index-driven Story Rail, 24px under the band (48px between rails).'],
   ['sidebar', 'Story / release sidebar: newsletter card, Explore more, Tags.'],
   ['body-column, highlight-dark', 'Dark highlight box inside the article ("What has changed" lists).'],
   ['body-column, highlight-grey', 'Grey highlight box inside a press release (FAQ callout).'],

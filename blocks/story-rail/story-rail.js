@@ -96,6 +96,9 @@ export function parseConfig(block) {
     // scope by setting `template` explicitly (SKODA-212 review P1).
     template,
     category: tokens(cfg.category),
+    // every WP category of the page plus its ancestors (index `categories`, SKODA-831), as the
+    // stories block reads it: the newsletter page's rails take `categories: newsletter` (SKODA-845)
+    categories: tokens(cfg.categories),
     tag: tokens(cfg.tag || cfg.tags),
     // index facet columns (model, years, …) as config keys (SKODA-820): each key is
     // its own facet, so `model: epiq` + `years: 2026` must BOTH match (the story's
@@ -135,6 +138,7 @@ export function selectRows(all, cfg) {
   let scoped = scopeRows(all, { template: cfg.template, path: cfg.path });
   const active = { ...(cfg.facets || {}) };
   if (cfg.category.length) active.category = cfg.category;
+  if (cfg.categories?.length) active.categories = cfg.categories;
   if (cfg.tag.length) active.tags = cfg.tag;
   if (Object.keys(active).length) scoped = filterRows(scoped, active);
   if (cfg.exclude.length) {
@@ -207,7 +211,7 @@ export function skipsPromo(cfg, { press = false, curated = false } = {}) {
 // (exported for the drift test against the publication contract,
 // tools/importer/push/block-contracts.json)
 export const CONFIG_KEYS = new Set([
-  'index', 'path', 'template', 'category', 'tag', 'tags', 'heading',
+  'index', 'path', 'template', 'category', 'categories', 'tag', 'tags', 'heading',
   'viewall', 'view-all', 'all', 'sort', 'limit', 'exclude', 'order', 'dots',
   ...INDEX_FACETS,
 ]);
@@ -538,6 +542,24 @@ export function railLayout({
 }
 
 /**
+ * The heading a rail sits under when it builds none itself: the last h2–h6 before the rail in its
+ * section (the model pages' "Press Kits", the Newsletter page's "Kvasiny"), so each carousel is
+ * named after it rather than the generic "Content carousel" (SKODA-845). '' when there is none.
+ * Another block before it ends the search: a rail's or gallery's card titles never name this one.
+ * @param {Element} block the story-rail block
+ */
+export function sectionHeadingText(block) {
+  const wrapper = block.parentElement?.classList.contains('story-rail-wrapper') ? block.parentElement : block;
+  for (let el = wrapper.previousElementSibling; el; el = el.previousElementSibling) {
+    if (/(?:^|\s)(?!default-content-wrapper)[\w-]+-wrapper(?:\s|$)/.test(el.className || '')) return '';
+    const hs = el.matches('h2, h3, h4, h5, h6') ? [el] : [...el.querySelectorAll('h2, h3, h4, h5, h6')];
+    const text = hs.length ? hs[hs.length - 1].textContent.trim() : '';
+    if (text) return text;
+  }
+  return '';
+}
+
+/**
  * The rail heading's element: the home bands' section headings are h3 on the source
  * (.search-results-heading on both homes, #272); every other rail keeps its h2. Only for a
  * heading the block builds itself: the model pages' rail titles are authored section headings
@@ -546,6 +568,37 @@ export function railLayout({
  */
 export function railHeadingTag(classes) {
   return classes.includes('story-rail-home') ? 'h3' : 'h2';
+}
+
+// the longest a rail waits for its carousel's styles before it shows anyway
+const STYLES_WAIT_MS = 3000;
+
+/** Whether a stylesheet and every sheet it `@import`s (carousel.css → card-teaser.css) loaded. */
+function sheetLoaded(sheet) {
+  if (!sheet) return false;
+  let rules;
+  try { rules = [...sheet.cssRules]; } catch (e) { return true; } // cross-origin: can't tell
+  return rules.every((rule) => !rule.href || (rule.styleSheet && rule.styleSheet.cssRules.length
+    && sheetLoaded(rule.styleSheet)));
+}
+
+/**
+ * Resolves once a block stylesheet already in the head has loaded, with its imports. Two rails can
+ * build at once: aem.js's loadCSS resolves the second request as soon as the first one added the
+ * <link>, before the sheet (and the card-teaser.css it imports) is applied, so the second rail's
+ * carousel would show unstyled for a frame: a layout shift above the fold (the Newsletter page's
+ * two rails, SKODA-845). A sheet that fails, or takes longer than STYLES_WAIT_MS, counts as ready
+ * (the rail shows, as it would after loadCSS rejected).
+ * @param {string} name the block name (`carousel`)
+ */
+export function blockStylesReady(name, doc = document, waitMs = STYLES_WAIT_MS) {
+  const link = doc.querySelector(`head > link[rel="stylesheet"][href$="/blocks/${name}/${name}.css"]`);
+  if (!link || sheetLoaded(link.sheet)) return Promise.resolve();
+  return new Promise((resolve) => {
+    link.addEventListener('load', resolve, { once: true });
+    link.addEventListener('error', resolve, { once: true });
+    setTimeout(resolve, waitMs);
+  });
 }
 
 export default async function decorate(block) {
@@ -628,7 +681,8 @@ export default async function decorate(block) {
     // so does a home-band media rail's card (railLayout)
     carousel.classList.add(...variants, ...carouselVariants);
     if (cfg.dots) carousel.classList.add('dots');
-    if (heading) carousel.setAttribute('aria-label', heading);
+    const name = heading || sectionHeadingText(block);
+    if (name) carousel.setAttribute('aria-label', name);
     carousel.hidden = true;
     mount.append(carousel);
     // a "#" cart button must not jump to the top, also before (or without) the media cart
@@ -657,6 +711,7 @@ export default async function decorate(block) {
     }
     decorateBlock(carousel);
     await loadBlock(carousel);
+    await blockStylesReady('carousel');
     // loadBlock logs and swallows the carousel's own failures: no track means no rail
     if (!carousel.querySelector('.carousel-track')) {
       collapseRail(block, mount, header);

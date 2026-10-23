@@ -575,6 +575,11 @@
       "pushedAt": "2026-10-14T06:34:18.981Z",
       "previewedHash": "852756bfae68cf95d59de6d67307191136227cc4f4c0483dfcc6c9a0ed9d4fa6"
     },
+    "/en/newsletter": {
+      "hash": "0ced392c2ba0bbecfed6b469dd0ead090f4d40f9fb04ec8ec769987b80a7a370",
+      "pushedAt": "2026-10-22T06:39:34.532Z",
+      "previewedHash": "0ced392c2ba0bbecfed6b469dd0ead090f4d40f9fb04ec8ec769987b80a7a370"
+    },
     "/en/press-kits": {
       "hash": "407e03a79a7f9413da1b3ad49ffd23f2050f4591cd2a60b9eb9b82729ce7e4ad",
       "pushedAt": "2026-10-14T06:34:18.981Z",
@@ -1275,15 +1280,25 @@
       "pushedAt": "2026-10-08T22:31:44.145Z",
       "previewedHash": "cd6adeb56d6a5fc2f5a0ffcbb4d5e8a4b1517258a09131ae9badd1e28eb91463"
     },
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-1-2026": {
+      "hash": "4e0f333078bb23c3fae87e7d0834a766734af49b16102036b10c0be3d9b18ee4",
+      "pushedAt": "2026-10-22T06:38:51.548Z",
+      "previewedHash": "4e0f333078bb23c3fae87e7d0834a766734af49b16102036b10c0be3d9b18ee4"
+    },
     "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-kvasiny-plant-3-2026": {
-      "hash": "a911916c77dbda9fbfe2be097ad0513f86e0bac738d6c70db92ce110e8623e47",
-      "pushedAt": "2026-10-10T16:59:57.991Z",
-      "previewedHash": "a911916c77dbda9fbfe2be097ad0513f86e0bac738d6c70db92ce110e8623e47"
+      "hash": "328a36b6aff5a19fb096182ededf5b84226c4505305480b7059e86761077f1f3",
+      "pushedAt": "2026-10-22T06:38:51.548Z",
+      "previewedHash": "328a36b6aff5a19fb096182ededf5b84226c4505305480b7059e86761077f1f3"
+    },
+    "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-1-2026": {
+      "hash": "81a0b305dd5c6f4f84cacd3c4ba7930f9852c9639dafa6751362c7c348bf0b59",
+      "pushedAt": "2026-10-22T06:38:51.548Z",
+      "previewedHash": "81a0b305dd5c6f4f84cacd3c4ba7930f9852c9639dafa6751362c7c348bf0b59"
     },
     "/en/press-releases/newsletter-for-employees-and-residents-living-near-the-skoda-auto-vrchlabi-plant-3-2026": {
-      "hash": "298da36f8cd93c3c3e253ad1ed76b3eecfde1d7b903bafe18aa68c1fbe787d2e",
-      "pushedAt": "2026-10-10T16:59:57.991Z",
-      "previewedHash": "298da36f8cd93c3c3e253ad1ed76b3eecfde1d7b903bafe18aa68c1fbe787d2e"
+      "hash": "79135fa9a161aac68cf382b0fb3e34d344e392e194646645c95306f248b81332",
+      "pushedAt": "2026-10-22T06:38:51.548Z",
+      "previewedHash": "79135fa9a161aac68cf382b0fb3e34d344e392e194646645c95306f248b81332"
     },
     "/en/press-releases/paris-motor-show-2018-two-skoda-presentations-live-online": {
       "hash": "fcf84b7776652ab0c3eedd2f7b66ee1139dc9b2f49b0d572c43b7cc7c5263653",
@@ -1401,9 +1416,9 @@
       "previewedHash": "45cb0c0636f36ed0022295a70842af965c69f174dcaa6acbb5dbfcf953ff3b3e"
     },
     "/en/press-releases/skoda-kvasiny-newsletter-2-2026": {
-      "hash": "165e779c193b32e1e5c656e727074aff7d18a7ef765f08633869bd82fd17fca1",
-      "pushedAt": "2026-10-10T16:59:57.991Z",
-      "previewedHash": "165e779c193b32e1e5c656e727074aff7d18a7ef765f08633869bd82fd17fca1"
+      "hash": "190f7423efcc6458e41d5d6267e8b5f67871efb0a36463dc42fa74dcd34c2b18",
+      "pushedAt": "2026-10-22T06:38:51.548Z",
+      "previewedHash": "190f7423efcc6458e41d5d6267e8b5f67871efb0a36463dc42fa74dcd34c2b18"
     },
     "/en/press-releases/skoda-launches-production-of-the-new-epiq-in-pamplona-spain": {
       "hash": "0cb16a027aea61210b0e8400556dad51c1bd2a64fe68f2d04d88d2a6fbd41205",
@@ -1456,9 +1471,9 @@
       "previewedHash": "1e442970a2cd66f8df79bd3494eb30858b63d3500cd2e7fe2e2d68b8d00330d5"
     },
     "/en/press-releases/skoda-vrchlabi-newsletter-2-2026": {
-      "hash": "938bd60ca6b0b6dc2a51bb904be7f8dbbeec9743e7ce762cefcac835f8989b0e",
-      "pushedAt": "2026-10-10T16:59:57.991Z",
-      "previewedHash": "938bd60ca6b0b6dc2a51bb904be7f8dbbeec9743e7ce762cefcac835f8989b0e"
+      "hash": "f0cf2c87147fdd4cb248534195198a3ba29ef7b6cf9db0d346afd98d098cad45",
+      "pushedAt": "2026-10-22T06:38:51.548Z",
+      "previewedHash": "f0cf2c87147fdd4cb248534195198a3ba29ef7b6cf9db0d346afd98d098cad45"
     },
     "/en/press-releases/skodas-electric-bestsellers-elroq-and-enyaq-receive-model-year-updates": {
       "hash": "65174e052f83dbdc1eee6426a2129361c30995a6a8ccb47fe649da4b1620035d",
