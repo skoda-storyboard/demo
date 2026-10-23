@@ -5,9 +5,9 @@
 - **Phase:** B · **Milestone:** M2 (go-live, 2027-01-02)
 - **Estimate:** 3 SP · AI-assisted 1.5–2d / manual 3–4d *(planning estimate, not a quote)*
 - **GitHub issue:** [#375](https://github.com/skoda-storyboard/demo/issues/375) (created 2026-10-16)
-- **Status (2026-10-19):** 🟡 Part 1 (the shared loader and its readers) built on branch `skoda-517-feed-loader`.
-  Part 2 (the generator and the published shards) starts after #380 merges: #380 edits the same generator files.
-  See "Part 1 (2026-10-19)". Proposed in
+- **Status (2026-10-21):** 🟡 Part 1 (the loader, PR #406) in review. Part 2 (the generator) built on branch
+  `skoda-517-part2`, stacked on #406; the shards are published (build `b-b8b032bbe7`). See "Part 1 (2026-10-19)" and
+  "Part 2 (2026-10-21)".
   [`SKODA-ASSET-INGESTION-M2.md`](../../architecture/SKODA-ASSET-INGESTION-M2.md) §3C.
 
 ## Why
@@ -109,3 +109,47 @@ count, facet options and lightbox as the whole-feed build.
 - A filtered deep link also loads the head, unused (70 KB raw).
 - Still open: the Fabia and Enyaq network bytes on a branch preview, the mobile LCP of `/en/images` by PSI, and
   every sheet under 500k cells. All need the published shards.
+
+## Part 2 (2026-10-21): the generator
+**Built**
+- `tools/importer/media-items/media-shards.mjs` (pure) and `build-media-shards.mjs`
+  (`npm run media-items:shards`): the published feed split into the registry and its shards in the build's
+  folder, the registry published last; a sheet over 500k cells fails the build.
+- From the part-1 list:
+  - detail shards cut at 400 rows (a year's newest first);
+  - the facet index compact: `f` = `key:value|…`, 5 columns, 917 KB → 342 KB raw;
+  - a filtered, path-scoped, oldest-first or past-48-rows deep link no longer requests the head (the listing
+    and the scripts.js prefetch).
+- Tests: the split read back through the real reader gives the same rows, order and facets as the whole feed
+  (listing views, a page's fill-in, the head, rails, image links, all rows); the cell gate; the build id; the
+  compact facet column; no head on a filtered or oldest-first deep link.
+
+**Generated from the live feed** (2,475 rows): 112 shards, build `b-b8b032bbe7`; the largest sheet 30,080 cells.
+
+| Kind | Sheets | Rows | Raw size |
+|---|---:|---:|---:|
+| head (image, video) | 2 | 96 | 133 KB |
+| facets | 1 | 2,475 | 342 KB |
+| detail | 25 | 2,475 | 3.4 MB in all |
+| slice (model, bodywork) | 20 | 2,486 | 3.7 MB in all |
+| keyed | 64 | 2,284 | 3.2 MB in all |
+
+**Measured locally** (this code, the generated shards served as files; `main` = the whole feed). Same = same
+cards, count, Load more count, facet options and lightbox.
+
+| Page | `main` | Shards | Result |
+|---|---:|---:|---|
+| `/en/images` | 3,442 KB | 435 KB | same |
+| `/en/videos` | 3,442 KB | 428 KB | same |
+| `/en/images?filter[model][]=fabia` | 3,442 KB | 973 KB | same |
+| `/en/images?sortby=oldest` | 3,442 KB | 438 KB | same |
+| `/en/images?offset=72` | 3,442 KB | 954 KB (no head) | same |
+| New Fabia rails (6 / 20 / 20 cards) | 3,362 KB | 110 KB | same cards |
+| Enyaq rails (3 / 1 / 6 / 2 / 20 / 17 cards) | 3,362 KB | 270 KB | same cards |
+| Octavia rails (2 / 10 / 10 / 10 / 20 / 20 cards) | 3,362 KB | 263 KB | same cards |
+| Image links (asset, image, a file not in the feed) | 3,442 KB | 174 KB (3 keyed) | same captions |
+
+**Published** (2026-10-21): the 112 shards, then the registry, on preview and live. #406 reads the compact
+facet index too (`expandFacets()`), so its preview works with the published build.
+
+**Still open:** the Fabia / Enyaq bytes and the `/en/images` mobile LCP by PSI on this branch's preview.

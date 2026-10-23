@@ -15,7 +15,7 @@
  * - facets: every row, in the whole feed's order, with only `id`, `template`, `date`, the
  *   facet columns and `detail` (the key of the detail shard that has the full row); the facet
  *   columns may come compact as one `f` column, `key:value|key:value` (expandFacets());
- * - detail: the full rows of one template and year;
+ * - detail: the full rows of one template and year (or a part of a large year);
  * - slice: the full rows that carry one facet value (rails);
  * - keyed: the full rows whose file name (`original`) hashes to that shard (keyShard()).
  *
@@ -272,6 +272,8 @@ export async function openListingFeed(url, { template = '', path = '' } = {}) {
   const wholeFeed = () => loadQueryIndex(url);
   return {
     get lazy() { return lazy; },
+    // how many rows the head shard holds (null: unknown), so a deep link past it can skip it
+    headRows: headEntry ? headEntry.rows : null,
     head: headEntry && (async () => {
       const rows = await loadQueryIndex(headEntry.url);
       remember(rows);

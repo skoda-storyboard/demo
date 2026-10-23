@@ -361,7 +361,15 @@ function startListingIndex(main) {
       index || defaultIndexUrl(),
       { template, path },
     ))
-    .then((feed) => (feed.head ? feed.head() : feed.rows()))
+    // the head only for the listing's default view (no filter, newest first, no more rows than
+    // it holds), as the block
+    .then((feed) => {
+      const params = new URLSearchParams(window.location.search);
+      const deepLinked = [...params.keys()].some((k) => k.startsWith('filter[') || k === 'sortby');
+      const offset = Number(params.get('offset')) || 0;
+      const fits = offset <= (feed.headRows ?? Infinity);
+      return feed.head && !path && !deepLinked && fits ? feed.head() : feed.rows();
+    })
     .catch(() => {}); // the block reports a failed load itself
 }
 

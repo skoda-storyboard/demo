@@ -352,9 +352,17 @@ async function buildListing(block, onFirstPaint) {
   // first paint and LCP wait for it (SKODA-702). A media feed with a head shard paints its
   // first page from that and loads the rest after (SKODA-517). Failures are handled where
   // they are awaited.
+  // State (restored from the deep-link URL). The head shard is the newest rows of the template:
+  // it can only be the first page of the default view (no filter, no path scope, newest first),
+  // so a deep link to another view doesn't request it.
+  const initial = decodeState(window.location.search, cfg.facets, cfg.perpage);
+  const headView = !cfg.path && initial.sort === 'newest'
+    && !Object.values(initial.active).some((v) => v.length);
   const feedReady = openListingFeed(cfg.index, { template: cfg.template, path: cfg.path });
-  const headReady = feedReady.then((f) => (f.head ? f.head() : null)).catch(() => null);
-  const rowsReady = feedReady.then((f) => (f.head ? null : f.rows()));
+  // (and one that reveals more rows than the head holds skips it too)
+  const useHead = (f) => !!f.head && headView && (f.headRows ?? Infinity) >= initial.revealed;
+  const headReady = feedReady.then((f) => (useHead(f) ? f.head() : null)).catch(() => null);
+  const rowsReady = feedReady.then((f) => (useHead(f) ? null : f.rows()));
   rowsReady.catch(() => {});
   // the source's option names (#273), alongside: only the facet bar needs them
   const facetLabels = cfg.facets.length ? loadFacetLabels() : Promise.resolve(facetLabelMap({}));
@@ -365,8 +373,6 @@ async function buildListing(block, onFirstPaint) {
   const STRINGS = buildStrings(placeholders);
   const mediaText = mediaLabels(placeholders); // media card controls (SKODA-406)
 
-  // State (restored from the deep-link URL).
-  const initial = decodeState(window.location.search, cfg.facets, cfg.perpage);
   const state = { active: initial.active, sort: initial.sort, revealed: initial.revealed };
 
   // Skeleton.
@@ -476,19 +482,15 @@ async function buildListing(block, onFirstPaint) {
   try {
     feed = await feedReady;
     const head = await headReady;
-    // the head shard is the newest rows of the template: it is the first page only for the
-    // default view (no filter, newest first) and when it holds that page
-    const filtered = Object.values(initial.active).some((v) => v.length);
-    // (the template's head knows nothing of a path scope, so a path-scoped listing waits)
+    // the head is the first page when it holds that page (a deep link may reveal more)
     const headRows = head ? scopeRows(head.rows, { template: cfg.template }) : [];
-    if (head && !cfg.path && !filtered && state.sort === 'newest'
-      && (headRows.length >= state.revealed || headRows.length >= head.total)) {
+    if (head && (headRows.length >= state.revealed || headRows.length >= head.total)) {
       paintGrid(paginate(headRows, state.revealed), head.total);
       paintedTotal = head.total;
       onFirstPaint(); // the section can show now: the facet index and the bar follow
     }
     // with a head shard (loaded or failed) the rows were left for now: request them here
-    const rows = await (feed.head ? feed.rows() : rowsReady);
+    const rows = await (useHead(feed) ? feed.rows() : rowsReady);
     scoped = scopeRows(rows, { template: cfg.template, path: cfg.path });
   } catch (e) {
     status.textContent = STRINGS.loadError;

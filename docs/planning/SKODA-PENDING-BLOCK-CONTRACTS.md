@@ -400,19 +400,28 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 - **Manifest gate (2026-09-29, #200 review):** every binary a row serves (thumbnail, `rendition-1920`, `original`,
   `poster`, `mp4`) has a row in `tools/importer/media/media-manifest.json` (`npm run media:build -- --feed …`);
   `media-items:build --push` refuses to publish while one is missing. DAM upload stays deferred (import-time rows).
-- **Sharding (SKODA-517; reader built 2026-10-19, generator pending):** a sheet holds 500k cells (~12,500 rows
+- **Sharding (SKODA-517; reader 2026-10-19, generator 2026-10-21):** a sheet holds 500k cells (~12,500 rows
   at 40 columns), and every reader downloaded the whole feed. The feed is split by how it is read. A registry
   sheet `/en/media-feed/index.json` lists one row per shard file: `kind | key | url | rows | total | build`.
-  - `head`, key = template: the newest rows of one template, newest first; `total` = all its rows. A listing's
-    first page in the default view (no filter, newest first).
-  - `facets`, no key: every row in the whole feed's order, with only `id`, `template`, `date`, `category`,
-    `tags`, the 15 facets and `detail` (the key of the detail shard holding the full row).
-  - `detail`, key `<template>:<year>`: full rows, filled in for the page a listing shows.
-  - `slice`, key `<facet>:<value>`: full rows carrying that value (rails; values of one facet are unioned).
+  - `head`, key = template (`image`, `video`): the newest 48 rows of one template, newest first; `total` = all
+    its rows. A listing's first page in the default view (no filter, no path, newest first, not past 48 rows).
+  - `facets`, no key: every row in the whole feed's order, with only `id`, `template`, `date`, `detail` (the
+    key of the detail shard holding the full row) and `f`, the facet values compact as
+    `key:value|key:value` (the reader expands them into the facet columns; 5 columns at any size).
+  - `detail`, key `<template>:<year>`, or `<template>:<year>-<n>` when a year holds more than 400 rows (parts
+    in the feed's newest-first order): full rows, filled in for the page a listing shows.
+  - `slice`, key `<facet>:<value>` for the rails' facets (`model`, `bodywork`): full rows carrying that value
+    (values of one facet are unioned).
   - `keyed`, key `0` … `n-1`: full rows by file name, `keyShard(fileKey(original), n)` (32-bit FNV-1a) in
     `scripts/media-feed.js`. The generator must import that function. Used for image-link and lightbox lookups.
   - `url` is a root-relative `.json` path. Every row of a registry carries the same `build`: mixed builds, or
-    no valid row, mean no registry. The generator writes the shards first and publishes the registry last.
+    no valid row, mean no registry.
+  - **Generator:** `npm run media-items:shards -- [--feed <file|url>] [--dry-run] [--push]`
+    (`tools/importer/media-items/build-media-shards.mjs`, the pure split in `media-shards.mjs`). It reads the
+    published feed (its AEM Assets and Media Bus URLs) and writes every shard in the build's folder under
+    `/en/media-feed/` (the folder is a hash of the rows, so the same feed gives the same names). On `--push` it
+    publishes every shard first and the registry last: a failed run leaves the previous build live. A sheet
+    over 500k cells fails the build. Run it after every `media-items:build --push`.
   - **Without a registry, every reader reads the whole feed, as before.** The loader (`scripts/media-feed.js`)
     looks for a registry only for a `/{locale}/media-feed.json` index. A shard that fails to load, or a detail
     shard without a row the facet index names, falls back to the whole feed, so publish it until the shards
