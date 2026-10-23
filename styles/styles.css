@@ -105,6 +105,7 @@
   --page-body-inset-wide: 30px;
   --page-body-half-gutter: 40px;
   --page-body-top: 10px; /* the band, or the row before, → a row's first text */
+  --page-body-pull-up: 20px; /* a `pull-up` row overlaps the row before (from 768px, Contacts) */
   --story-meta-gap: 11px; /* published date → category tag, same row (live) */
 
   /* intro (hero caption: perex, date, tag) → article, measured on the live Epiq story from
@@ -1346,6 +1347,14 @@ main > .section.page-body a:any-link:not(.button):focus-visible {
 
   main > .section.page-body.half > .default-content-wrapper > :is(h2, h3, h4, h5, h6, p, ul, ol, blockquote, table) {
     max-inline-size: calc((100% - var(--page-body-half-gutter)) / 2);
+  }
+}
+
+/* a row the source pulls 20px up into the one before (its `pull-up` row style, SKODA-810a:
+   the Contacts rows under a group heading), from 768px; below, it keeps its place */
+@media (width >= 768px) {
+  main > .section.page-body.pull-up {
+    margin-block-start: calc(-1 * var(--page-body-pull-up));
   }
 }
 

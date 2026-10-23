@@ -35,13 +35,13 @@ var CustomImportScript = (() => {
   };
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // import-company-page.js
+  // tools/importer/import-company-page.js
   var import_company_page_exports = {};
   __export(import_company_page_exports, {
     default: () => import_company_page_default
   });
 
-  // parsers/hero-banner.js
+  // tools/importer/parsers/hero-banner.js
   function parse(element, { document: document2 }) {
     const img = element.querySelector(".hero-image img, .image-wrapper img, img");
     const heading = element.querySelector("h1, h2, .hero-title, .entry-title");
@@ -75,9 +75,222 @@ var CustomImportScript = (() => {
     element.replaceWith(table);
   }
 
-  // transformers/skoda-page-cleanup.js
-  var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  // tools/importer/transformers/skoda-page-rows.js
+  var MARK = "data-skoda-page-body";
+  var HALF_ROW = "data-skoda-half-row";
+  var BODY = "page-body";
+  var HALF = "page-body, half";
+  var EMPTY_WIDGET = "empty-cell";
+  var isFilled = (cell) => !!cell && (!!cell.querySelector("img, picture, iframe, video, table") || !!cell.textContent.replace(/[\s\u00a0]/g, ""));
+  function withoutMedia(css) {
+    let out = "";
+    let i = 0;
+    while (i < css.length) {
+      const at = css.indexOf("@media", i);
+      if (at < 0) return out + css.slice(i);
+      out += css.slice(i, at);
+      let depth = 0;
+      let j = css.indexOf("{", at);
+      if (j < 0) return out;
+      for (; j < css.length; j += 1) {
+        if (css[j] === "{") depth += 1;
+        else if (css[j] === "}") {
+          depth -= 1;
+          if (!depth) break;
+        }
+      }
+      i = j + 1;
+    }
+    return out;
+  }
+  function cellWidths(doc) {
+    const css = withoutMedia([...doc.querySelectorAll("style")].map((s) => s.textContent).join("\n"));
+    const widths = /* @__PURE__ */ new Map();
+    [...css.matchAll(/((?:#pgc-[\w-]+\s*,?\s*)+)\{\s*width:\s*([\d.]+)%/g)].forEach(([, ids, w]) => {
+      ids.split(",").map((id) => id.trim().replace(/^#/, "")).filter(Boolean).forEach((id) => widths.set(id, Number(w)));
+    });
+    return widths;
+  }
+  var cellsOf = (row) => [...row.children].flatMap((child) => child.matches(".panel-row-style") ? [...child.children] : [child]).filter((c) => c.matches(".panel-grid-cell"));
+  function isHalfRow(row, widths) {
+    const cells = cellsOf(row);
+    if (cells.length !== 2) return false;
+    const [left, right] = cells;
+    return isFilled(left) && !isFilled(right) && widths.get(left.id) === 50;
+  }
+  function rowsOf(article) {
+    const layout = article.querySelector(".panel-layout");
+    return layout ? [...layout.children].filter((r) => r.matches(".panel-grid")) : [];
+  }
   function transform(hookName, element, payload) {
+    const doc = element.ownerDocument || (payload == null ? void 0 : payload.document);
+    const article = element.querySelector("article.page, article.post");
+    if (hookName === "preprocess") {
+      if (!article) return;
+      const widths = cellWidths(doc);
+      rowsOf(article).filter((row) => isHalfRow(row, widths)).forEach((row) => {
+        row.setAttribute(HALF_ROW, cellsOf(row)[1].querySelector(".so-panel") ? EMPTY_WIDGET : "");
+      });
+    }
+    if (hookName === "beforeTransform") {
+      if (!article) return;
+      const rows = rowsOf(article);
+      if (!rows.length) {
+        (article.querySelector(".entry-content") || article).setAttribute(MARK, BODY);
+        return;
+      }
+      rows.forEach((row, i) => {
+        const half = row.getAttribute(HALF_ROW);
+        let style = BODY;
+        if (half !== null) style = half ? `${HALF}, ${half}` : HALF;
+        row.removeAttribute(HALF_ROW);
+        if (i > 0) row.before(doc.createElement("hr"));
+        row.setAttribute(MARK, style);
+      });
+    }
+    if (hookName === "afterTransform") {
+      element.querySelectorAll(`[${MARK}]`).forEach((anchor) => {
+        const style = anchor.getAttribute(MARK);
+        anchor.removeAttribute(MARK);
+        anchor.before(WebImporter.Blocks.createBlock(doc, { name: "Section Metadata", cells: { style } }));
+      });
+    }
+  }
+
+  // tools/importer/transformers/skoda-company-people.js
+  var MARK2 = "data-skoda-page-body";
+  var BODY2 = "page-body";
+  var PULL_UP = "pull-up";
+  var SPACER_PX = 24;
+  var SPACER_INSET_PX = 10;
+  var NBSP_PLACEHOLDER = "\u{F00A0}";
+  var NBSP_ONLY = /^[\s\u00a0]*\u00a0[\s\u00a0]*$/;
+  var KEEP = /* @__PURE__ */ new Set(["P", "BR", "STRONG", "B", "EM", "I", "A", "IMG", "UL", "OL", "LI"]);
+  var cellsOf2 = (row) => [...row.children].flatMap((child) => child.matches(".panel-row-style") ? [...child.children] : [child]).filter((c) => c.matches(".panel-grid-cell"));
+  var widgetsOf = (cell) => [...cell.querySelectorAll(".so-panel")].filter((w) => w.parentElement.closest(".panel-grid-cell") === cell);
+  var isSpacer = (widget) => widget.matches(".widget_skoda-offset");
+  var isToggle = (widget) => widget.matches(".widget_ys-row-toggle");
+  var isBuilder = (widget) => widget.matches(".widget_siteorigin-panels-builder");
+  var isEditor = (widget) => widget.matches(".widget_sow-editor");
+  function isCard(cell) {
+    const editor = widgetsOf(cell).find(isEditor);
+    return !!(editor == null ? void 0 : editor.querySelector("img")) && !!editor.querySelector("strong, b");
+  }
+  function cleanNodes(source, document2) {
+    const clean = (node) => {
+      if (node.nodeType === 3) return [document2.createTextNode(node.textContent)];
+      if (node.nodeType !== 1) return [];
+      const kids = [...node.childNodes].flatMap(clean);
+      if (!KEEP.has(node.tagName)) return kids;
+      const el = document2.createElement(node.tagName.toLowerCase());
+      if (node.tagName === "A" && node.getAttribute("href")) el.setAttribute("href", node.getAttribute("href"));
+      if (node.tagName === "IMG") {
+        el.setAttribute("src", node.getAttribute("src") || "");
+        el.setAttribute("alt", node.getAttribute("alt") || "");
+        return [el];
+      }
+      el.append(...kids);
+      return [el];
+    };
+    const text = (source == null ? void 0 : source.querySelector(".siteorigin-widget-tinymce, .textwidget")) || source;
+    return [...(text == null ? void 0 : text.childNodes) || []].flatMap(clean).filter((n) => !(n.nodeType === 3 && !n.textContent.trim())).filter((n) => !(n.tagName === "P" && !n.textContent.trim() && !n.querySelector("img, a")));
+  }
+  function panelOf(cell, document2) {
+    const widgets = widgetsOf(cell);
+    const toggle = widgets.find(isToggle);
+    const builder = widgets.find(isBuilder);
+    const label = document2.createElement("p");
+    label.textContent = ((toggle == null ? void 0 : toggle.textContent) || "").replace(/\s+/g, " ").trim() || "show more";
+    const out = [label];
+    builder == null ? void 0 : builder.querySelectorAll(".gallery-item").forEach((item) => {
+      const link = item.querySelector("a[href]");
+      const img = item.querySelector("img");
+      if (!link && !img) return;
+      const p = document2.createElement("p");
+      const pic = document2.createElement("img");
+      pic.setAttribute("src", ((link == null ? void 0 : link.getAttribute("href")) || img.getAttribute("src") || "").split("#")[0]);
+      pic.setAttribute("alt", (img == null ? void 0 : img.getAttribute("alt")) || "");
+      p.append(pic);
+      out.push(p);
+    });
+    builder == null ? void 0 : builder.querySelectorAll(".so-panel.widget_sow-editor").forEach((editor) => {
+      const copy = editor.cloneNode(true);
+      copy.querySelectorAll(".search-results, .gallery-item").forEach((el) => el.remove());
+      out.push(...cleanNodes(copy, document2));
+    });
+    return out;
+  }
+  function peopleBlock(cards, document2) {
+    const bio = cards.some((cell) => widgetsOf(cell).some(isToggle));
+    const rows = cards.map((cell) => {
+      const card = cleanNodes(widgetsOf(cell).find(isEditor), document2);
+      return bio ? [card, panelOf(cell, document2)] : [card];
+    });
+    return WebImporter.DOMUtils.createTable([[bio ? "Exec Bio" : "Contact Directory"], ...rows], document2);
+  }
+  function spacerTables(document2) {
+    return [
+      WebImporter.DOMUtils.createTable([["Spacer"], [`${SPACER_PX}px`]], document2),
+      WebImporter.DOMUtils.createTable([["Spacer (line)"], [`${SPACER_INSET_PX}px`]], document2)
+    ];
+  }
+  function sectionAfter(anchor, nodes, document2) {
+    const holder = document2.createElement("div");
+    holder.setAttribute(MARK2, BODY2);
+    holder.append(...nodes);
+    anchor.after(document2.createElement("hr"), holder);
+    return holder;
+  }
+  function splitSpacers(row, document2) {
+    const cells = cellsOf2(row);
+    const widgets = cells.flatMap(widgetsOf);
+    if (!widgets.some(isSpacer)) return;
+    const rest = [];
+    let seen = false;
+    widgets.forEach((w) => {
+      if (isSpacer(w)) {
+        seen = true;
+        return;
+      }
+      if (seen) rest.push(w);
+    });
+    const before = widgets.slice(0, widgets.findIndex(isSpacer)).filter((w) => !isSpacer(w));
+    row.replaceChildren(...before, ...spacerTables(document2));
+    if (rest.length) sectionAfter(row, rest, document2);
+  }
+  function keepBlankLines(element) {
+    element.querySelectorAll("article .widget_sow-editor p").forEach((p) => {
+      const tail = [...p.childNodes].filter((n) => !(n.nodeType === 3 && !n.nodeValue.trim() && !n.nodeValue.includes("\xA0")));
+      const [br, text] = tail.slice(-2);
+      if ((br == null ? void 0 : br.nodeName) !== "BR" || (text == null ? void 0 : text.nodeType) !== 3 || !NBSP_ONLY.test(text.nodeValue)) return;
+      text.nodeValue = NBSP_PLACEHOLDER;
+    });
+  }
+  function transform2(hookName, element, payload) {
+    if (hookName === "preprocess") {
+      keepBlankLines(element);
+      return;
+    }
+    if (hookName !== "beforeTransform") return;
+    const document2 = element.ownerDocument || (payload == null ? void 0 : payload.document);
+    const layout = element.querySelector("article .panel-layout");
+    if (!layout) return;
+    [...layout.children].filter((r) => r.matches(".panel-grid")).forEach((row) => {
+      if (row.querySelector(":scope > .panel-row-style.pull-up") && row.hasAttribute(MARK2)) {
+        row.setAttribute(MARK2, `${row.getAttribute(MARK2)}, ${PULL_UP}`);
+      }
+      const cards = cellsOf2(row).filter(isCard);
+      if (cards.length) {
+        row.replaceChildren(peopleBlock(cards, document2));
+        return;
+      }
+      splitSpacers(row, document2);
+    });
+  }
+
+  // tools/importer/transformers/skoda-page-cleanup.js
+  var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
+  function transform3(hookName, element, payload) {
     if (hookName === TransformHook.beforeTransform) {
       WebImporter.DOMUtils.remove(element, [
         // Site header / nav / language switcher / search overlay chrome
@@ -159,7 +372,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-model-sections.js
+  // tools/importer/transformers/skoda-model-sections.js
   var SECTION_MARKER_ATTR = "data-excat-section-id";
   function querySection(root, selectors) {
     const list = Array.isArray(selectors) ? selectors : [selectors];
@@ -170,7 +383,7 @@ var CustomImportScript = (() => {
     }
     return null;
   }
-  function transform2(hookName, element, payload) {
+  function transform4(hookName, element, payload) {
     const sections = payload && payload.template && payload.template.sections || [];
     if (sections.length < 2) return;
     if (hookName === "beforeTransform") {
@@ -204,7 +417,7 @@ var CustomImportScript = (() => {
     }
   }
 
-  // transformers/skoda-metadata.js
+  // tools/importer/transformers/skoda-metadata.js
   var TransformHook2 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var FACETS = [
     "model",
@@ -451,7 +664,7 @@ var CustomImportScript = (() => {
     }
     return false;
   }
-  function transform3(hookName, element, payload) {
+  function transform5(hookName, element, payload) {
     if (hookName !== TransformHook2.afterTransform) return;
     if (hasMetadataBlock(element)) return;
     const { document: document2, url, params } = payload;
@@ -491,7 +704,7 @@ var CustomImportScript = (() => {
     element.append(block);
   }
 
-  // transformers/skoda-links.js
+  // tools/importer/transformers/skoda-links.js
   var TransformHook3 = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   var SOURCE_ORIGIN = "https://www.skoda-storyboard.com";
   var SOURCE_HOST = /^(?:https?:)?\/\/(?:www\.)?skoda-storyboard\.com(?=[/?#]|$)/i;
@@ -919,7 +1132,7 @@ var CustomImportScript = (() => {
     const head = table.rows[0] && table.rows[0].cells[0];
     return !!head && /^story rail\b/i.test(head.textContent.trim());
   }
-  function transform4(hookName, element, payload) {
+  function transform6(hookName, element, payload) {
     if (hookName !== TransformHook3.afterTransform) return;
     element.querySelectorAll("a[href]").forEach((a) => {
       let href = a.getAttribute("href").replace(/(?:\s|%20)+$/i, "");
@@ -931,10 +1144,10 @@ var CustomImportScript = (() => {
     });
   }
 
-  // transformers/skoda-nbsp.js
-  var NBSP_PLACEHOLDER = "\u{F00A0}";
+  // tools/importer/transformers/skoda-nbsp.js
+  var NBSP_PLACEHOLDER2 = "\u{F00A0}";
   var GLUED_NBSP = new RegExp("(?<=[^\\s])\\u00a0+(?=[^\\s])", "g");
-  function transform5(hookName, element, payload) {
+  function transform7(hookName, element, payload) {
     if (hookName !== "preprocess") return;
     const doc = element.ownerDocument || payload && payload.document;
     const walker = doc.createTreeWalker(
@@ -944,19 +1157,19 @@ var CustomImportScript = (() => {
     );
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
       if (node.nodeValue.includes("\xA0")) {
-        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER.repeat(run.length));
+        node.nodeValue = node.nodeValue.replace(GLUED_NBSP, (run) => NBSP_PLACEHOLDER2.repeat(run.length));
       }
     }
   }
 
-  // import-company-page.js
+  // tools/importer/import-company-page.js
   var parsers = {
     "hero-banner": parse
   };
   var PAGE_TEMPLATE = {
     name: "company-page",
-    description: "\u0160koda company/utility page (template-media-room-page). Hero banner + .entry-content flattened to default content. Named sub-type blocks/galleries deferred to SKODA-810. Metadata template=page. Content-driven detection only.",
-    urls: ["https://www.skoda-storyboard.com/en/contacts/"],
+    description: "\u0160koda company/utility page (template-media-room-page). Hero banner + the SiteOrigin body as page-body rows; person-card rows \u2192 Contact Directory / Exec Bio, spacer widgets \u2192 Spacer (SKODA-810a). Metadata template=page. Content-driven detection only.",
+    urls: ["https://www.skoda-storyboard.com/en/contacts/", "https://www.skoda-storyboard.com/en/board-of-management/"],
     metadata: { template: "page" },
     blocks: [
       { name: "hero-banner", instances: ["div.hero"] }
@@ -989,9 +1202,11 @@ var CustomImportScript = (() => {
   };
   var transformers = [
     transform,
-    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform2] : [],
+    transform2,
     transform3,
-    transform4
+    ...PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [transform4] : [],
+    transform5,
+    transform6
   ];
   function executeTransformers(hookName, element, payload) {
     const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE });
@@ -1021,7 +1236,11 @@ var CustomImportScript = (() => {
   }
   var import_company_page_default = {
     // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
-    preprocess: ({ document: document2 }) => transform5("preprocess", document2.body, { document: document2 }),
+    preprocess: ({ document: document2 }) => {
+      transform7("preprocess", document2.body, { document: document2 });
+      transform("preprocess", document2.body, { document: document2 });
+      transform2("preprocess", document2.body, { document: document2 });
+    },
     transform: (payload) => {
       const { document: document2, url, params } = payload;
       const main = document2.body;

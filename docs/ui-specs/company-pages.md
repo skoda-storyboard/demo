@@ -191,6 +191,34 @@ Applies to all five; sub-specs add their own. WHAT / WHERE / viewport / expected
 `company-logo-1280.png`, `skoda-media-services-application-1280.png`, `contacts-1280.png`.
 1024/768/mobile captures pending.
 
+## 11. SKODA-810a as built: Contacts + Board (re-measured 2026-10-23)
+
+Re-measured on the live pages at 1440 / 1080 / 992 / 991 / 781 / 780 / 768 / 576 / 575 / 390 (fresh loads, no
+query strings: the source serves its 404 page for a query string). These values supersede §3, A.2 and E.2 where they
+differ. Blocks: `blocks/contact-directory`, `blocks/exec-bio`, the shared card in `scripts/person-card.js`; importer
+`transformers/skoda-company-people.js` (company importer).
+
+- **Row layout:** two cells from **781px** (SiteOrigin's switch, not 768): cells 574px of text, 40px apart. Below
+  781 one column, the cells **10px apart**. Each source row is its own `page-body` section (SKODA-813: 10px top,
+  text 20px in, 30px from 781). Rows under a group heading carry the source's `pull-up` row style, -20px from
+  768px (section style `pull-up`).
+- **Card:** the name is the identity paragraph's first line at **24px** on both pages (the source's
+  `font-size: 18pt` span; 36px line), the title lines 16/24, all 600. Names stay a bold paragraph, as on the
+  source (decision 2026-10-23: no h3). The portrait is the card's width at its own ratio (574x323 at 1440;
+  source `object-fit: fill`), 20px under the identity. E-mail and LinkedIn lines at the page-body rhythm (20px).
+  The LinkedIn icon is 25x25, floated, 10px before the link.
+- **Phones:** plain text (`t: +420 …`), as on the source. The §9 / E.5 `tel:` criterion is not built (origin parity).
+- **Board toggle:** `h2` "show more" (6 on the page, the source's heading outline), here a `button[aria-expanded]`
+  inside it. 68px bar: 10px under the portrait's 20px margin (30px), padding 24, 1px `#e4e4e4` top and bottom,
+  16/18 600, the icon font's `\e027` in a 32px round hit area (hover `#f1f1f1`), rotated 45° open (0.2s ease-in).
+  The card ends 10px under the closed bar. The panel slides open in 400ms (jQuery swing), 15 to 378px measured.
+- **Board panel:** photos 46px under the bar, 29px in (19 below 781); 16:9 tiles, 8px corners, the photo centred
+  at 102%, 20px apart; **1 column below 768, 2 from 768, 3 from 992** (not 576). The links 52px under the tiles
+  (24px lines, the CV / photo-set / press-release links all 600: the source's bold sits inside the links). Each
+  member's set: 6 / 9 / 4 / 13 / 9 / 1 photos.
+- **Measured result (closed and open):** Board: every heading, portrait and link box equal at all ten widths;
+  open panel equal (tiles, columns, links). Contacts: equal except the deviations below (at most 7px).
+
 ---
 
 # PART 2, Per-sub-type sub-specs

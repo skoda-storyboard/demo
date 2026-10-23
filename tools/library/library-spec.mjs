@@ -62,6 +62,12 @@ export const SPEC = {
       { class: 'gallery story', label: 'gallery, story', description: "A photo grid in a story's text: photos only (1 / 2 / 3 across), each opening the lightbox with its download sizes. Add rows collapse | auto for the \"Show more\" of a long set, and columns | 3." },
     ],
   },
+  'contact-directory': {
+    structure: 'single cell card repeating',
+    purpose: 'company contacts: person cards with e-mail, phone and LinkedIn',
+    description: 'One row per person, one cell, as on the source: the name and title in bold (one paragraph, the name its first line, shown larger), the portrait, the e-mail line (a phone after it as text: "t: +420 …") and an optional LinkedIn line with its small icon picture before the link. Two cards to a row from 781px, one below. Put each source row in its own section (Style "page-body") and the group headings (h2) between them.',
+    variants: [],
+  },
   embed: {
     structure: 'config or bare url',
     purpose: 'video / podcast embed',
@@ -77,6 +83,12 @@ export const SPEC = {
     variants: [
       { class: 'line', label: 'line', description: 'A blank line in the text (44px: one line and its paragraph gap), shown at every width.' },
     ],
+  },
+  'exec-bio': {
+    structure: 'card-panel repeating',
+    purpose: 'board members: person card with a show-more photo set and links',
+    description: 'One row per board member, two cells. Cell 1, the card: the name and roles in bold (one paragraph, the name its first line, shown larger), then the portrait. Cell 2, the "show more" panel: its label as the first paragraph, one paragraph per photo (each opens the lightbox over the set), then the links (CV, photo set, press release, LinkedIn). Two members to a row from 781px, one below. A row without cell 2 is a plain card; a panel without a label reads "show more".',
+    variants: [],
   },
   footnotes: {
     structure: 'single cell text',
@@ -184,6 +196,7 @@ export const SECTION_STYLES = [
   ['page-body', 'Generic page body (copyright, legal, utility pages): the text under the page title band.'],
   ['page-body, half', 'Generic page body rows set in the left half of the column from 781px wide (the copyright page).'],
   ['page-body, half, empty-cell', 'A half row whose empty right cell still takes 10px under the text on phones (the source widget).'],
+  ['page-body, pull-up', 'A row pulled 20px up into the one before from 768px wide (the Contacts rows under a group heading); combine with half where needed.'],
   ['sidebar', 'Story / release sidebar: newsletter card, Explore more, Tags.'],
   ['body-column, highlight-dark', 'Dark highlight box inside the article ("What has changed" lists).'],
   ['body-column, highlight-grey', 'Grey highlight box inside a press release (FAQ callout).'],

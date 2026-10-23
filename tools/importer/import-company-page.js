@@ -5,14 +5,16 @@
  * Import orchestrator: Škoda company / utility page (template-media-room-page).
  * e.g. /en/contacts/, /en/board-of-management/, /en/annual-reports/.
  *
- * FLATTEN-TO-DEFAULT: hero banner + the SiteOrigin `.entry-content` body flattened
- * to plain default content (headings + rich text survive). The per-member "show more"
- * photo galleries / download grids / the 5 named company sub-type blocks are NOT
- * reconstructed here — deferred to SKODA-810 (+ SKODA-604 full-fidelity). Metadata
- * template=page. Content-driven detection only.
+ * Hero banner + the SiteOrigin body, one `page-body` section per row (skoda-page-rows, the
+ * SKODA-813 shell). The people pages' card rows become blocks (skoda-company-people,
+ * SKODA-810a): `Contact Directory` (/en/contacts/) and `Exec Bio` with its "show more" photo
+ * set (/en/board-of-management/); their spacer widgets become `Spacer` sections. Any other
+ * row stays default content. Metadata template=page. Content-driven detection only.
  */
 
 import heroBannerParser from './parsers/hero-banner.js';
+import pageRowsTransformer from './transformers/skoda-page-rows.js';
+import companyPeopleTransformer from './transformers/skoda-company-people.js';
 import cleanupTransformer from './transformers/skoda-page-cleanup.js';
 import sectionsTransformer from './transformers/skoda-model-sections.js';
 import metadataTransformer from './transformers/skoda-metadata.js';
@@ -26,8 +28,8 @@ const parsers = {
 const PAGE_TEMPLATE = {
   name: 'company-page',
   description:
-    'Škoda company/utility page (template-media-room-page). Hero banner + .entry-content flattened to default content. Named sub-type blocks/galleries deferred to SKODA-810. Metadata template=page. Content-driven detection only.',
-  urls: ['https://www.skoda-storyboard.com/en/contacts/'],
+    'Škoda company/utility page (template-media-room-page). Hero banner + the SiteOrigin body as page-body rows; person-card rows → Contact Directory / Exec Bio, spacer widgets → Spacer (SKODA-810a). Metadata template=page. Content-driven detection only.',
+  urls: ['https://www.skoda-storyboard.com/en/contacts/', 'https://www.skoda-storyboard.com/en/board-of-management/'],
   metadata: { template: 'page' },
   blocks: [
     { name: 'hero-banner', instances: ['div.hero'] },
@@ -55,7 +57,11 @@ const PAGE_TEMPLATE = {
   ],
 };
 
+// the body's sections (before the cleanup drops the layout CSS), then the people rows (before
+// the cleanup drops their toggle and spacer widgets)
 const transformers = [
+  pageRowsTransformer,
+  companyPeopleTransformer,
   cleanupTransformer,
   ...(PAGE_TEMPLATE.sections && PAGE_TEMPLATE.sections.length > 1 ? [sectionsTransformer] : []),
   metadataTransformer,
@@ -92,7 +98,13 @@ function findBlocksOnPage(document, template) {
 
 export default {
   // keep the source's glued non-breaking spaces (html2md would turn them into spaces)
-  preprocess: ({ document }) => nbspTransformer('preprocess', document.body, { document }),
+  preprocess: ({ document }) => {
+    nbspTransformer('preprocess', document.body, { document });
+    // mark the half-width rows while the layout CSS is still there (SKODA-813)
+    pageRowsTransformer('preprocess', document.body, { document });
+    // keep a person's trailing blank line (`<br>&nbsp;`) before html2md drops it (SKODA-810a)
+    companyPeopleTransformer('preprocess', document.body, { document });
+  },
 
   transform: (payload) => {
     const { document, url, params } = payload;

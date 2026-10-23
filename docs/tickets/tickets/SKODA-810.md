@@ -63,3 +63,15 @@ Checked against the live source:
 - **Not covered here:** the MR nav **Company** menu also links **Brand Group CORE (BGC)** (`/en/brand-group-core-bgc/`, `page-template-default`), which moves to SKODA-843, and **Newsletter** (`/en/newsletter/`, `template-carousel-listing`), which moves to SKODA-845.
 - **Proposed split:** 810a contacts + board (exec-bio reuses the 807 accordion), then 810b app promo + company logo. The ticket is now 4 sub-types, not 5.
 - Census: [coverage matrix](../../planning/SKODA-PAGE-COVERAGE-MATRIX.md) §3.
+
+## SKODA-810a: Contacts + Board of Management (2026-10-23)
+- **Built** on the SKODA-813 page shell (branch `skoda-810a-contacts-board`, off PR #409): `contact-directory`
+  and `exec-bio` blocks with a shared person card (`scripts/person-card.js`), the importer transformer
+  `transformers/skoda-company-people.js` (in `import-company-page.js`), and the section style `page-body, pull-up`.
+- **Spec corrections** (re-measured, `company-pages.md` §11): the two-up switch is at 781px, not 768; Contacts
+  names are 24px like the board's; 6 board members (3 + 3); the photo grid is 1 / 2 / 3 across at 768 / 992;
+  phones stay plain text, as on the source.
+- **Not reused:** the `accordion` block (SKODA-807). Blocks can't import each other (AGENTS.md), and its heading,
+  spacing and panel insets differ from the board's. `exec-bio` builds the same h2 + button + region pattern and
+  the same 400ms slide itself. The photo lightbox is the shared `scripts/lightbox.js`.
+- **810b** (app promo, company logo) remains open.

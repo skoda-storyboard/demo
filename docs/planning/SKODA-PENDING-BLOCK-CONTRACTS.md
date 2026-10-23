@@ -68,6 +68,8 @@ These blocks have code on `main`, with the variants and config keys that code re
 | `footnotes` | – | – (SKODA-805d; see `footnotes` below) |
 | `promo-box` | – | curated rows **or** config (`index`, `template`, `path`, `category`, `tags`, `limit`, `sort`); never mixed (PR #110, merged) |
 | `newsletter-stub` | `card` (SKODA-823: the story-sidebar sign-up card, emitted by `transformers/skoda-story-aside.js`) | `label`, `placeholder`, `button`, `consent`, `manage`, `message`, `list`, `language` (footer, SKODA-305) + `image`, `heading`, `error`, `consent-error` (card); config only |
+| `contact-directory` | – | – (SKODA-810a: one row per person, one cell `[name + title in bold, portrait, e-mail (+ phone as text), LinkedIn icon + link]`, the source editor widget as is; emitted by `transformers/skoda-company-people.js`) |
+| `exec-bio` | – | – (SKODA-810a: one row per member, `[card, panel]`: the card as `contact-directory`'s (name + roles, portrait), the panel `[label, one picture paragraph per photo, the links]`; emitted by `transformers/skoda-company-people.js`) |
 | `search`, `fragment`, `header`, `footer`, `widget` | – | – |
 
 **`Cards (series-directory)`** (SKODA-207, 2026-09-27; the M2 series directory `/en/series-2`). One row per source card, in source order: `[<picture>, <h2><a href="/en/series/…">Title</a></h2><p>excerpt</p>]`. The title sits over the image and the excerpt below it (`cards.css`). Emitted by `parsers/series-grid.js`. Replaces the index `Listing` proposal (`Cards (overlay, series-directory)` in `series.md` §7): the variant has its own layout, so it doesn't combine with `overlay`.
@@ -412,13 +414,17 @@ Two findings from the first inventory (2026-09-25), both caught by the check:
 
 ### `page-body`
 - **Status:** `pinned` (2026-10-21) · **Ticket:** SKODA-813 · **Fallback:** readable (unstyled default content
-  under the band) · **Styles:** `page-body`, `page-body, half`, `page-body, half, empty-cell`
+  under the band) · **Styles:** `page-body`, `page-body, half`, `page-body, half, empty-cell`, `pull-up` (added
+  to either, SKODA-810a)
 - **Emitted by:** `transformers/skoda-page-rows.js` (page-base importer). One section per SiteOrigin row of the
   generic page's body, each closed by its `Section Metadata`; a body without rows is one `page-body` section.
+  `transformers/skoda-company-people.js` (company importer) adds `pull-up` to a row with the source's `pull-up`
+  row style, and gives a spacer widget its own section (`Spacer` 24px + `Spacer (line)` 10px).
 - **Shape:** `page-body`: the row's flattened default content (h2/h3/p/lists/links). `half`: the row held its
   text in the left cell of a 50/50 row, the right cell empty: from 781px the text keeps half the column less a
   40px gutter. `empty-cell`: that right cell held an empty widget rather than none, so on phones the source
-  stacks it under the text, 10px tall.
+  stacks it under the text, 10px tall. `pull-up`: the source pulls the row 20px up into the one before (its
+  `margin-top: -20px`, from 768px; the Contacts rows under a group heading).
 - **Runtime (styles.css):** every row 10px under the band or the row before; text 20px inside the column,
   30px from 781px; h2 40/45 and h3 24/27.6, wt300, 16px under; paragraphs 20px apart; green links, ink on hover.
 - **Example** (`/en/copyright/`): `page-body` (the h2 row), `page-body, half, empty-cell`, then 3 × `page-body,
